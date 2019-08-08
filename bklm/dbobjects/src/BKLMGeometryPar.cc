@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dbobjects/BKLMGeometryPar.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
@@ -187,22 +188,22 @@ void BKLMGeometryPar::read(const GearDir& content)
   }
 
   // values that depend on fb/sector/layer
-  for (int fb = BKLM_FORWARD; fb <= BKLM_BACKWARD; ++fb) {
-    bool isForward = (fb == BKLM_FORWARD);
+  for (int section = 0; section <= BKLMElementNumbers::getMaximalSectionNumber(); ++section) {
+    bool isForward = (section == BKLMElementNumbers::c_ForwardSection);
     for (int sector = 1; sector <= m_NSector; ++sector) {
       sprintf(name, "/Sectors/%s/Sector[@sector=\"%d\"]", (isForward ? "Forward" : "Backward"), sector);
       GearDir sectorContent(data);
       sectorContent.append(name);
-      m_SectorRotation[fb - 1][sector - 1] = sectorContent.getAngle("Phi");
+      m_SectorRotation[section][sector - 1] = sectorContent.getAngle("Phi");
       for (int layer = 1; layer <= m_NLayer; ++layer) {
         GearDir layerContent(sectorContent);
         sprintf(name, "/Layer[@layer=\"%d\"]", layer);
         layerContent.append(name);
-        m_LocalReconstructionShiftX[fb - 1][sector - 1][layer - 1] = layerContent.getLength("ReconstructionShift/X");
-        m_LocalReconstructionShiftY[fb - 1][sector - 1][layer - 1] = layerContent.getLength("ReconstructionShift/Y");
-        m_LocalReconstructionShiftZ[fb - 1][sector - 1][layer - 1] = layerContent.getLength("ReconstructionShift/Z");
+        m_LocalReconstructionShiftX[section][sector - 1][layer - 1] = layerContent.getLength("ReconstructionShift/X");
+        m_LocalReconstructionShiftY[section][sector - 1][layer - 1] = layerContent.getLength("ReconstructionShift/Y");
+        m_LocalReconstructionShiftZ[section][sector - 1][layer - 1] = layerContent.getLength("ReconstructionShift/Z");
         if (layer <= NSCINTLAYER) {
-          m_IsFlipped[fb - 1][sector - 1][layer - 1] = layerContent.getBool("Flip", false);
+          m_IsFlipped[section][sector - 1][layer - 1] = layerContent.getBool("Flip", false);
         }
       }
     }

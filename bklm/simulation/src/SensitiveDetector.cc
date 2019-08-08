@@ -113,7 +113,7 @@ namespace Belle2 {
         int plane = hist->GetCopyNumber(depth - DEPTH_PLANE);
         int layer = hist->GetCopyNumber(depth - DEPTH_LAYER);
         int sector = hist->GetCopyNumber(depth - DEPTH_SECTOR);
-        int section = (hist->GetCopyNumber(depth - DEPTH_SECTION) == BKLM_FORWARD) ? 1 : 0;
+        int section = hist->GetCopyNumber(depth - DEPTH_SECTION);
         int moduleID =
           int(BKLMElementNumbers::moduleNumber(section, sector, layer))
           | BKLM_MC_MASK;

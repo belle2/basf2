@@ -76,7 +76,7 @@ int BKLMElementNumbers::getNStrips(
   int section, int sector, int layer, int plane)
 {
   int strips = 0;
-  if (section == 0 && sector == 3 && plane == 0) {
+  if (section == BKLMElementNumbers::c_BackwardSection && sector == 3 && plane == 0) {
     /* Chimney sector. */
     if (layer < 3)
       strips = 38;

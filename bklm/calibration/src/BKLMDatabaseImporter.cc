@@ -58,10 +58,18 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
     int sector = bklmPlane.getSector();
     int layer = bklmPlane.getLayer();
     int plane = bklmPlane.getPlane();
-    if (section == 1 && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 1 + BKLM_ID;
-    if (section == 1 && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 2 + BKLM_ID;
-    if (section == 0 && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 3 + BKLM_ID;
-    if (section == 0 && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 4 + BKLM_ID;
+    if (section == BKLMElementNumbers::c_ForwardSection) {
+      if (sector == 3 || sector == 4 || sector == 5 || sector == 6)
+        copperId = 1 + BKLM_ID;
+      if (sector == 1 || sector == 2 || sector == 7 || sector == 8)
+        copperId = 2 + BKLM_ID;
+    }
+    if (section == BKLMElementNumbers::c_BackwardSection) {
+      if (sector == 3 || sector == 4 || sector == 5 || sector == 6)
+        copperId = 3 + BKLM_ID;
+      if (sector == 1 || sector == 2 || sector == 7 || sector == 8)
+        copperId = 4 + BKLM_ID;
+    }
     if (sector == 3 || sector == 4 || sector == 5 || sector == 6) slotId = sector - 2;
     if (sector == 1 || sector == 2) slotId = sector + 2;
     if (sector == 7 || sector == 8) slotId = sector - 6;
@@ -78,8 +86,12 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
                         section, sector, layer, plane);
 
     bool dontFlip = false;
-    if (section == 1 && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2)) dontFlip = true;
-    if (section == 0 && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
+    if (section == BKLMElementNumbers::c_ForwardSection &&
+        (sector == 7 ||  sector == 8 || sector == 1 || sector == 2))
+      dontFlip = true;
+    if (section == BKLMElementNumbers::c_BackwardSection &&
+        (sector == 4 ||  sector == 5 || sector == 6 || sector == 7))
+      dontFlip = true;
 
     for (int iStrip = 1; iStrip <= MaxiChannel; iStrip++) {
       int channelId = iStrip;
@@ -90,7 +102,8 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
         if (layer == 2)  channelId = channelId + 2;
       } else if (plane == 0) { //z strips
         if (layer < 3) { //scintillator
-          if (section == 0 && sector == 3) { //sector #3 is the top sector, backward sector#3 is the chimney sector.
+          if (section == BKLMElementNumbers::c_BackwardSection
+              && sector == 3) { //sector #3 is the top sector, backward sector#3 is the chimney sector.
             if (layer == 1) {
               if (channelId > 0 && channelId < 9) channelId = 9 - channelId;
               else if (channelId > 8 && channelId < 24) channelId = 54 - channelId;

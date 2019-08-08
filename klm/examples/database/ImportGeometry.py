@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Create EKLM geometry payloads.
+# Create KLM geometry payloads.
+# Note that GeoConfiguration created by this script should not be used except
+# for testing, because it contains the KLM only.
 
 import os
 import random

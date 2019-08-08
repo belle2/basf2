@@ -8,6 +8,7 @@
 *  This software is provided "as is" without any warranty.               *
 *************************************************************************/
 
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/geometry/GeoBKLMCreator.h>
 #include <bklm/simulation/SensitiveDetector.h>
 #include "bklm/dbobjects/BKLMGeometryPar.h"
@@ -149,13 +150,13 @@ namespace Belle2 {
                             "BKLM.F_Logical"
                            );
       frontLogical->SetVisAttributes(m_VisAttributes.front()); // invisible
-      putSectorsInEnd(frontLogical, BKLM_FORWARD);
+      putSectorsInEnd(frontLogical, BKLMElementNumbers::c_ForwardSection);
       new G4PVPlacement(G4TranslateZ3D(m_SectorDz),
                         frontLogical,
                         "BKLM.F_Physical",
                         envelopeLogical,
                         false,
-                        BKLM_FORWARD,
+                        BKLMElementNumbers::c_ForwardSection,
                         false
                        );
       G4LogicalVolume* backLogical =
@@ -164,19 +165,19 @@ namespace Belle2 {
                             "BKLM.B_Logical"
                            );
       backLogical->SetVisAttributes(m_VisAttributes.front()); // invisible
-      putSectorsInEnd(backLogical, BKLM_BACKWARD);
+      putSectorsInEnd(backLogical, BKLMElementNumbers::c_BackwardSection);
       new G4PVPlacement(G4TranslateZ3D(-m_SectorDz) * G4RotateY3D(M_PI),
                         backLogical,
                         "BKLM.B_Physical",
                         envelopeLogical,
                         false,
-                        BKLM_BACKWARD,
+                        BKLMElementNumbers::c_BackwardSection,
                         false
                        );
 
     }
 
-    void GeoBKLMCreator::putSectorsInEnd(G4LogicalVolume* endLogical, int fb)
+    void GeoBKLMCreator::putSectorsInEnd(G4LogicalVolume* endLogical, int section)
     {
       if (m_SectorTube == NULL) {
         m_SectorTube =
@@ -190,22 +191,22 @@ namespace Belle2 {
       }
       char name[80] = "";
       for (int s = 0; s < m_GeoPar->getNSector(); ++s) {
-        int sector = (fb == BKLM_FORWARD ? s : ((12 - s) % 8)) + 1;
-        bool hasChimney = (fb == BKLM_BACKWARD) && (sector == CHIMNEY_SECTOR);
+        int sector = (section == BKLMElementNumbers::c_ForwardSection ? s : ((12 - s) % 8)) + 1;
+        bool hasChimney = (section == BKLMElementNumbers::c_BackwardSection) && (sector == CHIMNEY_SECTOR);
         bool hasInnerSupport = (sector <= m_GeoPar->getNSector() / 2 + 1);
-        sprintf(name, "BKLM.%sSector%dLogical", (fb == BKLM_FORWARD ? "Forward" : "Backward"), sector);
-        m_SectorLogical[fb - 1][sector - 1] =
+        sprintf(name, "BKLM.%sSector%dLogical", (section == BKLMElementNumbers::c_ForwardSection ? "Forward" : "Backward"), sector);
+        m_SectorLogical[section][sector - 1] =
           new G4LogicalVolume(m_SectorTube,
                               Materials::get("G4_AIR"),
                               name
                              );
-        m_SectorLogical[fb - 1][sector - 1]->SetVisAttributes(m_VisAttributes.front()); // invisible
-        putCapInSector(m_SectorLogical[fb - 1][sector - 1], hasChimney);
-        putInnerRegionInSector(m_SectorLogical[fb - 1][sector - 1], hasInnerSupport, hasChimney);
-        putLayersInSector(m_SectorLogical[fb - 1][sector - 1], fb, sector, hasChimney);
+        m_SectorLogical[section][sector - 1]->SetVisAttributes(m_VisAttributes.front()); // invisible
+        putCapInSector(m_SectorLogical[section][sector - 1], hasChimney);
+        putInnerRegionInSector(m_SectorLogical[section][sector - 1], hasInnerSupport, hasChimney);
+        putLayersInSector(m_SectorLogical[section][sector - 1], section, sector, hasChimney);
         new G4PVPlacement(G4RotateZ3D(m_SectorDphi * s),
-                          m_SectorLogical[fb - 1][sector - 1],
-                          physicalName(m_SectorLogical[fb - 1][sector - 1]),
+                          m_SectorLogical[section][sector - 1],
+                          physicalName(m_SectorLogical[section][sector - 1]),
                           endLogical,
                           false,
                           sector,
@@ -499,7 +500,7 @@ namespace Belle2 {
       }
     }
 
-    void GeoBKLMCreator::putLayersInSector(G4LogicalVolume* sectorLogical, int fb, int sector, bool hasChimney)
+    void GeoBKLMCreator::putLayersInSector(G4LogicalVolume* sectorLogical, int section, int sector, bool hasChimney)
     {
 
       const double dz = 0.5 * m_GeoPar->getGapLength() * CLHEP::cm;
@@ -521,7 +522,7 @@ namespace Belle2 {
                             2, z, rInner, rOuter
                            );
         }
-        const Module* module = m_GeoPar->findModule(fb == BKLM_FORWARD, sector, layer);
+        const Module* module = m_GeoPar->findModule(section == BKLMElementNumbers::c_ForwardSection, sector, layer);
         bool isFlipped = module->isFlipped();
         int newLvol = NLAYER * ((isFlipped ? 2 : 0) + (hasChimney ? 1 : 0)) + (layer - 1);
         int s1 = sector - 1;
@@ -540,7 +541,7 @@ namespace Belle2 {
                                 name
                                );
           m_LayerIronLogical[newLvol]->SetVisAttributes(m_VisAttributes.front()); // invisible
-          putModuleInLayer(m_LayerIronLogical[newLvol], fb, sector, layer, hasChimney, isFlipped, newLvol);
+          putModuleInLayer(m_LayerIronLogical[newLvol], section, sector, layer, hasChimney, isFlipped, newLvol);
           if (hasChimney) {
             putChimneyInLayer(m_LayerIronLogical[newLvol], layer);
           }
@@ -694,7 +695,7 @@ namespace Belle2 {
                        );
     }
 
-    void GeoBKLMCreator::putModuleInLayer(G4LogicalVolume* layerIronLogical, int fb, int sector, int layer, bool hasChimney,
+    void GeoBKLMCreator::putModuleInLayer(G4LogicalVolume* layerIronLogical, int section, int sector, int layer, bool hasChimney,
                                           bool isFlipped, int newLvol)
     {
       const CLHEP::Hep3Vector gapHalfSize = m_GeoPar->getGapHalfSize(layer, hasChimney) * CLHEP::cm;
@@ -739,7 +740,7 @@ namespace Belle2 {
         if (m_GeoPar->hasRPCs(layer)) {
           putRPCsInInterior(interiorLogical, layer, hasChimney);
         } else {
-          putScintsInInterior(interiorLogical, fb, sector, layer, hasChimney);
+          putScintsInInterior(interiorLogical, section, sector, layer, hasChimney);
         }
         new G4PVPlacement(G4TranslateZ3D(0.0),
                           interiorLogical,
@@ -775,7 +776,7 @@ namespace Belle2 {
         dx = -dx;
       }
       double dz = moduleHalfSize.z() - gapHalfSize.z();
-      G4Transform3D displacedGeo = m_GeoPar->getModuleDisplacedGeo(fb == BKLM_FORWARD, sector, layer);
+      G4Transform3D displacedGeo = m_GeoPar->getModuleDisplacedGeo(section == BKLMElementNumbers::c_ForwardSection, sector, layer);
       new G4PVPlacement(G4Translate3D(dx, 0.0, dz) * G4RotateZ3D(isFlipped ? M_PI : 0.0) * displacedGeo,
                         m_LayerModuleLogical[modLvol],
                         physicalName(m_LayerModuleLogical[modLvol]),
@@ -856,7 +857,7 @@ namespace Belle2 {
                        );
     }
 
-    void GeoBKLMCreator::putScintsInInterior(G4LogicalVolume* interiorLogical, int fb, int sector, int layer, bool hasChimney)
+    void GeoBKLMCreator::putScintsInInterior(G4LogicalVolume* interiorLogical, int section, int sector, int layer, bool hasChimney)
     {
       char name[80] = "";
       sprintf(name, "BKLM.Layer%02d%sAirSolid", layer, (hasChimney ? "Chimney" : ""));
@@ -889,7 +890,7 @@ namespace Belle2 {
       double scintHalfWidth  = m_GeoPar->getScintHalfWidth() * CLHEP::cm;
 
       int envelopeOffsetSign = m_GeoPar->getScintEnvelopeOffsetSign(layer);
-      const Module* module = m_GeoPar->findModule(fb == BKLM_FORWARD, sector, layer);
+      const Module* module = m_GeoPar->findModule(section == BKLMElementNumbers::c_ForwardSection, sector, layer);
       for (int scint = 1; scint <= m_GeoPar->getNPhiScints(layer); ++scint) {
         double scintHalfLength = module->getPhiScintHalfLength(scint) * CLHEP::cm;
         double scintPosition   = module->getPhiScintPosition(scint) * CLHEP::cm;

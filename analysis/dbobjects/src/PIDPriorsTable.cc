@@ -29,7 +29,7 @@ void PIDPriorsTable::setBinEdges(std::vector<float>binEdgesX, std::vector<float>
       edges = { -FLT_MAX, FLT_MAX};
     }
     auto prevVal = edges[0];
-    for (int iBin = 1; iBin < (int)edges.size(); iBin++) {
+    for (int iBin = 1; iBin < static_cast<int>(edges.size()); iBin++) {
       auto edge = edges[iBin];
       if (prevVal >= edge)
         B2FATAL("Null or negative bin size found on the X axis. Please make sure that all the bin edges are sorted and non-equal");
@@ -115,7 +115,7 @@ void  PIDPriorsTable::printPrior() const
   std::cout << " " << std::endl;
   std::cout << " Values " << std::endl;
   for (int iY = m_binEdgesY.size() - 2; iY >= 0; iY--) {
-    for (int iX = 0; iX < (int)m_binEdgesX.size() - 1; iX++) {
+    for (int iX = 0; iX < static_cast<int>(m_binEdgesX.size() - 1); iX++) {
       std::cout << " " << getPriorInBin(iX, iY) << " ";
     }
     std::cout << " " << std::endl;
@@ -141,7 +141,7 @@ void  PIDPriorsTable::printError() const
   std::cout << " " << std::endl;
   std::cout << " Values " << std::endl;
   for (int iY = m_binEdgesY.size() - 2; iY >= 0; iY--) {
-    for (int iX = 0; iX < (int)m_binEdgesX.size() - 1; iX++) {
+    for (int iX = 0; iX < static_cast<int>(m_binEdgesX.size() - 1); iX++) {
       std::cout << " " << getErrorInBin(iX, iY) << " ";
     }
     std::cout << " " << std::endl;
@@ -176,13 +176,14 @@ short PIDPriorsTable::findBinFast(float value, std::vector<float> array) const
   // value. First it starts assuming the bins are equal, and then moves around
   // the array until the correct bin is found
   float averageBinSize = (array.back() - array.front()) / (array.size() - 1);
-  int bin = 1 + (int)((value - array[0]) / averageBinSize);
+  short bin = 1 + (short)((value - array[0]) / averageBinSize);
   //adjusts forward
-  while (array[bin] < value && bin < (int)array.size()) {
+
+  while (bin < static_cast<short>(array.size()) && array[bin] < value) {
     bin++;
   }
   //adjusts backward
-  while (array[bin - 1] > value && bin - 1 >  0) {
+  while (bin - 1 >  0 && array[bin - 1] > value) {
     bin--;
   }
   return bin - 1;
@@ -192,5 +193,5 @@ short PIDPriorsTable::findBinFast(float value, std::vector<float> array) const
 short PIDPriorsTable::findBinWithFixedWidth(float val, std::vector<float> array) const
 {
   float binWidth = (array.back() - array.front()) / (array.size() - 1.);
-  return (int)((val - array.back()) / binWidth);
+  return (short)((val - array.back()) / binWidth);
 };

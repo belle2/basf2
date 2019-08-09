@@ -5,7 +5,7 @@ Standard Particles
 
 .. warning:: 
         At the moment, the standard particle lists are **not** recommended for use with recent data processings.
-        This will improve, but for now we recommend only using the standard charged lists in MC studies and for benchmarking.
+        This will improve, but for now we recommend only using the lists in MC studies and for benchmarking.
 
 The goal is that the standard particle lists will provide recommended selection criteria for final-state particles, and in some cases, for composite particles.
 The recommended selections will be provided by the performance group(s).

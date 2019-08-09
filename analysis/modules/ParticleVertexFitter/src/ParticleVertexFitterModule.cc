@@ -1059,8 +1059,9 @@ namespace Belle2 {
       }
     }
 
-    PCmsLabTransform T;
-    double rotationangle = (m_beamParams->getHER()).Vect().Angle(-1.0 * (m_beamParams->getLER()).Vect()) / 2.;
+    //Hardcoded: half of the crossing angle, taken from BeamParameters .
+    //TO DO: use an actual measurement.
+    double rotationangle = 0.083 / 2;
 
     TLorentzVector iptube_mom(0., 0., 1e10, 1e10);
     iptube_mom.RotateX(0.);

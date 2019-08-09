@@ -31,7 +31,7 @@ tntuple.SetAlias('Description', "This is a description test. "
                  "because e.g. \\theta will be interpreted as [tab]heta.")
 tntuple.SetAlias('Check', "This is the check text.")
 tntuple.SetAlias('Contact', "Name of the contact person.")
-tntuple.SetAlias('MetaOptions', "shifter, some_meta_options")
+tntuple.SetAlias('MetaOptions', "some_meta_options")
 
 # Overwrite the former TNtuple if one was there
 tntuple.Write()
@@ -43,7 +43,7 @@ gausH.FillRandom("gaus", 5000)
 gausH.GetListOfFunctions().Add(TNamed('Description', "xlog"))
 gausH.GetListOfFunctions().Add(TNamed('Check', "Gaus Histogram Check"))
 gausH.GetListOfFunctions().Add(TNamed('Contact', "Gaus Histogram Contact"))
-gausH.GetListOfFunctions().Add(TNamed('MetaOptions', "shifter, logx, nostats"))
+gausH.GetListOfFunctions().Add(TNamed('MetaOptions', "logx, nostats"))
 
 gausH.Write()
 
@@ -74,7 +74,7 @@ for i in range(10000):
 hist2d.GetListOfFunctions().Add(TNamed('Description', "Some 2D Histogram"))
 hist2d.GetListOfFunctions().Add(TNamed('Check', "Check For Something"))
 hist2d.GetListOfFunctions().Add(TNamed('Contact', "Contact Someone"))
-hist2d.GetListOfFunctions().Add(TNamed('MetaOptions', "shifter, contz"))
+hist2d.GetListOfFunctions().Add(TNamed('MetaOptions', "contz"))
 
 hist2d.Write()
 
@@ -97,7 +97,7 @@ teff.SetName("TEfficiency")
 teff.GetListOfFunctions().Add(TNamed('Description', "Efficiency plot of something"))
 teff.GetListOfFunctions().Add(TNamed('Check', "Check For Something"))
 teff.GetListOfFunctions().Add(TNamed('Contact', "Contact Someone"))
-teff.GetListOfFunctions().Add(TNamed('MetaOptions', "shifter"))
+teff.GetListOfFunctions().Add(TNamed('MetaOptions', ""))
 
 teff.Write()
 
@@ -117,7 +117,7 @@ graph_err.SetName("TGraphErrors")
 graph_err.GetListOfFunctions().Add(TNamed('Description', "TGraphErrors plot of something"))
 graph_err.GetListOfFunctions().Add(TNamed('Check', "Check For Something"))
 graph_err.GetListOfFunctions().Add(TNamed('Contact', "Contact Someone"))
-graph_err.GetListOfFunctions().Add(TNamed('MetaOptions', "shifter"))
+graph_err.GetListOfFunctions().Add(TNamed('MetaOptions', ""))
 
 graph_err.Write()
 

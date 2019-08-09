@@ -97,10 +97,10 @@ Users can use new DecayStringGrammar to set properties the particle. Then `isSig
 Once DecayStringGrammar is used with `reconstructDecay`, users can use `isSignal` instead of several specific variables such as `isSignalAcceptMissingNeutrino`.
 If one don't use any new DecayStringGrammar, all MCTruthVariables work same as before.
 
-This grammar is useful to analyze inclusive processes with both fully-inclusive-method and sum-of-exclusive method. 
+This grammar is useful to analyze inclusive processes with both fully-inclusive-method and sum-of-exclusive-method. 
 There are also new helper functions `genNMissingDaughter(PDG)` and `genNStepsToDaughter(i)` to obtain the detailed MC information.
 
-You can find examples of usage in :doc:`Marker of unspecified particle`, :doc:`Grammar for custom MCMatching`.
+You can find examples of usage in :ref:`Marker_of_unspecified_particle`, :ref:`Grammar_for_custom_MCMatching`.
 
 .. Now let's add the detailed changes for the analysis package first, that's
    what user will want to see

@@ -34,6 +34,8 @@ This line selectes B+, anti-D0 and pi+ from the anti-D0 decay:
 
 :code:`'^B+ -> [^anti-D0 -> K- ^pi+] pi^+'`
 
+.. _Marker_of_unspecified_particle:
+
 Marker of unspecified particle
 ------------------------------
 
@@ -54,13 +56,19 @@ Here is an example of use:
 
 	reconstructDecay('B0:Xsdee -> Xsd:comb e+:loose e-:loose', '', path=mypath)
 
+.. _Grammar_for_custom_MCMatching:
+
 Grammar for custom MCMatching
 -----------------------------
-One can use the grammar for decay string to configure how :code:`isSignal` is behaving. The grammar is composed of :doc:`Keywords` and :doc:`Arrows`. By default, :code:`'isSignal'` requires that all final state particle daughters are correctly reconstructed except radiated photon and intermediate state. One can make :code:`isSignal` accept missing some particles or do not accept missing radiated photon or intermediate resonances.
+One can use a specific grammar for the decay string to configure how :code:`isSignal` is behaving. The grammar is composed of :ref:`Keywords` and :ref:`Arrows`. 
+By default, :code:`'isSignal'` requires that all final state particle daughters are correctly reconstructed except for radiated photons and intermediate states. 
+One can configure :code:`isSignal` to accept missing particles or not to accept missing radiated photons or intermediate resonances.
+
+.. _Keywords:
 
 Keywords
 ^^^^^^^^
-If one put following keywords at the end of decay string, :code:`'isSignal'` will accept missing massive particle/neutrino/gamma(not radiated), respectively.  
+If one put the following keywords at the end of the decay string, :code:`'isSignal'` will accept missing massive particles/neutrinos/gammas(not radiated), respectively.  
 
 * :code:`'...'` Missing massive final state particles are ignored
 * :code:`'?nu'` Missing neutrinos are ignored
@@ -84,6 +92,8 @@ Keywords must be placed at the end of the decay string. It is not allowed to put
 	# isSignal of Xsu:missMassive accepts missing massive FSP and gamma (such as pi0 -> gamma gamma)
 	reconstructDecay('B+:inclusive    -> mu-:loose ... ?nu ?gamma',    '', path=mypath)
 	# isSignal of B+:inclusive accepts missing massive FSP, neutrino, and gamma. 
+
+.. _Arrows:
 
 Arrows
 ^^^^^^

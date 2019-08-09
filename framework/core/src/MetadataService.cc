@@ -11,9 +11,8 @@
 #include <framework/core/MetadataService.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/Utils.h>
 #include <fstream>
-#include <boost/process.hpp>
-#include <TMD5.h>
 
 #include <iostream>
 
@@ -42,14 +41,11 @@ void MetadataService::addRootOutputFile(const std::string& fileName, const FileM
   }
 
   try {
-    boost::process::ipstream out;
-    boost::process::system(boost::process::search_path("b2file-check"), "--json", fileName, boost::process::std_out > out);
-    nlohmann::json checks;
-    out >> checks;
-    file_json.merge_patch(checks);
+    std::string check = Utils::getCommandOutput("b2file-check --json " + fileName);
+    file_json.merge_patch(nlohmann::json::parse(check));
   } catch (...) {}
 
-  file_json["checksums"]["md5"] = TMD5::FileChecksum(fileName.c_str())->AsString();
+  file_json["checksums"]["md5"] = FileSystem::calculateMD5(fileName);
   // no sha256 yet
 
   m_json["output_files"].push_back(file_json);

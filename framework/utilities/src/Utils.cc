@@ -83,4 +83,17 @@ namespace Belle2::Utils {
     double elapsed = (getClock() - m_startTime) / Unit::ms;
     B2INFO(m_text << " " << std::fixed << std::setprecision(3) << elapsed << " ms");
   }
+
+  std::string getCommandOutput(const std::string& command)
+  {
+    std::string result;
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command.c_str(), "r"), pclose);
+    if (pipe) {
+      std::array<char, 256> buffer;
+      while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+        result += buffer.data();
+      }
+    }
+    return result;
+  }
 }

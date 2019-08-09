@@ -106,7 +106,7 @@ add_properties(
         'Check': "Expert Histogram Check. Should only appear if expert button"
                  "was checked.",
         'Contact': "Expert Histogram Contact",
-        'MetaOptions': "shifter, logy, nostats, C, expert"
+        'MetaOptions': "logy, nostats, C"
     }
 )
 

@@ -61,7 +61,7 @@ mop_expert = {
     'MetaOptions': "pvalue-error=0.6"
 }
 mop_shifter = mop_expert.copy()
-mop_shifter['MetaOptions'] += ", expert"
+mop_shifter['MetaOptions'] += ", shifter"
 
 generate_reference = False
 

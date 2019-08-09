@@ -73,6 +73,11 @@ def validation_metadata_set(obj: ROOT.TObject, title: str, contact: str,
         ylabel (str): If given try to set this as the label for the y axis
         metaoptions (str): Metaoptions (additional options to influence the
             comparison between revisions, styling of the plot, etc.)
+
+    .. note::
+
+        Different ways to specify LaTeX for different arguments:
+        see `create_validation_histograms`
     """
     obj.SetTitle(title)
     # For ntuples we add the metadata as aliases ...
@@ -130,6 +135,11 @@ def validation_metadata_update(
         ylabel (str): If given try to set this as the label for the y axis
         metaoptions (str): Metaoptions (additional options to influence the
             comparison between revisions, styling of the plot, etc.)
+
+    .. note::
+
+        Different ways to specify LaTeX for different arguments:
+        see `create_validation_histograms`
     """
 
     opened = False
@@ -246,6 +256,14 @@ def create_validation_histograms(
             description, check_for [, xlabel [, ylabel [, metaoptions]]]``
         description: Common description/information of/about all plots in this
             ROOT file (will be displayed above the plots)
+
+    .. note::
+
+        Different ways to specify LaTeX: ``xlabel``, ``ylabel``, ``title``:
+        ROOT style "Einstein-Pythagoras a^{2} + b^{2} = #frac{E}{m}".
+        ``description``, ``check_for``, (file) ``description``: LaTeX style
+        (with escaped backslashes):
+        "Einstein-Pythagoras a^2 + b^2 = \\frac{E}{m}".
     """
     if isinstance(rootfile, pathlib.PurePath):
         rootfile = str(rootfile)

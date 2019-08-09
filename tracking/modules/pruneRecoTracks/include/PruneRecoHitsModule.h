@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2012 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Hauth                                             *
+ * Contributors: Thomas Hauth, Sasha Glazov                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,19 +14,16 @@
 #include <tracking/dataobjects/RecoHitInformation.h>
 
 /**
- * This module calls RecoTrack::prune to remove hits before
- * the track gets stored to disk to save storage space.
- * By default, this module will remove all but the first and last hits of
- * the track.
+ * This module prunes all reco hits marked as being to be pruned but PruneRecoTracksmodule
  */
 
 namespace Belle2 {
   /// Module to prune RecoTracks.
-  class PruneRecoTracksModule : public Module {
+  class PruneRecoHitsModule : public Module {
 
   public:
     /// Constructor of the module. Setting up parameters and description.
-    PruneRecoTracksModule();
+    PruneRecoHitsModule();
 
     // Declare required StoreArray
     void initialize() override;
@@ -35,14 +32,9 @@ namespace Belle2 {
     void event() override;
 
   private:
-    /// Name of the StoreArray to prune.
-    std::string m_storeArrayName = "RecoTracks";
 
     /// We use SelectSubset here to delete all pruned RecoHitInformation.
     SelectSubset<RecoHitInformation> m_subsetOfUnprunedRecoHitInformation;
-
-    /// Remove pruned reco hits or leave this for PruneRecoHitsModule
-    bool m_do_remove_hits{false};
 
   }; // end class
 } // end namespace Belle2

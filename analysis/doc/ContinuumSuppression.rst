@@ -133,12 +133,3 @@ While in the DCS tutorial there is an Adverserial Network for every signal and
 background distribution for every quantity (which is put in as a spectator),
 one should limit the number of Adversarial Networks to only those distributions
 which are correlated.
-
-
-
-
-..
-  Documentation about continuum suppression framework is not yet migrated from our `confluence page <https://confluence.desy.de/display/BI/Continuum+Suppression+Framework>`_. Please go there.
-  If you have time to do the migration, feel free to take `agira ticket <https://agira.desy.de/browse/BII-2978>`_. In this case you might need nice guid on Sphinx documentation: :ref:`doctools` .
-
-

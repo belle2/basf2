@@ -29,7 +29,9 @@ namespace Belle2 {
    */
   class PIDPriors : public TObject {
 
-
+    /**
+     * Class revision number
+     */
     ClassDef(PIDPriors, 1);
 
 

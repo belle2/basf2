@@ -4,14 +4,28 @@
 MC matching
 -----------
 
+~~~~~~~~~~~~~~~~~~~~~~
+First, you must run it
+~~~~~~~~~~~~~~~~~~~~~~
+MCMatching relates `Particle` and `MCParticle` objects. 
+
+Most MC matching variables will have non-trivial values only if the :b2:mod:`MCMatching` module is actually executed.
+It can be executed by adding the module to your path, there is a `modularAnalysis.matchMCTruth` convenience function to do this.
+
+.. important:: To get non-trivial MC info, you need to match MC-level and reconstruction-level informtion by adding
+ :b2:mod:`MCMatching` to your path. You can use `modularAnalysis.matchMCTruth` convenience function to do this.
 
 ~~~~
 Core
 ~~~~
 
-MC matching at in Belle II returns two important pieces of information: the true PDG id of the particle (``mcPDG``), and an error flag (``mcErrors``). 
+MC matching at in Belle II returns two important pieces of information: 
+the true PDG id of the particle :b2:var:`mcPDG`, 
+and an error flag :b2:var:`mcErrors`. 
 
-Both variables will have non-trivial values only if the MCMatching module, which relates composite Particle(s) and MCParticle(s), is executed. mcPDG is set to the PDG code of the first common mother MCParticle of the daughters of this Particle.
+Both variables will have non-trivial values only if the MCMatching module, 
+which relates composite `Particle` (s) and `MCParticle` (s), is executed. 
+:b2:var:`mcPDG` is set to the PDG code of the first common mother `MCParticle` of the daughters of this `Particle`.
 
 
 .. b2-variables::
@@ -25,14 +39,22 @@ Convenience
 There are several extra variables defined *for your convenience*, however all information is contained in the first two.
 
 .. b2-variables::
-        :variables: isSignal,isExtendedSignal,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
+        :variables: isSignal,isExtendedSignal,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,
+                    isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,
+                    isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
         :noindex:
 
 ~~~~~~~~~~~~~~~
 The error flags
 ~~~~~~~~~~~~~~~
 
-The error flag (mcErrors) is a bit set where each bit flag describes a different kind of discrepancy between reconstruction and MCParticle. The individual flags are described by the MCMatching::MCErrorFlags enum. A value of mcErrors equal to 0 indicates perfect reconstruction (signal). Usually candidates with only FSR photons missing are also considered as signal, so you might want to ignore the corresponding c_MissFSR flag. The same is true for c_MissingResonance, which is set for any missing composite particle (e.g. K_1, but also D*0).
+The error flag :b2:var:`mcErrors` is a bit set where each bit flag describes
+ a different kind of discrepancy between reconstruction and `MCParticle`. 
+ The individual flags are described by the `MCMatching::MCErrorFlags` enum. 
+ A value of mcErrors equal to 0 indicates perfect reconstruction (signal). 
+ Usually candidates with only FSR photons missing are also considered as signal, 
+ so you might want to ignore the corresponding `c_MissFSR` flag. 
+ The same is true for `c_MissingResonance`, which is set for any missing composite particle (e.g. K_1, but also D*0).
 
 
 =============================  ================================================================================================
@@ -62,14 +84,19 @@ Flag                           Explanation
 Example of use
 ~~~~~~~~~~~~~~
 
-The two variables together allow the user not only to distinguish signal (correctly reconstructed) and background (incorrectly reconstructed) candidates, but also to study and identify various types of physics background (e.g. mis-ID, partly reconstructed decays, ...). To select candidates that have a certain flag set, you can use bitwise and to select only this flag from mcErrors and check if this value is non-zero: ``(mcErrors & MCMatching::c_MisID) != 0``.
-For use in a TTree selector, you'll need to use the integer value of the flag instead:
+The two variables together allow the user not only to distinguish signal (correctly reconstructed) 
+and background (incorrectly reconstructed) candidates, but also to study and identify various types of physics background 
+(e.g. mis-ID, partly reconstructed decays, ...). 
+To select candidates that have a certain flag set, you can use bitwise and to select only this flag from :b2:var:`mcErrors` 
+and check if this value is non-zero: ``(mcErrors & MCMatching::c_MisID) != 0`` .
+For use in a `TTree` selector, you'll need to use the integer value of the flag instead:
 
 .. code-block:: cpp
 
         ntuple->Draw("M", "(mcErrors & 128) != 0")
 
-You can also make use of ``MCMatching::explainFlags()``` which prints a human-readable list of flags present in a given bitset. Can also be used in both C++ and python:
+You can also make use of ``MCMatching::explainFlags()`` which prints a human-readable 
+list of flags present in a given bitset. Can also be used in both C++ and python:
 
 .. code-block:: python
 
@@ -79,7 +106,8 @@ You can also make use of ``MCMatching::explainFlags()``` which prints a human-re
         print(Belle2.MCMatching.explainFlags(a_weird_mcError_number)) 
 
 
-If instead only binary decision (1 = signal, 0 = background) is needed, then it for convenience one can use ``isSignal`` (or ``isSignalAcceptMissingNeutrino`` for semileptonic decays).
+If instead only binary decision (1 = signal, 0 = background) is needed, 
+then it for convenience one can use :b2:var:`isSignal` (or :b2:var:`isSignalAcceptMissingNeutrino` for semileptonic decays).
 
 .. code-block:: python
         
@@ -93,11 +121,11 @@ assuming you have reconstructed :code:`X -> Y Z` :
         from modularAnalysis import applyCuts
         applyCuts('X:myCandidates', 'isSignal==1')
 
---------------------------------------
-MC decay finder module `MCDecayFinder`
---------------------------------------
+----------------------------------------------
+MC decay finder module :b2:mod:`MCDecayFinder`
+----------------------------------------------
 
-Analysis module to search for a given decay in the list of generated particles (MCParticle).
+Analysis module to search for a given decay in the list of generated particles `MCParticle`.
 
 The module can be used for:
 
@@ -148,15 +176,22 @@ Using decay hashes
 
 The use of decay hashes is demonstrated in :code:`B2A502-WriteOutDecayHash.py` and :code:`B2A503-ReadDecayHash.py`.
 
-B2A502-WriteOutDecayHash.py creates one ROOT file, via `variablesToNtuple` containing the requested variables including the two decay hashes, and a second root file containing the two decay hashes, and the full decay string.  The decay strings can be related to the candidates that they are associated with by matching up the decay hashes.  An example of this using python is shown in B2A503-ReadDecayHash.py.
+:code:`B2A502-WriteOutDecayHash.py` creates one ROOT file, via `modularAnalysis.variablesToNtuple` 
+containing the requested variables including the two decay hashes, and a second root file containing the two decay hashes,
+ and the full decay string.  
+ The decay strings can be related to the candidates that they are associated with by matching up the decay hashes. 
+ An example of this using python is shown in :code:`B2A503-ReadDecayHash.py`.
 
 .. code-block:: python
 
   path.add_module('ParticleMCDecayString', listName='my_particle_list', fileName='my_hashmap.root')
 
-This will produce a file with all of the decay strings in it, along with the decayHash (hashes the MC decay string of the mother particle) and decayHashExtended (hashes the decay string of the mother and daughter particles).  The mapping of hashes to full MC decay strings is stored in a ROOT file determined by the fileName parameter.
+This will produce a file with all of the decay strings in it, along with the decayHash 
+(hashes the MC decay string of the mother particle) and decayHashExtended 
+(hashes the decay string of the mother and daughter particles).  
+The mapping of hashes to full MC decay strings is stored in a ROOT file determined by the fileName parameter.
 
-Then the decayHash and decayHashExtended can be included in NtupleTools by including them as extrainfo as a custom float:
+Then the :b2:mod:`decayHash` and :b2:mod:`decayHashExtended` can be included in `NtupleTools` by including them as extrainfo as a custom float:
 
 .. code-block:: python
 
@@ -217,112 +252,7 @@ MC mode       Decay channel                                    MC mode       Dec
 ============  ===============================================  ============  ==================================================
 
 
---------------
-Track matching
---------------
-
-This section describes the definition of the various status, that the matching of tracks can produce. The four main figures of merit for the track finder - the finding efficiency, the hit efficiency, the clone rate and the fake rate - are defined using these matching labels as described below.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-Overview: Available Status
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-After running the `TrackFinderMCTruth` (which creates Genfit Track Candidates in the following called MC track candidates) and the "normal" track finder algorithm (in the following called PR track candidates), you can apply the `MCMatcherTracksModule`, which creates relations between the two `StoreArrays` of track candidates by looking on the hit content. If the hit content of two track candidates has a non-zero intersection, a relation is created with the ration between the intersection number of hits to the total number of hits in the candidate as a weight (in both directions because the weight can be different as the total number of hits in a track can be different for MC and PR track candidates). The weights from PR to MC track candidates are called purity and from MC to PR track candidates efficiency. Only the single highest value for each PR and MC track candidates is stored in the relation array (so only the "best match" is stored) and only if the purity is above 2/3 and the efficiency is above 0.05.
-
-After the matching, each PR and each MC track candidate is given a single label:
-
-Tracks from Pattern Recognition can be,
-
-*    matched,
-*    clone, and
-*    fake (= background or ghost)
-
-as it can be seen in the `PRToMC::MatchInfo` in ``TrackMatchLookUp.h``
-
-Charged MCParticles can be
-
-*    found or matched (we will call it found to not confuse with the PR track candidates)
-*    merged or
-*    missing.
-
-as it can be seen in the `MCToPR::MatchInfo` in ``TrackMatchLookUp.h``.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-When is a Track/MCParticle What?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-We will first describe the labels here briefly (as it can also be found in the comments in the ``MCMatcherTracksModule.h``) and then show some examples.
-
-The `PRTracks` can be classified into four categories, which are described in the following
-
-* MATCHED
-
-  * The highest efficiency `PRTrack` of the highest purity `MCTrack` to this `PRTrack` is the same as this `PRTrack`. This means the `PRTrack` contains a high contribution of only one `MCTrack` and is also the best of all `PRTracks` describing this `MCTrack`.
-
-* CLONE
-
-  * The highest purity `MCTrack` has a different highest efficiency `PRTrack` than this track. This means the `PRTrack` contains high contributions of only one `MCTrack` but a different other `PRTrack` contains an even higher contribution to this `MCTrack`.
-
-* BACKGROUND
-
-  * The `PRTrack` contains mostly hits, which are not part of any `MCTrack`. This normally means, that this `PRTracks` is made of beam background hits. Be careful: If e.g. only creating MC track candidates out of primary particles, all found secondary particles will be called background (which is happening in the default validation)
-
-* GHOST
-
-  * The highest purity `MCTrack` to this `PRTrack` has a purity lower than the minimal purity given in the parameter minimalPurity (2/3) or has an efficiency lower than the efficiency given in the parameter minimalEfficiency (0.05). This means that the PRTrack does not contain a significat number of a specific MCTrack nor can it considered only made of background.
-
-`MCTracks` are classified into three categories:
-
-* MATCHED
-
-  * The highest purity `MCTrack` of the highest efficiency `PRTrack` of this `MCTrack` is the same as this `MCTrack`. This means the `MCTrack` is well described by a `PRTrack` and this `PRTrack` has only a significant contribution from this `MCTrack`.
-
-* MERGED
-
-  * The highest purity `MCTrack` of the highest efficiency `PRTrack` of this `MCTrack` is not the same as this `MCTrack`. This means this `MCTrack` is mostly contained in a `PRTrack`, which in turn however better describes a `MCTrack` different form this.
-* MISSING
-
-  * There is no highest efficiency `PRTrack` to this `MCTrack`, which also fullfills the minimal purity requirement.
-
-Four examples are shown in the pictures. The circles on the left side shows the MC track candidates, the right side stands for the PR track candidates. The arrows depict that there are common hits, the percentage values shows the ratio.
-
- 
-.. figure:: figs/fom_found.png
-  :width: 40em
-  :align: center
-
-  There is a one to one connection between a MCTrackCand and a track from the track finder. The MCTrackCand is labeled found and the other track is labeled matched.
-
-.. figure:: figs/fom_clone.png
-  :width: 40em
-  :align: center
-
-  The MCTrackCand is found twice. The track from the track finder with the higher percentage (the green one in this example) is labeled matched, the other one cloned. The MCTrackCand is nevertheless labeled found.
-
-.. figure:: figs/fom_fake.png
-  :width: 40em
-  :align: center
-
-  The track from the track finder is created with hits from many different MCTrackCands. As none of the corresponding hit ratios exceeds 66%, the track is called ghost or fake. The hit ratios of the MCTrackCands itself do not play any role here.
-
-.. figure:: figs/fom_background.png
-  :width: 40em
-  :align: center
-
-  The found track does not describe any of the MCTrackCands well (or well enough) - but is made out of background hits. This track is also called a fake or background.
-
-~~~~~~~~~~~~~~~~
-Figures of Merit
-~~~~~~~~~~~~~~~~
-
-The four main figures of merit, as also shown on the validation side, are:
-
-* Finding efficiency: Number of MC track candidates which are labeled found divided by the total number of MC track candidates
-* Hit efficiency: Mean of all single hit efficiency of the MC track candidates labeled as found. The single hit efficiency is defined as the number of found hits divided by the number of all hits in a track. This information is encoded in the weight of the relations created by the `MCTrackMatcherModule`.
-* Clone rate: Number of PR track candidates which are labeled clone divided by the number of PR track candidates which are labeled clone or matched
-* Fake rate: Number of PC track candidates which are labeled fake divided by the total number of PR track candidates.
-
-These definitions can be looked up in `tracking/scripts/validation/mc_side_module.py` and `tracking/scripts/validation/pr_side_module.py`.
+.. include:: ../../tracking/doc/MCTrackMatching.rst
 
 .. TODO: fill with material.
 

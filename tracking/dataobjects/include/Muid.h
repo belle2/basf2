@@ -220,7 +220,6 @@ namespace Belle2 {
 
     //! assign EKLM efficiency value TODO
     void setExtEKLMEfficiencyValue(int index, float efficiencyValue) { m_ExtEKLMEfficiencyValue[index] = efficiencyValue; }
-    //}
 
 
   private:

@@ -1418,8 +1418,12 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
       if (findMatchingEndcapHit(intersection, extState.track)) {
         extState.extLayerPattern |= (0x00008000 << intersection.layer);
         //efficiency implementation
-        muid->setExtEKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getEndcapEfficiency((intersection.isForward ? 1 : 0),
-                                        intersection.sector + 1, intersection.layer + 1, 1, 1));
+        float muid_phiEfficiency = m_klmStripEfficiency->getEndcapEfficiency((intersection.isForward ? 1 : 0), intersection.sector,
+                                   intersection.layer, 1, 1);
+        float muid_zEfficiency = m_klmStripEfficiency->getEndcapEfficiency((intersection.isForward ? 1 : 0), intersection.sector,
+                                 intersection.layer, 2, 1);
+        muid->setExtEKLMEfficiencyValue(intersection.layer, muid_phiEfficiency * muid_zEfficiency);
+
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;
         }
@@ -1455,8 +1459,11 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         }
         if (!isDead) {
           extState.extLayerPattern |= (0x00008000 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
-          muid->setExtEKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getEndcapEfficiency((intersection.isForward ? 1 : 0),
-                                          intersection.sector + 1, intersection.layer + 1, 1, 1));
+          float muid_phiEfficiency = m_klmStripEfficiency->getEndcapEfficiency((intersection.isForward ? 1 : 0), intersection.sector,
+                                     intersection.layer, 1, 1);
+          float muid_zEfficiency = m_klmStripEfficiency->getEndcapEfficiency((intersection.isForward ? 1 : 0), intersection.sector,
+                                   intersection.layer, 2, 1);
+          muid->setExtEKLMEfficiencyValue(intersection.layer, muid_phiEfficiency * muid_zEfficiency);
         } else {
           muid->setExtEKLMEfficiencyValue(intersection.layer, 0);
         }

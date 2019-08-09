@@ -133,3 +133,12 @@ While in the DCS tutorial there is an Adverserial Network for every signal and
 background distribution for every quantity (which is put in as a spectator),
 one should limit the number of Adversarial Networks to only those distributions
 which are correlated.
+
+
+
+
+
+Old Documentation
+=================
+  Documentation about FEI was migrated from our `confluence page <https://confluence.desy.de/display/BI/Continuum+Suppression+Framework>`_.
+

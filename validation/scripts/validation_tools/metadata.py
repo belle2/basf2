@@ -14,6 +14,9 @@ from ROOT import Belle2
 # circumvent BII-1264
 ROOT.gInterpreter.Declare("#include <framework/utilities/MakeROOTCompatible.h>")
 
+# Unfortunately doxygen doesn't recognize our docstrings in this file :/
+# @cond SUPPRESS_DOXYGEN
+
 
 def file_description_set(rootfile: Union[ROOT.TFile, str, pathlib.PurePath],
                          description: str) -> None:
@@ -173,6 +176,7 @@ class ValidationMetadataSetter(basf2.Module):
     def __init__(self, variables: List[Tuple[str]],
                  rootfile: Union[str, pathlib.PurePath], description=""):
         """!
+        Initialize ValidationMetadataSetter
 
         Arguments:
             variables (list(tuple(str))): List of objects to set the metadata
@@ -270,3 +274,6 @@ def create_validation_histograms(
         variables_2d=histograms_2d,
         fileName=rootfile,
     )
+
+# End suppression of doxygen checks
+# @endcond

@@ -20,6 +20,7 @@
 
 // Belle II utilities
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
 // Belle II dataobjects
@@ -356,8 +357,8 @@ void B2BIIConvertMdstModule::convertBeamEnergy()
   const double crossingAngle = Belle::BeamEnergy::Cross_angle();
   const double angleLer = M_PI; //parallel to negative z axis (different from Belle II!)
   const double angleHer = crossingAngle; //in positive z and x direction, verified to be consistent with Upsilon(4S) momentum
-  const double mass_e = 0.0;    //0.000510998902;
-  TMatrixDSym covariance(0); //0 entries = no error
+  const double mass_e = Const::electronMass;    //mass of electron: 0.0 in basf, 0.000510998902 in basf2;
+  TMatrixDSym covariance(0);    //0 entries = no error
   HepLorentzVector p_beam = Belle::BeamEnergy::p_beam(); // Testing only
 
   // Get four momentum of LER and HER

@@ -41,7 +41,6 @@
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 
 #include <ecl/dataobjects/ECLHit.h>
-#include <framework/dbobjects/BeamParameters.h>
 #include <tracking/dataobjects/ExtHit.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -399,10 +398,6 @@ namespace Belle2 {
 
     /** Ext hits */
     StoreArray<ExtHit> m_extHits;
-
-    /** BeamParameters */
-//    DBObjPtr<BeamParameters> m_beamParamsDB;
-//    BeamParameters m_beamParams;
 
     /** BeamSpot for IP */
     DBObjPtr<BeamSpot> m_beamSpotDB;

@@ -400,6 +400,46 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr sourceObjectIsInList(const std::vector<std::string>& arguments)
+    {
+      // unpack arguments, there should be only one: the name of the list we're checking
+      if (arguments.size() != 1) {
+        B2FATAL("Wrong number of arguments for sourceObjectIsInList");
+      }
+      auto listName = arguments[0];
+
+      auto func = [listName](const Particle * particle) -> double {
+
+        // check the list exists
+        StoreObjPtr<ParticleList> list(listName);
+        if (!(list.isValid()))
+        {
+          B2FATAL("Invalid Listname " << listName << " given to sourceObjectIsInList");
+        }
+
+        // this only makes sense for particles that are *not* composite and come
+        // from some mdst object (tracks, clusters..)
+        Particle::EParticleType particletype = particle->getParticleType();
+        if (particletype == Particle::EParticleType::c_Composite
+        or particletype == Particle::EParticleType::c_Undefined)
+          return -1.0;
+
+        // it *is* possible to have a particle list from different sources (like
+        // hadrons from the ECL and KLM) so we have to check each particle in
+        // the list individually
+        for (unsigned i = 0; i < list->getListSize(); ++i)
+        {
+          Particle* iparticle = list->getParticle(i);
+          if (particletype == iparticle->getParticleType())
+            if (particle->getMdstArrayIndex() == iparticle->getMdstArrayIndex())
+              return 1.0;
+        }
+        return 0.0;
+
+      };
+      return func;
+    }
+
     Manager::FunctionPtr isDaughterOfList(const std::vector<std::string>& arguments)
     {
       if (arguments.size() > 0) {
@@ -2167,6 +2207,12 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       "Returns 1.0 if the particle is in the list provided, 0.0 if not. Note that this only checks the particle given. For daughters of composite particles, please see isDaughterOfList().");
     REGISTER_VARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
                       "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.");
+    REGISTER_VARIABLE("sourceObjectIsInList(particleListName)", sourceObjectIsInList, R"DOC(
+Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to create a particle in ``particleListName``, 0.0 if not. 
+
+.. note::
+  This only makes sense for particles that are not composite. Returns -1 for composite particles.
+)DOC");
     REGISTER_VARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
                       "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("daughter(i, variable)", daughter,

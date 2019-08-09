@@ -24,7 +24,7 @@ def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=[]
         f.write(testfile_steering)
 
     subprocess.call(["basf2", "-o", name, "--experiment", str(exp), "--run", str(run),
-                    "-n", str(events), steering_file] + branchNames, env=env)
+                     "-n", str(events), steering_file] + branchNames, env=env)
 
 
 def create_testfile_direct(name, metadata=None, release="test_release", user="test_user", seed=None,

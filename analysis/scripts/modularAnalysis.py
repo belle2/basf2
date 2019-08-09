@@ -144,8 +144,7 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
     elif environmentType in ["MC8", "MC9", "MC10"]:
         # make sure the last database setup is the magnetic field for MC8-10
         use_database_chain()
-        use_central_database("Legacy_MagneticField_MC8_MC9_MC10", "", "", "centraldb",
-                             loglevel=LogLevel.INFO, invertLogging=True)
+        use_central_database("Legacy_MagneticField_MC8_MC9_MC10")
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
@@ -483,18 +482,28 @@ def cutAndCopyLists(
     path=None,
 ):
     """
-    Copy Particle indices that pass selection criteria from all input ParticleLists to
-    the single output ParticleList.
-    Note that the Particles themselves are not copied.The original and copied
-    ParticleLists will point to the same Particles.
+    Copy candidates from all lists in ``inputListNames`` to
+    ``outputListName`` if they pass ``cut`` (given selection criteria).
 
-    @param ouputListName copied ParticleList
-    @param inputListName vector of original ParticleLists to be copied
-    @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    Note:
+        Note the Particles themselves are not copied.
+        The original and copied ParticleLists will point to the same Particles.
+
+    Example:
+        Require energetic pions safely inside the cdc
+
+        >>> cutAndCopyLists("pi+:energeticPions", ["pi+:good", "pi+:loose"], "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        outputListName (str): the new ParticleList name
+        inputListName (list(str)): list of input ParticleList names
+        cut (str): Candidates that do not pass these selection criteria are removed from the ParticleList
+        writeOut (bool): whether RootOutput module should save the created ParticleList
+        path (basf2.Path): modules are added to this path
     """
-
     pmanipulate = register_module('ParticleListManipulator')
     pmanipulate.set_name('PListCutAndCopy_' + outputListName)
     pmanipulate.param('outputListName', outputListName)
@@ -512,18 +521,28 @@ def cutAndCopyList(
     path=None,
 ):
     """
-    Copy Particle indices that pass selection criteria from the input ParticleList to
-    the output ParticleList.
-    Note that the Particles themselves are not copied.The original and copied
-    ParticleLists will point to the same Particles.
+    Copy candidates from ``inputListName`` to ``outputListName`` if they pass
+    ``cut`` (given selection criteria).
 
-    @param ouputListName copied ParticleList
-    @param inputListName vector of original ParticleLists to be copied
-    @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    Note:
+        Note the Particles themselves are not copied.
+        The original and copied ParticleLists will point to the same Particles.
+
+    Example:
+        require energetic pions safely inside the cdc
+
+        >>> cutAndCopyLists("pi+:energeticPions", "pi+:loose", "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        outputListName (str): the new ParticleList name
+        inputListName (str): input ParticleList name
+        cut (str): Candidates that do not pass these selection criteria are removed from the ParticleList
+        writeOut (bool): whether RootOutput module should save the created ParticleList
+        path (basf2.Path): modules are added to this path
     """
-
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
@@ -858,12 +877,21 @@ def fillParticleListsFromMC(
 
 def applyCuts(list_name, cut, path):
     """
-    Removes StoreArray<Particle> indices of Particles from given ParticleList
-    that do not pass the given selection criteria (given in ParticleSelector style).
+    Removes particle candidates from ``list_name`` that do not pass ``cut``
+    (given selection criteria).
 
-    @param list_name input ParticleList name
-    @param cut  Particles that do not pass these selection criteria are removed from the ParticleList
-    @param path      modules are added to this path
+    Example:
+        require energetic pions safely inside the cdc
+
+        >>> applyCuts("pi+:mypions", "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        list_name (str): input ParticleList name
+        cut (str): Candidates that do not pass these selection criteria are removed from the ParticleList
+        path (basf2.Path): modules are added to this path
     """
 
     pselect = register_module('ParticleSelector')
@@ -875,10 +903,19 @@ def applyCuts(list_name, cut, path):
 
 def applyEventCuts(cut, path):
     """
-    Removes events that do not pass the given selection criteria (given in ParticleSelector style).
+    Removes events that do not pass the ``cut`` (given selection criteria).
 
-    @param cut  Events that do not pass these selection criteria are skipped
-    @param path      modules are added to this path
+    Example:
+        continuum events (in mc only) with more than 5 tracks
+
+        >>> applyEventCuts("[nTracks > 5] and [isContinuumEvent], path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        cut (str): Events that do not pass these selection criteria are skipped
+        path (basf2.Path): modules are added to this path
     """
 
     eselect = register_module('VariableToReturnValue')
@@ -981,12 +1018,12 @@ def reconstructMissingKlongDecayExpert(
     recoList="_reco",
 ):
     """
-    Creates mother particle accounting for missing momentum.
+    Creates a list of K_L0's with their momentum determined from kinematic constraints of B->K_L0 + something else.
 
     @param decayString DecayString specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
-    @param cut         created (mother) Particles are added to the mother ParticleList if they
-                       pass give cuts (in VariableManager style) and rejected otherwise
+    @param cut         Particles are added to the K_L0 ParticleList if they
+                       pass the given cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
     @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
@@ -2258,25 +2295,54 @@ def buildEventShape(inputListNames=[],
                     checkForDuplicates=False,
                     path=None):
     """
-    Calculates the event shape quantities (thrust, sphericity, Fox-Wolfram moments...) using the
-    particles in the lists provided by the user.
-    The results of the calculation are then store in the EventShapeContainer dataobject, and are accessible
-    byt the variabels of the EventShape group.
+    Calculates the event-level shape quantities (thrust, sphericity, Fox-Wolfram moments...)
+    using the particles in the lists provided by the user. If no particle list is provided,
+    the function will internally create a list of good tracks and a list of good photons
+    with (optionally) minimal quality cuts.
 
-    @param inputListNames   list of ParticleLists used to calculate the global event kinematics.
-                            If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
-    @param default_cleanup  if True,  applyes some very standard cuts on pt and costTheta when defines the interanl lists.
-    @param path             modules are added to this path
-    @param allMoments  Enables the calculation of FW and harmonic moments from 5 to 8
-    @param cleoCones  Enables the calculation of the CLEO cones.
-    @param collisionAxis  Enables the calculation of the  quantities related to the collision axis.
-    @param foxWolfram    Enables the calculation of the Fox-Wolfram moments.
-    @param jets   Enables the calculation of jet-related quantities.
-    @param harmonicMoments   Enables the calculation of the Harmonic moments.
-    @param sphericity  Enables the calculation of the sphericity-related quantities.
-    @param thrust  Enables the calculation of thust-related quantities.
-    @param checkForDuplicates Perform a check for duplicate particles before adding them.
 
+    The results of the calculation are then stored into the EventShapeContainer dataobject,
+    and are accessible using the variables of the EventShape group.
+
+    The user can switch the calculation of certain quantities on or off to save computing
+    time. By default the calculation of the high-order moments (5-8) is turned off.
+    Switching off an option will make the corresponding variables not available.
+
+    Warning:
+       The user can provide as many particle lists
+       as needed, using also combined particles, but the function will always assume that
+       the lists are independent.
+       If the lists provided by the user contain several times the same track (either with
+       different mass hypothesis, or once as an independent particle and once as daughter of a
+       combined particle) the results won't be reliable.
+       A basic check for duplicates is available setting the checkForDuplicate flags,
+       but is usually quite time consuming.
+
+
+    @param inputListNames     List of ParticleLists used to calculate the
+                              event shape variables. If the list is empty the default
+                              particleLists pi+:evtshape and gamma:evtshape are filled.
+    @param default_cleanup    If True, applies standard cuts on pt and cosTheta when
+                              defining the internal lists. This option is ignored if the
+                              particleLists are provided by the user.
+    @param path               Path to append the eventShape modules to.
+    @param thrust             Enables the calculation of thrust-related quantities (CLEO
+                              cones, Harmonic moments, jets).
+    @param collisionAxis      Enables the calculation of the  quantities related to the
+                              collision axis .
+    @param foxWolfram         Enables the calculation of the Fox-Wolfram moments.
+    @param harmonicMoments    Enables the calculation of the Harmonic moments with respect
+                              to both the thrust axis and, if collisionAxis = True, the collision axis.
+    @param allMoments         If True, calculates also the  FW and harmonic moments from order
+                              5 to 8 instead of the low-order ones only.
+    @param cleoCones          Enables the calculation of the CLEO cones with respect to both the thrust
+                              axis and, if collisionAxis = True, the collision axis.
+    @param jets               Enables the calculation of the hemisphere momenta and masses.
+                              Requires thrust = True.
+    @param sphericity         Enables the calculation of the sphericity-related quantities.
+    @param checkForDuplicates Perform a check for duplicate particles before adding them. This option
+                              is quite time consuming, instead of using it consider sanitizing
+                              the lists you are passing to the function.
     """
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
@@ -2285,7 +2351,7 @@ def buildEventShape(inputListNames=[],
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 
         if default_cleanup:
-            B2INFO("Using the default lists for the EventShape module.")
+            B2INFO("Applying standard cuts")
             trackCuts = 'pt > 0.1'
             trackCuts += ' and -0.8660 < cosTheta < 0.9535'
             trackCuts += ' and -3.0 < dz < 3.0'
@@ -2296,7 +2362,7 @@ def buildEventShape(inputListNames=[],
             gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
             applyCuts('gamma:evtshape', gammaCuts, path=path)
         else:
-            B2WARNING("Creating the default lists with no cleanup. This can be potentially dangerous")
+            B2WARNING("Creating the default lists with no cleanup.")
     else:
         particleLists = inputListNames
 

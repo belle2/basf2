@@ -19,6 +19,7 @@ def fork_process(*args, target=process):
 
 class FatalError(Module):
     """Simple module to just print a warning, an error and a fatal error"""
+
     def event(self):
         """print messages"""
         B2WARNING("warning")

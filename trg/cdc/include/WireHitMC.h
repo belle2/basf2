@@ -76,8 +76,8 @@ namespace Belle2 {
     CLHEP::Hep3Vector _momentum;
     float _distance;
     float _energy;
-    int _leftRight;
     const TRGCDCTrackMC* _hep;
+    int _leftRight;
 
     friend class TRGCDC;
   };

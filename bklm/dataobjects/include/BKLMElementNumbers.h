@@ -47,12 +47,35 @@ namespace Belle2 {
                                   int strip);
 
     /**
+     * Get element numbers by channel number.
+     * @param[in] channel  Channel.
+     * @param[out] forward Forward (1) or backward (0) BKLM.
+     * @param[out] sector  Sector (1-based).
+     * @param[out] layer   Layer (1-based).
+     * @param[out] plane   Plane (0-based).
+     * @param[out] strip   Strip (1-based).
+     */
+    static void channelNumberToElementNumbers(
+      uint16_t channel, int* forward, int* sector, int* layer, int* plane,
+      int* strip);
+
+    /**
      * Get module number.
      * @param[in] forward Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
      */
     static uint16_t moduleNumber(int forward, int sector, int layer);
+
+    /**
+     * Get element numbers by module number.
+     * @param[in]  module  Module.
+     * @param[out] forward Forward (1) or backward (0) BKLM.
+     * @param[out] sector  Sector (1-based).
+     * @param[out] layer   Layer (1-based).
+     */
+    static void moduleNumberToElementNumbers(
+      uint16_t module, int* forward, int* sector, int* layer);
 
     /**
      * Get sector number.

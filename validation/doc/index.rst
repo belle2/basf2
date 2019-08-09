@@ -56,6 +56,16 @@ results of a physics validation performed with ``b2validation``.
     :nogroupsections:
     :absolutecommand:
 
+``b2validation-revisions``: Extract quantities from each revision
+-----------------------------------------------------------------
+
+.. argparse::
+    :filename: validation/tools/b2validation-revisions
+    :func: get_argument_parser
+    :prog: b2validation-bisect
+    :nodefault:
+    :nogroupsections:
+    :absolutecommand:
 
 Convenience Functions
 =====================

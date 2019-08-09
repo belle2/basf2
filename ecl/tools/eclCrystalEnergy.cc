@@ -181,10 +181,15 @@ int main(int argc, char** argv)
     newPayload->SetBinContent(cellID, NewCalib[cellID - 1]);
     newPayload->SetBinError(cellID, NewCalibUnc[cellID - 1]);
 
-    float ratio = NewCalib[cellID - 1] / ExistingCalib[cellID - 1];
-    float rUnc0 = ExistingCalibUnc[cellID - 1] / ExistingCalib[cellID - 1];
-    float rUnc1 = NewCalibUnc[cellID - 1] / NewCalib[cellID - 1];
-    float ratioUnc = ratio * sqrt(rUnc0 * rUnc0 + rUnc1 * rUnc1);
+    float ratio = 1.;
+    float ratioUnc = 0.;
+    if (abs(ExistingCalib[cellID - 1]) > 1.0e-12) {
+      ratio = NewCalib[cellID - 1] / ExistingCalib[cellID - 1];
+      float rUnc0 = ExistingCalibUnc[cellID - 1] / ExistingCalib[cellID - 1];
+      float rUnc1 = 0.;
+      if (abs(NewCalib[cellID - 1]) > 1.0e-12) {rUnc1 = NewCalibUnc[cellID - 1] / NewCalib[cellID - 1];}
+      ratioUnc = ratio * sqrt(rUnc0 * rUnc0 + rUnc1 * rUnc1);
+    }
 
     payloadRatioVsCellID->SetBinContent(cellID, ratio);
     payloadRatioVsCellID->SetBinError(cellID, ratioUnc);

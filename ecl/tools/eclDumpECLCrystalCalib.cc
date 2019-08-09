@@ -11,7 +11,7 @@
  * tag, write a sample to screen, and fill a histogram with the values    *
  *                                                                        *
  * Usage:                                                                 *
- * eclDumpPayload payloadName globaltag exp run                           *
+ * eclDumpECLCrystalCalib payloadName globaltag exp run                           *
  *                                                                        *
  * resulting root file is payload_exp_run.root                            *
  *                                                                        *
@@ -58,14 +58,15 @@ namespace {
 int main(int argc, char** argv)
 {
   if (argc < 4 || argc > 5) {
-    std::cout << "incorrect number of arguments for eclDumpPayload" << std::endl;
+    std::cout << "incorrect number of arguments for eclDumpECLCrystalCalib" << std::endl;
     return -1;
   }
   std::string payloadName = argv[1];
   std::string gtName = argv[2];
   int experiment = std::stoi(argv[3]);
   int run = std::stoi(argv[4]);
-  std::cout << "eclDumpPayload called with arguments " << payloadName << " " << gtName << " " << experiment << " " << run << " " <<
+  std::cout << "eclDumpECLCrystalCalib called with arguments " << payloadName << " " << gtName << " " << experiment << " " << run <<
+            " " <<
             std::endl;
 
   //------------------------------------------------------------------------

@@ -17,6 +17,20 @@ This program is used to run the full physics validation suite
     :nogroupsections:
     :absolutecommand:
 
+``b2validation-plots``: Compare and plot a selection of revisions
+-----------------------------------------------------------------
+
+Select several different software versions (revisions) for which output files
+were generated using ``b2validation`` and generate comparison plots:
+
+.. argparse::
+    :filename: validation/tools/b2validation-plots
+    :func: get_argument_parser
+    :prog: b2validation-plots
+    :nodefault:
+    :nogroupsections:
+    :absolutecommand:
+
 ``b2validation-server``: Run Webserver Displaying the Phyiscs Validation Results
 --------------------------------------------------------------------------------
 

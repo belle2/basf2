@@ -87,22 +87,22 @@ namespace Belle2 {
     /// the geometry
     VXD::GeoCache& m_vxdGeometry;
 
-    std::string m_pxdClustersName; //< name of the store array of pxd clusters
-    std::string m_tracksName; //< name of the store array of tracks
-    std::string m_ROIsName; //< name of the store array of ROIs
+    std::string m_pxdClustersName; ///< name of the store array of pxd clusters
+    std::string m_tracksName; ///< name of the store array of tracks
+    std::string m_ROIsName; ///< name of the store array of ROIs
 
-    StoreArray<PXDCluster> m_pxdclusters; //< store array of pxd clusters
-    StoreArray<RecoTrack> m_tracks; //< store array of tracks
-    StoreArray<ROIid> m_ROIs; //< store array of ROIs
+    StoreArray<PXDCluster> m_pxdclusters; ///< store array of pxd clusters
+    StoreArray<RecoTrack> m_tracks; ///< store array of tracks
+    StoreArray<ROIid> m_ROIs; ///< store array of ROIs
 
-    double m_pcut; //< pValue-Cut for tracks
-    double m_momCut; //< Cut on fitted track momentum
-    double m_pTCut; //< Cut on fitted track pT
-    unsigned int m_minSVDHits; //< Required hits in SVD strips for tracks
-    int m_maskedDistance; //< Distance inside which no dead pixel or module border is allowed
+    double m_pcut; ///< pValue-Cut for tracks
+    double m_momCut; ///< Cut on fitted track momentum
+    double m_pTCut; ///< Cut on fitted track pT
+    unsigned int m_minSVDHits; ///< Required hits in SVD strips for tracks
+    int m_maskedDistance; ///< Distance inside which no dead pixel or module border is allowed
 
-    TFile* m_file{}; //< pointer to opened file
-    TNtuple* m_tuple{}; //< pointer to opened tuple
+    TFile* m_file{}; ///< pointer to opened file
+    TNtuple* m_tuple{}; ///< pointer to opened tuple
 
   };
 }

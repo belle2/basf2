@@ -10,8 +10,6 @@ from geometry import check_components
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
 
-from reconstruction import events_of_doom_buster
-
 from tracking import (
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,

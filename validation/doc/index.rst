@@ -1,6 +1,9 @@
 Tools for Physics Validation of the Software
 ++++++++++++++++++++++++++++++++++++++++++++
 
+Command line utilities
+======================
+
 ``b2validation``: Run Physics Validation
 ----------------------------------------
 
@@ -38,3 +41,21 @@ results of a physics validation performed with ``b2validation``.
     :nodefault:
     :nogroupsections:
     :absolutecommand:
+
+
+Convenience Functions
+=====================
+
+In order to simplify the generation of validation histograms in your basf2
+steering file, you can use the following:
+
+.. autofunction:: validation_tools.metadata.create_validation_histograms
+
+You can also add metadata to an existing ROOT object using
+
+.. autofunction:: validation_tools.metadata.validation_metadata_set
+
+or add metadata to an already written ROOT file:
+
+.. autofunction:: validation_tools.metadata.validation_metadata_update
+.. autofunction:: validation_tools.metadata.file_description_set

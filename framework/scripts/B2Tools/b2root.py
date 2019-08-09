@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
+import sys
+import tempfile
+import shutil
+from basf2 import B2ERROR
+
 
 byteorder = 'big'
 
@@ -228,3 +234,161 @@ class RawRootFile:
                 result.seekparent = int.from_bytes(result.data[pos+22:pos+26], byteorder)
                 self.seekkeys = int.from_bytes(result.data[pos+26:pos+30], byteorder)
         return result
+
+
+def normalize_file(filename, output=None, in_place=False, name=None, root_version=None):
+    """
+    Reset the non-reproducible root file metadata: UUID and datimes.
+    It can also reset the initial file name stored in the file itself, but
+    (WARNING!) this may corrupt the root file.
+    """
+
+    # open input file
+    rootfile = RawRootFile(filename)
+
+    # adjust root version number
+    if root_version:
+        rootfile.version = root_version
+
+    # create output file
+    if output:
+        newrootfile = open(output, 'wb')
+    elif in_place:
+        newrootfile = tempfile.TemporaryFile()
+    else:
+        basename, ext = os.path.splitext(filename)
+        newrootfile = open(basename + '_normalized' + ext, 'wb')
+
+    # write output file header
+    newrootfile.write(rootfile.header)
+
+    # file name in the metadata
+    if name:
+        newname = name.encode()
+    else:
+        newname = None
+
+    # bookkeeping of offsets, positions, and keys
+    offset = 0
+    seekfree = rootfile.seekfree
+    nbytesfree = rootfile.nbytesfree
+    nbytesname = rootfile.nbytesname
+    seekinfo = rootfile.seekinfo
+    keylist = []
+    keyskey = None
+    infokey = None
+    swap = False
+
+    for key in rootfile:
+        # reset datime and adjust position of key
+        key.normalize(pos=newrootfile.tell())
+
+        # Special treatment of key containing the TFile information
+        if key.showname == b'TFile':
+
+            # if a new name is given change the name and determine the offset caused by the change of name length
+            namelen = len(key.name)
+            if newname:
+                key.name = key.filename = newname
+            offset = len(key.name) - namelen
+
+            # apply the offset to total (2x), object, and key length
+            key.nbytes += 2*offset
+            key.objlen += offset
+            key.keylen += offset
+
+            # recreate the header from updated data members
+            key.recreate_header()
+
+            # recreate the key data with new name and lengths
+            buffer = len(key.name).to_bytes(1, byteorder) + key.name
+            buffer += len(key.title).to_bytes(1, byteorder) + key.title
+            buffer += key.version.to_bytes(2, byteorder)
+            buffer += (0).to_bytes(8, byteorder)  # reset datimeC and datimeM
+            buffer += (key.nbyteskeys + offset).to_bytes(4, byteorder)
+            buffer += (key.nbytesname + 2*offset).to_bytes(4, byteorder)
+            wordlen = 8 if key.version > 1000 else 4
+            buffer += key.seekdir.to_bytes(wordlen, byteorder)
+            buffer += key.seekparent.to_bytes(wordlen, byteorder)
+            seekkeyspos = newrootfile.tell() + len(key.header) + len(buffer)
+            buffer += (rootfile.seekkeys + 2*offset).to_bytes(wordlen, byteorder)
+            buffer += (0).to_bytes(18, byteorder)  # reset UUID
+            if key.version <= 1000:
+                buffer += (0).to_bytes(12, byteorder)
+            key.data = buffer
+
+        else:
+            # check whether we break pointers in TTrees
+            if key.classname == b'TTree' and offset != 0:
+                B2ERROR('Changing the name of root files containing a tree is not supported.')
+                if not in_place:
+                    os.remove(newrootfile.name)
+                sys.exit(1)
+
+            # update key data in KeysList: number of keys and key headers
+            # and remember key position
+            if key.showname == b'KeysList':
+                seekkeys = newrootfile.tell()
+                buffer = len(keylist).to_bytes(4, byteorder)
+                for filekey in keylist:
+                    buffer += filekey.header
+                key.data = buffer
+                keyskey = key
+                swap = (infokey is None)
+
+            # update free segments pointer and remember key position
+            if key.showname == b'FreeSegments':
+                seekfree = newrootfile.tell()
+                pointer = int.from_bytes(key.data[2:6], byteorder) + 4*offset
+                key.data = key.data[:2] + pointer.to_bytes(4, byteorder) + key.data[6:]
+
+            # update name in KeysList and FreeSegments
+            if key.showname in [b'KeysList', b'FreeSegments'] and newname:
+                key.name = newname
+                key.nbytes += offset
+                key.keylen += offset
+                key.recreate_header()
+
+            # keep track of all keys for the KeysList
+            elif key.showname not in [b'StreamerInfo', b'']:
+                keylist.append(key)
+
+            # remember streamer info key and position
+            if key.showname == b'StreamerInfo':
+                seekinfo = newrootfile.tell()
+                infokey = key
+
+        # write the updated key, making sure the KeysList come after the StreamerInfo
+        if swap and key.showname == b'KeysList':
+            pass
+        elif swap:
+            seekinfo = newrootfile.tell()
+            infokey.normalize(pos=seekinfo)
+            newrootfile.write(infokey.header)
+            newrootfile.write(infokey.data)
+            seekkeys = newrootfile.tell()
+            keyskey.normalize(pos=seekkeys)
+            newrootfile.write(keyskey.header)
+            newrootfile.write(keyskey.data)
+            swap = False
+        else:
+            newrootfile.write(key.header)
+            newrootfile.write(key.data)
+
+    # write the new file header
+    rootfile.normalize(end=newrootfile.tell(), seekfree=seekfree, nbytesfree=nbytesfree+offset,
+                       nbytesname=nbytesname+2*offset, seekinfo=seekinfo)
+    newrootfile.seek(0)
+    newrootfile.write(rootfile.header)
+
+    # update pointer to keyslist
+    newrootfile.seek(seekkeyspos)
+    newrootfile.write(seekkeys.to_bytes(wordlen, byteorder))
+
+    # replace in the input file if the in-place option is used
+    if in_place:
+        del rootfile
+        newrootfile.seek(0)
+        shutil.copyfileobj(newrootfile, open(filename, 'wb'))
+
+    newrootfile.close()

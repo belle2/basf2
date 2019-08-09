@@ -71,7 +71,7 @@ namespace {
     // also fail if the OPEN one is somewhere in the middle
     EXPECT_FALSE(provider.setTags({"TESTING", "VALIDATED", "OPEN", "RUNNING", "PUBLISHED"}));
     expectErrorWithVariables({{"globaltag", "OPEN"}, {"status", "OPEN"}});
-    provider.setValidTagStates({"OPEN", "INVALID"});
+    provider.setUsableTagStates({"OPEN", "INVALID"});
     EXPECT_TRUE(provider.setTags({"OPEN"}));
     EXPECT_FALSE(provider.setTags({"INVALID"}));
     expectErrorWithVariables({{"globaltag", "INVALID"}, {"status", "INVALID"}});

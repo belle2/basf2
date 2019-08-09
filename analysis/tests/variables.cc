@@ -1,5 +1,6 @@
 
 #include <analysis/variables/Variables.h>
+#include <analysis/variables/BasicParticleInformation.h>
 #include <analysis/variables/EventVariables.h>
 #include <analysis/variables/FlightInfoVariables.h>
 #include <analysis/variables/VertexVariables.h>

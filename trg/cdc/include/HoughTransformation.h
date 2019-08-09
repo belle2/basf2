@@ -62,6 +62,7 @@ namespace Belle2 {
   public:// Modifiers
 
   private:
+    // name
     const std::string _name;
   };
 

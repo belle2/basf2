@@ -105,12 +105,12 @@ def PRList(path):
         "Romulus Godang"
     ]
 
-    fillParticleList(decayString='pi+:all',
+    fillParticleList(decayString='pi+:eventShapeForSkims',
                      cut='pt> 0.1', path=path)
-    fillParticleList(decayString='gamma:all',
+    fillParticleList(decayString='gamma:eventShapeForSkims',
                      cut='E > 0.1', path=path)
 
-    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,

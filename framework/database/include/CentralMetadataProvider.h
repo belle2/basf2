@@ -11,14 +11,14 @@
 
 #include <framework/database/MetadataProvider.h>
 #include <framework/database/Downloader.h>
-#include <framework/utilities/json.h>
+#include <nlohmann/json.hpp>
 
 namespace Belle2::Conditions {
   /** Class to obtain payload metadata from the central database server via REST requests */
   class CentralMetadataProvider: public MetadataProvider {
   public:
     /** Create using a base rest url to find the server endpoints */
-    explicit CentralMetadataProvider(std::string baseUrl);
+    CentralMetadataProvider(std::string baseUrl, const std::set<std::string>& usableTagStates);
     /** default destructor */
     virtual ~CentralMetadataProvider() = default;
     /** Check the status of a given globaltag \

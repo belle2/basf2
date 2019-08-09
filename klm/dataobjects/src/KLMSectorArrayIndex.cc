@@ -52,7 +52,7 @@ uint16_t KLMSectorArrayIndex::getNumber(uint16_t index) const
 {
   std::map<uint16_t, uint16_t>::const_iterator it =
     m_MapIndexNumber.find(index);
-  if (it == m_MapNumberIndex.end())
+  if (it == m_MapIndexNumber.end())
     B2FATAL("Incorrect KLM sector index.");
   return it->second;
 }

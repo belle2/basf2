@@ -977,29 +977,110 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
   }
 }
 
+
+
 void
 TRGGDLDQMModule::fillOutputExtra(void)
 {
   for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
     bool c4_fired = isFired("C4");
     bool hie_fired = isFired("HIE");
+    bool lml_fired = (isFired("LML0") || isFired("LML1") || isFired("LML2") || isFired("LML3") || isFired("LML4") || isFired("LML5")
+                      || isFired("LML6") || isFired("LML7") || isFired("LML8") || isFired("LML9") || isFired("LML10") || isFired("ECLMUMU"));
     bool fff_fired = isFired("FFF");
-    if (fff_fired && (c4_fired || hie_fired)) {
+    bool ff_fired  = isFired("ff");
+    bool f_fired   = isFired("f");
+    bool ffo_fired = isFired("FFO");
+    bool ffb_fired = isFired("FFB");
+    bool ffy_fired = isFired("ffy");
+    bool fyo_fired = isFired("fyo");
+    bool fyb_fired = isFired("fyb");
+    bool bha2D_fired = isFired("BHA");
+    bool bha3D_fired = isFired("BHA3D");
+    if (1) {
       h_psn_extra[skim[ifill]]->Fill(0.5);
     }
-    if (c4_fired || hie_fired) {
+    if (fff_fired && (c4_fired || hie_fired)) {
       h_psn_extra[skim[ifill]]->Fill(1.5);
     }
-    if (fff_fired && hie_fired) {
+    if (ffo_fired && (c4_fired || hie_fired)) {
       h_psn_extra[skim[ifill]]->Fill(2.5);
     }
-    if (fff_fired && c4_fired) {
+    if (ffb_fired && (c4_fired || hie_fired)) {
       h_psn_extra[skim[ifill]]->Fill(3.5);
+    }
+    if (fff_fired) {
+      h_psn_extra[skim[ifill]]->Fill(4.5);
+    }
+    if (c4_fired || hie_fired) {
+      h_psn_extra[skim[ifill]]->Fill(5.5);
+    }
+    if (fff_fired || ffo_fired || ffb_fired) {
+      h_psn_extra[skim[ifill]]->Fill(6.5);
+    }
+    if ((fff_fired || ffo_fired || ffb_fired) && (c4_fired || hie_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(7.5);
+    }
+    if (bha2D_fired) {
+      h_psn_extra[skim[ifill]]->Fill(8.5);
+    }
+    if (bha3D_fired) {
+      h_psn_extra[skim[ifill]]->Fill(9.5);
+    }
+    if (ff_fired) {
+      h_psn_extra[skim[ifill]]->Fill(10.5);
+    }
+    if (ff_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(11.5);
+    }
+    if (f_fired) {
+      h_psn_extra[skim[ifill]]->Fill(12.5);
+    }
+    if (f_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(13.5);
+    }
+    if (lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(14.5);
+    }
+    if (fff_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(15.5);
+    }
+    if (ffo_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(16.5);
+    }
+    if (ffb_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(17.5);
+    }
+    if (ffy_fired) {
+      h_psn_extra[skim[ifill]]->Fill(18.5);
+    }
+    if (ffy_fired && (c4_fired || hie_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(19.5);
+    }
+    if (fyo_fired && (c4_fired || hie_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(20.5);
+    }
+    if (fyb_fired && (c4_fired || hie_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(21.5);
+    }
+    if ((ffy_fired || fyo_fired || fyb_fired) && (c4_fired || hie_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(22.5);
+    }
+    if (ffy_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(23.5);
+    }
+    if (fyo_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(24.5);
+    }
+    if (fyb_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(25.5);
     }
   }
 }
 
-const int TRGGDLDQMModule::n_output_extra = 4;
-const char* TRGGDLDQMModule::output_extra[4] = {
-  "fff&(c4|hie)", "c4|hie", "fff&hie", "fff&c4"
+const char* TRGGDLDQMModule::output_extra[n_output_extra] = {
+  "all", "fff&(c4|hie)", "ffo&(c4|hie)", "ffb&(c4|hie)", "fff", "c4|hie", "fff|ffo|ffb", "(fff|ffo|ffb)&(c4|hie)", "bha2D", "bha3D",
+  "ff", "ff&(lml|mumu)", "f", "f&(lml|mumu)", "lml|mumu", "fff&(lml|mumu)", "ffo&(lml|mumu)", "ffb&(lml|mumu)", "ffy", "ffy&(c4|hie)",
+  "fyo&(c4|hie)", "fyb&(c4|hie)", "(ffy|ffo|ffb)&(c4|hie)", "ffy&(lml|mumu)", "fyo&(lml|mumu)", "fyb&(lml|mumu)"
 };
+

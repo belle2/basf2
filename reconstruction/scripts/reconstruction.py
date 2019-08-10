@@ -83,7 +83,6 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     if reconstruct_cdst:
         add_dedx_modules(main_path)
         add_prune_tracks(main_path, components=components)
-
     else:
         # Add further reconstruction modules
         add_posttracking_reconstruction(path,

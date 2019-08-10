@@ -46,7 +46,7 @@ tntuple.SetAlias('Description', "This is a description test. "
                  "because e.g. \\theta will be interpreted as [tab]heta.")
 tntuple.SetAlias('Check', "This is the check text.")
 tntuple.SetAlias('Contact', "Name of the contact person.")
-tntuple.SetAlias('MetaOptions', "some_meta_options")
+tntuple.SetAlias('MetaOptions', "shifter, some_meta_options")
 
 # Overwrite the former TNtuple if one was there
 tntuple.Write()
@@ -63,7 +63,7 @@ add_properties(
         'Description': "xlog",
         'Check': "Gaus Histogram Check",
         'Contact': "Gaus Histogram Contact",
-        'MetaOptions': "logx, nostats"
+        'MetaOptions': "shifter, logx, nostats"
     }
 )
 
@@ -85,7 +85,7 @@ add_properties(
         'Description': "",
         'Check': "",
         'Contact': "Kilian Lieret, Kilian.Lieret@campus.lmu.de",
-        'MetaOptions': "logx, nostats"
+        'MetaOptions': "shifter, logx, nostats"
     }
 )
 
@@ -106,7 +106,7 @@ add_properties(
         'Check': "Expert Histogram Check. Should only appear if expert button"
                  "was checked.",
         'Contact': "Expert Histogram Contact",
-        'MetaOptions': "logy, nostats, C, expert"
+        'MetaOptions': "logy, nostats, C"
     }
 )
 
@@ -137,7 +137,7 @@ add_properties(
         'Description': "xlog ylog with stats. I can haz $\LaTeX$?",
         'Check': "Gaus Changing Histogram Check",
         'Contact': "Gaus Changing Histogram Contact",
-        'MetaOptions': "logx, logy"
+        'MetaOptions': "shifter, logx, logy"
     }
 )
 
@@ -161,7 +161,7 @@ add_properties(
         'Description': "Some 2D Histogram",
         'Check': "Check For Something",
         'Contact': "Contact Someone",
-        'MetaOptions': "contz"
+        'MetaOptions': "shifter, contz"
     }
 )
 
@@ -193,6 +193,7 @@ add_properties(
         'Description': "Efficiency plot of something",
         'Check': "Check For Something",
         'Contact': "Contact Someone",
+        'MetaOptions': "shifter"
     }
 )
 
@@ -218,7 +219,8 @@ add_properties(
     {
         'Description': "TGraphErrors plot of something",
         'Check': "Check For Something",
-        'Contact': "Contact Someone"
+        'Contact': "Contact Someone",
+        'MetaOptions': "shifter"
     }
 )
 

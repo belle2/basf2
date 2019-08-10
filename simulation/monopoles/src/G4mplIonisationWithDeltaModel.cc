@@ -29,7 +29,7 @@
 #include <G4ProductionCutsTable.hh>
 #include <G4MaterialCutsCouple.hh>
 #include <G4Log.hh>
-#include "G4Pow.hh"
+#include <G4Pow.hh>
 
 #include <framework/logging/Logger.h>
 

@@ -29,7 +29,6 @@ import mdst
 
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
-                       use_second_cdc_hits=False, add_muid_hits=False,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=False,
                        nCDCHitsMax=4000, nSVDShaperDigitsMax=70000):
     """
@@ -673,9 +672,6 @@ def add_dedx_modules(path, components=None):
         path.add_module(VXDdEdxPID)
 
 
-<< << << < HEAD
-
-
 class EventsOfDoomBuster(Module):
     """
     Module that flags an event destined for doom at reconstruction,
@@ -744,7 +740,6 @@ class EventsOfDoomBuster(Module):
                       nSVDShaperDigitsMax=self.nSVDShaperDigitsMax)
 
         self.return_value(doom_cdc or doom_svd)
-== == == =
 
 
 def prepare_cdst_analysis(path, components=None):
@@ -784,4 +779,3 @@ def prepare_cdst_analysis(path, components=None):
     add_ecl_eip_module(path, components)
     add_pid_module(path, components)
     add_ecl_track_brem_finder(path, components)
->>>>>> > 57d98769f2... Add the prepare_cdst_analysis function

@@ -3,16 +3,16 @@
 
 """
 <header>
-  <input>../GenericB.dst.root</input>
+  <input>../GenericB_GENSIMRECtoDST.dst.root</input>
   <output>Pi0_Validation.root</output>
-  <contact>Sam Cunliffe (sam.cunliffe@desy.de), Mario Merola (mario.merola@na.infn.it)</contact>
+  <contact>Mario Merola (mario.merola@na.infn.it), Andrea Selce (andrea.selce@pg.infn.it)</contact>
   <description>
   Check the calibration of the ECL in the MC by determining the measured pi0 invariant mass.
   </description>
 </header>
 """
 
-INPUT_FILENAME = "../GenericB.dst.root"
+INPUT_FILENAME = "../GenericB_GENSIMRECtoDST.dst.root"
 OUTPUT_FILENAME = "Pi0_Validation.root"
 
 import basf2
@@ -43,10 +43,10 @@ create_validation_histograms(
         (
             "Mreco", 40, 0.08, 0.18,
             "#pi^{0} reconstructed candidates, invariant mass",
-            "Mario Merola <mario.merola@desy.de>; Sam Cunliffe <sam.cunliffe@desy.de>",
+            "Mario Merola <mario.merola@desy.de>; Andrea Selce <andrea.selce@pg.infn.it>",
             r"The $pi^{0}$ invariant mass distribution with $E_{\gamma}>0.05\, \text{GeV}$",
             r"Distribution should be peaking at the nominal $\pi^{0}$ mass.",
-            "M(#pi^{0}) [GeV/c^{2}]", "Candidates"
+            "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
         ),
     ],
     description=r"$\pi^0$ reconstructed mass distribution",
@@ -61,10 +61,10 @@ create_validation_histograms(
         (
             "Mmc", 40, 0.08, 0.18,
             "#pi^{0} MC candidates, invariant mass",
-            "Mario Merola <mario.merola@desy.de>; Sam Cunliffe <sam.cunliffe@desy.de>",
+            "Mario Merola <mario.merola@desy.de>; Andrea Selce <andrea.selce@pg.infn.it>",
             r"The $pi^{0}$ invariant mass distribution for truth matched candidates",
             r"Distribution should be peaking at the nominal $\pi^{0}$ mass.",
-            "M(#pi^{0}) [GeV/c^{2}]", "Candidates"
+            "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
         ),
     ],
     description=r"$\pi^0$ MC mass distribution",
@@ -79,14 +79,14 @@ Mrecohist = f.Get('Mreco')
 Mmchist = f.Get('Mmc')
 
 
-mass = ROOT.RooRealVar("recomass", "m(#pi^{0}) GeV", 0.11, 0.15)
+mass = ROOT.RooRealVar("recomass", "m_{#gamma#gamma} [GeV/c^{2}]", 0.11, 0.15)
 
 h_pi0_reco = ROOT.RooDataHist("h_pi0_reco", "h_pi0_reco", ROOT.RooArgList(mass), Mrecohist)
 h_pi0_mc = ROOT.RooDataHist("h_pi0_mc", "h_pi0_mc", ROOT.RooArgList(mass), Mmchist)
 
 
 # pi0 signal PDF is a Crystal Ball (Gaussian also listed in case we want to switch)
-mean = ROOT.RooRealVar("mean", "mean", 0.14, 0.11, 0.16)
+mean = ROOT.RooRealVar("mean", "mean", 0.14, 0.11, 0.15)
 sig1 = ROOT.RooRealVar("#sigma", "sig", 0.05, 0.002, 0.1)
 gau1 = ROOT.RooGaussian("gau1", "gau1", mass, mean, sig1)
 
@@ -110,6 +110,7 @@ totalPdf = ROOT.RooAddPdf("totalpdf", "", ROOT.RooArgList(sigcb, bkg), ROOT.RooA
 
 output = ROOT.TFile("Pi0_Validation_ntuple.root", "recreate")
 
+# Store pi0 mass fit results to a tuple for comparison of mean and width among releases.
 outputNtuple = ROOT.TNtuple(
     "pi0_mass",
     "Pi0 mass fit results",
@@ -140,11 +141,14 @@ width = sig1.getVal()
 widtherror = sig1.getError()
 frame1.Draw("")
 
-
 outputNtuple.Fill(meanval, meanerror, width, widtherror)
+
 
 canvas.cd(2)
 
+# ---------------------------
+# Fit to the truth matched mass using the same pdf of the reco mass.
+# Re-initialize the fit parameters to the default values.
 mean.setVal(0.14)
 sig1.setVal(0.005)
 nsig.setVal(1000)
@@ -187,7 +191,7 @@ validation_metadata_update(
     output,
     "pi0_mass",
     title="Pi0 mass fit results",
-    contact="sam.cunliffe@desy.de, mario.merola@na.infn.it",
+    contact="mario.merola@na.infn.it, andrea.selce@pg.infn.it",
     description="Fit to the invariant mass of the reconstructed and truth matched pi0s",
     check="Consistent numerical fit results. Stable mean and width.",
     metaoptions="shifter")

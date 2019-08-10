@@ -255,6 +255,39 @@ namespace Belle2 {
     }
 
 
+    double cosHelicityAnglePrimary(const Particle* part)
+    {
+      return part->getCosHelicity();
+    }
+
+    Manager::FunctionPtr cosHelicityAngleDaughter(const std::vector<std::string>& arguments)
+    {
+      int iDaughter = 0;
+      int iGrandDaughter = 0;
+      if ((arguments.size() == 0) || (arguments.size() > 2)) {
+        B2FATAL("Wrong number of arguments for cosHelicityAngleDaughter: one or two are needed.");
+      }
+      try {
+        iDaughter = Belle2::convertString<int>(arguments[0]);
+        if (arguments.size() == 2) {
+          iGrandDaughter = Belle2::convertString<int>(arguments[1]);
+        }
+      } catch (boost::bad_lexical_cast&) {
+        B2FATAL("The arguments of cosHelicityAngleDaughter must be integers!");
+      }
+
+      auto func = [iDaughter, iGrandDaughter](const Particle * part) -> double {
+        return part->getCosHelicityDaughter(iDaughter, iGrandDaughter);
+      };
+      return func;
+    }
+
+    double acoplanarityAngle(const Particle* part)
+    {
+      return part->getAcoplanarity();
+    }
+
+
     VARIABLE_GROUP("Helicity variables");
 
     REGISTER_VARIABLE("cosHelicityAngleMomentum",
@@ -316,6 +349,22 @@ namespace Belle2 {
 
                       For example, in the Decay :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, if the provided particle is B0 and the selected indices are (0, 0),
                       the variable will return the acoplanarity using the :math:`\mu^+` and the :math:`K^+` granddaughters.)DOC");
+
+    REGISTER_VARIABLE("cosHelicityAnglePrimary", cosHelicityAnglePrimary,
+                      R"DOC(
+                      Cosine of the helicity angle (see `Particle::getCosHelicity`) assuming the center of mass system as mother rest frame.
+                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");
+
+    REGISTER_VARIABLE("cosHelicityAngleDaughter", cosHelicityAngleDaughter,
+                      R"DOC(
+                      Cosine of the helicity angle of the i-th daughter (see `Particle::getCosHelicityDaughter`).
+                      The second argument is the index of the grand daughter that defines the angle, default is 0.
+                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");
+
+    REGISTER_VARIABLE("acoplanarityAngle", acoplanarityAngle,
+                      R"DOC(
+                      Acoplanarity angle (see `Particle::getAcoplanarity`) assuming a two body decay of the particle and its daughters.
+                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the acoplanarity angle.)DOC");
 
   }
 }

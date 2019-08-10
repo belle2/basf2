@@ -62,5 +62,21 @@ namespace Belle2 {
      * */
     Manager::FunctionPtr cosAcoplanarityAngle(const std::vector<std::string>& arguments);
 
+    /**
+     * Cosine of the helicity angle (see Particle::getCosHelicity) assuming the center of mass system as mother rest frame
+     */
+    double cosHelicityAnglePrimary(const Particle* part);
+
+    /**
+     * Cosine of the helicity angle of the i-th daughter (see Particle::getCosHelicityDaughter)
+     * The second argument is the index of the grand daughter that defines the angle, default is 0
+     */
+    Manager::FunctionPtr cosHelicityAngleDaughter(const std::vector<std::string>& arguments);
+
+    /**
+     * Acoplanarity angle (see Particle::getAcoplanarity) assuming a two body decay of the particle and its daughters
+     */
+    double acoplanarityAngle(const Particle* part);
+
   }
 } // Belle2 namespace

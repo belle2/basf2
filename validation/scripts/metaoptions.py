@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# std
+from typing import Optional, Iterable, List
+
 
 class MetaOptionParser:
     """
@@ -9,16 +12,18 @@ class MetaOptionParser:
     to root plots.
 
     A typical meta options list might look like this:
-    ["expert", "pvalue-warn=0.9", "pvalue-error=0.4"]
+    ["pvalue-warn=0.9", "pvalue-error=0.4"]
     """
 
-    def __init__(self, meta_option_list):
+    def __init__(self, meta_option_list: Optional[Iterable] = None):
         """
         @param meta_option_list: list of meta options read from ROOT object
         """
-
+        if meta_option_list is None:
+            meta_option_list = []
+        meta_option_list = list(meta_option_list)
         #: store the meta option list for usage in the functions below
-        self.mo = meta_option_list
+        self.mo = meta_option_list  # type: List[str]
 
     def has_option(self, option_name):
         """

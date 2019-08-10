@@ -22,6 +22,7 @@
 #include <framework/pcore/ZMQEventProcessor.h>
 #include <framework/pcore/zmq/utils/ZMQAddressUtils.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/database/Configuration.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogSystem.h>
@@ -39,7 +40,9 @@ Framework::Framework()
   DataStore::s_DoCleanup = true;
   LogSystem::Instance().enableErrorSummary(true);
 
-  RandomNumbers::initialize();
+  if (!RandomNumbers::isInitialized()) {
+    RandomNumbers::initialize();
+  }
   Environment::Instance();
 }
 
@@ -52,6 +55,8 @@ Framework::~Framework()
   //after Py_Finalize(). The framework object is cleaned up before, so this is a good place.
   ModuleManager::Instance().reset();
   DataStore::s_DoCleanup = false;
+  //Also the database configuration has things to cleanup before Py_Finalize()
+  Conditions::Configuration::getInstance().reset();
 }
 
 

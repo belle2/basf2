@@ -49,7 +49,7 @@ namespace Belle2 {
     //! @param x x coordinate of the hit
     //! @param y y coordinate of the hit
     //! @param z x coordinate of the hit
-    void geometryConverter(bool fwd, int sector, int layer, int phiStrip, int zStrip, int& x, int& y, int& z);
+    void geometryConverter(int fwd, int sector, int layer, int phiStrip, int zStrip, int& x, int& y, int& z);
 
     //! Total number of sectors (eight, a constant)
     static const int c_TotalSectors = 8;
@@ -64,9 +64,9 @@ namespace Belle2 {
     int m_minLayers;
 
     //! Total number of processed events
-    int m_nEvents;
+    int m_nEvents = 0;
     //! Total number of found tracks
-    int m_nTracks;
+    int m_nTracks = 0;
 
     /**name of StoreArray Tracks*/
     std::string m_klmtrackCollectionName;

@@ -16,6 +16,7 @@
 #include <framework/logging/LogConnectionFilter.h>
 #include <framework/logging/LogConnectionTxtFile.h>
 #include <framework/logging/LogConnectionJSON.h>
+#include <framework/logging/LogConnectionUDP.h>
 #include <framework/logging/LogConnectionConsole.h>
 #include <framework/logging/LogVariableStream.h>
 
@@ -87,6 +88,11 @@ LogConfig& LogPythonInterface::getPackageLogConfig(const std::string& package)
 void LogPythonInterface::addLogJSON(bool complete)
 {
   LogSystem::Instance().addLogConnection(new LogConnectionJSON(complete));
+}
+
+void LogPythonInterface::addLogUDP(const std::string& hostname, unsigned short port)
+{
+  LogSystem::Instance().addLogConnection(new LogConnectionUDP(hostname, port));
 }
 
 void LogPythonInterface::addLogFile(const std::string& filename, bool append)
@@ -373,6 +379,18 @@ Parameters:
 
 See Also:
    `add_console()`, `set_info()`
+)DOCSTRING")
+  .def("add_udp", &LogPythonInterface::addLogUDP, (bp::arg("hostname"), bp::arg("port")), R"DOCSTRING(
+    Send the log output as a JSON object to the given hostname and port via UDP.
+
+.. versionadded:: release-04-00-00
+
+Parameters:
+   hostname (str): The hostname to send the message to. If it can not be resolved, an exception will be thrown.
+   port (int): The port on the host to send the message via UDP.
+
+See Also:
+   `add_json()`
 )DOCSTRING")
   .def("terminal_supports_colors", &terminalSupportsColors, "Returns true if the terminal supports colored output")
   .staticmethod("terminal_supports_colors")

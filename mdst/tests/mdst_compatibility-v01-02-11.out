@@ -1,9 +1,12 @@
 [INFO] Steering file: mdst/tests/mdst_compatibility-v01-02-11.py
 [INFO] The random number seed is set to "1"
 [INFO] Starting event processing, random seed is set to '1'
+[INFO] Added file ${BELLE2_LOCAL_DIR}/mdst/tests/mdst-v01-02-11.root
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 Untested method EventMetaData::addErrorFlag
 Untested method EventMetaData::isEndOfData
 Untested method EventMetaData::setEndOfData
+Untested method EventMetaData::setEndOfRun
 Untested method EventMetaData::setErrorFlag
 Untested method EventMetaData::setEvent
 Untested method EventMetaData::setExperiment
@@ -56,6 +59,7 @@ Untested method ECLCluster::setEnergyRaw
 Untested method ECLCluster::setHypothesis
 Untested method ECLCluster::setIsTrack
 Untested method ECLCluster::setLAT
+Untested method ECLCluster::setMaxECellId
 Untested method ECLCluster::setMinTrkDistance
 Untested method ECLCluster::setNumberOfCrystals
 Untested method ECLCluster::setNumberOfHadronDigits
@@ -100,7 +104,10 @@ Untested method TRGSummary::testPsnm
 Untested method SoftwareTriggerResult::addResult
 Untested method SoftwareTriggerResult::clear
 Untested method SoftwareTriggerResult::getInfoHTML
+Untested method SoftwareTriggerResult::getNonPrescaledResult
 Untested method SoftwareTriggerResult::getResult
+Untested method SoftwareTriggerResult::getResultPair
+Untested method SoftwareTriggerResult::getResultPairs
 Untested method MCParticle::addSeenInDetector
 Untested method MCParticle::addStatus
 Untested method MCParticle::fixParticleList
@@ -139,6 +146,7 @@ EventMetaData:
   getRun(): 0
   getSubrun(): 0
   getTime(): 1541275560155998554
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): 0
@@ -545,6 +553,9 @@ V0#4:
     -> Tracks#12
   getV0Hypothesis(): <type: anti-Lambda0>
 TrackFitResult#0:
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
   get4Momentum(): (0.0215085,0.145156,0.0849067,0.219595)
   getChargeSign(): 1
   getCotTheta(): 0.578618
@@ -3905,12 +3916,13 @@ ECLCluster#0:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000100000
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0258387
   getEnergyRaw(): 0.0393884
   getHypotheses(): 16
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -3958,6 +3970,7 @@ ECLCluster#1:
   getEnergyRaw(): 0.347293
   getHypotheses(): 16
   getLAT(): 0.142578
+  getMaxECellId(): 0
   getMinTrkDistance(): 60.791
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -4005,6 +4018,7 @@ ECLCluster#2:
   getEnergyRaw(): 0.262535
   getHypotheses(): 16
   getLAT(): 0.74707
+  getMaxECellId(): 0
   getMinTrkDistance(): 17.5781
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
@@ -4052,6 +4066,7 @@ ECLCluster#3:
   getEnergyRaw(): 0.174502
   getHypotheses(): 16
   getLAT(): 0.762695
+  getMaxECellId(): 0
   getMinTrkDistance(): 52.2461
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -4101,6 +4116,7 @@ ECLCluster#4:
   getEnergyRaw(): 0.16443
   getHypotheses(): 16
   getLAT(): 0.608398
+  getMaxECellId(): 0
   getMinTrkDistance(): 43.2129
   getNumberOfCrystals(): 4.88281
   getNumberOfHadronDigits(): 0
@@ -4150,6 +4166,7 @@ ECLCluster#5:
   getEnergyRaw(): 0.13524
   getHypotheses(): 16
   getLAT(): 0.557617
+  getMaxECellId(): 0
   getMinTrkDistance(): 20.0195
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -4198,6 +4215,7 @@ ECLCluster#6:
   getEnergyRaw(): 0.318179
   getHypotheses(): 16
   getLAT(): 0.355469
+  getMaxECellId(): 0
   getMinTrkDistance(): 18.7988
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -4245,6 +4263,7 @@ ECLCluster#7:
   getEnergyRaw(): 0.131801
   getHypotheses(): 16
   getLAT(): 0.423828
+  getMaxECellId(): 0
   getMinTrkDistance(): 27.0996
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -4292,6 +4311,7 @@ ECLCluster#8:
   getEnergyRaw(): 0.0385747
   getHypotheses(): 16
   getLAT(): 0.0673828
+  getMaxECellId(): 0
   getMinTrkDistance(): 109.619
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -4339,6 +4359,7 @@ ECLCluster#9:
   getEnergyRaw(): 0.0267607
   getHypotheses(): 16
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 62.7441
   getNumberOfCrystals(): 0.976562
   getNumberOfHadronDigits(): 0
@@ -4386,6 +4407,7 @@ ECLCluster#10:
   getEnergyRaw(): 0.219557
   getHypotheses(): 16
   getLAT(): 0.756836
+  getMaxECellId(): 0
   getMinTrkDistance(): 18.7988
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -4434,6 +4456,7 @@ ECLCluster#11:
   getEnergyRaw(): 0.190516
   getHypotheses(): 16
   getLAT(): 0.685547
+  getMaxECellId(): 0
   getMinTrkDistance(): 17.5781
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -4481,6 +4504,7 @@ ECLCluster#12:
   getEnergyRaw(): 0.0594257
   getHypotheses(): 16
   getLAT(): 0.0800781
+  getMaxECellId(): 0
   getMinTrkDistance(): 65.918
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -4529,6 +4553,7 @@ ECLCluster#13:
   getEnergyRaw(): 0.0742074
   getHypotheses(): 16
   getLAT(): 0.111328
+  getMaxECellId(): 0
   getMinTrkDistance(): 42.9688
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -4577,6 +4602,7 @@ ECLCluster#14:
   getEnergyRaw(): 0.211049
   getHypotheses(): 16
   getLAT(): 0.191406
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -4624,6 +4650,7 @@ ECLCluster#15:
   getEnergyRaw(): 0.493211
   getHypotheses(): 16
   getLAT(): 0.320312
+  getMaxECellId(): 0
   getMinTrkDistance(): 17.0898
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
@@ -4671,6 +4698,7 @@ ECLCluster#16:
   getEnergyRaw(): 0.0953977
   getHypotheses(): 16
   getLAT(): 0.0908203
+  getMaxECellId(): 0
   getMinTrkDistance(): 76.1719
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -4718,6 +4746,7 @@ ECLCluster#17:
   getEnergyRaw(): 0.0972288
   getHypotheses(): 16
   getLAT(): 0.0322266
+  getMaxECellId(): 0
   getMinTrkDistance(): 63.9648
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -4765,6 +4794,7 @@ ECLCluster#18:
   getEnergyRaw(): 0.0814412
   getHypotheses(): 16
   getLAT(): 0.109375
+  getMaxECellId(): 0
   getMinTrkDistance(): 52.002
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -4813,6 +4843,7 @@ ECLCluster#19:
   getEnergyRaw(): 0.0714147
   getHypotheses(): 16
   getLAT(): 0.145508
+  getMaxECellId(): 0
   getMinTrkDistance(): 104.736
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -4860,6 +4891,7 @@ ECLCluster#20:
   getEnergyRaw(): 0.12454
   getHypotheses(): 16
   getLAT(): 0.195312
+  getMaxECellId(): 0
   getMinTrkDistance(): 106.445
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -4907,6 +4939,7 @@ ECLCluster#21:
   getEnergyRaw(): 0.0710994
   getHypotheses(): 16
   getLAT(): 0.0810547
+  getMaxECellId(): 0
   getMinTrkDistance(): 38.5742
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -4954,6 +4987,7 @@ ECLCluster#22:
   getEnergyRaw(): 0.123157
   getHypotheses(): 16
   getLAT(): 0.382812
+  getMaxECellId(): 0
   getMinTrkDistance(): 13.6719
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -5004,6 +5038,7 @@ ECLCluster#23:
   getEnergyRaw(): 0.168726
   getHypotheses(): 16
   getLAT(): 0.147461
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -5051,6 +5086,7 @@ ECLCluster#24:
   getEnergyRaw(): 0.033703
   getHypotheses(): 16
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 80.3223
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -5099,6 +5135,7 @@ ECLCluster#25:
   getEnergyRaw(): 0.0729634
   getHypotheses(): 16
   getLAT(): 0.0732422
+  getMaxECellId(): 0
   getMinTrkDistance(): 13.4277
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -5144,13 +5181,14 @@ ECLCluster#26:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000010000
   getEnergy(16): nan
   getEnergy(32): 0.0393884
   getEnergyHighestCrystal(): 0.0258387
   getEnergyRaw(): 0.0393884
   getHypotheses(): 32
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -5198,6 +5236,7 @@ ECLCluster#27:
   getEnergyRaw(): 0.347293
   getHypotheses(): 32
   getLAT(): 0.142578
+  getMaxECellId(): 0
   getMinTrkDistance(): 60.791
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -5245,6 +5284,7 @@ ECLCluster#28:
   getEnergyRaw(): 0.26567
   getHypotheses(): 32
   getLAT(): 0.761719
+  getMaxECellId(): 0
   getMinTrkDistance(): 17.5781
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
@@ -5292,6 +5332,7 @@ ECLCluster#29:
   getEnergyRaw(): 0.476057
   getHypotheses(): 32
   getLAT(): 0.974609
+  getMaxECellId(): 0
   getMinTrkDistance(): 47.8516
   getNumberOfCrystals(): 16.9922
   getNumberOfHadronDigits(): 0
@@ -5343,6 +5384,7 @@ ECLCluster#30:
   getEnergyRaw(): 0.318179
   getHypotheses(): 32
   getLAT(): 0.355469
+  getMaxECellId(): 0
   getMinTrkDistance(): 18.7988
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -5390,6 +5432,7 @@ ECLCluster#31:
   getEnergyRaw(): 0.131801
   getHypotheses(): 32
   getLAT(): 0.423828
+  getMaxECellId(): 0
   getMinTrkDistance(): 27.0996
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -5437,6 +5480,7 @@ ECLCluster#32:
   getEnergyRaw(): 0.0385747
   getHypotheses(): 32
   getLAT(): 0.0673828
+  getMaxECellId(): 0
   getMinTrkDistance(): 109.619
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -5484,6 +5528,7 @@ ECLCluster#33:
   getEnergyRaw(): 0.0267607
   getHypotheses(): 32
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 62.7441
   getNumberOfCrystals(): 0.976562
   getNumberOfHadronDigits(): 0
@@ -5531,6 +5576,7 @@ ECLCluster#34:
   getEnergyRaw(): 0.219557
   getHypotheses(): 32
   getLAT(): 0.756836
+  getMaxECellId(): 0
   getMinTrkDistance(): 18.7988
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -5579,6 +5625,7 @@ ECLCluster#35:
   getEnergyRaw(): 0.190516
   getHypotheses(): 32
   getLAT(): 0.685547
+  getMaxECellId(): 0
   getMinTrkDistance(): 17.5781
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -5626,6 +5673,7 @@ ECLCluster#36:
   getEnergyRaw(): 0.0594257
   getHypotheses(): 32
   getLAT(): 0.0800781
+  getMaxECellId(): 0
   getMinTrkDistance(): 65.918
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -5674,6 +5722,7 @@ ECLCluster#37:
   getEnergyRaw(): 0.0742074
   getHypotheses(): 32
   getLAT(): 0.111328
+  getMaxECellId(): 0
   getMinTrkDistance(): 42.9688
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -5722,6 +5771,7 @@ ECLCluster#38:
   getEnergyRaw(): 0.211049
   getHypotheses(): 32
   getLAT(): 0.191406
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -5769,6 +5819,7 @@ ECLCluster#39:
   getEnergyRaw(): 0.493211
   getHypotheses(): 32
   getLAT(): 0.320312
+  getMaxECellId(): 0
   getMinTrkDistance(): 17.0898
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
@@ -5816,6 +5867,7 @@ ECLCluster#40:
   getEnergyRaw(): 0.0953977
   getHypotheses(): 32
   getLAT(): 0.0908203
+  getMaxECellId(): 0
   getMinTrkDistance(): 76.1719
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -5863,6 +5915,7 @@ ECLCluster#41:
   getEnergyRaw(): 0.0972288
   getHypotheses(): 32
   getLAT(): 0.0322266
+  getMaxECellId(): 0
   getMinTrkDistance(): 63.9648
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -5910,6 +5963,7 @@ ECLCluster#42:
   getEnergyRaw(): 0.0814412
   getHypotheses(): 32
   getLAT(): 0.109375
+  getMaxECellId(): 0
   getMinTrkDistance(): 52.002
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -5958,6 +6012,7 @@ ECLCluster#43:
   getEnergyRaw(): 0.0714147
   getHypotheses(): 32
   getLAT(): 0.145508
+  getMaxECellId(): 0
   getMinTrkDistance(): 104.736
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -6005,6 +6060,7 @@ ECLCluster#44:
   getEnergyRaw(): 0.12454
   getHypotheses(): 32
   getLAT(): 0.195312
+  getMaxECellId(): 0
   getMinTrkDistance(): 106.445
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -6052,6 +6108,7 @@ ECLCluster#45:
   getEnergyRaw(): 0.0710994
   getHypotheses(): 32
   getLAT(): 0.0810547
+  getMaxECellId(): 0
   getMinTrkDistance(): 38.5742
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -6099,6 +6156,7 @@ ECLCluster#46:
   getEnergyRaw(): 0.123157
   getHypotheses(): 32
   getLAT(): 0.382812
+  getMaxECellId(): 0
   getMinTrkDistance(): 13.6719
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -6149,6 +6207,7 @@ ECLCluster#47:
   getEnergyRaw(): 0.168726
   getHypotheses(): 32
   getLAT(): 0.147461
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -6196,6 +6255,7 @@ ECLCluster#48:
   getEnergyRaw(): 0.033703
   getHypotheses(): 32
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 80.3223
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -6244,6 +6304,7 @@ ECLCluster#49:
   getEnergyRaw(): 0.0729634
   getHypotheses(): 32
   getLAT(): 0.0732422
+  getMaxECellId(): 0
   getMinTrkDistance(): 13.4277
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -6706,6 +6767,112 @@ TRGSummary:
   getTRGSummary(9): 0
   getTimType(): 15
 SoftwareTriggerResult:
+  getNonPrescaledResults(): size(35)
+    pair
+      software_trigger_cut&calib&accept_D0_Kpi
+      0
+    pair
+      software_trigger_cut&calib&accept_Dstar
+      0
+    pair
+      software_trigger_cut&calib&accept_Xi_piLambda
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_D0
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Dplus
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Dstar
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Jpsiee
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Jpsimumu
+      0
+    pair
+      software_trigger_cut&calib&accept_ee
+      0
+    pair
+      software_trigger_cut&calib&accept_gee
+      0
+    pair
+      software_trigger_cut&calib&accept_gg_4pi
+      0
+    pair
+      software_trigger_cut&calib&accept_gg_ee
+      0
+    pair
+      software_trigger_cut&calib&accept_gmumu
+      0
+    pair
+      software_trigger_cut&calib&accept_mumu
+      0
+    pair
+      software_trigger_cut&calib&accept_test
+      0
+    pair
+      software_trigger_cut&calib&total_result
+      0
+    pair
+      software_trigger_cut&fast_reco&accept_ee
+      0
+    pair
+      software_trigger_cut&fast_reco&reject_bkg
+      0
+    pair
+      software_trigger_cut&fast_reco&reject_ee
+      0
+    pair
+      software_trigger_cut&fast_reco&total_result
+      0
+    pair
+      software_trigger_cut&hlt&accept_1_track1_cluster
+      0
+    pair
+      software_trigger_cut&hlt&accept_2_tracks
+      0
+    pair
+      software_trigger_cut&hlt&accept_b2bcluster_3D
+      0
+    pair
+      software_trigger_cut&hlt&accept_b2bclusterhigh_phi
+      0
+    pair
+      software_trigger_cut&hlt&accept_b2bclusterlow_phi
+      0
+    pair
+      software_trigger_cut&hlt&accept_bhabha
+      0
+    pair
+      software_trigger_cut&hlt&accept_gamma_gamma
+      0
+    pair
+      software_trigger_cut&hlt&accept_hadron
+      0
+    pair
+      software_trigger_cut&hlt&accept_mumu_1trk
+      0
+    pair
+      software_trigger_cut&hlt&accept_mumu_2trk
+      0
+    pair
+      software_trigger_cut&hlt&accept_single_photon_1GeV
+      0
+    pair
+      software_trigger_cut&hlt&accept_single_photon_2GeV_barrel
+      0
+    pair
+      software_trigger_cut&hlt&accept_single_photon_2GeV_endcap
+      0
+    pair
+      software_trigger_cut&hlt&accept_tau_tau
+      0
+    pair
+      software_trigger_cut&hlt&total_result
+      0
   getResults(): size(35)
     pair
       software_trigger_cut&calib&accept_D0_Kpi
@@ -9578,6 +9745,7 @@ EventMetaData:
   getRun(): 0
   getSubrun(): 0
   getTime(): 1541275609131813384
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -13224,12 +13392,13 @@ ECLCluster#0:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000100000
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0172933
   getEnergyRaw(): 0.0387778
   getHypotheses(): 16
   getLAT(): 0.265625
+  getMaxECellId(): 0
   getMinTrkDistance(): 36.6211
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -13277,6 +13446,7 @@ ECLCluster#1:
   getEnergyRaw(): 0.197996
   getHypotheses(): 16
   getLAT(): 0.332031
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.6484
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -13324,6 +13494,7 @@ ECLCluster#2:
   getEnergyRaw(): 0.11841
   getHypotheses(): 16
   getLAT(): 0.0175781
+  getMaxECellId(): 0
   getMinTrkDistance(): 24.4141
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -13373,6 +13544,7 @@ ECLCluster#3:
   getEnergyRaw(): 0.10057
   getHypotheses(): 16
   getLAT(): 0.292969
+  getMaxECellId(): 0
   getMinTrkDistance(): 115.967
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -13420,6 +13592,7 @@ ECLCluster#4:
   getEnergyRaw(): 0.239603
   getHypotheses(): 16
   getLAT(): 0.337891
+  getMaxECellId(): 0
   getMinTrkDistance(): 83.9844
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
@@ -13468,6 +13641,7 @@ ECLCluster#5:
   getEnergyRaw(): 0.304574
   getHypotheses(): 16
   getLAT(): 0.198242
+  getMaxECellId(): 0
   getMinTrkDistance(): 96.9238
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
@@ -13516,6 +13690,7 @@ ECLCluster#6:
   getEnergyRaw(): 0.206538
   getHypotheses(): 16
   getLAT(): 0.0830078
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -13563,6 +13738,7 @@ ECLCluster#7:
   getEnergyRaw(): 0.716437
   getHypotheses(): 16
   getLAT(): 0.196289
+  getMaxECellId(): 0
   getMinTrkDistance(): 55.1758
   getNumberOfCrystals(): 14.0625
   getNumberOfHadronDigits(): 0
@@ -13611,6 +13787,7 @@ ECLCluster#8:
   getEnergyRaw(): 0.262767
   getHypotheses(): 16
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -13658,6 +13835,7 @@ ECLCluster#9:
   getEnergyRaw(): 0.130832
   getHypotheses(): 16
   getLAT(): 0.380859
+  getMaxECellId(): 0
   getMinTrkDistance(): 32.959
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -13707,6 +13885,7 @@ ECLCluster#10:
   getEnergyRaw(): 0.0494796
   getHypotheses(): 16
   getLAT(): 0.237305
+  getMaxECellId(): 0
   getMinTrkDistance(): 17.5781
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -13754,6 +13933,7 @@ ECLCluster#11:
   getEnergyRaw(): 0.126312
   getHypotheses(): 16
   getLAT(): 0.177734
+  getMaxECellId(): 0
   getMinTrkDistance(): 35.6445
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -13801,6 +13981,7 @@ ECLCluster#12:
   getEnergyRaw(): 0.083681
   getHypotheses(): 16
   getLAT(): 0.0498047
+  getMaxECellId(): 0
   getMinTrkDistance(): 113.525
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -13848,6 +14029,7 @@ ECLCluster#13:
   getEnergyRaw(): 0.152217
   getHypotheses(): 16
   getLAT(): 0.189453
+  getMaxECellId(): 0
   getMinTrkDistance(): 77.8809
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -13897,6 +14079,7 @@ ECLCluster#14:
   getEnergyRaw(): 0.116641
   getHypotheses(): 16
   getLAT(): 0.267578
+  getMaxECellId(): 0
   getMinTrkDistance(): 101.074
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -13944,6 +14127,7 @@ ECLCluster#15:
   getEnergyRaw(): 0.140251
   getHypotheses(): 16
   getLAT(): 0.0166016
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -13992,6 +14176,7 @@ ECLCluster#16:
   getEnergyRaw(): 0.0735334
   getHypotheses(): 16
   getLAT(): 0.0605469
+  getMaxECellId(): 0
   getMinTrkDistance(): 40.5273
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -14039,6 +14224,7 @@ ECLCluster#17:
   getEnergyRaw(): 0.0774041
   getHypotheses(): 16
   getLAT(): 0.216797
+  getMaxECellId(): 0
   getMinTrkDistance(): 48.584
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -14086,6 +14272,7 @@ ECLCluster#18:
   getEnergyRaw(): 0.280287
   getHypotheses(): 16
   getLAT(): 0.208008
+  getMaxECellId(): 0
   getMinTrkDistance(): 107.91
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -14133,6 +14320,7 @@ ECLCluster#19:
   getEnergyRaw(): 0.3568
   getHypotheses(): 16
   getLAT(): 0.402344
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.4043
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -14182,6 +14370,7 @@ ECLCluster#20:
   getEnergyRaw(): 0.552387
   getHypotheses(): 16
   getLAT(): 0.299805
+  getMaxECellId(): 0
   getMinTrkDistance(): 16.6016
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
@@ -14231,6 +14420,7 @@ ECLCluster#21:
   getEnergyRaw(): 0.637737
   getHypotheses(): 16
   getLAT(): 0.477539
+  getMaxECellId(): 0
   getMinTrkDistance(): 32.4707
   getNumberOfCrystals(): 12.5
   getNumberOfHadronDigits(): 0
@@ -14281,6 +14471,7 @@ ECLCluster#22:
   getEnergyRaw(): 0.125486
   getHypotheses(): 16
   getLAT(): 0.456055
+  getMaxECellId(): 0
   getMinTrkDistance(): 21.2402
   getNumberOfCrystals(): 4.6875
   getNumberOfHadronDigits(): 0
@@ -14332,6 +14523,7 @@ ECLCluster#23:
   getEnergyRaw(): 0.116194
   getHypotheses(): 16
   getLAT(): 0.310547
+  getMaxECellId(): 0
   getMinTrkDistance(): 134.033
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
@@ -14379,13 +14571,14 @@ ECLCluster#24:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000010000
   getEnergy(16): nan
   getEnergy(32): 0.0387778
   getEnergyHighestCrystal(): 0.0172933
   getEnergyRaw(): 0.0387778
   getHypotheses(): 32
   getLAT(): 0.265625
+  getMaxECellId(): 0
   getMinTrkDistance(): 36.6211
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -14433,6 +14626,7 @@ ECLCluster#25:
   getEnergyRaw(): 0.197996
   getHypotheses(): 32
   getLAT(): 0.332031
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.6484
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -14480,6 +14674,7 @@ ECLCluster#26:
   getEnergyRaw(): 0.11841
   getHypotheses(): 32
   getLAT(): 0.0175781
+  getMaxECellId(): 0
   getMinTrkDistance(): 24.4141
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -14529,6 +14724,7 @@ ECLCluster#27:
   getEnergyRaw(): 0.10057
   getHypotheses(): 32
   getLAT(): 0.292969
+  getMaxECellId(): 0
   getMinTrkDistance(): 115.967
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -14576,6 +14772,7 @@ ECLCluster#28:
   getEnergyRaw(): 0.239603
   getHypotheses(): 32
   getLAT(): 0.337891
+  getMaxECellId(): 0
   getMinTrkDistance(): 83.9844
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
@@ -14624,6 +14821,7 @@ ECLCluster#29:
   getEnergyRaw(): 0.304574
   getHypotheses(): 32
   getLAT(): 0.198242
+  getMaxECellId(): 0
   getMinTrkDistance(): 96.9238
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
@@ -14672,6 +14870,7 @@ ECLCluster#30:
   getEnergyRaw(): 0.206538
   getHypotheses(): 32
   getLAT(): 0.0830078
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -14719,6 +14918,7 @@ ECLCluster#31:
   getEnergyRaw(): 0.716437
   getHypotheses(): 32
   getLAT(): 0.196289
+  getMaxECellId(): 0
   getMinTrkDistance(): 55.1758
   getNumberOfCrystals(): 14.0625
   getNumberOfHadronDigits(): 0
@@ -14767,6 +14967,7 @@ ECLCluster#32:
   getEnergyRaw(): 0.262767
   getHypotheses(): 32
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -14814,6 +15015,7 @@ ECLCluster#33:
   getEnergyRaw(): 0.181127
   getHypotheses(): 32
   getLAT(): 0.832031
+  getMaxECellId(): 0
   getMinTrkDistance(): 26.3672
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -14863,6 +15065,7 @@ ECLCluster#34:
   getEnergyRaw(): 0.126312
   getHypotheses(): 32
   getLAT(): 0.177734
+  getMaxECellId(): 0
   getMinTrkDistance(): 35.6445
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -14910,6 +15113,7 @@ ECLCluster#35:
   getEnergyRaw(): 0.083681
   getHypotheses(): 32
   getLAT(): 0.0498047
+  getMaxECellId(): 0
   getMinTrkDistance(): 113.525
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -14957,6 +15161,7 @@ ECLCluster#36:
   getEnergyRaw(): 0.152217
   getHypotheses(): 32
   getLAT(): 0.189453
+  getMaxECellId(): 0
   getMinTrkDistance(): 77.8809
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -15006,6 +15211,7 @@ ECLCluster#37:
   getEnergyRaw(): 0.116641
   getHypotheses(): 32
   getLAT(): 0.267578
+  getMaxECellId(): 0
   getMinTrkDistance(): 101.074
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -15053,6 +15259,7 @@ ECLCluster#38:
   getEnergyRaw(): 0.140251
   getHypotheses(): 32
   getLAT(): 0.0166016
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -15101,6 +15308,7 @@ ECLCluster#39:
   getEnergyRaw(): 0.0735334
   getHypotheses(): 32
   getLAT(): 0.0605469
+  getMaxECellId(): 0
   getMinTrkDistance(): 40.5273
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -15148,6 +15356,7 @@ ECLCluster#40:
   getEnergyRaw(): 0.0774041
   getHypotheses(): 32
   getLAT(): 0.216797
+  getMaxECellId(): 0
   getMinTrkDistance(): 48.584
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -15195,6 +15404,7 @@ ECLCluster#41:
   getEnergyRaw(): 0.280287
   getHypotheses(): 32
   getLAT(): 0.208008
+  getMaxECellId(): 0
   getMinTrkDistance(): 107.91
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -15242,6 +15452,7 @@ ECLCluster#42:
   getEnergyRaw(): 0.3568
   getHypotheses(): 32
   getLAT(): 0.402344
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.4043
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -15291,6 +15502,7 @@ ECLCluster#43:
   getEnergyRaw(): 1.31572
   getHypotheses(): 32
   getLAT(): 0.915039
+  getMaxECellId(): 0
   getMinTrkDistance(): 26.123
   getNumberOfCrystals(): 27.9297
   getNumberOfHadronDigits(): 0
@@ -15343,6 +15555,7 @@ ECLCluster#44:
   getEnergyRaw(): 0.116194
   getHypotheses(): 32
   getLAT(): 0.310547
+  getMaxECellId(): 0
   getMinTrkDistance(): 134.033
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
@@ -15774,6 +15987,112 @@ TRGSummary:
   getTRGSummary(9): 0
   getTimType(): 15
 SoftwareTriggerResult:
+  getNonPrescaledResults(): size(35)
+    pair
+      software_trigger_cut&calib&accept_D0_Kpi
+      0
+    pair
+      software_trigger_cut&calib&accept_Dstar
+      0
+    pair
+      software_trigger_cut&calib&accept_Xi_piLambda
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_D0
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Dplus
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Dstar
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Jpsiee
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Jpsimumu
+      0
+    pair
+      software_trigger_cut&calib&accept_ee
+      0
+    pair
+      software_trigger_cut&calib&accept_gee
+      0
+    pair
+      software_trigger_cut&calib&accept_gg_4pi
+      0
+    pair
+      software_trigger_cut&calib&accept_gg_ee
+      0
+    pair
+      software_trigger_cut&calib&accept_gmumu
+      0
+    pair
+      software_trigger_cut&calib&accept_mumu
+      0
+    pair
+      software_trigger_cut&calib&accept_test
+      0
+    pair
+      software_trigger_cut&calib&total_result
+      0
+    pair
+      software_trigger_cut&fast_reco&accept_ee
+      0
+    pair
+      software_trigger_cut&fast_reco&reject_bkg
+      0
+    pair
+      software_trigger_cut&fast_reco&reject_ee
+      0
+    pair
+      software_trigger_cut&fast_reco&total_result
+      0
+    pair
+      software_trigger_cut&hlt&accept_1_track1_cluster
+      0
+    pair
+      software_trigger_cut&hlt&accept_2_tracks
+      0
+    pair
+      software_trigger_cut&hlt&accept_b2bcluster_3D
+      0
+    pair
+      software_trigger_cut&hlt&accept_b2bclusterhigh_phi
+      0
+    pair
+      software_trigger_cut&hlt&accept_b2bclusterlow_phi
+      0
+    pair
+      software_trigger_cut&hlt&accept_bhabha
+      0
+    pair
+      software_trigger_cut&hlt&accept_gamma_gamma
+      0
+    pair
+      software_trigger_cut&hlt&accept_hadron
+      0
+    pair
+      software_trigger_cut&hlt&accept_mumu_1trk
+      0
+    pair
+      software_trigger_cut&hlt&accept_mumu_2trk
+      0
+    pair
+      software_trigger_cut&hlt&accept_single_photon_1GeV
+      0
+    pair
+      software_trigger_cut&hlt&accept_single_photon_2GeV_barrel
+      0
+    pair
+      software_trigger_cut&hlt&accept_single_photon_2GeV_endcap
+      0
+    pair
+      software_trigger_cut&hlt&accept_tau_tau
+      0
+    pair
+      software_trigger_cut&hlt&total_result
+      0
   getResults(): size(35)
     pair
       software_trigger_cut&calib&accept_D0_Kpi
@@ -18704,6 +19023,7 @@ EventMetaData:
   getRun(): 0
   getSubrun(): 0
   getTime(): 1541275614516574857
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -22144,12 +22464,13 @@ ECLCluster#0:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000100000
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.10096
   getEnergyRaw(): 0.109167
   getHypotheses(): 16
   getLAT(): 0.00390625
+  getMaxECellId(): 0
   getMinTrkDistance(): 16.6016
   getNumberOfCrystals(): 1.5625
   getNumberOfHadronDigits(): 0
@@ -22197,6 +22518,7 @@ ECLCluster#1:
   getEnergyRaw(): 0.0841009
   getHypotheses(): 16
   getLAT(): 0.0175781
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 2.34375
   getNumberOfHadronDigits(): 0
@@ -22244,6 +22566,7 @@ ECLCluster#2:
   getEnergyRaw(): 0.508417
   getHypotheses(): 16
   getLAT(): 0.239258
+  getMaxECellId(): 0
   getMinTrkDistance(): 68.6035
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
@@ -22291,6 +22614,7 @@ ECLCluster#3:
   getEnergyRaw(): 0.0562751
   getHypotheses(): 16
   getLAT(): 0.140625
+  getMaxECellId(): 0
   getMinTrkDistance(): 105.713
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -22339,6 +22663,7 @@ ECLCluster#4:
   getEnergyRaw(): 0.107925
   getHypotheses(): 16
   getLAT(): 0.124023
+  getMaxECellId(): 0
   getMinTrkDistance(): 120.361
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -22386,6 +22711,7 @@ ECLCluster#5:
   getEnergyRaw(): 0.104203
   getHypotheses(): 16
   getLAT(): 0.233398
+  getMaxECellId(): 0
   getMinTrkDistance(): 118.652
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -22434,6 +22760,7 @@ ECLCluster#6:
   getEnergyRaw(): 0.505154
   getHypotheses(): 16
   getLAT(): 0.157227
+  getMaxECellId(): 0
   getMinTrkDistance(): 128.174
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
@@ -22481,6 +22808,7 @@ ECLCluster#7:
   getEnergyRaw(): 0.10362
   getHypotheses(): 16
   getLAT(): 0.0126953
+  getMaxECellId(): 0
   getMinTrkDistance(): 125.244
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -22529,6 +22857,7 @@ ECLCluster#8:
   getEnergyRaw(): 0.191069
   getHypotheses(): 16
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -22576,6 +22905,7 @@ ECLCluster#9:
   getEnergyRaw(): 0.110404
   getHypotheses(): 16
   getLAT(): 0.125977
+  getMaxECellId(): 0
   getMinTrkDistance(): 49.0723
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -22623,6 +22953,7 @@ ECLCluster#10:
   getEnergyRaw(): 0.0478593
   getHypotheses(): 16
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 18.0664
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -22670,6 +23001,7 @@ ECLCluster#11:
   getEnergyRaw(): 0.74575
   getHypotheses(): 16
   getLAT(): 0.285156
+  getMaxECellId(): 0
   getMinTrkDistance(): 166.992
   getNumberOfCrystals(): 16.0156
   getNumberOfHadronDigits(): 0
@@ -22718,6 +23050,7 @@ ECLCluster#12:
   getEnergyRaw(): 1.67653
   getHypotheses(): 16
   getLAT(): 0.279297
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.8926
   getNumberOfCrystals(): 17.9688
   getNumberOfHadronDigits(): 0
@@ -22765,6 +23098,7 @@ ECLCluster#13:
   getEnergyRaw(): 0.144363
   getHypotheses(): 16
   getLAT(): 0.674805
+  getMaxECellId(): 0
   getMinTrkDistance(): 18.7988
   getNumberOfCrystals(): 4.88281
   getNumberOfHadronDigits(): 0
@@ -22812,6 +23146,7 @@ ECLCluster#14:
   getEnergyRaw(): 0.133869
   getHypotheses(): 16
   getLAT(): 0.421875
+  getMaxECellId(): 0
   getMinTrkDistance(): 34.1797
   getNumberOfCrystals(): 4.10156
   getNumberOfHadronDigits(): 0
@@ -22857,13 +23192,14 @@ ECLCluster#15:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000010000
   getEnergy(16): nan
   getEnergy(32): 0.19328
   getEnergyHighestCrystal(): 0.0986726
   getEnergyRaw(): 0.19328
   getHypotheses(): 32
   getLAT(): 0.015625
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.1367
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -22911,6 +23247,7 @@ ECLCluster#16:
   getEnergyRaw(): 0.512124
   getHypotheses(): 32
   getLAT(): 0.28125
+  getMaxECellId(): 0
   getMinTrkDistance(): 68.6035
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
@@ -22958,6 +23295,7 @@ ECLCluster#17:
   getEnergyRaw(): 0.0562751
   getHypotheses(): 32
   getLAT(): 0.140625
+  getMaxECellId(): 0
   getMinTrkDistance(): 105.713
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -23006,6 +23344,7 @@ ECLCluster#18:
   getEnergyRaw(): 0.107925
   getHypotheses(): 32
   getLAT(): 0.124023
+  getMaxECellId(): 0
   getMinTrkDistance(): 120.361
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -23053,6 +23392,7 @@ ECLCluster#19:
   getEnergyRaw(): 0.104203
   getHypotheses(): 32
   getLAT(): 0.233398
+  getMaxECellId(): 0
   getMinTrkDistance(): 118.652
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -23101,6 +23441,7 @@ ECLCluster#20:
   getEnergyRaw(): 0.505154
   getHypotheses(): 32
   getLAT(): 0.157227
+  getMaxECellId(): 0
   getMinTrkDistance(): 128.174
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
@@ -23148,6 +23489,7 @@ ECLCluster#21:
   getEnergyRaw(): 0.10362
   getHypotheses(): 32
   getLAT(): 0.0126953
+  getMaxECellId(): 0
   getMinTrkDistance(): 125.244
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -23196,6 +23538,7 @@ ECLCluster#22:
   getEnergyRaw(): 0.191069
   getHypotheses(): 32
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -23243,6 +23586,7 @@ ECLCluster#23:
   getEnergyRaw(): 0.110404
   getHypotheses(): 32
   getLAT(): 0.125977
+  getMaxECellId(): 0
   getMinTrkDistance(): 49.0723
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -23290,6 +23634,7 @@ ECLCluster#24:
   getEnergyRaw(): 0.0478593
   getHypotheses(): 32
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 18.0664
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -23337,6 +23682,7 @@ ECLCluster#25:
   getEnergyRaw(): 0.74575
   getHypotheses(): 32
   getLAT(): 0.285156
+  getMaxECellId(): 0
   getMinTrkDistance(): 166.992
   getNumberOfCrystals(): 16.0156
   getNumberOfHadronDigits(): 0
@@ -23385,6 +23731,7 @@ ECLCluster#26:
   getEnergyRaw(): 1.67653
   getHypotheses(): 32
   getLAT(): 0.279297
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.8926
   getNumberOfCrystals(): 17.9688
   getNumberOfHadronDigits(): 0
@@ -23432,6 +23779,7 @@ ECLCluster#27:
   getEnergyRaw(): 0.27825
   getHypotheses(): 32
   getLAT(): 0.896484
+  getMaxECellId(): 0
   getMinTrkDistance(): 24.9023
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
@@ -23893,6 +24241,112 @@ TRGSummary:
   getTRGSummary(9): 0
   getTimType(): 15
 SoftwareTriggerResult:
+  getNonPrescaledResults(): size(35)
+    pair
+      software_trigger_cut&calib&accept_D0_Kpi
+      0
+    pair
+      software_trigger_cut&calib&accept_Dstar
+      0
+    pair
+      software_trigger_cut&calib&accept_Xi_piLambda
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_D0
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Dplus
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Dstar
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Jpsiee
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Jpsimumu
+      0
+    pair
+      software_trigger_cut&calib&accept_ee
+      0
+    pair
+      software_trigger_cut&calib&accept_gee
+      0
+    pair
+      software_trigger_cut&calib&accept_gg_4pi
+      0
+    pair
+      software_trigger_cut&calib&accept_gg_ee
+      0
+    pair
+      software_trigger_cut&calib&accept_gmumu
+      0
+    pair
+      software_trigger_cut&calib&accept_mumu
+      0
+    pair
+      software_trigger_cut&calib&accept_test
+      0
+    pair
+      software_trigger_cut&calib&total_result
+      0
+    pair
+      software_trigger_cut&fast_reco&accept_ee
+      0
+    pair
+      software_trigger_cut&fast_reco&reject_bkg
+      0
+    pair
+      software_trigger_cut&fast_reco&reject_ee
+      0
+    pair
+      software_trigger_cut&fast_reco&total_result
+      0
+    pair
+      software_trigger_cut&hlt&accept_1_track1_cluster
+      0
+    pair
+      software_trigger_cut&hlt&accept_2_tracks
+      0
+    pair
+      software_trigger_cut&hlt&accept_b2bcluster_3D
+      0
+    pair
+      software_trigger_cut&hlt&accept_b2bclusterhigh_phi
+      0
+    pair
+      software_trigger_cut&hlt&accept_b2bclusterlow_phi
+      0
+    pair
+      software_trigger_cut&hlt&accept_bhabha
+      0
+    pair
+      software_trigger_cut&hlt&accept_gamma_gamma
+      0
+    pair
+      software_trigger_cut&hlt&accept_hadron
+      0
+    pair
+      software_trigger_cut&hlt&accept_mumu_1trk
+      0
+    pair
+      software_trigger_cut&hlt&accept_mumu_2trk
+      0
+    pair
+      software_trigger_cut&hlt&accept_single_photon_1GeV
+      0
+    pair
+      software_trigger_cut&hlt&accept_single_photon_2GeV_barrel
+      0
+    pair
+      software_trigger_cut&hlt&accept_single_photon_2GeV_endcap
+      0
+    pair
+      software_trigger_cut&hlt&accept_tau_tau
+      0
+    pair
+      software_trigger_cut&hlt&total_result
+      0
   getResults(): size(35)
     pair
       software_trigger_cut&calib&accept_D0_Kpi
@@ -25858,17 +26312,3 @@ MCParticle#63:
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 0
 [INFO] ========================================================================
-[INFO] ================================================================================
-[INFO] Error summary: 123 errors and 0 warnings occurred.
-[ERROR] This cluster does not support the requested hypothesis,
-	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
-	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000
-[INFO]  (last message occurred 65 times in total)
-[ERROR] This cluster does not support the requested hypothesis,
-	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
-	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000
-[INFO]  (last message occurred 58 times in total)
-[INFO] ================================================================================
-

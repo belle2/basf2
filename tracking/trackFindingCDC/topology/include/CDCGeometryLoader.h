@@ -12,6 +12,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /// Load the CDC geometry from the conditions database
     class CDCGeometryLoader {
 
     public:

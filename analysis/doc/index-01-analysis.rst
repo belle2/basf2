@@ -4,7 +4,7 @@ Analysis
 
 The analysis package collects modules and tools for high-level analysis of Belle II data.
 With analysis modules you are able to open mdst format files, create final state particles, and build more complicated decays.
-With these particle decay candidates, you can use high level tools such as `TreeFitter`, `FlavorTagger`, and the `FullEventInterpretation` (FEI).
+With these particle decay candidates, you can use high level tools such as :doc:`TreeFitter`, :doc:`FlavorTagger`, and the :doc:`FullEventInterpretation` (FEI).
 
 The core data objects of the ``basf2`` analysis package, are the `Particle`_ class, and the `ParticleList`_ class.
 Almost all analysis modules are concerned with the manipulation of `ParticleList`_ s.
@@ -31,9 +31,14 @@ To use them you need to use functions described in the standard particle lists.
 .. toctree:: StandardParticles
 
 Creation of new particle lists by combination of particles is essential part of almost any analysis job.
-The syntax used during this procedure is the `DecayString` and is described below:
+The syntax used during this procedure is the :doc:`DecayString` and is described below:
 
 .. toctree:: DecayString
+
+It is often desirable to apply selections to `ParticleList`_ s, and events.
+This is done with cut strings.
+
+.. toctree:: CutStrings
 
 
 Modular analysis convenience functions
@@ -49,29 +54,29 @@ There are also some more specialised python wrapper functions for vertex-fitting
 .. toctree:: Vertex
 .. toctree:: PhotonWrappers
 
+
 Variables
 =========
 
-While ``basf2`` operates on `ParticleList`_ s, it is also important to calculate variables associated with a given candidate or event.
-Here is a list of variables known to ``basf2`` that can be used in cut strings or written out to file.
+While ``basf2`` operates on `ParticleList`_ s, it is also important to calculate physics quantities associated with a given candidate or event.
+
+In ``basf2`` analysis, variables are handled by the `VariableManager`.
+There are many variables available for use in analysis.
+Probably the most obvious, and useful are: :b2:var:`p`, :b2:var:`E`, :b2:var:`mbc`, and :b2:var:`deltaE`.
+
+You can search the variables in an alphabetical :ref:`b2-varindex`, or browse :ref:`variablesByGroup`.
 
 .. toctree:: Variables
+
 
 Output for offline analysis
 ===========================
 
-You can save information from analysis jobs directly from the `VariableManager` (e.g. for offline analysis using python tools such as `pandas`_) 
+You can save information from analysis jobs directly from the ``VariableManager`` (e.g. for offline analysis using python tools such as `pandas`_) 
 
 .. _pandas: https://pandas.pydata.org/
 
 .. toctree:: VariableManagerOutput
-
-.. warning::
-        The alternative `NtupleMaker` tools are now deprecated, please update your scripts.
-        We expect to remove this functionality in the next major release.
-        The documentation is included here for completeness. 
-
-.. toctree:: NtupleMaker
 
 Event-based analysis
 ====================
@@ -92,13 +97,17 @@ Advanced Topics
 
 .. toctree:: FlavorTagger
 
+.. toctree:: DeepFlavorTagger
+
 .. toctree:: FullEventInterpretation
+
+.. toctree:: EventShape
 
 .. toctree:: ContinuumSuppression
 
 .. toctree:: TreeFitter
 
-.. toctree:: VertexFitter
+.. .. toctree:: VertexFitter
 
 .. toctree:: MVA
 

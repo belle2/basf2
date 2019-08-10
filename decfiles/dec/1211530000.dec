@@ -1,0 +1,44 @@
+# EventType: 1211530000
+# Descriptor: [B+ -> Jpsi [ -> e+ e-] K+ ]cc
+# NickName: Bu_JpsiK_ee
+# Documentation:
+# Tested: yes
+# Physics WG:
+# Responsible: Frank Meier
+# Email: frank.meier@desy.de
+# Cuts: None
+# Date: 20190529
+# Comments:
+
+# Define aliases
+Alias MyB+ B+
+Alias MyB- B-
+ChargeConj MyB+ MyB-
+
+Alias MyJpsi J/psi
+
+#
+# Y(4S) -> B+ B-
+# One B decays to signal mode, while the other generically
+#
+Decay Upsilon(4S)
+0.5000 MyB+ B-    VSS;
+0.5000 B+ MyB-    VSS;
+Enddecay
+
+#
+# B+ -> J/psi(1S) K+
+#
+Decay MyB+
+1.000 MyJpsi K+   SVS;
+Enddecay
+CDecay MyB-
+
+#
+# J/psi(1S) -> e+ e-
+#
+Decay MyJpsi
+1.000 e+ e-         PHOTOS VLL;
+Enddecay
+
+End

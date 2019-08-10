@@ -1,13 +1,12 @@
 /**************************************************************************
-* BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributors: Thomas Keck                                              *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
-
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2014-2019 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Thomas Keck, Anze Zupanc, Sam Cunliffe                   *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include <analysis/variables/MetaVariables.h>
 #include <analysis/VariableManager/Utility.h>
@@ -396,6 +395,46 @@ namespace Belle2 {
         // is the particle in the list?
         bool isIn = list->contains(particle);
         return double(isIn);
+
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr sourceObjectIsInList(const std::vector<std::string>& arguments)
+    {
+      // unpack arguments, there should be only one: the name of the list we're checking
+      if (arguments.size() != 1) {
+        B2FATAL("Wrong number of arguments for sourceObjectIsInList");
+      }
+      auto listName = arguments[0];
+
+      auto func = [listName](const Particle * particle) -> double {
+
+        // check the list exists
+        StoreObjPtr<ParticleList> list(listName);
+        if (!(list.isValid()))
+        {
+          B2FATAL("Invalid Listname " << listName << " given to sourceObjectIsInList");
+        }
+
+        // this only makes sense for particles that are *not* composite and come
+        // from some mdst object (tracks, clusters..)
+        Particle::EParticleType particletype = particle->getParticleType();
+        if (particletype == Particle::EParticleType::c_Composite
+        or particletype == Particle::EParticleType::c_Undefined)
+          return -1.0;
+
+        // it *is* possible to have a particle list from different sources (like
+        // hadrons from the ECL and KLM) so we have to check each particle in
+        // the list individually
+        for (unsigned i = 0; i < list->getListSize(); ++i)
+        {
+          Particle* iparticle = list->getParticle(i);
+          if (particletype == iparticle->getParticleType())
+            if (particle->getMdstArrayIndex() == iparticle->getMdstArrayIndex())
+              return 1.0;
+        }
+        return 0.0;
 
       };
       return func;
@@ -1186,6 +1225,38 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr pValueCombination(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() > 0) {
+        std::vector<const Variable::Manager::Var*> variables;
+        for (auto& argument : arguments)
+          variables.push_back(Manager::Instance().getVariable(argument));
+
+        auto func = [variables, arguments](const Particle * particle) -> double {
+          double pValueProduct = 1.;
+          for (auto variable : variables)
+          {
+            double pValue = variable->function(particle);
+            if (pValue < 0)
+              return -1;
+            else
+              pValueProduct *= pValue;
+          }
+          double pValueSum = 1.;
+          double factorial = 1.;
+          for (unsigned int i = 1; i < arguments.size(); ++i)
+          {
+            factorial *= i;
+            pValueSum += pow(-log(pValueProduct), i) / factorial;
+          }
+          return pValueProduct * pValueSum;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function pValueCombination");
+      }
+    }
+
     Manager::FunctionPtr abs(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -1229,7 +1300,7 @@ endloop:
 
         auto func = [var1, var2](const Particle * particle) -> double {
           double min = var1->function(particle);
-          if (min < var2->function(particle))
+          if (min > var2->function(particle))
             min = var2->function(particle);
           return min;
         };
@@ -1258,6 +1329,17 @@ endloop:
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function sin");
+      }
+    }
+
+    Manager::FunctionPtr log10(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double { return std::log10(var->function(particle)); };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function log10");
       }
     }
 
@@ -1839,6 +1921,231 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr averageValueInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        std::string listName = arguments[0];
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        if (not var) {
+          B2FATAL("Could not find variable named " << arguments[1] << " given to averageValueInList");
+        }
+        auto func = [listName, var](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid list name " << listName << " given to averageValueInList");
+          int nParticles = listOfParticles->getListSize();
+          double average = 0;
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            average += var->function(part) / nParticles;
+          }
+          return average;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function averageValueInList");
+      }
+    }
+
+    Manager::FunctionPtr medianValueInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        std::string listName = arguments[0];
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        if (not var) {
+          B2FATAL("Could not find variable named " << arguments[1] << " given to medianValueInList");
+        }
+        auto func = [listName, var](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid list name " << listName << " given to medianValueInList");
+          int nParticles = listOfParticles->getListSize();
+          if (nParticles == 0)
+          {
+            return std::numeric_limits<double>::quiet_NaN();
+          }
+          std::vector<double> valuesInList;
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            valuesInList.push_back(var->function(part));
+          }
+          std::sort(valuesInList.begin(), valuesInList.end());
+          if (nParticles % 2 != 0)
+          {
+            return valuesInList[nParticles / 2];
+          } else {
+            return 0.5 * (valuesInList[nParticles / 2] + valuesInList[nParticles / 2 - 1]);
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function medianValueInList");
+      }
+    }
+
+    Manager::FunctionPtr angleToClosestInList(const std::vector<std::string>& arguments)
+    {
+      // expecting the list name
+      if (arguments.size() != 1)
+        B2FATAL("Wrong number of arguments for meta function angleToClosestInList");
+      std::string listname = arguments[0];
+
+
+      auto func = [listname](const Particle * particle) -> double {
+        // get the list and check it's valid
+        StoreObjPtr<ParticleList> list(listname);
+        if (not list.isValid())
+          B2FATAL("Invalid particle list name " << listname << " given to angleToClosestInList");
+
+        // check the list isn't empty
+        if (list->getListSize() == 0)
+          return std::numeric_limits<double>::quiet_NaN();
+
+        // respect the current frame and get the momentum of our input
+        const auto& frame = ReferenceFrame::GetCurrent();
+        const auto p_this = frame.getMomentum(particle).Vect();
+
+        // find the particle index with the smallest opening angle
+        double minAngle = 2 * M_PI;
+        for (unsigned int i = 0; i < list->getListSize(); ++i)
+        {
+          const Particle* compareme = list->getParticle(i);
+          const auto p_compare = frame.getMomentum(compareme).Vect();
+          double angle = p_compare.Angle(p_this);
+          if (minAngle > angle) minAngle = angle;
+        }
+        return minAngle;
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr closestInList(const std::vector<std::string>& arguments)
+    {
+      // expecting the list name and a variable name
+      if (arguments.size() != 2)
+        B2FATAL("Wrong number of arguments for meta function closestInList");
+      std::string listname = arguments[0];
+
+      // the requested variable and check it exists
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+      if (not var)
+        B2FATAL("Invalid variable name " << arguments[1] << " given to closestInList");
+
+      auto func = [listname, var](const Particle * particle) -> double {
+        // get the list and check it's valid
+        StoreObjPtr<ParticleList> list(listname);
+        if (not list.isValid())
+          B2FATAL("Invalid particle list name " << listname << " given to closestInList");
+
+        // respect the current frame and get the momentum of our input
+        const auto& frame = ReferenceFrame::GetCurrent();
+        const auto p_this = frame.getMomentum(particle).Vect();
+
+        // find the particle index with the smallest opening angle
+        double minAngle = 2 * M_PI;
+        int iClosest = -1;
+        for (unsigned int i = 0; i < list->getListSize(); ++i)
+        {
+          const Particle* compareme = list->getParticle(i);
+          const auto p_compare = frame.getMomentum(compareme).Vect();
+          double angle = p_compare.Angle(p_this);
+          if (minAngle > angle) {
+            minAngle = angle;
+            iClosest = i;
+          }
+        }
+
+        // final check that the list wasn't empty (or some other problem)
+        if (iClosest == -1) return std::numeric_limits<double>::quiet_NaN();
+
+        return var->function(list->getParticle(iClosest));
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr angleToMostB2BInList(const std::vector<std::string>& arguments)
+    {
+      // expecting the list name
+      if (arguments.size() != 1)
+        B2FATAL("Wrong number of arguments for meta function angleToMostB2BInList");
+      std::string listname = arguments[0];
+
+      auto func = [listname](const Particle * particle) -> double {
+        // get the list and check it's valid
+        StoreObjPtr<ParticleList> list(listname);
+        if (not list.isValid())
+          B2FATAL("Invalid particle list name " << listname << " given to angleToMostB2BInList");
+
+        // check the list isn't empty
+        if (list->getListSize() == 0)
+          return std::numeric_limits<double>::quiet_NaN();
+
+        // respect the current frame and get the momentum of our input
+        const auto& frame = ReferenceFrame::GetCurrent();
+        const auto p_this = frame.getMomentum(particle).Vect();
+
+        // find the most back-to-back (the largest opening angle before they
+        // start getting smaller again!)
+        double maxAngle = 0;
+        for (unsigned int i = 0; i < list->getListSize(); ++i)
+        {
+          const Particle* compareme = list->getParticle(i);
+          const auto p_compare = frame.getMomentum(compareme).Vect();
+          double angle = p_compare.Angle(p_this);
+          if (maxAngle < angle) maxAngle = angle;
+        }
+        return maxAngle;
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr mostB2BInList(const std::vector<std::string>& arguments)
+    {
+      // expecting the list name and a variable name
+      if (arguments.size() != 2)
+        B2FATAL("Wrong number of arguments for meta function mostB2BInList");
+      std::string listname = arguments[0];
+
+      // the requested variable and check it exists
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+      if (not var)
+        B2FATAL("Invalid variable name " << arguments[1] << " given to mostB2BInList");
+
+      auto func = [listname, var](const Particle * particle) -> double {
+        // get the list and check it's valid
+        StoreObjPtr<ParticleList> list(listname);
+        if (not list.isValid())
+          B2FATAL("Invalid particle list name " << listname << " given to mostB2BInList");
+
+        // respect the current frame and get the momentum of our input
+        const auto& frame = ReferenceFrame::GetCurrent();
+        const auto p_this = frame.getMomentum(particle).Vect();
+
+        // find the most back-to-back (the largest opening angle before they
+        // start getting smaller again!)
+        double maxAngle = -1.0;
+        int iMostB2B = -1;
+        for (unsigned int i = 0; i < list->getListSize(); ++i)
+        {
+          const Particle* compareme = list->getParticle(i);
+          const auto p_compare = frame.getMomentum(compareme).Vect();
+          double angle = p_compare.Angle(p_this);
+          if (maxAngle < angle) {
+            maxAngle = angle;
+            iMostB2B = i;
+          }
+        }
+
+        // final check that the list wasn't empty (or some other problem)
+        if (iMostB2B == -1) return std::numeric_limits<double>::quiet_NaN();
+
+        return var->function(list->getParticle(iMostB2B));
+      };
+      return func;
+    }
+
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
                       "[Eventbased] Returns the number of clean Clusters in the event\n"
@@ -1867,11 +2174,16 @@ arguments. Operator precedence is taken into account. For example ::
     REGISTER_VARIABLE("useCMSFrame(variable)", useCMSFrame,
                       "Returns the value of the variable using the CMS frame as current reference frame.\n"
                       "E.g. useCMSFrame(E) returns the energy of a particle in the CMS frame.");
-    REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame,
-                      "Returns the value of the variable using the lab frame as current reference frame.\n"
-                      "The lab frame is the default reference frame, usually you don't need to use this meta-variable. E.g.\n"
-                      "  - useLabFrame(E) returns the energy of a particle in the Lab frame, same as just E.\n"
-                      "  - useRestFrame(daughter(0, formula(E - useLabFrame(E)))) only corner-cases like this need to use this variable.\n\n");
+    REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame, R"DOC(
+Returns the value of ``variable`` in the *lab* frame.
+
+.. tip::
+    The lab frame is the default reference frame, usually you don't need to use this meta-variable. 
+    E.g. ``useLabFrame(E)`` returns the energy of a particle in the Lab frame, same as just ``E``.
+
+Specifying the lab frame is useful in some corner-cases. For example:
+``useRestFrame(daughter(0, formula(E - useLabFrame(E))))`` which is the difference of the first daughter's energy in the rest frame of the mother (current particle) with the same daughter's lab-frame energy.
+)DOC");
     REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
                       "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
                       "E.g. useROERecoilFrame(E) returns the energy of a particle in the ROE recoil frame.");
@@ -1895,6 +2207,12 @@ arguments. Operator precedence is taken into account. For example ::
                       "Returns 1.0 if the particle is in the list provided, 0.0 if not. Note that this only checks the particle given. For daughters of composite particles, please see isDaughterOfList().");
     REGISTER_VARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
                       "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.");
+    REGISTER_VARIABLE("sourceObjectIsInList(particleListName)", sourceObjectIsInList, R"DOC(
+Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to create a particle in ``particleListName``, 0.0 if not. 
+
+.. note::
+  This only makes sense for particles that are not composite. Returns -1 for composite particles.
+)DOC");
     REGISTER_VARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
                       "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("daughter(i, variable)", daughter,
@@ -1916,25 +2234,25 @@ arguments. Operator precedence is taken into account. For example ::
                       "E.g. mcMother(PDG) will return the PDG code of the MC mother of the matched MC"
                       "particle of the reconstructed particle the function is applied to.\n"
                       "The meta variable can also be nested: mcMother(mcMother(PDG)).");
-    REGISTER_VARIABLE("genParticle(i, variable)", genParticle,
-                      "[Eventbased] Returns function which returns the variable for the ith generator particle.\n"
-                      "The arguments of the function must be:\n"
-                      "    argument 1: Index of the particle in the MCParticle Array\n"
-                      "    argument 2: Valid basf2 variable name of the function that shall be evaluated.\n"
-                      "If the provided index goes beyond the length of the mcParticles array, -999 will be returned."
-                      "E.g. genParticle(0, p) returns the total momentum of the first MC Particle, which is "
-                      "the Upsilon(4S) in a generic decay.\n"
-                      "     genParticle(0, mcDaughter(1, p) returns the total momentum of the second daughter of "
-                      "the first MC Particle, which is the momentum of the second B meson in a generic decay.");
-    REGISTER_VARIABLE("genUpsilon4S(variable)", genUpsilon4S,
-                      "[Eventbased] Returns function which returns the variable evaluated for the generator level"
-                      "Upsilon(4S).\n"
-                      "The argument of the function must be a valid basf2 variable name of the function "
-                      "that shall be evaluated.\n"
-                      "If no generator level Upsilon(4S) exists for the event, -999 will be returned.\n"
-                      "E.g. genUpsilon4S(p) returns the total momentum of the Upsilon(4S) in a generic decay.\n"
-                      "     genUpsilon4S(mcDaughter(1, p) returns the total momentum of the second daughter of "
-                      "the generator level Upsilon(4S), which is the momentum of the second B meson in a generic decay.");
+    REGISTER_VARIABLE("genParticle(index, variable)", genParticle, R"DOC(
+[Eventbased] Returns the ``variable`` for the ith generator particle.
+The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 
+and ``variable``, the name of the function or variable for that generator particle.
+If ``index`` goes beyond the length of the MCParticles array, -999 will be returned.
+
+E.g. ``genParticle(0, p)`` returns the total momentum of the first MCParticle, which is "
+the Upsilon(4S) in a generic decay.
+``genParticle(0, mcDaughter(1, p)`` returns the total momentum of the second daughter of
+the first MC Particle, which is the momentum of the second B meson in a generic decay.
+)DOC");
+    REGISTER_VARIABLE("genUpsilon4S(variable)", genUpsilon4S, R"DOC(
+[Eventbased] Returns the ``variable`` evaluated for the generator-level :math:`\Upsilon(4S)`.
+If no generator level :math:`\Upsilon(4S)` exists for the event, -999 will be returned.
+
+E.g. ``genUpsilon4S(p)`` returns the total momentum of the :math:`\Upsilon(4S)` in a generic decay.
+``genUpsilon4S(mcDaughter(1, p)`` returns the total momentum of the second daughter of the
+generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in a generic decay.
+)DOC");
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf,
                       "Returns product of a variable over all daughters.\n"
                       "E.g. daughterProductOf(extraInfo(SignalProbability)) returns the product of the SignalProbabilitys of all daughters.");
@@ -2033,7 +2351,7 @@ arguments. Operator precedence is taken into account. For example ::
                       "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.");
     REGISTER_VARIABLE("max(var1,var2)", max,
                       "Returns max value of two variables.\n");
-    REGISTER_VARIABLE("min(var1,var2)", max,
+    REGISTER_VARIABLE("min(var1,var2)", min,
                       "Returns min value of two variables.\n");
     REGISTER_VARIABLE("sin(variable)", sin,
                       "Returns sin value of the given variable.\n"
@@ -2041,6 +2359,9 @@ arguments. Operator precedence is taken into account. For example ::
     REGISTER_VARIABLE("cos(variable)", cos,
                       "Returns cos value of the given variable.\n"
                       "E.g. sin(?) returns the cosine of the value of the variable.");
+    REGISTER_VARIABLE("log10(variable)", log10,
+                      "Returns log10 value of the given variable.\n"
+                      "E.g. log10(?) returns the log10 of the value of the variable.");
     REGISTER_VARIABLE("isNAN(variable)", isNAN,
                       "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"
                       "Useful for debugging.");
@@ -2050,6 +2371,9 @@ arguments. Operator precedence is taken into account. For example ::
     REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
                       "Useful for debugging.");
+    REGISTER_VARIABLE("pValueCombination(p1, p2, ...)", pValueCombination,
+                      "Returns the combined p-value of the provided p-values according to the formula given in `Nucl. Instr. and Meth. A 411 (1998) 449 <https://doi.org/10.1016/S0168-9002(98)00293-9>`_ .\n"
+                      "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.");
     REGISTER_VARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"
                       "For instance one can apply this function on a signal Photon and provide a list of all photons in the rest of event and a cut \n"
@@ -2090,5 +2414,17 @@ arguments. Operator precedence is taken into account. For example ::
                       "Returns maximum transverse momentum Pt in the given particle List.");
     REGISTER_VARIABLE("eclClusterSpecialTrackMatched(cut)", eclClusterTrackMatchedWithCondition,
                       "Returns if at least one Track that satisfies the given condition is related to the ECLCluster of the Particle.");
+    REGISTER_VARIABLE("averageValueInList(particleListName, variable)", averageValueInList,
+                      "Returns the arithmetic mean of the given variable of the particles in the given particle list.");
+    REGISTER_VARIABLE("medianValueInList(particleListName, variable)", medianValueInList,
+                      "Returns the median value of the given variable of the particles in the given particle list.");
+    REGISTER_VARIABLE("angleToClosestInList(particleListName)", angleToClosestInList,
+                      "Returns the angle between this particle and the closest particle (smallest opening angle) in the list provided.");
+    REGISTER_VARIABLE("closestInList(particleListName, variable)", closestInList,
+                      "Returns `variable` for the closest particle (smallest opening angle) in the list provided.");
+    REGISTER_VARIABLE("angleToMostB2BInList(particleListName)", angleToMostB2BInList,
+                      "Returns the angle between this particle and the most back-to-back particle (closest opening angle to 180) in the list provided.");
+    REGISTER_VARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
+                      "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.");
   }
 }

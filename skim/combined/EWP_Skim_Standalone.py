@@ -16,19 +16,27 @@ from stdV0s import *
 from skim.standardlists.charm import *
 from skim.standardlists.lightmesons import *
 from stdPhotons import *
-from skimExpertFunctions import add_skim, setSkimLogging, encodeSkimName
-gb2_setuprel = 'release-03-00-00'
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
+import argparse
+gb2_setuprel = 'release-03-02-00'
 
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+fileList = get_test_file("mixedBGx1", "MC12")
+
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
 xggpath = Path()
 
 
-inputMdstList('MC9', fileList, path=xggpath)
+inputMdstList('default', fileList, path=xggpath)
 stdPi0s('loose', path=xggpath)
 stdPhotons('tight', path=xggpath)  # also builds loose list
 loadStdSkimPhoton(path=xggpath)
@@ -52,7 +60,7 @@ process(xggpath)
 
 
 xllpath = Path()
-inputMdstList('MC9', fileList, path=xllpath)
+inputMdstList('default', fileList, path=xllpath)
 loadStdSkimPi0(path=xllpath)
 loadStdSkimPhoton(path=xllpath)
 stdPi0s('loose', path=xllpath)

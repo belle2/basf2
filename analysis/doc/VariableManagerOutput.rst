@@ -24,9 +24,11 @@ Writes out Variables to a flat `ROOT`_ TTree (it is also possible to write out s
 
 Candidate-wise
 ~~~~~~~~~~~~~~
-For each candidate in the given `ParticleList`, there will be one entry in the TTree containing the desired Variables. 
+For each candidate in the given `ParticleList`_, there will be one entry in the TTree containing the desired Variables. 
 In other words, this produces a candidate-based ROOT file.
 Here is an example of use:
+
+.. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
 
 .. code-block:: python
  
@@ -71,9 +73,7 @@ You can write several trees to the same file by calling the module several times
                           path=mypath)
 
 
-Modular analysis convenience function
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Here is the full function documentation of the modular analysis convenience function:
+As with many modules, there is a `modularAnalysis` convenience function:
 
 .. autofunction:: modularAnalysis.variablesToNtuple
 
@@ -85,7 +85,7 @@ VariablesToEventBasedTree
 Writes out Variables to a structured `ROOT`_ TTree.
 For each **event** an entry is written into the Tree containing one array (for each Particle in the ParticleList) for each Variable.
 
-.. seealso:: More information for working event-wise is given in the section about `EventBased`.
+.. seealso:: More information for working event-wise is given in the section about :doc:`EventBased`.
 
 VariablesToHistogram
 --------------------
@@ -102,10 +102,7 @@ Here is an example of use:
         ]
         variablesToHistogram('pi+:all', list_of_variables_and_bins)
 
-Modular analysis convenience function
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Here is the full function documentation of the modular analysis convenience function:
+Here is the full function documentation of the `modularAnalysis` convenience function:
 
 .. autofunction:: modularAnalysis.variablesToHistogram
 
@@ -127,11 +124,10 @@ Analogous to `VariablesToNtuple <v2nt>`.
 .. code-block:: python
  
         from b2pandas_utils import VariablesToHDF5
-        v2hdf5 = VariablesToHDF5(
-                filename="variables.hdf5", listname="pi+:all",
-                variables=list_of_interesting_event_variables)
-        path.add_module(v2hdf5)
+        v2hdf5 = VariablesToHDF5("pi+:all", list_of_interesting_variables,
+                                 filename="variables.hdf5")
+        mypath.add_module(v2hdf5)
 
-.. autoclass:: modularAnalysis.VariablesToHDF5
+.. autoclass:: b2pandas_utils.VariablesToHDF5
    :members:
 

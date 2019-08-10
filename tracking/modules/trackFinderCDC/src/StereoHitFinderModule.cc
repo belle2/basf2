@@ -14,9 +14,15 @@ using namespace TrackFindingCDC;
 
 REG_MODULE(TFCDC_StereoHitFinder);
 REG_MODULE(TFCDC_MonopoleStereoHitFinder);
+REG_MODULE(TFCDC_MonopoleStereoHitFinderQuadratic);
 
 TFCDC_StereoHitFinderModule::TFCDC_StereoHitFinderModule()
   : Super( {"CDCWireHitVector", "CDCTrackVector"})
+{
+}
+
+TFCDC_MonopoleStereoHitFinderQuadraticModule::TFCDC_MonopoleStereoHitFinderQuadraticModule()
+  : Super( {"CDCWireHitVector", "CDCMonopoleTrackVector"})
 {
 }
 

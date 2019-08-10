@@ -7,9 +7,10 @@ Eventually these checks can be included as git hooks.
 """
 
 import re
-from b2test_utils import check_error_free
+from b2test_utils import check_error_free, skip_test
 
 if __name__ == "__main__":
+    skip_test("new cppcheck version")
     # ignore the nofile .. [missingInclude] that is always at the end of cppcheck
     ignoreme = 'Cppcheck cannot find all the include files'
     check_error_free("b2code-cppcheck", "cppcheck", "analysis",

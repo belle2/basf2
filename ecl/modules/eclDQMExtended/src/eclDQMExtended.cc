@@ -193,7 +193,7 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_timefail_crateid->GetXaxis()->SetTitle("Crate ID");
   h_timefail_crateid->SetOption("LIVE");
 
-  h_amptimefail_crateid = new TH1F("amptimefail_crateid", "Shaper IDs w/ failed times and amps", 52, 1, 53);
+  h_amptimefail_crateid = new TH1F("amptimefail_crateid", "Crate IDs w/ failed times and amps", 52, 1, 53);
   h_amptimefail_crateid->GetXaxis()->SetTitle("Crate ID");
   h_amptimefail_crateid->SetOption("LIVE");
 

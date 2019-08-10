@@ -13,19 +13,30 @@ from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
 from stdCharged import stdPi, stdK, stdE, stdMu
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-03'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 set_log_level(LogLevel.INFO)
 
 import os
 import sys
 import glob
+import argparse
+
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
 # create a new path
 ISRskimpath = Path()
 
 # Add default samples
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=ISRskimpath)
 
 # use standard final state particle lists

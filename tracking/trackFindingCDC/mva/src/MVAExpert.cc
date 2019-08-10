@@ -28,14 +28,15 @@ namespace Belle2 {
   }
 
   namespace TrackFindingCDC {
+    /// Implementation of the class to interact with the MVA package
     class MVAExpert::Impl {
 
     public:
-      Impl(const std::string& identifier, std::vector<Named<Float_t*>> namedVariables);
-      void initialize();
-      void beginRun();
-      std::unique_ptr<MVA::Weightfile> getWeightFile();
-      double predict();
+      Impl(const std::string& identifier, std::vector<Named<Float_t*>> namedVariables); /**< constructor */
+      void initialize(); /**< Signal the beginning of the event processing */
+      void beginRun(); /**< Called once before a new run begins */
+      std::unique_ptr<MVA::Weightfile> getWeightFile(); /**< Get the weight file */
+      double predict(); /**< Get the MVA prediction */
 
     private:
       /// References to the all named values from the source variable set.
@@ -93,7 +94,8 @@ void MVAExpert::Impl::beginRun()
   std::unique_ptr<MVA::Weightfile> weightfile = getWeightFile();
   if (weightfile) {
     if (weightfile->getElement<std::string>("method") == "FastBDT" and
-        weightfile->getElement<int>("FastBDT_version") == 1) {
+        (weightfile->getElement<int>("FastBDT_version") == 1 or
+         weightfile->getElement<int>("FastBDT_version") == 2)) {
 
       int nExpectedVars = weightfile->getElement<int>("number_feature_variables");
 
@@ -116,7 +118,8 @@ void MVAExpert::Impl::beginRun()
       }
       B2ASSERT("Number of variables mismatch", nExpectedVars == static_cast<int>(m_selectedNamedVariables.size()));
     } else {
-      B2WARNING("Unpacked new kind of classifier. Consider to extend the feature variable check.");
+      B2WARNING("Unpacked new kind of classifier. Consider to extend the feature variable check. Identifier name: " << m_identifier
+                << "; method name: " << weightfile->getElement<std::string>("method"));
       m_selectedNamedVariables = m_allNamedVariables;
     }
 

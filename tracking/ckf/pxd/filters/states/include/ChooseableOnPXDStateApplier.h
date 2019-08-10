@@ -16,10 +16,10 @@
 
 namespace Belle2 {
   class CDCToPXDState;
-
+  // Guard to prevent repeated instantiations
   extern template class LayerToggledApplier<CKFToPXDState,
                                             LimitedOnStateApplier<CKFToPXDState, TrackFindingCDC::ChooseableFilter<PXDStateFilterFactory>>>;
-
+                                            /// Alias to apply the () operator to all items filtered by CKF PXD layer states
                                             using ChooseableOnPXDStateApplier =
                                             LayerToggledApplier<CKFToPXDState, LimitedOnStateApplier<CKFToPXDState, TrackFindingCDC::ChooseableFilter<PXDStateFilterFactory>>>;
 }

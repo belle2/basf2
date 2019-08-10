@@ -11,6 +11,7 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 
 namespace Belle2 {
 
@@ -106,6 +107,12 @@ namespace Belle2 {
 
     //! @return matching-hit bit pattern
     unsigned int getHitLayerPattern() const { return m_HitLayerPattern; }
+
+    //! @return BKLM efficiency value
+    float getExtBKLMEfficiencyValue(int index) const { return m_ExtBKLMEfficiencyValue[index]; }
+
+    //! @return EKLM efficiency vector
+    //float getExtEKLMEfficiencyValue(int index) const { return m_ExtEKLMEfficiencyValue[index]; } TODO
 
     //! assign muon PDF value for this extrapolation
     //! @param pdfValue muon PDF value (normalized) for this extrapolation
@@ -207,6 +214,14 @@ namespace Belle2 {
     //! @param pattern bit pattern of matching-hit layers during extrapolation
     void setHitLayerPattern(unsigned int pattern) { m_HitLayerPattern = pattern; }
 
+    //! assign BKLMefficiency value
+    void setExtBKLMEfficiencyValue(int index, float efficiencyValue) { m_ExtBKLMEfficiencyValue[index] = efficiencyValue; }
+
+    //! assign EKLM efficiency value TODO
+    //    void setExtEKLMEfficiencyValue(int index, float efficiencyValue) { m_ExtEKLMEfficiencyValue[index] = efficiencyValue; }
+    //}
+
+
   private:
 
     //! PDG particleID hypothesis used for this extrapolation (typically muon)
@@ -296,8 +311,14 @@ namespace Belle2 {
     //! bits 15..28 = endcap layers 1..14)
     unsigned int m_HitLayerPattern;
 
+    //! Vector of BKLM layer efficiencies.
+    float m_ExtBKLMEfficiencyValue[BKLMElementNumbers::getMaximalLayerNumber()];
+
+    //! Vector of EKLM layer efficiencies TODO
+    // float m_ExtEKLMEfficiencyValue[EKLMElementNumbers::getMaximalLayerNumber()];
+
     //! Needed to make the ROOT object storable
-    ClassDef(Muid, 5)
+    ClassDef(Muid, 7)
 
   };
 }

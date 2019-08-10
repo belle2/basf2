@@ -357,9 +357,10 @@ std::vector<const ECLCluster*> RestOfEvent::getECLClusters(const std::string& ma
   std::vector<const ECLCluster*> result;
   std::vector<const Particle*> allParticles = getParticles(maskName);
   for (auto* particle : allParticles) {
-    //Get all ECL clusters independently of the particle type, for neutrals: if (particle->getParticleType() == Particle::EParticleType::c_ECLCluster) {
-    if (particle->getECLCluster()) {
-      result.push_back(particle->getECLCluster());
+    //Get all ECL clusters independently of the particle type, (both charged and neutral)
+    auto* cluster = particle->getECLCluster();
+    if (cluster and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+      result.push_back(cluster);
     }
   }
   return result;
@@ -568,6 +569,32 @@ void RestOfEvent::printIndices(const std::set<int>& indices) const
     printout += std::to_string(index) +  ", ";
   }
   B2INFO(printout);
+}
+
+Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCode, bool isSelfConjugated)
+{
+  StoreArray<Particle> particles;
+  std::set<int> source;
+  if (maskName == "") {
+    // if no mask provided work with internal source
+    source = m_particleIndices;
+  } else {
+    bool maskFound = false;
+    for (auto& mask : m_masks) {
+      if (mask.getName() == maskName) {
+        maskFound = true;
+        source = mask.getParticles();
+        break;
+      }
+    }
+    if (!maskFound) {
+      B2FATAL("No " << maskName << " mask defined in current ROE!");
+    }
+  }
+  int particlePDG = (pdgCode == 0) ? getPDGCode() : pdgCode;
+  auto isFlavored = (isSelfConjugated) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
+  return particles.appendNew(get4Vector(maskName), particlePDG, isFlavored, std::vector(source.begin(),
+                             source.end()), Particle::PropertyFlags::c_IsUnspecified);
 }
 
 double RestOfEvent::atcPIDBelleKpiFromPID(const PIDLikelihood* pid) const

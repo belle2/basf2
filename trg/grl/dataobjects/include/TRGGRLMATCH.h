@@ -55,7 +55,7 @@ namespace Belle2 {
 
     /**Phi angle difference between the ECL cluster and the expected position
     which is calculated from CDC*/
-    double m_dphi_d;
+    double m_dphi_d = -999.;
 
     /**! The Class title*/
     ClassDef(TRGGRLMATCH, 2); /*< the class title */

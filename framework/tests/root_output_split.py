@@ -13,6 +13,7 @@ import os
 
 class CreateDummyData(basf2.Module):
     """Create some random data to have event size not be too small"""
+
     def __init__(self, size, persistent=False):
         super().__init__()
         self.size = size // 8

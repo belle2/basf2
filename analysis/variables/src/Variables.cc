@@ -14,6 +14,7 @@
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/TrackVariables.h>
 #include <analysis/variables/ParameterVariables.h>
+#include <analysis/variables/FlightInfoVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
@@ -424,7 +425,61 @@ namespace Belle2 {
       } else return 0;
     }
 
+    double ArmenterosLongitudinalMomentumAsymmetry(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      int nDaughters = part -> getNDaughters();
+      if (nDaughters != 2)
+        B2FATAL("You are trying to use an Armenteros variable. The mother particle is required th have exactly two daughters");
 
+      const auto& daughters = part -> getDaughters();
+      TVector3 motherMomentum = frame.getMomentum(part).Vect();
+      TVector3 daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
+      TVector3 daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
+
+      int daughter1Charge = daughters[0] -> getCharge();
+      int daughter2Charge = daughters[1] -> getCharge();
+      double daughter1Ql = daughter1Momentum.Dot(motherMomentum) / motherMomentum.Mag();
+      double daughter2Ql = daughter2Momentum.Dot(motherMomentum) / motherMomentum.Mag();
+
+      double Arm_alpha;
+      if (daughter2Charge > daughter1Charge)
+        Arm_alpha = (daughter2Ql - daughter1Ql) / (daughter2Ql + daughter1Ql);
+      else
+        Arm_alpha = (daughter1Ql - daughter2Ql) / (daughter1Ql + daughter2Ql);
+
+      return Arm_alpha;
+    }
+
+    double ArmenterosDaughter1Qt(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      int nDaughters = part -> getNDaughters();
+      if (nDaughters != 2)
+        B2FATAL("You are trying to use an Armenteros variable. The mother particle is required th have exactly two daughters.");
+
+      const auto& daughters = part -> getDaughters();
+      TVector3 motherMomentum = frame.getMomentum(part).Vect();
+      TVector3 daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
+      double qt = daughter1Momentum.Perp(motherMomentum);
+
+      return qt;
+    }
+
+    double ArmenterosDaughter2Qt(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      int nDaughters = part -> getNDaughters();
+      if (nDaughters != 2)
+        B2FATAL("You are trying to use an Armenteros variable. The mother particle is required th have exactly two daughters.");
+
+      const auto& daughters = part -> getDaughters();
+      TVector3 motherMomentum = frame.getMomentum(part).Vect();
+      TVector3 daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
+      double qt = daughter2Momentum.Perp(motherMomentum);
+
+      return qt;
+    }
 
 
 // mass ------------------------------------------------------------
@@ -633,25 +688,6 @@ namespace Belle2 {
 
 // other ------------------------------------------------------------
 
-    double particlePvalue(const Particle* part)
-    {
-      return part->getPValue();
-    }
-
-    double particleNDaughters(const Particle* part)
-    {
-      return part->getNDaughters();
-    }
-
-    double particleFlavorType(const Particle* part)
-    {
-      return part->getFlavorType();
-    }
-
-    double particleCharge(const Particle* part)
-    {
-      return part->getCharge();
-    }
 
     void printParticleInternal(const Particle* p, int depth)
     {
@@ -965,40 +1001,6 @@ namespace Belle2 {
       }
     }
 
-    double goodBelleKshort(const Particle* KS)
-    {
-      // check input
-      if (KS->getNDaughters() != 2) {
-        B2WARNING("goodBelleKshort is only defined for a particle with two daughters");
-        return 0.0;
-      }
-      const Particle* d0 = KS->getDaughter(0);
-      const Particle* d1 = KS->getDaughter(1);
-      if ((d0->getCharge() == 0) || (d1->getCharge() == 0)) {
-        B2WARNING("goodBelleKshort is only defined for a particle with charged daughters");
-        return 0.0;
-      }
-      if (abs(KS->getPDGCode()) != 310)
-        B2WARNING("goodBelleKshort is being applied to a candidate with PDG " << KS->getPDGCode());
-
-      // Belle selection
-      double p = particleP(KS);
-      double fl = particleDRho(KS);
-      double dphi = acos(((particleDX(KS) * particlePx(KS)) + (particleDY(KS) * particlePy(KS))) / (fl * sqrt(particlePx(KS) * particlePx(
-                           KS) + particlePy(KS) * particlePy(KS))));
-      double dr = std::min(abs(trackD0(d0)), abs(trackD0(d1)));
-      double zdist = v0DaughterZ0Diff(KS);
-
-      bool low = p < 0.5 && abs(zdist) < 0.8 && dr > 0.05 && dphi < 0.3;
-      bool mid = p < 1.5 && p > 0.5 && abs(zdist) < 1.8 && dr > 0.03 && dphi < 0.1 && fl > .08;
-      bool high = p > 1.5 && abs(zdist) < 2.4 && dr > 0.02 && dphi < 0.03 && fl > .22;
-
-      if (low || mid || high) {
-        return 1.0;
-      } else
-        return 0.0;
-    }
-
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -1102,16 +1104,19 @@ namespace Belle2 {
                       "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.")
     REGISTER_VARIABLE("b2bClusterPhi", b2bClusterPhi,
                       "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("ArmenterosLongitudinalMomentumAsymmetry", ArmenterosLongitudinalMomentumAsymmetry,
+                      "Longitudinal momentum asymmetry of V0's daughters.\n"
+                      "The mother (V0) is required to have exactly two daughters");
+    REGISTER_VARIABLE("ArmenterosDaughter1Qt", ArmenterosDaughter1Qt,
+                      "Transverse momentum of the first daughter with respect to the V0 mother.\n"
+                      "The mother is required to have exactly two daughters");
+    REGISTER_VARIABLE("ArmenterosDaughter2Qt", ArmenterosDaughter2Qt,
+                      "Transverse momentum of the second daughter with respect to the V0 mother.\n"
+                      "The mother is required to have exactly two daughters");
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
                       "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");
-    REGISTER_VARIABLE("chiProb", particlePvalue, "chi ^ 2 probability of the fit");
-    REGISTER_VARIABLE("nDaughters", particleNDaughters,
-                      "number of daughter particles");
-    REGISTER_VARIABLE("flavor", particleFlavorType,
-                      "flavor type of decay(0 = unflavored, 1 = flavored)");
-    REGISTER_VARIABLE("charge", particleCharge, "charge of particle");
     REGISTER_VARIABLE("trackMatchType", trackMatchType,
                       "-1 particle has no ECL cluster, 0 particle has no associated track, 1 there is a matched track"
                       "called connected - region(CR) track match");
@@ -1128,12 +1133,6 @@ namespace Belle2 {
                       "returns always 0, used for testing and debugging.");
     REGISTER_VARIABLE("True", True,
                       "returns always 1, used for testing and debugging.");
-    REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort,
-                      "[Legacy] GoodKs Returns 1.0 if a Kshort candidate passes the Belle algorithm:"
-                      "a momentum-binned selection including requirements on impact parameter of, and"
-                      "angle between the daughter pions as well as separation from the vertex and flight distance in the transverse plane");
-
-    VARIABLE_GROUP("Other");
     REGISTER_VARIABLE("infinity", infinity,
                       "returns std::numeric_limits<double>::infinity()");
     REGISTER_VARIABLE("random", random,

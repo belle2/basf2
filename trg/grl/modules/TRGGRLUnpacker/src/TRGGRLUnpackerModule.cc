@@ -32,6 +32,7 @@ TRGGRLUnpackerModule::TRGGRLUnpackerModule()
 
   string desc = "TRGGRLUnpackerModule(" + version() + ")";
   setDescription(desc);
+  setPropertyFlags(c_ParallelProcessingCertified);
   B2INFO("TRGGRLUnpacker: Constructor done.");
 }
 
@@ -45,7 +46,7 @@ void TRGGRLUnpackerModule::terminate()
 
 void TRGGRLUnpackerModule::initialize()
 {
-  StoreObjPtr<TRGGRLUnpackerStore> evtinfo("GRLevt");
+  StoreObjPtr<TRGGRLUnpackerStore> evtinfo("TRGGRLUnpackerStore");
   evtinfo.registerInDataStore();
 }
 
@@ -83,7 +84,7 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
 
 //  StoreArray<TRGGRLUnpackerStore> storeAry("GRLclk");
   TRGGRLUnpackerStore* rawstore = new TRGGRLUnpackerStore();
-  StoreObjPtr<TRGGRLUnpackerStore> evtinfo("GRLevt");
+  StoreObjPtr<TRGGRLUnpackerStore> evtinfo("TRGGRLUnpackerStore");
 //  evtinfo.registerInDataStore();
 //    storeAry.appendNew();
 //    int ntups = storeAry.getEntries() - 1;
@@ -186,6 +187,8 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
     evtinfo->m_map_TSF0[i] = ((rawstore->m_map_TSF0_int[0] & (1 << i)) != 0);
     evtinfo->m_map_TSF2[i] = ((rawstore->m_map_TSF2_int[0] & (1 << i)) != 0);
     evtinfo->m_map_TSF4[i] = ((rawstore->m_map_TSF4_int[0] & (1 << i)) != 0);
+    evtinfo->m_map_TSF1[i] = ((rawstore->m_map_TSF1_int[0] & (1 << i)) != 0);
+    evtinfo->m_map_TSF3[i] = ((rawstore->m_map_TSF3_int[0] & (1 << i)) != 0);
   }
   for (int i = 32; i < 64; i++) {
     evtinfo->m_map_ST[i] = ((rawstore->m_map_ST_int[1] & (1 << (i - 32))) != 0);
@@ -194,6 +197,8 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
     evtinfo->m_map_TSF0[i] = ((rawstore->m_map_TSF0_int[1] & (1 << (i - 32))) != 0);
     evtinfo->m_map_TSF2[i] = ((rawstore->m_map_TSF2_int[1] & (1 << (i - 32))) != 0);
     evtinfo->m_map_TSF4[i] = ((rawstore->m_map_TSF4_int[1] & (1 << (i - 32))) != 0);
+    evtinfo->m_map_TSF1[i] = ((rawstore->m_map_TSF1_int[1] & (1 << (i - 32))) != 0);
+    evtinfo->m_map_TSF3[i] = ((rawstore->m_map_TSF3_int[1] & (1 << (i - 32))) != 0);
   }
 
 

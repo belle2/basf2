@@ -1,6 +1,8 @@
 [INFO] Steering file: analysis/tests/particleloader.py
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
+[INFO] Added file ${BELLE2_LOCAL_DIR}/analysis/tests/mdst.root
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
 [INFO]    -> MDST source: Tracks
@@ -82,8 +84,35 @@
 [INFO]  o) creating (anti-)ParticleList with name: D0:frommc (anti-D0:frommc)
 [INFO]    -> MDST source: MCParticles
 [INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
+[INFO]    -> MDST source: RestOfEvents
+[INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists studied 9 
 [INFO] Number of ParticleLists studied 11 
+[INFO] Number of ParticleLists studied 1 
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] ParticleStats Summary: 
+
+[INFO] =======================================================================
+			|Retention|	    0| Unique 
+   Upsilon(4S)( 0)	|	0.2800	1.0000	1.0000
+
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+			| All Particles 		| Particles     		| AntiParticles 		
+			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
+   Upsilon(4S)( 0)	|	  0.6600	  2.3571	  0.0000	  0.0000	  0.0000	  0.0000	  0.6600	  2.3571
+
+[INFO] 
+=======================================================
+Total Retention: 0.2800
+Total Number of Particles created in the DataStore: 6864
+=======================================================
+
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================
@@ -120,7 +149,7 @@ Lambda0:frommc( 6)	|	  0.1400	  1.1667	  0.1200	  1.0000	  0.0200	  0.1667	  0.0
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 6718
+Total Number of Particles created in the DataStore: 6864
 =======================================================
 
 [INFO] ParticleStats Summary: 
@@ -149,31 +178,24 @@ Total Number of Particles created in the DataStore: 6718
            mu+( 4)	|	 11.4000	 11.4000	  5.9800	  5.9800	  5.4200	  5.4200	  0.0000	  0.0000
           K_S0( 5)	|	  0.6600	  2.3571	  0.0000	  0.0000	  0.0000	  0.0000	  0.6600	  2.3571
        Lambda0( 6)	|	  1.6200	  4.2632	  0.9000	  2.3684	  0.7200	  1.8947	  0.0000	  0.0000
-          K_L0( 7)	|	 12.3000	 12.3000	  0.0000	  0.0000	  0.0000	  0.0000	 12.3000	 12.3000
+          K_L0( 7)	|	 14.5600	 14.5600	  0.0000	  0.0000	  0.0000	  0.0000	 14.5600	 14.5600
          gamma( 8)	|	 14.1400	 14.1400	  0.0000	  0.0000	  0.0000	  0.0000	 14.1400	 14.1400
 
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 6718
+Total Number of Particles created in the DataStore: 6864
 =======================================================
 
-[WARNING] There were 1 tracks skipped because of zero charge for mu+  { module: ParticleLoader }
-[WARNING] There were 1 tracks skipped because of zero charge for p+  { module: ParticleLoader }
-[WARNING] There were 1 tracks skipped because of zero charge for K+  { module: ParticleLoader }
-[WARNING] There were 1 tracks skipped because of zero charge for pi+  { module: ParticleLoader }
-[WARNING] There were 1 tracks skipped because of zero charge for e+  { module: ParticleLoader }
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 5 warnings occurred.
 [WARNING] There were 1 tracks skipped because of zero charge for mu+
 [WARNING] There were 1 tracks skipped because of zero charge for p+
 [WARNING] There were 1 tracks skipped because of zero charge for K+
 [WARNING] There were 1 tracks skipped because of zero charge for pi+
 [WARNING] There were 1 tracks skipped because of zero charge for e+
-[INFO] ================================================================================
-
 [INFO] Starting event processing, random seed is set to '1337'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
+[INFO] Added file ${BELLE2_LOCAL_DIR}/analysis/tests/mdst.root
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
 [INFO]    -> MDST source: Tracks
@@ -255,8 +277,13 @@ Total Number of Particles created in the DataStore: 6718
 [INFO]  o) creating (anti-)ParticleList with name: D0:frommc (anti-D0:frommc)
 [INFO]    -> MDST source: MCParticles
 [INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
+[INFO]    -> MDST source: RestOfEvents
+[INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists studied 9 
 [INFO] Number of ParticleLists studied 11 
+[INFO] Number of ParticleLists studied 1 
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: e+ (5+0) + e- (5+0)
 [INFO] collection=Particles
@@ -1223,7 +1250,7 @@ Total Number of Particles created in the DataStore: 6718
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
-[INFO]  ParticleList : K_L0 (0+4)
+[INFO]  ParticleList : K_L0 (0+8)
 [INFO] collection=Particles
  PDGCode=130 Charge=0 PDGMass=0.4976
  flavorType=0 particleType=2 particleTypeUsedForFit=0
@@ -1300,13 +1327,89 @@ Total Number of Particles created in the DataStore: 6718
 
  extra info=( ) 
 
+[INFO] collection=Particles
+ PDGCode=130 Charge=0 PDGMass=0.4976
+ flavorType=0 particleType=3 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=54 identifier=0 daughterIndices:  (none)
+ mass=0.4976
+ momentum=(0.08, -1.01, -0.35) p=1.075
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=130 Charge=0 PDGMass=0.4976
+ flavorType=0 particleType=3 particleTypeUsedForFit=0
+ mdstIndex=1 arrayIndex=55 identifier=1 daughterIndices:  (none)
+ mass=0.4976
+ momentum=(0.25, -0.24, -0.25) p=0.43
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=130 Charge=0 PDGMass=0.4976
+ flavorType=0 particleType=3 particleTypeUsedForFit=0
+ mdstIndex=2 arrayIndex=56 identifier=2 daughterIndices:  (none)
+ mass=0.4976
+ momentum=(-0.01, 0.18, 0.11) p=0.215
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=130 Charge=0 PDGMass=0.4976
+ flavorType=0 particleType=3 particleTypeUsedForFit=0
+ mdstIndex=3 arrayIndex=57 identifier=3 daughterIndices:  (none)
+ mass=0.4976
+ momentum=(0.00, -0.00, -0.00) p=0
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleList : gamma (0+4)
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
  flavorType=0 particleType=2 particleTypeUsedForFit=0
- mdstIndex=0 arrayIndex=54 identifier=1001 daughterIndices:  (none)
+ mdstIndex=0 arrayIndex=58 identifier=1001 daughterIndices:  (none)
  mass=0
  momentum=(-0.01, -0.02, 0.09) p=0.09314
  position=(0.00, 0.00, 0.00)
@@ -1325,7 +1428,7 @@ Total Number of Particles created in the DataStore: 6718
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
  flavorType=0 particleType=2 particleTypeUsedForFit=0
- mdstIndex=5 arrayIndex=55 identifier=6001 daughterIndices:  (none)
+ mdstIndex=5 arrayIndex=59 identifier=6001 daughterIndices:  (none)
  mass=0
  momentum=(-0.00, -0.02, 0.02) p=0.02579
  position=(0.00, 0.00, 0.00)
@@ -1344,7 +1447,7 @@ Total Number of Particles created in the DataStore: 6718
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
  flavorType=0 particleType=2 particleTypeUsedForFit=0
- mdstIndex=7 arrayIndex=56 identifier=8001 daughterIndices:  (none)
+ mdstIndex=7 arrayIndex=60 identifier=8001 daughterIndices:  (none)
  mass=0
  momentum=(0.04, 0.10, 0.07) p=0.1263
  position=(0.00, 0.00, 0.00)
@@ -1363,7 +1466,7 @@ Total Number of Particles created in the DataStore: 6718
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
  flavorType=0 particleType=2 particleTypeUsedForFit=0
- mdstIndex=11 arrayIndex=57 identifier=13001 daughterIndices:  (none)
+ mdstIndex=11 arrayIndex=61 identifier=13001 daughterIndices:  (none)
  mass=0
  momentum=(0.06, -0.12, -0.15) p=0.2045
  position=(0.00, 0.00, 0.00)
@@ -1380,6 +1483,25 @@ Total Number of Particles created in the DataStore: 6718
  extra info=( ) 
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] ParticleStats Summary: 
+
+[INFO] =======================================================================
+			|Retention|	    0| Unique 
+   Upsilon(4S)( 0)	|	0.0000	1.0000	0.0000
+
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+			| All Particles 		| Particles     		| AntiParticles 		
+			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
+   Upsilon(4S)( 0)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
+
+[INFO] 
+=======================================================
+Total Retention: 0.0000
+Total Number of Particles created in the DataStore: 107
+=======================================================
+
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================
@@ -1416,7 +1538,7 @@ Lambda0:frommc( 6)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0
 [INFO] 
 =======================================================
 Total Retention: 0.0200
-Total Number of Particles created in the DataStore: 103
+Total Number of Particles created in the DataStore: 107
 =======================================================
 
 [INFO] ParticleStats Summary: 
@@ -1445,12 +1567,12 @@ Total Number of Particles created in the DataStore: 103
            mu+( 4)	|	  0.2000	 10.0000	  0.1000	  5.0000	  0.1000	  5.0000	  0.0000	  0.0000
           K_S0( 5)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
        Lambda0( 6)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
-          K_L0( 7)	|	  0.0800	  4.0000	  0.0000	  0.0000	  0.0000	  0.0000	  0.0800	  4.0000
+          K_L0( 7)	|	  0.1600	  8.0000	  0.0000	  0.0000	  0.0000	  0.0000	  0.1600	  8.0000
          gamma( 8)	|	  0.0800	  4.0000	  0.0000	  0.0000	  0.0000	  0.0000	  0.0800	  4.0000
 
 [INFO] 
 =======================================================
 Total Retention: 0.0200
-Total Number of Particles created in the DataStore: 103
+Total Number of Particles created in the DataStore: 107
 =======================================================
 

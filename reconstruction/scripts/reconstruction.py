@@ -693,6 +693,7 @@ class EventsOfDoomBuster(Module):
         """
 
         super().__init__()
+        self.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
 
         self.nCDCHitsMax = nCDCHitsMax
         self.nSVDShaperDigitsMax = nSVDShaperDigitsMax

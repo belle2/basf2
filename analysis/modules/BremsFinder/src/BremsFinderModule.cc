@@ -176,54 +176,54 @@ namespace Belle2 {
       const std::string relationName = "Bremsstrahlung";
       RelationVector<ECLCluster> bremClusters = track->getRelationsFrom<ECLCluster>("", relationName);
 
-      //The 4-momentum of the new lepton in the output particle list
-      TLorentzVector new4Vec = lepton->get4Vector();
-
       Particle* bestGamma = nullptr; //For the case restricted to only one brem photon per lepton
       double bestWeight = m_maximumAcceptance; //For the case restricted to only one brem photon per lepton
       std::vector<Particle*> selectedGammas; //For the case of many brem photons per lepton
 
-      if (bremClusters.size() > 0) {
+      unsigned j = 0;
+      for (auto bremCluster = bremClusters.begin(); bremCluster != bremClusters.end(); bremCluster++, j++) {
+        double weight = bremClusters.weight(j);
+
+        if (weight > m_maximumAcceptance) continue;
+
         for (unsigned k = 0; k < nGamma; k++) {
+
           Particle* gamma = m_gammaList->getParticle(k);
 
           bool alreadyUsed = gamma->hasExtraInfo("bremsAcceptanceFactor");
           if (alreadyUsed) continue;
 
-          unsigned j = 0;
-          for (auto bremCluster = bremClusters.begin(); bremCluster != bremClusters.end(); bremCluster++, j++) {
-            // get the cluster of each photon
-            auto cluster = gamma->getECLCluster();
+          auto cluster = gamma->getECLCluster();
+          if (bremCluster->getClusterId() == cluster->getClusterId()) {
 
-            //... and see if it is one of the brem clusters of this lepton track
-            if (bremCluster->getClusterId() == cluster->getClusterId()) {
-              double weight = bremClusters.weight(j);
-              if (m_addMultiplePhotons) {
-                if (weight > m_maximumAcceptance) continue;
-                usedGammas[gamma->getMdstArrayIndex()] = gamma->getMdstArrayIndex();
-                gamma->addExtraInfo("bremsAcceptanceFactor", weight);
-                selectedGammas.push_back(gamma);
-              } else {
-                if (weight > bestWeight) continue;
-                bestWeight = weight;
-                bestGamma = gamma;
-              }
+            if (m_addMultiplePhotons) {
+              gamma->addExtraInfo("bremsAcceptanceFactor", weight);
+              selectedGammas.push_back(gamma);
+            } else {
+              if (weight > bestWeight) continue;
+              bestWeight = weight;
+              bestGamma = gamma;
             }
+
           }
 
-          //Add to this 4-momentum those of the selected photon(s)
-          if (m_addMultiplePhotons && selectedGammas.size() > 0) { //for the case of more than one brems photon
-            std::sort(selectedGammas.begin(), selectedGammas.end(), [](const Particle * photon1, const Particle * photon2) {
-              return photon1->getExtraInfo("bremsAcceptanceFactor") < photon2->getExtraInfo("bremsAcceptanceFactor");
-            });
-            for (auto const& bremGamma : selectedGammas) new4Vec += bremGamma->get4Vector();
-          } else if (!m_addMultiplePhotons && bestGamma) { //for the case restricted to only one brems photon per lepton
-            bestGamma->addExtraInfo("bremsAcceptanceFactor", bestWeight);
-            usedGammas[bestGamma->getMdstArrayIndex()] = bestGamma->getMdstArrayIndex();
-            new4Vec += bestGamma->get4Vector();
-          }
         } // Closes for loop on gammas
-      } // Closes if on bremCluster size
+
+      } // Closes for loop on brem clusters
+
+      //The 4-momentum of the new lepton in the output particle list
+      TLorentzVector new4Vec = lepton->get4Vector();
+
+      //Add to this 4-momentum those of the selected photon(s)
+      if (m_addMultiplePhotons && selectedGammas.size() > 0) { //for the case of more than one brems photon
+        std::sort(selectedGammas.begin(), selectedGammas.end(), [](const Particle * photon1, const Particle * photon2) {
+          return photon1->getExtraInfo("bremsAcceptanceFactor") < photon2->getExtraInfo("bremsAcceptanceFactor");
+        });
+        for (auto const& g : selectedGammas) new4Vec += g->get4Vector();
+      } else if (!m_addMultiplePhotons && bestGamma) { //for the case restricted to only one brems photon per lepton
+        bestGamma->addExtraInfo("bremsAcceptanceFactor", bestWeight);
+        new4Vec += bestGamma->get4Vector();
+      }
 
       //Create the new particle with the 4-momentum calculated before
       Particle correctedLepton(new4Vec, lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,

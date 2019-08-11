@@ -446,6 +446,7 @@ int main(int argc, char* argv[])
     }
 
     //Report completion in json metadata
+    MetadataService::Instance().addBasf2Status("finished successfully");
     MetadataService::Instance().finishBasf2();
   } catch (error_already_set&) {
     //Apparently an exception occured which wasn't handled. So print the traceback

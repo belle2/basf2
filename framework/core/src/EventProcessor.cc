@@ -20,6 +20,7 @@
 #include <framework/core/Environment.h>
 #include <framework/core/DataFlowVisualization.h>
 #include <framework/core/RandomNumbers.h>
+#include <framework/core/MetadataService.h>
 
 #ifdef HAS_CALLGRIND
 #include <valgrind/callgrind.h>
@@ -227,6 +228,8 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool
     m_processStatisticsPtr.create();
   m_processStatisticsPtr->startGlobal();
 
+  MetadataService::Instance().addBasf2Status("initializing");
+
   for (const ModulePtr& modPtr : modulePathList) {
     Module* module = modPtr.get();
 
@@ -293,6 +296,8 @@ void EventProcessor::installMainSignalHandlers(void (*fn)(int))
 
 bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule)
 {
+  MetadataService::Instance().addBasf2Status("running event loop");
+
   const bool collectStats = !Environment::Instance().getNoStats();
 
   while (!moduleIter.isDone()) {
@@ -406,6 +411,8 @@ void EventProcessor::processCore(const PathPtr& startPath, const ModulePtrList& 
 
 void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 {
+  MetadataService::Instance().addBasf2Status("terminating");
+
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_reverse_iterator listIter;
   m_processStatisticsPtr->startGlobal();
@@ -431,6 +438,8 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 
 void EventProcessor::processBeginRun(bool skipDB)
 {
+  MetadataService::Instance().addBasf2Status("beginning run");
+
   m_inRun = true;
 
   LogSystem& logSystem = LogSystem::Instance();
@@ -462,6 +471,8 @@ void EventProcessor::processBeginRun(bool skipDB)
 
 void EventProcessor::processEndRun()
 {
+  MetadataService::Instance().addBasf2Status("ending run");
+
   if (!m_inRun)
     return;
   m_inRun = false;

@@ -51,6 +51,11 @@ namespace Belle2 {
     void addRootNtupleFile(const std::string& fileName);
 
     /**
+     * Add metadata of basf2 status
+     */
+    void addBasf2Status(const std::string& message = "");
+
+    /**
      * Add metadata for basf2 completion
      */
     void finishBasf2(bool success = true);

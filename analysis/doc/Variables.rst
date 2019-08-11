@@ -153,7 +153,7 @@ Basic particle information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. b2-variables::
-   :group: Basic Particle Information
+   :group: Basic particle information
 
 PID for expert
 """"""""""""""
@@ -322,6 +322,8 @@ Rest of Event
 Continuum Suppression
 ~~~~~~~~~~~~~~~~~~~~~
 
+For a detailed description of the continuum suppression, see `ContinuumSuppression`
+
 .. b2-variables::
     :group: Continuum Suppression
 
@@ -333,6 +335,7 @@ Event Shape
 
 These variables are available after adding the event shape builder modules.
 This can be done with the function `modularAnalysis.buildEventShape`.
+For a detailed description of the event shape variables,  see `EventShape`
 
 .. b2-variables::
     :group: EventShape

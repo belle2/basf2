@@ -75,6 +75,8 @@ namespace Belle2::Conditions {
 
     /** Default constructible */
     MetadataProvider() = default;
+    /** Construct with a known set of usable global tag states */
+    explicit MetadataProvider(const std::set<std::string>& usableTagStates): m_usableTagStates(usableTagStates) {}
     /** Default destructible */
     virtual ~MetadataProvider() = default;
     /** Set the list of globaltag names to be considered for payloads.
@@ -119,16 +121,16 @@ namespace Belle2::Conditions {
      */
     bool getPayloads(int exp, int run, std::vector<PayloadMetadata>& info);
     /** Get the valid tag states when checking globaltag status */
-    std::set<std::string> getValidTagStates() { return m_validTagStates; }
+    std::set<std::string> getUsableTagStates() { return m_usableTagStates; }
     /** Set the valid tag states for this provider when checking globaltag
      * status. Should be called before setTags() if necessary.
      *
      * \warning The state "INVALID" will never be accepted and removed from the
      *     given set if present */
-    void setValidTagStates(const std::set<std::string>& states)
+    void setUsableTagStates(const std::set<std::string>& states)
     {
-      m_validTagStates = states;
-      m_validTagStates.erase("INVALID");
+      m_usableTagStates = states;
+      m_usableTagStates.erase("INVALID");
     }
   protected:
     /** Check the status of a global tag with the given name.
@@ -168,7 +170,7 @@ namespace Belle2::Conditions {
     /** Map of known payloads for current conditions */
     PayloadMap* m_payloads{nullptr};
     /** Set of global tag states to consider valid (except for 'INVALID' which is always considered invalid) */
-    std::set<std::string> m_validTagStates{"TESTING", "VALIDATED", "RUNNING", "PUBLISHED"};
+    std::set<std::string> m_usableTagStates{"TESTING", "VALIDATED", "RUNNING", "PUBLISHED"};
   };
 
   /** Fallback provider if no providers are given: Will raise an error if used

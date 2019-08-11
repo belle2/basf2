@@ -26,7 +26,9 @@
 
 namespace Belle2 {
 
+  //! 3D point
   typedef HepGeom::Point3D<double>  Point3D;
+  //! 3D Vector
   typedef HepGeom::Vector3D<double>  Vector3D;
 
   class TRGCDC;
@@ -105,10 +107,12 @@ namespace Belle2 {
 
     /// returns position in backward endplate.
     const HepGeom::Point3D<double>& backwardPosition(void) const;
+    /// position in backward endplate.
     double* backwardPosition(double p[3]) const;
 
     /// returns middle position of a wire. z componet is 0.
     const HepGeom::Point3D<double>& xyPosition(void) const;
+    /// middle position of a wire. z componet is 0.
     double* xyPosition(double p[3]) const;
 
     /// returns direction vector of the wire.

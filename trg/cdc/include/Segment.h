@@ -152,7 +152,7 @@ namespace Belle2 {
   private:
 
     /// LookUp Table. 0: no hit, 1: right, 2: left, 3: not determined.
-    TRGCDCLUT* m_TSLUT;
+    TRGCDCLUT* m_TSLUT = nullptr;
 
     /// LookUp Table.
 //    const TRGCDCLUT * const _lut;  //Will be Removed.

@@ -76,12 +76,12 @@ namespace Belle2 {
   protected :
     /** Event number */
     int n_basf2evt;
-    int etm_version;
+    int etm_version = 0;
 
-    unsigned int nodeid;
-    int nwords;
-    int iFiness;
-    int trgtype;
+    unsigned int nodeid = 0;
+    int nwords = 0;
+    int iFiness = 0;
+    int trgtype = 0;
 
   private :
 

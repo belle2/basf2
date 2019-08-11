@@ -17,14 +17,13 @@ from modularAnalysis import *
 
 
 def B2XgammaList(path):
-    # Build the skim list for B -> X gamma decays (inclusive)
+    """Build the skim list for B --> X(s,d) gamma decays"""
 
-    # Create lists for buildEventShape (basically all tracks and clusters)
-    cutAndCopyList('pi+:R2', 'pi+:all', 'pt> 0.1', path=path)
-    cutAndCopyList('gamma:R2', 'gamma:all', 'E > 0.1', path=path)
+    # event level cuts: R2 and require a minimum number of tracks + decent photons
+    fillParticleList(decayString='pi+:eventShapeForSkims', cut='pt > 0.1', path=path)
+    fillParticleList(decayString='gamma:eventShapeForSkims', cut='E > 0.1', path=path)
 
-    # buildEventShape to access R2
-    buildEventShape(inputListNames=['pi+:R2', 'gamma:R2'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,
@@ -50,14 +49,13 @@ def B2XgammaList(path):
 
 
 def B2XllList(path):
-    # Build the skim list for B -> X ll decays (no LFV modes, inclusive)
+    """Build the skim list for B --> X(s,d) l+ l- decays"""
 
-    # Create lists for buildEventShape (basically all tracks and clusters)
-    cutAndCopyList('pi+:R2', 'pi+:all', 'pt> 0.1', path=path)
-    cutAndCopyList('gamma:R2', 'gamma:all', 'E > 0.1', path=path)
+    # event level cuts: R2 and require a minimum number of tracks
+    fillParticleList(decayString='pi+:eventShapeForSkims', cut='pt > 0.1', path=path)
+    fillParticleList(decayString='gamma:eventShapeForSkims', cut='E > 0.1', path=path)
 
-    # buildEventShape to access R2
-    buildEventShape(inputListNames=['pi+:R2', 'gamma:R2'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,
@@ -99,11 +97,11 @@ def B2XllListLFV(path):
     # Build the skim list for B -> X ll decays (LFV modes only, inclusive)
 
     # Create lists for buildEventShape (basically all tracks and clusters)
-    cutAndCopyList('pi+:R2', 'pi+:all', 'pt> 0.1', path=path)
-    cutAndCopyList('gamma:R2', 'gamma:all', 'E > 0.1', path=path)
+    cutAndCopyList('pi+:eventShapeForSkims', 'pi+:all', 'pt> 0.1', path=path)
+    cutAndCopyList('gamma:eventShapeForSkims', 'gamma:all', 'E > 0.1', path=path)
 
     # buildEventShape to access R2
-    buildEventShape(inputListNames=['pi+:R2', 'gamma:R2'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,

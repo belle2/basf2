@@ -237,12 +237,12 @@ def runFEIforB0Hadronic(path):
         list name of the skim candidates
     """
     # Pre-selection cuts
-    fillParticleList(decayString='pi+:all',
+    fillParticleList(decayString='pi+:eventShapeForSkims',
                      cut='pt> 0.1', path=path)
-    fillParticleList(decayString='gamma:all',
+    fillParticleList(decayString='gamma:eventShapeForSkims',
                      cut='E > 0.1', path=path)
 
-    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,
@@ -330,12 +330,12 @@ def runFEIforBplusHadronic(path):
         list name of the skim candidates
     """
     # Pre-selection cuts
-    fillParticleList(decayString='pi+:all',
+    fillParticleList(decayString='pi+:eventShapeForSkims',
                      cut='pt> 0.1', path=path)
-    fillParticleList(decayString='gamma:all',
+    fillParticleList(decayString='gamma:eventShapeForSkims',
                      cut='E > 0.1', path=path)
 
-    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,
@@ -388,12 +388,12 @@ def runFEIforHadronicCombined(path):
         list name of the skim candidates
     """
     # Pre-selection cuts
-    fillParticleList(decayString='pi+:all',
+    fillParticleList(decayString='pi+:eventShapeForSkims',
                      cut='pt> 0.1', path=path)
-    fillParticleList(decayString='gamma:all',
+    fillParticleList(decayString='gamma:eventShapeForSkims',
                      cut='E > 0.1', path=path)
 
-    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,
@@ -585,12 +585,12 @@ def runFEIforB0SL(path):
 
     """
     # Pre-selection cuts
-    fillParticleList(decayString='pi+:all',
+    fillParticleList(decayString='pi+:eventShapeForSkims',
                      cut='pt> 0.1', path=path)
-    fillParticleList(decayString='gamma:all',
+    fillParticleList(decayString='gamma:eventShapeForSkims',
                      cut='E > 0.1', path=path)
 
-    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,
@@ -674,12 +674,12 @@ def runFEIforBplusSL(path):
 
     """
     # Pre-selection cuts
-    fillParticleList(decayString='pi+:all',
+    fillParticleList(decayString='pi+:eventShapeForSkims',
                      cut='pt> 0.1', path=path)
-    fillParticleList(decayString='gamma:all',
+    fillParticleList(decayString='gamma:eventShapeForSkims',
                      cut='E > 0.1', path=path)
 
-    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,
@@ -734,12 +734,12 @@ def runFEIforSLCombined(path):
         * nTracks >= 4
     """
     # Pre-selection cuts
-    fillParticleList(decayString='pi+:all',
+    fillParticleList(decayString='pi+:eventShapeForSkims',
                      cut='pt> 0.1', path=path)
-    fillParticleList(decayString='gamma:all',
+    fillParticleList(decayString='gamma:eventShapeForSkims',
                      cut='E > 0.1', path=path)
 
-    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,
@@ -801,12 +801,12 @@ def runFEIforSkimCombined(path):
         list name of the skim candidates
     """
     # Pre-selection cuts
-    fillParticleList(decayString='pi+:all',
+    fillParticleList(decayString='pi+:eventShapeForSkims',
                      cut='pt> 0.1', path=path)
-    fillParticleList(decayString='gamma:all',
+    fillParticleList(decayString='gamma:eventShapeForSkims',
                      cut='E > 0.1', path=path)
 
-    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,

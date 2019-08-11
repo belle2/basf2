@@ -24,11 +24,11 @@ namespace Belle2 {
     //! The evt id of this hit.
     int s_eventId;
 
-    //! The sumamry window of this hit.
-    int s_sum_win;
+    //! The summary window of this hit.
+    int s_sum_win = 0;
 
-    //! The sumamry revoclk of this hit.
-    int s_sum_revo;
+    //! The summary revoclk of this hit.
+    int s_sum_revo = 0;
 
     //! Cluster Theta of this hit.
     int s_cl_theta[6];

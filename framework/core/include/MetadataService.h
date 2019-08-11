@@ -46,6 +46,11 @@ namespace Belle2 {
     void addRootOutputFile(const std::string& fileName, const FileMetaData* metaData = nullptr);
 
     /**
+     * Add the metadata of a root ntuple file
+     */
+    void addRootNtupleFile(const std::string& fileName);
+
+    /**
      * Add metadata for basf2 completion
      */
     void finishBasf2(bool success = true);

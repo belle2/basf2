@@ -53,10 +53,27 @@ void MetadataService::addRootOutputFile(const std::string& fileName, const FileM
   writeJson();
 }
 
+void MetadataService::addRootNtupleFile(const std::string& fileName)
+{
+  if (!FileSystem::isFile(fileName)) return;
+
+  nlohmann::json file_json = {{"type", "RootNtuple"}, {"filename", fileName}};
+
+  // no metadata and no check
+
+  file_json["checksums"]["md5"] = FileSystem::calculateMD5(fileName);
+  // no sha256 yet
+
+  m_json["output_files"].push_back(file_json);
+
+  writeJson();
+}
+
 void MetadataService::finishBasf2(bool success)
 {
   m_json["basf2_status"]["finished"] = true;
   m_json["basf2_status"]["success"] = success;
+  m_json["basf2_status"]["message"] = "finished successfully";
 
   writeJson();
 }

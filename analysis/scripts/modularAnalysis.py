@@ -363,6 +363,7 @@ def bremsFinder(
     gammaList,
     maximumAcceptance=3.0,
     multiplePhotons=False,
+    ignorePhotonMC=False,
     writeOut=False,
     path=None,
 ):
@@ -390,6 +391,7 @@ def bremsFinder(
     @param gammaList    The photon list containing possibly bremsstrahlung photons; **It should already exist.**
     @param maximumAcceptance Maximum value of the relation weight. Should be a number between [0,3]
     @param multiplePhotons Whether to use only one photon (the one with the smallest acceptance) or as many as possible
+    @param ignorePhotonMC If true, the MC Matching of the brems photon will not alter the isSignal value of the corrected particle,
     @param writeOut      Whether `RootOutput` module should save the created `ParticleList`
     @param path          Modules are added to this path
     """
@@ -401,6 +403,7 @@ def bremsFinder(
     bremsfinder.param('gammaList', gammaList)
     bremsfinder.param('maximumAcceptance', maximumAcceptance)
     bremsfinder.param('multiplePhotons', multiplePhotons)
+    bremsfinder.param('ignorePhotonMC', ignorePhotonMC)
     bremsfinder.param('writeOut', writeOut)
     path.add_module(bremsfinder)
 

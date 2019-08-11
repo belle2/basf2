@@ -3,7 +3,7 @@
 
 """
 <header>
-<output>validationTestPlots.root</output>
+<output>validationTestPlots.root, validationTestPlotsExpertOnly.root</output>
 <contact>Kilian Lieret, Kilian.Lieret@campus.lmu.de</contact>
 </header>
 """
@@ -234,4 +234,13 @@ html_content = ROOT.TNamed("This is a bold HTML tag", "<p><b>THIS IS USER'S HTML
 
 html_content.Write()
 
+tfile.Close()
+
+# Expert only
+# ======================================
+
+tfile = ROOT.TFile("validationTestPlotsExpertOnly.root", "RECREATE")
+gaus_h = ROOT.TH1F("gaus_histogram_exprt", " Gaus Histogram Expert", 100, -3, 3)
+gaus_h.FillRandom("gaus", 500)
+gaus_h.Write()
 tfile.Close()

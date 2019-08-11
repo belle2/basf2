@@ -26,6 +26,7 @@
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
 #include <cmath>
@@ -85,17 +86,17 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
+    addParam("outputList", m_outputListName, "The output particle list name.");
     addParam("inputList", m_inputListName,
              R"DOC(The initial particle list name containing the particles to correct. **It should already exist
               and the particles must have an associated track.)DOC");
-    addParam("outputList", m_outputListName, "The output particle list name.");
     addParam("gammaList", m_gammaListName,
              R"DOC(The photon list containing the preselected bremsstrahlung candidates. **It should already exist and
               the particles in the list must be photons**)DOC");
     addParam("maximumAcceptance", m_maximumAcceptance,
              "The maximum value of the relation weight between a bremsstrahlung cluster and a particle track",
              m_maximumAcceptance);
-    addParam("addMultiplePhotons", m_addMultiplePhotons, "If true, use all possible photons to correct the particle's 4-momentum",
+    addParam("multiplePhotons", m_addMultiplePhotons, "If true, use all possible photons to correct the particle's 4-momentum",
              m_addMultiplePhotons);
     addParam("writeOut", m_writeOut,
              R"DOC(If true, the output `ParticleList` will be saved by `RootOutput`. If false, it will be ignored when writing the file.)DOC",
@@ -107,8 +108,11 @@ namespace Belle2 {
     //Get input lepton particle list
     m_inputList.isRequired(m_inputListName);
 
+    DecayDescriptor decDes;
+    decDes.init(m_inputListName);
+
+    m_pdgCode  = abs(decDes.getMother()->getPDGCode());
     //Check for the particles in the lepton list to have a track associated
-    m_pdgCode = abs(m_inputList->getPDGCode());
     if (m_pdgCode != 211 && m_pdgCode != 11 && m_pdgCode != 321 && m_pdgCode != 13 && m_pdgCode != 2212) {
       B2ERROR("[BremsFinderModule] Invalid particle list. the particles in " << m_inputListName << " should have an associated track.");
     }
@@ -116,8 +120,10 @@ namespace Belle2 {
     //Get input photon particle list
     m_gammaList.isRequired(m_gammaListName);
 
+    decDes.init(m_gammaListName);
+    int gpdg = decDes.getMother()->getPDGCode();
+
     //Check that this is a gamma list
-    int gpdg = m_gammaList->getPDGCode();
     if (gpdg != 22) {
       B2ERROR("[BremsFinderModule] Invalid particle list. the particles in " << m_gammaListName << " should be photons!");
     }
@@ -177,44 +183,47 @@ namespace Belle2 {
       double bestWeight = m_maximumAcceptance; //For the case restricted to only one brem photon per lepton
       std::vector<Particle*> selectedGammas; //For the case of many brem photons per lepton
 
-      unsigned j = 0;
-      for (auto bremCluster = bremClusters.begin(); bremCluster != bremClusters.end(); bremCluster++, j++) {
-        // loop over the input photon list
+      if (bremClusters.size() > 0) {
         for (unsigned k = 0; k < nGamma; k++) {
           Particle* gamma = m_gammaList->getParticle(k);
 
-          // get the cluster of each photon
-          auto cluster = gamma->getECLCluster();
+          bool alreadyUsed = gamma->hasExtraInfo("bremsAcceptanceFactor");
+          if (alreadyUsed) continue;
 
-          //... and see if it is one of the brem clusters of this lepton track
-          if (bremCluster->getClusterId() == cluster->getClusterId()) {
-            //If it is, check if it makes the cut in the acceptance factor
-            double weight = bremClusters.weight(j);
+          unsigned j = 0;
+          for (auto bremCluster = bremClusters.begin(); bremCluster != bremClusters.end(); bremCluster++, j++) {
+            // get the cluster of each photon
+            auto cluster = gamma->getECLCluster();
 
-            if (m_addMultiplePhotons) {
-              if (weight > m_maximumAcceptance) continue;
-              gamma->addExtraInfo("bremsAcceptanceFactor", weight);
-              selectedGammas.push_back(gamma);
-            } else {
-              if (weight > bestWeight) continue;
-              bestWeight = weight;
-              bestGamma = gamma;
+            //... and see if it is one of the brem clusters of this lepton track
+            if (bremCluster->getClusterId() == cluster->getClusterId()) {
+              double weight = bremClusters.weight(j);
+              if (m_addMultiplePhotons) {
+                if (weight > m_maximumAcceptance) continue;
+                usedGammas[gamma->getMdstArrayIndex()] = gamma->getMdstArrayIndex();
+                gamma->addExtraInfo("bremsAcceptanceFactor", weight);
+                selectedGammas.push_back(gamma);
+              } else {
+                if (weight > bestWeight) continue;
+                bestWeight = weight;
+                bestGamma = gamma;
+              }
             }
           }
-        }
 
-        //Add to this 4-momentum those of the selected photon(s)
-        if (m_addMultiplePhotons && selectedGammas.size() > 0) { //for the case of more than one brems photon
-          //sort brems photons by their acceptance factor
-          std::sort(selectedGammas.begin(), selectedGammas.end(), [](const Particle * photon1, const Particle * photon2) {
-            return photon1->getExtraInfo("bremsAcceptanceFactor") < photon2->getExtraInfo("bremsAcceptanceFactor");
-          });
-          for (auto const& bremGamma : selectedGammas) new4Vec += bremGamma->get4Vector();
-        } else if (bestGamma) { //for the case restricted to only one brems photon per lepton
-          bestGamma->addExtraInfo("bremsAcceptanceFactor", bestWeight);
-          new4Vec += bestGamma->get4Vector();
-        }
-      } // Closes if bremsCluster.size() > 0
+          //Add to this 4-momentum those of the selected photon(s)
+          if (m_addMultiplePhotons && selectedGammas.size() > 0) { //for the case of more than one brems photon
+            std::sort(selectedGammas.begin(), selectedGammas.end(), [](const Particle * photon1, const Particle * photon2) {
+              return photon1->getExtraInfo("bremsAcceptanceFactor") < photon2->getExtraInfo("bremsAcceptanceFactor");
+            });
+            for (auto const& bremGamma : selectedGammas) new4Vec += bremGamma->get4Vector();
+          } else if (!m_addMultiplePhotons && bestGamma) { //for the case restricted to only one brems photon per lepton
+            bestGamma->addExtraInfo("bremsAcceptanceFactor", bestWeight);
+            usedGammas[bestGamma->getMdstArrayIndex()] = bestGamma->getMdstArrayIndex();
+            new4Vec += bestGamma->get4Vector();
+          }
+        } // Closes for loop on gammas
+      } // Closes if on bremCluster size
 
       //Create the new particle with the 4-momentum calculated before
       Particle correctedLepton(new4Vec, lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,
@@ -239,7 +248,7 @@ namespace Belle2 {
           correctedLepton.appendDaughter(bremsGamma, false);
           B2INFO("[BremsFinderModule] Found a bremsstrahlung gamma and added its 4-vector to the charged particle");
         }
-      } else if (bestGamma) {
+      } else if (!m_addMultiplePhotons && bestGamma) {
         bremsGammaFound = true;
         const TMatrixFSym& gammaErrorMatrix = bestGamma->getMomentumVertexErrorMatrix();
         for (int irow = 0; irow <= 3; irow++) {
@@ -261,11 +270,10 @@ namespace Belle2 {
       const MCParticle* mcLepton = lepton->getRelated<MCParticle>();
       const PIDLikelihood* pid = lepton->getPIDLikelihood();
 
-      if (pid) {
-        newLepton->addRelationTo(pid);
-      }
+      if (pid) newLepton->addRelationTo(pid);
 
       if (mcLepton != nullptr) newLepton->addRelationTo(mcLepton);
+
       m_outputList->addParticle(newLepton);
 
     } //Closes for loop on leptons

@@ -358,9 +358,9 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None):
 
 
 def bremsFinder(
-    outputListName,
-    inputListName,
-    gammaListName,
+    outputList,
+    inputList,
+    gammaList,
     maximumAcceptance=3.0,
     multiplePhotons=False,
     writeOut=False,
@@ -395,7 +395,7 @@ def bremsFinder(
     """
 
     bremsfinder = register_module('BremsFinder')
-    bremsfinder.set_name('BremsFinder_' + outputListName)
+    bremsfinder.set_name('BremsFinder_' + outputList)
     bremsfinder.param('inputList', inputList)
     bremsfinder.param('outputList', outputList)
     bremsfinder.param('gammaList', gammaList)

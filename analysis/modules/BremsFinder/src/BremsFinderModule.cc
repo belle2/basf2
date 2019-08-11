@@ -51,37 +51,37 @@ namespace Belle2 {
     // set module description (e.g. insert text)
     setDescription(
       R"DOC(This module copies each particle in the `inputList` to the `outputList` and uses the results of the **eclTrackBremFinder module**
-                   to look for possible bremsstrahlung photons; if these photons exists, it adds their four momentum to the particle in the `outputList`. 
-                   It also adds the original particle and these photons as daughters of the new, corrected particle. Track and PID information of the original 
-                   particle are copied onto the new one to facilitate their access in the analysis scripts.
+    to look for possible bremsstrahlung photons; if these photons exists, it adds their four momentum to the particle in the `outputList`. 
+    It also adds the original particle and these photons as daughters of the new, corrected particle. Track and PID information of the original 
+    particle are copied onto the new one to facilitate their access in the analysis scripts.
 
-                   The **eclTrackBremFinder module** uses the lepton track PXD and SVD hits and extrapolates them to the ECL; then looks for ECL clusters 
-                   with energies between 0.2 and 1 times the track energy and without associated tracks, and checks if the distance between each of these clusters 
-                   and the extrapolated hit is smaller than 0.5 mm. If it is, the respective cluster is marked as bremsstrahlung, and a *Bremsstrahlung* weighted relation between 
-                   it and the track is stablished. The weight is determined as
+    The **eclTrackBremFinder module** uses the lepton track PXD and SVD hits and extrapolates them to the ECL; then looks for ECL clusters 
+    with energies between 0.2 and 1 times the track energy and without associated tracks, and checks if the distance between each of these clusters 
+    and the extrapolated hit is smaller than 0.5 mm. If it is, the respective cluster is marked as bremsstrahlung, and a *Bremsstrahlung* weighted relation between 
+    it and the track is stablished. The weight is determined as
 
-                   ..math:: 
+    ..math:: 
                    
-                  `\text{max}\left(\frac{\left|\phi_{\text{cluster}}-\phi_{\text{hit}}\right|}{\Delta\phi_{\text{cluster}}+\Delta\phi_{\text{hit}}},
-                   \frac{\left|\theta_{\text{cluster}}-\theta_{\text{hit}}\right|}{\Delta\theta_{\text{cluster}}+\Delta\theta_{\text{hit}}}\right)`
+    `\text{max}\left(\frac{\left|\phi_{\text{cluster}}-\phi_{\text{hit}}\right|}{\Delta\phi_{\text{cluster}}+\Delta\phi_{\text{hit}}},
+    \frac{\left|\theta_{\text{cluster}}-\theta_{\text{hit}}\right|}{\Delta\theta_{\text{cluster}}+\Delta\theta_{\text{hit}}}\right)`
 
-                   where :math: `\phi_i` and :math: `\theta_i` are the azimutal and polar angles of the ECL cluster and the extrapolated hit, and :math: `\Delta x` 
-                   represents the uncertainty of the value :math: `x`. The details of the calculation of these quantities are `here`_. By default, only relations with a weight
-                   smaller than 3.0 are stored. The user can further determine the maximum value of this weight required in order to perform the bremsstrahlung 
-                   correction.
+    where :math: `\phi_i` and :math: `\theta_i` are the azimutal and polar angles of the ECL cluster and the extrapolated hit, and :math: `\Delta x` 
+    represents the uncertainty of the value :math: `x`. The details of the calculation of these quantities are `here`_. By default, only relations with a weight
+    smaller than 3.0 are stored. The user can further determine the maximum value of this weight required in order to perform the bremsstrahlung 
+    correction.
 
-                   This module looks for photons in the `gammaList` whose clusters have a *Bremsstrahlung* relation with the track of one of the particles in 
-                   the `inputList`, and adds their 4-momentum to the particle's one. It also adds the weight of this relation as `extraInfo` to the photon, under 
-                   the name `bremsAcceptanceFactor`.
+    This module looks for photons in the `gammaList` whose clusters have a *Bremsstrahlung* relation with the track of one of the particles in 
+    the `inputList`, and adds their 4-momentum to the particle's one. It also adds the weight of this relation as `extraInfo` to the photon, under 
+    the name `bremsAcceptanceFactor`.
 
-                   Warning:
-                    Even in the event of no bremsstrahlung photons found, the new particle is still created, and the original one is still added as its daughter.
+    Warning:
+      Even in the event of no bremsstrahlung photons found, the new particle is still created, and the original one is still added as its daughter.
                   
-                   See also:
-                    `eclTrackBremFinder module`_
+    See also:
+      `eclTrackBremFinder module`_
                    
-                   .. _eclTrackBremFinder module: https://stash.desy.de/projects/B2/repos/software/browse/ecl/modules/eclTrackBremFinder
-                   .. _here: https://stash.desy.de/projects/B2/repos/software/browse/ecl/modules/eclTrackBremFinder/src/BremFindingMatchCompute.cc)DOC");
+    .. _eclTrackBremFinder module: https://stash.desy.de/projects/B2/repos/software/browse/ecl/modules/eclTrackBremFinder
+    .. _here: https://stash.desy.de/projects/B2/repos/software/browse/ecl/modules/eclTrackBremFinder/src/BremFindingMatchCompute.cc)DOC");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
@@ -174,7 +174,7 @@ namespace Belle2 {
       TLorentzVector new4Vec = lepton->get4Vector();
 
       Particle* bestGamma = nullptr; //For the case restricted to only one brem photon per lepton
-      double bestWeight = m_maximumAcceptanceFactor; //For the case restricted to only one brem photon per lepton
+      double bestWeight = m_maximumAcceptance; //For the case restricted to only one brem photon per lepton
       std::vector<Particle*> selectedGammas; //For the case of many brem photons per lepton
 
       unsigned j = 0;
@@ -192,7 +192,7 @@ namespace Belle2 {
             double weight = bremClusters.weight(j);
 
             if (m_addMultiplePhotons) {
-              if (weight > m_maximumAcceptanceFactor) continue;
+              if (weight > m_maximumAcceptance) continue;
               gamma->addExtraInfo("bremsAcceptanceFactor", weight);
               selectedGammas.push_back(gamma);
             } else {

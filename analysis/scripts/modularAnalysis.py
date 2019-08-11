@@ -357,6 +357,54 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None):
     path.add_module(mcparticleprinter)
 
 
+def bremsFinder(
+    outputListName,
+    inputListName,
+    gammaListName,
+    maximumAcceptance=3.0,
+    multiplePhotons=False,
+    writeOut=False,
+    path=None,
+):
+    """
+    For each particle in the given `inputList`, copies it to the `outputList` and adds the
+    4-vector of the photon(s) in the `gammaList` which has(have) a weighted named relation to
+    the particle's track, set by the **eclTrackBremFinder module** during reconstruction.
+
+    Warning:
+        This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
+        up to MC12 **do not** contain this.
+
+    Warning:
+        Please note that a new particle is always generated, with the old particle and -if found- one or more
+        photons as daughters.
+
+    Warning:
+        The `inputList` should contain particles with associated tracks. Otherwise the module will exit with an error.
+
+    Warning:
+        The `gammaList` should contain photons. Otherwise the module will exit with an error.
+
+    @param outputList   The output particle list name containing the corrected particles
+    @param inputList    The initial particle list name containing the particles to correct. **It should already exist.**
+    @param gammaList    The photon list containing possibly bremsstrahlung photons; **It should already exist.**
+    @param maximumAcceptance Maximum value of the relation weight. Should be a number between [0,3]
+    @param multiplePhotons Whether to use only one photon (the one with the smallest acceptance) or as many as possible
+    @param writeOut      Whether `RootOutput` module should save the created `ParticleList`
+    @param path          Modules are added to this path
+    """
+
+    bremsfinder = register_module('BremsFinder')
+    bremsfinder.set_name('BremsFinder_' + outputListName)
+    bremsfinder.param('inputList', inputList)
+    bremsfinder.param('outputList', outputList)
+    bremsfinder.param('gammaList', gammaList)
+    bremsfinder.param('maximumAcceptance', maximumAcceptance)
+    bremsfinder.param('multiplePhotons', multiplePhotons)
+    bremsfinder.param('writeOut', writeOut)
+    path.add_module(bremsfinder)
+
+
 def copyList(
     outputListName,
     inputListName,
@@ -403,15 +451,15 @@ def correctFSR(
     @param path          modules are added to this path
     """
 
-    fsrcorrector = register_module('FSRCorrection')
-    fsrcorrector.set_name('FSRCorrection_' + outputListName)
-    fsrcorrector.param('inputListName', inputListName)
-    fsrcorrector.param('outputListName', outputListName)
-    fsrcorrector.param('gammaListName', gammaListName)
-    fsrcorrector.param('angleThreshold', angleThreshold)
-    fsrcorrector.param('energyThreshold', energyThreshold)
-    fsrcorrector.param('writeOut', writeOut)
-    path.add_module(fsrcorrector)
+    bremsfinder = register_module('FSRCorrection')
+    bremsfinder.set_name('FSRCorrection_' + outputListName)
+    bremsfinder.param('inputListName', inputListName)
+    bremsfinder.param('outputListName', outputListName)
+    bremsfinder.param('gammaListName', gammaListName)
+    bremsfinder.param('angleThreshold', angleThreshold)
+    bremsfinder.param('energyThreshold', energyThreshold)
+    bremsfinder.param('writeOut', writeOut)
+    path.add_module(bremsfinder)
 
 
 def correctBremsBelle(

@@ -55,6 +55,7 @@
   <!-------------------------------------------------------------------------->
 
   {{#plotfiles}}
+  {{#if show_shifter || show_expert_plots }}
   <a name="{{package}}-{{rootfile}}"></a>
   <div class="wrap_rootfile">
     <!-- Header -->
@@ -118,6 +119,7 @@
     {{>plot_matrix}}
     {{/if}}
   </div>
+  {{ /if }}
   {{/plotfiles}}
 </div>
 {{/packages}}

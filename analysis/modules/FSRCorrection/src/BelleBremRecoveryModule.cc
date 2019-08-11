@@ -167,24 +167,18 @@ namespace Belle2 {
       correctedLepton.appendDaughter(lepton, false);
 
       const TMatrixFSym& lepErrorMatrix = lepton->getMomentumVertexErrorMatrix();
-      TMatrixFSym corLepMatrix(c_DimMatrix);
+      TMatrixFSym corLepMatrix = lepErrorMatrix;
       for (auto const& fsrgamma : selectedGammas) {
         usedGammas[fsrgamma->getMdstArrayIndex()] = fsrgamma->getMdstArrayIndex();
         //this extrainfo associated to the brephoton provides angle with the charged particle
         const TMatrixFSym& fsrErrorMatrix = fsrgamma->getMomentumVertexErrorMatrix();
-        for (int irow = 0; irow < c_DimMatrix; irow++)
-          for (int icol = irow; icol < c_DimMatrix; icol++) {
-            if (irow > 3 || icol > 3)
-              corLepMatrix(irow, icol) = lepErrorMatrix(irow, icol);
-            else
-              corLepMatrix(irow, icol) = lepErrorMatrix(irow, icol) + fsrErrorMatrix(irow, icol);
-          }
+        for (int irow = 0; irow <= 3 ; irow++)
+          for (int icol = irow; icol <= 3; icol++)
+            corLepMatrix(irow, icol) += fsrErrorMatrix(irow, icol);
         correctedLepton.appendDaughter(fsrgamma, false);
         B2INFO("[BelleBremRecoveryModule] Found a radiative gamma and added its 4-vector to the charge particle");
-        correctedLepton.setMomentumVertexErrorMatrix(corLepMatrix);
       }
-      if (int(selectedGammas.size()) == 0)
-        correctedLepton.setMomentumVertexErrorMatrix(lepton->getMomentumVertexErrorMatrix());
+      correctedLepton.setMomentumVertexErrorMatrix(corLepMatrix);
       correctedLepton.setVertex(lepton->getVertex());
       correctedLepton.setPValue(lepton->getPValue());
       // add the mc relation

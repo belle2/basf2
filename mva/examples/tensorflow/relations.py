@@ -177,6 +177,7 @@ def partial_fit(state, X, S, y, w, epoch):
 
     return True
 
+
 if __name__ == "__main__":
     import os
     import pandas
@@ -187,6 +188,12 @@ if __name__ == "__main__":
     import basf2
     import basf2_mva
     import basf2_mva_util
+
+    from basf2 import conditions
+    # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
+    conditions.testing_payloads = [
+        'localdb/database.txt'
+    ]
 
     # ##############Building Data samples ###########################
     # This is  a dataset for testing relational nets.

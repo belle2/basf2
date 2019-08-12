@@ -40,6 +40,11 @@ def f(x, general_options, process_number):
 
 
 if __name__ == "__main__":
+    from basf2 import conditions
+    # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
+    conditions.testing_payloads = [
+        'localdb/database.txt'
+    ]
 
     training_data = basf2_mva.vector("train.root")
     test_data = basf2_mva.vector("test.root")

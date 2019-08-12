@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Anze Zupanc, Marko Staric, Christian Pulvermacher,       *
- *               Sam Cunliffe, Torben Ferber                              *
+ *               Sam Cunliffe, Torben Ferber, Thomas Kuhr                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -393,15 +393,15 @@ float Particle::getCosHelicity(const Particle* mother) const
   }
   pMother.Boost(boost);
 
-  // momentum of the daughter (or normal vextor) in the particle's rest frame
+  // momentum of the daughter (or normal vector) in the particle's rest frame
   TLorentzVector pDaughter;
   if (getNDaughters() == 2) {  // two body decay
     pDaughter = getDaughter(0)->get4Vector();
     pDaughter.Boost(boost);
-  } else if (getNDaughters() == 2) {
-    if (getPDGCode() == 111) {  // pi0 Dalitz decay
+  } else if (getNDaughters() == 3) {
+    if (getPDGCode() == Const::pi0.getPDGCode()) {  // pi0 Dalitz decay
       for (auto& daughter : getDaughters()) {
-        if (daughter->getPDGCode() == 11) {
+        if (daughter->getPDGCode() == Const::photon.getPDGCode()) {
           pDaughter = daughter->get4Vector();
         }
       }
@@ -422,6 +422,13 @@ float Particle::getCosHelicity(const Particle* mother) const
 
 float Particle::getCosHelicityDaughter(unsigned iDaughter, unsigned iGrandDaughter) const
 {
+  // check existence of daughter
+  if (getNDaughters() <= iDaughter) {
+    B2ERROR("No daughter of particle 'name' with index 'iDaughter' for calculation of helicity angle"
+            << LogVar("name", getName()) << LogVar("iDaughter", iDaughter));
+    return std::numeric_limits<float>::quiet_NaN();
+  }
+
   // boost vector to the rest frame of the daughter particle
   const Particle* daughter = getDaughter(iDaughter);
   TVector3 boost = -daughter->get4Vector().BoostVector();
@@ -429,6 +436,13 @@ float Particle::getCosHelicityDaughter(unsigned iDaughter, unsigned iGrandDaught
   // momentum of the this particle in the daughter's rest frame
   TLorentzVector pMother = get4Vector();
   pMother.Boost(boost);
+
+  // check existence of grand daughter
+  if (daughter->getNDaughters() <= iGrandDaughter) {
+    B2ERROR("No grand daughter of daugher 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle"
+            << LogVar("name", getName()) << LogVar("iDaughter", iDaughter) << LogVar("iGrandDaughter", iGrandDaughter));
+    return std::numeric_limits<float>::quiet_NaN();
+  }
 
   // momentum of the grand daughter in the daughter's rest frame
   TLorentzVector pGrandDaughter = daughter->getDaughter(iGrandDaughter)->get4Vector();
@@ -441,16 +455,29 @@ float Particle::getCosHelicityDaughter(unsigned iDaughter, unsigned iGrandDaught
 
 float Particle::getAcoplanarity() const
 {
+  // check that we have a decay to two daughters and then two grand daughters each
+  if (getNDaughters() != 2) {
+    B2ERROR("Cannot calculate acoplanarity of particle 'name' because the number of daughters is not 2"
+            << LogVar("name", getName()) << LogVar("# of daughters", getNDaughters()));
+    return std::numeric_limits<float>::quiet_NaN();
+  }
+  const Particle* daughter0 = getDaughter(0);
+  const Particle* daughter1 = getDaughter(1);
+  if ((daughter0->getNDaughters() != 2) || (daughter1->getNDaughters() != 2)) {
+    B2ERROR("Cannot calculate acoplanarity of particle 'name' because the number of grand daughters is not 2"
+            << LogVar("name", getName()) << LogVar("# of grand daughters of first daughter", daughter0->getNDaughters())
+            << LogVar("# of grand daughters of second daughter", daughter1->getNDaughters()));
+    return std::numeric_limits<float>::quiet_NaN();
+  }
+
   // boost vector to the rest frame of the particle
   TVector3 boost = -get4Vector().BoostVector();
 
   // momenta of the daughters and grand daughters in the particle's rest frame
-  const Particle* daughter0 = getDaughter(0);
   TLorentzVector pDaughter0 = daughter0->get4Vector();
   pDaughter0.Boost(boost);
   TLorentzVector pGrandDaughter0 = daughter0->getDaughter(0)->get4Vector();
   pGrandDaughter0.Boost(boost);
-  const Particle* daughter1 = getDaughter(1);
   TLorentzVector pDaughter1 = daughter1->get4Vector();
   pDaughter1.Boost(boost);
   TLorentzVector pGrandDaughter1 = daughter1->getDaughter(0)->get4Vector();

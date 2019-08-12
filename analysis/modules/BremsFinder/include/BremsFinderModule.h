@@ -20,10 +20,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <string>
-//#include <vector>
-//#include <tuple>
-//#include <memory>
-
 
 namespace Belle2 {
   class Particle;

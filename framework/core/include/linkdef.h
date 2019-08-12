@@ -12,6 +12,6 @@
 #pragma link C++ class Belle2::ProcessStatistics+;
 #pragma link C++ class Belle2::Environment+;
 #pragma link C++ class Belle2::RandomGenerator+;
-#pragma link C++ class Belle2::MetadataService+;
+#pragma link C++ class Belle2::MetadataService-;
 
 #endif

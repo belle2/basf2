@@ -21,6 +21,8 @@
 #include <framework/core/DataFlowVisualization.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/MetadataService.h>
+#include <framework/gearbox/Unit.h>
+#include <framework/utilities/Utils.h>
 
 #ifdef HAS_CALLGRIND
 #include <valgrind/callgrind.h>
@@ -82,7 +84,7 @@ void EventProcessor::writeToStdErr(const char msg[])
 }
 
 EventProcessor::EventProcessor() : m_master(nullptr), m_processStatisticsPtr("", DataStore::c_Persistent),
-  m_inRun(false)
+  m_inRun(false), m_lastMetadataUpdate(0), m_metadataUpdateInterval(1.0)
 {
 
 }
@@ -296,7 +298,11 @@ void EventProcessor::installMainSignalHandlers(void (*fn)(int))
 
 bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule)
 {
-  MetadataService::Instance().addBasf2Status("running event loop");
+  double time = Utils::getClock() / Unit::s;
+  if (time > m_lastMetadataUpdate + m_metadataUpdateInterval) {
+    MetadataService::Instance().addBasf2Status("running event loop");
+    m_lastMetadataUpdate = time;
+  }
 
   const bool collectStats = !Environment::Instance().getNoStats();
 

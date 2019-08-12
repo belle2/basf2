@@ -46,7 +46,7 @@ void MetadataService::addRootOutputFile(const std::string& fileName, const FileM
   }
 
   try {
-    std::string check = Utils::getCommandOutput("b2file-check --json " + fileName);
+    std::string check = Utils::getCommandOutput("b2file-check", {"--json ", fileName});
     file_json.merge_patch(nlohmann::json::parse(check));
   } catch (...) {}
 
@@ -78,22 +78,23 @@ static auto basf2StartTime = Utils::getClock();
 
 void MetadataService::addBasf2Status(const std::string& message)
 {
-  m_json["basf2_status"]["elapsed_walltime_sec"] = (Utils::getClock() - basf2StartTime) / Unit::s;
-  m_json["basf2_status"]["resident_memory_mb"] = Utils::getRssMemoryKB() / 1024;
-  static StoreObjPtr<ProcessStatistics> processStatistics;
+  auto& status = m_json["basf2_status"];
+  status["elapsed_walltime_sec"] = (Utils::getClock() - basf2StartTime) / Unit::s;
+  status["resident_memory_mb"] = Utils::getRssMemoryKB() / 1024;
+  static StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
   if (processStatistics.isValid()) {
     const auto& stats = processStatistics->getGlobal();
-    m_json["basf2_status"]["runs_processed"] = stats.getCalls(ModuleStatistics::EStatisticCounters::c_BeginRun);
-    m_json["basf2_status"]["events_processed"] = stats.getCalls();
+    status["runs_processed"] = int(stats.getCalls(ModuleStatistics::EStatisticCounters::c_BeginRun));
+    status["events_processed"] = int(stats.getCalls());
   }
-  if ((m_json["basf2_status"].count("total_events") == 0) || (m_json["basf2_status"]["total_events"] == 0)) {
-    m_json["basf2_status"]["total_events"] = Environment::Instance().getNumberOfEvents();
+  if ((status.count("total_events") == 0) || (status["total_events"] == 0)) {
+    status["total_events"] = Environment::Instance().getNumberOfEvents();
   }
-  m_json["basf2_status"]["fatals"] = LogSystem::Instance().getMessageCounter(LogConfig::c_Fatal);
-  m_json["basf2_status"]["errors"] = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
-  m_json["basf2_status"]["warnings"] = LogSystem::Instance().getMessageCounter(LogConfig::c_Warning);
-  m_json["basf2_status"]["finished"] = false;
-  m_json["basf2_status"]["message"] = message;
+  status["fatals"] = LogSystem::Instance().getMessageCounter(LogConfig::c_Fatal);
+  status["errors"] = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
+  status["warnings"] = LogSystem::Instance().getMessageCounter(LogConfig::c_Warning);
+  status["finished"] = false;
+  status["message"] = message;
 
   writeJson();
 }

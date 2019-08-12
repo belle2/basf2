@@ -79,23 +79,16 @@ void FileMetaData::Print(Option_t* option) const
   if (option && (option == std::string("steering"))) {
     cout << m_steering << endl;
     return;
+  } else if (option && (option == std::string("json"))) {
+    cout << getJson().dump(2) << endl;
+    return;
   }
-  const bool use_json = (option && option == std::string("json"));
-  const bool all = use_json || (option && option == std::string("all"));
-  KeyValuePrinter printer(use_json);
+  const bool all = (option && option == std::string("all"));
+  KeyValuePrinter printer(false);
   printer.put("LFN", m_lfn);
   printer.put("nEvents", m_nEvents);
-  if (use_json) {
-    printer.put("experimentLow", m_experimentLow);
-    printer.put("runLow", m_runLow);
-    printer.put("eventLow", m_eventLow);
-    printer.put("experimentHigh", m_experimentHigh);
-    printer.put("runHigh", m_runHigh);
-    printer.put("eventHigh", m_eventHigh);
-  } else {
-    printer.put("range", std::to_string(m_experimentLow) + "/" + std::to_string(m_runLow) + "/" + std::to_string(m_eventLow)
-                + " - "  + std::to_string(m_experimentHigh) + "/" + std::to_string(m_runHigh) + "/" + std::to_string(m_eventHigh));
-  }
+  printer.put("range", std::to_string(m_experimentLow) + "/" + std::to_string(m_runLow) + "/" + std::to_string(m_eventLow)
+              + " - "  + std::to_string(m_experimentHigh) + "/" + std::to_string(m_runHigh) + "/" + std::to_string(m_eventHigh));
   printer.put("parents", m_parentLfns);
   if (all) {
     printer.put("date", m_date);
@@ -108,10 +101,7 @@ void FileMetaData::Print(Option_t* option) const
     printer.put("globalTag", m_databaseGlobalTag);
     printer.put("dataDescription", m_dataDescription);
   }
-  if (use_json)
-    printer.put("steering", m_steering);
-  if (!use_json)
-    std::cout << "=== FileMetaData ===\n";
+  std::cout << "=== FileMetaData ===\n";
   std::cout << printer.string();
 }
 

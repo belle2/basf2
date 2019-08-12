@@ -77,7 +77,7 @@ namespace Belle2 {
     /**
      * Execute a shell command and return its output
      */
-    std::string getCommandOutput(const std::string& command);
+    std::string getCommandOutput(const std::string& command, const std::vector<std::string>& arguments = {}, bool searchPath = true);
   }
 
   /**

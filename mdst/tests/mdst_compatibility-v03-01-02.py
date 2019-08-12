@@ -8,11 +8,12 @@ See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fa
 
 CHANGES since release-03-01-02:
 
+- EventMetaData:
+  + isEndOfRun
 
 - ECLCluster:
   + hasFailedFitTime
   + hasFailedTimeResolution
-
 """
 
 from basf2 import create_path, process, set_random_seed, find_file, LogLevel

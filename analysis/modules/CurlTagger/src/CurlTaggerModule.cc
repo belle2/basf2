@@ -72,7 +72,7 @@ CurlTaggerModule::~CurlTaggerModule() = default;
 bool CurlTaggerModule::passesPreSelection(Particle* p)
 {
   if (Variable::particlePt(p) > m_PtCut) {return false;}
-  if (Variable::trackNCDCHits(p) == 0 && Variable::trackNVXDHits(p) == 0) {return false;} //should never happen anyway but might as well check
+  if (!(Variable::trackNCDCHits(p) > 0 || Variable::trackNVXDHits(p) > 0)) {return false;} //should never happen anyway but might as well check
   if (p -> getCharge() == 0) {return false;}
   return true;
 }

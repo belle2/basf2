@@ -1947,7 +1947,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("nROE_RemainingTracks(maskName)", nROE_RemainingTracksWithMask,
                       "Returns number of remaining tracks between the ROE (specified via a mask) and the given particle. For the given particle only tracks are counted which are in the RoE."
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray."
-                      "Is required for the specific FEI.");
+                      "Is required for the specific FEI. :noindex:");
+    // nROE_RemainingTracks is overloaded (two C++ functions sharing one
+    // variable name) so one of the two needs to be made the indexed
+    // variable in sphinx
 
     REGISTER_VARIABLE("nROE_KLMClusters", nROE_KLMClusters,
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");
@@ -2084,11 +2087,20 @@ namespace Belle2 {
     REGISTER_VARIABLE("bssMassDifference(maskName)", bssMassDifference,
                       "Bs* - Bs mass difference");
 
-    REGISTER_VARIABLE("WE_cosThetaEll(maskName)", WE_cosThetaEll,
-                      "Returns the angle between M and lepton in W rest frame in the decays of the type\n"
-                      "M -> h_1 ... h_n ell, where W 4-momentum is given as pW = p_ell + p_nu. The neutrino\n"
-                      "momentum is calculated from ROE taking into account the specified mask and setting\n"
-                      "E_nu = |p_miss|.");
+    REGISTER_VARIABLE("WE_cosThetaEll(maskName)", WE_cosThetaEll, R"DOC(
+
+Returns the angle between $M$ and lepton in W rest frame in the decays of the type:
+:math`M \to h_1 ... h_n \ell`, where W 4-momentum is given as
+
+.. math::
+    p_W = p_\ell + p_\nu.
+
+The neutrino momentum is calculated from ROE taking into account the specified mask, and setting
+
+.. math::
+    E_{\nu} = |p_{miss}|.
+    
+)DOC");
 
     REGISTER_VARIABLE("REC_q2BhSimple", REC_q2BhSimple,
                       "Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2, \n"

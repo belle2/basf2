@@ -41,7 +41,7 @@ namespace Belle2 {
      */
     explicit RingBuffer(int nwords = c_DefaultSize);
     /** Constructor to create/attach named shared memory in global space */
-    RingBuffer(const std::string& name, unsigned int nwords = 0);     // Create / Attach Ring buffer
+    explicit RingBuffer(const std::string& name, unsigned int nwords = 0);     // Create / Attach Ring buffer
     /** Destructor */
     ~RingBuffer();
     /** open shared memory */

@@ -88,17 +88,17 @@ namespace Belle2 {
 
     //! The current number of created hits in an event.
     //! Used to fill the DataStore ECL array.
-    int m_hitNum;
+    int m_hitNum = 0;
     //! TC Hit number
-    int m_hitTCNum;
+    int m_hitTCNum = 0;
 
   private:
 
     // double m_timeCPU;        //  CPU time
     //!  Run number
-    int  m_nRun;
+    int  m_nRun = 0;
     //!  Event number
-    int  m_nEvent;
+    int  m_nEvent = 0;
     //! Clustering option
     int _Clustering;
 

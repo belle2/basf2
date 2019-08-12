@@ -18,7 +18,7 @@ using namespace CDC;
 // register module
 REG_MODULE(CDCJobCntlParModifier)
 CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDCSimControlPar::getInstance()),
-  m_gcp(CDCGeoControlPar::getInstance()), m_wireSag(), m_modLeftRightFlag(), m_debug4Sim(), m_thresholdEnergyDeposit(),
+  m_gcp(CDCGeoControlPar::getInstance()), m_timeWalk(), m_wireSag(), m_modLeftRightFlag(), m_debug4Sim(), m_thresholdEnergyDeposit(),
   m_minTrackLength(), m_maxSpaceResol(), m_addFudgeFactorForSigmaForData(), m_addFudgeFactorForSigmaForMC(),
   m_mapperGeometry(), m_mapperPhiAngle(), m_debug4Geo(), m_printMaterialTable(),
   m_materialDefinitionMode(), m_senseWireZposMode(),
@@ -41,6 +41,10 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //For Simulation
   //Switch for debug
   addParam("Debug4Sim", m_debug4Sim, "Switch on/off debug in FullSim.", false);
+  //Switch for time walk in translator
+  addParam("TimeWalkInTranslator", m_timeWalk,
+           "Switch on/off time-walk correction in the TDC-count translator for MC events. Use the CDCDigitizer's flag if you want to add/not add time walk in digitization.",
+           false);
   //Switch for wire sag
   addParam("WireSag", m_wireSag,
            "Switch on/off sense wire (gravitational) sag in FullSim. Here, sag means the main part which corresponds to design+displacement in case of wire position. You can control the perturbative part (corresponting to (mis)alignment in case of wire-position) of sag in Digitizer.",
@@ -159,6 +163,11 @@ void CDCJobCntlParModifierModule::initialize()
 {
   //  B2INFO("CDCJobCntlParModifierModule::initialize() called.");
   //For Simulation
+  if (m_scp.getTimeWalk() != m_timeWalk) {
+    B2INFO("CDCJobCntlParModifier: timeWalk modified: " << m_scp.getTimeWalk() << " to " << m_timeWalk);
+    m_scp.setTimeWalk(m_timeWalk);
+  }
+
   if (m_scp.getWireSag() != m_wireSag) {
     B2INFO("CDCJobCntlParModifier: wireSag modified: " << m_scp.getWireSag() << " to " << m_wireSag);
     m_scp.setWireSag(m_wireSag);

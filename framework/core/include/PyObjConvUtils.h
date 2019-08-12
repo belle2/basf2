@@ -19,6 +19,7 @@
 #include <boost/variant.hpp>
 #include <boost/optional.hpp>
 
+#include <set>
 #include <map>
 #include <string>
 #include <vector>

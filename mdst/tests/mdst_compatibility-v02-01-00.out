@@ -1,9 +1,12 @@
 [INFO] Steering file: mdst/tests/mdst_compatibility-v02-01-00.py
 [INFO] The random number seed is set to "1"
 [INFO] Starting event processing, random seed is set to '1'
+[INFO] Added file ${BELLE2_LOCAL_DIR}/mdst/tests/mdst-v02-01-00.root
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 Untested method EventMetaData::addErrorFlag
 Untested method EventMetaData::isEndOfData
 Untested method EventMetaData::setEndOfData
+Untested method EventMetaData::setEndOfRun
 Untested method EventMetaData::setErrorFlag
 Untested method EventMetaData::setEvent
 Untested method EventMetaData::setExperiment
@@ -143,6 +146,7 @@ EventMetaData:
   getRun(): 0
   getSubrun(): 0
   getTime(): 1541276075983871661
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -568,6 +572,9 @@ V0#2:
     -> Tracks#14
   getV0Hypothesis(): <type: Lambda0>
 TrackFitResult#0:
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
   get4Momentum(): (0.246631,-0.0590148,0.0710152,0.298048)
   getChargeSign(): 1
   getCotTheta(): 0.280035
@@ -3926,7 +3933,7 @@ ECLCluster#0:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000100000
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.075581
   getEnergyRaw(): 0.100061
@@ -5605,7 +5612,7 @@ ECLCluster#33:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000010000
   getEnergy(16): nan
   getEnergy(32): 0.100061
   getEnergyHighestCrystal(): 0.075581
@@ -10476,6 +10483,7 @@ EventMetaData:
   getRun(): 0
   getSubrun(): 0
   getTime(): 1541276125741332157
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): nan
@@ -15455,7 +15463,7 @@ ECLCluster#0:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000100000
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0751922
   getEnergyRaw(): 0.0813518
@@ -16473,7 +16481,7 @@ ECLCluster#20:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000010000
   getEnergy(16): nan
   getEnergy(32): 0.0813518
   getEnergyHighestCrystal(): 0.0733026
@@ -19832,6 +19840,7 @@ EventMetaData:
   getRun(): 0
   getSubrun(): 0
   getTime(): 1541276129800913811
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): nan
@@ -22030,7 +22039,7 @@ ECLCluster#0:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000100000
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.119451
   getEnergyRaw(): 0.16519
@@ -22687,7 +22696,7 @@ ECLCluster#13:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000010000
   getEnergy(16): nan
   getEnergy(32): 0.16519
   getEnergyHighestCrystal(): 0.116045
@@ -25354,17 +25363,3 @@ MCParticle#50:
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 0
 [INFO] ========================================================================
-[INFO] ================================================================================
-[INFO] Error summary: 123 errors and 0 warnings occurred.
-[ERROR] This cluster does not support the requested hypothesis,
-	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
-	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000
-[INFO]  (last message occurred 66 times in total)
-[ERROR] This cluster does not support the requested hypothesis,
-	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
-	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000
-[INFO]  (last message occurred 57 times in total)
-[INFO] ================================================================================
-

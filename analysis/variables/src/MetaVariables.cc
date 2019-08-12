@@ -400,6 +400,46 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr sourceObjectIsInList(const std::vector<std::string>& arguments)
+    {
+      // unpack arguments, there should be only one: the name of the list we're checking
+      if (arguments.size() != 1) {
+        B2FATAL("Wrong number of arguments for sourceObjectIsInList");
+      }
+      auto listName = arguments[0];
+
+      auto func = [listName](const Particle * particle) -> double {
+
+        // check the list exists
+        StoreObjPtr<ParticleList> list(listName);
+        if (!(list.isValid()))
+        {
+          B2FATAL("Invalid Listname " << listName << " given to sourceObjectIsInList");
+        }
+
+        // this only makes sense for particles that are *not* composite and come
+        // from some mdst object (tracks, clusters..)
+        Particle::EParticleType particletype = particle->getParticleType();
+        if (particletype == Particle::EParticleType::c_Composite
+        or particletype == Particle::EParticleType::c_Undefined)
+          return -1.0;
+
+        // it *is* possible to have a particle list from different sources (like
+        // hadrons from the ECL and KLM) so we have to check each particle in
+        // the list individually
+        for (unsigned i = 0; i < list->getListSize(); ++i)
+        {
+          Particle* iparticle = list->getParticle(i);
+          if (particletype == iparticle->getParticleType())
+            if (particle->getMdstArrayIndex() == iparticle->getMdstArrayIndex())
+              return 1.0;
+        }
+        return 0.0;
+
+      };
+      return func;
+    }
+
     Manager::FunctionPtr isDaughterOfList(const std::vector<std::string>& arguments)
     {
       if (arguments.size() > 0) {
@@ -2134,11 +2174,16 @@ arguments. Operator precedence is taken into account. For example ::
     REGISTER_VARIABLE("useCMSFrame(variable)", useCMSFrame,
                       "Returns the value of the variable using the CMS frame as current reference frame.\n"
                       "E.g. useCMSFrame(E) returns the energy of a particle in the CMS frame.");
-    REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame,
-                      "Returns the value of the variable using the lab frame as current reference frame.\n"
-                      "The lab frame is the default reference frame, usually you don't need to use this meta-variable. E.g.\n"
-                      "  - useLabFrame(E) returns the energy of a particle in the Lab frame, same as just E.\n"
-                      "  - useRestFrame(daughter(0, formula(E - useLabFrame(E)))) only corner-cases like this need to use this variable.\n\n");
+    REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame, R"DOC(
+Returns the value of ``variable`` in the *lab* frame.
+
+.. tip::
+    The lab frame is the default reference frame, usually you don't need to use this meta-variable. 
+    E.g. ``useLabFrame(E)`` returns the energy of a particle in the Lab frame, same as just ``E``.
+
+Specifying the lab frame is useful in some corner-cases. For example:
+``useRestFrame(daughter(0, formula(E - useLabFrame(E))))`` which is the difference of the first daughter's energy in the rest frame of the mother (current particle) with the same daughter's lab-frame energy.
+)DOC");
     REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
                       "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
                       "E.g. useROERecoilFrame(E) returns the energy of a particle in the ROE recoil frame.");
@@ -2162,6 +2207,12 @@ arguments. Operator precedence is taken into account. For example ::
                       "Returns 1.0 if the particle is in the list provided, 0.0 if not. Note that this only checks the particle given. For daughters of composite particles, please see isDaughterOfList().");
     REGISTER_VARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
                       "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.");
+    REGISTER_VARIABLE("sourceObjectIsInList(particleListName)", sourceObjectIsInList, R"DOC(
+Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to create a particle in ``particleListName``, 0.0 if not. 
+
+.. note::
+  This only makes sense for particles that are not composite. Returns -1 for composite particles.
+)DOC");
     REGISTER_VARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
                       "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("daughter(i, variable)", daughter,
@@ -2183,25 +2234,25 @@ arguments. Operator precedence is taken into account. For example ::
                       "E.g. mcMother(PDG) will return the PDG code of the MC mother of the matched MC"
                       "particle of the reconstructed particle the function is applied to.\n"
                       "The meta variable can also be nested: mcMother(mcMother(PDG)).");
-    REGISTER_VARIABLE("genParticle(i, variable)", genParticle,
-                      "[Eventbased] Returns function which returns the variable for the ith generator particle.\n"
-                      "The arguments of the function must be:\n"
-                      "    argument 1: Index of the particle in the MCParticle Array\n"
-                      "    argument 2: Valid basf2 variable name of the function that shall be evaluated.\n"
-                      "If the provided index goes beyond the length of the mcParticles array, -999 will be returned."
-                      "E.g. genParticle(0, p) returns the total momentum of the first MC Particle, which is "
-                      "the Upsilon(4S) in a generic decay.\n"
-                      "     genParticle(0, mcDaughter(1, p) returns the total momentum of the second daughter of "
-                      "the first MC Particle, which is the momentum of the second B meson in a generic decay.");
-    REGISTER_VARIABLE("genUpsilon4S(variable)", genUpsilon4S,
-                      "[Eventbased] Returns function which returns the variable evaluated for the generator level"
-                      "Upsilon(4S).\n"
-                      "The argument of the function must be a valid basf2 variable name of the function "
-                      "that shall be evaluated.\n"
-                      "If no generator level Upsilon(4S) exists for the event, -999 will be returned.\n"
-                      "E.g. genUpsilon4S(p) returns the total momentum of the Upsilon(4S) in a generic decay.\n"
-                      "     genUpsilon4S(mcDaughter(1, p) returns the total momentum of the second daughter of "
-                      "the generator level Upsilon(4S), which is the momentum of the second B meson in a generic decay.");
+    REGISTER_VARIABLE("genParticle(index, variable)", genParticle, R"DOC(
+[Eventbased] Returns the ``variable`` for the ith generator particle.
+The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 
+and ``variable``, the name of the function or variable for that generator particle.
+If ``index`` goes beyond the length of the MCParticles array, -999 will be returned.
+
+E.g. ``genParticle(0, p)`` returns the total momentum of the first MCParticle, which is "
+the Upsilon(4S) in a generic decay.
+``genParticle(0, mcDaughter(1, p)`` returns the total momentum of the second daughter of
+the first MC Particle, which is the momentum of the second B meson in a generic decay.
+)DOC");
+    REGISTER_VARIABLE("genUpsilon4S(variable)", genUpsilon4S, R"DOC(
+[Eventbased] Returns the ``variable`` evaluated for the generator-level :math:`\Upsilon(4S)`.
+If no generator level :math:`\Upsilon(4S)` exists for the event, -999 will be returned.
+
+E.g. ``genUpsilon4S(p)`` returns the total momentum of the :math:`\Upsilon(4S)` in a generic decay.
+``genUpsilon4S(mcDaughter(1, p)`` returns the total momentum of the second daughter of the
+generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in a generic decay.
+)DOC");
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf,
                       "Returns product of a variable over all daughters.\n"
                       "E.g. daughterProductOf(extraInfo(SignalProbability)) returns the product of the SignalProbabilitys of all daughters.");

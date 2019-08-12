@@ -176,6 +176,7 @@ class InputEditor():
         commentlines_start_with: Optionally define string with which comment
             lines start
     """
+
     def __init__(self,
                  editor_command: str = None,
                  initial_content: str = None,
@@ -211,9 +212,9 @@ class InputEditor():
 
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
                 # If editor not found or other problem with subprocess call, fall back to terminal input
-                print("Could not open {}.".format(self.get_editor_command()))
-                print("Try to set your $VISUAL or $EDITOR environment variables properly.\n")
-                sys.exit(1)
+            print("Could not open {}.".format(self.get_editor_command()))
+            print("Try to set your $VISUAL or $EDITOR environment variables properly.\n")
+            sys.exit(1)
 
         return input_string
 

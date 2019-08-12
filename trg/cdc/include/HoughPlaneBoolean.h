@@ -95,6 +95,7 @@ namespace Belle2 {
 
   private:
     unsigned _n;
+    /// cell
     unsigned* const _cell;
     unsigned _nPatterns;
     unsigned** _patterns;

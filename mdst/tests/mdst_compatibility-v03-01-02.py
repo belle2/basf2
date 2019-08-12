@@ -7,6 +7,7 @@ Test backwards compatibility for an mdst file produced with release-03-01-02.
 See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fails.
 
 CHANGES since release-03-01-02:
+- ECLCluster:
   + hasFailedFitTime
   + hasFailedTimeResolution
 """

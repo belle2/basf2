@@ -9,6 +9,8 @@ See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fa
 CHANGES since release-02-01-00:
 - ECLCluster:
   + getPulseShapeDiscriminationMVA added
+  + hasFailedFitTime
+  + hasFailedTimeResolution
   - getCovarianceMatrixAsArray removed
 - SoftwareTriggerResult:
   * non-prescaled results added

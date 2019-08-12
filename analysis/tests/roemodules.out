@@ -1,0 +1,151 @@
+[INFO] Steering file: /home/sbilokin/basf2-v1.0/releases/development/analysis/tests/roemodules.py
+[INFO] The random number seed is set to "1337"
+[INFO] Starting event processing, random seed is set to '1337'
+[INFO] Added file ${BELLE2_RELEASE_DIR}/analysis/tests/mdst.root
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K- (K+)
+[INFO]    -> MDST source: Tracks
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi- (pi+)
+[INFO]    -> MDST source: Tracks
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: gamma (gamma)
+[INFO]    -> MDST source: ECLClusters
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
+[INFO]    -> MDST source: KLMClusters
+[INFO]    -> MDST source: ECLClusters
+[INFO]    -> With cuts  : 
+[INFO] Number of ParticleLists studied 1 
+[INFO] RestOfEventInterpreter added ROEMask with specific fractions under name 'cleanMask' with track cuts: E > 0.05 and eclCluster cuts: E > 0.05
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K_S0 (K_S0)
+[INFO]    -> MDST source: V0
+[INFO]    -> With cuts  : 
+[INFO] RestOfEventUpdater updated track/eclCluster ROEMask(s) with infoList: K_S0 and cut: 
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] [RestOfEventPrinterModule] START ----------------------------------------
+[INFO]  - ROE related to particle with PDG: -321
+[INFO]  - ROE related to MC particle with PDG: -211
+[INFO]  - No. of Tracks in ROE: 9
+[INFO]  - No. of ECLClusters in ROE: 11
+[INFO]  - No. of KLMClusters in ROE: 4
+[INFO]  - Info for ROEMask with name: 'cleanMask'
+[INFO]     o) No. of Tracks which pass the mask: 9
+[INFO]     o) No. of ECLClusters which pass the mask: 10
+[INFO] [RestOfEventPrinterModule] END ------------------------------------------
+[INFO] [RestOfEventPrinterModule] START ----------------------------------------
+[INFO]  - ROE related to particle with PDG: -321
+[INFO]  - ROE related to MC particle with PDG: -321
+[INFO]  - No. of Tracks in ROE: 9
+[INFO]  - No. of ECLClusters in ROE: 11
+[INFO]  - No. of KLMClusters in ROE: 4
+[INFO]  - Info for ROEMask with name: 'cleanMask'
+[INFO]     o) No. of Tracks which pass the mask: 9
+[INFO]     o) No. of ECLClusters which pass the mask: 10
+[INFO] [RestOfEventPrinterModule] END ------------------------------------------
+[INFO] [RestOfEventPrinterModule] START ----------------------------------------
+[INFO]  - ROE related to particle with PDG: -321
+[INFO]  - ROE related to MC particle with PDG: 11
+[INFO]  - No. of Tracks in ROE: 9
+[INFO]  - No. of ECLClusters in ROE: 11
+[INFO]  - No. of KLMClusters in ROE: 4
+[INFO]  - Info for ROEMask with name: 'cleanMask'
+[INFO]     o) No. of Tracks which pass the mask: 9
+[INFO]     o) No. of ECLClusters which pass the mask: 10
+[INFO] [RestOfEventPrinterModule] END ------------------------------------------
+[INFO] [RestOfEventPrinterModule] START ----------------------------------------
+[INFO]  - ROE related to particle with PDG: -321
+[INFO]  - ROE related to MC particle with PDG: -211
+[INFO]  - No. of Tracks in ROE: 9
+[INFO]  - No. of ECLClusters in ROE: 11
+[INFO]  - No. of KLMClusters in ROE: 4
+[INFO]  - Info for ROEMask with name: 'cleanMask'
+[INFO]     o) No. of Tracks which pass the mask: 9
+[INFO]     o) No. of ECLClusters which pass the mask: 10
+[INFO] [RestOfEventPrinterModule] END ------------------------------------------
+[INFO] [RestOfEventPrinterModule] START ----------------------------------------
+[INFO]  - ROE related to particle with PDG: -321
+[INFO]  - ROE related to MC particle with PDG: -2212
+[INFO]  - No. of Tracks in ROE: 9
+[INFO]  - No. of ECLClusters in ROE: 12
+[INFO]  - No. of KLMClusters in ROE: 4
+[INFO]  - Info for ROEMask with name: 'cleanMask'
+[INFO]     o) No. of Tracks which pass the mask: 9
+[INFO]     o) No. of ECLClusters which pass the mask: 11
+[INFO] [RestOfEventPrinterModule] END ------------------------------------------
+[INFO] [RestOfEventPrinterModule] START ----------------------------------------
+[INFO]  - ROE related to particle with PDG: 321
+[INFO]  - ROE related to MC particle with PDG: 211
+[INFO]  - No. of Tracks in ROE: 9
+[INFO]  - No. of ECLClusters in ROE: 12
+[INFO]  - No. of KLMClusters in ROE: 4
+[INFO]  - Info for ROEMask with name: 'cleanMask'
+[INFO]     o) No. of Tracks which pass the mask: 9
+[INFO]     o) No. of ECLClusters which pass the mask: 11
+[INFO] [RestOfEventPrinterModule] END ------------------------------------------
+[INFO] [RestOfEventPrinterModule] START ----------------------------------------
+[INFO]  - ROE related to particle with PDG: 321
+[INFO]  - ROE related to MC particle with PDG: -13
+[INFO]  - No. of Tracks in ROE: 9
+[INFO]  - No. of ECLClusters in ROE: 11
+[INFO]  - No. of KLMClusters in ROE: 4
+[INFO]  - Info for ROEMask with name: 'cleanMask'
+[INFO]     o) No. of Tracks which pass the mask: 9
+[INFO]     o) No. of ECLClusters which pass the mask: 10
+[INFO] [RestOfEventPrinterModule] END ------------------------------------------
+[INFO] [RestOfEventPrinterModule] START ----------------------------------------
+[INFO]  - ROE related to particle with PDG: 321
+[INFO]  - ROE related to MC particle with PDG: 211
+[INFO]  - No. of Tracks in ROE: 9
+[INFO]  - No. of ECLClusters in ROE: 11
+[INFO]  - No. of KLMClusters in ROE: 4
+[INFO]  - Info for ROEMask with name: 'cleanMask'
+[INFO]     o) No. of Tracks which pass the mask: 9
+[INFO]     o) No. of ECLClusters which pass the mask: 10
+[INFO] [RestOfEventPrinterModule] END ------------------------------------------
+[INFO] [RestOfEventPrinterModule] START ----------------------------------------
+[INFO]  - ROE related to particle with PDG: 321
+[INFO]  - ROE related to MC particle with PDG: 211
+[INFO]  - No. of Tracks in ROE: 9
+[INFO]  - No. of ECLClusters in ROE: 11
+[INFO]  - No. of KLMClusters in ROE: 4
+[INFO]  - Info for ROEMask with name: 'cleanMask'
+[INFO]     o) No. of Tracks which pass the mask: 9
+[INFO]     o) No. of ECLClusters which pass the mask: 10
+[INFO] [RestOfEventPrinterModule] END ------------------------------------------
+[INFO] [RestOfEventPrinterModule] START ----------------------------------------
+[INFO]  - ROE related to particle with PDG: 321
+[INFO]  - ROE related to MC particle with PDG: -13
+[INFO]  - No. of Tracks in ROE: 9
+[INFO]  - No. of ECLClusters in ROE: 11
+[INFO]  - No. of KLMClusters in ROE: 4
+[INFO]  - Info for ROEMask with name: 'cleanMask'
+[INFO]     o) No. of Tracks which pass the mask: 9
+[INFO]     o) No. of ECLClusters which pass the mask: 10
+[INFO] [RestOfEventPrinterModule] END ------------------------------------------
+[INFO] ParticleStats Summary: 
+
+[INFO] =======================================================================
+			|Retention|	    0| Unique 
+            K-( 0)	|	1.0000	1.0000	1.0000
+
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+			| All Particles 		| Particles     		| AntiParticles 		
+			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
+            K-( 0)	|	 10.0000	 10.0000	  5.0000	  5.0000	  5.0000	  5.0000	  0.0000	  0.0000
+
+[INFO] 
+=======================================================
+Total Retention: 1.0000
+Total Number of Particles created in the DataStore: 32
+=======================================================
+

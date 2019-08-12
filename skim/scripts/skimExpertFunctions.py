@@ -28,7 +28,8 @@ all_skims = [
     "Charm3BodyHadronic", "Charm3BodyHadronic1", "Charm3BodyHadronic3", "Charm2BodyHadronic", "Charm2BodyHadronicD0",
     "Charm2BodyNeutrals", "Charm2BodyNeutralsD0", "BtoDh_Kspi0", "BtoDh_hh",
     "BtoDh_Kshh", "Tau", "PRsemileptonicUntagged", "SLUntagged",
-    "LeptonicUntagged", "TCPV", "CharmRare", "BtoXll", "BtoXgamma", "TauLFV",
+    "LeptonicUntagged", "TCPV", "CharmRare", "BtoXll", "BtoXll_LFV",
+    "BtoXgamma", "TauLFV"
 ]
 
 
@@ -273,6 +274,7 @@ _skimNameMatching = [
     ('11180400', 'feiSLBplus'),
     ('12160100', 'BtoXgamma'),
     ('12160200', 'BtoXll'),
+    ('12160300', 'BtoXll_LFV'),
     ('14120500', 'BtoPi0Pi0'),
     ('17240100', 'Charm2BodyHadronic'),  # D* -> D0 -> K pi/pi pi/K K
     # ('17240100', 'DstToD0PiD0ToHpJm'),  # D* -> D0 -> K pi/pi pi/K K

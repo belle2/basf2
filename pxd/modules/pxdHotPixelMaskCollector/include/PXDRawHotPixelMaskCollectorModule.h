@@ -35,9 +35,9 @@ namespace Belle2 {
 
   private:
 
-    /**< Required input for  PXDRawHit */
+    /** Required input for  PXDRawHit */
     StoreArray<PXDRawHit> m_pxdRawHit;
-    /**< Required input for PXD Daq Status */
+    /** Required input for PXD Daq Status */
     StoreObjPtr<PXDDAQStatus> m_storeDaqStatus;
 
     /** Name of the collection to use for PXDRawHits */

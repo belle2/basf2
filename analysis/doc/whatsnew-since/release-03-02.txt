@@ -18,6 +18,8 @@ Variables
 * Added variables for 2D Armenteros-Podolanski plot, :b2:var:`ArmenterosLongitudinalMomentumAsymmetry`, 
   :b2:var:`ArmenterosDaughter1Qt`, and :b2:var:`ArmenterosDaughter2Qt`
 * fall-back value changed from zero to NaN for several track variables
+* Added :b2:var:`sourceObjectIsInList` which checks whether there are particles from the same underlying track or cluster in a given particle list. 
+  Similar to :b2:var:`isInList` but a tighter check.
 
 Modules
 +++++++

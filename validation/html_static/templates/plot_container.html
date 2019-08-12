@@ -5,7 +5,7 @@
 <div id="topmost_viewselection">
   <input id="check_show_overview" type="checkbox" checked='{{show_overview}}'>
   <label for="check_show_overview">Compact View</label>
-  <input id="check_show_expert_plots" type="checkbox" checked='{{show_expert_plots}}'>
+  <input id="check_show_expert_plots" type="checkbox" checked='{{show_expert_plots}}' onchange="renderLatex()">
   <label for="check_show_expert_plots">Expert Content</label>
 </div>
 
@@ -55,6 +55,7 @@
   <!-------------------------------------------------------------------------->
 
   {{#plotfiles}}
+  {{#if show_shifter || show_expert_plots }}
   <a name="{{package}}-{{rootfile}}"></a>
   <div class="wrap_rootfile">
     <!-- Header -->
@@ -118,6 +119,7 @@
     {{>plot_matrix}}
     {{/if}}
   </div>
+  {{ /if }}
   {{/plotfiles}}
 </div>
 {{/packages}}

@@ -52,9 +52,6 @@ namespace Belle2 {
      */
     TLorentzVector getBeamFourMomentum() const
     {
-      TVector3 beta = getBoostVector();
-      double gamma = 1 / TMath::Sqrt(1 - beta.Mag2());
-      TLorentzVector beamFourVec(beta, 1.);
       return rotateCmsToLab() * TLorentzVector(0, 0, 0, getCMSEnergy());
     }
 

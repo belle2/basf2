@@ -27,7 +27,7 @@ import mdst
 
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
-                       use_second_cdc_hits=False, add_muid_hits=False):
+                       use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -47,6 +47,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param add_trigger_calculation: add the software trigger modules for monitoring (do not make any cut)
+    :param reconstruct_cdst: run only the minimal reconstruction needed to produce the cdsts (raw+tracking+dE/dx)
     """
 
     # Check components.
@@ -68,18 +69,24 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
-    # Add further reconstruction modules
-    add_posttracking_reconstruction(path,
-                                    components=components,
-                                    pruneTracks=pruneTracks,
-                                    add_muid_hits=add_muid_hits,
-                                    addClusterExpertModules=addClusterExpertModules)
+    # Add only the dE/dx calculation and prune the tracks
+    if reconstruct_cdst:
+        add_dedx_modules(main_path)
+        add_prune_tracks(main_path, components=components)
 
-    # Add the modules calculating the software trigger cuts (but not performing them)
-    if add_trigger_calculation and (not components or (
-            "CDC" in components and "ECL" in components and "KLM" in components)):
-        add_filter_software_trigger(path)
-        add_skim_software_trigger(path)
+    else:
+        # Add further reconstruction modules
+        add_posttracking_reconstruction(path,
+                                        components=components,
+                                        pruneTracks=pruneTracks,
+                                        add_muid_hits=add_muid_hits,
+                                        addClusterExpertModules=addClusterExpertModules)
+
+        # Add the modules calculating the software trigger cuts (but not performing them)
+        if add_trigger_calculation and (not components or (
+                "CDC" in components and "ECL" in components and "KLM" in components)):
+            add_filter_software_trigger(path)
+            add_skim_software_trigger(path)
 
 
 def add_cosmics_reconstruction(
@@ -93,7 +100,8 @@ def add_cosmics_reconstruction(
         top_in_counter=False,
         data_taking_period='early_phase3',
         use_second_cdc_hits=False,
-        add_muid_hits=False):
+        add_muid_hits=False,
+        reconstruct_cdst=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -121,6 +129,8 @@ def add_cosmics_reconstruction(
            (assuming PMT is put at -z of the counter).
 
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
+
+    :param reconstruct_cdst: run only the minimal reconstruction needed to produce the cdsts (raw+tracking+dE/dx)
     """
 
     # Check components.
@@ -144,13 +154,19 @@ def add_cosmics_reconstruction(
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
-    # Add further reconstruction modules
-    add_posttracking_reconstruction(path,
-                                    components=components,
-                                    pruneTracks=pruneTracks,
-                                    addClusterExpertModules=addClusterExpertModules,
-                                    add_muid_hits=add_muid_hits,
-                                    cosmics=True)
+    # Add only the dE/dx calculation and prune the tracks
+    if reconstruct_cdst:
+        add_dedx_modules(main_path)
+        add_prune_tracks(main_path, components=components)
+
+    else:
+        # Add further reconstruction modules
+        add_posttracking_reconstruction(path,
+                                        components=components,
+                                        pruneTracks=pruneTracks,
+                                        addClusterExpertModules=addClusterExpertModules,
+                                        add_muid_hits=add_muid_hits,
+                                        cosmics=True)
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
@@ -278,6 +294,7 @@ def add_cdst_output(
     filename='cdst.root',
     additionalBranches=[],
     dataDescription=None,
+    rawFormat=False
 ):
     """
     This function adds the cDST output modules (mDST + calibration objects) to a path,
@@ -289,6 +306,7 @@ def add_cdst_output(
     @param additionalBranches Additional objects/arrays of event durability to save
     @param dataDescription Additional key->value pairs to be added as data description
            fields to the output FileMetaData
+    @param rawFormat saves the cdsts in the raw+tracking format.
     """
 
     calibrationBranches = [
@@ -333,6 +351,31 @@ def add_cdst_output(
         'BKLMHit2dsToBKLMHit1ds',
         'BKLMHit1dsToBKLMDigits'
     ]
+
+    if rawFormat:
+        calibrationBranches = [
+            'EventMetaData',
+            'RawPXDs',
+            'RawSVDs',
+            'RawCDCs',
+            'RawECLs',
+            'RawARICHs',
+            'RawKLMs',
+            'RawTOPs',
+            'RawTRGs',
+            'RecoTracks',
+            'Tracks',
+            'V0s',
+            'TrackFitResults',
+            'EventT0',
+            'CDCDedxTracks',
+            'SVDShaperDigitsFromTracks',
+            'EventT0',
+            'VXDDedxTracks',
+            'CDCDedxLikelihoods',
+            'VXDDedxLikelihoods',
+            'SVDEventInfo']
+
     if dataDescription is None:
         dataDescription = {}
     dataDescription.setdefault("dataLevel", "cdst")
@@ -611,3 +654,42 @@ def add_dedx_modules(path, components=None):
     if components is None or 'SVD' in components:
         VXDdEdxPID = register_module('VXDDedxPID')
         path.add_module(VXDdEdxPID)
+
+
+def prepare_cdst_analysis(path, components=None):
+    """
+    Adds to a (analysis) path all the modules needed to
+    analyse a cdsts file in the raw+tracking format.
+
+    :param path: The path to add the modules to.
+    :param components: The components to use or None to use all standard components.
+    """
+    # unpackers
+    add_unpackers(path, components=components)
+
+    # this is currently just calls add_ecl_modules
+    add_pretracking_reconstruction(path, components=components)
+
+    # needed to retrieve the PXD and SVD clusters out of the raws
+    if components is None or 'SVD' in components:
+        add_svd_reconstruction(path)
+    if components is None or 'PXD' in components:
+        add_pxd_reconstruction(path)
+
+    # check, this one may not be needed...
+    path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
+
+    # from here on mostly a replica of add_posttracking_reconstruction without dE/dx, prunetracks and eventT0 modules
+    add_ext_module(path, components)
+    add_top_modules(path, components)
+    add_arich_modules(path, components)
+    add_ecl_finalizer_module(path, components)
+    add_ecl_mc_matcher_module(path, components)
+    add_klm_modules(path, components)
+    add_klm_mc_matcher_module(path, components)
+    add_muid_module(path, components=components)
+    add_ecl_track_cluster_modules(path, components)
+    add_ecl_cluster_properties_modules(path, components)
+    add_ecl_eip_module(path, components)
+    add_pid_module(path, components)
+    add_ecl_track_brem_finder(path, components)

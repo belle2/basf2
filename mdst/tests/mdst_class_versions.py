@@ -53,12 +53,15 @@ OBJECT_NAMES = [
 ]
 
 if __name__ == "__main__":
-    # Now get the actual objects corresponding to the names
+    # Now get
+    #: the actual objects corresponding to the names
     objects = [get_object_with_name(object_name)() for object_name in OBJECT_NAMES]
 
-    # Check the checksums of every entry
+    # Check the checksums of every entry and
+    #: keep track of found problems
     problems = []
 
+    #: dictionary of objects to (version, checksum)
     found = get_streamer_checksums(objects)
     # we don't care about TObject ...
     if 'TObject' in found:
@@ -71,6 +74,10 @@ if __name__ == "__main__":
             problems.append(f"There is no {key} in the checksum dictionary!")
             continue
 
+        #: \var expected_version
+        #  version so far
+        #: \var expected_checksum
+        #  checksum so far
         expected_version, expected_checksum = EXPECTED_CHECKSUMS[key]
 
         if expected_version != version and expected_checksum == checksum:

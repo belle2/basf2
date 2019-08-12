@@ -35,7 +35,7 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     PXDDAQDHEStatus() : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_sensorID(0), m_dheID(0), m_triggerGate(0), m_frameNr(0),
-      m_rawCount(0), m_redCount(0) {}
+      m_rawCount(0), m_redCount(0), m_errorinfo(0) {}
 
     /** constructor setting the error mask, dheid, raw and reduced data counters, ...
      * @param id VxdID of sensor
@@ -46,7 +46,7 @@ namespace Belle2 {
      */
     PXDDAQDHEStatus(VxdID id, int dheid, PXDErrorFlags mask, unsigned short tg,
                     unsigned short fn) : m_errorMask(mask), m_critErrorMask(0), m_usable(true), m_sensorID(id), m_dheID(dheid),
-      m_triggerGate(tg), m_frameNr(fn), m_rawCount(0), m_redCount(0)
+      m_triggerGate(tg), m_frameNr(fn), m_rawCount(0), m_redCount(0), m_errorinfo(0)
     {}
 
     /** Return Usability of data

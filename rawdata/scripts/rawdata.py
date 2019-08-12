@@ -141,7 +141,7 @@ def add_unpackers(path, components=None):
         neurounpacker = register_module('CDCTriggerUnpacker')
         neurounpacker.param('headerSize', 3)
         # unpack the data from the 2D tracker and save its Bitstream
-        neurounpacker.param('unpackTracker2D', True)
+        neurounpacker.param('unpackTracker2D', False)
         # make CDCTriggerTrack and CDCTriggerSegmentHit objects from the 2D output
         neurounpacker.param('decode2DFinderTrack', True)
         # make CDCTriggerSegmentHit objects from the 2D input

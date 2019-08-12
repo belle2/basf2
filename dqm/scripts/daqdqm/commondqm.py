@@ -142,11 +142,13 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             firmwareResultCollectionName='TRGCDCT3DUnpackerStore' + str(mod_t3d),
                             isVerbose=0)
             path.add_module('TRGCDCT3DDQM', T3DMOD=mod_t3d)
+
+    if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care"]) and (dqm_environment == 'hlt'):
         # CDCTriggerNeuro
         path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName='CDCTriggerNeuroTracks',
                         hitCollectionName='CDCTriggerNNInputSegmentHits', axialOnly=True)
         path.add_module('SetupGenfitExtrapolation')
-        path.add_module('CDCTriggerDQM',
+        path.add_module('CDCTriggerNeuroDQM',
                         limitedoutput=True,
                         showRecoTracks=True,
                         skipWithoutHWTS=True,

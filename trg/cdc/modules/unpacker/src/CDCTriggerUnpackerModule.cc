@@ -481,6 +481,7 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
 {
   // Set module properties
   setDescription("Unpack the CDC trigger data recorded in B2L");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("unpackMerger", m_unpackMerger,
@@ -539,7 +540,7 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
 void CDCTriggerUnpackerModule::initialize()
 {
   m_debugLevel = getLogConfig().getDebugLevel();
-  m_rawTriggers.isRequired();
+  //m_rawTriggers.isRequired();
   if (m_unpackMerger) {
     m_mergerBits.registerInDataStore("CDCTriggerMergerBits");
   }

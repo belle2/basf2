@@ -74,7 +74,7 @@ def validation_metadata_set(obj: ROOT.TObject, title: str, contact: str,
         metaoptions (str): Metaoptions (additional options to influence the
             comparison between revisions, styling of the plot, etc.)
 
-    .. note::
+    .. warning::
 
         Different ways to specify LaTeX for different arguments:
         see `create_validation_histograms`
@@ -136,7 +136,7 @@ def validation_metadata_update(
         metaoptions (str): Metaoptions (additional options to influence the
             comparison between revisions, styling of the plot, etc.)
 
-    .. note::
+    .. warning::
 
         Different ways to specify LaTeX for different arguments:
         see `create_validation_histograms`
@@ -257,13 +257,26 @@ def create_validation_histograms(
         description: Common description/information of/about all plots in this
             ROOT file (will be displayed above the plots)
 
-    .. note::
+    .. warning::
 
-        Different ways to specify LaTeX: ``xlabel``, ``ylabel``, ``title``:
-        ROOT style "Einstein-Pythagoras a^{2} + b^{2} = #frac{E}{m}".
-        ``description``, ``check_for``, (file) ``description``: LaTeX style
-        (with escaped backslashes):
-        "Einstein-Pythagoras a^2 + b^2 = \\frac{E}{m}".
+        Sadly, there are two different ways to specify latex formulas.
+
+        1. The ROOT-style using ``#``:
+           ``"Einstein-Pythagoras a^{2} + b^{2} = #frac{E}{m}"``
+
+           This style should be used for histogram title and labels, that is the
+           ``title``, ``xlabel`` and ``ylabel`` arguments
+
+        2. The normal Latex style (with escaped backslashes or raw
+           string literals):
+           ``"Einstein-Pythagoras $a^2 + b^2 = \\\\frac{E}{m}$"``.
+
+           This style should be used for all other fields like ``description``,
+           ``check_for``
+
+    You can use the normal Latex style also for histogram title and descriptions
+    but the PDF version of the plots will still be buggy and not show all
+    formulas correctly.
     """
     if isinstance(rootfile, pathlib.PurePath):
         rootfile = str(rootfile)

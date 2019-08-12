@@ -43,7 +43,7 @@ from .cli_utils import ItemFilter
 # the command_* functions are imported but not used so disable warning about
 # this if pylama/pylint is used to check
 from .cli_upload import command_upload  # noqa
-from .cli_download import command_download, command_offlinecopy  # noqa
+from .cli_download import command_download, command_legacydownload  # noqa
 
 
 def escape_ctrl_chars(name):
@@ -544,7 +544,7 @@ def command_iov(args, db):
                     print()
                     pretty_print_table(result, [-40, '*'], True)
                 else:
-                    payloads.append(PayloadInformation(payload, iov))
+                    payloads.append(PayloadInformation.from_json(payload, iov))
 
         if not args.detail:
             payloads.sort()

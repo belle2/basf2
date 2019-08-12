@@ -39,29 +39,45 @@ class PayloadInformation:
     """Small container class to help compare payload information for efficient
     comparison between globaltags"""
 
-    def __init__(self, payload, iov):
+    @classmethod
+    def from_json(cls, payload, iov):
         """Set all internal members from the json information of the payload and the iov.
 
         Arguments:
             payload (dict): json information of the payload as returned by REST api
             iov (dict): json information of the iov as returned by REST api
         """
+        return cls(
+            payload['payloadId'],
+            payload['basf2Module']['name'],
+            payload['revision'],
+            payload['checksum'],
+            payload['payloadUrl'],
+            payload['baseUrl'],
+            iov['payloadIovId'],
+            (iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"]),
+        )
+
+    def __init__(self, payload_id, name, revision, checksum, payload_url, base_url, iov_id=None, iov=None):
+        """
+        Create a new object from the given information
+        """
         #: name of the payload
-        self.name = payload['basf2Module']['name']
+        self.name = name
         #: checksum of the payload
-        self.checksum = payload['checksum']
+        self.checksum = checksum
         #: interval of validity
-        self.iov = iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"]
+        self.iov = iov
         #: revision, not used for comparisons
-        self.revision = payload["revision"]
+        self.revision = revision
         #: payload id in CDB, not used for comparisons
-        self.payload_id = payload["payloadId"]
+        self.payload_id = payload_id
         #: iov id in CDB, not used for comparisons
-        self.iov_id = iov["payloadIovId"]
+        self.iov_id = iov_id
         #: base url
-        self.base_url = payload["baseUrl"]
+        self.base_url = base_url
         #: payload url
-        self.payload_url = payload["payloadUrl"]
+        self.payload_url = payload_url
 
     def __hash__(self):
         """Make object hashable"""
@@ -77,6 +93,9 @@ class PayloadInformation:
 
     def readable_iov(self):
         """return a human readable name for the IoV"""
+        if self.iov is None:
+            return "none"
+
         if self.iov == (0, 0, -1, -1):
             return "always"
 
@@ -345,7 +364,7 @@ class ConditionsDB:
                 iovs = item['payloadIovs']
 
             for iov in iovs:
-                all_iovs.append(PayloadInformation(payload, iov))
+                all_iovs.append(PayloadInformation.from_json(payload, iov))
 
         all_iovs.sort()
         return all_iovs

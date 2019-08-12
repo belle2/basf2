@@ -394,7 +394,7 @@ def bremsFinder(
     @param maximumAcceptance Maximum value of the relation weight. Should be a number between [0,3]
     @param multiplePhotons Whether to use only one photon (the one with the smallest acceptance) or as many as possible
     @param ignorePhotonMC If true, the MC Matching of the brems photon will not alter the isSignal value of the corrected particle,
-    @param writeOut      Whether `RootOutput` module should save the created `ParticleList`
+    @param writeOut      Whether `RootOutput` module should save the created `outputList`
     @param path          Modules are added to this path
     """
 

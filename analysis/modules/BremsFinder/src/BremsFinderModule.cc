@@ -27,7 +27,6 @@
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <analysis/utility/PCmsLabTransform.h>
 
 #include <cmath>
 #include <algorithm>

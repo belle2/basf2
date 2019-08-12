@@ -106,6 +106,9 @@
   <DetectorComponent name="QCSMONITOR-phase2" isDefault="false">
     <xi:include href="../beast/qcsmonitor/QCSMONITOR-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
+  <DetectorComponent name="ServiceGaps-phase2" isDefault="false">
+    <xi:include href="../structure/ServiceGaps-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
 
   <!-- VXD Tracking and MUID muon identification -->
   <Tracking>

@@ -98,7 +98,8 @@ void AsicBackgroundDetector::applyAsicFilter(std::vector<CDCWireHit*>& wireHits)
     return;
   };
 
-  B2ASSERT("Number of hits per asic can not exceed 8", wireHits.size() <= 8);
+  B2ASSERT("Number of hits per asic should be above 0 and can not exceed 8",
+           (wireHits.size() <= 8) && (wireHits.size() > 0));
   // compute median time:
   vector<short> times;
   for (auto& hit : wireHits) {

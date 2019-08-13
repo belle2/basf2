@@ -34,7 +34,7 @@ phase2 = basf2.create_path()
 phase2.add_module("EventInfoSetter")
 phase2.add_module("Gearbox")
 phase2.add_module("Geometry", createPayloads=True, payloadIov=[1002, 0, 1002, -1],
-                  excludedComponents=["BeamPipe", "PXD", "SVD", "VXDService"],
+                  excludedComponents=["BeamPipe", "PXD", "SVD", "VXDService", "ServiceGapsMaterial"],
                   additionalComponents=[e + "-phase2" for e in phase2_detectors])
 basf2.process(phase2)
 
@@ -43,7 +43,7 @@ early3 = basf2.Path()
 early3.add_module("EventInfoSetter")
 early3.add_module("Gearbox")
 early3.add_module("Geometry", createPayloads=True, payloadIov=[1003, 0, 1003, -1],
-                  excludedComponents=['PXD'],
+                  excludedComponents=['PXD', "ServiceGapsMaterial"],
                   additionalComponents=['PXD-earlyPhase3', 'ServiceGapsMaterial-earlyPhase3'])
 basf2.process(early3)
 

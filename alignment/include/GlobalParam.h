@@ -21,7 +21,7 @@
 
 #include <framework/database/DBObjPtr.h>
 #include <alignment/GlobalLabel.h>
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 
 namespace Belle2 {
   namespace alignment {
@@ -285,21 +285,19 @@ namespace Belle2 {
       void ensureConstructed() {if (!m_object) construct();}
     };
 
-    template <>
-    unsigned short GlobalParamSet<BeamParameters>::getGlobalUniqueID() const;
     /// The DB object unique id in global calibration
     template <>
-    unsigned short GlobalParamSet<BeamParameters>::getGlobalUniqueID() const;
+    unsigned short GlobalParamSet<BeamSpot>::getGlobalUniqueID() const;
     /// Get global parameter of the DB object by its element and parameter number
     /// Note this is not const, it might need to construct the object
     template <>
-    double GlobalParamSet<BeamParameters>::getGlobalParam(unsigned short element, unsigned short param);
+    double GlobalParamSet<BeamSpot>::getGlobalParam(unsigned short element, unsigned short param);
     /// Set global parameter of the DB object by its element and parameter number
     template <>
-    void GlobalParamSet<BeamParameters>::setGlobalParam(double value, unsigned short element, unsigned short param);
+    void GlobalParamSet<BeamSpot>::setGlobalParam(double value, unsigned short element, unsigned short param);
     /// List global parameters in this DB object
     template <>
-    std::vector<std::pair<unsigned short, unsigned short>> GlobalParamSet<BeamParameters>::listGlobalParams();
+    std::vector<std::pair<unsigned short, unsigned short>> GlobalParamSet<BeamSpot>::listGlobalParams();
 
 
 

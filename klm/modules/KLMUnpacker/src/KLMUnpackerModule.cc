@@ -150,8 +150,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
   eklmDigit->setCTime(raw.ctime);
   eklmDigit->setTDC(raw.tdc);
   eklmDigit->setTime(
-    m_TimeConversion->getTime(raw.ctime, raw.tdc,
-                              klmDigitEventInfo->getTriggerCTime(), true));
+    m_TimeConversion->getTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
   eklmDigit->setSection(section);
   eklmDigit->setLayer(layer);
   eklmDigit->setSector(sector);
@@ -233,23 +232,29 @@ void KLMUnpackerModule::unpackBKLMDigit(
   }
 
   // still have to add channel and axis to moduleId
+  moduleId |= (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
+
+  BKLMDigit* bklmDigit;
   if (layer > 1) {
     moduleId |= BKLM_INRPC_MASK;
     klmDigitEventInfo->increaseRPCHits();
-  } else
+    // For RPC hits, digitize both the coarse (ctime) and fine (tdc) times relative
+    // to the revo9 trigger time rather than the event header's TriggerCTime.
+    // For the fine-time (tdc) measurement (11 bits), shift the revo9Trig time by
+    // 10 ticks to align the new prompt-time peak with the TriggerCtime-relative peak.
+    float triggerTime = klmDigitEventInfo->getRevo9TriggerWord();
+    std::pair<int, double> rpcTimes = m_TimeConversion->getTimes(raw.ctime, raw.tdc, triggerTime);
+    bklmDigit = m_bklmDigits.appendNew(moduleId, rpcTimes.first, raw.tdc, raw.charge);
+    bklmDigit->setTime(rpcTimes.second);
+  } else {
     klmDigitEventInfo->increaseSciHits();
-  // moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
-  moduleId |= (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
-
-  BKLMDigit* bklmDigit =
-    m_bklmDigits.appendNew(moduleId, raw.ctime, raw.tdc, raw.charge);
-  bklmDigit->setTime(
-    m_TimeConversion->getTime(raw.ctime, raw.tdc,
-                              klmDigitEventInfo->getTriggerCTime(),
-                              layer <= 1));
-  if (layer < 2 && (raw.charge < m_scintThreshold))
-    bklmDigit->isAboveThreshold(true);
-
+    // For scintillator hits, store the ctime relative to the event header's trigger ctime
+    bklmDigit = m_bklmDigits.appendNew(moduleId, raw.ctime, raw.tdc, raw.charge);
+    bklmDigit->setTime(
+      m_TimeConversion->getTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
+    if (raw.charge < m_scintThreshold)
+      bklmDigit->isAboveThreshold(true);
+  }
   bklmDigit->addRelationTo(klmDigitRaw);
   klmDigitEventInfo->addRelationTo(bklmDigit);
 }
@@ -301,12 +306,15 @@ void KLMUnpackerModule::event()
         }
         if (numDetNwords > 0) {
           /*
-           * In the last word there is the user word
-           * (from data concentrators).
+           * In the last word there are the revo9 trigger word
+          * and the the user word (both from DCs).
            */
-          unsigned int userWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
+          unsigned int revo9TriggerWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
+          klmDigitEventInfo->setRevo9TriggerWord(revo9TriggerWord);
+          unsigned int userWord = buf_slot[numDetNwords - 1] & 0xFFFF;
           klmDigitEventInfo->setUserWord(userWord);
         } else {
+          klmDigitEventInfo->setRevo9TriggerWord(0);
           klmDigitEventInfo->setUserWord(0);
         }
         for (int iHit = 0; iHit < numHits; iHit++) {

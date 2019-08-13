@@ -157,7 +157,7 @@ namespace Belle2 {
     /**
      * Get HSLB name.
      * @param[in] copper Copper.
-     * @param[in[ slot   Slot.
+     * @param[in] slot   Slot.
      */
     static std::string getHSLBName(int copper, int slot);
 

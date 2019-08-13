@@ -11,10 +11,10 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 #include <alignment/reconstruction/BKLMRecoHit.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <bklm/geometry/GeometryPar.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/geometry/GeometryPar.h>
 #include <alignment/GlobalLabel.h>
-#include <bklm/dataobjects/BKLMElementID.h>
+#include <klm/bklm/dataobjects/BKLMElementID.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
 
 #include <alignment/Hierarchy.h>

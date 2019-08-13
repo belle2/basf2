@@ -9,8 +9,8 @@
  **************************************************************************/
 
 #pragma once
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <bklm/geometry/GeometryPar.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/geometry/GeometryPar.h>
 
 
 // ROOT includes

@@ -9,8 +9,8 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <bklm/dataobjects/BKLMElementNumbers.h>
-#include <eklm/dataobjects/EKLMElementNumbers.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
 
 using namespace Belle2;

@@ -45,24 +45,24 @@ print(inputFileNames)
 main = basf2.create_path()
 
 # Basic modules: Input, converters, geometry, unpacker
-main.add_module('RootInput')
+main.add_module('SeqRootInput')
 main.add_module('Convert2RawDet')
 main.add_module('Gearbox')
 main.add_module('Geometry', components=['TOP'])
 main.add_module('TOPUnpacker')
 
 
-basf2.add_module('TOPRawDigitConverter',
-                 useSampleTimeCalibration=True,
-                 useChannelT0Calibration=False,
-                 useModuleT0Calibration=False,
-                 useCommonT0Calibration=False,
-                 calpulserHeightMin=320,
-                 calpulserHeightMax=680,
-                 calpulserWidthMin=1.5,
-                 calpulserWidthtMax=2.2,
-                 calibrationChannel=0,
-                 lookBackWindows=28)
+main.add_module('TOPRawDigitConverter',
+                useSampleTimeCalibration=True,
+                useChannelT0Calibration=False,
+                useModuleT0Calibration=False,
+                useCommonT0Calibration=False,
+                calpulseHeightMin=320,
+                calpulseHeightMax=680,
+                calpulseWidthMin=1.5,
+                calpulseWidthMax=2.2,
+                calibrationChannel=0,
+                lookBackWindows=28)
 
 
 laser_collector = basf2.register_module('TOPLaserCalibratorCollector')
@@ -71,11 +71,10 @@ laser_collector.param('storeMCTruth', False)
 laser_collector.param('refChannel', 0)  # Do not change this unless this channel is bad
 laser_collector.param('refSlot', 4)  # Do not change this unless this slot is bad
 
-
 algorithm = TOP.TOPLocalCalFitter()
-algorithm.isMC = False
-algorithm.m_TTSData = "/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrizations.root"
-algorithm.m_laserCorrections = "/group/belle2/group/detector/TOP/calibration/MCreferences/laserMCFit.root"
+algorithm.setMonitoringFit(False)
+algorithm.setTTSFileName("/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrizations.root")
+algorithm.setFitConstraintsFileName("/group/belle2/group/detector/TOP/calibration/MCreferences/laserMCFit.root")
 
 
 cal = Calibration(name='TOPLocalCalFitter', collector=laser_collector, algorithms=algorithm, input_files=inputFileNames)

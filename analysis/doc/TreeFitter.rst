@@ -32,3 +32,8 @@ For example, a selection of :math:`0.130 < \texttt{InvM} < 0.14~\rm{GeV}/c^2` al
 
 
 .. autofunction:: vertex.vertexTree
+
+Troubleshooting
+---------------
+
+Vertex fitting MC particles (ie. particle lists created with `modularAnalysis.fillParticleListsFromMC`) can lead to crashes. **MC particles do not need to be and should not be vertexed.** If you wish to study the vertex resolution please fit the reconstructed particles and compare the vertex variables with those of the truth matched MC values.   

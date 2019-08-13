@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from geometry import check_components
 from ROOT import Belle2
 from pxd import add_pxd_simulation
 from svd import add_svd_simulation
@@ -116,6 +117,9 @@ def add_simulation(
     This function adds the standard simulation modules to a path.
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
     """
+
+    # Check compoments.
+    check_components(components)
 
     # background mixing or overlay input before process forking
     if bkgfiles is not None:

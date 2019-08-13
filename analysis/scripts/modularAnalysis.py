@@ -144,8 +144,7 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
     elif environmentType in ["MC8", "MC9", "MC10"]:
         # make sure the last database setup is the magnetic field for MC8-10
         use_database_chain()
-        use_central_database("Legacy_MagneticField_MC8_MC9_MC10", "", "", "centraldb",
-                             loglevel=LogLevel.INFO, invertLogging=True)
+        use_central_database("Legacy_MagneticField_MC8_MC9_MC10")
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
@@ -1019,12 +1018,12 @@ def reconstructMissingKlongDecayExpert(
     recoList="_reco",
 ):
     """
-    Creates mother particle accounting for missing momentum.
+    Creates a list of K_L0's with their momentum determined from kinematic constraints of B->K_L0 + something else.
 
     @param decayString DecayString specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
-    @param cut         created (mother) Particles are added to the mother ParticleList if they
-                       pass give cuts (in VariableManager style) and rejected otherwise
+    @param cut         Particles are added to the K_L0 ParticleList if they
+                       pass the given cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
     @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path

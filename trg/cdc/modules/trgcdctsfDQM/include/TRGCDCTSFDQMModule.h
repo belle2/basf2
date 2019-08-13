@@ -37,20 +37,20 @@ namespace Belle2 {
 
   protected:
     //Total number of TSF hits per event in each superlayer
-    TH1I* h_nhit;
+    TH1I* h_nhit = nullptr;
 
     //Total number of hits in each TSF
-    TH1I* h_nhit_tsf;
+    TH1I* h_nhit_tsf = nullptr;
 
     //Valid type of TSF hits in each superlayer
-    TH1I* h_valid;
+    TH1I* h_valid = nullptr;
 
     //Timing of TSF hits in each superlayer
-    TH1I* h_timing;
+    TH1I* h_timing = nullptr;
 
     //TDirectories
-    TDirectory* oldDir;
-    TDirectory* dirDQM;
+    TDirectory* oldDir = nullptr;
+    TDirectory* dirDQM = nullptr;
 
     //flag to save ps file
     bool m_generatePostscript;
@@ -59,13 +59,13 @@ namespace Belle2 {
     std::string m_postScriptName;
 
     //experiment number
-    unsigned _exp;
+    unsigned _exp = 0;
 
     //run number
-    unsigned _run;
+    unsigned _run = 0;
 
     //TSF module number
-    int m_TSFMOD;
+    int m_TSFMOD = 0;
 
     //TSF data store
     StoreArray<TRGCDCTSFUnpackerStore> entAry;

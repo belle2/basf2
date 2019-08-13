@@ -81,7 +81,6 @@ void TOPLaserCalibratorCollectorModule::collect()
 {
   float refTimes[16] = {0.}; // Reference time for each slot
 
-
   // first loops over the TOPDigit to find all the pairs of digit that satisfy the pulser contitions
   if (m_useReferencePulse) {
     for (auto digit1 : m_TOPDigitArray) {
@@ -107,6 +106,7 @@ void TOPLaserCalibratorCollectorModule::collect()
     }
   }
 
+  TTree*  hitTree = getObjectPtr<TTree>("hitTree");
 
   // first loops over the TOPDigit to find all the pairs of digit that satisfy the pulser contitions
   for (auto& digit : m_TOPDigitArray) {
@@ -133,7 +133,7 @@ void TOPLaserCalibratorCollectorModule::collect()
 
     m_window = 0; // FIXME
     m_sample = 0; // FIXME
-    getObjectPtr<TTree>("hitTree")->Fill();
+    hitTree->Fill();
   }
   m_event++;
 }

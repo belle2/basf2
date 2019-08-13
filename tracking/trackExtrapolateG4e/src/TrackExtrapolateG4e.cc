@@ -1346,9 +1346,9 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         extState.extLayerPattern |= (0x00000001 << intersection.layer);
         //efficiency implementation
         float muIDphiEfficiency = m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0), intersection.sector + 1,
-                                  intersection.layer + 1, 1, 1);
+                                  intersection.layer + 1, 0, 1);
         float muIDzEfficiency = m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0), intersection.sector + 1,
-                                intersection.layer + 1, 2, 1);
+                                intersection.layer + 1, 1, 1);
         muid->setExtBKLMEfficiencyValue(intersection.layer, muIDphiEfficiency * muIDzEfficiency);
 
         if (extState.lastBarrelExtLayer < intersection.layer) {
@@ -1402,9 +1402,9 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           if (!isDead) {
             extState.extLayerPattern |= (0x00000001 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
             float muIDphiEfficiency = m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0), intersection.sector + 1,
-                                      intersection.layer + 1, 1, 1);
+                                      intersection.layer + 1, 0, 1);
             float muIDzEfficiency = m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0), intersection.sector + 1,
-                                    intersection.layer + 1, 2, 1);
+                                    intersection.layer + 1, 1, 1);
             muid->setExtBKLMEfficiencyValue(intersection.layer, muIDphiEfficiency * muIDzEfficiency);
           } else {
             muid->setExtBKLMEfficiencyValue(intersection.layer, 0);

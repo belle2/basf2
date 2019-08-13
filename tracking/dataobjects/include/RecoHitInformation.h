@@ -85,6 +85,9 @@ namespace Belle2 {
       c_LocalTrackFinder,
       c_SegmentTrackCombiner,
       c_VXDTrackFinder,
+      // CDC hit finders using a CKF (seeded from SVD or ECL)
+      c_SVDtoCDCCKF,
+      c_ECLtoCDCCKF,
       // Belle I's track finder
       c_Trasan,
       c_other

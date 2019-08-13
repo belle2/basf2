@@ -21,7 +21,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 #include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/dbobjects/CDCCalibration.h>
 #include <alignment/dbobjects/BKLMAlignment.h>

@@ -34,14 +34,19 @@ from ROOT import Belle2
 
 
 class CalculationProcess(multiprocessing.Process):
+    """ Main class to steer the production of ROOT tuples for beast """
     def __init__(self, iov, file_paths, output_dir):
+        """ Constructor """
         super(CalculationProcess, self).__init__()
         self.iov = iov
+        """ interval of validity """
         self.file_paths = file_paths
+        """ path to the files """
         self.output_dir = output_dir
+        """ output directory """
 
     def run(self):
-
+        """ Run """
         # Register modules
         rootinput = register_module('RootInput')
         rootinput.param('inputFileNames', self.file_paths)

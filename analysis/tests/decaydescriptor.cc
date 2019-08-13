@@ -157,7 +157,7 @@ namespace {
     EXPECT_EQ(dd2.isIgnoreNeutrino(), true);
     EXPECT_EQ(dd2.isIgnoreGamma(), false);
 
-    // !nu means take into account missing neutrino (Default)
+    // !nu does not change anything. It is reserved for future updates.
     DecayDescriptor dd3;
     initok = dd3.init("B0:candidates -> K+:loose pi-:loose !nu");
     EXPECT_EQ(initok, true);
@@ -177,7 +177,7 @@ namespace {
     EXPECT_EQ(dd4.isIgnoreNeutrino(), false);
     EXPECT_EQ(dd4.isIgnoreGamma(), true);
 
-    // !gamma means take into account missing gamma
+    // !gamma does not change anything. It is reserved for future updates.
     DecayDescriptor dd5;
     initok = dd5.init("B0:candidates -> K+:loose pi-:loose !gamma");
     EXPECT_EQ(initok, true);

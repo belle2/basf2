@@ -111,14 +111,10 @@ bool DecayDescriptor::init(const DecayString& s)
     // For neutrino
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?nu")) !=  d->m_keywords.end()) {
       m_isIgnoreNeutrino = true;
-    } else if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "!nu")) != d->m_keywords.end()) {
-      m_isIgnoreNeutrino = false;
     }
     // For gamma
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?gamma")) != d->m_keywords.end()) {
       m_isIgnoreGamma = true;
-    } else if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "!gamma")) != d->m_keywords.end()) {
-      m_isIgnoreGamma = false;
     }
     // For massive FSP
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "...")) != d->m_keywords.end()) {

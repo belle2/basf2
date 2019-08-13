@@ -74,11 +74,7 @@ If one put the following keywords at the end of the decay string, :code:`'isSign
 * :code:`'?nu'` Missing neutrinos are ignored
 * :code:`'?gamma'` Missing gammas are ignored 
 
-These are useful to analyze inclusive processes with fully-inclusive method. One can also use the following keywords to make one's decay string explicit. 
-
-* :code:`'!nu'` Missing neutrinos are considered (default)
-* :code:`'!gamma'` Missing gammas are considered (default)
-
+These are useful to analyze inclusive processes with fully-inclusive method. 
 
 Keywords must be placed at the end of the decay string. It is not allowed to put keywords in front of particles. Here is an exapmle of use:
 

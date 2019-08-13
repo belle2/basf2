@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMElementID_H
-#define BKLMElementID_H
+#pragma once
 
 #include <string>
 #include <ostream>
@@ -19,7 +18,7 @@ namespace Belle2 {
   /**
    * Class to uniquely identify a alignable element of BKLM.
    *
-   * - isForward: 1 = forward; 0 = backward
+   * - forward: 1 = forward; 0 = backward
    * - Sector, Layer all start at 1
    * - Sectors are numbered with increasing phi 1 - 8
    * - Layers are numbered from inner to out 1 - 15
@@ -30,16 +29,16 @@ namespace Belle2 {
     typedef unsigned short baseType;
     enum {
       /** Number of bits available to represent forward or backword*/
-      IsForwardBits  = 1,
+      ForwardBits  = 1,
       /** Number of bits available to represent a sector */
       SectorBits   = 5,
       /** Number of bits available to represent a layer */
       LayerBits    = 8,
       /** Total bit size of the BKLMElementID */
-      Bits        = IsForwardBits + SectorBits + LayerBits,
+      Bits        = ForwardBits + SectorBits + LayerBits,
 
       /** Maximum valid forward/backward ID */
-      MaxIsForward    = (1 << IsForwardBits) - 1,
+      MaxForward    = (1 << ForwardBits) - 1,
       /** Maximum valid Sector ID */
       MaxSector   = (1 << SectorBits) - 1,
       /** Maximum valid Layer ID */
@@ -54,10 +53,10 @@ namespace Belle2 {
     {
       m_id.id = id;
     }
-    /** Constructor using isForward, sector, layer ids */
-    BKLMElementID(baseType isForward, baseType sector, baseType layer)
+    /** Constructor using forward, sector, layer ids */
+    BKLMElementID(baseType forward, baseType sector, baseType layer)
     {
-      m_id.parts.isForward  = isForward;
+      m_id.parts.forward  = forward;
       m_id.parts.sector  = sector;
       m_id.parts.layer   = layer;
     }
@@ -88,8 +87,8 @@ namespace Belle2 {
 
     /** Get the unique id */
     baseType getID() const            { return m_id.id; }
-    /** Get the IsForward */
-    baseType getIsForward() const        { return m_id.parts.isForward; }
+    /** Get the Forward */
+    baseType getForward() const        { return m_id.parts.forward; }
     /** Get the sector id */
     baseType getSectorNumber() const        { return m_id.parts.sector; }
     /** Get the layer id */
@@ -98,7 +97,7 @@ namespace Belle2 {
     /** Set the unique id */
     void setID(baseType id)           { m_id.id = id; }
     /** Set forward or backward */
-    void setIsForward(baseType isForward)   { m_id.parts.isForward = isForward; }
+    void setForward(baseType forward)   { m_id.parts.forward = forward; }
     /** Set the sector id */
     void setSectorNumber(baseType sector)   { m_id.parts.sector = sector; }
     /** Set the layer id */
@@ -111,7 +110,7 @@ namespace Belle2 {
 baseType id: Bits;
       struct {
         /** forward or backward */
-baseType isForward: IsForwardBits;
+baseType forward: ForwardBits;
         /** sector id */
 baseType sector: SectorBits;
         /** Layer id */
@@ -123,5 +122,3 @@ baseType layer: LayerBits;
   /** Print id to stream by converting it to string */
   std::ostream& operator<<(std::ostream& out, const BKLMElementID& id);
 }
-
-#endif //BKLMElementID_H

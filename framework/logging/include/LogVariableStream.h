@@ -110,7 +110,7 @@ public:
   /** Constructor which sets an initial text for this stream
    * @param text Initial text
    * */
-  LogVariableStream(std::string const& text, std::map<std::string, std::string> variables = {})
+  explicit LogVariableStream(std::string const& text, std::map<std::string, std::string> variables = {})
   {
     m_stringStream << text;
     for (auto const& kv : variables) {

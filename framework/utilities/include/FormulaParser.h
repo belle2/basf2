@@ -172,7 +172,7 @@ namespace Belle2 {
       // and apply ...
       m_outputStack.push(std::visit(Utils::VisitOverload{
         // eagerly apply operations if both operands are numbers
-        [op](double a, double b) -> OutputToken { return applyOperator(op, a, b); },
+        [op](double a, double b) -> OutputToken { return OutputToken(applyOperator(op, a, b)); },
         // otherwise defer to variable constructor
         [op](auto a, auto b) -> OutputToken { return VariableConstructor()(op, a, b); },
       }, op1, op2));

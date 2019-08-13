@@ -19,15 +19,20 @@ def get_logger():
     return logging.getLogger(__name__)
 
 
+#: string formatter that handles missing keys gracefully
 formatter = TolerateMissingKeyFormatter()
 
 
 class Refiner(object):
+    """Python module to refine a peeled dictionary"""
 
     def __init__(self, refiner_function=None):
+        """Constructor of the Refiner instance"""
+        #: cached copy of the instance's refiner function
         self.refiner_function = refiner_function
 
     def __get__(self, harvesting_module, cls=None):
+        """Getter of the Refiner instance"""
         if harvesting_module is None:
             # Class access
             return self
@@ -40,6 +45,11 @@ class Refiner(object):
             return bound_call
 
     def __call__(self, harvesting_module, crops=None, *args, **kwds):
+        """implementation of the function-call of the Refiner instance
+             r = Refiner()
+             r(harvester) # decoration
+             r(harvester, crops, args, keywords) # refinement
+        """
         if crops is None:
             # Decoration mode
             harvesting_module.refiners.append(self)
@@ -49,22 +59,31 @@ class Refiner(object):
             return self.refine(harvesting_module, crops, *args, **kwds)
 
     def refine(self, harvesting_module, *args, **kwds):
+        """Apply the instance's refiner function"""
         self.refiner_function(harvesting_module, *args, **kwds)
 
 
 class SaveFiguresOfMeritRefiner(Refiner):
+    """Refiner for figures of merit"""
+    #: default name for this refiner
     default_name = "{module.id}_figures_of_merit{groupby_key}"
+    #: default title for this refiner
     default_title = "Figures of merit in {module.title}"
+    #: default contact person for this refiner
     default_contact = "{module.contact}"
+    #: default description for this refiner
     default_description = "Figures of merit are the {aggregation.__name__} of {keys}"
+    #: default user-check action for this refiner
     default_check = "Check for reasonable values"
+    #: default key name for this refiner
     default_key = "{aggregation.__name__}_{part_name}"
 
+    #: return the mean of the parts, ignoring NaNs
     @staticmethod
     def mean(xs):
         return np.nanmean(xs)
 
-    # default aggregation if the mean of the parts
+    #: default aggregation is the mean of the parts
     default_aggregation = mean
 
     def __init__(self,
@@ -76,17 +95,25 @@ class SaveFiguresOfMeritRefiner(Refiner):
                  key=None,
                  aggregation=None,
                  ):
+        """Constructor for this refiner"""
 
         super(SaveFiguresOfMeritRefiner, self).__init__()
 
+        #: cached name of the figure of merit
         self.name = name
+        #: cached title of the figure of merit
         self.title = title
 
+        #: cached description of the figure of merit
         self.description = description
+        #: cached user-check action of the figure of merit
         self.check = check
+        #: cached contact person of the figure of merit
         self.contact = contact
 
+        #: cached copy of the figures-of-merit key
         self.key = key
+        #: cached copy of the crops-aggregation method
         self.aggregation = aggregation
 
     def refine(self,
@@ -96,6 +123,7 @@ class SaveFiguresOfMeritRefiner(Refiner):
                groupby_part_name=None,
                groupby_value=None,
                **kwds):
+        """Process the figures of merit"""
 
         name = self.name or self.default_name
         title = self.title or self.default_title
@@ -142,10 +170,16 @@ class SaveFiguresOfMeritRefiner(Refiner):
 
 
 class SaveHistogramsRefiner(Refiner):
+    """Refiner for histograms"""
+    #: default name for this histogram
     default_name = "{module.id}_{part_name}_histogram{groupby_key}{stackby_key}"
+    #: default title for this histogram
     default_title = "Histogram of {part_name}{groupby_key}{stackby_key} from {module.title}"
+    #: default contact person for this histogram
     default_contact = "{module.contact}"
+    #: default description for this histogram
     default_description = "This is a histogram of {part_name}{groupby_key}{stackby_key}."
+    #: default user-check action for this histogram
     default_check = "Check if the distribution is reasonable"
 
     def __init__(self,
@@ -162,25 +196,39 @@ class SaveHistogramsRefiner(Refiner):
                  stackby="",
                  fit=None,
                  fit_z_score=None):
+        """Constructor for this refiner"""
 
         super(SaveHistogramsRefiner, self).__init__()
 
+        #: cached user-defined name for this histogram
         self.name = name
+        #: cached user-defined title for this histogram
         self.title = title
 
+        #: cached user-defined description for this histogram
         self.description = description
+        #: cached user-defined user-check action for this histogram
         self.check = check
+        #: cached user-defined contact person for this histogram
         self.contact = contact
 
+        #: cached lower bound for this histogram
         self.lower_bound = lower_bound
+        #: cached upper bound for this histogram
         self.upper_bound = upper_bound
+        #: cached number of bins for this histogram
         self.bins = bins
 
+        #: cached Z-score (for outlier detection) for this histogram
         self.outlier_z_score = outlier_z_score
+        #: cached flag to allow discrete values for this histogram
         self.allow_discrete = allow_discrete
+        #: cached stacking selection for this histogram
         self.stackby = stackby
 
+        #: cached fit for this histogram
         self.fit = fit
+        #: cached fit Z-score (for outlier detection) for this histogram
         self.fit_z_score = fit_z_score
 
     def refine(self,
@@ -190,6 +238,7 @@ class SaveHistogramsRefiner(Refiner):
                groupby_part_name=None,
                groupby_value=None,
                **kwds):
+        """Process the histogram"""
 
         stackby = self.stackby
         if stackby:
@@ -253,6 +302,8 @@ class SaveHistogramsRefiner(Refiner):
 
 
 class Plot2DRefiner(Refiner):
+    """Refiner for profile histograms and 2D scatterplots"""
+    #: by default, this refiner is for profile histograms
     plot_kind = "profile"
 
     def __init__(self,
@@ -275,33 +326,53 @@ class Plot2DRefiner(Refiner):
                  fit_z_score=None,
                  skip_single_valued=False,
                  allow_discrete=False):
+        """Constructor for this refiner"""
 
         super().__init__()
 
+        #: cached user-defined name for this profile histogram / scatterplot
         self.name = name
+        #: cached user-defined title for this profile histogram / scatterplot
         self.title = title
 
+        #: cached user-defined description for this profile histogram / scatterplot
         self.description = description
+        #: cached user-defined user-check action for this profile histogram / scatterplot
         self.check = check
+        #: cached user-defined contact person for this profile histogram / scatterplot
         self.contact = contact
 
+        #: cached value of abscissa
         self.x = x
+        #: cached value of ordinate
         self.y = y
+        #: cached stacking selection for this profile histogram / scatterplot
         self.stackby = stackby
+        #: cached measurement unit for ordinate
         self.y_unit = y_unit
 
+        #: cached lower bound for this profile histogram / scatterplot
         self.lower_bound = lower_bound
+        #: cached upper bound for this profile histogram / scatterplot
         self.upper_bound = upper_bound
+        #: cached number of bins for this profile histogram / scatterplot
         self.bins = bins
+        #: cached flag for probability y axis (range 0.0 .. 1.05) for this profile histogram / scatterplot
         self.y_binary = y_binary
+        #: cached flag for logarithmic y axis for this profile histogram / scatterplot
         self.y_log = y_log
 
+        #: cached Z-score (for outlier detection) for this profile histogram / scatterplot
         self.outlier_z_score = outlier_z_score
+        #: cached flag to allow discrete values for this profile histogram / scatterplot
         self.allow_discrete = allow_discrete
 
+        #: cached fit for this profile histogram / scatterplot
         self.fit = fit
+        #: cached fit Z-score (for outlier detection) for this profile histogram / scatterplot
         self.fit_z_score = fit_z_score
 
+        #: cached flag to skip single-valued bins for this profile histogram / scatterplot
         self.skip_single_valued = skip_single_valued
 
     def refine(self,
@@ -311,6 +382,7 @@ class Plot2DRefiner(Refiner):
                groupby_part_name=None,
                groupby_value=None,
                **kwds):
+        """Process the profile histogram / scatterplot"""
 
         stackby = self.stackby
         if stackby:
@@ -397,7 +469,7 @@ class Plot2DRefiner(Refiner):
                         fit_method_name = 'fit_' + str(self.fit)
                         try:
                             fit_method = getattr(profile_plot, fit_method_name)
-                        except:
+                        except BaseException:
                             profile_plot.fit(str(fit), **kwds)
                         else:
                             fit_method(**kwds)
@@ -423,6 +495,7 @@ class Plot2DRefiner(Refiner):
 
     @staticmethod
     def has_more_than_one_value(xs):
+        """check if a list has at least two unique values"""
         first_x = xs[0]
         for x in xs:
             if x != first_x:
@@ -432,29 +505,48 @@ class Plot2DRefiner(Refiner):
 
 
 class SaveProfilesRefiner(Plot2DRefiner):
+    """Refiner for profile histograms"""
+    #: default name for this profile histogram
     default_name = "{module.id}_{y_part_name}_by_{x_part_name}_profile{groupby_key}{stackby_key}"
+    #: default title for this profile histogram
     default_title = "Profile of {y_part_name} by {x_part_name} from {module.title}"
+    #: default contact person for this profile histogram
     default_contact = "{module.contact}"
+    #: default description for this profile histogram
     default_description = "This is a profile of {y_part_name} over {x_part_name}."
-    default_check = "Check if the trend line is resonable."
+    #: default user-check action for this profile histogram
+    default_check = "Check if the trend line is reasonable."
 
+    #: specify this as a profile histogram rather than a scatterplot
     plot_kind = "profile"
 
 
 class SaveScatterRefiner(Plot2DRefiner):
+    """Refiner for 2D scatterplots"""
+    #: default name for this scatterplot
     default_name = "{module.id}_{y_part_name}_by_{x_part_name}_scatter{groupby_key}{stackby_key}"
+    #: default title for this scatterplot
     default_title = "Scatter of {y_part_name} by {x_part_name} from {module.title}"
+    #: default contact person for this scatterplot
     default_contact = "{module.contact}"
+    #: default description for this scatterplot
     default_description = "This is a scatter of {y_part_name} over {x_part_name}."
+    #: default user-check action for this scatterplot
     default_check = "Check if the distributions is reasonable."
 
+    #: specify this as a scatterplot rather than a profile histogram
     plot_kind = "scatter"
 
 
 class SaveClassificationAnalysisRefiner(Refiner):
+    """Refiner for truth-classification analyses"""
+
+    #: default contact person for this truth-classification analysis
     default_contact = "{module.contact}"
 
+    #: default name for the truth-classification analysis truth-values collection
     default_truth_name = "{part_name}_truth"
+    #: default name for the truth-classification analysis estimates collection
     default_estimate_name = "{part_name}_estimate"
 
     def __init__(self,
@@ -469,19 +561,31 @@ class SaveClassificationAnalysisRefiner(Refiner):
                  outlier_z_score=None,
                  allow_discrete=False,
                  unit=None):
+        """Constructor for this refiner"""
 
+        #: cached part name for this truth-classification analysis
         self.part_name = part_name
+        #: cached contact person for this truth-classification analysis
         self.contact = contact
+        #: cached estimates-collection name for this truth-classification analysis
         self.estimate_name = estimate_name
+        #: cached truth-values-collection name for this truth-classification analysis
         self.truth_name = truth_name
 
+        #: cached threshold of estimates for this truth-classification analysis
         self.cut = cut
+        #: cached cut direction (> or <) of estimates for this truth-classification analysis
         self.cut_direction = cut_direction
 
+        #: cached lower bound of estimates for this truth-classification analysis
         self.lower_bound = lower_bound
+        #: cached upper bound of estimates for this truth-classification analysis
         self.upper_bound = upper_bound
+        #: cached Z-score (for outlier detection) of estimates for this truth-classification analysis
         self.outlier_z_score = outlier_z_score
+        #: cached discrete-value flag of estimates for this truth-classification analysis
         self.allow_discrete = allow_discrete
+        #: cached measurement unit of estimates for this truth-classification analysis
         self.unit = unit
 
     def refine(self,
@@ -491,6 +595,7 @@ class SaveClassificationAnalysisRefiner(Refiner):
                groupby_part_name=None,
                groupby_value=None,
                **kwds):
+        """Process the truth-classification analysis"""
 
         replacement_dict = dict(
             refiner=self,
@@ -542,12 +647,20 @@ class SaveClassificationAnalysisRefiner(Refiner):
 
 
 class SavePullAnalysisRefiner(Refiner):
+    """Refiner for pull analyses"""
+
+    #: default name for this pull analysis
     default_name = "{module.id}_{quantity_name}"
+    #: default contact person for this pull analysis
     default_contact = "{module.contact}"
+    #: default suffix for the title of this pull analysis
     default_title_postfix = " from {module.title}"
 
+    #: default name for the pull analysis truth-values collection
     default_truth_name = "{part_name}_truth"
+    #: default name for the pull analysis estimates collection
     default_estimate_name = "{part_name}_estimate"
+    #: default name for the pull analysis variances collection
     default_variance_name = "{part_name}_variance"
 
     def __init__(self,
@@ -565,11 +678,16 @@ class SavePullAnalysisRefiner(Refiner):
                  outlier_z_score=None,
                  absolute=False,
                  which_plots=None):
+        """Constructor for this refiner"""
 
+        #: cached name for this pull analysis
         self.name = name
+        #: cached contact person for this pull analysis
         self.contact = contact
+        #: cached suffix for the title of this pull analysis
         self.title_postfix = title_postfix
 
+        #: cached array of part names for this pull analysis
         self.part_names = []
         if part_names is not None:
             self.part_names = part_names
@@ -577,17 +695,26 @@ class SavePullAnalysisRefiner(Refiner):
         if part_name is not None:
             self.part_names.append(part_name)
 
+        #: cached name for the pull analysis truth-values collection
         self.truth_name = truth_name
+        #: cached name for the pull analysis estimates collection
         self.estimate_name = estimate_name
+        #: cached name for the pull analysis variances collection
         self.variance_name = variance_name
 
+        #: cached name of the quantity for the pull analysis
         self.quantity_name = quantity_name
+        #: cached measurement unit for the pull analysis
         self.unit = unit
 
+        #: cached auxiliary names for the pull analysis
         self.aux_names = aux_names
 
+        #: cached Z-score (for outlier detection) for the pull analysis
         self.outlier_z_score = outlier_z_score
+        #: cached absolute-value-comparison flag for the pull analysis
         self.absolute = absolute
+        #: cached list of plots produced by the pull analysis
         self.which_plots = which_plots
 
     def refine(self,
@@ -597,6 +724,7 @@ class SavePullAnalysisRefiner(Refiner):
                groupby_part_name=None,
                groupby_value=None,
                **kwds):
+        """Process the pull analysis"""
 
         replacement_dict = dict(
             refiner=self,
@@ -678,14 +806,22 @@ class SavePullAnalysisRefiner(Refiner):
 
 
 class SaveTreeRefiner(Refiner):
+    """Refiner for ROOT TTrees"""
+
+    #: default name for this TTree
     default_name = "{module.id}_tree"
+    #: default title for this TTree
     default_title = "Tree of {module.id}"
 
     def __init__(self,
                  name=None,
                  title=None):
+        """Constructor for this refiner"""
         super(SaveTreeRefiner, self).__init__()
+
+        #: cached name for this TTree
         self.name = name
+        #: cached title for this TTree
         self.title = title
 
     def refine(self,
@@ -695,6 +831,7 @@ class SaveTreeRefiner(Refiner):
                groupby_part_name=None,
                groupby_value=None,
                **kwds):
+        """Process the TTree"""
 
         replacement_dict = dict(
             refiner=self,
@@ -719,6 +856,7 @@ class SaveTreeRefiner(Refiner):
             output_ttree.Write()
 
     def add_branch(self, output_ttree, part_name, parts):
+        """Add a TBranch to the TTree"""
         input_value = np.zeros(1, dtype=float)
 
         branch_type_spec = '%s/D' % part_name
@@ -744,44 +882,65 @@ class SaveTreeRefiner(Refiner):
 
 
 class FilterRefiner(Refiner):
+    """Refiner for filters"""
 
     def __init__(self, wrapped_refiner, filter=None, on=None):
+        """Constructor for this refiner"""
+
+        #: cached value of the wrapped refiner
         self.wrapped_refiner = wrapped_refiner
 
         if filter is None:
+            #: cached value of the filter
             self.filter = np.nonzero
         else:
             self.filter = filter
 
+        #: cached value of the part name to filter on
         self.on = on
 
     def refine(self, harvesting_module, crops, *args, **kwds):
+        """Process this filter"""
         filtered_crops = filter_crops(crops, self.filter, part_name=self.on)
         self.wrapped_refiner(harvesting_module, filtered_crops, *args, **kwds)
 
 
 class SelectRefiner(Refiner):
+    """Refiner for selection"""
 
     def __init__(self, wrapped_refiner, select=[], exclude=[]):
+        """Constructor for this refiner"""
+
+        #: cached value of the wrapped refiner
         self.wrapped_refiner = wrapped_refiner
+        #: cached value of the selector
         self.select = select
+        #: cached value of the exclusion flag
         self.exclude = exclude
 
     def refine(self, harvesting_module, crops, *args, **kwds):
+        """Process this selection"""
         selected_crops = select_crop_parts(crops, select=self.select, exclude=self.exclude)
         self.wrapped_refiner(harvesting_module, selected_crops, *args, **kwds)
 
 
 class GroupByRefiner(Refiner):
+    """Refiner for grouping"""
+
+    #: default value of the exclude-by classifier
     default_exclude_by = True
 
     def __init__(self,
                  wrapped_refiner,
                  by=[],
                  exclude_by=None):
+        """Constructor for this refiner"""
 
+        #: cached value of the wrapped refiner
         self.wrapped_refiner = wrapped_refiner
+        #: cached value of the group-by classifier
         self.by = by
+        #: cached value of the exclude-by classifier
         self.exclude_by = exclude_by if exclude_by is not None else self.default_exclude_by
 
     def refine(self,
@@ -791,6 +950,7 @@ class GroupByRefiner(Refiner):
                groupby_value=None,
                *args,
                **kwds):
+        """Process this grouping"""
 
         by = self.by
 
@@ -865,17 +1025,24 @@ class GroupByRefiner(Refiner):
 
 
 class CdRefiner(Refiner):
-    # Folder name to be used if a groupby selection is active.
+    """Refiner for change-directory"""
+
+    #: Folder name to be used if a groupby selection is active.
     default_folder_name = ""
+    #: Default suffix for a groupby selection
     default_groupby_addition = "_groupby_{groupby}_{groupby_value}"
 
     def __init__(self,
                  wrapped_refiner,
                  folder_name=None,
                  groupby_addition=None):
+        """Constructor for this refiner"""
 
+        #: cached value of the wrapped refiner
         self.wrapped_refiner = wrapped_refiner
+        #: cached value of the folder name
         self.folder_name = folder_name
+        #: cached value of the suffix for a groupby selection
         self.groupby_addition = groupby_addition
 
     def refine(self,
@@ -886,6 +1053,7 @@ class CdRefiner(Refiner):
                groupby_value=None,
                *args,
                **kwds):
+        """Process the change-directory"""
 
         folder_name = self.folder_name
         if folder_name is None:
@@ -925,13 +1093,21 @@ class CdRefiner(Refiner):
 
 
 class ExpertLevelRefiner(Refiner):
+    """Refiner for expert-level categorization"""
 
     def __init__(self, wrapped_refiner, above_expert_level=None, below_expert_level=None):
+        """Constructor for this refiner"""
+
+        #: cached value of the wrapped refiner
         self.wrapped_refiner = wrapped_refiner
+        #: cached value of the upper range of the expert level
         self.above_expert_level = above_expert_level
+        #: cached value of the lower range of the expert level
         self.below_expert_level = below_expert_level
 
     def refine(self, harvesting_module, crops, *args, **kwds):
+        """Process the expert-level categorization"""
+
         above_expert_level = self.above_expert_level
         below_expert_level = self.below_expert_level
 
@@ -1024,7 +1200,7 @@ def context(refiner=None,
     if refiner is None:
         return context_decorator
     else:
-        return context_decorator(refiner)
+        return functools.wraps(refiner)(context_decorator(refiner))
 
 
 def refiner_with_context(refiner_factory):

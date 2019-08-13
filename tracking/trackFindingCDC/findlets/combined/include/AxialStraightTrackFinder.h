@@ -51,9 +51,10 @@ namespace Belle2 {
       void apply(const std::vector<CDCWireHit>& wireHits, std::vector<CDCTrack>& tracks);
 
     private:
+      /// Accessor to the ECLClusters StoreArray
       StoreArray<ECLCluster> m_storeArrayClusters{"ECLClusters"};
 
-      // Findlet for straight legendre pass
+      /// Findlet for straight legendre pass
       AxialStraightTrackCreator m_axialStraightTrackCreator;
 
       // Other findlets, especially post-processing should be here.

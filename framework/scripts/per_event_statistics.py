@@ -79,7 +79,12 @@ class PerEventStatisticsGetterModule(basf2.Module):
         self.event_number[1] = self.event_meta_data.getRun()
         self.event_number[2] = self.event_meta_data.getEvent()
 
+        # Again, change the directory
+        old = ROOT.gDirectory
+        self.tfile.cd()
+
         if not self.branches_added:
+
             # make sure all this is only done in the output process
             if Belle2.ProcHandler.parallelProcessingUsed() and not Belle2.ProcHandler.isOutputProcess():
                 basf2.B2FATAL("PerEventStatisticsGetterModule can only be used in single processing mode or in the output process")
@@ -107,10 +112,20 @@ class PerEventStatisticsGetterModule(basf2.Module):
         # Send the branches to the TTree.
         ttree.Fill()
 
+        # and back again
+        ROOT.gDirectory = old
+
     def terminate(self):
         """
         Write out the merged statistics to the ROOT file.
         This should only be called once, as we would end up with different versions otherwise.
         """
+        # Change the path a last time
+        old = ROOT.gDirectory
+        self.tfile.cd()
+
         self.statistics.Write()
         self.tfile.Close()
+
+        # and back again
+        ROOT.gDirectory = old

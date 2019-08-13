@@ -35,13 +35,13 @@ from skimExpertFunctions import get_test_file, get_eventN
 skims = ' ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon TauGeneric SystematicsRadMuMu SystematicsRadEE'
 skims += ' LFVZpInvisible LFVZpVisible SinglePhotonDark SystematicsTracking'
 skims += '  SystematicsLambda  Systematics ISRpipicc BtoDh_Kspipipi0 BtoPi0Pi0  CharmSemileptonic   '
-skims += 'feiSLB0WithOneLep  feiHadronicB0 feiHadronicBplus  BtoPi0Pi0 '
+skims += 'feiSLB0 feiSLBplus  feiHadronicB0 feiHadronicBplus  BtoPi0Pi0 '
 skims += '  BtoDh_Kspi0  BtoDh_hh TauGeneric  PRsemileptonicUntagged SLUntagged LeptonicUntagged TCPV'
 skims += ' CharmRare BtoXll BtoXgamma  TauLFV Charm3BodyHadronic Charm3BodyHadronic2 Charm3BodyHadronic3'
 skims += ' Charm3BodyHadronic2  Charm3BodyHadronic1   Charm2BodyNeutrals Charm2BodyNeutralsD0'
 
-bkgs = 'MC9_mixedBGx1  MC9_chargedBGx1 MC9_ccbarBGx1 MC9_ssbarBGx1 MC9_uubarBGx0  MC9_ddbarBGx1  MC9_taupairBGx1'
-bkgs += ' MC9_mixedBGx0 MC9_chargedBGx0 MC9_ccbarBGx0 MC9_ssbarBGx0 MC9_uubarBGx0 MC9_ddbarBGx0 MC9_taupairBGx0'
+bkgs = 'MC12_mixedBGx1  MC12_chargedBGx1 MC12_ccbarBGx1 MC12_ssbarBGx1 MC12_uubarBGx0  MC12_ddbarBGx1  MC12_taupairBGx1'
+bkgs += ' MC12_mixedBGx0 MC12_chargedBGx0 MC12_ccbarBGx0 MC12_ssbarBGx0 MC12_uubarBGx0 MC12_ddbarBGx0 MC12_taupairBGx0'
 
 
 nFullEvents = 200000

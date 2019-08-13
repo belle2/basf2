@@ -23,13 +23,17 @@ from tracking.validation.run import TrackingValidationRun
 
 
 class CDCLegendre(TrackingValidationRun):
+    """Validate the combined CDC Legendre track-finding algorithm"""
+    #: number of events to generate
     n_events = N_EVENTS
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
+    #: no background overlay
     root_input_file = '../EvtGenSimNoBkg.root'
 
     @staticmethod
     def finder_module(path):
+        """Add the CDC Legendre track-finding module and related modules to the basf2 path"""
         path.add_module('TFCDC_WireHitPreparer')
 
         use_legendre_finder = True
@@ -40,6 +44,7 @@ class CDCLegendre(TrackingValidationRun):
 
         path.add_module('TFCDC_TrackExporter')
 
+    #: Define the user parameters for the track-finding module
     tracking_coverage = {
         'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries
         'UsePXDHits': False,
@@ -53,11 +58,13 @@ class CDCLegendre(TrackingValidationRun):
         'EnergyCut': 0,
     }
 
+    #: Include pulls in the validation output
     pulls = True
+    #: name of the output ROOT file
     output_file_name = VALIDATION_OUTPUT_FILE
 
-    # disabled plotting of tan lambda and theta for this validation because
-    # the seed's theta is 90* for all and therefore this profile plot is useless
+    #: disabled plotting of tan lambda and theta for this validation because
+    #: the seed's theta is 90* for all and therefore this profile plot is useless
     exclude_profile_pr_parameter = ["Seed tan #lambda", "Seed #theta"]
 
 

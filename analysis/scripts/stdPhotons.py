@@ -5,15 +5,12 @@
 #
 # Author(s): Torben Ferber (ferber@physics.ubc.ca)
 #
-# more documentation: https://confluence.desy.de/x/I3I0Aw
-#
 ########################################################
 
-from basf2 import *
-from modularAnalysis import *
+from modularAnalysis import fillParticleList, cutAndCopyList
 
 
-def stdPhotons(listtype='loose', path=analysis_main):
+def stdPhotons(listtype='loose', path=None):
     """
     Function to prepare one of several standardized types of photon lists:
 
@@ -33,9 +30,9 @@ def stdPhotons(listtype='loose', path=analysis_main):
     @param path     modules are added to this path
     """
 
-    # all photons (reconstructed using the N1 clustering)
+    # all photons (all neutral ECLClusters that have the c_nPhotons hypothesis)
     if listtype == 'all':
-        fillParticleList('gamma:all', 'clusterHasNPhotons', True, path)
+        fillParticleList('gamma:all', '', True, path)
     # all photons within the cdc tracking acceptance: remove un track-matched
     # electrons from outside the tracking acceptance
     elif listtype == 'cdc':
@@ -119,7 +116,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
 
 
 # Used in skimming code
-def loadStdSkimPhoton(path=analysis_main):
+def loadStdSkimPhoton(path):
     """
     Function to prepare the skim photon lists.
 
@@ -138,13 +135,15 @@ def loadStdSkimPhoton(path=analysis_main):
         True,
         path)
 
+
 # Only used for Belle via b2bii
-
-
-def loadStdGoodBellePhoton(path=analysis_main):
+def loadStdGoodBellePhoton(path):
     """
     Load the Belle goodBelle list. Creates a ParticleList named
     'gamma:goodBelle' with '0.5 < :b2:var:`goodBelleGamma` < 1.5'
+
+    Warning:
+        Should only be used for Belle analyses using `b2bii`.
 
     Parameters:
         path (basf2.Path): the path to load the modules

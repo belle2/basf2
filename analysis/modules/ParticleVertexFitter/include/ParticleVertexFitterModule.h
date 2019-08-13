@@ -186,6 +186,11 @@ namespace Belle2 {
     void addIPProfileToKFitter(analysis::VertexFitKFit& kv);
 
     /**
+     * Adds IPTube constraint to the vertex fit using kfitter.
+     */
+    void addIPTubeToKFitter(analysis::VertexFitKFit& kv);
+
+    /**
      * Fills valid particle's children (with valid error matrix) in the vector of Particles that will enter the fit.
      * Pi0 particles are treated separately so they are filled to another vector.
      */
@@ -204,7 +209,7 @@ namespace Belle2 {
     bool doRaveFit(Particle* mother);
 
     /**  check if all the Daughters (o grand-daughters) are selected for the vertex fit*/
-    bool allSelectedDaughters(const Particle* mother, std::vector<const Particle*> tracksVertex);
+    bool allSelectedDaughters(const Particle* mother, const std::vector<const Particle*>& tracksVertex);
 
     /**  calculate iptube constraint (quasi cylinder along boost direction) for RAVE fit*/
     void findConstraintBoost(double cut);

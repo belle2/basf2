@@ -86,12 +86,26 @@ namespace Belle2 {
       StoreArray<TRGGDLUnpackerStore> store;
 
       //condition database for unpacer
-      DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
+      DBObjPtr<TRGGDLDBUnpacker> m_dbunpacker;
+      //condition database for badrun
+      DBObjPtr<TRGGDLDBBadrun> m_dbbadrun;
+
+      //variables to store database
       int LeafBitMap[320];
       char LeafNames[320][100];
-      //condition database for badrun
-      DBObjPtr<TRGGDLDBBadrun> m_badrun;
-
+      int nword_header;
+      int n_clocks;
+      int nBits;
+      int n_leafs;
+      int n_leafsExtra;
+      int conf;
+      int bad_flag;
+      int unpack_flag;
+      std::vector<std::vector<int>> BitMap;
+      std::vector<std::vector<int>> BitMap_extra;
+      int conf_map;
+      int evt_map;
+      int clk_map;
     };
   }
 } // end namespace Belle2

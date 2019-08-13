@@ -35,8 +35,8 @@ namespace Belle2 {
 
     /**
      * @param sensorID Sensor compact ID.
-     * @param row Pixel row coordinate.
-     * @param column Pixel column coordinate.
+     * @param row Pixel row coordinate (V Cell ID).
+     * @param column Pixel column coordinate ( U Cell ID).
      * @param charge The Pixel charge.
      * @param frameNr number of the (readout) frame.
      */
@@ -54,18 +54,34 @@ namespace Belle2 {
       return m_sensorID;
     }
 
-    /** Get v coordinate of hit position.
-     * @return v coordinate of hit position.
+    /** Get v cell id of hit position.
+     * @return v cell id of hit position.
      */
     short getRow() const
     {
       return m_row;
     }
 
-    /** Get u coordinate of hit position.
-     * @return u coordinate of hit position.
+    /** Get v cell id of hit position.
+     * @return v cell id of hit position.
+     */
+    short getVCellID() const
+    {
+      return m_row;
+    }
+
+    /** Get u cell id of hit position.
+     * @return u cell id of hit position.
      */
     short getColumn() const
+    {
+      return m_column;
+    }
+
+    /** Get u cell id of hit position.
+     * @return u cell id of hit position.
+     */
+    short getUCellID() const
     {
       return m_column;
     }
@@ -89,8 +105,8 @@ namespace Belle2 {
 
   private:
     unsigned short m_sensorID; /**< Compressed sensor identifier. actually a VxdID object*/
-    short m_row;         /**< Absolute pixel position in v. */
-    short m_column;         /**< Absolute pixel position in v. */
+    short m_row;         /**< Absolute pixel position in v (V Cell ID). */
+    short m_column;         /**< Absolute pixel position in u (U Cell ID). */
     short m_charge;           /**< Deposited charge in pixel. */
     unsigned short m_frameNr;    /**< Number of the Frames */
 

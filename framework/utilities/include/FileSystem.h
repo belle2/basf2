@@ -95,7 +95,7 @@ namespace Belle2 {
        * @param fileName  Name of the file to be locked (if it does not exist, it will be created)
        * @param readonly  create a read-only lock (multiple processes can hold one)
        */
-      explicit Lock(std::string fileName, bool readonly = false);
+      explicit Lock(const std::string& fileName, bool readonly = false);
 
       /**
        * Destructor. Releases the lock
@@ -124,8 +124,8 @@ namespace Belle2 {
       explicit TemporaryFile(std::ios_base::openmode mode = std::ios_base::trunc | std::ios_base::out);
       /** prevent assignment */
       TemporaryFile(const TemporaryFile&) = delete;
-      /** but allow move construction */
-      TemporaryFile(TemporaryFile&&) = default;
+      /** and no move construction as basic_ios doesn't allow that */
+      TemporaryFile(TemporaryFile&&) = delete;
       /** prevent copy constructor */
       TemporaryFile& operator=(const TemporaryFile&) = delete;
       /** close file and delete on destruction */

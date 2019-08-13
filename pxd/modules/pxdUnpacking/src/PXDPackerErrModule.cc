@@ -25,6 +25,7 @@
 
 #include <pxd/unpacking/PXDMappingLookup.h>
 
+#include <numeric>
 
 #include <TRandom.h>
 
@@ -339,7 +340,7 @@ void PXDPackerErrModule::terminate()
     // Check kindof test coverage
     B2INFO("Check Test coverage:");
     PXDErrorFlags mask = c_NO_ERROR;
-    for (auto& it : m_errors) mask |= it;
+    mask = std::accumulate(m_errors.begin(), m_errors.end(), mask, std::bit_or<PXDErrorFlags>());
     for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
       uint64_t m;
       m = 1ull << i; // ull is important!

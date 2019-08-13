@@ -56,7 +56,7 @@ namespace Belle2 {
       /// Storage for the internal quality estimation for a single algorithm. Only comparable for all temporaries with the same algorithm and detector.
       double quality = NAN;
 
-      ClassDef(EventT0Component, 3) /**< Storage element for the EventT0Component */
+      ClassDefNV(EventT0Component, 3) /**< Storage element for the EventT0Component */
     };
 
     /// Check if a final event t0 is set

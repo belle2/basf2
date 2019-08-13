@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+  <input>../BottomoniumPiPiUpsilon.dst.root</input>
+  <output>../BottomoniumPiPiUpsilon.udst.root</output>
+  <contact>jiasen@buaa.edu.cn</contact>
+  <interval>nightly</interval>
+</header>
+"""
+
 __author__ = "S. Spataro && S. Jia"
 
 from basf2 import *
@@ -9,14 +18,13 @@ from stdPi0s import *
 from stdPhotons import *
 from stdCharged import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging
-gb2_setuprel = 'release-02-00-01'
 
 # create a new path
 BottomoniumPiPiUpsilonskimpath = Path()
 
 fileList = ['../BottomoniumPiPiUpsilon.dst.root']
 
-inputMdstList('MC9', fileList, path=BottomoniumPiPiUpsilonskimpath)
+inputMdstList('default', fileList, path=BottomoniumPiPiUpsilonskimpath)
 
 # use standard final state particle lists
 stdPi('loose', path=BottomoniumPiPiUpsilonskimpath)
@@ -24,8 +32,6 @@ stdE('loose', path=BottomoniumPiPiUpsilonskimpath)
 stdMu('loose', path=BottomoniumPiPiUpsilonskimpath)
 
 stdPhotons('loose', path=BottomoniumPiPiUpsilonskimpath)
-
-inputMdstList('MC9', fileList, path=BottomoniumPiPiUpsilonskimpath)
 
 # Bottomonium Skim
 from skim.quarkonium import *

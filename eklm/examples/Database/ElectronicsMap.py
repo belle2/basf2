@@ -65,8 +65,14 @@ def eklm_electronics_map(stage):
     electronics_map.addSectorLane(1, 7, 1, 3, 1, 1)
     electronics_map.addSectorLane(1, 8, 1, 3, 1, 2)
     electronics_map.addSectorLane(1, 9, 1, 3, 1, 3)
-    electronics_map.addSectorLane(1, 10, 1, 3, 1, 4)
-    electronics_map.addSectorLane(1, 11, 1, 3, 1, 5)
+    # Switch lanes for real-data map.
+    # The wrong connection was fixed between phase 2 and phase 3.
+    if (mc or (stage >= 2)):
+        electronics_map.addSectorLane(1, 10, 1, 3, 1, 4)
+        electronics_map.addSectorLane(1, 11, 1, 3, 1, 5)
+    else:
+        electronics_map.addSectorLane(1, 10, 1, 3, 1, 5)
+        electronics_map.addSectorLane(1, 11, 1, 3, 1, 4)
     electronics_map.addSectorLane(1, 12, 1, 3, 1, 6)
 
     if (stage == 1):

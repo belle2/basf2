@@ -23,6 +23,7 @@
 #include <TClonesArray.h>
 
 #include <ctime>
+#include <memory>
 #include <regex>
 
 
@@ -39,7 +40,7 @@ REG_MODULE(RootOutput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), m_runLow(0), m_eventLow(0),
+RootOutputModule::RootOutputModule() : Module(), m_file(nullptr), m_experimentLow(1), m_runLow(0), m_eventLow(0),
   m_experimentHigh(0), m_runHigh(0), m_eventHigh(0)
 {
   //Set module properties
@@ -47,8 +48,8 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
   setPropertyFlags(c_Output);
 
   //Initialization of some member variables
-  for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
-    m_tree[jj] = 0;
+  for (auto& tree : m_tree) {
+    tree = nullptr;
   }
 
   //Parameter definition
@@ -130,7 +131,7 @@ Warning:
 }
 
 
-RootOutputModule::~RootOutputModule() { }
+RootOutputModule::~RootOutputModule() = default;
 
 void RootOutputModule::initialize()
 {
@@ -207,7 +208,7 @@ void RootOutputModule::openFile()
   for (int durability = 0; durability < DataStore::c_NDurabilityTypes; durability++) {
     DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
     set<string> branchList;
-    for (auto pair : map)
+    for (const auto& pair : map)
       branchList.insert(pair.first);
     //skip branches the user doesn't want
     branchList = filterBranches(branchList, m_branchNames[durability], m_excludeBranchNames[durability], durability);
@@ -216,10 +217,10 @@ void RootOutputModule::openFile()
     m_tree[durability] = new TTree(c_treeNames[durability].c_str(), c_treeNames[durability].c_str());
     m_tree[durability]->SetAutoFlush(m_autoflush);
     m_tree[durability]->SetAutoSave(m_autosave);
-    for (auto iter = map.begin(); iter != map.end(); ++iter) {
-      const std::string& branchName = iter->first;
+    for (auto & iter : map) {
+      const std::string& branchName = iter.first;
       //skip transient entries (allow overriding via branchNames)
-      if (iter->second.dontWriteOut
+      if (iter.second.dontWriteOut
           && find(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName) == m_branchNames[durability].end()
           && find(m_additionalBranchNames[durability].begin(), m_additionalBranchNames[durability].end(),
                   branchName) ==  m_additionalBranchNames[durability].end())
@@ -239,7 +240,7 @@ void RootOutputModule::openFile()
         B2WARNING("Persistent branches might not be stored as expected when splitting the output by size" << LogVar("branch", branchName));
       }
 
-      TClass* entryClass = iter->second.objClass;
+      TClass* entryClass = iter.second.objClass;
 
       //I want to do this in the input module, but I apparently I cannot disable reading those branches.
       //isabling reading the branch by not calling SetBranchAddress() for it results in the following crashes. Calling SetBranchStatus(..., 0) doesn't help, either.
@@ -265,20 +266,20 @@ void RootOutputModule::openFile()
         B2DEBUG(38, "Class has custom streamer, setting split level -1 for this branch." << LogVar("class", entryClass->GetName()));
 
         splitLevel = -1;
-        if (iter->second.isArray) {
+        if (iter.second.isArray) {
           //for arrays, we also don't want TClonesArray to go around our streamer
-          static_cast<TClonesArray*>(iter->second.object)->BypassStreamer(kFALSE);
+          static_cast<TClonesArray*>(iter.second.object)->BypassStreamer(kFALSE);
         }
       }
-      m_tree[durability]->Branch(branchName.c_str(), &iter->second.object, m_basketsize, splitLevel);
-      m_tree[durability]->SetBranchAddress(branchName.c_str(), &iter->second.object);
-      m_entries[durability].push_back(&iter->second);
+      m_tree[durability]->Branch(branchName.c_str(), &iter.second.object, m_basketsize, splitLevel);
+      m_tree[durability]->SetBranchAddress(branchName.c_str(), &iter.second.object);
+      m_entries[durability].push_back(&iter.second);
       B2DEBUG(39, "The branch " << branchName << " was created.");
 
       //Tell DataStore that we are using this entry
       if (m_fileIndex == 0) {
         DataStore::Instance().optionalInput(StoreAccessorBase(branchName, (DataStore::EDurability)durability, entryClass,
-                                                              iter->second.isArray));
+                                                              iter.second.isArray));
       }
     }
   }
@@ -366,7 +367,7 @@ void RootOutputModule::fillFileMetaData()
         //10M events correspond to about 240MB for the TTreeIndex object. for more than ~45M entries this causes crashes, broken files :(
         B2WARNING("Not building TTree index because of large number of events. The index object would conflict with ROOT limits on object size and cause problems.");
       } else if (tree->GetBranch("EventMetaData")) {
-        tree->SetBranchAddress("EventMetaData", 0);
+        tree->SetBranchAddress("EventMetaData", nullptr);
         RootIOUtilities::buildIndex(tree);
       }
     }
@@ -393,7 +394,7 @@ void RootOutputModule::fillFileMetaData()
     mcEvents = 0;
   }
   m_fileMetaData->setMcEvents(mcEvents);
-  m_fileMetaData->setDatabaseGlobalTag(Database::getGlobalTag());
+  m_fileMetaData->setDatabaseGlobalTag(Database::Instance().getGlobalTags());
   for (const auto& item : m_additionalDataDescription) {
     m_fileMetaData->setDataDescription(item.first, item.second);
   }
@@ -421,7 +422,7 @@ void RootOutputModule::closeFile()
   if(!m_file) return;
   //get pointer to file level metadata
   std::unique_ptr<FileMetaData> old;
-  if (m_fileMetaData) old.reset(new FileMetaData(*m_fileMetaData));
+  if (m_fileMetaData) old = std::make_unique<FileMetaData>(*m_fileMetaData);
 
   fillFileMetaData();
 
@@ -452,8 +453,8 @@ void RootOutputModule::closeFile()
   m_file = nullptr;
 
   // reset some variables
-  for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
-    m_entries[jj].clear();
+  for (auto & entry : m_entries) {
+    entry.clear();
   }
   m_parentLfns.clear();
   m_experimentLow = 1;
@@ -475,7 +476,7 @@ void RootOutputModule::fillTree(DataStore::EDurability durability)
   for (unsigned int i = 0; i < m_entries[durability].size(); i++) {
     if (!m_entries[durability][i]->ptr) {
       //create object owned and deleted by branch
-      m_tree[durability]->SetBranchAddress(m_entries[durability][i]->name.c_str(), 0);
+      m_tree[durability]->SetBranchAddress(m_entries[durability][i]->name.c_str(), nullptr);
     } else {
       m_tree[durability]->SetBranchAddress(m_entries[durability][i]->name.c_str(), &m_entries[durability][i]->object);
     }

@@ -237,26 +237,6 @@ namespace Belle2 {
     double particleDeltaE(const Particle* part);
 
     /**
-     * return prob(chi^2,ndf) of fit
-     */
-    double particlePvalue(const Particle* part);
-
-    /**
-     * return number of daughter particles
-     */
-    double particleNDaughters(const Particle* part);
-
-    /**
-     * return flavor type
-     */
-    double particleFlavorType(const Particle* part);
-
-    /**
-     * return charge
-     */
-    double particleCharge(const Particle* part);
-
-    /**
      * return component x of 3-momentum recoiling against given Particle
      */
     double recoilPx(const Particle* particle);
@@ -374,10 +354,26 @@ namespace Belle2 {
     double b2bClusterPhi(const Particle* particle);
 
     /**
-     * return Kshort using Belle goodKS algorithm
+     * returns the longitudinal momentum asymmetry
+     * alpha = (p_{L}^{+} - p_{L}^{-}) / (p_{L}^{+} - p_{L}^{-})
+     * for the Armenteros plot.
+     * The particle (mother) is required to have exactly two daughters.
+     * In case the two daughters have same charge it will return
+     * alpha = (p_{L}^{d1} - p_{L}^{d2}) / (p_{L}^{d1} - p_{L}^{d2})
+     * where d1 is the first daughter, d2 the second daughter.
      */
-    double goodBelleKshort(const Particle* KS);
+    double ArmenterosLongitudinalMomentumAsymmetry(const Particle* part);
 
+    /**
+     * returns the transverse momentum of the first daughter with
+     * respect to the V0 mother
+     */
+    double ArmenterosDaughter1Qt(const Particle* part);
 
+    /**
+     * returns the transverse momentum of the second daughter with
+     * respect to the V0 mother
+     */
+    double ArmenterosDaughter2Qt(const Particle* part);
   }
 } // Belle2 namespace

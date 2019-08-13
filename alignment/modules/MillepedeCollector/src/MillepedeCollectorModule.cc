@@ -24,12 +24,13 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/Track.h>
 
 #include <alignment/GlobalLabel.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
+#include <framework/dataobjects/EventT0.h>
 
 #include <TMath.h>
 #include <TH1F.h>
@@ -130,7 +131,7 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
            double(-1.));
 
   // Configure CDC specific options
-  addParam("fitEventT0", m_fitEventT0, "Add local parameter for event T0 fit in GBL",
+  addParam("fitTrackT0", m_fitTrackT0, "Add local parameter for track T0 fit in GBL",
            bool(true));
   addParam("updateCDCWeights", m_updateCDCWeights, "Update L/R weights from previous DAF fit result",
            bool(true));
@@ -146,12 +147,20 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
   addParam("enableSVDHierarchy", m_enableSVDHierarchy, "Enable SVD in hierarchy (flat or full)",
            bool(true));
 
+  addParam("enableWireByWireAlignment", m_enableWireByWireAlignment, "Enable global derivatives for wire-by-wire alignment",
+           bool(false));
+  addParam("enableWireSagging", m_enableWireSagging, "Enable global derivatives for wire sagging",
+           bool(false));
+
 }
 
 void MillepedeCollectorModule::prepare()
 {
   StoreObjPtr<EventMetaData> emd;
   emd.isRequired();
+
+  StoreObjPtr<EventT0> eventT0;
+  eventT0.isRequired();
 
   if (m_tracks.empty() &&
       m_particles.empty() &&
@@ -206,6 +215,7 @@ void MillepedeCollectorModule::prepare()
   registerObject<TH1F>("pval", new TH1F("pval", "pval", 100, 0., 1.));
 
   registerObject<TH1F>("cdc_hit_fraction", new TH1F("cdc_hit_fraction", "cdc_hit_fraction", 100, 0., 1.));
+  registerObject<TH1F>("evt0", new TH1F("evt0", "evt0", 400, -100., 100.));
 
   // Configure the (VXD) hierarchy before being built
   if (m_hierarchyType == 0)
@@ -222,13 +232,16 @@ void MillepedeCollectorModule::prepare()
   Belle2::alignment::GlobalCalibrationManager::getInstance().initialize(m_components);
   Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
 
-  AlignableCDCRecoHit::s_enableEventT0LocalDerivative = m_fitEventT0;
+  AlignableCDCRecoHit::s_enableTrackT0LocalDerivative = m_fitTrackT0;
+  AlignableCDCRecoHit::s_enableWireSaggingGlobalDerivative = m_enableWireSagging;
+  AlignableCDCRecoHit::s_enableWireByWireAlignmentGlobalDerivatives = m_enableWireByWireAlignment;
 }
 
 void MillepedeCollectorModule::collect()
 {
   StoreObjPtr<EventMetaData> emd;
   alignment::GlobalCalibrationManager::getInstance().preCollect(*emd);
+  StoreObjPtr<EventT0> eventT0;
 
   if (!m_useGblTree) {
     // Open new file on request (at start or after being closed)
@@ -241,6 +254,7 @@ void MillepedeCollectorModule::collect()
   double chi2 = -1.;
   double lostWeight = -1.;
   int ndf = -1;
+  float evt0 = -9999.;
 
   for (auto arrayName : m_tracks) {
     StoreArray<RecoTrack> recoTracks(arrayName);
@@ -269,6 +283,10 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+      if (eventT0.isValid() && eventT0->hasEventT0()) {
+        evt0 =  eventT0->getEventT0();
+        getObjectPtr<TH1F>("evt0")->Fill(evt0);
+      }
 
       if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(trajectory);
 
@@ -291,6 +309,10 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+        if (eventT0.isValid() && eventT0->hasEventT0()) {
+          evt0 =  eventT0->getEventT0();
+          getObjectPtr<TH1F>("evt0")->Fill(evt0);
+        }
 
         if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(trajectory);
 
@@ -320,8 +342,15 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+        if (eventT0.isValid() && eventT0->hasEventT0()) {
+          evt0 =  eventT0->getEventT0();
+          getObjectPtr<TH1F>("evt0")->Fill(evt0);
+        }
+
 
         if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
+
+        B2RESULT("Vertex-constrained fit NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
 
       }
     }
@@ -354,11 +383,11 @@ void MillepedeCollectorModule::collect()
       }
 
       if (daughters.size() > 1) {
-        DBObjPtr<BeamParameters> beam;
+        auto beam = getPrimaryVertexAndCov();
 
-        TMatrixDSym vertexCov(beam->getCovVertex());
-        TMatrixDSym vertexPrec(beam->getCovVertex().Invert());
-        TVector3 vertexResidual = - (mother->getVertex() - beam->getVertex());
+        TMatrixDSym vertexCov(get<TMatrixDSym>(beam));
+        TMatrixDSym vertexPrec(get<TMatrixDSym>(beam).Invert());
+        TVector3 vertexResidual = - (mother->getVertex() - get<TVector3>(beam));
 
         TVectorD extMeasurements(3);
         extMeasurements[0] = vertexResidual[0];
@@ -380,7 +409,7 @@ void MillepedeCollectorModule::collect()
           derivatives(2, 2) = 1.;
 
           std::vector<int> labels;
-          GlobalLabel label = GlobalLabel::construct<BeamParameters>(0, 0);
+          GlobalLabel label = GlobalLabel::construct<BeamSpot>(0, 0);
           labels.push_back(label.setParameterId(1));
           labels.push_back(label.setParameterId(2));
           labels.push_back(label.setParameterId(3));
@@ -450,6 +479,10 @@ void MillepedeCollectorModule::collect()
           getObjectPtr<TH1I>("ndf")->Fill(ndf);
           getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
           getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+          if (eventT0.isValid() && eventT0->hasEventT0()) {
+            evt0 =  eventT0->getEventT0();
+            getObjectPtr<TH1F>("evt0")->Fill(evt0);
+          }
 
           if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
           B2RESULT("Beam vertex constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
@@ -462,6 +495,11 @@ void MillepedeCollectorModule::collect()
           getObjectPtr<TH1I>("ndf")->Fill(ndf);
           getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
           getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+          if (eventT0.isValid() && eventT0->hasEventT0()) {
+            evt0 =  eventT0->getEventT0();
+            getObjectPtr<TH1F>("evt0")->Fill(evt0);
+          }
+
           if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
 
           B2RESULT("Beam vertex constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
@@ -518,6 +556,11 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+      if (eventT0.isValid() && eventT0->hasEventT0()) {
+        evt0 =  eventT0->getEventT0();
+        getObjectPtr<TH1F>("evt0")->Fill(evt0);
+      }
+
 
       B2RESULT("Mass(PDG) + vertex constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
 
@@ -563,6 +606,11 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+      if (eventT0.isValid() && eventT0->hasEventT0()) {
+        evt0 =  eventT0->getEventT0();
+        getObjectPtr<TH1F>("evt0")->Fill(evt0);
+      }
+
 
       B2RESULT("Mass constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
 
@@ -592,8 +640,8 @@ void MillepedeCollectorModule::collect()
       daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
       daughters.push_back({gbl->collectGblPoints(track12[1], track12[1]->getCardinalRep()), dfdextPlusMinus.second});
 
-      TMatrixDSym vertexPrec(beam->getCovVertex().Invert());
-      TVector3 vertexResidual = - (mother->getVertex() - beam->getVertex());
+      TMatrixDSym vertexPrec(get<TMatrixDSym>(getPrimaryVertexAndCov()).Invert());
+      TVector3 vertexResidual = - (mother->getVertex() - get<TVector3>(getPrimaryVertexAndCov()));
 
       TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / (beam->getCovHER() + beam->getCovLER())(0, 0);
       TVectorD massResidual(1); massResidual = - (mother->getMass() - beam->getMass());
@@ -621,6 +669,11 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+      if (eventT0.isValid() && eventT0->hasEventT0()) {
+        evt0 =  eventT0->getEventT0();
+        getObjectPtr<TH1F>("evt0")->Fill(evt0);
+      }
+
 
       if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
 
@@ -657,34 +710,55 @@ void MillepedeCollectorModule::collect()
       daughters.push_back({gbl->collectGblPoints(track12[1], track12[1]->getCardinalRep()), dfdextPlusMinus.second});
 
       TMatrixDSym extCov(7); extCov.Zero();
+
       // 3x3 IP vertex covariance
-      extCov.SetSub(0, 0, beam->getCovVertex());
-      //TODO: FIXME: add transformation from (E,theta_x,theta_y) -> (px,py,pz)
-      //covariance of the "boost vector" -> see BeamParameters
-      // 3x3 matrix cov(E,theta_x,theta_y)
-      //TODO:
-      //I cannot get all 3 entries non-zero using Y4S setting for add_beamparameters
-      //extCov.SetSub(3, 3, (beam->getCovLER() + beam->getCovHER()));
-      extCov(3, 3) = (beam->getCovLER() + beam->getCovHER())(0, 0);
-      //TODO: multiply by beam energy?
-      extCov(4, 4) = (beam->getCovLER() + beam->getCovHER())(1, 1);
-      //TODO: multiply by beam energy?
-      extCov(5, 5) = (beam->getCovLER() + beam->getCovHER())(2, 2);
-      //TODO Exactly zero if not set (experimental observation) ... temporary -> should NOT be zero
-      if (extCov(4, 4) == 0.)
-        extCov(4, 4) = extCov(0, 0);
-      //TODO Exactly zero if not set (experimental observation) ... temporary -> should NOT be zero
-      if (extCov(5, 5) == 0.)
-        extCov(5, 5) = extCov(0, 0);
-      // For the error of invariant mass of the beam I take that for its energy
-      extCov(6, 6) = (beam->getCovLER()(0, 0) + beam->getCovHER()(0, 0));
+      extCov.SetSub(0, 0, get<TMatrixDSym>(getPrimaryVertexAndCov()));
+
+      // 3x3 boost vector covariance
+      //NOTE: BeamParameters return covarince in variables (E, theta_x, theta_y)
+      // We need to transform it to our variables (px, py, pz)
+      double pz = (beam->getHER().Vect() + beam->getLER().Vect())[2];
+      double E  = (beam->getHER() + beam->getLER()).E();
+
+      TMatrixD dBoost_dVect(3, 3);
+      dBoost_dVect(0, 0) = 0.;     dBoost_dVect(0, 1) = 1. / pz; dBoost_dVect(0, 2) = 0.;
+      dBoost_dVect(1, 0) = 0.;     dBoost_dVect(1, 1) = 0.;      dBoost_dVect(1, 2) = 1. / pz;
+      dBoost_dVect(2, 0) = pz / E; dBoost_dVect(2, 1) = 0.;      dBoost_dVect(2, 2) = 0.;
+
+      TMatrixD dVect_dBoost(3, 3);
+      dVect_dBoost(0, 0) = 0.;     dVect_dBoost(0, 1) = 0.;      dVect_dBoost(0, 2) = E / pz;
+      dVect_dBoost(1, 0) = pz;     dVect_dBoost(1, 1) = 0.;      dVect_dBoost(1, 2) = 0.;
+      dVect_dBoost(2, 0) = 0.;     dVect_dBoost(2, 1) = pz;      dVect_dBoost(2, 2) = 0.;
+
+      TMatrixD covBoost(3, 3);
+      for (int i = 0; i < 3; ++i) {
+        for (int j = i; j < 3; ++j) {
+          covBoost(j, i) = covBoost(i, j) = (beam->getCovHER() + beam->getCovLER())(i, j);
+        }
+      }
+      //TODO: Temporary fix: if theta_x, theta_y covariance is zero, use arbitrary 10mrad^2
+//       if (covBoost(1, 1) == 0.) covBoost(1, 1) = 1.;
+//       if (covBoost(2, 2) == 0.) covBoost(2, 2) = 1.;
+      if (covBoost(1, 1) == 0.) covBoost(1, 1) = 1.e-4;
+      if (covBoost(2, 2) == 0.) covBoost(2, 2) = 1.e-4;
+
+      TMatrixD covVect =  dBoost_dVect * covBoost * dVect_dBoost;
+
+      extCov.SetSub(3, 3, covVect);
+
+      // For the error of invariant mass M = 2 * sqrt(E_HER * E_LER) (for m_e ~ 0)
+      double M = beam->getMass();
+      double E_HER = beam->getHER().E();
+      double E_LER = beam->getLER().E();
+
+      extCov(6, 6) = (E_HER / M) * (E_HER / M) * beam->getCovLER()(0, 0) + (E_LER / M) * (E_LER / M) * beam->getCovHER()(0, 0);
 
       auto extPrec = extCov; extPrec.Invert();
 
       TVectorD extMeasurements(7);
-      extMeasurements[0] = - (mother->getVertex() - beam->getVertex())[0];
-      extMeasurements[1] = - (mother->getVertex() - beam->getVertex())[1];
-      extMeasurements[2] = - (mother->getVertex() - beam->getVertex())[2];
+      extMeasurements[0] = - (mother->getVertex() - get<TVector3>(getPrimaryVertexAndCov()))[0];
+      extMeasurements[1] = - (mother->getVertex() - get<TVector3>(getPrimaryVertexAndCov()))[1];
+      extMeasurements[2] = - (mother->getVertex() - get<TVector3>(getPrimaryVertexAndCov()))[2];
       extMeasurements[3] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[0];
       extMeasurements[4] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[1];
       extMeasurements[5] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[2];
@@ -718,7 +792,7 @@ void MillepedeCollectorModule::collect()
           derivatives(0, 0) = 1.;
           derivatives(1, 1) = 1.;
           derivatives(2, 2) = 1.;
-          GlobalLabel label = GlobalLabel::construct<BeamParameters>(0, 0);
+          GlobalLabel label = GlobalLabel::construct<BeamSpot>(0, 0);
           labels.push_back(label.setParameterId(1));
           labels.push_back(label.setParameterId(2));
           labels.push_back(label.setParameterId(3));
@@ -733,7 +807,7 @@ void MillepedeCollectorModule::collect()
           derivatives(4, 4) = mother->getMomentumMagnitude();
           derivatives(8, 5) = (beam->getLER().E() + beam->getHER().E()) / beam->getMass();
 
-          GlobalLabel label = GlobalLabel::construct<BeamParameters>(0, 0);
+          GlobalLabel label = GlobalLabel::construct<BeamSpot>(0, 0);
           labels.push_back(label.setParameterId(4)); //theta_x
           labels.push_back(label.setParameterId(5)); //theta_y
           labels.push_back(label.setParameterId(6)); //E
@@ -829,6 +903,11 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+        if (eventT0.isValid() && eventT0->hasEventT0()) {
+          evt0 =  eventT0->getEventT0();
+          getObjectPtr<TH1F>("evt0")->Fill(evt0);
+        }
+
 
         B2RESULT("Full kinematic-constrained fit (calibration version) results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
 
@@ -844,6 +923,11 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+        if (eventT0.isValid() && eventT0->hasEventT0()) {
+          evt0 =  eventT0->getEventT0();
+          getObjectPtr<TH1F>("evt0")->Fill(evt0);
+        }
+
 
         B2RESULT("Full kinematic-constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
 
@@ -1098,7 +1182,8 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
         }
       }
     }
-  } catch (...) {
+  } catch (std::exception& e) {
+    B2ERROR(e.what());
     B2ERROR("SVD Cluster combination failed. This is symptomatic of pruned tracks. MillepedeCollector cannot process pruned tracks.");
     return false;
   }
@@ -1435,4 +1520,10 @@ TMatrixD MillepedeCollectorModule::getLocalToGlobalTransform(const genfit::Measu
 
   return J_pM_5x6.T();
 
+}
+
+tuple<TVector3, TMatrixDSym> MillepedeCollectorModule::getPrimaryVertexAndCov() const
+{
+  DBObjPtr<BeamSpot> beam;
+  return {beam->getIPPosition(), beam->getSizeCovMatrix()};
 }

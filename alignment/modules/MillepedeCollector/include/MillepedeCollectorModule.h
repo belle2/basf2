@@ -96,6 +96,13 @@ namespace Belle2 {
     /** Write down a GBL trajectory (to TTree or binary file) */
     void storeTrajectory(gbl::GblTrajectory& trajectory);
 
+    /** Get the primary vertex position estimation and its size
+     *  from BeamSpot
+     @return tuple<TVector3, TMatrixDSym> tuple with position and size as covariance matrix
+     */
+    std::tuple<TVector3, TMatrixDSym> getPrimaryVertexAndCov() const;
+
+
   private:
     /** Names of arrays with single RecoTracks fitted by GBL */
     std::vector<std::string> m_tracks;
@@ -136,8 +143,8 @@ namespace Belle2 {
     std::string m_internalIterations;
     /** Up to which external iteration propagation Jacobians should be re-calculated */
     int m_recalcJacobians;
-    /** Add local parameter for event T0 fit in GBL **/
-    bool m_fitEventT0;
+    /** Add local parameter for track T0 fit in GBL (local derivative) **/
+    bool m_fitTrackT0;
     /** Update L/R weights from previous DAF fit result? **/
     bool m_updateCDCWeights;
     /** Minimum CDC hit weight **/
@@ -151,6 +158,10 @@ namespace Belle2 {
     bool m_enablePXDHierarchy;
     /** enable SVD hierarchy **/
     bool m_enableSVDHierarchy;
+    /** Enable global derivatives for wire-by-wire alignment **/
+    bool m_enableWireByWireAlignment;
+    /** Enable global derivatives for wire sagging **/
+    bool m_enableWireSagging;
 
     /** Current vector of GBL data from trajectory to be stored in a tree */
     std::vector<gbl::GblData> m_currentGblData{};

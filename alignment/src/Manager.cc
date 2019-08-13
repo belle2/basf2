@@ -1,6 +1,6 @@
 #include <alignment/Manager.h>
 #include <cdc/dbobjects/CDCLayerAlignment.h>
-#include "../include/GlobalTimeLine.h"
+#include <alignment/GlobalTimeLine.h>
 
 namespace Belle2 {
   namespace alignment {
@@ -19,7 +19,7 @@ namespace Belle2 {
 
       // Try add all supported DB objects
       // - will be not added if not in selected components of the 'vector'
-      vector.addDBObj<BeamParameters>();
+      vector.addDBObj<BeamSpot>();
       vector.addDBObj<VXDAlignment>(vxdInterface);
       vector.addDBObj<CDCAlignment>(cdcInterface);
       vector.addDBObj<CDCTimeZeros>(cdcInterface);

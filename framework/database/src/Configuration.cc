@@ -46,7 +46,7 @@ namespace {
    * on each object in the list and use the string representation. So it should
    * work with basically any python object.
    */
-  std::vector<std::string> extractStringList(py::object obj)
+  std::vector<std::string> extractStringList(const py::object& obj)
   {
     std::vector<std::string> result;
     Belle2::PyObjConvUtils::iteratePythonObject(obj, [&result](const boost::python::object & item) {
@@ -117,8 +117,8 @@ namespace Belle2::Conditions {
       fillFromEnv(m_globalTags, "BELLE2_CONDB_GLOBALTAG", "");
       overrideGlobalTags();
     }
-    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA",
-                "http://belle2db.sdcc.bnl.gov/b2s/rest/ /cvms/belle.cern.ch/conditions/database.sqlite");
+    std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", "http://belle2db.sdcc.bnl.gov/b2s/rest/");
+    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", serverList + " /cvms/belle.cern.ch/conditions/database.sqlite");
     fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", "/cvmfs/belle.cern.ch/conditions");
   }
 
@@ -162,7 +162,7 @@ namespace Belle2::Conditions {
       B2WARNING("Input files metadata all have empty globaltag setting, globaltag replay not possible");
       return;
     }
-    // set the list of globaltags from the
+    // set the list of globaltags from the string containing the globaltags
     boost::split(*m_inputGlobaltags, *inputGlobaltags, boost::is_any_of(","));
   }
 

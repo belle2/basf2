@@ -1,6 +1,8 @@
 [INFO] Steering file: mdst/tests/mdst_compatibility-v00-09-03.py
 [INFO] The random number seed is set to "1"
 [INFO] Starting event processing, random seed is set to '1'
+[INFO] Added file ${BELLE2_LOCAL_DIR}/mdst/tests/mdst-v00-09-03.root
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 Untested method EventMetaData::addErrorFlag
 Untested method EventMetaData::isEndOfData
 Untested method EventMetaData::setEndOfData
@@ -419,6 +421,9 @@ V0#2:
     -> Tracks#6
   getV0Hypothesis(): <type: K_S0>
 TrackFitResult#0:
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
   get4Momentum(): (0.142389,0.0549256,0.0689178,0.217993)
   getChargeSign(): 1
   getCotTheta(): 0.451579
@@ -1559,7 +1564,7 @@ ECLCluster#0:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000100000
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0480965
   getEnergyRaw(): 0.103597
@@ -2390,7 +2395,7 @@ ECLCluster#17:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000010000
   getEnergy(16): nan
   getEnergy(32): 0.103597
   getEnergyHighestCrystal(): 0.0480965
@@ -3157,7 +3162,7 @@ KLMCluster#1:
     -> MCParticles#22 (weight: 1)
   getTime(): 2.62976
  ... message repeated 14 times
-[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!  { module: PrintObjectsModule }
+[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(25)
     pair
@@ -7299,7 +7304,7 @@ ECLCluster#0:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000100000
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.214085
   getEnergyRaw(): 0.209471
@@ -8475,7 +8480,7 @@ ECLCluster#24:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000010000
   getEnergy(16): nan
   getEnergy(32): 0.209471
   getEnergyHighestCrystal(): 0.208088
@@ -9486,7 +9491,7 @@ ECLCluster#44:
   isTrack(): False
   isTriggerCluster(): False
  ... message repeated 20 times
-[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!  { module: PrintObjectsModule }
+[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(25)
     pair
@@ -14123,7 +14128,7 @@ ECLCluster#0:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000100000
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.099204
   getEnergyRaw(): 0.239216
@@ -15440,7 +15445,7 @@ ECLCluster#27:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000010000
   getEnergy(16): nan
   getEnergy(32): 0.239216
   getEnergyHighestCrystal(): 0.0958266
@@ -16666,7 +16671,7 @@ KLMCluster#0:
     -> MCParticles#70 (weight: 1)
   getTime(): 2.63636
  ... message repeated 24 times
-[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!  { module: PrintObjectsModule }
+[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(25)
     pair
@@ -19432,19 +19437,3 @@ MCParticle#89:
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 0
 [INFO] ========================================================================
-[INFO] ================================================================================
-[INFO] Error summary: 132 errors and 0 warnings occurred.
-[ERROR] This cluster does not support the requested hypothesis,
-	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
-	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000
-[INFO]  (last message occurred 68 times in total)
-[ERROR] This cluster does not support the requested hypothesis,
-	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
-	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000
-[INFO]  (last message occurred 61 times in total)
-[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!
-[INFO]  (last message occurred 3 times in total)
-[INFO] ================================================================================
-

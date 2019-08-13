@@ -394,7 +394,7 @@ void RootOutputModule::fillFileMetaData()
     mcEvents = 0;
   }
   m_fileMetaData->setMcEvents(mcEvents);
-  m_fileMetaData->setDatabaseGlobalTag(Database::getGlobalTag());
+  m_fileMetaData->setDatabaseGlobalTag(Database::Instance().getGlobalTags());
   for (const auto& item : m_additionalDataDescription) {
     m_fileMetaData->setDataDescription(item.first, item.second);
   }

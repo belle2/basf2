@@ -3,6 +3,10 @@
 
 from basf2 import *
 
+from ROOT import Belle2
+
+from geometry import check_components
+
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
 
@@ -25,7 +29,8 @@ import mdst
 
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
-                       use_second_cdc_hits=False, add_muid_hits=False):
+                       use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=False,
+                       nCDCHitsMax=4000, nSVDShaperDigitsMax=70000):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -45,7 +50,18 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param add_trigger_calculation: add the software trigger modules for monitoring (do not make any cut)
+    :param reconstruct_cdst: run only the minimal reconstruction needed to produce the cdsts (raw+tracking+dE/dx)
+    :param nCDCHitsMax: the max number of CDC hits for an event to be reconstructed.
+    :param nSVDShaperDigitsMax: the max number of SVD shaper digits for an event to be reconstructed.
     """
+
+    # Check components.
+    check_components(components)
+
+    # Do not even attempt at reconstructing events w/ abnormally large occupancy.
+    empty_path = create_path()
+    doom = path.add_module(EventsOfDoomBuster(nCDCHitsMax, nSVDShaperDigitsMax))
+    doom.if_true(empty_path, AfterConditionPath.END)
 
     # Add modules that have to be run BEFORE track reconstruction
     add_pretracking_reconstruction(path,
@@ -63,18 +79,23 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
-    # Add further reconstruction modules
-    add_posttracking_reconstruction(path,
-                                    components=components,
-                                    pruneTracks=pruneTracks,
-                                    add_muid_hits=add_muid_hits,
-                                    addClusterExpertModules=addClusterExpertModules)
+    # Add only the dE/dx calculation and prune the tracks
+    if reconstruct_cdst:
+        add_dedx_modules(main_path)
+        add_prune_tracks(main_path, components=components)
+    else:
+        # Add further reconstruction modules
+        add_posttracking_reconstruction(path,
+                                        components=components,
+                                        pruneTracks=pruneTracks,
+                                        add_muid_hits=add_muid_hits,
+                                        addClusterExpertModules=addClusterExpertModules)
 
-    # Add the modules calculating the software trigger cuts (but not performing them)
-    if add_trigger_calculation and (not components or (
-            "CDC" in components and "ECL" in components and "EKLM" in components and "BKLM" in components)):
-        add_filter_software_trigger(path)
-        add_skim_software_trigger(path)
+        # Add the modules calculating the software trigger cuts (but not performing them)
+        if add_trigger_calculation and (not components or (
+                "CDC" in components and "ECL" in components and "EKLM" in components and "BKLM" in components)):
+            add_filter_software_trigger(path)
+            add_skim_software_trigger(path)
 
 
 def add_cosmics_reconstruction(
@@ -88,7 +109,8 @@ def add_cosmics_reconstruction(
         top_in_counter=False,
         data_taking_period='early_phase3',
         use_second_cdc_hits=False,
-        add_muid_hits=False):
+        add_muid_hits=False,
+        reconstruct_cdst=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -116,7 +138,12 @@ def add_cosmics_reconstruction(
            (assuming PMT is put at -z of the counter).
 
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
+
+    :param reconstruct_cdst: run only the minimal reconstruction needed to produce the cdsts (raw+tracking+dE/dx)
     """
+
+    # Check components.
+    check_components(components)
 
     # Add modules that have to be run before track reconstruction
     add_pretracking_reconstruction(path,
@@ -136,13 +163,19 @@ def add_cosmics_reconstruction(
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
-    # Add further reconstruction modules
-    add_posttracking_reconstruction(path,
-                                    components=components,
-                                    pruneTracks=pruneTracks,
-                                    addClusterExpertModules=addClusterExpertModules,
-                                    add_muid_hits=add_muid_hits,
-                                    cosmics=True)
+    # Add only the dE/dx calculation and prune the tracks
+    if reconstruct_cdst:
+        add_dedx_modules(main_path)
+        add_prune_tracks(main_path, components=components)
+
+    else:
+        # Add further reconstruction modules
+        add_posttracking_reconstruction(path,
+                                        components=components,
+                                        pruneTracks=pruneTracks,
+                                        addClusterExpertModules=addClusterExpertModules,
+                                        add_muid_hits=add_muid_hits,
+                                        cosmics=True)
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
@@ -270,6 +303,7 @@ def add_cdst_output(
     filename='cdst.root',
     additionalBranches=[],
     dataDescription=None,
+    rawFormat=False
 ):
     """
     This function adds the cDST output modules (mDST + calibration objects) to a path,
@@ -281,6 +315,7 @@ def add_cdst_output(
     @param additionalBranches Additional objects/arrays of event durability to save
     @param dataDescription Additional key->value pairs to be added as data description
            fields to the output FileMetaData
+    @param rawFormat saves the cdsts in the raw+tracking format.
     """
 
     calibrationBranches = [
@@ -325,6 +360,31 @@ def add_cdst_output(
         'BKLMHit2dsToBKLMHit1ds',
         'BKLMHit1dsToBKLMDigits'
     ]
+
+    if rawFormat:
+        calibrationBranches = [
+            'EventMetaData',
+            'RawPXDs',
+            'RawSVDs',
+            'RawCDCs',
+            'RawECLs',
+            'RawARICHs',
+            'RawKLMs',
+            'RawTOPs',
+            'RawTRGs',
+            'RecoTracks',
+            'Tracks',
+            'V0s',
+            'TrackFitResults',
+            'EventT0',
+            'CDCDedxTracks',
+            'SVDShaperDigitsFromTracks',
+            'EventT0',
+            'VXDDedxTracks',
+            'CDCDedxLikelihoods',
+            'VXDDedxLikelihoods',
+            'SVDEventInfo']
+
     if dataDescription is None:
         dataDescription = {}
     dataDescription.setdefault("dataLevel", "cdst")
@@ -609,3 +669,113 @@ def add_dedx_modules(path, components=None):
     if components is None or 'SVD' in components:
         VXDdEdxPID = register_module('VXDDedxPID')
         path.add_module(VXDdEdxPID)
+
+
+class EventsOfDoomBuster(Module):
+    """
+    Module that flags an event destined for doom at reconstruction,
+    based on the size of selected hits/digits containers after the unpacking.
+
+    This is meant to be registered in the path *after* the unpacking, but *before* reconstruction.
+    """
+
+    def __init__(self, nCDCHitsMax=int(1e9), nSVDShaperDigitsMax=int(1e9)):
+        """
+        Module constructor.
+
+        Args:
+            nCDCHitsMax (Optional[int]): the max number of CDC hits
+                for an event to be kept for reconstruction.
+                By default, no events are skipped based upon this requirement.
+            nSVDShaperDigitsMax (Optional[int]): the max number of SVD shaper digits
+                for an event to be kept for reconstruction.
+                By default, no events are skipped based upon this requirement.
+        """
+
+        super().__init__()
+        self.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
+
+        self.nCDCHitsMax = nCDCHitsMax
+        self.nSVDShaperDigitsMax = nSVDShaperDigitsMax
+
+    def initialize(self):
+        """
+        Module initializer.
+        """
+
+        self.eventinfo = Belle2.PyStoreObj("EventMetaData")
+        self.cdchits = Belle2.PyStoreArray("CDCHits")
+        self.svdshaperdigits = Belle2.PyStoreArray("SVDShaperDigits")
+
+    def event(self):
+        """
+        Flag each event.
+
+        Returns:
+            bool: True if event exceeds `nCDCHitsMax or nSVDShaperDigitsMax`.
+                  In that case, the event should be skipped for reco.
+        """
+
+        ncdchits = len(self.cdchits)
+        nsvdshaperdigits = len(self.svdshaperdigits)
+
+        B2DEBUG(20, f"Event: {self.eventinfo.getEvent()} - nCDCHits: {ncdchits}, nSVDShaperDigits: {nsvdshaperdigits}")
+
+        doom_cdc = ncdchits > self.nCDCHitsMax
+        doom_svd = nsvdshaperdigits > self.nSVDShaperDigitsMax
+
+        if doom_cdc:
+            B2WARNING("Skip event --> Too much occupancy for reco!",
+                      event=self.eventinfo.getEvent(),
+                      run=self.eventinfo.getRun(),
+                      exp=self.eventinfo.getExperiment(),
+                      nCDCHits=ncdchits,
+                      nCDCHitsMax=self.nCDCHitsMax)
+        if doom_svd:
+            B2WARNING("Skip event --> Too much occupancy for reco!",
+                      event=self.eventinfo.getEvent(),
+                      run=self.eventinfo.getRun(),
+                      exp=self.eventinfo.getExperiment(),
+                      nSVDShaperDigits=nsvdshaperdigits,
+                      nSVDShaperDigitsMax=self.nSVDShaperDigitsMax)
+
+        self.return_value(doom_cdc or doom_svd)
+
+
+def prepare_cdst_analysis(path, components=None):
+    """
+    Adds to a (analysis) path all the modules needed to
+    analyse a cdsts file in the raw+tracking format.
+
+    :param path: The path to add the modules to.
+    :param components: The components to use or None to use all standard components.
+    """
+    # unpackers
+    add_unpackers(path, components=components)
+
+    # this is currently just calls add_ecl_modules
+    add_pretracking_reconstruction(path, components=components)
+
+    # needed to retrieve the PXD and SVD clusters out of the raws
+    if components is None or 'SVD' in components:
+        add_svd_reconstruction(path)
+    if components is None or 'PXD' in components:
+        add_pxd_reconstruction(path)
+
+    # check, this one may not be needed...
+    path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
+
+    # from here on mostly a replica of add_posttracking_reconstruction without dE/dx, prunetracks and eventT0 modules
+    add_ext_module(path, components)
+    add_top_modules(path, components)
+    add_arich_modules(path, components)
+    add_ecl_finalizer_module(path, components)
+    add_ecl_mc_matcher_module(path, components)
+    add_klm_modules(path, components)
+    add_klm_mc_matcher_module(path, components)
+    add_muid_module(path, components=components)
+    add_ecl_track_cluster_modules(path, components)
+    add_ecl_cluster_properties_modules(path, components)
+    add_ecl_eip_module(path, components)
+    add_pid_module(path, components)
+    add_ecl_track_brem_finder(path, components)

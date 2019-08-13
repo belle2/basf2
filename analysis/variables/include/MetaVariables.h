@@ -44,6 +44,12 @@ namespace Belle2 {
     Manager::FunctionPtr isInList(const std::vector<std::string>& arguments);
 
     /**
+     * Returns 1 if the same mdst source object was used to create a particle in
+     * the list (0 if not and -1 for non-mdst source based particles
+     */
+    Manager::FunctionPtr sourceObjectIsInList(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns 1 if the given particle is a daughter of at least one of the particles of the
      * given particle Lists.
      */

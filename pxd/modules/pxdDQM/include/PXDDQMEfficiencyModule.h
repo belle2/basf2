@@ -118,7 +118,7 @@ namespace Belle2 {
     double m_pcut; ///< pValue-Cut for tracks
     double m_momCut; ///< Cut on fitted track momentum
     double m_pTCut; ///< Cut on fitted track pT
-    unsigned int m_minSVDHits; // Required hits in SVD strips for tracks
+    unsigned int m_minSVDHits; ///< Required hits in SVD strips for tracks
     double m_z0minCut;/**< cut z0 minimum in cm (large negativ value eg -9999 disables)*/
     double m_z0maxCut;/**< cut z0 maximum in cm (large positiv value eg 9999 disables)*/
     double m_d0Cut;/**< cut abs(d0) in cm (and negativ value eg -9999 disables)*/

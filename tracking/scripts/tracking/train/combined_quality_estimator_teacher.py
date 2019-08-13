@@ -156,6 +156,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 import basf2
 import basf2_mva
+from packaging import version
 import simulation
 import tracking
 import tracking.root_utils as root_utils
@@ -165,7 +166,7 @@ from tracking.harvesting_validation.combined_module import CombinedTrackingValid
 install_helpstring_formatter = ("\nCould not find {module} python module.Try installing it via\n"
                                 "  python3 -m pip install [--user] {module}\n")
 try:
-    import b2luigi as luigi
+    import b2luigi
     from b2luigi.core.utils import get_serialized_parameters
     from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
 except ModuleNotFoundError:
@@ -306,9 +307,9 @@ class GenerateSimTask(Basf2PathTask):
     evaluation/validation tasks.
     """
 
-    n_events = luigi.IntParameter()
-    random_seed = luigi.Parameter()
-    bkgfiles_dir = luigi.Parameter(hashed=True)
+    n_events = b2luigi.IntParameter()
+    random_seed = b2luigi.Parameter()
+    bkgfiles_dir = b2luigi.Parameter(hashed=True)
     output_file_name = "generated_mc.root"
 
     def output(self):
@@ -342,8 +343,8 @@ class VXDQEDataCollectionTask(Basf2PathTask):
     These variables are to be used as labelled training data for the MVA
     classifier which is the VXD track quality estimator
     """
-    n_events = luigi.IntParameter()
-    random_seed = luigi.Parameter()
+    n_events = b2luigi.IntParameter()
+    random_seed = b2luigi.Parameter()
     records_file_name = "vxd_qe_records.root"
 
     def requires(self):
@@ -400,8 +401,8 @@ class CDCQEDataCollectionTask(Basf2PathTask):
     These variables are to be used as labelled training data for the MVA
     classifier which is the CDC track quality estimator
     """
-    n_events = luigi.IntParameter()
-    random_seed = luigi.Parameter()
+    n_events = b2luigi.IntParameter()
+    random_seed = b2luigi.Parameter()
     records_file_name = "cdc_qe_records.root"
 
     def requires(self):
@@ -453,10 +454,10 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
     subdetector quality estimators to be trained.
     """
 
-    n_events = luigi.IntParameter()
-    random_seed = luigi.Parameter()
+    n_events = b2luigi.IntParameter()
+    random_seed = b2luigi.Parameter()
     records_file_name = "fulltrack_qe_records.root"
-    cdc_training_target = luigi.Parameter()
+    cdc_training_target = b2luigi.Parameter()
 
     def requires(self):
         yield GenerateSimTask(
@@ -540,9 +541,9 @@ class TrackQETeacherBaseTask(Basf2Task):
     and have the basic functionality in this base class/interface and have the
     specific teacher tasks inherit from it.
     """
-    n_events_training = luigi.IntParameter()
-    training_target = luigi.Parameter(default="truth")
-    exclude_variables = luigi.ListParameter(hashed=True, default=[])
+    n_events_training = b2luigi.IntParameter()
+    training_target = b2luigi.Parameter(default="truth")
+    exclude_variables = b2luigi.ListParameter(hashed=True, default=[])
 
     @property
     def weightfile_identifier(self):
@@ -634,7 +635,7 @@ class FullTrackQETeacherTask(TrackQETeacherBaseTask):
     tree_name = "tree"
     random_seed = "trainingdata_0"
     dataCollectionTask = FullTrackQEDataCollectionTask
-    cdc_training_target = luigi.Parameter()
+    cdc_training_target = b2luigi.Parameter()
 
     def requires(self):
         yield self.dataCollectionTask(
@@ -651,8 +652,8 @@ class HarvestingValidationBaseTask(Basf2PathTask):
     (="harvest") a root file with variables useful for the validation.
     """
 
-    n_events_testing = luigi.IntParameter()
-    n_events_training = luigi.IntParameter()
+    n_events_testing = b2luigi.IntParameter()
+    n_events_training = b2luigi.IntParameter()
     validation_output_file_name = "harvesting_validation.root"
     reco_output_file_name = "reconstruction.root"
     components = None  # components for the MC matching and track fit creation
@@ -753,7 +754,7 @@ class CDCQEHarvestingValidationTask(HarvestingValidationBaseTask):
     Run CDC reconstruction and write out (="harvest") a root file with variables
     useful for validation of the CDC Quality Estimator.
     """
-    training_target = luigi.Parameter()
+    training_target = b2luigi.Parameter()
     validation_output_file_name = "cdc_qe_harvesting_validation.root"
     reco_output_file_name = "cdc_qe_reconstruction.root"
 
@@ -789,10 +790,10 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
     Run track reconstruction and write out (="harvest") a root file with variables
     useful for validation of the MVA track Quality Estimator.
     """
-    n_events_testing = luigi.IntParameter()
-    n_events_training = luigi.IntParameter()
-    cdc_training_target = luigi.Parameter()
-    exclude_variables = luigi.ListParameter(hashed=True)
+    n_events_testing = b2luigi.IntParameter()
+    n_events_training = b2luigi.IntParameter()
+    cdc_training_target = b2luigi.Parameter()
+    exclude_variables = b2luigi.ListParameter(hashed=True)
     validation_output_file_name = "full_qe_harvesting_validation.root"
     reco_output_file_name = "full_qe_reconstruction.root"
 
@@ -868,9 +869,9 @@ class TrackQEEvaluationBaseTask(Basf2Task):
     Evaluation tasks for VXD, CDC and combined QE can inherit from it.
     """
 
-    n_events_testing = luigi.IntParameter()
-    n_events_training = luigi.IntParameter()
-    training_target = luigi.Parameter(default="truth")
+    n_events_testing = b2luigi.IntParameter()
+    n_events_training = b2luigi.IntParameter()
+    training_target = b2luigi.Parameter(default="truth")
 
     @property
     def teacherTask(self) -> TrackQETeacherBaseTask:
@@ -950,8 +951,8 @@ class FullTrackQEEvaluationTask(TrackQEEvaluationBaseTask):
     """
     teacherTask = FullTrackQETeacherTask
     dataCollectionTask = FullTrackQEDataCollectionTask
-    exclude_variables = luigi.ListParameter(hashed=True)
-    cdc_training_target = luigi.Parameter()
+    exclude_variables = b2luigi.ListParameter(hashed=True)
+    cdc_training_target = b2luigi.Parameter()
 
     def requires(self):
         yield self.teacherTask(
@@ -973,7 +974,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
     Create a PDF file with validation plots for a quality estimator produced
     from the ROOT ntuples produced by a harvesting validation task
     """
-    primaries_only = luigi.BoolParameter(default=True)  # normalize finding efficiencies to primary MC-tracks
+    primaries_only = b2luigi.BoolParameter(default=True)  # normalize finding efficiencies to primary MC-tracks
 
     @property
     def harvesting_validation_task_instance(self) -> HarvestingValidationBaseTask:
@@ -1202,8 +1203,8 @@ class VXDQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
     estimator produced from the ROOT ntuples produced by a VXDTF2 track QE
     harvesting validation task
     """
-    n_events_testing = luigi.IntParameter()
-    n_events_training = luigi.IntParameter()
+    n_events_testing = b2luigi.IntParameter()
+    n_events_training = b2luigi.IntParameter()
 
     @property
     def harvesting_validation_task_instance(self):
@@ -1220,9 +1221,9 @@ class CDCQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
     produced from the ROOT ntuples produced by a CDC track QE harvesting
     validation task
     """
-    n_events_testing = luigi.IntParameter()
-    n_events_training = luigi.IntParameter()
-    training_target = luigi.Parameter()
+    n_events_testing = b2luigi.IntParameter()
+    n_events_training = b2luigi.IntParameter()
+    training_target = b2luigi.Parameter()
 
     @property
     def harvesting_validation_task_instance(self):
@@ -1240,10 +1241,10 @@ class FullTrackQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
     estimator produced from the ROOT ntuples produced by a full track QE
     harvesting validation task
     """
-    n_events_testing = luigi.IntParameter()
-    n_events_training = luigi.IntParameter()
-    cdc_training_target = luigi.Parameter()
-    exclude_variables = luigi.ListParameter(hashed=True)
+    n_events_testing = b2luigi.IntParameter()
+    n_events_training = b2luigi.IntParameter()
+    cdc_training_target = b2luigi.Parameter()
+    exclude_variables = b2luigi.ListParameter(hashed=True)
 
     @property
     def harvesting_validation_task_instance(self):
@@ -1256,20 +1257,20 @@ class FullTrackQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
         )
 
 
-class MasterTask(luigi.WrapperTask):
+class MasterTask(b2luigi.WrapperTask):
     """
     Entry point: Task that defines the configurations that shall be tested.
     """
 
-    n_events_training = luigi.get_setting("n_events_training", default=3000)
-    n_events_testing = luigi.get_setting("n_events_testing", default=1000)
-    num_processes = luigi.get_setting("basf2_processes_per_worker", default=0)
+    n_events_training = b2luigi.get_setting("n_events_training", default=3000)
+    n_events_testing = b2luigi.get_setting("n_events_testing", default=1000)
+    num_processes = b2luigi.get_setting("basf2_processes_per_worker", default=0)
     # directory with MC overlay background root files
-    bkgfiles_dir = luigi.get_setting("bkgfiles_directory")
+    bkgfiles_dir = b2luigi.get_setting("bkgfiles_directory")
     # Choose whether to run basf2_mva_evaluate tasks on weightfiles. These will
     # fail if no LaTeX is installed, but we still have our own independent
     # validation tasks.
-    run_mva_evaluate = luigi.get_setting("run_mva_evaluate", default=True)
+    run_mva_evaluate = b2luigi.get_setting("run_mva_evaluate", default=True)
 
     def requires(self):
 
@@ -1325,5 +1326,5 @@ class MasterTask(luigi.WrapperTask):
 
 
 if __name__ == "__main__":
-    workers = luigi.get_setting("workers", default=1)
-    luigi.process(MasterTask(), workers=workers)
+    workers = b2luigi.get_setting("workers", default=1)
+    b2luigi.process(MasterTask(), workers=workers)

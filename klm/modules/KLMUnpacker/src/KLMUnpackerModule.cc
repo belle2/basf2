@@ -153,7 +153,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
   eklmDigit->setCTime(raw.ctime);
   eklmDigit->setTDC(raw.tdc);
   eklmDigit->setTime(
-    m_TimeConversion->getTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
+    m_TimeConversion->getScintillatorTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
   eklmDigit->setEndcap(endcap);
   eklmDigit->setLayer(layer);
   eklmDigit->setSector(sector);
@@ -249,7 +249,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
     // For the fine-time (tdc) measurement (11 bits), shift the revo9Trig time by
     // 10 ticks to align the new prompt-time peak with the TriggerCtime-relative peak.
     float triggerTime = klmDigitEventInfo->getRevo9TriggerWord();
-    std::pair<int, double> rpcTimes = m_TimeConversion->getTimes(raw.ctime, raw.tdc, triggerTime);
+    std::pair<int, double> rpcTimes = m_TimeConversion->getRPCTimes(raw.ctime, raw.tdc, triggerTime);
     bklmDigit = m_bklmDigits.appendNew(moduleId, rpcTimes.first, raw.tdc, raw.charge);
     bklmDigit->setTime(rpcTimes.second);
   } else {
@@ -257,7 +257,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
     // For scintillator hits, store the ctime relative to the event header's trigger ctime
     bklmDigit = m_bklmDigits.appendNew(moduleId, raw.ctime, raw.tdc, raw.charge);
     bklmDigit->setTime(
-      m_TimeConversion->getTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
+      m_TimeConversion->getScintillatorTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
     if (raw.charge < m_scintThreshold)
       bklmDigit->isAboveThreshold(true);
   }

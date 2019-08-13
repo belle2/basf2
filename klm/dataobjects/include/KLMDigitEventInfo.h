@@ -34,6 +34,7 @@ namespace Belle2 {
       m_nRPCHits(0),
       m_nSciHits(0),
       m_nOutOfRangeHits(0),
+      m_Revo9TriggerWord(0),
       m_UserWord(0)
     {
     };
@@ -51,6 +52,7 @@ namespace Belle2 {
       m_nRPCHits(0),
       m_nSciHits(0),
       m_nOutOfRangeHits(0),
+      m_Revo9TriggerWord(0),
       m_UserWord(0)
     {
     }
@@ -220,8 +222,26 @@ namespace Belle2 {
     }
 
     /**
-     * Get user word (from data concentrators).
-     * @return User word.
+     * Get revo9 trigger word (from DCs).
+     * @return Revo9 trigger word (from DCs).
+     */
+    unsigned int getRevo9TriggerWord() const
+    {
+      return m_Revo9TriggerWord;
+    }
+
+    /**
+     * Set Revo9 trigger word (from DCs).
+     * @param[in] revo9TriggerWord Revo9 trigger word (from DCs).
+     */
+    void setRevo9TriggerWord(unsigned int revo9TriggerWord)
+    {
+      m_Revo9TriggerWord = revo9TriggerWord;
+    }
+
+    /**
+     * Get user word (from DCs).
+     * @return User word (from DCs).
      */
     unsigned int getUserWord() const
     {
@@ -260,11 +280,14 @@ namespace Belle2 {
     /** Out-of-range hits (skipped hits with layer > 14 for BKLM). */
     int m_nOutOfRangeHits;
 
+    /** Revo9 trigger word (from DCs). */
+    unsigned int m_Revo9TriggerWord;
+
     /** User word (from DCs) */
     unsigned int m_UserWord;
 
     /** Class version. */
-    ClassDef(KLMDigitEventInfo, 4);
+    ClassDef(KLMDigitEventInfo, 5);
 
   };
 

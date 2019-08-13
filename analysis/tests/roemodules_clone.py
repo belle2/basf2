@@ -10,10 +10,10 @@ wherever the validation-data are visible  (it's also a bit slower).
 import b2test_utils
 from basf2 import set_random_seed, create_path, process
 
+inputFile = b2test_utils.require_file('mdst12.root', 'validation')
 # make logging more reproducible by replacing some strings
 b2test_utils.configure_logging_for_tests()
 set_random_seed("1337")
-inputFile = b2test_utils.require_file('mdst12.root', 'validation')
 fsps = ['K-', 'pi-', 'gamma', 'K_L0']
 
 ###############################################################################

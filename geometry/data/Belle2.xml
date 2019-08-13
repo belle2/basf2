@@ -57,7 +57,7 @@
   <!-- Subdedectors -->
   <xi:include href="../structure/COIL.xml"/>
   <xi:include href="../structure/STR.xml"/>
-  <xi:include href="../structure/ServiceGaps.xml"/> 
+  <xi:include href="../structure/ServiceGaps.xml"/>
   <xi:include href="../ir/BeamPipe.xml"/>
   <xi:include href="../ir/Cryostat.xml"/>
   <xi:include href="../ir/FarBeamLine.xml"/>
@@ -108,6 +108,16 @@
   </DetectorComponent>
   <DetectorComponent name="ServiceGapsMaterial-phase2" isDefault="false">
     <xi:include href="../structure/ServiceGaps-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+
+  <!-- early phase 3 Service Gaps -->
+  <DetectorComponent name="ServiceGapsMaterial-earlyPhase3" isDefault="false">
+    <xi:include href="../structure/ServiceGaps-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+
+  <!-- early phase 3 PXD -->
+  <DetectorComponent name="PXD-earlyPhase3" isDefault="false">
+    <xi:include href="../pxd/PXD-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
 
   <!-- VXD Tracking and MUID muon identification -->

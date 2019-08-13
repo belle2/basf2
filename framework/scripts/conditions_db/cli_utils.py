@@ -17,6 +17,7 @@ class ItemFilter:
     This class defines -f,--filter/-e,--exclude/-r/--regex parameters which will
     be added to a :class:`argparse.ArgumentParser` when calling `add_arguments`.
     """
+
     def __init__(self, args):
         """initilization, just remember the arguments or parser"""
         #: arguments, either :class:`argparse.ArgumentParser` on initialization
@@ -105,6 +106,7 @@ class ItemFilter:
 class PayloadInformation:
     """Small container class to help compare payload information for efficient
     comparison between global tags"""
+
     def __init__(self, payload, iov):
         """Set all internal members from the json information of the payload and the iov.
 

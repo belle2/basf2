@@ -51,20 +51,6 @@ namespace Belle2 {
     double eclClusterDeltaL(const Particle* particle);
 
     /**
-     * [Legacy] Returns true if the cluster with given attributes passes the Belle 'good gamma' criteria.
-     */
-    bool isGoodBelleGamma(int region, double energy);
-
-    /**
-     * [Legacy]
-     * Return 1 if ECLCluster passes the following selection criteria:
-     * Forward  : E > 100 MeV
-     * Barrel   : E >  50 MeV
-     * Backward : E > 150 MeV
-     */
-    double goodBelleGamma(const Particle* particle);
-
-    /**
      * return ECL cluster's Error on Energy
      */
     double eclClusterErrorE(const Particle* particle);

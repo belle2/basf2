@@ -64,6 +64,11 @@ namespace Belle2 {
     double isSignalAcceptMissingMassive(const Particle* part);
 
     /**
+     * return 1 if Particle is correctly reconstructed (SIGNAL including missing gamma), 0 otherwise
+     */
+    double isSignalAcceptMissingGamma(const Particle* part);
+
+    /**
      * return 1 if Particle is correctly reconstructed (SIGNAL including missing all particles), 0 otherwise
      */
     double isSignalAcceptMissing(const Particle* part);
@@ -93,6 +98,16 @@ namespace Belle2 {
      * can occur if the wrong charge is assigned). 0 all other cases
      */
     double isMisidentified(const Particle* particle);
+
+    /**
+     * Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.
+     */
+    double genNthMotherPDG(const Particle* part, const std::vector<double>& daughterIDs);
+
+    /**
+     * Check the array index of a particle n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.
+     */
+    double genNthMotherIndex(const Particle* part, const std::vector<double>& daughterIDs);
 
     /**
      * check the PDG code of a particles MC mother
@@ -272,5 +287,14 @@ namespace Belle2 {
      * correspont to the track's mcmatch (== the particle)
      */
     double particleClusterBestMCPDGCode(const Particle*);
+
+
+    /**
+     * returns True if the environment is MC and False for data
+     */
+    double isMC(const Particle*);
+
+
   }
 }
+

@@ -481,13 +481,19 @@ def create_mctruth_aliases(list_of_variables, prefix="mc"):
 def add_collection(list_of_variables, collection_name):
     """
     The function creates variable collection from the given list of variables
+    It wraps the `VariableManager.addCollection` method which is not particularly user-friendly.
 
-    Note: This is kept for compatibility.
+    Example:
+
+        Defining the collection
+        >>> variables.utils.add_collection(['p','E'], "my_collection")
+
+        Passing it as an argument to variablesToNtuple
+        >>> modularAnalysis.variablesToNtuple(variables=['my_collection'], ...)
 
     Parameters:
         list_of_variables (list(str)): list of variable names
         collection_name (str): name of the collection
-
 
     Returns:
         str: name of the variable collection

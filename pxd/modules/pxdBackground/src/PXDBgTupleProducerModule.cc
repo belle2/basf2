@@ -47,6 +47,7 @@ REG_MODULE(PXDBgTupleProducer)
 //-----------------------------------------------------------------
 
 PXDBgTupleProducerModule::PXDBgTupleProducerModule() : Module()
+  , m_nPXDSensors(0), m_hasPXDData(false)
 {
   //Set module properties
   setDescription("PXD background tuple producer module");

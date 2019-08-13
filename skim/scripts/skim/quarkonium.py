@@ -21,13 +21,28 @@ def EtabList(path):
     selection criteria are listed below
     (1) 2 std photon with E > 3.5 GeV
     (2) 7 < M(eta_b) < 10 GeV/c^2
-    (3) R2 < 0.995
+    (3) foxWolframR2 < 0.995
     """
     __author__ = "Stefano Spataro & Sen Jia"
 
     # create and fill hard photon
+    fillParticleList(decayString='pi+:eventShapeForSkims', cut='pt > 0.1', path=path)
+    fillParticleList(decayString='gamma:eventShapeForSkims', cut='E > 0.1', path=path)
+
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
+                    allMoments=False,
+                    foxWolfram=True,
+                    harmonicMoments=False,
+                    cleoCones=False,
+                    thrust=False,
+                    collisionAxis=False,
+                    jets=False,
+                    sphericity=False,
+                    checkForDuplicates=False,
+                    path=path)
+
     cutAndCopyList('gamma:hard', 'gamma:loose', 'E>3.5', path=path)
-    applyCuts('gamma:hard', 'R2EventLevel < 0.995', path=path)
+    applyCuts('gamma:hard', 'foxWolframR2 < 0.995', path=path)
 
     # the requirement of 7 < M(eta_b) < 10 GeV/c2
     Etabcuts = 'M > 7 and M < 10'
@@ -56,7 +71,7 @@ def UpsilonList(path):
     (1) 2 tracks with momentum ranging between 3.5 < p < 15,
     (2) At least 1 track p < 1.5 or 1 std photon with E > 150 MeV
     (3) M(Y(1S,2S)) > 8 GeV/c^2
-    (4) R2 < 0.995
+    (4) foxWolframR2 < 0.995
     """
     __author__ = "Stefano Spataro & Sen Jia"
 
@@ -72,8 +87,23 @@ def UpsilonList(path):
     reconstructDecay('Upsilon:mumu -> mu+:loose mu-:loose', 'M > 8', path=path)
     copyLists('Upsilon:all', ['Upsilon:ee', 'Upsilon:mumu'], path=path)
 
-    # require R2 < 0.995
-    applyCuts('Upsilon:all', 'R2EventLevel < 0.995', path=path)
+    # require foxWolframR2 < 0.995
+    fillParticleList(decayString='pi+:eventShapeForSkims', cut='pt > 0.1', path=path)
+    fillParticleList(decayString='gamma:eventShapeForSkims', cut='E > 0.1', path=path)
+
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
+                    allMoments=False,
+                    foxWolfram=True,
+                    harmonicMoments=False,
+                    cleoCones=False,
+                    thrust=False,
+                    collisionAxis=False,
+                    jets=False,
+                    sphericity=False,
+                    checkForDuplicates=False,
+                    path=path)
+
+    applyCuts('Upsilon:all', 'foxWolframR2 < 0.995', path=path)
 
     # Y(1S,2S) with pi+ or photon are reconstructed
     Upsilon_Channels = ['Upsilon:all pi+:loose',

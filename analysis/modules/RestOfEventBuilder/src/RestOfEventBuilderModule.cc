@@ -102,7 +102,7 @@ void RestOfEventBuilderModule::createNestedROE()
       return;
     }
     // create nested RestOfEvent object:
-    RestOfEvent* nestedROE = nestedROEArray.appendNew(true);
+    RestOfEvent* nestedROE = nestedROEArray.appendNew(particle->getPDGCode(), true);
     // create relation: Particle <-> RestOfEvent
     particle->addRelationTo(nestedROE);
     // create relation: host ROE <-> nested ROE
@@ -142,7 +142,7 @@ void RestOfEventBuilderModule::createROE()
       return;
 
     // create RestOfEvent object
-    RestOfEvent* roe = roeArray.appendNew();
+    RestOfEvent* roe = roeArray.appendNew(particle->getPDGCode());
 
     // create relation: Particle <-> RestOfEvent
     particle->addRelationTo(roe);

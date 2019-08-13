@@ -1341,8 +1341,6 @@ def execute(tag=None, is_test=None):
         # Now we process the command line arguments.
         # First of all, we read them in:
         cmd_arguments = parse_cmd_line_arguments(
-            tag=tag,
-            is_test=is_test,
             modes=Validation.get_available_job_control_names()
         )
 

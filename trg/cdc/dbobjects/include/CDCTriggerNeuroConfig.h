@@ -150,7 +150,7 @@ namespace Belle2 {
 
     /** switch wether the ETF is used or the first priority time of the
      * TSF is  used during preprocessing**/
-    bool m_useETF = true;
+    bool m_useETF = false;
 
     // short field for notes
     std::string m_PPNotes;

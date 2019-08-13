@@ -8,14 +8,14 @@ from basf2 import *
 from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
+from modularAnalysis import variablesToNtuple
 from modularAnalysis import fillParticleList
 from modularAnalysis import fillConvertedPhotonsList
 from modularAnalysis import loadGearbox
 from modularAnalysis import vertexKFit
 from modularAnalysis import vertexRave
 from modularAnalysis import printVariableValues
+from variables.utils import create_aliases_for_selected
 from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase
 from b2biiMonitors import addBeamParamsConversionMonitors
 from b2biiMonitors import addTrackConversionMonitors
@@ -104,42 +104,21 @@ printVariableValues('K_S0:mdst', ['mcPDG', 'M', 'InvM', 'p', 'px', 'py', 'pz',
 # matchMCTruth('B+:D0pi')
 
 # create and fill flat Ntuple with MCTruth and kinematic information
-toolsK0 = ['EventMetaData', '^K_S0']
-toolsK0 += ['Kinematics', '^K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['MomentumUncertainty', '^K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['InvMass', '^K_S0']
-toolsK0 += ['Vertex', '^K_S0']
-toolsK0 += ['MCVertex', '^K_S0']
-# toolsK0 += ['PID', 'K_S0 -> ^pi+ ^pi-']
-# toolsK0 += ['Track', 'K_S0 -> ^pi+ ^pi-']
-# toolsK0 += ['TrackHits', 'K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['MCTruth', '^K_S0 -> ^pi+ ^pi-']
-toolsK0 += [
-    'CustomFloats[dr:dz:isSignal:chiProb:extraInfo(goodKs):extraInfo(ksnbVLike):extraInfo(ksnbNoLam):extraInfo(ksnbStandard)]',
-    '^K_S0']
+kinematics = ['p', 'E']
+truth = ['isSignal', 'mcPDG']
+kinematics_and_truth = kinematics + truth
 
-toolsB = ['EventMetaData', '^B+']
-toolsB += ['InvMass', '^B+ -> ^anti-D0 pi+']
-toolsB += ['InvMass[BeforeFit]', '^B+ -> [anti-D0 -> K- pi+ ^pi0] pi+']
-toolsB += ['DeltaEMbc', '^B+']
-toolsB += ['Cluster', 'B+ -> [anti-D0 -> K- pi+ [pi0 -> ^gamma ^gamma]] pi+']
-toolsB += ['MCTruth', '^B+ -> ^anti-D0 pi+']
-toolsB += ['CustomFloats[isSignal]', '^B+ -> ^anti-D0 pi+']
-toolsB += ['CustomFloats[kIDBelle]', 'B+ -> [anti-D0 -> ^K- ^pi+ pi0] ^pi+']
+variables = create_aliases_for_selected(
+    kinematics_and_truth, '^K_S0 -> ^pi+ ^pi-')
 
-toolsTrackPI = ['EventMetaData', 'pi+']
-toolsTrackPI += ['Kinematics', '^pi+']
-toolsTrackPI += ['Track', '^pi+']
-# toolsTrackPI += ['PID', '^pi+']
-toolsTrackPI += ['MCTruth', '^pi+']
-toolsTrackPI += ['MCKinematics', '^pi+']
-toolsTrackPI += ['ErrMatrix', '^pi+']
-toolsTrackPI += ['CustomFloats[eIDBelle:muIDBelleQuality:muIDBelle:atcPIDBelle(3,2):atcPIDBelle(4,2):atcPIDBelle(4,3)]', '^pi+']
+belle1pid = [
+    'eIDBelle', 'muIDBelleQuality', 'muIDBelle',
+    'atcPIDBelle(3,2)', 'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)']
+variables += create_aliases_for_selected(
+    belle1pid, 'K_S0 -> ^pi+ ^pi-')
 
-ntupleFile(outputBelle2ROOTFile, path=mypath)
-# ntupleTree('bp', 'B+:D0pi', toolsB)
-ntupleTree('kshort', 'K_S0:mdst', toolsK0, path=mypath)
-# ntupleTree('pion', 'pi+:all', toolsTrackPI)
+variablesToNtuple('K_S0:mdst', variables,
+                  filename=outputBelle2ROOTFile, path=mypath)
 
 # progress
 progress = register_module('Progress')

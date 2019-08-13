@@ -4,6 +4,55 @@ Changes in the analysis package
 Variables
 +++++++++
 
+* Added a variable that returns the distance between a KLMCluster and its associated Track :b2:var:`klmClusterTrackDistance`
+
 * Access to tag vertexing quality indicators for resolution function study, :b2:var:`TagVNDF`, :b2:var:`TagVChi2`, and :b2:var:`TagVChi2IP`.
 
 * Statistically correct combination of p-values :b2:var:`pValueCombination`
+
+* chi2 and ndf from KFit vertices stored as extraInfo
+
+* Added :b2:var:`trackFitHypothesisPDG` which returns the PDG code of the successfull track fit hypothesis 
+  that was used to create this particle (that might be different from the PDG code of the particle list)
+
+* Added variables for 2D Armenteros-Podolanski plot, :b2:var:`ArmenterosLongitudinalMomentumAsymmetry`, 
+  :b2:var:`ArmenterosDaughter1Qt`, and :b2:var:`ArmenterosDaughter2Qt`
+* fall-back value changed from zero to NaN for several track variables
+* Added :b2:var:`sourceObjectIsInList` which checks whether there are particles from the same underlying track or cluster in a given particle list. 
+  Similar to :b2:var:`isInList` but a tighter check.
+
+Modules
++++++++
+
+* Added the new module AllParticleCombiner which is also available via the
+  function `modularAnalysis.combineAllParticles`. It creates a new Particle as
+  the combination of all unique Particles from the passed input ParticleLists.
+
+* ParticleLoader can load :doc:`RestOfEvent` as a particle
+  using a new function `modularAnalysis.fillParticleListFromROE`.
+  This ROE particle can be combined with any other particle or written down
+  using usual variables.
+  Another option is to load missing momentum as a particle by supplementing
+  ``useMissing = True`` argument to the function, mentioned above.
+
+Modular Analysis
+++++++++++++++++
+
+* A new boolean argument has been added to the function
+  `modularAnalysis.buildRestOfEvent`. It is called `belle_sources` and should be
+  switched to True (default is False) if you are analyzing converted Belle MC or
+  data. It triggers the ROE to be constructed from all tracks and from Belle's
+  specific gamma:mdst list.
+
+* Added signal region function `modularAnalysis.signalRegion`. By default,
+  this function enables a new variable ``isSignalRegion`` and excludes the
+  defined area when processing is done on data.
+
+Vertex Fitting
+++++++++++++++
+
+* The parameter confidenceLevel of the module ParticleVertexFitter now always
+  rejects the particle candidates with a p-value lower than the specified one.
+  Specifically, setting confidenceLevel to 0 does not reject candidates with
+  p-value equal to 0 anymore. Thus, the meaning of this parameter is now
+  the same as for the module TreeFitter.

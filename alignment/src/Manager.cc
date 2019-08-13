@@ -42,7 +42,7 @@ namespace Belle2 {
       // Reset time intervals and add pre-defined times where
       // constants can change (in addition of what is already in DB)
       m_dbTimeSlicing = timeSlices;
-      //sortUniqueVector(m_dbTimeSlicing);
+      sortUniqueVector(m_dbTimeSlicing);
 
       GlobalLabel label;
       m_iniTimeTable = alignment::timeline::makeInitialTimeTable(m_dbTimeSlicing, label);

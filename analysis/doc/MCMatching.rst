@@ -257,5 +257,5 @@ MC mode       Decay channel                                    MC mode       Dec
 ---------------
 Photon matching
 ---------------
-Detalis of photon matching efficiency can be found `in this talk <https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf>`_. If you want to `contribute <https://agira.desy.de/browse/BII-5306>`_ to the Belle II Software, please feel free to move material from the talk to this section.
+Detalis of photon matching efficiency can be found `in this talk <https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf>`_. If you want to `contribute <https://agira.desy.de/browse/BII-5316>`_ to the Belle II Software, please feel free to move material from the talk to this section.
 

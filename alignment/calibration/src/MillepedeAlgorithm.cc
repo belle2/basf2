@@ -179,7 +179,8 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 
     auto objects = timeline.releaseObjects();
     for (auto iov_obj : objects) {
-      saveCalibration(iov_obj.second, DataStore::objectName(iov_obj.second->IsA(), ""), iov_obj.first.overlap(getIovFromAllData()));
+      if (iov_obj.second)
+        saveCalibration(iov_obj.second, DataStore::objectName(iov_obj.second->IsA(), ""), iov_obj.first.overlap(getIovFromAllData()));
     }
 
   }

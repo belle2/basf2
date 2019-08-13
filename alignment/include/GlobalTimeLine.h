@@ -133,6 +133,8 @@ namespace Belle2 {
       ///
       /// @return vector of EventMetaData with the finest granularity inferred from the parameter configuration
       ///
+      /// WARNING: The function expects event metadata tuple in form (event, run, exp) while the implementation internally
+      /// reverses this for proper sorting of event metadata in sets!
       std::vector<EventMetaData> setupTimedepGlobalLabels(
         std::vector< std::tuple< std::vector< int >, std::vector< std::tuple< int, int, int > > > >& config);
 

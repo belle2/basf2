@@ -193,6 +193,13 @@ namespace Belle2 {
 
       int getContinuousIndexByTimeID(const TimeTable& timeTable, int uid, int timeid)
       {
+        if (timeid <= 0)
+          return 0;
+        if (std::get<TableData>(timeTable).find(uid) == std::get<TableData>(timeTable).end())
+          return 0;
+        if (timeid >= int(std::get<TableData>(timeTable).at(uid).size()))
+          return std::get<TableData>(timeTable).at(uid).size() - 1;
+
         auto cIndex = std::get<TableData>(timeTable).at(uid)[timeid];
         return cIndex;
       }
@@ -295,15 +302,19 @@ namespace Belle2 {
 
           for (auto& param : std::get<0>(params_events))
             std::get<0>(myRow).insert(param);
-          for (auto& event : std::get<1>(params_events))
-            std::get<1>(myRow).insert(event);
+          for (auto& event : std::get<1>(params_events)) {
+            // WARNING: The function expect event metadata tuple in form (event, run, exp) while the implementation internally
+            // reverses this for proper sorting of event metadata in sets!
+            std::get<1>(myRow).insert(std::make_tuple(std::get<2>(event), std::get<1>(event), std::get<0>(event)));
+          }
 
           for (auto& event : std::get<1>(params_events)) {
             int eventNum = std::get<0>(event);
             int runNum = std::get<1>(event);
             int expNum = std::get<2>(event);
 
-            auto emd = std::make_tuple(eventNum, runNum, expNum);
+            // WARNING: here we also need reversed order for the set to be sorted in ascending order
+            auto emd = std::make_tuple(expNum, runNum, eventNum);
             events.insert(emd);
 
 
@@ -312,8 +323,8 @@ namespace Belle2 {
               //NOTE: this is the main invariant we need to keep - if something can change inside run, it is expected
               // it did change since last run and will change for next run, too... (i.e. if there is an event depencency,
               // the IoV of the payload has to span only single run)
-              auto firstEventThisRun = std::make_tuple(0, runNum, expNum);
-              auto firstEventNextRun = std::make_tuple(0, runNum + 1, expNum);
+              auto firstEventThisRun = std::make_tuple(expNum, runNum, 0);
+              auto firstEventNextRun = std::make_tuple(expNum, runNum + 1, 0);
 
               events.insert(firstEventThisRun);
               events.insert(firstEventNextRun);
@@ -330,18 +341,22 @@ namespace Belle2 {
 
 
         for (auto& event : events) {
-          eventsVect.push_back(EventMetaData(std::get<0>(event), std::get<1>(event), std::get<2>(event)));
-          eventIndices[event] = eventsVect.size() - 1;
+          // WARNING: here we reverse order of exp,run,event back to "normal"
+          eventIndices[event] = eventsVect.size();
+          eventsVect.push_back(EventMetaData(std::get<2>(event), std::get<1>(event), std::get<0>(event)));
         }
 
         GlobalLabel::clearTimeDependentParamaters();
 
         for (auto& params_events : myConfig) {
           for (auto& param : std::get<0>(params_events)) {
+            GlobalLabel label(param);
+
             for (auto& event : std::get<1>(params_events)) {
-              GlobalLabel label(param);
               auto eventIndex = eventIndices[event];
-              label.registerTimeDependent(eventIndex);
+              if (eventIndex > 0)
+                label.registerTimeDependent(eventIndex);
+
             }
           }
         }

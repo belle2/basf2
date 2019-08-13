@@ -27,6 +27,8 @@
 #include <string>
 #include <boost/filesystem.hpp>
 
+#include <framework/database/Configuration.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace alignment;
@@ -59,58 +61,58 @@ namespace {
   protected:
 
     IntraIoVPayloads beamspotRun0 = {
-      {EventMetaData(0, 0, 7), std::make_shared<GlobalParamSet<BeamParameters>>()}
+      {EventMetaData(0, 0, 1003), std::make_shared<GlobalParamSet<BeamSpot>>()}
     };
 
     IntraIoVPayloads beamspotRun1 = {
-      {EventMetaData(0, 1, 7), std::make_shared<GlobalParamSet<BeamParameters>>()}
+      {EventMetaData(0, 1, 1003), std::make_shared<GlobalParamSet<BeamSpot>>()}
     };
 
     IntraIoVPayloads beamspotRun2 = {
-      {EventMetaData(0, 2, 7), std::make_shared<GlobalParamSet<BeamParameters>>()},
-      {EventMetaData(530532, 2, 7), std::make_shared<GlobalParamSet<BeamParameters>>()}
+      {EventMetaData(0, 2, 1003), std::make_shared<GlobalParamSet<BeamSpot>>()},
+      {EventMetaData(530532, 2, 1003), std::make_shared<GlobalParamSet<BeamSpot>>()}
     };
 
     IntraIoVPayloads beamspotRun3 = {
-      {EventMetaData(0, 3, 7), std::make_shared<GlobalParamSet<BeamParameters>>()}
+      {EventMetaData(0, 3, 1003), std::make_shared<GlobalParamSet<BeamSpot>>()}
     };
 
     IntraIoVPayloads beamspotRun4 = {
-      {EventMetaData(0, 4, 7), std::make_shared<GlobalParamSet<BeamParameters>>()}
+      {EventMetaData(0, 4, 1003), std::make_shared<GlobalParamSet<BeamSpot>>()}
     };
 
     PayloadIovBlockRow beamspotRow = {
-      {IntervalOfValidity(7, 0, 7, 0), beamspotRun0},
-      {IntervalOfValidity(7, 1, 7, 1), beamspotRun1},
-      {IntervalOfValidity(7, 2, 7, 2), beamspotRun2},
-      {IntervalOfValidity(7, 3, 7, 3), beamspotRun3},
-      {IntervalOfValidity(7, 4, 7, 4), beamspotRun4}
+      {IntervalOfValidity(1003, 0, 1003, 0), beamspotRun0},
+      {IntervalOfValidity(1003, 1, 1003, 1), beamspotRun1},
+      {IntervalOfValidity(1003, 2, 1003, 2), beamspotRun2},
+      {IntervalOfValidity(1003, 3, 1003, 3), beamspotRun3},
+      {IntervalOfValidity(1003, 4, 1003, 4), beamspotRun4}
     };
 
     IntraIoVPayloads vxdRun0to2 = {
-      {EventMetaData(0, 0, 7), std::make_shared<GlobalParamSet<VXDAlignment>>()},
+      {EventMetaData(0, 0, 1003), std::make_shared<GlobalParamSet<VXDAlignment>>()},
     };
 
     IntraIoVPayloads vxdRun3toInf = {
-      {EventMetaData(0, 3, 7), std::make_shared<GlobalParamSet<VXDAlignment>>()},
+      {EventMetaData(0, 3, 1003), std::make_shared<GlobalParamSet<VXDAlignment>>()},
     };
 
     PayloadIovBlockRow vxdRow = {
-      {IntervalOfValidity(7, 0, 7, 2), vxdRun0to2},
-      {IntervalOfValidity(7, 3, 7, 4), vxdRun3toInf}
+      {IntervalOfValidity(1003, 0, 1003, 2), vxdRun0to2},
+      {IntervalOfValidity(1003, 3, 1003, 4), vxdRun3toInf}
 
     };
 
     IntraIoVPayloads cdcBlock = {
-      {EventMetaData(0, 0, 7), std::make_shared<GlobalParamSet<CDCAlignment>>()}
+      {EventMetaData(0, 0, 1003), std::make_shared<GlobalParamSet<CDCAlignment>>()}
 
     };
     PayloadIovBlockRow cdcRow = {
-      {IntervalOfValidity(7, 0, 7, 4), cdcBlock}
+      {IntervalOfValidity(1003, 0, 1003, 4), cdcBlock}
     };
 
     PayloadsTable payloadsTable = {
-      {BeamParameters::getGlobalUniqueID(), beamspotRow},
+      {BeamSpot::getGlobalUniqueID(), beamspotRow},
       {VXDAlignment::getGlobalUniqueID(), vxdRow},
       {CDCAlignment::getGlobalUniqueID(), cdcRow}
     };
@@ -122,21 +124,21 @@ namespace {
     std::vector<int> row2  = {0, 0, 0, 0, 0, 0};
 
     EventHeader eventHeader = {
-      EventMetaData(0, 0, 7),
-      EventMetaData(0, 1, 7),
-      EventMetaData(0, 2, 7),
-      EventMetaData(530532, 2, 7),
-      EventMetaData(0, 3, 7),
-      EventMetaData(0, 4, 7)
+      EventMetaData(0, 0, 1003),
+      EventMetaData(0, 1, 1003),
+      EventMetaData(0, 2, 1003),
+      EventMetaData(530532, 2, 1003),
+      EventMetaData(0, 3, 1003),
+      EventMetaData(0, 4, 1003)
     };
 
     RunHeader runHeader = {
-      {7, 0},
-      {7, 1},
-      {7, 2},
-      {7, 2},
-      {7, 3},
-      {7, 4}
+      {1003, 0},
+      {1003, 1},
+      {1003, 2},
+      {1003, 2},
+      {1003, 3},
+      {1003, 4}
     };
 
     TableData tableData = {
@@ -162,15 +164,18 @@ namespace {
     /// init
     virtual void SetUp()
     {
-      DatabaseChain::createInstance();
-      ConditionsDatabase::createDefaultInstance("data_reprocessing_proc9");
-      LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+      //DatabaseChain::createInstance();
+      ConditionsDatabase::createDefaultInstance("master_2019-07-22");
+      //LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+
+      auto& c = Conditions::Configuration::getInstance();
+      c.setNewPayloadLocation("testPayloads/TestDatabase.txt");
 
       GlobalLabel::setCurrentTimeInterval(0);
       GlobalLabel::clearTimeDependentParamaters();
 
-      auto beamspotX = GlobalLabel::construct<BeamParameters>(0, 1);
-      auto beamspotZ = GlobalLabel::construct<BeamParameters>(0, 3);
+      auto beamspotX = GlobalLabel::construct<BeamSpot>(0, 1);
+      auto beamspotZ = GlobalLabel::construct<BeamSpot>(0, 3);
       auto yingZ = GlobalLabel::construct<VXDAlignment>(VxdID(1, 0, 0, 1).getID(), 3);
 
       yingZ.registerTimeDependent(4);
@@ -198,7 +203,7 @@ namespace {
 
       boost::filesystem::remove_all("testPayloads");
       Database::reset();
-      DataStore::Instance().reset();
+      //DataStore::Instance().reset();
     }
 
   };
@@ -244,17 +249,17 @@ namespace {
     EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 1, 3).second->getGlobalParam(0, 1), 42.);
 
 
-    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 1, 0).first, EventMetaData(0, 0, 7));
-    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 1, 1).first, EventMetaData(0, 1, 7));
-    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 1, 2).first, EventMetaData(0, 2, 7));
-    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 1, 3).first, EventMetaData(530532, 2, 7));
-    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 1, 4).first, EventMetaData(0, 3, 7));
-    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 1, 5).first, EventMetaData(0, 4, 7));
+    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 1, 0).first, EventMetaData(0, 0, 1003));
+    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 1, 1).first, EventMetaData(0, 1, 1003));
+    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 1, 2).first, EventMetaData(0, 2, 1003));
+    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 1, 3).first, EventMetaData(530532, 2, 1003));
+    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 1, 4).first, EventMetaData(0, 3, 1003));
+    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 1, 5).first, EventMetaData(0, 4, 1003));
 
-    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 10, 0).first, EventMetaData(0, 0, 7));
-    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 10, 1).first, EventMetaData(0, 3, 7));
+    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 10, 0).first, EventMetaData(0, 0, 1003));
+    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 10, 1).first, EventMetaData(0, 3, 1003));
 
-    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 27, 0).first, EventMetaData(0, 0, 7));
+    EXPECT_EQ(getPayloadByContinuousIndex(payloadsTable, 27, 0).first, EventMetaData(0, 0, 1003));
 
 
   }
@@ -262,7 +267,7 @@ namespace {
   /// Test creation of the payloads table from finalized timetable
   TEST_F(TimeLineTest, TimeTable2PayloadsTable)
   {
-    GlobalParamVector vector({"BeamParameters", "VXDAlignment", "CDCAlignment"});
+    GlobalParamVector vector({"BeamSpot", "VXDAlignment", "CDCAlignment"});
     GlobalCalibrationManager::initGlobalVector(vector);
 
     int timeid = 0;
@@ -272,100 +277,100 @@ namespace {
     timeid = 0;
     ev = gotoNextChangeInRun(timeTable, 10, timeid);
     EXPECT_EQ(timeid, 0);
-    EXPECT_EQ(ev, EventMetaData(0, 0, 7));
+    EXPECT_EQ(ev, EventMetaData(0, 0, 1003));
 
     timeid = 1;
     ev = gotoNextChangeInRun(timeTable, 10, timeid);
     EXPECT_EQ(timeid, 1);
-    EXPECT_EQ(ev, EventMetaData(0, 1, 7));
+    EXPECT_EQ(ev, EventMetaData(0, 1, 1003));
 
     timeid = 4;
     ev = gotoNextChangeInRun(timeTable, 10, timeid);
     EXPECT_EQ(timeid, 4);
-    EXPECT_EQ(ev, EventMetaData(0, 3, 7));
+    EXPECT_EQ(ev, EventMetaData(0, 3, 1003));
 
     timeid = 5;
     ev = gotoNextChangeInRun(timeTable, 10, timeid);
     EXPECT_EQ(timeid, 5);
-    EXPECT_EQ(ev, EventMetaData(0, 4, 7));
+    EXPECT_EQ(ev, EventMetaData(0, 4, 1003));
 
     // beam
     timeid = 0;
     ev = gotoNextChangeInRun(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 0);
-    EXPECT_EQ(ev, EventMetaData(0, 0, 7));
+    EXPECT_EQ(ev, EventMetaData(0, 0, 1003));
 
     timeid = 1;
     ev = gotoNextChangeInRun(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 1);
-    EXPECT_EQ(ev, EventMetaData(0, 1, 7));
+    EXPECT_EQ(ev, EventMetaData(0, 1, 1003));
 
     timeid = 2;
     ev = gotoNextChangeInRun(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 3);
-    EXPECT_EQ(ev, EventMetaData(530532, 2, 7));
+    EXPECT_EQ(ev, EventMetaData(530532, 2, 1003));
 
     timeid = 3;
     ev = gotoNextChangeInRun(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 3);
-    EXPECT_EQ(ev, EventMetaData(530532, 2, 7));
+    EXPECT_EQ(ev, EventMetaData(530532, 2, 1003));
 
     timeid = 4;
     ev = gotoNextChangeInRun(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 4);
-    EXPECT_EQ(ev, EventMetaData(0, 3, 7));
+    EXPECT_EQ(ev, EventMetaData(0, 3, 1003));
 
     timeid = 5;
     ev = gotoNextChangeInRun(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 5);
-    EXPECT_EQ(ev, EventMetaData(0, 4, 7));
+    EXPECT_EQ(ev, EventMetaData(0, 4, 1003));
 
 
 
     timeid = 0;
     ev = gotoNextChangeRunWise(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 0);
-    EXPECT_EQ(ev, EventMetaData(0, 0, 7));
+    EXPECT_EQ(ev, EventMetaData(0, 0, 1003));
 
     timeid = 1;
     ev = gotoNextChangeRunWise(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 1);
-    EXPECT_EQ(ev, EventMetaData(0, 1, 7));
+    EXPECT_EQ(ev, EventMetaData(0, 1, 1003));
 
     timeid = 2;
     ev = gotoNextChangeRunWise(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 3);
-    EXPECT_EQ(ev, EventMetaData(530532, 2, 7));
+    EXPECT_EQ(ev, EventMetaData(530532, 2, 1003));
 
     timeid = 3;
     ev = gotoNextChangeRunWise(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 3);
-    EXPECT_EQ(ev, EventMetaData(530532, 2, 7));
+    EXPECT_EQ(ev, EventMetaData(530532, 2, 1003));
 
     timeid = 4;
     ev = gotoNextChangeRunWise(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 4);
-    EXPECT_EQ(ev, EventMetaData(0, 3, 7));
+    EXPECT_EQ(ev, EventMetaData(0, 3, 1003));
 
     timeid = 5;
     ev = gotoNextChangeRunWise(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 5);
-    EXPECT_EQ(ev, EventMetaData(0, 4, 7));
+    EXPECT_EQ(ev, EventMetaData(0, 4, 1003));
 
 
 
     timeid = 0;
     ev = gotoNextChangeRunWise(timeTable, 10, timeid);
     EXPECT_EQ(timeid, 3);
-    EXPECT_EQ(ev, EventMetaData(530532, 2, 7));
+    EXPECT_EQ(ev, EventMetaData(530532, 2, 1003));
     ev = gotoNextChangeRunWise(timeTable, 10, timeid);
     EXPECT_EQ(timeid, 3);
-    EXPECT_EQ(ev, EventMetaData(530532, 2, 7));
+    EXPECT_EQ(ev, EventMetaData(530532, 2, 1003));
 
     timeid = 4;
     ev = gotoNextChangeRunWise(timeTable, 10, timeid);
     EXPECT_EQ(timeid, 5);
-    EXPECT_EQ(ev, EventMetaData(0, 4, 7));
+    EXPECT_EQ(ev, EventMetaData(0, 4, 1003));
 
 
 
@@ -412,7 +417,7 @@ namespace {
   TEST_F(TimeLineTest, GlobalParamTimeLine)
   {
 
-    GlobalParamVector vector({"BeamParameters", "VXDAlignment", "CDCAlignment"});
+    GlobalParamVector vector({"BeamSpot", "VXDAlignment", "CDCAlignment"});
     GlobalCalibrationManager::initGlobalVector(vector);
     GlobalLabel label;
     GlobalParamTimeLine timeline(eventHeader, label, vector);
@@ -420,12 +425,12 @@ namespace {
     timeline.loadFromDB();
 
     GlobalLabel::setCurrentTimeInterval(4);
-    auto beamX0 = GlobalLabel::construct<BeamParameters>(0, 1).label();
+    auto beamX0 = GlobalLabel::construct<BeamSpot>(0, 1).label();
     timeline.updateGlobalParam(GlobalLabel(beamX0), 3.);
 
     GlobalLabel::setCurrentTimeInterval(3);
-    auto beamZ = GlobalLabel::construct<BeamParameters>(0, 3).label();
-    auto beamX = GlobalLabel::construct<BeamParameters>(0, 1).label();
+    auto beamZ = GlobalLabel::construct<BeamSpot>(0, 3).label();
+    auto beamX = GlobalLabel::construct<BeamSpot>(0, 1).label();
 
     GlobalLabel::setCurrentTimeInterval(4);
     auto yingZ = GlobalLabel::construct<VXDAlignment>(VxdID(1, 0, 0, 1).getID(), 3).label();
@@ -444,24 +449,24 @@ namespace {
     TFile file("testPayloads/dbstore_EventDependency_rev_1.root");
     auto evdep = (EventDependency*) file.Get("EventDependency");
 
-    auto beam = dynamic_cast<BeamParameters*>(evdep->getObject(EventMetaData(530532, 2, 7)));
-    EXPECT_EQ(beam->getVertex()[2], 42.);
+    auto beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532, 2, 1003)));
+    EXPECT_EQ(beam->getIPPosition()[2], 42.);
 
-    beam = dynamic_cast<BeamParameters*>(evdep->getObject(EventMetaData(530532, 2, 7)));
-    EXPECT_EQ(beam->getVertex()[0], 43.);
+    beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532, 2, 1003)));
+    EXPECT_EQ(beam->getIPPosition()[0], 43.);
 
-    beam = dynamic_cast<BeamParameters*>(evdep->getObject(EventMetaData(530532 - 1, 2, 7)));
-    EXPECT_EQ(beam->getVertex()[2], 0.);
+    beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532 - 1, 2, 1003)));
+    EXPECT_EQ(beam->getIPPosition()[2], 0.);
 
-    beam = dynamic_cast<BeamParameters*>(evdep->getObject(EventMetaData(530532 - 1, 2, 7)));
-    EXPECT_EQ(beam->getVertex()[0], 0.);
+    beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532 - 1, 2, 1003)));
+    EXPECT_EQ(beam->getIPPosition()[0], 0.);
 
     file.Close();
 
-    TFile file2("testPayloads/dbstore_BeamParameters_rev_3.root");
-    auto beam2 = (BeamParameters*) file2.Get("BeamParameters");
-    beam2->getVertex().Print();
-    EXPECT_EQ(beam2->getVertex()[0], 3.);
+    TFile file2("testPayloads/dbstore_BeamSpot_rev_3.root");
+    auto beam2 = (BeamSpot*) file2.Get("BeamSpot");
+    beam2->getIPPosition().Print();
+    EXPECT_EQ(beam2->getIPPosition()[0], 3.);
 
     file2.Close();
 

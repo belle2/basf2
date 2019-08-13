@@ -210,7 +210,7 @@ if __name__ == "__main__":
 
         input_files = [generate_test_data(outfile)]
 
-    tags = [get_default_global_tags()]
+    tags = [conditions.default_globaltags]
     mp2_beamspot = PXDHalfShellsAlignment(input_files, tags)
     mp2_beamspot.max_iterations = 1
 

@@ -132,11 +132,13 @@ namespace Belle2 {
   void
   TRGGDLModule::event()
   {
+    /*
     StoreObjPtr<EventMetaData> bevt;
     unsigned _exp = bevt->getExperiment();
     unsigned _run = bevt->getRun();
     unsigned _evt = bevt->getEvent();
     std::cout << "evt(" << _evt << ") " << std::endl;
+    */
 
     TRGDebug::enterStage("TRGGDLModule event");
     //...GDL simulation...

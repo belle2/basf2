@@ -31,7 +31,7 @@
 
 #include <mdst/dataobjects/TRGSummary.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
-#include <mdst/dbobjects/TRGGDLDBAlgs.h>
+#include <trg/gdl/dbobjects/TRGGDLDBAlgs.h>
 
 #include <framework/logging/Logger.h>
 
@@ -287,8 +287,10 @@ namespace Belle2 {
   {
 //  B2INFO("TRGGDL::dataSimulation starts.");
     StoreObjPtr<EventMetaData> bevt;
+    /*
     unsigned _exp = bevt->getExperiment();
     unsigned _run = bevt->getRun();
+    */
     unsigned _evt = bevt->getEvent();
     TRGDebug::enterStage("TRGGDL dataSim");
 
@@ -361,7 +363,7 @@ namespace Belle2 {
                       << "):  ";
 
             bool a = false;
-            for (int j = 0; j < _inpBits.size(); j++) {
+            for (long unsigned int j = 0; j < _inpBits.size(); j++) {
               if (_inpBits[j]) {
                 if (a) {
                   std::cout << "," << j;

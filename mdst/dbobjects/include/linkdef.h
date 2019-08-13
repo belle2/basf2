@@ -13,7 +13,6 @@
 #pragma link C++ class Belle2::TRGGDLDBFTDLBits+;
 #pragma link C++ class Belle2::TRGGDLDBInputBits+;
 #pragma link C++ class Belle2::TRGGDLDBBadrun+;
-#pragma link C++ class Belle2::TRGGDLDBAlgs+;
 #pragma link C++ class Belle2::SoftwareTriggerCutBase+;
 #pragma link C++ class Belle2::DBRepresentationOfSoftwareTriggerCut+;
 #pragma link C++ class Belle2::SoftwareTriggerMenu+;

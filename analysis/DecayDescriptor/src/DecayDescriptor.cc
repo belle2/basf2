@@ -195,7 +195,8 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
       int iPDGCode_daughter_p = 0;
       if (const auto* part_test = dynamic_cast<const Particle*>(daughter)) iPDGCode_daughter_p = part_test->getPDGCode();
       else if (const auto* mc_test = dynamic_cast<const MCParticle*>(daughter)) iPDGCode_daughter_p = mc_test->getPDG();
-      if (iDaughter_d == 0 && m_isIgnoreRadiatedPhotons && iPDGCode_daughter_p == 22) matches_global.insert(jDaughter_p);
+      if (iDaughter_d == 0 && (m_isIgnoreRadiatedPhotons or m_isIgnoreGamma)
+          && iPDGCode_daughter_p == 22) matches_global.insert(jDaughter_p);
       int iMatchResult = m_daughters[iDaughter_d].match(daughter, jDaughter_p);
       if (iMatchResult < 0) isAmbiguities = true;
       if (abs(iMatchResult) == 2 && iCC == 1) continue;
@@ -212,7 +213,7 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
   }
 
   // Now, all daughters of the particles should be matched to at least one DecayDescriptor daughter
-  if (int(matches_global.size()) != nDaughters_p) return 0;
+  if (!(m_isIgnoreIntermediate or m_isIgnoreMassive or m_isIgnoreNeutrino) && int(matches_global.size()) != nDaughters_p) return 0;
 
   // In case that there are DecayDescriptor daughters with multiple matches, try to solve the problem
   // by removing the daughter candidates which are already used in other unambigous relations.

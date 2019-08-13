@@ -116,6 +116,34 @@ namespace Belle2 {
     static int getNStrips(int section, int sector, int layer, int plane);
 
     /**
+     * Check if section number is correct.
+     * @param[in] section    Forward (1) or backward (0) BKLM.
+     * @param[in] fatalError Issue fatal error (default) or not.
+     */
+    static bool checkSection(int section, bool fatalError = true);
+
+    /**
+     * Check if sector number is correct.
+     * @param[in] sector     Sector (1-based)
+     * @param[in] fatalError Issue fatal error (default) or not.
+     */
+    static bool checkSector(int sector, bool fatalError = true);
+
+    /**
+     * Check if layer number is correct.
+     * @param[in] layer      Layer (1-based)
+     * @param[in] fatalError Issue fatal error (default) or not.
+     */
+    static bool checkLayer(int layer, bool fatalError = true);
+
+    /**
+     * Check if plane number is correct.
+     * @param[in] plane      Plane (0-based)
+     * @param[in] fatalError Issue fatal error (default) or not.
+     */
+    static bool checkPlane(int plane, bool fatalError = true);
+
+    /**
      * Check channel number.
      * @param[in] section Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).
@@ -124,7 +152,7 @@ namespace Belle2 {
      * @param[in] strip   Strip (1-based).
      */
     static bool checkChannelNumber(
-      int section, int sector, int layer, int plane, int strip);
+      int section, int sector, int layer, int plane, int strip, bool fatalError = true);
 
     /**
      * Get HSLB name.

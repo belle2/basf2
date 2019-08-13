@@ -67,8 +67,14 @@ void EKLMTrackMatchCollectorModule::prepare()
   m_recoTracks.registerRelationTo(m_hit2ds);
   m_GeoDat = &(EKLM::GeometryData::Instance());
 
-  TH1F* MatchedDigitsInPlane = new TH1F("Matched Digits in planeNumber", "", 208, 1, 208);
-  TH1F* AllExtHitsInPlane = new TH1F("All ExtHits in planeNumber", "", 208, 1, 208);
+  TH1F* MatchedDigitsInPlane =
+    new TH1F("Matched Digits in planeNumber", "",
+             EKLMElementNumbers::getMaximalPlaneGlobalNumber(),
+             0.5, EKLMElementNumbers::getMaximalPlaneGlobalNumber() + 0.5);
+  TH1F* AllExtHitsInPlane = new TH1F(
+    "All ExtHits in planeNumber", "",
+    EKLMElementNumbers::getMaximalPlaneGlobalNumber(),
+    0.5, EKLMElementNumbers::getMaximalPlaneGlobalNumber() + 0.5);
 
   registerObject<TH1F>("MatchedDigitsInPlane", MatchedDigitsInPlane);
   registerObject<TH1F>("AllExtHitsInPlane", AllExtHitsInPlane);
@@ -220,5 +226,4 @@ void EKLMTrackMatchCollectorModule::collect()
 
 void EKLMTrackMatchCollectorModule::closeRun()
 {
-
 }

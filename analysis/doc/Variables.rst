@@ -144,8 +144,6 @@ Here is a list of particle identification variables:
   In other words, pionID was sensitive only to the pion-kaon mis-id, and not to
   the pion-proton or pion-muon mis-identification.
 
-More information in `this confluence page <https://confluence.desy.de/display/BI/Physics+charged+particle+identification>`_
-
 .. b2-variables::
    :group: PID   
 

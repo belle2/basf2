@@ -803,11 +803,6 @@ Resources, Publications etc.
 *    `Machine learning algorithms for the Belle II experiment and their validation on Belle data <https://publikationen.bibliothek.kit.edu/1000078149>`_
       Thomas's PhD thesis. 
 
-Old Documentation
-#################
-Documentation about FEI was migrated from our `confluence page <https://confluence.desy.de/pages/viewpage.action?pageId=35004501>`_.
-
-
 
 
 

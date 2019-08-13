@@ -143,6 +143,7 @@ you, e.g.::
 
 import errno
 import glob
+import git
 import os
 import subprocess
 import textwrap
@@ -169,6 +170,7 @@ try:
     import b2luigi
     from b2luigi.core.utils import get_serialized_parameters
     from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
+    from b2luigi.basf2_helper.utils import get_basf2_git_hash
 except ModuleNotFoundError:
     print(install_helpstring_formatter.format(module="b2luigi"))
     raise
@@ -177,6 +179,18 @@ try:
 except ModuleNotFoundError:
     print(install_helpstring_formatter.format(module="uncertain_panda"))
     raise
+
+# If b2luigi version 0.3.2 or older, it relies on $BELLE2_RELEASE being "head",
+# which is not the case in the new externals. A fix has been merged into b2luigi
+# via https://github.com/nils-braun/b2luigi/pull/17 and thus should be available
+# in future releases. Until then, this workaround setthe RELEASE to
+# head and updates the Basf2Task class.
+if version.parse(b2luigi.__version__) <= version.parse("0.3.2"):
+    if os.getenv("BELLE2_RELEASE") is None:
+        os.environ["BELLE2_RELEASE"] = "head"
+        # now update the properties that used the BELLE2_RELEASE at class definition time
+        Basf2Task.env = os.environ.copy()
+        Basf2Task.git_hash = get_basf2_git_hash()
 
 # Utility functions
 

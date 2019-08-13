@@ -12,14 +12,14 @@ MCMatching relates `Particle` and `MCParticle` objects.
 Most MC matching variables will have non-trivial values only if the :b2:mod:`MCMatching` module is actually executed.
 It can be executed by adding the module to your path, there is a `modularAnalysis.matchMCTruth` convenience function to do this.
 
-.. important:: To get non-trivial MC info, you need to match MC-level and reconstruction-level informtion by adding
+.. important:: To get non-trivial MC info, you need to match MC-level and reconstruction-level information by adding
  :b2:mod:`MCMatching` to your path. You can use `modularAnalysis.matchMCTruth` convenience function to do this.
 
 ~~~~
 Core
 ~~~~
 
-MC matching at in Belle II returns two important pieces of information: 
+MC matching at Belle II returns two important pieces of information: 
 the true PDG id of the particle :b2:var:`mcPDG`, 
 and an error flag :b2:var:`mcErrors`. 
 
@@ -107,7 +107,7 @@ list of flags present in a given bitset. Can also be used in both C++ and python
 
 
 If instead only binary decision (1 = signal, 0 = background) is needed, 
-then it for convenience one can use :b2:var:`isSignal` (or :b2:var:`isSignalAcceptMissingNeutrino` for semileptonic decays).
+then for convenience one can use :b2:var:`isSignal` (or :b2:var:`isSignalAcceptMissingNeutrino` for semileptonic decays).
 
 .. code-block:: python
         
@@ -254,10 +254,8 @@ MC mode       Decay channel                                    MC mode       Dec
 
 .. include:: ../../tracking/doc/MCTrackMatching.rst
 
-.. TODO: fill with material.
-
 ---------------
 Photon matching
 ---------------
-Detalis of photom matching efficeincy can be found `in this talk <https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf>`_. If you want to `contribute <https://agira.desy.de/browse/BII-5306>`_ to the Belle II Software, please feel free to move material from the talk to this section.
+Detalis of photon matching efficiency can be found `in this talk <https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf>`_. If you want to `contribute <https://agira.desy.de/browse/BII-5306>`_ to the Belle II Software, please feel free to move material from the talk to this section.
 

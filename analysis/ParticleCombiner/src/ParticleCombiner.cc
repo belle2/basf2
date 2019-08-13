@@ -386,11 +386,11 @@ namespace Belle2 {
     const TLorentzVector vec(px, py, pz, E);
 
     int property = Particle::PropertyFlags::c_Ordinary;
-    if (m_isIgnoreRadiatedPhotons) property += Particle::PropertyFlags::c_isIgnoreRadiatedPhotons;
-    if (m_isIgnoreIntermediate) property += Particle::PropertyFlags::c_isIgnoreIntermediate;
-    if (m_isIgnoreMassive) property += Particle::PropertyFlags::c_isIgnoreMassive;
-    if (m_isIgnoreNeutrino) property += Particle::PropertyFlags::c_isIgnoreNeutrino;
-    if (m_isIgnoreGamma) property += Particle::PropertyFlags::c_isIgnoreGamma;
+    if (m_isIgnoreRadiatedPhotons) property |= Particle::PropertyFlags::c_isIgnoreRadiatedPhotons;
+    if (m_isIgnoreIntermediate) property |= Particle::PropertyFlags::c_isIgnoreIntermediate;
+    if (m_isIgnoreMassive) property |= Particle::PropertyFlags::c_isIgnoreMassive;
+    if (m_isIgnoreNeutrino) property |= Particle::PropertyFlags::c_isIgnoreNeutrino;
+    if (m_isIgnoreGamma) property |= Particle::PropertyFlags::c_isIgnoreGamma;
 
     switch (m_iParticleType) {
       case 0: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,

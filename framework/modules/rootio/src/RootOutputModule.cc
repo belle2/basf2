@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <boost/python.hpp>
+
 #include <framework/modules/rootio/RootOutputModule.h>
 
 #include <framework/io/RootIOUtilities.h>
@@ -23,6 +25,8 @@
 #include <boost/algorithm/string.hpp>
 
 #include <TClonesArray.h>
+
+#include <nlohmann/json.hpp>
 
 #include <ctime>
 #include <memory>
@@ -408,48 +412,28 @@ void RootOutputModule::fillFileMetaData()
   // Format LFN if BELLE2_LFN_FORMATSTRING is set
   std::string format = EnvironmentVariables::get("BELLE2_LFN_FORMATSTRING", "");
   if (!format.empty()) {
-    std::map<std::string, std::string> substitutions;
-    // TODO: replace the following by extraction from metadata json when that becomes available
-    substitutions["experimentLow"] = m_fileMetaData->getExperimentLow();
-    substitutions["runLow"] = m_fileMetaData->getRunLow();
-    substitutions["eventLow"] = m_fileMetaData->getEventLow();
-    substitutions["experimentHigh"] = m_fileMetaData->getExperimentHigh();
-    substitutions["runHigh"] = m_fileMetaData->getRunHigh();
-    substitutions["eventHigh"] = m_fileMetaData->getEventHigh();
-    substitutions["date"] = m_fileMetaData->getDate();
-    substitutions["site"] = m_fileMetaData->getSite();
-    substitutions["user"] = m_fileMetaData->getUser();
-    substitutions["randomSeed"] = m_fileMetaData->getRandomSeed();
-    substitutions["release"] = m_fileMetaData->getRelease();
-    substitutions["type"] = m_fileMetaData->isMC() ? "mc" : "data";
-    substitutions["globalTag"] = m_fileMetaData->getDatabaseGlobalTag();
-    for (auto& [key, value]: m_fileMetaData->getDataDescription()) {
-      substitutions["dataDescription." + key] = value;
-    }
-    boost::filesystem::path fullPath(m_outputFileName);
-    substitutions["file.name"] = fullPath.filename().string();
-    substitutions["file.suffix"] = fullPath.extension().string();
-    substitutions["file.stem"] = fullPath.stem().string();
-    substitutions["file.parent"] = fullPath.parent_path().string();
-
-    lfn = format;
-    for (std::string::size_type first = lfn.find("{"); first != std::string::npos; first = lfn.find("{", first)) {
-      auto last = lfn.find("}", first);
-      auto key = lfn.substr(first+1, last-first-1);
-      std::string value = "";
-      auto equal = key.find(":=");
-      if (equal != std::string::npos) {
-        value = key.substr(equal+2);
-        key = key.substr(0, equal);
-      }
-      if (substitutions.find(key) != substitutions.end()) {
-        value = substitutions[key];
-      }
-      lfn.replace(first, last-first+1, value);
-    }
-    boost::algorithm::replace_all(lfn, " ", "_");
-    boost::algorithm::replace_all(lfn, "__", "_");
-    boost::algorithm::replace_all(lfn, "//", "/");
+    // TODO: replace the following by m_fileMetaData->getJson() when that becomes available
+    nlohmann::json metadata = {
+    {"LFN", m_fileMetaData->getLfn()},
+    {"nEvents", m_fileMetaData->getNEvents()},
+    {"experimentLow", m_fileMetaData->getExperimentLow()},
+    {"runLow", m_fileMetaData->getRunLow()},
+    {"eventLow", m_fileMetaData->getEventLow()},
+    {"experimentHigh", m_fileMetaData->getExperimentHigh()},
+    {"runHigh", m_fileMetaData->getRunHigh()},
+    {"eventHigh", m_fileMetaData->getEventHigh()},
+    {"date", m_fileMetaData->getDate()},
+    {"site", m_fileMetaData->getSite()},
+    {"user", m_fileMetaData->getUser()},
+    {"randomSeed", m_fileMetaData->getRandomSeed()},
+    {"release", m_fileMetaData->getRelease()},
+    {"isMC", m_fileMetaData->isMC() ? "mc" : "data"},
+    {"mcEvents", m_fileMetaData->getMcEvents()},
+    {"globalTag", m_fileMetaData->getDatabaseGlobalTag()},
+    {"dataDescription", m_fileMetaData->getDataDescription()}
+    };
+    auto formatFileName = boost::python::import("B2Tools.format").attr("formatFileName");
+    lfn = boost::python::extract<std::string>(formatFileName(format, m_outputFileName, metadata.dump()));
   }
   m_fileMetaData->setLfn(lfn);
   //register the file in the catalog

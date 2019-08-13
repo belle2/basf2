@@ -1,17 +1,3 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
- *                                                                        *
- * Analyze a tree contaninig laser hit timing and channel, returning      *
- * a tree  with the fit results and the histograms for each channel.      *
- * It can be used to produce both channelT0 calibrations and to analyze   *
- * the daily, low statistics laser runs                                   *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Umberto Tamponi                                          *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
 /**************************************************************************                                                                                                                                        * BASF2 (Belle Analysis Framework 2)                                     *                                                                                                                                        * Copyright(C) 2019 - Belle II Collaboration                             *                                                                                                                                        *                                                                        *                                                                                                                                        * Author: The Belle II Collaboration                                     *                                                                                                                                        * Contributors: Umberto Tamponi                                          *                                                                                                                                        *                                                                        *                                                                                                                                        * This software is provided "as is" without any warranty.                *                                                                                                                                        **************************************************************************/
 
 
@@ -133,15 +119,12 @@ void  TOPLocalCalFitter::loadMCInfoTrees()
   m_treeTTS->SetBranchAddress("pixelRow", &m_pixelRow);
   m_treeTTS->SetBranchAddress("pixelCol", &m_pixelCol);
 
-  std::cout << "Getting the laser fit parameters from " << m_fitConstraints << std::endl;
+  B2INFO("Getting the laser fit parameters from " << m_fitConstraints);
   m_inputConstraints->cd();
   m_inputConstraints->GetObject("fitTree", m_treeConstraints);
   m_treeConstraints->SetBranchAddress("peakTime", &m_peakTimeConstraints);
   m_treeConstraints->SetBranchAddress("deltaT", &m_deltaTConstraints);
   m_treeConstraints->SetBranchAddress("fraction", &m_fractionConstraints);
-
-  //  m_treeConstraints->Show(0);
-  //  m_treeTTS->Show(0);
 
   return;
 }
@@ -415,13 +398,11 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
   m_histFile->cd();
 
   for (short iSlot = 0; iSlot < 16; iSlot++) {
-    std::cout << "fitting slot " << iSlot + 1 << std::endl;
+    B2INFO("fitting slot " << iSlot + 1);
     for (short iChannel = 0; iChannel < 512; iChannel++) {
-      std::cout << "fitting channel " << iChannel << std::endl;
       TH1D* h_profile = h_hitTime->ProjectionY(("profile_" + std::to_string(iSlot + 1) + "_" + std::to_string(iChannel)).c_str(),
                                                iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1);
       h_profile->GetXaxis()->SetRangeUser(-100, -5);
-      std::cout << "entries: " << h_profile->GetEntries() << std::endl;
       fitChannel(iSlot, iChannel, h_profile);
       determineFitStatus();
 

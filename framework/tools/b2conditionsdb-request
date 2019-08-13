@@ -48,7 +48,7 @@ def get_argument_parser():
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument('--task', type=str, default=None,
-                        choices=['master', 'new', 'modify', 'online', 'prompt', 'data', 'mc', 'analysis'],
+                        choices=['master', 'new', 'modify', 'validation', 'online', 'prompt', 'data', 'mc', 'analysis'],
                         help="""Type of global tag that should be updated.
                                 Use new/modify if the request contains new/modified payload classes.""")
     normalize_group = parser.add_mutually_exclusive_group()
@@ -116,12 +116,12 @@ if __name__ == "__main__":
     else:
         if input('\nDoes the request contain new or modified payloads classes (y/n) [n]? ').lower() in ['n', '']:
             data['request'] = 'Update'
-            print('\nFor which type of global tags is the request, mas[t]er, [o]nline, [p]rompt, [d]ata, [m]c, or [a]nalysis?')
+            print('\nFor which type of global tags is the request, mas[t]er, [v]alidation, [o]nline, [p]rompt, [d]ata, [m]c, or [a]nalysis?')
             while True:
                 task = input('t/o/p/d/m/a: ').lower()
-                if task in ['t', 'o', 'p', 'd', 'm', 'a']:
+                if task in ['t', 'v', 'o', 'p', 'd', 'm', 'a']:
                     break
-            data['task'] = {'t': 'master', 'o': 'online', 'p': 'prompt', 'd': 'data', 'm': 'mc', 'a': 'analysis'}[task]
+            data['task'] = {'t': 'master', 'v': 'validation', 'o': 'online', 'p': 'prompt', 'd': 'data', 'm': 'mc', 'a': 'analysis'}[task]
         else:
             if input('\nDo payloads of the given names already exist, but the class definition has changed (y/n) [n]? ').lower() in ['n', '']:
                 ask_new(data)

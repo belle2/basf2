@@ -45,11 +45,11 @@ void BKLMElementNumbers::channelNumberToElementNumbers(
   *strip = ((channel & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1;
 }
 
-uint16_t BKLMElementNumbers::moduleNumber(int section, int sector, int layer)
+uint16_t BKLMElementNumbers::moduleNumber(int section, int sector, int layer, bool fatalError)
 {
   checkSection(section);
-  checkSector(sector);
-  checkLayer(layer);
+  checkSector(sector, fatalError);
+  checkLayer(layer, fatalError);
   return (section ? BKLM_END_MASK : 0)
          | ((sector - 1) << BKLM_SECTOR_BIT)
          | ((layer - 1) << BKLM_LAYER_BIT);

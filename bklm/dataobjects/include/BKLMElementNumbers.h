@@ -79,7 +79,7 @@ namespace Belle2 {
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
      */
-    static uint16_t moduleNumber(int section, int sector, int layer);
+    static uint16_t moduleNumber(int section, int sector, int layer, bool fatalError = true);
 
     /**
      * Get element numbers by module number.

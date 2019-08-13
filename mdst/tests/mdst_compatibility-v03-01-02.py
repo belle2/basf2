@@ -7,8 +7,13 @@ Test backwards compatibility for an mdst file produced with release-03-01-02.
 See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fails.
 
 CHANGES since release-03-01-02:
+
 - EventMetaData:
   + isEndOfRun
+
+- ECLCluster:
+  + hasFailedFitTime
+  + hasFailedTimeResolution
 """
 
 from basf2 import create_path, process, set_random_seed, find_file, LogLevel, logging

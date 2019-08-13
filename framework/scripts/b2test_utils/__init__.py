@@ -101,10 +101,11 @@ def configure_logging_for_tests(user_replacements=None):
     3. Intercept all log messages and replace
         * the current working directory in log messaged with ``${cwd}``
         * the current default globaltags with ``${default_globaltag}``
-        * the contents of the following environment varibles with their name:
+        * the contents of the following environment varibles with their name
+          (or the listed replacement string):
             - :envvar:`BELLE2_TOOLS`
-            - :envvar:`BELLE2_RELEASE_DIR`
-            - :envvar:`BELLE2_LOCAL_DIR`
+            - :envvar:`BELLE2_RELEASE_DIR` with ``BELLE2_SOFTWARE_DIR``
+            - :envvar:`BELLE2_LOCAL_DIR` with ``BELLE2_SOFTWARE_DIR``
             - :envvar:`BELLE2_EXTERNALS_DIR`
             - :envvar:`BELLE2_VALIDATION_DATA_DIR`
             - :envvar:`BELLE2_EXAMPLES_DATA_DIR`
@@ -132,9 +133,11 @@ def configure_logging_for_tests(user_replacements=None):
     replacements = OrderedDict()
     replacements[",".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
     # Let's be lazy and take the environment variables from the docstring so we don't have to repeat them here
-    for env_name in re.findall(":envvar:`(.*?)`", configure_logging_for_tests.__doc__):
+    for env_name, replacement in re.findall(":envvar:`(.*?)`(?:.*``(.*?)``)?", configure_logging_for_tests.__doc__):
+        if not replacement:
+            replacement = env_name
         if env_name in os.environ:
-            replacements[os.environ[env_name]] = f"${{{env_name}}}"
+            replacements[os.environ[env_name]] = f"${{{replacement}}}"
     if user_replacements is not None:
         replacements.update(user_replacements)
     # add cwd only if it doesn't overwrite anything ...

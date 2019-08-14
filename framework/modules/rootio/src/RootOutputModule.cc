@@ -413,28 +413,8 @@ void RootOutputModule::fillFileMetaData()
   // Format LFN if BELLE2_LFN_FORMATSTRING is set
   std::string format = EnvironmentVariables::get("BELLE2_LFN_FORMATSTRING", "");
   if (!format.empty()) {
-    // TODO: replace the following by m_fileMetaData->getJson() when that becomes available
-    nlohmann::json metadata = {
-    {"LFN", m_fileMetaData->getLfn()},
-    {"nEvents", m_fileMetaData->getNEvents()},
-    {"experimentLow", m_fileMetaData->getExperimentLow()},
-    {"runLow", m_fileMetaData->getRunLow()},
-    {"eventLow", m_fileMetaData->getEventLow()},
-    {"experimentHigh", m_fileMetaData->getExperimentHigh()},
-    {"runHigh", m_fileMetaData->getRunHigh()},
-    {"eventHigh", m_fileMetaData->getEventHigh()},
-    {"date", m_fileMetaData->getDate()},
-    {"site", m_fileMetaData->getSite()},
-    {"user", m_fileMetaData->getUser()},
-    {"randomSeed", m_fileMetaData->getRandomSeed()},
-    {"release", m_fileMetaData->getRelease()},
-    {"isMC", m_fileMetaData->isMC() ? "mc" : "data"},
-    {"mcEvents", m_fileMetaData->getMcEvents()},
-    {"globalTag", m_fileMetaData->getDatabaseGlobalTag()},
-    {"dataDescription", m_fileMetaData->getDataDescription()}
-    };
     auto format_filename = boost::python::import("B2Tools.format").attr("format_filename");
-    lfn = boost::python::extract<std::string>(format_filename(format, m_outputFileName, metadata.dump()));
+    lfn = boost::python::extract<std::string>(format_filename(format, m_outputFileName, m_fileMetaData->getJsonStr()));
   }
   m_fileMetaData->setLfn(lfn);
   //register the file in the catalog

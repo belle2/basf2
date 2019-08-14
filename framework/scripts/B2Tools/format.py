@@ -163,7 +163,6 @@ class DefaultValueFormatter(Formatter):
         try:
             return super().get_field(field_name, args, kwargs)
         except (KeyError, TypeError):
-            B2ERROR(f"Cannot replace field '{field_name}'.")
             return None, None
 
 

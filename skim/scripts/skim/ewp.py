@@ -118,7 +118,7 @@ def B2XgammaList(path):
     #
     cutAndCopyList('pi0:ewp', 'pi0:skim', 'p > 0.25 and 0.120 < M < 0.145', path=path)
     cutAndCopyList('pi0:ewpHigh', 'pi0:skim', 'p > 0.50 and 0.120 < M < 0.145', path=path)
-    cutAndCopyList('K_S0:ewp', 'K_S0:all', 'p > 0.50 and 0.4776 < M < 0.5176', path=path)  # 20 MeV width
+    cutAndCopyList('K_S0:ewp', 'K_S0:merged', 'p > 0.50 and 0.4776 < M < 0.5176', path=path)  # 20 MeV width
     #
     #
     # take the tight stdPhotons SPL (timing cuts dependent on regions) and add
@@ -192,7 +192,7 @@ def B2XllList(path):
     #
     cutAndCopyList('pi0:ewp', 'pi0:skim', 'p > 0.20 and 0.115 < M < 0.145', path=path)
     cutAndCopyList('pi0:ewpHigh', 'pi0:skim', 'p > 0.40 and 0.115 < M < 0.145', path=path)
-    cutAndCopyList('K_S0:ewp', 'K_S0:all', '0.4776 < M < 0.5176', path=path)  # 20 MeV width
+    cutAndCopyList('K_S0:ewp', 'K_S0:merged', '0.4776 < M < 0.5176', path=path)  # 20 MeV width
 
     # invariant mass and dE windows for all modes
     btoxlldilepton = 'formula(daughter(0, E)+daughter(1, E)) > 1.5'  # dilepton energy sum in a dirty way

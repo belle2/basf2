@@ -22,6 +22,8 @@
 #include <framework/logging/LogConfig.h>
 #include <framework/dbobjects/MagneticField.h>
 #include <framework/dbobjects/MagneticFieldComponentConstant.h>
+#include <mdst/dbobjects/CollisionInvariantMass.h>
+#include <mdst/dbobjects/CollisionBoostVector.h>
 #include <framework/database/DBStore.h>
 
 namespace {
@@ -50,6 +52,12 @@ namespace {
       Belle2::MagneticField* field = new Belle2::MagneticField();
       field->addComponent(new Belle2::MagneticFieldComponentConstant({0, 0, 1.5 * Belle2::Unit::T}));
       Belle2::DBStore::Instance().addConstantOverride("MagneticField", field, false);
+      auto* collisionInvariantMass = new Belle2::CollisionInvariantMass();
+      collisionInvariantMass->setMass(10.58, 0, 0);
+      Belle2::DBStore::Instance().addConstantOverride("CollisionInvariantMass", collisionInvariantMass);
+      auto* collisionBoostVector = new Belle2::CollisionBoostVector();
+      collisionBoostVector->setBoost(TVector3(0, 0, 0.27), TMatrixDSym(3));
+      Belle2::DBStore::Instance().addConstantOverride("CollisionBoostVector", collisionBoostVector);
     }
     /** Reset the logsytem after each test */
     virtual void OnTestEnd(const ::testing::TestInfo&) final override

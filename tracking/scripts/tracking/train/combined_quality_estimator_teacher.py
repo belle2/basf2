@@ -143,7 +143,6 @@ you, e.g.::
 
 import errno
 import glob
-import git
 import os
 import subprocess
 import textwrap
@@ -1301,7 +1300,7 @@ class MasterTask(b2luigi.WrapperTask):
         for exclude_variables in [ntrack_variables]:
             for cdc_training_target in [
                 "truth_track_is_matched",
-                # "truth" # truth includes clones as signal
+                "truth"  # truth includes clones as signal
             ]:
                 yield FullTrackQEValidationPlotsTask(
                     cdc_training_target=cdc_training_target,

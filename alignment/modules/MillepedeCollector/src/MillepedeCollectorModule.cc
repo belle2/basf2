@@ -618,7 +618,7 @@ void MillepedeCollectorModule::collect()
       DBObjPtr<BeamParameters> beam;
 
       double motherMass = beam->getMass();
-      double motherWidth = (beam->getCovHER() + beam->getCovLER())(0, 0);
+      double motherWidth = sqrt((beam->getCovHER() + beam->getCovLER())(0, 0));
 
       updateMassWidthIfSet(listName, motherMass, motherWidth);
 

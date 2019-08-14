@@ -16,6 +16,7 @@
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <klm/dataobjects/KLMChannelArrayIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 
 namespace Belle2 {
@@ -53,10 +54,19 @@ namespace Belle2 {
      */
     void closeRun() override;
 
+    /**
+     * Collection of data from DQM modules.
+     * @param[in] dqmFile File with DQM histograms.
+     */
+    void collectFromDQM(const char* dqmFile);
+
   private:
 
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
+
+    /** KLM channel array index. */
+    const KLMChannelArrayIndex* m_ChannelArrayIndex;
 
     /** BKLM digits. */
     StoreArray<BKLMDigit> m_BKLMDigits;

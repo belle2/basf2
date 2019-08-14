@@ -54,14 +54,14 @@ namespace Belle2 {
 
     /**
      * Add sector-lane pair.
-     * @param[in] endcap           Endcap number.
+     * @param[in] section          Section number.
      * @param[in] layer            Layer number.
      * @param[in] sector           Sector number.
      * @param[in] copper           Copper identifier.
      * @param[in] dataConcentrator Data concentrator (= finesse) number.
      * @param[in] lane             Lane number.
      */
-    void addSectorLane(int endcap, int layer, int sector,
+    void addSectorLane(int section, int layer, int sector,
                        int copper, int dataConcentrator, int lane);
 
   private:

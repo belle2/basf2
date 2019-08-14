@@ -19,6 +19,7 @@ input_file = ROOT.TFile('../EKLMMuonOutput.root')
 tree = input_file.Get('tree')
 output_file = ROOT.TFile('EKLMMuon.root', 'recreate')
 contact = 'Kirill Chilikin (chilikin@lebedev.ru)'
+
 h2dtres = ROOT.TH1F('muon_h2dtres', 'EKLM muon 2d hits time resolution',
                     100, -10, 10)
 h2dtres.SetXTitle('ns')
@@ -28,6 +29,8 @@ l = h2dtres.GetListOfFunctions()
 l.Add(TNamed('Description', 'Time resolution'))
 l.Add(TNamed('Check', 'No bias.'))
 l.Add(TNamed('Contact', contact))
+l.Add(TNamed('MetaOptions', 'shifter'))
+
 output_file.cd()
 h2dtres.Write()
 output_file.Close()

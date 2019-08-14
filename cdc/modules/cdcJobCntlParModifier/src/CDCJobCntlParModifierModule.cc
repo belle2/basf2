@@ -44,7 +44,7 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //Switch for time walk in translator
   addParam("TimeWalkInTranslator", m_timeWalk,
            "Switch on/off time-walk correction in the TDC-count translator for MC events. Use the CDCDigitizer's flag if you want to add/not add time walk in digitization.",
-           false);
+           true);
   //Switch for wire sag
   addParam("WireSag", m_wireSag,
            "Switch on/off sense wire (gravitational) sag in FullSim. Here, sag means the main part which corresponds to design+displacement in case of wire position. You can control the perturbative part (corresponting to (mis)alignment in case of wire-position) of sag in Digitizer.",
@@ -105,7 +105,7 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //input type for channel map
   addParam("ChannelMapInputType", m_chMapInputType, "Input type for channel map; db-object (true); text-file (false).", true);
   //input type for edep-to-adc
-  addParam("EDepToADCInputType", m_eDepToADCInputType, "Input type for edep-to-adc; db-object (true); text-file (false).", false);
+  addParam("EDepToADCInputType", m_eDepToADCInputType, "Input type for edep-to-adc; db-object (true); text-file (false).", true);
 
 
   //displacement file

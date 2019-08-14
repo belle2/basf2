@@ -32,7 +32,7 @@ MonopoleStereoHitFinder::MonopoleStereoHitFinder() : Super()
 
 std::string MonopoleStereoHitFinder::getDescription()
 {
-  return "Tries to add monopole CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree.";
+  return "Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a 3D hough tree looking for hyperbolic cosines.";
 }
 
 void MonopoleStereoHitFinder::beginEvent()
@@ -68,5 +68,7 @@ void MonopoleStereoHitFinder::apply(std::vector<CDCWireHit>& inputWireHits, std:
   m_adder.apply(m_relations);
   m_inspector.apply(tracks);
 
+  for (auto track : tracks)
+    track.sortByArcLength2D();
 //   m_szFitter.apply(tracks);
 }

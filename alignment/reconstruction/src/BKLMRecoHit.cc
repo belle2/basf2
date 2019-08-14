@@ -33,12 +33,12 @@ BKLMRecoHit::BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
   genfit::PlanarMeasurement(HIT_DIMENSIONS)
 {
   m_moduleID = hit->getModuleID();
-  m_Forward = hit->getForward();
+  m_Section = hit->getSection();
   m_Sector = hit->getSector();
   m_Layer = hit->getLayer();
 
   bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
-  module = m_GeoPar->findModule(m_Forward, m_Sector, m_Layer);
+  module = m_GeoPar->findModule(m_Section, m_Sector, m_Layer);
 
   //+++ global coordinates of the hit
   global[0] = hit->getGlobalPosition()[0];
@@ -131,7 +131,7 @@ std::pair<std::vector<int>, TMatrixD> BKLMRecoHit::globalDerivatives(const genfi
 {
 
   BKLMElementID klmid;
-  klmid.setForward(m_Forward);
+  klmid.setSection(m_Section);
   klmid.setSectorNumber(m_Sector);
   klmid.setLayerNumber(m_Layer);
   std::vector<int> labGlobal;

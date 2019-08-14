@@ -85,14 +85,20 @@ namespace Belle2 {
     static TRGCDCTrackMC* _undefined;
 
   private:
-//    const struct gen_hepevt * _hep;
-    TRGCDCTrackMC* _mother;
+    // const struct gen_hepevt * _hep;
+    /// pointer to mother TRGCDCTrackMC
+    TRGCDCTrackMC* _mother = nullptr;
+    /// vector of pointers to children TRGCDCTrackMC
     std::vector<TRGCDCTrackMC*> _children;
+    /// momentum
     const CLHEP::HepLorentzVector _p;
+    /// vertex
     const CLHEP::Hep3Vector _v;
+    /// vector of pointers to TRGCDCWireHitMC
     std::vector<TRGCDCWireHitMC*> _hits;
 
   private:// static members
+    // vector of pointers to TRGCDCTrackMC
     static std::vector<const TRGCDCTrackMC*> _list;
 
     friend class TRGCDC;

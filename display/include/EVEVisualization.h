@@ -123,6 +123,12 @@ namespace Belle2 {
     void addTrackCandidate(const std::string& collectionName,
                            const RecoTrack& recoTrack);
 
+    /** Add a RecoTrack, but use stored genfit track representation
+     * to make visualisation objects.
+     * FIXME this is mostly just a workaround for monopoles.*/
+    void addTrackCandidateImproved(const std::string& collectionName,
+                                   const RecoTrack& recoTrack);
+
     /** Add a CDCTriggerTrack. */
     void addCDCTriggerTrack(const std::string& collectionName,
                             const CDCTriggerTrack& track);

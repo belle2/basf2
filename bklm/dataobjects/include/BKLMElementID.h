@@ -18,7 +18,7 @@ namespace Belle2 {
   /**
    * Class to uniquely identify a alignable element of BKLM.
    *
-   * - forward: 1 = forward; 0 = backward
+   * - section: 1 = forward; 0 = backward
    * - Sector, Layer all start at 1
    * - Sectors are numbered with increasing phi 1 - 8
    * - Layers are numbered from inner to out 1 - 15
@@ -28,17 +28,17 @@ namespace Belle2 {
     /** The base integer type for BKLMElementID */
     typedef unsigned short baseType;
     enum {
-      /** Number of bits available to represent forward or backword*/
-      ForwardBits  = 1,
+      /** Number of bits available to represent a section */
+      SectionBits  = 1,
       /** Number of bits available to represent a sector */
       SectorBits   = 5,
       /** Number of bits available to represent a layer */
       LayerBits    = 8,
       /** Total bit size of the BKLMElementID */
-      Bits        = ForwardBits + SectorBits + LayerBits,
+      Bits        = SectionBits + SectorBits + LayerBits,
 
-      /** Maximum valid forward/backward ID */
-      MaxForward    = (1 << ForwardBits) - 1,
+      /** Maximum valid section ID */
+      MaxSection    = (1 << SectionBits) - 1,
       /** Maximum valid Sector ID */
       MaxSector   = (1 << SectorBits) - 1,
       /** Maximum valid Layer ID */
@@ -53,10 +53,10 @@ namespace Belle2 {
     {
       m_id.id = id;
     }
-    /** Constructor using forward, sector, layer ids */
-    BKLMElementID(baseType forward, baseType sector, baseType layer)
+    /** Constructor using section, sector, layer ids */
+    BKLMElementID(baseType section, baseType sector, baseType layer)
     {
-      m_id.parts.forward  = forward;
+      m_id.parts.section  = section;
       m_id.parts.sector  = sector;
       m_id.parts.layer   = layer;
     }
@@ -87,8 +87,8 @@ namespace Belle2 {
 
     /** Get the unique id */
     baseType getID() const            { return m_id.id; }
-    /** Get the Forward */
-    baseType getForward() const        { return m_id.parts.forward; }
+    /** Get the section id */
+    baseType getSection() const        { return m_id.parts.section; }
     /** Get the sector id */
     baseType getSectorNumber() const        { return m_id.parts.sector; }
     /** Get the layer id */
@@ -96,8 +96,8 @@ namespace Belle2 {
 
     /** Set the unique id */
     void setID(baseType id)           { m_id.id = id; }
-    /** Set forward or backward */
-    void setForward(baseType forward)   { m_id.parts.forward = forward; }
+    /** Set the section id */
+    void setSection(baseType section)   { m_id.parts.section = section; }
     /** Set the sector id */
     void setSectorNumber(baseType sector)   { m_id.parts.sector = sector; }
     /** Set the layer id */
@@ -109,8 +109,8 @@ namespace Belle2 {
       /** Unique id */
 baseType id: Bits;
       struct {
-        /** forward or backward */
-baseType forward: ForwardBits;
+        /** Section id */
+baseType section: SectionBits;
         /** sector id */
 baseType sector: SectorBits;
         /** Layer id */

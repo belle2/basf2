@@ -28,9 +28,9 @@ using namespace Belle2;
 static const char c_MemErr[] = "Memory allocation error.";
 
 const EKLM::GeometryData&
-EKLM::GeometryData::Instance(enum DataSource dataSource)
+EKLM::GeometryData::Instance(enum DataSource dataSource, const GearDir* gearDir)
 {
-  static EKLM::GeometryData gd(dataSource);
+  static EKLM::GeometryData gd(dataSource, gearDir);
   return gd;
 }
 
@@ -253,11 +253,12 @@ void EKLM::GeometryData::fillStripIndexArrays()
   }
 }
 
-void EKLM::GeometryData::readXMLDataStrips()
+void EKLM::GeometryData::readXMLDataStrips(const GearDir& gd)
 {
   int i;
   std::string name;
-  GearDir Strips("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Strip");
+  GearDir Strips(gd);
+  Strips.append("/Strip");
   m_StripGeometry.setWidth(Strips.getLength("Width") * CLHEP::cm);
   m_StripGeometry.setThickness(Strips.getLength("Thickness") * CLHEP::cm);
   m_StripGeometry.setGrooveDepth(Strips.getLength("GrooveDepth") * CLHEP::cm);
@@ -471,21 +472,22 @@ void EKLM::GeometryData::readEndcapStructureGeometry(const GearDir& gd)
   m_EndcapStructureGeometry.setNSides(d.getInt("NSides"));
 }
 
-void EKLM::GeometryData::initializeFromGearbox()
+void EKLM::GeometryData::initializeFromGearbox(const GearDir* gearDir)
 {
   int i, j, k;
   std::string name;
   ShieldDetailGeometry shieldDetailGeometry;
-  GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
+  GearDir gd(*gearDir);
+  gd.append("/EKLM");
   /* Numbers of elements. */
-  m_NEndcaps = gd.getInt("NEndcaps");
-  checkEndcap(m_NEndcaps);
+  m_NSections = gd.getInt("NSections");
+  checkSection(m_NSections);
   m_NLayers = gd.getInt("NLayers");
   checkLayer(m_NLayers);
-  m_NDetectorLayers = new int[m_NEndcaps];
+  m_NDetectorLayers = new int[m_NSections];
   m_NDetectorLayers[0] = gd.getInt("NDetectorLayersBackward");
   checkDetectorLayerNumber(1, m_NDetectorLayers[0]);
-  if (m_NEndcaps == 2) {
+  if (m_NSections == 2) {
     m_NDetectorLayers[1] = gd.getInt("NDetectorLayersForward");
     checkDetectorLayerNumber(2, m_NDetectorLayers[1]);
   }
@@ -501,10 +503,10 @@ void EKLM::GeometryData::initializeFromGearbox()
   /* Geometry parameters. */
   m_SolenoidZ = gd.getLength("SolenoidZ") * CLHEP::cm;
   readEndcapStructureGeometry(gd);
-  GearDir endcap(gd);
-  endcap.append("/Endcap");
-  readPositionData(&m_EndcapPosition, &endcap);
-  readSizeData(&m_EndcapPosition, &endcap);
+  GearDir section(gd);
+  section.append("/Section");
+  readPositionData(&m_SectionPosition, &section);
+  readSizeData(&m_SectionPosition, &section);
   GearDir layer(gd);
   layer.append("/Layer");
   readSizeData(&m_LayerPosition, &layer);
@@ -564,7 +566,7 @@ void EKLM::GeometryData::initializeFromGearbox()
         segmentSupport2.getLength("DeltaLLeft") * CLHEP::cm);
     }
   }
-  readXMLDataStrips();
+  readXMLDataStrips(gd);
   GearDir shield(gd);
   shield.append("/Shield");
   m_ShieldGeometry.setThickness(shield.getLength("Thickness") * CLHEP::cm);
@@ -596,21 +598,22 @@ void EKLM::GeometryData::initializeFromDatabase()
   m_Geometry = new EKLMGeometry(*this);
 }
 
-EKLM::GeometryData::GeometryData(enum DataSource dataSource)
+EKLM::GeometryData::GeometryData(enum DataSource dataSource,
+                                 const GearDir* gearDir)
 {
   m_Geometry = nullptr;
   switch (dataSource) {
     case c_Gearbox:
-      initializeFromGearbox();
+      initializeFromGearbox(gearDir);
       break;
     case c_Database:
       initializeFromDatabase();
       break;
   }
-  m_MinZForward = m_SolenoidZ + m_EndcapPosition.getZ() -
-                  0.5 * m_EndcapPosition.getLength();
-  m_MaxZBackward = m_SolenoidZ - m_EndcapPosition.getZ() +
-                   0.5 * m_EndcapPosition.getLength();
+  m_MinZForward = m_SolenoidZ + m_SectionPosition.getZ() -
+                  0.5 * m_SectionPosition.getLength();
+  m_MaxZBackward = m_SolenoidZ - m_SectionPosition.getZ() +
+                   0.5 * m_SectionPosition.getLength();
   calculateSectorSupportGeometry();
   fillStripIndexArrays();
   calculateShieldGeometry();
@@ -660,21 +663,21 @@ bool EKLM::GeometryData::hitInEKLM(double z) const
  * Note that numbers of elements are 0-based for all transformation functions.
  */
 void
-EKLM::GeometryData::getEndcapTransform(HepGeom::Transform3D* t, int n) const
+EKLM::GeometryData::getSectionTransform(HepGeom::Transform3D* t, int n) const
 {
   if (n == 0)
-    *t = HepGeom::Translate3D(m_EndcapPosition.getX(), m_EndcapPosition.getY(),
-                              -m_EndcapPosition.getZ() + m_SolenoidZ);
+    *t = HepGeom::Translate3D(m_SectionPosition.getX(), m_SectionPosition.getY(),
+                              -m_SectionPosition.getZ() + m_SolenoidZ);
   else
-    *t = HepGeom::Translate3D(m_EndcapPosition.getX(), m_EndcapPosition.getY(),
-                              m_EndcapPosition.getZ() + m_SolenoidZ) *
+    *t = HepGeom::Translate3D(m_SectionPosition.getX(), m_SectionPosition.getY(),
+                              m_SectionPosition.getZ() + m_SolenoidZ) *
          HepGeom::RotateY3D(180.*CLHEP::deg);
 }
 
 void
 EKLM::GeometryData::getLayerTransform(HepGeom::Transform3D* t, int n) const
 {
-  *t = HepGeom::Translate3D(0.0, 0.0, m_EndcapPosition.getLength() / 2.0 -
+  *t = HepGeom::Translate3D(0.0, 0.0, m_SectionPosition.getLength() / 2.0 -
                             (n + 1) * m_LayerShiftZ +
                             0.5 * m_LayerPosition.getLength());
 }

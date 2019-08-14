@@ -8,7 +8,6 @@
 #include <bklm/modules/bklmRawPacker/BKLMRawPackerModule.h>
 #include <framework/database/DBArray.h>
 #include <bklm/dataobjects/BKLMElementNumbers.h>
-#include <bklm/dbobjects/BKLMElectronicMapping.h>
 
 #include <framework/logging/Logger.h>
 
@@ -52,12 +51,8 @@ BKLMRawPackerModule::~BKLMRawPackerModule()
 
 void BKLMRawPackerModule::initialize()
 {
-  // Initialize EvtMetaData
   m_eventMetaDataPtr.registerInDataStore();
-
   rawklmarray.registerInDataStore();
-
-  loadMapFromDB();
 }
 
 
@@ -89,35 +84,33 @@ void BKLMRawPackerModule::event()
     int iAx = bklmDigit->isPhiReadout();
     int iLayer = bklmDigit->getLayer();
     int iSector = bklmDigit->getSector();
-    int iForward = bklmDigit->getForward();
+    int iSection = bklmDigit->getSection();
     float iTdc = bklmDigit->getTime();
     float icharge = bklmDigit->getCharge();
     short iCTime = bklmDigit->getCTime();
     bool isRPC = bklmDigit->inRPC();
     bool isAboveThresh = bklmDigit->isAboveThreshold();
-    int moduleId = BKLMElementNumbers::channelNumber(iForward, iSector, iLayer,
-                                                     iAx, iChannelNr);
-    B2DEBUG(20, "BKLMRawPackerModule:: digi before packer: sector: " << iSector << " isforward: " << iForward << " layer: " << iLayer <<
+    int channel = BKLMElementNumbers::channelNumber(iSection, iSector, iLayer,
+                                                    iAx, iChannelNr);
+    B2DEBUG(20, "BKLMRawPackerModule:: digi before packer: sector: " << iSector << " issection: " << iSection << " layer: " << iLayer <<
             " plane: " << iAx << " icharge " << icharge << " tdc " << iTdc << " ctime " << iCTime << " isAboveThresh " << isAboveThresh <<
-            " isRPC " << isRPC << " " << moduleId << bklmDigit->getModuleID());
+            " isRPC " << isRPC << " " << channel << bklmDigit->getModuleID());
 
-    int electId = 0;
-    if (m_ModuleIdToelectId.find(moduleId) == m_ModuleIdToelectId.end()) {
-      B2DEBUG(20, "BKLMRawPacker::can not find in mapping for moduleId " << moduleId << " forward? " << iForward << " , sector " <<
+    const BKLMElectronicsChannel* electronicsChannel =
+      m_ElectronicsMap->getElectronicsChannel(channel);
+    if (electronicsChannel == nullptr) {
+      B2DEBUG(20, "BKLMRawPacker::can not find in mapping for moduleId " << channel << " section? " << iSection << " , sector " <<
               iSector);
       continue;
-    } else {
-      electId = m_ModuleIdToelectId[moduleId];
     }
 
-    int copperId;
-    int finesse;
-    int lane;
-    int axis;
-    int channelId;
-    intToElectCoo(electId, copperId, finesse, lane, axis, channelId);
+    int copper = electronicsChannel->getCopper() - BKLM_ID;
+    int finesse = electronicsChannel->getSlot() - 1;
+    int lane = electronicsChannel->getLane();
+    int axis = electronicsChannel->getAxis();
+    int channelId = electronicsChannel->getChannel();
 
-    B2DEBUG(20, "BKLMRawPacker::copperId " << copperId << " " << iForward << " " << iSector << " " << lane << " " << axis << " " <<
+    B2DEBUG(20, "BKLMRawPacker::copper " << copper << " " << iSection << " " << iSector << " " << lane << " " << axis << " " <<
             channelId << " " << iTdc << " " << icharge << " " << iCTime);
 
     unsigned short bword1 = 0;
@@ -132,12 +125,12 @@ void BKLMRawPackerModule::event()
     buf[0] |= ((bword1 << 16));
     buf[1] |= bword4;
     buf[1] |= ((bword3 << 16));
-    if (copperId < 1 || copperId > 4) {
-      B2WARNING("BKLMRawPacker::event() out-of-range (1..4):" << LogVar("COPPER ID", copperId));
+    if (copper < 1 || copper > 4) {
+      B2WARNING("BKLMRawPacker::event() out-of-range (1..4):" << LogVar("COPPER ID", copper));
       continue;
     }
-    data_words[copperId - 1][finesse].push_back(buf[0]);
-    data_words[copperId - 1][finesse].push_back(buf[1]);
+    data_words[copper - 1][finesse].push_back(buf[0]);
+    data_words[copper - 1][finesse].push_back(buf[1]);
 
     delete [] buf;
   }
@@ -243,74 +236,5 @@ void BKLMRawPackerModule::formatData(int flag, int channel, int axis, int lane, 
   bword2 |= (ctime & 0xFFFF);
   bword3 |= (tdc & 0x7FF);
   bword4 |= (charge & 0xFFF);
-
-}
-
-void BKLMRawPackerModule::loadMapFromDB()
-{
-  DBArray<BKLMElectronicMapping> elements;
-  elements.getEntries();
-  for (const auto& element : elements) {
-    B2DEBUG(20, "Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
-            ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
-            ", forward = " << element.getForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
-            " plane(z/phi) = " << element.getPlane());
-
-    int copperId = element.getCopperId();
-    int slotId = element.getSlotId();
-    int laneId = element.getLaneId();
-    int axisId = element.getAxisId();
-    int channelId = element.getChannelId();
-    int sector = element.getSector();
-    int forward = element.getForward();
-    int layer = element.getLayer();
-    int plane =  element.getPlane();
-    int stripId = element.getStripId();
-    int elecId = electCooToInt(copperId - BKLM_ID, slotId - 1, laneId, axisId, channelId);
-    int moduleId = 0;
-    moduleId = BKLMElementNumbers::channelNumber(forward, sector, layer,
-                                                 plane, stripId);
-    m_ModuleIdToelectId[moduleId] = elecId;
-    B2DEBUG(20, " electId: " << elecId << " modId: " << moduleId);
-  }
-
-}
-
-void BKLMRawPackerModule::intToElectCoo(int id, int& copper, int& finesse, int& lane, int& axis, int& channelId)
-{
-  copper = 0;
-  finesse = 0;
-  lane = 0;
-  copper = (id & 0xF);
-  finesse = (id >> 4) & 3;
-  lane = 0;
-  lane = (id >> 6) & 0x1F;
-  axis = 0;
-  axis = (id >> 11) & 0x1;
-  channelId = 0;
-  channelId = (id >> 12) & 0x3F;
-
-}
-
-int BKLMRawPackerModule::electCooToInt(int copper, int finesse, int lane, int axis, int channel)
-{
-  //  there are at most 16 copper -->4 bit
-  // 4 finesse --> 2 bit
-  // < 20 lanes -->5 bit
-  // axis --> 1 bit
-  // channel --> 6 bit
-  int ret = 0;
-  copper = copper & 0xF;
-  ret |= copper;
-  finesse = finesse & 3;
-  ret |= (finesse << 4);
-  lane = lane & 0x1F;
-  ret |= (lane << 6);
-  axis = axis & 0x1;
-  ret |= (axis << 11);
-  channel = channel & 0x3F;
-  ret |= (channel << 12);
-
-  return ret;
 
 }

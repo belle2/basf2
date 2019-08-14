@@ -3,7 +3,7 @@
 
 """
 This script provides a command line interface to all the tasks related to the
-Conditions database: manage global tags and iovs as well as upload new payloads
+Conditions database: manage globaltags and iovs as well as upload new payloads
 or download of existing payloads.
 
 The usage of this program is similar to git: there are sub commands like for
@@ -38,12 +38,12 @@ from basf2.utils import pretty_print_table
 from terminal_utils import Pager
 from dateutil.parser import parse as parse_date
 from getpass import getuser
-from . import ConditionsDB, enable_debugging, encode_name
-from .cli_utils import ItemFilter, PayloadInformation
+from . import ConditionsDB, enable_debugging, encode_name, PayloadInformation
+from .cli_utils import ItemFilter
 # the command_* functions are imported but not used so disable warning about
 # this if pylama/pylint is used to check
 from .cli_upload import command_upload  # noqa
-from .cli_download import command_download  # noqa
+from .cli_download import command_download, command_legacydownload  # noqa
 
 
 def escape_ctrl_chars(name):
@@ -61,9 +61,9 @@ def escape_ctrl_chars(name):
 
 def command_tag(args, db=None):
     """
-    List, show, create, modify or clone global tags.
+    List, show, create, modify or clone globaltags.
 
-    This command allows to list, show, create modify or clone global tags in the
+    This command allows to list, show, create modify or clone globaltags in the
     central database. If no other command is given it will list all tags as if
     "%(prog)s show" was given.
     """
@@ -76,10 +76,10 @@ def command_tag(args, db=None):
 
 def command_tag_list(args, db=None):
     """
-    List all available global tags.
+    List all available globaltags.
 
-    This command allows to list all global tags, optionally limiting the output
-    to ones matching a given search term. By default invalidated global tags
+    This command allows to list all globaltags, optionally limiting the output
+    to ones matching a given search term. By default invalidated globaltags
     will not be included in the list, to show them as well please add
     --with-invalid as option. Alternatively one can use --only-published to show
     only tags which have been published
@@ -106,7 +106,7 @@ def command_tag_list(args, db=None):
     if not tagfilter.check_arguments():
         return 1
 
-    req = db.request("GET", "/globalTags", "Getting list of global tags{}".format(tagfilter))
+    req = db.request("GET", "/globalTags", "Getting list of globaltags{}".format(tagfilter))
 
     # now let's filter the tags
     taglist = []
@@ -125,7 +125,7 @@ def command_tag_list(args, db=None):
 
     # and print, either detailed info for each tag or summary table at the end
     table = []
-    with Pager("List of global tags{}{}".format(tagfilter, " (detailed)" if getattr(args, "detail", False) else ""), True):
+    with Pager("List of globaltags{}{}".format(tagfilter, " (detailed)" if getattr(args, "detail", False) else ""), True):
         for item in taglist:
             if getattr(args, "detail", False):
                 print_globaltag(db, item)
@@ -145,7 +145,7 @@ def command_tag_list(args, db=None):
 
 
 def print_globaltag(db, *tags):
-    """ Print detailed global tag information for the given global tags side by side"""
+    """ Print detailed globaltag information for the given globaltags side by side"""
     results = [["id"], ["name"], ["description"], ["type"], ["status"],
                ["# payloads"], ["created"], ["modified"], ["modified by"]]
     for info in tags:
@@ -155,7 +155,7 @@ def print_globaltag(db, *tags):
         if isinstance(info, str):
             try:
                 req = db.request("GET", "/globalTag/{}".format(encode_name(info)),
-                                 "Getting info for global tag {}".format(info))
+                                 "Getting info for globaltag {}".format(info))
             except ConditionsDB.RequestError as e:
                 # ok, there's an error for this one, let's continue with the other
                 # ones
@@ -184,9 +184,9 @@ def print_globaltag(db, *tags):
 
 def command_tag_show(args, db=None):
     """
-    Show details about global tags
+    Show details about globaltags
 
-    This command will show details for the given global tags like name,
+    This command will show details for the given globaltags like name,
     description and number of payloads.
     """
 
@@ -195,12 +195,12 @@ def command_tag_show(args, db=None):
     # always show the detailed information
 
     if db is None:
-        args.add_argument("tag", metavar="TAGNAME", nargs="+", help="global tags to show")
+        args.add_argument("tag", metavar="TAGNAME", nargs="+", help="globaltags to show")
         return
 
     # we retrieved all we could, print them
     ntags = 0
-    with Pager("Global tag Information", True):
+    with Pager("globaltag Information", True):
         for tag in args.tag:
             ntags += print_globaltag(db, tag)
 
@@ -210,17 +210,17 @@ def command_tag_show(args, db=None):
 
 def command_tag_create(args, db=None):
     """
-    Create a new global tag
+    Create a new globaltag
 
-    This command creates a new global tag in the database with the given name
+    This command creates a new globaltag in the database with the given name
     and description. The name can only contain alpha-numeric characters and the
     charachters '+-_:'.
     """
 
     if db is None:
-        args.add_argument("type", metavar="TYPE", help="type of the global tag to create, usually one of DEV or RELEASE")
-        args.add_argument("tag", metavar="TAGNAME", help="name of the global tag to create")
-        args.add_argument("description", metavar="DESCRIPTION", help="description of the global tag")
+        args.add_argument("type", metavar="TYPE", help="type of the globaltag to create, usually one of DEV or RELEASE")
+        args.add_argument("tag", metavar="TAGNAME", help="name of the globaltag to create")
+        args.add_argument("description", metavar="DESCRIPTION", help="description of the globaltag")
         args.add_argument("-u", "--user", metavar="USER", help="username who created the tag. "
                           "If not given we will try to supply a useful default")
         return
@@ -236,30 +236,30 @@ def command_tag_create(args, db=None):
         return 1
 
     req = db.request("POST", "/globalTag/{}".format(encode_name(typeinfo["name"])),
-                     "Creating global tag {name}".format(**info),
+                     "Creating globaltag {name}".format(**info),
                      json=info)
-    B2INFO("Succesfully created global tag {name} (id={globalTagId})".format(**req.json()))
+    B2INFO("Succesfully created globaltag {name} (id={globalTagId})".format(**req.json()))
 
 
 def command_tag_modify(args, db=None):
     """
-    Modify a global tag by changing name or description
+    Modify a globaltag by changing name or description
 
-    This command allows to change the name or description of an existing global tag.
+    This command allows to change the name or description of an existing globaltag.
     You can supply any combination of -n,-d,-t and only the given values will be changed
     """
     if db is None:
-        args.add_argument("tag", metavar="TAGNAME", help="global tag to modify")
+        args.add_argument("tag", metavar="TAGNAME", help="globaltag to modify")
         args.add_argument("-n", "--name", help="new name")
         args.add_argument("-d", "--description", help="new description")
-        args.add_argument("-t", "--type", help="new type of the global tag")
+        args.add_argument("-t", "--type", help="new type of the globaltag")
         args.add_argument("-u", "--user", metavar="USER", help="username who created the tag. "
                           "If not given we will try to supply a useful default")
         return
 
     # first we need to get the old tag information
     req = db.request("GET", "/globalTag/{}".format(encode_name(args.tag)),
-                     "Getting info for global tag {}".format(args.tag))
+                     "Getting info for globaltag {}".format(args.tag))
 
     # now we update the tag information
     info = req.json()
@@ -280,51 +280,51 @@ def command_tag_modify(args, db=None):
 
     # and push the changed info to the server
     db.request("PUT", "/globalTag",
-               "Modifying global tag {} (id={globalTagId})".format(old_name, **info),
+               "Modifying globaltag {} (id={globalTagId})".format(old_name, **info),
                json=info)
 
 
 def command_tag_clone(args, db=None):
     """
-    Clone a given global tag including all IoVs
+    Clone a given globaltag including all IoVs
 
-    This command allows to clone a given global tag with a new name but still
-    containing all the IoVs defined in the original global tag.
+    This command allows to clone a given globaltag with a new name but still
+    containing all the IoVs defined in the original globaltag.
     """
 
     if db is None:
-        args.add_argument("tag", metavar="TAGNAME", help="global tag to be cloned")
-        args.add_argument("name", metavar="NEWNAME", help="name of the cloned global tag")
+        args.add_argument("tag", metavar="TAGNAME", help="globaltag to be cloned")
+        args.add_argument("name", metavar="NEWNAME", help="name of the cloned globaltag")
         return
 
     # first we need to get the old tag information
     req = db.request("GET", "/globalTag/{}".format(encode_name(args.tag)),
-                     "Getting info for global tag {}".format(args.tag))
+                     "Getting info for globaltag {}".format(args.tag))
     info = req.json()
 
     # now we clone the tag. id came from the database so no need for escape
     req = db.request("POST", "/globalTags/{globalTagId}".format(**info),
-                     "Cloning global tag {name} (id={globalTagId})".format(**info))
+                     "Cloning globaltag {name} (id={globalTagId})".format(**info))
 
     # it gets a stupid name "{ID}_copy_of_{name}" so we change it to something
     # nice like the user asked
     cloned_info = req.json()
     cloned_info["name"] = args.name
     # and push the changed info to the server
-    db.request("PUT", "/globalTag", "Renaming global tag {name} (id={globalTagId})".format(**cloned_info),
+    db.request("PUT", "/globalTag", "Renaming globaltag {name} (id={globalTagId})".format(**cloned_info),
                json=cloned_info)
 
 
 def command_tag_publish(args, db):
     """
-    Publish a global tag.
+    Publish a globaltag.
 
-    This command ets the state of a global tag to PUBLISHED. This will make the
+    This command ets the state of a globaltag to PUBLISHED. This will make the
     tag immutable and no more modifications are possible. A confirmation dialog
     will be shown
     """
     if db is None:
-        args.add_argument("tag", metavar="TAGNAME", help="global tag to be published")
+        args.add_argument("tag", metavar="TAGNAME", help="globaltag to be published")
         return
 
     name = input("ATTENTION: Publishing a tag cannot be undone.\n"
@@ -334,19 +334,19 @@ def command_tag_publish(args, db):
         return 1
 
     db.request("PUT", "/globalTag/{}/PUBLISH".format(encode_name(args.tag)),
-               "Publishing global tag {}".format(args.tag))
+               "Publishing globaltag {}".format(args.tag))
 
 
 def command_tag_invalidate(args, db):
     """
-    Invalidate a global tag.
+    Invalidate a globaltag.
 
-    This command ets the state of a global tag to INVALID. This will disqualify
+    This command ets the state of a globaltag to INVALID. This will disqualify
     this tag from being used in user analysis.  A confirmation dialog will be
     shown.
     """
     if db is None:
-        args.add_argument("tag", metavar="TAGNAME", help="global tag to be invalidated")
+        args.add_argument("tag", metavar="TAGNAME", help="globaltag to be invalidated")
         return
 
     name = input("ATTENTION: invalidating a tag cannot be undone.\n"
@@ -356,19 +356,19 @@ def command_tag_invalidate(args, db):
         return 1
 
     db.request("PUT", "/globalTag/{}/INVALID".format(encode_name(args.tag)),
-               "invalidateing global tag {}".format(args.tag))
+               "invalidating globaltag {}".format(args.tag))
 
 
 def command_diff(args, db):
-    """Compare two global tags
+    """Compare two globaltags
 
-    This command allows to compare two global tags. It will show the changes in
+    This command allows to compare two globaltags. It will show the changes in
     a format similar to a unified diff but by default it will not show any
     context, only the new or removed payloads. Added payloads are marked with a
     ``+`` in the first column, removed payloads with a ``-``
 
     If ``--full`` is given it will show all payloads, even the ones common to
-    both global tags. The differences can be limited to a given run and
+    both globaltags. The differences can be limited to a given run and
     limited to a set of payloads names using ``--filter`` or ``--exclude``. If
     the ``--regex`` option is supplied the searchterm will interpreted as a
     python regular expression where the case is ignored.
@@ -395,43 +395,14 @@ def command_diff(args, db):
     if not iovfilter.check_arguments():
         return 1
 
-    def get_iovlist(tag):
-        """Return a list of minimized iov informations as json encoded strings
-        to be able to run the difflib difference finder on them"""
-        if args.run is not None:
-            msg = "Obtaining list of iovs for global tag {tag}, exp={exp}, run={run}{filter}".format(
-                tag=tag, exp=args.run[0], run=args.run[1], filter=iovfilter)
-            req = db.request("GET", "/iovPayloads", msg, params={'gtName': tag, 'expNumber': args.run[0],
-                                                                 'runNumber': args.run[1]})
-        else:
-            msg = "Obtaining list of iovs for global tag {tag}{filter}".format(tag=tag, filter=iovfilter)
-            req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(tag)), msg)
-
-        payloads = []
-        for item in req.json():
-            payload = item["payload" if 'payload' in item else "payloadId"]
-            if "payloadIov" in item:
-                iovs = [item['payloadIov']]
-            else:
-                iovs = item['payloadIovs']
-
-            if not iovfilter.check(payload['basf2Module']['name']):
-                continue
-
-            for iov in iovs:
-                payloads.append(PayloadInformation(payload, iov))
-
-        payloads.sort()
-        return payloads
-
-    with Pager("Differences between global tags {tagA} and {tagB}{}".format(iovfilter, tagA=args.tagA, tagB=args.tagB), True):
-        print("Global tags to be compared:")
+    with Pager(f"Differences between globaltags {args.tagA} and {args.tagB}{iovfilter}", True):
+        print("globaltags to be compared:")
         ntags = print_globaltag(db, args.tagA, args.tagB)
         if ntags != 2:
             return 1
         print()
-        listA = get_iovlist(args.tagA)
-        listB = get_iovlist(args.tagB)
+        listA = db.get_all_iovs(args.tagA, message=str(iovfilter))
+        listB = db.get_all_iovs(args.tagB, message=str(iovfilter))
 
         B2INFO("Comparing contents ...")
         diff = difflib.SequenceMatcher(a=listA, b=listB)
@@ -491,9 +462,9 @@ def command_diff(args, db):
 
 def command_iov(args, db):
     """
-    List all IoVs defined in a global tag, optionally limited to a run range
+    List all IoVs defined in a globaltag, optionally limited to a run range
 
-    This command lists all IoVs defined in a given global tag. The list can be
+    This command lists all IoVs defined in a given globaltag. The list can be
     limited to a given run and optionally searched using --filter or --exclude.
     If the --regex option is supplied the searchterm will interpreted as a
     python regular expression where the case is ignored.
@@ -505,7 +476,7 @@ def command_iov(args, db):
     iovfilter = ItemFilter(args)
 
     if db is None:
-        args.add_argument("tag", metavar="TAGNAME", help="global tag for which the the IoVs should be listed")
+        args.add_argument("tag", metavar="TAGNAME", help="globaltag for which the the IoVs should be listed")
         args.add_argument("--run", type=int, nargs=2, metavar="N", help="exp and run numbers "
                           "to limit showing iovs to a ones present in a given run")
         args.add_argument("--detail", action="store_true", default=False,
@@ -522,12 +493,12 @@ def command_iov(args, db):
         return 1
 
     if args.run is not None:
-        msg = "Obtaining list of iovs for global tag {tag}, exp={exp}, run={run}{filter}".format(
+        msg = "Obtaining list of iovs for globaltag {tag}, exp={exp}, run={run}{filter}".format(
             tag=args.tag, exp=args.run[0], run=args.run[1], filter=iovfilter)
         req = db.request("GET", "/iovPayloads", msg, params={'gtName': args.tag, 'expNumber': args.run[0],
                                                              'runNumber': args.run[1]})
     else:
-        msg = "Obtaining list of iovs for global tag {tag}{filter}".format(tag=args.tag, filter=iovfilter)
+        msg = "Obtaining list of iovs for globaltag {tag}{filter}".format(tag=args.tag, filter=iovfilter)
         req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(args.tag)), msg)
 
     with Pager("List of IoVs{}{}".format(iovfilter, " (detailed)" if args.detail else ""), True):
@@ -573,7 +544,7 @@ def command_iov(args, db):
                     print()
                     pretty_print_table(result, [-40, '*'], True)
                 else:
-                    payloads.append(PayloadInformation(payload, iov))
+                    payloads.append(PayloadInformation.from_json(payload, iov))
 
         if not args.detail:
             payloads.sort()

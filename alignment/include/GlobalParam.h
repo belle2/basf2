@@ -171,10 +171,10 @@ namespace Belle2 {
     ///
     /// Use to access any global calibration DB object, e.g.
     ///
-    /// GlobalParamSet<BeamParameters> params;
+    /// GlobalParamSet<BeamSpot> params;
     /// params.setGlobalParam(0.0012, 0, 1);
     ///
-    /// will set X-postion of BeamParameters vertex to 0.0012
+    /// will set X-postion of BeamSpot vertex to 0.0012
     template<class DBObjType>
     class GlobalParamSet : public GlobalParamSetAccess {
     public:

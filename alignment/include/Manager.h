@@ -228,7 +228,7 @@ namespace Belle2 {
 
       /// Initialize a given GlobalParamVector with all DB objects and interfaces
       ///
-      ///       auto gpv = GlobalParamVector({"BeamParameters"});
+      ///       auto gpv = GlobalParamVector({"BeamSpot"});
       ///       GlobalCalibrationManager::initGlobalVector(gpv);
       ///
       /// This one central function should be used to prepare the global vectors even

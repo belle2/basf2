@@ -18,7 +18,7 @@
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <bklm/dataobjects/BKLMElementID.h>
 #include <bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/dataobjects/BKLMChannelIndex.h>
+#include <klm/dataobjects/KLMChannelIndex.h>
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 
 #include <framework/gearbox/GearDir.h>
@@ -27,8 +27,9 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
-#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBImportArray.h>
 #include <framework/database/DBImportObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <string>
 #include <vector>
@@ -49,18 +50,27 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
 {
   int copperId = 0;
   int slotId = 0;
-  int laneId = 0;
+  int laneId;
   int axisId = 0;
-  BKLMChannelIndex bklmPlanes(BKLMChannelIndex::c_IndexLevelPlane);
-  for (BKLMChannelIndex& bklmPlane : bklmPlanes) {
-    int isForward = bklmPlane.getForward();
+  KLMChannelIndex bklmPlanes(KLMChannelIndex::c_IndexLevelPlane);
+  for (KLMChannelIndex bklmPlane = bklmPlanes.beginBKLM();
+       bklmPlane != bklmPlanes.endBKLM(); ++bklmPlane) {
+    int section = bklmPlane.getSection();
     int sector = bklmPlane.getSector();
     int layer = bklmPlane.getLayer();
     int plane = bklmPlane.getPlane();
-    if (isForward == 1 && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 1 + BKLM_ID;
-    if (isForward == 1 && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 2 + BKLM_ID;
-    if (isForward == 0 && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 3 + BKLM_ID;
-    if (isForward == 0 && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 4 + BKLM_ID;
+    if (section == BKLMElementNumbers::c_ForwardSection) {
+      if (sector == 3 || sector == 4 || sector == 5 || sector == 6)
+        copperId = 1 + BKLM_ID;
+      if (sector == 1 || sector == 2 || sector == 7 || sector == 8)
+        copperId = 2 + BKLM_ID;
+    }
+    if (section == BKLMElementNumbers::c_BackwardSection) {
+      if (sector == 3 || sector == 4 || sector == 5 || sector == 6)
+        copperId = 3 + BKLM_ID;
+      if (sector == 1 || sector == 2 || sector == 7 || sector == 8)
+        copperId = 4 + BKLM_ID;
+    }
     if (sector == 3 || sector == 4 || sector == 5 || sector == 6) slotId = sector - 2;
     if (sector == 1 || sector == 2) slotId = sector + 2;
     if (sector == 7 || sector == 8) slotId = sector - 6;
@@ -74,11 +84,15 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
     } else axisId = plane;
 
     int MaxiChannel = BKLMElementNumbers::getNStrips(
-                        isForward, sector, layer, plane);
+                        section, sector, layer, plane);
 
     bool dontFlip = false;
-    if (isForward == 1 && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2)) dontFlip = true;
-    if (isForward == 0 && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
+    if (section == BKLMElementNumbers::c_ForwardSection &&
+        (sector == 7 ||  sector == 8 || sector == 1 || sector == 2))
+      dontFlip = true;
+    if (section == BKLMElementNumbers::c_BackwardSection &&
+        (sector == 4 ||  sector == 5 || sector == 6 || sector == 7))
+      dontFlip = true;
 
     for (int iStrip = 1; iStrip <= MaxiChannel; iStrip++) {
       int channelId = iStrip;
@@ -89,7 +103,8 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
         if (layer == 2)  channelId = channelId + 2;
       } else if (plane == 0) { //z strips
         if (layer < 3) { //scintillator
-          if (isForward == 0 && sector == 3) { //sector #3 is the top sector, backward sector#3 is the chimney sector.
+          if (section == BKLMElementNumbers::c_BackwardSection
+              && sector == 3) { //sector #3 is the top sector, backward sector#3 is the chimney sector.
             if (layer == 1) {
               if (channelId > 0 && channelId < 9) channelId = 9 - channelId;
               else if (channelId > 8 && channelId < 24) channelId = 54 - channelId;
@@ -108,49 +123,49 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
         }
       }
 
-      m_bklmMapping.appendNew(1, copperId, slotId, laneId, axisId, channelId, isForward, sector, layer, plane, iStrip);
+      uint16_t detectorChannel = BKLMElementNumbers::channelNumber(
+                                   section, sector, layer, plane, iStrip);
+      m_ElectronicsChannels.push_back(
+        std::pair<uint16_t, BKLMElectronicsChannel>(
+          detectorChannel,
+          BKLMElectronicsChannel(copperId, slotId, laneId, axisId, channelId)));
     }
   }
 }
 
 void BKLMDatabaseImporter::setElectronicMappingLane(
-  int forward, int sector, int layer, int lane)
+  int section, int sector, int layer, int lane)
 {
-  int n = m_bklmMapping.getEntries();
-  for (int i = 0; i < n; i++) {
-    BKLMElectronicMapping* mapping = m_bklmMapping[i];
-    if ((mapping->getForward() == forward) &&
-        (mapping->getSector() == sector) &&
-        (mapping->getLayer() == layer))
-      mapping->setLane(lane);
+  int channelSection, channelSector, channelLayer, plane, strip;
+  unsigned int n = m_ElectronicsChannels.size();
+  for (unsigned int i = 0; i < n; ++i) {
+    uint16_t channel = m_ElectronicsChannels[i].first;
+    BKLMElementNumbers::channelNumberToElementNumbers(
+      channel, &channelSection, &channelSector, &channelLayer, &plane, &strip);
+    if ((channelSection == section) &&
+        (channelSector == sector) &&
+        (channelLayer == layer))
+      m_ElectronicsChannels[i].second.setLane(lane);
   }
 }
 
 void BKLMDatabaseImporter::importBklmElectronicMapping()
 {
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-  m_bklmMapping.import(iov);
-  return;
-}
-
-void BKLMDatabaseImporter::exportBklmElectronicMapping()
-{
-
-  DBArray<BKLMElectronicMapping> elements;
-  elements.getEntries();
-
-  // Print mapping info
-  B2INFO("DBArray<BKLMElectronicMapping> entries " << elements.getEntries());
-
-  for (const auto& element : elements) {
-    if (element.getStripId() == 1) {
-      B2INFO("Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
-             ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
-             ", channelId = " << element.getChannelId() <<
-             ", isForward = " << element.getForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
-             " plane(z/phi) = " << element.getPlane() << " stripId = " << element.getStripId());
-    }
+  IntervalOfValidity iov(0, 0, -1, -1);
+  DBImportObjPtr<BKLMElectronicsMap> m_ElectronicsMap;
+  m_ElectronicsMap.construct();
+  unsigned int n = m_ElectronicsChannels.size();
+  for (unsigned int i = 0; i < n; ++i) {
+    m_ElectronicsMap->addChannel(
+      m_ElectronicsChannels[i].first,
+      m_ElectronicsChannels[i].second.getCopper(),
+      m_ElectronicsChannels[i].second.getSlot(),
+      m_ElectronicsChannels[i].second.getLane(),
+      m_ElectronicsChannels[i].second.getAxis(),
+      m_ElectronicsChannels[i].second.getChannel());
   }
+  m_ElectronicsMap.import(iov);
+  return;
 }
 
 void BKLMDatabaseImporter::importBklmGeometryPar()
@@ -184,21 +199,17 @@ void BKLMDatabaseImporter::exportBklmGeometryPar()
          element->getLocalReconstructionShiftZ(1, 1, 1) << ")");
 }
 
-void BKLMDatabaseImporter::importBklmSimulationPar()
+void BKLMDatabaseImporter::importBklmSimulationPar(int expStart, int runStart, int expStop, int runStop)
 {
-  GearDir content("/Detector/DetectorComponent/Geometry/BKLM/Content/SimulationParameters");
-
-  // define the data
   BKLMSimulationPar bklmSimulationPar;
+  GearDir content(Gearbox::getInstance().getDetectorComponent("KLM"), "BKLM/SimulationParameters");
 
   // Get Gearbox simulation parameters for BKLM
-  bklmSimulationPar.setVersion(0);
   bklmSimulationPar.read(content);
 
-  // define IOV and store data to the DB
-  IntervalOfValidity iov(0, 0, -1, -1);
+  // Define the IOV and store data to the DB
+  IntervalOfValidity iov(expStart, runStart, expStop, runStop);
   Database::Instance().storeData("BKLMSimulationPar", &bklmSimulationPar, iov);
-
 }
 
 void BKLMDatabaseImporter::exportBklmSimulationPar()
@@ -247,7 +258,7 @@ void BKLMDatabaseImporter::exportBklmMisAlignment()
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 8; j++) {
       for (int k = 0; k < 15; k++) {
-        B2INFO("bklm misalignment parameter of isForward " << i << ", sector " << j + 1 << ", layer " << k + 1);
+        B2INFO("bklm misalignment parameter of section " << i << ", sector " << j + 1 << ", layer " << k + 1);
         for (int p = 1; p < 7; p++) { //six parameter
           BKLMElementID bklmid(i, j, k);
           double par = element->get(bklmid, p);
@@ -290,7 +301,7 @@ void BKLMDatabaseImporter::exportBklmAlignment()
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 8; j++) {
       for (int k = 0; k < 15; k++) {
-        B2INFO("bklm alignment parameter of isForward " << i << ", sector " << j + 1 << ", layer " << k + 1);
+        B2INFO("bklm alignment parameter of section " << i << ", sector " << j + 1 << ", layer " << k + 1);
         for (int p = 1; p < 7; p++) { //six parameter
           BKLMElementID bklmid(i, j, k);
           double par = element->get(bklmid, p);
@@ -326,10 +337,10 @@ void BKLMDatabaseImporter::exportBklmDisplacement()
   for (const auto& disp : displacements) {
     unsigned short bklmElementID = disp.getElementID();
     BKLMElementID bklmid(bklmElementID);
-    unsigned short forward = bklmid.getForward();
+    unsigned short section = bklmid.getSection();
     unsigned short sector = bklmid.getSectorNumber();
     unsigned short layer = bklmid.getLayerNumber();
-    B2INFO("displacement of " << forward << ", " << sector << ", " << layer << ": " << disp.getUShift() << ", " << disp.getVShift() <<
+    B2INFO("displacement of " << section << ", " << sector << ", " << layer << ": " << disp.getUShift() << ", " << disp.getVShift() <<
            ", " <<
            disp.getWShift() << ", " << disp.getAlphaRotation() << ", " << disp.getBetaRotation() << ", " << disp.getGammaRotation());
   }//end loop layer

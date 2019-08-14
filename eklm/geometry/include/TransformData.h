@@ -67,58 +67,58 @@ namespace Belle2 {
       ~TransformData();
 
       /**
-       * Get endcap transformation.
-       * @param[in] endcap Endcap number.
+       * Get section transformation.
+       * @param[in] section Section number.
        */
-      const HepGeom::Transform3D* getEndcapTransform(int endcap) const;
+      const HepGeom::Transform3D* getSectionTransform(int section) const;
 
       /**
        * Get layer transformation.
-       * @param[in] endcap Endcap number.
-       * @param[in] layer  Layer number.
+       * @param[in] section Section number.
+       * @param[in] layer   Layer number.
        */
       const HepGeom::Transform3D*
-      getLayerTransform(int endcap, int layer) const;
+      getLayerTransform(int section, int layer) const;
 
       /**
        * Get sector transformation.
-       * @param[in] endcap Endcap number.
-       * @param[in] layer  Layer number.
-       * @param[in] sector Sector number.
+       * @param[in] section Section number.
+       * @param[in] layer   Layer number.
+       * @param[in] sector  Sector number.
        */
       const HepGeom::Transform3D*
-      getSectorTransform(int endcap, int layer, int sector) const;
+      getSectorTransform(int section, int layer, int sector) const;
 
       /**
        * Get plane transformation.
-       * @param[in] endcap Endcap number.
-       * @param[in] layer  Layer number.
-       * @param[in] sector Sector number.
-       * @param[in] plane  Plane number.
+       * @param[in] section Section number.
+       * @param[in] layer   Layer number.
+       * @param[in] sector  Sector number.
+       * @param[in] plane   Plane number.
        */
       const HepGeom::Transform3D*
-      getPlaneTransform(int endcap, int layer, int sector, int plane) const;
+      getPlaneTransform(int section, int layer, int sector, int plane) const;
 
       /**
        * Get additional displacement for plane internal volumes.
-       * @param[in] endcap Endcap number.
-       * @param[in] layer  Layer number.
-       * @param[in] sector Sector number.
-       * @param[in] plane  Plane number.
+       * @param[in] section Section number.
+       * @param[in] layer   Layer number.
+       * @param[in] sector  Sector number.
+       * @param[in] plane   Plane number.
        */
       const HepGeom::Transform3D*
-      getPlaneDisplacement(int endcap, int layer, int sector, int plane) const;
+      getPlaneDisplacement(int section, int layer, int sector, int plane) const;
 
       /**
        * Get segment transformation.
-       * @param[in] endcap  Endcap number.
+       * @param[in] section Section number.
        * @param[in] layer   Layer number.
        * @param[in] sector  Sector number.
        * @param[in] plane   Plane number.
        * @param[in] segment Segment number.
        */
       const HepGeom::Transform3D*
-      getSegmentTransform(int endcap, int layer, int sector, int plane,
+      getSegmentTransform(int section, int layer, int sector, int plane,
                           int segment) const;
 
       /**
@@ -137,27 +137,27 @@ namespace Belle2 {
 
       /**
        * Get strip transformation.
-       * @param[in] endcap Endcap number.
-       * @param[in] layer  Layer number.
-       * @param[in] sector Sector number.
-       * @param[in] plane  Plane number.
-       * @param[in] strip  Strip number.
+       * @param[in] section Section number.
+       * @param[in] layer   Layer number.
+       * @param[in] sector  Sector number.
+       * @param[in] plane   Plane number.
+       * @param[in] strip   Strip number.
        */
       const HepGeom::Transform3D*
-      getStripTransform(int endcap, int layer, int sector, int plane,
+      getStripTransform(int section, int layer, int sector, int plane,
                         int strip) const;
 
       /**
        * Get strip global to local transformation by hit.
-       * @param[in] endcap Endcap number.
-       * @param[in] layer  Layer number.
-       * @param[in] sector Sector number.
-       * @param[in] plane  Plane number.
-       * @param[in] strip  Strip number.
+       * @param[in] section Section number.
+       * @param[in] layer   Layer number.
+       * @param[in] sector  Sector number.
+       * @param[in] plane   Plane number.
+       * @param[in] strip   Strip number.
        * @return Transformation.
        */
       const HepGeom::Transform3D*
-      getStripGlobalToLocal(int endcap, int layer, int sector, int plane,
+      getStripGlobalToLocal(int section, int layer, int sector, int plane,
                             int strip) const;
 
       /**
@@ -181,10 +181,10 @@ namespace Belle2 {
 
       /**
        * Get sector by position.
-       * @param[in] endcap   Endcap number.
+       * @param[in] section  Section number.
        * @param[in] position Position.
        */
-      int getSectorByPosition(int endcap,
+      int getSectorByPosition(int section,
                               const HepGeom::Point3D<double>& position) const;
 
 
@@ -209,8 +209,8 @@ namespace Belle2 {
       /** Geometry data. */
       const GeometryData* m_GeoDat;
 
-      /** Endcap transformations. */
-      HepGeom::Transform3D* m_Endcap;
+      /** Section transformations. */
+      HepGeom::Transform3D* m_Section;
 
       /** Layer transformations. */
       HepGeom::Transform3D** m_Layer;

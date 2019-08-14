@@ -1,9 +1,12 @@
 [INFO] Steering file: mdst/tests/mdst_compatibility-v00-09-03.py
 [INFO] The random number seed is set to "1"
 [INFO] Starting event processing, random seed is set to '1'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/mdst/tests/mdst-v00-09-03.root
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 Untested method EventMetaData::addErrorFlag
 Untested method EventMetaData::isEndOfData
 Untested method EventMetaData::setEndOfData
+Untested method EventMetaData::setEndOfRun
 Untested method EventMetaData::setErrorFlag
 Untested method EventMetaData::setEvent
 Untested method EventMetaData::setExperiment
@@ -143,6 +146,7 @@ EventMetaData:
   getRun(): 0
   getSubrun(): 0
   getTime(): 1541271770826344879
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 1
   getQualityIndicator(): 0
@@ -417,6 +421,9 @@ V0#2:
     -> Tracks#6
   getV0Hypothesis(): <type: K_S0>
 TrackFitResult#0:
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
   get4Momentum(): (0.142389,0.0549256,0.0689178,0.217993)
   getChargeSign(): 1
   getCotTheta(): 0.451579
@@ -1557,7 +1564,7 @@ ECLCluster#0:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000100000
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0480965
   getEnergyRaw(): 0.103597
@@ -1582,6 +1589,8 @@ ECLCluster#0:
   getUncertaintyTheta(): 0.00527344
   getUniqueId(): 105001
   getZernikeMVA(): 0.251953
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -1630,6 +1639,8 @@ ECLCluster#1:
   getUncertaintyTheta(): 0.00390625
   getUniqueId(): 205001
   getZernikeMVA(): 0.606445
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -1679,6 +1690,8 @@ ECLCluster#2:
   getUncertaintyTheta(): 0.00507813
   getUniqueId(): 405001
   getZernikeMVA(): 0.126953
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -1728,6 +1741,8 @@ ECLCluster#3:
   getUncertaintyTheta(): 0.00566406
   getUniqueId(): 405002
   getZernikeMVA(): 0.0849609
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -1776,6 +1791,8 @@ ECLCluster#4:
   getUncertaintyTheta(): 0.00644531
   getUniqueId(): 505001
   getZernikeMVA(): 0.664062
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -1824,6 +1841,8 @@ ECLCluster#5:
   getUncertaintyTheta(): 0.00644531
   getUniqueId(): 605001
   getZernikeMVA(): 0.268555
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -1872,6 +1891,8 @@ ECLCluster#6:
   getUncertaintyTheta(): 0.00664062
   getUniqueId(): 705001
   getZernikeMVA(): 0.242188
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -1920,6 +1941,8 @@ ECLCluster#7:
   getUncertaintyTheta(): 0.00527344
   getUniqueId(): 805001
   getZernikeMVA(): 0.683594
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -1968,6 +1991,8 @@ ECLCluster#8:
   getUncertaintyTheta(): 0.00703125
   getUniqueId(): 1005001
   getZernikeMVA(): 0.755859
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -2019,6 +2044,8 @@ ECLCluster#9:
   getUncertaintyTheta(): 0.00507813
   getUniqueId(): 1105001
   getZernikeMVA(): 0.421875
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -2067,6 +2094,8 @@ ECLCluster#10:
   getUncertaintyTheta(): 0.00742187
   getUniqueId(): 1205001
   getZernikeMVA(): 0.425781
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -2115,6 +2144,8 @@ ECLCluster#11:
   getUncertaintyTheta(): 0.00722656
   getUniqueId(): 1305001
   getZernikeMVA(): 0.59082
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -2163,6 +2194,8 @@ ECLCluster#12:
   getUncertaintyTheta(): 0.00878906
   getUniqueId(): 1505001
   getZernikeMVA(): 0.767578
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -2211,6 +2244,8 @@ ECLCluster#13:
   getUncertaintyTheta(): 0.00429688
   getUniqueId(): 1405001
   getZernikeMVA(): 0.416016
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -2262,6 +2297,8 @@ ECLCluster#14:
   getUncertaintyTheta(): 0.00605469
   getUniqueId(): 1605001
   getZernikeMVA(): 0.236328
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -2313,6 +2350,8 @@ ECLCluster#15:
   getUncertaintyTheta(): 0.00507813
   getUniqueId(): 1605002
   getZernikeMVA(): 0.298828
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -2361,6 +2400,8 @@ ECLCluster#16:
   getUncertaintyTheta(): 0.0101563
   getUniqueId(): 1805001
   getZernikeMVA(): 0.485352
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -2388,7 +2429,7 @@ ECLCluster#17:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000010000
   getEnergy(16): nan
   getEnergy(32): 0.103597
   getEnergyHighestCrystal(): 0.0480965
@@ -2414,6 +2455,8 @@ ECLCluster#17:
   getUncertaintyTheta(): 0
   getUniqueId(): 106001
   getZernikeMVA(): 0.748047
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -2462,6 +2505,8 @@ ECLCluster#18:
   getUncertaintyTheta(): 0
   getUniqueId(): 206001
   getZernikeMVA(): 0.393555
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -2511,6 +2556,8 @@ ECLCluster#19:
   getUncertaintyTheta(): 0
   getUniqueId(): 406001
   getZernikeMVA(): 0.989258
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -2559,6 +2606,8 @@ ECLCluster#20:
   getUncertaintyTheta(): 0
   getUniqueId(): 506001
   getZernikeMVA(): 0.335938
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -2607,6 +2656,8 @@ ECLCluster#21:
   getUncertaintyTheta(): 0
   getUniqueId(): 606001
   getZernikeMVA(): 0.731445
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -2655,6 +2706,8 @@ ECLCluster#22:
   getUncertaintyTheta(): 0
   getUniqueId(): 706001
   getZernikeMVA(): 0.757812
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -2703,6 +2756,8 @@ ECLCluster#23:
   getUncertaintyTheta(): 0
   getUniqueId(): 806001
   getZernikeMVA(): 0.316406
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -2751,6 +2806,8 @@ ECLCluster#24:
   getUncertaintyTheta(): 0
   getUniqueId(): 1006001
   getZernikeMVA(): 0.244141
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -2802,6 +2859,8 @@ ECLCluster#25:
   getUncertaintyTheta(): 0
   getUniqueId(): 1106001
   getZernikeMVA(): 0.578125
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -2850,6 +2909,8 @@ ECLCluster#26:
   getUncertaintyTheta(): 0
   getUniqueId(): 1206001
   getZernikeMVA(): 0.574219
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -2898,6 +2959,8 @@ ECLCluster#27:
   getUncertaintyTheta(): 0
   getUniqueId(): 1306001
   getZernikeMVA(): 0.40918
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -2946,6 +3009,8 @@ ECLCluster#28:
   getUncertaintyTheta(): 0
   getUniqueId(): 1506001
   getZernikeMVA(): 0.232422
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -2994,6 +3059,8 @@ ECLCluster#29:
   getUncertaintyTheta(): 0
   getUniqueId(): 1406001
   getZernikeMVA(): 0.583984
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -3045,6 +3112,8 @@ ECLCluster#30:
   getUncertaintyTheta(): 0
   getUniqueId(): 1606001
   getZernikeMVA(): 0.929688
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -3093,6 +3162,8 @@ ECLCluster#31:
   getUncertaintyTheta(): 0
   getUniqueId(): 1806001
   getZernikeMVA(): 0.514648
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -3155,7 +3226,7 @@ KLMCluster#1:
     -> MCParticles#22 (weight: 1)
   getTime(): 2.62976
  ... message repeated 14 times
-[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!  { module: PrintObjectsModule }
+[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(25)
     pair
@@ -4914,6 +4985,7 @@ EventMetaData:
   getRun(): 0
   getSubrun(): 0
   getTime(): 1541271819204440573
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 1
   getQualityIndicator(): 0
@@ -7296,7 +7368,7 @@ ECLCluster#0:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000100000
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.214085
   getEnergyRaw(): 0.209471
@@ -7321,6 +7393,8 @@ ECLCluster#0:
   getUncertaintyTheta(): 0.00429688
   getUniqueId(): 105001
   getZernikeMVA(): 0.189453
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -7371,6 +7445,8 @@ ECLCluster#1:
   getUncertaintyTheta(): 0.00429688
   getUniqueId(): 205001
   getZernikeMVA(): 0.0664062
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -7419,6 +7495,8 @@ ECLCluster#2:
   getUncertaintyTheta(): 0.00585938
   getUniqueId(): 405001
   getZernikeMVA(): 0.861328
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -7469,6 +7547,8 @@ ECLCluster#3:
   getUncertaintyTheta(): 0.00546875
   getUniqueId(): 305001
   getZernikeMVA(): 0.167969
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -7519,6 +7599,8 @@ ECLCluster#4:
   getUncertaintyTheta(): 0.00898437
   getUniqueId(): 305002
   getZernikeMVA(): 0.160156
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -7567,6 +7649,8 @@ ECLCluster#5:
   getUncertaintyTheta(): 0.0046875
   getUniqueId(): 505001
   getZernikeMVA(): 0.765625
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -7615,6 +7699,8 @@ ECLCluster#6:
   getUncertaintyTheta(): 0.00585938
   getUniqueId(): 605001
   getZernikeMVA(): 0.765625
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -7664,6 +7750,8 @@ ECLCluster#7:
   getUncertaintyTheta(): 0.00878906
   getUniqueId(): 805001
   getZernikeMVA(): 0.791992
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -7712,6 +7800,8 @@ ECLCluster#8:
   getUncertaintyTheta(): 0.009375
   getUniqueId(): 1005001
   getZernikeMVA(): 0.150391
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -7761,6 +7851,8 @@ ECLCluster#9:
   getUncertaintyTheta(): 0.00878906
   getUniqueId(): 905001
   getZernikeMVA(): 0.508789
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -7810,6 +7902,8 @@ ECLCluster#10:
   getUncertaintyTheta(): 0.00507813
   getUniqueId(): 905002
   getZernikeMVA(): 0.410156
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -7859,6 +7953,8 @@ ECLCluster#11:
   getUncertaintyTheta(): 0.00722656
   getUniqueId(): 1105001
   getZernikeMVA(): 0.0078125
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -7909,6 +8005,8 @@ ECLCluster#12:
   getUncertaintyTheta(): 0.00703125
   getUniqueId(): 1105002
   getZernikeMVA(): 0.00976562
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -7957,6 +8055,8 @@ ECLCluster#13:
   getUncertaintyTheta(): 0.009375
   getUniqueId(): 1205001
   getZernikeMVA(): 0.739258
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -8005,6 +8105,8 @@ ECLCluster#14:
   getUncertaintyTheta(): 0.00859375
   getUniqueId(): 1505001
   getZernikeMVA(): 0.210938
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -8055,6 +8157,8 @@ ECLCluster#15:
   getUncertaintyTheta(): 0.009375
   getUniqueId(): 1405001
   getZernikeMVA(): 0.436523
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -8104,6 +8208,8 @@ ECLCluster#16:
   getUncertaintyTheta(): 0.00683594
   getUniqueId(): 1705001
   getZernikeMVA(): 0.731445
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -8153,6 +8259,8 @@ ECLCluster#17:
   getUncertaintyTheta(): 0.00566406
   getUniqueId(): 1605001
   getZernikeMVA(): 0.749023
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -8201,6 +8309,8 @@ ECLCluster#18:
   getUncertaintyTheta(): 0.00859375
   getUniqueId(): 1805001
   getZernikeMVA(): 0.488281
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -8250,6 +8360,8 @@ ECLCluster#19:
   getUncertaintyTheta(): 0.009375
   getUniqueId(): 1905001
   getZernikeMVA(): 0.0136719
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -8298,6 +8410,8 @@ ECLCluster#20:
   getUncertaintyTheta(): 0.00546875
   getUniqueId(): 2005001
   getZernikeMVA(): 0.884766
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -8346,6 +8460,8 @@ ECLCluster#21:
   getUncertaintyTheta(): 0.00683594
   getUniqueId(): 2105001
   getZernikeMVA(): 0.725586
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -8397,6 +8513,8 @@ ECLCluster#22:
   getUncertaintyTheta(): 0.00957031
   getUniqueId(): 2205001
   getZernikeMVA(): 0.237305
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -8445,6 +8563,8 @@ ECLCluster#23:
   getUncertaintyTheta(): 0.00898437
   getUniqueId(): 2405001
   getZernikeMVA(): 0.5
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -8472,7 +8592,7 @@ ECLCluster#24:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000010000
   getEnergy(16): nan
   getEnergy(32): 0.209471
   getEnergyHighestCrystal(): 0.208088
@@ -8498,6 +8618,8 @@ ECLCluster#24:
   getUncertaintyTheta(): 0
   getUniqueId(): 106001
   getZernikeMVA(): 0.810547
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -8548,6 +8670,8 @@ ECLCluster#25:
   getUncertaintyTheta(): 0
   getUniqueId(): 206001
   getZernikeMVA(): 0.933594
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -8596,6 +8720,8 @@ ECLCluster#26:
   getUncertaintyTheta(): 0
   getUniqueId(): 406001
   getZernikeMVA(): 0.138672
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -8646,6 +8772,8 @@ ECLCluster#27:
   getUncertaintyTheta(): 0
   getUniqueId(): 306001
   getZernikeMVA(): 0.973633
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -8694,6 +8822,8 @@ ECLCluster#28:
   getUncertaintyTheta(): 0
   getUniqueId(): 506001
   getZernikeMVA(): 0.234375
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -8742,6 +8872,8 @@ ECLCluster#29:
   getUncertaintyTheta(): 0
   getUniqueId(): 606001
   getZernikeMVA(): 0.234375
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -8791,6 +8923,8 @@ ECLCluster#30:
   getUncertaintyTheta(): 0
   getUniqueId(): 806001
   getZernikeMVA(): 0.208008
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -8839,6 +8973,8 @@ ECLCluster#31:
   getUncertaintyTheta(): 0
   getUniqueId(): 1006001
   getZernikeMVA(): 0.849609
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -8888,6 +9024,8 @@ ECLCluster#32:
   getUncertaintyTheta(): 0
   getUniqueId(): 906001
   getZernikeMVA(): 0.791016
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -8939,6 +9077,8 @@ ECLCluster#33:
   getUncertaintyTheta(): 0
   getUniqueId(): 1106001
   getZernikeMVA(): 1
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -8987,6 +9127,8 @@ ECLCluster#34:
   getUncertaintyTheta(): 0
   getUniqueId(): 1206001
   getZernikeMVA(): 0.260742
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -9035,6 +9177,8 @@ ECLCluster#35:
   getUncertaintyTheta(): 0
   getUniqueId(): 1506001
   getZernikeMVA(): 0.789062
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -9085,6 +9229,8 @@ ECLCluster#36:
   getUncertaintyTheta(): 0
   getUniqueId(): 1406001
   getZernikeMVA(): 0.563477
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -9134,6 +9280,8 @@ ECLCluster#37:
   getUncertaintyTheta(): 0
   getUniqueId(): 1706001
   getZernikeMVA(): 0.268555
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -9183,6 +9331,8 @@ ECLCluster#38:
   getUncertaintyTheta(): 0
   getUniqueId(): 1606001
   getZernikeMVA(): 0.250977
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -9231,6 +9381,8 @@ ECLCluster#39:
   getUncertaintyTheta(): 0
   getUniqueId(): 1806001
   getZernikeMVA(): 0.511719
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -9280,6 +9432,8 @@ ECLCluster#40:
   getUncertaintyTheta(): 0
   getUniqueId(): 1906001
   getZernikeMVA(): 0.986328
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -9328,6 +9482,8 @@ ECLCluster#41:
   getUncertaintyTheta(): 0
   getUniqueId(): 2006001
   getZernikeMVA(): 0.115234
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -9376,6 +9532,8 @@ ECLCluster#42:
   getUncertaintyTheta(): 0
   getUniqueId(): 2106001
   getZernikeMVA(): 0.274414
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -9427,6 +9585,8 @@ ECLCluster#43:
   getUncertaintyTheta(): 0
   getUniqueId(): 2206001
   getZernikeMVA(): 0.762695
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -9475,6 +9635,8 @@ ECLCluster#44:
   getUncertaintyTheta(): 0
   getUniqueId(): 2406001
   getZernikeMVA(): 0.5
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -9483,7 +9645,7 @@ ECLCluster#44:
   isTrack(): False
   isTriggerCluster(): False
  ... message repeated 20 times
-[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!  { module: PrintObjectsModule }
+[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(25)
     pair
@@ -12750,6 +12912,7 @@ EventMetaData:
   getRun(): 0
   getSubrun(): 0
   getTime(): 1541271822415596744
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 1
   getQualityIndicator(): 0
@@ -14119,7 +14282,7 @@ ECLCluster#0:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000100000
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.099204
   getEnergyRaw(): 0.239216
@@ -14144,6 +14307,8 @@ ECLCluster#0:
   getUncertaintyTheta(): 0.00429688
   getUniqueId(): 105001
   getZernikeMVA(): 0.367188
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14192,6 +14357,8 @@ ECLCluster#1:
   getUncertaintyTheta(): 0.00488281
   getUniqueId(): 205001
   getZernikeMVA(): 0.782227
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14240,6 +14407,8 @@ ECLCluster#2:
   getUncertaintyTheta(): 0.0046875
   getUniqueId(): 305001
   getZernikeMVA(): 0.246094
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14288,6 +14457,8 @@ ECLCluster#3:
   getUncertaintyTheta(): 0.00449219
   getUniqueId(): 405001
   getZernikeMVA(): 0.728516
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14336,6 +14507,8 @@ ECLCluster#4:
   getUncertaintyTheta(): 0.00703125
   getUniqueId(): 505001
   getZernikeMVA(): 0.539062
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14386,6 +14559,8 @@ ECLCluster#5:
   getUncertaintyTheta(): 0.00703125
   getUniqueId(): 605001
   getZernikeMVA(): 0.419922
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14434,6 +14609,8 @@ ECLCluster#6:
   getUncertaintyTheta(): 0.00898437
   getUniqueId(): 705001
   getZernikeMVA(): 0.560547
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14482,6 +14659,8 @@ ECLCluster#7:
   getUncertaintyTheta(): 0.00625
   getUniqueId(): 805001
   getZernikeMVA(): 0.331055
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14530,6 +14709,8 @@ ECLCluster#8:
   getUncertaintyTheta(): 0.00546875
   getUniqueId(): 1005001
   getZernikeMVA(): 0.204102
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14579,6 +14760,8 @@ ECLCluster#9:
   getUncertaintyTheta(): 0.00644531
   getUniqueId(): 1105001
   getZernikeMVA(): 0.115234
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14628,6 +14811,8 @@ ECLCluster#10:
   getUncertaintyTheta(): 0.00820313
   getUniqueId(): 1205001
   getZernikeMVA(): 0.591797
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14676,6 +14861,8 @@ ECLCluster#11:
   getUncertaintyTheta(): 0.00429688
   getUniqueId(): 1305001
   getZernikeMVA(): 0.799805
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14724,6 +14911,8 @@ ECLCluster#12:
   getUncertaintyTheta(): 0.00507813
   getUniqueId(): 1405001
   getZernikeMVA(): 0.686523
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14774,6 +14963,8 @@ ECLCluster#13:
   getUncertaintyTheta(): 0.0046875
   getUniqueId(): 1505001
   getZernikeMVA(): 0.874023
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14822,6 +15013,8 @@ ECLCluster#14:
   getUncertaintyTheta(): 0.00683594
   getUniqueId(): 1605001
   getZernikeMVA(): 0.619141
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14870,6 +15063,8 @@ ECLCluster#15:
   getUncertaintyTheta(): 0.009375
   getUniqueId(): 1705001
   getZernikeMVA(): 0.277344
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14918,6 +15113,8 @@ ECLCluster#16:
   getUncertaintyTheta(): 0.00742187
   getUniqueId(): 1805001
   getZernikeMVA(): 0.732422
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -14966,6 +15163,8 @@ ECLCluster#17:
   getUncertaintyTheta(): 0.00761719
   getUniqueId(): 2005001
   getZernikeMVA(): 0.757812
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -15015,6 +15214,8 @@ ECLCluster#18:
   getUncertaintyTheta(): 0.00585938
   getUniqueId(): 1905001
   getZernikeMVA(): 0.750977
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -15063,6 +15264,8 @@ ECLCluster#19:
   getUncertaintyTheta(): 0.00800781
   getUniqueId(): 2105001
   getZernikeMVA(): 0.0146484
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -15112,6 +15315,8 @@ ECLCluster#20:
   getUncertaintyTheta(): 0.00703125
   getUniqueId(): 2105002
   getZernikeMVA(): 0.0117188
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -15165,6 +15370,8 @@ ECLCluster#21:
   getUncertaintyTheta(): 0.00488281
   getUniqueId(): 2205001
   getZernikeMVA(): 0.0224609
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -15217,6 +15424,8 @@ ECLCluster#22:
   getUncertaintyTheta(): 0.00722656
   getUniqueId(): 2205002
   getZernikeMVA(): 0.0605469
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -15265,6 +15474,8 @@ ECLCluster#23:
   getUncertaintyTheta(): 0.00546875
   getUniqueId(): 2305001
   getZernikeMVA(): 0.180664
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -15313,6 +15524,8 @@ ECLCluster#24:
   getUncertaintyTheta(): 0.00761719
   getUniqueId(): 2505001
   getZernikeMVA(): 0.426758
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -15361,6 +15574,8 @@ ECLCluster#25:
   getUncertaintyTheta(): 0.00644531
   getUniqueId(): 2605001
   getZernikeMVA(): 0.59375
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -15409,6 +15624,8 @@ ECLCluster#26:
   getUncertaintyTheta(): 0.00527344
   getUniqueId(): 2705001
   getZernikeMVA(): 0.783203
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): True
   hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
@@ -15436,7 +15653,7 @@ ECLCluster#27:
 [ERROR] This cluster does not support the requested hypothesis,
 	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
 	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000  { module: PrintObjectsModule }
+	 You requested the hypothesis bitmask:  = 0000000000010000
   getEnergy(16): nan
   getEnergy(32): 0.239216
   getEnergyHighestCrystal(): 0.0958266
@@ -15462,6 +15679,8 @@ ECLCluster#27:
   getUncertaintyTheta(): 0
   getUniqueId(): 106001
   getZernikeMVA(): 0.632812
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -15510,6 +15729,8 @@ ECLCluster#28:
   getUncertaintyTheta(): 0
   getUniqueId(): 206001
   getZernikeMVA(): 0.217773
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -15558,6 +15779,8 @@ ECLCluster#29:
   getUncertaintyTheta(): 0
   getUniqueId(): 306001
   getZernikeMVA(): 0.753906
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -15606,6 +15829,8 @@ ECLCluster#30:
   getUncertaintyTheta(): 0
   getUniqueId(): 406001
   getZernikeMVA(): 0.271484
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -15654,6 +15879,8 @@ ECLCluster#31:
   getUncertaintyTheta(): 0
   getUniqueId(): 506001
   getZernikeMVA(): 0.460938
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -15704,6 +15931,8 @@ ECLCluster#32:
   getUncertaintyTheta(): 0
   getUniqueId(): 606001
   getZernikeMVA(): 0.580078
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -15752,6 +15981,8 @@ ECLCluster#33:
   getUncertaintyTheta(): 0
   getUniqueId(): 706001
   getZernikeMVA(): 0.439453
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -15800,6 +16031,8 @@ ECLCluster#34:
   getUncertaintyTheta(): 0
   getUniqueId(): 806001
   getZernikeMVA(): 0.668945
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -15848,6 +16081,8 @@ ECLCluster#35:
   getUncertaintyTheta(): 0
   getUniqueId(): 1006001
   getZernikeMVA(): 0.795898
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -15897,6 +16132,8 @@ ECLCluster#36:
   getUncertaintyTheta(): 0
   getUniqueId(): 1106001
   getZernikeMVA(): 0.884766
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -15946,6 +16183,8 @@ ECLCluster#37:
   getUncertaintyTheta(): 0
   getUniqueId(): 1206001
   getZernikeMVA(): 0.408203
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -15994,6 +16233,8 @@ ECLCluster#38:
   getUncertaintyTheta(): 0
   getUniqueId(): 1306001
   getZernikeMVA(): 0.200195
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -16042,6 +16283,8 @@ ECLCluster#39:
   getUncertaintyTheta(): 0
   getUniqueId(): 1406001
   getZernikeMVA(): 0.313477
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -16092,6 +16335,8 @@ ECLCluster#40:
   getUncertaintyTheta(): 0
   getUniqueId(): 1506001
   getZernikeMVA(): 0.125977
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -16140,6 +16385,8 @@ ECLCluster#41:
   getUncertaintyTheta(): 0
   getUniqueId(): 1606001
   getZernikeMVA(): 0.380859
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -16188,6 +16435,8 @@ ECLCluster#42:
   getUncertaintyTheta(): 0
   getUniqueId(): 1706001
   getZernikeMVA(): 0.722656
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -16236,6 +16485,8 @@ ECLCluster#43:
   getUncertaintyTheta(): 0
   getUniqueId(): 1806001
   getZernikeMVA(): 0.267578
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -16284,6 +16535,8 @@ ECLCluster#44:
   getUncertaintyTheta(): 0
   getUniqueId(): 2006001
   getZernikeMVA(): 0.242188
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -16333,6 +16586,8 @@ ECLCluster#45:
   getUncertaintyTheta(): 0
   getUniqueId(): 1906001
   getZernikeMVA(): 0.249023
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -16382,6 +16637,8 @@ ECLCluster#46:
   getUncertaintyTheta(): 0
   getUniqueId(): 2106001
   getZernikeMVA(): 1
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -16435,6 +16692,8 @@ ECLCluster#47:
   getUncertaintyTheta(): 0
   getUniqueId(): 2206001
   getZernikeMVA(): 0.999023
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -16483,6 +16742,8 @@ ECLCluster#48:
   getUncertaintyTheta(): 0
   getUniqueId(): 2306001
   getZernikeMVA(): 0.819336
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -16531,6 +16792,8 @@ ECLCluster#49:
   getUncertaintyTheta(): 0
   getUniqueId(): 2506001
   getZernikeMVA(): 0.573242
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -16579,6 +16842,8 @@ ECLCluster#50:
   getUncertaintyTheta(): 0
   getUniqueId(): 2606001
   getZernikeMVA(): 0.40625
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -16627,6 +16892,8 @@ ECLCluster#51:
   getUncertaintyTheta(): 0
   getUniqueId(): 2706001
   getZernikeMVA(): 0.216797
+  hasFailedFitTime(): False
+  hasFailedTimeResolution(): False
   hasHypothesis(16): False
   hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
@@ -16662,7 +16929,7 @@ KLMCluster#0:
     -> MCParticles#70 (weight: 1)
   getTime(): 2.63636
  ... message repeated 24 times
-[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!  { module: PrintObjectsModule }
+[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(25)
     pair
@@ -19428,19 +19695,3 @@ MCParticle#89:
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 0
 [INFO] ========================================================================
-[INFO] ================================================================================
-[INFO] Error summary: 132 errors and 0 warnings occurred.
-[ERROR] This cluster does not support the requested hypothesis,
-	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
-	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
-	 You requested the hypothesis bitmask:  = 0000000000100000
-[INFO]  (last message occurred 68 times in total)
-[ERROR] This cluster does not support the requested hypothesis,
-	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
-	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
-	 You requested the hypothesis bitmask:  = 0000000000010000
-[INFO]  (last message occurred 61 times in total)
-[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!
-[INFO]  (last message occurred 3 times in total)
-[INFO] ================================================================================
-

@@ -27,17 +27,17 @@
 namespace Belle2 {
 
   namespace PXD {
-
+    //! Module to Load Raw PXD Data from DHH network-dump file and store it as RawPXD in Data Store
+    //! This is meant for lab use (standalone testing, debugging) without an event builder.
     class PXDReadRawBonnDAQModule : public Module {
       enum {MAXEVTSIZE = 4 * 1024 * 1024 + 256 * 4 + 16};
-      // Public functions
-    public:
 
-      //! Constructor / Destructor
+    public:
+      /// Constructor
       PXDReadRawBonnDAQModule();
 
     private:
-
+      /// Destructor
       ~PXDReadRawBonnDAQModule() override final;
 
       void initialize() override final;
@@ -73,13 +73,13 @@ namespace Belle2 {
       //! File handle
       FILE* fh;
 
-      unsigned int m_expNr;// set by Param
-      unsigned int m_runNr;// set by Param
-      unsigned int m_subRunNr;// set by Param
+      unsigned int m_expNr; //!< set by Param
+      unsigned int m_runNr; //!< set by Param
+      unsigned int m_subRunNr; //!< set by Param
 
-      void endian_swapper(void* a, unsigned int len);//! swaps memory region, quick and dirty
-      int readOneEvent(void);//! Read data of one Event from File
-      int read_data(char* data, size_t len);//! Read amount of data (len bytes) from file to ptr data
+      void endian_swapper(void* a, unsigned int len); ///!< swaps memory region, quick and dirty
+      int readOneEvent(void); ///!< Read data of one Event from File
+      int read_data(char* data, size_t len); ///!< Read amount of data (len bytes) from file to ptr data
     };
 
   } // end namespace PXD

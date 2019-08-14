@@ -14,8 +14,9 @@ main.add_module('ParticleGun', pdgCodes=[211, -211, 321, -321], nTracks=2)
 
 # detector simulation
 components = ['MagneticField', 'BeamPipe', 'CDC']
-add_simulation(main, components)
-add_reconstruction(main, components)
+simulation_components = ['CDC']
+add_simulation(main, simulation_components)
+add_reconstruction(main, simulation_components)
 set_module_parameters(main, type="Geometry", useDB=False, components=components)
 
 # output path

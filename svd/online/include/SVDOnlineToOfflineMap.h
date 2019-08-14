@@ -193,6 +193,45 @@ namespace Belle2 {
      */
     const SensorInfo& getSensorInfo(unsigned char FADC, unsigned char APV25);
 
+    /** is the APV of the strips in the map? for a given layer/ladder/dssd/side/strip combination.
+     * @param layer is the layer number
+     * @param ladder is the ladder number
+     * @param sensor is the sensor number
+     * @param side is true if U
+     * @param strip is the strip number
+     * @return true if the APV that reads the strip is in the map, false otherwise
+     */
+    bool isAPVinMap(unsigned short layer,  unsigned short ladder, unsigned short dssd, bool side, unsigned short strip);
+
+    /** is the APV of the strips in the map? for a given layer/ladder/dssd/side/strip combination.
+     * @param sensorID is the VxdID of the sensor
+     * @param side is true if U
+     * @param strip is the strip number
+     * @return true if the APV that reads the strip is in the map, false otherwise
+     */
+    bool isAPVinMap(VxdID sensorID, bool side, unsigned short strip);
+
+    /** prepares the list of the missing APVs
+     *  using the channel mapping
+     */
+    void prepareListOfMissingAPVs();
+    /** struct to hold missing APVs informations */
+    struct missingAPV {
+      VxdID m_sensorID;           /**< Sensor ID */
+      bool m_isUSide;               /**< True if u-side of the sensor */
+      float m_halfStrip;          /**< floating strip in the middle of the APV */
+    };
+
+    /** list of the missing APVs
+     */
+    std::vector< missingAPV > m_missingAPVs;
+
+    /** Get number of missing APVs */
+    int getNumberOfMissingAPVs()
+    {
+      return m_missingAPVs.size();
+    }
+
     /** Get ChipInfo for a given layer/ladder/dssd/side/strip combination.
      * @param layer is the the layer number
      * @param ladder is the the ladder number

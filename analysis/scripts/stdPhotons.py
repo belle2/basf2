@@ -5,12 +5,9 @@
 #
 # Author(s): Torben Ferber (ferber@physics.ubc.ca)
 #
-# more documentation: https://confluence.desy.de/x/I3I0Aw
-#
 ########################################################
 
-from basf2 import *
-from modularAnalysis import *
+from modularAnalysis import fillParticleList, cutAndCopyList
 
 
 def stdPhotons(listtype='loose', path=None):
@@ -33,9 +30,9 @@ def stdPhotons(listtype='loose', path=None):
     @param path     modules are added to this path
     """
 
-    # all photons (reconstructed using the N1 clustering)
+    # all photons (all neutral ECLClusters that have the c_nPhotons hypothesis)
     if listtype == 'all':
-        fillParticleList('gamma:all', 'clusterHasNPhotons', True, path)
+        fillParticleList('gamma:all', '', True, path)
     # all photons within the cdc tracking acceptance: remove un track-matched
     # electrons from outside the tracking acceptance
     elif listtype == 'cdc':
@@ -138,13 +135,15 @@ def loadStdSkimPhoton(path):
         True,
         path)
 
+
 # Only used for Belle via b2bii
-
-
 def loadStdGoodBellePhoton(path):
     """
     Load the Belle goodBelle list. Creates a ParticleList named
     'gamma:goodBelle' with '0.5 < :b2:var:`goodBelleGamma` < 1.5'
+
+    Warning:
+        Should only be used for Belle analyses using `b2bii`.
 
     Parameters:
         path (basf2.Path): the path to load the modules

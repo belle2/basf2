@@ -42,7 +42,7 @@ namespace Belle2 {
       struct TreeStruct {
 
         /** Hit rates in each layer. */
-        float layerRates[240] = {0};
+        float layerRates[BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {0};
 
         /** Total detector average hit rate. */
         float averageRate = 0;
@@ -70,7 +70,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      BKLMHitRateCounter() {};
+      BKLMHitRateCounter();
 
       /**
        * Class initializer.
@@ -112,11 +112,14 @@ namespace Belle2 {
       /** Total number of layers. */
       static constexpr int m_maxGlobalLayer = BKLMElementNumbers::getMaximalSectorGlobalNumber();
 
-      /** BKLM digits. */
-      StoreArray<BKLMDigit> m_digits;
+      /** KLM element numbers. */
+      const KLMElementNumbers* m_klmElementNumbers;
 
       /** KLM channel status. */
       DBObjPtr<KLMChannelStatus> m_ChannelStatus;
+
+      /** BKLM digits. */
+      StoreArray<BKLMDigit> m_digits;
     };
 
   }

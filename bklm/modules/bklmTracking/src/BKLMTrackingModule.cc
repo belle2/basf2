@@ -117,13 +117,13 @@ void BKLMTrackingModule::event()
     if (m_storeTracks.getEntries() > 0)
       thereIsATrack = true;
   } else if (m_studyEffi) {
-    for (int iForward = 0; iForward < 2; iForward++) {
+    for (int iSection = 0; iSection < 2; iSection++) {
       for (int iSector = 0; iSector < 8; iSector++) {
         for (int iLayer = 0; iLayer < 15; iLayer++) {
-          runTracking(1, iForward, iSector , iLayer);
+          runTracking(1, iSection, iSector , iLayer);
           if (m_storeTracks.getEntries() > 0)
             thereIsATrack = true;
-          generateEffi(iForward, iSector, iLayer);
+          generateEffi(iSection, iSector, iLayer);
           //clear tracks so prepare for the next layer efficieny study
           m_storeTracks.clear();
         }
@@ -136,7 +136,7 @@ void BKLMTrackingModule::event()
     m_runTotalEventsWithTracks++;
 }
 
-void BKLMTrackingModule::runTracking(int mode, int iForward, int iSector, int iLayer)
+void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iLayer)
 {
   m_storeTracks.clear();
   //std::list<BKLMTrack*> tracks;
@@ -157,8 +157,8 @@ void BKLMTrackingModule::runTracking(int mode, int iForward, int iSector, int iL
 
   for (int hi = 0; hi < hits2D.getEntries() - 1; ++hi) {
 
-    if (mode == 1 && isLayerUnderStudy(iForward, iSector, iLayer, hits2D[hi])) continue;
-    if (mode == 1 && !isSectorUnderStudy(iForward, iSector, hits2D[hi])) continue;
+    if (mode == 1 && isLayerUnderStudy(iSection, iSector, iLayer, hits2D[hi])) continue;
+    if (mode == 1 && !isSectorUnderStudy(iSection, iSector, hits2D[hi])) continue;
     if (hits2D[hi]->isOnStaTrack()) continue;
     if (hits2D[hi]->isOutOfTime()) continue;
     for (int hj = hi + 1; hj < hits2D.getEntries(); ++hj) {
@@ -179,8 +179,8 @@ void BKLMTrackingModule::runTracking(int mode, int iForward, int iSector, int iL
       for (int ho = 0; ho < hits2D.getEntries(); ++ho) {
 
         if (ho == hi || ho == hj) continue; //exclude seed hits
-        if (mode == 1 && isLayerUnderStudy(iForward, iSector, iLayer, hits2D[hj])) continue;
-        if (mode == 1 && !isSectorUnderStudy(iForward, iSector, hits2D[hj])) continue;
+        if (mode == 1 && isLayerUnderStudy(iSection, iSector, iLayer, hits2D[hj])) continue;
+        if (mode == 1 && !isSectorUnderStudy(iSection, iSector, hits2D[hj])) continue;
         if (hits2D[ho]->isOnStaTrack()) continue;
         if (!m_globalFit && !sameSector(hits2D[ho], hits2D[hi])) continue;
         // if (hits2D[ho]->getLayer() == hits2D[hi]->getLayer() || hits2D[ho]->getLayer() == hits2D[hj]->getLayer()) continue;
@@ -293,7 +293,7 @@ void BKLMTrackingModule::terminate()
 
 bool BKLMTrackingModule::sameSector(BKLMHit2d* hit1, BKLMHit2d* hit2)
 {
-  if (hit1->getForward() == hit2->getForward() && hit1->getSector() == hit2->getSector()) return true;
+  if (hit1->getSection() == hit2->getSection() && hit1->getSector() == hit2->getSector()) return true;
   else return false;
 }
 
@@ -362,7 +362,7 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
   else return true;
 }
 
-void BKLMTrackingModule::generateEffi(int iForward, int iSector, int iLayer)
+void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
 {
 
   set<int> m_pointUsed;
@@ -384,7 +384,7 @@ void BKLMTrackingModule::generateEffi(int iForward, int iSector, int iLayer)
     if (iLayer != 0 && cnt2 < 1) return;
     if (iLayer != 14 && cnt1 < 1) return;
     m_GeoPar = GeometryPar::instance();
-    const bklm::Module* module = m_GeoPar->findModule(iForward, iSector + 1, iLayer + 1);
+    const bklm::Module* module = m_GeoPar->findModule(iSection, iSector + 1, iLayer + 1);
     int minPhiStrip = module->getPhiStripMin();
     int maxPhiStrip = module->getPhiStripMax();
     int minZStrip = module->getZStripMin();
@@ -400,21 +400,21 @@ void BKLMTrackingModule::generateEffi(int iForward, int iSector, int iLayer)
     TVectorD trkPar = m_storeTracks[it]->getLocalTrackParam();
 
     //first layer is the reference layer
-    //if (iForward == 1 && (iSector + 1 ) ==5)  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iForward, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iForward, iSector + 1, 1)<<endl;
-    float reflocalX = fabs(m_GeoPar->getActiveMiddleRadius(iForward, iSector + 1,
-                                                           iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iForward, iSector + 1, 1));
-    //if (iForward == 1 && (iSector + 1 ) ==5)  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iForward, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iForward, iSector + 1, 1)<<endl;
+    //if (iSection == 1 && (iSector + 1 ) ==5)  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1)<<endl;
+    float reflocalX = fabs(m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1,
+                                                           iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1));
+    //if (iSection == 1 && (iSector + 1 ) ==5)  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1)<<endl;
 
     float reflocalY = trkPar[0] + trkPar[1] * reflocalX;
     float reflocalZ = trkPar[2] + trkPar[3] * reflocalX;
 
     //reference module is the first layer
-    //module = m_GeoPar->findModule(iForward, iSector + 1, 1);
+    //module = m_GeoPar->findModule(iSection, iSector + 1, 1);
     reflocalX = 0.0;
     Hep3Vector reflocal(reflocalX, reflocalY, reflocalZ);
     //Hep3Vector global(localX, localY, localZ);
     Hep3Vector global(0, 0, 0);
-    module = m_GeoPar->findModule(iForward, iSector + 1, iLayer + 1);
+    module = m_GeoPar->findModule(iSection, iSector + 1, iLayer + 1);
     global = module->localToGlobal(reflocal);
     //float localX = module->globalToLocal(global)[0];
     float localY = module->globalToLocal(global)[1];
@@ -425,12 +425,12 @@ void BKLMTrackingModule::generateEffi(int iForward, int iSector, int iLayer)
     if (localY > minLocalY && localY < maxLocalY && localZ > minLocalZ && localZ < maxLocalZ) {
 
       bool m_iffound = false;
-      m_total[iForward][iSector]->Fill(iLayer + 1);
+      m_total[iSection][iSector]->Fill(iLayer + 1);
       m_totalYX->Fill(global[0], global[1]);
       m_totalYZ->Fill(global[2], global[1]);
 
       for (int he = 0; he < hits2D.getEntries(); ++he) {
-        if (!isLayerUnderStudy(iForward, iSector, iLayer, hits2D[he])) continue;
+        if (!isLayerUnderStudy(iSection, iSector, iLayer, hits2D[he])) continue;
         if (hits2D[he]->isOutOfTime()) continue;
         //if alreday used, skip
         if (m_pointUsed.find(he) != m_pointUsed.end()) continue;
@@ -444,14 +444,14 @@ void BKLMTrackingModule::generateEffi(int iForward, int iSector, int iLayer)
           //global[0] = hits2D[he]->getGlobalPosition()[0];
           //global[1] = hits2D[he]->getGlobalPosition()[1];
           //global[2] = hits2D[he]->getGlobalPosition()[2];
-          m_pass[iForward][iSector]->Fill(iLayer + 1);
+          m_pass[iSection][iSector]->Fill(iLayer + 1);
           m_passYX->Fill(global[0], global[1]);
           m_passYZ->Fill(global[2], global[1]);
           break;
         }
       }
 
-      m_effiVsLayer[iForward][iSector]->Fill(m_iffound, iLayer + 1);
+      m_effiVsLayer[iSection][iSector]->Fill(m_iffound, iLayer + 1);
       //cout<<" global "<<global[0]<<", "<< global[1]<<" "<<global[2]<<endl;
       //m_effiYX->Fill(m_iffound, global[1], global[0]);
       //m_effiYZ->Fill(m_iffound, global[1], global[2]);
@@ -471,15 +471,15 @@ bool BKLMTrackingModule::sortByLayer(BKLMHit2d* hit1, BKLMHit2d* hit2)
 
 }
 
-bool BKLMTrackingModule::isLayerUnderStudy(int forward, int iSector, int iLayer, BKLMHit2d* hit)
+bool BKLMTrackingModule::isLayerUnderStudy(int section, int iSector, int iLayer, BKLMHit2d* hit)
 {
-  if (hit->getForward() == (forward != 0) && hit->getSector() == iSector + 1 &&  hit->getLayer() == iLayer + 1) return true;
+  if (hit->getSection() == section && hit->getSector() == iSector + 1 &&  hit->getLayer() == iLayer + 1) return true;
   else return false;
 }
 
-bool BKLMTrackingModule::isSectorUnderStudy(int forward, int iSector, BKLMHit2d* hit)
+bool BKLMTrackingModule::isSectorUnderStudy(int section, int iSector, BKLMHit2d* hit)
 {
-  if (hit->getForward() == (forward != 0) && hit->getSector() == iSector + 1) return true;
+  if (hit->getSection() == section && hit->getSector() == iSector + 1) return true;
   else return false;
 }
 
@@ -494,11 +494,10 @@ double BKLMTrackingModule::distanceToHit(BKLMTrack* track, BKLMHit2d* hit,
   sigma = DBL_MAX;
 
   TVectorD m_SectorPar = track->getLocalTrackParam();
-  TMatrixDSym m_SectorErr = track->getTrackParamErr();
 
   m_GeoPar = GeometryPar::instance();
-  const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getForward(), hit->getSector(), 1);
-  const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->getForward(), hit->getSector(), hit->getLayer());
+  const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), 1);
+  const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
 
   CLHEP::Hep3Vector globalPos(hit->getGlobalPosition()[0], hit->getGlobalPosition()[1], hit->getGlobalPosition()[2]);
   CLHEP::Hep3Vector local = refMod->globalToLocal(globalPos);

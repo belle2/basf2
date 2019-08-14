@@ -50,7 +50,7 @@ void EKLMDataCheckerModule::event()
   for (i = 0; i < n; i++) {
     EKLMDigit* eklmDigit = m_Digits[i];
     strip = m_GeoDat->stripNumber(
-              eklmDigit->getEndcap(), eklmDigit->getLayer(),
+              eklmDigit->getSection(), eklmDigit->getLayer(),
               eklmDigit->getSector(), eklmDigit->getPlane(),
               eklmDigit->getStrip());
     it = m_StripDataMap.find(strip);
@@ -86,7 +86,7 @@ static bool compareStripNumber(EKLMDataCheckerModule::StripData& dat1,
 
 void EKLMDataCheckerModule::terminate()
 {
-  int endcap, layer, sector, plane, strip, stripGlobal;
+  int section, layer, sector, plane, strip, stripGlobal;
   std::map<int, StripData>::iterator it;
   std::vector<StripData> stripDataVector;
   std::vector<StripData>::iterator it2, it3, it4;
@@ -107,28 +107,28 @@ void EKLMDataCheckerModule::terminate()
     }
     sort(it2, it3, compareStripNumber);
     for (it4 = it2; it4 != it3; ++it4) {
-      m_GeoDat->stripNumberToElementNumbers(it4->strip, &endcap, &layer,
+      m_GeoDat->stripNumberToElementNumbers(it4->strip, &section, &layer,
                                             &sector, &plane, &strip);
-      printf("Endcap %d, layer %d, sector %d, plane %d, strip %d: %.1f%% "
+      printf("Section %d, layer %d, sector %d, plane %d, strip %d: %.1f%% "
              "(%d/%d)\n",
-             endcap, layer, sector, plane, strip,
+             section, layer, sector, plane, strip,
              float(it4->nBadDigits) / it4->nDigits * 100,
              it4->nBadDigits, it4->nDigits);
     }
     it2 = it3;
   }
   printf("Strips with no data collected:\n");
-  for (endcap = 1; endcap <= m_GeoDat->getNEndcaps(); endcap++) {
-    for (layer = 1; layer <= m_GeoDat->getNDetectorLayers(endcap); layer++) {
+  for (section = 1; section <= m_GeoDat->getNSections(); section++) {
+    for (layer = 1; layer <= m_GeoDat->getNDetectorLayers(section); layer++) {
       for (sector = 1; sector <= m_GeoDat->getNSectors(); sector++) {
         for (plane = 1; plane <= m_GeoDat->getNPlanes(); plane++) {
           for (strip = 1; strip <= m_GeoDat->getNStrips(); strip++) {
-            stripGlobal = m_GeoDat->stripNumber(endcap, layer, sector, plane,
+            stripGlobal = m_GeoDat->stripNumber(section, layer, sector, plane,
                                                 strip);
             it = m_StripDataMap.find(stripGlobal);
             if (it == m_StripDataMap.end()) {
-              printf("Endcap %d, layer %d, sector %d, plane %d, strip %d.\n",
-                     endcap, layer, sector, plane, strip);
+              printf("Section %d, layer %d, sector %d, plane %d, strip %d.\n",
+                     section, layer, sector, plane, strip);
             }
           }
         }

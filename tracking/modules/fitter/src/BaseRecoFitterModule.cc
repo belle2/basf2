@@ -20,6 +20,8 @@
 #include <framework/datastore/RelationArray.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
+#include <simulation/monopoles/MonopoleConstants.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -53,6 +55,9 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
   addParam("initializeCDCTranslators", m_param_initializeCDCTranslators,
            "Configures whether the CDC Translators should be initialized by the FitterModule",
            m_param_initializeCDCTranslators);
+  addParam("monopoleMagCharge", Monopoles::monopoleMagCharge,
+           "Sets monopole magnetic charge hypothesis if it is in the pdgCodesToUseForFitting",
+           Monopoles::monopoleMagCharge);
 }
 
 void BaseRecoFitterModule::initialize()
@@ -67,6 +72,8 @@ void BaseRecoFitterModule::initialize()
   if (!genfit::FieldManager::getInstance()->isInitialized()) {
     B2FATAL("Magnetic field not set up. Please use SetupGenfitExtrapolationModule.");
   }
+
+  genfit::MaterialEffects::getInstance()->setMagCharge(Monopoles::monopoleMagCharge);
 }
 
 
@@ -103,9 +110,15 @@ void BaseRecoFitterModule::event()
     B2DEBUG(100, "Total number of hits assigned to the track: " << recoTrack.getNumberOfTotalHits());
 
     for (const unsigned int pdgCodeToUseForFitting : m_param_pdgCodesToUseForFitting) {
-      Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
-      B2DEBUG(100, "PDG: " << pdgCodeToUseForFitting);
-      const bool wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
+      bool wasFitSuccessful;
+      if (pdgCodeToUseForFitting != Monopoles::c_monopolePDGCode) {
+        Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
+        B2DEBUG(100, "PDG: " << pdgCodeToUseForFitting);
+        wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
+      } else {
+        // Different call signature for monopoles in order not to change Const::ChargedStable types
+        wasFitSuccessful = fitter.fit(recoTrack, pdgCodeToUseForFitting);
+      }
       const genfit::AbsTrackRep* trackRep = recoTrack.getTrackRepresentationForPDG(pdgCodeToUseForFitting);
 
       if (!trackRep) {

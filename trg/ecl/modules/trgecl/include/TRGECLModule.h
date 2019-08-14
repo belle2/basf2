@@ -87,17 +87,17 @@ namespace Belle2 {
 
     //! The current number of created hits in an event.
     //! Used to fill the DataStore ECL array.
-    int m_hitNum;
+    int m_hitNum = 0;
     //! TC Hit number
-    int m_hitTCNum;
+    int m_hitTCNum = 0;
 
   private:
 
     // double m_timeCPU;        //  CPU time
     //!  Run number
-    int m_nRun;
+    int m_nRun = 0;
     //!  Event number
-    int m_nEvent;
+    int m_nEvent = 0;
     //! Bhabha option
     int _Bhabha;
     //! Clustering option
@@ -120,8 +120,22 @@ namespace Belle2 {
     std::vector<double> _2DBhabhaThresholdFWD;
     //! 2D Bhabha Energy Threshold
     std::vector<double> _2DBhabhaThresholdBWD;
-    //! 3D Bhabha Energy Threshold
-    std::vector<double> _3DBhabhaThreshold;
+    //! 3D Selection Bhabha Energy Threshold
+    std::vector<double> _3DBhabhaSelectionThreshold;
+    //! 3D Veto Bhabha Energy Threshold
+    std::vector<double> _3DBhabhaVetoThreshold;
+    //! 3D Selection Bhabha Energy Angle
+    std::vector<double> _3DBhabhaSelectionAngle;
+    //! 3D Veto Bhabha Energy Angle
+    std::vector<double> _3DBhabhaVetoAngle;
+    //! mumu bit Energy Threshold
+    double _mumuThreshold;
+    //! mumu bit  Angle
+    std::vector<double> _mumuAngle;
+    //! The number of Cluster exceeding 300 MeV
+    int _n300MeVCluster;
+    //!ECL Burst Bit Threshold
+    double _ECLBurstThreshold;
     //! Total Energy Theshold (low, high, lum)
     std::vector<double> _TotalEnergy;
     //! Low Multiplicity Threshold

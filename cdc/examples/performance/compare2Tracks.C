@@ -11,7 +11,7 @@ void fit(TH1D* h1);
 void compare2Tracks(bool draw_sim =true){
 
  std::vector<std::string> filenames ={"cosmic/rootfile/twotracks*"};
-  bool loose_selection = false;
+  bool loose_selection(false);
   TString sCharge="all";
 
   //Root file contain histograms for compare with this results

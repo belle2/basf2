@@ -79,16 +79,16 @@ void EKLMDatabaseImporter::loadDefaultDisplacement()
   EKLMAlignmentData alignmentData(0., 0., 0.);
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   m_Displacement.construct();
-  int iEndcap, iLayer, iSector, iPlane, iSegment, segment, sector;
-  for (iEndcap = 1; iEndcap <= geoDat->getNEndcaps(); iEndcap++) {
-    for (iLayer = 1; iLayer <= geoDat->getNDetectorLayers(iEndcap);
+  int iSection, iLayer, iSector, iPlane, iSegment, segment, sector;
+  for (iSection = 1; iSection <= geoDat->getNSections(); iSection++) {
+    for (iLayer = 1; iLayer <= geoDat->getNDetectorLayers(iSection);
          iLayer++) {
       for (iSector = 1; iSector <= geoDat->getNSectors(); iSector++) {
-        sector = geoDat->sectorNumber(iEndcap, iLayer, iSector);
+        sector = geoDat->sectorNumber(iSection, iLayer, iSector);
         m_Displacement->setSectorAlignment(sector, &alignmentData);
         for (iPlane = 1; iPlane <= geoDat->getNPlanes(); iPlane++) {
           for (iSegment = 1; iSegment <= geoDat->getNSegments(); iSegment++) {
-            segment = geoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
+            segment = geoDat->segmentNumber(iSection, iLayer, iSector, iPlane,
                                             iSegment);
             m_Displacement->setSegmentAlignment(segment, &alignmentData);
           }
@@ -99,14 +99,14 @@ void EKLMDatabaseImporter::loadDefaultDisplacement()
 }
 
 void EKLMDatabaseImporter::setSectorDisplacement(
-  int endcap, int layer, int sector, float dx, float dy, float dalpha)
+  int section, int layer, int sector, float dx, float dy, float dalpha)
 {
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   EKLMAlignmentData sectorAlignment(dx, dy, dalpha);
   EKLM::AlignmentChecker alignmentChecker(false);
   int sectorGlobal;
-  sectorGlobal = geoDat->sectorNumber(endcap, layer, sector);
-  if (!alignmentChecker.checkSectorAlignment(endcap, layer, sector,
+  sectorGlobal = geoDat->sectorNumber(section, layer, sector);
+  if (!alignmentChecker.checkSectorAlignment(section, layer, sector,
                                              &sectorAlignment)) {
     B2ERROR("Incorrect displacement data (overlaps exist). "
             "The displacement is not changed");
@@ -116,7 +116,7 @@ void EKLMDatabaseImporter::setSectorDisplacement(
 }
 
 void EKLMDatabaseImporter::setSegmentDisplacement(
-  int endcap, int layer, int sector, int plane, int segment,
+  int section, int layer, int sector, int plane, int segment,
   float dx, float dy, float dalpha)
 {
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
@@ -124,12 +124,12 @@ void EKLMDatabaseImporter::setSegmentDisplacement(
   EKLM::AlignmentChecker alignmentChecker(false);
   const EKLMAlignmentData* sectorAlignment;
   int sectorGlobal, segmentGlobal;
-  sectorGlobal = geoDat->sectorNumber(endcap, layer, sector);
+  sectorGlobal = geoDat->sectorNumber(section, layer, sector);
   sectorAlignment = m_Displacement->getSectorAlignment(sectorGlobal);
   if (sectorAlignment == nullptr)
     B2FATAL("Incomplete alignment data.");
-  segmentGlobal = geoDat->segmentNumber(endcap, layer, sector, plane, segment);
-  if (!alignmentChecker.checkSegmentAlignment(endcap, layer, sector, plane,
+  segmentGlobal = geoDat->segmentNumber(section, layer, sector, plane, segment);
+  if (!alignmentChecker.checkSegmentAlignment(section, layer, sector, plane,
                                               segment, sectorAlignment,
                                               &segmentAlignment, false)) {
     B2ERROR("Incorrect displacement data (overlaps exist). "

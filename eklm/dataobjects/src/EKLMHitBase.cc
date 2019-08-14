@@ -18,7 +18,7 @@ EKLMHitBase::EKLMHitBase()
   m_PDG = -1;
   m_Time = -1;
   m_EDep = -1;
-  m_Endcap = -1;
+  m_Section = -1;
   m_Layer = -1;
   m_Sector = -1;
 }
@@ -27,24 +27,24 @@ EKLMHitBase::~EKLMHitBase()
 {
 }
 
-EKLMHitBase::EKLMHitBase(int Endcap, int Layer, int Sector)
+EKLMHitBase::EKLMHitBase(int Section, int Layer, int Sector)
 {
   m_PDG = -1;
   m_Time = -1;
   m_EDep = -1;
-  m_Endcap = Endcap;
+  m_Section = Section;
   m_Layer = Layer;
   m_Sector = Sector;
 }
 
-int EKLMHitBase::getEndcap() const
+int EKLMHitBase::getSection() const
 {
-  return m_Endcap;
+  return m_Section;
 }
 
-void EKLMHitBase::setEndcap(int Endcap)
+void EKLMHitBase::setSection(int Section)
 {
-  m_Endcap = Endcap;
+  m_Section = Section;
 }
 
 int EKLMHitBase::getLayer() const

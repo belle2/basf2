@@ -107,7 +107,7 @@ void EKLMTimeCalibrationCollectorModule::collect()
     for (j = 0; j < 2; j++) {
       entryHit[j] = nullptr;
       exitHit[j] = nullptr;
-      vol = m_GeoDat->stripNumber(digits[j]->getEndcap(), digits[j]->getLayer(),
+      vol = m_GeoDat->stripNumber(digits[j]->getSection(), digits[j]->getLayer(),
                                   digits[j]->getSector(), digits[j]->getPlane(),
                                   digits[j]->getStrip());
       itLower = mapExtHit.lower_bound(vol);
@@ -156,7 +156,7 @@ void EKLMTimeCalibrationCollectorModule::collect()
       m_ev.dist = 0.5 * l - hitLocal.x() / CLHEP::mm * Unit::mm;
       m_ev.npe = digits[j]->getNPE();
       m_Strip =
-        m_GeoDat->stripNumber(digits[j]->getEndcap(), digits[j]->getLayer(),
+        m_GeoDat->stripNumber(digits[j]->getSection(), digits[j]->getLayer(),
                               digits[j]->getSector(), digits[j]->getPlane(),
                               digits[j]->getStrip());
       calibrationData->Fill();

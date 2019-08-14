@@ -36,14 +36,14 @@ namespace Belle2 {
 
   public:
 
-    // Constructor.
+    /// Constructor.
     TRGCDCEventTimeFinder(const std::string& name,
                           const TRGClock& systemClock,
                           const TRGClock& dataClock,
                           const TRGClock& userClockInput,
                           const TRGClock& userClockOutput);
 
-    // Destructor.
+    /// Destructor.
     ~TRGCDCEventTimeFinder();
 
   public:
@@ -51,6 +51,7 @@ namespace Belle2 {
     /// return version
     static std::string version(void);
 
+    /// push back the TRGCDCTrackSegmentFinder pointer
     void push_back(const TRGCDCTrackSegmentFinder*);
 
     /// Firmware simulation. yi

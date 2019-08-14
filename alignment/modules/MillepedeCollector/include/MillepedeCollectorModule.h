@@ -17,7 +17,7 @@
 #include <genfit/MeasuredStateOnPlane.h>
 #include <analysis/dataobjects/Particle.h>
 #include <genfit/GblTrajectory.h>
-
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
@@ -96,6 +96,13 @@ namespace Belle2 {
     /** Write down a GBL trajectory (to TTree or binary file) */
     void storeTrajectory(gbl::GblTrajectory& trajectory);
 
+    /** Get the primary vertex position estimation and its size
+     *  from BeamSpot
+     @return tuple<TVector3, TMatrixDSym> tuple with position and size as covariance matrix
+     */
+    std::tuple<TVector3, TMatrixDSym> getPrimaryVertexAndCov() const;
+
+
   private:
     /** Names of arrays with single RecoTracks fitted by GBL */
     std::vector<std::string> m_tracks;
@@ -155,6 +162,11 @@ namespace Belle2 {
     bool m_enableWireByWireAlignment;
     /** Enable global derivatives for wire sagging **/
     bool m_enableWireSagging;
+
+    /** List of event meta data entries at which payloads can change for timedep calibration */
+    std::vector<std::tuple<int, int, int>> m_eventNumbers{};
+
+    std::vector< std::tuple< std::vector< int >, std::vector< std::tuple< int, int, int > > > > m_timedepConfig;
 
     /** Current vector of GBL data from trajectory to be stored in a tree */
     std::vector<gbl::GblData> m_currentGblData{};

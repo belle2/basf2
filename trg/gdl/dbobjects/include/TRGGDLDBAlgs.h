@@ -8,7 +8,7 @@ namespace Belle2 {
 
   /** The payload class for GDL algorithm.
    *
-   *  The payload class stores the number of psnm bit and their prescale values
+   *  The payload class stores strings of GDL logic algorithm.
    */
 
 

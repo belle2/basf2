@@ -313,7 +313,7 @@ namespace Belle2 {
 
       _inpBits.clear();
       for (int i = 0; i < N_InputBits; i++) {
-        _inpBits.push_back(GDLResult->isFiredInput(i));
+        _inpBits.push_back(GDLResult->testInput(i));
       }
 
       if (_alg_from_db) {
@@ -354,7 +354,7 @@ namespace Belle2 {
         bool event_ok = true;
         for (int i = 0; i < N_OutputBits; i++) {
           bool ftdl_fired = isFiredFTDL(_inpBits, algs[i]);
-          bool data = GDLResult->isFiredFtdl(i);
+          bool data = GDLResult->testFtdl(i);
           if ((ftdl_fired && !data) || (!ftdl_fired && data)) {
             event_ok = false;
             std::cout << "i(" << i

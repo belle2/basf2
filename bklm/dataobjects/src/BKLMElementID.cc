@@ -58,7 +58,7 @@ namespace Belle2 {
     istringstream in(module);
     try {
       //Get all the parts
-      m_id.parts.forward = getPart(in);
+      m_id.parts.section = getPart(in);
       m_id.parts.sector = getPart(in);
       m_id.parts.layer  = getPart(in);
       /*//Check if we also have a segment specified, if so get it
@@ -86,8 +86,8 @@ namespace Belle2 {
   BKLMElementID::operator string() const
   {
     stringstream out;
-    if (m_id.parts.forward) {
-      out << m_id.parts.forward;
+    if (m_id.parts.section) {
+      out << m_id.parts.section;
     } else {
       out << "*";
     }

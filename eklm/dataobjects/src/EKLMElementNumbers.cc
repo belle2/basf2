@@ -22,11 +22,11 @@ EKLMElementNumbers::~EKLMElementNumbers()
 {
 }
 
-bool EKLMElementNumbers::checkEndcap(int endcap, bool fatalError) const
+bool EKLMElementNumbers::checkSection(int section, bool fatalError) const
 {
-  if (endcap <= 0 || endcap > m_MaximalEndcapNumber) {
+  if (section <= 0 || section > m_MaximalSectionNumber) {
     if (fatalError) {
-      B2FATAL("Number of endcap must be 1 (backward) or 2 (forward).");
+      B2FATAL("Number of section must be 1 (backward) or 2 (forward).");
     }
     return false;
   }
@@ -45,16 +45,16 @@ bool EKLMElementNumbers::checkLayer(int layer, bool fatalError) const
   return true;
 }
 
-bool EKLMElementNumbers::checkDetectorLayer(int endcap, int layer,
+bool EKLMElementNumbers::checkDetectorLayer(int section, int layer,
                                             bool fatalError) const
 {
   /* cppcheck-suppress variableScope */
-  const char* endcapName[2] = {"backward", "forward"};
-  if (layer < 0 || layer > m_MaximalDetectorLayerNumber[endcap - 1]) {
+  const char* sectionName[2] = {"backward", "forward"};
+  if (layer < 0 || layer > m_MaximalDetectorLayerNumber[section - 1]) {
     if (fatalError) {
       B2FATAL("Number of layer must be from 1 to the maximal number of "
-              "detector layers in the " << endcapName[endcap - 1] << " endcap ("
-              << m_MaximalDetectorLayerNumber[endcap - 1] << ").");
+              "detector layers in the " << sectionName[section - 1] << " section ("
+              << m_MaximalDetectorLayerNumber[section - 1] << ").");
     }
     return false;
   }
@@ -109,46 +109,46 @@ bool EKLMElementNumbers::checkStrip(int strip, bool fatalError) const
   return true;
 }
 
-int EKLMElementNumbers::detectorLayerNumber(int endcap, int layer) const
+int EKLMElementNumbers::detectorLayerNumber(int section, int layer) const
 {
-  checkEndcap(endcap);
-  checkDetectorLayer(endcap, layer);
-  if (endcap == 1)
+  checkSection(section);
+  checkDetectorLayer(section, layer);
+  if (section == 1)
     return layer;
   return m_MaximalDetectorLayerNumber[0] + layer;
 }
 
 void EKLMElementNumbers::layerNumberToElementNumbers(
-  int layerGlobal, int* endcap, int* layer) const
+  int layerGlobal, int* section, int* layer) const
 {
   static int maxLayer = getMaximalLayerGlobalNumber();
   if (layerGlobal <= 0 || layerGlobal > maxLayer)
     B2FATAL("Number of segment must be from 1 to " << maxLayer << ".");
   if (layerGlobal <= m_MaximalDetectorLayerNumber[0]) {
-    *endcap = 1;
+    *section = 1;
     *layer = layerGlobal;
   } else {
-    *endcap = 2;
+    *section = 2;
     *layer = layerGlobal - m_MaximalDetectorLayerNumber[0];
   }
 }
 
-int EKLMElementNumbers::sectorNumber(int endcap, int layer, int sector) const
+int EKLMElementNumbers::sectorNumber(int section, int layer, int sector) const
 {
   checkSector(sector);
-  return m_MaximalSectorNumber * (detectorLayerNumber(endcap, layer) - 1) +
+  return m_MaximalSectorNumber * (detectorLayerNumber(section, layer) - 1) +
          sector;
 }
 
-int EKLMElementNumbers::sectorNumberKLMOrder(int endcap, int sector) const
+int EKLMElementNumbers::sectorNumberKLMOrder(int section, int sector) const
 {
-  checkEndcap(endcap);
+  checkSection(section);
   checkSector(sector);
-  return m_MaximalSectorNumber * (endcap - 1) + sector;
+  return m_MaximalSectorNumber * (section - 1) + sector;
 }
 
 void EKLMElementNumbers::sectorNumberToElementNumbers(
-  int sectorGlobal, int* endcap, int* layer, int* sector) const
+  int sectorGlobal, int* section, int* layer, int* sector) const
 {
   static int maxSector = getMaximalSectorGlobalNumber();
   int layerGlobal;
@@ -156,19 +156,19 @@ void EKLMElementNumbers::sectorNumberToElementNumbers(
     B2FATAL("Number of segment must be from 1 to " << maxSector << ".");
   *sector = (sectorGlobal - 1) % m_MaximalSectorNumber + 1;
   layerGlobal = (sectorGlobal - 1) / m_MaximalSectorNumber + 1;
-  layerNumberToElementNumbers(layerGlobal, endcap, layer);
+  layerNumberToElementNumbers(layerGlobal, section, layer);
 }
 
-int EKLMElementNumbers::planeNumber(int endcap, int layer, int sector,
+int EKLMElementNumbers::planeNumber(int section, int layer, int sector,
                                     int plane) const
 {
   checkPlane(plane);
-  return m_MaximalPlaneNumber * (sectorNumber(endcap, layer, sector) - 1) +
+  return m_MaximalPlaneNumber * (sectorNumber(section, layer, sector) - 1) +
          plane;
 }
 
 void EKLMElementNumbers::planeNumberToElementNumbers(
-  int planeGlobal, int* endcap, int* layer, int* sector, int* plane) const
+  int planeGlobal, int* section, int* layer, int* sector, int* plane) const
 {
   static int maxPlane = getMaximalPlaneGlobalNumber();
   int sectorGlobal;
@@ -176,19 +176,19 @@ void EKLMElementNumbers::planeNumberToElementNumbers(
     B2FATAL("Number of segment must be from 1 to " << maxPlane << ".");
   *plane = (planeGlobal - 1) % m_MaximalPlaneNumber + 1;
   sectorGlobal = (planeGlobal - 1) / m_MaximalPlaneNumber + 1;
-  sectorNumberToElementNumbers(sectorGlobal, endcap, layer, sector);
+  sectorNumberToElementNumbers(sectorGlobal, section, layer, sector);
 }
 
-int EKLMElementNumbers::segmentNumber(int endcap, int layer, int sector,
+int EKLMElementNumbers::segmentNumber(int section, int layer, int sector,
                                       int plane, int segment) const
 {
   checkSegment(segment);
-  return m_MaximalSegmentNumber * (planeNumber(endcap, layer, sector, plane) -
+  return m_MaximalSegmentNumber * (planeNumber(section, layer, sector, plane) -
                                    1) + segment;
 }
 
 void EKLMElementNumbers::segmentNumberToElementNumbers(
-  int segmentGlobal, int* endcap, int* layer, int* sector, int* plane,
+  int segmentGlobal, int* section, int* layer, int* sector, int* plane,
   int* segment) const
 {
   static int maxSegment = getMaximalSegmentGlobalNumber();
@@ -197,19 +197,19 @@ void EKLMElementNumbers::segmentNumberToElementNumbers(
     B2FATAL("Number of segment must be from 1 to " << maxSegment << ".");
   *segment = (segmentGlobal - 1) % m_MaximalSegmentNumber + 1;
   planeGlobal = (segmentGlobal - 1) / m_MaximalSegmentNumber + 1;
-  planeNumberToElementNumbers(planeGlobal, endcap, layer, sector, plane);
+  planeNumberToElementNumbers(planeGlobal, section, layer, sector, plane);
 }
 
-int EKLMElementNumbers::stripNumber(int endcap, int layer, int sector,
+int EKLMElementNumbers::stripNumber(int section, int layer, int sector,
                                     int plane, int strip) const
 {
   checkStrip(strip);
-  return m_MaximalStripNumber * (planeNumber(endcap, layer, sector, plane) - 1)
+  return m_MaximalStripNumber * (planeNumber(section, layer, sector, plane) - 1)
          + strip;
 }
 
 void EKLMElementNumbers::stripNumberToElementNumbers(
-  int stripGlobal, int* endcap, int* layer, int* sector, int* plane,
+  int stripGlobal, int* section, int* layer, int* sector, int* plane,
   int* strip) const
 {
   static int maxStrip = getMaximalStripGlobalNumber();
@@ -218,7 +218,7 @@ void EKLMElementNumbers::stripNumberToElementNumbers(
     B2FATAL("Number of strip must be from 1 to " << maxStrip << ".");
   *strip = (stripGlobal - 1) % m_MaximalStripNumber + 1;
   planeGlobal = (stripGlobal - 1) / m_MaximalStripNumber + 1;
-  planeNumberToElementNumbers(planeGlobal, endcap, layer, sector, plane);
+  planeNumberToElementNumbers(planeGlobal, section, layer, sector, plane);
 }
 
 int EKLMElementNumbers::stripLocalNumber(int strip) const
@@ -260,8 +260,8 @@ void EKLMElementNumbers::getAsicChannel(
   *asic = asicMod5 + m_MaximalSegmentNumber * (plane - 1);
 }
 
-int EKLMElementNumbers::getMaximalDetectorLayerNumber(int endcap) const
+int EKLMElementNumbers::getMaximalDetectorLayerNumber(int section) const
 {
-  checkEndcap(endcap);
-  return m_MaximalDetectorLayerNumber[endcap - 1];
+  checkSection(section);
+  return m_MaximalDetectorLayerNumber[section - 1];
 }

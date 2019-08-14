@@ -21,7 +21,7 @@ EKLMHit2d::EKLMHit2d()
 
 EKLMHit2d::EKLMHit2d(EKLMDigit* s1)
 {
-  setEndcap(s1->getEndcap());
+  setSection(s1->getSection());
   setLayer(s1->getLayer());
   setSector(s1->getSector());
   m_ChiSq = -1;

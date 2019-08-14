@@ -144,8 +144,6 @@ Here is a list of particle identification variables:
   In other words, pionID was sensitive only to the pion-kaon mis-id, and not to
   the pion-proton or pion-muon mis-identification.
 
-More information in `this confluence page <https://confluence.desy.de/display/BI/Physics+charged+particle+identification>`_
-
 .. b2-variables::
    :group: PID   
 
@@ -322,6 +320,8 @@ Rest of Event
 Continuum Suppression
 ~~~~~~~~~~~~~~~~~~~~~
 
+For a detailed description of the continuum suppression, see `ContinuumSuppression`
+
 .. b2-variables::
     :group: Continuum Suppression
 
@@ -333,6 +333,7 @@ Event Shape
 
 These variables are available after adding the event shape builder modules.
 This can be done with the function `modularAnalysis.buildEventShape`.
+For a detailed description of the event shape variables,  see `EventShape`
 
 .. b2-variables::
     :group: EventShape

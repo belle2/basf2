@@ -110,7 +110,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         topdqm = register_module('TOPDQM')
         path.add_module(topdqm)
     # KLM
-    if (components is None or 'BKLM' or 'EKLM' in components) and (dqm_mode in ["dont_care", "filtered"]):
+    if (components is None or 'KLM' in components) and (dqm_mode in ["dont_care", "filtered"]):
         klmdqm = register_module("KLMDQM")
         path.add_module(klmdqm)
 
@@ -121,7 +121,11 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module(trgecldqm)
         # TRGGDL
         trggdldqm = register_module('TRGGDLDQM')
+        trggdldqm.param('skim', 0)
         path.add_module(trggdldqm)
+        # TRGGRL
+        trggrldqm = register_module('TRGGRLDQM')
+        path.add_module(trggrldqm)
         # TRGCDCTSF
         nmod_tsf = [0, 1, 2, 3, 4, 5, 6]
         for mod_tsf in nmod_tsf:
@@ -142,6 +146,12 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             firmwareResultCollectionName='TRGCDCT3DUnpackerStore' + str(mod_t3d),
                             isVerbose=0)
             path.add_module('TRGCDCT3DDQM', T3DMOD=mod_t3d)
+    # TRG after skim
+    if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "filtered"]):
+        # TRGGDL
+        trggdldqm_skim = register_module('TRGGDLDQM')
+        trggdldqm_skim.param('skim', 1)
+        path.add_module(trggdldqm_skim)
 
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):

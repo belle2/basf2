@@ -1,7 +1,7 @@
 [INFO] Steering file: analysis/tests/particleloader.py
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
-[INFO] Added file ${BELLE2_LOCAL_DIR}/analysis/tests/mdst.root
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
 [INFO]    -> MDST source: Tracks
@@ -193,7 +193,7 @@ Total Number of Particles created in the DataStore: 6864
 [WARNING] There were 1 tracks skipped because of zero charge for e+
 [INFO] Starting event processing, random seed is set to '1337'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
-[INFO] Added file ${BELLE2_LOCAL_DIR}/analysis/tests/mdst.root
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
 [INFO]    -> MDST source: Tracks

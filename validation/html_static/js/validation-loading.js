@@ -877,7 +877,8 @@ function getObjectWithKey(objects, key, value) {
  * this function until it looks like no new elements appear.
  * Note: We wait until we have latex support (via the latexRenderingLoaded
  * global variable) and (via latexRenderingInProgress) also make sure that
- * only one kind of this function is active (including its recursive calls)
+ * only one kind of this function is active (including its recursive calls).
+ * It will not re-render anything that is already typeset.
  * That means that calling this function is super cheap, so please call it
  * whenever your actions might make any DOM that contains LaTeX appear on the
  * page!
@@ -917,7 +918,7 @@ function renderLatex(force=false, irepeat=0) {
         ["Typeset", MathJax.Hub],
         function () {
             let neqn = MathJax.Hub.getAllJax().length;
-            let msg = `LaTeX re-rendering: neqn=${neqn}, irepeat=${irepeat}. `;
+            let msg = `LaTeX reloading: neqn=${neqn}, irepeat=${irepeat}. `;
             if (latexEqnCount !== neqn) {
                 // New LaTeX appeared, restart counting.
                 irepeat = 0;

@@ -219,17 +219,27 @@ namespace Belle2 {
     using tsOut = std::array<unsigned, 4>;
     using tsOutArray = std::array<tsOut, 5>;
     struct TRG2DFinderTrack {
+      /// omega of a 2D track
       double omega;
+      /// phi0 of a 2D track
       double phi0;
+      /// all TS of a 2D track
       tsOutArray ts;
     };
     struct TRGNeuroTrack {
+      /// z0 of a NN track
       double z;
+      /// theta of a NN track
       double theta;
+      /// sector of a NN track
       unsigned sector;
+      /// input ID list of a NN track
       std::array<float, 9> inputID;
+      /// input T list of a NN track
       std::array<float, 9> inputT;
+      /// input Alpha list of a NN track
       std::array<float, 9> inputAlpha;
+      /// input TS list of a NN track
       std::array<tsOut, 9> ts;
     };
 

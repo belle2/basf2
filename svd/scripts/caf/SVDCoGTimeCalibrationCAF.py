@@ -4,6 +4,7 @@ set_log_level(LogLevel.INFO)
 import os
 import sys
 import multiprocessing
+import datetime
 
 import ROOT
 from ROOT import Belle2
@@ -23,6 +24,9 @@ input_branches = [
 ]
 
 # set_log_level(LogLevel.WARNING)
+
+now = datetime.datetime.now()
+uniqueID = "SVDCoGTimeCalibrations_MC_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_lat=+47.16"
 
 
 def SVDCoGTimeCalibration(files, tags):
@@ -60,7 +64,7 @@ def SVDCoGTimeCalibration(files, tags):
     collector = register_module('SVDCoGTimeCalibrationCollector')
     collector.param("SVDClustersFromTracksName", "SVDClustersFromTracks")
     collector.param("SVDRecoDigitsFromTracksName", "SVDRecoDigitsFromTracks")
-    algorithm = SVDCoGTimeCalibrationAlgorithm("SVDCoGTimeCAF")
+    algorithm = SVDCoGTimeCalibrationAlgorithm(uniqueID)
 
     # calibration setup
     calibration = Calibration('SVDCoGTime',
@@ -81,25 +85,26 @@ def SVDCoGTimeCalibration(files, tags):
 
 if __name__ == "__main__":
 
-    # input_files = [os.path.abspath(file) for file in Belle2.Environment.Instance().getInputFilesOverride()]
-    input_files = [os.path.abspath(file) for file in [
-        "/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009/\
-e0008/4S/r01309/skim/hlt_bhabha/cdst/sub00/cdst.physics.0008.01309.HLT*"]]
-
+    input_files = [os.path.abspath(file) for file in Belle2.Environment.Instance().getInputFilesOverride()]
+    '''    input_files = [os.path.abspath(file) for file in [
+    "/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009/\
+    e0008/4S/r01309/skim/hlt_bhabha/cdst/sub00/cdst.physics.0008.01309.HLT*"]]
+    '''
     if not len(input_files):
         print("You have to specify some input file(s)\n"
               "using the standard basf2 command line option - i")
         print("See: basf2 -h")
         sys.exit(1)
 
-    svdCoGCAF = SVDCoGTimeCalibration(input_files, ['data_reprocessing_proc9'])
+    #    svdCoGCAF = SVDCoGTimeCalibration(input_files, ['data_reprocessing_proc9', 'svd_NOCoGCorrections'])
+    svdCoGCAF = SVDCoGTimeCalibration(input_files, ['master_2019-07-15', 'svd_NOCoGCorrections'])
 
     cal_fw = CAF()
     cal_fw.add_calibration(svdCoGCAF)
-    cal_fw.backend = backends.LSF()
+#    cal_fw.backend = backends.LSF()
 
     # Try to guess if we are at KEKCC and change the backend to Local if not
-    if multiprocessing.cpu_count() < 10:
-        cal_fw.backend = backends.Local(8)
+#    if multiprocessing.cpu_count() < 10:
+#        cal_fw.backend = backends.Local(8)
 
     cal_fw.run()

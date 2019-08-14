@@ -44,7 +44,7 @@ EKLMDigit::EKLMDigit(const EKLMSimHit* hit)
 
 unsigned int EKLMDigit::getUniqueChannelID() const
 {
-  return m_ElementNumbers->stripNumber(m_Endcap, m_Layer, m_Sector, m_Plane,
+  return m_ElementNumbers->stripNumber(m_Section, m_Layer, m_Sector, m_Plane,
                                        m_Strip);
 }
 

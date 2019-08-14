@@ -24,6 +24,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/database/DBObjPtr.h>
 #include <bklm/dbobjects/BKLMADCThreshold.h>
+#include <bklm/dbobjects/BKLMElectronicsMap.h>
 
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawKLM.h>
@@ -89,11 +90,11 @@ namespace Belle2 {
     //! digits array
     StoreArray<BKLMDigit> digits;
 
-    //! to map logical coordinates to hardware coordinates
-    std::map<int, int> m_ModuleIdToelectId;
-
     //! ADC offset and threshold read from database
     DBObjPtr<BKLMADCThreshold> m_ADCParams;
+
+    //! Electronics map.
+    DBObjPtr<BKLMElectronicsMap> m_ElectronicsMap;
 
     //! format the data
     //! @param[in] channel rpc channel
@@ -109,22 +110,6 @@ namespace Belle2 {
     void formatData(int flag, int channel, int axis, int lane, int tdc, int charge, int ctime, unsigned short& bword1,
                     unsigned short& bword2,
                     unsigned short& bword3, unsigned short& bword4);
-
-    //    //! put datapackets for a track together
-    //    //! param[in] channel The channel that will be set in all layers
-    //     //! param[out] bword1-bword4 the words
-    //    void getTrack(int channel, short& bword1, short& bword2, short& bword3, short& bword4);
-
-    //! fill m_ModuleIdToelectId from data base
-    void loadMapFromDB();
-
-    //! To be used to map module id to electronics address
-    //! @param copperId id of the copper board
-    //! @param finesse is the Finesse slot on the copper boards
-    void intToElectCoo(int id, int& copper, int& finesse, int& lane, int& plane, int& channel);
-
-    //! TO be used to map electronics address to module id
-    int electCooToInt(int copper, int finesse, int lane, int axis, int channel);
 
   };
 

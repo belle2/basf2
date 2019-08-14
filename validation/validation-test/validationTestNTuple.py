@@ -25,7 +25,7 @@ tntuple.Fill(array_of_values)
 tntuple.SetAlias('Description', "Test default precision")
 tntuple.SetAlias('Check', "Should display the default of 4 digits.")
 tntuple.SetAlias('Contact', "Kilian Lieret, Kilian.Lieret@campus.lmu.de")
-tntuple.SetAlias('MetaOptions', "some_meta_options")
+tntuple.SetAlias('MetaOptions', "shifter, some_meta_options")
 
 tntuple.Write()
 
@@ -39,7 +39,6 @@ tntuple.Fill(array_of_values)
 
 tntuple.SetAlias('Description', "Test expert ntuple")
 tntuple.SetAlias('Check', "Should be expert.")
-tntuple.SetAlias('MetaOptions', "expert")
 
 tntuple.Write()
 

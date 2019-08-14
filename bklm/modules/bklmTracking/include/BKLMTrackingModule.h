@@ -124,19 +124,19 @@ namespace Belle2 {
     StoreArray<RecoHitInformation> recoHitInformation;
 
     //! run the track finding and fitting
-    void runTracking(int mode, int isforward, int sector, int layer);
+    void runTracking(int mode, int section, int sector, int layer);
 
     //! calculate efficiency
-    void generateEffi(int isforward, int sector, int layer);
+    void generateEffi(int section, int sector, int layer);
 
     //! my defined sort function using layer number
     static bool sortByLayer(BKLMHit2d* hit1, BKLMHit2d* hit2);
 
     //! judge whether the current layer is understudy
-    bool isLayerUnderStudy(int isForward, int iSector, int iLayer, BKLMHit2d* hit);
+    bool isLayerUnderStudy(int section, int iSector, int iLayer, BKLMHit2d* hit);
 
     //! judge whether the hits come from the sctor understudy
-    bool isSectorUnderStudy(int isForward, int iSector, BKLMHit2d* hit);
+    bool isSectorUnderStudy(int section, int iSector, BKLMHit2d* hit);
 
     //! calculate distance from track to hit
     double distanceToHit(BKLMTrack* track, BKLMHit2d* hit,

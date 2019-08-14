@@ -36,6 +36,7 @@ REG_MODULE(PXDClusterPositionCollector)
 //-----------------------------------------------------------------
 
 PXDClusterPositionCollectorModule::PXDClusterPositionCollectorModule() : CalibrationCollectorModule()
+  , m_clusterEta(0), m_positionOffsetU(0), m_positionOffsetV(0), m_sizeV(0), m_pitchV(0)
 {
   // Set module properties
   setDescription("Calibration collector module for PXD cluster position estimation");

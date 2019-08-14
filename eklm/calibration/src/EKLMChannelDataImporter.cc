@@ -50,14 +50,14 @@ void EKLMChannelDataImporter::loadChannelData(EKLMChannelData* channelData)
 {
   m_Channels.construct();
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
-  int iEndcap, iLayer, iSector, iPlane, iStrip, strip;
-  for (iEndcap = 1; iEndcap <= geoDat->getNEndcaps(); iEndcap++) {
-    for (iLayer = 1; iLayer <= geoDat->getNDetectorLayers(iEndcap);
+  int iSection, iLayer, iSector, iPlane, iStrip, strip;
+  for (iSection = 1; iSection <= geoDat->getNSections(); iSection++) {
+    for (iLayer = 1; iLayer <= geoDat->getNDetectorLayers(iSection);
          iLayer++) {
       for (iSector = 1; iSector <= geoDat->getNSectors(); iSector++) {
         for (iPlane = 1; iPlane <= geoDat->getNPlanes(); iPlane++) {
           for (iStrip = 1; iStrip <= geoDat->getNStrips(); iStrip++) {
-            strip = geoDat->stripNumber(iEndcap, iLayer, iSector, iPlane,
+            strip = geoDat->stripNumber(iSection, iLayer, iSector, iPlane,
                                         iStrip);
             m_Channels->setChannelData(strip, channelData);
           }
@@ -68,13 +68,13 @@ void EKLMChannelDataImporter::loadChannelData(EKLMChannelData* channelData)
 }
 
 void EKLMChannelDataImporter::setChannelData(
-  int endcap, int layer, int sector, int plane, int strip,
+  int section, int layer, int sector, int plane, int strip,
   EKLMChannelData* channelData)
 {
   int stripGlobal;
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
-  stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
+  stripGlobal = elementNumbers->stripNumber(section, layer, sector, plane,
                                             strip);
   m_Channels->setChannelData(stripGlobal, channelData);
 }
@@ -84,7 +84,7 @@ void EKLMChannelDataImporter::loadActiveChannels(const char* activeChannelsData)
   int i, n;
   int copper, dataConcentrator, lane, daughterCard, channel, active;
   /* cppcheck-suppress variableScope */
-  int endcap, layer, sector, plane, strip, stripFirmware, stripGlobal;
+  int section, layer, sector, plane, strip, stripFirmware, stripGlobal;
   /* cppcheck-suppress variableScope */
   const int* sectorGlobal;
   const EKLM::ElementNumbersSingleton* elementNumbers =
@@ -113,12 +113,12 @@ void EKLMChannelDataImporter::loadActiveChannels(const char* activeChannelsData)
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
     }
-    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &endcap,
+    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &section,
                                                  &layer, &sector);
     plane = daughterCard / 5 + 1;
     stripFirmware = (daughterCard % 5) * 15 + channel + 1;
     strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
-    stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
+    stripGlobal = elementNumbers->stripNumber(section, layer, sector, plane,
                                               strip);
     EKLMChannelData* channelData = const_cast<EKLMChannelData*>(
                                      m_Channels->getChannelData(stripGlobal));
@@ -135,7 +135,7 @@ void EKLMChannelDataImporter::loadHighVoltage(const char* highVoltageData)
   int copper, dataConcentrator, lane, daughterCard, channel;
   float voltage;
   /* cppcheck-suppress variableScope */
-  int endcap, layer, sector, plane, strip, stripFirmware, stripGlobal;
+  int section, layer, sector, plane, strip, stripFirmware, stripGlobal;
   /* cppcheck-suppress variableScope */
   const int* sectorGlobal;
   const EKLM::ElementNumbersSingleton* elementNumbers =
@@ -164,12 +164,12 @@ void EKLMChannelDataImporter::loadHighVoltage(const char* highVoltageData)
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
     }
-    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &endcap,
+    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &section,
                                                  &layer, &sector);
     plane = daughterCard / 5 + 1;
     stripFirmware = (daughterCard % 5) * 15 + channel + 1;
     strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
-    stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
+    stripGlobal = elementNumbers->stripNumber(section, layer, sector, plane,
                                               strip);
     EKLMChannelData* channelData = const_cast<EKLMChannelData*>(
                                      m_Channels->getChannelData(stripGlobal));
@@ -187,7 +187,7 @@ void EKLMChannelDataImporter::loadLookbackWindow(const char* lookbackWindowData)
   int copper, dataConcentrator, lane, daughterCard, channel;
   int lookbackTime, lookbackWindowWidth;
   /* cppcheck-suppress variableScope */
-  int endcap, layer, sector, plane, strip, stripFirmware, stripGlobal;
+  int section, layer, sector, plane, strip, stripFirmware, stripGlobal;
   /* cppcheck-suppress variableScope */
   const int* sectorGlobal;
   const EKLM::ElementNumbersSingleton* elementNumbers =
@@ -217,12 +217,12 @@ void EKLMChannelDataImporter::loadLookbackWindow(const char* lookbackWindowData)
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
     }
-    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &endcap,
+    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &section,
                                                  &layer, &sector);
     plane = daughterCard / 5 + 1;
     stripFirmware = (daughterCard % 5) * 15 + channel + 1;
     strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
-    stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
+    stripGlobal = elementNumbers->stripNumber(section, layer, sector, plane,
                                               strip);
     EKLMChannelData* channelData = const_cast<EKLMChannelData*>(
                                      m_Channels->getChannelData(stripGlobal));
@@ -241,7 +241,7 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
   int copper, dataConcentrator, lane, daughterCard, channel;
   int active, pedestalMin, threshold, adjustmentVoltage;
   /* cppcheck-suppress variableScope */
-  int endcap, layer, sector, plane, strip, stripFirmware, stripGlobal;
+  int section, layer, sector, plane, strip, stripFirmware, stripGlobal;
   /* cppcheck-suppress variableScope */
   const int* sectorGlobal;
   const EKLM::ElementNumbersSingleton* elementNumbers =
@@ -273,12 +273,12 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
     }
-    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &endcap,
+    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &section,
                                                  &layer, &sector);
     plane = daughterCard / 5 + 1;
     stripFirmware = (daughterCard % 5) * 15 + channel + 1;
     strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
-    stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
+    stripGlobal = elementNumbers->stripNumber(section, layer, sector, plane,
                                               strip);
     EKLMChannelData* channelData = const_cast<EKLMChannelData*>(
                                      m_Channels->getChannelData(stripGlobal));

@@ -135,9 +135,6 @@ namespace Belle2 {
     /** Return energy smearing of the CMS */
     //double getEnergySmearingCMS() const;
 
-    /** Return unique ID of BeamParameters in global Millepede calibration (1) */
-    static unsigned short getGlobalUniqueID() { return 1; }
-
   private:
     /** Calculate FourVector of a beam from energy and angle wrt the z-axis.
      * Negative angles will be treated as angle = M_PI - fabs(angle)

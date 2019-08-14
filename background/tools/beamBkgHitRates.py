@@ -86,7 +86,7 @@ if len(trigTypes) > 0:
 
 # Unpack detector data
 add_unpackers(path=main,
-              components=['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'BKLM', 'EKLM'])
+              components=['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM'])
 
 # additional modules if needed for hit processing
 main.add_module('ARICHFillHits')

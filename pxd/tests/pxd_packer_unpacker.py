@@ -36,7 +36,9 @@ class PxdPackerUnpackerTestModule(Module):
         super().__init__()
         # and do whatever else is necessary like declaring member variables
         self.rawhits_collection = rawhits_collection
+        """ the PXDRawHits """
         self.digits_collection = digits_collection
+        """ the PXDDigits """
 
     def sortDigits(self, unsortedPyStoreArray):
         """ use a some digit information to sort the PXDDigits list

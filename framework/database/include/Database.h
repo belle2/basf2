@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015-2018 - Belle II Collaboration                        *
+ * Copyright(C) 2015-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thomas Kuhr, Martin Ritter                               *
@@ -10,9 +10,10 @@
 #pragma once
 
 #include <framework/database/IntervalOfValidity.h>
+#include <framework/database/PayloadMetadata.h>
+#include <framework/database/TestingPayloadStorage.h>
 #include <framework/database/DBStore.h>
-#include <framework/logging/LogConfig.h>
-
+#include <framework/utilities/ScopeGuard.h>
 #include <TClonesArray.h>
 
 #include <string>
@@ -25,6 +26,10 @@ class TObject;
 
 namespace Belle2 {
   class EventMetaData;
+  namespace Conditions {
+    class MetadataProvider;
+    class PayloadProvider;
+  }
 
   /**
    * Singleton base class for the low-level interface to the database.
@@ -34,52 +39,20 @@ namespace Belle2 {
    */
   class Database {
   public:
-
-    /**
-     * Get the default global tags for the central database.
-     * Multiple global tags are separated by spaces.
-     *
-     * @return           The default global tags
-     */
-    static std::string getDefaultGlobalTags();
-
     /**
      * Instance of a singleton Database.
      */
     static Database& Instance();
 
     /**
-     * Helper function to set the database instance.
-     * If the current instance is a DatabaseChain the given database is added to it.
-     *
-     * @param database   The database object.
-     */
-    static void setInstance(Database* database);
-
-    /**
      * Reset the database instance.
      */
     static void reset();
 
-    /** Destructor, resets the instance pointer if needed. */
-    virtual ~Database();
-
     /**
      * Struct for bulk read queries.
      */
-    struct DBQuery {
-      /**
-       * Constructor
-       */
-      explicit DBQuery(const std::string& aName, bool required = true): name(aName), missingOK(required) {};
-      std::string name;         /**< identifier of the object */
-      unsigned int revision{0}; /**< revision of the payload */
-      std::string filename{};   /**< filename containing the payload */
-      std::string checksum{};   /**< checksum of the filename containing the payload */
-      IntervalOfValidity iov{}; /**< Interval of validity of the object */
-      bool missingOK{false};    /**< Input parameter: if True don't emit an error if the payload is missing */
-    };
-
+    using DBQuery = Conditions::PayloadMetadata;
 
     /**
      * Struct for bulk write queries.
@@ -87,11 +60,11 @@ namespace Belle2 {
     struct DBImportQuery {
       /**
        * Constructor
-       * @param aName  The identifier of the object
+       * @param aName The identifier of the object
        * @param aObject Pointer to the object
        * @param aIov Iov of the object
        */
-      explicit DBImportQuery(const std::string& aName, TObject* aObject = 0,
+      explicit DBImportQuery(const std::string& aName, TObject* aObject = nullptr,
                              const IntervalOfValidity& aIov = IntervalOfValidity()): name(aName), object(aObject), iov(aIov) {};
       std::string        name;   /**< identifier of the object */
       TObject*           object; /**< Pointer to the object */
@@ -117,7 +90,13 @@ namespace Belle2 {
      *                be filled with all information about the payload.
      * @return        True if the payload could be found. False otherwise.
      */
-    virtual bool getData(const EventMetaData& event, DBQuery& query) = 0;
+    bool getData(const EventMetaData& event, DBQuery& query)
+    {
+      std::vector<DBQuery> container{query};
+      bool found = getData(event, container);
+      query = container[0];
+      return found;
+    }
 
     /**
      * Request multiple objects from the database.
@@ -127,7 +106,7 @@ namespace Belle2 {
      *                   the objects to be retrieved. On return the object and
      *                   iov fields are filled.
      */
-    virtual void getData(const EventMetaData& event, std::list<DBQuery>& query);
+    bool getData(const EventMetaData& event, std::vector<DBQuery>& query);
 
     /**
      * Store an object in the database.
@@ -137,7 +116,7 @@ namespace Belle2 {
      * @param iov    The interval of validity of the the object.
      * @return       True if the storage of the object succeeded.
      */
-    virtual bool storeData(const std::string& name, TObject* object, const IntervalOfValidity& iov) = 0;
+    bool storeData(const std::string& name, TObject* object, const IntervalOfValidity& iov);
 
     /**
      * Store an ClonesArray in the database with the default name.
@@ -163,7 +142,7 @@ namespace Belle2 {
      * @param query      A list of DBImportQuery entries that contains the objects, their names, and their intervals of validity.
      * @return           True if the storage of the object succeeded.
      */
-    virtual bool storeData(std::list<DBImportQuery>& query);
+    bool storeData(std::list<DBImportQuery>& query);
 
     /**
      * Add a payload file to the database.
@@ -173,8 +152,11 @@ namespace Belle2 {
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */
-    virtual bool addPayload(const std::string& name, const std::string& fileName,
-                            const IntervalOfValidity& iov) = 0;
+    bool addPayload(const std::string& name, const std::string& fileName, const IntervalOfValidity& iov)
+    {
+      if (!m_payloadCreation) initialize();
+      return m_payloadCreation->storePayload(name, fileName, iov);
+    }
 
     /**
      * Exposes setGlobalTag function of the Database class to Python.
@@ -182,48 +164,44 @@ namespace Belle2 {
     static void exposePythonAPI();
 
     /**
-     * Return the global tag used by the database. If no conditions database is
+     * Return the global tags used by the database. If no conditions database is
      * configured return an empty string. If more then one database is
      * configured return all global tags concatenated by ','
      */
-    static std::string getGlobalTag();
+    std::string getGlobalTags();
 
     /**
-     * Set level of log messages about not-found payloads.
-     *
-     * @param logLevel  The level of log messages about not-found payloads.
-     * @param invertLogging  If true log messages will be created when a
-     *                  payload is found. This is intended for the local
-     *                  database to notify the user that a non-standard payload
-     *                  from a local directory is used.
+     * Make sure we have efficient http pipelinging during initialize/beginRun
+     * but don't keep session alive for full processing time. This will return
+     * an object which keeps the session open as long as it is alive.
      */
-    void setLogLevel(LogConfig::ELogLevel logLevel = LogConfig::c_Warning, bool invertLogging = false)
-    {
-      m_logLevel = logLevel;
-      m_invertLogging = invertLogging;
-    }
+    ScopeGuard createScopedUpdateSession();
+
 
   protected:
-    /** Pointer to the database instance. */
-    static std::unique_ptr<Database> s_instance;
-
     /** Hidden constructor, as it is a singleton. */
-    Database() : m_logLevel(LogConfig::c_Warning) {};
-
+    Database() = default;
     /** No copy constructor, as it is a singleton. */
     Database(const Database&) = delete;
-
-    /** Helper function to construct a payload file name. */
-    std::string payloadFileName(const std::string& path, const std::string& name, int revision) const;
-
-    /** Helper function to write an object to a payload file. */
-    bool writePayload(const std::string& fileName, const std::string& name, const TObject* object,
-                      const IntervalOfValidity* iov = 0) const;
-
-    /** Level of log messages about not found objects. */
-    LogConfig::ELogLevel m_logLevel;
-
-    /** If true logging should be inverted: i.e. show messages if a payload was found, not if it wasn't */
-    bool m_invertLogging{false};
+    /** Hidden destructor, as it is a singleton. */
+    ~Database();
+    /** Initialize the database connection settings on first use */
+    void initialize();
+    /** Enable the next metadataprovider in the list */
+    void nextMetadataProvider();
+    /** List of available metadata providers (which haven't been tried yet) */
+    std::vector<std::string> m_metadataConfigurations;
+    /** List of globaltags to be used */
+    std::vector<std::string> m_globalTags;
+    /** Set of usable globaltag states to be handed to the metadata providers */
+    std::set<std::string> m_usableTagStates;
+    /** Currently active metadata provider */
+    std::unique_ptr<Conditions::MetadataProvider> m_metadataProvider;
+    /** The active payload provider */
+    std::unique_ptr<Conditions::PayloadProvider> m_payloadProvider;
+    /** testing payload storage to create new payloads */
+    std::unique_ptr<Conditions::TestingPayloadStorage> m_payloadCreation;
+    /** optional list of testing payload storages to look for existing payloads */
+    std::vector<Conditions::TestingPayloadStorage> m_testingPayloads;
   };
 } // namespace Belle2

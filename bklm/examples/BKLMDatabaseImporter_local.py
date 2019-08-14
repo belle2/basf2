@@ -1,47 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from basf2 import *
+
+import basf2 as b2
 import ROOT
 from ROOT.Belle2 import BKLMDatabaseImporter
-import os
-import sys
-import glob
-import subprocess
-from fnmatch import fnmatch
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
-# use_local_database()
-reset_database()
-use_local_database("localdb/database.txt", "localdb")
-# use use_central_database for uploading data to PNNL
-# use_central_database("test_bklm", LogLevel.WARNING);
+# Define the local database
+b2.reset_database()
+b2.use_local_database("localdb/database.txt", "localdb")
 
+# Simple path with EventInfoSetter and Gearbox
+main = b2.create_path()
+main.add_module('EventInfoSetter')
+main.add_module('Gearbox')
+b2.process(main)
 
-# EventInfoSetter is only needed to register EventMetaData in the Datastore to
-# get rid of an error message with gearbox
-eventinfo = register_module('EventInfoSetter')
-eventinfo.initialize()
-
-# download data if it is not available locally
-# make sure you change paths
-# os.path.isfile('BKLMElectronicsMapping_test.xml'):
-
-# create a gearbox module to read the data so it can be used
-paramloader = register_module('Gearbox')
-# pathname = 'file://%s/AllData/' % (os.getcwd())
-# paramloader.param('backends', [pathname])
-# paramloader.initialize()
-
-main = create_path()
-main.add_module(eventinfo)
-main.add_module(paramloader)
-process(main)
-
-# and run the importer
+# And run the importer
 dbImporter = BKLMDatabaseImporter()
 # dbImporter.importBklmGeometryPar()
-# dbImporter.importBklmSimulationPar()
+dbImporter.importBklmSimulationPar(0, 0, 0, -1)
 # dbImporter.importBklmBadChannels()
 # dbImporter.importBklmAlignment()
 # dbImporter.importBklmMisAlignment()
@@ -49,13 +28,3 @@ dbImporter = BKLMDatabaseImporter()
 # dbImporter.importBklmDigitizationParams()
 # dbImporter.importBklmADCThreshold()
 # dbImporter.importBklmTimeWindow()
-# dbImporter.exportBklmElectronicMapping()
-# dbImporter.exportBklmGeometryPar()
-# dbImporter.exportBklmSimulationPar()
-# dbImporter.exportBklmBadChannels()
-# dbImporter.exportBklmAlignment()
-# dbImporter.exportBklmMisAlignment()
-# dbImporter.exportBklmDisplacement()
-# dbImporter.exportBklmDigitizationParams()
-# dbImporter.exportBklmADCThreshold()
-# dbImporter.exportBklmTimeWindow()

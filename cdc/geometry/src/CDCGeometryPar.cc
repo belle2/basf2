@@ -12,6 +12,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/core/Environment.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeoControlPar.h>
@@ -128,7 +129,8 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
     }
   }
 
-  if (gcp.getEDepToADCInputType()) {
+  //  B2INFO("CDCGeometryPar: isMC= " << Environment::Instance().isMC());
+  if (gcp.getEDepToADCInputType() && Environment::Instance().isMC()) {
     m_eDepToADCConversionsFromDB = new DBObjPtr<CDCEDepToADCConversions>;
     if ((*m_eDepToADCConversionsFromDB).isValid()) {
       (*m_eDepToADCConversionsFromDB).addCallback(this, &CDCGeometryPar::setEDepToADCConversions);
@@ -455,11 +457,13 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
     }
     B2DEBUG(100, "CDCGeometryPar: Time-walk param. mode= " << m_twParamMode);
 
-    if (gcp.getEDepToADCInputType()) {
-      B2DEBUG(29, "CDCGeometryPar: Read EDepToADC from DB");
-      setEDepToADCConversions(); //Set edep-to-adc (from DB)
-    } else {
-      readEDepToADC(gbxParams);  //Read edep-to-adc params. (from file)
+    if (Environment::Instance().isMC()) {
+      if (gcp.getEDepToADCInputType()) {
+        B2DEBUG(29, "CDCGeometryPar: Read EDepToADC from DB");
+        setEDepToADCConversions(); //Set edep-to-adc (from DB)
+      } else {
+        readEDepToADC(gbxParams);  //Read edep-to-adc params. (from file)
+      }
     }
   }
 
@@ -1246,7 +1250,7 @@ void CDCGeometryPar::readEDepToADC(const GearDir gbxParams, const int mode)
   unsigned short paramMode(0), nParams(0);
   ifs >> paramMode >> nParams;
   if (paramMode > 0) B2FATAL("Param mode > 0!");
-  if (nParams > 4)   B2FATAL("No. of params. > 4!");
+  if (nParams > 6)   B2FATAL("No. of params. > 6!");
   unsigned short groupId(0);
   ifs >> groupId;
   B2DEBUG(29, paramMode << " " << nParams << " " << groupId);
@@ -1535,7 +1539,7 @@ void CDCGeometryPar::setEDepToADCConversions()
 
   for (unsigned short id = 0; id < nEnt; ++id) {
     unsigned short np = ((*m_eDepToADCConversionsFromDB)->getParams(id)).size();
-    if (np > 4) B2FATAL("CDCGeometryPar:: No. of edep-to-ADC conversion params. > 4");
+    if (np > 6) B2FATAL("CDCGeometryPar:: No. of edep-to-ADC conversion params. > 6");
     if (groupId == 0) { //per super-layer; id=super-layer
       for (unsigned short cL = cLMin[id]; cL <= cLMax[id]; ++cL) { //clayer loop
         for (unsigned short cell = 0; cell < nCell[cL]; ++cell) { //cell loop
@@ -1569,6 +1573,8 @@ double CDCGeometryPar::getEDepToADCConvFactor(unsigned short iCL, unsigned short
   const double& alf   = m_eDepToADCParams[iCL][iW][1];
   const double& gam   = m_eDepToADCParams[iCL][iW][2];
   const double& dlt   = m_eDepToADCParams[iCL][iW][3];
+  const double& a     = m_eDepToADCParams[iCL][iW][4];
+  const double& b     = m_eDepToADCParams[iCL][iW][5];
   const double cth  = fabs(costh) + dlt;
   const double iGen = edep / dx; // keV/cm
   const double tmp  = cth - gam * iGen;
@@ -1593,10 +1599,11 @@ double CDCGeometryPar::getEDepToADCConvFactor(unsigned short iCL, unsigned short
   } else {
     //TODO: check the following issue more
     //    B2WARNING("CDCGeometryPar: Measured dE/dx <= 0!");
-    //    B2DEBUG(29, "CDCGeometryPar: Measured dE/dx <= 0!" << std::endl;
+    //    B2DEBUG(29, "CDCGeometryPar: Measured dE/dx <= 0!");
     //    B2DEBUG(29, "iGen,iMea= " << std::setw(15) << std::scientific << std::setprecision(8) << iGen <<" "<< iMea);
     //    B2DEBUG(29, "dx,mainF,alf,gam,dlt,cth,tmp,disc= " << dx <<" "<< mainF <<" "<< alf <<" "<< gam <<" "<< dlt <<" "<<" "<< tmp <<" "<< disc);
   }
+  convF *= 1. + a * (costh - b);
   return convF;
 }
 

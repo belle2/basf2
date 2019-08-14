@@ -14,7 +14,8 @@ set_log_level(LogLevel.INFO)
 class PackerUnpackerTest(Module):
 
     """
-    module which checks if two collections of EKLMDigits are equal
+    module which checks if two collections of EKLMDigits and BKLMDigits are
+    equal
     """
 
     def sort_bklm_digits(self, unsortedPyStoreArray):
@@ -30,7 +31,7 @@ class PackerUnpackerTest(Module):
         return sorted(
             py_list,
             key=lambda x: (
-                x.getForward(),
+                x.getSection(),
                 x.getSector(),
                 x.getLayer(),
                 x.getStrip())
@@ -49,7 +50,7 @@ class PackerUnpackerTest(Module):
         return sorted(
             py_list,
             key=lambda x: (
-                x.getEndcap(),
+                x.getSection(),
                 x.getLayer(),
                 x.getSector(),
                 x.getPlane(),
@@ -58,7 +59,7 @@ class PackerUnpackerTest(Module):
 
     def event(self):
         """
-        load original EKLMDigits and the packed/unpacked ones, sort and compare them
+        load original digits and the packed/unpacked ones, sort and compare them
         """
 
         # direct from simulation
@@ -88,7 +89,7 @@ class PackerUnpackerTest(Module):
 
             # check the content of the digit
             # the following content is not consistent due to incomplete mapping file,  data/geometry/BKLMElectronicsMapping.xml
-            assert digit.getForward() == digit_unpacked.getForward()
+            assert digit.getSection() == digit_unpacked.getSection()
             assert digit.getSector() == digit_unpacked.getSector()
             assert digit.getLayer() == digit_unpacked.getLayer()
             assert digit.getStrip() == digit_unpacked.getStrip()
@@ -109,7 +110,7 @@ class PackerUnpackerTest(Module):
 
             # check the content of the digit
             # From EKLMHitBase
-            assert digit.getEndcap() == digit_unpacked.getEndcap()
+            assert digit.getSection() == digit_unpacked.getSection()
             assert digit.getLayer() == digit_unpacked.getLayer()
             assert digit.getSector() == digit_unpacked.getSector()
             # assert digit.getEDep() == digit_unpacked.getEDep()
@@ -134,9 +135,8 @@ particlegun.param('nTracks', 10)
 particlegun.param('momentumParams', [0.5, 4.0])
 main.add_module(particlegun)
 
-add_simulation(main, components=['BKLM', 'EKLM'])
-set_module_parameters(main, type='Geometry', useDB=False,
-                      components=['BKLM', 'EKLM'])
+add_simulation(main, components=['KLM'])
+set_module_parameters(main, type='Geometry', useDB=False, components=['KLM'])
 
 bklm_packer = register_module('BKLMRawPacker')
 eklm_packer = register_module('EKLMRawPacker')

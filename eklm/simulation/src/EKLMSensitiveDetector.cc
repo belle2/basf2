@@ -45,15 +45,15 @@ EKLM::EKLMSensitiveDetector::~EKLMSensitiveDetector()
 bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
   const int stripLevel = 1;
-  int endcap, layer, sector, plane, strip, stripGlobal;
+  int section, layer, sector, plane, strip, stripGlobal;
   HepGeom::Point3D<double> gpos, lpos;
   G4TouchableHandle hist = aStep->GetPreStepPoint()->GetTouchableHandle();
-  endcap = hist->GetVolume(stripLevel + 6)->GetCopyNo();
+  section = hist->GetVolume(stripLevel + 6)->GetCopyNo();
   layer = hist->GetVolume(stripLevel + 5)->GetCopyNo();
   sector = hist->GetVolume(stripLevel + 4)->GetCopyNo();
   plane = hist->GetVolume(stripLevel + 3)->GetCopyNo();
   strip = hist->GetVolume(stripLevel)->GetCopyNo();
-  stripGlobal = m_GeoDat->stripNumber(endcap, layer, sector, plane, strip);
+  stripGlobal = m_GeoDat->stripNumber(section, layer, sector, plane, strip);
   const G4double eDep = aStep->GetTotalEnergyDeposit();
   /* Do not record hits without deposited energy. */
   if (eDep <= 0)
@@ -90,7 +90,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   hit->setPlane(plane);
   hit->setSector(sector);
   hit->setLayer(layer);
-  hit->setEndcap(endcap);
+  hit->setSection(section);
   hit->setVolumeID(stripGlobal);
   /* Relation. */
   StoreArray<MCParticle> particles;

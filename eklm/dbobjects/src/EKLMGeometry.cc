@@ -943,7 +943,7 @@ void EKLMGeometry::ShieldGeometry::setDetailCCenter(double x, double y)
 
 EKLMGeometry::EKLMGeometry()
 {
-  m_NEndcaps = 0;
+  m_NSections = 0;
   m_NLayers = 0;
   m_NDetectorLayers = nullptr;
   m_NSectors = 0;
@@ -960,7 +960,7 @@ EKLMGeometry::EKLMGeometry()
 EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
   EKLMElementNumbers(geometry),
   m_EndcapStructureGeometry(*geometry.getEndcapStructureGeometry()),
-  m_EndcapPosition(*geometry.getEndcapPosition()),
+  m_SectionPosition(*geometry.getSectionPosition()),
   m_LayerPosition(*geometry.getLayerPosition()),
   m_SectorPosition(*geometry.getSectorPosition()),
   m_SectorSupportPosition(*geometry.getSectorSupportPosition()),
@@ -972,11 +972,11 @@ EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
   m_ShieldGeometry(*geometry.getShieldGeometry())
 {
   int i, j;
-  m_NEndcaps = geometry.getNEndcaps();
+  m_NSections = geometry.getNSections();
   m_NLayers = geometry.getNLayers();
-  m_NDetectorLayers = new int[m_NEndcaps];
+  m_NDetectorLayers = new int[m_NSections];
   m_NDetectorLayers[0] = geometry.getNDetectorLayers(1);
-  if (m_NEndcaps == 2)
+  if (m_NSections == 2)
     m_NDetectorLayers[1] = geometry.getNDetectorLayers(2);
   m_NSectors = geometry.getNSectors();
   m_NPlanes = geometry.getNPlanes();
@@ -1013,13 +1013,13 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
   int i, j;
   if (&geometry == this)
     return *this;
-  m_NEndcaps = geometry.getNEndcaps();
+  m_NSections = geometry.getNSections();
   m_NLayers = geometry.getNLayers();
   if (m_NDetectorLayers != nullptr)
     delete[] m_NDetectorLayers;
-  m_NDetectorLayers = new int[m_NEndcaps];
+  m_NDetectorLayers = new int[m_NSections];
   m_NDetectorLayers[0] = geometry.getNDetectorLayers(1);
-  if (m_NEndcaps == 2)
+  if (m_NSections == 2)
     m_NDetectorLayers[1] = geometry.getNDetectorLayers(2);
   m_NSectors = geometry.getNSectors();
   m_NPlanes = geometry.getNPlanes();
@@ -1028,7 +1028,7 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
   m_NStrips = geometry.getNStrips();
   m_SolenoidZ = geometry.getSolenoidZ();
   m_EndcapStructureGeometry = *geometry.getEndcapStructureGeometry();
-  m_EndcapPosition = *geometry.getEndcapPosition();
+  m_SectionPosition = *geometry.getSectionPosition();
   m_LayerPosition = *geometry.getLayerPosition();
   m_LayerShiftZ = geometry.getLayerShiftZ();
   m_SectorPosition = *geometry.getSectorPosition();
@@ -1059,9 +1059,9 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
 
 /* Numbers of geometry elements. */
 
-int EKLMGeometry::getNEndcaps() const
+int EKLMGeometry::getNSections() const
 {
-  return m_NEndcaps;
+  return m_NSections;
 }
 
 int EKLMGeometry::getNLayers() const
@@ -1069,10 +1069,10 @@ int EKLMGeometry::getNLayers() const
   return m_NLayers;
 }
 
-int EKLMGeometry::getNDetectorLayers(int endcap) const
+int EKLMGeometry::getNDetectorLayers(int section) const
 {
-  checkEndcap(endcap);
-  return m_NDetectorLayers[endcap - 1];
+  checkSection(section);
+  return m_NDetectorLayers[section - 1];
 }
 
 int EKLMGeometry::getNSectors() const
@@ -1102,25 +1102,25 @@ int EKLMGeometry::getNStrips() const
 
 /* Element number checks. */
 
-void EKLMGeometry::checkDetectorLayerNumber(int endcap, int layer) const
+void EKLMGeometry::checkDetectorLayerNumber(int section, int layer) const
 {
   /* cppcheck-suppress variableScope */
-  const char* endcapName[2] = {"backward", "forward"};
+  const char* sectionName[2] = {"backward", "forward"};
   if (layer < 0 || layer > m_NLayers ||
-      layer > m_MaximalDetectorLayerNumber[endcap - 1])
-    B2FATAL("Number of detector layers in the " << endcapName[endcap - 1] <<
-            " endcap must be from 0 to the number of layers ( " <<
+      layer > m_MaximalDetectorLayerNumber[section - 1])
+    B2FATAL("Number of detector layers in the " << sectionName[section - 1] <<
+            " section must be from 0 to the number of layers ( " <<
             m_NLayers << ").");
 }
 
-void EKLMGeometry::checkDetectorLayer(int endcap, int layer) const
+void EKLMGeometry::checkDetectorLayer(int section, int layer) const
 {
   /* cppcheck-suppress variableScope */
-  const char* endcapName[2] = {"backward", "forward"};
-  if (layer < 0 || layer > m_NDetectorLayers[endcap - 1])
+  const char* sectionName[2] = {"backward", "forward"};
+  if (layer < 0 || layer > m_NDetectorLayers[section - 1])
     B2FATAL("Number of layer must be less from 1 to the number of "
-            "detector layers in the " << endcapName[endcap - 1] << " endcap ("
-            << m_NDetectorLayers[endcap - 1] << ").");
+            "detector layers in the " << sectionName[section - 1] << " section ("
+            << m_NDetectorLayers[section - 1] << ").");
 }
 
 void EKLMGeometry::checkSegmentSupport(int support) const
@@ -1150,9 +1150,9 @@ EKLMGeometry::getEndcapStructureGeometry() const
   return &m_EndcapStructureGeometry;
 }
 
-const EKLMGeometry::ElementPosition* EKLMGeometry::getEndcapPosition() const
+const EKLMGeometry::ElementPosition* EKLMGeometry::getSectionPosition() const
 {
-  return &m_EndcapPosition;
+  return &m_SectionPosition;
 }
 
 const EKLMGeometry::ElementPosition* EKLMGeometry::getLayerPosition() const

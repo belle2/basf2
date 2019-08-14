@@ -40,6 +40,7 @@ namespace Belle2 {
                TRGPoint2D crossPoint[2]) const;
 
   private:
+    /// 2D points
     TRGPoint2D _c[2];
   };
 

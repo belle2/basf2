@@ -41,17 +41,12 @@ REG_MODULE(RootOutput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-RootOutputModule::RootOutputModule() : Module(), m_file(nullptr), m_experimentLow(1), m_runLow(0), m_eventLow(0),
-  m_experimentHigh(0), m_runHigh(0), m_eventHigh(0)
+RootOutputModule::RootOutputModule() : Module(), m_file(nullptr), m_tree{0}, m_experimentLow(1), m_runLow(0),
+  m_eventLow(0), m_experimentHigh(0), m_runHigh(0), m_eventHigh(0)
 {
   //Set module properties
   setDescription("Writes DataStore objects into a .root file. Data is stored in a TTree 'tree' for event-dependent and in 'persistent' for peristent data. You can use RootInput to read the files back into basf2.");
   setPropertyFlags(c_Output);
-
-  //Initialization of some member variables
-  for (auto& tree : m_tree) {
-    tree = nullptr;
-  }
 
   //Parameter definition
   addParam("outputFileName"  , m_outputFileName, "Name of the output file. Can be overridden using the -o argument to basf2.",
@@ -158,7 +153,6 @@ void RootOutputModule::initialize()
 
   // Now check if the file has a protocol like file:// or http:// in front
   std::regex protocol("^([A-Za-z]*)://");
-  // cppcheck-suppress syntaxError ; of course cppcheck doesn't know if with initializer yet
   if(std::smatch m; std::regex_search(m_outputFileName, m, protocol)) {
     if(m[1] == "file") {
       // file protocol: treat as local and just remove it from the filename

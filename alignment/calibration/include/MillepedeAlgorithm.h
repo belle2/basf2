@@ -52,6 +52,8 @@ namespace Belle2 {
     /// time IDs (aka continuous subruns) to EventMetaData (and later IoVs))
     void setEvents(const std::vector<EventMetaData>& events) {m_events = events;}
 
+    void setMinEntries(int minEntries) {m_minEntries = minEntries;}
+
     /// Setup the complete time dependence of parameters at once (ensures consistency) (Python version)
     ///
     /// (Calls GlobalLabel static functions internally to fill its timedep. map)
@@ -119,6 +121,9 @@ namespace Belle2 {
 
     /// Write out binary files from data in tree with GBL data to be used by Millepede and add them to steering
     void prepareMilleBinary();
+
+    /// Minimum entries collected - report NotEnoughData for less
+    int m_minEntries{ -1};
 
   };
 } // namespace Belle2

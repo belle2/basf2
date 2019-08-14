@@ -29,6 +29,11 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   auto chisqHist = getObjectPtr<TH1F>("chi2_per_ndf");
   B2INFO(" Mean of Chi2 / NDF of tracks before calibration: " << chisqHist->GetMean());
 
+  if (chisqHist->GetEntries() < m_minEntries) {
+    B2INFO("Less than " << m_minEntries << " collected: " << chisqHist->GetEntries() << ". Return c_NotEnoughData.");
+    return c_NotEnoughData;
+  }
+
   // Write out binary files from tree and add to steering
   prepareMilleBinary();
   auto mille = getObjectPtr<MilleData>("mille");

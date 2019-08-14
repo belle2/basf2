@@ -23,7 +23,7 @@ namespace Belle2 {
      * Type of EKLM element.
      */
     enum ElementType {
-      c_Endcap,  /**< Endcap. */
+      c_Section,  /**< Section. */
       c_Layer,   /**< Layer. */
       c_Sector,  /**< Sector. */
       c_Plane,   /**< Plane. */
@@ -37,21 +37,21 @@ namespace Belle2 {
 
     /**
      * Constructor (sector).
-     * @param[in] endcap  Endcap number.
+     * @param[in] section Section number.
      * @param[in] layer   Layer number.
      * @param[in] sector  Sector number.
      */
-    EKLMElementID(int endcap, int layer, int sector);
+    EKLMElementID(int section, int layer, int sector);
 
     /**
      * Constructor (segment).
-     * @param[in] endcap  Endcap number.
+     * @param[in] section Section number.
      * @param[in] layer   Layer number.
      * @param[in] sector  Sector number.
      * @param[in] plane   Plane number.
      * @param[in] segment Segment number.
      */
-    EKLMElementID(int endcap, int layer, int sector, int plane, int segment);
+    EKLMElementID(int section, int layer, int sector, int plane, int segment);
 
     /**
      * Constructor.
@@ -75,14 +75,14 @@ namespace Belle2 {
     ElementType getType() const;
 
     /**
-     * Set endcap number.
+     * Set section number.
      */
-    void setEndcap(int endcap);
+    void setSection(int section);
 
     /**
-     * Get endcap number.
+     * Get section number.
      */
-    int getEndcap() const;
+    int getSection() const;
 
     /**
      * Set layer number.
@@ -154,8 +154,8 @@ namespace Belle2 {
     /** Element type. */
     ElementType m_Type;
 
-    /** Endcap number. */
-    int m_Endcap;
+    /** Section number. */
+    int m_Section;
 
     /** Layer number. */
     int m_Layer;

@@ -2,23 +2,24 @@
 # -*- coding: utf-8 -*-
 
 import os
-from ROOT import Belle2
+import basf2
 import unittest
 import glob
 import b2test_utils
 
 
 def test_one_tutorial(tutorial_name):
-    loc = Belle2.FileSystem.findFile('analysis/examples/tutorials/' + tutorial_name)
+    """Tests one tutorial. Will fail if the tutorial doesn't exist."""
+    loc = basf2.find_file('analysis/examples/tutorials/' + tutorial_name)
     return os.system('basf2 ' + loc + ' -n 1')
 
 
 class TutorialsTest(unittest.TestCase):
-    """Test to run all tutorials"""
+    """Test to run all tutorials. Will fail if no tutorial directory is found."""
 
     #: list of supported tutorials (everything in the tutorials directory)
     supported_tutorials = [x.split("/")[-1]
-                           for x in glob.glob(Belle2.FileSystem.findFile('analysis/examples/tutorials/') + "*.py")]
+                           for x in glob.glob(basf2.find_file('analysis/examples/tutorials/') + "*.py")]
 
     #: list of the broken tutorials (to be removed when they are individually fixed)
     broken_tutorials = ['B2A701-ContinuumSuppression_Input.py',  # BII-4246

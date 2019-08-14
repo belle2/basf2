@@ -17,6 +17,7 @@
 #include <bklm/dataobjects/BKLMDigit.h>
 #include <bklm/dataobjects/BKLMDigitOutOfRange.h>
 #include <bklm/dbobjects/BKLMADCThreshold.h>
+#include <bklm/dbobjects/BKLMElectronicsMap.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMChannels.h>
@@ -96,11 +97,6 @@ namespace Belle2 {
                          KLMDigitEventInfo* klmDigitEventInfo);
 
     /**
-     * Fill m_electIdToModuleId from database.
-     */
-    void loadMapFromDB();
-
-    /**
      * To be used to map electronics address to module id.
      *
      * @param copperId
@@ -167,7 +163,7 @@ namespace Belle2 {
     /* EKLM database objects. */
 
     /** Electronics map. */
-    DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
+    DBObjPtr<EKLMElectronicsMap> m_eklmElectronicsMap;
 
     /** Channels. */
     DBObjPtr<EKLMChannels> m_Channels;
@@ -177,8 +173,8 @@ namespace Belle2 {
 
     /* BKLM database objects. */
 
-    /** Map: hardware coordinates to logical coordinates. */
-    std::map<int, int> m_electIdToModuleId;
+    /** Electronics map. */
+    DBObjPtr<BKLMElectronicsMap> m_bklmElectronicsMap;
 
     /** ADC offset and threshold read from database. */
     DBObjPtr<BKLMADCThreshold> m_ADCParams;

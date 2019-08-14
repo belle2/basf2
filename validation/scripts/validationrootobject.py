@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+
+import pprint
+
+pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
+
+
 class RootObject:
 
     """!

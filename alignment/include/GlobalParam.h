@@ -21,7 +21,7 @@
 
 #include <framework/database/DBObjPtr.h>
 #include <alignment/GlobalLabel.h>
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 
 namespace Belle2 {
   namespace alignment {
@@ -112,6 +112,9 @@ namespace Belle2 {
       /// Release the object from internal unique_ptr to be managed elsewhere
       /// Useful to pass it to be stored in DB (and thus later deleted by framework)
       virtual TObject* releaseObject() = 0;
+
+      virtual GlobalParamSetAccess* clone() = 0;
+
       /// Load the content (by copying obj retrieved from DB) for a given exp/run/event
       virtual void loadFromDB(EventMetaData emd) = 0;
       /// Load using DBObjPtr<DBObjType> which uses current EventMetaData to load valid constants
@@ -240,6 +243,11 @@ namespace Belle2 {
         return m_object.release();
       }
 
+      virtual GlobalParamSetAccess* clone() override final
+      {
+        return new GlobalParamSet<DBObjType>(*this);
+      }
+
       /// Load content of the object using DBObjPtr<DBObjType>
       /// which will try to load object valid for current EventMetaData
       /// Also resets if the object has been changed
@@ -285,21 +293,19 @@ namespace Belle2 {
       void ensureConstructed() {if (!m_object) construct();}
     };
 
-    template <>
-    unsigned short GlobalParamSet<BeamParameters>::getGlobalUniqueID() const;
     /// The DB object unique id in global calibration
     template <>
-    unsigned short GlobalParamSet<BeamParameters>::getGlobalUniqueID() const;
+    unsigned short GlobalParamSet<BeamSpot>::getGlobalUniqueID() const;
     /// Get global parameter of the DB object by its element and parameter number
     /// Note this is not const, it might need to construct the object
     template <>
-    double GlobalParamSet<BeamParameters>::getGlobalParam(unsigned short element, unsigned short param);
+    double GlobalParamSet<BeamSpot>::getGlobalParam(unsigned short element, unsigned short param);
     /// Set global parameter of the DB object by its element and parameter number
     template <>
-    void GlobalParamSet<BeamParameters>::setGlobalParam(double value, unsigned short element, unsigned short param);
+    void GlobalParamSet<BeamSpot>::setGlobalParam(double value, unsigned short element, unsigned short param);
     /// List global parameters in this DB object
     template <>
-    std::vector<std::pair<unsigned short, unsigned short>> GlobalParamSet<BeamParameters>::listGlobalParams();
+    std::vector<std::pair<unsigned short, unsigned short>> GlobalParamSet<BeamSpot>::listGlobalParams();
 
 
 

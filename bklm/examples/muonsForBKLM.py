@@ -52,7 +52,7 @@ paramloader = register_module('Gearbox')
 geobuilder = register_module('Geometry')
 geobuilder.log_level = LogLevel.INFO
 
-geobuilder.param('components', ['BKLM'])
+geobuilder.param('components', ['KLM'])
 
 # Full Geant4 simulation
 g4sim = register_module('FullSim')

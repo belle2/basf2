@@ -4,27 +4,30 @@
 """
 Tool to do for each git commit in a specific range:
 - check out the commit (configurable if you want to run git stash and git stash pop before and afterwards)
-- run scons or not (configurable)
+- run ``scons`` or not (configurable)
 - run a script (given on command line)
-- extract the meanX, the meanY and the zeroSupressedMeanY from variables from ROOT files (also configured on the commandline)
-- write all variables together with their svn number and svn log message into a pandas DataFrame and this dataframe into the
-  results.pkl file as a pickle stream.
+- extract the ``meanX``, the ``meanY`` and the ``zeroSupressedMeanY`` from variables from ROOT files (also configured on the commandline)
+- write all variables together with their git hash and git log message into a pandas DataFrame and this dataframe into the ``results.pkl`` file as a pickle stream.
 
-  For example if you want to examine some commits related to tracking, you can use:
+For example if you want to examine some commits related to tracking, you can use:
 
-  b2validation-revisions 5e066d31b391bb240cb2b381e67c5488681a8ec6 05d5bf078a45f6af8022bf06b398213d0bc2409d
-    --check-quantity ~/basf2/tracking/validation/results/current/TrackingValidation.root:hEfficiency
-    --script "validate_basf2 -s *_trackingEfficiency_*.py"
+.. code-block::
 
-  which will run through all commits from 5e066d31b391bb240cb2b381e67c5488681a8ec6 to 05d5bf078a45f6af8022bf06b398213d0bc2409d
-  and execute "validate_basf2 -s *_trackingEfficiency_*.py" for each of them. Then it will extract the meanX, the meanY and
-  the zeroSupressedMeanY of the TNtuple hEfficiency in the file
-  ~/basf2/tracking/validation/results/current/tracking/TrackingValidation.root.
+    b2validation-revisions 5e066d31b391bb240cb2b381e67c5488681a8ec6 05d5bf078a45f6af8022bf06b398213d0bc2409d \
+      --check-quantity ~/basf2/tracking/validation/results/current/TrackingValidation.root:hEfficiency \
+      --script "validate_basf2 -s *_trackingEfficiency_*.py"
 
-  The options --script and --check-quantity can be given more than once.
+which will run through all commits from
+``5e066d31b391bb240cb2b381e67c5488681a8ec6`` to
+``05d5bf078a45f6af8022bf06b398213d0bc2409d``
+and execute ``validate_basf2 -s *_trackingEfficiency_*.py`` for each of them.
+Then it will extract the ``meanX``, the ``meanY`` and
+the ``zeroSupressedMeanY`` of the ``TNtuple hEfficiency`` in the file
+``~/basf2/tracking/validation/results/current/tracking/TrackingValidation.root``.
 
-  Author: The Belle II Collaboration
-  Contributors: Nils Braun, Thomas Hauth
+The options ``--script`` and ``--check-quantity`` can be given more than once.
+
+:Authors: The Belle II Collaboration. Contributors: Nils Braun, Thomas Hauth
 """
 from collections import defaultdict
 
@@ -110,11 +113,10 @@ def get_fom_from_file(script_name, file_names_and_fom, git_commit_hash,
     return results
 
 
-if __name__ == "__main__":
+def get_argument_parser():
+    """ Define the accepted command line flags """
     # setup argument parser options
-    parser = argparse.ArgumentParser(
-        description='Evaluate status of the compile and validation of a '
-                    'specific basf2 revision.')
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         'git_start_hash',
         help='Start git hash to check.'
@@ -155,8 +157,11 @@ if __name__ == "__main__":
              'the quantity check. Only this validation script and all scripts '
              'it depends on are executed.'
     )
+    return parser
 
-    args = parser.parse_args()
+if __name__ == "__main__":
+
+    args = get_argument_parser().parse_args()
     argsVar = vars(args)
 
     # see if quantities must be checked and

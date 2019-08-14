@@ -210,7 +210,7 @@ void BKLMAnaModule::event()
       ExtHit* exthit =  relatedExtHit[t];
       if (exthit->getDetectorID() != Const::EDetector::BKLM) continue;
       int copyid = exthit->getCopyID();
-      int forward = ((copyid & BKLM_END_MASK) >> BKLM_END_BIT);
+      int section = ((copyid & BKLM_END_MASK) >> BKLM_END_BIT);
       int sector = ((copyid & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1;
       int layer = ((copyid & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1;
       //int plane = (copyid & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;//only for sci
@@ -241,7 +241,7 @@ void BKLMAnaModule::event()
       for (int mHit = 0; mHit < hits2D.getEntries(); mHit++) {
         BKLMHit2d* hit = hits2D[mHit];
         //if(!hit->inRPC()) continue;
-        if (hit->getForward() != forward) continue;
+        if (hit->getSection() != section) continue;
         if (hit->getSector() != sector) continue;
         if (hit->getLayer() != layer) continue;
         TVector3 position = hit->getGlobalPosition();
@@ -271,14 +271,11 @@ void BKLMAnaModule::endRun()
 
 void BKLMAnaModule::terminate()
 {
-  float num = 0;
-  float denom = 0;
-
   for (int iL = 0; iL < 15; iL ++) {
     for (int i = 0; i < m_totalThephi[iL]->GetNbinsX(); i++) {
       for (int j = 0; j < m_totalThephi[iL]->GetNbinsY(); j++) {
-        num = m_passThephi[iL]->GetBinContent(i + 1, j + 1);
-        denom = m_totalThephi[iL]->GetBinContent(i + 1, j + 1);
+        float num = m_passThephi[iL]->GetBinContent(i + 1, j + 1);
+        float denom = m_totalThephi[iL]->GetBinContent(i + 1, j + 1);
         if (num > 0) {
           m_effiThephi[iL]->SetBinContent(i + 1, j + 1, num / denom);
           m_effiThephi[iL]->SetBinError(i + 1, j + 1, sqrt(num * (denom - num) / (denom * denom * denom)));
@@ -293,8 +290,8 @@ void BKLMAnaModule::terminate()
   for (int iL = 0; iL < 15; iL ++) {
     for (int i = 0; i < m_totalTrkThephi[iL]->GetNbinsX(); i++) {
       for (int j = 0; j < m_totalTrkThephi[iL]->GetNbinsY(); j++) {
-        num = m_passTrkThephi[iL]->GetBinContent(i + 1, j + 1);
-        denom = m_totalTrkThephi[iL]->GetBinContent(i + 1, j + 1);
+        float num = m_passTrkThephi[iL]->GetBinContent(i + 1, j + 1);
+        float denom = m_totalTrkThephi[iL]->GetBinContent(i + 1, j + 1);
         if (num > 0) {
           m_effiTrkThephi[iL]->SetBinContent(i + 1, j + 1, num / denom);
           m_effiTrkThephi[iL]->SetBinError(i + 1, j + 1, sqrt(num * (denom - num) / (denom * denom * denom)));
@@ -309,8 +306,8 @@ void BKLMAnaModule::terminate()
 
   for (int i = 0; i < m_totalYX->GetNbinsX(); i++) {
     for (int j = 0; j < m_totalYX->GetNbinsY(); j++) {
-      num = m_passYX->GetBinContent(i + 1, j + 1);
-      denom = m_totalYX->GetBinContent(i + 1, j + 1);
+      float num = m_passYX->GetBinContent(i + 1, j + 1);
+      float denom = m_totalYX->GetBinContent(i + 1, j + 1);
       if (num > 0) {
         m_effiYX->SetBinContent(i + 1, j + 1, num / denom);
         m_effiYX->SetBinError(i + 1, j + 1, sqrt(num * (denom - num) / (denom * denom * denom)));
@@ -332,8 +329,8 @@ void BKLMAnaModule::terminate()
   }
 
   for (int i = 0; i < m_totalMom->GetNbinsX(); i++) {
-    num = m_passMom->GetBinContent(i + 1);
-    denom = m_totalMom->GetBinContent(i + 1);
+    float num = m_passMom->GetBinContent(i + 1);
+    float denom = m_totalMom->GetBinContent(i + 1);
     if (num > 0) {
       m_effiMom->SetBinContent(i + 1, num / denom);
       m_effiMom->SetBinError(i + 1, sqrt(num * (denom - num) / (denom * denom * denom)));
@@ -342,6 +339,7 @@ void BKLMAnaModule::terminate()
       m_effiMom->SetBinError(i + 1,  0);
     }
   }
+
   m_file->cd();
   m_hdistance->Write();
   m_totalYX->Write();
@@ -363,6 +361,5 @@ void BKLMAnaModule::terminate()
   }
   m_extTree->Write();
   m_file->Close();
-
 }
 

@@ -29,4 +29,21 @@ namespace Belle2 {
     inline const T& operator *()  const {return *getObject<T>(); }  /**< Imitate pointer functionality. */
     inline const T* operator ->() const {return getObject<T>(); }   /**< Imitate pointer functionality. */
   };
+
+  /** Optional DBObjPtr: This class behaves the same as the DBObjPtr except
+   * that it will not raise errors when an object could not be found in the
+   * database.
+   *
+   * Users are responsible to check the validity of the object before using it.
+   *
+   * This is the same as using a DBObjPtr with full constructor arguments to
+   * specify whether it is optional but allows to use default constructor and
+   * gives a clearer intention to readers.
+   */
+  template<class T> class OptionalDBObjPtr: public DBObjPtr<T> {
+  public:
+    /** Construct a new Array with a given name or with the default name which
+     * is identical to the class name of T */
+    explicit OptionalDBObjPtr(const std::string& name = ""): DBObjPtr<T>(name, false) {}
+  };
 }

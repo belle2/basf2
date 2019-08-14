@@ -403,6 +403,17 @@ Parameters:
 Warning:
     it's still possible to modify `globaltags` after this call.
 )DOC")
+    .def("disable_globaltag_replay", &Configuration::disableGlobalTagReplay, R"DOC("disable_globaltag_replay()
+
+Disable global tag replay and revert to the old behavior that the default
+globaltag will be used if no other globaltags are specified.
+
+This is a shortcut to just calling
+
+    >>> conditions.override_globaltags()
+    >>> conditions.globaltags += list(conditions.default_globaltags)
+
+)DOC")
     .def("append_testing_payloads", &Configuration::appendTestingPayloadLocation, py::args("filename"), R"DOC(append_testing_payloads(filename)
 
 Append a text file containing local test payloads to the end of the list of

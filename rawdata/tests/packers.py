@@ -27,6 +27,8 @@ def create_digits():
 
 set_random_seed("something important")
 set_log_level(LogLevel.WARNING)
+# disable tag replay, we want to test current packers independent of when the digits were created
+conditions.disable_globaltag_replay()
 
 if Belle2.FileSystem.findFile("rawdata/tests/digits.root", False) == "":
     # execute the create_digits in a child process to avoid side effects

@@ -168,7 +168,6 @@
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] File appears to be empty, skipping
 	filename = chaintest_empty.root  { module: RootInput }
-[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 [INFO] Added file chaintest_1.root
 [WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] ========================================================================
@@ -193,7 +192,6 @@
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] File appears to be empty, skipping
 	filename = chaintest_empty.root  { module: RootInput }
-[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 [INFO] Added file chaintest_1.root
 [INFO] Added file chaintest_2.root
 [WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
@@ -237,7 +235,6 @@
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] File appears to be empty, skipping
 	filename = chaintest_empty.root  { module: RootInput }
-[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 [INFO] Added file chaintest_1.root
 [INFO] Added file chaintest_2.root
 [INFO] Added file chaintest_1.root

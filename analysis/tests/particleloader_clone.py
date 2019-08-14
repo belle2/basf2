@@ -7,7 +7,6 @@ this is not present on the bamboo server so this test only runs on buildbot or
 wherever the validation-data are visible  (it's also a bit slower).
 """
 
-import sys
 import basf2
 import b2test_utils
 

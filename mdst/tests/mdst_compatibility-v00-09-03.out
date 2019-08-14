@@ -2,7 +2,6 @@
 [INFO] The random number seed is set to "1"
 [INFO] Starting event processing, random seed is set to '1'
 [INFO] Added file ${BELLE2_LOCAL_DIR}/mdst/tests/mdst-v00-09-03.root
-[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 Untested method EventMetaData::addErrorFlag
 Untested method EventMetaData::isEndOfData
 Untested method EventMetaData::setEndOfData
@@ -421,6 +420,7 @@ V0#2:
     -> Tracks#6
   getV0Hypothesis(): <type: K_S0>
 TrackFitResult#0:
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltag is ${default_globaltag}

@@ -143,6 +143,19 @@ namespace Belle2::Conditions {
     /** Check if override is enabled by previous calls to overrideGlobalTags() */
     bool overrideEnabled() const { return m_overrideEnabled; }
 
+    /** Disable global tag replay.
+     *
+     * This restores the previous behavior of just using the default globaltag
+     * and is just a shortcut for calling overrideGlobalTags() and appending
+     * each tag in getDefaultGlobalTags() tho the list of globaltags using
+     * appendGlobalTag()
+     */
+    void disableGlobalTagReplay()
+    {
+      overrideGlobalTags();
+      for (const auto& tag : getDefaultGlobalTags()) appendGlobalTag(tag);
+    }
+
     /** Get the final list of globaltags to be used for processing.
      *
      * - if overrideEnabled() is false then processing will use getGlobalTags()

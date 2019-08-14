@@ -52,6 +52,8 @@ namespace Belle2 {
     /// time IDs (aka continuous subruns) to EventMetaData (and later IoVs))
     void setEvents(const std::vector<EventMetaData>& events) {m_events = events;}
 
+    /// Set minimum entries - for less algo will not run, but report NotEnoughData.
+    /// Use -1 for no cut (default)
     void setMinEntries(int minEntries) {m_minEntries = minEntries;}
 
     /// Setup the complete time dependence of parameters at once (ensures consistency) (Python version)

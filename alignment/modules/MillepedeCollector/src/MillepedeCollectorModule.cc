@@ -606,6 +606,13 @@ void MillepedeCollectorModule::collect()
     if (!list.isValid())
       continue;
 
+    DBObjPtr<BeamParameters> beam;
+
+    double motherMass = beam->getMass();
+    double motherWidth = sqrt((beam->getCovHER() + beam->getCovLER())(0, 0));
+
+    updateMassWidthIfSet(listName, motherMass, motherWidth);
+
     for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
 
       auto mother = list->getParticle(iParticle);
@@ -614,13 +621,6 @@ void MillepedeCollectorModule::collect()
         B2ERROR("Did not get 2 fitted tracks. Skipping this mother.");
         continue;
       }
-
-      DBObjPtr<BeamParameters> beam;
-
-      double motherMass = beam->getMass();
-      double motherWidth = sqrt((beam->getCovHER() + beam->getCovLER())(0, 0));
-
-      updateMassWidthIfSet(listName, motherMass, motherWidth);
 
       auto dfdextPlusMinus = getTwoBodyToLocalTransform(*mother, motherMass);
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
@@ -662,6 +662,13 @@ void MillepedeCollectorModule::collect()
     if (!list.isValid())
       continue;
 
+    DBObjPtr<BeamParameters> beam;
+
+    double motherMass = beam->getMass();
+    double motherWidth = sqrt((beam->getCovHER() + beam->getCovLER())(0, 0));
+
+    updateMassWidthIfSet(listName, motherMass, motherWidth);
+
     for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
 
       auto mother = list->getParticle(iParticle);
@@ -670,13 +677,6 @@ void MillepedeCollectorModule::collect()
         B2ERROR("Did not get 2 fitted tracks. Skipping this mother.");
         continue;
       }
-
-      DBObjPtr<BeamParameters> beam;
-
-      double motherMass = beam->getMass();
-      double motherWidth = sqrt((beam->getCovHER() + beam->getCovLER())(0, 0));
-
-      updateMassWidthIfSet(listName, motherMass, motherWidth);
 
       auto dfdextPlusMinus = getTwoBodyToLocalTransform(*mother, motherMass);
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;

@@ -10,6 +10,11 @@ Variables
 
 * Statistically correct combination of p-values :b2:var:`pValueCombination`
 
+* Added the meta variable :b2:var:`clusterHasFailedTiming` to check if
+  the ECL cluster's timing fit failed.
+
+* Added the meta variable :b2:var:`clusterHasFailedErrorTiming` to
+   check if the calculation of the ECL cluster's error on the timing failed.
 * chi2 and ndf from KFit vertices stored as extraInfo
 
 * Added :b2:var:`trackFitHypothesisPDG` which returns the PDG code of the successfull track fit hypothesis 

@@ -15,7 +15,7 @@ env['LIBS'] = ['framework', 'cdc_dataobjects',
                'genfit2', '$ROOT_LIBS', 'EG', 'svd', 'pxd',
                'alignment_dataobjects', 'calibration', 'calibration_dataobjects',
                'klm_eklm_dataobjects', 'klm_eklm_dbobjects', 'klm', 'cdc', 'alignment_dbobjects',
-               'vxd', 'mdst_dataobjects']
+               'vxd', 'mdst_dataobjects', 'boost_python']
 
 Return('env')
 

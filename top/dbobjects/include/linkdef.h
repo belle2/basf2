@@ -52,5 +52,7 @@
 #pragma link C++ class Belle2::TOPSignalShape+;
 #pragma link C++ class Belle2::TOPPulseHeightPar+;
 #pragma link C++ class Belle2::TOPWavelengthFilter+;
+#pragma link C++ class Belle2::TOPCalAsicShift+;
+#pragma link C++ class Belle2::TOPFrontEndSetting+;
 
 #endif

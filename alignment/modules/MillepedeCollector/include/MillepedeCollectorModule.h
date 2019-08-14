@@ -17,7 +17,7 @@
 #include <genfit/MeasuredStateOnPlane.h>
 #include <analysis/dataobjects/Particle.h>
 #include <genfit/GblTrajectory.h>
-
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
@@ -162,6 +162,11 @@ namespace Belle2 {
     bool m_enableWireByWireAlignment;
     /** Enable global derivatives for wire sagging **/
     bool m_enableWireSagging;
+
+    /** List of event meta data entries at which payloads can change for timedep calibration */
+    std::vector<std::tuple<int, int, int>> m_eventNumbers{};
+
+    std::vector< std::tuple< std::vector< int >, std::vector< std::tuple< int, int, int > > > > m_timedepConfig;
 
     /** Current vector of GBL data from trajectory to be stored in a tree */
     std::vector<gbl::GblData> m_currentGblData{};

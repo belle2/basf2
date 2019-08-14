@@ -46,7 +46,6 @@ void BKLMElectronicsMap::addChannel(
   uint16_t detectorChannel, int copper, int slot, int lane, int axis,
   int channel)
 {
-  int sectorGlobal;
   BKLMElectronicsChannel electronicsChannel(copper, slot, lane, axis, channel);
   if (m_MapDetectorElectronics.find(detectorChannel) != m_MapDetectorElectronics.end()) {
     B2ERROR("Detector channel already exists in the electronics map."

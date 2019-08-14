@@ -230,6 +230,7 @@ namespace Belle2 {
     //! @param elementId Unique id of Belle2 detector element (sensor, layer, wire...)
     void construct(gidTYPE elementId, gidTYPE paramId);
 
+  public:
     //! Struct to hold intervals of validity
     struct TimeInterval {
 
@@ -273,7 +274,7 @@ namespace Belle2 {
         }
       }
     };
-
+  public:
     //! Reference to map EIDPID -> (TEIDPID, time intervals)
     static std::map<gidTYPE, TimeInterval >& getTimeIntervals()
     {
@@ -295,7 +296,7 @@ namespace Belle2 {
 
     //! Helper to compose time elemnt id & param id
     gidTYPE makeTEIDPID(gidTYPE teid_, gidTYPE pid_) {return pid_ * pidOffset + teid_ * teidOffset;}
-
+  private:
     //! global id
     gidTYPE gid {0};
 

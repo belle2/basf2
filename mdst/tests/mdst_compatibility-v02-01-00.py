@@ -11,6 +11,8 @@ CHANGES since release-02-01-00:
   + isEndOfRun
 - ECLCluster:
   + getPulseShapeDiscriminationMVA added
+  + hasFailedFitTime
+  + hasFailedTimeResolution
   - getCovarianceMatrixAsArray removed
 - SoftwareTriggerResult:
   * non-prescaled results added

@@ -109,7 +109,7 @@ def add_mdst_dump(path, print_untested=False):
             "getAbsZernike40", "getAbsZernike51", "getZernikeMVA", "getE1oE9",
             "getE9oE21", "getClusterHadronIntensity", "getNumberOfHadronDigits",
             "getSecondMoment", "getLAT", "getNumberOfCrystals", "getTime",
-            "getDeltaTime99", "getPhi", "getTheta", "getR", "getHypotheses",
+            "getDeltaTime99", "hasFailedFitTime", "hasFailedTimeResolution", "getPhi", "getTheta", "getR", "getHypotheses",
             "getEnergyRaw", "getEnergyHighestCrystal", "getUncertaintyEnergy",
             "getUncertaintyTheta", "getUncertaintyPhi", "getClusterPosition",
             "getCovarianceMatrix3x3", "getDetectorRegion", "getUniqueId",

@@ -28,7 +28,7 @@ all_skims = [
     "DstToD0Pi_D0ToHpJmPi0", "DstToD0Pi_D0ToHpHmPi0", "DstToD0Pi_D0ToHpJmEta", "DstToD0Pi_D0ToHpJm", "XToD0_D0ToHpJm",
     "DstToD0Pi_D0ToNeutrals", "XToD0_D0ToNeutrals", "XToDp_DpToKsHp", "BtoDh_Kspi0", "BtoDh_hh",
     "BtoDh_Kshh", "Tau", "PRsemileptonicUntagged", "SLUntagged",
-    "LeptonicUntagged", "TCPV", "DstToD0Pi_D0ToRare", "BtoXll", "BtoXgamma", "TauLFV",
+    "LeptonicUntagged", "TCPV", "DstToD0Pi_D0ToRare", "BtoXll", "BtoXll_LFV", "BtoXgamma", "TauLFV",
 ]
 
 

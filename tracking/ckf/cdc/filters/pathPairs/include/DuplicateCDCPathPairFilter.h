@@ -36,12 +36,12 @@ namespace Belle2 {
       int total = shortPath->size() - 1;
       for (const auto& sState : *shortPath)
       {
-        for (const auto& lState : *longPath) {
-          if (!sState.isSeed() && !lState.isSeed()
-          && sState.getWireHit() == lState.getWireHit()) {
-            match++;
-            break;
-          }
+        if (sState.isSeed()) {
+          continue;
+        }
+        if (std::any_of(longPath->begin(), longPath->end(), [&sState](auto & lState)
+        {return !lState.isSeed() && sState.getWireHit() == lState.getWireHit();})) {
+          match++;
         }
       }
 

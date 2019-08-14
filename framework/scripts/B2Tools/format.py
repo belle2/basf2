@@ -167,7 +167,18 @@ class DefaultValueFormatter(Formatter):
             return None, None
 
 
-def formatFileName(template, filename, metadata_json):
+def format_filename(template, filename, metadata_json):
+    """
+    Format a file name as described in BELLE2-NOTE-TE-2017-012
+
+    Parameters:
+      template (str): the format string
+      filename (str): the name of the file
+      metadata_json (str): a string representation of the file metadata json
+
+    Returns:
+      a string with the formatted file name
+    """
     filepath = Path(filename)
     metadata = json.loads(metadata_json)
     for key, value in metadata.items():

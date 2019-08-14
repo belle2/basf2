@@ -432,8 +432,8 @@ void RootOutputModule::fillFileMetaData()
     {"globalTag", m_fileMetaData->getDatabaseGlobalTag()},
     {"dataDescription", m_fileMetaData->getDataDescription()}
     };
-    auto formatFileName = boost::python::import("B2Tools.format").attr("formatFileName");
-    lfn = boost::python::extract<std::string>(formatFileName(format, m_outputFileName, metadata.dump()));
+    auto format_filename = boost::python::import("B2Tools.format").attr("format_filename");
+    lfn = boost::python::extract<std::string>(format_filename(format, m_outputFileName, metadata.dump()));
   }
   m_fileMetaData->setLfn(lfn);
   //register the file in the catalog

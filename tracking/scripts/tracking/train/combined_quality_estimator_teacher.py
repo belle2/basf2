@@ -182,14 +182,16 @@ except ModuleNotFoundError:
 # If b2luigi version 0.3.2 or older, it relies on $BELLE2_RELEASE being "head",
 # which is not the case in the new externals. A fix has been merged into b2luigi
 # via https://github.com/nils-braun/b2luigi/pull/17 and thus should be available
-# in future releases. Until then, this workaround setthe RELEASE to
-# head and updates the Basf2Task class.
-if version.parse(b2luigi.__version__) <= version.parse("0.3.2"):
-    if os.getenv("BELLE2_RELEASE") is None:
-        os.environ["BELLE2_RELEASE"] = "head"
-        # now update the properties that used the BELLE2_RELEASE at class definition time
-        Basf2Task.env = os.environ.copy()
-        Basf2Task.git_hash = get_basf2_git_hash()
+# in future releases.
+if (
+    version.parse(b2luigi.__version__) <= version.parse("0.3.2") and
+    get_basf2_git_hash() is None and
+    os.getenv("BELLE2_LOCAL_DIR") is not None
+):
+    print(f"b2luigi version could not obtain git hash because of a bug not yet fixed in version {b2luigi.__version__}\n"
+          "Please install the latest version of b2luigi from github via\n\n"
+          "  python3 -m pip install --upgrade [--user] git+https://github.com/nils-braun/b2luigi.git\n")
+    raise ImportError
 
 # Utility functions
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DetectorComponent name="ServiceGapsMaterial" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="true">
+<DetectorComponent name="ServiceGapsMaterial" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
   <Creator library="structure">ServiceMaterialCreator</Creator>
   <Content>
-    <xi:include href="GAPS-thickness-density.xml"/>
+    <xi:include href="GAPS-thickness-density-phase2.xml"/>
     <!-- Service Gaps Materials mother volume geometry Parameter -->
     <GapMomVolTopBack id="0" desc="Backward Top Material">
       <ZBound id="0">

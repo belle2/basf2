@@ -17,6 +17,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include <nlohmann/json.hpp>
+
 #include <iostream>
 #include <fstream>
 
@@ -80,7 +82,7 @@ void FileMetaData::Print(Option_t* option) const
     cout << m_steering << endl;
     return;
   } else if (option && (option == std::string("json"))) {
-    cout << getJson().dump(2) << endl;
+    cout << getJsonStr() << endl;
     return;
   }
   const bool all = (option && option == std::string("all"));
@@ -178,9 +180,9 @@ bool FileMetaData::write(std::ostream& output, const std::string& physicalFileNa
   return true;
 }
 
-nlohmann::json FileMetaData::getJson() const
+std::string FileMetaData::getJsonStr() const
 {
-  return {
+  nlohmann::json metadata = {
     {"LFN", m_lfn},
     {"nEvents", m_nEvents},
     {"experimentLow", m_experimentLow},
@@ -201,4 +203,5 @@ nlohmann::json FileMetaData::getJson() const
     {"dataDescription", m_dataDescription},
     {"steering", m_steering}
   };
+  return metadata.dump(2);
 }

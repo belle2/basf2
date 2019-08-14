@@ -42,7 +42,7 @@ void MetadataService::addRootOutputFile(const std::string& fileName, const FileM
   nlohmann::json file_json = {{"type", "RootOutput"}, {"filename", fileName}};
 
   if (metaData) {
-    file_json["metadata"] = metaData->getJson();
+    file_json["metadata"] = nlohmann::json::parse(metaData->getJsonStr());
   }
 
   try {

@@ -16,7 +16,6 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <nlohmann/json.hpp>
 
 namespace Belle2 {
 
@@ -238,7 +237,7 @@ namespace Belle2 {
 
     /** Get a json representation.
      */
-    nlohmann::json getJson() const;
+    std::string getJsonStr() const;
 
   private:
 

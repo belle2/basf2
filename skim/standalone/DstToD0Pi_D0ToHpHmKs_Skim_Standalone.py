@@ -31,7 +31,7 @@ set_log_level(LogLevel.INFO)
 import os
 import sys
 import glob
-skimCode = encodeSkimName('DstToD0Pi_D0ToHpJmPi02')
+skimCode = encodeSkimName('DstToD0Pi_D0ToHpHmKs')
 
 c3bh2path = Path()
 

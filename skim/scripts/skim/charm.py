@@ -269,3 +269,18 @@ def CharmSemileptonic(path):
 
     allLists = nueList + numuList
     return allLists
+
+
+def DpToKsHp(path):
+    Dpcuts = '1.72 < M < 1.98 and useCMSFrame(p)>2'
+    Dp_Channels = ['K_S0:merged pi+:loose',
+                   'K_S0:merged K+:loose',
+                   ]
+
+    DpList = []
+    for chID, channel in enumerate(Dp_Channels):
+        reconstructDecay('D+:KsHp' + str(chID) + ' -> ' + channel, Dpcuts, chID, path=path)
+        DpList.append('D+:KsHp' + str(chID))
+
+    Lists = DpList
+    return Lists

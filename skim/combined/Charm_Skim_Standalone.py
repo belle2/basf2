@@ -76,23 +76,26 @@ add_skim("DstToD0Pi_D0ToHpHmPi0", DstToD0PiD0ToHpHmPi0List, path=charmpath)
 
 from skim.charm import DstToD0PiD0ToHpHmKs
 DstToD0PiD0ToHpHmKsList = DstToD0PiD0ToHpHmKs(charmpath)
-add_skim("DstToD0Pi_D0ToHpJmPi02", DstToD0PiD0ToHpHmKsList, path=charmpath)
+add_skim("DstToD0Pi_D0ToHpHmKs", DstToD0PiD0ToHpHmKsList, path=charmpath)
 
-# from skim.charm import DstToD0PiD0ToHpJmEta
-# DstToD0PiD0ToHpJmEtaList = DstToD0PiD0ToHpJmEta(charmpath)
-# add_skim("DstToD0Pi_D0ToHpJmEta", DstToD0PiD0ToHpJmEtaList, path=charmpath)
+from skim.charm import DstToD0PiD0ToHpJmEta
+DstToD0PiD0ToHpJmEtaList = DstToD0PiD0ToHpJmEta(charmpath)
+add_skim("DstToD0Pi_D0ToHpJmEta", DstToD0PiD0ToHpJmEtaList, path=charmpath)
 
-# from skim.charm import DstToD0PiD0ToKsOmega
-# DstList = DstToD0PiD0ToKsOmega(charmpath)
-# add_skim("DstToD0Pi_D0ToKsOmega", DstList, path=charmpath)
+from skim.charm import DstToD0PiD0ToKsOmega
+DstList = DstToD0PiD0ToKsOmega(charmpath)
+add_skim("DstToD0Pi_D0ToKsOmega", DstList, path=charmpath)
 
-# from skim.charm import DstToD0Neutrals
-# add_skim("DstToD0Pi_D0ToNeutrals", DstToD0Neutrals(charmpath), path=charmpath)
-
+from skim.charm import DstToD0Neutrals
+add_skim("DstToD0Pi_D0ToNeutrals", DstToD0Neutrals(charmpath), path=charmpath)
 
 from skim.charm import CharmRare
 DstToD0Pi_D0ToRareList = CharmRare(charmpath)
 add_skim("DstToD0Pi_D0ToRare", DstToD0Pi_D0ToRareList, path=charmpath)
+
+from skim.charm import DpToKsHp
+DpToKsHpList = DpToKsHp(charmpath)
+add_skim("XToDp_DpToKsHp", DpToKsHpList, path=charmpath)
 
 setSkimLogging(path=charmpath)
 process(charmpath)

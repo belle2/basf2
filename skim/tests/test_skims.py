@@ -128,11 +128,15 @@ add_skim('DstToD0Pi_D0ToNeutrals', DstToD0Neutrals(path=skimpath), path=skimpath
 
 # charm Skim: D* -> D0 (-> pi pi Ks/ K K Ks) pi
 from skim.charm import DstToD0PiD0ToHpHmKs
-add_skim('DstToD0Pi_D0ToHpJmPi02', DstToD0PiD0ToHpHmKs(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToHpHmKs', DstToD0PiD0ToHpHmKs(path=skimpath), path=skimpath)
 
 # charm Skim: D -> gamma gamma/ e e/ mu mu
 from skim.charm import CharmRare
 add_skim('DstToD0Pi_D0ToRare', CharmRare(path=skimpath), path=skimpath)
+
+# charm Skim: D+ -> Ks pi+/ Ks K+
+from skim.charm import DpToKsHp
+add_skim('XToDp_DpToKsHp', DpToKsHp(path=skimpath), path=skimpath)
 
 
 # Systematics skim

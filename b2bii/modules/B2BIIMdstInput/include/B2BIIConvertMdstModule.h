@@ -400,15 +400,15 @@ namespace Belle2 {
     StoreArray<ExtHit> m_extHits;
 
     /** BeamSpot for IP */
-    DBObjPtr<BeamSpot> m_beamSpotDB;
+    OptionalDBObjPtr<BeamSpot> m_beamSpotDB;
     BeamSpot m_beamSpot;
 
     /** CollisionBoostVector for boost vector*/
-    DBObjPtr<CollisionBoostVector> m_collisionBoostVectorDB;
+    OptionalDBObjPtr<CollisionBoostVector> m_collisionBoostVectorDB;
     CollisionBoostVector m_collisionBoostVector;
 
     /** CollisionInvariantMass for Invariant Mass of Beam*/
-    DBObjPtr<CollisionInvariantMass> m_collisionInvMDB;
+    OptionalDBObjPtr<CollisionInvariantMass> m_collisionInvMDB;
     CollisionInvariantMass m_collisionInvM;
 
     /** CONVERSION OF TRACK ERROR MATRIX ELEMENTS */

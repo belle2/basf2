@@ -34,8 +34,13 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+
+// Replace BeamParameters
+#include <mdst/dbobjects/BeamSpot.h>
+#include <mdst/dbobjects/CollisionBoostVector.h>
+#include <mdst/dbobjects/CollisionInvariantMass.h>
+
 #include <ecl/dataobjects/ECLHit.h>
-#include <framework/dbobjects/BeamParameters.h>
 #include <tracking/dataobjects/ExtHit.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -205,10 +210,10 @@ namespace Belle2 {
      */
     void convertExtHitTable();
 
-    /** Stores beam parameters (energy, angles) in BeamParameters (currently in the DataStore). */
+    /** Stores beam parameters (energy, angles) in CollisionInvariantMass and CollisionBoostVector (currently in the DataStore). */
     void convertBeamEnergy();
 
-    /** Stores the IPProfiles in BeamParameters (currently in DataStore) */
+    /** Stores the IPProfiles in BeamSpot (currently in DataStore) */
     void convertIPProfile(bool beginRun = false);
 
     //-----------------------------------------------------------------------------
@@ -401,9 +406,17 @@ namespace Belle2 {
     /** Ext hits */
     StoreArray<ExtHit> m_extHits;
 
-    /** BeamParameters */
-    DBObjPtr<BeamParameters> m_beamParamsDB;
-    BeamParameters m_beamParams;
+    /** BeamSpot for IP */
+    OptionalDBObjPtr<BeamSpot> m_beamSpotDB;
+    BeamSpot m_beamSpot;
+
+    /** CollisionBoostVector for boost vector*/
+    OptionalDBObjPtr<CollisionBoostVector> m_collisionBoostVectorDB;
+    CollisionBoostVector m_collisionBoostVector;
+
+    /** CollisionInvariantMass for Invariant Mass of Beam*/
+    OptionalDBObjPtr<CollisionInvariantMass> m_collisionInvMDB;
+    CollisionInvariantMass m_collisionInvM;
 
     /** CONVERSION OF TRACK ERROR MATRIX ELEMENTS */
     /** Belle error matrix elements are in the following order

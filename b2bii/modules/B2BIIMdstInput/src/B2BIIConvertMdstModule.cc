@@ -20,6 +20,7 @@
 
 // Belle II utilities
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
 // Belle II dataobjects
@@ -278,31 +279,37 @@ void B2BIIConvertMdstModule::event()
   else
     m_realData = true;  // <- this is real data sample
 
-  // 0. Convert IPProfile
+  // 0. Convert IPProfile to BeamSpot
   convertIPProfile();
 
   // Make sure beam parameters are correct: if they are not found in the
   // database or different from the ones in the database we need to override them
-  if (!m_beamParamsDB || !(m_beamParams == *m_beamParamsDB)) {
-    if (!m_beamParamsDB && !m_realData) {
+  if (!m_beamSpotDB || !(m_beamSpot == *m_beamSpotDB) ||
+      !m_collisionBoostVectorDB || !(m_collisionBoostVector == *m_collisionBoostVectorDB) ||
+      !m_collisionInvMDB || !(m_collisionInvM == *m_collisionInvMDB)) {
+    if ((!m_beamSpotDB || !m_collisionBoostVectorDB || !m_collisionInvMDB) && !m_realData) {
       B2INFO("No database entry for this run yet, create one");
       StoreObjPtr<EventMetaData> event;
       IntervalOfValidity iov(event->getExperiment(), event->getRun(), event->getExperiment(), event->getRun());
-      Database::Instance().storeData("BeamParameters", &m_beamParams, iov);
+      Database::Instance().storeData("CollisionBoostVector", &m_collisionBoostVector, iov);
+      Database::Instance().storeData("CollisionInvariantMass", &m_collisionInvM, iov);
+      Database::Instance().storeData("BeamSpot", &m_beamSpot, iov);
       B2INFO("store");
     }
     if (m_realData) {
       B2ERROR("BeamParameters from condition database are different from converted "
               "ones, overriding database. Did you call setupB2BIIDatabase()?");
     } else {
-      B2INFO("BeamParameters from condition database are different from converted "
+      B2INFO("BeamSpot, BoostVector, and InvariantMass from condition database are different from converted "
              "ones, overriding database");
     }
     if (ProcHandler::parallelProcessingUsed()) {
       B2FATAL("Cannot reliably override the Database content in parallel processing "
               "mode, please run the conversion in single processing mode");
     }
-    DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(m_beamParams), true);
+    DBStore::Instance().addConstantOverride("CollisionBoostVector", new CollisionBoostVector(m_collisionBoostVector), true);
+    DBStore::Instance().addConstantOverride("CollisionInvariantMass", new CollisionInvariantMass(m_collisionInvM), true);
+    DBStore::Instance().addConstantOverride("BeamSpot", new BeamSpot(m_beamSpot), true);
   }
 
   // 1. Convert MC information
@@ -353,13 +360,25 @@ void B2BIIConvertMdstModule::convertBeamEnergy()
   const double crossingAngle = Belle::BeamEnergy::Cross_angle();
   const double angleLer = M_PI; //parallel to negative z axis (different from Belle II!)
   const double angleHer = crossingAngle; //in positive z and x direction, verified to be consistent with Upsilon(4S) momentum
+  const double mass_e = Const::electronMass;    //mass of electron: 0.0 in basf, 0.000510998902 in basf2;
+  TMatrixDSym covariance(0);    //0 entries = no error
+  HepLorentzVector p_beam = Belle::BeamEnergy::p_beam(); // Testing only
 
-  std::vector<double> covariance; //0 entries = no error
+  // Get four momentum of LER and HER
+  TLorentzVector P_her(0.0, 0.0, TMath::Sqrt(Eher * Eher - mass_e * mass_e), Eher);
+  P_her.RotateY(angleHer);
+  TLorentzVector P_ler(0.0, 0.0, TMath::Sqrt(Eler * Eler - mass_e * mass_e), Eler);
+  P_ler.RotateY(angleLer);
 
-  m_beamParams.setLER(Eler, angleLer, covariance);
-  m_beamParams.setHER(Eher, angleHer, covariance);
+  // Get four momentum of beam
+  TLorentzVector P_beam = P_her + P_ler;
+
+  m_collisionBoostVector.setBoost(P_beam.BoostVector(), covariance);
+  m_collisionInvM.setMass(P_beam.M(), 0.0 , 0.0);
 
   B2DEBUG(99, "Beam Energy: E_HER = " << Eher << "; E_LER = " << Eler << "; angle = " << crossingAngle);
+  B2DEBUG(99, "Beam Momentum (pre-convert) : P_X = " << p_beam.px() << "; P_Y = " << p_beam.py() << "; P_Z = " << p_beam.pz());
+  B2DEBUG(99, "Beam Momentum (post-convert) : P_X = " << P_beam.Px() << "; P_Y = " << P_beam.Py() << "; P_Z = " << P_beam.Pz());
 }
 
 void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
@@ -368,11 +387,11 @@ void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
     // No IPProfile for this run ...
     if (beginRun) {
       // no IPProfile, set vertex to NaN without errors for the full run
-      m_beamParams.setVertex(
+      m_beamSpot.setIP(
         TVector3(std::numeric_limits<double>::quiet_NaN(),
                  std::numeric_limits<double>::quiet_NaN(),
                  std::numeric_limits<double>::quiet_NaN()
-                ), std::vector<double>()
+                ), TMatrixTSym<double>()
       );
     }
     return;
@@ -401,8 +420,7 @@ void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
       cov(i, j) = ipErr(i + 1, j + 1);
     }
   }
-  m_beamParams.setVertex(TVector3(ip.x(), ip.y(), ip.z()));
-  m_beamParams.setCovVertex(cov);
+  m_beamSpot.setIP(TVector3(ip.x(), ip.y(), ip.z()), cov);
 }
 
 void B2BIIConvertMdstModule::convertMdstChargedTable()

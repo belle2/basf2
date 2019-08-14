@@ -58,9 +58,9 @@ HLT_INPUT_OBJECTS.remove("ROIs")
 #: list of DataStore names that are present when data enters the expressreco
 EXPRESSRECO_INPUT_OBJECTS = RAWDATA_OBJECTS + ALWAYS_SAVE_OBJECTS
 
-#: Detectors to be included in hlt
-DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM", "TRG"]
-#: Detectors to be included in expressreco
+# Detectors to be included in hlt
+DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "KLM", "TRG"]
+# Detectors to be included in expressreco
 DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
 
 #: Location of the database in the online system

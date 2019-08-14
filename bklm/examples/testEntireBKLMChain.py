@@ -16,7 +16,7 @@ import basf2
 import simulation as sim
 from ROOT import Belle2
 
-components = ['BKLM']
+components = ['KLM']
 bklm_dataObjects = ['BKLMDigits',
                     'BKLMDigitOutOfRanges',
                     'BKLMDigitRaws',

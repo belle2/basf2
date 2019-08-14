@@ -257,7 +257,7 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
   }
 
   double dataMedian = GetChargeMedianFromDB(sensorID, uBin, vBin);
-  double mcMedian;
+  double mcMedian = -1;
   // check if dataMedian makes sense
   if (dataMedian <= 0.0) {
     B2WARNING("Retrieved negative charge median from DB for sensor=" << sensorID << " uBin=" << uBin << " vBin=" << vBin <<

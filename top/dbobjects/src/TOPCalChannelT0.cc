@@ -32,26 +32,6 @@ namespace Belle2 {
   }
 
 
-  void TOPCalChannelT0::addAsicJump(int moduleID, unsigned asic, double jump)
-  {
-    unsigned module = moduleID - 1;
-    if (module >= c_numModules) {
-      B2ERROR("Invalid module number, ASIC jump not added to constant ("
-              << ClassName() << ")");
-      return;
-    }
-    if (asic >= c_numChannels / 8) {
-      B2ERROR("Invalid ASIC number, ASIC jump not added to constant ("
-              << ClassName() << ")");
-      return;
-    }
-    for (int i = 0; i < 8; i++) {
-      unsigned channel = asic * 8 + i;
-      m_T0[module][channel] += jump;
-    }
-  }
-
-
   void TOPCalChannelT0::setUnusable(int moduleID, unsigned channel)
   {
     unsigned module = moduleID - 1;

@@ -18,7 +18,7 @@ namespace Belle2::Conditions {
   class CentralMetadataProvider: public MetadataProvider {
   public:
     /** Create using a base rest url to find the server endpoints */
-    explicit CentralMetadataProvider(std::string baseUrl);
+    CentralMetadataProvider(std::string baseUrl, const std::set<std::string>& usableTagStates);
     /** default destructor */
     virtual ~CentralMetadataProvider() = default;
     /** Check the status of a given globaltag \

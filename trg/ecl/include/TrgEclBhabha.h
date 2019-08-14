@@ -60,8 +60,19 @@ namespace Belle2 {
       _2DBhabhaThresholdFWD = i2DBhabhaThresholdFWD;
       _2DBhabhaThresholdBWD = i2DBhabhaThresholdBWD;
     }
-    //! set 2D Bhabha Energy Threshold
-    void set3DBhabhaThreshold(std::vector<double> i3DBhabhaThreshold) { _3DBhabhaThreshold = i3DBhabhaThreshold; };
+    //! set 3D selection Bhabha Energy Threshold
+    void set3DBhabhaSelectionThreshold(std::vector<double> i3DBhabhaSelectionThreshold) { _3DBhabhaSelectionThreshold = i3DBhabhaSelectionThreshold; };
+    //! set 3D veto Bhabha Energy Threshold
+    void set3DBhabhaVetoThreshold(std::vector<double> i3DBhabhaVetoThreshold) { _3DBhabhaVetoThreshold = i3DBhabhaVetoThreshold; };
+
+    //! set 3D selection Bhabha Energy Angle
+    void set3DBhabhaSelectionAngle(std::vector<double> i3DBhabhaSelectionAngle) { _3DBhabhaSelectionAngle = i3DBhabhaSelectionAngle; };
+    //! set 3D veto Bhabha Energy Angle
+    void set3DBhabhaVetoAngle(std::vector<double> i3DBhabhaVetoAngle) { _3DBhabhaVetoAngle = i3DBhabhaVetoAngle; };
+    //! set mumu bit Threshold
+    void setmumuThreshold(int mumuThreshold) {_mumuThreshold = mumuThreshold; }
+    //! set mumu bit Angle selection
+    void setmumuAngle(std::vector<double>  imumuAngle) {_mumuAngle = imumuAngle; }
 
   private:
     /** Object of TC Mapping */
@@ -83,8 +94,18 @@ namespace Belle2 {
     std::vector<double> _2DBhabhaThresholdFWD;
     //! 2D Bhabha Energy Threshold
     std::vector<double> _2DBhabhaThresholdBWD;
-    //! 3D Bhabha Energy Threshold
-    std::vector<double> _3DBhabhaThreshold;
+    //! 3D Selection Bhabha Energy Threshold
+    std::vector<double> _3DBhabhaSelectionThreshold;
+    //! 3D Veto Bhabha Energy Threshold
+    std::vector<double> _3DBhabhaVetoThreshold;
+    //! 3D Selection Bhabha Energy Angle
+    std::vector<double> _3DBhabhaSelectionAngle;
+    //! 3D Veto Bhabha Energy Angle
+    std::vector<double> _3DBhabhaVetoAngle;
+    //! mumu bit Energy Threshold
+    double _mumuThreshold;
+    //! mumu bit  Angle
+    std::vector<double> _mumuAngle;
 
 
   };

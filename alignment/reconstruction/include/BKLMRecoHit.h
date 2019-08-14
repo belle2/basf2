@@ -86,8 +86,8 @@ namespace Belle2 {
 
     unsigned short m_moduleID; /**< Unique module identifier.*/
 
-    /** Forward. */
-    int m_Forward;
+    /** Section number. */
+    int m_Section;
 
     /** Sector number. */
     int m_Sector;

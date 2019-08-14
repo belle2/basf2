@@ -10,6 +10,11 @@ Variables
 
 * Statistically correct combination of p-values :b2:var:`pValueCombination`
 
+* Added the meta variable :b2:var:`clusterHasFailedTiming` to check if
+  the ECL cluster's timing fit failed.
+
+* Added the meta variable :b2:var:`clusterHasFailedErrorTiming` to
+   check if the calculation of the ECL cluster's error on the timing failed.
 * chi2 and ndf from KFit vertices stored as extraInfo
 
 * Added :b2:var:`trackFitHypothesisPDG` which returns the PDG code of the successfull track fit hypothesis 
@@ -18,6 +23,8 @@ Variables
 * Added variables for 2D Armenteros-Podolanski plot, :b2:var:`ArmenterosLongitudinalMomentumAsymmetry`, 
   :b2:var:`ArmenterosDaughter1Qt`, and :b2:var:`ArmenterosDaughter2Qt`
 * fall-back value changed from zero to NaN for several track variables
+* Added :b2:var:`sourceObjectIsInList` which checks whether there are particles from the same underlying track or cluster in a given particle list. 
+  Similar to :b2:var:`isInList` but a tighter check.
 
 Modules
 +++++++

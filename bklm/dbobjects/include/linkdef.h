@@ -5,7 +5,8 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::BKLMElectronicMapping+;
+#pragma link C++ class Belle2::BKLMElectronicsChannel+;
+#pragma link C++ class Belle2::BKLMElectronicsMap+;
 #pragma link C++ class Belle2::BKLMGeometryPar+;
 #pragma link C++ class Belle2::BKLMSimulationPar+;
 #pragma link C++ class Belle2::BKLMMisAlignment+;

@@ -40,7 +40,6 @@ class Full(TrackingValidationRun):
         'UseSVDHits': True,
         'UseCDCHits': True,
         "UseReassignedHits": True,
-        'UseOnlyBeforeTOP': True,
         'UseNLoops': 1
     }
     #: tracks will be already fitted by

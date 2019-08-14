@@ -71,14 +71,22 @@ void RecoTrackParticleLoaderModule::event()
       continue;
     }
     auto rep = recoTrack.getCardinalRepresentation();
+    int pdg = rep->getPDG();
     auto firstHit = recoTrack.getMeasuredStateOnPlaneFromFirstHit(rep);
+    genfit::MeasuredStateOnPlane extrapolatedMSoP = firstHit;
+    try {
+      extrapolatedMSoP.extrapolateToLine(TVector3(0.0, 0.0, 0.0), TVector3(0.0, 0.0, 1.0));
+    } catch (...) {
+      B2WARNING("Could not extrapolate the fit result for pdg " << pdg <<
+                " to the IP. Why, I don't know.");
+      continue;
+    }
     TVector3 pos;
     TVector3 mom;
     TMatrixDSym cov;
-    firstHit.getPosMomCov(pos, mom, cov);
-    int pdg = rep->getPDG();
-    double mass = rep->getMass(firstHit);
-    double charge = rep->getCharge(firstHit); // mplTrackRep returns magnetic charge
+    extrapolatedMSoP.getPosMomCov(pos, mom, cov);
+    double mass = rep->getMass(extrapolatedMSoP);
+    double charge = rep->getCharge(extrapolatedMSoP); // mplTrackRep returns magnetic charge
     double E = std::sqrt(mom.x() * mom.x() + mom.y() * mom.y() + mom.z() * mom.z() + mass * mass);
     double pValue = recoTrack.getTrackFitStatus(rep)->getPVal();
     TLorentzVector lorentzMom(mom.x(), mom.y(), mom.z(), E);

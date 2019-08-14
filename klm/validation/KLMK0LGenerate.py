@@ -35,7 +35,7 @@ beamparameters = add_beamparameters(main, "Y4S")
 # Geometry and Geant simulation
 paramloader = register_module('Gearbox')
 geometry = register_module('Geometry')
-geometry.param('components', ['BKLM', 'EKLM'])
+geometry.param('components', ['KLM'])
 geometry.param('useDB', False)
 g4sim = register_module('FullSim')
 

@@ -118,7 +118,7 @@ namespace Belle2 {
           }
         }
       }
-      if (debugLevel >= 100) {
+      if (debugLevel >= 300) {
         printBuffer(data32tab[iFinesse] + headerSize, eventWidth);
         B2DEBUG(20, "");
         printBuffer(data32tab[iFinesse] + headerSize + eventWidth, eventWidth);
@@ -268,7 +268,7 @@ namespace Belle2 {
         // clear output bitstream
         outputClock->m_signal[iTracker].fill(zero_val);
         B2DEBUG(90, "unpacker clock " << iclock);
-        if (debugLevel >= 100) {
+        if (debugLevel >= 300) {
           printBuffer(data32tab[iFinesse] + headerSize + eventWidth * iclock,
                       eventWidth);
         }
@@ -448,7 +448,7 @@ namespace Belle2 {
         auto inputClock = (*inputArrayPtr)[iclock];
         auto outputClock = (*outputArrayPtr)[iclock];
         B2DEBUG(20, "clock " << iclock);
-        if (debugLevel >= 100) {
+        if (debugLevel >= 300) {
           printBuffer(data32tab[iFinesse] + headerSize + eventWidth * iclock,
                       eventWidth);
         }
@@ -481,6 +481,7 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
 {
   // Set module properties
   setDescription("Unpack the CDC trigger data recorded in B2L");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("unpackMerger", m_unpackMerger,
@@ -526,13 +527,20 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
   addParam("alignFoundTime", m_alignFoundTime,
            "Whether to align out-of-sync Belle2Link data between different sub-modules", true);
 
+  std::vector<int> defaultDelayNNOutput = {10, 10, 10, 10};
+  std::vector<int> defaultDelayNNSelect = {4, 4, 4, 4};
+  addParam("delayNNOutput", m_delayNNOutput,
+           "delay of the NN output values clock cycle after the NN enable bit (by quadrant)", defaultDelayNNOutput);
+  addParam("delayNNSelect", m_delayNNSelect,
+           "delay of the NN selected TS clock cycle after the NN enable bit (by quadrant)", defaultDelayNNSelect);
+
 }
 
 
 void CDCTriggerUnpackerModule::initialize()
 {
   m_debugLevel = getLogConfig().getDebugLevel();
-  m_rawTriggers.isRequired();
+  //m_rawTriggers.isRequired();
   if (m_unpackMerger) {
     m_mergerBits.registerInDataStore("CDCTriggerMergerBits");
   }
@@ -558,14 +566,12 @@ void CDCTriggerUnpackerModule::initialize()
     m_NNInputTSHits.registerInDataStore("CDCTriggerNNInputSegmentHits");
     m_NNInput2DFinderTracks.registerInDataStore("CDCTriggerNNInput2DFinderTracks");
     m_NeuroTracks.registerInDataStore("CDCTriggerNeuroTracks");
-    m_NeuroInputs.registerInDataStore("CDCTriggerNeuroTracksInput",
-                                      DataStore::c_DontWriteOut);
+    m_NeuroInputs.registerInDataStore("CDCTriggerNeuroTracksInput");
     m_NeuroTracks.registerRelationTo(m_NNInputTSHits);
     m_NNInput2DFinderTracks.registerRelationTo(m_NNInputTSHits);
     m_NNInput2DFinderTracks.registerRelationTo(m_NeuroTracks);
     m_NeuroTracks.registerRelationTo(m_NNInput2DFinderTracks);
-    m_NeuroTracks.registerRelationTo(m_NeuroInputs, DataStore::c_Event,
-                                     DataStore::c_DontWriteOut);
+    m_NeuroTracks.registerRelationTo(m_NeuroInputs);
   }
   for (int iSL = 0; iSL < 9; iSL += 2) {
     if (m_unpackMerger) {
@@ -648,12 +654,15 @@ void CDCTriggerUnpackerModule::event()
         trg->reserve(subDetectorId, nWords);
         // only unpack when there are enough words in the event
         if (trg->getHeaders(subDetectorId, data32tab, nWords)) {
+          B2DEBUG(99, "starting to unpack a subTrigger, subDetectorId" << std::hex << subDetectorId);
           trg->unpack(subDetectorId, data32tab, nWords);
           setReturnValue(1);
         }
       }
     }
+    B2DEBUG(99, "looped over entries and filled words " << nEntriesRawTRG);
   }
+  B2DEBUG(99, "looped over rawTriggers, unpacking 2D ");
 
   // decode bitstream and make TSIM objects
   if (m_decode2DFinderTrack) {
@@ -665,6 +674,7 @@ void CDCTriggerUnpackerModule::event()
                      &m_TSHits);
     }
   }
+  B2DEBUG(99, "unpack 2D Input TS ");
   if (m_decode2DFinderInputTS) {
     std::array<int, 4> clockCounter2D = {0, 0, 0, 0};
     std::array<int, 4> timeOffset2D = {0, 0, 0, 0};
@@ -705,8 +715,11 @@ void CDCTriggerUnpackerModule::event()
       decode2DInput(iclock - m_2DFinderDelay, timeOffset2D, m_bitsTo2D[iclock], &m_TSHits);
     }
   }
+  B2DEBUG(99, "now unpack neuro ");
   if (m_decodeNeuro) {
-    decodeNNIO(&m_bitsToNN, &m_bitsFromNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NeuroInputs);
+    decodeNNIO(&m_bitsToNN, &m_bitsFromNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NeuroInputs, m_delayNNOutput,
+               m_delayNNSelect);
   }
+  B2DEBUG(99, " all is unpacked ##### ");
 }
 

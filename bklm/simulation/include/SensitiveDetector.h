@@ -12,6 +12,14 @@
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
+
+#include <bklm/dbobjects/BKLMSimulationPar.h>
+
 namespace Belle2 {
 
   class BKLMSimHit;
@@ -21,7 +29,6 @@ namespace Belle2 {
 
     class Module;
     class GeometryPar;
-    class SimulationPar;
 
     //! Class for the BKLM Sensitive Detector
     //! Each qualified simulation step is saved into a StoreArray of BKLMSimHits.
@@ -55,8 +62,8 @@ namespace Belle2 {
       //! Pointer to GeometryPar singleton
       GeometryPar* m_GeoPar;
 
-      //! Pointer to SimulationPar singleton
-      SimulationPar* m_SimPar;
+      //! Simulation parameters (from DB)
+      DBObjPtr<BKLMSimulationPar> m_SimPar;
 
     };
 

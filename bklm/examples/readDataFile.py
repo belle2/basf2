@@ -56,7 +56,7 @@ print('Gearbox registered ')
 # Geometry builder
 geobuilder = register_module('Geometry')
 geobuilder.log_level = LogLevel.INFO
-geobuilder.param('components', ['BKLM'])
+geobuilder.param('components', ['KLM'])
 klmUnpack = register_module('KLMUnpacker')
 # klmUnpack.param("keepEvenPackages",1)
 klmUnpack.param("useDefaultModuleId", 1)

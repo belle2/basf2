@@ -22,9 +22,9 @@ static bool compareSector(EKLMDigit* d1, EKLMDigit* d2)
   int s1, s2;
   static const EKLM::ElementNumbersSingleton& elementNumbers =
     EKLM::ElementNumbersSingleton::Instance();
-  s1 = elementNumbers.sectorNumber(d1->getEndcap(), d1->getLayer(),
+  s1 = elementNumbers.sectorNumber(d1->getSection(), d1->getLayer(),
                                    d1->getSector());
-  s2 = elementNumbers.sectorNumber(d2->getEndcap(), d2->getLayer(),
+  s2 = elementNumbers.sectorNumber(d2->getSection(), d2->getLayer(),
                                    d2->getSector());
   return s1 < s2;
 }
@@ -46,7 +46,7 @@ static bool compareTime(EKLMDigit* d1, EKLMDigit* d2)
 
 static bool sameSector(EKLMDigit* d1, EKLMDigit* d2)
 {
-  return ((d1->getEndcap() == d2->getEndcap()) &&
+  return ((d1->getSection() == d2->getSection()) &&
           (d1->getLayer() == d2->getLayer()) &&
           (d1->getSector() == d2->getSector()));
 }
@@ -112,7 +112,7 @@ bool EKLMReconstructorModule::fastHit(HepGeom::Point3D<double>& pos,
 double EKLMReconstructorModule::getTime(EKLMDigit* d, double dist)
 {
   int strip;
-  strip = m_GeoDat->stripNumber(d->getEndcap(), d->getLayer(), d->getSector(),
+  strip = m_GeoDat->stripNumber(d->getSection(), d->getLayer(), d->getSector(),
                                 d->getPlane(), d->getStrip()) - 1;
   return d->getTime() -
          (dist / m_TimeCalibration->getEffectiveLightSpeed() +

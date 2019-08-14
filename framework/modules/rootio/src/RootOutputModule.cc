@@ -14,6 +14,7 @@
 
 #include <framework/io/RootIOUtilities.h>
 #include <framework/core/FileCatalog.h>
+#include <framework/core/MetadataService.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/database/Database.h>
 // needed for complex module parameter
@@ -400,7 +401,7 @@ void RootOutputModule::fillFileMetaData()
     mcEvents = 0;
   }
   m_fileMetaData->setMcEvents(mcEvents);
-  m_fileMetaData->setDatabaseGlobalTag(Database::getGlobalTag());
+  m_fileMetaData->setDatabaseGlobalTag(Database::Instance().getGlobalTags());
   for (const auto& item : m_additionalDataDescription) {
     m_fileMetaData->setDataDescription(item.first, item.second);
   }
@@ -440,13 +441,14 @@ void RootOutputModule::fillFileMetaData()
   if (m_updateFileCatalog) {
     FileCatalog::Instance().registerFile(m_file->GetName(), *m_fileMetaData);
   }
-
+  m_outputFileMetaData = *m_fileMetaData;
 }
 
 
 void RootOutputModule::terminate()
 {
   closeFile();
+  MetadataService::Instance().addRootOutputFile(m_outputFileName, &m_outputFileMetaData);
 }
 
 void RootOutputModule::closeFile()

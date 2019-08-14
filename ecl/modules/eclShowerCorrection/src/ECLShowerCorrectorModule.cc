@@ -286,10 +286,10 @@ double ECLShowerCorrectorModule::getLeakageCorrectionTemporary(const double thet
   // m_leakage_bgx1_limits are ordered this way:
   // 0 : theta_geo ph2, 1 : theta_geo ph3, 2 : phi_geo ph2,   3 : phi_geo ph3,
   // 4 : theta_en ph2, 5 : theta_en ph3, 6 : phi_en ph2,   7 : phi_en ph3
-  int type_theta_geo = 0 + add_type;
-  int type_phi_geo = 2 + add_type;
-  int type_theta_en = 4 + add_type ;
-  int type_phi_en = 6 + add_type;
+  const int type_theta_geo = 0 + add_type;
+  const int type_phi_geo = 2 + add_type;
+  const int type_theta_en = 4 + add_type ;
+  const int type_phi_en = 6 + add_type;
 
   B2DEBUG(175, "Index to select payloads: type_theta_geo = " << type_theta_geo << " , type_phi_geo =  " << type_phi_geo
           << " type_theta_en = " << type_theta_en << " , type_phi_en = " << type_phi_en);
@@ -305,35 +305,35 @@ double ECLShowerCorrectorModule::getLeakageCorrectionTemporary(const double thet
   if (theta_clip > m_leakage_bgx1_limits[type_theta_geo][1]) theta_clip = m_leakage_bgx1_limits[type_theta_geo][1] - 1e-5;
   if (energy_clip < m_leakage_bgx1_limits[type_theta_geo][2]) energy_clip = m_leakage_bgx1_limits[type_theta_geo][2] + 1e-5;
   if (energy_clip > m_leakage_bgx1_limits[type_theta_geo][3]) energy_clip = m_leakage_bgx1_limits[type_theta_geo][3] - 1e-5;
-  double corr_theta_geo = m_leakage_bgx1[type_theta_geo].Interpolate(theta_clip, energy_clip);
-  theta_clip = theta; energy_clip = energy; // re-initialize for the computetion of the remaining corrections
+  const double corr_theta_geo = m_leakage_bgx1[type_theta_geo].Interpolate(theta_clip, energy_clip);
+  theta_clip = theta; energy_clip = energy; // re-initialize for the computation of the remaining corrections
 
   if (phi_clip < m_leakage_bgx1_limits[type_phi_geo][0]) phi_clip = m_leakage_bgx1_limits[type_phi_geo][0] + 1e-5;
   if (phi_clip > m_leakage_bgx1_limits[type_phi_geo][1]) phi_clip = m_leakage_bgx1_limits[type_phi_geo][1] - 1e-5;
   if (energy_clip < m_leakage_bgx1_limits[type_phi_geo][2]) energy_clip = m_leakage_bgx1_limits[type_phi_geo][2] + 1e-5;
   if (energy_clip > m_leakage_bgx1_limits[type_phi_geo][3]) energy_clip = m_leakage_bgx1_limits[type_phi_geo][3] - 1e-5;
-  double corr_phi_geo = m_leakage_bgx1[type_phi_geo].Interpolate(phi_clip, energy_clip);
+  const double corr_phi_geo = m_leakage_bgx1[type_phi_geo].Interpolate(phi_clip, energy_clip);
   phi_clip = phi; energy_clip = energy;
 
   if (theta_clip < m_leakage_bgx1_limits[type_theta_en][0]) theta_clip = m_leakage_bgx1_limits[type_theta_en][0] + 1e-5;
   if (theta_clip > m_leakage_bgx1_limits[type_theta_en][1]) theta_clip = m_leakage_bgx1_limits[type_theta_en][1] - 1e-5;
   if (energy_clip < m_leakage_bgx1_limits[type_theta_en][2]) energy_clip = m_leakage_bgx1_limits[type_theta_en][2] + 1e-5;
   if (energy_clip > m_leakage_bgx1_limits[type_theta_en][3]) energy_clip = m_leakage_bgx1_limits[type_theta_en][3] - 1e-5;
-  double corr_theta_en = m_leakage_bgx1[type_theta_en].Interpolate(theta_clip, energy_clip);
+  const double corr_theta_en = m_leakage_bgx1[type_theta_en].Interpolate(theta_clip, energy_clip);
   theta_clip = theta; energy_clip = energy;
 
   if (phi_clip < m_leakage_bgx1_limits[type_phi_en][0]) phi_clip = m_leakage_bgx1_limits[type_phi_en][0] + 1e-5;
   if (phi_clip > m_leakage_bgx1_limits[type_phi_en][1]) phi_clip = m_leakage_bgx1_limits[type_phi_en][1] - 1e-5;
   if (energy_clip < m_leakage_bgx1_limits[type_phi_en][2]) energy_clip = m_leakage_bgx1_limits[type_phi_en][2] + 1e-5;
   if (energy_clip > m_leakage_bgx1_limits[type_phi_en][3]) energy_clip = m_leakage_bgx1_limits[type_phi_en][3] - 1e-5;
-  double corr_phi_en = m_leakage_bgx1[type_phi_en].Interpolate(phi_clip, energy_clip);
+  const double corr_phi_en = m_leakage_bgx1[type_phi_en].Interpolate(phi_clip, energy_clip);
 
 
   // The final correction formula is:
   // correctedEnergy = (rawEnergy + corr_theta_geo+corr_phi_geo ) *corr_theta_en*corr_phi_en
   // to use "corr" as multiplicative factor in ECLShowerCorrectorModule::event,
   // the following form should be returned
-  double corr = (1 + (corr_theta_geo + corr_phi_geo) / energy_clip) * corr_theta_en * corr_phi_en;
+  const double corr = (1 + (corr_theta_geo + corr_phi_geo) / energy) * corr_theta_en * corr_phi_en;
 
   B2DEBUG(175, "Geometrical correction factors: corr_theta_geo=" << corr_theta_geo << ", corr_phi_geo=" << corr_phi_geo);
   B2DEBUG(175, "Energy correction factors:  corr_theta_en=" << corr_theta_en << ", corr_phi_en=" << corr_phi_en);

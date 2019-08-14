@@ -70,7 +70,7 @@ ECLShowerCorrectorModule::~ECLShowerCorrectorModule()
 
 void ECLShowerCorrectorModule::initialize()
 {
-  B2DEBUG(175, "ECLShowerCorrectorModule::initialize()");
+  B2DEBUG(28, "ECLShowerCorrectorModule::initialize()");
 
   // Register in datastore
   m_eclShowers.registerInDataStore(eclShowerArrayName());
@@ -110,7 +110,7 @@ void ECLShowerCorrectorModule::event()
       if (backgroundLevel < 0.1) correctionFactor = getLeakageCorrection(theta, phi, energy, backgroundLevel); // "Sumans corrections"
       else correctionFactor = getLeakageCorrectionTemporary(theta, phi, energy, backgroundLevel); // "Elisas and Claudias corrections"
 
-      B2DEBUG(175, "theta=" << theta << ", phi=" << phi << ", E=" << energy << ", BG=" << backgroundLevel << " --> correction factor=" <<
+      B2DEBUG(28, "theta=" << theta << ", phi=" << phi << ", E=" << energy << ", BG=" << backgroundLevel << " --> correction factor=" <<
               correctionFactor);
 
       if (correctionFactor < 1.e-5 or correctionFactor > 10.) {
@@ -120,7 +120,7 @@ void ECLShowerCorrectorModule::event()
 
       const double correctedEnergy = energy * correctionFactor;
       const double correctedEnergyHighest = energyHighest * correctionFactor;
-      B2DEBUG(175, "Correction factor=" << correctionFactor << ", correctedEnergy=" << correctedEnergy << ", correctedEnergyHighest=" <<
+      B2DEBUG(28, "Correction factor=" << correctionFactor << ", correctedEnergy=" << correctedEnergy << ", correctedEnergyHighest=" <<
               correctedEnergyHighest);
 
       // Set the correction
@@ -159,7 +159,7 @@ void ECLShowerCorrectorModule::prepareLeakageCorrections()
   m_leakage_bgx1_limits[1][1] = m_leakageCorrectionPtr_thetaGeo_phase3bgx1->getAngleMax();
   m_leakage_bgx1_limits[1][2] = m_leakageCorrectionPtr_thetaGeo_phase3bgx1->getEnergyMin();
   m_leakage_bgx1_limits[1][3] = m_leakageCorrectionPtr_thetaGeo_phase3bgx1->getEnergyMax();
-  B2DEBUG(175, "Prepariong leakage corrections, theta and energy  boundaries :  thetamin=" << m_leakage_bgx1_limits[0][0] <<
+  B2DEBUG(28, "Preparing leakage corrections, theta and energy  boundaries :  thetamin=" << m_leakage_bgx1_limits[0][0] <<
           ", thate_max=" << m_leakage_bgx1_limits[0][1]
           << ", Emin=" << m_leakage_bgx1_limits[0][2] << " Emax= " << m_leakage_bgx1_limits[0][3]);
 
@@ -291,14 +291,14 @@ double ECLShowerCorrectorModule::getLeakageCorrectionTemporary(const double thet
   const int type_theta_en = 4 + add_type ;
   const int type_phi_en = 6 + add_type;
 
-  B2DEBUG(175, "Index to select payloads: type_theta_geo = " << type_theta_geo << " , type_phi_geo =  " << type_phi_geo
+  B2DEBUG(28, "Index to select payloads: type_theta_geo = " << type_theta_geo << " , type_phi_geo =  " << type_phi_geo
           << " type_theta_en = " << type_theta_en << " , type_phi_en = " << type_phi_en);
 
   double theta_clip = theta;
   double phi_clip = phi;
   double energy_clip = energy;
 
-  B2DEBUG(175, "Cluster info to compute leakage corrections: theta=" << theta_clip << ", phi=" << phi_clip << ", E=" << energy_clip);
+  B2DEBUG(28, "Cluster info to compute leakage corrections: theta=" << theta_clip << ", phi=" << phi_clip << ", E=" << energy_clip);
 
   // check and clip boundaries since TGraph2D returns zero outside of them
   if (theta_clip < m_leakage_bgx1_limits[type_theta_geo][0]) theta_clip = m_leakage_bgx1_limits[type_theta_geo][0] + 1e-5;
@@ -335,9 +335,9 @@ double ECLShowerCorrectorModule::getLeakageCorrectionTemporary(const double thet
   // the following form should be returned
   const double corr = (1 + (corr_theta_geo + corr_phi_geo) / energy) * corr_theta_en * corr_phi_en;
 
-  B2DEBUG(175, "Geometrical correction factors: corr_theta_geo=" << corr_theta_geo << ", corr_phi_geo=" << corr_phi_geo);
-  B2DEBUG(175, "Energy correction factors:  corr_theta_en=" << corr_theta_en << ", corr_phi_en=" << corr_phi_en);
-  B2DEBUG(175, "Final correction=" << corr);
+  B2DEBUG(28, "Geometrical correction factors: corr_theta_geo=" << corr_theta_geo << ", corr_phi_geo=" << corr_phi_geo);
+  B2DEBUG(28, "Energy correction factors:  corr_theta_en=" << corr_theta_en << ", corr_phi_en=" << corr_phi_en);
+  B2DEBUG(28, "Final correction=" << corr);
 
   return corr;
 
@@ -393,7 +393,7 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
     x1Bin = 0;
   }
 
-  B2DEBUG(175, "m_numOfPhiBins=" << m_numOfPhiBins << " x0Bin=" << x0Bin << " x1Bin=" << x1Bin);
+  B2DEBUG(28, "m_numOfPhiBins=" << m_numOfPhiBins << " x0Bin=" << x0Bin << " x1Bin=" << x1Bin);
 
   double y = theta;
   double y0 = 0.;
@@ -484,11 +484,11 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
     }
   } //End of region 3
   else {
-    B2DEBUG(175, "No valid theta region found (theta=" << theta << " deg), return correction factor of 1.0.");
+    B2DEBUG(28, "No valid theta region found (theta=" << theta << " deg), return correction factor of 1.0.");
     return 1.0; // We have not found a theta region that is valid, return no correction at all (i.e. 1.0)
   }
 
-  B2DEBUG(175,  "y0Bin=" << y0Bin << " y1Bin=" << y1Bin);
+  B2DEBUG(28,  "y0Bin=" << y0Bin << " y1Bin=" << y1Bin);
 
   //int energyBin = 0;
   double z = energy;
@@ -524,7 +524,7 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
     z1Bin = (m_numOfEnergyBins - 1);
   }
 
-  B2DEBUG(175,  "z0Bin=" << z0Bin << " z1Bin=" << z1Bin);
+  B2DEBUG(28,  "z0Bin=" << z0Bin << " z1Bin=" << z1Bin);
 
   xd = (x - x0) / (x1 - x0);
   yd = (y - y0) / (y1 - y0);

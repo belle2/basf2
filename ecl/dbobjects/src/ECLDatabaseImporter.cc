@@ -372,7 +372,7 @@ void ECLDatabaseImporter::importShowerEnergyCorrectionTemporary()
   double energyMax = DBL_MAX;
 
 
-  B2DEBUG(175, "Leakage DBobjects angle boundaries: angleMin=" << angleMin << " angleMax=" << angleMax << " enmin=" << energyMin <<
+  B2DEBUG(28, "Leakage DBobjects angle boundaries: angleMin=" << angleMin << " angleMax=" << angleMax << " enmin=" << energyMin <<
           " enmax=" << energyMax);
 
   TGraph2D* theta_geo_graph = getRootObjectFromFile<TGraph2D*>(inputFile, "LeakageCorrections_theta_geometry");

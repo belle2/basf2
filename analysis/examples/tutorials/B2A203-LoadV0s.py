@@ -17,9 +17,6 @@
 #    stdKshorts(prioritiseV0, path)
 #    stdLambdas(prioritiseV0, path)
 #
-# For a more advanced usage see also:
-#    B2A205-LoadV0s_expert.py
-#
 # Contributors: B. Scavino (August 2018)
 #               I. Komarov (September 2018)
 #

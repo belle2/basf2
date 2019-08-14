@@ -11,7 +11,7 @@
 # - Lambda0
 # - (anti-Lambda0)
 #
-# See B2A203-LoadV0s.py for the recommended way to load V0-like particles
+# See tutorials/B2A203-LoadV0s.py for the recommended way to load V0-like particles
 #
 # This is a more advanced example.
 # It shows how to create and fill Ks/Lambda0 ParticleLists using V0s as source and

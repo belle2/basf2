@@ -35,16 +35,20 @@ namespace Belle2 {
 
   using NodeList = std::vector<std::vector<int> >;
 
+  /** Merger data width */
   static constexpr int mergerWidth = 256;
+  /** Number of Mergers */
   static constexpr int nAllMergers = 146;
   /** width of a single word in the raw int buffer */
   static constexpr int wordWidth = 32;
+  /** Number of FINESSE in the copper */
   static constexpr int nFinesse = 4;
+  /** Merger data bus */
   using MergerBus = std::array<std::bitset<mergerWidth>, nAllMergers>;
+  /** Merger data bus Bitstream */
   using MergerBits = Bitstream<MergerBus>;
 
-  /* enum class SubTriggerType : unsigned char {Merger, TSF, T2D, T3D, Neuro, ETF}; */
-
+  /** enum class SubTriggerType : unsigned char {Merger, TSF, T2D, T3D, Neuro, ETF}; */
   struct SubTrigger {
     /** constructor */
     SubTrigger(std::string inName,
@@ -313,8 +317,11 @@ namespace Belle2 {
 
     /** cnttrg */
     // int m_Cnttrg = 0; // not used, commented out at 2019/07/31 by ytlai
+    /** Merger cnttrg */
     int m_mergerCnttrg = 0;
+    /** 2D cnttrg */
     int m_2DFinderCnttrg = 0;
+    /** NN cnttrg */
     int m_NeuroCnttrg = 0;
 
     /** vector holding the pointers to all the dynamically allocated SubTriggers */

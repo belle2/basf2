@@ -40,15 +40,14 @@ namespace Belle2 {
 
   public:
 
-    /**  get pointer of TrgEclMaster object  */
-
+    //!  get pointer of TrgEclMaster object
     static TrgEclMaster* getTrgEclMaster(void);
 
 
-    /** Constructor */
+    //! TrgEclMaster Constructor
     TrgEclMaster(void);
 
-    /** Destructor */
+    //! TrgEclMaster Destructor
     virtual ~TrgEclMaster();
 
   public:
@@ -95,7 +94,9 @@ namespace Belle2 {
     void makeTriggerBit(int, int, int, int, int, int, int, std::vector<int>, int, int, int, int, int, int, int, int, int);
     /** Set Total Energy*/
     double setTotalEnergy(std::vector<double>);
+    //! Get ECL Trigger bit
     int getTriggerbit(int i) {return _Triggerbit[i];}
+    //! Get Low Multiplicity Trigger Bit
     int getLowmultibit() {return _Lowmultibit;}
     //! set 2D Bhabha Energy Threshold
     void set2DBhabhaThreshold(std::vector<double> i2DBhabhaThresholdFWD, std::vector<double> i2DBhabhaThresholdBWD)
@@ -177,13 +178,13 @@ namespace Belle2 {
     int _NofTopTC;
     /** The limit number of Cluster */
     int _ClusterLimit;
-    // ETM bit
+    //! ECL Trigger  bit
     int _Triggerbit[4];
-    //  LowMultibit
+    //!  Low Multiplicity bit
     int _Lowmultibit;
-    // Bhabha Prescale Factor
+    //!  Bhabha Prescale Factor
     int _PrescaleFactor;
-    // Bhabha Prescale Countor
+    //! Bhabha Prescale Countor
     int _PrescaleCounter;
 
     //! 2D Bhabha Energy Threshold

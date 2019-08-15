@@ -53,6 +53,7 @@ namespace Belle2 {
 
   /** unpacker for the merger reader (TSF which reads the merger output) */
   struct Merger : SubTrigger {
+    /** Constructor */
     Merger(StoreArray<MergerBits>* inArrayPtr, std::string inName,
            unsigned inEventWidth, unsigned inOffset,
            int inHeaderSize, std::vector<int> inNodeID,
@@ -89,6 +90,7 @@ namespace Belle2 {
       }
     };
 
+    /** Unpack function */
     void unpack(int subDetectorId,
                 std::array<int*, 4> data32tab,
                 std::array<int, 4> nWords)
@@ -394,7 +396,9 @@ namespace Belle2 {
     }
   };
 
+  /** unpacker for the Neuro */
   struct Neuro : SubTrigger {
+    /** Constructor */
     Neuro(StoreArray<NNInputBitStream>* inArrayPtr,
           StoreArray<NNOutputBitStream>* outArrayPtr,
           std::string inName, unsigned inEventWidth, unsigned inOffset,
@@ -407,9 +411,13 @@ namespace Belle2 {
       iTracker(std::stoul(inName.substr(inName.length() - 1))),
       offsetBitWidth(inOffset) {};
 
+    /** Input array pointer for NN */
     StoreArray<NNInputBitStream>* inputArrayPtr;
+    /** Output array pointer for NN */
     StoreArray<NNOutputBitStream>* outputArrayPtr;
+    /** Tracker board ID */
     unsigned iTracker;
+    /** Offset bit width */
     unsigned offsetBitWidth;
 
     void reserve(int subDetectorId, std::array<int, nFinesse> nWords)

@@ -12,7 +12,7 @@
 #include <cstdint>
 
 /* Belle2 headers. */
-#include <bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/modules/KLMUnpacker/KLMUnpackerModule.h>
 #include <klm/rawdata/RawData.h>
 #include <framework/datastore/DataStore.h>

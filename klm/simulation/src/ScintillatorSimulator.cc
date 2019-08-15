@@ -16,8 +16,8 @@
 #include <TFile.h>
 
 /* Belle2 headers. */
-#include <bklm/geometry/GeometryPar.h>
-#include <eklm/geometry/GeometryData.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/eklm/geometry/GeometryData.h>
 #include <klm/simulation/ScintillatorSimulator.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/dataobjects/EventMetaData.h>

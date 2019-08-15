@@ -45,11 +45,13 @@ namespace Belle2 {
       return getMessagePartAsString<c_identity>();
     }
 
+    /// Get the data part
     zmq::message_t& getDataMessage()
     {
       return getMessagePart<c_data>();
     }
 
+    /// Get the additional data part
     zmq::message_t& getAdditionalDataMessage()
     {
       return getMessagePart<c_additionalData>();

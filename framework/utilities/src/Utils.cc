@@ -72,7 +72,6 @@ namespace Belle2::Utils {
     return getStatmSize().second;
   }
 
-  // cppcheck-suppress passedByValue ; We take a value to move it into a member so no performance penalty
   Timer::Timer(std::string  text):
     m_startTime(getClock()),
     m_text(std::move(text))

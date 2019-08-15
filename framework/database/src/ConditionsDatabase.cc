@@ -22,7 +22,7 @@
 
 namespace Belle2 {
 
-  void ConditionsDatabase::createDefaultInstance(const std::string& globalTag, LogConfig::ELogLevel logLevel,
+  void ConditionsDatabase::createDefaultInstance(const std::string& globalTag, LogConfig::ELogLevel,
                                                  const std::string& payloadDir)
   {
     if (!payloadDir.empty()) {
@@ -33,8 +33,8 @@ namespace Belle2 {
 
   void ConditionsDatabase::createInstance(const std::string& globalTag, const std::string& restBaseName,
                                           const std::string& fileBaseName,
-                                          const std::string& fileBaseLocal, LogConfig::ELogLevel logLevel,
-                                          bool invertLogging)
+                                          const std::string& fileBaseLocal, LogConfig::ELogLevel,
+                                          bool)
   {
     if (!(restBaseName.empty() and fileBaseName.empty() and fileBaseLocal.empty())) {
       B2FATAL(R"fatal(Expert settings for central databases are no longer supported".

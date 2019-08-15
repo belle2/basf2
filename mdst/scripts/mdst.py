@@ -32,6 +32,7 @@ def add_mdst_output(
         'PIDLikelihoods',
         'TracksToPIDLikelihoods',
         'ECLClusters',
+        'ECLClustersToTracksNamedBremsstrahlung',
         'EventLevelClusteringInfo',
         'TracksToECLClusters',
         'KLMClusters',

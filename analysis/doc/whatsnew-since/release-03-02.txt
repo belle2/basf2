@@ -43,6 +43,7 @@ Vertex Fitting
   Specifically, setting confidenceLevel to 0 does not reject candidates with
   p-value equal to 0 anymore. Thus, the meaning of this parameter is now
   the same as for the module TreeFitter.
+
 Modules
 +++++++
 
@@ -52,3 +53,17 @@ Modules
   using usual variables. 
   Another option is to load missing momentum as a particle by supplementing 
   ``useMissing = True`` argument to the function, mentioned above.
+
+Standard V0s Lists
+++++++++++++++++++
+
+* Updated V0 lists. The standard list became the merged list, a combined list of particles
+  coming from V0 objects merged with a list of particles combined using the analysis ParticleCombiner module.
+  `stdKshorts(prioritiseV0, path)` returns a Ks list called `K_S0:merged`
+  `stdLambdas(prioritiseV0, path)` returns a Lambda list called `Lambda0:merged`
+  mergedKshorts() and mergedLambdas() are now deprecated, and return the standard lists.
+  
+* The definition of the standard V0 lists slightly changed. 
+  For Lambdas, the modularAnalysis.markDuplicate() function is now used to detect duplicates
+  among the same list (V0 and ReconstructDecay), rather than between different lists.
+  For Ks, the modularAnalysis.markDuplicate() function is no longer used.

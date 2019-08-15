@@ -84,7 +84,7 @@ def CharmlessHad2BodyB0List(path):
 
     **Particle Lists**:
     * Standard loose lists for all light mesons.
-    * Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
+    * Modified K_S0:merged with tighter invariant mass, 0.48 < M < 0.51.
     * Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
 
     **Additional Cuts**:
@@ -101,7 +101,7 @@ def CharmlessHad2BodyB0List(path):
     applyEventCuts('nTracks >= 2', path=path)
 
     cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.14 and E > 0.25', path=path)
-    cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51', path=path)
+    cutAndCopyList('K_S0:hbd', 'K_S0:merged', '0.48 < M < 0.51', path=path)
 
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
@@ -237,7 +237,7 @@ def CharmlessHad2BodyBmList(path):
 
     **Particle Lists**:
     * Standard loose lists for all light mesons.
-    * Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
+    * Modified K_S0:merged with tighter invariant mass, 0.48 < M < 0.51.
     * Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
 
     **Additional Cuts**:
@@ -254,7 +254,7 @@ def CharmlessHad2BodyBmList(path):
     applyEventCuts('nTracks >= 2', path=path)
 
     cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.14 and E > 0.25', path=path)
-    cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51', path=path)
+    cutAndCopyList('K_S0:hbd', 'K_S0:merged', '0.48 < M < 0.51', path=path)
 
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
@@ -360,7 +360,7 @@ def CharmlessHad3BodyB0List(path):
 
     **Particle Lists**:
     * Standard loose lists for all light mesons.
-    * Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
+    * Modified K_S0:merged with tighter invariant mass, 0.48 < M < 0.51.
     * Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
 
     **Additional Cuts**:
@@ -379,7 +379,7 @@ def CharmlessHad3BodyB0List(path):
     applyEventCuts('nTracks >= 2', path=path)
 
     cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.14 and E > 0.25', path=path)
-    cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51', path=path)
+    cutAndCopyList('K_S0:hbd', 'K_S0:merged', '0.48 < M < 0.51', path=path)
 
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
@@ -462,7 +462,7 @@ def CharmlessHad3BodyBmList(path):
 
     **Particle Lists**:
     * Standard loose lists for all light mesons.
-    * Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
+    * Modified K_S0:merged with tighter invariant mass, 0.48 < M < 0.51.
     * Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
 
     **Additional Cuts**:
@@ -481,7 +481,7 @@ def CharmlessHad3BodyBmList(path):
     applyEventCuts('nTracks >= 2', path=path)
 
     cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.15 and E > 0.25', path=path)
-    cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51', path=path)
+    cutAndCopyList('K_S0:hbd', 'K_S0:merged', '0.48 < M < 0.51', path=path)
 
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 

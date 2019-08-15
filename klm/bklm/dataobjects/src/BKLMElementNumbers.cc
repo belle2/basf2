@@ -26,6 +26,7 @@ BKLMElementNumbers::~BKLMElementNumbers()
 uint16_t BKLMElementNumbers::channelNumber(
   int section, int sector, int layer, int plane, int strip)
 {
+  checkChannelNumber(section, sector, layer, plane, strip);
   return (section ? BKLM_END_MASK : 0)
          | ((sector - 1) << BKLM_SECTOR_BIT)
          | ((layer - 1) << BKLM_LAYER_BIT)
@@ -44,8 +45,11 @@ void BKLMElementNumbers::channelNumberToElementNumbers(
   *strip = ((channel & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1;
 }
 
-uint16_t BKLMElementNumbers::moduleNumber(int section, int sector, int layer)
+uint16_t BKLMElementNumbers::moduleNumber(int section, int sector, int layer, bool fatalError)
 {
+  checkSection(section);
+  checkSector(sector, fatalError);
+  checkLayer(layer, fatalError);
   return (section ? BKLM_END_MASK : 0)
          | ((sector - 1) << BKLM_SECTOR_BIT)
          | ((layer - 1) << BKLM_LAYER_BIT);
@@ -61,12 +65,17 @@ void BKLMElementNumbers::moduleNumberToElementNumbers(
 
 uint16_t BKLMElementNumbers::sectorNumber(int section, int sector)
 {
+  checkSection(section);
+  checkSector(sector);
   return (section ? BKLM_END_MASK : 0)
          | ((sector - 1) << BKLM_SECTOR_BIT);
 }
 
 int BKLMElementNumbers::layerGlobalNumber(int section, int sector, int layer)
 {
+  checkSection(section);
+  checkSector(sector);
+  checkLayer(layer);
   int layerGlobal = layer - 1;
   layerGlobal += (sector - 1) * m_MaximalLayerNumber;
   layerGlobal += section * m_MaximalSectorNumber * m_MaximalLayerNumber;
@@ -76,6 +85,10 @@ int BKLMElementNumbers::layerGlobalNumber(int section, int sector, int layer)
 int BKLMElementNumbers::getNStrips(
   int section, int sector, int layer, int plane)
 {
+  checkSection(section);
+  checkSector(sector);
+  checkLayer(layer);
+  checkPlane(plane);
   int strips = 0;
   if (section == BKLMElementNumbers::c_BackwardSection && sector == 3 && plane == 0) {
     /* Chimney sector. */
@@ -103,11 +116,56 @@ int BKLMElementNumbers::getNStrips(
   return strips;
 }
 
-bool BKLMElementNumbers::checkChannelNumber(
-  int section, int sector, int layer, int plane, int strip)
+bool BKLMElementNumbers::checkSection(int section, bool fatalError)
 {
-  return (strip >= 1) && (strip <= BKLMElementNumbers::getNStrips(
-                            section, sector, layer, plane));
+  if (section < BKLMElementNumbers::c_BackwardSection || section > BKLMElementNumbers::c_ForwardSection) {
+    if (fatalError)
+      B2FATAL("Invalid BKLM section number: " << section << ".");
+    return false;
+  }
+  return true;
+}
+
+bool BKLMElementNumbers::checkSector(int sector, bool fatalError)
+{
+  if (sector < 1 || sector > m_MaximalSectorNumber) {
+    if (fatalError)
+      B2FATAL("Invalid BKLM sector number: " << sector << ".");
+    return false;
+  }
+  return true;
+}
+
+bool BKLMElementNumbers::checkLayer(int layer, bool fatalError)
+{
+  if (layer < 1 || layer > m_MaximalLayerNumber) {
+    if (fatalError)
+      B2FATAL("Invalid BKLM layer number: " << layer << ".");
+    return false;
+  }
+  return true;
+}
+
+bool BKLMElementNumbers::checkPlane(int plane, bool fatalError)
+{
+  if (plane < 0 || plane > m_MaximalPlaneNumber) {
+    if (fatalError)
+      B2FATAL("Invalid BKLM plane number: " << plane << ".");
+    return false;
+  }
+  return true;
+}
+
+bool BKLMElementNumbers::checkChannelNumber(
+  int section, int sector, int layer, int plane, int strip, bool fatalError)
+{
+  if (strip < 1 || strip > getNStrips(section, sector, layer, plane)) {
+    if (fatalError)
+      B2FATAL("Invalid BKLM channel number: section = " << section << ", sector = " << sector << ", layer = " << layer << ", plane = " <<
+              plane << ", strip = " << strip << ".");
+    return false;
+  }
+  return true;
 }
 
 void BKLMElementNumbers::layerGlobalNumberToElementNumbers(int layerGlobal, int* section, int* sector, int* layer)

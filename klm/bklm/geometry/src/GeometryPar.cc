@@ -808,7 +808,7 @@ namespace Belle2 {
                                             disp.getGammaRotation()
                                                                            );
 
-        int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);
+        int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer, false);
 
         m_Displacements.insert(std::pair<int, HepGeom::Transform3D>(moduleID, displacement));
       }

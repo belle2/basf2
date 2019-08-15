@@ -206,7 +206,7 @@ namespace Belle2 {
       // and V_{ij} is the covariance matrix
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      const auto& vertex = frame.getVertex(part) - beamSpotDB->getIPPosition();
+      const auto& vertex = frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition());
       const auto& vertexErr = frame.getVertexErrorMatrix(static_cast<TMatrixDSym>(part->getVertexErrorMatrix()) +
                                                          beamSpotDB->getCovVertex());
       auto denominator = vertex * (vertexErr * vertex);

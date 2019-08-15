@@ -179,14 +179,12 @@ namespace Belle2 {
 
     double particleDPhi(const Particle* part)
     {
-      static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getVertex(part).Phi();
     }
 
     double particleDCosTheta(const Particle* part)
     {
-      static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getVertex(part).CosTheta();
     }

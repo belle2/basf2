@@ -56,6 +56,7 @@ EXCLUDES="-i ${SOFTWARE_DIR}/tracking/ckf/pxd/findlets/src/CKFToPXDFindlet.cc
           -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/filters/segmentTrack/src/SegmentTrackFilterFactory.cc
           -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/combined/src/AxialTrackFinderHough.cc
           -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/combined/src/MonopoleStereoHitFinder.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/combined/src/MonopoleStereoHitFinderQuadratic.cc
           -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/combined/src/StereoHitFinder.cc
           -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/complete/src/TrackFinder.cc
           -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/minimal/src/AxialTrackCreatorHitHough.cc

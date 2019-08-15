@@ -83,7 +83,7 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
   n = m_EKLMDigits.getEntries();
   for (i = 0; i < n; i++) {
     vol = m_GeoDat->stripNumber(
-            m_EKLMDigits[i]->getEndcap(), m_EKLMDigits[i]->getLayer(),
+            m_EKLMDigits[i]->getSection(), m_EKLMDigits[i]->getLayer(),
             m_EKLMDigits[i]->getSector(), m_EKLMDigits[i]->getPlane(),
             m_EKLMDigits[i]->getStrip());
     digitVolumes.insert(vol);
@@ -109,10 +109,10 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
       hitGlobal.setZ(hitPosition.Z() / Unit::mm * CLHEP::mm);
       m_Event->stripGlobal = it2->first;
       m_GeoDat->stripNumberToElementNumbers(
-        m_Event->stripGlobal, &m_Event->endcap, &m_Event->layer,
+        m_Event->stripGlobal, &m_Event->section, &m_Event->layer,
         &m_Event->sector, &m_Event->plane, &m_Event->strip);
       tr = m_TransformData->getStripGlobalToLocal(
-             m_Event->endcap, m_Event->layer, m_Event->sector, m_Event->plane,
+             m_Event->section, m_Event->layer, m_Event->sector, m_Event->plane,
              m_Event->strip);
       hitLocal = (*tr) * hitGlobal;
       l = m_GeoDat->getStripLength(m_Event->strip) / CLHEP::mm * Unit::mm;
@@ -120,7 +120,7 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
       m_Event->distFarEnd = 0.5 * l + hitLocal.x() / CLHEP::mm * Unit::mm;
       m_Event->segmentGlobal =
         m_GeoDat->segmentNumber(
-          m_Event->endcap, m_Event->layer, m_Event->sector, m_Event->plane,
+          m_Event->section, m_Event->layer, m_Event->sector, m_Event->plane,
           (m_Event->strip - 1) / m_GeoDat->getNStripsSegment() + 1);
       calibrationData->Fill();
     }

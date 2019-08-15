@@ -109,6 +109,7 @@ namespace Belle2 {
 
     /// initilize variables.
     void initialize(void);
+    /// initilize variables.
     void initialize(bool fevtTime);
 
   public:// Utility functions

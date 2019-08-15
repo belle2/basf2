@@ -23,7 +23,7 @@ namespace Belle2 {
 
   namespace CDCTrigger {
     enum class Priority : unsigned char {nothing, first, second};
-    /* map and function to convert priorityPosition to Priority class */
+    /** map and function to convert priorityPosition to Priority class */
     std::unordered_map<unsigned, Priority> toPriorityMap = {{0, Priority::nothing},
       {1, Priority::second},
       {2, Priority::second},
@@ -72,10 +72,10 @@ namespace Belle2 {
     /** number of mergers in each super layer */
     static constexpr std::array<int, 9> nMergers = {10, 10, 12, 14, 16, 18, 20, 22, 24};
 
-    /* number of mergers in axial super layers */
+    /** number of mergers in axial super layers */
     static constexpr std::array<int, m_nSubModules> nAxialMergers = {10, 12, 16, 20, 24};
 
-    /* number of trackers */
+    /** number of trackers */
     static constexpr int nTrackers = 4;
 
     /** merger output data width */
@@ -84,22 +84,22 @@ namespace Belle2 {
     /** width of output data width*/
     static constexpr int width_out = 429;
 
-    /* number of wire/cell in a single merger unit */
+    /** number of wire/cell in a single merger unit */
     static constexpr int nWiresInMerger = 80;
 
-    /* Number of wire/cells in a single layer per merger unit */
+    /** Number of wire/cells in a single layer per merger unit */
     static constexpr int nCellsInLayer = 16;
 
-    /* number of track segments in a single merger unit */
+    /** number of track segments in a single merger unit */
     static constexpr int nSegmentsInMerger = 16;
 
-    /* bit width for priority time and fast time */
+    /** bit width for priority time and fast time */
     static constexpr size_t timeWidth = 4;
 
     /** how many clocks to simulate per event */
     static constexpr int m_nClockPerEvent = 44;
 
-    // data clock period (32ns) in unit of 2ns
+    /// data clock period (32ns) in unit of 2ns
     static constexpr int clockPeriod = 16;
 
   protected:
@@ -118,10 +118,14 @@ namespace Belle2 {
     /** CDCHit array */
     Belle2::StoreArray<CDCHit> m_cdcHits;
 
+    /// output vector
     using outputVector = std::array<char, width_out>;
+    /// output array
     using outputArray = std::array<outputVector, nTrackers>;
 
+    /// signal bus
     using signalBus = std::array<outputArray, m_nSubModules>;
+    /// signal bit stream
     using signalBitStream = Bitstream<signalBus>;
 
     /** bitstream of TSF output to 2D tracker */
@@ -142,6 +146,7 @@ namespace Belle2 {
     /** debug level specified in the steering file */
     int m_debugLevel;
 
+    /// TDC count value from T0
     int m_TDCCountForT0 = 4988;
 
     /** switch
@@ -150,15 +155,19 @@ namespace Belle2 {
      */
     bool m_allPositiveTime = true;
 
+    /// extension of lib
     std::string lib_extension = ".so";
+    /// current diretory
     std::string cwd = getcurrentdir();
     /** path to the simulation snapshot */
     std::string design_libname_pre = cwd + "/xsim.dir/tsf";
+    /** path to the simulation snapshot */
     std::string design_libname_post = "/xsimk" + lib_extension;
     /** path to the simulation engine */
     std::string simengine_libname = "librdi_simulator_kernel" + lib_extension;
-
+    /// wdb name prefix
     std::string wdbName_pre = "tsf";
+    /// wdb name extension
     std::string wdbName_post = ".wdb";
 
     /** '1' in XSI VHDL simulation */
@@ -169,30 +178,36 @@ namespace Belle2 {
     /** array holding child process ID */
     std::array<pid_t, m_nSubModules> m_pid;
 
+    /// Merger vector
     using mergerVector = std::bitset<mergerWidth>;
+    /// Merger output
     using mergerOutput = std::vector<mergerVector>;
+    /// Merger output array
     using mergerOutArray = std::array<mergerOutput, m_nSubModules>;
-    /* bits format of merger output / TSF input */
+    /** bits format of merger output / TSF input */
     mergerOutArray outputFromMerger;
 
+    /// input array
     using inputVector = std::array<char, mergerWidth>;
+    /// input array from Merger
     using inputFromMerger = std::vector<inputVector>;
+    /// input array to TSF
     using inputToTSFArray = std::array<inputFromMerger, m_nSubModules>;
-    /* XSI compliant format of input to TSF */
+    /** XSI compliant format of input to TSF */
     inputToTSFArray inputToTSF;
 
     /** array holding TSF output data */
     std::array<outputArray, m_nSubModules> outputToTracker;
 
-    /* get the XSI compliant format from the bits format TSF input */
+    /** get the XSI compliant format from the bits format TSF input */
     template<int iSL>
     char* getData(inputToTSFArray);
 
     using streamPair = std::array<FILE*, 2>;
-    /* array holding file handlers of pipes */
+    /** array holding file handlers of pipes */
     std::array<streamPair, m_nSubModules> stream;
 
-    /* array holding file descriptors of pipes */
+    /** array holding file descriptors of pipes */
     std::array<std::array<int, 2>, m_nSubModules> inputFileDescriptor;
     std::array<std::array<int, 2>, m_nSubModules> outputFileDescriptor;
 
@@ -214,19 +229,21 @@ namespace Belle2 {
      */
     outputArray read(FILE* instream);
 
+    /// data stream
     std::istream* ins;
 
     /**************************************************
      *  Merger simulation
      **************************************************/
 
+    /// element of data structure to hold merger output
     using timeVec = std::bitset<timeWidth>;
-    // data structure to hold merger output
-    // <priority time (4 bits x 16),
-    // fast time (4 bits x 16),
-    // edge timing (4 bits x 3 or 5),
-    // hitmap (80 bits x 1),
-    // 2nd priority hit (16 bit x 1)>
+    /// data structure to hold merger output
+    /// <priority time (4 bits x 16),
+    /// fast time (4 bits x 16),
+    /// edge timing (4 bits x 3 or 5),
+    /// hitmap (80 bits x 1),
+    /// 2nd priority hit (16 bit x 1)>
     template<size_t nEdges>
     using mergerStructElement = std::tuple <
                                 std::array<timeVec, nSegmentsInMerger>,
@@ -234,12 +251,14 @@ namespace Belle2 {
                                 std::array<timeVec, nEdges>,
                                 std::array<std::bitset<nWiresInMerger>, 1>,
                                 std::array<std::bitset<nSegmentsInMerger>, 1> >;
+    /// data structure to hold merger output
     template<size_t nEdges>
     using mergerStruct = std::vector<mergerStructElement<nEdges> >;
+    /// data structure to hold merger output
     std::map<unsigned, mergerStruct<5> > dataAcrossClocks;
 
-    // record when a time slow has been registered by a hit
-    // <priority time, fast time, edge timing>
+    /// record when a time slow has been registered by a hit
+    /// <priority time, fast time, edge timing>
     using registeredStructElement = std::array<std::bitset<nCellsInLayer>, 3>;
     using registeredStruct = std::vector<registeredStructElement>;
 
@@ -247,19 +266,19 @@ namespace Belle2 {
     using priorityHitStructInSL = std::vector<priorityHitInMerger>;
     using priorityHitStructInClock = std::map<unsigned, priorityHitStructInSL>;
     using priorityHitStruct = std::array<priorityHitStructInClock, m_nClockPerEvent>;
-    /* list keeping the index of priority hit of a TS for making fastsim ts hit object */
+    /** list keeping the index of priority hit of a TS for making fastsim ts hit object */
     priorityHitStruct m_priorityHit;
     /** CDC hit ID in each clock */
     std::vector<std::vector<int> > iAxialHitInClock;
 
     using WireSet = std::vector<short>;
     using TSMap = std::unordered_map<short, WireSet>;
-    /* map from cell ID to TS ID, for inner and outer Merger */
+    /** map from cell ID to TS ID, for inner and outer Merger */
     std::array<TSMap, 2> m_tsMap;
 
     using edgeMap = std::unordered_map<unsigned short, timeVec*>;
     using cellList = std::vector<unsigned short>;
-    /* list of cell ID related to edge timing */
+    /** list of cell ID related to edge timing */
     std::array<cellList, 5> innerInvEdge = {cellList {31},
                                             cellList {64},
                                             cellList {32, 48, 64, 65},
@@ -267,15 +286,16 @@ namespace Belle2 {
                                             cellList {63, 79}
                                            };
 
+    /** list of cell ID related to edge timing */
     std::array<cellList, 3> outerInvEdge = {cellList {63},
                                             cellList {0, 64},
                                             cellList {15, 31, 63, 79}
                                            };
     using edgeList = std::unordered_map<unsigned short, std::vector<unsigned short>>;
-    /* map from cell ID to related edge ID */
+    /** map from cell ID to related edge ID */
     std::array<edgeList, 2> m_edge;
 
-    /* ID of the earlist CDC hit in an event */
+    /** ID of the earlist CDC hit in an event */
     int m_iFirstHit;
 
     /**
@@ -395,10 +415,13 @@ namespace Belle2 {
      */
     void registerHit(CDCTrigger::MergerOut field, unsigned iTS, registeredStructElement& reg);
 
+    /// save firmware output
     void saveFirmwareOutput();
 
+    /// save fast TSIM output
     void saveFastOutput(short iclock);
 
+    /// set 2nd priority info
     void setSecondPriority(unsigned priTS,
                            unsigned iHit,
                            timeVec hitTime,

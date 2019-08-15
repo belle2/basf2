@@ -27,7 +27,7 @@ namespace Belle2 {
      * Event: time, distance from hit to SiPM.
      */
     struct Event {
-      int endcap;        /**< Endcap number. */
+      int section;       /**< Section number. */
       int layer;         /**< Layer number. */
       int sector;        /**< Sector number. */
       int plane;         /**< Plane number. */

@@ -28,7 +28,7 @@ class EventInspectorPocketDAQ:
     BKLM_LAYER_BIT = 7
     #: bit position for sector-1 [0..7]; 0 is on the +x axis and 2 is on the +y axis
     BKLM_SECTOR_BIT = 11
-    #: bit position for detector end [0..1]; forward is 0
+    #: bit position for section [0..1]; forward is 0
     BKLM_END_BIT = 14
     #: bit position for maxStrip-1 [0..47]
     BKLM_MAXSTRIP_BIT = 15
@@ -40,7 +40,7 @@ class EventInspectorPocketDAQ:
     BKLM_LAYER_MASK = (15 << BKLM_LAYER_BIT)
     #: bit mask for sector-1 [0..7]; 0 is on the +x axis and 2 is on the +y axis
     BKLM_SECTOR_MASK = (7 << BKLM_SECTOR_BIT)
-    #: bit mask for detector end [0..1]; forward is 0
+    #: bit mask for section [0..1]; forward is 0
     BKLM_END_MASK = (1 << BKLM_END_BIT)
     #: bit mask for maxStrip-1 [0..47]
     BKLM_MAXSTRIP_MASK = (63 << BKLM_MAXSTRIP_BIT)

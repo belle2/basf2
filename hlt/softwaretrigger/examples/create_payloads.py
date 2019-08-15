@@ -5,7 +5,7 @@ current HLT trigger menu.
 
 from softwaretrigger.db_access import upload_cut_to_db, upload_trigger_menu_to_db
 
-# Definition of all filter cuts (by Chris Hearty)
+#: Definition of all filter cuts (by Chris Hearty)
 FILTER_CUTS = [
     dict(cut_string="nTrkLoose >= 3 and nTrkTight >= 1 and ee2leg == 0",
          base_identifier="filter",
@@ -275,7 +275,7 @@ FILTER_CUTS = [
          reject_cut=False),
 ]
 
-# Definition of all skim cuts (copy from HLT before)
+#: Definition of all skim cuts (copy from HLT before)
 SKIM_CUTS = [
     dict(cut_string="[[nTracksLE >= 3] and [Bhabha2Trk == 0]]",
          base_identifier="skim",
@@ -367,8 +367,8 @@ SKIM_CUTS = [
 def upload_cuts(cuts, accept_mode=True):
     """
     Helper function to upload all cuts and the trigger menu to the local database.
-    :param cuts: A list of cuts (cut_string, base_identifier, cut_identifier, prescale_factor, reject_cut)
-    :param accept_mode: Whether the trigger menu should be in accept mode (default) or not
+    @param cuts A list of cuts (cut_string, base_identifier, cut_identifier, prescale_factor, reject_cut)
+    @param accept_mode Whether the trigger menu should be in accept mode (default) or not
     """
     for cut in cuts:
         upload_cut_to_db(**cut)

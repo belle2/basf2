@@ -41,17 +41,6 @@ class SelectTRGTypes(basf2.Module):
                 return
 
 
-class AdjustTOPDigitsTime(basf2.Module):
-    ''' adjust time of TOPDigits: a temporary solution! '''
-
-    def event(self):
-        ''' event processing '''
-
-        digits = Belle2.PyStoreArray('TOPDigits')
-        for digit in digits:
-            digit.subtractT0(330.0)  # set t = 0 to the average bunch crossing time
-
-
 # Define global tag
 basf2.use_central_database(globalTag)
 
@@ -82,15 +71,12 @@ selector.if_false(emptypath)
 
 # Unpack detector data
 add_unpackers(main,
-              components=['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'BKLM', 'EKLM'])
+              components=['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM'])
 
 # Convert ECLDsps to ECLWaveforms
 compress = basf2.register_module('ECLCompressBGOverlay')
 main.add_module(compress, CompressionAlgorithm=3)
 compress.if_false(emptypath)
-
-# Adjust time of TOPDigits
-main.add_module(AdjustTOPDigitsTime())
 
 # Output: digitized hits only
 output = basf2.register_module('RootOutput')

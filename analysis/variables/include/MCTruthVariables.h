@@ -100,6 +100,16 @@ namespace Belle2 {
     double isMisidentified(const Particle* particle);
 
     /**
+     * Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.
+     */
+    double genNthMotherPDG(const Particle* part, const std::vector<double>& daughterIDs);
+
+    /**
+     * Check the array index of a particle n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.
+     */
+    double genNthMotherIndex(const Particle* part, const std::vector<double>& daughterIDs);
+
+    /**
      * check the PDG code of a particles MC mother
      */
     double genMotherPDG(const Particle* particle);

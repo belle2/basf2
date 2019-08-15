@@ -15,20 +15,20 @@
 
 using namespace Belle2;
 
-EKLMElementID::EKLMElementID() : m_Type(c_Endcap), m_Endcap(-1), m_Layer(-1),
+EKLMElementID::EKLMElementID() : m_Type(c_Section), m_Section(-1), m_Layer(-1),
   m_Sector(-1), m_Plane(-1), m_Segment(-1)
 {
 }
 
-EKLMElementID::EKLMElementID(int endcap, int layer, int sector) :
-  m_Type(c_Sector), m_Endcap(endcap), m_Layer(layer), m_Sector(sector),
+EKLMElementID::EKLMElementID(int section, int layer, int sector) :
+  m_Type(c_Sector), m_Section(section), m_Layer(layer), m_Sector(sector),
   m_Plane(-1), m_Segment(-1)
 {
 }
 
 EKLMElementID::EKLMElementID(
-  int endcap, int layer, int sector, int plane, int segment) :
-  m_Type(c_Segment), m_Endcap(endcap), m_Layer(layer), m_Sector(sector),
+  int section, int layer, int sector, int plane, int segment) :
+  m_Type(c_Segment), m_Section(section), m_Layer(layer), m_Sector(sector),
   m_Plane(plane), m_Segment(segment)
 {
 }
@@ -40,36 +40,36 @@ EKLMElementID::EKLMElementID(int globalNumber)
   int id = globalNumber;
   if (id <= 0)
     B2FATAL("Incorrect (non-positive) EKLM global element number.");
-  if (id <= elementNumbers->getMaximalEndcapNumber()) {
-    m_Type = c_Endcap;
-    m_Endcap = id;
+  if (id <= elementNumbers->getMaximalSectionNumber()) {
+    m_Type = c_Section;
+    m_Section = id;
     return;
   }
-  id -= elementNumbers->getMaximalEndcapNumber();
+  id -= elementNumbers->getMaximalSectionNumber();
   if (id <= elementNumbers->getMaximalLayerGlobalNumber()) {
     m_Type = c_Layer;
-    elementNumbers->layerNumberToElementNumbers(id, &m_Endcap, &m_Layer);
+    elementNumbers->layerNumberToElementNumbers(id, &m_Section, &m_Layer);
     return;
   }
   id -= elementNumbers->getMaximalLayerGlobalNumber();
   if (id <= elementNumbers->getMaximalSectorGlobalNumber()) {
     m_Type = c_Sector;
     elementNumbers->sectorNumberToElementNumbers(
-      id, &m_Endcap, &m_Layer, &m_Sector);
+      id, &m_Section, &m_Layer, &m_Sector);
     return;
   }
   id -= elementNumbers->getMaximalSectorGlobalNumber();
   if (id <= elementNumbers->getMaximalPlaneGlobalNumber()) {
     m_Type = c_Plane;
     elementNumbers->planeNumberToElementNumbers(
-      id, &m_Endcap, &m_Layer, &m_Sector, &m_Plane);
+      id, &m_Section, &m_Layer, &m_Sector, &m_Plane);
     return;
   }
   id -= elementNumbers->getMaximalPlaneGlobalNumber();
   if (id <= elementNumbers->getMaximalSegmentGlobalNumber()) {
     m_Type = c_Segment;
     elementNumbers->segmentNumberToElementNumbers(
-      id, &m_Endcap, &m_Layer, &m_Sector, &m_Plane, &m_Segment);
+      id, &m_Section, &m_Layer, &m_Sector, &m_Plane, &m_Segment);
     return;
   }
   B2FATAL("Incorrect (too large) EKLM global element number.");
@@ -89,14 +89,14 @@ EKLMElementID::ElementType EKLMElementID::getType() const
   return m_Type;
 }
 
-void EKLMElementID::setEndcap(int endcap)
+void EKLMElementID::setSection(int section)
 {
-  m_Endcap = endcap;
+  m_Section = section;
 }
 
-int EKLMElementID::getEndcap() const
+int EKLMElementID::getSection() const
 {
-  return m_Endcap;
+  return m_Section;
 }
 
 void EKLMElementID::setLayer(int layer)
@@ -143,28 +143,28 @@ int EKLMElementID::getLayerNumber() const
 {
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
-  return elementNumbers->detectorLayerNumber(m_Endcap, m_Layer);
+  return elementNumbers->detectorLayerNumber(m_Section, m_Layer);
 }
 
 int EKLMElementID::getSectorNumber() const
 {
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
-  return elementNumbers->sectorNumber(m_Endcap, m_Layer, m_Sector);
+  return elementNumbers->sectorNumber(m_Section, m_Layer, m_Sector);
 }
 
 int EKLMElementID::getPlaneNumber() const
 {
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
-  return elementNumbers->planeNumber(m_Endcap, m_Layer, m_Sector, m_Plane);
+  return elementNumbers->planeNumber(m_Section, m_Layer, m_Sector, m_Plane);
 }
 
 int EKLMElementID::getSegmentNumber() const
 {
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
-  return elementNumbers->segmentNumber(m_Endcap, m_Layer, m_Sector,
+  return elementNumbers->segmentNumber(m_Section, m_Layer, m_Sector,
                                        m_Plane, m_Segment);
 }
 
@@ -173,24 +173,24 @@ int EKLMElementID::getGlobalNumber() const
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
   int offset = 0;
-  if (m_Type == c_Endcap)
-    return m_Endcap;
+  if (m_Type == c_Section)
+    return m_Section;
   else
-    offset += elementNumbers->getMaximalEndcapNumber();
+    offset += elementNumbers->getMaximalSectionNumber();
   if (m_Type == c_Layer)
-    return offset + elementNumbers->detectorLayerNumber(m_Endcap, m_Layer);
+    return offset + elementNumbers->detectorLayerNumber(m_Section, m_Layer);
   else
     offset += elementNumbers->getMaximalLayerGlobalNumber();
   if (m_Type == c_Sector)
-    return offset + elementNumbers->sectorNumber(m_Endcap, m_Layer, m_Sector);
+    return offset + elementNumbers->sectorNumber(m_Section, m_Layer, m_Sector);
   else
     offset += elementNumbers->getMaximalSectorGlobalNumber();
   if (m_Type == c_Plane)
-    return offset + elementNumbers->planeNumber(m_Endcap, m_Layer, m_Sector,
+    return offset + elementNumbers->planeNumber(m_Section, m_Layer, m_Sector,
                                                 m_Plane);
   else
     offset += elementNumbers->getMaximalPlaneGlobalNumber();
-  return offset + elementNumbers->segmentNumber(m_Endcap, m_Layer, m_Sector,
+  return offset + elementNumbers->segmentNumber(m_Section, m_Layer, m_Sector,
                                                 m_Plane, m_Segment);
 }
 

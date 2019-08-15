@@ -393,46 +393,6 @@ namespace Belle2 {
       return theta_BY;
     }
 
-    Manager::FunctionPtr cosHelicityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments)
-    {
-      int idau = 0;
-      if (arguments.size() == 1) {
-        try {
-          idau = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
-          B2FATAL("The argument of cosHelicityAngleWrtCMSFrame must be an integer!");
-          return nullptr;
-        }
-      } else {
-        B2FATAL("Wrong number of arguments for cosHelicityAngleIfCMSIsTheMother");
-      }
-      auto func = [idau](const Particle * mother) -> double {
-        const Particle* part = mother->getDaughter(idau);
-        if (!part)
-        {
-          B2FATAL("Couldn't find the " << idau << "th daughter");
-          return -999.0;
-        }
-
-        TLorentzVector beam4Vector(getBeamPx(nullptr), getBeamPy(nullptr), getBeamPz(nullptr), getBeamE(nullptr));
-        TLorentzVector part4Vector = part->get4Vector();
-        TLorentzVector mother4Vector = mother->get4Vector();
-
-        TVector3 motherBoost = -(mother4Vector.BoostVector());
-
-        TLorentzVector beam4Vector_motherFrame, part4Vector_motherFrame;
-        beam4Vector_motherFrame = beam4Vector;
-        part4Vector_motherFrame = part4Vector;
-
-        beam4Vector_motherFrame.Boost(motherBoost);
-        part4Vector_motherFrame.Boost(motherBoost);
-
-        return std::cos(beam4Vector_motherFrame.Angle(part4Vector_motherFrame.Vect()));
-      };
-      return func;
-    }
-
-
     double cosToThrustOfEvent(const Particle* part)
     {
       StoreObjPtr<EventShapeContainer> evtShape;
@@ -444,97 +404,6 @@ namespace Belle2 {
       TVector3 th = evtShape->getThrustAxis();
       TVector3 particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
       return std::cos(th.Angle(particleMomentum));
-    }
-
-
-    double cosHelicityAngle(const Particle* part)
-    {
-
-      const auto& frame = ReferenceFrame::GetCurrent();
-      TVector3 motherBoost = - frame.getMomentum(part).BoostVector();
-      TVector3 motherMomentum = frame.getMomentum(part).Vect();
-      const auto& daughters = part -> getDaughters() ;
-
-      if (daughters.size() == 2) {
-
-        bool isOneConversion = false;
-
-        for (auto& idaughter : daughters) {
-          if (idaughter -> getNDaughters() == 2) {
-            if (std::abs(idaughter -> getDaughters()[0]-> getPDGCode()) == 11) isOneConversion = true;
-          }
-        }
-
-        if (isOneConversion) {
-          //only for pi0 decay where one gamma converts
-
-          TLorentzVector pGamma;
-
-          for (auto& idaughter : daughters) {
-            if (idaughter -> getNDaughters() == 2) continue;
-            else pGamma = frame.getMomentum(idaughter);
-          }
-
-          pGamma.Boost(motherBoost);
-
-          return std::cos(motherMomentum.Angle(pGamma.Vect()));
-
-        } else {
-          TLorentzVector pDaughter1 = frame.getMomentum(daughters[0]);
-          TLorentzVector pDaughter2 = frame.getMomentum(daughters[1]);
-
-          pDaughter1.Boost(motherBoost);
-          pDaughter2.Boost(motherBoost);
-
-          TVector3 p12 = (pDaughter2 - pDaughter1).Vect();
-
-          return std::cos(motherMomentum.Angle(p12));
-        }
-
-      } else if (daughters.size() == 3) {
-
-        TLorentzVector pDaughter1 = frame.getMomentum(daughters[0]);
-        TLorentzVector pDaughter2 = frame.getMomentum(daughters[1]);
-        TLorentzVector pDaughter3 = frame.getMomentum(daughters[2]);
-
-        pDaughter1.Boost(motherBoost);
-        pDaughter2.Boost(motherBoost);
-        pDaughter3.Boost(motherBoost);
-
-        TVector3 p12 = (pDaughter2 - pDaughter1).Vect();
-        TVector3 p13 = (pDaughter3 - pDaughter1).Vect();
-
-        TVector3 n = p12.Cross(p13);
-
-        return std::cos(motherMomentum.Angle(n));
-
-      }  else return 0;
-
-    }
-
-    double cosHelicityAnglePi0Dalitz(const Particle* part)
-    {
-
-      const auto& frame = ReferenceFrame::GetCurrent();
-      TVector3 motherBoost = - frame.getMomentum(part).BoostVector();
-      TVector3 motherMomentum = frame.getMomentum(part).Vect();
-      const auto& daughters = part -> getDaughters() ;
-
-
-      if (daughters.size() == 3) {
-
-        TLorentzVector pGamma;
-
-        for (auto& idaughter : daughters) {
-          if (std::abs(idaughter -> getPDGCode()) == 22) pGamma = frame.getMomentum(idaughter);
-        }
-
-        pGamma.Boost(motherBoost);
-
-        return std::cos(motherMomentum.Angle(pGamma.Vect()));
-
-      }  else return 0;
-
     }
 
     double ImpactXY(const Particle* particle)
@@ -1179,26 +1048,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosThetaBetweenParticleAndNominalB",
                       cosThetaBetweenParticleAndNominalB,
                       "cosine of the angle in CMS between momentum the particle and a nominal B particle. It is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
-    REGISTER_VARIABLE("cosHelicityAngleIfCMSIsTheMother", cosHelicityAngleIfCMSIsTheMother,
-                      "Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided,\n"
-                      "assuming that the mother of the provided particle correspond to the Centre of Mass System, whose parameters are\n"
-                      "automatically loaded by the function, given the accelerators conditions.");
-
     REGISTER_VARIABLE("cosToThrustOfEvent", cosToThrustOfEvent,
                       "Returns the cosine of the angle between the particle and the thrust axis of the event, as calculate by the EventShapeCalculator module. buildEventShape() must be run before calling this variable")
 
-    REGISTER_VARIABLE("cosHelicityAngle",
-                      cosHelicityAngle,
-                      "If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference of the two daughters in the frame of the given particle (mother)"
-                      "and the momentum of the given particle in the lab frame\n"
-                      "If the given particle has three daughters: cosine of the angle between the normal vector of the plane defined by the momenta of the three daughters in the frame of the given particle (mother)"
-                      "and the momentum of the given particle in the lab frame.\n"
-                      "Else: 0.");
-    REGISTER_VARIABLE("cosHelicityAnglePi0Dalitz",
-                      cosHelicityAnglePi0Dalitz,
-                      "To be used for the decay pi0 -> e+ e- gamma: cosine of the angle between the momentum of the gamma in the frame of the given particle (mother)"
-                      "and the momentum of the given particle in the lab frame.\n"
-                      "Else: 0.");
 
     REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
 

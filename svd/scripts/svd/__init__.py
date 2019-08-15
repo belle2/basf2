@@ -94,6 +94,7 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
     if(isROIsimulation):
         fitterName = '__ROISVDCoGTimeEstimator'
         clusterizerName = '__ROISVDSimpleClusterizer'
+        dataFormatName = '__ROISVDDataFormat'
         clusterName = '__ROIsvdClusters'
         recoDigitsName = '__ROIsvdRecoDigits'
         shaperDigitsName = ""
@@ -101,6 +102,7 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
     else:
         fitterName = 'SVDCoGTimeEstimator'
         clusterizerName = 'SVDSimpleClusterizer'
+        dataFormatName = 'SVDDataFormat'
         clusterName = ""
         recoDigitsName = ""
         shaperDigitsName = ""
@@ -121,7 +123,9 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
             masking.param('ShaperDigitsUnmasked', shaperDigitsName)
             path.add_module(masking)
 
-    path.add_module('SVDDataFormatCheck', ShaperDigits=shaperDigitsName)
+    if dataFormatName not in [e.name() for e in path.modules()]:
+        dataFormat = register_module('SVDDataFormatCheck')
+        dataFormat.param('ShaperDigits', shaperDigitsName)
 
     if fitterName not in [e.name() for e in path.modules()]:
         fitter = register_module('SVDCoGTimeEstimator')
@@ -199,8 +203,8 @@ def add_svd_unpacker(path):
 
 def add_svd_packer(path):
 
-    path.add_module('SVDDigitSplitter')
-    path.add_module('SVDDigitSorter')
+    changeSVDEventInfoNameForPacker(path)
+
     packer = register_module('SVDPacker')
     path.add_module(packer)
 
@@ -223,3 +227,10 @@ def add_svd_SPcreation(path, isROIsimulation=False):
         spCreatorSVD.param('SpacePoints', nameSPs)
         spCreatorSVD.param('SVDClusters', svd_clusters)
         path.add_module(spCreatorSVD)
+
+
+def changeSVDEventInfoNameForPacker(path):
+
+    for module in path.modules():
+        if module.name() in["SVDEventInfoSetter", "SVDDigitizer"]:
+            module.param('SVDEventInfo', 'SVDEventInfoSim')

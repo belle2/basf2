@@ -13,10 +13,13 @@ import sys
 import os
 import tempfile
 from contextlib import contextmanager
+from collections import OrderedDict
 import multiprocessing
 import basf2
 import subprocess
 import unittest
+import re
+from . import logfilter
 
 
 def skip_test(reason, py_case=None):
@@ -87,6 +90,59 @@ def show_only_errors():
     """
     with set_loglevel(basf2.LogLevel.ERROR):
         yield
+
+
+def configure_logging_for_tests(user_replacements=None):
+    """
+    Change the log system to behave a bit more appropriately for testing scenarios:
+
+    1. Simplify log message to be just ``[LEVEL] message``
+    2. Disable error summary, just additional noise
+    3. Intercept all log messages and replace
+        * the current working directory in log messaged with ``${cwd}``
+        * the current default globaltags with ``${default_globaltag}``
+        * the contents of the following environment varibles with their name
+          (or the listed replacement string):
+            - :envvar:`BELLE2_TOOLS`
+            - :envvar:`BELLE2_RELEASE_DIR` with ``BELLE2_SOFTWARE_DIR``
+            - :envvar:`BELLE2_LOCAL_DIR` with ``BELLE2_SOFTWARE_DIR``
+            - :envvar:`BELLE2_EXTERNALS_DIR`
+            - :envvar:`BELLE2_VALIDATION_DATA_DIR`
+            - :envvar:`BELLE2_EXAMPLES_DATA_DIR`
+            - :envvar:`BELLE2_BACKGROUND_DIR`
+
+    Parameters:
+        user_replacements (dict(str, str)): Additional strings and their replacements to replace in the output
+
+    Warning:
+        This function should be called **after** switching directory to replace the correct directory name
+    """
+    basf2.logging.reset()
+    basf2.logging.enable_summary(False)
+    basf2.logging.enable_python_logging = True
+    basf2.logging.add_console()
+    # clang prints namespaces differently so no function names. Also let's skip the line number,
+    # we don't want failing tests just because we added a new line of code. In fact, let's just see the message
+    for level in basf2.LogLevel.values.values():
+        basf2.logging.set_info(level, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
+
+    # now create dictionary of string replacements. Since each key can only be
+    # present once oder is kind of important so the less portable ones like
+    # current directory should go first and might be overridden if for example
+    # the BELLE2_LOCAL_DIR is identical to the current working directory
+    replacements = OrderedDict()
+    replacements[",".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
+    # Let's be lazy and take the environment variables from the docstring so we don't have to repeat them here
+    for env_name, replacement in re.findall(":envvar:`(.*?)`(?:.*``(.*?)``)?", configure_logging_for_tests.__doc__):
+        if not replacement:
+            replacement = env_name
+        if env_name in os.environ:
+            replacements[os.environ[env_name]] = f"${{{replacement}}}"
+    if user_replacements is not None:
+        replacements.update(user_replacements)
+    # add cwd only if it doesn't overwrite anything ...
+    replacements.setdefault(os.getcwd(), "${cwd}")
+    sys.stdout = logfilter.LogReplacementFilter(sys.__stdout__, replacements)
 
 
 @contextmanager

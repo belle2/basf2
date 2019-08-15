@@ -24,7 +24,6 @@ import copy
 
 
 if __name__ == "__main__":
-
     training_data = basf2_mva.vector("train.root")
     test_data = basf2_mva.vector("test.root")
 

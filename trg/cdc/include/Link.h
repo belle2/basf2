@@ -360,7 +360,7 @@ namespace Belle2 {
     TRGCDCLink* _neighbor[7];
     TRGCDCLink* _link;
 
-    //...tmp...
+    /// ...tmp...
     HepGeom::Point3D<double> _conf;
 
     HepGeom::Point3D<double> _arcZ[4];
@@ -368,13 +368,18 @@ namespace Belle2 {
     //
     // for quick dicision
     //
+    /// ms_smallcell
     static bool ms_smallcell;
+    /// ms_superb
     static bool ms_superb;
 
-    //...Buffers...
+    /// ...Buffers...
     static unsigned _nL;
+    /// ...Buffers...
     static unsigned _nSL;
+    /// ...Buffers...
     static unsigned _nSLA;
+    /// ...Buffers...
     static unsigned* _nHitsSL;
 
 #ifdef TRASAN_DEBUG

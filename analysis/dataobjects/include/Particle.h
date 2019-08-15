@@ -528,6 +528,33 @@ namespace Belle2 {
     TMatrixFSym getVertexErrorMatrix() const;
 
     /**
+     * Returns cosine of the helicity angle
+     * The helicity angle is defined in the rest frame of the particle as the angle between the negative momentum of the mother and
+     * - the momentum of the first daughter for two body decays
+     * - the momentum of the photon for pi0 Dalitz decays
+     * - the direction perpendicular to the daughter momenta for three body decays
+     * @param mother mother particle, if not given the center of mass system is taken as mother frame
+     * @return cosine of the helicity angle
+     */
+    float getCosHelicity(const Particle* mother = nullptr) const;
+
+    /**
+     * Returns cosine of the helicity angle of the given daughter defined by given grand daughter
+     * @param iDaughter 0-based index of daughter particle
+     * @param iGrandDaughter 0-based index of grand daughter particle
+     * @return cosine of the helicity angle
+     */
+    float getCosHelicityDaughter(unsigned iDaughter, unsigned iGrandDaughter = 0) const;
+
+    /**
+     * Returns acoplanarity angle defined as the angle between the decay planes of the grand daughters in the particle's rest frame
+     * This assumes that the particle and its daughters have two daughters each
+     * @return acoplanarity angle
+     */
+    float getAcoplanarity() const;
+
+
+    /**
      * Returns unique identifier of final state particle (needed in particle combiner)
      * @return unique identifier of final state particle
      */

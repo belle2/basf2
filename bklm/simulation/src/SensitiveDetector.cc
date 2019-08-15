@@ -9,18 +9,12 @@
  **************************************************************************/
 
 #include <bklm/simulation/SensitiveDetector.h>
-#include <bklm/simulation/SimulationPar.h>
 #include <bklm/geometry/GeometryPar.h>
 #include <bklm/geometry/Module.h>
 #include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
 #include <bklm/dataobjects/BKLMStatus.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 
 #include <simulation/background/BkgSensitiveDetector.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -34,7 +28,7 @@
 #include "G4Step.hh"
 #include "G4VProcess.hh"
 
-#define DEPTH_FORWARD 2
+#define DEPTH_SECTION 2
 #define DEPTH_SECTOR 3
 #define DEPTH_LAYER 5
 #define DEPTH_PLANE 9
@@ -49,10 +43,12 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector(const G4String& name) : SensitiveDetectorBase(name, Const::KLM)
     {
       m_FirstCall = true;
-      m_HitTimeMax = 0.0;
       m_BkgSensitiveDetector = NULL;
       m_GeoPar = NULL;
-      m_SimPar = NULL;
+      if (!m_SimPar.isValid())
+        B2FATAL("BKLM simulation parameters are not available.");
+      m_HitTimeMax = m_SimPar->getHitTimeMax();
+
       StoreArray<MCParticle> particles;
       StoreArray<BKLMSimHit> simHits;
       StoreArray<BKLMSimHitPosition> simHitPositions;
@@ -69,20 +65,17 @@ namespace Belle2 {
     //-----------------------------------------------------
     G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
     {
-
       // Once-only initializations (constructor is called too early for these)
       if (m_FirstCall) {
         m_FirstCall = false;
         m_GeoPar = GeometryPar::instance();
-        if (m_GeoPar->doBeamBackgroundStudy()) {
+        if (m_GeoPar->doBeamBackgroundStudy())
           m_BkgSensitiveDetector = m_GeoPar->getBkgSensitiveDetector();
-        }
-        m_SimPar = SimulationPar::instance();
-        if (!(m_SimPar->isValid())) {
-          B2FATAL("Simulation-control parameters are not available from module BKLMParamLoader");
-        }
+        if (!m_SimPar.isValid())
+          B2FATAL("BKLM simulation parameters are not available.");
         m_HitTimeMax = m_SimPar->getHitTimeMax();
-        if (!gRandom) B2FATAL("gRandom is not initialized; please set up gRandom first");
+        if (!gRandom)
+          B2FATAL("gRandom is not initialized; please set up gRandom first");
       }
 
       // Record a BeamBackHit for any particle
@@ -120,13 +113,15 @@ namespace Belle2 {
         int plane = hist->GetCopyNumber(depth - DEPTH_PLANE);
         int layer = hist->GetCopyNumber(depth - DEPTH_LAYER);
         int sector = hist->GetCopyNumber(depth - DEPTH_SECTOR);
-        int forward = (hist->GetCopyNumber(depth - DEPTH_FORWARD) == BKLM_FORWARD) ? 1 : 0;
+        int section = hist->GetCopyNumber(depth - DEPTH_SECTION);
         int moduleID =
-          int(BKLMElementNumbers::moduleNumber(forward, sector, layer))
+          int(BKLMElementNumbers::moduleNumber(section, sector, layer))
           | BKLM_MC_MASK;
         double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
+        if (time > m_HitTimeMax)
+          return false;
         const CLHEP::Hep3Vector globalPosition = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / CLHEP::cm; // in cm
-        const Module* m = m_GeoPar->findModule(forward, sector, layer);
+        const Module* m = m_GeoPar->findModule(section, sector, layer);
         const CLHEP::Hep3Vector localPosition = m->globalToLocal(globalPosition);
         const CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(localPosition);
         if (postStep->GetProcessDefinedStep() != 0) {
@@ -224,5 +219,7 @@ namespace Belle2 {
       }
       return;
     }
+
   } // end of namespace bklm
+
 } // end of namespace Belle2

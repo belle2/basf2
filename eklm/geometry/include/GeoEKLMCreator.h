@@ -75,8 +75,8 @@ namespace Belle2 {
      * @struct Solids
      * All solids of EKLM.
      *
-     * @var Solids::endcap
-     * Endcap.
+     * @var Solids::section
+     * Section.
      *
      * @var Solids::layer
      * Layer.
@@ -112,7 +112,7 @@ namespace Belle2 {
      * Sector support.
      */
     struct Solids {
-      G4VSolid* endcap;
+      G4VSolid* section;
       G4VSolid* layer;
       G4VSolid* sector;
       G4VSolid* secsupp;
@@ -199,7 +199,7 @@ namespace Belle2 {
      * Volume numbers.
      */
     struct VolumeNumbers {
-      int endcap;  /**< Endcap. */
+      int section;  /**< Section. */
       int layer;   /**< Layer. */
       int sector;  /**< Sector. */
       int plane;   /**< Plane. */
@@ -264,9 +264,9 @@ namespace Belle2 {
       void readXMLDataStrips();
 
       /**
-       * Create endcap solid.
+       * Create section solid.
        */
-      void createEndcapSolid();
+      void createSectionSolid();
 
       /**
        * Create layer logical volume.
@@ -480,30 +480,30 @@ namespace Belle2 {
 
       /**
        * Check if a given layer is a detector layer.
-       * @param[in] endcap Endcap number.
-       * @param[in] layer  Layer number.
+       * @param[in] section Section number.
+       * @param[in] layer   Layer number.
        * @return True if this layer is a detector layer.
        */
-      bool detectorLayer(int endcap, int layer) const;
+      bool detectorLayer(int section, int layer) const;
 
       /**
-       * Create endcap.
+       * Create section.
        * @param[in] topVolume Geant world volume.
-       * @return Endcap logical volume.
+       * @return Section logical volume.
        */
-      G4LogicalVolume* createEndcap(G4LogicalVolume* topVolume) const;
+      G4LogicalVolume* createSection(G4LogicalVolume* topVolume) const;
 
       /**
        * Create layer.
-       * @param[in] endcap Endcap logical volume.
-       * @param[in] layer  Layer logical volume.
+       * @param[in] section Section logical volume.
+       * @param[in] layer   Layer logical volume.
        * @return Layer logical volume.
        *
        * If layer == nullptr, then new layer logical volume is created
        * (for detector layers). If layer != nullptr, then the existing
        * logical volume is used (for shield layers).
        */
-      G4LogicalVolume* createLayer(G4LogicalVolume* endcap,
+      G4LogicalVolume* createLayer(G4LogicalVolume* section,
                                    G4LogicalVolume* layer) const;
 
       /**

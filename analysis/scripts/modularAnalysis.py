@@ -2365,6 +2365,34 @@ def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path):
     path.add_module(chargedpid)
 
 
+def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
+    """
+    Calculates distance between two vertices, distance of closest approach between a vertex and a track,\
+    distance of closest approach between a vertex and btube
+
+    @param list_name              name of the input ParticleList
+    @param decay_string           select particles between the distance of closest approch will be calculated
+    @param mode                   Specifies how the distance is calculated
+                                  vertextrack: calculate the distance of closest appreach between a track and a\
+                                   vertex, taking the first candidate as vertex, default
+                                  trackvertex: calculate the distance of closest appreach between a track and a\
+                                   vertex, taking the first candidate as track
+                                  2tracks: calculates the distance of closest appreach between two tracks
+                                  2vertices: calculates the distance between two vertices
+                                  vertexbtube: calculates the distance of closest appreach between a vertex and btube
+                                  trackbtube: calculates the distance of closest appreach between a track and btube
+    @param path                   modules are added to this path
+
+    """
+
+    dist_mod = register_module('DistanceCalculator')
+
+    dist_mod.set_name('DistanceCalculator_' + list_name)
+    dist_mod.param('listName', list_name)
+    dist_mod.param('decayString', decay_string)
+    dist_mod.param('mode', mode)
+    path.add_module(dist_mod)
+
 if __name__ == '__main__':
     from basf2.utils import pretty_print_module
     pretty_print_module(__name__, "modularAnalysis")

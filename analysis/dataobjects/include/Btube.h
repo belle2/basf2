@@ -32,21 +32,30 @@ namespace Belle2 {
     Btube()
     {
       m_tubecenter(0, 0) = 0; m_tubecenter(1, 0) = 0; m_tubecenter(2, 0) = 0;
+      m_tubedirection(0, 0) = 0; m_tubedirection(1, 0) = 0; m_tubedirection(2, 0) = 0;
       resetTubeMatrix();
     }
 
     /**
      * Returns Btube center
      */
-    Eigen::Matrix<double, 3, 1> getTubeCenter();
+    Eigen::Matrix<double, 3, 1> getTubeCenter() const;
+    /**
+     * Returns Btube direction
+     */
+    Eigen::Matrix<double, 3, 1> getTubeDirection() const;
     /**
      * Returns Btube matrix
      */
-    TMatrixFSym getTubeMatrix();
+    TMatrixFSym getTubeMatrix() const;
     /**
      * Sets Btube Center
      */
     void setTubeCenter(const Eigen::Matrix<double, 3, 1>& tubecenter);
+    /**
+     * Sets Btube Direction
+     */
+    void setTubeDirection(const Eigen::Matrix<double, 3, 1>& tubedirection);
     /**
      * Sets Btube Error Matrix
      */
@@ -58,6 +67,7 @@ namespace Belle2 {
 
   private:
     Eigen::Matrix<double, 3, 1> m_tubecenter;   /**< Btube center */
+    Eigen::Matrix<double, 3, 1> m_tubedirection;   /**< Btube center */
     TMatrixFSym m_tubematrix;   /**< Btube (3x3)  matrix */
 
     void resetTubeMatrix(); /**< resets the tube  matrix */

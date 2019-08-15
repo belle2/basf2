@@ -49,8 +49,8 @@ DistanceCalculatorModule::DistanceCalculatorModule() : Module()
            "trackvertex: calculate the distance of closest appreach between a track and a vertex, taking the first candidate as track,\n"
            "2tracks: calculates the distance of closest appreach between two tracks,\n"
            "2vertices: calculates the distance between two vertices,\n"
-           "vertexbtube: calculates the distance of closest appreach between a vertex and btube,\n"
-           "trackbtube: calculates the distance of closest appreach between a track and btube",
+           "vertexbtube: calculates the distance of closest appreach between a vertex and a Btube,\n"
+           "trackbtube: calculates the distance of closest appreach between a track and a Btube",
            std::string("vertextrack"));
 }
 

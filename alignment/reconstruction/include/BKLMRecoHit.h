@@ -34,7 +34,7 @@ namespace Belle2 {
     BKLMRecoHit() {};
 
     /** Construct BKLMRecoHit from a BKLMHit2d */
-    BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit* trackCandHit = NULL);
+    explicit BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit* trackCandHit = NULL);
 
     /** Destructor. */
     virtual ~BKLMRecoHit() {}

@@ -386,6 +386,7 @@ namespace Belle2 {
     const TLorentzVector vec(px, py, pz, E);
 
     int property = Particle::PropertyFlags::c_Ordinary;
+    if (m_isUnspecified) property |= Particle::PropertyFlags::c_IsUnspecified;
     if (m_isIgnoreRadiatedPhotons) property |= Particle::PropertyFlags::c_isIgnoreRadiatedPhotons;
     if (m_isIgnoreIntermediate) property |= Particle::PropertyFlags::c_isIgnoreIntermediate;
     if (m_isIgnoreMassive) property |= Particle::PropertyFlags::c_isIgnoreMassive;

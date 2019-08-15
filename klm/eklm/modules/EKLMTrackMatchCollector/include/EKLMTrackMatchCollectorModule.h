@@ -137,23 +137,8 @@ namespace Belle2 {
     /** EKLMElementNumbers. */
     const EKLMElementNumbers* m_ElementNumbers;
 
-    /** D0 distribution*/
-    TH1F* m_D0Distribution;
-
-    /** Z0 distribution*/
-    TH1F* m_Z0Distribution;
-
-    /** File with the result */
-    TFile* m_file;
-
-    /** Run in debug mode or not */
-    bool m_debug;
-
     /** D0 and Z0 distance parameters */
     double m_D0Z0;
-
-    /** Use energy cut or not (some issues, so I don`t use this now)*/
-    bool m_EnergyCut;
 
     /** Output file name */
     std::string m_filename;

@@ -167,7 +167,7 @@ namespace Belle2 {
     //! T&E reconstruction method
     int m_TEreconstruct;
 
-    /* //! ConversionFactor CC */
+    //! ConversionFactor CC
     double m_ConversionFactor;
 
     //! T offset

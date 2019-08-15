@@ -25,15 +25,17 @@ namespace Belle2 {
 
   public:
 
-    /** Constructor */
+    //! TrgEclDatabaseImporter Constructor
     TrgEclDatabaseImporter();
-    /** Destructor */
+    //! TrgEclDatabaseImporter Destructor
     virtual ~TrgEclDatabaseImporter() {}
+    //! Set Run Number
     void setRunNumber(int start, int end)
     {
       startRun = start;
       endRun = end;
     }
+    //! Set Experimnet Number
     void setExpNumber(int start, int end)
     {
       startExp = start;
@@ -42,35 +44,28 @@ namespace Belle2 {
 
   public:
 
-    //-----------------------------------
-    // FAM Parameters
-    //------------------------------------
-    /** Import FAM Parameters. */
+    //! Import FAM Parameters
     void importFAMParameter(std::string, std::string, std::string);
-    //-----------------------------------
-    // TMM Parameters
-    //------------------------------------
+    //! Import TMM Parameters
     void importTMMParameter(std::string);
-    //-----------------------------------
-    // ETM Parameters
-    //------------------------------------
-    /** Import ETM Parameters */
+    //! Import ETM Parameters
     void importETMParameter(std::string);
-    //-----------------------------------
-    // Bad Run List
-    //------------------------------------
-    /** Import Bad Run Number */
+    //! Import Bad Run Number
     void importBadRunNumber(std::string);
 
-    /**Print TC energy Threshold*/
+    //!Print TC energy Threshold
     void printTCThreshold();
-    //  double GetTCFLatency(int);
-  private:
-    int startExp;
-    int startRun;
-    int endExp;
-    int endRun;
 
+  private:
+    //! Start Experiment Number
+    int startExp;
+    //! Start Run Number
+    int startRun;
+    //! End Experiment Number
+    int endExp;
+    //! End Run Number
+    int endRun;
+    //! Class Def
     ClassDef(TrgEclDatabaseImporter, 1);
   };
 } // End namespace Belle2

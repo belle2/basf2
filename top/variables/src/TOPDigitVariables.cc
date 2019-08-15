@@ -111,6 +111,30 @@ namespace Belle2 {
         return computeTOF(particle, pdg);
       }
 
+      // returns the average time of the first 5 (good) digits
+      double getAverageTimeOfFirst5(const Particle* particle)
+      {
+        int slotID = static_cast<int>(getSlotID(particle));
+        StoreArray<TOPDigit> digits;
+        vector<double> digitTimes;
+        for (const auto& digit : digits) {
+          if (digit.getModuleID() != slotID) continue;
+          // skip bad digits only when we want to clean
+          if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+          digitTimes.push_back(digit.getTime());
+        }
+        if (digitTimes.empty()) return 0;
+        sort(digitTimes.begin(), digitTimes.end());
+        double T0 = 0;
+        size_t count = 0;
+        for (auto t : digitTimes) {
+          T0 += t;
+          count += 1;
+          if (count == 5) break;
+        }
+        return T0 / count;
+      }
+
       // counts the number of photons in the TOP in a given time frame
       // if tmin < 0, count from the time of the first photon
       int countHits(const Particle* particle, double tmin, double tmax, bool clean)
@@ -528,6 +552,8 @@ namespace Belle2 {
                       "[calibration] The time of flight from the origin to the TOP");
     REGISTER_VARIABLE("topTOFExpert(pdg)", TOPVariable::getTOFExpert,
                       "[calibration] The time of flight from the origin to the TOP under the given hypothesis");
+    REGISTER_VARIABLE("topAverageTimeOfFirst5", TOPVariable::getAverageTimeOfFirst5,
+                      "[calibration] The average time of the first (up to) 5 hits in the module with the track");
     REGISTER_VARIABLE("topSlotID", TOPVariable::getSlotID,
                       "[calibration] The ID of the TOP slot that was hit by the particle");
     REGISTER_VARIABLE("topExpectedPhotonCount(pdg)", TOPVariable::getExpectedTOPPhotonCount,

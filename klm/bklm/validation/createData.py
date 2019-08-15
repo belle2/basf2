@@ -14,7 +14,7 @@
 """
 <header>
     <output>muon-BKLMValidation.root</output>
-    <contact>piilonen@vt.edu</contact>
+    <contact>giacomo.depietro@roma3.infn.it</contact>
     <description>Create events with 1 muon track for BKLM validation.</description>
 </header>
 """
@@ -55,6 +55,7 @@ main_path.add_module('ParticleGun',
                      yVertexParams=[0.0],
                      zVertexParams=[0.0])
 
+"""
 if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bkg_filename = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
     b2.B2INFO('The background files are: ' + str(bkg_filename))
@@ -63,7 +64,9 @@ if 'BELLE2_BACKGROUND_DIR' in os.environ:
 else:
     b2.B2WARNING('The variable BELLE2_BACKGROUND_DIR is not set: beam background is not used in the simulation')
     sim.add_simulation(path=main_path)
+"""
 
+sim.add_simulation(path=main_path)
 rec.add_reconstruction(path=main_path)
 
 main_path.add_module('RootOutput',

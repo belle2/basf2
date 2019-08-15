@@ -11,8 +11,8 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-#include <bklm/dataobjects/BKLMElementNumbers.h>
-#include <eklm/dataobjects/EKLMElementNumbers.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
 
 namespace Belle2 {
 

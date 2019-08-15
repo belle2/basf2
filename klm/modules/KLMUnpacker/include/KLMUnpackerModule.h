@@ -14,14 +14,14 @@
 #include <string>
 
 /* Belle2 headers. */
-#include <bklm/dataobjects/BKLMDigit.h>
-#include <bklm/dataobjects/BKLMDigitOutOfRange.h>
-#include <bklm/dbobjects/BKLMADCThreshold.h>
-#include <bklm/dbobjects/BKLMElectronicsMap.h>
-#include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/dataobjects/ElementNumbersSingleton.h>
-#include <eklm/dbobjects/EKLMChannels.h>
-#include <eklm/dbobjects/EKLMElectronicsMap.h>
+#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/dataobjects/BKLMDigitOutOfRange.h>
+#include <klm/bklm/dbobjects/BKLMADCThreshold.h>
+#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+#include <klm/eklm/dbobjects/EKLMChannels.h>
+#include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/core/Module.h>

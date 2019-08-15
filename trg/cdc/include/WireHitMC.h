@@ -68,15 +68,25 @@ namespace Belle2 {
     const TRGCDCWireHit* hit(void) const;
 
   private:
+    /// pointer to TRGCDCWire
     const TRGCDCWire* _wire;
+    /// pointer to TRGCDCWireHit
     const TRGCDCWireHit* _hit;
+    /// position vector
     HepGeom::Point3D<double>  _position;
+    /// entrance vector
     HepGeom::Point3D<double>  _entrance;
+    /// direction vector
     HepGeom::Vector3D<double>  _direction;
+    /// momentum
     CLHEP::Hep3Vector _momentum;
+    /// distance
     float _distance;
+    /// energy
     float _energy;
+    /// pointer to TRGCDCTrackMC
     const TRGCDCTrackMC* _hep;
+    /// leftright info
     int _leftRight;
 
     friend class TRGCDC;

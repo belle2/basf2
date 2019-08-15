@@ -148,7 +148,7 @@ void PXDRawDQMModule::event()
     auto dhh_id = dhe->getDHEID();
     auto startGate = dhe->getTriggerGate();
 
-    if (dhh_id <= 0 || dhh_id >= 64) {
+    if (dhh_id == 0 || dhh_id >= 64) {
       B2ERROR("SensorId (DHH ID) out of range: " << dhh_id);
       continue;
     }

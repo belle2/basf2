@@ -12,9 +12,7 @@
 #include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <string>
 
 namespace Belle2 {
@@ -38,8 +36,6 @@ namespace Belle2 {
       void doCalculation(SoftwareTriggerObject& calculationResult) override;
 
     private:
-      /// Internal storage of the monopole tracks as particles.
-      StoreArray<RecoTrack> m_monopoleRecoTracks;
       /// Internal storage of the tracks as particles.
       StoreObjPtr<ParticleList> m_pionParticles;
       /// Internal storage of the ECL clusters as particles.

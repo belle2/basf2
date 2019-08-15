@@ -92,6 +92,9 @@ namespace Belle2 {
       /** No copy construction. */
       ClusterCache(const ClusterCache&) = delete;
 
+      /** No operator= **/
+      ClusterCache& operator=(const ClusterCache&) = delete;
+
       /** Delete the cache and free the memory */
       ~ClusterCache();
       /** Clear the cache structure */

@@ -54,7 +54,7 @@ namespace Belle2::Conditions {
   class LocalMetadataProvider: public MetadataProvider {
   public:
     /** Construct with the name of the sqlite file */
-    explicit LocalMetadataProvider(std::string filename);
+    LocalMetadataProvider(std::string filename, const std::set<std::string>& usableTagStates);
     /** copy constructor */
     LocalMetadataProvider(const LocalMetadataProvider&) = delete;
     /** move constructor */

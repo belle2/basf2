@@ -47,7 +47,7 @@ namespace Belle2 {
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
     bool m_moreHistos; /**< Fill aditional histograms */
 
-    //the geometry
+    /// the geometry
     VXD::GeoCache& m_vxdGeometry;
 
     /** StoreArray name where Tracks are written. */

@@ -34,6 +34,7 @@ namespace Belle2 {
       public std::vector<const TRGCDCFrontEnd*> {
 
   public:// enum
+    /// enum of unitType
     enum unitType {
       innerType = 0,            // for superlayer 0, connected with FE innerInside and innerOutside
       outerType = 1,            // for superlayer 1-7, connected with FE outerInside and outerOutside
@@ -105,15 +106,18 @@ namespace Belle2 {
     //TRGSignalBundle* output(void) { return _mosb;};
 //yi  TRGSignalBundle* output(void) const { return _mosb;};
 
+    /// push back TRGCDCFrontEnd of this Merger
     void push_back(const TRGCDCFrontEnd*);
 
     /// dumps contents. "message" is to select information to dump. "pre" will be printed in head of each line.
     void dump(const std::string& message = "",
               const std::string& pre = "") const;
 
-    //Dump all the details of _mosb into a .log file, do it in the end of simulate()
+    /// Dump all the details of _mosb into a .log file, do it in the end of simulate()
     void dump_log(void) const;
+    /// dump_log for inner Merger
     void dump_log_inner(void) const;
+    /// dump_log for outer Merger
     void dump_log_outer(void) const;
 
 

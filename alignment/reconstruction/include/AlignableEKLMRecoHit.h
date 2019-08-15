@@ -21,8 +21,8 @@
 #include <genfit/TrackCandHit.h>
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMAlignmentHit.h>
-#include <eklm/dataobjects/EKLMElementID.h>
+#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
+#include <klm/eklm/dataobjects/EKLMElementID.h>
 
 namespace Belle2 {
 

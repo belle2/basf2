@@ -136,6 +136,8 @@ outOfRangeWeightInfo["SystErr"] = -1
 #
 ######################################################
 
+conditions.testing_payloads = ["localdb/database.txt"]
+
 # Now, let's configure table creator
 addtable = register_module('ParticleWeightingLookUpCreator')
 addtable.param('tableIDNotSpec', tableIDNotSpec)

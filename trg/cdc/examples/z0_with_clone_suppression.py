@@ -63,14 +63,19 @@ r_SL0 = 18.3
 
 
 class Skim(Module):
-    "Reject tracks with bad combination of z0 and theta"
+    """Reject tracks with bad combination of z0 and theta"""
 
     def initialize(self):
+        """Initialization of Skim"""
+        #: set MCParticles
         self.mc = Belle2.PyStoreArray('MCParticles')
 
     def event(self):
+        """event function of Skim"""
         self.return_value(0)
+        #: z0 of MCParticle
         z0 = self.mc[0].getVertex().Z()
+        #: momentum of MCParticle
         vec = self.mc[0].getMomentum()
         # skip the event if the track didn't reach SL0
         if z_SL0[0] < z0 + r_SL0 / vec.Pt() * vec.Z() < z_SL0[1]:
@@ -137,27 +142,47 @@ class Ana(Module):
     """analyze the difference between 2D with and without clone suppression"""
 
     def initialize(self):
+        """Initilization of Ana"""
+        #: EventMetaData
         self.event_info = Belle2.PyStoreObj('EventMetaData')
+        #: MCParticles
         self.mc = Belle2.PyStoreArray('MCParticles')
+        #: TRGCDC2DFinderTracks
         self.finder_trk2d = Belle2.PyStoreArray('TRGCDC2DFinderTracks')
+        #: TRGCDC2DFinderFastTracks
         self.fast_finder_trk2d = Belle2.PyStoreArray('TRGCDC2DFinderFastTracks')
+        #: TRGCDC2DFitterTracks
         self.trk2d = Belle2.PyStoreArray('TRGCDC2DFitterTracks')
+        #: TRGCDC2DFitterFastTracks
         self.fast_trk2d = Belle2.PyStoreArray('TRGCDC2DFitterFastTracks')
+        #: TRGCDC3DFitterTracks
         self.trk3d = Belle2.PyStoreArray('TRGCDC3DFitterTracks')
+        #: TRGCDC3DFitterFastTracks
         self.fast_trk3d = Belle2.PyStoreArray('TRGCDC3DFitterFastTracks')
+        #: TRGCDCNeuroTracks
         self.trknt = Belle2.PyStoreArray('TRGCDCNeuroTracks')
+        #: TRGCDCNeuroFastTracks
         self.fast_trknt = Belle2.PyStoreArray('TRGCDCNeuroFastTracks')
 
+        #: number of TRGCDC2DFinderTracks
         self.n2d_finder = 0
+        #: number of TRGCDC2DFinderFastTracks
         self.n2d_fast_finder = 0
+        #: number of TRGCDC2DFitterTracks
         self.n2d_fitter = 0
+        #: number of TRGCDC2DFitterFastTracks
         self.n2d_fast_fitter = 0
+        #: number of TRGCDC3DFitterTracks
         self.n3d_fitter = 0
+        #: number of TRGCDC3DFitterFastTracks
         self.n3d_fast_fitter = 0
+        #: number of TRGCDCNeuroTracks
         self.n3d_neuro = 0
+        #: number of TRGCDCNeuroFastTracks
         self.n3d_fast_neuro = 0
 
     def event(self):
+        """event function of Ana"""
         self.n2d_finder += any(self.finder_trk2d)
         self.n2d_fitter += any(self.trk2d)
         self.n3d_fitter += any(self.trk3d)
@@ -175,6 +200,7 @@ class Ana(Module):
         B2DEBUG(10, 'fast TS size: {}'.format(fast_ts_hits.size()))
 
     def terminate(self):
+        """Terminate Ana"""
         total = self.n2d_finder
         fast_total = self.n2d_fast_finder
         all_numbers = ','.join(['{}'] * 8)

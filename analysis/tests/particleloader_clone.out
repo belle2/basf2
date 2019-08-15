@@ -1,6 +1,8 @@
-[INFO] Steering file: /home/sbilokin/basf2-v1.0/releases/development/analysis/tests/particleloader_clone.py
+[INFO] Steering file: analysis/tests/particleloader_clone.py
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
+[INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst12.root
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
 [INFO]    -> MDST source: Tracks
@@ -89,25 +91,28 @@
 [INFO] Number of ParticleLists studied 9 
 [INFO] Number of ParticleLists studied 11 
 [INFO] Number of ParticleLists studied 1 
-[WARNING] Number of excluded particles do not coincide with the number of target FSP daughters! Provided lists must be incomplete  { module: RestOfEventBuilder }
- ... message repeated 40 times
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[WARNING] Number of excluded particles do not coincide with the number of target FSP daughters! Provided lists must be incomplete
+ ... message repeated 19 times
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================
 			|Retention|	    0| Unique 
-   Upsilon(4S)( 0)	|	0.4915	1.0000	1.0000
+   Upsilon(4S)( 0)	|	0.4911	1.0000	1.0000
 
 [INFO] 
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
 			| All Particles 		| Particles     		| AntiParticles 		
 			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
-   Upsilon(4S)( 0)	|	  1.0219	  2.0793	  0.0000	  0.0000	  0.0000	  0.0000	  1.0219	  2.0793
+   Upsilon(4S)( 0)	|	  1.0199	  2.0768	  0.0000	  0.0000	  0.0000	  0.0000	  1.0199	  2.0768
 
 [INFO] 
 =======================================================
-Total Retention: 0.4915
-Total Number of Particles created in the DataStore: 13434153
+Total Retention: 0.4911
+Total Number of Particles created in the DataStore: 13431875
 =======================================================
 
 [INFO] ParticleStats Summary: 
@@ -146,22 +151,22 @@ Lambda0:frommc( 6)	|	  0.1330	  1.1244	  0.0967	  0.8175	  0.0363	  0.3069	  0.0
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 13434153
+Total Number of Particles created in the DataStore: 13431875
 =======================================================
 
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================
 			|Retention|	    0|	    1|	    2|	    3|	    4|	    5|	    6|	    7|	    8| Unique 
-            e+( 0)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	1.0000	0.9999	0.0000
-           pi+( 1)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	1.0000	0.9999	0.0000
-            K+( 2)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	1.0000	0.9999	0.0000
-            p+( 3)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	1.0000	0.9999	0.0000
-           mu+( 4)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	1.0000	0.9999	0.0000
-          K_S0( 5)	|	0.4915	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.9961	1.0000	1.0000	0.0000
-       Lambda0( 6)	|	0.5560	1.0000	1.0000	1.0000	1.0000	1.0000	0.8805	1.0000	1.0000	0.9999	0.0000
-          K_L0( 7)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	1.0000	0.9999	0.0000
-         gamma( 8)	|	0.9999	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	1.0000	1.0000	0.0000
+            e+( 0)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4911	0.5555	1.0000	0.9999	0.0000
+           pi+( 1)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4911	0.5555	1.0000	0.9999	0.0000
+            K+( 2)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4911	0.5555	1.0000	0.9999	0.0000
+            p+( 3)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4911	0.5555	1.0000	0.9999	0.0000
+           mu+( 4)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4911	0.5555	1.0000	0.9999	0.0000
+          K_S0( 5)	|	0.4911	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.9961	1.0000	1.0000	0.0000
+       Lambda0( 6)	|	0.5555	1.0000	1.0000	1.0000	1.0000	1.0000	0.8806	1.0000	1.0000	0.9999	0.0000
+          K_L0( 7)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4911	0.5555	1.0000	0.9999	0.0000
+         gamma( 8)	|	0.9999	1.0000	1.0000	1.0000	1.0000	1.0000	0.4911	0.5555	1.0000	1.0000	0.0000
 
 [INFO] 
 ======================================================================
@@ -173,35 +178,28 @@ Total Number of Particles created in the DataStore: 13434153
             K+( 2)	|	 12.4562	 12.4562	  6.4886	  6.4886	  5.9676	  5.9676	  0.0000	  0.0000
             p+( 3)	|	 12.4556	 12.4556	  6.4868	  6.4868	  5.9688	  5.9688	  0.0000	  0.0000
            mu+( 4)	|	 12.4571	 12.4571	  6.4894	  6.4894	  5.9677	  5.9677	  0.0000	  0.0000
-          K_S0( 5)	|	  1.0219	  2.0793	  0.0000	  0.0000	  0.0000	  0.0000	  1.0219	  2.0793
-       Lambda0( 6)	|	  2.3568	  4.2391	  1.1833	  2.1283	  1.1735	  2.1108	  0.0000	  0.0000
+          K_S0( 5)	|	  1.0199	  2.0768	  0.0000	  0.0000	  0.0000	  0.0000	  1.0199	  2.0768
+       Lambda0( 6)	|	  2.3510	  4.2324	  1.1804	  2.1250	  1.1706	  2.1074	  0.0000	  0.0000
           K_L0( 7)	|	 14.8899	 14.8899	  0.0000	  0.0000	  0.0000	  0.0000	 14.8899	 14.8899
          gamma( 8)	|	 15.2537	 15.2551	  0.0000	  0.0000	  0.0000	  0.0000	 15.2537	 15.2551
 
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 13434153
+Total Number of Particles created in the DataStore: 13431875
 =======================================================
 
-[WARNING] There were 500 tracks skipped because of zero charge for mu+  { module: ParticleLoader }
-[WARNING] There were 632 tracks skipped because of zero charge for p+  { module: ParticleLoader }
-[WARNING] There were 581 tracks skipped because of zero charge for K+  { module: ParticleLoader }
-[WARNING] There were 500 tracks skipped because of zero charge for pi+  { module: ParticleLoader }
-[WARNING] There were 500 tracks skipped because of zero charge for e+  { module: ParticleLoader }
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 46 warnings occurred.
-[WARNING] Number of excluded particles do not coincide with the number of target FSP daughters! Provided lists must be incomplete
-[INFO]  (last message occurred 41 times in total)
+[WARNING] There were 518 v0s skipped because of same charge daughters for Lambda0
+[WARNING] There were 181 v0s skipped because of same charge daughters for K_S0
 [WARNING] There were 500 tracks skipped because of zero charge for mu+
 [WARNING] There were 632 tracks skipped because of zero charge for p+
 [WARNING] There were 581 tracks skipped because of zero charge for K+
 [WARNING] There were 500 tracks skipped because of zero charge for pi+
 [WARNING] There were 500 tracks skipped because of zero charge for e+
-[INFO] ================================================================================
-
 [INFO] Starting event processing, random seed is set to '1337'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
+[INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst12.root
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
 [INFO]    -> MDST source: Tracks

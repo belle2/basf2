@@ -9,6 +9,8 @@
 **************************************************************************/
 
 #include <analysis/variables/VertexVariables.h>
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <framework/logging/Logger.h>
@@ -101,24 +103,47 @@ namespace Belle2 {
       }
       return -999;
     }
-    // vertex or POCA in respect to IP ------------------------------
+    // vertex or POCA in respect to origin ------------------------------
 
-    double particleDX(const Particle* part)
+    double particleX(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getVertex(part).X();
     }
 
-    double particleDY(const Particle* part)
+    double particleY(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getVertex(part).Y();
     }
 
-    double particleDZ(const Particle* part)
+    double particleZ(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getVertex(part).Z();
+    }
+
+    // vertex or POCA in respect to IP ------------------------------
+
+    double particleDX(const Particle* part)
+    {
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).X() - beamSpotDB->getIPPosition().X();
+    }
+
+    double particleDY(const Particle* part)
+    {
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).Y() - beamSpotDB->getIPPosition().Y();
+    }
+
+    double particleDZ(const Particle* part)
+    {
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).Z() - beamSpotDB->getIPPosition().Z();
     }
 
     inline double getParticleUncertaintyByIndex(const Particle* part, unsigned int index)
@@ -147,26 +172,30 @@ namespace Belle2 {
 
     double particleDRho(const Particle* part)
     {
+      static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).Perp();
+      return frame.getVertex(part).Perp() - beamSpotDB->getIPPosition().Perp();
     }
 
     double particleDPhi(const Particle* part)
     {
+      static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getVertex(part).Phi();
     }
 
     double particleDCosTheta(const Particle* part)
     {
+      static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getVertex(part).CosTheta();
     }
 
     double particleDistance(const Particle* part)
     {
+      static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).Mag();
+      return frame.getVertex(part).Mag() - beamSpotDB->getIPPosition().Mag();
     }
 
     double particleDistanceSignificance(const Particle* part)
@@ -177,9 +206,11 @@ namespace Belle2 {
       // where:
       // r &= \sqrt{\vec{x}*\vec{x}}
       // and V_{ij} is the covariance matrix
+      static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      const auto& vertex = frame.getVertex(part);
-      const auto& vertexErr = frame.getVertexErrorMatrix(part->getVertexErrorMatrix());
+      const auto& vertex = frame.getVertex(part) - beamSpotDB->getIPPosition();
+      const auto& vertexErr = frame.getVertexErrorMatrix(static_cast<TMatrixDSym>(part->getVertexErrorMatrix()) +
+                                                         beamSpotDB->getCovVertex());
       auto denominator = vertex * (vertexErr * vertex);
       if (denominator <= 0) {
         return -999;

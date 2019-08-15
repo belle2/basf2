@@ -55,6 +55,22 @@ namespace Belle2 {
      * return z production vertex coordinate of matched generated particle
      */
     double particleMCProductionZ(const Particle* part);
+
+    /**
+     * return position in x relative to origin
+     */
+    double particleX(const Particle* part);
+
+    /**
+     * return position in y relative to origin
+     */
+    double particleY(const Particle* part);
+
+    /**
+     * return position in z relative to origin
+     */
+    double particleZ(const Particle* part);
+
     /**
      * return position in x relative to interaction point
      */

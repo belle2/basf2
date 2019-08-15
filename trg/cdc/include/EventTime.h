@@ -31,6 +31,7 @@ namespace Belle2 {
   class TRGCDCSegmentHit;
   class TRGCDCLink;
 
+  /// A class of TRGCDC Event Time
   class TRGCDCEventTime {
   public:
 

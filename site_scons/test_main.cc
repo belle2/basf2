@@ -24,6 +24,7 @@
 #include <framework/dbobjects/MagneticFieldComponentConstant.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 #include <mdst/dbobjects/CollisionBoostVector.h>
+#include <mdst/dbobjects/BeamSpot.h>
 #include <framework/database/DBStore.h>
 
 namespace {
@@ -58,6 +59,8 @@ namespace {
       auto* collisionBoostVector = new Belle2::CollisionBoostVector();
       collisionBoostVector->setBoost(TVector3(0.0414880886031, 0, 0.272492455429), TMatrixDSym(3));
       Belle2::DBStore::Instance().addConstantOverride("CollisionBoostVector", collisionBoostVector);
+      auto* beamSpot = new Belle2::BeamSpot();
+      Belle2::DBStore::Instance().addConstantOverride("BeamSpot", beamSpot);
     }
     /** Reset the logsytem after each test */
     virtual void OnTestEnd(const ::testing::TestInfo&) final override

@@ -386,7 +386,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                     wirePosition="aligned",
                     useSecondHits=use_second_hits,
                     flightTimeEstimation="outwards",
-                    noiseChargeDeposit=6.0e-7)
+                    filter="cuts_from_DB")
 
     # Constructs clusters
     path.add_module("TFCDC_ClusterPreparer",

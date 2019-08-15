@@ -12,6 +12,7 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
 
 namespace Belle2 {
 
@@ -112,7 +113,7 @@ namespace Belle2 {
     float getExtBKLMEfficiencyValue(int index) const { return m_ExtBKLMEfficiencyValue[index]; }
 
     //! @return EKLM efficiency vector
-    //float getExtEKLMEfficiencyValue(int index) const { return m_ExtEKLMEfficiencyValue[index]; } TODO
+    float getExtEKLMEfficiencyValue(int index) const { return m_ExtEKLMEfficiencyValue[index]; }
 
     //! assign muon PDF value for this extrapolation
     //! @param pdfValue muon PDF value (normalized) for this extrapolation
@@ -218,8 +219,7 @@ namespace Belle2 {
     void setExtBKLMEfficiencyValue(int index, float efficiencyValue) { m_ExtBKLMEfficiencyValue[index] = efficiencyValue; }
 
     //! assign EKLM efficiency value TODO
-    //    void setExtEKLMEfficiencyValue(int index, float efficiencyValue) { m_ExtEKLMEfficiencyValue[index] = efficiencyValue; }
-    //}
+    void setExtEKLMEfficiencyValue(int index, float efficiencyValue) { m_ExtEKLMEfficiencyValue[index] = efficiencyValue; }
 
 
   private:
@@ -314,11 +314,11 @@ namespace Belle2 {
     //! Vector of BKLM layer efficiencies.
     float m_ExtBKLMEfficiencyValue[BKLMElementNumbers::getMaximalLayerNumber()];
 
-    //! Vector of EKLM layer efficiencies TODO
-    // float m_ExtEKLMEfficiencyValue[EKLMElementNumbers::getMaximalLayerNumber()];
+    //! Vector of EKLM layer efficiencies
+    float m_ExtEKLMEfficiencyValue[EKLMElementNumbers::getMaximalLayerNumber()];
 
     //! Needed to make the ROOT object storable
-    ClassDef(Muid, 7)
+    ClassDef(Muid, 8)
 
   };
 }

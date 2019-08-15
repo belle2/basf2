@@ -29,19 +29,14 @@
 
 namespace Belle2 {
 
-  /*! A module of ETM */
+  /** A module of ETM */
   class TRGECLModule : public Module {
 
 
   public:
 
-    //    virtual ModulePtr newModule(){
-    //      ModulePtr nm(new TRGECLModule(false)); return nm;
-    //    };
-
     /** Constructor */
     TRGECLModule();
-
 
     /** Destructor  */
     virtual ~TRGECLModule();
@@ -120,17 +115,35 @@ namespace Belle2 {
     std::vector<double> _2DBhabhaThresholdFWD;
     //! 2D Bhabha Energy Threshold
     std::vector<double> _2DBhabhaThresholdBWD;
-    //! 3D Bhabha Energy Threshold
-    std::vector<double> _3DBhabhaThreshold;
+    //! 3D Selection Bhabha Energy Threshold
+    std::vector<double> _3DBhabhaSelectionThreshold;
+    //! 3D Veto Bhabha Energy Threshold
+    std::vector<double> _3DBhabhaVetoThreshold;
+    //! 3D Selection Bhabha Energy Angle
+    std::vector<double> _3DBhabhaSelectionAngle;
+    //! 3D Veto Bhabha Energy Angle
+    std::vector<double> _3DBhabhaVetoAngle;
+    //! mumu bit Energy Threshold
+    double _mumuThreshold;
+    //! mumu bit  Angle
+    std::vector<double> _mumuAngle;
+    //! The number of Cluster exceeding 300 MeV
+    int _n300MeVCluster;
+    //!ECL Burst Bit Threshold
+    double _ECLBurstThreshold;
     //! Total Energy Theshold (low, high, lum)
     std::vector<double> _TotalEnergy;
     //! Low Multiplicity Threshold
     std::vector<double> _LowMultiThreshold;
 
-    StoreArray<TRGECLHit> m_TRGECLHit; /**< output for TRGECLHit */
-    StoreArray<TRGECLTrg> m_TRGECLTrg; /**< output for TRGECLTrg */
-    StoreArray<TRGECLCluster> m_TRGECLCluster; /**< output for TRGECLCluster */
-    DBArray<TRGECLETMPara> m_ETMPara; /** ETN Parameters */
+    /** output for TRGECLHit */
+    StoreArray<TRGECLHit> m_TRGECLHit;
+    /** output for TRGECLTrg */
+    StoreArray<TRGECLTrg> m_TRGECLTrg;
+    /** output for TRGECLCluster */
+    StoreArray<TRGECLCluster> m_TRGECLCluster;
+    /** ETN Parameters */
+    DBArray<TRGECLETMPara> m_ETMPara;
 
   };
 

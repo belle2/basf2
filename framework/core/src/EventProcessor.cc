@@ -21,6 +21,9 @@
 #include <framework/core/Environment.h>
 #include <framework/core/DataFlowVisualization.h>
 #include <framework/core/RandomNumbers.h>
+#include <framework/core/MetadataService.h>
+#include <framework/gearbox/Unit.h>
+#include <framework/utilities/Utils.h>
 
 #ifdef HAS_CALLGRIND
 #include <valgrind/callgrind.h>
@@ -82,7 +85,7 @@ void EventProcessor::writeToStdErr(const char msg[])
 }
 
 EventProcessor::EventProcessor() : m_master(nullptr), m_processStatisticsPtr("", DataStore::c_Persistent),
-  m_inRun(false)
+  m_inRun(false), m_lastMetadataUpdate(0), m_metadataUpdateInterval(1.0)
 {
 
 }
@@ -229,6 +232,8 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool
     m_processStatisticsPtr.create();
   m_processStatisticsPtr->startGlobal();
 
+  MetadataService::Instance().addBasf2Status("initializing");
+
   for (const ModulePtr& modPtr : modulePathList) {
     Module* module = modPtr.get();
 
@@ -295,6 +300,12 @@ void EventProcessor::installMainSignalHandlers(void (*fn)(int))
 
 bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule)
 {
+  double time = Utils::getClock() / Unit::s;
+  if (time > m_lastMetadataUpdate + m_metadataUpdateInterval) {
+    MetadataService::Instance().addBasf2Status("running event loop");
+    m_lastMetadataUpdate = time;
+  }
+
   const bool collectStats = !Environment::Instance().getNoStats();
 
   while (!moduleIter.isDone()) {
@@ -408,6 +419,8 @@ void EventProcessor::processCore(const PathPtr& startPath, const ModulePtrList& 
 
 void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 {
+  MetadataService::Instance().addBasf2Status("terminating");
+
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_reverse_iterator listIter;
   m_processStatisticsPtr->startGlobal();
@@ -433,7 +446,10 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 
 void EventProcessor::processBeginRun(bool skipDB)
 {
+  MetadataService::Instance().addBasf2Status("beginning run");
+
   m_inRun = true;
+  // cppcheck-suppress unreadVariable; scope guard with side effects, no need to read
   auto dbsession = Database::Instance().createScopedUpdateSession();
 
   LogSystem& logSystem = LogSystem::Instance();
@@ -465,6 +481,8 @@ void EventProcessor::processBeginRun(bool skipDB)
 
 void EventProcessor::processEndRun()
 {
+  MetadataService::Instance().addBasf2Status("ending run");
+
   if (!m_inRun)
     return;
   m_inRun = false;

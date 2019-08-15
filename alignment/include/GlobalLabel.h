@@ -85,9 +85,9 @@ namespace Belle2 {
     template<class DBObjType>
     static GlobalLabel construct(gidTYPE element, gidTYPE param)
     {
-      GlobalLabel label;
-      label.construct(DBObjType::getGlobalUniqueID(), element, param);
-      return label;
+      GlobalLabel theLabel;
+      theLabel.construct(DBObjType::getGlobalUniqueID(), element, param);
+      return theLabel;
     }
 
     /**

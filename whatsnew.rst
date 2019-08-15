@@ -92,12 +92,12 @@ use the full geometry from the database.
 
 .. rubric:: New DecayStringGrammar for custom MCMatching 
 
-Users can use new DecayStringGrammar to set properties the particle. Then `isSignal`, `mcErrors` and other MCTruthVariables behave according to the property. 
+Users can use new DecayStringGrammar to set properties of the MCMatching. Then `isSignal`, `mcErrors` and other MCTruthVariables behave according to the property. 
 
 Once DecayStringGrammar is used with `reconstructDecay`, users can use `isSignal` instead of several specific variables such as `isSignalAcceptMissingNeutrino`.
-If one don't use any new DecayStringGrammar, all MCTruthVariables work same as before.
+If one doesn't use any new DecayStringGrammar, all MCTruthVariables work same as before.
 
-This grammar is useful to analyze inclusive processes with both fully-inclusive-method and sum-of-exclusive-method. 
+The grammar is useful to analyze inclusive processes with both fully-inclusive-method and sum-of-exclusive-method. 
 There are also new helper functions `genNMissingDaughter(PDG)` and `genNStepsToDaughter(i)` to obtain the detailed MC information.
 
 You can find examples of usage in :ref:`Marker_of_unspecified_particle`, :ref:`Grammar_for_custom_MCMatching`.

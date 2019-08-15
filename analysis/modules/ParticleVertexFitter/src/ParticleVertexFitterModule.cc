@@ -1059,9 +1059,10 @@ namespace Belle2 {
       }
     }
 
-    //Hardcoded: half of the crossing angle, taken from BeamParameters .
-    //TO DO: use an actual measurement.
-    double rotationangle = 0.083 / 2;
+    //Hardcoded: half of the crossing angle, taken from BeamParameters.
+    //Belle II crossing angle is 0.083, but since this constraint is mostly useful for Belle,
+    //we use the Belle crossing angle.
+    double rotationangle = 0.022 / 2;
 
     TLorentzVector iptube_mom(0., 0., 1e10, 1e10);
     iptube_mom.RotateX(0.);

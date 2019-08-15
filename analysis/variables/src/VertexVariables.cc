@@ -129,21 +129,21 @@ namespace Belle2 {
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).X() - beamSpotDB->getIPPosition().X();
+      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).X();
     }
 
     double particleDY(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).Y() - beamSpotDB->getIPPosition().Y();
+      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Y();
     }
 
     double particleDZ(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).Z() - beamSpotDB->getIPPosition().Z();
+      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Z();
     }
 
     inline double getParticleUncertaintyByIndex(const Particle* part, unsigned int index)
@@ -174,7 +174,7 @@ namespace Belle2 {
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).Perp() - beamSpotDB->getIPPosition().Perp();
+      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Perp();
     }
 
     double particleDPhi(const Particle* part)
@@ -193,7 +193,7 @@ namespace Belle2 {
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).Mag() - beamSpotDB->getIPPosition().Mag();
+      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Mag();
     }
 
     double particleDistanceSignificance(const Particle* part)
@@ -330,10 +330,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("dx", particleDX, "x in respect to IP");
     REGISTER_VARIABLE("dy", particleDY, "y in respect to IP");
     REGISTER_VARIABLE("dz", particleDZ, "z in respect to IP");
-    REGISTER_VARIABLE("x", particleDX,
+    REGISTER_VARIABLE("x", particleX,
                       "x coordinate of vertex in case of composite particle, or point of the closest approach (POCA) in case of a track");
-    REGISTER_VARIABLE("y", particleDY, "y coordinate of vertex");
-    REGISTER_VARIABLE("z", particleDZ, "z coordinate of vertex");
+    REGISTER_VARIABLE("y", particleY, "y coordinate of vertex");
+    REGISTER_VARIABLE("z", particleZ, "z coordinate of vertex");
     REGISTER_VARIABLE("x_uncertainty", particleDXUncertainty, "uncertainty on x");
     REGISTER_VARIABLE("y_uncertainty", particleDYUncertainty, "uncertainty on y");
     REGISTER_VARIABLE("z_uncertainty", particleDZUncertainty, "uncertainty on z");

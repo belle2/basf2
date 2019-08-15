@@ -69,23 +69,44 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
                      output_variable='networkOutput', target='qrCombined', overwrite=False,
                      transform_to_probability=False, signal_fraction=-1.0, classifier_args=None,
                      train_valid_fraction=.92, mva_steering_file='analysis/scripts/dft/tensorflow_dnn_interface.py',
+                     additional_roe_filter=None,
                      path=None):
     """
-    DeepFlavorTagger classifier function.
+    Interfacing for the DeepFlavorTagger. This function can be used for training (``teacher``), preparation of
+    training datasets (``sampler``) and inference (``expert``).
 
-    :param particle_list: string, particle list of the reconstructing signal
-    :param mode: string, valid modes are expert, teacher, sampler
+    This function requires reconstructed B meson signal particle list and where an RestOfEvent is built.
+
+    :param particle_lists:  string or list[string], particle list(s) of the reconstructed signal B meson
+    :param mode: string, valid modes are ``expert`` (default), ``teacher``, ``sampler``
     :param working_dir: string, working directory for the method
     :param uniqueIdentifier: string, database identifier for the method
-    :param variable_list: list of strings, name of the basf2 variables used for discrimination
-    :param output_variable: string, variable name returned by the expert
+    :param variable_list: list[string], name of the basf2 variables used for discrimination
+    :param output_variable: string, variable name returned by the expert and added to extra info
     :param target: string, target variable
     :param overwrite: bool, overwrite already (locally!) existing training
-    :param transform_to_probability: bool, enable transformation, can only be set during training
-    :param signal_fraction: float, signal fraction override, can only be set during training
-    :param classifier_args:dictionary, costumized arguments for the mlp
-    :param train_valid_fraction: float, train-valid fraction. if transform to probability is
-    enabled, train valid fraction will be splitted to a test set (.5)
+    :param transform_to_probability: bool, enable a purity transformation to compensate potential over-training,
+     can only be set during training
+    :param signal_fraction: float, (experimental) signal fraction override,
+     transform to output to a probability if an uneven signal/background fraction is used in the training data,
+     can only be set during training
+    :param classifier_args: dictionary, costumized arguments for the mlp
+     possible attributes of the dictionary are:
+     lr_dec_rate: learning rate decay rate
+     lr_init: learning rate initial value
+     mom_init: momentum initial value
+     min_epochs: minimal number of epochs
+     max_epochs: maximal number of epochs
+     stop_epochs: epochs to stop without improvements on the validation set for early stopping
+     batch_size: batch size
+     seed: random seed for tensorflow
+     layers: [[layer name, activation function, input_width, output_width, init_bias, init_weights],..]
+     wd_coeffs: weight decay coefficients, length of layers
+     cuda_visible_devices: selection of cuda devices
+     tensorboard_dir: addition directory for logging the training process
+    :param train_valid_fraction: float, train-valid fraction (.92). If transform to probability is
+     enabled, train valid fraction will be splitted to a test set (.5)
+    :param additional_roe_filter: string, additional cut string applied for the particle lists in the RoE
     :param path: basf2 path obj
     :return: None
     """
@@ -133,10 +154,15 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
 
     dft_particle_lists = ['pi+:pos_charged', 'pi+:neg_charged']
 
-    cutAndCopyList(dft_particle_lists[0], roe_particle_list, 'charge > 0 and isInRestOfEvent == 1 and p < infinity',
-                   writeOut=True, path=roe_path)
-    cutAndCopyList(dft_particle_lists[1], roe_particle_list, 'charge < 0 and isInRestOfEvent == 1 and p < infinity',
-                   writeOut=True, path=roe_path)
+    pos_cut = 'charge > 0 and isInRestOfEvent == 1 and p < infinity'
+    neg_cut = 'charge < 0 and isInRestOfEvent == 1 and p < infinity'
+
+    if additional_roe_filter:
+        pos_cut = pos_cut + ' and ' + additional_roe_filter
+        neg_cut = neg_cut + ' and ' + additional_roe_filter
+
+    cutAndCopyList(particle_lists[0], roe_particle_list, pos_cut, writeOut=True, path=roe_path)
+    cutAndCopyList(particle_lists[1], roe_particle_list, neg_cut, writeOut=True, path=roe_path)
 
     # sort pattern for tagging specific variables
     rank_variable = 'p'

@@ -61,7 +61,10 @@ namespace Belle2 {
     // Add parameters
     addParam("listName", m_listName, "name of particle list", string(""));
     addParam("confidenceLevel", m_confidenceLevel,
-             "required confidence level of fit to keep particles in the list. Note that even with confidenceLevel == 0.0, errors during the fit might discard Particles in the list. confidenceLevel = -1 if an error occurs during the fit",
+             "Confidence level to accept the fit. Particle candidates with "
+             "p-value less than confidenceLevel are removed from the particle "
+             "list. If set to -1, all candidates are kept; if set to 0, "
+             "the candidates failing the fit are removed.",
              0.001);
     addParam("vertexFitter", m_vertexFitter, "kfitter or rave", string("kfitter"));
     addParam("fitType", m_fitType, "type of the kinematic fit (vertex, massvertex, mass)", string("vertex"));
@@ -168,12 +171,10 @@ namespace Belle2 {
       if (hasTube) {
         ok = doVertexFit(particle);
       }
-      if (!ok) particle->setPValue(-1);
-      if (m_confidenceLevel == 0. && particle->getPValue() == 0.) {
+      if (!ok)
+        particle->setPValue(-1);
+      if (particle->getPValue() < m_confidenceLevel)
         toRemove.push_back(particle->getArrayIndex());
-      } else {
-        if (particle->getPValue() < m_confidenceLevel)toRemove.push_back(particle->getArrayIndex());
-      }
     }
     plist->removeParticles(toRemove);
 

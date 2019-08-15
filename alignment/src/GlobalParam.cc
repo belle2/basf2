@@ -25,49 +25,49 @@
 
 namespace Belle2 {
   namespace alignment {
-    //std::tuple<BeamParameters, VXDAlignment, CDCAlignment, CDCLayerAlignment, CDCTimeWalks, CDCTimeZeros, CDCXtRelations, BKLMAlignment, EKLMAlignment> dbvector = {};
+    //std::tuple<BeamSpot, VXDAlignment, CDCAlignment, CDCLayerAlignment, CDCTimeWalks, CDCTimeZeros, CDCXtRelations, BKLMAlignment, EKLMAlignment> dbvector = {};
 
     /// The DB object unique id in global calibration
     template <>
-    unsigned short GlobalParamSet<BeamParameters>::getGlobalUniqueID() const { return 1; }
+    unsigned short GlobalParamSet<BeamSpot>::getGlobalUniqueID() const { return 1; }
     /// Get global parameter of the DB object by its element and parameter number
     /// Note this is not const, it might need to construct the object
     template <>
-    double GlobalParamSet<BeamParameters>::getGlobalParam(unsigned short element, unsigned short param)
+    double GlobalParamSet<BeamSpot>::getGlobalParam(unsigned short element, unsigned short param)
     {
       this->ensureConstructed();
       if (element != 0 or param > 3) {
-        B2ERROR("Invalid global BeamParameters parameter id");
+        B2ERROR("Invalid global BeamSpot parameter id");
         return 0;
       }
 
-      if (auto bp = dynamic_cast<BeamParameters*>(this->getDBObj()))
-        return bp->getVertex()[param - 1];
+      if (auto bp = dynamic_cast<BeamSpot*>(this->getDBObj()))
+        return bp->getIPPosition()[param - 1];
 
-      B2ERROR("Could not get value for BeamParameters");
+      B2ERROR("Could not get value for BeamSpot");
       return 0.;
     }
     /// Set global parameter of the DB object by its element and parameter number
     template <>
-    void GlobalParamSet<BeamParameters>::setGlobalParam(double value, unsigned short element, unsigned short param)
+    void GlobalParamSet<BeamSpot>::setGlobalParam(double value, unsigned short element, unsigned short param)
     {
       this->ensureConstructed();
       if (element != 0 or param > 3) {
-        B2ERROR("Invalid global BeamParameters id");
+        B2ERROR("Invalid global BeamSpot id");
         return;
       }
-      if (auto bp = dynamic_cast<BeamParameters*>(this->getDBObj())) {
-        TVector3 vertex = bp->getVertex();
+      if (auto bp = dynamic_cast<BeamSpot*>(this->getDBObj())) {
+        TVector3 vertex = bp->getIPPosition();
         vertex[param - 1] = value;
-        bp->setVertex(vertex);
+        bp->setIP(vertex, bp->getIPPositionCovMatrix());
       } else {
-        B2ERROR("Could not set value for BeamParameters");
+        B2ERROR("Could not set value for BeamSpot");
       }
 
     }
     /// List global parameters in this DB object
     template <>
-    std::vector<std::pair<unsigned short, unsigned short>> GlobalParamSet<BeamParameters>::listGlobalParams()
+    std::vector<std::pair<unsigned short, unsigned short>> GlobalParamSet<BeamSpot>::listGlobalParams()
     {
       return {{0, 1}, {0, 2}, {0, 3}};
     }

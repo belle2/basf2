@@ -158,6 +158,7 @@ unsigned short HitPatternVXD::getNPXDLayers(const PXDMode& mode) const
 {
   unsigned short nPXD = 0;
   for (const auto layerId : s_PXDLayerNumbers) {
+    // cppcheck-suppress useStlAlgorithm   // std::count_if would make the code non-uniform and not more readable
     if (getPXDLayer(layerId, mode) > 0) ++nPXD;
   }
   return nPXD;
@@ -166,6 +167,7 @@ unsigned short HitPatternVXD::getNPXDLayers(const PXDMode& mode) const
 short HitPatternVXD::getFirstPXDLayer(const PXDMode& mode) const
 {
   for (const auto layerId : s_PXDLayerNumbers) {
+    // cppcheck-suppress useStlAlgorithm   // std::find_if would make the code longer and not more readable
     if (getPXDLayer(layerId, mode) > 0) return layerId;
   }
   return -1;

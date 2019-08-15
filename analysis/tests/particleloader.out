@@ -1,6 +1,8 @@
 [INFO] Steering file: analysis/tests/particleloader.py
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
 [INFO]    -> MDST source: Tracks
@@ -82,8 +84,35 @@
 [INFO]  o) creating (anti-)ParticleList with name: D0:frommc (anti-D0:frommc)
 [INFO]    -> MDST source: MCParticles
 [INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
+[INFO]    -> MDST source: RestOfEvents
+[INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists studied 9 
 [INFO] Number of ParticleLists studied 11 
+[INFO] Number of ParticleLists studied 1 
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] ParticleStats Summary: 
+
+[INFO] =======================================================================
+			|Retention|	    0| Unique 
+   Upsilon(4S)( 0)	|	0.2800	1.0000	1.0000
+
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+			| All Particles 		| Particles     		| AntiParticles 		
+			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
+   Upsilon(4S)( 0)	|	  0.6600	  2.3571	  0.0000	  0.0000	  0.0000	  0.0000	  0.6600	  2.3571
+
+[INFO] 
+=======================================================
+Total Retention: 0.2800
+Total Number of Particles created in the DataStore: 6864
+=======================================================
+
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================
@@ -120,7 +149,7 @@ Lambda0:frommc( 6)	|	  0.1400	  1.1667	  0.1200	  1.0000	  0.0200	  0.1667	  0.0
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 6831
+Total Number of Particles created in the DataStore: 6864
 =======================================================
 
 [INFO] ParticleStats Summary: 
@@ -155,25 +184,18 @@ Total Number of Particles created in the DataStore: 6831
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 6831
+Total Number of Particles created in the DataStore: 6864
 =======================================================
 
-[WARNING] There were 1 tracks skipped because of zero charge for mu+  { module: ParticleLoader }
-[WARNING] There were 1 tracks skipped because of zero charge for p+  { module: ParticleLoader }
-[WARNING] There were 1 tracks skipped because of zero charge for K+  { module: ParticleLoader }
-[WARNING] There were 1 tracks skipped because of zero charge for pi+  { module: ParticleLoader }
-[WARNING] There were 1 tracks skipped because of zero charge for e+  { module: ParticleLoader }
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 5 warnings occurred.
 [WARNING] There were 1 tracks skipped because of zero charge for mu+
 [WARNING] There were 1 tracks skipped because of zero charge for p+
 [WARNING] There were 1 tracks skipped because of zero charge for K+
 [WARNING] There were 1 tracks skipped because of zero charge for pi+
 [WARNING] There were 1 tracks skipped because of zero charge for e+
-[INFO] ================================================================================
-
 [INFO] Starting event processing, random seed is set to '1337'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
 [INFO]    -> MDST source: Tracks
@@ -255,8 +277,13 @@ Total Number of Particles created in the DataStore: 6831
 [INFO]  o) creating (anti-)ParticleList with name: D0:frommc (anti-D0:frommc)
 [INFO]    -> MDST source: MCParticles
 [INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
+[INFO]    -> MDST source: RestOfEvents
+[INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists studied 9 
 [INFO] Number of ParticleLists studied 11 
+[INFO] Number of ParticleLists studied 1 
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: e+ (5+0) + e- (5+0)
 [INFO] collection=Particles
@@ -1456,6 +1483,25 @@ Total Number of Particles created in the DataStore: 6831
  extra info=( ) 
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] ParticleStats Summary: 
+
+[INFO] =======================================================================
+			|Retention|	    0| Unique 
+   Upsilon(4S)( 0)	|	0.0000	1.0000	0.0000
+
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+			| All Particles 		| Particles     		| AntiParticles 		
+			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
+   Upsilon(4S)( 0)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
+
+[INFO] 
+=======================================================
+Total Retention: 0.0000
+Total Number of Particles created in the DataStore: 107
+=======================================================
+
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================

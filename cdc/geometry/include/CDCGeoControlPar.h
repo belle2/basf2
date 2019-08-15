@@ -637,7 +637,7 @@ namespace Belle2 {
       bool m_twInputType = true;  /**< Input type for time-walk. */
       bool m_bwInputType = true;  /**< Input type for bad wire. */
       bool m_chMapInputType = true;  /**< Input type for channel map. */
-      bool m_eDepToADCInputType = false;  /**< Input type for edep-to-adc. */
+      bool m_eDepToADCInputType = true;  /**< Input type for edep-to-adc. */
 
       double m_maxSpaceResol = 2.5 * 0.0130; /**< Max. space resolution allowed (cm) */
       double m_addFudgeFactorForSigmaForData = 1.; /**< Additional fudge factor for space resol. for data */

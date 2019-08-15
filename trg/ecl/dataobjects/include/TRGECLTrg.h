@@ -306,7 +306,7 @@ namespace Belle2 {
     //! Get bits for GDL
     int getECLtoGDL(int i) { if (i < 4) { return m_bitECLtoGDL[i]; } else { return 0; }}
 
-
+    int get3DBhabha() { return m_3DBhabha; }
 
 
 //! Empty constructor

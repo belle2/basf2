@@ -198,7 +198,7 @@ namespace Belle2 {
                       const Const::ParticleType& type = Const::photon);
 
     /**
-     * Constructor of a KLong from a reconstructed KLM cluster that is not matched to any charged track.
+     * Constructor of a KLong from a reconstructed KLM cluster.
      * @param klmCluster pointer to KLMCluster object
      */
     explicit Particle(const KLMCluster* klmCluster);
@@ -292,16 +292,18 @@ namespace Belle2 {
      * Appends index of daughter to daughters index array
      * @param daughter pointer to the daughter particle
      */
-    void appendDaughter(const Particle* daughter);
+    void appendDaughter(const Particle* daughter, const bool updateType = true);
 
     /**
      * Appends index of daughter to daughters index array
      * @param particleIndex index of daughter in StoreArray<Particle>
      */
-    void appendDaughter(int particleIndex)
+    void appendDaughter(int particleIndex, const bool updateType = true)
     {
-      m_particleType = c_Composite;
-
+      if (updateType) {
+        // is it a composite particle or fsr corrected?
+        m_particleType = c_Composite;
+      }
       m_daughterIndices.push_back(particleIndex);
     }
 
@@ -526,6 +528,33 @@ namespace Belle2 {
     TMatrixFSym getVertexErrorMatrix() const;
 
     /**
+     * Returns cosine of the helicity angle
+     * The helicity angle is defined in the rest frame of the particle as the angle between the negative momentum of the mother and
+     * - the momentum of the first daughter for two body decays
+     * - the momentum of the photon for pi0 Dalitz decays
+     * - the direction perpendicular to the daughter momenta for three body decays
+     * @param mother mother particle, if not given the center of mass system is taken as mother frame
+     * @return cosine of the helicity angle
+     */
+    float getCosHelicity(const Particle* mother = nullptr) const;
+
+    /**
+     * Returns cosine of the helicity angle of the given daughter defined by given grand daughter
+     * @param iDaughter 0-based index of daughter particle
+     * @param iGrandDaughter 0-based index of grand daughter particle
+     * @return cosine of the helicity angle
+     */
+    float getCosHelicityDaughter(unsigned iDaughter, unsigned iGrandDaughter = 0) const;
+
+    /**
+     * Returns acoplanarity angle defined as the angle between the decay planes of the grand daughters in the particle's rest frame
+     * This assumes that the particle and its daughters have two daughters each
+     * @return acoplanarity angle
+     */
+    float getAcoplanarity() const;
+
+
+    /**
      * Returns unique identifier of final state particle (needed in particle combiner)
      * @return unique identifier of final state particle
      */
@@ -651,7 +680,7 @@ namespace Belle2 {
 
     /**
      * Returns the pointer to the KLMCluster object that was used to create this Particle (ParticleType == c_KLMCluster).
-     * Returns the pointer to the largest KLMCluster object associated to this Particle if ParticleType == c_Track.
+     * Returns the pointer to the KLMCluster object associated to this Particle if ParticleType == c_Track.
      * NULL pointer is returned, if the Particle has no relation to the KLMCluster.
      * @return const pointer to the KLMCluster
      */

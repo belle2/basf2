@@ -121,7 +121,7 @@ else:
 main.add_module('ProgressBar')
 
 eventInspector = EventInspectorLookback(exp, run, histName, pdfName, mode, window)
-rawdata.add_unpackers(main, components=['BKLM'])
+rawdata.add_unpackers(main, components=['KLM'])
 main.add_module('BKLMReconstructor')
 main.add_module(eventInspector)
 

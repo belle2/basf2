@@ -146,9 +146,6 @@ namespace Belle2 {
         //bool dataHeader = ( (data32tab.at(iFinesse)[headerSize]&0xffff0000) == 0xdddd0000);
         long dataHeader = (data32tab.at(iFinesse)[headerSize] & 0xffff0000);
         if (dataHeader != 0xdddd0000) {
-          //B2DEBUG(20, "The module " << name << " has an event data header " << std::hex << std::setfill('0') << std::setw(4) << (dataHeader>>16) <<
-          //    " in this event. It will be ignore.");
-          //  return 0;
           B2DEBUG(30, "The module " << name << " has an event data header " << std::hex << std::setfill('0') << std::setw(4) <<
                   (dataHeader >> 16) <<
                   " in this event. It will be ignore.");
@@ -159,7 +156,6 @@ namespace Belle2 {
                 " : " << std::hex << std::setw(8) << data32tab.at(iFinesse)[0] << " " << data32tab.at(iFinesse)[1] << " " << data32tab.at(
                   iFinesse)[2] <<
                 " " << data32tab.at(iFinesse)[3] << " dataheader = " << dataHeader);
-
       }
 
       /* get event header information
@@ -207,7 +203,6 @@ namespace Belle2 {
       }
       return 1;
     };
-
     /** destructor */
     virtual ~SubTrigger() {};
   };
@@ -266,6 +261,9 @@ namespace Belle2 {
     bool m_unpackNeuro;  /**< flag to unpack neurotrigger data */
     bool m_decodeNeuro;  /**< flag to decode neurotrigger data */
 
+    std::vector<int> m_delayNNOutput; /**< delay of the NN output values clock cycle after the NN enable bit (by quadrant) */
+    std::vector<int> m_delayNNSelect; /**< delay of the NN selected TS clock cycle after the NN enable bit (by quadrant) */
+
     /** bitstream of TSF output to 2D tracker */
     StoreArray<CDCTriggerUnpacker::TSFOutputBitStream> m_bitsTo2D;
 
@@ -300,7 +298,7 @@ namespace Belle2 {
     StoreArray<CDCTriggerSegmentHit> m_NNInputTSHits;
 
     /** debug level specified in the steering file */
-    int m_debugLevel;
+    int m_debugLevel = 0;
 
     /** Belle2Link delay of the merger reader */
     int m_mergerDelay = 0;
@@ -314,7 +312,7 @@ namespace Belle2 {
     int m_NeuroDelay = 0;
 
     /** cnttrg */
-    int m_Cnttrg = 0;
+    // int m_Cnttrg = 0; // not used, commented out at 2019/07/31 by ytlai
     int m_mergerCnttrg = 0;
     int m_2DFinderCnttrg = 0;
     int m_NeuroCnttrg = 0;

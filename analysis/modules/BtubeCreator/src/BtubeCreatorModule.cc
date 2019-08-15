@@ -177,7 +177,7 @@ void BtubeCreatorModule::event()
       TMatrix r2(3, 3);  r2.Mult(r2z, r2y);
       TMatrix r2t(3, 3); r2t.Transpose(r2);
 
-      TMatrix longerror(3, 3); longerror(2, 2) = 1;
+      TMatrix longerror(3, 3); longerror(2, 2) = 1000;
       TMatrix longerror_temp(3, 3); longerror_temp.Mult(r2, longerror);
       TMatrix longerrorRotated(3, 3); longerrorRotated.Mult(longerror_temp, r2t);
 

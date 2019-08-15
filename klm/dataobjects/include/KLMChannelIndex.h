@@ -30,7 +30,7 @@ namespace Belle2 {
       /** Subdetector (BKLM or EKLM). */
       c_IndexLevelSubdetector = 1,
 
-      /** Section ("forward" for BKLM, "endcap" for EKLM). */
+      /** Section. */
       c_IndexLevelSection = 2,
 
       /** Sector. */
@@ -73,7 +73,8 @@ namespace Belle2 {
     ~KLMChannelIndex();
 
     /**
-     * Set index level.
+     * Set index level. If the index level is increased, then the index is set
+     * to the first element of the higher-order level.
      */
     void setIndexLevel(enum IndexLevel indexLevel);
 

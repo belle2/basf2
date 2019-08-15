@@ -149,6 +149,7 @@ namespace Belle2 {
 
     // Assignment
     GlobalLabel other = GlobalLabel::construct<CDCAlignment>(cdcWire, 20);
+    EXPECT_EQ(270620409, other.label());
     other = vxdlabel1;
     EXPECT_EQ(100873609, other.label());
   }

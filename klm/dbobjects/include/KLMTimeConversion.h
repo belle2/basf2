@@ -54,7 +54,7 @@ namespace Belle2 {
      * @param[in] ctime        CTIME.
      * @param[in] triggerCTime Trigger CTIME.
      */
-    double getTime(int ctime, int triggerCTime) const;
+    double getScintillatorTime(int ctime, int triggerCTime) const;
 
     /**
      * Get coarse and fine times for RPC.
@@ -62,7 +62,7 @@ namespace Belle2 {
      * @param[in] tdc          TDC.
      * @param[in] triggerTime  REVO9 Trigger time.
      */
-    std::pair<int, double> getTimes(int ctime, int tdc, int triggerTime) const;
+    std::pair<int, double> getRPCTimes(int ctime, int tdc, int triggerTime) const;
 
     /**
      * Get time for simulation.

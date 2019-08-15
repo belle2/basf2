@@ -79,7 +79,7 @@ namespace sqlite {
           col = ptr;
         }
       }
-      /* Fill blob column */
+      /** Fill blob column */
       void operator()(int index, std::vector<std::byte>& col)
       {
         // ptr is owned by sqlite, no need to free but we need to copy

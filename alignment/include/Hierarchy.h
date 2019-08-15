@@ -21,7 +21,6 @@
 #include <framework/logging/Logger.h>
 #include <alignment/GlobalParam.h>
 
-
 namespace Belle2 {
   class MillepedeAlgorithm;
   namespace alignment {

@@ -21,7 +21,7 @@
 
 namespace Belle2 {
 
-  void DatabaseChain::createInstance(bool resetIoVs, LogConfig::ELogLevel logLevel, bool invertLogging)
+  void DatabaseChain::createInstance(bool, LogConfig::ELogLevel, bool)
   {
     B2WARNING("DatabaseChain is obsolete and doesn't do anything anymore");
   }

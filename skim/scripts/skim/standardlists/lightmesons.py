@@ -105,23 +105,23 @@ def loadStdAllKstar0(persistent=True, path=None):
 
 def loadStdLooseKstarPlus(persistent=True, path=None):
     """
-    Create a list of 'K*+:loose' list from 'pi+:loose K_S0:all' with :math:`0.74 < M < 1.04~GeV`
+    Create a list of 'K*+:loose' list from 'pi+:loose K_S0:merged' with :math:`0.74 < M < 1.04~GeV`
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('K*+:loose -> pi+:loose K_S0:all', '0.74 < M < 1.04', 1, persistent, path)
+    reconstructDecay('K*+:loose -> pi+:loose K_S0:merged', '0.74 < M < 1.04', 1, persistent, path)
     return 'K*+:loose'
 
 
 def loadStdAllKstarPlus(persistent=True, path=None):
     """
-    Create a list of 'K*+:all' list from 'pi+:all K_S0:all' with :math:`0.74 < M < 1.04~GeV`
+    Create a list of 'K*+:all' list from 'pi+:all K_S0:merged' with :math:`0.74 < M < 1.04~GeV`
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('K*+:all -> pi+:all K_S0:all', '0.74 < M < 1.04', 1, persistent, path)
+    reconstructDecay('K*+:all -> pi+:all K_S0:merged', '0.74 < M < 1.04', 1, persistent, path)
     return 'K*+:all'
 
 

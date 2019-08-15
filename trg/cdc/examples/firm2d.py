@@ -93,10 +93,8 @@ class Skim(Module):
         """
         Initialize self.mc with MCParticles StoreArray
         """
+        #: MCParticles StoreArray
         self.mc = Belle2.PyStoreArray('MCParticles')
-        """
-        mc: MCParticles StoreArray
-        """
 
     def event(self):
         """

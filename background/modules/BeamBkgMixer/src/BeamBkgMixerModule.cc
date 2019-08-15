@@ -32,8 +32,8 @@
 #include <top/dataobjects/TOPSimHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <ecl/dataobjects/ECLHit.h>
-#include <bklm/dataobjects/BKLMSimHit.h>
-#include <eklm/dataobjects/EKLMSimHit.h>
+#include <klm/bklm/dataobjects/BKLMSimHit.h>
+#include <klm/eklm/dataobjects/EKLMSimHit.h>
 #include <simulation/dataobjects/BeamBackHit.h>
 
 // MetaData

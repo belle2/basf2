@@ -40,7 +40,7 @@ namespace Belle2 {
     TRGECLQAMModule();
     //! Destrunctor
     virtual ~TRGECLQAMModule();
-    int basf2evt;
+
   public:
     //! version
     std::string version() const;
@@ -111,11 +111,12 @@ namespace Belle2 {
     //! Cluster Energy Vector
     std::vector<int> cluster;
 
-    //!
+    //! ECL Trigger Unpacker TC output
     StoreArray<TRGECLUnpackerStore> m_TRGECLUnpackerStore;
+    //! ECL Trigger Unpacker Event output
     StoreArray<TRGECLUnpackerEvtStore> m_TRGECLUnpackerEvtStore;
+    //! Trigger Summary
     StoreObjPtr<TRGSummary> m_TRGSummary;
-    //    StoreObjPtr<EventMetaData> EvtMeta;
 
   };
 

@@ -28,7 +28,7 @@
 #include <alignment/dbobjects/CDCCalibration.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include "GlobalLabel.h"
-#include <eklm/dbobjects/EKLMAlignment.h>
+#include <klm/eklm/dbobjects/EKLMAlignment.h>
 
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>

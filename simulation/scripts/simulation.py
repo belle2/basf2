@@ -204,7 +204,7 @@ def add_simulation(
         path.add_module(ecl_digitizer)
 
     # KLM digitization
-    if components is None or 'BKLM' in components or 'EKLM' in components:
+    if components is None or 'KLM' in components:
         klm_digitizer = register_module('KLMDigitizer')
         path.add_module(klm_digitizer)
 

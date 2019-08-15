@@ -75,7 +75,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "Magnitude (w) of trigger timing jitter (ns). The trigger timing is randuminzed uniformly in a time window of [-w/2, +w/2].",
            0.);
   //Switches to control time information handling
-  addParam("AddTimeWalk", m_addTimeWalk, "A switch for time-walk (pulse-heght dep. delay); true: on; false: off", false);
+  addParam("AddTimeWalk", m_addTimeWalk, "A switch for time-walk (pulse-heght dep. delay); true: on; false: off", true);
   addParam("AddInWirePropagationDelay",   m_addInWirePropagationDelay,
            "A switch used to control adding propagation delay in the wire into the final drift time or not; this is for signal hits.", true);
   addParam("AddInWirePropagationDelay4Bg",  m_addInWirePropagationDelay4Bg,
@@ -116,6 +116,8 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   //Switch for database
   addParam("UseDB4FEE", m_useDB4FEE, "Fetch and use FEE params. from database or not", true);
   addParam("UseDB4EDepToADC", m_useDB4EDepToADC, "Fetch and use edep-to-ADC conversion params. from database or not", true);
+  addParam("UseDB4RunGain", m_useDB4RunGain, "Fetch and use run gain from database or not", true);
+  addParam("OverallGainFactor", m_overallGainFactor, "Overall gain factor for adjustment", 1.0);
 
   //Some FEE params.
   addParam("TDCThresholdOffset", m_tdcThresholdOffset, "Offset for TDC (digital) threshold (mV)", 3820.);
@@ -125,7 +127,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
 
   addParam("AddFudgeFactorForSigma", m_addFudgeFactorForSigma,
            "Additional fudge factor for space resol. (common to all cells)",  1.);
-  addParam("SpaceChargeEffect", m_spaceChargeEffect, "Switch for space charge effect", false);
+  addParam("SpaceChargeEffect", m_spaceChargeEffect, "Switch for space charge effect", true);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
@@ -192,6 +194,17 @@ void CDCDigitizerModule::initialize()
     }
   }
   */
+
+  if (m_useDB4RunGain) {
+    m_runGainFromDB = new DBObjPtr<CDCDedxRunGain>;
+    if ((*m_runGainFromDB).isValid()) {
+      (*m_runGainFromDB).addCallback(this, &CDCDigitizerModule::setRunGain);
+      setRunGain();
+    } else {
+      B2FATAL("CDCDedxRunGain invalid!");
+    }
+  }
+  B2DEBUG(29, "run-gain = " << m_runGain);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
@@ -833,6 +846,7 @@ unsigned short CDCDigitizerModule::getADCCount(const WireID& wid, double dEinGeV
   } else {
     if (m_useDB4EDepToADC) conv = m_cdcgp->getEDepToADCMainFactor(layer, cell);
   }
+  conv *= m_runGain;
 
   //The ADCcount is obtained by rounding-up (measured voltage)/bin in real ADC. This is true both for pedestal and signal voltages, so the pedestal-subtracted ADCcount (simulated here) is rounded.
   adcCount = static_cast<unsigned short>(std::round(conv * dEInkeV));
@@ -892,4 +906,11 @@ void CDCDigitizerModule::setFEElectronics()
     B2DEBUG(29, bdi << " " << m_lowEdgeOfTimeWindow[bdi] << " " << m_uprEdgeOfTimeWindow[bdi] << " " << m_adcThresh[bdi] << " " <<
             m_tdcThresh[bdi]);
   }
+}
+
+// Set Run-gain (from DB)
+void CDCDigitizerModule::setRunGain()
+{
+  m_runGain = (*m_runGainFromDB)->getRunGain();
+  m_runGain *= m_overallGainFactor;
 }

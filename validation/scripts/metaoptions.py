@@ -12,12 +12,14 @@ class MetaOptionParser:
     to root plots.
 
     A typical meta options list might look like this:
-    ["expert", "pvalue-warn=0.9", "pvalue-error=0.4"]
+    ["pvalue-warn=0.9", "pvalue-error=0.4"]
     """
 
     def __init__(self, meta_option_list: Optional[Iterable] = None):
         """
+        Initialize MetaOptionParser
         @param meta_option_list: list of meta options read from ROOT object
+            or None
         """
         if meta_option_list is None:
             meta_option_list = []

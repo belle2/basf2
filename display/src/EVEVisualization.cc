@@ -24,9 +24,9 @@
 #include <display/EveVisBField.h>
 
 #include <vxd/geometry/GeoCache.h>
-#include <bklm/dataobjects/BKLMSimHitPosition.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <bklm/geometry/GeometryPar.h>
+#include <klm/bklm/dataobjects/BKLMSimHitPosition.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/geometry/GeometryPar.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
@@ -1489,7 +1489,7 @@ void EVEVisualization::addBKLMHit2d(const BKLMHit2d* bklm2dhit)
 {
   //TVector3 globalPosition=  bklm2dhit->getGlobalPosition();
   bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
-  const bklm::Module* module = m_GeoPar->findModule(bklm2dhit->getForward(), bklm2dhit->getSector(), bklm2dhit->getLayer());
+  const bklm::Module* module = m_GeoPar->findModule(bklm2dhit->getSection(), bklm2dhit->getSector(), bklm2dhit->getLayer());
 
   CLHEP::Hep3Vector global;
   //+++ global coordinates of the hit

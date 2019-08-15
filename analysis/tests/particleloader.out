@@ -1,6 +1,8 @@
 [INFO] Steering file: analysis/tests/particleloader.py
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
 [INFO]    -> MDST source: Tracks
@@ -89,6 +91,9 @@
 [INFO] Number of ParticleLists studied 9 
 [INFO] Number of ParticleLists studied 11 
 [INFO] Number of ParticleLists studied 1 
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================
@@ -182,22 +187,15 @@ Total Retention: 1.0000
 Total Number of Particles created in the DataStore: 6864
 =======================================================
 
-[WARNING] There were 1 tracks skipped because of zero charge for mu+  { module: ParticleLoader }
-[WARNING] There were 1 tracks skipped because of zero charge for p+  { module: ParticleLoader }
-[WARNING] There were 1 tracks skipped because of zero charge for K+  { module: ParticleLoader }
-[WARNING] There were 1 tracks skipped because of zero charge for pi+  { module: ParticleLoader }
-[WARNING] There were 1 tracks skipped because of zero charge for e+  { module: ParticleLoader }
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 5 warnings occurred.
 [WARNING] There were 1 tracks skipped because of zero charge for mu+
 [WARNING] There were 1 tracks skipped because of zero charge for p+
 [WARNING] There were 1 tracks skipped because of zero charge for K+
 [WARNING] There were 1 tracks skipped because of zero charge for pi+
 [WARNING] There were 1 tracks skipped because of zero charge for e+
-[INFO] ================================================================================
-
 [INFO] Starting event processing, random seed is set to '1337'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
 [INFO]    -> MDST source: Tracks

@@ -48,7 +48,40 @@ namespace Belle2 {
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
 
+    double isSignalWithoutProperty(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      int status = MCMatching::getMCErrors(part, mcparticle, false);
+      //remove the following bits, these are usually ok
+      status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissPHOTOS);
+      status &= (~MCMatching::c_MissingResonance);
+      //status &= (~MCMatching::c_DecayInFlight);
+
+      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+    }
+
     double isExtendedSignal(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      int status = MCMatching::getMCErrors(part, mcparticle);
+      //remove the following bits, these are usually ok
+      status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissPHOTOS);
+      status &= (~MCMatching::c_MissingResonance);
+      status &= (~MCMatching::c_MisID);
+      status &= (~MCMatching::c_AddedWrongParticle);
+
+      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+    }
+
+    double isSignalAcceptWrongFSPs(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
@@ -115,6 +148,52 @@ namespace Belle2 {
           qq.push(d->getDaughter(iDau));
       }
       return 0.0;
+    }
+
+    double genNthMotherPDG(const Particle* part, const std::vector<double>& args)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      unsigned int nLevels;
+      if (args.empty())
+        nLevels = 0;
+      else
+        nLevels = args[0];
+
+      const MCParticle* curMCParticle = mcparticle;
+      for (unsigned int i = 0; i <= nLevels; i++) {
+        const MCParticle* curMCMother = curMCParticle->getMother();
+        if (curMCMother == nullptr)
+          return 0.0;
+        curMCParticle = curMCMother;
+      }
+      int m_pdg = curMCParticle->getPDG();
+      return m_pdg;
+    }
+
+    double genNthMotherIndex(const Particle* part, const std::vector<double>& args)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      unsigned int nLevels;
+      if (args.empty())
+        nLevels = 0;
+      else
+        nLevels = args[0];
+
+      const MCParticle* curMCParticle = mcparticle;
+      for (unsigned int i = 0; i <= nLevels; i++) {
+        const MCParticle* curMCMother = curMCParticle->getMother();
+        if (curMCMother == nullptr)
+          return 0.0;
+        curMCParticle = curMCMother;
+      }
+      int m_id = curMCParticle->getArrayIndex();
+      return m_id;
     }
 
     double genMotherPDG(const Particle* part)
@@ -234,6 +313,11 @@ namespace Belle2 {
     double particleMCErrors(const Particle* part)
     {
       return MCMatching::getMCErrors(part);
+    }
+
+    double particleMCErrorsWithoutProperty(const Particle* part)
+    {
+      return MCMatching::getMCErrors(part, nullptr, false);
     }
 
     double particleNumberOfMCMatch(const Particle* particle)
@@ -754,16 +838,34 @@ namespace Belle2 {
 
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
+                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise. \n"
+                      "It behaves according to DecayStringGrammar.");
+    REGISTER_VARIABLE("isSignalWithoutProperty", isSignalWithoutProperty,
+                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise. \n"
+                      "It does not consider the missing particle flags of PropertyFlags of the particle.");
     REGISTER_VARIABLE("isExtendedSignal", isExtendedSignal,
+                      "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
+                      "Misidentification of charged FSP is allowed. \n"
+                      "It will be deprecated in release-05, please consider to use isSignalAcceptWrongFSPs");
+    REGISTER_VARIABLE("isSignalAcceptWrongFSPs", isSignalAcceptWrongFSPs,
                       "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
                       "Misidentification of charged FSP is allowed.");
     REGISTER_VARIABLE("isPrimarySignal", isPrimarySignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL) and primary, 0.0 otherwise");
+
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
                       "Check the PDG code of a particles MC mother particle");
+    REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,
+                      "Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.  :noindex:");
+
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
                       "Check the array index of a particles generated mother");
+    REGISTER_VARIABLE("genMotherID(i)", genNthMotherIndex,
+                      "Check the array index of a particle n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc. :noindex:");
+    // genMotherPDG and genMotherID are overloaded (each are two C++ functions
+    // sharing one variable name) so one of the two needs to be made the indexed
+    // variable in sphinx
+
     REGISTER_VARIABLE("genMotherP", genMotherP,
                       "Generated momentum of a particles MC mother particle");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
@@ -792,6 +894,9 @@ namespace Belle2 {
                       "The PDG code of matched MCParticle, 0 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcErrors", particleMCErrors,
                       "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)");
+    REGISTER_VARIABLE("mcErrorsWithoutProperty", particleMCErrors,
+                      "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags) \n"
+                      "The ignore particle flags of Particle::PropertyFlags which is set by decayString grammar are not considered.");
     REGISTER_VARIABLE("mcMatchWeight", particleMCMatchWeight,
                       "The weight of the Particle -> MCParticle relation (only for the first Relation = largest weight).");
     REGISTER_VARIABLE("nMCMatches", particleNumberOfMCMatch,

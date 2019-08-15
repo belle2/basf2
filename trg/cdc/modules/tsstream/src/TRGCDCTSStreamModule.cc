@@ -28,6 +28,7 @@ using namespace std;
 
 namespace Belle2 {
 
+  /// register the basf2 TRGCDCTSStream module
   REG_MODULE(TRGCDCTSStream);
 
   string

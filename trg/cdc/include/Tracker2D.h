@@ -70,8 +70,9 @@ namespace Belle2 {
                            TRGState& registers,
                            bool& logicStillActive);
 
-    /// Do core logic simulation.
+    /// Do core logic simulation for positive charge.
     static void HoughMappingPlus(void);
+    /// Do core logic simulation for negative charge.
     static void HoughMappingMinus(void);
 
   public:// Configuration

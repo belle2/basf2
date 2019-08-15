@@ -80,11 +80,11 @@ void KLMDQMModule::defineHistoBKLM()
 
   m_bklmSectorLayerPhi = new TH1F("SectorLayerPhi", "Sector and layer number occupancy for phi-readout hits",
                                   240, 0.0, 239.0);
-  m_bklmSectorLayerPhi->GetXaxis()->SetTitle("sector*15 + layer (0..120 = backward, 120..240 = forward)");
+  m_bklmSectorLayerPhi->GetXaxis()->SetTitle("sector*15 + layer (0..120 = backward, 120..240 = section)");
   m_bklmSectorLayerPhi->SetOption("LIVE");
   m_bklmSectorLayerZ = new TH1F("SectorLayerZ", "Sector and layer number occupancy for Z-readout hits",
                                 240, 0.0, 239.0);
-  m_bklmSectorLayerZ->GetXaxis()->SetTitle("sector*15 + layer (0..120 = backward, 120..240 = forward)");
+  m_bklmSectorLayerZ->GetXaxis()->SetTitle("sector*15 + layer (0..120 = backward, 120..240 = section)");
   m_bklmSectorLayerZ->SetOption("LIVE");
   m_bklmHit2dsZ = new TH1F("zBKLMHit2ds", "Axial position of muon hit",
                            97, -172.22, 266.22);
@@ -232,15 +232,15 @@ void KLMDQMModule::event()
      */
     if (!eklmDigit->isGood())
       continue;
-    int endcap = eklmDigit->getEndcap();
+    int section = eklmDigit->getSection();
     int sector = eklmDigit->getSector();
     int layer = eklmDigit->getLayer();
     int plane = eklmDigit->getPlane();
     int strip = eklmDigit->getStrip();
-    uint16_t klmSector = m_ElementNumbers->sectorNumberEKLM(endcap, sector);
+    uint16_t klmSector = m_ElementNumbers->sectorNumberEKLM(section, sector);
     uint16_t klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
     uint16_t channel = m_ElementNumbers->channelNumberEKLM(
-                         endcap, sector, layer, plane, strip);
+                         section, sector, layer, plane, strip);
     uint16_t channelIndex = m_ChannelArrayIndex->getIndex(channel);
     for (int j = 0; j < m_ChannelHitHistogramsEKLM; j++) {
       double xMin = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmin();
@@ -249,7 +249,7 @@ void KLMDQMModule::event()
         continue;
       m_ChannelHits[klmSectorIndex][j]->Fill(channelIndex);
     }
-    int sectorGlobal = m_Elements->sectorNumber(endcap, layer, sector);
+    int sectorGlobal = m_Elements->sectorNumber(section, layer, sector);
     m_eklmSector->Fill(sectorGlobal);
     m_TimeScintillatorEKLM->Fill(eklmDigit->getTime());
   }
@@ -259,15 +259,15 @@ void KLMDQMModule::event()
   m_bklmDigitsN->Fill((double)digits.getEntries());
   for (i = 0; i < nent; i++) {
     BKLMDigit* digit = static_cast<BKLMDigit*>(digits[i]);
-    int forward = digit->getForward();
+    int section = digit->getSection();
     int sector = digit->getSector();
     int layer = digit->getLayer();
     int plane = digit->getPlane();
     int strip = digit->getStrip();
-    uint16_t klmSector = m_ElementNumbers->sectorNumberBKLM(forward, sector);
+    uint16_t klmSector = m_ElementNumbers->sectorNumberBKLM(section, sector);
     uint16_t klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
     uint16_t channel = m_ElementNumbers->channelNumberBKLM(
-                         forward, sector, layer, plane, strip);
+                         section, sector, layer, plane, strip);
     uint16_t channelIndex = m_ChannelArrayIndex->getIndex(channel);
     for (int j = 0; j < m_ChannelHitHistogramsBKLM; j++) {
       double xMin = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmin();
@@ -293,9 +293,9 @@ void KLMDQMModule::event()
   for (i = 0; i < nent1d; i++) {
     BKLMHit1d* hit1d = static_cast<BKLMHit1d*>(hits1d[i]);
     if (hit1d->isPhiReadout()) {
-      m_bklmSectorLayerPhi->Fill(hit1d->getForward() * 120 + (hit1d->getSector() - 1) * 15 + (hit1d->getLayer() - 1));
+      m_bklmSectorLayerPhi->Fill(hit1d->getSection() * 120 + (hit1d->getSector() - 1) * 15 + (hit1d->getLayer() - 1));
     } else {
-      m_bklmSectorLayerZ->Fill(hit1d->getForward() * 120 + (hit1d->getSector() - 1) * 15 + (hit1d->getLayer() - 1));
+      m_bklmSectorLayerZ->Fill(hit1d->getSection() * 120 + (hit1d->getSector() - 1) * 15 + (hit1d->getLayer() - 1));
     }
   }
 }

@@ -48,14 +48,10 @@ class PrintTRGTime(Module):
         """
         set CDCHits and EventMetaData
         """
+        #: EventMetaData
         self.event_info = Belle2.PyStoreObj('EventMetaData')
-        """
-        set EventMetaData
-        """
+        #: CDCHits
         self.cdc_hit = Belle2.PyStoreArray('CDCHits')
-        """
-        set CDCHits
-        """
 
     def event(self):
         """

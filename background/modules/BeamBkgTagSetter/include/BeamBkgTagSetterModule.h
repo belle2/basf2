@@ -25,8 +25,8 @@
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLHit.h>
-#include <bklm/dataobjects/BKLMSimHit.h>
-#include <eklm/dataobjects/EKLMSimHit.h>
+#include <klm/bklm/dataobjects/BKLMSimHit.h>
+#include <klm/eklm/dataobjects/EKLMSimHit.h>
 
 // BEAST SimHits
 #include <beast/beamabort/dataobjects/BeamabortSimHit.h>

@@ -11,6 +11,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 
 #include <boost/foreach.hpp>
 
@@ -428,6 +429,9 @@ void SVDPerformanceModule::beginRun()
 
 void SVDPerformanceModule::event()
 {
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
+  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+
   m_nEvents++;
   float c_eTOkeV = 3.6 / 1000; //keV = e * c_eTOkeV
 
@@ -500,8 +504,7 @@ void SVDPerformanceModule::event()
       h_cltrkSN[layer][sensor][side]->Fill(clSN);
       h_cltrkTime[layer][sensor][side]->Fill(clTime);
 
-      RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svdClustersTrack[cl]);
-      SVDModeByte::baseType tb = (theRecoDigits[0]->getModeByte()).getTriggerBin();
+      SVDModeByte::baseType tb = modeByte.getTriggerBin();
       if ((int) tb == 0) h_cltrkTime_TB1[layer][sensor][side]->Fill(clTime);
       if ((int) tb == 1) h_cltrkTime_TB2[layer][sensor][side]->Fill(clTime);
       if ((int) tb == 2) h_cltrkTime_TB3[layer][sensor][side]->Fill(clTime);

@@ -21,11 +21,11 @@
 
 #include <framework/logging/Logger.h>
 
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 #include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/dbobjects/CDCCalibration.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
-#include <eklm/dbobjects/EKLMAlignment.h>
+#include <klm/eklm/dbobjects/EKLMAlignment.h>
 
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
@@ -35,6 +35,7 @@
 #include <alignment/GlobalParam.h>
 #include <alignment/GlobalLabel.h>
 #include <alignment/Hierarchy.h>
+#include <alignment/GlobalTimeLine.h>
 
 namespace Belle2 {
   namespace alignment {
@@ -205,7 +206,11 @@ namespace Belle2 {
       std::function<bool(const EventMetaData&, const EventMetaData&)> cmpEventMetaData = [](const EventMetaData& lhs,
       const EventMetaData& rhs) -> bool {
         if (lhs.getExperiment() < rhs.getExperiment()) return true;
+        if (lhs.getExperiment() > rhs.getExperiment()) return false;
+
         if (lhs.getRun() < rhs.getRun()) return true;
+        if (lhs.getRun() > rhs.getRun()) return false;
+
         if (lhs.getEvent() < rhs.getEvent()) return true;
         return false;
       };
@@ -284,6 +289,10 @@ namespace Belle2 {
 
       /// Vector of EventMetaData containing the time slicing of the calibration job
       std::vector<EventMetaData> m_dbTimeSlicing {};
+
+      /// The initial time table generated from time intervals in GlobalLabel
+      /// used to check if payload (labels) can change and update the hierarchy if so
+      alignment::timeline::TimeTable m_iniTimeTable{};
     };
 
   }

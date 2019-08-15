@@ -7,7 +7,7 @@ from rawdata import add_unpackers
 from reconstruction import add_reconstruction, add_cosmics_reconstruction
 
 reset_database()
-use_central_database('validation')
+use_central_database('validation_2019-07-22')
 
 main = create_path()
 

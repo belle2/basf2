@@ -110,8 +110,9 @@ namespace Belle2 {
 
   private:
     unsigned int m_2timesNrROIs;/**< Number of ROIs times two (size of one ROI is 2*32bit) */
-    int* m_rois; // [m_2timesNrROIs] /**< Buffer of size 2*m_NrROIs ints  */
+    int* m_rois; /**< Buffer of size 2*m_NrROIs ints  */
 
+    /** necessary for ROOT */
     ClassDef(PXDRawROIs, 3)
   };
 

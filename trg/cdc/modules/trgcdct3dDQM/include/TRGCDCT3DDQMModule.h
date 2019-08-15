@@ -14,6 +14,7 @@
 
 namespace Belle2 {
 
+  //! DQM module for TRGCDCT3D
   class TRGCDCT3DDQMModule : public HistoModule {
 
   public:
@@ -37,38 +38,44 @@ namespace Belle2 {
     virtual void defineHisto();
 
   protected:
-    //dz of T3D in each module
+    //! dz of T3D in each module
     TH1D* h_dz = nullptr;
+    //! phi of T3D in each module
     TH1D* h_phi = nullptr;
+    //! tanlambda of T3D in each module
     TH1D* h_tanlambda = nullptr;
+    //! pt of T3D in each module
     TH1D* h_pt = nullptr;
+    //! phi (from 2D) of T3D in each module
     TH1D* h_phi_2D = nullptr;
+    //! pt (from 2D) of T3D in each module
     TH1D* h_pt_2D = nullptr;
 
 
-    //TDirectories
+    //! TDirectories for DQM histograms
     TDirectory* oldDir = nullptr;
+    //! TDirectories for DQM histograms
     TDirectory* dirDQM = nullptr;
 
-    //flag to save ps file
+    /// flag to save ps file
     bool m_generatePostscript;
 
-    //name of ps file
+    /// name of ps file
     std::string m_postScriptName;
 
-    //experiment number
+    /// experiment number
     unsigned _exp = 0;
 
-    //run number
+    /// run number
     unsigned _run = 0;
 
-    //T3D module number
+    /// T3D module number
     int m_T3DMOD = 0;
 
-    //3D data store
+    /// 3D data store
     StoreArray<CDCTriggerTrack> entAry;
 
-    //2D data store
+    /// 2D data store
     StoreArray<CDCTriggerTrack> entAry_2D;
   };
 

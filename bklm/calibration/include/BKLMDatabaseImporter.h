@@ -21,8 +21,8 @@
 #include <iostream>
 
 #include <bklm/dbobjects/BKLMADCThreshold.h>
-#include <bklm/dbobjects/BKLMElectronicMapping.h>
-#include <framework/database/DBImportArray.h>
+#include <bklm/dbobjects/BKLMElectronicsMap.h>
+#include <framework/database/DBImportObjPtr.h>
 
 namespace Belle2 {
 
@@ -51,23 +51,18 @@ namespace Belle2 {
 
     /**
      * Set non-default lane.
-     * @param[in] forward Forward.
+     * @param[in] section Section.
      * @param[in] sector  Sector.
      * @param[in] leyar   Layer.
      * @param[in] lane    Lane.
      */
     void setElectronicMappingLane(
-      int forward, int sector, int layer, int lane);
+      int section, int sector, int layer, int lane);
 
     /**
      * Import BKLM electronics mapping in the database.
      */
     void importBklmElectronicMapping();
-
-    /**
-     * Export BKLM electronics mapping from the database.
-     */
-    void exportBklmElectronicMapping();
 
     //! Import BKLM geometry parameters into the database
     void importBklmGeometryPar();
@@ -76,7 +71,7 @@ namespace Belle2 {
     void exportBklmGeometryPar();
 
     //! Import BKLM simulation parameters into the database
-    void importBklmSimulationPar();
+    void importBklmSimulationPar(int expStart, int runStart, int expStop, int runStop);
 
     //! Export BKLM simulation parameters from the database
     void exportBklmSimulationPar();
@@ -120,8 +115,10 @@ namespace Belle2 {
   private:
 
     /** Electronics mapping. */
-    DBImportArray<BKLMElectronicMapping> m_bklmMapping;
+    std::vector< std::pair<uint16_t, BKLMElectronicsChannel> > m_ElectronicsChannels;
 
-    ClassDef(BKLMDatabaseImporter, 0); /**< ClassDef */
+    /** Class version. */
+    ClassDef(BKLMDatabaseImporter, 1);
+
   };
 }

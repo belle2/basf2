@@ -39,38 +39,42 @@ void KLMTimeConversion::setCTimeShift(int shift)
   m_CTimeShift = shift;
 }
 
-double KLMTimeConversion::getTime(int ctime, int tdc, int triggerCTime,
-                                  bool scintillator) const
+double KLMTimeConversion::getTime(int ctime, int triggerCTime) const
 {
-  /* Relative time in TDC periods. */
+  /* Relative time in TDC periods for scintillators. */
   int relativeTime;
-  if (scintillator) {
-    /*
-     * All time values were shifted by 2 bits for the phase2 data.
-     */
-    int correctedCTime = (ctime << m_CTimeShift) & 0xFFFF;
-    int correctedTriggerCTime = (triggerCTime << m_CTimeShift) & 0xFFFF;
-    /* Scintillator: 16-bit CTIME. */
-    if (correctedCTime <= correctedTriggerCTime)
-      relativeTime = correctedCTime - correctedTriggerCTime;
-    else
-      relativeTime = correctedCTime - correctedTriggerCTime - 0x10000;
-    /* Get time in TDC periods. */
-    relativeTime = (relativeTime << 3);
-  } else {
-    /*
-     * RPC: 11-bit TDC, but reduced to 10, since the first bit does not depend
-     * on trigger CTIME. TDC frequency is 8 times greater than CTIME frequency.
-     * The 2 last bits are zero, thus, the precision is 4 * (TDC period).
-     */
-    int trigger = (triggerCTime & 0x7F) << 3;
-    int tdcReduced = tdc & 0x3FF;
-    if (tdcReduced <= trigger)
-      relativeTime = tdcReduced - trigger;
-    else
-      relativeTime = tdcReduced - trigger - 0x400;
-  }
+  /*
+   * All time values were shifted by 2 bits for the phase2 data.
+   */
+  int correctedCTime = (ctime << m_CTimeShift) & 0xFFFF;
+  int correctedTriggerCTime = (triggerCTime << m_CTimeShift) & 0xFFFF;
+  /* Scintillator: 16-bit CTIME. */
+  if (correctedCTime <= correctedTriggerCTime)
+    relativeTime = correctedCTime - correctedTriggerCTime;
+  else
+    relativeTime = correctedCTime - correctedTriggerCTime - 0x10000;
+  /* Get time in TDC periods. */
+  relativeTime = (relativeTime << 3);
   return relativeTime * m_TDCPeriod;
+}
+
+std::pair<int, double> KLMTimeConversion::getTimes(int ctime, int tdc, int triggerTime) const
+{
+  /* Relative time in TDC periods for RPC hits. */
+  int relativeTime = tdc & 0x7FF;
+  /*
+   * TDC frequency is 8 times greater than revo9 frequency.
+   * The 2 last bits are zero, thus, the precision is 4 * (TDC period).
+   * The TDC has 11 bits of dynamic range. Shift the triggerTime by
+   * 10 ticks to align the new prompt-time peak with the old
+   * TriggerCTime-relative peak (for backward compatibility of calibration).
+   */
+  int trigger = ((triggerTime - 10) & 0x0FF) << 3;
+  if (relativeTime <= trigger)
+    relativeTime -= trigger;
+  else
+    relativeTime -= trigger + 0x800;
+  return std::pair<int, double>(ctime - triggerTime, relativeTime * m_TDCPeriod);
 }
 
 double KLMTimeConversion::getTimeSimulation(int tdc, bool scintillator) const

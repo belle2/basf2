@@ -11,6 +11,7 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
 #include <vector>
@@ -44,9 +45,9 @@ namespace Belle2 {
     //! @return whether this 1D hit is in RPC (true) or scintillator (false)
     bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
 
-    //! Get detector end
-    //! @return detector end (1=forward or 0=backward) of this strip
-    int getForward() const { return ((m_ModuleID & BKLM_END_MASK) >> BKLM_END_BIT); }
+    //! Get section number
+    //! @return section number (1=forward or 0=backward) of this strip
+    int getSection() const { return ((m_ModuleID & BKLM_END_MASK) >> BKLM_END_BIT); }
 
     //! Get sector number
     //! @return sector number (1..8) of this 1D hit
@@ -56,13 +57,17 @@ namespace Belle2 {
     //! @return layer number (1..15) of this 1D hit
     int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
 
+    //! Get plane number.
+    //! @return Plane number (0=z, 1=phi).
+    bool getPlane() const { return BKLMElementNumbers::getPlaneByModule(m_ModuleID);}
+
     //! Get readout coordinate
     //! @return readout coordinate of this 1D hit
     bool isPhiReadout() const { return ((m_ModuleID & BKLM_PLANE_MASK) != 0); }
 
     //! Get lowest strip number of this 1D hit
     //! @return lowest strip number of this 1D hit
-    int getStripMin() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
+    int getStripMin() const { return BKLMElementNumbers::getStripByModule(m_ModuleID); }
 
     //! Get highest strip number of this 1D hit
     //! @return highest strip number of this 1D hit

@@ -11,8 +11,7 @@
 /* Belle2 headers. */
 #include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/dataobjects/BKLMChannelIndex.h>
-#include <klm/dataobjects/EKLMChannelIndex.h>
+#include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <framework/logging/Logger.h>
@@ -51,19 +50,16 @@ void KLMChannelStatus::setChannelStatus(uint16_t channel,
 
 void KLMChannelStatus::setStatusAllChannels(enum ChannelStatus status)
 {
-  BKLMChannelIndex bklmChannels;
-  for (BKLMChannelIndex& bklmChannel : bklmChannels)
-    setChannelStatus(bklmChannel.getKLMChannelNumber(), status);
-  EKLMChannelIndex eklmChannels;
-  for (EKLMChannelIndex& eklmChannel : eklmChannels)
-    setChannelStatus(eklmChannel.getKLMChannelNumber(), status);
+  KLMChannelIndex klmChannels;
+  for (KLMChannelIndex& klmChannel : klmChannels)
+    setChannelStatus(klmChannel.getKLMChannelNumber(), status);
 }
 
 int KLMChannelStatus::getActiveStripsEKLMSector(int sectorGlobal) const
 {
   int active;
   int nPlanes, nStrips;
-  int endcap, layer, sector, plane, strip;
+  int section, layer, sector, plane, strip;
   const EKLM::ElementNumbersSingleton* eklmElementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
   const KLMElementNumbers* elementNumbers =
@@ -71,12 +67,12 @@ int KLMChannelStatus::getActiveStripsEKLMSector(int sectorGlobal) const
   nPlanes = eklmElementNumbers->getMaximalPlaneNumber();
   nStrips = eklmElementNumbers->getMaximalStripNumber();
   eklmElementNumbers->sectorNumberToElementNumbers(
-    sectorGlobal, &endcap, &layer, &sector);
+    sectorGlobal, &section, &layer, &sector);
   active = 0;
   for (plane = 1; plane <= nPlanes; ++plane) {
     for (strip = 1; strip <= nStrips; ++strip) {
       uint16_t channel = elementNumbers->channelNumberEKLM(
-                           endcap, sector, layer, plane, strip);
+                           section, sector, layer, plane, strip);
       enum ChannelStatus status = getChannelStatus(channel);
       if (status == c_Unknown)
         B2FATAL("Incomplete KLM channel data.");

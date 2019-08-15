@@ -48,7 +48,7 @@
   <!-- Subdedectors -->
   <xi:include href="../structure/COIL.xml"/>
   <xi:include href="../structure/STR.xml"/>
-  <xi:include href="../structure/ServiceGaps.xml"/>  
+  <xi:include href="../structure/ServiceGaps-phase2.xml"/>  
   <xi:include href="../ir/BeamPipe-phase2.xml"/>
   <xi:include href="../ir/Cryostat.xml"/>
   <xi:include href="../ir/FarBeamLine.xml"/>
@@ -60,8 +60,7 @@
   <xi:include href="../top/TOP.xml"/>
   <xi:include href="../arich/ARICH.xml"/>
   <xi:include href="../ecl/ECL.xml"/>
-  <xi:include href="../bklm/BKLM.xml"/>
-  <xi:include href="../eklm/EKLM.xml"/>
+  <xi:include href="../klm/KLM.xml"/>
 
   <xi:include href="../beast/microtpc/MICROTPC-phase2.xml"/>
   <xi:include href="../beast/pindiode/PINDIODE-phase2.xml"/>

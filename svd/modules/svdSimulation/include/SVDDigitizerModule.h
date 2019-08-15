@@ -15,6 +15,11 @@
 #include <svd/simulation/SVDSignal.h>
 #include <svd/geometry/SensorInfo.h>
 #include <framework/dataobjects/RelationElement.h>
+#include <svd/calibration/SVDFADCMaskedStrips.h>
+#include <svd/online/SVDOnlineToOfflineMap.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/PayloadFile.h>
+
 #include <string>
 #include <set>
 #include <vector>
@@ -207,6 +212,12 @@ namespace Belle2 {
       double m_elNoiseU;
       /** Electronic noise for v-strips. */
       double m_elNoiseV;
+
+      //run-dependent MC payloads:
+      SVDFADCMaskedStrips m_MaskedStr; /**< FADC masked strip payload*/
+      static std::string m_xmlFileName /**< channel mapping xml filename*/;
+      DBObjPtr<PayloadFile> m_mapping; /**<channel mapping payload*/
+      std::unique_ptr<SVDOnlineToOfflineMap> m_map; /**<channel mapping map*/
 
       // ROOT stuff:
       /** Pointer to the ROOT filename for statistics */

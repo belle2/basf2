@@ -47,15 +47,6 @@ namespace Belle2 {
     void setT0(int moduleID, unsigned channel, double T0, double errT0);
 
     /**
-     * Add ASIC jump (multiple of ruoghly 8 ns or similar).
-     * These to be added *after* call to suppressAverage().
-     * @param moduleID module ID (1-based)
-     * @param asic ASIC number within the module (0 - 63)
-     * @param jump jump in T0 to be added to 8 channels of an ASIC
-     */
-    void addAsicJump(int moduleID, unsigned asic, double jump);
-
-    /**
      * Switches calibration status to unusable to flag badly calibrated constant
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)

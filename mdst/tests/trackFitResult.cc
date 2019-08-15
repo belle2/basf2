@@ -89,6 +89,7 @@ namespace Belle2 {
       }
       std::vector<float> cov(15);
       for (auto& element : cov) {
+        // cppcheck-suppress useStlAlgorithm   // std::generate would make the code longer and not more readable
         element = generator.Gaus(1e-4);
       }
       Belle2::TrackFitResult myResult(tau, cov, pType, pValue, 0, 0);

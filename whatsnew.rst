@@ -12,6 +12,29 @@ be adapted when changing to the new release.
    :depth: 3
    :local:
 
+Changes since release-03-02
+===========================
+
+.. important changes should go here. Especially things that break backwards
+      compatibility 
+
+.. rubric:: Tidy up and rename of Helicity variables.
+
+Renamed helicity variables in the VariableManager following consistent logic.
+We added the new variable :b2:var:`cosAcoplanarityAngle`.
+
+.. warning::  ``cosHelicityAngle`` is now :b2:var:`cosHelicityAngleMomentum`, and :b2:var:`cosHelicityAngle` has a new definition (as in the PDG 2018, p. 722).
+
++--------------------------------------+---------------------------------------------+
+|                Old name              |                New name                     |
++======================================+=============================================+
+|        ``cosHelicityAngle``          |       :b2:var:`cosHelicityAngleMomentum`    |
++--------------------------------------+---------------------------------------------+
+|     ``cosHelicityAnglePi0Dalitz``    | :b2:var:`cosHelicityAngleMomentumPi0Dalitz` |
++--------------------------------------+---------------------------------------------+
+| ``cosHelicityAngleIfCMSIsTheMother`` |    :b2:var:`cosHelicityAngleBeamMomentum`   |
++--------------------------------------+---------------------------------------------+
+
 
 Changes since release-03-02
 ===========================
@@ -69,6 +92,18 @@ It is now possible to load :math:`K_L^0` particles from clusters in the ECL.
 This has several important consequences for the creation of particles and using combinations containing :math:`K_L^0` s or other neutral hadrons in the analysis package.
 This is handled correctly by the ParticleLoader and ParticleCombiner (the corresponding convenience functions are `modularAnalysis.fillParticleList` and `modularAnalysis.reconstructDecay`).
 Essentially: it is forbidden from now onwards for any other analysis modules to create particles.
+
+.. rubric:: Deprecated RAVE for analysis use
+
+The (external) `RAVE <https://github.com/rave-package>`_ vertex fitter is not maintained.
+Its use in analysis is therefore deprecated.
+We do not expect to *remove* it, but *do not recommend* its use for any realy physics analyses other than benchmarking or legacy studies.
+
+Instead we recommend you use either KFitter (`vertex.vertexKFit`, and similar functions) for fast/simple fits, or `TreeFitter` (`vertex.vertexTree`) for more complex fits and fitting the full decay chain.
+Please check the `TreeFitter` pages for details about the constraints available.
+If you are unable to use TreeFitter because of missing functionality, please `submit a feature request <https://agira.desy.de/projects/BII>`_!
+
+.. warning:: The default fitter for `vertex.fitVertex` has been changed to KFitter.
 
 .. rubric:: Abort processing for invalid or missing global tags
 

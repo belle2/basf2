@@ -26,7 +26,7 @@ gearbox = register_module('Gearbox')
 # Geometry builder
 geobuilder = register_module('Geometry')
 geobuilder.log_level = LogLevel.INFO
-geobuilder.param('components', ['BKLM'])
+geobuilder.param('components', ['KLM'])
 
 klmUnpack = register_module('KLMUnpacker')
 # BKLM reco

@@ -34,7 +34,7 @@ process(main)
 
 # EKLM electronics map
 #
-#     backward (endcap == 1)     forward (endcap == 2)
+#     backward (section == 1)    forward (section == 2)
 #           _1____2____               _2____1____       Sector number
 #      EB0 /   ||   \\\\ EB1     EF0 /   ||   \\\\ EF1  Crate identifier
 #         /3   ||3   \\\\           /1   ||1   \\\\     Copper number - EKLM_ID
@@ -55,7 +55,7 @@ def eklm_electronics_map(stage):
 
     electronics_map = EKLMElectronicsMap()
 
-    # Backward endcap
+    # Backward section
     electronics_map.addSectorLane(1, 1, 1, 3, 0, 1)
     electronics_map.addSectorLane(1, 2, 1, 3, 0, 2)
     electronics_map.addSectorLane(1, 3, 1, 3, 0, 3)
@@ -142,7 +142,7 @@ def eklm_electronics_map(stage):
     electronics_map.addSectorLane(1, 11, 4, 4, 3, 5)
     electronics_map.addSectorLane(1, 12, 4, 4, 3, 6)
 
-    # Forward endcap
+    # Forward section
     electronics_map.addSectorLane(2, 1, 1, 1, 2, 1)
     electronics_map.addSectorLane(2, 2, 1, 1, 2, 2)
     electronics_map.addSectorLane(2, 3, 1, 1, 2, 3)

@@ -29,13 +29,16 @@
 #
 # Once, Btag and Bsig candidates are reconstructed the
 # RestOfEvent is filled for each BtagBsig combination
-# with the remaining Tracks, ECLClusters and KLMClusters
-# that are not used to reconstruct Btag or Bsig. The
-# RestOfEvent object is then used as an input for E_extra,
+# with the remaining charged particles, photons and neutral
+# hadrons that are not used to reconstruct Btag or Bsig.
+# The RestOfEvent object is then used as an input for E_extra,
 # MissingMass^2, etc. variables.
+# At last, the signal neutrino is reconstructed as a particle
+# using missing momentum of the event.
 #
 # Contributors: A. Zupanc (June 2014)
 #               I. Komarov (September 2018)
+#               S. Bilokin (July 2019)
 #
 ################################################################################
 
@@ -117,6 +120,10 @@ ma.matchMCTruth(list_name='Upsilon(4S)',
 ma.buildRestOfEvent(target_list_name='Upsilon(4S)',
                     path=my_path)
 
+# 6. Reconstruct neutrino using missing momentum of the event
+ma.fillParticleListFromROE('nu_mu:missing -> Upsilon(4S)', '', '',
+                           useMissing=True, path=my_path)
+
 # 6. Select variables that we want to store to ntuple
 d_vars = vc.mc_truth + vc.kinematics + vc.inv_mass
 b_vars = vc.mc_truth + \
@@ -127,6 +134,7 @@ b_vars = vc.mc_truth + \
                       wrapper='daughter(0,extraInfo(variable))',
                       prefix="D")
 mu_vars = vc.mc_truth
+nu_vars = d_vars
 
 u4s_vars = vc.mc_truth + \
     vc.roe_multiplicities + \
@@ -140,6 +148,11 @@ u4s_vars = vc.mc_truth + \
 
 # 7. Saving variables to ntuple
 rootOutputFile = 'B2A305-Btag+SingleMuon-Reconstruction.root'
+ma.variablesToNtuple(decayString='nu_mu:missing',
+                     variables=nu_vars,
+                     filename=rootOutputFile,
+                     treename='neutrino',
+                     path=my_path)
 ma.variablesToNtuple(decayString='B-:tag',
                      variables=b_vars,
                      filename=rootOutputFile,

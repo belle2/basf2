@@ -45,7 +45,30 @@ namespace Belle2 {
 //
 // constructors and destructor
 //
-  TRGCDCLpav::TRGCDCLpav()
+  TRGCDCLpav::TRGCDCLpav() :
+    m_wsum(),
+    m_xsum(),
+    m_ysum(),
+    m_xxsum(),
+    m_yysum(),
+    m_xysum(),
+    m_xrrsum(),
+    m_yrrsum(),
+    m_rrrrsum(),
+    m_wsum_temp(),
+    m_xav(),
+    m_yav(),
+    m_xyavp(),
+    m_rscale(),
+    m_xxavp(),
+    m_yyavp(),
+    m_xrravp(),
+    m_yrravp(),
+    m_rrrravp(),
+    m_sinrot(),
+    m_cosrot(),
+    m_nc(),
+    m_chisq() // 2019/07/31 by ytlai
   {
     clear();
   }

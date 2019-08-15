@@ -57,7 +57,7 @@ namespace Belle2 {
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
 
       if (det == Const::EDetector::CDC) {
@@ -67,7 +67,7 @@ namespace Belle2 {
       } else if (det == Const::EDetector::PXD) {
         return trackFit->getHitPatternVXD().getNPXDHits();
       } else {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -95,7 +95,7 @@ namespace Belle2 {
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return trackFit->getHitPatternVXD().getFirstSVDLayer();
     }
@@ -104,7 +104,7 @@ namespace Belle2 {
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return trackFit->getHitPatternVXD().getFirstPXDLayer(HitPatternVXD::PXDMode::normal);
     }
@@ -113,7 +113,7 @@ namespace Belle2 {
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return trackFit->getHitPatternCDC().getLastLayer();
     }
@@ -122,7 +122,7 @@ namespace Belle2 {
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return trackFit->getD0();
     }
@@ -131,7 +131,7 @@ namespace Belle2 {
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return trackFit->getPhi0();
     }
@@ -140,7 +140,7 @@ namespace Belle2 {
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return trackFit->getOmega();
     }
@@ -149,7 +149,7 @@ namespace Belle2 {
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return trackFit->getZ0();
     }
@@ -158,7 +158,7 @@ namespace Belle2 {
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return trackFit->getTanLambda();
     }
@@ -167,77 +167,77 @@ namespace Belle2 {
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
 
       double errorSquared = trackFit->getCovariance5()[0][0];
       if (errorSquared > 0.0)
         return sqrt(errorSquared);
       else
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
     }
 
     double trackPhi0Error(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
 
       double errorSquared = trackFit->getCovariance5()[1][1];
       if (errorSquared > 0.0)
         return sqrt(errorSquared);
       else
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
     }
 
     double trackOmegaError(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
 
       double errorSquared = trackFit->getCovariance5()[2][2];
       if (errorSquared > 0.0)
         return sqrt(errorSquared);
       else
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
     }
 
     double trackZ0Error(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
 
       double errorSquared = trackFit->getCovariance5()[3][3];
       if (errorSquared > 0.0)
         return sqrt(errorSquared);
       else
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
     }
 
     double trackTanLambdaError(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
 
       double errorSquared = trackFit->getCovariance5()[4][4];
       if (errorSquared > 0.0)
         return sqrt(errorSquared);
       else
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
     }
 
     double trackPValue(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return 0.0;
+        return -1;
       }
 
       return trackFit->getPValue();

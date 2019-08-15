@@ -28,10 +28,17 @@ namespace Belle2 {
 
     /**
      * Returns function which returns the value of the given variable for the given particle if its abs(pdgCode) agrees with the given one
-     * First argument in the argument vector must be the name of variable.
-     * Second argument in the argument vector must be an integers corresponding to a PDG code.
+     * First argument in the argument vector must be an integer corresponding to a PDG code.
+     * Second argument in the argument vector must be the name of a variable.
      */
     Manager::FunctionPtr varFor(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the value of the given variable for the given particle if the MC particle related to it is primary, not virtual, and not initial.
+     * If no MC particle is related to the given particle, or the MC particle is not primary, virtual, or initial, NaN will be returned.
+     * Only one argument is allowed in the argument vector and it must be the name of a variable.
+     */
+    Manager::FunctionPtr varForMCGen(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the number of particles in the given particle List.
@@ -42,6 +49,12 @@ namespace Belle2 {
      * Returns 1 if the particle is contained in the particle list
      */
     Manager::FunctionPtr isInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns 1 if the same mdst source object was used to create a particle in
+     * the list (0 if not and -1 for non-mdst source based particles
+     */
+    Manager::FunctionPtr sourceObjectIsInList(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns 1 if the given particle is a daughter of at least one of the particles of the

@@ -79,6 +79,7 @@ void ECLChargedPIDDataAnalysisValidationModule::initialize()
     m_tree[chargedIdx]->Branch("trkPhi", &m_trkPhi[chargedIdx], "trkPhi/F");
     m_tree[chargedIdx]->Branch("clusterTheta", &m_clusterTheta[chargedIdx], "clusterTheta/F");
     m_tree[chargedIdx]->Branch("clusterPhi", &m_clusterPhi[chargedIdx], "clusterPhi/F");
+    m_tree[chargedIdx]->Branch("clusterReg", &m_clusterReg[chargedIdx], "clusterReg/F");
     m_tree[chargedIdx]->Branch("trackClusterMatch", &m_trackClusterMatch[chargedIdx], "trackClusterMatch/F");
     m_tree[chargedIdx]->Branch("logl_sig", &m_logl_sig[chargedIdx], "logl_sig/F");
     m_tree[chargedIdx]->Branch("logl_bkg", &m_logl_bkg[chargedIdx], "logl_bkg/F");
@@ -114,6 +115,7 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
     m_trkPhi[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
     m_clusterTheta[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
     m_clusterPhi[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
+    m_clusterReg[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
     m_trackClusterMatch[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
     m_logl_sig[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
     m_logl_bkg[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
@@ -176,6 +178,8 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
 
       m_clusterTheta[chargedIdx] = eclCluster->getTheta();
       m_clusterPhi[chargedIdx] = eclCluster->getPhi();
+      m_clusterReg[chargedIdx] = eclCluster->getDetectorRegion();
+
       m_trackClusterMatch[chargedIdx] = 1;
 
       const auto eclLikelihood = track->getRelated<ECLPidLikelihood>();
@@ -310,6 +314,13 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
   h_deltalogl->SetOption("HIST");
   h_trkclusmatch->SetOption("HIST");
 
+  // MetaOptions string.
+  std::string metaopts("pvalue-warn=0.25,pvalue-error=0.01");
+  // Electron plots should be visible to the shifter by default.
+  if (sigHypo == Const::electron) {
+    metaopts = "shifter," + metaopts;
+  }
+
   // Add histogram info.
   h_pid->GetListOfFunctions()->Add(new TNamed("Description",
                                               TString::Format("Sample PDG = %i - ECL global PID(%i) distribution. U/O flow is added to first (last) bin.",
@@ -318,17 +329,17 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
   h_pid->GetListOfFunctions()->Add(new TNamed("Check",
                                               "The more peaked at 1, the better. Non-zero O-flow indicates either failure of MC matching for reco tracks (unlikely), or failure of track-ECL-cluster matching (more likely). Both cases result in PID=nan."));
   h_pid->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_pid->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.25,pvalue-error=0.01"));
+  h_pid->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
 
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("Description",
-                                                    TString::Format("Sample PDG = %i - ECL distribution of binary deltaLogL=logl(%i)-logl(%i). U/O flow is added to first (last) bin.",
+                                                    TString::Format("Sample PDG = %i - ECL distribution of binary $\\Delta log(L)$ = log(L(%i)) - log(L(%i)). U/O flow is added to first (last) bin.",
                                                         sigHypoPdgId * sigCharge,
                                                         bkgHypoPdgId,
                                                         sigHypoPdgId).Data()));
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("Check",
                                                     "Basic metric for signal/bkg separation. The more negative, the better separation is achieved. Non-zero U-flow indicates a non-normal PDF value (of sig OR bkg) for some p,clusterTheta range, which might be due to a non-optimal definition of the x-axis range of the PDF templates. Non-zero O-flow indicates either failure of MC matching for reco tracks (unlikely), or failure of track-ECL-cluster matching (more likely)."));
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_deltalogl->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.25,pvalue-error=0.01"));
+  h_deltalogl->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
 
   h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Description",
                                                        TString::Format("Sample PDG = %i - Track-ECLCluster match flag distribution.",
@@ -336,7 +347,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
   h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Check",
                                                        "The more peaked at 1, the better. Non-zero population in the bins w/ flag != 0|1 indicates failure of MC matching for reco tracks. In such cases, flag=nan."));
   h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
-  h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.25,pvalue-error=0.01"));
+  h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
 
   h_pid->Write();
   h_deltalogl->Write();
@@ -367,29 +378,31 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
   // TTree vector branch of global PID values via the idx.
   TString pidSigCut = TString::Format("pids_glob[%i] > %f", sigHypoIdx, c_PID);
 
-  // Histograms of p, clusterTheta, clusterPhi... for "pass" (N, numerator) and "all" (D, denominator) events.
+  // Histograms of p, clusterReg, clusterPhi... for "pass" (N, numerator) and "all" (D, denominator) events.
   TString h_p_N_name = TString::Format("h_p_N_%i", sigHypoPdgId);
   TString h_p_D_name = TString::Format("h_p_D_%i", sigHypoPdgId);
-  TH1F* h_p_N = new TH1F(h_p_N_name.Data(), "h_p_N", 15, 0.0, 5.0);
-  TH1F* h_p_D = new TH1F(h_p_D_name.Data(), "h_p_D", 15, 0.0, 5.0);
+  TH1F* h_p_N = new TH1F(h_p_N_name.Data(), "h_p_N", 10, 0.0, 5.0);
+  TH1F* h_p_D = new TH1F(h_p_D_name.Data(), "h_p_D", 10, 0.0, 5.0);
 
-  TString h_th_N_name = TString::Format("h_th_N_%i", sigHypoPdgId);
-  TString h_th_D_name = TString::Format("h_th_D_%i", sigHypoPdgId);
-  TH1F* h_th_N = new TH1F(h_th_N_name.Data(), "h_th_N", m_th_binedges.size() - 1, m_th_binedges.data());
-  TH1F* h_th_D = new TH1F(h_th_D_name.Data(), "h_th_D", m_th_binedges.size() - 1, m_th_binedges.data());
+  TString h_eclreg_N_name = TString::Format("h_eclreg_N_%i", sigHypoPdgId);
+  TString h_eclreg_D_name = TString::Format("h_eclreg_D_%i", sigHypoPdgId);
+  TH1F* h_eclreg_N = new TH1F(h_eclreg_N_name.Data(), "h_eclreg_N", 5, -0.5, 4.5);
+  TH1F* h_eclreg_D = new TH1F(h_eclreg_D_name.Data(), "h_eclreg_D", 5, -0.5, 4.5);
 
   TString h_phi_N_name = TString::Format("h_phi_N_%i", sigHypoPdgId);
   TString h_phi_D_name = TString::Format("h_phi_D_%i", sigHypoPdgId);
-  TH1F* h_phi_N = new TH1F(h_phi_N_name.Data(), "h_phi_N", 15, -3.14159, 3.14159);
-  TH1F* h_phi_D = new TH1F(h_phi_D_name.Data(), "h_phi_D", 15, -3.14159, 3.14159);
+  TH1F* h_phi_N = new TH1F(h_phi_N_name.Data(), "h_phi_N", 10, -3.14159, 3.14159);
+  TH1F* h_phi_D = new TH1F(h_phi_D_name.Data(), "h_phi_D", 10, -3.14159, 3.14159);
 
   // Fill the histograms from the sample's TTree.
 
   sampleTree->Project(h_p_N_name.Data(), "p", pidSigCut.Data());
   sampleTree->Project(h_p_D_name.Data(), "p");
 
-  sampleTree->Project(h_th_N_name.Data(), "clusterTheta", pidSigCut.Data());
-  sampleTree->Project(h_th_D_name.Data(), "clusterTheta");
+  sampleTree->Project(h_eclreg_N_name.Data(), "clusterReg", pidSigCut.Data());
+  sampleTree->Project(h_eclreg_D_name.Data(), "clusterReg");
+  paintUnderOverflow(h_eclreg_N);
+  paintUnderOverflow(h_eclreg_D);
 
   sampleTree->Project(h_phi_N_name.Data(), "clusterPhi", pidSigCut.Data());
   sampleTree->Project(h_phi_D_name.Data(), "clusterPhi");
@@ -397,11 +410,11 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
   // Compute the efficiency/fake rate.
 
   TString pid_glob_ratio_p_name = TString::Format("pid_glob_%i_%s__VS_p", sigHypoPdgId, ratioType.c_str());
-  TString pid_glob_ratio_th_name = TString::Format("pid_glob_%i_%s__VS_th", sigHypoPdgId, ratioType.c_str());
+  TString pid_glob_ratio_eclreg_name = TString::Format("pid_glob_%i_%s__VS_eclreg", sigHypoPdgId, ratioType.c_str());
   TString pid_glob_ratio_phi_name = TString::Format("pid_glob_%i_%s__VS_phi", sigHypoPdgId, ratioType.c_str());
 
   // MetaOptions string.
-  std::string metaopts("pvalue-warn=0.25,pvalue-error=0.01,nostats");
+  std::string metaopts("pvalue-warn=0.1,pvalue-error=0.01,nostats");
   // Electron plots should be visible to the shifter by default.
   if (sampleHypo == Const::electron || sigHypo == Const::electron) {
     metaopts = "shifter," + metaopts;
@@ -418,7 +431,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
     t_pid_glob_ratio_p->SetPosteriorMode();
 
     t_pid_glob_ratio_p->GetListOfFunctions()->Add(new TNamed("Description",
-                                                             TString::Format("Sample PDG = %i - %s of ECL global PID(%i) > %.2f as a function of track momentum.",
+                                                             TString::Format("Sample PDG = %i - %s of ECL global PID(%i) > %.2f as a function of $p_{trk}$.",
                                                                  sampleHypoPdgId,
                                                                  ratioType.c_str(),
                                                                  sigHypoPdgId,
@@ -434,31 +447,31 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
     delete t_pid_glob_ratio_p;
 
   }
-  if (TEfficiency::CheckConsistency(*h_th_N, *h_th_D)) {
+  if (TEfficiency::CheckConsistency(*h_eclreg_N, *h_eclreg_D)) {
 
-    TEfficiency* t_pid_glob_ratio_th = new TEfficiency(*h_th_N, *h_th_D);
-    t_pid_glob_ratio_th->SetName(pid_glob_ratio_th_name.Data());
-    t_pid_glob_ratio_th->SetTitle(TString::Format("%s;#theta_{cluster} [rad];#varepsilon/f", pid_glob_ratio_th_name.Data()).Data());
+    TEfficiency* t_pid_glob_ratio_eclreg = new TEfficiency(*h_eclreg_N, *h_eclreg_D);
+    t_pid_glob_ratio_eclreg->SetName(pid_glob_ratio_eclreg_name.Data());
+    t_pid_glob_ratio_eclreg->SetTitle(TString::Format("%s;ECL Region;#varepsilon/f", pid_glob_ratio_eclreg_name.Data()).Data());
 
-    t_pid_glob_ratio_th->SetConfidenceLevel(0.683);
-    t_pid_glob_ratio_th->SetStatisticOption(TEfficiency::kBUniform);
-    t_pid_glob_ratio_th->SetPosteriorMode();
+    t_pid_glob_ratio_eclreg->SetConfidenceLevel(0.683);
+    t_pid_glob_ratio_eclreg->SetStatisticOption(TEfficiency::kBUniform);
+    t_pid_glob_ratio_eclreg->SetPosteriorMode();
 
-    t_pid_glob_ratio_th->GetListOfFunctions()->Add(new TNamed("Description",
-                                                              TString::Format("Sample PDG = %i - %s of ECL global PID(%i) > %.2f as a function of ECL cluster theta.",
-                                                                  sampleHypoPdgId,
-                                                                  ratioType.c_str(),
-                                                                  sigHypoPdgId,
-                                                                  c_PID
-                                                                             ).Data()));
-    t_pid_glob_ratio_th->GetListOfFunctions()->Add(new TNamed("Check",
-                                                              "Shape should be consistent. Obviously, check for decreasing efficiency / increasing fake rate."));
-    t_pid_glob_ratio_th->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-    t_pid_glob_ratio_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
+    t_pid_glob_ratio_eclreg->GetListOfFunctions()->Add(new TNamed("Description",
+                                                       TString::Format("Sample PDG = %i - %s of ECL global PID(%i) > %.2f as a function of ECL cluster region ($\\theta_{cluster}$). Regions are labelled: 0 (outside ECL acceptance), 1 (ECL FWD), 2 (ECL Barrel), 3 (ECL BWD), 4 (ECL FWD/BWD gaps).",
+                                                           sampleHypoPdgId,
+                                                           ratioType.c_str(),
+                                                           sigHypoPdgId,
+                                                           c_PID
+                                                                      ).Data()));
+    t_pid_glob_ratio_eclreg->GetListOfFunctions()->Add(new TNamed("Check",
+                                                       "Shape should be consistent. Obviously, check for decreasing efficiency / increasing fake rate."));
+    t_pid_glob_ratio_eclreg->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+    t_pid_glob_ratio_eclreg->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
 
-    t_pid_glob_ratio_th->Write();
+    t_pid_glob_ratio_eclreg->Write();
 
-    delete t_pid_glob_ratio_th;
+    delete t_pid_glob_ratio_eclreg;
 
   }
   if (TEfficiency::CheckConsistency(*h_phi_N, *h_phi_D)) {
@@ -472,7 +485,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
     t_pid_glob_ratio_phi->SetPosteriorMode();
 
     t_pid_glob_ratio_phi->GetListOfFunctions()->Add(new TNamed("Description",
-                                                               TString::Format("Sample PDG = %i - %s of ECL global PID(%i) > %.2f as a function of ECL cluster phi.",
+                                                               TString::Format("Sample PDG = %i - %s of ECL global PID(%i) > %.2f as a function of $\\phi_{cluster}$.",
                                                                    sampleHypoPdgId,
                                                                    ratioType.c_str(),
                                                                    sigHypoPdgId,
@@ -490,8 +503,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
 
   delete h_p_N;
   delete h_p_D;
-  delete h_th_N;
-  delete h_th_D;
+  delete h_eclreg_N;
+  delete h_eclreg_D;
   delete h_phi_N;
   delete h_phi_D;
 
@@ -508,8 +521,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
   // Histograms of pt, clusterTheta, clusterPhi... for "pass" (N, numerator) and "all" (D, denominator) events.
   TString h_pt_N_name = TString::Format("h_pt_N_%i", sampleHypoPdgId);
   TString h_pt_D_name = TString::Format("h_pt_D_%i", sampleHypoPdgId);
-  TH1F* h_pt_N = new TH1F(h_pt_N_name.Data(), "h_pt_N", 15, 0.0, 5.0);
-  TH1F* h_pt_D = new TH1F(h_pt_D_name.Data(), "h_pt_D", 15, 0.0, 5.0);
+  TH1F* h_pt_N = new TH1F(h_pt_N_name.Data(), "h_pt_N", 10, 0.0, 5.0);
+  TH1F* h_pt_D = new TH1F(h_pt_D_name.Data(), "h_pt_D", 10, 0.0, 5.0);
 
   TString h_th_N_name = TString::Format("h_th_N_%i", sampleHypoPdgId);
   TString h_th_D_name = TString::Format("h_th_D_%i", sampleHypoPdgId);
@@ -518,8 +531,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
 
   TString h_phi_N_name = TString::Format("h_phi_N_%i", sampleHypoPdgId);
   TString h_phi_D_name = TString::Format("h_phi_D_%i", sampleHypoPdgId);
-  TH1F* h_phi_N = new TH1F(h_phi_N_name.Data(), "h_phi_N", 15, -3.14159, 3.14159);
-  TH1F* h_phi_D = new TH1F(h_phi_D_name.Data(), "h_phi_D", 15, -3.14159, 3.14159);
+  TH1F* h_phi_N = new TH1F(h_phi_N_name.Data(), "h_phi_N", 10, -3.14159, 3.14159);
+  TH1F* h_phi_D = new TH1F(h_phi_D_name.Data(), "h_phi_D", 10, -3.14159, 3.14159);
 
   TString match_cut_N("trackClusterMatch == 1");
   TString match_cut_D("trackClusterMatch >= 0");
@@ -542,7 +555,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
   TString match_eff_phi_name = TString::Format("trkclusmatch_%i_Efficiency__VS_phi", sampleHypoPdgId);
 
   // MetaOptions string.
-  std::string metaopts("pvalue-warn=0.25,pvalue-error=0.01,nostats");
+  std::string metaopts("pvalue-warn=0.1,pvalue-error=0.01,nostats");
   // Electron plots should be visible to the shifter by default.
   if (sampleHypo == Const::electron) {
     metaopts = "shifter," + metaopts;
@@ -552,7 +565,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
 
     TEfficiency* t_match_eff_pt = new TEfficiency(*h_pt_N, *h_pt_D);
     t_match_eff_pt->SetName(match_eff_pt_name.Data());
-    t_match_eff_pt->SetTitle(TString::Format("%s;p_{T} [GeV/c];#varepsilon", match_eff_pt_name.Data()).Data());
+    t_match_eff_pt->SetTitle(TString::Format("%s;p_{T}^{trk} [GeV/c];#varepsilon", match_eff_pt_name.Data()).Data());
     t_match_eff_pt->SetTitle(match_eff_pt_name.Data());
 
     t_match_eff_pt->SetConfidenceLevel(0.683);
@@ -560,7 +573,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
     t_match_eff_pt->SetPosteriorMode();
 
     t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("Description",
-                                                         TString::Format("Sample PDG = %i - Efficiency of track-ECL-cluster matching as a function of track transverse momentum.",
+                                                         TString::Format("Sample PDG = %i - Efficiency of track-ECL-cluster matching as a function of $p_{T}^{trk}$.",
                                                              sampleHypoPdgId * sampleCharge).Data()));
     t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("Check",
                                                          "Shape should be consistent. Obviously, check for decreasing efficiency."));
@@ -576,7 +589,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
 
     TEfficiency* t_match_eff_th = new TEfficiency(*h_th_N, *h_th_D);
     t_match_eff_th->SetName(match_eff_th_name.Data());
-    t_match_eff_th->SetTitle(TString::Format("%s;#theta_{cluster} [rad];#varepsilon", match_eff_th_name.Data()).Data());
+    t_match_eff_th->SetTitle(TString::Format("%s;#theta_{trk} [rad];#varepsilon", match_eff_th_name.Data()).Data());
     t_match_eff_th->SetTitle(match_eff_th_name.Data());
 
     t_match_eff_th->SetConfidenceLevel(0.683);
@@ -584,7 +597,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
     t_match_eff_th->SetPosteriorMode();
 
     t_match_eff_th->GetListOfFunctions()->Add(new TNamed("Description",
-                                                         TString::Format("Sample PDG = %i - Efficiency of track-ECL-cluster matching as a function of track theta.",
+                                                         TString::Format("Sample PDG = %i - Efficiency of track-ECL-cluster matching as a function of $\\theta_{trk}$.",
                                                              sampleHypoPdgId * sampleCharge).Data()));
     t_match_eff_th->GetListOfFunctions()->Add(new TNamed("Check",
                                                          "Shape should be consistent. Obviously, check for decreasing efficiency."));
@@ -600,14 +613,14 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
 
     TEfficiency* t_match_eff_phi = new TEfficiency(*h_phi_N, *h_phi_D);
     t_match_eff_phi->SetName(match_eff_phi_name.Data());
-    t_match_eff_phi->SetTitle(TString::Format("%s;#phi_{cluster} [rad];#varepsilon", match_eff_phi_name.Data()).Data());
+    t_match_eff_phi->SetTitle(TString::Format("%s;#phi_{trk} [rad];#varepsilon", match_eff_phi_name.Data()).Data());
 
     t_match_eff_phi->SetConfidenceLevel(0.683);
     t_match_eff_phi->SetStatisticOption(TEfficiency::kBUniform);
     t_match_eff_phi->SetPosteriorMode();
 
     t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Description",
-                                                          TString::Format("Sample PDG = %i - Efficiency of track-ECL-cluster matching as a function of track phi.",
+                                                          TString::Format("Sample PDG = %i - Efficiency of track-ECL-cluster matching as a function of $\\phi_{trk}$.",
                                                               sampleHypoPdgId * sampleCharge).Data()));
     t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Check",
                                                           "Shape should be consistent. Obviously, check for decreasing efficiency."));

@@ -8,19 +8,26 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <boost/python.hpp>
+
 #include <framework/modules/rootio/RootOutputModule.h>
 
 #include <framework/io/RootIOUtilities.h>
 #include <framework/core/FileCatalog.h>
+#include <framework/core/MetadataService.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/database/Database.h>
 // needed for complex module parameter
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/utilities/EnvironmentVariables.h>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <TClonesArray.h>
+
+#include <nlohmann/json.hpp>
 
 #include <ctime>
 #include <memory>
@@ -394,7 +401,7 @@ void RootOutputModule::fillFileMetaData()
     mcEvents = 0;
   }
   m_fileMetaData->setMcEvents(mcEvents);
-  m_fileMetaData->setDatabaseGlobalTag(Database::getGlobalTag());
+  m_fileMetaData->setDatabaseGlobalTag(Database::Instance().getGlobalTags());
   for (const auto& item : m_additionalDataDescription) {
     m_fileMetaData->setDataDescription(item.first, item.second);
   }
@@ -403,18 +410,25 @@ void RootOutputModule::fillFileMetaData()
   if(m_regularFile) {
     lfn = boost::filesystem::absolute(lfn, boost::filesystem::initial_path()).string();
   }
+  // Format LFN if BELLE2_LFN_FORMATSTRING is set
+  std::string format = EnvironmentVariables::get("BELLE2_LFN_FORMATSTRING", "");
+  if (!format.empty()) {
+    auto format_filename = boost::python::import("B2Tools.format").attr("format_filename");
+    lfn = boost::python::extract<std::string>(format_filename(format, m_outputFileName, m_fileMetaData->getJsonStr()));
+  }
   m_fileMetaData->setLfn(lfn);
   //register the file in the catalog
   if (m_updateFileCatalog) {
     FileCatalog::Instance().registerFile(m_file->GetName(), *m_fileMetaData);
   }
-
+  m_outputFileMetaData = *m_fileMetaData;
 }
 
 
 void RootOutputModule::terminate()
 {
   closeFile();
+  MetadataService::Instance().addRootOutputFile(m_outputFileName, &m_outputFileMetaData);
 }
 
 void RootOutputModule::closeFile()

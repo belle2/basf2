@@ -63,6 +63,9 @@ def get_comparison(object_1, object_2, mop):
     """ Uses the metaoptions to determine which comparison algorithm is used
     and initializes the corresponding subclass of :class:`ComparisonBase` that
     implements the actual comparison and holds the results.
+    @param object_1
+    @param object_2
+    @param mop Metaoption parser
     """
     if mop.has_option("kolmogorov"):
         tester = KolmogorovTest
@@ -112,6 +115,14 @@ class ComparisonBase(ABC):
 
     def __init__(self, object_a, object_b,
                  mop: Optional[MetaOptionParser] = None, debug=False):
+        """
+        Initialize ComparisonBase class
+
+        :param object_a:
+        :param object_b:
+        :param mop: MetaOptionParser
+        :param debug (bool): Debug mode enabled?
+        """
         #: store the first object to compare
         self.object_a = object_a
 
@@ -320,6 +331,12 @@ class PvalueTest(ComparisonBase):
     _default_pvalue_error = 0.01
 
     def __init__(self, *args, **kwargs):
+        """ Initialize Pvalue test
+
+        Args:
+            *args: Positional arguments to ComparisonBase
+            **kwargs: Keyword arguments to ComparisonBase
+        """
         super().__init__(*args, **kwargs)
         #: pvalue
         self._pvalue = None
@@ -534,6 +551,8 @@ class Chi2Test(PvalueTest):
 
 
 class KolmogorovTest(PvalueTest):
+    """ Kolmogorov-Smirnov Test """
+
     def __init__(self, *args, **kwargs):
         """
         Initialize Kolmogorov test.
@@ -586,6 +605,8 @@ class KolmogorovTest(PvalueTest):
 
 
 class AndersonDarlingTest(PvalueTest):
+    """ Anderson-Darling test"""
+
     def __init__(self, *args, **kwargs):
         """
         Initialize Kolmogorov test.

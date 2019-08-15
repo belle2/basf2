@@ -61,19 +61,19 @@ namespace Belle2 {
 
     /**
      * Set sector displacement.
-     * @param[in] endcap Endcap number.
-     * @param[in] layer  Layer number.
-     * @param[in] sector Sector number.
-     * @param[in[ dx     dx.
-     * @param[in] dy     dy.
-     * @param[in] dalpha dalpha.
+     * @param[in] section Section number.
+     * @param[in] layer   Layer number.
+     * @param[in] sector  Sector number.
+     * @param[in[ dx      dx.
+     * @param[in] dy      dy.
+     * @param[in] dalpha  dalpha.
      */
-    void setSectorDisplacement(int endcap, int layer, int sector,
+    void setSectorDisplacement(int section, int layer, int sector,
                                float dx, float dy, float dalpha);
 
     /**
      * Set segment displacement.
-     * @param[in] endcap  Endcap number.
+     * @param[in] section Section number.
      * @param[in] layer   Layer number.
      * @param[in] sector  Sector number.
      * @param[in] plane   Plane number.
@@ -82,7 +82,7 @@ namespace Belle2 {
      * @param[in] dy      dy.
      * @param[in] dalpha  dalpha.
      */
-    void setSegmentDisplacement(int endcap, int layer, int sector, int plane,
+    void setSegmentDisplacement(int section, int layer, int sector, int plane,
                                 int segment, float dx, float dy, float dalpha);
 
     /**

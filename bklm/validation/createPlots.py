@@ -97,16 +97,16 @@ def draw_bklmhists(file_chain):
     inRPC.SetMinimum(0.0)
     inRPC.Write()
 
-    forward = TH1F('Forward', 'Forward for BKLMHit2ds', 2, -0.5, 1.5)
-    file_chain.Draw('BKLMHit2ds.getForward()>>Forward', '')
-    forward.GetXaxis().SetTitle('0=backward  1=forward')
-    forward.GetListOfFunctions().Add(TNamed('Description',
+    section = TH1F('Forward', 'Section for BKLMHit2ds', 2, -0.5, 1.5)
+    file_chain.Draw('BKLMHit2ds.getSection()>>Forward', '')
+    section.GetXaxis().SetTitle('0=backward  1=forward')
+    section.GetListOfFunctions().Add(TNamed('Description',
                                             'Flag indicating if a muon hit is in backward (0) or forward (1) BKLM'))
-    forward.GetListOfFunctions().Add(TNamed('Check', 'Somewhat more hits in the backward'))
-    forward.GetListOfFunctions().Add(TNamed('Contact', 'piilonen@vt.edu'))
-    forward.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.99,pvalue-error=0.90'))
-    forward.SetMinimum(0.0)
-    forward.Write()
+    section.GetListOfFunctions().Add(TNamed('Check', 'Somewhat more hits in the backward'))
+    section.GetListOfFunctions().Add(TNamed('Contact', 'piilonen@vt.edu'))
+    section.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.99,pvalue-error=0.90'))
+    section.SetMinimum(0.0)
+    section.Write()
 
     isOnTrack = TH1F('IsOnTrack', 'IsOnTrack for BKLMHit2ds', 2, -0.5, 1.5)
     file_chain.Draw('BKLMHit2ds.isOnTrack()>>IsOnTrack', '')

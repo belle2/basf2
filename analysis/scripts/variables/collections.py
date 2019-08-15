@@ -36,6 +36,8 @@ cluster = [
     'clusterErrorTheta',
     'clusterErrorTiming',
     'clusterHighestE',
+    'clusterHasFailedErrorTiming',
+    'clusterHasFailedTiming',
     'clusterHasNPhotons',
     'clusterHasNeutralHadron',
     'clusterLAT',

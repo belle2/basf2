@@ -2347,6 +2347,71 @@ namespace {
     EXPECT_FLOAT_EQ(vsensible->function(notinthelist), 0.0);
   }
 
+  TEST_F(MetaVariableTest, sourceObjectIsInList)
+  {
+    // datastore things
+    DataStore::Instance().reset();
+    DataStore::Instance().setInitializeActive(true);
+
+    // needed to mock up
+    StoreArray<ECLCluster> clusters;
+    StoreArray<Particle> particles;
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+
+    clusters.registerInDataStore();
+    particles.registerInDataStore();
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+    gammalist.registerInDataStore(flags);
+
+    // end datastore things
+    DataStore::Instance().setInitializeActive(false);
+
+    // of course we have to create the list...
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // mock up two clusters from the ECL let's say they both came from true Klongs
+    // but one looked a little bit photon-like
+    auto* cl0 = clusters.appendNew(ECLCluster());
+    cl0->setEnergy(1.0);
+    cl0->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+    cl0->addHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+    cl0->setClusterId(0);
+    auto* cl1 = clusters.appendNew(ECLCluster());
+    cl1->setEnergy(1.0);
+    cl1->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+    cl1->setClusterId(1);
+
+    // create particles from the clusters
+    Particle myphoton(cl0, Const::photon);
+    Particle iscopiedin(cl0, Const::Klong);
+    Particle notcopiedin(cl1, Const::Klong);
+
+    // add the particle created from cluster zero to the gamma list
+    auto* myphoton_ = particles.appendNew(myphoton);
+    gammalist->addParticle(myphoton_);
+
+    auto* iscopied = particles.appendNew(iscopiedin); // a clone of this guy is now in the gamma list
+    auto* notcopied = particles.appendNew(notcopiedin);
+
+    // get the variables
+    const Manager::Var* vnonsense = Manager::Instance().getVariable("sourceObjectIsInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable("sourceObjectIsInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(iscopied));
+    EXPECT_FLOAT_EQ(vsensible->function(iscopied), 1.0);
+    EXPECT_FLOAT_EQ(vsensible->function(notcopied), 0.0);
+
+    // now mock up some other type particles
+    Particle composite({0.5 , 0.4 , 0.5 , 0.8}, 512, Particle::c_Unflavored, Particle::c_Composite, 0);
+    Particle undefined({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
+    auto* composite_ = particles.appendNew(undefined);
+    auto* undefined_ = particles.appendNew(composite);
+    EXPECT_FLOAT_EQ(vsensible->function(composite_), -1.0);
+    EXPECT_FLOAT_EQ(vsensible->function(undefined_), -1.0);
+  }
+
   TEST_F(MetaVariableTest, mostB2BAndClosestParticles)
   {
     /* Mock up an event with a "photon" and an "electron" which are nearly back to

@@ -224,7 +224,7 @@ void BKLMSimHistogrammerModule::event()
       break;
 
     }
-    int channel = hits1D[i]->getForward() * 840 +  hits1D[i]->getSector() * 105 + hits1D[i]->isPhiReadout() * 1680 +
+    int channel = hits1D[i]->getSection() * 840 +  hits1D[i]->getSector() * 105 + hits1D[i]->isPhiReadout() * 1680 +
                   hits1D[i]->getStripAve();
     m_hSimHitPerChannelLayer->Fill(channel, hits1D[i]->getLayer(), m_weight);
     m_bgSource->Fill(scaledTag, m_weight);

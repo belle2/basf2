@@ -25,9 +25,13 @@ namespace Belle2 {
 #define TCFitter TRGCDCFitter
 #endif
 
+/// parameter to identify fit result
 #define TRGCDCFitAlreadyFitted 1;
+/// parameter to identify fit result
 #define TRGCDCFitErrorFewHits -1;
+/// parameter to identify fit result
 #define TRGCDCFitFailed       -2;
+/// parameter to identify fit result
 #define TRGCDCFitUnavailable  -3;
 
 /// A class to fit a TRGCDCTrackBase object.
@@ -54,6 +58,7 @@ namespace Belle2 {
     void fitDone(TRGCDCTrackBase&) const;
 
   private:
+    /// name
     std::string _name;
   };
 

@@ -133,7 +133,7 @@ namespace Belle2 {
       /** Singleton class */
       CDCSimControlPar& operator=(const CDCSimControlPar&);
 
-      bool m_timeWalk = false;           /*!< Switch for time walk in translator */
+      bool m_timeWalk = true;           /*!< Switch for time walk in translator */
       bool m_wireSag = true;             /*!< Switch for sense wire sag */
       bool m_modLeftRightFlag = false;   /*!< Switch for modified left/right flag */
       bool m_debug = false;                    /*!< Switch for debug printing. */

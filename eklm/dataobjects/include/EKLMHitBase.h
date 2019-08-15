@@ -28,9 +28,9 @@ namespace Belle2 {
     EKLMHitBase();
 
     /**
-     * Constructor with endcap, layer and sector initializations.
+     * Constructor with section, layer and sector initializations.
      */
-    EKLMHitBase(int Endcap, int Layer, int Sector);
+    EKLMHitBase(int Section, int Layer, int Sector);
 
     /**
      * Destructor.
@@ -38,16 +38,16 @@ namespace Belle2 {
     virtual ~EKLMHitBase();
 
     /**
-     * Get endcap number.
-     * @return Endcap number.
+     * Get section number.
+     * @return Section number.
      */
-    int getEndcap() const;
+    int getSection() const;
 
     /**
-     * Set endcap number.
-     * @param[in] Endcap Endcap number.
+     * Set section number.
+     * @param[in] Section Section number.
      */
-    void setEndcap(int Endcap);
+    void setSection(int Section);
 
     /**
      * Get layer number.
@@ -126,8 +126,8 @@ namespace Belle2 {
     /** Energy deposition. */
     float m_EDep;
 
-    /** Number of endcap. */
-    int m_Endcap;
+    /** Number of section. */
+    int m_Section;
 
     /** Number of layer. */
     int m_Layer;
@@ -138,7 +138,7 @@ namespace Belle2 {
   private:
 
     /** Class version. */
-    ClassDef(Belle2::EKLMHitBase, 2);
+    ClassDef(Belle2::EKLMHitBase, 3);
 
   };
 

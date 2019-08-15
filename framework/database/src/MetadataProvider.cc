@@ -26,11 +26,11 @@ namespace Belle2::Conditions {
       // empty status: Unspecified error already dealt with
       if (status.empty()) return false;
       // otherwise check for valid states
-      if (m_validTagStates.count(status) == 0) {
+      if (m_usableTagStates.count(status) == 0) {
         B2ERROR("The globaltag has a status which is not permitted for use. This is for your own protection"
                 << LogVar("globaltag", name)
                 << LogVar("status", status)
-                << LogVar("allowed states", boost::algorithm::join(m_validTagStates, ", ")));
+                << LogVar("allowed states", boost::algorithm::join(m_usableTagStates, ", ")));
         return false;
       }
       return true;

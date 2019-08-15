@@ -382,9 +382,6 @@ class VXDQEDataCollectionTask(Basf2PathTask):
         path.add_module("Gearbox")
         tracking.add_geometry_modules(path)
         tracking.add_hit_preparation_modules(path)  # only needed for simulated hits
-        path.add_module(
-            "SetupGenfitExtrapolation", energyLossBrems=False, noiseBrems=False
-        )
         tracking.add_vxd_track_finding_vxdtf2(
             path, components=["SVD"], use_vxdtf2_quality_estimator=False
         )
@@ -440,9 +437,6 @@ class CDCQEDataCollectionTask(Basf2PathTask):
         path.add_module("Gearbox")
         tracking.add_geometry_modules(path)
         tracking.add_hit_preparation_modules(path)  # only needed for simulated hits
-        path.add_module(
-            "SetupGenfitExtrapolation", energyLossBrems=False, noiseBrems=False
-        )
         tracking.add_cdc_track_finding(path, use_cdc_quality_estimator=True)
 
         basf2.set_module_parameters(
@@ -499,9 +493,6 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
         path.add_module("Gearbox")
         tracking.add_geometry_modules(path)
         tracking.add_hit_preparation_modules(path)  # only needed for simulated hits
-        path.add_module(
-            "SetupGenfitExtrapolation", energyLossBrems=False, noiseBrems=False
-        )
         tracking.add_cdc_track_finding(
             path,
             output_reco_tracks="CDCRecoTracks",
@@ -712,9 +703,6 @@ class HarvestingValidationBaseTask(Basf2PathTask):
         path.add_module("Gearbox")
         tracking.add_geometry_modules(path)
         tracking.add_hit_preparation_modules(path)  # only needed for simulated hits
-        path.add_module(
-            "SetupGenfitExtrapolation", energyLossBrems=False, noiseBrems=False
-        )
         # add track finding module that needs to be validated
         self.add_tracking_with_quality_estimation(path)
         # add modules for validation

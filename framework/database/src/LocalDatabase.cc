@@ -25,7 +25,7 @@
 
 namespace Belle2 {
   void LocalDatabase::createInstance(const std::string& fileName, const std::string& payloadDir, bool readOnly,
-                                     LogConfig::ELogLevel logLevel, bool invertLogging)
+                                     LogConfig::ELogLevel, bool)
   {
     if (!readOnly) {
       B2WARNING(R"warn(Local databases are now aways read only.

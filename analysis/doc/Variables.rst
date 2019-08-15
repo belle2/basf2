@@ -116,6 +116,12 @@ Kinematics
 .. b2-variables::
    :group: Kinematics
 
+Helicity 
+~~~~~~~~
+
+.. b2-variables::
+      :group: Helicity variables
+
 Tracking
 ~~~~~~~~
 

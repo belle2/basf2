@@ -57,7 +57,7 @@
   <!-- Subdedectors -->
   <xi:include href="../structure/COIL.xml"/>
   <xi:include href="../structure/STR.xml"/>
-  <xi:include href="../structure/ServiceGaps.xml"/> 
+  <xi:include href="../structure/ServiceGaps-earlyPhase3.xml"/> 
   <xi:include href="../ir/BeamPipe.xml"/>
   <xi:include href="../ir/Cryostat.xml"/>
   <xi:include href="../ir/FarBeamLine.xml"/>
@@ -104,6 +104,9 @@
   </DetectorComponent>
   <DetectorComponent name="QCSMONITOR-phase2" isDefault="false">
     <xi:include href="../beast/qcsmonitor/QCSMONITOR-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="ServiceGapsMaterial-phase2" isDefault="false">
+      <xi:include href="../structure/ServiceGaps-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
 
   <!-- VXD Tracking and MUID muon identification -->

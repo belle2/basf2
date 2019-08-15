@@ -12,6 +12,29 @@ be adapted when changing to the new release.
    :depth: 3
    :local:
 
+Changes since release-03-02
+===========================
+
+.. important changes should go here. Especially things that break backwards
+      compatibility 
+
+.. rubric:: Tidy up and rename of Helicity variables.
+
+Renamed helicity variables in the VariableManager following consistent logic.
+We added the new variable :b2:var:`cosAcoplanarityAngle`.
+
+.. warning::  ``cosHelicityAngle`` is now :b2:var:`cosHelicityAngleMomentum`, and :b2:var:`cosHelicityAngle` has a new definition (as in the PDG 2018, p. 722).
+
++--------------------------------------+---------------------------------------------+
+|                Old name              |                New name                     |
++======================================+=============================================+
+|        ``cosHelicityAngle``          |       :b2:var:`cosHelicityAngleMomentum`    |
++--------------------------------------+---------------------------------------------+
+|     ``cosHelicityAnglePi0Dalitz``    | :b2:var:`cosHelicityAngleMomentumPi0Dalitz` |
++--------------------------------------+---------------------------------------------+
+| ``cosHelicityAngleIfCMSIsTheMother`` |    :b2:var:`cosHelicityAngleBeamMomentum`   |
++--------------------------------------+---------------------------------------------+
+
 
 Changes since release-03-02
 ===========================
@@ -101,6 +124,18 @@ This also changes the behavior of `add_simulation()
 <reconstruction.add_reconstruction>`: If a list of components is provided this
 will now only change the digitization or reconstruction setup but will always
 use the full geometry from the database.
+
+.. rubric:: New DecayStringGrammar for custom MCMatching 
+
+Users can use new DecayStringGrammar to set properties of the MCMatching. Then `isSignal`, `mcErrors` and other MCTruthVariables behave according to the property. 
+
+Once DecayStringGrammar is used with `reconstructDecay`, users can use `isSignal` instead of several specific variables such as `isSignalAcceptMissingNeutrino`.
+If one doesn't use any new DecayStringGrammar, all MCTruthVariables work same as before.
+
+The grammar is useful to analyze inclusive processes with both fully-inclusive-method and sum-of-exclusive-method. 
+There are also new helper functions `genNMissingDaughter(PDG)` and `genNStepsToDaughter(i)` to obtain the detailed MC information.
+
+You can find examples of usage in :ref:`Marker_of_unspecified_particle`, :ref:`Grammar_for_custom_MCMatching`.
 
 .. Now let's add the detailed changes for the analysis package first, that's
    what user will want to see

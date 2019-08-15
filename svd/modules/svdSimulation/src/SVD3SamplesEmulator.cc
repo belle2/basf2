@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <svd/modules/svdSimulation/SVD3SamplesEmulator.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 
 using namespace Belle2;
 
@@ -69,20 +70,22 @@ void SVD3SamplesEmulatorModule::beginRun()
 
 void SVD3SamplesEmulatorModule::event()
 {
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
+  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+
   StoreArray<SVDShaperDigit> ShaperDigit3Samples(m_outputArrayName);
   StoreArray<SVDShaperDigit> ShaperDigits(m_shaperDigitInput);
 
+  int DAQMode = modeByte.getDAQMode();
+  if (DAQMode != 2) {
+    B2FATAL("The DAQMode is = " << DAQMode << " The number of samples of the input shaperdigits is NOT 6!");
+    return;
+  }
+
+  modeByte.setDAQMode(1);
+
   for (const SVDShaperDigit& shaper : ShaperDigits) {
 
-    SVDModeByte modeByte = shaper.getModeByte();
-
-    int DAQMode = modeByte.getDAQMode();
-    if (DAQMode != 2) {
-      B2FATAL("The DAQMode is = " << DAQMode << " The number of samples of the input shaperdigits is NOT 6!");
-      return;
-    }
-
-    modeByte.setDAQMode(1);
     Belle2::SVDShaperDigit::APVFloatSamples samples = shaper.getSamples();
     VxdID sensorID = shaper.getSensorID();
     bool side = shaper.isUStrip();

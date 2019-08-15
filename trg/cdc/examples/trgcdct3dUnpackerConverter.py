@@ -13,6 +13,8 @@ import ROOT.Belle2
 
 
 class is2DSkim(basf2.Module):
+    """check the 2D skim with Tracks StoreArray"""
+
     def event(self):
         Tracks = ROOT.Belle2.PyStoreArray("Tracks")
         TRGGRLT3DUnpackerStores = ROOT.Belle2.PyStoreArray("TRGCDCT3DUnpackerStores")

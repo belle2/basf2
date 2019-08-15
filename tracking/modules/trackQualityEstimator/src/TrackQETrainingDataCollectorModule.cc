@@ -62,7 +62,10 @@ void TrackQETrainingDataCollectorModule::event()
   for (const RecoTrack& recoTrack : m_recoTracks) {
     m_truth = float(recoTrack.getMatchingStatus() ==  RecoTrack::MatchingStatus::c_matched);
 
-    RecoTrack* svdcdcRecoTrack; RecoTrack* cdcRecoTrack; RecoTrack* svdRecoTrack; RecoTrack* pxdRecoTrack;
+    RecoTrack* svdcdcRecoTrack;
+    RecoTrack* cdcRecoTrack;
+    RecoTrack* svdRecoTrack;
+    RecoTrack* pxdRecoTrack;
 
     svdcdcRecoTrack = recoTrack.getRelatedTo<RecoTrack>(m_svdcdcRecoTracksStoreArrayName);
     if (svdcdcRecoTrack) {

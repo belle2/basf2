@@ -255,9 +255,6 @@ namespace Belle2 {
     /** D0 and Z0 distance parameters */
     double m_D0Z0;
 
-    /** Use energy cut or not (some issues, so I don`t use this now)*/
-    bool m_EnergyCut;
-
     /** Output file name */
     std::string m_filename;
 

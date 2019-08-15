@@ -33,7 +33,8 @@ namespace Belle2 {
       addProcessingSignalListener(&m_filter_duplicateSeed);
     }
 
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+    /// Expose the parameters of the sub findlets.
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {
       m_filter_badTracks.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("badTracks", prefix));
       m_filter_duplicateTrack.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("duplicateTrack", prefix));

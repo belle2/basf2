@@ -154,7 +154,8 @@ const LogConfig& LogSystem::getCurrentLogConfig(const char* package) const
 LogSystem::LogSystem() :
   m_logConfig(LogConfig::c_Info),
   m_moduleLogConfig(nullptr),
-  m_printErrorSummary(false)
+  m_printErrorSummary(false),
+  m_messageCounter{0}
 {
   resetLogging();
 }

@@ -110,7 +110,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         topdqm = register_module('TOPDQM')
         path.add_module(topdqm)
     # KLM
-    if (components is None or 'BKLM' or 'EKLM' in components) and (dqm_mode in ["dont_care", "filtered"]):
+    if (components is None or 'KLM' in components) and (dqm_mode in ["dont_care", "filtered"]):
         klmdqm = register_module("KLMDQM")
         path.add_module(klmdqm)
 
@@ -153,6 +153,18 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         trggdldqm_skim.param('skim', 1)
         path.add_module(trggdldqm_skim)
 
+    if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care"]) and (dqm_environment == 'hlt'):
+        # CDCTriggerNeuro
+        path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName='CDCTriggerNeuroTracks',
+                        hitCollectionName='CDCTriggerNNInputSegmentHits', axialOnly=True)
+        path.add_module('SetupGenfitExtrapolation')
+        path.add_module('CDCTriggerNeuroDQM',
+                        limitedoutput=True,
+                        showRecoTracks=True,
+                        skipWithoutHWTS=True,
+                        maxRecoZDist=1.0,
+                        maxRecoD0Dist=0.5,
+                        )
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):
         trackDqm = register_module('TrackDQM')

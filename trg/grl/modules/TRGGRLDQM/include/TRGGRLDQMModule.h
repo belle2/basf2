@@ -47,7 +47,9 @@ namespace Belle2 {
     virtual void defineHisto() override;
 
   protected:
+    //! TDirectory
     TDirectory* oldDir = nullptr;
+    //! TDirectory
     TDirectory* dirDQM = nullptr;
 
     /** Number of tracks */

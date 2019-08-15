@@ -69,6 +69,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
                                         trackFitHypotheses=trackFitHypotheses,
                                         reco_tracks=reco_tracks)
+    if prune_temporary_tracks or pruneTracks:
+        path.add_module("PruneRecoHits")
 
 
 def add_time_extraction(path, components=None):

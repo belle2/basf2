@@ -1,0 +1,2100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BKLM xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="BKLMSimulationPar.xml"/>
+  <BeamBackgroundStudy desc="Flag to use additional sensitive-detector object to record beam-bkg hits">false</BeamBackgroundStudy>
+  <Rotation desc="Rotation about z axis of the BKLM with respect to the Detector"  unit="mrad">0.0</Rotation>
+  <OffsetZ  desc="Offset of the BKLM along z with respect to the IP" unit="cm">47.0</OffsetZ>
+  <Phi desc="Starting azimuthal angle of the BKLM polygon" unit="deg">-22.5</Phi>
+  <SolenoidOuterRadius unit="cm">200.0</SolenoidOuterRadius>
+  <OuterRadius unit="cm">353.5</OuterRadius>
+  <HalfLength unit="cm">230.0</HalfLength>
+  <RibThickness unit="cm">10.0</RibThickness>
+  <CablesWidth unit="cm">150.66</CablesWidth>
+  <BraceWidth unit="cm">10.0</BraceWidth>
+  <BraceWidthChimney unit="cm">62.6</BraceWidthChimney>
+  <SupportPlateWidth unit="cm">152.5</SupportPlateWidth>
+  <SupportPlateHeight unit="cm">1.0</SupportPlateHeight>
+  <SupportPlateLength unit="cm">222.0</SupportPlateLength>
+  <SupportPlateLengthChimney unit="cm">158.6</SupportPlateLengthChimney>
+  <BracketWidth unit="cm">48.23</BracketWidth>
+  <BracketThickness unit="cm">1.2</BracketThickness>
+  <BracketLength unit="cm">15.0</BracketLength>
+  <BracketRibWidth unit="cm">12.3</BracketRibWidth>
+  <BracketRibThickness unit="cm">2.8</BracketRibThickness>
+  <BracketInnerRadius unit="cm">201.18</BracketInnerRadius>
+  <BracketInset unit="cm">32.5</BracketInset>
+  <BracketCutoutDphi unit="deg">50.076196</BracketCutoutDphi>
+  <Readout>
+    <Stations>
+      <!-- Phi stations are at same y location relative to module center in L0, L1 -->
+      <Station station="1">
+        <IsPhi>true</IsPhi>
+        <Position unit="cm">-65.5</Position>
+      </Station>
+      <Station station="2">
+        <IsPhi>true</IsPhi>
+        <Position unit="cm">-15.5</Position>
+      </Station>
+      <Station station="3">
+        <IsPhi>true</IsPhi>
+        <Position unit="cm">59.5</Position>
+      </Station>
+      <!-- Z stations are at same z location relative to module's readout-panel end in L0, L1 including chimney modules -->
+      <Station station="4">
+        <IsPhi>false</IsPhi>
+        <Position unit="cm">-15.5</Position>
+      </Station>
+      <Station station="5">
+        <IsPhi>false</IsPhi>
+        <Position unit="cm">-69.5</Position>
+      </Station>
+      <Station station="6">
+        <IsPhi>false</IsPhi>
+        <Position unit="cm">-129.5</Position>
+      </Station>
+      <Station station="7">
+        <IsPhi>false</IsPhi>
+        <Position unit="cm">-189.5</Position>
+      </Station>
+    </Stations>
+    <Container>
+      <Length unit="cm">18.05</Length>
+      <Width unit="cm">1.80</Width>
+      <Height unit="cm">1.80</Height>
+    </Container>
+    <Carrier>
+      <Length unit="cm">18.0</Length>
+      <Width unit="cm">1.778</Width>
+      <Height unit="cm">0.16</Height>
+    </Carrier>
+    <Preamplifier>
+      <Length unit="cm">0.17</Length>
+      <Width unit="cm">1.778</Width>
+      <Height unit="cm">1.62</Height>
+      <Position unit="cm">
+         -7.558, -7.004, -6.449, -5.895, -5.341, -4.786, -4.282, -3.678,
+         4.194, 4.753, 5.311, 5.869, 6.428, 6.986, 7.544
+      </Position>
+    </Preamplifier>
+    <Connectors>
+      <Length unit="cm">6.5</Length>
+      <Width unit="cm">1.72</Width>
+      <Height unit="cm">1.62</Height>
+      <Position unit="cm">0.258</Position>
+    </Connectors>
+    <MPPC>
+      <Housing>
+        <Radius unit="cm">0.375</Radius>
+        <Length unit="cm">1.15</Length>
+      </Housing>
+      <Sensor>
+        <Length unit="cm">0.13</Length>
+        <Width unit="cm">0.13</Width>
+        <Height unit="cm">0.01</Height>
+      </Sensor>
+    </MPPC>
+  </Readout>    
+  <Layers>
+    <InnerRadius unit="cm">201.9</InnerRadius>
+    <GapLength unit="cm">222.0</GapLength>
+    <GapNominalHeight unit="cm">4.4</GapNominalHeight>
+    <IronNominalHeight unit="cm">4.7</IronNominalHeight>
+    <IronActualHeight unit="cm">4.6689</IronActualHeight>
+    <GapIronWidth unit="cm">3.0</GapIronWidth>
+    <NZStrips>48</NZStrips>
+    <NZStripsChimney>34</NZStripsChimney>
+    <NZScintillators>54</NZScintillators>
+    <NZScintillatorsChimney>38</NZScintillatorsChimney>
+    <Layer layer="1">
+      <GapNominalHeight unit="cm">4.1</GapNominalHeight>
+      <GapIronWidth unit="cm">7.94</GapIronWidth>
+      <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">0</HasRPCs>
+      <PhiStrips>
+        <NStrips>36</NStrips>
+        <Width unit="cm">4.45</Width>
+      </PhiStrips>
+      <ZStrips>
+        <Width unit="cm">4.52</Width>
+      </ZStrips>
+      <ScintEnvelopeOffsetSign desc="Shift scint envelope to -y for MPPCs at +y (i.e., on left)">-1</ScintEnvelopeOffsetSign>
+      <PhiScintillators>
+        <NScints>37</NScints>
+      </PhiScintillators>
+    </Layer>
+    <Layer layer="2">
+      <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">0</HasRPCs>
+      <PhiStrips>
+        <NStrips>36</NStrips>
+        <Width unit="cm">4.69</Width>
+      </PhiStrips>
+      <ZStrips>
+        <Width unit="cm">4.52</Width>
+      </ZStrips>
+      <ScintEnvelopeOffsetSign desc="Shift scint envelope to +y for MPPCs at -y (i.e., on right)">+1</ScintEnvelopeOffsetSign>
+      <PhiScintillators>
+        <NScints>42</NScints>
+      </PhiScintillators>
+      <ZScintillators>
+        <Scint scint="7">
+          <DLength unit="cm">-2.0</DLength>
+        </Scint>
+        <Scint scint="8">
+          <DLength unit="cm">-2.0</DLength>
+        </Scint>
+        <Scint scint="9">
+          <DLength unit="cm">-2.0</DLength>
+        </Scint>
+        <Scint scint="10">
+          <DLength unit="cm">-2.0</DLength>
+        </Scint>
+        <Scint scint="22">
+          <DLength unit="cm">-2.0</DLength>
+        </Scint>
+        <Scint scint="23">
+          <DLength unit="cm">-2.0</DLength>
+        </Scint>
+        <Scint scint="24">
+          <DLength unit="cm">-2.0</DLength>
+        </Scint>
+        <Scint scint="25">
+          <DLength unit="cm">-2.0</DLength>
+        </Scint>
+        <Scint scint="37">
+          <DLength unit="cm">-2.0</DLength>
+        </Scint>
+        <Scint scint="38">
+          <DLength unit="cm">-2.0</DLength>
+        </Scint>
+        <Scint scint="39">
+          <DLength unit="cm">-2.0</DLength>
+        </Scint>
+        <Scint scint="40">
+          <DLength unit="cm">-2.0</DLength>
+        </Scint>
+        <Scint scint="51">
+          <DLength unit="cm">-2.0</DLength>
+        </Scint>
+        <Scint scint="52">
+          <DLength unit="cm">-2.0</DLength>
+        </Scint>
+        <Scint scint="53">
+          <DLength unit="cm">-2.0</DLength>
+        </Scint>
+      </ZScintillators>
+    </Layer>
+    <Layer layer="3">
+      <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">1</HasRPCs>
+      <PhiStrips>
+        <NStrips>36</NStrips>
+        <Width unit="cm">4.90</Width>
+      </PhiStrips>
+      <ZStrips>
+        <Width unit="cm">4.52</Width>
+      </ZStrips>
+    </Layer>
+    <Layer layer="4">
+      <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">1</HasRPCs>
+      <PhiStrips>
+        <NStrips>36</NStrips>
+        <Width unit="cm">5.11</Width>
+      </PhiStrips>
+      <ZStrips>
+        <Width unit="cm">4.52</Width>
+      </ZStrips>
+    </Layer>
+    <Layer layer="5">
+      <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">1</HasRPCs>
+      <PhiStrips>
+        <NStrips>36</NStrips>
+        <Width unit="cm">5.32</Width>
+      </PhiStrips>
+      <ZStrips>
+        <Width unit="cm">4.52</Width>
+      </ZStrips>
+    </Layer>
+    <Layer layer="6">
+      <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">1</HasRPCs>
+      <PhiStrips>
+        <NStrips>36</NStrips>
+        <Width unit="cm">5.53</Width>
+      </PhiStrips>
+      <ZStrips>
+        <Width unit="cm">4.52</Width>
+      </ZStrips>
+    </Layer>
+    <Layer layer="7">
+      <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">1</HasRPCs>
+      <PhiStrips>
+        <NStrips>48</NStrips>
+        <Width unit="cm">4.30</Width>
+      </PhiStrips>
+      <ZStrips>
+        <Width unit="cm">4.52</Width>
+      </ZStrips>
+    </Layer>
+    <Layer layer="8">
+      <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">1</HasRPCs>
+      <PhiStrips>
+        <NStrips>48</NStrips>
+        <Width unit="cm">4.46</Width>
+      </PhiStrips>
+      <ZStrips>
+        <Width unit="cm">4.52</Width>
+      </ZStrips>
+    </Layer>
+    <Layer layer="9">
+      <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">1</HasRPCs>
+      <PhiStrips>
+        <NStrips>48</NStrips>
+        <Width unit="cm">4.62</Width>
+      </PhiStrips>
+      <ZStrips>
+        <Width unit="cm">4.52</Width>
+      </ZStrips>
+    </Layer>
+    <Layer layer="10">
+      <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">1</HasRPCs>
+      <PhiStrips>
+        <NStrips>48</NStrips>
+        <Width unit="cm">4.77</Width>
+      </PhiStrips>
+      <ZStrips>
+        <Width unit="cm">4.52</Width>
+      </ZStrips>
+    </Layer>
+    <Layer layer="11">
+      <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">1</HasRPCs>
+      <PhiStrips>
+        <NStrips>48</NStrips>
+        <Width unit="cm">4.93</Width>
+      </PhiStrips>
+      <ZStrips>
+        <Width unit="cm">4.52</Width>
+      </ZStrips>
+    </Layer>
+    <Layer layer="12">
+      <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">1</HasRPCs>
+      <PhiStrips>
+        <NStrips>48</NStrips>
+        <Width unit="cm">5.09</Width>
+      </PhiStrips>
+      <ZStrips>
+        <Width unit="cm">4.52</Width>
+      </ZStrips>
+    </Layer>
+    <Layer layer="13">
+      <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">1</HasRPCs>
+      <PhiStrips>
+        <NStrips>48</NStrips>
+        <Width unit="cm">5.25</Width>
+      </PhiStrips>
+      <ZStrips>
+        <Width unit="cm">4.52</Width>
+      </ZStrips>
+    </Layer>
+    <Layer layer="14">
+      <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">1</HasRPCs>
+      <PhiStrips>
+        <NStrips>48</NStrips>
+        <Width unit="cm">5.40</Width>
+      </PhiStrips>
+      <ZStrips>
+        <Width unit="cm">4.52</Width>
+      </ZStrips>
+    </Layer>
+    <Layer layer="15">
+      <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">1</HasRPCs>
+      <PhiStrips>
+        <NStrips>48</NStrips>
+        <Width unit="cm">5.56</Width>
+      </PhiStrips>
+      <ZStrips>
+        <Width unit="cm">4.52</Width>
+      </ZStrips>
+    </Layer>
+  </Layers>
+  <Sectors>
+    <Forward>
+      <Sector sector="1">
+        <Phi unit="deg">0</Phi>
+        <Layer layer="1">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+      <Sector sector="2">
+        <Phi unit="deg">45</Phi>
+        <Layer layer="1">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+      <Sector sector="3">
+        <Phi unit="deg">90</Phi>
+        <Layer layer="1">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+      <Sector sector="4">
+        <Phi unit="deg">135</Phi>
+        <Layer layer="1">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+      <Sector sector="5">
+        <Phi unit="deg">180</Phi>
+        <Layer layer="1">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+      <Sector sector="6">
+        <Phi unit="deg">225</Phi>
+        <Layer layer="1">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+      <Sector sector="7">
+        <Phi unit="deg">270</Phi>
+        <Layer layer="1">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+      <Sector sector="8">
+        <Phi unit="deg">315</Phi>
+        <Layer layer="1">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+    </Forward>
+    <Backward>
+      <Sector sector="1">
+        <Phi unit="deg">0</Phi>
+        <Layer layer="1">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+      <Sector sector="2">
+        <Phi unit="deg">45</Phi>
+        <Layer layer="1">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+      <Sector sector="3">
+        <Phi unit="deg">90</Phi>
+        <Layer layer="1">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+      <Sector sector="4">
+        <Phi unit="deg">135</Phi>
+        <Layer layer="1">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+      <Sector sector="5">
+        <Phi unit="deg">180</Phi>
+        <Layer layer="1">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+      <Sector sector="6">
+        <Phi unit="deg">225</Phi>
+        <Layer layer="1">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+      <Sector sector="7">
+        <Phi unit="deg">270</Phi>
+        <Layer layer="1">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+      <Sector sector="8">
+        <Phi unit="deg">315</Phi>
+        <Layer layer="1">
+          <Flip>true</Flip>
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="2">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="3">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="4">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="5">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="6">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="7">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="8">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="9">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="10">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="11">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="12">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="13">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="14">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+        <Layer layer="15">
+          <ReconstructionShift>
+             <X unit="cm">0.0</X>
+             <Y unit="cm">0.0</Y>
+             <Z unit="cm">0.0</Z>
+          </ReconstructionShift>
+        </Layer>
+      </Sector>
+    </Backward>
+  </Sectors>
+  <Module>
+    <CoverHeight unit="cm">0.08</CoverHeight>
+    <CopperHeight unit="cm">0.0035</CopperHeight>
+    <FoamHeight unit="cm">0.782375</FoamHeight>
+    <MylarHeight unit="cm">0.075</MylarHeight>
+    <GlassHeight unit="cm">0.238125</GlassHeight>
+    <GasHeight unit="cm">0.2</GasHeight>
+    <Length unit="cm">222.0</Length>
+    <LengthChimney unit="cm">159.0</LengthChimney>
+    <FrameWidth unit="cm">1.25</FrameWidth>
+    <FrameThickness unit="cm">0.3</FrameThickness>
+    <SpacerWidth unit="cm">0.6</SpacerWidth>
+    <PolystyreneInnerHeight unit="cm">0.635</PolystyreneInnerHeight>
+    <PolystyreneOuterHeight unit="cm">0.47625</PolystyreneOuterHeight>
+    <Scintillator>
+      <Width unit="cm">4.00</Width>
+      <Height unit="cm">1.00</Height>
+      <BoreRadius unit="cm">0.125</BoreRadius>
+      <FiberRadius unit="cm">0.06</FiberRadius>
+      <TiO2ThicknessTop unit="cm">0.030</TiO2ThicknessTop>
+      <TiO2ThicknessSide unit="cm">0.015</TiO2ThicknessSide>
+    </Scintillator>
+  </Module>
+  <Chimney>
+    <Length unit="cm">55.0</Length>
+    <Width unit="cm">50.0</Width>
+    <CoverThickness unit="cm">12.0</CoverThickness>
+    <HousingInnerRadius unit="cm">15.475</HousingInnerRadius>
+    <HousingOuterRadius unit="cm">15.925</HousingOuterRadius>
+    <ShieldInnerRadius unit="cm">10.8</ShieldInnerRadius>
+    <ShieldOuterRadius unit="cm">11.0</ShieldOuterRadius>
+    <PipeInnerRadius unit="cm">0.0</PipeInnerRadius>
+    <PipeOuterRadius unit="cm">4.0</PipeOuterRadius>
+  </Chimney>
+</BKLM>

@@ -30,6 +30,7 @@ namespace Belle2 {
   class TRGCDCSegmentHit;
   class TRGCDCTrackSegmentFinder;
 
+  /// A class of TRGCDC Event Time Finder
   class TRGCDCEventTimeFinder
     : public TRGBoard,
       public std::vector <const TRGCDCTrackSegmentFinder*> {

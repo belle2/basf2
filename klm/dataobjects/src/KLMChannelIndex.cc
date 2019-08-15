@@ -9,8 +9,8 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <bklm/dataobjects/BKLMElementNumbers.h>
-#include <eklm/dataobjects/EKLMElementNumbers.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
 
 using namespace Belle2;
@@ -204,7 +204,7 @@ void KLMChannelIndex::increment(enum IndexLevel indexLevel)
         break;
       case c_IndexLevelSection:
         m_Section++;
-        if (m_Section > BKLMElementNumbers::getMaximalForwardNumber()) {
+        if (m_Section > BKLMElementNumbers::getMaximalSectionNumber()) {
           m_Section = 0;
           increment(c_IndexLevelSubdetector);
         }
@@ -245,7 +245,7 @@ void KLMChannelIndex::increment(enum IndexLevel indexLevel)
         break;
       case c_IndexLevelSection:
         m_Section++;
-        if (m_Section > EKLMElementNumbers::getMaximalEndcapNumber()) {
+        if (m_Section > EKLMElementNumbers::getMaximalSectionNumber()) {
           m_Section = 1;
           increment(c_IndexLevelSubdetector);
         }

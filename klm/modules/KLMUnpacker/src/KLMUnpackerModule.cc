@@ -12,8 +12,7 @@
 #include <cstdint>
 
 /* Belle2 headers. */
-#include <bklm/dataobjects/BKLMElementNumbers.h>
-#include <bklm/dbobjects/BKLMElectronicMapping.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/modules/KLMUnpacker/KLMUnpackerModule.h>
 #include <klm/rawdata/RawData.h>
 #include <framework/datastore/DataStore.h>
@@ -72,7 +71,6 @@ void KLMUnpackerModule::initialize()
   m_DigitEventInfos.registerRelationTo(m_bklmDigits);
   m_DigitEventInfos.registerRelationTo(m_bklmDigitOutOfRanges);
 
-  loadMapFromDB();
   /* EKLM. */
   m_eklmDigits.registerInDataStore(m_outputEKLMDigitsName);
   m_DigitEventInfos.registerInDataStore();
@@ -81,13 +79,12 @@ void KLMUnpackerModule::initialize()
 
 void KLMUnpackerModule::beginRun()
 {
-  if (!m_ElectronicsMap.isValid())
+  if (!m_eklmElectronicsMap.isValid())
     B2FATAL("No EKLM electronics map.");
   if (!m_TimeConversion.isValid())
     B2FATAL("EKLM time conversion parameters are not available.");
   if (!m_Channels.isValid())
     B2FATAL("EKLM channel data are not available.");
-  loadMapFromDB();
   if (m_loadThresholdFromDB)
     m_scintThreshold = m_ADCParams->getADCThreshold();
   m_triggerCTimeOfPreviousEvent = 0;
@@ -97,7 +94,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
   const int* rawData, EKLMDataConcentratorLane* lane,
   KLMDigitEventInfo* klmDigitEventInfo)
 {
-  int endcap, layer, sector, strip = 0;
+  int section, layer, sector, strip = 0;
   KLM::RawData raw;
   KLM::unpackRawData(rawData, &raw, nullptr, nullptr, false);
   if ((raw.triggerBits & 0x10) != 0)
@@ -130,7 +127,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
    * always correct.
    */
   lane->setLane(raw.lane);
-  const int* sectorGlobal = m_ElectronicsMap->getSectorByLane(lane);
+  const int* sectorGlobal = m_eklmElectronicsMap->getSectorByLane(lane);
   if (sectorGlobal == nullptr) {
     if (!m_IgnoreWrongHits) {
       B2ERROR("Lane does not exist in the EKLM electronics map."
@@ -140,13 +137,13 @@ void KLMUnpackerModule::unpackEKLMDigit(
     }
     if (!m_WriteWrongHits)
       return;
-    endcap = 0;
+    section = 0;
     layer = 0;
     sector = 0;
     correctHit = false;
   } else {
     m_ElementNumbers->sectorNumberToElementNumbers(
-      *sectorGlobal, &endcap, &layer, &sector);
+      *sectorGlobal, &section, &layer, &sector);
   }
   EKLMDigit* eklmDigit = m_eklmDigits.appendNew();
   eklmDigit->addRelationTo(klmDigitEventInfo);
@@ -154,7 +151,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
   eklmDigit->setTDC(raw.tdc);
   eklmDigit->setTime(
     m_TimeConversion->getScintillatorTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
-  eklmDigit->setEndcap(endcap);
+  eklmDigit->setSection(section);
   eklmDigit->setLayer(layer);
   eklmDigit->setSector(sector);
   eklmDigit->setPlane(plane);
@@ -162,7 +159,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
   eklmDigit->setCharge(raw.charge);
   if (correctHit) {
     int stripGlobal = m_ElementNumbers->stripNumber(
-                        endcap, layer, sector, plane, strip);
+                        section, layer, sector, plane, strip);
     const EKLMChannelData* channelData =
       m_Channels->getChannelData(stripGlobal);
     if (channelData == nullptr)
@@ -181,12 +178,12 @@ void KLMUnpackerModule::unpackBKLMDigit(
   KLM::RawData raw;
   KLMDigitRaw* klmDigitRaw;
   KLM::unpackRawData(rawData, &raw, &m_klmDigitRaws, &klmDigitRaw, true);
-  int electId = electCooToInt(copper - BKLM_ID, hslb,
-                              raw.lane, raw.axis, raw.channel);
-  int moduleId = 0;
-  std::map<int, int>::iterator it;
-  it = m_electIdToModuleId.find(electId);
-  if (it == m_electIdToModuleId.end()) {
+  const uint16_t* detectorChannel;
+  BKLMElectronicsChannel electronicsChannel(
+    copper, hslb + 1, raw.lane, raw.axis, raw.channel);
+  detectorChannel =
+    m_bklmElectronicsMap->getDetectorChannel(&electronicsChannel);
+  if (detectorChannel == nullptr) {
     B2DEBUG(20, "KLMUnpackerModule:: could not find in mapping"
             << LogVar("Copper", copper)
             << LogVar("Finesse", hslb + 1)
@@ -194,41 +191,38 @@ void KLMUnpackerModule::unpackBKLMDigit(
             << LogVar("Axis", raw.axis));
     if (!m_WriteWrongHits)
       return;
-    /* Try to find element with the same module ID. */
-    for (it = m_electIdToModuleId.begin(); it != m_electIdToModuleId.end();
-         ++it) {
-      /* Copper, finesse, and lane are 11 least-significant bits. */
-      if ((it->first & 0x3FF) == electId) {
-        // increase by 1 the event-counter of outOfRange-flagged hits
-        klmDigitEventInfo->increaseOutOfRangeHits();
+    /* Find channel from the same module. */
+    electronicsChannel.setAxis(0);
+    /* Phi-plane channels may start from 3 or 5. */
+    electronicsChannel.setChannel(5);
+    detectorChannel = m_bklmElectronicsMap->getDetectorChannel(&electronicsChannel);
+    if (detectorChannel != nullptr) {
+      // increase by 1 the event-counter of outOfRange-flagged hits
+      klmDigitEventInfo->increaseOutOfRangeHits();
 
-        // store the digit in the appropriate dataobject
-        BKLMDigitOutOfRange* bklmDigitOutOfRange =
-          m_bklmDigitOutOfRanges.appendNew(
-            moduleId, raw.ctime, raw.tdc, raw.charge);
-        bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
-        klmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
+      // store the digit in the appropriate dataobject
+      int moduleId = *detectorChannel;
+      BKLMDigitOutOfRange* bklmDigitOutOfRange =
+        m_bklmDigitOutOfRanges.appendNew(
+          moduleId, raw.ctime, raw.tdc, raw.charge);
+      bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
+      klmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
 
-        std::string message = "channel number is out of range";
-        m_rejected[message] += 1;
-        m_rejectedCount++;
-        B2DEBUG(21, "KLMUnpackerModule:: raw channel number is out of range"
-                << LogVar("Channel", raw.channel));
+      std::string message = "channel number is out of range";
+      m_rejected[message] += 1;
+      m_rejectedCount++;
+      B2DEBUG(21, "KLMUnpackerModule:: raw channel number is out of range"
+              << LogVar("Channel", raw.channel));
 
-        break;
-      }
     }
     return;
   }
-  moduleId = it->second;
 
   // moduleId counts are zero based
+  int moduleId = *detectorChannel;
   int layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
   if ((layer < 2) && ((raw.triggerBits & 0x10) != 0))
     return;
-  // int sector = (moduleId & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT;
-  // int forward = (moduleId & BKLM_END_MASK) >> BKLM_END_BIT;
-  // int plane = (moduleId & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;
   int channel = (moduleId & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT;
 
   if (layer > 14) {
@@ -346,59 +340,4 @@ void KLMUnpackerModule::terminate()
   for (const auto& message : m_rejected) {
     B2DEBUG(20, "KLMUnpackerModule:: " << message.first << " (occured " << message.second << " times)");
   }
-}
-
-void KLMUnpackerModule::loadMapFromDB()
-{
-  B2DEBUG(29, "KLMUnpackerModule:: reading from database...");
-
-  DBArray<BKLMElectronicMapping> elements;
-  for (const auto& element : elements) {
-    B2DEBUG(29, "KLMUnpackerModule:: version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " <<
-            element.getCopperId() <<
-            ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
-            ", forward = " << element.getForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
-            " plane(z/phi) = " << element.getPlane());
-
-    int copperId = element.getCopperId();
-    int slotId = element.getSlotId();
-    int laneId = element.getLaneId();
-    int axisId = element.getAxisId();
-    int channelId = element.getChannelId();
-    int sector = element.getSector();
-    int forward = element.getForward();
-    int layer = element.getLayer();
-    int plane =  element.getPlane();
-    int stripId = element.getStripId();
-    int elecId = electCooToInt(copperId - BKLM_ID, slotId - 1 , laneId, axisId, channelId);
-    int moduleId = 0;
-
-    moduleId = BKLMElementNumbers::channelNumber(forward, sector, layer,
-                                                 plane, stripId);
-    m_electIdToModuleId[elecId] = moduleId;
-
-    B2DEBUG(29, "KLMUnpackerModule:: electId: " << elecId << " moduleId: " << moduleId);
-  }
-}
-
-int KLMUnpackerModule::electCooToInt(int copper, int finesse, int lane, int axis, int channel)
-{
-  // there are at most 16 coppers --> 4 bit
-  // 4 finesse --> 2 bit
-  // < 20 lanes --> 5 bit
-  // axis --> 1 bit
-  // channel --> 6 bit
-  int ret = 0;
-  copper = copper & 0xF;
-  ret |= copper;
-  finesse = finesse & 3;
-  ret |= (finesse << 4);
-  lane = lane & 0x1F;
-  ret |= (lane << 6);
-  axis = axis & 0x1;
-  ret |= (axis << 11);
-  channel = channel & 0x3F;
-  ret |= (channel << 12);
-
-  return ret;
 }

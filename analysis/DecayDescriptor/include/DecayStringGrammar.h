@@ -38,21 +38,23 @@ namespace Belle2 {
     // Reserved characters for steering - cppcheck doesn't understand the
     // boost::spirit syntax so we suppress warnings
     // cppcheck-suppress knownConditionTrueFalse
-    reserved = space || '^' || '[' || ']' || '>' || ':' || '.';
+    reserved = space || '^' || '[' || ']' || '>' || ':' || '.' || '?' || '!' || '@';
 
     // particle composed of selector, particle name, and user label: "^D_s+:label"
-    particle %= -selector >> lexeme[+(char_ - reserved)] >> -label;
+    particle %= *selector >> lexeme[+(char_ - reserved)] >> -label;
     selector = string("^") | string("@");
     label %= lit(":") >> lexeme[+(char_ - reserved)];
 
     // Arrow types
-    arrow %= string("->") | string("-->") | string("=>") | string("==>");
+    arrow %= string("->") | string("-->") | string("=>") | string("==>") | string("=direct=>") | string("=norad=>") |
+             string("=exact=>");
 
-    // Inclusive decay
-    inclusive = string("...");
+    // Keyword for custom MC Matching
+    keyword = string("...") | string("?nu") | string("!nu") | string("?gamma") | string("!gamma");
+    keywordlist = *keyword;
 
     // Basic decay: mother -> daughterlist
-    decay %= particle >> arrow >> daughterlist >> -inclusive;
+    decay %= particle >> arrow >> daughterlist >> -keywordlist;
     daughterdecay %= lit("[") >> decay >> lit("]");
     daughter %= daughterdecay | particle;
     daughterlist %= +daughter;
@@ -71,8 +73,10 @@ namespace Belle2 {
   boost::spirit::qi::rule<Iterator, std::string(), boost::spirit::unicode::space_type> label;
   /** Allowed arrow types. */
   boost::spirit::qi::rule<Iterator, std::string(), boost::spirit::unicode::space_type> arrow;
-  /** Syntax element for inclusive decays: three dots. */
-  boost::spirit::qi::rule<Iterator, std::string(), boost::spirit::unicode::space_type> inclusive;
+  /** Syntax keyword */
+  boost::spirit::qi::rule<Iterator, std::string(), boost::spirit::unicode::space_type> keyword;
+  /** The list of the keywords */
+  boost::spirit::qi::rule<Iterator, std::vector<std::string>(), boost::spirit::unicode::space_type> keywordlist;
   /** Syntax of a decay: 'mother arrow daughters ...'. */
   boost::spirit::qi::rule<Iterator, DecayStringDecay(), boost::spirit::unicode::space_type> decay;
   /** Syntax of decaying daughter particle. Daughter decays have to be in brackets '[ ]'.*/

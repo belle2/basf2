@@ -355,6 +355,27 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr varForMCGen(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+
+          if (particle -> getMCParticle())
+          {
+            if (particle -> getMCParticle() -> getStatus(MCParticle::c_PrimaryParticle)
+            && (! particle -> getMCParticle() -> getStatus(MCParticle::c_IsVirtual))
+            && (! particle -> getMCParticle() -> getStatus(MCParticle::c_Initial))) {
+              return var -> function(particle);
+            } else return std::numeric_limits<float>::quiet_NaN();
+          } else return std::numeric_limits<float>::quiet_NaN();
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function varForMCGen");
+      }
+    }
+
     Manager::FunctionPtr nParticlesInList(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -2201,6 +2222,10 @@ Specifying the lab frame is useful in some corner-cases. For example:
     REGISTER_VARIABLE("varFor(pdgCode, variable)", varFor,
                       "Returns the value of the variable for the given particle if its abs(pdgCode) agrees with the given one.\n"
                       "E.g. varFor(11, p) returns the momentum if the particle is an electron or a positron.");
+    REGISTER_VARIABLE("varForMCGen(variable)", varForMCGen,
+                      "Returns the value of the variable for the given particle if the MC particle related to it is primary, not virtual, and not initial.\n"
+                      "If no MC particle is related to the given particle, or the MC particle is not primary, virtual, or initial, NaN will be returned.\n"
+                      "E.g. varForMCGen(PDG) returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.");
     REGISTER_VARIABLE("nParticlesInList(particleListName)", nParticlesInList,
                       "Returns number of particles in the given particle List.");
     REGISTER_VARIABLE("isInList(particleListName)", isInList,

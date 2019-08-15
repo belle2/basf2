@@ -39,9 +39,7 @@ Convenience
 There are several extra variables defined *for your convenience*, however all information is contained in the first two.
 
 .. b2-variables::
-        :variables: isSignal,isExtendedSignal,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,
-                    isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,
-                    isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
+        :variables: isSignal,isSignalWithoutProperty,isExtendedSignal,isSignalAcceptWrongFSPs,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
         :noindex:
 
 ~~~~~~~~~~~~~~~

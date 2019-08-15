@@ -235,6 +235,10 @@ namespace Belle2 {
      */
     bool write(std::ostream& output, const std::string& physicalFileName) const;
 
+    /** Get a json representation.
+     */
+    std::string getJsonStr() const;
+
   private:
 
     std::string m_lfn; /**< Logical file name.  */

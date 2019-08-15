@@ -17,7 +17,7 @@ gearbox = register_module('Gearbox')
 gearbox.initialize()
 
 
-FAMParameters = FileSystem.findFile('trg/ecl/data/FAM_Parameters.dat')
+FAMParameters = FileSystem.findFile('../data/FAM_Parameters.dat')
 SignalPDF = FileSystem.findFile('trg/ecl/data/SignalPDF.dat')
 NoiseMatrix = FileSystem.findFile('trg/ecl/data/NoiseMatrix.dat')
 

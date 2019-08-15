@@ -112,6 +112,9 @@ namespace Belle2 {
       /// Release the object from internal unique_ptr to be managed elsewhere
       /// Useful to pass it to be stored in DB (and thus later deleted by framework)
       virtual TObject* releaseObject() = 0;
+
+      virtual GlobalParamSetAccess* clone() = 0;
+
       /// Load the content (by copying obj retrieved from DB) for a given exp/run/event
       virtual void loadFromDB(EventMetaData emd) = 0;
       /// Load using DBObjPtr<DBObjType> which uses current EventMetaData to load valid constants
@@ -238,6 +241,11 @@ namespace Belle2 {
       {
         //ensureConstructed();
         return m_object.release();
+      }
+
+      virtual GlobalParamSetAccess* clone() override final
+      {
+        return new GlobalParamSet<DBObjType>(*this);
       }
 
       /// Load content of the object using DBObjPtr<DBObjType>

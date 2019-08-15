@@ -154,7 +154,9 @@ namespace Belle2 {
 
   private:
     /// limits for helix parameters
-    static CLHEP::HepVector ms_amin, ms_amax;
+    static CLHEP::HepVector ms_amin;
+    /// limits for helix parameters
+    static CLHEP::HepVector ms_amax;
     /// range in checked or not
     static bool ms_check_range;
     /// print debug info or not

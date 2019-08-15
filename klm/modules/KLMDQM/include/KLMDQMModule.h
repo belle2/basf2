@@ -14,11 +14,11 @@
 #include <TH1F.h>
 
 /* Belle2 headers. */
-#include <bklm/dataobjects/BKLMDigit.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <bklm/dataobjects/BKLMHit1d.h>
-#include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/dataobjects/ElementNumbersSingleton.h>
+#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/dataobjects/BKLMHit1d.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>

@@ -11,7 +11,7 @@ basf2.set_log_level(basf2.LogLevel.INFO)
 main = basf2.create_path()
 
 # Modules
-input = basf2.register_module('DQMHistAnalysisInputRootFile')
+input = basf2.register_module('DQMHistAnalysisInputRootFile', Experiment=0, RunNr=0)
 input.param('SelectFolders', ['KLM', 'BKLM', 'EKLM'])
 input.param('InputRootFile', 'KLMDQM.root')
 main.add_module(input)

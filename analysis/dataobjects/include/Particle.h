@@ -98,11 +98,17 @@ namespace Belle2 {
     enum {c_Px, c_Py, c_Pz, c_E, c_X, c_Y, c_Z};
 
     /**
-     * Flags that describe the particle property
+     * Flags that describe the particle property,
+     * which are used in the MC matching.
      */
     enum PropertyFlags {
       c_Ordinary = 0, /** Ordinary particles */
       c_IsUnspecified = 1, /**< Is the particle unspecified by marking @ ? */
+      c_isIgnoreRadiatedPhotons = 2, /**< Is the particle MC matched with the ignore radiated photon flag set?*/
+      c_isIgnoreIntermediate = 4, /**< Is the particle MC matched with the ignore intermediate resonances flag set?*/
+      c_isIgnoreMassive = 8, /**< Is the particle MC matched with the ignore missing massive particle flag set?*/
+      c_isIgnoreNeutrino = 16, /**< Is the particle MC matched with the ignore missing neutrino flag set?*/
+      c_isIgnoreGamma = 32, /**< Is the particle MC matched with the ignore missing gamma flag set?*/
     };
 
     /**

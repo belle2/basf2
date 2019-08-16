@@ -99,7 +99,7 @@ namespace Belle2 {
     if (_simulationMode != 3) {
       m_TRGGRLInfo.isRequired("TRGGRLObjects");
     }
-//  m_TRGSummary.registerInDataStore();
+    m_TRGSummary.registerInDataStore();
   }
 
   void
@@ -145,7 +145,7 @@ namespace Belle2 {
     _gdl->update(true);
     _gdl->simulate();
 
-    StoreObjPtr<TRGSummary> m_TRGSummary; /**< output for TRGSummary */
+    //StoreObjPtr<TRGSummary> m_TRGSummary; /**< output for TRGSummary */
     int result_summary = 0;
     if (m_TRGSummary) {
       result_summary = m_TRGSummary->getTRGSummary(0);

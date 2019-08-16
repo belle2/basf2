@@ -61,7 +61,7 @@ namespace Belle2 {
   private: // Parameters
 
     StoreObjPtr<TRGGRLInfo> m_TRGGRLInfo; /**< required input for TRGGRLInfo */
-//  StoreObjPtr<TRGSummary> m_TRGSummary; /**< output for TRGSummary */
+    StoreObjPtr<TRGSummary> m_TRGSummary; /**< output for TRGSummary */
 
     /// Debug level.
     int _debugLevel;

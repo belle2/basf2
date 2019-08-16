@@ -62,6 +62,10 @@ namespace Belle2 {
        */
       double getTOFExpert(const Particle* particle, const std::vector<double>& vars);
 
+      /**
+       * returns the average time of the first 5 (good) digits
+       */
+      double getAverageTimeOfFirst5(const Particle* particle);
 
       /**
        * counts the number of photons in the TOP in a given time frame

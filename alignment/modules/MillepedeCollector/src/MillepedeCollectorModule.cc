@@ -23,6 +23,7 @@
 #include <analysis/utility/ReferenceFrame.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/dbobjects/BeamParameters.h>
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/Track.h>

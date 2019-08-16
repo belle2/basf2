@@ -35,14 +35,13 @@ namespace Belle2 {
             qDivisions>;
 
     public:
+      using DecisionAlgorithm = AHitDecisionAlgorithm;
+
       /// Constructor using the given maximal level setting the maximal values.
       QuadraticLegendre()
         : Super(2, 2, 1, 1)
       {
       }
-
-      /// End view: use the quadratic expression for z(s)
-      static const bool m_lookingForQuadraticTracks = true;
     };
   }
 }

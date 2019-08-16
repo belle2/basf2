@@ -8,19 +8,26 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <boost/python.hpp>
+
 #include <framework/modules/rootio/RootOutputModule.h>
 
 #include <framework/io/RootIOUtilities.h>
 #include <framework/core/FileCatalog.h>
+#include <framework/core/MetadataService.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/database/Database.h>
 // needed for complex module parameter
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/utilities/EnvironmentVariables.h>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <TClonesArray.h>
+
+#include <nlohmann/json.hpp>
 
 #include <ctime>
 #include <memory>
@@ -40,17 +47,12 @@ REG_MODULE(RootOutput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-RootOutputModule::RootOutputModule() : Module(), m_file(nullptr), m_experimentLow(1), m_runLow(0), m_eventLow(0),
-  m_experimentHigh(0), m_runHigh(0), m_eventHigh(0)
+RootOutputModule::RootOutputModule() : Module(), m_file(nullptr), m_tree{0}, m_experimentLow(1), m_runLow(0),
+  m_eventLow(0), m_experimentHigh(0), m_runHigh(0), m_eventHigh(0)
 {
   //Set module properties
   setDescription("Writes DataStore objects into a .root file. Data is stored in a TTree 'tree' for event-dependent and in 'persistent' for peristent data. You can use RootInput to read the files back into basf2.");
   setPropertyFlags(c_Output);
-
-  //Initialization of some member variables
-  for (auto& tree : m_tree) {
-    tree = nullptr;
-  }
 
   //Parameter definition
   addParam("outputFileName"  , m_outputFileName, "Name of the output file. Can be overridden using the -o argument to basf2.",
@@ -157,7 +159,6 @@ void RootOutputModule::initialize()
 
   // Now check if the file has a protocol like file:// or http:// in front
   std::regex protocol("^([A-Za-z]*)://");
-  // cppcheck-suppress syntaxError ; of course cppcheck doesn't know if with initializer yet
   if(std::smatch m; std::regex_search(m_outputFileName, m, protocol)) {
     if(m[1] == "file") {
       // file protocol: treat as local and just remove it from the filename
@@ -394,7 +395,7 @@ void RootOutputModule::fillFileMetaData()
     mcEvents = 0;
   }
   m_fileMetaData->setMcEvents(mcEvents);
-  m_fileMetaData->setDatabaseGlobalTag(Database::getGlobalTag());
+  m_fileMetaData->setDatabaseGlobalTag(Database::Instance().getGlobalTags());
   for (const auto& item : m_additionalDataDescription) {
     m_fileMetaData->setDataDescription(item.first, item.second);
   }
@@ -403,18 +404,25 @@ void RootOutputModule::fillFileMetaData()
   if(m_regularFile) {
     lfn = boost::filesystem::absolute(lfn, boost::filesystem::initial_path()).string();
   }
+  // Format LFN if BELLE2_LFN_FORMATSTRING is set
+  std::string format = EnvironmentVariables::get("BELLE2_LFN_FORMATSTRING", "");
+  if (!format.empty()) {
+    auto format_filename = boost::python::import("B2Tools.format").attr("format_filename");
+    lfn = boost::python::extract<std::string>(format_filename(format, m_outputFileName, m_fileMetaData->getJsonStr()));
+  }
   m_fileMetaData->setLfn(lfn);
   //register the file in the catalog
   if (m_updateFileCatalog) {
     FileCatalog::Instance().registerFile(m_file->GetName(), *m_fileMetaData);
   }
-
+  m_outputFileMetaData = *m_fileMetaData;
 }
 
 
 void RootOutputModule::terminate()
 {
   closeFile();
+  MetadataService::Instance().addRootOutputFile(m_outputFileName, &m_outputFileMetaData);
 }
 
 void RootOutputModule::closeFile()

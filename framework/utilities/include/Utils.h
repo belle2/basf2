@@ -73,6 +73,11 @@ namespace Belle2 {
       double m_startTime; /**< time at start (in ns). */
       std::string m_text; /**< identifying text (printed at end). */
     };
+
+    /**
+     * Execute a shell command and return its output
+     */
+    std::string getCommandOutput(const std::string& command, const std::vector<std::string>& arguments = {}, bool searchPath = true);
   }
 
   /**

@@ -148,8 +148,8 @@ def TauLFVList(flag=1, path=None):
                         'mu+:loose eta:loose',
                         'e+:loose eta\':loose',
                         'mu+:loose eta\':loose',
-                        'e+:loose K_S0:all',
-                        'mu+:loose K_S0:all'
+                        'e+:loose K_S0:merged',
+                        'mu+:loose K_S0:merged'
                         ]
 
     tau_lS0_Channels = ['e+:loose f_0:loose',
@@ -180,8 +180,8 @@ def TauLFVList(flag=1, path=None):
                         'mu+:loose K-:loose pi+:loose',
                         'e-:loose K+:loose pi+:loose',
                         'mu-:loose K+:loose pi+:loose',
-                        'e-:loose K_S0:all K_S0:all',
-                        'mu-:loose K_S0:all K_S0:all'
+                        'e-:loose K_S0:merged K_S0:merged',
+                        'mu-:loose K_S0:merged K_S0:merged'
                         ]
 
     tau_bnv_Channels = ['mu+:loose mu+:loose anti-p-:loose',

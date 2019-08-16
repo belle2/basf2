@@ -1,5 +1,6 @@
 
 #include <analysis/variables/Variables.h>
+#include <analysis/variables/BasicParticleInformation.h>
 #include <analysis/variables/EventVariables.h>
 #include <analysis/variables/FlightInfoVariables.h>
 #include <analysis/variables/VertexVariables.h>
@@ -89,12 +90,12 @@ namespace {
         UseReferenceFrame<CMSFrame> dummy;
         EXPECT_FLOAT_EQ(0.68176979, particleP(&p));
         EXPECT_FLOAT_EQ(0.80920333, particleE(&p));
-        EXPECT_FLOAT_EQ(0.058562335, particlePx(&p));
+        EXPECT_FLOAT_EQ(0.061728548, particlePx(&p));
         EXPECT_FLOAT_EQ(-0.40000001, particlePy(&p));
-        EXPECT_FLOAT_EQ(0.54898131, particlePz(&p));
-        EXPECT_FLOAT_EQ(0.40426421, particlePt(&p));
-        EXPECT_FLOAT_EQ(0.80522972, particleCosTheta(&p));
-        EXPECT_FLOAT_EQ(-1.4254233, particlePhi(&p));
+        EXPECT_FLOAT_EQ(0.54863429, particlePz(&p));
+        EXPECT_FLOAT_EQ(0.404735, particlePt(&p));
+        EXPECT_FLOAT_EQ(0.80472076, particleCosTheta(&p));
+        EXPECT_FLOAT_EQ(-1.4176828, particlePhi(&p));
 
         EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
       }
@@ -176,12 +177,12 @@ namespace {
         UseReferenceFrame<CMSRotationFrame> dummy(TVector3(1, 0, 0), TVector3(0, 1, 0), TVector3(0, 0, 1));
         EXPECT_FLOAT_EQ(0.68176979, particleP(&p));
         EXPECT_FLOAT_EQ(0.80920333, particleE(&p));
-        EXPECT_FLOAT_EQ(0.058562335, particlePx(&p));
+        EXPECT_FLOAT_EQ(0.061728548, particlePx(&p));
         EXPECT_FLOAT_EQ(-0.40000001, particlePy(&p));
-        EXPECT_FLOAT_EQ(0.54898131, particlePz(&p));
-        EXPECT_FLOAT_EQ(0.40426421, particlePt(&p));
-        EXPECT_FLOAT_EQ(0.80522972, particleCosTheta(&p));
-        EXPECT_FLOAT_EQ(-1.4254233, particlePhi(&p));
+        EXPECT_FLOAT_EQ(0.54863429, particlePz(&p));
+        EXPECT_FLOAT_EQ(0.404735, particlePt(&p));
+        EXPECT_FLOAT_EQ(0.80472076, particleCosTheta(&p));
+        EXPECT_FLOAT_EQ(-1.4176828, particlePhi(&p));
 
         EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
       }
@@ -269,11 +270,11 @@ namespace {
 
     {
       UseReferenceFrame<CMSFrame> dummy;
-      EXPECT_FLOAT_EQ(1.0261739, particleDX(&p));
+      EXPECT_FLOAT_EQ(1.0382183, particleDX(&p));
       EXPECT_FLOAT_EQ(2.0, particleDY(&p));
-      EXPECT_FLOAT_EQ(2.256825, particleDZ(&p));
-      EXPECT_FLOAT_EQ(std::sqrt(2.0 * 2.0 + 1.0261739 * 1.0261739), particleDRho(&p));
-      EXPECT_FLOAT_EQ(3.1853244, particleDistance(&p));
+      EXPECT_FLOAT_EQ(2.2510159, particleDZ(&p));
+      EXPECT_FLOAT_EQ(std::sqrt(2.0 * 2.0 + 1.0382183 * 1.0382183), particleDRho(&p));
+      EXPECT_FLOAT_EQ(3.185117, particleDistance(&p));
       EXPECT_FLOAT_EQ(0.5, particlePvalue(&p));
     }
 
@@ -1143,7 +1144,7 @@ namespace {
 
     var = Manager::Instance().getVariable("useCMSFrame(distance)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 3.1853244);
+    EXPECT_FLOAT_EQ(var->function(&p), 3.185117);
   }
 
   TEST_F(MetaVariableTest, extraInfo)
@@ -1959,7 +1960,7 @@ namespace {
     const Particle* par = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices);
 
     //now we expect non-nan results
-    EXPECT_FLOAT_EQ(var->function(par), 2.8614323);
+    EXPECT_FLOAT_EQ(var->function(par), 2.8638029);
     EXPECT_FLOAT_EQ(varCMS->function(par), M_PI);
   }
 
@@ -2344,6 +2345,71 @@ namespace {
     EXPECT_B2FATAL(vnonsense->function(notinthelist));
     EXPECT_FLOAT_EQ(vsensible->function(inthelist), 1.0);
     EXPECT_FLOAT_EQ(vsensible->function(notinthelist), 0.0);
+  }
+
+  TEST_F(MetaVariableTest, sourceObjectIsInList)
+  {
+    // datastore things
+    DataStore::Instance().reset();
+    DataStore::Instance().setInitializeActive(true);
+
+    // needed to mock up
+    StoreArray<ECLCluster> clusters;
+    StoreArray<Particle> particles;
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+
+    clusters.registerInDataStore();
+    particles.registerInDataStore();
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+    gammalist.registerInDataStore(flags);
+
+    // end datastore things
+    DataStore::Instance().setInitializeActive(false);
+
+    // of course we have to create the list...
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // mock up two clusters from the ECL let's say they both came from true Klongs
+    // but one looked a little bit photon-like
+    auto* cl0 = clusters.appendNew(ECLCluster());
+    cl0->setEnergy(1.0);
+    cl0->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+    cl0->addHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+    cl0->setClusterId(0);
+    auto* cl1 = clusters.appendNew(ECLCluster());
+    cl1->setEnergy(1.0);
+    cl1->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+    cl1->setClusterId(1);
+
+    // create particles from the clusters
+    Particle myphoton(cl0, Const::photon);
+    Particle iscopiedin(cl0, Const::Klong);
+    Particle notcopiedin(cl1, Const::Klong);
+
+    // add the particle created from cluster zero to the gamma list
+    auto* myphoton_ = particles.appendNew(myphoton);
+    gammalist->addParticle(myphoton_);
+
+    auto* iscopied = particles.appendNew(iscopiedin); // a clone of this guy is now in the gamma list
+    auto* notcopied = particles.appendNew(notcopiedin);
+
+    // get the variables
+    const Manager::Var* vnonsense = Manager::Instance().getVariable("sourceObjectIsInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable("sourceObjectIsInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(iscopied));
+    EXPECT_FLOAT_EQ(vsensible->function(iscopied), 1.0);
+    EXPECT_FLOAT_EQ(vsensible->function(notcopied), 0.0);
+
+    // now mock up some other type particles
+    Particle composite({0.5 , 0.4 , 0.5 , 0.8}, 512, Particle::c_Unflavored, Particle::c_Composite, 0);
+    Particle undefined({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
+    auto* composite_ = particles.appendNew(undefined);
+    auto* undefined_ = particles.appendNew(composite);
+    EXPECT_FLOAT_EQ(vsensible->function(composite_), -1.0);
+    EXPECT_FLOAT_EQ(vsensible->function(undefined_), -1.0);
   }
 
   TEST_F(MetaVariableTest, mostB2BAndClosestParticles)

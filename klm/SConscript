@@ -1,10 +1,14 @@
 Import('env')
 
 env['LIBS'] = ['klm_dataobjects', 'klm_dbobjects',
-               'eklm', 'eklm_dataobjects', 'eklm_dbobjects',
-               'bklm',	       
-               'framework',
+               'klm_bklm_dataobjects', 'klm_bklm_dbobjects',
+               'klm_eklm_dataobjects', 'klm_eklm_dbobjects',
+               'alignment_dbobjects',
                'calibration', 'calibration_dataobjects',
+               'framework',
+               'geometry',
+               'mdst_dataobjects',
+               'simulation',
                '$ROOT_LIBS']
 
 Return('env')

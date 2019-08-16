@@ -13,7 +13,7 @@ from softwaretrigger.softwaretrigger_reconstruction import add_softwaretrigger_r
 
 # You could use your own components here or just use the default for the HLT (everything except PXD)
 # e.g. without SVD
-#     components = ["CDC", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
+#     components = ["CDC", "ECL", "TOP", "ARICH", "KLM"]
 # if you leave out the components in all calls, the default will be used
 components = constants.DEFAULT_HLT_COMPONENTS
 

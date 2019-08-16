@@ -16,8 +16,8 @@
 #include <TFile.h>
 
 /* Belle2 headers. */
-#include <bklm/geometry/GeometryPar.h>
-#include <eklm/geometry/GeometryData.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/eklm/geometry/GeometryData.h>
 #include <klm/simulation/ScintillatorSimulator.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -36,14 +36,11 @@ void KLM::ScintillatorSimulator::reallocPhotoElectronBuffers(int size)
    * Here there is a memory leak in case of realloc() failure, but it does not
    * matter because a fatal error is issued in this case.
    */
-  /* cppcheck-suppress memleakOnRealloc */
   m_Photoelectrons =
     (struct Photoelectron*)realloc(m_Photoelectrons,
                                    size * sizeof(struct Photoelectron));
-  /* cppcheck-suppress memleakOnRealloc */
   m_PhotoelectronIndex = (int*)realloc(m_PhotoelectronIndex,
                                        size * sizeof(int));
-  /* cppcheck-suppress memleakOnRealloc */
   m_PhotoelectronIndex2 = (int*)realloc(m_PhotoelectronIndex2,
                                         size * sizeof(int));
   if (size != 0) {
@@ -157,7 +154,7 @@ void KLM::ScintillatorSimulator::simulate(
   bklm::GeometryPar* geoPar = bklm::GeometryPar::instance();
   const BKLMSimHit* hit = firstHit->second;
   const bklm::Module* module =
-    geoPar->findModule(hit->getForward(), hit->getSector(), hit->getLayer());
+    geoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
   double stripLength =
     2.0 * (hit->isPhiReadout() ?
            module->getPhiScintHalfLength(hit->getStrip()) :

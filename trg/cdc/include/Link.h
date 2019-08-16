@@ -108,6 +108,7 @@ namespace Belle2 {
 
   public:// tmp
 //    const HepGeom::Point3D<double> & conf(void) const;
+    /// conf 3D point
     const HepGeom::Point3D<double>& conf(const HepGeom::Point3D<double>& conf);
 
   public:// Modifiers
@@ -125,10 +126,12 @@ namespace Belle2 {
 
     /// sets and returns the closest point on wire to a track.
     const HepGeom::Point3D<double>& positionOnWire(const HepGeom::Point3D<double>&);
+    /// sets and returns the closest point on wire to a track.
     const HepGeom::Point3D<double>& positionOnWire(double p[3]);
 
     /// sets and returns the closest point on track to wire.
     const HepGeom::Point3D<double>& positionOnTrack(const HepGeom::Point3D<double>&);
+    /// sets and returns the closest point on track to wire.
     const HepGeom::Point3D<double>& positionOnTrack(double p[3]);
 
     /// sets and returns dPhi to the closest point.
@@ -312,6 +315,7 @@ namespace Belle2 {
                      const std::string& message = std::string(""),
                      const std::string& prefix = std::string(""));
 
+    /// usage of each layer
     static std::string layerUsage(const std::vector<TRGCDCLink*>& links);
 
   public:// Sorters
@@ -326,9 +330,11 @@ namespace Belle2 {
     friend class TRGCDC;
 
   public:
+    /// initialize the Buffers
     static void initializeBuffers(void);
 
   private:
+    /// clear buffers
     static void clearBufferSL(void);
 
     /// dumps debug information.
@@ -346,10 +352,14 @@ namespace Belle2 {
     /// Cell hit object.
     const TRGCDCCellHit* _hit;
 
+    /// position on track
     HepGeom::Point3D<double> _onTrack;
+    /// position on wire
     HepGeom::Point3D<double> _onWire;
+    /// position
     HepGeom::Point3D<double> _position;
     double _dPhi;
+    /// left right
     unsigned _leftRight;
     float _drift[2];
     float _dDrift[2];
@@ -360,7 +370,7 @@ namespace Belle2 {
     TRGCDCLink* _neighbor[7];
     TRGCDCLink* _link;
 
-    //...tmp...
+    /// ...tmp...
     HepGeom::Point3D<double> _conf;
 
     HepGeom::Point3D<double> _arcZ[4];
@@ -368,13 +378,18 @@ namespace Belle2 {
     //
     // for quick dicision
     //
+    /// ms_smallcell
     static bool ms_smallcell;
+    /// ms_superb
     static bool ms_superb;
 
-    //...Buffers...
+    /// ...Buffers...
     static unsigned _nL;
+    /// ...Buffers...
     static unsigned _nSL;
+    /// ...Buffers...
     static unsigned _nSLA;
+    /// ...Buffers...
     static unsigned* _nHitsSL;
 
 #ifdef TRASAN_DEBUG

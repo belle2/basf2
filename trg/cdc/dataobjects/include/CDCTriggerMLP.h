@@ -65,6 +65,7 @@ namespace Belle2 {
       B2WARNING("Use of this flag is deprecated! Use get_et_option() instead!");
       return T0fromHits;
     }
+    /** Returns way of obtaining the event time */
     std::string get_et_option() const { return et_option; }
 
     /** check whether given phi value is in sector */

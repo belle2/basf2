@@ -1,17 +1,111 @@
-.. _variables:
 
-Variables
-=========
+VariableManager
+===============
 
-Variables are handled by the VariableManager:
+The VariableManager handles all variables in ``basf2`` analysis.
+It is implemented as a `singleton <https://en.wikipedia.org/wiki/Singleton_pattern>`_
+C++ class with a python interface.
 
-.. _variablemanager:
-.. automodule:: variables
-   :members:
-   :undoc-members:
+The C++ documentation is `here <https://b2-master.belle2.org/software/development/classBelle2_1_1Variable_1_1Manager.html>`_.
 
-   .. autodata:: variables.variables
+.. tip::
 
+        For (unfortunate) historical reasons, the python accessor to the VariableManager
+        singleton is called ``variables`` and is in the python ``variables`` module.
+        This leads to strange-looking python ``import`` commands.
+
+        For example:
+
+        .. code-block:: python
+
+            from variables import variables
+                
+        To avoid confusion, example/tutorial scripts often use a namespace alias ``vm``.
+        You might want to use this in your scripts.
+
+        .. code-block:: python
+
+            from variables import variables as vm # shorthand for VariableManager
+
+
+.. py:class:: VariableManager
+
+   Singleton class to hold all variables and aliases in the current scope.
+
+   .. py:method:: addAlias(alias, expression)
+
+      Create a new alias.
+
+      Variable names are deliberately verbose and explicit (to avoid ambiguity).
+      However, it is often not desirable to deal with long unwieldy variable names particularly in the context of `VariableManagerOutput`.
+
+      Example:
+
+          Aliases to a verbose variable may be set with:
+
+          >>> from variables import variables as vm
+          >>> vm.addAlias("shortname", "aReallyLongAndSpecificVariableName(1, 2, 3)")
+
+      .. seealso:: 
+
+          `variables.utils.create_aliases` and `variables.utils.create_aliases_for_selected` 
+          might be helpful if you find yourself setting many aliases in your analysis script.
+
+      .. warning:: 
+
+          The VariableManager instance is configured independently of the `basf2.Path`. 
+          In case of adding the same alias twice, the configuration just before calling `basf2.process` is what wins.
+
+      :param str alias: New alias to create
+      :param str expression: The expression the alias should evaluate to
+
+      :return: True if the alias was successfully added
+
+   .. py:method:: getAliasNames()
+
+      Get a list of all alias names (in reverse order added)
+
+      .. tip:: 
+
+          This returns a ``ROOT.vector`` which you will probably 
+          need to convert into a python ``list(str)``.
+
+          >>> my_aliases = list(vm.getAliasNames())
+
+      :returns: ``ROOT.vector`` list of alias names
+
+   .. py:method:: addCollection(collection, variables)
+
+      Create a new variable collection.
+
+      .. tip:: 
+
+         This method takes a ``ROOT.vector<string>`` as input.
+         It's probably easier to use `variables.utils.add_collection` which wraps this function for you.
+
+      :param str collection: The new collection to create.
+      :param ROOT.vector(str) variables: A ``ROOT.vector<string>`` of variables to add as the variable collection.
+
+      :returns: True if the collection was successfully added
+
+   .. py:method:: getCollection(collection)
+  
+      Get a list of all variables in the ``collection``.
+
+      :param str collection: The name of the existing variable collection
+
+      :returns: ``ROOT.vector`` list of variable names
+
+   .. py:method:: printAliases()
+ 
+      Prints all aliases currently registered.
+      Useful to call just before calling `basf2.process` on an analysis `basf2.Path` when debugging.
+
+
+.. _variablesByGroup:
+
+Variables by group
+==================
 
 Here is a categorised list of variables known to ``basf2``.
 You can also look at the alphabetical index: :ref:`b2-varindex`.
@@ -21,6 +115,12 @@ Kinematics
 
 .. b2-variables::
    :group: Kinematics
+
+Helicity 
+~~~~~~~~
+
+.. b2-variables::
+      :group: Helicity variables
 
 Tracking
 ~~~~~~~~
@@ -50,8 +150,6 @@ Here is a list of particle identification variables:
   In other words, pionID was sensitive only to the pion-kaon mis-id, and not to
   the pion-proton or pion-muon mis-identification.
 
-More information in `this confluence page <https://confluence.desy.de/display/BI/Physics+charged+particle+identification>`_
-
 .. b2-variables::
    :group: PID   
 
@@ -59,7 +157,7 @@ Basic particle information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. b2-variables::
-   :group: Basic Particle Information
+   :group: Basic particle information
 
 PID for expert
 """"""""""""""
@@ -228,6 +326,8 @@ Rest of Event
 Continuum Suppression
 ~~~~~~~~~~~~~~~~~~~~~
 
+For a detailed description of the continuum suppression, see `ContinuumSuppression`
+
 .. b2-variables::
     :group: Continuum Suppression
 
@@ -239,6 +339,7 @@ Event Shape
 
 These variables are available after adding the event shape builder modules.
 This can be done with the function `modularAnalysis.buildEventShape`.
+For a detailed description of the event shape variables,  see `EventShape`
 
 .. b2-variables::
     :group: EventShape
@@ -259,7 +360,7 @@ This can be done with the function `modularAnalysis.buildEventKinematics`.
 Flight Information
 ~~~~~~~~~~~~~~~~~~
 
-Here is a list of flight time and distance variables of a (grand)daughter particle w.r.t. of its (grand)mother decay vertex:
+Here is a list of flight time and distance variables of a (grand)daughter particle w.r.t. its (grand)mother decay vertex:
 
 .. b2-variables::
    :group: Flight Information   
@@ -310,7 +411,7 @@ There are several variables also available for calibration experts who are worki
 
 .. warning:: Many of these will not work for- and should not be used by- normal analyses.
 
-They have a *[Calibration]* pretag.
+They have a **[Calibration]** pretag.
 
 .. b2-variables::
    :group: Event (cDST only)
@@ -321,8 +422,9 @@ They have a *[Calibration]* pretag.
 .. b2-variables::
    :group: KLM Calibration | PID
 
-Variables Collections and Lists
-===============================
+
+Collections and Lists
+=====================
 
 To avoid very long lists of variable names in `variablesToNtuple <modularAnalysis.variablesToNtuple>`,
 it is possible to use collections of variables or lists of variables instead.
@@ -335,26 +437,24 @@ One can use the list in the steering file as follows:
   # Defining the list
   my_list = ['p','E']
 
-  # Passing it as an argumet to variablesToNtuple
-  modularAnalysis.variablesToNtuple(variables=my_list,
-                                     ...)
+  # Passing it as an argument to variablesToNtuple
+  modularAnalysis.variablesToNtuple(variables=my_list, ...)
 
-It is also possible to create user-defined variable collections. Name of the variable collection can
-be threated as a variable name, and hence one would have the following syntax in the steering file:
+It is also possible to create user-defined variable collections.
+The name of the variable collection can be treated as a variable name.
 
-.. code:: python
+.. autofunction:: variables.utils.add_collection
 
-  # Defining the collection
-  variables.utils.add_collection(['p','E'],"my_collection")
 
-  # Passing it as an argumet to variablesToNtuple
-  modularAnalysis.variablesToNtuple(variables=['my_collection'],
-                                     ...)
+Predefined collections
+~~~~~~~~~~~~~~~~~~~~~~
 
-There are several predefined lists of variables and for each predefined list it exists a collection with the same name:
+We provide several predefined lists of variables.
+For each predefined list, there is a collection with the same name:
 
 .. automodule:: variables.collections
    :members:
+
 
 Operations with variable lists
 ==============================
@@ -368,6 +468,7 @@ lists of kinematic variables in CMS using ``useCMSFrame(variable)`` meta-variabl
   from variables.utils import create_aliases
   # Replacement to Kinematics tool
   kinematics = ['px', 'py', 'pz', 'pt', 'p', 'E']
+
   # Kinematic variables in CMS
   cms_kinematics = create_aliases(kinematics, "useCMSFrame({variable})", "CMS")
 
@@ -383,3 +484,10 @@ to help to easily create aliases.
 .. autofunction:: variables.utils.create_aliases_for_selected
 .. autofunction:: variables.utils.create_daughter_aliases
 .. autofunction:: variables.utils.create_mctruth_aliases
+
+Miscellaneous helpers for using variables
+=========================================
+
+.. autofunction:: variables.getAllTrgNames
+.. autofunction:: variables.std_vector
+.. autofunction:: variables.printVars

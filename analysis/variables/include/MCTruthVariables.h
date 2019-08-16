@@ -287,6 +287,21 @@ namespace Belle2 {
     int genNMissingDaughter(const Particle* particle, const std::vector<double>& arguments);
 
     /**
+     * return energy of HER from generator level beam kinematics
+     */
+    double getHEREnergy(const Particle*);
+
+    /**
+     * return energy of LER from generator level beam kinematics
+     */
+    double getLEREnergy(const Particle*);
+
+    /**
+     * return crossing angle from generator level beam kinematics
+     */
+    double getCrossingAngle(const Particle*);
+
+    /**
      * retruns the weight of the ECLCluster -> MCParticle relation for the
      * MCParticle related to the particle provided.
      */
@@ -312,7 +327,6 @@ namespace Belle2 {
      * returns True if the environment is MC and False for data
      */
     double isMC(const Particle*);
-
 
   }
 }

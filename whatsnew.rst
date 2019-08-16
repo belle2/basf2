@@ -86,6 +86,16 @@ You should update it to this:
               $BELLE2_RELEASE_DIR/analysis/examples/VariableManager
 
 
+.. rubric:: Switch of beam spot information from nominal to measured values.
+
+All IP position and errors now use the BeamSpot database, which contains the measured IP size instead of the nominal one. 
+All beam kinematics are handled through PCmsLabTransform, which computes them by combining CollisionInvariantMass and CollisionBoostVector. 
+Previously, these were pulled from either BeamParameters or gearbox (obsolete). 
+Some truth variables still use BeamParameters; those were marked as such.
+
+It must be noted that in previous definitions the boost included a small rotation to align it with the HER. 
+This is no longer possible with the new structure, so the definition of CMS is slightly changed. The impact should be at the percent level.
+
 .. rubric:: Loading ECLClusters under multiple hypotheses
 
 It is now possible to load :math:`K_L^0` particles from clusters in the ECL. 

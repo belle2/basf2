@@ -343,7 +343,7 @@ namespace Belle2 {
       StoreArray<Particle> particles;
       auto* signalSideParticle = roe->getRelatedFrom<Particle>();
       PCmsLabTransform T;
-      TLorentzVector boost4Vector = T.getBoostVector();
+      TLorentzVector boost4Vector = T.getBeamFourMomentum();
 
       TLorentzVector signal4Vector = signalSideParticle->get4Vector();
       TLorentzVector roe4Vector = roe->get4Vector(m_roeMaskName);

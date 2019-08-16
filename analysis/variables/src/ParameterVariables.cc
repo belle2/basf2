@@ -377,7 +377,7 @@ namespace Belle2 {
         return -999;
 
       PCmsLabTransform T;
-      TLorentzVector m = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+      TLorentzVector m = T.getBeamFourMomentum();
       TLorentzVector p = particle->get4Vector();
       TLorentzVector d1 = particle->getDaughter(daughter1)->get4Vector();
       TLorentzVector d2 = particle->getDaughter(daughter2)->get4Vector();

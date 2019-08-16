@@ -39,6 +39,8 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
+#include <mdst/dbobjects/BeamSpot.h>
+
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
@@ -344,14 +346,15 @@ namespace Belle2 {
 
     double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part)
     {
-      PCmsLabTransform T;
+      static DBObjPtr<BeamSpot> beamSpotDB;
       double px = part->getMomentum().Px();
       double py = part->getMomentum().Py();
 
       double xV = part->getVertex().X();
       double yV = part->getVertex().Y();
-      double xIP = T.getBeamParams().getVertex().X();
-      double yIP = T.getBeamParams().getVertex().Y();
+
+      double xIP = (beamSpotDB->getIPPosition()).X();
+      double yIP = (beamSpotDB->getIPPosition()).Y();
 
       double x = xV - xIP;
       double y = yV - yIP;
@@ -362,8 +365,8 @@ namespace Belle2 {
 
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part)
     {
-      PCmsLabTransform T;
-      return std::cos((part->getVertex() - T.getBeamParams().getVertex()).Angle(part->getMomentum()));
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      return std::cos((part->getVertex() - beamSpotDB->getIPPosition()).Angle(part->getMomentum()));
     }
 
     double cosThetaBetweenParticleAndNominalB(const Particle* part)
@@ -405,13 +408,15 @@ namespace Belle2 {
 
     double ImpactXY(const Particle* particle)
     {
+      static DBObjPtr<BeamSpot> beamSpotDB;
+
       double px = particle->getPx();
       double py = particle->getPy();
 
       if (py == py && px == px) {
 
-        double x = particle->getX() - 0;
-        double y = particle->getY() - 0;
+        double x = particle->getX() - (beamSpotDB->getIPPosition()).X();
+        double y = particle->getY() - (beamSpotDB->getIPPosition()).Y();
 
         double pt = sqrt(px * px + py * py);
 
@@ -756,7 +761,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).Px();
     }
@@ -766,7 +771,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).Py();
     }
@@ -776,7 +781,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).Pz();
     }
@@ -787,7 +792,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).P();
     }
@@ -797,7 +802,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).Vect().Theta();
     }
@@ -807,7 +812,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).Vect().Phi();
     }
@@ -817,7 +822,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).E();
     }
@@ -827,7 +832,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).M();
     }
@@ -837,7 +842,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).M2();
     }

@@ -128,8 +128,8 @@ namespace Belle2 {
       addVariable(identifier + "_std", variables);
       addVariable(identifier + "_median", variables);
       addVariable(identifier + "_n_zeros", variables);
-      addVariable(identifier + "_firstCDChit", variables);
-      addVariable(identifier + "_lastSVDhit", variables);
+      addVariable(identifier + "_firstCDCHit", variables);
+      addVariable(identifier + "_lastSVDHit", variables);
     }
 
     /// calculated statistics and saves them in variable set
@@ -144,8 +144,8 @@ namespace Belle2 {
         m_variables.at(identifier + "_std") =  m_valueIfVarNotAvailable;
         m_variables.at(identifier + "_median") =  m_valueIfVarNotAvailable;
         m_variables.at(identifier + "_n_zeros") = m_valueIfVarNotAvailable;
-        m_variables.at(identifier + "_firstCDChit") = m_valueIfVarNotAvailable;
-        m_variables.at(identifier + "_lastSVDhit") = m_valueIfVarNotAvailable;
+        m_variables.at(identifier + "_firstCDCHit") = m_valueIfVarNotAvailable;
+        m_variables.at(identifier + "_lastSVDHit") = m_valueIfVarNotAvailable;
         return;
       }
 

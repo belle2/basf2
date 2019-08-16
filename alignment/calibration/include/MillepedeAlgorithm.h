@@ -42,7 +42,7 @@ namespace Belle2 {
     /// Add (false) or subtract (true) corrections to previous values?
     void invertSign(bool use_subtraction = true) {m_invertSign = use_subtraction;}
 
-    /// Set components (BeamParameters...) to calibrate or empty for all available in data
+    /// Set components (BeamSpot...) to calibrate or empty for all available in data
     void setComponents(const std::vector<std::string>& components) {m_components = components;}
 
     /// Report failure(false) or success (true) even if some parameters could not be determined
@@ -105,7 +105,7 @@ namespace Belle2 {
     virtual EResult calibrate() override;
 
   private:
-    /// Components (BeamParameters...) to calibrate or empty for all available in data
+    /// Components (BeamSpot...) to calibrate or empty for all available in data
     std::vector<std::string> m_components{};
     /// Add (true) or subtract (false) corrections?
     bool m_invertSign{false};

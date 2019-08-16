@@ -19,21 +19,7 @@
 #include <root/TGeoMatrix.h>
 
 #include <framework/logging/Logger.h>
-
 #include <alignment/GlobalParam.h>
-
-
-#include <framework/dbobjects/BeamParameters.h>
-#include <alignment/dbobjects/VXDAlignment.h>
-#include <alignment/dbobjects/CDCCalibration.h>
-#include <alignment/dbobjects/BKLMAlignment.h>
-#include "GlobalLabel.h"
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
-
-#include <cdc/dbobjects/CDCTimeZeros.h>
-#include <cdc/dbobjects/CDCTimeWalks.h>
-#include <cdc/dbobjects/CDCAlignment.h>
-#include <cdc/dbobjects/CDCXtRelations.h>
 
 namespace Belle2 {
   class MillepedeAlgorithm;

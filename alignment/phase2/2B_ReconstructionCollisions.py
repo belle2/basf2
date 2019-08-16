@@ -52,7 +52,7 @@ modularAnalysis.vertexRaveDaughtersUpdate('Z0:mumu', 0.0, path=main, constraint=
 main.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
 main.add_module('HistoManager', histoFileName='CollectorOutput.root')
 main.add_module('MillepedeCollector',
-                components=['VXDAlignment', 'BeamParameters'],
+                components=['VXDAlignment', 'BeamSpot'],
                 tracks=[],
                 particles=['mu+:bbmu'],
                 vertices=[],

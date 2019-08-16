@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -46,8 +45,6 @@ inputMdstList('default', fileList, path=ckshppath)
 mergedKshorts(path=ckshppath)
 stdPi('loose', path=ckshppath)
 stdK('loose', path=ckshppath)
-# stdPi('all', path=ckshppath)
-# stdK('all', path=ckshppath)
 
 from skim.charm import DpToKsHp
 DpToKsHpList = DpToKsHp(ckshppath)

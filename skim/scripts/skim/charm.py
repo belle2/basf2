@@ -28,24 +28,25 @@ def D0ToHpJm(path):
                    ]
 
     D0List = []
-    for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:HpJm' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-        # vertexKFit('D0:HpJm' + str(chID), 0.000, path=path)
-        D0List.append('D0:HpJm' + str(chID))
 
     global haveRunD0ToHpJm
-    haveRunD0ToHpJm = 1
+    if haveRunD0ToHpJm == 0:
+        haveRunD0ToHpJm = 1
+        for chID, channel in enumerate(D0_Channels):
+            reconstructDecay('D0:HpJm' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
+            # vertexKFit('D0:HpJm' + str(chID), 0.000, path=path)
+            D0List.append('D0:HpJm' + str(chID))
+    else:
+        for chID, channel in enumerate(D0_Channels):
+            D0List.append('D0:HpJm' + str(chID))
+
     Lists = D0List
     return Lists
 
 
 def DstToD0PiD0ToHpJm(path):
 
-    D0List = []
-    if haveRunD0ToHpJm == 1:
-        D0List = ['D0:HpJm0', 'D0:HpJm1', 'D0:HpJm2']
-    else:
-        D0List = D0ToHpJm(path)
+    D0List = D0ToHpJm(path)
 
     Dstcuts = '0 < Q < 0.018'
 
@@ -143,31 +144,32 @@ def D0ToNeutrals(path):
                    ]
 
     D0List = []
-    for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:2Nbdy' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-        vertexRave('D0:2Nbdy' + str(chID), 0.001, path=path)
-        D0List.append('D0:2Nbdy' + str(chID))
 
     global haveRunD0ToNeutrals
-    haveRunD0ToNeutrals = 1
+    if haveRunD0ToNeutrals == 0:
+        haveRunD0ToNeutrals = 1
+        for chID, channel in enumerate(D0_Channels):
+            reconstructDecay('D0:2Nbdy' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
+            # vertexRave('D0:2Nbdy' + str(chID), 0.001, path=path)
+            D0List.append('D0:2Nbdy' + str(chID))
+    else:
+        for chID, channel in enumerate(D0_Channels):
+            D0List.append('D0:2Nbdy' + str(chID))
+
     Lists = D0List
     return Lists
 
 
 def DstToD0Neutrals(path):
 
-    D0List = []
-    if haveRunD0ToNeutrals == 1:
-        D0List = ['D0:2Nbdy0', 'D0:2Nbdy1', 'D0:2Nbdy2']
-    else:
-        D0List = D0ToNeutrals(path)
+    D0List = D0ToNeutrals(path)
 
     Dstcuts = '0 < Q < 0.02'
 
     DstList = []
     for chID, channel in enumerate(D0List):
         reconstructDecay('D*+:2Nbdy' + str(chID) + ' -> pi+:all ' + channel, Dstcuts, chID, path=path)
-        massVertexRave('D*+:2Nbdy' + str(chID), 0.001, path=path)
+        # massVertexRave('D*+:2Nbdy' + str(chID), 0.001, path=path)
         DstList.append('D*+:2Nbdy' + str(chID))
 
     return DstList

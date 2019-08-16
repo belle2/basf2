@@ -1,6 +1,7 @@
 <!-- This governs the packages side bar -->
 
-{{#packages}} {{#if visible}}
+{{#packages}}
+{{#if visible}}
 <div>
   <!-- This span prevents a newline btw. the status graphic and the name -->
   <span style="white-space: nowrap">
@@ -24,6 +25,7 @@
     <!--iterate over plot files contained in this package -->
     {{#plotfiles}}
     <!-- This span prevents a newline btw. the status graphic and the name -->
+    {{#if show_shifter || show_expert_plots }}
     <span class="package_root_file">
 			{{#if comparison_error > 0 }}
 				<span class="fail_count_greater_zero_rootfile" title="{{comparison_error}} comparisons failed" > {{comparison_error}} </span>
@@ -34,7 +36,9 @@
 					OK
 				</span>
 			{{/if}}
-			<a title="{{ title }}" href="#{{package}}-{{rootfile}}">{{ rootfile }}</a></span><br>
+			<a title="{{ title }}" href="#{{package}}-{{rootfile}}">{{ rootfile }}</a>
+    </span>
+    {{ /if }}
     {{/plotfiles}}
     {{! give output if there are no plot files at all }}
     {{^plotfiles}}

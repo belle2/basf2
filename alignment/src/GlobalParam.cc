@@ -18,6 +18,8 @@
 
 #include <framework/database/Database.h>
 
+#include <framework/geometry/B2Vector3.h>
+
 #include <vxd/geometry/GeoCache.h>
 #include <alignment/Hierarchy.h>
 
@@ -57,7 +59,7 @@ namespace Belle2 {
         return;
       }
       if (auto bp = dynamic_cast<BeamSpot*>(this->getDBObj())) {
-        TVector3 vertex = bp->getIPPosition();
+        B2Vector3D vertex = bp->getIPPosition();
         vertex[param - 1] = value;
         bp->setIP(vertex, bp->getIPPositionCovMatrix());
       } else {

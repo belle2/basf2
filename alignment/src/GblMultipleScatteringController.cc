@@ -15,6 +15,7 @@ using namespace std;
 using namespace Belle2;
 
 void GblMultipleScatteringController::controlTrackSegment(TVector3, TVector3, double scatTheta, genfit::GblFitter* fitter)
+// void GblMultipleScatteringController::controlTrackSegment(B2Vector3D, B2Vector3D, double scatTheta, genfit::GblFitter* fitter)
 {
   bool enableScattering = true;
 

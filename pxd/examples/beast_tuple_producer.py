@@ -38,12 +38,12 @@ class CalculationProcess(multiprocessing.Process):
     def __init__(self, iov, file_paths, output_dir):
         """ Constructor """
         super(CalculationProcess, self).__init__()
+        #: interval of validity
         self.iov = iov
-        """ interval of validity """
+        #: path to files
         self.file_paths = file_paths
-        """ path to the files """
+        #: output directory
         self.output_dir = output_dir
-        """ output directory """
 
     def run(self):
         """ Run """

@@ -148,7 +148,8 @@ namespace Belle2 {
     EXPECT_EQ(100873609, (unsigned int)vxdlabel2);
 
     // Assignment
-    GlobalLabel other = GlobalLabel::construct<CDCAlignment>(cdcWire, 20);
+    GlobalLabel other = GlobalLabel::construct<CDCAlignment>(cdcWire, 2);
+    EXPECT_EQ(270620402, other.label());
     other = vxdlabel1;
     EXPECT_EQ(100873609, other.label());
   }

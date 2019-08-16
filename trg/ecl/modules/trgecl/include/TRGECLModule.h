@@ -29,19 +29,14 @@
 
 namespace Belle2 {
 
-  /*! A module of ETM */
+  /** A module of ETM */
   class TRGECLModule : public Module {
 
 
   public:
 
-    //    virtual ModulePtr newModule(){
-    //      ModulePtr nm(new TRGECLModule(false)); return nm;
-    //    };
-
     /** Constructor */
     TRGECLModule();
-
 
     /** Destructor  */
     virtual ~TRGECLModule();
@@ -141,10 +136,14 @@ namespace Belle2 {
     //! Low Multiplicity Threshold
     std::vector<double> _LowMultiThreshold;
 
-    StoreArray<TRGECLHit> m_TRGECLHit; /**< output for TRGECLHit */
-    StoreArray<TRGECLTrg> m_TRGECLTrg; /**< output for TRGECLTrg */
-    StoreArray<TRGECLCluster> m_TRGECLCluster; /**< output for TRGECLCluster */
-    DBArray<TRGECLETMPara> m_ETMPara; /** ETN Parameters */
+    /** output for TRGECLHit */
+    StoreArray<TRGECLHit> m_TRGECLHit;
+    /** output for TRGECLTrg */
+    StoreArray<TRGECLTrg> m_TRGECLTrg;
+    /** output for TRGECLCluster */
+    StoreArray<TRGECLCluster> m_TRGECLCluster;
+    /** ETN Parameters */
+    DBArray<TRGECLETMPara> m_ETMPara;
 
   };
 

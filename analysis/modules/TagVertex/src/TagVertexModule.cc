@@ -199,7 +199,7 @@ namespace Belle2 {
 
     // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
     PCmsLabTransform T;
-    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boost = T.getBoostVector();
     TVector3 boostDir = boost.Unit();
     float boostAngle = TMath::ATan(float(boostDir[0]) / boostDir[2]); // boost angle with respect from Z
     double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
@@ -207,10 +207,10 @@ namespace Belle2 {
     m_shiftZ = 4.184436e+02 * bg *  0.0001;   // shift of 120 um (Belle2) in the boost direction
 
     if (m_useFitAlgorithm == "singleTrack" || m_useFitAlgorithm == "singleTrack_PXD") {
-      m_BeamSpotCenter = m_beamParams->getVertex() +
+      m_BeamSpotCenter = m_beamSpotDB->getIPPosition() +
                          TVector3(m_shiftZ * TMath::Sin(boostAngle), 0., m_shiftZ * TMath::Cos(boostAngle)); // boost in the XZ plane
     } else {
-      m_BeamSpotCenter = m_beamParams->getVertex(); // Standard algorithm needs no shift
+      m_BeamSpotCenter = m_beamSpotDB->getIPPosition(); // Standard algorithm needs no shift
     }
 
     double cut = 8.717575e-02 * bg;
@@ -282,7 +282,7 @@ namespace Belle2 {
     if (Breco->getPValue() < 0.) return false;
 
     TMatrixDSym beamSpotCov(3);
-    beamSpotCov = m_beamParams->getCovVertex();
+    beamSpotCov = m_beamSpotDB->getCovVertex();
 
     analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, beamSpotCov);
 
@@ -411,11 +411,11 @@ namespace Belle2 {
 
     PCmsLabTransform T;
 
-    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boost = T.getBoostVector();
     TVector3 boostDir = boost.Unit();
 
     TMatrixDSym beamSpotCov(3);
-    beamSpotCov = m_beamParams->getCovVertex();
+    beamSpotCov = m_beamSpotDB->getCovVertex();
     beamSpotCov(2, 2) = cut * cut;
     double thetab = boostDir.Theta();
     double phib = boostDir.Phi();
@@ -1001,7 +1001,7 @@ namespace Belle2 {
 
     PCmsLabTransform T;
 
-    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boost = T.getBoostVector();
 
     double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
 

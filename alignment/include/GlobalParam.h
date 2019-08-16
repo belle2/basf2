@@ -71,13 +71,17 @@ namespace Belle2 {
     /// Very tentative interface for VXD
     class VXDGlobalParamInterface : public IGlobalParamInterface {
     public:
+      /// Type of VXD hierarchy
       enum E_VXDHierarchyType {
         c_None = 0,
         c_Flat = 1,
         c_Full = 2
       };
+      /// What type of hierarchy to use for VXD?
       static E_VXDHierarchyType s_hierarchyType;
+      /// Enable PXD in hierarchy?
       static bool s_enablePXD;
+      /// Enable SVD in hierarchy?
       static bool s_enableSVD;
 
       /// Very tentaive function: not yet used
@@ -112,7 +116,8 @@ namespace Belle2 {
       /// Release the object from internal unique_ptr to be managed elsewhere
       /// Useful to pass it to be stored in DB (and thus later deleted by framework)
       virtual TObject* releaseObject() = 0;
-
+      /// Clone the object, making a copy of the internal object - has to be implemented in derived template class
+      /// to return the actuall type of the object
       virtual GlobalParamSetAccess* clone() = 0;
 
       /// Load the content (by copying obj retrieved from DB) for a given exp/run/event
@@ -171,10 +176,10 @@ namespace Belle2 {
     ///
     /// Use to access any global calibration DB object, e.g.
     ///
-    /// GlobalParamSet<BeamParameters> params;
+    /// GlobalParamSet<BeamSpot> params;
     /// params.setGlobalParam(0.0012, 0, 1);
     ///
-    /// will set X-postion of BeamParameters vertex to 0.0012
+    /// will set X-postion of BeamSpot vertex to 0.0012
     template<class DBObjType>
     class GlobalParamSet : public GlobalParamSetAccess {
     public:
@@ -243,6 +248,7 @@ namespace Belle2 {
         return m_object.release();
       }
 
+      /// Clone the object, making a copy of the internal object
       virtual GlobalParamSetAccess* clone() override final
       {
         return new GlobalParamSet<DBObjType>(*this);

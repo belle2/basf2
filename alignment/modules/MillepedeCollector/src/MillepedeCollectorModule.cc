@@ -23,6 +23,7 @@
 #include <analysis/utility/ReferenceFrame.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/dbobjects/BeamParameters.h>
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/Track.h>
@@ -111,7 +112,7 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
 
   // Configure global parameters
   addParam("components", m_components,
-           "Specify which DB objects are calibrated, like ['BeamParameters', 'CDCTimeWalks'] or leave empty to use all components available.",
+           "Specify which DB objects are calibrated, like ['BeamSpot', 'CDCTimeWalks'] or leave empty to use all components available.",
            m_components);
   addParam("calibrateVertex", m_calibrateVertex,
            "For primary vertices / two body decays, beam spot vertex calibration derivatives are added",
@@ -161,6 +162,11 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
   addParam("timedepConfig", m_timedepConfig,
            "list{ {list{param1, param2, ...}, list{(ev1, run1, exp1), ...}}, ... }.",
            m_timedepConfig);
+
+  // Custom mass+width config
+  addParam("customMassConfig", m_customMassConfig,
+           "dict{ list_name: (mass, width), ... } with custom mass and width to use as external measurement.",
+           m_customMassConfig);
 }
 
 void MillepedeCollectorModule::prepare()
@@ -438,7 +444,7 @@ void MillepedeCollectorModule::collect()
           labels.push_back(label.setParameterId(2));
           labels.push_back(label.setParameterId(3));
 
-          // Allow to disable BeamParameters externally
+          // Allow to disable BeamSpot externally
           alignment::GlobalDerivatives globals(labels, derivatives);
           // Add derivatives for vertex calibration to first point of first trajectory
           // NOTE: use GlobalDerivatives operators vector<int> and TMatrixD which filter
@@ -547,23 +553,26 @@ void MillepedeCollectorModule::collect()
         continue;
       }
 
-      auto dfdextPlusMinus = getTwoBodyToLocalTransform(*mother, mother->getPDGMass());
-      std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
-
-      daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
-      daughters.push_back({gbl->collectGblPoints(track12[1], track12[1]->getCardinalRep()), dfdextPlusMinus.second});
-
       auto pdgdb = EvtGenDatabasePDG::Instance();
+      double motherMass = mother->getPDGMass();
       double motherWidth = pdgdb->GetParticle(mother->getPDGCode())->Width();
+
+      updateMassWidthIfSet(listName, motherMass, motherWidth);
+
       //TODO: what to take as width for "real" particles? -> make a param for default detector mass resolution??
       if (motherWidth == 0.) {
         motherWidth = m_stableParticleWidth * Unit::GeV;
         B2WARNING("Using artificial width for " << pdgdb->GetParticle(mother->getPDGCode())->GetName() << " : " << motherWidth << " GeV");
       }
 
+      auto dfdextPlusMinus = getTwoBodyToLocalTransform(*mother, motherMass);
+      std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
+
+      daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
+      daughters.push_back({gbl->collectGblPoints(track12[1], track12[1]->getCardinalRep()), dfdextPlusMinus.second});
 
       TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / motherWidth / motherWidth;
-      TVectorD massResidual(1); massResidual = - (mother->getMass() - mother->getPDGMass());
+      TVectorD massResidual(1); massResidual = - (mother->getMass() - motherMass);
 
       TVectorD extMeasurements(1);
       extMeasurements[0] = massResidual[0];
@@ -598,6 +607,13 @@ void MillepedeCollectorModule::collect()
     if (!list.isValid())
       continue;
 
+    DBObjPtr<BeamParameters> beam;
+
+    double motherMass = beam->getMass();
+    double motherWidth = sqrt((beam->getCovHER() + beam->getCovLER())(0, 0));
+
+    updateMassWidthIfSet(listName, motherMass, motherWidth);
+
     for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
 
       auto mother = list->getParticle(iParticle);
@@ -607,15 +623,14 @@ void MillepedeCollectorModule::collect()
         continue;
       }
 
-      DBObjPtr<BeamParameters> beam;
-      auto dfdextPlusMinus = getTwoBodyToLocalTransform(*mother, beam->getMass());
+      auto dfdextPlusMinus = getTwoBodyToLocalTransform(*mother, motherMass);
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
 
       daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
       daughters.push_back({gbl->collectGblPoints(track12[1], track12[1]->getCardinalRep()), dfdextPlusMinus.second});
 
-      TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / 0.05 / 0.05;
-      TVectorD massResidual(1); massResidual = - (mother->getMass() - beam->getMass());
+      TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / motherWidth / motherWidth;
+      TVectorD massResidual(1); massResidual = - (mother->getMass() - motherMass);
 
       TVectorD extMeasurements(1);
       extMeasurements[0] = massResidual[0];
@@ -648,6 +663,13 @@ void MillepedeCollectorModule::collect()
     if (!list.isValid())
       continue;
 
+    DBObjPtr<BeamParameters> beam;
+
+    double motherMass = beam->getMass();
+    double motherWidth = sqrt((beam->getCovHER() + beam->getCovLER())(0, 0));
+
+    updateMassWidthIfSet(listName, motherMass, motherWidth);
+
     for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
 
       auto mother = list->getParticle(iParticle);
@@ -657,8 +679,7 @@ void MillepedeCollectorModule::collect()
         continue;
       }
 
-      DBObjPtr<BeamParameters> beam;
-      auto dfdextPlusMinus = getTwoBodyToLocalTransform(*mother, beam->getMass());
+      auto dfdextPlusMinus = getTwoBodyToLocalTransform(*mother, motherMass);
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
 
       daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
@@ -667,8 +688,8 @@ void MillepedeCollectorModule::collect()
       TMatrixDSym vertexPrec(get<TMatrixDSym>(getPrimaryVertexAndCov()).Invert());
       TVector3 vertexResidual = - (mother->getVertex() - get<TVector3>(getPrimaryVertexAndCov()));
 
-      TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / (beam->getCovHER() + beam->getCovLER())(0, 0);
-      TVectorD massResidual(1); massResidual = - (mother->getMass() - beam->getMass());
+      TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / motherWidth / motherWidth;
+      TVectorD massResidual(1); massResidual = - (mother->getMass() - motherMass);
 
       TMatrixDSym extPrec(4); extPrec.Zero();
       extPrec.SetSub(0, 0, vertexPrec);
@@ -715,6 +736,20 @@ void MillepedeCollectorModule::collect()
 
     DBObjPtr<BeamParameters> beam;
 
+    // For the error of invariant mass M = 2 * sqrt(E_HER * E_LER) (for m_e ~ 0)
+    double M = beam->getMass();
+    double E_HER = beam->getHER().E();
+    double E_LER = beam->getLER().E();
+
+    double pz = (beam->getHER().Vect() + beam->getLER().Vect())[2];
+    double E  = (beam->getHER() + beam->getLER()).E();
+
+    double motherMass = beam->getMass();
+    double motherWidth = sqrt((E_HER / M) * (E_HER / M) * beam->getCovLER()(0, 0) + (E_LER / M) * (E_LER / M) * beam->getCovHER()(0,
+                              0));
+
+    updateMassWidthIfSet(listName, motherMass, motherWidth);
+
     for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
 
       B2WARNING("Two body decays with full kinematic constraint not yet correct - need to resolve strange covariance provided by BeamParameters!");
@@ -727,7 +762,7 @@ void MillepedeCollectorModule::collect()
         continue;
       }
 
-      auto dfdextPlusMinus = getTwoBodyToLocalTransform(*mother, beam->getMass());
+      auto dfdextPlusMinus = getTwoBodyToLocalTransform(*mother, motherMass);
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
 
       daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
@@ -739,10 +774,8 @@ void MillepedeCollectorModule::collect()
       extCov.SetSub(0, 0, get<TMatrixDSym>(getPrimaryVertexAndCov()));
 
       // 3x3 boost vector covariance
-      //NOTE: BeamParameters return covarince in variables (E, theta_x, theta_y)
+      //NOTE: BeamSpot return covarince in variables (E, theta_x, theta_y)
       // We need to transform it to our variables (px, py, pz)
-      double pz = (beam->getHER().Vect() + beam->getLER().Vect())[2];
-      double E  = (beam->getHER() + beam->getLER()).E();
 
       TMatrixD dBoost_dVect(3, 3);
       dBoost_dVect(0, 0) = 0.;     dBoost_dVect(0, 1) = 1. / pz; dBoost_dVect(0, 2) = 0.;
@@ -770,13 +803,7 @@ void MillepedeCollectorModule::collect()
 
       extCov.SetSub(3, 3, covVect);
 
-      // For the error of invariant mass M = 2 * sqrt(E_HER * E_LER) (for m_e ~ 0)
-      double M = beam->getMass();
-      double E_HER = beam->getHER().E();
-      double E_LER = beam->getLER().E();
-
-      extCov(6, 6) = (E_HER / M) * (E_HER / M) * beam->getCovLER()(0, 0) + (E_LER / M) * (E_LER / M) * beam->getCovHER()(0, 0);
-
+      extCov(6, 6) = motherWidth * motherWidth;
       auto extPrec = extCov; extPrec.Invert();
 
       TVectorD extMeasurements(7);
@@ -786,7 +813,7 @@ void MillepedeCollectorModule::collect()
       extMeasurements[3] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[0];
       extMeasurements[4] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[1];
       extMeasurements[5] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[2];
-      extMeasurements[6] = - (mother->getMass() - beam->getMass());
+      extMeasurements[6] = - (mother->getMass() - motherMass);
 
       B2INFO("mother mass = " << mother->getMass() << "  and beam mass = " << beam->getMass());
 
@@ -842,7 +869,7 @@ void MillepedeCollectorModule::collect()
           labels.push_back(0);
         }
 
-        // Allow to disable BeamParameters externally
+        // Allow to disable BeamSpot externally
         alignment::GlobalDerivatives globals(labels, derivatives);
 
         // Add derivatives for vertex calibration to first point of first trajectory
@@ -1551,3 +1578,13 @@ tuple<TVector3, TMatrixDSym> MillepedeCollectorModule::getPrimaryVertexAndCov() 
   DBObjPtr<BeamSpot> beam;
   return {beam->getIPPosition(), beam->getSizeCovMatrix()};
 }
+
+void MillepedeCollectorModule::updateMassWidthIfSet(string listName, double& mass, double& width)
+{
+  if (m_customMassConfig.find(listName) != m_customMassConfig.end()) {
+    auto massWidth = m_customMassConfig.at(listName);
+    mass = std::get<0>(massWidth);
+    width = std::get<1>(massWidth);
+  }
+}
+

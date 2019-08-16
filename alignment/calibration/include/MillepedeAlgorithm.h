@@ -42,7 +42,7 @@ namespace Belle2 {
     /// Add (false) or subtract (true) corrections to previous values?
     void invertSign(bool use_subtraction = true) {m_invertSign = use_subtraction;}
 
-    /// Set components (BeamParameters...) to calibrate or empty for all available in data
+    /// Set components (BeamSpot...) to calibrate or empty for all available in data
     void setComponents(const std::vector<std::string>& components) {m_components = components;}
 
     /// Report failure(false) or success (true) even if some parameters could not be determined
@@ -51,6 +51,10 @@ namespace Belle2 {
     /// Set the events at which payloads can change for time-dep calibration (translation from
     /// time IDs (aka continuous subruns) to EventMetaData (and later IoVs))
     void setEvents(const std::vector<EventMetaData>& events) {m_events = events;}
+
+    /// Set minimum entries - for less algo will not run, but report NotEnoughData.
+    /// Use -1 for no cut (default)
+    void setMinEntries(int minEntries) {m_minEntries = minEntries;}
 
     /// Setup the complete time dependence of parameters at once (ensures consistency) (Python version)
     ///
@@ -101,7 +105,7 @@ namespace Belle2 {
     virtual EResult calibrate() override;
 
   private:
-    /// Components (BeamParameters...) to calibrate or empty for all available in data
+    /// Components (BeamSpot...) to calibrate or empty for all available in data
     std::vector<std::string> m_components{};
     /// Add (true) or subtract (false) corrections?
     bool m_invertSign{false};
@@ -119,6 +123,9 @@ namespace Belle2 {
 
     /// Write out binary files from data in tree with GBL data to be used by Millepede and add them to steering
     void prepareMilleBinary();
+
+    /// Minimum entries collected - report NotEnoughData for less
+    int m_minEntries{ -1};
 
   };
 } // namespace Belle2

@@ -164,9 +164,12 @@ namespace {
     /// init
     virtual void SetUp()
     {
-      //DatabaseChain::createInstance();
-      ConditionsDatabase::createDefaultInstance("master_2019-07-22");
-      //LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+      StoreObjPtr<EventMetaData> evtPtr;
+      DataStore::Instance().setInitializeActive(true);
+      evtPtr.registerInDataStore();
+      DataStore::Instance().setInitializeActive(false);
+      // Event 0 run 0 exp 0
+      evtPtr.construct(0, 0, 0);
 
       auto& c = Conditions::Configuration::getInstance();
       c.setNewPayloadLocation("testPayloads/TestDatabase.txt");
@@ -203,7 +206,7 @@ namespace {
 
       boost::filesystem::remove_all("testPayloads");
       Database::reset();
-      //DataStore::Instance().reset();
+      DataStore::Instance().reset();
     }
 
   };

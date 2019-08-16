@@ -76,6 +76,7 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   addParam("TrueHits", m_storeTrueHitsName, "TrueHit collection name",
            string(""));
   addParam("ShaperDigits", m_storeShaperDigitsName, "ShaperDigits collection name", string(""));
+  addParam("SVDEventInfo", m_svdEventInfoName, "SVDEventInfo name", string(""));
 
   // 2. Physics
   addParam("SegmentLength", m_segmentLength,
@@ -649,7 +650,7 @@ double SVDDigitizerModule::addNoise(double charge, double noise)
 
 void SVDDigitizerModule::saveDigits()
 {
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
   SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
 
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);

@@ -14,7 +14,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/dbobjects/BeamParameters.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -62,9 +61,9 @@ void BtubeCreatorModule::initialize()
   // magnetic field
   m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
 
-  m_BeamSpotCenter = m_beamParams->getVertex();
+  m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
   m_beamSpotCov.ResizeTo(3, 3);
-  m_beamSpotCov = m_beamParams->getCovVertex();
+  m_beamSpotCov = m_beamSpotDB->getCovVertex();
   B2INFO("BtubeCreator : magnetic field = " << m_Bfield);
 
   tubeArray.registerInDataStore();

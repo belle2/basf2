@@ -12,13 +12,13 @@
 #include <map>
 
 /* Belle2 headers. */
-#include <bklm/dataobjects/BKLMDigit.h>
-#include <bklm/dataobjects/BKLMHit1d.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <bklm/dataobjects/BKLMSimHit.h>
-#include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/dataobjects/EKLMHit2d.h>
-#include <eklm/dataobjects/EKLMSimHit.h>
+#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/dataobjects/BKLMHit1d.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/dataobjects/BKLMSimHit.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/eklm/dataobjects/EKLMSimHit.h>
 #include <framework/datastore/RelationArray.h>
 #include <klm/modules/MCMatcherKLMClusters/MCMatcherKLMClustersModule.h>
 #include <mdst/dataobjects/MCParticle.h>

@@ -206,11 +206,10 @@ namespace Belle2 {
 
       // GlobalParamTimeLine class -------------------------------------------------------------------------------------
 
-      GlobalParamTimeLine::GlobalParamTimeLine(std::vector< EventMetaData > events, GlobalLabel& label, GlobalParamVector& vector)
+      GlobalParamTimeLine::GlobalParamTimeLine(const std::vector< EventMetaData >& events, GlobalLabel& label,
+                                               GlobalParamVector& vector) : timeTable(makeInitialTimeTable(events, label))
       {
-        timeTable = makeInitialTimeTable(events, label);
         finalizeTimeTable(timeTable);
-
         payloadsTable = TimeIdsTable2PayloadsTable(timeTable, vector);
 
       }

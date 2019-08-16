@@ -23,6 +23,7 @@ using namespace std;
 
 namespace Belle2 {
 
+  /// TRGCDCUndefinedLayer declaration
   const TRGCDCLayer* TRGCDCUndefinedLayer = new TRGCDCLayer(9999,
                                                             9999,
                                                             9999,

@@ -36,7 +36,7 @@ args, basf2_args = parser.parse_known_args()
 
 main = create_path()
 
-millepede = alignment.MillepedeCalibration(['VXDAlignment', 'BeamParameters'],
+millepede = alignment.MillepedeCalibration(['VXDAlignment', 'BeamSpot'],
                                            tracks=['CosmicRecoTracks'],
                                            particles=['mu+:bbmu'],
                                            vertices=[],

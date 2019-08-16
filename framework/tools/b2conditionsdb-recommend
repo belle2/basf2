@@ -29,7 +29,7 @@ if __name__ == "__main__":
     args = create_argumentparser().parse_args()
 
     metadata = None
-    base_tags = [basf2.get_default_global_tags()]
+    base_tags = [basf2.conditions.default_globaltags]
 
     # get metadata and base_tags from input file
     if args.input_file:

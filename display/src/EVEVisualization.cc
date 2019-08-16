@@ -24,9 +24,9 @@
 #include <display/EveVisBField.h>
 
 #include <vxd/geometry/GeoCache.h>
-#include <bklm/dataobjects/BKLMSimHitPosition.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <bklm/geometry/GeometryPar.h>
+#include <klm/bklm/dataobjects/BKLMSimHitPosition.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/geometry/GeometryPar.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>

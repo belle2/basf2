@@ -73,7 +73,7 @@ namespace Belle2 {
   std::pair<TObject*, IntervalOfValidity> Database::getData(const EventMetaData& event, const std::string& name)
   {
     DBStoreEntry entry(DBStoreEntry::c_Object, name, TObject::Class(), false, true);
-    std::vector<DBQuery> query{{name, true}};
+    std::vector<DBQuery> query{DBQuery{name, true}};
     getData(event, query);
     entry.updatePayload(query[0].revision, query[0].iov, query[0].filename, query[0].checksum, event);
     return std::make_pair(entry.releaseObject(), query[0].iov);

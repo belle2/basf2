@@ -35,10 +35,10 @@ class PxdPackerUnpackerTestModule(Module):
         # call constructor of base class, required if you implement __init__ yourself!
         super().__init__()
         # and do whatever else is necessary like declaring member variables
+        #: the PXDRawHits
         self.rawhits_collection = rawhits_collection
-        """ the PXDRawHits """
+        #: the PXDDigits
         self.digits_collection = digits_collection
-        """ the PXDDigits """
 
     def sortDigits(self, unsortedPyStoreArray):
         """ use a some digit information to sort the PXDDigits list

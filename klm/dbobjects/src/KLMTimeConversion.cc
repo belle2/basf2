@@ -39,7 +39,7 @@ void KLMTimeConversion::setCTimeShift(int shift)
   m_CTimeShift = shift;
 }
 
-double KLMTimeConversion::getTime(int ctime, int triggerCTime) const
+double KLMTimeConversion::getScintillatorTime(int ctime, int triggerCTime) const
 {
   /* Relative time in TDC periods for scintillators. */
   int relativeTime;
@@ -58,7 +58,7 @@ double KLMTimeConversion::getTime(int ctime, int triggerCTime) const
   return relativeTime * m_TDCPeriod;
 }
 
-std::pair<int, double> KLMTimeConversion::getTimes(int ctime, int tdc, int triggerTime) const
+std::pair<int, double> KLMTimeConversion::getRPCTimes(int ctime, int tdc, int triggerTime) const
 {
   /* Relative time in TDC periods for RPC hits. */
   int relativeTime = tdc & 0x7FF;

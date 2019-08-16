@@ -19,7 +19,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/dbobjects/BeamParameters.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -77,8 +76,6 @@ namespace Belle2 {
 
   void ParticleVertexFitterModule::initialize()
   {
-
-    //m_beamParams.required("", DataStore::c_Persistent);
     // magnetic field
     m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
 
@@ -119,10 +116,10 @@ namespace Belle2 {
     if (m_vertexFitter == "rave")
       analysis::RaveSetup::initialize(1, m_Bfield);
 
-    m_BeamSpotCenter = m_beamParams->getVertex();
+    m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
     m_beamSpotCov.ResizeTo(3, 3);
     TMatrixDSym beamSpotCov(3);
-    if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamParams->getCovVertex();
+    if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamSpotDB->getCovVertex();
     if (m_withConstraint == "iptube") ParticleVertexFitterModule::findConstraintBoost(2.);
     if (m_withConstraint == "iptubecut") {  // for development purpose only
       m_BeamSpotCenter = TVector3(0.001, 0., .013);
@@ -622,7 +619,8 @@ namespace Belle2 {
     }
 
     // apply four momentum constraint
-    kf.setFourMomentum(m_beamParams->getHER() + m_beamParams->getLER());
+    PCmsLabTransform T;
+    kf.setFourMomentum(T.getBeamFourMomentum());
 
     int err = kf.doFit();
 
@@ -1061,8 +1059,10 @@ namespace Belle2 {
       }
     }
 
-    PCmsLabTransform T;
-    double rotationangle = T.getBeamParams().getHER().Vect().Angle(-1.0 * T.getBeamParams().getLER().Vect()) / 2.;
+    //Hardcoded: half of the crossing angle, taken from BeamParameters.
+    //Belle II crossing angle is 0.083, but since this constraint is mostly useful for Belle,
+    //we use the Belle crossing angle.
+    double rotationangle = 0.022 / 2;
 
     TLorentzVector iptube_mom(0., 0., 1e10, 1e10);
     iptube_mom.RotateX(0.);
@@ -1080,10 +1080,10 @@ namespace Belle2 {
   {
     PCmsLabTransform T;
 
-    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boost = T.getBoostVector();
     TVector3 boostDir = boost.Unit();
 
-    TMatrixDSym beamSpotCov = m_beamParams->getCovVertex();
+    TMatrixDSym beamSpotCov = m_beamSpotDB->getCovVertex();
     beamSpotCov(2, 2) = cut * cut;
     double thetab = boostDir.Theta();
     double phib = boostDir.Phi();

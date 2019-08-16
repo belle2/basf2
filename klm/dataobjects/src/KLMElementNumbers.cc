@@ -9,7 +9,7 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <framework/logging/Logger.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 

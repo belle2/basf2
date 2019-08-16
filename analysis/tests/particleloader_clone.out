@@ -2,7 +2,6 @@
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst12.root
-[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
 [INFO]    -> MDST source: Tracks
@@ -91,6 +90,7 @@
 [INFO] Number of ParticleLists studied 9 
 [INFO] Number of ParticleLists studied 11 
 [INFO] Number of ParticleLists studied 1 
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltag is ${default_globaltag}
@@ -199,7 +199,6 @@ Total Number of Particles created in the DataStore: 13431875
 [INFO] Starting event processing, random seed is set to '1337'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst12.root
-[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
 [INFO]    -> MDST source: Tracks

@@ -8,10 +8,11 @@ larger file) that is present on the buildbot server but not bamboo
 """
 
 import b2test_utils
-from basf2 import set_random_seed, create_path, process
+from basf2 import set_random_seed, create_path, process, conditions
 
 # make logging more reproducible by replacing some strings
 b2test_utils.configure_logging_for_tests()
+conditions.disable_globaltag_replay()
 set_random_seed("1337")
 testinput = [b2test_utils.require_file('analysis/tests/mdst.root')]
 fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0 -> pi+ pi-', 'Lambda0 -> p+ pi-', 'K_L0', 'gamma']

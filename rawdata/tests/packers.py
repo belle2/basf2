@@ -15,6 +15,9 @@ import multiprocessing as mp
 
 b2.set_random_seed("L1V0RN0")
 b2.set_log_level(b2.LogLevel.WARNING)
+# Disable tag replay, we want to test current packers
+# independent of when the digits were created
+b2.conditions.disable_globaltag_replay()
 
 # This function create a secondary path to create the digits
 

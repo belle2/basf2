@@ -45,6 +45,7 @@ namespace Belle2::Conditions {
         info.baseUrl = "";
         info.payloadUrl = "";
         info.filename = payloadFilename(m_payloadDir, info.name, info.revision);
+        info.iov = iov;
         if (!FileSystem::fileExists(info.filename)) {
           B2FATAL("Could not find payload file specified in testing payload storage" << LogVar("storage filen", m_filename)
                   << LogVar("name", info.name) << LogVar("local revision", info.revision)

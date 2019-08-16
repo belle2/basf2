@@ -89,8 +89,8 @@ namespace Belle2 {
         weight_firstCDCHit = kalmanFitterInfo->getWeights().front();
         smoothedChi2_firstCDCHit = this->getSmoothedChi2(kalmanFitterInfo);
       }
-      m_variables.at("weight_firstCDCHit") = weight_firstCDCHit.value_or(m_valueIfVarNotAvailable);
-      m_variables.at("smoothedChi2_firstCDCHit") = smoothedChi2_firstCDCHit.value_or(m_valueIfVarNotAvailable);
+      m_variables.at("weight_firstCDCHit") = weight_firstCDCHit.value_or(m_valueIfNAN);
+      m_variables.at("smoothedChi2_firstCDCHit") = smoothedChi2_firstCDCHit.value_or(m_valueIfNAN);
 
       // find last SVD hit with Kalman info and extract weight and Chi2
       const auto lastHitWithSVDKalmanInfoIter = std::find_if(recoHitInformations.rbegin(),
@@ -103,8 +103,8 @@ namespace Belle2 {
         weight_lastSVDHit = kalmanFitterInfo->getWeights().front();
         smoothedChi2_lastSVDHit = this->getSmoothedChi2(kalmanFitterInfo);
       }
-      m_variables.at("weight_lastSVDHit") = weight_lastSVDHit.value_or(m_valueIfVarNotAvailable);
-      m_variables.at("smoothedChi2_lastSVDHit") = smoothedChi2_lastSVDHit.value_or(m_valueIfVarNotAvailable);
+      m_variables.at("weight_lastSVDHit") = weight_lastSVDHit.value_or(m_valueIfNAN);
+      m_variables.at("smoothedChi2_lastSVDHit") = smoothedChi2_lastSVDHit.value_or(m_valueIfNAN);
 
       std::vector<float> fitWeights;
       std::vector<float> chi2Values;
@@ -112,7 +112,7 @@ namespace Belle2 {
       chi2Values.reserve(kalmanFitterInfos.size());
       for (const auto& kalmanFitterInfo : kalmanFitterInfos) {
         fitWeights.push_back(kalmanFitterInfo->getWeights().front());
-        chi2Values.push_back(this->getSmoothedChi2(kalmanFitterInfo).value_or(m_valueIfVarNotAvailable));
+        chi2Values.push_back(this->getSmoothedChi2(kalmanFitterInfo).value_or(m_valueIfNAN));
       }
       setStats("weight", fitWeights);
       setStats("smoothedChi2", chi2Values);
@@ -138,14 +138,14 @@ namespace Belle2 {
     {
       int size = values.size();
       if (values.size() == 0) {
-        m_variables.at(identifier + "_max") =  m_valueIfVarNotAvailable;
-        m_variables.at(identifier + "_min") =  m_valueIfVarNotAvailable;
-        m_variables.at(identifier + "_mean") =  m_valueIfVarNotAvailable;
-        m_variables.at(identifier + "_std") =  m_valueIfVarNotAvailable;
-        m_variables.at(identifier + "_median") =  m_valueIfVarNotAvailable;
-        m_variables.at(identifier + "_n_zeros") = m_valueIfVarNotAvailable;
-        m_variables.at(identifier + "_firstCDCHit") = m_valueIfVarNotAvailable;
-        m_variables.at(identifier + "_lastSVDHit") = m_valueIfVarNotAvailable;
+        m_variables.at(identifier + "_max") = m_valueIfNAN;
+        m_variables.at(identifier + "_min") = m_valueIfNAN;
+        m_variables.at(identifier + "_mean") = m_valueIfNAN;
+        m_variables.at(identifier + "_std") = m_valueIfNAN;
+        m_variables.at(identifier + "_median") = m_valueIfNAN;
+        m_variables.at(identifier + "_n_zeros") = m_valueIfNAN;
+        m_variables.at(identifier + "_firstCDCHit") = m_valueIfNAN;
+        m_variables.at(identifier + "_lastSVDHit") = m_valueIfNAN;
         return;
       }
 
@@ -200,6 +200,6 @@ namespace Belle2 {
      * value different from NAN, but which is not obtainable otherwise, can be
      * useful if one wants the MVA classifier to train on the variable not being
      * available instead of ignoring it. */
-    const float m_valueIfVarNotAvailable = -1.0;
+    const float m_valueIfNAN = -1.0;
   };
 }

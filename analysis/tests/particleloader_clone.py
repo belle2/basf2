@@ -13,6 +13,7 @@ import b2test_utils
 inputFile = b2test_utils.require_file('mdst12.root', 'validation')
 # make logging more reproducible by replacing some strings
 b2test_utils.configure_logging_for_tests()
+basf2.conditions.disable_globaltag_replay()
 basf2.set_random_seed("1337")
 fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0 -> pi+ pi-', 'Lambda0 -> p+ pi-', 'K_L0', 'gamma']
 

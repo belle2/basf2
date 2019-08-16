@@ -15,6 +15,7 @@ from skim.standardlists.charm import *
 from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import *
 set_log_level(LogLevel.INFO)
+conditions.disable_globaltag_replay()
 
 from skimExpertFunctions import setSkimLogging, add_skim
 skimpath = Path()

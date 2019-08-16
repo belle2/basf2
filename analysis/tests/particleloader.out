@@ -90,9 +90,10 @@
 [INFO] Number of ParticleLists studied 9 
 [INFO] Number of ParticleLists studied 11 
 [INFO] Number of ParticleLists studied 1 
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltag is master_2018-12-24
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================

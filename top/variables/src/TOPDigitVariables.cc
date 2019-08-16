@@ -507,6 +507,7 @@ namespace Belle2 {
         }
         return count;
       }
+
       //! returns the number of good photons in a given slot
       double TOPGoodPhotonsInSlot([[maybe_unused]] const Particle* particle, const vector<double>& vars)
       {
@@ -521,6 +522,29 @@ namespace Belle2 {
         }
         return count;
       }
+
+      //! returns the number of tracks in the same slot as the particle
+      double TOPTracksInSlot([[maybe_unused]] const Particle* particle)
+      {
+        const auto* trk = particle->getTrack();
+        if (not trk) {
+          return -1.0;
+        }
+        int thisModuleID = static_cast<int>(getSlotID(particle));
+        if (thisModuleID == 0) return 0;
+        StoreArray<Track> tracks;
+        int nTracks = 1;
+        for (auto t : tracks) {
+          const auto* tl = t.getRelated<TOPLikelihood>();
+          if (not tl) continue;
+          const auto* te = tl->getRelated<ExtHit>();
+          if (not te) continue;
+          if (te->getCopyID() != thisModuleID) continue;
+          nTracks += 1;
+        }
+        return nTracks;
+      }
+
     } // TOPVariable
 
     VARIABLE_GROUP("TOP Calibration");
@@ -535,7 +559,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("topReflectedDigitCount", TOPVariable::topReflectedDigitCount,
                       "[calibration] The number of reflected photons in the same module");
     REGISTER_VARIABLE("topReflectedDigitCountExpert(minGap, maxGap)", TOPVariable::topReflectedDigitCountExpert,
-                      "[calibration] The number of photons after the largest gap between minGap and maxGap")
+                      "[calibration] The number of photons after the largest gap between minGap and maxGap");
     REGISTER_VARIABLE("topDigitGapSize", TOPVariable::topDigitGapSize,
                       "[calibration] The largest time difference between two consecutive hits in the same module");
     REGISTER_VARIABLE("topLocalX", TOPVariable::getTOPLocalX,
@@ -592,5 +616,7 @@ namespace Belle2 {
                       "[calibration] The number of all photons in the given slot");
     REGISTER_VARIABLE("topGoodPhotonsInSlot(id)", TOPVariable::TOPGoodPhotonsInSlot,
                       "[calibration] The number of good photons in the given slot");
+    REGISTER_VARIABLE("topTracksInSlot", TOPVariable::TOPTracksInSlot,
+                      "[calibration] The number of tracks in the same slot as the particle");
   } // Variable
 } // Belle2

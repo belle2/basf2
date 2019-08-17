@@ -458,6 +458,11 @@ namespace Belle2 {
       return v0DaughterZ0(particle, {0}) - v0DaughterZ0(particle, {1});
     }
 
+    double isBremsPhoton(const Particle* particle)
+    {
+      return particle->hasExtraInfo("bremsAcceptanceFactor");
+    }
+
     double Constant(const Particle*, const std::vector<double>& constant)
     {
       return constant[0];

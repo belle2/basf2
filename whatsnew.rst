@@ -86,6 +86,16 @@ You should update it to this:
               $BELLE2_RELEASE_DIR/analysis/examples/VariableManager
 
 
+.. rubric:: Switch of beam spot information from nominal to measured values.
+
+All IP position and errors now use the BeamSpot database, which contains the measured IP size instead of the nominal one. 
+All beam kinematics are handled through PCmsLabTransform, which computes them by combining CollisionInvariantMass and CollisionBoostVector. 
+Previously, these were pulled from either BeamParameters or gearbox (obsolete). 
+Some truth variables still use BeamParameters; those were marked as such.
+
+It must be noted that in previous definitions the boost included a small rotation to align it with the HER. 
+This is no longer possible with the new structure, so the definition of CMS is slightly changed. The impact should be at the percent level.
+
 .. rubric:: Loading ECLClusters under multiple hypotheses
 
 It is now possible to load :math:`K_L^0` particles from clusters in the ECL. 
@@ -124,6 +134,18 @@ This also changes the behavior of `add_simulation()
 <reconstruction.add_reconstruction>`: If a list of components is provided this
 will now only change the digitization or reconstruction setup but will always
 use the full geometry from the database.
+
+.. rubric:: New DecayStringGrammar for custom MCMatching 
+
+Users can use new DecayStringGrammar to set properties of the MCMatching. Then `isSignal`, `mcErrors` and other MCTruthVariables behave according to the property. 
+
+Once DecayStringGrammar is used with `reconstructDecay`, users can use `isSignal` instead of several specific variables such as `isSignalAcceptMissingNeutrino`.
+If one doesn't use any new DecayStringGrammar, all MCTruthVariables work same as before.
+
+The grammar is useful to analyze inclusive processes with both fully-inclusive-method and sum-of-exclusive-method. 
+There are also new helper functions `genNMissingDaughter(PDG)` and `genNStepsToDaughter(i)` to obtain the detailed MC information.
+
+You can find examples of usage in :ref:`Marker_of_unspecified_particle`, :ref:`Grammar_for_custom_MCMatching`.
 
 .. Now let's add the detailed changes for the analysis package first, that's
    what user will want to see

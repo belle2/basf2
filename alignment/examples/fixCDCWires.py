@@ -21,10 +21,16 @@ last_layer = 55
 
 
 class FixWires(Module):
+    """
+    Module to loop through all wires in geometry and write down
+    a text file with parameter fixing for millepede.
+
+    """
 
     def __init__(self):
         """ init """
         super(FixWires, self).__init__()
+        #: list of text lines in the "const-making" file
         self.consts = []
 
     def event(self):
@@ -54,6 +60,7 @@ class FixWires(Module):
                 self.consts.append('{} 0. -1.'.format(str(label.label())))
 
     def terminate(self):
+        """ Write down the text file """
         with open('fix-cdc-wires.txt', 'w') as txt:
             for line in self.consts:
                 txt.write(str(line) + '\n')

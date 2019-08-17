@@ -411,8 +411,8 @@ namespace Belle2 {
      * @{
      * TMP (Template Meta Programming )
      * The given python list is filled, and later converted into a python tuple (in convertToPythonObject).
-     * To fill the python list frmo the C++ std::tuple we need again TMP methods.
-     * The variadic template std::tuple is copied by rthe ecursive defined template function GetTuple,
+     * To fill the python list from the C++ std::tuple we need again TMP methods.
+     * The variadic template std::tuple is copied by the recursive defined template function GetTuple,
      * the overloaded argument (type SizeT<>) of the function serves as a counter for the recursion depth.
      */
     template < typename TupleType >
@@ -421,9 +421,12 @@ namespace Belle2 {
       GetTuple(tuple, pyList, SizeT<std::tuple_size<TupleType>::value>());
     }
 
+    /** Break recursion when all members are already appended to the list */
     template < typename TupleType >
     inline void GetTuple(const TupleType&, boost::python::list&, SizeT<0>) { }
 
+    /** Append elements of the tuple to pyList by recursively calling this function with the
+     * element index as argument type */
     template < typename TupleType, size_t N >
     inline void GetTuple(const TupleType& tuple, boost::python::list& pyList, SizeT<N>)
     {
@@ -436,7 +439,7 @@ namespace Belle2 {
      * Writes content of a std::tuple to a python tuple.
      *
      * @param tuple The tuple whose items should be stored to a python tuple.
-     * @return The python tuple where the the content of the map is stored.
+     * @return The python tuple where the content of the map is stored.
      */
     template<typename... Types>
     boost::python::tuple convertToPythonObject(const std::tuple<Types...>& tuple)
@@ -597,9 +600,12 @@ namespace Belle2 {
       SetTuple(tuple, pyTuple, SizeT<N>());
     }
 
+    /** Break recursion once all elements have been set */
     template < typename TupleType >
     inline void SetTuple(TupleType&, const boost::python::tuple&, SizeT<0>) { }
 
+    /** Set the elements of the tuple recursively by calling with the function
+     * with the next tuple index and converting one element */
     template < typename TupleType, size_t N >
     inline void SetTuple(TupleType& tuple, const boost::python::tuple& pyTuple, SizeT<N>)
     {
@@ -639,6 +645,7 @@ namespace Belle2 {
                                pyObject.ptr()->ob_type->tp_name + "'.");
     }
 
+    /** Recursively go through all possible types of the variant and check which one is a possible conversion */
     template < typename... Types, size_t N >
     inline void SetVariant(boost::variant<Types...>& variant, const boost::python::object& pyObject, SizeT<N>)
     {

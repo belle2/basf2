@@ -25,7 +25,7 @@
 #include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/dbobjects/CDCCalibration.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
-#include <eklm/dbobjects/EKLMAlignment.h>
+#include <klm/eklm/dbobjects/EKLMAlignment.h>
 
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
@@ -228,7 +228,7 @@ namespace Belle2 {
 
       /// Initialize a given GlobalParamVector with all DB objects and interfaces
       ///
-      ///       auto gpv = GlobalParamVector({"BeamParameters"});
+      ///       auto gpv = GlobalParamVector({"BeamSpot"});
       ///       GlobalCalibrationManager::initGlobalVector(gpv);
       ///
       /// This one central function should be used to prepare the global vectors even

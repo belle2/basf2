@@ -20,7 +20,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 // digits
-#include <bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/dataobjects/BKLMDigit.h>
 
 #include <trg/klm/dataobjects/KLMTriggerHit.h>
 #include <trg/klm/dataobjects/KLMTriggerTrack.h>

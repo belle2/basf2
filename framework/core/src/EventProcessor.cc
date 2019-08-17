@@ -449,6 +449,7 @@ void EventProcessor::processBeginRun(bool skipDB)
   MetadataService::Instance().addBasf2Status("beginning run");
 
   m_inRun = true;
+  // cppcheck-suppress unreadVariable; scope guard with side effects, no need to read
   auto dbsession = Database::Instance().createScopedUpdateSession();
 
   LogSystem& logSystem = LogSystem::Instance();

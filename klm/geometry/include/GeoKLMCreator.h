@@ -11,8 +11,8 @@
 #pragma once
 
 /* Belle2 headers. */
-#include <bklm/geometry/GeoBKLMCreator.h>
-#include <eklm/geometry/GeoEKLMCreator.h>
+#include <klm/bklm/geometry/GeoBKLMCreator.h>
+#include <klm/eklm/geometry/GeoEKLMCreator.h>
 
 /**
  * @file

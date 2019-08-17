@@ -24,6 +24,11 @@ import simulation as si
 import reconstruction as re
 import modularAnalysis as ma
 
+# We previously generated events but we want to simulate them with the
+# currently best values, not whatever whas valid back then. So we have to
+# disable reuse of the same globaltag from when the events were generated
+b2.conditions.disable_globaltag_replay()
+
 # create path
 my_path = b2.create_path()
 

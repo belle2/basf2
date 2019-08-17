@@ -92,12 +92,14 @@ namespace Belle2 {
     std::vector<double> RevoTrg;
 
 
-
+    //! Trg ECL Unpakcer TC output
     StoreArray<TRGECLUnpackerStore> trgeclHitArray;
+    //! Trg ECL Unpakcer Event output
     StoreArray<TRGECLUnpackerEvtStore> trgeclEvtArray;
-    StoreArray<TRGECLCluster> trgeclCluster;
+    //! Trg Ecl Unpacker Summary output
     StoreArray<TRGECLUnpackerSumStore> trgeclSumArray;
-
+    //! Trg ECL Cluster output
+    StoreArray<TRGECLCluster> trgeclCluster;
   };
 
 }

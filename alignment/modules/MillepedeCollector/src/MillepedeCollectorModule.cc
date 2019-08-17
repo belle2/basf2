@@ -23,6 +23,7 @@
 #include <analysis/utility/ReferenceFrame.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/dbobjects/BeamParameters.h>
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/Track.h>
@@ -111,7 +112,7 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
 
   // Configure global parameters
   addParam("components", m_components,
-           "Specify which DB objects are calibrated, like ['BeamParameters', 'CDCTimeWalks'] or leave empty to use all components available.",
+           "Specify which DB objects are calibrated, like ['BeamSpot', 'CDCTimeWalks'] or leave empty to use all components available.",
            m_components);
   addParam("calibrateVertex", m_calibrateVertex,
            "For primary vertices / two body decays, beam spot vertex calibration derivatives are added",
@@ -443,7 +444,7 @@ void MillepedeCollectorModule::collect()
           labels.push_back(label.setParameterId(2));
           labels.push_back(label.setParameterId(3));
 
-          // Allow to disable BeamParameters externally
+          // Allow to disable BeamSpot externally
           alignment::GlobalDerivatives globals(labels, derivatives);
           // Add derivatives for vertex calibration to first point of first trajectory
           // NOTE: use GlobalDerivatives operators vector<int> and TMatrixD which filter
@@ -773,7 +774,7 @@ void MillepedeCollectorModule::collect()
       extCov.SetSub(0, 0, get<TMatrixDSym>(getPrimaryVertexAndCov()));
 
       // 3x3 boost vector covariance
-      //NOTE: BeamParameters return covarince in variables (E, theta_x, theta_y)
+      //NOTE: BeamSpot return covarince in variables (E, theta_x, theta_y)
       // We need to transform it to our variables (px, py, pz)
 
       TMatrixD dBoost_dVect(3, 3);
@@ -868,7 +869,7 @@ void MillepedeCollectorModule::collect()
           labels.push_back(0);
         }
 
-        // Allow to disable BeamParameters externally
+        // Allow to disable BeamSpot externally
         alignment::GlobalDerivatives globals(labels, derivatives);
 
         // Add derivatives for vertex calibration to first point of first trajectory

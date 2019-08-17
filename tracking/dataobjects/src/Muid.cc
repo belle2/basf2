@@ -44,6 +44,9 @@ Muid::Muid() :
   for (int i = 0; i < BKLMElementNumbers::getMaximalLayerNumber(); ++i) {
     m_ExtBKLMEfficiencyValue[i] = 1.0;
   }
+  for (int i = 0; i < EKLMElementNumbers::getMaximalLayerNumber(); ++i) {
+    m_ExtEKLMEfficiencyValue[i] = 1.0;
+  }
 }
 
 Muid::Muid(int pdgCode) :
@@ -76,5 +79,8 @@ Muid::Muid(int pdgCode) :
 {
   for (int i = 0; i < BKLMElementNumbers::getMaximalLayerNumber(); ++i) {
     m_ExtBKLMEfficiencyValue[i] = 1.0;
+  }
+  for (int i = 0; i < EKLMElementNumbers::getMaximalLayerNumber(); ++i) {
+    m_ExtEKLMEfficiencyValue[i] = 1.0;
   }
 }

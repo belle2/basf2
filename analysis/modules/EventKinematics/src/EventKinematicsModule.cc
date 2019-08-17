@@ -130,7 +130,7 @@ void EventKinematicsModule::getParticleMomentumLists(vector<string> particleList
 TVector3 EventKinematicsModule::getMissingMomentum()
 {
   PCmsLabTransform T;
-  TLorentzVector beam = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+  TLorentzVector beam = T.getBeamFourMomentum();
   TVector3 p = beam.Vect();
   int nParticles = m_particleMomentumList.size();
   for (int i = 0; i < nParticles; ++i) {

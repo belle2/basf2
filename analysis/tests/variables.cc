@@ -90,12 +90,12 @@ namespace {
         UseReferenceFrame<CMSFrame> dummy;
         EXPECT_FLOAT_EQ(0.68176979, particleP(&p));
         EXPECT_FLOAT_EQ(0.80920333, particleE(&p));
-        EXPECT_FLOAT_EQ(0.058562335, particlePx(&p));
+        EXPECT_FLOAT_EQ(0.061728548, particlePx(&p));
         EXPECT_FLOAT_EQ(-0.40000001, particlePy(&p));
-        EXPECT_FLOAT_EQ(0.54898131, particlePz(&p));
-        EXPECT_FLOAT_EQ(0.40426421, particlePt(&p));
-        EXPECT_FLOAT_EQ(0.80522972, particleCosTheta(&p));
-        EXPECT_FLOAT_EQ(-1.4254233, particlePhi(&p));
+        EXPECT_FLOAT_EQ(0.54863429, particlePz(&p));
+        EXPECT_FLOAT_EQ(0.404735, particlePt(&p));
+        EXPECT_FLOAT_EQ(0.80472076, particleCosTheta(&p));
+        EXPECT_FLOAT_EQ(-1.4176828, particlePhi(&p));
 
         EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
       }
@@ -177,12 +177,12 @@ namespace {
         UseReferenceFrame<CMSRotationFrame> dummy(TVector3(1, 0, 0), TVector3(0, 1, 0), TVector3(0, 0, 1));
         EXPECT_FLOAT_EQ(0.68176979, particleP(&p));
         EXPECT_FLOAT_EQ(0.80920333, particleE(&p));
-        EXPECT_FLOAT_EQ(0.058562335, particlePx(&p));
+        EXPECT_FLOAT_EQ(0.061728548, particlePx(&p));
         EXPECT_FLOAT_EQ(-0.40000001, particlePy(&p));
-        EXPECT_FLOAT_EQ(0.54898131, particlePz(&p));
-        EXPECT_FLOAT_EQ(0.40426421, particlePt(&p));
-        EXPECT_FLOAT_EQ(0.80522972, particleCosTheta(&p));
-        EXPECT_FLOAT_EQ(-1.4254233, particlePhi(&p));
+        EXPECT_FLOAT_EQ(0.54863429, particlePz(&p));
+        EXPECT_FLOAT_EQ(0.404735, particlePt(&p));
+        EXPECT_FLOAT_EQ(0.80472076, particleCosTheta(&p));
+        EXPECT_FLOAT_EQ(-1.4176828, particlePhi(&p));
 
         EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
       }
@@ -270,11 +270,11 @@ namespace {
 
     {
       UseReferenceFrame<CMSFrame> dummy;
-      EXPECT_FLOAT_EQ(1.0261739, particleDX(&p));
+      EXPECT_FLOAT_EQ(1.0382183, particleDX(&p));
       EXPECT_FLOAT_EQ(2.0, particleDY(&p));
-      EXPECT_FLOAT_EQ(2.256825, particleDZ(&p));
-      EXPECT_FLOAT_EQ(std::sqrt(2.0 * 2.0 + 1.0261739 * 1.0261739), particleDRho(&p));
-      EXPECT_FLOAT_EQ(3.1853244, particleDistance(&p));
+      EXPECT_FLOAT_EQ(2.2510159, particleDZ(&p));
+      EXPECT_FLOAT_EQ(std::sqrt(2.0 * 2.0 + 1.0382183 * 1.0382183), particleDRho(&p));
+      EXPECT_FLOAT_EQ(3.185117, particleDistance(&p));
       EXPECT_FLOAT_EQ(0.5, particlePvalue(&p));
     }
 
@@ -1144,7 +1144,7 @@ namespace {
 
     var = Manager::Instance().getVariable("useCMSFrame(distance)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 3.1853244);
+    EXPECT_FLOAT_EQ(var->function(&p), 3.185117);
   }
 
   TEST_F(MetaVariableTest, extraInfo)
@@ -1960,7 +1960,7 @@ namespace {
     const Particle* par = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices);
 
     //now we expect non-nan results
-    EXPECT_FLOAT_EQ(var->function(par), 2.8614323);
+    EXPECT_FLOAT_EQ(var->function(par), 2.8638029);
     EXPECT_FLOAT_EQ(varCMS->function(par), M_PI);
   }
 

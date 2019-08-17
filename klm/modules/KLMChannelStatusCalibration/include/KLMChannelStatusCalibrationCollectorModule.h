@@ -12,8 +12,8 @@
 
 /* Belle2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
-#include <bklm/dataobjects/BKLMDigit.h>
-#include <eklm/dataobjects/EKLMDigit.h>
+#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>

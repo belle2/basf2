@@ -20,7 +20,7 @@ import os
 import sys
 import glob
 import argparse
-skimCode = encodeSkimName("CharmSemileptonic")
+skimCode = encodeSkimName("DstToD0Pi_D0ToSemileptonic")
 
 # Read optional --data argument
 parser = argparse.ArgumentParser()
@@ -49,8 +49,8 @@ applyCuts('K_S0:all', '0.477614 < M < 0.517614', path=cslpath)
 
 
 # CSL Skim
-from skim.charm import CharmSemileptonicList
-CSLList = CharmSemileptonicList(cslpath)
+from skim.charm import CharmSemileptonic
+CSLList = CharmSemileptonic(cslpath)
 skimOutputUdst(skimCode, CSLList, path=cslpath)
 summaryOfLists(CSLList, path=cslpath)
 

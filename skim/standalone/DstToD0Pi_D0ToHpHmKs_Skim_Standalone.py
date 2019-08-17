@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 
 #######################################################
+#
 # Charm skims
-# P. Urquijo, 6/Jan/2015
 # G. Casarosa, 7/Oct/2016
 #
 ######################################################
 
+from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import stdE, stdMu, stdPi
-from stdPi0s import *
-from stdPhotons import *
+from stdCharged import stdPi, stdK, stdE, stdMu
+from stdV0s import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 import argparse
 
@@ -25,34 +25,39 @@ args = parser.parse_args()
 if args.data:
     use_central_database("data_reprocessing_prompt_bucket6")
 
-
 gb2_setuprel = 'release-03-02-02'
 set_log_level(LogLevel.INFO)
+
 import os
 import sys
 import glob
+skimCode = encodeSkimName('DstToD0Pi_D0ToHpHmKs')
 
-# skimCode = encodeSkimName('CharmRare')
-skimCode = "CharmRare"
-
-crpath = Path()
+c3bh2path = Path()
 
 fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=crpath)
+inputMdstList('default', fileList, path=c3bh2path)
 
 
-loadStdSkimPi0(path=crpath)
-loadStdSkimPhoton(path=crpath)
-stdMu('loose', path=crpath)
-stdE('loose', path=crpath)
-stdPi('loose', path=crpath)
+stdKshorts(path=c3bh2path)
+mergedKshorts(path=c3bh2path)
+stdPi('loose', path=c3bh2path)
+stdK('loose', path=c3bh2path)
+stdE('loose', path=c3bh2path)
+stdMu('loose', path=c3bh2path)
+stdPi('all', path=c3bh2path)
+stdK('all', path=c3bh2path)
+stdE('all', path=c3bh2path)
+stdMu('all', path=c3bh2path)
 
-from skim.charm import CharmRare
-CharmRareList = CharmRare(crpath)
-skimOutputUdst(skimCode, CharmRareList, path=crpath)
-summaryOfLists(CharmRareList, path=crpath)
+from skim.charm import DstToD0PiD0ToHpHmKs
+DstToD0PiD0ToHpHmKsList = DstToD0PiD0ToHpHmKs(c3bh2path)
+skimOutputUdst(skimCode, DstToD0PiD0ToHpHmKsList, path=c3bh2path)
 
-setSkimLogging(path=crpath)
-process(crpath)
+summaryOfLists(DstToD0PiD0ToHpHmKsList, path=c3bh2path)
+
+
+setSkimLogging(path=c3bh2path)
+process(c3bh2path)
 
 print(statistics)

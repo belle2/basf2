@@ -97,43 +97,47 @@ add_skim('CharmlessHad3Body', Had3BodyList, path=skimpath)
 # Charm skims
 # charm Skim: D0 -> K pi/ pi pi /K K
 from skim.charm import D0ToHpJm
-add_skim('Charm2BodyHadronicD0', D0ToHpJm(path=skimpath), path=skimpath)
+add_skim('XToD0_D0ToHpJm', D0ToHpJm(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> K pi/ pi pi /K K) pi
 from skim.charm import DstToD0PiD0ToHpJm
-add_skim('Charm2BodyHadronic', DstToD0PiD0ToHpJm(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToHpJm', DstToD0PiD0ToHpJm(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> K pi pi0) pi
 from skim.charm import DstToD0PiD0ToHpJmPi0
-add_skim('Charm3BodyHadronic', DstToD0PiD0ToHpJmPi0(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToHpJmPi0', DstToD0PiD0ToHpJmPi0(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> pi pi pi0/K K pi0) pi
 from skim.charm import DstToD0PiD0ToHpHmPi0
-add_skim('Charm3BodyHadronic1', DstToD0PiD0ToHpHmPi0(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToHpHmPi0', DstToD0PiD0ToHpHmPi0(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> K pi eta) pi
 from skim.charm import DstToD0PiD0ToHpJmEta
-add_skim('Charm3BodyHadronic3', DstToD0PiD0ToHpJmEta(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToHpJmEta', DstToD0PiD0ToHpJmEta(path=skimpath), path=skimpath)
 
 # charm Skim: D*+ -> D0 (-> Ks omega/eta (-> pi pi pi0)) pi
 from skim.charm import DstToD0PiD0ToKsOmega
-add_skim('Charm2BodyNeutrals2', DstToD0PiD0ToKsOmega(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToKsOmega', DstToD0PiD0ToKsOmega(path=skimpath), path=skimpath)
 
 # charm Skim: D0 -> pi0 pi0/Ks pi0/Ks Ks
 from skim.charm import D0ToNeutrals
-add_skim('Charm2BodyNeutralsD0', D0ToNeutrals(path=skimpath), path=skimpath)
+add_skim('XToD0_D0ToNeutrals', D0ToNeutrals(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> pi0 pi0/Ks pi0/Ks Ks) pi
 from skim.charm import DstToD0Neutrals
-add_skim('Charm2BodyNeutrals', DstToD0Neutrals(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToNeutrals', DstToD0Neutrals(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> pi pi Ks/ K K Ks) pi
 from skim.charm import DstToD0PiD0ToHpHmKs
-add_skim('Charm3BodyHadronic2', DstToD0PiD0ToHpHmKs(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToHpHmKs', DstToD0PiD0ToHpHmKs(path=skimpath), path=skimpath)
 
 # charm Skim: D -> gamma gamma/ e e/ mu mu
 from skim.charm import CharmRare
-add_skim('CharmRare', CharmRare(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToRare', CharmRare(path=skimpath), path=skimpath)
+
+# charm Skim: D+ -> Ks pi+/ Ks K+
+from skim.charm import DpToKsHp
+add_skim('XToDp_DpToKsHp', DpToKsHp(path=skimpath), path=skimpath)
 
 
 # Systematics skim

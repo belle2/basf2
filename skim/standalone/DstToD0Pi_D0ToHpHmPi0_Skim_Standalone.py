@@ -31,7 +31,7 @@ set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
-skimCode = encodeSkimName('Charm3BodyHadronic1')
+skimCode = encodeSkimName('DstToD0Pi_D0ToHpHmPi0')
 
 c3bh1path = Path()
 

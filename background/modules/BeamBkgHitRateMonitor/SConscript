@@ -2,7 +2,7 @@ Import('env')
 
 env['LIBS'] = ['framework', 'rawdata_dataobjects', 'mdst_dataobjects',
                'pxd_dataobjects', 'pxd', 
-               'svd_dataobjects',
+               'svd_dataobjects', 'svd',
                'cdc_dataobjects',
                'top_dataobjects', 'top', 
                'arich_dataobjects', 'arich',

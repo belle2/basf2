@@ -14,8 +14,6 @@
 
 using namespace Belle2;
 
-static const char MemErr[] = "Memory allocation error.";
-
 /* Register the creator */
 geometry::CreatorFactory<KLM::GeoKLMCreator> GeoKLMFactory("KLMCreator");
 

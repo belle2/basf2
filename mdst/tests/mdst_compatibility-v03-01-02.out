@@ -2,7 +2,6 @@
 [INFO] The random number seed is set to "1"
 [INFO] Starting event processing, random seed is set to '1'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/mdst/tests/mdst-v03-01-02.root
-[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 Untested method EventMetaData::addErrorFlag
 Untested method EventMetaData::isEndOfData
 Untested method EventMetaData::setEndOfData
@@ -445,7 +444,7 @@ Track#12:
 TrackFitResult#0:
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] Conditions data: configured globaltag is release-03-01-00_rev3
   get4Momentum(): (-0.22817,0.0114942,0.0574713,0.273818)
   getChargeSign(): 1
   getCotTheta(): 0.251561

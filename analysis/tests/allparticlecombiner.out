@@ -1,6 +1,7 @@
 [INFO] Steering file: analysis/tests/allparticlecombiner.py
 [INFO] The random number seed is set to "1234"
 [INFO] Starting event processing, random seed is set to '1234'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltag is ${default_globaltag}

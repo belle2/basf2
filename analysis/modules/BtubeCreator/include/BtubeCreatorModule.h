@@ -20,7 +20,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // DataObjects
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Btube.h>
 
@@ -58,7 +58,7 @@ namespace Belle2 {
     double m_Bfield;              /**< magnetic field from data base */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
-    DBObjPtr<BeamParameters> m_beamParams;/**< Beam parameters */
+    DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
     StoreArray<Particle> particles; /**< the particles */
     StoreArray<Btube> tubeArray; /**< the (output) array of Btube objects */
 

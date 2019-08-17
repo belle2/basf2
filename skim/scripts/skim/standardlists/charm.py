@@ -12,8 +12,8 @@ def loadStdD0(path):
       - 'K-:loose pi+:loose'
       - 'K-:loose pi+:loose pi+:loose pi-:loose'
       - 'K-:loose pi+:loose pi0:loose'
-      - 'K_S0:all pi0:loose'
-      - 'K_S0:all pi+:loose pi-:loose'
+      - 'K_S0:merged pi0:loose'
+      - 'K_S0:merged pi+:loose pi-:loose'
 
     @param path     modules are added to this path
     """
@@ -21,8 +21,8 @@ def loadStdD0(path):
     D_Channels = ['K-:loose pi+:loose',
                   'K-:loose pi+:loose pi+:loose pi-:loose',
                   'K-:loose pi+:loose pi0:loose',
-                  'K_S0:all pi0:loose',
-                  'K_S0:all pi+:loose pi-:loose',
+                  'K_S0:merged pi0:loose',
+                  'K_S0:merged pi+:loose pi-:loose',
                   ]
 
     DList = []
@@ -38,17 +38,17 @@ def loadStdDplus(path):
     Create a list of 'D+:all' list, with an invariant mass cut :math:`1.82 < M < 1.92 GeV`, from the following particles lists:
 
       - 'K-:loose pi+:loose pi+:loose'
-      - 'K_S0:all pi+:loose'
-      - 'K_S0:all pi+:loose pi0:loose'
-      - 'K_S0:all pi+:loose pi+:loose pi-:loose'
+      - 'K_S0:merged pi+:loose'
+      - 'K_S0:merged pi+:loose pi0:loose'
+      - 'K_S0:merged pi+:loose pi+:loose pi-:loose'
 
     @param path     modules are added to this path
     """
     Dcuts = '1.82 < M < 1.92'
     D_Channels = ['K-:loose pi+:loose pi+:loose',
-                  'K_S0:all pi+:loose',
-                  'K_S0:all pi+:loose pi0:loose',
-                  'K_S0:all pi+:loose pi+:loose pi-:loose',
+                  'K_S0:merged pi+:loose',
+                  'K_S0:merged pi+:loose pi0:loose',
+                  'K_S0:merged pi+:loose pi+:loose pi-:loose',
                   ]
 
     DList = []

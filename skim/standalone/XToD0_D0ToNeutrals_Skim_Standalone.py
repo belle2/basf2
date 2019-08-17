@@ -13,9 +13,13 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from stdV0s import *
+from stdPi0s import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 import argparse
+gb2_setuprel = 'release-03-02-00'
+skimCode = encodeSkimName('XToD0_D0ToNeutrals')
 
+# Read optional --data argument
 parser = argparse.ArgumentParser()
 parser.add_argument('--data',
                     help='Provide this flag if running on data.',
@@ -25,39 +29,29 @@ args = parser.parse_args()
 if args.data:
     use_central_database("data_reprocessing_prompt_bucket6")
 
-gb2_setuprel = 'release-03-02-02'
-set_log_level(LogLevel.INFO)
-
-import os
-import sys
-import glob
-skimCode = encodeSkimName('Charm3BodyHadronic2')
-
-c3bh2path = Path()
+c2bndpath = Path()
 
 fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=c3bh2path)
+inputMdstList('default', fileList, path=c2bndpath)
 
 
-stdKshorts(path=c3bh2path)
-mergedKshorts(path=c3bh2path)
-stdPi('loose', path=c3bh2path)
-stdK('loose', path=c3bh2path)
-stdE('loose', path=c3bh2path)
-stdMu('loose', path=c3bh2path)
-stdPi('all', path=c3bh2path)
-stdK('all', path=c3bh2path)
-stdE('all', path=c3bh2path)
-stdMu('all', path=c3bh2path)
+loadStdSkimPi0(path=c2bndpath)
+stdPi('loose', path=c2bndpath)
+stdK('loose', path=c2bndpath)
+stdPi('all', path=c2bndpath)
+stdK('all', path=c2bndpath)
+stdKshorts(path=c2bndpath)
+mergedKshorts(path=c2bndpath)
 
-from skim.charm import DstToD0PiD0ToHpHmKs
-DstToD0PiD0ToHpHmKsList = DstToD0PiD0ToHpHmKs(c3bh2path)
-skimOutputUdst(skimCode, DstToD0PiD0ToHpHmKsList, path=c3bh2path)
+from skim.charm import D0ToNeutrals
 
-summaryOfLists(DstToD0PiD0ToHpHmKsList, path=c3bh2path)
+D0ToNeutralsList = D0ToNeutrals(c2bndpath)
+skimOutputUdst(skimCode, D0ToNeutralsList, path=c2bndpath)
+
+summaryOfLists(D0ToNeutralsList, path=c2bndpath)
 
 
-setSkimLogging(path=c3bh2path)
-process(c3bh2path)
+setSkimLogging(path=c2bndpath)
+process(c2bndpath)
 
 print(statistics)

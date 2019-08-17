@@ -3,7 +3,7 @@
 
 #######################################################
 #
-
+# Charm skims
 # G. Casarosa, 7/Oct/2016
 #
 ######################################################
@@ -15,10 +15,13 @@ from stdCharged import stdPi, stdK, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-import argparse
 gb2_setuprel = 'release-03-02-00'
-
-skimCode = encodeSkimName('Charm2BodyNeutrals2')
+set_log_level(LogLevel.INFO)
+import sys
+import os
+import glob
+import argparse
+skimCode = encodeSkimName('DstToD0Pi_D0ToHpJmEta')
 
 # Read optional --data argument
 parser = argparse.ArgumentParser()
@@ -30,30 +33,32 @@ args = parser.parse_args()
 if args.data:
     use_central_database("data_reprocessing_prompt_bucket6")
 
-c2bn2path = Path()
+c3bh3path = Path()
 
 fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=c2bn2path)
+inputMdstList('default', fileList, path=c3bh3path)
 
-stdPi('loose', path=c2bn2path)
-stdK('loose', path=c2bn2path)
-stdE('loose', path=c2bn2path)
-stdMu('loose', path=c2bn2path)
-stdPi('all', path=c2bn2path)
-stdK('all', path=c2bn2path)
-stdE('all', path=c2bn2path)
-stdMu('all', path=c2bn2path)
-stdKshorts(path=c2bn2path)
-mergedKshorts(path=c2bn2path)
-loadStdSkimPi0(path=c2bn2path)
 
-from skim.charm import DstToD0PiD0ToKsOmega
-DstList = DstToD0PiD0ToKsOmega(c2bn2path)
-skimOutputUdst(skimCode, DstList, path=c2bn2path)
+loadStdSkimPhoton(path=c3bh3path)
+loadStdSkimPi0(path=c3bh3path)
+stdPi('loose', path=c3bh3path)
+stdK('loose', path=c3bh3path)
+stdE('loose', path=c3bh3path)
+stdMu('loose', path=c3bh3path)
+stdPi('all', path=c3bh3path)
+stdK('all', path=c3bh3path)
+stdE('all', path=c3bh3path)
+stdMu('all', path=c3bh3path)
+stdKshorts(path=c3bh3path)
 
-summaryOfLists(DstList, path=c2bn2path)
+from skim.charm import DstToD0PiD0ToHpJmEta
+DstToD0PiD0ToHpJmEtaList = DstToD0PiD0ToHpJmEta(c3bh3path)
+skimOutputUdst(skimCode, DstToD0PiD0ToHpJmEtaList, path=c3bh3path)
 
-setSkimLogging(path=c2bn2path)
-process(c2bn2path)
+summaryOfLists(DstToD0PiD0ToHpJmEtaList, path=c3bh3path)
+
+
+setSkimLogging(path=c3bh3path)
+process(c3bh3path)
 
 print(statistics)

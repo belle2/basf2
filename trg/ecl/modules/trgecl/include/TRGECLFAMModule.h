@@ -112,7 +112,7 @@ namespace Belle2 {
     StoreArray<TRGECLWaveform> m_TRGECLWaveform; /**< output for TRGECLWaveform */
     StoreArray<TRGECLHit> m_TRGECLHit; /**< output for TRGECLHit */
     StoreArray<TRGECLFAMAna> m_TRGECLFAMAna; /**< output for TRGECLFAMAna */
-    DBArray<TRGECLFAMPara> m_FAMPara; /** FAM Parameters */
+    DBArray<TRGECLFAMPara> m_FAMPara; /**< FAM Parameters */
   };
 
 } // namespace Belle2

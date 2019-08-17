@@ -51,6 +51,7 @@ namespace Belle2 {
 
     //! TDirectories
     TDirectory* oldDir = nullptr;
+    //! TDirectories
     TDirectory* dirDQM = nullptr;
 
     //! flag to save ps file

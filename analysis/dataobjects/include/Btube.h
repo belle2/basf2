@@ -34,6 +34,7 @@ namespace Belle2 {
       m_tubecenter(0, 0) = 0; m_tubecenter(1, 0) = 0; m_tubecenter(2, 0) = 0;
       m_tubedirection(0, 0) = 0; m_tubedirection(1, 0) = 0; m_tubedirection(2, 0) = 0;
       resetTubeMatrix();
+      resetTubeCenterErrorMatrix();
     }
 
     /**
@@ -49,6 +50,10 @@ namespace Belle2 {
      */
     TMatrixFSym getTubeMatrix() const;
     /**
+     * Retuens Btube Center Error Matrix
+     */
+    TMatrixFSym getTubeCenterErrorMatrix() const;
+    /**
      * Sets Btube Center
      */
     void setTubeCenter(const Eigen::Matrix<double, 3, 1>& tubecenter);
@@ -57,9 +62,13 @@ namespace Belle2 {
      */
     void setTubeDirection(const Eigen::Matrix<double, 3, 1>& tubedirection);
     /**
-     * Sets Btube Error Matrix
+     * Sets Btube Matrix
      */
     void setTubeMatrix(const TMatrixFSym& tubematrix);
+    /**
+     * Sets Btube Center Error Matrix
+     */
+    void setTubeCenterErrorMatrix(const TMatrixFSym& tubecentererrormatrix);
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~Btube() { }
@@ -67,10 +76,12 @@ namespace Belle2 {
 
   private:
     Eigen::Matrix<double, 3, 1> m_tubecenter;   /**< Btube center */
-    Eigen::Matrix<double, 3, 1> m_tubedirection;   /**< Btube center */
+    Eigen::Matrix<double, 3, 1> m_tubedirection;   /**< Btube directiom */
     TMatrixFSym m_tubematrix;   /**< Btube (3x3)  matrix */
+    TMatrixFSym m_tubecentererrormatrix;   /**< Btube Center Error (3x3)  matrix */
 
     void resetTubeMatrix(); /**< resets the tube  matrix */
+    void resetTubeCenterErrorMatrix(); /**< resets the tube center error matrix */
     // Note: values >=1 are versions, and should be incremented when anything about the class members is changed.
     // 0 is used to disable I/O capabilities, so always make sure this starts at 1.
     // comments after the Classdef macro are also used by ROOT to provide online documentation of a class, e.g. with the auto-generated Print() function

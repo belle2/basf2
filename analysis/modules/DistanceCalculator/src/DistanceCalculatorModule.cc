@@ -199,7 +199,7 @@ Eigen::Vector3d getDocaBtubeVertex(const Particle* pVertex, const Btube* tube)
 
 TMatrixFSym getDocaBtubeVertexError(const Particle* pVertex, const Btube* tube)
 {
-  TMatrixFSym err_r = tube->getTubeMatrix() + pVertex->getVertexErrorMatrix();
+  TMatrixFSym err_r = tube->getTubeCenterErrorMatrix() + pVertex->getVertexErrorMatrix();
   Eigen::Vector3d V(tube->getTubeDirection()(0, 0), tube->getTubeDirection()(1, 0), tube->getTubeDirection()(2, 0));
   Eigen::Vector3d v = V.normalized();
   TMatrixFSym Jacobian(3);
@@ -231,7 +231,7 @@ Eigen::Vector3d getDocaBtubeTrack(const Particle* pTrack, const Btube* tube)
 
 TMatrixFSym getDocaBtubeTrackError(const Particle* pTrack, const Btube* tube)
 {
-  TMatrixFSym err_r = pTrack->getVertexErrorMatrix() + tube->getTubeMatrix();
+  TMatrixFSym err_r = pTrack->getVertexErrorMatrix() + tube->getTubeCenterErrorMatrix();
   Eigen::Vector3d p1p(pTrack->getPx(), pTrack->getPy(), pTrack->getPz());
   Eigen::Vector3d p2p(tube->getTubeDirection()(0, 0), tube->getTubeDirection()(1, 0), tube->getTubeDirection()(2, 0));
   Eigen::Vector3d n = p1p.cross(p2p);

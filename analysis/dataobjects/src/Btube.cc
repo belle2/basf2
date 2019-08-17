@@ -29,6 +29,11 @@ TMatrixFSym Btube::getTubeMatrix() const
   return m_tubematrix;
 }
 
+TMatrixFSym Btube::getTubeCenterErrorMatrix() const
+{
+  return m_tubecentererrormatrix;
+}
+
 void Btube::setTubeCenter(const Eigen::Matrix<double, 3, 1>& tubecenter)
 {
   m_tubecenter = tubecenter;
@@ -44,9 +49,19 @@ void Btube::setTubeMatrix(const TMatrixFSym& tubematrix)
   m_tubematrix = tubematrix;
 }
 
+void Btube::setTubeCenterErrorMatrix(const TMatrixFSym& tubecentererrormatrix)
+{
+  m_tubecentererrormatrix = tubecentererrormatrix;
+}
 void  Btube::resetTubeMatrix()
 {
   TMatrixFSym temp(3);
   m_tubematrix.ResizeTo(temp);
   m_tubematrix = temp;
+}
+void  Btube::resetTubeCenterErrorMatrix()
+{
+  TMatrixFSym temp2(3);
+  m_tubecentererrormatrix.ResizeTo(temp2);
+  m_tubecentererrormatrix = temp2;
 }

@@ -150,10 +150,10 @@ Y',
     'DistanceCovMatrixZY',
     'Distan\
 ceCovMatrixZZ']
-a1_vars_sig = vu.create_aliases_for_selected(
+Distance_vars_sig = vu.create_aliases_for_selected(
     list_of_variables=distance_vars,
     decay_string='Upsilon(4S):sig -> B+:tag ^B-:sigT',
-    prefix='a1')
+    prefix='Distance')
 D_vars_tagside = vu.create_aliases_for_selected(
     list_of_variables=common_vars,
     decay_string='B+:tag -> ^anti-D0:kpi pi+:all',
@@ -166,7 +166,7 @@ U4S_vars_tag = vu.create_aliases_for_selected(
     list_of_variables=common_vars + avf_vars + true_vars,
     decay_string='Upsilon(4S):sig -> ^B+:tag B-:sigT',
     prefix='tagB')
-U4S_vars = common_vars + U4S_vars_tag + U4S_vars_sig + D_vars_tagside + a1_vars_sig
+U4S_vars = common_vars + U4S_vars_tag + U4S_vars_sig + D_vars_tagside + Distance_vars_sig
 ma.variablesToNtuple('Upsilon(4S):sig', U4S_vars,
                      filename=output_file, treename='u4stree', path=my_path)
 ma.variablesToNtuple('B+:tag', common_vars,

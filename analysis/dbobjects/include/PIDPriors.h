@@ -48,7 +48,7 @@ namespace Belle2 {
      * @param PDGCode the PDG code of the particle
      * @param table the priors table
      */
-    void setPriors(const Const::ChargedStable& particle, PIDPriorsTable table)
+    void setPriors(const Const::ChargedStable& particle, const PIDPriorsTable& table)
     {
       auto index = particle.getIndex();
       m_priors[index] = table;

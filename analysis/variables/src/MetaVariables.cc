@@ -617,7 +617,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -649,11 +648,8 @@ endloop:
         // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
-          // cppcheck-suppress unreadVariable
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-          // cppcheck-suppress unreadVariable
           agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
           bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&) {
@@ -689,7 +685,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -731,11 +726,8 @@ endloop:
         // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
-          // cppcheck-suppress unreadVariable
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-          // cppcheck-suppress unreadVariable
           agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
           bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&) {
@@ -781,7 +773,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -826,11 +817,8 @@ endloop:
         // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
-          // cppcheck-suppress unreadVariable
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-          // cppcheck-suppress unreadVariable
           agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
           bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&) {
@@ -879,7 +867,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -922,7 +909,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -968,7 +954,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -1590,6 +1575,11 @@ endloop:
         }
 
         auto flavourType = (Belle2::EvtPDLUtil::hasAntiParticle(pdgCode)) ? Particle::c_Flavored : Particle::c_Unflavored;
+        // cppcheck has problems understanding lambda function syntax and throws
+        // a warning here about cut being unread. but it is read in the if
+        // statements so suppress the false positive
+        //
+        // cppcheck-suppress unreadVariable
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
         auto func = [roeListName, cut, pdgCode, flavourType](const Particle * particle) -> double {

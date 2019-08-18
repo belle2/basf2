@@ -7,7 +7,7 @@ MC matching
 ~~~~~~~~~~~~~~~~~~~~~~
 First, you must run it
 ~~~~~~~~~~~~~~~~~~~~~~
-MCMatching relates `Particle` and `MCParticle` objects. 
+MCMatching relates ``Particle`` and ``MCParticle`` objects. 
 
 Most MC matching variables will have non-trivial values only if the :b2:mod:`MCMatching` module is actually executed.
 It can be executed by adding the module to your path, there is a `modularAnalysis.matchMCTruth` convenience function to do this.
@@ -24,8 +24,8 @@ the true PDG id of the particle :b2:var:`mcPDG`,
 and an error flag :b2:var:`mcErrors`. 
 
 Both variables will have non-trivial values only if the MCMatching module, 
-which relates composite `Particle` (s) and `MCParticle` (s), is executed. 
-:b2:var:`mcPDG` is set to the PDG code of the first common mother `MCParticle` of the daughters of this `Particle`.
+which relates composite ``Particle`` (s) and ``MCParticle`` (s), is executed. 
+:b2:var:`mcPDG` is set to the PDG code of the first common mother ``MCParticle`` of the daughters of this ``Particle``.
 
 
 .. b2-variables::
@@ -47,12 +47,12 @@ The error flags
 ~~~~~~~~~~~~~~~
 
 The error flag :b2:var:`mcErrors` is a bit set where each bit flag describes
- a different kind of discrepancy between reconstruction and `MCParticle`. 
+ a different kind of discrepancy between reconstruction and ``MCParticle``. 
  The individual flags are described by the `MCMatching::MCErrorFlags` enum. 
  A value of mcErrors equal to 0 indicates perfect reconstruction (signal). 
  Usually candidates with only FSR photons missing are also considered as signal, 
  so you might want to ignore the corresponding `c_MissFSR` flag. 
- The same is true for `c_MissingResonance`, which is set for any missing composite particle (e.g. K_1, but also D*0).
+ The same is true for `c_MissingResonance`, which is set for any missing composite particle (e.g. :math:`K_1`, but also :math:`D^{*0}`).
 
 
 =============================  ================================================================================================
@@ -87,7 +87,7 @@ and background (incorrectly reconstructed) candidates, but also to study and ide
 (e.g. mis-ID, partly reconstructed decays, ...). 
 To select candidates that have a certain flag set, you can use bitwise and to select only this flag from :b2:var:`mcErrors` 
 and check if this value is non-zero: ``(mcErrors & MCMatching::c_MisID) != 0`` .
-For use in a `TTree` selector, you'll need to use the integer value of the flag instead:
+For use in a ``TTree`` selector, you'll need to use the integer value of the flag instead:
 
 .. code-block:: cpp
 
@@ -123,11 +123,11 @@ assuming you have reconstructed :code:`X -> Y Z` :
 MC decay finder module :b2:mod:`MCDecayFinder`
 ----------------------------------------------
 
-Analysis module to search for a given decay in the list of generated particles `MCParticle`.
+Analysis module to search for a given decay in the list of generated particles ``MCParticle``.
 
 The module can be used for:
 
-* Determination of the number of generated decays for efficiency studies, especially in the case of inclusive decays (e.g.: What's the generated number of B -> D^0 X decays?).
+* Determination of the number of generated decays for efficiency studies, especially in the case of inclusive decays (e.g.: What's the generated number of :math:`B \to D^0 X` decays?).
 * Matched MC decays as input for a truth matching module.
 
 ~~~~~~~~~~~~~~~~~~~~~
@@ -160,7 +160,7 @@ Steering file snippet
 Status
 ~~~~~~
 
-Skipping of intermediate states in decay chain not supported yet, e.g. $B \to \pi \pi K$.
+Skipping of intermediate states in decay chain not supported yet, e.g. :math:`B \to \pi \pi K`.
 
 ---------------
 MC decay string
@@ -189,16 +189,7 @@ This will produce a file with all of the decay strings in it, along with the dec
 (hashes the decay string of the mother and daughter particles).  
 The mapping of hashes to full MC decay strings is stored in a ROOT file determined by the fileName parameter.
 
-Then the :b2:mod:`decayHash` and :b2:mod:`decayHashExtended` can be included in `NtupleTools` by including them as extrainfo as a custom float:
-
-.. code-block:: python
-
-  from variables import variables
-  variables.addAlias('decayHash', 'extraInfo(DecayHash)')
-  variables.addAlias('decayHashExtended', 'extraInfo(DecayHashExtended)')
-  ...
-  variables += ['decayHash', 'decayHashExtended']
-  variablesToNtuple('mydecay', variables, path=mypath)
+Then the :b2:mod:`decayHash` and :b2:mod:`decayHashExtended` are available in the `VariableManager`.
 
 ------------------
 Tau decay MC modes
@@ -255,5 +246,5 @@ MC mode       Decay channel                                    MC mode       Dec
 ---------------
 Photon matching
 ---------------
-Detalis of photon matching efficiency can be found `in this talk <https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf>`_. If you want to `contribute <https://agira.desy.de/browse/BII-5316>`_ to the Belle II Software, please feel free to move material from the talk to this section.
+Detalis of photon matching efficiency can be found `in this talk <https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf>`_. If you want to contribute, please feel free to move material from the talk to this section (:issue:`BII-5316`).
 

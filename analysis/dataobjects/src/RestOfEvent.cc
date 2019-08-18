@@ -458,7 +458,6 @@ TLorentzVector RestOfEvent::get4VectorTracks(const std::string& maskName) const
 
     // PID for Belle
     //////////////////////////////////////////
-    double pidChoice = Const::pion.getPDGCode();
     // Set variables
     Const::PIDDetectorSet set = Const::ECL;
     double eIDBelle = pid->getProbability(Const::electron, Const::pion, set);
@@ -468,6 +467,7 @@ TLorentzVector RestOfEvent::get4VectorTracks(const std::string& maskName) const
     double atcPIDBelle_Kpi = atcPIDBelleKpiFromPID(pid);
 
     // Check for leptons, else kaons or pions
+    double pidChoice;
     if (eIDBelle > 0.9 and eIDBelle > muIDBelle)
       pidChoice = Const::electron.getPDGCode();
     else if (muIDBelle > 0.9 and eIDBelle < muIDBelle)

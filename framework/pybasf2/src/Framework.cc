@@ -17,7 +17,7 @@
 #include <framework/core/EventProcessor.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/datastore/DataStore.h>
-#include <framework/database/DBStore.h>
+#include <framework/database/Database.h>
 #include <framework/pcore/pEventProcessor.h>
 #include <framework/pcore/ZMQEventProcessor.h>
 #include <framework/pcore/zmq/utils/ZMQAddressUtils.h>
@@ -145,15 +145,18 @@ void Framework::process(PathPtr startPath, long maxEvent)
       }
     }
     errors_from_previous_run = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
-
-    DBStore::Instance().reset();
+    // Also, reset the Database connection itself. However don't reset the
+    // configuration, just the actual setup. In case the user runs process()
+    // again it will reinitialize correctly with the same settings.
+    // This will also clean the DBStore
+    Database::Instance().reset(true);
   } catch (std::exception& e) {
     B2ERROR("Uncaught exception encountered: " << e.what()); //should show module name
-    DataStore::Instance().reset(); // ensure we are executed before ROOT's exit handlers
+    Database::Instance().reset(true); // ensure we are executed before ROOT's exit handlers
     throw; //and let python's global handler do the rest
   } catch (...) {
     B2ERROR("Uncaught exception encountered!"); //should show module name
-    DataStore::Instance().reset(); // ensure we are executed before ROOT's exit handlers
+    Database::Instance().reset(true); // ensure we are executed before ROOT's exit handlers
     throw; //and let python's global handler do the rest
     //TODO: having a stack trace would be nicer, but somehow a handler I set using std::set_terminate() never gets called
   }

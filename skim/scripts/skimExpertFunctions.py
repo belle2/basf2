@@ -516,6 +516,7 @@ class RetentionCheck(Module):
     """
 
     summary = {}  # static dictionary containing the results (retention rates, number of candidates, ...)
+    output_override = None  # if the -o option is provided to basf2, this variable store the ouptut for the plotting
 
     def __init__(self, module_name='', module_number=0, particle_lists=[]):
 
@@ -529,6 +530,9 @@ class RetentionCheck(Module):
 
         self._key = "{:04}. {}".format(int(self.module_number), str(self.module_name))
         type(self).summary[self._key] = {}
+
+        if type(self).output_override is None:
+            type(self).output_override = Belle2.Environment.Instance().getOutputFileOverride()
 
         super().__init__()
 
@@ -611,8 +615,8 @@ class RetentionCheck(Module):
         Keyword arguments:
 
             particle_lists -- particle list name
-            title -- plot title
-            save_as -- output filename
+            title -- plot title (overwritten by the -o argument in basf2)
+            save_as -- output filename (overwritten by the -o argument in basf2)
             module_name_max_length -- if the module name length is higher than this value, do not display the full name
         """
         module_name = []
@@ -633,6 +637,10 @@ class RetentionCheck(Module):
                 module_name.append(module)
                 retention.append(100*(results[particle_list]['retention_rate']))
 
+        if not at_least_one_entry:
+            B2WARNING(particle_list+" seems to have a zero retention rate when created (if created).")
+            return
+
         plt.figure()
         bars = plt.barh(module_name, retention, label=particle_list, color=(0.67, 0.15, 0.31, 0.6))
 
@@ -646,11 +654,17 @@ class RetentionCheck(Module):
         plt.axvline(x=10.0, linewidth=1, linestyle="--", color='k', alpha=0.5)
         plt.xlabel('Retention Rate [%]')
         plt.legend(loc='lower right')
-        plt.title(plot_title)
 
-        if save_as:
-            os.makedirs(os.path.dirname(save_as), exist_ok=True)
+        if save_as or cls.output_override:
+            if cls.output_override:
+                plot_title = (cls.output_override).split(".")[0]
+                save_as = plot_title+'.pdf'
+            if '/' in save_as:
+                os.makedirs(os.path.dirname(save_as), exist_ok=True)
+            plt.title(plot_title)
             plt.savefig(save_as, bbox_inches="tight")
+            B2RESULT("Retention rate results for list {} saved in {}."
+                     .format(particle_list, os.getcwd()+"/"+save_as))
 
 
 def pathWithRetentionCheck(particle_lists, path):

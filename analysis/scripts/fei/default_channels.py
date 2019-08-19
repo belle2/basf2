@@ -1337,6 +1337,7 @@ def get_fr_channels(convertedFromBelle=False):
     B0.addChannel(['D_s*+', 'D*-'])
     B0.addChannel(['J/psi', 'K_S0'])
     B0.addChannel(['J/psi', 'K+', 'pi-'])
+    B0.addChannel(['J/psi', 'K_S0', 'pi+', 'pi-'])
 
     particles = []
     particles.append(pion)

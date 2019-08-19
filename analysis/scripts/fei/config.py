@@ -54,7 +54,7 @@ MVAConfiguration.target.__doc__ = "Target variable from the VariableManager."
 MVAConfiguration.sPlotVariable.__doc__ = "Discriminating variable used by sPlot to do data-driven training."
 
 
-PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, decayTreeFitter, vertexCut, bestCandidateVariable,'
+PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, vertexCut, bestCandidateVariable,'
                                              'bestCandidateCut, bestCandidateMode')
 PreCutConfiguration.__new__.__defaults__ = ('', -2, None, 0, 'lowest')
 PreCutConfiguration.__doc__ = "PreCut configuration class. These cuts is employed before training the mva classifier."

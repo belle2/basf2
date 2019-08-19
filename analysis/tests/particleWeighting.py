@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
 import os
-from basf2 import *
+from basf2 import B2FATAL, B2RESULT, Path, process, conditions, register_module
 import b2test_utils
-from modularAnalysis import *
-from stdCharged import *
+import modularAnalysis as ma
+from variables import variables
 import random
-from ROOT import Belle2, TFile, TNtuple
+from ROOT import TFile
 
 #######################################################
 #
@@ -136,7 +135,7 @@ outOfRangeWeightInfo["SystErr"] = -1
 #
 ######################################################
 
-conditions.testing_payloads = ["localdb/database.txt"]
+conditions.testing_payloads = [os.path.abspath("localdb/database.txt")]
 
 # Now, let's configure table creator
 addtable = register_module('ParticleWeightingLookUpCreator')
@@ -174,15 +173,15 @@ B2RESULT("Weights are created and loaded to DB")
 ######################################################
 
 
-main = create_path()
+main = Path()
 ntupleName = 'particleWeighting.root'
 treeName = 'pitree'
 inputfile = b2test_utils.require_file('analysis/tests/mdst.root')
-inputMdst("default", inputfile, path=main)
+ma.inputMdst("default", inputfile, path=main)
 
 # use standard final state particle lists
 # creates "pi+:all" ParticleList (and c.c.)
-fillParticleListFromMC('pi+:gen', '', path=main)
+ma.fillParticleListFromMC('pi+:gen', '', path=main)
 
 # ID of weight table is taked from B2A904
 weight_table_id = "ParticleReweighting:TestMomentum"
@@ -204,8 +203,8 @@ main.add_module(reweighter)
 
 
 # write out the flat ntuple
-variablesToNtuple('pi+:gen', varsPi, filename=ntupleName, treename=treeName,
-                  path=main)
+ma.variablesToNtuple('pi+:gen', varsPi, filename=ntupleName, treename=treeName,
+                     path=main)
 
 with b2test_utils.clean_working_directory():
 

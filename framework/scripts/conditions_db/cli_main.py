@@ -859,7 +859,7 @@ def main():
 
     # Ok, some people prefer `-` in the executable name for tab completion so lets
     # support that by just splitting the executable name
-    sys.argv[0:1] = sys.argv[0].split('-')
+    sys.argv[0:1] = os.path.basename(sys.argv[0]).split('-')
 
     # parse argument definition for all sub commands
     parser = get_argument_parser()

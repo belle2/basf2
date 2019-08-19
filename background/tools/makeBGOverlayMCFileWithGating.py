@@ -4,12 +4,13 @@
 from basf2 import *
 import os
 from simulation import add_simulation
+from svd import add_svd_simulation
 import glob
 import sys
 
 # -----------------------------------------------------------------------------------
-# This example is for preparing a root file for BG overlay using simulated BG samples
-# Output file: BGforOverlay.root
+# Prepare a root file for BG overlay with PXD gating using simulated BG samples
+# Default output file: BGforOverlayWithGating.root
 # -----------------------------------------------------------------------------------
 
 argvs = sys.argv
@@ -17,12 +18,15 @@ if len(argvs) > 1:
     if argvs[1] == 'phase2':
         phase = 2
         compression = 3
+        expNo = 1002
     elif argvs[1] == 'phase3':
         phase = 3
         compression = 4
+        expNo = 0
     elif argvs[1] == 'phase31':
         phase = 31
         compression = 4
+        expNo = 1003
     else:
         B2ERROR('The argument can be either phase2, phase3 or phase31')
         sys.exit()
@@ -44,19 +48,12 @@ if len(bg) == 0:
     B2ERROR('No root files found in folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
     sys.exit()
 
-if phase == 2:
-    for fileName in bg:
-        if 'phase2' not in fileName:
-            B2ERROR('BG mixing samples given in BELLE2_BACKGROUND_MIXING_DIR are not for phase 2')
-            B2INFO('Try:\n export BELLE2_BACKGROUND_MIXING_DIR=/group/belle2/BGFile/OfficialBKG/15thCampaign/phase2/set0/')
-            sys.exit()
-
 B2INFO('Making BG overlay sample for ' + argvs[1] + ' with ECL compression = ' +
        str(compression))
 B2INFO('Using background samples from folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
 B2INFO('With scaling factor: ' + str(scaleFactor))
 
-set_log_level(LogLevel.ERROR)
+set_log_level(LogLevel.WARNING)
 
 # Create path
 main = create_path()
@@ -64,19 +61,15 @@ main = create_path()
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [100])
+eventinfosetter.param('expList', [expNo])
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
 gearbox = register_module('Gearbox')
-if phase == 2:
-    gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
-elif phase == 31:
-    gearbox.param('fileName', 'geometry/Belle2_earlyPhase3.xml')
 main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('useDB', False)
 main.add_module(geometry)
 
 # Beam background mixer
@@ -97,8 +90,7 @@ pxd_digitizer = register_module('PXDDigitizer')
 main.add_module(pxd_digitizer)
 
 # SVD digitizer
-svd_digitizer = register_module('SVDDigitizer')
-main.add_module(svd_digitizer)
+add_svd_simulation(main)
 
 # CDC digitization
 cdc_digitizer = register_module('CDCDigitizer')
@@ -117,17 +109,13 @@ main.add_module(arich_digitizer)
 ecl_digitizer = register_module('ECLDigitizer')
 main.add_module(ecl_digitizer, WaveformMaker=True, CompressionAlgorithm=compression)
 
-# BKLM digitization
-bklm_digitizer = register_module('BKLMDigitizer')
-main.add_module(bklm_digitizer)
-
-# EKLM digitization
-eklm_digitizer = register_module('EKLMDigitizer')
-main.add_module(eklm_digitizer)
+# KLM digitization
+klm_digitizer = register_module('KLMDigitizer')
+main.add_module(klm_digitizer)
 
 # Output: digitized hits only
 output = register_module('RootOutput')
-output.param('outputFileName', 'BGforOverlay.root')
+output.param('outputFileName', 'BGforOverlayWithGating.root')
 output.param('branchNames', ['PXDDigits', 'PXDInjectionBGTiming', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
                              'ARICHDigits', 'ECLWaveforms', 'BKLMDigits', 'EKLMDigits'])
 main.add_module(output)

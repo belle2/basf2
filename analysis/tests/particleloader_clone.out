@@ -199,10 +199,6 @@ Total Number of Particles created in the DataStore: 13431875
 [INFO] Starting event processing, random seed is set to '1337'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst12.root
-[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
-[INFO] Conditions Database: found working server
-	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltag is ${default_globaltag}
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
 [INFO]    -> MDST source: Tracks
@@ -291,6 +287,10 @@ Total Number of Particles created in the DataStore: 13431875
 [INFO] Number of ParticleLists studied 9 
 [INFO] Number of ParticleLists studied 11 
 [INFO] Number of ParticleLists studied 1 
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: e+ (5+0) + e- (5+0)
 [INFO] collection=Particles

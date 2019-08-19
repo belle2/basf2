@@ -54,7 +54,7 @@ namespace Belle2 {
 
   void Database::reset(bool keepConfig)
   {
-    DBStore::Instance().reset();
+    DBStore::Instance().reset(true);
     Instance().m_metadataProvider.reset();
     Instance().m_payloadCreation.reset();
     if (not keepConfig)

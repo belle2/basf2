@@ -181,6 +181,7 @@ class FSPLoader(object):
             fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
                                ('mu+:FSP', ''), ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
             for outputList, inputList in [('gamma:FSP', 'gamma:mdst'), ('K_S0:V0', 'K_S0:mdst'),
+                                          ('Lambda0:V0', 'Lambda0:mdst'),
                                           ('pi0:FSP', 'pi0:mdst'), ('gamma:V0', 'gamma:v0mdst')]:
                 copyParticles(outputList, inputList, writeOut=True, path=path)
         else:
@@ -188,7 +189,7 @@ class FSPLoader(object):
                                ('mu+:FSP', ''), ('gamma:FSP', ''),
                                ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
             fillParticleList('K_S0:V0 -> pi+ pi-', '', writeOut=True, path=path)
-            fillParticleList('Lambda0:FSP -> p+ pi-', '', writeOut=True, path=path)
+            fillParticleList('Lambda0:V0 -> p+ pi-', '', writeOut=True, path=path)
             fillConvertedPhotonsList('gamma:V0 -> e+ e-', '', writeOut=True, path=path)
 
         if self.config.monitor:
@@ -354,28 +355,18 @@ class PreReconstruction(object):
                 # otherwise we did it above already!
                 elif self.config.training:
                     matchMCTruth(channel.name, path=path)
-                # Utilise DecayTreeFitter when specified and not the the mode pi0:FSP
-                # if not default vertex fitter used which ignores multiple pi0s
-                if(len(channel.daughters) > 1):
-                    forbidden = ['pi0', 'K_S0', 'D+:generic_4', 'D+:generic_9', 'D0:generic_9']
-                    if(channel.preCutConfig.decayTreeFitter and particle.name not in forbidden and channel.name not in forbidden):
-                        ChannelMassConstraint = []
-                        if re.findall(r"[\w']+", channel.decayString).count('pi0') >= 1:
-                            ChannelMassConstraint = [111]
-                        vertexTree(list_name=channel.name, conf_level=channel.preCutConfig.vertexCut,
-                                   path=path, massConstraint=ChannelMassConstraint)
-                    else:
-                        if re.findall(r"[\w']+", channel.decayString).count('pi0') > 1:
-                            B2INFO("Ignoring vertex fit because multiple pi0 are not supported yet {c}.".format(c=channel.name))
-                        else:
-                            pvfit = register_module('ParticleVertexFitter')
-                            pvfit.set_name('ParticleVertexFitter_' + channel.name)
-                            pvfit.param('listName', channel.name)
-                            pvfit.param('confidenceLevel', channel.preCutConfig.vertexCut)
-                            pvfit.param('vertexFitter', 'kfitter')
-                            pvfit.param('fitType', 'vertex')
-                            pvfit.set_log_level(logging.log_level.ERROR)  # let's not produce gigabytes of uninteresting warnings
-                            path.add_module(pvfit)
+
+                if re.findall(r"[\w']+", channel.decayString).count('pi0') > 1:
+                    B2INFO("Ignoring vertex fit because multiple pi0 are not supported yet {c}.".format(c=channel.name))
+                elif len(channel.daughters) > 1:
+                    pvfit = register_module('ParticleVertexFitter')
+                    pvfit.set_name('ParticleVertexFitter_' + channel.name)
+                    pvfit.param('listName', channel.name)
+                    pvfit.param('confidenceLevel', channel.preCutConfig.vertexCut)
+                    pvfit.param('vertexFitter', 'kfitter')
+                    pvfit.param('fitType', 'vertex')
+                    pvfit.set_log_level(logging.log_level.ERROR)  # let's not produce gigabytes of uninteresting warnings
+                    path.add_module(pvfit)
 
                 if self.config.monitor:
                     hist_variables = ['chiProb', 'mcErrors', 'mcParticleStatus', channel.mvaConfig.target]
@@ -708,9 +699,9 @@ def get_stages_from_particles(particles: typing.Sequence[config.Particle]):
     @param particles list of config.Particle objects
     """
     stages = [
-        [p for p in particles if p.name in ['e+', 'K+', 'pi+', 'mu+', 'gamma', 'p+', 'K_L0', 'Lambda0']],
-        [p for p in particles if p.name in ['pi0', 'J/psi']],
-        [p for p in particles if p.name in ['K_S0']],
+        [p for p in particles if p.name in ['e+', 'K+', 'pi+', 'mu+', 'gamma', 'p+', 'K_L0']],
+        [p for p in particles if p.name in ['pi0', 'J/psi', 'Lambda0']],
+        [p for p in particles if p.name in ['K_S0', 'Sigma+']],
         [p for p in particles if p.name in ['D+', 'D0', 'D_s+', 'Lambda_c+']],
         [p for p in particles if p.name in ['D*+', 'D*0', 'D_s*+']],
         [p for p in particles if p.name in ['B0', 'B+', 'B_s+']],

@@ -16,7 +16,7 @@ from stdV0s import *
 from skim.standardlists.lightmesons import *
 
 
-def SetTauGenericSkimVariables(path=analysis_main):
+def SetTauGenericSkimVariables(path):
     """
     Set particle lists and variables for TauGeneric skim
 
@@ -64,7 +64,7 @@ def SetTauGenericSkimVariables(path=analysis_main):
     variables.addAlias('E_ECLtrk', 'formula(totalECLEnergyOfParticlesInList(pi+:tauskim))')
 
 
-def TauList(path=analysis_main):
+def TauList(path):
     """
     Note:
         * Skim for Tau generic decays
@@ -111,7 +111,7 @@ def TauList(path=analysis_main):
     return eventParticle
 
 
-def TauLFVList(flag=1, path=analysis_main):
+def TauLFVList(flag=1, path=None):
     """
     Note:
         * Skim for Tau LFV decays
@@ -148,8 +148,8 @@ def TauLFVList(flag=1, path=analysis_main):
                         'mu+:loose eta:loose',
                         'e+:loose eta\':loose',
                         'mu+:loose eta\':loose',
-                        'e+:loose K_S0:all',
-                        'mu+:loose K_S0:all'
+                        'e+:loose K_S0:merged',
+                        'mu+:loose K_S0:merged'
                         ]
 
     tau_lS0_Channels = ['e+:loose f_0:loose',
@@ -180,8 +180,8 @@ def TauLFVList(flag=1, path=analysis_main):
                         'mu+:loose K-:loose pi+:loose',
                         'e-:loose K+:loose pi+:loose',
                         'mu-:loose K+:loose pi+:loose',
-                        'e-:loose K_S0:all K_S0:all',
-                        'mu-:loose K_S0:all K_S0:all'
+                        'e-:loose K_S0:merged K_S0:merged',
+                        'mu-:loose K_S0:merged K_S0:merged'
                         ]
 
     tau_bnv_Channels = ['mu+:loose mu+:loose anti-p-:loose',
@@ -238,7 +238,7 @@ def TauLFVList(flag=1, path=analysis_main):
     return tau_lfv_lists
 
 
-def SetTauThrustSkimVariables(path=analysis_main):
+def SetTauThrustSkimVariables(path):
     """
     Set particle lists and variables for TauThrust skim
 
@@ -275,7 +275,7 @@ def SetTauThrustSkimVariables(path=analysis_main):
     variables.addAlias('nTracksS2', 'nParticlesInList(pi+:S2)')
 
 
-def TauThrustList(path=analysis_main):
+def TauThrustList(path):
     """
     Note:
         * Skim for Tau decays using thrust

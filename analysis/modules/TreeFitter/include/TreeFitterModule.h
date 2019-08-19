@@ -117,5 +117,11 @@ namespace Belle2 {
      *  'I dont know hat I am doing'
      * */
     bool m_automatic_vertex_constraining;
+
+    /** dimension to use for beam/origin cosntraint  */
+    int m_originDimension;
+
+    /** inflate beamspot covariance of z by this number */
+    int m_inflationFactorCovZ;
   };
 }

@@ -9,10 +9,9 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <bklm/dataobjects/BKLMElementNumbers.h>
-#include <eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/dataobjects/BKLMChannelIndex.h>
-#include <klm/dataobjects/EKLMChannelIndex.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+#include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <framework/logging/Logger.h>
@@ -51,19 +50,16 @@ void KLMChannelStatus::setChannelStatus(uint16_t channel,
 
 void KLMChannelStatus::setStatusAllChannels(enum ChannelStatus status)
 {
-  BKLMChannelIndex bklmChannels;
-  for (BKLMChannelIndex& bklmChannel : bklmChannels)
-    setChannelStatus(bklmChannel.getKLMChannelNumber(), status);
-  EKLMChannelIndex eklmChannels;
-  for (EKLMChannelIndex& eklmChannel : eklmChannels)
-    setChannelStatus(eklmChannel.getKLMChannelNumber(), status);
+  KLMChannelIndex klmChannels;
+  for (KLMChannelIndex& klmChannel : klmChannels)
+    setChannelStatus(klmChannel.getKLMChannelNumber(), status);
 }
 
 int KLMChannelStatus::getActiveStripsEKLMSector(int sectorGlobal) const
 {
   int active;
   int nPlanes, nStrips;
-  int endcap, layer, sector, plane, strip;
+  int section, layer, sector, plane, strip;
   const EKLM::ElementNumbersSingleton* eklmElementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
   const KLMElementNumbers* elementNumbers =
@@ -71,12 +67,12 @@ int KLMChannelStatus::getActiveStripsEKLMSector(int sectorGlobal) const
   nPlanes = eklmElementNumbers->getMaximalPlaneNumber();
   nStrips = eklmElementNumbers->getMaximalStripNumber();
   eklmElementNumbers->sectorNumberToElementNumbers(
-    sectorGlobal, &endcap, &layer, &sector);
+    sectorGlobal, &section, &layer, &sector);
   active = 0;
   for (plane = 1; plane <= nPlanes; ++plane) {
     for (strip = 1; strip <= nStrips; ++strip) {
       uint16_t channel = elementNumbers->channelNumberEKLM(
-                           endcap, layer, sector, plane, strip);
+                           section, sector, layer, plane, strip);
       enum ChannelStatus status = getChannelStatus(channel);
       if (status == c_Unknown)
         B2FATAL("Incomplete KLM channel data.");
@@ -85,4 +81,41 @@ int KLMChannelStatus::getActiveStripsEKLMSector(int sectorGlobal) const
     }
   }
   return active;
+}
+
+bool KLMChannelStatus::operator==(KLMChannelStatus& status)
+{
+  if (this->m_ChannelStatus.size() != status.m_ChannelStatus.size())
+    return false;
+  std::map<uint16_t, enum ChannelStatus>::iterator it, it2;
+  it = this->m_ChannelStatus.begin();
+  it2 = status.m_ChannelStatus.begin();
+  while (it != this->m_ChannelStatus.end()) {
+    if (it->first != it2->first)
+      return false;
+    if (it->second != it2->second)
+      return false;
+    ++it;
+    ++it2;
+  }
+  return true;
+}
+
+unsigned int KLMChannelStatus::newNormalChannels(KLMChannelStatus& status)
+{
+  unsigned int channels = 0;
+  if (this->m_ChannelStatus.size() != status.m_ChannelStatus.size())
+    return 0;
+  std::map<uint16_t, enum ChannelStatus>::iterator it, it2;
+  it = this->m_ChannelStatus.begin();
+  it2 = status.m_ChannelStatus.begin();
+  while (it != this->m_ChannelStatus.end()) {
+    if (it->first != it2->first)
+      return 0;
+    if ((it->second == c_Normal) && (it2->second != c_Normal))
+      ++channels;
+    ++it;
+    ++it2;
+  }
+  return channels;
 }

@@ -19,12 +19,11 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/dbobjects/BeamParameters.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-
+#include <analysis/dataobjects/Btube.h>
 // utilities
 #include <analysis/utility/CLHEPToROOT.h>
 #include <analysis/utility/PCmsLabTransform.h>
@@ -61,11 +60,15 @@ namespace Belle2 {
     // Add parameters
     addParam("listName", m_listName, "name of particle list", string(""));
     addParam("confidenceLevel", m_confidenceLevel,
-             "required confidence level of fit to keep particles in the list. Note that even with confidenceLevel == 0.0, errors during the fit might discard Particles in the list. confidenceLevel = -1 if an error occurs during the fit",
+             "Confidence level to accept the fit. Particle candidates with "
+             "p-value less than confidenceLevel are removed from the particle "
+             "list. If set to -1, all candidates are kept; if set to 0, "
+             "the candidates failing the fit are removed.",
              0.001);
     addParam("vertexFitter", m_vertexFitter, "kfitter or rave", string("kfitter"));
     addParam("fitType", m_fitType, "type of the kinematic fit (vertex, massvertex, mass)", string("vertex"));
-    addParam("withConstraint", m_withConstraint, "additional constraint on vertex: ipprofile, iptube, mother, iptubecut, pointing",
+    addParam("withConstraint", m_withConstraint,
+             "additional constraint on vertex: ipprofile, iptube, mother, iptubecut, pointing, btube",
              string(""));
     addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
     addParam("updateDaughters", m_updateDaughters, "true: update the daughters after the vertex fit", false);
@@ -73,8 +76,6 @@ namespace Belle2 {
 
   void ParticleVertexFitterModule::initialize()
   {
-
-    //m_beamParams.required("", DataStore::c_Persistent);
     // magnetic field
     m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
 
@@ -115,17 +116,17 @@ namespace Belle2 {
     if (m_vertexFitter == "rave")
       analysis::RaveSetup::initialize(1, m_Bfield);
 
-    m_BeamSpotCenter = m_beamParams->getVertex();
+    m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
     m_beamSpotCov.ResizeTo(3, 3);
     TMatrixDSym beamSpotCov(3);
-    if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamParams->getCovVertex();
+    if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamSpotDB->getCovVertex();
     if (m_withConstraint == "iptube") ParticleVertexFitterModule::findConstraintBoost(2.);
     if (m_withConstraint == "iptubecut") {  // for development purpose only
       m_BeamSpotCenter = TVector3(0.001, 0., .013);
       findConstraintBoost(0.03);
     }
     if ((m_vertexFitter == "rave") && (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"
-                                       || m_withConstraint == "mother" || m_withConstraint == "iptubecut"))
+                                       || m_withConstraint == "mother" || m_withConstraint == "iptubecut" || m_withConstraint == "btube"))
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
 
     std::vector<unsigned int> toRemove;
@@ -152,13 +153,25 @@ namespace Belle2 {
           }
         }
       }
-      bool ok = doVertexFit(particle);
-      if (!ok) particle->setPValue(-1);
-      if (m_confidenceLevel == 0. && particle->getPValue() == 0.) {
-        toRemove.push_back(particle->getArrayIndex());
-      } else {
-        if (particle->getPValue() < m_confidenceLevel)toRemove.push_back(particle->getArrayIndex());
+      bool hasTube = true;
+      if (m_withConstraint == "btube") {
+        Btube* Ver = particle->getRelatedTo<Btube>();
+        if (!Ver) {
+          hasTube = false;
+          toRemove.push_back(particle->getArrayIndex());
+        } else {
+          m_BeamSpotCenter.SetXYZ(Ver->getTubeCenter()(0, 0), Ver->getTubeCenter()(1, 0), Ver->getTubeCenter()(2, 0));
+          m_beamSpotCov = Ver->getTubeMatrix();
+        }
       }
+      bool ok = false;
+      if (hasTube) {
+        ok = doVertexFit(particle);
+      }
+      if (!ok)
+        particle->setPValue(-1);
+      if (particle->getPValue() < m_confidenceLevel)
+        toRemove.push_back(particle->getArrayIndex());
     }
     plist->removeParticles(toRemove);
 
@@ -180,6 +193,7 @@ namespace Belle2 {
         m_withConstraint != "mother" &&
         m_withConstraint != "iptubecut" &&
         m_withConstraint != "pointing" &&
+        m_withConstraint != "btube" &&
         m_withConstraint != "")
       B2FATAL("ParticleVertexFitter: " << m_withConstraint << " ***invalid Constraint ");
 
@@ -605,7 +619,8 @@ namespace Belle2 {
     }
 
     // apply four momentum constraint
-    kf.setFourMomentum(m_beamParams->getHER() + m_beamParams->getLER());
+    PCmsLabTransform T;
+    kf.setFourMomentum(T.getBeamFourMomentum());
 
     int err = kf.doFit();
 
@@ -829,10 +844,9 @@ namespace Belle2 {
   {
     if ((m_decayString.empty() ||
          (m_withConstraint == "" && m_fitType != "mass")) && mother->getNDaughters() < 2) return false;
-
     if (m_withConstraint == "") analysis::RaveSetup::getInstance()->unsetBeamSpot();
     if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"  || m_withConstraint == "mother"
-        || m_withConstraint == "iptubecut")
+        || m_withConstraint == "iptubecut" || m_withConstraint == "btube")
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
 
     analysis::RaveKinematicVertexFitter rf;
@@ -1045,8 +1059,10 @@ namespace Belle2 {
       }
     }
 
-    PCmsLabTransform T;
-    double rotationangle = T.getBeamParams().getHER().Vect().Angle(-1.0 * T.getBeamParams().getLER().Vect()) / 2.;
+    //Hardcoded: half of the crossing angle, taken from BeamParameters.
+    //Belle II crossing angle is 0.083, but since this constraint is mostly useful for Belle,
+    //we use the Belle crossing angle.
+    double rotationangle = 0.022 / 2;
 
     TLorentzVector iptube_mom(0., 0., 1e10, 1e10);
     iptube_mom.RotateX(0.);
@@ -1064,10 +1080,10 @@ namespace Belle2 {
   {
     PCmsLabTransform T;
 
-    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boost = T.getBoostVector();
     TVector3 boostDir = boost.Unit();
 
-    TMatrixDSym beamSpotCov = m_beamParams->getCovVertex();
+    TMatrixDSym beamSpotCov = m_beamSpotDB->getCovVertex();
     beamSpotCov(2, 2) = cut * cut;
     double thetab = boostDir.Theta();
     double phib = boostDir.Phi();

@@ -76,20 +76,26 @@ namespace Belle2 {
   protected :
     /** Event number */
     int n_basf2evt;
-    int etm_version;
-
-    unsigned int nodeid;
-    int nwords;
-    int iFiness;
-    int trgtype;
+    //! ETM Version
+    int etm_version = 0;
+    //! Node Id
+    unsigned int nodeid = 0;
+    //! N Word
+    int nwords = 0;
+    //! Finess
+    int iFiness = 0;
+    //! Trigger Type
+    int trgtype = 0;
 
   private :
-
+    //! ECL Trigger Unpacker TC output
     StoreArray<TRGECLUnpackerStore>     m_TRGECLTCArray;
+    //! ECL Trigger Unpacker Summary output
     StoreArray<TRGECLUnpackerSumStore>  m_TRGECLSumArray;
+    //! ECL Trigger Unpacker Event output
     StoreArray<TRGECLUnpackerEvtStore>  m_TRGECLEvtArray;
+    //! ECL Trigger Cluster output
     StoreArray<TRGECLCluster>  m_TRGECLClusterArray;
-
   };
 
 } // end namespace Belle2

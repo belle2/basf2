@@ -192,20 +192,6 @@ def process(path, max_event=0):
     if path is None:
         return
 
-    # check if this is analysis_main (or any other global path object we
-    # deprecated) and print the warning attached to it
-    try:
-        pybasf2.B2WARNING(path._deprecation_warning)
-    except AttributeError:
-        import analysisPath
-        if analysisPath.analysis_main.modules():
-            modulenames = [m.name() for m in analysisPath.analysis_main.modules()]
-            modulenames = "\n".join(modulenames)
-            pybasf2.B2WARNING(
-                "You are not processing the (deprecated) analysis_main path,"
-                " but it has the following modules:\n", modulenames)
-        pass
-
     pybasf2.B2INFO("Starting event processing, random seed is set to '" + pybasf2.get_random_seed() + "'")
 
     if max_event != 0:
@@ -308,3 +294,36 @@ def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=[]):
 
 pybasf2.Path.add_module = _add_module
 pybasf2.Path.add_independent_path = _add_independent_path
+
+
+def get_default_global_tags():
+    """
+    Return the list of default globaltags in one string separated with comma
+
+    .. deprecated:: release-04-00-00
+       Please use `basf2.conditions.default_globaltags` instead
+    """
+    B2WARNING("basf2.get_default_global_tags() is deprecated, please use basf2.conditions.default_globaltags")
+    return ",".join(conditions.default_globaltags)
+
+
+def set_central_database_networkparams(**argk):
+    """
+    Set some expert database connection details
+
+    .. deprecated:: release-04-00-00
+       Please use `basf2.conditions.expert_settings` instead
+    """
+    B2WARNING("basf2.set_central_database_networkparams() is deprecated, please use basf2.conditions.expert_settings()")
+    return conditions.expert_settings(**argk)
+
+
+def set_central_serverlist(serverlist):
+    """
+    Set the list of database servers
+
+    .. deprecated:: release-04-00-00
+       Please use `basf2.conditions.metadata_providers` instead
+    """
+    B2WARNING("basf2.set_central_serverlist() is deprecated, please use basf2.conditions.metadata_providers instead")
+    conditions.metadata_providers = serverlist + [e for e in conditions.metadata_providers if not e.startswith("http")]

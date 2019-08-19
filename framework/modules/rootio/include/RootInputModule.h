@@ -146,10 +146,6 @@ namespace Belle2 {
     /** experiment, run, event number of first event to load */
     std::vector<int> m_skipToEvent;
 
-    /** Try recovery when reading corrupted files. Might allow reading some of the data (FileMetaData likely to be missing) */
-    bool m_recovery;
-
-
     //then those for purely internal use:
 
     /** Next entry to be read in event tree.  */

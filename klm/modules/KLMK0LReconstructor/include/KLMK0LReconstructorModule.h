@@ -11,7 +11,7 @@
 #pragma once
 
 /* Belle2 headers. */
-#include <eklm/geometry/GeometryData.h>
+#include <klm/eklm/geometry/GeometryData.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <klm/modules/KLMK0LReconstructor/KLMHit2d.h>

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from geometry import check_components
 from ROOT import Belle2
 from pxd import add_pxd_packer, add_pxd_unpacker
 from svd import add_svd_packer, add_svd_unpacker
@@ -12,6 +13,9 @@ def add_packers(path, components=None):
     """
     This function adds the raw data packer modules to a path.
     """
+
+    # Check components.
+    check_components(components)
 
     # Add Gearbox or geometry to path if not already there
     if "Gearbox" not in path:
@@ -49,13 +53,10 @@ def add_packers(path, components=None):
         arichpacker = register_module('ARICHPacker')
         path.add_module(arichpacker)
 
-    # BKLM
-    if components is None or 'BKLM' in components:
+    # KLM
+    if components is None or 'KLM' in components:
         bklmpacker = register_module('BKLMRawPacker')
         path.add_module(bklmpacker)
-
-    # EKLM
-    if components is None or 'EKLM' in components:
         eklmpacker = register_module('EKLMRawPacker')
         path.add_module(eklmpacker)
 
@@ -64,6 +65,9 @@ def add_unpackers(path, components=None):
     """
     This function adds the raw data unpacker modules to a path.
     """
+
+    # Check components.
+    check_components(components)
 
     # Add Gearbox or geometry to path if not already there
     if "Gearbox" not in path:
@@ -106,7 +110,7 @@ def add_unpackers(path, components=None):
         path.add_module(arichunpacker)
 
     # KLM
-    if components is None or 'BKLM' in components or 'EKLM' in components:
+    if components is None or 'KLM' in components:
         klmunpacker = register_module('KLMUnpacker')
         path.add_module(klmunpacker)
 
@@ -129,6 +133,33 @@ def add_unpackers(path, components=None):
         nmod_t3d = [0, 1, 2, 3]
         for mod_t3d in nmod_t3d:
             path.add_module('TRGCDCT3DUnpacker', T3DMOD=mod_t3d)
+
+        # unpacker for neurotrigger
+        neurounpacker = register_module('CDCTriggerUnpacker')
+        neurounpacker.param('headerSize', 3)
+        # unpack the data from the 2D tracker and save its Bitstream
+        neurounpacker.param('unpackTracker2D', False)
+        # make CDCTriggerTrack and CDCTriggerSegmentHit objects from the 2D output
+        neurounpacker.param('decode2DFinderTrack', True)
+        # make CDCTriggerSegmentHit objects from the 2D input
+        neurounpacker.param('decode2DFinderInput', True)
+        neurounpacker.param('2DNodeId', [
+            [0x11000001, 0],
+            [0x11000001, 1],
+            [0x11000002, 0],
+            [0x11000002, 1],
+        ])
+        neurounpacker.param('NeuroNodeId', [
+            [0x11000005, 0],
+            [0x11000005, 1],
+            [0x11000006, 0],
+            [0x11000006, 1],
+        ])
+        neurounpacker.param('unpackNeuro', True)
+        neurounpacker.param('decodeNeuro', True)
+        neurounpacker.param('delayNNOutput', [9, 9, 9, 9])
+        neurounpacker.param('delayNNSelect', [4, 4, 4, 4])
+        path.add_module(neurounpacker)
 
 
 def add_raw_output(path, filename='raw.root', additionalBranches=[]):

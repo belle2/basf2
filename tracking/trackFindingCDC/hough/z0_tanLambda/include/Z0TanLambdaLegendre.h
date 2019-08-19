@@ -36,14 +36,13 @@ namespace Belle2 {
             tanLambdaDivisions>;
 
     public:
+      using DecisionAlgorithm = AHitDecisionAlgorithm;
+
       /// Constructor using the given maximal level setting the maximal values.
       Z0TanLambdaLegendre()
         : Super(140, std::tan(75.0 * M_PI / 180.0), 1, 1)
       {
       }
-
-      /// Side view: use the linear formula for z(s)
-      static const bool m_lookingForQuadraticTracks = false;
     };
   }
 }

@@ -211,7 +211,7 @@ class Plotuple:
         """!
         @return Returns true if this plotuple has the expert option
         """
-        return self.mop.has_option("expert")
+        return not self.mop.has_option("shifter")
 
     def perform_comparison(self):
         """!
@@ -831,5 +831,6 @@ class Plotuple:
                 is_expert=self.is_expert(),
                 plot_path=self.get_plot_path(),
                 png_filename=self.get_png_filename(),
-                pdf_filename=self.get_pdf_filename()
+                pdf_filename=self.get_pdf_filename(),
+                warnings=self.warnings
             )

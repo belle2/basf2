@@ -322,6 +322,13 @@ function getDefaultRevisions(mode="rbn") {
     // Don't use [referenceRevision, otherList[0]] or similar, because this
     // gives problems if otherList is of length 0!
 
+    // First, we cache the case of running locally: There all of the above
+    // revision lists are empty and our only guess is to return allRevisions, which
+    // in particular will include 'reference' and 'current' etc.
+    if (!nightlyRevisions.length && !buildRevisions.length && !releaseRevisions.length){
+        return allRevisions;
+    }
+
     if (mode === "all"){
         return allRevisions;
     }
@@ -674,47 +681,47 @@ function loadValidationPlots(packageLoadName="") {
 function fillNtupleTable(domId, jsonLoadingPath) {
     // move out of the static folder
     $.getJSON(`../${jsonLoadingPath}`, function (ntuple_data) {
-        let items = [];
+        let table_str = "";
 
         // add header
-        items.push("<tr>");
-        items.push("<th>tag</th>");
+        table_str += "<tr>";
+        table_str += "<th>Tag</th>";
 
         // get the name of each value which is plotted
         for (let rev in ntuple_data) {
             for (let val_pair of ntuple_data[rev]) {
-                items.push(`<th>${val_pair[0]}</th>`);
+                table_str += `<th>${val_pair[0]}</th>`;
             }
             break;
         }
 
-        items.push("</tr>");
+        table_str += "</tr>";
 
         // reference first, if available
         $.each(ntuple_data, function (key) {
             if (key === "reference") {
-                items.push("<tr>");
-                items.push(`<td>${key}</td>`);
+                table_str += "<tr>";
+                table_str += `<td>${key}</td>`;
                 for (let val_pair of ntuple_data[key]) {
-                    items.push(`<td>${val_pair[1]}</td>`);
+                    table_str += `<td>${val_pair[1]}</td>`;
                 }
-                items.push("</tr>");
+                table_str += "</tr>";
             }
         });
 
         // now the rest
         $.each(ntuple_data, function (key) {
             if (key !== "reference") {
-                items.push("<tr>");
-                items.push(`<td>${key}</td>`);
+                table_str += "<tr>";
+                table_str += `<td>${key}</td>`;
                 for (let val_pair of ntuple_data[key]) {
-                    items.push(`<td>${val_pair[1]}</td>`);
+                    table_str += `<td>${val_pair[1]}</td>`;
                 }
-                items.push("</tr>");
+                table_str += "</tr>";
             }
         });
 
-        $(`#${domId}`).after(items);
+        $(`#${domId}`).append(table_str);
     });
 }
 
@@ -870,7 +877,8 @@ function getObjectWithKey(objects, key, value) {
  * this function until it looks like no new elements appear.
  * Note: We wait until we have latex support (via the latexRenderingLoaded
  * global variable) and (via latexRenderingInProgress) also make sure that
- * only one kind of this function is active (including its recursive calls)
+ * only one kind of this function is active (including its recursive calls).
+ * It will not re-render anything that is already typeset.
  * That means that calling this function is super cheap, so please call it
  * whenever your actions might make any DOM that contains LaTeX appear on the
  * page!
@@ -910,7 +918,7 @@ function renderLatex(force=false, irepeat=0) {
         ["Typeset", MathJax.Hub],
         function () {
             let neqn = MathJax.Hub.getAllJax().length;
-            let msg = `LaTeX re-rendering: neqn=${neqn}, irepeat=${irepeat}. `;
+            let msg = `LaTeX reloading: neqn=${neqn}, irepeat=${irepeat}. `;
             if (latexEqnCount !== neqn) {
                 // New LaTeX appeared, restart counting.
                 irepeat = 0;

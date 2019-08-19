@@ -276,7 +276,7 @@ void ZMQEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList
 
   // TODO: make sure to only send statistics!
   const auto& evtMessage = streamer.stream();
-  auto message = ZMQMessageFactory::createMessage(c_MessageTypes::c_statisticMessage, evtMessage);
+  auto message = ZMQMessageFactory::createMessage(EMessageTypes::c_statisticMessage, evtMessage);
   zmqClient.publish(std::move(message));
 
   B2DEBUG(10, "Finished an output process");

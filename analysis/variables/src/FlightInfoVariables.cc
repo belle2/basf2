@@ -11,7 +11,8 @@
 #include <analysis/variables/FlightInfoVariables.h>
 #include <framework/logging/Logger.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/utility/PCmsLabTransform.h>
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
 #include <framework/utilities/Conversion.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -70,10 +71,10 @@ namespace Belle2 {
           mumvtxZ = particle->getExtraInfo("prodVertZ");
         } else {
           //if no production vertex assume the particle originated at the ip
-          PCmsLabTransform T;
-          mumvtxX = T.getBeamParams().getVertex().X();
-          mumvtxY = T.getBeamParams().getVertex().Y();
-          mumvtxZ = T.getBeamParams().getVertex().Z();
+          static DBObjPtr<BeamSpot> beamSpotDB;
+          mumvtxX = (beamSpotDB->getIPPosition()).X();
+          mumvtxY = (beamSpotDB->getIPPosition()).Y();
+          mumvtxZ = (beamSpotDB->getIPPosition()).Z();
         }
       }
       //daughter vertex
@@ -113,8 +114,8 @@ namespace Belle2 {
             }
           }
         } else {
-          PCmsLabTransform T;
-          mumCov = T.getBeamParams().getCovVertex();
+          static DBObjPtr<BeamSpot> beamSpotDB;
+          mumCov = beamSpotDB->getCovVertex();
         }
       }
       //compute total covariance matrix

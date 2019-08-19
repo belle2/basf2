@@ -16,7 +16,6 @@
 #include <analysis/utility/MCMatching.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-
 #include <mdst/dataobjects/ECLCluster.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -25,6 +24,9 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/core/Environment.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 #include <queue>
 
@@ -47,7 +49,40 @@ namespace Belle2 {
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
 
+    double isSignalWithoutProperty(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      int status = MCMatching::getMCErrors(part, mcparticle, false);
+      //remove the following bits, these are usually ok
+      status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissPHOTOS);
+      status &= (~MCMatching::c_MissingResonance);
+      //status &= (~MCMatching::c_DecayInFlight);
+
+      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+    }
+
     double isExtendedSignal(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      int status = MCMatching::getMCErrors(part, mcparticle);
+      //remove the following bits, these are usually ok
+      status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissPHOTOS);
+      status &= (~MCMatching::c_MissingResonance);
+      status &= (~MCMatching::c_MisID);
+      status &= (~MCMatching::c_AddedWrongParticle);
+
+      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+    }
+
+    double isSignalAcceptWrongFSPs(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
@@ -114,6 +149,52 @@ namespace Belle2 {
           qq.push(d->getDaughter(iDau));
       }
       return 0.0;
+    }
+
+    double genNthMotherPDG(const Particle* part, const std::vector<double>& args)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      unsigned int nLevels;
+      if (args.empty())
+        nLevels = 0;
+      else
+        nLevels = args[0];
+
+      const MCParticle* curMCParticle = mcparticle;
+      for (unsigned int i = 0; i <= nLevels; i++) {
+        const MCParticle* curMCMother = curMCParticle->getMother();
+        if (curMCMother == nullptr)
+          return 0.0;
+        curMCParticle = curMCMother;
+      }
+      int m_pdg = curMCParticle->getPDG();
+      return m_pdg;
+    }
+
+    double genNthMotherIndex(const Particle* part, const std::vector<double>& args)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      unsigned int nLevels;
+      if (args.empty())
+        nLevels = 0;
+      else
+        nLevels = args[0];
+
+      const MCParticle* curMCParticle = mcparticle;
+      for (unsigned int i = 0; i <= nLevels; i++) {
+        const MCParticle* curMCMother = curMCParticle->getMother();
+        if (curMCMother == nullptr)
+          return 0.0;
+        curMCParticle = curMCMother;
+      }
+      int m_id = curMCParticle->getArrayIndex();
+      return m_id;
     }
 
     double genMotherPDG(const Particle* part)
@@ -186,6 +267,22 @@ namespace Belle2 {
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
 
+    double isSignalAcceptMissingGamma(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      int status = MCMatching::getMCErrors(part, mcparticle);
+      //remove the following bits, these are usually ok
+      status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissPHOTOS);
+      status &= (~MCMatching::c_MissGamma);
+      status &= (~MCMatching::c_MissingResonance);
+
+      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+    }
+
     double isSignalAcceptMissing(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
@@ -196,6 +293,7 @@ namespace Belle2 {
       //remove the following bits, these are usually ok
       status &= (~MCMatching::c_MissFSR);
       status &= (~MCMatching::c_MissPHOTOS);
+      status &= (~MCMatching::c_MissGamma);
       status &= (~MCMatching::c_MissingResonance);
       status &= (~MCMatching::c_MissMassiveParticle);
       status &= (~MCMatching::c_MissKlong);
@@ -216,6 +314,11 @@ namespace Belle2 {
     double particleMCErrors(const Particle* part)
     {
       return MCMatching::getMCErrors(part);
+    }
+
+    double particleMCErrorsWithoutProperty(const Particle* part)
+    {
+      return MCMatching::getMCErrors(part, nullptr, false);
     }
 
     double particleNumberOfMCMatch(const Particle* particle)
@@ -644,6 +747,24 @@ namespace Belle2 {
       return MCMatching::countMissingParticle(p, mcp, PDGcodes);
     }
 
+    double getHEREnergy(const Particle*)
+    {
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      return (beamParamsDB->getHER()).E();
+    }
+
+    double getLEREnergy(const Particle*)
+    {
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      return (beamParamsDB->getLER()).E();
+    }
+
+    double getCrossingAngle(const Particle*)
+    {
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      return (beamParamsDB->getHER()).Vect().Angle(-1.0 * (beamParamsDB->getLER()).Vect());
+    }
+
     double particleClusterMatchWeight(const Particle* particle)
     {
       /* Get the weight of the *cluster* mc match for the mcparticle matched to
@@ -729,18 +850,41 @@ namespace Belle2 {
       return mcps.object(weightsAndIndices[0].second)->getPDG();
     }
 
+    double isMC(const Particle*)
+    {
+      return Environment::Instance().isMC();
+    }
+
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
+                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise. \n"
+                      "It behaves according to DecayStringGrammar.");
+    REGISTER_VARIABLE("isSignalWithoutProperty", isSignalWithoutProperty,
+                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise. \n"
+                      "It does not consider the missing particle flags of PropertyFlags of the particle.");
     REGISTER_VARIABLE("isExtendedSignal", isExtendedSignal,
+                      "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
+                      "Misidentification of charged FSP is allowed. \n"
+                      "It will be deprecated in release-05, please consider to use isSignalAcceptWrongFSPs");
+    REGISTER_VARIABLE("isSignalAcceptWrongFSPs", isSignalAcceptWrongFSPs,
                       "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
                       "Misidentification of charged FSP is allowed.");
     REGISTER_VARIABLE("isPrimarySignal", isPrimarySignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL) and primary, 0.0 otherwise");
+
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
                       "Check the PDG code of a particles MC mother particle");
+    REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,
+                      "Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.  :noindex:");
+
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
                       "Check the array index of a particles generated mother");
+    REGISTER_VARIABLE("genMotherID(i)", genNthMotherIndex,
+                      "Check the array index of a particle n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc. :noindex:");
+    // genMotherPDG and genMotherID are overloaded (each are two C++ functions
+    // sharing one variable name) so one of the two needs to be made the indexed
+    // variable in sphinx
+
     REGISTER_VARIABLE("genMotherP", genMotherP,
                       "Generated momentum of a particles MC mother particle");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
@@ -751,6 +895,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignalAcceptMissingMassive",
                       isSignalAcceptMissingMassive,
                       "same as isSignal, but also accept missing massive particle");
+    REGISTER_VARIABLE("isSignalAcceptMissingGamma",
+                      isSignalAcceptMissingGamma,
+                      "same as isSignal, but also accept missing gamma, such as B -> K* gamma, pi0 -> gamma gamma");
     REGISTER_VARIABLE("isSignalAcceptMissing",
                       isSignalAcceptMissing,
                       "same as isSignal, but also accept missing particle");
@@ -766,6 +913,9 @@ namespace Belle2 {
                       "The PDG code of matched MCParticle, 0 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcErrors", particleMCErrors,
                       "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)");
+    REGISTER_VARIABLE("mcErrorsWithoutProperty", particleMCErrors,
+                      "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags) \n"
+                      "The ignore particle flags of Particle::PropertyFlags which is set by decayString grammar are not considered.");
     REGISTER_VARIABLE("mcMatchWeight", particleMCMatchWeight,
                       "The weight of the Particle -> MCParticle relation (only for the first Relation = largest weight).");
     REGISTER_VARIABLE("nMCMatches", particleNumberOfMCMatch,
@@ -826,7 +976,21 @@ namespace Belle2 {
     REGISTER_VARIABLE("genNMissingDaughter(PDG)", genNMissingDaughter,
                       "Returns the number of missing daughters having assigned PDG codes."
                       "-1 if the no MCParticle is associated to the particle.")
+    REGISTER_VARIABLE("Eher", getHEREnergy, R"DOC(
+[Eventbased] The nominal HER energy used by the generator.
 
+.. warning:: This variable does not make sense for data.
+)DOC");
+    REGISTER_VARIABLE("Eler", getLEREnergy, R"DOC(
+[Eventbased] The nominal LER energy used by the generator.
+
+.. warning:: This variable does not make sense for data.
+)DOC");
+    REGISTER_VARIABLE("XAngle", getCrossingAngle, R"DOC(
+[Eventbased] The nominal beam crossing angle from generator level beam kinematics.
+
+.. warning:: This variable does not make sense for data.
+)DOC");
 
     VARIABLE_GROUP("Generated tau decay information");
     REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode,
@@ -865,5 +1029,8 @@ namespace Belle2 {
                       "returns the weight of the ECLCluster -> MCParticle relation for the relation with the largest weight.");
     REGISTER_VARIABLE("clusterBestMCPDG", particleClusterBestMCPDGCode,
                       "returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
+    REGISTER_VARIABLE("isMC", isMC,
+                      "Returns 1 if run on MC and 0 for data.");
+
   }
 }

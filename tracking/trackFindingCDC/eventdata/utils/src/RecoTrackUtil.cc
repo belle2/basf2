@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oliver Frost                                             *
+ * Contributors: Oliver Frost, Dmitrii Neverov                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,6 +13,10 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
@@ -33,6 +37,51 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+RecoTrack* RecoTrackUtil::storeInto(const CDCTrack& track, StoreArray<RecoTrack>& recoTracks, const double momentumSeedMagnitude)
+{
+  CDCTrack firstHits;
+  ISuperLayer closestLayer = track.getStartISuperLayer();
+  if (ISuperLayerUtil::isAxial(closestLayer)) closestLayer = ISuperLayerUtil::getNextOutwards(closestLayer);
+
+  for (const CDCRecoHit3D hit : track) {
+    if (hit.isAxial()) continue;
+    firstHits.push_back(hit);
+    if ((hit.getISuperLayer() != closestLayer) and (firstHits.size() > 3)) break;
+  }
+
+  const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
+  const CDCTrajectorySZ& szTrajectory = szFitter.fitWithStereoHits(firstHits);
+
+  Vector3D position(track.getStartTrajectory3D().getSupport().x(),
+                    track.getStartTrajectory3D().getSupport().y(),
+                    szTrajectory.getZ0());
+
+  Vector3D momentum(track.getStartTrajectory3D().getFlightDirection3DAtSupport());
+  const double z0 = szTrajectory.getZ0();
+  const double lambda = std::atan(szTrajectory.getTanLambda());
+  momentum.scale(std::cos(lambda));
+  momentum.setZ(std::sin(lambda));
+  momentum *= momentumSeedMagnitude;
+
+  ESign charge;
+  double votes(0);
+  int nHits(0);
+  closestLayer = track.getEndISuperLayer();
+  if (ISuperLayerUtil::isAxial(closestLayer)) closestLayer = ISuperLayerUtil::getNextInwards(closestLayer);
+  for (auto it = track.rbegin(); it != track.rend(); it++) {
+    CDCRecoHit3D hit = *it;
+    if (hit.isAxial()) continue;
+    votes += (hit.getRecoZ() - z0 - std::tan(lambda) * hit.getArcLength2D());
+    nHits++;
+    if ((hit.getISuperLayer() != closestLayer) and (nHits > 3)) break;
+  }
+  votes > 0 ? charge = ESign::c_Plus : charge = ESign::c_Minus;
+
+  RecoTrack* newRecoTrack = recoTracks.appendNew(position, momentum, charge);
+  RecoTrackUtil::fill(track, *newRecoTrack);
+  return newRecoTrack;
+}
 
 RecoTrack* RecoTrackUtil::storeInto(const CDCTrack& track, StoreArray<RecoTrack>& recoTracks)
 {

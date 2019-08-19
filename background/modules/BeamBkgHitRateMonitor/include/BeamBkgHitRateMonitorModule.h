@@ -85,7 +85,7 @@ namespace Belle2 {
     bool m_writeEmptyTimeStamps;  /**< if true write to ntuple also empty time stamps */
     double m_topTimeOffset; /**< TOP: time offset of hits [ns] */
     double m_topTimeWindow; /**< TOP: time window in which to count hits [ns] */
-
+    std::string m_svdShaperDigitsName; /**< SVD: name of the SVDShaperDigits collection */
     // collections
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< event meta data object */
     StoreObjPtr<TRGSummary> m_trgSummary;  /**< trigger summary */

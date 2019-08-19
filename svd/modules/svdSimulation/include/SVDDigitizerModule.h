@@ -15,6 +15,11 @@
 #include <svd/simulation/SVDSignal.h>
 #include <svd/geometry/SensorInfo.h>
 #include <framework/dataobjects/RelationElement.h>
+#include <svd/calibration/SVDFADCMaskedStrips.h>
+#include <svd/online/SVDOnlineToOfflineMap.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/PayloadFile.h>
+
 #include <string>
 #include <set>
 #include <vector>
@@ -110,6 +115,8 @@ namespace Belle2 {
       std::string m_relShaperDigitMCParticleName;
       /** Name of the relation between SVDShaperDigits and SVDTrueHits */
       std::string m_relShaperDigitTrueHitName;
+      /** Name of the SVDEventInfo object */
+      std::string m_svdEventInfoName;
 
       // 2. Physics
       /** Max. Segment length to use for charge drifting */
@@ -155,10 +162,6 @@ namespace Belle2 {
        * Starting from this time, signal samples are taken in samplingTime intervals.
        */
       double m_startSampling;
-      /** Number of samples
-       * Number of consecutive APV25 samples
-       */
-      int m_nAPV25Samples;
 
       // 5. Reporting
       /** Name of the ROOT filename to output statistics */
@@ -211,6 +214,12 @@ namespace Belle2 {
       double m_elNoiseU;
       /** Electronic noise for v-strips. */
       double m_elNoiseV;
+
+      //run-dependent MC payloads:
+      SVDFADCMaskedStrips m_MaskedStr; /**< FADC masked strip payload*/
+      static std::string m_xmlFileName /**< channel mapping xml filename*/;
+      DBObjPtr<PayloadFile> m_mapping; /**<channel mapping payload*/
+      std::unique_ptr<SVDOnlineToOfflineMap> m_map; /**<channel mapping map*/
 
       // ROOT stuff:
       /** Pointer to the ROOT filename for statistics */

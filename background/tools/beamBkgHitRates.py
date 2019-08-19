@@ -86,16 +86,22 @@ if len(trigTypes) > 0:
 
 # Unpack detector data
 add_unpackers(path=main,
-              components=['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'BKLM', 'EKLM'])
+              components=['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM'])
 
 # additional modules if needed for hit processing
 main.add_module('ARICHFillHits')
 main.add_module('TOPChannelMasker')
 main.add_module('ActivatePXDGainCalibrator')
 main.add_module('PXDClusterizer')
+main.add_module('SVDZeroSuppressionEmulator', SNthreshold=5, ShaperDigits='SVDShaperDigits', ShaperDigitsIN='SVDShaperDigitsZSed')
+main.add_module('SVDStripMasking', ShaperDigits='SVDShaperDigitsZSed', ShaperDigitsUnmasked='SVDShaperDigitsUnmasked')
 
 # Beam background rate monitor: output to flat ntuple
-main.add_module('BeamBkgHitRateMonitor', outputFileName=outputFile, trgTypes=trigTypes)
+main.add_module(
+    'BeamBkgHitRateMonitor',
+    outputFileName=outputFile,
+    trgTypes=trigTypes,
+    svdShaperDigitsName='SVDShaperDigitsUnmasked')
 
 # Process events
 basf2.process(main)

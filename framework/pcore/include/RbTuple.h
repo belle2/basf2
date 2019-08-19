@@ -61,7 +61,11 @@ namespace Belle2 {
     /** Functions to add up all histogram files */
     int hadd(bool deleteflag = true);
 
-    //  private:
+    /** Return the list of modules that have defined histograms */
+    const std::vector<Module*>& getHistDefiningModules() const
+    {
+      return m_histdefs;
+    }
 
   private:
     static RbTupleManager* s_instance; /**< singleton instance. */

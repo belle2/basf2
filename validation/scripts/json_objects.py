@@ -123,6 +123,8 @@ class PlotFile(JsonBase):
         self.plots = plots
         #: Description of plot file
         self.description = description
+        #: Number of shifter plots
+        self.n_shifter_plots = sum([not plot.is_expert for plot in self.plots])
 
 
 class Plot(JsonBase):
@@ -264,8 +266,8 @@ class ComparisonResult(JsonBase):
 class ComparisonPlotFile(PlotFile):
 
     """
-    Contains information about a file containing plots and the comparison which have
-    been performed for the content of this file
+    Contains information about a file containing plots and the comparison which
+    have been performed for the content of this file
     """
 
     def __init__(
@@ -278,7 +280,7 @@ class ComparisonPlotFile(PlotFile):
         has_reference=False,
         ntuples=None,
         html_content=None,
-        description=None
+        description=None,
     ):
         """
         Create a new ComparisonPlotFile object and fill all members
@@ -312,6 +314,18 @@ class ComparisonPlotFile(PlotFile):
             plt for plt in self.plots if plt.comparison_result == "warning"
         ])
 
+        #: Number of shifter ntuples
+        self.n_shifter_ntuples = sum([
+            not tuple.is_expert for tuple in self.ntuples
+        ])
+
+        #: Show to shifter, i.e. is there at least one non-expert plot?
+        self.show_shifter = bool(
+            self.n_shifter_plots or
+            self.n_shifter_ntuples or
+            self.html_content
+        )
+
 
 class ComparisonPlot(Plot):
 
@@ -332,7 +346,8 @@ class ComparisonPlot(Plot):
             plot_path=None,
             comparison_text=None,
             height=None,
-            width=None):
+            width=None,
+            warnings=None):
         """
         Create a new ComparisonPlot object and fill all members
         """
@@ -363,6 +378,11 @@ class ComparisonPlot(Plot):
 
         #: path were the png and pdf files are located
         self.plot_path = plot_path
+
+        #: Warnings ("no contact" person etc.)
+        if warnings is None:
+            warnings = []
+        self.warnings = warnings
 
 
 class ComparisonNTuple(NTuple):

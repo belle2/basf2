@@ -24,9 +24,9 @@ namespace Belle2 {
 
   public:
 
-    /** Constructor */
+    //! TrgEclDataBase Constructor
     TrgEclDataBase();
-    /** Destructor */
+    //! TrgEclDataBase Destructor
     virtual ~TrgEclDataBase() {}
 
   public:

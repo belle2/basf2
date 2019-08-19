@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-from modularAnalysis import analysis_main
 from modularAnalysis import setAnalysisConfigParams
 import os
 import re
@@ -28,7 +27,7 @@ def setupBelleDatabaseServer():
     os.environ['BELLE_POSTGRES_SERVER'] = belleDBServer
 
 
-def setupBelleMagneticField(path=analysis_main):
+def setupBelleMagneticField(path):
     """
     This function set the Belle Magnetic field (constant).
     """
@@ -65,9 +64,10 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
                                   useBelleDBServer=None,
                                   generatorLevelReconstruction=False,
                                   generatorLevelMCMatching=False,
-                                  path=analysis_main, entrySequences=None,
+                                  path=None, entrySequences=None,
                                   convertECLCrystalEnergies=False,
-                                  convertExtHits=False):
+                                  convertExtHits=False,
+                                  matchType2E9oE25Threshold=-1.1):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -116,6 +116,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
         convert.param('mcMatchingMode', 'GeneratorLevel')
     convert.param("convertECLCrystalEnergies", convertECLCrystalEnergies)
     convert.param("convertExtHits", convertExtHits)
+    convert.param("matchType2E9oE25Threshold", matchType2E9oE25Threshold)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)

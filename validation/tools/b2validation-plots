@@ -13,7 +13,7 @@ from validationplots import create_plots
 import validationfunctions
 
 
-def cli():
+def get_argument_parser():
     """ Define the accepted command line flags and read them in """
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -39,7 +39,7 @@ def cli():
         dest="popular"
     )
 
-    return parser.parse_args()
+    return parser
 
 
 def get_popular_revision_combinations(work_folder):
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     if os.environ.get('BELLE2_RELEASE_DIR', None) is None and os.environ.get('BELLE2_LOCAL_DIR', None) is None:
         sys.exit('Error: No basf2 release set up!')
 
-    args = cli()
+    args = get_argument_parser().parse_args()
 
     # Go to the html directory and call the create_plots function
     save_dir = os.path.abspath(os.getcwd())

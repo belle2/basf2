@@ -17,6 +17,7 @@
 #include <string>
 namespace Belle2 {
 
+  /// a class to store TRGGRL TSIM info
   class TRGGRLInfo : public TObject {
   public:
 

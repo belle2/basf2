@@ -218,6 +218,7 @@ namespace Belle2 {
 
     using tsOut = std::array<unsigned, 4>;
     using tsOutArray = std::array<tsOut, 5>;
+    /// TRG 2DFinder Track
     struct TRG2DFinderTrack {
       /// omega of a 2D track
       double omega;
@@ -226,6 +227,7 @@ namespace Belle2 {
       /// all TS of a 2D track
       tsOutArray ts;
     };
+    /// TRG Neuro track
     struct TRGNeuroTrack {
       /// z0 of a NN track
       double z;

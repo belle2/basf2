@@ -29,12 +29,19 @@ namespace Belle2 {
 
   typedef HepGeom::Point3D<double> Point3D;
   typedef HepGeom::Vector3D<double> Vector3D;
+/// type of the wire
 #define WireInnerLeft 0
+/// type of the wire
 #define WireInnerRight 1
+/// type of the wire
 #define WireLeft 2
+/// type of the wire
 #define WireRight 3
+/// type of the wire
 #define WireOuterLeft 4
+/// type of the wire
 #define WireOuterRight 5
+/// Max number of neighbors
 #define MaxNeighbors 6
 
   class TRGCDC;

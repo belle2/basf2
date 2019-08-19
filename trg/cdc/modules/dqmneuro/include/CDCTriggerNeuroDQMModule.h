@@ -54,6 +54,7 @@ namespace Belle2 {
         histo->Fill(value);
       }
     }
+    /** get pattern of the track */
     unsigned getPattern(CDCTriggerTrack* track, std::string hitCollectionName)
     {
       unsigned pattern = 0;
@@ -63,6 +64,7 @@ namespace Belle2 {
       }
       return pattern;
     }
+    /** Validity of the pattern*/
     bool isValidPattern(unsigned pattern)
     {
       bool valid = false;

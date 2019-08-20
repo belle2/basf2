@@ -20,9 +20,9 @@
 #include <alignment/Hierarchy.h>
 #include <alignment/GlobalDerivatives.h>
 
+#include <framework/geometry/B2Vector3.h>
 
 #include <genfit/DetPlane.h>
-#include <TVector3.h>
 #include <TRandom.h>
 
 using namespace std;
@@ -86,12 +86,12 @@ BKLMRecoHit::BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
   CLHEP::Hep3Vector gVaxis = module->localToGlobal(vAxis) - gOrigin;
 
   //!the position (in global coordinates) of this module's sensitive-volume origin
-  TVector3 origin_mid(gOrigin_midway[0], gOrigin_midway[1], gOrigin_midway[2]);
+  B2Vector3D origin_mid(gOrigin_midway[0], gOrigin_midway[1], gOrigin_midway[2]);
 
   //!the directioin (in global coordinates) of this module's U axis
-  TVector3 uGlobal(gUaxis[0], gUaxis[1], gUaxis[2]);
+  B2Vector3D uGlobal(gUaxis[0], gUaxis[1], gUaxis[2]);
   //!the directioin (in global coordinates) of this module's V axis
-  TVector3 vGlobal(gVaxis[0], gVaxis[1], gVaxis[2]);
+  B2Vector3D vGlobal(gVaxis[0], gVaxis[1], gVaxis[2]);
 
   genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin_mid, uGlobal, vGlobal, 0));
   setPlane(detPlane, m_moduleID);

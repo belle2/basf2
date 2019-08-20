@@ -58,6 +58,7 @@ namespace Belle2 {
       const double bField = BFieldManager::getField(TVector3(0, 0, getZ0())).Z() / Unit::T;
       return getTransverseMomentum(bField);
     }
+    /** get the quadrant */
     short getQuadrant()
     {
       return m_quadrant;
@@ -70,7 +71,7 @@ namespace Belle2 {
     float m_chi3D;
     /** number of trigger clocks of (the track output - L1 trigger)*/
     short m_time;
-
+    /** iTracker of the unpacked quadrant*/
     short m_quadrant;
 
     //! Needed to make the ROOT object storable

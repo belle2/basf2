@@ -176,7 +176,7 @@ namespace Belle2 {
     /// data members
     double m_kappa;
 
-
+    /// belle alpha
     static const double BELLE_ALPHA;
 
     // static data members

@@ -20,6 +20,8 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <framework/geometry/B2Vector3.h>
+
 namespace Belle2 {
   /**
    * Calibration data collector for Millepede Algorithm
@@ -98,9 +100,9 @@ namespace Belle2 {
 
     /** Get the primary vertex position estimation and its size
      *  from BeamSpot
-     @return tuple<TVector3, TMatrixDSym> tuple with position and size as covariance matrix
+     @return tuple<B2Vector3D, TMatrixDSym> tuple with position and size as covariance matrix
      */
-    std::tuple<TVector3, TMatrixDSym> getPrimaryVertexAndCov() const;
+    std::tuple<B2Vector3D, TMatrixDSym> getPrimaryVertexAndCov() const;
 
 
   private:

@@ -81,42 +81,42 @@ class VCDWriter(object):
                  version='', default_scope_type='module', scope_sep='.',
                  check_values=True, init_timestamp=0):
         """Initialization of VCDWriter"""
+        #: output file
         self._ofile = file
-        """output file"""
+        #: header keywords
         self._header_keywords = {
             '$timescale': self._check_timescale(timescale),
             '$date': str(datetime.datetime.now()) if date is None else date,
             '$comment': comment,
             '$version': version,
         }
-        """header keywords"""
         if default_scope_type not in self.SCOPE_TYPES:
             raise ValueError('Invalid default scope type ({})'.format(
                 default_scope_type))
+        #: set default_scope_type
         self._default_scope_type = default_scope_type
-        """set default_scope_type """
+        #: set scope_sep
         self._scope_sep = scope_sep
-        """set scope_sep"""
+        #: set check_values
         self._check_values = check_values
-        """set check_values"""
+        #: set registering
         self._registering = True
-        """set registering"""
+        #: set closed
         self._closed = False
-        """set closed"""
+        #: set dumping
         self._dumping = True
-        """set dumping"""
+        #: set next_var_id
         self._next_var_id = 0
-        """set next_var_id"""
+        #: set scope_var_strs
         self._scope_var_strs = {}
-        """set scope_var_strs"""
+        #: set scope_var_names
         self._scope_var_names = {}
-        """set scope_var_names"""
+        #: set scopr_types
         self._scope_types = {}
-        """set scopr_types"""
+        #: set ident_values
         self._ident_values = OrderedDict()
-        """set ident_values"""
+        #: set time_stamp
         self._timestamp = int(init_timestamp)
-        """set time_stamp"""
 
     def set_scope_type(self, scope, scope_type):
         """Set the scope_type for a given scope.
@@ -239,6 +239,7 @@ class VCDWriter(object):
         self._dumping = False
 
     def _dump_off(self, timestamp):
+        """Stop dumping to VCD file."""
         print('#' + str(int(timestamp)), file=self._ofile)
         print('$dumpoff', file=self._ofile)
         for ident, val_str in six.iteritems(self._ident_values):
@@ -259,6 +260,7 @@ class VCDWriter(object):
         self._dumping = True
 
     def _dump_values(self, keyword):
+        """Dump values to VCD file."""
         print(keyword, file=self._ofile)
         # TODO: events should be excluded
         print(*six.itervalues(self._ident_values),
@@ -464,8 +466,8 @@ class VCDWriter(object):
 class Variable(object):
     """VCD variable details needed to call :meth:`VCDWriter.change()`."""
 
+    #: variables
     __slots__ = ('ident', 'type', 'size')
-    """varialbes"""
 
     def __init__(self, ident, type, size):
         """Initialization of Variable function"""
@@ -488,8 +490,8 @@ class ScalarVariable(Variable):
 
     """
 
+    #: variables
     __slots__ = ()
-    """varialbes"""
 
     def format_value(self, value, check=True):
         """Format scalar value change for VCD stream.
@@ -519,8 +521,8 @@ class RealVariable(Variable):
 
     """
 
+    #: variables
     __slots__ = ()
-    """varialbes"""
 
     def format_value(self, value, check=True):
         """Format real value change for VCD stream.
@@ -545,8 +547,8 @@ class VectorVariable(Variable):
 
     """
 
+    #: variables
     __slots__ = ()
-    """varialbes"""
 
     def format_value(self, value, check=True):
         """Format value change for VCD stream.

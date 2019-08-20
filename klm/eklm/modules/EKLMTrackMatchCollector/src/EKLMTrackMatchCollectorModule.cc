@@ -8,10 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
 #include <CLHEP/Vector/LorentzVector.h>
 #include "CLHEP/Geometry/Point3D.h"
-
 
 // Std lib includes
 #include <vector>
@@ -33,7 +31,6 @@
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -49,6 +46,8 @@ EKLMTrackMatchCollectorModule::EKLMTrackMatchCollectorModule() :
            "Max distance in strips number to 1D hit from extHit to be still matched (default 8 strips)", double(8));
   addParam("z0_d0", m_D0Z0, "D0_z0 distance", double(5));
   setPropertyFlags(c_ParallelProcessingCertified);
+  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
+  m_GeoDat = nullptr;
 }
 
 EKLMTrackMatchCollectorModule::~EKLMTrackMatchCollectorModule()

@@ -33,6 +33,7 @@
 
 namespace Belle2 {
 
+  /// Node list
   using NodeList = std::vector<std::vector<int> >;
 
   /** Merger data width */
@@ -251,7 +252,7 @@ namespace Belle2 {
 
     NodeList m_mergerNodeID; /**< list of (COPPER ID, HSLB ID) of Merger reader (TSF) */
     bool m_unpackMerger;  /**< flag to unpack merger data (recorded by Merger Reader / TSF) */
-    MergerBits m_mergerBitsPerClock;
+    MergerBits m_mergerBitsPerClock; /**< Merger bits per clock*/
     StoreArray<MergerBits> m_mergerBits; /**< merger output bitstream */
 
     bool m_decodeTSHit;  /**< flag to decode track segment  */

@@ -226,7 +226,7 @@ def safe_process(*args, **kwargs):
     return run_in_subprocess(target=basf2.process, *args, **kwargs)
 
 
-def check_error_free(tool, toolname, package, filter=lambda x: False):
+def check_error_free(tool, toolname, package, filter=lambda x: False, toolopts=None):
     """Calls the `tool` with argument `package` and check that the output is
     error-free. Optionally `filter` the output in case of error messages that
     can be ignored.
@@ -248,6 +248,7 @@ def check_error_free(tool, toolname, package, filter=lambda x: False):
         package(str): package to run over. Also the first argument to the tool
         filter(lambda): function which gets called for each line of output and
            if it returns True the line will be ignored.
+        toolopts(list(str)): extra options to pass to the tool.
     """
 
     if "BELLE2_RELEASE_DIR" in os.environ:
@@ -257,7 +258,9 @@ def check_error_free(tool, toolname, package, filter=lambda x: False):
 
     with local_software_directory():
         try:
-            output = subprocess.check_output([tool, package], encoding="utf8")
+            output = subprocess.check_output(
+                [tool] + toolopts + [package] if toolopts else [tool, package],
+                encoding="utf8")
         except subprocess.CalledProcessError as error:
             print(error)
             output = error.output

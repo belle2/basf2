@@ -1,31 +1,32 @@
 //+
-// File : RawFTSWFormat_latest.h
+// File : RawFTSWFormat_v2.h
 // Description : Module to handle raw data from COPPER
 //
 // Author : Satoru Yamada, IPNS, KEK
 // Date : 7 - Mar - 2016
 //-
 
-#ifndef RAWFTSWFORMAT_LATEST_H
-#define RAWFTSWFORMAT_LATEST_H
+#ifndef RAWFTSWFORMAT_V2_H
+#define RAWFTSWFORMAT_V2_H
 #include <rawdata/dataobjects/RawFTSWFormat.h>
+#include "rawdata/switch_basf2_standalone.h"
 
 namespace Belle2 {
 
   /**
-   * The Raw FTSW class 3 ( 2019.8.20 )
+   * The Raw FTSW class ver.2 .
    *
-   * This class stores the RAW data containing FTSW data(event #, trg time ).
+   * Nakao-san will add additional data in FTSW format
    */
-  class RawFTSWFormat_latest : public RawFTSWFormat {
+  class RawFTSWFormat_v2 : public RawFTSWFormat {
   public:
 
     //! Default constructor
-    RawFTSWFormat_latest();
+    RawFTSWFormat_v2();
     //! Constructor using existing pointer to raw data buffer
-    //RawFTSWFormat_latest(int* bufin, int nwords);
+    //RawFTSWFormat_v2(int* bufin, int nwords);
     //! Destructor
-    virtual ~RawFTSWFormat_latest();
+    virtual ~RawFTSWFormat_v2();
 
     /*     //! Get # of words in this buffer */
     /*     int GetNwords(int n); */
@@ -160,31 +161,31 @@ namespace Belle2 {
 
   };
 
-  inline unsigned int RawFTSWFormat_latest::GetExpRunSubrun(int n)
+  inline unsigned int RawFTSWFormat_v2::GetExpRunSubrun(int n)
   {
     return (unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]);
 
   }
 
 
-  inline int RawFTSWFormat_latest::GetRunNo(int n)
+  inline int RawFTSWFormat_v2::GetRunNo(int n)
   {
     return (((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) & RUNNO_MASK)
             >> RUNNO_SHIFT);
   }
 
-  inline int RawFTSWFormat_latest::GetSubRunNo(int n)
+  inline int RawFTSWFormat_v2::GetSubRunNo(int n)
   {
     return (m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ] & SUBRUNNO_MASK);
   }
 
-  inline int RawFTSWFormat_latest::GetRunNoSubRunNo(int n)
+  inline int RawFTSWFormat_v2::GetRunNoSubRunNo(int n)
   {
     return ((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) &
             (RUNNO_MASK | SUBRUNNO_MASK));
   }
 
-  inline int RawFTSWFormat_latest::GetExpNo(int n)
+  inline int RawFTSWFormat_v2::GetExpNo(int n)
   {
     return (((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) & EXP_MASK)
             >> EXP_SHIFT);

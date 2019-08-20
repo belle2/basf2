@@ -203,12 +203,14 @@ namespace Belle2 {
     template<int iSL>
     char* getData(inputToTSFArray);
 
+    /** file handlers of pipes */
     using streamPair = std::array<FILE*, 2>;
     /** array holding file handlers of pipes */
     std::array<streamPair, m_nSubModules> stream;
 
     /** array holding file descriptors of pipes */
     std::array<std::array<int, 2>, m_nSubModules> inputFileDescriptor;
+    /** array holding file descriptors of pipes */
     std::array<std::array<int, 2>, m_nSubModules> outputFileDescriptor;
 
     /**
@@ -260,23 +262,32 @@ namespace Belle2 {
     /// record when a time slow has been registered by a hit
     /// <priority time, fast time, edge timing>
     using registeredStructElement = std::array<std::bitset<nCellsInLayer>, 3>;
+    /// vector of registeredStructElement
     using registeredStruct = std::vector<registeredStructElement>;
 
+    /// priority hits map in Merger
     using priorityHitInMerger = std::map<unsigned, int>;
+    /// priority hits map in Merger for a SL
     using priorityHitStructInSL = std::vector<priorityHitInMerger>;
+    /// priority hits map in Merger for a clock
     using priorityHitStructInClock = std::map<unsigned, priorityHitStructInSL>;
+    /// all priority hits map in Merger
     using priorityHitStruct = std::array<priorityHitStructInClock, m_nClockPerEvent>;
     /** list keeping the index of priority hit of a TS for making fastsim ts hit object */
     priorityHitStruct m_priorityHit;
     /** CDC hit ID in each clock */
     std::vector<std::vector<int> > iAxialHitInClock;
 
+    ///  Wire set
     using WireSet = std::vector<short>;
+    /// TS map
     using TSMap = std::unordered_map<short, WireSet>;
     /** map from cell ID to TS ID, for inner and outer Merger */
     std::array<TSMap, 2> m_tsMap;
 
+    /// edge wire list
     using edgeMap = std::unordered_map<unsigned short, timeVec*>;
+    /// cell list
     using cellList = std::vector<unsigned short>;
     /** list of cell ID related to edge timing */
     std::array<cellList, 5> innerInvEdge = {cellList {31},
@@ -291,6 +302,7 @@ namespace Belle2 {
                                             cellList {0, 64},
                                             cellList {15, 31, 63, 79}
                                            };
+    /// edge wire list
     using edgeList = std::unordered_map<unsigned short, std::vector<unsigned short>>;
     /** map from cell ID to related edge ID */
     std::array<edgeList, 2> m_edge;

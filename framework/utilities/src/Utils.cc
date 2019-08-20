@@ -83,7 +83,8 @@ namespace Belle2::Utils {
     B2INFO(m_text << " " << std::fixed << std::setprecision(3) << elapsed << " ms");
   }
 
-  std::string getCommandOutput(const std::string& command, const std::vector<std::string>& arguments, bool searchPath)
+  std::string getCommandOutput(const std::string& command, const std::vector<std::string>& arguments,
+                               bool searchPath [[maybe_unused]])
   {
     std::string cmd = command;
     for (auto& arg : arguments) {

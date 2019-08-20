@@ -20,7 +20,9 @@
 
 
 namespace Belle2 {
+  /// Database importer of TRGECL
   class TrgEclDatabaseImporter;
+  /// Database importer of TRGECL
   class TrgEclDatabaseImporter {
 
   public:

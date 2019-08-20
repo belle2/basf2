@@ -52,12 +52,13 @@ namespace Belle2 {
 
   Database::~Database() = default;
 
-  void Database::reset()
+  void Database::reset(bool keepConfig)
   {
     DBStore::Instance().reset(true);
     Instance().m_metadataProvider.reset();
     Instance().m_payloadCreation.reset();
-    Conditions::Configuration::getInstance().reset();
+    if (not keepConfig)
+      Conditions::Configuration::getInstance().reset();
   }
 
   ScopeGuard Database::createScopedUpdateSession()
@@ -258,8 +259,8 @@ namespace Belle2 {
     //don't show c++ signature in python doc to keep it simple
     py::docstring_options options(true, true, false);
 
-    //def("get_default_global_tags", &Database::getDefaultGlobalTags, "Get the default global tags for the central database");
-    py::def("reset_database", &Database::reset, R"DOC(Reset the database setup to have no database sources
+    py::def("reset_database", &Database::reset, (py::arg("keep_config") = false),
+        R"DOC(Reset the database setup to have no database sources
 
 .. deprecated:: release-04-00-00
    Please use `basf2.conditions` for all configuration of the conditions database)DOC");

@@ -124,6 +124,7 @@ class AttrDict:
 
     def __init__(self, content):
         """Remember the dictionary"""
+        #: Dictionary we want to access via attributes
         self.__content = content
 
     def __getattr__(self, key):

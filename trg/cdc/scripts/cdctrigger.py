@@ -6,7 +6,7 @@ from ROOT import Belle2
 
 
 def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
-                    thetaDef='avg', zDef='min', trueEventTime=False):
+                    thetaDef='avg', zDef='min', trueEventTime=False, realdata=False):
     """
     This function adds the CDC trigger modules to a path.
     @path              modules are added to this path
@@ -27,6 +27,7 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
                        the true event time can be used instead.
                        recommended especially for tests on single tracks.
     """
+
     if SimulationMode == 1:
         # TSF
         path.add_module('CDCTriggerTSF',
@@ -50,12 +51,16 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
         path.add_module('CDCTrigger3DFitter')
         # neurotrigger
         if shortTracks:
-            B2WARNING("shortTracks=True is deprecated and no longer supported! "
-                      "Network weights will now be loaded from the database. "
-                      "If you really want to use shorttracks, load the specific network "
-                      "weights in the Neurotrigger module!")
+            B2ERROR("shortTracks=True is deprecated and no longer supported! "
+                    "Network weights will now be loaded from the database. "
+                    "If you really want to use shorttracks, load the specific network "
+                    "weights in the Neurotrigger module!")
             exit()
-        path.add_module('CDCTriggerNeuro')
+        if realdata:
+            path.add_module('CDCTriggerNeuro')
+        else:
+            path.add_module('CDCTriggerNeuro', filename=Belle2.FileSystem.findFile('trg/cdc/data/Background2.0_20161207.root'))
+
         path.add_module('CDCTriggerTrackCombiner',
                         thetaDefinition=thetaDef, zDefinition=zDef)
     elif SimulationMode == 2:

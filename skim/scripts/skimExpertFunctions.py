@@ -540,13 +540,13 @@ class RetentionCheck(Module):
 
         for particle_list in self.particle_lists:
 
-            inst2 = Belle2.PyStoreObj(Belle2.ParticleList.Class(), particle_list)
+            pl = Belle2.PyStoreObj(Belle2.ParticleList.Class(), particle_list)
 
-            if inst2.isValid():
+            if pl.isValid():
 
-                self.candidate_count[particle_list] += inst2.getListSize()
+                self.candidate_count[particle_list] += pl.getListSize()
 
-                if inst2.getListSize() != 0:
+                if pl.getListSize() != 0:
 
                     self.event_with_candidate_count[particle_list] += 1
 

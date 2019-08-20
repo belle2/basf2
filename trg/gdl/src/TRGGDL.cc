@@ -69,7 +69,8 @@ namespace Belle2 {
                     unsigned fastSimulationMode,
                     unsigned firmwareSimulationMode,
                     const std::string& Phase,
-                    bool alg_from_db)
+                    bool algFromDB,
+                    const std::string& algFilePath)
   {
     if (_gdl) {
       //delete _gdl;
@@ -82,7 +83,8 @@ namespace Belle2 {
                         fastSimulationMode,
                         firmwareSimulationMode,
                         Phase,
-                        alg_from_db);
+                        algFromDB,
+                        algFilePath);
     } else {
       cout << "TRGGDL::getTRGGDL ... good-bye" << endl;
       //        delete _gdl;
@@ -105,7 +107,8 @@ namespace Belle2 {
                  unsigned fastSimulationMode,
                  unsigned firmwareSimulationMode,
                  const std::string& Phase,
-                 bool alg_from_db)
+                 bool algFromDB,
+                 const std::string& algFilePath)
     : _debugLevel(0),
       _configFilename(configFile),
       _simulationMode(simulationMode),
@@ -116,7 +119,8 @@ namespace Belle2 {
       _offset(15.3),
       _isb(0),
       _osb(0),
-      _alg_from_db(alg_from_db)
+      _algFilePath(algFilePath),
+      _algFromDB(algFromDB)
   {
 
     if (TRGDebug::level()) {
@@ -250,7 +254,7 @@ namespace Belle2 {
       DBObjPtr<TRGGDLDBAlgs> db_algs;
       std::string str;
       std::vector<std::string> algs;
-      std::ifstream isload("ftd_0018.alg", std::ios::in);
+      std::ifstream isload(_algFilePath.c_str(), std::ios::in);
       int index = 0;
       while (std::getline(isload, str)) {
         algs.push_back(str);
@@ -267,7 +271,7 @@ namespace Belle2 {
           L1Summary = 0;
           L1Summary_psnm = 0;
         }
-        std::string alg = _alg_from_db ? db_algs->getalg(i) : algs[i];
+        std::string alg = _algFromDB ? db_algs->getalg(i) : algs[i];
         if (isFiredFTDL(_inpBits, alg)) {
           L1Summary |= (1 << (i % 32));
           if (doprescale(m_PrescalesDB->getprescales(i))) {
@@ -317,7 +321,7 @@ namespace Belle2 {
         _inpBits.push_back(GDLResult->testInput(i));
       }
 
-      if (_alg_from_db) {
+      if (_algFromDB) {
 
         DBObjPtr<TRGGDLDBAlgs> db_algs;
         int L1Summary = 0;
@@ -344,7 +348,7 @@ namespace Belle2 {
         int L1Summary_psnm = 0;
         std::string str;
         std::vector<std::string> algs;
-        std::ifstream isload("ftd_0017.alg", std::ios::in);
+        std::ifstream isload(_algFilePath.c_str(), std::ios::in);
         int index = 0;
         while (std::getline(isload, str)) {
           algs.push_back(str);

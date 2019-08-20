@@ -59,7 +59,8 @@ namespace Belle2 {
                              unsigned fastSimulationMode = 0,
                              unsigned firmwareSimulationMode = 0,
                              const std::string& Phase = "Phase",
-                             bool alg_from_db = true);
+                             bool algFromDB = true,
+                             const std::string& algFilePath = "ftd.alg");
 
     /// returns TRGGDL object. TRGGDL should be created with specific
     /// configuration before calling this function.
@@ -73,7 +74,8 @@ namespace Belle2 {
            unsigned fastSimulationMode,
            unsigned firmwareSimulationMode,
            const std::string& Phase,
-           bool alg_from_db = true);
+           bool algFromDB = true,
+           const std::string& algFilePath = "ftd.alg");
 
     /// Destructor
     virtual ~TRGGDL();
@@ -209,6 +211,9 @@ namespace Belle2 {
     //Phase
     std::string _Phase;
 
+    // Path to algorithm file
+    std::string _algFilePath;
+
     /// GDL trigger system clock.
     const TRGClock& _clock;
 
@@ -249,7 +254,7 @@ namespace Belle2 {
     std::vector<bool> _ftdBits;
     std::vector<bool> _psnBits;
 
-    bool _alg_from_db;
+    bool _algFromDB;
 
     friend class TRGGDLModule;
   };

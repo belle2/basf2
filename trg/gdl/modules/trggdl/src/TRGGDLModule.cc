@@ -45,6 +45,7 @@ namespace Belle2 {
       _simulationMode(1),
       _fastSimulationMode(0),
       _firmwareSimulationMode(0),
+      _algFilePath("ftd.alg"),
       _Phase("Phase2")
   {
 
@@ -72,9 +73,14 @@ namespace Belle2 {
              _firmwareSimulationMode);
 
     addParam("algFromDB",
-             _alg_from_db,
+             _algFromDB,
              "Set false when alg is taken from local file.",
              true);
+
+    addParam("algFilePath",
+             _algFilePath,
+             ".alg file path",
+             _algFilePath);
 
     B2DEBUG(100, "TRGGDLModule ... created");
   }
@@ -116,14 +122,16 @@ namespace Belle2 {
                                _fastSimulationMode,
                                _firmwareSimulationMode,
                                _Phase,
-                               _alg_from_db);
+                               _algFromDB,
+                               _algFilePath);
     } else if (cfn != _gdl->configFile()) {
       _gdl = TRGGDL::getTRGGDL(cfn,
                                _simulationMode,
                                _fastSimulationMode,
                                _firmwareSimulationMode,
                                _Phase,
-                               _alg_from_db);
+                               _algFromDB,
+                               _algFilePath);
     }
 
     B2DEBUG(100, "TRGGDLModule ... beginRun called  configFile = " << cfn);

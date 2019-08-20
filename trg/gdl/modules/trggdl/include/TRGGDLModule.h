@@ -81,9 +81,13 @@ namespace Belle2 {
     int _firmwareSimulationMode;
 
     /// Switch for algorithm source. False when using local .alg file.
-    bool _alg_from_db;
+    bool _algFromDB;
 
+    // Phase
     std::string _Phase;
+
+    // Path to algorithm file
+    std::string _algFilePath;
 
   private:
 

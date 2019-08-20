@@ -65,7 +65,7 @@ void DistanceCalculatorModule::initialize()
   }
 }
 
-Eigen::Vector3d getDistanceTrackVertex(const Particle* pTrack, const Particle* pVertex)
+Eigen::Vector3d getDocaTrackVertex(const Particle* pTrack, const Particle* pVertex)
 {
   Eigen::Vector3d v(pTrack->getPx(), pTrack->getPy(), pTrack->getPz());
   Eigen::Vector3d p_ray(pTrack->getX(), pTrack->getY(), pTrack->getZ());
@@ -75,7 +75,7 @@ Eigen::Vector3d getDistanceTrackVertex(const Particle* pTrack, const Particle* p
   return r - r.dot(v_dir) * v_dir;
 }
 
-TMatrixFSym getDistanceTrackVertexError(const Particle* pTrack, const Particle* pVertex)
+TMatrixFSym getDocaTrackVertexError(const Particle* pTrack, const Particle* pVertex)
 {
   //covariance matrix of r
   TMatrixFSym err_r = pTrack->getVertexErrorMatrix() + pVertex->getVertexErrorMatrix();
@@ -112,7 +112,7 @@ Eigen::Vector3d getDocaTracks(const Particle* p1, const Particle* p2)
   if (n.norm() < eps) {
     //if tracks are parallel then the distance is independant on the point on the line
     //and we can use the old way to calculate the DOCA
-    return getDistanceTrackVertex(p1, p2);
+    return getDocaTrackVertex(p1, p2);
   }
   Eigen::Vector3d n_dir = n.normalized();
   Eigen::Vector3d p1v(p1->getX(), p1->getY(), p1->getZ());
@@ -129,7 +129,7 @@ TMatrixFSym getDocaTracksError(const Particle* p1, const Particle* p2)
   Eigen::Vector3d p2p(p2->getPx(), p2->getPy(), p2->getPz());
   Eigen::Vector3d n = p1p.cross(p2p);
   if (n.norm() < eps) {
-    return getDistanceTrackVertexError(p1, p2);
+    return getDocaTrackVertexError(p1, p2);
   }
   Eigen::Vector3d n_dir = n.normalized();
   //d_j = n_dir_j * n_dir_k r_k
@@ -167,10 +167,10 @@ Eigen::Vector3d getDistance(const Particle* p1, const Particle* p2, const std::s
     return getDistanceVertices(p1, p2);
   }
   if (mode == "trackandvertex") {
-    return getDistanceTrackVertex(p2, p1);
+    return getDocaTrackVertex(p2, p1);
   }
   //if(mode == "vertexandtrack")
-  return getDistanceTrackVertex(p1, p2);
+  return getDocaTrackVertex(p1, p2);
 }
 TMatrixFSym getDistanceErrors(const Particle* p1, const Particle* p2, const std::string& mode)
 {
@@ -181,10 +181,10 @@ TMatrixFSym getDistanceErrors(const Particle* p1, const Particle* p2, const std:
     return getDistanceVerticesErrors(p1, p2);
   }
   if (mode == "trackandvertex") {
-    return getDistanceTrackVertexError(p2, p1);
+    return getDocaTrackVertexError(p2, p1);
   }
   //  if(mode == "vertexandtrack"){
-  return getDistanceTrackVertexError(p1, p2);
+  return getDocaTrackVertexError(p1, p2);
 }
 
 Eigen::Vector3d getDocaBtubeVertex(const Particle* pVertex, const Btube* tube)
@@ -299,7 +299,7 @@ void DistanceCalculatorModule::event()
     double dist_err = 0;
     if (DistanceMag != 0) {
       Eigen::Vector3d dist_dir = Distance.normalized();
-      dist_err = ((dist_dir.transpose()) * (DistanceCovMatrix_eigen * dist_dir)).norm();
+      dist_err = TMath::Sqrt(((dist_dir.transpose()) * (DistanceCovMatrix_eigen * dist_dir)).norm());
     }
     particle->writeExtraInfo("CalculatedDistance", DistanceMag);
     particle->writeExtraInfo("CalculatedDistanceError", dist_err);

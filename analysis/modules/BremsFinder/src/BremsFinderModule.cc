@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Moritz Gelb                                              *
+ * Contributors: Alejandro Mora                                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -49,33 +49,36 @@ namespace Belle2 {
     Module(), m_pdgCode(0)
   {
     // set module description (e.g. insert text)
-    setDescription(
-      R"DOC(This module copies each particle in the `inputList` to the `outputList` and uses the results of the **eclTrackBremFinder module**
-    to look for possible bremsstrahlung photons; if these photons exists, it adds their four momentum to the particle in the `outputList`. 
-    It also adds the original particle and these photons as daughters of the new, corrected particle. Track and PID information of the original 
-    particle are copied onto the new one to facilitate their access in the analysis scripts.
+    setDescription(R"DOC(This module copies each particle in the `inputList` to the `outputList` and uses
+    the results of the **eclTrackBremFinder** module to look for possible bremsstrahlung photons; if these 
+    photons exists, it adds their four momentum to the particle in the `outputList`. 
+    It also adds the original particle and these photons as daughters of the new, corrected particle. 
+    Track and PID information of the original particle are copied onto the new one to facilitate their access 
+    in the analysis scripts.
 
-    The **eclTrackBremFinder module** uses the lepton track PXD and SVD hits and extrapolates them to the ECL; then looks for ECL clusters 
-    with energies between 0.2 and 1 times the track energy and without associated tracks, and checks if the distance between each of these clusters 
-    and the extrapolated hit is smaller than 0.5 mm. If it is, the respective cluster is marked as bremsstrahlung, and a *Bremsstrahlung* weighted relation between 
-    it and the track is stablished. The weight is determined as
+    The **eclTrackBremFinder** module uses the lepton track PXD and SVD hits and extrapolates them to the ECL; 
+    then looks for ECL clusters with energies between 0.2 and 1 times the track energy and without associated 
+    tracks, and checks if the distance between each of these clusters 
+    and the extrapolated hit is smaller than 0.5 mm. If it is, a *Bremsstrahlung* weighted relation 
+    between said cluster and the track is stablished. The weight is determined as
 
-    ..math:: 
+    .. math:: 
                    
-    `\text{max}\left(\frac{\left|\phi_{\text{cluster}}-\phi_{\text{hit}}\right|}{\Delta\phi_{\text{cluster}}+\Delta\phi_{\text{hit}}},
-    \frac{\left|\theta_{\text{cluster}}-\theta_{\text{hit}}\right|}{\Delta\theta_{\text{cluster}}+\Delta\theta_{\text{hit}}}\right)`
+       \text{max}\left(\frac{\left|\phi_{\text{cluster}}-\phi_{\text{hit}}\right|}{\Delta\phi_{\text{cluster}}+\Delta\phi_{\text{hit}}}, \, \frac{\left|\theta_{\text{cluster}}-\theta_{\text{hit}}\right|}{\Delta\theta_{\text{cluster}}+\Delta\theta_{\text{hit}}}\right)
 
-    where :math: `\phi_i` and :math: `\theta_i` are the azimutal and polar angles of the ECL cluster and the extrapolated hit, and :math: `\Delta x` 
-    represents the uncertainty of the value :math: `x`. The details of the calculation of these quantities are `here`_. By default, only relations with a weight
-    smaller than 3.0 are stored. The user can further determine the maximum value of this weight required in order to perform the bremsstrahlung 
-    correction.
+    where :math:`\phi_i` and :math:`\theta_i` are the azimutal and polar angles of the ECL cluster and the 
+    extrapolated hit, and :math:`\Delta x` represents the uncertainty of the value :math:`x`. The details of 
+    the calculation of these quantities are `here`_. By default, only relations with a weight
+    smaller than 3.0 are stored. The user can further determine the maximum value of this weight required in order 
+    to perform the bremsstrahlung correction.
 
-    This module looks for photons in the `gammaList` whose clusters have a *Bremsstrahlung* relation with the track of one of the particles in 
-    the `inputList`, and adds their 4-momentum to the particle's one. It also adds the weight of this relation as `extraInfo` to the photon, under 
-    the name `bremsAcceptanceFactor`.
+    This module looks for photons in the `gammaList` whose clusters have a *Bremsstrahlung* relation with the track 
+    of one of the particles in the `inputList`, and adds their 4-momentum to the particle's one. It also adds the 
+    weight of this relation as `extraInfo` to the photon, under the name `bremsAcceptanceFactor`.
 
     Warning:
-      Even in the event of no bremsstrahlung photons found, the new particle is still created, and the original one is still added as its daughter.
+      Even in the event of no bremsstrahlung photons found, a new particle is still created, and the original one is still 
+      added as its daughter.
                   
     See also:
       `eclTrackBremFinder module`_
@@ -87,11 +90,11 @@ namespace Belle2 {
     // Add parameters
     addParam("outputList", m_outputListName, "The output particle list name.");
     addParam("inputList", m_inputListName,
-             R"DOC(The initial particle list name containing the particles to correct. **It should already exist
-              and the particles must have an associated track.)DOC");
+             R"DOC(The initial particle list name containing the particles to correct. *It should already exist
+              and the particles must have an associated track.*)DOC");
     addParam("gammaList", m_gammaListName,
-             R"DOC(The photon list containing the preselected bremsstrahlung candidates. **It should already exist and
-              the particles in the list must be photons**)DOC");
+             R"DOC(The photon list containing the preselected bremsstrahlung candidates. *It should already exist and
+              the particles in the list must be photons*)DOC");
     addParam("maximumAcceptance", m_maximumAcceptance,
              "The maximum value of the relation weight between a bremsstrahlung cluster and a particle track",
              m_maximumAcceptance);

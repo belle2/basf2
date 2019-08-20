@@ -255,10 +255,6 @@ namespace Belle2 {
         auto variableName = arguments[0];
         std::string mode = arguments[1];
 
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) unreadVariable
-
-        // cppcheck-suppress unreadVariable
         const bool modeisSignal = mode == "Signal";
         const bool modeisAuto = mode == "Auto";
 

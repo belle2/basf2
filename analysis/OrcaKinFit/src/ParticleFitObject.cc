@@ -273,10 +273,7 @@ namespace Belle2 {
     {
       // reimplemented here to take account of cyclical variables e.g azimuthal angle phi - DJeans
 
-      if (!covinvvalid) {
-        calculateCovInv();
-        return -1;
-      }
+      if (not covinvvalid and not calculateCovInv()) return 0;
 
       double resid[BaseDefs::MAXPAR] = {0};
       for (int i = 0; i < getNPar(); i++) {

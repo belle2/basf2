@@ -409,10 +409,7 @@ namespace Belle2 {
 
     double BaseFitObject::getChi2() const
     {
-      if (!covinvvalid) {
-        calculateCovInv();
-        return -1;
-      }
+      if (not covinvvalid and not calculateCovInv()) return -1;
       double chi2 = 0;
       static double resid[BaseDefs::MAXPAR];
       static bool chi2contr[BaseDefs::MAXPAR];
@@ -435,10 +432,9 @@ namespace Belle2 {
     {
       assert(ilocal >= 0 && ilocal < getNPar());
       if (isParamFixed(ilocal) || !isParamMeasured(ilocal)) return 0;
-      if (!covinvvalid) {
-        calculateCovInv();
-        return 0;
-      }
+
+      if (not covinvvalid and not calculateCovInv()) return 0;
+
       double result = 0;
       for (int jlocal = 0; jlocal < getNPar(); jlocal++)
         if (!isParamFixed(jlocal) && isParamMeasured(jlocal))
@@ -453,10 +449,7 @@ namespace Belle2 {
       if (isParamFixed(ilocal) || !isParamMeasured(ilocal) ||
           isParamFixed(jlocal) || !isParamMeasured(jlocal))
         return 0;
-      if (!covinvvalid) {
-        calculateCovInv();
-        return 0;
-      }
+      if (not covinvvalid and not calculateCovInv()) return 0;
       return 2 * covinv[ilocal][jlocal]; // JL: ok in absence of soft constraints
     }
 
@@ -486,10 +479,7 @@ namespace Belle2 {
     {
       // This adds the dChi2/dpar piece
       assert(getNPar() <= BaseDefs::MAXPAR);
-      if (!covinvvalid) {
-        calculateCovInv();
-        return 1;
-      }
+      if (not covinvvalid and not calculateCovInv()) return 0;
       for (int ilocal = 0; ilocal < getNPar(); ++ilocal) {
         if (!isParamFixed(ilocal) && isParamMeasured(ilocal)) {
           int iglobal = getGlobalParNum(ilocal);

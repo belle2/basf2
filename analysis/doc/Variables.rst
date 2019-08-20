@@ -84,7 +84,7 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
          It's probably easier to use `variables.utils.add_collection` which wraps this function for you.
 
       :param str collection: The new collection to create.
-      :param ``ROOT.vector``(str) variables: A ``ROOT.vector<string>`` of variables to add as the variable collection.
+      :param variables: A ``ROOT.std.vector(string)`` instance of variables to add as the variable collection.
 
       :returns: True if the collection was successfully added
 

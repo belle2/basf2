@@ -786,7 +786,11 @@ NeuroTrigger::load(const string& filename, const string& arrayname)
   if (filename.size() < 1) {
     m_MLPs.clear();
     m_MLPs = m_cdctriggerneuroconfig->getMLPs();
-    B2INFO("Loaded Neurotrigger MLP weights from database: " +  m_cdctriggerneuroconfig->getNNName());
+    if (m_MLPs.size() == 0) {
+      B2ERROR("Could not load Neurotrigger weights from database!");
+      return false;
+    }
+    B2DEBUG(2, "Loaded Neurotrigger MLP weights from database: " +  m_cdctriggerneuroconfig->getNNName());
     B2DEBUG(100, "loaded " << m_MLPs.size() << " networks from database");
     return true;
   } else {

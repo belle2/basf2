@@ -9,11 +9,10 @@ First, you must run it
 ~~~~~~~~~~~~~~~~~~~~~~
 MCMatching relates ``Particle`` and ``MCParticle`` objects. 
 
-Most MC matching variables will have non-trivial values only if the :b2:mod:`MCMatching` module is actually executed.
-It can be executed by adding the module to your path, there is a `modularAnalysis.matchMCTruth` convenience function to do this.
+.. important:: 
+        Most MC matching variables will have non-trivial values only if the :b2:mod:`MCMatching` module is actually executed.
+        It can be executed by adding the module to your path, there is a `modularAnalysis.matchMCTruth` convenience function to do this.
 
-.. important:: To get non-trivial MC info, you need to match MC-level and reconstruction-level information by adding
- :b2:mod:`MCMatching` to your path. You can use `modularAnalysis.matchMCTruth` convenience function to do this.
 
 ~~~~
 Core
@@ -32,11 +31,13 @@ which relates composite ``Particle`` (s) and ``MCParticle`` (s), is executed.
         :variables: mcPDG,mcErrors
         :noindex:
 
-~~~~~~~~~~~
-Convenience
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+Extra variables
+~~~~~~~~~~~~~~~
 
-There are several extra variables defined *for your convenience*, however all information is contained in the first two.
+There are several extra variables relating to MCMatching. 
+Many are defined for convenience and can be recreated logically from :b2:var:`mcPDG` and :b2:var:`mcErrors`.
+Some extra variables are provided externally, for example :b2:var:`isCloneTrack` from the tracking-level MC matching.
 
 .. b2-variables::
         :variables: isSignal,isSignalWithoutProperty,isExtendedSignal,isSignalAcceptWrongFSPs,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
@@ -246,5 +247,5 @@ MC mode       Decay channel                                    MC mode       Dec
 ---------------
 Photon matching
 ---------------
-Detalis of photon matching efficiency can be found `in this talk <https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf>`_. If you want to contribute, please feel free to move material from the talk to this section (:issue:`BII-5316`).
+Details of photon matching efficiency can be found `in this talk <https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf>`_. If you want to contribute, please feel free to move material from the talk to this section (:issue:`BII-5316`).
 

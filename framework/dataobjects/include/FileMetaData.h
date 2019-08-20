@@ -280,6 +280,7 @@ namespace Belle2 {
     void declareRealData() {m_isMC = false;}
 
     friend class SeqRootInputModule;
+    friend class RootInputModule;
     friend class RootOutputModule;
     friend class B2BIIMdstInputModule;
 

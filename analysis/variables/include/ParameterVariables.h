@@ -106,7 +106,7 @@ namespace Belle2 {
     double v0DaughterZ0Diff(const Particle* particle);
 
     /**
-     * returns true if the particle has been used as a photn for Bremsstrahlung recovery, and false otherwise
+     * returns true if the particle has been used as a photon for Bremsstrahlung recovery, and false otherwise
      */
     double isBremsPhoton(const Particle* particle);
 

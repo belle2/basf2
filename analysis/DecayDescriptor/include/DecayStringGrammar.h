@@ -23,7 +23,7 @@ namespace Belle2 {
     to initialise the DecayDescriptor class.
 
     User documentation is located at analysis/doc/DecayDescriptor.rst
-    Please modify in accordingly to introduced changes.*/
+    Please modify it according to introduced changes.*/
   template <typename Iterator>
   struct DecayStringGrammar : boost::spirit::qi::grammar<Iterator, DecayString(), boost::spirit::unicode::space_type> {
     DecayStringGrammar() : DecayStringGrammar::base_type(start)

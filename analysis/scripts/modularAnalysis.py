@@ -372,20 +372,18 @@ def bremsFinder(
     """
     For each particle in the given `inputList`, copies it to the `outputList` and adds the
     4-vector of the photon(s) in the `gammaList` which has(have) a weighted named relation to
-    the particle's track, set by the **eclTrackBremFinder** module during reconstruction.
+    the particle's track, set by the :b2:mod:`eclTrackBremFinder` module during reconstruction.
 
     Warning:
         This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
         up to MC12 **do not** contain this.
 
-    Warning:
+    Information:
         Please note that a new particle is always generated, with the old particle and -if found- one or more
         photons as daughters.
 
-    Warning:
         The `inputList` should contain particles with associated tracks. Otherwise the module will exit with an error.
 
-    Warning:
         The `gammaList` should contain photons. Otherwise the module will exit with an error.
 
     @param outputList   The output particle list name containing the corrected particles

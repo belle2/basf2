@@ -272,7 +272,7 @@ def command_tag_modify(args, db=None):
         args.add_argument("-t", "--type", help="new type of the globaltag")
         args.add_argument("-u", "--user", metavar="USER", help="username who created the tag. "
                           "If not given we will try to supply a useful default")
-        args.add_argument("-s", "--state", help="new globaltag state, see the command ``tat state`` for details")
+        args.add_argument("-s", "--state", help="new globaltag state, see the command ``tag state`` for details")
         return
 
     # first we need to get the old tag information
@@ -373,6 +373,8 @@ def command_tag_state(args, db):
 
     INVALID:
        Tag is invalid and should not be used for anything
+
+    .. versionadded:: release-04-00-00
     """
     if db is None:
         args.add_argument("tag", metavar="TAGNAME", help="globaltag to be published")
@@ -874,7 +876,6 @@ def create_symlinks(base):
 
     python3 -c 'from conditions_db import cli_main; cli_main.create_symlinks("b2conditionsdb")'
     """
-    from conditions_db import cli_main
     import os
     excluded = [
         ['tag']  # the tag command without subcommand is not very useful

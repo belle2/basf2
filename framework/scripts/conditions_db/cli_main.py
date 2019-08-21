@@ -365,14 +365,17 @@ def command_tag_state(args, db):
     PUBLISHED
        Tag cannot be modified and is suitable for user analysis
 
-       Can only declared INVALID
+       Can only be transitioned to INVALID
 
     RUNNING
        Tag can only be modified by adding new runs, not modifying the payloads
        for existing runs.
 
     INVALID:
-       Tag is invalid and should not be used for anything
+       Tag is invalid and should not be used for anything.
+
+       This state is end of life for a globaltag and cannot be transitioned to
+       any other state.
 
     .. versionadded:: release-04-00-00
     """

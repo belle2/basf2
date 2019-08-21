@@ -33,6 +33,16 @@ namespace Belle2 {
     EKLMTrackMatchAlgorithm();
 
     /**
+     * Copy constructor (disabled).
+     */
+    EKLMTrackMatchAlgorithm(const EKLMTrackMatchAlgorithm&) = delete;
+
+    /**
+     * Operator = (disabled).
+     */
+    EKLMTrackMatchAlgorithm& operator=(const EKLMTrackMatchAlgorithm&) = delete;
+
+    /**
      * Destructor.
      */
     ~EKLMTrackMatchAlgorithm();

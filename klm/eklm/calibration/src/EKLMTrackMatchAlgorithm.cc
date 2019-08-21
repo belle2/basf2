@@ -15,8 +15,6 @@ using namespace Belle2;
 
 EKLMTrackMatchAlgorithm::EKLMTrackMatchAlgorithm() : CalibrationAlgorithm("EKLMTrackMatchCollector")
 {
-  /* cppcheck-suppress noCopyConstructor */
-  /* cppcheck-suppress noOperatorEq */
   m_planesEff = new TH1F(
     "plane_effiiency", "",
     EKLMElementNumbers::getMaximalPlaneGlobalNumber(),

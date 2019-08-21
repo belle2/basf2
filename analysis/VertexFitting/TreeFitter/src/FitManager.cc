@@ -217,9 +217,8 @@ namespace TreeFitter {
         jacobian(col + 4, col + 3) = 1;
       }
 
-      Eigen::Matrix<double, 7, 7> cov7 =
-        Eigen::Matrix<double, 7, 7>::Zero(7, 7);
-      cov7 = jacobian * cov6.selfadjointView<Eigen::Lower>() * jacobian.transpose();
+      Eigen::Matrix<double, 7, 7> cov7
+        = jacobian * cov6.selfadjointView<Eigen::Lower>() * jacobian.transpose();
 
       for (int row = 0; row < 7; ++row) {
         for (int col = 0; col < 7; ++col) {

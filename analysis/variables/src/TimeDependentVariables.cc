@@ -380,7 +380,6 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       TVector3 boost = T.getBoostVector();
-      TVector3 boostDir = boost.Unit();
 
       double cy = boost.Z() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
       double sy = boost.X() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());

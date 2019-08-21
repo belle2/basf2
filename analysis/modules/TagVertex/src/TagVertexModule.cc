@@ -674,11 +674,11 @@ namespace Belle2 {
      before with the exact same criteria */
     std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
     int ROEGoodTracks = 0;
-    bool exitROEWhile = false;
     int ROETotalTracks = ROETracks.size();
     for (int i = 0; i < ROETotalTracks; i++) {
       auto* roeTrackMCParticle = ROETracks[i]->getRelatedTo<MCParticle>();
       MCParticle* roeTrackMCParticleMother = roeTrackMCParticle->getMother();
+      bool exitROEWhile;
       do {
         int PDG = TMath::Abs(roeTrackMCParticleMother->getPDG());
         std::string motherPDGString = std::to_string(PDG);
@@ -931,9 +931,7 @@ namespace Belle2 {
       if (trak1) trak1Res = trak1->getTrackFitResultWithClosestMass(Const::pion);
       TVector3 mom1;
       if (trak1Res) mom1 = trak1Res->getMomentum();
-      if (std::isinf(mom1.Mag2()) == true || std::isnan(mom1.Mag2()) == true) {
-        continue;
-      }
+      if (std::isinf(mom1.Mag2()) or std::isnan(mom1.Mag2())) continue;
       if (!trak1Res) continue;
 
       bool isKsDau = false;
@@ -946,7 +944,7 @@ namespace Belle2 {
 
           TVector3 mom2;
           if (trak2Res) mom2 = trak2Res->getMomentum();
-          if (std::isinf(mom2.Mag2()) == true || std::isnan(mom2.Mag2()) == true) continue;
+          if (std::isinf(mom2.Mag2()) or std::isnan(mom2.Mag2())) continue;
           if (!trak2Res) continue;
 
           double Mass2 = TMath::Power(TMath::Sqrt(mom1.Mag2() + mpi * mpi) + TMath::Sqrt(mom2.Mag2() + mpi * mpi), 2)

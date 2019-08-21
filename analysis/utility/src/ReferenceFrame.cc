@@ -18,12 +18,12 @@ using namespace Belle2;
 std::stack<const ReferenceFrame*> ReferenceFrame::m_reference_frames;
 
 
-RestFrame::RestFrame(const Particle* particle)
+RestFrame::RestFrame(const Particle* particle) :
+  m_momentum(particle->get4Vector()),
+  m_displacement(particle->getVertex()),
+  m_boost(m_momentum.BoostVector()),
+  m_lab2restframe(TLorentzRotation(-m_boost))
 {
-  m_momentum = particle->get4Vector();
-  m_displacement = particle->getVertex();
-  m_boost = m_momentum.BoostVector();
-  m_lab2restframe = TLorentzRotation(-m_boost);
 }
 
 const ReferenceFrame& ReferenceFrame::GetCurrent()

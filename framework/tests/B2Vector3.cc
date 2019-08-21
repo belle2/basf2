@@ -172,13 +172,13 @@ namespace {
         bvec.Rotate(angle, baxis);
         tvec.Rotate(angle, taxis);
 
-        // Check for the single values to be +-PI and differing by 2 PI
-        // which means both of them are basically equal
+        // Check for the single values to be +-PI and differing by 2 PI, which means both of them are
+        // basically equal, at least in terms of trigonometrical functions
         if (fabs(fabs(bvec.Phi() - tvec.Phi()) - 2.*M_PI) < 1e-14) {
           bvec.SetPhi(-bvec.Phi());
         }
 
-        // Phi, Theta and CosTheta are not affected by large values of r, thus keep 1e-14
+        // Phi, Theta and CosTheta are not affected by large values of r, thus keep 1e-12
         EXPECT_NEAR(bvec.CosTheta(), tvec.CosTheta(), 1e-12) << bvec.PrintString();
         EXPECT_NEAR(bvec.Phi(), tvec.Phi(), 1e-12) << bvec.PrintString();
         EXPECT_NEAR(bvec.Theta(), tvec.Theta(), 1e-12) << bvec.PrintString();

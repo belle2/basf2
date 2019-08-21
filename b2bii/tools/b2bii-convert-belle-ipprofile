@@ -1,0 +1,151 @@
+#!/usr/bin/env python3
+
+"""
+Convert Beam energy and IPProfile from Belle database to Belle II Conditions
+database payloads.
+
+This script will try to convert the Belle information for all known runs of
+Belle data and create a directory containing all the payload files and a text
+file containing the validity for each payload.
+
+There are many Belle runs which don't have Benergy or IPProfile data so there
+will be a lot of messages starting with `ERR    : ` from the belle library if
+the data cannot be found. These can be safely ignored:
+
+* If Benergy is missing the run will be skipped and added to the
+  ``missing_benergy.txt`` in the output directory
+* If IPProfile is missing the BeamSpot/BeamParameters will be created with NaN
+for the IP position.
+
+This script requires access to the BELLE postgres database so it should be run on
+KEKCC or proper port forwarding needs to be setup and BELLE_POSTGRESS_SERVER
+needs to point to it prior to runing this script.
+"""
+
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+import basf2 as b2
+from b2biiConversion import setupBelleDatabaseServer
+import argparse
+import sys
+import os
+import shutil
+import numpy as np
+import multiprocessing
+
+
+def get_argument_parser():
+    """Return a parser for all the arguments"""
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("-j", "--jobs", default=1, type=int,
+                        help="number of simultaneous jobs to run for conversion")
+    parser.add_argument("--delete", default=False, action="store_true",
+                        help="delete existing output directory")
+    parser.add_argument("-o", "--output", default="belle_beamparams",
+                        help="output directory (default: %(default)s)")
+    parser.add_argument("--run-data", default=None,
+                        help="Alternate file containing a list of all runs to convert. "
+                        "If not given the default data/b2bii/belle-runs.txt is used")
+    parser.add_argument("--exclude", default=None,
+                        help="File containing exp,run numbers per line to exclude from conversion.")
+    return parser
+
+
+def run_data(filename, **argk):
+    """Get the belle run information from a text file
+
+    This function assumes that the file contains the run information in comma
+    separated values exp, run and used numpy.loadtxt to load the data from that
+    file. All additional arguments are passed on to that function.
+
+    Returns:
+        a set() with (exp, run) values
+
+    Parameters:
+        filename (str): name of the file to read
+    """
+    data = np.loadtxt(filename, dtype=int, delimiter=',', **argk)
+    return {(int(e[0]), int(e[1])) for e in data}
+
+
+def run_conversion(rundata):
+    """Run conversion for all runs in rundata
+
+    Parameters:
+        rundata (list(tuple(int,int)): List of exp, run values
+    """
+    global missing
+    experiments = [e[0] for e in rundata]
+    runs = [e[1] for e in rundata]
+    events = list(map(int, np.zeros(len(runs))+1))
+
+    main = b2.create_path()
+    main.add_module("EventInfoSetter", expList=experiments, runList=runs, evtNumList=events)
+    main.add_module("B2BIIConvertBeamParams", mcFlag=1, missing=missing)
+    b2.process(main)
+
+
+if __name__ == "__main__":
+    args = get_argument_parser().parse_args()
+
+    if args.jobs < 1:
+        b2.B2FATAL("number of jobs cannot be smaller than one")
+
+    if args.delete:
+        shutil.rmtree(args.output, True)
+
+    # setup the Belle database server unless it's already setup
+    if "BELLE_POSTGRES_SERVER" not in os.environ:
+        setupBelleDatabaseServer()
+
+    # create output directory
+    os.makedirs(args.output, exist_ok=True)
+    # and remember where to put information
+    db_file = os.path.join(args.output, "database.txt")
+    missing = os.path.join(args.output, "missing_benergy.txt")
+    # specfiy where to store new payloads
+    b2.conditions.expert_settings(save_payloads=db_file)
+    # disable database access, we only create, don't use
+    b2.conditions.metadata_providers = []
+    b2.conditions.payload_providers = []
+    # and set the framework logging a bit higher as we don't care about the
+    # info messages for this use case
+    b2.logging.package("framework").log_level = b2.LogLevel.WARNING
+
+    # get list of runs
+    belle_runs = b2.find_file("data/b2bii/belle-runs.txt") if args.run_data is None else args.run_data
+    if not os.path.exists(belle_runs):
+        b2.B2FATAL(f"Cannot find run data file {belle_runs}")
+    rundata = run_data(belle_runs, usecols=(0, 1))
+    b2.B2INFO(f"{len(rundata)} runs in total")
+
+    # and subtract all excluded runs from that
+    subtract = [
+        (db_file, f"existing in database file {db_file}", (2, 3)),
+        (missing, f"runs we know don't have benergy data from {missing}", (0, 1)),
+    ]
+
+    if args.exclude is not None:
+        if not os.path.exists(args.exclude):
+            b2.B2FATAL(f"exclusion file {args.exclude} doesn't exist")
+        subtract.insert(0, (args.exclude, f"excluded runs from {args.exclude}", (0, 1)))
+
+    for filename, message, columns in subtract:
+        if os.path.exists(filename):
+            rundata -= run_data(filename, usecols=columns)
+            b2.B2INFO(f"{len(rundata)} runs after removing {message}")
+
+    # check if there's anything left to do
+    if len(rundata) == 0:
+        b2.B2INFO("Nothing to do, exiting")
+        sys.exit(0)
+
+    # if so run conversion on all runs
+    rundata = list(sorted(rundata))
+    if args.jobs > 1:
+        rundata = [rundata[i::args.jobs] for i in range(args.jobs)]
+        with multiprocessing.Pool(args.jobs, maxtasksperchild=1) as pool:
+            pool.map(run_conversion, rundata)
+    else:
+        run_conversion(rundata)

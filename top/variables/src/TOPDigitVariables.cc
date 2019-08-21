@@ -127,7 +127,7 @@ namespace Belle2 {
         sort(digitTimes.begin(), digitTimes.end());
         double T0 = 0;
         size_t count = 0;
-        for (auto t : digitTimes) {
+        for (const auto& t : digitTimes) {
           T0 += t;
           count += 1;
           if (count == 5) break;
@@ -152,7 +152,7 @@ namespace Belle2 {
         sort(digitTimes.begin(), digitTimes.end());
         int count = 0;
         if (tmin < 0) tmin = digitTimes[0];
-        for (auto t : digitTimes) {
+        for (const auto& t : digitTimes) {
           if (t > tmax) break;
           if (t >= tmin) ++count;
         }
@@ -188,7 +188,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (t.getModuleID() != thisModuleID) continue; // catch the case where one of the module IDs is negative
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           count += 1;
@@ -208,7 +208,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) == abs(thisModuleID)) continue; // catch the case where one of the module IDs is negative
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           count += 1;
@@ -228,7 +228,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) == abs(thisModuleID)) continue; // catch the case where one of the module IDs is negative
           count += 1;
         }
@@ -247,7 +247,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue; // catch the case where one of the module IDs is negative
           count += 1;
         }
@@ -267,7 +267,7 @@ namespace Belle2 {
         StoreArray<TOPDigit> topDigits;
         double maxGap = 0; // the largest time difference between two consecutive hits
         vector<double> digitTimes; // all digits in the module that the track entered
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           digitTimes.push_back(t.getTime());
@@ -299,7 +299,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         vector<double> digitTimes; // the times for all digits in the module that the track entered
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           digitTimes.push_back(t.getTime());
@@ -501,7 +501,7 @@ namespace Belle2 {
         StoreArray<TOPDigit> topDigits;
         int thisModuleID = static_cast<int>(vars[0]);
         size_t count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
           count += 1;
         }
@@ -515,7 +515,7 @@ namespace Belle2 {
         StoreArray<TOPDigit> topDigits;
         int thisModuleID = static_cast<int>(vars[0]);
         size_t count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           count += 1;
@@ -534,7 +534,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<Track> tracks;
         int nTracks = 1;
-        for (auto t : tracks) {
+        for (const auto& t : tracks) {
           const auto* tl = t.getRelated<TOPLikelihood>();
           if (not tl) continue;
           const auto* te = tl->getRelated<ExtHit>();

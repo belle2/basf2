@@ -32,6 +32,8 @@ import os
 import shutil
 import numpy as np
 import multiprocessing
+from conditions_db.testing_payloads import parse_testing_payloads_file
+from collections import defaultdict
 
 
 def get_argument_parser():
@@ -49,6 +51,8 @@ def get_argument_parser():
                         "If not given the default data/b2bii/belle-runs.txt is used")
     parser.add_argument("--exclude", default=None,
                         help="File containing exp,run numbers per line to exclude from conversion.")
+    parser.add_argument("--exp", default=None, type=int,
+                        help="If present limit the conversion to all runs in this experiment")
     return parser
 
 
@@ -78,11 +82,14 @@ def run_conversion(rundata):
     global missing
     experiments = [e[0] for e in rundata]
     runs = [e[1] for e in rundata]
-    events = list(map(int, np.zeros(len(runs))+1))
+    events = [1]*len(runs)
 
-    main = b2.create_path()
+    # get rid of some annoying messages about random seed and globaltags
+    b2.logging.log_level = b2.LogLevel.WARNING
+    # and create and run the conversion path
+    main = b2.Path()
     main.add_module("EventInfoSetter", expList=experiments, runList=runs, evtNumList=events)
-    main.add_module("B2BIIConvertBeamParams", mcFlag=1, missing=missing)
+    main.add_module("B2BIIConvertBeamParams", mcFlag=1, missing=missing, logLevel=b2.LogLevel.INFO)
     b2.process(main)
 
 
@@ -109,9 +116,6 @@ if __name__ == "__main__":
     # disable database access, we only create, don't use
     b2.conditions.metadata_providers = []
     b2.conditions.payload_providers = []
-    # and set the framework logging a bit higher as we don't care about the
-    # info messages for this use case
-    b2.logging.package("framework").log_level = b2.LogLevel.WARNING
 
     # get list of runs
     belle_runs = b2.find_file("data/b2bii/belle-runs.txt") if args.run_data is None else args.run_data
@@ -119,6 +123,10 @@ if __name__ == "__main__":
         b2.B2FATAL(f"Cannot find run data file {belle_runs}")
     rundata = run_data(belle_runs, usecols=(0, 1))
     b2.B2INFO(f"{len(rundata)} runs in total")
+
+    if args.exp is not None:
+        rundata = set(e for e in rundata if e[0] == args.exp)
+        b2.B2INFO(f"{len(rundata)} runs for experiment {args.exp}")
 
     # and subtract all excluded runs from that
     subtract = [
@@ -149,3 +157,44 @@ if __name__ == "__main__":
             pool.map(run_conversion, rundata)
     else:
         run_conversion(rundata)
+
+    b2.B2INFO("Conversion finished, optimizing database file")
+    # ok, data is converted, let's write an optimized database file:
+    payloads = parse_testing_payloads_file(db_file)
+    # we want a set of all iovs per unique payload (same name and checksum)
+    all_iovs = defaultdict(set)
+    # and a set of all revisions per unique payload (same name and checksum)
+    checksums = defaultdict(set)
+
+    for p in sorted(payloads):
+        # remember all revisions for each payload/checksum combination
+        checksums[p.module, p.checksum].add(p.revision)
+        # and remember all iovs for all checksums
+        all_iovs[p.module, p.checksum].add(p.iov_tuple)
+
+    # ok, now let's write normalized file by concatenating all
+    # iovs if they are consecutive
+    final_iovs = []
+    for (name, checksum), iovs in all_iovs.items():
+        # with sorted iovs we can check pairwise if the next one can be merged.
+        # Also add one useless iov so we don't have to add the last one after the
+        # loop since we extend prev until we find something incompatible so the last
+        # thing we find after all iovs is something guaranteed incompatible
+        iovs = sorted(iovs) + [(None, None, None, None)]
+        revision = min(checksums[name, checksum])
+        prev = iovs.pop(0)
+        for iov in iovs:
+            if (prev[2], prev[3]+1) == iov[:2]:
+                # compatible, yaay, merge
+                prev = prev[:2] + iov[2:]
+            else:
+                # not compatible, add what we had and continue looking for the next
+                # match
+                final_iovs.append((name, revision, prev))
+                prev = iov
+
+    final_iovs.sort()
+    with open(os.path.join(args.output, "database-optimized.txt"), "w") as f:
+        for name, revision, iov in final_iovs:
+            iov = ",".join(map(str, iov))
+            f.write(f"dbstore/{name} {revision} {iov}\n")

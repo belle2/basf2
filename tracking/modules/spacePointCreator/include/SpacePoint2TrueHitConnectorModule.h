@@ -425,7 +425,7 @@ namespace Belle2 {
   class simpleBitfield {
 
   public:
-    simpleBitfield() { __bits = T(); } /**< default constructor */
+    simpleBitfield() : __bits()  { } /**< default constructor */
 
     simpleBitfield(const simpleBitfield<T>& __otherBitfield) = delete; /**< not needed */
     simpleBitfield<T>& operator = (simpleBitfield<T>&) = delete; /**< not needed */

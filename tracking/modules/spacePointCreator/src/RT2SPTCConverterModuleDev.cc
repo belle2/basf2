@@ -286,7 +286,6 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformationViaTrueHits(std::vec
     }
 
     // NOTE: double cluster SVD SP and PXD SP should be stored in the same StoreArray!
-    // cppcheck-suppress uninitvar
     const SpacePoint* relatedSpacePoint = [this, hitInfo, relatedTrueHit]() -> const SpacePoint* {
       if (m_svdSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) {
         return relatedTrueHit->getRelatedFrom<SpacePoint>(*m_svdSpacePointsStoreArrayName);
@@ -381,6 +380,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
         // determine intersecting SpacePoints.
         for (const auto& spacePoint : relatedSpacePointsA) {
           for (const auto& spacePointCompare : relatedSpacePointsB) {
+            // cppcheck-suppress useStlAlgorithm
             if (spacePoint == spacePointCompare) {
               spacePointCandidates.push_back(&spacePoint);
               break;

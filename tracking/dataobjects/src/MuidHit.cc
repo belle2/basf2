@@ -21,22 +21,22 @@ MuidHit::MuidHit() :
   m_IsForward(false),
   m_Sector(0),
   m_Layer(0),
-  m_ChiSquared(0.0)
+  m_ChiSquared(0.0),
+  m_ExtPosition(0.0, 0.0, 0.0)
 {
-  m_ExtPosition = TVector3(0.0, 0.0, 0.0);
   m_HitPosition = m_ExtPosition;
 }
 
 MuidHit::MuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer, const TVector3& extPosition,
-                 const TVector3& hitPosition, double extTime, double hitTime, double chiSquared)
+                 const TVector3& hitPosition, double extTime, double hitTime, double chiSquared) :
+  m_ExtPosition(extPosition),
+  m_HitPosition(hitPosition)
 {
   m_PdgCode = pdgCode;
   m_InBarrel = inBarrel;
   m_IsForward = isForward;
   m_Sector = sector;
   m_Layer = layer;
-  m_ExtPosition = extPosition;
-  m_HitPosition = hitPosition;
   m_ExtTime = extTime;
   m_HitTime = hitTime;
   m_ChiSquared = chiSquared;

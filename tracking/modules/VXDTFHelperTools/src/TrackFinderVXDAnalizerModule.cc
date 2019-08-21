@@ -187,6 +187,7 @@ void TrackFinderVXDAnalizerModule::initialize()
   if ((m_PARAMrootFileName.size()) != 2) {
     string output;
     for (string& entry : m_PARAMrootFileName) {
+      // cppcheck-suppress useStlAlgorithm
       output += "'" + entry + "' ";
     }
     B2FATAL("TrackFinderVXDAnalizer::initialize(), rootFileName is set wrong, although parameter 'writeToRoot' is enabled! Actual entries are: "

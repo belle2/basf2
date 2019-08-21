@@ -120,7 +120,7 @@ namespace {
     tvec.SetXYZ(1., 0., 0.);
     bvec.Rotate(M_PI_2, B2Vector3D(0., 0., 1.));
     tvec.Rotate(M_PI_2, TVector3(0., 0., 1.));
-    EXPECT_NEAR(bvec.x(), 0., 1e-14) << bvec.PrintString();   // equality with 0 is hard to get... thus EXPECT_NEAR
+    EXPECT_NEAR(bvec.x(), 0., 1e-14) << bvec.PrintString();
     EXPECT_NEAR(bvec.y(), 1., 1e-14) << bvec.PrintString();
     EXPECT_NEAR(bvec.Phi(), tvec.Phi(), 1e-14) << bvec.PrintString();
     EXPECT_NEAR(bvec.Theta(), tvec.Theta(), 1e-14) << bvec.PrintString();
@@ -161,8 +161,6 @@ namespace {
     const TVector3   taxis(4., 3., -2.);
 
     for (auto& rtp : test_vectors({0, 1, 1e20}, 64, 64)) {
-//       tvec.SetMagThetaPhi(rtp.r, rtp.theta, rtp.phi);
-//       bvec.SetMagThetaPhi(rtp.r, rtp.theta, rtp.phi);
 
       double epsilon = (rtp.r < 1e10 ? 1e-10 : rtp.r * 1e-10);
 
@@ -174,6 +172,8 @@ namespace {
         bvec.Rotate(angle, baxis);
         tvec.Rotate(angle, taxis);
 
+        // Check for the single values to be +-PI and differing by 2 PI
+        // which means both of them are basically equal
         if (fabs(fabs(bvec.Phi() - tvec.Phi()) - 2.*M_PI) < 1e-14) {
           bvec.SetPhi(-bvec.Phi());
         }
@@ -182,13 +182,13 @@ namespace {
         EXPECT_NEAR(bvec.CosTheta(), tvec.CosTheta(), 1e-12) << bvec.PrintString();
         EXPECT_NEAR(bvec.Phi(), tvec.Phi(), 1e-12) << bvec.PrintString();
         EXPECT_NEAR(bvec.Theta(), tvec.Theta(), 1e-12) << bvec.PrintString();
-        EXPECT_NEAR(bvec.Mag(), tvec.Mag(), bvec.Mag() * 1e-12) << bvec.PrintString();
-        EXPECT_NEAR(bvec.Mag2(), tvec.Mag2(), bvec.Mag2() * 1e-12) << bvec.PrintString();
-        EXPECT_NEAR(bvec.Perp(), tvec.Perp(), bvec.Perp() * 1e-12) << bvec.PrintString();
-        EXPECT_NEAR(bvec.Perp2(), tvec.Perp2(), bvec.Perp2() * 1e-12) << bvec.PrintString();
-        EXPECT_NEAR(bvec.X(), tvec.X(), epsilon /*fabs(bvec.X())*1e-14*/) << bvec.PrintString();
-        EXPECT_NEAR(bvec.Y(), tvec.Y(), epsilon /*fabs(bvec.Y())*1e-14*/) << bvec.PrintString();
-        EXPECT_NEAR(bvec.Z(), tvec.Z(), epsilon /*fabs(bvec.Z())*1e-14*/) << bvec.PrintString();
+        EXPECT_NEAR(bvec.Mag(), tvec.Mag(), (bvec.Mag() < 10 ? 1e-12 : bvec.Mag() * 1e-12)) << bvec.PrintString();
+        EXPECT_NEAR(bvec.Mag2(), tvec.Mag2(), (bvec.Mag2() < 10 ? 1e-12 : bvec.Mag2() * 1e-12)) << bvec.PrintString();
+        EXPECT_NEAR(bvec.Perp(), tvec.Perp(), (bvec.Perp() < 10 ? 1e-12 : bvec.Perp() * 1e-12)) << bvec.PrintString();
+        EXPECT_NEAR(bvec.Perp2(), tvec.Perp2(), (bvec.Perp2() < 10 ? 1e-12 : bvec.Perp2() * 1e-12)) << bvec.PrintString();
+        EXPECT_NEAR(bvec.X(), tvec.X(), epsilon) << bvec.PrintString();
+        EXPECT_NEAR(bvec.Y(), tvec.Y(), epsilon) << bvec.PrintString();
+        EXPECT_NEAR(bvec.Z(), tvec.Z(), epsilon) << bvec.PrintString();
       }
     }
   }

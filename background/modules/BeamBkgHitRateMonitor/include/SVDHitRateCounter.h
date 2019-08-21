@@ -66,7 +66,7 @@ namespace Belle2 {
        * Constructor
        * @param svdShaperDigitsName name of the input SVDShaperDigits collection
        */
-      SVDHitRateCounter(std::string svdShaperDigitsName):
+      explicit SVDHitRateCounter(const std::string& svdShaperDigitsName):
         m_svdShaperDigitsName(svdShaperDigitsName)
       {}
 

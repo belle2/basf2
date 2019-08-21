@@ -287,6 +287,10 @@ Total Number of Particles created in the DataStore: 13431875
 [INFO] Number of ParticleLists studied 9 
 [INFO] Number of ParticleLists studied 11 
 [INFO] Number of ParticleLists studied 1 
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: e+ (5+0) + e- (5+0)
 [INFO] collection=Particles

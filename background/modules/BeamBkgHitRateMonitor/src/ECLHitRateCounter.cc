@@ -52,14 +52,15 @@ namespace Belle2 {
       // check if data are available
       if (not m_dsps.isValid()) return;
 
-      // get buffer element
-      auto& rates = m_buffer[timeStamp];
-
       //calculate rates using waveforms
       //The background rate for a crystal is calculated as
       //rate = rms_pedestal_squared / (average_photon_energy_squared * time_constant)
       //where time_constant=2.53 us and average_photon_energy_squared = 1 MeV
       if (m_dsps.getEntries() == 8736) {
+
+        // get buffer element
+        auto& rates = m_buffer[timeStamp];
+
         // increment event counter
         rates.numEvents++;
 

@@ -150,7 +150,7 @@ You can find examples of usage in :ref:`Marker_of_unspecified_particle`, :ref:`G
 .. Now let's add the detailed changes for the analysis package first, that's
    what user will want to see
 
-.. include:: analysis/doc/whatsnew-since/release-03-00.txt
+.. include:: analysis/doc/whatsnew-since/release-03-02.txt
 
 .. And then for framework as well. If something is more important we can always
    move it directly in here

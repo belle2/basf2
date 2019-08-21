@@ -182,6 +182,23 @@ def print_globaltag(db, *tags):
     return ntags
 
 
+def change_state(db, tag, state, force=False):
+    """Change the state of a global tag
+
+    If the new state is not revertable then ask for confirmation
+    """
+    state = state.upper()
+    if state in ["INVALID", "PUBLISHED"] and not force:
+        name = input(f"ATTENTION: Marking a tag as {state} cannot be undone.\n"
+                     "If you are sure you want to publish it please enter the tag name again: ")
+        if name != tag:
+            B2ERROR("Names don't match, aborting")
+            return 1
+
+    db.request("PUT", f"/globalTag/{encode_name(tag)}/updateGlobalTagStatus/{state}",
+               f"Changing globaltag state {tag} to {state}")
+
+
 def command_tag_show(args, db=None):
     """
     Show details about globaltags
@@ -255,6 +272,7 @@ def command_tag_modify(args, db=None):
         args.add_argument("-t", "--type", help="new type of the globaltag")
         args.add_argument("-u", "--user", metavar="USER", help="username who created the tag. "
                           "If not given we will try to supply a useful default")
+        args.add_argument("-s", "--state", help="new globaltag state, see the command ``tat state`` for details")
         return
 
     # first we need to get the old tag information
@@ -282,6 +300,10 @@ def command_tag_modify(args, db=None):
     db.request("PUT", "/globalTag",
                "Modifying globaltag {} (id={globalTagId})".format(old_name, **info),
                json=info)
+
+    if args.state is not None:
+        name = args.name if args.name is not None else old_name
+        return change_state(db, name, args.state)
 
 
 def command_tag_clone(args, db=None):
@@ -315,26 +337,67 @@ def command_tag_clone(args, db=None):
                json=cloned_info)
 
 
+def command_tag_state(args, db):
+    """
+    Change the state of a globaltag.
+
+    This command changes the state of a globaltag to the given value.
+
+    Usually the valid states are
+
+    OPEN
+       Tag can be modified, payloads and iovs can be created and deleted. This
+       is the default state for new or cloned globaltags and is not suitable
+       for use in data analysis
+
+       Can be transitioned to TESTING, RUNNING
+
+    TESTING
+       Tag cannot be modified and is suitable for testing but can be reopened
+
+       Can be transitioned to VALIDATED, OPEN
+
+    VALIDATED
+       Tag cannot be modified and has been tested.
+
+       Can be transitioned to PUBLISHED, OPEN
+
+    PUBLISHED
+       Tag cannot be modified and is suitable for user analysis
+
+       Can only declared INVALID
+
+    RUNNING
+       Tag can only be modified by adding new runs, not modifying the payloads
+       for existing runs.
+
+    INVALID:
+       Tag is invalid and should not be used for anything
+    """
+    if db is None:
+        args.add_argument("tag", metavar="TAGNAME", help="globaltag to be published")
+        args.add_argument("state", metavar="STATE", help="new state for the globaltag")
+        return
+
+    return change_state(db, args.tag, args.state)
+
+
 def command_tag_publish(args, db):
     """
     Publish a globaltag.
 
-    This command ets the state of a globaltag to PUBLISHED. This will make the
+    This command sets the state of a globaltag to PUBLISHED. This will make the
     tag immutable and no more modifications are possible. A confirmation dialog
     will be shown
+
+    .. deprecated:: release-04-00-00
+       Use ``tag state $name PUBLISHED`` instead
     """
     if db is None:
         args.add_argument("tag", metavar="TAGNAME", help="globaltag to be published")
         return
 
-    name = input("ATTENTION: Publishing a tag cannot be undone.\n"
-                 "If you are sure you want to publish it please enter the tag name again: ")
-    if name != args.tag:
-        B2ERROR("Names don't match, aborting")
-        return 1
-
-    db.request("PUT", "/globalTag/{}/PUBLISH".format(encode_name(args.tag)),
-               "Publishing globaltag {}".format(args.tag))
+    return change_state(db, args.tag, "PUBLISHED")
 
 
 def command_tag_invalidate(args, db):
@@ -344,19 +407,15 @@ def command_tag_invalidate(args, db):
     This command ets the state of a globaltag to INVALID. This will disqualify
     this tag from being used in user analysis.  A confirmation dialog will be
     shown.
+
+    .. deprecated:: release-04-00-00
+       Use ``tag state $name PUBLISHED`` instead
     """
     if db is None:
         args.add_argument("tag", metavar="TAGNAME", help="globaltag to be invalidated")
         return
 
-    name = input("ATTENTION: invalidating a tag cannot be undone.\n"
-                 "If you are sure you want to invalidate it please enter the tag name again: ")
-    if name != args.tag:
-        B2ERROR("Names don't match, aborting")
-        return 1
-
-    db.request("PUT", "/globalTag/{}/INVALID".format(encode_name(args.tag)),
-               "invalidating globaltag {}".format(args.tag))
+    return change_state(db, args.tag, "INVALID")
 
 
 def command_diff(args, db):

@@ -108,4 +108,88 @@ namespace {
       }
     }
   }
+
+  TEST(B2Vector3, Rotation)
+  {
+    gErrorIgnoreLevel = kError;
+    TVector3 tvec;
+    B2Vector3D bvec;
+
+    // rotate \vec{e_x} by 90deg around \vec{e_z} to become \vec{e_y}
+    bvec.SetXYZ(1., 0., 0.);
+    tvec.SetXYZ(1., 0., 0.);
+    bvec.Rotate(M_PI_2, B2Vector3D(0., 0., 1.));
+    tvec.Rotate(M_PI_2, TVector3(0., 0., 1.));
+    EXPECT_NEAR(bvec.x(), 0., 1e-14) << bvec.PrintString();   // equality with 0 is hard to get... thus EXPECT_NEAR
+    EXPECT_NEAR(bvec.y(), 1., 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Phi(), tvec.Phi(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Theta(), tvec.Theta(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.x(), tvec.x(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.y(), tvec.y(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.z(), tvec.z(), 1e-14) << bvec.PrintString();
+
+    // rotate \vec{e_x} by 180deg around \vec{e_z} to become -\vec{e_x}
+    bvec.SetXYZ(1., 0., 0.);
+    tvec.SetXYZ(1., 0., 0.);
+    bvec.Rotate(M_PI, B2Vector3D(0., 0., 1.));
+    tvec.Rotate(M_PI, TVector3(0., 0., 1.));
+    EXPECT_NEAR(bvec.x(), -1., 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.y(), 0., 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Phi(), tvec.Phi(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Theta(), tvec.Theta(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.x(), tvec.x(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.y(), tvec.y(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.z(), tvec.z(), 1e-14) << bvec.PrintString();
+
+    // just test a "random" case
+    bvec.SetXYZ(4., 3., 2.);
+    tvec.SetXYZ(4., 3., 2.);
+    bvec.Rotate(M_PI / 2.5, B2Vector3D(1., 2., 3.));
+    tvec.Rotate(M_PI / 2.5, TVector3(1., 2., 3.));
+    EXPECT_NEAR(bvec.Mag(), tvec.Mag(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Mag2(), tvec.Mag2(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Perp(), tvec.Perp(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Perp2(), tvec.Perp2(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Phi(), tvec.Phi(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Theta(), tvec.Theta(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.X(), tvec.X(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Y(), tvec.Y(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Z(), tvec.Z(), 1e-14) << bvec.PrintString();
+
+    // rotate the test vectors all around the same axis by different angles
+    const B2Vector3D baxis(4., 3., -2.);
+    const TVector3   taxis(4., 3., -2.);
+
+    for (auto& rtp : test_vectors({0, 1, 1e20}, 64, 64)) {
+//       tvec.SetMagThetaPhi(rtp.r, rtp.theta, rtp.phi);
+//       bvec.SetMagThetaPhi(rtp.r, rtp.theta, rtp.phi);
+
+      double epsilon = (rtp.r < 1e10 ? 1e-10 : rtp.r * 1e-10);
+
+      // just test rotations around baxis / taxis by different angles in 0...2 M_PI
+      for (int i = 0; i < 28; i++) {
+        double angle = 2.*M_PI / 28 * i;
+        tvec.SetMagThetaPhi(rtp.r, rtp.theta, rtp.phi);
+        bvec.SetMagThetaPhi(rtp.r, rtp.theta, rtp.phi);
+        bvec.Rotate(angle, baxis);
+        tvec.Rotate(angle, taxis);
+
+        if (fabs(fabs(bvec.Phi() - tvec.Phi()) - 2.*M_PI) < 1e-14) {
+          bvec.SetPhi(-bvec.Phi());
+        }
+
+        // Phi, Theta and CosTheta are not affected by large values of r, thus keep 1e-14
+        EXPECT_NEAR(bvec.CosTheta(), tvec.CosTheta(), 1e-12) << bvec.PrintString();
+        EXPECT_NEAR(bvec.Phi(), tvec.Phi(), 1e-12) << bvec.PrintString();
+        EXPECT_NEAR(bvec.Theta(), tvec.Theta(), 1e-12) << bvec.PrintString();
+        EXPECT_NEAR(bvec.Mag(), tvec.Mag(), bvec.Mag() * 1e-12) << bvec.PrintString();
+        EXPECT_NEAR(bvec.Mag2(), tvec.Mag2(), bvec.Mag2() * 1e-12) << bvec.PrintString();
+        EXPECT_NEAR(bvec.Perp(), tvec.Perp(), bvec.Perp() * 1e-12) << bvec.PrintString();
+        EXPECT_NEAR(bvec.Perp2(), tvec.Perp2(), bvec.Perp2() * 1e-12) << bvec.PrintString();
+        EXPECT_NEAR(bvec.X(), tvec.X(), epsilon /*fabs(bvec.X())*1e-14*/) << bvec.PrintString();
+        EXPECT_NEAR(bvec.Y(), tvec.Y(), epsilon /*fabs(bvec.Y())*1e-14*/) << bvec.PrintString();
+        EXPECT_NEAR(bvec.Z(), tvec.Z(), epsilon /*fabs(bvec.Z())*1e-14*/) << bvec.PrintString();
+      }
+    }
+  }
 }  // namespace

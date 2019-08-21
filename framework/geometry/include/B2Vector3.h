@@ -381,10 +381,10 @@ namespace Belle2 {
      * Using this rotation matrix, the full rotation of a vector b (= this) around the axis v by angle alpha can be written as
      * R(n, alpha)*b = n(n*b) + cos(alpha) * (n x b) x n + sin(alpha) * (n x b).
      */
-    B2Vector3<DataType> Rotate(DataType alpha, B2Vector3<DataType> v)
+    void Rotate(DataType alpha, B2Vector3<DataType> v)
     {
       B2Vector3<DataType> n = v.Unit();
-      return (n * (n.Dot(*this)) + cos(alpha) * ((n.Cross(*this)).Cross(n)) + sin(alpha) * (n.Cross(*this)));
+      *this = (n * (n.Dot(*this)) + cos(alpha) * ((n.Cross(*this)).Cross(n)) + sin(alpha) * (n.Cross(*this)));
     }
 
     /** calculates the absolute value of the coordinates element-wise */

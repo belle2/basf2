@@ -64,13 +64,18 @@ You should update it to this:
 
 .. rubric:: Switch of beam spot information from nominal to measured values.
 
-All IP position and errors now use the BeamSpot database, which contains the measured IP size instead of the nominal one. 
-All beam kinematics are handled through PCmsLabTransform, which computes them by combining CollisionInvariantMass and CollisionBoostVector. 
-Previously, these were pulled from either BeamParameters or gearbox (obsolete). 
-Some truth variables still use BeamParameters; those were marked as such.
+The IP position and errors are now taken from the database with values provided by the tracking group.
+All beam kinematics information is also moved to the database, which will eventually be measured on data. 
+For now they are the values provided by the accelerator.
 
-It must be noted that in previous definitions the boost included a small rotation to align it with the HER. 
-This is no longer possible with the new structure, so the definition of CMS is slightly changed. The impact should be at the percent level.
+.. warning::
+    The previous definition the boost included a small rotation to align it with the HER.
+    This is no longer possible with the new structure.
+    The definition of CMS is therefore slightly changed. The impact should be at the percent level.
+
+.. seealso:: The values can be accessed with :b2:var:`Ecms`, :b2:var:`beamPx`,  :b2:var:`beamPy`,  :b2:var:`beamPz`, and  :b2:var:`beamE`.
+
+.. note:: A consequence of this is there is now a difference between the variables ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz` ) and ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` ).
 
 .. rubric:: Abort processing for invalid or missing global tags
 

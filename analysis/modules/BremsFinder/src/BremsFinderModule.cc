@@ -90,11 +90,9 @@ namespace Belle2 {
     // Add parameters
     addParam("outputList", m_outputListName, "The output particle list name.");
     addParam("inputList", m_inputListName,
-             R"DOC(The initial particle list name containing the particles to correct. *It should already exist*
-             and *the particles must have an associated track.*)DOC");
+             R"DOC(The initial particle list name containing the particles to correct. *It should already exist* and *the particles must have an associated track.*)DOC");
     addParam("gammaList", m_gammaListName,
-             R"DOC(The photon list containing the preselected bremsstrahlung candidates. *It should already exist*
-             and *the particles in the list must be photons*)DOC");
+             R"DOC(The photon list containing the preselected bremsstrahlung candidates. *It should already exist* and *the particles in the list must be photons*)DOC");
     addParam("maximumAcceptance", m_maximumAcceptance,
              "The maximum value of the relation weight between a bremsstrahlung cluster and a particle track",
              m_maximumAcceptance);

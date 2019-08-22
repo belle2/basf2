@@ -67,7 +67,6 @@ namespace Belle2 {
       //! File handle
       FILE* fh;
 
-      void endian_swapper(void* a, unsigned int len);///< swaps memory region, quick and dirty
       int readOneEvent(unsigned int& tnr); ///< Read event and store it in datastore if trigger nr matches
       int read_data(char* data, size_t len); ///< Read amount of data (len bytes) from file to ptr data
 

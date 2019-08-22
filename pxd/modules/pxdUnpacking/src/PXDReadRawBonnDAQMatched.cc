@@ -77,18 +77,6 @@ int PXDReadRawBonnDAQMatchedModule::read_data(char* data, size_t len)
   return l;
 }
 
-void PXDReadRawBonnDAQMatchedModule::endian_swapper(void* a, unsigned int len)
-{
-  // Quick and Dirty swapper for BonnDAQ
-  ubig16_t* p;
-  ulittle16_t* q;
-  p = (ubig16_t*)a;
-  q = (ulittle16_t*)a;
-  len /= 2;
-  for (unsigned int i = 0; i < len; i++, q++, p++) { *q = *p;}
-}
-
-
 int PXDReadRawBonnDAQMatchedModule::readOneEvent(unsigned int& rettriggernr)
 {
   unsigned int triggernr = 0xFFFFFFFF;

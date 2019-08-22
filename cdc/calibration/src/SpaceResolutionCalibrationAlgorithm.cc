@@ -82,16 +82,16 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
   auto tree = getObjectPtr<TTree>("tree");
 
   int lay;
-  double w;
-  double x_u;
-  double x_b;
-  double x_mea;
-  double Pval;
-  double alpha;
-  double theta;
-  double ndf;
-  double absRes_u;
-  double absRes_b;
+  float w;
+  float x_u;
+  float x_b;
+  float x_mea;
+  float Pval;
+  float alpha;
+  float theta;
+  float ndf;
+  float absRes_u;
+  float absRes_b;
   tree->SetBranchAddress("lay", &lay);
   tree->SetBranchAddress("ndf", &ndf);
   tree->SetBranchAddress("Pval", &Pval);

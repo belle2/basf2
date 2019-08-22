@@ -17,6 +17,7 @@
 #include <framework/pcore/ProcHandler.h>
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/utilities/RootFileCreationManager.h>
 
 #include <algorithm>
 #include <cmath>
@@ -33,7 +34,7 @@ VariablesToHistogramModule::VariablesToHistogramModule() :
   Module()
 {
   //Set module properties
-  setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TH1F.");
+  setDescription("Calculate variables specified by the user for a given ParticleList and save them into one or two dimensional histograms.");
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   std::vector<std::tuple<std::string, int, float, float>> emptylist;
@@ -49,6 +50,8 @@ VariablesToHistogramModule::VariablesToHistogramModule() :
            emptylist_2d);
 
   addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToHistogram.root"));
+  addParam("directory", m_directory, "Directory for all histograms **inside** the file to allow for histograms from multiple "
+           "particlelists in the same file without conflicts", m_directory);
 
   m_file = nullptr;
 }
@@ -59,12 +62,15 @@ void VariablesToHistogramModule::initialize()
     StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
   // Check if we can acces the given file
-  m_file = new TFile(m_fileName.c_str(), "RECREATE");
-  if (!m_file->IsOpen()) {
-    B2WARNING("Could not create file " << m_fileName);
-    return;
+  m_file = RootFileCreationManager::getInstance().getFile(m_fileName);
+  if (!m_file) return;
+  // Make sure we don't disturb the global directory for other modules, friggin side effects everywhere
+  TDirectory::TContext directoryGuard(m_file.get());
+  if (not m_directory.empty()) {
+    m_directory = makeROOTCompatible(m_directory);
+    m_file->mkdir(m_directory.c_str());
+    m_file->cd(m_directory.c_str());
   }
-  delete m_file;
 
   for (const auto& varTuple : m_variables) {
     std::string varStr;
@@ -75,11 +81,9 @@ void VariablesToHistogramModule::initialize()
     std::string compatibleName = makeROOTCompatible(varStr);
 
     auto ptr = std::make_unique<StoreObjPtr<RootMergeable<TH1D>>>("", DataStore::c_Persistent);
-    ptr->registerInDataStore(m_fileName + varStr, DataStore::c_DontWriteOut);
+    ptr->registerInDataStore(m_fileName + m_directory + varStr, DataStore::c_DontWriteOut);
     ptr->construct(compatibleName.c_str(), compatibleName.c_str(), varNbins, low, high);
-    // Create histogram in memory and do not associate them with a TFile
-    (*ptr)->get().SetDirectory(nullptr);
-    m_hists.push_back(std::move(ptr));
+    m_hists.emplace_back(std::move(ptr));
 
     //also collection function pointers
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varStr);
@@ -104,11 +108,10 @@ void VariablesToHistogramModule::initialize()
     std::string compatibleName2 = makeROOTCompatible(varStr2);
 
     auto ptr2d = std::make_unique<StoreObjPtr<RootMergeable<TH2D>>>("", DataStore::c_Persistent);
-    ptr2d->registerInDataStore(m_fileName + varStr1 + varStr2, DataStore::c_DontWriteOut);
+    ptr2d->registerInDataStore(m_fileName + m_directory + varStr1 + varStr2, DataStore::c_DontWriteOut);
     ptr2d->construct((compatibleName1 + compatibleName2).c_str(), (compatibleName1 + compatibleName2).c_str(),
                      varNbins1, low1, high1, varNbins2, low2, high2);
-    (*ptr2d)->get().SetDirectory(nullptr);
-    m_2d_hists.push_back(std::move(ptr2d));
+    m_2d_hists.emplace_back(std::move(ptr2d));
 
     //also collection function pointers
     const Variable::Manager::Var* var1 = Variable::Manager::Instance().getVariable(varStr1);
@@ -169,25 +172,24 @@ void VariablesToHistogramModule::event()
 void VariablesToHistogramModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
-    B2INFO("Writing Histogram " << m_treeName);
-    // Initializing the output root file
-    m_file = new TFile(m_fileName.c_str(), "RECREATE");
-    if (!m_file->IsOpen()) {
-      B2WARNING("Could not create file " << m_fileName);
-      return;
+    TDirectory::TContext directoryGuard(m_file.get());
+    if (not m_directory.empty()) {
+      m_file->cd(m_directory.c_str());
     }
-
-    m_file->cd();
+    B2INFO("Writing Histograms to " << gDirectory->GetPath());
     unsigned int nVars = m_variables.size();
     for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-      (*m_hists[iVar])->write(m_file);
+      (*m_hists[iVar])->write(gDirectory);
     }
     unsigned int nVars_2d = m_variables_2d.size();
     for (unsigned int iVar = 0; iVar < nVars_2d; iVar++) {
-      (*m_2d_hists[iVar])->write(m_file);
+      (*m_2d_hists[iVar])->write(gDirectory);
     }
 
-    B2INFO("Closing file " << m_fileName);
-    delete m_file;
+    const bool writeError = m_file->TestBit(TFile::kWriteError);
+    m_file.reset();
+    if (writeError) {
+      B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
+    }
   }
 }

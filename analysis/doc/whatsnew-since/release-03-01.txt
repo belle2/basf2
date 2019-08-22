@@ -4,6 +4,8 @@ Changes in the analysis package
 Variables
 +++++++++
 
+* The event-based variable ``KLMEnergy`` is removed. It is completely meaningless (:issue:`BII-5002`).
+
 * The variables ``mcDX``, ``mcDY``, ``mcDZ`` are now deprecated, 
   because they are duplicates of :b2:var:`mcX`, :b2:var:`mcY` and :b2:var:`mcZ`.
   A warning had been added in documentation.
@@ -12,9 +14,21 @@ Variables
   any track related to an ECL cluster satisfies certain criteria. It can be used
   to apply an individual track-cluster matching.
 
-* Added missing error variable DeltaZErr and DeltaBoostErr. Fixed bug in TagV error functions.
+* Added missing error variables :b2:var:`DeltaZErr` and :b2:var:`DeltaBoostErr`. 
+  Fixed bug in TagV error functions.
+
+* Replaced :b2:var:`pValue` (tracking variable) with :b2:var:`chiProb` (vertexing variable) 
+  in the collection of vertexing variables.
 
 * Replaced pValue (tracking variable) with chiProb (vertexing variable) in the vertexing variable collection.
+ 
+.. warning:: we overhauled the helicity variables and added new ones to replace the `NtupleHelicityTool`.
+   We renamed :b2:var:`cosHelicityAngle` to :b2:var:`cosHelicityAngleMomentum`,
+   :b2:var:`cosHelicityAnglePi0Dalitz` to :b2:var:`cosHelicityAngleMomentumPi0Dalitz`, and 
+   :b2:var:`cosHelicityAngleIfCMSIsTheMother` to :b2:var:`cosHelicityAngleBeamMomentum`.
+   We added the variables :b2:var:`cosHelicityAngle` and :b2:var:`cosAcoplanarityAngle`
+   defining them as the PDG 2018, p. 722.  
+
 
 * Added the meta variables :b2:var:`averageValueInList` and
   :b2:var:`medianValueInList` which calculate the arithmetic mean and median of
@@ -31,3 +45,8 @@ Flavor Tagger
 * Default Expert (testing mode) does not create repositories and does not save weight files locally. 
   It only loads the payloads directly from the database using the database payload names
   as mva identifiers.
+
+Vertex Fitting
+++++++++++++++
+
+* Added IP tube constraint to KFit

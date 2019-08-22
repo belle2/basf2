@@ -98,6 +98,11 @@ namespace Belle2 {
     // Configure TOP detector for reconstruction
     TOPconfigure config;
 
+    // bunch separation in time
+
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+    m_bunchTimeSep = geo->getNominalTDC().getSyncTimeBase() / 24;
+
     // Parse PDF option
     if (m_pdfOption == "rough") {
       m_PDFOption = TOPreco::c_Rough;
@@ -206,6 +211,12 @@ namespace Belle2 {
                      digit.getTimeError());
     }
 
+    // running offset must not be subtracted in TOPDigits: issue an error if it is
+
+    if (isRunningOffsetSubtracted()) {
+      B2ERROR("Running offset subtracted in TOPDigits: common T0 will not be correct");
+    }
+
     // loop over reconstructed tracks, make a selection and accumulate log likelihoods
 
     for (const auto& track : m_tracks) {
@@ -312,9 +323,10 @@ namespace Belle2 {
     if (minimum.valid) {
       h_relCommonT0.SetBinContent(1, minimum.position);
       h_relCommonT0.SetBinError(1, minimum.error * scaleError);
-      double T0 = 0;
-      if (m_commonT0->isCalibrated()) T0 = m_commonT0->getT0();
-      h_commonT0.SetBinContent(1, minimum.position + T0);
+      double T0 = minimum.position;
+      if (m_commonT0->isCalibrated()) T0 += m_commonT0->getT0();
+      T0 -= round(T0 / m_bunchTimeSep) * m_bunchTimeSep; // wrap around
+      h_commonT0.SetBinContent(1, T0);
       h_commonT0.SetBinError(1, minimum.error * scaleError);
     }
     h_relCommonT0.Write();
@@ -329,6 +341,15 @@ namespace Belle2 {
 
     B2RESULT("Results available in " << m_outFileName);
   }
+
+  bool TOPCommonT0CalibratorModule::isRunningOffsetSubtracted()
+  {
+    for (const auto& digit : m_digits) {
+      if (digit.hasStatus(TOPDigit::c_BunchOffsetSubtracted)) return true;
+    }
+    return false;
+  }
+
 
 } // end Belle2 namespace
 

@@ -3,7 +3,7 @@
 
 """
 <header>
-<contact>Thomas Hauth, Thomas.Hauth@kit.edu</contact>
+<contact>Kilian Lieret, Kilian.Lieret@campus.lmu.de</contact>
 </header>
 """
 

@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013-2019 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Thomas Keck, Christian Pulvermacher                      *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
@@ -279,6 +289,13 @@ std::vector<std::string> Variable::Manager::getNames() const
   for (const VarBase* var : m_variablesInRegistrationOrder) {
     names.push_back(var->name);
   }
+  return names;
+}
+
+std::vector<std::string> Variable::Manager::getAliasNames() const
+{
+  std::vector<std::string> names;
+  for (auto al : m_alias) names.push_back(al.first);
   return names;
 }
 

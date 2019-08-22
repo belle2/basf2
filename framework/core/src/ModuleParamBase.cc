@@ -14,7 +14,6 @@
 
 using namespace Belle2 ;
 
-// cppcheck-suppress passedByValue ; We take a value to move it into a member so no performance penalty
 ModuleParamBase::ModuleParamBase(std::string  typeInfo, std::string  description, bool force)
   : m_typeInfo(std::move(typeInfo))
   , m_description(std::move(description))

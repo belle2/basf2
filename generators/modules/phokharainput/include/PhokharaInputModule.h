@@ -86,6 +86,7 @@ namespace Belle2 {
     double m_epsilon; /**< Soft/hard photon separator*/
     std::string m_ParameterFile; /**< file that holds all resonance parameters*/
 //     std::string m_InputFile; /**< file that holds all input parameters - NOT USED IN BELLE II IMPLEMENTATION!!!*/
+    bool m_BeamEnergySpread; /**< Simulate beam-energy spread. */
 
     /** Variables */
     Phokhara m_generator;   /**< The Phokhara generator. */

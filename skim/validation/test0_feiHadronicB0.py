@@ -5,7 +5,7 @@
 """
 <header>
   <output>feiHadronicB0.dst.root</output>
-  <contact>sophie.hollitt@adelaide.edu.au, philip.grace@adelaide.edu.au</contact>
+  <contact>philip.grace@adelaide.edu.au</contact>
 </header>
 """
 

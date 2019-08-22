@@ -88,11 +88,11 @@ void GeneratePlots(TFile *file, TString ListName, string sfx, Bool_t isGroupC) {
 		if (isGroupC)cOPCanvas[i]->Divide(splitX, splitY);
 	}
 
-	string fromR = "", toR = "", hname = "";
-	Int_t fRun = 1, sRun = 1;
-	Int_t iC = 1, iCd = 1;
-
 	for (int ih = 0; ih < InputList->GetEntries(); ih++) {
+
+		string fromR = "", toR = "", hname = "";
+		Int_t fRun = 1, sRun = 1;
+		Int_t iC = 1, iCd = 1;
 
 		((TH1F*)InputList->At(ih))->SetFillColor(kYellow);
 

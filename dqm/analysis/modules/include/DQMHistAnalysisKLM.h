@@ -20,11 +20,14 @@
 
 /* Belle2 headers. */
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <eklm/dataobjects/ElementNumbersSingleton.h>
-#include <eklm/dbobjects/EKLMElectronicsMap.h>
-#include <bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
+#include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
+#include <klm/dataobjects/KLMChannelArrayIndex.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMSectorArrayIndex.h>
 
 namespace Belle2 {
 
@@ -73,13 +76,17 @@ namespace Belle2 {
   protected:
 
     /**
-     * Analyse strip number histogram.
-     * @param[in]  layerGlobal Global layer number.
-     * @param[in]  histogram   Histogram.
-     * @param[out] latex       TLatex to draw messages.
+     * Analyse channel hit histogram.
+     * @param[in]  subdetector    Subdetector.
+     * @param[in]  section        Section.
+     * @param[in]  sector         Sector.
+     * @param[in]  histogram      Histogram.
+     * @param[in]  canvas         Canvas.
+     * @param[out] latex          TLatex to draw messages.
      */
-    void analyseStripLayerHistogram(int layerGlobal, TH1* histogram,
-                                    TLatex& latex);
+    void analyseChannelHitHistogram(
+      int subdetector, int section, int sector,
+      TH1* histogram, TCanvas* canvas, TLatex& latex);
 
     /**
      * Process one BKLM sector+layer histogram.
@@ -94,11 +101,23 @@ namespace Belle2 {
      */
     TCanvas* findCanvas(const std::string& canvasName);
 
-    /** Electronics map. */
-    DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
+    /** BKLM electronics map. */
+    DBObjPtr<BKLMElectronicsMap> m_bklmElectronicsMap;
 
-    /** Element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
+    /** EKLM electronics map. */
+    DBObjPtr<EKLMElectronicsMap> m_eklmElectronicsMap;
+
+    /** KLM channel array index. */
+    const KLMChannelArrayIndex* m_ChannelArrayIndex;
+
+    /** KLM sector array index. */
+    const KLMSectorArrayIndex* m_SectorArrayIndex;
+
+    /** KLM element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
+
+    /** EKLM element numbers. */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;
 
     /** EKLM strip number within a layer. */
     TCanvas* m_eklmStripLayer[

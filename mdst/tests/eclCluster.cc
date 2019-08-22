@@ -134,27 +134,6 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(error[4], error3x3(2, 1));
     EXPECT_FLOAT_EQ(error[5], error3x3(2, 2));
 
-    TMatrixDSym errorecl = error3x3;
-    TMatrixD  jacobian(4, 3);
-    const double cosPhi = cos(phi);
-    const double sinPhi = sin(phi);
-    const double cosTheta = cos(theta);
-    const double sinTheta = sin(theta);
-    jacobian(0, 0) = cosPhi * sinTheta;
-    jacobian(0, 1) = -1.0 * energy * sinPhi * sinTheta;
-    jacobian(0, 2) = energy * cosPhi * cosTheta;
-    jacobian(1, 0) = sinPhi * sinTheta;
-    jacobian(1, 1) = energy * cosPhi * sinTheta;
-    jacobian(1, 2) = energy * sinPhi * cosTheta;
-    jacobian(2, 0) = cosTheta;
-    jacobian(2, 1) = 0.0;
-    jacobian(2, 2) = -1.0 * energy * sinTheta;
-    jacobian(3, 0) = 1.0;
-    jacobian(3, 1) = 0.0;
-    jacobian(3, 2) = 0.0;
-    TMatrixDSym error4x4expected(4);
-    error4x4expected = errorecl.Similarity(jacobian);
-
   } // default constructor
 
 

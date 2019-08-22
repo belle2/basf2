@@ -4,8 +4,8 @@
 
 """
 <header>
-  <output>LeptonicUntagged.dst.root</output>
-  <contact>sophie.hollitt@adelaide.edu.au, philip.grace@adelaide.edu.au</contact>
+  <output>feiHadronicBplus.dst.root</output>
+  <contact>philip.grace@adelaide.edu.au</contact>
 </header>
 """
 

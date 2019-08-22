@@ -14,6 +14,7 @@ to achieve a selected cms energy.
 """
 
 from basf2 import *
+import os
 from beamparameters import beamparameter_presets, add_beamparameters
 import argparse
 

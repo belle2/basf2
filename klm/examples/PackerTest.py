@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Particle gun muon events for EKLM, only EKLM digitization and reconstruction.
+# Particle gun muon events for KLM, only KLM digitization and reconstruction.
 
 import os
 import random
@@ -30,7 +30,7 @@ paramloader = basf2.register_module('Gearbox')
 
 # Geometry builder
 geobuilder = basf2.register_module('Geometry')
-geobuilder.param('components', ['EKLM', 'BKLM'])
+geobuilder.param('components', ['KLM'])
 
 # Full Geant4 simulation
 g4sim = basf2.register_module('FullSim')
@@ -40,8 +40,7 @@ output = basf2.register_module('RootOutput')
 output.param('outputFileName', 'ParticleGunMuonsKLM.root')
 
 # Digitizers
-bklm_digitizer = basf2.register_module('BKLMDigitizer')
-eklm_digitizer = basf2.register_module('EKLMDigitizer')
+klm_digitizer = basf2.register_module('KLMDigitizer')
 
 # Packers
 bklm_packer = basf2.register_module('BKLMRawPacker')
@@ -66,8 +65,7 @@ main.add_module(paramloader)
 main.add_module(geobuilder)
 main.add_module(g4sim)
 
-main.add_module(bklm_digitizer)
-main.add_module(eklm_digitizer)
+main.add_module(klm_digitizer)
 main.add_module(bklm_packer)
 main.add_module(eklm_packer)
 main.add_module(klm_unpacker)

@@ -63,6 +63,14 @@ bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particle
   return fit(recoTrack, trackRepresentation);
 }
 
+bool TrackFitter::fit(RecoTrack& recoTrack, const int pdgCode) const
+{
+  genfit::AbsTrackRep* trackRepresentation = RecoTrackGenfitAccess::createOrReturnRKTrackRep(recoTrack,
+                                             pdgCode);
+
+  return fit(recoTrack, trackRepresentation);
+}
+
 bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRep& trackRepresentation) const
 {
   // Fit the track

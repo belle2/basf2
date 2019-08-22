@@ -4,8 +4,8 @@
 
 """
 <header>
-  <output>LeptonicUntagged.dst.root</output>
-  <contact>hannah.wakeling@mail.mcgill.ca, philip.grace@adelaide.edu.au</contact>
+  <output>PRsemileptonicUntagged.dst.root</output>
+  <contact>philip.grace@adelaide.edu.au</contact>
 </header>
 """
 

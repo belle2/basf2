@@ -16,11 +16,11 @@ from stdV0s import *
 from skim.standardlists.lightmesons import *
 
 
-def SetTauGenericSkimVariables(path=analysis_main):
+def SetTauGenericSkimVariables(path):
     """
     Set particle lists and variables for TauGeneric skim
 
-    * inout particle lists: pi+:all, gamma:all
+    * input particle lists: pi+:all, gamma:all
 
     * output particle lists: pi+:tauskim, gamma:tauskim, pi+:S1/S2, gamma:S1/S2
 
@@ -64,7 +64,7 @@ def SetTauGenericSkimVariables(path=analysis_main):
     variables.addAlias('E_ECLtrk', 'formula(totalECLEnergyOfParticlesInList(pi+:tauskim))')
 
 
-def TauList(path=analysis_main):
+def TauList(path):
     """
     Note:
         * Skim for Tau generic decays
@@ -111,7 +111,7 @@ def TauList(path=analysis_main):
     return eventParticle
 
 
-def TauLFVList(flag=1, path=analysis_main):
+def TauLFVList(flag=1, path=None):
     """
     Note:
         * Skim for Tau LFV decays
@@ -128,7 +128,7 @@ def TauLFVList(flag=1, path=analysis_main):
     """
     __author__ = "P. Urquijo, K. Inami"
 
-    tauLFVCuts = '1.58 < Mbc < 1.98 and abs(deltaE) < 1.0'
+    tauLFVCuts = '1.58 < M < 1.98 and abs(deltaE) < 1.0'
 
     tau_lgamma_Channels = ['e+:loose gamma:loose',
                            'mu+:loose gamma:loose'
@@ -148,8 +148,8 @@ def TauLFVList(flag=1, path=analysis_main):
                         'mu+:loose eta:loose',
                         'e+:loose eta\':loose',
                         'mu+:loose eta\':loose',
-                        'e+:loose K_S0:all',
-                        'mu+:loose K_S0:all'
+                        'e+:loose K_S0:merged',
+                        'mu+:loose K_S0:merged'
                         ]
 
     tau_lS0_Channels = ['e+:loose f_0:loose',
@@ -180,8 +180,8 @@ def TauLFVList(flag=1, path=analysis_main):
                         'mu+:loose K-:loose pi+:loose',
                         'e-:loose K+:loose pi+:loose',
                         'mu-:loose K+:loose pi+:loose',
-                        'e-:loose K_S0:all K_S0:all',
-                        'mu-:loose K_S0:all K_S0:all'
+                        'e-:loose K_S0:merged K_S0:merged',
+                        'mu-:loose K_S0:merged K_S0:merged'
                         ]
 
     tau_bnv_Channels = ['mu+:loose mu+:loose anti-p-:loose',
@@ -238,11 +238,11 @@ def TauLFVList(flag=1, path=analysis_main):
     return tau_lfv_lists
 
 
-def SetTauThrustSkimVariables(path=analysis_main):
+def SetTauThrustSkimVariables(path):
     """
     Set particle lists and variables for TauThrust skim
 
-    * inout particle lists: pi+:all, gamma:all
+    * input particle lists: pi+:all, gamma:all
 
     * output particle lists: pi+:good, gamma:good, pi+:S1/S2
 
@@ -254,7 +254,7 @@ def SetTauThrustSkimVariables(path=analysis_main):
     __author__ = "Ami Rostomyan, Kenji Inami"
 
     # Track and gamma cuts
-    trackCuts = '-5.0 < dz < 5.0 and dr < 1.0 and nCDCHits > 0'
+    trackCuts = '-5.0 < dz < 5.0 and dr < 1.0 and nSVDHits >= 6'
     cutAndCopyList('pi+:good', 'pi+:all', trackCuts, path=path)
     gammaCuts = 'E > 0.20 and clusterNHits > 1.5 and -0.8660 < cosTheta < 0.9563'
     cutAndCopyList('gamma:good', 'gamma:all', gammaCuts, path=path)
@@ -275,7 +275,7 @@ def SetTauThrustSkimVariables(path=analysis_main):
     variables.addAlias('nTracksS2', 'nParticlesInList(pi+:S2)')
 
 
-def TauThrustList(path=analysis_main):
+def TauThrustList(path):
     """
     Note:
         * Skim for Tau decays using thrust

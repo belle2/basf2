@@ -35,8 +35,7 @@ void CDCGeometryLoader::loadDatabase()
   // use experiment 0 for MC-only events
   evtPtr.construct(1, 0, 0);
 
-  // Load the default database including the remote db
-  Database::Instance();
+  Database::reset();
   // load database content for IoV in EventMetaData
   DBStore::Instance().update();
 

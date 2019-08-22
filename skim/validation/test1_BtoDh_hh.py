@@ -18,29 +18,29 @@ from stdCharged import stdK
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 
-hh = Path()
+path = Path()
 
 skimCode = encodeSkimName('BtoDh_hh')
 
 fileList = ['../BtoDh_hh.dst.root']
 
-inputMdstList('default', fileList, path=hh)
+inputMdstList('default', fileList, path=path)
 
 # Load particle lists
-stdPi('all', path=hh)
-stdK('all', path=hh)
+stdPi('all', path=path)
+stdK('all', path=path)
 
 
 # Hh skim
 from skim.btocharm import loadD0bar, BsigToDhTohhList
-loadD0bar(path=hh)
-BtoDhList = BsigToDhTohhList(path=hh)
-skimOutputUdst(skimCode, BtoDhList, path=hh)
-summaryOfLists(BtoDhList, path=hh)
+loadD0bar(path=path)
+BtoDhList = BsigToDhTohhList(path=path)
+skimOutputUdst(skimCode, BtoDhList, path=path)
+summaryOfLists(BtoDhList, path=path)
 
 # Suppress noisy modules, and then process
-setSkimLogging()
-process(hh)
+setSkimLogging(path)
+process(path)
 
 # print out the summary
 print(statistics)

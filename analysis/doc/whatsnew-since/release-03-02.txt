@@ -77,10 +77,6 @@ Variables
 * Added :b2:var:`isCloneOfSignalSide` and :b2:var:`hasAncestorFromSignalSide`  variables to monitor the clone particle
   contamination in ROE. These variables use generator information.
 
-* The function to create variable aliases for particles selected from a decay
-  string has been fixed and extended to allow better
-  customization (:issue:`BII-4437`)
-
 * The variables for the fast reco HLT trigger stage have been removed,
   as we are currently not planning to have it in the early data taking.
 
@@ -162,10 +158,11 @@ Modules
   function `modularAnalysis.combineAllParticles`. It creates a new Particle as
   the combination of all unique Particles from the passed input ParticleLists.
 
-* ParticleLoader can load :doc:`RestOfEvent` as a particle
+* The :b2:mod:`ParticleLoader` can load :doc:`RestOfEvent` as a particle
   using a new function `modularAnalysis.fillParticleListFromROE`.
   This ROE particle can be combined with any other particle or written down
   using usual variables.
+
   Another option is to load missing momentum as a particle by supplementing
   ``useMissing = True`` argument to the function, mentioned above.
 
@@ -201,13 +198,6 @@ Modules
 * The module :b2:mod:`VertexFitUpdateDaughtersModule` now always updates
   the daughters (as advertised).
 
-* The :b2:mod:`ParticleLoader` can load :doc:`RestOfEvent` as a particle 
-  using a new function `modularAnalysis.fillParticleListFromROE`.
-  This ROE particle can be combined with any other particle or written down 
-  using usual variables. 
-
-  Another option is to load missing momentum as a particle by supplementing 
-  ``useMissing = True`` argument to the function, mentioned above.
 
 Modular Analysis
 ++++++++++++++++

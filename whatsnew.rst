@@ -64,18 +64,18 @@ You should update it to this:
 
 .. rubric:: Switch of beam spot information from nominal to measured values.
 
-The IP position and errors are now taken from the database with values provided by the tracking group.
+The IP position and its uncertainties are now taken from the database with values provided by the tracking group.
 All beam kinematics information is also moved to the database, which will eventually be measured on data. 
 For now they are the values provided by the accelerator.
 
 .. warning::
-    The previous definition the boost included a small rotation to align it with the HER.
+    The previous definition of the boost included a small rotation to align it with the HER.
     This is no longer possible with the new structure.
     The definition of CMS is therefore slightly changed. The impact should be at the percent level.
 
 .. seealso:: The values can be accessed with :b2:var:`Ecms`, :b2:var:`beamPx`,  :b2:var:`beamPy`,  :b2:var:`beamPz`, and  :b2:var:`beamE`.
 
-.. note:: A consequence of this is there is now a difference between the variables ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz` ) and ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` ).
+.. note:: As a consequence of this, there is now a difference between the variables ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz` ) and ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` ).
 
 .. rubric:: Abort processing for invalid or missing global tags
 
@@ -109,7 +109,7 @@ Essentially: it is forbidden from now onwards for any other analysis modules to 
 
 The (external) `RAVE <https://github.com/rave-package>`_ vertex fitter is not maintained.
 Its use in analysis is therefore deprecated.
-We do not expect to *remove* it, but *do not recommend* its use for any realy physics analyses other than benchmarking or legacy studies.
+We do not expect to *remove* it, but *do not recommend* its use for any real physics analyses other than benchmarking or legacy studies.
 
 Instead we recommend you use either KFitter (`vertex.vertexKFit`, and similar functions) for fast/simple fits, or `TreeFitter` (`vertex.vertexTree`) for more complex fits and fitting the full decay chain.
 Please check the `TreeFitter` pages for details about the constraints available.

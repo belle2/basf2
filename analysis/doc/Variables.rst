@@ -420,7 +420,7 @@ They have a **[Calibration]** pretag.
 .. b2-variables::
    :group: ECL trigger calibration
 .. b2-variables::
-   :group: KLM Calibration | PID
+   :group: Muid calibration
 
 
 Collections and Lists

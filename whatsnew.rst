@@ -26,7 +26,7 @@ Changes since release-03
 This is a major backward-compatibility breaking change.
 Please update your user scripts to create your own path (`basf2.create_path`) and to use the `variable manager tools <variablemanageroutput>` (such as `VariablesToNtuple <v2nt>`).
 
-To give a worked example, if your script from ``release-03`` looked something like this:
+If your previously working example script from ``release-03`` looked something like this:
 
 .. code-block:: python
 
@@ -64,7 +64,7 @@ You should update it to this:
 
 .. rubric:: Switch of beam spot information from nominal to measured values.
 
-The IP position and its uncertainties are now taken from the database with values provided by the tracking group.
+The interaction point position and its uncertainties are now taken from the database with values provided by the tracking group.
 All beam kinematics information is also moved to the database, which will eventually be measured on data. 
 For now they are the values provided by the accelerator.
 
@@ -73,9 +73,12 @@ For now they are the values provided by the accelerator.
     This is no longer possible with the new structure.
     The definition of CMS is therefore slightly changed. The impact should be at the percent level.
 
-.. seealso:: The values can be accessed with :b2:var:`Ecms`, :b2:var:`beamPx`,  :b2:var:`beamPy`,  :b2:var:`beamPz`, and  :b2:var:`beamE`.
+If you have a physics analysis sensitive to this change: please discuss with the software / performance groups and add a comment to :issue:`BII-4360`.
+
+.. seealso:: The beam information can be accessed with :b2:var:`Ecms`, :b2:var:`beamPx`,  :b2:var:`beamPy`,  :b2:var:`beamPz`, and  :b2:var:`beamE`.
 
 .. note:: As a consequence of this, there is now a difference between the variables ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz` ) and ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` ).
+
 
 .. rubric:: Abort processing for invalid or missing global tags
 

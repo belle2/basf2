@@ -85,6 +85,9 @@ Variables
 * The variables ``mcDX``, ``mcDY``, ``mcDZ`` are now deprecated, 
   because they are duplicates of :b2:var:`mcX`, :b2:var:`mcY` and :b2:var:`mcZ`.
 
+* The variables ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz` ) are with respect to the interaction point (as documented). 
+  This now makes them different with respect to ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` ).
+
 * Added the meta variable :b2:var:`eclClusterSpecialTrackMatched` to check if
   any track related to an ECL cluster satisfies certain criteria. It can be used
   to apply an individual track-cluster matching.

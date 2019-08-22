@@ -127,7 +127,7 @@ namespace Belle2 {
         sort(digitTimes.begin(), digitTimes.end());
         double T0 = 0;
         size_t count = 0;
-        for (const auto& t : digitTimes) {
+        for (auto t : digitTimes) {
           T0 += t;
           count += 1;
           if (count == 5) break;
@@ -152,7 +152,7 @@ namespace Belle2 {
         sort(digitTimes.begin(), digitTimes.end());
         int count = 0;
         if (tmin < 0) tmin = digitTimes[0];
-        for (const auto& t : digitTimes) {
+        for (auto t : digitTimes) {
           if (t > tmax) break;
           if (t >= tmin) ++count;
         }

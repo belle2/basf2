@@ -190,7 +190,7 @@ def change_state(db, tag, state, force=False):
     state = state.upper()
     if state in ["INVALID", "PUBLISHED"] and not force:
         name = input(f"ATTENTION: Marking a tag as {state} cannot be undone.\n"
-                     "If you are sure you want to publish it please enter the tag name again: ")
+                     "If you are sure you want to continue it please enter the tag name again: ")
         if name != tag:
             B2ERROR("Names don't match, aborting")
             return 1
@@ -380,7 +380,7 @@ def command_tag_state(args, db):
     .. versionadded:: release-04-00-00
     """
     if db is None:
-        args.add_argument("tag", metavar="TAGNAME", help="globaltag to be published")
+        args.add_argument("tag", metavar="TAGNAME", help="globaltag to be changed")
         args.add_argument("state", metavar="STATE", help="new state for the globaltag")
         return
 

@@ -24,6 +24,9 @@
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPSimHit.h>
 
+#include <algorithm>
+#include <vector>
+
 using namespace Belle2;
 
 REG_MODULE(TOPLaserCalibratorCollector)
@@ -60,9 +63,10 @@ void TOPLaserCalibratorCollectorModule::prepare()
   hitTree->Branch<float>("refTime", &m_refTime);
   hitTree->Branch<float>("amplitude", &m_amplitude);
   hitTree->Branch<float>("width", &m_width);
-  //  hitTree->Branch<short>("sample", &m_sample);
-  //  hitTree->Branch<short>("window", &m_window);
+  hitTree->Branch<short>("sample", &m_sample);
+  hitTree->Branch<short>("window", &m_window);
   hitTree->Branch<int>("event", &m_event);
+  hitTree->Branch<bool>("refTimeValid", &m_refTimeValid);
 
   registerObject<TTree>("hitTree", hitTree);
 
@@ -80,59 +84,58 @@ void TOPLaserCalibratorCollectorModule::prepare()
 void TOPLaserCalibratorCollectorModule::collect()
 {
   float refTimes[16] = {0.}; // Reference time for each slot
+  std::vector<bool> refTimesValid(16, true);
 
-  // first loops over the TOPDigit to find all the pairs of digit that satisfy the pulser contitions
+  // first loop over TOPDigits to find all the pairs of digits that satisfy the double-pulse conditions
   if (m_useReferencePulse) {
-    for (auto digit1 : m_TOPDigitArray) {
-
-      if (digit1.getHitQuality() != 4 ||  m_refChannel != digit1.getChannel())
+    std::vector<float> calPulseTimes[16];
+    for (const auto& digit : m_TOPDigitArray) {
+      if (digit.getHitQuality() != TOPDigit::c_CalPulse or digit.getChannel() != m_refChannel)
         continue; // remove photons and everything not on the ref channel
-
-      for (auto digit2 : m_TOPDigitArray) {
-        if (digit1.getModuleID() != digit2.getModuleID())
-          continue; // not in the same module
-        if (digit2.getHitQuality() != 4 ||  m_refChannel != digit2.getChannel())
-          continue; // remove photons and everything not on the ref channel
-
-        // If I reach this point, I have to pulser-like hits on the ref channel of the same slot
-        if (TMath::Abs(TMath::Abs(digit1.getTime() - digit2.getTime()) - m_pulserDeltaT) < m_pulserDeltaTTolerance) {
-          if (digit1.getTime() < digit2.getTime())
-            refTimes[digit1.getModuleID() - 1] = digit1.getTime();
-          else
-            refTimes[digit1.getModuleID() - 1] = digit2.getTime();
-        }
-
+      calPulseTimes[digit.getModuleID() - 1].push_back(digit.getTime());
+    }
+    for (int i = 0; i < 16; i++) {
+      if (calPulseTimes[i].size() == 2) {
+        refTimes[i] = std::min(calPulseTimes[i][0], calPulseTimes[i][1]);
+        refTimesValid[i] = true;
+      } else {
+        refTimesValid[i] = false;
       }
     }
   }
 
   TTree*  hitTree = getObjectPtr<TTree>("hitTree");
 
-  // first loops over the TOPDigit to find all the pairs of digit that satisfy the pulser contitions
-  for (auto& digit : m_TOPDigitArray) {
-    if (digit.getHitQuality() == 0)
-      continue; // remove the bad hits
+  // then fill the tree with good digits (photons and cal pulses)
+  for (const auto& digit : m_TOPDigitArray) {
+    if (digit.getHitQuality() == TOPDigit::c_Junk) continue; // remove the bad hits
     m_channel = digit.getChannel();
     m_slot = digit.getModuleID(); // this is 1-based
     m_dVdt = 0.5 * TMath::Sqrt(-2.*TMath::Log(0.5)) * digit.getPulseHeight() / digit.getPulseWidth();
 
-    if (m_refSlot > 0)
+    if (m_refSlot > 0) {
       m_refTime = refTimes[m_refSlot - 1];
-    else
+      m_refTimeValid = refTimesValid[m_refSlot - 1];
+    } else {
       m_refTime = refTimes[m_slot - 1];
+      m_refTimeValid = refTimesValid[m_slot - 1];
+    }
 
     m_amplitude = digit.getPulseHeight() ;
     m_width =  digit.getPulseWidth();
 
     if (m_storeMCTruth) {
       const auto* simHit = digit.getRelated<TOPSimHit>();
-      if (simHit)
-        m_hitTime = simHit->getTime();
-    } else
+      if (not simHit) continue; // no tree entry if MC truth doesn't exist
+      m_hitTime = simHit->getTime();
+    } else {
       m_hitTime = digit.getTime() - m_refTime;
+    }
 
-    m_window = 0; // FIXME
-    m_sample = 0; // FIXME
+    m_window = -1;
+    const auto* rawDigit = digit.getRelated<TOPRawDigit>();
+    if (rawDigit) m_window = rawDigit->getASICWindow(); // window from which the feature is extracted
+    m_sample = digit.getModulo256Sample(); // sample number refered in TBC
     hitTree->Fill();
   }
   m_event++;

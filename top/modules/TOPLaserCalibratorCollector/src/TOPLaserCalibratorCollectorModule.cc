@@ -95,11 +95,14 @@ void TOPLaserCalibratorCollectorModule::collect()
       calPulseTimes[digit.getModuleID() - 1].push_back(digit.getTime());
     }
     for (int i = 0; i < 16; i++) {
+      refTimesValid[i] = false;
       if (calPulseTimes[i].size() == 2) {
-        refTimes[i] = std::min(calPulseTimes[i][0], calPulseTimes[i][1]);
-        refTimesValid[i] = true;
-      } else {
-        refTimesValid[i] = false;
+        auto t1 = calPulseTimes[i][0];
+        auto t2 = calPulseTimes[i][1];
+        if (fabs(fabs(t1 - t2) - m_pulserDeltaT) < m_pulserDeltaTTolerance) {
+          refTimes[i] = std::min(t1, t2);
+          refTimesValid[i] = true;
+        }
       }
     }
   }

@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
@@ -64,6 +65,10 @@ namespace Belle2 {
 
     std::string m_cutParameter;  /**< selection criteria */
     std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
+
+    std::string m_variableName; /**< Variable which defines the best duplicate. */
+    bool m_selectLowest; /**< Select the candidate with the lowest value (instead of highest). */
+    const Variable::Manager::Var* m_variable; /**< Variable which defines the best duplicate selection. */
 
     bool m_writeOut;                     /**< toggle Particle List btw. transient/writeOut */
 

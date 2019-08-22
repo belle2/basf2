@@ -88,23 +88,30 @@ void TOPLaserCalibratorCollectorModule::collect()
 
   // first loop over TOPDigits to find all the pairs of digits that satisfy the double-pulse conditions
   if (m_useReferencePulse) {
+
     std::vector<float> calPulseTimes[16];
     for (const auto& digit : m_TOPDigitArray) {
       if (digit.getHitQuality() != TOPDigit::c_CalPulse or digit.getChannel() != m_refChannel)
         continue; // remove photons and everything not on the ref channel
       calPulseTimes[digit.getModuleID() - 1].push_back(digit.getTime());
     }
+
     for (int i = 0; i < 16; i++) {
       refTimesValid[i] = false;
-      if (calPulseTimes[i].size() == 2) {
-        auto t1 = calPulseTimes[i][0];
-        auto t2 = calPulseTimes[i][1];
-        if (fabs(fabs(t1 - t2) - m_pulserDeltaT) < m_pulserDeltaTTolerance) {
-          refTimes[i] = std::min(t1, t2);
+      auto& calTimes = calPulseTimes[i];
+      if (calTimes.size() < 2) continue;
+      std::sort(calTimes.begin(), calTimes.end());
+      for (unsigned k = 0; k < calTimes.size() - 1; k++) {
+        auto t1 = calTimes[k];
+        auto t2 = calTimes[k + 1];
+        if (fabs(fabs(t2 - t1) - m_pulserDeltaT) < m_pulserDeltaTTolerance) {
+          refTimes[i] = t1;
           refTimesValid[i] = true;
+          break;
         }
       }
     }
+
   }
 
   TTree*  hitTree = getObjectPtr<TTree>("hitTree");

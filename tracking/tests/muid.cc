@@ -8,9 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Belle2 headers. */
 #include <tracking/dataobjects/Muid.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/utilities/TestHelpers.h>
+
+/* C++ headers. */
+#include <bitset>
+#include <string>
 
 using namespace std;
 
@@ -61,30 +66,34 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(m_muid->getExtEKLMEfficiencyValue(layer), efficiency);
 
     // Test the methods to count the hits
-    // 63 = 000000000111111
+    // 111111
     // it means 6 hits in BKLM and 0 in EKLM
-    unsigned int pattern = 63;
+    std::bitset<30> bitPattern(std::string("111111"));
+    unsigned int pattern = static_cast<unsigned int>(bitPattern.to_ulong());
     m_muid->setHitLayerPattern(pattern);
     EXPECT_EQ(m_muid->getHitLayerPattern(), pattern);
     EXPECT_EQ(m_muid->getTotalBarrelHits(), 6);
     EXPECT_EQ(m_muid->getTotalEndcapHits(), 0);
-    // 32768 = 1000000000000000
+    // 1000000000000000
     // it means 0 hits in BKLM and 1 in EKLM
-    pattern = 32768;
+    bitPattern = std::bitset<30>(std::string("1000000000000000"));
+    pattern = static_cast<unsigned int>(bitPattern.to_ulong());
     m_muid->setHitLayerPattern(pattern);
     EXPECT_EQ(m_muid->getHitLayerPattern(), pattern);
     EXPECT_EQ(m_muid->getTotalBarrelHits(), 0);
     EXPECT_EQ(m_muid->getTotalEndcapHits(), 1);
-    // 688184 = 10101000000000111000
+    // 10101000000000111000
     // it means 3 hits in BKLM and 3 in EKLM
-    pattern = 688184;
+    bitPattern = std::bitset<30>(std::string("10101000000000111000"));
+    pattern = static_cast<unsigned int>(bitPattern.to_ulong());
     m_muid->setHitLayerPattern(pattern);
     EXPECT_EQ(m_muid->getHitLayerPattern(), pattern);
     EXPECT_EQ(m_muid->getTotalBarrelHits(), 3);
     EXPECT_EQ(m_muid->getTotalEndcapHits(), 3);
-    // 1073741823 = 11111111111111111111111111111
+    // 11111111111111111111111111111
     // it means 15 hits in BKLM, 14 in EKLM and 1 "fake" hit
-    pattern = 1073741823;
+    bitPattern = std::bitset<30>(std::string("11111111111111111111111111111"));
+    pattern = static_cast<unsigned int>(bitPattern.to_ulong());
     m_muid->setHitLayerPattern(pattern);
     EXPECT_EQ(m_muid->getHitLayerPattern(), pattern);
     EXPECT_EQ(m_muid->getTotalBarrelHits(), 15);

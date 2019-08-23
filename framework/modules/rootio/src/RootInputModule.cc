@@ -153,11 +153,12 @@ void RootInputModule::initialize()
       // read metadata and create sum of MCEvents and global tags
       try {
         RootIOUtilities::RootFileInfo fileInfo(fileName);
-        const FileMetaData& meta = fileInfo.getFileMetaData();
+        FileMetaData meta = fileInfo.getFileMetaData();
         if (meta.getNEvents() == 0) {
           B2WARNING("File appears to be empty, skipping" << LogVar("filename", fileName));
           continue;
         }
+        realDataWorkaround(meta);
         fileMetaData.push_back(meta);
         // make sure we only look at data or MC. For the first file this is trivially true
         if (fileMetaData.front().isMC() != meta.isMC()) {
@@ -443,6 +444,7 @@ void RootInputModule::readTree()
     }
     // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
     readPersistentEntry(treeNum);
+    realDataWorkaround(*fileMetaData);
     B2INFO("Loading new input file"
            << LogVar("filename", m_tree->GetFile()->GetName())
            << LogVar("metadata LFN", fileMetaData->getLfn()));
@@ -737,5 +739,13 @@ void RootInputModule::readPersistentEntry(long fileEntry)
       entry->recoverFromNullObject();
       entry->ptr = nullptr;
     }
+  }
+}
+
+void RootInputModule::realDataWorkaround(FileMetaData& metaData)
+{
+  if ((metaData.getSite().find("bfe0") == 0) && (metaData.getDate().compare("2019-06-30") > 0) &&
+      (metaData.getExperimentLow() > 0) && (metaData.getExperimentHigh() < 9) && (metaData.getRunLow() > 0)) {
+    metaData.declareRealData();
   }
 }

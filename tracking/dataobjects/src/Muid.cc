@@ -85,9 +85,9 @@ Muid::Muid(int pdgCode) :
   }
 }
 
-int Muid::getTotalBarrelHits() const
+unsigned int Muid::getTotalBarrelHits() const
 {
-  int hits = 0;
+  unsigned int hits = 0;
   unsigned int pattern = m_HitLayerPattern;
   for (int bit = 0; bit < BKLMElementNumbers::getMaximalLayerNumber(); ++bit) {
     if (pattern & (1 << bit)) {
@@ -97,9 +97,9 @@ int Muid::getTotalBarrelHits() const
   return hits;
 }
 
-int Muid::getTotalEndcapHits() const
+unsigned int Muid::getTotalEndcapHits() const
 {
-  int hits = 0;
+  unsigned int hits = 0;
   unsigned int pattern = m_HitLayerPattern;
   for (int bit = BKLMElementNumbers::getMaximalLayerNumber();
        bit < BKLMElementNumbers::getMaximalLayerNumber() + EKLMElementNumbers::getMaximalLayerNumber(); ++bit) {

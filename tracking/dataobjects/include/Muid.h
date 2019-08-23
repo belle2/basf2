@@ -110,10 +110,10 @@ namespace Belle2 {
     unsigned int getHitLayerPattern() const { return m_HitLayerPattern; }
 
     //! @return total number of matching BKLM hits
-    int getTotalBarrelHits() const;
+    unsigned int getTotalBarrelHits() const;
 
     //! @return total number of matching EKLM hits
-    int getTotalEndcapHits() const;
+    unsigned int getTotalEndcapHits() const;
 
     //! @return BKLM efficiency value
     float getExtBKLMEfficiencyValue(int index) const { return m_ExtBKLMEfficiencyValue[index]; }

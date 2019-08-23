@@ -25,6 +25,8 @@ import stdCharged as stdc
 from stdV0s import stdKshorts
 from stdPi0s import stdPi0s
 
+b2.conditions.disable_globaltag_replay()
+
 # create path
 my_path = b2.create_path()
 

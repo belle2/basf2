@@ -22,13 +22,14 @@ all_skims = [
     "SinglePhotonDark", "SystematicsTracking", "BottomoniumUpsilon",
     "BottomoniumEtabExclusive", "SystematicsLambda", "Systematics",
     "Resonance", "ISRpipicc", "BtoDh_Kspipipi0", "BtoPi0Pi0",
-    "CharmSemileptonic", "BottomoniumEtabExclusive", "BottomoniumUpsilon",
+    "DstToD0Pi_D0ToSemileptonic", "BottomoniumEtabExclusive", "BottomoniumUpsilon",
     "feiSLB0", "feiBplus", "feiHadronicB0",
-    "feiHadronicBplus", "BtoPi0Pi0", "Charm3BodyHadronic2",
-    "Charm3BodyHadronic", "Charm3BodyHadronic1", "Charm3BodyHadronic3", "Charm2BodyHadronic", "Charm2BodyHadronicD0",
-    "Charm2BodyNeutrals", "Charm2BodyNeutralsD0", "BtoDh_Kspi0", "BtoDh_hh",
+    "feiHadronicBplus", "BtoPi0Pi0", "DstToD0Pi_D0ToHpHmKs",
+    "DstToD0Pi_D0ToHpJmPi0", "DstToD0Pi_D0ToHpHmPi0", "DstToD0Pi_D0ToHpJmEta", "DstToD0Pi_D0ToHpJm", "XToD0_D0ToHpJm",
+    "DstToD0Pi_D0ToNeutrals", "XToD0_D0ToNeutrals", "XToDp_DpToKsHp", "BtoDh_Kspi0", "BtoDh_hh",
     "BtoDh_Kshh", "Tau", "PRsemileptonicUntagged", "SLUntagged",
-    "LeptonicUntagged", "TCPV", "CharmRare", "BtoXll", "BtoXgamma", "TauLFV",
+    "LeptonicUntagged", "TCPV", "DstToD0Pi_D0ToRare", "BtoXll", "BtoXll_LFV",
+    "BtoXgamma", "TauLFV"
 ]
 
 
@@ -273,20 +274,22 @@ _skimNameMatching = [
     ('11180400', 'feiSLBplus'),
     ('12160100', 'BtoXgamma'),
     ('12160200', 'BtoXll'),
+    ('12160300', 'BtoXll_LFV'),
     ('14120500', 'BtoPi0Pi0'),
-    ('17240100', 'Charm2BodyHadronic'),  # D* -> D0 -> K pi/pi pi/K K
+    ('17240100', 'DstToD0Pi_D0ToHpJm'),  # D* -> D0 -> K pi/pi pi/K K
     # ('17240100', 'DstToD0PiD0ToHpJm'),  # D* -> D0 -> K pi/pi pi/K K
-    ('17240200', 'Charm3BodyHadronic'),  # D* -> D0 -> K- pi+ pi0 (RS+WS)
-    ('17240300', 'Charm3BodyHadronic1'),  # D* -> D0 -> h h pi0
-    ('17240400', 'Charm2BodyNeutrals2'),  # D* -> D0 -> Ks omega / Ks eta -> Ks pi+ pi- pi0
-    ('17240500', 'Charm3BodyHadronic3'),  # D* -> D0 -> K- pi+ eta (RS+WS)
-    ('17240600', 'Charm2BodyNeutrals'),  # D* -> D0 -> pi0 pi0/Ks pi0/Ks Ks
-    ('17240700', 'Charm3BodyHadronic2'),  # D* -> D0 -> h h Ks
-    ('17230100', 'Charm2BodyHadronicD0'),  # D0 -> K pi/pi pi/K K
+    ('17240200', 'DstToD0Pi_D0ToHpJmPi0'),  # D* -> D0 -> K- pi+ pi0 (RS+WS)
+    ('17240300', 'DstToD0Pi_D0ToHpHmPi0'),  # D* -> D0 -> h h pi0
+    ('17240400', 'DstToD0Pi_D0ToKsOmega'),  # D* -> D0 -> Ks omega / Ks eta -> Ks pi+ pi- pi0
+    ('17240500', 'DstToD0Pi_D0ToHpJmEta'),  # D* -> D0 -> K- pi+ eta (RS+WS)
+    ('17240600', 'DstToD0Pi_D0ToNeutrals'),  # D* -> D0 -> pi0 pi0/Ks pi0/Ks Ks
+    ('17240700', 'DstToD0Pi_D0ToHpHmKs'),  # D* -> D0 -> h h Ks
+    ('17230100', 'XToD0_D0ToHpJm'),  # D0 -> K pi/pi pi/K K
     # ('17230100', 'D0ToHpJm'),  # D0 -> K pi/pi pi/K K
-    ('17230200', 'Charm2BodyNeutralsD0'),  # D0 -> pi0 pi0/Ks pi0/Ks Ks
-    ('17230300', 'CharmRare'),  # D0 -> g g/e e/mu mu
-    ('17260900', 'CharmSemileptonic'),
+    ('17230200', 'XToD0_D0ToNeutrals'),  # D0 -> pi0 pi0/Ks pi0/Ks Ks
+    ('17230300', 'DstToD0Pi_D0ToRare'),  # D0 -> g g/e e/mu mu
+    ('17260900', 'DstToD0Pi_D0ToSemileptonic'),  # D*(tag) -> D0(tag) -> hadron, D*(q) -> D0(q) -> K+ nu l-
+    ('17230400', 'XToDp_DpToKsHp'),  # D+ -> Ks h+
     ('19130100', 'CharmlessHad2Body'),
     ('19130200', 'CharmlessHad3Body'),
     ('14130200', 'DoubleCharm'),
@@ -310,7 +313,8 @@ _skimNameMatching = [
 
 
 def encodeSkimName(skimScriptName):
-    """ Returns the appropriate 8 digit skim code that will be used as the output uDST file name for any give name of a skimming script.
+    """ Returns the appropriate 8 digit skim code that will be used as the output uDST
+    file name for any give name of a skimming script.
     :param str skimScriptName: Name of the skim.  """
     lookup_dict = {n: c for c, n in _skimNameMatching}
     if skimScriptName not in lookup_dict:

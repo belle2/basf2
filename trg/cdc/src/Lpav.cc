@@ -22,10 +22,12 @@ namespace Belle2 {
 //
 // constants, enums and typedefs
 //
+  /// prob function
   extern "C" {
     float prob_(float*, int*);
   }
 
+  /// distance error
   static double err_dis_inv(double x, double y, double w, double a, double b)
   {
     if (a == 0 && b == 0) {
@@ -45,7 +47,30 @@ namespace Belle2 {
 //
 // constructors and destructor
 //
-  TRGCDCLpav::TRGCDCLpav()
+  TRGCDCLpav::TRGCDCLpav() :
+    m_wsum(),
+    m_xsum(),
+    m_ysum(),
+    m_xxsum(),
+    m_yysum(),
+    m_xysum(),
+    m_xrrsum(),
+    m_yrrsum(),
+    m_rrrrsum(),
+    m_wsum_temp(),
+    m_xav(),
+    m_yav(),
+    m_xyavp(),
+    m_rscale(),
+    m_xxavp(),
+    m_yyavp(),
+    m_xrravp(),
+    m_yrravp(),
+    m_rrrravp(),
+    m_sinrot(),
+    m_cosrot(),
+    m_nc(),
+    m_chisq() // 2019/07/31 by ytlai
   {
     clear();
   }
@@ -237,7 +262,7 @@ namespace Belle2 {
 // static member functions
 //
 
-
+  /// ostream operator
   std::ostream& operator<<(std::ostream& o, const TRGCDCLpav& a)
   {
 //  o << "wsum=" << a.m_wsum << " xsum=" << a.m_xsum << " ysum=" << a.m_ysum

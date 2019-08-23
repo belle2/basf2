@@ -21,7 +21,7 @@
 
 #include <framework/database/DBObjPtr.h>
 #include <alignment/GlobalLabel.h>
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 
 namespace Belle2 {
   namespace alignment {
@@ -71,13 +71,17 @@ namespace Belle2 {
     /// Very tentative interface for VXD
     class VXDGlobalParamInterface : public IGlobalParamInterface {
     public:
+      /// Type of VXD hierarchy
       enum E_VXDHierarchyType {
         c_None = 0,
         c_Flat = 1,
         c_Full = 2
       };
+      /// What type of hierarchy to use for VXD?
       static E_VXDHierarchyType s_hierarchyType;
+      /// Enable PXD in hierarchy?
       static bool s_enablePXD;
+      /// Enable SVD in hierarchy?
       static bool s_enableSVD;
 
       /// Very tentaive function: not yet used
@@ -112,6 +116,10 @@ namespace Belle2 {
       /// Release the object from internal unique_ptr to be managed elsewhere
       /// Useful to pass it to be stored in DB (and thus later deleted by framework)
       virtual TObject* releaseObject() = 0;
+      /// Clone the object, making a copy of the internal object - has to be implemented in derived template class
+      /// to return the actuall type of the object
+      virtual GlobalParamSetAccess* clone() = 0;
+
       /// Load the content (by copying obj retrieved from DB) for a given exp/run/event
       virtual void loadFromDB(EventMetaData emd) = 0;
       /// Load using DBObjPtr<DBObjType> which uses current EventMetaData to load valid constants
@@ -168,10 +176,10 @@ namespace Belle2 {
     ///
     /// Use to access any global calibration DB object, e.g.
     ///
-    /// GlobalParamSet<BeamParameters> params;
+    /// GlobalParamSet<BeamSpot> params;
     /// params.setGlobalParam(0.0012, 0, 1);
     ///
-    /// will set X-postion of BeamParameters vertex to 0.0012
+    /// will set X-postion of BeamSpot vertex to 0.0012
     template<class DBObjType>
     class GlobalParamSet : public GlobalParamSetAccess {
     public:
@@ -240,6 +248,12 @@ namespace Belle2 {
         return m_object.release();
       }
 
+      /// Clone the object, making a copy of the internal object
+      virtual GlobalParamSetAccess* clone() override final
+      {
+        return new GlobalParamSet<DBObjType>(*this);
+      }
+
       /// Load content of the object using DBObjPtr<DBObjType>
       /// which will try to load object valid for current EventMetaData
       /// Also resets if the object has been changed
@@ -285,21 +299,19 @@ namespace Belle2 {
       void ensureConstructed() {if (!m_object) construct();}
     };
 
-    template <>
-    unsigned short GlobalParamSet<BeamParameters>::getGlobalUniqueID() const;
     /// The DB object unique id in global calibration
     template <>
-    unsigned short GlobalParamSet<BeamParameters>::getGlobalUniqueID() const;
+    unsigned short GlobalParamSet<BeamSpot>::getGlobalUniqueID() const;
     /// Get global parameter of the DB object by its element and parameter number
     /// Note this is not const, it might need to construct the object
     template <>
-    double GlobalParamSet<BeamParameters>::getGlobalParam(unsigned short element, unsigned short param);
+    double GlobalParamSet<BeamSpot>::getGlobalParam(unsigned short element, unsigned short param);
     /// Set global parameter of the DB object by its element and parameter number
     template <>
-    void GlobalParamSet<BeamParameters>::setGlobalParam(double value, unsigned short element, unsigned short param);
+    void GlobalParamSet<BeamSpot>::setGlobalParam(double value, unsigned short element, unsigned short param);
     /// List global parameters in this DB object
     template <>
-    std::vector<std::pair<unsigned short, unsigned short>> GlobalParamSet<BeamParameters>::listGlobalParams();
+    std::vector<std::pair<unsigned short, unsigned short>> GlobalParamSet<BeamSpot>::listGlobalParams();
 
 
 

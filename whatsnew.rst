@@ -12,6 +12,29 @@ be adapted when changing to the new release.
    :depth: 3
    :local:
 
+Changes since release-03-02
+===========================
+
+.. important changes should go here. Especially things that break backwards
+      compatibility 
+
+.. rubric:: Tidy up and rename of Helicity variables.
+
+Renamed helicity variables in the VariableManager following consistent logic.
+We added the new variable :b2:var:`cosAcoplanarityAngle`.
+
+.. warning::  ``cosHelicityAngle`` is now :b2:var:`cosHelicityAngleMomentum`, and :b2:var:`cosHelicityAngle` has a new definition (as in the PDG 2018, p. 722).
+
++--------------------------------------+---------------------------------------------+
+|                Old name              |                New name                     |
++======================================+=============================================+
+|        ``cosHelicityAngle``          |       :b2:var:`cosHelicityAngleMomentum`    |
++--------------------------------------+---------------------------------------------+
+|     ``cosHelicityAnglePi0Dalitz``    | :b2:var:`cosHelicityAngleMomentumPi0Dalitz` |
++--------------------------------------+---------------------------------------------+
+| ``cosHelicityAngleIfCMSIsTheMother`` |    :b2:var:`cosHelicityAngleBeamMomentum`   |
++--------------------------------------+---------------------------------------------+
+
 
 Changes since release-03-02
 ===========================
@@ -63,12 +86,34 @@ You should update it to this:
               $BELLE2_RELEASE_DIR/analysis/examples/VariableManager
 
 
+.. rubric:: Switch of beam spot information from nominal to measured values.
+
+All IP position and errors now use the BeamSpot database, which contains the measured IP size instead of the nominal one. 
+All beam kinematics are handled through PCmsLabTransform, which computes them by combining CollisionInvariantMass and CollisionBoostVector. 
+Previously, these were pulled from either BeamParameters or gearbox (obsolete). 
+Some truth variables still use BeamParameters; those were marked as such.
+
+It must be noted that in previous definitions the boost included a small rotation to align it with the HER. 
+This is no longer possible with the new structure, so the definition of CMS is slightly changed. The impact should be at the percent level.
+
 .. rubric:: Loading ECLClusters under multiple hypotheses
 
 It is now possible to load :math:`K_L^0` particles from clusters in the ECL. 
 This has several important consequences for the creation of particles and using combinations containing :math:`K_L^0` s or other neutral hadrons in the analysis package.
 This is handled correctly by the ParticleLoader and ParticleCombiner (the corresponding convenience functions are `modularAnalysis.fillParticleList` and `modularAnalysis.reconstructDecay`).
 Essentially: it is forbidden from now onwards for any other analysis modules to create particles.
+
+.. rubric:: Deprecated RAVE for analysis use
+
+The (external) `RAVE <https://github.com/rave-package>`_ vertex fitter is not maintained.
+Its use in analysis is therefore deprecated.
+We do not expect to *remove* it, but *do not recommend* its use for any realy physics analyses other than benchmarking or legacy studies.
+
+Instead we recommend you use either KFitter (`vertex.vertexKFit`, and similar functions) for fast/simple fits, or `TreeFitter` (`vertex.vertexTree`) for more complex fits and fitting the full decay chain.
+Please check the `TreeFitter` pages for details about the constraints available.
+If you are unable to use TreeFitter because of missing functionality, please `submit a feature request <https://agira.desy.de/projects/BII>`_!
+
+.. warning:: The default fitter for `vertex.fitVertex` has been changed to KFitter.
 
 .. rubric:: Abort processing for invalid or missing global tags
 
@@ -89,6 +134,18 @@ This also changes the behavior of `add_simulation()
 <reconstruction.add_reconstruction>`: If a list of components is provided this
 will now only change the digitization or reconstruction setup but will always
 use the full geometry from the database.
+
+.. rubric:: New DecayStringGrammar for custom MCMatching 
+
+Users can use new DecayStringGrammar to set properties of the MCMatching. Then `isSignal`, `mcErrors` and other MCTruthVariables behave according to the property. 
+
+Once DecayStringGrammar is used with `reconstructDecay`, users can use `isSignal` instead of several specific variables such as `isSignalAcceptMissingNeutrino`.
+If one doesn't use any new DecayStringGrammar, all MCTruthVariables work same as before.
+
+The grammar is useful to analyze inclusive processes with both fully-inclusive-method and sum-of-exclusive-method. 
+There are also new helper functions `genNMissingDaughter(PDG)` and `genNStepsToDaughter(i)` to obtain the detailed MC information.
+
+You can find examples of usage in :ref:`Marker_of_unspecified_particle`, :ref:`Grammar_for_custom_MCMatching`.
 
 .. Now let's add the detailed changes for the analysis package first, that's
    what user will want to see

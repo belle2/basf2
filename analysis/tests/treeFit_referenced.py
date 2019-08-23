@@ -4,6 +4,7 @@ import unittest
 import os
 import tempfile
 from basf2 import *
+import b2test_utils
 from modularAnalysis import *
 from vertex import vertexTree
 from ROOT import Belle2
@@ -19,9 +20,14 @@ class TestTreeFits(unittest.TestCase):
 
         testFile = tempfile.NamedTemporaryFile()
 
+        # we want to use the latest grated globaltag, not the old one from the
+        # file
+        conditions.disable_globaltag_replay()
+
         main = create_path()
 
-        inputMdst('default', find_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root'), path=main)
+        inputfile = b2test_utils.require_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root', py_case=self)
+        inputMdst('default', inputfile, path=main)
 
         fillParticleList('pi+:a', 'pionID > 0.5', path=main)
 

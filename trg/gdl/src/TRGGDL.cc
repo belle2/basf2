@@ -41,6 +41,7 @@ using namespace std;
 namespace Belle2 {
 
   void ftd_0_01(bool* b, bool* i);
+  /**do the final trigger decision*/
   void dotrigger(std::vector<int>& res, std::vector<int> ob);
 
   TRGGDL*

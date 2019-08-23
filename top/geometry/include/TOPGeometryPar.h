@@ -264,8 +264,8 @@ namespace Belle2 {
 
       // PMT database
 
-      DBArray<TOPPmtInstallation> m_pmtInstalled; /**< PMT installation data */
-      DBArray<TOPPmtQE> m_pmtQEData; /**< quantum efficiencies */
+      OptionalDBArray<TOPPmtInstallation> m_pmtInstalled; /**< PMT installation data */
+      OptionalDBArray<TOPPmtQE> m_pmtQEData; /**< quantum efficiencies */
       DBObjPtr<TOPCalChannelRQE> m_channelRQE; /**< channel relative quantum effi. */
       DBObjPtr<TOPCalChannelThresholdEff> m_thresholdEff; /**< channel threshold effi. */
 

@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <svd/modules/svdReconstruction/SVDDataFormatCheckModule.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 
 using namespace Belle2;
 using namespace std;
@@ -27,15 +28,14 @@ SVDDataFormatCheckModule::SVDDataFormatCheckModule() : Module()
   setDescription("Checks the SVD data format: ");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("SVDEventInfo", m_svdEventInfoName,
+           "SVDEventInfo name", string(""));
   addParam("ShaperDigits", m_storeShaperDigitsName,
            "ShaperDigits collection name", string("SVDShaperDigits"));
   addParam("DAQDiagnostics", m_storeDAQName,
            "DAQDiagnostics collection name", string("SVDDAQDiagnostics"));
   addParam("maxProblematicEvents", m_maxProblematicEvts,
            "maximum number of problematic events to display WARNING", int(10));
-  addParam("maxProblematicStripsEvent", m_maxProblematicStripsInEvts,
-           "maximum number of problematic strips in a single event to display WARNING", int(10));
-
 }
 
 
@@ -75,7 +75,6 @@ void SVDDataFormatCheckModule::beginRun()
   m_n3samples = 0;
   m_n6samples = 0;
 
-
 }
 
 
@@ -84,10 +83,10 @@ void SVDDataFormatCheckModule::event()
 
   int evtNumber = m_evtMetaData->getEvent();
 
-  bool isProblematic = false;
-  int  problematicStripsInEvtCounter = 0;
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
+  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
 
-  bool shutUpWarningsPerEvt = false;
+  bool isProblematic = false;
 
   // If no digits, nothing to do
   if (!m_storeShaper || !m_storeShaper.getEntries()) {
@@ -101,74 +100,62 @@ void SVDDataFormatCheckModule::event()
 
   m_stripEvtsCounter++;
 
-  for (const SVDShaperDigit& shaper : m_storeShaper) {
+  //checking the number of acquired samples per APV
+  int daqMode = (int) modeByte.getDAQMode();
+  //0 -> 1-sample
+  //1 -> 3-sample
+  //2 -> 6-sample
+  if (daqMode == 2)
+    m_n6samples++;
 
-    SVDModeByte modeByte = shaper.getModeByte();
+  if (daqMode == 1) {
+    m_n3samples++;
+    isProblematic = true;
+    if (!m_shutUpWarnings)
+      B2WARNING("SVDDataFormatCheck: the event " << evtNumber << " of exp " << m_expNumber << ", run " << m_runNumber <<
+                " is apparently taken with 3-sample mode, this is not expected. [daqMode = " << daqMode << "]");
+  }
 
-    //checking the number of acquired samples per APV
-    int daqMode = (int) modeByte.getDAQMode();
-    //0 -> 1-sample
-    //1 -> 3-sample
-    //2 -> 6-sample
-    if (daqMode == 2)
-      m_n6samples++;
+  if (daqMode == 0) {
+    m_n1samples++;
+    isProblematic = true;
+    if (!m_shutUpWarnings)
+      B2WARNING("SVDDataFormatCheck: the event " << evtNumber << " of exp " << m_expNumber << ", run " << m_runNumber <<
+                " is apparently taken with 1-sample mode, this is not expected. [daqMode = " << daqMode << "]");
+  }
 
-    if (daqMode == 1) {
-      m_n3samples++;
-      isProblematic = true;
-      if ((!m_shutUpWarnings) && (!shutUpWarningsPerEvt))
-        B2WARNING("SVDDataFormatCheck: the event " << evtNumber << " of exp " << m_expNumber << ", run " << m_runNumber <<
-                  " is apparently taken with 3-sample mode, this is not expected. [daqMode = " << daqMode << "]");
-    }
+  int evtType = (int) modeByte.getEventType();
+  //0 -> global run
+  //1 -> local run
+  if (evtType != 0) { //only global runs are expected
+    m_nLocalRunEvts++;
+    isProblematic = true;
+    if (!m_shutUpWarnings)
+      B2WARNING("SVDDataFormatCheck: the event " << evtNumber << " of exp " << m_expNumber << ", run " << m_runNumber <<
+                " is apparently taken as Local Run, this is not expected. [evtType = " << evtType << "]");
+  }
 
-    if (daqMode == 0) {
-      m_n1samples++;
-      isProblematic = true;
-      if ((!m_shutUpWarnings) && (!shutUpWarningsPerEvt))
-        B2WARNING("SVDDataFormatCheck: the event " << evtNumber << " of exp " << m_expNumber << ", run " << m_runNumber <<
-                  " is apparently taken with 1-sample mode, this is not expected. [daqMode = " << daqMode << "]");
-    }
+  int runType = (int) modeByte.getRunType();
+  //0 -> raw
+  //1 -> transparent
+  //2 -> zero suppressed
+  //3 -> zs + hit time
+  if (runType != 2) { //only zero suppressed events are expected
+    m_nNoZSEvts++;
+    isProblematic = true;
+    if (!m_shutUpWarnings)
+      B2WARNING("SVDDataFormatCheck: the event " << evtNumber << " of exp " << m_expNumber << ", run " << m_runNumber <<
+                " is apparently not taken as ZeroSuppressed, this is not expected. [runType = " << runType << "]");
+  }
 
-    int evtType = (int) modeByte.getEventType();
-    //0 -> global run
-    //1 -> local run
-    if (evtType != 0) { //only global runs are expected
-      m_nLocalRunEvts++;
-      isProblematic = true;
-      if ((!m_shutUpWarnings) && (!shutUpWarningsPerEvt))
-        B2WARNING("SVDDataFormatCheck: the event " << evtNumber << " of exp " << m_expNumber << ", run " << m_runNumber <<
-                  " is apparently taken as Local Run, this is not expected. [evtType = " << evtType << "]");
-    }
-
-    int runType = (int) modeByte.getRunType();
-    //0 -> raw
-    //1 -> transparent
-    //2 -> zero suppressed
-    //3 -> zs + hit time
-    if (runType != 2) { //only zero suppressed events are expected
-      m_nNoZSEvts++;
-      isProblematic = true;
-      if ((!m_shutUpWarnings) && (!shutUpWarningsPerEvt))
-        B2WARNING("SVDDataFormatCheck: the event " << evtNumber << " of exp " << m_expNumber << ", run " << m_runNumber <<
-                  " is apparently not taken as ZeroSuppressed, this is not expected. [runType = " << runType << "]");
-    }
-
-    int triggerBin = modeByte.getTriggerBin();
-    //between 0 and 3
-    if (triggerBin < 0 || triggerBin > 3) {
-      m_nBadTBEvts++;
-      isProblematic = true;
-      if ((!m_shutUpWarnings) && (!shutUpWarningsPerEvt))
-        B2WARNING("SVDDataFormatCheck: the event " << evtNumber << " of exp " << m_expNumber << ", run " << m_runNumber <<
-                  " is apparently not with an unexpected trigger bin = " << triggerBin);
-    }
-
-
-    if (isProblematic)
-      problematicStripsInEvtCounter++;
-
-    if (problematicStripsInEvtCounter > m_maxProblematicStripsInEvts)
-      shutUpWarningsPerEvt = true;
+  int triggerBin = modeByte.getTriggerBin();
+  //between 0 and 3
+  if (triggerBin < 0 || triggerBin > 3) {
+    m_nBadTBEvts++;
+    isProblematic = true;
+    if (!m_shutUpWarnings)
+      B2WARNING("SVDDataFormatCheck: the event " << evtNumber << " of exp " << m_expNumber << ", run " << m_runNumber <<
+                " is apparently not with an unexpected trigger bin = " << triggerBin);
   }
 
   if (isProblematic)

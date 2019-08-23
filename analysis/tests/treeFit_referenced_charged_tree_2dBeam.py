@@ -3,7 +3,8 @@
 import unittest
 import os
 import tempfile
-from basf2 import *
+import basf2
+import b2test_utils
 from modularAnalysis import *
 from vertex import vertexTree
 from ROOT import Belle2
@@ -19,9 +20,13 @@ class TestTreeFits(unittest.TestCase):
 
         testFile = tempfile.NamedTemporaryFile()
 
-        main = create_path()
+        conditions.disable_globaltag_replay()
 
-        inputMdst('default',  Belle2.FileSystem.findFile('analysis/1000_B_DstD0Kpi_skimmed.root', 'validation'), path=main)
+        main = basf2.create_path()
+
+        inputfile = b2test_utils.require_file(
+            'analysis/1000_B_DstD0Kpi_skimmed.root', 'validation', py_case=self)
+        inputMdst('default', inputfile, path=main)
 
         fillParticleList('pi+:a', 'pionID > 0.5', path=main)
         fillParticleList('K+:a', 'kaonID > 0.5', path=main)
@@ -48,7 +53,7 @@ class TestTreeFits(unittest.TestCase):
         ntupler.param('particleList', 'B0:rec')
         main.add_module(ntupler)
 
-        process(main)
+        basf2.process(main)
 
         ntuplefile = TFile(testFile.name)
         ntuple = ntuplefile.Get('ntuple')

@@ -34,7 +34,7 @@ mypath.add_module('VariablesToEventBasedTree',
                   particleList='D0',
                   variables=['dM', 'isSignal', 'mcErrors', 'p', 'E',
                              'daughter(0, kaonID)', 'daughter(1, pionID)'],
-                  event_variables=['nTracks', 'expNum', 'runNum', 'evtNum'])
+                  event_variables=['nTracks', 'isMC'])
 
 # process the data
 basf2.process(mypath)

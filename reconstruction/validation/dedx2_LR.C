@@ -47,13 +47,13 @@ void plot(const TString &input_filename)
   TString logl_strings[num_particles];
   for(int part = 0; part < show_particles; part++) {
     //for this particle, take its likelihood...
-    logl_strings[part] = TString::Format("exp(CDCDedxTracks.m_cdcLogl[][%i] + VXDDedxTracks.m_vxdLogl[][%i]) / (", part, part);
+    logl_strings[part] = TString::Format("exp(CDCDedxLikelihoods.m_cdcLogl[][%i] + VXDDedxLikelihoods.m_vxdLogl[][%i]) / (", part, part);
 
     //and divide by summed likelihood of all particles
     for(int i = 0; i < num_particles; i++) {
       if(i!=0)
         logl_strings[part] += " + ";
-      logl_strings[part] += TString::Format("exp(CDCDedxTracks.m_cdcLogl[][%i] + VXDDedxTracks.m_vxdLogl[][%i])", i, i);
+      logl_strings[part] += TString::Format("exp(CDCDedxLikelihoods.m_cdcLogl[][%i] + VXDDedxLikelihoods.m_vxdLogl[][%i])", i, i);
     }
     logl_strings[part] += ") ";
     std::cout << logl_strings[part] << "\n";

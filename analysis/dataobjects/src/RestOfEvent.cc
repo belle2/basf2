@@ -458,7 +458,6 @@ TLorentzVector RestOfEvent::get4VectorTracks(const std::string& maskName) const
 
     // PID for Belle
     //////////////////////////////////////////
-    double pidChoice = Const::pion.getPDGCode();
     // Set variables
     Const::PIDDetectorSet set = Const::ECL;
     double eIDBelle = pid->getProbability(Const::electron, Const::pion, set);
@@ -468,6 +467,7 @@ TLorentzVector RestOfEvent::get4VectorTracks(const std::string& maskName) const
     double atcPIDBelle_Kpi = atcPIDBelleKpiFromPID(pid);
 
     // Check for leptons, else kaons or pions
+    double pidChoice;
     if (eIDBelle > 0.9 and eIDBelle > muIDBelle)
       pidChoice = Const::electron.getPDGCode();
     else if (muIDBelle > 0.9 and eIDBelle < muIDBelle)
@@ -569,6 +569,32 @@ void RestOfEvent::printIndices(const std::set<int>& indices) const
     printout += std::to_string(index) +  ", ";
   }
   B2INFO(printout);
+}
+
+Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCode, bool isSelfConjugated)
+{
+  StoreArray<Particle> particles;
+  std::set<int> source;
+  if (maskName == "") {
+    // if no mask provided work with internal source
+    source = m_particleIndices;
+  } else {
+    bool maskFound = false;
+    for (auto& mask : m_masks) {
+      if (mask.getName() == maskName) {
+        maskFound = true;
+        source = mask.getParticles();
+        break;
+      }
+    }
+    if (!maskFound) {
+      B2FATAL("No " << maskName << " mask defined in current ROE!");
+    }
+  }
+  int particlePDG = (pdgCode == 0) ? getPDGCode() : pdgCode;
+  auto isFlavored = (isSelfConjugated) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
+  return particles.appendNew(get4Vector(maskName), particlePDG, isFlavored, std::vector(source.begin(),
+                             source.end()), Particle::PropertyFlags::c_IsUnspecified);
 }
 
 double RestOfEvent::atcPIDBelleKpiFromPID(const PIDLikelihood* pid) const

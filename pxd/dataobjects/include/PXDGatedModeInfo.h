@@ -58,6 +58,9 @@ namespace Belle2 {
      */
     bool isReadoutGated() const { return m_readoutGated; }
 
+    /** Return if gate is ok
+     * @return gate is ok
+     */
     bool isGateOK(VxdID id, int gate) const
     {
       if (m_fullGated) {
@@ -78,8 +81,10 @@ namespace Belle2 {
       }
     }
 
+    /** is the VCELL valid*/
     bool isVCellOK(VxdID id, int vCellId) const { return isGateOK(id, vCellId / 4); }
 
+    /** set gate status of specific gate */
     void setGateGatedL2(int gate, bool gated)
     {
       if (gate < 0 || gate >= 192) {
@@ -96,6 +101,7 @@ namespace Belle2 {
     std::vector <bool>
     m_gateStatus; /**< Status of Gates (true=gated), the gates are numbered as (VCellID/4) for Layer 2 (as rolling shutter runs in V direction), and invers for Layer 1 */
 
+    /** necessary for ROOT */
     ClassDef(PXDGatedModeInfo, 1)
 
   }; // class PXDGatedModeInfo

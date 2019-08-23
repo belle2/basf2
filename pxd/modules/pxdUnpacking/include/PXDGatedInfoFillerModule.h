@@ -35,6 +35,7 @@ namespace Belle2 {
       void event() override final;
 
     private:
+      /** Name of input array for DAQ Status. */
       std::string m_GatedModeInfoName;
       /** Input array for DAQ Status. */
       StoreObjPtr<PXDGatedModeInfo> m_storeGatedModeInfo;

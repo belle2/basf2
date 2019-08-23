@@ -583,7 +583,7 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         auto variableName = arguments[0];
 
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
 
         auto func = [var](const Particle * particle) -> double {
           StoreObjPtr<EventShapeContainer> evtShapeCont;

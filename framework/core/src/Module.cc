@@ -543,7 +543,6 @@ calling this function:
 //                          ModuleProxyBase
 //=====================================================================
 
-// cppcheck-suppress passedByValue ; We take a value to move it into a member so no performance penalty
 ModuleProxyBase::ModuleProxyBase(std::string  moduleType, std::string  package) : m_moduleType(std::move(moduleType)),
   m_package(std::move(package))
 {

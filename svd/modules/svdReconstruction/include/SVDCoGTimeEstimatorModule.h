@@ -127,6 +127,8 @@ namespace Belle2 {
     /** Lookup table for SVDShaperDigit->SVDTrueHit relation */
     RelationLookup m_trueRelation;
 
+    /** Name of the SVDEventInfo object */
+    std::string m_svdEventInfoName;
     /** Name of the collection to use for the MCParticles */
     std::string m_storeMCParticlesName;
     /** Name of the collection to use for the SVDTrueHits */

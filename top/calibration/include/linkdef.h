@@ -6,5 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::TOPDatabaseImporter+;
+#pragma link C++ class Belle2::TOP::TOPLocalCalFitter-;
 
 #endif

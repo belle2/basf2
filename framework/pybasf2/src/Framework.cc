@@ -18,10 +18,12 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/database/DBStore.h>
+#include <framework/database/Database.h>
 #include <framework/pcore/pEventProcessor.h>
 #include <framework/pcore/ZMQEventProcessor.h>
 #include <framework/pcore/zmq/utils/ZMQAddressUtils.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/database/Configuration.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogSystem.h>
@@ -54,6 +56,8 @@ Framework::~Framework()
   //after Py_Finalize(). The framework object is cleaned up before, so this is a good place.
   ModuleManager::Instance().reset();
   DataStore::s_DoCleanup = false;
+  //Also the database configuration has things to cleanup before Py_Finalize()
+  Conditions::Configuration::getInstance().reset();
 }
 
 
@@ -144,6 +148,10 @@ void Framework::process(PathPtr startPath, long maxEvent)
     errors_from_previous_run = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
 
     DBStore::Instance().reset();
+    // Also, reset the Database connection itself. However don't reset the
+    // configuration, just the actual setup. In case the user runs process()
+    // again it will reinitialize correctly with the same settings.
+    Database::Instance().reset(true);
   } catch (std::exception& e) {
     B2ERROR("Uncaught exception encountered: " << e.what()); //should show module name
     DataStore::Instance().reset(); // ensure we are executed before ROOT's exit handlers

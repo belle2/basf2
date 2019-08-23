@@ -41,7 +41,7 @@ namespace Belle2 {
     }
 
     /** Pointer to a Muid object. */
-    Muid* m_muid;
+    Muid* m_muid = nullptr;
   };
 
   /** Test some setters and getters. */

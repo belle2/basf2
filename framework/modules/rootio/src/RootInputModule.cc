@@ -158,10 +158,7 @@ void RootInputModule::initialize()
           B2WARNING("File appears to be empty, skipping" << LogVar("filename", fileName));
           continue;
         }
-        // workaround for wrong isMC flag in raw data recorded before experiment 8 run 2364
-        if ((meta.getLfn().find("/belle/Raw/e000") == 0) && (meta.getExperimentHigh() <= 8)) {
-          meta.declareRealData();
-        }
+        realDataWorkaround(meta);
         fileMetaData.push_back(meta);
         // make sure we only look at data or MC. For the first file this is trivially true
         if (fileMetaData.front().isMC() != meta.isMC()) {
@@ -447,10 +444,7 @@ void RootInputModule::readTree()
     }
     // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
     readPersistentEntry(treeNum);
-    // workaround for wrong isMC flag in raw data recorded before experiment 8 run 2364
-    if ((fileMetaData->getLfn().find("/belle/Raw/e000") == 0) && (fileMetaData->getExperimentHigh() <= 8)) {
-      fileMetaData->declareRealData();
-    }
+    realDataWorkaround(*fileMetaData);
     B2INFO("Loading new input file"
            << LogVar("filename", m_tree->GetFile()->GetName())
            << LogVar("metadata LFN", fileMetaData->getLfn()));
@@ -745,5 +739,13 @@ void RootInputModule::readPersistentEntry(long fileEntry)
       entry->recoverFromNullObject();
       entry->ptr = nullptr;
     }
+  }
+}
+
+void RootInputModule::realDataWorkaround(FileMetaData& metaData)
+{
+  if ((metaData.getSite().find("bfe0") == 0) && (metaData.getDate().compare("2019-06-30") > 0) &&
+      (metaData.getExperimentLow() > 0) && (metaData.getExperimentHigh() < 9) && (metaData.getRunLow() > 0)) {
+    metaData.declareRealData();
   }
 }

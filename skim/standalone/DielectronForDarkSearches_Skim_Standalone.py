@@ -38,7 +38,7 @@ dielectron_path = Path()
 fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=dielectron_path)
 
-stdMu('all', path=dielectron_path)
+stdE('all', path=dielectron_path)
 
 dielectron_list = DielectronList(path=dielectron_path)
 skimOutputUdst(skimCode, dielectron_list, path=dielectron_path)

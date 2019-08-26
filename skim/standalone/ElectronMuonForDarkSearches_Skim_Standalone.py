@@ -38,6 +38,7 @@ dimuon_path = Path()
 fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=dimuon_path)
 
+stdE('all', path=dimuon_path)
 stdMu('all', path=dimuon_path)
 
 dimuon_list = ElectronMuonList(path=dimuon_path)

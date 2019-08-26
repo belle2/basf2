@@ -72,10 +72,10 @@ add_skim('SinglePhotonDark', SinglePhotonDarkList(path=darkskimpath), path=darks
 from skim.dark import DimuonForDarkSearchesList as DimuonList
 add_skim('DimuonForDarkSearches', DimuonList(path=darkskimpath), path=darkskimpath)
 
-from skm.dark import ElectronMuonForDarkSearchesList as ElectronMuonList
+from skim.dark import ElectronMuonForDarkSearchesList as ElectronMuonList
 add_skim('ElectronMuonForDarkSearches', ElectronMuonList(path=darkskimpath), path=darkskimpath)
 
-from skm.dark import DielectronForDarkSearchesList as DielectronList
+from skim.dark import DielectronForDarkSearchesList as DielectronList
 add_skim('DielectronForDarkSearches', DielectronList(path=darkskimpath), path=darkskimpath)
 
 setSkimLogging(path=darkskimpath)

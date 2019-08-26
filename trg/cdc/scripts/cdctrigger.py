@@ -56,10 +56,7 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
                     "If you really want to use shorttracks, load the specific network "
                     "weights in the Neurotrigger module!")
             exit()
-        if Belle2.Environment.Instance().isMC():
-            path.add_module('CDCTriggerNeuro', filename=Belle2.FileSystem.findFile('trg/cdc/data/Background2.0_20161207.root'))
-        else:
-            path.add_module('CDCTriggerNeuro')
+        path.add_module('CDCTriggerNeuro')
 
         path.add_module('CDCTriggerTrackCombiner',
                         thetaDefinition=thetaDef, zDefinition=zDef)

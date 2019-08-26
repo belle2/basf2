@@ -36,9 +36,7 @@ VariablesToExtraInfoModule::VariablesToExtraInfoModule()
            0);
 }
 
-VariablesToExtraInfoModule::~VariablesToExtraInfoModule()
-{
-}
+VariablesToExtraInfoModule::~VariablesToExtraInfoModule() = default;
 
 void VariablesToExtraInfoModule::initialize()
 {
@@ -83,8 +81,8 @@ void VariablesToExtraInfoModule::event()
       addExtraInfo(p, p);
     } else {
       std::vector<const Particle*> selparticles = m_pDDescriptor.getSelectionParticles(p);
-      for (unsigned int iDaug = 0; iDaug < selparticles.size(); iDaug++) {
-        Particle* daug = particles[selparticles[iDaug]->getArrayIndex()];
+      for (auto& selparticle : selparticles) {
+        Particle* daug = particles[selparticle->getArrayIndex()];
         addExtraInfo(p, daug);
       }
     }

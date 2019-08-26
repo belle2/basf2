@@ -18,12 +18,12 @@ using namespace Belle2;
 std::stack<const ReferenceFrame*> ReferenceFrame::m_reference_frames;
 
 
-RestFrame::RestFrame(const Particle* particle)
+RestFrame::RestFrame(const Particle* particle) :
+  m_momentum(particle->get4Vector()),
+  m_displacement(particle->getVertex()),
+  m_boost(m_momentum.BoostVector()),
+  m_lab2restframe(TLorentzRotation(-m_boost))
 {
-  m_momentum = particle->get4Vector();
-  m_displacement = particle->getVertex();
-  m_boost = m_momentum.BoostVector();
-  m_lab2restframe = TLorentzRotation(-m_boost);
 }
 
 const ReferenceFrame& ReferenceFrame::GetCurrent()
@@ -117,7 +117,7 @@ TVector3 CMSFrame::getVertex(const TVector3& vector) const
   // 2. Subtract movement of vertex end due to the time difference between
   //    the former simultaneous measured vertex points (see derivation of Lorentz contraction)
   TLorentzVector a = m_transform.rotateLabToCms() * TLorentzVector(vector, 0);
-  return a.Vect() - m_transform.getBoostVector().BoostVector() * a.T();
+  return a.Vect() - m_transform.getBoostVector() * a.T();
 }
 
 TLorentzVector CMSFrame::getMomentum(const TLorentzVector& vector) const
@@ -153,7 +153,7 @@ TMatrixFSym CMSFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
 
   TMatrixD timeshift(3, 4);
   timeshift.Zero();
-  auto boost_vector = m_transform.getBoostVector().BoostVector();
+  auto boost_vector = m_transform.getBoostVector();
   timeshift(0, 0) = 1;
   timeshift(1, 1) = 1;
   timeshift(2, 2) = 1;

@@ -190,6 +190,7 @@ int RFEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
   }
   if (m_pid_basf2 != 0) {
     printf("RFEventProcessor : killing basf2 pid=%d\n", m_pid_basf2);
+    //    kill(m_pid_basf2, SIGINT);
     kill(m_pid_basf2, SIGINT);
     waitpid(m_pid_basf2, &status, 0);
     m_pid_basf2 = 0;

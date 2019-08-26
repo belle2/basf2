@@ -34,12 +34,12 @@ namespace {
       m_a = {1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0, 3.0, 3.0, 3.0, 3.0, 4.0, 3.0, 4.0, 4.0, 4.0, 4.0};
     }
 
-    virtual unsigned int getNumberOfFeatures() const override { return 1; }
-    virtual unsigned int getNumberOfSpectators() const override { return 0; }
-    virtual unsigned int getNumberOfEvents() const override { return 20; }
-    virtual void loadEvent(unsigned int iEvent) override { m_input[0] = m_a[iEvent]; m_target = iEvent % 2; m_isSignal = m_target == 1; };
-    virtual float getSignalFraction() override { return 0.5; };
-    virtual std::vector<float> getFeature(unsigned int) override { return m_a; }
+    [[nodiscard]] unsigned int getNumberOfFeatures() const override { return 1; }
+    [[nodiscard]] unsigned int getNumberOfSpectators() const override { return 0; }
+    [[nodiscard]] unsigned int getNumberOfEvents() const override { return 20; }
+    void loadEvent(unsigned int iEvent) override { m_input[0] = m_a[iEvent]; m_target = iEvent % 2; m_isSignal = m_target == 1; };
+    float getSignalFraction() override { return 0.5; };
+    std::vector<float> getFeature(unsigned int) override { return m_a; }
 
     std::vector<float> m_a;
 

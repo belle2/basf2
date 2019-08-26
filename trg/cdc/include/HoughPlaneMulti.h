@@ -23,6 +23,7 @@
 namespace Belle2 {
 
 //#define N_LAYERS 64
+/// number of layers
 #define N_LAYERS 6
 
 /// A class to represent a Hough parameter plane.
@@ -46,8 +47,10 @@ namespace Belle2 {
   public:// Selectors
     /// returns # of active cells in the pattern.
     using TRGCDCHoughPlane::nActiveCellsInPattern; // to be checked
+    /// # of active cells in the pattern.
     virtual unsigned nActiveCellsInPattern(unsigned layerId) const;
 
+    /// dump debug info
     void dump(const std::string& message = std::string(""),
               const std::string& prefix = std::string("")) const override;
 
@@ -57,6 +60,7 @@ namespace Belle2 {
 
     /// vote
     using TRGCDCHoughPlaneBase::vote; // to be checked
+    /// vote
     void vote(float rx,
               float ry,
               float charge,
@@ -64,7 +68,9 @@ namespace Belle2 {
               unsigned weight,
               unsigned layerId);
     // using TRGCDCHoughPlaneBase::vote; // to be checked
+    /// vote
     void vote(float phi, unsigned layerId, int weight);
+    /// merge function
     void merge(void);
 
     /// registers a pattern..
@@ -72,8 +78,11 @@ namespace Belle2 {
 
   private:
 //  AList<TRGCDCHoughPlane> _layers;
+    /// number of layers
     unsigned _nLayers;
+    /// layers of TRGCDCHoughPlane
     TRGCDCHoughPlane* _layers[N_LAYERS];
+    /// usage of each layer
     bool _usage[N_LAYERS];
   };
 

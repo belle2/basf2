@@ -9,7 +9,7 @@
 #pragma link C++ class Belle2::EventExtraInfo+;
 #pragma link C++ class Belle2::ParticleList+;
 #pragma link C++ class Belle2::RestOfEvent+;
-#pragma link C++ class Belle2::Vertex+;
+#pragma link C++ class Belle2::TagVertex+;
 #pragma link C++ class Belle2::ContinuumSuppression+;
 #pragma link C++ class Belle2::FlavorTaggerInfo+;
 #pragma link C++ class Belle2::FlavorTaggerInfoMap+;
@@ -28,5 +28,6 @@
 #pragma link C++ class Belle2::ParticleExtraInfoMap::IndexMap+;
 #pragma link C++ class map<string, unsigned int>+;
 #pragma link C++ class vector<map<string, unsigned int> >+;
+#pragma link C++ class Belle2::Btube+;
 
 #endif

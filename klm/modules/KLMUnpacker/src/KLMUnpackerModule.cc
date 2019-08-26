@@ -12,7 +12,7 @@
 #include <cstdint>
 
 /* Belle2 headers. */
-#include <bklm/dbobjects/BKLMElectronicMapping.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/modules/KLMUnpacker/KLMUnpackerModule.h>
 #include <klm/rawdata/RawData.h>
 #include <framework/datastore/DataStore.h>
@@ -41,8 +41,6 @@ KLMUnpackerModule::KLMUnpackerModule() : Module(),
   addParam("IgnoreStrip0", m_IgnoreStrip0,
            "Ignore hits with strip = 0 (normally expected for certain firmware "
            "versions).", true);
-  addParam("useDefaultModuleId", m_useDefaultModuleId,
-           "Use default module id if not found in mapping.", true);
   addParam("keepEvenPackages", m_keepEvenPackages,
            "Keep packages that have even length normally indicating that "
            "data was corrupted ", false);
@@ -51,8 +49,6 @@ KLMUnpackerModule::KLMUnpackerModule() : Module(),
            "marked as bad.", double(140.0));
   addParam("loadThresholdFromDB", m_loadThresholdFromDB,
            "Load threshold from database (true) or not (false)", true);
-  addParam("loadMapFromDB", m_loadMapFromDB,
-           "Whether load electronic map from database", true);
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
@@ -75,8 +71,6 @@ void KLMUnpackerModule::initialize()
   m_DigitEventInfos.registerRelationTo(m_bklmDigits);
   m_DigitEventInfos.registerRelationTo(m_bklmDigitOutOfRanges);
 
-  if (m_loadMapFromDB)
-    loadMapFromDB();
   /* EKLM. */
   m_eklmDigits.registerInDataStore(m_outputEKLMDigitsName);
   m_DigitEventInfos.registerInDataStore();
@@ -85,14 +79,12 @@ void KLMUnpackerModule::initialize()
 
 void KLMUnpackerModule::beginRun()
 {
-  if (!m_ElectronicsMap.isValid())
+  if (!m_eklmElectronicsMap.isValid())
     B2FATAL("No EKLM electronics map.");
   if (!m_TimeConversion.isValid())
     B2FATAL("EKLM time conversion parameters are not available.");
   if (!m_Channels.isValid())
     B2FATAL("EKLM channel data are not available.");
-  if (m_loadMapFromDB)
-    loadMapFromDB();
   if (m_loadThresholdFromDB)
     m_scintThreshold = m_ADCParams->getADCThreshold();
   m_triggerCTimeOfPreviousEvent = 0;
@@ -102,9 +94,11 @@ void KLMUnpackerModule::unpackEKLMDigit(
   const int* rawData, EKLMDataConcentratorLane* lane,
   KLMDigitEventInfo* klmDigitEventInfo)
 {
-  int endcap, layer, sector, strip = 0, stripGlobal;
+  int section, layer, sector, strip = 0;
   KLM::RawData raw;
   KLM::unpackRawData(rawData, &raw, nullptr, nullptr, false);
+  if ((raw.triggerBits & 0x10) != 0)
+    return;
   /**
    * The possible values of the strip number in the raw data are
    * from 0 to 127, while the actual range of strip numbers is from
@@ -133,7 +127,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
    * always correct.
    */
   lane->setLane(raw.lane);
-  const int* sectorGlobal = m_ElectronicsMap->getSectorByLane(lane);
+  const int* sectorGlobal = m_eklmElectronicsMap->getSectorByLane(lane);
   if (sectorGlobal == nullptr) {
     if (!m_IgnoreWrongHits) {
       B2ERROR("Lane does not exist in the EKLM electronics map."
@@ -143,30 +137,29 @@ void KLMUnpackerModule::unpackEKLMDigit(
     }
     if (!m_WriteWrongHits)
       return;
-    endcap = 0;
+    section = 0;
     layer = 0;
     sector = 0;
     correctHit = false;
   } else {
     m_ElementNumbers->sectorNumberToElementNumbers(
-      *sectorGlobal, &endcap, &layer, &sector);
+      *sectorGlobal, &section, &layer, &sector);
   }
   EKLMDigit* eklmDigit = m_eklmDigits.appendNew();
   eklmDigit->addRelationTo(klmDigitEventInfo);
   eklmDigit->setCTime(raw.ctime);
   eklmDigit->setTDC(raw.tdc);
   eklmDigit->setTime(
-    m_TimeConversion->getTime(raw.ctime, raw.tdc,
-                              klmDigitEventInfo->getTriggerCTime(), true));
-  eklmDigit->setEndcap(endcap);
+    m_TimeConversion->getScintillatorTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
+  eklmDigit->setSection(section);
   eklmDigit->setLayer(layer);
   eklmDigit->setSector(sector);
   eklmDigit->setPlane(plane);
   eklmDigit->setStrip(strip);
   eklmDigit->setCharge(raw.charge);
   if (correctHit) {
-    stripGlobal = m_ElementNumbers->stripNumber(
-                    endcap, layer, sector, plane, strip);
+    int stripGlobal = m_ElementNumbers->stripNumber(
+                        section, layer, sector, plane, strip);
     const EKLMChannelData* channelData =
       m_Channels->getChannelData(stripGlobal);
     if (channelData == nullptr)
@@ -185,34 +178,51 @@ void KLMUnpackerModule::unpackBKLMDigit(
   KLM::RawData raw;
   KLMDigitRaw* klmDigitRaw;
   KLM::unpackRawData(rawData, &raw, &m_klmDigitRaws, &klmDigitRaw, true);
-  int electId = electCooToInt(copper - BKLM_ID, hslb,
-                              raw.lane, raw.axis, raw.channel);
-  int moduleId = 0;
-  bool outRange = false;
-  if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {
-    if (!m_useDefaultModuleId) {
-      B2DEBUG(20, "KLMUnpackerModule:: could not find in mapping"
-              << LogVar("Copper", copper)
-              << LogVar("Finesse", hslb + 1)
-              << LogVar("Lane", raw.lane)
-              << LogVar("Axis", raw.axis));
+  const uint16_t* detectorChannel;
+  BKLMElectronicsChannel electronicsChannel(
+    copper, hslb + 1, raw.lane, raw.axis, raw.channel);
+  detectorChannel =
+    m_bklmElectronicsMap->getDetectorChannel(&electronicsChannel);
+  if (detectorChannel == nullptr) {
+    B2DEBUG(20, "KLMUnpackerModule:: could not find in mapping"
+            << LogVar("Copper", copper)
+            << LogVar("Finesse", hslb + 1)
+            << LogVar("Lane", raw.lane)
+            << LogVar("Axis", raw.axis));
+    if (!m_WriteWrongHits)
       return;
-    } else {
-      moduleId = getDefaultModuleId(copper, hslb, raw.lane,
-                                    raw.axis, raw.channel, outRange);
-    }
-  } else {
-    // found moduleId in the mapping
-    moduleId = m_electIdToModuleId[electId];
+    /* Find channel from the same module. */
+    electronicsChannel.setAxis(0);
+    /* Phi-plane channels may start from 3 or 5. */
+    electronicsChannel.setChannel(5);
+    detectorChannel = m_bklmElectronicsMap->getDetectorChannel(&electronicsChannel);
+    if (detectorChannel != nullptr) {
+      // increase by 1 the event-counter of outOfRange-flagged hits
+      klmDigitEventInfo->increaseOutOfRangeHits();
 
-    // only channel and inRpc flag are not set yet
+      // store the digit in the appropriate dataobject
+      int moduleId = *detectorChannel;
+      BKLMDigitOutOfRange* bklmDigitOutOfRange =
+        m_bklmDigitOutOfRanges.appendNew(
+          moduleId, raw.ctime, raw.tdc, raw.charge);
+      bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
+      klmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
+
+      std::string message = "channel number is out of range";
+      m_rejected[message] += 1;
+      m_rejectedCount++;
+      B2DEBUG(21, "KLMUnpackerModule:: raw channel number is out of range"
+              << LogVar("Channel", raw.channel));
+
+    }
+    return;
   }
 
   // moduleId counts are zero based
+  int moduleId = *detectorChannel;
   int layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
-  // int sector = (moduleId & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT;
-  // int isForward = (moduleId & BKLM_END_MASK) >> BKLM_END_BIT;
-  // int plane = (moduleId & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;
+  if ((layer < 2) && ((raw.triggerBits & 0x10) != 0))
+    return;
   int channel = (moduleId & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT;
 
   if (layer > 14) {
@@ -221,43 +231,30 @@ void KLMUnpackerModule::unpackBKLMDigit(
     return;
   }
 
-  if (outRange) {
-    // increase by 1 the event-counter of outOfRange-flagged hits
-    klmDigitEventInfo->increaseOutOfRangeHits();
-
-    // store the digit in the appropriate dataobject
-    BKLMDigitOutOfRange* bklmDigitOutOfRange =
-      m_bklmDigitOutOfRanges.appendNew(
-        moduleId, raw.ctime, raw.tdc, raw.charge);
-    bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
-    klmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
-
-    std::string message = "channel number is out of range";
-    m_rejected[message] += 1;
-    m_rejectedCount++;
-    B2DEBUG(21, "KLMUnpackerModule:: channel number is out of range"
-            << LogVar("Channel", channel));
-    return;
-  }
-
   // still have to add channel and axis to moduleId
+  moduleId |= (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
+
+  BKLMDigit* bklmDigit;
   if (layer > 1) {
     moduleId |= BKLM_INRPC_MASK;
     klmDigitEventInfo->increaseRPCHits();
-  } else
+    // For RPC hits, digitize both the coarse (ctime) and fine (tdc) times relative
+    // to the revo9 trigger time rather than the event header's TriggerCTime.
+    // For the fine-time (tdc) measurement (11 bits), shift the revo9Trig time by
+    // 10 ticks to align the new prompt-time peak with the TriggerCtime-relative peak.
+    float triggerTime = klmDigitEventInfo->getRevo9TriggerWord();
+    std::pair<int, double> rpcTimes = m_TimeConversion->getRPCTimes(raw.ctime, raw.tdc, triggerTime);
+    bklmDigit = m_bklmDigits.appendNew(moduleId, rpcTimes.first, raw.tdc, raw.charge);
+    bklmDigit->setTime(rpcTimes.second);
+  } else {
     klmDigitEventInfo->increaseSciHits();
-  // moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
-  moduleId |= (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
-
-  BKLMDigit* bklmDigit =
-    m_bklmDigits.appendNew(moduleId, raw.ctime, raw.tdc, raw.charge);
-  bklmDigit->setTime(
-    m_TimeConversion->getTime(raw.ctime, raw.tdc,
-                              klmDigitEventInfo->getTriggerCTime(),
-                              layer <= 1));
-  if (layer < 2 && (raw.charge < m_scintThreshold))
-    bklmDigit->isAboveThreshold(true);
-
+    // For scintillator hits, store the ctime relative to the event header's trigger ctime
+    bklmDigit = m_bklmDigits.appendNew(moduleId, raw.ctime, raw.tdc, raw.charge);
+    bklmDigit->setTime(
+      m_TimeConversion->getScintillatorTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
+    if (raw.charge < m_scintThreshold)
+      bklmDigit->isAboveThreshold(true);
+  }
   bklmDigit->addRelationTo(klmDigitRaw);
   klmDigitEventInfo->addRelationTo(bklmDigit);
 }
@@ -309,12 +306,15 @@ void KLMUnpackerModule::event()
         }
         if (numDetNwords > 0) {
           /*
-           * In the last word there is the user word
-           * (from data concentrators).
+           * In the last word there are the revo9 trigger word
+          * and the the user word (both from DCs).
            */
-          int userWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
+          unsigned int revo9TriggerWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
+          klmDigitEventInfo->setRevo9TriggerWord(revo9TriggerWord);
+          unsigned int userWord = buf_slot[numDetNwords - 1] & 0xFFFF;
           klmDigitEventInfo->setUserWord(userWord);
         } else {
+          klmDigitEventInfo->setRevo9TriggerWord(0);
           klmDigitEventInfo->setUserWord(0);
         }
         for (int iHit = 0; iHit < numHits; iHit++) {
@@ -340,245 +340,4 @@ void KLMUnpackerModule::terminate()
   for (const auto& message : m_rejected) {
     B2DEBUG(20, "KLMUnpackerModule:: " << message.first << " (occured " << message.second << " times)");
   }
-}
-
-void KLMUnpackerModule::loadMapFromDB()
-{
-  B2DEBUG(29, "KLMUnpackerModule:: reading from database...");
-
-  DBArray<BKLMElectronicMapping> elements;
-  for (const auto& element : elements) {
-    B2DEBUG(29, "KLMUnpackerModule:: version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " <<
-            element.getCopperId() <<
-            ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
-            ", isForward = " << element.getIsForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
-            " plane(z/phi) = " << element.getPlane());
-
-    int copperId = element.getCopperId();
-    int slotId = element.getSlotId();
-    int laneId = element.getLaneId();
-    int axisId = element.getAxisId();
-    int channelId = element.getChannelId();
-    int sector = element.getSector();
-    int isForward = element.getIsForward();
-    int layer = element.getLayer();
-    int plane =  element.getPlane();
-    int stripId = element.getStripId();
-    int elecId = electCooToInt(copperId - BKLM_ID, slotId - 1 , laneId, axisId, channelId);
-    int moduleId = 0;
-
-    moduleId = (isForward ? BKLM_END_MASK : 0)
-               | ((sector - 1) << BKLM_SECTOR_BIT)
-               | ((layer - 1) << BKLM_LAYER_BIT)
-               | ((plane) << BKLM_PLANE_BIT)
-               | ((stripId - 1) << BKLM_STRIP_BIT);
-    m_electIdToModuleId[elecId] = moduleId;
-
-    B2DEBUG(29, "KLMUnpackerModule:: electId: " << elecId << " moduleId: " << moduleId);
-  }
-}
-
-int KLMUnpackerModule::electCooToInt(int copper, int finesse, int lane, int axis, int channel)
-{
-  // there are at most 16 coppers --> 4 bit
-  // 4 finesse --> 2 bit
-  // < 20 lanes --> 5 bit
-  // axis --> 1 bit
-  // channel --> 6 bit
-  int ret = 0;
-  copper = copper & 0xF;
-  ret |= copper;
-  finesse = finesse & 3;
-  ret |= (finesse << 4);
-  lane = lane & 0x1F;
-  ret |= (lane << 6);
-  axis = axis & 0x1;
-  ret |= (axis << 11);
-  channel = channel & 0x3F;
-  ret |= (channel << 12);
-
-  return ret;
-}
-
-/*void KLMUnpackerModule::intToElectCoo(int id, int& copper, int& finesse, int& lane)
-{
-  copper = 0;
-  finesse = 0;
-  lane = 0;
-  copper = (id & 0xF);
-  finesse = (id >> 4) & 3;
-  lane = 0;
-  lane = (id >> 6) & 0xF;
-}*/
-
-int KLMUnpackerModule::getDefaultModuleId(int copperId, int finesse, int lane, int axis, int channel, bool& outOfRange)
-{
-  int sector = 0;
-  int isForward = 0;
-  int layer = 0;
-  int plane = 0;
-  int stripId = 0;
-
-  if (copperId == 117440513 || copperId == 117440514)
-    isForward = 1;
-  if (copperId == 117440515 || copperId == 117440516)
-    isForward = 0;
-  if (copperId == 117440513 || copperId == 117440515)
-    sector = finesse + 3;
-  if (copperId == 117440514 || copperId == 117440516)
-    sector = (finesse + 7 > 8) ? finesse - 1 : finesse + 7;
-
-  if (lane > 2)
-    layer = lane - 5;
-  else
-    layer = lane;
-  if (lane > 2)
-    plane = axis;
-  else {
-    if (axis == 0)
-      plane = 1;
-    else
-      plane = 0;
-  }
-
-  stripId =  getChannel(isForward, sector, layer, plane, channel);
-  stripId =  flipChannel(isForward, sector, layer, plane, stripId, outOfRange);
-
-  // attention: moduleId counts are zero based
-  int moduleId = (isForward ? BKLM_END_MASK : 0)
-                 | (uint(sector - 1) << BKLM_SECTOR_BIT)
-                 | ((layer - 1) << BKLM_LAYER_BIT)
-                 | ((plane) << BKLM_PLANE_BIT)
-                 | ((stripId - 1) << BKLM_STRIP_BIT);
-
-  return moduleId;
-}
-
-unsigned short KLMUnpackerModule::getChannel(int isForward, int sector, int layer, int axis, unsigned short channel)
-{
-  if (axis == 0 && layer < 3) { //scintillator z
-    if (isForward == 0 && sector == 3) { //sector #3 is the top sector, backward sector#3 is the chimney sector.
-      if (layer == 1) {
-        if (channel > 8 && channel < 16)
-          channel = 0;
-        else if (channel > 0 && channel < 9)
-          channel = 9 - channel;
-        else if (channel > 30 && channel < 46)
-          channel = 54 - channel;
-        else if (channel > 15 && channel < 31)
-          channel = 54 - channel;
-      } else if (layer == 2) {
-        if (channel == 16)
-          channel = 0;
-        else if (channel > 9 && channel < 16)
-          channel = 0;
-        else if (channel > 0 && channel < 10)
-          channel = 10 - channel;
-        else if (channel > 16 && channel < 31)
-          channel = 40 - channel;
-        else if (channel > 30 && channel < 46)
-          channel = 69 - channel;
-      }
-    } else { //all sectors except backward sector#3
-      if (channel > 0 && channel < 16)
-        channel = 15 - channel + 1;
-      else if (channel > 15 && channel < 31)
-        channel = 45 - channel + 1;
-      else if (channel > 30 && channel < 46)
-        channel = 75 - channel + 1;
-      else if (channel > 45 && channel < 61)
-        channel = 105 - channel + 1;
-    }
-  }
-
-  if (layer == 1) {
-    if (axis == 1) { //phi strips
-      if (channel > 0 && channel < 5)
-        channel = 0;
-      //else channel = channel - 4;
-      if (channel > 4 && channel < 42)
-        channel = channel - 4;
-      //if(channel>41) channel=0;
-      if (channel > 41)
-        channel = channel - 4;
-    }
-
-    if (axis == 0 && !(isForward == 0 && sector == 3)) { //z strips
-      //if (channel > 0 && channel < 10) channel = channel;
-      if (channel > 0 && channel < 7)
-        channel = 0;
-      if (channel > 6 && channel < 61)
-        channel = channel - 6;
-      if (channel > 60)
-        channel = channel - 6;
-    }
-  }
-  if (layer == 2) {
-    if (axis == 1) { //phi
-      if (channel > 0 && channel < 3)
-        channel = 0;
-      if (channel > 2 && channel < 45)
-        channel = channel - 2;
-      if (channel > 44)
-        channel = channel - 2;;
-    }
-    if (axis == 0 && !(isForward == 0 && sector == 3)) {
-      //if (channel > 0 && channel < 10) channel = channel;
-      if (channel > 0 && channel < 7)
-        channel = 0;
-      if (channel > 6 && channel < 61)
-        channel = channel - 6;
-      if (channel > 60)
-        channel = channel - 6;;
-    }
-
-  }
-  //if (layer > 2) channel = channel + 1;
-  //if (sector == 3 && layer > 2 && layer < 16) channel = channel + 1;
-  //if (sector == 7 && layer > 2 && layer < 16) channel = channel;
-
-  return channel;
-}
-
-unsigned short KLMUnpackerModule::flipChannel(int isForward, int sector, int layer, int plane, unsigned short channel,
-                                              bool& isOutRange)
-{
-  isOutRange = false;
-  int MaxiChannel = 0;
-
-  if (!isForward && sector == 3 && plane == 0) {
-    if (layer < 3)
-      MaxiChannel = 38;
-    if (layer > 2)
-      MaxiChannel = 34;
-  } else {
-    if (layer == 1 && plane == 1)
-      MaxiChannel = 37;
-    if (layer == 2 && plane == 1)
-      MaxiChannel = 42;
-    if (layer > 2 && layer < 7 && plane == 1)
-      MaxiChannel = 36;
-    if (layer > 6 && plane == 1)
-      MaxiChannel = 48;
-    //z plane
-    if (layer == 1 && plane == 0)
-      MaxiChannel = 54;
-    if (layer == 2 && plane == 0)
-      MaxiChannel = 54;
-    if (layer > 2 && plane == 0)
-      MaxiChannel = 48;
-  }
-
-  bool dontFlip = false;
-  if (isForward && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2))
-    dontFlip = true;
-  if (!isForward && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7))
-    dontFlip = true;
-  if (!(dontFlip && layer > 2 && plane == 1) && (channel > 0 && channel < (MaxiChannel + 1)))
-    channel = MaxiChannel - channel + 1;
-
-  if (channel < 1 || channel > MaxiChannel)
-    isOutRange = true;
-
-  return channel;
 }

@@ -14,13 +14,14 @@
 #include <string>
 
 /* Belle2 headers. */
-#include <bklm/dataobjects/BKLMDigit.h>
-#include <bklm/dataobjects/BKLMDigitOutOfRange.h>
-#include <bklm/dbobjects/BKLMADCThreshold.h>
-#include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/dataobjects/ElementNumbersSingleton.h>
-#include <eklm/dbobjects/EKLMChannels.h>
-#include <eklm/dbobjects/EKLMElectronicsMap.h>
+#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/dataobjects/BKLMDigitOutOfRange.h>
+#include <klm/bklm/dbobjects/BKLMADCThreshold.h>
+#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+#include <klm/eklm/dbobjects/EKLMChannels.h>
+#include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/core/Module.h>
@@ -96,25 +97,6 @@ namespace Belle2 {
                          KLMDigitEventInfo* klmDigitEventInfo);
 
     /**
-     * Fill m_electIdToModuleId from database.
-     */
-    void loadMapFromDB();
-
-    /**
-     * In case the module id is not found in the mapping and useDefaultModuleId
-     * flag is set, this computes the default module id from the lane and
-     * the axis. Sector etc are set to 0.
-     *
-     * @param lane
-     * The lane number, giving for the rpcs the slot number in the crate.
-     *
-     * @param axis
-     * Z or phi.
-     */
-    int getDefaultModuleId(int copperId, int finesse, int lane, int axis,
-                           int channel, bool& outOfRange);
-
-    /**
      * To be used to map electronics address to module id.
      *
      * @param copperId
@@ -130,18 +112,6 @@ namespace Belle2 {
      * The axis bit in the datapacket.
      */
     int electCooToInt(int copper, int finesse, int lane, int axis, int channel);
-
-    /**
-     * Remap the channel ID for scitilators and RPCs.
-     */
-    unsigned short getChannel(int isForward, int sector, int layer, int plane,
-                              unsigned short channel);
-
-    /**
-     * Handle 0-->max max-->0 channel number flip between software and detector.
-     */
-    unsigned short flipChannel(int isForward, int sector, int layer, int plane,
-                               unsigned short channel, bool& isOutRange);
 
     /* Module parameters. */
 
@@ -173,12 +143,6 @@ namespace Belle2 {
     /** The flag to keep the even packages. */
     bool m_keepEvenPackages = false;
 
-    /** Use default module id, if not found in mapping file. */
-    bool m_useDefaultModuleId = false;
-
-    /** Use electronic map from DataBase or not. */
-    bool m_loadMapFromDB = true;
-
     /** Load threshold from DataBase (true) or not (false). */
     bool m_loadThresholdFromDB = true;
 
@@ -199,7 +163,7 @@ namespace Belle2 {
     /* EKLM database objects. */
 
     /** Electronics map. */
-    DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
+    DBObjPtr<EKLMElectronicsMap> m_eklmElectronicsMap;
 
     /** Channels. */
     DBObjPtr<EKLMChannels> m_Channels;
@@ -209,8 +173,8 @@ namespace Belle2 {
 
     /* BKLM database objects. */
 
-    /** Map: hardware coordinates to logical coordinates. */
-    std::map<int, int> m_electIdToModuleId;
+    /** Electronics map. */
+    DBObjPtr<BKLMElectronicsMap> m_bklmElectronicsMap;
 
     /** ADC offset and threshold read from database. */
     DBObjPtr<BKLMADCThreshold> m_ADCParams;

@@ -5,6 +5,91 @@ from basf2 import *
 from ROOT import Belle2
 
 
+def add_pxd_unpacker(path):
+    pxdunpacker = register_module('PXDUnpacker')
+    path.add_module(pxdunpacker)
+
+    pxderrorcheck = register_module('PXDPostErrorChecker')
+    path.add_module(pxderrorcheck)
+
+    pxdhitsorter = register_module('PXDRawHitSorter')
+    path.add_module(pxdhitsorter)
+    if 'ActivatePXDPixelMasker' not in [e.name() for e in path.modules()]:
+        path.add_module('ActivatePXDPixelMasker')
+
+
+def add_pxd_packer(path):
+    pxdpacker = register_module('PXDPacker')
+    pxdpacker.param('dhe_to_dhc', [
+        [
+            0,
+            2,
+            4,
+            34,
+            36,
+            38,
+        ],
+        [
+            1,
+            6,
+            8,
+            40,
+            42,
+            44,
+        ],
+        [
+            2,
+            10,
+            12,
+            46,
+            48,
+            50,
+        ],
+        [
+            3,
+            14,
+            16,
+            52,
+            54,
+            56,
+        ],
+        [
+            4,
+            3,
+            5,
+            35,
+            37,
+            39,
+        ],
+        [
+            5,
+            7,
+            9,
+            41,
+            43,
+            45,
+        ],
+        [
+            6,
+            11,
+            13,
+            47,
+            49,
+            51,
+        ],
+        [
+            7,
+            15,
+            17,
+            53,
+            55,
+            57,
+        ],
+    ])
+
+    path.add_module(pxdpacker)
+
+
 def add_pxd_reconstruction(path, clusterName=None, digitsName=None, usePXDClusterShapes=False):
 
     if usePXDClusterShapes:
@@ -23,7 +108,12 @@ def add_pxd_reconstruction(path, clusterName=None, digitsName=None, usePXDCluste
         path.add_module(clusterizer)
 
 
-def add_pxd_simulation(path, digitsName=None):
+def add_pxd_simulation(path, digitsName=None, activatePixelMasks=True, activateGainCorrection=True):
+
+    if activatePixelMasks and 'ActivatePXDPixelMasker' not in [e.name() for e in path.modules()]:
+        path.add_module('ActivatePXDPixelMasker')
+    if activateGainCorrection and 'ActivatePXDGainCalibrator' not in [e.name() for e in path.modules()]:
+        path.add_module('ActivatePXDGainCalibrator')
 
     digitizer = register_module('PXDDigitizer')
     if digitsName:

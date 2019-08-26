@@ -15,7 +15,7 @@ using namespace Belle2;
 using namespace Belle2::analysis;
 using namespace CLHEP;
 
-MassPointingVertexFitKFit::MassPointingVertexFitKFit(void):
+MassPointingVertexFitKFit::MassPointingVertexFitKFit():
   m_BeforeVertex(HepPoint3D(0., 0., 0.)),
   m_AfterVertexError(HepSymMatrix(3, 0)),
   m_ProductionVertex(HepPoint3D(0., 0., 0.))
@@ -29,9 +29,7 @@ MassPointingVertexFitKFit::MassPointingVertexFitKFit(void):
 }
 
 
-MassPointingVertexFitKFit::~MassPointingVertexFitKFit(void)
-{
-}
+MassPointingVertexFitKFit::~MassPointingVertexFitKFit() = default;
 
 
 enum KFitError::ECode
@@ -59,7 +57,7 @@ MassPointingVertexFitKFit::setProductionVertex(const HepPoint3D& v) {
 
 
 enum KFitError::ECode
-MassPointingVertexFitKFit::fixMass(void) {
+MassPointingVertexFitKFit::fixMass() {
   m_IsFixMass.push_back(true);
 
   return m_ErrorCode = KFitError::kNoError;
@@ -67,7 +65,7 @@ MassPointingVertexFitKFit::fixMass(void) {
 
 
 enum KFitError::ECode
-MassPointingVertexFitKFit::unfixMass(void) {
+MassPointingVertexFitKFit::unfixMass() {
   m_IsFixMass.push_back(false);
 
   return m_ErrorCode = KFitError::kNoError;
@@ -81,7 +79,7 @@ MassPointingVertexFitKFit::setCorrelation(const HepMatrix& m) {
 
 
 enum KFitError::ECode
-MassPointingVertexFitKFit::setZeroCorrelation(void) {
+MassPointingVertexFitKFit::setZeroCorrelation() {
   return KFitBase::setZeroCorrelation();
 }
 
@@ -106,21 +104,21 @@ MassPointingVertexFitKFit::getVertex(const int flag) const
 
 
 const HepSymMatrix
-MassPointingVertexFitKFit::getVertexError(void) const
+MassPointingVertexFitKFit::getVertexError() const
 {
   return m_AfterVertexError;
 }
 
 
 double
-MassPointingVertexFitKFit::getInvariantMass(void) const
+MassPointingVertexFitKFit::getInvariantMass() const
 {
   return m_InvariantMass;
 }
 
 
 double
-MassPointingVertexFitKFit::getCHIsq(void) const
+MassPointingVertexFitKFit::getCHIsq() const
 {
   return m_CHIsq;
 }
@@ -198,13 +196,13 @@ MassPointingVertexFitKFit::getCorrelation(const int id1, const int id2, const in
 
 
 enum KFitError::ECode
-MassPointingVertexFitKFit::doFit(void) {
+MassPointingVertexFitKFit::doFit() {
   return KFitBase::doFit2();
 }
 
 
 enum KFitError::ECode
-MassPointingVertexFitKFit::prepareInputMatrix(void) {
+MassPointingVertexFitKFit::prepareInputMatrix() {
   if (m_TrackCount > KFitConst::kMaxTrackCount)
   {
     m_ErrorCode = KFitError::kBadTrackSize;
@@ -231,24 +229,24 @@ MassPointingVertexFitKFit::prepareInputMatrix(void) {
   m_property = HepMatrix(m_TrackCount, 3, 0);
   m_V_al_0   = HepSymMatrix(KFitConst::kNumber7 * m_TrackCount, 0);
 
-  for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it)
+  for (auto& track : m_Tracks)
   {
     // momentum x,y,z,E and position x,y,z
-    m_al_0[index * KFitConst::kNumber7 + 0][0] = it->getMomentum(KFitConst::kBeforeFit).x();
-    m_al_0[index * KFitConst::kNumber7 + 1][0] = it->getMomentum(KFitConst::kBeforeFit).y();
-    m_al_0[index * KFitConst::kNumber7 + 2][0] = it->getMomentum(KFitConst::kBeforeFit).z();
-    m_al_0[index * KFitConst::kNumber7 + 3][0] = it->getMomentum(KFitConst::kBeforeFit).t();
-    m_al_0[index * KFitConst::kNumber7 + 4][0] = it->getPosition(KFitConst::kBeforeFit).x();
-    m_al_0[index * KFitConst::kNumber7 + 5][0] = it->getPosition(KFitConst::kBeforeFit).y();
-    m_al_0[index * KFitConst::kNumber7 + 6][0] = it->getPosition(KFitConst::kBeforeFit).z();
+    m_al_0[index * KFitConst::kNumber7 + 0][0] = track.getMomentum(KFitConst::kBeforeFit).x();
+    m_al_0[index * KFitConst::kNumber7 + 1][0] = track.getMomentum(KFitConst::kBeforeFit).y();
+    m_al_0[index * KFitConst::kNumber7 + 2][0] = track.getMomentum(KFitConst::kBeforeFit).z();
+    m_al_0[index * KFitConst::kNumber7 + 3][0] = track.getMomentum(KFitConst::kBeforeFit).t();
+    m_al_0[index * KFitConst::kNumber7 + 4][0] = track.getPosition(KFitConst::kBeforeFit).x();
+    m_al_0[index * KFitConst::kNumber7 + 5][0] = track.getPosition(KFitConst::kBeforeFit).y();
+    m_al_0[index * KFitConst::kNumber7 + 6][0] = track.getPosition(KFitConst::kBeforeFit).z();
     // these error
-    m_V_al_0.sub(index * KFitConst::kNumber7 + 1, it->getError(KFitConst::kBeforeFit));
+    m_V_al_0.sub(index * KFitConst::kNumber7 + 1, track.getError(KFitConst::kBeforeFit));
     // charge, mass, a
-    m_property[index][0] =  it->getCharge();
-    m_property[index][1] =  it->getMass();
+    m_property[index][0] =  track.getCharge();
+    m_property[index][1] =  track.getMass();
     const double c = KFitConst::kLightSpeed; // C++ bug?
     // m_property[index][2] = - it->getCharge() * KFitConst::kLightSpeed * m_MagneticField;
-    m_property[index][2] = -c * m_MagneticField * it->getCharge();
+    m_property[index][2] = -c * m_MagneticField * track.getCharge();
     index++;
   }
 
@@ -285,7 +283,7 @@ MassPointingVertexFitKFit::prepareInputMatrix(void) {
 
 
 enum KFitError::ECode
-MassPointingVertexFitKFit::prepareInputSubMatrix(void) {
+MassPointingVertexFitKFit::prepareInputSubMatrix() {
   // vertex
   for (int i = 0; i < 3; i++) m_v[i][0] = m_v_a[i][0];
 
@@ -294,7 +292,7 @@ MassPointingVertexFitKFit::prepareInputSubMatrix(void) {
 
 
 enum KFitError::ECode
-MassPointingVertexFitKFit::prepareCorrelation(void) {
+MassPointingVertexFitKFit::prepareCorrelation() {
   if (m_BeforeCorrelation.size() != static_cast<unsigned int>(m_TrackCount * (m_TrackCount - 1) / 2))
   {
     m_ErrorCode = KFitError::kBadCorrelationSize;
@@ -304,10 +302,8 @@ MassPointingVertexFitKFit::prepareCorrelation(void) {
 
   int row = 0, col = 0;
 
-  for (vector<HepMatrix>::const_iterator it = m_BeforeCorrelation.begin(), endIt = m_BeforeCorrelation.end(); it != endIt; ++it)
+  for (auto& hm : m_BeforeCorrelation)
   {
-    const HepMatrix& hm = *it;
-
     // counter
     row++;
     if (row == m_TrackCount) {
@@ -331,12 +327,11 @@ MassPointingVertexFitKFit::prepareCorrelation(void) {
 
 
 enum KFitError::ECode
-MassPointingVertexFitKFit::prepareOutputMatrix(void) {
+MassPointingVertexFitKFit::prepareOutputMatrix() {
   Hep3Vector h3v;
   int index = 0;
-  for (vector<KFitTrack>::iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it)
+  for (auto& pdata : m_Tracks)
   {
-    KFitTrack& pdata = *it;
     // tracks
     // momentum
     h3v.setX(m_al_1[index * KFitConst::kNumber7 + 0][0]);
@@ -390,7 +385,7 @@ MassPointingVertexFitKFit::prepareOutputMatrix(void) {
 
 
 enum KFitError::ECode
-MassPointingVertexFitKFit::makeCoreMatrix(void) {
+MassPointingVertexFitKFit::makeCoreMatrix() {
   // Mass Constraint
   HepMatrix al_1_prime(m_al_1);
   HepMatrix Sum_al_1(4, 1, 0);
@@ -430,7 +425,12 @@ MassPointingVertexFitKFit::makeCoreMatrix(void) {
   - Sum_al_1[1][0] * Sum_al_1[1][0] - Sum_al_1[2][0] * Sum_al_1[2][0]
   - m_InvariantMass * m_InvariantMass;
 
-  m_d[2 * m_TrackCount + 1][0] = atan2(m_v_a[1][0] - m_ProductionVertex.y(), m_v_a[0][0] - m_ProductionVertex.x()) - atan2(Sum_al_1[1][0], Sum_al_1[0][0]);
+  double phiPointingConstraint = atan2(m_v_a[1][0] - m_ProductionVertex.y(), m_v_a[0][0] - m_ProductionVertex.x()) - atan2(Sum_al_1[1][0], Sum_al_1[0][0]);
+  phiPointingConstraint = std::fmod(phiPointingConstraint + TMath::Pi(), TMath::TwoPi());
+  if (phiPointingConstraint < 0) phiPointingConstraint += TMath::TwoPi();
+  phiPointingConstraint -= TMath::Pi();
+
+  m_d[2 * m_TrackCount + 1][0] = phiPointingConstraint;
   m_d[2 * m_TrackCount + 2][0] = acos((m_v_a[2][0] - m_ProductionVertex.z()) / vtx) - acos(Sum_al_1[2][0] / mom);
 
   double Sum_a = 0., Sum_tmpx = 0., Sum_tmpy = 0.;
@@ -595,7 +595,7 @@ MassPointingVertexFitKFit::makeCoreMatrix(void) {
 
 
 enum KFitError::ECode
-MassPointingVertexFitKFit::calculateNDF(void) {
+MassPointingVertexFitKFit::calculateNDF() {
   m_NDF = 2 * m_TrackCount - 3 + 3;
 
   return m_ErrorCode = KFitError::kNoError;
@@ -625,7 +625,7 @@ enum KFitError::ECode MassPointingVertexFitKFit::updateMother(Particle* mother)
   int ndf = getNDF();
   double prob = TMath::Prob(chi2, ndf);
   mother->addExtraInfo("ndf", ndf);
-  mother->addExtraInfo("chisq", chi2);
+  mother->addExtraInfo("chiSquared", chi2);
   mother->updateMomentum(
     CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
     CLHEPToROOT::getTVector3(kmm.getMotherPosition()),

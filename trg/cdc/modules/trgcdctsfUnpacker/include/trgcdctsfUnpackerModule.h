@@ -38,15 +38,16 @@ namespace Belle2 {
     const int nLeafsExtra = 4;
     /** num of clk time window **/
     const int nClks = 48;
-    /** num of b2l bits **/
+    /** num of b2l bits for 2K case **/
     const int nBits_2k = 2048;
+    /** num of b2l bits for 4K case **/
     const int nBits_4k = 4096;
-    /** num of word **/
+    /** num of word for 2K case **/
     const int nword_2k = 0xC03;
+    /** num of word for 4K case **/
     const int nword_4k = 6147;
+
     /** leaf names **/
-
-
     const char* LeafNames[nLeafs + nLeafsExtra] = {
       "c127",
       "validtracker", "trackercc",
@@ -778,6 +779,7 @@ namespace Belle2 {
 
     };
 
+    /// set the pointer array of each leaf
     void
     setLeafPointersArray(TRGCDCTSFUnpackerStore* store, int** bitArray)
     {
@@ -1106,20 +1108,28 @@ namespace Belle2 {
 
     private:
 
-      // StoreArray of TRGCDCTSFUnpackerStore
+      //! StoreArray of TRGCDCTSFUnpackerStore
       StoreArray<TRGCDCTSFUnpackerStore> storeAry;
 
-      //bitmap
+      //! bitmap
       int m_BitMap[nLeafs][2];
+      //! number of bit
       int m_nBits;
+      //! number of word
       int m_nword;
 
-      //address of copper module
+      //! address of copper module
       unsigned int m_copper_address;
+      //! address of copper module
       unsigned int m_copper_ab;
 
-      //TSF module number
+      //! TSF module number
       int m_TSFMOD;
+
+      //! exp number
+      unsigned _exp;
+      //! run number
+      unsigned _run;
 
     };
   }

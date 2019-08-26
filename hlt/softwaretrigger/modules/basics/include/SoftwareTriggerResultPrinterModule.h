@@ -24,8 +24,7 @@ class TTree;
 namespace Belle2 {
   namespace SoftwareTrigger {
     /**
-     * Print (and optionally write out) the software trigger results
-     * in an easily accessible summary table.
+     * Write out the software trigger results in an easily accessible summary table.
      */
     class SoftwareTriggerResultPrinterModule : public Module {
     public:
@@ -45,21 +44,23 @@ namespace Belle2 {
       void terminate() override;
 
     private:
-      /// Output file name for the debug output. Is only used if debug is turned on.
-      std::string m_param_debugOutputFileName = "software_trigger_results.root";
-      /// Write out all results to disk also
-      bool m_param_storeResultsToDisk = false;
+      /// Output file name for the debug output.
+      std::string m_param_outputFileName = "software_trigger_results.root";
 
       /// Store Object for reading the trigger decision.
       StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
       /// Store Object for reading the l1 result
       StoreObjPtr<TRGSummary> m_l1Result;
-      /// TFile to store the debug TTree (or a nullptr if we do not save the debug output).
+      /// TFile to store the debug TTree
       std::unique_ptr<TFile> m_debugOutputFile;
-      /// TTree to store the debug output (or a nullptr if we do not save the debug output).
+      /// TTree to store the debug output
       std::unique_ptr<TTree> m_debugTTree;
       /// Internal map of summed results
       std::map<std::string, std::map<SoftwareTriggerCutResult, unsigned int>> m_passedEventsPerTrigger;
+      /// Internal map of summed results
+      std::map<std::string, std::map<SoftwareTriggerCutResult, unsigned int>> m_passedEventsPerTriggerNonPrescaled;
+      /// Internal map of prescales
+      std::map<std::string, unsigned int> m_prescales;
       /// Internal counter for the number of seen events
       unsigned int m_numberOfEvents = 0;
     };

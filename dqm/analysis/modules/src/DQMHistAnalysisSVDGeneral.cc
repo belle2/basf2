@@ -344,11 +344,11 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
   TH1F* htmp = NULL;
 
-  Int_t nStrips = 768;
   for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
     int tmp_layer = m_SVDModules[i].getLayerNumber();
     int tmp_ladder = m_SVDModules[i].getLadderNumber();
     int tmp_sensor = m_SVDModules[i].getSensorNumber();
+
 
     Int_t bin = m_hOccupancyU->FindBin(tmp_ladder, findBinY(tmp_layer, tmp_sensor));
 
@@ -360,6 +360,8 @@ void DQMHistAnalysisSVDGeneralModule::event()
       B2INFO("Occupancy U histogram not found");
       m_cOccupancyU->SetFillColor(kRed);
     } else {
+
+      Int_t nStrips = 768;
 
       Float_t occU = htmp->GetEntries() / nStrips / nEvents * 100;
       m_hOccupancyU->SetBinContent(bin, occU);
@@ -401,6 +403,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cOccupancyV->SetFillColor(kRed);
     } else {
 
+      Int_t nStrips = 768;
       if (tmp_layer != 3)
         nStrips = 512;
 
@@ -442,6 +445,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cOnlineOccupancyV->SetFillColor(kRed);
     } else {
 
+      Int_t nStrips = 768;
       if (tmp_layer != 3)
         nStrips = 512;
 
@@ -477,8 +481,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cOnlineOccupancyU->SetFillColor(kRed);
     } else {
 
-      if (tmp_layer != 3)
-        nStrips = 512;
+      Int_t nStrips = 768;
 
       Float_t onlineOccU = htmp->GetEntries() / nStrips / nEvents * 100;
       m_hOnlineOccupancyU->SetBinContent(bin, onlineOccU);

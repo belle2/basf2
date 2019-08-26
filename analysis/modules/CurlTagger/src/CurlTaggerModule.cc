@@ -67,14 +67,12 @@ CurlTaggerModule::CurlTaggerModule() : Module()
   addParam("responseCut", m_ResponseCut, "minimum allowed selector response for a match.", 0.324);
 }
 
-CurlTaggerModule::~CurlTaggerModule()
-{
-}
+CurlTaggerModule::~CurlTaggerModule() = default;
 
 bool CurlTaggerModule::passesPreSelection(Particle* p)
 {
   if (Variable::particlePt(p) > m_PtCut) {return false;}
-  if (Variable::trackNCDCHits(p) == 0 && Variable::trackNVXDHits(p) == 0) {return false;} //should never happen anyway but might as well check
+  if (!(Variable::trackNCDCHits(p) > 0 || Variable::trackNVXDHits(p) > 0)) {return false;} //should never happen anyway but might as well check
   if (p -> getCharge() == 0) {return false;}
   return true;
 }
@@ -167,10 +165,10 @@ void CurlTaggerModule::event()
 
         if (m_McStatsFlag) {
           bool addedParticleToTruthBundle = false;
-          for (unsigned int tb = 0; tb < truthBundles.size(); tb++) {
-            Particle* bPart = truthBundles[tb].getParticle(0);
+          for (auto& truthBundle : truthBundles) {
+            Particle* bPart = truthBundle.getParticle(0);
             if (Variable::genParticleIndex(iPart) == Variable::genParticleIndex(bPart)) {
-              truthBundles[tb].addParticle(iPart);
+              truthBundle.addParticle(iPart);
               addedParticleToTruthBundle = true;
               break;
             } // same genParticleIndex
@@ -219,6 +217,3 @@ void CurlTaggerModule::terminate()
 {
   m_Selector->finalize();
 }
-
-
-

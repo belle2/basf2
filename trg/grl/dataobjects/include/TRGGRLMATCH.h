@@ -18,12 +18,16 @@
 
 namespace Belle2 {
 
+  /// a class for CDC2D-ECL Matching in TRGGRL
   class TRGGRLMATCH : public RelationsObject {
   public:
 
+    /// Constructor
     TRGGRLMATCH(): m_deltar(-999.), m_deltaz(-999.) {}
+    /// Destructor
     ~TRGGRLMATCH() {}
 
+    /** get deltaR */
     double getDeltaR() const {return m_deltar;}
 
     /**Get the Delta Z (distance along Z-axis between the ECL cluster and the expected position
@@ -55,7 +59,7 @@ namespace Belle2 {
 
     /**Phi angle difference between the ECL cluster and the expected position
     which is calculated from CDC*/
-    double m_dphi_d;
+    double m_dphi_d = -999.;
 
     /**! The Class title*/
     ClassDef(TRGGRLMATCH, 2); /*< the class title */

@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from geometry import check_components
 from ROOT import Belle2
+from pxd import add_pxd_packer, add_pxd_unpacker
 from svd import add_svd_packer, add_svd_unpacker
 from iov_conditional import make_conditional_at
 
@@ -11,6 +13,9 @@ def add_packers(path, components=None):
     """
     This function adds the raw data packer modules to a path.
     """
+
+    # Check components.
+    check_components(components)
 
     # Add Gearbox or geometry to path if not already there
     if "Gearbox" not in path:
@@ -21,75 +26,7 @@ def add_packers(path, components=None):
 
     # PXD
     if components is None or 'PXD' in components:
-        pxdpacker = register_module('PXDPacker')
-        pxdpacker.param('dhe_to_dhc', [
-            [
-                0,
-                2,
-                4,
-                34,
-                36,
-                38,
-            ],
-            [
-                1,
-                6,
-                8,
-                40,
-                42,
-                44,
-            ],
-            [
-                2,
-                10,
-                12,
-                46,
-                48,
-                50,
-            ],
-            [
-                3,
-                14,
-                16,
-                52,
-                54,
-                56,
-            ],
-            [
-                4,
-                3,
-                5,
-                35,
-                37,
-                39,
-            ],
-            [
-                5,
-                7,
-                9,
-                41,
-                43,
-                45,
-            ],
-            [
-                6,
-                11,
-                13,
-                47,
-                49,
-                51,
-            ],
-            [
-                7,
-                15,
-                17,
-                53,
-                55,
-                57,
-            ],
-        ])
-
-        path.add_module(pxdpacker)
+        add_pxd_packer(path)
 
     # SVD
     if components is None or 'SVD' in components:
@@ -116,13 +53,10 @@ def add_packers(path, components=None):
         arichpacker = register_module('ARICHPacker')
         path.add_module(arichpacker)
 
-    # BKLM
-    if components is None or 'BKLM' in components:
+    # KLM
+    if components is None or 'KLM' in components:
         bklmpacker = register_module('BKLMRawPacker')
         path.add_module(bklmpacker)
-
-    # EKLM
-    if components is None or 'EKLM' in components:
         eklmpacker = register_module('EKLMRawPacker')
         path.add_module(eklmpacker)
 
@@ -131,6 +65,9 @@ def add_unpackers(path, components=None):
     """
     This function adds the raw data unpacker modules to a path.
     """
+
+    # Check components.
+    check_components(components)
 
     # Add Gearbox or geometry to path if not already there
     if "Gearbox" not in path:
@@ -141,15 +78,7 @@ def add_unpackers(path, components=None):
 
     # PXD
     if components is None or 'PXD' in components:
-        pxdunpacker = register_module('PXDUnpacker')
-        path.add_module(pxdunpacker)
-
-        pxderrorcheck = register_module('PXDPostErrorChecker')
-        path.add_module(pxderrorcheck)
-
-        pxdhitsorter = register_module('PXDRawHitSorter')
-        path.add_module(pxdhitsorter)
-        path.add_module('ActivatePXDPixelMasker')
+        add_pxd_unpacker(path)
 
     # SVD
     if components is None or 'SVD' in components:
@@ -181,7 +110,7 @@ def add_unpackers(path, components=None):
         path.add_module(arichunpacker)
 
     # KLM
-    if components is None or 'BKLM' in components or 'EKLM' in components:
+    if components is None or 'KLM' in components:
         klmunpacker = register_module('KLMUnpacker')
         path.add_module(klmunpacker)
 
@@ -194,6 +123,8 @@ def add_unpackers(path, components=None):
         path.add_module(trggdlsummary)
         trgeclunpacker = register_module('TRGECLUnpacker')
         path.add_module(trgeclunpacker)
+        trggrlunpacker = register_module('TRGGRLUnpacker')
+        path.add_module(trggrlunpacker)
 
         nmod_tsf = [0, 1, 2, 3, 4, 5, 6]
         for mod_tsf in nmod_tsf:
@@ -202,6 +133,33 @@ def add_unpackers(path, components=None):
         nmod_t3d = [0, 1, 2, 3]
         for mod_t3d in nmod_t3d:
             path.add_module('TRGCDCT3DUnpacker', T3DMOD=mod_t3d)
+
+        # unpacker for neurotrigger
+        neurounpacker = register_module('CDCTriggerUnpacker')
+        neurounpacker.param('headerSize', 3)
+        # unpack the data from the 2D tracker and save its Bitstream
+        neurounpacker.param('unpackTracker2D', False)
+        # make CDCTriggerTrack and CDCTriggerSegmentHit objects from the 2D output
+        neurounpacker.param('decode2DFinderTrack', True)
+        # make CDCTriggerSegmentHit objects from the 2D input
+        neurounpacker.param('decode2DFinderInput', True)
+        neurounpacker.param('2DNodeId', [
+            [0x11000001, 0],
+            [0x11000001, 1],
+            [0x11000002, 0],
+            [0x11000002, 1],
+        ])
+        neurounpacker.param('NeuroNodeId', [
+            [0x11000005, 0],
+            [0x11000005, 1],
+            [0x11000006, 0],
+            [0x11000006, 1],
+        ])
+        neurounpacker.param('unpackNeuro', True)
+        neurounpacker.param('decodeNeuro', True)
+        neurounpacker.param('delayNNOutput', [9, 9, 9, 9])
+        neurounpacker.param('delayNNSelect', [4, 4, 4, 4])
+        path.add_module(neurounpacker)
 
 
 def add_raw_output(path, filename='raw.root', additionalBranches=[]):

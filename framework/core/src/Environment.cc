@@ -145,16 +145,23 @@ Environment::Environment() :
   setExternalsPath(envarExtDir);
 }
 
+Environment::~Environment() = default;
 
-Environment::~Environment()
-{
-}
+
+// we know getFileNames is deprecated but we need it as long as --dry-run is available
+// so let's remove the warning for now ...
+#ifdef __INTEL_COMPILER
+#pragma warning (disable:1478) //[[deprecated]]
+#pragma warning (disable:1786) //[[deprecated("message")]]
+#else
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 void Environment::setJobInformation(const std::shared_ptr<Path>& path)
 {
   const std::list<ModulePtr>& modules = path->buildModulePathList(true);
 
-  for (ModulePtr m : modules) {
+  for (const ModulePtr& m : modules) {
     if (m->hasProperties(Module::c_Input)) {
       std::vector<std::string> inputFiles = m->getFileNames(false);
       for (const string& file : inputFiles) {

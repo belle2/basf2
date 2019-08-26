@@ -21,8 +21,10 @@
 #include <genfit/TrackCandHit.h>
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMAlignmentHit.h>
-#include <eklm/dataobjects/EKLMElementID.h>
+#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
+#include <klm/eklm/dataobjects/EKLMElementID.h>
+
+#include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
 
@@ -96,7 +98,7 @@ namespace Belle2 {
     EKLMElementID m_Segment;
 
     /** V direction. */
-    TVector3 m_StripV;
+    B2Vector3D m_StripV;
 
     /** Needed to make objects storable. */
     ClassDefOverride(AlignableEKLMRecoHit, 2);

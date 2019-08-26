@@ -2,10 +2,14 @@
 #define NEUROTRIGGER_H
 
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
-
 #include <framework/datastore/StoreArray.h>
-#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/database/DBStore.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
 #include <framework/dataobjects/BinnedEventT0.h>
 
 namespace Belle2 {
@@ -195,6 +199,18 @@ namespace Belle2 {
      * if the option is enabled for the given sector. */
     void getEventTime(unsigned isector, const CDCTriggerTrack& track);
 
+    /** Return value of m_et_option */
+    std::string get_et_option()
+    {
+      std::string eto = m_MLPs[0].get_et_option();
+      for (unsigned int i = 0; i < m_MLPs.size(); ++i) {
+        if (m_MLPs[i].get_et_option() != eto) {
+          B2ERROR("Timing options in the expert networks in the CDC Neurotrigger differ!");
+        }
+      }
+      return eto;
+
+    }
 
     /** Calculate input pattern for MLP.
      * @param isector index of the MLP that will use the input
@@ -258,6 +274,9 @@ namespace Belle2 {
     StoreObjPtr<BinnedEventT0> m_eventTime;
     /** Name of the StoreArray containing the input track segment hits. */
     std::string m_hitCollectionName;
+    /** get NNT payload from database. */
+    DBObjPtr<CDCTriggerNeuroConfig> m_cdctriggerneuroconfig;
+
   };
 }
 #endif

@@ -28,6 +28,7 @@
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
+
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -45,7 +46,8 @@ CDCCalibrationCollectorModule::CDCCalibrationCollectorModule() : CalibrationColl
   addParam("bField", m_bField, "If true -> #Params ==5 else #params ==4 for calculate P-Val", false);
   addParam("calExpectedDriftTime", m_calExpectedDriftTime, "if true module will calculate expected drift time, it take a time",
            false);
-  addParam("storeTrackParams", m_storeTrackParams, "Store Track Parameter or not, it will be multicount for each hit", true);
+
+  addParam("storeTrackParams", m_storeTrackParams, "Store Track Parameter or not, it will be multicount for each hit", false);
   addParam("eventT0Extraction", m_eventT0Extraction, "use event t0 extract t0 or not", false);
   addParam("minimumPt", m_minimumPt, "Tracks with tranverse momentum small than this will not recored", 0.);
   addParam("isCosmic", m_isCosmic, "True when we process cosmic events, else False (collision)", m_isCosmic);
@@ -69,39 +71,39 @@ void CDCCalibrationCollectorModule::prepare()
 
 
   auto m_tree  = new TTree(m_treeName.c_str(), "tree for cdc calibration");
-  m_tree->Branch<double>("x_mea", &x_mea);
-  m_tree->Branch<double>("x_u", &x_u);
-  m_tree->Branch<double>("x_b", &x_b);
-  m_tree->Branch<double>("alpha", &alpha);
-  m_tree->Branch<double>("theta", &theta);
-  m_tree->Branch<double>("t", &t);
+  m_tree->Branch<float>("x_mea", &x_mea);
+  m_tree->Branch<float>("x_u", &x_u);
+  m_tree->Branch<float>("x_b", &x_b);
+  m_tree->Branch<float>("alpha", &alpha);
+  m_tree->Branch<float>("theta", &theta);
+  m_tree->Branch<float>("t", &t);
   m_tree->Branch<unsigned short>("adc", &adc);
   //  m_tree->Branch<int>("boardID", &boardID);
   m_tree->Branch<int>("lay", &lay);
-  m_tree->Branch<double>("weight", &weight);
+  m_tree->Branch<float>("weight", &weight);
   m_tree->Branch<int>("IWire", &IWire);
-  m_tree->Branch<double>("Pval", &Pval);
-  m_tree->Branch<double>("ndf", &ndf);
+  m_tree->Branch<float>("Pval", &Pval);
+  m_tree->Branch<float>("ndf", &ndf);
   if (m_storeTrackParams) {
-    m_tree->Branch<double>("d0", &d0);
-    m_tree->Branch<double>("z0", &z0);
-    m_tree->Branch<double>("phi0", &phi0);
-    m_tree->Branch<double>("tanL", &tanL);
-    m_tree->Branch<double>("omega", &omega);
+    m_tree->Branch<float>("d0", &d0);
+    m_tree->Branch<float>("z0", &z0);
+    m_tree->Branch<float>("phi0", &phi0);
+    m_tree->Branch<float>("tanL", &tanL);
+    m_tree->Branch<float>("omega", &omega);
   }
 
   if (m_calExpectedDriftTime) { // expected drift time, calculated form xfit
-    m_tree->Branch<double>("t_fit", &t_fit);
+    m_tree->Branch<float>("t_fit", &t_fit);
   }
 
-  auto m_hNDF = new TH1D("hNDF", "NDF of fitted track;NDF;Tracks", 71, -1, 70);
-  auto m_hPval = new TH1D("hPval", "p-values of tracks;pVal;Tracks", 1000, 0, 1);
-  auto m_hEventT0 = new TH1D("hEventT0", "Event T0", 1000, -100, 100);
+  auto m_hNDF = new TH1F("hNDF", "NDF of fitted track;NDF;Tracks", 71, -1, 70);
+  auto m_hPval = new TH1F("hPval", "p-values of tracks;pVal;Tracks", 1000, 0, 1);
+  auto m_hEventT0 = new TH1F("hEventT0", "Event T0", 1000, -100, 100);
 
   registerObject<TTree>("tree", m_tree);
-  registerObject<TH1D>("hNDF", m_hNDF);
-  registerObject<TH1D>("hPval", m_hPval);
-  registerObject<TH1D>("hEventT0", m_hEventT0);
+  registerObject<TH1F>("hNDF", m_hNDF);
+  registerObject<TH1F>("hPval", m_hPval);
+  registerObject<TH1F>("hEventT0", m_hEventT0);
 }
 
 void CDCCalibrationCollectorModule::collect()
@@ -138,8 +140,8 @@ void CDCCalibrationCollectorModule::collect()
       ndf = fs->getNdf();
     }
 
-    getObjectPtr<TH1D>("hPval")->Fill(Pval);
-    getObjectPtr<TH1D>("hNDF")->Fill(ndf);
+    getObjectPtr<TH1F>("hPval")->Fill(Pval);
+    getObjectPtr<TH1F>("hNDF")->Fill(ndf);
     B2DEBUG(99, "ndf = " << ndf);
     B2DEBUG(99, "Pval = " << Pval);
 
@@ -159,13 +161,14 @@ void CDCCalibrationCollectorModule::collect()
     if (m_isCosmic == true && phi0 > 0.0) continue;
 
     //cut at Pt
+
     if (fitresult->getMomentum().Perp() < m_minimumPt) continue;
     //reject events don't have eventT0
     if (m_eventT0Extraction) {
       // event with is fail to extract t0 will be exclude from analysis
       if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
         evtT0 =  m_eventTimeStoreObject->getEventT0();
-        getObjectPtr<TH1D>("hEventT0")->Fill(evtT0);
+        getObjectPtr<TH1F>("hEventT0")->Fill(evtT0);
       } else {
         continue;
       }

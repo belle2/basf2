@@ -9,8 +9,8 @@
  **************************************************************************/
 
 
-#include <stdio.h>
 #include <algorithm>
+#include <cstdio>
 
 #include <TMatrixFSym.h>
 
@@ -24,7 +24,7 @@ using namespace Belle2;
 using namespace Belle2::analysis;
 using namespace CLHEP;
 
-VertexFitKFit::VertexFitKFit(void):
+VertexFitKFit::VertexFitKFit():
   m_BeforeVertex(HepPoint3D(0, 0, 0)),
   m_AfterVertexError(HepSymMatrix(3, 0)),
   m_BeamError(HepSymMatrix(3, 0))
@@ -44,9 +44,7 @@ VertexFitKFit::VertexFitKFit(void):
   fill_n(m_EachCHIsq, KFitConst::kMaxTrackCount2, 0);
 }
 
-VertexFitKFit::~VertexFitKFit(void)
-{
-}
+VertexFitKFit::~VertexFitKFit() = default;
 
 
 enum KFitError::ECode
@@ -81,7 +79,7 @@ VertexFitKFit::setIpProfile(const HepPoint3D& ip, const HepSymMatrix& ipe) {
 
 
 enum KFitError::ECode
-VertexFitKFit::setIpTubeProfile(const KFitTrack& p) {
+VertexFitKFit::setIpTubeProfile(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q) {
   if (m_FlagBeam)
   {
     char buf[1024];
@@ -90,7 +88,7 @@ VertexFitKFit::setIpTubeProfile(const KFitTrack& p) {
   }
 
   m_FlagTube = true;
-  m_TubeTrack = p;
+  m_TubeTrack = KFitTrack(p, x, e, q);
 
   return m_ErrorCode = KFitError::kNoError;
 }
@@ -132,21 +130,21 @@ VertexFitKFit::getVertex(const int flag) const
 
 
 const HepSymMatrix
-VertexFitKFit::getVertexError(void) const
+VertexFitKFit::getVertexError() const
 {
   return m_AfterVertexError;
 }
 
 
 double
-VertexFitKFit::getCHIsq(void) const
+VertexFitKFit::getCHIsq() const
 {
   return KFitBase::getCHIsq();
 }
 
 
 double
-VertexFitKFit::getCHIsqVertex(void) const
+VertexFitKFit::getCHIsqVertex() const
 {
   // only m_FlagBeam = 1
   return m_CHIsqVertex;
@@ -175,7 +173,7 @@ VertexFitKFit::getTrackCHIsq(const int id) const
 
 
 double
-VertexFitKFit::getTrackPartCHIsq(void) const
+VertexFitKFit::getTrackPartCHIsq() const
 {
   if (m_ErrorCode != KFitError::kNoError) {
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
@@ -198,7 +196,7 @@ VertexFitKFit::getTrackPartCHIsq(void) const
 
 
 int
-VertexFitKFit::getTrackPartNDF(void) const
+VertexFitKFit::getTrackPartNDF() const
 {
   if (m_ErrorCode != KFitError::kNoError) {
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
@@ -215,7 +213,7 @@ VertexFitKFit::getTrackPartNDF(void) const
 
 
 enum KFitError::ECode
-VertexFitKFit::doFit(void) {
+VertexFitKFit::doFit() {
   if (m_FlagTube) this->appendTube();
 
   if (m_FlagBeam) m_ErrorCode = this->doFit4();
@@ -235,7 +233,7 @@ VertexFitKFit::doFit(void) {
 
 
 enum KFitError::ECode
-VertexFitKFit::doFit3(void) {
+VertexFitKFit::doFit3() {
   // use small Matrix --> No Correlation
   if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
 
@@ -251,7 +249,6 @@ VertexFitKFit::doFit3(void) {
 
 
   double chisq = 0;
-  double tmp_chisq = KFitConst::kInitialCHIsq;
   double tmp2_chisq = KFitConst::kInitialCHIsq;
   int err_inverse = 0;
 
@@ -272,7 +269,7 @@ VertexFitKFit::doFit3(void) {
   for (int j = 0; j < KFitConst::kMaxIterationCount; j++)   // j'th loop start
   {
 
-    tmp_chisq = KFitConst::kInitialCHIsq;
+    double tmp_chisq = KFitConst::kInitialCHIsq;
 
     for (int i = 0; i < KFitConst::kMaxIterationCount; i++) { // i'th loop start
 
@@ -403,7 +400,7 @@ VertexFitKFit::doFit3(void) {
 
 
 enum KFitError::ECode
-VertexFitKFit::doFit4(void) {
+VertexFitKFit::doFit4() {
   // included beam position constraint (only no correlation)
   if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
 
@@ -527,7 +524,7 @@ VertexFitKFit::doFit4(void) {
 
 
 enum KFitError::ECode
-VertexFitKFit::doFit5(void) {
+VertexFitKFit::doFit5() {
   // known vertex --> do not find vertex. (only no correlation)
   if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
 
@@ -619,7 +616,7 @@ VertexFitKFit::doFit5(void) {
 
 
 enum KFitError::ECode
-VertexFitKFit::prepareInputMatrix(void) {
+VertexFitKFit::prepareInputMatrix() {
   if (!m_CorrelationMode || m_FlagBeam || m_FlagKnownVertex)
   {
     if (m_TrackCount > KFitConst::kMaxTrackCount2) {
@@ -643,19 +640,19 @@ VertexFitKFit::prepareInputMatrix(void) {
   HepMatrix    tmp_property(m_TrackCount, 3, 0);
 
 
-  for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it)
+  for (auto& track : m_Tracks)
   {
     // momentum x,y,z and position x,y,z
     for (int j = 0; j < KFitConst::kNumber6; j++)
-      tmp_al_0[index * KFitConst::kNumber6 + j][0] = it->getFitParameter(j, KFitConst::kBeforeFit);
+      tmp_al_0[index * KFitConst::kNumber6 + j][0] = track.getFitParameter(j, KFitConst::kBeforeFit);
     // these error
-    tmp_V_al_0.sub(index * KFitConst::kNumber6 + 1, it->getFitError(KFitConst::kBeforeFit));
+    tmp_V_al_0.sub(index * KFitConst::kNumber6 + 1, track.getFitError(KFitConst::kBeforeFit));
     // charge , mass , a
-    tmp_property[index][0] =  it->getCharge();
-    tmp_property[index][1] =  it->getMass();
+    tmp_property[index][0] =  track.getCharge();
+    tmp_property[index][1] =  track.getMass();
     const double c = KFitConst::kLightSpeed; // C++ bug?
     // tmp_property[index][2] = -KFitConst::kLightSpeed * m_MagneticField * it->getCharge();
-    tmp_property[index][2] = -c * m_MagneticField * it->getCharge();
+    tmp_property[index][2] = -c * m_MagneticField * track.getCharge();
     index++;
   }
 
@@ -698,7 +695,7 @@ VertexFitKFit::prepareInputMatrix(void) {
 
 
 enum KFitError::ECode
-VertexFitKFit::prepareInputSubMatrix(void) {
+VertexFitKFit::prepareInputSubMatrix() {
   // vertex
   for (int i = 0; i < 3; i++)
   {
@@ -709,13 +706,12 @@ VertexFitKFit::prepareInputSubMatrix(void) {
 
 
 enum KFitError::ECode
-VertexFitKFit::prepareOutputMatrix(void) {
+VertexFitKFit::prepareOutputMatrix() {
   Hep3Vector h3v;
   unsigned index = 0;
 
-  for (vector<KFitTrack>::iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it)
+  for (auto& pdata : m_Tracks)
   {
-    KFitTrack& pdata = *it;
     // tracks
     // momentum
     h3v.setX(m_al_1[index * KFitConst::kNumber6 + 0][0]);
@@ -765,7 +761,7 @@ VertexFitKFit::prepareOutputMatrix(void) {
 
 
 enum KFitError::ECode
-VertexFitKFit::makeCoreMatrix(void) {
+VertexFitKFit::makeCoreMatrix() {
   // vertex fit
   for (int i = 0; i < m_TrackCount; i++)
   {
@@ -860,7 +856,7 @@ VertexFitKFit::makeCoreMatrix(void) {
 
 
 enum KFitError::ECode
-VertexFitKFit::calculateNDF(void) {
+VertexFitKFit::calculateNDF() {
   if (m_FlagBeam) m_NDF = 2 * m_TrackCount;
   else if (m_FlagTube) m_NDF = 2 * (m_TrackCount - 1) - 1;
   else if (m_FlagKnownVertex) m_NDF = 2 * m_TrackCount;
@@ -871,7 +867,7 @@ VertexFitKFit::calculateNDF(void) {
 
 
 enum KFitError::ECode
-VertexFitKFit::appendTube(void) {
+VertexFitKFit::appendTube() {
   if (!m_FlagTube) return m_ErrorCode = KFitError::kNoError;
 
   if (m_iTrackTube != -1)
@@ -890,7 +886,7 @@ VertexFitKFit::appendTube(void) {
 
 
 enum KFitError::ECode
-VertexFitKFit::deleteTube(void) {
+VertexFitKFit::deleteTube() {
   if (!m_FlagTube) return m_ErrorCode = KFitError::kNoError;
 
   if (m_iTrackTube == -1)
@@ -928,6 +924,16 @@ enum KFitError::ECode VertexFitKFit::updateMother(Particle* mother)
   double chi2 = getCHIsq();
   int ndf = getNDF();
   double prob = TMath::Prob(chi2, ndf);
+  //
+  bool haschi2 = mother->hasExtraInfo("chiSquared");
+  if (haschi2) {
+    mother->setExtraInfo("chiSquared", chi2);
+    mother->setExtraInfo("ndf", ndf);
+  } else if (!haschi2) {
+    mother->addExtraInfo("chiSquared", chi2);
+    mother->addExtraInfo("ndf", ndf);
+  }
+
   mother->updateMomentum(
     CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
     CLHEPToROOT::getTVector3(kmm.getMotherPosition()),
@@ -936,4 +942,3 @@ enum KFitError::ECode VertexFitKFit::updateMother(Particle* mother)
   m_ErrorCode = KFitError::kNoError;
   return m_ErrorCode;
 }
-

@@ -35,7 +35,7 @@ namespace Belle2 {
      * @param end if true point to after the array, otherwise point to the
      *    beginning
      */
-    ObjArrayIterator(ArrayType const* array, bool end = false)
+    explicit ObjArrayIterator(ArrayType const* array, bool end = false)
     {
       if (array) {
         m_array = array->GetObjectRef() + (end ? array->GetEntriesFast() : 0);
@@ -49,7 +49,7 @@ namespace Belle2 {
      * @param end if true point to after the array, otherwise point to the
      *    beginning
      */
-    ObjArrayIterator(ArrayType const* const* array, bool end = false): ObjArrayIterator(array ? * array : nullptr, end) {}
+    explicit ObjArrayIterator(ArrayType const* const* array, bool end = false): ObjArrayIterator(array ? * array : nullptr, end) {}
     /** prefix increment */
     ObjArrayIterator<ArrayType, ValueType>& operator++() { ++m_array; return *this; }
     /** postfix increment */

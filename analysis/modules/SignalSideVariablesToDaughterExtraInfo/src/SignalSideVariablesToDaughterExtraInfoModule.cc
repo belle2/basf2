@@ -74,7 +74,7 @@ void SignalSideVariablesToDaughterExtraInfoModule::event()
 
   StoreObjPtr<RestOfEvent> roe("RestOfEvent");
   if (roe.isValid()) {
-    Particle* signalSide = roe->getRelated<Particle>();
+    auto* signalSide = roe->getRelated<Particle>();
     Particle* daughter = plist->getParticle(0);
 
     const unsigned int nVars = m_functions.size();

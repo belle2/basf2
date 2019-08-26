@@ -31,13 +31,24 @@
 //
 // - Cluster base Logic
 // - Compare all clusters satisfying following conditions
+//  @ Bhabha for veto
 //  160 degree < (CM Phi_Cluster 1 - CM Phi_Cluster 2) < 200 degree
 //  165 degree < (CM Theta Cluster 1 + CM Theta Cluster 2 ) < 190 degree
 //  Boths Cluster CM E > 3 GeV  and One of cluster CM E > 4.5 GeV
+//  @ Bhabha for calibration  (selection bhabha)
+//  140 degree < (CM Phi_Cluster 1 - CM Phi_Cluster 2) < 220 degree
+//  160 degree < (CM Theta Cluster 1 + CM Theta Cluster 2 ) < 200 degree
+//  Boths Cluster CM E > 2.5 GeV  and One of cluster CM E > 4.0 GeV
+//
+//    ee->mumu selection
+//  160 degree < (CM Phi_Cluster 1 - CM Phi_Cluster 2) < 200 degree
+//  165 degree < (CM Theta Cluster 1 + CM Theta Cluster 2 ) < 190 degree
+//  Boths Cluster CM E < 2 GeV  and One of cluster CM E < 2 GeV
 //
 //
 //---------------------------------------------------------------
 // $Log$ 2018-08-24 First Version
+// $Log$ 2019-05-13 Update selection bhabha and mumu
 //---------------------------------------------------------------
 
 #define TRG_SHORT_NAMES
@@ -56,7 +67,7 @@ using namespace Belle2;
 //
 //
 //
-TrgEclBhabha::TrgEclBhabha()
+TrgEclBhabha::TrgEclBhabha(): _mumuThreshold(20)
 {
   BhabhaComb.clear();
   MaxTCId.clear();
@@ -70,7 +81,21 @@ TrgEclBhabha::TrgEclBhabha()
 
   _2DBhabhaThresholdFWD.clear();
   _2DBhabhaThresholdBWD.clear();
-  _3DBhabhaThreshold.clear();
+  _3DBhabhaSelectionThreshold.clear();
+  _3DBhabhaVetoThreshold.clear();
+  _3DBhabhaSelectionAngle.clear();
+  _3DBhabhaVetoAngle.clear();
+  _mumuAngle.clear();
+
+
+
+  _2DBhabhaThresholdFWD = {40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 30, 35}; // /100 MeV
+  _2DBhabhaThresholdBWD  = {25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 30, 30}; // /100 MeV
+  _3DBhabhaVetoThreshold = {30, 45}; //  /100 MeV
+  _3DBhabhaSelectionThreshold = {20, 40}; //  /100 MeV
+  _3DBhabhaVetoAngle = {160, 200, 165, 190}; //  /100 MeV
+  _3DBhabhaSelectionAngle = {140, 220, 160, 200}; //  /100 MeV
+  _mumuAngle = {160, 200, 165, 190}; //  degree
 
 
 }
@@ -244,7 +269,7 @@ bool TrgEclBhabha::GetBhabha00(std::vector<double> PhiRingSum)  //Belle 2D Bhabh
   return  BtoBflag;
 }
 
-bool TrgEclBhabha::GetBhabha01()
+bool TrgEclBhabha::GetBhabha01() // veto bhabha
 {
   //-----------------------
   // 3D Bhabha veto
@@ -308,29 +333,180 @@ bool TrgEclBhabha::GetBhabha01()
       int thetaSum = theta1 + theta2;
 
 
-      if (dphi > 160 && thetaSum > 165 && thetaSum < 190) {BtoBFlag = true;}
-      if ((ClusterEnergy[icluster] * 100.) > _3DBhabhaThreshold[0] * energy1
-          && (ClusterEnergy[jcluster] * 100.) > _3DBhabhaThreshold[0] * (energy2)
-          && ((ClusterEnergy[icluster] * 100.) > _3DBhabhaThreshold[1] * energy1
-              || (ClusterEnergy[jcluster] * 100.) > _3DBhabhaThreshold[1] * (energy2))) {
+      if (dphi > _3DBhabhaVetoAngle[0] && thetaSum > _3DBhabhaVetoAngle[2] && thetaSum <  _3DBhabhaVetoAngle[3]) {BtoBFlag = true;}
+      if ((ClusterEnergy[icluster] * 100.) > _3DBhabhaVetoThreshold[0] * energy1
+          && (ClusterEnergy[jcluster] * 100.) > _3DBhabhaVetoThreshold[0] * (energy2)
+          && ((ClusterEnergy[icluster] * 100.) > _3DBhabhaVetoThreshold[1] * energy1
+              || (ClusterEnergy[jcluster] * 100.) > _3DBhabhaVetoThreshold[1] * (energy2))) {
         if (BtoBFlag) {BhabhaFlag = true;}
       }
-      // if (BhabhaFlag && icluster == 0 && jcluster == 1) {BhabhaComb[0] = 1;}
-      // else if (BhabhaFlag && icluster == 0 && jcluster == 2) {BhabhaComb[1] = 1;}
-      // else if (BhabhaFlag && icluster == 0 && jcluster == 3) {BhabhaComb[2] = 1;}
-      // else if (BhabhaFlag && icluster == 0 && jcluster == 4) {BhabhaComb[3] = 1;}
-      // else if (BhabhaFlag && icluster == 0 && jcluster == 5) {BhabhaComb[4] = 1;}
-      // else if (BhabhaFlag && icluster == 1 && jcluster == 2) {BhabhaComb[5] = 1;}
-      // else if (BhabhaFlag && icluster == 1 && jcluster == 3) {BhabhaComb[6] = 1;}
-      // else if (BhabhaFlag && icluster == 1 && jcluster == 4) {BhabhaComb[7] = 1;}
-      // else if (BhabhaFlag && icluster == 1 && jcluster == 5) {BhabhaComb[8] = 1;}
-      // else if (BhabhaFlag && icluster == 2 && jcluster == 3) {BhabhaComb[9] = 1;}
-      // else if (BhabhaFlag && icluster == 2 && jcluster == 4) {BhabhaComb[10] = 1;}
-      // else if (BhabhaFlag && icluster == 2 && jcluster == 5) {BhabhaComb[11] = 1;}
-      // else if (BhabhaFlag && icluster == 3 && jcluster == 4) {BhabhaComb[12] = 1;}
-      // else if (BhabhaFlag && icluster == 3 && jcluster == 5) {BhabhaComb[13] = 1;}
-      // else if (BhabhaFlag && icluster == 4 && jcluster == 5) {BhabhaComb[14] = 1;}
 
+    }
+
+
+
+
+
+  }
+
+
+
+  return BhabhaFlag;
+}
+
+bool TrgEclBhabha::GetBhabha02() // selection bhabha
+{
+  //-----------------------
+  // 3D Bhabha veto
+  //------------------------
+  bool BtoBFlag = false;
+  bool BhabhaFlag = false;
+
+  //
+  //
+  // Read Cluster Table
+  //
+  //
+  MaxTCId.clear();
+  ClusterEnergy.clear();
+  ClusterTiming.clear();
+  ClusterPosition.clear();
+  //  int EventId = 0;
+  StoreArray<TRGECLCluster> trgeclClusterArray;
+  for (int ii = 0; ii < trgeclClusterArray.getEntries(); ii++) {
+    TRGECLCluster* aTRGECLCluster = trgeclClusterArray[ii];
+    //  EventId = aTRGECLCluster ->getEventId();
+    int maxTCId    = aTRGECLCluster ->getMaxTCId();
+    double clusterenergy  = aTRGECLCluster ->getEnergyDep();
+    double clustertiming  =  aTRGECLCluster -> getTimeAve();
+    TVector3 clusterposition(aTRGECLCluster ->getPositionX(), aTRGECLCluster ->getPositionY(), aTRGECLCluster ->getPositionZ());
+    ClusterTiming.push_back(clustertiming);
+    ClusterEnergy.push_back(clusterenergy);
+    ClusterPosition.push_back(clusterposition);
+    MaxTCId.push_back(maxTCId);
+  }
+  const int ncluster = ClusterEnergy.size();
+  //
+  //
+  //
+  //
+  BhabhaComb.clear();
+  BhabhaComb.resize(18, 0);
+
+  BtoBFlag = false;
+
+  for (int icluster = 0; icluster < ncluster ; icluster++) {
+    for (int jcluster = icluster + 1; jcluster < ncluster; jcluster ++) {
+
+      if (icluster == jcluster) {continue;}
+      int lut1 = _database->Get3DBhabhaLUT(MaxTCId[icluster]);
+      int lut2 = _database->Get3DBhabhaLUT(MaxTCId[jcluster]);
+      int energy1 = 15 & lut1;
+      int energy2 = 15 & lut2;
+      lut1 >>= 4;
+      lut2 >>= 4;
+      int phi1 = 511 & lut1;
+      int phi2 = 511 & lut2;
+      lut1 >>= 9;
+      lut2 >>= 9;
+      int theta1 = lut1;
+      int theta2 = lut2;
+
+
+      int dphi = abs(phi1 - phi2);
+      if (dphi > 180) {dphi = 360 - dphi;}
+      int thetaSum = theta1 + theta2;
+
+
+      if (dphi > _3DBhabhaSelectionAngle[0] && dphi < _3DBhabhaSelectionAngle[1] && thetaSum > _3DBhabhaSelectionAngle[2]
+          && thetaSum <  _3DBhabhaSelectionAngle[3]) {BtoBFlag = true;}
+      if ((ClusterEnergy[icluster] * 100.) > _3DBhabhaSelectionThreshold[0] * energy1
+          && (ClusterEnergy[jcluster] * 100.) > _3DBhabhaSelectionThreshold[0] * (energy2)
+          && ((ClusterEnergy[icluster] * 100.) > _3DBhabhaSelectionThreshold[1] * energy1
+              || (ClusterEnergy[jcluster] * 100.) > _3DBhabhaSelectionThreshold[1] * (energy2))) {
+        if (BtoBFlag) {BhabhaFlag = true;}
+      }
+
+    }
+
+
+
+
+  }
+
+
+
+  return BhabhaFlag;
+}
+
+
+
+bool TrgEclBhabha::Getmumu() // MuMu bit
+{
+  //-----------------------
+  // 3D Bhabha veto
+  //------------------------
+  bool BtoBFlag = false;
+  bool BhabhaFlag = false;
+
+  //
+  //
+  // Read Cluster Table
+  //
+  //
+  MaxTCId.clear();
+  ClusterEnergy.clear();
+  ClusterTiming.clear();
+  ClusterPosition.clear();
+  //  int EventId = 0;
+  StoreArray<TRGECLCluster> trgeclClusterArray;
+  for (int ii = 0; ii < trgeclClusterArray.getEntries(); ii++) {
+    TRGECLCluster* aTRGECLCluster = trgeclClusterArray[ii];
+    //  EventId = aTRGECLCluster ->getEventId();
+    int maxTCId    = aTRGECLCluster ->getMaxTCId();
+    double clusterenergy  = aTRGECLCluster ->getEnergyDep();
+    double clustertiming  =  aTRGECLCluster -> getTimeAve();
+    TVector3 clusterposition(aTRGECLCluster ->getPositionX(), aTRGECLCluster ->getPositionY(), aTRGECLCluster ->getPositionZ());
+    ClusterTiming.push_back(clustertiming);
+    ClusterEnergy.push_back(clusterenergy);
+    ClusterPosition.push_back(clusterposition);
+    MaxTCId.push_back(maxTCId);
+  }
+  const int ncluster = ClusterEnergy.size();
+  //
+  //
+  //
+  //
+  BhabhaComb.clear();
+  BhabhaComb.resize(18, 0);
+
+  BtoBFlag = false;
+
+  for (int icluster = 0; icluster < ncluster ; icluster++) {
+    for (int jcluster = icluster + 1; jcluster < ncluster; jcluster ++) {
+
+      if (icluster == jcluster) {continue;}
+      int lut1 = _database->Get3DBhabhaLUT(MaxTCId[icluster]);
+      int lut2 = _database->Get3DBhabhaLUT(MaxTCId[jcluster]);
+      lut1 >>= 4;
+      lut2 >>= 4;
+      int phi1 = 511 & lut1;
+      int phi2 = 511 & lut2;
+      lut1 >>= 9;
+      lut2 >>= 9;
+      int theta1 = lut1;
+      int theta2 = lut2;
+
+
+      int dphi = abs(phi1 - phi2);
+      if (dphi > 180) {dphi = 360 - dphi;}
+      int thetaSum = theta1 + theta2;
+
+
+      if (dphi > _mumuAngle[0] && dphi < _mumuAngle[1] && thetaSum > _mumuAngle[2] && thetaSum < _mumuAngle[3]) {BtoBFlag = true;}
+      if ((ClusterEnergy[icluster] * 10.) < _mumuThreshold && (ClusterEnergy[jcluster] * 10.) < _mumuThreshold) {
+        if (BtoBFlag) {BhabhaFlag = true;}
+      }
 
     }
 

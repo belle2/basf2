@@ -74,23 +74,26 @@ TRGGDLDQMModule::TRGGDLDQMModule() : HistoModule()
   addParam("postScriptName", m_postScriptName,
            "postscript file name",
            string("gdldqm.ps"));
+  addParam("skim", m_skim,
+           "use skim information or not",
+           int(-1));
   B2DEBUG(20, "eventByEventTimingFlag(" << m_eventByEventTimingHistRecord
           << "), m_dumpVcdFile(" << m_dumpVcdFile
           << "), m_bitConditionToDumpVcd(" << m_bitConditionToDumpVcd
           << "), m_vcdEventStart(" << m_vcdEventStart
           << "), m_vcdNumberOfEvents(" << m_vcdNumberOfEvents);
 
+
 }
 
 void TRGGDLDQMModule::defineHisto()
 {
   oldDir = gDirectory;
-  dirDQM = NULL;
-  dirDQM = oldDir->mkdir("TRGGDL");
-  dirDQM->cd();
+  dirDQM = gDirectory;
+  oldDir->mkdir("TRGGDL");
+  dirDQM->cd("TRGGDL");
 
-
-  for (int iskim = 0; iskim < nskim_gdldqm; iskim++) {
+  for (int iskim = start_skim_gdldqm; iskim < end_skim_gdldqm; iskim++) {
     h_c8_gdlL1TocomL1[iskim]  = new TH1I(Form("hGDL_gdlL1TocomL1_%s", skim_smap[iskim].c_str()),  "comL1 - gdlL1 [clk8ns]", 100, 0,
                                          100);
     h_c8_gdlL1TocomL1[iskim]->GetXaxis()->SetTitle("clk8ns");
@@ -147,6 +150,8 @@ void TRGGDLDQMModule::defineHisto()
                                     2000);
     h_c2_cdcToecl[iskim]->GetXaxis()->SetTitle("clk2ns");
 
+    h_timtype[iskim] = new TH1I(Form("hGDL_timtype_%s", skim_smap[iskim].c_str()), "timtype", 7, 0, 7);
+
     h_itd[iskim] = new TH1I(Form("hGDL_itd_%s", skim_smap[iskim].c_str()), "itd", n_inbit + 1, -1, n_inbit);
     h_ftd[iskim] = new TH1I(Form("hGDL_ftd_%s", skim_smap[iskim].c_str()), "ftd", n_outbit + 1, -1, n_outbit);
     h_psn[iskim] = new TH1I(Form("hGDL_psn_%s", skim_smap[iskim].c_str()), "psn", n_outbit + 1, -1, n_outbit);
@@ -155,6 +160,18 @@ void TRGGDLDQMModule::defineHisto()
     for (int i = 0; i < n_output_extra; i++) {
       h_psn_extra[iskim]->GetXaxis()->SetBinLabel(i + 1, output_extra[i]);
     }
+
+    for (unsigned i = 0; i < n_inbit; i++) {
+      if (m_bitNameOnBinLabel) {
+        h_itd[iskim]->GetXaxis()->SetBinLabel(h_itd[iskim]->GetXaxis()->FindBin(i + 0.5), inbitname[i]);
+        h_ftd[iskim]->GetXaxis()->SetBinLabel(h_ftd[iskim]->GetXaxis()->FindBin(i + 0.5), outbitname[i]);
+        h_psn[iskim]->GetXaxis()->SetBinLabel(h_psn[iskim]->GetXaxis()->FindBin(i + 0.5), outbitname[i]);
+      }
+    }
+
+    //reduce #plot
+    if (iskim != 0)continue;
+
     // rise/fall
     for (unsigned i = 0; i < n_inbit; i++) {
       h_itd_rise[i][iskim] = new TH1I(Form("hGDL_itd_%s_rise_%s", inbitname[i], skim_smap[iskim].c_str()),
@@ -163,9 +180,6 @@ void TRGGDLDQMModule::defineHisto()
       h_itd_fall[i][iskim] = new TH1I(Form("hGDL_itd_%s_fall_%s", inbitname[i], skim_smap[iskim].c_str()),
                                       Form("itd%d(%s) falling", i, inbitname[i]), 48, 0, 48);
       h_itd_fall[i][iskim]->SetLineColor(kGreen);
-      if (m_bitNameOnBinLabel) {
-        h_itd[iskim]->GetXaxis()->SetBinLabel(h_itd[iskim]->GetXaxis()->FindBin(i + 0.5), inbitname[i]);
-      }
     }
     for (unsigned i = 0; i < n_outbit; i++) {
       h_ftd[iskim]->GetXaxis()->SetBinLabel(h_ftd[iskim]->GetXaxis()->FindBin(i + 0.5), outbitname[i]);
@@ -182,12 +196,7 @@ void TRGGDLDQMModule::defineHisto()
       h_psn_fall[i][iskim] = new TH1I(Form("hGDL_psn_%s_fall_%s", outbitname[i], skim_smap[iskim].c_str()),
                                       Form("psn%d(%s) falling", i, outbitname[i]), 48, 0, 48);
       h_psn_fall[i][iskim]->SetLineColor(kGreen);
-      if (m_bitNameOnBinLabel) {
-        h_ftd[iskim]->GetXaxis()->SetBinLabel(h_ftd[iskim]->GetXaxis()->FindBin(i + 0.5), outbitname[i]);
-        h_psn[iskim]->GetXaxis()->SetBinLabel(h_psn[iskim]->GetXaxis()->FindBin(i + 0.5), outbitname[i]);
-      }
     }
-    h_timtype[iskim] = new TH1I(Form("hGDL_timtype_%s", skim_smap[iskim].c_str()), "timtype", 7, 0, 7);
   }
 
 
@@ -199,7 +208,7 @@ void TRGGDLDQMModule::beginRun()
 
   dirDQM->cd();
 
-  for (int iskim = 0; iskim < nskim_gdldqm; iskim++) {
+  for (int iskim = start_skim_gdldqm; iskim < end_skim_gdldqm; iskim++) {
     h_c8_gdlL1TocomL1[iskim]->Reset();
     h_c8_topTogdlL1[iskim]->Reset();
     h_c8_eclTogdlL1[iskim]->Reset();
@@ -227,6 +236,17 @@ void TRGGDLDQMModule::beginRun()
 
 void TRGGDLDQMModule::initialize()
 {
+
+  if (m_skim == 0) { //no skim
+    start_skim_gdldqm = 0;
+    end_skim_gdldqm = 1;
+  } else if (m_skim == 1) { //skim
+    start_skim_gdldqm = 1;
+    end_skim_gdldqm = nskim_gdldqm;
+  } else { //no skim + skim
+    start_skim_gdldqm = 0;
+    end_skim_gdldqm = nskim_gdldqm;
+  }
 
   StoreObjPtr<EventMetaData> bevt;
   _exp = bevt->getExperiment();
@@ -315,14 +335,8 @@ void TRGGDLDQMModule::endRun()
     TCanvas c1("c1", "", 0, 0, 500, 300);
     c1.cd();
 
-    for (int iskim = 0; iskim < nskim_gdldqm; iskim++) {
-      for (unsigned i = 0; i < n_inbit; i++) {
-        h_itd_rise[i][iskim]->SetTitle(Form("itd%d(%s) rising(red), falling(green)",
-                                            i, inbitname[i]));
-        h_itd_rise[i][iskim]->Draw();
-        h_itd_fall[i][iskim]->Draw("same");
-        c1.Update();
-      }
+    for (int iskim = start_skim_gdldqm; iskim < end_skim_gdldqm; iskim++) {
+
       h_itd[iskim]->GetXaxis()->SetRange(h_itd[iskim]->GetXaxis()->FindBin(0.5),
                                          h_itd[iskim]->GetXaxis()->FindBin(n_inbit - 0.5));
       h_itd[iskim]->Draw();
@@ -377,6 +391,18 @@ void TRGGDLDQMModule::endRun()
       c1.Update();
       h_ns_cdcToecl[iskim]->Draw();
       c1.Update();
+
+      //reduce #plot
+      if (iskim != 0)continue;
+      for (unsigned i = 0; i < n_inbit; i++) {
+
+        h_itd_rise[i][iskim]->SetTitle(Form("itd%d(%s) rising(red), falling(green)",
+                                            i, inbitname[i]));
+        h_itd_rise[i][iskim]->Draw();
+        h_itd_fall[i][iskim]->Draw("same");
+        c1.Update();
+      }
+
     }
 
     ps->Close();
@@ -406,13 +432,11 @@ void TRGGDLDQMModule::event()
 
   //Get skim type from SoftwareTriggerResult
   StoreObjPtr<SoftwareTriggerResult> result_soft;
-  if (!result_soft.isValid()) {
-    skim.push_back(0);
-  } else {
-    skim.push_back(0);
+  if (result_soft.isValid()) {
     const std::map<std::string, int>& skim_map = result_soft->getResults();
-    for (int iskim = 1; iskim < nskim_gdldqm; iskim++) {
-      if (skim_map.find(skim_menu[iskim]) != skim_map.end()) {
+    for (int iskim = start_skim_gdldqm; iskim < end_skim_gdldqm; iskim++) {
+      if (iskim == 0) skim.push_back(iskim);
+      else if (skim_map.find(skim_menu[iskim]) != skim_map.end()) {
         const bool accepted = (result_soft->getResult(skim_menu[iskim]) == SoftwareTriggerCutResult::c_accept);
         if (accepted) skim.push_back(iskim);
       }
@@ -868,6 +892,9 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
   //std::cout << "rise " << skim.size() << std::endl;
 
   for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
+    //reduce #plot
+    if (skim[ifill] != 0)continue;
+
     for (unsigned i = 0; i < n_inbit; i++) {
       if (n_clocks == 32) {
         h_itd_rise[i][skim[ifill]]->GetXaxis()->SetTitle("clk32ns");
@@ -950,29 +977,110 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
   }
 }
 
+
+
 void
 TRGGDLDQMModule::fillOutputExtra(void)
 {
   for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
     bool c4_fired = isFired("C4");
     bool hie_fired = isFired("HIE");
+    bool lml_fired = (isFired("LML0") || isFired("LML1") || isFired("LML2") || isFired("LML3") || isFired("LML4") || isFired("LML5")
+                      || isFired("LML6") || isFired("LML7") || isFired("LML8") || isFired("LML9") || isFired("LML10") || isFired("ECLMUMU"));
     bool fff_fired = isFired("FFF");
-    if (fff_fired && (c4_fired || hie_fired)) {
+    bool ff_fired  = isFired("ff");
+    bool f_fired   = isFired("f");
+    bool ffo_fired = isFired("FFO");
+    bool ffb_fired = isFired("FFB");
+    bool ffy_fired = isFired("ffy");
+    bool fyo_fired = isFired("fyo");
+    bool fyb_fired = isFired("fyb");
+    bool bha2D_fired = isFired("BHA");
+    bool bha3D_fired = isFired("BHA3D");
+    if (1) {
       h_psn_extra[skim[ifill]]->Fill(0.5);
     }
-    if (c4_fired || hie_fired) {
+    if (fff_fired && (c4_fired || hie_fired)) {
       h_psn_extra[skim[ifill]]->Fill(1.5);
     }
-    if (fff_fired && hie_fired) {
+    if (ffo_fired && (c4_fired || hie_fired)) {
       h_psn_extra[skim[ifill]]->Fill(2.5);
     }
-    if (fff_fired && c4_fired) {
+    if (ffb_fired && (c4_fired || hie_fired)) {
       h_psn_extra[skim[ifill]]->Fill(3.5);
+    }
+    if (fff_fired) {
+      h_psn_extra[skim[ifill]]->Fill(4.5);
+    }
+    if (c4_fired || hie_fired) {
+      h_psn_extra[skim[ifill]]->Fill(5.5);
+    }
+    if (fff_fired || ffo_fired || ffb_fired) {
+      h_psn_extra[skim[ifill]]->Fill(6.5);
+    }
+    if ((fff_fired || ffo_fired || ffb_fired) && (c4_fired || hie_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(7.5);
+    }
+    if (bha2D_fired) {
+      h_psn_extra[skim[ifill]]->Fill(8.5);
+    }
+    if (bha3D_fired) {
+      h_psn_extra[skim[ifill]]->Fill(9.5);
+    }
+    if (ff_fired) {
+      h_psn_extra[skim[ifill]]->Fill(10.5);
+    }
+    if (ff_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(11.5);
+    }
+    if (f_fired) {
+      h_psn_extra[skim[ifill]]->Fill(12.5);
+    }
+    if (f_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(13.5);
+    }
+    if (lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(14.5);
+    }
+    if (fff_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(15.5);
+    }
+    if (ffo_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(16.5);
+    }
+    if (ffb_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(17.5);
+    }
+    if (ffy_fired) {
+      h_psn_extra[skim[ifill]]->Fill(18.5);
+    }
+    if (ffy_fired && (c4_fired || hie_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(19.5);
+    }
+    if (fyo_fired && (c4_fired || hie_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(20.5);
+    }
+    if (fyb_fired && (c4_fired || hie_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(21.5);
+    }
+    if ((ffy_fired || fyo_fired || fyb_fired) && (c4_fired || hie_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(22.5);
+    }
+    if (ffy_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(23.5);
+    }
+    if (fyo_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(24.5);
+    }
+    if (fyb_fired && (lml_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(25.5);
     }
   }
 }
 
-const int TRGGDLDQMModule::n_output_extra = 4;
-const char* TRGGDLDQMModule::output_extra[4] = {
-  "fff&(c4|hie)", "c4|hie", "fff&hie", "fff&c4"
+const char* TRGGDLDQMModule::output_extra[n_output_extra] = {
+  "all", "fff&(c4|hie)", "ffo&(c4|hie)", "ffb&(c4|hie)", "fff", "c4|hie", "fff|ffo|ffb", "(fff|ffo|ffb)&(c4|hie)", "bha2D", "bha3D",
+  "ff", "ff&(lml|mumu)", "f", "f&(lml|mumu)", "lml|mumu", "fff&(lml|mumu)", "ffo&(lml|mumu)", "ffb&(lml|mumu)", "ffy", "ffy&(c4|hie)",
+  "fyo&(c4|hie)", "fyb&(c4|hie)", "(ffy|ffo|ffb)&(c4|hie)", "ffy&(lml|mumu)", "fyo&(lml|mumu)", "fyb&(lml|mumu)"
 };
+

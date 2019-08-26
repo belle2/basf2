@@ -30,6 +30,14 @@ namespace Belle2 {
       static CDCSimControlPar& getInstance();
 
       /**
+       * Set time-walk flag
+       */
+      void setTimeWalk(bool onoff)
+      {
+        m_timeWalk = onoff;
+      }
+
+      /**
        * Set wiresag flag
        */
       void setWireSag(bool onoff)
@@ -67,6 +75,14 @@ namespace Belle2 {
       void setMinTrackLength(double input)
       {
         m_minTrackLength = input;
+      }
+
+      /**
+       * Get time-walk flag
+       */
+      bool getTimeWalk() const
+      {
+        return m_timeWalk;
       }
 
       /**
@@ -117,7 +133,8 @@ namespace Belle2 {
       /** Singleton class */
       CDCSimControlPar& operator=(const CDCSimControlPar&);
 
-      bool m_wireSag = true;                       /*!< Switch for sense wire sag */
+      bool m_timeWalk = true;           /*!< Switch for time walk in translator */
+      bool m_wireSag = true;             /*!< Switch for sense wire sag */
       bool m_modLeftRightFlag = false;   /*!< Switch for modified left/right flag */
       bool m_debug = false;                    /*!< Switch for debug printing. */
 

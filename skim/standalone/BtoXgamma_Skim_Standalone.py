@@ -1,50 +1,53 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
+######################################################
 #
 # EWP standalone skim steering
-# P. Urquijo, 6/Jan/2015
+#
+# B->Xgamma inclusive skim
+#
+# Trevor Shillington July 2019
 #
 ######################################################
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import stdPi, stdK
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.charm import *
-from skim.standardlists.lightmesons import *
 from stdPhotons import *
-from skimExpertFunctions import setSkimLogging, encodeSkimName
+from stdCharged import stdPi
+from skimExpertFunctions import setSkimLogging, encodeSkimName, get_test_file
+import argparse
 
-gb2_setuprel = 'release-03-00-03'
+# Use argparse to allow the optional --data argument, used only when run on data
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
 
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
+# basic setup
+gb2_setuprel = 'release-03-02-03'
 skimCode = encodeSkimName('BtoXgamma')
-fileList = get_test_file("mixedBGx1", "MC11")
-path = Path()
-inputMdstList('default', fileList, path=path)
-stdPi0s('loose', path=path)
-stdPhotons('tight', path=path)  # also builds loose list
-loadStdSkimPhoton(path=path)
-loadStdSkimPi0(path=path)
-stdPi('loose', path=path)
-stdK('loose', path=path)
-stdK('95eff', path=path)
-stdPi('95eff', path=path)
-stdKshorts(path=path)
-loadStdLightMesons(path=path)
 
-cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1', path=path)
-reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580', path=path)
-# EWP Skim
+path = Path()
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=path)
+
+# import standard lists
+stdPhotons('loose', path=path)
+stdPhotons('all', path=path)
+stdPi('all', path=path)
+
+# call reconstructed lists from scripts/skim/ewp_incl.py
 from skim.ewp import B2XgammaList
 XgammaList = B2XgammaList(path=path)
 skimOutputUdst(skimCode, XgammaList, path=path)
 summaryOfLists(XgammaList, path=path)
 
-
+# process
 setSkimLogging(path=path)
 process(path=path)
 

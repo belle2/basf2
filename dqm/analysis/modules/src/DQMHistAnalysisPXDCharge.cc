@@ -2,7 +2,7 @@
 // File : DQMHistAnalysisPXDCharge.cc
 // Description : Analysis of PXD Cluster Charge
 //
-// Author : Bjoern Spruck, Univerisity Mainz
+// Author : Bjoern Spruck, University Mainz
 // Date : 2018
 //-
 
@@ -35,7 +35,7 @@ DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
   // This module CAN NOT be run in parallel!
 
   //Parameter definition
-  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("pxd"));
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDER"));
   addParam("RangeLow", m_rangeLow, "Lower boarder for fit", 30.);
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 85.);
   addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Charge:"));
@@ -59,7 +59,6 @@ void DQMHistAnalysisPXDChargeModule::initialize()
   std::vector<VxdID> sensors = geo.getListOfSensors();
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
-    // B2DEBUG(20,"VXD " << aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
 
@@ -68,8 +67,8 @@ void DQMHistAnalysisPXDChargeModule::initialize()
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
-  m_cCharge = new TCanvas("c_Charge");
-  m_hCharge = new TH1F("Cluster Charge", "Cluster Charge; Module; Cluster Charge", m_PXDModules.size(), 0, m_PXDModules.size());
+  m_cCharge = new TCanvas((m_histogramDirectoryName + "/c_Charge").data());
+  m_hCharge = new TH1F("Cluster Charge", "Cluster Charge; Module; Track Cluster Charge", m_PXDModules.size(), 0, m_PXDModules.size());
   m_hCharge->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCharge->SetStats(false);
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
@@ -111,8 +110,10 @@ void DQMHistAnalysisPXDChargeModule::initialize()
 
 #ifdef _BELLE2_EPICS
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  mychid.resize(3);
   SEVCHK(ca_create_channel((m_pvPrefix + "Mean").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
   SEVCHK(ca_create_channel((m_pvPrefix + "Diff").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
+  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }
@@ -127,14 +128,13 @@ void DQMHistAnalysisPXDChargeModule::beginRun()
 
 void DQMHistAnalysisPXDChargeModule::event()
 {
-//   double data = 0.0;
   if (!m_cCharge) return;
   m_hCharge->Reset(); // dont sum up!!!
 
   bool enough = false;
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    std::string name = "DQMER_PXD_" + (std::string)m_PXDModules[i ] + "_ClusterCharge";;
+    std::string name = "DQMER_PXD_" + (std::string)m_PXDModules[i] + "_ClusterCharge";
     std::replace(name.begin(), name.end(), '.', '_');
 
     TH1* hh1 = findHist(name);
@@ -146,17 +146,24 @@ void DQMHistAnalysisPXDChargeModule::event()
       /// FIXME Replace by a nice fit
       m_fLandau->SetParameter(0, 1000);
       m_fLandau->SetParameter(1, 50);
+      m_fLandau->SetParLimits(1, 10, 80);
       m_fLandau->SetParameter(2, 10);
-      hh1->Fit(m_fLandau, "R");
-      m_hCharge->SetBinContent(i + 1, m_fLandau->GetParameter(1));
-      m_hCharge->SetBinError(i + 1, m_fLandau->GetParError(1));
+      m_fLandau->SetParLimits(2, 1, 50);
+      if (hh1->GetEntries() > 100) {
+        hh1->Fit(m_fLandau, "R");
+        m_hCharge->SetBinContent(i + 1, m_fLandau->GetParameter(1));
+        m_hCharge->SetBinError(i + 1, m_fLandau->GetParError(1));
+      } else {
+        m_hCharge->SetBinContent(i + 1, 50);
+        m_hCharge->SetBinError(i + 1, 100);
+      }
       // m_hCharge->SetBinError(i + 1, m_fLandau->GetParameter(2) * 0.25); // arbitrary scaling
       // cout << m_fLandau->GetParameter(0) << " " << m_fLandau->GetParameter(1) << " " << m_fLandau->GetParameter(2) << endl;
 
       // m_hCharge->Fill(i, hh1->GetMean());
       m_cCharge->cd();
       hh1->Draw();
-      m_fLandau->Draw("same");
+      if (hh1->GetEntries() > 100) m_fLandau->Draw("same");
 //      m_cCharge->Print(str(format("cc_%d.pdf") % i).data());
 
       if (hh1->GetEntries() > 1000) enough = true;
@@ -164,24 +171,9 @@ void DQMHistAnalysisPXDChargeModule::event()
   }
   m_cCharge->cd();
 
-
-  // not enough Entries
-  if (!enough) {
-    m_cCharge->Pad()->SetFillColor(6);// Magenta
-  } else {
-//   B2INFO("data "<<data);
-    /// FIXME: absolute numbers or relative numbers and what is the laccpetable limit?
-//   if (data > 100.) {
-//     m_cCharge->Pad()->SetFillColor(2);// Red
-//   } else if (data > 50.) {
-//     m_cCharge->Pad()->SetFillColor(5);// Yellow
-//   } else {
-    m_cCharge->Pad()->SetFillColor(0);// White
-  }
-
+  double data = 0;
+  double diff = 0;
   if (m_hCharge) {
-    double data = 0;
-    double diff = 0;
     double currentMin, currentMax;
     m_hCharge->Draw("");
 //     m_line1->Draw();
@@ -196,9 +188,35 @@ void DQMHistAnalysisPXDChargeModule::event()
 #ifdef _BELLE2_EPICS
     SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
     SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
   }
+  int status = 0;
+
+  if (!enough) {
+    // not enough Entries
+    m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
+    // status = 0; default
+  } else {
+    /// FIXME: what is the accpetable limit?
+    if (fabs(data - 50.) > 20. || diff > 30) {
+      m_cCharge->Pad()->SetFillColor(kRed);// Red
+      status = 4;
+    } else if (fabs(data - 50) > 15. || diff > 10) {
+      m_cCharge->Pad()->SetFillColor(kYellow);// Yellow
+      status = 3;
+    } else {
+      m_cCharge->Pad()->SetFillColor(kGreen);// Green
+      status = 2;
+    }
+
+    // FIXME overwrite for now
+    m_cCharge->Pad()->SetFillColor(kGreen);// Green
+  }
+
+#ifdef _BELLE2_EPICS
+  SEVCHK(ca_put(DBR_INT, mychid[2], (void*)&status), "ca_set failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
 
   auto tt = new TLatex(5.5, 0, "1.3.2 Module is broken, please ignore");
   tt->SetTextAngle(90);// Rotated
@@ -219,8 +237,7 @@ void DQMHistAnalysisPXDChargeModule::terminate()
 {
   // should delete canvas here, maybe hist, too? Who owns it?
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_clear_channel(mychid[0]), "ca_clear_channel failure");
-  SEVCHK(ca_clear_channel(mychid[1]), "ca_clear_channel failure");
+  for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: terminate called");

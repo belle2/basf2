@@ -19,21 +19,9 @@
 #include <root/TGeoMatrix.h>
 
 #include <framework/logging/Logger.h>
-
 #include <alignment/GlobalParam.h>
 
-
-#include <framework/dbobjects/BeamParameters.h>
-#include <alignment/dbobjects/VXDAlignment.h>
-#include <alignment/dbobjects/CDCCalibration.h>
-#include <alignment/dbobjects/BKLMAlignment.h>
-#include "GlobalLabel.h"
-#include <eklm/dbobjects/EKLMAlignment.h>
-
-#include <cdc/dbobjects/CDCTimeZeros.h>
-#include <cdc/dbobjects/CDCTimeWalks.h>
-#include <cdc/dbobjects/CDCAlignment.h>
-#include <cdc/dbobjects/CDCXtRelations.h>
+#include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
   class MillepedeAlgorithm;
@@ -126,7 +114,7 @@ namespace Belle2 {
 
       /// Template function to get globals for given db object and its element (and the rest of hierarchy)
       template<class LowestLevelDBObject>
-      GlobalDerivativeSet getGlobalDerivatives(unsigned short sensor, const genfit::StateOnPlane* sop, TVector3 bField)
+      GlobalDerivativeSet getGlobalDerivatives(unsigned short sensor, const genfit::StateOnPlane* sop, B2Vector3D bField)
       {
         if (bField.Mag() < 1.e-10)
           return std::make_pair(std::vector<int>(), TMatrixD());
@@ -139,7 +127,7 @@ namespace Belle2 {
       }
 
       /// Derivatives for Lorentz shift in sensor plane
-      TMatrixD getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, TVector3 bField);
+      TMatrixD getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, B2Vector3D bField);
 
       /// Template function to insert hierarchy relation bewteen two DB objects and their elements
       template<class ChildDBObjectType, class MotherDBObjectType>

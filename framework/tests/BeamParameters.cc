@@ -25,7 +25,7 @@ namespace {
     EXPECT_TRUE(fabs(upsVecCMS.E() - mUpsilon) < 1e-2);
     EXPECT_TRUE(fabs(upsVecCMS.X()) < 1e-15);
     EXPECT_TRUE(fabs(upsVecCMS.Y()) < 1e-15);
-    EXPECT_TRUE(fabs(upsVecCMS.Z()) < 1e-15);
+    EXPECT_TRUE(fabs(upsVecCMS.Z()) < 2e-15) << fabs(upsVecCMS.Z());
 
     EXPECT_TRUE(fabs(beamparams.getMass() - mUpsilon) < 1e-2);
   }

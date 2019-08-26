@@ -51,7 +51,7 @@ stdPi0s('looseFit', path=my_path)
 reconstructDecay('D0:pi0pi0 -> pi0:looseFit pi0:looseFit', '1.7 < M < 2.0', path=my_path)
 
 # perform mass fit using KFit
-# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
+# Reject the candidates with failed fit.
 massKFit('D0:pi0pi0', 0.0, path=my_path)
 
 # reconstruct B0 -> D0 pi0 decay

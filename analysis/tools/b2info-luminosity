@@ -8,7 +8,7 @@ Based on a bash script by Mikhail Remnev mikhail.remnev@desy.de
 https://confluence.desy.de/display/BI/ECL+LM+Integrated+luminosity+in+Phase+3
 
 Usage:
-    b2info-luminosity-online --exp <E> --runs <Range> --what [online|offline]--plot [DATE|RUN] [--verbose] [--db db_path]
+    b2info-luminosity-online --exp <E> --runs <Range> --what [online|offline] --plot [DATE|RUN] [--verbose]
 
 <E> experiment number (mandatory) A range is allowed
 <Range> run range (mandatory)
@@ -18,7 +18,7 @@ Usage:
 --what Use Offline (default) or Online luminosity
 --plot Produce plot of integrated luminosity vs day (DATE) or vs run (RUN)
 --verbose print lumi for each run
---dbon|offline path of database to use
+--dbon|offline path of database to use (for developers)
 
 """
 
@@ -196,12 +196,13 @@ class Luminosity:
         """
         create a panda dataframe from Offline DB
         """
-        cmdexp = f"SELECT {self.col_lumi} as lumi, run, start_time as date FROM RunLumi WHERE exp IN ({', '.join(['?' for _ in self.exp])})  "
+        cmdexp = f"SELECT {self.col_lumi} as lumi, exp, run, start_time as date FROM RunLumi WHERE exp IN ({', '.join(['?' for _ in self.exp])})  "
         if args.runs:
             cmdexp += f" AND run >= {min(self.runs)} AND run <= {max(self.runs)}"
 
         # Get the DB as a pandas.Dataframe.
         df = pd.read_sql(cmdexp, self.conn, params=self.exp)
+        df = df.sort_values(by=['date'])
         print(f"Read {len(df)} runs for experiment {self.expstr}")
 
         # # convert epoch to date
@@ -226,6 +227,7 @@ class Luminosity:
 
         # Get the DB as a pandas.Dataframe.
         df = pd.read_sql(cmdexp, self.conn, params=self.exp)
+        df = df.sort_values(by=['date'])
         print(f"Read {len(df)} runs for experiment {self.expstr}")
 
         # convert epoch to date
@@ -363,14 +365,16 @@ class Luminosity:
             dfRuns=self.df
         # create a reduced dataframe with only runs selected
 
-        cols=['run','lumi','date','intLumi']
+        cols=['exp','run','lumi','date','intLumi']
         if (self.verb):
             print('-' * 61)
             print('-' * 20,f"{self.what} Luminosity",'-'*20)
             print('-' * 61)
             print(dfRuns[cols]
                 .to_string(index=False,
-                    formatters={"run" : "{:5d}".format,
+                    formatters={
+                    "exp" : "{:3d}".format,
+                    "run" : "{:5d}".format,
                     "lumi" : "{:,.2f}".format,
                     "data" : "".format,
                     "intLumi" : "{:,.2f}".format,

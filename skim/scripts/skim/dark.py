@@ -6,7 +6,8 @@
 __authors__ = [
     "Sam Cunliffe",
     "Michael De Nuccio",
-    "Ilya Komarov"
+    "Ilya Komarov",
+    "Giacomo De Pietro"
 ]
 
 
@@ -225,3 +226,119 @@ def LFVZpVisibleList(path):
     lfvzp_list.append('vpho:2tr_vislfvzp')
 
     return lfvzp_list
+
+
+def DimuonForDarkSearchesList(path):
+    """
+    Note:
+        * Dimuon skim, needed for ee --> mu mu Z'; Z' --> invisible and others
+        * Skim code: ???
+        * Physics channel: ee --> mu mu
+        * Skim category: physics, dark sector
+
+    The skim list for the dimuon-based dark sector searches
+
+    Parameters:
+        path (basf2.Path) the path to add the skim list builders
+
+    Returns:
+        list containing the candidate names
+    """
+    __author__ = 'Giacomo De Pietro'
+
+    dimuon_list = []
+    dimuon_name = 'Z0:mumu'
+
+    # Define some cuts
+    fromIP_cut = 'abs(dz) < 2.0 and abs(dr) < 0.5'
+    muonID_cut = 'muonID > 0.1'
+    # We want exaclty 2 tracks from IP
+    dimuon_cut = 'nCleanedTracks(' + fromIP_cut + ') == 2'
+    # And the pair must have pt > 200 MeV in CMS frame
+    dimuon_cut += ' and useCMSFrame(pt) > 0.2'
+
+    # Reconstruct the dimuon candidate
+    cutAndCopyList('mu+:dimuon', 'mu+:all', fromIP_cut + ' and ' + muonID_cut, path=path)
+    reconstructDecay(dimuon_name + ' -> mu+:dimuon mu-:dimuon', dimuon_cut, path=path)
+
+    # And return the dimuon list
+    dimuon_list.append(dimuon_name)
+    return dimuon_list
+
+
+def ElectronMuonForDarkSearchesList(path):
+    """
+    Note:
+        * Electron-muon pair skim, needed for ee --> e mu Z'; Z' --> invisible and others
+        * Skim code: ???
+        * Physics channel: ee --> e mu
+        * Skim category: physics, dark sector
+
+    The skim list for the electron-muon-based dark sector searches
+
+    Parameters:
+        path (basf2.Path) the path to add the skim list builders
+
+    Returns:
+        list containing the candidate names
+    """
+    __author__ = 'Giacomo De Pietro'
+
+    emu_list = []
+    emu_name = 'Z0:emu'
+
+    # Define some basic cuts
+    fromIP_cut = 'abs(dz) < 2.0 and abs(dr) < 0.5'
+    electronID_cut = 'electronID > 0.1'
+    muonID_cut = 'muonID > 0.1'
+    # We want exaclty 2 tracks from IP
+    emu_cut = 'nCleanedTracks(' + fromIP_cut + ') == 2'
+    # And the pair must have pt > 200 MeV in CMS frame
+    emu_cut += ' and useCMSFrame(pt) > 0.2'
+
+    # Reconstruct the dimuon candidate
+    cutAndCopyList('e+:emu', 'e+:all', fromIP_cut + ' and ' + electronID_cut, path=path)
+    cutAndCopyList('mu+:emu', 'mu+:all', fromIP_cut + ' and ' + muonID_cut, path=path)
+    reconstructDecay(emu_name + ' -> e+:emu mu-:emu', emu_cut, path=path)
+
+    # And return the dimuon list
+    emu_list.append(emu_name)
+    return emu_list
+
+
+def DielectronForDarkSearchesList(path):
+    """
+    Note:
+        * Dielectron skim, needed for ee --> gamma A'; A' --> ee and others
+        * Skim code: ???
+        * Physics channel: ee --> ee
+        * Skim category: physics, dark sector
+
+    The skim list for the dielectron-based dark sector searches
+
+    Parameters:
+        path (basf2.Path) the path to add the skim list builders
+
+    Returns:
+        list containing the candidate names
+    """
+    __author__ = 'Giacomo De Pietro'
+
+    dielectron_list = []
+    dielectron_name = 'Z0:ee'
+
+    # Define some basic cuts
+    fromIP_cut = 'abs(dz) < 2.0 and abs(dr) < 0.5'
+    electronID_cut = 'electronID > 0.1'
+    # We want exaclty 2 tracks from IP
+    dielectron_cut = 'nCleanedTracks(' + fromIP_cut + ') == 2'
+    # And the pair must have pt > 200 MeV in CMS frame
+    dielectron_cut += ' and useCMSFrame(pt) > 0.2'
+
+    # Reconstruct the dielectron candidate
+    cutAndCopyList('e+:dielectron', 'e+:all', fromIP_cut + ' and ' + electronID_cut, path=path)
+    reconstructDecay(dielectron_name + ' -> e+:dielectron e-:dielectron', dielectron_cut, path=path)
+
+    # And return the dielectron list
+    dielectron_list.append(dielectron_name)
+    return dielectron_list

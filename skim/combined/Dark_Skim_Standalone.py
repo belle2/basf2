@@ -34,7 +34,6 @@ if args.data:
 darkskimpath = Path()
 inputMdstList('default', fileList, path=darkskimpath)
 
-
 stdMu('all', path=darkskimpath)
 stdMu('loose', path=darkskimpath)
 stdE('all', path=darkskimpath)
@@ -58,10 +57,8 @@ loadStdDiLeptons(True, path=darkskimpath)
 
 cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=darkskimpath)
 
-
 from skim.dark import ALP3GammaList
 add_skim('ALP3Gamma', ALP3GammaList(path=darkskimpath), path=darkskimpath)
-
 
 from skim.dark import LFVZpInvisibleList
 add_skim('LFVZpInvisible', LFVZpInvisibleList(path=darkskimpath), path=darkskimpath)
@@ -69,9 +66,18 @@ add_skim('LFVZpInvisible', LFVZpInvisibleList(path=darkskimpath), path=darkskimp
 from skim.dark import LFVZpVisibleList
 add_skim('LFVZpVisible', LFVZpVisibleList(path=darkskimpath), path=darkskimpath)
 
-
 from skim.dark import SinglePhotonDarkList
 add_skim('SinglePhotonDark', SinglePhotonDarkList(path=darkskimpath), path=darkskimpath)
+
+from skim.dark import DimuonForDarkSearchesList as DimuonList
+add_skim('DimuonForDarkSearches', DimuonList(path=darkskimpath), path=darkskimpath)
+
+from skm.dark import ElectronMuonForDarkSearchesList as ElectronMuonList
+add_skim('ElectronMuonForDarkSearches', ElectronMuonList(path=darkskimpath), path=darkskimpath)
+
+from skm.dark import DielectronForDarkSearchesList as DielectronList
+add_skim('DielectronForDarkSearches', DielectronList(path=darkskimpath), path=darkskimpath)
+
 setSkimLogging(path=darkskimpath)
 process(darkskimpath)
 

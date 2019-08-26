@@ -8,7 +8,7 @@ Based on a bash script by Mikhail Remnev mikhail.remnev@desy.de
 https://confluence.desy.de/display/BI/ECL+LM+Integrated+luminosity+in+Phase+3
 
 Usage:
-    b2info-luminosity-online --exp <E> --runs <Range> --what [online|offline] --plot [DATE|RUN] [--verbose]
+    b2info-luminosity --exp <E> --runs <Range> --what [online|offline] --plot [DATE|RUN] [--verbose]
 
 <E> experiment number (mandatory) A range is allowed
 <Range> run range (mandatory)

@@ -22,7 +22,6 @@ from variables import variables
 import sys
 
 path = create_path()
-use_central_database("development")
 set_random_seed('#BAADF00D')
 
 if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:

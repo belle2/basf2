@@ -84,9 +84,77 @@ namespace Belle2 {
       }
     }
 
+    double chiE(const Particle* part)
+    {
+      const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getChi(0);
+      }
+    }
+
+    double chiMu(const Particle* part)
+    {
+      const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getChi(1);
+      }
+    }
+
+    double chiPi(const Particle* part)
+    {
+      const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getChi(2);
+      }
+    }
+
+    double chiK(const Particle* part)
+    {
+      const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getChi(3);
+      }
+    }
+
+    double chiP(const Particle* part)
+    {
+      const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getChi(4);
+      }
+    }
+
+
+    double chiD(const Particle* part)
+    {
+      const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getChi(5);
+      }
+    }
+
+
     VARIABLE_GROUP("Dedx");
     REGISTER_VARIABLE("dedx", dedx, "dE/dx truncated mean");
     REGISTER_VARIABLE("dedxnosat", dedxnosat, "dE/dx truncated mean without saturation correction");
     REGISTER_VARIABLE("pCDC", pCDC, "Momentum valid in the CDC");
+    REGISTER_VARIABLE("chiE", chiE, "Chi value of electrons from CDC dEdx");
+    REGISTER_VARIABLE("chiMu", chiMu, "Chi value of muons from CDC dEdx");
+    REGISTER_VARIABLE("chiPi", chiPi, "Chi value of pions from CDC dEdx");
+    REGISTER_VARIABLE("chiK", chiK, "Chi value of kaons from CDC dEdx");
+    REGISTER_VARIABLE("chiP", chiP, "Chi value of protons from CDC dEdx");
+    REGISTER_VARIABLE("chiD", chiD, "Chi value of duetrons from CDC dEdx");
   }
 }

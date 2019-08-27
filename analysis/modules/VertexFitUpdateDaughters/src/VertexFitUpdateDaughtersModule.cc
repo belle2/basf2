@@ -155,8 +155,6 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
 
   std::vector<std::string> tracksName = m_decaydescriptor.getSelectionNames();
 
-  int nvert = 0;
-
   if (tracksVertex.size() == 0) {
     B2ERROR("VertexFitUpdateDaughtersModule: no track selected.");
     return false;
@@ -178,7 +176,7 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
 
     TVector3 pos; TMatrixDSym RerrMatrix(7);
 
-    nvert = rsf.fit();
+    int nvert = rsf.fit();
 
 
 
@@ -221,7 +219,7 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
 
     TVector3 pos; TMatrixDSym RerrMatrix(3);
 
-    nvert = rsg.fit("avf");
+    int nvert = rsg.fit("avf");
 
     if (nvert > 0) {
       pos = rsg.getPos(0);

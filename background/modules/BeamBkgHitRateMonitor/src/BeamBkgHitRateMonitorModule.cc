@@ -63,7 +63,7 @@ namespace Belle2 {
     addParam("writeEmptyTimeStamps", m_writeEmptyTimeStamps,
              "if true, write to ntuple also empty time stamps", false);
     addParam("topTimeOffset", m_topTimeOffset,
-             "TOP: time offset of hits (to be subtracted) [ns]", 400.0);
+             "TOP: time offset of hits (to be subtracted) [ns]", 25.0);
     addParam("topTimeWindow", m_topTimeWindow,
              "TOP: time window in which to count hits [ns]", 100.0);
     addParam("svdShaperDigitsName", m_svdShaperDigitsName,

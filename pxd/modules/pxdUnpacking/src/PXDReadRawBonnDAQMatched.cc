@@ -1,13 +1,14 @@
 //+
-// File : PXDReadRawBonnDAQ.cc
+// File : PXDReadRawBonnDAQMatched.cc
 // Description : Module to Load Raw PXD Data from DHH network-dump file and store it as RawPXD in Data Store
 // This is meant for lab use (standalone testing, debugging) without an event builder.
+// This module is able to read the BonnDAQ data unordered, e.g. scan for the current event number
 //
 // Author : Bjoern Spruck
-// Date : 02.05.2018
+// Date : 16.06.2019
 //-
 
-#include <pxd/modules/pxdUnpacking/PXDReadRawBonnDAQ.h>
+#include <pxd/modules/pxdUnpacking/PXDReadRawBonnDAQMatched.h>
 #include <boost/spirit/home/support/detail/endian.hpp>
 #include <boost/crc.hpp>
 
@@ -23,37 +24,36 @@ typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhe_crc_32_type;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDReadRawBonnDAQ)
+REG_MODULE(PXDReadRawBonnDAQMatched)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDReadRawBonnDAQModule::PXDReadRawBonnDAQModule() : Module()
+PXDReadRawBonnDAQMatchedModule::PXDReadRawBonnDAQMatchedModule() : Module()
 {
   fh = 0;
   //Set module properties
-  setDescription("Read a BonnDAQ file and stores it as RawPXD in Data Store");
-  //setPropertyFlags(c_Input | c_ParallelProcessingCertified); // not parallel processing!
+  setDescription("Read a BonnDAQ form file, match to current event and stores it as RawPXD in Data Store");
+  //setPropertyFlags( c_ParallelProcessingCertified); // can not be run in parallel!
+
+  addParam("RawPXDsName", m_RawPXDsName, "The name of the StoreArray of RawPXDs to be written", std::string(""));
 
   addParam("FileName", m_filename, "file name");
-  addParam("SubRunNr", m_subRunNr, "sub-run number", 0u);
-  addParam("RunNr", m_runNr, "run number", 0u);
-  addParam("ExpNr", m_expNr, "exp number", 0u);
   m_buffer = new int[MAXEVTSIZE];
 
-  B2DEBUG(29, "PXDReadRawBonnDAQModule: Constructor done.");
+  B2DEBUG(29, "PXDReadRawBonnDAQMatchedModule: Constructor done.");
 }
 
 
-PXDReadRawBonnDAQModule::~PXDReadRawBonnDAQModule()
+PXDReadRawBonnDAQMatchedModule::~PXDReadRawBonnDAQMatchedModule()
 {
   delete[] m_buffer;
 }
 
-void PXDReadRawBonnDAQModule::initialize()
+void PXDReadRawBonnDAQMatchedModule::initialize()
 {
-  // Open file
+  // Open File
   fh = fopen(m_filename.c_str(), "rb");
   if (fh) {
     B2INFO("Read BonnDAQ Data from " << m_filename);
@@ -61,15 +61,15 @@ void PXDReadRawBonnDAQModule::initialize()
     B2ERROR("Could not open BonnDAQ Data: " << m_filename);
   }
 
-  // Register EvtMetaData
-  m_eventMetaDataPtr.registerInDataStore(DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  // Ask EvtMetaData
+  m_eventMetaDataPtr.isRequired();
   // Register RawPXD
-  m_rawPXD.registerInDataStore(DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  m_rawPXD.registerInDataStore(m_RawPXDsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
 
-  B2DEBUG(29, "PXDReadRawBonnDAQModule: initialized.");
+  B2DEBUG(29, "PXDReadRawBonnDAQMatchedModule: initialized.");
 }
 
-int PXDReadRawBonnDAQModule::read_data(char* data, size_t len)
+int PXDReadRawBonnDAQMatchedModule::read_data(char* data, size_t len)
 {
   size_t l = 0;
   if (fh) l = fread(data, 1, len, fh);
@@ -77,9 +77,12 @@ int PXDReadRawBonnDAQModule::read_data(char* data, size_t len)
   return l;
 }
 
-int PXDReadRawBonnDAQModule::readOneEvent()
+int PXDReadRawBonnDAQMatchedModule::readOneEvent(unsigned int& rettriggernr)
 {
   unsigned int triggernr = 0xFFFFFFFF;
+
+  auto current_offset = ftell(fh);
+  if (current_offset > m_last_offset) m_last_offset = current_offset;
 
   struct EvtHeader {
     ulittle16_t size;
@@ -116,7 +119,7 @@ int PXDReadRawBonnDAQModule::readOneEvent()
       continue;
     } else if (evt->get_header12() == 0xe100) {
       B2DEBUG(29, "Info Event " << std::hex << evt->get_header12() << " RunNr $" << std::hex << data32[1]);
-      if (m_runNr == 0) m_runNr = data32[1]; // we assume it will not change within one file
+      // if (m_runNr == 0) m_runNr = data32[1]; // we assume it will not change within one file
       continue;
     } else if (evt->get_header10() == 0x0000) { // war 0x0020
       B2DEBUG(29, "Run Event Group " << std::hex << evt->get_header10() << " Magic $" << std::hex << data32[1]);
@@ -165,7 +168,7 @@ int PXDReadRawBonnDAQModule::readOneEvent()
           }
 
           for (int i = 0; i < frames; i++) {
-            B2INFO(".... " << i << ": " << table16[i]);
+            // B2INFO(".... " << i << ": " << table16[i]);
             size += table16[i];
 
             /** For current processed frames */
@@ -200,18 +203,15 @@ int PXDReadRawBonnDAQModule::readOneEvent()
             data16 += 2;
           }
 
-          m_rawPXD.appendNew(m_onsen_header, m_onsen_payload);
+          if (rettriggernr == triggernr) m_rawPXD.appendNew(m_onsen_header, m_onsen_payload);
         }
       }// while ...
 
-      // Update EventMetaData
-      B2INFO("Set Meta: Exp " << m_expNr << " Run " << m_runNr << " TrgNr " << triggernr);
-      m_eventMetaDataPtr.create();
-      m_eventMetaDataPtr->setExperiment(m_expNr);
-      m_eventMetaDataPtr->setRun(m_runNr);
-      m_eventMetaDataPtr->setEvent(triggernr);
-      // we cannot recover time tag here. this would need further decoding from DHH header
-      // m_eventMetaDataPtr->setTime((unsigned long long int)((time_tag_hi<<1) +(time_tag_mid &0x8000?1:0))*1000000000+(int)std::round(tt / 0.127216));
+      rettriggernr = triggernr;
+
+      m_event_offset[triggernr] = current_offset;
+      current_offset = ftell(fh);
+      if (current_offset > m_last_offset) m_last_offset = current_offset;
 
       return 1;
     } else {
@@ -221,32 +221,44 @@ int PXDReadRawBonnDAQModule::readOneEvent()
     continue;
 
   }
+  rettriggernr = 0xFFFFFFFF;
+
   return 0;
 }
 
-void PXDReadRawBonnDAQModule::event()
+void PXDReadRawBonnDAQMatchedModule::event()
 {
   if (fh == 0) {
-    B2ERROR("Unexpected close of dump file.");
+    B2ERROR("Unexpected close of bonndaq file.");
     terminate();
     return;
   }
 
+  auto triggernr = m_eventMetaDataPtr->getEvent();
+
+  // Check if event has an offset, if not skip until end of checked area
+  auto offset = m_event_offset[triggernr];
+  if (offset == 0) offset = m_last_offset;
+  fseek(fh, offset, SEEK_SET);
   // Get a record from file
   int stat;
+  auto tnr = triggernr;
   do {
-    stat = readOneEvent();
+//         B2INFO("Search for " << triggernr);
+    tnr = triggernr; // set again as it is the return value
+    stat = readOneEvent(tnr);
     if (stat <= 0) {
       /// End of File
-      terminate();
-      return;
+      break;
     };
-  } while (stat == 0);
+//         B2INFO("Found " << tnr);
+  } while (tnr != triggernr); // found and filled, else continue
+
 
   return;
 }
 
-void PXDReadRawBonnDAQModule::terminate()
+void PXDReadRawBonnDAQMatchedModule::terminate()
 {
   if (fh) fclose(fh);
   fh = 0;

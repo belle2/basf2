@@ -822,7 +822,7 @@ namespace Belle2 {
     float m_x;      /**< position component x */
     float m_y;      /**< position component y */
     float m_z;      /**< position component z */
-    float m_errMatrix[c_SizeMatrix]; /**< error matrix (1D representation) */
+    float m_errMatrix[c_SizeMatrix] = {}; /**< error matrix (1D representation) */
     float m_pValue;   /**< chi^2 probability of the fit. Default is nan */
     std::vector<int> m_daughterIndices;  /**< daughter particle indices */
     EFlavorType m_flavorType;  /**< flavor type. */

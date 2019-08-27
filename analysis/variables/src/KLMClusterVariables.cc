@@ -299,7 +299,7 @@ namespace Belle2 {
 Returns the energy of the KLMCluster. 
 
 .. warning::
-    klmClusterEnergy is an approximation of the energy: it uses :b2:var:klmClusterMomentum: as momentum and the hypothesis that the cluster was originated by a :math:`K_{L}^0`.
+    klmClusterEnergy is an approximation of the energy: it uses :b2:var:`klmClusterMomentum` as momentum and the hypothesis that the cluster was originated by a :math:`K_{L}^0`.
     It should be used with caution, and may not be physically meaningful.
 )DOC");
     REGISTER_VARIABLE("klmClusterMomentum", klmClusterMomentum, R"DOC(

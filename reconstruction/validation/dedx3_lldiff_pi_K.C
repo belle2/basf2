@@ -61,13 +61,13 @@ void plot(const TString &input_filename)
       TH1* hist = (TH1*)output_file->Get(TString::Format("%d_%d_LLdiff", det, pdg_codes[part]));
       hist->SetTitle(TString::Format("LL(pi) - LL(K) for true %s, over momentum (in %s)", pdg_names[part], (det==0)?"VXD":"CDC"));
       hist->GetListOfFunctions()->Add(new TNamed("Description", hist->GetTitle()));
-      hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
       if (pdg_codes[part] == 211) {
         hist->GetListOfFunctions()->Add(new TNamed("Check", "Should be as high as possible (esp. for low momenta), with almost no entries <0 "));
       } else {
         hist->GetListOfFunctions()->Add(new TNamed("Check", "Should be as low as possible (esp. for low momenta), with almost no entries >0 "));
       }
-      hist->GetListOfFunctions()->Add(new TNamed("Contact","jkumar@andrew.cmu.edu"));
+      hist->GetListOfFunctions()->Add(new TNamed("Contact","Jitendra Kumar: jkumar@andrew.cmu.edu"));
+      hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
       hist->Write();
 
     }

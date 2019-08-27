@@ -938,12 +938,26 @@ def reconstructDecay(
     their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All
     possible combinations are created (overlaps are forbidden) and combinations that pass the specified selection
     criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
-    reconstructed as well (meaning that the charge conjugated mother list is created as well). One cay use an
-    at-sign '@' to mark a particle as unspecified, e.g. in form of a DecayString: '\@Xsd -> K+ pi-'. If the particle
-    is marked as unspecified, it will not checked for its identity when doing :ref:`MCMatching`. Any particle which
+    reconstructed as well (meaning that the charge conjugated mother list is created as well).
+
+    One can use an at-sign '@' to mark a particle as unspecified, e.g. in form of a DecayString: '\@Xsd -> K+ pi-'. If the particle
+    is marked as unspecified, its identity will not be checked when doing :ref:`MCMatching`. Any particle which
     decays into the correct daughters will be flagged as correct. For example the DecayString '\@Xsd -> K+ pi-'
     would match all particles which decay into a Kaon and a pion, for example K*, B0, D0. Still the daughters
     need to be stated correctly so this can be used for "sum of exclusive" decays
+
+    .. warning::
+        The input ParticleLists are typically ordered according to the upstream reconstruction algorithm.
+        Therefore, if you combine two or more identical particles in the decay chain you should not expect to see the same
+        distribution for the daughter kinematics as they may be sorted by geometry, momentum etc.
+
+        For example, in the decay ``D0 -> pi0 pi0`` the momentum distributions of the two ``pi0`` s are not identical.
+        This can be solved by manually randomising the lists before combining.
+
+    See Also:
+
+        * `Particle combiner how does it work? <https://questions.belle2.org/question/4318/particle-combiner-how-does-it-work/>`_
+        * `Identical particles in decay chain <https://questions.belle2.org/question/5724/identical-particles-in-decay-chain/>`_
 
     @param decayString :ref:`DecayString` specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)

@@ -141,7 +141,7 @@ namespace Belle2 {
       struct MetaVar : public VarBase {
         MetaFunctionPtr function; /**< Pointer to function. */
         /** ctor */
-        MetaVar(const std::string& n, MetaFunctionPtr f, const std::string& d, const std::string& g = "")
+        explicit MetaVar(const std::string& n, MetaFunctionPtr f, const std::string& d, const std::string& g = "")
           : VarBase(n, d, g), function(f) { }
       };
 

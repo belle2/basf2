@@ -31,14 +31,14 @@ namespace Belle2 {
      * @param binEdgesX the vector of bin edges for the X axis
      * @param binEdgesY the vector of bin edges for the Y axis
      */
-    void setBinEdges(std::vector<float>binEdgesX, std::vector<float>binEdgesY);
+    void setBinEdges(const std::vector<float>& binEdgesX, const std::vector<float>& binEdgesY);
 
 
     /**
      * Sets the priors table from a 2D std::vector
      * @param priors 2D std:vector of floats containing the prior probaiblity for each bin
      */
-    void setPriorsTable(std::vector<float> priors)
+    void setPriorsTable(const std::vector<float>& priors)
     {
       m_priors = priors;
       return;
@@ -49,7 +49,7 @@ namespace Belle2 {
      * Sets the priors error table from a 2D std::vector
      * @param errors 2D std:vector of floats containing the error on the prior probaiblity for each bin
      */
-    void setErrorsTable(std::vector<float> errors)
+    void setErrorsTable(const std::vector<float>& errors)
     {
       m_errors = errors;
       return;
@@ -79,7 +79,7 @@ namespace Belle2 {
      * @param labelX the label of the X axis
      * @param labelY the label of the X axis
      */
-    void setAxisLabels(std::string labelX, std::string labelY)
+    void setAxisLabels(const std::string& labelX, const std::string& labelY)
     {
       m_xAxisLabel = labelX;
       m_yAxisLabel = labelY;
@@ -195,6 +195,7 @@ namespace Belle2 {
      * @param array the std::vector the val has to be found
      * @returns the position of the last edge below the input value
      */
+    // cppcheck-suppress unusedPrivateFunction
     short findBinFast(float value, std::vector<float> array) const;
 
     /**
@@ -204,6 +205,7 @@ namespace Belle2 {
      * @param array the std::vector the val has to be found
      * @returns the position of the last edge below the input value
      */
+    // cppcheck-suppress unusedPrivateFunction
     short findBinWithFixedWidth(float val, std::vector<float> array) const;
 
 

@@ -99,11 +99,10 @@ namespace Belle2 {
     {
       m_eventextrainfo.registerInDataStore();
 
-      if (m_decayString != "")
+      if (m_decayString != "") {
         m_decaydescriptor.init(m_decayString);
-
-      if (m_decayString != "")
         B2INFO("ParticleKinematicFitter: Using specified decay string: " << m_decayString);
+      }
     }
 
 
@@ -401,7 +400,6 @@ namespace Belle2 {
 
         // error matrix
         CLHEP::HepSymMatrix clhepmomentumerrormatrix = getCLHEPMomentumErrorMatrix(particle);
-        CLHEP::HepSymMatrix clhepmomentumvertexerrormatrix = getCLHEPMomentumVertexErrorMatrix(particle);
 
         // create the fit object (ParticleFitObject is the base class)
         ParticleFitObject* pfitobject;
@@ -544,9 +542,6 @@ namespace Belle2 {
         m_hardConstraintRecoilMass.setName("Recoil Mass [hard]");
 
       } else if (m_orcaConstraint == "Mass") {
-        PCmsLabTransform T;
-        const TLorentzVector boost = T.getBeamFourMomentum();
-
         m_hardConstraintMass = MassConstraint(m_invMass);
 
         m_hardConstraintMass.resetFOList();
@@ -734,7 +729,6 @@ namespace Belle2 {
                                                                Particle* mother)
     {
       // get old values
-      TLorentzVector mom    = mother->get4Vector();
       TVector3 pos          = mother->getVertex();
       TMatrixFSym errMatrix = mother->getMomentumVertexErrorMatrix();
       float pvalue          = mother->getPValue();

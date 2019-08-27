@@ -98,10 +98,6 @@ namespace Belle2 {
       void addParticles(std::vector<const Particle*>& particles)
       {
         if (isValid()) {
-          B2INFO("Mask " + m_name + " is default and valid, cannot write to it!");
-          return;
-        }
-        if (isValid()) {
           B2INFO("Mask " + m_name + " originating from "  + m_origin + " is  valid, cannot write to it!");
           return;
         } else {

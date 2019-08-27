@@ -60,7 +60,7 @@ void PIDPriors::setPriors(const Const::ChargedStable& particle, TH2F* priorHisto
 
 void PIDPriors::setPriors(const Const::ChargedStable& particle, TH2F* counts, TH2F* normalization)
 {
-  TH2F* priorHistogram = (TH2F*)counts->Clone();
+  TH2F* priorHistogram = static_cast<TH2F*>(counts->Clone());
 
   priorHistogram->Sumw2();
   priorHistogram->Divide(normalization);

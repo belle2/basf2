@@ -222,28 +222,28 @@ namespace Belle2 {
 
     double flightDistance(const Particle* part)
     {
-      double flightDistanceErr = -999;
-      return getFlightInfoBtw(part, part, flightDistanceErr, "distance");
+      double flightDistanceError = -999;
+      return getFlightInfoBtw(part, part, flightDistanceError, "distance");
     }
 
     double flightTime(const Particle* part)
     {
-      double flightTimeErr = -999;
-      return getFlightInfoBtw(part, part, flightTimeErr, "time");
+      double flightTimeError = -999;
+      return getFlightInfoBtw(part, part, flightTimeError, "time");
     }
 
     double flightDistanceErr(const Particle* part)
     {
-      double flightDistanceErr = -999;
-      getFlightInfoBtw(part, part, flightDistanceErr, "distance");
-      return flightDistanceErr;
+      double flightDistanceError = -999;
+      getFlightInfoBtw(part, part, flightDistanceError, "distance");
+      return flightDistanceError;
     }
 
     double flightTimeErr(const Particle* part)
     {
-      double flightTimeErr = -999;
-      getFlightInfoBtw(part, part, flightTimeErr, "time");
-      return flightTimeErr;
+      double flightTimeError = -999;
+      getFlightInfoBtw(part, part, flightTimeError, "time");
+      return flightTimeError;
     }
 
     inline double getVertexDistance(const Particle* particle, const Particle* daughter, double& vertexDistanceErr,
@@ -326,30 +326,30 @@ namespace Belle2 {
 
     double vertexDistance(const Particle* part)
     {
-      double vertexDistanceErr = -999;
+      double vertexDistanceError = -999;
       if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
         return -999;
       }
-      return getVertexDistance(part, part, vertexDistanceErr);
+      return getVertexDistance(part, part, vertexDistanceError);
     }
 
     double vertexDistanceErr(const Particle* part)
     {
-      double vertexDistanceErr = -999;
+      double vertexDistanceError = -999;
       if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
         return -999;
       }
-      getVertexDistance(part, part, vertexDistanceErr);
-      return vertexDistanceErr;
+      getVertexDistance(part, part, vertexDistanceError);
+      return vertexDistanceError;
     }
 
     double vertexDistanceSignificance(const Particle* part)
     {
-      double vertexDistanceErr = -999;
+      double vertexDistanceError = -999;
       if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
         return -999;
       }
-      return getVertexDistance(part, part, vertexDistanceErr) / vertexDistanceErr;
+      return getVertexDistance(part, part, vertexDistanceError) / vertexDistanceError;
     }
 
     Manager::FunctionPtr flightTimeOfDaughter(const std::vector<std::string>& arguments)

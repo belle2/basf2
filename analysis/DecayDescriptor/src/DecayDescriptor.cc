@@ -56,10 +56,8 @@ bool DecayDescriptor::init(const DecayString& s)
   // a) DecayStringParticleList
   // b) DecayStringDecay
 
-  bool isInitOK = false;
-
   if (const DecayStringParticle* p = boost::get< DecayStringParticle >(&s)) {
-    isInitOK = m_mother.init(*p);
+    bool isInitOK = m_mother.init(*p);
     if (!isInitOK) {
       B2WARNING("Could not initialise mother particle " << p->m_strName);
       return false;
@@ -67,7 +65,7 @@ bool DecayDescriptor::init(const DecayString& s)
     return true;
   } else if (const DecayStringDecay* d = boost::get< DecayStringDecay > (&s)) {
     // Initialise list of mother particles
-    isInitOK = m_mother.init(d->m_mother);
+    bool isInitOK = m_mother.init(d->m_mother);
     if (!isInitOK) {
       B2WARNING("Could not initialise mother particle " << d->m_mother.m_strName);
       return false;

@@ -77,8 +77,10 @@ If you have a physics analysis sensitive to this change: please discuss with the
 
 .. seealso:: The beam information can be accessed with :b2:var:`Ecms`, :b2:var:`beamPx`,  :b2:var:`beamPy`,  :b2:var:`beamPz`, and  :b2:var:`beamE`.
 
-.. note:: As a consequence of this, there is now a difference between the variables ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz` ) and ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` ).
-
+.. note:: 
+        As a consequence of this, there is now a **difference** between the variables 
+        ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz` ) compared to ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` );
+        and similarly for variables ( :b2:var:`mcDX`, :b2:var:`mcDY`, :b2:var:`mcDZ` )  compared to ( :b2:var:`mcX`, :b2:var:`mcY` and :b2:var:`mcZ` ).
 
 .. rubric:: Abort processing for invalid or missing global tags
 

@@ -2518,7 +2518,13 @@ def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path):
 def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
     """
     Calculates distance between two vertices, distance of closest approach between a vertex and a track,\
-    distance of closest approach between a vertex and btube
+    distance of closest approach between a vertex and btube. For track, this calculation ignores track curvature,\
+    it's negligible for small distances.The user should use extraInfo(CalculatedDistance)\
+    to get it. A full example steering file is at analysis/tests/test_DistanceCalculator.py
+
+    Example:
+      >>> from modularAnalysis import calculateDistance
+      >>>calculateDistance('list_name', 'decay_string', "mode", path=user_path)
 
     @param list_name              name of the input ParticleList
     @param decay_string           select particles between the distance of closest approch will be calculated

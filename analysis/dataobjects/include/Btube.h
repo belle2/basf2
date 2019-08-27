@@ -76,7 +76,7 @@ namespace Belle2 {
 
   private:
     Eigen::Matrix<double, 3, 1> m_tubecenter;   /**< Btube center */
-    Eigen::Matrix<double, 3, 1> m_tubedirection;   /**< Btube directiom */
+    Eigen::Matrix<double, 3, 1> m_tubedirection;   /**< Btube direction */
     TMatrixFSym m_tubematrix;   /**< Btube (3x3)  matrix */
     TMatrixFSym m_tubecentererrormatrix;   /**< Btube Center Error (3x3)  matrix */
 

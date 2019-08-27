@@ -21,7 +21,7 @@
 
 namespace Belle2 {
   /**
-   * Calculates distance between two vertices, distance of closest approach between a vertex and a track, distance of closest approach between a vertex and btube
+   * Calculates distance between two vertices, distance of closest approach between a vertex and a track, distance of closest approach between a vertex and btube. T calculation ignores track curvature, it's negligible for small distances.
    */
   class DistanceCalculatorModule : public Module {
 
@@ -38,7 +38,6 @@ namespace Belle2 {
 
     /** process event */
     virtual void event() override;
-    //    virtual void terminate() override;
 
   private:
 

@@ -251,7 +251,7 @@ def DimuonForDarkSearchesList(path):
 
     # Define some cuts
     fromIP_cut = 'abs(dz) < 2.0 and abs(dr) < 0.5'
-    muonID_cut = 'muonID > 0.1'
+    muonID_cut = 'muonID > 0.2'
     # We want exaclty 2 tracks from IP
     dimuon_cut = 'nCleanedTracks(' + fromIP_cut + ') == 2'
     # And the pair must have pt > 200 MeV in CMS frame
@@ -289,15 +289,17 @@ def ElectronMuonForDarkSearchesList(path):
 
     # Define some basic cuts
     fromIP_cut = 'abs(dz) < 2.0 and abs(dr) < 0.5'
-    electronID_cut = 'electronID > 0.1'
-    muonID_cut = 'muonID > 0.1'
+    electronID_cut = 'electronID > 0.2'
+    muonID_cut = 'muonID > 0.2'
+    # We require the electron in the barrel ECL
+    theta_cut = '0.387 < theta < 2.421'
     # We want exaclty 2 tracks from IP
     emu_cut = 'nCleanedTracks(' + fromIP_cut + ') == 2'
     # And the pair must have pt > 200 MeV in CMS frame
     emu_cut += ' and useCMSFrame(pt) > 0.2'
 
     # Reconstruct the dimuon candidate
-    cutAndCopyList('e+:emu', 'e+:all', fromIP_cut + ' and ' + electronID_cut, path=path)
+    cutAndCopyList('e+:emu', 'e+:all', fromIP_cut + ' and ' + electronID_cut + ' and ' + theta_cut, path=path)
     cutAndCopyList('mu+:emu', 'mu+:all', fromIP_cut + ' and ' + muonID_cut, path=path)
     reconstructDecay(emu_name + ' -> e+:emu mu-:emu', emu_cut, path=path)
 
@@ -309,7 +311,7 @@ def ElectronMuonForDarkSearchesList(path):
 def DielectronForDarkSearchesList(path):
     """
     Note:
-        * Dielectron skim, needed for ee --> gamma A'; A' --> ee and others
+        * Dielectron skim, needed for ee --> A' h'; A' --> ee + h' --> invisible and others
         * Skim code: ???
         * Physics channel: ee --> ee
         * Skim category: physics, dark sector
@@ -329,14 +331,16 @@ def DielectronForDarkSearchesList(path):
 
     # Define some basic cuts
     fromIP_cut = 'abs(dz) < 2.0 and abs(dr) < 0.5'
-    electronID_cut = 'electronID > 0.1'
+    electronID_cut = 'electronID > 0.2'
+    # We require the electron in the barrel ECL
+    theta_cut = '0.387 < theta < 2.421'
     # We want exaclty 2 tracks from IP
     dielectron_cut = 'nCleanedTracks(' + fromIP_cut + ') == 2'
     # And the pair must have pt > 200 MeV in CMS frame
     dielectron_cut += ' and useCMSFrame(pt) > 0.2'
 
     # Reconstruct the dielectron candidate
-    cutAndCopyList('e+:dielectron', 'e+:all', fromIP_cut + ' and ' + electronID_cut, path=path)
+    cutAndCopyList('e+:dielectron', 'e+:all', fromIP_cut + ' and ' + electronID_cut + ' and ' + theta_cut, path=path)
     reconstructDecay(dielectron_name + ' -> e+:dielectron e-:dielectron', dielectron_cut, path=path)
 
     # And return the dielectron list

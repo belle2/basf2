@@ -67,7 +67,7 @@ namespace Belle2 {
     std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
 
     std::string m_variableName; /**< Variable which defines the best duplicate. */
-    bool m_selectLowest; /**< Select the candidate with the lowest value (instead of highest). */
+    bool m_preferLowest; /**< Select the duplicate with the lowest value (instead of highest). */
     const Variable::Manager::Var* m_variable; /**< Variable which defines the best duplicate selection. */
 
     bool m_writeOut;                     /**< toggle Particle List btw. transient/writeOut */

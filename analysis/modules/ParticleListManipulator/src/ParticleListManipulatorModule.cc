@@ -26,6 +26,7 @@
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
+#include <analysis/utility/ValueIndexPairSorting.h>
 
 using namespace std;
 
@@ -59,8 +60,8 @@ namespace Belle2 {
 
     addParam("variable", m_variableName, "Variable which defines the best duplicate (see ``selectLowest`` for ordering)",
              std::string("mdstIndex"));
-    addParam("selectLowest", m_selectLowest,
-             "If true, duplicate with lower value of ``variable`` is better, otherwise higher is better", true);
+    addParam("preferLowest", m_preferLowest,
+             "If true, duplicate with lowest value of ``variable`` is accepted, otherwise higher one.", true);
 
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
@@ -148,18 +149,9 @@ namespace Belle2 {
       }
     }
 
-    // define the criteria for "best"
+    // create list of candidate indices and corresponding sorting values
     typedef std::pair<double, unsigned int> ValueIndexPair;
     std::vector<ValueIndexPair> valueToIndex;
-    auto betterThan = [this](const ValueIndexPair & a, const ValueIndexPair & b) -> bool {
-      // always sort NaN to the high ranks: it's never a good thing to have nan in front
-      if (std::isnan(a.first)) return false;
-      if (std::isnan(b.first)) return true;
-      if (m_selectLowest)
-        return a.first < b.first;
-      else
-        return a.first > b.first;
-    };
 
     // fill all particles from input lists that pass selection criteria into comparison list
     for (const auto& inputListName : m_inputListNames) {
@@ -183,7 +175,11 @@ namespace Belle2 {
 
     // use stable sort to make sure we keep the relative order of elements with
     // same value as it was before
-    std::stable_sort(valueToIndex.begin(), valueToIndex.end(), betterThan);
+    if (m_preferLowest) {
+      std::stable_sort(valueToIndex.begin(), valueToIndex.end(), lowerPair<ValueIndexPair>);
+    } else {
+      std::stable_sort(valueToIndex.begin(), valueToIndex.end(), higherPair<ValueIndexPair>);
+    }
 
     // starting from the best candidate add all particles to output list that are not already in it
     for (const auto& candidate : valueToIndex) {

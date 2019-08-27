@@ -10,6 +10,8 @@
 
 #include <analysis/modules/BestCandidateSelection/BestCandidateSelectionModule.h>
 
+#include <analysis/utility/ValueIndexPairSorting.h>
+
 #include <analysis/VariableManager/Utility.h>
 
 #include <analysis/dataobjects/Particle.h>
@@ -102,19 +104,8 @@ void BestCandidateSelectionModule::event()
     return;
   }
 
-  // define the criteria for "best"
-  typedef std::pair<double, unsigned int> ValueIndexPair;
-  auto betterThan = [this](const ValueIndexPair & a, const ValueIndexPair & b) -> bool {
-    // always sort NaN to the high ranks: it's never a good thing to have nan in front
-    if (std::isnan(a.first)) return false;
-    if (std::isnan(b.first)) return true;
-    if (m_selectLowest)
-      return a.first < b.first;
-    else
-      return a.first > b.first;
-  };
-
   // create list of particle index and the corresponding value of variable
+  typedef std::pair<double, unsigned int> ValueIndexPair;
   std::vector<ValueIndexPair> valueToIndex;
   const unsigned int numParticles = m_inputList->getListSize();
   valueToIndex.reserve(numParticles);
@@ -125,7 +116,11 @@ void BestCandidateSelectionModule::event()
 
   // use stable sort to make sure we keep the relative order of elements with
   // same value as it was before
-  std::stable_sort(valueToIndex.begin(), valueToIndex.end(), betterThan);
+  if (m_selectLowest) {
+    std::stable_sort(valueToIndex.begin(), valueToIndex.end(), lowerPair<ValueIndexPair>);
+  } else {
+    std::stable_sort(valueToIndex.begin(), valueToIndex.end(), higherPair<ValueIndexPair>);
+  }
 
   // assign ranks and (optionally) remove everything but best candidates
   m_inputList->clear();

@@ -41,18 +41,20 @@ def checkIfRunUsable(file):
     return nev
 
 
+# creates a file with histograms for masked channels and returns the total number of masked channels in a run
 def makeChannelMasks(file, outFileName):
 
     masks = [TH1F('slot_' + str(slot), 'Channel mask for slot ' + str(slot),
                   512, 0.0, 512.0) for slot in range(1, 17)]
     masked = 0
 
-    # dead/hot channels
+    # dead/hot channels: <10% or >1000% of the average in this slot
     for slot in range(1, 17):
         h = file.FindObject('TOP/good_channel_hits_' + str(slot))
         if not h:
             logging.error('no good_channel_hits found for slot'+str(slot))
             continue
+        # calculate average number of hits per channel
         mean = 0
         n = 0
         for chan in range(h.GetNbinsX()):
@@ -62,6 +64,7 @@ def makeChannelMasks(file, outFileName):
                 n += 1
         if n > 0:
             mean /= n
+        # define threshold for dead and hot
         deadCut = mean / 10
         hotCut = mean * 10
         for chan in range(h.GetNbinsX()):

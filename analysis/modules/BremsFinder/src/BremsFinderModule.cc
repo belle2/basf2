@@ -242,7 +242,7 @@ namespace Belle2 {
         for (auto const& bremsGamma : selectedGammas) {
           //Add the weights as extra info of the mother
           std::string extraInfoName = "bremsWeightWithPhoton" + std::to_string(photonIndex);
-          correctedLepton.addExtraInfo(extraInfoName, weights(photonIndex));
+          correctedLepton.addExtraInfo(extraInfoName, weights[photonIndex]);
           photonIndex++;
 
           const TMatrixFSym& gammaErrorMatrix = bremsGamma->getMomentumVertexErrorMatrix();

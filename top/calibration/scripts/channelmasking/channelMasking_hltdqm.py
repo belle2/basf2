@@ -9,7 +9,9 @@ import logging
 from ROOT import TH1F, TH2F, TProfile, TFile
 
 
+# checks if the run can be analyzed based on the HLT histograms, returns -1 if not and the number of events otherwise
 def checkIfRunUsable(file):
+    # consider only runs identified as physics runs (possible since experiment 8)
     h = file.FindObject('DQMInfo/rtype')
     if not h:
         logging.warning(fileName + ' ... histogram runtype not found')
@@ -17,6 +19,8 @@ def checkIfRunUsable(file):
     if not h.GetTitle() == "physics":
         logging.info(fileName + ' ... not a physics run, skipping')
         return -1
+
+    # check if we have enough events for meaningful masking
     h = file.FindObject('TOP/good_hits_per_event1')
     if not h:
         logging.warning(fileName + ' ... histogram good_hits_per_event1 not found')
@@ -25,6 +29,8 @@ def checkIfRunUsable(file):
     if nev < 10000:
         logging.warning(fileName + 'run =' + str(run) + 'events =' + str(nev) + ' ... skipped, not enough events')
         return -1
+
+    # check if we have the necessary histogram to determine masking
     h = file.FindObject('TOP/good_hits')
     if not h:
         logging.warning(fileName + ' ... histogram good_hits not found')

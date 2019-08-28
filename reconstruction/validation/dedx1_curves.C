@@ -58,7 +58,7 @@ void plot(const TString &input_filename)
       hist->GetListOfFunctions()->Add(new TNamed("Check", "Distinct bands for pions/kaons/protons below 1GeV, minimal ionisation for higher p. Some misreconstructed tracks at very low dE/dx values."));
     }
     hist->GetListOfFunctions()->Add(new TNamed("Contact","Jitendra Kumar: jkumar@andrew.cmu.edu"));
-    hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
+    hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
     hist->Write();
 
   }

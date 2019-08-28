@@ -18,7 +18,7 @@ import json
 all_skims = [
     "Dark", "BtoCharmless", "BtoCharm", "ALP3Gamma",
     "BottomoniumEtabExclusive", "BottomoniumUpsilon", "TauGeneric",
-    "SystematicsRadMuMu", "SystematicsRadEE", "LFVZpInvisible", "LFVZpVisible",
+    "SystematicsRadMuMu", "SystematicsRadEE", "LFVZpVisible",
     "SinglePhotonDark", "SystematicsTracking", "BottomoniumUpsilon",
     "BottomoniumEtabExclusive", "SystematicsLambda", "Systematics",
     "Resonance", "ISRpipicc", "BtoDh_Kspipipi0", "BtoPi0Pi0",
@@ -309,7 +309,6 @@ _skimNameMatching = [
     ('18520100', 'DimuonForDarkSearches'),
     ('18520200', 'ElectronMuonForDarkSearches'),
     # ('18520300', 'DielectronForDarkSearches'),
-    ('18520400', 'LFVZpInvisible'),
     ('18520500', 'LFVZpVisible'),
     ('18570600', 'TauGeneric'),
     ('18570700', 'TauThrust'),

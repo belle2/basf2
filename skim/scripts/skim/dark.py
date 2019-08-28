@@ -139,44 +139,6 @@ def ALP3GammaList(path):
     return beamList
 
 
-def LFVZpInvisibleList(path):
-    """
-    Note:
-        * Lepton flavour violating Z' skim, Z' to invisible FS
-        * Skim code:  18520400
-        * Physics channel: ee --> e mu Z'; Z' --> invisible
-        * Skim category: physics, dark sector
-
-    The skim list for the LFV Z' to invisible final state search
-
-    Parameters:
-        path (basf2.Path) the path to add the skim list builders
-
-    Returns:
-        list containing the candidate names
-    """
-    __author__ = "Ilya Komarov"
-
-    lfvzp_list = []
-
-    # Some loose PID cuts for leptons
-    muID_cuts = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pidProbabilityExpert(13, all) > 0.1'
-    eID_cuts = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pidProbabilityExpert(11, all) > 0.1'
-
-    # We want exaclty 2 good tracks
-    Event_cuts = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2'
-
-    cutAndCopyList('mu+:lfvzp', 'mu+:all', muID_cuts, path=path)
-    cutAndCopyList('e+:lfvzp', 'e+:all', eID_cuts, path=path)
-
-    # Z' to invisible
-    LFVZpInvChannel = 'mu+:lfvzp e-:lfvzp'
-    reconstructDecay('vpho:invlfvzp -> ' + LFVZpInvChannel, Event_cuts, path=path)
-    lfvzp_list.append('vpho:invlfvzp')
-
-    return lfvzp_list
-
-
 def LFVZpVisibleList(path):
     """
     Note:

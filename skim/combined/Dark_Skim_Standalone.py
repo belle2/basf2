@@ -60,9 +60,6 @@ cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=darkskimpath)
 from skim.dark import ALP3GammaList
 add_skim('ALP3Gamma', ALP3GammaList(path=darkskimpath), path=darkskimpath)
 
-from skim.dark import LFVZpInvisibleList
-add_skim('LFVZpInvisible', LFVZpInvisibleList(path=darkskimpath), path=darkskimpath)
-
 from skim.dark import LFVZpVisibleList
 add_skim('LFVZpVisible', LFVZpVisibleList(path=darkskimpath), path=darkskimpath)
 

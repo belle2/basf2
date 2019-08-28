@@ -19,17 +19,6 @@ skimCode = encodeSkimName('LFVZpInvisible')
 import sys
 import os
 import glob
-import argparse
-
-# Read optional --data argument
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
-
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
 
 lfvzppath = Path()
 fileList = get_test_file("mixedBGx1", "MC12")

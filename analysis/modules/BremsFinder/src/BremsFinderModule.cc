@@ -73,7 +73,10 @@ namespace Belle2 {
     to perform the bremsstrahlung correction.
 
     This module looks for photons in the `gammaList` whose clusters have a *Bremsstrahlung* relation with the track 
-    of one of the particles in the `inputList`, and adds their 4-momentum to the particle's one. 
+    of one of the particles in the `inputList`, and adds their 4-momentum to the particle's one. It also stores the value
+    of each relation weight as `extraInfo` of the corrected particle, under the name `"bremsWeightWithPhotonN"`, where
+    N is the index of the photon as daughter of the corrected particle; thus `"bremsWeightWithPhoton0" gives the weight
+    of the Bremsstrahlung relation between the new, corrected particle, and the first photon daughter.
 
     Warning:
       Even in the event of no bremsstrahlung photons found, a new particle is still created, and the original one is still 
@@ -178,6 +181,7 @@ namespace Belle2 {
       Particle* bestGamma = nullptr; //For the case restricted to only one brem photon per lepton
       double bestWeight = m_maximumAcceptance; //For the case restricted to only one brem photon per lepton
       std::vector<Particle*> selectedGammas; //For the case of many brem photons per lepton
+      std::vector<double> weights; //For the case of many brem photons per lepton
 
       unsigned j = 0;
       for (auto bremCluster = bremClusters.begin(); bremCluster != bremClusters.end(); bremCluster++, j++) {
@@ -194,6 +198,7 @@ namespace Belle2 {
 
             if (m_addMultiplePhotons) {
               selectedGammas.push_back(gamma);
+              weights.push_back(weight);
             } else {
               if (weight > bestWeight) continue;
               bestWeight = weight;
@@ -229,11 +234,17 @@ namespace Belle2 {
       TMatrixFSym corLepMatrix(lepErrorMatrix);
 
       bool bremsGammaFound = false;
+      int photonIndex = 0;
 
       //Now, if there are any, add the brems photons as daughters as well. As before, we distinguish between the multiple and only one brems photon cases
       if (m_addMultiplePhotons && selectedGammas.size() > 0) {
         bremsGammaFound = true;
         for (auto const& bremsGamma : selectedGammas) {
+          //Add the weights as extra info of the mother
+          std::string extraInfoName = "bremsWeightWithPhoton" + std::to_string(photonIndex);
+          correctedLepton.addExtraInfo(extraInfoName, weights(photonIndex));
+          photonIndex++;
+
           const TMatrixFSym& gammaErrorMatrix = bremsGamma->getMomentumVertexErrorMatrix();
           for (int irow = 0; irow <= 3; irow++) {
             for (int icol = irow; icol <= 3; icol++) corLepMatrix(irow, icol) += gammaErrorMatrix(irow, icol);
@@ -243,6 +254,11 @@ namespace Belle2 {
         }
       } else if (!m_addMultiplePhotons && bestGamma) {
         bremsGammaFound = true;
+
+        //Add the weight as extra info of the mother
+        std::string extraInfoName = "bremsWeightWithPhoton" + std::to_string(photonIndex);
+        correctedLepton.addExtraInfo(extraInfoName, bestWeight);
+
         const TMatrixFSym& gammaErrorMatrix = bestGamma->getMomentumVertexErrorMatrix();
         for (int irow = 0; irow <= 3; irow++) {
           for (int icol = irow; icol <= 3; icol++) corLepMatrix(irow, icol) += gammaErrorMatrix(irow, icol);

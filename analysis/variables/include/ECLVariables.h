@@ -51,20 +51,6 @@ namespace Belle2 {
     double eclClusterDeltaL(const Particle* particle);
 
     /**
-     * [Legacy] Returns true if the cluster with given attributes passes the Belle 'good gamma' criteria.
-     */
-    bool isGoodBelleGamma(int region, double energy);
-
-    /**
-     * [Legacy]
-     * Return 1 if ECLCluster passes the following selection criteria:
-     * Forward  : E > 100 MeV
-     * Barrel   : E >  50 MeV
-     * Backward : E > 150 MeV
-     */
-    double goodBelleGamma(const Particle* particle);
-
-    /**
      * return ECL cluster's Error on Energy
      */
     double eclClusterErrorE(const Particle* particle);
@@ -99,11 +85,19 @@ namespace Belle2 {
      */
     double eclClusterTiming(const Particle* particle);
 
+    /**
+     * return whether or not ECL cluster's timing fit failed
+     */
+    double eclClusterHasFailedTiming(const Particle* particle);
 
-    /** return  Error on clusters phi position  */
+    /**
+     * return  Error on clusters phi position
+     */
     double eclClusterErrorPhi(const Particle* particle);
 
-    /** return  Error on clusters theta position  */
+    /**
+     * return  Error on clusters theta position
+     */
     double eclClusterErrorTheta(const Particle* particle);
 
     /**
@@ -112,9 +106,19 @@ namespace Belle2 {
     double eclClusterErrorTiming(const Particle* particle);
 
     /**
-     * return the energy of the crystall with highest  energy
+     * return whether or not calculation of ECL cluster's error on the timing failed
+     */
+    double eclClusterHasFailedErrorTiming(const Particle* particle);
+
+    /**
+     * return the energy of the crystal with highest energy
      */
     double eclClusterHighestE(const Particle* particle);
+
+    /**
+     * return the cellID [1,8736] of the crystal with highest energy
+     */
+    double eclClusterCellId(const Particle* particle);
 
     /**
      * return ratio of energies of the central crystal and 3x3 crystals around the central crystal

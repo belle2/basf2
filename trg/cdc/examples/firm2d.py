@@ -85,12 +85,21 @@ r_SL0 = 18.3
 
 
 class Skim(Module):
-    "Reject tracks with bad combination of z0 and theta"
+    """
+    Reject tracks with bad combination of z0 and theta
+    """
 
     def initialize(self):
+        """
+        Initialize self.mc with MCParticles StoreArray
+        """
+        #: MCParticles StoreArray
         self.mc = Belle2.PyStoreArray('MCParticles')
 
     def event(self):
+        """
+        Reject tracks with bad combination of z0 and theta
+        """
         self.return_value(0)
         z0 = self.mc[0].getVertex().Z()
         vec = self.mc[0].getMomentum()

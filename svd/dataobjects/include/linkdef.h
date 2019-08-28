@@ -18,6 +18,7 @@
 #pragma link C++ class Belle2::SVDEnergyDepositionEvent+;
 #pragma link C++ class Belle2::SVDNeutronFluxEvent+;
 #pragma link C++ class Belle2::SVDOccupancyEvent+;
+#pragma link C++ class Belle2::SVDEventInfo+;
 
 #pragma link C++ class Belle2::SVDHistograms< TH1F > +;
 #pragma link C++ class Belle2::SVDHistograms< TH1D > +;

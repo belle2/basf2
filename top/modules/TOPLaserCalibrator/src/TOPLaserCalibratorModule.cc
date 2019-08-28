@@ -84,6 +84,7 @@ namespace Belle2 {
 
   void TOPLaserCalibratorModule::initialize()
   {
+    B2WARNING("You are using an old version of the laser fitter, now deprecated. This module has been superseded by the CAF collector TOPLaserCalibratorCollector and the CAF fitter TOPLocalCalFitter.");
     m_digits.isRequired();
   }
 

@@ -32,6 +32,7 @@ def add_mdst_output(
         'PIDLikelihoods',
         'TracksToPIDLikelihoods',
         'ECLClusters',
+        'ECLClustersToTracksNamedBremsstrahlung',
         'EventLevelClusteringInfo',
         'TracksToECLClusters',
         'KLMClusters',
@@ -76,6 +77,7 @@ def add_mdst_dump(path, print_untested=False):
         DataStorePrinter("EventMetaData", [
             "getErrorFlag", "getEvent", "getRun", "getSubrun", "getExperiment",
             "getProduction", "getTime", "getParentLfn", "getGeneratedWeight",
+            "isEndOfRun"
             ], array=False),
         DataStorePrinter("Track", ["getNumberOfFittedHypotheses", "getQualityIndicator"], {
             "getTrackFitResult": charged_stables,
@@ -108,12 +110,12 @@ def add_mdst_dump(path, print_untested=False):
             "getAbsZernike40", "getAbsZernike51", "getZernikeMVA", "getE1oE9",
             "getE9oE21", "getClusterHadronIntensity", "getNumberOfHadronDigits",
             "getSecondMoment", "getLAT", "getNumberOfCrystals", "getTime",
-            "getDeltaTime99", "getPhi", "getTheta", "getR", "getHypotheses",
+            "getDeltaTime99", "hasFailedFitTime", "hasFailedTimeResolution", "getPhi", "getTheta", "getR", "getHypotheses",
             "getEnergyRaw", "getEnergyHighestCrystal", "getUncertaintyEnergy",
             "getUncertaintyTheta", "getUncertaintyPhi", "getClusterPosition",
             "getCovarianceMatrix3x3", "getDetectorRegion", "getUniqueId",
             "isTriggerCluster", "hasTriggerClusterMatching", "hasPulseShapeDiscrimination",
-            "getPulseShapeDiscriminationMVA",
+            "getPulseShapeDiscriminationMVA", "getMaxECellId",
             ], {
                 "getEnergy": [16, 32],
                 "hasHypothesis": [16, 32],
@@ -141,7 +143,7 @@ def add_mdst_dump(path, print_untested=False):
             "getFtdlBits": range(10),
             "getPsnmBits": range(10),
             }, array=False),
-        DataStorePrinter("SoftwareTriggerResult", ["getResults"], array=False),
+        DataStorePrinter("SoftwareTriggerResult", ["getResults", "getNonPrescaledResults"], array=False),
         DataStorePrinter("MCParticle", [
             "getPDG", "getStatus", "getMass", "getCharge", "getEnergy", "hasValidVertex",
             "getProductionTime", "getDecayTime", "getLifetime", "getVertex",

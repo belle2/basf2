@@ -7,9 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef HEPMCINPUTMODULE_H
-#define HEPMCINPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -71,9 +69,8 @@ namespace Belle2 {
     DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter. */
   private:
     InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
-    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr; /**< event meta data pointer to control event nubmer etc */
   };
 
 } // end namespace Belle2
 
-#endif // HEPMCINPUTMODULE_H

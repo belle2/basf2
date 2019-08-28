@@ -14,7 +14,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/dbobjects/BeamParameters.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -61,9 +60,7 @@ CreateBsigFromFullRecoBtagModule::CreateBsigFromFullRecoBtagModule() : Module(),
   m_isSelfConjugatedParticle = true; // FIXME BII-4106
 }
 
-CreateBsigFromFullRecoBtagModule::~CreateBsigFromFullRecoBtagModule()
-{
-}
+CreateBsigFromFullRecoBtagModule::~CreateBsigFromFullRecoBtagModule() = default;
 
 void CreateBsigFromFullRecoBtagModule::initialize()
 {
@@ -96,9 +93,9 @@ void CreateBsigFromFullRecoBtagModule::event()
 
   analysis::RaveSetup::initialize(1, m_Bfield);
 
-  m_BeamSpotCenter = m_beamParams->getVertex();
+  m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
   m_beamSpotCov.ResizeTo(3, 3);
-  m_beamSpotCov = m_beamParams->getCovVertex();
+  m_beamSpotCov = m_beamSpotDB->getCovVertex();
 
 
   std::vector<unsigned int> toRemove;

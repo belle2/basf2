@@ -38,6 +38,8 @@
 // Magnetic field
 #include <framework/geometry/BFieldManager.h>
 
+#include <TVector.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -54,7 +56,7 @@ namespace Belle2 {
 
   TagVertexModule::TagVertexModule() : Module(),
     m_Bfield(0), m_fitPval(0), m_mcPDG(0), m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_shiftZ(0), m_FitType(0), m_tagVl(0),
-    m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0)
+    m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0), m_tagVNDF(0), m_tagVChi2(0), m_tagVChi2IP(0)
   {
     // Set module properties
     setDescription("Tag side Vertex Fitter for modular analysis");
@@ -153,6 +155,9 @@ namespace Belle2 {
           ver->setTagVol(m_tagVol);
           ver->setTruthTagVol(m_truthTagVol);
           ver->setTagVolErr(m_tagVolErr);
+          ver->setTagVNDF(m_tagVNDF);
+          ver->setTagVChi2(m_tagVChi2);
+          ver->setTagVChi2IP(m_tagVChi2IP);
         } else {
           ver->setTagVertex(m_tagV);
           ver->setTagVertexPval(-1.);
@@ -166,6 +171,9 @@ namespace Belle2 {
           ver->setTagVol(-1111.);
           ver->setTruthTagVol(-1111.);
           ver->setTagVolErr(-1111.);
+          ver->setTagVNDF(-1111.);
+          ver->setTagVChi2(-1111.);
+          ver->setTagVChi2IP(-1111.);
         }
       }
 
@@ -191,7 +199,7 @@ namespace Belle2 {
 
     // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
     PCmsLabTransform T;
-    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boost = T.getBoostVector();
     TVector3 boostDir = boost.Unit();
     float boostAngle = TMath::ATan(float(boostDir[0]) / boostDir[2]); // boost angle with respect from Z
     double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
@@ -199,10 +207,10 @@ namespace Belle2 {
     m_shiftZ = 4.184436e+02 * bg *  0.0001;   // shift of 120 um (Belle2) in the boost direction
 
     if (m_useFitAlgorithm == "singleTrack" || m_useFitAlgorithm == "singleTrack_PXD") {
-      m_BeamSpotCenter = m_beamParams->getVertex() +
+      m_BeamSpotCenter = m_beamSpotDB->getIPPosition() +
                          TVector3(m_shiftZ * TMath::Sin(boostAngle), 0., m_shiftZ * TMath::Cos(boostAngle)); // boost in the XZ plane
     } else {
-      m_BeamSpotCenter = m_beamParams->getVertex(); // Standard algorithm needs no shift
+      m_BeamSpotCenter = m_beamSpotDB->getIPPosition(); // Standard algorithm needs no shift
     }
 
     double cut = 8.717575e-02 * bg;
@@ -274,7 +282,7 @@ namespace Belle2 {
     if (Breco->getPValue() < 0.) return false;
 
     TMatrixDSym beamSpotCov(3);
-    beamSpotCov = m_beamParams->getCovVertex();
+    beamSpotCov = m_beamSpotDB->getCovVertex();
 
     analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, beamSpotCov);
 
@@ -403,11 +411,11 @@ namespace Belle2 {
 
     PCmsLabTransform T;
 
-    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boost = T.getBoostVector();
     TVector3 boostDir = boost.Unit();
 
     TMatrixDSym beamSpotCov(3);
-    beamSpotCov = m_beamParams->getCovVertex();
+    beamSpotCov = m_beamSpotDB->getCovVertex();
     beamSpotCov(2, 2) = cut * cut;
     double thetab = boostDir.Theta();
     double phib = boostDir.Phi();
@@ -513,13 +521,9 @@ namespace Belle2 {
     const std::vector<Belle2::MCParticle*> genDau = Bgen->getDaughters();
 
     if (recDau.size() > 0 && genDau.size() > 0) {
-      for (unsigned int i = 0; i < recDau.size(); i++) {
+      for (auto dauRec : recDau) {
         bool isDau = false;
-        Particle* dauRec = recDau[i];
-
-        for (unsigned int j = 0; j < genDau.size(); j++) {
-          MCParticle* dauGen = genDau[j];
-
+        for (auto dauGen : genDau) {
           if (dauGen->getPDG() == dauRec->getPDGCode())
             isDau = compBrecoBgen(dauRec, dauGen) ;
         }
@@ -548,7 +552,7 @@ namespace Belle2 {
   {
 
     const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
-    FlavorTaggerInfo* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
+    auto* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
 
     if (!flavorTagInfo) return;
 
@@ -566,13 +570,13 @@ namespace Belle2 {
        The iteration will go on while the mother is an immediately decaying particle (PDG). The iteration will stop tracking back mothers once it reaches either the B0, or another particle coming from the B0 that does not decay immediately. In the later case it assumes that the correspondent track does not share its production point with the decaying point of the B0 */
     for (unsigned i = 0; i < tracksFT.size(); i++) {
 
-      if (i == 6 || (tracksFT[i] == NULL)) { // Tracks belonging to the Lambda category or not well reconstructed are discarted
+      if (i == 6 || (tracksFT[i] == nullptr)) { // Tracks belonging to the Lambda category or not well reconstructed are discarted
         flavorTagInfo->setIsFromB(0);
         flavorTagInfo->setProdPointResolutionZ(100);
         continue;
       }
 
-      MCParticle* trackMCParticle = particle[i]->getRelatedTo<MCParticle>();
+      auto* trackMCParticle = particle[i]->getRelatedTo<MCParticle>();
       flavorTagInfo->setMCParticle(trackMCParticle);
 
       flavorTagInfo->setProdPointResolutionZ((trackMCParticle->getProductionVertex() - m_MCtagV).Mag2());
@@ -670,11 +674,11 @@ namespace Belle2 {
      before with the exact same criteria */
     std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
     int ROEGoodTracks = 0;
-    bool exitROEWhile = false;
     int ROETotalTracks = ROETracks.size();
     for (int i = 0; i < ROETotalTracks; i++) {
-      MCParticle* roeTrackMCParticle = ROETracks[i]->getRelatedTo<MCParticle>();
+      auto* roeTrackMCParticle = ROETracks[i]->getRelatedTo<MCParticle>();
       MCParticle* roeTrackMCParticleMother = roeTrackMCParticle->getMother();
+      bool exitROEWhile;
       do {
         int PDG = TMath::Abs(roeTrackMCParticleMother->getPDG());
         std::string motherPDGString = std::to_string(PDG);
@@ -745,7 +749,7 @@ namespace Belle2 {
     const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
     std::vector<const Track*> fitTracks; // Vector of track that will be returned after the selection. Now it must contain only 1
 
-    FlavorTaggerInfo* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
+    auto* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
     if (!flavorTagInfo) return false;
     std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
     std::vector<float> listMomentum = flavorTagInfo->getP(); // Momentum of the tracks
@@ -775,7 +779,7 @@ namespace Belle2 {
                                          };
 
     for (unsigned i = 0; i < listCategoryP.size(); i++) {
-      if (i ==  6 || (originalTracks[i] == NULL)) { // Skip Lambdas and non-reconstructed tracks
+      if (i ==  6 || (originalTracks[i] == nullptr)) { // Skip Lambdas and non-reconstructed tracks
 
         flavorTagInfo->setD0(1.0); // Giving by hand 1cm is more than enough to make Lambdas discardable
         flavorTagInfo->setZ0(1.0);
@@ -873,9 +877,9 @@ namespace Belle2 {
   {
     if (listTracks[trackPosition] == 0) return;
     int toEliminate = listTracks[trackPosition];
-    for (unsigned i = 0; i < listTracks.size(); i++) {
-      if (listTracks[i] == toEliminate) {
-        listTracks.at(i) = 0;
+    for (int& listTrack : listTracks) {
+      if (listTrack == toEliminate) {
+        listTrack = 0;
       }
     }
   }
@@ -891,17 +895,17 @@ namespace Belle2 {
     std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
     if (ROETracks.size() == 0) return false;
     std::vector<const Track*> fitTracks;
-    for (unsigned i = 0; i < ROETracks.size(); i++) {
+    for (auto& ROETrack : ROETracks) {
       // TODO: this will always return something (so not nullptr) contrary to the previous method
       // used here. This line can be removed as soon as the multi hypothesis fitting method
       // has been properly established
-      if (!ROETracks[i]->getTrackFitResultWithClosestMass(Const::pion)) {
+      if (!ROETrack->getTrackFitResultWithClosestMass(Const::pion)) {
         continue;
       }
-      HitPatternVXD roeTrackPattern = ROETracks[i]->getTrackFitResultWithClosestMass(Const::pion)->getHitPatternVXD();
+      HitPatternVXD roeTrackPattern = ROETrack->getTrackFitResultWithClosestMass(Const::pion)->getHitPatternVXD();
 
       if (roeTrackPattern.getNPXDHits() >= reqPXDHits) {
-        fitTracks.push_back(ROETracks[i]);
+        fitTracks.push_back(ROETrack);
       }
     }
     if (fitTracks.size() == 0) return false;
@@ -923,26 +927,24 @@ namespace Belle2 {
     // remove traks from KS
     for (unsigned int i = 0; i < m_tagTracks.size(); i++) {
       const Track* trak1 = m_tagTracks[i];
-      const TrackFitResult* trak1Res = NULL;
+      const TrackFitResult* trak1Res = nullptr;
       if (trak1) trak1Res = trak1->getTrackFitResultWithClosestMass(Const::pion);
       TVector3 mom1;
       if (trak1Res) mom1 = trak1Res->getMomentum();
-      if (std::isinf(mom1.Mag2()) == true || std::isnan(mom1.Mag2()) == true) {
-        continue;
-      }
+      if (std::isinf(mom1.Mag2()) or std::isnan(mom1.Mag2())) continue;
       if (!trak1Res) continue;
 
       bool isKsDau = false;
       for (unsigned int j = 0; j < m_tagTracks.size(); j++) {
         if (i != j) {
           const Track* trak2 = m_tagTracks[j];
-          const TrackFitResult* trak2Res = NULL;
+          const TrackFitResult* trak2Res = nullptr;
 
           if (trak2) trak2Res = trak2->getTrackFitResultWithClosestMass(Const::pion);
 
           TVector3 mom2;
           if (trak2Res) mom2 = trak2Res->getMomentum();
-          if (std::isinf(mom2.Mag2()) == true || std::isnan(mom2.Mag2()) == true) continue;
+          if (std::isinf(mom2.Mag2()) or std::isnan(mom2.Mag2())) continue;
           if (!trak2Res) continue;
 
           double Mass2 = TMath::Power(TMath::Sqrt(mom1.Mag2() + mpi * mpi) + TMath::Sqrt(mom2.Mag2() + mpi * mpi), 2)
@@ -967,9 +969,23 @@ namespace Belle2 {
       return false;
     }
 
+    if (m_useFitAlgorithm != "noConstraint") {
+      TMatrixDSym tubeInv = m_tube;
+      tubeInv.Invert();
+      TVector3 dTagV = rFit.getPos(0) - m_BeamSpotCenter;
+      TVectorD dV(0, 2,
+                  dTagV.X(),
+                  dTagV.Y(),
+                  dTagV.Z(),
+                  "END");
+      m_tagVChi2IP = tubeInv.Similarity(dV);
+    }
+
     m_tagV = rFit.getPos(0);
     m_tagVErrMatrix.ResizeTo(rFit.getCov(0));
     m_tagVErrMatrix = rFit.getCov(0);
+    m_tagVNDF = rFit.getNdf(0);
+    m_tagVChi2 = rFit.getChi2(0);
 
     m_fitPval = rFit.getPValue();
 
@@ -983,7 +999,7 @@ namespace Belle2 {
 
     PCmsLabTransform T;
 
-    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boost = T.getBoostVector();
 
     double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
 

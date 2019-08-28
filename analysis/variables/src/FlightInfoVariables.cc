@@ -11,7 +11,8 @@
 #include <analysis/variables/FlightInfoVariables.h>
 #include <framework/logging/Logger.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/utility/PCmsLabTransform.h>
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
 #include <framework/utilities/Conversion.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -41,8 +42,7 @@ namespace Belle2 {
     }
 
     // Helper function for flight distance and its uncertainty (provided as it is)
-    inline double getFlightInfoBtw(const Particle* particle, const Particle* daughter, double& outErr, const std::string& mode,
-                                   const bool motherToGranddaughter = false)
+    inline double getFlightInfoBtw(const Particle* particle, const Particle* daughter, double& outErr, const std::string& mode)
     {
       if (!particle || !daughter) {
         outErr = -999;
@@ -60,23 +60,6 @@ namespace Belle2 {
         outErr = -999;
         return -999;
       }
-      // get TreeFitter values if they exist.
-      // Bypass this in case the variables are requested for the granddaughter with respect to the mother as
-      // TreeFitter will return the values of the granddaughter with respect to the daughter
-      if (!motherToGranddaughter) {
-        if (mode == "distance" &&
-            daughter->hasExtraInfo("decayLength") &&
-            daughter->hasExtraInfo("decayLengthErr")) {
-          outErr = daughter -> getExtraInfo("decayLengthErr");
-          return daughter -> getExtraInfo("decayLength");
-        }
-        if (mode == "time" &&
-            daughter->hasExtraInfo("lifeTime") &&
-            daughter->hasExtraInfo("lifeTimeErr")) {
-          outErr = daughter -> getExtraInfo("lifeTimeErr");
-          return daughter -> getExtraInfo("lifeTime");
-        }
-      }
 
       double mumvtxX = particle->getX();
       double mumvtxY = particle->getY();
@@ -88,10 +71,10 @@ namespace Belle2 {
           mumvtxZ = particle->getExtraInfo("prodVertZ");
         } else {
           //if no production vertex assume the particle originated at the ip
-          PCmsLabTransform T;
-          mumvtxX = T.getBeamParams().getVertex().X();
-          mumvtxY = T.getBeamParams().getVertex().Y();
-          mumvtxZ = T.getBeamParams().getVertex().Z();
+          static DBObjPtr<BeamSpot> beamSpotDB;
+          mumvtxX = (beamSpotDB->getIPPosition()).X();
+          mumvtxY = (beamSpotDB->getIPPosition()).Y();
+          mumvtxZ = (beamSpotDB->getIPPosition()).Z();
         }
       }
       //daughter vertex
@@ -131,8 +114,8 @@ namespace Belle2 {
             }
           }
         } else {
-          PCmsLabTransform T;
-          mumCov = T.getBeamParams().getCovVertex();
+          static DBObjPtr<BeamSpot> beamSpotDB;
+          mumCov = beamSpotDB->getCovVertex();
         }
       }
       //compute total covariance matrix
@@ -239,28 +222,28 @@ namespace Belle2 {
 
     double flightDistance(const Particle* part)
     {
-      double flightDistanceErr = -999;
-      return getFlightInfoBtw(part, part, flightDistanceErr, "distance");
+      double flightDistanceError = -999;
+      return getFlightInfoBtw(part, part, flightDistanceError, "distance");
     }
 
     double flightTime(const Particle* part)
     {
-      double flightTimeErr = -999;
-      return getFlightInfoBtw(part, part, flightTimeErr, "time");
+      double flightTimeError = -999;
+      return getFlightInfoBtw(part, part, flightTimeError, "time");
     }
 
     double flightDistanceErr(const Particle* part)
     {
-      double flightDistanceErr = -999;
-      getFlightInfoBtw(part, part, flightDistanceErr, "distance");
-      return flightDistanceErr;
+      double flightDistanceError = -999;
+      getFlightInfoBtw(part, part, flightDistanceError, "distance");
+      return flightDistanceError;
     }
 
     double flightTimeErr(const Particle* part)
     {
-      double flightTimeErr = -999;
-      getFlightInfoBtw(part, part, flightTimeErr, "time");
-      return flightTimeErr;
+      double flightTimeError = -999;
+      getFlightInfoBtw(part, part, flightTimeError, "time");
+      return flightTimeError;
     }
 
     inline double getVertexDistance(const Particle* particle, const Particle* daughter, double& vertexDistanceErr,
@@ -343,30 +326,30 @@ namespace Belle2 {
 
     double vertexDistance(const Particle* part)
     {
-      double vertexDistanceErr = -999;
+      double vertexDistanceError = -999;
       if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
         return -999;
       }
-      return getVertexDistance(part, part, vertexDistanceErr);
+      return getVertexDistance(part, part, vertexDistanceError);
     }
 
     double vertexDistanceErr(const Particle* part)
     {
-      double vertexDistanceErr = -999;
+      double vertexDistanceError = -999;
       if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
         return -999;
       }
-      getVertexDistance(part, part, vertexDistanceErr);
-      return vertexDistanceErr;
+      getVertexDistance(part, part, vertexDistanceError);
+      return vertexDistanceError;
     }
 
     double vertexDistanceSignificance(const Particle* part)
     {
-      double vertexDistanceErr = -999;
+      double vertexDistanceError = -999;
       if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
         return -999;
       }
-      return getVertexDistance(part, part, vertexDistanceErr) / vertexDistanceErr;
+      return getVertexDistance(part, part, vertexDistanceError) / vertexDistanceError;
     }
 
     Manager::FunctionPtr flightTimeOfDaughter(const std::vector<std::string>& arguments)
@@ -400,7 +383,7 @@ namespace Belle2 {
           if (grandDaughterNumber > -1)
           {
             if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-              return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr, "time", true);
+              return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr, "time");
             }
           } else {
             return getFlightInfoBtw(particle, daughter, flightTimeErr, "time");
@@ -444,7 +427,7 @@ namespace Belle2 {
           if (grandDaughterNumber > -1)
           {
             if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-              getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr, "time", true);
+              getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr, "time");
               return flightTimeErr;
             }
           } else {
@@ -489,7 +472,7 @@ namespace Belle2 {
           if (grandDaughterNumber > -1)
           {
             if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-              return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr, "distance", true);
+              return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr, "distance");
             }
           } else {
             return getFlightInfoBtw(particle, daughter, flightDistanceErr, "distance");
@@ -533,7 +516,7 @@ namespace Belle2 {
           if (grandDaughterNumber > -1)
           {
             if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-              getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr, "distance", true);
+              getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr, "distance");
               return flightDistanceErr;
             }
           } else {

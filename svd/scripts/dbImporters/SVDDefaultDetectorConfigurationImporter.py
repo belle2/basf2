@@ -58,6 +58,7 @@ class defaultSVDConfigParametersImporter(basf2.Module):
 
 
 use_database_chain()
+use_central_database("svd_onlySVDinGeoConfiguration")
 use_local_database("localdb_defaultconfig/database.txt", "localdb_defaultconfig", invertLogging=True)
 
 main = create_path()

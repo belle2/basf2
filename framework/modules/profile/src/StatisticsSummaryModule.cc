@@ -62,9 +62,9 @@ void StatisticsSummaryModule::record(ModuleStatistics::EStatisticCounters type)
     const ModuleStatistics& statistics = allStatistics[index];
 
     // check if we have another StatisticsSummary module
-    std::string name = statistics.getName();
-    const Module* module = 0;
-    for (auto aModule : modules) {
+    const std::string& name = statistics.getName();
+    const Module* module = nullptr;
+    for (const auto& aModule : modules) {
       if (aModule->getName() == name) {
         module = aModule.get();
         break;

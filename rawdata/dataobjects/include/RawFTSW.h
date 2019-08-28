@@ -13,6 +13,7 @@
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawFTSWFormat.h>
 #include <rawdata/dataobjects/RawFTSWFormat_v1.h>
+#include <rawdata/dataobjects/RawFTSWFormat_v2.h>
 #include <rawdata/dataobjects/RawFTSWFormat_latest.h>
 
 namespace Belle2 {
@@ -200,14 +201,19 @@ namespace Belle2 {
       /// ver 2 : phase II ? version
       ///       : header size is 8 words
       ///       : Format is written by Nakao-san in ver.26(as of 2019.3.1 ) of https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=DAQ+TimingDistribution#DAQTimingDistribution-InformationsentfromTTDtodatastream
-      POS_NODE_FORMAT_ID = 6, //! 0x545452?? up to ver.2 this number is more or less same. So, it cannot be used to distinguish different version numbers
-      FORMAT_ID_VER_0TO2 = 0x54544420,
+      //! 0x545452?? up to ver.2 this number is more or less same. So, it cannot be used to distinguish different version numbers
+      POS_NODE_FORMAT_ID = 6,  // Position of format ID in header
       FTSW_FORMAT_MASK = 0x000000FF,
+
+      FORMAT_ID_VER_0TO2 = 0x54544420,
+      FORMAT_ID_VER_0TO3 = 0x54544421,
+
       POS_HEADER_SIZE = 1, //! The same number of this information must appear in RawFTSWFormat*.h. Information should be placed in one place but I need to put this number in RawFTSW.h because it is used to distinguish different version numbers.
       // header size is used to distinguish different version number for ver. 0, 1, and 2
       VER_0_HEADER_SIZE = 0, //! Unpacker for ver.0(early DESY version) is not available.
       VER_1_HEADER_SIZE = 0, // ! Unpacker for ver.1(late DESY version) is available but it is unlikely for a user to read this ver. Until there is a request to read ver.1, it is closed.
-      VER_2_HEADER_SIZE = 8
+      VER_2_HEADER_SIZE = 8,
+      VER_3_HEADER_SIZE = 8
     };
 
     //! class to access

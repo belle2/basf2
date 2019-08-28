@@ -13,7 +13,6 @@
 #include <Eigen/Core>
 #include <vector>
 #include <framework/logging/Logger.h>
-
 namespace TreeFitter {
 
   class ParticleBase;
@@ -24,7 +23,7 @@ namespace TreeFitter {
   public:
 
     /** Constructor */
-    explicit FitParams(int dim);
+    explicit FitParams(const int dim);
 
     /** Destructor */
     ~FitParams() {};
@@ -34,13 +33,10 @@ namespace TreeFitter {
       : m_dim(toCopy.m_dim),
         m_chiSquare(toCopy.m_chiSquare),
         m_nConstraints(toCopy.m_nConstraints),
-        m_dimensionReduction(toCopy.m_dimensionReduction)
-    {
-      this->m_globalState =
-        Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > (toCopy.m_globalState);
-      this->m_globalCovariance =
-        Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > (toCopy.m_globalCovariance);
-    }
+        m_dimensionReduction(toCopy.m_dimensionReduction),
+        m_globalState(Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > (toCopy.m_globalState)),
+        m_globalCovariance(Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > (toCopy.m_globalCovariance))
+    { }
 
     /** Assignment operator. */
     FitParams& operator =(const FitParams& other)
@@ -156,12 +152,6 @@ namespace TreeFitter {
 
   private:
 
-    /** vector holding all parameters of this fit */
-    Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > m_globalState;
-
-    /** covariance of the global state */
-    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > m_globalCovariance;
-
     /** dimension of statevector */
     int m_dim;
 
@@ -176,5 +166,12 @@ namespace TreeFitter {
 
     /** vector with the number of constraints per parameter */
     std::vector<int> m_nConstraintsVec;
+
+    /** vector holding all parameters of this fit */
+    Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > m_globalState;
+
+    /** covariance of the global state */
+    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > m_globalCovariance;
+
   };
 }

@@ -12,13 +12,14 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/io/RootIOUtilities.h>
+#include <framework/database/Configuration.h>
 
 #include <cmath>
-#include <stdlib.h>
+#include <cstdlib>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <stdio.h>
+#include <cstdio>
 
 using namespace std;
 using namespace Belle2;
@@ -52,10 +53,7 @@ SeqRootInputModule::SeqRootInputModule() : Module()
   addParam("declareRealData", m_realData, "Declare the input to be real, not generated data", false);
 }
 
-
-SeqRootInputModule::~SeqRootInputModule()
-{
-}
+SeqRootInputModule::~SeqRootInputModule() = default;
 
 void SeqRootInputModule::initialize()
 {
@@ -84,7 +82,7 @@ void SeqRootInputModule::initialize()
   // This is necessary to create object tables before TTree initialization
   // if used together with TTree based output (RootOutput module).
 
-  EvtMessage* evtmsg = NULL;
+  EvtMessage* evtmsg = nullptr;
   // Open input file
   m_file = new SeqFile(m_inputFileName.c_str(), "r", nullptr, 0, m_fileNameIsPattern);
   if (m_file->status() <= 0)
@@ -95,7 +93,7 @@ void SeqRootInputModule::initialize()
   //Read StreamerInfo and the first event
   int info_cnt = 0;
   while (true) {
-    char* evtbuf = new char[EvtMessage::c_MaxEventSize];
+    auto* evtbuf = new char[EvtMessage::c_MaxEventSize];
     int size = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
     if (size > 0) {
       evtmsg = new EvtMessage(evtbuf);
@@ -126,14 +124,15 @@ void SeqRootInputModule::initialize()
     fileMetaData.create();
     fileMetaData->declareRealData();
   }
-
-  B2INFO("SeqRootInput: initialized.");
+  // make sure global tag replay is disabled and users have to specify a globaltag.
+  // We don't have input file metadata so this is all we can do.
+  Conditions::Configuration::getInstance().setInputGlobaltags({});
 }
 
 
 void SeqRootInputModule::beginRun()
 {
-  gettimeofday(&m_t0, 0);
+  gettimeofday(&m_t0, nullptr);
   m_size = 0.0;
   m_size2 = 0.0;
   m_nevt = 0;
@@ -149,24 +148,24 @@ void SeqRootInputModule::event()
   if (++m_nevt == 0) return;
 
   // Get a SeqRoot record from the file
-  char* evtbuf = new char[EvtMessage::c_MaxEventSize];
-  EvtMessage* evtmsg = NULL;
+  auto* evtbuf = new char[EvtMessage::c_MaxEventSize];
+  EvtMessage* evtmsg = nullptr;
   int size = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
   if (size < 0) {
     B2ERROR("SeqRootInput : file read error");
     delete m_file;
-    m_file = 0;
+    m_file = nullptr;
     delete[] evtbuf;
-    evtbuf = NULL;
+    evtbuf = nullptr;
     return;
   } else if (size == 0) {
     B2INFO("SeqRootInput : EOF detected");
     delete m_file;
-    m_file = 0;
+    m_file = nullptr;
     m_fileptr++;
     if (m_fileptr >= m_nfile) {
       delete[] evtbuf;
-      evtbuf = NULL;
+      evtbuf = nullptr;
       return;
     }
     printf("fileptr = %d ( of %d )\n", m_fileptr, m_nfile);
@@ -211,17 +210,17 @@ void SeqRootInputModule::event()
 
   // Delete buffers
   delete[] evtbuf;
-  evtbuf = NULL;
+  evtbuf = nullptr;
   delete evtmsg;
-  evtmsg = NULL;
+  evtmsg = nullptr;
 }
 
 void SeqRootInputModule::endRun()
 {
   // End time
-  gettimeofday(&m_tend, 0);
-  double etime = (double)((m_tend.tv_sec - m_t0.tv_sec) * 1000000 +
-                          (m_tend.tv_usec - m_t0.tv_usec));
+  gettimeofday(&m_tend, nullptr);
+  auto etime = (double)((m_tend.tv_sec - m_t0.tv_sec) * 1000000 +
+                        (m_tend.tv_usec - m_t0.tv_usec));
 
   // Statistics
   // Sigma^2 = Sum(X^2)/n - (Sum(X)/n)^2
@@ -250,4 +249,3 @@ void SeqRootInputModule::terminate()
   delete m_file;
   B2INFO("SeqRootInput: terminate called");
 }
-

@@ -171,14 +171,22 @@ namespace Belle2 {
 
   private:
 
+    /// mc left/right information
     int _mcLR;
 
+    /// state, defined above
     mutable unsigned _state;
+    /// drift distance
     float _drift[2];         // 0:left, 1:right
+    /// drift distance error
     float _driftError[2];
+    /// a pointer to a TRGCDCWire
     const TRGCDCCell& _cell;
+    /// position in the middle of wire. z is always zero, however.
     const HepGeom::Point3D<double>&   _xyPosition;
+    /// a pointer to a TTrack
     mutable const void* _track;
+    /// sequential Length in one segment
     mutable unsigned _sequentialLength;
 
     /// Index to CDCHit array

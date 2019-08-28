@@ -16,6 +16,7 @@
 #include <boost/python/overloads.hpp>
 #include <boost/python/enum.hpp>
 #include <boost/python/docstring_options.hpp>
+#include <utility>
 
 #include <framework/core/Module.h>
 #include <framework/core/ModuleCondition.h>
@@ -77,18 +78,18 @@ void Module::setLogInfo(int logLevel, unsigned int logInfo)
 }
 
 
-void Module::if_value(const std::string& expression, std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
+void Module::if_value(const std::string& expression, const std::shared_ptr<Path>& path, EAfterConditionPath afterConditionPath)
 {
   m_conditions.emplace_back(expression, path, afterConditionPath);
 }
 
 
-void Module::if_false(std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
+void Module::if_false(const std::shared_ptr<Path>& path, EAfterConditionPath afterConditionPath)
 {
   if_value("<1", path, afterConditionPath);
 }
 
-void Module::if_true(std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
+void Module::if_true(const std::shared_ptr<Path>& path, EAfterConditionPath afterConditionPath)
 {
   if_value(">=1", path, afterConditionPath);
 }
@@ -168,7 +169,7 @@ bool Module::hasUnsetForcedParams() const
 {
   auto missing = m_moduleParamList.getUnsetForcedParams();
   std::string allMissing = "";
-  for (auto s : missing)
+  for (const auto& s : missing)
     allMissing += s + " ";
   if (!missing.empty())
     B2ERROR("The following required parameters of Module '" << getName() << "' were not specified: " << allMissing <<
@@ -236,10 +237,14 @@ void Module::setParamPython(const std::string& name, const boost::python::object
 {
   LogSystem& logSystem = LogSystem::Instance();
   logSystem.updateModule(&(getLogConfig()), getName());
+  try {
+    m_moduleParamList.setParamPython(name, pyObj);
+  } catch (std::runtime_error& e) {
+    throw std::runtime_error("Cannot set parameter '" + name + "' for module '"
+                             + m_name + "': " + e.what());
+  }
 
-  m_moduleParamList.setParamPython(name, pyObj);
-
-  logSystem.updateModule(NULL);
+  logSystem.updateModule(nullptr);
 }
 
 
@@ -265,7 +270,7 @@ void Module::setParamPythonDict(const boost::python::dict& dictionary)
     }
   }
 
-  logSystem.updateModule(NULL);
+  logSystem.updateModule(nullptr);
 }
 
 
@@ -538,8 +543,8 @@ calling this function:
 //                          ModuleProxyBase
 //=====================================================================
 
-ModuleProxyBase::ModuleProxyBase(const std::string& moduleType, const std::string& package) : m_moduleType(moduleType),
-  m_package(package)
+ModuleProxyBase::ModuleProxyBase(std::string  moduleType, std::string  package) : m_moduleType(std::move(moduleType)),
+  m_package(std::move(package))
 {
   ModuleManager::Instance().registerModuleProxy(this);
 }

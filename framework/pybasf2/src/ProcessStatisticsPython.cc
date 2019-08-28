@@ -54,7 +54,7 @@ string ProcessStatisticsPython::getModuleStatistics(const boost::python::list& m
 
   std::vector<ModuleStatistics> moduleStats;
   auto modules = PyObjConvUtils::convertPythonObject(modulesPyList, std::vector<ModulePtr>());
-  for (ModulePtr ptr : modules) {
+  for (const ModulePtr& ptr : modules) {
     ModuleStatistics& stats = getWrapped()->getStatistics(ptr.get());
     //Name could be empty if module has never been called
     if (stats.getName().empty()) stats.setName(ptr->getName());
@@ -74,7 +74,7 @@ boost::python::list ProcessStatisticsPython::getAll()
   return result;
 }
 
-const ModuleStatistics* ProcessStatisticsPython::get(ModulePtr module)
+const ModuleStatistics* ProcessStatisticsPython::get(const ModulePtr& module)
 {
   if (!getWrapped())
     return nullptr;

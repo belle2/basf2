@@ -5,10 +5,10 @@
     FEI Hadronic B0 and B+ tag skim standalone for generic analysis in the
     (Semi-)Leptonic and Missing Energy Working Group
     Skim LFN code: 11180100, 11180200
-    fei training: MC11 based, release-03-00-03 'FEIv4_2018_MC11_release_03_00_00'
+    fei training: MC11 based, release-03-02-00 'FEIv4_2018_MC11_release_03_00_00'
     """
 
-__authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
+__authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling", "Phil Grace"]
 
 ######################################################
 #
@@ -25,12 +25,11 @@ import os.path
 
 from basf2 import *
 from modularAnalysis import *
-from analysisPath import analysis_main
 from beamparameters import add_beamparameters
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-03'
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 path = create_path()
 
 inputMdstList('default', fileList, path=path)
@@ -55,7 +54,7 @@ skimCode2 = encodeSkimName('feiHadronicBplus')
 skimOutputUdst(skimCode2, BphadronicList, path=path)
 summaryOfLists(BphadronicList, path=path)
 
-setSkimLogging()
+setSkimLogging(path)
 process(path)
 
 # print out the summary

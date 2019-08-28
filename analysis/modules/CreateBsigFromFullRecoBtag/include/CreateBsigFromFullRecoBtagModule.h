@@ -20,7 +20,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // DataObjects
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 // rave
@@ -63,7 +63,7 @@ namespace Belle2 {
 
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
-    DBObjPtr<BeamParameters> m_beamParams;/**< Beam parameters */
+    DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
 
     bool m_isSelfConjugatedParticle; /**< flag that indicates whether an anti-particle mother does not exist and should not be reconstructed as well*/
 

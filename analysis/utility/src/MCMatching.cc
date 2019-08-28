@@ -1,7 +1,13 @@
-// ******************************************************************
-// MC Matching
-// authors: A. Zupanc (anze.zupanc@ijs.si), C. Pulvermacher (christian.pulvermacher@kit.edu)
-// ******************************************************************
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ *                                                                        *
+ * Copyright(C) 2013-2018 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Anze Zupanc, Christian Pulvermacher, Yo Sato             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include <analysis/utility/MCMatching.h>
 #include <analysis/utility/AnalysisConfiguration.h>
@@ -210,7 +216,8 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
                   << mother->getPDG() << " " << particle->getPDGCode() << " " << mcParticle->getPDG());
       }
       status |= MCErrorFlags::c_MissingResonance;
-    } else {
+    } else if (!(particle->getProperty() & Particle::PropertyFlags::c_IsUnspecified)) {
+      // Check if the particle is unspecified. If so the flag of c_AddedWrongParticle will be ignored.
       status |= MCErrorFlags::c_AddedWrongParticle;
     }
   }
@@ -225,6 +232,9 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
   status |= (daughterStatus & daughterStatusAcceptMask);
 
   status |= getMissingParticleFlags(particle, mcParticle);
+
+  // Mask the flags ignored by PropertyFlags of the particle
+  status &= ~(getFlagsIgnoredByProperty(particle));
 
   return setStatus(particle, status);
 }
@@ -242,14 +252,22 @@ int MCMatching::getNumberOfDaughtersWithoutNeutrinos(const MCParticle* mcParticl
   return daughters.size() - number_of_neutrinos;
 }
 
-int MCMatching::getMCErrors(const Particle* particle, const MCParticle* mcParticle)
+int MCMatching::getMCErrors(const Particle* particle, const MCParticle* mcParticle, const bool honorProperty)
 {
   if (particle->hasExtraInfo(c_extraInfoMCErrors)) {
-    return particle->getExtraInfo(c_extraInfoMCErrors);
+    if (honorProperty) {
+      return (int(particle->getExtraInfo(c_extraInfoMCErrors)) & ~(getFlagsIgnoredByProperty(particle)));
+    } else {
+      return particle->getExtraInfo(c_extraInfoMCErrors);
+    }
   } else {
     if (!mcParticle)
       mcParticle = particle->getRelatedTo<MCParticle>();
-    return setMCErrorsExtraInfo(const_cast<Particle*>(particle), mcParticle);
+    if (honorProperty) {
+      return (int(setMCErrorsExtraInfo(const_cast<Particle*>(particle), mcParticle)) & ~(getFlagsIgnoredByProperty(particle)));
+    } else {
+      return setMCErrorsExtraInfo(const_cast<Particle*>(particle), mcParticle);
+    }
   }
 }
 
@@ -342,8 +360,7 @@ namespace {
       return; //stop at the bottom of the MC decay tree (ignore secondaries)
 
     const vector<MCParticle*>& genDaughters = gen->getDaughters();
-    for (unsigned i = 0; i < genDaughters.size(); ++i) {
-      const MCParticle* daug = genDaughters[i];
+    for (auto daug : genDaughters) {
       children.push_back(daug);
       appendParticles(daug, children);
     }
@@ -390,7 +407,6 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
         }
       } else if (absGeneratedPDG == 12 || absGeneratedPDG == 14 || absGeneratedPDG == 16) { // missing neutrino
         flags |= c_MissNeutrino;
-
       } else { //neither photon nor neutrino -> massive
         flags |= c_MissMassiveParticle;
         if (absGeneratedPDG == 130) {
@@ -399,5 +415,46 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
       }
     }
   }
+  return flags;
+}
+
+int MCMatching::countMissingParticle(const Particle* particle, const MCParticle* mcParticle, const vector<int>& daughterPDG)
+{
+  unordered_set<const MCParticle*> mcMatchedParticles;
+  appendParticles(particle, mcMatchedParticles);
+  vector<const MCParticle*> genParts;
+  appendParticles(mcParticle, genParts);
+
+  int nMissingDaughter = 0;
+
+  for (const MCParticle* genPart : genParts) {
+    const bool missing = (mcMatchedParticles.find(genPart) == mcMatchedParticles.end());
+    if (missing) {
+
+      const int generatedPDG = genPart->getPDG();
+      const int absGeneratedPDG = abs(generatedPDG);
+
+      auto result = find(daughterPDG.begin(), daughterPDG.end(), absGeneratedPDG);
+      if (result != daughterPDG.end())
+        nMissingDaughter++;
+    }
+  }
+
+  return nMissingDaughter;
+}
+
+int MCMatching::getFlagsIgnoredByProperty(const Particle* part)
+{
+  int flags = 0;
+
+  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreRadiatedPhotons) {
+    flags |= (MCMatching::c_MissFSR);
+    flags |= (MCMatching::c_MissPHOTOS);
+  }
+  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreIntermediate) flags |= (MCMatching::c_MissingResonance);
+  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreMassive) flags |= (MCMatching::c_MissMassiveParticle);
+  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreNeutrino) flags |= (MCMatching::c_MissNeutrino);
+  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreGamma) flags |= (MCMatching::c_MissGamma);
+
   return flags;
 }

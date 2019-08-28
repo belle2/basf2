@@ -19,21 +19,17 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <dirent.h>
-#include <errno.h>
+#include <cerrno>
 
 using namespace std;
 using namespace Belle2;
 
-RbTupleManager* RbTupleManager::s_instance = 0;
+RbTupleManager* RbTupleManager::s_instance = nullptr;
 
 // Constructor and Destructor
-RbTupleManager::RbTupleManager()
-{
-}
+RbTupleManager::RbTupleManager() = default;
 
-RbTupleManager::~RbTupleManager()
-{
-}
+RbTupleManager::~RbTupleManager() = default;
 
 RbTupleManager::RbTupleManager(int nproc, const char* file, const char* workdir):
   m_nproc(nproc), m_filename(file), m_workdir(workdir)
@@ -63,14 +59,14 @@ void RbTupleManager::init(int nprocess, const char* filename, const char* workdi
     std::string dir = m_workdir;
     DIR* dp;
     struct dirent* dirp;
-    if ((dp = opendir(dir.c_str())) == NULL) {
+    if ((dp = opendir(dir.c_str())) == nullptr) {
       B2ERROR("Error to open directory" << dir);
       return;
     }
 
     // Scan the directory and delete temporary files
     std::string compfile = m_filename + ".";
-    while ((dirp = readdir(dp)) != NULL) {
+    while ((dirp = readdir(dp)) != nullptr) {
       std::string curfile = std::string(dirp->d_name);
       if (curfile.compare(0, compfile.size(), compfile) == 0) {
         //        unlink(curfile.c_str());
@@ -103,11 +99,11 @@ int RbTupleManager::begin(int procid)
     //    printf("RbTupleManager: initialized for single-process\n");
     B2INFO("RbTupleManager :  initialized for single process");
   }
-  if (m_root == NULL) return -1;
+  if (m_root == nullptr) return -1;
   //  printf ( "RbTupleManager::TFile opened\n" );
 
-  for (vector<Module*>::iterator it = m_histdefs.begin(); it != m_histdefs.end(); ++it) {
-    HistoModule* hmod = (HistoModule*) * it;
+  for (auto& mod : m_histdefs) {
+    auto* hmod = (HistoModule*) mod;
     hmod->defineHisto();
   }
 
@@ -118,18 +114,18 @@ int RbTupleManager::begin(int procid)
 
 int RbTupleManager::terminate()
 {
-  if (m_root != NULL) {
+  if (m_root != nullptr) {
     m_root->Write();
     m_root->Close();
     delete m_root;
-    m_root = NULL;
+    m_root = nullptr;
   }
   return 0;
 }
 
 int RbTupleManager::dump()
 {
-  if (m_root != NULL) {
+  if (m_root != nullptr) {
     m_root->Write();
   }
   return 0;
@@ -158,7 +154,7 @@ int RbTupleManager::hadd(bool deleteflag)
   std::string dir = m_workdir;
   DIR* dp;
   struct dirent* dirp;
-  if ((dp = opendir(dir.c_str())) == NULL) {
+  if ((dp = opendir(dir.c_str())) == nullptr) {
     B2ERROR("Error to open directory" << dir);
     return errno;
   }
@@ -168,7 +164,7 @@ int RbTupleManager::hadd(bool deleteflag)
   //  std::string compfile = dir + "/" + m_filename + ".";
   std::string compfile = m_filename + ".";
   printf("compfile = %s\n", compfile.c_str());
-  while ((dirp = readdir(dp)) != NULL) {
+  while ((dirp = readdir(dp)) != nullptr) {
     std::string curfile = std::string(dirp->d_name);
     //    printf("Checking %s with compfile%s\n", curfile.c_str(), compfile.c_str());
     if (curfile.compare(0, compfile.size(), compfile) == 0) {

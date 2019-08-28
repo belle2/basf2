@@ -16,10 +16,14 @@
 #include <framework/core/PathIterator.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/database/DBStore.h>
+#include <framework/database/Database.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/Environment.h>
 #include <framework/core/DataFlowVisualization.h>
 #include <framework/core/RandomNumbers.h>
+#include <framework/core/MetadataService.h>
+#include <framework/gearbox/Unit.h>
+#include <framework/utilities/Utils.h>
 
 #ifdef HAS_CALLGRIND
 #include <valgrind/callgrind.h>
@@ -43,7 +47,7 @@
 
 #include <TROOT.h>
 
-#include <signal.h>
+#include <csignal>
 #include <unistd.h>
 #include <cstring>
 
@@ -80,18 +84,13 @@ void EventProcessor::writeToStdErr(const char msg[])
 
 }
 
-
-EventProcessor::EventProcessor() : m_master(NULL), m_processStatisticsPtr("", DataStore::c_Persistent),
-  m_inRun(false)
+EventProcessor::EventProcessor() : m_master(nullptr), m_processStatisticsPtr("", DataStore::c_Persistent),
+  m_inRun(false), m_lastMetadataUpdate(0), m_metadataUpdateInterval(1.0)
 {
 
 }
 
-
-EventProcessor::~EventProcessor()
-{
-
-}
+EventProcessor::~EventProcessor() = default;
 
 namespace {
   /** Small helper class to make sure the number of events override is reset
@@ -123,7 +122,7 @@ long EventProcessor::getMaximumEventNumber(long maxEvent) const
   return maxEvent;
 }
 
-void EventProcessor::process(PathPtr startPath, long maxEvent)
+void EventProcessor::process(const PathPtr& startPath, long maxEvent)
 {
   maxEvent = getMaximumEventNumber(maxEvent);
   // Make sure the NumberEventsOverride reflects the actual number if
@@ -136,7 +135,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
 
   //Find the adress of the module we want to profile
   if (!m_profileModuleName.empty()) {
-    for (auto module : moduleList) {
+    for (const auto& module : moduleList) {
       if (module->getName() == m_profileModuleName) {
         m_profileModule = module.get();
         break;
@@ -217,12 +216,13 @@ void EventProcessor::callEvent(Module* module)
   // stop timing
   if (collectStats) m_processStatisticsPtr->stopModule(module, ModuleStatistics::c_Event);
   // reset logging
-  logSystem.updateModule(NULL);
+  logSystem.updateModule(nullptr);
 };
 
 void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool setEventInfo)
 {
   LogSystem& logSystem = LogSystem::Instance();
+  auto dbsession = Database::Instance().createScopedUpdateSession();
 
   m_processStatisticsPtr.registerInDataStore();
   //TODO I might want to overwrite it in initialize (e.g. if read from file)
@@ -231,6 +231,8 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool
   if (!m_processStatisticsPtr)
     m_processStatisticsPtr.create();
   m_processStatisticsPtr->startGlobal();
+
+  MetadataService::Instance().addBasf2Status("initializing");
 
   for (const ModulePtr& modPtr : modulePathList) {
     Module* module = modPtr.get();
@@ -251,10 +253,10 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool
     m_processStatisticsPtr->stopModule(module, ModuleStatistics::c_Init);
 
     //Set the global log level
-    logSystem.updateModule(NULL);
+    logSystem.updateModule(nullptr);
 
     //Check whether this is the master module
-    if (!m_master && DataStore::Instance().getEntry(m_eventMetaDataPtr) != NULL) {
+    if (!m_master && DataStore::Instance().getEntry(m_eventMetaDataPtr) != nullptr) {
       B2DEBUG(100, "Found module providing EventMetaData: " << module->getName());
       m_master = module;
       if (setEventInfo) {
@@ -298,6 +300,12 @@ void EventProcessor::installMainSignalHandlers(void (*fn)(int))
 
 bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule)
 {
+  double time = Utils::getClock() / Unit::s;
+  if (time > m_lastMetadataUpdate + m_metadataUpdateInterval) {
+    MetadataService::Instance().addBasf2Status("running event loop");
+    m_lastMetadataUpdate = time;
+  }
+
   const bool collectStats = !Environment::Instance().getNoStats();
 
   while (!moduleIter.isDone()) {
@@ -375,7 +383,7 @@ bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule
   return false;
 }
 
-void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent, bool isInputProcess)
+void EventProcessor::processCore(const PathPtr& startPath, const ModulePtrList& modulePathList, long maxEvent, bool isInputProcess)
 {
   DataStore::Instance().setInitializeActive(false);
   m_moduleList = modulePathList;
@@ -411,6 +419,8 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
 void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 {
+  MetadataService::Instance().addBasf2Status("terminating");
+
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_reverse_iterator listIter;
   m_processStatisticsPtr->startGlobal();
@@ -427,7 +437,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
     m_processStatisticsPtr->stopModule(module, ModuleStatistics::c_Term);
 
     //Set the global log level
-    logSystem.updateModule(NULL);
+    logSystem.updateModule(nullptr);
   }
 
   m_processStatisticsPtr->stopGlobal(ModuleStatistics::c_Term);
@@ -436,7 +446,11 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 
 void EventProcessor::processBeginRun(bool skipDB)
 {
+  MetadataService::Instance().addBasf2Status("beginning run");
+
   m_inRun = true;
+  // cppcheck-suppress unreadVariable; scope guard with side effects, no need to read
+  auto dbsession = Database::Instance().createScopedUpdateSession();
 
   LogSystem& logSystem = LogSystem::Instance();
   m_processStatisticsPtr->startGlobal();
@@ -458,7 +472,7 @@ void EventProcessor::processBeginRun(bool skipDB)
     m_processStatisticsPtr->stopModule(module, ModuleStatistics::c_BeginRun);
 
     //Set the global log level
-    logSystem.updateModule(NULL);
+    logSystem.updateModule(nullptr);
   }
 
   m_processStatisticsPtr->stopGlobal(ModuleStatistics::c_BeginRun);
@@ -467,6 +481,8 @@ void EventProcessor::processBeginRun(bool skipDB)
 
 void EventProcessor::processEndRun()
 {
+  MetadataService::Instance().addBasf2Status("ending run");
+
   if (!m_inRun)
     return;
   m_inRun = false;
@@ -492,7 +508,7 @@ void EventProcessor::processEndRun()
     m_processStatisticsPtr->stopModule(module, ModuleStatistics::c_EndRun);
 
     //Set the global log level
-    logSystem.updateModule(NULL);
+    logSystem.updateModule(nullptr);
   }
   *m_eventMetaDataPtr = newEventMetaData;
 

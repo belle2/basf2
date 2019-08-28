@@ -19,6 +19,7 @@
 #include <boost/variant.hpp>
 #include <boost/optional.hpp>
 
+#include <set>
 #include <map>
 #include <string>
 #include <vector>
@@ -60,6 +61,9 @@ namespace Belle2 {
     /** check if the python object can be converted to the given std::vector type */
     template<typename Value>
     bool checkPythonObject(const boost::python::object& pyObject, const std::vector<Value>&);
+    /** check if the python object can be converted to the given std::set type */
+    template<typename Value>
+    bool checkPythonObject(const boost::python::object& pyObject, const std::set<Value>&);
     /** check if the python object can be converted to the given std::tuple type */
     template<typename... Types>
     bool checkPythonObject(const boost::python::object& pyObject, const std::tuple<Types...>&);
@@ -79,6 +83,9 @@ namespace Belle2 {
     /** Convert from Python to given type. */
     template<typename Value>
     std::vector<Value> convertPythonObject(const boost::python::object& pyObject, const std::vector<Value>&);
+    /** Convert from Python to given type */
+    template<typename Value>
+    std::set<Value> convertPythonObject(const boost::python::object& pyObject, const std::set<Value>&);
     /** Convert from Python to given type. */
     template<typename... Types>
     std::tuple<Types...> convertPythonObject(const boost::python::object& pyObject, const std::tuple<Types...>&);
@@ -93,6 +100,9 @@ namespace Belle2 {
     boost::python::object convertToPythonObject(const Scalar& value);
     template<typename Value>
     boost::python::list convertToPythonObject(const std::vector<Value>& vector);
+    /** Convert std::set to a python object */
+    template<typename Value>
+    boost::python::object convertToPythonObject(const std::set<Value>& set);
     template<typename Key, typename Value>
     boost::python::dict convertToPythonObject(const std::map<Key, Value>& map);
     template<typename... Types>
@@ -105,6 +115,7 @@ namespace Belle2 {
 
     template<typename T> struct Type;
     template<typename T> struct Type<std::vector<T> >;
+    template<typename T> struct Type<std::set<T>>;
     template<typename A, typename B> struct Type<std::map<A, B> >;
     template<typename... Types> struct Type<std::tuple<Types...> >;
     template<typename... Types> struct Type<boost::variant<Types...> >;
@@ -133,6 +144,8 @@ namespace Belle2 {
     template<typename T> struct Type { /** type name. */ static std::string name() { return "???";} };
     /** Converts a template argument into a string for corresponding Python type. */
     template<typename T> struct Type<std::vector<T> > { /** type name. */ static std::string name() { return std::string("list(") + Type<T>::name() + ")"; } };
+    /** Convert a templeate arugment into a string for corresponding Python type */
+    template<typename T> struct Type<std::set<T>> { /** type name */ static std::string name() { return std::string("set(") + Type<T>::name() + ")"; }};
     /** Converts a template argument into a string for corresponding Python type. */
     template<typename A, typename B> struct Type<std::map<A, B> > { /** type name. */ static std::string name() { return std::string("dict(") + Type<A>::name() + " -> " + Type<B>::name() + ")"; } };
 
@@ -230,16 +243,43 @@ namespace Belle2 {
       return true;
     }
 
+    /** Helper function to loop over a python object that implements the iterator
+     * concept and call a functor with each element as argument
+     * @param pyObject the python object to iterate over
+     * @function any functor object which accepts a boost::python::object as its
+     *       only argument and returns true if the iteration should be continued
+     * @returns true if the iteration was completed over all elements
+     */
+    template<class Functor>
+    bool iteratePythonObject(const boost::python::object& pyObject, Functor function)
+    {
+      boost::python::object iterator(boost::python::handle<>(PyObject_GetIter(pyObject.ptr())));
+      PyObject* item{nullptr};
+      // ok, loop over the iterator and check all elements
+      while ((item = PyIter_Next(iterator.ptr()))) {
+        boost::python::object obj{boost::python::handle<>(item)}; // to make sure we properly decref
+        if (not function(obj)) return false;
+      }
+      return true;
+    }
+
     /// Check if the python object is a list of objects of the correct value type
     template<typename Value>
     bool checkPythonObject(const boost::python::object& pyObject, const std::vector<Value>& /*dispatch tag*/)
     {
       if (not PyList_Check(pyObject.ptr())) return false;
-      const boost::python::list& pyList = static_cast<const boost::python::list&>(pyObject);
-      for (int i = 0; i < boost::python::len(pyList); ++i) {
-        if (not checkPythonObject(pyList[i], Value())) return false;
-      }
-      return true;
+      return iteratePythonObject(pyObject, [](const boost::python::object & element) {
+        return checkPythonObject(element, Value());
+      });
+    }
+
+    template<typename Value>
+    bool checkPythonObject(const boost::python::object& pyObject, const std::set<Value>&)
+    {
+      if (not PyAnySet_Check(pyObject.ptr())) return false;
+      return iteratePythonObject(pyObject, [](const boost::python::object & element) {
+        return checkPythonObject(element, Value());
+      });
     }
 
     /// Recursion sentinal for the case that all element checks succeeded.
@@ -331,10 +371,24 @@ namespace Belle2 {
     boost::python::list convertToPythonObject(const std::vector<Value>& vector)
     {
       boost::python::list outputList;
-      for (auto value : vector) {
+      for (const auto& value : vector) {
         outputList.append(convertToPythonObject(value));
       }
       return outputList;
+    }
+
+    /** Write the content of a std::set to a python set
+     * @param set the set that should be converted
+     * @return python object for the set
+     */
+    template<typename Value>
+    boost::python::object convertToPythonObject(const std::set<Value>& set)
+    {
+      boost::python::object result(boost::python::handle<>(PySet_New(nullptr)));
+      for (const auto& value : set) {
+        PySet_Add(result.ptr(), convertToPythonObject(value).ptr());
+      }
+      return result;
     }
 
     /**
@@ -357,8 +411,8 @@ namespace Belle2 {
      * @{
      * TMP (Template Meta Programming )
      * The given python list is filled, and later converted into a python tuple (in convertToPythonObject).
-     * To fill the python list frmo the C++ std::tuple we need again TMP methods.
-     * The variadic template std::tuple is copied by rthe ecursive defined template function GetTuple,
+     * To fill the python list from the C++ std::tuple we need again TMP methods.
+     * The variadic template std::tuple is copied by the recursive defined template function GetTuple,
      * the overloaded argument (type SizeT<>) of the function serves as a counter for the recursion depth.
      */
     template < typename TupleType >
@@ -367,9 +421,12 @@ namespace Belle2 {
       GetTuple(tuple, pyList, SizeT<std::tuple_size<TupleType>::value>());
     }
 
+    /** Break recursion when all members are already appended to the list */
     template < typename TupleType >
     inline void GetTuple(const TupleType&, boost::python::list&, SizeT<0>) { }
 
+    /** Append elements of the tuple to pyList by recursively calling this function with the
+     * element index as argument type */
     template < typename TupleType, size_t N >
     inline void GetTuple(const TupleType& tuple, boost::python::list& pyList, SizeT<N>)
     {
@@ -382,7 +439,7 @@ namespace Belle2 {
      * Writes content of a std::tuple to a python tuple.
      *
      * @param tuple The tuple whose items should be stored to a python tuple.
-     * @return The python tuple where the the content of the map is stored.
+     * @return The python tuple where the content of the map is stored.
      */
     template<typename... Types>
     boost::python::tuple convertToPythonObject(const std::tuple<Types...>& tuple)
@@ -454,7 +511,7 @@ namespace Belle2 {
       if (valueProxy.check()) {
         tmpValue = static_cast<Scalar>(valueProxy);
       } else {
-        throw std::runtime_error(std::string("Could not set module parameter: Expected type '") + Type<Scalar>::name() + "' instead of '" +
+        throw std::runtime_error(std::string("Could not convert value: Expected type '") + Type<Scalar>::name() + "' instead of '" +
                                  pyObject.ptr()->ob_type->tp_name + "'.");
       }
       return tmpValue;
@@ -473,17 +530,31 @@ namespace Belle2 {
     {
 
       std::vector<Value> tmpVector;
-
-      if (PyList_Check(pyObject.ptr())) {
-        const boost::python::list& pyList = static_cast<const boost::python::list&>(pyObject);
-        int nList = boost::python::len(pyList);
-        for (int iList = 0; iList < nList; ++iList) {
-          tmpVector.push_back(convertPythonObject(pyList[iList], Value()));
-        }
+      if (PyList_Check(pyObject.ptr()) or PyGen_Check(pyObject.ptr())) {
+        iteratePythonObject(pyObject, [&tmpVector](const boost::python::object & element) {
+          tmpVector.emplace_back(convertPythonObject(element, Value()));
+          return true;
+        });
       } else {
-        tmpVector.push_back(convertPythonObject(pyObject, Value()));
+        tmpVector.emplace_back(convertPythonObject(pyObject, Value()));
       }
       return tmpVector;
+    }
+
+    /** Convert a python set to a std::set */
+    template<typename Value>
+    std::set<Value> convertPythonObject(const boost::python::object& pyObject, const std::set<Value>&)
+    {
+      std::set<Value> result;
+      if (PyAnySet_Check(pyObject.ptr())) {
+        iteratePythonObject(pyObject, [&result](const boost::python::object & element) {
+          result.emplace(convertPythonObject(element, Value()));
+          return true;
+        });
+      } else {
+        result.emplace(convertPythonObject(pyObject, Value()));
+      }
+      return result;
     }
 
 
@@ -529,9 +600,12 @@ namespace Belle2 {
       SetTuple(tuple, pyTuple, SizeT<N>());
     }
 
+    /** Break recursion once all elements have been set */
     template < typename TupleType >
     inline void SetTuple(TupleType&, const boost::python::tuple&, SizeT<0>) { }
 
+    /** Set the elements of the tuple recursively by calling with the function
+     * with the next tuple index and converting one element */
     template < typename TupleType, size_t N >
     inline void SetTuple(TupleType& tuple, const boost::python::tuple& pyTuple, SizeT<N>)
     {
@@ -571,6 +645,7 @@ namespace Belle2 {
                                pyObject.ptr()->ob_type->tp_name + "'.");
     }
 
+    /** Recursively go through all possible types of the variant and check which one is a possible conversion */
     template < typename... Types, size_t N >
     inline void SetVariant(boost::variant<Types...>& variant, const boost::python::object& pyObject, SizeT<N>)
     {

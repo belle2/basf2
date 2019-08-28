@@ -32,7 +32,7 @@ ChargedPidMVAModule::ChargedPidMVAModule() : Module()
 }
 
 
-ChargedPidMVAModule::~ChargedPidMVAModule() {}
+ChargedPidMVAModule::~ChargedPidMVAModule() = default;
 
 
 void ChargedPidMVAModule::initialize()

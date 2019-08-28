@@ -34,11 +34,7 @@ EventInfoPrinterModule::EventInfoPrinterModule() : Module()
   addParam("printTime", m_printTime, "Print time in addition to exp/run/evt numbers.", false);
 }
 
-
-EventInfoPrinterModule::~EventInfoPrinterModule()
-{
-
-}
+EventInfoPrinterModule::~EventInfoPrinterModule() = default;
 
 void EventInfoPrinterModule::initialize()
 {

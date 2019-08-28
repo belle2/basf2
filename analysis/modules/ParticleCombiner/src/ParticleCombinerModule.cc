@@ -25,9 +25,9 @@
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <framework/dbobjects/BeamParameters.h>
 
 #include <algorithm>
+#include <memory>
 
 using namespace std;
 
@@ -79,8 +79,8 @@ namespace Belle2 {
 
     // initializing the rest of private memebers
     m_pdgCode   = 0;
-    m_isSelfConjugatedParticle = 0;
-    m_generator = 0;
+    m_isSelfConjugatedParticle = false;
+    m_generator = nullptr;
   }
 
   void ParticleCombinerModule::initialize()
@@ -111,7 +111,7 @@ namespace Belle2 {
       StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
     }
 
-    m_generator = std::unique_ptr<ParticleGenerator>(new ParticleGenerator(m_decayString, m_cutParameter));
+    m_generator = std::make_unique<ParticleGenerator>(m_decayString, m_cutParameter);
 
     StoreObjPtr<ParticleList> particleList(m_listName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
@@ -160,7 +160,7 @@ namespace Belle2 {
       //    - p(mother) = p(daughter_0) - Sum_i p(daughter_i) (where i > 0)
       if (m_recoilParticleType == 1) {
         PCmsLabTransform T;
-        TLorentzVector recoilMomentum = T.getBeamParams().getHER() + T.getBeamParams().getLER() - particle.get4Vector();
+        TLorentzVector recoilMomentum = T.getBeamFourMomentum() - particle.get4Vector();
         particle.set4Vector(recoilMomentum);
       } else if (m_recoilParticleType == 2) {
         const std::vector<Particle*> daughters = particle.getDaughters();

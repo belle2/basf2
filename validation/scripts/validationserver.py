@@ -429,7 +429,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     cwd_folder = os.getcwd()
 
     # Only execute the program if a basf2 release is set up!
-    if os.environ.get('BELLE2_RELEASE', None) is None:
+    if os.environ.get('BELLE2_RELEASE_DIR', None) is None and os.environ.get('BELLE2_LOCAL_DIR', None) is None:
         sys.exit('Error: No basf2 release set up!')
 
     cherry_config = dict()

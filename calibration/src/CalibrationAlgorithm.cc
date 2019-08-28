@@ -27,7 +27,6 @@ bool CalibrationAlgorithm::checkPyExpRun(PyObject* pyObj)
       B2DEBUG(29, "ExpRun was a Python sequence which didn't have exactly 2 entries!");
       return false;
     }
-    long value1, value2;
     PyObject* item1, *item2;
     item1 = PySequence_GetItem(pyObj, 0);
     item2 = PySequence_GetItem(pyObj, 1);
@@ -38,6 +37,7 @@ bool CalibrationAlgorithm::checkPyExpRun(PyObject* pyObj)
     }
     // Are they longs?
     if (PyLong_Check(item1) && PyLong_Check(item2)) {
+      long value1, value2;
       value1 = PyLong_AsLong(item1);
       value2 = PyLong_AsLong(item2);
       if (((value1 == -1) || (value2 == -1)) && PyErr_Occurred()) {
@@ -385,7 +385,7 @@ string CalibrationAlgorithm::getGranularityFromData() const
   f.reset(TFile::Open(fileName.c_str(), "READ"));
   runRange = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
   if (!runRange) {
-    B2FATAL("The input file " << fileName << "does not conatin a RunRange object at "
+    B2FATAL("The input file " << fileName << " does not contain a RunRange object at "
             << runRangeObjName << ". Please set your input files to exclude it.");
     return "";
   }

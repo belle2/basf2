@@ -8,10 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TFile.h>
-#include <TH1F.h>
-
 /* Belle2 headers. */
 #include <klm/simulation/ScintillatorFirmware.h>
 #include <framework/utilities/FileSystem.h>
@@ -61,6 +57,7 @@ enum KLM::ScintillatorFirmwareFitStatus KLM::ScintillatorFirmware::fit(
   /* Region for background (pedestal) level. */
   ibg = std::max(ithr - nPointsSigBg, 0);
   /* Cannot determine background level, no data before signal. */
+  /* cppcheck-suppress knownConditionTrueFalse */
   if (ibg == 0)
     return c_ScintillatorFirmwareNoSignal;
   /* Determine background (pedestal) level. */

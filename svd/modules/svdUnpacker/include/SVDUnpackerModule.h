@@ -23,6 +23,8 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDTransparentDigit.h>
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
+#include <svd/dataobjects/SVDEventInfo.h>
+#include <svd/dataobjects/SVDTriggerType.h>
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <svd/online/SVDStripNoiseMap.h>
@@ -55,20 +57,20 @@ namespace Belle2 {
       /**
        *Initializes the Module.
        */
-      virtual void initialize() override;
-      virtual void beginRun() override;
-      virtual void event() override;
-      virtual void endRun() override;
+      virtual void initialize() override; /**<initialize*/
+      virtual void beginRun() override; /**<begin run*/
+      virtual void event() override; /**<event*/
+      virtual void endRun() override; /**<end run*/
 
-      std::string m_rawSVDListName;
-      std::string m_svdDigitListName;
+      std::string m_rawSVDListName; /**<RawSVD StoreArray name*/
+      std::string m_svdDigitListName; /**<SVDDigit StoreArray name*/
 
-      bool m_generateOldDigits;
-      std::string m_svdShaperDigitListName;
-      std::string m_svdDAQDiagnosticsListName;
+      bool m_generateOldDigits;  /**< whether to produce old SVDDigit format*/
+      std::string m_svdShaperDigitListName; /**<SVDShaperDigit StoreArray name*/
+      std::string m_svdDAQDiagnosticsListName; /**<SVDDAQDiagnostic StoreArray name*/
+      std::string m_svdEventInfoName; /**< SVDEventInfo name */
 
-      int m_wrongFTBcrc;
-
+      int m_wrongFTBcrc; /**<FTB CRC no-Match counter*/
 
 
     private:
@@ -151,17 +153,20 @@ namespace Belle2 {
 
 
       union {  // The 4 byte words of the stream can be interpreted as:
-        uint32_t m_data32;
-        FTBHeader m_FTBHeader;
-        MainHeader m_MainHeader;
-        APVHeader m_APVHeader;
-        data_A  m_data_A;
-        data_B  m_data_B;
-        FADCTrailer m_FADCTrailer;
-        FTBTrailer m_FTBTrailer;
+        uint32_t m_data32; /**< Input 32-bit data word */
+        FTBHeader m_FTBHeader; /**< Implementation of FTB Header */
+        MainHeader m_MainHeader;  /**< Implementation of FADC Header */
+        APVHeader m_APVHeader;  /**< Implementation of APV Header */
+        data_A  m_data_A; /**< Implementation of 1st data word */
+        data_B  m_data_B; /**< Implementation of 2nd data word */
+        FADCTrailer m_FADCTrailer;  /**< Implementation of FADC Trailer */
+        FTBTrailer m_FTBTrailer; /**< Implementation of FTB Trailer */
       };
 
       StoreObjPtr<EventMetaData> m_eventMetaDataPtr;   /**< Required input for EventMetaData */
+      StoreObjPtr<SVDEventInfo> m_svdEventInfoPtr;  /**< SVDEventInfo output per event */
+      SVDTriggerType m_SVDTriggerType;  /**<  SVDTriggerType object */
+
       StoreArray<RawSVD> m_rawSVD;   /**< output for RawSVD */
       StoreArray<SVDDigit> m_svdDigit; /**< Required input for SVDDigit */
 
@@ -194,10 +199,27 @@ namespace Belle2 {
        */
       bool m_badMappingFatal = false;
 
-      /** Optionally we can switch all B2ERRORS to B2WARNINGS
-       *  if running on HLT or ExpressReco
+      /** Optionally we can get printout of Raw Data words */
+      bool m_printRaw;
+
+      /** The parameter that indicates what fraction of B2ERRORs messages
+       * should be suppressed to not overload HLT while data taking
        */
-      bool m_switchErrors2Warnings = false;
+      int m_errorRate;
+
+      /** this 4-bits value should be 1111 if no headers/trailers are missing */
+      unsigned short seenHeadersAndTrailers: 4;
+
+      /** counters for specific ERRORS produced by the Unpacker */
+      int nTriggerMatchErrors;
+      int nEventMatchErrors;
+      int nUpsetAPVsErrors;
+      int nErrorFieldErrors;
+      int nMissingAPVsErrors;
+      int nFADCMatchErrors;
+      int nAPVErrors;
+      int nFTBFlagsErrors;
+      int nEventInfoMatchErrors;
 
       /** Map to store a list of missing APVs */
       std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_missingAPVs;

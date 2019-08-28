@@ -548,6 +548,7 @@ namespace Belle2 {
                       "Return the z0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track.");
     REGISTER_VARIABLE("V0Deltaz0", v0DaughterZ0Diff,
                       "Return the difference between z0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track.");
+
     REGISTER_VARIABLE("constant(float i)", Constant, R"DOC(
                       Returns i.
 

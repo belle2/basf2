@@ -176,9 +176,9 @@ namespace Belle2 {
     // use stable sort to make sure we keep the relative order of elements with
     // same value as it was before
     if (m_preferLowest) {
-      std::stable_sort(valueToIndex.begin(), valueToIndex.end(), lowerPair<ValueIndexPair>);
+      std::stable_sort(valueToIndex.begin(), valueToIndex.end(), ValueIndexPairSorting::lowerPair<ValueIndexPair>);
     } else {
-      std::stable_sort(valueToIndex.begin(), valueToIndex.end(), higherPair<ValueIndexPair>);
+      std::stable_sort(valueToIndex.begin(), valueToIndex.end(), ValueIndexPairSorting::higherPair<ValueIndexPair>);
     }
 
     // starting from the best candidate add all particles to output list that are not already in it

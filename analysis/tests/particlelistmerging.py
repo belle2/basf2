@@ -79,8 +79,8 @@ ma.variablesToExtraInfo('e-:above3', {'formula(3)': 'identifier', 'formula(2 + r
 # Merging the three lists with the e-:all list as first input list
 ma.copyLists('e-:onlyall', ['e-:all', 'e-:below2', 'e-:above3'], path=path)
 # Since e-:all is a superset of the other two lists, the merged list should contain only particles with identifier equals 0.
+ma.printVariableValues('e-:onlyall', ['extraInfo(identifier)'], path=path)
 ma.applyCuts('e-:onlyall', 'extraInfo(identifier) == 0', path=path)
-# ma.printVariableValues('e-:onlyall', ['extraInfo(identifier)'], path=path)
 
 # Merging the three lists with the e-:all list at the end
 ma.copyLists('e-:goodmerge', ['e-:below2', 'e-:above3', 'e-:all'], path=path)
@@ -88,15 +88,15 @@ ma.copyLists('e-:goodmerge', ['e-:below2', 'e-:above3', 'e-:all'], path=path)
 # the merged list, and those with 2 < px < 3 from the e-:all list.
 # Thus, the merged list contains the ten best (according to quality)
 # particles. This desired outcome was achieved accidentally.
+ma.printVariableValues('e-:goodmerge', ['extraInfo(identifier)'], path=path)
 ma.applyCuts('e-:goodmerge', 'extraInfo(identifier) > 0', path=path)
-# ma.printVariableValues('e-:goodmerge', ['extraInfo(identifier)'], path=path)
 
 # Merging the three lists with the e-:all list as first input list but providing the quality extra info as sorting variable
 path.add_module('ParticleListManipulator', outputListName='e-:best', inputListNames=['e-:all', 'e-:below2', 'e-:above3'],
                 variable='extraInfo(quality)', preferLowest=False)
 # The merged list should again contain the ten best particles. This time independent of the order in the input list.
+ma.printVariableValues('e-:best', ['extraInfo(identifier)'], path=path)
 ma.applyCuts('e-:best', 'extraInfo(identifier) > 0', path=path)
-# ma.printVariableValues('e-:best', ['extraInfo(identifier)'], path=path)
 
 path.add_module(MergingChecker())
 

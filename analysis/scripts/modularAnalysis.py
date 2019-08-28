@@ -451,15 +451,15 @@ def correctFSR(
     @param path          modules are added to this path
     """
 
-    bremsfinder = register_module('FSRCorrection')
-    bremsfinder.set_name('FSRCorrection_' + outputListName)
-    bremsfinder.param('inputListName', inputListName)
-    bremsfinder.param('outputListName', outputListName)
-    bremsfinder.param('gammaListName', gammaListName)
-    bremsfinder.param('angleThreshold', angleThreshold)
-    bremsfinder.param('energyThreshold', energyThreshold)
-    bremsfinder.param('writeOut', writeOut)
-    path.add_module(bremsfinder)
+    fsrcorrector = register_module('FSRCorrection')
+    fsrcorrector.set_name('FSRCorrection_' + outputListName)
+    fsrcorrector.param('inputListName', inputListName)
+    fsrcorrector.param('outputListName', outputListName)
+    fsrcorrector.param('gammaListName', gammaListName)
+    fsrcorrector.param('angleThreshold', angleThreshold)
+    fsrcorrector.param('energyThreshold', energyThreshold)
+    fsrcorrector.param('writeOut', writeOut)
+    path.add_module(fsrcorrector)
 
 
 def copyLists(

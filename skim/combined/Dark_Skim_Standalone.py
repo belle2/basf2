@@ -75,8 +75,8 @@ add_skim('DimuonForDarkSearches', DimuonList(path=darkskimpath), path=darkskimpa
 from skim.dark import ElectronMuonForDarkSearchesList as ElectronMuonList
 add_skim('ElectronMuonForDarkSearches', ElectronMuonList(path=darkskimpath), path=darkskimpath)
 
-from skim.dark import DielectronForDarkSearchesList as DielectronList
-add_skim('DielectronForDarkSearches', DielectronList(path=darkskimpath), path=darkskimpath)
+# from skim.dark import DielectronForDarkSearchesList as DielectronList
+# add_skim('DielectronForDarkSearches', DielectronList(path=darkskimpath), path=darkskimpath)
 
 setSkimLogging(path=darkskimpath)
 process(darkskimpath)

@@ -231,9 +231,9 @@ def LFVZpVisibleList(path):
 def DimuonForDarkSearchesList(path):
     """
     Note:
-        * Dimuon skim, needed for ee --> mu mu Z'; Z' --> invisible and others
+        * Dimuon skim, needed for e+e- --> mu+mu- Z'; Z' --> invisible and others
         * Skim code: ???
-        * Physics channel: ee --> mu mu
+        * Physics channel: e+e- --> mu+mu-
         * Skim category: physics, dark sector
 
     The skim list for the dimuon-based dark sector searches
@@ -269,9 +269,9 @@ def DimuonForDarkSearchesList(path):
 def ElectronMuonForDarkSearchesList(path):
     """
     Note:
-        * Electron-muon pair skim, needed for ee --> e mu Z'; Z' --> invisible and others
+        * Electron-muon pair skim, needed for e+e- --> e+mu- Z'; Z' --> invisible and others
         * Skim code: ???
-        * Physics channel: ee --> e mu
+        * Physics channel: e+e- --> e+mu-
         * Skim category: physics, dark sector
 
     The skim list for the electron-muon-based dark sector searches
@@ -307,13 +307,13 @@ def ElectronMuonForDarkSearchesList(path):
     emu_list.append(emu_name)
     return emu_list
 
-
+'''
 def DielectronForDarkSearchesList(path):
     """
     Note:
-        * Dielectron skim, needed for ee --> A' h'; A' --> ee + h' --> invisible and others
+        * Dielectron skim, needed for e+e- --> A' h'; A' --> e+e- + h' --> invisible and others
         * Skim code: ???
-        * Physics channel: ee --> ee
+        * Physics channel: e+e- --> e+e-
         * Skim category: physics, dark sector
 
     The skim list for the dielectron-based dark sector searches
@@ -346,3 +346,4 @@ def DielectronForDarkSearchesList(path):
     # And return the dielectron list
     dielectron_list.append(dielectron_name)
     return dielectron_list
+'''

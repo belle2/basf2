@@ -75,6 +75,7 @@ void PXDInjectionDQMModule::defineHisto()
 
       TString buff = (std::string)avxdid;
       TString bufful = buff;
+      bufful.ReplaceAll(".", "_");
 
       if (m_offlineStudy) {
         hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful,

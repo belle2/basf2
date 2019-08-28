@@ -182,10 +182,6 @@ namespace Belle2 {
      */
     void setSteering(const std::string& steering) {m_steering = steering;}
 
-    /** Declare that this is not generated, but real data.
-     */
-    void declareRealData() {m_isMC = false;}
-
     /** Number of generated events setter.
      *
      *  @param nEvents The number of generated events.
@@ -278,6 +274,15 @@ namespace Belle2 {
     std::string m_databaseGlobalTag; /**< Global tag in the database used for production of this file */
 
     std::map<std::string, std::string> m_dataDescription; /**< key-value store to describe the data. (for use by the computing group) */
+
+    /** Declare that this is not generated, but real data.
+     */
+    void declareRealData() {m_isMC = false;}
+
+    friend class SeqRootInputModule;
+    friend class RootInputModule;
+    friend class RootOutputModule;
+    friend class B2BIIMdstInputModule;
 
     ClassDefOverride(FileMetaData, 10); /**< Metadata information about a file. */
 

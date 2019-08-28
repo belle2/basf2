@@ -70,7 +70,6 @@ void prepareSADsample(std::string inputFile, std::string outputFile)
   chain.SetBranchAddress("dp_over_p0", &m_sad.dp_over_p0);
   chain.SetBranchAddress("watt", &m_sad.watt);
 
-
   int numEntries = chain.GetEntries();
   if(numEntries <= 0) {
     cout << "tree 'tp' is empty";
@@ -86,16 +85,15 @@ void prepareSADsample(std::string inputFile, std::string outputFile)
   tree->Branch("py", &m_sad.py, "py/D");
   tree->Branch("E", &m_sad.E, "E/D");
   tree->Branch("rate", &m_sad.rate, "rate/D");
-  tree->BranchAddress("ss", &m_sad.ss, "ss/D");
-  tree->BranchAddress("sraw", &m_sad.sraw, "sraw/D");
-  tree->BranchAddress("nturn", &m_sad.nturn, "nturn/I");
-  tree->BranchAddress("xraw", &m_sad.xraw, "xraw/D");
-  tree->BranchAddress("yraw", &m_sad.yraw, "yraw/D");
-  tree->BranchAddress("r", &m_sad.r, "r/D");
-  tree->BranchAddress("rr", &m_sad.rr, "rr/D");
-  tree->BranchAddress("dp_over_p0", &m_sad.dp_over_p0, "dp_over_p0/D");
-  tree->BranchAddress("watt", &m_sad.watt, 'watt/D');
-
+  tree->Branch("ss", &m_sad.ss, "ss/D");
+  tree->Branch("sraw", &m_sad.sraw, "sraw/D");
+  tree->Branch("nturn", &m_sad.nturn, "nturn/I");
+  tree->Branch("xraw", &m_sad.xraw, "xraw/D");
+  tree->Branch("yraw", &m_sad.yraw, "yraw/D");
+  tree->Branch("r", &m_sad.r, "r/D");
+  tree->Branch("rr", &m_sad.rr, "rr/D");
+  tree->Branch("dp_over_p0", &m_sad.dp_over_p0, "dp_over_p0/D");
+  tree->Branch("watt", &m_sad.watt, "watt/D");
 
   double rate = 0;
   for(int i = 0; i < numEntries; i++) {

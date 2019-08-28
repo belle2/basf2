@@ -14,7 +14,7 @@
 
 from basf2 import create_path, process, statistics
 
-from modularAnalysis import use_central_database, set_random_seed, inputMdst, reconstructDecay, fillParticleList, matchMCTruth
+from modularAnalysis import set_random_seed, inputMdst, reconstructDecay, fillParticleList, matchMCTruth
 import os
 from vertex import vertexTree
 

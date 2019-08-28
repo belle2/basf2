@@ -33,32 +33,32 @@ namespace Belle2 {
     /**
      * returns the chi value for electrons from CDC dEdx
      */
-    double chiE(const Particle* part);
+    double chiE_CDCdEdx(const Particle* part);
 
     /**
      * returns the chi value for muons from CDC dEdx
      */
-    double chiMu(const Particle* part);
+    double chiMu_CDCdEdx(const Particle* part);
 
     /**
      * returns the chi value for pions from CDC dEdx
      */
-    double chiPi(const Particle* part);
+    double chiPi_CDCdEdx(const Particle* part);
 
     /**
      * returns the chi value for kaons from CDC dEdx
      */
-    double chiK(const Particle* part);
+    double chiK_CDCdEdx(const Particle* part);
 
     /**
      * returns the chi value for protons from CDC dEdx
      */
-    double chiP(const Particle* part);
+    double chiP_CDCdEdx(const Particle* part);
 
     /**
      * returns the chi value for duetrons from CDC dEdx
      */
-    double chiD(const Particle* part);
+    double chiD_CDCdEdx(const Particle* part);
 
   }
 } // Belle2 namespace

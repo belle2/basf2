@@ -84,7 +84,7 @@ namespace Belle2 {
       }
     }
 
-    double chiE(const Particle* part)
+    double chiE_CDCdEdx(const Particle* part)
     {
       const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
       if (!dedxTrack) {
@@ -94,7 +94,7 @@ namespace Belle2 {
       }
     }
 
-    double chiMu(const Particle* part)
+    double chiMu_CDCdEdx(const Particle* part)
     {
       const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
       if (!dedxTrack) {
@@ -104,7 +104,7 @@ namespace Belle2 {
       }
     }
 
-    double chiPi(const Particle* part)
+    double chiPi_CDCdEdx(const Particle* part)
     {
       const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
       if (!dedxTrack) {
@@ -114,7 +114,7 @@ namespace Belle2 {
       }
     }
 
-    double chiK(const Particle* part)
+    double chiK_CDCdEdx(const Particle* part)
     {
       const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
       if (!dedxTrack) {
@@ -124,7 +124,7 @@ namespace Belle2 {
       }
     }
 
-    double chiP(const Particle* part)
+    double chiP_CDCdEdx(const Particle* part)
     {
       const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
       if (!dedxTrack) {
@@ -135,7 +135,7 @@ namespace Belle2 {
     }
 
 
-    double chiD(const Particle* part)
+    double chiD_CDCdEdx(const Particle* part)
     {
       const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
       if (!dedxTrack) {
@@ -150,11 +150,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("dedx", dedx, "dE/dx truncated mean");
     REGISTER_VARIABLE("dedxnosat", dedxnosat, "dE/dx truncated mean without saturation correction");
     REGISTER_VARIABLE("pCDC", pCDC, "Momentum valid in the CDC");
-    REGISTER_VARIABLE("chiE", chiE, "Chi value of electrons from CDC dEdx");
-    REGISTER_VARIABLE("chiMu", chiMu, "Chi value of muons from CDC dEdx");
-    REGISTER_VARIABLE("chiPi", chiPi, "Chi value of pions from CDC dEdx");
-    REGISTER_VARIABLE("chiK", chiK, "Chi value of kaons from CDC dEdx");
-    REGISTER_VARIABLE("chiP", chiP, "Chi value of protons from CDC dEdx");
-    REGISTER_VARIABLE("chiD", chiD, "Chi value of duetrons from CDC dEdx");
+    REGISTER_VARIABLE("chiE_CDCdEdx", chiE_CDCdEdx, "Chi value of electrons from CDC dEdx");
+    REGISTER_VARIABLE("chiMu_CDCdEdx", chiMu_CDCdEdx, "Chi value of muons from CDC dEdx");
+    REGISTER_VARIABLE("chiPi_CDCdEdx", chiPi_CDCdEdx, "Chi value of pions from CDC dEdx");
+    REGISTER_VARIABLE("chiK_CDCdEdx", chiK_CDCdEdx, "Chi value of kaons from CDC dEdx");
+    REGISTER_VARIABLE("chiP_CDCdEdx", chiP_CDCdEdx, "Chi value of protons from CDC dEdx");
+    REGISTER_VARIABLE("chiD_CDCdEdx", chiD_CDCdEdx, "Chi value of duetrons from CDC dEdx");
   }
 }

@@ -80,6 +80,9 @@ namespace Belle2 {
       /// Set name for histogram output
       void setHistFileName(const std::string& name) {m_histName = "histXT_" + name + ".root";}
 
+      /// Set LR separate mode (default is true).
+      void setLRSeparate(bool lr = true) {m_LRseparate = lr;}
+
 
     protected:
 

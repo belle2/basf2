@@ -136,6 +136,7 @@ void SubEventModule::setProperties()
 void restoreContents(const DataStore::StoreEntryMap& orig, DataStore::StoreEntryMap& dest)
 {
   for (const auto& entry : orig) {
+    // cppcheck-suppress variableScope ; accessing a map entry creates it so this is effect free
     auto& destEntry = dest[entry.first];
     auto& srcEntry = entry.second;
     if (srcEntry.ptr == nullptr)
@@ -237,15 +238,12 @@ void SubEventModule::event()
   // Nothing to do? fine, don't do anything;
   if (m_mode == c_ForEach && m_loopOver.getEntries() == 0) return;
 
-  //disable statistics for subevent
-  const bool noStats = Environment::Instance().getNoStats();
   StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
-  //Environment::Instance().setNoStats(true);
-  processStatistics->suspendGlobal();
-
-  //don't call processBeginRun/EndRun() again (we do that in our implementations)
+  // We don't want call processBeginRun/EndRun() again (we do that in beginRun()/endRun() anyways) so
+  // set the previous event meta to the current one to make sure this isn't triggered
   m_previousEventMetaData = *(StoreObjPtr<EventMetaData>());
-  //and don't reinitialize the random numbers in this path
+  //and don't reinitialize the random numbers in this path which is done after
+  //the master module ... so make sure there's none
   m_master = nullptr;
 
   if (m_mode == c_ForEach) {
@@ -293,10 +291,6 @@ void SubEventModule::event()
     } while (m_loopCondition->evaluate(returnValue));
   }
 
-
-  Environment::Instance().setNoStats(noStats);
-
   //don't screw up statistics for this module
   processStatistics->startModule();
-  processStatistics->resumeGlobal();
 }

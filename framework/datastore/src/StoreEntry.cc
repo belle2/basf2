@@ -9,7 +9,6 @@
 
 using namespace Belle2;
 
-// cppcheck-suppress passedByValue ; We take a value to move it into a member so no performance penalty
 StoreEntry::StoreEntry(bool isArray_, TClass* cl, std::string  name_, bool dontWriteOut_):
   isArray(isArray_),
   dontWriteOut(dontWriteOut_),

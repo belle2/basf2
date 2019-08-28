@@ -38,6 +38,8 @@
 // Magnetic field
 #include <framework/geometry/BFieldManager.h>
 
+#include <TVector.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -54,7 +56,7 @@ namespace Belle2 {
 
   TagVertexModule::TagVertexModule() : Module(),
     m_Bfield(0), m_fitPval(0), m_mcPDG(0), m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_shiftZ(0), m_FitType(0), m_tagVl(0),
-    m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0)
+    m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0), m_tagVNDF(0), m_tagVChi2(0), m_tagVChi2IP(0)
   {
     // Set module properties
     setDescription("Tag side Vertex Fitter for modular analysis");
@@ -153,6 +155,9 @@ namespace Belle2 {
           ver->setTagVol(m_tagVol);
           ver->setTruthTagVol(m_truthTagVol);
           ver->setTagVolErr(m_tagVolErr);
+          ver->setTagVNDF(m_tagVNDF);
+          ver->setTagVChi2(m_tagVChi2);
+          ver->setTagVChi2IP(m_tagVChi2IP);
         } else {
           ver->setTagVertex(m_tagV);
           ver->setTagVertexPval(-1.);
@@ -166,6 +171,9 @@ namespace Belle2 {
           ver->setTagVol(-1111.);
           ver->setTruthTagVol(-1111.);
           ver->setTagVolErr(-1111.);
+          ver->setTagVNDF(-1111.);
+          ver->setTagVChi2(-1111.);
+          ver->setTagVChi2IP(-1111.);
         }
       }
 
@@ -191,7 +199,7 @@ namespace Belle2 {
 
     // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
     PCmsLabTransform T;
-    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boost = T.getBoostVector();
     TVector3 boostDir = boost.Unit();
     float boostAngle = TMath::ATan(float(boostDir[0]) / boostDir[2]); // boost angle with respect from Z
     double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
@@ -199,10 +207,10 @@ namespace Belle2 {
     m_shiftZ = 4.184436e+02 * bg *  0.0001;   // shift of 120 um (Belle2) in the boost direction
 
     if (m_useFitAlgorithm == "singleTrack" || m_useFitAlgorithm == "singleTrack_PXD") {
-      m_BeamSpotCenter = m_beamParams->getVertex() +
+      m_BeamSpotCenter = m_beamSpotDB->getIPPosition() +
                          TVector3(m_shiftZ * TMath::Sin(boostAngle), 0., m_shiftZ * TMath::Cos(boostAngle)); // boost in the XZ plane
     } else {
-      m_BeamSpotCenter = m_beamParams->getVertex(); // Standard algorithm needs no shift
+      m_BeamSpotCenter = m_beamSpotDB->getIPPosition(); // Standard algorithm needs no shift
     }
 
     double cut = 8.717575e-02 * bg;
@@ -274,7 +282,7 @@ namespace Belle2 {
     if (Breco->getPValue() < 0.) return false;
 
     TMatrixDSym beamSpotCov(3);
-    beamSpotCov = m_beamParams->getCovVertex();
+    beamSpotCov = m_beamSpotDB->getCovVertex();
 
     analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, beamSpotCov);
 
@@ -403,11 +411,11 @@ namespace Belle2 {
 
     PCmsLabTransform T;
 
-    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boost = T.getBoostVector();
     TVector3 boostDir = boost.Unit();
 
     TMatrixDSym beamSpotCov(3);
-    beamSpotCov = m_beamParams->getCovVertex();
+    beamSpotCov = m_beamSpotDB->getCovVertex();
     beamSpotCov(2, 2) = cut * cut;
     double thetab = boostDir.Theta();
     double phib = boostDir.Phi();
@@ -666,11 +674,11 @@ namespace Belle2 {
      before with the exact same criteria */
     std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
     int ROEGoodTracks = 0;
-    bool exitROEWhile = false;
     int ROETotalTracks = ROETracks.size();
     for (int i = 0; i < ROETotalTracks; i++) {
       auto* roeTrackMCParticle = ROETracks[i]->getRelatedTo<MCParticle>();
       MCParticle* roeTrackMCParticleMother = roeTrackMCParticle->getMother();
+      bool exitROEWhile;
       do {
         int PDG = TMath::Abs(roeTrackMCParticleMother->getPDG());
         std::string motherPDGString = std::to_string(PDG);
@@ -923,9 +931,7 @@ namespace Belle2 {
       if (trak1) trak1Res = trak1->getTrackFitResultWithClosestMass(Const::pion);
       TVector3 mom1;
       if (trak1Res) mom1 = trak1Res->getMomentum();
-      if (std::isinf(mom1.Mag2()) == true || std::isnan(mom1.Mag2()) == true) {
-        continue;
-      }
+      if (std::isinf(mom1.Mag2()) or std::isnan(mom1.Mag2())) continue;
       if (!trak1Res) continue;
 
       bool isKsDau = false;
@@ -938,7 +944,7 @@ namespace Belle2 {
 
           TVector3 mom2;
           if (trak2Res) mom2 = trak2Res->getMomentum();
-          if (std::isinf(mom2.Mag2()) == true || std::isnan(mom2.Mag2()) == true) continue;
+          if (std::isinf(mom2.Mag2()) or std::isnan(mom2.Mag2())) continue;
           if (!trak2Res) continue;
 
           double Mass2 = TMath::Power(TMath::Sqrt(mom1.Mag2() + mpi * mpi) + TMath::Sqrt(mom2.Mag2() + mpi * mpi), 2)
@@ -963,9 +969,23 @@ namespace Belle2 {
       return false;
     }
 
+    if (m_useFitAlgorithm != "noConstraint") {
+      TMatrixDSym tubeInv = m_tube;
+      tubeInv.Invert();
+      TVector3 dTagV = rFit.getPos(0) - m_BeamSpotCenter;
+      TVectorD dV(0, 2,
+                  dTagV.X(),
+                  dTagV.Y(),
+                  dTagV.Z(),
+                  "END");
+      m_tagVChi2IP = tubeInv.Similarity(dV);
+    }
+
     m_tagV = rFit.getPos(0);
     m_tagVErrMatrix.ResizeTo(rFit.getCov(0));
     m_tagVErrMatrix = rFit.getCov(0);
+    m_tagVNDF = rFit.getNdf(0);
+    m_tagVChi2 = rFit.getChi2(0);
 
     m_fitPval = rFit.getPValue();
 
@@ -979,7 +999,7 @@ namespace Belle2 {
 
     PCmsLabTransform T;
 
-    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boost = T.getBoostVector();
 
     double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
 

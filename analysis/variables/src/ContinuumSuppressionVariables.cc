@@ -44,7 +44,7 @@ namespace Belle2 {
 
     double R2EventLevel(const Particle*)
     {
-      B2WARNING("The variable R2EventLevel is deprecated. Use `foxWolframR2` and ma.buildEventShape(inputListNames=[], default_cleanup=True, allMoments=False, cleoCones=True, collisionAxis=True, foxWolfram=True, harmonicMoments=True, jets=True, sphericity=True, thrust=True, checkForDuplicates=False, path=analysis_main)");
+      B2WARNING("The variable R2EventLevel is deprecated. Use `foxWolframR2` and ma.buildEventShape(inputListNames=[], default_cleanup=True, allMoments=False, cleoCones=True, collisionAxis=True, foxWolfram=True, harmonicMoments=True, jets=True, sphericity=True, thrust=True, checkForDuplicates=False, path=mypath)");
 
       std::vector<TVector3> p3_all;
 
@@ -253,14 +253,15 @@ namespace Belle2 {
     {
       if (arguments.size() == 2) {
         auto variableName = arguments[0];
-        if (arguments[1] != "Signal" and arguments[1] != "ROE" and arguments[1] !=  "Auto")
-          B2FATAL("Second argument in useBThrustFrame can only be 'Signal', 'ROE' or 'Auto'. Your argument was " + arguments[1]);
-
         std::string mode = arguments[1];
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
 
         const bool modeisSignal = mode == "Signal";
         const bool modeisAuto = mode == "Auto";
+
+        if (not modeisSignal and (mode != "ROE") and not modeisAuto)
+          B2FATAL("Second argument in useBThrustFrame can only be 'Signal', 'ROE' or 'Auto'. Your argument was " + mode);
+
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
 
         auto func = [var, modeisSignal, modeisAuto](const Particle * particle) -> double {
           StoreObjPtr<RestOfEvent> roe("RestOfEvent");

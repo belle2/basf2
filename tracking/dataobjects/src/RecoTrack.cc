@@ -7,6 +7,8 @@
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/WireTrackCandHit.h>
 #include <genfit/RKTrackRep.h>
+#include <genfit/MplTrackRep.h>
+#include <simulation/monopoles/MonopoleConstants.h>
 
 #include <framework/dataobjects/Helix.h>
 
@@ -398,7 +400,11 @@ genfit::AbsTrackRep* RecoTrackGenfitAccess::createOrReturnRKTrackRep(RecoTrack& 
 
   // not available? create one
   if (trackRepresentation == nullptr) {
-    trackRepresentation = new genfit::RKTrackRep(PDGcode);
+    if (PDGcode == Monopoles::c_monopolePDGCode) {
+      trackRepresentation = new genfit::MplTrackRep(PDGcode, Monopoles::monopoleMagCharge);
+    } else {
+      trackRepresentation = new genfit::RKTrackRep(PDGcode);
+    }
     RecoTrackGenfitAccess::getGenfitTrack(recoTrack).addTrackRep(trackRepresentation);
   }
   return trackRepresentation;

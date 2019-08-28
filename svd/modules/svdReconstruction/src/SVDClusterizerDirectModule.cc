@@ -22,6 +22,7 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 
 #include <svd/reconstruction/NNWaveFitTool.h>
 
@@ -174,6 +175,9 @@ void SVDClusterizerDirectModule::fillRelationMap(const RelationLookup& lookup,
 
 void SVDClusterizerDirectModule::event()
 {
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
+  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+
   const StoreArray<SVDShaperDigit> storeShaperDigits(m_storeShaperDigitsName);
   // If no digits, nothing to do
   if (!storeShaperDigits || !storeShaperDigits.getEntries()) return;
@@ -376,7 +380,7 @@ void SVDClusterizerDirectModule::event()
         }
         // Correct with trigger bin information
         const double triggerBinSep = 4 * 1.96516; //in ns
-        double apvPhase = triggerBinSep * (0.5 + static_cast<int>(digit.getModeByte().getTriggerBin()));
+        double apvPhase = triggerBinSep * (0.5 + static_cast<int>(modeByte.getTriggerBin()));
         timeShift = timeShift + apvPhase;
         waveWidths.push_back(peakWidth);
         timeShifts.push_back(timeShift);

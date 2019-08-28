@@ -13,6 +13,11 @@
 
 using namespace Belle2::Background;
 
+BKLMHitRateCounter::BKLMHitRateCounter()
+{
+  m_klmElementNumbers = &(KLMElementNumbers::Instance());
+}
+
 void BKLMHitRateCounter::initialize(TTree* tree)
 {
   // register collection(s) as optional: BKLM might be excluded in DAQ
@@ -50,7 +55,7 @@ void BKLMHitRateCounter::accumulate(unsigned timeStamp)
     if (!digit.inRPC() && !digit.isAboveThreshold())
       continue;
 
-    int layerGlobal = BKLMElementNumbers::layerGlobalNumber(digit.isForward(), digit.getSector(), digit.getLayer());
+    int layerGlobal = BKLMElementNumbers::layerGlobalNumber(digit.getSection(), digit.getSector(), digit.getLayer());
     rates.layerRates[layerGlobal]++;
     rates.averageRate++;
   }
@@ -90,13 +95,12 @@ int BKLMHitRateCounter::getActiveStripsBKLMLayer(int layerGlobal) const
 {
   int active = 0;
 
-  int isForward, sector, layer;
-  BKLMElementNumbers::layerGlobalNumberToElementNumbers(layerGlobal, &isForward, &sector, &layer);
+  int forward, sector, layer;
+  BKLMElementNumbers::layerGlobalNumberToElementNumbers(layerGlobal, &forward, &sector, &layer);
 
   for (int plane = 0; plane < BKLMElementNumbers::getMaximalPlaneNumber(); ++plane) {
-    for (int strip = 1; strip <= BKLMElementNumbers::getNStrips(isForward, sector, layer, plane); ++strip) {
-      const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t channel = elementNumbers->channelNumberBKLM(isForward, sector, layer, plane, strip);
+    for (int strip = 1; strip <= BKLMElementNumbers::getNStrips(forward, sector, layer, plane); ++strip) {
+      uint16_t channel = m_klmElementNumbers->channelNumberBKLM(forward, sector, layer, plane, strip);
       enum KLMChannelStatus::ChannelStatus status = m_ChannelStatus->getChannelStatus(channel);
 
       // Ignore the unknown and dead channels

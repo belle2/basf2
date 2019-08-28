@@ -27,7 +27,7 @@ ana.matchMCTruth('Z0:mumu', main)
 ana.printVariableValues('Z0:mumu', ['E', 'deltaE', 'M', 'mcPDG', 'p'], path=main)
 ana.printVariableValues('mu+:qed', ['E', 'deltaE', 'M', 'mcPDG', 'p', 'muonID'], path=main)
 
-# main.add_module('MillepedeCollector', components=['BeamParameters'], tracks=[], primaryVertices=['Z0:mumu'], calibrateVertex=True)
+# main.add_module('MillepedeCollector', components=['BeamSpot'], tracks=[], primaryVertices=['Z0:mumu'], calibrateVertex=True)
 
 main.add_module('RootOutput')
 main.add_module("Progress")

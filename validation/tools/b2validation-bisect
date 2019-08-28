@@ -26,8 +26,7 @@ filename>:<quantity>:<compare op>:<value>``
   - ``mean_x`` = mean of the histogram
   - ``entries`` = number of entries in all bins
   - ``mean_y`` = the mean of the bin content
-  - ``mean_y_zero_suppressed`` = the mean of the bin content, only with bins
-     with > 0 filling
+  - ``mean_y_zero_suppressed`` = the mean of all the bin contents > 0
 
 - ``compare op`` can be ``>`` or ``<``
 - ``value`` is the reference value as a float to compare to

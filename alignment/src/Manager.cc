@@ -1,5 +1,6 @@
 #include <alignment/Manager.h>
 #include <cdc/dbobjects/CDCLayerAlignment.h>
+#include <alignment/GlobalTimeLine.h>
 
 namespace Belle2 {
   namespace alignment {
@@ -18,7 +19,7 @@ namespace Belle2 {
 
       // Try add all supported DB objects
       // - will be not added if not in selected components of the 'vector'
-      vector.addDBObj<BeamParameters>();
+      vector.addDBObj<BeamSpot>();
       vector.addDBObj<VXDAlignment>(vxdInterface);
       vector.addDBObj<CDCAlignment>(cdcInterface);
       vector.addDBObj<CDCTimeZeros>(cdcInterface);
@@ -42,6 +43,9 @@ namespace Belle2 {
       // constants can change (in addition of what is already in DB)
       m_dbTimeSlicing = timeSlices;
       sortUniqueVector(m_dbTimeSlicing);
+
+      GlobalLabel label;
+      m_iniTimeTable = alignment::timeline::makeInitialTimeTable(m_dbTimeSlicing, label);
 
       StoreObjPtr<EventMetaData> emd;
       if (emd.isValid()) updateTimeDepGlobalLabels(*emd);
@@ -94,14 +98,38 @@ namespace Belle2 {
 
       // Generate time id from current EventMetaData
       // range for time dependent calibration consts
-      updateTimeDepGlobalLabels(emd);
+      auto subrun = updateTimeDepGlobalLabels(emd);
+
+      bool alignmentHierarchyChanged = false;
+      bool lorentzHierarchyChanged = false;
+      for (auto& uid : getAlignmentHierarchy().getUsedDBObjUniqueIDs()) {
+        if (alignment::timeline::getContinuousIndexByTimeID(m_iniTimeTable, uid, subrun) == 1) {
+          alignmentHierarchyChanged = true;
+          break;
+        }
+      }
+      for (auto& uid : getLorentzShiftHierarchy().getUsedDBObjUniqueIDs()) {
+        if (alignment::timeline::getContinuousIndexByTimeID(m_iniTimeTable, uid, subrun) == 1) {
+          alignmentHierarchyChanged = true;
+          break;
+        }
+      }
+
+      //TODO: this is now probably redundant. If time-dependence is not set, constraints coefficients will
+      // be just overriden...
+      if (m_globalVector->hasBeenChangedInDB(getAlignmentHierarchy().getUsedDBObjUniqueIDs(), false)) {
+        lorentzHierarchyChanged = true;
+      }
+      if (m_globalVector->hasBeenChangedInDB(getLorentzShiftHierarchy().getUsedDBObjUniqueIDs(), false)) {
+        lorentzHierarchyChanged = true;
+      }
 
       // Update hierarchy and constraints if DB objects changed
-      if (m_globalVector->hasBeenChangedInDB(getAlignmentHierarchy().getUsedDBObjUniqueIDs(), false)) {
+      if (alignmentHierarchyChanged) {
         m_globalVector->postHierarchyChanged(getAlignmentHierarchy());
         getAlignmentHierarchy().buildConstraints(m_constraints);
       }
-      if (m_globalVector->hasBeenChangedInDB(getLorentzShiftHierarchy().getUsedDBObjUniqueIDs(), false)) {
+      if (lorentzHierarchyChanged) {
         m_globalVector->postHierarchyChanged(getLorentzShiftHierarchy());
         getLorentzShiftHierarchy().buildConstraints(m_constraints);
       }
@@ -147,26 +175,19 @@ namespace Belle2 {
         return 0;
       }
 
-      /// These are intentionally two loops
-      /// One goes to future events, the second backwards if ever needed
-      /// This should deal with issues like randomized order of events in processing
-      for (unsigned int index = GlobalLabel::getCurrentTimeInterval(); index < m_dbTimeSlicing.size(); ++index) {
-        if (not cmpEventMetaData(event, m_dbTimeSlicing[index])) {
-          // emd < slice <=> slice >= emd => first slice to contain this event
+      for (unsigned int index = 0; index < m_dbTimeSlicing.size() - 1; ++index) {
+        if (event == m_dbTimeSlicing[index + 1]) {
+          GlobalLabel::setCurrentTimeInterval(index + 1);
+          return index + 1;
+        }
+        if (cmpEventMetaData(event, m_dbTimeSlicing[index + 1])) {
           GlobalLabel::setCurrentTimeInterval(index);
           return index;
         }
       }
 
-      for (int index = GlobalLabel::getCurrentTimeInterval(); index >= 0; --index) {
-        if (not cmpEventMetaData(event, m_dbTimeSlicing[index])) {
-          GlobalLabel::setCurrentTimeInterval(index);
-          return index;
-        }
-      }
-
-      GlobalLabel::setCurrentTimeInterval(0);
-      return 0;
+      GlobalLabel::setCurrentTimeInterval(m_dbTimeSlicing.size() - 1);
+      return m_dbTimeSlicing.size() - 1;
     }
   }
 }

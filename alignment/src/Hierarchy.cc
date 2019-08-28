@@ -114,7 +114,7 @@ namespace Belle2 {
       return labels;
     }
 
-    TMatrixD LorentShiftHierarchy::getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, TVector3 bField)
+    TMatrixD LorentShiftHierarchy::getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, B2Vector3D bField)
     {
       // values for global derivatives
       //TMatrixD derGlobal(2, 6);
@@ -122,13 +122,13 @@ namespace Belle2 {
       derGlobal.Zero();
 
       // electrons in device go in local w-direction to P-side
-      TVector3 v = sop->getPlane()->getNormal();
+      B2Vector3D v = sop->getPlane()->getNormal();
       // Lorentz force (without E-field) direction
-      TVector3 F_dir = v.Cross(bField);
+      B2Vector3D F_dir = v.Cross(bField);
       // ... projected to sensor coordinates:
       genfit::StateOnPlane localForce(*sop);
       localForce.setPosMom(sop->getPos(), F_dir);
-      TVector3 lorentzLocal(localForce.getState()[3], localForce.getState()[4], 0); // or 0,1?
+      B2Vector3D lorentzLocal(localForce.getState()[3], localForce.getState()[4], 0); // or 0,1?
       // Lorentz shift = parameter(layer) * B_local
       derGlobal(0, 0) = lorentzLocal(0);
       derGlobal(1, 0) = lorentzLocal(1);

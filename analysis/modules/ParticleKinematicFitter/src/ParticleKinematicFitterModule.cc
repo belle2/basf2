@@ -33,7 +33,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-// analysis utilities (uses beamparameters)
+// analysis utilities
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
 
@@ -99,11 +99,10 @@ namespace Belle2 {
     {
       m_eventextrainfo.registerInDataStore();
 
-      if (m_decayString != "")
+      if (m_decayString != "") {
         m_decaydescriptor.init(m_decayString);
-
-      if (m_decayString != "")
         B2INFO("ParticleKinematicFitter: Using specified decay string: " << m_decayString);
+      }
     }
 
 
@@ -401,7 +400,6 @@ namespace Belle2 {
 
         // error matrix
         CLHEP::HepSymMatrix clhepmomentumerrormatrix = getCLHEPMomentumErrorMatrix(particle);
-        CLHEP::HepSymMatrix clhepmomentumvertexerrormatrix = getCLHEPMomentumVertexErrorMatrix(particle);
 
         // create the fit object (ParticleFitObject is the base class)
         ParticleFitObject* pfitobject;
@@ -517,7 +515,7 @@ namespace Belle2 {
 
       if (m_orcaConstraint == "HardBeam") {
         PCmsLabTransform T;
-        const TLorentzVector boost = T.getBoostVector();
+        const TLorentzVector boost = T.getBeamFourMomentum();
 
         m_hardConstraintPx = MomentumConstraint(0, 1, 0, 0, boost.Px());
         m_hardConstraintPy = MomentumConstraint(0, 0, 1, 0, boost.Py());
@@ -536,7 +534,7 @@ namespace Belle2 {
 
       } else if (m_orcaConstraint == "RecoilMass") {
         PCmsLabTransform T;
-        const TLorentzVector boost = T.getBoostVector();
+        const TLorentzVector boost = T.getBeamFourMomentum();
 
         m_hardConstraintRecoilMass = RecoilMassConstraint(m_recoilMass, boost.Px(), boost.Py(), boost.Pz(), boost.E());
 
@@ -544,9 +542,6 @@ namespace Belle2 {
         m_hardConstraintRecoilMass.setName("Recoil Mass [hard]");
 
       } else if (m_orcaConstraint == "Mass") {
-        PCmsLabTransform T;
-        const TLorentzVector boost = T.getBoostVector();
-
         m_hardConstraintMass = MassConstraint(m_invMass);
 
         m_hardConstraintMass.resetFOList();
@@ -734,7 +729,6 @@ namespace Belle2 {
                                                                Particle* mother)
     {
       // get old values
-      TLorentzVector mom    = mother->get4Vector();
       TVector3 pos          = mother->getVertex();
       TMatrixFSym errMatrix = mother->getMomentumVertexErrorMatrix();
       float pvalue          = mother->getPValue();

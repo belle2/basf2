@@ -42,6 +42,7 @@
 //                   |      1 |         74    | 3D Bhabha Trigger for selection
 //                   |      1 |         75    | mumu bit
 //                   |      1 |         76    | Bhabha prescale bit
+//                   |      1 |         77    | E_tot > 20 GeV
 //
 // ---------------------------------------------------------------------------------
 //
@@ -81,7 +82,7 @@ using namespace Belle2;
 //
 TrgEclMaster::TrgEclMaster():
   TimeWindow(250.0), OverlapWindow(0.0), _Clustering(1), _Bhabha(0), _EventTiming(1), _NofTopTC(3), _ClusterLimit(6), _Lowmultibit(0),
-  _PrescaleFactor(0), _PrescaleCounter(0)
+  _PrescaleFactor(0), _PrescaleCounter(0), _mumuThreshold(20), _n300MeVCluster(1), _ECLBurstThreshold(200)
 {
 
   TCEnergy.clear();
@@ -102,10 +103,27 @@ TrgEclMaster::TrgEclMaster():
   _Triggerbit[2] = 0;
   _Triggerbit[3] = 0;
 
+
   _2DBhabhaThresholdFWD.clear();
   _2DBhabhaThresholdBWD.clear();
-  _3DBhabhaThreshold.clear();
+  _3DBhabhaSelectionThreshold.clear();
+  _3DBhabhaVetoThreshold.clear();
+  _3DBhabhaSelectionAngle.clear();
+  _3DBhabhaVetoAngle.clear();
+  _mumuAngle.clear();
 
+  _TotalEnergy.clear();
+  _LowMultiThreshold.clear();
+
+  _TotalEnergy = {5, 10, 30}; // /100 MeV
+  _2DBhabhaThresholdFWD = {40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 30, 35}; // /100 MeV
+  _2DBhabhaThresholdBWD  = {25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 30, 30}; // /100 MeV
+  _3DBhabhaVetoThreshold = {30, 45}; //  /100 MeV
+  _3DBhabhaSelectionThreshold = {20, 40}; //  /100 MeV
+  _3DBhabhaVetoAngle = {160, 200, 165, 190}; //  /100 MeV
+  _3DBhabhaSelectionAngle = {140, 220, 160, 200}; //  /100 MeV
+  _mumuAngle = {160, 200, 165, 190}; //  degree
+  _LowMultiThreshold = {10, 20, 25, 30}; // degree
 
   //ThetaRingSum.resize(3,std::vector<double>(36,0));
   //PhiRingSum.resize(17,0);
@@ -290,6 +308,7 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     double E_bwd = 0;
     double E_phys = 0;
     double E_total = 0;
+    int E_burst = 0;
     for (int iii = 0; iii <= 16; iii++) {
       if (iii > 0 && iii < 15) {E_phys += phiringsum[iii];}
       if (iii < 3) {E_fwd += phiringsum[iii];}
@@ -300,6 +319,9 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     if (E_total == 0) {continue;}
     int ELow, EHigh, ELum;
 
+    if (E_total > _ECLBurstThreshold / 10) {
+      E_burst = 0x01;
+    }
     if (E_phys > _TotalEnergy[0] / 10) { // GeV
       ELow = 0x01;
     }
@@ -361,7 +383,13 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     //--------------
 
     obj_bhabha-> set2DBhabhaThreshold(_2DBhabhaThresholdFWD, _2DBhabhaThresholdBWD);
-    obj_bhabha-> set3DBhabhaThreshold(_3DBhabhaThreshold);
+    obj_bhabha -> set3DBhabhaSelectionThreshold(_3DBhabhaSelectionThreshold);
+    obj_bhabha -> set3DBhabhaVetoThreshold(_3DBhabhaVetoThreshold);
+    obj_bhabha -> set3DBhabhaSelectionAngle(_3DBhabhaSelectionAngle);
+    obj_bhabha -> set3DBhabhaVetoAngle(_3DBhabhaVetoAngle);
+    obj_bhabha -> setmumuThreshold(_mumuThreshold);
+    obj_bhabha -> setmumuAngle(_mumuAngle);
+
     std::vector<double> vct_bhabha;
     vct_bhabha.clear();
     int bhabha2D = 0 ;
@@ -418,7 +446,7 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     }
 
     makeTriggerBit(hit, Timing, 0, timingsource, (int)E_phys, bhabha2D, physics, bhabhabit, icn, beambkgtag, flagoverflow,
-                   bhabha3D_veto, _Lowmultibit, bhabha3D_sel, mumu, bhabhaprescale);
+                   bhabha3D_veto, _Lowmultibit, bhabha3D_sel, mumu, bhabhaprescale, E_burst);
 
 
     int m_hitEneNum = 0;
@@ -650,6 +678,8 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   double E_bwd = 0;
   double E_phys = 0;
   double E_total = 0;
+  int E_burst = 0;
+
   for (int iii = 0; iii <= 16; iii++) {
     if (iii > 0 && iii < 15) {E_phys += phiringsum[iii];}
     if (iii < 3) {E_fwd += phiringsum[iii];}
@@ -659,6 +689,10 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   }
   if (E_total == 0) {return;}
   int ELow, EHigh, ELum;
+  if (E_total > _ECLBurstThreshold) {
+    E_burst = 0x01;
+  }
+
   if (E_phys > _TotalEnergy[0] / 10) { // GeV
     ELow = 0x01;
   }
@@ -719,7 +753,14 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   //--------------
   //
   obj_bhabha-> set2DBhabhaThreshold(_2DBhabhaThresholdFWD, _2DBhabhaThresholdBWD);
-  obj_bhabha-> set3DBhabhaThreshold(_3DBhabhaThreshold);
+  obj_bhabha -> set3DBhabhaSelectionThreshold(_3DBhabhaSelectionThreshold);
+  obj_bhabha -> set3DBhabhaVetoThreshold(_3DBhabhaVetoThreshold);
+  obj_bhabha -> set3DBhabhaSelectionAngle(_3DBhabhaSelectionAngle);
+  obj_bhabha -> set3DBhabhaVetoAngle(_3DBhabhaVetoAngle);
+  obj_bhabha -> setmumuThreshold(_mumuThreshold);
+  obj_bhabha -> setmumuAngle(_mumuAngle);
+
+
   std::vector<double> vct_bhabha;
   vct_bhabha.clear();
   int bhabha2D = 0 ;
@@ -775,7 +816,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   }
 
   makeTriggerBit(hit, Timing, 0, timingsource, (int)E_phys, bhabha2D, physics, bhabhabit, icn, beambkgtag, flagoverflow,
-                 bhabha3D_veto, _Lowmultibit, bhabha3D_sel, mumu, bhabhaprescale);
+                 bhabha3D_veto, _Lowmultibit, bhabha3D_sel, mumu, bhabhaprescale, E_burst);
 
   //
   //
@@ -995,7 +1036,7 @@ TrgEclMaster::setRS(std::vector<int> TCId, std::vector<double> TCHit, std::vecto
 
 void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSource, int etot, int bhabha2D, int physics,
                                   std::vector<int> bhabhatype, int ICN, int BGVeto, int ClusterOverflow, int bhabha3D, int lowmultibit, int bhabha3D_sel, int mumubit,
-                                  int prescale)
+                                  int prescale, int burst)
 {
 
 
@@ -1036,6 +1077,10 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
   //                  |      1 |         71    | 170 < delta phi(CM) < 190 degree, one Cluster < 250 MeV (LAB), the other Cluster > 250 MeV(LAB), and no 2GeV (CM) Cluster
   //                  |      1 |         72    | 160 < delta phi(CM) < 200 degree, 160 < Sum Theta (CM)< 200 degree, no 2 GeV(CM) cluster
   //                  |      1 |         73    | No 2GeV (CM) Cluster
+  //                  |      1 |         74    | 3D Bhabha Trigger for selection
+  //                  |      1 |         75    | mumu bit
+  //                  |      1 |         76    | Bhabha prescale bit
+  //                  |      1 |         77    | E_tot > 20 GeV
   //---------------------------------------------------------------------------------
   //
   //
@@ -1070,7 +1115,6 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
   }
 
 
-
   int bit_hit = hit & 0x01;
   int bit_Timing = (Timing & 0x7F) ;
   int bit_RevoFAM = (RevoFAM & 0x7F) ;
@@ -1090,14 +1134,16 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
   int bit_3DBhabha_sel = bhabha3D_sel & 0x01;
   int bit_mumu = mumubit & 0x01;
   int bit_prescale = prescale & 0x01;
+  int bit_burst = burst & 0x01;
 
-
+  _Triggerbit[2] |= bit_burst;
+  _Triggerbit[2] <<= 1;
   _Triggerbit[2] |= bit_prescale;
-  _Triggerbit[1] <<= 1;
+  _Triggerbit[2] <<= 1;
   _Triggerbit[2] |= bit_mumu;
-  _Triggerbit[1] <<= 1;
+  _Triggerbit[2] <<= 1;
   _Triggerbit[2] |= bit_3DBhabha_sel;
-  _Triggerbit[1] <<= 1;
+  _Triggerbit[2] <<= 1;
   _Triggerbit[2] |= ((bit_lowmulti) >> 2) & 0x3FF;
   _Triggerbit[1] |= (bit_lowmulti & 0x03);
   _Triggerbit[1] <<= 2;
@@ -1231,9 +1277,10 @@ void TrgEclMaster::makeLowMultiTriggerBit(std::vector<int> CenterTCId, std::vect
       //..3D
       if (dphi > 160. && thetaSum > 160. && thetaSum < 200) {_n3DPair++;}
       //..ecl Bhabha
-      if (dphi > 160 && thetaSum > 165 && thetaSum < 190 && clusterenergy[i0] * 100 > _3DBhabhaThreshold[0] * energy1
-          && clusterenergy[i1] * 100 > _3DBhabhaThreshold[0]  * energy2
-          && (clusterenergy[i0] * 100 > _3DBhabhaThreshold[1]  * energy1 ||  clusterenergy[i1] * 100 > _3DBhabhaThreshold[1]  * energy2)) {
+      if (dphi > 160 && thetaSum > 165 && thetaSum < 190 && clusterenergy[i0] * 100 > _3DBhabhaVetoThreshold[0] * energy1
+          && clusterenergy[i1] * 100 > _3DBhabhaVetoThreshold[0]  * energy2
+          && (clusterenergy[i0] * 100 > _3DBhabhaVetoThreshold[1]  * energy1
+              ||  clusterenergy[i1] * 100 > _3DBhabhaVetoThreshold[1]  * energy2)) {
         _nECLBhabha++;
 
       }
@@ -1252,7 +1299,7 @@ void TrgEclMaster::makeLowMultiTriggerBit(std::vector<int> CenterTCId, std::vect
   int bit11 = 0;
   int bit12 = 0;
 
-  if (_nClust >= 3 && _n300MeV && _nECLBhabha == 0) {
+  if (_nClust >= 3 && _n300MeV > _n300MeVCluster && _nECLBhabha == 0) {
     bit1 = 0x01; //6
   }
   if (_n2GeV414 > 0) {

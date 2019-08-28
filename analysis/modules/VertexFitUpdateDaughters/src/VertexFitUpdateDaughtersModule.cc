@@ -14,7 +14,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/dbobjects/BeamParameters.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -92,10 +91,10 @@ void VertexFitUpdateDaughtersModule::event()
 
   analysis::RaveSetup::initialize(1, m_Bfield);
 
-  m_BeamSpotCenter = m_beamParams->getVertex();
+  m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
   m_beamSpotCov.ResizeTo(3, 3);
   TMatrixDSym beamSpotCov(3);
-  if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamParams->getCovVertex();
+  if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamSpotDB->getCovVertex();
   if (m_withConstraint == "iptube") VertexFitUpdateDaughtersModule::findConstraintBoost(2.);
 
   if (m_withConstraint != "ipprofile" && m_withConstraint != "iptube"  && m_withConstraint != "mother" && m_withConstraint != "")
@@ -156,8 +155,6 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
 
   std::vector<std::string> tracksName = m_decaydescriptor.getSelectionNames();
 
-  int nvert = 0;
-
   if (tracksVertex.size() == 0) {
     B2ERROR("VertexFitUpdateDaughtersModule: no track selected.");
     return false;
@@ -179,7 +176,7 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
 
     TVector3 pos; TMatrixDSym RerrMatrix(7);
 
-    nvert = rsf.fit();
+    int nvert = rsf.fit();
 
 
 
@@ -222,7 +219,7 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
 
     TVector3 pos; TMatrixDSym RerrMatrix(3);
 
-    nvert = rsg.fit("avf");
+    int nvert = rsg.fit("avf");
 
     if (nvert > 0) {
       pos = rsg.getPos(0);
@@ -262,11 +259,11 @@ void VertexFitUpdateDaughtersModule::findConstraintBoost(double cut)
 
   PCmsLabTransform T;
 
-  TVector3 boost = T.getBoostVector().BoostVector();
+  TVector3 boost = T.getBoostVector();
   TVector3 boostDir = boost.Unit();
 
   TMatrixDSym beamSpotCov(3);
-  beamSpotCov = m_beamParams->getCovVertex();
+  beamSpotCov = m_beamSpotDB->getCovVertex();
   beamSpotCov(2, 2) = cut * cut;
   double thetab = boostDir.Theta();
   double phib = boostDir.Phi();

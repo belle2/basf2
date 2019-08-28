@@ -75,6 +75,14 @@ namespace TreeFitter {
 
     /** covariance (x_c,y_c,z_c,E_c) of measured pars */
     Eigen::Matrix<double, 4, 4> m_covariance;
+
+    /** index with the highest momentum. We have to make sure this does not change during the fit.  */
+    int m_i1;
+    /** random other index */
+    int m_i2;
+    /**  another random index */
+    int m_i3;
+
   };
 
 }

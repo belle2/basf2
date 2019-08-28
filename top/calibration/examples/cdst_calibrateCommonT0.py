@@ -3,10 +3,10 @@
 
 # ---------------------------------------------------------------------------------------
 # Calibrate common T0 with Bhabha (or dimuon) events using new constants from DB
-# (M. Staric, 2019-06-07)
+# (M. Staric, 2019-07-10)
 #
-# usage: cdst_calibrateCommonT0.py pathToFiles
-#
+# usage: basf2 cdst_calibrateCommonT0.py experiment run
+#   job: bsub -q s "basf2 cdst_calibrateCommonT0.py experiment run"
 # ---------------------------------------------------------------------------------------
 
 from basf2 import *
@@ -20,9 +20,12 @@ import os
 
 # ----- those need to be adjusted before running --------------------------------------
 #
-globalTag = 'data_reprocessing_prompt'  # base global tag
-stagingTags = []  # list of staging tags with new calibration constants
-localDB = []  # list of local databases with new calibration constants
+sampleType = 'bhabha'  # sample type: 'bhabha' or 'dimuon'
+data_dir = '/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009_nofilter'
+skim_dir = 'skim/hlt_bhabha/cdst/sub00'
+globalTag = 'data_reprocessing_prompt'  # base global tag (fall-back)
+stagingTags = ['staging_data_reprocessing']  # list of global tags with new calibration
+localDB = []  # list of local databases with new calibration
 method = 'BF'  # BF: bunch offset fit, LL: likelihood method
 output_dir = 'commonT0'  # main output folder
 #
@@ -30,44 +33,44 @@ output_dir = 'commonT0'  # main output folder
 
 # Argument parsing
 argvs = sys.argv
-if len(argvs) < 2:
-    print("usage: basf2", argvs[0], "pathToFiles")
+if len(argvs) < 3:
+    print("usage: basf2", argvs[0], "experiment run")
     sys.exit()
-pathToFiles = argvs[1]
+experiment = int(argvs[1])
+run = int(argvs[2])
+
+expNo = 'e' + '{:0=4d}'.format(experiment)
+runNo = 'r' + '{:0=5d}'.format(run)
 
 # Make list of files
-files = glob.glob(pathToFiles + '/cdst.*.root')
+files = []
+for typ in ['4S', 'Continuum', 'Scan']:
+    folder = data_dir + '/' + expNo + '/' + typ + '/' + runNo + '/' + skim_dir
+    files += glob.glob(folder + '/cdst.*.root')
 if len(files) == 0:
     B2ERROR('No cdst files found')
     sys.exit()
 
-# Extract experiment and run numbers from file name
-input_file = files[0].split('/')[-1]
-try:
-    expNo = 'e' + input_file.split('.')[-3]
-    runNo = 'r' + input_file.split('.')[-2]
-except:
-    B2ERROR("Cannot determine experiment and run numbers from file name: " + input_file)
-    sys.exit()
-
 # Output folder
-output_folder = output_dir + '/' + expNo
+output_folder = output_dir + '/' + expNo + '/' + sampleType + '/' + method
 if not os.path.isdir(output_folder):
     os.makedirs(output_folder)
     print('New folder created: ' + output_folder)
 
 # Output file name
 fileName = output_folder + '/commonT0-' + expNo + '-' + runNo + '.root'
+print('Output file:', fileName)
 
-# Sample type (needed only for LL method)
-if method == 'LL':
-    if 'bhabha' in input_file:
-        sample = 'bhabha'
-    elif 'mumu' in input_file:
-        sample = 'dimuon'
-    else:
-        B2ERROR("Cannot determine sample type from file name: " + input_file)
-        sys.exit()
+
+class Mask_BS13d(Module):
+    ''' exclude (mask-out) BS 13d '''
+
+    def event(self):
+        ''' event processing '''
+
+        for digit in Belle2.PyStoreArray('TOPDigits'):
+            if digit.getModuleID() == 13 and digit.getBoardstackNumber() == 3:
+                digit.setHitQuality(Belle2.TOPDigit.c_Junk)
 
 
 class calibrateGlobalT0Offline(Module):
@@ -95,6 +98,9 @@ class calibrateGlobalT0Offline(Module):
         Creates the histogram used for the commoT0 calculation, and
         takes the necessary objects from the DataStore
         """
+
+        #: Output root file
+        self.file = TFile.Open(fileName, 'recreate')
 
         geo = Belle2.PyDBObj('TOPGeometry')
         if not geo.isValid():
@@ -220,7 +226,6 @@ class calibrateGlobalT0Offline(Module):
         status = h_to_fit.Fit(func, 'L R S')
 
         # Tree creation, branches declaration....
-        outFile = TFile(fileName, 'recreate')
         tree = TTree('tree', '')
 
         expNum = array('i', [0])
@@ -249,7 +254,8 @@ class calibrateGlobalT0Offline(Module):
         expNum[0] = self.expNo
         runNum[0] = int(self.run)
         fitted_offset[0] = func.GetParameter(1)
-        offset[0] = fitted_offset[0] + self.t0
+        new_t0 = fitted_offset[0] + self.t0
+        offset[0] = new_t0 - round(new_t0 / self.bunchTimeSep, 0) * self.bunchTimeSep
         offsetErr[0] = func.GetParError(1)
         sigma[0] = func.GetParameter(2)
         integral[0] = func.GetParameter(0) / h_to_fit.GetBinWidth(1)
@@ -265,7 +271,7 @@ class calibrateGlobalT0Offline(Module):
         self.h2.Write()
         self.h2a.Write()
         self.h2b.Write()
-        outFile.Close()
+        self.file.Close()
 
         B2RESULT('Calibration for exp' + str(self.expNo) + '-run' + self.run)
         if self.t0Err > 0:
@@ -304,17 +310,17 @@ main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
 # Channel masking
 main.add_module('TOPChannelMasker')
 
+# Exclude BS13d
+main.add_module(Mask_BS13d())
+
 # Bunch finder
-main.add_module('TOPBunchFinder', usePIDLikelihoods=True)
+main.add_module('TOPBunchFinder', usePIDLikelihoods=True, subtractRunningOffset=False)
 
 # Common T0 calibration
 if method == 'BF':
     main.add_module(calibrateGlobalT0Offline())
 elif method == 'LL':
-    calibrator = register_module('TOPCommonT0Calibrator')
-    calibrator.param('sample', sample)
-    calibrator.param('outputFileName', fileName)
-    main.add_module(calibrator)
+    main.add_module('TOPCommonT0Calibrator', sample=sampleType, outputFileName=fileName)
 else:
     B2ERROR('unknown method ' + method)
     sys.exit()

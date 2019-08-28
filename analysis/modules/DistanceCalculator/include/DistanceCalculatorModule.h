@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Sourav Dey, Abi Soffer                                   *
- *Past Contributors: Omer Benami                                          *
+ * Past Contributors: Omer Benami                                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -21,7 +21,7 @@
 
 namespace Belle2 {
   /**
-   * Calculates distance between two vertices, distance of closest approach between a vertex and a track, distance of closest approach between a vertex and btube. T calculation ignores track curvature, it's negligible for small distances.
+   * Calculates distance between two vertices, distance of closest approach between a vertex and a track, distance of closest approach between a vertex and Btube. The calculation ignores track curvature, it's negligible for small distances.
    */
   class DistanceCalculatorModule : public Module {
 

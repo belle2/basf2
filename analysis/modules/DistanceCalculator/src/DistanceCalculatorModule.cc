@@ -38,19 +38,19 @@ REG_MODULE(DistanceCalculator)
 DistanceCalculatorModule::DistanceCalculatorModule() : Module()
 {
   // Set module properties
-  setDescription("Calculates distance between two vertices, distance of closest approach between a vertex and a track, distance of closest approach between a vertex and btube");
+  setDescription("Calculates distance between two vertices, distance of closest approach between a vertex and a track, distance of closest approach between a vertex and Btube");
 
   // Parameter definitions
   addParam("listName", m_listName, "", std::string(""));
   addParam("decayString", m_decayString, "", std::string(""));
   addParam("mode", m_mode,
            "Specifies how the distance is calculated:\n"
-           "vertextrack: calculate the distance of closest appreach between a track and a vertex, taking the first candidate as vertex, default\n"
-           "trackvertex: calculate the distance of closest appreach between a track and a vertex, taking the first candidate as track,\n"
-           "2tracks: calculates the distance of closest appreach between two tracks,\n"
+           "vertextrack: calculate the distance of closest approach between a track and a vertex, taking the first candidate as vertex, default\n"
+           "trackvertex: calculate the distance of closest approach between a track and a vertex, taking the first candidate as track,\n"
+           "2tracks: calculates the distance of closest approach between two tracks,\n"
            "2vertices: calculates the distance between two vertices,\n"
-           "vertexbtube: calculates the distance of closest appreach between a vertex and a Btube,\n"
-           "trackbtube: calculates the distance of closest appreach between a track and a Btube",
+           "vertexbtube: calculates the distance of closest approach between a vertex and a Btube,\n"
+           "trackbtube: calculates the distance of closest approach between a track and a Btube",
            std::string("vertextrack"));
 }
 
@@ -62,6 +62,8 @@ void DistanceCalculatorModule::initialize()
 {
   if (m_decayString != "") {
     m_decayDescriptor.init(m_decayString);
+  } else {
+    B2FATAL("Please provide a decay string for DistanceCalculatorModule");
   }
 }
 
@@ -83,10 +85,10 @@ TMatrixFSym getDocaTrackVertexError(const Particle* pTrack, const Particle* pVer
   Eigen::Vector3d v = V.normalized();
   //d_j = r_j - v_j * v_k r_k
   //Jij = del_i d_j = delta_ij - v_i * v_j
-  //Since the vector of closest approch is a linear function of r, it's
+  //Since the vector of closest approach is a linear function of r, its
   //propagation of errors is exact
   TMatrixFSym Jacobian(3);
-  //Fill the jacobian matrix accodring to the equation:
+  //Fill the jacobian matrix according to the equation:
   // J_ij = delta_ij -v(i)v(j)
   for (int i = 0; i < 3; i++)
     for (int j = 0; j < 3; j++)
@@ -102,7 +104,7 @@ TMatrixFSym getDocaTrackVertexError(const Particle* pTrack, const Particle* pVer
  * This is done using the following equation:
  * d = (n*(x1-x2))n
  * where d is the doca vector, n is a unit vector that is orthogonal to both lines,
- * and x1 and x2 are points on the first and second line respecfuly
+ * and x1 and x2 are points on the first and second line respectively
  */
 Eigen::Vector3d getDocaTracks(const Particle* p1, const Particle* p2)
 {
@@ -110,7 +112,7 @@ Eigen::Vector3d getDocaTracks(const Particle* p1, const Particle* p2)
   Eigen::Vector3d v2(p2->getPx(), p2->getPy(), p2->getPz());
   Eigen::Vector3d n = v1.cross(v2); //The doca vector must be orthogonal to both lines.
   if (n.norm() < eps) {
-    //if tracks are parallel then the distance is independant on the point on the line
+    //if tracks are parallel then the distance is independant of the point on the line
     //and we can use the old way to calculate the DOCA
     return getDocaTrackVertex(p1, p2);
   }
@@ -166,10 +168,10 @@ Eigen::Vector3d getDistance(const Particle* p1, const Particle* p2, const std::s
   if (mode == "2vertices") {
     return getDistanceVertices(p1, p2);
   }
-  if (mode == "trackandvertex") {
+  if (mode == "trackvertex") {
     return getDocaTrackVertex(p2, p1);
   }
-  //if(mode == "vertexandtrack")
+  //if(mode == "vertextrack")
   return getDocaTrackVertex(p1, p2);
 }
 TMatrixFSym getDistanceErrors(const Particle* p1, const Particle* p2, const std::string& mode)
@@ -180,10 +182,10 @@ TMatrixFSym getDistanceErrors(const Particle* p1, const Particle* p2, const std:
   if (mode == "2vertices") {
     return getDistanceVerticesErrors(p1, p2);
   }
-  if (mode == "trackandvertex") {
+  if (mode == "trackvertex") {
     return getDocaTrackVertexError(p2, p1);
   }
-  //  if(mode == "vertexandtrack"){
+  //  if(mode == "vertextrack"){
   return getDocaTrackVertexError(p1, p2);
 }
 
@@ -218,7 +220,7 @@ Eigen::Vector3d getDocaBtubeTrack(const Particle* pTrack, const Btube* tube)
   Eigen::Vector3d v2 = tube->getTubeDirection();
   Eigen::Vector3d n = v1.cross(v2); //The doca vector must be orthogonal to both lines.
   if (n.norm() < eps) {
-    //if tracks are parallel then the distance is independant on the point on the line
+    //if tracks are parallel then the distance is independant of the point on the line
     //and we can use the old way to calculate the DOCA
     return getDocaBtubeVertex(pTrack, tube);
   }
@@ -276,6 +278,9 @@ void DistanceCalculatorModule::event()
     if ((m_mode == "vertexbtube") || (m_mode == "trackbtube")) {
       if (selectedParticles.size() == 1) {
         const Btube* t = particle->getRelatedTo<Btube>();
+        if (!t) {
+          B2FATAL("No associated Btube found");
+        }
         const Particle* p0 = selectedParticles[0];
         Distance = getBtubeDistance(p0, t, m_mode);
         DistanceCovMatrix = getBtubeDistanceErrors(particle, t, m_mode);

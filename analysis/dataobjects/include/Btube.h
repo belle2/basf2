@@ -50,7 +50,7 @@ namespace Belle2 {
      */
     TMatrixFSym getTubeMatrix() const;
     /**
-     * Retuens Btube Center Error Matrix
+     * Returns Btube Center Error Matrix
      */
     TMatrixFSym getTubeCenterErrorMatrix() const;
     /**

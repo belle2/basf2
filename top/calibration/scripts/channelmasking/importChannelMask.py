@@ -9,40 +9,20 @@ import os
 import sys
 import glob
 
-# reset_database()
-# use_database_chain()
-# use_central_database("online")
-# use_central_database('data_reprocessing_proc8')
-# use_central_database('data_reprocessing_prompt')
-# use_central_database('data_reprocessing_prompt_bucket2c',LogLevel.WARNING)
-# use_central_database('data_reprocessing_prompt_bucket4_alignment',LogLevel.WARNING)
-use_central_database('data_reprocessing_prompt_bucket6_cdst')
-# gSystem.Load("libtop.so")
-
-# define a local database (will be created automatically, if doesn't exist)
-use_local_database("localDB/localDB.txt", "localDB", False)
-
-
+# Create path
 main = create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1], 'runList': [1312]})
-main.add_module(eventinfosetter)
+main.add_module('EventInfoSetter', evtNumList=[1])
 
-# Gearbox - access to xml files
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
-
-# geometry = register_module('Geometry')
-# geometry.param('components', ['TOP'])
-# main.add_module(geometry)
-# main.add_module(geometry, components=['TOP'])
-# main.add_module('TOPGeometryParInitializer')
-main.add_module("Geometry")
+# Initialize TOP geometry parameters using default GT
+main.add_module('TOPGeometryParInitializer')
 
 # process single event
 process(main)
+
+# define a local database (will be created automatically, if doesn't exist)
+use_local_database('localDB/localDB.txt', readonly=False)
 
 # and then run the importer
 dbImporter = TOPDatabaseImporter()

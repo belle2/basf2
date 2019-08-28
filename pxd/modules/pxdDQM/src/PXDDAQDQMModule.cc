@@ -42,8 +42,10 @@ PXDDAQDQMModule::PXDDAQDQMModule() : HistoModule() , m_vxdGeometry(VXD::GeoCache
 void PXDDAQDQMModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
-  oldDir->cd(m_histogramDirectoryName.c_str());
+  if (m_histogramDirectoryName != "") {
+    oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
+    oldDir->cd(m_histogramDirectoryName.c_str());
+  }
 
   hDAQErrorEvent = new TH1F("PXDDAQError", "PXDDAQError/Event;;Count", ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
   hDAQErrorDHC = new TH2F("PXDDAQDHCError", "PXDDAQError/DHC;DHC ID;", 16, 0, 16, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);

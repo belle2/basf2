@@ -41,8 +41,10 @@ PXDInjectionDQMModule::PXDInjectionDQMModule() : HistoModule() , m_vxdGeometry(V
 void PXDInjectionDQMModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
-  oldDir->cd(m_histogramDirectoryName.c_str());//changing to the right directory
+  if (m_histogramDirectoryName != "") {
+    oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
+    oldDir->cd(m_histogramDirectoryName.c_str());//changing to the right directory
+  }
 
   if (m_offlineStudy) {
     hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;Time in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);

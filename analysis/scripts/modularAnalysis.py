@@ -363,7 +363,6 @@ def bremsFinder(
     gammaList,
     maximumAcceptance=3.0,
     multiplePhotons=False,
-    ignorePhotonMC=False,
     writeOut=False,
     path=None,
 ):

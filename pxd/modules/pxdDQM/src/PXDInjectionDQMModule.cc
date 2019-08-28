@@ -124,12 +124,12 @@ void PXDInjectionDQMModule::beginRun()
   hEOccAfterInjHER->Reset();
   hMaxOccAfterInjLER->Reset();
   hMaxOccAfterInjHER->Reset();
-  for (auto& a : hOccModAfterInjLER) a.second->Reset();
-  for (auto& a : hOccModAfterInjHER) a.second->Reset();
-  for (auto& a : hEOccModAfterInjLER) a.second->Reset();
-  for (auto& a : hEOccModAfterInjHER) a.second->Reset();
-  for (auto& a : hMaxOccModAfterInjLER) a.second->Reset();
-  for (auto& a : hMaxOccModAfterInjHER) a.second->Reset();
+  for (auto& a : hOccModAfterInjLER) if (a.second) a.second->Reset();
+  for (auto& a : hOccModAfterInjHER) if (a.second) a.second->Reset();
+  for (auto& a : hEOccModAfterInjLER) if (a.second) a.second->Reset();
+  for (auto& a : hEOccModAfterInjHER) if (a.second) a.second->Reset();
+  for (auto& a : hMaxOccModAfterInjLER) if (a.second) a.second->Reset();
+  for (auto& a : hMaxOccModAfterInjHER) if (a.second) a.second->Reset();
 }
 
 void PXDInjectionDQMModule::event()

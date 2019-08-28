@@ -115,11 +115,11 @@ void PXDDAQDQMModule::beginRun()
   hDAQNotUseableModule->Reset();
   hDAQEndErrorDHC->Reset();
   hDAQEndErrorDHE->Reset();
-  for (auto& it : hDAQDHETriggerGate) it.second->Reset();
-  for (auto& it : hDAQDHCReduction) it.second->Reset();
-  for (auto& it : hDAQDHEReduction) it.second->Reset();
-  for (auto& it : hDAQCM) it.second->Reset();
-  for (auto& it : hDAQCM2) it.second->Reset();
+  for (auto& it : hDAQDHETriggerGate) if (it.second) it.second->Reset();
+  for (auto& it : hDAQDHCReduction) if (it.second) it.second->Reset();
+  for (auto& it : hDAQDHEReduction) if (it.second) it.second->Reset();
+  for (auto& it : hDAQCM) if (it.second) it.second->Reset();
+  for (auto& it : hDAQCM2) if (it.second) it.second->Reset();
 }
 
 void PXDDAQDQMModule::event()

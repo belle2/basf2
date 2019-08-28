@@ -803,6 +803,12 @@ def add_vxd_track_finding_vxdtf2(
             UseTimingInfo=False,
             ClusterInformation="Average",
         )
+    else:
+        path.add_module(
+            'QualityEstimatorVXD',
+            EstimationMethod='tripletFit',
+            SpacePointTrackCandsStoreArrayName=nameSPTCs,
+        )
 
     if min_SPTC_quality > 0.:
         qualityIndicatorCutter = register_module('VXDTrackCandidatesQualityIndicatorCutter')

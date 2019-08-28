@@ -12,9 +12,9 @@
 # Reconstruct B0 to J/PsiKs using the TreeFitter. Use the ..._Plot.py
 # to plot the resolutions.
 
-from basf2 import create_path, process, statistics
+from basf2 import create_path, process, statistics, set_random_seed
 
-from modularAnalysis import set_random_seed, inputMdst, reconstructDecay, fillParticleList, matchMCTruth
+from modularAnalysis import inputMdst, reconstructDecay, fillParticleList, matchMCTruth
 import os
 from vertex import vertexTree
 

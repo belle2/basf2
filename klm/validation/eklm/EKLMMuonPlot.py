@@ -17,7 +17,7 @@ from ROOT import TFile, TTree, TH1F, TNamed
 ROOT.gROOT.SetBatch(True)
 input_file = ROOT.TFile('../EKLMMuonOutput.root')
 tree = input_file.Get('tree')
-output_file = ROOT.TFile('../EKLMMuon.root', 'recreate')
+output_file = ROOT.TFile('EKLMMuon.root', 'recreate')
 contact = 'Kirill Chilikin (chilikin@lebedev.ru)'
 
 h2dtres = ROOT.TH1F('muon_h2dtres', 'EKLM muon 2d hits time resolution',

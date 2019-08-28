@@ -73,8 +73,7 @@ namespace Belle2 {
     to perform the bremsstrahlung correction.
 
     This module looks for photons in the `gammaList` whose clusters have a *Bremsstrahlung* relation with the track 
-    of one of the particles in the `inputList`, and adds their 4-momentum to the particle's one. It also adds the 
-    weight of this relation as `extraInfo` to the photon, under the name `bremsAcceptanceFactor`.
+    of one of the particles in the `inputList`, and adds their 4-momentum to the particle's one. 
 
     Warning:
       Even in the event of no bremsstrahlung photons found, a new particle is still created, and the original one is still 
@@ -98,9 +97,6 @@ namespace Belle2 {
              m_maximumAcceptance);
     addParam("multiplePhotons", m_addMultiplePhotons, "If true, use all possible photons to correct the particle's 4-momentum",
              m_addMultiplePhotons);
-    addParam("ignorePhotonMC", m_ignorePhotonMC,
-             "If true, ignore the MC Matching of the bremsstrahlung photon when MC Matching the corrected particle",
-             m_ignorePhotonMC);
     addParam("writeOut", m_writeOut,
              R"DOC(If true, the output `ParticleList` will be saved by `RootOutput`. If false, it will be ignored when writing the file.)DOC",
              m_writeOut);
@@ -193,14 +189,10 @@ namespace Belle2 {
 
           Particle* gamma = m_gammaList->getParticle(k);
 
-          bool alreadyUsed = gamma->hasExtraInfo("bremsAcceptanceFactor");
-          if (alreadyUsed) continue;
-
           auto cluster = gamma->getECLCluster();
           if (bremCluster->getClusterId() == cluster->getClusterId()) {
 
             if (m_addMultiplePhotons) {
-              gamma->addExtraInfo("bremsAcceptanceFactor", weight);
               selectedGammas.push_back(gamma);
             } else {
               if (weight > bestWeight) continue;
@@ -219,17 +211,11 @@ namespace Belle2 {
 
       //Add to this 4-momentum those of the selected photon(s)
       if (m_addMultiplePhotons && selectedGammas.size() > 0) { //for the case of more than one brems photon
-        std::sort(selectedGammas.begin(), selectedGammas.end(), [](const Particle * photon1, const Particle * photon2) {
-          return photon1->getExtraInfo("bremsAcceptanceFactor") < photon2->getExtraInfo("bremsAcceptanceFactor");
-        });
         for (auto const& g : selectedGammas) {
           new4Vec += g->get4Vector();
-          if (m_ignorePhotonMC) g->addExtraInfo("lightMCPhoton", true); //For MC Matching skipping
         }
       } else if (!m_addMultiplePhotons && bestGamma) { //for the case restricted to only one brems photon per lepton
-        bestGamma->addExtraInfo("bremsAcceptanceFactor", bestWeight);
         new4Vec += bestGamma->get4Vector();
-        if (m_ignorePhotonMC) bestGamma->addExtraInfo("lightMCPhoton", true); //For MC Matching skipping
       }
 
       //Create the new particle with the 4-momentum calculated before

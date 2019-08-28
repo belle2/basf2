@@ -31,8 +31,8 @@ namespace Belle2 {
   template <class T>
   auto lowerPair = [](const T& a, const T& b) -> bool {
     // always put NaN to the end
-    if (std::isnan(b.first)) return false;
-    if (std::isnan(a.first)) return true;
+    if (std::isnan(a.first)) return false;
+    if (std::isnan(b.first)) return true;
     return a.first < b.first;
   };
 

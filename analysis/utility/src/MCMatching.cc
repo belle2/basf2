@@ -227,9 +227,7 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
   int daughterStatus = 0;
   for (unsigned i = 0; i < nChildren; ++i) {
     const Particle* daughter = particle->getDaughter(i);
-    if (daughter->hasExtraInfo("lightMCPhoton")) getMCErrors(
-        daughter); //Properly MC match brems like photons, but do not invalidate the mother particle
-    else daughterStatus |= getMCErrors(daughter);
+    daughterStatus |= getMCErrors(daughter);
   }
   status |= (daughterStatus & daughterStatusAcceptMask);
 

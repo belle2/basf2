@@ -93,7 +93,7 @@ namespace Belle2 {
     double thetaInEKLMAcceptance(const Particle* particle)
     {
       double acceptance = thetaInKLMAcceptance(particle);
-      if (acceptance != 0 && acceptance != 5) {
+      if (acceptance != 0 && acceptance != 3) {
         return 1;
       } else return 0;
     }

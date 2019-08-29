@@ -253,7 +253,7 @@ def ElectronMuonPlusMissingEnergyList(path):
     fromIP_cut = 'abs(dz) < 2.0 and abs(dr) < 0.5'
     electronID_cut = 'electronID > 0.2'
     muonID_cut = 'muonID > 0.2'
-    # We require the electron in the barrel ECL
+    # We require that the electron points to the barrel ECL + 10 degrees
     theta_cut = '0.387 < theta < 2.421'
     # We want exactly 2 tracks from IP
     emu_cut = 'nCleanedTracks(' + fromIP_cut + ') == 2'
@@ -293,7 +293,7 @@ def DielectronPlusMissingEnergyList(path):
     # FIXME this skim is currently deactivated: delete the following two lines to activate it
     # and update the Sphinx documentation
     B2WARNING("This skim is currently deactivated.")
-    return []
+    # return []
 
     dielectron_list = []
     skim_label = 'forDielectronMissingEnergySkim'
@@ -302,8 +302,8 @@ def DielectronPlusMissingEnergyList(path):
     # Define some basic cuts
     fromIP_cut = 'abs(dz) < 2.0 and abs(dr) < 0.5'
     electronID_cut = 'electronID > 0.2'
-    # We require the electron in the barrel ECL
-    theta_cut = '0.387 < theta < 2.421'
+    # We require that the electron points to the barrel ECL + 10 degrees
+    theta_cut = '0.387 < clusterTheta < 2.421'
     # We want exactly 2 tracks from IP
     dielectron_cut = 'nCleanedTracks(' + fromIP_cut + ') == 2'
     # And the pair must have pt > 200 MeV in CMS frame

@@ -10,7 +10,7 @@ Like testing, and for skim name encoding(decoding).
 """
 from basf2 import create_path, register_module, B2ERROR, AfterConditionPath
 from mdst import add_mdst_output
-from modularAnalysis import removeParticlesNotInLists, skimOutputUdst
+from modularAnalysis import removeParticlesNotInLists, skimOutputUdst, summaryOfLists
 from skim.registry import skim_registry
 import os
 import sys

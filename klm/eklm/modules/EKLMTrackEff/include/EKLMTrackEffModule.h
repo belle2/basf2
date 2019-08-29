@@ -10,7 +10,6 @@
 
 #pragma once
 
-
 /* C++ headers. */
 #include<map>
 
@@ -31,7 +30,7 @@
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
-#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
@@ -63,7 +62,6 @@ namespace Belle2 {
      * Initializer.
      */
     void initialize() override;
-
 
     /**
      * This method is called for each event.
@@ -174,8 +172,8 @@ namespace Belle2 {
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 
-    /** EKLMElementNumbers. */
-    const EKLMElementNumbers* m_ElementNumbers;
+    /** EKLM Element Numbers. */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 
     /** Hist for z distribution of Hit2ds */
     TH1F* m_Hit2dZDistrib;

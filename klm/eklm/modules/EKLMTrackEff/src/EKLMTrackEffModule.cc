@@ -8,11 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Belle2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-
-#include <CLHEP/Vector/LorentzVector.h>
-
 #include <klm/eklm/modules/EKLMTrackEff/EKLMTrackEffModule.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
@@ -21,9 +19,12 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include "CLHEP/Geometry/Point3D.h"
 
-// Std lib includes
+/* CLHEP headers. */
+#include <CLHEP/Vector/LorentzVector.h>
+#include <CLHEP/Geometry/Point3D.h>
+
+/* C++ headers. */
 #include <vector>
 #include <map>
 #include <iostream>
@@ -47,11 +48,37 @@ EKLMTrackEffModule::EKLMTrackEffModule() : Module()
   addParam("AllowedDistance1D", m_AllowedDistance1D,
            "Max distance in strips number to 1D hit from extHit to be still matched (default 8 strips)", double(8));
   // addParam("energy_cut", m_EnergyCut, " 2 < E < 10 full energy", bool(false));
+
+  m_file = nullptr;
+  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
+  m_GeoDat = nullptr;
+  m_AllExtHitsInPlane = nullptr;
+  m_D0Distribution = nullptr;
+  m_DigitMinDist = nullptr;
+  m_ExtHitZTheta = nullptr;
+  m_ExtHitsCorrelation = nullptr;
+  m_ExtHitsLayerDistribTracks = nullptr;
+  m_ExtHitsLayerDistribution = nullptr;
+  m_ExtHitsZDistribTracks = nullptr;
+  m_ExtHitsZDistribution = nullptr;
+  m_Hit2dMatchedDistrib = nullptr;
+  m_Hit2dZDistrib = nullptr;
+  m_Hit2dsCorrelation = nullptr;
+  m_Hit2dsNum = nullptr;
+  m_MatchedDigitsInPlane = nullptr;
+  m_MinHitDist = nullptr;
+  m_MuonsAngle = nullptr;
+  m_MuonsEnergy = nullptr;
+  m_MuonsTheta = nullptr;
+  m_MuonsThetaWithoutCut = nullptr;
+  m_ThetaCorrelationHist = nullptr;
+  m_Z0Distribution = nullptr;
+  m_extHitsNum = nullptr;
+  m_planesEff = nullptr;
 }
 
 EKLMTrackEffModule::~EKLMTrackEffModule()
 {
-
 }
 
 /* Define some functions in EKLMTrackEffModule namespace
@@ -69,10 +96,8 @@ void EKLMTrackEffModule::initialize()
   m_hitAlign.isRequired();
   m_recoTracks.registerRelationTo(m_hit2ds);
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  // hit2ds.registerRelation(<Tracks>);
 
   // Set of declarated variables
-
   m_file = new TFile(m_filename.c_str(), "recreate");
   m_file->cd();
 

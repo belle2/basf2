@@ -533,7 +533,7 @@ namespace Belle2 {
         int thisModuleID = static_cast<int>(getSlotID(particle));
         if (thisModuleID == 0) return 0;
         StoreArray<Track> tracks;
-        int nTracks = 1;
+        int nTracks = 0;
         for (const auto& t : tracks) {
           const auto* tl = t.getRelated<TOPLikelihood>();
           if (not tl) continue;

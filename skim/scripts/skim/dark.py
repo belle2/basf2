@@ -194,9 +194,9 @@ def DimuonPlusMissingEnergyList(path):
     """
     Note:
         * Dimuon + missing energy skim,
-          needed for :math:`e^{+}e^{-} \to \mu^{+}\mu^{-} Z^{\prime}; \, Z^{\prime} \to \mathrm{invisible}` and other searches
+          needed for :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
         * Skim code: 18520100
-        * Physics channel: :math:`e^{+}e^{-} \to \mu^{+}\mu^{-}` + missing energy
+        * Physics channel: :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} \, +` missing energy
         * Skim category: physics, dark sector
 
     Parameters:
@@ -232,9 +232,9 @@ def ElectronMuonPlusMissingEnergyList(path):
     """
     Note:
         * Electron-muon pair + missing energy skim,
-          needed for :math:`e^{+}e^{-} \to e^{\pm}\mu^{\mp} Z^{\prime}; \, Z^{\prime} \to \mathrm{invisible}` and other searches
+          needed for :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
         * Skim code: 18520200
-        * Physics channel: :math:`e^{+}e^{-} \to e^{\pm}\mu^{\mp}` + missing energy
+        * Physics channel: :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} \, +` missing energy
         * Skim category: physics, dark sector
 
     Parameters:

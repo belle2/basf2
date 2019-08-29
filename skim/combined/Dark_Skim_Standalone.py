@@ -35,15 +35,8 @@ stdK('loose', path=darkskimpath)
 stdPi0s('loose', path=darkskimpath)
 stdPhotons('loose', path=darkskimpath)
 stdKshorts(path=darkskimpath)
-loadStdLightMesons(path=darkskimpath)
 loadStdSkimPi0(path=darkskimpath)
 loadStdSkimPhoton(path=darkskimpath)
-
-loadStdD0(path=darkskimpath)
-loadStdDplus(path=darkskimpath)
-loadStdDstar0(path=darkskimpath)
-loadStdDstarPlus(path=darkskimpath)
-loadStdDiLeptons(True, path=darkskimpath)
 
 cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=darkskimpath)
 

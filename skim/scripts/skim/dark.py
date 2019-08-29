@@ -13,7 +13,7 @@ __authors__ = [
 
 import pdg
 from modularAnalysis import cutAndCopyList, applyEventCuts, fillParticleList, \
-    reconstructDecay
+    reconstructDecay, B2WARNING
 
 
 def SinglePhotonDarkList(path):
@@ -143,7 +143,7 @@ def LFVZpVisibleList(path):
     """
     Note:
         * Lepton flavour violating Z' skim, Z' to visible FS
-        * Skim code:  18520500
+        * Skim code:  18520400
         * Physics channel: ee --> e mu Z'; Z' --> e mu
         * Skim category: physics, dark sector
 
@@ -269,13 +269,17 @@ def ElectronMuonPlusMissingEnergyList(path):
     emu_list.append(emu_name)
     return emu_list
 
-'''
+
 def DielectronPlusMissingEnergyList(path):
     """
+    Warning:
+        This skim is currently deactivated, since the retention rate is too high
+
     Note:
-        * Dielectron skim, needed for e+e- --> A' h'; A' --> e+e- + h' --> invisible and others
-        * Skim code: ???
-        * Physics channel: e+e- --> e+e-
+        * Dielectron skim, needed for :math:`e^{+}e^{-} \\to A^{\prime} h^{\prime};`
+          :math:`A^{\prime} \\to e^{+}e^{-}; \, h^{\prime} \\to \mathrm{invisible}` and other searches
+        * Skim code: 18520300
+        * Physics channel: :math:`e^{+}e^{-} \\to e^{+}e^{-}`
         * Skim category: physics, dark sector
 
     Parameters:
@@ -286,8 +290,14 @@ def DielectronPlusMissingEnergyList(path):
     """
     __author__ = 'Giacomo De Pietro'
 
+    # FIXME this skim is currently deactivated: delete the following two lines to activate it
+    # and update the Sphinx documentation
+    B2WARNING("This skim is currently deactivated.")
+    return []
+
     dielectron_list = []
-    dielectron_name = 'Z0:ee'
+    skim_label = 'forDielectronMissingEnergySkim'
+    dielectron_name = 'Z0:' + skim_label
 
     # Define some basic cuts
     fromIP_cut = 'abs(dz) < 2.0 and abs(dr) < 0.5'
@@ -300,10 +310,9 @@ def DielectronPlusMissingEnergyList(path):
     dielectron_cut += ' and useCMSFrame(pt) > 0.2'
 
     # Reconstruct the dielectron candidate
-    cutAndCopyList('e+:dielectron', 'e+:all', fromIP_cut + ' and ' + electronID_cut + ' and ' + theta_cut, path=path)
-    reconstructDecay(dielectron_name + ' -> e+:dielectron e-:dielectron', dielectron_cut, path=path)
+    cutAndCopyList('e+:' + skim_label, 'e+:all', fromIP_cut + ' and ' + electronID_cut + ' and ' + theta_cut, path=path)
+    reconstructDecay(dielectron_name + ' -> e+:' + skim_label + ' e-:' + skim_label, dielectron_cut, path=path)
 
     # And return the dielectron list
     dielectron_list.append(dielectron_name)
     return dielectron_list
-'''

@@ -53,7 +53,7 @@ add_skim('LFVZpVisible', dark.LFVZpVisibleList(path=darkskimpath), path=darkskim
 add_skim('SinglePhotonDark', dark.SinglePhotonDarkList(path=darkskimpath), path=darkskimpath)
 add_skim('DimuonPlusMissingEnergy', dark.DimuonPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
 add_skim('ElectronMuonPlusMissingEnergy', dark.ElectronMuonPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
-# add_skim('DielectronPlusMissingEnergy', dark.DielectronPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
+add_skim('DielectronPlusMissingEnergy', dark.DielectronPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
 
 setSkimLogging(path=darkskimpath)
 process(darkskimpath)

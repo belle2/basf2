@@ -767,8 +767,8 @@ class ValidationPlot(object):
             # add expert option, if requested
             if self.is_expert:
                 meta_options.append("expert")
-            else
-            meta_options.append("shifter")
+            else:
+                meta_options.append("shifter")
 
             # give a custom pvalue warning / error zone if requested
             if self.pvalue_error is not None:

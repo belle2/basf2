@@ -193,9 +193,10 @@ def LFVZpVisibleList(path):
 def DimuonPlusMissingEnergyList(path):
     """
     Note:
-        * Dimuon + missing energy skim, needed for e+e- --> mu+mu- Z'; Z' --> invisible and others
-        * Skim code: ???
-        * Physics channel: e+e- --> mu+mu-
+        * Dimuon + missing energy skim,
+          needed for :math:`e^{+}e^{-} \to \mu^{+}\mu^{-} Z^{\prime}; \, Z^{\prime} \to \mathrm{invisible}` and other searches
+        * Skim code: 18520100
+        * Physics channel: :math:`e^{+}e^{-} \to \mu^{+}\mu^{-}` + missing energy
         * Skim category: physics, dark sector
 
     Parameters:
@@ -230,9 +231,10 @@ def DimuonPlusMissingEnergyList(path):
 def ElectronMuonPlusMissingEnergyList(path):
     """
     Note:
-        * Electron-muon pair skim, needed for e+e- --> e+mu- Z'; Z' --> invisible and others
-        * Skim code: ???
-        * Physics channel: e+e- --> e+mu-
+        * Electron-muon pair + missing energy skim,
+          needed for :math:`e^{+}e^{-} \to e^{\pm}\mu^{\mp} Z^{\prime}; \, Z^{\prime} \to \mathrm{invisible}` and other searches
+        * Skim code: 18520200
+        * Physics channel: :math:`e^{+}e^{-} \to e^{\pm}\mu^{\mp}` + missing energy
         * Skim category: physics, dark sector
 
     Parameters:
@@ -253,7 +255,7 @@ def ElectronMuonPlusMissingEnergyList(path):
     muonID_cut = 'muonID > 0.2'
     # We require the electron in the barrel ECL
     theta_cut = '0.387 < theta < 2.421'
-    # We want exaclty 2 tracks from IP
+    # We want exactly 2 tracks from IP
     emu_cut = 'nCleanedTracks(' + fromIP_cut + ') == 2'
     # And the pair must have pt > 200 MeV in CMS frame
     emu_cut += ' and useCMSFrame(pt) > 0.2'
@@ -292,7 +294,7 @@ def DielectronPlusMissingEnergyList(path):
     electronID_cut = 'electronID > 0.2'
     # We require the electron in the barrel ECL
     theta_cut = '0.387 < theta < 2.421'
-    # We want exaclty 2 tracks from IP
+    # We want exactly 2 tracks from IP
     dielectron_cut = 'nCleanedTracks(' + fromIP_cut + ') == 2'
     # And the pair must have pt > 200 MeV in CMS frame
     dielectron_cut += ' and useCMSFrame(pt) > 0.2'

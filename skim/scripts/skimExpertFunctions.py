@@ -309,6 +309,7 @@ _skimNameMatching = [
     ('18520100', 'DimuonPlusMissingEnergy'),
     ('18520200', 'ElectronMuonPlusMissingEnergy'),
     ('18520300', 'DielectronPlusMissingEnergy'),
+    ('18520400', 'LFVZpInvisible'),  # Deactivated skim
     ('18520500', 'LFVZpVisible'),
     ('18570600', 'TauGeneric'),
     ('18570700', 'TauThrust'),

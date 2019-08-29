@@ -47,7 +47,7 @@ def main():
                              help='Root file with Ext/Muid/BKLM/EKLM validation data.'
                              )
     option_parser.add_option('-o', '--output-file', dest='output_file',
-                             default='BKLMValidation.root',
+                             default='BKLMMuon.root',
                              help='Root file with BKLM validation histograms.')
     (options, args) = option_parser.parse_args()
 

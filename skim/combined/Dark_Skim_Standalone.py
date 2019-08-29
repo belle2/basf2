@@ -16,20 +16,10 @@ from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import *
 
 from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
-import argparse
+
 gb2_setuprel = 'release-03-02-00'
 
 fileList = get_test_file("mixedBGx1", "MC12")
-
-# Read optional --data argument
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
-
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
 
 darkskimpath = Path()
 inputMdstList('default', fileList, path=darkskimpath)
@@ -57,23 +47,13 @@ loadStdDiLeptons(True, path=darkskimpath)
 
 cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=darkskimpath)
 
-from skim.dark import ALP3GammaList
-add_skim('ALP3Gamma', ALP3GammaList(path=darkskimpath), path=darkskimpath)
-
-from skim.dark import LFVZpVisibleList
-add_skim('LFVZpVisible', LFVZpVisibleList(path=darkskimpath), path=darkskimpath)
-
-from skim.dark import SinglePhotonDarkList
-add_skim('SinglePhotonDark', SinglePhotonDarkList(path=darkskimpath), path=darkskimpath)
-
-from skim.dark import DimuonForDarkSearchesList as DimuonList
-add_skim('DimuonForDarkSearches', DimuonList(path=darkskimpath), path=darkskimpath)
-
-from skim.dark import ElectronMuonForDarkSearchesList as ElectronMuonList
-add_skim('ElectronMuonForDarkSearches', ElectronMuonList(path=darkskimpath), path=darkskimpath)
-
-# from skim.dark import DielectronForDarkSearchesList as DielectronList
-# add_skim('DielectronForDarkSearches', DielectronList(path=darkskimpath), path=darkskimpath)
+from skim import dark
+add_skim('ALP3Gamma', dark.ALP3GammaList(path=darkskimpath), path=darkskimpath)
+add_skim('LFVZpVisible', dark.LFVZpVisibleList(path=darkskimpath), path=darkskimpath)
+add_skim('SinglePhotonDark', dark.SinglePhotonDarkList(path=darkskimpath), path=darkskimpath)
+add_skim('DimuonPlusMissingEnergy', dark.DimuonPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
+add_skim('ElectronMuonPlusMissingEnergy', dark.ElectronMuonPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
+# add_skim('DielectronPlusMissingEnergy', dark.DielectronPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
 
 setSkimLogging(path=darkskimpath)
 process(darkskimpath)

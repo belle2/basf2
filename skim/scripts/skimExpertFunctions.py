@@ -29,7 +29,7 @@ all_skims = [
     "DstToD0Pi_D0ToNeutrals", "XToD0_D0ToNeutrals", "XToDp_DpToKsHp", "BtoDh_Kspi0", "BtoDh_hh",
     "BtoDh_Kshh", "Tau", "PRsemileptonicUntagged", "SLUntagged",
     "LeptonicUntagged", "TCPV", "DstToD0Pi_D0ToRare", "BtoXll", "BtoXll_LFV",
-    "BtoXgamma", "TauLFV", "DimuonForDarkSearches", "ElectronMuonForDarkSearches",
+    "BtoXgamma", "TauLFV", "DimuonPlusMissingEnergy", "ElectronMuonPlusMissingEnergy",
     # "DielectronForDarkSearches"
 ]
 
@@ -306,9 +306,9 @@ _skimNameMatching = [
     ('13160100', 'TCPV'),
     ('18020100', 'SinglePhotonDark'),
     ('18020300', 'ALP3Gamma'),
-    ('18520100', 'DimuonForDarkSearches'),
-    ('18520200', 'ElectronMuonForDarkSearches'),
-    # ('18520300', 'DielectronForDarkSearches'),
+    ('18520100', 'DimuonPlusMissingEnergy'),
+    ('18520200', 'ElectronMuonPlusMissingEnergy'),
+    ('18520300', 'DielectronPlusMissingEnergy'),
     ('18520500', 'LFVZpVisible'),
     ('18570600', 'TauGeneric'),
     ('18570700', 'TauThrust'),

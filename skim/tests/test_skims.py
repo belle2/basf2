@@ -232,20 +232,12 @@ from skim.fei import*
 add_skim('feiSLB0', B0SL(path=skimpath), path=skimpath)
 
 # Dark Sector Skims
-from skim.dark import SinglePhotonDarkList
-add_skim('SinglePhotonDark', SinglePhotonDarkList(path=skimpath), path=skimpath)
-
-from skim.dark import LFVZpVisibleList
-add_skim('LFVZpVisible', LFVZpVisibleList(path=skimpath), path=skimpath)
-
-from skim.dark import ALP3GammaList
-add_skim('ALP3Gamma', ALP3GammaList(path=skimpath), path=skimpath)
-
-from skim.dark import DimuonForDarkSearchesList as DimuonList
-add_skim('DimuonForDarkSearches', DimuonList(path=skimpath), path=skimpath)
-
-from skim.dark import ElectronMuonForDarkSearchesList as ElectronMuonList
-add_skim('ElectronMuonForDarkSearches', ElectronMuonList(path=skimpath), path=skimpath)
+from skim import dark
+add_skim('SinglePhotonDark', dark.SinglePhotonDarkList(path=skimpath), path=skimpath)
+add_skim('LFVZpVisible', dark.LFVZpVisibleList(path=skimpath), path=skimpath)
+add_skim('ALP3Gamma', dark.ALP3GammaList(path=skimpath), path=skimpath)
+add_skim('DimuonPlusMissingEnergy', dark.DimuonPlusMissingEnergyList(path=skimpath), path=skimpath)
+add_skim('ElectronMuonPlusMissingEnergy', dark.ElectronMuonPlusMissingEnergyList(path=skimpath), path=skimpath)
 
 setSkimLogging(path=skimpath)
 

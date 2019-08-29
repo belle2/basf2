@@ -28,7 +28,7 @@ def SinglePhotonDarkList(path):
     invisible final state analysis.
 
     Parameters:
-        path (basf2.Path) the path to add the skim
+        path (basf2.Path): the path to add the skim
 
     Returns:
         list name of the skim candidates
@@ -69,7 +69,7 @@ def _initialALP(path):
     `ALP3GammaList` skim functions.
 
     Parameters:
-        path (basf2.Path) the path to add the skim
+        path (basf2.Path): the path to add the skim
 
     Returns:
         list name of the ALP decays candidates
@@ -111,7 +111,7 @@ def ALP3GammaList(path):
         * Skim category: physics, dark sector
 
     Parameters:
-        path (basf2.Path) the path to add the skim list builders
+        path (basf2.Path): the path to add the skim list builders
 
     Returns:
         list name of the skim candidates
@@ -150,7 +150,7 @@ def LFVZpVisibleList(path):
     The skim list for the LFV Z' to visible final state search
 
     Parameters:
-        path (basf2.Path) the path to add the skim list builders
+        path (basf2.Path): the path to add the skim list builders
 
     Returns:
         list containing the candidate names
@@ -190,18 +190,16 @@ def LFVZpVisibleList(path):
     return lfvzp_list
 
 
-def DimuonForDarkSearchesList(path):
+def DimuonPlusMissingEnergyList(path):
     """
     Note:
-        * Dimuon skim, needed for e+e- --> mu+mu- Z'; Z' --> invisible and others
+        * Dimuon + missing energy skim, needed for e+e- --> mu+mu- Z'; Z' --> invisible and others
         * Skim code: ???
         * Physics channel: e+e- --> mu+mu-
         * Skim category: physics, dark sector
 
-    The skim list for the dimuon-based dark sector searches
-
     Parameters:
-        path (basf2.Path) the path to add the skim list builders
+        path (basf2.Path): the path to add the skim
 
     Returns:
         list containing the candidate names
@@ -209,26 +207,27 @@ def DimuonForDarkSearchesList(path):
     __author__ = 'Giacomo De Pietro'
 
     dimuon_list = []
-    dimuon_name = 'Z0:mumu'
+    skim_label = 'forDimuonMissingEnergySkim'
+    dimuon_name = 'Z0:' + skim_label
 
     # Define some cuts
     fromIP_cut = 'abs(dz) < 2.0 and abs(dr) < 0.5'
     muonID_cut = 'muonID > 0.2'
-    # We want exaclty 2 tracks from IP
+    # We want exactly 2 tracks from IP
     dimuon_cut = 'nCleanedTracks(' + fromIP_cut + ') == 2'
     # And the pair must have pt > 200 MeV in CMS frame
     dimuon_cut += ' and useCMSFrame(pt) > 0.2'
 
     # Reconstruct the dimuon candidate
-    cutAndCopyList('mu+:dimuon', 'mu+:all', fromIP_cut + ' and ' + muonID_cut, path=path)
-    reconstructDecay(dimuon_name + ' -> mu+:dimuon mu-:dimuon', dimuon_cut, path=path)
+    cutAndCopyList('mu+:' + skim_label, 'mu+:all', fromIP_cut + ' and ' + muonID_cut, path=path)
+    reconstructDecay(dimuon_name + ' -> mu+:' + skim_label + ' mu-:' + skim_label, dimuon_cut, path=path)
 
     # And return the dimuon list
     dimuon_list.append(dimuon_name)
     return dimuon_list
 
 
-def ElectronMuonForDarkSearchesList(path):
+def ElectronMuonPlusMissingEnergyList(path):
     """
     Note:
         * Electron-muon pair skim, needed for e+e- --> e+mu- Z'; Z' --> invisible and others
@@ -236,10 +235,8 @@ def ElectronMuonForDarkSearchesList(path):
         * Physics channel: e+e- --> e+mu-
         * Skim category: physics, dark sector
 
-    The skim list for the electron-muon-based dark sector searches
-
     Parameters:
-        path (basf2.Path) the path to add the skim list builders
+        path (basf2.Path): the path to add the skim
 
     Returns:
         list containing the candidate names
@@ -247,7 +244,8 @@ def ElectronMuonForDarkSearchesList(path):
     __author__ = 'Giacomo De Pietro'
 
     emu_list = []
-    emu_name = 'Z0:emu'
+    skim_label = 'forElectronMuonMissingEnergySkim'
+    emu_name = 'Z0:' + skim_label
 
     # Define some basic cuts
     fromIP_cut = 'abs(dz) < 2.0 and abs(dr) < 0.5'
@@ -261,16 +259,16 @@ def ElectronMuonForDarkSearchesList(path):
     emu_cut += ' and useCMSFrame(pt) > 0.2'
 
     # Reconstruct the dimuon candidate
-    cutAndCopyList('e+:emu', 'e+:all', fromIP_cut + ' and ' + electronID_cut + ' and ' + theta_cut, path=path)
-    cutAndCopyList('mu+:emu', 'mu+:all', fromIP_cut + ' and ' + muonID_cut, path=path)
-    reconstructDecay(emu_name + ' -> e+:emu mu-:emu', emu_cut, path=path)
+    cutAndCopyList('e+:' + skim_label, 'e+:all', fromIP_cut + ' and ' + electronID_cut + ' and ' + theta_cut, path=path)
+    cutAndCopyList('mu+:' + skim_label, 'mu+:all', fromIP_cut + ' and ' + muonID_cut, path=path)
+    reconstructDecay(emu_name + ' -> e+:' + skim_label + ' mu-:' + skim_label, emu_cut, path=path)
 
     # And return the dimuon list
     emu_list.append(emu_name)
     return emu_list
 
 '''
-def DielectronForDarkSearchesList(path):
+def DielectronPlusMissingEnergyList(path):
     """
     Note:
         * Dielectron skim, needed for e+e- --> A' h'; A' --> e+e- + h' --> invisible and others
@@ -278,10 +276,8 @@ def DielectronForDarkSearchesList(path):
         * Physics channel: e+e- --> e+e-
         * Skim category: physics, dark sector
 
-    The skim list for the dielectron-based dark sector searches
-
     Parameters:
-        path (basf2.Path) the path to add the skim list builders
+        path (basf2.Path) the path to add the skim
 
     Returns:
         list containing the candidate names

@@ -488,27 +488,27 @@ class RetentionCheck(Module):
     The module stores its results in the static variable "summary".
 
     To monitor the effect of every module of an initial path, this module should be added after
-    each module of the path. A function was written (see below) to do it automatically (check its documentation):
+    each module of the path. A function was written (`skimExpertFunctions.pathWithRetentionCheck`) to do it:
 
-        path = pathWithRetentionCheck(particle_lists, path)
+    >>> path = pathWithRetentionCheck(particle_lists, path)
 
     After the path processing, the result of the RetentionCheck can be printed with
 
-        RetentionCheck.print_results()
+    >>> RetentionCheck.print_results()
 
     or plotted with (check the corresponding documentation)
 
-        RetentionCheck.plot_retention(...)
+    >>> RetentionCheck.plot_retention(...)
 
     and the summary dictionary can be accessed through
 
-        RetentionCheck.summary
+    >>> RetentionCheck.summary
 
     Authors:
 
         Cyrille Praz, Slavomira Stefkova
 
-    Keyword arguments:
+    Parameters:
 
         module_name -- name of the module after which the retention rate is measured
         module_number -- index of the module after which the retention rate is measured
@@ -610,9 +610,9 @@ class RetentionCheck(Module):
 
         Example of use (to be put after process(path)):
 
-            RetentionCheck.plot_retention('B+:semileptonic','skim:feiSLBplus','retention_plots/plot.pdf')
+        >>> RetentionCheck.plot_retention('B+:semileptonic','skim:feiSLBplus','retention_plots/plot.pdf')
 
-        Keyword arguments:
+        Parameters:
 
             particle_lists -- particle list name
             title -- plot title (overwritten by the -o argument in basf2)
@@ -674,24 +674,24 @@ def pathWithRetentionCheck(particle_lists, path):
 
     Example of use (to be put just before process(path)):
 
-        path = pathWithRetentionCheck(['B+:semileptonic'], path)
+    >>> path = pathWithRetentionCheck(['B+:semileptonic'], path)
 
     Warning: pathWithRetentionCheck(['B+:semileptonic'], path) does not modify path,
     it only returns a new one.
 
     After the path processing, the result of the RetentionCheck can be printed with
 
-        RetentionCheck.print_results()
+    >>> RetentionCheck.print_results()
 
     or plotted with (check the corresponding documentation)
 
-        RetentionCheck.plot_retention(...)
+    >>> RetentionCheck.plot_retention(...)
 
     and the summary dictionary can be accessed through
 
-        RetentionCheck.summary
+    >>> RetentionCheck.summary
 
-    Keyword arguments:
+    Parameters:
 
         particle_lists -- list of particle list names which will be tracked by RetentionCheck
         path -- initial path (it is not modified, see warning above and example of use)

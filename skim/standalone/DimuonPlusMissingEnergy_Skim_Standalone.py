@@ -8,30 +8,30 @@
 #
 #######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import basf2 as b2
+import modularAnalysis as ma
+import stdCharged as charged
+import skimExpertFunctions as skimExp
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 gb2_setuprel = 'release-03-02-00'
 
-dimuon_path = Path()
+dimuon_path = b2.Path()
 
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=dimuon_path)
+fileList = skimExp.get_test_file("mixedBGx1", "MC12")
+ma.inputMdstList('default', fileList, path=dimuon_path)
 
-stdMu('all', path=dimuon_path)
+charged.stdMu('all', path=dimuon_path)
 
-skimCode = encodeSkimName('DimuonPlusMissingEnergy')
+skimCode = skimExp.encodeSkimName('DimuonPlusMissingEnergy')
 
 from skim import dark
 dimuon_list = dark.DimuonPlusMissingEnergyList(path=dimuon_path)
 
-skimOutputUdst(skimCode, dimuon_list, path=dimuon_path)
-summaryOfLists(dimuon_list, path=dimuon_path)
+skimExp.skimOutputUdst(skimCode, dimuon_list, path=dimuon_path)
+skimExp.summaryOfLists(dimuon_list, path=dimuon_path)
 
-setSkimLogging(path=dimuon_path)
-process(dimuon_path)
+skimExp.setSkimLogging(path=dimuon_path)
+b2.process(dimuon_path)
 
-print(statistics)
+print(b2.statistics)

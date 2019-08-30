@@ -93,16 +93,16 @@ void PXDDQMEfficiencyModule::initialize()
 
 void PXDDQMEfficiencyModule::beginRun()
 {
-  for (auto& h : m_h_track_hits) h.second->Reset();
-  for (auto& h : m_h_matched_cluster) h.second->Reset();
-  for (auto& h : m_h_p) h.second->Reset();
-  for (auto& h : m_h_pt) h.second->Reset();
-  for (auto& h : m_h_su) h.second->Reset();
-  for (auto& h : m_h_sv) h.second->Reset();
-  for (auto& h : m_h_p2) h.second->Reset();
-  for (auto& h : m_h_pt2) h.second->Reset();
-  for (auto& h : m_h_su2) h.second->Reset();
-  for (auto& h : m_h_sv2) h.second->Reset();
+  for (auto& h : m_h_track_hits) if (h.second) h.second->Reset();
+  for (auto& h : m_h_matched_cluster) if (h.second) h.second->Reset();
+  for (auto& h : m_h_p) if (h.second) h.second->Reset();
+  for (auto& h : m_h_pt) if (h.second) h.second->Reset();
+  for (auto& h : m_h_su) if (h.second) h.second->Reset();
+  for (auto& h : m_h_sv) if (h.second) h.second->Reset();
+  for (auto& h : m_h_p2) if (h.second) h.second->Reset();
+  for (auto& h : m_h_pt2) if (h.second) h.second->Reset();
+  for (auto& h : m_h_su2) if (h.second) h.second->Reset();
+  for (auto& h : m_h_sv2) if (h.second) h.second->Reset();
 }
 
 void PXDDQMEfficiencyModule::event()

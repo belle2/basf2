@@ -180,6 +180,7 @@ void CDCSVGPlotter::drawSimHits(const std::string& storeArrayName,
   }
   std::vector<CDCSimHit> simHitsRelatedToHits;
   for (const CDCHit& hit : storeArray) {
+    // cppcheck-suppress useStlAlgorithm
     simHitsRelatedToHits.push_back(*hit.getRelated<CDCSimHit>("CDCSimHits"));
   }
   B2INFO("#CDCSimHits: " << storeArray.getEntries());
@@ -331,6 +332,7 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
   }
   std::vector<CDCSimHit*> simHits;
   for (const CDCHit& hit : hitStoreArray) {
+    // cppcheck-suppress useStlAlgorithm
     simHits.push_back(hit.getRelated<CDCSimHit>());
   }
 

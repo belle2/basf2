@@ -52,6 +52,8 @@ namespace Belle2 {
     // Add parameters
     addParam("useSampleTimeCalibration", m_useSampleTimeCalibration,
              "if true, use sample time calibration", true);
+    addParam("useAsicShiftCalibration", m_useAsicShiftCalibration,
+             "if true, use ASIC shifts calibration", true);
     addParam("useChannelT0Calibration", m_useChannelT0Calibration,
              "if true, use channel T0 calibration", true);
     addParam("useModuleT0Calibration", m_useModuleT0Calibration,
@@ -96,6 +98,8 @@ namespace Belle2 {
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
+    }
+    if (m_useAsicShiftCalibration) {
       if (not m_asicShift.isValid()) {
         B2FATAL("ASIC shifts calibration requested but not available for run "
                 << evtMetaData->getRun()
@@ -175,6 +179,8 @@ namespace Belle2 {
           time -= cal->getT0(moduleID, channel);
           statusBits |= TOPDigit::c_ChannelT0Calibrated;
         }
+      }
+      if (m_useAsicShiftCalibration) {
         auto asic = channel / 8;
         if (m_asicShift->isCalibrated(moduleID, asic)) {
           time -= m_asicShift->getT0(moduleID, asic);

@@ -60,6 +60,8 @@ namespace Belle2 {
              "name of TOPDigit store array", string(""));
     addParam("useSampleTimeCalibration", m_useSampleTimeCalibration,
              "if true, use sample time calibration", true);
+    addParam("useAsicShiftCalibration", m_useAsicShiftCalibration,
+             "if true, use ASIC shifts calibration", true);
     addParam("useChannelT0Calibration", m_useChannelT0Calibration,
              "if true, use channel T0 calibration", true);
     addParam("useModuleT0Calibration", m_useModuleT0Calibration,
@@ -138,6 +140,8 @@ namespace Belle2 {
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
+    }
+    if (m_useAsicShiftCalibration) {
       if (not m_asicShift.isValid()) {
         B2FATAL("ASIC shifts calibration requested but not available for run "
                 << evtMetaData->getRun()
@@ -357,13 +361,11 @@ namespace Belle2 {
         timeError = rawErr * sampleTimes->getTimeBin(window, sample); // [ns]
       }
 
-      // is Monte Carlo ?
-      // c_Production: temporary solution, since only MC is packed in this format for now
+      // is Monte Carlo with simplified digitization ?
 
-      bool isMC = (rawDigit.getDataType() == TOPRawDigit::c_MC or
-                   rawDigit.getDataType() == TOPRawDigit::c_Production);
+      bool isMC = (rawDigit.getDataType() == TOPRawDigit::c_MC);
 
-      // apply T0 calibration or subtract offset - depending on data/MC
+      // apply T0 calibration or subtract offset - depending on data (MC) or simplified MC
 
       double calErrorSq = 0;
       if (not isMC) { // data: apply T0 calibration
@@ -375,6 +377,8 @@ namespace Belle2 {
             calErrorSq += err * err;
             statusBits |= TOPDigit::c_ChannelT0Calibrated;
           }
+        }
+        if (m_useAsicShiftCalibration) {
           auto asic = channel / 8;
           if (m_asicShift->isCalibrated(moduleID, asic)) {
             time -= m_asicShift->getT0(moduleID, asic);

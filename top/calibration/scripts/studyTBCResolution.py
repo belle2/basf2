@@ -367,6 +367,7 @@ if dbaddress == 'none':
 else:
     print("Using TBC")
     converter.param('useSampleTimeCalibration', True)
+converter.param('useAsicShiftCalibration', False)
 converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
 converter.param('useCommonT0Calibration', False)

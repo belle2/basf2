@@ -117,177 +117,176 @@ namespace Belle2 {
     //Check for the particles in the lepton list to have a track associated
     if (Const::chargedStableSet.find(abs(m_pdgCode)) == Const::invalidParticle)
       B2ERROR("[BremsFinderModule] Invalid particle list. the particles in " << m_inputListName << " should have an associated track.");
-  }
 
-  //Get input photon particle list
-  m_gammaList.isRequired(m_gammaListName);
+    //Get input photon particle list
+    m_gammaList.isRequired(m_gammaListName);
 
-  decDes.init(m_gammaListName);
-  int pdg = decDes.getMother()->getPDGCode();
+    decDes.init(m_gammaListName);
+    int temp_pdg = decDes.getMother()->getPDGCode();
 
-  //Check that this is a gamma list
-  if (gpdg != Const::photon.getPDGCode())
-  {
-    B2ERROR("[BremsFinderModule] Invalid particle list. the particles in " << m_gammaListName << " should be photons!");
-  }
+    //Check that this is a gamma list
+    if (temp_pdg != Const::photon.getPDGCode())
+      B2ERROR("[BremsFinderModule] Invalid particle list. the particles in " << m_gammaListName << " should be photons!");
 
-  decDes.init(m_outputListName);
-  pdg = decDes.getMother()->getPDGCode();
-  // check the validity of output ParticleList name
-  if (m_inputListName == m_outputListName)
-  {
-    B2ERROR("[BremsFinderModule] Input and output particle list names are the same: " << m_inputListName);
-  } else if (pdg != m_pdgCode)
-  {
-    B2ERROR("[BremsFinderModule] The input and output particle list correspond to different particles: " << m_inputListName << " --> "
-            << m_outputListName);
-  }
-
-  // output particle
-  m_outputAntiListName = ParticleListName::antiParticleListName(m_outputListName);
-
-  // make output lists
-  DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
-  m_outputList.registerInDataStore(m_outputListName, flags);
-  m_outputAntiList.registerInDataStore(m_outputAntiListName, flags);
-
-  StoreArray<Particle> particles;
-  StoreArray<PIDLikelihood> pidlikelihoods;
-  particles.registerRelationTo(pidlikelihoods);
-}
-
-void BremsFinderModule::event()
-{
-  StoreArray<Particle> particles;
-  StoreArray<MCParticle> mcParticles;
-
-  RelationArray particlesToMCParticles(particles, mcParticles);
-
-  // new output particle list
-  m_outputList.create();
-  m_outputList->initialize(m_pdgCode, m_outputListName);
-
-  m_outputAntiList.create();
-  m_outputAntiList->initialize(-1 * m_pdgCode, m_outputAntiListName);
-  m_outputAntiList->bindAntiParticleList(*(m_outputList));
-
-  // Number of photons (calculate it here only once)
-  const unsigned int nGamma = m_gammaList->getListSize();
-
-  // loop over charged particles, correct them and add them to the output list
-  const unsigned int nLep = m_inputList->getListSize();
-  for (unsigned i = 0; i < nLep; i++) {
-    const Particle* lepton = m_inputList->getParticle(i);
-
-    //Get the track of this lepton
-    auto track = lepton->getTrack();
-
-    //... and get the bremsstrahlung clusters related to this track
-    const std::string relationName = "Bremsstrahlung";
-    RelationVector<ECLCluster> bremClusters = track->getRelationsFrom<ECLCluster>("", relationName);
-
-    std::vector<std::pair <double, Particle*> > selectedGammas;
-
-    unsigned j = 0;
-    for (auto bremCluster = bremClusters.begin(); bremCluster != bremClusters.end(); bremCluster++, j++) {
-      double weight = bremClusters.weight(j);
-
-      if (weight > m_maximumAcceptance) continue;
-
-      for (unsigned k = 0; k < nGamma; k++) {
-
-        Particle* gamma = m_gammaList->getParticle(k);
-
-        auto cluster = gamma->getECLCluster();
-        if (bremCluster->getClusterId() == cluster->getClusterId()) {
-          selectedGammas.push_back(std::make_pair(weight, gamma));
-        }
-
-      } // Closes for loop on gammas
-
-    } // Closes for loop on brem clusters
-
-    //The 4-momentum of the new lepton in the output particle list
-    TLorentzVector new4Vec = lepton->get4Vector();
-
-    //Sort weight-particle pairs by weight. Smaller weights go first
-    std::sort(selectedGammas.begin(), selectedGammas.end());
-
-    //Add to this 4-momentum those of the selected photon(s)
-    if (selectedGammas.size() > 0) { //for the case of more than one brems photon
-      if (m_addMultiplePhotons)
-        for (auto const& g : selectedGammas) {
-          new4Vec += g->get4Vector();
-        }
-    } else { //If not multiple gammas, add the photon with the smallest weight
-      new4Vec += selectedGammas[0].second->get4Vector();
+    decDes.init(m_outputListName);
+    temp_pdg = decDes.getMother()->getPDGCode();
+    // check the validity of output ParticleList name
+    if (m_inputListName == m_outputListName)
+      B2ERROR("[BremsFinderModule] Input and output particle list names are the same: " << m_inputListName);
+    else if (temp_pdg != m_pdgCode) {
+      B2ERROR("[BremsFinderModule] The input and output particle list correspond to different particles: " << m_inputListName << " --> "
+              << m_outputListName);
     }
 
-    //Create the new particle with the 4-momentum calculated before
-    Particle correctedLepton(new4Vec, lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,
-                             track->getArrayIndex());
+    // output particle
+    m_outputAntiListName = ParticleListName::antiParticleListName(m_outputListName);
 
-    //And add the original lepton as its daughter
-    correctedLepton.appendDaughter(lepton, false);
+    // make output lists
+    DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
+    m_outputList.registerInDataStore(m_outputListName, flags);
+    m_outputAntiList.registerInDataStore(m_outputAntiListName, flags);
 
-    const TMatrixFSym& lepErrorMatrix = lepton->getMomentumVertexErrorMatrix();
-    TMatrixFSym corLepMatrix(lepErrorMatrix);
+    StoreArray<Particle> particles;
+    StoreArray<PIDLikelihood> pidlikelihoods;
+    particles.registerRelationTo(pidlikelihoods);
+  }
 
-    bool bremsGammaFound = false;
-    int photonIndex = 0;
-    //Now, if there are any, add the brems photons as daughters as well. As before, we distinguish between the multiple and only one brems photon cases
-    if (selectedGammas.size() > 0) {
-      bremsGammaFound = true;
-      if (m_addMultiplePhotons) {
-        for (auto const& bremsPair : selectedGammas) {
-          //Add the weights as extra info of the mother
-          Particle* bremsGamma = bremsPair.second;
+  void BremsFinderModule::event()
+  {
+    StoreArray<Particle> particles;
+    StoreArray<MCParticle> mcParticles;
+
+    RelationArray particlesToMCParticles(particles, mcParticles);
+
+    // new output particle list
+    m_outputList.create();
+    m_outputList->initialize(m_pdgCode, m_outputListName);
+
+    m_outputAntiList.create();
+    m_outputAntiList->initialize(-1 * m_pdgCode, m_outputAntiListName);
+    m_outputAntiList->bindAntiParticleList(*(m_outputList));
+
+    // Number of photons (calculate it here only once)
+    const unsigned int nGamma = m_gammaList->getListSize();
+
+    // loop over charged particles, correct them and add them to the output list
+    const unsigned int nLep = m_inputList->getListSize();
+    for (unsigned i = 0; i < nLep; i++) {
+      const Particle* lepton = m_inputList->getParticle(i);
+
+      //Get the track of this lepton
+      auto track = lepton->getTrack();
+
+      //... and get the bremsstrahlung clusters related to this track
+      const std::string relationName = "Bremsstrahlung";
+      RelationVector<ECLCluster> bremClusters = track->getRelationsFrom<ECLCluster>("", relationName);
+
+      std::vector<std::pair <double, Particle*> > selectedGammas;
+
+      unsigned j = 0;
+      for (auto bremCluster = bremClusters.begin(); bremCluster != bremClusters.end(); bremCluster++, j++) {
+        double weight = bremClusters.weight(j);
+
+        if (weight > m_maximumAcceptance) continue;
+
+        for (unsigned k = 0; k < nGamma; k++) {
+
+          Particle* gamma = m_gammaList->getParticle(k);
+          auto cluster = gamma->getECLCluster();
+
+          if (bremCluster->getClusterId() == cluster->getClusterId()) {
+            selectedGammas.push_back(std::make_pair(weight, gamma));
+          }
+
+        } // Closes for loop on gammas
+
+      } // Closes for loop on brem clusters
+
+      //The 4-momentum of the new lepton in the output particle list
+      TLorentzVector new4Vec = lepton->get4Vector();
+
+      //Sort weight-particle pairs by weight. Smaller weights go first
+      std::sort(selectedGammas.begin(), selectedGammas.end());
+
+      //Add to this 4-momentum those of the selected photon(s)
+      if (selectedGammas.size() > 0) { //for the case of more than one brems photon
+        if (m_addMultiplePhotons) {
+          for (auto const& bremsPair : selectedGammas) {
+            Particle* g = bremsPair.second;
+            new4Vec += g->get4Vector();
+          }
+        } else { //If not multiple gammas, add the photon with the smallest weight
+          Particle* g = selectedGammas[0].second;
+          new4Vec += g->get4Vector();
+        }
+      }
+
+      //Create the new particle with the 4-momentum calculated before
+      Particle correctedLepton(new4Vec, lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,
+                               track->getArrayIndex());
+
+      //And add the original lepton as its daughter
+      correctedLepton.appendDaughter(lepton, false);
+
+      const TMatrixFSym& lepErrorMatrix = lepton->getMomentumVertexErrorMatrix();
+      TMatrixFSym corLepMatrix(lepErrorMatrix);
+
+      bool bremsGammaFound = false;
+      int photonIndex = 0;
+      //Now, if there are any, add the brems photons as daughters as well. As before, we distinguish between the multiple and only one brems photon cases
+      if (selectedGammas.size() > 0) {
+        bremsGammaFound = true;
+        if (m_addMultiplePhotons) {
+          for (auto const& bremsPair : selectedGammas) {
+            //Add the weights as extra info of the mother
+            Particle* bremsGamma = bremsPair.second;
+            std::string extraInfoName = "bremsWeightWithPhoton" + std::to_string(photonIndex);
+            correctedLepton.addExtraInfo(extraInfoName, bremsPair.first);
+            photonIndex++;
+
+            const TMatrixFSym& gammaErrorMatrix = bremsGamma->getMomentumVertexErrorMatrix();
+            for (int irow = 0; irow <= 3; irow++) {
+              for (int icol = irow; icol <= 3; icol++) corLepMatrix(irow, icol) += gammaErrorMatrix(irow, icol);
+            }
+            correctedLepton.appendDaughter(bremsGamma, false);
+            B2DEBUG(1, "[BremsFinderModule] Found a bremsstrahlung gamma and added its 4-vector to the charged particle");
+          }
+        } else {
+          auto bestPair = selectedGammas[0];
+          Particle* bestGamma = bestPair.second;
           std::string extraInfoName = "bremsWeightWithPhoton" + std::to_string(photonIndex);
-          correctedLepton.addExtraInfo(extraInfoName, bremsPair.first);
-          photonIndex++;
+          correctedLepton.addExtraInfo(extraInfoName, bestPair.first);
 
-          const TMatrixFSym& gammaErrorMatrix = bremsGamma->getMomentumVertexErrorMatrix();
+          const TMatrixFSym& gammaErrorMatrix = bestGamma->getMomentumVertexErrorMatrix();
           for (int irow = 0; irow <= 3; irow++) {
             for (int icol = irow; icol <= 3; icol++) corLepMatrix(irow, icol) += gammaErrorMatrix(irow, icol);
           }
-          correctedLepton.appendDaughter(bremsGamma, false);
+          correctedLepton.appendDaughter(bestGamma, false);
           B2DEBUG(1, "[BremsFinderModule] Found a bremsstrahlung gamma and added its 4-vector to the charged particle");
         }
-      } else {
-        Particle* bestGamma = selectedGammas[0].second;
-        std::string extraInfoName = "bremsWeightWithPhoton" + std::to_string(photonIndex);
-        correctedLepton.addExtraInfo(extraInfoName, selectedGammas[0].first);
-
-        const TMatrixFSym& gammaErrorMatrix = bestGamma->getMomentumVertexErrorMatrix();
-        for (int irow = 0; irow <= 3; irow++) {
-          for (int icol = irow; icol <= 3; icol++) corLepMatrix(irow, icol) += gammaErrorMatrix(irow, icol);
-        }
-        correctedLepton.appendDaughter(bestGamma, false);
-        B2DEBUG(1, "[BremsFinderModule] Found a bremsstrahlung gamma and added its 4-vector to the charged particle");
       }
-    }
 
-    correctedLepton.setMomentumVertexErrorMatrix(corLepMatrix);
+      correctedLepton.setMomentumVertexErrorMatrix(corLepMatrix);
 
-    // add the info from original lepton to the new lepton
-    correctedLepton.setVertex(lepton->getVertex());
-    correctedLepton.setPValue(lepton->getPValue());
-    correctedLepton.addExtraInfo("bremsCorrected", float(bremsGammaFound));
+      // add the info from original lepton to the new lepton
+      correctedLepton.setVertex(lepton->getVertex());
+      correctedLepton.setPValue(lepton->getPValue());
+      correctedLepton.addExtraInfo("bremsCorrected", float(bremsGammaFound));
 
-    // add the mc relation
-    Particle* newLepton = particles.appendNew(correctedLepton);
-    const MCParticle* mcLepton = lepton->getRelated<MCParticle>();
-    const PIDLikelihood* pid = lepton->getPIDLikelihood();
+      // add the mc relation
+      Particle* newLepton = particles.appendNew(correctedLepton);
+      const MCParticle* mcLepton = lepton->getRelated<MCParticle>();
+      const PIDLikelihood* pid = lepton->getPIDLikelihood();
 
-    if (pid) newLepton->addRelationTo(pid);
+      if (pid) newLepton->addRelationTo(pid);
 
-    if (mcLepton != nullptr) newLepton->addRelationTo(mcLepton);
+      if (mcLepton != nullptr) newLepton->addRelationTo(mcLepton);
 
-    m_outputList->addParticle(newLepton);
+      m_outputList->addParticle(newLepton);
 
-  } //Closes for loop on leptons
+    } //Closes for loop on leptons
 
-} //Close event()
+  } //Close event()
 
 
 } // end Belle2 namespace

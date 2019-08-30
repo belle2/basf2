@@ -373,7 +373,7 @@ def bremsFinder(
 
     Warning:
         This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
-        up to and including MC12 and proc9 **do not** contain this. Newer production campaings (proc10 and MC13) will.
+        up to and including MC12 and proc9 **do not** contain this. Newer production campaigns (from proc10 and MC13) will.
 
     Information:
         Please note that a new particle is always generated, with the old particle and -if found- one or more

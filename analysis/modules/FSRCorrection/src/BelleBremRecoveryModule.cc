@@ -51,7 +51,10 @@ namespace Belle2 {
 
   {
     // set module description (e.g. insert text)
-    setDescription("Takes the charged particle from the given charged particle list and copies them to the output list and adds the 4-vector of  all the photons (considered as radiative) to the charged particle, if the given criteria for maximum angle and minimum energy are fulfilled.");
+    setDescription(R"DOC(Takes the charged particle from the given charged particle list(`inputListName`) and
+                   copies them to the output list(`outputListName`) and adds the 4-vector of  all the photons
+                   from `gammaListName` (considered as radiative) to the charged particle, if the given
+                   criteria for maximum angle(`angleThreshold`) and minimum energy(`minimumEnergy`) are fulfilled.)DOC");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
@@ -121,7 +124,6 @@ namespace Belle2 {
     m_outputAntiparticleList->initialize(-1 * m_pdgCode, m_outputAntiListName);
     m_outputAntiparticleList->bindAntiParticleList(*(m_outputparticleList));
 
-    std::unordered_map<int, int> usedGammas;
     // loop over charged particles, correct them and add them to the output list
     const unsigned int nLep = m_inputparticleList->getListSize();
     for (unsigned i = 0; i < nLep; i++) {
@@ -135,14 +137,14 @@ namespace Belle2 {
         Particle* gamma = m_gammaList->getParticle(j);
         // check if gamma energy is within allowed energy range
         if (gamma->getEnergy() < m_minimumEnergy) continue;
-        //This will prevent double counting of bremphoton
-        bool NotgammaUsed = usedGammas.find(gamma->getMdstArrayIndex()) == usedGammas.end();
-        if (!NotgammaUsed) continue;
         // get angle (in lab system)
         TVector3 pi = lepton->getMomentum();
         TVector3 pj = gamma->getMomentum();
         double angle = (pi.Angle(pj));
+        //Instead of first-come-first-serve, serve all charged particle equally.
+        // https://indico.belle2.org/event/946/contributions/4007/attachments/1946/2967/SCunliffe190827.pdf
         if (m_angleThres > angle) {
+          gamma->removeExtraInfo();
           gamma->addExtraInfo("theta_e_gamma", angle);
           selectedGammas.push_back(gamma);
         }
@@ -166,17 +168,16 @@ namespace Belle2 {
                                lepton->getTrack()->getArrayIndex());
       correctedLepton.appendDaughter(lepton, false);
 
+      //Calculating matrix element of corrected charged particle
       const TMatrixFSym& lepErrorMatrix = lepton->getMomentumVertexErrorMatrix();
       TMatrixFSym corLepMatrix = lepErrorMatrix;
       for (auto const& fsrgamma : selectedGammas) {
-        usedGammas[fsrgamma->getMdstArrayIndex()] = fsrgamma->getMdstArrayIndex();
-        //this extrainfo associated to the brephoton provides angle with the charged particle
         const TMatrixFSym& fsrErrorMatrix = fsrgamma->getMomentumVertexErrorMatrix();
         for (int irow = 0; irow <= 3 ; irow++)
           for (int icol = irow; icol <= 3; icol++)
             corLepMatrix(irow, icol) += fsrErrorMatrix(irow, icol);
         correctedLepton.appendDaughter(fsrgamma, false);
-        B2INFO("[BelleBremRecoveryModule] Found a radiative gamma and added its 4-vector to the charge particle");
+        B2DEBUG(19, "[BelleBremRecoveryModule] Found a radiative gamma and added its 4-vector to the charge particle");
       }
       correctedLepton.setMomentumVertexErrorMatrix(corLepMatrix);
       correctedLepton.setVertex(lepton->getVertex());

@@ -861,6 +861,7 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
             WeightFileIdentifier=self.get_input_file_names(
                 FullTrackQETeacherTask.weightfile_identifier
             )[0],
+            collectEventFeatures=True,
         )
 
 
@@ -1290,7 +1291,7 @@ class MasterTask(b2luigi.WrapperTask):
         for exclude_variables in [ntrack_variables]:
             for cdc_training_target in [
                 "truth_track_is_matched",
-                "truth"  # truth includes clones as signal
+                # "truth"  # truth includes clones as signal
             ]:
                 yield FullTrackQEValidationPlotsTask(
                     cdc_training_target=cdc_training_target,
@@ -1299,16 +1300,16 @@ class MasterTask(b2luigi.WrapperTask):
                     n_events_testing=self.n_events_testing,
                 )
 
-                yield CDCQEValidationPlotsTask(
-                    training_target=cdc_training_target,
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                )
+                # yield CDCQEValidationPlotsTask(
+                #     training_target=cdc_training_target,
+                #     n_events_training=self.n_events_training,
+                #     n_events_testing=self.n_events_testing,
+                # )
 
-                yield VXDQEValidationPlotsTask(
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                )
+                # yield VXDQEValidationPlotsTask(
+                #     n_events_training=self.n_events_training,
+                #     n_events_testing=self.n_events_testing,
+                # )
 
                 if self.run_mva_evaluate:
                     yield FullTrackQEEvaluationTask(

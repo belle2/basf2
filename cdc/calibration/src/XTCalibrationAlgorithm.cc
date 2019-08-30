@@ -365,8 +365,14 @@ void XTCalibrationAlgorithm::write()
             }
             par[0] = 0; par[1] = 0.004; par[2] = 0; par[3] = 0; par[4] = 0; par[5] = 0; par[6] = m_par6[l]; par[7] = 0.00001;
           } else {
-            m_xtFunc[l][lr][al][th]->GetParameters(par);
-            nfitted += 1;
+            if (par[1] < 0) {
+              for (int i = 0; i < 8; ++i) {
+                par[i] = m_xtPrior[l][lr][al][th][i];
+              }
+            } else {
+              m_xtFunc[l][lr][al][th]->GetParameters(par);
+              nfitted += 1;
+            }
           }
           std::vector<float> xtbuff;
           for (int i = 0; i < 8; ++i) {

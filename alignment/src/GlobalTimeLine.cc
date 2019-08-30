@@ -353,8 +353,8 @@ namespace Belle2 {
 
             for (auto& event : std::get<1>(params_events)) {
               auto eventIndex = eventIndices[event];
-              if (eventIndex > 0)
-                label.registerTimeDependent(eventIndex);
+              //if (eventIndex > 0)
+              label.registerTimeDependent(eventIndex);
 
             }
           }

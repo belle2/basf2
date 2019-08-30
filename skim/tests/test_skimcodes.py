@@ -23,7 +23,7 @@ class TestSkimCodes(unittest.TestCase):
 
     def test_unique_names(self):
         """check that there aren't two skims registered with the same name"""
-        codes = [name for _, name in skim_registry]
+        names = [name for _, name in skim_registry]
         self.assertEqual(len(names), len(set(names)), "Duplicated skim name")
 
     def test_encode(self):

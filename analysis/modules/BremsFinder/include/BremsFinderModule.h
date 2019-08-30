@@ -14,7 +14,6 @@
 
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/Particle.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -76,7 +75,7 @@ namespace Belle2 {
     double m_maximumAcceptance =
       3.0f;  /**< photons whose clusters have relation weights higher than this will not be used for bremsstrahlung correction of the track */
     bool m_addMultiplePhotons =
-      false; /**<In case there is more than one brems photon, use only the best one (based in the weight of the relation), or all of them for correcting the lepton momentum */
+      false; /**<In case there is more than one brems photon, use only the best one (based on the weight of the relation), or all of them for correcting the lepton momentum */
     bool m_writeOut = false;  /**< Write the output particle list in the final file? */
 
   };

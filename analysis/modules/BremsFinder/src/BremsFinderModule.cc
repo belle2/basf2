@@ -232,11 +232,11 @@ namespace Belle2 {
       TMatrixFSym corLepMatrix(lepErrorMatrix);
 
       bool bremsGammaFound = false;
-      int photonIndex = 0;
       //Now, if there are any, add the brems photons as daughters as well. As before, we distinguish between the multiple and only one brems photon cases
       if (selectedGammas.size() > 0) {
         bremsGammaFound = true;
         if (m_addMultiplePhotons) {
+          int photonIndex = 0;
           for (auto const& bremsPair : selectedGammas) {
             //Add the weights as extra info of the mother
             Particle* bremsGamma = bremsPair.second;
@@ -254,7 +254,7 @@ namespace Belle2 {
         } else {
           auto bestPair = selectedGammas[0];
           Particle* bestGamma = bestPair.second;
-          std::string extraInfoName = "bremsWeightWithPhoton" + std::to_string(photonIndex);
+          std::string extraInfoName = "bremsWeightWithPhoton0";
           correctedLepton.addExtraInfo(extraInfoName, bestPair.first);
 
           const TMatrixFSym& gammaErrorMatrix = bestGamma->getMomentumVertexErrorMatrix();

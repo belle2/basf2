@@ -26,7 +26,7 @@ variables.addAlias('d2_p_CMSframe', 'useCMSFrame(daughter(2,p))')
 from stdCharged import *
 
 
-def B0hadronic(path):
+def B0Hadronic(path):
     """
     Note:
         * **Skim description**: Hadronic :math:`B^0` tag FEI skim for
@@ -48,9 +48,9 @@ def B0hadronic(path):
 
     Example usage:
 
-    >>> from skim.fei import runFEIforB0Hadronic, B0hadronic
+    >>> from skim.fei import runFEIforB0Hadronic, B0Hadronic
     >>> runFEIforB0Hadronic(path)
-    >>> B0hadronic(path)
+    >>> B0Hadronic(path)
     ['B0:generic']
 
     Tag modes
@@ -107,15 +107,15 @@ def B0hadronic(path):
         path (`basf2.Path`): the path to add the skim list builders.
 
     Returns:
-        ``B0hadronicList``, a Python list containing the string
+        ``B0HadronicList``, a Python list containing the string
         :code:`'B0:generic'`, the name of the particle list for
         hadronic :math:`B^0` skim candidates.
     """
 
     applyCuts('B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001', path=path)
 
-    B0hadronicList = ['B0:generic']
-    return B0hadronicList
+    B0HadronicList = ['B0:generic']
+    return B0HadronicList
 
 
 def BplusHadronic(path):
@@ -215,7 +215,7 @@ def runFEIforB0Hadronic(path):
     Reconstruct hadronic :math:`B^0` tags using the generically
     trained FEI. Skim pre-cuts are applied before running the FEI.
 
-    Remaining skim cuts are applied by `skim.fei.B0hadronic`.
+    Remaining skim cuts are applied by `skim.fei.B0Hadronic`.
 
     Parameters:
         path (`basf2.Path`): the path to add the skim list builders.
@@ -225,7 +225,7 @@ def runFEIforB0Hadronic(path):
         supplied path.
 
     See also:
-        `skim.fei.B0hadronic` for skim details, FEI training, list of
+        `skim.fei.B0Hadronic` for skim details, FEI training, list of
         reconstructed tag modes, and pre-cuts applied.
     """
     # Pre-selection cuts
@@ -311,7 +311,7 @@ def runFEIforHadronicCombined(path):
     the FEI (the pre-cuts are the same for all FEI skims, and are
     documented in their respective list functions).
 
-    Remaining cuts for skims are applied by `skim.fei.B0hadronic` and
+    Remaining cuts for skims are applied by `skim.fei.B0Hadronic` and
     `skim.fei.BplusHadronic`.
 
     Parameters:
@@ -322,7 +322,7 @@ def runFEIforHadronicCombined(path):
         :code:`B+:generic` for supplied path.
 
     See also:
-        `skim.fei.B0hadronic` and `skim.fei.BplusHadronic` for skim
+        `skim.fei.B0Hadronic` and `skim.fei.BplusHadronic` for skim
         details, FEI training, lists of reconstructed tag modes, and
         pre-cuts applied.
     """
@@ -684,7 +684,7 @@ def runFEIforSkimCombined(path):
     is run with ``removeSLD=True`` flag to deactivate rare but
     time-intensive SL :math:`D` channels in skim.
 
-    Remaining cuts for skims are applied by `skim.fei.B0hadronic`,
+    Remaining cuts for skims are applied by `skim.fei.B0Hadronic`,
     `skim.fei.BplusHadronic`, `skim.fei.B0SL`, and `skim.fei.BplusSL`.
 
     Parameters:
@@ -696,7 +696,7 @@ def runFEIforSkimCombined(path):
         :code:`B0:semileptonic` for supplied path.
 
     See also:
-        `skim.fei.B0hadronic`, `skim.fei.BplusHadronic`,
+        `skim.fei.B0Hadronic`, `skim.fei.BplusHadronic`,
         `skim.fei.B0SL`, and `skim.fei.BplusSL` for skim details, FEI
         training, lists of reconstructed tag modes, and pre-cuts
         applied.

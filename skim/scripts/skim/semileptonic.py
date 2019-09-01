@@ -53,14 +53,14 @@ def SemileptonicList(path):
     ['B+:SL1', 'B+:SL2', 'B+:SL3', 'B+:SL4', 'B0:SL1', 'B0:SL2', 'B0:SL3', 'B0:SL4']
 
     Reconstructed decays
-        * B+ -> anti-D0 e+
-        * B+ -> anti-D0 mu+
-        * B+ -> anti-D*0 e+
-        * B+ -> anti-D*0 mu+
-        * B0 ->  D- e+
-        * B0 ->  D- mu+
-        * B0 ->  D*- e+
-        * B0 ->  D*- mu+
+        * :math:`B^+ \\to \\overline{D}^{0} e^+`
+        * :math:`B^+ \\to \\overline{D}^{0} \\mu^+`
+        * :math:`B^+ \\to \\overline{D}^{*0} e^+`
+        * :math:`B^+ \\to \\overline{D}^{*0} \\mu^+`
+        * :math:`B^0 \\to  D^{-} e^+`
+        * :math:`B^0 \\to  D^{-} \\mu^+`
+        * :math:`B^0 \\to  D^{*-} e^+`
+        * :math:`B^0 \\to  D^{*-} \\mu^+`
 
     Cuts applied
         * :math:`p_{\\ell} > 0.35\\,\\text{GeV}`

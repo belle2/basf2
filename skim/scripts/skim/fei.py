@@ -383,6 +383,7 @@ def B0SL(path):
     Tag modes
         SL :math:`B^0` tags are reconstructed. Hadronic :math:`B` with
         SL :math:`D` are not reconstructed.
+
         * :math:`B^0 \\to D^- \\mu^+ \\nu_{e}`
         * :math:`B^0 \\to D^- \\mu^+ \\nu_{\\mu}`
         * :math:`B^0 \\to D^{-*} \\mu^+ \\nu_{e}`

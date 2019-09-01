@@ -19,7 +19,7 @@ def LeptonicList(path):
     """
     Note:
         * **Skim description**: Skim for leptonic analyses,
-          :math:`B_{\\sig}^-\\to\\ell\\nu` (:math:`\\ell=e,\\mu`).
+          :math:`B_{\\text{sig}}^-\\to\\ell\\nu`, where :math:`\\ell=e,\\mu`.
         * **Skim LFN code**: 11130300
         * **Working Group**: (Semi-)Leptonic and Missing Energy
           Working Group (WG1)
@@ -39,13 +39,13 @@ def LeptonicList(path):
 
     Reconstructed decays
         * :math:`B^- \\to e^-`
-        * :math:`B^- \\to mu^-`
+        * :math:`B^- \\to \\mu^-`
 
     Cuts applied
         * :math:`p_{\\ell}^{*} > 2\\,\\text{GeV}` in CMS Frame
         * :math:`\\text{electronID} > 0.5`
         * :math:`\\text{muonID} > 0.5`
-        * :math:`n_{tracks} \geq 3`
+        * :math:`n_{\\text{tracks}} \geq 3`
 
     Parameters:
         path (`basf2.Path`): the path to add the skim list builders.
@@ -53,7 +53,7 @@ def LeptonicList(path):
     Returns:
         ``lepList``, a Python list containing the strings
         :code:`'B-:L0'` and :code:`'B-:L1'`, the names of the particle
-        lists for hadronic :math:`B^-` skim candidates.
+        lists for leptonic :math:`B^-` skim candidates.
     """
     __authors__ = [
         "Phillip Urquijo"

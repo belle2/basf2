@@ -18,8 +18,8 @@ def SemileptonicList(path):
     """
     Note:
         * **Skim description**: skim to be used initially for
-        semileptonic :math:`B: decays (:math:`B \\to D \\ell\\nu,`
-        where :math:`\\ell=e,\\mu`)
+          semileptonic :math:`B: decays (:math:`B \\to D \\ell\\nu,`
+          where :math:`\\ell=e,\\mu`)
         * **Skim LFN code**: 11160200
         * **Working Group**: (Semi-)Leptonic and Missing Energy
           Working Group (WG1)
@@ -66,7 +66,7 @@ def SemileptonicList(path):
         * :math:`p_{\\ell} > 0.35\\,\\text{GeV}`
         * :math:`5.24 < M_{\\text{bc}} < 5.29`
         * :math:`|\\Delta E | < 0.5`
-        * :math:`n_{tracks} > 4`
+        * :math:`n_{\\text{tracks}} > 4`
 
     Parameters:
         path (`basf2.Path`): the path to add the skim list builders.
@@ -76,7 +76,7 @@ def SemileptonicList(path):
         :code:`B+:SL1`, :code:`B+:SL2`, :code:`B+:SL3`,
         :code:`B+:SL4`, :code:`B0:SL1`, :code:`B0:SL2`,
         :code:`B0:SL3`, and :code:`B0:SL4`, the names of the particle
-        lists for semileptonic :math:`B^0` and :math:`B^-` skim
+        lists for semileptonic :math:`B^+` and :math:`B^0` skim
         candidates.
     """
 

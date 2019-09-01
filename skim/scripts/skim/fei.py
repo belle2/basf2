@@ -465,12 +465,12 @@ def B0SL(path):
 
     """
     # Apply cuts
-    B0SLcuts = ['log10_sigProb>-2.4', '-4.0<cosThetaBY<3.0', 'dmID<8',
-                # Decay mode IDs 0--3 (B -> D l) need to be treated differently to
-                # IDs 4--7 (B -> D pi l) to make a cut on tag-side lepton momentum.
-                '[[dmID<4 and d1_p_CMSframe>1.0] or [dmID>=4 and d2_p_CMSframe>1.0]]']
-
-    applyCuts('B0:semileptonic', ' and '.join(B0SLcuts), path=path)
+    applyCuts('B0:semileptonic', 'log10_sigProb>-2.4', path=path)
+    applyCuts('B0:semileptonic', '-4.0<cosThetaBY<3.0', path=path)
+    applyCuts('B0:semileptonic', 'dmID<8', path=path)
+    # Decay mode IDs 0--3 (B -> D l) need to be treated differently to
+    # IDs 4--7 (B -> D pi l) to make a cut on tag-side lepton momentum
+    applyCuts('B0:semileptonic', '[[dmID<4 and d1_p_CMSframe>1.0] or [dmID>=4 and d2_p_CMSframe>1.0]]', path=path)
 
     BtagList = ['B0:semileptonic']
     return BtagList

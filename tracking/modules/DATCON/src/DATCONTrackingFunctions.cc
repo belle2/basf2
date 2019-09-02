@@ -192,6 +192,7 @@ DATCONTrackingModule::trackCandMerger()
             uTrackCandCopy.erase(it_in);
             break;
           }
+          // cppcheck-suppress redundantAssignment
           cancelflag = true;
         }
 
@@ -234,6 +235,7 @@ DATCONTrackingModule::trackCandMerger()
             vTrackCandCopy.erase(it_in);
             break;
           }
+          // cppcheck-suppress redundantAssignment
           cancelflag = true;
         }
 
@@ -312,6 +314,7 @@ DATCONTrackingModule::trackMerger()
           TracksCopy.erase(it_in);
           break;
         }
+        // cppcheck-suppress redundantAssignment
         cancelflag = true;
       }
 

@@ -9,8 +9,8 @@
  **************************************************************************/
 
 #pragma once
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <bklm/geometry/GeometryPar.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/geometry/GeometryPar.h>
 
 
 // ROOT includes
@@ -34,7 +34,7 @@ namespace Belle2 {
     BKLMRecoHit() {};
 
     /** Construct BKLMRecoHit from a BKLMHit2d */
-    BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit* trackCandHit = NULL);
+    explicit BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit* trackCandHit = NULL);
 
     /** Destructor. */
     virtual ~BKLMRecoHit() {}
@@ -86,8 +86,8 @@ namespace Belle2 {
 
     unsigned short m_moduleID; /**< Unique module identifier.*/
 
-    /** Forward. */
-    int m_Forward;
+    /** Section number. */
+    int m_Section;
 
     /** Sector number. */
     int m_Sector;

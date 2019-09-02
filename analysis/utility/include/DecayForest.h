@@ -32,7 +32,7 @@ namespace Belle2 {
      * @param removeRadiativeGammaFlag remove radiative photons from decay string. Handle with care:
      * In the decay B+ --> e+ nu_e gamma, the gamma would be removed although this might be your signal.
      */
-    DecayForest(const std::string& full_decaystring, bool save_memory = true, bool removeRadiativeGammaFlag = false);
+    explicit DecayForest(const std::string& full_decaystring, bool save_memory = true, bool removeRadiativeGammaFlag = false);
 
     /**
      * Return nth tree (0 is the reconstructed tree)

@@ -625,7 +625,7 @@ enum KFitError::ECode MassPointingVertexFitKFit::updateMother(Particle* mother)
   int ndf = getNDF();
   double prob = TMath::Prob(chi2, ndf);
   mother->addExtraInfo("ndf", ndf);
-  mother->addExtraInfo("chisq", chi2);
+  mother->addExtraInfo("chiSquared", chi2);
   mother->updateMomentum(
     CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
     CLHEPToROOT::getTVector3(kmm.getMotherPosition()),

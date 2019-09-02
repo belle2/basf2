@@ -34,6 +34,7 @@ namespace Belle2 {
       public std::vector<const TRGCDCWire*> {
 
   public:// enum
+    /// enum boardType
     enum boardType {
       innerInside  = 0,       // inner of the inner-most super layer
       innerOutside = 1,       // outer of the inner-most super layer
@@ -112,6 +113,7 @@ namespace Belle2 {
 
   public:// Configuration
 
+    /// push back TRGCDCWire for this Front-end
     void push_back(const TRGCDCWire*);
 
     /// dumps contents. "message" is to select information to
@@ -119,11 +121,15 @@ namespace Belle2 {
     void dump(const std::string& message = "",
               const std::string& pre = "") const;
 
-    //Dump all the details of _mosb into a .log file, do it in the end of simulate()
+    /// Dump all the details of _mosb into a .log file, do it in the end of simulate()
     void dump_log(void) const;
+    /// Dump all the details of _mosb into a .log file, for innerInside FE
     void dump_log_innerInside(void) const;
+    /// Dump all the details of _mosb into a .log file, for innerOutside FE
     void dump_log_innerOutside(void) const;
+    /// Dump all the details of _mosb into a .log file, for outerInside FE
     void dump_log_outerInside(void) const;
+    /// Dump all the details of _mosb into a .log file, for outerOutside FE
     void dump_log_outerOutside(void) const;
 
 //  public: // allow Merger class to access FrontEnd data

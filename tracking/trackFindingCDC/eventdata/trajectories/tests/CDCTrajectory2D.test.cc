@@ -52,7 +52,7 @@ TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory2D_reconstruct)
   double localPhi0 = M_PI / 3;
   double localCurv = -2.0;
   double localImpact = 0.0;
-  PerigeeCircle localPerigeeCircle(localCurv, localPhi0, localImpact);
+  UncertainPerigeeCircle localPerigeeCircle(localCurv, localPhi0, localImpact);
   Vector3D localOrigin(0.5, 1, -5);
 
   Vector3D positionOnWire = wireLine.nominalPos3DAtZ(localOrigin.z());

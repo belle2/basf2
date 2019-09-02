@@ -57,13 +57,14 @@ namespace Belle2 {
     /** destructor, empty because we don't allocate memory explicitly. */
     ~Bitstream() { };
 
-    // accessors
+    //! accessors
     const SignalBus& signal()
     {
       return m_signal;
     }
 
   protected:
+    //! SignalBus of the Bitstream
     SignalBus m_signal;
 
     //! Needed to make the ROOT object storable

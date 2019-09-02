@@ -24,7 +24,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 
 #include <string>
 
@@ -65,9 +65,9 @@ namespace Belle2 {
     virtual void event() override;
 
     /**
-     * returns the BeamParameters object
+     * returns the BeamSpot object
      */
-    const BeamParameters& getBeamParameters() const { return *m_beamParams; }
+    const BeamSpot& getBeamSpot() const { return *m_beamSpotDB; }
 
 
   private:
@@ -95,7 +95,7 @@ namespace Belle2 {
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     bool m_MCInfo;                /**< true if user wants to retrieve MC information out from the tracks used    in the fit */
     double m_shiftZ;              /**< parameter for testing the systematic errror from the IP measurement*/
-    DBObjPtr<BeamParameters> m_beamParams; /**< Beam parameters */
+    DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object*/
     int m_FitType;                /**< fit algo used  */
     double m_tagVl;               /**< tagV component in the boost direction  */
     double m_truthTagVl;          /**< MC tagV component in the boost direction  */

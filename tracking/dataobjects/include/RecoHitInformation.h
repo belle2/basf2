@@ -13,8 +13,8 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <eklm/dataobjects/EKLMAlignmentHit.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -85,6 +85,9 @@ namespace Belle2 {
       c_LocalTrackFinder,
       c_SegmentTrackCombiner,
       c_VXDTrackFinder,
+      // CDC hit finders using a CKF (seeded from SVD or ECL)
+      c_SVDtoCDCCKF,
+      c_ECLtoCDCCKF,
       // Belle I's track finder
       c_Trasan,
       c_other

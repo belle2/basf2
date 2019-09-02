@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Particle gun muon events for EKLM, only EKLM digitization and reconstruction.
+# Particle gun muon events for KLM, only KLM digitization and reconstruction.
 
 import os
 import random
@@ -30,7 +30,7 @@ paramloader = basf2.register_module('Gearbox')
 
 # Geometry builder
 geobuilder = basf2.register_module('Geometry')
-geobuilder.param('components', ['EKLM', 'BKLM'])
+geobuilder.param('components', ['KLM'])
 
 # Full Geant4 simulation
 g4sim = basf2.register_module('FullSim')

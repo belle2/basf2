@@ -56,7 +56,9 @@ namespace {
   std::vector<CDCRLWireHit> getRLWireHitSegment(const CDCSegment3D& segment3D)
   {
     std::vector<CDCRLWireHit> result;
+    result.reserve(segment3D.size());
     for (const CDCRecoHit3D& recoHit3D : segment3D) {
+      // cppcheck-suppress useStlAlgorithm
       result.push_back(recoHit3D.getRLWireHit());
     }
     return result;
@@ -106,6 +108,7 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
   for (const CDCTrack& track : inputTracks) {
     for (const CDCRecoHit3D& recoHit3D : track) {
       const CDCWireHit& wireHit = recoHit3D.getWireHit();
+      // cppcheck-suppress stlFindInsert
       if (inTracksByWireHit.count(&wireHit) == 0) inTracksByWireHit[&wireHit] = {nullptr, nullptr};
       inTracksByWireHit[&wireHit][0] = &track;
       // Prepare hits for the cellular automaton
@@ -117,6 +120,7 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
   for (const CDCTrack& track : secondInputTracks) {
     for (const CDCRecoHit3D& recoHit3D : track) {
       const CDCWireHit& wireHit = recoHit3D.getWireHit();
+      // cppcheck-suppress stlFindInsert
       if (inTracksByWireHit.count(&wireHit) == 0) inTracksByWireHit[&wireHit] = {nullptr, nullptr};
       inTracksByWireHit[&wireHit][1] = &track;
       // Prepare hits for the cellular automaton

@@ -42,6 +42,7 @@ namespace Belle2 {
        _cell(w),
        _xyPosition(w.xyPosition()),
        _track(0),
+       _sequentialLength(0), //2019/07/31 by ytlai
        _iCDCHit(indexCDCHit),
        _iCDCSimHit(indexCDCSimHit),
        _iMCParticle(indexMCParticle)

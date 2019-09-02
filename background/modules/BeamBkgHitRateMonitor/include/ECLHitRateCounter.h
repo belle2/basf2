@@ -140,7 +140,7 @@ namespace Belle2 {
       // other
       Belle2::ECL::ECLGeometryPar* m_geometry{nullptr}; /**< pointer to ECLGeometryPar */
       std::map<int, int> m_segmentMap; /**< map with keys containing ECL CellID and values containing segment number */
-      int m_crystalsInSegment[16] = {0}; /** array cotaining the number of crystals in given segment */
+      int m_crystalsInSegment[16] = {0}; /**< array cotaining the number of crystals in given segment */
     };
   }
 }

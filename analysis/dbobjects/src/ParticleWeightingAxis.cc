@@ -95,8 +95,9 @@ void ParticleWeightingAxis::printAxis()
     int i_ll_len = i_ll.size();
     std::string i_ul = std::to_string(i_entry.second->second());
     int i_ul_len = i_ul.size();
-    id_cells += "|" + std::string(len, ' ') + i_id + std::string(len - i_id_len + 1, ' ') + "|";
-    bin_cells += "|" + i_ll + std::string(len - i_ll_len, ' ') + "|" + i_ul + std::string(len - i_ul_len, ' ') + "|";
+    id_cells += "|" + std::string(len, ' ') + i_id + std::string(std::max(1, len - i_id_len + 1), ' ') + "|";
+    bin_cells += "|" + i_ll + std::string(std::max(1, len - i_ll_len), ' ') + "|" + i_ul + std::string(std::max(1, len - i_ul_len),
+                 ' ') + "|";
   }
   B2INFO(id_cells);
   B2INFO(bin_cells);

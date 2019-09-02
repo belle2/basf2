@@ -45,6 +45,7 @@ namespace Belle2::Conditions {
         info.baseUrl = "";
         info.payloadUrl = "";
         info.filename = payloadFilename(m_payloadDir, info.name, info.revision);
+        info.iov = iov;
         if (!FileSystem::fileExists(info.filename)) {
           B2FATAL("Could not find payload file specified in testing payload storage" << LogVar("storage filen", m_filename)
                   << LogVar("name", info.name) << LogVar("local revision", info.revision)
@@ -64,10 +65,11 @@ namespace Belle2::Conditions {
 
   void TestingPayloadStorage::read()
   {
-    if (!fs::is_regular_file(m_absoluteFilename)) {
-      B2FATAL("Given testing payload storage file doesn't exist or is not a regular file" << LogVar("storage file", m_filename));
-    }
     m_payloads.clear();
+    if (!fs::is_regular_file(m_absoluteFilename)) {
+      B2WARNING("Given testing payload storage file doesn't exist or is not a regular file" << LogVar("storage file", m_filename));
+      return;
+    }
     // read and parse the database content
     std::ifstream file(m_absoluteFilename.c_str());
     if (!file.is_open()) {
@@ -153,7 +155,7 @@ namespace Belle2::Conditions {
   }
 
   bool TestingPayloadStorage::store(const std::string& name, const IntervalOfValidity& iov,
-                                    std::function<bool(const std::string&)> writer)
+                                    const std::function<bool(const std::string&)>& writer)
   {
     if (iov.empty()) {
       B2ERROR("IoV is empty, refusing to store object in testing payload storage"

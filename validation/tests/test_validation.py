@@ -179,12 +179,12 @@ class ValidationTest(unittest.TestCase):
         Test if the meta options parsers behaves nice
         """
         p = metaoptions.MetaOptionParser(
-            ["expert", "pvalue-warn=0.9", "pvalue-error=0.4"]
+            ["shifter", "pvalue-warn=0.9", "pvalue-error=0.4"]
         )
 
         self.assertEqual(0.9, p.pvalue_warn())
         self.assertEqual(0.4, p.pvalue_error())
-        self.assertTrue(p.has_option("expert"))
+        self.assertTrue(p.has_option("shifter"))
         self.assertFalse(p.has_option("not is list"))
 
         p = metaoptions.MetaOptionParser(["expert", "pvalue-warn="])

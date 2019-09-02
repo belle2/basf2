@@ -811,6 +811,7 @@ void SpacePoint2TrueHitConnectorModule::initializeRootFile()
 {
   if (m_PARAMrootFileName.size() != 2 || (m_PARAMrootFileName[1] != "UPDATE" && m_PARAMrootFileName[1] != "RECREATE")) {
     string output;
+    // cppcheck-suppress useStlAlgorithm
     for (string entry : m_PARAMrootFileName) { output += "'" + entry + "' "; }
     B2FATAL("CurlingTrackCandSplitter::initialize() : rootFileName is set wrong: entries are: " << output);
   }

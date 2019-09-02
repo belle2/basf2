@@ -35,8 +35,9 @@ mypath.add_module('VariablesToExtraInfo',
                   particleList='D0',
                   variables={'M': 'M_before_vertex_fit'})
 
-# now we do a verted fit (this can change the mass)
-vertexKFit('D0', -2.0, path=mypath, silence_warning=True)
+# Now we do a vertex fit (this can change the mass).
+# All candidates are kept.
+vertexKFit('D0', -1.0, path=mypath, silence_warning=True)
 
 # now save the pre- and post- fit mass using VariablesToNtuple
 mypath.add_module('VariablesToNtuple',

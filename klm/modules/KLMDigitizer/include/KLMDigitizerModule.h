@@ -11,12 +11,12 @@
 #pragma once
 
 /* Belle2 headers. */
-#include <bklm/dataobjects/BKLMDigit.h>
-#include <bklm/dataobjects/BKLMSimHit.h>
-#include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/dataobjects/EKLMSimHit.h>
-#include <eklm/dataobjects/ElementNumbersSingleton.h>
-#include <eklm/dbobjects/EKLMChannels.h>
+#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/dataobjects/BKLMSimHit.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/EKLMSimHit.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+#include <klm/eklm/dbobjects/EKLMChannels.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>

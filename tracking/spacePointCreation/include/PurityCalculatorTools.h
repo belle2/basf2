@@ -177,6 +177,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
     // create MCVXDPurityInfos and add them to the return vector
     std::vector<Belle2::MCVXDPurityInfo> purityInfos;
     for (int mcId : getUniqueKeys(mcClusters)) {
+      // cppcheck-suppress useStlAlgorithm
       purityInfos.push_back(MCVXDPurityInfo(mcId, totalClusters, mcClusters[mcId]));
     }
 

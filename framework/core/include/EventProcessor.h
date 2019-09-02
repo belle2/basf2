@@ -170,6 +170,12 @@ namespace Belle2 {
 
     /** Are we currently in a run? If yes, processEndRun() needs to do something. */
     bool m_inRun;
+
+    /** Time in seconds of last call for metadata update in event loop */
+    double m_lastMetadataUpdate;
+
+    /** Minimal time difference in seconds for metadata updates in event loop */
+    double m_metadataUpdateInterval;
   };
 
 }

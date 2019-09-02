@@ -13,7 +13,7 @@ That is: a udst file contains the same as an `mdst` but with the addition of `Pa
 
 .. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
 
-To get information about existing skim, ask current skim group convener.
+To get information about existing skim, ask the current skim group liaison.
 
 
 Systematics skims
@@ -100,3 +100,23 @@ Tau-pair skims
 
 .. automodule:: skim.taupair
     :members:
+
+
+For skim liaisons and developers
+--------------------------------
+
+Some functions and tools are for the use of skim liaisons and developers.
+
+.. tip:: If you are only interested in the selection criteria this section is probably not relevant for you.
+
+
+.. automodule:: skim.registry
+    :members:
+ 
+
+.. automodule:: skimExpertFunctions
+    :members:
+    :undoc-members:
+
+
+

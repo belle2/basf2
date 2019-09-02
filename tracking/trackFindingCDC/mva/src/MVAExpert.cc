@@ -94,7 +94,8 @@ void MVAExpert::Impl::beginRun()
   std::unique_ptr<MVA::Weightfile> weightfile = getWeightFile();
   if (weightfile) {
     if (weightfile->getElement<std::string>("method") == "FastBDT" and
-        weightfile->getElement<int>("FastBDT_version") == 2) {
+        (weightfile->getElement<int>("FastBDT_version") == 1 or
+         weightfile->getElement<int>("FastBDT_version") == 2)) {
 
       int nExpectedVars = weightfile->getElement<int>("number_feature_variables");
 
@@ -117,7 +118,8 @@ void MVAExpert::Impl::beginRun()
       }
       B2ASSERT("Number of variables mismatch", nExpectedVars == static_cast<int>(m_selectedNamedVariables.size()));
     } else {
-      B2WARNING("Unpacked new kind of classifier. Consider to extend the feature variable check.");
+      B2WARNING("Unpacked new kind of classifier. Consider to extend the feature variable check. Identifier name: " << m_identifier
+                << "; method name: " << weightfile->getElement<std::string>("method"));
       m_selectedNamedVariables = m_allNamedVariables;
     }
 

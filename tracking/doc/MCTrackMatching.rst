@@ -26,7 +26,7 @@ After the matching, each PR and each MC track candidate is given a single label:
 Tracks from Pattern Recognition can be,
 
 *    matched,
-*    clone, and
+*    clone, or
 *    fake (= background or ghost)
 
 as it can be seen in the `PRToMCMatchInfo` in ``TrackMatchLookUp.h``
@@ -63,7 +63,7 @@ The PR track candidate can be classified into four categories, which are describ
 * BACKGROUND
 
   * The PR track candidate contains mostly hits, which are not part of any MC track candidate. 
-    This normally means, that this PR track candidates is made of beam background hits. 
+    This normally means, that this PR track candidates is made of beam background hits or random combinations of hits. 
     Be careful: If e.g. only creating MC track candidates out of primary particles, 
     all found secondary particles will be called background (which is happening in the default validation)
 

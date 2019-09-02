@@ -51,6 +51,7 @@ main.add_module('TOPGeometryParInitializer')
 main.add_module('TOPUnpacker')
 main.add_module('TOPRawDigitConverter',
                 useSampleTimeCalibration=True,
+                useAsicShiftCalibration=True,
                 useChannelT0Calibration=False,
                 useModuleT0Calibration=False,
                 useCommonT0Calibration=False,

@@ -432,16 +432,16 @@ def correctBremsBelle(
     ``angleThreshold`` and above ``minimumEnergy``.
 
     Parameters:
-
-    outputListName(str):    The output charged particle list containing the corrected charged particles
-    inputListName(str):     The initial charged particle list containing the charged particles to correct.
-    gammaListName(str):     The gammas list containing possibly radiative gammas, should already exist.
-    multiplePhotons(bool):  How many photon to add with the charged particle? nearest one-> False,
-    add all the photons within the cone->True
-    angleThreshold(double): The maximum angle in radian between the charged particle and the(radiative) gamma to be accepted..
-    minimumEnergy(double):  The minimum energy in GeV of the(radiative) gamma to be accepted..
-    writeOut(bool):         whether RootOutput module should save the created ParticleList
-    path(basf2.Path):       modules are added to this path
+       outputListName (str): The output charged particle list containing the corrected charged particles
+       inputListName (str): The initial charged particle list containing the charged particles to correct.
+       gammaListName (str): The gammas list containing possibly radiative gammas, should already exist.
+       multiplePhotons (bool): How many photon to add with the charged particle? nearest one-> False,
+             add all the photons within the cone->True
+       angleThreshold (double): The maximum angle in radian between the charged particle and the(radiative)
+              gamma to be accepted.
+       minimumEnergy (double): The minimum energy in GeV of the(radiative) gamma to be accepted..
+       writeOut (bool): whether RootOutput module should save the created ParticleList
+       path (basf2.Path): modules are added to this path
     """
 
     fsrcorrector = register_module('BelleBremRecovery')

@@ -3,6 +3,7 @@
 
 import basf2
 from simulation import add_simulation
+from pxd import add_pxd_reconstruction
 import os
 import glob
 import sys
@@ -42,6 +43,7 @@ add_simulation(main, bkgfiles=bg, bkgOverlay=True)
 # additional modules, if needed for hit processing
 main.add_module("ARICHFillHits")
 main.add_module('TOPChannelMasker')
+add_pxd_reconstruction(main)
 
 # Bkg rate monitor: output to flat ntuple
 # - all trigger types must be selected since no TRGSummary is given by the simulation

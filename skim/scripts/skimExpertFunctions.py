@@ -9,6 +9,7 @@ Some helper functions to do common tasks relating to skims.
 Like testing, and for skim name encoding(decoding).
 """
 from basf2 import create_path, register_module, LogLevel, B2ERROR, AfterConditionPath
+from basf2 import Path, B2WARNING, B2INFO, B2RESULT, Module
 from mdst import add_mdst_output
 from modularAnalysis import removeParticlesNotInLists, skimOutputUdst, summaryOfLists
 from skim.registry import skim_registry

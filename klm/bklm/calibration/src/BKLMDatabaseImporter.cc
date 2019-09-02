@@ -10,12 +10,10 @@
  **************************************************************************/
 
 #include <klm/bklm/calibration/BKLMDatabaseImporter.h>
+#include <klm/bklm/dbobjects/BKLMAlignment.h>
 #include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <klm/bklm/dbobjects/BKLMSimulationPar.h>
-#include <klm/bklm/dbobjects/BKLMDisplacement.h>
 #include <klm/bklm/dbobjects/BKLMTimeWindow.h>
-#include <alignment/dbobjects/BKLMAlignment.h>
-#include <klm/bklm/dataobjects/BKLMElementID.h>
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
@@ -197,44 +195,19 @@ void BKLMDatabaseImporter::importBklmSimulationPar(int expStart, int runStart, i
   Database::Instance().storeData("BKLMSimulationPar", &bklmSimulationPar, iov);
 }
 
-void BKLMDatabaseImporter::importBklmAlignment()
+void BKLMDatabaseImporter::importBklmDisplacement(const char* payloadName)
 {
-
-  DBImportObjPtr<BKLMAlignment> al;
-  al.construct();
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 8; j++) {
-      for (int k = 0; k < 15; k++) {
-        BKLMElementID bklmid(i, j, k);
-        al->set(bklmid, 1, 0.);
-        al->set(bklmid, 2, 0.);
-        al->set(bklmid, 3, 0.);
-        al->set(bklmid, 4, 0.);
-        al->set(bklmid, 5, 0.);
-        al->set(bklmid, 6, 0.);
-      }
-    }
+  DBImportObjPtr<BKLMAlignment> bklmDisplacement(payloadName);
+  bklmDisplacement.construct();
+  KLMAlignmentData alignmentData(0, 0, 0, 0, 0, 0);
+  KLMChannelIndex bklmModules(KLMChannelIndex::c_IndexLevelLayer);
+  for (KLMChannelIndex bklmModule = bklmModules.beginBKLM();
+       bklmModule != bklmModules.endBKLM(); ++bklmModule) {
+    uint16_t module = bklmModule.getKLMModuleNumber();
+    bklmDisplacement->setModuleAlignment(module, &alignmentData);
   }
-
-  IntervalOfValidity Iov(0, 0, -1, -1);
-  al.import(Iov);
-}
-
-void BKLMDatabaseImporter::importBklmDisplacement()
-{
-
-  DBImportArray<BKLMDisplacement> m_displacement;
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 8; j++) {
-      for (int k = 0; k < 15; k++) {
-        BKLMElementID bklmid(i, j, k);
-        m_displacement.appendNew(bklmid, 0, 0, 0, 0, 0, 0);
-      }
-    }
-  }
-
-  IntervalOfValidity Iov(0, 0, -1, -1);
-  m_displacement.import(Iov);
+  IntervalOfValidity iov(0, 0, -1, -1);
+  bklmDisplacement.import(iov);
 }
 
 void BKLMDatabaseImporter::importBklmADCThreshold(BKLMADCThreshold* threshold)

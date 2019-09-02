@@ -15,8 +15,6 @@
 #include <set>
 #include <vxd/dataobjects/VxdID.h>
 #include <cdc/dataobjects/WireID.h>
-#include <klm/bklm/dataobjects/BKLMElementID.h>
-#include <klm/eklm/dataobjects/EKLMElementID.h>
 
 #include <framework/gearbox/Const.h>
 

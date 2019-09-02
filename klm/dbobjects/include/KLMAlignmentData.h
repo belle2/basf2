@@ -23,6 +23,31 @@ namespace Belle2 {
   public:
 
     /**
+     * Alignment parameter numbers.
+     */
+    enum ParameterNumbers {
+
+      /** Shift in U (EKLM: local X). */
+      c_DeltaU = 1,
+
+      /** Shift in V (EKLM: local Y). */
+      c_DeltaV = 2,
+
+      /** Shift in W. */
+      c_DeltaW = 3,
+
+      /** Rotation in alpha. */
+      c_DeltaAlpha = 4,
+
+      /** Rotation in beta. */
+      c_DeltaBeta = 5,
+
+      /** Rotation in gamma (EKLM: rotation in local plane). */
+      c_DeltaGamma = 6,
+
+    };
+
+    /**
      * Constructor.
      */
     KLMAlignmentData() :

@@ -10,12 +10,11 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
-#include <alignment/reconstruction/BKLMRecoHit.h>
+#include <alignment/reconstruction/AlignableBKLMRecoHit.h>
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <alignment/GlobalLabel.h>
-#include <klm/bklm/dataobjects/BKLMElementID.h>
-#include <alignment/dbobjects/BKLMAlignment.h>
+#include <klm/bklm/dbobjects/BKLMAlignment.h>
 
 #include <alignment/Hierarchy.h>
 #include <alignment/GlobalDerivatives.h>
@@ -29,16 +28,21 @@ using namespace std;
 using namespace Belle2;
 
 
-BKLMRecoHit::BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
+AlignableBKLMRecoHit::AlignableBKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
   genfit::PlanarMeasurement(HIT_DIMENSIONS)
 {
-  m_moduleID = hit->getModuleID();
-  m_Section = hit->getSection();
-  m_Sector = hit->getSector();
-  m_Layer = hit->getLayer();
+  uint16_t moduleId = hit->getModuleID();
 
-  bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
-  module = m_GeoPar->findModule(m_Section, m_Sector, m_Layer);
+  int section = hit->getSection();
+  int sector = hit->getSector();
+  m_Layer = hit->getLayer();
+  m_AlignableModule.setType(KLMAlignableElement::c_BKLMModule);
+  m_AlignableModule.setSection(section);
+  m_AlignableModule.setLayer(m_Layer);
+  m_AlignableModule.setSector(sector);
+
+  bklm::GeometryPar* m_GeoPar = Belle2::bklm::GeometryPar::instance();
+  m_Module = m_GeoPar->findModule(section, sector, m_Layer);
 
   //+++ global coordinates of the hit
   global[0] = hit->getGlobalPosition()[0];
@@ -46,13 +50,13 @@ BKLMRecoHit::BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
   global[2] = hit->getGlobalPosition()[2];
 
   //+++ local coordinates of the hit
-  CLHEP::Hep3Vector local = module->globalToLocal(global);
+  CLHEP::Hep3Vector local = m_Module->globalToLocal(global);
 
-  //+++ local coordinates in KLM layer of the hit
+  //+++ local coordinates in KLM m_Layer of the hit
   double localU = local[1]; //phi
   double localV = local[2]; //z
-  double errorU = module->getPhiStripWidth() / sqrt(12);
-  double errorV = module->getZStripWidth() / sqrt(12);
+  double errorU = m_Module->getPhiStripWidth() / sqrt(12);
+  double errorV = m_Module->getZStripWidth() / sqrt(12);
 
   if (hit->inRPC()) {
     //+++ scale localU and localV based on measured-in-Belle resolution
@@ -76,14 +80,14 @@ BKLMRecoHit::BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
   rawHitCov_(1, 0) = 0.;
   rawHitCov_(1, 1) = errorV * errorV; // error in V, squared
 
-  //+++ Construct vectors o, u, v of layer in global coords.
-  CLHEP::Hep3Vector gOrigin = module->getGlobalOrigin();
-  CLHEP::Hep3Vector lOrigin = module->globalToLocal(gOrigin) + module->getLocalReconstructionShift();
-  CLHEP::Hep3Vector gOrigin_midway = module->localToGlobal(lOrigin);
+  //+++ Construct vectors o, u, v of m_Layer in global coords.
+  CLHEP::Hep3Vector gOrigin = m_Module->getGlobalOrigin();
+  CLHEP::Hep3Vector lOrigin = m_Module->globalToLocal(gOrigin) + m_Module->getLocalReconstructionShift();
+  CLHEP::Hep3Vector gOrigin_midway = m_Module->localToGlobal(lOrigin);
   CLHEP::Hep3Vector uAxis(0, 1, 0);
   CLHEP::Hep3Vector vAxis(0, 0, 1);
-  CLHEP::Hep3Vector gUaxis = module->localToGlobal(uAxis) - gOrigin;
-  CLHEP::Hep3Vector gVaxis = module->localToGlobal(vAxis) - gOrigin;
+  CLHEP::Hep3Vector gUaxis = m_Module->localToGlobal(uAxis) - gOrigin;
+  CLHEP::Hep3Vector gVaxis = m_Module->localToGlobal(vAxis) - gOrigin;
 
   //!the position (in global coordinates) of this module's sensitive-volume origin
   B2Vector3D origin_mid(gOrigin_midway[0], gOrigin_midway[1], gOrigin_midway[2]);
@@ -94,25 +98,25 @@ BKLMRecoHit::BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
   B2Vector3D vGlobal(gVaxis[0], gVaxis[1], gVaxis[2]);
 
   genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin_mid, uGlobal, vGlobal, 0));
-  setPlane(detPlane, m_moduleID);
+  setPlane(detPlane, moduleId);
 }
 
-genfit::AbsMeasurement* BKLMRecoHit::clone() const
+genfit::AbsMeasurement* AlignableBKLMRecoHit::clone() const
 {
-  return new BKLMRecoHit(*this);
+  return new AlignableBKLMRecoHit(*this);
 }
 
-std::vector<genfit::MeasurementOnPlane*> BKLMRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
+std::vector<genfit::MeasurementOnPlane*> AlignableBKLMRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
   TVectorD predFglo = state.get6DState();
   TVectorD correctedLocal(2);
   CLHEP::Hep3Vector localmom(predFglo[3], predFglo[4], predFglo[5]);
-  localmom = module->RotateToLocal(localmom);
+  localmom = m_Module->RotateToLocal(localmom);
 
   //do correction for scintillators
   if (m_Layer == 1 || m_Layer == 2) {
     CLHEP::Hep3Vector global_shift_z(0, 0, predFglo[5]*halfheight_sci / sqrt(predFglo[3]*predFglo[3] + predFglo[4]*predFglo[4]));
-    CLHEP::Hep3Vector local_corrected_z = module->globalToLocal(global - global_shift_z);
+    CLHEP::Hep3Vector local_corrected_z = m_Module->globalToLocal(global - global_shift_z);
     double local_shift_u = localmom[1] / localmom[0] * halfheight_sci;
     correctedLocal[0] = local_corrected_z[1] + local_shift_u;
     //correctedLocal[0] = local_corrected_z[1];
@@ -127,21 +131,17 @@ std::vector<genfit::MeasurementOnPlane*> BKLMRecoHit::constructMeasurementsOnPla
                                                   state.getRep(), this->constructHMatrix(state.getRep())));
 }
 
-std::pair<std::vector<int>, TMatrixD> BKLMRecoHit::globalDerivatives(const genfit::StateOnPlane* sop)
+std::pair<std::vector<int>, TMatrixD> AlignableBKLMRecoHit::globalDerivatives(const genfit::StateOnPlane* sop)
 {
-
-  BKLMElementID klmid;
-  klmid.setSection(m_Section);
-  klmid.setSectorNumber(m_Sector);
-  klmid.setLayerNumber(m_Layer);
   std::vector<int> labGlobal;
 
-  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(klmid, BKLMAlignment::dU)); // du
-  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(klmid, BKLMAlignment::dV));// dv
-  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(klmid, BKLMAlignment::dW)); // dw
-  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(klmid, BKLMAlignment::dAlpha)); // dalpha
-  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(klmid, BKLMAlignment::dBeta)); // dbeta
-  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(klmid, BKLMAlignment::dGamma)); // dgamma
+  int elementNumber = m_AlignableModule.getNumber();
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaU));
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaV));
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaW));
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaAlpha));
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaBeta));
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaGamma));
 
   // Matrix of global derivatives
   TMatrixD derGlobal(2, 6);

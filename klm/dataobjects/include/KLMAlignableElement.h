@@ -10,12 +10,15 @@
 
 #pragma once
 
+/* C++ headers. */
+#include <cstdint>
+
 namespace Belle2 {
 
   /**
-   * EKLM element identifier.
+   * KLM alignable element identifier.
    */
-  class EKLMElementID {
+  class KLMAlignableElement {
 
   public:
 
@@ -23,46 +26,38 @@ namespace Belle2 {
      * Type of EKLM element.
      */
     enum ElementType {
-      c_Section,  /**< Section. */
-      c_Layer,   /**< Layer. */
-      c_Sector,  /**< Sector. */
-      c_Plane,   /**< Plane. */
-      c_Segment, /**< Segment. */
+      c_EKLMSector,  /**< EKLM sector (module). */
+      c_EKLMSegment, /**< EKLM segment. */
+      c_BKLMModule,  /**< BKLM module. */
     };
 
     /**
      * Constructor.
      */
-    EKLMElementID();
+    KLMAlignableElement();
 
     /**
-     * Constructor (sector).
+     * Constructor.
+     * @param[in] type    Element type.
      * @param[in] section Section number.
-     * @param[in] layer   Layer number.
      * @param[in] sector  Sector number.
-     */
-    EKLMElementID(int section, int layer, int sector);
-
-    /**
-     * Constructor (segment).
-     * @param[in] section Section number.
      * @param[in] layer   Layer number.
-     * @param[in] sector  Sector number.
-     * @param[in] plane   Plane number.
-     * @param[in] segment Segment number.
+     * @param[in] plane   Plane number (for EKLM segments only).
+     * @param[in] segment Segment number (for EKLM segments only).
      */
-    EKLMElementID(int section, int layer, int sector, int plane, int segment);
+    KLMAlignableElement(enum ElementType type, int section, int sector,
+                        int layer, int plane = 0, int segment = 0);
 
     /**
      * Constructor.
      * @param[in] globalNumber Element global number.
      */
-    explicit EKLMElementID(int globalNumber);
+    explicit KLMAlignableElement(int globalNumber);
 
     /**
      * Destructor.
      */
-    ~EKLMElementID();
+    ~KLMAlignableElement();
 
     /**
      * Set element type.
@@ -119,55 +114,51 @@ namespace Belle2 {
      */
     void setSegment(int segment);
 
-    /**
+    /**d
      * Get segment number.
      */
     int getSegment() const;
 
     /**
-     * Get global detector layer number.
+     * Get KLM module number (for EKLM sectors and BKLM modules).
      */
-    int getLayerNumber() const;
+    uint16_t getModuleNumber() const;
 
     /**
-     * Get global sector number.
+     * Get EKLM segment number.
      */
-    int getSectorNumber() const;
+    int getEKLMSegmentNumber() const;
 
     /**
-     * Get global plane number.
+     * Get alignable element number.
      */
-    int getPlaneNumber() const;
-
-    /**
-     * Get global segment number.
-     */
-    int getSegmentNumber() const;
-
-    /**
-     * Get global element number.
-     */
-    int getGlobalNumber() const;
+    int getNumber() const;
 
   private:
 
     /** Element type. */
     ElementType m_Type;
 
+    /** Subdetector. */
+    int m_Subdetector;
+
     /** Section number. */
     int m_Section;
 
-    /** Layer number. */
-    int m_Layer;
-
     /** Sector number. */
     int m_Sector;
+
+    /** Layer number. */
+    int m_Layer;
 
     /** Plane number. */
     int m_Plane;
 
     /** Segment number. */
     int m_Segment;
+
+    /** EKLM segment offset for global number. */
+    const int c_EKLMSegmentOffset = 65536;
 
   };
 

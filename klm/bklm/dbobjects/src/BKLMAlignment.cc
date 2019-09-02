@@ -10,70 +10,48 @@
 
 /* Belle2 headers. */
 #include <framework/logging/Logger.h>
+#include <klm/bklm/dbobjects/BKLMAlignment.h>
 #include <klm/dataobjects/KLMAlignableElement.h>
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
 
 using namespace Belle2;
 
-EKLMAlignment::EKLMAlignment()
+BKLMAlignment::BKLMAlignment()
 {
 }
 
-EKLMAlignment::~EKLMAlignment()
+BKLMAlignment::~BKLMAlignment()
 {
 }
 
-void EKLMAlignment::setSectorAlignment(uint16_t sector,
+void BKLMAlignment::setModuleAlignment(uint16_t module,
                                        KLMAlignmentData* dat)
 {
   std::map<uint16_t, KLMAlignmentData>::iterator it;
-  it = m_SectorAlignment.find(sector);
-  if (it == m_SectorAlignment.end()) {
-    m_SectorAlignment.insert(
-      std::pair<uint16_t, KLMAlignmentData>(sector, *dat));
+  it = m_ModuleAlignment.find(module);
+  if (it == m_ModuleAlignment.end()) {
+    m_ModuleAlignment.insert(
+      std::pair<uint16_t, KLMAlignmentData>(module, *dat));
   } else {
     it->second = *dat;
   }
 }
 
-const KLMAlignmentData* EKLMAlignment::getSectorAlignment(
-  uint16_t sector) const
+const KLMAlignmentData* BKLMAlignment::getModuleAlignment(
+  uint16_t module) const
 {
   std::map<uint16_t, KLMAlignmentData>::const_iterator it;
-  it = m_SectorAlignment.find(sector);
-  if (it == m_SectorAlignment.end())
+  it = m_ModuleAlignment.find(module);
+  if (it == m_ModuleAlignment.end())
     return nullptr;
   return &(it->second);
 }
 
-void EKLMAlignment::setSegmentAlignment(uint16_t segment,
-                                        KLMAlignmentData* dat)
-{
-  std::map<uint16_t, KLMAlignmentData>::iterator it;
-  it = m_SegmentAlignment.find(segment);
-  if (it == m_SegmentAlignment.end()) {
-    m_SegmentAlignment.insert(
-      std::pair<uint16_t, KLMAlignmentData>(segment, *dat));
-  } else
-    it->second = *dat;
-}
-
-const KLMAlignmentData* EKLMAlignment::getSegmentAlignment(
-  uint16_t segment) const
-{
-  std::map<uint16_t, KLMAlignmentData>::const_iterator it;
-  it = m_SegmentAlignment.find(segment);
-  if (it == m_SegmentAlignment.end())
-    return nullptr;
-  return &(it->second);
-}
-
-double EKLMAlignment::getGlobalParam(unsigned short element,
+double BKLMAlignment::getGlobalParam(unsigned short element,
                                      unsigned short param) const
 {
   const KLMAlignmentData* alignmentData;
   KLMAlignableElement id(element);
-  alignmentData = getSectorAlignment(id.getModuleNumber());
+  alignmentData = getModuleAlignment(id.getModuleNumber());
   if (alignmentData == nullptr)
     return 0;
   switch (param) {
@@ -82,26 +60,26 @@ double EKLMAlignment::getGlobalParam(unsigned short element,
     case KLMAlignmentData::c_DeltaV:
       return alignmentData->getDeltaV();
     case KLMAlignmentData::c_DeltaW:
-      break;
+      return alignmentData->getDeltaW();
     case KLMAlignmentData::c_DeltaAlpha:
-      break;
+      return alignmentData->getDeltaAlpha();
     case KLMAlignmentData::c_DeltaBeta:
-      break;
+      return alignmentData->getDeltaBeta();
     case KLMAlignmentData::c_DeltaGamma:
       return alignmentData->getDeltaGamma();
   }
-  B2FATAL("Attempt to get EKLM alignment parameter with incorrect number " <<
+  B2FATAL("Attempt to get BKLM alignment parameter with incorrect number " <<
           param);
   return 0;
 }
 
-void EKLMAlignment::setGlobalParam(double value, unsigned short element,
+void BKLMAlignment::setGlobalParam(double value, unsigned short element,
                                    unsigned short param)
 {
   KLMAlignmentData* alignmentData;
   KLMAlignableElement id(element);
   alignmentData = const_cast<KLMAlignmentData*>(
-                    getSectorAlignment(id.getModuleNumber()));
+                    getModuleAlignment(id.getModuleNumber()));
   if (alignmentData == nullptr)
     return;
   switch (param) {
@@ -112,22 +90,25 @@ void EKLMAlignment::setGlobalParam(double value, unsigned short element,
       alignmentData->setDeltaV(value);
       return;
     case KLMAlignmentData::c_DeltaW:
-      break;
+      alignmentData->setDeltaW(value);
+      return;
     case KLMAlignmentData::c_DeltaAlpha:
-      break;
+      alignmentData->setDeltaAlpha(value);
+      return;
     case KLMAlignmentData::c_DeltaBeta:
-      break;
+      alignmentData->setDeltaBeta(value);
+      return;
     case KLMAlignmentData::c_DeltaGamma:
       alignmentData->setDeltaGamma(value);
       return;
   }
-  B2FATAL("Attempt to set EKLM alignment parameter with incorrect number " <<
+  B2FATAL("Attempt to set BKLM alignment parameter with incorrect number " <<
           param);
 }
 
 /* TODO: this function is not implemented. */
 std::vector< std::pair<unsigned short, unsigned short> >
-EKLMAlignment::listGlobalParams()
+BKLMAlignment::listGlobalParams()
 {
   return {};
 }

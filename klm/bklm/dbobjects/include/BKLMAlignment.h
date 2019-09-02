@@ -23,47 +23,34 @@
 namespace Belle2 {
 
   /**
-   * Class to store EKLM alignment data in the database.
+   * Class to store BKLM alignment data in the database.
    */
-  class EKLMAlignment : public TObject {
+  class BKLMAlignment : public TObject {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMAlignment();
+    BKLMAlignment();
 
     /**
      * Destructor.
      */
-    ~EKLMAlignment();
+    ~BKLMAlignment();
 
     /**
-     * Set sector alignment data.
-     * @param[in] sector Sector number.
+     * Set module alignment data.
+     * @param[in] module Module number.
      * @param[in] dat    Alignment data.
      */
-    void setSectorAlignment(uint16_t sector, KLMAlignmentData* dat);
+    void setModuleAlignment(uint16_t module, KLMAlignmentData* dat);
 
     /**
-     * Get sector alignment data.
-     * @param[in] sector Sector number.
+     * Get module alignment data.
+     * @param[in] module Module number.
      */
-    const KLMAlignmentData* getSectorAlignment(uint16_t sector) const;
-
-    /**
-     * Set segment alignment data.
-     * @param[in] segment Segment number.
-     * @param[in] dat     Alignment data.
-     */
-    void setSegmentAlignment(uint16_t segment, KLMAlignmentData* dat);
-
-    /**
-     * Get segment alignment data.
-     * @param[in] segment Segment number.
-     */
-    const KLMAlignmentData* getSegmentAlignment(uint16_t segment) const;
+    const KLMAlignmentData* getModuleAlignment(uint16_t module) const;
 
     /* Interface to global Millepede calibration. */
 
@@ -71,7 +58,10 @@ namespace Belle2 {
      * Get global unique identifier.
      * @return Global unique identifier.
      */
-    static unsigned short getGlobalUniqueID() { return 40; }
+    static unsigned short getGlobalUniqueID()
+    {
+      return 30;
+    }
 
     /**
      * Get global parameter.
@@ -91,14 +81,11 @@ namespace Belle2 {
 
   private:
 
-    /** Sector alignment. */
-    std::map<uint16_t, KLMAlignmentData> m_SectorAlignment;
-
-    /** Segment alignment. */
-    std::map<uint16_t, KLMAlignmentData> m_SegmentAlignment;
+    /** Module alignment. */
+    std::map<uint16_t, KLMAlignmentData> m_ModuleAlignment;
 
     /** Class version. */
-    ClassDef(Belle2::EKLMAlignment, 2);
+    ClassDef(Belle2::BKLMAlignment, 3);
 
   };
 

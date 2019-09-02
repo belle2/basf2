@@ -70,11 +70,9 @@ namespace Belle2 {
     //! Import BKLM simulation parameters into the database
     void importBklmSimulationPar(int expStart, int runStart, int expStop, int runStop);
 
-    //! Import BKLM Alignment parameters into the database
-    void importBklmAlignment();
-
-    //! Import BKLM displaced-geometry parameters into the database
-    void importBklmDisplacement();
+    //! Import BKLM displacement or alignment parameters into the database.
+    // @param[in] payloadName Payload name.
+    void importBklmDisplacement(const char* payloadName = "BKLMDisplacement");
 
     //! Import BKLM scintillator digitization parameters in database
     void importBklmDigitizationParams();

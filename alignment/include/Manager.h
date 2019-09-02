@@ -24,7 +24,7 @@
 #include <mdst/dbobjects/BeamSpot.h>
 #include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/dbobjects/CDCCalibration.h>
-#include <alignment/dbobjects/BKLMAlignment.h>
+#include <klm/bklm/dbobjects/BKLMAlignment.h>
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
 
 #include <cdc/dbobjects/CDCTimeZeros.h>

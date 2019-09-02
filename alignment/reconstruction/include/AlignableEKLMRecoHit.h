@@ -21,15 +21,14 @@
 #include <genfit/TrackCandHit.h>
 
 /* Belle2 headers. */
-#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
-#include <klm/eklm/dataobjects/EKLMElementID.h>
-
 #include <framework/geometry/B2Vector3.h>
+#include <klm/dataobjects/KLMAlignableElement.h>
+#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
 
 namespace Belle2 {
 
   /**
-   * Alignable EKLMHit2d.
+   * Alignable EKLM hit.
    */
   class AlignableEKLMRecoHit: public genfit::PlanarMeasurement,
     public genfit::ICalibrationParametersDerivatives {
@@ -92,10 +91,10 @@ namespace Belle2 {
   private:
 
     /** Sector identifier. */
-    EKLMElementID m_Sector;
+    KLMAlignableElement m_Sector;
 
     /** Segment identifier. */
-    EKLMElementID m_Segment;
+    KLMAlignableElement m_Segment;
 
     /** V direction. */
     B2Vector3D m_StripV;

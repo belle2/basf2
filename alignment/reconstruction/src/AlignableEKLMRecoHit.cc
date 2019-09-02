@@ -30,7 +30,7 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   genfit::PlanarMeasurement(1)
 {
   (void)trackCandHit;
-  int digit, endcap, layer, sector, plane, segment, strip;
+  int digit, section, layer, sector, plane, segment, strip;
   const HepGeom::Transform3D* t;
   CLHEP::HepRotation r;
   CLHEP::Hep3Vector origin;
@@ -47,24 +47,24 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   if (eklmDigits.size() != 2)
     B2FATAL("Incorrect number of related EKLMDigits.");
   digit = hit->getDigitIdentifier();
-  endcap = eklmDigits[digit]->getSection();
+  section = eklmDigits[digit]->getSection();
   layer = eklmDigits[digit]->getLayer();
   sector = eklmDigits[digit]->getSector();
   plane = eklmDigits[digit]->getPlane();
   segment = (eklmDigits[digit]->getStrip() - 1) / geoDat->getNStripsSegment()
             + 1;
   strip = (segment - 1) * geoDat->getNStripsSegment() + 1;
-  m_Sector.setType(EKLMElementID::c_Sector);
-  m_Sector.setSection(endcap);
+  m_Sector.setType(KLMAlignableElement::c_EKLMSector);
+  m_Sector.setSection(section);
   m_Sector.setLayer(layer);
   m_Sector.setSector(sector);
-  m_Segment.setType(EKLMElementID::c_Segment);
-  m_Segment.setSection(endcap);
+  m_Segment.setType(KLMAlignableElement::c_EKLMSegment);
+  m_Segment.setSection(section);
   m_Segment.setLayer(layer);
   m_Segment.setSector(sector);
   m_Segment.setPlane(plane);
   m_Segment.setSegment(segment);
-  t = transformData->getStripTransform(endcap, layer, sector, plane, strip);
+  t = transformData->getStripTransform(section, layer, sector, plane, strip);
   origin = t->getTranslation();
   origin2.SetX(origin.x() / CLHEP::cm * Unit::cm);
   origin2.SetY(origin.y() / CLHEP::cm * Unit::cm);
@@ -78,13 +78,13 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   v2.SetX(v.x());
   v2.SetY(v.y());
   v2.SetZ(v.z());
-  t = transformData->getSectorTransform(endcap, layer, sector);
+  t = transformData->getSectorTransform(section, layer, sector);
   r = t->getRotation().inverse();
   v = r * v;
   m_StripV.SetX(v.unit().x());
   m_StripV.SetY(v.unit().y());
   genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin2, u2, v2, 0));
-  setPlane(detPlane, m_Segment.getGlobalNumber());
+  setPlane(detPlane, m_Segment.getNumber());
   rawHitCoords_[0] = geoDat->getStripGeometry()->getWidth() *
                      ((eklmDigits[digit]->getStrip() - 1) %
                       geoDat->getNStripsSegment()) / CLHEP::cm * Unit::cm;
@@ -101,9 +101,10 @@ std::pair<std::vector<int>, TMatrixD> AlignableEKLMRecoHit::globalDerivatives(co
 {
 
   std::vector<int> labGlobal;
-  labGlobal.push_back(GlobalLabel::construct<EKLMAlignment>(m_Sector.getGlobalNumber(), 1)); // dx
-  labGlobal.push_back(GlobalLabel::construct<EKLMAlignment>(m_Sector.getGlobalNumber(), 2));// dy
-  labGlobal.push_back(GlobalLabel::construct<EKLMAlignment>(m_Sector.getGlobalNumber(), 6)); // drot
+  int elementNumber = m_Sector.getNumber();
+  labGlobal.push_back(GlobalLabel::construct<EKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaU)); // dx
+  labGlobal.push_back(GlobalLabel::construct<EKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaV)); // dy
+  labGlobal.push_back(GlobalLabel::construct<EKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaGamma)); // drot
 
   /* Local parameters. */
   const double dalpha = 0;

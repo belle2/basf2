@@ -76,12 +76,6 @@ namespace Belle2 {
     //! Export BKLM simulation parameters from the database
     void exportBklmSimulationPar();
 
-    //! Import BKLM Misalignment parameters into the database
-    void importBklmMisAlignment();
-
-    //! Export BKLM Misalignment parameters from the database
-    void exportBklmMisAlignment();
-
     //! Import BKLM Alignment parameters into the database
     void importBklmAlignment();
 

@@ -19,7 +19,7 @@
 
 /* Belle2 headers. */
 #include <klm/eklm/dataobjects/EKLMElementID.h>
-#include <klm/eklm/dbobjects/EKLMAlignmentData.h>
+#include <klm/dbobjects/KLMAlignmentData.h>
 
 namespace Belle2 {
 
@@ -45,26 +45,26 @@ namespace Belle2 {
      * @param[in] sector Sector number.
      * @param[in] dat    Alignment data.
      */
-    void setSectorAlignment(uint16_t sector, EKLMAlignmentData* dat);
+    void setSectorAlignment(uint16_t sector, KLMAlignmentData* dat);
 
     /**
      * Get sector alignment data.
      * @param[in] sector Sector number.
      */
-    const EKLMAlignmentData* getSectorAlignment(uint16_t sector) const;
+    const KLMAlignmentData* getSectorAlignment(uint16_t sector) const;
 
     /**
      * Set segment alignment data.
      * @param[in] segment Segment number.
      * @param[in] dat     Alignment data.
      */
-    void setSegmentAlignment(uint16_t segment, EKLMAlignmentData* dat);
+    void setSegmentAlignment(uint16_t segment, KLMAlignmentData* dat);
 
     /**
      * Get segment alignment data.
      * @param[in] segment Segment number.
      */
-    const EKLMAlignmentData* getSegmentAlignment(uint16_t segment) const;
+    const KLMAlignmentData* getSegmentAlignment(uint16_t segment) const;
 
     /* Interface to global Millepede calibration. */
 
@@ -93,10 +93,10 @@ namespace Belle2 {
   private:
 
     /** Sector alignment. */
-    std::map<uint16_t, EKLMAlignmentData> m_SectorAlignment;
+    std::map<uint16_t, KLMAlignmentData> m_SectorAlignment;
 
     /** Segment alignment. */
-    std::map<uint16_t, EKLMAlignmentData> m_SegmentAlignment;
+    std::map<uint16_t, KLMAlignmentData> m_SegmentAlignment;
 
     /** Class version. */
     ClassDef(Belle2::EKLMAlignment, 2);

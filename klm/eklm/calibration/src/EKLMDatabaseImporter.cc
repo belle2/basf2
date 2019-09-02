@@ -76,7 +76,7 @@ void EKLMDatabaseImporter::importSimulationParameters()
 
 void EKLMDatabaseImporter::loadDefaultDisplacement()
 {
-  EKLMAlignmentData alignmentData(0., 0., 0.);
+  KLMAlignmentData alignmentData(0, 0, 0, 0, 0, 0);
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   m_Displacement.construct();
   int iSection, iLayer, iSector, iPlane, iSegment, segment, sector;
@@ -99,10 +99,11 @@ void EKLMDatabaseImporter::loadDefaultDisplacement()
 }
 
 void EKLMDatabaseImporter::setSectorDisplacement(
-  int section, int layer, int sector, float dx, float dy, float dalpha)
+  int section, int layer, int sector,
+  float deltaU, float deltaV, float deltaGamma)
 {
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
-  EKLMAlignmentData sectorAlignment(dx, dy, dalpha);
+  KLMAlignmentData sectorAlignment(deltaU, deltaV, 0, 0, 0, deltaGamma);
   EKLM::AlignmentChecker alignmentChecker(false);
   int sectorGlobal;
   sectorGlobal = geoDat->sectorNumber(section, layer, sector);
@@ -117,12 +118,12 @@ void EKLMDatabaseImporter::setSectorDisplacement(
 
 void EKLMDatabaseImporter::setSegmentDisplacement(
   int section, int layer, int sector, int plane, int segment,
-  float dx, float dy, float dalpha)
+  float deltaU, float deltaV, float deltaGamma)
 {
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
-  EKLMAlignmentData segmentAlignment(dx, dy, dalpha);
+  KLMAlignmentData segmentAlignment(deltaU, deltaV, 0, 0, 0, deltaGamma);
   EKLM::AlignmentChecker alignmentChecker(false);
-  const EKLMAlignmentData* sectorAlignment;
+  const KLMAlignmentData* sectorAlignment;
   int sectorGlobal, segmentGlobal;
   sectorGlobal = geoDat->sectorNumber(section, layer, sector);
   sectorAlignment = m_Displacement->getSectorAlignment(sectorGlobal);

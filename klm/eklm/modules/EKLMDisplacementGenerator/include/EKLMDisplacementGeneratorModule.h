@@ -71,23 +71,23 @@ namespace Belle2 {
     /** If the displacement should be the same for all sectors. */
     bool m_SectorSameDisplacement;
 
-    /** Fix sector dx at 0. */
-    bool m_SectorZeroDx;
+    /** Fix sector deltaU at 0. */
+    bool m_SectorZeroDeltaU;
 
-    /** Fix sector dy at 0. */
-    bool m_SectorZeroDy;
+    /** Fix sector deltaV at 0. */
+    bool m_SectorZeroDeltaV;
 
-    /** Fix sector dalpha at 0. */
-    bool m_SectorZeroDalpha;
+    /** Fix sector deltaGamma at 0. */
+    bool m_SectorZeroDeltaGamma;
 
-    /** Sector dx */
-    double m_SectorDx;
+    /** Sector deltaU */
+    double m_SectorDeltaU;
 
-    /** Sector dy. */
-    double m_SectorDy;
+    /** Sector deltaV. */
+    double m_SectorDeltaV;
 
-    /** Sector dalpha. */
-    double m_SectorDalpha;
+    /** Sector deltaGamma. */
+    double m_SectorDeltaGamma;
 
     /** Name of input file. */
     std::string m_InputFile;
@@ -111,11 +111,12 @@ namespace Belle2 {
 
     /**
      * Generation of fixed sector displacements.
-     * @param[in] dx     dx.
-     * @param[in] dy     dy.
-     * @param[in] dalpha dalpha.
+     * @param[in] deltaU     Shift in U.
+     * @param[in] deltaV     Shift in V.
+     * @param[in] deltaGamma Rotation in Gamma.
      */
-    void generateFixedSectorDisplacement(double dx, double dy, double dalpha);
+    void generateFixedSectorDisplacement(double deltaU, double deltaV,
+                                         double deltaGamma);
 
     /**
      * Generation of random displacements.

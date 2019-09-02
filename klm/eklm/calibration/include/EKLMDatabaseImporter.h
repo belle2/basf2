@@ -61,29 +61,30 @@ namespace Belle2 {
 
     /**
      * Set sector displacement.
-     * @param[in] section Section number.
-     * @param[in] layer   Layer number.
-     * @param[in] sector  Sector number.
-     * @param[in[ dx      dx.
-     * @param[in] dy      dy.
-     * @param[in] dalpha  dalpha.
+     * @param[in] section    Section number.
+     * @param[in] layer      Layer number.
+     * @param[in] sector     Sector number.
+     * @param[in] deltaU     Shift in U.
+     * @param[in] deltaV     Shift in V.
+     * @param[in] deltaGamma Rotation in Gamma.
      */
     void setSectorDisplacement(int section, int layer, int sector,
-                               float dx, float dy, float dalpha);
+                               float deltaU, float deltaV, float deltaGamma);
 
     /**
      * Set segment displacement.
-     * @param[in] section Section number.
-     * @param[in] layer   Layer number.
-     * @param[in] sector  Sector number.
-     * @param[in] plane   Plane number.
-     * @param[in] segment Segment number.
-     * @param[in] dx      dx.
-     * @param[in] dy      dy.
-     * @param[in] dalpha  dalpha.
+     * @param[in] section    Section number.
+     * @param[in] layer      Layer number.
+     * @param[in] sector     Sector number.
+     * @param[in] plane      Plane number.
+     * @param[in] segment    Segment number.
+     * @param[in] deltaU     Shift in U.
+     * @param[in] deltaV     Shift in V.
+     * @param[in] deltaGamma Rotation in Gamma.
      */
-    void setSegmentDisplacement(int section, int layer, int sector, int plane,
-                                int segment, float dx, float dy, float dalpha);
+    void setSegmentDisplacement(
+      int section, int layer, int sector, int plane, int segment,
+      float deltaU, float deltaV, float deltaGamma);
 
     /**
      * Import displacement data.

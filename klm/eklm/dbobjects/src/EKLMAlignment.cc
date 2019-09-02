@@ -24,21 +24,21 @@ EKLMAlignment::~EKLMAlignment()
 }
 
 void EKLMAlignment::setSectorAlignment(uint16_t segment,
-                                       EKLMAlignmentData* dat)
+                                       KLMAlignmentData* dat)
 {
-  std::map<uint16_t, EKLMAlignmentData>::iterator it;
+  std::map<uint16_t, KLMAlignmentData>::iterator it;
   it = m_SectorAlignment.find(segment);
   if (it == m_SectorAlignment.end()) {
     m_SectorAlignment.insert(
-      std::pair<uint16_t, EKLMAlignmentData>(segment, *dat));
+      std::pair<uint16_t, KLMAlignmentData>(segment, *dat));
   } else
     it->second = *dat;
 }
 
-const EKLMAlignmentData* EKLMAlignment::getSectorAlignment(
+const KLMAlignmentData* EKLMAlignment::getSectorAlignment(
   uint16_t segment) const
 {
-  std::map<uint16_t, EKLMAlignmentData>::const_iterator it;
+  std::map<uint16_t, KLMAlignmentData>::const_iterator it;
   it = m_SectorAlignment.find(segment);
   if (it == m_SectorAlignment.end())
     return nullptr;
@@ -46,21 +46,21 @@ const EKLMAlignmentData* EKLMAlignment::getSectorAlignment(
 }
 
 void EKLMAlignment::setSegmentAlignment(uint16_t segment,
-                                        EKLMAlignmentData* dat)
+                                        KLMAlignmentData* dat)
 {
-  std::map<uint16_t, EKLMAlignmentData>::iterator it;
+  std::map<uint16_t, KLMAlignmentData>::iterator it;
   it = m_SegmentAlignment.find(segment);
   if (it == m_SegmentAlignment.end()) {
     m_SegmentAlignment.insert(
-      std::pair<uint16_t, EKLMAlignmentData>(segment, *dat));
+      std::pair<uint16_t, KLMAlignmentData>(segment, *dat));
   } else
     it->second = *dat;
 }
 
-const EKLMAlignmentData* EKLMAlignment::getSegmentAlignment(
+const KLMAlignmentData* EKLMAlignment::getSegmentAlignment(
   uint16_t segment) const
 {
-  std::map<uint16_t, EKLMAlignmentData>::const_iterator it;
+  std::map<uint16_t, KLMAlignmentData>::const_iterator it;
   it = m_SegmentAlignment.find(segment);
   if (it == m_SegmentAlignment.end())
     return nullptr;
@@ -70,18 +70,18 @@ const EKLMAlignmentData* EKLMAlignment::getSegmentAlignment(
 double EKLMAlignment::getGlobalParam(unsigned short element,
                                      unsigned short param) const
 {
-  const EKLMAlignmentData* alignmentData;
+  const KLMAlignmentData* alignmentData;
   EKLMElementID id(element);
   alignmentData = getSectorAlignment(id.getSectorNumber());
   if (alignmentData == nullptr)
     return 0;
   switch (param) {
     case 1:
-      return alignmentData->getDx();
+      return alignmentData->getDeltaU();
     case 2:
-      return alignmentData->getDy();
+      return alignmentData->getDeltaW();
     case 6:
-      return alignmentData->getDalpha();
+      return alignmentData->getDeltaGamma();
   }
   B2FATAL("Attempt to get EKLM alignment parameter with incorrect number " <<
           param);
@@ -91,21 +91,21 @@ double EKLMAlignment::getGlobalParam(unsigned short element,
 void EKLMAlignment::setGlobalParam(double value, unsigned short element,
                                    unsigned short param)
 {
-  EKLMAlignmentData* alignmentData;
+  KLMAlignmentData* alignmentData;
   EKLMElementID id(element);
-  alignmentData = const_cast<EKLMAlignmentData*>(
+  alignmentData = const_cast<KLMAlignmentData*>(
                     getSectorAlignment(id.getSectorNumber()));
   if (alignmentData == nullptr)
     return;
   switch (param) {
     case 1:
-      alignmentData->setDx(value);
+      alignmentData->setDeltaU(value);
       return;
     case 2:
-      alignmentData->setDy(value);
+      alignmentData->setDeltaW(value);
       return;
     case 6:
-      alignmentData->setDalpha(value);
+      alignmentData->setDeltaGamma(value);
       return;
   }
   B2FATAL("Attempt to set EKLM alignment parameter with incorrect number " <<

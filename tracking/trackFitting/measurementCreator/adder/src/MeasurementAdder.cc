@@ -13,7 +13,7 @@
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
-#include <alignment/reconstruction/BKLMRecoHit.h>
+#include <alignment/reconstruction/AlignableBKLMRecoHit.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
 
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
@@ -84,7 +84,7 @@ void MeasurementAdder::createGenfitMeasurementFactory()
                                            new genfit::MeasurementProducer<RecoHitInformation::UsedCDCHit, CDCRecoHit>(cdcHits.getPtr()));
   if (bklmHits.isOptional())
     m_genfitMeasurementFactory.addProducer(Const::BKLM,
-                                           new genfit::MeasurementProducer<RecoHitInformation::UsedBKLMHit, BKLMRecoHit>(bklmHits.getPtr()));
+                                           new genfit::MeasurementProducer<RecoHitInformation::UsedBKLMHit, AlignableBKLMRecoHit>(bklmHits.getPtr()));
   if (eklmHits.isOptional())
     m_genfitMeasurementFactory.addProducer(Const::EKLM,
                                            new genfit::MeasurementProducer<RecoHitInformation::UsedEKLMHit, AlignableEKLMRecoHit>(eklmHits.getPtr()));

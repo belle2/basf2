@@ -21,57 +21,11 @@ import vertex as vx
 from simulation import add_simulation
 from L1trigger import add_tsim
 
+import alignment.constraints as hierarchy
 
-def gen_constraints(timedep_config):
-    events = []
-    for (labels, events_) in timedep_config:
-        events += [event for event in events_]
-
-    if not len(timedep_config):
-        events = [(0, 0, 0)]
-
-    events = [(exp, run, ev) for (ev, run, exp) in events]
-    events = sorted(list(set(events)))
-    events = [(ev_, run_, exp_) for (exp_, run_, ev_) in events]
-
-    fileName = 'TimedepConfigEvent_exp{}run{}ev{}.root'
-    files = []
-
-    for index, event in enumerate(events):
-        # conditions.reset()
-        # conditions.override_globaltags(conditions.default_globaltags)
-
-        ev, run, exp = event
-        path = create_path()
-        path.add_module("EventInfoSetter",
-                        skipNEvents=ev,
-                        evtNumList=[ev + 1],
-                        runList=[run],
-                        expList=[exp])
-        path.add_module('Progress')
-        this_filename = fileName.format(exp, run, ev)
-        path.add_module('RootOutput', outputFileName=this_filename, ignoreCommandLineOverride=True)
-        files.append(this_filename)
-        process(path)
-        print(statistics)
-
-    # conditions.reset()
-    # conditions.override_globaltags(conditions.default_globaltags)
-
-    print(files)
-
-    conditions.override_globaltags([tag for tag in conditions.default_globaltags])
-
-    path = create_path()
-    path.add_module("RootInput", inputFileNames=files, ignoreCommandLineOverride=True)
-    path.add_module('HistoManager')
-    path.add_module('Progress')
-    path.add_module('Gearbox')
-    path.add_module('Geometry')
-    path.add_module('MillepedeCollector', timedepConfig=timedep_config, enableSVDHierarchy=False)
-    process(path)
-    print(statistics)
-
+consts = [
+  hierarchy.VXDHierarchyConstraints(type=2, svd=False),
+  hierarchy.CDCLayerConstraints("myCDCLayerConstr.txt")]
 
 # Generate 4 runs, with run number 4, 5, 6, 7
 runList = [4, 5, 6, 7]
@@ -95,20 +49,19 @@ Belle2.GlobalLabel.clearTimeDependentParamaters()
 label = Belle2.GlobalLabel()
 
 pxd_labels = []
-ladder_labels = []
 
 for par in params:
     for shell in [ying, yang]:
         label.construct(Belle2.VXDAlignment.getGlobalUniqueID(), shell.getID(), par)
         pxd_labels.append(label.label())
-    for ladder in [pxd_ladder1]:
-        label.construct(Belle2.VXDAlignment.getGlobalUniqueID(), ladder.getID(), par)
-        ladder_labels.append(label.label())
 
 # Configure the the time dependence for calibration
-timedep = [(pxd_labels, [(0, run, 0) for run in runList] + [(20, 5, 0), (40, 5, 0)] + [(20, 7, 0)]), (ladder_labels, [(0, 6, 0)])]
+timedep = [(pxd_labels, [(0, run, 0) for run in runList] + [(20, 5, 0), (40, 5, 0)] + [(20, 7, 0)])]
 
-db_components = ['VXDAlignment']
+timedep += [([hierarchy.cdc_layer_label(layer, ipar) for ipar in [1, 2, 6, 11, 12, 16]
+              for layer in range(0, 56)], [(0, run, 0) for run in runList])]
+
+db_components = ['VXDAlignment', 'CDCAlignment']
 components = ['PXD', 'SVD', 'CDC']
 
 
@@ -164,7 +117,8 @@ def PXDHalfShellsAlignment(files, tags):
     # algorithm.steering().command('dwfractioncut 0.1')
     # algorithm.steering().command('presigmas 1.')
     algorithm.steering().command('FortranFiles')
-    algorithm.steering().command('/home/tadeas/belle2/head/alignment/examples/constraints.txt')
+    for filename in hierarchy.gen_constraints(consts, timedep):
+        algorithm.steering().command(filename)
 
     algorithm.steering().command('Parameters')
 
@@ -187,7 +141,7 @@ def PXDHalfShellsAlignment(files, tags):
 
     for layer in range(1, 7):
         for ladder in range(1, ladders[layer - 1] + 1):
-            # fix_vxd_id(Belle2.VxdID(layer, ladder, 0), params=[1, 2, 3, 4, 5, 6])
+            fix_vxd_id(Belle2.VxdID(layer, ladder, 0), params=[1, 2, 3, 4, 5, 6])
             for sensor in range(1, sensors[layer - 1] + 1):
                 # sensors
                 fix_vxd_id(
@@ -283,9 +237,6 @@ if __name__ == "__main__":
         # Btw. CAF runs completely independent processes, so there it is fine to process() anything before
         # (but not so much again after or in pre_algorithm() (probably!)
         exit(0)
-
-    print("Starting to generate time-dependent constraints...")
-    gen_constraints(timedep)
 
     tags = conditions.default_globaltags
     mp2_beamspot = PXDHalfShellsAlignment(input_files, tags)

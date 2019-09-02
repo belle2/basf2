@@ -185,20 +185,6 @@ void BKLMDatabaseImporter::importBklmGeometryPar()
 
 }
 
-void BKLMDatabaseImporter::exportBklmGeometryPar()
-{
-  DBObjPtr<BKLMGeometryPar> element("BKLMGeometryPar");
-
-  B2INFO("BKLMGeometryPar version: " << element->getVersion() <<
-         ", global rotation angle " << element->getRotation() <<
-         ", module frame width: " << element->getModuleFrameWidth() <<
-         ", module frame thickness: " << element->getModuleFrameThickness() <<
-         ", local reconstruction shift (x,y,z) of forward sector 1 layer 1: (" <<
-         element->getLocalReconstructionShiftX(1, 1, 1) << ", " <<
-         element->getLocalReconstructionShiftY(1, 1, 1) << ", " <<
-         element->getLocalReconstructionShiftZ(1, 1, 1) << ")");
-}
-
 void BKLMDatabaseImporter::importBklmSimulationPar(int expStart, int runStart, int expStop, int runStop)
 {
   BKLMSimulationPar bklmSimulationPar;
@@ -210,21 +196,6 @@ void BKLMDatabaseImporter::importBklmSimulationPar(int expStart, int runStart, i
   // Define the IOV and store data to the DB
   IntervalOfValidity iov(expStart, runStart, expStop, runStop);
   Database::Instance().storeData("BKLMSimulationPar", &bklmSimulationPar, iov);
-}
-
-void BKLMDatabaseImporter::exportBklmSimulationPar()
-{
-
-  DBObjPtr<BKLMSimulationPar> element("BKLMSimulationPar");
-
-  B2INFO("HitTimeMax: " << element->getHitTimeMax());
-  B2INFO("weight table: ");
-  for (int ii = 0; ii < element->getNPhiDivision(); ii++) {
-    for (int jj = 1; jj <= element->getNPhiMultiplicity(ii); jj++) {
-      B2INFO(ii << ", " << jj << ", :" << element->getPhiWeight(ii, jj) << endl);
-    }
-  }
-
 }
 
 void BKLMDatabaseImporter::importBklmMisAlignment()
@@ -250,26 +221,6 @@ void BKLMDatabaseImporter::importBklmMisAlignment()
   mal.import(Iov);
 }
 
-void BKLMDatabaseImporter::exportBklmMisAlignment()
-{
-
-  DBObjPtr<BKLMMisAlignment> element("BKLMMisAlignment");
-
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 8; j++) {
-      for (int k = 0; k < 15; k++) {
-        B2INFO("bklm misalignment parameter of section " << i << ", sector " << j + 1 << ", layer " << k + 1);
-        for (int p = 1; p < 7; p++) { //six parameter
-          BKLMElementID bklmid(i, j, k);
-          double par = element->get(bklmid, p);
-          B2INFO(" p [" << p << "] : " << par);
-        }
-        //B2INFO(" " << endl);
-      }//end loop layer
-    }//end loop sector
-  }
-}
-
 void BKLMDatabaseImporter::importBklmAlignment()
 {
 
@@ -293,27 +244,6 @@ void BKLMDatabaseImporter::importBklmAlignment()
   al.import(Iov);
 }
 
-void BKLMDatabaseImporter::exportBklmAlignment()
-{
-
-  DBObjPtr<BKLMAlignment> element("BKLMAlignment");
-
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 8; j++) {
-      for (int k = 0; k < 15; k++) {
-        B2INFO("bklm alignment parameter of section " << i << ", sector " << j + 1 << ", layer " << k + 1);
-        for (int p = 1; p < 7; p++) { //six parameter
-          BKLMElementID bklmid(i, j, k);
-          double par = element->get(bklmid, p);
-          B2INFO(" p [" << p << "] : " << par);
-        }
-        //B2INFO(" " << endl);
-      }//end loop layer
-    }//end loop sector
-  }
-}
-
-
 void BKLMDatabaseImporter::importBklmDisplacement()
 {
 
@@ -331,36 +261,12 @@ void BKLMDatabaseImporter::importBklmDisplacement()
   m_displacement.import(Iov);
 }
 
-void BKLMDatabaseImporter::exportBklmDisplacement()
-{
-  DBArray<BKLMDisplacement> displacements;
-  for (const auto& disp : displacements) {
-    unsigned short bklmElementID = disp.getElementID();
-    BKLMElementID bklmid(bklmElementID);
-    unsigned short section = bklmid.getSection();
-    unsigned short sector = bklmid.getSectorNumber();
-    unsigned short layer = bklmid.getLayerNumber();
-    B2INFO("displacement of " << section << ", " << sector << ", " << layer << ": " << disp.getUShift() << ", " << disp.getVShift() <<
-           ", " <<
-           disp.getWShift() << ", " << disp.getAlphaRotation() << ", " << disp.getBetaRotation() << ", " << disp.getGammaRotation());
-  }//end loop layer
-}
-
 void BKLMDatabaseImporter::importBklmADCThreshold(BKLMADCThreshold* threshold)
 {
   DBImportObjPtr<BKLMADCThreshold> adcParam;
   adcParam.construct(*threshold);
   IntervalOfValidity iov(0, 0, -1, -1);
   adcParam.import(iov);
-}
-
-void BKLMDatabaseImporter::exportBklmADCThreshold()
-{
-
-  DBObjPtr<BKLMADCThreshold> element("BKLMADCThreshold");
-  B2INFO("MPPC gain " << element->getMPPCGain());
-  B2INFO("ADC offset " << element->getADCOffset());
-  B2INFO("ADC threshold " << element->getADCThreshold());
 }
 
 void BKLMDatabaseImporter::importBklmTimeWindow()
@@ -374,13 +280,4 @@ void BKLMDatabaseImporter::importBklmTimeWindow()
 
   IntervalOfValidity iov(0, 0, -1, -1);
   m_timing.import(iov);
-}
-
-void BKLMDatabaseImporter::exportBklmTimeWindow()
-{
-
-  DBObjPtr<BKLMTimeWindow> m_timing("BKLMTimeWindow");
-  B2INFO("z/phi coincidence window " << m_timing->getCoincidenceWindow());
-  B2INFO(" timing cut reference " << m_timing->getPromptTime());
-  B2INFO(" timing window " << m_timing->getPromptWindow());
 }

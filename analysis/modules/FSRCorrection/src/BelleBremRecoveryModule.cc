@@ -51,10 +51,12 @@ namespace Belle2 {
 
   {
     // set module description (e.g. insert text)
-    setDescription(R"DOC(Takes the charged particle from the given charged particle list(`inputListName`) and
-                   copies them to the output list(`outputListName`) and adds the 4-vector of  all the photons
-                   from `gammaListName` (considered as radiative) to the charged particle, if the given
-                   criteria for maximum angle(`angleThreshold`) and minimum energy(`minimumEnergy`) are fulfilled.)DOC");
+    setDescription(R"DOC(
+                   Takes the charged particle from the given charged particle list(``inputListName``) and
+                   copies them to the output list(``outputListName``) and adds the 4-vector of nearest(all) photon(s)
+                   from ``gammaListName`` (considered as radiative) to the charged particle, if the given
+                   criteria for maximum angle(``angleThreshold``) and minimum energy(``minimumEnergy``) are fulfilled.
+                   )DOC");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters

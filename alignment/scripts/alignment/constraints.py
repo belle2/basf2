@@ -53,9 +53,15 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None):
     fileName = 'TimedepConfigEvent_exp{}run{}ev{}.root'
     files = []
 
+    print(global_tags)
+    print(reversed(global_tags))
+
+    conditions.override_globaltags([tag for tag in reversed(global_tags)])
+    conditions.prepend_testing_payloads(os.path.abspath(
+        "/home/tadeas/belle2/head/alignment/examples/fuckingworkaround/database.txt"))
+
     for index, event in enumerate(events):
         #  conditions.reset()
-        #  conditions.override_globaltags(global_tags)
 
         ev, run, exp = event
         path = create_path()
@@ -73,7 +79,7 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None):
 
     print(files)
 
-    conditions.override_globaltags(global_tags)
+    # conditions.override_globaltags(global_tags)
 
     path = create_path()
     path.add_module("RootInput", inputFileNames=files, ignoreCommandLineOverride=True)

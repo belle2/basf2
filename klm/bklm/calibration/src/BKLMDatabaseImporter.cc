@@ -12,7 +12,6 @@
 #include <klm/bklm/calibration/BKLMDatabaseImporter.h>
 #include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <klm/bklm/dbobjects/BKLMSimulationPar.h>
-#include <klm/bklm/dbobjects/BKLMMisAlignment.h>
 #include <klm/bklm/dbobjects/BKLMDisplacement.h>
 #include <klm/bklm/dbobjects/BKLMTimeWindow.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
@@ -196,29 +195,6 @@ void BKLMDatabaseImporter::importBklmSimulationPar(int expStart, int runStart, i
   // Define the IOV and store data to the DB
   IntervalOfValidity iov(expStart, runStart, expStop, runStop);
   Database::Instance().storeData("BKLMSimulationPar", &bklmSimulationPar, iov);
-}
-
-void BKLMDatabaseImporter::importBklmMisAlignment()
-{
-
-  DBImportObjPtr<BKLMMisAlignment> mal;
-  mal.construct();
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 8; j++) {
-      for (int k = 0; k < 15; k++) {
-        BKLMElementID bklmid(i, j, k);
-        mal->set(bklmid, 1, 0.);
-        mal->set(bklmid, 2, 0.);
-        mal->set(bklmid, 3, 0.);
-        mal->set(bklmid, 4, 0.);
-        mal->set(bklmid, 5, 0.);
-        mal->set(bklmid, 6, 0.);
-      }
-    }
-  }
-
-  IntervalOfValidity Iov(0, 0, -1, -1);
-  mal.import(Iov);
 }
 
 void BKLMDatabaseImporter::importBklmAlignment()

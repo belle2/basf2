@@ -70,9 +70,6 @@ namespace Belle2 {
     //! Import BKLM simulation parameters into the database
     void importBklmSimulationPar(int expStart, int runStart, int expStop, int runStop);
 
-    //! Import BKLM Misalignment parameters into the database
-    void importBklmMisAlignment();
-
     //! Import BKLM Alignment parameters into the database
     void importBklmAlignment();
 

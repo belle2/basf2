@@ -343,12 +343,6 @@ void ECLDigitizerModule::event()
         eclDsp->setDspA(FitA);
       }
 
-      B2INFO(energyFit << " " << m_Awave[CellId - 1]);
-      for (int k = 1; k < 8737; k++) {
-        B2INFO("k: " << k << "     ECL_FPGA_StoreWaveform(ADC):" << m_Awave[k - 1] << "    ECL_FPGA_StoreWaveform(MeV):" << m_Awave[k - 1] /
-               m_calib[k - 1].ascale / 20.0 << "     ADCtoMeV:" << m_calib[k - 1].ascale);
-      }
-
       const auto eclDigit = m_eclDigits.appendNew();
       eclDigit->setCellId(CellId); // cellId in range from 1 to 8736
       eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;

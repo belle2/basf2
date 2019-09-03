@@ -286,7 +286,7 @@ def plot_with_errobands(uncertain_series,
     if ax is None:
         ax = plt.gca()
     uncertain_series = uncertain_series.dropna()
-    ax.plot(uncertain_series.index, uncertain_series.nominal_value, **plot_kwargs)
+    ax.plot(uncertain_series.index.values, uncertain_series.nominal_value, **plot_kwargs)
     ax.fill_between(x=uncertain_series.index,
                     y1=uncertain_series.nominal_value - uncertain_series.std_dev,
                     y2=uncertain_series.nominal_value + uncertain_series.std_dev,
@@ -1303,7 +1303,7 @@ class MasterTask(b2luigi.WrapperTask):
         for exclude_variables in [ntrack_variables]:
             for cdc_training_target in [
                 "truth_track_is_matched",
-                # "truth"  # truth includes clones as signal
+                "truth"  # truth includes clones as signal
             ]:
                 yield FullTrackQEValidationPlotsTask(
                     cdc_training_target=cdc_training_target,
@@ -1312,16 +1312,16 @@ class MasterTask(b2luigi.WrapperTask):
                     n_events_testing=self.n_events_testing,
                 )
 
-                # yield CDCQEValidationPlotsTask(
-                #     training_target=cdc_training_target,
-                #     n_events_training=self.n_events_training,
-                #     n_events_testing=self.n_events_testing,
-                # )
+                yield CDCQEValidationPlotsTask(
+                    training_target=cdc_training_target,
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                )
 
-                # yield VXDQEValidationPlotsTask(
-                #     n_events_training=self.n_events_training,
-                #     n_events_testing=self.n_events_testing,
-                # )
+                yield VXDQEValidationPlotsTask(
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                )
 
                 if self.run_mva_evaluate:
                     yield FullTrackQEEvaluationTask(

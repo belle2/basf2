@@ -914,8 +914,11 @@ class TrackQEEvaluationBaseTask(Basf2Task):
         yield self.add_to_output(evaluation_pdf_output)
 
     def run(self):
-        evaluation_pdf_output = (
-            self.teacherTask.weightfile_identifier.rsplit(".", 1)[0] + ".pdf"
+        evaluation_pdf_output_basename = self.teacherTask.weightfile_identifier.rsplit(".", 1)[0] + ".pdf"
+        evaluation_pdf_output_path = self.get_output_file_name(evaluation_pdf_output_basename)
+        # use tmp file until creation of evaluation pdf is finished and succesfull
+        tmp_evaluation_pdf_output_path = os.path.join(
+            os.path.dirname(evaluation_pdf_output_path), "tmp_" + evaluation_pdf_output_basename
         )
         cmd = [
             "basf2_mva_evaluate.py",
@@ -926,10 +929,11 @@ class TrackQEEvaluationBaseTask(Basf2Task):
             "--treename",
             self.teacherTask.tree_name,
             "-o",
-            self.get_output_file_name(evaluation_pdf_output),
+            tmp_evaluation_pdf_output_path,
         ]
         print(" ".join(cmd))
         subprocess.check_call(cmd)
+        os.rename(tmp_evaluation_pdf_output_path, evaluation_pdf_output_path)
 
 
 class VXDTrackQEEvaluationTask(TrackQEEvaluationBaseTask):
@@ -1036,8 +1040,13 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
         # qi_cuts = np.append(qi_cuts, np.linspace(np.max(qi_cuts), 1, 20, endpoint=False))
 
         # Create plots and append them to single output pdf
+
         output_pdf_file_path = self.get_output_file_name(self.output_pdf_file_basename)
-        with PdfPages(output_pdf_file_path, keep_empty=False) as pdf:
+        # use temporary filename until pdf is completed
+        tmp_output_pdf_file_path = os.path.join(
+            os.path.dirname(output_pdf_file_path), "tmp_" + self.output_pdf_file_basename
+        )
+        with PdfPages(tmp_output_pdf_file_path, keep_empty=False) as pdf:
 
             # Add a title page to validation plot PDF with some metadata
             # Remember that most metadata is in the xml file of the weightfile
@@ -1199,6 +1208,9 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
                 axarr[0].legend(loc="upper center", bbox_to_anchor=(0, -0.15))
                 pdf.savefig(fig, bbox_inches="tight")
                 plt.close(fig)
+        # if creation of all plots was successful, rename temporary pdf file to
+        # final pdf file name
+        os.rename(tmp_output_pdf_file_path, output_pdf_file_path)
 
 
 class VXDQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):

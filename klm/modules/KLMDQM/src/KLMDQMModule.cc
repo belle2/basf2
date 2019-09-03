@@ -149,7 +149,7 @@ void KLMDQMModule::defineHisto()
       i += 3;
     }
   }
-  firstChannelNumbers[nChannelHistograms] = m_ChannelArrayIndex->getNChannels();
+  firstChannelNumbers[nChannelHistograms] = m_ChannelArrayIndex->getNElements();
   i = 0;
   for (KLMChannelIndex& klmSector : klmSectors) {
     int nHistograms;

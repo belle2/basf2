@@ -10,21 +10,21 @@
 
 /* Belle2 headers. */
 #include <framework/logging/Logger.h>
-#include <klm/dataobjects/KLMChannelArrayIndex.h>
+#include <klm/dataobjects/KLMModuleArrayIndex.h>
 
 using namespace Belle2;
 
-KLMChannelArrayIndex::KLMChannelArrayIndex() :
-  KLMElementArrayIndex(KLMChannelIndex::c_IndexLevelStrip)
+KLMModuleArrayIndex::KLMModuleArrayIndex() :
+  KLMElementArrayIndex(KLMChannelIndex::c_IndexLevelLayer)
 {
 }
 
-KLMChannelArrayIndex::~KLMChannelArrayIndex()
+KLMModuleArrayIndex::~KLMModuleArrayIndex()
 {
 }
 
-const KLMChannelArrayIndex& KLMChannelArrayIndex::Instance()
+const KLMModuleArrayIndex& KLMModuleArrayIndex::Instance()
 {
-  static KLMChannelArrayIndex klmChannelArrayIndex;
-  return klmChannelArrayIndex;
+  static KLMModuleArrayIndex klmModuleArrayIndex;
+  return klmModuleArrayIndex;
 }

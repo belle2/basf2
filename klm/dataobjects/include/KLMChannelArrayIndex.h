@@ -13,12 +13,15 @@
 /* C++ headers. */
 #include <map>
 
+/* Belle2 headers. */
+#include <klm/dataobjects/KLMElementArrayIndex.h>
+
 namespace Belle2 {
 
   /**
    * KLM channel array index.
    */
-  class KLMChannelArrayIndex {
+  class KLMChannelArrayIndex : public KLMElementArrayIndex {
 
   public:
 
@@ -26,26 +29,6 @@ namespace Belle2 {
      * Instantiation.
      */
     static const KLMChannelArrayIndex& Instance();
-
-    /**
-     * Get channel index.
-     * @param[in] number Channel number.
-     */
-    uint16_t getIndex(uint16_t number) const;
-
-    /**
-     * Get channel number.
-     * @param[in] index Channel index.
-     */
-    uint16_t getNumber(uint16_t index) const;
-
-    /**
-     * Get number of channels.
-     */
-    uint16_t getNChannels() const
-    {
-      return m_NChannels;
-    }
 
   private:
 
@@ -58,15 +41,6 @@ namespace Belle2 {
      * Destructor.
      */
     ~KLMChannelArrayIndex();
-
-    /** Map KLM channel number - KLM channel index. */
-    std::map<uint16_t, uint16_t> m_MapNumberIndex;
-
-    /** Map KLM channel index - KLM channel number. */
-    std::map<uint16_t, uint16_t> m_MapIndexNumber;
-
-    /** Number of channels. */
-    uint16_t m_NChannels;
 
   };
 

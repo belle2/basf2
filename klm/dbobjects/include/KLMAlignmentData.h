@@ -16,7 +16,7 @@
 namespace Belle2 {
 
   /**
-   * EKLM Alignment data.
+   * KLM Alignment data.
    */
   class KLMAlignmentData : public TObject {
 
@@ -50,15 +50,7 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    KLMAlignmentData() :
-      m_DeltaU(0),
-      m_DeltaV(0),
-      m_DeltaW(0),
-      m_DeltaAlpha(0),
-      m_DeltaBeta(0),
-      m_DeltaGamma(0)
-    {
-    }
+    KLMAlignmentData();
 
     /**
      * Constructor.
@@ -70,22 +62,12 @@ namespace Belle2 {
      * @param[in] deltaGamma Rotation in gamma (EKLM: rotation in local plane).
      */
     KLMAlignmentData(float deltaU, float deltaV, float deltaW,
-                     float deltaAlpha, float deltaBeta, float deltaGamma) :
-      m_DeltaU(deltaU),
-      m_DeltaV(deltaV),
-      m_DeltaW(deltaW),
-      m_DeltaAlpha(deltaAlpha),
-      m_DeltaBeta(deltaBeta),
-      m_DeltaGamma(deltaGamma)
-    {
-    }
+                     float deltaAlpha, float deltaBeta, float deltaGamma);
 
     /**
      * Destructor.
      */
-    ~KLMAlignmentData()
-    {
-    }
+    ~KLMAlignmentData();
 
     /**
      * Get shift in U.
@@ -188,6 +170,19 @@ namespace Belle2 {
     {
       m_DeltaGamma = deltaGamma;
     }
+
+    /**
+     * Get parameter by number.
+     * @param[in] number Parameter number.
+     */
+    float getParameter(enum ParameterNumbers number) const;
+
+    /**
+     * Set parameter by number.
+     * @param[in] number Parameter number.
+     * @param[in] value  Parameter value.
+     */
+    void setParameter(enum ParameterNumbers number, float value);
 
   private:
 

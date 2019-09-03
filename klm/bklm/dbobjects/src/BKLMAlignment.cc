@@ -54,23 +54,8 @@ double BKLMAlignment::getGlobalParam(unsigned short element,
   alignmentData = getModuleAlignment(id.getModuleNumber());
   if (alignmentData == nullptr)
     return 0;
-  switch (param) {
-    case KLMAlignmentData::c_DeltaU:
-      return alignmentData->getDeltaU();
-    case KLMAlignmentData::c_DeltaV:
-      return alignmentData->getDeltaV();
-    case KLMAlignmentData::c_DeltaW:
-      return alignmentData->getDeltaW();
-    case KLMAlignmentData::c_DeltaAlpha:
-      return alignmentData->getDeltaAlpha();
-    case KLMAlignmentData::c_DeltaBeta:
-      return alignmentData->getDeltaBeta();
-    case KLMAlignmentData::c_DeltaGamma:
-      return alignmentData->getDeltaGamma();
-  }
-  B2FATAL("Attempt to get BKLM alignment parameter with incorrect number " <<
-          param);
-  return 0;
+  return alignmentData->getParameter(
+           static_cast<enum KLMAlignmentData::ParameterNumbers>(param));
 }
 
 void BKLMAlignment::setGlobalParam(double value, unsigned short element,
@@ -82,28 +67,8 @@ void BKLMAlignment::setGlobalParam(double value, unsigned short element,
                     getModuleAlignment(id.getModuleNumber()));
   if (alignmentData == nullptr)
     return;
-  switch (param) {
-    case KLMAlignmentData::c_DeltaU:
-      alignmentData->setDeltaU(value);
-      return;
-    case KLMAlignmentData::c_DeltaV:
-      alignmentData->setDeltaV(value);
-      return;
-    case KLMAlignmentData::c_DeltaW:
-      alignmentData->setDeltaW(value);
-      return;
-    case KLMAlignmentData::c_DeltaAlpha:
-      alignmentData->setDeltaAlpha(value);
-      return;
-    case KLMAlignmentData::c_DeltaBeta:
-      alignmentData->setDeltaBeta(value);
-      return;
-    case KLMAlignmentData::c_DeltaGamma:
-      alignmentData->setDeltaGamma(value);
-      return;
-  }
-  B2FATAL("Attempt to set BKLM alignment parameter with incorrect number " <<
-          param);
+  alignmentData->setParameter(
+    static_cast<enum KLMAlignmentData::ParameterNumbers>(param), value);
 }
 
 /* TODO: this function is not implemented. */

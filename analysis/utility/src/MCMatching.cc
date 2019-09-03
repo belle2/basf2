@@ -452,7 +452,10 @@ int MCMatching::getFlagsIgnoredByProperty(const Particle* part)
     flags |= (MCMatching::c_MissPHOTOS);
   }
   if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreIntermediate) flags |= (MCMatching::c_MissingResonance);
-  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreMassive) flags |= (MCMatching::c_MissMassiveParticle);
+  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreMassive) {
+    flags |= (MCMatching::c_MissMassiveParticle);
+    flags |= (MCMatching::c_MissKlong);
+  }
   if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreNeutrino) flags |= (MCMatching::c_MissNeutrino);
   if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreGamma) flags |= (MCMatching::c_MissGamma);
 

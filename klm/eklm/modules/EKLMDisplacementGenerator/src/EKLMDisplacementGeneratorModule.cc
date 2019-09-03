@@ -13,7 +13,6 @@
 #include <TTree.h>
 
 /* Belle2 headers. */
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
 #include <klm/eklm/geometry/AlignmentChecker.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/modules/EKLMDisplacementGenerator/EKLMDisplacementGeneratorModule.h>
@@ -62,7 +61,8 @@ EKLMDisplacementGeneratorModule::~EKLMDisplacementGeneratorModule()
 {
 }
 
-void EKLMDisplacementGeneratorModule::fillZeroDisplacements(EKLMAlignment* alignment)
+void EKLMDisplacementGeneratorModule::fillZeroDisplacements(
+  EKLMAlignment* alignment, EKLMSegmentAlignment* segmentAlignment)
 {
   KLMAlignmentData alignmentData(0, 0, 0, 0, 0, 0);
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
@@ -72,12 +72,12 @@ void EKLMDisplacementGeneratorModule::fillZeroDisplacements(EKLMAlignment* align
          iLayer++) {
       for (iSector = 1; iSector <= geoDat->getNSectors(); iSector++) {
         sector = geoDat->sectorNumber(iSection, iLayer, iSector);
-        alignment->setSectorAlignment(sector, &alignmentData);
+        alignment->setModuleAlignment(sector, &alignmentData);
         for (iPlane = 1; iPlane <= geoDat->getNPlanes(); iPlane++) {
           for (iSegment = 1; iSegment <= geoDat->getNSegments(); iSegment++) {
             segment = geoDat->segmentNumber(iSection, iLayer, iSector, iPlane,
                                             iSegment);
-            alignment->setSegmentAlignment(segment, &alignmentData);
+            segmentAlignment->setSegmentAlignment(segment, &alignmentData);
           }
         }
       }
@@ -89,8 +89,9 @@ void EKLMDisplacementGeneratorModule::generateZeroDisplacement()
 {
   IntervalOfValidity iov(0, 0, -1, -1);
   EKLMAlignment alignment;
-  fillZeroDisplacements(&alignment);
-  saveDisplacement(&alignment);
+  EKLMSegmentAlignment segmentAlignment;
+  fillZeroDisplacements(&alignment, &segmentAlignment);
+  saveDisplacement(&alignment, &segmentAlignment);
   Database::Instance().storeData(m_PayloadName, (TObject*)&alignment, iov);
 }
 
@@ -99,19 +100,20 @@ void EKLMDisplacementGeneratorModule::generateFixedSectorDisplacement(
 {
   IntervalOfValidity iov(0, 0, -1, -1);
   EKLMAlignment alignment;
+  EKLMSegmentAlignment segmentAlignment;
   KLMAlignmentData sectorAlignment(deltaU, deltaV, 0, 0, 0, deltaGamma);
   int iSection, iLayer, iSector, sector;
-  fillZeroDisplacements(&alignment);
+  fillZeroDisplacements(&alignment, &segmentAlignment);
   for (iSection = 1; iSection <= m_GeoDat->getNSections(); iSection++) {
     for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iSection);
          iLayer++) {
       for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
         sector = m_GeoDat->sectorNumber(iSection, iLayer, iSector);
-        alignment.setSectorAlignment(sector, &sectorAlignment);
+        alignment.setModuleAlignment(sector, &sectorAlignment);
       }
     }
   }
-  saveDisplacement(&alignment);
+  saveDisplacement(&alignment, &segmentAlignment);
   Database::Instance().storeData(m_PayloadName, (TObject*)&alignment, iov);
 }
 
@@ -132,11 +134,12 @@ void EKLMDisplacementGeneratorModule::generateRandomDisplacement(
   const double segmentMaxDeltaGamma = 0.003 * Unit::rad;
   const double segmentMinDeltaGamma = -0.003 * Unit::rad;
   EKLMAlignment alignment;
-  KLMAlignmentData sectorAlignment, segmentAlignment, *alignmentData;
+  EKLMSegmentAlignment segmentAlignment;
+  KLMAlignmentData sectorAlignmentData, segmentAlignmentData, *alignmentData;
   EKLM::AlignmentChecker alignmentChecker(false);
   int iSection, iLayer, iSector, iPlane, iSegment, sector, segment;
   double d;
-  fillZeroDisplacements(&alignment);
+  fillZeroDisplacements(&alignment, &segmentAlignment);
   for (iSection = 1; iSection <= m_GeoDat->getNSections(); iSection++) {
     for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iSection);
          iLayer++) {
@@ -145,18 +148,18 @@ void EKLMDisplacementGeneratorModule::generateRandomDisplacement(
           if (iSection > 1 || iLayer > 1 || iSector > 1) {
             sector = m_GeoDat->sectorNumber(1, 1, 1);
             alignmentData = const_cast<KLMAlignmentData*>(
-                              alignment.getSectorAlignment(sector));
+                              alignment.getModuleAlignment(sector));
             sector = m_GeoDat->sectorNumber(iSection, iLayer, iSector);
-            alignment.setSectorAlignment(sector, alignmentData);
+            alignment.setModuleAlignment(sector, alignmentData);
             for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
               for (iSegment = 1; iSegment <= m_GeoDat->getNSegments();
                    iSegment++) {
                 segment = m_GeoDat->segmentNumber(1, 1, 1, iPlane, iSegment);
                 alignmentData = const_cast<KLMAlignmentData*>(
-                                  alignment.getSegmentAlignment(segment));
+                                  segmentAlignment.getSegmentAlignment(segment));
                 segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector,
                                                   iPlane, iSegment);
-                alignment.setSegmentAlignment(segment, alignmentData);
+                segmentAlignment.setSegmentAlignment(segment, alignmentData);
               }
             }
             continue;
@@ -169,39 +172,40 @@ sector:
               d = 0;
             else
               d = gRandom->Uniform(sectorMinDeltaU, sectorMaxDeltaU);
-            sectorAlignment.setDeltaU(d);
+            sectorAlignmentData.setDeltaU(d);
             if (m_SectorZeroDeltaV)
               d = 0;
             else
               d = gRandom->Uniform(sectorMinDeltaV, sectorMaxDeltaV);
-            sectorAlignment.setDeltaV(d);
+            sectorAlignmentData.setDeltaV(d);
             if (m_SectorZeroDeltaGamma)
               d = 0;
             else
               d = gRandom->Uniform(sectorMinDeltaGamma, sectorMaxDeltaGamma);
-            sectorAlignment.setDeltaGamma(d);
+            sectorAlignmentData.setDeltaGamma(d);
           } while (!alignmentChecker.checkSectorAlignment(
-                     iSection, iLayer, iSector, &sectorAlignment));
+                     iSection, iLayer, iSector, &sectorAlignmentData));
           sector = m_GeoDat->sectorNumber(iSection, iLayer, iSector);
-          alignment.setSectorAlignment(sector, &sectorAlignment);
+          alignment.setModuleAlignment(sector, &sectorAlignmentData);
         }
         if (displaceSegment) {
           for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
             for (iSegment = 1; iSegment <= m_GeoDat->getNSegments();
                  iSegment++) {
               do {
-                segmentAlignment.setDeltaU(
+                segmentAlignmentData.setDeltaU(
                   gRandom->Uniform(segmentMinDeltaU, segmentMaxDeltaU));
-                segmentAlignment.setDeltaV(
+                segmentAlignmentData.setDeltaV(
                   gRandom->Uniform(segmentMinDeltaV, segmentMaxDeltaV));
-                segmentAlignment.setDeltaGamma(
+                segmentAlignmentData.setDeltaGamma(
                   gRandom->Uniform(segmentMinDeltaGamma, segmentMaxDeltaGamma));
               } while (!alignmentChecker.checkSegmentAlignment(
                          iSection, iLayer, iSector, iPlane, iSegment,
-                         &sectorAlignment, &segmentAlignment, false));
+                         &sectorAlignmentData, &segmentAlignmentData, false));
               segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector,
                                                 iPlane, iSegment);
-              alignment.setSegmentAlignment(segment, &segmentAlignment);
+              segmentAlignment.setSegmentAlignment(
+                segment, &segmentAlignmentData);
             }
           }
         } else {
@@ -210,7 +214,7 @@ sector:
                  iSegment++) {
               if (!alignmentChecker.checkSegmentAlignment(
                     iSection, iLayer, iSector, iPlane, iSegment,
-                    &sectorAlignment, &segmentAlignment, false))
+                    &sectorAlignmentData, &segmentAlignmentData, false))
                 goto sector;
             }
           }
@@ -218,7 +222,7 @@ sector:
       }
     }
   }
-  saveDisplacement(&alignment);
+  saveDisplacement(&alignment, &segmentAlignment);
   Database::Instance().storeData(m_PayloadName, (TObject*)&alignment, iov);
 }
 
@@ -231,8 +235,9 @@ void EKLMDisplacementGeneratorModule::readDisplacementFromROOTFile()
   TFile* f;
   TTree* t_sector, *t_segment;
   EKLMAlignment alignment;
+  EKLMSegmentAlignment segmentAlignment;
   KLMAlignmentData* alignmentData;
-  fillZeroDisplacements(&alignment);
+  fillZeroDisplacements(&alignment, &segmentAlignment);
   f = new TFile(m_InputFile.c_str());
   t_sector = (TTree*)f->Get("eklm_sector");
   t_sector->SetBranchAddress("section", &iSection);
@@ -253,7 +258,7 @@ void EKLMDisplacementGeneratorModule::readDisplacementFromROOTFile()
     t_sector->GetEntry(i);
     sector = m_GeoDat->sectorNumber(iSection, iLayer, iSector);
     alignmentData = const_cast<KLMAlignmentData*>(
-                      alignment.getSectorAlignment(sector));
+                      alignment.getModuleAlignment(sector));
     switch (param) {
       case 1:
         alignmentData->setDeltaU(value);
@@ -272,7 +277,7 @@ void EKLMDisplacementGeneratorModule::readDisplacementFromROOTFile()
     segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector, iPlane,
                                       iSegment);
     alignmentData = const_cast<KLMAlignmentData*>(
-                      alignment.getSegmentAlignment(segment));
+                      segmentAlignment.getSegmentAlignment(segment));
     switch (param) {
       case 1:
         alignmentData->setDeltaV(value);
@@ -282,7 +287,7 @@ void EKLMDisplacementGeneratorModule::readDisplacementFromROOTFile()
         break;
     }
   }
-  saveDisplacement(&alignment);
+  saveDisplacement(&alignment, &segmentAlignment);
   Database::Instance().storeData(m_PayloadName, (TObject*)&alignment, iov);
 }
 
@@ -298,6 +303,7 @@ void EKLMDisplacementGeneratorModule::studySectorAlignmentLimits(TFile* f)
   float deltaU, deltaV, deltaGamma;
   int i, alignmentStatus, iSection, iLayer, iSector, sector;
   EKLMAlignment alignment;
+  EKLMSegmentAlignment segmentAlignment;
   KLMAlignmentData alignmentDataRandom;
   EKLM::AlignmentChecker alignmentChecker(false);
   TTree* t;
@@ -308,7 +314,7 @@ void EKLMDisplacementGeneratorModule::studySectorAlignmentLimits(TFile* f)
   t->Branch("deltaGamma", &deltaGamma, "deltaGamma/F");
   t->Branch("status", &alignmentStatus, "status/I");
   for (i = 0; i < nPoints; i++) {
-    fillZeroDisplacements(&alignment);
+    fillZeroDisplacements(&alignment, &segmentAlignment);
     deltaU = gRandom->Uniform(minDeltaU, maxDeltaU);
     deltaV = gRandom->Uniform(minDeltaV, maxDeltaV);
     deltaGamma = gRandom->Uniform(minDeltaGamma, maxDeltaGamma);
@@ -320,11 +326,11 @@ void EKLMDisplacementGeneratorModule::studySectorAlignmentLimits(TFile* f)
            iLayer++) {
         for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
           sector = m_GeoDat->sectorNumber(iSection, iLayer, iSector);
-          alignment.setSectorAlignment(sector, &alignmentDataRandom);
+          alignment.setModuleAlignment(sector, &alignmentDataRandom);
         }
       }
     }
-    if (alignmentChecker.checkAlignment(&alignment))
+    if (alignmentChecker.checkAlignment(&alignment, &segmentAlignment))
       alignmentStatus = 1;
     else
       alignmentStatus = 0;
@@ -346,6 +352,7 @@ void EKLMDisplacementGeneratorModule::studySegmentAlignmentLimits(TFile* f)
   int i, alignmentStatus;
   int iSection, iLayer, iSector, jPlane, jSegment, segment;
   EKLMAlignment alignment;
+  EKLMSegmentAlignment segmentAlignment;
   KLMAlignmentData alignmentDataRandom;
   EKLM::AlignmentChecker alignmentChecker(false);
   TTree* t;
@@ -362,7 +369,7 @@ void EKLMDisplacementGeneratorModule::studySegmentAlignmentLimits(TFile* f)
     for (jSegment = 1; jSegment <= m_GeoDat->getNSegments(); jSegment++) {
       printf("Segment %d\n", jSegment);
       for (i = 0; i < nPoints; i++) {
-        fillZeroDisplacements(&alignment);
+        fillZeroDisplacements(&alignment, &segmentAlignment);
         deltaU = gRandom->Uniform(minDeltaU, maxDeltaU);
         deltaV = gRandom->Uniform(minDeltaV, maxDeltaV);
         deltaGamma = gRandom->Uniform(minDeltaGamma, maxDeltaGamma);
@@ -375,11 +382,12 @@ void EKLMDisplacementGeneratorModule::studySegmentAlignmentLimits(TFile* f)
             for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
               segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector,
                                                 jPlane, jSegment);
-              alignment.setSegmentAlignment(segment, &alignmentDataRandom);
+              segmentAlignment.setSegmentAlignment(
+                segment, &alignmentDataRandom);
             }
           }
         }
-        if (alignmentChecker.checkAlignment(&alignment))
+        if (alignmentChecker.checkAlignment(&alignment, &segmentAlignment))
           alignmentStatus = 1;
         else
           alignmentStatus = 0;
@@ -399,7 +407,8 @@ void EKLMDisplacementGeneratorModule::studyAlignmentLimits()
   delete f;
 }
 
-void EKLMDisplacementGeneratorModule::saveDisplacement(EKLMAlignment* alignment)
+void EKLMDisplacementGeneratorModule::saveDisplacement(
+  EKLMAlignment* alignment, EKLMSegmentAlignment* segmentAlignment)
 {
   int iSection, iLayer, iSector, iPlane, iSegment, sector, segment, param;
   float value;
@@ -427,7 +436,7 @@ void EKLMDisplacementGeneratorModule::saveDisplacement(EKLMAlignment* alignment)
       for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
         sector = m_GeoDat->sectorNumber(iSection, iLayer, iSector);
         alignmentData = const_cast<KLMAlignmentData*>(
-                          alignment->getSectorAlignment(sector));
+                          alignment->getModuleAlignment(sector));
         param = 1;
         value = alignmentData->getDeltaU();
         t_sector->Fill();
@@ -446,7 +455,7 @@ void EKLMDisplacementGeneratorModule::saveDisplacement(EKLMAlignment* alignment)
             segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector, iPlane,
                                               iSegment);
             alignmentData = const_cast<KLMAlignmentData*>(
-                              alignment->getSegmentAlignment(segment));
+                              segmentAlignment->getSegmentAlignment(segment));
             param = 1;
             value = alignmentData->getDeltaV();
             t_segment->Fill();

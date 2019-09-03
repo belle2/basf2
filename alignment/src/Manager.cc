@@ -27,6 +27,7 @@ namespace Belle2 {
       vector.addDBObj<CDCXtRelations>(cdcInterface);
       vector.addDBObj<BKLMAlignment>();
       vector.addDBObj<EKLMAlignment>();
+      vector.addDBObj<EKLMSegmentAlignment>();
     }
 
     void GlobalCalibrationManager::initialize(const std::vector< std::string >& components,

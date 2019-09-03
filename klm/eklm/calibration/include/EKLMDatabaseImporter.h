@@ -12,6 +12,7 @@
 
 /* Belle2 headers. */
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
+#include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
 #include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
 #include <framework/database/DBImportObjPtr.h>
 
@@ -101,6 +102,9 @@ namespace Belle2 {
 
     /** Displacement. */
     DBImportObjPtr<EKLMAlignment> m_Displacement;
+
+    /** Displacement. */
+    DBImportObjPtr<EKLMSegmentAlignment> m_SegmentDisplacement;
 
     /** Electronics map. */
     DBImportObjPtr<EKLMElectronicsMap> m_ElectronicsMap;

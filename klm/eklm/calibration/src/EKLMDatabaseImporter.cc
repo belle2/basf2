@@ -85,12 +85,12 @@ void EKLMDatabaseImporter::loadDefaultDisplacement()
          iLayer++) {
       for (iSector = 1; iSector <= geoDat->getNSectors(); iSector++) {
         sector = geoDat->sectorNumber(iSection, iLayer, iSector);
-        m_Displacement->setSectorAlignment(sector, &alignmentData);
+        m_Displacement->setModuleAlignment(sector, &alignmentData);
         for (iPlane = 1; iPlane <= geoDat->getNPlanes(); iPlane++) {
           for (iSegment = 1; iSegment <= geoDat->getNSegments(); iSegment++) {
             segment = geoDat->segmentNumber(iSection, iLayer, iSector, iPlane,
                                             iSegment);
-            m_Displacement->setSegmentAlignment(segment, &alignmentData);
+            m_SegmentDisplacement->setSegmentAlignment(segment, &alignmentData);
           }
         }
       }
@@ -113,7 +113,7 @@ void EKLMDatabaseImporter::setSectorDisplacement(
             "The displacement is not changed");
     return;
   }
-  m_Displacement->setSectorAlignment(sectorGlobal, &sectorAlignment);
+  m_Displacement->setModuleAlignment(sectorGlobal, &sectorAlignment);
 }
 
 void EKLMDatabaseImporter::setSegmentDisplacement(
@@ -126,7 +126,7 @@ void EKLMDatabaseImporter::setSegmentDisplacement(
   const KLMAlignmentData* sectorAlignment;
   int sectorGlobal, segmentGlobal;
   sectorGlobal = geoDat->sectorNumber(section, layer, sector);
-  sectorAlignment = m_Displacement->getSectorAlignment(sectorGlobal);
+  sectorAlignment = m_Displacement->getModuleAlignment(sectorGlobal);
   if (sectorAlignment == nullptr)
     B2FATAL("Incomplete alignment data.");
   segmentGlobal = geoDat->segmentNumber(section, layer, sector, plane, segment);
@@ -137,7 +137,7 @@ void EKLMDatabaseImporter::setSegmentDisplacement(
             "The displacement is not changed");
     return;
   }
-  m_Displacement->setSegmentAlignment(segmentGlobal, &segmentAlignment);
+  m_SegmentDisplacement->setSegmentAlignment(segmentGlobal, &segmentAlignment);
 }
 
 void EKLMDatabaseImporter::importDisplacement()
@@ -145,6 +145,7 @@ void EKLMDatabaseImporter::importDisplacement()
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
   m_Displacement.import(iov);
+  m_SegmentDisplacement.import(iov);
 }
 
 void EKLMDatabaseImporter::importElectronicsMap(

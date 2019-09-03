@@ -303,16 +303,17 @@ checkSegmentAlignment(int section, int layer, int sector, int plane, int segment
 }
 
 bool EKLM::AlignmentChecker::checkAlignment(
-  const EKLMAlignment* alignment) const
+  const EKLMAlignment* alignment,
+  const EKLMSegmentAlignment* segmentAlignment) const
 {
   int iSection, iLayer, iSector, iPlane, iSegment, sector, segment;
-  const KLMAlignmentData* sectorAlignment, *segmentAlignment;
   for (iSection = 1; iSection <= m_GeoDat->getNSections(); iSection++) {
     for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iSection);
          iLayer++) {
       for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
         sector = m_GeoDat->sectorNumber(iSection, iLayer, iSector);
-        sectorAlignment = alignment->getSectorAlignment(sector);
+        const KLMAlignmentData* sectorAlignment =
+          alignment->getModuleAlignment(sector);
         if (sectorAlignment == nullptr)
           B2FATAL("Incomplete alignment data.");
         if (!checkSectorAlignment(iSection, iLayer, iSector, sectorAlignment))
@@ -321,12 +322,13 @@ bool EKLM::AlignmentChecker::checkAlignment(
           for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
             segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector, iPlane,
                                               iSegment);
-            segmentAlignment = alignment->getSegmentAlignment(segment);
+            const KLMAlignmentData* segmentAlignmentData =
+              segmentAlignment->getSegmentAlignment(segment);
             if (segmentAlignment == nullptr)
               B2FATAL("Incomplete alignment data.");
             if (!checkSegmentAlignment(iSection, iLayer, iSector, iPlane,
                                        iSegment, sectorAlignment,
-                                       segmentAlignment, false))
+                                       segmentAlignmentData, false))
               return false;
           }
         }

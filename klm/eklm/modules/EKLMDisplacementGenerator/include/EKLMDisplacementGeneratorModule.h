@@ -12,6 +12,8 @@
 
 /* Belle2 headers. */
 #include <framework/core/Module.h>
+#include <klm/eklm/dbobjects/EKLMAlignment.h>
+#include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
 
 namespace Belle2 {
 
@@ -100,9 +102,11 @@ namespace Belle2 {
 
     /**
      * Fill EKLMAlignment with zero displacements.
-     * @param[in,out] alignment EKLMAlignment dbobject.
+     * @param[in,out] alignment        Displacements.
+     * @param[in,out] segmentAlignment Segment displacements.
      */
-    void fillZeroDisplacements(EKLMAlignment* alignment);
+    void fillZeroDisplacements(EKLMAlignment* alignment,
+                               EKLMSegmentAlignment* segmentAlignment);
 
     /**
      * Generation of zero displacements.
@@ -152,9 +156,11 @@ namespace Belle2 {
 
     /**
      * Save displacements to a ROOT file.
-     * @param[in] alignment Displacements.
+     * @param[in] alignment        Displacements.
+     * @param[in] segmentAlignment Segment displacements.
      */
-    void saveDisplacement(EKLMAlignment* alignment);
+    void saveDisplacement(EKLMAlignment* alignment,
+                          EKLMSegmentAlignment* segmentAlignment);
 
   };
 

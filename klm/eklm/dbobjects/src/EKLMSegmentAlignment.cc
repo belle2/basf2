@@ -11,60 +11,59 @@
 /* Belle2 headers. */
 #include <framework/logging/Logger.h>
 #include <klm/dataobjects/KLMAlignableElement.h>
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
+#include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
 
 using namespace Belle2;
 
-EKLMAlignment::EKLMAlignment()
+EKLMSegmentAlignment::EKLMSegmentAlignment()
 {
 }
 
-EKLMAlignment::~EKLMAlignment()
+EKLMSegmentAlignment::~EKLMSegmentAlignment()
 {
 }
 
-void EKLMAlignment::setModuleAlignment(uint16_t module,
-                                       KLMAlignmentData* dat)
+void EKLMSegmentAlignment::setSegmentAlignment(uint16_t segment,
+                                               KLMAlignmentData* dat)
 {
   std::map<uint16_t, KLMAlignmentData>::iterator it;
-  it = m_ModuleAlignment.find(module);
-  if (it == m_ModuleAlignment.end()) {
-    m_ModuleAlignment.insert(
-      std::pair<uint16_t, KLMAlignmentData>(module, *dat));
-  } else {
+  it = m_SegmentAlignment.find(segment);
+  if (it == m_SegmentAlignment.end()) {
+    m_SegmentAlignment.insert(
+      std::pair<uint16_t, KLMAlignmentData>(segment, *dat));
+  } else
     it->second = *dat;
-  }
 }
 
-const KLMAlignmentData* EKLMAlignment::getModuleAlignment(
-  uint16_t module) const
+const KLMAlignmentData* EKLMSegmentAlignment::getSegmentAlignment(
+  uint16_t segment) const
 {
   std::map<uint16_t, KLMAlignmentData>::const_iterator it;
-  it = m_ModuleAlignment.find(module);
-  if (it == m_ModuleAlignment.end())
+  it = m_SegmentAlignment.find(segment);
+  if (it == m_SegmentAlignment.end())
     return nullptr;
   return &(it->second);
 }
 
-double EKLMAlignment::getGlobalParam(unsigned short element,
-                                     unsigned short param) const
+double EKLMSegmentAlignment::getGlobalParam(unsigned short element,
+                                            unsigned short param) const
 {
   const KLMAlignmentData* alignmentData;
   KLMAlignableElement id(element);
-  alignmentData = getModuleAlignment(id.getModuleNumber());
+  alignmentData = getSegmentAlignment(id.getModuleNumber());
   if (alignmentData == nullptr)
     return 0;
   return alignmentData->getParameter(
            static_cast<enum KLMAlignmentData::ParameterNumbers>(param));
 }
 
-void EKLMAlignment::setGlobalParam(double value, unsigned short element,
-                                   unsigned short param)
+void EKLMSegmentAlignment::setGlobalParam(double value, unsigned short element,
+                                          unsigned short param)
 {
   KLMAlignmentData* alignmentData;
   KLMAlignableElement id(element);
   alignmentData = const_cast<KLMAlignmentData*>(
-                    getModuleAlignment(id.getModuleNumber()));
+                    getSegmentAlignment(id.getModuleNumber()));
   if (alignmentData == nullptr)
     return;
   alignmentData->setParameter(
@@ -73,7 +72,7 @@ void EKLMAlignment::setGlobalParam(double value, unsigned short element,
 
 /* TODO: this function is not implemented. */
 std::vector< std::pair<unsigned short, unsigned short> >
-EKLMAlignment::listGlobalParams()
+EKLMSegmentAlignment::listGlobalParams()
 {
   return {};
 }

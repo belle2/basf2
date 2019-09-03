@@ -26,6 +26,7 @@
 #include <alignment/dbobjects/CDCCalibration.h>
 #include <klm/bklm/dbobjects/BKLMAlignment.h>
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
+#include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
 
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>

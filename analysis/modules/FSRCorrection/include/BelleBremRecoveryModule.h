@@ -14,7 +14,6 @@
 
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/Particle.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

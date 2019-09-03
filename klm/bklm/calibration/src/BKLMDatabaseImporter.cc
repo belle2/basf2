@@ -195,21 +195,6 @@ void BKLMDatabaseImporter::importBklmSimulationPar(int expStart, int runStart, i
   Database::Instance().storeData("BKLMSimulationPar", &bklmSimulationPar, iov);
 }
 
-void BKLMDatabaseImporter::importBklmDisplacement(const char* payloadName)
-{
-  DBImportObjPtr<BKLMAlignment> bklmDisplacement(payloadName);
-  bklmDisplacement.construct();
-  KLMAlignmentData alignmentData(0, 0, 0, 0, 0, 0);
-  KLMChannelIndex bklmModules(KLMChannelIndex::c_IndexLevelLayer);
-  for (KLMChannelIndex bklmModule = bklmModules.beginBKLM();
-       bklmModule != bklmModules.endBKLM(); ++bklmModule) {
-    uint16_t module = bklmModule.getKLMModuleNumber();
-    bklmDisplacement->setModuleAlignment(module, &alignmentData);
-  }
-  IntervalOfValidity iov(0, 0, -1, -1);
-  bklmDisplacement.import(iov);
-}
-
 void BKLMDatabaseImporter::importBklmADCThreshold(BKLMADCThreshold* threshold)
 {
   DBImportObjPtr<BKLMADCThreshold> adcParam;

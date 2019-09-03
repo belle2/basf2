@@ -11,10 +11,13 @@
 #pragma once
 
 /* Belle2 headers. */
+#include <klm/bklm/dbobjects/BKLMAlignment.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
+#include <klm/eklm/dbobjects/EKLMAlignment.h>
+#include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
 
 namespace Belle2 {
 
@@ -75,7 +78,36 @@ namespace Belle2 {
      */
     void importStripEfficiency(const KLMStripEfficiency* stripEfficiency);
 
+    /**
+     * Import alignment.
+     * @param[in] bklmAlignment        BKLM alignment.
+     * @param[in] eklmAlignment        EKLM alignment.
+     * @param[in] eklmSegmentAlignment EKLM segment alignment.
+     */
+    void importAlignment(const BKLMAlignment* bklmAlignment,
+                         const EKLMAlignment* eklmAlignment,
+                         const EKLMSegmentAlignment* eklmSegmentAlignment);
+
   private:
+
+    /**
+     * Import BKLM alignment.
+     * @param[in] bklmAlignment BKLM alignment.
+     */
+    void importBKLMAlignment(const BKLMAlignment* bklmAlignment);
+
+    /**
+     * Import EKLM alignment.
+     * @param[in] eklmAlignment EKLM alignment.
+     */
+    void importEKLMAlignment(const EKLMAlignment* eklmAlignment);
+
+    /**
+     * Import EKLM segment alignment.
+     * @param[in] eklmSegmentAlignment EKLM segment alignment.
+     */
+    void importEKLMSegmentAlignment(
+      const EKLMSegmentAlignment* eklmSegmentAlignment);
 
     /** Low experiment. */
     int m_ExperimentLow;

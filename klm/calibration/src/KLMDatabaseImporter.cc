@@ -127,3 +127,41 @@ void KLMDatabaseImporter::importStripEfficiency(
   stripEfficiencyImport.import(iov);
 }
 
+void KLMDatabaseImporter::importBKLMAlignment(
+  const BKLMAlignment* bklmAlignment)
+{
+  DBImportObjPtr<BKLMAlignment> bklmAlignmentImport;
+  bklmAlignmentImport.construct(*bklmAlignment);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  bklmAlignmentImport.import(iov);
+}
+
+void KLMDatabaseImporter::importEKLMAlignment(
+  const EKLMAlignment* eklmAlignment)
+{
+  DBImportObjPtr<EKLMAlignment> eklmAlignmentImport;
+  eklmAlignmentImport.construct(*eklmAlignment);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  eklmAlignmentImport.import(iov);
+}
+
+void KLMDatabaseImporter::importEKLMSegmentAlignment(
+  const EKLMSegmentAlignment* eklmSegmentAlignment)
+{
+  DBImportObjPtr<EKLMSegmentAlignment> eklmSegmentAlignmentImport;
+  eklmSegmentAlignmentImport.construct(*eklmSegmentAlignment);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  eklmSegmentAlignmentImport.import(iov);
+}
+
+void KLMDatabaseImporter::importAlignment(
+  const BKLMAlignment* bklmAlignment, const EKLMAlignment* eklmAlignment,
+  const EKLMSegmentAlignment* eklmSegmentAlignment)
+{
+  importBKLMAlignment(bklmAlignment);
+  importEKLMAlignment(eklmAlignment);
+  importEKLMSegmentAlignment(eklmSegmentAlignment);
+}

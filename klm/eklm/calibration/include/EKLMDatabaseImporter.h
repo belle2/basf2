@@ -11,8 +11,6 @@
 #pragma once
 
 /* Belle2 headers. */
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
-#include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
 #include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
 #include <framework/database/DBImportObjPtr.h>
 
@@ -56,55 +54,12 @@ namespace Belle2 {
     void importSimulationParameters();
 
     /**
-     * Load default displacement data (zeros).
-     */
-    void loadDefaultDisplacement();
-
-    /**
-     * Set sector displacement.
-     * @param[in] section    Section number.
-     * @param[in] layer      Layer number.
-     * @param[in] sector     Sector number.
-     * @param[in] deltaU     Shift in U.
-     * @param[in] deltaV     Shift in V.
-     * @param[in] deltaGamma Rotation in Gamma.
-     */
-    void setSectorDisplacement(int section, int layer, int sector,
-                               float deltaU, float deltaV, float deltaGamma);
-
-    /**
-     * Set segment displacement.
-     * @param[in] section    Section number.
-     * @param[in] layer      Layer number.
-     * @param[in] sector     Sector number.
-     * @param[in] plane      Plane number.
-     * @param[in] segment    Segment number.
-     * @param[in] deltaU     Shift in U.
-     * @param[in] deltaV     Shift in V.
-     * @param[in] deltaGamma Rotation in Gamma.
-     */
-    void setSegmentDisplacement(
-      int section, int layer, int sector, int plane, int segment,
-      float deltaU, float deltaV, float deltaGamma);
-
-    /**
-     * Import displacement data.
-     */
-    void importDisplacement();
-
-    /**
      * Import electronics map.
      * @param[in] electronicsMap EKLM electronics map.
      */
     void importElectronicsMap(const EKLMElectronicsMap* electronicsMap);
 
   private:
-
-    /** Displacement. */
-    DBImportObjPtr<EKLMAlignment> m_Displacement;
-
-    /** Displacement. */
-    DBImportObjPtr<EKLMSegmentAlignment> m_SegmentDisplacement;
 
     /** Electronics map. */
     DBImportObjPtr<EKLMElectronicsMap> m_ElectronicsMap;

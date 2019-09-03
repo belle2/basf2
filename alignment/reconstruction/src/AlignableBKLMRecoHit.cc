@@ -8,38 +8,30 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
-#include <alignment/reconstruction/AlignableBKLMRecoHit.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/bklm/geometry/GeometryPar.h>
-#include <alignment/GlobalLabel.h>
-#include <klm/bklm/dbobjects/BKLMAlignment.h>
-
+/* Belle2 headers. */
 #include <alignment/Hierarchy.h>
 #include <alignment/GlobalDerivatives.h>
-
+#include <alignment/GlobalLabel.h>
+#include <alignment/reconstruction/AlignableBKLMRecoHit.h>
+#include <framework/gearbox/Const.h>
 #include <framework/geometry/B2Vector3.h>
-
-#include <genfit/DetPlane.h>
-#include <TRandom.h>
+#include <framework/logging/Logger.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/bklm/dbobjects/BKLMAlignment.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 
 using namespace std;
 using namespace Belle2;
 
-
 AlignableBKLMRecoHit::AlignableBKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
   genfit::PlanarMeasurement(HIT_DIMENSIONS)
 {
-  uint16_t moduleId = hit->getModuleID();
-
   int section = hit->getSection();
   int sector = hit->getSector();
   m_Layer = hit->getLayer();
-  m_AlignableModule.setType(KLMAlignableElement::c_BKLMModule);
-  m_AlignableModule.setSection(section);
-  m_AlignableModule.setLayer(m_Layer);
-  m_AlignableModule.setSector(sector);
+  const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
+  m_KLMModule = elementNumbers->moduleNumberBKLM(section, sector, m_Layer);
 
   bklm::GeometryPar* m_GeoPar = Belle2::bklm::GeometryPar::instance();
   m_Module = m_GeoPar->findModule(section, sector, m_Layer);
@@ -98,7 +90,7 @@ AlignableBKLMRecoHit::AlignableBKLMRecoHit(const BKLMHit2d* hit, const genfit::T
   B2Vector3D vGlobal(gVaxis[0], gVaxis[1], gVaxis[2]);
 
   genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin_mid, uGlobal, vGlobal, 0));
-  setPlane(detPlane, moduleId);
+  setPlane(detPlane, m_KLMModule);
 }
 
 genfit::AbsMeasurement* AlignableBKLMRecoHit::clone() const
@@ -135,13 +127,12 @@ std::pair<std::vector<int>, TMatrixD> AlignableBKLMRecoHit::globalDerivatives(co
 {
   std::vector<int> labGlobal;
 
-  int elementNumber = m_AlignableModule.getNumber();
-  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaU));
-  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaV));
-  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaW));
-  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaAlpha));
-  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaBeta));
-  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaGamma));
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(m_KLMModule, KLMAlignmentData::c_DeltaU));
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(m_KLMModule, KLMAlignmentData::c_DeltaV));
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(m_KLMModule, KLMAlignmentData::c_DeltaW));
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(m_KLMModule, KLMAlignmentData::c_DeltaAlpha));
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(m_KLMModule, KLMAlignmentData::c_DeltaBeta));
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(m_KLMModule, KLMAlignmentData::c_DeltaGamma));
 
   // Matrix of global derivatives
   TMatrixD derGlobal(2, 6);

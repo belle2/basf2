@@ -22,7 +22,6 @@
 
 /* Belle2 headers. */
 #include <framework/geometry/B2Vector3.h>
-#include <klm/dataobjects/KLMAlignableElement.h>
 #include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
 
 namespace Belle2 {
@@ -90,11 +89,20 @@ namespace Belle2 {
 
   private:
 
-    /** Sector identifier. */
-    KLMAlignableElement m_Sector;
+    /** Section number. */
+    int m_Section;
 
-    /** Segment identifier. */
-    KLMAlignableElement m_Segment;
+    /** Sector number. */
+    int m_Sector;
+
+    /** Layer number. */
+    int m_Layer;
+
+    /** KLM module number. */
+    uint16_t m_KLMModule;
+
+    /** Segment number. */
+    uint16_t m_Segment;
 
     /** V direction. */
     B2Vector3D m_StripV;

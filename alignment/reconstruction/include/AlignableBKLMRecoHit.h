@@ -22,7 +22,6 @@
 /* Belle2 headers. */
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
 #include <klm/bklm/geometry/Module.h>
-#include <klm/dataobjects/KLMAlignableElement.h>
 
 namespace Belle2 {
 
@@ -111,8 +110,8 @@ namespace Belle2 {
 
     enum { HIT_DIMENSIONS = 2 /**< sensitive Dimensions of the Hit */ };
 
-    /** Module identifier. */
-    KLMAlignableElement m_AlignableModule;
+    /** KLM module number. */
+    uint16_t m_KLMModule;
 
     /** Hit layer. */
     int m_Layer;

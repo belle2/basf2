@@ -65,15 +65,21 @@ namespace Belle2 {
 
     /**
      * Get global parameter.
+     * @param[in] element Element number (KLM module number).
+     * @param[in] param   Parameter number.
      * @return Global parameter value.
      */
     double getGlobalParam(unsigned short element, unsigned short param) const;
 
     /**
      * Set global parameter.
+     * @param[in] value   Parameter value.
+     * @param[in] element Element number (KLM module number).
+     * @param[in] param   Parameter number.
      */
     void setGlobalParam(double value, unsigned short element,
                         unsigned short param);
+
     /**
      * Get a list of stored global parameters.
      */

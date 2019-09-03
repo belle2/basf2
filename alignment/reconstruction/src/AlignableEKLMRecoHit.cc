@@ -12,8 +12,10 @@
 #include <alignment/GlobalDerivatives.h>
 #include <alignment/GlobalLabel.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
@@ -47,23 +49,19 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   if (eklmDigits.size() != 2)
     B2FATAL("Incorrect number of related EKLMDigits.");
   digit = hit->getDigitIdentifier();
-  section = eklmDigits[digit]->getSection();
-  layer = eklmDigits[digit]->getLayer();
-  sector = eklmDigits[digit]->getSector();
+  m_Section = eklmDigits[digit]->getSection();
+  m_Layer = eklmDigits[digit]->getLayer();
+  m_Sector = eklmDigits[digit]->getSector();
   plane = eklmDigits[digit]->getPlane();
   segment = (eklmDigits[digit]->getStrip() - 1) / geoDat->getNStripsSegment()
             + 1;
   strip = (segment - 1) * geoDat->getNStripsSegment() + 1;
-  m_Sector.setType(KLMAlignableElement::c_EKLMSector);
-  m_Sector.setSection(section);
-  m_Sector.setLayer(layer);
-  m_Sector.setSector(sector);
-  m_Segment.setType(KLMAlignableElement::c_EKLMSegment);
-  m_Segment.setSection(section);
-  m_Segment.setLayer(layer);
-  m_Segment.setSector(sector);
-  m_Segment.setPlane(plane);
-  m_Segment.setSegment(segment);
+  const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
+  m_KLMModule = elementNumbers->moduleNumberEKLM(m_Section, m_Sector, m_Layer);
+  const EKLM::ElementNumbersSingleton* eklmElementNumbers =
+    &(EKLM::ElementNumbersSingleton::Instance());
+  m_Segment = eklmElementNumbers->segmentNumber(
+                section, layer, sector, plane, segment);
   t = transformData->getStripTransform(section, layer, sector, plane, strip);
   origin = t->getTranslation();
   origin2.SetX(origin.x() / CLHEP::cm * Unit::cm);
@@ -84,7 +82,7 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   m_StripV.SetX(v.unit().x());
   m_StripV.SetY(v.unit().y());
   genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin2, u2, v2, 0));
-  setPlane(detPlane, m_Segment.getNumber());
+  setPlane(detPlane, m_Segment);
   rawHitCoords_[0] = geoDat->getStripGeometry()->getWidth() *
                      ((eklmDigits[digit]->getStrip() - 1) %
                       geoDat->getNStripsSegment()) / CLHEP::cm * Unit::cm;
@@ -99,12 +97,10 @@ AlignableEKLMRecoHit::~AlignableEKLMRecoHit()
 
 std::pair<std::vector<int>, TMatrixD> AlignableEKLMRecoHit::globalDerivatives(const genfit::StateOnPlane* sop)
 {
-
   std::vector<int> labGlobal;
-  int elementNumber = m_Sector.getNumber();
-  labGlobal.push_back(GlobalLabel::construct<EKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaU)); // dx
-  labGlobal.push_back(GlobalLabel::construct<EKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaV)); // dy
-  labGlobal.push_back(GlobalLabel::construct<EKLMAlignment>(elementNumber, KLMAlignmentData::c_DeltaGamma)); // drot
+  labGlobal.push_back(GlobalLabel::construct<EKLMAlignment>(m_KLMModule, KLMAlignmentData::c_DeltaU)); // dx
+  labGlobal.push_back(GlobalLabel::construct<EKLMAlignment>(m_KLMModule, KLMAlignmentData::c_DeltaV)); // dy
+  labGlobal.push_back(GlobalLabel::construct<EKLMAlignment>(m_KLMModule, KLMAlignmentData::c_DeltaGamma)); // drot
 
   /* Local parameters. */
   const double dalpha = 0;
@@ -122,9 +118,7 @@ std::pair<std::vector<int>, TMatrixD> AlignableEKLMRecoHit::globalDerivatives(co
   HepGeom::Transform3D t;
   const EKLM::TransformDataGlobalAligned* transformData =
     &(EKLM::TransformDataGlobalAligned::Instance());
-  t = (*transformData->getSectorTransform(m_Sector.getSection(),
-                                          m_Sector.getLayer(),
-                                          m_Sector.getSector())).inverse();
+  t = (*transformData->getSectorTransform(m_Section, m_Layer, m_Sector)).inverse();
   globalPos.setX(sop->getPos().X() / Unit::cm * CLHEP::cm);
   globalPos.setY(sop->getPos().Y() / Unit::cm * CLHEP::cm);
   globalPos.setZ(sop->getPos().Z() / Unit::cm * CLHEP::cm);

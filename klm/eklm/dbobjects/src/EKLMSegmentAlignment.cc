@@ -10,7 +10,6 @@
 
 /* Belle2 headers. */
 #include <framework/logging/Logger.h>
-#include <klm/dataobjects/KLMAlignableElement.h>
 #include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
 
 using namespace Belle2;
@@ -48,9 +47,7 @@ const KLMAlignmentData* EKLMSegmentAlignment::getSegmentAlignment(
 double EKLMSegmentAlignment::getGlobalParam(unsigned short element,
                                             unsigned short param) const
 {
-  const KLMAlignmentData* alignmentData;
-  KLMAlignableElement id(element);
-  alignmentData = getSegmentAlignment(id.getModuleNumber());
+  const KLMAlignmentData* alignmentData = getSegmentAlignment(element);
   if (alignmentData == nullptr)
     return 0;
   return alignmentData->getParameter(
@@ -60,10 +57,8 @@ double EKLMSegmentAlignment::getGlobalParam(unsigned short element,
 void EKLMSegmentAlignment::setGlobalParam(double value, unsigned short element,
                                           unsigned short param)
 {
-  KLMAlignmentData* alignmentData;
-  KLMAlignableElement id(element);
-  alignmentData = const_cast<KLMAlignmentData*>(
-                    getSegmentAlignment(id.getModuleNumber()));
+  KLMAlignmentData* alignmentData =
+    const_cast<KLMAlignmentData*>(getSegmentAlignment(element));
   if (alignmentData == nullptr)
     return;
   alignmentData->setParameter(

@@ -10,7 +10,6 @@
 
 /* Belle2 headers. */
 #include <framework/logging/Logger.h>
-#include <klm/dataobjects/KLMAlignableElement.h>
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
 
 using namespace Belle2;
@@ -49,9 +48,7 @@ const KLMAlignmentData* EKLMAlignment::getModuleAlignment(
 double EKLMAlignment::getGlobalParam(unsigned short element,
                                      unsigned short param) const
 {
-  const KLMAlignmentData* alignmentData;
-  KLMAlignableElement id(element);
-  alignmentData = getModuleAlignment(id.getModuleNumber());
+  const KLMAlignmentData* alignmentData = getModuleAlignment(element);
   if (alignmentData == nullptr)
     return 0;
   return alignmentData->getParameter(
@@ -61,10 +58,8 @@ double EKLMAlignment::getGlobalParam(unsigned short element,
 void EKLMAlignment::setGlobalParam(double value, unsigned short element,
                                    unsigned short param)
 {
-  KLMAlignmentData* alignmentData;
-  KLMAlignableElement id(element);
-  alignmentData = const_cast<KLMAlignmentData*>(
-                    getModuleAlignment(id.getModuleNumber()));
+  KLMAlignmentData* alignmentData =
+    const_cast<KLMAlignmentData*>(getModuleAlignment(element));
   if (alignmentData == nullptr)
     return;
   alignmentData->setParameter(

@@ -77,6 +77,7 @@ void RelationFromSVDTracksCreator::apply(std::vector<CKFToSVDState>& seedStates,
       } else {
         for (CKFToSVDState& seedState : seedStates) {
           // We are not setting the related SVD track of the first state!
+          // cppcheck-suppress useStlAlgorithm
           relations.emplace_back(&seedState, NAN, &nextState);
         }
       }

@@ -12,8 +12,12 @@ import shutil
 import time
 import pathlib
 
-from basf2 import *
+import basf2
+from basf2 import create_path
+from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
+from basf2 import conditions as b2conditions
 from basf2.pickle_path import serialize_path
+
 import os
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
@@ -1087,26 +1091,33 @@ class AlgorithmMachine(Machine):
         """
         Apply all databases in the correct order
         """
-        # Clean everything out just in case
-        reset_database()
-        use_database_chain()
+        # We deliberately override the normal database ordering because we don't want input files GTs to affect
+        # the processing. Only explicit GTs and intermediate local DBs made by the CAF should be added here.
+        b2conditions.reset()
+        b2conditions.override_globaltags()
+
         # Apply all the databases in order, starting with the user-set chain for this Calibration
         for database in self.database_chain:
             if database.db_type == 'local':
-                B2INFO("Using local database {} for {}".format((database.filepath.as_posix(), database.payload_dir.as_posix()),
-                                                               self.algorithm.name))
-                use_local_database(database.filepath.as_posix(), database.payload_dir.as_posix())
+                B2INFO("Adding Local Database {} to head of chain of local databases, for {}.".format(
+                       database.filepath.as_posix(),
+                       self.algorithm.name))
+
+                b2conditions.prepend_testing_payloads(database.filepath.as_posix())
             elif database.db_type == 'central':
-                B2INFO("Using Central database tag {} for {}".format(database.global_tag, self.algorithm.name))
-                use_central_database(database.global_tag)
+                B2INFO("Adding Central database tag {} to head of GT chain, for {}".format(
+                       database.global_tag,
+                       self.algorithm.name))
+                b2conditions.prepend_globaltag(database.global_tag)
             else:
                 raise ValueError("Unknown database type {}".format(database.db_type))
         # Here we add the finished databases of previous calibrations that we depend on.
         # We can assume that the databases exist as we can't be here until they have returned
         # with OK status.
         for filename, directory in self.dependent_databases:
-            B2INFO("Using local database {} created by a dependent calibration for {}".format(directory, self.algorithm.name))
-            use_local_database(filename, directory)
+            B2INFO(("Adding Local Database {} to head of chain of local databases created by"
+                    " a dependent calibration, for {}").format(filename, self.algorithm.name))
+            b2conditions.prepend_testing_payloads(filename)
 
         # Create a directory to store the payloads of this algorithm
         create_directories(pathlib.Path(self.output_database_dir), overwrite=False)
@@ -1115,10 +1126,9 @@ class AlgorithmMachine(Machine):
         B2INFO("Output local database for {} stored at {}".format(
                self.algorithm.name,
                self.output_database_dir))
-        use_local_database(str(self.output_database_dir.joinpath("database.txt")),
-                           str(self.output_database_dir),
-                           False,
-                           LogLevel.INFO)
+        # Things have changed. We now need to do the expert settings to create a database directly.
+        # LocalDB is readonly without this but we don't need 'use_local_database' during writing.
+        b2conditions.expert_settings(save_payloads=str(self.output_database_dir.joinpath("database.txt")))
 
     def _setup_logging(self, **kwargs):
         """
@@ -1126,11 +1136,11 @@ class AlgorithmMachine(Machine):
         # add logfile for output
         log_file = os.path.join(self.output_dir, self.algorithm.name + '_stdout')
         B2INFO('Output log file at {}'.format(log_file))
-        reset_log()
-        set_log_level(LogLevel.INFO)
-#        set_log_level(LogLevel.DEBUG)
+        basf2.reset_log()
+        basf2.set_log_level(basf2.LogLevel.INFO)
+#        set_log_level(basf2.LogLevel.DEBUG)
 #        set_debug_level(100)
-        log_to_file(log_file)
+        basf2.log_to_file(log_file)
 
     def _pre_algorithm(self, **kwargs):
         """

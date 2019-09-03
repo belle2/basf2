@@ -85,7 +85,7 @@ namespace Belle2 {
     std::map<uint16_t, KLMAlignmentData> m_SegmentAlignment;
 
     /** Class version. */
-    ClassDef(Belle2::EKLMSegmentAlignment, 3);
+    ClassDef(Belle2::EKLMSegmentAlignment, 1);
 
   };
 

@@ -67,44 +67,23 @@ namespace Belle2 {
     //! Import BKLM geometry parameters into the database
     void importBklmGeometryPar();
 
-    //! Export BKLM geometry parameters from the database
-    void exportBklmGeometryPar();
-
     //! Import BKLM simulation parameters into the database
     void importBklmSimulationPar(int expStart, int runStart, int expStop, int runStop);
-
-    //! Export BKLM simulation parameters from the database
-    void exportBklmSimulationPar();
 
     //! Import BKLM Alignment parameters into the database
     void importBklmAlignment();
 
-    //! Export BKLM Alignment parameters from the database
-    void exportBklmAlignment();
-
     //! Import BKLM displaced-geometry parameters into the database
     void importBklmDisplacement();
-
-    //! Export BKLM displaced-geometry parameters from the database
-    void exportBklmDisplacement();
 
     //! Import BKLM scintillator digitization parameters in database
     void importBklmDigitizationParams();
 
-    //! Export BKLM scintillator digitization parameters from database
-    void exportBklmDigitizationParams();
-
     //! Import BKLM scintillator ADC parameters in database
     void importBklmADCThreshold(BKLMADCThreshold* threshold);
 
-    //! Export BKLM scintillator ADC parameters from database
-    void exportBklmADCThreshold();
-
     //! Import BKLM time window cut
     void importBklmTimeWindow();
-
-    //! Export BKLM time window cut
-    void exportBklmTimeWindow();
 
   private:
 

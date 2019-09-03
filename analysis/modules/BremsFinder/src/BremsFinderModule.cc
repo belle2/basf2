@@ -210,14 +210,10 @@ namespace Belle2 {
 
       //Add to this 4-momentum those of the selected photon(s)
       if (selectedGammas.size() > 0) { //for the case of more than one brems photon
-        if (m_addMultiplePhotons) {
-          for (auto const& bremsPair : selectedGammas) {
-            Particle* g = bremsPair.second;
-            new4Vec += g->get4Vector();
-          }
-        } else { //If not multiple gammas, add the photon with the smallest weight
-          Particle* g = selectedGammas[0].second;
+        for (auto const& bremsPair : selectedGammas) {
+          Particle* g = bremsPair.second;
           new4Vec += g->get4Vector();
+          if (! m_addMultiplePhotons) break; //stop after adding the first photon
         }
       }
 
@@ -235,34 +231,21 @@ namespace Belle2 {
       //Now, if there are any, add the brems photons as daughters as well. As before, we distinguish between the multiple and only one brems photon cases
       if (selectedGammas.size() > 0) {
         bremsGammaFound = true;
-        if (m_addMultiplePhotons) {
-          int photonIndex = 0;
-          for (auto const& bremsPair : selectedGammas) {
-            //Add the weights as extra info of the mother
-            Particle* bremsGamma = bremsPair.second;
-            std::string extraInfoName = "bremsWeightWithPhoton" + std::to_string(photonIndex);
-            correctedLepton.addExtraInfo(extraInfoName, bremsPair.first);
-            photonIndex++;
+        int photonIndex = 0;
+        for (auto const& bremsPair : selectedGammas) {
+          //Add the weights as extra info of the mother
+          Particle* bremsGamma = bremsPair.second;
+          std::string extraInfoName = "bremsWeightWithPhoton" + std::to_string(photonIndex);
+          correctedLepton.addExtraInfo(extraInfoName, bremsPair.first);
+          photonIndex++;
 
-            const TMatrixFSym& gammaErrorMatrix = bremsGamma->getMomentumVertexErrorMatrix();
-            for (int irow = 0; irow <= 3; irow++) {
-              for (int icol = irow; icol <= 3; icol++) corLepMatrix(irow, icol) += gammaErrorMatrix(irow, icol);
-            }
-            correctedLepton.appendDaughter(bremsGamma, false);
-            B2DEBUG(1, "[BremsFinderModule] Found a bremsstrahlung gamma and added its 4-vector to the charged particle");
-          }
-        } else {
-          auto bestPair = selectedGammas[0];
-          Particle* bestGamma = bestPair.second;
-          std::string extraInfoName = "bremsWeightWithPhoton0";
-          correctedLepton.addExtraInfo(extraInfoName, bestPair.first);
-
-          const TMatrixFSym& gammaErrorMatrix = bestGamma->getMomentumVertexErrorMatrix();
+          const TMatrixFSym& gammaErrorMatrix = bremsGamma->getMomentumVertexErrorMatrix();
           for (int irow = 0; irow <= 3; irow++) {
             for (int icol = irow; icol <= 3; icol++) corLepMatrix(irow, icol) += gammaErrorMatrix(irow, icol);
           }
-          correctedLepton.appendDaughter(bestGamma, false);
-          B2DEBUG(1, "[BremsFinderModule] Found a bremsstrahlung gamma and added its 4-vector to the charged particle");
+          correctedLepton.appendDaughter(bremsGamma, false);
+          B2DEBUG(10, "[BremsFinderModule] Found a bremsstrahlung gamma and added its 4-vector to the charged particle");
+          if (! m_addMultiplePhotons) break; //stop after adding the first photon
         }
       }
 

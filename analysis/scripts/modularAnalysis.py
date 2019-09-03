@@ -359,7 +359,7 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None):
     path.add_module(mcparticleprinter)
 
 
-def bremsFinder(
+def correctBrems(
     outputList,
     inputList,
     gammaList,
@@ -394,15 +394,16 @@ def bremsFinder(
     @param path          The module is added to this path
     """
 
-    bremsfinder = register_module('BremsFinder')
-    bremsfinder.set_name('BremsFinder_' + outputList)
-    bremsfinder.param('inputList', inputList)
-    bremsfinder.param('outputList', outputList)
-    bremsfinder.param('gammaList', gammaList)
-    bremsfinder.param('maximumAcceptance', maximumAcceptance)
-    bremsfinder.param('multiplePhotons', multiplePhotons)
-    bremsfinder.param('writeOut', writeOut)
-    path.add_module(bremsfinder)
+    bremscorrector = register_module('BremsFinder')
+    bremscorrector.set_name('bremsFinder_' + outputList)
+    bremscorrector.param('inputList', inputList)
+    bremscorrector.param('outputList', outputList)
+    bremscorrector.param('gammaList', gammaList)
+    bremscorrector.param('maximumAcceptance', maximumAcceptance)
+    bremscorrector.param('multiplePhotons', multiplePhotons)
+    bremscorrector.param('ignorePhotonMC', ignorePhotonMC)
+    bremscorrector.param('writeOut', writeOut)
+    path.add_module(bremscorrector)
 
 
 def copyList(

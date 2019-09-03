@@ -76,6 +76,8 @@ namespace Belle2 {
       3.0f;  /**< photons whose clusters have relation weights higher than this will not be used for bremsstrahlung correction of the track */
     bool m_addMultiplePhotons =
       false; /**<In case there is more than one brems photon, use only the best one (based on the weight of the relation), or all of them for correcting the lepton momentum */
+    bool m_usePhotonOnlyOnce =
+      false; /**< Each brems photon can be used to correct only one particle (the one with the smallest relation weight) */
     bool m_writeOut = false;  /**< Write the output particle list in the final file? */
 
   };

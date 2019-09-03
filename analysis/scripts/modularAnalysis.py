@@ -365,6 +365,7 @@ def correctBrems(
     gammaList,
     maximumAcceptance=3.0,
     multiplePhotons=False,
+    usePhotonOnlyOnce=False,
     writeOut=False,
     path=None,
 ):
@@ -390,18 +391,19 @@ def correctBrems(
     @param gammaList    The photon list containing possibly bremsstrahlung photons; *It should already exist.*
     @param maximumAcceptance Maximum value of the relation weight. Should be a number between [0,3)
     @param multiplePhotons Whether to use only one photon (the one with the smallest acceptance) or as many as possible
+    @param usePhotonOnlyOnce If true, each brems candidate is used to correct only the track with the smallest relation weight
     @param writeOut      Whether `RootOutput` module should save the created `outputList`
     @param path          The module is added to this path
     """
 
     bremscorrector = register_module('BremsFinder')
-    bremscorrector.set_name('bremsFinder_' + outputList)
+    bremscorrector.set_name('bremsCorrector_' + outputList)
     bremscorrector.param('inputList', inputList)
     bremscorrector.param('outputList', outputList)
     bremscorrector.param('gammaList', gammaList)
     bremscorrector.param('maximumAcceptance', maximumAcceptance)
     bremscorrector.param('multiplePhotons', multiplePhotons)
-    bremscorrector.param('ignorePhotonMC', ignorePhotonMC)
+    bremscorrector.param('usePhotonOnlyOnce', usePhotonOnlyOnce)
     bremscorrector.param('writeOut', writeOut)
     path.add_module(bremscorrector)
 

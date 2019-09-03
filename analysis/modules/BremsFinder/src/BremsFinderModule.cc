@@ -100,6 +100,9 @@ namespace Belle2 {
              m_maximumAcceptance);
     addParam("multiplePhotons", m_addMultiplePhotons, "If true, use all possible photons to correct the particle's 4-momentum",
              m_addMultiplePhotons);
+    addParam("usePhotonOnlyOnce", m_usePhotonOnlyOnce,
+             R"DOC(If true, each brems candidate is used to correct maximum 1 particle (the one with the lowest relation weight among all in the `inputList`).)DOC",
+             m_usePhotonOnlyOnce);
     addParam("writeOut", m_writeOut,
              R"DOC(If true, the output `ParticleList` will be saved by `RootOutput`. If false, it will be ignored when writing the file.)DOC",
              m_writeOut);
@@ -169,16 +172,52 @@ namespace Belle2 {
     // Number of photons (calculate it here only once)
     const unsigned int nGamma = m_gammaList->getListSize();
 
-    // loop over charged particles, correct them and add them to the output list
+    // Number of leptons (calculate it here only once)
     const unsigned int nLep = m_inputList->getListSize();
+
+    const std::string relationName = "Bremsstrahlung";
+
+    //In the case of only one track per photon
+    if (m_usePhotonOnlyOnce) {
+      for (unsigned n = 0; n < nGamma; n++) {
+        Particle* gamma = m_gammaList->getParticle(n);
+        auto cluster = gamma->getECLCluster();
+        //Get the tracks related to each photon...
+        RelationVector<Track> relatedTracks = cluster->getRelationsTo<Track>("", relationName);
+        double bestWeight = m_maximumAcceptance; //Maximum weight should be 3, from the pre-cuts applied by the ECL module...
+        unsigned bestMatchIndex = -1;
+        unsigned trkIndex = 0;
+        //Loop over the related tracks...
+        for (auto trk = relatedTracks.begin(); trk != relatedTracks.end(); trk++, trkIndex++) {
+          //... and over the input particles' tracks...
+          for (unsigned i = 0; i < nLep; i++) {
+            const Particle* lepton = m_inputList->getParticle(i);
+            auto leptonTrack = lepton->getTrack();
+            //... check that the particle track corresponds to the related track....
+            if (leptonTrack->getArrayIndex() == trk->getArrayIndex()) {
+              double weight = relatedTracks.weight(trkIndex);
+              if (weight < bestWeight) {
+                bestWeight = weight;
+                //... and only select the best match among the tracks in the input list
+                bestMatchIndex = trk->getArrayIndex();
+              }
+            }
+          }
+        }
+        //... finally, add the best match index as an extra info for the photon
+        gamma->addExtraInfo("bestMatchIndex", bestMatchIndex);
+      }
+    }
+
+    // loop over charged particles, correct them and add them to the output list
+
     for (unsigned i = 0; i < nLep; i++) {
       const Particle* lepton = m_inputList->getParticle(i);
 
-      //Get the track of this lepton
+      //Get the track of this lepton...
       auto track = lepton->getTrack();
 
       //... and get the bremsstrahlung clusters related to this track
-      const std::string relationName = "Bremsstrahlung";
       RelationVector<ECLCluster> bremClusters = track->getRelationsFrom<ECLCluster>("", relationName);
 
       std::vector<std::pair <double, Particle*> > selectedGammas;
@@ -195,7 +234,12 @@ namespace Belle2 {
           auto cluster = gamma->getECLCluster();
 
           if (bremCluster->getClusterId() == cluster->getClusterId()) {
-            selectedGammas.push_back(std::make_pair(weight, gamma));
+            if (m_usePhotonOnlyOnce) { //If only one track per photon should be used...
+              if (track->getArrayIndex() == gamma->getExtraInfo("bestMatchIndex"))  //... check if this track is the best match ...
+                selectedGammas.push_back(std::make_pair(weight, gamma)); //... and if it is, add it to the selected gammas
+            } else {
+              selectedGammas.push_back(std::make_pair(weight, gamma));
+            }
           }
 
         } // Closes for loop on gammas

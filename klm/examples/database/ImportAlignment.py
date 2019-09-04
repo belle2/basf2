@@ -47,6 +47,14 @@ while (index != index2.end()):
         eklmAlignment.setModuleAlignment(module, alignmentData)
     index.increment()
 
+index.setIndexLevel(KLMChannelIndex.c_IndexLevelStrip)
+index2.setIndexLevel(KLMChannelIndex.c_IndexLevelStrip)
+index = index2.beginEKLM()
+index.useEKLMSegments()
+while (index != index2.endEKLM()):
+    segment = index.getEKLMSegmentNumber()
+    eklmSegmentAlignment.setSegmentAlignment(segment, alignmentData)
+    index.increment()
 
 if (mc):
     dbImporter.setIOV(0, 0, 0, -1)

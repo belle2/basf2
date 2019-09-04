@@ -139,6 +139,12 @@ uint16_t KLMChannelIndex::getKLMSectorNumber() const
     return m_ElementNumbers->sectorNumberEKLM(m_Section, m_Sector);
 }
 
+uint16_t KLMChannelIndex::getEKLMSegmentNumber() const
+{
+  m_ElementNumbersEKLM->segmentNumber(
+    m_Section, m_Layer, m_Sector, m_Plane, m_Strip);
+}
+
 KLMChannelIndex KLMChannelIndex::beginBKLM()
 {
   return KLMChannelIndex(KLMElementNumbers::c_BKLM, 0, 1, 1, 0, 1,

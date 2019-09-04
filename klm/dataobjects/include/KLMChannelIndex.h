@@ -153,6 +153,11 @@ namespace Belle2 {
     uint16_t getKLMSectorNumber() const;
 
     /**
+     * Get EKLM segment number.
+     */
+    uint16_t getEKLMSegmentNumber() const;
+
+    /**
      * First channel for BKLM.
      */
     KLMChannelIndex beginBKLM();

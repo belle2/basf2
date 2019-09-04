@@ -220,7 +220,7 @@ path = skimpath.add_path(feistate.path)
 
 
 from skim.fei import *
-add_skim('feiHadronicB0', B0hadronic(path=skimpath), path=skimpath)
+add_skim('feiHadronicB0', B0Hadronic(path=skimpath), path=skimpath)
 
 from skim.fei import*
 add_skim('feiHadronicBplus', BplusHadronic(path=skimpath), path=skimpath)

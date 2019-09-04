@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <alignment/GlobalTimeLine.h>
+#include "../include/Manager.h"
 
 
 #include <framework/core/PyObjConvUtils.h>
@@ -31,7 +32,8 @@ namespace Belle2 {
         for (long unsigned int iCol = timeid + 1; iCol < row.size(); ++iCol) {
           if (row.at(iCol) != cell && std::get<RunHeader>(timeTable).at(iCol) != cellRun) {
             timeid = iCol - 1;
-            return std::get<EventHeader>(timeTable).at(iCol - 1);
+            return std::get<EventHeader>(timeTable).at(iCol);
+            //return std::get<EventHeader>(timeTable).at(iCol - 1);
           }
         }
         timeid = row.size() - 1;
@@ -69,9 +71,9 @@ namespace Belle2 {
 
           if (std::get<TableData>(timeTable).find(uid) == std::get<TableData>(timeTable).end()) {
             auto firstEvent = std::get<EventHeader>(timeTable).at(0);
-            auto lastEvent = std::get<EventHeader>(timeTable).at(std::get<EventHeader>(timeTable).size() - 1);
+//             auto lastEvent = std::get<EventHeader>(timeTable).at(std::get<EventHeader>(timeTable).size() - 1);
 
-            auto iov = IntervalOfValidity(firstEvent.getExperiment(), firstEvent.getRun(), lastEvent.getExperiment(), lastEvent.getRun());
+            auto iov = IntervalOfValidity(firstEvent.getExperiment(), firstEvent.getRun(), -1, -1);
             auto objCopy = std::shared_ptr<GlobalParamSetAccess>(obj->clone());
             payloadsTable[uid].push_back({ iov, {{firstEvent, objCopy}} });
 
@@ -106,7 +108,14 @@ namespace Belle2 {
             // Move to next IoV block (for intra-run deps in just processed block, next block is always the next run)
             auto endEvent = gotoNextChangeRunWise(timeTable, uid, iCol);
             int endExp = endEvent.getExperiment();
-            int endRun = endEvent.getRun();
+            //int endRun = endEvent.getRun();
+            int endRun = endEvent.getRun() - 1;
+            // The last run will be the same as this run, so take the max, which is this run.
+            //endRun = std::max(run, endRun);
+            if (endRun < run) {
+              endRun = -1;
+              endExp = -1;
+            }
             // Store finished block
             payloadsTable[uid].push_back({IntervalOfValidity(exp, run, endExp, endRun), intraRunEntries});
 

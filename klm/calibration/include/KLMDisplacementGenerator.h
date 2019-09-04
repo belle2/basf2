@@ -92,8 +92,13 @@ namespace Belle2 {
 
     /**
      * Read displacement from ROOT file.
+     * @param[out] alignment        Displacements.
+     * @param[out] segmentAlignment Segment displacements.
+     * @param[in]  inputFile        Input file.
      */
-    void readDisplacementFromROOTFile();
+    void readDisplacementFromROOTFile(EKLMAlignment* alignment,
+                                      EKLMSegmentAlignment* segmentAlignment,
+                                      const char* inputFile);
 
     /**
      * Generate random sector displacements and check if they are correct
@@ -101,6 +106,18 @@ namespace Belle2 {
      * @oaram[in] f Output file.
      */
     void studySectorAlignmentLimits(TFile* f);
+
+    /**
+     * Save displacements to a ROOT file.
+     * @param[in] alignment        Displacements.
+     * @param[in] segmentAlignment Segment displacements.
+     * @param[in] outputFile       Output file.
+     */
+    void saveDisplacement(EKLMAlignment* alignment,
+                          EKLMSegmentAlignment* segmentAlignment,
+                          const char* outputFile);
+
+  private:
 
     /**
      * Generate random segment displacements and check if they are correct
@@ -112,18 +129,9 @@ namespace Belle2 {
     /**
      * Generate random displacements and check if they are correct
      * (no overlaps).
+     * @param[in] outputFile Output file.
      */
-    void studyAlignmentLimits();
-
-    /**
-     * Save displacements to a ROOT file.
-     * @param[in] alignment        Displacements.
-     * @param[in] segmentAlignment Segment displacements.
-     */
-    void saveDisplacement(EKLMAlignment* alignment,
-                          EKLMSegmentAlignment* segmentAlignment);
-
-  private:
+    void studyAlignmentLimits(const char* outputFile);
 
     /** Mode. */
     std::string m_Mode;

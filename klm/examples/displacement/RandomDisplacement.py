@@ -34,6 +34,8 @@ eklmSegmentAlignment = EKLMSegmentAlignment()
 displacementGenerator = KLMDisplacementGenerator()
 displacementGenerator.generateRandomDisplacement(
     eklmAlignment, eklmSegmentAlignment, True, False)
+displacementGenerator.saveDisplacement(
+    eklmAlignment, eklmSegmentAlignment, 'EKLMDisplacement.root')
 
 # Zero displacement for BKLM.
 alignmentData = KLMAlignmentData(0, 0, 0, 0, 0, 0)

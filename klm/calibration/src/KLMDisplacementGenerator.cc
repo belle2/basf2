@@ -193,7 +193,9 @@ sector:
   }
 }
 
-void KLMDisplacementGenerator::readDisplacementFromROOTFile()
+void KLMDisplacementGenerator::readDisplacementFromROOTFile(
+  EKLMAlignment* alignment, EKLMSegmentAlignment* segmentAlignment,
+  const char* inputFile)
 {
   /* cppcheck-suppress variableScope */
   int i, n, iSection, iLayer, iSector, iPlane, iSegment, segment, param;
@@ -201,11 +203,9 @@ void KLMDisplacementGenerator::readDisplacementFromROOTFile()
   IntervalOfValidity iov(0, 0, -1, -1);
   TFile* f;
   TTree* t_sector, *t_segment;
-  EKLMAlignment alignment;
-  EKLMSegmentAlignment segmentAlignment;
   KLMAlignmentData* alignmentData;
-  fillZeroDisplacements(&alignment, &segmentAlignment);
-  f = new TFile(m_InputFile.c_str());
+  fillZeroDisplacements(alignment, segmentAlignment);
+  f = new TFile(inputFile);
   t_sector = (TTree*)f->Get("eklm_sector");
   t_sector->SetBranchAddress("section", &iSection);
   t_sector->SetBranchAddress("layer", &iLayer);
@@ -225,7 +225,7 @@ void KLMDisplacementGenerator::readDisplacementFromROOTFile()
     t_sector->GetEntry(i);
     int module = m_ElementNumbers->moduleNumberEKLM(iSection, iSector, iLayer);
     alignmentData = const_cast<KLMAlignmentData*>(
-                      alignment.getModuleAlignment(module));
+                      alignment->getModuleAlignment(module));
     switch (param) {
       case 1:
         alignmentData->setDeltaU(value);
@@ -244,7 +244,7 @@ void KLMDisplacementGenerator::readDisplacementFromROOTFile()
     segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector, iPlane,
                                       iSegment);
     alignmentData = const_cast<KLMAlignmentData*>(
-                      segmentAlignment.getSegmentAlignment(segment));
+                      segmentAlignment->getSegmentAlignment(segment));
     switch (param) {
       case 1:
         alignmentData->setDeltaV(value);
@@ -363,24 +363,25 @@ void KLMDisplacementGenerator::studySegmentAlignmentLimits(TFile* f)
   t->Write();
 }
 
-void KLMDisplacementGenerator::studyAlignmentLimits()
+void KLMDisplacementGenerator::studyAlignmentLimits(const char* outputFile)
 {
   TFile* f;
-  f = new TFile(m_OutputFile.c_str(), "recreate");
+  f = new TFile(outputFile, "recreate");
   studySectorAlignmentLimits(f);
   studySegmentAlignmentLimits(f);
   delete f;
 }
 
 void KLMDisplacementGenerator::saveDisplacement(
-  EKLMAlignment* alignment, EKLMSegmentAlignment* segmentAlignment)
+  EKLMAlignment* alignment, EKLMSegmentAlignment* segmentAlignment,
+  const char* outputFile)
 {
   int iSection, iLayer, iSector, iPlane, iSegment, segment, param;
   float value;
   KLMAlignmentData* alignmentData;
   TFile* f;
   TTree* t_sector, *t_segment;
-  f = new TFile(m_OutputFile.c_str(), "recreate");
+  f = new TFile(outputFile, "recreate");
   t_sector = new TTree("eklm_sector", "");
   t_sector->Branch("section", &iSection, "section/I");
   t_sector->Branch("layer", &iLayer, "layer/I");
@@ -411,7 +412,7 @@ void KLMDisplacementGenerator::saveDisplacement(
         value = alignmentData->getDeltaV();
         t_sector->Fill();
         /* cppcheck-suppress redundantAssignment */
-        param = 3;
+        param = 6;
         /* cppcheck-suppress redundantAssignment */
         value = alignmentData->getDeltaGamma();
         t_sector->Fill();
@@ -421,11 +422,11 @@ void KLMDisplacementGenerator::saveDisplacement(
                                               iSegment);
             alignmentData = const_cast<KLMAlignmentData*>(
                               segmentAlignment->getSegmentAlignment(segment));
-            param = 1;
+            param = 2;
             value = alignmentData->getDeltaV();
             t_segment->Fill();
             /* cppcheck-suppress redundantAssignment */
-            param = 2;
+            param = 6;
             /* cppcheck-suppress redundantAssignment */
             value = alignmentData->getDeltaGamma();
             t_segment->Fill();

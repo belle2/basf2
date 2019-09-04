@@ -38,15 +38,15 @@ EventsOfDoomBusterModule::~EventsOfDoomBusterModule() = default;
 void EventsOfDoomBusterModule::initialize()
 {
   m_eventInfo.isRequired();
-  m_cdcHits.isRequired();
-  m_svdShaperDigits.isRequired();
+  m_cdcHits.isOptional();
+  m_svdShaperDigits.isOptional();
 }
 
 
 void EventsOfDoomBusterModule::event()
 {
-  const unsigned int nCDCHits = m_cdcHits.getEntries();
-  const unsigned int nSVDShaperDigits = m_svdShaperDigits.getEntries();
+  const unsigned int nCDCHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
+  const unsigned int nSVDShaperDigits = m_svdShaperDigits.isOptional() ? m_svdShaperDigits.getEntries() : 0;
 
   B2DEBUG(20, "Event: " << m_eventInfo->getEvent() << " - nCDCHits: " << nCDCHits << ", nSVDShaperDigits: " << nSVDShaperDigits);
 

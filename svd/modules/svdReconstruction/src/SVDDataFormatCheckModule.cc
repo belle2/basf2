@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <svd/modules/svdReconstruction/SVDDataFormatCheckModule.h>
-#include <svd/dataobjects/SVDEventInfo.h>
 
 using namespace Belle2;
 using namespace std;
@@ -49,6 +48,7 @@ void SVDDataFormatCheckModule::initialize()
 
   m_evtMetaData.isRequired();
   m_storeShaper.isRequired(m_storeShaperDigitsName);
+  m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
 
   //there only if reconstructing data
   m_storeDAQ.isOptional(m_storeDAQName);
@@ -82,10 +82,6 @@ void SVDDataFormatCheckModule::event()
 {
 
   int evtNumber = m_evtMetaData->getEvent();
-
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
-  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
-
   bool isProblematic = false;
 
   // If no digits, nothing to do
@@ -97,6 +93,9 @@ void SVDDataFormatCheckModule::event()
     m_evtsCounter++;
     return;
   }
+  if (!m_storeSVDEvtInfo.isValid()) return;
+
+  SVDModeByte modeByte = m_storeSVDEvtInfo->getModeByte();
 
   m_stripEvtsCounter++;
 

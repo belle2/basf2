@@ -19,7 +19,6 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-#include <svd/dataobjects/SVDEventInfo.h>
 
 #include <svd/reconstruction/NNWaveFitTool.h>
 
@@ -85,6 +84,7 @@ void SVDNNShapeReconstructorModule::initialize()
   storeShaperDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
+  m_storeSVDEvtInfo.isRequired();
 
   RelationArray relRecoDigitShaperDigits(storeRecoDigits, storeShaperDigits);
   RelationArray relRecoDigitTrueHits(storeRecoDigits, storeTrueHits);
@@ -167,12 +167,12 @@ void SVDNNShapeReconstructorModule::fillRelationMap(const RelationLookup& lookup
 
 void SVDNNShapeReconstructorModule::event()
 {
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
-  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
 
   const StoreArray<SVDShaperDigit> storeShaperDigits(m_storeShaperDigitsName);
-  // If no digits, nothing to do
-  if (!storeShaperDigits || !storeShaperDigits.getEntries()) return;
+  // If no digits or no SVDEventInfo, nothing to do
+  if (!storeShaperDigits || !storeShaperDigits.getEntries() || !m_storeSVDEvtInfo.isValid()) return;
+
+  SVDModeByte modeByte = m_storeSVDEvtInfo->getModeByte();
 
   size_t nDigits = storeShaperDigits.getEntries();
   B2DEBUG(90, "Initial size of StoreDigits array: " << nDigits);

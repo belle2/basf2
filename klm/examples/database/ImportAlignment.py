@@ -10,23 +10,12 @@ from ROOT.Belle2 import KLMDatabaseImporter, BKLMAlignment, EKLMAlignment, \
                         EKLMSegmentAlignment, KLMAlignmentData, \
                         KLMElementNumbers, KLMChannelIndex
 
+basf2.set_log_level(basf2.LogLevel.INFO)
+
 mc = False
 if (len(sys.argv) >= 2):
     if (sys.argv[1] == 'mc'):
         mc = True
-
-# Create main path
-main = basf2.create_path()
-basf2.set_log_level(basf2.LogLevel.INFO)
-
-# EventInfoSetter
-main.add_module('EventInfoSetter')
-
-# Gearbox
-main.add_module('Gearbox')
-
-# Process the main path
-basf2.process(main)
 
 dbImporter = KLMDatabaseImporter()
 

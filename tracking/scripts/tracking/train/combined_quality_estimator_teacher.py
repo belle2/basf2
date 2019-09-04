@@ -930,6 +930,7 @@ class TrackQEEvaluationBaseTask(Basf2Task):
             self.teacherTask.tree_name,
             "--outputfile",
             tmp_evaluation_pdf_output_path,
+            "--fillnan",  # fill NANs with actual values so that plots don't fail
         ]
         print(" ".join(cmd))
         subprocess.check_call(cmd)

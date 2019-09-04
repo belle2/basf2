@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Import KLM scintillator digitization parameters.
+# Import KLM scintillator digitization parameters payloads.
 
 import sys
-import basf2
-import ROOT
 import math
 from ROOT.Belle2 import KLMDatabaseImporter, KLMScintillatorDigitizationParameters
-
-basf2.set_log_level(basf2.LogLevel.INFO)
 
 mc = False
 if (len(sys.argv) >= 2):

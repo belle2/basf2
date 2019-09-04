@@ -4,8 +4,6 @@
 # Import KLM strip efficiency payloads.
 
 import sys
-import basf2
-import ROOT
 from ROOT.Belle2 import KLMDatabaseImporter, KLMStripEfficiency, KLMChannelIndex
 
 mc = False

@@ -120,14 +120,14 @@ namespace Belle2 {
       short m_pixelCol = 0; /**< Pixel column */
 
       // Variables for the MC truth infos
-      short m_channelConstraints = 0; /**< Channel number (0-512) */
+      //short m_channelConstraints = 0; /**< Channel number (0-512) */
       float m_peakTimeConstraints = 0; /**< Time of the main laser peak in the MC simulation (aka MC correction)  */
       float m_deltaTConstraints = 0; /**< Distance between the main and the secondary laser peak */
       float m_fractionConstraints = 0; /**< Fraction of the main peak*/
-      float m_extraTimeConstraints = 0; /**< Position of the guassian used to describe the extra peak on the timing distribution tail */
-      float m_extraTimeSigma = 0; /**< Width of the guassian used to describe the extra peak on the timing distribution tail */
-      float m_backgroundTimeConstraints = 0; /**< Position of the guassian used to describe the long tail of the timing distribution */
-      float m_backgroundSigmaConstraints = 0; /**< Width of the guassian used to describe the long tail of the timing distribution */
+      //float m_extraTimeConstraints = 0; /**< Position of the guassian used to describe the extra peak on the timing distribution tail */
+      //float m_extraTimeSigma = 0; /**< Width of the guassian used to describe the extra peak on the timing distribution tail */
+      //float m_backgroundTimeConstraints = 0; /**< Position of the guassian used to describe the long tail of the timing distribution */
+      //float m_backgroundSigmaConstraints = 0; /**< Width of the guassian used to describe the long tail of the timing distribution */
 
 
       // Variables for the output tree

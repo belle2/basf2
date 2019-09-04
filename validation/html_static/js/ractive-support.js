@@ -4,6 +4,16 @@ Support functions for using Ractive on the validation website
 
 "use strict";
 
+
+// ============================================================================
+// Global variables
+// ============================================================================
+
+/**
+ * This global variables maps template name to the corresponding ractive object.
+ */
+let template2ractive = {};
+
 // ============================================================================
 // Saving ractive values to local or session storage
 // ============================================================================
@@ -130,6 +140,8 @@ function ractiveValuePreserveLocal(ractive, keypath) {
 // Setting up ractive element from template.
 // ============================================================================
 
+
+
 /**
  * Sets up ractive element from template
  * @param templateName
@@ -190,6 +202,8 @@ function setupRactive(templateName,
             }
 
             renderLatex();
+
+            template2ractive[templateName] = ractive;
 
             console.log("Ractive setup with " + templateName + " complete");
         }).fail(

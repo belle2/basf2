@@ -14,16 +14,6 @@ from stdCharged import stdE, stdMu, stdPi
 from stdPi0s import *
 from stdPhotons import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
-
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
 
 
 gb2_setuprel = 'release-03-02-02'

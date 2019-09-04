@@ -101,6 +101,7 @@ namespace Belle2 {
                                                         cellHolder));
 
           for (const WeightedRelation<ACellHolder>& relation : continuations) {
+            // cppcheck-suppress useStlAlgorithm
             if (isHighestContinuation(relation)) {
               ACellHolder* neighbor = relation.getTo();
               path.push_back(neighbor);

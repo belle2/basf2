@@ -1,5 +1,13 @@
-/**************************************************************************                                                                                                                                        * BASF2 (Belle Analysis Framework 2)                                     *                                                                                                                                        * Copyright(C) 2019 - Belle II Collaboration                             *                                                                                                                                        *                                                                        *                                                                                                                                        * Author: The Belle II Collaboration                                     *                                                                                                                                        * Contributors: Umberto Tamponi                                          *                                                                                                                                        *                                                                        *                                                                                                                                        * This software is provided "as is" without any warranty.                *                                                                                                                                        **************************************************************************/
-
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
+ *                                                                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Umberto Tamponi                                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include <top/calibration/TOPLocalCalFitter.h>
 
@@ -393,7 +401,7 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
   // Loads the tree with the hits
   auto hitTree = getObjectPtr<TTree>("hitTree");
   TH2F* h_hitTime = new TH2F("h_hitTime", " ", 512 * 16, 0., 512 * 16, 20000, -60, 40.); // 10 ps bins
-  hitTree->Draw("hitTime:(channel+(slot-1)*512)>>h_hitTime", "dVdt > 80 && amplitude > 80");
+  hitTree->Draw("hitTime:(channel+(slot-1)*512)>>h_hitTime", "dVdt > 80 && amplitude > 80 && refTimeValid");
 
   m_histFile->cd();
 

@@ -185,7 +185,7 @@ namespace Belle2 {
     int     getEndOfValidity()
     {
       if (!tif)
-        return 0;
+        return maxTIF;
       auto it = GlobalLabel::getTimeIntervals().find(makeEIDPID(eid, pid));
       if (it == GlobalLabel::getTimeIntervals().end())
         return tid;

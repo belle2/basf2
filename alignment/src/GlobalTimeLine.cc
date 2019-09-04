@@ -109,10 +109,9 @@ namespace Belle2 {
             auto endEvent = gotoNextChangeRunWise(timeTable, uid, iCol);
             int endExp = endEvent.getExperiment();
             //int endRun = endEvent.getRun();
-            int endRun = endEvent.getRun() - 1;
-            // The last run will be the same as this run, so take the max, which is this run.
-            //endRun = std::max(run, endRun);
-            if (endRun < run) {
+            int endRun = std::max(0, endEvent.getRun() - 1);
+            // The last run will be the same as this run
+            if (endEvent.getRun() == run && endExp == exp) {
               endRun = -1;
               endExp = -1;
             }

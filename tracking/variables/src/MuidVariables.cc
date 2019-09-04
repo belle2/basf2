@@ -1,17 +1,14 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Alberto Martini                                          *
+ * Contributors: Alberto Martini, Giacomo De Pietro                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/core/Module.h>
 #include <analysis/VariableManager/Manager.h>
-
-// Belle II dataobjects include
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/Muid.h>
@@ -237,6 +234,30 @@ namespace Belle2 {
       return muid->getHitLayerPattern();
     }
 
+    //! @return total number of matching BKLM hits
+    double muidTotalBarrelHits(const Particle* particle)
+    {
+      Muid* muid = getMuid(particle);
+      if (!muid)
+        return std::numeric_limits<double>::quiet_NaN();
+      return muid->getTotalBarrelHits();
+    }
+
+    //! @return total number of matching EKLM hits
+    double muidTotalEndcapHits(const Particle* particle)
+    {
+      Muid* muid = getMuid(particle);
+      if (!muid)
+        return std::numeric_limits<double>::quiet_NaN();
+      return muid->getTotalEndcapHits();
+    }
+
+    //! @return total number of matching KLM hits
+    double muidTotalHits(const Particle* particle)
+    {
+      return muidTotalBarrelHits(particle) + muidTotalEndcapHits(particle);
+    }
+
     VARIABLE_GROUP("Muid calibration");
     REGISTER_VARIABLE("muidMuonProbability", muidMuonProbability,
                       "[Calibration] Returns the muon probability stored in the Muid dataobject");
@@ -280,5 +301,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("muidExtLayerPattern", muidExtLayerPattern,
                       "[Calibration] Returns layer-crossing bit pattern during extrapolation");
     REGISTER_VARIABLE("muidHitLayerPattern", muidHitLayerPattern, "[Calibration] Returns matching-hit bit pattern");
+    REGISTER_VARIABLE("muidTotalBarrelHits", muidTotalBarrelHits, "[Calibration] Returns total number of matching BKLM hits");
+    REGISTER_VARIABLE("muidTotalEndcapHits", muidTotalEndcapHits, "[Calibration] Returns total number of matching EKLM hits");
+    REGISTER_VARIABLE("muidTotalHits", muidTotalHits, "[Calibration] Returns total number of matching KLM hits");
   }
 }

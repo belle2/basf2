@@ -2,7 +2,7 @@ Import('env')
 
 env['SUBLIB'] = True
 env['LIBS'] = ['framework',
-               'trg_cdc_dbobjects',
+#               'trg_cdc_dbobjects',
                'mdst_dataobjects',
                'rawdata_dataobjects',
                'cdc',

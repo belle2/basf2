@@ -922,13 +922,13 @@ class TrackQEEvaluationBaseTask(Basf2Task):
         )
         cmd = [
             "basf2_mva_evaluate.py",
-            "--identifier",
+            "--identifiers",
             self.get_input_file_names(self.teacherTask.weightfile_identifier)[0],
-            "-d",
+            "--datafiles",
             self.get_input_file_names(self.dataCollectionTask.records_file_name)[0],
             "--treename",
             self.teacherTask.tree_name,
-            "-o",
+            "--outputfile",
             tmp_evaluation_pdf_output_path,
         ]
         print(" ".join(cmd))

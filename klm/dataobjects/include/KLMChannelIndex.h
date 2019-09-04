@@ -84,10 +84,7 @@ namespace Belle2 {
      * over BKLM strips. Make sure that the iteration is performed for EKLM
      * only, e. g. by using beginEKLM() and endEKLM().
      */
-    void useEKLMSegments(bool useSegments = true)
-    {
-      m_UseEKLMSegments = useSegments;
-    }
+    void useEKLMSegments(bool useSegments = true);
 
     /**
      * Get subdetector.
@@ -155,7 +152,7 @@ namespace Belle2 {
     /**
      * Get EKLM segment number.
      */
-    uint16_t getEKLMSegmentNumber() const;
+    int getEKLMSegmentNumber() const;
 
     /**
      * First channel for BKLM.

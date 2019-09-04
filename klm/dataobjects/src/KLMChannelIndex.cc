@@ -112,6 +112,12 @@ void KLMChannelIndex::setIndexLevel(enum IndexLevel indexLevel)
     setNStripsPlane();
 }
 
+void KLMChannelIndex::useEKLMSegments(bool useSegments)
+{
+  m_UseEKLMSegments = useSegments;
+  setNStripsPlane();
+}
+
 uint16_t KLMChannelIndex::getKLMChannelNumber() const
 {
   if (m_Subdetector == KLMElementNumbers::c_BKLM) {
@@ -139,10 +145,10 @@ uint16_t KLMChannelIndex::getKLMSectorNumber() const
     return m_ElementNumbers->sectorNumberEKLM(m_Section, m_Sector);
 }
 
-uint16_t KLMChannelIndex::getEKLMSegmentNumber() const
+int KLMChannelIndex::getEKLMSegmentNumber() const
 {
-  m_ElementNumbersEKLM->segmentNumber(
-    m_Section, m_Layer, m_Sector, m_Plane, m_Strip);
+  return m_ElementNumbersEKLM->segmentNumber(
+           m_Section, m_Layer, m_Sector, m_Plane, m_Strip);
 }
 
 KLMChannelIndex KLMChannelIndex::beginBKLM()

@@ -212,12 +212,12 @@ def DimuonPlusMissingEnergyList(path):
     dimuon_name = 'Z0:' + skim_label
 
     # Define some cuts
-    fromIP_cut = 'abs(dz) < 2.0 and abs(dr) < 0.5'
-    muonID_cut = 'muonID > 0.2'
+    fromIP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'
+    muonID_cut = '[muonID > 0.3]'
     # We want exactly 2 tracks from IP
-    dimuon_cut = 'nCleanedTracks(' + fromIP_cut + ') == 2'
+    dimuon_cut = '[nCleanedTracks(' + fromIP_cut + ') < 4]'
     # And the pair must have pt > 200 MeV in CMS frame
-    dimuon_cut += ' and useCMSFrame(pt) > 0.2'
+    dimuon_cut += ' and [useCMSFrame(pt) > 0.2]'
 
     # Reconstruct the dimuon candidate
     cutAndCopyList('mu+:' + skim_label, 'mu+:all', fromIP_cut + ' and ' + muonID_cut, path=path)
@@ -250,15 +250,15 @@ def ElectronMuonPlusMissingEnergyList(path):
     emu_name = 'Z0:' + skim_label
 
     # Define some basic cuts
-    fromIP_cut = 'abs(dz) < 2.0 and abs(dr) < 0.5'
-    electronID_cut = 'electronID > 0.2'
-    muonID_cut = 'muonID > 0.2'
+    fromIP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'
+    electronID_cut = '[electronID > 0.3]'
+    muonID_cut = '[muonID > 0.3]'
     # We require that the electron points to the barrel ECL + 10 degrees
-    theta_cut = '0.387 < theta < 2.421'
+    theta_cut = '[0.387 < theta < 2.421]'
     # We want exactly 2 tracks from IP
-    emu_cut = 'nCleanedTracks(' + fromIP_cut + ') == 2'
+    emu_cut = '[nCleanedTracks(' + fromIP_cut + ') < 4]'
     # And the pair must have pt > 200 MeV in CMS frame
-    emu_cut += ' and useCMSFrame(pt) > 0.2'
+    emu_cut += ' and [useCMSFrame(pt) > 0.2]'
 
     # Reconstruct the dimuon candidate
     cutAndCopyList('e+:' + skim_label, 'e+:all', fromIP_cut + ' and ' + electronID_cut + ' and ' + theta_cut, path=path)
@@ -300,14 +300,14 @@ def DielectronPlusMissingEnergyList(path):
     dielectron_name = 'Z0:' + skim_label
 
     # Define some basic cuts
-    fromIP_cut = 'abs(dz) < 2.0 and abs(dr) < 0.5'
-    electronID_cut = 'electronID > 0.2'
+    fromIP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'
+    electronID_cut = '[electronID > 0.2]'
     # We require that the electron points to the barrel ECL + 10 degrees
-    theta_cut = '0.387 < theta < 2.421'
+    theta_cut = '[0.387 < theta < 2.421]'
     # We want exactly 2 tracks from IP
-    dielectron_cut = 'nCleanedTracks(' + fromIP_cut + ') == 2'
+    dielectron_cut = '[nCleanedTracks(' + fromIP_cut + ') == 2]'
     # And the pair must have pt > 200 MeV in CMS frame
-    dielectron_cut += ' and useCMSFrame(pt) > 0.2'
+    dielectron_cut += ' and [useCMSFrame(pt) > 0.2]'
 
     # Reconstruct the dielectron candidate
     cutAndCopyList('e+:' + skim_label, 'e+:all', fromIP_cut + ' and ' + electronID_cut + ' and ' + theta_cut, path=path)

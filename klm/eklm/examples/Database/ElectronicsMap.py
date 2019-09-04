@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Create EKLM electronics mapping payloads.
+# Create EKLM database payloads.
 
 import sys
+import basf2
+import ROOT
 from ROOT.Belle2 import EKLMDatabaseImporter, EKLMElectronicsMap
+from basf2 import *
+
+set_log_level(LogLevel.INFO)
 
 # MC corresponds to the design electronics map
 

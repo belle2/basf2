@@ -18,20 +18,6 @@ if (len(sys.argv) >= 2):
     if (sys.argv[1] == 'mc'):
         mc = True
 
-eventinfosetter = register_module('EventInfoSetter')
-
-# Gearbox
-gearbox = register_module('Gearbox')
-
-# Create main path
-main = create_path()
-
-# Add modules to main path
-main.add_module(eventinfosetter)
-main.add_module(gearbox)
-
-process(main)
-
 # EKLM electronics map
 #
 #     backward (section == 1)    forward (section == 2)

@@ -133,18 +133,6 @@ namespace Belle2 {
      */
     void studyAlignmentLimits(const char* outputFile);
 
-    /** Mode. */
-    std::string m_Mode;
-
-    /** What should be randomly displaced */
-    std::string m_RandomDisplacement;
-
-    /** Name of input file. */
-    std::string m_InputFile;
-
-    /** Name of output file. */
-    std::string m_OutputFile;
-
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 

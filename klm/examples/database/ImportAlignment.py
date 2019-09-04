@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Import KLM strip efficiency payloads.
+# Import KLM alignment and displacement payloads.
 
 import sys
 import basf2
@@ -58,18 +58,26 @@ while (index != index2.endEKLM()):
 
 if (mc):
     dbImporter.setIOV(0, 0, 0, -1)
-    dbImporter.importAlignment(bklmAlignment,
-                               eklmAlignment, eklmSegmentAlignment)
+    dbImporter.importAlignment(bklmAlignment, eklmAlignment,
+                               eklmSegmentAlignment)
+    dbImporter.importAlignment(bklmAlignment, eklmAlignment,
+                               eklmSegmentAlignment, True)
 
     dbImporter.setIOV(1002, 0, 1002, -1)
-    dbImporter.importAlignment(bklmAlignment,
-                               eklmAlignment, eklmSegmentAlignment)
+    dbImporter.importAlignment(bklmAlignment, eklmAlignment,
+                               eklmSegmentAlignment)
+    dbImporter.importAlignment(bklmAlignment, eklmAlignment,
+                               eklmSegmentAlignment, True)
 
     dbImporter.setIOV(1003, 0, 1003, -1)
-    dbImporter.importAlignment(bklmAlignment,
-                               eklmAlignment, eklmSegmentAlignment)
+    dbImporter.importAlignment(bklmAlignment, eklmAlignment,
+                               eklmSegmentAlignment)
+    dbImporter.importAlignment(bklmAlignment, eklmAlignment,
+                               eklmSegmentAlignment, True)
 
 else:
     dbImporter.setIOV(0, 0, -1, -1)
-    dbImporter.importAlignment(bklmAlignment,
-                               eklmAlignment, eklmSegmentAlignment)
+    dbImporter.importAlignment(bklmAlignment, eklmAlignment,
+                               eklmSegmentAlignment)
+    dbImporter.importAlignment(bklmAlignment, eklmAlignment,
+                               eklmSegmentAlignment, True)

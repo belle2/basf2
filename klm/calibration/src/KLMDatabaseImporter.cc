@@ -128,9 +128,14 @@ void KLMDatabaseImporter::importStripEfficiency(
 }
 
 void KLMDatabaseImporter::importBKLMAlignment(
-  const BKLMAlignment* bklmAlignment)
+  const BKLMAlignment* bklmAlignment, bool displacement)
 {
-  DBImportObjPtr<BKLMAlignment> bklmAlignmentImport;
+  std::string payloadName;
+  if (displacement)
+    payloadName = "BKLMDisplacement";
+  else
+    payloadName = "BKLMAlignment";
+  DBImportObjPtr<BKLMAlignment> bklmAlignmentImport(payloadName);
   bklmAlignmentImport.construct(*bklmAlignment);
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
@@ -138,9 +143,14 @@ void KLMDatabaseImporter::importBKLMAlignment(
 }
 
 void KLMDatabaseImporter::importEKLMAlignment(
-  const EKLMAlignment* eklmAlignment)
+  const EKLMAlignment* eklmAlignment, bool displacement)
 {
-  DBImportObjPtr<EKLMAlignment> eklmAlignmentImport;
+  std::string payloadName;
+  if (displacement)
+    payloadName = "EKLMDisplacement";
+  else
+    payloadName = "EKLMAlignment";
+  DBImportObjPtr<EKLMAlignment> eklmAlignmentImport(payloadName);
   eklmAlignmentImport.construct(*eklmAlignment);
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
@@ -148,9 +158,14 @@ void KLMDatabaseImporter::importEKLMAlignment(
 }
 
 void KLMDatabaseImporter::importEKLMSegmentAlignment(
-  const EKLMSegmentAlignment* eklmSegmentAlignment)
+  const EKLMSegmentAlignment* eklmSegmentAlignment, bool displacement)
 {
-  DBImportObjPtr<EKLMSegmentAlignment> eklmSegmentAlignmentImport;
+  std::string payloadName;
+  if (displacement)
+    payloadName = "EKLMSegmentDisplacement";
+  else
+    payloadName = "EKLMSegmentAlignment";
+  DBImportObjPtr<EKLMSegmentAlignment> eklmSegmentAlignmentImport(payloadName);
   eklmSegmentAlignmentImport.construct(*eklmSegmentAlignment);
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
@@ -159,9 +174,9 @@ void KLMDatabaseImporter::importEKLMSegmentAlignment(
 
 void KLMDatabaseImporter::importAlignment(
   const BKLMAlignment* bklmAlignment, const EKLMAlignment* eklmAlignment,
-  const EKLMSegmentAlignment* eklmSegmentAlignment)
+  const EKLMSegmentAlignment* eklmSegmentAlignment, bool displacement)
 {
-  importBKLMAlignment(bklmAlignment);
-  importEKLMAlignment(eklmAlignment);
-  importEKLMSegmentAlignment(eklmSegmentAlignment);
+  importBKLMAlignment(bklmAlignment, displacement);
+  importEKLMAlignment(eklmAlignment, displacement);
+  importEKLMSegmentAlignment(eklmSegmentAlignment, displacement);
 }

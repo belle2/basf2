@@ -11,99 +11,34 @@
 #pragma once
 
 /* Belle2 headers. */
-#include <framework/core/Module.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
 #include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
+#include <klm/eklm/geometry/GeometryData.h>
 
 namespace Belle2 {
 
   /**
-   * Module for generation of displacement or alignment data.
+   * Module for generation of KLM displacement or alignment data.
    */
-  class EKLMDisplacementGeneratorModule : public Module {
+  class KLMDisplacementGenerator {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMDisplacementGeneratorModule();
+    KLMDisplacementGenerator();
 
     /**
      * Destructor.
      */
-    ~EKLMDisplacementGeneratorModule();
-
-    /**
-     * Initializer.
-     */
-    void initialize() override;
-
-    /**
-     * Called when entering a new run.
-     */
-    void beginRun() override;
-
-    /**
-     * This method is called for each event.
-     */
-    void event() override;
-
-    /**
-     * This method is called if the current run ends.
-     */
-    void endRun() override;
-
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override;
-
-  private:
-
-    /** Payload name. */
-    std::string m_PayloadName;
-
-    /** Mode. */
-    std::string m_Mode;
-
-    /** What should be randomly displaced */
-    std::string m_RandomDisplacement;
-
-    /** If the displacement should be the same for all sectors. */
-    bool m_SectorSameDisplacement;
-
-    /** Fix sector deltaU at 0. */
-    bool m_SectorZeroDeltaU;
-
-    /** Fix sector deltaV at 0. */
-    bool m_SectorZeroDeltaV;
-
-    /** Fix sector deltaGamma at 0. */
-    bool m_SectorZeroDeltaGamma;
-
-    /** Sector deltaU */
-    double m_SectorDeltaU;
-
-    /** Sector deltaV. */
-    double m_SectorDeltaV;
-
-    /** Sector deltaGamma. */
-    double m_SectorDeltaGamma;
-
-    /** Name of input file. */
-    std::string m_InputFile;
-
-    /** Name of output file. */
-    std::string m_OutputFile;
-
-    /** Geometry data. */
-    const EKLM::GeometryData* m_GeoDat;
+    ~KLMDisplacementGenerator();
 
     /**
      * Fill EKLMAlignment with zero displacements.
-     * @param[in,out] alignment        Displacements.
-     * @param[in,out] segmentAlignment Segment displacements.
+     * @param[out] alignment        Displacements.
+     * @param[out] segmentAlignment Segment displacements.
      */
     void fillZeroDisplacements(EKLMAlignment* alignment,
                                EKLMSegmentAlignment* segmentAlignment);
@@ -124,10 +59,36 @@ namespace Belle2 {
 
     /**
      * Generation of random displacements.
-     * @param[in] displaceSector  Whether sectors should be displaced.
-     * @param[in] displaceSegment Whether segments should be displaced.
+     *
+     * @param[out] alignment
+     * Displacements.
+     *
+     * @param[out] segmentAlignment
+     * Segment displacements.
+     *
+     * @param[in] displaceSector
+     * Whether sectors should be displaced.
+     *
+     * @param[in] displaceSegment
+     * Whether segments should be displaced.
+     *
+     * @param[in] sectorSameDisplacement
+     * If the displacement should be the same for all sectors.
+     *
+     * @param[in] sectorZeroDeltaU
+     * Fix sector deltaU at 0.
+     *
+     * @param[in] sectorZeroDeltaV
+     * Fix sector deltaV at 0.
+     *
+     * @param[in] sectorZeroDeltaGamma
+     * Fix sector deltaGamma at 0.
      */
-    void generateRandomDisplacement(bool displaceSector, bool displaceSegment);
+    void generateRandomDisplacement(
+      EKLMAlignment* alignment, EKLMSegmentAlignment* segmentAlignment,
+      bool displaceSector, bool displaceSegment,
+      bool sectorSameDisplacement = false, bool sectorZeroDeltaU = false,
+      bool sectorZeroDeltaV = false, bool sectorZeroDeltaGamma = false);
 
     /**
      * Read displacement from ROOT file.
@@ -161,6 +122,26 @@ namespace Belle2 {
      */
     void saveDisplacement(EKLMAlignment* alignment,
                           EKLMSegmentAlignment* segmentAlignment);
+
+  private:
+
+    /** Mode. */
+    std::string m_Mode;
+
+    /** What should be randomly displaced */
+    std::string m_RandomDisplacement;
+
+    /** Name of input file. */
+    std::string m_InputFile;
+
+    /** Name of output file. */
+    std::string m_OutputFile;
+
+    /** Geometry data. */
+    const EKLM::GeometryData* m_GeoDat;
+
+    /** Element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
 
   };
 

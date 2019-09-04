@@ -248,8 +248,10 @@ namespace Belle2 {
         }
 
         for (auto payloadIndex : payloadIndices) {
-          getPayloadByContinuousIndex(payloadsTable, label.getUniqueId(), payloadIndex).second->updateGlobalParam(correction,
-              label.getElementId(), label.getParameterId());
+          auto& payload = getPayloadByContinuousIndex(payloadsTable, label.getUniqueId(), payloadIndex).second;
+          // If not found, we get an empty payload shared ptr
+          if (payload)
+            payload->updateGlobalParam(correction, label.getElementId(), label.getParameterId());
         }
 
       }
@@ -265,7 +267,9 @@ namespace Belle2 {
 
             // non-intra-run
             if (iovBlock.second.size() == 1) {
-              result.push_back({iov, obj});
+              if (obj)
+                result.push_back({iov, obj});
+
               continue;
             }
 
@@ -279,7 +283,8 @@ namespace Belle2 {
               auto nextEvent = iovBlock.second.at(iObj).first.getEvent();
               auto nextObj = iovBlock.second.at(iObj).second->releaseObject();
 
-              payloads->add(nextEvent, nextObj);
+              if (nextObj)
+                payloads->add(nextEvent, nextObj);
               //payloads.add(nextEvent, nextObj);
             }
             result.push_back({iov, payloads});

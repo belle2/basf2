@@ -16,20 +16,6 @@ if (len(sys.argv) >= 2):
     if (sys.argv[1] == 'mc'):
         mc = True
 
-eventinfosetter = basf2.register_module('EventInfoSetter')
-
-# Gearbox
-gearbox = basf2.register_module('Gearbox')
-
-# Create main path
-main = basf2.create_path()
-
-# Add modules to main path
-main.add_module(eventinfosetter)
-main.add_module(gearbox)
-
-basf2.process(main)
-
 dbImporter = KLMDatabaseImporter()
 
 channelStatus = KLMChannelStatus()

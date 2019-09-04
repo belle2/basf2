@@ -60,8 +60,10 @@ skim_registry = [
     ('13160100', 'TCPV'),
     ('18020100', 'SinglePhotonDark'),
     ('18020300', 'ALP3Gamma'),
-    ('18520400', 'LFVZpInvisible'),
-    ('18520500', 'LFVZpVisible'),
+    ('18520100', 'DimuonPlusMissingEnergy'),
+    ('18520200', 'ElectronMuonPlusMissingEnergy'),
+    ('18520300', 'DielectronPlusMissingEnergy'),
+    ('18520400', 'LFVZpVisible'),
     ('18570600', 'TauGeneric'),
     ('18570700', 'TauThrust'),
 ]

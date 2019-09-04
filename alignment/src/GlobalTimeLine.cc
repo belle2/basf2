@@ -248,7 +248,7 @@ namespace Belle2 {
         }
 
         for (auto payloadIndex : payloadIndices) {
-          auto& payload = getPayloadByContinuousIndex(payloadsTable, label.getUniqueId(), payloadIndex).second;
+          auto payload = getPayloadByContinuousIndex(payloadsTable, label.getUniqueId(), payloadIndex).second;
           // If not found, we get an empty payload shared ptr
           if (payload)
             payload->updateGlobalParam(correction, label.getElementId(), label.getParameterId());

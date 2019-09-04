@@ -184,7 +184,7 @@ namespace Belle2 {
         auto cluster = gamma->getECLCluster();
         //Get the tracks related to each photon...
         RelationVector<Track> relatedTracks = cluster->getRelationsTo<Track>("", relationName);
-        double bestWeight = m_maximumAcceptance; //Maximum weight should be 3, from the pre-cuts applied by the ECL module...
+        double bestWeight = m_maximumAcceptance;
         unsigned bestMatchIndex = 0;
         unsigned trkIndex = 0;
         //Loop over the related tracks...
@@ -201,6 +201,7 @@ namespace Belle2 {
                 //... and only select the best match among the tracks in the input list
                 bestMatchIndex = trk->getArrayIndex();
               }
+              break; //If the particle corresponding to the related track is found, break the loop over the particles and go for the next related track
             }
           }
         }

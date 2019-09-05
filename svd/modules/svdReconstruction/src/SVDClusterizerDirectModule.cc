@@ -22,7 +22,6 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-#include <svd/dataobjects/SVDEventInfo.h>
 
 #include <svd/reconstruction/NNWaveFitTool.h>
 
@@ -92,6 +91,7 @@ void SVDClusterizerDirectModule::initialize()
   storeShaperDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
+  m_storeSVDEvtInfo.isRequired();
 
   RelationArray relClusterShaperDigits(storeClusters, storeShaperDigits);
   RelationArray relClusterTrueHits(storeClusters, storeTrueHits);
@@ -175,12 +175,12 @@ void SVDClusterizerDirectModule::fillRelationMap(const RelationLookup& lookup,
 
 void SVDClusterizerDirectModule::event()
 {
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
-  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
 
   const StoreArray<SVDShaperDigit> storeShaperDigits(m_storeShaperDigitsName);
-  // If no digits, nothing to do
-  if (!storeShaperDigits || !storeShaperDigits.getEntries()) return;
+  // If no digits or no SVDEventInfo, nothing to do
+  if (!storeShaperDigits || !storeShaperDigits.getEntries() || !m_storeSVDEvtInfo.isValid()) return;
+
+  SVDModeByte modeByte = m_storeSVDEvtInfo->getModeByte();
 
   size_t nDigits = storeShaperDigits.getEntries();
   B2DEBUG(90, "Initial size of StoreDigits array: " << nDigits);

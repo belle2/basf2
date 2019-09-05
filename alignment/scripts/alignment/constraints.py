@@ -332,6 +332,7 @@ if __name__ == '__main__':
       [
         consts6,
         consts7,
+        consts10,
         cdcT0,
         cdcWires,
         VXDHierarchyConstraints(type=1, pxd=False),
@@ -339,5 +340,3 @@ if __name__ == '__main__':
 
       timedep=timedep,
       global_tags=None)
-
-    print(files)

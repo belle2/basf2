@@ -24,7 +24,6 @@ class ConstraintsGenerator(Module):
 
     def event(self):
         consts = self.generator.generate()
-        print(consts)
         for const in consts:
             self.consts[const.get_checksum()] = const.data
 
@@ -35,7 +34,8 @@ class ConstraintsGenerator(Module):
                     f.write('Constraint 0.\n')
                     for label, coef in data:
                         f.write('{} {}\n'.format(label, coef))
-                print("Done: ", self.generator.filename)
+                print("Finished file: ", self.generator.filename)
+        print("Done: ", self.generator.filename)
 
 
 def save_config(constraint_sets, timedep_config=None, global_tags=None):
@@ -54,6 +54,7 @@ def save_config(constraint_sets, timedep_config=None, global_tags=None):
 
 
 def read_config(filename='constraint_config.pickled'):
+    print('Reading config from: ', filename)
     with open(filename, 'rb') as fileObject:
         # load the object from the file into var b
         b = pickle.load(fileObject)
@@ -81,8 +82,10 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None):
     fileName = 'TimedepConfigEvent_exp{}run{}ev{}.root'
     files = []
 
+    print('Global tags:')
     print(global_tags)
-    print(reversed(global_tags))
+    print('Global tags reversed (this will be used for conditions.override_globaltags(...)):')
+    print([tag for tag in reversed(global_tags)])
 
     conditions.override_globaltags([tag for tag in reversed(global_tags)])
     conditions.prepend_testing_payloads(os.path.abspath(

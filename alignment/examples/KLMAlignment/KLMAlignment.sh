@@ -9,24 +9,22 @@ basf2 ${BELLE2_LOCAL_DIR}/klm/examples/displacement/RandomDisplacement.py
 cd ..
 
 # Generation of 100000 e+ e- -> mu+ mu- events.
-basf2 -n 100000 ${BELLE2_LOCAL_DIR}/eklm/examples/TimeCalibration/Generation.py eetomumu_gen.root
+basf2 -n 100000 ${BELLE2_LOCAL_DIR}/klm/eklm/examples/TimeCalibration/Generation.py eetomumu_gen.root
 
-# Simulation.
+# Simulation and reconstruction.
+# If an iteration is necessary, restart from here.
 cp -R displacement/localdb .
-basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/EKLMAlignment/Simulation.py eetomumu_gen.root eetomumu_sim.root
+basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/KLMAlignment/Simulation.py eetomumu_gen.root eetomumu_rec.root
 rm -rf localdb
 
-# Reconstruction.
-basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/EKLMAlignment/Reconstruction.py eetomumu_sim.root eetomumu_rec.root
-
 # Millipede collection. If an iteration is necessary, restart from here.
-basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/EKLMAlignment/Collection.py eetomumu_rec.root eetomumu_col.root
+basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/KLMAlignment/Collection.py eetomumu_rec.root eetomumu_col.root
 
 # Alignment.
-basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/EKLMAlignment/Alignment.py eetomumu_col.root
+basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/KLMAlignment/Alignment.py eetomumu_col.root
 
 # Comparison of the alignment results and initial displacement.
-root -b -q ${BELLE2_LOCAL_DIR}'/alignment/examples/EKLMAlignment/CompareAlignment.C("displacement/EKLMDisplacement.root","alignment.root","comparison.root")'
+root -b -q ${BELLE2_LOCAL_DIR}'/alignment/examples/KLMAlignment/CompareAlignment.C("displacement/EKLMDisplacement.root","alignment.root","comparison.root")'
 
 # Graphical comparison of alignment results and initial displacement.
-root -b -q ${BELLE2_LOCAL_DIR}'/alignment/examples/EKLMAlignment/ViewAlignment.C("comparison.root")'
+root -b -q ${BELLE2_LOCAL_DIR}'/alignment/examples/KLMAlignment/ViewAlignment.C("comparison.root")'

@@ -226,7 +226,7 @@ namespace Belle2 {
             m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
           }
 
-          if (abs(pdgCode) == abs(Const::Klong.getPDGCode())) {
+          if (abs(pdgCode) == abs(Const::Klong.getPDGCode()) || abs(pdgCode) == abs(Const::neutron.getPDGCode())) {
             B2INFO("   -> MDST source: KLMClusters");
             m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
             B2INFO("   -> MDST source: ECLClusters");
@@ -679,6 +679,12 @@ namespace Belle2 {
             and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
           continue;
 
+        // don't fill a neutron list with clusters that don't have the neutral
+        // hadron hypothesis set (ECL people call this N2)
+        if (listPdgCode == Const::neutron.getPDGCode()
+            and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+          continue;
+
         // create particle and check it before adding to list
         Particle particle(cluster, thisType);
         if (particle.getParticleType() != Particle::c_ECLCluster) {
@@ -692,9 +698,9 @@ namespace Belle2 {
           const MCParticle* relMCParticle = mcParticles[weightsAndIndex.first];
           double weight = weightsAndIndex.second;
 
-          // TODO: study this further and avoid hardcoded values
+          // TODO: study this further and avoid hard-coded values
           // set the relation only if the MCParticle(reconstructed Particle)'s
-          // energy contribution to this cluster ammounts to at least 30(20)%
+          // energy contribution to this cluster amounts to at least 30(20)%
           if (relMCParticle)
             if (weight / newPart->getEnergy() > 0.20 &&  weight / relMCParticle->getEnergy() > 0.30)
               newPart->addRelationTo(relMCParticle, weight);
@@ -742,7 +748,7 @@ namespace Belle2 {
     StoreArray<KLMCluster> KLMClusters;
     StoreArray<Particle> particles;
 
-    // load reconstructed neutral KLM cluster's as Klongs
+    // load reconstructed neutral KLM cluster's as Klongs or neutrons
     for (int i = 0; i < KLMClusters.getEntries(); i++) {
       const KLMCluster* cluster      = KLMClusters[i];
 
@@ -853,6 +859,9 @@ namespace Belle2 {
       return true;
 
     if (abs(pdgCode) == abs(Const::Lambda.getPDGCode()))
+      return true;
+
+    if (abs(pdgCode) == abs(Const::neutron.getPDGCode()))
       return true;
 
     return result;

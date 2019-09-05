@@ -116,8 +116,11 @@ def PXDHalfShellsAlignment(files, tags):
     # algorithm.steering().command('outlierdownweighting 3')
     # algorithm.steering().command('dwfractioncut 0.1')
     # algorithm.steering().command('presigmas 1.')
+
+    from alignment.constraints import generate_constraints
+
     algorithm.steering().command('FortranFiles')
-    for filename in hierarchy.gen_constraints(consts, timedep):
+    for filename in generate_constraints(consts, timedep, tags):
         algorithm.steering().command(filename)
 
     algorithm.steering().command('Parameters')

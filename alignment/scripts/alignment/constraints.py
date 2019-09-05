@@ -1,118 +1,11 @@
 '''
-Created on 28 May 2018
-
-@author: kleinwrt
+@author: Claus Kleinwort (DESY), Tadeas Bilka
 '''
 from basf2 import *
 from ROOT import Belle2
 
 import os
-
-
-class ConstraintsGenerator(Module):
-    def __init__(self, generator):
-        """ init """
-        super(ConstraintsGenerator, self).__init__()
-        self.generator = generator
-        self.consts = dict()
-
-    def event(self):
-        consts = self.generator.genenerate()
-        print(consts)
-        for const in consts:
-            self.consts[const.get_checksum()] = const.data
-
-    def terminate(self):
-        if len(self.consts):
-            with open(self.generator.filename, 'w') as f:
-                for checksum, data in self.consts.items():
-                    f.write('Constraint 0.\n')
-                    for label, coef in data:
-                        f.write('{} {}\n'.format(label, coef))
-                print("Done: ", self.generator.filename)
-
-
-def gen_constraints(constraint_sets, timedep_config=None, global_tags=None):
-    if timedep_config is None:
-        timedep_config = []
-
-    if global_tags is None:
-        global_tags = [tag for tag in conditions.default_globaltags]
-
-    events = []
-    for (labels, events_) in timedep_config:
-        events += [event for event in events_]
-
-    if not len(timedep_config):
-        events = [(0, 0, 0)]
-
-    events = [(exp, run, ev) for (ev, run, exp) in events]
-    events = sorted(list(set(events)))
-    events = [(ev_, run_, exp_) for (exp_, run_, ev_) in events]
-
-    fileName = 'TimedepConfigEvent_exp{}run{}ev{}.root'
-    files = []
-
-    print(global_tags)
-    print(reversed(global_tags))
-
-    conditions.override_globaltags([tag for tag in reversed(global_tags)])
-    conditions.prepend_testing_payloads(os.path.abspath(
-        "/home/tadeas/belle2/head/alignment/examples/fuckingworkaround/database.txt"))
-
-    for index, event in enumerate(events):
-        #  conditions.reset()
-
-        ev, run, exp = event
-        path = create_path()
-        path.add_module("EventInfoSetter",
-                        skipNEvents=ev,
-                        evtNumList=[ev + 1],
-                        runList=[run],
-                        expList=[exp])
-        path.add_module('Progress')
-        this_filename = fileName.format(exp, run, ev)
-        path.add_module('RootOutput', outputFileName=this_filename, ignoreCommandLineOverride=True)
-        files.append(this_filename)
-        process(path)
-        print(statistics)
-
-    print(files)
-
-    # conditions.override_globaltags(global_tags)
-
-    path = create_path()
-    path.add_module("RootInput", inputFileNames=files, ignoreCommandLineOverride=True)
-    path.add_module('HistoManager')
-    path.add_module('Progress')
-    path.add_module('Gearbox')
-    path.add_module('Geometry')
-
-    collector = path.add_module('MillepedeCollector',
-                                timedepConfig=timedep_config)
-
-    constraint_files = []
-    for constraint_set in constraint_sets:
-        constraint_set.configure_collector(collector)
-        constraint_files.append(constraint_set.filename)
-        path.add_module(ConstraintsGenerator(constraint_set))
-
-    process(path)
-    print(statistics)
-
-    return [os.path.abspath(file) for file in constraint_files]
-
-
-def cmp(a, b):
-    return (a > b) - (a < b)
-
-
-def cdc_layer_label(layer, param):
-    wire = 511
-    wireid = Belle2.WireID(layer, wire).getEWire()
-    label = Belle2.GlobalLabel()
-    label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, param)
-    return label.label()
+import pickle
 
 
 class Constraint():
@@ -143,6 +36,20 @@ class Constraints():
         pass
 
 
+def generate_constraints(constraint_sets, timedep, global_tags):
+    files = []
+    for filename in [consts.filename for consts in constraint_sets]:
+        files.append(os.path.abspath(filename))
+
+    from alignment.constraints_generator import save_config
+    ccfn = save_config(constraint_sets, timedep, global_tags)
+    os.system('basf2 {} {}'.format(Belle2.FileSystem.findFile('alignment/scripts/alignment/constraints_generator.py'), ccfn))
+
+    return files
+
+# ----------------------------- Sub-detector specific constraint classes -----------------------------------------------
+
+
 class VXDHierarchyConstraints(Constraints):
     def __init__(self, type=2, pxd=True, svd=True):
         #  TODO: cannot currently change the filename in collector, so fixed here
@@ -155,6 +62,14 @@ class VXDHierarchyConstraints(Constraints):
         collector.param('hierarchyType', self.type)
         collector.param('enablePXDHierarchy', self.pxd)
         collector.param('enableSVDHierarchy', self.svd)
+
+
+def cdc_layer_label(layer, param):
+    wire = 511
+    wireid = Belle2.WireID(layer, wire).getEWire()
+    label = Belle2.GlobalLabel()
+    label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, param)
+    return label.label()
 
 
 class CDCLayerConstraints(Constraints):
@@ -180,6 +95,9 @@ class CDCLayerConstraints(Constraints):
         pass
 
     def genenerate(self):
+        def cmp(a, b):
+            return (a > b) - (a < b)
+
         consts = []
 
         for par in self.parameter:
@@ -273,12 +191,28 @@ class CDCLayerConstraints(Constraints):
 
         return consts
 
+# ------------ Main: Generate some constraint files with default config (no time-dependence, default global tags) ------
+
 if __name__ == '__main__':
     consts6 = CDCLayerConstraints('cdc-layer-constraints-6D.txt')
     consts7 = CDCLayerConstraints('cdc-layer-constraints-7D.txt', rigid=True, z_offset=True, r_scale=False, z_scale=False)
 
-    timedep = [([cdc_layer_label(1, ipar) for ipar in [1, 2, 6, 11, 12, 16] for layer in range(0, 56)], [(0, 0, 0), (10, 0, 0)])]
+    # phase 2
+    # timedep = [([], [(0, 0, 1002)])]
+    # early phase 3
+    # timedep = [([], [(0, 0, 1003)])]
 
-    files = gen_constraints([consts6, consts7, VXDHierarchyConstraints(
-        type=1, pxd=False), Constraints("my_file.txt")], timedep_config=timedep)
+    # final detector (phase 3)
+    timedep = [([], [(0, 0, 0)])]
+
+    files = generate_constraints(
+      [
+        consts6,
+        consts7,
+        VXDHierarchyConstraints(type=1, pxd=False),
+        Constraints("my_file.txt")],
+
+      timedep=timedep,
+      global_tags=None)
+
     print(files)

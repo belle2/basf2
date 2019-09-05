@@ -60,7 +60,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
 
     # Do not even attempt at reconstructing events w/ abnormally large occupancy.
     empty_path = create_path()
-    doom = path.add_module(EventsOfDoomBuster(nCDCHitsMax, nSVDShaperDigitsMax))
+    doom = path.add_module("EventsOfDoomBuster", nCDCHitsMax=nCDCHitsMax, nSVDShaperDigitsMax=nSVDShaperDigitsMax)
     doom.if_true(empty_path, AfterConditionPath.END)
 
     # Add modules that have to be run BEFORE track reconstruction
@@ -664,77 +664,6 @@ def add_dedx_modules(path, components=None):
     if components is None or 'SVD' in components:
         VXDdEdxPID = register_module('VXDDedxPID')
         path.add_module(VXDdEdxPID)
-
-
-class EventsOfDoomBuster(Module):
-    """
-    Module that flags an event destined for doom at reconstruction,
-    based on the size of selected hits/digits containers after the unpacking.
-
-    This is meant to be registered in the path *after* the unpacking, but *before* reconstruction.
-    """
-
-    def __init__(self, nCDCHitsMax=int(1e9), nSVDShaperDigitsMax=int(1e9)):
-        """
-        Module constructor.
-
-        Args:
-            nCDCHitsMax (Optional[int]): the max number of CDC hits
-                for an event to be kept for reconstruction.
-                By default, no events are skipped based upon this requirement.
-            nSVDShaperDigitsMax (Optional[int]): the max number of SVD shaper digits
-                for an event to be kept for reconstruction.
-                By default, no events are skipped based upon this requirement.
-        """
-
-        super().__init__()
-        self.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
-
-        self.nCDCHitsMax = nCDCHitsMax
-        self.nSVDShaperDigitsMax = nSVDShaperDigitsMax
-
-    def initialize(self):
-        """
-        Module initializer.
-        """
-
-        self.eventinfo = Belle2.PyStoreObj("EventMetaData")
-        self.cdchits = Belle2.PyStoreArray("CDCHits")
-        self.svdshaperdigits = Belle2.PyStoreArray("SVDShaperDigits")
-
-    def event(self):
-        """
-        Flag each event.
-
-        Returns:
-            bool: True if event exceeds `nCDCHitsMax or nSVDShaperDigitsMax`.
-                  In that case, the event should be skipped for reco.
-        """
-
-        ncdchits = len(self.cdchits)
-        nsvdshaperdigits = len(self.svdshaperdigits)
-
-        B2DEBUG(20, f"Event: {self.eventinfo.getEvent()} - nCDCHits: {ncdchits}, nSVDShaperDigits: {nsvdshaperdigits}")
-
-        doom_cdc = ncdchits > self.nCDCHitsMax
-        doom_svd = nsvdshaperdigits > self.nSVDShaperDigitsMax
-
-        if doom_cdc:
-            B2WARNING("Skip event --> Too much occupancy for reco!",
-                      event=self.eventinfo.getEvent(),
-                      run=self.eventinfo.getRun(),
-                      exp=self.eventinfo.getExperiment(),
-                      nCDCHits=ncdchits,
-                      nCDCHitsMax=self.nCDCHitsMax)
-        if doom_svd:
-            B2WARNING("Skip event --> Too much occupancy for reco!",
-                      event=self.eventinfo.getEvent(),
-                      run=self.eventinfo.getRun(),
-                      exp=self.eventinfo.getExperiment(),
-                      nSVDShaperDigits=nsvdshaperdigits,
-                      nSVDShaperDigitsMax=self.nSVDShaperDigitsMax)
-
-        self.return_value(doom_cdc or doom_svd)
 
 
 def prepare_cdst_analysis(path, components=None):

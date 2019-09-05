@@ -236,7 +236,8 @@ namespace Belle2 {
 
           if (bremCluster->getClusterId() == cluster->getClusterId()) {
             if (m_usePhotonOnlyOnce) { //If only one track per photon should be used...
-              if (track->getArrayIndex() == gamma->getExtraInfo("bestMatchIndex"))  //... check if this track is the best match ...
+              if (track->getArrayIndex() == static_cast<int>
+                  (gamma->getExtraInfo("bestMatchIndex")))      //... check if this track is the best match ...
                 selectedGammas.push_back(std::make_pair(weight, gamma)); //... and if it is, add it to the selected gammas
             } else {
               selectedGammas.push_back(std::make_pair(weight, gamma));

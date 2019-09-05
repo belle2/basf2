@@ -32,7 +32,7 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   genfit::PlanarMeasurement(1)
 {
   (void)trackCandHit;
-  int digit, section, layer, sector, plane, segment, strip;
+  int digit, plane, segment, strip;
   const HepGeom::Transform3D* t;
   CLHEP::HepRotation r;
   CLHEP::Hep3Vector origin;
@@ -61,8 +61,9 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   const EKLM::ElementNumbersSingleton* eklmElementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
   m_Segment = eklmElementNumbers->segmentNumber(
-                section, layer, sector, plane, segment);
-  t = transformData->getStripTransform(section, layer, sector, plane, strip);
+                m_Section, m_Layer, m_Sector, plane, segment);
+  t = transformData->getStripTransform(
+        m_Section, m_Layer, m_Sector, plane, strip);
   origin = t->getTranslation();
   origin2.SetX(origin.x() / CLHEP::cm * Unit::cm);
   origin2.SetY(origin.y() / CLHEP::cm * Unit::cm);
@@ -76,7 +77,7 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   v2.SetX(v.x());
   v2.SetY(v.y());
   v2.SetZ(v.z());
-  t = transformData->getSectorTransform(section, layer, sector);
+  t = transformData->getSectorTransform(m_Section, m_Layer, m_Sector);
   r = t->getRotation().inverse();
   v = r * v;
   m_StripV.SetX(v.unit().x());

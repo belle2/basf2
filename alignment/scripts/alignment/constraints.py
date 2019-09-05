@@ -314,7 +314,7 @@ class CDCWireConstraints(Constraints):
 # ------------ Main: Generate available constraint files with default config (no time-dependence, default global tags) ------
 
 if __name__ == '__main__':
-    consts6 = CDCLayerConstraints('cdc-layer-constraints-6D.txt')
+    consts6 = CDCLayerConstraints('cdc-layer-constraints-6D.txt', rigid=True, z_offset=False, r_scale=False, z_scale=False)
     consts7 = CDCLayerConstraints('cdc-layer-constraints-7D.txt', rigid=True, z_offset=True, r_scale=False, z_scale=False)
     consts10 = CDCLayerConstraints('cdc-layer-constraints-10D.txt', rigid=True, z_offset=True, r_scale=True, z_scale=True)
     cdcT0 = CDCTimeZerosConstraint()
@@ -327,9 +327,6 @@ if __name__ == '__main__':
 
     # final detector (phase 3)
     timedep = [([], [(0, 0, 0)])]
-
-    import alignment.parameters as ap
-    print(len(ap.cdc_wires()))
 
     files = generate_constraints(
       [

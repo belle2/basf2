@@ -55,22 +55,54 @@ def cdc_wires():
     return result
 
 
-def vxd_halfshells(pxd=True, svd=True):
-    ying = Belle2.VxdID(1, 0, 0, 1)
-    yang = Belle2.VxdID(1, 0, 0, 2)
-    pat = Belle2.VxdID(3, 0, 0, 1)
-    mat = Belle2.VxdID(3, 0, 0, 2)
+def cdc_t0s():
+    wires_in_layer = [
+        160, 160, 160, 160, 160, 160, 160, 160,
+        160, 160, 160, 160, 160, 160,
+        192, 192, 192, 192, 192, 192,
+        224, 224, 224, 224, 224, 224,
+        256, 256, 256, 256, 256, 256,
+        288, 288, 288, 288, 288, 288,
+        320, 320, 320, 320, 320, 320,
+        352, 352, 352, 352, 352, 352,
+        384, 384, 384, 384, 384, 384]
+
+    result = []
+
+    for layer in range(0, 56):
+        for wire in range(0, wires_in_layer[layer]):
+            label = Belle2.GlobalLabel()
+            label.construct(Belle2.CDCTimeZeros.getGlobalUniqueID(), Belle2.WireID(layer, wire).getEWire(), 0)
+            result.append(label.label())
+
+    return result
+
+
+def vxd_halfshells(pxd=True, svd=True, parameters=None, ying=True, yang=True, pat=True, mat=True):
+    if parameters is None:
+        parameters = [1, 2, 3, 4, 5, 6]
 
     result = []
 
     shells = []
+    _ying = Belle2.VxdID(1, 0, 0, 1)
+    _yang = Belle2.VxdID(1, 0, 0, 2)
+    _pat = Belle2.VxdID(3, 0, 0, 1)
+    _mat = Belle2.VxdID(3, 0, 0, 2)
+
     if pxd:
-        shells += [ying, yang]
+        if ying:
+            shells.append(_ying)
+        if yang:
+            shells.append(_yang)
     if svd:
-        shells += [pat, mat]
+        if pat:
+            shells.append(_pat)
+        if mat:
+            shells.append(_mat)
 
     for vxdid in shells:
-        for param in [1, 2, 3, 4, 5, 6]:
+        for param in parameters:
             vxdid = Belle2.VxdID(vxdid).getID()
             label = Belle2.GlobalLabel()
             label.construct(Belle2.VXDAlignment.getGlobalUniqueID(), vxdid, param)
@@ -91,18 +123,19 @@ def beamspot():
     return result
 
 
-def vxd_ladders(layers=None):
+def vxd_ladders(layers=None, parameters=None):
     if layers is None:
         layers = [1, 2, 3, 4, 5, 6]
+    if parameters is None:
+        parameters = [1, 2, 3, 4, 5, 6]
 
     result = []
 
-    params = [1, 2, 3, 4, 5, 6]
     ladders = [8, 12, 7, 10, 12, 16]
 
     for layer in layers:
         for ladder in range(1, ladders[layer - 1] + 1):
-            for ipar in params:
+            for ipar in parameters:
                 label = Belle2.GlobalLabel()
                 label.construct(Belle2.VXDAlignment.getGlobalUniqueID(), Belle2.VxdID(layer, ladder, 0).getID(), ipar)
                 result.append(label.label())
@@ -110,7 +143,7 @@ def vxd_ladders(layers=None):
     return result
 
 
-def vxd_sensors(layers=None, rigid=True, surface=True, surface2=True, surface3=True, surface4=True):
+def vxd_sensors(layers=None, rigid=True, surface=True, surface2=True, surface3=True, surface4=True, parameters=None):
     if layers is None:
         layers = [1, 2, 3, 4, 5, 6]
 
@@ -131,12 +164,16 @@ def vxd_sensors(layers=None, rigid=True, surface=True, surface2=True, surface3=T
         if surface4:
             params += params_surface4
 
+    # Allow full override by user
+    if parameters:
+        params = parameters
+
     result = []
 
     ladders = [8, 12, 7, 10, 12, 16]
     sensors = [2, 2, 2, 3, 4, 5]
 
-    for layer in range(1, 7):
+    for layer in layers:
         for ladder in range(1, ladders[layer - 1] + 1):
             for sensor in range(1, sensors[layer - 1] + 1):
                 for param in params:
@@ -156,3 +193,20 @@ def pxd():
 
 def svd():
     return vxd_sensors(layers=[3, 4, 5, 6]) + vxd_ladders(layers=[3, 4, 5, 6]) + vxd_halfshells(pxd=False, svd=True)
+
+
+def all():
+    # TODO: klm
+    return beamspot() + pxd() + svd() + cdc_layers() + cdc_wires() + cdc_t0s()
+
+if __name__ == '__main__':
+    print("Number of available parameters:")
+    print("BeamSpot:", len(beamspot()))
+    print("PXD:", len(pxd()))
+    print("SVD:", len(svd()))
+    print("( VXD:", len(vxd()), ")")
+    assert(len(vxd()) == len(pxd()) + len(svd()))
+    print("CDC layers:", len(cdc_layers()))
+    print("CDC wires:", len(cdc_wires()))
+    print("CDC T0s:", len(cdc_t0s()))
+    print("TOTAL:", len(all()))

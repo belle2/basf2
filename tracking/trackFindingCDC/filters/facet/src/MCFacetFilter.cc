@@ -92,10 +92,10 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
   int middleToEndInTrackDistance =  endInTrackId - middleInTrackId;
   int startToEndInTrackDistance =  endInTrackId - startInTrackId;
 
-  const bool makeNoDifferenceForReassignedSecondaries = true;
+  constexpr bool makeNoDifferenceForReassignedSecondaries = true;
 
-  if ((not startIsReassigned and not middleIsReassigned and not endIsReassigned) or
-      makeNoDifferenceForReassignedSecondaries) {
+  if (makeNoDifferenceForReassignedSecondaries or
+      (not startIsReassigned and not middleIsReassigned and not endIsReassigned)) {
 
     distanceInTrackIsSufficientlyLow =
       0 < startToMiddleInTrackDistance and startToMiddleInTrackDistance <= maxInTrackHitIdDifference and

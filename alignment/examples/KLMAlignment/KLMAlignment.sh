@@ -17,7 +17,7 @@ cp -R displacement/localdb .
 basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/KLMAlignment/Simulation.py eetomumu_gen.root eetomumu_rec.root
 rm -rf localdb
 
-# Millipede collection. If an iteration is necessary, restart from here.
+# Millipede collection.
 basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/KLMAlignment/Collection.py eetomumu_rec.root eetomumu_col.root
 
 # Alignment.

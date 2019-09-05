@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# KLM alignment: simulation and reconstruction.
+
 import sys
 import basf2
 from simulation import add_simulation

@@ -6,6 +6,7 @@ from ROOT import Belle2
 
 import os
 import pickle
+import math
 
 
 class Constraint():
@@ -28,7 +29,7 @@ class Constraints():
     def __init__(self, filename):
         self.filename = filename
 
-    def genenerate(self):
+    def generate(self):
         consts = []
         return consts
 
@@ -63,6 +64,10 @@ class VXDHierarchyConstraints(Constraints):
         collector.param('enablePXDHierarchy', self.pxd)
         collector.param('enableSVDHierarchy', self.svd)
 
+    def generate(self):
+        print("Generating constraints for VXD (no-op, file created by collector) ...")
+        return []
+
 
 def cdc_layer_label(layer, param):
     wire = 511
@@ -73,6 +78,7 @@ def cdc_layer_label(layer, param):
 
 
 class CDCLayerConstraints(Constraints):
+    # Code from Claus Kleinwort
     cdc = [['A1', 8, 160, 16.80, 23.80, 0., -35.9, 67.9],
            ['U2', 6, 160, 25.70, 34.80, 0.068, -51.4, 98.6],
            ['A3', 6, 192, 36.52, 45.57, 0., -57.5, 132.9],
@@ -94,7 +100,9 @@ class CDCLayerConstraints(Constraints):
         self.z_scale = z_scale
         pass
 
-    def genenerate(self):
+    def generate(self):
+        print("Generating constraints for CDC layers...")
+
         def cmp(a, b):
             return (a > b) - (a < b)
 
@@ -191,11 +199,126 @@ class CDCLayerConstraints(Constraints):
 
         return consts
 
-# ------------ Main: Generate some constraint files with default config (no time-dependence, default global tags) ------
+
+class CDCTimeZerosConstraint(Constraints):
+    wires_in_layer = [
+        160, 160, 160, 160, 160, 160, 160, 160,
+        160, 160, 160, 160, 160, 160,
+        192, 192, 192, 192, 192, 192,
+        224, 224, 224, 224, 224, 224,
+        256, 256, 256, 256, 256, 256,
+        288, 288, 288, 288, 288, 288,
+        320, 320, 320, 320, 320, 320,
+        352, 352, 352, 352, 352, 352,
+        384, 384, 384, 384, 384, 384]
+
+    def __init__(self, filename='cdc-T0-constraints.txt'):
+        super(CDCTimeZerosConstraint, self).__init__(filename)
+        pass
+
+    def generate(self):
+        print("Generating constraints for CDC T0's ...")
+        consts = []
+        const = Constraint()
+
+        for layer in range(0, 56):
+            for wire in range(0, self.wires_in_layer[layer]):
+                label = Belle2.GlobalLabel()
+                label.construct(Belle2.CDCTimeZeros.getGlobalUniqueID(), Belle2.WireID(layer, wire).getEWire(), 0)
+                const.add(label.label(), 1.0)
+
+        consts.append(const)
+        return consts
+
+
+class CDCWireConstraints(Constraints):
+    wires_in_layer = [
+        160, 160, 160, 160, 160, 160, 160, 160,
+        160, 160, 160, 160, 160, 160,
+        192, 192, 192, 192, 192, 192,
+        224, 224, 224, 224, 224, 224,
+        256, 256, 256, 256, 256, 256,
+        288, 288, 288, 288, 288, 288,
+        320, 320, 320, 320, 320, 320,
+        352, 352, 352, 352, 352, 352,
+        384, 384, 384, 384, 384, 384]
+
+    def __init__(self, filename='cdc-wire-constraints.txt'):
+        super(CDCWireConstraints, self).__init__(filename)
+        pass
+
+    def get_label(self, layer, wire, parameter):
+        wireid = Belle2.WireID(layer, wire).getEWire()
+        label = Belle2.GlobalLabel()
+        label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, parameter)
+        return label.label()
+
+    def generate(self):
+        print("Generating constraints for CDC wires...")
+        consts = []
+
+        layers = [l for l in range(0, 56)]
+
+        const1 = Constraint()
+        for layer in layers:
+            # sum of wire X (BWD) in layer
+            for wire in range(0, self.wires_in_layer[layer]):
+                const1.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdX), 1.)
+        consts.append(const1)
+
+        const2 = Constraint()
+        for layer in layers:
+            # sum of wire Y (BWD) in layer
+            for wire in range(0, self.wires_in_layer[layer]):
+                const2.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdY), 1.)
+        consts.append(const2)
+
+        const3 = Constraint()
+        for layer in layers:
+            # sum of wire rotations (BWD) in layer
+            for wire in range(0, self.wires_in_layer[layer]):
+
+                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
+
+                const3.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdX), -math.sin(wirePhi))
+                const3.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdY), +math.cos(wirePhi))
+        consts.append(const3)
+
+        const4 = Constraint()
+        for layer in layers:
+            # sum of wire X (FWD) in layer
+            for wire in range(0, self.wires_in_layer[layer]):
+                const4.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdX), 1.)
+        consts.append(const4)
+
+        const5 = Constraint()
+        for layer in layers:
+            # sum of wire Y (FWD) in layer
+            for wire in range(0, self.wires_in_layer[layer]):
+                const5.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), 1.)
+        consts.append(const5)
+
+        const6 = Constraint()
+        for layer in layers:
+            # sum of wire rotations (FWD) in layer
+            for wire in range(0, self.wires_in_layer[layer]):
+
+                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
+
+                const6.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdX), -math.sin(wirePhi))
+                const6.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), +math.cos(wirePhi))
+        consts.append(const6)
+
+        return consts
+
+# ------------ Main: Generate available constraint files with default config (no time-dependence, default global tags) ------
 
 if __name__ == '__main__':
     consts6 = CDCLayerConstraints('cdc-layer-constraints-6D.txt')
     consts7 = CDCLayerConstraints('cdc-layer-constraints-7D.txt', rigid=True, z_offset=True, r_scale=False, z_scale=False)
+    consts10 = CDCLayerConstraints('cdc-layer-constraints-10D.txt', rigid=True, z_offset=True, r_scale=True, z_scale=True)
+    cdcT0 = CDCTimeZerosConstraint()
+    cdcWires = CDCWireConstraints()
 
     # phase 2
     # timedep = [([], [(0, 0, 1002)])]
@@ -205,10 +328,15 @@ if __name__ == '__main__':
     # final detector (phase 3)
     timedep = [([], [(0, 0, 0)])]
 
+    import alignment.parameters as ap
+    print(len(ap.cdc_wires()))
+
     files = generate_constraints(
       [
         consts6,
         consts7,
+        cdcT0,
+        cdcWires,
         VXDHierarchyConstraints(type=1, pxd=False),
         Constraints("my_file.txt")],
 

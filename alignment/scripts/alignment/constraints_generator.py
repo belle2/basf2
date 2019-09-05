@@ -10,7 +10,8 @@ import os
 import sys
 import pickle
 
-from alignment.constraints import Constraint, Constraints, VXDHierarchyConstraints, CDCLayerConstraints
+# Needed for pickling of constraints
+from alignment.constraints import *
 
 
 class ConstraintsGenerator(Module):
@@ -19,9 +20,10 @@ class ConstraintsGenerator(Module):
         super(ConstraintsGenerator, self).__init__()
         self.generator = generator
         self.consts = dict()
+        super(ConstraintsGenerator, self).set_name(super(ConstraintsGenerator, self).name() + ":" + generator.filename)
 
     def event(self):
-        consts = self.generator.genenerate()
+        consts = self.generator.generate()
         print(consts)
         for const in consts:
             self.consts[const.get_checksum()] = const.data

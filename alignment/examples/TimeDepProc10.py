@@ -67,7 +67,7 @@ def define_timedep_bucket7():
 
 consts = [
   alignment.constraints.VXDHierarchyConstraints(type=2, svd=True, pxd=True),
-  alignment.constraints.CDCLayerConstraints("myCDCLayerConstr.txt", z_offset=True)]
+  alignment.constraints.CDCLayerConstraints("myCDCLayerConstr.txt", z_offset=False)]
 
 timedep = define_timedep_bucket7()
 
@@ -205,6 +205,7 @@ def VXDCDCalignment(files, tags, filesCosmicsB, filesCosmicsB0):
     # algorithm.steering().command('presigmas 1.')
 
     algorithm.steering().command('FortranFiles')
+    from alignment.constraints import generate_constraints
     for filename in generate_constraints(consts, timedep, tags):
         algorithm.steering().command(filename)
 

@@ -18,6 +18,43 @@ def cdc_layers(layers=None):
     return result
 
 
+def cdc_wires():
+    wires_in_layer = [
+        160, 160, 160, 160, 160, 160, 160, 160,
+        160, 160, 160, 160, 160, 160,
+        192, 192, 192, 192, 192, 192,
+        224, 224, 224, 224, 224, 224,
+        256, 256, 256, 256, 256, 256,
+        288, 288, 288, 288, 288, 288,
+        320, 320, 320, 320, 320, 320,
+        352, 352, 352, 352, 352, 352,
+        384, 384, 384, 384, 384, 384]
+
+    result = []
+
+    for layer in range(0, 56):
+        for wire in range(0, wires_in_layer[layer]):
+            # Unique id of CDCAlignment db object
+            cdcid = Belle2.CDCAlignment.getGlobalUniqueID()
+
+            wireid = Belle2.WireID(layer, wire).getEWire()
+            label = Belle2.GlobalLabel()
+
+            label.construct(cdcid, wireid, Belle2.CDCAlignment.wireBwdX)
+            result.append(label.label())
+
+            label.construct(cdcid, wireid, Belle2.CDCAlignment.wireFwdX)
+            result.append(label.label())
+
+            label.construct(cdcid, wireid, Belle2.CDCAlignment.wireBwdY)
+            result.append(label.label())
+
+            label.construct(cdcid, wireid, Belle2.CDCAlignment.wireFwdY)
+            result.append(label.label())
+
+    return result
+
+
 def vxd_halfshells(pxd=True, svd=True):
     ying = Belle2.VxdID(1, 0, 0, 1)
     yang = Belle2.VxdID(1, 0, 0, 2)
@@ -54,14 +91,16 @@ def beamspot():
     return result
 
 
-def vxd_ladders():
+def vxd_ladders(layers=None):
+    if layers is None:
+        layers = [1, 2, 3, 4, 5, 6]
+
     result = []
 
     params = [1, 2, 3, 4, 5, 6]
-
     ladders = [8, 12, 7, 10, 12, 16]
 
-    for layer in range(1, 7):
+    for layer in layers:
         for ladder in range(1, ladders[layer - 1] + 1):
             for ipar in params:
                 label = Belle2.GlobalLabel()
@@ -105,3 +144,15 @@ def vxd_sensors(layers=None, rigid=True, surface=True, surface2=True, surface3=T
                     label.construct(Belle2.VXDAlignment.getGlobalUniqueID(), Belle2.VxdID(layer, ladder, sensor).getID(), param)
                     result.append(label.label())
     return result
+
+
+def vxd():
+    return vxd_sensors() + vxd_ladders() + vxd_halfshells()
+
+
+def pxd():
+    return vxd_sensors(layers=[1, 2]) + vxd_ladders(layers=[1, 2]) + vxd_halfshells(pxd=True, svd=False)
+
+
+def svd():
+    return vxd_sensors(layers=[3, 4, 5, 6]) + vxd_ladders(layers=[3, 4, 5, 6]) + vxd_halfshells(pxd=False, svd=True)

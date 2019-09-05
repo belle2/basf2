@@ -594,8 +594,6 @@ namespace {
       EXPECT_FLOAT_EQ(0.497614, p.getMass());
     }
 
-    /*
-    // when neutrons exist
     {
       ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
       cluster->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
@@ -609,6 +607,5 @@ namespace {
       EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
       EXPECT_FLOAT_EQ(0.939565, p.getMass());
     }
-    */
   }
 }  // namespace

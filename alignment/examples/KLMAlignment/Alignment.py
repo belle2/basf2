@@ -1,55 +1,79 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# KLM alignment: alignment using the collected data.
+
 import sys
-from basf2 import *
+import basf2
 import ROOT
 from ROOT import Belle2
+from ROOT.Belle2 import KLMChannelIndex, KLMElementNumbers, EKLMElementNumbers
 import numpy as np
-from alignment import MillepedeCalibration, calibrate
-from caf.framework import Calibration
+from alignment import MillepedeCalibration
 
-set_log_level(LogLevel.DEBUG)
+basf2.set_log_level(basf2.LogLevel.INFO)
 
-# Create the algorithm
-millepede = MillepedeCalibration(['EKLMAlignment'])
+# Element numbers.
+element_numbers = KLMElementNumbers.Instance()
+eklm_element_numbers = EKLMElementNumbers()
 
-# Fix EKLM parameters
-for endcap in range(1, 3):
-    if (endcap == 1):
-        maxlayer = 12
+# Create the algorithm.
+millepede = MillepedeCalibration(['BKLMAlignment', 'EKLMAlignment', 'EKLMSegmentAlignment'])
+
+# Fix module parameters.
+index = KLMChannelIndex(KLMChannelIndex.c_IndexLevelLayer)
+index2 = KLMChannelIndex(KLMChannelIndex.c_IndexLevelLayer)
+while (index != index2.end()):
+    module = index.getKLMModuleNumber()
+    if (index.getSubdetector() == KLMElementNumbers.c_BKLM):
+        for ipar in [1, 2, 3, 4, 5, 6]:
+            # Free parameters are idU, dV, dGamma.
+            if ipar in [1, 2, 6]:
+                continue
+            millepede.fixGlobalParam(Belle2.BKLMAlignment.getGlobalUniqueID(),
+                                     module, ipar)
     else:
-        maxlayer = 14
-    for layer in range(1, maxlayer + 1):
-        for sector in range(1, 5):
-            for ipar in range(1, 4):
-                eklmid = Belle2.EKLMElementID(endcap, layer, sector)
-                # millepede.fixGlobalParam(Belle2.EKLMAlignment.getGlobalUniqueID(),
-                #                         eklmid.getGlobalNumber(),
-                #                         ipar)
-            for plane in range(1, 3):
-                for segment in range(1, 6):
-                    for ipar in range(1, 3):
-                        eklmid = Belle2.EKLMElementID(endcap, layer, sector, plane, segment)
-                        millepede.fixGlobalParam(Belle2.EKLMAlignment.getGlobalUniqueID(),
-                                                 eklmid.getGlobalNumber(),
-                                                 ipar)
+        for ipar in [1, 2, 6]:
+            # No parameters are fixed; if necessary, uncomment the following:
+            # millepede.fixGlobalParam(Belle2.EKLMAlignment.getGlobalUniqueID(),
+            #                          module, ipar)
+            continue
+    index.increment()
 
-# ---------- end of parameter fixing ----------------------
+# Fix EKLM segment parameters.
+index.setIndexLevel(KLMChannelIndex.c_IndexLevelStrip)
+index2.setIndexLevel(KLMChannelIndex.c_IndexLevelStrip)
+index = index2.beginEKLM()
+index.useEKLMSegments()
+while (index != index2.endEKLM()):
+    segment = index.getEKLMSegmentNumber()
+    for ipar in [2, 6]:
+        millepede.fixGlobalParam(
+            Belle2.EKLMSegmentAlignment.getGlobalUniqueID(),
+            segment, ipar)
+    index.increment()
 
+# Execute the algorithm over all collected data (auto-merged).
+input_files = sys.argv[1:]
+calibration = millepede.create('eklm_alignment', input_files)
+millepede.algo.setInputFileNames(input_files)
+millepede.algo.ignoreUndeterminedParams(True)
+millepede.algo.invertSign()
+millepede.algo.execute()
+millepede.algo.commit()
 
-# -------------- Run the Millepede Algorithm ----------------
-
-# Execute the algorithm over all collected data (auto-merged)
-calibration = millepede.create('eklm_alignment', sys.argv[1])
-calibrate(calibration, sys.argv[1])
-
-# -----------------------------------------------------------
+# Get payloads.
 payloads = list(millepede.algo.getPayloads())
-eklm = None
+bklm_alignment = None
+eklm_alignment = None
+eklm_segment_alignment = None
 for payload in payloads:
-    if payload.name == 'EKLMAlignment':
-        eklm = payload.object.IsA().DynamicCast(Belle2.EKLMAlignment().IsA(), payload.object, False)
+    if payload.name == 'BKLMAlignment':
+        bklm_alignment = payload.object.IsA().DynamicCast(Belle2.BKLMAlignment().IsA(), payload.object, False)
+    elif payload.name == 'EKLMAlignment':
+        eklm_alignment = payload.object.IsA().DynamicCast(Belle2.EKLMAlignment().IsA(), payload.object, False)
+    elif payload.name == 'EKLMAlignment':
+        eklm_segment_alignment = payload.object.IsA().DynamicCast(Belle2.EKLMSegmentAlignment().IsA(), payload.object, False)
 
 # Profile plot for all determined parameters
 profile = ROOT.TH1F(
@@ -68,36 +92,45 @@ layer = np.zeros(1, dtype=int)
 ladder = np.zeros(1, dtype=int)
 sector = np.zeros(1, dtype=int)
 sensor = np.zeros(1, dtype=int)
-forward = np.zeros(1, dtype=int)
-endcap = np.zeros(1, dtype=int)
+section = np.zeros(1, dtype=int)
+section = np.zeros(1, dtype=int)
 plane = np.zeros(1, dtype=int)
 segment = np.zeros(1, dtype=int)
 
 alignment_file = ROOT.TFile('alignment.root', 'recreate')
-# Tree with EKLM sector data.
-eklmsectortree = ROOT.TTree('eklm_sector', 'EKLM sector alignment data')
-eklmsectortree.Branch('endcap', endcap, 'endcap/I')
-eklmsectortree.Branch('layer', layer, 'layer/I')
-eklmsectortree.Branch('sector', sector, 'sector/I')
-eklmsectortree.Branch('param', param, 'param/I')
-eklmsectortree.Branch('value', value, 'value/F')
-eklmsectortree.Branch('correction', correction, 'correction/F')
-eklmsectortree.Branch('error', error, 'error/F')
+# Tree with BKLM module data.
+bklm_module_tree = ROOT.TTree('bklm_module', 'BKLM module alignment data')
+bklm_module_tree.Branch('section', section, 'section/I')
+bklm_module_tree.Branch('layer', layer, 'layer/I')
+bklm_module_tree.Branch('sector', sector, 'sector/I')
+bklm_module_tree.Branch('param', param, 'param/I')
+bklm_module_tree.Branch('value', value, 'value/F')
+bklm_module_tree.Branch('correction', correction, 'correction/F')
+bklm_module_tree.Branch('error', error, 'error/F')
+# Tree with EKLM module data.
+eklm_module_tree = ROOT.TTree('eklm_module', 'EKLM module alignment data')
+eklm_module_tree.Branch('section', section, 'section/I')
+eklm_module_tree.Branch('layer', layer, 'layer/I')
+eklm_module_tree.Branch('sector', sector, 'sector/I')
+eklm_module_tree.Branch('param', param, 'param/I')
+eklm_module_tree.Branch('value', value, 'value/F')
+eklm_module_tree.Branch('correction', correction, 'correction/F')
+eklm_module_tree.Branch('error', error, 'error/F')
 # Tree with EKLM segment data.
-eklmsegmenttree = ROOT.TTree('eklm_segment', 'EKLM segment alignment data')
-eklmsegmenttree.Branch('endcap', endcap, 'endcap/I')
-eklmsegmenttree.Branch('layer', layer, 'layer/I')
-eklmsegmenttree.Branch('sector', sector, 'sector/I')
-eklmsegmenttree.Branch('plane', plane, 'plane/I')
-eklmsegmenttree.Branch('segment', segment, 'segment/I')
-eklmsegmenttree.Branch('param', param, 'param/I')
-eklmsegmenttree.Branch('value', value, 'value/F')
-eklmsegmenttree.Branch('correction', correction, 'correction/F')
-eklmsegmenttree.Branch('error', error, 'error/F')
+eklm_segment_tree = ROOT.TTree('eklm_segment', 'EKLM segment alignment data')
+eklm_segment_tree.Branch('section', section, 'section/I')
+eklm_segment_tree.Branch('layer', layer, 'layer/I')
+eklm_segment_tree.Branch('sector', sector, 'sector/I')
+eklm_segment_tree.Branch('plane', plane, 'plane/I')
+eklm_segment_tree.Branch('segment', segment, 'segment/I')
+eklm_segment_tree.Branch('param', param, 'param/I')
+eklm_segment_tree.Branch('value', value, 'value/F')
+eklm_segment_tree.Branch('correction', correction, 'correction/F')
+eklm_segment_tree.Branch('error', error, 'error/F')
 
-
-# Index of determined param
+# Index of determined parameter.
 ibin = 0
+subdetector = 0
 
 for ipar in range(0, millepede.algo.result().getNoParameters()):
     label = Belle2.GlobalLabel(millepede.algo.result().getParameterLabel(ipar))
@@ -111,35 +144,30 @@ for ipar in range(0, millepede.algo.result().getNoParameters()):
         correction[0] = 0.0
         error[0] = -1.0
 
-    if (label.getUniqueId() == 40):  # EKLMAlignment
-        eklmid = Belle2.EKLMElementID(label.getElementId())
-        if (eklmid.getType() == 2):  # 2 = sector
-            endcap[0] = eklmid.getEndcap()
-            layer[0] = eklmid.getLayer()
-            sector[0] = eklmid.getSector()
-            if (eklm is not None):
-                alignment = eklm.getSectorAlignment(eklmid.getSectorNumber())
-                if (param[0] == 1):
-                    value[0] = alignment.getDx()
-                elif (param[0] == 2):
-                    value[0] = alignment.getDy()
-                elif (param[0] == 6):
-                    value[0] = alignment.getDalpha()
-
-            eklmsectortree.Fill()
+    # Module alignment.
+    if (label.getUniqueId() == Belle2.BKLMAlignment.getGlobalUniqueID() or
+            label.getUniqueId() == Belle2.EKLMAlignment.getGlobalUniqueID()):
+        module = label.getElementId()
+        element_numbers.moduleNumberToElementNumbers(
+            module, subdetector, section[0], sector[0], layer[0])
+        if (subdetector == KLMElementNumbers.c_BKLM):
+            if (bklm_alignment is not None):
+                value[0] = bklm_alignment.getGlobalParam(module, int(param[0]))
+            bklm_module_tree.Fill()
         else:
-            endcap[0] = eklmid.getEndcap()
-            layer[0] = eklmid.getLayer()
-            sector[0] = eklmid.getSector()
-            plane[0] = eklmid.getPlane()
-            segment[0] = eklmid.getSegment()
-            if (eklm is not None):
-                alignment = eklm.getSegmentAlignment(eklmid.getSegmentNumber())
-                if (param[0] == 1):
-                    value[0] = alignment.getDy()
-                elif (param[0] == 2):
-                    value[0] = alignment.getDalpha()
-            eklmsegmenttree.Fill()
+            if (eklm_alignment is not None):
+                value[0] = eklm_alignment.getGlobalParam(module, int(param[0]))
+            eklm_module_tree.Fill()
+
+    # EKLM segments alignment
+    elif (label.getUniqueId() ==
+          Belle2.EKLMSegmentAlignment.getGlobalUniqueID()):
+        segment_global = label.getElementId()
+        eklm_element_numbers.segmentNumberToElementNumbers(
+            segment_global, section[0], layer[0], sector[0], plane[0], segment[0])
+        if (eklm_segment_alignment is not None):
+            value[0] = eklm_segment_alignment.getGlobalParam(segment, int(param[0]))
+        eklm_segment_tree.Fill()
 
     if not millepede.algo.result().isParameterDetermined(ipar):
         continue
@@ -150,6 +178,7 @@ for ipar in range(0, millepede.algo.result().getNoParameters()):
 
 alignment_file.cd()
 profile.Write()
-eklmsectortree.Write()
-eklmsegmenttree.Write()
+bklm_module_tree.Write()
+eklm_module_tree.Write()
+eklm_segment_tree.Write()
 alignment_file.Close()

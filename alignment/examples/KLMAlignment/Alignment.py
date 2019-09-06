@@ -13,10 +13,6 @@ from alignment import MillepedeCalibration
 
 basf2.set_log_level(basf2.LogLevel.INFO)
 
-# Element numbers.
-element_numbers = KLMElementNumbers.Instance()
-eklm_element_numbers = EKLMElementNumbers()
-
 # Create the algorithm.
 millepede = MillepedeCalibration(['BKLMAlignment', 'EKLMAlignment', 'EKLMSegmentAlignment'])
 
@@ -88,12 +84,10 @@ param = np.zeros(1, dtype=int)
 value = np.zeros(1, dtype=np.float32)
 correction = np.zeros(1, dtype=np.float32)
 error = np.zeros(1, dtype=np.float32)
-layer = np.zeros(1, dtype=int)
-ladder = np.zeros(1, dtype=int)
+section = np.zeros(1, dtype=int)
 sector = np.zeros(1, dtype=int)
+layer = np.zeros(1, dtype=int)
 sensor = np.zeros(1, dtype=int)
-section = np.zeros(1, dtype=int)
-section = np.zeros(1, dtype=int)
 plane = np.zeros(1, dtype=int)
 segment = np.zeros(1, dtype=int)
 
@@ -101,8 +95,8 @@ alignment_file = ROOT.TFile('alignment.root', 'recreate')
 # Tree with BKLM module data.
 bklm_module_tree = ROOT.TTree('bklm_module', 'BKLM module alignment data')
 bklm_module_tree.Branch('section', section, 'section/I')
-bklm_module_tree.Branch('layer', layer, 'layer/I')
 bklm_module_tree.Branch('sector', sector, 'sector/I')
+bklm_module_tree.Branch('layer', layer, 'layer/I')
 bklm_module_tree.Branch('param', param, 'param/I')
 bklm_module_tree.Branch('value', value, 'value/F')
 bklm_module_tree.Branch('correction', correction, 'correction/F')
@@ -110,8 +104,8 @@ bklm_module_tree.Branch('error', error, 'error/F')
 # Tree with EKLM module data.
 eklm_module_tree = ROOT.TTree('eklm_module', 'EKLM module alignment data')
 eklm_module_tree.Branch('section', section, 'section/I')
-eklm_module_tree.Branch('layer', layer, 'layer/I')
 eklm_module_tree.Branch('sector', sector, 'sector/I')
+eklm_module_tree.Branch('layer', layer, 'layer/I')
 eklm_module_tree.Branch('param', param, 'param/I')
 eklm_module_tree.Branch('value', value, 'value/F')
 eklm_module_tree.Branch('correction', correction, 'correction/F')
@@ -119,8 +113,8 @@ eklm_module_tree.Branch('error', error, 'error/F')
 # Tree with EKLM segment data.
 eklm_segment_tree = ROOT.TTree('eklm_segment', 'EKLM segment alignment data')
 eklm_segment_tree.Branch('section', section, 'section/I')
-eklm_segment_tree.Branch('layer', layer, 'layer/I')
 eklm_segment_tree.Branch('sector', sector, 'sector/I')
+eklm_segment_tree.Branch('layer', layer, 'layer/I')
 eklm_segment_tree.Branch('plane', plane, 'plane/I')
 eklm_segment_tree.Branch('segment', segment, 'segment/I')
 eklm_segment_tree.Branch('param', param, 'param/I')
@@ -130,7 +124,6 @@ eklm_segment_tree.Branch('error', error, 'error/F')
 
 # Index of determined parameter.
 ibin = 0
-subdetector = 0
 
 for ipar in range(0, millepede.algo.result().getNoParameters()):
     label = Belle2.GlobalLabel(millepede.algo.result().getParameterLabel(ipar))
@@ -148,9 +141,11 @@ for ipar in range(0, millepede.algo.result().getNoParameters()):
     if (label.getUniqueId() == Belle2.BKLMAlignment.getGlobalUniqueID() or
             label.getUniqueId() == Belle2.EKLMAlignment.getGlobalUniqueID()):
         module = label.getElementId()
-        element_numbers.moduleNumberToElementNumbers(
-            module, subdetector, section[0], sector[0], layer[0])
-        if (subdetector == KLMElementNumbers.c_BKLM):
+        index.setKLMModule(module)
+        section[0] = index.getSection()
+        sector[0] = index.getSector()
+        layer[0] = index.getLayer()
+        if (index.getSubdetector() == KLMElementNumbers.c_BKLM):
             if (bklm_alignment is not None):
                 value[0] = bklm_alignment.getGlobalParam(module, int(param[0]))
             bklm_module_tree.Fill()
@@ -159,12 +154,16 @@ for ipar in range(0, millepede.algo.result().getNoParameters()):
                 value[0] = eklm_alignment.getGlobalParam(module, int(param[0]))
             eklm_module_tree.Fill()
 
-    # EKLM segments alignment
+    # EKLM segments alignment.
     elif (label.getUniqueId() ==
           Belle2.EKLMSegmentAlignment.getGlobalUniqueID()):
         segment_global = label.getElementId()
-        eklm_element_numbers.segmentNumberToElementNumbers(
-            segment_global, section[0], layer[0], sector[0], plane[0], segment[0])
+        index.setEKLMSegment(segment_global)
+        section[0] = index.getSection()
+        sector[0] = index.getSector()
+        layer[0] = index.getLayer()
+        plane[0] = index.getPlane()
+        segment[0] = index.getStrip()
         if (eklm_segment_alignment is not None):
             value[0] = eklm_segment_alignment.getGlobalParam(segment, int(param[0]))
         eklm_segment_tree.Fill()

@@ -118,6 +118,28 @@ void KLMChannelIndex::useEKLMSegments(bool useSegments)
   setNStripsPlane();
 }
 
+void KLMChannelIndex::setKLMModule(uint16_t module)
+{
+  m_ElementNumbers->moduleNumberToElementNumbers(
+    module, &m_Subdetector, &m_Section, &m_Sector, &m_Layer);
+  if (m_Subdetector == KLMElementNumbers::c_BKLM)
+    m_Plane = 0;
+  else
+    m_Plane = 1;
+  m_Strip = 1;
+  useEKLMSegments(false);
+  m_IndexLevel = c_IndexLevelLayer;
+}
+
+void KLMChannelIndex::setEKLMSegment(int segment)
+{
+  m_ElementNumbersEKLM->segmentNumberToElementNumbers(
+    segment, &m_Section, &m_Sector, &m_Layer, &m_Plane, &m_Strip);
+  m_Subdetector = KLMElementNumbers::c_EKLM;
+  useEKLMSegments();
+  m_IndexLevel = c_IndexLevelStrip;
+}
+
 uint16_t KLMChannelIndex::getKLMChannelNumber() const
 {
   if (m_Subdetector == KLMElementNumbers::c_BKLM) {

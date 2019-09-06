@@ -174,10 +174,8 @@ void BKLMDatabaseImporter::importElectronicMapping()
 
 void BKLMDatabaseImporter::importGeometryPar()
 {
-  BKLMGeometryPar bklmGeometryPar;
   GearDir content(Gearbox::getInstance().getDetectorComponent("KLM"));
-  bklmGeometryPar.setVersion(0);
-  bklmGeometryPar.read(content);
+  BKLMGeometryPar bklmGeometryPar(content);
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
   Database::Instance().storeData("BKLMGeometryPar", &bklmGeometryPar, iov);
@@ -186,9 +184,8 @@ void BKLMDatabaseImporter::importGeometryPar()
 
 void BKLMDatabaseImporter::importSimulationPar()
 {
-  BKLMSimulationPar bklmSimulationPar;
   GearDir content(Gearbox::getInstance().getDetectorComponent("KLM"), "BKLM/SimulationParameters");
-  bklmSimulationPar.read(content);
+  BKLMSimulationPar bklmSimulationPar(content);
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
   Database::Instance().storeData("BKLMSimulationPar", &bklmSimulationPar, iov);

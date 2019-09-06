@@ -30,9 +30,14 @@ BKLMGeometryPar::~BKLMGeometryPar()
 // *** This is a DIVOT ***
 void BKLMGeometryPar::read(const GearDir& content)
 {
+  if (!content) {
+    B2FATAL("The GearDir to look for BKLM geometry parameters is not valid.");
+    return;
+  }
   char name[80] = "";
   GearDir data(content);
   data.append("/BKLM");
+  m_version = 0;
   m_DoBeamBackgroundStudy = data.getBool("BeamBackgroundStudy");
   m_Rotation = data.getAngle("Rotation");
   m_OffsetZ = data.getLength("OffsetZ");

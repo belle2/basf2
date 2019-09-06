@@ -15,14 +15,14 @@ using namespace Belle2;
 
 MuidHit::MuidHit() :
   m_PdgCode(0),
+  m_ExtPosition(0.0, 0.0, 0.0),
   m_ExtTime(0.0),
   m_HitTime(0.0),
   m_InBarrel(false),
   m_IsForward(false),
   m_Sector(0),
   m_Layer(0),
-  m_ChiSquared(0.0),
-  m_ExtPosition(0.0, 0.0, 0.0)
+  m_ChiSquared(0.0)
 {
   m_HitPosition = m_ExtPosition;
 }

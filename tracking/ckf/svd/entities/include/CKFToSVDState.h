@@ -29,7 +29,7 @@ namespace Belle2 {
     explicit CKFToSVDState(const SpacePoint* hit);
 
     /// Constructor setting the state to the position of the first CDC track seed hit
-    CKFToSVDState(const RecoTrack* seed, bool reversed = false);
+    explicit CKFToSVDState(const RecoTrack* seed, bool reversed = false);
 
     /// Extract the real layer this state sits on
     unsigned int getGeometricalLayer() const;

@@ -31,9 +31,9 @@ runFEIforBplusHadronic(path)
 path.add_module('MCMatcherParticles', listName='B+:generic', looseMCMatching=True)
 
 # Apply final B+ tag cuts
-BplushadronicList = BplusHadronic(path)
-skimOutputUdst('../feiHadronicBplus', BplushadronicList, path=path)
-summaryOfLists(BplushadronicList, path=path)
+BplusHadronicList = BplusHadronic(path)
+skimOutputUdst('../feiHadronicBplus', BplusHadronicList, path=path)
+summaryOfLists(BplusHadronicList, path=path)
 
 # Suppress noisy modules, and then process
 setSkimLogging(path)

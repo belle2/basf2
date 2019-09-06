@@ -220,7 +220,7 @@ path = skimpath.add_path(feistate.path)
 
 
 from skim.fei import *
-add_skim('feiHadronicB0', B0hadronic(path=skimpath), path=skimpath)
+add_skim('feiHadronicB0', B0Hadronic(path=skimpath), path=skimpath)
 
 from skim.fei import*
 add_skim('feiHadronicBplus', BplusHadronic(path=skimpath), path=skimpath)
@@ -231,20 +231,14 @@ add_skim('feiSLBplus', BplusSL(path=skimpath), path=skimpath)
 from skim.fei import*
 add_skim('feiSLB0', B0SL(path=skimpath), path=skimpath)
 
-
-from skim.dark import SinglePhotonDarkList
-add_skim('SinglePhotonDark', SinglePhotonDarkList(path=skimpath), path=skimpath)
-
-
-from skim.dark import LFVZpInvisibleList
-add_skim('LFVZpInvisible', LFVZpInvisibleList(path=skimpath), path=skimpath)
-
-
-from skim.dark import LFVZpVisibleList
-add_skim('LFVZpVisible', LFVZpVisibleList(path=skimpath), path=skimpath)
-
-from skim.dark import ALP3GammaList
-add_skim('ALP3Gamma', ALP3GammaList(path=skimpath), path=skimpath)
+# Dark Sector Skims
+from skim import dark
+add_skim('SinglePhotonDark', dark.SinglePhotonDarkList(path=skimpath), path=skimpath)
+add_skim('ALP3Gamma', dark.ALP3GammaList(path=skimpath), path=skimpath)
+add_skim('DimuonPlusMissingEnergy', dark.DimuonPlusMissingEnergyList(path=skimpath), path=skimpath)
+add_skim('ElectronMuonPlusMissingEnergy', dark.ElectronMuonPlusMissingEnergyList(path=skimpath), path=skimpath)
+add_skim('DielectronPlusMissingEnergy', dark.DielectronPlusMissingEnergyList(path=skimpath), path=skimpath)
+add_skim('LFVZpVisible', dark.LFVZpVisibleList(path=skimpath), path=skimpath)
 
 setSkimLogging(path=skimpath)
 

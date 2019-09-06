@@ -16,15 +16,6 @@ if (len(sys.argv) >= 2):
     if (sys.argv[1] == 'mc'):
         mc = True
 
-eventinfo = register_module('EventInfoSetter')
-eventinfo.initialize()
-paramloader = register_module('Gearbox')
-
-main = create_path()
-main.add_module(eventinfo)
-main.add_module(paramloader)
-process(main)
-
 # Import database
 dbImporter = BKLMDatabaseImporter()
 dbImporter.loadDefaultBklmElectronicMapping()

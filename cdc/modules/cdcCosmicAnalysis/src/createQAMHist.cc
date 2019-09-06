@@ -101,7 +101,7 @@ namespace Belle2 {
       treeTrkj->SetBranchAddress("Pt1", &Pt1);
       treeTrkj->SetBranchAddress("D01", &D01);
       treeTrkj->SetBranchAddress("Phi01", &Phi01);
-      treeTrkj->SetBranchAddress("Om1", &Om1);
+      treeTrkj->SetBranchAddress("Omega1", &Om1);
       treeTrkj->SetBranchAddress("Z01", &Z01);
       treeTrkj->SetBranchAddress("tanLambda1", &tanLambda1);
       treeTrkj->SetBranchAddress("eD01", &eD01);
@@ -117,7 +117,7 @@ namespace Belle2 {
       treeTrkj->SetBranchAddress("Pt2", &Pt2);
       treeTrkj->SetBranchAddress("D02", &D02);
       treeTrkj->SetBranchAddress("Phi02", &Phi02);
-      treeTrkj->SetBranchAddress("Om2", &Om2);
+      treeTrkj->SetBranchAddress("Omega2", &Om2);
       treeTrkj->SetBranchAddress("Z02", &Z02);
       treeTrkj->SetBranchAddress("tanLambda2", &tanLambda2);
       treeTrkj->SetBranchAddress("eD02", &eD02);

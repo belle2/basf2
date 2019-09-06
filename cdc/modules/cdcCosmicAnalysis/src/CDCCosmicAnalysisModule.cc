@@ -9,25 +9,24 @@
  **************************************************************************/
 
 #include "cdc/modules/cdcCosmicAnalysis/CDCCosmicAnalysisModule.h"
+#include <framework/geometry/BFieldManager.h>
 #include <framework/gearbox/Const.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
-#include <set>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
 
 #include "TMath.h"
 #include <Math/ProbFuncMathCore.h>
 #include "iostream"
-
+#include "algorithm"
 
 using namespace std;
 using namespace Belle2;
@@ -46,21 +45,21 @@ REG_MODULE(CDCCosmicAnalysis)
 
 CDCCosmicAnalysisModule::CDCCosmicAnalysisModule() : Module()
 {
-  setDescription("Module for save two tracks in cdc-top test");
+  setDescription("Module for harvesting parameters of the two half (up/down) of a cosmic track for performance study");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("RecoTracksColName", m_recoTrackArrayName, "Name of collectrion hold RecoTracks", std::string(""));
-  addParam("Output", m_OutputFileName, "output file name", string("twotrack.root"));
-  addParam("noBFit", m_noBFit, "If true -> #Params ==4, #params ==5 for calculate P-Val", true);
-  addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", false);
+  addParam("Output", m_OutputFileName, "output file name", string("twotracks.root"));
+  addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", true);
   addParam("treeName", m_treeName, "Output tree name", string("tree"));
   addParam("phi0InRad", m_phi0InRad, "Phi0 in unit of radian, true: rad, false: deg", true);
   addParam("qam", m_qam, "Output QAM histograms", false);
+  addParam("StoreTrackParErrors", m_storeTrackParErrors,
+           "Store Track Parameter errors (true) or not (false),it will be true if qam=true", false);
 }
 
 CDCCosmicAnalysisModule::~CDCCosmicAnalysisModule()
 {
 }
-
 void CDCCosmicAnalysisModule::initialize()
 {
   // Register histograms (calls back defineHisto)
@@ -73,49 +72,68 @@ void CDCCosmicAnalysisModule::initialize()
   m_trackFitResultArrayName = storeTrackFitResults.getName();
   m_relRecoTrackTrackName = relRecoTrackTrack.getName();
 
+  if (m_qam)
+    m_storeTrackParErrors = true;
+
   tfile = new TFile(m_OutputFileName.c_str(), "RECREATE");
   //  tree = new TTree("treeTrk", "treeTrk");
   tree = new TTree(m_treeName.c_str(), m_treeName.c_str());
+  tree->Branch("run", &run, "run/I");
   tree->Branch("evtT0", &evtT0, "evtT0/D");
   tree->Branch("charge", &charge, "charge/S");
+
   tree->Branch("Pval1", &Pval1, "Pval1/D");
   tree->Branch("ndf1", &ndf1, "ndf1/D");
   tree->Branch("Pt1", &Pt1, "Pt1/D");
   tree->Branch("D01", &D01, "D01/D");
   tree->Branch("Phi01", &Phi01, "Phi01/D");
-  tree->Branch("Om1", &Om1, "Om1/D");
+  //  tree->Branch("Om1", &Om1, "Om1/D");
   tree->Branch("Z01", &Z01, "Z01/D");
   tree->Branch("tanLambda1", &tanLambda1, "tanLambda1/D");
   tree->Branch("posSeed1", "TVector3", &posSeed1);
   tree->Branch("Omega1", &Omega1, "Omega1/D");
   tree->Branch("Mom1", "TVector3", &Mom1);
 
-  tree->Branch("eD01", &eD01, "eD01/D");
-  tree->Branch("ePhi01", &ePhi01, "ePhi01/D");
-  tree->Branch("eOm1", &eOm1, "eOm1/D");
-  tree->Branch("eZ01", &eZ01, "eZ01/D");
-  tree->Branch("etanL1", &etanL1, "etanL1/D");
   tree->Branch("Pval2", &Pval2, "Pval2/D");
   tree->Branch("ndf2", &ndf2, "ndf2/D");
   tree->Branch("Pt2", &Pt2, "Pt2/D");
   tree->Branch("D02", &D02, "D02/D");
   tree->Branch("Phi02", &Phi02, "Phi02/D");
-  tree->Branch("Om2", &Om2, "Om2/D");
+  //  tree->Branch("Om2", &Om2, "Om2/D");
   tree->Branch("Z02", &Z02, "Z02/D");
   tree->Branch("tanLambda2", &tanLambda2, "tanLambda2/D");
-  tree->Branch("eD02", &eD02, "eD02/D");
-  tree->Branch("ePhi02", &ePhi02, "ePhi02/D");
-  tree->Branch("eOm2", &eOm2, "eOm2/D");
-  tree->Branch("eZ02", &eZ02, "eZ02/D");
-  tree->Branch("etanL2", &etanL2, "etanL2/D");
   tree->Branch("posSeed2", "TVector3", &posSeed2);
   tree->Branch("Omega2", &Omega2, "Omega2/D");
   tree->Branch("Mom2", "TVector3", &Mom2);
+
+  if (m_storeTrackParErrors) {
+    tree->Branch("eD01", &eD01, "eD01/D");
+    tree->Branch("ePhi01", &ePhi01, "ePhi01/D");
+    tree->Branch("eOm1", &eOm1, "eOm1/D");
+    tree->Branch("eZ01", &eZ01, "eZ01/D");
+    tree->Branch("etanL1", &etanL1, "etanL1/D");
+
+    tree->Branch("eD02", &eD02, "eD02/D");
+    tree->Branch("ePhi02", &ePhi02, "ePhi02/D");
+    tree->Branch("eOm2", &eOm2, "eOm2/D");
+    tree->Branch("eZ02", &eZ02, "eZ02/D");
+    tree->Branch("etanL2", &etanL2, "etanL2/D");
+  }
 
 }
 
 void CDCCosmicAnalysisModule::beginRun()
 {
+  B2Vector3D pos(0, 0, 0);
+  B2Vector3D bfield = BFieldManager::getFieldInTesla(pos);
+  if (bfield.Z() > 1) {
+    m_BField = true;
+    B2INFO("CDCCosmicAnalysis: Magnetic field is ON");
+  } else {
+    m_BField = false;
+    B2INFO("CDCCosmicAnalysis: Magnetic field is OFF");
+  }
+  B2INFO("CDCCosmicAnalysis: BField at (0,0,0)  = " << bfield.Mag());
 }
 
 void CDCCosmicAnalysisModule::event()
@@ -124,67 +142,62 @@ void CDCCosmicAnalysisModule::event()
   const StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
   const StoreArray<Belle2::RecoTrack> recoTracks(m_recoTrackArrayName);
   const RelationArray relTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
+  const StoreObjPtr<EventMetaData> eventMetaData;
 
+  if (eventMetaData)
+    run = eventMetaData->getRun();
 
-  //temporary add here, but should be outsidel
-  bool store = true;
   evtT0 = 0;
   if (m_EventT0Extraction) {
-    // event with is fail to extract t0 will be exclude from analysis
+    // event with is fail to extract event-t0 will be excluded
     if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
       evtT0 =  m_eventTimeStoreObject->getEventT0();
     } else {
-      store = false;
+      return;
     }
   }
 
+  // Loop over Tracks
+  int nTr = storeTrack.getEntries();
 
-  // Loop over Recotracks
-  int nTr = recoTracks.getEntries();
-  int nfitted = 0;
-  int n = 0;
   short charge2 = 0;
   short charge1 = 0;
-
+  bool up(false), down(false);
   for (int i = 0; i < nTr; ++i) {
-    const RecoTrack* track = recoTracks[i];
-    if (!track->getTrackFitStatus()->isFitted()) {
-      m_fitstatus = 2;
-      continue;
-    }
-    const genfit::FitStatus* fs = track->getTrackFitStatus();
-    if (!fs || !fs->isFitConverged()) {//not fully convergence
-      m_fitstatus = 1;
-      continue;
-    }
-    m_fitstatus = 0;
-    nfitted = nfitted + 1;
-
-    /** find results in track fit results**/
-    const Belle2::Track* b2track = track->getRelatedFrom<Belle2::Track>();
-    if (!b2track) {B2DEBUG(99, "No relation found"); continue;}
+    const Belle2::Track* b2track = storeTrack[i];
+    const Belle2::TrackFitResult* fitresult;
     fitresult = b2track->getTrackFitResult(Const::muon);
-
     if (!fitresult) {
-      B2WARNING("track was fitted but Relation not found");
+      B2WARNING("There is no track fit result for muon hypothesis; try with the closest mass hypothesis...");
+      fitresult = b2track->getTrackFitResultWithClosestMass(Const::muon);
+      if (!fitresult) {
+        B2WARNING("There is also no track fit reslt for the other mass hypothesis");
+        continue;
+      }
+    }
+    const Belle2::RecoTrack* recoTrack = b2track->getRelatedTo<Belle2::RecoTrack>(m_recoTrackArrayName);
+    if (!recoTrack) {
+      B2WARNING("Can not access RecoTrack of this Belle2::Track");
       continue;
     }
-    double ndf;
-    if (m_noBFit) { // in case of no magnetic field, NDF=4 instead of 5.
-      ndf = fs->getNdf() + 1;
-    } else {
-      ndf = fs->getNdf();
-    }
+
+    TVector3 posSeed = recoTrack->getPositionSeed();
+    const genfit::FitStatus* fs = recoTrack->getTrackFitStatus();
+
+    double ndf = fs->getNdf();
+    if (!m_BField)  // in case of no magnetic field, #track par=4 instead of 5.
+      ndf = +1;
+
     double Chi2 = fs->getChi2();
     double TrPval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
     double Phi0 = fitresult->getPhi0();
     if (m_phi0InRad == false) { // unit of degrees.
       Phi0 *=  180 / M_PI;
     }
-    TVector3 posSeed = track->getPositionSeed();
 
     /*** Two track case.***/
-    if (nfitted == 1) {
+    if ((posSeed.Y() > 0 && !up) ||
+        (up && posSeed.Y()*posSeed1.Y() > 0 &&  ndf > ndf1)) {
       charge1 = fitresult->getChargeSign();
       posSeed1 = posSeed;
       D01 = fitresult->getD0();
@@ -197,8 +210,6 @@ void CDCCosmicAnalysisModule::event()
 
       Omega1 = fitresult->getOmega();
       Mom1 = fitresult->getMomentum();
-      Om1 = fitresult->getOmega();
-
       eOm1 = sqrt(fitresult->getCovariance5()[2][2]);
       Z01 = fitresult->getZ0();
       eZ01 = sqrt(fitresult->getCovariance5()[3][3]);
@@ -207,9 +218,11 @@ void CDCCosmicAnalysisModule::event()
       Pt1 = fitresult->getTransverseMomentum();
       ndf1 = ndf;
       Pval1 = TrPval;
-      n += 1;
+      up = true;
     }
-    if (nfitted == 2) {
+
+    if ((posSeed.Y() < 0 && !down) ||
+        (down && posSeed.Y()*posSeed2.Y() > 0 && ndf > ndf2)) {
       charge2 = fitresult->getChargeSign();
       posSeed2 = posSeed;
       D02 = fitresult->getD0();
@@ -221,7 +234,6 @@ void CDCCosmicAnalysisModule::event()
       }
       Omega2 = fitresult->getOmega();
       Mom2 = fitresult->getMomentum();
-      Om2 = fitresult->getOmega();
       eOm2 = sqrt(fitresult->getCovariance5()[2][2]);
       Z02 = fitresult->getZ0();
       eZ02 = sqrt(fitresult->getCovariance5()[3][3]);
@@ -230,11 +242,11 @@ void CDCCosmicAnalysisModule::event()
       Pt2 = fitresult->getTransverseMomentum();
       ndf2 = ndf;
       Pval2 = TrPval;
-      n += 1;
+      down = true;
     }
   }
-
-  if (n == 2 && store && charge1 * charge2 >= 0) {
+  if (m_BField && charge1 * charge2 == 0)  return;
+  if (charge1 * charge2 >= 0 && up && down) {
     charge = charge1;
     tree->Fill();
   }

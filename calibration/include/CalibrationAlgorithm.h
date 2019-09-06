@@ -418,4 +418,13 @@ namespace Belle2 {
     B2DEBUG(100, "Passing back merged data " << name);
     return objOutputPtr;
   }
+
+  /**
+   * Specialization of getObjectPtr<TTree>.
+   */
+  template<> std::shared_ptr<TTree>
+  CalibrationAlgorithm::getObjectPtr(
+    const std::string& name,
+    const std::vector<Calibration::ExpRun>& requestedRuns);
+
 } // namespace Belle2

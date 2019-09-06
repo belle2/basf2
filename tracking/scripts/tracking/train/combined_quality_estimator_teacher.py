@@ -167,7 +167,7 @@ install_helpstring_formatter = ("\nCould not find {module} python module.Try ins
                                 "  python3 -m pip install [--user] {module}\n")
 try:
     import b2luigi
-    from b2luigi.core.utils import get_serialized_parameters
+    from b2luigi.core.utils import get_serialized_parameters, get_log_file_dir
     from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
     from b2luigi.core.task import Task
     from b2luigi.basf2_helper.utils import get_basf2_git_hash
@@ -918,6 +918,7 @@ class TrackQEEvaluationBaseTask(Task):
     def run(self):
         evaluation_pdf_output_basename = self.teacherTask.weightfile_identifier.rsplit(".", 1)[0] + ".pdf"
         evaluation_pdf_output_path = self.get_output_file_name(evaluation_pdf_output_basename)
+
         cmd = [
             "basf2_mva_evaluate.py",
             "--identifiers",
@@ -930,8 +931,25 @@ class TrackQEEvaluationBaseTask(Task):
             evaluation_pdf_output_path,
             "--fillnan",  # fill NANs with actual values so that plots don't fail
         ]
-        print(" ".join(cmd))
-        subprocess.check_call(cmd)
+
+        # Prepare log files
+        log_file_dir = get_log_file_dir(self)
+        stderr_log_file_path = log_file_dir + "stderr"
+        stdout_log_file_path = log_file_dir + "stdout"
+        with open(stdout_log_file_path, "w") as stdout_file:
+            stdout_file.write("stdout output of the command:\n{}\n\n".format(" ".join(cmd)))
+        if os.path.exists(stderr_log_file_path):
+            # remove stderr file if it already exists b/c in the following it will be opened in appending mode
+            os.remove(stderr_log_file_path)
+
+        # Run evaluation via subprocess and write output into logfiles
+        with open(stdout_log_file_path, "a") as stdout_file:
+            with open(stderr_log_file_path, "a") as stderr_file:
+                try:
+                    subprocess.run(cmd, check=True, stdin=stdout_file, stderr=stderr_file)
+                except subprocess.CalledProcessError as err:
+                    stderr_file.write(f"Evaluation failed with error:\n{err}")
+                    raise err
 
 
 class VXDTrackQEEvaluationTask(TrackQEEvaluationBaseTask):

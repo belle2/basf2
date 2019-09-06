@@ -908,13 +908,11 @@ bool TrackFinderMCTruthRecoTracksModule::isWithinNLoops(double Bz, const THit* a
   // subtract the production time here in order for this classification to also work
   // for particles produced at times t' > t0
   const double tof = aSimHit->getGlobalTime() - mcParticle->getProductionTime();
-  const float absPT = mcParticle->getMomentum().Perp();
-  // speed in the x-y-plane
-  const double speed = absPT * Const::speedOfLight /  mcParticle->get4Vector().E();
+  const double speed = mcParticle->get4Vector().Beta() * Const::speedOfLight;
+  const float absMom3D = mcParticle->getMomentum().Mag();
 
-  const double loopLength = 2 * M_PI * absPT / (Bz * 0.00299792458);
+  const double loopLength = 2 * M_PI * absMom3D / (Bz * 0.00299792458);
   const double loopTOF =  loopLength / speed;
-
   if (tof > loopTOF * nLoops) {
     return false;
   } else {

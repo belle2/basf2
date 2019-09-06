@@ -357,6 +357,55 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None):
     path.add_module(mcparticleprinter)
 
 
+def correctBrems(
+    outputList,
+    inputList,
+    gammaList,
+    maximumAcceptance=3.0,
+    multiplePhotons=False,
+    usePhotonOnlyOnce=False,
+    writeOut=False,
+    path=None,
+):
+    """
+    For each particle in the given `inputList`, copies it to the `outputList` and adds the
+    4-vector of the photon(s) in the `gammaList` which has(have) a weighted named relation to
+    the particle's track, set by the :b2:mod:`eclTrackBremFinder` module during reconstruction.
+
+    Warning:
+        This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
+        up to and including MC12 and proc9 **do not** contain this. Newer production campaigns (from proc10 and MC13) will.
+
+    Information:
+        Please note that a new particle is always generated, with the old particle and -if found- one or more
+        photons as daughters.
+
+        The `inputList` should contain particles with associated tracks. Otherwise the module will exit with an error.
+
+        The `gammaList` should contain photons. Otherwise the module will exit with an error.
+
+    @param outputList   The output particle list name containing the corrected particles
+    @param inputList    The initial particle list name containing the particles to correct. *It should already exist.*
+    @param gammaList    The photon list containing possibly bremsstrahlung photons; *It should already exist.*
+    @param maximumAcceptance Maximum value of the relation weight. Should be a number between [0,3)
+    @param multiplePhotons Whether to use only one photon (the one with the smallest acceptance) or as many as possible
+    @param usePhotonOnlyOnce If true, each brems candidate is used to correct only the track with the smallest relation weight
+    @param writeOut      Whether `RootOutput` module should save the created `outputList`
+    @param path          The module is added to this path
+    """
+
+    bremscorrector = register_module('BremsFinder')
+    bremscorrector.set_name('bremsCorrector_' + outputList)
+    bremscorrector.param('inputList', inputList)
+    bremscorrector.param('outputList', outputList)
+    bremscorrector.param('gammaList', gammaList)
+    bremscorrector.param('maximumAcceptance', maximumAcceptance)
+    bremscorrector.param('multiplePhotons', multiplePhotons)
+    bremscorrector.param('usePhotonOnlyOnce', usePhotonOnlyOnce)
+    bremscorrector.param('writeOut', writeOut)
+    path.add_module(bremscorrector)
+
+
 def copyList(
     outputListName,
     inputListName,

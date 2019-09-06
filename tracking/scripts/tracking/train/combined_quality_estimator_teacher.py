@@ -169,6 +169,7 @@ try:
     import b2luigi
     from b2luigi.core.utils import get_serialized_parameters
     from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
+    from b2luigi.core.task import Task
     from b2luigi.basf2_helper.utils import get_basf2_git_hash
 except ModuleNotFoundError:
     print(install_helpstring_formatter.format(module="b2luigi"))
@@ -599,7 +600,7 @@ class TrackQETeacherBaseTask(Basf2Task):
     def output(self):
         yield self.add_to_output(self.weightfile_identifier)
 
-    def run(self):
+    def process(self):
         records_files = self.get_input_file_names(
             self.dataCollectionTask.records_file_name
         )
@@ -865,14 +866,14 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
         )
 
 
-class TrackQEEvaluationBaseTask(Basf2Task):
+class TrackQEEvaluationBaseTask(Task):
     """
     Base class for evaluating a quality estimator ``basf2_mva_evaluate.py`` on a
     separate test data set.
 
     Evaluation tasks for VXD, CDC and combined QE can inherit from it.
     """
-
+    git_hash = b2luigi.Parameter(default=get_basf2_git_hash())
     n_events_testing = b2luigi.IntParameter()
     n_events_training = b2luigi.IntParameter()
     training_target = b2luigi.Parameter(default="truth")
@@ -1004,7 +1005,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
         yield self.add_to_output(self.output_pdf_file_basename)
 
     @b2luigi.on_temporary_files
-    def run(self):
+    def process(self):
         # get the validation "harvest", which is the ROOT file with ntuples for validation
         validation_harvest_basename = self.harvesting_validation_task_instance.validation_output_file_name
         validation_harvest_path = self.get_input_file_names(validation_harvest_basename)[0]

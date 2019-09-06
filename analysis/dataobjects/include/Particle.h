@@ -804,7 +804,8 @@ namespace Belle2 {
           or (pdg == Const::proton.getPDGCode())
           or (pdg == Const::deuteron.getPDGCode())) {
         return ECLCluster::EHypothesisBit::c_nPhotons;
-      } else if (pdg == Const::Klong.getPDGCode()) {
+      } else if ((pdg == Const::Klong.getPDGCode())
+                 or (pdg == Const::neutron.getPDGCode())) {
         return ECLCluster::EHypothesisBit::c_neutralHadron;
       } else {
         return ECLCluster::EHypothesisBit::c_none;

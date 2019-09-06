@@ -14,10 +14,10 @@ dbImporter = BKLMDatabaseImporter()
 adc = BKLMADCThreshold()
 # ADC pedestal.
 pedestal = 3700
-adc.setADCOffset(3700)
+adc.setADCOffset(pedestal)
 # Photoelectron amplitude.
 amplitude = 20
-adc.setMPPCGain(20)
+adc.setMPPCGain(amplitude)
 # ADC threshold (the difference with pedestal is 3 photoelectron amplitudes).
 adc.setADCThreshold(pedestal-3*amplitude)
 

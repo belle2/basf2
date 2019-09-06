@@ -1,32 +1,48 @@
-/***********************************************************************/
-/* This script is for checking CDC performance using cosmic muon       */
-/* Input files are from output of CDCCosmicAnalysis module             */
-/* Question send to cdc@belle2.org                                     */
-/***********************************************************************/
+/************************************************************************/
+/*                                                                      */
+/*   This script is for checking CDC performance using cosmic muon      */
+/*   Input files are from output of CDCCosmicAnalysis module            */
+/*   Question send to cdc@belle2.org                                    */
+/*                                                                      */
+/************************************************************************/
 #include "TROOT.h"
 void loadStyle();
 void fit(TH1D* h1);
 
 
-void compare2Tracks(bool draw_sim =true){
+void compare2Tracks(){
+  // Input file names:
+  std::vector<std::string> input_filenames ={"cosmic/rootfile/twotracks*"};
 
- std::vector<std::string> filenames ={"cosmic/rootfile/twotracks*"};
+  // Apply loose or tight selection
   bool loose_selection(false);
-  TString sCharge="all";
 
-  //Root file contain histograms for compare with this results
+  // Run analysis for positve (pos) or negative (neg) or both (all)
+  TString sCharge="all";
+  
+  // Option to compare this result with a previous result.
+  // The previous result is defined in result4Compare.
+  bool compare = true;
+
+  // Root file contain histograms for comparing with this results.
+  // it must be set properly if compare= true
   TString result4Compare = "/home/belle2/dvthanh/public/cdc_perform/result_Exp2_good_selection.root";//Exp2
 
-  int color4Compare = 2; //color of input histo
+  //color of input histo
   //1:black 2:red 3:green 4:blue 5:yellow 6:magenta 7:cyan
   // 5(Y)=2(R)+3(G) 6(M)=2(R)+4(B) 7(C)=3(G)+4(B)
   //std::string label4Compare = "July"; //label of input histo
-  std::string label4Compare = "Exp2 (Feb-2018)"; //label of input histo
+  int color4Compare = 2; 
 
-  // Belle CDC params
+  //label of the input histograms
+  std::string label4Compare = "Exp2 (Feb-2018)"; 
+
+  // Belle CDC parameters
   // Belle CDC only: = 0.28Pt oplus 0.35/beta %
   double Param_belle_CDC[2] = {0.28, 0.35};
-  int ndfmin=25;
+
+  // mininum number of degree freedom
+  int ndfmin = 25;
 
   //selection for track parameter resolutio as a function of Pt.
   double cut_z0min, cut_z0max, cut_d0max, cut_tanlmin, cut_tanlmax;
@@ -42,10 +58,11 @@ void compare2Tracks(bool draw_sim =true){
     cut_d0max=3;
     cut_tanlmin=-1.4;
     cut_tanlmax=0.65;}
-  //starting to read data and draw
+
+  //starting to read data and draw  
   loadStyle();
 
-  //limit for ploting
+  //limits for ploting
   double max_dD0 = 0.1;
   double max_dZ0 = 1;
   double max_dPhi0 = 0.4;
@@ -99,17 +116,17 @@ void compare2Tracks(bool draw_sim =true){
   TH2D*hdZ0D0 = new TH2D("hdZ0D0","#Deltaz_{0}/#surd2 vs. d_{0}; d_{0};#Deltaz_{0};",50,-50,50,100,-1*max_dZ0, max_dZ0);
   // Phi0 dependence
  
-  TH2D*hdD0Phi0 = new TH2D("hdD0Phi0","#Deltad_{0}/#surd2 vs. #varphi_{0}; #varphi_{0};#Deltad_{0};",90,-180,0,100,-0.15,0.15);
-  TH2D*hdZ0Phi0 = new TH2D("hdZ0Phi0","#Deltaz_{0}/#surd2 vs. #varphi_{0}; #varphi_{0};#Deltaz_{0};",90,-180,0,100,-1.5,1.5);
+  TH2D*hdD0Phi0 = new TH2D("hdD0Phi0","#Deltad_{0}/#surd2 vs. #varphi_{0}; #varphi_{0};#Deltad_{0};",60,-180,0,100,-0.15,0.15);
+  TH2D*hdZ0Phi0 = new TH2D("hdZ0Phi0","#Deltaz_{0}/#surd2 vs. #varphi_{0}; #varphi_{0};#Deltaz_{0};",60,-180,0,100,-1.5,1.5);
   // Pt dependence
-  TH2D* hdPPt = new TH2D("hdPPt"," #DeltaPt vs. Pt ;P_{t} (Gev/c);#surd2(P^{up}-P^{down})/(P^{up}+P^{down})",
+  TH2D* hdPPt = new TH2D("hdPPt"," #DeltaP vs. Pt ;P_{t} (Gev/c);#surd2(P^{up}-P^{down})/(P^{up}+P^{down})", 
 			 20,0,10,100,-1*max_dPt, max_dPt);
-  TH2D* hdPtPt = new TH2D("hdPtPt"," #DeltaP vs. Pt ;P_{t} (Gev/c);#surd2(P_{t}^{up}-P_{t}^{down})/(P_{t}^{up}+P_{t}^{down})",
+  TH2D* hdPtPt = new TH2D("hdPtPt"," #DeltaPt vs. Pt ;P_{t} (Gev/c);#surd2(P_{t}^{up}-P_{t}^{down})/(P_{t}^{up}+P_{t}^{down})",
 			  20,0,10,100,-1*max_dPt, max_dPt);
   TH2D* hdPtPt_pos = new TH2D("hdPtPt_pos"," #DeltaP vs. Pt (Neg. Charge);P_{t} (Gev/c);#surd2(P_{t}^{up}-P_{t}^{down})/(P_{t}^{up}+P_{t}^{down})",
-			  20,0,10,100,-1*max_dPt, max_dPt);
+			  10,0,10,100,-1*max_dPt, max_dPt);
   TH2D* hdPtPt_neg = new TH2D("hdPtPt_neg"," #DeltaP vs. Pt (Neg. Charge) ;P_{t} (Gev/c);#surd2(P_{t}^{up}-P_{t}^{down})/(P_{t}^{up}+P_{t}^{down})",
-			  20,0,10,100,-1*max_dPt, max_dPt);
+			  10,0,10,100,-1*max_dPt, max_dPt);
 
   TH2D* hdD0Pt = new TH2D("hdD0Pt","#Deltad_{0}/#surd2 vs. P_{t};P_{t};#Deltad_{0}",20,0,10,100,-1*max_dD0, max_dD0);
   TH2D* hdZ0Pt = new TH2D("hdZ0Pt","#Deltaz_{0}/#surd2 vs. P_{t};P_{t};#Deltaz_{0}",20,0,10,100,-1*max_dZ0, max_dZ0);
@@ -163,7 +180,7 @@ void compare2Tracks(bool draw_sim =true){
   TH1D* hdPhi0Pt_sim;
   TH1D* hdtanLPt_sim;
   TH1D*  hdPPt_sim;
-  if(draw_sim){
+  if(compare){
     TFile ff(result4Compare);
     hdPtPt_sim = (TH1D*)ff.Get("hdPtPt_2;1");
     hdPPt_sim = (TH1D*)ff.Get("hdPPt_2;1");
@@ -192,11 +209,12 @@ void compare2Tracks(bool draw_sim =true){
     hdtanLPt_sim->SetLineColor(color4Compare);
     ff.Close();
   }
-  //Read data and fill to histo
+  //Read data and fill histos
+
   TChain *tree = new TChain("tree");
-  for( int i=0;i<filenames.size();++i){
-    tree->Add(filenames[i].c_str());
-    cout<<"Input files: "<<filenames[i].c_str()<<endl;
+  for( int i=0;i<input_filenames.size();++i){
+    tree->Add(input_filenames[i].c_str());
+    cout<<"Input files: "<<input_filenames[i].c_str()<<endl;
   }
   if(!tree->GetBranch("Pval1")) return;
   double nEtr = tree->GetEntries();
@@ -232,39 +250,40 @@ void compare2Tracks(bool draw_sim =true){
   tree->SetBranchAddress("posSeed2",&posSeed2);
   tree->SetBranchAddress("Omega2",&Omega2);
   tree->SetBranchAddress("Mom2",&Mom2);
-  Long64_t nbytes=0;
 
+  Long64_t nbytes=0;
+  double sqrti = 1/sqrt(2);
   for(int i=0; i< nEtr;++i){
     nbytes += tree->GetEntry(i);    
     if(Mom1->Dot(*Mom2)<0) continue;
 
     if(posSeed1->Y() <  posSeed2->Y() ){
-      Phi0 = Phi01; Phi01 =Phi02; Phi02 =Phi0;
-      Omega = Omega1; Omega1 = Omega2; Omega2 = Omega;
-      tanLambda = tanLambda1; tanLambda1 = tanLambda2; tanLambda2 =tanLambda;
-      Z0 = Z01; Z01 =Z02; Z02 =Z0;
-      D0 = D01; D01 =D02; D02 =D0;
-      ndf = ndf1; ndf1 =ndf2; ndf2 =ndf;
-      Pval = Pval1; Pval1 =Pval2; Pval2 =Pval;
-      TVector3*Mom = new TVector3(*Mom1); Mom1 = Mom2;Mom2 = Mom;
+      swap(Phi01, Phi02);
+      swap(Omega1, Omega2);
+      swap(tanLambda1, tanLambda2);
+      swap(Z01, Z02);
+      swap(D01, D02);
+      swap(ndf1, ndf2);
+      swap(Pval1, Pval2);
+      swap(Mom1, Mom2);
     }
     Phi01 *=180/M_PI;
     Phi02 *=180/M_PI;
 
-    double dD0=(D01-D02)/sqrt(2);
-    double dZ0 = (Z01-Z02)/sqrt(2);
-    double dPhi0=(Phi01-Phi02)/sqrt(2);
-    double dtanLambda = (tanLambda1-tanLambda2)/sqrt(2);
-    double dOmega = (Omega1 - Omega2)/sqrt(2);
-    double dPt = (Mom1->Perp() - Mom2->Perp())/sqrt(2);
-    double dP = (Mom1->Mag() - Mom2->Mag())/sqrt(2);
+    double dD0=(D01-D02)*sqrti;
+    double dZ0 = (Z01-Z02)*sqrti;
+    double dPhi0=(Phi01-Phi02)*sqrti;
+    double dtanLambda = (tanLambda1-tanLambda2)*sqrti;
+    double dOmega = (Omega1 - Omega2)*sqrti;
+    double dPt = (Mom1->Perp() - Mom2->Perp())*sqrti;
+    double dP = (Mom1->Mag() - Mom2->Mag())*sqrti;
     
-    double D0m = (D01+D02)/2;
-    double Z0m = (Z01+Z02)/2;
-    double Phi0m = (Phi01+Phi02)/2;
-    double tanLm = (tanLambda1 + tanLambda2)/2;
-    double Ptm = (Mom1->Perp() + Mom2->Perp())/2;
-    double Pm = (Mom1->Mag() + Mom2->Mag())/2;
+    double D0m = (D01+D02)*0.5;
+    double Z0m = (Z01+Z02)*0.5;
+    double Phi0m = (Phi01+Phi02)*0.5;
+    double tanLm = (tanLambda1 + tanLambda2)*0.5;
+    double Ptm = (Mom1->Perp() + Mom2->Perp())*0.5;
+    double Pm = (Mom1->Mag() + Mom2->Mag())*0.5;
 
     double sigmaPt = dPt/Ptm;
     double sigmaP = dP/Pm;
@@ -276,13 +295,14 @@ void compare2Tracks(bool draw_sim =true){
       if(charge >0) continue;
     }else{}
 
-    hNDF1->Fill(ndf1);   hPval1->Fill(Pval1); hPhi01->Fill(Phi01);  hD01->Fill(D01);
+    hNDF1->Fill(ndf1);   hPval1->Fill(Pval1); hPhi01->Fill(Phi01);  hD01->Fill(D01); 
     hZ01->Fill(Z01);     htanLambda1->Fill(tanLambda1); hOmega1->Fill(Omega1); hPt1->Fill(Mom1->Perp());
-    hNDF2->Fill(ndf2);    hPval2->Fill(Pval2); hPhi02->Fill(Phi02);  hD02->Fill(D02);
+    hNDF2->Fill(ndf2);    hPval2->Fill(Pval2); hPhi02->Fill(Phi02);  hD02->Fill(D02); 
     hZ02->Fill(Z02); htanLambda2->Fill(tanLambda2); hOmega2->Fill(Omega2); hPt2->Fill(Mom2->Perp());
-    hEvtT0->Fill(evtT0);
+    hEvtT0->Fill(evtT0);    
     // NDF cut
     if(ndf1<ndfmin ||ndf2<ndfmin) continue;
+    if(Phi01>0 || Phi02>0) continue;
 
     int index = floor(fabs(Phi01)/binWidth);
     if(index>=0 && index<nbin){
@@ -355,15 +375,22 @@ void compare2Tracks(bool draw_sim =true){
   TLatex lt;	lt.SetTextSize(0.032);
   TCanvas* c1 = new TCanvas("c1","",900,800);
   c1->Divide(2,2);
-  c1->cd(1);
-  TDatime date;// const char *d = date.AsString();
-  lt.DrawLatex(0.2,0.8,date.AsString());
-  lt.DrawLatex(0.2,0.7,Form("Inputs: %s",filenames[0].c_str()));
-  lt.DrawLatex(0.2,0.6,loose_selection? "Loose selection is applied":"Tight selection:");
-  lt.DrawLatex(0.2,0.5,Form("#bullet %3.2f < d_{0} < %3.2f cm",cut_d0max,cut_d0max));
-  lt.DrawLatex(0.2,0.4,Form("#bullet %3.2f < z_{0} < %3.2f cm",cut_z0min,cut_z0max));
-  lt.DrawLatex(0.2,0.3,Form("#bullet %3.2f < tan#lambda < %3.2f",cut_tanlmin,cut_tanlmax));
-  lt.DrawLatex(0.2,0.2,Form("#bullet ndf > %d",ndfmin));
+  c1->cd(1); 
+  TDatime date;
+  lt.DrawLatex(0.15,0.8,date.AsString());
+  lt.DrawLatex(0.15,0.75,Form("Inputs: %s",input_filenames[0].c_str()));
+  lt.DrawLatex(0.15, 0.7,"-------------------------------------------------------------------------------------");
+  lt.DrawLatex(0.15,0.65, "+ Page 1 and 2 are raw distributions (no cut).");
+  lt.DrawLatex(0.15,0.6,Form("+ NDF > %d is applied for pages 3-end",ndfmin));
+  lt.DrawLatex(0.15,0.55,loose_selection? "+ Loose selection is applied: ":"+ Tight selection is applied for plots in pages: 3, 8, 9, 10,");
+  lt.DrawLatex(0.15,0.5, "   and #DeltaPt vs. Pt (p11): ");
+  lt.DrawLatex(0.15,0.45,Form("    #bullet |d_{0}| < %3.2f (cm)", cut_d0max));
+  lt.DrawLatex(0.15,0.4,Form("    #bullet %3.2f < z_{0} < %3.2f (cm)", cut_z0min, cut_z0max));
+  lt.DrawLatex(0.15,0.35,Form("    #bullet %3.2f < tan#lambda < %3.2f",cut_tanlmin, cut_tanlmax));
+  lt.DrawLatex(0.15,0.30,"+ Page-4, tan#lambda dependence: |d_{0}|<5  & -5< z_{0} <10 (cm)");
+  lt.DrawLatex(0.15,0.25,"+ Page-5, #varphi_{0} dependence:   |d_{0}|<5 & -5< z_{0} <10 (cm) & |tan#lambda| <0.5");
+  lt.DrawLatex(0.15,0.2, "+ More details: #it{cdc/examples/performance/compare2Tracks.C}");
+
   c1->cd(2); hEvtT0->Draw();
   c1->cd(3); hNDF1->Draw(); hNDF2->Draw("same");
   c1->cd(4); hPval1->Draw(); hPval2->Draw("same");
@@ -382,7 +409,7 @@ void compare2Tracks(bool draw_sim =true){
   c1->Print("cdc_performance_with_cr.pdf","Title:Pars_distribution");
 
   gStyle->SetStatH(0.2);//change statistics box size here
-  gStyle->SetStatW(0.2);
+  gStyle->SetStatW(0.2); 
   gStyle->SetOptStat(0000);
     // Draw difference of track params
   TCanvas* c2 = new TCanvas("c2","",1200,800);
@@ -428,7 +455,7 @@ void compare2Tracks(bool draw_sim =true){
       //      TPad* pad2 = (TPad*)c3->GetPrimitive("c3_2");
       pad2->cd();//pad2->SetGrid();
       m_hdD0TanL->Draw();
-      c3->cd(3);
+      c3->cd(3);    
       s_hdD0TanL->Draw();
     }
 
@@ -446,10 +473,10 @@ void compare2Tracks(bool draw_sim =true){
     m_hdZ0TanL->GetXaxis()->SetNdivisions(8,9);
     s_hdZ0TanL->SetTitle("z_{0} resolution vs. tan#lambda ; tan#lambda   ;z_{0} resolution  (cm)  ");
     m_hdZ0TanL->SetTitle("#Deltaz_{0} vs. tan#lambda ; tan#lambda   ;#Deltaz_{0}  (cm)  ");
-
+    
     c3->cd(5);
     //    TPad* pad5 = (TPad*)c3->GetPrimitive("c3_5");
-    pad5->cd(); //pad5->SetGrid();
+    pad5->cd(); //pad5->SetGrid(); 
     m_hdZ0TanL->Draw();
     c3->cd(6); s_hdZ0TanL->Draw();
   }
@@ -595,15 +622,16 @@ void compare2Tracks(bool draw_sim =true){
       hdPtPt_s->Fit("f1","MQ","",1.5,10);
       gPad->Update();
       lt.DrawLatex(1.5, 0.12, Form("#sigma_{Pt}/Pt(%%) = (%3.3f#pm%3.3f)Pt #oplus (%3.3f#pm%3.3f)",
-				 f1->GetParameter(0),f1->GetParError(0),f1->GetParameter(1),f1->GetParError(1)));
+				   fabs(f1->GetParameter(0)), f1->GetParError(0),
+				   fabs(f1->GetParameter(1)), f1->GetParError(1)));
       //      TPaveStats *s = (TPaveStats*)hdPtPt_s->GetListOfFunctions()->FindObject("stats");
-      //      s->SetBorderSize(0);  s->SetFillColor(0);s->SetShadowColor(0);
+      //      s->SetBorderSize(0);  s->SetFillColor(0);s->SetShadowColor(0);  
       //      s->SetX1(0.5); s->SetY1(1.5);s->SetX2(6); s->SetY2(1.95);
       //      gPad->Modified();
       fbelle->DrawF1(0.6,10,"same");
       lt.SetTextColor(kMagenta-7);
       lt.DrawLatex(7,1.7,"#splitline{Belle}{CDC only}");
-      if(draw_sim){
+      if(compare){
 	cout<<"draw Sim Pt resolution"<<endl;
 	//	hdPtPt_sim->Scale(100);
 	hdPtPt_sim->SetStats(0);
@@ -637,9 +665,10 @@ void compare2Tracks(bool draw_sim =true){
       hdPPt_s->Fit("f2","MQ","",1.5,10);
       lt.SetTextColor(kBlack);
       lt.DrawLatex(1.5,0.12, Form("#sigma_{P}/P(%%) = (%3.3f#pm%3.3f)Pt #oplus (%3.3f#pm%3.3f)",
-				 f2->GetParameter(0),f2->GetParError(0),f2->GetParameter(1),f2->GetParError(1)));
+				  fabs(f2->GetParameter(0)), f2->GetParError(0),
+				  fabs(f2->GetParameter(1)), f2->GetParError(1)));
 
-      if(draw_sim){
+      if(compare){
 	hdPPt_sim->SetStats(0);
       	hdPPt_sim ->Draw("same");
       }
@@ -659,9 +688,9 @@ void compare2Tracks(bool draw_sim =true){
     hdD0Pt_s->SetMinimum(0);
     hdD0Pt_s->SetMaximum(0.12);
     c3->cd(1); hdD0Pt->Draw("colz");
-    c3->cd(2); hdD0Pt_m->Draw();
+    c3->cd(2); hdD0Pt_m->Draw(); 
     c3->cd(3); hdD0Pt_s->Draw();
-    if(draw_sim &&  hdD0Pt_sim){
+    if(compare &&  hdD0Pt_sim){
       hdD0Pt_sim ->Draw("same");
     }
   }
@@ -677,11 +706,11 @@ void compare2Tracks(bool draw_sim =true){
     hdZ0Pt_s->SetMinimum(0);
     hdZ0Pt_s->SetMaximum(max_z0s);
     c3->cd(4); hdZ0Pt->Draw("colz");
-    c3->cd(5); hdZ0Pt_m->Draw();
+    c3->cd(5); hdZ0Pt_m->Draw(); 
     c3->cd(6); hdZ0Pt_s->Draw();
-    if(draw_sim){
+    if(compare){
       hdZ0Pt_sim ->Draw("same");
-    }
+    }    
   }
   c3->Print("cdc_performance_with_cr.pdf","Title:d0z0_vs._Pt");
 
@@ -697,9 +726,9 @@ void compare2Tracks(bool draw_sim =true){
     hdPhi0Pt_s->SetMinimum(0);
     hdPhi0Pt_s->SetMaximum(0.3);
     c3->cd(1); hdPhi0Pt->Draw("colz");
-    c3->cd(2); hdPhi0Pt_m->Draw();
+    c3->cd(2); hdPhi0Pt_m->Draw(); 
     c3->cd(3); hdPhi0Pt_s->Draw();
-    if(draw_sim){
+    if(compare){
       hdPhi0Pt_sim ->Draw("same");
     }
   }
@@ -716,9 +745,9 @@ void compare2Tracks(bool draw_sim =true){
     hdtanLPt_s->SetMaximum(0.01);
 
     c3->cd(4); hdtanLPt->Draw("colz");
-    c3->cd(5); hdtanLPt_m->Draw();
+    c3->cd(5); hdtanLPt_m->Draw(); 
     c3->cd(6); hdtanLPt_s->Draw();
-    if(draw_sim){
+    if(compare){
       hdtanLPt_sim ->Draw("same");
     }
   }
@@ -745,8 +774,8 @@ void compare2Tracks(bool draw_sim =true){
   fneg->SetLineWidth(1);
   gStyle->SetOptFit(0000);
   gStyle->SetOptStat(0000);
-  if(hdPtPt_neg_m && hdPtPt_pos_m && hdPtPt_neg_s && hdPtPt_pos_s)
-    {
+  if(hdPtPt_neg_m && hdPtPt_pos_m && hdPtPt_neg_s && hdPtPt_pos_s) 
+    { 
       pad1->cd();pad1->SetGrid();
       hdPtPt_pos_m->SetTitle("#DeltaPt/Pt;P_{t} (GeV/c)  ; #DeltaP_{t}/P_{t}   ");
       hdPtPt_pos_m->SetLineColor(kRed);
@@ -795,11 +824,13 @@ void compare2Tracks(bool draw_sim =true){
       fneg->GetParameters(par_neg);
       lt.SetTextColor(kRed);
       lt.DrawLatex(0.5, 1.8, Form("(+) #sigma_{Pt}/Pt(%%) = (%3.3f#pm%3.3f)Pt #oplus (%3.3f#pm%3.3f)",
-				 par_pos[0],fpos->GetParError(0),par_pos[1],fpos->GetParError(1)));
+				  fabs(par_pos[0]), fpos->GetParError(0),
+				  fabs(par_pos[1]), fpos->GetParError(1)));
 
       lt.SetTextColor(kBlue);
       lt.DrawLatex(0.5, 1.6, Form("(-) #sigma_{Pt}/Pt(%%) = (%3.3f#pm%3.3f)Pt #oplus (%3.3f#pm%3.3f)",
-				 par_neg[0],fneg->GetParError(0),par_neg[1],fneg->GetParError(1)));
+				  fabs(par_neg[0]), fneg->GetParError(0),
+				  fabs(par_neg[1]), fneg->GetParError(1)));
     }
 
   hdPtTanl->FitSlicesY(0,0,-1,15);
@@ -814,11 +845,11 @@ void compare2Tracks(bool draw_sim =true){
     hdPtTanl_s->SetTitle("Pt resolution vs. tan#lambda ; tan#lambda; Pt resolution (%) ");
     pad3->cd();pad3->SetGrid(); hdPtTanl_m->Draw();
     c3->cd(4);hdPtTanl_s->Draw();
-
+    
   }
-
+   
   c3->Print("cdc_performance_with_cr.pdf)","Title:others");
-
+    
   cout<<"Finish"<<endl;
   TFile *result = new TFile("result.root","recreate");
   result->cd();
@@ -868,17 +899,17 @@ void loadStyle(){
   gStyle->SetPalette(1);
   gStyle->SetEndErrorSize(0);
   gROOT->SetBatch(1);
-  gStyle->SetStatW(0.32);
-  gStyle->SetTitleX(0.075);
+  gStyle->SetStatW(0.32); 
+  gStyle->SetTitleX(0.075);    
   gStyle->SetTitleY(0.91);
   gStyle->SetTitleAlign(11);
   gStyle->SetTitleBorderSize(2);
   gStyle->SetStatH(0.1);
-  gStyle->SetLabelSize(0.04,"xyz"); // size of axis value font
-  gStyle->SetTitleSize(0.045,"xyz"); // size of axis title font
-  gStyle->SetTitleFont(22,"xyz"); // font option
-  gStyle->SetLabelFont(22,"xyz");
-  gStyle->SetGridColor(14);
+  gStyle->SetLabelSize(0.04,"xyz"); // size of axis value font     
+  gStyle->SetTitleSize(0.045,"xyz"); // size of axis title font     
+  gStyle->SetTitleFont(22,"xyz"); // font option      
+  gStyle->SetLabelFont(22,"xyz"); 
+  gStyle->SetGridColor(15);
   TGaxis::SetMaxDigits(4);
   gROOT->ForceStyle();
 }
@@ -901,3 +932,4 @@ void fit(TH1D* h1){
   g2->Draw("same");
 
 }
+

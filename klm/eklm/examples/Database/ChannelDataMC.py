@@ -1,27 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Create EKLM database payloads.
+# Create EKLM channel data payloads.
 
-from basf2 import *
+import basf2
 import ROOT
 from ROOT.Belle2 import EKLMDatabaseImporter, EKLMChannelData
 
-set_log_level(LogLevel.INFO)
-
-eventinfosetter = register_module('EventInfoSetter')
-
-# Gearbox
-gearbox = register_module('Gearbox')
-
-# Create main path
-main = create_path()
-
-# Add modules to main path
-main.add_module(eventinfosetter)
-main.add_module(gearbox)
-
-process(main)
+basf2.set_log_level(basf22.LogLevel.INFO)
 
 # Create default data
 channel_data = EKLMChannelData()

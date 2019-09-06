@@ -3,11 +3,11 @@
 
 # Create EKLM database payloads.
 
-from basf2 import *
+import basf2
 import ROOT
 from ROOT.Belle2 import EKLMDatabaseImporter
 
-set_log_level(LogLevel.INFO)
+basf2.set_log_level(basf2.LogLevel.INFO)
 
 dbImporter = EKLMDatabaseImporter()
 dbImporter.importDigitizationParameters()

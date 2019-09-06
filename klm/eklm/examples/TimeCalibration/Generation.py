@@ -3,22 +3,22 @@
 
 # Generation of 1000 ee->mumu(ISR) events using PHOKHARA.
 
-from basf2 import *
-from beamparameters import add_beamparameters
 import sys
+import basf2
+from beamparameters import add_beamparameters
 
 # Set the global log level
-set_log_level(LogLevel.INFO)
+basf2.set_log_level(basf2.LogLevel.INFO)
 
-main = create_path()
+main = basf2.create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = basf2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])  # we want to process 1000 events
 eventinfosetter.param('runList', [1])  # from run number 1
 eventinfosetter.param('expList', [0])  # and experiment number 0
 
-# Register the PHOKHARA module
-phokhara = register_module('PhokharaInput')
+# Basf2.Register the PHOKHARA module
+phokhara = basf2.register_module('PhokharaInput')
 
 # Set the logging level for the PHOKHARA module to INFO in order to see the cross sections etc.
 phokhara.set_log_level(LogLevel.INFO)
@@ -107,17 +107,17 @@ phokhara.param('MaxInvMassHadrons', 200.0)
 phokhara.param('MinEnergyGamma', 0.25)
 
 # geometry parameter database
-gearbox = register_module('Gearbox')
+gearbox = basf2.register_module('Gearbox')
 
-# Register the Progress module and the Python histogram module
-progress = register_module('Progress')
+# Basf2.Register the Progress module and the Python histogram module
+progress = basf2.register_module('Progress')
 
 # output
-output = register_module('RootOutput')
+output = basf2.register_module('RootOutput')
 output.param('outputFileName', sys.argv[1])
 
 # Create the main path and add the modules
-main = create_path()
+main = basf2.create_path()
 main.add_module(eventinfosetter)
 add_beamparameters(main, "Y4S")
 main.add_module(progress)
@@ -126,7 +126,7 @@ main.add_module(phokhara)
 main.add_module(output)
 
 # generate events
-process(main)
+basf2.process(main)
 
 # show call statistics
-print(statistics)
+print(basf2.statistics)

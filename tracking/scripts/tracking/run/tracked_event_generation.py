@@ -85,36 +85,39 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
             # determine which sub-detector hits will be used
             tracking_coverage = dict(self.tracking_coverage)
 
+            matching_coverage = {key: value for key, value in tracking_coverage.items()
+                                 if key in ('UsePXDHits', 'UseSVDHits', 'UseCDCHits', 'MinimalEfficiency', 'MinimalPurity')}
+            # Removing minimal efficiency and purity as they are only parameters of the matching
+            if "MinimalEfficiency" in tracking_coverage:
+                tracking_coverage.pop("MinimalEfficiency")
+            if "MinimalPurity" in tracking_coverage:
+                tracking_coverage.pop("MinimalPurity")
+
             # Include the mc tracks if the monte carlo data is presentx
             if 'MCRecoTracksMatcher' not in path:
-                matching_coverage = {key: value for key, value in tracking_coverage.items()
-                                     if key in ('UsePXDHits', 'UseSVDHits', 'UseCDCHits', 'MinimalEfficiency', 'MinimalPurity')}
-
-                # Removing minimal efficiency and purity as they are only parameters of the matching
-                if "MinimalEfficiency" in tracking_coverage:
-                    tracking_coverage.pop("MinimalEfficiency")
-                if "MinimalPurity" in tracking_coverage:
-                    tracking_coverage.pop("MinimalPurity")
-
                 # Reference Monte Carlo tracks
                 track_finder_mc_truth_module = basf2.register_module('TrackFinderMCTruthRecoTracks')
-                track_finder_mc_truth_module.param({
-                    'RecoTracksStoreArrayName': 'MCRecoTracks',
-                    **tracking_coverage
-                })
 
                 # Track matcher
                 mc_track_matcher_module = basf2.register_module('MCRecoTracksMatcher')
 
-                mc_track_matcher_module.param({
-                    'mcRecoTracksStoreArrayName': 'MCRecoTracks',
-                    'MinimalPurity': 0.66,
-                    'prRecoTracksStoreArrayName': "RecoTracks",
-                    **matching_coverage
-                })
-
                 path.add_module(IfMCParticlesPresentModule(track_finder_mc_truth_module))
                 path.add_module(IfMCParticlesPresentModule(mc_track_matcher_module))
+
+            # this ensures that the parameters are set in both cases (if the modules have been added or are already in the path)
+            for module in path.modules():
+                if (module.name() == 'MCRecoTracksMatcher'):
+                    module.param({
+                          'mcRecoTracksStoreArrayName': 'MCRecoTracks',
+                          'MinimalPurity': 0.66,
+                          'prRecoTracksStoreArrayName': "RecoTracks",
+                          **matching_coverage
+                        })
+                if (module.name() == 'TrackFinderMCTruthRecoTracks'):
+                    module.param({
+                          'RecoTracksStoreArrayName': 'MCRecoTracks',
+                          **tracking_coverage
+                        })
 
         if self.fit_tracks:
             # Fit tracks

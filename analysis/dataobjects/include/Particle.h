@@ -204,10 +204,11 @@ namespace Belle2 {
                       const Const::ParticleType& type = Const::photon);
 
     /**
-     * Constructor of a KLong from a reconstructed KLM cluster.
+     * Constructor from a reconstructed KLM cluster.
      * @param klmCluster pointer to KLMCluster object
+     * @param pdgCode PDG code (Klong by default)
      */
-    explicit Particle(const KLMCluster* klmCluster);
+    explicit Particle(const KLMCluster* klmCluster, const int pdgCode = Const::Klong.getPDGCode());
 
     /**
      * Constructor from MC particle (mdst object MCParticle)

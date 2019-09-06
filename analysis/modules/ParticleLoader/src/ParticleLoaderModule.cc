@@ -763,26 +763,28 @@ namespace Belle2 {
         continue;
       }
 
-
       const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
 
-      Particle particle(cluster);
+      for (auto klmCluster2Plist : m_KLMClusters2Plists) {
+        string listName = get<c_PListName>(klmCluster2Plist);
+        int pdgCode = get<c_PListPDGCode>(klmCluster2Plist);
 
-      if (particle.getParticleType() == Particle::c_KLMCluster) { // should always hold but...
+        // create particle and check its type before adding it to list
+        Particle particle(cluster, pdgCode);
+        if (particle.getParticleType() != Particle::c_KLMCluster) {
+          B2FATAL("Particle created from KLMCluster does not have KLMCluster type.");
+        }
         Particle* newPart = particles.appendNew(particle);
 
         if (mcParticle)
           newPart->addRelationTo(mcParticle);
 
         // add particle to list if it passes the selection criteria
-        for (auto klmCluster2Plist : m_KLMClusters2Plists) {
-          string listName = get<c_PListName>(klmCluster2Plist);
-          auto&  cut = get<c_CutPointer>(klmCluster2Plist);
-          StoreObjPtr<ParticleList> plist(listName);
+        auto&  cut = get<c_CutPointer>(klmCluster2Plist);
+        StoreObjPtr<ParticleList> plist(listName);
 
-          if (cut->check(newPart))
-            plist->addParticle(newPart);
-        }
+        if (cut->check(newPart))
+          plist->addParticle(newPart);
       }
     }
   }

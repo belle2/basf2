@@ -89,7 +89,6 @@ def Path_Cosmics():
     path.add_module('Geometry')
     import rawdata as raw
     raw.add_unpackers(path)
-    path.add_module('SVDEventInfoSetter')
     path.add_module('SetupGenfitExtrapolation')
     reco.add_cosmics_reconstruction(
         path,
@@ -135,10 +134,8 @@ def VXDCDCalignment(files, tags, filesCosmicsB, filesCosmicsB0):
     path.add_module('RootInput', branchNames=input_branches, entrySequences=['0:5000'])
     path.add_module('Gearbox')
     path.add_module('Geometry')
-    # path.add_module('SVDEventInfoSetter')
     import rawdata as raw
     raw.add_unpackers(path)
-    path.add_module('SVDEventInfoSetter')
     # Not needed for di-muon skim cdst or mdst, but needed to re-run reconstruction
     # with possibly changed global tags
     # raw.add_unpackers(path)
@@ -259,7 +256,7 @@ if __name__ == "__main__":
     physics_runs = [(0, run, 8) for run in [3115, 3118, 3119, 3120, 3121, 3122, 3123]]
 
     input_files_cosmics = ['/group/belle2/dataprod/Data/Raw/e0008/r0{}/sub00/cosmic.*.root'.format(
-        run) for run in [3463, 3464, 3466]]  # , 3467, 3468, 3469, 3470, 3471, 3472, 3475, 3476, 3478, 3479, 3480]]
+        run) for run in [3463, 3464, 3466, 3467, 3468]]  # , 3469, 3470, 3471, 3472, 3475, 3476, 3478, 3479, 3480]]
     input_files_Bcosmics = ['/group/belle2/dataprod/Data/Raw/e0008/r0305*/sub00/cosmic.*.root']
 
     if len(Belle2.Environment.Instance().getInputFilesOverride()):
@@ -280,5 +277,4 @@ if __name__ == "__main__":
     if multiprocessing.cpu_count() < 10:
         cal_fw.backend = backends.Local(1)
 
-    # do some other stuff in the main process
     cal_fw.run()

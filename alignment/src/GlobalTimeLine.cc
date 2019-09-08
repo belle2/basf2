@@ -233,7 +233,7 @@ namespace Belle2 {
         }
       }
 
-      void GlobalParamTimeLine::updateGlobalParam(GlobalLabel label, double correction)
+      void GlobalParamTimeLine::updateGlobalParam(GlobalLabel label, double correction, bool resetParam)
       {
         auto timeid = label.getTimeId();
         auto eov = label.getEndOfValidity();
@@ -249,8 +249,13 @@ namespace Belle2 {
         for (auto payloadIndex : payloadIndices) {
           auto payload = getPayloadByContinuousIndex(payloadsTable, label.getUniqueId(), payloadIndex).second;
           // If not found, we get an empty payload shared ptr
-          if (payload)
-            payload->updateGlobalParam(correction, label.getElementId(), label.getParameterId());
+          if (payload) {
+            if (resetParam) {
+              payload->setGlobalParam(correction, label.getElementId(), label.getParameterId());
+            } else {
+              payload->updateGlobalParam(correction, label.getElementId(), label.getParameterId());
+            }
+          }
         }
 
       }

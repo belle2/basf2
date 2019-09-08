@@ -5,6 +5,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric, Anze Zupanc                                *
  *               Sam Cunliffe, Torben Ferber                              *
+ *               Frank Meier                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

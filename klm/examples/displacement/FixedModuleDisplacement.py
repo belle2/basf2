@@ -28,10 +28,11 @@ bklmAlignment = BKLMAlignment()
 eklmAlignment = EKLMAlignment()
 eklmSegmentAlignment = EKLMSegmentAlignment()
 
-# Zero displacement for EKLM.
+# Fixed displacement for EKLM modules, zero displacement for EKLM segments.
 displacementGenerator = KLMDisplacementGenerator()
 displacementGenerator.fillZeroDisplacements(
     eklmAlignment, eklmSegmentAlignment)
+displacementGenerator.generateFixedModuleDisplacement(1, 0, 0)
 displacementGenerator.saveDisplacement(
     eklmAlignment, eklmSegmentAlignment, 'EKLMDisplacement.root')
 

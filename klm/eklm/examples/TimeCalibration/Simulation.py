@@ -17,7 +17,7 @@ output = basf2.register_module('RootOutput')
 output.param('outputFileName', sys.argv[2])
 
 # Create the main path and add the modules
-main = create_path()
+main = basf2.create_path()
 main.add_module(input)
 add_simulation(main)
 main.add_module('Progress')

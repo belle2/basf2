@@ -21,7 +21,7 @@ eventinfosetter.param('expList', [0])  # and experiment number 0
 phokhara = basf2.register_module('PhokharaInput')
 
 # Set the logging level for the PHOKHARA module to INFO in order to see the cross sections etc.
-phokhara.set_log_level(LogLevel.INFO)
+phokhara.set_log_level(basf2.LogLevel.INFO)
 
 # Set the parameter file (EXPERTS ONLY!)
 # phokhara.param('ParameterFile', 'test.dat')

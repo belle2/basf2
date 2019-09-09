@@ -88,8 +88,6 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None):
     print([tag for tag in reversed(global_tags)])
 
     conditions.override_globaltags([tag for tag in reversed(global_tags)])
-    conditions.prepend_testing_payloads(os.path.abspath(
-        "/home/tadeas/belle2/head/alignment/examples/fuckingworkaround/database.txt"))
 
     for index, event in enumerate(events):
         #  conditions.reset()

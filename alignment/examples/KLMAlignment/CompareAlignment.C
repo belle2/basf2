@@ -1,123 +1,151 @@
 
 /**
- * Get parameter index.
- */
-int parameterIndex(int param)
-{
-  switch (param) {
-    case 1:
-      return 0;
-    case 2:
-      return 1;
-    case 6:
-      return 2;
-  }
-  return -1;
-}
-
-/**
  * Comparison of initial displacements and alignment result.
  */
 void CompareAlignment(const char *displacementFile, const char *alignmentFile,
                       const char *comparisonFile)
 {
   int i, n;
-  int endcap, layer, sector, plane, segment, param;
+  int section, layer, sector, plane, segment, param;
   float value0, value, error;
   float val0[2][14][4][2][5][2];
-  TFile *fDisplacement = new TFile(displacementFile);
-  TTree *tDisplacementSector = (TTree*)fDisplacement->Get("eklm_sector");
-  TTree *tDisplacementSegment = (TTree*)fDisplacement->Get("eklm_segment");
-  TFile *fAlignment = new TFile(alignmentFile);
-  TTree *tAlignmentSector = (TTree*)fAlignment->Get("eklm_sector");
-  TTree *tAlignmentSegment = (TTree*)fAlignment->Get("eklm_segment");
-  TFile *fComparison = new TFile(comparisonFile, "recreate");
-  TTree *tComparisonSector = new TTree("eklm_sector", "");
-  TTree *tComparisonSegment = new TTree("eklm_segment", "");
-  /* Sector. */
-  tDisplacementSector->SetBranchAddress("endcap", &endcap);
-  tDisplacementSector->SetBranchAddress("layer", &layer);
-  tDisplacementSector->SetBranchAddress("sector", &sector);
-  tDisplacementSector->SetBranchAddress("param", &param);
-  tDisplacementSector->SetBranchAddress("value", &value);
-  tAlignmentSector->SetBranchAddress("endcap", &endcap);
-  tAlignmentSector->SetBranchAddress("layer", &layer);
-  tAlignmentSector->SetBranchAddress("sector", &sector);
-  tAlignmentSector->SetBranchAddress("param", &param);
-  tAlignmentSector->SetBranchAddress("value", &value);
-  tAlignmentSector->SetBranchAddress("error", &error);
-  tComparisonSector->Branch("endcap", &endcap, "endcap/I");
-  tComparisonSector->Branch("layer", &layer, "layer/I");
-  tComparisonSector->Branch("sector", &sector, "sector/I");
-  tComparisonSector->Branch("param", &param, "param/I");
-  tComparisonSector->Branch("value0", &value0, "value0/F");
-  tComparisonSector->Branch("value", &value, "value/F");
-  tComparisonSector->Branch("error", &error, "error/F");
-  n = tDisplacementSector->GetEntries();
-  for (i = 0; i < n; i++) {
-    /*
-     * Usage of (param - 1) is intentional: EKLMAlignment module uses
-     * number 3 for dalpha.
-     */
-    tDisplacementSector->GetEntry(i);
-    val0[endcap - 1][layer - 1][sector - 1][0][0][param - 1] =
-      value;
+  TFile *fDisplacement;
+  TTree *tDisplacementEKLMModule, *tDisplacementEKLMSegment;
+  if (displacementFile != nullptr) {
+    fDisplacement = new TFile(displacementFile);
+    tDisplacementEKLMModule = (TTree*)fDisplacement->Get("eklm_module");
+    tDisplacementEKLMSegment = (TTree*)fDisplacement->Get("eklm_segment");
   }
-  n = tAlignmentSector->GetEntries();
+  TFile *fAlignment = new TFile(alignmentFile);
+  TTree *tAlignmentEKLMModule = (TTree*)fAlignment->Get("eklm_module");
+  TTree *tAlignmentEKLMSegment = (TTree*)fAlignment->Get("eklm_segment");
+  TTree *tAlignmentBKLMModule = (TTree*)fAlignment->Get("bklm_module");
+  TFile *fComparison = new TFile(comparisonFile, "recreate");
+  TTree *tComparisonEKLMModule = new TTree("eklm_module", "");
+  TTree *tComparisonEKLMSegment = new TTree("eklm_segment", "");
+  TTree *tComparisonBKLMModule = new TTree("bklm_module", "");
+  /* Sector. */
+  if (displacementFile != nullptr) {
+    tDisplacementEKLMModule->SetBranchAddress("section", &section);
+    tDisplacementEKLMModule->SetBranchAddress("layer", &layer);
+    tDisplacementEKLMModule->SetBranchAddress("sector", &sector);
+    tDisplacementEKLMModule->SetBranchAddress("param", &param);
+    tDisplacementEKLMModule->SetBranchAddress("value", &value);
+  }
+  tAlignmentEKLMModule->SetBranchAddress("section", &section);
+  tAlignmentEKLMModule->SetBranchAddress("layer", &layer);
+  tAlignmentEKLMModule->SetBranchAddress("sector", &sector);
+  tAlignmentEKLMModule->SetBranchAddress("param", &param);
+  tAlignmentEKLMModule->SetBranchAddress("value", &value);
+  tAlignmentEKLMModule->SetBranchAddress("error", &error);
+  tComparisonEKLMModule->Branch("section", &section, "section/I");
+  tComparisonEKLMModule->Branch("layer", &layer, "layer/I");
+  tComparisonEKLMModule->Branch("sector", &sector, "sector/I");
+  tComparisonEKLMModule->Branch("param", &param, "param/I");
+  tComparisonEKLMModule->Branch("value0", &value0, "value0/F");
+  tComparisonEKLMModule->Branch("value", &value, "value/F");
+  tComparisonEKLMModule->Branch("error", &error, "error/F");
+  if (displacementFile != nullptr) {
+    n = tDisplacementEKLMModule->GetEntries();
+    for (i = 0; i < n; i++) {
+      tDisplacementEKLMModule->GetEntry(i);
+      val0[section - 1][layer - 1][sector - 1][0][0][param - 1] =
+        value;
+    }
+  }
+  n = tAlignmentEKLMModule->GetEntries();
   for (i = 0; i < n; i++) {
-    tAlignmentSector->GetEntry(i);
-    value0 =
-      val0[endcap - 1][layer - 1][sector - 1][0][0][parameterIndex(param)];
-    tComparisonSector->Fill();
+    tAlignmentEKLMModule->GetEntry(i);
+    if (displacementFile != nullptr) {
+      value0 =
+        val0[section - 1][layer - 1][sector - 1][0][0][param - 1];
+    } else {
+      value0 = 0;
+    }
+    tComparisonEKLMModule->Fill();
   }
   /* Segment. */
-  tDisplacementSegment->SetBranchAddress("endcap", &endcap);
-  tDisplacementSegment->SetBranchAddress("layer", &layer);
-  tDisplacementSegment->SetBranchAddress("sector", &sector);
-  tDisplacementSegment->SetBranchAddress("plane", &plane);
-  tDisplacementSegment->SetBranchAddress("segment", &segment);
-  tDisplacementSegment->SetBranchAddress("param", &param);
-  tDisplacementSegment->SetBranchAddress("value", &value);
-  tAlignmentSegment->SetBranchAddress("endcap", &endcap);
-  tAlignmentSegment->SetBranchAddress("layer", &layer);
-  tAlignmentSegment->SetBranchAddress("sector", &sector);
-  tAlignmentSegment->SetBranchAddress("plane", &plane);
-  tAlignmentSegment->SetBranchAddress("segment", &segment);
-  tAlignmentSegment->SetBranchAddress("param", &param);
-  tAlignmentSegment->SetBranchAddress("value", &value);
-  tAlignmentSegment->SetBranchAddress("error", &error);
-  tComparisonSegment->Branch("endcap", &endcap, "endcap/I");
-  tComparisonSegment->Branch("layer", &layer, "layer/I");
-  tComparisonSegment->Branch("sector", &sector, "sector/I");
-  tComparisonSegment->Branch("plane", &plane, "plane/I");
-  tComparisonSegment->Branch("segment", &segment, "segment/I");
-  tComparisonSegment->Branch("param", &param, "param/I");
-  tComparisonSegment->Branch("value0", &value0, "value0/F");
-  tComparisonSegment->Branch("value", &value, "value/F");
-  tComparisonSegment->Branch("error", &error, "error/F");
-  n = tDisplacementSegment->GetEntries();
-  for (i = 0; i < n; i++) {
-    tDisplacementSegment->GetEntry(i);
-    val0[endcap - 1][layer - 1][sector - 1][plane - 1][segment - 1][param - 1] =
-      value;
+  if (displacementFile != nullptr) {
+    tDisplacementEKLMSegment->SetBranchAddress("section", &section);
+    tDisplacementEKLMSegment->SetBranchAddress("layer", &layer);
+    tDisplacementEKLMSegment->SetBranchAddress("sector", &sector);
+    tDisplacementEKLMSegment->SetBranchAddress("plane", &plane);
+    tDisplacementEKLMSegment->SetBranchAddress("segment", &segment);
+    tDisplacementEKLMSegment->SetBranchAddress("param", &param);
+    tDisplacementEKLMSegment->SetBranchAddress("value", &value);
   }
-  n = tAlignmentSegment->GetEntries();
-  for (i = 0; i < n; i++) {
-    tAlignmentSegment->GetEntry(i);
-    value0 = val0[endcap - 1][layer - 1][sector - 1][plane - 1][segment - 1]
-                 [param - 1];
-    tComparisonSegment->Fill();
+  tAlignmentEKLMSegment->SetBranchAddress("section", &section);
+  tAlignmentEKLMSegment->SetBranchAddress("layer", &layer);
+  tAlignmentEKLMSegment->SetBranchAddress("sector", &sector);
+  tAlignmentEKLMSegment->SetBranchAddress("plane", &plane);
+  tAlignmentEKLMSegment->SetBranchAddress("segment", &segment);
+  tAlignmentEKLMSegment->SetBranchAddress("param", &param);
+  tAlignmentEKLMSegment->SetBranchAddress("value", &value);
+  tAlignmentEKLMSegment->SetBranchAddress("error", &error);
+  tComparisonEKLMSegment->Branch("section", &section, "section/I");
+  tComparisonEKLMSegment->Branch("layer", &layer, "layer/I");
+  tComparisonEKLMSegment->Branch("sector", &sector, "sector/I");
+  tComparisonEKLMSegment->Branch("plane", &plane, "plane/I");
+  tComparisonEKLMSegment->Branch("segment", &segment, "segment/I");
+  tComparisonEKLMSegment->Branch("param", &param, "param/I");
+  tComparisonEKLMSegment->Branch("value0", &value0, "value0/F");
+  tComparisonEKLMSegment->Branch("value", &value, "value/F");
+  tComparisonEKLMSegment->Branch("error", &error, "error/F");
+  if (displacementFile != nullptr) {
+    n = tDisplacementEKLMSegment->GetEntries();
+    for (i = 0; i < n; i++) {
+      tDisplacementEKLMSegment->GetEntry(i);
+      val0[section - 1][layer - 1][sector - 1][plane - 1][segment - 1]
+        [param - 1] = value;
+    }
   }
+  n = tAlignmentEKLMSegment->GetEntries();
+  for (i = 0; i < n; i++) {
+    tAlignmentEKLMSegment->GetEntry(i);
+    if (displacementFile != nullptr) {
+      value0 = val0[section - 1][layer - 1][sector - 1][plane - 1][segment - 1]
+                   [param - 1];
+    } else {
+      value0 = 0;
+    }
+    tComparisonEKLMSegment->Fill();
+  }
+  /* BKLM module. */
+  tAlignmentBKLMModule->SetBranchAddress("section", &section);
+  tAlignmentBKLMModule->SetBranchAddress("layer", &layer);
+  tAlignmentBKLMModule->SetBranchAddress("sector", &sector);
+  tAlignmentBKLMModule->SetBranchAddress("param", &param);
+  tAlignmentBKLMModule->SetBranchAddress("value", &value);
+  tAlignmentBKLMModule->SetBranchAddress("error", &error);
+  tComparisonBKLMModule->Branch("section", &section, "section/I");
+  tComparisonBKLMModule->Branch("layer", &layer, "layer/I");
+  tComparisonBKLMModule->Branch("sector", &sector, "sector/I");
+  tComparisonBKLMModule->Branch("param", &param, "param/I");
+  tComparisonBKLMModule->Branch("value0", &value0, "value0/F");
+  tComparisonBKLMModule->Branch("value", &value, "value/F");
+  tComparisonBKLMModule->Branch("error", &error, "error/F");
+  n = tAlignmentBKLMModule->GetEntries();
+  for (i = 0; i < n; i++) {
+    tAlignmentBKLMModule->GetEntry(i);
+    value0 = 0;
+    tComparisonBKLMModule->Fill();
+  }
+  /* Write data. */
   fComparison->cd();
-  tComparisonSector->Write();
-  tComparisonSegment->Write();
-  delete tComparisonSegment;
-  delete tComparisonSector;
+  tComparisonEKLMModule->Write();
+  tComparisonEKLMSegment->Write();
+  tComparisonBKLMModule->Write();
+  delete tComparisonEKLMSegment;
+  delete tComparisonEKLMModule;
+  delete tComparisonBKLMModule;
   delete fComparison;
-  delete tAlignmentSegment;
-  delete tAlignmentSector;
+  delete tAlignmentEKLMSegment;
+  delete tAlignmentEKLMModule;
+  delete tAlignmentBKLMModule;
   delete fAlignment;
-  delete tDisplacementSegment;
-  delete tDisplacementSector;
-  delete fDisplacement;
+  if (displacementFile != nullptr) {
+    delete tDisplacementEKLMSegment;
+    delete tDisplacementEKLMModule;
+    delete fDisplacement;
+  }
 }

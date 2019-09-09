@@ -49,12 +49,12 @@ namespace Belle2 {
     void generateZeroDisplacement();
 
     /**
-     * Generation of fixed sector displacements.
+     * Generation of fixed module displacements.
      * @param[in] deltaU     Shift in U.
      * @param[in] deltaV     Shift in V.
      * @param[in] deltaGamma Rotation in Gamma.
      */
-    void generateFixedSectorDisplacement(double deltaU, double deltaV,
+    void generateFixedModuleDisplacement(double deltaU, double deltaV,
                                          double deltaGamma);
 
     /**
@@ -66,29 +66,29 @@ namespace Belle2 {
      * @param[out] segmentAlignment
      * Segment displacements.
      *
-     * @param[in] displaceSector
-     * Whether sectors should be displaced.
+     * @param[in] displaceModule
+     * Whether modules should be displaced.
      *
      * @param[in] displaceSegment
      * Whether segments should be displaced.
      *
-     * @param[in] sectorSameDisplacement
-     * If the displacement should be the same for all sectors.
+     * @param[in] moduleSameDisplacement
+     * If the displacement should be the same for all modules.
      *
-     * @param[in] sectorZeroDeltaU
-     * Fix sector deltaU at 0.
+     * @param[in] moduleZeroDeltaU
+     * Fix module deltaU at 0.
      *
-     * @param[in] sectorZeroDeltaV
-     * Fix sector deltaV at 0.
+     * @param[in] moduleZeroDeltaV
+     * Fix module deltaV at 0.
      *
-     * @param[in] sectorZeroDeltaGamma
-     * Fix sector deltaGamma at 0.
+     * @param[in] moduleZeroDeltaGamma
+     * Fix module deltaGamma at 0.
      */
     void generateRandomDisplacement(
       EKLMAlignment* alignment, EKLMSegmentAlignment* segmentAlignment,
-      bool displaceSector, bool displaceSegment,
-      bool sectorSameDisplacement = false, bool sectorZeroDeltaU = false,
-      bool sectorZeroDeltaV = false, bool sectorZeroDeltaGamma = false);
+      bool displaceModule, bool displaceSegment,
+      bool moduleSameDisplacement = false, bool moduleZeroDeltaU = false,
+      bool moduleZeroDeltaV = false, bool moduleZeroDeltaGamma = false);
 
     /**
      * Read displacement from ROOT file.
@@ -101,11 +101,11 @@ namespace Belle2 {
                                       const char* inputFile);
 
     /**
-     * Generate random sector displacements and check if they are correct
+     * Generate random module displacements and check if they are correct
      * (no overlaps).
      * @oaram[in] f Output file.
      */
-    void studySectorAlignmentLimits(TFile* f);
+    void studyModuleAlignmentLimits(TFile* f);
 
     /**
      * Save displacements to a ROOT file.

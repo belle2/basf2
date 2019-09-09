@@ -613,15 +613,15 @@ namespace Belle2 {
       if (!plist) { // create the list only if the klmClustersToParticles function has not already created it
         plist.create();
         plist->initialize(pdgCode, listName);
-      }
 
-      // create anti-particle list if necessary
-      if (!isSelfConjugatedParticle) {
-        StoreObjPtr<ParticleList> antiPlist(antiListName);
-        antiPlist.create();
-        antiPlist->initialize(-1 * pdgCode, antiListName);
+        // create anti-particle list if necessary
+        if (!isSelfConjugatedParticle) {
+          StoreObjPtr<ParticleList> antiPlist(antiListName);
+          antiPlist.create();
+          antiPlist->initialize(-1 * pdgCode, antiListName);
 
-        antiPlist->bindAntiParticleList(*(plist));
+          antiPlist->bindAntiParticleList(*(plist));
+        }
       }
     }
 
@@ -735,14 +735,14 @@ namespace Belle2 {
       if (!plist) { // create the list only if the eclClustersToParticle has not already created it
         plist.create();
         plist->initialize(pdgCode, listName);
-      }
 
-      if (!isSelfConjugatedParticle) {
-        StoreObjPtr<ParticleList> antiPlist(antiListName);
-        antiPlist.create();
-        antiPlist->initialize(-1 * pdgCode, antiListName);
+        if (!isSelfConjugatedParticle) {
+          StoreObjPtr<ParticleList> antiPlist(antiListName);
+          antiPlist.create();
+          antiPlist->initialize(-1 * pdgCode, antiListName);
 
-        antiPlist->bindAntiParticleList(*(plist));
+          antiPlist->bindAntiParticleList(*(plist));
+        }
       }
     }
 

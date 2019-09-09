@@ -109,7 +109,7 @@ phokhara.param('MinEnergyGamma', 0.25)
 # geometry parameter database
 gearbox = basf2.register_module('Gearbox')
 
-# Basf2.Register the Progress module and the Python histogram module
+# Register the Progress module and the Python histogram module
 progress = basf2.register_module('Progress')
 
 # output

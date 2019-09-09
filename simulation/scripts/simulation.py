@@ -8,6 +8,7 @@ from pxd import add_pxd_simulation
 from svd import add_svd_simulation
 from svd import add_svd_reconstruction
 from tracking import add_tracking_for_PXDDataReduction_simulation
+from iov_conditional import make_conditional_at
 
 
 def check_simulation(path):

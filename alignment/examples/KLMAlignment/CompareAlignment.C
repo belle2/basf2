@@ -8,7 +8,7 @@ void CompareAlignment(const char *displacementFile, const char *alignmentFile,
   int i, n;
   int section, layer, sector, plane, segment, param;
   float value0, value, error;
-  float val0[2][14][4][2][5][2];
+  float val0[2][14][4][2][5][6];
   TFile *fDisplacement;
   TTree *tDisplacementEKLMModule, *tDisplacementEKLMSegment;
   if (displacementFile != nullptr) {

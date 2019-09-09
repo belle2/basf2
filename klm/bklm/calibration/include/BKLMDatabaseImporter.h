@@ -106,9 +106,6 @@ namespace Belle2 {
     /** High run. */
     int m_RunHigh;
 
-    /** Class version. */
-    ClassDef(BKLMDatabaseImporter, 2);
-
   };
 
 }

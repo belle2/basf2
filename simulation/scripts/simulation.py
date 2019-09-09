@@ -108,7 +108,7 @@ def add_simulation(
         components=None,
         bkgfiles=None,
         bkgOverlay=True,
-        usePXDDataReduction=False,
+        usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
         generate_2nd_cdc_hits=False,
         simulateT0jitter=False,
@@ -184,7 +184,15 @@ def add_simulation(
     if components is None or 'PXD' in components:
         if usePXDDataReduction:
             pxd_digits_name = 'pxd_unfiltered_digits'
-        add_pxd_simulation(path, digitsName=pxd_digits_name)
+        # use 'make_conditional_at' to force deactivation of ROI finding for early phase 3 (experiment 1003)
+        path_earlyPhase3_pxdDigi = create_path()
+        path_standard_pxdDigi = create_path()
+
+        add_pxd_simulation(path_earlyPhase3_pxdDigi, digitsName=None)
+        add_pxd_simulation(path_standard_pxdDigi, digitsName=pxd_digits_name)
+
+        make_conditional_at(path, iov_list=[(1003, 0, 1003, -1)],
+                            path_when_in_iov=path_earlyPhase3_pxdDigi, path_when_not_in_iov=path_standard_pxdDigi)
 
     # TOP digitization
     if components is None or 'TOP' in components:
@@ -208,18 +216,32 @@ def add_simulation(
         klm_digitizer = register_module('KLMDigitizer')
         path.add_module(klm_digitizer)
 
+    # use 'make_conditional_at' to force deactivation of ROI finding for early phase 3 (experiment 1003)
+    path_earlyPhase3 = create_path()
+    path_standard = create_path()
+
     # background overlay executor - after all digitizers
     if bkgfiles is not None and bkgOverlay:
-        path.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)
+        path_earlyPhase3.add_module('BGOverlayExecutor', PXDDigitsName=None)
+        path_standard.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)
+
         if components is None or 'PXD' in components:
-            path.add_module("PXDDigitSorter", digits=pxd_digits_name)
+            path_earlyPhase3.add_module("PXDDigitSorter", digits=None)
+            path_standard.add_module("PXDDigitSorter", digits=pxd_digits_name)
+
         # sort SVDShaperDigits before PXD data reduction
         if components is None or 'SVD' in components:
-            path.add_module("SVDShaperDigitSorter")
+            path_earlyPhase3.add_module("SVDShaperDigitSorter")
+            path_standard.add_module("SVDShaperDigitSorter")
 
     # PXD data reduction - after background overlay executor
     if (components is None or 'PXD' in components) and usePXDDataReduction:
-        add_PXDDataReduction(path, components, pxd_digits_name, doCleanup=cleanupPXDDataReduction)
+        # don't add this module for early phase 3
+        add_PXDDataReduction(path_standard, components, pxd_digits_name, doCleanup=cleanupPXDDataReduction)
+
+    # pick the valid path
+    make_conditional_at(path, iov_list=[(1003, 0, 1003, -1)],
+                        path_when_in_iov=path_earlyPhase3, path_when_not_in_iov=path_standard)
 
     # statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Simulation')

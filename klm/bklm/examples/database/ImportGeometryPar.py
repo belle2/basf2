@@ -10,6 +10,8 @@ from ROOT.Belle2 import BKLMDatabaseImporter
 basf2.set_log_level(basf2.LogLevel.INFO)
 
 # The Gearbox is needed for BKLMGeometryPar
+eventinfosetter = basf2.register_module('EventInfoSetter')
+eventinfosetter.initialize()
 gearbox = basf2.register_module('Gearbox')
 gearbox.initialize()
 

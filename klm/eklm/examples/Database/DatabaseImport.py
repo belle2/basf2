@@ -9,7 +9,11 @@ from ROOT.Belle2 import EKLMDatabaseImporter
 
 basf2.set_log_level(basf2.LogLevel.INFO)
 
+eventinfosetter = basf2.register_module('EventInfoSetter')
+eventinfosetter.initialize()
+gearbox = basf2.register_module('Gearbox')
+gearbox.initialize()
+
 dbImporter = EKLMDatabaseImporter()
-dbImporter.importDigitizationParameters()
-dbImporter.importReconstructionParameters()
+# dbImporter.importReconstructionParameters()
 dbImporter.importSimulationParameters()

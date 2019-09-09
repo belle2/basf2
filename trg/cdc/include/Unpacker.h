@@ -411,10 +411,11 @@ namespace Belle2 {
       //    break;
       //  }
       //}
-      if (!hit) {
-        hit = tsHits->appendNew(iSL, iTS, ts[3], ts[2], ts[1], 0, foundTime, iTracker);
-        B2DEBUG(15, "make hit at SL " << iSL << " ID " << iTS << " clock " << foundTime << " iTracker " << iTracker);
-      }
+// !hit is always true.
+//      if (!hit) {
+      hit = tsHits->appendNew(iSL, iTS, ts[3], ts[2], ts[1], 0, foundTime, iTracker);
+      B2DEBUG(15, "make hit at SL " << iSL << " ID " << iTS << " clock " << foundTime << " iTracker " << iTracker);
+//      }
       return hit;
     }
 

@@ -69,16 +69,9 @@ class VXDHierarchyConstraints(Constraints):
         return []
 
 
-def cdc_layer_label(layer, param):
-    wire = 511
-    wireid = Belle2.WireID(layer, wire).getEWire()
-    label = Belle2.GlobalLabel()
-    label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, param)
-    return label.label()
-
-
 class CDCLayerConstraints(Constraints):
-    # Code from Claus Kleinwort
+    """Code from Claus Kleinwort
+    """
     cdc = [['A1', 8, 160, 16.80, 23.80, 0., -35.9, 67.9],
            ['U2', 6, 160, 25.70, 34.80, 0.068, -51.4, 98.6],
            ['A3', 6, 192, 36.52, 45.57, 0., -57.5, 132.9],
@@ -102,6 +95,13 @@ class CDCLayerConstraints(Constraints):
 
     def generate(self):
         print("Generating constraints for CDC layers...")
+
+        def cdc_layer_label(layer, param):
+            wire = 511
+            wireid = Belle2.WireID(layer, wire).getEWire()
+            label = Belle2.GlobalLabel()
+            label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, param)
+            return label.label()
 
         def cmp(a, b):
             return (a > b) - (a < b)
@@ -246,6 +246,10 @@ class CDCWireConstraints(Constraints):
     def __init__(self, filename='cdc-wire-constraints.txt'):
         super(CDCWireConstraints, self).__init__(filename)
         pass
+
+    def configure_collector(self, collector):
+        B2WARNING("Adding CDC wire constraints -> enabling wire-by-wire alignment derivatives")
+        collector.param('enableWireByWireAlignment', True)
 
     def get_label(self, layer, wire, parameter):
         wireid = Belle2.WireID(layer, wire).getEWire()

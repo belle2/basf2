@@ -22,6 +22,7 @@ from simulation import add_simulation
 from L1trigger import add_tsim
 
 import alignment.constraints as hierarchy
+import alignment.parameters
 
 consts = [
   hierarchy.VXDHierarchyConstraints(type=2, svd=False),
@@ -58,10 +59,9 @@ for par in params:
 # Configure the the time dependence for calibration
 timedep = [(pxd_labels, [(0, run, 0) for run in runList] + [(20, 5, 0), (40, 5, 0)] + [(20, 7, 0)])]
 
-timedep += [([hierarchy.cdc_layer_label(layer, ipar) for ipar in [1, 2, 6, 11, 12, 16]
-              for layer in range(0, 56)], [(0, run, 0) for run in runList])]
+# timedep += [(alignment.parameters.cdc_layers(), [(0, 6, 0)])]
 
-db_components = ['VXDAlignment', 'CDCAlignment']
+db_components = ['VXDAlignment']
 components = ['PXD', 'SVD', 'CDC']
 
 
@@ -88,13 +88,15 @@ def PXDHalfShellsAlignment(files, tags):
                                 granularity='all',  # time dependence needs granularity=all
                                 useGblTree=False,
                                 absFilePaths=True,
-                                timedepConfig=timedep,
-                                enableSVDHierarchy=False
+                                timedepConfig=timedep
                                 )
 
     algorithm = MillepedeAlgorithm()
     algorithm.invertSign(True)
-    algorithm.ignoreUndeterminedParams(False)
+    # algorithm.ignoreUndeterminedParams(False)
+    # Must be true because ww probably use some version of run dependent MC - layer 54 of CDC seems
+    # to bedisabled -> this gives 12 undetermined params (6 per each time interval)
+    algorithm.ignoreUndeterminedParams(True)
 
     std_components = ROOT.vector('string')()
     for component in db_components:
@@ -136,15 +138,15 @@ def PXDHalfShellsAlignment(files, tags):
     # Halfshells
     # fix_vxd_id(Belle2.VxdID(1, 0, 0, 1)) # ying
     # fix_vxd_id(Belle2.VxdID(1, 0, 0, 2)) # yang
-    fix_vxd_id(Belle2.VxdID(3, 0, 0, 1))  # pat
-    fix_vxd_id(Belle2.VxdID(3, 0, 0, 2))  # mat
+    # fix_vxd_id(Belle2.VxdID(3, 0, 0, 1))  # pat
+    # fix_vxd_id(Belle2.VxdID(3, 0, 0, 2))  # mat
 
     ladders = [8, 12, 7, 10, 12, 16]
     sensors = [2, 2, 2, 3, 4, 5]
 
     for layer in range(1, 7):
         for ladder in range(1, ladders[layer - 1] + 1):
-            fix_vxd_id(Belle2.VxdID(layer, ladder, 0), params=[1, 2, 3, 4, 5, 6])
+            fix_vxd_id(Belle2.VxdID(layer, ladder, 0, 0), params=[1, 2, 3, 4, 5, 6])
             for sensor in range(1, sensors[layer - 1] + 1):
                 # sensors
                 fix_vxd_id(
@@ -243,7 +245,7 @@ if __name__ == "__main__":
 
     tags = conditions.default_globaltags
     mp2_beamspot = PXDHalfShellsAlignment(input_files, tags)
-    mp2_beamspot.max_iterations = 1
+    mp2_beamspot.max_iterations = 5
 
     print("Starting CAF...")
     cal_fw = CAF()

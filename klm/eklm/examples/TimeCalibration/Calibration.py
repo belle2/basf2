@@ -3,15 +3,14 @@
 
 # EKLM time calibration.
 
-from basf2 import *
-from reconstruction import *
-from ROOT import Belle2
 import sys
+import basf2
+from ROOT import Belle2
 
 # Set the global log level
-set_log_level(LogLevel.INFO)
+basf2.set_log_level(basf2.LogLevel.INFO)
 
-gearbox = register_module('Gearbox')
+gearbox = basf2.register_module('Gearbox')
 gearbox.initialize()
 
 algo = Belle2.EKLMTimeCalibrationAlgorithm()

@@ -39,11 +39,6 @@ namespace Belle2 {
     void setIOV(int experimentLow, int runLow, int experimentHigh, int runHigh);
 
     /**
-     * Import digitization parameters.
-     */
-    void importDigitizationParameters();
-
-    /**
      * Import reconstruction parameters.
      */
     void importReconstructionParameters();

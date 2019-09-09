@@ -80,7 +80,7 @@ void BKLMReconstructorModule::beginRun()
 {
   if (m_loadTimingFromDB) {
     if (!m_timing.isValid())
-      B2FATAL("BKLM time window are not available.");
+      B2FATAL("BKLM time window data are not available.");
     m_DtMax = m_timing->getCoincidenceWindow();
     m_PromptTime = m_timing->getPromptTime();
     m_PromptWindow = m_timing->getPromptWindow();

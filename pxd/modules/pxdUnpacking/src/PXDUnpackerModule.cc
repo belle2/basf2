@@ -1049,6 +1049,9 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
       m_errorMaskDHC = m_errorMask; // forget about anything before this frame
       daqpktstat.newDHC(currentDHCID, m_errorMask);
+      daqpktstat.dhc_back().setGatedFlag(dhc.data_dhc_start_frame->get_gated_flag());
+      daqpktstat.dhc_back().setGatedHER(dhc.data_dhc_start_frame->get_gated_isher());
+
       break;
     };
     case EDHCFrameHeaderDataType::c_DHE_START: {

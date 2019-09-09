@@ -21,18 +21,10 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
-#include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
-#include <framework/database/DBArray.h>
+#include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportArray.h>
 #include <framework/database/DBImportObjPtr.h>
-#include <framework/database/DBObjPtr.h>
-
-#include <string>
-#include <vector>
-#include <map>
-#include <fstream>
-#include <iostream>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -40,10 +32,23 @@
 using namespace std;
 using namespace Belle2;
 
-BKLMDatabaseImporter::BKLMDatabaseImporter()
+BKLMDatabaseImporter::BKLMDatabaseImporter() :
+  m_ExperimentLow(0),
+  m_RunLow(0),
+  m_ExperimentHigh(-1),
+  m_RunHigh(-1)
 {}
 
-void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
+void BKLMDatabaseImporter::setIOV(int experimentLow, int runLow,
+                                  int experimentHigh, int runHigh)
+{
+  m_ExperimentLow = experimentLow;
+  m_RunLow = runLow;
+  m_ExperimentHigh = experimentHigh;
+  m_RunHigh = runHigh;
+}
+
+void BKLMDatabaseImporter::loadDefaultElectronicMapping()
 {
   int copperId = 0;
   int slotId = 0;
@@ -146,14 +151,13 @@ void BKLMDatabaseImporter::setElectronicMappingLane(
   }
 }
 
-void BKLMDatabaseImporter::importBklmElectronicMapping()
+void BKLMDatabaseImporter::importElectronicMapping()
 {
-  IntervalOfValidity iov(0, 0, -1, -1);
-  DBImportObjPtr<BKLMElectronicsMap> m_ElectronicsMap;
-  m_ElectronicsMap.construct();
+  DBImportObjPtr<BKLMElectronicsMap> electronicsMap;
+  electronicsMap.construct();
   unsigned int n = m_ElectronicsChannels.size();
   for (unsigned int i = 0; i < n; ++i) {
-    m_ElectronicsMap->addChannel(
+    electronicsMap->addChannel(
       m_ElectronicsChannels[i].first,
       m_ElectronicsChannels[i].second.getCopper(),
       m_ElectronicsChannels[i].second.getSlot(),
@@ -161,57 +165,44 @@ void BKLMDatabaseImporter::importBklmElectronicMapping()
       m_ElectronicsChannels[i].second.getAxis(),
       m_ElectronicsChannels[i].second.getChannel());
   }
-  m_ElectronicsMap.import(iov);
-  return;
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  electronicsMap.import(iov);
 }
 
-void BKLMDatabaseImporter::importBklmGeometryPar()
+void BKLMDatabaseImporter::importGeometryPar()
 {
-  GearDir content("/Detector/DetectorComponent[@name=\"BKLM\"]/Content");
-
-  // define the data
-  BKLMGeometryPar bklmGeometryPar;
-
-  // Get Gearbox parameters for BKLM
-  bklmGeometryPar.setVersion(0);
-  bklmGeometryPar.read(content);
-
-  // define IOV and store data to the DB
-  IntervalOfValidity iov(0, 0, -1, -1);
+  GearDir content(Gearbox::getInstance().getDetectorComponent("KLM"));
+  BKLMGeometryPar bklmGeometryPar(content);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
   Database::Instance().storeData("BKLMGeometryPar", &bklmGeometryPar, iov);
 
 }
 
-void BKLMDatabaseImporter::importBklmSimulationPar(int expStart, int runStart, int expStop, int runStop)
+void BKLMDatabaseImporter::importSimulationPar()
 {
-  BKLMSimulationPar bklmSimulationPar;
   GearDir content(Gearbox::getInstance().getDetectorComponent("KLM"), "BKLM/SimulationParameters");
-
-  // Get Gearbox simulation parameters for BKLM
-  bklmSimulationPar.read(content);
-
-  // Define the IOV and store data to the DB
-  IntervalOfValidity iov(expStart, runStart, expStop, runStop);
+  BKLMSimulationPar bklmSimulationPar(content);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
   Database::Instance().storeData("BKLMSimulationPar", &bklmSimulationPar, iov);
 }
 
-void BKLMDatabaseImporter::importBklmADCThreshold(BKLMADCThreshold* threshold)
+void BKLMDatabaseImporter::importADCThreshold(BKLMADCThreshold* inputThreshold)
 {
-  DBImportObjPtr<BKLMADCThreshold> adcParam;
-  adcParam.construct(*threshold);
-  IntervalOfValidity iov(0, 0, -1, -1);
-  adcParam.import(iov);
+  DBImportObjPtr<BKLMADCThreshold> adcThreshold;
+  adcThreshold.construct(*inputThreshold);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  adcThreshold.import(iov);
 }
 
-void BKLMDatabaseImporter::importBklmTimeWindow()
+void BKLMDatabaseImporter::importTimeWindow(BKLMTimeWindow* inputWindow)
 {
-
-  DBImportObjPtr<BKLMTimeWindow> m_timing;
-  m_timing.construct();
-  m_timing->setCoincidenceWindow(50);
-  m_timing->setPromptTime(0);
-  m_timing->setPromptWindow(2000);
-
-  IntervalOfValidity iov(0, 0, -1, -1);
-  m_timing.import(iov);
+  DBImportObjPtr<BKLMTimeWindow> timeWindow;
+  timeWindow.construct(*inputWindow);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  timeWindow.import(iov);
 }

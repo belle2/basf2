@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Generates random EKLM displacement data.
+# Generates EKLM displacement data with fixed module displacement.
 
 import basf2
 from ROOT.Belle2 import KLMDatabaseImporter, BKLMAlignment, EKLMAlignment, \

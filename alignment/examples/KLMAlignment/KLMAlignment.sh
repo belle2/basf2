@@ -7,15 +7,14 @@ mkdir displacement
 cd displacement
 basf2 ${BELLE2_LOCAL_DIR}/klm/examples/displacement/RandomDisplacement.py
 cd ..
+cp -R displacement/localdb .
 
 # Generation of 100000 e+ e- -> mu+ mu- events.
 basf2 -n 100000 ${BELLE2_LOCAL_DIR}/klm/eklm/examples/TimeCalibration/Generation.py eetomumu_gen.root
 
 # Simulation and reconstruction.
 # If an iteration is necessary, restart from here.
-cp -R displacement/localdb .
 basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/KLMAlignment/Simulation.py eetomumu_gen.root eetomumu_rec.root
-rm -rf localdb
 
 # Millipede collection.
 basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/KLMAlignment/Collection.py eetomumu_rec.root eetomumu_col.root

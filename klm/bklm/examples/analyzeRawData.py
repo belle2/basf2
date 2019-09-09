@@ -17,16 +17,16 @@
 
 import basf2
 
-# Set the input file names
-inputRoot = ['/ghi/fs01/belle2/bdata/Data/Raw/e0003/r05184/sub00/physics.0003.05184.HLT2.f00000.root']
-inputSRoot = ['/home/belle2/giacomo/ghi/BKLM/190207-ut3trg-afterBB0oper4.sroot']
+# Add a Global Tag
+basf2.conditions.override_globaltags()
+basf2.conditions.append_globaltag('data_reprocessing_prompt_bucket7')
+basf2.conditions.append_globaltag('data_reprocessing_prompt_rel4_patch')
 
 # Create the main path
 main = basf2.create_path()
 
 # Add the input files and the progress bar
-# main.add_module('RootInput', inputFileNames=inputRoot)
-main.add_module('SeqRootInput', inputFileNames=inputSRoot)
+main.add_module('SeqRootInput')
 main.add_module('Progress')
 
 # Add the unpacker
@@ -34,8 +34,6 @@ main.add_module('KLMUnpacker')
 
 # Add the digit analyzer
 # Note that it must go after the unpacker
-# since it requires BKLMDigit and other dataobjects
-# created by the KLMUnpacker
 main.add_module('BKLMDigitAnalyzer',
                 outputRootName='bklmHitmap')  # Note that .root is not needed!
 

@@ -13,7 +13,9 @@
 #include <calibration/CalibrationCollectorModule.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRecBunch.h>
 
 namespace Belle2 {
 
@@ -43,9 +45,11 @@ namespace Belle2 {
     // steering parameters
     double m_timeOffset; /**< time offset */
     int m_nx; /**< number of histogram bins */
+    bool m_requireRecBunch; /**< if true, require reconstructed bunch */
 
     // collections
     StoreArray<TOPDigit> m_topDigits; /**< collection of TOP digits */
+    StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
 
   };
 

@@ -40,6 +40,9 @@ namespace Belle2 {
     // module parameters
     addParam("timeOffset", m_timeOffset, "time offset", 0.0);
     addParam("nx", m_nx, "number of histogram bins (bin size ~8 ns)", 50);
+    addParam("requireRecBunch", m_requireRecBunch,
+             "if True, require reconstructed bunch (to be used on cdst files only!)",
+             false);
 
   }
 
@@ -48,6 +51,11 @@ namespace Belle2 {
   {
 
     m_topDigits.isRequired();
+    if (m_requireRecBunch) {
+      m_recBunch.isRequired();
+    } else {
+      m_recBunch.isOptional();
+    }
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     double timeStep = geo->getNominalTDC().getSyncTimeBase() / 6;
@@ -80,6 +88,11 @@ namespace Belle2 {
 
   void TOPAsicShiftsBS13dCollectorModule::collect()
   {
+
+    if (m_requireRecBunch) {
+      if (not m_recBunch.isValid()) return;
+      if (not m_recBunch->isReconstructed()) return;
+    }
 
     auto time_vs_BS = getObjectPtr<TH2F>("time_vs_BS");
     auto timeReference = getObjectPtr<TH1F>("time_reference");

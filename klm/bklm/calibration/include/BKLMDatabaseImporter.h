@@ -48,7 +48,7 @@ namespace Belle2 {
      * Set non-default lane.
      * @param[in] section Section.
      * @param[in] sector  Sector.
-     * @param[in] leyar   Layer.
+     * @param[in] layer   Layer.
      * @param[in] lane    Lane.
      */
     void setElectronicMappingLane(

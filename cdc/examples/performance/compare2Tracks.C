@@ -780,11 +780,11 @@ void compare2Tracks()
 
   TF1* fpos = new TF1("fpos", "sqrt([0]*[0]*x*x+[1]*[1])", 0, 10);
   fpos->SetParameters(0.2, 0.2);
-  fpos->SetLineColor(kBlack);
+  fpos->SetLineColor(kRed);
   fpos->SetLineWidth(1);
   TF1* fneg = new TF1("fneg", "sqrt([0]*[0]*x*x+[1]*[1])", 0, 10);
   fneg->SetParameters(0.2, 0.2);
-  fneg->SetLineColor(kBlack);
+  fneg->SetLineColor(kBlue);
   fneg->SetLineWidth(1);
   gStyle->SetOptFit(0000);
   gStyle->SetOptStat(0000);
@@ -812,12 +812,29 @@ void compare2Tracks()
 
     hdPtPt_pos_m->SetMarkerColor(kRed);
     hdPtPt_neg_m->SetMarkerColor(kBlue);
-    TLegend* lg = new TLegend(0.2, 0.7, 0.45, 0.85);
-    lg->AddEntry(hdPtPt_pos_m, "Pos. charge");
-    lg->AddEntry(hdPtPt_neg_m, "Neg. charge");
+    //    TLegend* lg = new TLegend(0.2, 0.7, 0.45, 0.85);
+    //    lg->AddEntry(hdPtPt_pos_m, "Pos. charge");
+    //    lg->AddEntry(hdPtPt_neg_m, "Neg. charge");
     hdPtPt_pos_m->Draw();
     hdPtPt_neg_m->Draw("same");
-    lg->Draw();
+    //    lg->Draw();
+
+    int scale =1000;
+    TF1* fp = new TF1("fp","pol1",0,10); fp->SetLineColor(kRed);
+    TF1* fn = new TF1("fn","pol1",0,10) ;fn->SetLineColor(kBlue);
+    hdPtPt_pos_m->Fit("fp","Q");
+    hdPtPt_neg_m->Fit("fn","Q");
+    lt.SetTextColor(kRed);
+    lt.DrawLatex(0.5, 0.0042, Form("(+) #DeltaPt/Pt = [(%3.2f#pm%3.2f) + (%3.2f#pm%3.2f)Pt ]#times10^{-3}",
+				   fp->GetParameter(0)*scale, fp->GetParError(0)*scale,
+				   fp->GetParameter(1)*scale, fp->GetParError(1)*scale));
+
+    lt.SetTextColor(kBlue);
+    lt.DrawLatex(0.5, -0.0046, Form("(-) #DeltaPt/Pt = [(%3.2f#pm%3.2f) + (%3.2f#pm%3.2f)Pt ]#times10^{-3}",
+				    fn->GetParameter(0)*scale, fn->GetParError(0)*scale,
+				    fn->GetParameter(1)*scale, fn->GetParError(1)*scale));
+
+
 
     //      pad2->cd(); pad2->SetGrid(0,0);
     c3->cd(2);

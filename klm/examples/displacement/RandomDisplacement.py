@@ -3,8 +3,6 @@
 
 # Generates random EKLM displacement data.
 
-import os
-import random
 import basf2
 from ROOT.Belle2 import KLMDatabaseImporter, BKLMAlignment, EKLMAlignment, \
                         EKLMSegmentAlignment, KLMAlignmentData, \

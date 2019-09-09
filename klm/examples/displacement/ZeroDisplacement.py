@@ -1,34 +1,52 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Generates default EKLM displacement data (zero displacements).
+# Generates random EKLM displacement data.
 
-import os
-import random
-from basf2 import *
-
-# Set the log level to show only error and fatal messages
-set_log_level(LogLevel.INFO)
-
-# EventInfoSetter - generate event meta data
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1])
-
-# XML reader
-xmldata = register_module('Gearbox')
-
-# EKLM displacement generator
-eklmalignment = register_module('EKLMDisplacementGenerator')
-# Uncomment to generate alignment data instead of displacement data.
-# eklmalignment.param('PayloadName', 'EKLMAlignment')
+import basf2
+from ROOT.Belle2 import KLMDatabaseImporter, BKLMAlignment, EKLMAlignment, \
+                        EKLMSegmentAlignment, KLMAlignmentData, \
+                        KLMElementNumbers, KLMChannelIndex, \
+                        KLMDisplacementGenerator
 
 # Create main path
-main = create_path()
+main = basf2.create_path()
+basf2.set_log_level(basf2.LogLevel.INFO)
 
-# Add modules to main path
-main.add_module(eventinfosetter)
-main.add_module(xmldata)
-main.add_module(eklmalignment)
+# EventInfoSetter
+main.add_module('EventInfoSetter')
 
-# Run
-process(main)
+# Gearbox
+main.add_module('Gearbox')
+
+# Process the main path
+basf2.process(main)
+
+dbImporter = KLMDatabaseImporter()
+
+bklmAlignment = BKLMAlignment()
+eklmAlignment = EKLMAlignment()
+eklmSegmentAlignment = EKLMSegmentAlignment()
+
+# Random displacement for EKLM.
+displacementGenerator = KLMDisplacementGenerator()
+displacementGenerator.fillZeroDisplacements(
+    eklmAlignment, eklmSegmentAlignment)
+displacementGenerator.saveDisplacement(
+    eklmAlignment, eklmSegmentAlignment, 'EKLMDisplacement.root')
+
+# Zero displacement for BKLM.
+alignmentData = KLMAlignmentData(0, 0, 0, 0, 0, 0)
+index = KLMChannelIndex(KLMChannelIndex.c_IndexLevelLayer)
+index2 = KLMChannelIndex(KLMChannelIndex.c_IndexLevelLayer)
+index = index2.beginBKLM()
+
+while (index != index2.endBKLM()):
+    module = index.getKLMModuleNumber()
+    bklmAlignment.setModuleAlignment(module, alignmentData)
+    index.increment()
+
+# Import the payloads.
+dbImporter.setIOV(0, 0, -1, -1)
+dbImporter.importAlignment(
+    bklmAlignment, eklmAlignment, eklmSegmentAlignment, True)

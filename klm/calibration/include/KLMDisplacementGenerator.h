@@ -44,11 +44,6 @@ namespace Belle2 {
                                EKLMSegmentAlignment* segmentAlignment);
 
     /**
-     * Generation of zero displacements.
-     */
-    void generateZeroDisplacement();
-
-    /**
      * Generation of fixed module displacements.
      * @param[in] deltaU     Shift in U.
      * @param[in] deltaV     Shift in V.

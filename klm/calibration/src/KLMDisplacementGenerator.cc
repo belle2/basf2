@@ -58,14 +58,6 @@ void KLMDisplacementGenerator::fillZeroDisplacements(
   }
 }
 
-void KLMDisplacementGenerator::generateZeroDisplacement()
-{
-  IntervalOfValidity iov(0, 0, -1, -1);
-  EKLMAlignment alignment;
-  EKLMSegmentAlignment segmentAlignment;
-  fillZeroDisplacements(&alignment, &segmentAlignment);
-}
-
 void KLMDisplacementGenerator::generateFixedModuleDisplacement(
   double deltaU, double deltaV, double deltaGamma)
 {

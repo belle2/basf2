@@ -103,18 +103,6 @@ namespace Belle2 {
     void studyModuleAlignmentLimits(TFile* f);
 
     /**
-     * Save displacements to a ROOT file.
-     * @param[in] alignment        Displacements.
-     * @param[in] segmentAlignment Segment displacements.
-     * @param[in] outputFile       Output file.
-     */
-    void saveDisplacement(EKLMAlignment* alignment,
-                          EKLMSegmentAlignment* segmentAlignment,
-                          const char* outputFile);
-
-  private:
-
-    /**
      * Generate random segment displacements and check if they are correct
      * (no overlaps).
      * @oaram[in] f Output file.
@@ -127,6 +115,18 @@ namespace Belle2 {
      * @param[in] outputFile Output file.
      */
     void studyAlignmentLimits(const char* outputFile);
+
+    /**
+     * Save displacements to a ROOT file.
+     * @param[in] alignment        Displacements.
+     * @param[in] segmentAlignment Segment displacements.
+     * @param[in] outputFile       Output file.
+     */
+    void saveDisplacement(EKLMAlignment* alignment,
+                          EKLMSegmentAlignment* segmentAlignment,
+                          const char* outputFile);
+
+  private:
 
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;

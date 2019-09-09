@@ -6,8 +6,7 @@
 import basf2
 from ROOT.Belle2 import KLMDatabaseImporter, BKLMAlignment, EKLMAlignment, \
                         EKLMSegmentAlignment, KLMAlignmentData, \
-                        KLMElementNumbers, KLMChannelIndex, \
-                        KLMDisplacementGenerator
+                        KLMChannelIndex, KLMDisplacementGenerator
 
 # Create main path
 main = basf2.create_path()

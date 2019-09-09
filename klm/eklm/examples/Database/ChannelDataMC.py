@@ -7,7 +7,7 @@ import basf2
 import ROOT
 from ROOT.Belle2 import EKLMDatabaseImporter, EKLMChannelData
 
-basf2.set_log_level(basf22.LogLevel.INFO)
+basf2.set_log_level(basf2.LogLevel.INFO)
 
 # Create default data
 channel_data = EKLMChannelData()

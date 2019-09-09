@@ -37,7 +37,6 @@ void BKLMGeometryPar::read(const GearDir& content)
   char name[80] = "";
   GearDir data(content);
   data.append("/BKLM");
-  m_version = 0;
   m_DoBeamBackgroundStudy = data.getBool("BeamBackgroundStudy");
   m_Rotation = data.getAngle("Rotation");
   m_OffsetZ = data.getLength("OffsetZ");

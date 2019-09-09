@@ -48,8 +48,8 @@ CDCCosmicAnalysisModule::CDCCosmicAnalysisModule() : Module()
   setDescription("Module for harvesting parameters of the two half (up/down) of a cosmic track for performance study");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("RecoTracksColName", m_recoTrackArrayName, "Name of collectrion hold RecoTracks", std::string(""));
-  addParam("Output", m_OutputFileName, "output file name", string("twotracks.root"));
-  addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", true);
+  addParam("Output", m_outputFileName, "output file name", string("twotracks.root"));
+  addParam("EventT0Extraction", m_eventT0Extraction, "use event t0 extract t0 or not", true);
   addParam("treeName", m_treeName, "Output tree name", string("tree"));
   addParam("phi0InRad", m_phi0InRad, "Phi0 in unit of radian, true: rad, false: deg", true);
   addParam("qam", m_qam, "Output QAM histograms", false);
@@ -75,7 +75,7 @@ void CDCCosmicAnalysisModule::initialize()
   if (m_qam)
     m_storeTrackParErrors = true;
 
-  tfile = new TFile(m_OutputFileName.c_str(), "RECREATE");
+  tfile = new TFile(m_outputFileName.c_str(), "RECREATE");
   //  tree = new TTree("treeTrk", "treeTrk");
   tree = new TTree(m_treeName.c_str(), m_treeName.c_str());
   tree->Branch("run", &run, "run/I");
@@ -126,11 +126,11 @@ void CDCCosmicAnalysisModule::beginRun()
 {
   B2Vector3D pos(0, 0, 0);
   B2Vector3D bfield = BFieldManager::getFieldInTesla(pos);
-  if (bfield.Z() > 1) {
-    m_BField = true;
+  if (bfield.Z() > 0.5) {
+    m_bField = true;
     B2INFO("CDCCosmicAnalysis: Magnetic field is ON");
   } else {
-    m_BField = false;
+    m_bField = false;
     B2INFO("CDCCosmicAnalysis: Magnetic field is OFF");
   }
   B2INFO("CDCCosmicAnalysis: BField at (0,0,0)  = " << bfield.Mag());
@@ -148,7 +148,7 @@ void CDCCosmicAnalysisModule::event()
     run = eventMetaData->getRun();
 
   evtT0 = 0;
-  if (m_EventT0Extraction) {
+  if (m_eventT0Extraction) {
     // event with is fail to extract event-t0 will be excluded
     if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
       evtT0 =  m_eventTimeStoreObject->getEventT0();
@@ -185,7 +185,7 @@ void CDCCosmicAnalysisModule::event()
     const genfit::FitStatus* fs = recoTrack->getTrackFitStatus();
 
     double ndf = fs->getNdf();
-    if (!m_BField)  // in case of no magnetic field, #track par=4 instead of 5.
+    if (!m_bField)  // in case of no magnetic field, #track par=4 instead of 5.
       ndf = +1;
 
     double Chi2 = fs->getChi2();
@@ -245,7 +245,7 @@ void CDCCosmicAnalysisModule::event()
       down = true;
     }
   }
-  if (m_BField && charge1 * charge2 == 0)  return;
+  if (m_bField && charge1 * charge2 == 0)  return;
   if (charge1 * charge2 >= 0 && up && down) {
     charge = charge1;
     tree->Fill();

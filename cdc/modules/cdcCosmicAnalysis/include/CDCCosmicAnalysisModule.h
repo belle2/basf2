@@ -80,7 +80,7 @@ namespace Belle2 {
       std::string m_recoTrackArrayName ;       /**< Belle2::RecoTrack StoreArray nam.e */
       std::string m_trackFitResultArrayName;  /**< Belle2::TrackFitResult StoreArray name. */
       std::string m_relRecoTrackTrackName;     /**< Releation between RecoTrack and Belle2:Track. */
-      std::string m_OutputFileName;           /**< Output file name. */
+      std::string m_outputFileName;           /**< Output file name. */
       std::string m_treeName;    /**< output tree name. */
 
 
@@ -124,8 +124,8 @@ namespace Belle2 {
       double evtT0;                       /**< event t0. */
       short charge;                     /**< charge of track */
 
-      bool m_BField; /**< Data are taken with B-field or not, if true, NDF=5 in cal P-value */
-      bool m_EventT0Extraction;/**< run with event t0 extraction*/
+      bool m_bField; /**< Data are taken with B-field or not, if true, NDF=5 in cal P-value */
+      bool m_eventT0Extraction;/**< run with event t0 extraction*/
       bool m_phi0InRad; /**< Unit of phi0, true: radian, false: degree */
       bool m_qam; /**< Enable output of QAM histogram */
       bool m_storeTrackParErrors;/**< Store error of track parameters or not. */

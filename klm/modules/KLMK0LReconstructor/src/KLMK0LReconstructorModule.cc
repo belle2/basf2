@@ -15,7 +15,7 @@
 #include <TDatabasePDG.h>
 
 /* Belle2 headers. */
-#include <bklm/dbobjects/BKLMGeometryPar.h>
+#include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Const.h>
 #include <klm/modules/KLMK0LReconstructor/KLMK0LReconstructorModule.h>

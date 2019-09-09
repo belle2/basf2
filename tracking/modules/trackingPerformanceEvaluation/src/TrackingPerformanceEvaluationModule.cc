@@ -820,8 +820,6 @@ void  TrackingPerformanceEvaluationModule::fillTrackErrParams2DHistograms(const 
   double p = momentum.Mag();
   double mass = fitResult->getParticleType().getMass();
   double beta = p / sqrt(p * p + mass * mass);
-  // the following line gives a false positive for cpp-check
-  // cppcheck-suppress unreadVariable
   double sinTheta = TMath::Sin(momentum.Theta());
 
   m_h2_d0errphi0err_xy->Fill(d0_err / phi_err * px / pt,

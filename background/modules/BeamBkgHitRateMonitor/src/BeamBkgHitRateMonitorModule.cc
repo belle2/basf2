@@ -63,9 +63,11 @@ namespace Belle2 {
     addParam("writeEmptyTimeStamps", m_writeEmptyTimeStamps,
              "if true, write to ntuple also empty time stamps", false);
     addParam("topTimeOffset", m_topTimeOffset,
-             "TOP: time offset of hits (to be subtracted) [ns]", 400.0);
+             "TOP: time offset of hits (to be subtracted) [ns]", 25.0);
     addParam("topTimeWindow", m_topTimeWindow,
              "TOP: time window in which to count hits [ns]", 100.0);
+    addParam("svdShaperDigitsName", m_svdShaperDigitsName,
+             "SVDShaperDigits collection name", string(""));
 
   }
 
@@ -89,7 +91,7 @@ namespace Belle2 {
     // create, set and append hit rate monitoring classes
     auto* pxd = new Background::PXDHitRateCounter();
     m_monitors.push_back(pxd);
-    auto* svd = new Background::SVDHitRateCounter();
+    auto* svd = new Background::SVDHitRateCounter(m_svdShaperDigitsName);
     m_monitors.push_back(svd);
     auto* cdc = new Background::CDCHitRateCounter();
     m_monitors.push_back(cdc);

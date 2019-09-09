@@ -1084,7 +1084,7 @@ namespace Belle2 {
       float m_FWirPosAlign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. alignment at the forward endplate for each cell; ibid. */
       float m_BWirPosAlign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. alignment at the backward endplate for each cell; ibid. */
       float m_WireSagCoefAlign[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coefficient incl. alignment for each cell; ibid. */
-      float m_eDepToADCParams[MAX_N_SLAYERS][MAX_N_SCELLS][4] = {0}; /*!< edep-to-ADC conv. params. */
+      float m_eDepToADCParams[MAX_N_SLAYERS][MAX_N_SCELLS][6] = {0}; /*!< edep-to-ADC conv. params. */
 
       float m_alphaPoints[maxNAlphaPoints]; /*!< alpha sampling points for xt (rad) */
       float m_thetaPoints[maxNThetaPoints]; /*!< theta sampling points for xt (rad) */

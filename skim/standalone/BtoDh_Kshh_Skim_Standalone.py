@@ -17,29 +17,29 @@ from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-03-02-00'
 
-mypath = Path()
+path = Path()
 
 skimCode = encodeSkimName('BtoDh_Kshh')
 
 
 fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=mypath)
+inputMdstList('default', fileList, path=path)
 
 
-stdPi('all', path=mypath)
-stdK('all', path=mypath)
-stdKshorts(path=mypath)
+stdPi('all', path=path)
+stdK('all', path=path)
+stdKshorts(path=path)
 
 # B- to D(->Kshh)h- Skim
 from skim.btocharm import loadDkshh, BsigToDhToKshhList
-loadDkshh(path=mypath)
-BtoDhList = BsigToDhToKshhList(path=mypath)
-skimOutputUdst(skimCode, BtoDhList, path=mypath)
-summaryOfLists(BtoDhList, path=mypath)
+loadDkshh(path=path)
+BtoDhList = BsigToDhToKshhList(path=path)
+skimOutputUdst(skimCode, BtoDhList, path=path)
+summaryOfLists(BtoDhList, path=path)
 
 
-setSkimLogging()
-process(mypath)
+setSkimLogging(path)
+process(path)
 
 # print out the summary
 print(statistics)

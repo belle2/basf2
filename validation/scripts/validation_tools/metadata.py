@@ -14,6 +14,43 @@ from ROOT import Belle2
 # circumvent BII-1264
 ROOT.gInterpreter.Declare("#include <framework/utilities/MakeROOTCompatible.h>")
 
+# Unfortunately doxygen doesn't recognize our docstrings in this file :/
+# @cond SUPPRESS_DOXYGEN
+
+
+def file_description_set(rootfile: Union[ROOT.TFile, str, pathlib.PurePath],
+                         description: str) -> None:
+    """
+    Add file description validation metdata to a ROOT file.
+
+    Args:
+        rootfile (TFile, str or pathlib.PurePath): Name of the root file
+            to open or an already open TFile instance
+        description (str):  Common description/information of/about all plots
+            in this ROOT file (will be displayed above the plots)
+
+    Returns:
+        None
+    """
+    opened = False
+    if not isinstance(rootfile, ROOT.TFile):
+        if isinstance(rootfile, pathlib.PurePath):
+            rootfile = str(rootfile)
+        rootfile = ROOT.TFile(rootfile, "UPDATE")
+        opened = True
+    if not rootfile.IsOpen() or not rootfile.IsWritable():
+        raise RuntimeError(
+            f"ROOT file {rootfile.GetName()} is not open for writing"
+        )
+    # scope guard to avoid side effects by changing the global gDirectory
+    # in modules ...
+    # noinspection PyUnusedLocal
+    directory_guard = ROOT.TDirectory.TContext(rootfile)
+    desc = ROOT.TNamed("Description", description)
+    desc.Write()
+    if opened:
+        rootfile.Close()
+
 
 def validation_metadata_set(obj: ROOT.TObject, title: str, contact: str,
                             description: str, check: str,
@@ -36,6 +73,11 @@ def validation_metadata_set(obj: ROOT.TObject, title: str, contact: str,
         ylabel (str): If given try to set this as the label for the y axis
         metaoptions (str): Metaoptions (additional options to influence the
             comparison between revisions, styling of the plot, etc.)
+
+    .. warning::
+
+        Different ways to specify LaTeX for different arguments:
+        see `create_validation_histograms`
     """
     obj.SetTitle(title)
     # For ntuples we add the metadata as aliases ...
@@ -93,6 +135,11 @@ def validation_metadata_update(
         ylabel (str): If given try to set this as the label for the y axis
         metaoptions (str): Metaoptions (additional options to influence the
             comparison between revisions, styling of the plot, etc.)
+
+    .. warning::
+
+        Different ways to specify LaTeX for different arguments:
+        see `create_validation_histograms`
     """
 
     opened = False
@@ -137,8 +184,9 @@ class ValidationMetadataSetter(basf2.Module):
     """
 
     def __init__(self, variables: List[Tuple[str]],
-                 rootfile: Union[str, pathlib.PurePath]):
+                 rootfile: Union[str, pathlib.PurePath], description=""):
         """
+        Initialize ValidationMetadataSetter
 
         Arguments:
             variables (list(tuple(str))): List of objects to set the metadata
@@ -150,6 +198,8 @@ class ValidationMetadataSetter(basf2.Module):
                 where ``xlabel``, ``ylabel`` and ``metaoptions`` are optional
             rootfile (str or pathlib.PurePath): The name of the ROOT file where
                 the objects can be found
+            description (str): Common description/information of/about all plots
+                in this ROOT file (will be displayed above the plots)
         """
         super().__init__()
         #: Remember the metadata
@@ -158,6 +208,9 @@ class ValidationMetadataSetter(basf2.Module):
             rootfile = str(rootfile)
         #: And the name of the root file
         self._rootfile = rootfile  # type: str
+        #: Common description/information of/about all plots
+        #: in this ROOT file (will be displayed above the plots)
+        self._description = description
         #: Shared pointer to the root file that will be closed when the last
         #: user disconnects
         self._tfile = None  # type: ROOT.TFile
@@ -171,15 +224,18 @@ class ValidationMetadataSetter(basf2.Module):
         """And update the metadata at the end"""
         for name, *metadata in self._variables:
             name = Belle2.makeROOTCompatible(name)
-            validation_metadata_update(self._tfile.get(), name, *metadata)
-        self._tfile.reset()
+            validation_metadata_update(self._tfile, name, *metadata)
+        if self._description:
+            file_description_set(self._tfile, self._description)
+        del self._tfile
 
 
 def create_validation_histograms(
     path: basf2.Path, rootfile: Union[str, pathlib.PurePath],
     particlelist: str,
     variables_1d: Optional[List[Tuple]] = None,
-    variables_2d: Optional[List[Tuple]] = None
+    variables_2d: Optional[List[Tuple]] = None,
+    description=""
 ) -> None:
     """
     Create histograms for all the variables and also label them to be useful
@@ -198,6 +254,29 @@ def create_validation_histograms(
         variables_2d: List of 2D histogram definitions of the form
             ``var1, bins1, min1, max1, var2, bins2, min2, max2, title, contact,
             description, check_for [, xlabel [, ylabel [, metaoptions]]]``
+        description: Common description/information of/about all plots in this
+            ROOT file (will be displayed above the plots)
+
+    .. warning::
+
+        Sadly, there are two different ways to specify latex formulas.
+
+        1. The ROOT-style using ``#``:
+           ``"Einstein-Pythagoras a^{2} + b^{2} = #frac{E}{m}"``
+
+           This style should be used for histogram title and labels, that is the
+           ``title``, ``xlabel`` and ``ylabel`` arguments
+
+        2. The normal Latex style (with escaped backslashes or raw
+           string literals):
+           ``"Einstein-Pythagoras $a^2 + b^2 = \\\\frac{E}{m}$"``.
+
+           This style should be used for all other fields like ``description``,
+           ``check_for``
+
+    You can use the normal Latex style also for histogram title and descriptions
+    but the PDF version of the plots will still be buggy and not show all
+    formulas correctly.
     """
     if isinstance(rootfile, pathlib.PurePath):
         rootfile = str(rootfile)
@@ -216,11 +295,16 @@ def create_validation_histograms(
             histograms_2d.append(row[:8])
             metadata.append([var1 + var2] + list(row[8:]))
 
-    path.add_module(ValidationMetadataSetter(metadata, rootfile))
+    path.add_module(
+        ValidationMetadataSetter(metadata, rootfile, description=description)
+    )
     path.add_module(
         "VariablesToHistogram",
         particleList=particlelist,
         variables=histograms_1d,
         variables_2d=histograms_2d,
-        fileName=rootfile
+        fileName=rootfile,
     )
+
+# End suppression of doxygen checks
+# @endcond

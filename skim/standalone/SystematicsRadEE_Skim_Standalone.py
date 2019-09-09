@@ -9,7 +9,7 @@
 #######################################################
 
 from basf2 import process, statistics, Path
-from modularAnalysis import analysis_main, inputMdstList, \
+from modularAnalysis import inputMdstList, \
     skimOutputUdst, summaryOfLists
 from stdCharged import stdE
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file

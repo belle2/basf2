@@ -91,6 +91,7 @@ namespace Belle2 {
 
         for (auto& item : storeArray)
         {
+          // cppcheck-suppress useStlAlgorithm
           output.push_back(&item);
         }
       }

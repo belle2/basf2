@@ -7,7 +7,7 @@
     fei training: MC11 based, release-03-02-00 'FEIv4_2018_MC11_release_03_00_00'
     """
 
-__authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
+__authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling", "Phil Grace"]
 
 import sys
 import glob
@@ -15,7 +15,6 @@ import os.path
 
 from basf2 import *
 from modularAnalysis import *
-from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
 gb2_setuprel = 'release-03-02-00'
@@ -36,10 +35,10 @@ path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatchin
 path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
 
 # Apply final B0 hadronic tag cuts
-B0hadronicList = B0hadronic(path)
+B0HadronicList = B0Hadronic(path)
 skimCode1 = encodeSkimName('feiHadronicB0')
-skimOutputUdst(skimCode1, B0hadronicList, path=path)
-summaryOfLists(B0hadronicList, path=path)
+skimOutputUdst(skimCode1, B0HadronicList, path=path)
+summaryOfLists(B0HadronicList, path=path)
 
 # Apply final B+ hadronic tag cuts
 BphadronicList = BplusHadronic(path)
@@ -48,19 +47,19 @@ skimOutputUdst(skimCode2, BphadronicList, path=path)
 summaryOfLists(BphadronicList, path=path)
 
 # Apply final B0 semileptonic tag cuts
-B0semileptonicList = B0SLWithOneLep(path)
-skimCode3 = encodeSkimName('feiSLB0WithOneLep')
+B0semileptonicList = B0SL(path)
+skimCode3 = encodeSkimName('feiSLB0')
 skimOutputUdst(skimCode3, B0semileptonicList, path=path)
 summaryOfLists(B0semileptonicList, path=path)
 
 # Apply final B+ semileptonic tag cuts
-BpsemileptonicList = BplusSLWithOneLep(path)
-skimCode4 = encodeSkimName('feiSLBplusWithOneLep')
+BpsemileptonicList = BplusSL(path)
+skimCode4 = encodeSkimName('feiSLBplus')
 skimOutputUdst(skimCode4, BpsemileptonicList, path=path)
 summaryOfLists(BpsemileptonicList, path=path)
 
 
-setSkimLogging()
+setSkimLogging(path)
 process(path)
 
 # print out the summary

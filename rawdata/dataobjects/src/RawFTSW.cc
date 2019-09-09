@@ -50,9 +50,12 @@ void RawFTSW::SetVersion()
             m_buffer[ POS_HEADER_SIZE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     B2FATAL(err_buf);
+  } else if (m_buffer[ POS_NODE_FORMAT_ID ] == FORMAT_ID_VER_0TO3) { // Add on Aug. 20, 2019
+    m_access = new RawFTSWFormat_latest;
+    m_version = 3; // as of 2019.3.20 the latest version is 3.
   } else if (m_buffer[ POS_NODE_FORMAT_ID ] == FORMAT_ID_VER_0TO2) {
     if (m_buffer[ POS_HEADER_SIZE ] == VER_2_HEADER_SIZE) {
-      m_access = new RawFTSWFormat_latest;
+      m_access = new RawFTSWFormat_v2;
       m_version = 2; // as of 2019.3.2, the latest version is 2.
     } else if (m_buffer[ POS_HEADER_SIZE ] == VER_1_HEADER_SIZE) {
       m_access = new RawFTSWFormat_v1;

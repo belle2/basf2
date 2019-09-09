@@ -314,6 +314,11 @@ void CDCUnpackerModule::event()
                 secondHit->setOtherHitIndices(firstHit);
                 secondHit->set2ndHitFlag();
               }
+              if (m_enableStoreCDCRawHit == true) {
+                for (int iSample = 0; iSample < nSamples; ++iSample) {
+                  cdcHits[cdcHits.getEntries() - 1]->addRelationTo(cdcRawHitWFs[cdcRawHitWFs.getEntries() - 1 + iSample - (nSamples - 1) ]);
+                }
+              }
             }
 
 

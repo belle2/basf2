@@ -44,7 +44,7 @@
 #include <top/dbobjects/TOPCalCommonT0.h>
 #include <top/dbobjects/TOPCalIntegratedCharge.h>
 #include <top/dbobjects/TOPCalModuleAlignment.h>
-
+#include <top/dbobjects/TOPCalAsicShift.h>
 
 #include <top/dbobjects/TOPPmtGainPar.h>
 #include <top/dbobjects/TOPPmtQE.h>
@@ -52,6 +52,8 @@
 #include <top/dbobjects/TOPPmtObsoleteData.h>
 #include <top/dbobjects/TOPPmtTTSPar.h>
 #include <top/dbobjects/TOPPmtTTSHisto.h>
+
+#include <top/dbobjects/TOPFrontEndSetting.h>
 
 #include <iostream>
 #include <fstream>
@@ -345,6 +347,36 @@ namespace Belle2 {
   }
 
 
+  void TOPDatabaseImporter::importAsicShifts_BS13d(double s0, double s1, double s2, double s3,
+                                                   int expNo, int firstRun, int lastRun)
+  {
+
+    std::vector<double> shifts;
+    shifts.push_back(s0);
+    shifts.push_back(s1);
+    shifts.push_back(s2);
+    shifts.push_back(s3);
+
+    DBImportObjPtr<TOPCalAsicShift> asicShift;
+    asicShift.construct();
+
+    int moduleID = 13;
+    unsigned bs = 3;
+    for (unsigned carrier = 0; carrier < 4; carrier++) {
+      for (unsigned a = 0; a < 4; a++) {
+        unsigned asic = a + carrier * 4 + bs * 16;
+        asicShift->setT0(moduleID, asic, shifts[carrier]);
+      }
+    }
+
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    asicShift.import(iov);
+
+    B2INFO("ASIC shifts of BS13d imported for exp " << expNo << " run " << firstRun <<
+           " to " << lastRun);
+  }
+
+
   void TOPDatabaseImporter::importOfflineCommonT0Calibration(string fileName,
                                                              int firstExp, int firstRun,
                                                              int lastExp, int lastRun)
@@ -420,10 +452,12 @@ namespace Belle2 {
   }
 
   void TOPDatabaseImporter::importCommonT0(double value, double error,
-                                           int expNo, int firstRun, int lastRun)
+                                           int expNo, int firstRun, int lastRun,
+                                           bool roughlyCalibrated)
   {
     DBImportObjPtr<TOPCalCommonT0> commonT0;
     commonT0.construct(value, error);
+    if (roughlyCalibrated) commonT0->setRoughlyCalibrated();
 
     IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
     commonT0.import(iov);
@@ -1212,6 +1246,37 @@ namespace Belle2 {
     return;
   }
 
+  void TOPDatabaseImporter::importFrontEndSettings(int lookback, int readoutWin,
+                                                   int extraWin, int offset,
+                                                   int expNo, int firstRun, int lastRun)
+  {
+    DBImportObjPtr<TOPFrontEndSetting> feSetting;
+    feSetting.construct();
+
+    // write-window depths (write-window is 128 samples)
+    std::vector<int> writeDepths;
+    for (int i = 0; i < 3; i++) {
+      writeDepths.push_back(214);
+      writeDepths.push_back(212);
+      writeDepths.push_back(214);
+    }
+    feSetting->setWriteDepths(writeDepths);
+    feSetting->setLookbackWindows(lookback);
+    feSetting->setReadoutWindows(readoutWin);
+    feSetting->setExtraWindows(extraWin);
+    feSetting->setOffset(offset);
+
+    // window shifts
+    std::vector<int> shifts = {0, 0, 1, 1, 1, 2};
+    feSetting->setWindowShifts(shifts);
+
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    feSetting.import(iov);
+
+    B2INFO("Front-end settings imported for exp " << expNo << " run " << firstRun <<
+           " to " << lastRun);
+  }
+
 
   void TOPDatabaseImporter::importDummyCalModuleAlignment(int firstExp, int firstRun,
                                                           int lastExp, int lastRun)
@@ -1332,6 +1397,16 @@ namespace Belle2 {
     integratedCharge.import(iov);
     B2INFO("Dummy TOPCalIntegratedCharge imported");
     return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalAsicShift(int firstExp, int firstRun,
+                                                    int lastExp, int lastRun)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalAsicShift> asicShift;
+    asicShift.construct();
+    asicShift.import(iov);
+    B2INFO("Dummy TOPCalAsicShift imported");
   }
 
   void TOPDatabaseImporter::correctTOPPmtQE()

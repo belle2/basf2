@@ -49,11 +49,9 @@ ge.add_evtgen_generator(path=my_path,
 ma.loadGearbox(path=my_path)
 
 # dump generated events in DST format to the output ROOT file
-#
 my_path.add_module('RootOutput', outputFileName='B2A101-Y4SEventGeneration-evtgen.root')
 
-# process all modules added to the analysis_main path
-# (note: analysis_main is the default path created in the modularAnapys.py)
+# process all modules added to the path
 b2.process(path=my_path)
 
 # print out the summary

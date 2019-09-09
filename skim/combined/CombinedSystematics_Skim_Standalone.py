@@ -27,6 +27,7 @@ set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-03-02-00'
 
 fileList = get_test_file("mixedBGx1", "MC12")
+
 syspath = Path()
 inputMdstList('default', fileList, path=syspath)
 stdPi('loose', path=syspath)

@@ -83,13 +83,19 @@ namespace Belle2 {
   private:
 
     /**
+     * Checks if running offset is subtracted in TOPDigits
+     * @return true if subtracted at least in one digit
+     */
+    bool isRunningOffsetSubtracted();
+
+    /**
      * Sizes
      */
     enum {c_numModules = 16, /**< number of modules */
           c_numSets = 32,  /**< number of statistically independent subsamples */
          };
 
-    // module parameters
+    // steering parameters
     int m_numBins;      /**< number of bins to which search region is divided */
     double m_timeRange; /**< time range in which to search for the minimum [ns] */
     double m_minBkgPerBar; /**< minimal assumed background photons per module */
@@ -109,6 +115,7 @@ namespace Belle2 {
     TOP::TrackSelector m_selector; /**< track selection utility */
     TOP::Chi2MinimumFinder1D m_finders[c_numSets]; /**< finders */
     TOP::TOPreco::PDFoption m_PDFOption = TOP::TOPreco::c_Rough; /**< PDF option */
+    double m_bunchTimeSep = 0; /**< time between two bunches */
 
     // datastore objects
     StoreArray<TOPDigit> m_digits; /**< collection of digits */

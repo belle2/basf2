@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundBlocker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundDetector.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitMCMultiLoopBlocker.h>
+#include <tracking/trackFindingCDC/findlets/minimal/AsicBackgroundDetector.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
@@ -55,6 +56,9 @@ namespace Belle2 {
 
       /// Marks hits as background based on the result of a filter
       WireHitBackgroundDetector m_wireHitBackgroundDetector;
+
+      /// Marks hits as background based on ASIC cross-talk signature
+      AsicBackgroundDetector m_asicBackgroundDetector;
 
       /// Marks higher order loops as background for tuning analysis
       WireHitMCMultiLoopBlocker m_wireHitMCMultiLoopBlocker;

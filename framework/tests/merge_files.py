@@ -6,6 +6,7 @@ import sys
 import re
 import subprocess
 import itertools
+from shutil import copyfile
 import ROOT
 from ROOT.Belle2 import FileMetaData, EventMetaData
 # we don't really need basf2 but it fixes the print buffering problem
@@ -24,12 +25,11 @@ def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=[]
         f.write(testfile_steering)
 
     subprocess.call(["basf2", "-o", name, "--experiment", str(exp), "--run", str(run),
-                    "-n", str(events), steering_file] + branchNames, env=env)
+                     "-n", str(events), steering_file] + branchNames, env=env)
 
 
 def create_testfile_direct(name, metadata=None, release="test_release", user="test_user", seed=None,
-                           site="test_site", global_tag="test_globaltag", steering="test_steering",
-                           is_mc=True):
+                           site="test_site", global_tag="test_globaltag", steering="test_steering"):
     """similar to create_testfile but does it manually without running basf2 for
     full control over the FileMetaData"""
     if metadata is None:
@@ -43,8 +43,6 @@ def create_testfile_direct(name, metadata=None, release="test_release", user="te
     metadata.setCreationData("the most auspicious of days for testing", site, user, release)
     metadata.setDatabaseGlobalTag(global_tag)
     metadata.setSteering(steering)
-    if (not is_mc):
-        metadata.declareRealData()
     f = ROOT.TFile(name, "RECREATE")
     t = ROOT.TTree("persistent", "persistent")
     t.Branch("FileMetaData", metadata)
@@ -358,8 +356,8 @@ def check_21_eventmetadata():
 
 def check_22_real_mc():
     """Check that merging fails if real and MC data are mixed"""
-    create_testfile_direct("test1.root", is_mc=True)
-    create_testfile_direct("test2.root", is_mc=False)
+    create_testfile_direct("test1.root")
+    copyfile(basf2.find_file("framework/tests/fake_real.root"), "test2.root")
     return merge_files("test1.root", "test2.root") != 0
 
 

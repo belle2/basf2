@@ -9,6 +9,11 @@ from modularAnalysis import *
 
 
 if __name__ == "__main__":
+    from basf2 import conditions
+    # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
+    conditions.testing_payloads = [
+        'localdb/database.txt'
+    ]
 
     variables = ['M', 'p', 'pt', 'pz', 'phi',
                  'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)', 'daughter(0, phi)',
@@ -98,7 +103,7 @@ if __name__ == "__main__":
     inputMdstList('MC6', ['/storage/jbod/tkeck/MC6/evtgen-charged/sub00/mdst_0001*.root'], path=path)
     fillParticleLists([('K-', 'kaonID > 0.5'), ('pi+', 'pionID > 0.5')], path=path)
     reconstructDecay('D0 -> K- pi+', '1.8 < M < 1.9', path=path)
-    vertexKFit('D0', 0.1, path=path, silence_warning=True)
+    vertexKFit('D0', 0.1, path=path)
     applyCuts('D0', '1.8 < M < 1.9', path=path)
     matchMCTruth('D0', path=path)
 

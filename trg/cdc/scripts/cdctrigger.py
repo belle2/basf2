@@ -50,16 +50,12 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
         path.add_module('CDCTrigger3DFitter')
         # neurotrigger
         if shortTracks:
-            if lowPt:
-                filename = Belle2.FileSystem.findFile("data/trg/cdc/Neuro20170922_ShortTracksPtMin255_LUTBkg.root")
-            else:
-                filename = Belle2.FileSystem.findFile("data/trg/cdc/Neuro20170922_ShortTracksPtMin300_LUTBkg.root")
-        else:
-            filename = Belle2.FileSystem.findFile("data/trg/cdc/Neuro20170405_LUTBkg.root")
-            if lowPt:
-                B2WARNING("no networks available for shortTracks=False and lowPt=True "
-                          "(combination not recommended), using networks for lowPt=False")
-        path.add_module('CDCTriggerNeuro', filename=filename)
+            B2WARNING("shortTracks=True is deprecated and no longer supported! "
+                      "Network weights will now be loaded from the database. "
+                      "If you really want to use shorttracks, load the specific network "
+                      "weights in the Neurotrigger module!")
+            exit()
+        path.add_module('CDCTriggerNeuro')
         path.add_module('CDCTriggerTrackCombiner',
                         thetaDefinition=thetaDef, zDefinition=zDef)
     elif SimulationMode == 2:

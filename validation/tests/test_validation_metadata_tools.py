@@ -13,6 +13,7 @@ import generators as ge
 
 # ours
 from validation_tools.metadata import create_validation_histograms
+from validationplots import get_metadata
 
 
 TRIVIAL_DECFILE = """
@@ -32,12 +33,16 @@ class TestValidationMetadataSetter(unittest.TestCase):
     :func:`validation_tools.metadata.create_validation_histograms`
     """
     def setUp(self):
+        """ Open temporary directory to work in. """
+        #: Temporary directory
         self.tmp_dir = tempfile.TemporaryDirectory()
 
     def tearDown(self):
+        """ Clean up temporary directory """
         self.tmp_dir.cleanup()
 
     def test(self):
+        """ Perform tests """
         tmp_dir_path = pathlib.Path(self.tmp_dir.name)
 
         dec_path = tmp_dir_path / "test_y4s_trivial.dec"
@@ -70,13 +75,15 @@ class TestValidationMetadataSetter(unittest.TestCase):
                     "description of M", "nothing to check",
                     "x label"
                 )
-            ], variables_2d=[
+            ],
+            variables_2d=[
                 (
                     "M", 100, 5, 15, "M", 100, 5, 15, "mass vs mass",
                     "me <wontreply@dont.try>", "some description nobody reads",
                     "nothing to check", "x label", "why label?", "mop1, mop2"
                 )
-            ]
+            ],
+            description="Overall description of plots in this package."
         )
 
         basf2.process(path=path)
@@ -86,40 +93,32 @@ class TestValidationMetadataSetter(unittest.TestCase):
 
         tf = ROOT.TFile(str(out_file_path))
 
+        # Overall
+        # *******
+
+        d = tf.Get("Description")
+        self.assertEqual(
+            d.GetTitle(),
+            "Overall description of plots in this package."
+        )
+
         # 1D Histogram
         # ************
 
-        m = tf.Get("M")
-        self.assertEqual(
-            m.FindObject("Description").GetTitle(), "description of M"
-        )
-        self.assertEqual(
-            m.FindObject("Check").GetTitle(), "nothing to check"
-        )
-        self.assertEqual(
-            m.FindObject("MetaOptions").GetTitle(), ""
-        )
-        self.assertEqual(
-            m.FindObject("Contact").GetTitle(), "me <wontreply@dont.try>"
-        )
+        md = get_metadata(tf.Get("M"))
+        self.assertEqual(md["description"], "description of M")
+        self.assertEqual(md["check"], "nothing to check")
+        self.assertEqual(md["metaoptions"], [])
+        self.assertEqual(md["contact"], "me <wontreply@dont.try>")
 
         # 2D Histogram
         # ************
 
-        mm = tf.Get("MM")
-        self.assertEqual(
-            mm.FindObject("Description").GetTitle(),
-            "some description nobody reads"
-        )
-        self.assertEqual(
-            mm.FindObject("Check").GetTitle(), "nothing to check"
-        )
-        self.assertEqual(
-            mm.FindObject("MetaOptions").GetTitle(), "mop1, mop2"
-        )
-        self.assertEqual(
-            mm.FindObject("Contact").GetTitle(), "me <wontreply@dont.try>"
-        )
+        md = get_metadata(tf.Get("MM"))
+        self.assertEqual(md["description"], "some description nobody reads")
+        self.assertEqual(md["check"], "nothing to check")
+        self.assertEqual(md["metaoptions"], ["mop1", "mop2"])
+        self.assertEqual(md["contact"], "me <wontreply@dont.try>")
 
 
 if __name__ == "__main__":

@@ -13,7 +13,6 @@ __author__ = "P. Grace"
 
 from basf2 import *
 from modularAnalysis import *
-from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import *
 
@@ -32,12 +31,12 @@ runFEIforBplusHadronic(path)
 path.add_module('MCMatcherParticles', listName='B+:generic', looseMCMatching=True)
 
 # Apply final B+ tag cuts
-BplushadronicList = BplusHadronic(path)
-skimOutputUdst('../feiHadronicBplus', BplushadronicList, path=path)
-summaryOfLists(BplushadronicList, path=path)
+BplusHadronicList = BplusHadronic(path)
+skimOutputUdst('../feiHadronicBplus', BplusHadronicList, path=path)
+summaryOfLists(BplusHadronicList, path=path)
 
 # Suppress noisy modules, and then process
-setSkimLogging()
+setSkimLogging(path)
 process(path)
 
 # print out the summary

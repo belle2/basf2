@@ -26,6 +26,7 @@ gb2_setuprel = 'release-03-02-00'
 skimCode = encodeSkimName('PRsemileptonicUntagged')
 
 fileList = get_test_file("mixedBGx1", "MC12")
+
 # create a new path
 PRSLpath = Path()
 

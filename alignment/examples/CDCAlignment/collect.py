@@ -8,7 +8,7 @@ from basf2 import *
 from ROOT import Belle2
 """
 Belle2.GlobalLabel.disableComponent(Belle2.VXDAlignment.getGlobalUniqueID())
-Belle2.GlobalLabel.disableComponent(Belle2.BeamParameters.getGlobalUniqueID())
+Belle2.GlobalLabel.disableComponent(Belle2.BeamSpot.getGlobalUniqueID())
 Belle2.GlobalLabel.disableComponent(Belle2.CDCTimeZeros.getGlobalUniqueID())
 Belle2.GlobalLabel.disableComponent(Belle2.CDCTimeWalks.getGlobalUniqueID())
 Belle2.GlobalLabel.disableComponent(Belle2.BKLMAlignment.getGlobalUniqueID())

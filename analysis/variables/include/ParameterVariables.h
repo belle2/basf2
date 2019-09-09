@@ -38,15 +38,6 @@ namespace Belle2 {
      */
     double hasAncestor(const Particle* part, const std::vector<double>& args);
 
-    /**
-     * Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.
-     */
-    double genNthMotherPDG(const Particle* part, const std::vector<double>& daughterIDs);
-
-    /**
-     * Check the array index of a particle n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.
-     */
-    double genNthMotherIndex(const Particle* part, const std::vector<double>& daughterIDs);
 
     /**
      * return cosine of the angle between the mother momentum vector and the direction of the i-th daughter in the mother's rest frame

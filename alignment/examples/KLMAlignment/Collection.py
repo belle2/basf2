@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# KLM alignment: collection.
+# KLM alignment: reconstruction and collection.
 
 import sys
 import basf2
+from reconstruction import add_reconstruction
+
+basf2.conditions.append_testing_payloads('localdb/database.txt')
 
 # Create path.
 main = basf2.create_path()
@@ -19,14 +22,22 @@ main.add_module('HistoManager', histoFileName=sys.argv[2])
 main.add_module('Gearbox')
 main.add_module('Geometry')
 
+# Reconstruction.
+add_reconstruction(main, pruneTracks=False, add_muid_hits=True)
+# Disable the time window in muid module by setting it to 1 second.
+# This is necessary because the  alignment needs to be performed before
+# the time calibration; if the time window is not disabled, then all
+# scintillator hits are rejected.
+basf2.set_module_parameters(main, 'Muid', MaxDt=1e9)
+
+# DAF fitter.
+main.add_module('DAFRecoFitter', resortHits=True)
+
 # Genfit extrapolation.
 main.add_module('SetupGenfitExtrapolation',
                 noiseBetheBloch=False,
                 noiseCoulomb=False,
                 noiseBrems=False)
-
-# DAF fitter.
-main.add_module('DAFRecoFitter', resortHits=True)
 
 # Millepede collector.
 main.add_module('MillepedeCollector',

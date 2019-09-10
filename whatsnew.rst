@@ -16,7 +16,7 @@ Changes since release-04
 ========================
 
 .. important changes should go here. Especially things that break backwards
-      compatibility 
+      compatibility
 
 .. .. rubric:: Some important feature
 
@@ -33,8 +33,6 @@ Changes since release-04
 
 Changes since release-03
 ========================
-
-
 
 .. rubric:: Removal of default analysis path and ``NtupleTools``
 
@@ -82,7 +80,7 @@ You should update it to this:
 .. rubric:: Switch of beam spot information from nominal to measured values.
 
 The interaction point position and its uncertainties are now taken from the database with values provided by the tracking group.
-All beam kinematics information is also moved to the database, which will eventually be measured on data. 
+All beam kinematics information is also moved to the database, which will eventually be measured on data.
 For now they are the values provided by the accelerator.
 
 .. warning::
@@ -94,16 +92,19 @@ If you have a physics analysis sensitive to this change: please discuss with the
 
 .. seealso:: The beam information can be accessed with :b2:var:`Ecms`, :b2:var:`beamPx`,  :b2:var:`beamPy`,  :b2:var:`beamPz`, and  :b2:var:`beamE`.
 
-.. note:: 
-        As a consequence of this, there is now a **difference** between the variables 
+.. note::
+        As a consequence of this, there is now a **difference** between the variables
         ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz` ) compared to ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` );
         and similarly for variables ( :b2:var:`mcDX`, :b2:var:`mcDY`, :b2:var:`mcDZ` )  compared to ( :b2:var:`mcX`, :b2:var:`mcY` and :b2:var:`mcZ` ).
 
-.. rubric:: Abort processing for invalid or missing global tags
+.. rubric:: Redesign of the Conditions Database Interface
 
+The configuration and handling of the connection to the conditions database has
+been completely rewritten in a more coherent and modular way. We now have a new
+and consistent configuration interface, global tag replay and advanced checks:
 If users specify a global tag to be used which is either marked as invalid in
 the database or which cannot be found in the database the processing is now
-aborted.
+aborted. See :ref:`ConditionsDB` for details.
 
 .. rubric:: Restrict usage of ``useDB=False`` for Geometry creation
 
@@ -122,7 +123,7 @@ use the full geometry from the database.
 
 .. rubric:: Loading ECLClusters under multiple hypotheses
 
-It is now possible to load :math:`K_L^0` particles from clusters in the ECL. 
+It is now possible to load :math:`K_L^0` particles from clusters in the ECL.
 This has several important consequences for the creation of particles and using combinations containing :math:`K_L^0` s or other neutral hadrons in the analysis package.
 This is handled correctly by the ParticleLoader and ParticleCombiner (the corresponding convenience functions are `modularAnalysis.fillParticleList` and `modularAnalysis.reconstructDecay`).
 Essentially: it is forbidden from now onwards for any other analysis modules to create particles.
@@ -157,14 +158,14 @@ We added the new variable :b2:var:`cosAcoplanarityAngle`.
 | ``cosHelicityAngleIfCMSIsTheMother`` |    :b2:var:`cosHelicityAngleBeamMomentum`   |
 +--------------------------------------+---------------------------------------------+
 
-.. rubric:: New DecayStringGrammar for custom MCMatching 
+.. rubric:: New DecayStringGrammar for custom MCMatching
 
-Users can use new DecayStringGrammar to set properties of the MCMatching. Then `isSignal`, `mcErrors` and other MCTruthVariables behave according to the property. 
+Users can use new DecayStringGrammar to set properties of the MCMatching. Then `isSignal`, `mcErrors` and other MCTruthVariables behave according to the property.
 
 Once DecayStringGrammar is used with `reconstructDecay`, users can use `isSignal` instead of several specific variables such as `isSignalAcceptMissingNeutrino`.
 If one doesn't use any new DecayStringGrammar, all MCTruthVariables work same as before.
 
-The grammar is useful to analyze inclusive processes with both fully-inclusive-method and sum-of-exclusive-method. 
+The grammar is useful to analyze inclusive processes with both fully-inclusive-method and sum-of-exclusive-method.
 There are also new helper functions `genNMissingDaughter(PDG)` and `genNStepsToDaughter(i)` to obtain the detailed MC information.
 
 You can find examples of usage in :ref:`Marker_of_unspecified_particle`, :ref:`Grammar_for_custom_MCMatching`.
@@ -191,7 +192,7 @@ The whole software including the ROOT in the externals is now compiled using
 the C++17 standard. This should not affect many users but there are a few rare
 cases where this might lead to compilation problems of analysis code as some
 deprecated features `have been removed <https://mariusbancila.ro/blog/2018/07/05/c17-removed-and-deprecated-features/>`_.
-The most notable are 
+The most notable are
 
   * ``throw(TypeName)`` exception specifiers, just remove them.
   * ``std::auto_ptr`` which should be replaced by ``std::unique_ptr``
@@ -217,9 +218,9 @@ notice any difference except for two instances:
 
        scons: *** [...] TypeError : intern() argument 1 must be string, not unicode
        scons: building terminated because of errors.
-       TypeError: intern() argument 1 must be string, not unicode: 
+       TypeError: intern() argument 1 must be string, not unicode:
        [...]
-    
+
    In this case please remove all ``.scon*`` files in the top level of your
    software directory and rerun ``scons``
 

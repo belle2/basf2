@@ -787,14 +787,6 @@ void TrackFinderMCTruthRecoTracksModule::event()
     TVector3 momentumTrue = aMcParticlePtr->getMomentum();
     double timeTrue = aMcParticlePtr->getProductionTime();
 
-
-
-
-
-
-
-
-
     // if no kind of smearing is activated the initial values (seeds) for track fit will be the simulated truth
     TVector3 momentum = momentumTrue;
     TVector3 position = positionTrue;
@@ -965,5 +957,3 @@ void TrackFinderMCTruthRecoTracksModule::endRun()
   }
   B2INFO("The MCTrackFinder created a total of " << m_nRecoTracks << " track candidates");
 }
-
-

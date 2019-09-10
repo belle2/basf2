@@ -101,7 +101,7 @@ def BS13d_calibration():
     cal.pre_collector_path = main
     cal.max_files_per_collector_job = 1
     cal.backend_args = {"queue": "l"}
-    cal.strategies = SingleIOV
+    cal.strategies = SequentialRunByRun  # in case of power-cycle between the runs
     return cal
 
 
@@ -148,7 +148,7 @@ def channelT0_calibration():
     cal.pre_collector_path = main
     cal.max_files_per_collector_job = 1
     cal.backend_args = {"queue": "l"}
-    cal.strategies = SingleIOV
+    cal.strategies = SingleIOV  # merge all runs together to gain statistics
     return cal
 
 

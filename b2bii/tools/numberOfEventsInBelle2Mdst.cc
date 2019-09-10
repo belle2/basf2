@@ -77,10 +77,9 @@ int main(int argc, char* argv[])
     B2ERROR("No meta data found in " << filename);
     return 1;
   }
-//  metaDataPtr = 0;
+
   branch->SetAddress(&metaDataPtr);
   tree->GetEntry(0);
-
   std::cout << metaDataPtr->getNEvents() << std::endl;
 
   return 0;

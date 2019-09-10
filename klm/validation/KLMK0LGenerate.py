@@ -43,7 +43,7 @@ g4sim = register_module('FullSim')
 klmDigitizer = register_module('KLMDigitizer')
 bklmReconstructor = register_module('BKLMReconstructor')
 eklmReconstructor = register_module('EKLMReconstructor')
-klmK0LReconstructor = register_module('KLMK0LReconstructor')
+klmClustersReconstructor = register_module('KLMClustersReconstructor')
 mc_matcher = register_module('MCMatcherKLMClusters')
 
 # Add progress bars

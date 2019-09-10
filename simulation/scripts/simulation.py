@@ -189,7 +189,7 @@ def add_simulation(
         path_earlyPhase3_pxdDigi = create_path()
         path_standard_pxdDigi = create_path()
 
-        add_pxd_simulation(path_earlyPhase3_pxdDigi, digitsName=None)
+        add_pxd_simulation(path_earlyPhase3_pxdDigi)
         add_pxd_simulation(path_standard_pxdDigi, digitsName=pxd_digits_name)
 
         make_conditional_at(path, iov_list=[(1003, 0, 1003, -1)],
@@ -223,11 +223,11 @@ def add_simulation(
 
     # background overlay executor - after all digitizers
     if bkgfiles is not None and bkgOverlay:
-        path_earlyPhase3.add_module('BGOverlayExecutor', PXDDigitsName=None)
+        path_earlyPhase3.add_module('BGOverlayExecutor')
         path_standard.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)
 
         if components is None or 'PXD' in components:
-            path_earlyPhase3.add_module("PXDDigitSorter", digits=None)
+            path_earlyPhase3.add_module("PXDDigitSorter")
             path_standard.add_module("PXDDigitSorter", digits=pxd_digits_name)
 
         # sort SVDShaperDigits before PXD data reduction

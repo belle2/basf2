@@ -192,7 +192,12 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     auto objects = timeline.releaseObjects();
     for (auto iov_obj : objects) {
       if (iov_obj.second && !iov_obj.first.overlap(getIovFromAllData()).empty()) {
-        saveCalibration(iov_obj.second, DataStore::objectName(iov_obj.second->IsA(), ""), iov_obj.first.overlap(getIovFromAllData()));
+        if (auto evdep = dynamic_cast<EventDependency*>(iov_obj.second)) {
+          saveCalibration(iov_obj.second, DataStore::objectName(evdep->getAnyObject()->IsA(), ""),
+                          iov_obj.first.overlap(getIovFromAllData()));
+        } else {
+          saveCalibration(iov_obj.second, DataStore::objectName(iov_obj.second->IsA(), ""), iov_obj.first.overlap(getIovFromAllData()));
+        }
       } else {
         if (iov_obj.second) delete iov_obj.second;
       }
@@ -201,8 +206,13 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     auto objects_errors = timeline_errors.releaseObjects();
     for (auto iov_obj : objects_errors) {
       if (iov_obj.second && !iov_obj.first.overlap(getIovFromAllData()).empty()) {
-        saveCalibration(iov_obj.second, DataStore::objectName(iov_obj.second->IsA(), "") + "_ERRORS",
-                        iov_obj.first.overlap(getIovFromAllData()));
+        if (auto evdep = dynamic_cast<EventDependency*>(iov_obj.second)) {
+          saveCalibration(iov_obj.second, DataStore::objectName(evdep->getAnyObject()->IsA(), "") + "_ERRORS",
+                          iov_obj.first.overlap(getIovFromAllData()));
+        } else {
+          saveCalibration(iov_obj.second, DataStore::objectName(iov_obj.second->IsA(), "") + "_ERRORS",
+                          iov_obj.first.overlap(getIovFromAllData()));
+        }
       } else {
         if (iov_obj.second) delete iov_obj.second;
       }
@@ -211,8 +221,13 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     auto objects_corrections = timeline_corrections.releaseObjects();
     for (auto iov_obj : objects_corrections) {
       if (iov_obj.second && !iov_obj.first.overlap(getIovFromAllData()).empty()) {
-        saveCalibration(iov_obj.second, DataStore::objectName(iov_obj.second->IsA(), "") + "_CORRECTIONS",
-                        iov_obj.first.overlap(getIovFromAllData()));
+        if (auto evdep = dynamic_cast<EventDependency*>(iov_obj.second)) {
+          saveCalibration(iov_obj.second, DataStore::objectName(evdep->getAnyObject()->IsA(), "") + "_CORRECTIONS",
+                          iov_obj.first.overlap(getIovFromAllData()));
+        } else {
+          saveCalibration(iov_obj.second, DataStore::objectName(iov_obj.second->IsA(), "") + "_CORRECTIONS",
+                          iov_obj.first.overlap(getIovFromAllData()));
+        }
       } else {
         if (iov_obj.second) delete iov_obj.second;
       }

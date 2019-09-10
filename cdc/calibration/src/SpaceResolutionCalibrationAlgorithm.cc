@@ -335,15 +335,6 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
   double intp6;
 
   for (int i = 0; i < 56; ++i) {
-
-    if (i < 8) {
-      upFit = halfCSize[i] + 0.1;
-      intp6 = halfCSize[i] + 0.1;
-    } else {
-      upFit = halfCSize[i] - 0.07;
-      intp6 = halfCSize[i];
-    }
-
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nAlphaBins; ++al) {
         for (int th = 0; th < m_nThetaBins; ++th) {
@@ -434,6 +425,25 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
 
   write();
   storeHisto();
+
+  const int nTotal = 56 * 2 * m_nAlphaBins * m_nThetaBins;
+  int nFitFailed = 0;
+  for (int l = 0; l < 56; ++l) {
+    for (int lr = 0; lr < 2; ++lr) {
+      for (int al = 0; al < m_nAlphaBins; ++al) {
+        for (int th = 0; th < m_nThetaBins; ++th) {
+          if (m_fitStatus[l][lr][al][th] != 1) {
+            nFitFailed++;
+          }
+        }
+      }
+    }
+  }
+
+  if (static_cast<double>(nFitFailed) / nTotal < 0.6) {
+    B2WARNING("Less than 60 % of Sigmas were fitted.");
+    return c_NotEnoughData;
+  }
 
   return c_OK;
 }

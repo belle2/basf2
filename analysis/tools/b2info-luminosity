@@ -221,7 +221,7 @@ class Luminosity:
         """
 
         #cmdexp = f"SELECT {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = :exp "
-        cmdexp = f"SELECT {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp IN ({', '.join(['?' for _ in self.exp])})  "
+        cmdexp = f"SELECT exp, {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp IN ({', '.join(['?' for _ in self.exp])})  "
         if args.runs:
             cmdexp += f" AND run >= {min(self.runs)} AND run <= {max(self.runs)}"
 
@@ -293,12 +293,12 @@ class Luminosity:
         ax2.legend(h1+h2, l1+l2,loc="best",title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
 
         # Text box. Use axis coords.
-        plt.text(0., 1.03, rf"Belle II {self.what} luminosity", transform=ax1.transAxes, fontsize=12)
+        plt.text(0., 1.03, rf"Belle II {self.what.title()} luminosity", transform=ax1.transAxes, fontsize=12)
         plt.text(.5, 1.03, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, fontsize=12)
         plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
         plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
-        filename=f"Lumi{self.what}Per{label}_Exp{self.expstr}"
+        filename=f"Lumi{self.what.title()}Per{label}_Exp{self.expstr}"
         if self.runs:
             filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
         print(f"Creating {filename}.pdf|png files")
@@ -341,12 +341,12 @@ class Luminosity:
         ax2.legend(h1+h2, l1+l2, loc=2, title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
 
         # Text box. Use axis coords.
-        plt.text(0., 1.03, rf"Belle II {self.what} luminosity", transform=ax1.transAxes, fontsize=12)
+        plt.text(0., 1.03, rf"Belle II {self.what.title()} luminosity", transform=ax1.transAxes, fontsize=12)
         plt.text(.5, 1.03, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, fontsize=12)
         plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {dfRuns['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
         plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
-        filename=f"Lumi{self.what}PerRun_Exp{self.expstr}"
+        filename=f"Lumi{self.what.title()}PerRun_Exp{self.expstr}"
         if self.runs:
             filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
         print(f"Creating {filename}.pdf|png files")

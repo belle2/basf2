@@ -28,12 +28,11 @@ The constraints can be counted as following:
 +--------------+------------------------------+--------------+---------------------------+
 
 :math:`\tau` is the decay length. For intermediates it depends, generally there are 4 equations from the kinematic constraint, if they have a flight length longer than :math:`1~\mu m` AND a well defined production vertex (a mother particle or an origin constraint) we extract the flight length and can use a geometric constraint, which the fit will automatically do unless configured otherwise. If the particle shares the decay vertex with the mother we will only extract this vertex parameters once in the fit. A mass constraint will only be used if the user configures the fit to do so.
-So for example for :math:`J/\psi` the calculation is the following: parameters: 
+So for example for :math:`J/\psi \tightarrow l^+ l^-` the calculation is the following: parameters: 
 
 .. math::
     r = 5 (track) + 5 (track) + 4 (kinematic) - 3 (track) - 3 (track) - 7 (J/\psi:~px, py, pz, E, x, y, z) = 1`. For :math:`B \rightarrow D(K \pi \pi^0)\pi` :math:`r = 3\dot 5 (track) + 2 \cdot 3 (gamma) + 3 \cdot 4 (kinematic) + 3 (D:geometric) - 6 (B:~x,y,z,px,py,pz) - 7 (D:~x,y,z,tau,px,py,pz) - 3 (\pi^0:~px,py,pz) - 3 \cdot 3 (track) - 2 \cdot 3 (gamma) = 5. 
 
-The :math:`\pi^0` does not have to be mass constraint in this example.
 
 
 Usage: 

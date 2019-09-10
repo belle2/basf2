@@ -93,7 +93,6 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
 
     if(isROIsimulation):
         fitterName = '__ROISVDCoGTimeEstimator'
-        SVDEventInfoName = 'SVDEventInfoSim'
         clusterizerName = '__ROISVDSimpleClusterizer'
         dataFormatName = '__ROISVDDataFormat'
         clusterName = '__ROIsvdClusters'
@@ -102,7 +101,6 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
         missingAPVsClusterCreatorName = '__ROISVDMissingAPVsClusterCreator'
     else:
         fitterName = 'SVDCoGTimeEstimator'
-        SVDEventInfoName = ''
         clusterizerName = 'SVDSimpleClusterizer'
         dataFormatName = 'SVDDataFormat'
         clusterName = ""
@@ -132,7 +130,6 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
     if fitterName not in [e.name() for e in path.modules()]:
         fitter = register_module('SVDCoGTimeEstimator')
         fitter.set_name(fitterName)
-        fitter.param('SVDEventInfo', SVDEventInfoName)
         fitter.param('RecoDigits', recoDigitsName)
         path.add_module(fitter)
 

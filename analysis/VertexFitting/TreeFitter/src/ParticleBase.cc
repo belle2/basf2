@@ -488,12 +488,18 @@ namespace TreeFitter {
     /** be aware that the signs here are important
      * E-|p|-m extracts a negative mass and messes with the momentum !
      * */
-    p.getResiduals()(0) = -mass2 + E * E - px * px - py * py - pz * pz;
+    p.getResiduals()(0) = mass2 - E * E + px * px + py * py + pz * pz;
 
-    p.getH()(0, momindex)     = -2.0 * px;
-    p.getH()(0, momindex + 1) = -2.0 * py;
-    p.getH()(0, momindex + 2) = -2.0 * pz;
-    p.getH()(0, momindex + 3) = 2.0 * E;
+    p.getH()(0, momindex)     = 2.0 * px;
+    p.getH()(0, momindex + 1) = 2.0 * py;
+    p.getH()(0, momindex + 2) = 2.0 * pz;
+    p.getH()(0, momindex + 3) = -2.0 * E;
+
+    // TODO 0 in most cases -> needs special treatment if width=0 to not crash chi2 calculation
+    // const double width = TDatabasePDG::Instance()->GetParticle(particle()->getPDGCode())->Width();
+    // transport  measurement uncertainty into residual system
+    // f' = sigma_x^2 * (df/dx)^2
+    // p.getV()(0) = width * width * 4 * mass2;
 
     return ErrCode(ErrCode::Status::success);
   }
@@ -541,9 +547,9 @@ namespace TreeFitter {
       const Eigen::Matrix < double, 1, -1, 1, 1, 3 >
       mom = fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
 
-// if an intermediate vertex is not well defined by a track or so it will be initialised with 0
-// same for the momentum of for example B0, it might be initialsed with 0
-// in those cases use pdg value
+      // if an intermediate vertex is not well defined by a track or so it will be initialised with 0
+      // same for the momentum of for example B0, it might be initialsed with 0
+      // in those cases use pdg value
       const double mom_norm = mom.norm();
       const double dot = std::abs(vertex_dist.dot(mom));
       const double tau = dot / mom_norm;
@@ -552,10 +558,6 @@ namespace TreeFitter {
       } else {
         fitparams.getStateVector()(tauindex) = tau;
       }
-
-
-
-
     }
 
     return ErrCode(ErrCode::Status::success);

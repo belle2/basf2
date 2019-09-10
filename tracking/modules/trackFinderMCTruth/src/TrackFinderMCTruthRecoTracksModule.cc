@@ -845,9 +845,9 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
       // extrapolate the position and momentum to the point of the first hit on the helix
       if (hitInformationVector.size() != 0) {
-        // the hits have been sorted, so the first hit should be the earliest
-        double hittime = std::get<0>(hitInformationVector.at(0));
-        const double deltaT = hittime - aMcParticlePtr->getProductionTime();
+        // reset the time to the time of the first hit  (assumes time > production time)
+        time = std::get<0>(hitInformationVector.at(0));
+        const double deltaT = time - aMcParticlePtr->getProductionTime();
         // build the 4-vector with the smeared momentum
         TLorentzVector lorentzV;
         lorentzV.SetVectM(momentum, aMcParticlePtr->get4Vector().M());

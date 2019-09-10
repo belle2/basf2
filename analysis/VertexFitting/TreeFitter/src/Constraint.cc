@@ -37,13 +37,8 @@ namespace TreeFitter {
     double chisq(0);
     int iter(0);
     bool finished(false) ;
-    bool deleteFitpars = false;
 
-    FitParams* unfilteredState = nullptr;
-    if (m_maxNIter > 1) {
-      unfilteredState = new FitParams(fitpar);
-      deleteFitpars = true;
-    }
+    double accumulated_chi2 = 0;
     while (!finished && !status.failure()) {
 
       p.resetProjection();
@@ -60,13 +55,20 @@ namespace TreeFitter {
                   );
 
         if (!status.failure()) {
-          if (iter > 0) {
-            kalman.updateState(fitpar, *unfilteredState);
-          } else {
-            kalman.updateState(fitpar);
-          }
+          kalman.updateState(fitpar);
 
-          double newchisq = kalman.getChiSquare();
+          double newchisq = 0;
+          // the chi2 of exact constraints is different
+          if (m_type == Type::geometric || m_type == Type::kinematic || m_type == Type::mass) {
+            // for exact cosntriants (= constraints without V)
+            // we use  2 r^t R^-1 r
+            newchisq = 2 * kalman.getChiSquare();
+          } else {
+            // for measurement constraints use the measurement covariance
+            // explicit because Eigen::View does not implement '.inverse()'
+            const Eigen::Matrix < double, -1, -1, 0, 5, 5 > V = p.getV().selfadjointView<Eigen::Lower>();
+            newchisq = p.getResiduals().transpose() * V.inverse() * p.getResiduals();
+          }
 
           double dchisqconverged = 0.001 ;
 
@@ -79,12 +81,10 @@ namespace TreeFitter {
       }
     }
 
-    const unsigned int NDF = kalman.getConstraintDim();
-    fitpar.addChiSquare(kalman.getChiSquare(), NDF);
-
-    if (deleteFitpars) { delete unfilteredState; }
+    const unsigned int number_of_constraints = kalman.getConstraintDim();
+    fitpar.addChiSquare(accumulated_chi2, number_of_constraints);
     kalman.updateCovariance(fitpar);
-    m_chi2 = kalman.getChiSquare();
+
     return status;
   }
 
@@ -97,6 +97,10 @@ namespace TreeFitter {
     double chisq(0);
     int iter(0);
     bool finished(false) ;
+
+    // for non-linear cosntraitns we have to sum the chi2 of each iteration
+    double accumulated_chi2 = 0;
+
     while (!finished && !status.failure()) {
       p.resetProjection();
 
@@ -117,7 +121,20 @@ namespace TreeFitter {
 
         if (!status.failure()) {
           kalman.updateState(fitpar);
-          double newchisq = kalman.getChiSquare();
+
+          double newchisq = 0;
+          // the chi2 of exact constraints is different
+          if (m_type == Type::geometric || m_type == Type::kinematic || m_type == Type::mass) {
+            // for exact cosntriants (= constraints without V)
+            // we use  2 r^t R^-1 r
+            newchisq = 2 * kalman.getChiSquare();
+          } else {
+            // for measurement constraints use the measurement covariance
+            // explicit because Eigen::View does not implement '.inverse()'
+            const Eigen::Matrix < double, -1, -1, 0, 5, 5 > V = p.getV().selfadjointView<Eigen::Lower>();
+            newchisq = p.getResiduals().transpose() * V.inverse() * p.getResiduals();
+
+          }
 
           double dchisqconverged = 0.001 ;
 
@@ -126,15 +143,14 @@ namespace TreeFitter {
           bool converged = std::abs(dchisq) < dchisqconverged;
           finished  = ++iter >= m_maxNIter || diverging || converged;
           chisq = newchisq;
+          accumulated_chi2 += newchisq;
         }
       }
     }
 
-    const unsigned int NDF = kalman.getConstraintDim();
-    fitpar.addChiSquare(kalman.getChiSquare(), NDF);
-
+    const unsigned int number_of_constraints = kalman.getConstraintDim();
+    fitpar.addChiSquare(accumulated_chi2, number_of_constraints);
     kalman.updateCovariance(fitpar);
-    m_chi2 = kalman.getChiSquare();
     return status;
   }
 

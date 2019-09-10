@@ -98,14 +98,6 @@ namespace TreeFitter {
 
     fitparams.getCovariance().triangularView<Eigen::Lower>() = delta.triangularView<Eigen::Lower>();
 
-    for (int col = 0; col < m_constrDim; ++col) {
-      for (int k = 0; k < m_stateDim; ++k) {
-        if (m_G(col, k) != 0) {
-          ++(fitparams.incrementNConstraintsVec(k));
-        }
-      }
-    }//end for block
-
   }//end function
 
   TREEFITTER_RESTORE_WARNINGS

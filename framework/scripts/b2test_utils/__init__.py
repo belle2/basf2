@@ -17,7 +17,6 @@ from collections import OrderedDict
 import multiprocessing
 import basf2
 import subprocess
-import unittest
 import re
 from . import logfilter
 

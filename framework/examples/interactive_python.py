@@ -7,7 +7,7 @@
 # Prints further instructions when started.
 ############################################################
 
-from basf2 import *
+from basf2 import Module, Path, process, B2INFO
 import interactive
 from ROOT import Belle2
 
@@ -24,8 +24,8 @@ class MinModule(Module):
         """
         reimplement Module::event()
         """
-        evtmetadata = Belle2.PyStoreObj("EventMetaData")
-        particles = Belle2.PyStoreArray("MCParticles")
+        evtmetadata = Belle2.PyStoreObj("EventMetaData")  # noqa
+        particles = Belle2.PyStoreArray("MCParticles")  # noqa
         B2INFO(80 * '=')
         B2INFO("Dropping into interactive python shell. Try:"
                "\n  print evtmetadata.obj().getEvent()"
@@ -37,7 +37,7 @@ class MinModule(Module):
         interactive.embed()
 
 
-main = create_path()
+main = Path()
 main.add_module('EventInfoSetter', evtNumList=[2])
 main.add_module('ParticleGun')
 main.add_module(MinModule())

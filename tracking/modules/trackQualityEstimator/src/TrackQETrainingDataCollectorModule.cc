@@ -23,8 +23,11 @@ TrackQETrainingDataCollectorModule::TrackQETrainingDataCollectorModule() : Modul
 
   addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "Name of the recoTrack StoreArray.",
            std::string("RecoTracks"));
-  addParam("SVDCDCRecoTracksStoreArrayName", m_svdcdcRecoTracksStoreArrayName , "Name of the SVD-CDC StoreArray.",
+  addParam("SVDCDCRecoTracksStoreArrayName", m_svdCDCRecoTracksStoreArrayName , "Name of the SVD-CDC StoreArray.",
            std::string("SVDCDCRecoTracks"));
+  addParam("SVDPlusCDCStandaloneRecoTracksStoreArrayName", m_svdPlusCDCStandaloneRecoTracksStoreArrayName ,
+           "Name of the SVD StoreArray with tracks added from the CDC to SVD CKF.",
+           std::string("SVDplusRecoTracks"));
   addParam("CDCRecoTracksStoreArrayName", m_cdcRecoTracksStoreArrayName , "Name of the CDC StoreArray.",
            std::string("CDCRecoTracks"));
   addParam("SVDRecoTracksStoreArrayName", m_svdRecoTracksStoreArrayName , "Name of the SVD StoreArray.",
@@ -62,22 +65,35 @@ void TrackQETrainingDataCollectorModule::event()
   for (const RecoTrack& recoTrack : m_recoTracks) {
     m_truth = float(recoTrack.getMatchingStatus() ==  RecoTrack::MatchingStatus::c_matched);
 
-    RecoTrack* svdcdcRecoTrack;
-    RecoTrack* cdcRecoTrack;
-    RecoTrack* svdRecoTrack;
-    RecoTrack* pxdRecoTrack;
+    RecoTrack* pxdRecoTrackPtr = recoTrack.getRelatedTo<RecoTrack>(m_pxdRecoTracksStoreArrayName);
+    // track after both CDC-to-SVD and also SVD-to-CDC CKF if it is enabled
+    RecoTrack* svdCDCRecoTrackPtr = recoTrack.getRelatedTo<RecoTrack>(m_svdCDCRecoTracksStoreArrayName);
+    // tracks after CDC-to-SVD CKF
+    RecoTrack* svdPlusCDCStandaloneRecoTrackPtr = nullptr;
+    RecoTrack* cdcRecoTrackPtr = nullptr;
+    RecoTrack* svdRecoTrackPtr = nullptr;
 
-    svdcdcRecoTrack = recoTrack.getRelatedTo<RecoTrack>(m_svdcdcRecoTracksStoreArrayName);
-    if (svdcdcRecoTrack) {
-      cdcRecoTrack = svdcdcRecoTrack->getRelatedTo<RecoTrack>(m_cdcRecoTracksStoreArrayName);
-      svdRecoTrack = svdcdcRecoTrack->getRelatedTo<RecoTrack>(m_svdRecoTracksStoreArrayName);
+    if (svdCDCRecoTrackPtr) {
+      svdPlusCDCStandaloneRecoTrackPtr =
+        svdCDCRecoTrackPtr->getRelatedTo<RecoTrack>(m_svdPlusCDCStandaloneRecoTracksStoreArrayName);
+      // When `use_svd_to_cdc_ckf` is false, there is no related intermediate
+      // svdPlusCDCStandalone store array, and the svdCDC store array relates
+      // directly to CDC and SVD tracks. Then, set the svdPlusCDCStandalone
+      // pointer to be equal to the svdCDC pointer.
+      if (not svdPlusCDCStandaloneRecoTrackPtr) {
+        svdPlusCDCStandaloneRecoTrackPtr = svdCDCRecoTrackPtr;
+      }
     }
-    pxdRecoTrack = recoTrack.getRelatedTo<RecoTrack>(m_pxdRecoTracksStoreArrayName);
+    if (svdPlusCDCStandaloneRecoTrackPtr) {
+      // TODO: also use `CKFCDCRecoTracks` in quality estimation
+      cdcRecoTrackPtr = svdCDCRecoTrackPtr->getRelatedTo<RecoTrack>(m_cdcRecoTracksStoreArrayName);
+      svdRecoTrackPtr = svdCDCRecoTrackPtr->getRelatedTo<RecoTrack>(m_svdRecoTracksStoreArrayName);
+    }
     if (m_param_collectEventFeatures) {
       m_eventInfoExtractor->extractVariables(m_recoTracks, recoTrack);
     }
     m_recoTrackExtractor->extractVariables(recoTrack);
-    m_subRecoTrackExtractor->extractVariables(cdcRecoTrack, svdRecoTrack, pxdRecoTrack);
+    m_subRecoTrackExtractor->extractVariables(cdcRecoTrackPtr, svdRecoTrackPtr, pxdRecoTrackPtr);
     m_hitInfoExtractor->extractVariables(recoTrack);
 
     // record variables

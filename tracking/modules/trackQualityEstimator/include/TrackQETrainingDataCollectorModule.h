@@ -51,7 +51,9 @@ namespace Belle2 {
     /// Name of the recoTrack StoreArray
     std::string m_recoTracksStoreArrayName;
     /// Name of the SVD-CDC StoreArray
-    std::string m_svdcdcRecoTracksStoreArrayName;
+    std::string m_svdCDCRecoTracksStoreArrayName;
+    /// Name of the StoreArray of SVD tracks combined with CDC-tracks from only the standalone CDC trackfinding
+    std::string m_svdPlusCDCStandaloneRecoTracksStoreArrayName;
     /// Name of the CDC StoreArray
     std::string m_cdcRecoTracksStoreArrayName;
     /// Name of the SVD StoreArray

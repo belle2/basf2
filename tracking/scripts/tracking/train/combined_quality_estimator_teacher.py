@@ -508,6 +508,7 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
             input_reco_tracks="CDCRecoTracks",
             output_reco_tracks="SVDCDCRecoTracks",
             temporary_reco_tracks="SVDRecoTracks",
+            temporary_reco_tracks_two="SVDplusRecoTracks"
             add_both_directions=True,
             use_vxdtf2_quality_estimator=True,
         )
@@ -533,6 +534,7 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
             "TrackQETrainingDataCollector",
             TrainingDataOutputName=self.get_output_file_name(self.records_file_name),
             collectEventFeatures=True,  # collect event features and then just don't train on them via ``exclude_features``
+            SVDPlusCDCStandaloneRecoTracksStoreArrayName="SVDplusRecoTracks",
         )
         return path
 
@@ -836,6 +838,7 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
             input_reco_tracks="CDCRecoTracks",
             output_reco_tracks="SVDCDCRecoTracks",
             temporary_reco_tracks="SVDRecoTracks",
+            temporary_reco_tracks_two="SVDplusRecoTracks",
             add_both_directions=True,
             use_vxdtf2_quality_estimator=True,
         )

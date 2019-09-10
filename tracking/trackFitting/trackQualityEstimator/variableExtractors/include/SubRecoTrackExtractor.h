@@ -56,7 +56,7 @@ namespace Belle2 {
       }
 
       if (CDCRecoTrack) {
-        float cdcQI = CDCRecoTrack->getQualityIndicator();
+        const float cdcQI = CDCRecoTrack->getQualityIndicator();
         m_variables.at("CDC_QI") = isnan(cdcQI) ? 0. : cdcQI;
         m_variables.at("CDC_FitSuccessful") = CDCRecoTrack->wasFitSuccessful();
       } else {

@@ -15,7 +15,7 @@
 #include <TDatabasePDG.h>
 
 /* Belle2 headers. */
-#include <bklm/dbobjects/BKLMGeometryPar.h>
+#include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Const.h>
 #include <klm/modules/KLMK0LReconstructor/KLMK0LReconstructorModule.h>
@@ -76,12 +76,12 @@ static bool compareDistance(KLMHit2d& hit1, KLMHit2d& hit2)
 
 void KLMK0LReconstructorModule::event()
 {
-  static double mass = TDatabasePDG::Instance()->GetParticle(130)->Mass();
+  //static double mass = TDatabasePDG::Instance()->GetParticle(130)->Mass();
   int i, n, nLayers, innermostLayer, nHits;
   int nLayersBKLM = NLAYER, nLayersEKLM;
   int* layerHitsBKLM, *layerHitsEKLM;
   float minTime = -1;
-  double p, v;
+  double p;//, v;
   std::vector<KLMHit2d> klmHit2ds, klmClusterHits;
   std::vector<KLMHit2d>::iterator it, it0, it2;
   KLMCluster* klmCluster;
@@ -176,19 +176,20 @@ clusterFound:;
       }
     }
     /* Calculate energy. */
-    if (it0->inBKLM()) {
-      /*
-       * TODO: The constant is from BKLM K0L reconstructor,
-       * it must be recalculated.
-       */
-      p = klmClusterHits.size() * 0.215;
+    //if (it0->inBKLM()) {
+    /*
+     * TODO: The constant is from BKLM K0L reconstructor,
+     * it must be recalculated.
+     */
+    p = klmClusterHits.size() * 0.215;
+    /* FIXME: Reimplement time calculation after completion of time calibration.
     } else {
       v = hitPos.Mag() / minTime / Const::speedOfLight;
       if (v < 0.999999)
         p = mass * v / sqrt(1.0 - v * v);
       else
         p = 0;
-    }
+    }*/
     klmCluster = m_KLMClusters.appendNew(
                    hitPos.x(), hitPos.y(), hitPos.z(), minTime, nLayers,
                    innermostLayer, p);

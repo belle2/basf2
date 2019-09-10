@@ -39,7 +39,7 @@ mypath.add_module('VariablesToNtuple',
 # but all the variables to specify have to be event-based
 mypath.add_module('VariablesToNtuple',
                   particleList='',
-                  variables=['nTracks', 'evtNum', 'runNum', 'expNum'],
+                  variables=['nTracks', 'isMC', 'year'],
                   fileName='EventVariables.root')
 
 # you might also like to uncomment the following, and read the help for the

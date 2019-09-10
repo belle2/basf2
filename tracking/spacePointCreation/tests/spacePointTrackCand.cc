@@ -222,14 +222,14 @@ namespace Belle2 {
     shortTC2.addSpacePoint(&SVDSpacePoint4, 5.67);
     shortTC2.addSpacePoint(&SVDSpacePoint5, 6.78);
 
-    SpacePointTrackCand subTrackCand1 = fullTrackCand.getHitsInRange(0, 3);
+    SpacePointTrackCand subTrackCand1 = SpacePointTrackCand(fullTrackCand.getHitsInRange(0, 3));
     EXPECT_TRUE(subTrackCand1 == shortTC1);
     std::vector<double> sortParams1 = { 1.23, 2.34, 3.45 };
     std::vector<double> sortParamsTC1 = fullTrackCand.getSortingParametersInRange(0, 3);
     EXPECT_EQ(sortParams1.size(), sortParamsTC1.size());
     for (unsigned int i = 0; i < sortParamsTC1.size(); ++i) { EXPECT_DOUBLE_EQ(sortParams1.at(i), sortParamsTC1.at(i)); }
 
-    SpacePointTrackCand subTrackCand2 = fullTrackCand.getHitsInRange(2, 6);
+    SpacePointTrackCand subTrackCand2 = SpacePointTrackCand(fullTrackCand.getHitsInRange(2, 6));
     EXPECT_TRUE(subTrackCand2 == shortTC2);
     std::vector<double> sortParams2 = { 3.45, 4.56, 5.67, 6.78 };
     std::vector<double> sortParamsTC2 = fullTrackCand.getSortingParametersInRange(2, 6);
@@ -462,11 +462,11 @@ namespace Belle2 {
     sortedConstructed.addSpacePoint(&SVDSpacePoint6, 7.89);
 
     // test sorting
-    SpacePointTrackCand sorted = unsortedConstructed.getSortedHits();
+    SpacePointTrackCand sorted = SpacePointTrackCand(unsortedConstructed.getSortedHits());
     // == compares the spacepoints
     EXPECT_TRUE(sorted == sortedConstructed);
 
-    SpacePointTrackCand nothingChanged = sortedConstructed.getSortedHits();
+    SpacePointTrackCand nothingChanged = SpacePointTrackCand(sortedConstructed.getSortedHits());
     EXPECT_TRUE(nothingChanged == sortedConstructed);
 
 
@@ -474,7 +474,7 @@ namespace Belle2 {
     sortedConstructed.setSortingParameters(sortParams1);
 
     // verify that sorting changed according to new sortParams
-    SpacePointTrackCand unsorted = sortedConstructed.getSortedHits();
+    SpacePointTrackCand unsorted = SpacePointTrackCand(sortedConstructed.getSortedHits());
     EXPECT_TRUE(unsorted == unsortedConstructed);
   }
 }

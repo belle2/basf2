@@ -13,7 +13,8 @@ from modularAnalysis import *  # Standard Analysis Tools
 from stdPhotons import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 skimCode = encodeSkimName('ALP3Gamma')
-gb2_setuprel = 'release-03-00-03'
+gb2_setuprel = 'release-03-02-00'
+
 # create a new path
 darkskimpath = Path()
 

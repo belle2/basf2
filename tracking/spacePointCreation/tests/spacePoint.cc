@@ -477,40 +477,6 @@ namespace Belle2 {
 
 
 
-  /**  Testing member of spacePoint: getGlobalCoordinates
-   */
-  TEST_F(SpacePointTest, testGetGlobalCoordinates)
-  {
-    VxdID aVxdID = VxdID(1, 1, 1);
-    VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2);
-  }
-  /** converts a local hit on a given sensor into global coordinates.
-   *
-   * first parameter is the local hit stored as a pair of floats.
-   * second parameter is the coded vxdID, which carries the sensorID.
-   * third parameter, a sensorInfo can be passed for testing purposes.
-   *  If no sensorInfo is passed, the member gets its own pointer to it.
-   */
-  //     static TVector3 getGlobalCoordinates(const pair<float, float>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
-
-
-
-  /**  Testing member of spacePoint: convertToLocalCoordinatesNormalized
-   */
-  TEST_F(SpacePointTest, testConvertToLocalCoordinatesNormalized)
-  {
-    VxdID aVxdID = VxdID(1, 1, 1);
-    VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2);
-  }
-  /** converts a hit in sensor-independent relative coordinates into local coordinate of given sensor.
-   *
-   * first parameter is the hit in sensor-independent normalized ! coordinates stored as a pair of floats.
-   * second parameter is the coded vxdID, which carries the sensorID.
-   * third parameter, a sensorInfo can be passed for testing purposes.
-   *  If no sensorInfo is passed, the member gets its own pointer to it.
-   */
-  //     static pair<float, float> convertToLocalCoordinatesNormalized(const pair<float, float>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
-
   /** Test if the number of assigned Clusters is obtained correctly
    * NOTE: using the same constructors as in previous tests!
    */

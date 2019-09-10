@@ -27,6 +27,8 @@ SVDCoGTimeEstimatorModule::SVDCoGTimeEstimatorModule() : Module()
   setDescription("From SVDShaperDigit to SVDRecoDigit. Strip charge is evaluated as the max of the 6 samples; hit time is evaluated as a corrected Centre of Gravity (CoG) time.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("SVDEventInfo", m_svdEventInfoName,
+           "SVDEventInfo name", string(""));
   addParam("ShaperDigits", m_storeShaperDigitsName,
            "ShaperDigits collection name", string(""));
   addParam("RecoDigits", m_storeRecoDigitsName,
@@ -55,6 +57,7 @@ void SVDCoGTimeEstimatorModule::initialize()
 
   //Inizialization of needed store array
   m_storeShaper.isRequired(m_storeShaperDigitsName);
+  m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
 
   //Initialize the new RecoDigit
   m_storeReco.registerInDataStore(m_storeRecoDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
@@ -101,11 +104,14 @@ void SVDCoGTimeEstimatorModule::beginRun()
 
 void SVDCoGTimeEstimatorModule::event()
 {
+
   /** Probabilities, to be defined here */
   std::vector<float> probabilities = {0.5};
 
-  // If no digits, nothing to do
-  if (!m_storeShaper || !m_storeShaper.getEntries()) return;
+  // If no digits or no SVDEventInfo, nothing to do
+  if (!m_storeShaper || !m_storeShaper.getEntries() || !m_storeSVDEvtInfo.isValid()) return;
+
+  SVDModeByte modeByte = m_storeSVDEvtInfo->getModeByte();
 
   size_t nDigits = m_storeShaper.getEntries();
 
@@ -137,8 +143,6 @@ void SVDCoGTimeEstimatorModule::event()
 
     m_StopCreationReco = false;
 
-
-    SVDModeByte modeByte = shaper.getModeByte();
     m_NumberOfAPVSamples = fromModeToNumberOfSample((int) modeByte.getDAQMode());
     B2DEBUG(1, "number of APV samples = " << m_NumberOfAPVSamples);
 
@@ -172,7 +176,7 @@ void SVDCoGTimeEstimatorModule::event()
 
     if (m_corrPeakTime)
       m_weightedMeanTime -= m_PulseShapeCal.getPeakTime(thisSensorID, thisSide, thisCellID);
-    SVDModeByte::baseType triggerBin = (shaper.getModeByte()).getTriggerBin();
+    SVDModeByte::baseType triggerBin = modeByte.getTriggerBin();
 
     if (m_calEventT0)
       m_weightedMeanTime = m_TimeCal.getCorrectedTime(thisSensorID, thisSide, thisCellID, m_weightedMeanTime, triggerBin);
@@ -191,7 +195,7 @@ void SVDCoGTimeEstimatorModule::event()
 
     //recording of the RecoDigit
     m_storeReco.appendNew(SVDRecoDigit(shaper.getSensorID(), shaper.isUStrip(), shaper.getCellID(), m_amplitude, m_amplitudeError,
-                                       m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2, shaper.getModeByte()));
+                                       m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2, modeByte));
 
     //Add digit to the RecoDigit->ShaperDigit relation list
     int recoDigitIndex = m_storeReco.getEntries() - 1;

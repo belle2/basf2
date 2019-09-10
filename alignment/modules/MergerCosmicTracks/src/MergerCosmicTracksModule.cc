@@ -18,6 +18,8 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <vxd/geometry/GeoCache.h>
 
+#include <framework/geometry/B2Vector3.h>
+
 using namespace Belle2;
 
 REG_MODULE(MergerCosmicTracks);
@@ -108,12 +110,12 @@ void MergerCosmicTracksModule::MergingTracks(RecoTrack* firstRecoTrack, RecoTrac
                                                  upperTrack->getMomentumSeed(),
                                                  upperTrack->getChargeSeed());
   } else {
-    TVector3 momentum = upperTrack->getMomentumSeed();
+    B2Vector3D momentum = upperTrack->getMomentumSeed();
     float magnitudeMomentum = momentum.Mag();
     float newMomentumX = (momentum.Px() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
     float newMomentumY = (momentum.Py() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
     float newMomentumZ = (momentum.Pz() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
-    TVector3 newMomentum(newMomentumX, newMomentumY, newMomentumZ);
+    B2Vector3D newMomentum(newMomentumX, newMomentumY, newMomentumZ);
     // std::cout << "No Magnetic Field: " << newMomentum.Mag() << "\n";
     mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
                                                  newMomentum,
@@ -270,12 +272,12 @@ void MergerCosmicTracksModule::event()
               mergedRecoTrack = mergedRecoTracks.appendNew(recoTrackStoreArray[0]->getPositionSeed(),
                                                            recoTrackStoreArray[0]->getMomentumSeed(), recoTrackStoreArray[0]->getChargeSeed());
             } else {
-              TVector3 momentum = recoTrackStoreArray[0]->getMomentumSeed();
+              B2Vector3D momentum = recoTrackStoreArray[0]->getMomentumSeed();
               float magnitudeMomentum = momentum.Mag();
               float newMomentumX = (momentum.Px() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
               float newMomentumY = (momentum.Py() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
               float newMomentumZ = (momentum.Pz() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
-              TVector3 newMomentum(newMomentumX, newMomentumY, newMomentumZ);
+              B2Vector3D newMomentum(newMomentumX, newMomentumY, newMomentumZ);
               mergedRecoTrack = mergedRecoTracks.appendNew(recoTrackStoreArray[0]->getPositionSeed(),
                                                            newMomentum, recoTrackStoreArray[0]->getChargeSeed());
             }

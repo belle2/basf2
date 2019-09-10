@@ -65,20 +65,17 @@ namespace Belle2 {
     TLine* m_line1 = nullptr;
     /** TLine to show upper boundary for 'trigtag2_trigid' histogram. */
     TLine* m_line2 = nullptr;
+    /** TLine to show lower boundary for 'pedmean_cellid' histogram. */
+    TLine* m_line3 = nullptr;
+    /** TLine to show upper boundary for 'pedmean_cellid' histogram. */
+    TLine* m_line4 = nullptr;
 
     /** Statistics control flag for time crate histograms from current run. */
     Int_t stat[52] = {};
     /** Statistics control flag for time crate histograms from reference run. */
     Int_t stat_ref[52] = {};
 
-    /** Combined error for time offsets from current and reference runs. */
-    Double_t combined_err[52] = {};
-    /** Distance in terms of 'sigmas' between time offsets from current and reference runs. */
-    Double_t nsigmas[52] = {};
-    /** Sigma level which determines 'large time offsets'. */
-    Double_t m_level = 5.;
-
-    //** TCanvas  for adc_flag. */
+    /** TCanvas  for adc_flag. */
     TCanvas* c_adc_flag_title = nullptr;
 
     /** TCanvas for time offsets. */

@@ -19,6 +19,7 @@
 #include <framework/datastore/StoreArray.h>
 //#include <svd/geometry/SensorInfo.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
 //#include <svd/calibration/SVDDetectorConfiguration.h>
@@ -64,6 +65,9 @@ namespace Belle2 {
     /** event meta data store array */
     StoreObjPtr<EventMetaData> m_evtMetaData;
 
+    /**<storage for SVDEventInfo object */
+    StoreObjPtr<SVDEventInfo> m_storeSVDEvtInfo;
+
     /** experiment number */
     int m_expNumber = 0;
     /** run number */
@@ -93,13 +97,15 @@ namespace Belle2 {
     /** max number of events with at least one strip with a warning*/
     int m_maxProblematicEvts = 10;
     /** max number of strips in one with at least a warning*/
-    int m_maxProblematicStripsInEvts = 10;
+
   protected:
 
     /** Name of the collection to use for the SVDShaperDigits */
     std::string m_storeShaperDigitsName;
     /** Name of the collection to use for the SVDDAQDiagnostic */
     std::string m_storeDAQName;
+    /** Name of the SVDEventInfo object */
+    std::string m_svdEventInfoName;
 
     //counters
     //    int m_

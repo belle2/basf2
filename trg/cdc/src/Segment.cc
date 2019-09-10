@@ -52,6 +52,7 @@ namespace Belle2 {
              w.forwardPosition(),
              w.backwardPosition()),
       _wires(cells),
+      _center(), // 2019/07/31 by ytlai
       _signal(std::string("TS_") + TRGUtil::itostring(id), clock),
       _storeHits{},
       m_TSLUTFileName(TSLUTFile)

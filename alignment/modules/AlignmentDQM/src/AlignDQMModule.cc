@@ -26,6 +26,8 @@
 
 #include <vxd/geometry/GeoTools.h>
 
+#include <framework/geometry/B2Vector3.h>
+
 #include <TDirectory.h>
 #include <TVectorD.h>
 
@@ -1057,11 +1059,11 @@ void AlignDQMModule::event()
           if (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_PXD) {
             posU = recoHitInfo->getRelatedTo<PXDCluster>()->getU();
             posV = recoHitInfo->getRelatedTo<PXDCluster>()->getV();
-            TVector3 rLocal(posU, posV, 0);
+            B2Vector3D rLocal(posU, posV, 0);
             VxdID sensorID = recoHitInfo->getRelatedTo<PXDCluster>()->getSensorID();
             auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
             iLayer = sensorID.getLayerNumber();
-            TVector3 ral = info.pointToGlobal(rLocal);
+            B2Vector3D ral = info.pointToGlobal(rLocal);
             fPosSPU = ral.Phi() / TMath::Pi() * 180;
             fPosSPV = ral.Theta() / TMath::Pi() * 180;
             ResidUPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
@@ -1114,8 +1116,8 @@ void AlignDQMModule::event()
             iLayer = sensorID.getLayerNumber();
             if (IsSVDU) {
               posU = recoHitInfo->getRelatedTo<SVDCluster>()->getPosition();
-              TVector3 rLocal(posU, 0, 0);
-              TVector3 ral = info.pointToGlobal(rLocal);
+              B2Vector3D rLocal(posU, 0, 0);
+              B2Vector3D ral = info.pointToGlobal(rLocal);
               fPosSPU = ral.Phi() / TMath::Pi() * 180;
               ResidUPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
               if (sensorIDPrew != sensorID) { // other sensor, reset
@@ -1125,8 +1127,8 @@ void AlignDQMModule::event()
               sensorIDPrew = sensorID;
             } else {
               posV = recoHitInfo->getRelatedTo<SVDCluster>()->getPosition();
-              TVector3 rLocal(0, posV, 0);
-              TVector3 ral = info.pointToGlobal(rLocal);
+              B2Vector3D rLocal(0, posV, 0);
+              B2Vector3D ral = info.pointToGlobal(rLocal);
               fPosSPV = ral.Theta() / TMath::Pi() * 180;
               ResidVPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
               if (sensorIDPrew == sensorID) { // evaluate

@@ -168,4 +168,21 @@ namespace {
     }
     ASSERT_EQ(start, boost::filesystem::current_path().c_str());
   }
+
+
+  /** Test guarding the ROOT batch state */
+  TEST(ScopeGuards, Batch)
+  {
+    const bool start = gROOT->IsBatch();
+    {
+      auto guard1 = Belle2::ScopeGuard::guardBatchMode();
+      ASSERT_EQ(true, gROOT->IsBatch());
+      {
+        auto guard2 = Belle2::ScopeGuard::guardBatchMode(false);
+        ASSERT_EQ(false, gROOT->IsBatch());
+      }
+      ASSERT_EQ(true, gROOT->IsBatch());
+    }
+    ASSERT_EQ(start, gROOT->IsBatch());
+  }
 }

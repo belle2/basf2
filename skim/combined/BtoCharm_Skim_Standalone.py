@@ -15,8 +15,9 @@ from stdV0s import *
 from skim.standardlists.charm import *
 from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import *
-from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging
-gb2_setuprel = 'release-03-00-00'
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
+
+gb2_setuprel = 'release-03-02-00'
 
 btocharmpath = Path()
 

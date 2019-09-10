@@ -31,7 +31,7 @@ namespace Belle2 {
     /**
      * Create a new Decay tree from a decaystring
      */
-    DecayTree(const std::string& decaystring, bool removeRadiativeGammaFlag = false);
+    explicit DecayTree(const std::string& decaystring, bool removeRadiativeGammaFlag = false);
 
     /**
      * Copy constructor

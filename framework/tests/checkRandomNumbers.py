@@ -25,6 +25,7 @@ def double_to_hex(double):
 
 class RandomTestModule(Module):
     """Print some random numbers to check reproducibility"""
+
     def __init__(self, name):
         """Make sure we can run in multiple processes"""
         super(RandomTestModule, self).__init__()

@@ -67,7 +67,7 @@ using namespace Belle2;
 //
 //
 //
-TrgEclBhabha::TrgEclBhabha()
+TrgEclBhabha::TrgEclBhabha(): _mumuThreshold(20)
 {
   BhabhaComb.clear();
   MaxTCId.clear();
@@ -81,7 +81,21 @@ TrgEclBhabha::TrgEclBhabha()
 
   _2DBhabhaThresholdFWD.clear();
   _2DBhabhaThresholdBWD.clear();
-  _3DBhabhaThreshold.clear();
+  _3DBhabhaSelectionThreshold.clear();
+  _3DBhabhaVetoThreshold.clear();
+  _3DBhabhaSelectionAngle.clear();
+  _3DBhabhaVetoAngle.clear();
+  _mumuAngle.clear();
+
+
+
+  _2DBhabhaThresholdFWD = {40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 30, 35}; // /100 MeV
+  _2DBhabhaThresholdBWD  = {25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 30, 30}; // /100 MeV
+  _3DBhabhaVetoThreshold = {30, 45}; //  /100 MeV
+  _3DBhabhaSelectionThreshold = {20, 40}; //  /100 MeV
+  _3DBhabhaVetoAngle = {160, 200, 165, 190}; //  /100 MeV
+  _3DBhabhaSelectionAngle = {140, 220, 160, 200}; //  /100 MeV
+  _mumuAngle = {160, 200, 165, 190}; //  degree
 
 
 }
@@ -319,11 +333,11 @@ bool TrgEclBhabha::GetBhabha01() // veto bhabha
       int thetaSum = theta1 + theta2;
 
 
-      if (dphi > 160 && thetaSum > 165 && thetaSum < 190) {BtoBFlag = true;}
-      if ((ClusterEnergy[icluster] * 100.) > _3DBhabhaThreshold[0] * energy1
-          && (ClusterEnergy[jcluster] * 100.) > _3DBhabhaThreshold[0] * (energy2)
-          && ((ClusterEnergy[icluster] * 100.) > _3DBhabhaThreshold[1] * energy1
-              || (ClusterEnergy[jcluster] * 100.) > _3DBhabhaThreshold[1] * (energy2))) {
+      if (dphi > _3DBhabhaVetoAngle[0] && thetaSum > _3DBhabhaVetoAngle[2] && thetaSum <  _3DBhabhaVetoAngle[3]) {BtoBFlag = true;}
+      if ((ClusterEnergy[icluster] * 100.) > _3DBhabhaVetoThreshold[0] * energy1
+          && (ClusterEnergy[jcluster] * 100.) > _3DBhabhaVetoThreshold[0] * (energy2)
+          && ((ClusterEnergy[icluster] * 100.) > _3DBhabhaVetoThreshold[1] * energy1
+              || (ClusterEnergy[jcluster] * 100.) > _3DBhabhaVetoThreshold[1] * (energy2))) {
         if (BtoBFlag) {BhabhaFlag = true;}
       }
 
@@ -404,16 +418,16 @@ bool TrgEclBhabha::GetBhabha02() // selection bhabha
       int thetaSum = theta1 + theta2;
 
 
-      if (dphi > 140 && thetaSum > 160 && thetaSum < 200) {BtoBFlag = true;}
-      if ((ClusterEnergy[icluster] * 100.) >  25 * energy1
-          && (ClusterEnergy[jcluster] * 100.) >  25 * (energy2)
-          && ((ClusterEnergy[icluster] * 100.) >  40 * energy1
-              || (ClusterEnergy[jcluster] * 100.) >  40 * (energy2))) {
+      if (dphi > _3DBhabhaSelectionAngle[0] && dphi < _3DBhabhaSelectionAngle[1] && thetaSum > _3DBhabhaSelectionAngle[2]
+          && thetaSum <  _3DBhabhaSelectionAngle[3]) {BtoBFlag = true;}
+      if ((ClusterEnergy[icluster] * 100.) > _3DBhabhaSelectionThreshold[0] * energy1
+          && (ClusterEnergy[jcluster] * 100.) > _3DBhabhaSelectionThreshold[0] * (energy2)
+          && ((ClusterEnergy[icluster] * 100.) > _3DBhabhaSelectionThreshold[1] * energy1
+              || (ClusterEnergy[jcluster] * 100.) > _3DBhabhaSelectionThreshold[1] * (energy2))) {
         if (BtoBFlag) {BhabhaFlag = true;}
       }
 
     }
-
 
 
 
@@ -489,8 +503,8 @@ bool TrgEclBhabha::Getmumu() // MuMu bit
       int thetaSum = theta1 + theta2;
 
 
-      if (dphi > 160 && thetaSum > 165 && thetaSum < 190) {BtoBFlag = true;}
-      if ((ClusterEnergy[icluster] * 100.) < 200 && (ClusterEnergy[jcluster] * 100.) < 200) {
+      if (dphi > _mumuAngle[0] && dphi < _mumuAngle[1] && thetaSum > _mumuAngle[2] && thetaSum < _mumuAngle[3]) {BtoBFlag = true;}
+      if ((ClusterEnergy[icluster] * 10.) < _mumuThreshold && (ClusterEnergy[jcluster] * 10.) < _mumuThreshold) {
         if (BtoBFlag) {BhabhaFlag = true;}
       }
 

@@ -104,6 +104,7 @@ namespace Belle2 {
       return createMessage<ZMQNoIdMessage>(msgType, eventMessage);
     }
 
+    /// Create a No-ID Message out of an identity, the type, an event message, and and additional message
     static auto createMessage(const EMessageTypes msgType,
                               const std::unique_ptr<EvtMessage>& eventMessage,
                               zmq::message_t additionalData)

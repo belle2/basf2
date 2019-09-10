@@ -15,12 +15,13 @@
 #include <framework/gearbox/Const.h>
 #include <framework/database/DBObjPtr.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
-#include <eklm/dbobjects/EKLMChannels.h>
-#include <bklm/geometry/GeometryPar.h>
-#include <eklm/geometry/TransformDataGlobalAligned.h>
+#include <klm/eklm/dbobjects/EKLMChannels.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <tracking/dataobjects/ExtHit.h>
+#include <tracking/dbobjects/MuidParameters.h>
 
 #include <G4TouchableHandle.hh>
 #include <G4ErrorTrajErr.hh>
@@ -107,10 +108,6 @@ namespace Belle2 {
     int extLayerPattern;
     //! MUID: accumulated bit pattern of layers with matching hits
     int hitLayerPattern;
-    //! MUID: vector of BKLM layer efficiencies
-    std::vector<float> extBKLMEfficiencyVector;
-    //! MUID: vector of EKLM layer efficiencies
-    //    std::vector<float> extEKLMEfficiencyVector;
     //! MUID: flag to indicate that the extrapolated track escaped from the KLM
     bool escaped;
   };
@@ -303,7 +300,7 @@ namespace Belle2 {
                       const std::pair<ECLCluster*, G4ThreeVector>&, double, double);
 
     //! Create another MUID extrapolation hit for a track candidate
-    bool createMuidHit(ExtState&, G4ErrorFreeTrajState&, std::vector<std::map<const Track*, double> >*);
+    bool createMuidHit(ExtState&, G4ErrorFreeTrajState&, Muid*, std::vector<std::map<const Track*, double> >*);
 
     //! Find the intersection point of the track with the crossed BKLM plane
     bool findBarrelIntersection(ExtState&, const G4ThreeVector&, Intersection&);
@@ -484,6 +481,9 @@ namespace Belle2 {
 
     //! KLM element numbers.
     const KLMElementNumbers* m_klmElementNumbers;
+
+    //! Conditions-database object for Muid parameters
+    DBObjPtr<MuidParameters> m_muidParameters;
 
     //! Conditions-database object for KLM strip efficiency
     DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;

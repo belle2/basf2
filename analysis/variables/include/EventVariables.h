@@ -50,11 +50,6 @@ namespace Belle2 {
     double nKLMClusters(const Particle*);
 
     /**
-     * return total energy in KLM clusters in event
-     */
-    double KLMEnergy(const Particle*);
-
-    /**
      * return number MCParticles in event
      */
     double nMCParticles(const Particle*);
@@ -80,24 +75,9 @@ namespace Belle2 {
     double productionIdentifier(const Particle*);
 
     /**
-     * return energy of HER
-     */
-    double getHEREnergy(const Particle*);
-
-    /**
-     * return energy of LER
-     */
-    double getLEREnergy(const Particle*);
-
-    /**
      * return CMS energy
      */
     double getCMSEnergy(const Particle*);
-
-    /**
-     * return crossing angle
-     */
-    double getCrossingAngle(const Particle*);
 
     /**
      * return nominal beam Px

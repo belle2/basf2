@@ -20,6 +20,8 @@ CHANGES since release-00-09-03:
   + hasPulseShapeDiscrimination
   + hasTriggerClusterMatching
   + isTriggerCluster
+  + hasFailedFitTime
+  + hasFailedTimeResolution
   * getCovarianceMatrixAsArray removed
 - KlIds are added
 - TRGSummary:
@@ -29,13 +31,17 @@ CHANGES since release-00-09-03:
   * non-prescaled results added
 """
 
-from basf2 import create_path, process, set_random_seed, find_file, LogLevel
+from basf2 import create_path, process, set_random_seed, find_file, conditions
+from b2test_utils import configure_logging_for_tests
 from mdst import add_mdst_dump
 
 if __name__ == "__main__":
+    # there's no magnetic field in that old globaltag, disable replay
+    conditions.disable_globaltag_replay()
+    configure_logging_for_tests()
     set_random_seed(1)
     main = create_path()
-    main.add_module("RootInput", inputFileName=find_file("mdst/tests/mdst-v00-09-03.root"), logLevel=LogLevel.WARNING)
+    main.add_module("RootInput", inputFileName=find_file("mdst/tests/mdst-v00-09-03.root"))
     main.add_module("EventInfoPrinter")
     add_mdst_dump(main, True)
     process(main, 3)

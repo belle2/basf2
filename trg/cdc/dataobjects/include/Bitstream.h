@@ -49,7 +49,7 @@ namespace Belle2 {
     Bitstream() {};
 
     /** constructor from Signal Bus */
-    Bitstream(SignalBus bus)
+    explicit Bitstream(SignalBus bus) : m_signal(bus)
     {
       m_signal = bus;
     };
@@ -57,13 +57,14 @@ namespace Belle2 {
     /** destructor, empty because we don't allocate memory explicitly. */
     ~Bitstream() { };
 
-    // accessors
+    //! accessors
     const SignalBus& signal()
     {
       return m_signal;
     }
 
   protected:
+    //! SignalBus of the Bitstream
     SignalBus m_signal;
 
     //! Needed to make the ROOT object storable

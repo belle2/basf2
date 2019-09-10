@@ -1,5 +1,6 @@
 
 #include <analysis/variables/Variables.h>
+#include <analysis/variables/BasicParticleInformation.h>
 #include <analysis/variables/EventVariables.h>
 #include <analysis/variables/FlightInfoVariables.h>
 #include <analysis/variables/VertexVariables.h>
@@ -89,12 +90,12 @@ namespace {
         UseReferenceFrame<CMSFrame> dummy;
         EXPECT_FLOAT_EQ(0.68176979, particleP(&p));
         EXPECT_FLOAT_EQ(0.80920333, particleE(&p));
-        EXPECT_FLOAT_EQ(0.058562335, particlePx(&p));
+        EXPECT_FLOAT_EQ(0.061728548, particlePx(&p));
         EXPECT_FLOAT_EQ(-0.40000001, particlePy(&p));
-        EXPECT_FLOAT_EQ(0.54898131, particlePz(&p));
-        EXPECT_FLOAT_EQ(0.40426421, particlePt(&p));
-        EXPECT_FLOAT_EQ(0.80522972, particleCosTheta(&p));
-        EXPECT_FLOAT_EQ(-1.4254233, particlePhi(&p));
+        EXPECT_FLOAT_EQ(0.54863429, particlePz(&p));
+        EXPECT_FLOAT_EQ(0.404735, particlePt(&p));
+        EXPECT_FLOAT_EQ(0.80472076, particleCosTheta(&p));
+        EXPECT_FLOAT_EQ(-1.4176828, particlePhi(&p));
 
         EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
       }
@@ -176,12 +177,12 @@ namespace {
         UseReferenceFrame<CMSRotationFrame> dummy(TVector3(1, 0, 0), TVector3(0, 1, 0), TVector3(0, 0, 1));
         EXPECT_FLOAT_EQ(0.68176979, particleP(&p));
         EXPECT_FLOAT_EQ(0.80920333, particleE(&p));
-        EXPECT_FLOAT_EQ(0.058562335, particlePx(&p));
+        EXPECT_FLOAT_EQ(0.061728548, particlePx(&p));
         EXPECT_FLOAT_EQ(-0.40000001, particlePy(&p));
-        EXPECT_FLOAT_EQ(0.54898131, particlePz(&p));
-        EXPECT_FLOAT_EQ(0.40426421, particlePt(&p));
-        EXPECT_FLOAT_EQ(0.80522972, particleCosTheta(&p));
-        EXPECT_FLOAT_EQ(-1.4254233, particlePhi(&p));
+        EXPECT_FLOAT_EQ(0.54863429, particlePz(&p));
+        EXPECT_FLOAT_EQ(0.404735, particlePt(&p));
+        EXPECT_FLOAT_EQ(0.80472076, particleCosTheta(&p));
+        EXPECT_FLOAT_EQ(-1.4176828, particlePhi(&p));
 
         EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
       }
@@ -269,11 +270,11 @@ namespace {
 
     {
       UseReferenceFrame<CMSFrame> dummy;
-      EXPECT_FLOAT_EQ(1.0261739, particleDX(&p));
+      EXPECT_FLOAT_EQ(1.0382183, particleDX(&p));
       EXPECT_FLOAT_EQ(2.0, particleDY(&p));
-      EXPECT_FLOAT_EQ(2.256825, particleDZ(&p));
-      EXPECT_FLOAT_EQ(std::sqrt(2.0 * 2.0 + 1.0261739 * 1.0261739), particleDRho(&p));
-      EXPECT_FLOAT_EQ(3.1853244, particleDistance(&p));
+      EXPECT_FLOAT_EQ(2.2510159, particleDZ(&p));
+      EXPECT_FLOAT_EQ(std::sqrt(2.0 * 2.0 + 1.0382183 * 1.0382183), particleDRho(&p));
+      EXPECT_FLOAT_EQ(3.185117, particleDistance(&p));
       EXPECT_FLOAT_EQ(0.5, particlePvalue(&p));
     }
 
@@ -411,6 +412,8 @@ namespace {
       true_photon->setPDG(22);
       auto* true_electron = mcparticles.appendNew(MCParticle());
       true_electron->setPDG(11);
+      auto* true_pion = mcparticles.appendNew(MCParticle());
+      true_pion->setPDG(-211);
 
       // create the reco clusters
       auto* cl0 = clusters.appendNew(ECLCluster());
@@ -428,23 +431,38 @@ namespace {
       trackfits.appendNew(
         TVector3(), TVector3(), cov, -1, Const::electron, 0.5, 1.5,
         static_cast<unsigned long long int>(0x300000000000000), 16777215);
-      auto* tr = tracks.appendNew(Track());
-      tr->setTrackFitResultIndex(Const::electron, 0);
-      tr->addRelationTo(cl1);  // a track <--> cluster match
+      auto* electron_tr = tracks.appendNew(Track());
+      electron_tr->setTrackFitResultIndex(Const::electron, 0);
+      electron_tr->addRelationTo(cl1);  // a track <--> cluster match
+
+      TMatrixDSym cov1(6);
+      trackfits.appendNew(
+        TVector3(), TVector3(), cov1, -1, Const::pion, 0.51, 1.5,
+        static_cast<unsigned long long int>(0x300000000000000), 16777215);
+      auto* pion_tr = tracks.appendNew(Track());
+      pion_tr->setTrackFitResultIndex(Const::pion, 0);
+      pion_tr->addRelationTo(cl1);  // a track <--> cluster match
 
       // now set mcmatch relations
-      cl0->addRelationTo(true_photon, 12.3);
+      cl0->addRelationTo(true_photon,   12.3);
+      cl0->addRelationTo(true_electron,  2.3);
       cl1->addRelationTo(true_electron, 45.6);
-      tr->addRelationTo(true_electron);
+      cl1->addRelationTo(true_photon,    5.6);
+      cl1->addRelationTo(true_pion,     15.6);
+
+      electron_tr->addRelationTo(true_electron);
+      pion_tr->addRelationTo(true_pion);
 
       // create belle2::Particles from the mdst objects
       const auto* photon = particles.appendNew(Particle(cl0));
-      const auto* electron = particles.appendNew(Particle(tr, Const::electron));
+      const auto* electron = particles.appendNew(Particle(electron_tr, Const::electron));
+      const auto* pion = particles.appendNew(Particle(pion_tr, Const::pion));
       const auto* misid_photon = particles.appendNew(Particle(cl1));
 
       // now set mcmatch relations
       photon->addRelationTo(true_photon);
       electron->addRelationTo(true_electron);
+      pion->addRelationTo(true_pion);
       misid_photon->addRelationTo(true_electron); // assume MC matching caught this
     }
 
@@ -459,10 +477,12 @@ namespace {
     StoreArray<Particle> particles;
     const auto* photon = particles[0];
     const auto* electron = particles[1];
+    const auto* pion = particles[2];
 
     const auto* weight = Manager::Instance().getVariable("clusterMCMatchWeight");
     EXPECT_FLOAT_EQ(weight->function(photon),   12.3);
     EXPECT_FLOAT_EQ(weight->function(electron), 45.6);
+    EXPECT_FLOAT_EQ(weight->function(pion), 15.6);
   }
 
   TEST_F(MCTruthVariablesTest, ECLBestMCMatchVariables)
@@ -470,17 +490,20 @@ namespace {
     StoreArray<Particle> particles;
     const auto* photon = particles[0];
     const auto* electron = particles[1];
-    const auto* misid_photon = particles[2];
+    const auto* pion = particles[2];
+    const auto* misid_photon = particles[3];
 
 
     const auto* pdgcode = Manager::Instance().getVariable("clusterBestMCPDG");
     EXPECT_EQ(pdgcode->function(photon),       22);
     EXPECT_EQ(pdgcode->function(electron),     11);
+    EXPECT_EQ(pdgcode->function(pion),     11);
     EXPECT_EQ(pdgcode->function(misid_photon), 11);
 
     const auto* weight = Manager::Instance().getVariable("clusterBestMCMatchWeight");
     EXPECT_FLOAT_EQ(weight->function(photon),       12.3);
     EXPECT_FLOAT_EQ(weight->function(electron),     45.6);
+    EXPECT_FLOAT_EQ(weight->function(pion),     45.6);
     EXPECT_FLOAT_EQ(weight->function(misid_photon), 45.6);
   }
 
@@ -1121,7 +1144,7 @@ namespace {
 
     var = Manager::Instance().getVariable("useCMSFrame(distance)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 3.1853244);
+    EXPECT_FLOAT_EQ(var->function(&p), 3.185117);
   }
 
   TEST_F(MetaVariableTest, extraInfo)
@@ -1196,6 +1219,10 @@ namespace {
     var = Manager::Instance().getVariable("max(E, pz)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(&p), 2.0);
+
+    var = Manager::Instance().getVariable("log10(px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), -1.0);
   }
 
   TEST_F(MetaVariableTest, formula)
@@ -1933,7 +1960,7 @@ namespace {
     const Particle* par = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices);
 
     //now we expect non-nan results
-    EXPECT_FLOAT_EQ(var->function(par), 2.8614323);
+    EXPECT_FLOAT_EQ(var->function(par), 2.8638029);
     EXPECT_FLOAT_EQ(varCMS->function(par), M_PI);
   }
 
@@ -2318,6 +2345,71 @@ namespace {
     EXPECT_B2FATAL(vnonsense->function(notinthelist));
     EXPECT_FLOAT_EQ(vsensible->function(inthelist), 1.0);
     EXPECT_FLOAT_EQ(vsensible->function(notinthelist), 0.0);
+  }
+
+  TEST_F(MetaVariableTest, sourceObjectIsInList)
+  {
+    // datastore things
+    DataStore::Instance().reset();
+    DataStore::Instance().setInitializeActive(true);
+
+    // needed to mock up
+    StoreArray<ECLCluster> clusters;
+    StoreArray<Particle> particles;
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+
+    clusters.registerInDataStore();
+    particles.registerInDataStore();
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+    gammalist.registerInDataStore(flags);
+
+    // end datastore things
+    DataStore::Instance().setInitializeActive(false);
+
+    // of course we have to create the list...
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // mock up two clusters from the ECL let's say they both came from true Klongs
+    // but one looked a little bit photon-like
+    auto* cl0 = clusters.appendNew(ECLCluster());
+    cl0->setEnergy(1.0);
+    cl0->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+    cl0->addHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+    cl0->setClusterId(0);
+    auto* cl1 = clusters.appendNew(ECLCluster());
+    cl1->setEnergy(1.0);
+    cl1->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+    cl1->setClusterId(1);
+
+    // create particles from the clusters
+    Particle myphoton(cl0, Const::photon);
+    Particle iscopiedin(cl0, Const::Klong);
+    Particle notcopiedin(cl1, Const::Klong);
+
+    // add the particle created from cluster zero to the gamma list
+    auto* myphoton_ = particles.appendNew(myphoton);
+    gammalist->addParticle(myphoton_);
+
+    auto* iscopied = particles.appendNew(iscopiedin); // a clone of this guy is now in the gamma list
+    auto* notcopied = particles.appendNew(notcopiedin);
+
+    // get the variables
+    const Manager::Var* vnonsense = Manager::Instance().getVariable("sourceObjectIsInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable("sourceObjectIsInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(iscopied));
+    EXPECT_FLOAT_EQ(vsensible->function(iscopied), 1.0);
+    EXPECT_FLOAT_EQ(vsensible->function(notcopied), 0.0);
+
+    // now mock up some other type particles
+    Particle composite({0.5 , 0.4 , 0.5 , 0.8}, 512, Particle::c_Unflavored, Particle::c_Composite, 0);
+    Particle undefined({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
+    auto* composite_ = particles.appendNew(undefined);
+    auto* undefined_ = particles.appendNew(composite);
+    EXPECT_FLOAT_EQ(vsensible->function(composite_), -1.0);
+    EXPECT_FLOAT_EQ(vsensible->function(undefined_), -1.0);
   }
 
   TEST_F(MetaVariableTest, mostB2BAndClosestParticles)
@@ -2880,6 +2972,44 @@ namespace {
                                     "medianValueInList(NONEXISTANTLIST, px)");
 
     EXPECT_B2FATAL(vnolist->function(nullptr));
+  }
+
+  TEST_F(MetaVariableTest, pValueCombination)
+  {
+    TLorentzVector momentum;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    Particle KS(TLorentzVector(1.164, 1.55200, 0, 2), 310, Particle::c_Unflavored, Particle::c_Composite, 0);
+    KS.setPValue(0.1);
+    momentum += KS.get4Vector();
+    Particle* newDaughters = particles.appendNew(KS);
+    daughterIndices.push_back(newDaughters->getArrayIndex());
+    Particle Jpsi(TLorentzVector(-1, 1, 1, 3.548), 443, Particle::c_Unflavored, Particle::c_Composite, 1);
+    Jpsi.setPValue(0.9);
+    momentum += Jpsi.get4Vector();
+    newDaughters = particles.appendNew(Jpsi);
+    daughterIndices.push_back(newDaughters->getArrayIndex());
+    Particle* B = particles.appendNew(momentum, 521, Particle::c_Flavored, daughterIndices);
+    B->setPValue(0.5);
+
+    const Manager::Var* singlePvalue = Manager::Instance().getVariable("pValueCombination(chiProb)");
+    ASSERT_NE(singlePvalue, nullptr);
+    EXPECT_FLOAT_EQ(singlePvalue->function(B), 0.5);
+
+    const Manager::Var* twoPvalues = Manager::Instance().getVariable("pValueCombination(chiProb, daughter(0, chiProb))");
+    ASSERT_NE(twoPvalues, nullptr);
+    EXPECT_FLOAT_EQ(twoPvalues->function(B), 0.05 * (1 - log(0.05)));
+
+    const Manager::Var* threePvalues =
+      Manager::Instance().getVariable("pValueCombination(chiProb, daughter(0, chiProb), daughter(1, chiProb))");
+    ASSERT_NE(threePvalues, nullptr);
+    EXPECT_FLOAT_EQ(threePvalues->function(B), 0.045 * (1 - log(0.045) + 0.5 * log(0.045) * log(0.045)));
+
+    // wrong number of arguments
+    EXPECT_B2FATAL(Manager::Instance().getVariable("pValueCombination()"));
+
+    // non-existing variable
+    EXPECT_B2FATAL(Manager::Instance().getVariable("pValueCombination(chiProb, NONEXISTANTVARIABLE)"));
   }
 
   class PIDVariableTest : public ::testing::Test {

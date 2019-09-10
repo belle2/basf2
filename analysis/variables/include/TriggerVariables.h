@@ -57,14 +57,21 @@ namespace Belle2 {
     Manager::FunctionPtr softwareTriggerResult(const std::vector<std::string>& args);
 
     /**
+     * returns 1 if the event would have passed a given software trigger identifier, if this trigger would not be prescaled.
+     * Please note, this is not the final HLT decision!
+     */
+    Manager::FunctionPtr softwareTriggerResultNonPrescaled(const std::vector<std::string>& args);
+
+    /**
+     * returns the prescaling for the specific software trigger identifier.
+     * Please note, this prescaling is taken from the currently setup database. It only corresponds
+     * to the correct HLT prescale if you are using the online database!
+     */
+    Manager::FunctionPtr softwareTriggerPrescaling(const std::vector<std::string>& args);
+
+    /**
      * returns 1 if the event passes the HLT
      */
     double passesAnyHighLevelTrigger(const Particle*);
-
-    /**
-     * returns 1 if the event passes the fast reco trigger
-     */
-    double passesAnyFastRecoTrigger(const Particle*);
-
   }
 }

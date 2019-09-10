@@ -18,8 +18,8 @@
 #include <TStyle.h>
 
 /* Belle2 headers. */
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <eklm/dataobjects/EKLMHit2d.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <framework/datastore/RelationArray.h>
 #include <klm/modules/KLMClusterEfficiency/KLMClusterEfficiencyModule.h>
 

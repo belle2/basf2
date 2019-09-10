@@ -13,6 +13,8 @@
 
 #include <alignment/Manager.h>
 
+#include <alignment/GlobalTimeLine.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace alignment;
@@ -26,6 +28,11 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 {
   auto chisqHist = getObjectPtr<TH1F>("chi2_per_ndf");
   B2INFO(" Mean of Chi2 / NDF of tracks before calibration: " << chisqHist->GetMean());
+
+  if (chisqHist->GetEntries() < m_minEntries) {
+    B2INFO("Less than " << m_minEntries << " collected: " << chisqHist->GetEntries() << ". Return c_NotEnoughData.");
+    return c_NotEnoughData;
+  }
 
   // Write out binary files from tree and add to steering
   prepareMilleBinary();
@@ -54,16 +61,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 //     }
 //   }
 
-  GlobalParamVector result(m_components);
-  GlobalParamVector errors(m_components);
-  GlobalParamVector corrections(m_components);
 
-  GlobalCalibrationManager::initGlobalVector(result);
-  GlobalCalibrationManager::initGlobalVector(errors);
-  GlobalCalibrationManager::initGlobalVector(corrections);
-
-  // <UniqueID, ElementID, ParameterId, value>
-  std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>> resultTuple;
 
   // This function gives you the vector of ExpRuns that were requested for this execution only
   //auto expRuns = getRunList();
@@ -71,67 +69,125 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   // Or you can inspect all the input files to get the full RunRange
   auto expRuns = getRunListFromAllData();
 
-  for (auto& exprun : expRuns) {
-    auto event1 = EventMetaData(1, exprun.second, exprun.first);
-    result.loadFromDB(event1);
-    errors.construct();
-    corrections.construct();
-    break;
-  }
-
-  // Construct all remaining components not loaded from DB
-  // to easily create new objects not previously in DB :-)
-  // TODO: remove?
-  result.construct();
-
   int undeterminedParams = 0;
   double maxCorrectionPull = 0.;
   int maxCorrectionPullLabel = 0;
   int nParams = 0;
   double paramChi2 = 0.;
 
-  // Loop over all determined parameters:
-  for (int ipar = 0; ipar < m_result.getNoParameters(); ipar++) {
-    if (!m_result.isParameterDetermined(ipar)) {
-      if (!m_result.isParameterFixed(ipar)) {
-        ++undeterminedParams;
+  if (m_events.empty()) {
+    GlobalParamVector result(m_components);
+    GlobalParamVector errors(m_components);
+    GlobalParamVector corrections(m_components);
+
+    GlobalCalibrationManager::initGlobalVector(result);
+    GlobalCalibrationManager::initGlobalVector(errors);
+    GlobalCalibrationManager::initGlobalVector(corrections);
+
+    // <UniqueID, ElementID, ParameterId, value>
+    std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>> resultTuple;
+
+    for (auto& exprun : expRuns) {
+      auto event1 = EventMetaData(1, exprun.second, exprun.first);
+      result.loadFromDB(event1);
+      errors.construct();
+      corrections.construct();
+      break;
+    }
+
+    // Construct all remaining components not loaded from DB
+    // to easily create new objects not previously in DB :-)
+    // TODO: remove?
+    result.construct();
+
+
+
+    // Loop over all determined parameters:
+    for (int ipar = 0; ipar < m_result.getNoParameters(); ipar++) {
+      if (!m_result.isParameterDetermined(ipar)) {
+        if (!m_result.isParameterFixed(ipar)) {
+          ++undeterminedParams;
+        }
+        continue;
       }
-      continue;
+
+      GlobalLabel label(m_result.getParameterLabel(ipar));
+      double correction = m_result.getParameterCorrection(ipar);
+      double error = m_result.getParameterError(ipar);
+      double pull = correction / error;
+
+      ++nParams;
+      paramChi2 += pull * pull;
+
+      if (fabs(pull) > fabs(maxCorrectionPull)) {
+        maxCorrectionPull = pull;
+        maxCorrectionPullLabel = label.label();
+      }
+
+      if (m_invertSign) correction = - correction;
+
+      result.updateGlobalParam(correction, label.getUniqueId(), label.getElementId(), label.getParameterId());
+      errors.setGlobalParam(error, label.getUniqueId(), label.getElementId(), label.getParameterId());
+      corrections.setGlobalParam(correction, label.getUniqueId(), label.getElementId(), label.getParameterId());
+
+      resultTuple.push_back({label.getUniqueId(), label.getElementId(), label.getParameterId(), correction});
+
     }
 
-    GlobalLabel label(m_result.getParameterLabel(ipar));
-    double correction = m_result.getParameterCorrection(ipar);
-    double error = m_result.getParameterError(ipar);
-    double pull = correction / error;
+    result.postReadFromResult(resultTuple);
 
-    ++nParams;
-    paramChi2 += pull * pull;
+    for (auto object : result.releaseObjects()) {
+      saveCalibration(object);
+    }
+    for (auto object : errors.releaseObjects()) {
+      saveCalibration(object, DataStore::objectName(object->IsA(), "") + "_ERRORS");
+    }
+    for (auto object : corrections.releaseObjects()) {
+      saveCalibration(object, DataStore::objectName(object->IsA(), "") + "_CORRECTIONS");
+    }
+  } else {
 
-    if (fabs(pull) > fabs(maxCorrectionPull)) {
-      maxCorrectionPull = pull;
-      maxCorrectionPullLabel = label.label();
+    GlobalParamVector gpv(m_components);
+    GlobalCalibrationManager::initGlobalVector(gpv);
+    GlobalLabel label_system;
+
+    alignment::timeline::GlobalParamTimeLine timeline(m_events, label_system, gpv);
+    timeline.loadFromDB();
+
+    // Loop over all determined parameters:
+    for (int ipar = 0; ipar < m_result.getNoParameters(); ipar++) {
+      if (!m_result.isParameterDetermined(ipar)) {
+        if (!m_result.isParameterFixed(ipar)) {
+          ++undeterminedParams;
+        }
+        continue;
+      }
+
+      GlobalLabel label(m_result.getParameterLabel(ipar));
+      double correction = m_result.getParameterCorrection(ipar);
+      double error = m_result.getParameterError(ipar);
+      double pull = correction / error;
+
+      ++nParams;
+      paramChi2 += pull * pull;
+
+      if (fabs(pull) > fabs(maxCorrectionPull)) {
+        maxCorrectionPull = pull;
+        maxCorrectionPullLabel = label.label();
+      }
+
+      if (m_invertSign) correction = - correction;
+
+      timeline.updateGlobalParam(label, correction);
     }
 
-    if (m_invertSign) correction = - correction;
 
-    result.updateGlobalParam(correction, label.getUniqueId(), label.getElementId(), label.getParameterId());
-    errors.setGlobalParam(error, label.getUniqueId(), label.getElementId(), label.getParameterId());
-    corrections.setGlobalParam(correction, label.getUniqueId(), label.getElementId(), label.getParameterId());
+    auto objects = timeline.releaseObjects();
+    for (auto iov_obj : objects) {
+      if (iov_obj.second)
+        saveCalibration(iov_obj.second, DataStore::objectName(iov_obj.second->IsA(), ""), iov_obj.first.overlap(getIovFromAllData()));
+    }
 
-    resultTuple.push_back({label.getUniqueId(), label.getElementId(), label.getParameterId(), correction});
-
-  }
-
-  result.postReadFromResult(resultTuple);
-
-  for (auto object : result.releaseObjects()) {
-    saveCalibration(object);
-  }
-  for (auto object : errors.releaseObjects()) {
-    saveCalibration(object, DataStore::objectName(object->IsA(), "") + "_ERRORS");
-  }
-  for (auto object : corrections.releaseObjects()) {
-    saveCalibration(object, DataStore::objectName(object->IsA(), "") + "_CORRECTIONS");
   }
 
   if (undeterminedParams) {

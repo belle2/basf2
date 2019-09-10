@@ -72,6 +72,7 @@ namespace Belle2 {
         PurityType bestResult = PurityType();
 
         for (const PurityType& iD : purities) {
+          // cppcheck-suppress useStlAlgorithm
           if (iD > bestResult) { bestResult = iD; }
         }
         return bestResult;

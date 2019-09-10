@@ -13,6 +13,9 @@ SVDCoGCalibrationFunction::SVDCoGCalibrationFunction(const SVDCoGCalibrationFunc
     m_scale[i] = a.m_scale[i];
   }
   m_current = a.m_current;
+
+  for (int i = 0; i < 4; i++)
+    m_par[i] = a.m_par[i];
 }
 
 

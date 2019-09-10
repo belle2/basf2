@@ -8,7 +8,6 @@ from basf2 import *
 from modularAnalysis import *
 
 if __name__ == "__main__":
-
     variables = ['p', 'pt', 'pz', 'phi',
                  'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)', 'daughter(0, phi)',
                  'daughter(1, p)', 'daughter(1, pz)', 'daughter(1, pt)', 'daughter(1, phi)',

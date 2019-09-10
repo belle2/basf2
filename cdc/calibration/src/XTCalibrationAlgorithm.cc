@@ -262,8 +262,8 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::checkConvergence()
     }
   }
 
-  if (static_cast<double>(nFitCompleted) / nTotal < 0.6) {
-    B2WARNING("Less than 60 % of XTs were fitted.");
+  if (static_cast<double>(nFitCompleted) / nTotal < m_threshold) {
+    B2WARNING("Less than " << m_threshold * 100 << " % of XTs were fitted.");
     return c_NotEnoughData;
   }
   return c_OK;

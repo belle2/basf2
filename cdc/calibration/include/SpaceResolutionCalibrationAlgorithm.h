@@ -65,6 +65,8 @@ namespace Belle2 {
       /// Set name for histogram output
       void setHistFileName(const std::string& name) {m_histName = "histSigma_" + name + ".root";}
 
+      /// Set threshold for the fraction of fitted results.
+      void setThreshold(double th = 0.6) {m_threshold = th;}
 
     protected:
       /// Run algo on data
@@ -89,6 +91,7 @@ namespace Belle2 {
       bool m_debug = false;   /**< Debug or not */
       bool m_storeHisto = false; /**<  Store histogram or not*/
       bool m_bField = true;                   /**< Work with BField, fit range and initial parameters is different incase B and noB */
+      double m_threshold = 0.6 ; /**< minimal requirement for the fraction of fitted results */
       double m_sigma[56][2][18][7][8]; /**<new sigma prameters.*/
       TGraphErrors* m_gFit[56][2][18][7];  /**< sigma*sigma graph for fit*/
       TGraphErrors* m_graph[56][2][18][7];    /**< sigma graph.*/

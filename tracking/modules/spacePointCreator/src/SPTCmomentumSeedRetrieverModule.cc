@@ -80,6 +80,7 @@ bool SPTCmomentumSeedRetrieverModule::createSPTCmomentumSeed(SpacePointTrackCand
 {
   TVectorD stateSeed(6); //(x,y,z,px,py,pz)
   TMatrixDSym covSeed(6);
+  // TODO: find out where these numbers come from!
   covSeed(0, 0) = 0.01 ; covSeed(1, 1) = 0.01 ; covSeed(2, 2) = 0.04 ; // 0.01 = 0.1^2 = dx*dx =dy*dy. 0.04 = 0.2^2 = dz*dz
   covSeed(3, 3) = 0.01 ; covSeed(4, 4) = 0.01 ; covSeed(5, 5) = 0.04 ;
 

@@ -257,7 +257,7 @@ namespace TreeFitter {
     const int posindex = posIndex();
     if (posindex >= 0) {
       for (int i = 0; i < 3; ++i) {
-        fitparams.getCovariance()(posindex + i, posindex + i) = 1000;
+        fitparams.getCovariance()(posindex + i, posindex + i) = 1;
       }
     }
 

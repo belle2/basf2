@@ -27,7 +27,7 @@ REG_MODULE(KLMClustersReconstructor)
 KLMClustersReconstructorModule::KLMClustersReconstructorModule() : Module(),
   m_GeoDat(nullptr), m_PositionMode(c_FirstLayer), m_ClusterMode(c_AnyHit)
 {
-  setDescription("Unified BKLM/EKLM K0L reconstruction module.");
+  setDescription("Unified BKLM/EKLM module for the reconstruction of KLMClusters.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("ClusteringAngle", m_ClusteringAngle, "Clustering angle (rad).",
            0.26);

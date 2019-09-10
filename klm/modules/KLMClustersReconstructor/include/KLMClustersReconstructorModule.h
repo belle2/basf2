@@ -22,7 +22,7 @@ namespace Belle2 {
   /**
    * Module KLMClustersReconstructorModule.
    * @details
-   * Module for K0L reconstruction.
+   * Module for KLMClusters reconstruction.
    */
   class KLMClustersReconstructorModule : public Module {
 

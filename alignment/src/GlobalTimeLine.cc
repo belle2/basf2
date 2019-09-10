@@ -227,7 +227,9 @@ namespace Belle2 {
         for (auto& row : payloadsTable) {
           for (auto& iovBlock : row.second) {
             for (auto& payload : iovBlock.second) {
-              payload.second->loadFromDB(payload.first);
+              DBStore::Instance().update(payload.first);
+              DBStore::Instance().updateEvent(payload.first.getEvent());
+              payload.second->loadFromDBObjPtr();
             }
           }
         }

@@ -249,20 +249,20 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::checkConvergence()
 {
 
   const int nTotal = 56 * 2 * m_nAlphaBins * m_nThetaBins;
-  int nFitFailed = 0;
+  int nFitCompleted = 0;
   for (int l = 0; l < 56; ++l) {
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nAlphaBins; ++al) {
         for (int th = 0; th < m_nThetaBins; ++th) {
-          if (m_fitStatus[l][lr][al][th] != FitStatus::c_OK) {
-            nFitFailed++;
+          if (m_fitStatus[l][lr][al][th] == FitStatus::c_OK) {
+            nFitCompleted++;
           }
         }
       }
     }
   }
 
-  if (static_cast<double>(nFitFailed) / nTotal < 0.6) {
+  if (static_cast<double>(nFitCompleted) / nTotal < 0.6) {
     B2WARNING("Less than 60 % of XTs were fitted.");
     return c_NotEnoughData;
   }

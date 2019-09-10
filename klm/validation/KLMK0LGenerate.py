@@ -64,7 +64,7 @@ main.add_module(g4sim)
 main.add_module(klmDigitizer)
 main.add_module(bklmReconstructor)
 main.add_module(eklmReconstructor)
-main.add_module(klmK0LReconstructor)
+main.add_module(klmClustersReconstructor)
 main.add_module(mc_matcher)
 
 main.add_module(progress)

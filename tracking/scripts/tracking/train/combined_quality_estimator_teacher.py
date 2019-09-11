@@ -508,7 +508,7 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
             input_reco_tracks="CDCRecoTracks",
             output_reco_tracks="SVDCDCRecoTracks",
             temporary_reco_tracks="SVDRecoTracks",
-            temporary_reco_tracks_two="SVDplusRecoTracks"
+            temporary_reco_tracks_two="SVDplusRecoTracks",
             add_both_directions=True,
             use_vxdtf2_quality_estimator=True,
         )

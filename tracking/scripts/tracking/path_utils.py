@@ -256,7 +256,31 @@ def add_svd_track_finding(
         prune_temporary_tracks=True,
         use_vxdtf2_quality_estimator=False,
         **kwargs):
-    """Add SVD track finding to the path"""
+    """
+    Add SVD track finding to the path.
+
+    :param path: The path to add the tracking reconstruction modules to
+    :param components: The list of geometry components in use or None for all components.
+    :param input_reco_tracks: Name of the StoreArray with the input reco tracks (usually from CDC) that are used in the
+           CKF track finding and are merged with the newly found SVD tracks into the ``output_reco_tracks``.
+    :param output_reco_tracks: Name of the StoreArray where the reco tracks outputted by the SVD track finding should be
+           stored.
+    :param svd_ckf_mode: String designating the mode of the CDC-to-SVD CKF, that is how it is combined with the VXDTF2
+            standalone track finding. One of "VXDTF2_after", "VXDTF2_before", "VXDTF2_before_with_second_ckf",
+            "only_ckf", "VXDTF2_alone", "cosmics".
+    :param use_mc_truth: Add mc matching and use the MC information in the CKF (but not in the VXDTF2)
+    :param add_both_directions: Whether to add the CKF with both forward and backward extrapolation directions instead
+           of just one.
+    :param temporary_reco_tracks: Intermediate store array where the SVD tracks from the VXDTF2 standalone track finding
+           are stored, before they are merged with CDC tracks and extended via the CKF tracking.
+    :param temporary_svd_cdc_reco_tracks: Intermediate store array where the combination of ``temporary_reco_tracks``
+           (from SVD) and ``input_reco_tracks`` (from CDC standalone) is stored, before the CKF is applied.
+           It is only used if ``use_svd_to_cdc_ckf`` is true. Otherwise, the combination is stored directly in
+           ``output_reco_tracks``.
+    :param use_svd_to_cdc_ckf: Whether to enable the CKF extrapolation from the SVD into the CDC.
+           That CKF application is not affected by ``svd_ckf_mode``.
+    :param prune_temporary_tracks: Delete all hits expect the first and last from intermediate track objects.
+    """
 
     if not is_svd_used(components):
         return

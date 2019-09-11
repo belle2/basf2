@@ -312,6 +312,7 @@ namespace Belle2 {
       (m_storeArrayNameOfRecoHitInformation);
 
       for (RecoHitInformation& recoHitInformation : relatedHitInformationToHit) {
+        // cppcheck-suppress useStlAlgorithm
         if (recoHitInformation.getRelatedFrom<RecoTrack>(this->getArrayName()) == this) {
           return &recoHitInformation;
         }
@@ -853,6 +854,7 @@ namespace Belle2 {
       std::vector<const RecoHitInformation*> relatedHitInformationAsVector;
       relatedHitInformationAsVector.reserve(relatedHitInformation.size());
       for (const RecoHitInformation& hitInformation : relatedHitInformation) {
+        // cppcheck-suppress useStlAlgorithm
         relatedHitInformationAsVector.push_back(&hitInformation);
       }
       std::sort(relatedHitInformationAsVector.begin(), relatedHitInformationAsVector.end(), [](const RecoHitInformation * a,
@@ -883,6 +885,7 @@ namespace Belle2 {
       std::vector<HitType*> hitList;
       hitList.reserve(relatedHits.size());
       for (HitType& hit : relatedHits) {
+        // cppcheck-suppress useStlAlgorithm
         hitList.push_back(&hit);
       }
 

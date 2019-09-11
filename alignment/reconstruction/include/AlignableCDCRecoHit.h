@@ -31,7 +31,11 @@ namespace Belle2 {
 
   public:
     /// Static enabling(true) or disabling(false) addition of local derivative for track T0
-    static bool s_enableEventT0LocalDerivative;
+    static bool s_enableTrackT0LocalDerivative;
+    /// Static enabling(true) or disabling(false) addition of global derivative for wire sagging coefficient (per wire)
+    static bool s_enableWireSaggingGlobalDerivative;
+    /// Static enabling(true) or disabling(false) addition of global derivatives for wire-by-wire alignment
+    static bool s_enableWireByWireAlignmentGlobalDerivatives;
 
     /// Inherit constructors
     using CDCRecoHit::CDCRecoHit;

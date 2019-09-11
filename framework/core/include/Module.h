@@ -130,6 +130,7 @@ namespace Belle2 {
      * Environment as they get consumed when obtained so the finalized list of
      * output files should be stored for subsequent calls.
      */
+    [[deprecated("will be removed in release-05.")]]
     virtual std::vector<std::string> getFileNames(__attribute__((unused)) bool outputFiles)
     {
       return std::vector<std::string>();
@@ -267,7 +268,7 @@ namespace Belle2 {
      * @param path       Shared pointer to the Path which will be executed if the condition is evaluated to true.
      * @param afterConditionPath  What to do after executing 'path'.
      */
-    void if_value(const std::string& expression, std::shared_ptr<Path> path,
+    void if_value(const std::string& expression, const std::shared_ptr<Path>& path,
                   EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
@@ -285,7 +286,7 @@ namespace Belle2 {
      * @param path Shared pointer to the Path which will be executed if the return value is _false_.
      * @param afterConditionPath  What to do after executing 'path'.
      */
-    void if_false(std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
+    void if_false(const std::shared_ptr<Path>& path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
      * A simplified version to set the condition of the module. Please note that successive calls of this function will
@@ -302,7 +303,7 @@ namespace Belle2 {
      * @param path Shared pointer to the Path which will be executed if the return value is _true_.
      * @param afterConditionPath  What to do after executing 'path'.
      */
-    void if_true(std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
+    void if_true(const std::shared_ptr<Path>& path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
      * Returns true if at least one condition was set for the module.
@@ -602,7 +603,7 @@ namespace Belle2 {
      * @param moduleType The type name of the module.
      * @param package the package which contains the module
      */
-    ModuleProxyBase(const std::string& moduleType, const std::string& package);
+    ModuleProxyBase(std::string  moduleType, std::string  package);
 
     /**
      * The destructor of the ModuleProxyBase class.

@@ -89,7 +89,7 @@ bool TimeWalkCalibration::calibrate()
   gROOT->SetBatch(1);
   readTW();
   CreateHisto();
-  TF1* fold;
+  TF1* fold = nullptr;
   if (m_twParamMode_old == 0)
     fold = new TF1("fold", "[0]/sqrt(x)", 0, 500);
   else if (m_twParamMode_old == 1)

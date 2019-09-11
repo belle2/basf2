@@ -111,6 +111,30 @@ namespace Belle2 {
         return computeTOF(particle, pdg);
       }
 
+      // returns the average time of the first 5 (good) digits
+      double getAverageTimeOfFirst5(const Particle* particle)
+      {
+        int slotID = static_cast<int>(getSlotID(particle));
+        StoreArray<TOPDigit> digits;
+        vector<double> digitTimes;
+        for (const auto& digit : digits) {
+          if (digit.getModuleID() != slotID) continue;
+          // skip bad digits only when we want to clean
+          if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+          digitTimes.push_back(digit.getTime());
+        }
+        if (digitTimes.empty()) return 0;
+        sort(digitTimes.begin(), digitTimes.end());
+        double T0 = 0;
+        size_t count = 0;
+        for (auto t : digitTimes) {
+          T0 += t;
+          count += 1;
+          if (count == 5) break;
+        }
+        return T0 / count;
+      }
+
       // counts the number of photons in the TOP in a given time frame
       // if tmin < 0, count from the time of the first photon
       int countHits(const Particle* particle, double tmin, double tmax, bool clean)
@@ -164,7 +188,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (t.getModuleID() != thisModuleID) continue; // catch the case where one of the module IDs is negative
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           count += 1;
@@ -184,7 +208,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) == abs(thisModuleID)) continue; // catch the case where one of the module IDs is negative
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           count += 1;
@@ -204,7 +228,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) == abs(thisModuleID)) continue; // catch the case where one of the module IDs is negative
           count += 1;
         }
@@ -223,7 +247,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue; // catch the case where one of the module IDs is negative
           count += 1;
         }
@@ -243,7 +267,7 @@ namespace Belle2 {
         StoreArray<TOPDigit> topDigits;
         double maxGap = 0; // the largest time difference between two consecutive hits
         vector<double> digitTimes; // all digits in the module that the track entered
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           digitTimes.push_back(t.getTime());
@@ -275,7 +299,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         vector<double> digitTimes; // the times for all digits in the module that the track entered
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           digitTimes.push_back(t.getTime());
@@ -477,12 +501,13 @@ namespace Belle2 {
         StoreArray<TOPDigit> topDigits;
         int thisModuleID = static_cast<int>(vars[0]);
         size_t count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
           count += 1;
         }
         return count;
       }
+
       //! returns the number of good photons in a given slot
       double TOPGoodPhotonsInSlot([[maybe_unused]] const Particle* particle, const vector<double>& vars)
       {
@@ -490,13 +515,36 @@ namespace Belle2 {
         StoreArray<TOPDigit> topDigits;
         int thisModuleID = static_cast<int>(vars[0]);
         size_t count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           count += 1;
         }
         return count;
       }
+
+      //! returns the number of tracks in the same slot as the particle
+      double TOPTracksInSlot([[maybe_unused]] const Particle* particle)
+      {
+        const auto* trk = particle->getTrack();
+        if (not trk) {
+          return -1.0;
+        }
+        int thisModuleID = static_cast<int>(getSlotID(particle));
+        if (thisModuleID == 0) return 0;
+        StoreArray<Track> tracks;
+        int nTracks = 0;
+        for (const auto& t : tracks) {
+          const auto* tl = t.getRelated<TOPLikelihood>();
+          if (not tl) continue;
+          const auto* te = tl->getRelated<ExtHit>();
+          if (not te) continue;
+          if (te->getCopyID() != thisModuleID) continue;
+          nTracks += 1;
+        }
+        return nTracks;
+      }
+
     } // TOPVariable
 
     VARIABLE_GROUP("TOP Calibration");
@@ -511,7 +559,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("topReflectedDigitCount", TOPVariable::topReflectedDigitCount,
                       "[calibration] The number of reflected photons in the same module");
     REGISTER_VARIABLE("topReflectedDigitCountExpert(minGap, maxGap)", TOPVariable::topReflectedDigitCountExpert,
-                      "[calibration] The number of photons after the largest gap between minGap and maxGap")
+                      "[calibration] The number of photons after the largest gap between minGap and maxGap");
     REGISTER_VARIABLE("topDigitGapSize", TOPVariable::topDigitGapSize,
                       "[calibration] The largest time difference between two consecutive hits in the same module");
     REGISTER_VARIABLE("topLocalX", TOPVariable::getTOPLocalX,
@@ -528,6 +576,8 @@ namespace Belle2 {
                       "[calibration] The time of flight from the origin to the TOP");
     REGISTER_VARIABLE("topTOFExpert(pdg)", TOPVariable::getTOFExpert,
                       "[calibration] The time of flight from the origin to the TOP under the given hypothesis");
+    REGISTER_VARIABLE("topAverageTimeOfFirst5", TOPVariable::getAverageTimeOfFirst5,
+                      "[calibration] The average time of the first (up to) 5 hits in the module with the track");
     REGISTER_VARIABLE("topSlotID", TOPVariable::getSlotID,
                       "[calibration] The ID of the TOP slot that was hit by the particle");
     REGISTER_VARIABLE("topExpectedPhotonCount(pdg)", TOPVariable::getExpectedTOPPhotonCount,
@@ -566,5 +616,7 @@ namespace Belle2 {
                       "[calibration] The number of all photons in the given slot");
     REGISTER_VARIABLE("topGoodPhotonsInSlot(id)", TOPVariable::TOPGoodPhotonsInSlot,
                       "[calibration] The number of good photons in the given slot");
+    REGISTER_VARIABLE("topTracksInSlot", TOPVariable::TOPTracksInSlot,
+                      "[calibration] The number of tracks in the same slot as the particle");
   } // Variable
 } // Belle2

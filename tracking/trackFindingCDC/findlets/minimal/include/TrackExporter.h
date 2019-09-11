@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oliver Frost                                             *
+ * Contributors: Oliver Frost, Dmitrii Neverov                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -49,6 +49,9 @@ namespace Belle2 {
 
       /// Parameter: Discard covariance matrix in favour of a hand written one.
       bool m_param_discardCovarianceMatrix = false;
+
+      /// Parameter: If non-zero, estimate seeds as for monopoles and set the momentum magnitude as this value
+      double m_param_monopoleMomSeed = 0.0;
     };
   }
 }

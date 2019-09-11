@@ -18,7 +18,7 @@ import sqlite3
 import shutil
 
 from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
-from basf2 import get_default_global_tags
+from basf2 import conditions as b2conditions
 
 from abc import ABC, abstractmethod
 import ROOT
@@ -92,6 +92,9 @@ class Collection():
         #: the `Algorithm.data_input` function to handle the different types of files and call the
         #: CalibrationAlgorithm.setInputFiles() with the correct ones.
         self.output_patterns = ['CollectorOutput.root']
+        if output_patterns:
+            self.output_patterns = output_patterns
+
         #: Maximum number of input files per subjob during the collector step (passed to a `caf.backends.Job` object).
         #: -1 is the default meaning that all input files are run in one big collector job.
         self.max_files_per_collector_job = max_files_per_collector_job
@@ -99,6 +102,8 @@ class Collection():
         #: the collector job. Currently only useful for setting the 'queue' of the batch system backends that the collector
         #: jobs are submitted to e.g. cal.backend_args = {"queue":"short"}
         self.backend_args = {}
+        if backend_args:
+            self.backend_args = backend_args
 
         if database_chain:
             #: The database chain used for this Collection. NOT necessarily the same database chain used for the algorithm
@@ -107,12 +112,16 @@ class Collection():
             self.database_chain = database_chain
         else:
             self.database_chain = []
-            self.use_central_database(get_default_global_tags())
+            # This may seem weird but the changes to the DB interface mean that they have effectively swapped from being
+            # described well by appending to a list to a deque. So we do bit of reversal to translate it back and make the
+            # most important GT the last one encountered.
+            for tag in reversed(b2conditions.default_globaltags):
+                self.use_central_database(tag)
 
     def reset_database(self):
         """
         Remove everything in the database_chain of this Calibration, including the default central database
-        tag automatically included from `basf2.get_default_global_tags`
+        tag automatically included from `basf2.conditions.default_globaltags`
         """
         self.database_chain = []
 
@@ -121,12 +130,21 @@ class Collection():
         Parameters:
             global_tag (str): The central database global tag to use for this calibration.
 
-        Using this allows you to append a central database to the database chain for this collection.
-        The default database chain is just the central one from `basf2.get_default_global_tags`.
+        Using this allows you to add a central database to the head of the global tag database chain for this collection.
+        The default database chain is just the central one from `basf2.conditions.default_globaltags`.
+        The input file global tag will always be overrided and never used unless explicitly set.
+
         To turn off central database completely or use a custom tag as the base, you should call `Calibration.reset_database`
         and start adding databases with `Calibration.use_local_database` and `Calibration.use_central_database`.
 
         Alternatively you could set an empty list as the input database_chain when adding the Collection to the Calibration.
+
+        NOTE!! Since release-04-00-00 the behaviour of basf2 conditions databases has changed.
+        All local database files MUST now be at the head of the 'chain', with all central database global tags in their own
+        list which will be checked after all local database files have been checked.
+
+        So even if you ask for ["global_tag1", "localdb/database.txt", "global_tag2"] to be the database chain, the real order
+        that basf2 will use them is ["global_tag1", "global_tag2", "localdb/database.txt"] where the file is checked first.
         """
         central_db = CentralDatabase(global_tag)
         self.database_chain.append(central_db)
@@ -142,6 +160,13 @@ class Collection():
         Append a local database to the chain for this collection.
         You can call this function multiple times and each database will be added to the chain IN ORDER.
         The databases are applied to this collection ONLY.
+
+        NOTE!! Since release-04-00-00 the behaviour of basf2 conditions databases has changed.
+        All local database files MUST now be at the head of the 'chain', with all central database global tags in their own
+        list which will be checked after all local database files have been checked.
+
+        So even if you ask for ["global_tag1", "localdb/database.txt", "global_tag2"] to be the database chain, the real order
+        that basf2 will use them is ["global_tag1", "global_tag2", "localdb/database.txt"] where the file is checked first.
         """
         local_db = LocalDatabase(filename, directory)
         self.database_chain.append(local_db)
@@ -327,8 +352,10 @@ class Calibration(CalibrationBase):
     >>> cal.pre_collector_path = my_basf2_path
 
     You don't have to put a RootInput module in this pre-collection path, but you can if
-    you need some special parameters.
-    The inputFileNames parameter of RootInput will be set by the CAF automatically for you.
+    you need some special parameters. If you want to process sroot files the you have to explicitly add
+    SeqRootInput to your pre-collection path.
+    The inputFileNames parameter of (Seq)RootInput will be set by the CAF automatically for you.
+
 
     You can use optional arguments to pass in some/all during initialisation of the `Calibration` class
 
@@ -443,7 +470,8 @@ class Calibration(CalibrationBase):
         else:
             self.database_chain = []
             # This database is already applied to the `Collection` automatically, so don't do it again
-            self.use_central_database(get_default_global_tags(), apply_to_default_collection=False)
+            for tag in reversed(b2conditions.default_globaltags):
+                self.use_central_database(tag, apply_to_default_collection=False)
         #: The class that runs all the algorithms in this Calibration using their assigned
         #: :py:class:`caf.strategies.AlgorithmStrategy`.
         #: Plugin your own runner class to change how your calibration will run the list of algorithms.
@@ -524,7 +552,7 @@ class Calibration(CalibrationBase):
             apply_to_default_collection (bool): Should we also reset the default collection?
 
         Remove everything in the database_chain of this Calibration, including the default central database
-        tag automatically included from `basf2.get_default_global_tags`. This will NOT affect the database chain of any
+        tag automatically included from `basf2.conditions.default_globaltags`. This will NOT affect the database chain of any
         `Collection` other than the default one. You can prevent the default Collection from having its chain reset by setting
         'apply_to_default_collection' to False.
         """
@@ -541,7 +569,7 @@ class Calibration(CalibrationBase):
             apply_to_default_collection (bool): Should we also call use_central_database on the default collection (if it exists)
 
         Using this allows you to append a central database to the database chain for this calibration.
-        The default database chain is just the central one from `basf2.get_default_global_tags`.
+        The default database chain is just the central one from `basf2.conditions.default_globaltags`.
         To turn off central database completely or use a custom tag as the base, you should call `Calibration.reset_database`
         and start adding databases with `Calibration.use_local_database` and `Calibration.use_central_database`.
 

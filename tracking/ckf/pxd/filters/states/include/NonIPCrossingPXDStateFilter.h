@@ -14,5 +14,6 @@
 
 namespace Belle2 {
   extern template class NonIPCrossingStateFilter<AllPXDStateFilter>;
+  /// Alias for filter to check direction of a new CKF PXD state
   using NonIPCrossingPXDStateFilter = NonIPCrossingStateFilter<AllPXDStateFilter>;
 }

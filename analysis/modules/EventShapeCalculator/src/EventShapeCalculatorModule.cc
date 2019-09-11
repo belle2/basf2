@@ -19,7 +19,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dbobjects/BeamParameters.h>
 
 #include <framework/logging/Logger.h>
 
@@ -170,7 +169,7 @@ void EventShapeCalculatorModule::event()
     if (m_enableJets) {
       TLorentzVector p4FWD(0., 0., 0., 0.);
       TLorentzVector p4BKW(0., 0., 0., 0.);
-      for (auto p4 : m_p4List) {
+      for (const auto& p4 : m_p4List) {
         if (p4.Vect().Dot(thrust) > 0)
           p4FWD += p4;
         else
@@ -255,7 +254,7 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
 
       if (m_checkForDuplicates) {
         // loops over all the particles loaded so far
-        for (auto testPart : tmpParticles) {
+        for (const auto& testPart : tmpParticles) {
           if (testPart.isCopyOf(part)) {
             B2WARNING("Duplicate particle found. The new one won't be used for the calculation of the event shape variables. Please, double check your input lists and try to make them mutually exclusive.");
             isDuplicate = true;

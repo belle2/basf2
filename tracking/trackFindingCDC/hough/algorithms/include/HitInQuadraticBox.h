@@ -59,6 +59,28 @@ namespace Belle2 {
         }
       }
 
+      /**
+       * Compares distances from two hits to the track represented by the given box.
+       * The comparison is done based on reconstructed Z coordinates of hits and track Z position.
+       */
+      static bool compareDistances(const HoughBox& pqBox, const CDCRecoHit3D& lhsRecoHit, const CDCRecoHit3D& rhsRecoHit)
+      {
+        const double pMean = (pqBox.getLowerP() + pqBox.getUpperP()) / 2.0;
+        const double qMean = (pqBox.getLowerQ() + pqBox.getUpperQ()) / 2.0;
+
+        const double lhsZ = lhsRecoHit.getRecoZ();
+        const double rhsZ = rhsRecoHit.getRecoZ();
+
+        const double lhsS = lhsRecoHit.getArcLength2D();
+        const double rhsS = rhsRecoHit.getArcLength2D();
+
+        const double lhsZDistance = (pMean + 4 * qMean) * lhsS - qMean / 25 * lhsS * lhsS - lhsZ;
+        const double rhsZDistance = (pMean + 4 * qMean) * rhsS - qMean / 25 * rhsS * rhsS - rhsZ;
+
+        return lhsZDistance < rhsZDistance;
+      }
+
+      /// ROOT-compatible formula for z(s) = (p + 4q)*s - q/25 * s^2
       static const char* debugLine() { return "([0] + 4*[1])*x - [1] / 25 * x * x";}
     };
   }

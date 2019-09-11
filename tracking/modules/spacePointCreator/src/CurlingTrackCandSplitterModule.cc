@@ -157,6 +157,7 @@ void CurlingTrackCandSplitterModule::initialize()
     // check if there are two entries and if the second value is either UPDATE or RECREATE
     if (m_PARAMrootFileName.size() != 2 || (m_PARAMrootFileName[1] != "UPDATE" && m_PARAMrootFileName[1] != "RECREATE")) {
       string output;
+      // cppcheck-suppress useStlAlgorithm
       for (string entry : m_PARAMrootFileName) { output += "'" + entry + "' "; }
       B2FATAL("CurlingTrackCandSplitter::initialize() : rootFileName is set wrong: entries are: " << output);
     }
@@ -527,6 +528,8 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
 }
 
 // ======================================= GET GLOBAL POSITION AND MOMENTUM ============================================================
+
+/// Helper class to retrieve the global position and momentum of a TrueHit
 template<class TrueHit>
 std::pair<const Belle2::B2Vector3<double>, const Belle2::B2Vector3<double> >
 CurlingTrackCandSplitterModule::getGlobalPositionAndMomentum(TrueHit* aTrueHit)

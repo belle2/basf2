@@ -62,15 +62,18 @@ class DigitTest(Module):
             # check the content of the digit
             assert digit.getModuleID() == digitUnpacked.getModuleID()
             assert digit.getPixelID() == digitUnpacked.getPixelID()
-            assert digit.getRawTime() == digitUnpacked.getRawTime()
-            assert digit.getPulseHeight() == digitUnpacked.getPulseHeight()
-            assert digit.getIntegral() == digitUnpacked.getIntegral()
             assert digit.getChannel() == digitUnpacked.getChannel()
-            assert digit.getHitQuality() == digitUnpacked.getHitQuality()
+            assert digit.getRawTime() == digitUnpacked.getRawTime()
             assert abs(digit.getTime() - digitUnpacked.getTime()) < precision
             assert abs(digit.getTimeError() - digitUnpacked.getTimeError()) < precision
+            assert digit.getPulseHeight() == digitUnpacked.getPulseHeight()
             assert abs(digit.getPulseWidth() - digitUnpacked.getPulseWidth()) < precision
+            assert digit.getIntegral() == digitUnpacked.getIntegral()
             assert digit.getFirstWindow() == digitUnpacked.getFirstWindow()
+            assert digit.getHitQuality() == digitUnpacked.getHitQuality()
+            assert digit.getStatus() == digitUnpacked.getStatus()
+            assert digit.isChargeShare() == digitUnpacked.isChargeShare()
+            assert digit.isPrimaryChargeShare() == digitUnpacked.isPrimaryChargeShare()
 
 
 main = create_path()

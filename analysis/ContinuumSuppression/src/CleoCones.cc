@@ -13,9 +13,9 @@
 
 namespace Belle2 {
 
-  CleoCones::CleoCones(std::vector<TVector3> p3_cms_all,
-                       std::vector<TVector3> p3_cms_roe,
-                       TVector3 thrustB,
+  CleoCones::CleoCones(const std::vector<TVector3>& p3_cms_all,
+                       const std::vector<TVector3>& p3_cms_roe,
+                       const TVector3& thrustB,
                        bool calc_CleoCones_with_all,
                        bool calc_CleoCones_with_roe
                       )
@@ -29,7 +29,7 @@ namespace Belle2 {
     if (calc_CleoCones_with_all == true) {
       for (int i = 1; i <= 9; i++) {
         float momentum_flow_all = 0;
-        for (std::vector<TVector3>::iterator iter0 = p3_cms_all.begin(); iter0 != p3_cms_all.end(); ++iter0) {
+        for (auto& iter0 : p3_cms_all) {
 
           /* Use the following intervals
              0*10<= <1*10  0- 10   170-180  180-1*10< <=180-0*10
@@ -43,13 +43,13 @@ namespace Belle2 {
              8*10<= <9*10 80- 90    90-100  180-9*10< <=180-8*10
              ==90 */
 
-          float angle = ((180 * (thrustB.Angle(*iter0))) / M_PI);
+          float angle = ((180 * (thrustB.Angle(iter0))) / M_PI);
           if (((((i - 1) * 10) <= angle) && (angle < (i * 10))) || (((180 - (i * 10)) < angle) && (angle <= (180 - ((i - 1) * 10))))) {
-            momentum_flow_all += (*iter0).Mag();
+            momentum_flow_all += iter0.Mag();
             // B2DEBUG(19, "interval " << ((i-1)*10) << " to " << (i*10) << " and " << (180-(i*10)) << " to " << (180-((i-1)*10)) << " has value " << (180*(thrustB.angle(*iter0)))/M_PI << ", momentum flow is " << momentum_flow );
           }
           if ((i == 9) && (angle == 90)) {
-            momentum_flow_all += (*iter0).Mag();
+            momentum_flow_all += iter0.Mag();
           }
         }
         m_cleo_cone_with_all.push_back(momentum_flow_all);
@@ -62,13 +62,13 @@ namespace Belle2 {
     if (calc_CleoCones_with_roe == true) {
       for (int i = 1; i <= 9; i++) {
         float momentum_flow_roe = 0;
-        for (std::vector<TVector3>::iterator iter1 = p3_cms_roe.begin(); iter1 != p3_cms_roe.end(); ++iter1) {
-          float angle = ((180 * (thrustB.Angle(*iter1))) / M_PI);
+        for (auto& iter1 : p3_cms_roe) {
+          float angle = ((180 * (thrustB.Angle(iter1))) / M_PI);
           if (((((i - 1) * 10) <= angle) && (angle < (i * 10))) || (((180 - (i * 10)) < angle) && (angle <= (180 - ((i - 1) * 10))))) {
-            momentum_flow_roe += (*iter1).Mag();
+            momentum_flow_roe += iter1.Mag();
           }
           if ((i == 9) && (angle == 90)) {
-            momentum_flow_roe += (*iter1).Mag();
+            momentum_flow_roe += iter1.Mag();
           }
         }
         m_cleo_cone_with_roe.push_back(momentum_flow_roe);

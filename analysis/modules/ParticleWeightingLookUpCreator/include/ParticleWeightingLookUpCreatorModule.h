@@ -48,7 +48,7 @@ namespace Belle2 {
      * Currently, std::pair can not be retreived from python list
      * We will get ParticleWeightingLookUpTable entries with tuples and transform tuples to pairs here.
      */
-    NDBin NDBinTupleToNDBin(NDBinTuple bin_tuple);
+    NDBin NDBinTupleToNDBin(const NDBinTuple& bin_tuple);
 
   public:
 

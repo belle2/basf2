@@ -313,7 +313,8 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   // Size: 64*768 + 8 bytes for a full frame readout
   if (frame_len != 0xC008) {
     if (!(m_suppressErrorMask & c_FIX_SIZE)) B2WARNING("Frame size unsupported for RAW ADC frame! $" <<
-                                                         LogVar("size [bytes] $", static_cast < std::ostringstream && >(std::ostringstream() << hex << frame_len).str()));
+                                                         LogVar("size [bytes] $", static_cast < std::ostringstream && >(std::ostringstream() << hex << frame_len).str())
+                                                         << LogVar("DHE", dhe_ID) << LogVar("DHP", dhe_DHPport));
     m_errorMask |= c_FIX_SIZE;
     return;
   }
@@ -357,7 +358,8 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   m_storeRawAdc.appendNew(vxd_id, data, frame_len);
 };
 
-void PXDUnpackerModule::unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id)
+void PXDUnpackerModule::unpack_fce([[maybe_unused]] unsigned short* data, [[maybe_unused]] unsigned int length,
+                                   [[maybe_unused]] VxdID vxd_id)
 {
   //! *************************************************************
   //! Important Remark:
@@ -454,7 +456,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   unsigned int dhp_dhp_id       = 0;
 
   unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
-//   unsigned int dhp_offset = 0;
+//  unsigned int dhp_offset = 0;
   bool rowflag = false;
   bool pixelflag = true; // just for first row start
 
@@ -514,7 +516,9 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
 
   /* // TODO removed because data format error is not to be fixed soon
   if (((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) > m_maxDHPFrameDiff) {
-    if(!m_suppressErrorMask&c_DHP_DHE_FRAME_DIFFER ) B2WARNING("DHP Frame Nr differ from DHE Frame Nr by >1 DHE " << dhe_first_readout_frame_id_lo << " != DHP " << (dhp_readout_frame_lo & 0x3F) << " delta "<< ((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) );
+    if (!m_suppressErrorMask & c_DHP_DHE_FRAME_DIFFER) B2WARNING("DHP Frame Nr differ from DHE Frame Nr by >1 DHE " <<
+          dhe_first_readout_frame_id_lo << " != DHP " << (dhp_readout_frame_lo & 0x3F) << " delta " << ((
+                dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F));
     m_errorMask |= c_DHP_DHE_FRAME_DIFFER;
   }
   */
@@ -580,6 +584,11 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
         pixelflag = false;
         dhp_row = (dhp_pix[i] & 0xFFC0) >> 5;
         dhp_cm  = dhp_pix[i] & 0x3F;
+        if (dhp_cm == 63) { // fifo overflow
+          B2WARNING("DHP data loss (CM=63) in " << LogVar("DHE", dhe_ID) << LogVar("DHP", dhp_dhp_id));
+          /// FIXME TODO set an error bit ... but define one first
+          m_errorMask |= c_DHH_MISC_ERROR;
+        }
         if (daqpktstat.dhc_size() > 0) {
           if (daqpktstat.dhc_back().dhe_size() > 0) {
             PXDDAQDHPComMode cm(dhp_dhp_id, dhp_row, dhp_cm);
@@ -1040,6 +1049,9 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
       m_errorMaskDHC = m_errorMask; // forget about anything before this frame
       daqpktstat.newDHC(currentDHCID, m_errorMask);
+      daqpktstat.dhc_back().setGatedFlag(dhc.data_dhc_start_frame->get_gated_flag());
+      daqpktstat.dhc_back().setGatedHER(dhc.data_dhc_start_frame->get_gated_isher());
+
       break;
     };
     case EDHCFrameHeaderDataType::c_DHE_START: {
@@ -1178,6 +1190,11 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         }
       }
       /// TODO how to handle error flags set in in DHC_END?
+      if (dhc.data_dhc_end_frame->getErrorInfo() != 0) {
+        if (!(m_suppressErrorMask & c_DHH_END_ERRORBITS)) B2ERROR("DHC END Error Info set to $" << hex <<
+                                                                    dhc.data_dhc_end_frame->getErrorInfo());
+        m_errorMask |= c_DHH_END_ERRORBITS;
+      }
       m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
       m_errorMaskDHC |= m_errorMask; // do latest updates
 
@@ -1188,6 +1205,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         daqpktstat.dhc_back().setErrorMask(m_errorMaskDHC);
         //B2DEBUG(98,"** DHC "<<currentDHCID<<" Raw"<<dhc.data_dhc_end_frame->get_words() * 4 <<" Red"<<countedBytesInDHC);
         daqpktstat.dhc_back().setCounters(dhc.data_dhc_end_frame->get_words() * 4, countedBytesInDHC);
+        daqpktstat.dhc_back().setEndErrorInfo(dhc.data_dhc_end_frame->getErrorInfo());
       }
       m_errorMaskDHC = 0;
       currentDHEID = 0xFFFFFFFF;
@@ -1206,6 +1224,11 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         m_errorMask |= c_DHE_START_END_ID;
       }
       /// TODO how to handle error flags set in in DHE_END?
+      if (dhc.data_dhe_end_frame->getErrorInfo() != 0) {
+        if (!(m_suppressErrorMask & c_DHH_END_ERRORBITS)) B2ERROR("DHE END Error Info set to $" << hex <<
+                                                                    dhc.data_dhe_end_frame->getErrorInfo());
+        m_errorMask |= c_DHH_END_ERRORBITS;
+      }
       m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
       if (found_mask_active_dhp != mask_active_dhp) {
         if (!(m_suppressErrorMask & c_DHP_ACTIVE)) {
@@ -1249,6 +1272,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
           daqpktstat.dhc_back().dhe_back().setErrorMask(m_errorMaskDHE);
           // B2DEBUG(98,"** DHC "<<currentDHEID<<" Raw "<<dhc.data_dhe_end_frame->get_words() * 2 <<" Red"<<countedBytesInDHE);
           daqpktstat.dhc_back().dhe_back().setCounters(dhc.data_dhe_end_frame->get_words() * 2, countedBytesInDHE);
+          daqpktstat.dhc_back().dhe_back().setEndErrorInfo(dhc.data_dhe_end_frame->getErrorInfo());
         }
       }
       m_errorMaskDHE = 0;
@@ -1429,4 +1453,3 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   }
   B2DEBUG(29, "DHC/DHE $" << hex << countedBytesInDHC << ", $" << hex << countedBytesInDHE);
 }
-

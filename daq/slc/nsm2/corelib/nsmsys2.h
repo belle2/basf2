@@ -311,7 +311,7 @@ typedef struct {
   NSMdat_snd snd[NSMSYS_MAX_DAT];
   NSMdat_rcv rcv[NSMSYS_MAX_DAT];
 
-  int16_t generation;
+  uint16_t generation;
   int16_t master;
   int16_t deputy;
   int16_t ready;

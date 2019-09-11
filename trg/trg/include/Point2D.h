@@ -24,44 +24,64 @@ namespace Belle2 {
 
 // class CLHEP::Hep3Vector;
 
-/// A class to represent a point in 2D.
+  /// A class to represent a point in 2D.
   class TRGPoint2D {
 
   public:
-    /// Constructors
+    /// Constructor
     TRGPoint2D();
+    /// Constructor
     TRGPoint2D(double, double);
+    /// Constructor
     TRGPoint2D(const HepGeom::Point3D<double>&);
+    /// Constructor
     TRGPoint2D(const Vector3D&);
+    /// Constructor
     TRGPoint2D(const CLHEP::Hep3Vector&);
 
     /// Destructor
     virtual ~TRGPoint2D();
 
   public:// Selectors
+    /// x of the point
     double x(void) const;
+    /// y of the point
     double y(void) const;
+    /// magnitude of the point
     double mag(void) const;
+    /// magnitude square of the point
     double mag2(void) const;
+    /// phi of the point
     double phi(void) const;
 
   public:// Modifiers
+    /// x of the point
     double x(double);
+    /// y of the point
     double y(double);
 
   public:// Operators
+    /// inner product
     double dot(const TRGPoint2D&) const;
+    /// outer product
     double cross(const TRGPoint2D&) const;
+    /// unit vector
     TRGPoint2D unit(void) const;
+    /// + operator
     TRGPoint2D operator + (const TRGPoint2D&) const;
+    /// - operator
     TRGPoint2D operator - (const TRGPoint2D&) const;
+    /// - operator
     TRGPoint2D operator - () const;
+    /// equal operator
     bool operator == (const TRGPoint2D&) const;
 
   private:
+    /// vector
     double _p[2];
   };
 
+  /// ostrream operator
   std::ostream&
   operator << (std::ostream&, const TRGPoint2D&);
 

@@ -19,18 +19,20 @@ using namespace std;
 namespace Belle2 {
   namespace TOP {
 
-    TimeDigitizer::TimeDigitizer(int moduleID, int pixelID, unsigned window,
-                                 unsigned storageDepth, double rmsNoise,
+    unsigned TimeDigitizer::m_storageDepth = 0;
+    unsigned TimeDigitizer::m_readoutWindows = 0;
+    int TimeDigitizer::m_offsetWindows = 0;
+    unsigned TimeDigitizer::m_window = 0;
+    bool TimeDigitizer::m_maskSamples = false;
+
+    TimeDigitizer::TimeDigitizer(int moduleID, int pixelID, double timeOffset,
+                                 double calErrorsSq, int shift, double rmsNoise,
                                  const TOPSampleTimes& sampleTimes):
-      m_moduleID(moduleID), m_pixelID(pixelID), m_window(window),
-      m_storageDepth(storageDepth), m_rmsNoise(rmsNoise), m_sampleTimes(&sampleTimes)
+      m_moduleID(moduleID), m_pixelID(pixelID), m_timeOffset(timeOffset),
+      m_calErrorsSq(calErrorsSq), m_rmsNoise(rmsNoise), m_sampleTimes(&sampleTimes),
+      m_windowShift(shift)
     {
       const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
-      if (!channelMapper.isValid()) {
-        B2ERROR("TimeDigitizer::TimeDigitizer: no valid channel mapper found");
-        return;
-      }
-
       m_channel = channelMapper.getChannel(pixelID);
       if (!channelMapper.isChannelValid(m_channel)) {
         B2ERROR("TimeDigitizer::TimeDigitizer: invalid channel");
@@ -41,11 +43,6 @@ namespace Belle2 {
       channelMapper.splitChannelNumber(m_channel, bs, m_carrier, m_asic, m_chan);
 
       const auto& frontEndMapper = TOPGeometryPar::Instance()->getFrontEndMapper();
-      if (!frontEndMapper.isValid()) {
-        B2ERROR("TimeDigitizer::TimeDigitizer: no valid frontend mapper found");
-        return;
-      }
-
       const auto* map = frontEndMapper.getMap(m_moduleID, bs);
       if (!map) {
         B2ERROR("TimeDigitizer::TimeDigitizer: no valid frontend map found");
@@ -206,7 +203,8 @@ namespace Belle2 {
         double cfdTime = rawTime * tdc.getSampleWidth() - tdc.getOffset();
         double cfdWidth = rawDigit->getFWHM() * tdc.getSampleWidth();
         int sampleDivisions = 0x1 << tdc.getSubBits();
-        unsigned tfine = int(rawTime * sampleDivisions) % sampleDivisions;
+        int tfine = int(rawTime * sampleDivisions) % sampleDivisions;
+        if (tfine < 0) tfine += sampleDivisions;
         rawDigit->setTFine(tfine);
 
         // append new digit
@@ -258,8 +256,11 @@ namespace Belle2 {
       // generate waveform
 
       std::vector<unsigned short> windowNumbers;
-      windowNumbers.push_back(m_window);
-      for (unsigned i = 1; i < tdc.getNumWindows(); i++) {
+      int offsetWindows = m_offsetWindows + m_windowShift;
+      int winnum = m_window + offsetWindows;
+      if (winnum < 0) winnum += m_storageDepth;
+      windowNumbers.push_back(winnum);
+      for (unsigned i = 1; i < m_readoutWindows; i++) {
         windowNumbers.push_back((windowNumbers.back() + 1) % m_storageDepth);
       }
       std::vector<double> baselines(windowNumbers.size(), 0);
@@ -268,12 +269,14 @@ namespace Belle2 {
       std::vector<double> pedestals(windowNumbers.size(), averagePedestal);
       int adcRange = tdc.getADCRange();
 
-      auto wfData = generateWaveform(baselines, rmsNoises, pedestals, adcRange);
+      int startSample = -offsetWindows * TOPRawWaveform::c_WindowSize;
+      auto wfData = generateWaveform(startSample, baselines, rmsNoises, pedestals,
+                                     adcRange);
 
       // store waveform
 
       auto* waveform = waveforms.appendNew(m_moduleID, m_pixelID, m_channel, m_scrodID,
-                                           m_window, 0, wfData);
+                                           windowNumbers[0], 0, wfData);
       waveform->setStorageWindows(windowNumbers);
       waveform->setPedestalSubtractedFlag(true);
 
@@ -284,49 +287,76 @@ namespace Belle2 {
       // digits
 
       for (const auto& feature : waveform->getFeatureExtractionData()) {
+        int sampleRise = feature.sampleRise;
+        if (sampleRise < 0) continue;
+        unsigned iwin = sampleRise / TOPRawWaveform::c_WindowSize;
+        if (iwin >= windowNumbers.size()) continue;
+        sampleRise -= iwin * TOPRawWaveform::c_WindowSize; // should fit raw data bits
+        if (m_maskSamples and (sampleRise % 64) > 55) continue;
+
+        unsigned DsamplePeak = feature.samplePeak - feature.sampleRise;
+        if ((DsamplePeak & 0x0F) != DsamplePeak) continue; // does not fit raw data bits
+
+        unsigned DsampleFall = feature.sampleFall - feature.sampleRise;
+        if ((DsampleFall & 0x0F) != DsampleFall) continue; // does not fit raw data bits
+
+        std::vector<unsigned short> winNumbers;
+        for (unsigned i = iwin; i < windowNumbers.size(); i++) {
+          winNumbers.push_back(windowNumbers[i]);
+        }
 
         // append new raw digit and set it
-        auto* rawDigit = rawDigits.appendNew(m_scrodID, TOPRawDigit::c_MC);
+        auto* rawDigit = rawDigits.appendNew(m_scrodID, TOPRawDigit::c_ProductionDebug);
         rawDigit->setCarrierNumber(m_carrier);
         rawDigit->setASICNumber(m_asic);
         rawDigit->setASICChannel(m_chan);
-        rawDigit->setASICWindow(m_window);
-        rawDigit->setStorageWindows(windowNumbers);
-        rawDigit->setSampleRise(feature.sampleRise);
-        rawDigit->setDeltaSamplePeak(feature.samplePeak - feature.sampleRise);
-        rawDigit->setDeltaSampleFall(feature.sampleFall - feature.sampleRise);
+        rawDigit->setASICWindow(windowNumbers[iwin]);
+        rawDigit->setStorageWindows(winNumbers);
+        rawDigit->setSampleRise(sampleRise);
+        rawDigit->setDeltaSamplePeak(DsamplePeak);
+        rawDigit->setDeltaSampleFall(DsampleFall);
         rawDigit->setValueRise0(feature.vRise0);
         rawDigit->setValueRise1(feature.vRise1);
         rawDigit->setValueFall0(feature.vFall0);
         rawDigit->setValueFall1(feature.vFall1);
         rawDigit->setValuePeak(feature.vPeak);
         rawDigit->setIntegral(feature.integral);
-        double rawTime = rawDigit->getCFDLeadingTime(); // time in [samples]
-        double rawTimeErr = rawDigit->getCFDLeadingTimeError(m_rmsNoise); // in [samples]
+        double rawTimeLeading = rawDigit->getCFDLeadingTime(); // time in [samples]
         int sampleDivisions = 0x1 << tdc.getSubBits();
-        unsigned tfine = int(rawTime * sampleDivisions) % sampleDivisions; // TODO rawTime<0 ?
+        int tfine = int(rawTimeLeading * sampleDivisions) % sampleDivisions;
+        if (tfine < 0) tfine += sampleDivisions;
         rawDigit->setTFine(tfine);
         rawDigit->addRelationTo(waveform);
 
+        double rawTimeFalling = rawDigit->getCFDFallingTime(); // time in [samples]
+        double rawTimeErr = rawDigit->getCFDLeadingTimeError(m_rmsNoise); // in [samples]
+
         // convert to [ns] using time base calibration
-        double cfdTime = m_sampleTimes->getTime(m_window, rawTime) - tdc.getOffset();
+        int nwin = iwin + offsetWindows;
+        rawTimeLeading += nwin * TOPRawDigit::c_WindowSize;
+        rawTimeFalling += nwin * TOPRawDigit::c_WindowSize;
+
+        double cfdTime = m_sampleTimes->getTime(m_window, rawTimeLeading) - m_timeOffset;
         double width = m_sampleTimes->getDeltaTime(m_window,
-                                                   rawDigit->getCFDFallingTime(),
-                                                   rawDigit->getCFDLeadingTime());
-        double timeError = rawTimeErr * m_sampleTimes->getTimeBin(m_window,
-                                                                  feature.sampleRise);
+                                                   rawTimeFalling,
+                                                   rawTimeLeading);
+        int sample = static_cast<int>(rawTimeLeading);
+        if (rawTimeLeading < 0) sample--;
+        double timeError = rawTimeErr * m_sampleTimes->getTimeBin(m_window, sample);
+        timeError = sqrt(timeError * timeError + m_calErrorsSq);
 
         // append new digit and set it
-        auto* digit = digits.appendNew(m_moduleID, m_pixelID, rawTime);
+        auto* digit = digits.appendNew(m_moduleID, m_pixelID, rawTimeLeading);
         digit->setTime(cfdTime);
         digit->setTimeError(timeError);
         digit->setPulseHeight(rawDigit->getValuePeak());
         digit->setIntegral(rawDigit->getIntegral());
         digit->setPulseWidth(width);
         digit->setChannel(m_channel);
-        digit->setFirstWindow(rawDigit->getASICWindow());
-        digit->setStatus(TOPDigit::c_OffsetSubtracted);
-        if (m_sampleTimes->isCalibrated()) digit->addStatus(TOPDigit::c_TimeBaseCalibrated);
+        digit->setFirstWindow(m_window);
+        if (m_sampleTimes->isCalibrated()) {
+          digit->addStatus(TOPDigit::c_TimeBaseCalibrated);
+        }
         digit->addRelationTo(rawDigit);
 
         // check validity of feature extraction
@@ -371,7 +401,8 @@ namespace Belle2 {
     }
 
 
-    vector<short> TimeDigitizer::generateWaveform(const vector<double>& baselines,
+    vector<short> TimeDigitizer::generateWaveform(int startSample,
+                                                  const vector<double>& baselines,
                                                   const vector<double>& rmsNoises,
                                                   const vector<double>& pedestals,
                                                   int adcRange) const
@@ -436,9 +467,10 @@ namespace Belle2 {
         double hitTime = hit.first;
         double pulseHeight = hit.second.pulseHeight;
         const auto* pulseShape = hit.second.shape;
-        if (!pulseShape) continue;
-        for (unsigned sample = 0; sample < waveform.size(); sample++) {
-          double t = m_sampleTimes->getTime(m_window, sample) - tdc.getOffset();
+        if (not pulseShape) continue;
+        int size = waveform.size();
+        for (int sample = 0; sample < size; sample++) {
+          double t = m_sampleTimes->getTime(m_window, sample - startSample) - m_timeOffset;
           waveform[sample] += pulseHeight * pulseShape->getValue(t - hitTime);
         }
       }

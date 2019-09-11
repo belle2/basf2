@@ -109,7 +109,7 @@ namespace Belle2 {
      *
      * @param path path to file where the pickled path is stored
     */
-    static void setPicklePath(std::string path);
+    static void setPicklePath(const std::string& path);
 
     /**
      * Function to get the path to the file where the pickled path is stored
@@ -123,7 +123,7 @@ namespace Belle2 {
      *
      * @param streamingObjects objects to be streamed
     */
-    static void setStreamingObjects(boost::python::list streamingObjects);
+    static void setStreamingObjects(const boost::python::list& streamingObjects);
 
 
     /** Find a file. This is a wrapper around FileSystem::findFile() to be able

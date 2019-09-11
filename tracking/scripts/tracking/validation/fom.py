@@ -9,6 +9,7 @@ from tracking.root_utils import root_cd, root_save_name
 
 
 class ValidationFiguresOfMerit(collections.MutableMapping):
+    """Create and write an TNtuple of the validation figures of merit"""
 
     def __init__(
         self,
@@ -18,17 +19,24 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
         contact='',
         title='',
     ):
+        """Constructor"""
 
+        #: cached name for this figure of merit
         self.name = root_save_name(name)
+        #: cached description for this figure of merit
         self.description = description
+        #: cached user-check action for this figure of merit
         self.check = check
+        #: cached contact person for this figure of merit
         self.contact = contact
+        #: cached title for this figure of merit
         self.title = title
 
+        #: cached dictionary of figures for this figure of merit
         self.figures_by_name = collections.OrderedDict()
 
     def __str__(self):
-        """Informal sting output listing the assigned figures of merit."""
+        """Informal string output listing the assigned figures of merit."""
 
         figures_by_name = self.figures_by_name
         return '\n'.join('%s : %s' % (key, figures_by_name[key])
@@ -126,8 +134,10 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
 
 
 class ValidationManyFiguresOfMerit(ValidationFiguresOfMerit):
+    """Create and write an TNtuple with several validation figures of merit"""
 
     def __str__(self):
+        """Describe myself"""
         return 'Not supported.'
 
     def write(self, tdirectory=None):

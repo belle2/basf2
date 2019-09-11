@@ -54,8 +54,9 @@ main.add_module('EvtGenInput', userDECFile=find_file('decfiles/dec/1111440100.de
 
 # detector simulation
 bg = None
-if 'BELLE2_BACKGROUND_DIR' in os.environ:
-    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+# temporarily disable background overlay until new background files are produced
+# if 'BELLE2_BACKGROUND_DIR' in os.environ:
+#    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 add_simulation(main, bkgfiles=bg)
 
 # trigger simulation
@@ -103,7 +104,7 @@ matchMCTruth('B0:jpsiks', path=main)
 flavorTagger('B0:jpsiks', path=main)
 
 # calculate the Tag Vertex and Delta t (in ps), breco: type of MC association.
-TagV('B0:jpsiks', 'breco')
+TagV('B0:jpsiks', 'breco', path=main)
 
 # select variables that we want to store to ntuple
 fs_vars = ['kaonID', 'muonID', 'dr', 'dz', 'pValue', 'isSignal', 'mcErrors', 'genMotherID']
@@ -120,6 +121,8 @@ add_unpackers(main)
 for module in main.modules():
     if module.type() == 'SVDUnpacker':
         module.param('silentlyAppend', True)
+    if module.name() in ['SVDDataFormatCheck', '__ROISVDDataFormatCheck', '__ROISVDCoGTimeEstimator', 'SVDCoGTimeEstimator']:
+        module.param('SVDEventInfo', 'SVDEventInfoSim')
 
 # gather profiling information
 main.add_module('Profile', outputFileName='vmem_profile.png', rssOutputFileName='rss_profile.png').set_log_level(LogLevel.INFO)

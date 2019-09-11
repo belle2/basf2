@@ -12,6 +12,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <daq/slc/system/LockGuard.h>
 
 using namespace Belle2;
 
@@ -57,11 +58,10 @@ NSMDataStore::Entry* NSMDataStore::add(unsigned int addr,
                                        const std::string& format,
                                        unsigned int rid)
 {
-  m_mutex.lock();
+  MLockGuard lockGuard(m_mutex);
   unsigned int n = m_header->nentries;
   for (unsigned int i = 0; i < n; i++) {
     if (m_entries[i].id > 0 && name == m_entries[i].name) {
-      m_mutex.unlock();
       return &m_entries[i];
     }
   }
@@ -75,37 +75,32 @@ NSMDataStore::Entry* NSMDataStore::add(unsigned int addr,
   strcpy(m_entries[n].name, name.c_str());
   strcpy(m_entries[n].format, format.c_str());
   m_header->nentries++;
-  m_mutex.unlock();
   return &m_entries[n];
 }
 
 NSMDataStore::Entry* NSMDataStore::get(const std::string& name)
 {
-  m_mutex.lock();
+  MLockGuard lockGuard(m_mutex);
   const unsigned int n = m_header->nentries;
   for (unsigned int i = 0; i < n; i++) {
     if (m_entries[i].id > 0 && name == m_entries[i].name) {
-      m_mutex.unlock();
       return &m_entries[i];
     }
   }
-  m_mutex.unlock();
   return NULL;
 }
 
 NSMDataStore::Entry* NSMDataStore::get(unsigned int id)
 {
   if (id == 0) return NULL;
-  m_mutex.lock();
+  MLockGuard lockGuard(m_mutex);
   const unsigned int n = m_header->nentries;
   for (unsigned int i = 0; i < n; i++) {
     if (m_entries[i].id > 0 &&
         m_entries[i].id == (unsigned int)id) {
-      m_mutex.unlock();
       return &m_entries[i];
     }
   }
-  m_mutex.unlock();
   return NULL;
 }
 
@@ -113,17 +108,15 @@ NSMDataStore::Entry* NSMDataStore::get(unsigned int addr,
                                        unsigned int id)
 {
   if (id == 0) return NULL;
-  m_mutex.lock();
+  MLockGuard lockGuard(m_mutex);
   const unsigned int n = m_header->nentries;
   for (unsigned int i = 0; i < n; i++) {
     if (m_entries[i].rid > 0 &&
         m_entries[i].addr == (unsigned int)addr &&
         m_entries[i].rid == (unsigned int)id) {
-      m_mutex.unlock();
       return &m_entries[i];
     }
   }
-  m_mutex.unlock();
   return NULL;
 }
 

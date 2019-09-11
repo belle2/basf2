@@ -51,14 +51,14 @@ namespace Belle2 {
   /**
    * Some massaging of python input is needed
    */
-  NDBin ParticleWeightingLookUpCreatorModule::NDBinTupleToNDBin(NDBinTuple bin_tuple)
+  NDBin ParticleWeightingLookUpCreatorModule::NDBinTupleToNDBin(const NDBinTuple& bin_tuple)
   {
     NDBin binning;
     for (auto bin_1d : bin_tuple) {
       std::string axis_name = bin_1d.first;
       double min_val = std::get<0>(bin_1d.second);
       double max_val = std::get<1>(bin_1d.second);
-      ParticleWeightingBinLimits* lims = new ParticleWeightingBinLimits(min_val, max_val);
+      auto* lims = new ParticleWeightingBinLimits(min_val, max_val);
       binning.insert(std::make_pair(axis_name, lims));
     }
     return binning;

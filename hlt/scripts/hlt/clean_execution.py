@@ -41,12 +41,16 @@ class CleanBasf2Execution:
 
     """
 
-    def __init__(self):
+    def __init__(self, timeout=10):
         """
         Create a new execution with the given parameters (list of arguments)
         """
+        #: The processes handled by this class
         self._handled_processes = []
+        #: The commands related to the processes
         self._handled_commands = []
+        #: Maximum time the process is allowed to stay alive after SIGTERM has been sent
+        self.timeout = timeout
 
     def start(self, command):
         """
@@ -102,14 +106,14 @@ class CleanBasf2Execution:
             # Send a graceful stop signal to the process and give it some time to react
             for process in self._handled_processes:
                 try:
-                    process.send_signal(signal.SIGINT)
+                    os.killpg(process.pid, signal.SIGINT)
                     process.poll()
                 except ProcessLookupError:
                     # The process is already gone! Nice
                     pass
 
             # Give the process some time to react
-            if not self.wait_for_process(timeout=10):
+            if not self.wait_for_process(timeout=self.timeout):
                 basf2.B2WARNING("Process did not react in time. Sending a SIGKILL.")
         finally:
             # In any case: kill the process
@@ -131,13 +135,16 @@ class CleanBasf2Execution:
             # And reinstall the signal handlers
             self.install_signal_handler()
 
-    def wait_for_process(self, process_list=None, timeout=10, minimum_delay=0.0005):
+    def wait_for_process(self, process_list=None, timeout=None, minimum_delay=1):
         """
         Wait maximum "timeout" for the process to stop.
         If it did not end in this period, returns False.
         """
         if process_list is None:
             process_list = self._handled_processes
+
+        if timeout is None:
+            timeout = self.timeout
 
         endtime = time() + timeout
         while True:
@@ -149,8 +156,7 @@ class CleanBasf2Execution:
             if remaining <= 0:
                 return False
 
-            delay = min(minimum_delay, remaining)
-            sleep(delay)
+            sleep(minimum_delay)
 
     def install_signal_handler(self):
         """

@@ -167,7 +167,7 @@ void PXDDQMClustersModule::defineHisto()
     //----------------------------------------------------------------
     string name = str(format("DQM_PXD_%1%_Fired") % sensorDescr);
     string title = str(format("DQM PXD Sensor %1% Fired pixels") % sensorDescr);
-    m_fired[i] = NULL;
+    m_fired[i] = nullptr;
     m_fired[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
     m_fired[i]->GetXaxis()->SetTitle("# of fired pixels");
     m_fired[i]->GetYaxis()->SetTitle("counts");
@@ -176,7 +176,7 @@ void PXDDQMClustersModule::defineHisto()
     //----------------------------------------------------------------
     name = str(format("DQM_PXD_%1%_Clusters") % sensorDescr);
     title = str(format("DQM PXD Sensor %1% Number of clusters") % sensorDescr);
-    m_clusters[i] = NULL;
+    m_clusters[i] = nullptr;
     m_clusters[i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
     m_clusters[i]->GetXaxis()->SetTitle("# of clusters");
     m_clusters[i]->GetYaxis()->SetTitle("counts");
@@ -217,8 +217,8 @@ void PXDDQMClustersModule::defineHisto()
     //----------------------------------------------------------------
     name = str(format("DQM_PXD_%1%_ClusterEnergy") % sensorDescr);
     title = str(format("DQM PXD Sensor %1% Cluster Energy") % sensorDescr);
-    m_clusterEnergy[i] = new TH1F(name.c_str(), title.c_str(), 100, 0, 60000);
-    m_clusterEnergy[i]->GetXaxis()->SetTitle("energy of clusters [eV]");
+    m_clusterEnergy[i] = new TH1F(name.c_str(), title.c_str(), 100, 0, 50);
+    m_clusterEnergy[i]->GetXaxis()->SetTitle("energy of clusters [keV]");
     m_clusterEnergy[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
     // Pixel Signal
@@ -348,31 +348,31 @@ void PXDDQMClustersModule::beginRun()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfPXDLayers() == 0) return;
 
-  if (m_hitMapCounts != NULL) m_hitMapCounts->Reset();
-  if (m_hitMapClCounts != NULL) m_hitMapClCounts->Reset();
-  if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Reset();
-  if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Reset();
+  if (m_hitMapCounts != nullptr) m_hitMapCounts->Reset();
+  if (m_hitMapClCounts != nullptr) m_hitMapClCounts->Reset();
+  if (m_hitMapCountsChip != nullptr) m_hitMapCountsChip->Reset();
+  if (m_hitMapClCountsChip != nullptr) m_hitMapClCountsChip->Reset();
 
   for (int i = 0; i < gTools->getNumberOfPXDSensors(); i++) {
-    if (m_fired[i] != NULL) m_fired[i]->Reset();
-    if (m_clusters[i] != NULL) m_clusters[i]->Reset();
-    if (m_startRow[i] != NULL) m_startRow[i]->Reset();
-    if (m_chargStartRow[i] != NULL) m_chargStartRow[i]->Reset();
-    if (m_startRowCount[i] != NULL) m_startRowCount[i]->Reset();
-    if (m_clusterCharge[i] != NULL) m_clusterCharge[i]->Reset();
-    if (m_clusterEnergy[i] != NULL) m_clusterEnergy[i]->Reset();
-    if (m_pixelSignal[i] != NULL) m_pixelSignal[i]->Reset();
-    if (m_clusterSizeU[i] != NULL) m_clusterSizeU[i]->Reset();
-    if (m_clusterSizeV[i] != NULL) m_clusterSizeV[i]->Reset();
-    if (m_clusterSizeUV[i] != NULL) m_clusterSizeUV[i]->Reset();
+    if (m_fired[i] != nullptr) m_fired[i]->Reset();
+    if (m_clusters[i] != nullptr) m_clusters[i]->Reset();
+    if (m_startRow[i] != nullptr) m_startRow[i]->Reset();
+    if (m_chargStartRow[i] != nullptr) m_chargStartRow[i]->Reset();
+    if (m_startRowCount[i] != nullptr) m_startRowCount[i]->Reset();
+    if (m_clusterCharge[i] != nullptr) m_clusterCharge[i]->Reset();
+    if (m_clusterEnergy[i] != nullptr) m_clusterEnergy[i]->Reset();
+    if (m_pixelSignal[i] != nullptr) m_pixelSignal[i]->Reset();
+    if (m_clusterSizeU[i] != nullptr) m_clusterSizeU[i]->Reset();
+    if (m_clusterSizeV[i] != nullptr) m_clusterSizeV[i]->Reset();
+    if (m_clusterSizeUV[i] != nullptr) m_clusterSizeUV[i]->Reset();
 
-    if (m_hitMapU[i] != NULL) m_hitMapU[i]->Reset();
-    if (m_hitMapV[i] != NULL) m_hitMapV[i]->Reset();
-    if (m_hitMap[i] != NULL) m_hitMap[i]->Reset();
-    if (m_hitMapUCl[i] != NULL) m_hitMapUCl[i]->Reset();
-    if (m_hitMapVCl[i] != NULL) m_hitMapVCl[i]->Reset();
-    if (m_hitMapCl[i] != NULL) m_hitMapCl[i]->Reset();
-    if (m_seed[i] != NULL) m_seed[i]->Reset();
+    if (m_hitMapU[i] != nullptr) m_hitMapU[i]->Reset();
+    if (m_hitMapV[i] != nullptr) m_hitMapV[i]->Reset();
+    if (m_hitMap[i] != nullptr) m_hitMap[i]->Reset();
+    if (m_hitMapUCl[i] != nullptr) m_hitMapUCl[i]->Reset();
+    if (m_hitMapVCl[i] != nullptr) m_hitMapVCl[i]->Reset();
+    if (m_hitMapCl[i] != nullptr) m_hitMapCl[i]->Reset();
+    if (m_seed[i] != nullptr) m_seed[i]->Reset();
 
   }
 }
@@ -408,20 +408,20 @@ void PXDDQMClustersModule::event()
     Pixels[index]++;
     int iChip = PXDMappingLookup::getDCDID(digit2.getUCellID(), digit2.getVCellID(), sensorID);
     int indexChip = gTools->getPXDChipIndex(sensorID, kTRUE, iChip);
-    if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
+    if (m_hitMapCountsChip != nullptr) m_hitMapCountsChip->Fill(indexChip);
     iChip = PXDMappingLookup::getSWBID(digit2.getVCellID());
     indexChip = gTools->getPXDChipIndex(sensorID, kFALSE, iChip);
-    if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
-    if (m_pixelSignal[index] != NULL) m_pixelSignal[index]->Fill(digit2.getCharge());
+    if (m_hitMapCountsChip != nullptr) m_hitMapCountsChip->Fill(indexChip);
+    if (m_pixelSignal[index] != nullptr) m_pixelSignal[index]->Fill(digit2.getCharge());
     if (digit2.getCharge() < m_CutPXDCharge) continue;
-    if (m_hitMapCounts != NULL) m_hitMapCounts->Fill(index);
-    if (m_hitMapU[index] != NULL) m_hitMapU[index]->Fill(digit2.getUCellID());
-    if (m_hitMapV[index] != NULL) m_hitMapV[index]->Fill(digit2.getVCellID());
-    if (m_hitMap[index] != NULL) m_hitMap[index]->Fill(digit2.getUCellID(), digit2.getVCellID());
+    if (m_hitMapCounts != nullptr) m_hitMapCounts->Fill(index);
+    if (m_hitMapU[index] != nullptr) m_hitMapU[index]->Fill(digit2.getUCellID());
+    if (m_hitMapV[index] != nullptr) m_hitMapV[index]->Fill(digit2.getVCellID());
+    if (m_hitMap[index] != nullptr) m_hitMap[index]->Fill(digit2.getUCellID(), digit2.getVCellID());
 
   }
   for (int i = 0; i < nPXDSensors; i++) {
-    if ((m_fired[i] != NULL) && (Pixels[i] > 0)) m_fired[i]->Fill(Pixels[i]);
+    if ((m_fired[i] != nullptr) && (Pixels[i] > 0)) m_fired[i]->Fill(Pixels[i]);
   }
 
   // Hitmaps, Charge, Seed, Size, ...
@@ -437,35 +437,35 @@ void PXDDQMClustersModule::event()
     counts[index]++;
     int iChip = PXDMappingLookup::getDCDID(SensorInfo.getUCellID(cluster.getU()), SensorInfo.getVCellID(cluster.getV()), sensorID);
     int indexChip = gTools->getPXDChipIndex(sensorID, kTRUE, iChip);
-    if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
+    if (m_hitMapClCountsChip != nullptr) m_hitMapClCountsChip->Fill(indexChip);
     iChip = PXDMappingLookup::getSWBID(SensorInfo.getVCellID(cluster.getV()));
     indexChip = gTools->getPXDChipIndex(sensorID, kFALSE, iChip);
-    if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
-    if (m_hitMapClCounts != NULL) m_hitMapClCounts->Fill(index);
-    if (m_clusterCharge[index] != NULL) m_clusterCharge[index]->Fill(cluster.getCharge());
+    if (m_hitMapClCountsChip != nullptr) m_hitMapClCountsChip->Fill(indexChip);
+    if (m_hitMapClCounts != nullptr) m_hitMapClCounts->Fill(index);
+    if (m_clusterCharge[index] != nullptr) m_clusterCharge[index]->Fill(cluster.getCharge());
     // FIXME: The cluster charge is stored in ADU. We have to extract the
     // area dependent conversion factor ADU->eV. Assume this is the same for all pixels of the
     // cluster.
     auto cluster_uID = SensorInfo.getUCellID(cluster.getU());
     auto cluster_vID = SensorInfo.getVCellID(cluster.getV());
     auto ADUToEnergy =  PXDGainCalibrator::getInstance().getADUToEnergy(sensorID, cluster_uID, cluster_vID);
-    if (m_clusterEnergy[index] != NULL) m_clusterEnergy[index]->Fill(cluster.getCharge()* ADUToEnergy / Unit::eV);
-    if (m_clusterSizeU[index] != NULL) m_clusterSizeU[index]->Fill(cluster.getUSize());
-    if (m_clusterSizeV[index] != NULL) m_clusterSizeV[index]->Fill(cluster.getVSize());
-    if (m_clusterSizeUV[index] != NULL) m_clusterSizeUV[index]->Fill(cluster.getSize());
-    if (m_seed[index] != NULL) m_seed[index]->Fill(cluster.getSeedCharge());
+    if (m_clusterEnergy[index] != nullptr) m_clusterEnergy[index]->Fill(cluster.getCharge()* ADUToEnergy / Unit::keV);
+    if (m_clusterSizeU[index] != nullptr) m_clusterSizeU[index]->Fill(cluster.getUSize());
+    if (m_clusterSizeV[index] != nullptr) m_clusterSizeV[index]->Fill(cluster.getVSize());
+    if (m_clusterSizeUV[index] != nullptr) m_clusterSizeUV[index]->Fill(cluster.getSize());
+    if (m_seed[index] != nullptr) m_seed[index]->Fill(cluster.getSeedCharge());
     if (cluster.getCharge() < m_CutPXDCharge) continue;
-    if (m_hitMapUCl[index] != NULL) m_hitMapUCl[index]->Fill(
+    if (m_hitMapUCl[index] != nullptr) m_hitMapUCl[index]->Fill(
         SensorInfo.getUCellID(cluster.getU()));
-    if (m_hitMapVCl[index] != NULL) m_hitMapVCl[index]->Fill(
+    if (m_hitMapVCl[index] != nullptr) m_hitMapVCl[index]->Fill(
         SensorInfo.getVCellID(cluster.getV()));
-    if (m_hitMapCl[index] != NULL) m_hitMapCl[index]->Fill(
+    if (m_hitMapCl[index] != nullptr) m_hitMapCl[index]->Fill(
         SensorInfo.getUCellID(cluster.getU()),
         SensorInfo.getVCellID(cluster.getV()));
 
   }
   for (int i = 0; i < nPXDSensors; i++) {
-    if ((m_clusters[i] != NULL) && (counts[i] > 0))
+    if ((m_clusters[i] != nullptr) && (counts[i] > 0))
       m_clusters[i]->Fill(counts[i]);
   }
 
@@ -478,7 +478,7 @@ void PXDDQMClustersModule::event()
       const PXDDAQDHEStatus* dhe = (*m_storeDAQEvtStats).findDHE(id);
       if (dhe != nullptr) {
         auto startRow = dhe->getStartRow();
-        if (m_startRow[index] != NULL) m_startRow[index]->Fill(startRow);
+        if (m_startRow[index] != nullptr) m_startRow[index]->Fill(startRow);
         startRows.insert(std::make_pair(id, startRow));
       } else {
         B2WARNING("No PXDDAQDHEStatus for VXD Sensor " << id << " found.");
@@ -493,8 +493,8 @@ void PXDDQMClustersModule::event()
 
       float fDistance = SensorInfo.getVCellID(cluster.getV()) - startRows[cluster.getSensorID()];
       if (fDistance < 0) fDistance += SensorInfo.getVCells();
-      if (m_chargStartRow[index] != NULL) m_chargStartRow[index]->Fill(fDistance, cluster.getSeedCharge());
-      if (m_startRowCount[index] != NULL) m_startRowCount[index]->Fill(fDistance);
+      if (m_chargStartRow[index] != nullptr) m_chargStartRow[index]->Fill(fDistance, cluster.getSeedCharge());
+      if (m_startRowCount[index] != nullptr) m_startRowCount[index]->Fill(fDistance);
     }
   }
 

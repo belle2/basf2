@@ -49,6 +49,7 @@ namespace Belle2 {
     SelectSubset< PXDCluster > m_selectorIN; /**< selector of the subset of PXDClusters contained in the ROIs*/
     SelectSubset< PXDCluster > m_selectorOUT; /**< selector of the subset of PXDClusters NOT contained in the ROIs*/
 
+    /// Check for cluster overlaps - a pixel shared with two or more clusters
     bool Overlaps(const ROIid& theROI, const PXDCluster& thePXDCluster);
 
   };

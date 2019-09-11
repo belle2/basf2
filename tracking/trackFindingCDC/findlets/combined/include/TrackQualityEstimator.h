@@ -40,13 +40,13 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Receive and dispatch signal before the start of the event processing
-      void initialize();
+      void initialize() override;
 
       /// Main algorithm
       void apply(std::vector<CDCTrack>& tracks) final;
 
     private:
-      // Findlet to fill CDCTracks into lookup table (singleton) with clone information
+      /// Findlet to fill CDCTracks into lookup table (singleton) with clone information
       CDCMCCloneLookUpFiller m_mcCloneLookUpFiller;
 
       /// Store output of needsTruthInformation from filter in member variable

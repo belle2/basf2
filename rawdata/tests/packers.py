@@ -1,64 +1,68 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+path_to_output = 'rawdata/tests/digits.root'
+
+import basf2 as b2
+import simulation as sim
+import rawdata as raw
+
+from ROOT import Belle2
+
 import sys
 import os
-import multiprocessing
-from basf2 import *
-from ROOT import Belle2
-from simulation import add_simulation
-from rawdata import add_packers, add_raw_output
+import multiprocessing as mp
+
+b2.set_random_seed("L1V0RN0")
+b2.set_log_level(b2.LogLevel.WARNING)
+# Disable tag replay, we want to test current packers
+# independent of when the digits were created
+b2.conditions.disable_globaltag_replay()
+
+# This function create a secondary path to create the digits
 
 
 def create_digits():
-    """Create digits.root needed for testing the packers if it does not exist"""
-    # Digits file does not exist, create it on the fly in a child process
-    os.chdir(os.path.expandvars("${BELLE2_LOCAL_DIR}/rawdata/tests"))
-    sim = create_path()
-    sim.add_module("EventInfoSetter", evtNumList=[10])
-    sim.add_module("EvtGenInput")
-    add_simulation(sim)
-    sim.add_module("RootOutput", outputFileName="digits.root", branchNames=[
-        "PXDDigits", "SVDShaperDigits", "CDCDigits", "TOPRawDigits", "ARICHDigits",
-        "BKLMDigits", "EKLMDigits", "ECLDigits", "ECLDsp",
-    ])
-    process(sim)
+    """Create the file 'digits.root' needed for testing the packers if it does not exist"""
 
+    child_path = b2.create_path()
+    child_path.add_module('EventInfoSetter',
+                          evtNumList=[10])
+    child_path.add_module('EvtGenInput')
+    sim.add_simulation(path=child_path)
+    child_path.add_module('RootOutput',
+                          outputFileName='${BELLE2_LOCAL_DIR}/' + path_to_output,
+                          branchNames=['ARICHDigits',
+                                       'BKLMDigits',
+                                       'CDCHits',
+                                       'ECLDigits',
+                                       'EKLMDigits',
+                                       'PXDDigits',
+                                       'SVDEventInfo',
+                                       'SVDShaperDigits',
+                                       'TOPRawDigits'])
+    child_path.add_module('Progress')
+    b2.process(child_path)
+    print(b2.statistics)
 
-set_random_seed("something important")
-set_log_level(LogLevel.WARNING)
-
-if Belle2.FileSystem.findFile("rawdata/tests/digits.root", False) == "":
-    # execute the create_digits in a child process to avoid side effects
-    child = multiprocessing.Process(target=create_digits)
+if Belle2.FileSystem.findFile(path_to_output, True) == '':
+    # Execute create_digits() in a child process to avoid side effects
+    child = mp.Process(target=create_digits)
     child.start()
-    # wait for simulation to finish
+    # Wait for simulation to finish
     child.join()
-    # and exit if it had an error
+    # And exit if it had an error
     if child.exitcode != 0:
         sys.exit(child.exitcode)
 
-main = create_path()
-
-# input
-input = register_module('RootInput')
-input.param('inputFileNames', Belle2.FileSystem.findFile('rawdata/tests/digits.root'))
-main.add_module(input)
-
-# gearbox
-main.add_module('Gearbox')
-
-# geometry, needed by arich and top
-main.add_module('Geometry', components=['ARICH', 'TOP', 'SVD'])
-
-# conversion from digits to raw data
-add_packers(main)
-
-# output
-# add_raw_output(main)
-
-# process events
-process(main)
-
-# Print call statistics
-print(statistics)
+# Here starts the main path
+main_path = b2.create_path()
+main_path.add_module('RootInput',
+                     inputFileNames=Belle2.FileSystem.findFile(path_to_output))
+raw.add_packers(path=main_path)
+for module in main_path.modules():
+    if module.name() in ['SVDPacker']:
+        module.param('SVDEventInfo', 'SVDEventInfo')
+main_path.add_module('Progress')
+b2.process(main_path)
+print(b2.statistics)

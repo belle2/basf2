@@ -35,7 +35,8 @@ namespace Belle2 {
     return string("TRGCDCLUT 1.00");
   }
 
-  TRGCDCLUT::TRGCDCLUT()
+  TRGCDCLUT::TRGCDCLUT() :
+    m_data{}, m_bitsize(), m_name() // 2019/07/31 by ytlai
   {
   }
 

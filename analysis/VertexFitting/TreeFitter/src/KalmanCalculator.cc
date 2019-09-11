@@ -40,17 +40,11 @@ namespace TreeFitter {
   {
     m_res = residuals;
     m_G = G;
-    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > C =
-      Eigen::Matrix < double, -1, -1, 0 , MAX_MATRIX_SIZE, MAX_MATRIX_SIZE >
-      ::Zero(m_stateDim, m_stateDim).triangularView<Eigen::Lower>();
 
-    Eigen::Matrix < double, -1, -1, 0, 5, 5 > Rtemp =
-      Eigen::Matrix < double, -1, -1, 0, 5, 5 >
-      ::Zero(m_constrDim, m_constrDim).triangularView<Eigen::Lower>();
+    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > C = fitparams.getCovariance().triangularView<Eigen::Lower>();
 
-    C  = fitparams.getCovariance().triangularView<Eigen::Lower>();
     m_CGt = C.selfadjointView<Eigen::Lower>() * G.transpose();
-    Rtemp = G * m_CGt;
+    Eigen::Matrix < double, -1, -1, 0, 5, 5 > Rtemp = G * m_CGt;
     if (V && (weight) && ((*V).diagonal().array() != 0).all()) {
 
       const Eigen::Matrix < double, -1, -1, 0, 5, 5 > weightedV  =

@@ -15,16 +15,14 @@ from stdV0s import *
 from skim.standardlists.charm import *
 from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import *
-from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging
-gb2_setuprel = 'release-03-00-00'
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
+
+gb2_setuprel = 'release-03-02-00'
 
 btocharmpath = Path()
-fileList = \
-    [
-        '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-        'mdst_000001_prod00002288_task00000001.root'
-    ]
-inputMdstList('MC9', fileList, path=btocharmpath)
+
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=btocharmpath)
 
 
 stdPi('all', path=btocharmpath)

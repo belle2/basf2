@@ -21,7 +21,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // DataObjects
-#include <framework/dbobjects/BeamParameters.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 

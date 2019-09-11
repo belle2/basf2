@@ -12,22 +12,28 @@ from basf2 import *
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.INFO)
 
+# Set your suitable DB
+reset_database()
+use_database_chain()
+use_central_database('data_reprocessing_prompt')
+
 # input file must be a data taken by Suppress mode of FE (Belle2 normal mode for physics run)
 # Input (ROOT file).
-# input = register_module('RootInput')
+input = register_module('RootInput')
 # Input (Seq. ROOT file).
-input = register_module('SeqRootInput')
+# input = register_module('SeqRootInput')
 
 # output
 unpacker = register_module('CDCUnpacker')
 # FE channel <-> CDC cell ID map.
 # unpacker.param('xmlMapFileName', 'ch_map.dat')
 # Enable/Disable to store the RawCDC Object.
-unpacker.param('enableStoreRawCDC', True)
+unpacker.param('enableStoreCDCRawHit', True)
+# unpacker.param('enableStoreRawCDC', True)
 # Enable/Disable print out the ADC/TDC data to the terminal.
-unpacker.param('enablePrintOut', True)
+# unpacker.param('enablePrintOut', True)
 # Set/Unset the relation between RawCDC and CDCHit.
-unpacker.param('setRelationRaw2Hit', False)
+# unpacker.param('setRelationRaw2Hit', False)
 
 # dqm
 histo = register_module("HistoManager")  # Histogram Manager

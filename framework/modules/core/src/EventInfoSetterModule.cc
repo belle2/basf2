@@ -56,12 +56,7 @@ EventInfoSetterModule::EventInfoSetterModule() : Module()
            "is useful for debugging to start with a specific event.", m_skipToEvent);
 }
 
-
-EventInfoSetterModule::~EventInfoSetterModule()
-{
-
-}
-
+EventInfoSetterModule::~EventInfoSetterModule() = default;
 
 void EventInfoSetterModule::initialize()
 {

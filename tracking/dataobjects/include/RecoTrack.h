@@ -558,7 +558,7 @@ namespace Belle2 {
     }
 
     /** Return an already created track representation of the given reco track for the PDG. You
-     * are nowt allowed to modify this TrackRep! Will return nulltpr if a trackRep is not available
+     * are not allowed to modify this TrackRep! Will return nulltpr if a trackRep is not available
      * for the given pdgCode.
      *
      * @param pdgCode PDG code of the track representations, only positive PDG numbers are allowed

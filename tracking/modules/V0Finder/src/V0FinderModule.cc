@@ -62,6 +62,8 @@ void V0FinderModule::initialize()
   //All the other required StoreArrays are checked in the Construtor of the V0Fitter.
   m_v0Fitter = std::make_unique<V0Fitter>(m_arrayNameTFResult, m_arrayNameV0,
                                           m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack, m_validation);
+
+  m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
 }
 
 
@@ -94,11 +96,11 @@ void V0FinderModule::event()
     return;
   }
 
-  m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
 
   // Pair up each positive track with each negative track.
   for (auto& trackPlus : tracksPlus) {
     for (auto& trackMinus : tracksMinus) {
+      // TODO: this will throw away all hypotheses if one of them fails! Not sure if that is a problem (how frequent it is)?
       try {
         m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort);
         m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon);

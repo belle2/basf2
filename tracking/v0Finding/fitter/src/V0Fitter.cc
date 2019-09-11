@@ -159,7 +159,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
 
   //Existence of corresponding RecoTrack already checked at the module level;
   RecoTrack* recoTrackPlus = trackPlus->getRelated<RecoTrack>(m_recoTracksName);
-  genfit::Track gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
+  genfit::Track& gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
   int pdgTrackPlus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getParticleType().getPDGCode();
   genfit::AbsTrackRep* plusRepresentation = recoTrackPlus->getTrackRepresentationForPDG(pdgTrackPlus);
   if ((plusRepresentation == nullptr) or (not recoTrackPlus->wasFitSuccessful(plusRepresentation))) {
@@ -169,7 +169,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
 
   //Existence of corresponding RecoTrack already checked at the module level;
   RecoTrack* recoTrackMinus = trackMinus->getRelated<RecoTrack>(m_recoTracksName);
-  genfit::Track gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
+  genfit::Track& gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
   int pdgTrackMinus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getParticleType().getPDGCode();
   genfit::AbsTrackRep* minusRepresentation = recoTrackMinus->getTrackRepresentationForPDG(pdgTrackMinus);
   if ((minusRepresentation == nullptr) or (not recoTrackMinus->wasFitSuccessful(minusRepresentation))) {
@@ -219,6 +219,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
   const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
 
+  // TODO: lv0 and lv1 are only used iv m_validation is true, so investigate if the following lines can be moved down to the if(m_validation) condition!
   const TVector3& posVert(vert.getPos());
   TLorentzVector lv0, lv1;
 

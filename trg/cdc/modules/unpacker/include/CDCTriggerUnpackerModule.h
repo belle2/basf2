@@ -261,6 +261,7 @@ namespace Belle2 {
     bool m_decode2DFinderTrack;  /**< flag to decode 2D finder track  */
     bool m_decode2DFinderInputTS;  /**< flag to decode 2D finder input TS */
     bool m_alignFoundTime;  /**< flag to align found time in different sub-modules */
+    int  m_n2DTS;  /**< flag to unpack 2D tracker data with 15TS*/
 
     NodeList m_neuroNodeID;  /**< list of (COPPER ID, HSLB ID) of neurotrigger */
     bool m_unpackNeuro;  /**< flag to unpack neurotrigger data */

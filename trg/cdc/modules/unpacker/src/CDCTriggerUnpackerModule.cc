@@ -380,7 +380,8 @@ namespace Belle2 {
             old_track(5 downto 0) &
             Main_out(731 downto 0) &
            */
-          const int outputOffset = 1159;
+          //const int outputOffset = 1159;
+          const int outputOffset = offsetBitWidth +  nAxialTSF * numTS * lenTS + 45;  //1159 with numTS=10 ,  1684 with numTS=15
           for (unsigned pos = 0; pos < T2DOutputWidth; ++pos) {
             const int j = (pos + outputOffset) / wordWidth;
             const int k = (pos + outputOffset) % wordWidth;
@@ -504,6 +505,8 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            "flag to decode input TS to 2D", false);
   addParam("decodeNeuro", m_decodeNeuro,
            "flag to decode neurotrigger data", false);
+  addParam("n2DTS", m_n2DTS,
+           "number of TS to decode 2D data", 10);
   //  https://confluence.desy.de/display/BI/DAQ+and+Operation for CPR/HSLB
   NodeList defaultMergerNodeID = {    // These should be very temporary ones since no merger to B2L yet.
     {0x11000001, 0},
@@ -600,12 +603,13 @@ void CDCTriggerUnpackerModule::initialize()
   // This is not the case for now (around first collision), where some coppers are lacking.
   // Therefore it might help to make the following code more flexible
   // so that we won't have a hard fail when some boards are missing
+
   for (int iTracker = 0; iTracker < 4; ++iTracker) {
     if (m_unpackTracker2D) {
       Tracker2D* m_tracker2d =
         new Tracker2D(&m_bitsTo2D, &m_bits2DTo3D,
                       "Tracker2D" + std::to_string(iTracker), 64, 82, m_headerSize,
-                      m_tracker2DNodeID[iTracker], 10,
+                      m_tracker2DNodeID[iTracker], m_n2DTS,
                       m_2DFinderDelay, m_2DFinderCnttrg,
                       m_debugLevel);
       m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_tracker2d));

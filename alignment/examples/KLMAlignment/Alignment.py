@@ -13,6 +13,8 @@ from alignment import MillepedeCalibration
 
 basf2.set_log_level(basf2.LogLevel.INFO)
 
+basf2.conditions.append_testing_payloads('localdb/database.txt')
+
 # Create the algorithm.
 millepede = MillepedeCalibration(['BKLMAlignment', 'EKLMAlignment', 'EKLMSegmentAlignment'])
 

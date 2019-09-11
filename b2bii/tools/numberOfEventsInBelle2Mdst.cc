@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
   std::string filename;
   po::options_description description("Options");
   description.add_options()
-  ("filename", po::value<std::string>(&filename), "belle 1 mdst file");
+  ("filename", po::value<std::string>(&filename), "belle 2 mdst file");
   po::variables_map vm;
   po::positional_options_description p;
   p.add("filename", -1);

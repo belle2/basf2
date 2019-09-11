@@ -224,13 +224,27 @@ namespace Belle2 {
 
       void GlobalParamTimeLine::loadFromDB()
       {
+        std::map<std::tuple<int, int, int>, std::vector<std::shared_ptr<GlobalParamSetAccess>>> eventPayloads{};
         for (auto& row : payloadsTable) {
           for (auto& iovBlock : row.second) {
             for (auto& payload : iovBlock.second) {
-              DBStore::Instance().update(payload.first);
-              DBStore::Instance().updateEvent(payload.first.getEvent());
-              payload.second->loadFromDBObjPtr();
+              auto eventTuple = std::make_tuple((int)payload.first.getExperiment(), (int)payload.first.getRun(), (int)payload.first.getEvent());
+              if (eventPayloads.find(eventTuple) == eventPayloads.end()) {
+                eventPayloads[eventTuple] = std::vector<std::shared_ptr<GlobalParamSetAccess>>();
+              }
+              eventPayloads[eventTuple].push_back(payload.second);
+//               DBStore::Instance().update(payload.first);
+//               DBStore::Instance().updateEvent(payload.first.getEvent());
+//               payload.second->loadFromDBObjPtr();
             }
+          }
+        }
+        for (auto event_payloads : eventPayloads) {
+          auto event = EventMetaData(std::get<2>(event_payloads.first), std::get<1>(event_payloads.first), std::get<0>(event_payloads.first));
+          DBStore::Instance().update(event);
+          DBStore::Instance().updateEvent(event.getEvent());
+          for (auto& payload : event_payloads.second) {
+            payload->loadFromDBObjPtr();
           }
         }
       }

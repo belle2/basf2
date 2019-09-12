@@ -15,11 +15,15 @@
 #define TRGGDLModule_H
 
 #include <string>
-#include "framework/core/Module.h"
+// #include "framework/core/Module.h"
+#include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include "trg/gdl/TRGGDL.h"
+#include <TDirectory.h>
+#include <TH1I.h>
+#include <TH2I.h>
 
 namespace Belle2 {
 
@@ -27,7 +31,8 @@ namespace Belle2 {
 /// requires sub-trigger simulation data (CDC, ECL, TOP, and KLM). The
 /// output is GDL response.
 
-  class TRGGDLModule : public Module {
+//class TRGGDLModule : public Module {
+  class TRGGDLModule : public HistoModule {
 
   public:
 
@@ -52,6 +57,9 @@ namespace Belle2 {
 
     /// Called when processing ended.
     virtual void terminate() override;
+
+    //! Define Histogram
+    virtual void defineHisto() override;
 
   public:
 
@@ -93,6 +101,16 @@ namespace Belle2 {
 
     /// A pointer to a TRGGDL;
     static TRGGDL* _gdl;
+
+  protected:
+
+    TDirectory* oldDir = nullptr;
+    TDirectory* newDir = nullptr;
+
+    TH1I* h_inp = nullptr;
+    TH1I* h_ftd = nullptr;
+    TH1I* h_psn = nullptr;
+
   };
 
 } // namespace Belle2

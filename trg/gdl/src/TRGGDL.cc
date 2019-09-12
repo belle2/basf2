@@ -35,6 +35,9 @@
 
 #include <framework/logging/Logger.h>
 
+#include <TH2I.h>
+#include <TH1I.h>
+
 #define N_TIMING_REGISTERS 4
 
 using namespace std;
@@ -135,6 +138,15 @@ namespace Belle2 {
       cout << "TRGGDL ... TRGGDL created with " << _configFilename << endl;
       _clock.dump();
     }
+
+    for (int i = 0; i < m_InputBitsDB->getninbit(); i++) {
+      _inpBitNames.push_back(std::string(m_InputBitsDB->getinbitname(i)));
+    }
+
+    for (int i = 0; i < m_FTDLBitsDB->getnoutbit(); i++) {
+      _oupBitNames.push_back(std::string(m_FTDLBitsDB->getoutbitname(i)));
+    }
+
   }
 
   void
@@ -224,7 +236,7 @@ namespace Belle2 {
 
     StoreObjPtr<TRGSummary> GDLResult;
     if (GDLResult) {
-      B2WARNING("TRGSummary exist already, check it!!!!");
+      B2WARNING("TRGGDL::fastSimulation(): TRGSummary exist already, check it!!!!");
       return;
     } else {
       GDLResult.create();
@@ -312,11 +324,13 @@ namespace Belle2 {
 
     StoreObjPtr<TRGSummary> GDLResult;
     if (! GDLResult) {
-      B2WARNING("TRGSummary not found. Check it!!!!");
+      B2WARNING("TRGGDL::dataSimulation(): TRGSummary not found. Check it!!!!");
       return;
     } else {
 
       _inpBits.clear();
+      _ftdBits.clear();
+      _psnBits.clear();
       for (int i = 0; i < N_InputBits; i++) {
         _inpBits.push_back(GDLResult->testInput(i));
       }
@@ -360,27 +374,29 @@ namespace Belle2 {
         for (int i = 0; i < N_OutputBits; i++) {
           bool ftdl_fired = isFiredFTDL(_inpBits, algs[i]);
           bool data = GDLResult->testFtdl(i);
-          if ((ftdl_fired && !data) || (!ftdl_fired && data)) {
-            event_ok = false;
-            std::cout << "i(" << i
-                      << "),simu(" << ftdl_fired
-                      << "),data(" << data
-                      << "):  ";
+          if (m_PrescalesDB->getprescales(i) == 1) {
+            if ((ftdl_fired && !data) || (!ftdl_fired && data)) {
+              event_ok = false;
+              std::cout << "i(" << i
+                        << "),simu(" << ftdl_fired
+                        << "),data(" << data
+                        << "):  ";
 
-            bool a = false;
-            for (long unsigned int j = 0; j < _inpBits.size(); j++) {
-              if (_inpBits[j]) {
-                if (a) {
-                  std::cout << "," << j;
-                } else {
-                  std::cout << j;
-                  a = true;
+              bool a = false;
+              for (long unsigned int j = 0; j < _inpBits.size(); j++) {
+                if (_inpBits[j]) {
+                  if (a) {
+                    std::cout << "," << j;
+                  } else {
+                    std::cout << j;
+                    a = true;
+                  }
                 }
               }
+              std::cout << " [[" << algs[i].c_str()
+                        << "]], ftdl1(" << GDLResult->getFtdlBits(1)
+                        << ")" << std::endl;
             }
-            std::cout << " [[" << algs[i].c_str()
-                      << "]], ftdl1(" << GDLResult->getFtdlBits(1)
-                      << ")" << std::endl;
           }
           bool psnm_fired = false;
           _ftdBits.push_back(ftdl_fired);
@@ -963,6 +979,30 @@ namespace Belle2 {
 
     //...Termination...
     return out;
+  }
+
+  void
+  TRGGDL::accumulateInp(TH1I* h)
+  {
+    for (int i = 0; i < _inpBits.size(); i++) {
+      if (_inpBits[i]) h->Fill(i);
+    }
+  }
+
+  void
+  TRGGDL::accumulateFtd(TH1I* h)
+  {
+    for (int i = 0; i < _ftdBits.size(); i++) {
+      if (_ftdBits[i]) h->Fill(i);
+    }
+  }
+
+  void
+  TRGGDL::accumulatePsn(TH1I* h)
+  {
+    for (int i = 0; i < _psnBits.size(); i++) {
+      if (_psnBits[i]) h->Fill(i);
+    }
   }
 
 } // namespace Belle2

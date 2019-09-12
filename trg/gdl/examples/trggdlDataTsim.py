@@ -27,6 +27,9 @@ set_log_level(LogLevel.INFO)
 # use_central_database("staging_online")
 # use_central_database("TRGGDL_201811")
 
+use_central_database("data_reprocessing_prompt_bucket6")
+use_local_database("./localdb/database.txt")
+
 main = create_path()
 
 # input
@@ -45,12 +48,6 @@ input.param('inputFileName', f_in_root)
 main.add_module(input)
 
 
-# output
-output = register_module('RootOutput')
-output.param("outputFileName", "trgsum/trgsum.%s.root" % basename)
-if not os.path.isdir('trgsum'):
-    os.mkdir('trgsum')
-
 # Unpacker
 trggdlUnpacker = register_module("TRGGDLUnpacker")
 main.add_module(trggdlUnpacker)
@@ -65,10 +62,16 @@ datatsim.param('Belle2Phase', "Belle2Phase")
 datatsim.param('algFromDB', False)
 main.add_module(datatsim)
 
+histo = register_module('HistoManager')
+histo.param("histoFileName", "trgsum/dsim.%s.root" % basename)
+main.add_module(histo)
+if not os.path.isdir('trgsum'):
+    os.mkdir('trgsum')
+
 progress = register_module('Progress')
 main.add_module(progress)
 
-main.add_module(output, branchNames=["TRGSummary"])
+# main.add_module(output, branchNames=["TRGSummary"])
 
 process(main)
 

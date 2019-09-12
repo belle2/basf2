@@ -32,6 +32,8 @@
 #include <mdst/dbobjects/TRGGDLDBPrescales.h>
 #include <mdst/dataobjects/TRGSummary.h>
 
+#include <TH1I.h>
+
 namespace HepGeom {
   template <class T> class Point3D;
 }
@@ -132,9 +134,7 @@ namespace Belle2 {
     /// updates TRGGDL information.
     void update(bool mcAnalysis = true);
 
-  public:// Utility functions
-
-  public:// TRG information
+  public:
 
     /// returns the system clock.
     const TRGClock& systemClock(void) const;
@@ -155,6 +155,12 @@ namespace Belle2 {
     bool doprescale(int f);
 
     bool isFiredFTDL(std::vector<bool> input, std::string alg);
+
+    std::vector<bool> getInpBits(void) {return _inpBits;}
+
+    std::vector<bool> getFtdBits(void) {return _ftdBits;}
+
+    std::vector<bool> getPsnBits(void) {return _psnBits;}
 
   private:
 
@@ -178,6 +184,15 @@ namespace Belle2 {
 
     /// Read algorithm data definition.
     void getAlgorithm(std::ifstream& ifs);
+
+    /// Accumulate bit info in histogram
+    void accumulateInp(TH1I*);
+
+    /// Accumulate bit info in histogram
+    void accumulateFtd(TH1I*);
+
+    /// Accumulate bit info in histogram
+    void accumulatePsn(TH1I*);
 
     /// Returns fired/not for input bits.
     bool isFiredInput(int n) {return _inpBits[n];}
@@ -253,6 +268,11 @@ namespace Belle2 {
     std::vector<bool> _inpBits;
     std::vector<bool> _ftdBits;
     std::vector<bool> _psnBits;
+    std::vector<std::string> _inpBitNames;
+    std::vector<std::string> _oupBitNames;
+
+    int getNbitsOup(void) {return _oupBitNames.size();}
+    int getNbitsInp(void) {return _inpBitNames.size();}
 
     bool _algFromDB;
 

@@ -38,15 +38,16 @@ namespace Belle2 {
     return string("TRGGDLModule 0.00");
   }
 
-  TRGGDLModule::TRGGDLModule()
-    : Module::Module(),
-      _debugLevel(0),
-      _configFilename("TRGGDLConfig.dat"),
-      _simulationMode(1),
-      _fastSimulationMode(0),
-      _firmwareSimulationMode(0),
-      _algFilePath("ftd.alg"),
-      _Phase("Phase2")
+  TRGGDLModule::TRGGDLModule() : HistoModule(),
+//TRGGDLModule::TRGGDLModule()
+//  : Module::Module(),
+    _debugLevel(0),
+    _configFilename("TRGGDLConfig.dat"),
+    _simulationMode(1),
+    _fastSimulationMode(0),
+    _firmwareSimulationMode(0),
+    _algFilePath("ftd.alg"),
+    _Phase("Phase2")
   {
 
     string desc = "TRGGDLModule(" + version() + ")";
@@ -94,9 +95,28 @@ namespace Belle2 {
     B2DEBUG(100,  "TRGGDLModule ... destructed ");
   }
 
+  void TRGGDLModule::defineHisto()
+  {
+
+    oldDir = gDirectory;
+    newDir = gDirectory;
+    oldDir->mkdir("TRGGDLModule");
+    newDir->cd("TRGGDLModule");
+
+    h_inp  = new TH1I("hTRGGDL_inp", "input bits from TRGGDLModule", 200, 0, 200);
+    h_ftd  = new TH1I("hTRGGDL_ftd", "ftdl  bits from TRGGDLModule", 200, 0, 200);
+    h_psn  = new TH1I("hTRGGDL_psn", "psnm  bits from TRGGDLModule", 200, 0, 200);
+
+    oldDir->cd();
+
+  }
+
   void
   TRGGDLModule::initialize()
   {
+
+    REG_HISTOGRAM
+    defineHisto();
 
 //  m_TRGSummary.isRequired();
     TRGDebug::level(_debugLevel);
@@ -148,10 +168,17 @@ namespace Belle2 {
     std::cout << "evt(" << _evt << ") " << std::endl;
     */
 
+    newDir->cd();
+
     TRGDebug::enterStage("TRGGDLModule event");
     //...GDL simulation...
     _gdl->update(true);
     _gdl->simulate();
+    std::cout << "h_inp->GetName()=" << h_inp->GetName()
+              << ", h_inp->GetNbinsX()=" << h_inp->GetNbinsX() << std::endl;
+    _gdl->accumulateInp(h_inp);
+    _gdl->accumulateFtd(h_ftd);
+    _gdl->accumulatePsn(h_psn);
 
     //StoreObjPtr<TRGSummary> m_TRGSummary; /**< output for TRGSummary */
     int result_summary = 0;
@@ -164,6 +191,7 @@ namespace Belle2 {
 
     TRGDebug::leaveStage("TRGGDLModule event");
 
+    oldDir->cd();
   }
 
   void

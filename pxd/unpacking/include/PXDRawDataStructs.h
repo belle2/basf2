@@ -55,7 +55,7 @@ namespace Belle2 {
       /// get misc
       inline unsigned short getMisc(void) const
       {
-        return data & 0x3FF;
+        return data & 0x7FF;
       };
       /// print
       void print(void) const;
@@ -93,6 +93,8 @@ namespace Belle2 {
       inline unsigned short get_subrun(void) const {return run_subrun & 0x00FF;};
       inline unsigned short get_run(void) const {return (((run_subrun & 0xFF00) >> 8)  | ((exp_run & 0x003F) << 8));};
       inline unsigned short get_experiment(void) const {return (exp_run & 0xFFC0) >> 6 ;};
+      inline unsigned short get_gated_flag(void) const {return (word0.getMisc() & 0x200) != 0;};
+      inline unsigned short get_gated_isher(void) const {return (word0.getMisc() & 0x400) != 0; ;};
     };
 
     /** DHH start frame data struct.

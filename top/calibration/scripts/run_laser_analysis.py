@@ -47,13 +47,11 @@ main = basf2.create_path()
 # Basic modules: Input, converters, geometry, unpacker
 main.add_module('SeqRootInput')
 main.add_module('Convert2RawDet')
-main.add_module('Gearbox')
-main.add_module('Geometry', components=['TOP'])
+main.add_module('TOPGeometryParInitializer')
 main.add_module('TOPUnpacker')
-
-
 main.add_module('TOPRawDigitConverter',
                 useSampleTimeCalibration=True,
+                useAsicShiftCalibration=True,
                 useChannelT0Calibration=False,
                 useModuleT0Calibration=False,
                 useCommonT0Calibration=False,
@@ -63,7 +61,6 @@ main.add_module('TOPRawDigitConverter',
                 calpulseWidthMax=2.2,
                 calibrationChannel=0,
                 lookBackWindows=28)
-
 
 laser_collector = basf2.register_module('TOPLaserCalibratorCollector')
 laser_collector.param('useReferencePulse', True)

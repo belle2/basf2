@@ -10,9 +10,13 @@
 
 #pragma once
 
-#include <TH1.h>
+/* Belle2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+
+/* ROOT headers. */
+#include <TH1.h>
 
 namespace Belle2 {
 
@@ -29,6 +33,16 @@ namespace Belle2 {
     EKLMTrackMatchAlgorithm();
 
     /**
+     * Copy constructor (disabled).
+     */
+    EKLMTrackMatchAlgorithm(const EKLMTrackMatchAlgorithm&) = delete;
+
+    /**
+     * Operator = (disabled).
+     */
+    EKLMTrackMatchAlgorithm& operator=(const EKLMTrackMatchAlgorithm&) = delete;
+
+    /**
      * Destructor.
      */
     ~EKLMTrackMatchAlgorithm();
@@ -40,14 +54,14 @@ namespace Belle2 {
 
   private:
 
-    /** EKLMElementNumbers. */
-    const EKLMElementNumbers* m_ElementNumbers;
-
     /** Hist of planes eff (data for calibration) */
     TH1F* m_planesEff;
 
     /** Output root file */
     TFile* m_file;
+
+    /** EKLM element numbers */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 
     /** Efficiency data object */
     KLMStripEfficiency* m_StripEfficiency;

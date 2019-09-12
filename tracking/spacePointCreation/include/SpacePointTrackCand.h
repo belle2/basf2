@@ -103,8 +103,8 @@ namespace Belle2 {
      *  sortingParameters are generated from the order of the SpacePoints!
      *  Each SPTC is created in c_isActive-state and has to be deactivated manually, if need be.
      */
-    SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode = 0, double charge = 0,
-                        int mcTrackID = -1);
+    explicit SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode = 0, double charge = 0,
+                                 int mcTrackID = -1);
 
 
     /**

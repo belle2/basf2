@@ -166,7 +166,7 @@ namespace Belle2 {
     DBObjPtr<EKLMElectronicsMap> m_eklmElectronicsMap;
 
     /** Channels. */
-    DBObjPtr<EKLMChannels> m_Channels;
+    DBObjPtr<EKLMChannels> m_eklmChannels;
 
     /** EKLM digits. */
     StoreArray<EKLMDigit> m_eklmDigits;
@@ -177,7 +177,7 @@ namespace Belle2 {
     DBObjPtr<BKLMElectronicsMap> m_bklmElectronicsMap;
 
     /** ADC offset and threshold read from database. */
-    DBObjPtr<BKLMADCThreshold> m_ADCParams;
+    DBObjPtr<BKLMADCThreshold> m_bklmADCParams;
 
     /** BKLM digits. */
     StoreArray<BKLMDigit> m_bklmDigits;

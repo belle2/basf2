@@ -82,6 +82,7 @@ namespace Belle2 {
         return result;
       }
 
+      /// Write debug information into a ROOT file; not implemented
       void writeDebugInfoToFile(const std::string& filename __attribute__((unused)))
       {
         //do nothing;

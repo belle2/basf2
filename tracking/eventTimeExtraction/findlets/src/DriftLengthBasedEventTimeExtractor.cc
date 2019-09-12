@@ -108,6 +108,7 @@ void DriftLengthBasedEventTimeExtractor::apply(std::vector<RecoTrack*>& recoTrac
 
   double weightSum = 0;
   for (const auto& pair : eventT0WithWeights) {
+    // cppcheck-suppress useStlAlgorithm
     weightSum += pair.second;
   }
 

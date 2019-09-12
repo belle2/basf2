@@ -103,6 +103,9 @@ namespace Belle2 {
     /** For index files, this creates TEventList/TEntryListArray to enable better cache use. */
     void addEventListForIndexFile(const std::string& parentLfn);
 
+    /** Correct isMC flag for raw data recorded before experiment 8 run 2364. */
+    void realDataWorkaround(FileMetaData& metaData);
+
     //first the steerable variables:
     /** File to read from. Cannot be used together with m_inputFileNames. */
     std::string m_inputFileName;

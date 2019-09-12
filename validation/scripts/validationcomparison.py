@@ -18,6 +18,11 @@ import ROOT
 # ours
 from metaoptions import MetaOptionParser
 
+# Unfortunately doxygen has some trouble with inheritance of attributes, so
+# we disable it.
+# @cond SUPPRESS_DOXYGEN
+
+
 # ==============================================================================
 # Custom Exceptions
 # ==============================================================================
@@ -210,6 +215,7 @@ class ComparisonBase(ABC):
 
     @abstractmethod
     def _compute(self):
+        """ This method performs the actual computations. """
         pass
 
     def can_compare(self):
@@ -835,3 +841,6 @@ def debug_cli():
 if __name__ == "__main__":
     # Run command line interface for testing purposes.
     debug_cli()
+
+# End suppression of doxygen checks
+# @endcond

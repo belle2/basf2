@@ -71,6 +71,7 @@ class Mask_BS13d(Module):
     ''' exclude (mask-out) BS 13d '''
 
     def event(self):
+        ''' event processing '''
 
         for digit in Belle2.PyStoreArray('TOPDigits'):
             if digit.getModuleID() == 13 and digit.getBoardstackNumber() == 3:

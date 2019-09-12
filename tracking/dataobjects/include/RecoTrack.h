@@ -312,6 +312,7 @@ namespace Belle2 {
       (m_storeArrayNameOfRecoHitInformation);
 
       for (RecoHitInformation& recoHitInformation : relatedHitInformationToHit) {
+        // cppcheck-suppress useStlAlgorithm
         if (recoHitInformation.getRelatedFrom<RecoTrack>(this->getArrayName()) == this) {
           return &recoHitInformation;
         }

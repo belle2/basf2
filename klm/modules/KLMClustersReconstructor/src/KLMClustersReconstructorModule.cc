@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016  Belle II Collaboration                              *
+ * Copyright(C) 2019  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Kirill Chilikin                                          *
@@ -18,16 +18,16 @@
 #include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Const.h>
-#include <klm/modules/KLMK0LReconstructor/KLMK0LReconstructorModule.h>
+#include <klm/modules/KLMClustersReconstructor/KLMClustersReconstructorModule.h>
 
 using namespace Belle2;
 
-REG_MODULE(KLMK0LReconstructor)
+REG_MODULE(KLMClustersReconstructor)
 
-KLMK0LReconstructorModule::KLMK0LReconstructorModule() : Module(),
+KLMClustersReconstructorModule::KLMClustersReconstructorModule() : Module(),
   m_GeoDat(nullptr), m_PositionMode(c_FirstLayer), m_ClusterMode(c_AnyHit)
 {
-  setDescription("Unified BKLM/EKLM K0L reconstruction module.");
+  setDescription("Unified BKLM/EKLM module for the reconstruction of KLMClusters.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("ClusteringAngle", m_ClusteringAngle, "Clustering angle (rad).",
            0.26);
@@ -39,11 +39,11 @@ KLMK0LReconstructorModule::KLMK0LReconstructorModule() : Module(),
            std::string("AnyHit"));
 }
 
-KLMK0LReconstructorModule::~KLMK0LReconstructorModule()
+KLMClustersReconstructorModule::~KLMClustersReconstructorModule()
 {
 }
 
-void KLMK0LReconstructorModule::initialize()
+void KLMClustersReconstructorModule::initialize()
 {
   m_KLMClusters.registerInDataStore();
   m_BKLMHit2ds.isRequired();
@@ -65,7 +65,7 @@ void KLMK0LReconstructorModule::initialize()
     B2FATAL("Incorrect ClusterMode argument.");
 }
 
-void KLMK0LReconstructorModule::beginRun()
+void KLMClustersReconstructorModule::beginRun()
 {
 }
 
@@ -74,7 +74,7 @@ static bool compareDistance(KLMHit2d& hit1, KLMHit2d& hit2)
   return hit1.getPosition().Mag() < hit2.getPosition().Mag();
 }
 
-void KLMK0LReconstructorModule::event()
+void KLMClustersReconstructorModule::event()
 {
   //static double mass = TDatabasePDG::Instance()->GetParticle(130)->Mass();
   int i, n, nLayers, innermostLayer, nHits;
@@ -204,11 +204,11 @@ clusterFound:;
   delete[] layerHitsEKLM;
 }
 
-void KLMK0LReconstructorModule::endRun()
+void KLMClustersReconstructorModule::endRun()
 {
 }
 
-void KLMK0LReconstructorModule::terminate()
+void KLMClustersReconstructorModule::terminate()
 {
 }
 

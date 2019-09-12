@@ -19,6 +19,7 @@
 #include <framework/datastore/StoreArray.h>
 //#include <svd/geometry/SensorInfo.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
 //#include <svd/calibration/SVDDetectorConfiguration.h>
@@ -63,6 +64,9 @@ namespace Belle2 {
     StoreArray<SVDDAQDiagnostic> m_storeDAQ;
     /** event meta data store array */
     StoreObjPtr<EventMetaData> m_evtMetaData;
+
+    /**<storage for SVDEventInfo object */
+    StoreObjPtr<SVDEventInfo> m_storeSVDEvtInfo;
 
     /** experiment number */
     int m_expNumber = 0;

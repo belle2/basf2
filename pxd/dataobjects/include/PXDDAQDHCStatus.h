@@ -88,10 +88,19 @@ namespace Belle2 {
     uint32_t getRawCnt(void) const { return m_rawCount;};
     /** Set Reduced Data counter for reduction calculation */
     uint32_t getRedCnt(void) const { return m_redCount;};
-    /** set erroinfo from the DHC END */
+    /** set errorinfo from the DHC END */
     void setEndErrorInfo(uint32_t e) { m_errorinfo = e;};
-    /** get erroinfo from the DHC END */
+    /** get errorinfo from the DHC END */
     uint32_t getEndErrorInfo(void) const { return m_errorinfo;};
+
+    /** set gating info from the DHC END */
+    void setGatedFlag(uint32_t e) { m_gated_mode = e;};
+    /** get gating info from the DHC END */
+    bool getGatedFlag(void) const { return m_gated_mode;};
+    /** set HER/LER gating info from the DHC END */
+    void setGatedHER(uint32_t e) { m_gated_her = e;};
+    /** get HER/LER gating info from the DHC END */
+    bool getGatedHER(void) const { return m_gated_her;};
 
 
     /** Add DHE information
@@ -131,13 +140,15 @@ namespace Belle2 {
     unsigned short m_dhcID;/**< DHC ID as delivered by DAQ.*/
     uint32_t m_rawCount; /**< raw byte count for monitoring */
     uint32_t m_redCount; /**< reduced byte count for monitoring */
-    uint32_t m_errorinfo; /**< erroinfo from the DHC END **/
+    uint32_t m_errorinfo; /**< errorinfo from the DHC END */
+    bool m_gated_mode{false}; /**< gated info from the DHC START */
+    bool m_gated_her{false}; /**< gated info from the DHC START - true HER, 0 LER*/
 
     /** Vector of DHE informations belonging to this event */
     std::vector <PXDDAQDHEStatus> m_pxdDHE;
 
     /** necessary for ROOT */
-    ClassDef(PXDDAQDHCStatus, 3);
+    ClassDef(PXDDAQDHCStatus, 4);
 
   }; // class PXDDAQDHCStatus
 

@@ -328,7 +328,6 @@ namespace Belle2 {
       double p1 = f1->GetParameter(1);
       double f10 = f1->Eval(10);
       /****************************/
-      int in = 0; /*how many time inner part change fit limit*/
       int out = 0; /*how many time outer part change fit limit*/
       m_fitFunc->SetParameters(p0, p1, 0, 0, 0, 0, m_XTParam[6], 0);
       double p6default = m_XTParam[6];
@@ -364,7 +363,6 @@ namespace Belle2 {
         if (fabs(par[0] - p0) > max_dif || fabs(f10 - m_fitFunc->Eval(10)) > max_dif2) {
           m_fitflag = 3;
           if (i == 9) std::cout << "ERROR XT FIT inner part" << std::endl;
-          in += 1;
           m_fitFunc->SetParameters(p0, p1, 0, 0, 0, 0, p6default, 0);
           m_fitFunc->SetParLimits(1, 0, 0.08);
           m_tmin -= 0.5;

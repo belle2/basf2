@@ -12,6 +12,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/ScopeGuard.h>
 
 #include <TDirectory.h>
 #include <TFile.h>
@@ -212,6 +213,8 @@ namespace Belle2::Conditions {
   {
     // Save the current gDirectory
     TDirectory::TContext saveDir;
+    // Change settings to create reproducible output files
+    auto scopegard = ScopeGuard::guardGetterSetter(&TDirectory::IsReproducible, &TDirectory::MakeReproducible, true);
     // And create the file ...
     std::unique_ptr<TFile> file{TFile::Open(fileName.c_str(), "RECREATE")};
     if (!file || !file->IsOpen()) {

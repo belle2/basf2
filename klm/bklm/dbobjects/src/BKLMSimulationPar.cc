@@ -30,10 +30,10 @@ BKLMSimulationPar::~BKLMSimulationPar()
 
 void BKLMSimulationPar::read(const GearDir& content)
 {
-  // GearDir content(Gearbox::getInstance().getDetectorComponent("BKLM"), "BKLMSimulationParameters");
-  if (!content)
+  if (!content) {
+    B2FATAL("The GearDir to look for BKLM simulation parameters is not valid.");
     return;
-
+  }
   char name[40];
   double weight[c_MAX_NHIT];
 

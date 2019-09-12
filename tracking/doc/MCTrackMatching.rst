@@ -9,9 +9,9 @@ The four main figures of merit for the track finder - the finding efficiency, th
 Overview: Available Status
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-After running the `TrackFinderMCTruth` (which creates Genfit Track Candidates in the following called MC track candidates) 
-and the "normal" track finder algorithm (in the following called PR track candidates), 
-you can apply the `MCMatcherTracksModule`, which creates relations between the two `StoreArrays` 
+After running the `TrackFinderMCTruthRecoTracksModule` which creates Genfit Track Candidates from MC information (in the following called MC track candidates) 
+and the "normal" track finder algorithm which uses hit information from the detector(in the following called PR track candidates), 
+you can apply the `MCRecoTracksMatcherModule`, which creates relations between the two `StoreArray` s 
 of track candidates by looking on the hit content. 
 If the hit content of two track candidates has a non-zero intersection, 
 a relation is created with the ration between the intersection number of hits to the total number of 
@@ -26,10 +26,10 @@ After the matching, each PR and each MC track candidate is given a single label:
 Tracks from Pattern Recognition can be,
 
 *    matched,
-*    clone, and
+*    clone, or
 *    fake (= background or ghost)
 
-as it can be seen in the `PRToMC::MatchInfo` in ``TrackMatchLookUp.h``
+as it can be seen in the `PRToMCMatchInfo` in ``TrackMatchLookUp.h``
 
 Charged MCParticles can be
 
@@ -37,7 +37,7 @@ Charged MCParticles can be
 *    merged or
 *    missing.
 
-as it can be seen in the `MCToPR::MatchInfo` in ``TrackMatchLookUp.h``.
+as it can be seen in the `MCToPRMatchInfo` in ``TrackMatchLookUp.h``.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When is a Track/MCParticle What?
@@ -45,52 +45,52 @@ When is a Track/MCParticle What?
 
 We will first describe the labels here briefly 
 (as it can also be found in the comments in the ``MCMatcherTracksModule.h``)
- and then show some examples.
+and then show some examples.
 
-The `PRTracks` can be classified into four categories, which are described in the following
+The PR track candidate can be classified into four categories, which are described in the following
 
 * MATCHED
 
-  * The highest efficiency `PRTrack` of the highest purity `MCTrack` to this `PRTrack` is the same as this `PRTrack`. 
-    This means the `PRTrack` contains a high contribution of only one `MCTrack` and is also the best of all `PRTracks` 
-    describing this `MCTrack`.
+  * The highest efficiency PR track candidate of the highest purity  MC track candidate  to this PR track candidate  is the same as this PR track candidate. 
+    This means the PR track candidate contains a high contribution of only one MC track candidate and is also the best of all PR track candidates 
+    describing this MC track candidate.
 * CLONE
 
-  * The highest purity `MCTrack` has a different highest efficiency `PRTrack` than this track. 
-    This means the `PRTrack` contains high contributions of only one `MCTrack` but a different other 
-    `PRTrack` contains an even higher contribution to this `MCTrack`.
+  * The highest purity MC track candidate has a different highest efficiency PR track candidate than this track. 
+    This means the PR track candidate contains high contributions of only one MC track candidate but a different other 
+    PR track candidate contains an even higher contribution to this MC track candidate.
 
 * BACKGROUND
 
-  * The `PRTrack` contains mostly hits, which are not part of any `MCTrack`. 
-    This normally means, that this `PRTracks` is made of beam background hits. 
+  * The PR track candidate contains mostly hits, which are not part of any MC track candidate. 
+    This normally means, that this PR track candidates is made of beam background hits or random combinations of hits. 
     Be careful: If e.g. only creating MC track candidates out of primary particles, 
     all found secondary particles will be called background (which is happening in the default validation)
 
 * GHOST
 
-  * The highest purity `MCTrack` to this `PRTrack` has a purity lower than the minimal purity given in 
+  * The highest purity MC track candidate to this PR track candidate has a purity lower than the minimal purity given in 
     the parameter minimalPurity (2/3) or has an efficiency lower than the efficiency given in the parameter 
     minimalEfficiency (0.05). 
     This means that the PRTrack does not contain a significat number of a specific MCTrack nor can it considered only made of background.
 
 
-`MCTracks` are classified into three categories:
+MC track candidates are classified into three categories:
 
 * MATCHED
 
-  * The highest purity `MCTrack` of the highest efficiency `PRTrack` of this `MCTrack` is the same as this `MCTrack`. 
-    This means the `MCTrack` is well described by a `PRTrack` and this 
-    `PRTrack` has only a significant contribution from this `MCTrack`.
+  * The highest purity MC track candidate of the highest efficiency PR track candidate of this MC track candidate is the same as this MC track candidate. 
+    This means the MC track candidate is well described by a PR track candidate and this 
+    PR track candidate has only a significant contribution from this MC track candidate.
 
 * MERGED
 
-  * The highest purity `MCTrack` of the highest efficiency `PRTrack` of this `MCTrack` is not the same as this `MCTrack`. 
-    This means this `MCTrack` is mostly contained in a `PRTrack`, 
-    which in turn however better describes a `MCTrack` different form this.
+  * The highest purity MC track candidate of the highest efficiency PR track candidate of this MC track candidate is not the same as this MC track candidate. 
+    This means this MC track candidate is mostly contained in a PR track candidate, 
+    which in turn however better describes a MC track candidate different form this.
 
 * MISSING
-  * There is no highest efficiency `PRTrack` to this `MCTrack`, which also fullfills the minimal purity requirement.
+  * There is no highest efficiency PR track candidate to this MC track candidate, which also fullfills the minimal purity requirement.
 
 
 Four examples are shown in the pictures. 
@@ -137,7 +137,7 @@ The four main figures of merit, as also shown on the validation side, are:
 * Finding efficiency: Number of MC track candidates which are labeled found divided by the total number of MC track candidates
 * Hit efficiency: Mean of all single hit efficiency of the MC track candidates labeled as found. 
   The single hit efficiency is defined as the number of found hits divided by the number of all hits in a track. 
-  This information is encoded in the weight of the relations created by the `MCTrackMatcherModule`.
+  This information is encoded in the weight of the relations created by the `MCRecoTracksMatcherModule`.
 * Clone rate: Number of PR track candidates which are labeled clone divided by the number of PR 
   track candidates which are labeled clone or matched
 * Fake rate: Number of PC track candidates which are labeled fake divided by the total number of PR track candidates.

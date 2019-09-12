@@ -10,6 +10,7 @@
 
 /* Belle2 headers. */
 #include <background/modules/BeamBkgHitRateMonitor/BKLMHitRateCounter.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2::Background;
 
@@ -56,7 +57,12 @@ void BKLMHitRateCounter::accumulate(unsigned timeStamp)
       continue;
 
     int layerGlobal = BKLMElementNumbers::layerGlobalNumber(digit.getSection(), digit.getSector(), digit.getLayer());
-    rates.layerRates[layerGlobal]++;
+    if (layerGlobal >= 0 and layerGlobal < m_maxGlobalLayer) {
+      rates.layerRates[layerGlobal]++;
+    } else {
+      B2ERROR("BKLMHitRateCounter: global layer number out of range"
+              << LogVar("global layer", layerGlobal));
+    }
     rates.averageRate++;
   }
 

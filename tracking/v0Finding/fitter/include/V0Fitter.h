@@ -8,12 +8,14 @@
 
 #include <TVector3.h>
 
+#include <genfit/Track.h>
+
 #include <utility>
 
 namespace genfit {
   class MeasuredStateOnPlane;
   class GFRaveVertex;
-  class Track;
+  //class Track;
 }
 
 namespace Belle2 {
@@ -92,6 +94,9 @@ namespace Belle2 {
 
     double m_beamPipeRadius;  ///< Radius where inside/outside beampipe is defined.
     double m_vertexChi2CutOutside;  ///< Chi2 cut outside beampipe.
+
+    genfit::Track gfTrackPlus;
+    genfit::Track gfTrackMinus;
   };
 
 }

@@ -9,7 +9,6 @@
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/GFRaveVertexFactory.h>
 #include <genfit/GFRaveVertex.h>
-#include <genfit/Track.h>
 #include <genfit/FieldManager.h>
 #include "genfit/MaterialEffects.h"
 #include <genfit/Exception.h>
@@ -21,7 +20,7 @@ using namespace Belle2;
 V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0sName,
                    const std::string& v0ValidationVerticesName, const std::string& recoTracksName,
                    bool enableValidation)
-  : m_validation(enableValidation), m_recoTracksName(recoTracksName)
+  : m_validation(enableValidation), m_recoTracksName(recoTracksName), gfTrackPlus(), gfTrackMinus()
 {
   m_trackFitResults.isRequired(trackFitResultsName);
   m_v0s.registerInDataStore(v0sName, DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
@@ -159,7 +158,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
 
   //Existence of corresponding RecoTrack already checked at the module level;
   RecoTrack* recoTrackPlus = trackPlus->getRelated<RecoTrack>(m_recoTracksName);
-  genfit::Track& gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
+  gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
   int pdgTrackPlus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getParticleType().getPDGCode();
   genfit::AbsTrackRep* plusRepresentation = recoTrackPlus->getTrackRepresentationForPDG(pdgTrackPlus);
   if ((plusRepresentation == nullptr) or (not recoTrackPlus->wasFitSuccessful(plusRepresentation))) {
@@ -169,7 +168,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
 
   //Existence of corresponding RecoTrack already checked at the module level;
   RecoTrack* recoTrackMinus = trackMinus->getRelated<RecoTrack>(m_recoTracksName);
-  genfit::Track& gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
+  gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
   int pdgTrackMinus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getParticleType().getPDGCode();
   genfit::AbsTrackRep* minusRepresentation = recoTrackMinus->getTrackRepresentationForPDG(pdgTrackMinus);
   if ((minusRepresentation == nullptr) or (not recoTrackMinus->wasFitSuccessful(minusRepresentation))) {

@@ -458,7 +458,7 @@ void TRGCDCT3DConverterModule::addTSDatastore(vector<vector<vector<double> > >& 
 
 void TRGCDCT3DConverterModule::storeTSFirmwareData(vector<vector<vector<vector<double> > > >& tsfInfo)
 {
-  tsfInfo.resize(4, vector<vector<vector<double> > > (10, vector<vector<double> > (48, vector<double> (4))));
+  tsfInfo.resize(4, vector<vector<vector<double> > > (15, vector<vector<double> > (48, vector<double> (4))));
   for (int iClk = 0; iClk < m_firmwareResults.getEntries(); iClk++) {
     TRGCDCT3DUnpackerStore* result = m_firmwareResults[iClk];
     //cout<<"iClk:"<<iClk<<" tsf1_cc:"<<result->m_tsf1_cc<<" tsf1ts0_id:"<<result->m_tsf1ts0_id<<" tsf1ts0_rt:"<<result->m_tsf1ts0_rt<<" tsf1ts0_lr:"<<result->m_tsf1ts0_lr<<" tsf1ts0_pr:"<<result->m_tsf1ts0_pr<<endl;
@@ -512,6 +512,31 @@ void TRGCDCT3DConverterModule::storeTSFirmwareData(vector<vector<vector<vector<d
     tsfInfo[0][9][iClk][2] = result->m_tsf1ts9_lr;
     tsfInfo[0][9][iClk][3] = result->m_tsf1ts9_pr;
     tsfInfo[0][9][iClk][4] = result->m_tsf1_cc;
+    tsfInfo[0][10][iClk][0] = result->m_tsf1ts10_id;
+    tsfInfo[0][10][iClk][1] = result->m_tsf1ts10_rt;
+    tsfInfo[0][10][iClk][2] = result->m_tsf1ts10_lr;
+    tsfInfo[0][10][iClk][3] = result->m_tsf1ts10_pr;
+    tsfInfo[0][10][iClk][4] = result->m_tsf1_cc;
+    tsfInfo[0][11][iClk][0] = result->m_tsf1ts11_id;
+    tsfInfo[0][11][iClk][1] = result->m_tsf1ts11_rt;
+    tsfInfo[0][11][iClk][2] = result->m_tsf1ts11_lr;
+    tsfInfo[0][11][iClk][3] = result->m_tsf1ts11_pr;
+    tsfInfo[0][11][iClk][4] = result->m_tsf1_cc;
+    tsfInfo[0][12][iClk][0] = result->m_tsf1ts12_id;
+    tsfInfo[0][12][iClk][1] = result->m_tsf1ts12_rt;
+    tsfInfo[0][12][iClk][2] = result->m_tsf1ts12_lr;
+    tsfInfo[0][12][iClk][3] = result->m_tsf1ts12_pr;
+    tsfInfo[0][12][iClk][4] = result->m_tsf1_cc;
+    tsfInfo[0][13][iClk][0] = result->m_tsf1ts13_id;
+    tsfInfo[0][13][iClk][1] = result->m_tsf1ts13_rt;
+    tsfInfo[0][13][iClk][2] = result->m_tsf1ts13_lr;
+    tsfInfo[0][13][iClk][3] = result->m_tsf1ts13_pr;
+    tsfInfo[0][13][iClk][4] = result->m_tsf1_cc;
+    tsfInfo[0][14][iClk][0] = result->m_tsf1ts14_id;
+    tsfInfo[0][14][iClk][1] = result->m_tsf1ts14_rt;
+    tsfInfo[0][14][iClk][2] = result->m_tsf1ts14_lr;
+    tsfInfo[0][14][iClk][3] = result->m_tsf1ts14_pr;
+    tsfInfo[0][14][iClk][4] = result->m_tsf1_cc;
 
     tsfInfo[1][0][iClk][0] = result->m_tsf3ts0_id;
     tsfInfo[1][0][iClk][1] = result->m_tsf3ts0_rt;
@@ -563,6 +588,31 @@ void TRGCDCT3DConverterModule::storeTSFirmwareData(vector<vector<vector<vector<d
     tsfInfo[1][9][iClk][2] = result->m_tsf3ts9_lr;
     tsfInfo[1][9][iClk][3] = result->m_tsf3ts9_pr;
     tsfInfo[1][9][iClk][4] = result->m_tsf3_cc;
+    tsfInfo[1][10][iClk][0] = result->m_tsf3ts10_id;
+    tsfInfo[1][10][iClk][1] = result->m_tsf3ts10_rt;
+    tsfInfo[1][10][iClk][2] = result->m_tsf3ts10_lr;
+    tsfInfo[1][10][iClk][3] = result->m_tsf3ts10_pr;
+    tsfInfo[1][10][iClk][4] = result->m_tsf3_cc;
+    tsfInfo[1][11][iClk][0] = result->m_tsf3ts11_id;
+    tsfInfo[1][11][iClk][1] = result->m_tsf3ts11_rt;
+    tsfInfo[1][11][iClk][2] = result->m_tsf3ts11_lr;
+    tsfInfo[1][11][iClk][3] = result->m_tsf3ts11_pr;
+    tsfInfo[1][11][iClk][4] = result->m_tsf3_cc;
+    tsfInfo[1][12][iClk][0] = result->m_tsf3ts12_id;
+    tsfInfo[1][12][iClk][1] = result->m_tsf3ts12_rt;
+    tsfInfo[1][12][iClk][2] = result->m_tsf3ts12_lr;
+    tsfInfo[1][12][iClk][3] = result->m_tsf3ts12_pr;
+    tsfInfo[1][12][iClk][4] = result->m_tsf3_cc;
+    tsfInfo[1][13][iClk][0] = result->m_tsf3ts13_id;
+    tsfInfo[1][13][iClk][1] = result->m_tsf3ts13_rt;
+    tsfInfo[1][13][iClk][2] = result->m_tsf3ts13_lr;
+    tsfInfo[1][13][iClk][3] = result->m_tsf3ts13_pr;
+    tsfInfo[1][13][iClk][4] = result->m_tsf3_cc;
+    tsfInfo[1][14][iClk][0] = result->m_tsf3ts14_id;
+    tsfInfo[1][14][iClk][1] = result->m_tsf3ts14_rt;
+    tsfInfo[1][14][iClk][2] = result->m_tsf3ts14_lr;
+    tsfInfo[1][14][iClk][3] = result->m_tsf3ts14_pr;
+    tsfInfo[1][14][iClk][4] = result->m_tsf3_cc;
 
     tsfInfo[2][0][iClk][0] = result->m_tsf5ts0_id;
     tsfInfo[2][0][iClk][1] = result->m_tsf5ts0_rt;
@@ -614,6 +664,31 @@ void TRGCDCT3DConverterModule::storeTSFirmwareData(vector<vector<vector<vector<d
     tsfInfo[2][9][iClk][2] = result->m_tsf5ts9_lr;
     tsfInfo[2][9][iClk][3] = result->m_tsf5ts9_pr;
     tsfInfo[2][9][iClk][4] = result->m_tsf5_cc;
+    tsfInfo[2][10][iClk][0] = result->m_tsf5ts10_id;
+    tsfInfo[2][10][iClk][1] = result->m_tsf5ts10_rt;
+    tsfInfo[2][10][iClk][2] = result->m_tsf5ts10_lr;
+    tsfInfo[2][10][iClk][3] = result->m_tsf5ts10_pr;
+    tsfInfo[2][10][iClk][4] = result->m_tsf5_cc;
+    tsfInfo[2][11][iClk][0] = result->m_tsf5ts11_id;
+    tsfInfo[2][11][iClk][1] = result->m_tsf5ts11_rt;
+    tsfInfo[2][11][iClk][2] = result->m_tsf5ts11_lr;
+    tsfInfo[2][11][iClk][3] = result->m_tsf5ts11_pr;
+    tsfInfo[2][11][iClk][4] = result->m_tsf5_cc;
+    tsfInfo[2][12][iClk][0] = result->m_tsf5ts12_id;
+    tsfInfo[2][12][iClk][1] = result->m_tsf5ts12_rt;
+    tsfInfo[2][12][iClk][2] = result->m_tsf5ts12_lr;
+    tsfInfo[2][12][iClk][3] = result->m_tsf5ts12_pr;
+    tsfInfo[2][12][iClk][4] = result->m_tsf5_cc;
+    tsfInfo[2][13][iClk][0] = result->m_tsf5ts13_id;
+    tsfInfo[2][13][iClk][1] = result->m_tsf5ts13_rt;
+    tsfInfo[2][13][iClk][2] = result->m_tsf5ts13_lr;
+    tsfInfo[2][13][iClk][3] = result->m_tsf5ts13_pr;
+    tsfInfo[2][13][iClk][4] = result->m_tsf5_cc;
+    tsfInfo[2][14][iClk][0] = result->m_tsf5ts14_id;
+    tsfInfo[2][14][iClk][1] = result->m_tsf5ts14_rt;
+    tsfInfo[2][14][iClk][2] = result->m_tsf5ts14_lr;
+    tsfInfo[2][14][iClk][3] = result->m_tsf5ts14_pr;
+    tsfInfo[2][14][iClk][4] = result->m_tsf5_cc;
 
     tsfInfo[3][0][iClk][0] = result->m_tsf7ts0_id;
     tsfInfo[3][0][iClk][1] = result->m_tsf7ts0_rt;
@@ -665,6 +740,31 @@ void TRGCDCT3DConverterModule::storeTSFirmwareData(vector<vector<vector<vector<d
     tsfInfo[3][9][iClk][2] = result->m_tsf7ts9_lr;
     tsfInfo[3][9][iClk][3] = result->m_tsf7ts9_pr;
     tsfInfo[3][9][iClk][4] = result->m_tsf7_cc;
+    tsfInfo[3][10][iClk][0] = result->m_tsf7ts10_id;
+    tsfInfo[3][10][iClk][1] = result->m_tsf7ts10_rt;
+    tsfInfo[3][10][iClk][2] = result->m_tsf7ts10_lr;
+    tsfInfo[3][10][iClk][3] = result->m_tsf7ts10_pr;
+    tsfInfo[3][10][iClk][4] = result->m_tsf7_cc;
+    tsfInfo[3][11][iClk][0] = result->m_tsf7ts11_id;
+    tsfInfo[3][11][iClk][1] = result->m_tsf7ts11_rt;
+    tsfInfo[3][11][iClk][2] = result->m_tsf7ts11_lr;
+    tsfInfo[3][11][iClk][3] = result->m_tsf7ts11_pr;
+    tsfInfo[3][11][iClk][4] = result->m_tsf7_cc;
+    tsfInfo[3][12][iClk][0] = result->m_tsf7ts12_id;
+    tsfInfo[3][12][iClk][1] = result->m_tsf7ts12_rt;
+    tsfInfo[3][12][iClk][2] = result->m_tsf7ts12_lr;
+    tsfInfo[3][12][iClk][3] = result->m_tsf7ts12_pr;
+    tsfInfo[3][12][iClk][4] = result->m_tsf7_cc;
+    tsfInfo[3][13][iClk][0] = result->m_tsf7ts13_id;
+    tsfInfo[3][13][iClk][1] = result->m_tsf7ts13_rt;
+    tsfInfo[3][13][iClk][2] = result->m_tsf7ts13_lr;
+    tsfInfo[3][13][iClk][3] = result->m_tsf7ts13_pr;
+    tsfInfo[3][13][iClk][4] = result->m_tsf7_cc;
+    tsfInfo[3][14][iClk][0] = result->m_tsf7ts14_id;
+    tsfInfo[3][14][iClk][1] = result->m_tsf7ts14_rt;
+    tsfInfo[3][14][iClk][2] = result->m_tsf7ts14_lr;
+    tsfInfo[3][14][iClk][3] = result->m_tsf7ts14_pr;
+    tsfInfo[3][14][iClk][4] = result->m_tsf7_cc;
 
   }
 }

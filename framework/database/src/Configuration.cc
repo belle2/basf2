@@ -143,7 +143,9 @@ namespace Belle2::Conditions {
     // make sure the list of globaltags to be used is created but empty
     m_inputGlobaltags.emplace();
     // now check for compatibility: make sure all metadata have the same globaltag
-    // setting
+    // setting. Unless we don't have metadata ...
+    if (inputMetadata.empty()) return;
+
     std::optional<std::string> inputGlobaltags;
     for (const auto& metadata : inputMetadata) {
       if (!inputGlobaltags) {
@@ -152,7 +154,6 @@ namespace Belle2::Conditions {
         if (inputGlobaltags != metadata.getDatabaseGlobalTag()) {
           B2WARNING("Input files metadata contain incompatible globaltag settings, globaltag replay not possible");
           // no need to set anything
-          inputGlobaltags.reset();
           return;
         }
       }
@@ -164,6 +165,28 @@ namespace Belle2::Conditions {
     }
     // set the list of globaltags from the string containing the globaltags
     boost::split(*m_inputGlobaltags, *inputGlobaltags, boost::is_any_of(","));
+
+    // HACK: So, we successfully set the input globaltags from the input file,
+    // however we also decided that we want to add new payloads for
+    // boost/invariant mass/beam spot. So if any of the files was created
+    // before the first of October 2019 we assume their globaltag might be
+    // missing these new payloads and we append an extra globaltag containing
+    // just this information with lowest priority. If the files actually had
+    // all payloads these legacy payloads will never be used as they have
+    // lowest priority. Otherwise this should enable running over old files.
+    //
+    // TODO: Once we're sure all files being used contain all payloads remove this.
+    std::optional<std::string> youngest;
+    for (const auto& metadata : inputMetadata) {
+      if (!youngest or * youngest > metadata.getDate()) {
+        youngest = metadata.getDate();
+      }
+    }
+    if (youngest->compare("2019-10-01") < 0) {
+      B2DEBUG(30, "Enabling legacy IP information globaltag in tag replay");
+      m_inputGlobaltags->emplace_back("Legacy_IP_Information");
+    }
+    // END TODO/HACK
   }
 
   std::vector<std::string> Configuration::getBaseTags() const

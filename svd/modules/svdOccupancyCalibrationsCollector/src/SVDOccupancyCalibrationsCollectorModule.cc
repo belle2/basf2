@@ -152,7 +152,7 @@ void SVDOccupancyCalibrationsCollectorModule::closeRun()
           m_sensor = itSvdSensors->getSensorNumber();
           m_side = k;
 
-          getObjectPtr<TTree>("HTreeCoGTimeCalib")->Fill();
+          getObjectPtr<TTree>("HTreeOccupancyCalib")->Fill();
 
         }
       }

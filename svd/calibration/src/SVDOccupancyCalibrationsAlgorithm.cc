@@ -66,7 +66,7 @@ CalibrationAlgorithm::EResult SVDOccupancyCalibrationsAlgorithm::calibrate()
     }
   }
 
-  saveCalibration(payload, "SVDOccupancyTimeCalibrations");
+  saveCalibration(payload, "SVDOccupancyCalibrations");
 
   // probably not needed - would trigger re-doing the collection
   //if ( ... too large corrections ... ) return c_Iterate;

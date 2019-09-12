@@ -21,6 +21,9 @@
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerFinderClone.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <trg/cdc/dbobjects/CDCTrigger2DConfig.h>
 
 #include <array>
 #include <bitset>
@@ -329,6 +332,8 @@ namespace Belle2 {
     /** vector holding the pointers to all the dynamically allocated SubTriggers */
     std::vector<SubTrigger*> m_subTrigger;
 
+    //condition database for number of TS in 2D
+    DBObjPtr<CDCTrigger2DConfig> m_dbn2DTS;
   };
 
 }

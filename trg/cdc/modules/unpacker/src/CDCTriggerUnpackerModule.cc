@@ -505,8 +505,6 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            "flag to decode input TS to 2D", false);
   addParam("decodeNeuro", m_decodeNeuro,
            "flag to decode neurotrigger data", false);
-  addParam("n2DTS", m_n2DTS,
-           "number of TS to decode 2D data", 10);
   //  https://confluence.desy.de/display/BI/DAQ+and+Operation for CPR/HSLB
   NodeList defaultMergerNodeID = {    // These should be very temporary ones since no merger to B2L yet.
     {0x11000001, 0},
@@ -603,6 +601,8 @@ void CDCTriggerUnpackerModule::initialize()
   // This is not the case for now (around first collision), where some coppers are lacking.
   // Therefore it might help to make the following code more flexible
   // so that we won't have a hard fail when some boards are missing
+
+  m_n2DTS = m_dbn2DTS->getnTS();
 
   for (int iTracker = 0; iTracker < 4; ++iTracker) {
     if (m_unpackTracker2D) {

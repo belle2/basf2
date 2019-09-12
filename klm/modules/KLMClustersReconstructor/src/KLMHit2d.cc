@@ -9,7 +9,7 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <klm/modules/KLMK0LReconstructor/KLMHit2d.h>
+#include <klm/modules/KLMClustersReconstructor/KLMHit2d.h>
 
 using namespace Belle2;
 

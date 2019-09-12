@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016  Belle II Collaboration                              *
+ * Copyright(C) 2019  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Kirill Chilikin                                          *
@@ -14,17 +14,17 @@
 #include <klm/eklm/geometry/GeometryData.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <klm/modules/KLMK0LReconstructor/KLMHit2d.h>
+#include <klm/modules/KLMClustersReconstructor/KLMHit2d.h>
 #include <mdst/dataobjects/KLMCluster.h>
 
 namespace Belle2 {
 
   /**
-   * Module KLMK0LReconstructorModule.
+   * Module KLMClustersReconstructorModule.
    * @details
-   * Module for K0L reconstruction.
+   * Module for KLMClusters reconstruction.
    */
-  class KLMK0LReconstructorModule : public Module {
+  class KLMClustersReconstructorModule : public Module {
 
     /**
      * Vertex position calculation mode.
@@ -47,12 +47,12 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    KLMK0LReconstructorModule();
+    KLMClustersReconstructorModule();
 
     /**
      * Destructor.
      */
-    ~KLMK0LReconstructorModule();
+    ~KLMClustersReconstructorModule();
 
     /**
      * Initializer.

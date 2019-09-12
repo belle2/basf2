@@ -65,8 +65,8 @@ void EKLMDatabaseImporter::importSimulationParameters()
 {
   DBImportObjPtr<EKLMSimulationParameters> simPar;
   simPar.construct();
-  GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/"
-             "Content/SensitiveDetector");
+  GearDir gd(Gearbox::getInstance().getDetectorComponent("KLM"));
+  gd.append("/EKLM/SensitiveDetector");
   simPar->setHitTimeThreshold(
     Unit::convertValue(gd.getDouble("HitTimeThreshold") , "ns"));
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,

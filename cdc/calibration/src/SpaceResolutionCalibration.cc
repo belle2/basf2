@@ -301,13 +301,6 @@ bool SpaceResolutionCalibration::calibrate()
   double intp6;
 
   for (int i = 0; i < 56; ++i) {
-    if (i < 8) {
-      upFit = halfCSize[i] + 0.1;
-      intp6 = halfCSize[i] + 0.1;
-    } else {
-      upFit = halfCSize[i] - 0.07;
-      intp6 = halfCSize[i];
-    }
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nalpha; ++al) {
         for (int th = 0; th < m_ntheta; ++th) {

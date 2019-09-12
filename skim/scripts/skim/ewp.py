@@ -41,9 +41,9 @@ def B2XgammaList(path):
     # Apply gamma cuts clusterE9E21 > 0.9 and 1.4 < E_gamma < 3.4 GeV (in CMS frame)
     cutAndCopyList('gamma:ewp', 'gamma:loose', 'clusterE9E21 > 0.9 and 1.4 < useCMSFrame(E) < 3.4', path=path)
 
-    reconstructDecay('B+:ewp -> gamma:ewp', '', path=path)
+    reconstructDecay('B+:gamma -> gamma:ewp', '', path=path)
 
-    BtoXgammaList = ['B+:ewp']
+    BtoXgammaList = ['B+:gamma']
 
     return BtoXgammaList
 
@@ -86,9 +86,9 @@ def B2XllList(path):
     reconstructDecay('B+:ch3 -> e+:ewp e+:ewp', E_dilep_cut, dmID=3, path=path)
     reconstructDecay('B+:ch4 -> mu+:ewp mu+:ewp', E_dilep_cut, dmID=4, path=path)
 
-    copyLists('B+:ewp', ['B+:ch1', 'B+:ch2', 'B+:ch3', 'B+:ch4'], path=path)
+    copyLists('B+:xll', ['B+:ch1', 'B+:ch2', 'B+:ch3', 'B+:ch4'], path=path)
 
-    BptoXllList = ['B+:ewp']
+    BptoXllList = ['B+:xll']
 
     return BptoXllList
 
@@ -126,13 +126,13 @@ def B2XllListLFV(path):
 
     # B+ reconstruction:
     # oppositely charged leptons
-    reconstructDecay('B+:ch1 -> e+:ewp mu-:ewp', E_dilep_cut, dmID=1, path=path)
-    reconstructDecay('B+:ch2 -> mu+:ewp e-:ewp', E_dilep_cut, dmID=2, path=path)
+    reconstructDecay('B+:lfvch1 -> e+:ewp mu-:ewp', E_dilep_cut, dmID=1, path=path)
+    reconstructDecay('B+:lfvch2 -> mu+:ewp e-:ewp', E_dilep_cut, dmID=2, path=path)
     # same charge leptons
-    reconstructDecay('B+:ch3 -> e+:ewp mu+:ewp', E_dilep_cut, dmID=3, path=path)
+    reconstructDecay('B+:lfvch3 -> e+:ewp mu+:ewp', E_dilep_cut, dmID=3, path=path)
 
-    copyLists('B+:ewp', ['B+:ch1', 'B+:ch2', 'B+:ch3'], path=path)
+    copyLists('B+:lfv', ['B+:lfvch1', 'B+:lfvch2', 'B+:lfvch3'], path=path)
 
-    BtoXllListLFV = ['B+:ewp']
+    BtoXllListLFV = ['B+:lfv']
 
     return BtoXllListLFV

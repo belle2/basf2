@@ -3,13 +3,17 @@
 
 # Create EKLM database payloads.
 
-from basf2 import *
+import basf2
 import ROOT
 from ROOT.Belle2 import EKLMDatabaseImporter
 
-set_log_level(LogLevel.INFO)
+basf2.set_log_level(basf2.LogLevel.INFO)
+
+eventinfosetter = basf2.register_module('EventInfoSetter')
+eventinfosetter.initialize()
+gearbox = basf2.register_module('Gearbox')
+gearbox.initialize()
 
 dbImporter = EKLMDatabaseImporter()
-dbImporter.importDigitizationParameters()
-dbImporter.importReconstructionParameters()
+# dbImporter.importReconstructionParameters()
 dbImporter.importSimulationParameters()

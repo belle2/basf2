@@ -12,11 +12,28 @@ be adapted when changing to the new release.
    :depth: 3
    :local:
 
-Changes since release-03
+Changes since release-04
 ========================
 
 .. important changes should go here. Especially things that break backwards
       compatibility 
+
+.. .. rubric:: Some important feature
+
+
+.. Detailed changes for the analysis package first, that's
+   what user will want to see
+
+.. include:: analysis/doc/whatsnew-since/release-04-00.txt
+
+.. And then for framework as well. If something is more important we can always
+   move it directly in here
+
+.. .. include:: framework/doc/whatsnew-since/release-04-00.txt
+
+Changes since release-03
+========================
+
 
 
 .. rubric:: Removal of default analysis path and ``NtupleTools``

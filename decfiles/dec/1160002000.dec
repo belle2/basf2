@@ -1,0 +1,28 @@
+# EventType: 1160002000
+# Descriptor: [B0 -> pi0 nu_e anti-nu_e ]cc
+# NickName: Bd_pi0nunubar
+# Documentation: b->d nu nubar rare process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Borys Knysh
+# Email: borys.knysh@gmail.com
+# Cuts: None
+# Date: 20190912
+#
+Alias myB0sig B0
+Alias myanti-B0sig anti-B0
+ChargeConj myB0sig myanti-B0sig
+#
+Decay Upsilon(4S)
+1.0     myB0sig myanti-B0sig B0 anti-B0	             	VSS_BMIX dm;
+Enddecay
+#
+#
+Decay myB0sig
+1.0 pi0 nu_e anti-nu_e PHOTOS PHSP;
+Enddecay
+CDecay myanti-B0sig
+#
+# 
+End
+

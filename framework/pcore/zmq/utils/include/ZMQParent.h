@@ -27,7 +27,7 @@ namespace Belle2 {
    *
    * In your application, you should have only a single instance of
    * a ZMQParent, for example a std::shared_ptr in your main class.
-   * Use if to create sockets and let the automatic destruction at the end
+   * Use it to create sockets and let the automatic destruction at the end
    * call the cleanup functions properly. After the parent is closed, all
    * its sockets are also invalid. The parent gets initialized
    * on first socket creation.
@@ -81,7 +81,7 @@ namespace Belle2 {
     /**
      * Create a socket of the given type while deciding on the bind behaviour via the address.
      *
-     * An address in the form "tcp://ast:<port>" (with ast = *) means the socket is bound to the own interface.
+     * An address in the form "tcp://ast:<port>" (with ast = *) means the socket is bound to a local interface.
      * An address in the from "tcp://<host>:<port>" means it connects to the given host.
      *
      * If you want to fore a given bind behaviour (and fail if the address is invalid),

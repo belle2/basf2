@@ -82,10 +82,9 @@ Variables
 
 * The event-based variable ``KLMEnergy`` is removed. It is completely meaningless (:issue:`BII-5002`).
 
-* The variables ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz` ) are with respect to the interaction point (as documented). 
-  This now makes them different with respect to ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` ).
-
-  This is similarly true for As above variables ( :b2:var:`mcDX`, :b2:var:`mcDY`, :b2:var:`mcDZ` )  w.r.t ( :b2:var:`mcX`, :b2:var:`mcY` and :b2:var:`mcZ` ).
+* The variables ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz`, :b2:var:`dr`, :b2:var:`dphi`, :b2:var:`dcosTheta` ) are now with respect to the interaction point (as documented). 
+  This now makes them different with respect to the cartesian position ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` ) with respect to the origin..
+  This is similarly true for ( :b2:var:`mcDX`, :b2:var:`mcDY`, :b2:var:`mcDZ` )  versus ( :b2:var:`mcX`, :b2:var:`mcY` and :b2:var:`mcZ` ).
 
 * Added the meta variable :b2:var:`eclClusterSpecialTrackMatched` to check if
   any track related to an ECL cluster satisfies certain criteria. It can be used

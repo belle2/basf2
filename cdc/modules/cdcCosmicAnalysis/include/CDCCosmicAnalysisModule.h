@@ -29,10 +29,6 @@ namespace Belle2 {
 
 
 
-    /**
-     * Create QAM histograms.
-     */
-    void createQAMHist(TTree*);
 
     /**
      * Analysis module for CDC CR data.
@@ -127,7 +123,6 @@ namespace Belle2 {
       bool m_bField; /**< Data are taken with B-field or not, if true, NDF=5 in cal P-value */
       bool m_eventT0Extraction;/**< run with event t0 extraction*/
       bool m_phi0InRad; /**< Unit of phi0, true: radian, false: degree */
-      bool m_qam; /**< Enable output of QAM histogram */
       bool m_storeTrackParErrors;/**< Store error of track parameters or not. */
     };
   }

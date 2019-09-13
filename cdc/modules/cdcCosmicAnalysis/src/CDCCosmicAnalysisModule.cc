@@ -52,9 +52,8 @@ CDCCosmicAnalysisModule::CDCCosmicAnalysisModule() : Module()
   addParam("EventT0Extraction", m_eventT0Extraction, "use event t0 extract t0 or not", true);
   addParam("treeName", m_treeName, "Output tree name", string("tree"));
   addParam("phi0InRad", m_phi0InRad, "Phi0 in unit of radian, true: rad, false: deg", true);
-  addParam("qam", m_qam, "Output QAM histograms", false);
   addParam("StoreTrackParErrors", m_storeTrackParErrors,
-           "Store Track Parameter errors (true) or not (false),it will be true if qam=true", false);
+           "Store Track Parameter errors (true) or not (false)", false);
 }
 
 CDCCosmicAnalysisModule::~CDCCosmicAnalysisModule()
@@ -71,9 +70,6 @@ void CDCCosmicAnalysisModule::initialize()
   m_recoTrackArrayName = recoTracks.getName();
   m_trackFitResultArrayName = storeTrackFitResults.getName();
   m_relRecoTrackTrackName = relRecoTrackTrack.getName();
-
-  if (m_qam)
-    m_storeTrackParErrors = true;
 
   tfile = new TFile(m_outputFileName.c_str(), "RECREATE");
   //  tree = new TTree("treeTrk", "treeTrk");
@@ -261,9 +257,6 @@ void CDCCosmicAnalysisModule::terminate()
 {
   tfile->cd();
   tree->Write();
-  if (m_qam == true) {
-    createQAMHist(tree);
-  }
   tfile->Close();
 }
 

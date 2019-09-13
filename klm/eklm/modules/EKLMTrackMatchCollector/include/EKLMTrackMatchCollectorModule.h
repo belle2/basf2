@@ -32,12 +32,12 @@
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 #include <calibration/CalibrationCollectorModule.h>
-
 
 namespace Belle2 {
 
@@ -135,7 +135,7 @@ namespace Belle2 {
     const EKLM::GeometryData* m_GeoDat;
 
     /** EKLMElementNumbers. */
-    const EKLMElementNumbers* m_ElementNumbers;
+    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 
     /** D0 and Z0 distance parameters */
     double m_D0Z0;

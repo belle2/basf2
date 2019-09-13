@@ -38,6 +38,7 @@ namespace {
     CDCTrajectory2D trajectory2D = trajectory3D.getTrajectory2D();
     CDCTrajectorySZ trajectorySZ = trajectory3D.getTrajectorySZ();
 
+    result.reserve(segment2D.size());
     for (const CDCRecoHit2D& recoHit2D : segment2D) {
       result.push_back(CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D, trajectorySZ));
     }

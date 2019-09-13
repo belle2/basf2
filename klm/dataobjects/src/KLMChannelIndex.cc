@@ -24,8 +24,7 @@ KLMChannelIndex::KLMChannelIndex(enum IndexLevel indexLevel) :
   m_Plane(0),
   m_Strip(1)
 {
-  m_NStripsPlane = BKLMElementNumbers::getNStrips(
-                     m_Section, m_Sector, m_Layer, m_Plane);
+  setNStripsPlane();
   m_ElementNumbers = &(KLMElementNumbers::Instance());
   m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
 }
@@ -41,18 +40,26 @@ KLMChannelIndex::KLMChannelIndex(
   m_Plane(plane),
   m_Strip(strip)
 {
-  if (m_Subdetector == KLMElementNumbers::c_BKLM) {
-    m_NStripsPlane = BKLMElementNumbers::getNStrips(
-                       m_Section, m_Sector, m_Layer, m_Plane);
-  } else {
-    m_NStripsPlane = 0;
-  }
+  setNStripsPlane();
   m_ElementNumbers = &(KLMElementNumbers::Instance());
   m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 KLMChannelIndex::~KLMChannelIndex()
 {
+}
+
+void KLMChannelIndex::setNStripsPlane()
+{
+  if (m_Subdetector == KLMElementNumbers::c_BKLM) {
+    m_NStripsPlane = BKLMElementNumbers::getNStrips(
+                       m_Section, m_Sector, m_Layer, m_Plane);
+  } else {
+    if (m_UseEKLMSegments)
+      m_NStripsPlane = EKLMElementNumbers::getMaximalSegmentNumber();
+    else
+      m_NStripsPlane = EKLMElementNumbers::getMaximalStripNumber();
+  }
 }
 
 void KLMChannelIndex::setIndexLevel(enum IndexLevel indexLevel)
@@ -101,12 +108,14 @@ void KLMChannelIndex::setIndexLevel(enum IndexLevel indexLevel)
     }
   }
   m_IndexLevel = indexLevel;
-  if (m_Subdetector == KLMElementNumbers::c_BKLM) {
-    if (indexLevel == c_IndexLevelStrip) {
-      m_NStripsPlane = BKLMElementNumbers::getNStrips(
-                         m_Section, m_Sector, m_Layer, m_Plane);
-    }
-  }
+  if (indexLevel == c_IndexLevelStrip)
+    setNStripsPlane();
+}
+
+void KLMChannelIndex::useEKLMSegments(bool useSegments)
+{
+  m_UseEKLMSegments = useSegments;
+  setNStripsPlane();
 }
 
 uint16_t KLMChannelIndex::getKLMChannelNumber() const
@@ -134,6 +143,12 @@ uint16_t KLMChannelIndex::getKLMSectorNumber() const
     return m_ElementNumbers->sectorNumberBKLM(m_Section, m_Sector);
   else
     return m_ElementNumbers->sectorNumberEKLM(m_Section, m_Sector);
+}
+
+int KLMChannelIndex::getEKLMSegmentNumber() const
+{
+  return m_ElementNumbersEKLM->segmentNumber(
+           m_Section, m_Layer, m_Sector, m_Plane, m_Strip);
 }
 
 KLMChannelIndex KLMChannelIndex::beginBKLM()
@@ -177,8 +192,7 @@ void KLMChannelIndex::increment(enum IndexLevel indexLevel)
         if (m_Strip > m_NStripsPlane) {
           m_Strip = 1;
           increment(c_IndexLevelPlane);
-          m_NStripsPlane = BKLMElementNumbers::getNStrips(
-                             m_Section, m_Sector, m_Layer, m_Plane);
+          setNStripsPlane();
         }
         break;
       case c_IndexLevelPlane:
@@ -217,9 +231,10 @@ void KLMChannelIndex::increment(enum IndexLevel indexLevel)
     switch (indexLevel) {
       case c_IndexLevelStrip:
         m_Strip++;
-        if (m_Strip > EKLMElementNumbers::getMaximalStripNumber()) {
+        if (m_Strip > m_NStripsPlane) {
           m_Strip = 1;
           increment(c_IndexLevelPlane);
+          setNStripsPlane();
         }
         break;
       case c_IndexLevelPlane:

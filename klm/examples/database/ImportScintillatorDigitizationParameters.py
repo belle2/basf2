@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Import KLM scintillator digitization parameters.
+# Import KLM scintillator digitization parameters payloads.
 
 import sys
 import basf2
-import ROOT
 import math
+import ROOT
 from ROOT.Belle2 import KLMDatabaseImporter, KLMScintillatorDigitizationParameters
 
 basf2.set_log_level(basf2.LogLevel.INFO)
@@ -15,20 +15,6 @@ mc = False
 if (len(sys.argv) >= 2):
     if (sys.argv[1] == 'mc'):
         mc = True
-
-eventinfosetter = basf2.register_module('EventInfoSetter')
-
-# Gearbox
-gearbox = basf2.register_module('Gearbox')
-
-# Create main path
-main = basf2.create_path()
-
-# Add modules to main path
-main.add_module(eventinfosetter)
-main.add_module(gearbox)
-
-basf2.process(main)
 
 dbImporter = KLMDatabaseImporter()
 

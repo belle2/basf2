@@ -5,7 +5,7 @@
 This module contains various utility functions for the CAF and Job submission Backends to use.
 """
 
-from basf2 import *
+from basf2 import B2INFO, B2WARNING, B2DEBUG
 import os
 from collections import deque
 from collections import OrderedDict

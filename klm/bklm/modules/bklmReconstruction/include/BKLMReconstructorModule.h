@@ -44,8 +44,6 @@ namespace Belle2 {
     //! Once-only termination at the end of the job
     virtual void terminate() override;
 
-  protected:
-
   private:
 
     //! Pointer to GeometryPar singleton
@@ -77,5 +75,6 @@ namespace Belle2 {
 
     //! hit2ds StoreArray
     StoreArray<BKLMHit2d> hit2ds;
+
   };
 } // end namespace Belle2

@@ -4,9 +4,12 @@ Changes in the analysis package
 Modules
 +++++++
 
- * When merging ParticleLists using the :b2mod:`ParticleListManipulator`
-   (`modularAnalysis.copyLists`) duplicates (not multiple candidates) are removed
-   on a first-come, first-served basis, i.e. the order of the input particles
-   matters. Now, the new parameter ``variable`` can be provided to determine
-   which duplicate should be preferred. The logic is the same as for the
-   :b2mod:`BestCandidateSelector`.
+* When merging ParticleLists using the :b2mod:`ParticleListManipulator`
+  (`modularAnalysis.copyLists`) duplicates (not multiple candidates) are removed
+  on a first-come, first-served basis, i.e. the order of the input particles
+  matters. Now, the new parameter ``variable`` can be provided to determine
+  which duplicate should be preferred. The logic is the same as for the
+  :b2mod:`BestCandidateSelector`.
+
+* The :b2mod:`ParticleLoader` can create neutron particle lists now. ECL
+  cluster with the hadron hypothesis as well as KLM cluster are used as source.

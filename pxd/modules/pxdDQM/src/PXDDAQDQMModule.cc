@@ -42,8 +42,10 @@ PXDDAQDQMModule::PXDDAQDQMModule() : HistoModule() , m_vxdGeometry(VXD::GeoCache
 void PXDDAQDQMModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
-  oldDir->cd(m_histogramDirectoryName.c_str());
+  if (m_histogramDirectoryName != "") {
+    oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
+    oldDir->cd(m_histogramDirectoryName.c_str());
+  }
 
   hDAQErrorEvent = new TH1F("PXDDAQError", "PXDDAQError/Event;;Count", ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
   hDAQErrorDHC = new TH2F("PXDDAQDHCError", "PXDDAQError/DHC;DHC ID;", 16, 0, 16, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
@@ -115,11 +117,11 @@ void PXDDAQDQMModule::beginRun()
   hDAQNotUseableModule->Reset();
   hDAQEndErrorDHC->Reset();
   hDAQEndErrorDHE->Reset();
-  for (auto& it : hDAQDHETriggerGate) it.second->Reset();
-  for (auto& it : hDAQDHCReduction) it.second->Reset();
-  for (auto& it : hDAQDHEReduction) it.second->Reset();
-  for (auto& it : hDAQCM) it.second->Reset();
-  for (auto& it : hDAQCM2) it.second->Reset();
+  for (auto& it : hDAQDHETriggerGate) if (it.second) it.second->Reset();
+  for (auto& it : hDAQDHCReduction) if (it.second) it.second->Reset();
+  for (auto& it : hDAQDHEReduction) if (it.second) it.second->Reset();
+  for (auto& it : hDAQCM) if (it.second) it.second->Reset();
+  for (auto& it : hDAQCM2) if (it.second) it.second->Reset();
 }
 
 void PXDDAQDQMModule::event()

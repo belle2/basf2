@@ -50,8 +50,10 @@ namespace Belle2 {
     class HitInHyperBox {
 
     public:
+      /// Hough space is 3D with axes q, p, z0 as described above
       using HoughBox = Box<DiscreteQ, DiscreteP, DiscreteZ0>;
 
+      /// Returns weight of the hit for the given hough box; in this algorithm - 1 if hit inside the box, NaN otherwise
       Weight operator()(const CDCRecoHit3D& recoHit,
                         const HoughBox* hyperBox)
       {
@@ -98,6 +100,7 @@ namespace Belle2 {
       }
 
     private:
+      /// Returns z(R) for the catenary with parameters q = E/p_t and p = p_z/E
       static double catZ(const double q, const double p, const double R)
       {
         //100 here is a reference  - size of CDC in cm
@@ -105,21 +108,25 @@ namespace Belle2 {
       }
 
     public:
+      /// Returns center value of the box along first (Q) axis
       static float centerX(const HoughBox& hyperBox)
       {
         return *(hyperBox.getCenter<0>());
       }
 
+      /// Returns center value of the box along second (P) axis
       static float centerY(const HoughBox& hyperBox)
       {
         return *(hyperBox.getCenter<1>());
       }
 
+      /// Returns center value of the box along third (Z0) axis
       static float centerZ(const HoughBox& hyperBox)
       {
         return *(hyperBox.getCenter<2>());
       }
 
+      /// Returns half width of the box along first (Q) axis
       static float deltaX(const HoughBox& hyperBox)
       {
         const float lowerQ = *(hyperBox.getLowerBound<DiscreteQ>()); //DiscreteValue is based on std::vector<T>::const_iterator
@@ -127,6 +134,7 @@ namespace Belle2 {
         return 0.5 * (upperQ - lowerQ);
       }
 
+      /// ROOT expression of the track hypothesis
       static const char* debugLine() { return "100.0 * [0] * (TMath::Sqrt(1 - [1] * [1]) * TMath::CosH(x / 100.0 + TMath::ASinH([1] / TMath::Sqrt(1 - [1] * [1]))) - 1) + [2]";}
     };
   }

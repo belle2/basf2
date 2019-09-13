@@ -363,10 +363,17 @@ void XTCalibrationAlgorithm::write()
                 B2DEBUG(21, "Probability of fit: " <<  m_xtFunc[l][lr][al][th]->GetProb());
               }
             }
-            // If fit is failed, previous xt is retqined.
-            for (int i = 0; i < 8; ++i) {
-              par[i] = m_xtPrior[l][lr][al][th][i];
+            // If fit is failed
+            // and mode of input xt (prior) is same as output, previous xt is used.
+            if (m_xtMode == m_xtModePrior) {
+              for (int i = 0; i < 8; ++i) {
+                par[i] = m_xtPrior[l][lr][al][th][i];
+              }
+            } else { // if modes are different, simple xt is used.
+              par[0] = 0; par[1] = 0.004; par[2] = 0; par[3] = 0; par[4] = 0; par[5] = 0; par[6] = m_par6[l]; par[7] = 0.00001;
             }
+
+
           } else {
             if (par[1] < 0) {
               for (int i = 0; i < 8; ++i) {

@@ -79,6 +79,15 @@ void XTCalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("Pval", &Pval);
   tree->SetBranchAddress("ndf", &ndf);
 
+  /* Disable unused branch */
+  std::vector<TString> list_vars = {"lay", "t", "x_u", "alpha", "theta", "Pval", "ndf"};
+  tree->SetBranchStatus("*", 0);
+
+  for (TString brname : list_vars) {
+    tree->SetBranchStatus(brname, 1);
+  }
+
+
   int al = 0;
   int th = 0;
   const int nEntries = tree->GetEntries();

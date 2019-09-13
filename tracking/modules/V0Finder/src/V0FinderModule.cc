@@ -2,6 +2,7 @@
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/core/ModuleParam.templateDetails.h> // needed for complicated parameter types 
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -51,6 +52,14 @@ V0FinderModule::V0FinderModule() : Module()
 
   addParam("vertexChi2CutOutside", m_vertexChi2CutOutside,
            "Maximum chi² for the vertex fit (NDF = 1)", 50.);
+
+
+  addParam("massRangeKshort", m_MassRangeKshort, "mass range for reconstructed Kshort used for pre-selection of candidates"
+           " (to be chosen loosely as used momenta are not very precise)", m_MassRangeKshort);
+  addParam("massRangeLambda", m_MassRangeLambda, "mass range for reconstructed Lambda used for pre-selection of candidates"
+           " (to be chosen loosely as used momenta are not very precise)", m_MassRangeLambda);
+  addParam("massRangeGamma", m_MassRangeGamma, "mass range for reconstructed photon mass used for pre-selection of candidates"
+           " (to be chosen loosely as used momenta are not very precise)", m_MassRangeGamma);
 }
 
 
@@ -100,12 +109,13 @@ void V0FinderModule::event()
   // Pair up each positive track with each negative track.
   for (auto& trackPlus : tracksPlus) {
     for (auto& trackMinus : tracksMinus) {
-      // TODO: this will throw away all hypotheses if one of them fails! Not sure if that is a problem (how frequent it is)?
+      // TODO: this will throw away all hypotheses if one of them fails! Not sure if that is a problem or how frequent it is?
       try {
-        m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort);
-        m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon);
-        m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda);
-        m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda);
+        if (preFilterTracks(trackPlus, trackMinus, Const::Kshort)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort);
+        if (preFilterTracks(trackPlus, trackMinus, Const::photon)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon);
+        if (preFilterTracks(trackPlus, trackMinus, Const::Lambda))  m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda);
+        if (preFilterTracks(trackPlus, trackMinus, Const::antiLambda)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda);
+
       } catch (const genfit::Exception& e) {
         // genfit exception raised, skip this track pair
         B2DEBUG(27, "Genfit exception caught: " << e.what() << "skip the track pair and continue");
@@ -113,4 +123,36 @@ void V0FinderModule::event()
       }
     }
   }
+}
+
+
+bool
+V0FinderModule::preFilterTracks(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis)
+{
+
+  const auto trackHypotheses = m_v0Fitter->getTrackHypotheses(v0Hypothesis);
+
+  // first track should always be the positve one
+  TLorentzVector p4trackPlus;
+  p4trackPlus.SetVectM(trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getMomentum(),
+                       trackHypotheses.first.getMass());
+
+  // second track should always be the negative  one
+  TLorentzVector p4trackMinus;
+  p4trackMinus.SetVectM(trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getMomentum(),
+                        trackHypotheses.second.getMass());
+
+  float mass = (p4trackPlus + p4trackMinus).Mag();
+
+  std::tuple<float, float>  massrange = {0., 0.};
+  if (v0Hypothesis == Const::Kshort) {
+    massrange = m_MassRangeKshort;
+  } else if (v0Hypothesis == Const::photon) {
+    massrange = m_MassRangeGamma;
+  } else if (v0Hypothesis == Const::Lambda or v0Hypothesis == Const::antiLambda) {
+    massrange = m_MassRangeKshort;
+  } else {
+    B2WARNING("This should not happen!");
+  }
+  return (mass > std::get<0>(massrange) and mass < std::get<1>(massrange));
 }

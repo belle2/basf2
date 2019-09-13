@@ -10,6 +10,7 @@
 #include <framework/pcore/zmq/utils/ZMQLogger.h>
 #include <boost/property_tree/json_parser.hpp>
 #include <ostream>
+#include <stdexcept>
 
 using namespace Belle2;
 
@@ -74,7 +75,7 @@ void ZMQLogger::Incrementor::operator()(double& value)
 
 void ZMQLogger::Incrementor::operator()(std::string&)
 {
-  // This makes no sense... we just keep it as it is
+  throw std::domain_error("Can not increment a string type");
 }
 
 void ZMQLogger::Decrementor::operator()(long& value)
@@ -89,5 +90,5 @@ void ZMQLogger::Decrementor::operator()(double& value)
 
 void ZMQLogger::Decrementor::operator()(std::string&)
 {
-  // This makes no sense... we just keep it as it is
+  throw std::domain_error("Can not decrement a string type");
 }

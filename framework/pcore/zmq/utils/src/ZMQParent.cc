@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <framework/pcore/zmq/utils/ZMQParent.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
+#include <bitset>
 
 using namespace std;
 using namespace Belle2;
@@ -57,7 +58,8 @@ void ZMQParent::initialize()
 #endif
 unsigned int ZMQParent::poll(const std::vector<zmq::socket_t*>& socketList, int timeout)
 {
-  unsigned int return_bitmask = 0;
+  B2ASSERT("Only allow to poll on maximal 8 sockets at the same time!", socketList.size() <= 8);
+  std::bitset<8> return_bitmask;
   zmq::pollitem_t items[socketList.size()];
 
   for (unsigned int i = 0; i < socketList.size(); i++) {
@@ -66,16 +68,13 @@ unsigned int ZMQParent::poll(const std::vector<zmq::socket_t*>& socketList, int 
     items[i].revents = 0;
   }
 
-
   try {
     zmq::poll(items, socketList.size(), timeout);
 
     for (unsigned int i = 0; i < socketList.size(); i++) {
-      if (static_cast<bool>(items[i].revents & ZMQ_POLLIN)) {
-        return_bitmask = return_bitmask | 1 << i;
-      }
+      return_bitmask[i] = static_cast<bool>(items[i].revents & ZMQ_POLLIN);
     }
-    return return_bitmask;
+    return return_bitmask.to_ulong();
   } catch (zmq::error_t& error) {
     if (error.num() == EINTR) {
       return 0;

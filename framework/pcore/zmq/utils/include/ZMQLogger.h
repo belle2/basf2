@@ -12,7 +12,9 @@
 #include <variant>
 #include <deque>
 #include <chrono>
+#include <vector>
 #include <map>
+#include <unordered_map>
 #include <numeric>
 #include <string>
 
@@ -44,7 +46,7 @@ namespace Belle2 {
     /// Instead of storeing the double value directly under the given key, store the average of the last MAX_SIZE values.
     template<size_t MAX_SIZE = 100>
     void average(const std::string& key, double value);
-    /// Store the information how much time has elapsed since the last call to this function (with the same key) and store the rate (averaged over MAX_SIZE calls)
+    /// Measure the rate of calls with the same key every AVERAGE_SIZE calls (and also display the last time AVERAGE_SIZE was reached under <key>_last_measurement)
     template<size_t AVERAGE_SIZE = 2000>
     void timeit(const std::string& key);
     /// Store the current time as a string under the given key
@@ -54,11 +56,9 @@ namespace Belle2 {
     /// Internal storage of all stored values
     std::map<std::string, std::variant<long, double, std::string>> m_monitoring;
     /// Internal storage of the previous values when calculating averages
-    std::map<std::string, std::deque<double>> m_averages;
-    /// Internal storage how often the timeit function for a given key was called
-    std::map<std::string, unsigned long> m_eventNumber;
-    /// Time of the last call to timeit for the given key, when it has reached MAX_SIZE
-    std::map<std::string, std::chrono::system_clock::time_point> m_timestamp;
+    std::unordered_map<std::string, std::tuple<std::vector<double>, size_t>> m_averages;
+    /// Internal storage how often the timeit function for a given key was called and when it has last reached MAX_SIZE
+    std::unordered_map<std::string, std::tuple<unsigned long, std::chrono::system_clock::time_point>> m_timeCounters;
 
     /// Visitor Helper for converting a variant value into a JSON string
     struct toJSON {
@@ -100,29 +100,35 @@ namespace Belle2 {
   template<size_t MAX_SIZE>
   void ZMQLogger::average(const std::string& key, double value)
   {
-    m_averages[key].push_back(value);
-    if (m_averages[key].size() > MAX_SIZE) {
-      m_averages[key].pop_front();
+    auto& [averages, index] = m_averages[key];
+
+    if (averages.size() == MAX_SIZE) {
+      averages[index] = value;
+      index = (index + 1) % MAX_SIZE;
+    } else {
+      averages.push_back(value);
     }
-    log(key, std::accumulate(m_averages[key].begin(), m_averages[key].end(), 0.0) / m_averages[key].size());
+
+    log(key, std::accumulate(averages.begin(), averages.end(), 0.0) / averages.size());
   }
 
   template<size_t AVERAGE_SIZE>
   void ZMQLogger::timeit(const std::string& key)
   {
-    if (m_eventNumber[key] % AVERAGE_SIZE == 0) {
-      auto current = std::chrono::system_clock::now();
+    auto& [calls, timestamp] = m_timeCounters[key];
+    if (calls % AVERAGE_SIZE == 0) {
+      auto current = std::chrono::high_resolution_clock::now();
       double elapsed = std::chrono::duration_cast<std::chrono::duration<double>>(
-                         current - m_timestamp[key]).count();
+                         current - timestamp).count();
 
       log(key, AVERAGE_SIZE / elapsed);
 
-      m_timestamp[key] = current;
-      m_eventNumber[key] = 0;
+      timestamp = current;
+      calls = 0;
 
       auto displayTime = std::chrono::system_clock::to_time_t(current);
       log(key + "_last_measurement", std::ctime(&displayTime));
     }
-    m_eventNumber[key]++;
+    calls++;
   }
 }

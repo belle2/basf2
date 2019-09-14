@@ -28,7 +28,7 @@ namespace Belle2 {
   public:
 
     /** Default constructor */
-    CDCTrigger2DConfig(): m_nTS{10} {}
+    CDCTrigger2DConfig(): m_nTS{0} {}
     /** copy constructor */
     CDCTrigger2DConfig(const CDCTrigger2DConfig& b): TObject(b)
     {
@@ -58,7 +58,7 @@ namespace Belle2 {
     /** Number of TS */
     int m_nTS;
 
-    ClassDef(CDCTrigger2DConfig, 0);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(CDCTrigger2DConfig, 1);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
 } // end of namespace Belle2

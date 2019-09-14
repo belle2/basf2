@@ -86,7 +86,7 @@ namespace Belle2 {
         }
         B2DEBUG(20, name << ": " << nClocks << " clocks");
       } else if (entries != nClocks) {
-        B2ERROR("Number of clocks in " << name << " conflicts with others!");
+        B2DEBUG(20, "Number of clocks in " << name << " conflicts with others!");
       }
     };
 
@@ -99,8 +99,8 @@ namespace Belle2 {
         return;
       }
       if (nWords[iFinesse] < headerSize) {
-        B2WARNING("The module " << name << " does not have enough data (" <<
-                  nWords[iFinesse] << "). Nothing will be unpacked.");
+        B2DEBUG(20, "The module " << name << " does not have enough data (" <<
+                nWords[iFinesse] << "). Nothing will be unpacked.");
         // TODO: need to clear the output bitstream because we return early here
         return;
       }
@@ -185,7 +185,7 @@ namespace Belle2 {
           }
           B2DEBUG(20, name << ": " << nClocks << " clocks");
         } else if (entries != nClocks) {
-          B2ERROR("Number of clocks in " << name << " conflicts with others!");
+          B2DEBUG(20, "Number of clocks in " << name << " conflicts with others!");
         }
       }
     };
@@ -238,7 +238,7 @@ namespace Belle2 {
         }
       }
       if (counter_correct_error) {
-        B2WARNING("PHYSJG: " <<  name << " too many clock counter rotation corrections: " << ccShift << " data object skipped.");
+        B2DEBUG(20, "PHYSJG: " <<  name << " too many clock counter rotation corrections: " << ccShift << " data object skipped.");
         // maybe implement an option for user to decide if this data block should be kept or not?!
         return;
       }
@@ -246,7 +246,7 @@ namespace Belle2 {
       [](halfDataWord i, halfDataWord j) {
       return (j.to_ulong() - i.to_ulong() == 4);
       })) {
-        B2WARNING("clock counters are still out of order");
+        B2DEBUG(20, "clock counters are still out of order");
         for (const auto& c : counters) {
           B2DEBUG(90, "" << c.to_ulong());
         }
@@ -438,7 +438,7 @@ namespace Belle2 {
           }
           B2DEBUG(20, name << ": " << nClocks << " clocks");
         } else if (entries != nClocks) {
-          B2ERROR("Number of clocks in " << name << " conflicts with others!");
+          B2DEBUG(20, "Number of clocks in " << name << " conflicts with others!");
         }
       }
     };
@@ -603,12 +603,18 @@ void CDCTriggerUnpackerModule::initialize()
   // so that we won't have a hard fail when some boards are missing
 
   m_n2DTS = m_dbn2DTS->getnTS();
+  int datasize_2D = 64;
+  if (m_n2DTS == 10) {
+    datasize_2D = 64;
+  } else if (m_n2DTS == 15) {
+    datasize_2D = 82;
+  }
 
   for (int iTracker = 0; iTracker < 4; ++iTracker) {
     if (m_unpackTracker2D) {
       Tracker2D* m_tracker2d =
         new Tracker2D(&m_bitsTo2D, &m_bits2DTo3D,
-                      "Tracker2D" + std::to_string(iTracker), 64, 82, m_headerSize,
+                      "Tracker2D" + std::to_string(iTracker), datasize_2D, 82, m_headerSize,
                       m_tracker2DNodeID[iTracker], m_n2DTS,
                       m_2DFinderDelay, m_2DFinderCnttrg,
                       m_debugLevel);
@@ -718,8 +724,8 @@ void CDCTriggerUnpackerModule::event()
         B2DEBUG(100, "Adding " << clockCounterDiff << " clock(s) to 2D" << iTracker << " found time");
       }
       if (std::abs(clockCounterDiff) > 2) {
-        B2WARNING("Clock counters between 2D [0," << iTracker << "] differ by " << clockCounterDiff << " clocks! (" \
-                  << clockCounter2D[0] << ", " << clockCounter2D[iTracker] << ")");
+        B2DEBUG(20, "Clock counters between 2D [0," << iTracker << "] differ by " << clockCounterDiff << " clocks! (" \
+                << clockCounter2D[0] << ", " << clockCounter2D[iTracker] << ")");
       }
     }
     for (short iclock = 0; iclock < m_bitsTo2D.getEntries(); ++iclock) {

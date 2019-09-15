@@ -193,6 +193,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
 
   for (const RecoHitInformation::UsedCDCHit* hit : track->getCDCHitList()) {
     const genfit::TrackPoint* tp = track->getCreatedTrackPoint(track->getRecoHitInformation(hit));
+    if (!tp) continue;
     lay = hit->getICLayer();
     IWire = hit->getIWire();
     adc = hit->getADCCount();

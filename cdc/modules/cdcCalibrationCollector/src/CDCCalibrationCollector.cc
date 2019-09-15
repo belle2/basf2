@@ -47,7 +47,7 @@ CDCCalibrationCollectorModule::CDCCalibrationCollectorModule() : CalibrationColl
   addParam("calExpectedDriftTime", m_calExpectedDriftTime, "if true module will calculate expected drift time, it take a time",
            false);
 
-  addParam("storeTrackParams", m_storeTrackParams, "Store Track Parameter or not, it will be multicount for each hit", false);
+  addParam("storeTrackParams", m_storeTrackParams, "Store Track Parameter or not, it will be multicount for each hit", true);
   addParam("eventT0Extraction", m_eventT0Extraction, "use event t0 extract t0 or not", false);
   addParam("minimumPt", m_minimumPt, "Tracks with tranverse momentum small than this will not recored", 0.);
   addParam("isCosmic", m_isCosmic, "True when we process cosmic events, else False (collision)", m_isCosmic);

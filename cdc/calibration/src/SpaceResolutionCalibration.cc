@@ -69,6 +69,14 @@ void SpaceResolutionCalibration::createHisto()
   tree->SetBranchAddress("alpha", &alpha);
   tree->SetBranchAddress("theta", &theta);
 
+  /* Disable unused branch */
+  std::vector<TString> list_vars = {"lay", "ndf", "Pval", "x_u", "x_b", "x_mea", "weight", "alpha", "theta"};
+  tree->SetBranchStatus("*", 0);
+
+  for (TString brname : list_vars) {
+    tree->SetBranchStatus(brname, 1);
+  }
+
 
   vector<double> yu;
   vector <double> yb;

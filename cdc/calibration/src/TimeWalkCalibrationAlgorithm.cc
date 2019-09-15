@@ -82,6 +82,14 @@ void TimeWalkCalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("Pval", &Pval);
   tree->SetBranchAddress("adc", &adc);
 
+  /* Disable unused branch */
+  std::vector<TString> list_vars = {"lay", "IWire", "x_u", "t", "t_fit",  "weight", "Pval", "ndf", "adc"};
+  tree->SetBranchStatus("*", 0);
+
+  for (TString brname : list_vars) {
+    tree->SetBranchStatus(brname, 1);
+  }
+
   const int nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
   for (int i = 0; i < nEntries; ++i) {

@@ -117,6 +117,19 @@ void CDCCalibrationCollectorModule::collect()
   /* CDCHit distribution */
   //  make evt t0 incase we dont use evt t0
   evtT0 = 0;
+
+  //reject events don't have eventT0
+  if (m_eventT0Extraction) {
+    // event with is fail to extract t0 will be exclude from analysis
+    if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
+      evtT0 =  m_eventTimeStoreObject->getEventT0();
+      getObjectPtr<TH1F>("hEventT0")->Fill(evtT0);
+    } else {
+      return;
+    }
+  }
+
+
   const int nTr = recoTracks.getEntries();
 
   for (int i = 0; i < nTr; ++i) {
@@ -161,19 +174,7 @@ void CDCCalibrationCollectorModule::collect()
     if (m_isCosmic == true && phi0 > 0.0) continue;
 
     //cut at Pt
-
     if (fitresult->getMomentum().Perp() < m_minimumPt) continue;
-    //reject events don't have eventT0
-    if (m_eventT0Extraction) {
-      // event with is fail to extract t0 will be exclude from analysis
-      if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
-        evtT0 =  m_eventTimeStoreObject->getEventT0();
-        getObjectPtr<TH1F>("hEventT0")->Fill(evtT0);
-      } else {
-        continue;
-      }
-    }
-
     try {
       harvest(track);
     } catch (...) {

@@ -131,6 +131,8 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   B2INFO("Creating CDCGeometryPar object");
   CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
 
+
+  double dEventT0 = getObjectPtr<TH1F>("hEventT0")->GetMean();
   createHisto();
   TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels", 500, -10, 10);
   TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all chanels", 100, 0, 10);
@@ -187,10 +189,10 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   }
 
   // mean shift
-  const double dt0Mean = hm_All->GetMean();
+  //  const double dt0Mean = hm_All->GetMean();
   for (int ilay = 0; ilay < 56; ++ilay) {
     for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
-      dt[ilay][iwire] -= dt0Mean;
+      dt[ilay][iwire] -= dEventT0;
     }
   }
 

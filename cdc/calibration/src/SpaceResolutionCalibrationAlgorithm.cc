@@ -314,20 +314,11 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
   const auto exprun = getRunList()[0];
   B2INFO("ExpRun used for DB Geometry : " << exprun.first << " " << exprun.second);
   updateDBObjPtrs(1, exprun.second, exprun.first);
-  B2INFO("Creating CDCGeometryPar object");
-  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
+  //  B2INFO("Creating CDCGeometryPar object");
+  //  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   prepare();
   createHisto();
-
-  //half cell size
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-  double halfCSize[56];
-  for (int i = 0; i < 56; ++i) {
-    double R = cdcgeo.senseWireR(i);
-    double nW = cdcgeo.nWiresInLayer(i);
-    halfCSize[i] = M_PI * R / nW;
-  }
 
   TF1* func = new TF1("func", "[0]/(x*x + [1])+[2]* x+[3]+[4]*exp([5]*(x-[6])*(x-[6]))", 0, 1.);
   TH1F* hprob = new TH1F("h1", "", 20, 0, 1);
@@ -338,34 +329,11 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nAlphaBins; ++al) {
         for (int th = 0; th < m_nThetaBins; ++th) {
-          //boundary parameters,
-          if (m_bField) {
-            if (i < 8) {
-              upFit = halfCSize[i] + 0.15;
-              intp6 = halfCSize[i] + 0.1;
-            } else {
-              if (fabs(m_iAlpha[al]) < 25) {
-                upFit = halfCSize[i];
-                intp6 = halfCSize[i];
-              } else {
-                upFit = halfCSize[i] + 0.2;
-                intp6 = halfCSize[i] + 0.4 ;
-              }
-            }
-            //no B case
-          } else {
-            if (i < 8) {
-              upFit = halfCSize[i] + 0.1;
-              intp6 = halfCSize[i] + 0.1;
-            } else {
-              upFit = halfCSize[i] - 0.07;
-              intp6 = halfCSize[i];
-            }
-          }
 
-          if (upFit > 0.9) upFit = 0.9;
+          upFit = getUpperBoundaryForFit(m_gFit[i][lr][al][th]);
+          intp6 = upFit + 0.2;
+          B2DEBUG(199, "xmax for fitting: " << upFit);
 
-          //          func->SetLineColor(1 + lr + al * 2 + th * 3);
           func->SetParameters(5E-6, 0.007, 1E-4, 1E-5, 0.00008, -30, intp6);
           func->SetParLimits(0, 1E-7, 1E-4);
           func->SetParLimits(1, 0.0045, 0.02);

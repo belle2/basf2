@@ -80,6 +80,32 @@ namespace Belle2 {
       /// Prepare the calibration of space resolution.
       void prepare();
 
+      /// search max point at boundary region
+      double getUpperBoundaryForFit(TGraphErrors* graph)
+      {
+        double ymax = 0;
+        double xmax = 0;
+        int imax = 0;
+        double x, y;
+        int unCount = floor(0.05 / m_binWidth);
+        int N = graph->GetN();
+        int Nstart = floor(0.5 * (N - unCount));
+        int Nend = N - unCount;
+        for (int i  = Nstart; i < Nend; ++i) {
+          graph->GetPoint(i, x, y);
+          if (graph->GetErrorY(i) > 0.06E-3) continue;
+          if (y > ymax) {
+            xmax = x; ymax = y;
+            imax = i;
+          }
+        }
+        if (imax <= Nstart) {
+          graph->GetPoint(Nend, x, y);
+          xmax = x;
+        }
+        return xmax;
+      }
+
     private:
       static const int Max_nalpha = 18; /**< Maximum alpha bin.*/
       static const int Max_ntheta = 7; /**< maximum theta bin  */

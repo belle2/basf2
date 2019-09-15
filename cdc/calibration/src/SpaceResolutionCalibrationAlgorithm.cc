@@ -356,7 +356,8 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
               B2DEBUG(21, "stat of fit" << stat);
               std::string Fit_status = gMinuit->fCstatu.Data();
               B2DEBUG(21, "FIT STATUS: " << Fit_status);
-              if (Fit_status == "OK" || Fit_status == "SUCCESSFUL") {//need to found better way
+              if (Fit_status == "OK" || Fit_status == "SUCCESSFUL" || Fit_status == "CALL LIMIT"
+                  || Fit_status == "PROBLEMS") {//need to found better way
                 if (fabs(func->Eval(0.3)) > 0.00035 || func->Eval(0.3) < 0) {
                   func->SetParameters(5E-6, 0.007, 1E-4, 1E-7, 0.0007, -30, intp6 + 0.05 * j);
                   func->SetParLimits(6, intp6 + 0.05 * j - 0.5, intp6 + 0.05 * j + 0.2);

@@ -19,7 +19,7 @@ from variables import *
 variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
 variables.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
 variables.addAlias('dmID', 'extraInfo(decayModeID)')
-variables.addAlias('FWR2', 'ifNANgiveX(foxWolframR2,1)')
+variables.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
 variables.addAlias('cosThetaBY', 'cosThetaBetweenParticleAndNominalB')
 variables.addAlias('d1_p_CMSframe', 'useCMSFrame(daughter(1,p))')
 variables.addAlias('d2_p_CMSframe', 'useCMSFrame(daughter(2,p))')
@@ -251,7 +251,7 @@ def runFEIforB0Hadronic(path):
                     checkForDuplicates=False,
                     path=path)
 
-    applyEventCuts('FWR2<0.4 and nTracks>=4', path=path)
+    applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -298,7 +298,7 @@ def runFEIforBplusHadronic(path):
                     checkForDuplicates=False,
                     path=path)
 
-    applyEventCuts('FWR2<0.4 and nTracks>=4', path=path)
+    applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -349,7 +349,7 @@ def runFEIforHadronicCombined(path):
                     checkForDuplicates=False,
                     path=path)
 
-    applyEventCuts('FWR2<0.4 and nTracks>=4', path=path)
+    applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -554,7 +554,7 @@ def runFEIforB0SL(path):
                     checkForDuplicates=False,
                     path=path)
 
-    applyEventCuts('FWR2<0.4 and nTracks>=4', path=path)
+    applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -609,7 +609,7 @@ def runFEIforBplusSL(path):
                     checkForDuplicates=False,
                     path=path)
 
-    applyEventCuts('FWR2<0.4 and nTracks>=4', path=path)
+    applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -668,7 +668,7 @@ def runFEIforSLCombined(path):
                     checkForDuplicates=False,
                     path=path)
 
-    applyEventCuts('FWR2<0.4 and nTracks>=4', path=path)
+    applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -729,7 +729,7 @@ def runFEIforSkimCombined(path):
                     checkForDuplicates=False,
                     path=path)
 
-    applyEventCuts('FWR2<0.4 and nTracks>=4', path=path)
+    applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')

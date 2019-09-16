@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
+ * Contributors: Bjoern.Spruck@belle2.org                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,11 +20,11 @@ namespace Belle2 {
 
     /** The PXDRawHitMasking module.
      *
-     * This module sorts the existing PXDRawHits collection and saves PXDDigits
-     * ordered by row and column for each half-ladder. This
-     * provides ordered input to PXDClusterizer.
+     * This module is a helper module to apply basic cuts on the RawHits.
+     * Its is similar to what PXDRawHitSorter is doing, but here we stay
+     * on the RawHits level for further raw analysis
      *
-     * @see PXDClusterizerModule
+     * @see PXDRawHitSorter
      */
     class PXDRawHitMaskingModule : public Module {
 
@@ -34,7 +34,7 @@ namespace Belle2 {
 
       /** Initialize the module */
       virtual void initialize();
-      /** do the sorting */
+      /** do the filtering */
       virtual void event();
 
     private:

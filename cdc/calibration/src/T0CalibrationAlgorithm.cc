@@ -131,8 +131,8 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   B2INFO("Creating CDCGeometryPar object");
   CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
 
-
-  double dEventT0 = getObjectPtr<TH1F>("hEventT0")->GetMean();
+  TH1F* hEvtT0 =   getObjectPtr<TH1F>("hEventT0");
+  double dEventT0 = hEvtT0->GetMean();
   createHisto();
   TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels", 500, -10, 10);
   TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all chanels", 100, 0, 10);
@@ -200,11 +200,19 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
   if (m_storeHisto) {
     B2INFO("Storing histograms");
-
+    TH1F* hNDF =   getObjectPtr<TH1F>("hNDF");
+    TH1F* hPval =   getObjectPtr<TH1F>("hPval");
     TFile* fout = new TFile(m_histName.c_str(), "RECREATE");
     fout->cd();
     TGraphErrors* gr[56];
     TDirectory* top = gDirectory;
+
+    //store NDF, P-val. EventT0 histogram for monitoring during calibration
+    if (hNDF && hPval && hEvtT0) {
+      hEvtT0->Write();
+      hPval->Write();
+      hNDF->Write();
+    }
     m_hTotal->Write();
     hm_All->Write();
     hs_All->Write();

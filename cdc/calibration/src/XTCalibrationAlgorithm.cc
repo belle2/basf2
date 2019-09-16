@@ -417,9 +417,21 @@ void XTCalibrationAlgorithm::write()
 
 void XTCalibrationAlgorithm::storeHisto()
 {
+
+  TH1F* hNDF =   getObjectPtr<TH1F>("hNDF");
+  TH1F* hPval =   getObjectPtr<TH1F>("hPval");
+  TH1F* hEvtT0 =   getObjectPtr<TH1F>("hEventT0");
   B2INFO("saving histograms");
   TFile* fout = new TFile(m_histName.c_str(), "RECREATE");
   TDirectory* top = gDirectory;
+  //store NDF, P-val. EventT0 histogram for monitoring during calibration
+  if (hNDF && hPval && hEvtT0) {
+    hEvtT0->Write();
+    hPval->Write();
+    hNDF->Write();
+  }
+  // for each layer
+
   TDirectory* Direct[56];
   int nhisto = 0;
   for (int l = 0; l < 56; ++l) {

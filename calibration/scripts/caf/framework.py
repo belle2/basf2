@@ -1341,19 +1341,17 @@ class CAF():
         Returns:
             str: The absolute path of the new output_dir
         """
-        if os.path.isdir(self.output_dir):
+        p = Path(self.output_dir).resolve()
+        if p.is_dir():
             B2INFO('{0} output directory already exists. '
-                   'We will try to restart from the previous finishing state.'.format(self.output_dir))
-            abs_output_dir = os.path.join(os.getcwd(), self.output_dir)
-            return abs_output_dir
+                   'We will try to restart from the previous finishing state.'.format(p.as_posix()))
+            return p.as_posix()
         else:
-            os.mkdir(self.output_dir)
-            abs_output_dir = os.path.join(os.getcwd(), self.output_dir)
-            if os.path.exists(abs_output_dir):
-                return abs_output_dir
+            p.mkdir(parents=True)
+            if p.is_dir():
+                return p.as_posix()
             else:
-                B2ERROR("Attempted to create output_dir {0}, but it didn't work.".format(abs_output_dir))
-                sys.exit(1)
+                raise FileNotFoundError("Attempted to create output_dir {0}, but it didn't work.".format(p.as_posix()))
 
     def _make_database(self):
         """

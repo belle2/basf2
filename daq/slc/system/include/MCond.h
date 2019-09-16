@@ -10,29 +10,29 @@ namespace Belle2 {
   class MCond {
 
   public:
-    static size_t size() throw() { return sizeof(pthread_cond_t); }
+    static size_t size() { return sizeof(pthread_cond_t); }
 
     // constructors and destructor
   public:
-    MCond() throw();
-    MCond(const MCond&) throw();
-    MCond(void*) throw();
-    ~MCond() throw();
+    MCond();
+    MCond(const MCond&);
+    MCond(void*);
+    ~MCond();
 
     // member functions;
   public:
-    bool init(void*) throw();
-    bool init() throw();
-    bool set(void*) throw();
-    bool signal() throw();
-    bool broadcast() throw();
-    bool wait(MMutex& mutex) throw();
+    bool init(void*);
+    bool init();
+    bool set(void*);
+    bool signal();
+    bool broadcast();
+    bool wait(MMutex& mutex);
     bool wait(MMutex& mutex, const unsigned int sec,
-              const unsigned int msec = 0) throw();
-    bool destroy() throw();
+              const unsigned int msec = 0);
+    bool destroy();
 
   public:
-    const MCond& operator=(const MCond&) throw();
+    const MCond& operator=(const MCond&);
 
     // data members;
   private:

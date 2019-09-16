@@ -29,8 +29,8 @@ namespace Belle2 {
   class ECLSimHit : public SimHitBase {
   public:
     /** default constructor for ROOT */
-    ECLSimHit(): SimHitBase(), m_CellId(0), m_TrackId(0), m_Pdg(0), m_FlightTime(0), m_Edep(0), m_Momentum{0}, m_Position{0} {;}
-    //    ECLSimHit() {} // do nothing
+    ECLSimHit(): SimHitBase(), m_CellId(0), m_TrackId(0), m_Pdg(0), m_FlightTime(0), m_Edep(0), m_Momentum{0}, m_Position{0},
+      m_HadronEdep{0} {;}
 
     //! Useful Constructor
     ECLSimHit(
@@ -128,7 +128,7 @@ namespace Belle2 {
     /** Shift the SimHit in time (needed for beam background mixing)
      * @param delta The value of the time shift.
      */
-    void shiftInTime(float delta) { m_FlightTime += delta; }
+    void shiftInTime(float delta) override { m_FlightTime += delta; }
 
 
   private:
@@ -142,7 +142,7 @@ namespace Belle2 {
     double m_HadronEdep;      /**< Hadron Energy Deposit */
 
 
-    ClassDef(ECLSimHit, 6);/**< the class title */
+    ClassDefOverride(ECLSimHit, 6);/**< the class title */
 
   };
 } // end namespace Belle2

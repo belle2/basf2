@@ -103,7 +103,7 @@ void PXDHotPixelMaskCollectorModule::collect() // Do your event() stuff here
   TH1I* collector_hits = getObjectPtr<TH1I>("PXDHits");
 
   // Even if there is no input StoreArray, we still want to fill zero hits
-  if (!!m_pxdDigit)
+  if (!m_pxdDigit)
     collector_hits->Fill(0);
   else
     collector_hits->Fill(m_pxdDigit.getEntries());

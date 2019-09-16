@@ -44,13 +44,13 @@ namespace Belle2 {
   public:// Selectors
 
     /// returns entry in a cell.
-    unsigned entry(unsigned id) const;
+    unsigned entry(unsigned id) const override;
 
     /// returns entry in a cell.
-    unsigned entry(unsigned x, unsigned y) const;
+    unsigned entry(unsigned x, unsigned y) const override;
 
     /// returns max. entry in a plane.
-    int maxEntry(void) const;
+    int maxEntry(void) const override;
 
     /// returns # of active cells in the pattern.
     virtual unsigned nActiveCellsInPattern(void) const;
@@ -58,16 +58,16 @@ namespace Belle2 {
   public:// Modifiers
 
     /// Sets entry.
-    unsigned setEntry(unsigned serialId, unsigned n);
+    unsigned setEntry(unsigned serialId, unsigned n) override;
 
     /// clear all entries.
-    void clear(void);
+    void clear(void) override;
 
     /// Clears entires only.
     void clearCells(void);
 
     /// Registers a pattern on a Hough plane with (r, phi=0).
-    void registerPattern(unsigned id);
+    void registerPattern(unsigned id) override;
 
     /// Votes using a pattern.
     virtual void voteByPattern(float xOffset, int weight = 1);
@@ -75,7 +75,7 @@ namespace Belle2 {
   protected:
 
     /// Add to a cell.
-    void add(unsigned cellId, int weight);
+    void add(unsigned cellId, int weight) override;
 
   private:
 

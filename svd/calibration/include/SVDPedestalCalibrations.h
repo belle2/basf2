@@ -27,12 +27,17 @@ namespace Belle2 {
    */
   class SVDPedestalCalibrations {
   public:
-    static std::string name;
-    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_payload;
+    static std::string name; /**< name of the SVDPedestalCalibrations payload*/
+    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > >
+    t_payload; /**< typedef of the SVDPedestalCalibrations payload of all SVD strips*/
 
     /** Constructor, no input argument is required */
     SVDPedestalCalibrations(): m_aDBObjPtr(name)
-    {}
+    {
+      m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+        B2INFO("SVDPedestalCalibrations: from now on we are using " <<
+        this->m_aDBObjPtr -> get_uniqueID()); });
+    }
 
 
     /** This is the method for getting the pedestal.
@@ -60,8 +65,14 @@ namespace Belle2 {
     }
     */
 
+    /** returns the unique ID of the payload */
+    TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }
+
+    /** returns true if the m_aDBObtPtr is valid in the requested IoV */
+    bool isValid() { return m_aDBObjPtr.isValid(); }
+
   private:
-    DBObjPtr< t_payload > m_aDBObjPtr;
+    DBObjPtr< t_payload > m_aDBObjPtr; /**< SVDPedestalCalibrations payload*/
 
 
   };

@@ -141,7 +141,7 @@ namespace Belle2 {
     /** Shift the Hit in time (needed for beam background mixing)
      * @param delta The value of the time shift.
      */
-    void shiftInTime(float delta) {  m_FlightTime += delta; }
+    void shiftInTime(float delta) override {  m_FlightTime += delta; }
 
 
   private:
@@ -154,7 +154,7 @@ namespace Belle2 {
     TVector3 m_Position;     /**< Position */
     float m_Erecdep;         /**< Deposit energy reconstructed*/
 
-    ClassDef(BgoHit, 1)
+    ClassDefOverride(BgoHit, 1)
   };
 
 } // end namespace Belle2

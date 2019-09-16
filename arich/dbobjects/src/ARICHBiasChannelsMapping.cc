@@ -90,7 +90,7 @@ void ARICHBiasChannelsMapping::addMapping(int crate, int slot, int channelID, in
 
 }
 
-void ARICHBiasChannelsMapping::print()
+void ARICHBiasChannelsMapping::print() const
 {
 
   for (int crate = 0; crate < 3 ; crate++) {

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Materials>
+  <!--Can switch the material of the gap beteewn ARICH and tOP, TOP and ECL, barrel and endcap of ECL.-->
+  <Material name="Arich_TopGapfor">
+    <density unit="g/cm3">8.96</density>
+    <Components>
+      <Material>Air</Material>
+    </Components>
+  </Material>
+  <Material name="Top_ECLGapback">
+    <density unit="g/cm3">8.96</density>
+    <Components>
+      <Material>Air</Material>
+    </Components>
+  </Material>
+  <Material name="Top_ECLGapfor">
+    <density unit="g/cm3">8.96</density>
+    <Components>
+      <Material>Air</Material>
+    </Components>
+  </Material>
+  <Material name="ECLGapback">
+    <density unit="g/cm3">8.96</density>
+    <Components>
+      <Material>Air</Material>
+    </Components>
+  </Material>
+  <Material name="ECLGapfor">
+    <density unit="g/cm3">8.96</density>
+    <Components>
+      <Material>Air</Material>
+    </Components>
+  </Material>
+  <Material name="ECL_COILbarrel">
+    <density unit="g/cm3">8.96</density>
+    <Components>
+      <Material>Air</Material>
+    </Components>
+  </Material>
+  <Material name="CDCGapback">
+    <density unit="g/cm3">8.96</density>
+  <!--Can switch the material of the gap beteewn ECL and CDC backward.-->
+    <Components>
+    <!-- <Material>Al</Material> -->
+      <Material>Air</Material>
+    </Components>
+  </Material>
+  <Material name="CDCGapfor">
+    <density unit="g/cm3">8.96</density>
+  <!-- Can switch the material of the gap beteewn CDC and ARICH forward.-->
+    <Components>
+    <!-- <Material>Al</Material> -->
+      <Material>Air</Material>
+    </Components>
+  </Material>
+</Materials>

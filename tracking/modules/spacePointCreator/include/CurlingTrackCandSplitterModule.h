@@ -21,8 +21,6 @@
 #include <TFile.h>
 #include <TTree.h>
 
-#include <array>
-
 namespace Belle2 {
   /**
    * Module for checking SpacePointTrackCandidates for curling behaviour and splitting them into Track Candidate Stubs (each of them being a SpacePointTrackCand again) which do not show curling behaviour.
@@ -175,8 +173,10 @@ namespace Belle2 {
      */
     const std::vector<int> checkTrackCandForCurling(const Belle2::SpacePointTrackCand&, RootVariables& rootVariables);
 
-    /**
-     * Get the global position and momentum for a given TrueHit (PXD or SVD at the moment). .first is position, .second is momentum
+    /** Get the global position and momentum for a given TrueHit (PXD or SVD at the moment).
+     * @tparam TrueHit TrueHit type
+     * @param aTrueHit pointer to a trueHit
+     * @return pair of global position and momentum for a given TrueHit. .first is position, .second is momentum
      */
     template<class TrueHit>
     std::pair<const B2Vector3<double>, const B2Vector3<double> >
@@ -190,7 +190,7 @@ namespace Belle2 {
 
     /** determine the direction of flight of a particle for a given hit and the origin (assumed interaction point). True is outwards, false is inwards */
     bool getDirectionOfFlight(std::pair<const B2Vector3<double>, const B2Vector3<double> > const& hitPosAndMom,
-                              const B2Vector3<double> origin);
+                              const B2Vector3<double>& origin);
 
     /**
      * Exception for case when no TrueHit can be found for a Cluster

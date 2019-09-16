@@ -131,7 +131,7 @@ namespace Belle2 {
 
   double Unit::convertValue(double value, const std::string& unitString)
   {
-    map<string, double>::const_iterator it = s_conversionFactors.find(unitString);
+    auto it = s_conversionFactors.find(unitString);
     if (it == s_conversionFactors.end()) {
       B2ERROR("Could not find conversion factor for unit " << unitString << ", assuming 1.0");
       return value;
@@ -141,7 +141,7 @@ namespace Belle2 {
 
   double Unit::convertValueToUnit(double value, const std::string& unitString)
   {
-    map<string, double>::const_iterator it = s_conversionFactors.find(unitString);
+    auto it = s_conversionFactors.find(unitString);
     if (it == s_conversionFactors.end()) {
       B2ERROR("Could not find conversion factor for unit " << unitString << ", assuming 1.0");
       return value;
@@ -242,6 +242,22 @@ size_t Const::DetectorSet::size() const
   return size;
 }
 
+std::string Const::DetectorSet::__repr__() const
+{
+  std::string result = "<set: ";
+  std::string detectorNames[] = {"invalidDetector", "PXD", "SVD", "CDC", "TOP", "ARICH", "ECL", "KLM", "IR", "TRG", "DAQ", "BEAST", "TEST"};
+  for (size_t index = 1; index <= Const::TEST; index++) {
+    if (contains(EDetector(index))) {
+      if (result.size() > 6) {
+        result += ",";
+      }
+      result += detectorNames[index];
+    }
+  }
+  result += ">";
+  return result;
+}
+
 
 const Const::DetectorSet Const::VXDDetectors::c_set = Const::PXD + Const::SVD;
 
@@ -287,6 +303,14 @@ const TParticlePDG* Const::ParticleType::getParticlePDG() const
 double Const::ParticleType::getMass() const
 {
   return getParticlePDG()->Mass();
+}
+
+std::string Const::ParticleType::__repr__() const
+{
+  std::string result = "<type: ";
+  result += getParticlePDG()->GetName();
+  result += ">";
+  return result;
 }
 
 const Const::ParticleSet Const::chargedStableSet =
@@ -335,7 +359,7 @@ void Const::ParticleSet::add(const Const::ParticleType& p)
 {
   if (contains(p))
     return;
-  m_particles.push_back(Const::ParticleType(p.getPDGCode(), this, m_particles.size()));
+  m_particles.emplace_back(p.getPDGCode(), this, m_particles.size());
 }
 
 bool Const::ParticleSet::contains(const Const::ParticleType& p) const

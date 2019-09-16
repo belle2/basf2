@@ -7,9 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclTriggerClusterMatcher/ECLTriggerClusterMatcherModule.h>
+
+//Framework
 #include <framework/geometry/B2Vector3.h>
+
+//MDST
+#include <mdst/dataobjects/ECLCluster.h>
+
+//Trg
+#include <trg/ecl/dataobjects/TRGECLCluster.h>
+
 
 using namespace Belle2;
 using namespace std;
@@ -46,13 +55,19 @@ void ECLTriggerClusterMatcherModule::event()
   for (auto& eclcluster : m_eclClusters) {
     const double eclclusterTheta = eclcluster.getTheta();
     const double eclclusterPhi = eclcluster.getPhi();
-    const double eclclusterE = eclcluster.getEnergy();
+
+    double eclclusterE = 0.0;
+    if (eclcluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+      eclclusterE = eclcluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+    } else if (eclcluster.hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)) {
+      eclclusterE = eclcluster.getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron);
+    } else continue;
 
     // Users can re-run this with different settings, remove this bit.
-    eclcluster.removeStatus(ECLCluster::c_TriggerCluster);
+    eclcluster.removeStatus(ECLCluster::EStatusBit::c_TriggerCluster);
 
     // Add status bit that shows that the matcher has run
-    eclcluster.addStatus(ECLCluster::c_TriggerClusterMatching);
+    eclcluster.addStatus(ECLCluster::EStatusBit::c_TriggerClusterMatching);
 
     if (eclclusterE < m_minClusterEnergy) continue;  // skip low energy cluster
 
@@ -76,7 +91,7 @@ void ECLTriggerClusterMatcherModule::event()
 
       // set relation(s) and status bit
       if (angle < m_maxAngle and fracEnergy > m_minFracEnergy and fracEnergy < m_maxFracEnergy) {
-        eclcluster.addStatus(ECLCluster::c_TriggerCluster);
+        eclcluster.addStatus(ECLCluster::EStatusBit::c_TriggerCluster);
         eclcluster.addRelationTo(&ecltrigger);
       }
 

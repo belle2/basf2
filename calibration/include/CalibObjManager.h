@@ -36,7 +36,7 @@ namespace Belle2 {
     /** Add a new object to manage, this is used as a template for creating future/missing objects.
       * We take ownership of this object but cannot guarantee that a user won't alter the wrapped ROOT object :(
       */
-    void addObject(std::string name, std::shared_ptr<TNamed> object);
+    void addObject(const std::string& name, std::shared_ptr<TNamed> object);
 
     /// For each templated object we know about, we find an in memory object for this exprun and write to the TDirectory
     void writeCurrentObjects(const Calibration::ExpRun& expRun);
@@ -53,7 +53,7 @@ namespace Belle2 {
     void createExpRunDirectories(Calibration::ExpRun& expRun) const;
 
     /// Scans the directory to get the highest "_i" index of an object with this name
-    unsigned int getHighestIndexObject(const std::string name, const TDirectory* dir) const;
+    unsigned int getHighestIndexObject(const std::string& name, const TDirectory* dir) const;
 
     /// Clears the map of templated objects -> causing their destruction
     void deleteHeldObjects();
@@ -63,7 +63,7 @@ namespace Belle2 {
       * object is file resident it creates a new in memory object with a higher index.
       */
     template<class T>
-    T* getObject(const std::string name, const Belle2::Calibration::ExpRun expRun)
+    T* getObject(const std::string& name, const Belle2::Calibration::ExpRun expRun)
     {
       std::string objectDirName = name + '/' + getObjectExpRunName(name, expRun);
       TDirectory* objectDir = m_dir->GetDirectory(objectDirName.c_str());
@@ -92,7 +92,7 @@ namespace Belle2 {
   private:
 
     template<class T>
-    T* cloneObj(T* source, std::string newName) const
+    T* cloneObj(T* source, const std::string& newName) const
     {
       B2DEBUG(100, "Held object " << source->GetName() << " will be treated as a generic TNamed and have Clone(newname) called.");
       return dynamic_cast<T*>(source->Clone(newName.c_str()));
@@ -115,9 +115,9 @@ namespace Belle2 {
 
     std::string getObjectExpRunName(const std::string& name, const Calibration::ExpRun& expRun) const;
 
-    unsigned int extractKeyIndex(std::string& keyName) const;
+    unsigned int extractKeyIndex(const std::string& keyName) const;
   };
   /// Template specialization for TTree needs to be defined here to prevent automatic specialization being created
   template<>
-  TTree* CalibObjManager::cloneObj(TTree* source, std::string newName) const;
+  TTree* CalibObjManager::cloneObj(TTree* source, const std::string& newName) const;
 }

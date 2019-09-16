@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jake Bennett
+ * Contributors: Jitendra Kumar, Jake Bennett
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,18 +11,31 @@
 #pragma once
 
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/database/DBObjPtr.h>
 
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TF1.h"
+#include "TH1D.h"
+#include "TH2D.h"
+#include "TString.h"
+#include "TDirectory.h"
+using std::vector;
+using std::string;
+
 
 namespace Belle2 {
 
-  /** Extracts dE/dx information for calibration testing. Writes a ROOT file.
+  /**
+   * This module to design collect CDC dEdx monitoring for DQM and only minimal information are
+   * stored. All higher level calculation like fit etc is done using DQM analysis module.
+   * Output of this module used as an input to DQM analysis.
    */
+
   class CDCDedxDQMModule : public HistoModule {
 
   public:
@@ -33,31 +46,49 @@ namespace Belle2 {
     /** Destructor */
     virtual ~CDCDedxDQMModule();
 
+    /** Defination of histograms */
+    virtual void defineHisto() override;
+
     /** Initialize the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** This method is called for each run */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** This method is called for each event. All processing of the event
      * takes place in this method. */
-    virtual void event();
+    virtual void event() override;
 
     /** This method is called at the end of each run */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** End of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
-    /** Function to define histograms. */
-    virtual void defineHisto();
+
 
   private:
 
+    StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array for CDCDedxTrack */
 
-    TH1F* m_h_dedxmeans = nullptr; /**< Histogram for dE/dx electron means */
-    TH2F* m_h_dedxbands = nullptr; /**< Histogram for dE/dx band plot */
+    Int_t fCurrentEventNum; /**< variable to get run number */
+    std::string m_triggerIdentifier = ""; /**< variable to get specific trigger event */
+
+    Bool_t isHadronfile; /**< Parameter-1 to switch binning */
+    TString fCollType = ""; /**< Parameter-2 to switch binning */
+
+    TH1D* temp1D{nullptr}; /**< Dedx histogram per run */
+    TH2D* temp2D{nullptr}; /**< Dedx vs P histogram per run */
+
+    Int_t    nBinsdedx; /**< nbin of dedx range */
+    Double_t nBinsdedxLE; /**< Lowedge of dedx */
+    Double_t nBinsdedxUE; /**< Upedge of dedx */
+
+    Int_t    nBinsP; /**< nbins of P range */
+    Double_t nBinsPLE; /**< Lowedge of P range */
+    Double_t nBinsPUE; /**< Upedge of P range */
 
   };
+
 } // Belle2 namespace

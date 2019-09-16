@@ -46,18 +46,19 @@ namespace Belle2 {
     virtual ~PhokharaInputModule();
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
     /** Method is called at the end of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   protected:
 
     /** Module parameters */
     int m_finalState; /**< Final state: mu+mu-(0), pi+pi-(1), 2pi0pi+pi-(2), 2pi+2pi-(3), ppbar(4), nnbar(5), K+K-(6), K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10) */
+    bool m_replaceMuonsByVirtualPhoton; /**< Replace muons by a virtual photon. */
     int m_nMaxTrials; /**< Events before loop is aborted. */
     int m_nSearchMax; /**< Events used to search maximum of differential cross section. */
 
@@ -72,18 +73,20 @@ namespace Belle2 {
     int m_narres;  /**< narr_res: no narrow resonances (0), J/psi (1) and psi(2S) (2) only for m_finalState = 0,1,6,7 */
     int m_protonff;  /**< ProtonFormFactor old(0), ProtonFormFactor new(1) */
 
-    double m_cmsEnergy; /**< CMS energy. */
+    double m_cmsEnergy = -1.0; /**< CMS energy. */
     std::vector<double> m_ScatteringAngleRangePhoton; /**< Minimal/Maximal photon angle/missing momentum angle. */
     std::vector<double> m_ScatteringAngleRangeFinalStates; /**< Minimal/Maximal pions(muons,nucleons,kaons) momentum angle. */
-    double m_MinInvMassHadronsGamma; /**< m_MinInvMassHadronsGamma [GeV]. */
-    double m_MinInvMassHadrons; /**< m_MinInvMassHadrons [GeV]. */
-    double m_MaxInvMassHadrons; /**< m_MaxInvMassHadrons [GeV] */
+    double m_MinInvMassHadronsGamma; /**< m_MinInvMassHadronsGamma [GeV^2]. */
+    double m_MinInvMassHadrons; /**< m_MinInvMassHadrons [GeV^2]. */
+    bool m_ForceMinInvMassHadronsCut; /**< Force application of the above cut. */
+    double m_MaxInvMassHadrons; /**< m_MaxInvMassHadrons [GeV^2] */
     double m_MinEnergyGamma; /**< m_MinEnergyGamma [GeV]. */
 
 //     int m_finalState; /**< Final state: mu+mu-(0), pi+pi-(1), 2pi0pi+pi-(2), 2pi+2pi-(3), ppbar(4), nnbar(5), K+K-(6), K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10) */
     double m_epsilon; /**< Soft/hard photon separator*/
     std::string m_ParameterFile; /**< file that holds all resonance parameters*/
 //     std::string m_InputFile; /**< file that holds all input parameters - NOT USED IN BELLE II IMPLEMENTATION!!!*/
+    bool m_BeamEnergySpread; /**< Simulate beam-energy spread. */
 
     /** Variables */
     Phokhara m_generator;   /**< The Phokhara generator. */

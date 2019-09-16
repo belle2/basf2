@@ -39,8 +39,9 @@ using namespace Belle2;
 REG_MODULE(StandardTrackingPerformance)
 
 StandardTrackingPerformanceModule::StandardTrackingPerformanceModule() :
-  Module(), m_outputFile(NULL), m_dataTree(NULL), m_pValue(-999), m_nGeneratedChargedStableMcParticles(-999),
-  m_nReconstructedChargedStableTracks(-999), m_nFittedChargedStabletracks(-999)
+  Module(), m_outputFile(NULL), m_dataTree(NULL), m_trackProperties(-999),  m_pValue(-999),
+  m_nGeneratedChargedStableMcParticles(-999), m_nReconstructedChargedStableTracks(-999),
+  m_nFittedChargedStabletracks(-999)
 {
   setDescription("Module to test the tracking efficiency. Writes information about the tracks and MCParticles in a ROOT file.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -276,7 +277,6 @@ void StandardTrackingPerformanceModule::findSignalMCParticles(const StoreArray<M
 {
   std::sort(m_signalDaughterPDGs.begin(), m_signalDaughterPDGs.end());
 
-  std::vector<MCParticle*> daughterMcParticles;
   for (const MCParticle& mcParticle : mcParticles) {
     // continue if mcParticle is not a B meson
     if (abs(mcParticle.getPDG()) != 511 && abs(mcParticle.getPDG()) != 521)
@@ -298,6 +298,7 @@ bool StandardTrackingPerformanceModule::isSignalDecay(const MCParticle& mcPartic
   daughterMcParticles = removeFinalStateRadiation(daughterMcParticles);
 
   for (auto daughterMCParticle : daughterMcParticles) {
+    // cppcheck-suppress useStlAlgorithm
     daughterPDGs.push_back(daughterMCParticle->getPDG());
   }
 

@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>Thomas Keck; thomas.keck2@kit.edu</contact>
+  <contact>william.sutcliffe@kit.edu</contact>
 </header>
 """
 
@@ -44,9 +44,6 @@ if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
 
 # inputFile = '/storage/jbod/tkeck/MC6/evtgen-charged/sub00/mdst_000020_prod00000189_task00000020.root'
 inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst6_BBx0_charged.root')
-
-from fei import backward_compatibility_layer
-backward_compatibility_layer.pid_renaming_oktober_2017()
 
 path = create_path()
 inputMdstList('MC6', [inputFile], path)

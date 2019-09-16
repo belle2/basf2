@@ -37,7 +37,7 @@ namespace Belle2 {
     /// destructor
     ~SpacePointInfo() {};
 
-    /** setter for the position
+    /** setter for the position.
      * @param v: 3-vector with new position
     */
     void setPosition(TVector3 v) { m_position = v; };

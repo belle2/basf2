@@ -47,6 +47,19 @@
       END
 
 
+      SUBROUTINE GET_TIME_WINDOW(TMIN, TMAX)
+      
+      IMPLICIT NONE
+      REAL TMIN                 ! time window lower edge
+      REAL TMAX                 ! time window upper edge
+#include "TOP_PIK.fi"
+
+      TMIN=T_MIN
+      TMAX=T_MAX
+
+      END
+      
+      
       SUBROUTINE SET_CFD(DT, DELT)
       
       IMPLICIT NONE

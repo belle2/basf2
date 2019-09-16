@@ -3,20 +3,20 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler, Jonas Wagner                        *
+ * Contributors: Jakob Lettenbichler, Jonas Wagner, Felix Metzner         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
-#include <framework/logging/Logger.h>
-
 #include <string>
 #include <vector>
-#include <utility>      // std::move
-#include <memory> // std::unique_ptr
-
+#include <utility>
+#include <memory>
 #include <sstream>
+
+#include <framework/logging/Logger.h>
+
 
 namespace Belle2 {
 
@@ -44,51 +44,63 @@ namespace Belle2 {
   template<class ContainerType, class NodeType, class NeighbourContainerType, class NodeCompatibilityCheckerType>
   class PathCollectorRecursive {
   public:
-
-    /** typedef to clarify what is a path here*/
-    typedef std::vector<NodeType*> Path;
-
-
-    /** typedef to clarify what is a pathPtr here*/
-    typedef std::unique_ptr<Path> PathPtr;
+    /// Using Path for vector of pointers to NodeTypes
+    using Path = std::vector<NodeType*>;
 
 
-    /** main function does need a network fulfilling some stuff which is fulfilled by any DirectedNode*/
-    std::vector<PathPtr> findPaths(ContainerType& aNetwork, bool storeSubsets = false)
+    /** Main functionality of this class
+     * Evaluates provided network and creates all allowed paths.
+     * All found paths are filled into the provided vector 'paths'.
+     * If storeSubsets is turned on, also the sub-paths are saved to vector 'paths'.
+     * If a defined limit on the number of possible paths is exceeded, the search is aborted, and false is returned.
+     */
+    bool findPaths(ContainerType& aNetwork, std::vector<Path>& paths, unsigned int pathLimit, bool storeSubsets = false)
     {
       m_storeSubsets = storeSubsets;
 
-      B2DEBUG(25, "findPaths: executing now a network of size " << aNetwork.size());
-      std::vector<PathPtr> allNodePaths;
+      std::vector<Path> allNodePaths;
       for (NodeType* aNode : aNetwork) {
-        if (aNode->getMetaInfo().isSeed() == false) { B2DEBUG(75, "findPaths: current node is no seed!-> skipping"); continue; } // was: B2DEBUG(100,
+        if (aNode->getMetaInfo().isSeed() == false) {
+          continue;
+        }
 
         NeighbourContainerType& innerNeighbours = aNode->getInnerNodes();
-        if (innerNeighbours.empty()) { B2DEBUG(75, "findPaths: current node has no inner neighbours!-> skipping"); continue; }
-        if (aNode->getOuterNodes().empty()) { B2DEBUG(75, "findPaths: no outerNodes -> is a Tree."); nTrees++; }
+        if (innerNeighbours.empty()) {
+          continue;
+        }
+        if (aNode->getOuterNodes().empty()) {
+          nTrees++;
+        }
 
         // creating unique_ptr of a new path:
-        PathPtr newPath(new Path{aNode});
+        Path newPath = Path{aNode};
 
         findPathsRecursive(allNodePaths, newPath, innerNeighbours);
-        storeAcceptedPath(std::move(newPath), allNodePaths);
+        storeAcceptedPath(newPath, allNodePaths);
+
+        if (allNodePaths.size() > pathLimit) {
+          B2ERROR("Number of collected paths to large. Aborting Event!");
+          return false;
+        }
       }
-      B2DEBUG(25, "findPaths-end: nTrees: " << nTrees << ", nRecursiveCalls: " << nRecursiveCalls);
-      return std::move(allNodePaths);
+      paths = allNodePaths;
+      return true;
     }
 
 
-
-    /**  for debugging purposes, tries to print all given paths */
-    static std::string printPaths(std::vector<PathPtr>& allPaths)
+    /// Prints information about all paths provided in a vector of paths
+    static std::string printPaths(std::vector<Path>& allPaths)
     {
       std::stringstream out;
       unsigned int longestPath = 0, longesPathIndex = 0, index = 0;
       out << "Print " << allPaths.size() << " paths:";
-      for (PathPtr& aPath : allPaths) {
-        if (longestPath < aPath->size()) { longestPath = aPath->size(); longesPathIndex = index; }
-        out << "\n" << "path " << index << ": length " << aPath->size() << ", entries:\n";
-        for (auto* entry : *aPath) {
+      for (Path const& aPath : allPaths) {
+        if (longestPath < aPath.size()) {
+          longestPath = aPath.size();
+          longesPathIndex = index;
+        }
+        out << "\n" << "path " << index << ": length " << aPath.size() << ", entries:\n";
+        for (auto* entry : aPath) {
           out << entry->getEntry() << "| ";
         }
         index++;
@@ -99,57 +111,33 @@ namespace Belle2 {
     }
 
 
-/// public Data members:
-
-    /** parameter for setting minimal path length: (path length == number of nodes collected in a row from given network, this is not necessarily number of hits! */
-    unsigned int minPathLength = 2;
-
-
-    /** simple counter for number of trees found */
-    unsigned int nTrees = 0;
-
-
-    /** simple counter for number of recursive calls of triggered */
-    unsigned int nRecursiveCalls = 0;
-
-    /** flag if subsets should be stored or not */
-    bool m_storeSubsets = false;
-
-
   protected:
-
-    /** copies all pointers of given path to create an identical one */
-    PathPtr clone(PathPtr& aPath) const
+    /// Copies path to create an identical one
+    Path clone(Path& aPath) const
     {
-      PathPtr newPath(new Path());
-      for (auto* entry : *aPath) {
-        newPath->push_back(entry);
+      Path newPath = Path();
+      for (auto* entry : aPath) {
+        newPath.push_back(entry);
       }
-      return std::move(newPath);
+      return newPath;
     }
 
 
-
-    /** takes care of storing only paths which are long enough. */
-    void storeAcceptedPath(PathPtr newPath, std::vector<PathPtr >& allNodePaths) const
+    /// Tests length requirement on a path before adding it to path vector
+    void storeAcceptedPath(Path newPath, std::vector<Path>& allNodePaths) const
     {
-      B2DEBUG(150, "storeAcceptedPath was started");
-      if (!(newPath->size() < minPathLength)) {
-        B2DEBUG(100, "storeAcceptedPath: path with size " << newPath->size() << " was accepted and will now be stored next to " <<
-                allNodePaths.size() << " other paths");
-        allNodePaths.push_back(std::move(newPath));
+      if (newPath.size() >= minPathLength) {
+        allNodePaths.push_back(newPath);
       }
     }
 
 
-
-    /** recursice pathFinder collecting all possible combinations there are.  WARNING does not take care of metaInfo (where e.g. CA-cell-state is stored) */
-    void findPathsRecursive(std::vector<PathPtr >& allNodePaths, PathPtr& currentPath, NeighbourContainerType& innerNeighbours)
+    /// Recursive pathFinder: Collects all possible segment combinations to build paths.
+    void findPathsRecursive(std::vector<Path >& allNodePaths, Path& currentPath, NeighbourContainerType& innerNeighbours)
     {
-      B2DEBUG(150, "findPathsRecursive was started");
       nRecursiveCalls++;
 
-      if (currentPath->size() > 30) {
+      if (currentPath.size() > 30) {
         B2WARNING("findPathsRecursive reached a path length of over 30. Stopping Path here!");
         return;
       }
@@ -157,42 +145,54 @@ namespace Belle2 {
       // Test if there are viable neighbours to current node
       NeighbourContainerType viableNeighbours;
       for (size_t iNeighbour = 0; iNeighbour < innerNeighbours.size(); ++iNeighbour) {
-        if (m_compatibilityChecker.areCompatible(currentPath->back(), innerNeighbours[iNeighbour])) {
+        if (m_compatibilityChecker.areCompatible(currentPath.back(), innerNeighbours[iNeighbour])) {
           viableNeighbours.push_back(innerNeighbours[iNeighbour]);
         }
       }
 
       // If current path will continue, optionally store the subpath up to current node
       if (m_storeSubsets && viableNeighbours.size() > 0) {
-        PathPtr newPath = clone(currentPath); // deep copy of existing path
-        storeAcceptedPath(std::move(newPath), allNodePaths);
+        Path newPath = clone(currentPath);
+        storeAcceptedPath(newPath, allNodePaths);
       }
 
-      B2DEBUG(150, "findPathsRecursive: Number of valid neighbours: " << viableNeighbours.size());
       for (size_t iNeighbour = 0; iNeighbour < viableNeighbours.size(); ++iNeighbour) {
         // the last alternative is assigned to the existing path.
         if (iNeighbour == viableNeighbours.size() - 1) {
-          currentPath->push_back(viableNeighbours[iNeighbour]);
+          currentPath.push_back(viableNeighbours[iNeighbour]);
           NeighbourContainerType& newNeighbours = viableNeighbours[iNeighbour]->getInnerNodes();
 
           findPathsRecursive(allNodePaths, currentPath, newNeighbours);
         } else {
-          PathPtr newPath = clone(currentPath); // deep copy of existing path
+          Path newPath = clone(currentPath);
 
-          newPath->push_back(viableNeighbours[iNeighbour]);
+          newPath.push_back(viableNeighbours[iNeighbour]);
           NeighbourContainerType& newNeighbours = viableNeighbours[iNeighbour]->getInnerNodes();
 
           findPathsRecursive(allNodePaths, newPath, newNeighbours);
-          storeAcceptedPath(std::move(newPath), allNodePaths);
+          storeAcceptedPath(newPath, allNodePaths);
         }
       }
     }
 
+  public:
+    /// public Data members:
+    /** parameter for setting minimal path length:
+     * path length == number of nodes collected in a row from given network, this is not necessarily number of hits! */
+    unsigned int minPathLength = 2;
 
-/// protected Data members:
+    /// Counter for number of trees found
+    unsigned int nTrees = 0;
 
+    /// Counter for number of recursive calls
+    unsigned int nRecursiveCalls = 0;
+
+    /// flag if subsets should be stored or not
+    bool m_storeSubsets = false;
+
+  protected:
+    /// protected Data members:
     /** Stores mini-Class for checking compatibility of two nodes passed. */
     NodeCompatibilityCheckerType m_compatibilityChecker;
   };
-
-} //Belle2 namespace
+}

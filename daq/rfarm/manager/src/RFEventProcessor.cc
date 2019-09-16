@@ -74,6 +74,13 @@ RFEventProcessor::RFEventProcessor(string conffile)
   // 6. Initialize data flow monitor
   m_flow = new RFFlowStat((char*)shmname.c_str());
 
+  // 7. Clear PID list
+  m_pid_sender = 0;
+  m_pid_basf2 = 0;
+  m_pid_receiver = 0;
+  m_pid_hrecv = 0;
+  m_pid_hrelay = 0;
+
 }
 
 RFEventProcessor::~RFEventProcessor()
@@ -126,6 +133,7 @@ int RFEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
   m_pid_sender = m_proc->Execute(sender, (char*)rbufout.c_str(), port, (char*)shmname.c_str(), (char*)"1");
   m_flow->clear(1);
 
+  /*
   // 4. Run basf2
   char* basf2 = m_conf->getconf("processor", "basf2", "script");
   if (nsmm->len > 0) {
@@ -133,6 +141,7 @@ int RFEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
     printf("Configure: basf2 script overridden : %s\n", basf2);
   }
   m_pid_basf2 = m_proc->Execute(basf2, (char*)rbufin.c_str(), (char*)rbufout.c_str(), hport);
+  */
 
   // 5. Run receiver
   char* receiver = m_conf->getconf("processor", "receiver", "script");
@@ -171,6 +180,8 @@ int RFEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
 {
   // Simple implementation to stop all processes
   //  system("killall basf2 sock2rbr rb2sockr hrelay hserver");
+
+  // Normal abort
   int status;
   if (m_pid_sender != 0) {
     printf("RFEventProcessor : killing sender pid=%d\n", m_pid_sender);
@@ -179,6 +190,7 @@ int RFEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
   }
   if (m_pid_basf2 != 0) {
     printf("RFEventProcessor : killing basf2 pid=%d\n", m_pid_basf2);
+    //    kill(m_pid_basf2, SIGINT);
     kill(m_pid_basf2, SIGINT);
     waitpid(m_pid_basf2, &status, 0);
     m_pid_basf2 = 0;
@@ -219,9 +231,13 @@ int RFEventProcessor::Start(NSMmsg* nsmm, NSMcontext* nsmc)
                    string(m_conf->getconf("processor", "ringbufout"));
   char* hport = m_conf->getconf("processor", "historecv", "port");
 
+  // 0. Set run numbers
+  m_expno = nsmm->pars[0];
+  m_runno = nsmm->pars[1];
+
   // 1. Clear RingBuffers
-  //  m_rbufout->forceClear();
-  //  m_rbufin->forceClear();
+  m_rbufout->forceClear();
+  m_rbufin->forceClear();
 
   // 2. Run basf2
   char* basf2 = m_conf->getconf("processor", "basf2", "script");
@@ -234,8 +250,10 @@ int RFEventProcessor::Start(NSMmsg* nsmm, NSMcontext* nsmc)
   return 0;
 }
 
-int RFEventProcessor::Stop(NSMmsg*, NSMcontext*)
+int RFEventProcessor::Stop(NSMmsg* msgm, NSMcontext* msgc)
 {
+  printf("RFEventProcessor : STOP processing started\n");
+  //  fflush ( stdout );
   /*
   char* hcollect = m_conf->getconf("processor", "dqm", "hcollect");
   char* filename = m_conf->getconf("processor", "dqm", "file");
@@ -244,13 +262,42 @@ int RFEventProcessor::Stop(NSMmsg*, NSMcontext*)
   int status;
   waitpid(pid_hcollect, &status, 0);
   */
+
+  /*
+  // Need to wait until all the events are processed and sent
+  RfNodeInfo* nodeinfo = GetNodeInfo();
+  int ncount = 0;
+  for (;;) {
+    RfShm_Cell& cellin = m_flow->getinfo(0);
+    RfShm_Cell& cellout = m_flow->getinfo(1);
+    if (cellin.nqueue == 0 && cellout.nqueue == 0) break;
+    printf("inqueue = %d : outqueue = %d\n", cellin.nqueue, cellout.nqueue);
+    if (ncount > 30) {
+      printf("RFEventProcessor : Timeout (30sec) in stopping\n");
+      break;
+    }
+    sleep(1);
+    ncount ++;
+  }
+  */
+  // Checking number of processed events using RfShm_Cell does not work as expected and is
+  // equivalent to wait for 30 sec. Just replaced with 5 sec waiting.
+  sleep(5);
+
   int status;
   if (m_pid_basf2 != 0) {
     printf("RFEventProcessor : killing basf2 pid=%d\n", m_pid_basf2);
     kill(m_pid_basf2, SIGINT);
     waitpid(m_pid_basf2, &status, 0);
     m_pid_basf2 = 0;
+    char outfile[1024];
+    sprintf(outfile, "dqm_e%4.4dr%6.6d.root", m_expno, m_runno);
+    std::rename("histofile.root", outfile);
+    printf("output file name = %s\n", outfile);
+    fflush(stdout);
+
   }
+  printf("RFEventProcessor : STOP processing done\n");
   return 0;
 }
 
@@ -331,6 +378,14 @@ void RFEventProcessor::server()
     m_flow->fillProcessStatus(GetNodeInfo(), m_pid_receiver, m_pid_sender, m_pid_basf2,
                               m_pid_hrecv, m_pid_hrelay);
   }
+}
+
+void RFEventProcessor::cleanup()
+{
+  printf("RFEventProcessor : cleaning up\n");
+  UnConfigure(NULL, NULL);
+  printf("RFEventProcessor: Done. Exitting\n");
+  exit(-1);
 }
 
 

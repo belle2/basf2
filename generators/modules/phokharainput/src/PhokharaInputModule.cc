@@ -41,6 +41,9 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
   addParam("FinalState", m_finalState,
            "Final state: mu+mu-(0, default), pi+pi-(1), 2pi0pi+pi-(2), 2pi+2pi-(3), ppbar(4), nnbar(5), K+K-(6), K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10)",
            1);
+  addParam("ReplaceMuonsByVirtualPhoton", m_replaceMuonsByVirtualPhoton,
+           "Replace muons by a virtual photon (for FinalState == 0 only).",
+           false);
   addParam("SearchMax", m_nSearchMax, "Number of events used to search for maximum of differential cross section", 100000);
   addParam("Epsilon", m_epsilon, "Soft/hard photon separator", 0.0001);
   addParam("nMaxTrials", m_nMaxTrials, "Maximum trials per event", 10000);
@@ -67,12 +70,19 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
 
   addParam("MinInvMassHadronsGamma", m_MinInvMassHadronsGamma, "Minimal hadrons/muons-gamma invariant mass squared [GeV^2]", 0.0);
   addParam("MinInvMassHadrons", m_MinInvMassHadrons, "Minimal hadrons/muons invariant mass squared [GeV^2]", 0.2);
+  addParam("ForceMinInvMassHadronsCut", m_ForceMinInvMassHadronsCut,
+           "Force application of the MinInvMassHadrons cut "
+           "It is ignored by PHOKHARA with LO = 1, NLO = 1.",
+           false);
   addParam("MaxInvMassHadrons", m_MaxInvMassHadrons, "Maximal hadrons/muons invariant mass squared [GeV^2]", 112.0);
   addParam("MinEnergyGamma", m_MinEnergyGamma, "Minimal photon energy/missing energy, must be greater than 0.0098 * CMS energy [GeV]",
            0.15);
 
   addParam("ParameterFile", m_ParameterFile, "File that contain particle properties",
            FileSystem::findFile("/data/generators/phokhara/const_and_model_paramall9.1.dat"));
+  addParam("BeamEnergySpread", m_BeamEnergySpread,
+           "Simulate beam-energy spread (initializes PHOKHARA for every "
+           "event - very slow).", false);
 //   addParam("InputFile", m_InputFile, "File that contain input configuration", FileSystem::findFile("/data/generators/phokhara/input_9.1.dat"));
 
 }
@@ -93,7 +103,30 @@ void PhokharaInputModule::initialize()
   StoreArray<MCParticle> mcparticle;
   mcparticle.registerInDataStore();
 
+  if (m_replaceMuonsByVirtualPhoton) {
+    if (m_finalState != 0) {
+      B2FATAL("You requested to replace muons by a virtual photon, but the "
+              "final state is not mu+ mu-.");
+    }
+    if (m_QED != 0) {
+      B2FATAL("You requested to replace muons by a virtual photon. In this "
+              "mode, PHOKHARA works as an ISR generator. The parameter QED "
+              "should be set to 0 (ISR only). If FSR is taken into account "
+              "(QED = 1 or 2), the results will be incorrect.");
+    }
+    if (m_NLOIFI != 0) {
+      B2FATAL("You requested to replace muons by a virtual photon. In this "
+              "mode, PHOKHARA works as an ISR generator. The parameter NLOIFI "
+              "should be set to 0 (off). If simultaneous emission of initial "
+              "and final-state photons is taken into account (NLOIFI = 1), "
+              "the results will be incorrect.");
+    }
+  }
   //Beam Parameters, initial particle - PHOKHARA cannot handle beam energy spread
+  if (m_BeamEnergySpread) {
+    m_initial.setAllowedFlags(BeamParameters::c_smearVertex |
+                              BeamParameters::c_smearBeam);
+  }
   m_initial.initialize();
 
 }
@@ -123,6 +156,12 @@ void PhokharaInputModule::event()
   TVector3 vertex = initial.getVertex();
 
   m_mcGraph.clear();
+  if (m_BeamEnergySpread) {
+    // PHOKHARA does not support beam-energy spread. To simulate it,
+    // the generator is initialized with the new energy for every event.
+    m_generator.setCMSEnergy(initial.getMass());
+    m_generator.init(m_ParameterFile);
+  }
   m_generator.generateEvent(m_mcGraph, vertex, boost);
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
@@ -148,6 +187,7 @@ void PhokharaInputModule::initializeGenerator()
 
   m_generator.setNSearchMax(m_nSearchMax);
   m_generator.setFinalState(m_finalState);
+  m_generator.setReplaceMuonsByVirtualPhoton(m_replaceMuonsByVirtualPhoton);
   m_generator.setNMaxTrials(m_nMaxTrials);
   m_generator.setEpsilon(m_epsilon);
   m_generator.setLO(m_LO);
@@ -163,6 +203,7 @@ void PhokharaInputModule::initializeGenerator()
 
   m_generator.setMinInvMassHadronsGamma(m_MinInvMassHadronsGamma);
   m_generator.setm_MinInvMassHadrons(m_MinInvMassHadrons);
+  m_generator.setForceMinInvMassHadronsCut(m_ForceMinInvMassHadronsCut);
   m_generator.setm_MaxInvMassHadrons(m_MaxInvMassHadrons);
   m_generator.setMinEnergyGamma(m_MinEnergyGamma);
   m_generator.setScatteringAngleRangePhoton(vectorToPair(m_ScatteringAngleRangePhoton, "ScatteringAngleRangePhoton"));

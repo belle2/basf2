@@ -61,8 +61,8 @@ void TelTrackFinderModule::initialize()
 
   //register the store array for svd and pxd cluster as they might needed
   // use the default names "" as this are the one used by genfit!
-  StoreArray<SVDCluster>::optional();
-  StoreArray<PXDCluster>::optional();
+  StoreArray<SVDCluster> SVDCluster;  SVDCluster.isOptional();
+  StoreArray<PXDCluster> PXDCluster;  PXDCluster.isOptional();
 
 
   //the output track candidates

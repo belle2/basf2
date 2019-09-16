@@ -10,18 +10,15 @@ namespace Belle2 {
   public:
     DynamicLoader() {}
     DynamicLoader(const std::string& path)
-    throw (DynamicLoadException)
     {
       open(path);
     }
-    ~DynamicLoader() throw();
+    ~DynamicLoader();
 
   public:
-    void* open(const std::string& lib_path)
-    throw(DynamicLoadException);
-    void* load(const std::string& func_name)
-    throw(DynamicLoadException);
-    void close() throw();
+    void* open(const std::string& lib_path);
+    void* load(const std::string& func_name);
+    void close();
 
   private:
     void* m_handle;

@@ -24,6 +24,8 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/ParticleCopy.h>
 
+#include <memory>
+
 using namespace std;
 
 namespace Belle2 {
@@ -39,11 +41,11 @@ namespace Belle2 {
 //-----------------------------------------------------------------
 
   KlongMomentumCalculatorExpertModule::KlongMomentumCalculatorExpertModule() :
-    Module()
+    Module(), m_pdgCode(0)
 
   {
     // set module description (e.g. insert text)
-    setDescription("This module is used to reconstruct B momentum for two body decays in a K_L0 and something else. The K_L0 momentum is reconstructed by taking reconstructed direction (ECL or KLM) and kinematic constraints.");
+    setDescription("This module is used to employ kinematic constraints to determine the momentum of Klongs for two body B decays containing a K_L0 and something else. The module creates a list of K_L0 candidates whose K_L0 momentum is reconstructed by combining the reconstructed direction (from either the ECL or KLM) of the K_L0 and kinematic constraints of the intial state.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
@@ -66,8 +68,8 @@ namespace Belle2 {
     // clear everything, initialize private members
     m_pdgCode = 0;
     m_listName = "";
-    m_isSelfConjugatedParticle = 0;
-    m_generator = 0;
+    m_isSelfConjugatedParticle = false;
+    m_generator = nullptr;
 
     // obtain the input and output particle lists from the decay string
     bool valid = m_decaydescriptor.init(m_decayString);
@@ -84,10 +86,9 @@ namespace Belle2 {
     m_isSelfConjugatedParticle = (m_listName == m_antiListName);
 
     m_klistName = m_recoList;
-    m_kpdgCode = Const::Klong.getPDGCode();
 
     // Daughters
-    bool k_check = 0;
+    bool k_check = false;
     int nProducts = m_decaydescriptor.getNDaughters();
     for (int i = 0; i < nProducts; ++i) {
       const DecayDescriptorParticle* daughter =
@@ -95,14 +96,14 @@ namespace Belle2 {
       StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
       if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
         m_klistName = daughter->getFullName() + m_klistName;
-        k_check = 1;
+        k_check = true;
       }
     }
 
     if (!k_check)
       B2FATAL("This module is meant to reconstruct decays with a K_L0 in the final state. There is no K_L0 in this decay!");
 
-    m_generator = std::unique_ptr<ParticleGenerator>(new ParticleGenerator(m_decayString, m_cutParameter));
+    m_generator = std::make_unique<ParticleGenerator>(m_decayString, m_cutParameter);
 
     StoreObjPtr<ParticleList> KparticleList(m_klistName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
@@ -118,7 +119,7 @@ namespace Belle2 {
 
     StoreObjPtr<ParticleList> koutputList(m_klistName);
     koutputList.create();
-    koutputList->initialize(m_kpdgCode, m_klistName);
+    koutputList->initialize(Const::Klong.getPDGCode(), m_klistName);
 
     m_generator->init();
 
@@ -128,9 +129,9 @@ namespace Belle2 {
       Particle&& particle = m_generator->getCurrentParticle();
 
       TLorentzVector missDaughters;
-      Particle* kparticle = 0;
+      Particle* kparticle = nullptr;
 
-      bool is_physical = 1;
+      bool is_physical = true;
 
       const std::vector<Particle*> daughters = particle.getDaughters();
 
@@ -141,17 +142,17 @@ namespace Belle2 {
         B2FATAL("Higher multiplicity (>2) missing momentum decays not implemented yet!");
 
       TLorentzVector pDaughters;
-      for (unsigned i = 0; i < daughters.size(); i++) {
-        if (daughters[i]->getPDGCode() != Const::Klong.getPDGCode()) {
-          pDaughters += daughters[i]->get4Vector();
+      for (auto daughter : daughters) {
+        if (daughter->getPDGCode() != Const::Klong.getPDGCode()) {
+          pDaughters += daughter->get4Vector();
         }
       }
 
       TLorentzVector klDaughters;
-      for (unsigned i = 0; i < daughters.size(); i++) {
-        if (daughters[i]->getPDGCode() == Const::Klong.getPDGCode()) {
-          kparticle = ParticleCopy::copyParticle(daughters[i]);
-          klDaughters += daughters[i]->get4Vector();
+      for (auto daughter : daughters) {
+        if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
+          kparticle = ParticleCopy::copyParticle(daughter);
+          klDaughters += daughter->get4Vector();
         }
       }
 
@@ -163,10 +164,10 @@ namespace Belle2 {
 
       int idx = 0;
 
-      for (unsigned i = 0; i < daughters.size(); i++) {
-        if (daughters[i]->getPDGCode() != Const::Klong.getPDGCode()) {
-          m_j = daughters[i]->getPDGMass();
-          idx = daughters[i]->getArrayIndex() + idx * 100;
+      for (auto daughter : daughters) {
+        if (daughter->getPDGCode() != Const::Klong.getPDGCode()) {
+          m_j = daughter->getPDGMass();
+          idx = daughter->getArrayIndex() + idx * 100;
         }
       }
 
@@ -193,12 +194,12 @@ namespace Belle2 {
         missDaughters.SetVect(k_mag2 * (klDaughters.Vect().Unit()));
       missDaughters.SetE(std::sqrt(m_k * m_k + missDaughters.Vect().Mag2()));
 
-      for (unsigned i = 0; i < daughters.size(); i++) {
-        if (daughters[i]->getPDGCode() == Const::Klong.getPDGCode()) {
+      for (auto daughter : daughters) {
+        if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
           if (!isnan(missDaughters.Vect().Mag())) {
             kparticle->set4Vector(missDaughters);
           } else
-            is_physical = 0;
+            is_physical = false;
         }
       }
 
@@ -207,7 +208,7 @@ namespace Belle2 {
         mom.SetE(std::sqrt(m_b * m_b + mom.Vect().Mag2()));
         particle.set4Vector(mom);
         if (isnan(mom.Vect().Mag()))
-          is_physical = 0;
+          is_physical = false;
       }
 
       if (!m_cut->check(&particle))

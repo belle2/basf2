@@ -17,6 +17,14 @@ namespace Belle2 {
    */
   struct ParticleProperties {
 
+    ParticleProperties() = default; /**< default constructor */
+
+    /** constructor which sets all members to the given value */
+    explicit ParticleProperties(double value)
+    {
+      setAllTo(value);
+    }
+
     static const int maxNweights = 160; /**< the maximum number of stored weights */
 
     double mass; /**< measured mass */
@@ -26,17 +34,19 @@ namespace Belle2 {
     double pt; /**< measured transverse momentum */
     double ptot; /**< measured total momentum */
     double cosTheta; /**< polar angle of measured momentum vector */
-    double x; /** < measured x value of position */
-    double y; /** < measured y value of position */
-    double z; /** < measured z value of position */
+    double phi; /**< azimuthal angle of measured momentum vector */
+    double x; /**< measured x value of position */
+    double y; /**< measured y value of position */
+    double z; /**< measured z value of position */
 
-    int nPXDhits;  /** Number of PXD hits in reconstructed track  */
-    int nSVDhits;  /** Number of SVD hits in reconstructed track  */
-    int nCDChits;  /** Number of CDC hits in reconstructed track  */
+    int nPXDhits;  /**< Number of PXD hits in reconstructed track  */
+    int nSVDhits;  /**< Number of SVD hits in reconstructed track  */
+    int nCDChits;  /**< Number of CDC hits in reconstructed track  */
 
-    int nWeights;  /** Number of entries in weights array  */
-    float weights[maxNweights];  /** Weights of the hits in sequence  */
+    int nWeights;  /**< Number of entries in weights array  */
+    float weights[maxNweights];  /**< Weights of the hits in sequence  */
 
+    int pdg_gen; /**< PDG code of generated particle */
     double mass_gen; /**< generated mass */
     double px_gen; /**< generated momentum in x direction */
     double py_gen; /**< generated momentum in y direction */
@@ -44,6 +54,7 @@ namespace Belle2 {
     double pt_gen; /**< generated transverse momentum */
     double ptot_gen; /**< generated total momentum */
     double cosTheta_gen; /**< polar angle of generated momentum vector */
+    double phi_gen; /**< azimuthal angle of generated momentum vector */
     double x_gen; /**< x value of generated position */
     double y_gen; /**< y value of generated position */
     double z_gen; /**< z value of generated position */
@@ -61,6 +72,7 @@ namespace Belle2 {
       pt = value;
       ptot = value;
       cosTheta = value;
+      phi = value;
       x = value;
       y = value;
       z = value;
@@ -73,14 +85,15 @@ namespace Belle2 {
       for (int i = 0; i < maxNweights; ++i)
         weights[i] = 0;
 
+      pdg_gen = 0;
       mass_gen = value;
       px_gen = value;
       py_gen = value;
       pz_gen = value;
-      pt = value;
       pt_gen = value;
       ptot_gen = value;
       cosTheta_gen = value;
+      phi_gen = value;
       x_gen = value;
       y_gen = value;
       z_gen = value;

@@ -17,8 +17,8 @@ directory or any files in sub directories.  So for example if we have
       an_image.png
       variable_groups/01-Kinematics.rst
       variable_groups/02-PID.rst
-  caf/doc/
-      framework.rst
+  calibration/doc/
+      index_caf.rst
   framework/doc/
       index-01-install.rst
       index-02-tools.rst
@@ -28,7 +28,7 @@ It would include the files in the global table contents in the order
 - ``framework/doc/index-01-install.rst``
 - ``framework/doc/index-02-tools.rst``
 - ``analysis/doc/index.rst``
-- ``caf/doc/framework.rst``
+- ``calibration/doc/index_caf.rst``
 
 .. note:: ``.rst`` files not starting with ``index`` in the sub directory
   ``variable_groups`` are not included in the top level tree
@@ -50,15 +50,15 @@ the following rules:
    something like
 
    .. code-block:: rst
- 
+
      Analysis Package
      ================
- 
+
      Some text describing the structure of the package
- 
+
      .. toctree:
         :glob:
- 
+
         variables
         variable_groups/*
 
@@ -71,7 +71,7 @@ the following rules:
 6. Every file can limit the depth to which the table of contents is expanded by
    adding ``:tocdepth: N`` at the top of the file. The global table of contents
    is limited to two levels.
-   
+
    .. note:: This will not have any effect on latex output. For the PDF output
       the depth of the table of contents is always set to 3 levels
 
@@ -107,6 +107,72 @@ this would render something like
 
    .. include:: docstring-example.rst-fragment
 
+.. _referencing_things:
+
+Referencing Components
+----------------------
+
+Much of the documentation done by Sphinx involves referencing other components of the documentation.
+For example, when writing the command ``:py:func:`examplemodule.dummy_function_example```, you are
+referencing a documented Python function of this name.
+Sphinx then automatically creates a reference link to this function for you, displayed as
+:py:func:`examplemodule.dummy_function_example`.
+You can also create your own references to most other components of the documentation, such as sections, code-blocks,
+and figures.
+To create a custom reference you should put the reference directive just prior to the component you want to reference.
+For example, in order to create a reference to this section this code was used
+
+.. code-block:: rst
+
+  .. _referencing_things:
+
+  Referencing Components
+  ----------------------
+
+.. important:: Notice that the reference name ``_referencing_things`` has a leading underscore.
+               This is *not part of the name*. When using the reference you omit this underscore.
+
+We can then make a reference to this section by using ``:ref:`referencing_things``` which displays as :ref:`referencing_things`.
+If you prefer to have a numbered reference, we could instead use ``:numref:`referencing_things``` which displays as
+:numref:`referencing_things`.
+
+We also have enabled a extension to automatically define references for all
+sections. So without adding anything this section could also be referenced by
+``:ref:`framework/doc/atend-doctools:Referencing Components``` which still
+result in :ref:`framework/doc/atend-doctools:Referencing Components`.
+
+Inserting Figures
+-----------------
+
+While properly documenting the code itself is the first step to take, you may want to include figures that explain
+overall concepts of a package, module, or class (see :numref:`framework_modpath_diagram`).
+To do this, first simply place the image file you would like to display into your ``<package>/doc>`` directory.
+you can then place the image (in this case ``cat.jpg``) into the documentation by using
+
+.. code-block:: rst
+
+  .. _cat_picture:
+
+  .. figure:: cat.jpg
+    :width: 40em
+    :align: center
+
+    Why is it always cats?
+
+where we have also included the reference ``cat_picture`` to use later.
+This markup would display the image as
+
+.. _cat_picture:
+
+.. figure:: cat.jpg
+  :width: 40em
+  :align: center
+
+  Why is it always cats?
+
+Just as with other components, we can reference the picture from the text by using ``:ref:`cat_picture```.
+Which then appears as a reference using the caption text as :ref:`cat_picture`.
+As before, we could use the ``:numref:`` syntax to get a numbered reference displayed as :numref:`cat_picture`.
 
 .. _multiline_cpp_strings:
 
@@ -193,7 +259,7 @@ The known sections you can and should use if appropriate are
 * ``Yields``
 
 
-You can see a more complete example of this format at 
+You can see a more complete example of this format at
 http://www.sphinx-doc.org/en/stable/ext/example_google.html
 
 .. _Google style docstrings: http://www.sphinx-doc.org/en/stable/ext/napoleon.html
@@ -258,6 +324,12 @@ Basf2 Module documentation can be added to sphinx automatically using
     if present it will try to include a graph showing the required, optional
     and registered DataStore elements.
 
+  .. rst:role:: noindex
+
+    if present the modules will not be added to the index. This is useful if
+    the same module is documented multiple times to select which of these
+    should show up in the index.
+
 
 For this automatic documentation to work all documentation strings passed to
 ``setDescription()`` and ``addParam()`` should be valid reStructuredText_ (see
@@ -306,6 +378,13 @@ We can also add documentation for basf2 variables with a very similar syntax to 
            :group: Kinematics
            :regex-filter: ^x.*
 
+  .. rst:role:: noindex
+
+    if present the variables will not be added to the index. This is useful if
+    the same variable is documented multiple times to select which of these
+    should show up in the index.
+
+
 For this automatic documentation to work all documentation strings passed to
 ``REGISTER_VARIABLE()`` should be valid reStructuredText_ (see
 :ref:`multiline_cpp_strings`) It is also possible to reference variables
@@ -324,10 +403,23 @@ Additional Features
 * All documented basf2 modules and variables are automatically added to a
   separate, alphabetic index page for easy lookup. They can be referenced with
 
-  - ``:ref:`b2-modindex``` (:ref:`b2-modindex`)  
+  - ``:ref:`b2-modindex``` (:ref:`b2-modindex`)
   - ``:ref:`b2-varindex``` (:ref:`b2-varindex`)
 
 * We have support for easy linking to JIRA issues by using
   ``:issue:`BII-XXXX```, for example ``:issue:`BII-8``` (:issue:`BII-8`)
 
 
+How to test locally
+-------------------
+
+You can test locally your changes in the Sphinx documentation by compiling your
+code with the following command:
+
+::
+
+    scons --sphinx html
+
+The output will be produced in ``$BELLE2_LOCAL_DIR/build/html`` and you can
+navigate it with your favorite browser to check if the output is what you
+expect.

@@ -4,6 +4,8 @@ from sphinx.directives import ObjectDescription
 from sphinx.domains import Domain, ObjType, Index
 from sphinx.util.docfields import TypedField, Field
 from sphinx.util.nodes import make_refnode
+from sphinx.util import logging
+logger = logging.getLogger(__name__)
 
 
 class Basf2Object(ObjectDescription):
@@ -59,10 +61,10 @@ class Basf2Object(ObjectDescription):
 
         if name in ddata:
             # already exists, give warning
-            self.env.warn(self.env.docname,
-                          "Duplicate description of basf2 %s %s, " % (self.objtype, name) +
-                          "Other instance in " + self.env.doc2path(ddata[name][0]),
-                          self.lineno)
+            logger.warn("Duplicate description of basf2 %s %s, " % (self.objtype, name) +
+                        "Other instance in " + self.env.doc2path(ddata[name][0]) +
+                        ", please add ':noindex:' to one",
+                        location=(self.env.docname, self.lineno))
         else:
             ddata[name] = (self.env.docname, targetname)
 
@@ -80,7 +82,7 @@ class Basf2ModuleIndex(Index):
             letter = modname[0].upper()
             content.setdefault(letter, [])
             content[letter].append([modname, 0, docname, target, "", "", ""])
-        return content.items(), False
+        return list(content.items()), False
 
 
 class Basf2VariableIndex(Index):
@@ -92,11 +94,12 @@ class Basf2VariableIndex(Index):
     def generate(self, docnames=None):
         content = {}
         modules = self.domain.data["variables"].items()
+        modules = sorted(modules, key=lambda x: x[0].lower())
         for modname, (docname, target) in modules:
             letter = modname[0].upper()
             content.setdefault(letter, [])
             content[letter].append([modname, 0, docname, target, "", "", ""])
-        return content.items(), False
+        return list(content.items()), False
 
 
 class Basf2Domain(Domain):

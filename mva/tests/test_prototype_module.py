@@ -5,6 +5,7 @@
 from basf2 import *
 
 from modularAnalysis import *
+from generators import add_evtgen_generator
 
 import tempfile
 import os
@@ -14,7 +15,8 @@ from ROOT import Belle2
 if __name__ == "__main__":
 
     path = create_path()
-    generateY4S(100, Belle2.FileSystem.findFile('analysis/examples/tutorials/B2A101-Y4SEventGeneration.dec'), path=path)
+    setupEventInfo(100, path)
+    add_evtgen_generator(path, 'signal', Belle2.FileSystem.findFile('analysis/examples/tutorials/B2A101-Y4SEventGeneration.dec'))
     path.add_module('MVAPrototype', identifier='fake.xml')
 
     with tempfile.TemporaryDirectory() as tempdir:

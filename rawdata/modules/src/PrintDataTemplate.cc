@@ -82,6 +82,7 @@ void PrintDataTemplateModule::printBuffer(int* buf, int nwords)
 
 void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
 {
+
   int* buf  = raw_datablock->GetBuffer(i);
   int nwords =  raw_datablock->GetBlockNwords(i);
   printf("*******FTSW data**********: nwords %d\n", nwords);
@@ -95,18 +96,39 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
   int num_nodes = 1;
   rawftsw.SetBuffer(buf, nwords, delete_flag, num_event, num_nodes);
 
-
-
   timeval tv;
-  int n = 0;
+  int n = i;
   rawftsw.GetTTTimeVal(n , &tv);
-  printf("eve %d TLU %d: %d %d %.8x: tv %d %d\n",
-         rawftsw.GetEveNo(n),
-         rawftsw.Get15bitTLUTag(n),
-         rawftsw.GetBlockNwords(n),
+
+  printf("HdrNwords %d nodeID %.8x runsub %.8x run %.4x sub %.4x exp %.4x eve %.8x trl %.8x\n",
          rawftsw.GetNwordsHeader(n),
          rawftsw.GetFTSWNodeID(n),
-         (int)(tv.tv_sec), (int)(tv.tv_usec)
+         rawftsw.GetRunNoSubRunNo(n),
+         rawftsw.GetRunNo(n),
+         rawftsw.GetSubRunNo(n),
+         rawftsw.GetExpNo(n),
+         rawftsw.GetEveNo(n),
+         rawftsw.GetMagicTrailer(n)
+        );
+
+  printf("ctimetrg %.8x utime %.8x ctime %.8x trg %d sec %.8x usec %.8x\n",
+         rawftsw.GetTTCtimeTRGType(n),
+         rawftsw.GetTTUtime(n),
+         rawftsw.GetTTCtime(n),
+         rawftsw.GetTRGType(n),
+         (int)(tv.tv_sec),
+         (int)(tv.tv_usec));
+  //  rawftsw.Get15bitTLUTag(n) );
+
+  //
+  // Show newly added variables for ver.2 format
+  //
+  printf("IsHER %d TimeLastInj %u TimePrevTrg %u BunchNum %d FrameCnt %d \n",
+         rawftsw.GetIsHER(n),
+         rawftsw.GetTimeSinceLastInjection(n),
+         rawftsw.GetTimeSincePrevTrigger(n),
+         rawftsw.GetBunchNumber(n),
+         rawftsw.GetFrameCount(n)
         );
 
   m_nftsw++;
@@ -114,10 +136,124 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
 }
 
 
+void PrintDataTemplateModule::checkFTSWver2(RawFTSW* rawftsw, int i)
+{
+  //
+  // Double check by comparing extracted values with ones at https://confluence.desy.de/display/BI/DAQ+TimingDistribution (ver.26)
+  //
+
+  int* buf = rawftsw->GetBuffer(i);
+
+
+  int nword_header = buf[ 0 ];
+  unsigned int node_id = buf[ 6 ];
+  int runno_subrunno = buf[ 3 ] & 0x3fffff;
+  int runno = (buf[ 3 ] >> 8) & 0x3fff;
+  int subrunno = buf[ 3 ] & 0xff;
+  int expno = (buf[ 3 ] >> 22) & 0x3ff;
+  unsigned int eveno = (unsigned int)buf[ 4 ];
+  unsigned int magic_trl = (unsigned int)buf[ 21 ];
+  unsigned int ctime_trgtype = (unsigned int)buf[ 8 ];
+  unsigned int utime = (unsigned int)buf[ 9 ];
+  unsigned int ctime = (unsigned int)(buf[ 8 ] >> 4);
+  int trgtype = buf[ 8 ] & 0xf;
+  int tv_sec = (unsigned int)buf[ 9 ];
+  int tv_usec = (int)(ctime / 127.216);
+
+  unsigned int frame_cnt = buf[ 11 ];
+  unsigned int time_prevtrg = buf[ 12 ];
+  int is_her = buf[ 13 ] >> 31;
+  unsigned int time_lastinj = buf[ 13 ] & 0x7fffffff;
+  unsigned int bunch_num = buf[ 14 ] & 0x7ff;
+
+  timeval tv;
+  rawftsw->GetTTTimeVal(i , &tv);
+
+  int err_flag = 0;
+
+  if (rawftsw->GetBlockNwords(i) != 22) {
+    B2FATAL("Nords " << rawftsw->GetBlockNwords(i));
+  }
+
+  if (rawftsw->GetFTSWNodeID(i) != 0x54544420) {
+    B2FATAL("ID " << rawftsw->GetFTSWNodeID(i));
+  }
+
+  if (rawftsw->GetMagicTrailer(i) != 0x7fff0000) {
+    B2FATAL("Magic " << rawftsw->GetMagicTrailer(i));
+  }
+
+  if (runno_subrunno != rawftsw->GetRunNoSubRunNo(i)) {
+    B2FATAL("Magic " << runno_subrunno << " != " <<  rawftsw->GetRunNoSubRunNo(i));
+  }
+
+  if (runno != rawftsw->GetRunNo(i)) {
+    B2FATAL("RunNo " << runno << " != " <<  rawftsw->GetRunNo(i));
+  }
+
+  if (subrunno != rawftsw->GetSubRunNo(i)) {
+    B2FATAL("SubRunNo " << subrunno << " != " <<  rawftsw->GetSubRunNo(i));
+  }
+
+  if (expno != rawftsw->GetExpNo(i)) {
+    B2FATAL("ExpNo" << expno << " != " <<  rawftsw->GetExpNo(i));
+  }
+
+  if (eveno != rawftsw->GetEveNo(i)) {
+    B2FATAL("EveNo " << eveno << " != " <<  rawftsw->GetEveNo(i));
+  }
+
+  if (ctime_trgtype != rawftsw->GetTTCtimeTRGType(i)) {
+    B2FATAL("ctime_trg " << ctime_trgtype << " != " <<  rawftsw->GetTTCtimeTRGType(i));
+  }
+
+  if (utime != rawftsw->GetTTUtime(i)) {
+    B2FATAL("utime " << utime << " != " <<  rawftsw->GetTTUtime(i));
+  }
+
+  if (ctime != rawftsw->GetTTCtime(i)) {
+    B2FATAL("ctime " << ctime << " != " <<  rawftsw->GetTTCtime(i));
+  }
+
+  if (trgtype != rawftsw->GetTRGType(i)) {
+    B2FATAL("trgtype " << trgtype << " != " <<  rawftsw->GetTRGType(i));
+  }
+
+  if (tv_sec != (int)(tv.tv_sec)) {
+    B2FATAL("tv_sec " << tv_sec << " != " << (int)(tv.tv_sec));
+  }
+
+  if (tv_usec != (int)(tv.tv_usec)) {
+    B2FATAL("tv_usec " << tv_usec << " != " << (int)(tv.tv_usec));
+  }
+
+  if (frame_cnt != rawftsw->GetFrameCount(i)) {
+    B2FATAL("frame_cnt " << frame_cnt << " != " <<  rawftsw->GetFrameCount(i));
+  }
+
+  if (time_prevtrg != rawftsw->GetTimeSincePrevTrigger(i)) {
+    B2FATAL("prevtrg " << time_prevtrg << " != " <<  rawftsw->GetTimeSincePrevTrigger(i));
+  }
+
+  if (is_her != rawftsw->GetIsHER(i)) {
+    B2FATAL("is_her " << is_her << " != " <<  rawftsw->GetIsHER(i));
+  }
+
+  if (time_lastinj != rawftsw->GetTimeSinceLastInjection(i)) {
+    B2FATAL("time_lastinj " << time_lastinj << " != " <<  rawftsw->GetTimeSinceLastInjection(i));
+  }
+
+  if (bunch_num != rawftsw->GetBunchNumber(i)) {
+    B2FATAL("bunch_num " << bunch_num << " != " <<  rawftsw->GetBunchNumber(i));
+  }
+
+}
+
+
 void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
 {
 
-  printf(": Event %8d node 0x%.8x block %d by: sum det %d by : A %d by B %d by C %d by D %d by\n",
+  printf(": Event %8u node 0x%.8x block %d by: sum det %d by : A %d by B %d by C %d by D %d by\n",
          raw_copper->GetEveNo(i), raw_copper->GetNodeID(i),
          (int)(sizeof(int) * raw_copper->GetBlockNwords(i)),
          (int)(sizeof(int) * (raw_copper->GetDetectorNwords(i, 0) + raw_copper->GetDetectorNwords(i, 1) +
@@ -127,11 +263,11 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
          (int)(sizeof(int) * (raw_copper->GetDetectorNwords(i, 2))),
          (int)(sizeof(int) * (raw_copper->GetDetectorNwords(i, 3)))
         );
-  printf("EventMetaData : exp %d run %d subrun %d eve %.8x\n", m_eventMetaDataPtr->getExperiment(),
+  printf("EventMetaData : exp %d run %d subrun %d eve %.8d\n", m_eventMetaDataPtr->getExperiment(),
          m_eventMetaDataPtr->getRun(), m_eventMetaDataPtr->getSubrun(), m_eventMetaDataPtr->getEvent());
 
   if (m_eventMetaDataPtr->getErrorFlag()) {
-    printf("!!!!!!!!! ERROR event !!!!!!!!!! : eve %d errflag %.8x\n", raw_copper->GetEveNo(i), m_eventMetaDataPtr->getErrorFlag());
+    printf("!!!!!!!!! ERROR event !!!!!!!!!! : eve %u errflag %.8x\n", raw_copper->GetEveNo(i), m_eventMetaDataPtr->getErrorFlag());
   }
 
   printBuffer(raw_copper->GetWholeBuffer(), raw_copper->TotalBufNwords());
@@ -228,7 +364,7 @@ void PrintDataTemplateModule::printPXDEvent(RawPXD* raw_pxd)
       pos += nframesv[ i ] / 4;
     }
   }
-  printf("PXD FTSW %u TRG %u DHE %u\n", ctime_type, hlttrg, dhe_time);
+  printf("PXD FTSW %d TRG %u DHE %d\n", ctime_type, hlttrg, dhe_time);
 
 
 }
@@ -290,8 +426,12 @@ void PrintDataTemplateModule::event()
     for (int j = 0; j < raw_ftswarray[ i ]->GetNumEntries(); j++) {
       printf("\n===== DataBlock(RawFTSW): Block # %d ", i);
       printFTSWEvent(raw_ftswarray[ i ], j);
+      if (raw_ftswarray[ i ]->m_version == 2) {
+        checkFTSWver2(raw_ftswarray[ i ], j);
+      }
     }
   }
+
 
   //
   //  Data from COPPER ( data from any detectors(e.g. CDC, SVD, ... ))

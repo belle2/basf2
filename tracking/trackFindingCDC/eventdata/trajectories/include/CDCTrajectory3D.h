@@ -59,6 +59,11 @@ namespace Belle2 {
       {
       }
 
+      /// conversion constructor to make that one stupid test work
+      explicit CDCTrajectory3D(const Helix& helix) : CDCTrajectory3D(UncertainHelix(helix))
+      {
+      }
+
       /// Constructs a trajectory from a local helix taken as relative to the given origin.
       CDCTrajectory3D(const Vector3D& localOrigin,
                       const UncertainHelix& localHelix,

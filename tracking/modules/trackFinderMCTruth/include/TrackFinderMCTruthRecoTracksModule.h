@@ -79,7 +79,8 @@ namespace Belle2 {
     bool m_enforceTrueHit;                                      /**< If set true only cluster hits that have a relation to a TrueHit will be included in the track candidate */
     std::vector<std::string>
     m_whichParticles;                  /**< List of keywords to mark what properties particles must have to get a track candidate . */
-    int m_particleProperties;                                   /**< Internal encoding of m_whichParticles to avoid string comparisons */
+    int m_particleProperties =
+      0;                               /**< Internal encoding of m_whichParticles to avoid string comparisons */
     double m_energyCut;                                         /**< Create track candidates only for MCParticles with energy above this cut*/
     bool m_neutrals;                                            /**< Boolean to mark if track candidates should also be created for neutral particles.*/
     bool m_mergeDecayInFlight;                                  /**< Boolean to merge decay in flight chains that involve a single charged particle */
@@ -90,9 +91,11 @@ namespace Belle2 {
     m_smearingCov;                          /**< Covariance matrix used to smear the true pos and mom before passed to track candidate. This matrix will also passed to Genfit as the initial covarance matrix. If any diagonal value is negative this feature will not be used. OFF DIAGNOLA ELEMENTS DO NOT HAVE AN EFFECT AT THE MOMENT */
     TMatrixDSym
     m_initialCov;                                   /**< The std::vector m_smearingCov will be translated into this TMatrixD*/
-    int m_notEnoughtHitsCounter;                                /**< will hold number of tracks that do not have enough hits to form a track candidate (total NDF less than 5)*/
-    int m_noTrueHitCounter;                                     /**< will hold number of cluster hits that do not have a corresponding true hit*/
-    int m_nRecoTracks;                                          /**< will hold the total number of created track candidates*/
+    int m_notEnoughtHitsCounter =
+      0;                                /**< will hold number of tracks that do not have enough hits to form a track candidate (total NDF less than 5)*/
+    int m_noTrueHitCounter =
+      0;                                     /**< will hold number of cluster hits that do not have a corresponding true hit*/
+    int m_nRecoTracks = 0;                                          /**< will hold the total number of created track candidates*/
     std::string m_recoTracksStoreArrayName;                          /**< RecoTracks StoreArray name */
     int m_minPXDHits;                                           /**< Minimum number of PXD hits per track to allow track candidate creation*/
     int m_minSVDHits;                                           /**< Minimum number of SVD hits per track to allow track candidate creation*/

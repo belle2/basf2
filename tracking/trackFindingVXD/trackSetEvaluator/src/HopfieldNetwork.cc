@@ -22,6 +22,11 @@ unsigned short HopfieldNetwork::doHopfield(
   //activiation by the total number of Nodes.
   //Incompatible Nodes get later minus one, which counteracts all activation,
   //if the incompatible Node is active.
+  if (overlapResolverNodeInfos.size() < 2) {
+    B2DEBUG(20, "No reason to doHopfield with less than 2 nodes!");
+    return 0;
+  }
+
   const float compatibilityValue = (1.0 - m_omega) / static_cast<float>(overlapResolverNodeInfos.size() - 1);
 
   const size_t overlapSize = overlapResolverNodeInfos.size();
@@ -79,7 +84,7 @@ unsigned short HopfieldNetwork::doHopfield(
 
     for (unsigned int i : sequenceVector) {
       float aTempVal = W.row(i).dot(x);
-      float act = aTempVal + m_omega * overlapResolverNodeInfos[i].qualityIndex;
+      float act = aTempVal + m_omega * overlapResolverNodeInfos[i].qualityIndicator;
       x(i) = 0.5 * (1. + tanh(act / T));
     }
 

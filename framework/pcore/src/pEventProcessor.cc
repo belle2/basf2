@@ -21,7 +21,8 @@
 
 #include <TROOT.h>
 
-#include <signal.h>
+#include <csignal>
+#include <memory>
 
 
 using namespace std;
@@ -30,7 +31,7 @@ using namespace Belle2;
 namespace {
   static int gSignalReceived = 0;
 
-  static pEventProcessor* g_pEventProcessor = NULL;
+  static pEventProcessor* g_pEventProcessor = nullptr;
 
   void cleanupIPC()
   {
@@ -104,7 +105,7 @@ void pEventProcessor::clearFileList()
 }
 
 
-void pEventProcessor::process(PathPtr spath, long maxEvent)
+void pEventProcessor::process(const PathPtr& spath, long maxEvent)
 {
   if (spath->getModules().size() == 0) return;
 
@@ -127,7 +128,12 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     B2INFO("Input Path " << m_inputPath->getPathString());
   }
   if (m_mainPath) {
-    B2INFO("Main Path " << m_mainPath->getPathString());
+    if (m_mainPath->getModules().size() <= 5) {
+      B2INFO("Main Path " << m_mainPath->getPathString());
+    } else {
+      B2INFO("Main Path [" << m_mainPath->getModules().front()->getName() << " -> ... (" << m_mainPath->getModules().size() - 2 <<
+             " further modules) ... -> " << m_mainPath->getModules().back()->getName() << " ]");
+    }
   }
   if (m_outputPath) {
     B2INFO("Output Path " << m_outputPath->getPathString());
@@ -158,7 +164,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     mergedPath.addPath(m_mainPath);
     if (m_outputPath)
       mergedPath.addPath(m_outputPath);
-    for (ModulePtr module : mergedPath.buildModulePathList())
+    for (const ModulePtr& module : mergedPath.buildModulePathList())
       m_processStatisticsPtr->initModule(module.get());
   }
 
@@ -191,7 +197,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   //Path for current process
   PathPtr localPath;
 
-  m_procHandler.reset(new ProcHandler(numProcesses));
+  m_procHandler = std::make_unique<ProcHandler>(numProcesses);
 
   // 3. Fork input path
   m_procHandler->startInputProcess();
@@ -315,7 +321,7 @@ void pEventProcessor::analyzePath(const PathPtr& path)
 
       if (stage == 2) {
         bool path_is_useful = false;
-        for (auto parallelModule : mainpath->getModules()) {
+        for (const auto& parallelModule : mainpath->getModules()) {
           if (uselessParallelModules.count(parallelModule->getType()) == 0) {
             path_is_useful = true;
             break;
@@ -365,12 +371,12 @@ void pEventProcessor::analyzePath(const PathPtr& path)
     m_outputPath = outpath;
 }
 
-RingBuffer* pEventProcessor::connectViaRingBuffer(const char* name, PathPtr a, PathPtr& b)
+RingBuffer* pEventProcessor::connectViaRingBuffer(const char* name, const PathPtr& a, PathPtr& b)
 {
   //create ringbuffers and add rx/tx where needed
   const char* inrbname = getenv(name);
   RingBuffer* rbuf;
-  if (inrbname == NULL) {
+  if (inrbname == nullptr) {
     rbuf = new RingBuffer();
   } else {
     string rbname(inrbname + to_string(0)); //currently at most one input, one output buffer
@@ -405,7 +411,7 @@ void pEventProcessor::preparePaths()
 }
 
 
-void pEventProcessor::dump_modules(const std::string title, const ModulePtrList modlist)
+void pEventProcessor::dump_modules(const std::string& title, const ModulePtrList& modlist)
 {
   ModulePtrList::const_iterator it;
   std::ostringstream strbuf;

@@ -33,7 +33,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/ProfileInfo.h>
 #include <framework/datastore/RelationsObject.h>
-// #include <boost/concept_check.hpp>
 
 #include <tuple>
 #include <utility>
@@ -72,6 +71,8 @@ namespace VXDTFObserversTest {
     TGeoCombiTrans c1(t1, r1);
     TGeoHMatrix transform = c1;
     sensorInfoBase.setTransformation(transform);
+    // also need the reco transform
+    sensorInfoBase.setTransformation(transform, true);
 
     return sensorInfoBase;
   }
@@ -234,6 +235,9 @@ namespace VXDTFObserversTest {
     struct AcceptRejectPair {
       AcceptRejectPair() : accept(0), reject(0) {}
 
+      /** Increase respective counter if accepted or not
+       * @param accepted : bool indicating if accepted or not
+       */
       void Increase(bool accepted)
       {
         if (accepted) {
@@ -313,7 +317,7 @@ namespace VXDTFObserversTest {
 
 
     /** for easy printing of results collected so far */
-    void PrintResults(string identifier = "unknown")
+    void PrintResults(const string& identifier = "unknown")
     {
       for (auto& entry : m_container) {
         B2WARNING(" for " << identifier << "-combination: " <<

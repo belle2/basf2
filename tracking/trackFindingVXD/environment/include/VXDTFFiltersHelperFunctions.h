@@ -71,7 +71,7 @@ namespace Belle2 {
     * - suppressDeadSectors discards sectors without links if set to true
      */
     template<class HitType>
-    void printStaticSectorRelations(const VXDTFFilters<HitType>& filters, std::string configName,
+    void printStaticSectorRelations(const VXDTFFilters<HitType>& filters, const std::string& configName,
                                     unsigned int nHitCombinations = 2, bool print2File = true, bool suppressDeadSectors = true)
     {
       if (nHitCombinations <2 or nHitCombinations > 4)

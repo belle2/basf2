@@ -26,7 +26,7 @@ namespace Belle2 {
        */
       FileContext(const std::string& filename, bool compressed);
       /** Return a block of the data */
-      virtual int readXmlData(char* buffer, int buffsize)
+      virtual int readXmlData(char* buffer, int buffsize) override
       {
         m_stream.read(buffer, buffsize);
         return m_stream.gcount();
@@ -75,7 +75,7 @@ namespace Belle2 {
        * named like path.
        * @param path name of the file, relative to the FileHandler search path
        */
-      virtual InputContext* open(const std::string& path);
+      virtual InputContext* open(const std::string& path) override;
     protected:
       /** Search path to look for files */
       std::string m_path;

@@ -52,6 +52,8 @@ namespace Belle2 {
         switch (size) {
           case 4: //#rgb, add alpha since none was specified
             colorValue = (colorValue << 4) + 15;
+            // and then continue with rgba case
+            [[fallthrough]];
           case 5: //#rgba
             red   = ((colorValue & 0xf000) >> 12) / 15.;
             green = ((colorValue & 0x0f00) >>  8) / 15.;
@@ -60,6 +62,8 @@ namespace Belle2 {
             break;
           case 7: //#rrggbb, add alpha since none was specified
             colorValue = (colorValue << 8) + 255;
+            // and then continue with #rrggbbaa case
+            [[fallthrough]];
           case 9: //#rrggbbaa
             red   = ((colorValue & 0xff000000) >> 24) / 255.;
             green = ((colorValue & 0x00ff0000) >> 16) / 255.;
@@ -71,8 +75,8 @@ namespace Belle2 {
         }
       } else if (colorString.substr(0, 3) == "rgb") {
         //Parse value of the type rgb(1.0,1.0,1.0)
-        size_t startPos = colorString.find("(");
-        size_t stopPos = colorString.find(")");
+        size_t startPos = colorString.find('(');
+        size_t stopPos = colorString.find(')');
         string ws(" \t\r\n,");
         stringstream in(colorString.substr(startPos + 1, stopPos - startPos - 1));
         in >> red;
@@ -92,14 +96,14 @@ namespace Belle2 {
 
     void setColor(G4LogicalVolume& volume, const string& color)
     {
-      G4VisAttributes* attr = const_cast<G4VisAttributes*>(volume.GetVisAttributes());
+      auto* attr = const_cast<G4VisAttributes*>(volume.GetVisAttributes());
       if (!attr) attr = GeometryManager::getInstance().newVisAttributes();
       attr->SetColor(parseColor(color));
       volume.SetVisAttributes(attr);
     }
     void setVisibility(G4LogicalVolume& volume, bool visible)
     {
-      G4VisAttributes* attr = const_cast<G4VisAttributes*>(volume.GetVisAttributes());
+      auto* attr = const_cast<G4VisAttributes*>(volume.GetVisAttributes());
       if (!attr) attr = GeometryManager::getInstance().newVisAttributes();
       attr->SetVisibility(visible);
       volume.SetVisAttributes(attr);
@@ -107,7 +111,7 @@ namespace Belle2 {
 
     G4Polycone* createPolyCone(const string& name, const GearDir& params, double& minZ, double& maxZ)
     {
-      if (!params) return 0;
+      if (!params) return nullptr;
 
       double minPhi = params.getAngle("minPhi", 0);
       double dPhi   = params.getAngle("maxPhi", 2 * M_PI) - minPhi;
@@ -115,7 +119,7 @@ namespace Belle2 {
       int nPlanes = planes.size();
       if (nPlanes < 2) {
         B2ERROR("Polycone needs at least two planes");
-        return 0;
+        return nullptr;
       }
       std::vector<double> z(nPlanes, 0);
       std::vector<double> rMin(nPlanes, 0);
@@ -138,9 +142,9 @@ namespace Belle2 {
     //Use unnamed namespace to hide helper functions/definitions from outside
     namespace {
       /** Struct representing the Z and X coordinate of a point */
-      typedef pair<double, double> ZXPoint;
+      using ZXPoint = pair<double, double>;
       /** List of points in the ZX plane */
-      typedef list<ZXPoint> PointList;
+      using PointList = list<ZXPoint>;
       /** Helper function for createRotationSolid.
        * This function subdivides the polyline given by segments to contain a
        * point at every z position in points.  Furthermore, the polyline will
@@ -166,8 +170,8 @@ namespace Belle2 {
           //coordinate we know that we need a new segment. We calculate the x
           //position of the segment and insert a new point at that position in
           //the list of points
-          PointList::iterator segStart = segments.begin();
-          PointList::iterator segEnd = segStart;
+          auto segStart = segments.begin();
+          auto segEnd = segStart;
           ++segEnd;
           for (; segEnd != segments.end(); ++segEnd) {
             if ((p.first > segStart->first && p.first < segEnd->first) ||
@@ -198,10 +202,10 @@ namespace Belle2 {
       //Make a list of all the points (ZX coordinates)
       PointList innerPoints;
       PointList outerPoints;
-      for (const GearDir point : params.getNodes("InnerPoints/point")) {
+      for (const GearDir& point : params.getNodes("InnerPoints/point")) {
         innerPoints.push_back(ZXPoint(point.getLength("z") / Unit::mm, point.getLength("x") / Unit::mm));
       }
-      for (const GearDir point : params.getNodes("OuterPoints/point")) {
+      for (const GearDir& point : params.getNodes("OuterPoints/point")) {
         outerPoints.push_back(ZXPoint(point.getLength("z") / Unit::mm, point.getLength("x") / Unit::mm));
       }
       //Subdivide the segments to have an x position for each z specified for
@@ -238,7 +242,7 @@ namespace Belle2 {
         if (popInner) innerPoints.pop_front();
         if (innerZ != outerZ) {
           B2ERROR("createRotationSolid: Something is wrong, z values should be identical");
-          return 0;
+          return nullptr;
         }
         z.push_back(innerZ);
         rMin.push_back(innerX);
@@ -291,7 +295,7 @@ namespace Belle2 {
         if (popInner) innerPoints.pop_front();
         if (innerZ != outerZ) {
           B2ERROR("createRotationSolid: Something is wrong, z values should be identical");
-          return 0;
+          return nullptr;
         }
         z.push_back(innerZ / Unit::mm);
         rMin.push_back(innerX / Unit::mm);

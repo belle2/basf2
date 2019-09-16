@@ -24,12 +24,12 @@ namespace Belle2 {
 
   namespace Monopoles {
 
+    class G4MonopoleEquation;
+
     /**
      * Monopole field setup singleton class, that takes care of switching between conventional
      * particle transportation and monopole transportation.
      */
-    class G4MonopoleEquation;
-
     class G4MonopoleFieldSetup {
     public:
 

@@ -10,11 +10,8 @@
 
 #include <beast/bgo/modules/BgoDigitizerModule.h>
 #include <beast/bgo/dataobjects/BgoSimHit.h>
-#include <beast/bgo/dataobjects/BgoHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
@@ -72,7 +69,7 @@ BgoDigitizerModule::~BgoDigitizerModule()
 void BgoDigitizerModule::initialize()
 {
   B2INFO("BgoDigitizer: Initializing");
-  StoreArray<BgoHit>::registerPersistent();
+  m_bgoHit.registerInDataStore();
 
   //get xml data
   getXMLData();

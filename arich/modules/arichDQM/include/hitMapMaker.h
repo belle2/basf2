@@ -13,8 +13,6 @@
 
 #include <framework/core/HistoModule.h>
 
-#include <arich/modules/arichDQM/newTHs.h>
-
 #include <arich/dataobjects/ARICHHit.h>
 #include <arich/dataobjects/ARICHTrack.h>
 #include <arich/dataobjects/ARICHPhoton.h>

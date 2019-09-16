@@ -32,18 +32,14 @@ REG_MODULE(PrintCollections)
 
 PrintCollectionsModule::PrintCollectionsModule()
 {
-  setDescription("Prints the contents of the DataStore in each event, listing all objects and arrays (including size).");
+  setDescription("Prints the contents of the DataStore in an event, listing all objects and arrays (including size).");
 
   addParam("printForEvent", m_printForEvent,
-           "Print the collections only for a specific event number. "
-           "If set to 0, the collections of all events will be printed, which might be a lot of output.",
+           "Print the collections only for a specific event number.  If set to -1 (default) only the collections of the first event will be printed, if set to 0, the collections of all events will be printed, which might be a lot of output.",
            m_printForEvent);
 }
 
-
-PrintCollectionsModule::~PrintCollectionsModule()
-{
-}
+PrintCollectionsModule::~PrintCollectionsModule() = default;
 
 void PrintCollectionsModule::initialize()
 {
@@ -54,8 +50,15 @@ void PrintCollectionsModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
-  // check if printing for a specific event was selected.
-  if ((m_printForEvent != eventMetaDataPtr->getEvent()) and (m_printForEvent > 0))
+  // check if printing only for the first event
+  if (m_printForEvent < 0) {
+    if (m_firstEvent)
+      m_firstEvent = false;
+    else
+      return;
+  }
+  // or for a specific event
+  else if ((m_printForEvent > 0) && ((unsigned int)m_printForEvent != eventMetaDataPtr->getEvent()))
     return;
 
   B2INFO("============================================================================");
@@ -73,7 +76,7 @@ void PrintCollectionsModule::event()
 /** remove Belle2 namespace prefix from className, if present. */
 std::string shorten(std::string className)
 {
-  if (className.find("Belle2::") == 0) {
+  if (className.compare(0, 8, "Belle2::") == 0) {
     //we know the experiment name, thanks
     return className.substr(8);
   }
@@ -91,12 +94,12 @@ void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
   //Print the object information
   //-----------------------------
   const DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(durability);
-  for (DataStore::StoreEntryConstIter iter = map.begin(); iter != map.end(); ++iter) {
+  for (auto iter = map.begin(); iter != map.end(); ++iter) {
     if (iter->second.isArray)
       continue;
     const TObject* currCol = iter->second.ptr;
 
-    if (currCol != NULL) {
+    if (currCol != nullptr) {
       B2INFO(boost::format("%1% %|20t| %2%") % shorten(currCol->ClassName()) % iter->first);
     }
   }
@@ -105,13 +108,13 @@ void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
   //-----------------------------
   //Print the array information
   //-----------------------------
-  for (DataStore::StoreEntryConstIter iter = map.begin(); iter != map.end(); ++iter) {
+  for (auto iter = map.begin(); iter != map.end(); ++iter) {
     if (!iter->second.isArray)
       continue;
     const TClonesArray* currCol = dynamic_cast<TClonesArray*>(iter->second.ptr);
 
     long entries = 0;
-    if (currCol != NULL)
+    if (currCol != nullptr)
       entries = currCol->GetEntriesFast();
 
     std::string type = shorten(iter->second.objClass->GetName());

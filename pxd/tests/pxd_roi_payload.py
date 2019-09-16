@@ -153,7 +153,7 @@ particlegun.param('nTracks', 40)
 
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10]})
 # Show progress of processing
 progress = register_module('Progress')
 
@@ -163,8 +163,9 @@ main.add_module(eventinfosetter)
 main.add_module(particlegun)
 # add simulation for pxd only
 # turn off the cleanup as the storearrays are needed
-simulation.add_simulation(main, components=['PXD', 'SVD', 'MagneticFieldConstant4LimitedRSVD'], usePXDDataReduction=True,
+simulation.add_simulation(main, components=['PXD', 'SVD'], usePXDDataReduction=True,
                           cleanupPXDDataReduction=False)
+set_module_parameters(main, type="Geometry", useDB=False, components=['PXD', 'SVD', 'MagneticFieldConstant4LimitedRSVD'])
 
 roiPayloadAssembler = register_module('ROIPayloadAssembler')
 roiPayloadAssembler.param({"ROIListName": "ROIs", "SendAllDownscaler": 0,

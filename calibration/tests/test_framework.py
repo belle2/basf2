@@ -8,7 +8,7 @@ set_log_level(LogLevel.ERROR)
 
 import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
-from ROOT.Belle2 import PXDClusterShapeCalibrationAlgorithm as PXDAlgo
+from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm as PXDAlgo
 
 from caf.framework import Calibration, CAF
 from caf.backends import Local
@@ -127,39 +127,6 @@ class TestCalibrationClass_Args(TestCase):
         cal1._apply_calibration_defaults(defaults)
         cal2 = Calibration(self.name, collector=self.col1, algorithms=[self.alg1], input_files='path/to/file.root')
         self.assertTrue(cal1.max_iterations == 4 and not cal2.max_iterations)
-
-
-class TestCalibrationClass_Mismatch(TestCase):
-    """
-    UnitTest to check if Calibration class can identify mismatched collectors and alogirithms
-    """
-
-    def setUp(self):
-        """
-        Create useful objects for each test
-        """
-        #: Calibration algorithm for use in unittests
-        self.alg1 = TestAlgo()
-        #: Calibration algorithm for use in unittests
-        self.alg2 = PXDAlgo()
-        #: Collector module attribute for use in unittests
-        self.col1 = register_module('CaTest')
-
-    def test_1(self):
-        """
-        Test whether or not calibration is valid with correct setup and if name is stored correctly
-        """
-        name = 'TestCalibration'
-        cal = Calibration(name, collector=self.col1, algorithms=[self.alg1], input_files='path/to/file.root')
-        self.assertTrue(cal.is_valid() and cal.name == name)
-
-    def test_2(self):
-        """
-        Test whether or not calibration is valid with collector and algorithm mismatched.
-        """
-        name = 'TestCalibration'
-        cal = Calibration(name, collector=self.col1, algorithms=[self.alg2], input_files='path/to/file.root')
-        self.assertFalse(cal.is_valid() and cal.name == name)
 
 
 class TestCAF(TestCase):

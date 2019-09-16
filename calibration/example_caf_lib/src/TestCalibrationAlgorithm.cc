@@ -43,12 +43,18 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
 
   B2INFO("Mean of MyHisto was " << mean);
   B2INFO("Mean Error of MyHisto was " << meanError);
-  if (!mille) return c_Failure;
+
+  // Fail if we we're asked to. Useful for testing
+  if (getForceFail()) {
+    B2WARNING("We were asked to fail by the m_willFail flag. Failing");
+    return c_Failure;
+  }
+
   for (auto& fileName : mille->getFiles()) {
     B2INFO("Stored Mille binary file: " << fileName);
   }
 
-  if (hist->GetEntries() < 100 || ttree->GetEntries() < 100 || mille->getFiles().empty())
+  if (hist->GetEntries() < 100 || ttree->GetEntries() < getMinEntries() || mille->getFiles().empty())
     return c_NotEnoughData;
 
   // Example of saving a DBObject.

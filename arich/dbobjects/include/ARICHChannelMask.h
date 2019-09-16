@@ -64,7 +64,7 @@ namespace Belle2 {
     /**
      * dump content
      */
-    void print();
+    void print() const;
 
   private:
 

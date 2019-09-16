@@ -28,6 +28,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/core/ModuleParamList.h>
 
 
 //utilities
@@ -69,7 +71,7 @@ TRGGRLMatchModule::TRGGRLMatchModule() : Module()
   addParam("TRGECLClusterCollection", m_clusterlist, "the cluster list used in the match", std::string("TRGECLClusters"));
   addParam("KLMTriggerTrack", m_klmtracklist, "the KLM track list used in the match", std::string("TRGKLMTracks"));
   addParam("2DmatchCollection", m_2dmatch_tracklist, "the 2d tracklist with associated cluster", std::string("TRG2DMatchTracks"));
-  addParam("PhimatchCollection", m_phimatch_tracklist, "the 2d tracklist with associated cluster", std::string("TRG2DMatchTracks"));
+  addParam("PhimatchCollection", m_phimatch_tracklist, "the 2d tracklist with associated cluster", std::string("TRGPhiMatchTracks"));
   addParam("3DmatchCollection", m_3dmatch_tracklist, "the 3d NN tracklist with associated cluster", std::string("TRG3DMatchTracks"));
   addParam("KLMmatchCollection", m_klmmatch_tracklist, "the 2d tracklist with associated KLM track",
            std::string("TRGKLMMatchTracks"));
@@ -181,6 +183,14 @@ void TRGGRLMatchModule::event()
     }
 
     for (int j = 0; j < clusterlist.getEntries(); j++) {
+      // skip the end-cap cluster
+      double _cluster_x = clusterlist[j]->getPositionX();
+      double _cluster_y = clusterlist[j]->getPositionY();
+      double _cluster_z = clusterlist[j]->getPositionZ();
+      double _cluster_theta = atan(_cluster_z / (sqrt(_cluster_x * _cluster_x + _cluster_y * _cluster_y)));
+      _cluster_theta = 0.5 * M_PI - _cluster_theta;
+      if (_cluster_theta < M_PI * 35.0 / 180.0 || _cluster_theta > M_PI * 126.0 / 180.0) continue;
+
       double ds_ct[2] = {99999., 99999.};
       calculationdistance(track2Dlist[i], clusterlist[j], ds_ct, 0);
       int dphi_d = 0;
@@ -232,6 +242,14 @@ void TRGGRLMatchModule::event()
     double dz_tmp = 99999.;
     int cluster_ind = -1;
     for (int j = 0; j < clusterlist.getEntries(); j++) {
+      // skip the end-cap cluster
+      double _cluster_x = clusterlist[j]->getPositionX();
+      double _cluster_y = clusterlist[j]->getPositionY();
+      double _cluster_z = clusterlist[j]->getPositionZ();
+      double _cluster_theta = atan(_cluster_z / (sqrt(_cluster_x * _cluster_x + _cluster_y * _cluster_y)));
+      _cluster_theta = 0.5 * M_PI - _cluster_theta;
+      if (_cluster_theta < M_PI * 35.0 / 180.0 || _cluster_theta > M_PI * 126.0 / 180.0) continue;
+
       double ds_ct[2] = {99999., 99999.};
       calculationdistance(track3Dlist[i], clusterlist[j], ds_ct, 1);
       if (dr_tmp > ds_ct[0]) {
@@ -374,7 +392,7 @@ void TRGGRLMatchModule::calculationphiangle(CDCTriggerTrack* _track, TRGECLClust
   else if (abs(phi_ECL_d - phi_CDC_d) == 15 || abs(phi_ECL_d - phi_CDC_d) == 21) {dphi_d = 15;}
   else if (abs(phi_ECL_d - phi_CDC_d) == 16 || abs(phi_ECL_d - phi_CDC_d) == 20) {dphi_d = 16;}
   else if (abs(phi_ECL_d - phi_CDC_d) == 17 || abs(phi_ECL_d - phi_CDC_d) == 19) {dphi_d = 17;}
-  else if (abs(phi_ECL_d - phi_CDC_d) == 18 || abs(phi_ECL_d - phi_CDC_d) == 18) {dphi_d = 18;}
+  else if (abs(phi_ECL_d - phi_CDC_d) == 18) {dphi_d = 18;}
 
 }
 
@@ -419,6 +437,11 @@ bool TRGGRLMatchModule::photon_cluster(TRGECLCluster* _cluster, std::vector<bool
   //-- cluster/TRGECL information
   double    _cluster_x = _cluster->getPositionX();
   double    _cluster_y = _cluster->getPositionY();
+  double    _cluster_z = _cluster->getPositionZ();
+  double    _cluster_theta = atan(_cluster_z / (sqrt(_cluster_x * _cluster_x + _cluster_y * _cluster_y)));
+  _cluster_theta = 0.5 * M_PI - _cluster_theta;
+  bool barrel = true;
+  if (_cluster_theta < M_PI * 35.0 / 180.0 || _cluster_theta > M_PI * 126.0 / 180.0) {barrel = false;}
   double  _cluster_e = _cluster->getEnergyDep();
 
   // -- ECL phi angle
@@ -438,7 +461,8 @@ bool TRGGRLMatchModule::photon_cluster(TRGECLCluster* _cluster, std::vector<bool
   if (index_p > 35) {index_p = index_p - 36;}
   if (index_m < 0) {index_m = index_m + 36;}
 
-  if (!phimap[index] && !phimap[index_p] && !phimap[index_m] && _cluster_e >= e_threshold) {return true;}
+  if (!phimap[index] && !phimap[index_p] && !phimap[index_m] && _cluster_e >= e_threshold && barrel) {return true;}
+  else if (!barrel) {return true;}
   else {return false;}
 
 }

@@ -124,11 +124,20 @@ void CDCDedxScanModule::event()
         double doca = j * cellHalfWidth / 50.0 - cellHalfWidth;
         double entAng = k * 3.14159265 / 100.0 - 3.14159265 / 2.0;
 
+        // re-scaled (RS) doca and entAng variable: map to square cell
+        double cellR = 2 * cellHalfWidth / cellHeight;
+        double tana = 100.0;
+        if (std::abs(2 * atan(1) - std::abs(entAng)) < 0.01)tana = 100 * (entAng / std::abs(entAng)); //avoid infinity at pi/2
+        else tana =  std::tan(entAng);
+        double docaRS = doca * std::sqrt((1 + cellR * cellR * tana * tana) / (1 + tana * tana));
+        double entAngRS = std::atan(tana / cellR);
+
         // now calculate the path length for this hit
         double celldx = c.dx(doca, entAng);
         if (!c.isValid()) continue;
 
-        dedxTrack->addHit(0, 0, i, doca, entAng, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0, 1.0, 1.0, 1.0);
+        dedxTrack->addHit(0, 0, i, doca, docaRS, entAng, entAngRS, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0, 1.0, 1.0,
+                          1.0);
       }
     }
     m_dedxArray.appendNew(*dedxTrack);

@@ -4,6 +4,7 @@
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm 
 ! mar-2017: change in some commons
 ! feb-2018: change in some commons
+! oct-2018: change in some commons
 !-------------------------------------------------------------------------
 
       INTEGER FUNCTION TOPF_PMT(XD,ZD,ZB,IEP,ICA,H)
@@ -225,13 +226,16 @@
       F_Y0(K)=F_Y0(K0)
       F_Z0(K)=F_Z0(K0)
       F_H(K)=0
-
+      F_NRT=0
+      F_RCODE=0
+      
       XD=F_XD(I0,K0)
       X=ATAN2(F_SFIC(I0,K0),F_CFIC(I0,K0))
       Y=GET_XD_RAYTR(X,I0,K,OK,TOT)-XD
       IF(.NOT.OK) RETURN
       IF(ABS(Y).LT.Y_PREC) THEN
          IF(TOT) TOPF_RAYTR=K
+         F_RCODE=1
          RETURN
       ENDIF         
       X1=X
@@ -246,6 +250,7 @@
          IF(.NOT.OK) RETURN
          IF(ABS(Y).LT.Y_PREC) THEN
             IF(TOT) TOPF_RAYTR=K
+            F_RCODE=2
             RETURN
          ENDIF         
          IF(Y1*Y.LT.0) EXIT
@@ -266,6 +271,7 @@
          IF(.NOT.OK) RETURN
          IF(ABS(Y).LT.Y_PREC) THEN
             IF(TOT) TOPF_RAYTR=K
+            F_RCODE=3
             RETURN
          ENDIF         
          IF(Y.EQ.Y0) EXIT
@@ -282,6 +288,7 @@
       IF(ABS(Y).LT.5.AND.TOT) THEN
          F_TL(I0,K)=TL1+(TL2-TL1)/(Y2-Y1)*(0-Y1)
          TOPF_RAYTR=K
+         F_RCODE=4
       ENDIF
 
       END
@@ -331,11 +338,60 @@
       F_NYM(I0,K)=NY(2)
       F_NXE(I0,K)=NX(3)
       F_NYE(I0,K)=NY(3)
+      F_NRT=F_NRT+1
       
       GET_XD_RAYTR=XD
 
       END
 
+
+      SUBROUTINE TLEN_AVERAGE(I0,K0)
+
+      IMPLICIT NONE
+      INTEGER I0, K0
+#include "TOP_PAR.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_TOPF.fi"
+#include "TOP_GRID.fi"
+      REAL CFIC, SFIC
+      REAL RF(3), DIRF(3), AA, BB
+      REAL TL, TIME, FRAC
+      INTEGER I, K
+      LOGICAL OK, TOT
+
+      IF(G_NP.EQ.0.OR.G_NC.EQ.0) RETURN
+      
+      CFIC=F_CFIC(I0,K0)
+      SFIC=F_SFIC(I0,K0)
+      TIME=0
+      FRAC=0
+      DO K=1,G_NC
+         IF(G_FRAC(K).EQ.0) CYCLE
+         DO I=1,G_NP
+            RF(1)=G_R0(1,I)
+            RF(2)=G_R0(2,I)
+            RF(3)=G_R0(3,I)
+            AA=G_CTH(I)*G_STHC(K)*CFIC+G_STH(I)*G_CTHC(K)
+            BB=G_STHC(K)*SFIC
+            DIRF(1)=AA*G_CFI(I)-BB*G_SFI(I)
+            DIRF(2)=AA*G_SFI(I)+BB*G_CFI(I)
+            DIRF(3)=G_CTH(I)*G_CTHC(K)-G_STH(I)*G_STHC(K)*CFIC
+            CALL FAST_RAYTR_0(RF,DIRF,MODUL,TL,OK,TOT)
+            IF(OK.AND.TOT) THEN
+               TIME=TIME+TL*G_IND(K)*G_FRAC(K)
+               FRAC=FRAC+G_FRAC(K)
+            ENDIF
+         ENDDO
+      ENDDO
+
+      IF(FRAC.EQ.0) RETURN
+
+      TIME=TIME/FRAC
+      TL=TIME/GRU_IND
+      F_TL(I0,K0)=TL
+      
+      END
+      
 
       REAL FUNCTION TOPF_DTL(I,K1,K2)
 
@@ -767,6 +823,73 @@ c--   propagate photon from emission point to detection plane
       END
 
 
+      SUBROUTINE FAST_RAYTR_0(RF,DIR,MDN,TLEN,OK,TOT)
+
+c--   propagate photon from emission point to detection plane
+
+      IMPLICIT NONE
+      REAL RF(3), DIR(3)        ! photon [in/out]
+      INTEGER MDN               ! bar ID [in]
+      REAL TLEN                 ! propagation length [out]
+      LOGICAL OK                ! status [out]
+      LOGICAL TOT               ! total reflection [out]
+#include "TOP_GEO.fi" 
+#include "TOP_PIK.fi" 
+      INTEGER TYP, I
+      REAL XM, YM, XB, YB, XE, YE, TL
+      INTEGER LR, NX1, NY1
+      LOGICAL TOTX, TOTY
+      
+      TLEN=0
+      OK=.FALSE.
+      TOT=.TRUE.
+
+      IF(DIR(3).GT.0) THEN
+         TYP=QBAR_RSIDE(MDN)
+         LR=1
+      ELSE
+         TYP=QBAR_LSIDE(MDN)
+         LR=0
+      ENDIF
+      IF(TYP.EQ.0) RETURN
+
+      IF(TYP.GT.1) THEN
+         TOTX=ABS(DIR(1)).LT.PTOT
+         TOTY=ABS(DIR(2)).LT.PTOT
+         CALL MIRR_RAYTR(RF,DIR,MDN,TL,NX1,NY1,XM,YM,OK)
+         IF(.NOT.OK) RETURN
+         TOT=TOT.AND.(TOTX.OR.NX1.EQ.0).AND.(TOTY.OR.NY1.EQ.0)
+         LR=1-LR
+         TLEN=TLEN+TL
+      ENDIF
+
+      TOTX=ABS(DIR(1)).LT.PTOT
+      TOTY=ABS(DIR(2)).LT.PTOT
+      CALL BAR_RAYTR(RF,DIR,MDN,TL,NX1,NY1,XB,YB,OK)
+      IF(.NOT.OK) RETURN
+      TOT=TOT.AND.(TOTX.OR.NX1.EQ.0).AND.(TOTY.OR.NY1.EQ.0)
+      TLEN=TLEN+TL
+
+      IF(QBAR_EXT(LR,MDN).GT.0) THEN
+         TOTX=ABS(DIR(1)).LT.PTOT
+         TOTY=ABS(DIR(2)).LT.PTOT
+         CALL EVOL_RAYTR(RF,DIR,MDN,TL,NX1,NY1,XE,YE,OK)
+         IF(.NOT.OK) RETURN
+         TOT=TOT.AND.(TOTX.OR.NX1.EQ.0).AND.(TOTY.OR.NY1.EQ.0)
+         TLEN=TLEN+TL
+      ENDIF
+
+      IF(QBAR_WIN(MDN).GT.0) THEN
+         TL=ABS(QBAR_WIN(MDN)/DIR(3))
+         DO I=1,3
+            RF(I)=RF(I)+TL*DIR(I)
+         ENDDO
+         TLEN=TLEN+TL
+      ENDIF      
+
+      END
+
+
       SUBROUTINE BAR_RAYTR(RF,DIR,MDN,TL,NX,NY,XD,YD,OK)
 
 c--   propagate photon to the bar end 
@@ -1043,6 +1166,7 @@ c--   propagate photon to mirror and do reflection
          Y=Y+Y0
       ELSE                      ! prism shaped
          CALL UNFOLD_EXTVOL(MDN,LR,KMIN,KMAX)
+         YSIZ=EXT_YUP(ID)-EXT_YDN(ID)
          Y0=(EXT_YUP(ID)+EXT_YDN(ID))/2
          IF(YD.GT.Y0) THEN
             K2=KMAX

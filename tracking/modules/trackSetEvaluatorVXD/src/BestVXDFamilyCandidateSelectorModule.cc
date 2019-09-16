@@ -40,7 +40,7 @@ void BestVXDFamilyCandidateSelectorModule::event()
   for (SpacePointTrackCand& sptc : m_spacePointTrackCands) {
     if (not sptc.hasRefereeStatus(SpacePointTrackCand::c_isActive)) continue;
 
-    float qi = sptc.getQualityIndex();
+    float qi = sptc.getQualityIndicator();
     unsigned short family = sptc.getFamily();
     auto iter = familyToCand.find(family);
     if (iter != familyToCand.end()) {

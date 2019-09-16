@@ -51,13 +51,14 @@ SVDPackerModule::SVDPackerModule() : Module(),
 
 
   // Parameter definitions
+  addParam("SVDEventInfo", m_svdEventInfoName, "Name of the SVDEventInfo object", string("SVDEventInfoSim"));
   addParam("svdShaperDigitListName", m_svdShaperDigitListName, "Name of the SVD Shaper Digits List", string(""));
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
   //addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", FileSystem::findFile("data/svd/svd_mapping.xml"));
   addParam("NodeID", m_nodeid, "Node ID", 0);
   addParam("FADCTriggerNumberOffset", m_FADCTriggerNumberOffset,
            "number to be added to the FADC trigger number to match the main trigger number", 0);
-  addParam("simulate3sampleData", m_simulate3sampleData, "Simulate 3-sample RAW Data", bool(false));
+  addParam("binPrintout", m_binPrintout, "Print binary data created by the Packer", bool(false));
   // initialize event #
   n_basf2evt = 0;
 
@@ -76,7 +77,7 @@ void SVDPackerModule::initialize()
   m_rawSVD.registerInDataStore(m_rawSVDListName);
   m_svdShaperDigit.isRequired(m_svdShaperDigitListName);
   m_eventMetaDataPtr.isRequired();
-
+  m_svdEventInfoPtr.isRequired(m_svdEventInfoName);
 }
 
 
@@ -103,18 +104,29 @@ void SVDPackerModule::beginRun()
 void SVDPackerModule::event()
 {
 
-  StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
-  StoreArray<SVDShaperDigit> svdShaperDigits(m_svdShaperDigitListName);
-
   if (!m_eventMetaDataPtr.isValid()) {  // give up...
     B2ERROR("Missing valid EventMetaData.");
     return;
   }
 
+  if (!m_svdEventInfoPtr.isValid()) {
+    B2ERROR("Missing valid SVDEventInfo.");
+    return;
+  }
+
+  // retrieve the information from SVDEventInfo to store it in the FADCHeaders for this event
+  SVDModeByte modeByte = m_svdEventInfoPtr->getModeByte();
+
+  uint8_t triggerBin = modeByte.getTriggerBin();
+  uint8_t runType = modeByte.getRunType();
+  uint8_t eventType = modeByte.getEventType();
+  uint8_t daqMode = modeByte.getDAQMode();
+
+  uint8_t xTalk = m_svdEventInfoPtr->isCrossTalkEvent();
+  uint8_t triggerType = (m_svdEventInfoPtr->getTriggerType()).getType();
 
 
-  rawSVDList.clear();
-
+  m_rawSVD.clear();
 
   if (! m_map) {
     B2ERROR("xml map not loaded, going to the next module");
@@ -132,7 +144,7 @@ void SVDPackerModule::event()
   rawcprpacker_info.b2l_ctime = 0x7654321;
 
 
-  unsigned int nEntries_SVDShaperDigits = svdShaperDigits.getEntries();
+  unsigned int nEntries_SVDShaperDigits = m_svdShaperDigit.getEntries();
 
   // DataInfo contains info on 6 samples and strip number
   vector<DataInfo> (*fadc_apv_matrix)[48] = new
@@ -140,7 +152,7 @@ void SVDPackerModule::event()
 
   for (unsigned int i = 0; i < nEntries_SVDShaperDigits; i++) {
 
-    const SVDShaperDigit* hit = svdShaperDigits[i];
+    const SVDShaperDigit* hit = m_svdShaperDigit[i];
 
     short int cellID = hit->getCellID();
     VxdID sensID = hit->getSensorID();
@@ -155,6 +167,9 @@ void SVDPackerModule::event()
     unsigned short fadc = CHIP_info.fadc;
     unsigned short apv = CHIP_info.apv;
     unsigned short apvChannel = CHIP_info.apvChannel;
+
+    //do not create data words for APV missing in the hardware mapping
+    if (fadc == 0) continue;
 
     // return 0-47 for given FADC number
     auto fadcIter = FADCnumberMap.find(fadc);
@@ -174,22 +189,13 @@ void SVDPackerModule::event()
   }// end of the loop that fills fadc_apv_matrix !!!!
 
 
-  bool sim3sample;
-
   for (unsigned int iFADC = 0; iFADC < nFADCboards; iFADC++) {
-
-    iCRC = 0;
-    sim3sample = false;
 
     //get original FADC number
     unsigned short FADCorg = FADCnumberMapRev[iFADC];
 
-    // if m_simulate3sampleData==true, 3-sample data will be simulated for FADCs: 168,144,48,24
-    if (m_simulate3sampleData and FADCorg % 24 == 0) sim3sample = true;
-
-
     //new RawSVD entry --> moved inside FADC loop
-    RawSVD* raw_svd = rawSVDList.appendNew();
+    RawSVD* raw_svd = m_rawSVD.appendNew();
     data_words.clear();
 
 
@@ -198,7 +204,7 @@ void SVDPackerModule::event()
     // here goes FTB header
     data32 = 0xffaa0000;
 
-    //adds data32 to data vector and to crc16Input for further crc16 calculation
+    //adds data32 to data vector
     addData32(data32);
 
     m_FTBHeader.errorsField = 0xf0;
@@ -208,16 +214,14 @@ void SVDPackerModule::event()
 
     // here goes FADC header
     m_MainHeader.trgNumber = ((m_eventMetaDataPtr->getEvent() - m_FADCTriggerNumberOffset) & 0xFF);
-    m_MainHeader.trgType = 0xf;
-    m_MainHeader.trgTiming = 0;
-    m_MainHeader.onebit = 0;
+    m_MainHeader.trgType = triggerType;
+    m_MainHeader.trgTiming = triggerBin;
+    m_MainHeader.xTalk = xTalk;
     m_MainHeader.FADCnum = FADCorg; // write original FADC number
-    m_MainHeader.evtType = 0;
+    m_MainHeader.evtType = eventType;
+    m_MainHeader.DAQMode = daqMode;
 
-    m_MainHeader.DAQMode = 2;
-    if (sim3sample) m_MainHeader.DAQMode = 1;
-
-    m_MainHeader.runType = 0x2; //zero-suppressed mode
+    m_MainHeader.runType = runType; //zero-suppressed mode
     m_MainHeader.check = 6; // 110
 
     addData32(data32);
@@ -252,7 +256,7 @@ void SVDPackerModule::event()
           // here go DATA words
 
           //skip 1st data frame if simulate 3-sample data
-          if (not sim3sample) {
+          if (daqMode == 2) {
             m_data_A.sample1 = apv_data->data[0];
             m_data_A.sample2 = apv_data->data[1];
             m_data_A.sample3 = apv_data->data[2];
@@ -276,8 +280,9 @@ void SVDPackerModule::event()
     } // end APV loop
 
     // here goes FADC trailer
-    m_FADCTrailer.FTBFlags = 0x001f;
-    m_FADCTrailer.emPipeAddr = 0;
+    m_FADCTrailer.FTBFlags = 0;
+    m_FADCTrailer.dataSizeCut = 0;
+    m_FADCTrailer.nullDigits = 0;
     m_FADCTrailer.fifoErrOR = 0;
     m_FADCTrailer.frameErrOR = 0;
     m_FADCTrailer.detectErrOR = 0;
@@ -289,14 +294,15 @@ void SVDPackerModule::event()
 
     // crc16 calculation
     //first swap all 32-bits word -> big endian
-    uint32_t tmpBuffer[iCRC];
+    unsigned short nCRC = data_words.size();
+    uint32_t tmpBuffer[nCRC];
 
-    for (unsigned short i = 0; i < iCRC; i++)
-      tmpBuffer[i] = htonl(crc16Input[i]);
+    for (unsigned short i = 0; i < nCRC; i++)
+      tmpBuffer[i] = htonl(data_words[i]);
 
     //compute crc16
     boost::crc_basic<16> bcrc(0x8005, 0xffff, 0, false, false);
-    bcrc.process_block(tmpBuffer, tmpBuffer + iCRC);
+    bcrc.process_block(tmpBuffer, tmpBuffer + nCRC);
     unsigned int crc = bcrc.checksum();
 
 
@@ -304,7 +310,7 @@ void SVDPackerModule::event()
     m_FTBTrailer.crc16 = crc;
     m_FTBTrailer.controlWord = 0xff55;
 
-    data_words.push_back(data32);
+    addData32(data32);
 
 
     // ******* modified and moved inside FADC loop **********
@@ -337,7 +343,7 @@ void SVDPackerModule::event()
   } // end FADC loop
 
 
-  //binPrintout(data_words.size());
+  if (m_binPrintout) binPrintout(data_words.size());
 
   delete [] fadc_apv_matrix;
 
@@ -369,7 +375,7 @@ void SVDPackerModule::binPrintout(unsigned int nwords)
 
     uint32_t ulFlag = 1 << (sizeof(data_words[j]) * 8 - 1);
     for (; ulFlag > 0; ulFlag >>= 1)
-      printf("%d", data_words[j] & ulFlag ? 1 : 0);
+      printf("%d", (data_words[j] & ulFlag) ? 1 : 0);
 
     cout << endl;
   }

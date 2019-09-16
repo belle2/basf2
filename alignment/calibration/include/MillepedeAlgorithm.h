@@ -14,7 +14,8 @@
 #include <alignment/PedeResult.h>
 #include <alignment/PedeApplication.h>
 #include <alignment/dataobjects/PedeSteering.h>
-#include <boost/python/list.hpp>
+
+#include <alignment/GlobalTimeLine.h>
 
 namespace Belle2 {
   /**
@@ -41,19 +42,70 @@ namespace Belle2 {
     /// Add (false) or subtract (true) corrections to previous values?
     void invertSign(bool use_subtraction = true) {m_invertSign = use_subtraction;}
 
-    /// Set components (BeamParameters...) to calibrate or empty for all available in data
+    /// Set components (BeamSpot...) to calibrate or empty for all available in data
     void setComponents(const std::vector<std::string>& components) {m_components = components;}
 
     /// Report failure(false) or success (true) even if some parameters could not be determined
     void ignoreUndeterminedParams(bool ignore = true) {m_ignoreUndeterminedParams = ignore;}
 
+    /// Set the events at which payloads can change for time-dep calibration (translation from
+    /// time IDs (aka continuous subruns) to EventMetaData (and later IoVs))
+    void setEvents(const std::vector<EventMetaData>& events) {m_events = events;}
+
+    /// Set minimum entries - for less algo will not run, but report NotEnoughData.
+    /// Use -1 for no cut (default)
+    void setMinEntries(int minEntries) {m_minEntries = minEntries;}
+
+    /// Setup the complete time dependence of parameters at once (ensures consistency) (Python version)
+    ///
+    /// (Calls GlobalLabel static functions internally to fill its timedep. map)
+    ///
+    /// @param config python list of tuples of size 2, first element is list of parameter numbers
+    /// retrieved by GlobalLabel.construct(payload id (uid), element id, param id) (with empty timedep map)
+    /// second is list of event metadata as tuple of size 3 (event, run, exp)
+    /// For example:
+    ///
+    /// >>> config = [([1, 2], [(0, 0, 0), (111, 0, 0)]), ([3], (0, 3, 0))]
+    /// >>> setupTimedepGlobalLabels(config)
+    ///
+    /// will define parameters 1 and 2 to timedep with values changing at event 0 and 111 of run 0 exp 0
+    /// and (added automatically) at event 0 of run 1. Parameter 3 can change its value from run 2 to 3.
+    ///
+    /// Overrides the event slicing defined by setEvents()
+    ///
+    void setTimedepConfig(PyObject* config) {setEvents(alignment::timeline::setupTimedepGlobalLabels(config));}
+
+    /// Setup the complete time dependence of parameters at once (ensures consistency) (C++ version)
+    ///
+    /// (Calls GlobalLabel static functions internally to fill its timedep. map)
+    ///
+    /// @param config vector of tuples of size 2, first element is vector of parameter numbers
+    /// retrieved by GlobalLabel.construct(payload id (uid), element id, param id) (with empty timedep map)
+    /// second is vector of event metadata as tuple of size 3 (event, run, exp)
+    /// For example:
+    ///
+    ///     setupTimedepGlobalLabels
+    ///     (
+    ///         {{{1, 2}, {{0, 0, 0}, {111, 0, 0}}}, {{3}, {0, 3, 0}}}
+    ///     );
+    ///
+    /// will define parameters 1 and 2 to be timedep with values changing at event 0 and 111 of run 0 exp 0
+    /// and (added automatically) at event 0 of run 1. Parameter 3 can change its value from run 2 to 3.
+    ///
+    /// Overrides the event slicing defined by setEvents()
+    ///
+    void setTimedepConfig(std::vector< std::tuple< std::vector<int>, std::vector< std::tuple<int, int, int> > > >& config)
+    {
+      setEvents(alignment::timeline::setupTimedepGlobalLabels(config));
+    }
+
   protected:
 
     /// Run algo on data
-    virtual EResult calibrate();
+    virtual EResult calibrate() override;
 
   private:
-    /// Components (BeamParameters...) to calibrate or empty for all available in data
+    /// Components (BeamSpot...) to calibrate or empty for all available in data
     std::vector<std::string> m_components{};
     /// Add (true) or subtract (false) corrections?
     bool m_invertSign{false};
@@ -65,27 +117,15 @@ namespace Belle2 {
     alignment::PedeApplication m_pede{};
     /// Report failure(false) or success (true) even if some parameters could not be determined
     bool m_ignoreUndeterminedParams{false};
-
-    /// Convert IOV to string (to be able to use it as a key in map)
-    std::string to_string(const IntervalOfValidity& iov)
-    {
-      std::stringstream stream;
-      stream << iov;
-      return stream.str();
-    }
-
-    /// Convert string to IOV (to convert map key back to IOV)
-    IntervalOfValidity to_IOV(const std::string& iov)
-    {
-      std::stringstream stream;
-      stream << iov;
-      IntervalOfValidity IOV;
-      stream >> IOV;
-      return IOV;
-    }
+    /// The events at which payloads can change for time-dep calibration (translation from
+    /// time IDs (aka continuous subruns) to EventMetaData (and later IoVs))
+    std::vector<EventMetaData> m_events{};
 
     /// Write out binary files from data in tree with GBL data to be used by Millepede and add them to steering
     void prepareMilleBinary();
+
+    /// Minimum entries collected - report NotEnoughData for less
+    int m_minEntries{ -1};
 
   };
 } // namespace Belle2

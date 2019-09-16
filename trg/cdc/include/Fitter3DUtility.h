@@ -55,6 +55,19 @@ public:
   static void calPhi(std::map<std::string, double> const& mConstD, std::map<std::string, std::vector<double> > const& mConstV,
                      std::map<std::string, Belle2::TRGCDCJSignal>& mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT* >& mLutStorage);
 
+  /// Saves stereo Xt to file
+  static void saveStereoXt(std::vector<std::vector<double> >& stXts, std::string const& filePrefix);
+
+  /// Load stereo Xt file
+  static void loadStereoXt(std::string const& filePrefix, int nFiles, std::vector<std::vector<double> >& stXts);
+
+  /// Converts stereo ts id to phi
+  static double stereoIdToPhi(std::vector<double>& stNWires, int iSt, int id);
+
+  /// Calculates phi with fast simulation
+  static void calPhiFast(std::map<std::string, std::vector<double> >& stGeometry, std::vector<std::vector<double> > const& stXts,
+                         int eventTimeValid, int eventTime, std::vector<std::vector<int> > const& rawStTSs, std::vector<double>& stTSs);
+
   /// Rotates to range [-pi, pi]
   static double rotatePhi(double value, double refPhi);
 
@@ -66,6 +79,9 @@ public:
 
   /// Finds quadrant of angle. Angle is in rad.
   static int findQuadrant(double value);
+
+  /// Sets error for fitting
+  static void setErrorFast(std::vector<std::vector<int> > const& rawStTSs, int eventTimeValid, std::vector<double>& invZError2);
 
   /// Sets error using JSignal class.
   static void setError(std::map<std::string, double> const& mConstD, std::map<std::string, std::vector<double> > const& mConstV,
@@ -114,6 +130,27 @@ public:
   /// Fits z and arc S using JSingal with multiple constants.
   static void rSFit(std::map<std::string, double> const& mConstD, std::map<std::string, std::vector<double> > const& mConstV,
                     std::map<std::string, Belle2::TRGCDCJSignal>& mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT* >& mLutStorage);
+
+  /// Combines several functions for fitter3D
+  static void fitter3D(std::map<std::string, std::vector<double> >& stGeometry, std::vector<std::vector<double> > const& stXts,
+                       int eventTimeValid, int eventTime,
+                       std::vector<std::vector<int> > const& rawStTSs,
+                       int charge, double radius, double phi_c, double& z0, double& cot, double& chi2);
+  /// Combines several functions for fitter3D. Also outputs arcS, zz and invZError2.
+  static void fitter3D(std::map<std::string, std::vector<double> >& stGeometry, std::vector<std::vector<double> > const& stXts,
+                       int eventTimeValid, int eventTime,
+                       std::vector<std::vector<int> > const& rawStTSs,
+                       int charge, double radius, double phi_c, double& z0, double& cot, double& chi2,
+                       std::vector<double>& arcS, std::vector<double>& zz, std::vector<double>& invZError2);
+
+  /// Combines several functions for fitter3D firmware
+  static void fitter3DFirm(std::map<std::string, double>& mConstD, std::map<std::string, std::vector<double> >& mConstV,
+                           int eventTimeValid, int eventTime,
+                           std::vector<std::vector<int> > const& rawStTSs,
+                           int charge, double radius, double phi_c,
+                           Belle2::TRGCDCJSignalData* commonData, std::map<std::string, Belle2::TRGCDCJSignal>& mSignalStorage,
+                           std::map<std::string, Belle2::TRGCDCJLUT*>& mLutStorage);
+
 
   /// MC calculation functions
   /// Calculates the impact position of track.

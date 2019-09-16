@@ -28,43 +28,57 @@ namespace Belle2 {
 
 // forward declarations
 
+  /// TRGCDCLpar class
   class TRGCDCLpar {
     // friend classes and functions
 
   public:
     // constants, enums and typedefs
 
-    // Constructors and destructor
+    /// Constructor
     TRGCDCLpar();
 
+    /// Destructor
     virtual ~TRGCDCLpar();
 
-    // assignment operator(s)
+    /// assignment operator(s)
     inline const TRGCDCLpar& operator=(const TRGCDCLpar&);
 
-    // member functions
+    /// member functions
     inline void neg();
+    /// circle
     void circle(double x1, double y1, double x2, double y2,
                 double x3, double y3);
 
-    // const member functions
+    /// const member functions
     double kappa() const { return m_kappa; }
+    /// const member functions
     double radius() const { return 0.5 / std::fabs(m_kappa);}
+    /// const member functions
     CLHEP::HepVector center() const;
+    /// const member functions
     double s(double x, double y) const;
+    /// const member functions
     inline double d(double x, double y) const;
+    /// const member functions
     inline double dr(double x, double y) const;
+    /// const member functions
     double s(double r, int dir = 0) const;
+    /// const member functions
     double phi(double r, int dir = 0) const;
+    /// const member functions
     inline int sd(double r, double x, double y,
                   double limit, double& s, double& d) const;
+    /// const member functions
     inline CLHEP::HepVector Hpar(const HepGeom::Point3D<double>&   pivot) const;
 
     // static member functions
 
-    // friend functions and classes
+    /// friend functions and classes
     friend class TRGCDCLpav;
+    /// ostream operator
     friend std::ostream& operator<<(std::ostream& o, TRGCDCLpar&);
+    /// intersection
     friend int intersect(const TRGCDCLpar&, const TRGCDCLpar&, CLHEP::HepVector&, CLHEP::HepVector&);
 
   protected:
@@ -73,62 +87,96 @@ namespace Belle2 {
     // protected const member functions
 
   private:
-    // Private class cpar
+    /// Private class cpar
     class Cpar {
     public:
-      Cpar(const TRGCDCLpar&);
+      /// constructor  of Cpar class
+      explicit Cpar(const TRGCDCLpar&);
+      /// returns parameter of Cpar class
       double xi() const { return 1 + 2 * m_cu * m_da; }
+      /// returns parameter of Cpar class
       double sfi() const { return m_sfi; }
+      /// returns parameter of Cpar class
       double cfi() const { return m_cfi; }
+      /// returns parameter of Cpar class
       double da() const { return m_da; }
+      /// returns parameter of Cpar class
       double cu() const { return m_cu; }
+      /// returns parameter of Cpar class
       double fi() const { return m_fi; }
     private:
+      /// parameter of Cpar class
       double m_cu;
+      /// parameter of Cpar class
       double m_fi;
+      /// parameter of Cpar class
       double m_da;
+      /// parameter of Cpar class
       double m_sfi;
+      /// parameter of Cpar class
       double m_cfi;
     };
     friend class TRGCDCLpar::Cpar;
-    // Constructors and destructor
+    /// Constructors and destructor
     inline TRGCDCLpar(const TRGCDCLpar&);
 
-    // comparison operators
+    /// comparison operators
     bool operator==(const TRGCDCLpar&) const;
+    /// comparison operators
     bool operator!=(const TRGCDCLpar&) const;
 
-    // private member functions
+    /// private member functions
     void scale(double s) { m_kappa /= s; m_gamma *= s; }
+    /// private member functions
     inline void rotate(double c, double s);
+    /// private member functions
     inline void move(double x, double y);
 
-    // private const member functions
+    /// private const member functions
     double alpha() const { return m_alpha; }
+    /// private const member functions
     double beta() const { return m_beta; }
+    /// private const member functions
     double gamma() const { return m_gamma; }
+    /// private const member functions
     inline double check() const;
+    /// private const member functions
     CLHEP::HepMatrix dldc() const;
+    /// private const member functions
     inline double d0(double x, double y) const;
+    /// private const member functions
     double kr2g(double r) const { return m_kappa * r * r + m_gamma; }
+    /// private const member functions
     double x(double r) const;
+    /// private const member functions
     double y(double r) const;
+    /// private const member functions
     void xhyh(double x, double y, double& xh, double& yh) const;
+    /// private const member functions
     double xi2() const { return 1 + 4 * m_kappa * m_gamma; }
+    /// private const member functions
     bool xy(double, double&, double&, int dir = 0) const;
+    /// private const member functions
     inline double r_max() const;
+    /// private const member functions
     double xc() const { return - m_alpha / 2 / m_kappa; }
+    /// private const member functions
     double yc() const { return - m_beta / 2 / m_kappa; }
+    /// private const member functions
     double da() const {  return 2 * gamma() / (std::sqrt(xi2()) + 1); }
+    /// private const member functions
     inline double arcfun(double xh, double yh) const;
 
-    // data members
+    /// data members
     double m_alpha;
+    /// data members
     double m_beta;
+    /// data members
     double m_gamma;
+    /// data members
     double m_kappa;
 
-
+    /// belle alpha
     static const double BELLE_ALPHA;
 
     // static data members

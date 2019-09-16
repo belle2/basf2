@@ -40,13 +40,13 @@ namespace Belle2 {
   class PyDBArray: private DBAccessorBase {
   public:
     /** Construct the array from the name of the payload */
-    explicit PyDBArray(const std::string& name);
+    explicit PyDBArray(const std::string& name, bool required = true);
     /** Construct the array from the type of the payload, payload name will be
      * the class name */
-    explicit PyDBArray(const TClass* objClass);
+    explicit PyDBArray(const TClass* objClass, bool required = true);
     /** Construct the array from the name of the payload and make sure the
      * class if compatible with objClass */
-    explicit PyDBArray(const std::string& name, const TClass* objClass);
+    explicit PyDBArray(const std::string& name, const TClass* objClass, bool required = true);
 
     using DBAccessorBase::isValid;
     using DBAccessorBase::operator bool;
@@ -62,8 +62,5 @@ namespace Belle2 {
      * protected method and we add a pure python method to wrap the object in
      * something to guarantee constness in framework/scripts/basf2.py */
     const TObject* _get(int i) const;
-  private:
-    /** Pointer to the actual array */
-    TClonesArray** m_array;
   };
 }

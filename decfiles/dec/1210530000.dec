@@ -1,0 +1,25 @@
+# EventType: 1210530000
+# Descriptor: [B+ -> pi+ e+ e-] cc
+# NickName: Bu_piee
+# Documentation: Rare b->dll process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Saurabh Sandilya
+# Email: saurabhsandilya@gmail.com
+# Cuts: None
+# Date: 2018113
+#
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0  pi+  e+ e- PHOTOS BTOSLLBALL 6;
+Enddecay
+CDecay B-sig
+
+#
+End
+

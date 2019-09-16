@@ -7,13 +7,14 @@
  *                                                                        *
  **************************************************************************/
 
-#ifndef PXDDigitizerModule_H
-#define PXDDigitizerModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDSimHit.h>
+#include <pxd/dataobjects/PXDInjectionBGTiming.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <framework/dataobjects/RelationElement.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <TRandom.h>
 #include <string>
 #include <set>
@@ -114,6 +115,9 @@ namespace Belle2 {
       double addNoise(double charge);
       /** Save all digits to the datastore */
       void saveDigits();
+      /** Check if gate was read while in gated mode */
+      bool checkIfGated(int gate);
+
 
       /** Initialize the module and check the parameters */
       void initialize() override final;
@@ -153,6 +157,15 @@ namespace Belle2 {
       /** Wether or not to apply a time window cut */
       bool   m_applyWindow;
 
+      /** Digits from gated rows not sent to DHH */
+      bool m_gatingWithoutReadout;
+      /** Time window during which digits from gated rows are not sent to DHH */
+      double m_gatingWithoutReadoutTime;
+      /** Time window during which the PXD is not collecting charge */
+      double m_gatingTime;
+      /** Hardware delay between time of bunch crossing and switching on triggergate in ns*/
+      double m_hwdelay;
+
       /** Max. Segment length to use for charge drifting */
       double m_segmentLength;
       /** Max number of electrons per random walk */
@@ -191,10 +204,28 @@ namespace Belle2 {
       /** Current magnetic field */
       TVector3 m_currentBField;
 
+      /** Number of readout gates (or total number of Switcher channels) */
+      int m_nGates;
+      /** Integration time for each gate of the PXD in ns*/
+      double m_pxdIntegrationTime;
+      /** Time needed to sample and clear a readout gate  */
+      double m_timePerGate;
+      /** PXD triggergate */
+      int m_triggerGate;
+      /** Gated mode flag */
+      bool m_gated;
+      /** Vector of start times for gating */
+      std::vector<float> m_gatingStartTimes;
+      /** Vector of gated readout channels  */
+      std::vector<std::pair<int, int> > m_gatedChannelIntervals;
+
+    private:
+      /** Input array for timings. */
+      StoreObjPtr<PXDInjectionBGTiming> m_storePXDTiming;
+
     };//end class declaration
 
 
   } // end namespace PXD
 } // end namespace Belle2
 
-#endif // PXDDigitizerModule_H

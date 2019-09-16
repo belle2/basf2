@@ -25,9 +25,13 @@ namespace Belle2 {
 #define TCFitter TRGCDCFitter
 #endif
 
+/// parameter to identify fit result
 #define TRGCDCFitAlreadyFitted 1;
+/// parameter to identify fit result
 #define TRGCDCFitErrorFewHits -1;
+/// parameter to identify fit result
 #define TRGCDCFitFailed       -2;
+/// parameter to identify fit result
 #define TRGCDCFitUnavailable  -3;
 
 /// A class to fit a TRGCDCTrackBase object.
@@ -43,10 +47,12 @@ namespace Belle2 {
   public:// Selectors
     /// returns name.
     const std::string& name(void) const;
+    /// dump debug info
     void dump(const std::string& message = std::string(""),
               const std::string& prefix = std::string("")) const;
 
-  public:// Fit functions.
+  public:
+    /// Fit functions.
     virtual int fit(TRGCDCTrackBase&) const = 0;
 
   protected:
@@ -54,6 +60,7 @@ namespace Belle2 {
     void fitDone(TRGCDCTrackBase&) const;
 
   private:
+    /// name
     std::string _name;
   };
 

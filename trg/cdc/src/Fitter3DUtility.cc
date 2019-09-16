@@ -14,6 +14,7 @@
 #include <utility>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include "TLorentzVector.h"
 #include "TVector3.h"
 #include "TVector2.h"
@@ -30,6 +31,9 @@ using std::stringstream;
 using std::to_string;
 using std::get;
 using std::function;
+using std::ofstream;
+using std::ifstream;
+using std::make_tuple;
 
 int Fitter3DUtility::findSign(double* phi2)
 {
@@ -538,6 +542,72 @@ void Fitter3DUtility::calPhi(std::map<std::string, double> const& mConstD,
 
 }
 
+void Fitter3DUtility::saveStereoXt(std::vector<std::vector<double> >& stXts, string const& filePrefix)
+{
+  for (unsigned iSt = 0; iSt < stXts.size(); ++iSt) {
+    string filename = filePrefix + ".st" + to_string(iSt);
+    ofstream xtFile;
+    cout << "Fitter3DUtility::saveStereoXt() Saving xt file to " << filename << endl;
+    xtFile.open(filename);
+    for (unsigned iTick = 0; iTick < stXts[iSt].size(); ++iTick) {
+      xtFile << stXts[iSt][iTick] << endl;
+    }
+    xtFile.close();
+  }
+}
+
+void Fitter3DUtility::loadStereoXt(string const& filePrefix, int nFiles, std::vector<std::vector<double> >& stXts)
+{
+  stXts = vector<vector<double> > (nFiles);
+  for (unsigned iSt = 0; iSt < stXts.size(); ++iSt) {
+    string filename = filePrefix + ".st" + to_string(iSt);
+    ifstream xtFile;
+    xtFile.open(filename.c_str());
+    if (xtFile.fail()) {
+      cout << "Fitter3DUtility::loadStereoXt() Cannot load " << filename << endl;
+      return;
+    }
+    string line;
+    while (getline(xtFile, line)) {
+      stXts[iSt].push_back(std::stof(line));
+    }
+    xtFile.close();
+  }
+}
+
+double Fitter3DUtility::stereoIdToPhi(vector<double>& stNWires, int iSt, int id)
+{
+  return (double)id / stNWires[iSt] * 4 * M_PI;
+}
+
+// rawStTSs[iSt] = [TS ID, TS LR, TS driftTime]
+// stTSs is 9999 when not valid
+void Fitter3DUtility::calPhiFast(map<string, vector<double> >& stGeometry, vector<vector<double> > const& stXts, int eventTimeValid,
+                                 int eventTime, vector<vector<int> > const& rawStTSs, vector<double>& stTSs)
+{
+  stTSs = vector<double> (4, 9999);
+  if (eventTimeValid == 0) {
+    for (unsigned iSt = 0; iSt < 4; iSt++) {
+      stTSs[iSt] = stereoIdToPhi(stGeometry["nWires"], iSt, rawStTSs[iSt][0]);
+    }
+  } else {
+    //cout<<"eventTime: "<<eventTime;
+    for (unsigned iSt = 0; iSt < 4; iSt++) {
+      if (rawStTSs[iSt][1] != 0) {
+        // Get drift length from table.
+        int t = rawStTSs[iSt][2] - eventTime;
+        //cout<<" iSt:"<<iSt<<" rt: "<<rawStTSs[iSt][2];
+        if (t < 0) t = 0;
+        if (t > 511) t = 511;
+        double driftLength = stXts[iSt][t];
+        stTSs[iSt] = Fitter3DUtility::calPhi(stereoIdToPhi(stGeometry["nWires"], iSt, rawStTSs[iSt][0]), driftLength,
+                                             stGeometry["cdcRadius"][iSt], rawStTSs[iSt][1]);
+      }
+    }
+    //cout<<endl;
+  }
+}
+
 double Fitter3DUtility::rotatePhi(double value, double refPhi)
 {
   double Trg_PI = 3.141592653589793;
@@ -590,6 +660,26 @@ int Fitter3DUtility::findQuadrant(double value)
   else if (value > -Trg_PI / 2) result = 4;
   else if (value > -Trg_PI) result = 3;
   return result;
+}
+
+
+// rawStTSs[iSt] = [TS ID, TS LR, TS driftTime]
+void Fitter3DUtility::setErrorFast(std::vector<std::vector<int> > const& rawStTSs, int eventTimeValid,
+                                   std::vector<double>& invZError2)
+{
+  vector<double> driftZError({0.7676, 0.9753, 1.029, 1.372});
+  vector<double> wireZError({0.7676, 0.9753, 1.029, 1.372});
+  vector<double> zError(4, 9999);
+  invZError2 = vector<double> (4, 0);
+  for (unsigned iSt = 0; iSt < 4; ++iSt) {
+    if (rawStTSs[iSt][1] != 0) {
+      // Check LR and eventTime
+      if (rawStTSs[iSt][1] != 3 && eventTimeValid != 0) zError[iSt] = driftZError[iSt];
+      else zError[iSt] = wireZError[iSt];
+      // Get inverse zerror ^ 2
+      invZError2[iSt] = 1 / pow(zError[iSt], 2);
+    }
+  }
 }
 
 void Fitter3DUtility::setError(std::map<std::string, double> const& mConstD,
@@ -1515,6 +1605,100 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const& mConstD,
   if (mConstD.at("JB") == 1) {cout << "<<<cot>>>" << endl; mSignalStorage["cot"].dump();}
   if (mConstD.at("JB") == 1) {cout << "<<<z0>>>" << endl; mSignalStorage["z0"].dump();}
 
+  // Constrain z0 to [-30,30]
+  double z0Min = -30;
+  double z0Max = 30;
+  // Calculate z0Max and z0Min
+  if (mSignalStorage.find("z0Min") == mSignalStorage.end()) {
+    mSignalStorage["z0Min"] = Belle2::TRGCDCJSignal(z0Min, mSignalStorage["z0"].getToReal(), commonData);
+    mSignalStorage["z0Max"] = Belle2::TRGCDCJSignal(z0Max, mSignalStorage["z0"].getToReal(), commonData);
+  }
+  {
+    // Make ifElse data.
+    vector<pair<Belle2::TRGCDCJSignal, vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > > > t_data;
+    // Compare
+    Belle2::TRGCDCJSignal t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage["z0"], ">", mSignalStorage["z0Max"]);
+    // Assignments
+    vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > t_assigns = {
+      make_pair(&mSignalStorage["z0_c"], mSignalStorage["z0Max"])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare
+    t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage["z0"], ">", mSignalStorage["z0Min"]);
+    // Assignments
+    t_assigns = {
+      make_pair(&mSignalStorage["z0_c"], mSignalStorage["z0"].limit(mSignalStorage["z0Min"], mSignalStorage["z0Max"]))
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare
+    t_compare = Belle2::TRGCDCJSignal();
+    // Assignments
+    t_assigns = {
+      make_pair(&mSignalStorage["z0_c"], mSignalStorage["z0Min"])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    Belle2::TRGCDCJSignal::ifElse(t_data);
+  }
+  //cout<<"<<<z0Min>>>"<<endl; mSignalStorage["z0Min"].dump();
+  //cout<<"<<<z0Max>>>"<<endl; mSignalStorage["z0Max"].dump();
+  //cout<<"<<<z0_c>>>"<<endl; mSignalStorage["z0_c"].dump();
+  // Constraint cot to [-0.753, 1.428]
+  double cotMin = cos(127 * mConstD.at("Trg_PI") / 180) / sin(127 * mConstD.at("Trg_PI") / 180);
+  double cotMax = cos(35 * mConstD.at("Trg_PI") / 180) / sin(35 * mConstD.at("Trg_PI") / 180);
+  if (mSignalStorage.find("cotMin") == mSignalStorage.end()) {
+    mSignalStorage["cotMin"] = Belle2::TRGCDCJSignal(cotMin, mSignalStorage["cot"].getToReal(), commonData);
+    mSignalStorage["cotMax"] = Belle2::TRGCDCJSignal(cotMax, mSignalStorage["cot"].getToReal(), commonData);
+  }
+  {
+    // Make ifElse data.
+    vector<pair<Belle2::TRGCDCJSignal, vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > > > t_data;
+    // Compare
+    Belle2::TRGCDCJSignal t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage["cot"], ">", mSignalStorage["cotMax"]);
+    // Assignments
+    vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > t_assigns = {
+      make_pair(&mSignalStorage["cot_c"], mSignalStorage["cotMax"])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare
+    t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage["cot"], ">", mSignalStorage["cotMin"]);
+    // Assignments
+    t_assigns = {
+      make_pair(&mSignalStorage["cot_c"], mSignalStorage["cot"].limit(mSignalStorage["cotMin"], mSignalStorage["cotMax"]))
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare
+    t_compare = Belle2::TRGCDCJSignal();
+    // Assignments
+    t_assigns = {
+      make_pair(&mSignalStorage["cot_c"], mSignalStorage["cotMin"])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    Belle2::TRGCDCJSignal::ifElse(t_data);
+  }
+  //cout<<"<<<cotMin>>>"<<endl; mSignalStorage["cotMin"].dump();
+  //cout<<"<<<cotMax>>>"<<endl; mSignalStorage["cotMax"].dump();
+  //cout<<"<<<cot_c>>>"<<endl; mSignalStorage["cot_c"].dump();
+  // Reduce number of bits for z0 to 11 bits and cot to 11 bits
+  int z0Bits = 11;
+  int cotBits = 11;
+  {
+    int z0Shift = mSignalStorage["z0_c"].getBitsize() - z0Bits;
+    mSignalStorage["z0_r"] <= mSignalStorage["z0_c"].shift(z0Shift, 0);
+    int cotShift = mSignalStorage["cot_c"].getBitsize() - cotBits;
+    mSignalStorage["cot_r"] <= mSignalStorage["cot_c"].shift(cotShift, 0);
+  }
+  //cout<<"<<<z0_c>>>"<<endl; mSignalStorage["z0_c"].dump();
+  //cout<<"<<<cot_c>>>"<<endl; mSignalStorage["cot_c"].dump();
+  //cout<<"<<<z0_r>>>"<<endl; mSignalStorage["z0_r"].dump();
+  //cout<<"<<<cot_r>>>"<<endl; mSignalStorage["cot_r"].dump();
+
+
   // fitDistFromZ0[i] = cot*arcS[i]
   for (unsigned iSt = 0; iSt < 4; iSt++) {
     mSignalStorage["fitDistFromZ0_" + to_string(iSt)] <= mSignalStorage["cot"] * mSignalStorage["arcS_" + to_string(iSt)];
@@ -1602,6 +1786,134 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const& mConstD,
   // chi2Sum = chi2Sum_p1_0 + chi2Sum_p1_1
   mSignalStorage["zChi2"] <= (mSignalStorage["chi2Sum_p1_0"] + mSignalStorage["chi2Sum_p1_1"]).shift(1);
   if (mConstD.at("JB") == 1) {cout << "<<<zChi2>>>" << endl; mSignalStorage["zChi2"].dump();}
+
+  // Constrain zChi2 to [0, 100]
+  double zChi2Min = 0;
+  double zChi2Max = 100;
+  int zChi2Bits = 4;
+  // Calculate zChi2Max and zChi2Min
+  if (mSignalStorage.find("zChi2Min") == mSignalStorage.end()) {
+    mSignalStorage["zChi2Min"] = Belle2::TRGCDCJSignal(zChi2Min, mSignalStorage["zChi2"].getToReal(), commonData);
+    mSignalStorage["zChi2Max"] = Belle2::TRGCDCJSignal(zChi2Max, mSignalStorage["zChi2"].getToReal(), commonData);
+  }
+  {
+    // Make ifElse data.
+    vector<pair<Belle2::TRGCDCJSignal, vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > > > t_data;
+    // Compare
+    Belle2::TRGCDCJSignal t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage["zChi2"], ">", mSignalStorage["zChi2Max"]);
+    // Assignments
+    vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > t_assigns = {
+      make_pair(&mSignalStorage["zChi2_c"], mSignalStorage["zChi2Max"])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare
+    t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage["zChi2"], ">", mSignalStorage["zChi2Min"]);
+    // Assignments
+    t_assigns = {
+      make_pair(&mSignalStorage["zChi2_c"], mSignalStorage["zChi2"].limit(mSignalStorage["zChi2Min"], mSignalStorage["zChi2Max"]))
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare
+    t_compare = Belle2::TRGCDCJSignal();
+    // Assignments
+    t_assigns = {
+      make_pair(&mSignalStorage["zChi2_c"], mSignalStorage["zChi2Min"])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    Belle2::TRGCDCJSignal::ifElse(t_data);
+  }
+  //cout<<"<<<zChi2Min>>>"<<endl; mSignalStorage["zChi2Min"].dump();
+  //cout<<"<<<zChi2Max>>>"<<endl; mSignalStorage["zChi2Max"].dump();
+  //cout<<"<<<zChi2_c>>>"<<endl; mSignalStorage["zChi2_c"].dump();
+  {
+    int zChi2Shift = mSignalStorage["zChi2_c"].getBitsize() - zChi2Bits;
+    mSignalStorage["zChi2_r"] <= mSignalStorage["zChi2_c"].shift(zChi2Shift, 0);
+  }
+  //cout<<"<<<zChi2_c>>>"<<endl; mSignalStorage["zChi2_c"].dump();
+  //cout<<"<<<zChi2_r>>>"<<endl; mSignalStorage["zChi2_r"].dump();
+
+}
+
+void Fitter3DUtility::fitter3D(std::map<std::string, std::vector<double> >& stGeometry,
+                               std::vector<std::vector<double> > const& stXts,
+                               int eventTimeValid, int eventTime,
+                               std::vector<std::vector<int> > const& rawStTSs,
+                               int charge, double radius, double phi_c, double& z0, double& cot, double& chi2)
+{
+  vector<double> zz;
+  vector<double> arcS;
+  vector<double> invZError2;
+  fitter3D(stGeometry, stXts, eventTimeValid, eventTime, rawStTSs, charge, radius, phi_c, z0, cot, chi2, arcS, zz, invZError2);
+}
+
+void Fitter3DUtility::fitter3D(std::map<std::string, std::vector<double> >& stGeometry,
+                               std::vector<std::vector<double> > const& stXts,
+                               int eventTimeValid, int eventTime,
+                               std::vector<std::vector<int> > const& rawStTSs,
+                               int charge, double radius, double phi_c, double& z0, double& cot, double& chi2, vector<double>& arcS, vector<double>& zz,
+                               vector<double>& invZError2)
+{
+  vector<double> stTSs(4);
+  Fitter3DUtility::calPhiFast(stGeometry, stXts, eventTimeValid, eventTime, rawStTSs, stTSs);
+  Fitter3DUtility::setErrorFast(rawStTSs, eventTimeValid, invZError2);
+  zz = vector<double> (4, 0);
+  arcS = vector<double> (4, 0);
+  for (unsigned iSt = 0; iSt < 4; iSt++) {
+    if (rawStTSs[iSt][1] != 0) {
+      zz[iSt] = Fitter3DUtility::calZ(charge, stGeometry["angleSt"][iSt], stGeometry["zToStraw"][iSt],
+                                      stGeometry["cdcRadius"][iSt], stTSs[iSt], radius, phi_c);
+      arcS[iSt] = Fitter3DUtility::calS(radius, stGeometry["cdcRadius"][iSt]);
+    }
+  }
+  Fitter3DUtility::rSFit(&invZError2[0], &arcS[0], &zz[0], z0, cot, chi2);
+}
+
+void Fitter3DUtility::fitter3DFirm(std::map<std::string, double>& mConstD, std::map<std::string, std::vector<double> >& mConstV,
+                                   int eventTimeValid, int eventTime,
+                                   std::vector<std::vector<int> > const& rawStTSs,
+                                   int charge, double radius, double phi_c,
+                                   Belle2::TRGCDCJSignalData* commonData, std::map<std::string, Belle2::TRGCDCJSignal>& mSignalStorage,
+                                   std::map<std::string, Belle2::TRGCDCJLUT*>& mLutStorage)
+{
+  // Change to Signals.
+  // rawStTSs[iSt] = [TS ID, TS LR, TS driftTime]
+  vector<tuple<string, double, int, double, double, int> > t_values = {
+    make_tuple("phi0", phi_c, mConstD["phiBitSize"], mConstD["phiMin"], mConstD["phiMax"], 0),
+    make_tuple("rho", radius, mConstD["rhoBitSize"], mConstD["rhoMin"], mConstD["rhoMax"], 0),
+    make_tuple("charge", (int)(charge == 1 ? 1 : 0), 1, 0, 1.5, 0),
+    make_tuple("lr_0", rawStTSs[0][1], 2, 0, 3.5, 0),
+    make_tuple("lr_1", rawStTSs[1][1], 2, 0, 3.5, 0),
+    make_tuple("lr_2", rawStTSs[2][1], 2, 0, 3.5, 0),
+    make_tuple("lr_3", rawStTSs[3][1], 2, 0, 3.5, 0),
+    make_tuple("tsId_0", rawStTSs[0][0], ceil(log(mConstV["nTSs"][1]) / log(2)), 0, pow(2, ceil(log(mConstV["nTSs"][1]) / log(2))) - 0.5, 0),
+    make_tuple("tsId_1", rawStTSs[1][0], ceil(log(mConstV["nTSs"][3]) / log(2)), 0, pow(2, ceil(log(mConstV["nTSs"][3]) / log(2))) - 0.5, 0),
+    make_tuple("tsId_2", rawStTSs[2][0], ceil(log(mConstV["nTSs"][5]) / log(2)), 0, pow(2, ceil(log(mConstV["nTSs"][5]) / log(2))) - 0.5, 0),
+    make_tuple("tsId_3", rawStTSs[3][0], ceil(log(mConstV["nTSs"][7]) / log(2)), 0, pow(2, ceil(log(mConstV["nTSs"][7]) / log(2))) - 0.5, 0),
+    make_tuple("tdc_0", rawStTSs[0][2], mConstD["tdcBitSize"], 0, pow(2, mConstD["tdcBitSize"]) - 0.5, 0),
+    make_tuple("tdc_1", rawStTSs[1][2], mConstD["tdcBitSize"], 0, pow(2, mConstD["tdcBitSize"]) - 0.5, 0),
+    make_tuple("tdc_2", rawStTSs[2][2], mConstD["tdcBitSize"], 0, pow(2, mConstD["tdcBitSize"]) - 0.5, 0),
+    make_tuple("tdc_3", rawStTSs[3][2], mConstD["tdcBitSize"], 0, pow(2, mConstD["tdcBitSize"]) - 0.5, 0),
+    make_tuple("eventTime", eventTime, mConstD["tdcBitSize"], 0, pow(2, mConstD["tdcBitSize"]) - 0.5, 0),
+    make_tuple("eventTimeValid", eventTimeValid, 1, 0, 1.5, 0),
+  };
+  Belle2::TRGCDCJSignal::valuesToMapSignals(t_values, commonData, mSignalStorage);
+  // Calculate complex fit3D
+  Fitter3DUtility::setError(mConstD, mConstV, mSignalStorage);
+  Fitter3DUtility::calPhi(mConstD, mConstV, mSignalStorage, mLutStorage);
+  Fitter3DUtility::constrainRPerStSl(mConstV, mSignalStorage);
+  Fitter3DUtility::calZ(mConstD, mConstV, mSignalStorage, mLutStorage);
+  Fitter3DUtility::calS(mConstD, mConstV, mSignalStorage, mLutStorage);
+  Fitter3DUtility::rSFit(mConstD, mConstV, mSignalStorage, mLutStorage);
+  // Post handling of signals.
+  // Name all signals.
+  if ((*mSignalStorage.begin()).second.getName() == "") {
+    for (auto it = mSignalStorage.begin(); it != mSignalStorage.end(); ++it) {
+      (*it).second.setName((*it).first);
+    }
+  }
 }
 
 void Fitter3DUtility::findImpactPosition(TVector3* mcPosition, TLorentzVector* mcMomentum, int charge, TVector2& helixCenter,

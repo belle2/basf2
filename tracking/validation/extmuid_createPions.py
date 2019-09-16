@@ -22,6 +22,7 @@
 
 import glob
 from basf2 import *
+import os
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
@@ -34,8 +35,6 @@ print(output_filename)
 path = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('expList', [7])
-eventinfosetter.param('runList', [35])
 eventinfosetter.param('evtNumList', [1000])
 path.add_module(eventinfosetter)
 

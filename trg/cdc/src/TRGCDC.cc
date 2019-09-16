@@ -56,7 +56,6 @@
 #include "trg/cdc/Fitter3D.h"
 #include "trg/cdc/Fitter3DUtility.h"
 #include "trg/cdc/Link.h"
-#include "trg/cdc/Relation.h"
 #include "trg/cdc/EventTime.h"
 #include <framework/gearbox/Const.h>
 
@@ -556,8 +555,9 @@ namespace Belle2 {
       if (i)
         tsType = 1;
 
-      const unsigned nLayers = _superLayers[i]->size();
-      if (nLayers < 5) {
+//      const unsigned nLayers = _superLayers[i]->size(); //'nLayers' shadows a previous local
+//      if (nLayers < 5) {
+      if (_superLayers[i]->size() < 5) {
         cout << "TRGCDC !!! can not create TS because "
              << "#layers is less than 5 in super layer " << i
              << endl;
@@ -1078,6 +1078,9 @@ namespace Belle2 {
         TCWire& w = *(TCWire*) wire(layerId, wireId);
 
         //...TDC count...
+        B2INFO("t0:" << m_cdcp->getT0(WireID(h.getID())) <<
+               "binwidth:" << m_cdcp->getTdcBinWidth() <<
+               "tdc count:" << h.getTDCCount());
         const int tdcCount = floor(m_cdcp->getT0(WireID(h.getID())) / m_cdcp->getTdcBinWidth()
                                    - h.getTDCCount() + 0.5);
 
@@ -1149,8 +1152,8 @@ namespace Belle2 {
             h.dump("detail", TRGDebug::tab(4));
           }
         } else {
-          unsigned n = 10;
-          if (n > _hits.size()) n = _hits.size();
+          unsigned nh = 10;
+          if (nh > _hits.size()) nh = _hits.size();
           cout << TRGDebug::tab() << "Dump of the first " << n
                << " hits of a wire" << endl;
           for (unsigned i = 0; i < n; i++) {

@@ -34,7 +34,6 @@
 #include <TGraph.h>
 #include <TGraphPainter.h>
 #include <THistPainter.h>
-#include <TStyle.h>
 #include <TColor.h>
 #include <TMultiGraph.h>
 #include <TLegend.h>
@@ -67,35 +66,35 @@ namespace Belle2 {
      *
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      *
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      *
      * Convert TOPSimHits of the event to TOPHits.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      *
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      *
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /**
      *Prints module parameters.

@@ -30,7 +30,6 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector():
       Simulation::SensitiveDetectorBase("He3tubeSensitiveDetector", Const::invalidDetector)
     {
-      m_simhitNumber = 0;
       m_trackID = 0;
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;
@@ -151,9 +150,9 @@ namespace Belle2 {
 
       HE3G4TrackInfos.appendNew(HE3G4TrackInfo(trackID, PDG, Mass, Energy, vtx, mom));
 
-      int m_simhitNumber = HE3G4TrackInfos.getEntries() - 1;
+      int simhitNumber = HE3G4TrackInfos.getEntries() - 1;
 
-      return (m_simhitNumber);
+      return (simhitNumber);
     }//saveG4TrackInfo
 
 

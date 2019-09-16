@@ -38,6 +38,11 @@ QETrainingDataCollectorModule::QETrainingDataCollectorModule() : Module()
   addParam("MCStrictQualityEstimator", m_MCStrictQualityEstimator,
            "Only required for MCInfo method. If false combining several MCTracks is allowed.", bool(true));
 
+  addParam("mva_target", m_mva_target,
+           "Whether to write out MVA target which requires complete agreement between SVD CLusters of pattern "
+           "recognition track and MC track to yield 1, else 0, and thus provides maximal hit purity and hit efficiency.",
+           m_mva_target);
+
   addParam("TrainingDataOutputName", m_TrainingDataOutputName, "Name of the output rootfile.", std::string("QETrainingOutput.root"));
 
   addParam("ClusterInformation", m_ClusterInformation, "How to compile information from clusters ['Average']", std::string(""));
@@ -71,7 +76,7 @@ void QETrainingDataCollectorModule::initialize()
   }
   B2ASSERT("Not all QualityEstimators could be initialized!", m_estimator);
 
-  m_estimatorMC = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
+  m_estimatorMC = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator, m_mva_target);
   B2ASSERT("QualityEstimatorMC could be initialized!", m_estimatorMC);
 }
 

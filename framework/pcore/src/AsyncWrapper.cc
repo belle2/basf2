@@ -13,7 +13,7 @@
 
 #include <framework/core/EventProcessor.h>
 #include <framework/core/ModuleManager.h>
-#include <framework/pcore/ProcHandler.h>
+#include <framework/pcore/GlobalProcHandler.h>
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/TxModule.h>
@@ -29,7 +29,7 @@
 using namespace Belle2;
 
 bool AsyncWrapper::s_isAsync = false;
-RingBuffer* AsyncWrapper::s_currentRingBuffer = NULL;
+RingBuffer* AsyncWrapper::s_currentRingBuffer = nullptr;
 namespace {
   static std::vector<RingBuffer*> rbList;
   void cleanupIPC()
@@ -52,9 +52,10 @@ int AsyncWrapper::numAvailableEvents()
   return s_currentRingBuffer->numq();
 }
 
-AsyncWrapper::AsyncWrapper(const std::string& moduleType): Module(), m_procHandler(nullptr), m_ringBuffer(0), m_rx(0), m_tx(0)
+AsyncWrapper::AsyncWrapper(const std::string& moduleType): Module(),
+  m_wrappedModule(ModuleManager::Instance().registerModule(moduleType)),
+  m_ringBuffer(nullptr), m_rx(nullptr), m_tx(nullptr)
 {
-  m_wrappedModule = ModuleManager::Instance().registerModule(moduleType);
   setParamList(m_wrappedModule->getParamList()); //inherit parameters from wrapped module
 
   addParam("discardOldEvents", m_discardOldEvents,
@@ -62,15 +63,13 @@ AsyncWrapper::AsyncWrapper(const std::string& moduleType): Module(), m_procHandl
            true);
 }
 
-AsyncWrapper::~AsyncWrapper()
-{
-}
+AsyncWrapper::~AsyncWrapper() = default;
 
 void AsyncWrapper::initialize()
 {
   B2INFO("Initializing AsyncWrapper...");
 
-  m_procHandler = new ProcHandler(1);
+  GlobalProcHandler::initialize(1);
   const int bufferSizeInts = 8000000; //~32M, within Ubuntu's shmmax limit
   m_ringBuffer = new RingBuffer(bufferSizeInts);
   rbList.push_back(m_ringBuffer);
@@ -81,8 +80,7 @@ void AsyncWrapper::initialize()
   m_tx->setBlockingInsert(!m_discardOldEvents); //actually decouple this process
 
   //fork out one extra process
-  m_procHandler->startWorkerProcesses();
-  if (m_procHandler->isWorkerProcess()) {
+  if (GlobalProcHandler::startWorkerProcesses(1)) {
     //forked thread:
     //allow access to async parts
     s_isAsync = true;
@@ -108,8 +106,8 @@ void AsyncWrapper::initialize()
 
 void AsyncWrapper::event()
 {
-  if (!m_procHandler->isWorkerProcess()) {
-    if (waitpid(-1, NULL, WNOHANG) != 0) {
+  if (!GlobalProcHandler::isWorkerProcess()) {
+    if (waitpid(-1, nullptr, WNOHANG) != 0) {
       StoreObjPtr<EventMetaData> eventMetaData;
       eventMetaData->setEndOfData();
     }
@@ -120,12 +118,12 @@ void AsyncWrapper::event()
 
 void AsyncWrapper::terminate()
 {
-  if (!m_procHandler->isWorkerProcess()) {
+  if (!GlobalProcHandler::isWorkerProcess()) {
     m_tx->terminate();
 
     m_ringBuffer->kill();
     B2INFO("Waiting for asynchronous process...");
-    m_procHandler->waitForAllProcesses();
+    GlobalProcHandler::waitForAllProcesses();
     B2INFO("Done, cleaning up...");
     delete m_tx;
     delete m_rx;
@@ -133,6 +131,5 @@ void AsyncWrapper::terminate()
     for (RingBuffer*& rb : rbList)
       if (rb == m_ringBuffer)
         rb = nullptr;
-    delete m_procHandler;
   }
 }

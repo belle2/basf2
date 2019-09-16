@@ -40,13 +40,13 @@ namespace Belle2 {
     DisplayModule();
 
     /// Sets up geometry if needed.
-    void initialize();
+    void initialize() override;
 
     /// Show various reconstructed or simulated objects in the event viewer until the next event is requested.
-    void event();
+    void event() override;
 
     /// Terminate gEve to avoid problems with root's cleanup.
-    void terminate();
+    void terminate() override;
 
   private:
     /** List of drawing options, see EVEVisualization::setOptions() */
@@ -85,6 +85,9 @@ namespace Belle2 {
     /** If true, BKLMHit objects will be shown in the display. */
     bool m_showBKLM2dHits;
 
+    /** If true, EKLMHit2d objects will be shown in the display. */
+    bool m_showEKLM2dHits;
+
     /** If true, ARICHHit objects will be shown as squares, corresponding to channel pixels */
     bool m_showARICHHits;
 
@@ -100,8 +103,11 @@ namespace Belle2 {
     /** Path to custom file with geometry extract */
     std::string m_customGeometryExtractPath;
 
-    /** Path to custom file with geometry extract with corrected placement of TOP bars */
-    std::string m_customGeometryExtractPathTop;
+    /** List of volumes to be hidden (can be re-enabled in Eve panel / Geometry scene. The volume and all its daughters will be hidden. */
+    std::vector<std::string> m_hideVolumes;
+
+    /** List of volumes to be deleted. The volume and all its daughters will be removed completely. */
+    std::vector<std::string> m_deleteVolumes;
 
     /** pointer to actual display */
     DisplayUI* m_display;

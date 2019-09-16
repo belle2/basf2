@@ -19,8 +19,6 @@
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/Logger.h>
 
-#include <memory>
-
 #include <list>
 #include <string>
 #include <memory>
@@ -109,6 +107,34 @@ namespace Belle2 {
      * This method can be implemented by subclasses.
      */
     virtual void initialize() {};
+
+    /** Return a list of output filenames for this modules.
+     *
+     * This will be called when basf2 is run with "--dry-run" if the module has
+     * set either the c_Input or c_Output properties.
+     *
+     * If the parameter \p outputFiles is false (for modules with c_Input) the
+     * list of input filenames should be returned (if any). If \p outputFiles is
+     * true (for modules with c_Output) the list of output files should be
+     * returned (if any).
+     *
+     * If a module has sat both properties this member is called twice, once
+     * for each property.
+     *
+     * The module should return the actual list of requested input or produced
+     * output filenames (including handling of input/output overrides) so that
+     * the grid system can handle input/output files correctly.
+     *
+     * This function should return the same value when called multiple times.
+     * This is especially important when taking the input/output overrides from
+     * Environment as they get consumed when obtained so the finalized list of
+     * output files should be stored for subsequent calls.
+     */
+    [[deprecated("will be removed in release-05.")]]
+    virtual std::vector<std::string> getFileNames(__attribute__((unused)) bool outputFiles)
+    {
+      return std::vector<std::string>();
+    }
 
     /**
      * Called when entering a new run.
@@ -242,7 +268,7 @@ namespace Belle2 {
      * @param path       Shared pointer to the Path which will be executed if the condition is evaluated to true.
      * @param afterConditionPath  What to do after executing 'path'.
      */
-    void if_value(const std::string& expression, std::shared_ptr<Path> path,
+    void if_value(const std::string& expression, const std::shared_ptr<Path>& path,
                   EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
@@ -260,7 +286,7 @@ namespace Belle2 {
      * @param path Shared pointer to the Path which will be executed if the return value is _false_.
      * @param afterConditionPath  What to do after executing 'path'.
      */
-    void if_false(std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
+    void if_false(const std::shared_ptr<Path>& path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
      * A simplified version to set the condition of the module. Please note that successive calls of this function will
@@ -277,7 +303,7 @@ namespace Belle2 {
      * @param path Shared pointer to the Path which will be executed if the return value is _true_.
      * @param afterConditionPath  What to do after executing 'path'.
      */
-    void if_true(std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
+    void if_true(const std::shared_ptr<Path>& path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
      * Returns true if at least one condition was set for the module.
@@ -347,6 +373,12 @@ namespace Belle2 {
      */
     template<typename T>
     ModuleParam<T>& getParam(const std::string& name) const;
+
+    /** Return true if this module has a valid return value set */
+    bool hasReturnValue() const { return m_hasReturnValue; }
+    /** Return the return value set by this module. This value is only
+     * meaningful if hasReturnValue() is true */
+    int getReturnValue() const { return m_returnValue; }
 
     /** Create an independent copy of this module.
      *
@@ -571,7 +603,7 @@ namespace Belle2 {
      * @param moduleType The type name of the module.
      * @param package the package which contains the module
      */
-    ModuleProxyBase(const std::string& moduleType, const std::string& package);
+    ModuleProxyBase(std::string  moduleType, std::string  package);
 
     /**
      * The destructor of the ModuleProxyBase class.

@@ -14,7 +14,6 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDModeByte.h>
 #include <framework/dataobjects/DigitBase.h>
-
 #include <cstdint>
 #include <sstream>
 #include <string>
@@ -45,12 +44,12 @@ namespace Belle2 {
      * of doubles suitable for computing.
      */
     typedef uint8_t APVRawSampleType;
-    typedef std::array<APVRawSampleType, c_nAPVSamples> APVRawSamples;
+    typedef std::array<APVRawSampleType, c_nAPVSamples> APVRawSamples; /**<array of APVRawSamplesType objects */
 
     /** Types for array of samples for processing.
      */
     typedef float APVFloatSampleType;
-    typedef std::array<APVFloatSampleType, c_nAPVSamples> APVFloatSamples;
+    typedef std::array<APVFloatSampleType, c_nAPVSamples> APVFloatSamples; /**<array of APVFloatSampleType objects*/
 
     /** Constructor using c-array of samples.
      * @param sensorID Sensor VXD ID.
@@ -69,7 +68,7 @@ namespace Belle2 {
       m_mode(mode.getID())
     {
       std::transform(samples, samples + c_nAPVSamples, m_samples.begin(),
-                     [this](T x)->APVRawSampleType { return trimToSampleRange(x); }
+                     [](T x)->APVRawSampleType { return trimToSampleRange(x); }
                     );
     }
 
@@ -89,7 +88,7 @@ namespace Belle2 {
       m_mode(mode.getID())
     {
       std::transform(samples.begin(), samples.end(), m_samples.begin(),
-                     [this](typename T::value_type x)->APVRawSampleType
+                     [](typename T::value_type x)->APVRawSampleType
       { return trimToSampleRange(x); }
                     );
     }
@@ -132,12 +131,50 @@ namespace Belle2 {
       return returnSamples;
     }
 
-    /** Get digit FADCTime estimate
+
+    /**
+     * Get the max bin.
+     * @return int time bin corresponding to the higher sample amplitude
+     */
+    int getMaxTimeBin() const
+    {
+      float amplitude = 0;
+      int maxbin = 0;
+      APVFloatSamples samples =  this->getSamples();
+      for (int k = 0; k < this->getNSamples(); k ++) {
+        //      for (int k = 0; k < 6; k ++) {
+        if (samples[k] > amplitude) {
+          amplitude = samples[k];
+          maxbin = k;
+        }
+      }
+      return maxbin;
+    }
+
+    /**
+     * Get the ADC counts corresponding to the higher sample amplitude
+     * @return int of the ADC counts corresponding to the higher sample amplitude
+     */
+    int getMaxADCCounts() const
+    {
+      float amplitude = 0;
+      APVFloatSamples samples =  this->getSamples();
+      for (int k = 0; k < this->getNSamples(); k ++) {
+        if (samples[k] > amplitude)
+          amplitude = samples[k];
+      }
+      return amplitude;
+    }
+
+
+    /**
+     * Get digit FADCTime estimate
      * @return digit time estimate from FADC
      */
     float getFADCTime() const { return static_cast<float>(m_FADCTime); }
 
-    /** Get the SVDMOdeByte object containing information on trigger FADCTime and DAQ mode.
+    /**
+     * Get the SVDMOdeByte object containing information on trigger FADCTime and DAQ mode.
      * @return the SVDModeByte object of the digit
      */
     SVDModeByte getModeByte() const
@@ -168,8 +205,11 @@ namespace Belle2 {
       os << "VXDID : " << m_sensorID << " = " << std::string(thisSensorID) << " strip: "
          << ((m_isU) ? "U-" : "V-") << m_cellID << " samples: ";
       std::copy(m_samples.begin(), m_samples.end(),
-                std::ostream_iterator<APVRawSampleType>(os, " "));
-      os << "FADC time: " << m_FADCTime << " " << thisMode << std::endl;
+                std::ostream_iterator<unsigned int>(os, " "));
+      os << "FADC time: " << (unsigned int)m_FADCTime << " Triggerbin:" << (unsigned int) thisMode.getTriggerBin() << std::endl;
+      os << "RunType: " << (unsigned int)thisMode.getRunType() << ", EventType: " << (unsigned int) thisMode.getEventType() <<
+         ", DAQMode:  " << (unsigned int) thisMode.getDAQMode() << std::endl;
+      os << " SVDModeByte: " << (unsigned int)thisMode << std::endl;
       return os.str();
     }
 
@@ -180,7 +220,7 @@ namespace Belle2 {
     * @return unique channel ID, composed of VxdID (1 - 16), strip side (17), and
     * strip number (18-28)
     */
-    unsigned int getUniqueChannelID() const
+    unsigned int getUniqueChannelID() const override
     { return m_cellID + ((m_isU ? 1 : 0) << 11) + (m_sensorID << 12); }
 
     /**
@@ -190,7 +230,7 @@ namespace Belle2 {
     * @param bg beam background digit
     * @return append status
     */
-    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg)
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg) override
     {
       // Don't modify and don't append when bg points nowhere.
       if (!bg) return DigitBase::c_DontAppend;
@@ -198,7 +238,7 @@ namespace Belle2 {
       // Add background samples to the digit's and trim back to range
       std::transform(m_samples.begin(), m_samples.end(), bgSamples.begin(),
                      m_samples.begin(),
-                     [this](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
+                     [](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
       { return trimToSampleRange(x + y); }
                     );
       // FIXME: Reset FADC time flag in mode byte.
@@ -231,31 +271,10 @@ namespace Belle2 {
       int nOKSamples = 0;
       Belle2::SVDShaperDigit::APVFloatSamples samples_vec = this->getSamples();
       for (int k = 0; k < this->getNSamples(); k ++)
-        if (samples_vec[k] > cutMinSignal)
+        if (samples_vec[k] >= cutMinSignal)
           nOKSamples++;
 
       if (nOKSamples >= nSamples)
-        return true;
-
-      return false;
-    }
-
-
-    /*
-     * mark the strip as hot
-     * @param max numner of samples above threshold
-     * @param SN threshold
-     * @return true if the strip is hot, false otherwise
-     */
-    bool isHot(int nSamples, float cutMinSignal) const
-    {
-      int nHotSamples = 0;
-      Belle2::SVDShaperDigit::APVFloatSamples samples_vec = this->getSamples();
-      for (int k = 0; k < this->getNSamples(); k ++)
-        if (samples_vec[k] > cutMinSignal)
-          nHotSamples++;
-
-      if (nHotSamples <= nSamples)
         return true;
 
       return false;
@@ -289,7 +308,8 @@ namespace Belle2 {
     SVDModeByte::baseType m_mode = SVDModeByte::c_DefaultID;
     /**< Mode byte, trigger FADCTime + DAQ mode */
 
-    ClassDef(SVDShaperDigit, 2)
+
+    ClassDefOverride(SVDShaperDigit, 4)
 
   }; // class SVDShaperDigit
 

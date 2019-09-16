@@ -16,6 +16,9 @@ argvs = sys.argv
 if len(argvs) > 1:
     debuglevel = int(argvs[1])
 
+# Define a global tag (note: the one given bellow will become out-dated!)
+use_central_database('data_reprocessing_proc8')
+
 # Create path
 main = create_path()
 
@@ -28,19 +31,11 @@ main.add_module(roinput)
 converter = register_module('Convert2RawDet')
 main.add_module(converter)
 
-# geometry parameters
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
+# Initialize TOP geometry parameters (creation of Geant geometry is not needed)
+main.add_module('TOPGeometryParInitializer')
 
-# Geometry (only TOP needed)
-geometry = register_module('Geometry')
-geometry.param('components', ['TOP'])
-main.add_module(geometry)
-
-# Unpacking
+# Unpacking (format auto detection works now)
 unpack = register_module('TOPUnpacker')
-unpack.param('swapBytes', True)
-unpack.param('dataFormat', 0x0301)
 unpack.logging.log_level = LogLevel.DEBUG
 unpack.logging.debug_level = debuglevel
 main.add_module(unpack)

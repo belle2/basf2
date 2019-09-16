@@ -38,20 +38,19 @@ using namespace std;
 using namespace Belle2;
 
 /**
- *
  * These tests cover the functionality of the classes:
  * DirectedNode, DirectedNodeNetwork. TODO
- *
  */
 namespace NodeFamilyTests {
 
+  /// Unit test for NodeFamilyDefiner
   TEST(NodeFamilyDefinerTest, TestNodeFamiliesUsingDirectedNodeNetworkInt)
   {
     // just some input for testing (same as in DirectedNodeNetwork-tests):
-    std::array<int, 5> intArray  = { { 1, 5, 3, 4, 2} };
-    std::array<int, 5> intArray2  = { { 0, 3, 4, 6, 7} }; // these entries are independent of the first intArray-entries
-    std::array<int, 5> intArray3  = { { 99, 101, 103, 104, 105} }; // entry 2 crosses intArray, entry 3 crosses intArray2
-    std::array<int, 3> intArray4  = { { 100, 101, 102} };
+    std::array<int, 5> intArray = { { 1, 5, 3, 4, 2} }; /**< A array of integers for test */
+    std::array<int, 5> intArray2 = { { 0, 3, 4, 6, 7} }; /**< these entries are independent of the first intArray-entries */
+    std::array<int, 5> intArray3 = { { 99, 101, 103, 104, 105} }; /**< entry 2 crosses intArray, entry 3 crosses intArray2 */
+    std::array<int, 3> intArray4 = { { 100, 101, 102} }; /**< another array for tests */
 
     DirectedNodeNetwork<int, CACell> intNetwork;
     EXPECT_EQ(0, intNetwork.size());

@@ -12,6 +12,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <calibration/CalibrationCollectorModule.h>
 #include <string>
 
@@ -19,7 +20,7 @@ namespace Belle2 {
   /**
    * Calibration Collector Module for PXD hot pixel masking from PXDRawHits
    *
-   *    *
+   *
    */
   class PXDRawHotPixelMaskCollectorModule : public CalibrationCollectorModule {
 
@@ -34,8 +35,10 @@ namespace Belle2 {
 
   private:
 
-    /**< Required input for  PXDRawHit */
+    /** Required input for  PXDRawHit */
     StoreArray<PXDRawHit> m_pxdRawHit;
+    /** Required input for PXD Daq Status */
+    StoreObjPtr<PXDDAQStatus> m_storeDaqStatus;
 
     /** Name of the collection to use for PXDRawHits */
     std::string m_storeRawHitsName;

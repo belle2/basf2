@@ -1,7 +1,0 @@
-Import('env')
-
-# env['CONTINUE'] = False
-
-env['LIBS'] = ['framework','hlt_hlt_dataobjects']
-
-Return('env')

@@ -11,7 +11,8 @@
 </header>
 """
 
-from basf2 import *
+from basf2 import set_random_seed, create_path, process, statistics, \
+    register_module
 from simulation import add_simulation
 
 set_random_seed(1337)
@@ -21,7 +22,7 @@ main = create_path()
 main.add_module('EventInfoSetter',
                 evtNumList=[500],
                 runList=[1],
-                expList=[1]
+                expList=[0]
                 )
 
 main.add_module('ParticleGun',
@@ -50,8 +51,16 @@ process(main)
 print(statistics)
 
 from validation import *
-statistics_plots('KShortGenSimNoBkg_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation job with KShortGenSimNoBkg particleGun', prefix='KShortGenSimNoBkg')
-event_timing_plot('../KShortGenSimNoBkg.root', 'KShortGenSimNoBkg_statistics.root',
-                  contact='tkuhr',
-                  jobDesc='a standard simulation job with Klong particleGun', prefix='KShortGenSimNoBkg')
+statistics_plots(
+    'KShortGenSimNoBkg_statistics.root',
+    contact='tkuhr',
+    job_desc='a standard simulation job with KShortGenSimNoBkg particleGun',
+    prefix='KShortGenSimNoBkg'
+)
+event_timing_plot(
+    '../KShortGenSimNoBkg.root',
+    'KShortGenSimNoBkg_statistics.root',
+    contact='tkuhr',
+    job_desc='a standard simulation job with Klong particleGun',
+    prefix='KShortGenSimNoBkg'
+)

@@ -24,7 +24,6 @@ namespace Belle2 {
    * It will record some stat data of this DHP
    *
    */
-
   class PXDDAQDHPStatus {
   public:
 
@@ -52,6 +51,7 @@ namespace Belle2 {
     uint8_t m_chipID;/**< Chip ID as delivered by DAQ.*/
     uint16_t m_frameNr; /**< Frame number (low bits) from DHP header */
 
+    /** necessary for ROOT */
     ClassDef(PXDDAQDHPStatus, 1);
 
   }; // class PXDDAQDHPStatus

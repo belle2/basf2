@@ -8,19 +8,19 @@ from basf2 import *
 from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
+from modularAnalysis import variablesToNtuple
 from modularAnalysis import fillParticleList
 from modularAnalysis import fillConvertedPhotonsList
 from modularAnalysis import loadGearbox
 from modularAnalysis import vertexKFit
 from modularAnalysis import vertexRave
 from modularAnalysis import printVariableValues
+from variables.utils import create_aliases_for_selected
 from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase
 from b2biiMonitors import addBeamParamsConversionMonitors
 from b2biiMonitors import addTrackConversionMonitors
 from b2biiMonitors import addNeutralsConversionMonitors
+import variables as va
 
 if len(sys.argv) != 4:
     sys.exit('Must provide two input parameters: [mc|data] [input_Belle_MDST_file][output_BelleII_ROOT_file].\n'
@@ -52,36 +52,42 @@ print('PANTHER_TABLE_DIR        = ' + str(os.getenv('PANTHER_TABLE_DIR')))
 print('PGUSER                   = ' + str(os.getenv('PGUSER')))
 
 # Convert
-convertBelleMdstToBelleIIMdst(inputBelleMDSTFile)
+mypath = create_path()
+convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, path=mypath)
 
 # Reconstruct
 # first the gearbox needs to be loaded
-loadGearbox()
+loadGearbox(mypath)
 
 # Create monitoring histograms
-addBeamParamsConversionMonitors()
-addTrackConversionMonitors()
-addNeutralsConversionMonitors()
+addBeamParamsConversionMonitors(path=mypath)
+addTrackConversionMonitors(path=mypath)
+addNeutralsConversionMonitors(path=mypath)
 
 # Only charged final state particles need to be loaded
 # All photon and pi0 candidates are already loaded
 # to 'gamma:mdst' and 'pi0:mdst' particle lists
-fillParticleList('pi+:all', '')
-fillParticleList('K-:all', '')
-fillParticleList('mu+:all', '')
-fillParticleList('e+:all', '')
+fillParticleList('pi+:all', '', path=mypath)
+fillParticleList('K-:all', '', path=mypath)
+fillParticleList('mu+:all', '', path=mypath)
+fillParticleList('e+:all', '', path=mypath)
 
 # in the case of pi0 candidates in 'pi0:mdst' the mc truth matching
 # needs to be executed
-matchMCTruth('pi0:mdst')
-matchMCTruth('K_S0:mdst')
-vertexKFit('K_S0:mdst', -1)
+matchMCTruth('pi0:mdst', path=mypath)
+matchMCTruth('K_S0:mdst', path=mypath)
+vertexKFit('K_S0:mdst', -1, path=mypath)
 
 # The Belle PID variables are: atcPIDBelle(sigHyp, bkgHyp), muIDBelle, and eIDBelle
-printVariableValues('pi+:all', ['mcPDG', 'p', 'atcPIDBelle(3,2)', 'muIDBelle', 'muIDBelleQuality', 'eIDBelle', 'nSVDHits'])
+va.variables.addAlias('Lkpi', 'atcPIDBelle(3,2)')
+va.variables.addAlias('Lppi', 'atcPIDBelle(4,2)')
+va.variables.addAlias('Lpk', 'atcPIDBelle(4,3)')
 
-printVariableValues('gamma:mdst', ['mcPDG', 'E', 'clusterE9E25'])
-printVariableValues('pi0:mdst', ['mcPDG', 'p', 'M', 'InvM'])
+printVariableValues('pi+:all', ['mcPDG', 'p', 'Lkpi', 'muIDBelle',
+                                'muIDBelleQuality', 'eIDBelle', 'nSVDHits'], path=mypath)
+
+printVariableValues('gamma:mdst', ['mcPDG', 'E', 'clusterE9E25'], path=mypath)
+printVariableValues('pi0:mdst', ['mcPDG', 'p', 'M', 'InvM'], path=mypath)
 
 # V0's (loaded by ParticleLoader from the converted V0 Array)
 # the difference between K_S0:all and K_S0:mdst is in the
@@ -95,7 +101,7 @@ printVariableValues('pi0:mdst', ['mcPDG', 'p', 'M', 'InvM'])
 # matchMCTruth('K_S0:all')
 
 printVariableValues('K_S0:mdst', ['mcPDG', 'M', 'InvM', 'p', 'px', 'py', 'pz',
-                                  'extraInfo(goodKs)', 'extraInfo(ksnbVLike)', 'extraInfo(ksnbNoLam)'])
+                                  'extraInfo(goodKs)', 'extraInfo(ksnbVLike)', 'extraInfo(ksnbNoLam)'], path=mypath)
 
 # reconstructDecay('D0:Kpipi0 -> K-:all pi+:all pi0:mdst', '1.7 < M < 2.0')
 # reconstructDecay('B+:D0pi -> anti-D0:Kpipi0 pi+:all', '4.8 < M < 5.5')
@@ -103,48 +109,27 @@ printVariableValues('K_S0:mdst', ['mcPDG', 'M', 'InvM', 'p', 'px', 'py', 'pz',
 # matchMCTruth('B+:D0pi')
 
 # create and fill flat Ntuple with MCTruth and kinematic information
-toolsK0 = ['EventMetaData', '^K_S0']
-toolsK0 += ['Kinematics', '^K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['MomentumUncertainty', '^K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['InvMass', '^K_S0']
-toolsK0 += ['Vertex', '^K_S0']
-toolsK0 += ['MCVertex', '^K_S0']
-# toolsK0 += ['PID', 'K_S0 -> ^pi+ ^pi-']
-# toolsK0 += ['Track', 'K_S0 -> ^pi+ ^pi-']
-# toolsK0 += ['TrackHits', 'K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['MCTruth', '^K_S0 -> ^pi+ ^pi-']
-toolsK0 += [
-    'CustomFloats[dr:dz:isSignal:chiProb:extraInfo(goodKs):extraInfo(ksnbVLike):extraInfo(ksnbNoLam):extraInfo(ksnbStandard)]',
-    '^K_S0']
+kinematics = ['p', 'E']
+truth = ['isSignal', 'mcPDG']
+kinematics_and_truth = kinematics + truth
 
-toolsB = ['EventMetaData', '^B+']
-toolsB += ['InvMass', '^B+ -> ^anti-D0 pi+']
-toolsB += ['InvMass[BeforeFit]', '^B+ -> [anti-D0 -> K- pi+ ^pi0] pi+']
-toolsB += ['DeltaEMbc', '^B+']
-toolsB += ['Cluster', 'B+ -> [anti-D0 -> K- pi+ [pi0 -> ^gamma ^gamma]] pi+']
-toolsB += ['MCTruth', '^B+ -> ^anti-D0 pi+']
-toolsB += ['CustomFloats[isSignal]', '^B+ -> ^anti-D0 pi+']
-toolsB += ['CustomFloats[kIDBelle]', 'B+ -> [anti-D0 -> ^K- ^pi+ pi0] ^pi+']
+variables = create_aliases_for_selected(
+    kinematics_and_truth, '^K_S0 -> ^pi+ ^pi-')
 
-toolsTrackPI = ['EventMetaData', 'pi+']
-toolsTrackPI += ['Kinematics', '^pi+']
-toolsTrackPI += ['Track', '^pi+']
-# toolsTrackPI += ['PID', '^pi+']
-toolsTrackPI += ['MCTruth', '^pi+']
-toolsTrackPI += ['MCKinematics', '^pi+']
-toolsTrackPI += ['ErrMatrix', '^pi+']
-toolsTrackPI += ['CustomFloats[eIDBelle:muIDBelleQuality:muIDBelle:atcPIDBelle(3,2):atcPIDBelle(4,2):atcPIDBelle(4,3)]', '^pi+']
+belle1pid = [
+    'eIDBelle', 'muIDBelleQuality', 'muIDBelle',
+    'Lkpi', 'Lppi', 'Lpk']
+variables += create_aliases_for_selected(
+    belle1pid, 'K_S0 -> ^pi+ ^pi-')
 
-ntupleFile(outputBelle2ROOTFile)
-# ntupleTree('bp', 'B+:D0pi', toolsB)
-ntupleTree('kshort', 'K_S0:mdst', toolsK0)
-# ntupleTree('pion', 'pi+:all', toolsTrackPI)
+variablesToNtuple('K_S0:mdst', variables,
+                  filename=outputBelle2ROOTFile, path=mypath)
 
 # progress
 progress = register_module('Progress')
-analysis_main.add_module(progress)
+mypath.add_module(progress)
 
-process(analysis_main)
+process(mypath)
 
 # Print call statistics
 print(statistics)

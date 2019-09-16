@@ -176,12 +176,12 @@ namespace Belle2 {
 
   private:
 
-    int  m_old_expno;          // most recently used experiment # in muid
-    int  m_mapped_expno;       // mapped value of m_old_exp_no
+    int  m_old_expno = 0;          // most recently used experiment # in muid
+    int  m_mapped_expno = 0;       // mapped value of m_old_exp_no
 
-    MuidProb* m_muonprob;      // Pointer to muons' prob-density object
-    MuidProb* m_pionprob;      // Pointer to pions' prob-density object
-    MuidProb* m_kaonprob;      // Pointer to kaons' prob-density object
+    MuidProb* m_muonprob{nullptr};      // Pointer to muons' prob-density object
+    MuidProb* m_pionprob{nullptr};      // Pointer to pions' prob-density object
+    MuidProb* m_kaonprob{nullptr};      // Pointer to kaons' prob-density object
 
     bool good_event();
 
@@ -288,13 +288,13 @@ namespace Belle2 {
     double fRange[2][4][15][kRange];      // range pdf
     double fRchisq[2][4][kRchisq + 1]; // reduced chi-squared pdf
     double fRchisqN[2][4][15];    // non-overflow normalization
-    double fRchisqD1[2][4][kRchisq + 1]; // first derivatives of above
-    double fRchisqD2[2][4][kRchisq + 1]; // second derivatives of above
-    double fRchisqD3[2][4][kRchisq + 1]; // third derivatives of above
+    double fRchisqD1[2][4][kRchisq + 1] = {0.0}; // first derivatives of above
+    double fRchisqD2[2][4][kRchisq + 1] = {0.0}; // second derivatives of above
+    double fRchisqD3[2][4][kRchisq + 1] = {0.0}; // third derivatives of above
     double fEEcl[kPTrk][kEEcl + 1];       // ECL energy pdf
-    double fEEclD1[kPTrk][kEEcl + 1];     // first derivatives of above
-    double fEEclD2[kPTrk][kEEcl + 1];     // second derivatives of above
-    double fEEclD3[kPTrk][kEEcl + 1];     // third derivatives of above
+    double fEEclD1[kPTrk][kEEcl + 1] = {0.0};     // first derivatives of above
+    double fEEclD2[kPTrk][kEEcl + 1] = {0.0};     // second derivatives of above
+    double fEEclD3[kPTrk][kEEcl + 1] = {0.0};     // third derivatives of above
 
     // private member functions
 

@@ -65,7 +65,7 @@ namespace Belle2 {
 
 
     /** constructor, mandatory iDChain musst at least contain one iD. Sectors should be sorted from outer to inner sectors, please take care of that yourself since this is not checked internally. */
-    SubGraphID(const std::vector<unsigned>& idChain) : m_idChain(idChain)
+    explicit SubGraphID(const std::vector<unsigned>& idChain) : m_idChain(idChain)
     {
       if (m_idChain.empty()) { B2FATAL("SubGraphID-Constructor, given idChain is empty - illegal usage!"); }
     }
@@ -199,6 +199,10 @@ namespace Belle2 {
 namespace std {
   /** customized hash-function for being able to use unordered_map. */
   template <> struct hash<Belle2::SubGraphID> {
+    /** Create Hash value from graphID
+     * @param graphID : the subgraph ID
+     * @return the hash value
+     */
     std::size_t operator()(const Belle2::SubGraphID& graphID) const
     {
       std::size_t hashVal = 0;

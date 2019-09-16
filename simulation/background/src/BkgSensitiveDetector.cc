@@ -120,7 +120,7 @@ namespace Belle2 {
         if ((sector == 0) && (m_eclrepscale == 2) && ((id & 1) != 0)) id += 144; // barrel odd-numbered diodes in sector 0 -> sector 144
         id += sector * m_eclrepscale;
       }
-      beamBackHits.appendNew(m_subDet, id, pdgCode, m_trackID, m_startPos, m_startMom, m_startTime, endEnergy, m_startEnergy,
+      beamBackHits.appendNew(m_subDet, id, pdgCode, m_trackID, m_startPos, m_startMom, m_startTime, m_startEnergy, endEnergy,
                              m_energyDeposit, m_trackLength, neutWeight);
 
 

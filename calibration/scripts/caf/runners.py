@@ -3,12 +3,15 @@
 
 from abc import ABC, abstractmethod
 from threading import Thread
+import time
 import ROOT
-from caf.utils import decode_json_string
-from caf.state_machines import MachineError, ConditionError, TransitionError
-from caf.state_machines import AlgorithmMachine
-import basf2
-from basf2 import B2ERROR, B2FATAL, B2INFO
+from .utils import decode_json_string
+from .utils import IoV_Result
+from .utils import AlgResult
+from .state_machines import MachineError, ConditionError, TransitionError
+from .state_machines import AlgorithmMachine
+from .strategies import AlgorithmStrategy
+from basf2 import B2ERROR, B2FATAL, B2INFO, B2DEBUG
 import multiprocessing
 
 
@@ -31,8 +34,8 @@ class AlgorithmsRunner(Runner):
     objects. As an example, assume that a single `framework.Calibration` was given and list of two `framework.Algorithm`
     instances to run.
 
-    In this example the chosen `AlgorithmsRunner.run` is simple and just loops over the list of `framework.Algorithm`
-    calling each one's `strategies.AlgorithmStrategy.run` and `strategies.AlgorithmStrategy.commit` methods in order.
+    In this example the chosen :py:meth:`AlgorithmsRunner.run()` is simple and just loops over the list of `caf.framework.Algorithm`
+    calling each one's :py:meth:`caf.strategies.AlgorithmStrategy.run()` methods in order.
     Thereby generating a localdb with the only communication between the `strategies.AlgorithmStrategy` instances coming from the
     database payloads being available from one algorithm to the next.
 
@@ -54,9 +57,10 @@ class AlgorithmsRunner(Runner):
     output data it is your job to filter through the input files and assign them correctly.
 
     A list of local database paths are given to the `AlgorithmsRunner` based on the `framework.Calibration` dependencies and
-    any overall localdb given to the CAF. By default you can call the `setup_database_chain` method to automatically set a
-    database chain based on this list. But you have freedom to not call this at all in `run`, or to implement a different method
-    to deal with this.
+    any overall database chain given to the Calibration before running.
+    By default you can call the "setup_algorithm" transition of the `caf.state_machines.AlgorithmMachine` to automatically
+    set a database chain based on this list.
+    But you have freedom to not call this at all in `run`, or to implement a different method to deal with this.
     """
 
     def __init__(self, name):
@@ -66,8 +70,8 @@ class AlgorithmsRunner(Runner):
         self.name = name
         #: All of the output files made by the collector job and recovered by the "output_patterns"
         self.input_files = []
-        #: User input local database, can be used to apply your own constants
-        self.local_database_chain = []
+        #: User set databases, can be used to apply your own constants and global tags
+        self.database_chain = []
         #: List of local databases created by previous CAF calibrations/iterations
         self.dependent_databases = []
         #: The directory of the local database we use to store algorithm payloads from this execution
@@ -98,31 +102,54 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
         for algorithm in self.algorithms:
             # Need to create an instance of the requested strategy and set the attributes
             strategy = algorithm.strategy(algorithm)
-            strategy.input_files = self.input_files
-            strategy.output_dir = self.output_dir
-            strategy.output_database_dir = self.output_database_dir
-            strategy.global_tag = self.global_tag
-            strategy.local_database_chain = self.local_database_chain
-            strategy.dependent_databases = self.dependent_databases
+            # Now add all the necessary parameters for a strategy to run
+            strategy_params = {}
+            strategy_params["database_chain"] = self.database_chain
+            strategy_params["dependent_databases"] = self.dependent_databases
+            strategy_params["output_dir"] = self.output_dir
+            strategy_params["output_database_dir"] = self.output_database_dir
+            strategy_params["input_files"] = self.input_files
+            strategy_params["ignored_runs"] = self.ignored_runs
+            strategy.setup_from_dict(strategy_params)
             strategies.append(strategy)
 
-        parent_conn, child_conn = multiprocessing.Pipe()
         # We then fork off a copy of this python process so that we don't affect the original with logging changes
         ctx = multiprocessing.get_context("fork")
         for strategy in strategies:
+            queue = multiprocessing.SimpleQueue()
             child = ctx.Process(target=SeqAlgorithmsRunner._run_strategy,
-                                args=(strategy, iov, iteration, child_conn))
+                                args=(strategy, iov, iteration, queue))
+
+            self.results[strategy.algorithm.name] = []
+            B2DEBUG(29, "Starting subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
             child.start()
+            update_interval = 60
+            previous_update_time = time.time()
+            while True:
+                if (time.time() - previous_update_time) > update_interval:
+                    B2INFO("Still waiting for AlgorithStrategy to finish for {}".format(strategy.algorithm.name))
+                    previous_update_time = time.time()
+                else:
+                    result = queue.get()
+                    if result == strategy.FINISHED_RESULTS:
+                        break
+                    else:
+                        self.results[strategy.algorithm.name].append(result)
             child.join()
-            self.results[algorithm.name] = parent_conn.recv()
+            # Check the exitcode for failed Process()
+            if child.exitcode == 0:
+                B2INFO("AlgorithStrategy subprocess for {} exited correctly.".format(strategy.algorithm.name))
+            else:
+                raise RunnerError("Error during subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
+            B2DEBUG(29, "Finished subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
         B2INFO("SequentialAlgorithmsRunner finished for Calibration {}".format(self.name))
 
     @staticmethod
-    def _run_strategy(strategy, iov, iteration, conn):
+    def _run_strategy(strategy, iov, iteration, queue):
         """Runs the AlgorithmStrategy sends back the results"""
-        strategy.run(iov, iteration)
+        strategy.run(iov, iteration, queue)
         # Get the return codes of the algorithm for the IoVs found by the Process
-        conn.send(strategy.results)
+        B2INFO("Finished Strategy for {}".format(strategy.algorithm.name))
 
 
 class RunnerError(Exception):

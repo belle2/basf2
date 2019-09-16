@@ -1,7 +1,7 @@
 /*
 <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <contact>jvbennett@cmu.edu</contact>
+  <contact>jkumar@andrew.cmu.edu</contact>
   <description>Plot dE/dx over momentum</description>
 </header>
 */
@@ -46,19 +46,19 @@ void plot(const TString &input_filename)
   const double dedx_cutoff[] = { 10e3, 5.e6, 10.0 };
   for(int idet = 1; idet < num_detectors; idet++) { //PXD not in input file, anyway
     if( idet == 1 )
-      tree->Project(TString::Format("dedx_p_%d", idet), TString::Format("VXDDedxTracks.m_dedx_avg_truncated[][%d]:VXDDedxTracks.m_p", idet), TString::Format("VXDDedxTracks.m_p < 3 && VXDDedxTracks.m_dedx_avg_truncated[][%d] < %f ", idet, dedx_cutoff[idet]));
+      tree->Project(TString::Format("dedx_p_%d", idet), TString::Format("VXDDedxTracks.m_dedxAvgTruncated[][%d]:VXDDedxTracks.m_p", idet), TString::Format("VXDDedxTracks.m_p < 3 && VXDDedxTracks.m_dedxAvgTruncated[][%d] < %f ", idet, dedx_cutoff[idet]));
     else
-      tree->Project(TString::Format("dedx_p_%d", idet), TString::Format("CDCDedxTracks.m_dedx_avg_truncated[][%d]:CDCDedxTracks.m_p_cdc", idet), TString::Format("CDCDedxTracks.m_p_cdc < 3 && CDCDedxTracks.m_dedx_avg_truncated[][%d] < %f ", idet, dedx_cutoff[idet]));
+      tree->Project(TString::Format("dedx_p_%d", idet), TString::Format("CDCDedxTracks.m_dedxAvgTruncated[][%d]:CDCDedxTracks.m_pCDC", idet), TString::Format("CDCDedxTracks.m_pCDC < 3 && CDCDedxTracks.m_dedxAvgTruncated[][%d] < %f ", idet, dedx_cutoff[idet]));
     TH1* hist = (TH1*)output_file->Get(TString::Format("dedx_p_%d", idet));
     hist->SetTitle(TString::Format("dE/dx curve for %s; p [GeV]; dE/dx", detectors[idet]));
     hist->GetListOfFunctions()->Add(new TNamed("Description", hist->GetTitle()));
-    hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
     if (idet == 2) { //CDC
       hist->GetListOfFunctions()->Add(new TNamed("Check", "Distinct bands for pions/kaons/protons below 1GeV, relativistic rise visible . Some misreconstructed tracks at very low dE/dx values."));
     } else { //PXD/SVD
       hist->GetListOfFunctions()->Add(new TNamed("Check", "Distinct bands for pions/kaons/protons below 1GeV, minimal ionisation for higher p. Some misreconstructed tracks at very low dE/dx values."));
     }
-    hist->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+    hist->GetListOfFunctions()->Add(new TNamed("Contact","Jitendra Kumar: jkumar@andrew.cmu.edu"));
+    hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
     hist->Write();
 
   }

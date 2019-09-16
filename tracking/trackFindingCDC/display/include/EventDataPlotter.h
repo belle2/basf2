@@ -70,9 +70,9 @@ namespace Belle2 {
        *
        *  Note that the EventDataPlotter takes ownership of the PrimitivePlotter and destroys it on its on own deconstruction.
        */
-      EventDataPlotter(std::unique_ptr<PrimitivePlotter> ptrPrimitivePlotter,
-                       bool animate = false,
-                       bool forwardFade = false);
+      explicit EventDataPlotter(std::unique_ptr<PrimitivePlotter> ptrPrimitivePlotter,
+                                bool animate = false,
+                                bool forwardFade = false);
 
       /// Copy constructor
       EventDataPlotter(const EventDataPlotter& eventDataPlotter);
@@ -122,7 +122,7 @@ namespace Belle2 {
        */
       void setCanvasHeight(float height);
 
-      /*
+      /**
        *  Indicates the start of a group of drawn elements.
        */
       void startGroup(const AttributeMap& attributeMap = AttributeMap());

@@ -26,7 +26,7 @@ namespace Belle2 {
 
     /** Constructor.
      */
-    ROIPixelTranslator(const ROIinfo*  theROIinfo);
+    explicit ROIPixelTranslator(const ROIinfo*  theROIinfo);
 
     /** Second Constructor.
      */

@@ -12,14 +12,16 @@ SET( ${PROJECT_NAME}_VERSION_MAJOR 2 )
 SET( ${PROJECT_NAME}_VERSION_MINOR 2 )
 SET( ${PROJECT_NAME}_VERSION_PATCH 0 )
 
+include(GNUInstallDirs)
+
 # install destinations can be passed via the command line:
 # cmake -DLIBRARY_OUTPUT_DIRECTORY:PATH=.... -DINCLUDE_OUTPUT_DIRECTORY:PATH=....
 # otherwise, set default install destinations
 IF(NOT DEFINED LIBRARY_OUTPUT_DIRECTORY)
-	set( LIBRARY_OUTPUT_DIRECTORY ./lib )
+	set( LIBRARY_OUTPUT_DIRECTORY ${CMAKE_INSTALL_LIBDIR} )
 ENDIF()
 IF(NOT DEFINED INCLUDE_OUTPUT_DIRECTORY)
-	set( INCLUDE_OUTPUT_DIRECTORY ./include )
+	set( INCLUDE_OUTPUT_DIRECTORY ${CMAKE_INSTALL_INCLUDEDIR} )
 ENDIF()
 
 # define path to macros and settings
@@ -34,41 +36,40 @@ IF(${ROOT_found_version} LESS 60000)
 	MESSAGE(FATAL_ERROR "GenFit requires a ROOT version > 6.00.00")
 ENDIF()
 
-FIND_PACKAGE(Eigen3 REQUIRED NO_MODULE)
+FIND_PACKAGE(Eigen3 REQUIRED)
 
-# either, the environment variable RAVEPATH has to be specified, and RAVE's pkgConfig will be used to determine everything we need
-# or, RAVE_LDFLAGS, RAVE_INCLUDE_DIRS and RAVE_CFLAGS have to be set via the command-line
+# either, the environment variable RAVEPATH has to be specified, and RAVE's RaveConfig.cmake will be used to determine everything we need
+# or, Rave_LDFLAGS, Rave_INCLUDE_DIRS and Rave_CFLAGS have to be set via the command-line
 
 
 IF(DEFINED ENV{RAVEPATH})
-	MESSAGE("Environment variable RAVEPATH is set. Try to build GFRave.") 
+	MESSAGE(STATUS "Environment variable RAVEPATH is set. Try to build GFRave.")
 	# get compiler flags from rave
 	INCLUDE(FindPkgConfig)
 	SET(ENV{PKG_CONFIG_PATH} $ENV{RAVEPATH})
-	pkg_search_module(RAVE rave REQUIRED)
+	find_package(Rave REQUIRED)
 	
 	SET(RAVE True)
-ELSEIF(DEFINED RAVE_LDFLAGS)
-	IF(DEFINED RAVE_INCLUDE_DIRS)
-		IF(DEFINED RAVE_CFLAGS)
-			MESSAGE("RAVE_LDFLAGS, RAVE_INCLUDE_DIRS and RAVE_CFLAGS are set. Try to build GFRave.") 
+ELSEIF(DEFINED Rave_LDFLAGS)
+	IF(DEFINED Rave_INCLUDE_DIRS)
+		IF(DEFINED Rave_CFLAGS)
+			MESSAGE(STATUS "Rave_LDFLAGS, Rave_INCLUDE_DIRS and Rave_CFLAGS are set. Try to build GFRave.")
 			SET(RAVE True)
 		ENDIF()
 	ENDIF()
 ELSE()
-   	MESSAGE("You did not define the environment variable RAVEPATH which is needed to find rave. GFRave will not be built.") 
+   	MESSAGE(STATUS "No RAVEPATH or Rave flags given. GFRave will not be built.")
 ENDIF()
 
 IF(DEFINED RAVE)
 	# turn comma separated lists into space separated strings
-	string (REPLACE ";" " " RAVE_LDFLAGS_STR "${RAVE_LDFLAGS}")
-	string (REPLACE ";" " " RAVE_INCLUDE_DIRS_STR "${RAVE_INCLUDE_DIRS}")
-	string (REPLACE ";" " " RAVE_CFLAGS_STR "${RAVE_CFLAGS}")
+	string (REPLACE ";" " " Rave_LDFLAGS_STR "${Rave_LDFLAGS}")
+	string (REPLACE ";" " " Rave_INCLUDE_DIRS_STR "${Rave_INCLUDE_DIRS}")
+	string (REPLACE ";" " " Rave_CFLAGS_STR "${Rave_CFLAGS}")
 
-	SET (CMAKE_CXX_FLAGS ${RAVE_CFLAGS_STR})
-	
+	SET (CMAKE_CXX_FLAGS ${Rave_DEFINITIONS} ${Rave_CFLAGS_STR})
 	SET(GF_INC_DIRS
-		./GFRave/include/
+		./GFRave/include/ ${Rave_INCLUDE_DIRS_STR}
 	)
 	
 	AUX_SOURCE_DIRECTORY( ./GFRave/src  library_sources )
@@ -248,6 +249,7 @@ SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/measurementsRootDict.cc" "${lib
 
 SET(TRACKREPS_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/trackReps/include/RKTrackRep.h
+		${CMAKE_CURRENT_SOURCE_DIR}/trackReps/include/MplTrackRep.h
 )
 ROOT_GENERATE_DICTIONARY(
 		"${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
@@ -298,9 +300,9 @@ if(DEFINED RAVE)
 	TARGET_LINK_LIBRARIES(
 			${PROJECT_NAME}
 			${ROOT_LIBS}
-			${RAVE_LDFLAGS_STR}
-			-I${RAVE_INCLUDE_DIRS_I}
-  	)
+			${Rave_LIB}
+			${Rave_LDFLAGS_STR}
+	)
 else()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${ROOT_LIBS})
 endif()

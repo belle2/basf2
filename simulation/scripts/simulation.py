@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from geometry import check_components
 from ROOT import Belle2
 from pxd import add_pxd_simulation
 from svd import add_svd_simulation
@@ -69,7 +70,8 @@ def add_PXDDataReduction(path, components,
                                                  'SegmentNetwork__ROI', 'PXDInterceptsToROIs',
                                                  'RecoHitInformationsTo__ROIsvdClusters',
                                                  'SpacePoints__ROITo__ROIsvdClusters', '__ROIsvdClustersToMCParticles',
-                                                 '__ROIsvdClustersToSVDDigits', '__ROIsvdClustersToSVDTrueHits',
+                                                 '__ROIsvdRecoDigitsToMCParticles',
+                                                 '__ROIsvdClustersTo__ROIsvdRecoDigits', '__ROIsvdClustersToSVDTrueHits',
                                                  '__ROIsvdClustersTo__ROIsvdRecoTracks', '__ROIsvdRecoTracksToPXDIntercepts',
                                                  '__ROIsvdRecoTracksToRecoHitInformations',
                                                  '__ROIsvdRecoTracksToSPTrackCands__ROI'])
@@ -109,14 +111,18 @@ def add_simulation(
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
         generate_2nd_cdc_hits=False,
-        simulateT0jitter=False):
+        simulateT0jitter=False,
+        usePXDGatedMode=False):
     """
     This function adds the standard simulation modules to a path.
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
     """
 
+    # Check compoments.
+    check_components(components)
+
     # background mixing or overlay input before process forking
-    if bkgfiles:
+    if bkgfiles is not None:
         if bkgOverlay:
             bkginput = register_module('BGOverlayInput')
             bkginput.param('inputFileNames', bkgfiles)
@@ -127,6 +133,14 @@ def add_simulation(
             if components:
                 bkgmixer.param('components', components)
             path.add_module(bkgmixer)
+            if usePXDGatedMode:
+                if components is None or 'PXD' in components:
+                    # PXD is sensitive to hits in intervall -20us to +20us
+                    bkgmixer.param('minTimePXD', -20000.0)
+                    bkgmixer.param('maxTimePXD', 20000.0)
+                    # Emulate injection vetos for PXD
+                    pxd_veto_emulator = register_module('PXDInjectionVetoEmulator')
+                    path.add_module(pxd_veto_emulator)
 
     # geometry parameter database
     if 'Gearbox' not in path:
@@ -135,12 +149,9 @@ def add_simulation(
 
     # detector geometry
     if 'Geometry' not in path:
-        geometry = register_module('Geometry', useDB=True)
+        path.add_module('Geometry', useDB=True)
         if components is not None:
-            B2WARNING("Custom detector components specified, disabling Geometry from Database")
-            geometry.param('useDB', False)
-            geometry.param('components', components)
-        path.add_module(geometry)
+            B2WARNING("Custom detector components specified: Will still build full geometry")
 
     # event T0 jitter simulation
     if simulateT0jitter and 'EventT0Generator' not in path:
@@ -188,22 +199,17 @@ def add_simulation(
     # ECL digitization
     if components is None or 'ECL' in components:
         ecl_digitizer = register_module('ECLDigitizer')
-        if bkgfiles:
+        if bkgfiles is not None:
             ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)
 
-    # BKLM digitization
-    if components is None or 'BKLM' in components:
-        bklm_digitizer = register_module('BKLMDigitizer')
-        path.add_module(bklm_digitizer)
-
-    # EKLM digitization
-    if components is None or 'EKLM' in components:
-        eklm_digitizer = register_module('EKLMDigitizer')
-        path.add_module(eklm_digitizer)
+    # KLM digitization
+    if components is None or 'KLM' in components:
+        klm_digitizer = register_module('KLMDigitizer')
+        path.add_module(klm_digitizer)
 
     # background overlay executor - after all digitizers
-    if bkgfiles and bkgOverlay:
+    if bkgfiles is not None and bkgOverlay:
         path.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)
         if components is None or 'PXD' in components:
             path.add_module("PXDDigitSorter", digits=pxd_digits_name)

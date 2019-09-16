@@ -36,10 +36,14 @@ namespace Belle2 {
     /// CONSTRUCTORS
 
     /** standard constructor */
-    StaticSector() : m_secID(FullSecID()), m_compactSecIDsMap(nullptr) { }
+    StaticSector() :
+      m_secID(FullSecID()), m_compactSecIDsMap(nullptr)
+    {}
 
     /** constructor */
-    StaticSector(FullSecID secID) : m_secID(secID), m_compactSecIDsMap(nullptr) {}
+    explicit StaticSector(FullSecID secID) :
+      m_secID(secID), m_compactSecIDsMap(nullptr)
+    {}
 
 
     // ACCESSOR FUNCTIONS
@@ -51,7 +55,7 @@ namespace Belle2 {
     {
       auto filter = m_2spFilters.find(m_compactSecIDsMap->getCompactID(innerSector));
       if (filter == m_2spFilters.end()) {
-        return NULL;
+        return nullptr;
       }
       return &(filter->second);
     }
@@ -64,9 +68,7 @@ namespace Belle2 {
     {
       auto filter = m_3spFilters.find(m_compactSecIDsMap->getCompactID(centerID, innerID));
       if (filter == m_3spFilters.end()) {
-        B2DEBUG(1, "StaticSector:getFilter3sp: could not find compactID for given SecIDs  (c/i: " << centerID.getFullSecString() <<
-                "/"  << innerID.getFullSecString() << ")! Returning false.");
-        return NULL;
+        return nullptr;
       }
       return &(filter->second);
     }
@@ -79,7 +81,7 @@ namespace Belle2 {
                                   const FullSecID& /*innerID*/) const
     {
       B2WARNING("StaticSector:getFilter4sp  4 hit, all 4 hits are yet ignored in here! TODO: implement!");
-      return NULL;
+      return nullptr;
     }
 
 
@@ -244,9 +246,9 @@ namespace Belle2 {
         char typeID = accessor[index].first;
         void* valuePtr = accessor[index].second;
         if (typeID == TBranchLeafType(double())) x = *((double*)valuePtr);
-        else if (typeID == TBranchLeafType(int())) x = *((int*)valuePtr);
-        else if (typeID == TBranchLeafType(float())) x = *((float*)valuePtr);
-        else if (typeID == TBranchLeafType(bool())) x = *((bool*)valuePtr);
+        else if (typeID == TBranchLeafType(int())) x = (double)(*((int*)valuePtr));
+        else if (typeID == TBranchLeafType(float())) x = (double)(*((float*)valuePtr));
+        else if (typeID == TBranchLeafType(bool())) x = (double)(*((bool*)valuePtr));
         else {
           B2FATAL("Unrecognized type : " << typeID);
         } // end else if

@@ -48,14 +48,14 @@ namespace Belle2 {
     /** Types for internal storage of probability array.
      */
     typedef uint16_t StoredProbType;
-    typedef std::vector<StoredProbType> StoredProbArray;
-    static const uint16_t storedProbArrayNorm = UINT16_MAX;
+    typedef std::vector<StoredProbType> StoredProbArray; /**< vector of StoreProbType objects*/
+    static const uint16_t storedProbArrayNorm = UINT16_MAX; /**<some constant */
 
     /** Type for output probability array.
      * There is no link between this and what the fitter may produce.
      */
     typedef double OutputProbType;
-    typedef std::vector<OutputProbType> OutputProbArray;
+    typedef std::vector<OutputProbType> OutputProbArray; /**< vector of OutProbType objects*/
 
     /** Constructor using a stl container of time bin probabilities.
      * @param sensorID Sensor VXD ID.
@@ -85,7 +85,7 @@ namespace Belle2 {
       double normCoef = static_cast<double>(storedProbArrayNorm) / inputNorm;
       std::transform(probabilities.begin(), probabilities.end(),
                      std::back_inserter(m_probabilities),
-                     [this, normCoef](typename T::value_type x)->StoredProbType
+                     [normCoef](typename T::value_type x)->StoredProbType
       { return static_cast<StoredProbType>(normCoef * x); }
                     );
     }
@@ -155,7 +155,7 @@ namespace Belle2 {
       if (normCoef < 1.0e-15) normCoef = 1.0;
       std::transform(m_probabilities.begin(), m_probabilities.end(),
                      std::back_inserter(outputPdf),
-                     [this, normCoef](StoredProbType x)-> OutputProbType
+                     [normCoef](StoredProbType x)-> OutputProbType
       { return static_cast<OutputProbType>(normCoef * x); }
                     );
       return outputPdf;
@@ -195,16 +195,16 @@ namespace Belle2 {
     VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/
     bool m_isU; /**< True if U, false if V. */
     short m_cellID; /**< Strip coordinate in pitch units. */
-    float m_stripNoise; /**< Noise of the strip, from calibration. */
+    //    float m_stripNoise; /**< Noise of the strip, from calibration. */
     float m_fittedAmplitude; /**< Fitted amplitude of the signal ("charge") */
-    float m_fittedAmplitudeError; /** Error estimate of amplitude fit. */
-    float m_fittedTime; /** Fitted arrival time of the signal. */
-    float m_fittedTimeError; /** Error estiamte of time fit. */
-    StoredProbArray m_probabilities; /** pdf of the time estimate. */
-    float m_fitChi2Ndf; /** Standardized chi2 of the fit. */
+    float m_fittedAmplitudeError; /**< Error estimate of amplitude fit. */
+    float m_fittedTime; /**< Fitted arrival time of the signal. */
+    float m_fittedTimeError; /**< Error estimate of time fit. */
+    StoredProbArray m_probabilities; /**< pdf of the time estimate. */
+    float m_fitChi2Ndf; /**< Standardized chi2 of the fit. */
     SVDModeByte::baseType m_mode; /**< Mode byte, trigger FADCTime + DAQ mode */
 
-    ClassDef(SVDRecoDigit, 1)
+    ClassDef(SVDRecoDigit, 2)
 
   }; // class SVDRecoDigit
 

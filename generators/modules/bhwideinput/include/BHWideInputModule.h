@@ -43,20 +43,19 @@ namespace Belle2 {
     virtual ~BHWideInputModule();
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
     /** Method is called at the end of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   protected:
 
     double getBeamEnergyCM(double e1, double e2, double angle); /**< Get CM beam energy from LER, HER and crossing angle. */
 
     /** Module parameters */
-    int m_boostMode; /**< The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle). */
     std::vector<double>
     m_ScatteringAngleRangePositron; /**< Min [0] and Max [1] value for the scattering angle [deg] of the positron. */
     std::vector<double>
@@ -67,7 +66,6 @@ namespace Belle2 {
     BHWide::PhotonVacPolarization m_vacPol; /**< Vacuum polarization */
     double m_eMin; /**< Minimum energy for leptons in the final state, in GeV. */
     double m_maxAcollinearity; /**< maximum acollinearity angle between finale state leptons in degrees. */
-    double m_cmsEnergy; /**< CMS energy. */
     double m_wtMax; /**< Maximum weight (wtmax). */
 
     /** Variables */

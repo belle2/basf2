@@ -52,7 +52,7 @@ main.add_module(geometry)
 # simulation
 add_simulation(main)
 # reconstruction
-add_reconstruction(main)
+add_reconstruction(main, pruneTracks=False)
 
 """
 for module in main.modules():

@@ -66,7 +66,7 @@ namespace Belle2 {
       }
 
       /** Destructor freeing the sensor Info */
-      virtual ~SensitiveDetectorBase()
+      virtual ~SensitiveDetectorBase() override
       {
         if (m_info) delete m_info;
       }

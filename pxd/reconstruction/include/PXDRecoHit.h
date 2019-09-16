@@ -3,18 +3,17 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kvasnicka, Martin Ritter, Moritz Nadler            *
+ * Contributors: Peter Kvasnicka, Martin Ritter, Moritz Nadler,           *
+ *               Benjamin Schwenker                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDRECOHIT_H_
-#define PXDRECOHIT_H_
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
-
 
 // ROOT includes
 #include <TMatrixD.h>
@@ -64,7 +63,7 @@ namespace Belle2 {
      * @param sigmaU Error of the Hit along u
      * @param sigmaV Error of the Hit along v
      */
-    PXDRecoHit(const PXDTrueHit* hit, const genfit::TrackCandHit* trackCandHit = NULL, float sigmaU = -1, float sigmaV = -1);
+    explicit PXDRecoHit(const PXDTrueHit* hit, const genfit::TrackCandHit* trackCandHit = NULL, float sigmaU = -1, float sigmaV = -1);
 
     /** Construct PXDRecoHit from a PXD cluster.
      * For users that want to supply their own errors on construction
@@ -74,7 +73,7 @@ namespace Belle2 {
      * @param sigmaV Error of the Hit along v
      * @param covUV  Covariance between u and v
      */
-    PXDRecoHit(const PXDCluster* hit, float sigmaU, float sigmaV, float covUV);
+    explicit PXDRecoHit(const PXDCluster* hit, float sigmaU, float sigmaV, float covUV);
 
     /** Construct PXDRecoHit from a PXD cluster
      * This constructor is intended as a temporary solution for people who want
@@ -86,19 +85,14 @@ namespace Belle2 {
      *
      * @param hit    PXDCluster to use as base
      */
-    PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit* trackCandHit = NULL);
-
-    /** Destructor. */
-    virtual ~PXDRecoHit() {}
+    explicit PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit* trackCandHit = NULL);
 
     /** Creating a deep copy of this hit. */
-    genfit::AbsMeasurement* clone() const;
+    genfit::AbsMeasurement* clone() const override;
 
     /** Methods that actually interface to Genfit.  */
     /* This method allows to provide hit position dependent on track direction. */
-    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
-    /* This method allows to provide hit position dependent on track direction. New method using the PXDClusterPositionEstimator */
-    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane2(const genfit::StateOnPlane& state) const;
+    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const override;
 
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
@@ -126,7 +120,10 @@ namespace Belle2 {
     /** Get deposited energy error. */
     //float getEnergyDepError() const { return m_energyDepError; }
 
-    virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const { return new genfit::HMatrixUV(); };
+    /** Get the likelyhood that cluster shape is likely to be created from track state. */
+    float getShapeLikelyhood(const genfit::StateOnPlane& state) const;
+
+    virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const override { return new genfit::HMatrixUV(); };
 
   private:
 
@@ -143,9 +140,10 @@ namespace Belle2 {
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(PXDRecoHit, 7)
+    /** Apply planar deformation of sensors*/
+    TVectorD applyPlanarDeformation(TVectorD hitCoords, std::vector<double> planarParameters, const genfit::StateOnPlane& state) const;
+
+    ClassDefOverride(PXDRecoHit, 8)
   };
 
 } // namespace Belle2
-
-#endif /* PXDRECOHIT_H_ */

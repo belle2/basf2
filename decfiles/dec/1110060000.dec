@@ -1,0 +1,43 @@
+# EventType: B02KsKsKs
+# Descriptor: [B0 -> (K_S0 -> pi+ pi-)(K_S0 -> pi+ pi-)(K_S0 -> pi+ pi-)]cc
+# NickName: B0_3KS_6pi+pi-
+# Documentation: Decay mode for sensitivity studies
+# Tested: Yes
+# PhysicsWG: TDPCV
+# Responsible: Alessandro Gaz
+# Email: gaz@hepl.phys.nagoya-u.ac.jp
+# Cuts: None
+# Date: 20171206
+#
+#
+#
+#
+Alias      K_S0sig1  K_S0
+ChargeConj K_S0sig1  K_S0sig1
+Alias      K_S0sig2  K_S0
+ChargeConj K_S0sig2  K_S0sig2
+Alias      K_S0sig3  K_S0
+ChargeConj K_S0sig3  K_S0sig3
+#
+#
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0			VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.000	 K_S0sig1    K_S0sig2    K_S0sig3                           PHSP; 
+Enddecay
+CDecay anti-B0sig
+#
+Decay K_S0sig1
+1        pi+       pi-                 PHSP;
+Enddecay
+Decay K_S0sig2
+1        pi+       pi-                 PHSP;
+Enddecay
+Decay K_S0sig3
+1        pi+       pi-                 PHSP;
+Enddecay
+#
+End
+

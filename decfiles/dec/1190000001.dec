@@ -1,0 +1,31 @@
+# EventType: 1190000001
+# Descriptor: [B0 -> Xs0 eta]cc
+# NickName: Bd_Xsdeta
+# Documentation: 
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Saurabh Sandilya
+# Email: saurabhsandilya@gmail.com
+# Cuts: None
+# Date: 20180416
+#
+#
+Alias MyXsd Xsd
+Alias Myanti-Xsd anti-Xsd
+
+ChargeConj Myanti-Xsd MyXsd
+
+ChangeMassMin MyXsd 1.1
+ChangeMassMin Myanti-Xsd 1.1
+# Minimum Mass cut changed as requested by Ishikawa-san on 20180416
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.0      MyXsd eta         PHOTOS PHSP;
+Enddecay
+CDecay anti-B0sig
+#
+End

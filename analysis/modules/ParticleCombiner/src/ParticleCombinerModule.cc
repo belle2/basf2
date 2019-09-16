@@ -25,9 +25,9 @@
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <framework/dbobjects/BeamParameters.h>
 
 #include <algorithm>
+#include <memory>
 
 using namespace std;
 
@@ -68,18 +68,19 @@ namespace Belle2 {
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
     addParam("recoilParticleType", m_recoilParticleType,
              "If not equal 0, the mother Particle is reconstructed in the recoil against the daughter particles.\n"
-             "In the case of the following decay chain M -> D1 D2 ... Dn and\n"
-             " a) recoilParticleType = 1: \n"
-             "   - the mother momentum is given by: p(M) = p(e+e-) - p(D1) - p(D2) - ... - p(DN)\n"
-             "   - D1, D2, ..., DN are attached as daughters of M\n"
-             " b) recoilParticleType = 2: \n"
-             "   - the mother momentum is given by: p(M) = p(D1) - p(D2) - ... - p(DN)\n"
-             "   - D1, D2, ..., DN are attached as daughters of M\n" , 0);
+             "In the case of the following decay chain M -> D1 D2 ... Dn and\n\n"
+             ""
+             "  a) recoilParticleType = 1: \n\n"
+             "    - the mother momentum is given by: p(M) = p(e+e-) - p(D1) - p(D2) - ... - p(DN)\n"
+             "    - D1, D2, ..., DN are attached as daughters of M\n\n"
+             "  b) recoilParticleType = 2: \n\n"
+             "    - the mother momentum is given by: p(M) = p(D1) - p(D2) - ... - p(DN)\n"
+             "    - D1, D2, ..., DN are attached as daughters of M\n\n" , 0);
 
     // initializing the rest of private memebers
     m_pdgCode   = 0;
-    m_isSelfConjugatedParticle = 0;
-    m_generator = 0;
+    m_isSelfConjugatedParticle = false;
+    m_generator = nullptr;
   }
 
   void ParticleCombinerModule::initialize()
@@ -110,7 +111,7 @@ namespace Belle2 {
       StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
     }
 
-    m_generator = std::unique_ptr<ParticleGenerator>(new ParticleGenerator(m_decayString, m_cutParameter));
+    m_generator = std::make_unique<ParticleGenerator>(m_decayString, m_cutParameter);
 
     StoreObjPtr<ParticleList> particleList(m_listName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
@@ -159,7 +160,7 @@ namespace Belle2 {
       //    - p(mother) = p(daughter_0) - Sum_i p(daughter_i) (where i > 0)
       if (m_recoilParticleType == 1) {
         PCmsLabTransform T;
-        TLorentzVector recoilMomentum = T.getBeamParams().getHER() + T.getBeamParams().getLER() - particle.get4Vector();
+        TLorentzVector recoilMomentum = T.getBeamFourMomentum() - particle.get4Vector();
         particle.set4Vector(recoilMomentum);
       } else if (m_recoilParticleType == 2) {
         const std::vector<Particle*> daughters = particle.getDaughters();

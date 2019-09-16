@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>oliver.frost@desy.de</contact>
+  <contact>software-tracking@belle2.org</contact>
   <input>EvtGenSimNoBkg.root</input>
   <output>CDCAutomatonTrackingValidation.root</output>
   <description>
@@ -14,7 +14,7 @@
 """
 
 VALIDATION_OUTPUT_FILE = 'CDCAutomatonTrackingValidation.root'
-CONTACT = 'oliver.frost@desy.de'
+CONTACT = 'software-tracking@belle2.org'
 N_EVENTS = 1000
 ACTIVE = True
 
@@ -27,16 +27,21 @@ from tracking.validation.run import TrackingValidationRun
 
 
 class CDCAutomaton(TrackingValidationRun):
+    """Validate the CDC TrackFinderAutomaton"""
+    #: number of events to generate
     n_events = N_EVENTS
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
+    #: no background overlay
     root_input_file = '../EvtGenSimNoBkg.root'
 
     def finder_module(self, path):
+        """Add the CDC TrackFinderAutomaton to the basf2 path"""
         path.add_module('TFCDC_TrackFinderAutomaton',
                         # UseNLoops = 1,
                         )
 
+    #: Define the user parameters for the track-finding module
     tracking_coverage = {
         'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries
         'UsePXDHits': False,
@@ -51,8 +56,11 @@ class CDCAutomaton(TrackingValidationRun):
         "AllowFirstCDCSuperLayerOnly": True,
         'EnergyCut': 0,
     }
+    #: Include pulls in the validation output
     pulls = True
+    #: name of the contact person
     contact = CONTACT
+    #: name of the output ROOT file
     output_file_name = VALIDATION_OUTPUT_FILE
 
 

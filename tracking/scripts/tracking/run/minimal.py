@@ -19,22 +19,30 @@ def get_logger():
 
 
 class EmptyRun(object):
+    """Configure for a bare-bones basf2 job"""
+
     # Declarative section which can be redefined in a subclass
+
+    #: Description of the run setup to be displayed on command line
     description = "Empty execution of basf2"
 
     def __init__(self, **kwds):
+        """Constructor"""
         if kwds:
             raise ValueError("Received_unknown unknown argument")
 
     @property
     def name(self):
+        """provide name of this object"""
         return self.__class__.__name__
 
     def configure_and_execute_from_commandline(self):
+        """Configure basf2 job script from command-line arguments then run it"""
         self.configure_from_commandline()
         self.execute()
 
     def execute(self):
+        """Create the basf2 path then run the job"""
         # Create path and run #
         #######################
         path = self.create_path()
@@ -42,6 +50,7 @@ class EmptyRun(object):
         self.run(path)
 
     def run(self, path):
+        """Process the basf2 path"""
         # Run basf2 module path #
         #########################
         get_logger().info('Start processing')
@@ -50,11 +59,13 @@ class EmptyRun(object):
         get_logger().info("\n%s", str(basf2.statistics))
 
     def configure_from_commandline(self):
+        """Convert the command-line arguments to a basf2 job script"""
         argument_parser = self.create_argument_parser()
         arguments = argument_parser.parse_args()
         self.configure(arguments)
 
     def configure(self, arguments):
+        """Save the command-line arguments as key-value pairs"""
         # Simply translate the arguments that have
         # the same name as valid instance arguments
         for (key, value) in list(vars(arguments).items()):
@@ -65,32 +76,45 @@ class EmptyRun(object):
                 setattr(self, key, value)
 
     def create_argument_parser(self, **kwds):
+        """Parse the command-line arguments to a basf2 job script"""
         argument_parser = utilities.ArgumentParser(description=self.description, **kwds)
         return argument_parser
 
     def create_path(self):
+        """Create a new basf2 path"""
         path = basf2.create_path()
         return path
 
     def adjust_path(self, path):
-        """Hook that gives the opportunity to check the path for consistance before processing it"""
+        """Hook that gives the opportunity to check the path for consistency before processing it"""
         pass
 
 # Minimal run stub defining some general parameters
 
 
 class MinimalRun(EmptyRun):
+    """Configure for a minimal basf2 job"""
+
+    #: Description of this object
     description = "Minimally populated execution of basf2"
 
     # Declarative section which can be redefined in a subclass
+
+    #: By default, this basf2 job can read events from an input ROOT TFile
     allow_input = True
+    #: By default, process 10000 events
     n_events = 10000
+    #: By default, there is no input ROOT TFile
     root_input_file = None
+    #: By default, the random-number seed is unassigned
     random_seed = None
+    #: By default, no parallel processing
     n_processes = 0
+    #: By default, do not skip any events at the start of the input ROOT TFile
     n_events_to_skip = 0
 
     def create_argument_parser(self, **kwds):
+        """Convert command-line arguments to basf2 argument list"""
         argument_parser = super().create_argument_parser(**kwds)
         master_argument_group = argument_parser.add_argument_group("Master arguments")
 
@@ -141,6 +165,7 @@ class MinimalRun(EmptyRun):
         return argument_parser
 
     def create_path(self):
+        """Create and configure the basf2 path"""
         path = super().create_path()
 
         if self.random_seed is not None:
@@ -155,7 +180,7 @@ class MinimalRun(EmptyRun):
             path.add_module('EventInfoSetter',
                             evtNumList=[self.n_events],
                             runList=[1],
-                            expList=[1],
+                            expList=[0],
                             skipNEvents=self.n_events_to_skip
                             )
 

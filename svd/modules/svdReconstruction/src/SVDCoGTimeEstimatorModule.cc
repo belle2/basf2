@@ -27,6 +27,8 @@ SVDCoGTimeEstimatorModule::SVDCoGTimeEstimatorModule() : Module()
   setDescription("From SVDShaperDigit to SVDRecoDigit. Strip charge is evaluated as the max of the 6 samples; hit time is evaluated as a corrected Centre of Gravity (CoG) time.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("SVDEventInfo", m_svdEventInfoName,
+           "SVDEventInfo name", string(""));
   addParam("ShaperDigits", m_storeShaperDigitsName,
            "ShaperDigits collection name", string(""));
   addParam("RecoDigits", m_storeRecoDigitsName,
@@ -34,14 +36,11 @@ SVDCoGTimeEstimatorModule::SVDCoGTimeEstimatorModule() : Module()
   addParam("FixedTimeError", m_FixedTimeError, "Fixed error on the estimated time, corresponding to the Width of the 3rd time shift",
            float(6.0));
 
-  addParam("Correction_StripCalPeakTime", Correction_1,
+  addParam("StripPeakTimeCorrection", m_corrPeakTime,
            "Correct for the different peaking times of the strips, obtained from local run calibration", true);
-  addParam("Correction_TBTimeWindow", Correction_2,
-           "Subtract the central value of the time window corresponding to the event Trigger Bin", true);
-  addParam("Correction_ShiftMeanToZero", Correction_3, "Apply correction to shift the mean of the time distribution to zero", true);
-  addParam("Correction_ShiftMeanToZeroTBDep", Correction_4,
-           "Apply correction to shift the mean of the time distribution to zero, Trigger Bin dependent", false);
-
+  addParam("CalibrationWithEventT0", m_calEventT0,
+           "Use the timing informations of the EventT0 in order to calibrate the CoG.",
+           true);
 
 }
 
@@ -58,6 +57,7 @@ void SVDCoGTimeEstimatorModule::initialize()
 
   //Inizialization of needed store array
   m_storeShaper.isRequired(m_storeShaperDigitsName);
+  m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
 
   //Initialize the new RecoDigit
   m_storeReco.registerInDataStore(m_storeRecoDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
@@ -104,11 +104,14 @@ void SVDCoGTimeEstimatorModule::beginRun()
 
 void SVDCoGTimeEstimatorModule::event()
 {
+
   /** Probabilities, to be defined here */
   std::vector<float> probabilities = {0.5};
 
-  // If no digits, nothing to do
-  if (!m_storeShaper || !m_storeShaper.getEntries()) return;
+  // If no digits or no SVDEventInfo, nothing to do
+  if (!m_storeShaper || !m_storeShaper.getEntries() || !m_storeSVDEvtInfo.isValid()) return;
+
+  SVDModeByte modeByte = m_storeSVDEvtInfo->getModeByte();
 
   size_t nDigits = m_storeShaper.getEntries();
 
@@ -140,8 +143,6 @@ void SVDCoGTimeEstimatorModule::event()
 
     m_StopCreationReco = false;
 
-
-    SVDModeByte modeByte = shaper.getModeByte();
     m_NumberOfAPVSamples = fromModeToNumberOfSample((int) modeByte.getDAQMode());
     B2DEBUG(1, "number of APV samples = " << m_NumberOfAPVSamples);
 
@@ -172,15 +173,13 @@ void SVDCoGTimeEstimatorModule::event()
     //convert ADC into #e- and apply offset to shift estimated peak time to hit time (to be completed)
     m_amplitude = m_PulseShapeCal.getChargeFromADC(thisSensorID, thisSide, thisCellID, m_amplitude);
     m_amplitudeError = m_PulseShapeCal.getChargeFromADC(thisSensorID, thisSide, thisCellID, m_amplitudeError);
-    if (Correction_1) //first correction
+
+    if (m_corrPeakTime)
       m_weightedMeanTime -= m_PulseShapeCal.getPeakTime(thisSensorID, thisSide, thisCellID);
-    SVDModeByte::baseType triggerBin = (shaper.getModeByte()).getTriggerBin();
-    if (Correction_2) //second correction
-      m_weightedMeanTime -= (DeltaT / 8 + ((int)triggerBin) * DeltaT / 4);
-    if (Correction_3) //third correction
-      m_weightedMeanTime -= m_PulseShapeCal.getTimeShiftCorrection(thisSensorID, thisSide, thisCellID);
-    if (Correction_4) //fourth correction
-      m_weightedMeanTime -= m_PulseShapeCal.getTriggerBinDependentCorrection(thisSensorID, thisSide, thisCellID, (int)triggerBin);
+    SVDModeByte::baseType triggerBin = modeByte.getTriggerBin();
+
+    if (m_calEventT0)
+      m_weightedMeanTime = m_TimeCal.getCorrectedTime(thisSensorID, thisSide, thisCellID, m_weightedMeanTime, triggerBin);
 
     //check high charges and too high ADC
     if (m_amplitude > 100000) {
@@ -196,7 +195,7 @@ void SVDCoGTimeEstimatorModule::event()
 
     //recording of the RecoDigit
     m_storeReco.appendNew(SVDRecoDigit(shaper.getSensorID(), shaper.isUStrip(), shaper.getCellID(), m_amplitude, m_amplitudeError,
-                                       m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2, shaper.getModeByte()));
+                                       m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2, modeByte));
 
     //Add digit to the RecoDigit->ShaperDigit relation list
     int recoDigitIndex = m_storeReco.getEntries() - 1;

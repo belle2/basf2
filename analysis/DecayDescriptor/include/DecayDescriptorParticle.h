@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef DECAYDESCRIPTORPARTICLE_H
-#define DECAYDESCRIPTORPARTICLE_H
+#pragma once
 
 #include <string>
 
@@ -27,6 +26,8 @@ namespace Belle2 {
     std::string m_strName;
     /** Is particle selected? */
     bool m_isSelected;
+    /** Is particle unspecified by marking @ ? */
+    bool m_isUnspecified;
     /** Label of this particle to distinguish e.g. different decay channels or selection criteria. */
     std::string m_strLabel;
     /** PDG code of the decaying particle. */
@@ -34,8 +35,13 @@ namespace Belle2 {
   public:
     /** Default ctor. */
     DecayDescriptorParticle();
-    /** Copy ctor. */
-    DecayDescriptorParticle(const DecayDescriptorParticle& other);
+
+    /** Want the default copy ctor. */
+    DecayDescriptorParticle(const DecayDescriptorParticle&) = default;
+
+    /** Want the default assignment operator */
+    DecayDescriptorParticle& operator=(const DecayDescriptorParticle&) = default;
+
     /** initialise member variables from std::string member variables contained in a DecayStringParticle struct. */
     bool init(const DecayStringParticle& p);
     /** evt.pdl name of the particle. */
@@ -70,8 +76,12 @@ namespace Belle2 {
     {
       return m_iPDGCode;
     }
+    /** Is the particle unspecified? */
+    int isUnspecified() const
+    {
+      return m_isUnspecified;
+    }
   };
 }
 
-#endif // DECAYDESCRIPTORPARTICLE_H
 

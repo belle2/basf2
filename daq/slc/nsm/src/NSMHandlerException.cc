@@ -6,7 +6,7 @@
 
 using namespace Belle2;
 
-NSMHandlerException::NSMHandlerException(const std::string& format, ...) throw()
+NSMHandlerException::NSMHandlerException(const std::string& format, ...)
 {
   va_list ap;
   char ss[1024 * 100];

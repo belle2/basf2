@@ -46,6 +46,7 @@ gROOT.ProcessLine('struct EventData {\
     float cluster_pull;\
     float cluster_residual;\
     float truehit_position;\
+    float truehit_interstripPosition;\
     float truehit_deposEnergy;\
     float truehit_lossmomentum;\
     };')
@@ -122,10 +123,10 @@ class SVDValidationTTree(Module):
                 # Interstrip position calculations
                 if cluster.isUCluster():
                     strip_dir = 0
-                    strip_pitch = sensorInfo.getUPitch(cluster_position)
+                    strip_pitch = sensorInfo.getUPitch(truehit.getV())
                 else:
                     strip_dir = 1
-                    strip_pitch = sensorInfo.getVPitch(cluster_position)
+                    strip_pitch = sensorInfo.getVPitch(truehit.getU())
                 self.data.strip_dir = strip_dir
                 self.data.strip_pitch = strip_pitch
                 cluster_interstripPosition = cluster_position % strip_pitch / strip_pitch
@@ -138,7 +139,7 @@ class SVDValidationTTree(Module):
                     uPos = 0
                     vPos = cluster_position
                 localPosition = TVector3(uPos, vPos, 0)  # sensor center at (0, 0, 0)
-                globalPosition = sensorInfo.pointToGlobal(localPosition)
+                globalPosition = sensorInfo.pointToGlobal(localPosition, True)
                 x = globalPosition[0]
                 y = globalPosition[1]
                 z = globalPosition[2]
@@ -172,6 +173,8 @@ class SVDValidationTTree(Module):
                 self.data.cluster_pull = cluster_pull
                 # Truehit information
                 self.data.truehit_position = truehitPos
+                truehit_interstripPosition = truehitPos % strip_pitch / strip_pitch
+                self.data.truehit_interstripPosition = truehit_interstripPosition
                 self.data.truehit_deposEnergy = truehit.getEnergyDep()
                 self.data.truehit_lossmomentum = truehit.getEntryMomentum().Mag() - truehit.getExitMomentum().Mag()
                 # Fill tree

@@ -11,27 +11,36 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#ifndef ECLSHOWERSHAPEMODULE_H_
-#define ECLSHOWERSHAPEMODULE_H_
+//STL
+#include <complex>
+
+//ROOT
+#include <TGraph.h>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
+#include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 
-// ECL
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/geometry/ECLNeighbours.h>
-#include <framework/database/DBArray.h>
-#include <ecl/dbobjects/ECLShowerShapeSecondMomentCorrection.h>
-
-//MVA package
-#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-#include <mva/interface/Weightfile.h>
-#include <mva/interface/Expert.h>
-
 namespace Belle2 {
+
+  class DatabaseRepresentationOfWeightfile;
+  class ECLConnectedRegion;
+  class ECLShower;
+  class ECLShowerShapeSecondMomentCorrection;
+
+  namespace MVA {
+    class Expert;
+    class SingleDataset;
+  }
+
+  namespace ECL {
+    class ECLNeighbours;
+  }
 
   /** Class to perform the shower correction */
   class ECLShowerShapeModule : public Module {
@@ -52,19 +61,19 @@ namespace Belle2 {
     ~ECLShowerShapeModule();
 
     /** Initialize. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Begin run. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Event. */
-    virtual void event();
+    virtual void event() override;
 
     /** End run. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Terminate. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -80,6 +89,9 @@ namespace Belle2 {
       /** polar angel */
       double alpha;
     };
+
+    /** StoreArray ECLConnectedRegion */
+    StoreArray<ECLConnectedRegion> m_eclConnectedRegions;
 
     // Module Parameters
     double m_zernike_n1_rho0; /**< Scaling factor for radial distances in perpendicular plane, used in Zernike moment calculation for N1 showers */
@@ -108,10 +120,10 @@ namespace Belle2 {
     m_dataset; /**< Pointer to the current dataset. It is assumed it holds 22 entries, 11 Zernike moments of N2 shower, followed by 11 Zernike moments of N1 shower. */
 
     /** Neighbour map 9 neighbours, for E9oE21 and E1oE9. */
-    ECL::ECLNeighbours* m_neighbourMap9;
+    std::unique_ptr<ECL::ECLNeighbours> m_neighbourMap9;
 
     /** Neighbour map 21 neighbours, for E9oE21. */
-    ECL::ECLNeighbours* m_neighbourMap21;
+    std::unique_ptr<ECL::ECLNeighbours> m_neighbourMap21;
 
     /** initialize MVA weight files from DB
      */
@@ -235,5 +247,3 @@ namespace Belle2 {
   }; // end of ECLShowerShapePureCsIModule
 
 } // end of Belle2 namespace
-
-#endif

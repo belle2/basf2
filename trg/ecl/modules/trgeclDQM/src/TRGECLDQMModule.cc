@@ -13,6 +13,7 @@
 #include <trg/ecl/TrgEclMapping.h>
 #include <trg/ecl/TrgEclCluster.h>
 #include <trg/ecl/TrgEclMaster.h>
+#include <trg/ecl/TrgEclDataBase.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -30,7 +31,7 @@ REG_MODULE(TRGECLDQM);
 TRGECLDQMModule::TRGECLDQMModule() : HistoModule()
 {
 
-  _TCCluster = new TrgEclCluster();
+
   setDescription("DQM for ECL Trigger system");
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -46,31 +47,36 @@ TRGECLDQMModule::TRGECLDQMModule() : HistoModule()
 
 TRGECLDQMModule::~TRGECLDQMModule()
 {
-  delete _TCCluster;
+
 }
 
 
 void TRGECLDQMModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-
-  TDirectory* dirDQM = NULL;
-  dirDQM = oldDir->mkdir("TRG");
+  TDirectory* dirDQM = (TDirectory*)gDirectory->Get("TRG");
+  if (!dirDQM) {
+    dirDQM = oldDir->mkdir("TRG");
+  }
   dirDQM->cd();
-  h_TCId = new TH1D("h_TCId", "Hit TC ID", 100, 0, 600);
-  //  h_TC2d = new TH2D("h_TC2d","Hit TC ID;x;Hit TC #phi",17,0,17,36,0,36);
-  h_TCthetaId = new TH1D("h_TCthetaId", "Hit TC #theta ID", 17, 0, 17);
-  h_TCphiId_FWD = new TH1D("h_TCphiId_FWD", "Hit TC #phi ID", 33, 0, 32);
-  h_TCphiId_BR = new TH1D("h_TCphiId_BR", "Hit TC #phi ID", 36, 0, 36);
-  h_TCphiId_BWD = new TH1D("h_TCphiId_BWD", "Hit TC #phi ID", 33, 0, 32);
-  h_TotalEnergy = new TH1D("h_TotalEnergy", "Total TC Energy (FADC Count)", 100, 0, 1000);
-  h_TCEnergy = new TH1D("h_TCEnergy", "TC Energy/event", 100, 0, 300);
-  h_n_TChit_event = new TH1D("h_n_TChit_event", "Number of TC / Event", 20, 0, 20);
-  h_Cluster = new TH1D("h_Cluster", "N(Cluster)/event", 10, 0, 10);
-  h_TCTiming = new TH1D("h_TCTiming", "TCTiming/event", 100, 2000, 4000);
-  h_TRGTiming = new TH1D("h_TRGTiming", "TRGTiming/event", 500, 2000, 4000);
 
-
+  h_TCId           = new TH1D("h_TCId",          "Hit TC ID",                   578, 0, 578);
+  h_TCthetaId      = new TH1D("h_TCthetaId",     "Hit TC #theta ID",             19, 0, 19);
+  h_TCphiId_FWD    = new TH1D("h_TCphiId_FWD",   "Hit TC #phi ID in FWD",        34, 0, 34);
+  h_TCphiId_BR     = new TH1D("h_TCphiId_BR",    "Hit TC #phi ID in BR",         38, 0, 38);
+  h_TCphiId_BWD    = new TH1D("h_TCphiId_BWD",   "Hit TC #phi ID in BWD",        34, 0, 34);
+  h_TotalEnergy    = new TH1D("h_TotalEnergy",   "Total TC Energy (ADC)",       100, 0, 3000);
+  h_TCEnergy       = new TH1D("h_TCEnergy",      "TC Energy (ADC)",     100, 0, 1500);
+  h_Narrow_TotalEnergy    = new TH1D("h_Narrow_TotalEnergy",   "Total TC Energy (ADC)",       100, 0, 500);
+  h_Narrow_TCEnergy       = new TH1D("h_Narrow_TCEnergy",      "TC Energy (ADC)",     100, 0, 100);
+  h_n_TChit_event  = new TH1D("h_n_TChit_event", "N(TC) ",                40, 0, 40);
+  h_Cluster        = new TH1D("h_Cluster",       "N(Cluster) ",           20, 0, 20);
+  h_TCTiming       = new TH1D("h_TCTiming",      "TC Timing  (ns)",      100, 3010, 3210);
+  h_TRGTiming      = new TH1D("h_TRGTiming",     "TRG Timing  (ns)",     100, 3010, 3210);
+  h_Cal_TCTiming       = new TH1D("h_Cal_TCTiming",      "Cal TC Timing  (ns)",      100, -400, 400);
+  h_Cal_TRGTiming      = new TH1D("h_Cal_TRGTiming",     "TRG Timing  (ns)",     100, -400, 400);
+  h_ECL_TriggerBit      = new TH1D("h_ECL_TriggerBit",     "ECL Trigger Bit",     26, 0, 26);
+  h_Cluster_Energy_Sum    = new TH1D("h_Cluster_Energy_Sum",   "Energy Sum of 2 Clusters (ADC)",       300, 0, 3000);
 
   oldDir->cd();
 }
@@ -81,8 +87,9 @@ void TRGECLDQMModule::initialize()
 
   REG_HISTOGRAM
   trgeclHitArray.registerInDataStore();
+  trgeclEvtArray.registerInDataStore();
   trgeclCluster.registerInDataStore();
-
+  trgeclSumArray.registerInDataStore();
   defineHisto();
 
 }
@@ -112,45 +119,228 @@ void TRGECLDQMModule::event()
   double HitRevoFam = 0;
   double HitRevoTrg = 0;
   double HitFineTiming = 0;
+  double HitRevoEvtTiming = 0;
+  double HitCalTiming = 0;
+  int CheckSum = 0;
+
+  for (int iii = 0; iii < trgeclEvtArray.getEntries(); iii++) {
+    TRGECLUnpackerEvtStore* aTRGECLUnpackerEvtStore = trgeclEvtArray[iii];
+
+    HitFineTiming = aTRGECLUnpackerEvtStore ->  getEvtTime();
+    HitRevoTrg = aTRGECLUnpackerEvtStore -> getL1Revo();
+    HitRevoEvtTiming = aTRGECLUnpackerEvtStore -> getEvtRevo();
+    CheckSum =  aTRGECLUnpackerEvtStore -> getEvtExist() ;
+
+
+    RevoTrg.push_back(HitRevoTrg);
+
+
+
+  }
+  if (CheckSum == 0) {return;}
+
+
+
   for (int ii = 0; ii < trgeclHitArray.getEntries(); ii++) {
     TRGECLUnpackerStore* aTRGECLUnpackerStore = trgeclHitArray[ii];
     int TCID = (aTRGECLUnpackerStore->getTCId());
+    int hit_win =  aTRGECLUnpackerStore -> getHitWin();
     HitEnergy =  aTRGECLUnpackerStore -> getTCEnergy();
-    if (TCID < 1 || TCID > 576 || HitEnergy == 0) {continue;}
-
     HitTiming    = aTRGECLUnpackerStore ->getTCTime();
-    HitRevoFam = aTRGECLUnpackerStore -> getRevoFAM();
-    HitRevoTrg = aTRGECLUnpackerStore -> getRevoGDL();
-    HitFineTiming = aTRGECLUnpackerStore -> getEVTTime();
 
+    if (TCID < 1 || TCID > 576 || HitEnergy == 0) {continue;}
+    if (!(hit_win == 3 || hit_win == 4)) {continue;}
+    HitCalTiming = aTRGECLUnpackerStore ->getTCCALTime() ;
+    HitRevoFam = aTRGECLUnpackerStore-> getRevoFAM() ;
 
     TCId.push_back(TCID);
     TCEnergy.push_back(HitEnergy);
     TCTiming.push_back(HitTiming);
     RevoFAM.push_back(HitRevoFam);
-    RevoTrg.push_back(HitRevoTrg);
-    FineTiming.push_back(HitFineTiming);
+    FineTiming.push_back(HitCalTiming);
+  }
+  //
+  //
+  if (TCId.size() == 0) {return;}
+
+  int phy    = 0;
+  int b1     = 0;
+  int b2v    = 0;
+  int b2s    = 0;
+  int mu     = 0;
+  int pre    = 0;
+  int clover = 0;
+  int tsource = 0;
+  int b1type = 0;
+  int etot = 0;
+  int vlm = 0;
+  //  int s_hit_win= 0;
+  std::vector<int> trgbit ;
+  trgbit.resize(41, 0);
+  for (int iii = 0; iii < trgeclSumArray.getEntries(); iii++) {
+    TRGECLUnpackerSumStore* aTRGECLUnpackerSumStore = trgeclSumArray[iii];
+
+    tsource = aTRGECLUnpackerSumStore ->getTimeType();
+    phy     = aTRGECLUnpackerSumStore ->getPhysics();
+    b1      = aTRGECLUnpackerSumStore ->get2DBhabha();
+    b1type  = aTRGECLUnpackerSumStore -> getBhabhaType();
+    b2v     = aTRGECLUnpackerSumStore -> get3DBhabhaV();
+    b2s     = aTRGECLUnpackerSumStore -> get3DBhabhaS() ;
+    etot    = aTRGECLUnpackerSumStore ->  getEtotType();
+    clover  = aTRGECLUnpackerSumStore ->  getICNOver();
+    vlm     = aTRGECLUnpackerSumStore ->  getLowMulti();
+    mu      = aTRGECLUnpackerSumStore ->  getMumu();
+    pre     = aTRGECLUnpackerSumStore ->  getPrescale();
+
+
+    //
+    trgbit[0] = 1;
+    trgbit[1] = tsource & 0x1;
+    trgbit[2] = (tsource >> 1) & 0x1;
+    trgbit[3] = (tsource >> 2) & 0x1;
+    trgbit[4] = phy;
+    trgbit[5] = b1;
+    trgbit[6] = b2v;
+    trgbit[7] = b2s;
+    trgbit[8] = etot & 0x1;
+    trgbit[9] = (etot >> 1) & 0x1;
+    trgbit[10] = (etot >> 2) & 0x1;
+    trgbit[11] = clover;
+
+    for (int j = 0; j < 12; j++) {
+      trgbit[12 + j] = (vlm >> j) & 0x1;
+    }
+
+    trgbit[24] = mu;
+    trgbit[25] = pre;
+
+    trgbit[26] = b1type & 0x1;
+    trgbit[27] = (b1type >> 1) & 0x1;
+    trgbit[28] = (b1type >> 2) & 0x1;
+    trgbit[29] = (b1type >> 3) & 0x1;
+    trgbit[30] = (b1type >> 4) & 0x1;
+    trgbit[31] = (b1type >> 5) & 0x1;
+    trgbit[32] = (b1type >> 6) & 0x1;
+    trgbit[33] = (b1type >> 7) & 0x1;
+    trgbit[34] = (b1type >> 8) & 0x1;
+    trgbit[35] = (b1type >> 9) & 0x1;
+    trgbit[36] = (b1type >> 10) & 0x1;
+    trgbit[37] = (b1type >> 11) & 0x1;
+    trgbit[38] = (b1type >> 12) & 0x1;
+    trgbit[39] = (b1type >> 13) & 0x1;
+    trgbit[40] = (b1type >> 14) & 0x1;
 
   }
+
+  const char* label[41] = {"Hit", "Timing Source(FWD)", "Timing Source(BR)", "Timing Source(BWD)", "physics Trigger", "2D Bhabha Veto", "3D Bhabha veto", "3D Bhabha Selection", "E Low", "E High", "E LOM", "Cluster Overflow", "Low multi bit 0", "Low multi bit 1", "Low multi bit 2", "Low multi bit 3", "Low multi bit 4", "Low multi bit 5", "Low multi bit 6", "Low multi bit 7", "Low multi bit 8", "Low multi bit 9", "Low multi bit 10", "Low multi bit 11", "mumu bit", "prescale bit", "2D Bhabha bit 1", "2D Bhabha bit 2"  , "2D Bhabha bit 3", "2D Bhabha bit 4", "2D Bhabha bit 5", "2D Bhabha bit 6", "2D Bhabha bit 7", "2D Bhabha bit 8", "2D Bhabha bit 9", "2D Bhabha bit 10", "2D Bhabha bit 11", "2D Bhabha bit 12", "2D Bhabha bit 13", "2D Bhabha bit 14"};
+
+
+
+  for (int j = 0; j < 26; j++) {
+    if (trgbit[j] == 0x1) {h_ECL_TriggerBit->Fill(j, 1);}
+    h_ECL_TriggerBit->GetXaxis()-> SetBinLabel(j + 1, label[j]);
+
+  }
+  h_ECL_TriggerBit->SetStats(0);
+
+
+
   //----------------------
   //Clustering
   //----------------------
   //
 
-  _TCCluster = new TrgEclCluster();
-  _TCCluster -> setICN(TCId, TCEnergy, TCTiming);
-  int icnfwd = _TCCluster -> getICNSub(0);
-  int icnbr = _TCCluster -> getICNSub(1);
-  int icnbwd = _TCCluster -> getICNSub(2);
-  int c = icnfwd + icnbr + icnbwd;
-  h_Cluster->Fill(c);
+  TrgEclCluster  _TCCluster ;
+  _TCCluster.setICN(TCId, TCEnergy, TCTiming);
 
-  //
+  int c = _TCCluster.getNofCluster();
+  h_Cluster->Fill(c);
+  std::vector<double> ClusterTiming;
+  std::vector<double> ClusterEnergy;
+  std::vector<int> MaxTCId;
+  ClusterTiming.clear();
+  ClusterEnergy.clear();
+  MaxTCId.clear();
+
+  for (int iii = 0; iii < trgeclCluster.getEntries(); iii++) {
+    TRGECLCluster* aTRGECLCluster = trgeclCluster[iii];
+    int maxTCId    = aTRGECLCluster ->getMaxTCId();
+    double clusterenergy  = aTRGECLCluster ->getEnergyDep();
+    double clustertiming  =  aTRGECLCluster -> getTimeAve();
+    ClusterTiming.push_back(clustertiming);
+    ClusterEnergy.push_back(clusterenergy);
+    MaxTCId.push_back(maxTCId);
+  }
+
+
+  std::vector<double> maxClusterEnergy;
+  std::vector<double> maxClusterTiming;
+  std::vector<int> maxCenterTCId;
+  maxClusterTiming.clear();
+  maxClusterEnergy.clear();
+  maxCenterTCId.clear();
+
+  maxClusterEnergy.resize(2, 0.0);
+  maxClusterTiming.resize(2, 0.0);
+  maxCenterTCId.resize(2, 0.0);
+  const int cl_size = ClusterEnergy.size();
+  for (int icl = 0; icl < cl_size; icl++) {
+    if (maxClusterEnergy[0] < ClusterEnergy[icl]) {
+      maxClusterEnergy[0] = ClusterEnergy[icl];
+      maxClusterTiming[0] = ClusterTiming[icl];
+      maxCenterTCId[0] = MaxTCId[icl];
+    } else if (maxClusterEnergy[1] < ClusterEnergy[icl]) {
+      maxClusterEnergy[1] = ClusterEnergy[icl];
+      maxClusterTiming[1] = ClusterTiming[icl];
+      maxCenterTCId[1] = MaxTCId[icl];
+
+    }
+
+  }
+  TrgEclDataBase _database;
+
+  std::vector<double> _3DBhabhaThreshold;
+  _3DBhabhaThreshold = {30, 45}; //  /10 MeV
+
+
+  bool BtoBFlag = false;
+  bool BhabhaFlag = false;
+  int lut1 = _database.Get3DBhabhaLUT(maxCenterTCId[0]);
+  int lut2 = _database.Get3DBhabhaLUT(maxCenterTCId[1]);
+  int energy1 = 15 & lut1;
+  int energy2 = 15 & lut2;
+  lut1 >>= 4;
+  lut2 >>= 4;
+  int phi1 = 511 & lut1;
+  int phi2 = 511 & lut2;
+  lut1 >>= 9;
+  lut2 >>= 9;
+  int theta1 = lut1;
+  int theta2 = lut2;
+  int dphi = abs(phi1 - phi2);
+  if (dphi > 180) {dphi = 360 - dphi;}
+  int thetaSum = theta1 + theta2;
+  if (dphi > 160 && thetaSum > 165 && thetaSum < 190) {BtoBFlag = true;}
+
+  if ((maxClusterEnergy[0] * 0.1) > _3DBhabhaThreshold[0] * energy1
+      && (maxClusterEnergy[1] * 0.1) > _3DBhabhaThreshold[0] * (energy2)
+      && ((maxClusterEnergy[0] * 0.1) > _3DBhabhaThreshold[1] * energy1
+          || (maxClusterEnergy[1] * 0.1) > _3DBhabhaThreshold[1] * (energy2))) {
+    if (BtoBFlag) {BhabhaFlag = true;}
+  }
+
+
+  if (BhabhaFlag) {
+    h_Cluster_Energy_Sum -> Fill((maxClusterEnergy[0] + maxClusterEnergy[1]) / 5.25);
+  }
+
+
   const int NofTCHit = TCId.size();
 
   double totalEnergy = 0;
   TrgEclMapping* a = new TrgEclMapping();
-
+  double max = 0;
+  double caltrgtiming = 0;
   double timing = 0;
   double trgtiming = 0;
 
@@ -168,16 +358,27 @@ void TRGECLDQMModule::event()
       }
     }
     h_TCEnergy -> Fill(TCEnergy[ihit]);
+    h_Narrow_TCEnergy -> Fill(TCEnergy[ihit]);
+    h_Cal_TCTiming -> Fill(FineTiming[ihit]);
+
+    if (max < TCEnergy[ihit]) {
+      max = TCEnergy[ihit];
+      caltrgtiming = FineTiming[ihit];
+    }
+
     totalEnergy += TCEnergy[ihit];
     h_n_TChit_event -> Fill(NofTCHit);
-    timing = 8 * RevoTrg[ihit] - (128 * RevoFAM[ihit] + TCTiming[ihit]);
-    trgtiming = 8 * RevoTrg[ihit] - (128 * RevoFAM[ihit] + FineTiming[ihit]);
-
+    timing = 8 * HitRevoTrg - (128 * RevoFAM[ihit] + TCTiming[ihit]);
+    if (timing < 0) {timing = timing + 10240;}
     h_TCTiming->Fill(timing);
   }
-  h_TRGTiming -> Fill(trgtiming);
-  h_TotalEnergy -> Fill(totalEnergy);
+  trgtiming = 8 * HitRevoTrg - (128 *     HitRevoEvtTiming + HitFineTiming);
 
+  if (trgtiming < 0) {trgtiming = trgtiming + 10240;}
+  h_TRGTiming -> Fill(trgtiming);
+  h_Cal_TRGTiming -> Fill(caltrgtiming);
+  h_TotalEnergy -> Fill(totalEnergy);
+  h_Narrow_TotalEnergy -> Fill(totalEnergy);
 
   // usleep(100);
 }

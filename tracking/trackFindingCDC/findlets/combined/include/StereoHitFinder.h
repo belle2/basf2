@@ -19,6 +19,7 @@
 #include <tracking/trackFindingCDC/collectors/selectors/FilterSelector.h>
 #include <tracking/trackFindingCDC/collectors/adders/StereoHitTrackAdder.h>
 
+#include <tracking/trackFindingCDC/filters/stereoHits/BaseStereoHitFilter.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilterFactory.h>
 #include <tracking/trackFindingCDC/utilities/HitComperator.h>
@@ -31,6 +32,10 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCWireHit;
     class CDCTrack;
+
+    // Guard to prevent repeated instantiations
+    extern template class TrackFindingCDC::Chooseable<BaseStereoHitFilter>;
+    extern template class TrackFindingCDC::ChooseableFilter<StereoHitFilterFactory>;
 
     /**
      * Complex findlet for finding stereo hits to a list of cdc tracks.

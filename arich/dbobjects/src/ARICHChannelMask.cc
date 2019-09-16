@@ -59,7 +59,7 @@ bool ARICHChannelMask::isActive(unsigned moduleID, unsigned channelID) const
   return false;
 }
 
-void ARICHChannelMask::print()
+void ARICHChannelMask::print() const
 {
 
   cout << endl << "ARICH masked channels" << endl << endl;

@@ -1,5 +1,4 @@
-#ifndef RF_ROISENDER_H
-#define RF_ROISENDER_H
+#pragma once
 //+
 // File : RFRoiSender.h
 // Description : DQM server for RFARM
@@ -8,21 +7,12 @@
 // Date : 14 - Jun - 2013
 //-
 
-#include <string>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
 #include "daq/rfarm/manager/RFConf.h"
 #include "daq/rfarm/manager/RFSharedMem.h"
 #include "daq/rfarm/manager/RFProcessManager.h"
 #include "daq/rfarm/manager/RFLogManager.h"
-#include "daq/rfarm/manager/RFNSM.h"
 #include "daq/rfarm/manager/RFFlowStat.h"
-
 #include "daq/rfarm/manager/RFServerBase.h"
-
-#define MAXNODES 256
 
 namespace Belle2 {
 
@@ -41,17 +31,19 @@ namespace Belle2 {
     // Server function
     void server();
 
-  private:
-    RFConf*            m_conf;
-    RFProcessManager*  m_proc;
-    RFLogManager*      m_log;
-    RFSharedMem*       m_shm;
-    RFFlowStat*        m_flow;
+    // Cleanup
+    void cleanup();
 
-    int m_pid_merger;
-    int m_pid_sender;
+  private:
+    RFConf*            m_conf{};
+    RFProcessManager*  m_proc{};
+    RFLogManager*      m_log{};
+    RFSharedMem*       m_shm{};
+    RFFlowStat*        m_flow{};
+
+    int m_pid_merger{};
+    int m_pid_sender{};
 
   };
 }
-#endif
 

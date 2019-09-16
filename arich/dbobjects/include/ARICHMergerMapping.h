@@ -80,7 +80,7 @@ namespace Belle2 {
     /**
      * Pring mapping
      */
-    void print();
+    void print() const;
 
   private:
 

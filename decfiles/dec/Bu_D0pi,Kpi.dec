@@ -1,0 +1,49 @@
+# Description: [B+ -> (D0bar -> K+ pi-) pi+ ]cc
+#
+# Short name: Bu_D0pi,Kpi.dec
+#
+# Event type: 12163001 (see https://confluence.desy.de/download/attachments/35818955/mc_scheme.pdf)
+#
+# Filters:
+#
+# Documentation: Control channel for analysis package
+#
+# Tested:
+# 
+# Physics working group:
+#
+# Responsible: 
+# 
+# Date: 20120228
+
+Alias myB+ B+
+Alias myB- B-
+ChargeConj myB+ myB-
+Alias myD D0
+Alias myantiD anti-D0
+ChargeConj myD myantiD
+#
+#
+Decay Upsilon(4S)
+0.500 myB+  B-                          VSS;
+0.500 B+  myB-                          VSS;
+Enddecay
+#
+Decay myB-
+1.000 myD   pi-    		        PHOTOS PHSP;
+Enddecay
+#
+Decay myD
+1.000   K-  pi+                         PHOTOS PHSP;
+Enddecay
+#
+Decay myB+
+1.000 myantiD   pi+        		PHOTOS PHSP;
+Enddecay
+#
+Decay myantiD
+1.000   K+  pi-                         PHOTOS PHSP;
+Enddecay
+#
+End
+

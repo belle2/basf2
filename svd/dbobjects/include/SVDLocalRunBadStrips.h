@@ -42,13 +42,13 @@ namespace Belle2 {
      *
      * Output: boolean variable as flag for bad strips.
      */
-    bool isBad(VxdID , bool , unsigned char)
+    bool isBad(VxdID , bool , unsigned char) const
     {
       return false;
     }
   private:
 
-    ClassDef(SVDLocalRunBadStrips, 1);
+    ClassDef(SVDLocalRunBadStrips, 1); /**< needed by root*/
   };
 }
 

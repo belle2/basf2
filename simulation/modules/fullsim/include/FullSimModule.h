@@ -66,29 +66,29 @@ namespace Belle2 {
      * Initializes Geant4, calls the geometry converter, creates the physics processes and
      * create the user actions.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when a new run is started.
      *
      * Initializes the Geant4 run manager and sets the run number in Geant4.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Performs the full Geant4 simulation.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * Called when run has ended.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Terminates the module.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   protected:
@@ -101,7 +101,9 @@ namespace Belle2 {
     int m_hadronProcessVerbosity;          /**< Hadron Process verbosity: 0=Silent; 1=info level; 2=debug level, default=0 */
     int m_emProcessVerbosity;              /**< Loss Table verbosity: 0=Silent; 1=info level; 2=debug level, default=0 */
     std::string m_physicsList;             /**< The name of the physics list which is used for the simulation. */
+    bool m_standardEM;                     /*!< If set to true, replaces fast EM physics with standard EM physics. */
     bool m_optics;                         /*!< If set to true, registers the optical physics list. */
+    bool m_HPneutrons;                     /*!< If true, high precision neutron models used below 20 MeV. */
     bool m_monopoles;                      /*!< If set to true, G4MonopolePhysics is registered in Geant4 PhysicsList.*/
     double m_monopoleMagneticCharge;       /*!< The value of monopole magnetic charge in units of e+.*/
     double m_productionCut;                /*!< Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance. */

@@ -4,10 +4,10 @@
 
 using namespace Belle2;
 
-BufferedReader::BufferedReader() throw()
+BufferedReader::BufferedReader()
   : m_memory(NULL), m_size(0), m_pos(0), m_allocated(false) {}
 
-BufferedReader::BufferedReader(const BufferedReader& reader) throw()
+BufferedReader::BufferedReader(const BufferedReader& reader)
   : m_memory(NULL), m_size(reader.m_size),
     m_pos(reader.m_pos), m_allocated(reader.m_allocated)
 {
@@ -21,7 +21,7 @@ BufferedReader::BufferedReader(const BufferedReader& reader) throw()
   m_pos = reader.m_pos;
 }
 
-BufferedReader::BufferedReader(size_t size, unsigned char* memory) throw()
+BufferedReader::BufferedReader(size_t size, unsigned char* memory)
   : m_memory(memory), m_size(size), m_pos(0), m_allocated(false)
 {
   if (memory == NULL) {
@@ -30,14 +30,14 @@ BufferedReader::BufferedReader(size_t size, unsigned char* memory) throw()
   }
 }
 
-BufferedReader::~BufferedReader() throw()
+BufferedReader::~BufferedReader()
 {
   if (m_allocated && m_memory != NULL) {
     delete [] m_memory;
   }
 }
 
-const BufferedReader& BufferedReader::operator=(const BufferedReader& reader) throw()
+const BufferedReader& BufferedReader::operator=(const BufferedReader& reader)
 {
   if (m_allocated) {
     delete [] m_memory;
@@ -54,7 +54,7 @@ const BufferedReader& BufferedReader::operator=(const BufferedReader& reader) th
   return *this;
 }
 
-void BufferedReader::copy(const void* buffer, size_t count) throw(IOException)
+void BufferedReader::copy(const void* buffer, size_t count)
 {
   if (count < m_size) {
     memcpy(m_memory, buffer, count);
@@ -65,7 +65,7 @@ void BufferedReader::copy(const void* buffer, size_t count) throw(IOException)
   }
 }
 
-size_t BufferedReader::read(void* buf, const size_t count) throw(IOException)
+size_t BufferedReader::read(void* buf, const size_t count)
 {
   if (m_pos + count > size()) {
     throw (IOException("Out of buffer range: %d + %d > %d",

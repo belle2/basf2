@@ -18,7 +18,7 @@ namespace {
   class DataStoreTest : public ::testing::Test {
   protected:
     /** fill StoreArrays with entries from 0..9 */
-    virtual void SetUp()
+    void SetUp() override
     {
       StoreObjPtr<EventMetaData> evtPtr;
       StoreArray<EventMetaData> evtData;
@@ -52,7 +52,6 @@ namespace {
         evtDataDifferentName.appendNew(newObj2);
 
         //fancy constructors
-        // cppcheck-suppress memleak
         newobj = evtDataDifferentDurability.appendNew(30 + i);
         ASSERT_TRUE(newobj != nullptr);
 
@@ -62,7 +61,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -268,7 +267,7 @@ namespace {
   TEST_F(DataStoreTest, RangeCheck)
   {
     StoreArray<EventMetaData> evtData;
-    EXPECT_TRUE(evtData[0] != NULL);
+    EXPECT_TRUE(evtData[0] != nullptr);
     EXPECT_THROW(evtData[-1], std::out_of_range);
     EXPECT_THROW(evtData[10], std::out_of_range);
   }
@@ -348,7 +347,7 @@ namespace {
     StoreArray<EventMetaData> evtDataNonConst;
     //array syntax
     for (int i = 0; i < evtData.getEntries(); i++) {
-      EXPECT_TRUE(evtData[i] != NULL);
+      EXPECT_TRUE(evtData[i] != nullptr);
     }
 
     //basic iterator features
@@ -730,6 +729,12 @@ namespace {
     evtData.registerRelationTo(profileInfo);
     DataStore::Instance().setInitializeActive(false);
 
+    EXPECT_TRUE(DataStore::Instance().hasRelation(evtData, profileInfo, DataStore::c_Event, ""));
+    EXPECT_FALSE(DataStore::Instance().hasRelation(profileInfo, evtData, DataStore::c_Event, ""));
+    EXPECT_FALSE(DataStore::Instance().hasRelation(evtData, profileInfo, DataStore::c_Event, "SOMENONSENSE"));
+    EXPECT_FALSE(DataStore::Instance().hasRelation(evtData, profileInfo, DataStore::c_Persistent, ""));
+    EXPECT_FALSE(DataStore::Instance().hasRelation(profileInfo, evtData, DataStore::c_Persistent, ""));
+
     EXPECT_EQ(1, DataStore::Instance().getListOfRelatedArrays(evtData).size());
     EXPECT_EQ(1, DataStore::Instance().getListOfRelatedArrays(profileInfo).size());
 
@@ -757,7 +762,7 @@ namespace {
     EXPECT_EQ(evtData.getEntries(), 10);
 
     StoreObjPtr<EventMetaData> evtPtr;
-    EventMetaData* newobj = new EventMetaData();
+    auto* newobj = new EventMetaData();
     newobj->setEvent(123);
     EXPECT_FALSE(evtPtr.assign(new EventMetaData(), false));
     EXPECT_FALSE(evtPtr.assign(new ProfileInfo(), true));

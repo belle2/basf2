@@ -94,6 +94,6 @@ void QualityEstimatorMVAModule::event()
     m_qeResultsExtractor->extractVariables(m_estimator->estimateQualityAndProperties(sortedHits));
 
     float qi = m_mvaExpert->predict();
-    aTC.setQualityIndex(qi);
+    aTC.setQualityIndicator(qi);
   }
 }

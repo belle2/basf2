@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef MASSVERTEXFITKFIT_H
-#define MASSVERTEXFITKFIT_H
-
+#pragma once
 
 #include <framework/logging/Logger.h>
 
@@ -46,6 +43,11 @@ namespace Belle2 {
        * @return error code (zero if success)
        */
       enum KFitError::ECode       setInitialVertex(const HepPoint3D& v);
+      /** Set an initial vertex point for the mass-vertex constraint fit.
+       * @param v initial vertex point
+       * @return error code (zero if success)
+       */
+      enum KFitError::ECode       setInitialVertex(const TVector3& v);
       /** Set an invariant mass for the mass-vertex constraint fit.
        * @param m invariant mass
        * @return error code (zero if success)
@@ -61,8 +63,8 @@ namespace Belle2 {
        * @return error code (zero if success)
        */
       enum KFitError::ECode       unfixMass(void);
-      enum KFitError::ECode       setCorrelation(const CLHEP::HepMatrix& m);
-      enum KFitError::ECode       setZeroCorrelation(void);
+      enum KFitError::ECode       setCorrelation(const CLHEP::HepMatrix& m) override;
+      enum KFitError::ECode       setZeroCorrelation(void) override;
 
 
       /** Get a vertex position.
@@ -78,15 +80,16 @@ namespace Belle2 {
        * @return invariant mass
        */
       double                      getInvariantMass(void) const;
-      double                      getCHIsq(void) const;
+      double                      getCHIsq(void) const override;
       /** Get a vertex error matrix of the track
        * @param id track id
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return vertex error matrix
        */
       const CLHEP::HepMatrix             getTrackVertexError(const int id) const;
-      double                      getTrackCHIsq(const int id) const;
-      const CLHEP::HepMatrix             getCorrelation(const int id1, const int id2, const int flag = KFitConst::kAfterFit) const;
+      double                      getTrackCHIsq(const int id) const override;
+      const CLHEP::HepMatrix             getCorrelation(const int id1, const int id2,
+                                                        const int flag = KFitConst::kAfterFit) const override;
 
 
     public:
@@ -95,14 +98,19 @@ namespace Belle2 {
        */
       enum KFitError::ECode doFit(void);
 
+      /**
+       * Update mother particle.
+       * @param[in] mother Mother particle.
+       */
+      enum KFitError::ECode updateMother(Particle* mother);
 
     private:
-      enum KFitError::ECode prepareInputMatrix(void);
-      enum KFitError::ECode prepareInputSubMatrix(void);
-      enum KFitError::ECode prepareCorrelation(void);
-      enum KFitError::ECode prepareOutputMatrix(void);
-      enum KFitError::ECode makeCoreMatrix(void);
-      enum KFitError::ECode calculateNDF(void);
+      enum KFitError::ECode prepareInputMatrix(void) override;
+      enum KFitError::ECode prepareInputSubMatrix(void) override;
+      enum KFitError::ECode prepareCorrelation(void) override;
+      enum KFitError::ECode prepareOutputMatrix(void) override;
+      enum KFitError::ECode makeCoreMatrix(void) override;
+      enum KFitError::ECode calculateNDF(void) override;
 
 
     private:
@@ -125,6 +133,3 @@ namespace Belle2 {
   } // namespace analysis
 
 } // namespace Belle2
-
-#endif /* MASSVERTEXFITKFIT_H */
-

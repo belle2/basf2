@@ -290,10 +290,8 @@ namespace Belle2 {
       return pxdGeometryPar;
     }
 
-    void GeoPXDCreator::readHalfShellSupport(GearDir support, PXDGeometryPar& pxdGeometryPar)
+    void GeoPXDCreator::readHalfShellSupport(const GearDir& support, PXDGeometryPar& pxdGeometryPar)
     {
-      if (!support) return;
-
       for (const GearDir& endflange : support.getNodes("Endflange")) {
         VXDPolyConePar endflangePar(
           endflange.getString("@name"),
@@ -408,15 +406,17 @@ namespace Belle2 {
         sensor.setSensorInfo(createSensorInfo(paramsSensor));
 
         vector<VXDGeoPlacement> subcomponents;
-        for (const VXDGeoPlacementPar& component : paramsSensor.getComponents()) {
-          subcomponents.push_back(VXDGeoPlacement(
-                                    component.getName(),
-                                    component.getU() / Unit::mm,
-                                    component.getV() / Unit::mm,
-                                    component.getW(),
-                                    component.getWOffset() / Unit::mm
-                                  ));
-        }
+        const auto& components = paramsSensor.getComponents();
+        subcomponents.reserve(components.size());
+        std::transform(components.begin(), components.end(), std::back_inserter(subcomponents),
+        [](auto const & component) {
+          return VXDGeoPlacement(component.getName(),
+                                 component.getU() / Unit::mm,
+                                 component.getV() / Unit::mm,
+                                 component.getW(),
+                                 component.getWOffset() / Unit::mm
+                                );
+        });
         sensor.setComponents(subcomponents);
         m_sensorMap[sensorTypeID] = sensor;
       }
@@ -451,17 +451,17 @@ namespace Belle2 {
         }
 
         vector<VXDGeoPlacement> subComponents;
-        for (const VXDGeoPlacementPar& paramsSubComponent : paramsComponent.getSubComponents()) {
-          subComponents.push_back(VXDGeoPlacement(
-                                    paramsSubComponent.getName(),
-                                    paramsSubComponent.getU()  / Unit::mm,
-                                    paramsSubComponent.getV()  / Unit::mm,
-                                    paramsSubComponent.getW(),
-                                    paramsSubComponent.getWOffset()  / Unit::mm
-                                  ));
-
-        }
-
+        const auto& paramsSubComponents = paramsComponent.getSubComponents();
+        subComponents.reserve(paramsSubComponents.size());
+        std::transform(paramsSubComponents.begin(), paramsSubComponents.end(), std::back_inserter(subComponents),
+        [](auto const & paramsSubComponent) {
+          return VXDGeoPlacement(paramsSubComponent.getName(),
+                                 paramsSubComponent.getU() / Unit::mm,
+                                 paramsSubComponent.getV() / Unit::mm,
+                                 paramsSubComponent.getW(),
+                                 paramsSubComponent.getWOffset() / Unit::mm
+                                );
+        });
         createSubComponents(m_prefix + "." + name, c, subComponents);
         if (m_activeChips &&  parameters.getSensitiveChipID(name) >= 0) {
           int chipID = parameters.getSensitiveChipID(name);
@@ -482,6 +482,9 @@ namespace Belle2 {
         string shellName =  shell.getName();
         m_currentHalfShell = m_prefix + "." + shellName;
         G4Transform3D shellAlignment = getAlignment(parameters.getAlignment(m_currentHalfShell));
+
+        // Remember shell coordinate system (into which ladders are inserted)
+        VXD::GeoCache::getInstance().addHalfShellPlacement(m_halfShellVxdIDs[m_currentHalfShell], shellAlignment);
 
         //Place shell support
         double shellAngle = shell.getShellAngle(); // Only used to move support, not active volumes!
@@ -504,10 +507,6 @@ namespace Belle2 {
           for (const std::pair<int, double>& ladder : Ladders) {
             int ladderID = ladder.first;
             double phi = ladder.second;
-
-            // Remember shell coordinate system (into which ladders are inserted)
-            VXD::GeoCache::getInstance().addHalfShellPlacement(m_halfShellVxdIDs[m_currentHalfShell],
-                                                               shellAlignment); //  * G4RotateZ3D(shellAngle) not taken into account in ladder!
 
             G4Transform3D ladderPlacement = placeLadder(ladderID, phi, envelope, shellAlignment, parameters);
             if (!m_onlyActiveMaterial) ladderSupport.place(envelope, ladderPlacement);

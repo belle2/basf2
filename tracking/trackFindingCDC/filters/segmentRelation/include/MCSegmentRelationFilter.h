@@ -26,7 +26,7 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      MCSegmentRelationFilter(bool allowReverse = true);
+      explicit MCSegmentRelationFilter(bool allowReverse = true);
 
       /// Expose the set of parameters of the filter to the module parameter list.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;

@@ -62,21 +62,24 @@ class DigitTest(Module):
             # check the content of the digit
             assert digit.getModuleID() == digitUnpacked.getModuleID()
             assert digit.getPixelID() == digitUnpacked.getPixelID()
-            assert digit.getRawTime() == digitUnpacked.getRawTime()
-            assert digit.getPulseHeight() == digitUnpacked.getPulseHeight()
-            assert digit.getIntegral() == digitUnpacked.getIntegral()
             assert digit.getChannel() == digitUnpacked.getChannel()
-            assert digit.getHitQuality() == digitUnpacked.getHitQuality()
+            assert digit.getRawTime() == digitUnpacked.getRawTime()
             assert abs(digit.getTime() - digitUnpacked.getTime()) < precision
             assert abs(digit.getTimeError() - digitUnpacked.getTimeError()) < precision
+            assert digit.getPulseHeight() == digitUnpacked.getPulseHeight()
             assert abs(digit.getPulseWidth() - digitUnpacked.getPulseWidth()) < precision
+            assert digit.getIntegral() == digitUnpacked.getIntegral()
             assert digit.getFirstWindow() == digitUnpacked.getFirstWindow()
+            assert digit.getHitQuality() == digitUnpacked.getHitQuality()
+            assert digit.getStatus() == digitUnpacked.getStatus()
+            assert digit.isChargeShare() == digitUnpacked.isChargeShare()
+            assert digit.isPrimaryChargeShare() == digitUnpacked.isPrimaryChargeShare()
 
 
 main = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10]})
 main.add_module(eventinfosetter)
 
 particlegun = register_module('ParticleGun')
@@ -85,14 +88,12 @@ particlegun.param('nTracks', 10)
 main.add_module(particlegun)
 
 add_simulation(main, components=['TOP'])
+set_module_parameters(main, type="Geometry", useDB=False, components=["TOP"])
 
 converter = register_module('TOPRawDigitConverter')
 converter.param('outputDigitsName', 'TOPDigitsUnpacked')
-converter.param('useSampleTimeCalibration', False)
-converter.param('useChannelT0Calibration', False)
-converter.param('useModuleT0Calibration', False)
-converter.param('useCommonT0Calibration', False)
-converter.param('subtractOffset', True)
+converter.param('minPulseWidth', 0.0)
+converter.param('maxPulseWidth', 1000.0)
 main.add_module(converter)
 
 main.add_module(DigitTest())

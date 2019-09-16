@@ -27,7 +27,7 @@ namespace Belle2 {
 
     /** Constructor */
     VXDGeoPlacementPar(const std::string& name = "", double u = 0, double v = 0,
-                       std::string w = "bottom", double woffset = 0);
+                       const std::string& w = "bottom", double woffset = 0);
     //! Destructor
     ~VXDGeoPlacementPar() {}
     /** get name of the component */
@@ -45,7 +45,7 @@ namespace Belle2 {
     /** get local w position where to place the component */
     const std::string& getW() const { return m_w; }
     /** set local w position where to place the component */
-    void setW(std::string  w) {m_w = w;}
+    void setW(std::string&  w) {m_w = w;}
     /** get offset to local w position where to place the component */
     double getWOffset() const { return m_woffset; }
     /** set offset to local w position where to place the component */

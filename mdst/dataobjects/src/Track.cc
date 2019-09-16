@@ -12,13 +12,15 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
+#include <sstream>
+
 using namespace Belle2;
 
 const TrackFitResult* Track::getTrackFitResult(const Const::ChargedStable& chargedStable) const
 {
   const auto trackFitResultArrayIndex = m_trackFitIndices[chargedStable.getIndex()];
   if (trackFitResultArrayIndex < 0) {
-    B2DEBUG(100, "TrackFitResult for the requested hypothesis is not set. Returning a nullptr instead.");
+    B2DEBUG(20, "TrackFitResult for the requested hypothesis is not set. Returning a nullptr instead.");
     return nullptr;
   }
 
@@ -83,4 +85,21 @@ const TrackFitResult* Track::getTrackFitResultWithClosestMass(const Const::Charg
   });
 
   return bestMassFit->second;
+}
+
+std::string Track::getInfoHTML() const
+{
+  std::stringstream out;
+  out << "<b>Number of Fitted Hypothesis</b>: " << getNumberOfFittedHypotheses() << "<br>";
+
+  // just output all the TrackFitResult infos.
+  size_t count = 1;
+  for (auto fitResults : getTrackFitResults()) {
+    out << "<p>";
+    out << "<br><b>-- Hypothesis " << count << " --</b><br>";
+    out << fitResults.second->getInfoHTML();
+    out << "</p>";
+    count++;
+  }
+  return out.str();
 }

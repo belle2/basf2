@@ -33,7 +33,7 @@ namespace Belle2 {
       //sort the vector according to the QI supplied.
       std::sort(overlapResolverNodeInfo.begin(), overlapResolverNodeInfo.end(),
       [](OverlapResolverNodeInfo const & lhs, OverlapResolverNodeInfo const & rhs) -> bool {
-        return lhs.qualityIndex > rhs.qualityIndex;
+        return lhs.qualityIndicator > rhs.qualityIndicator;
       });
 
       //kill all tracks, that have overlaps and lower QI:

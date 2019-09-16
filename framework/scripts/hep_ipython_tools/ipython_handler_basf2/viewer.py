@@ -1,5 +1,3 @@
-import json
-
 from hep_ipython_tools import viewer
 import random
 import string
@@ -88,8 +86,8 @@ class ModuleViewer(viewer.IPythonWidget):
 
         #: The module to show
         if isinstance(module, str):
-            import basf2
-            self.module = basf2.register_module(module)
+            import basf2.core as _basf2
+            self.module = _basf2.register_module(module)
         else:
             self.module = module
 

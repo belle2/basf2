@@ -14,10 +14,13 @@
 
 #include <G4VPhysicsConstructor.hh>
 #include <globals.hh>
+#include <simulation/monopoles/MonopoleConstants.h>
 
 namespace Belle2 {
 
   namespace Monopoles {
+
+    class G4Monopole;
 
     /**
      * Monopole physics class to register on the physics list.
@@ -25,8 +28,6 @@ namespace Belle2 {
      * Entry point from FullSim to the monopole package. Consists of monopole
      * definition, transportation and ionisation processes.
      */
-    class G4Monopole;
-
     class G4MonopolePhysics : public G4VPhysicsConstructor {
     public:
 
@@ -73,9 +74,7 @@ namespace Belle2 {
 
       G4Monopole* fMpl; /**< Pointer to the monopole definition in GEANT4*/
       G4Monopole* fApl; /**< Pointer to the anti-monopole definition in GEANT4*/
-      //Anti-monopole and its processes has to be treated separetely for now.
-      //TODO fix physics process registration so that anti-monopole can be treated automatically
-      //as a an anti-particle of the monopole
+      //Both monopole and anti-monopole have own process managers and have to be treated separately
 
     };
 

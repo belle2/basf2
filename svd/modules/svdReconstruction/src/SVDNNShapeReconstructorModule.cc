@@ -84,6 +84,7 @@ void SVDNNShapeReconstructorModule::initialize()
   storeShaperDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
+  m_storeSVDEvtInfo.isRequired();
 
   RelationArray relRecoDigitShaperDigits(storeRecoDigits, storeShaperDigits);
   RelationArray relRecoDigitTrueHits(storeRecoDigits, storeTrueHits);
@@ -166,9 +167,12 @@ void SVDNNShapeReconstructorModule::fillRelationMap(const RelationLookup& lookup
 
 void SVDNNShapeReconstructorModule::event()
 {
+
   const StoreArray<SVDShaperDigit> storeShaperDigits(m_storeShaperDigitsName);
-  // If no digits, nothing to do
-  if (!storeShaperDigits || !storeShaperDigits.getEntries()) return;
+  // If no digits or no SVDEventInfo, nothing to do
+  if (!storeShaperDigits || !storeShaperDigits.getEntries() || !m_storeSVDEvtInfo.isValid()) return;
+
+  SVDModeByte modeByte = m_storeSVDEvtInfo->getModeByte();
 
   size_t nDigits = storeShaperDigits.getEntries();
   B2DEBUG(90, "Initial size of StoreDigits array: " << nDigits);
@@ -237,7 +241,7 @@ void SVDNNShapeReconstructorModule::event()
       unsigned short stripNo = shaperDigit.getCellID();
       bool validDigit = true; // FIXME: We don't care about local run bad strips for now.
       const double triggerBinSep = 4 * 1.96516; //in ns
-      double apvPhase = triggerBinSep * (0.5 + static_cast<int>(shaperDigit.getModeByte().getTriggerBin()));
+      double apvPhase = triggerBinSep * (0.5 + static_cast<int>(modeByte.getTriggerBin()));
       // Get things from the database.
       // Noise is good as it comes.
       float stripNoiseADU = m_noiseCal.getNoise(sensorID, isU, stripNo);
@@ -317,7 +321,7 @@ void SVDNNShapeReconstructorModule::event()
       storeRecoDigits.appendNew(
         SVDRecoDigit(sensorID, isU, shaperDigit.getCellID(), stripAmplitude,
                      stripAmplitudeError, stripTime, stripTimeError, *pStrip, stripChi2,
-                     shaperDigit.getModeByte())
+                     modeByte)
       );
 
       //Create relations to RecoDigits

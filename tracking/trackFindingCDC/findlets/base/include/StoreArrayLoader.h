@@ -45,7 +45,7 @@ namespace Belle2 {
           if (m_classMnemomicName != "") {
             m_classMnemomicDescription = m_classMnemomicName;
           } else {
-            // Just a little bit of ADL, takem from StoreArraySwapper
+            // Just a little bit of ADL, taken from StoreArraySwapper
             m_classMnemomicDescription = getClassMnemomicParameterDescription(static_cast<IOType*>(nullptr));
           }
         }
@@ -91,6 +91,7 @@ namespace Belle2 {
 
         for (auto& item : storeArray)
         {
+          // cppcheck-suppress useStlAlgorithm
           output.push_back(&item);
         }
       }

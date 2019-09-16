@@ -18,6 +18,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <vector>
@@ -73,7 +74,7 @@ namespace Belle2 {
     for (const Belle2::Particle* sigFS0 : signalDaughters) {
       TLorentzVector p_cms = T.rotateLabToCms() * sigFS0->get4Vector();
 
-      p3_cms_q_sigA.push_back({p_cms.Vect(), sigFS0->getCharge()});
+      p3_cms_q_sigA.emplace_back(p_cms.Vect(), sigFS0->getCharge());
 
       p_cms_missA -= p_cms;
       et[0] += p_cms.Perp();
@@ -88,7 +89,7 @@ namespace Belle2 {
       p3_cms_all.push_back(p_cms.Vect());
       p3_cms_sigB.push_back(p_cms.Vect());
 
-      p3_cms_q_sigB.push_back({p_cms.Vect(), sigFS1->getCharge()});
+      p3_cms_q_sigB.emplace_back(p_cms.Vect(), sigFS1->getCharge());
 
       p_cms_missB -= p_cms;
       et[1] += p_cms.Perp();
@@ -103,22 +104,27 @@ namespace Belle2 {
       //
       std::vector<const Track*> roeTracks = roe->getTracks(maskName);
 
-      const Const::ChargedStable charged = Const::pion;
-
       for (const Track* track : roeTracks) {
 
         // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
         // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
 
-        // Create particle from track with pion hypothesis
-        Particle pion_particle(track, charged);
-        if (pion_particle.getParticleType() == Particle::c_Track) {
-          TLorentzVector p_cms = T.rotateLabToCms() * pion_particle.get4Vector();
+        // Create particle from track with most probable hypothesis
+        const PIDLikelihood* iPidLikelihood = track->getRelated<PIDLikelihood>();
+        const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
+        // Here we skip tracks with 0 charge
+        if (track->getTrackFitResultWithClosestMass(charged)->getChargeSign() == 0) {
+          B2WARNING("Track with charge = 0 skipped! From the ContinuumSuppression");
+          continue;
+        }
+        Particle charged_particle(track, charged);
+        if (charged_particle.getParticleType() == Particle::c_Track) {
+          TLorentzVector p_cms = T.rotateLabToCms() * charged_particle.get4Vector();
 
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
 
-          p3_cms_q_roe.push_back({p_cms.Vect(), pion_particle.getCharge()});
+          p3_cms_q_roe.emplace_back(p_cms.Vect(), charged_particle.getCharge());
 
           p_cms_missA -= p_cms;
           p_cms_missB -= p_cms;
@@ -133,15 +139,15 @@ namespace Belle2 {
 
       for (const ECLCluster* cluster : roeECLClusters) {
 
-        if (cluster->isNeutral()) {
+        if (cluster->isNeutral() and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
           // Create particle from ECLCluster with gamma hypothesis
-          Particle gamma_particle(cluster);
+          Particle gamma_particle(cluster, Const::photon);
 
           TLorentzVector p_cms = T.rotateLabToCms() * gamma_particle.get4Vector();
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
 
-          p3_cms_q_roe.push_back({p_cms.Vect(), gamma_particle.getCharge()});
+          p3_cms_q_roe.emplace_back(p_cms.Vect(), gamma_particle.getCharge());
 
           p_cms_missA -= p_cms;
           p_cms_missB -= p_cms;
@@ -165,7 +171,8 @@ namespace Belle2 {
 
       // Fox-Wolfram Moments: Uses all final-state tracks (= sigB + ROE)
       FoxWolfram FW(p3_cms_all);
-      R2 = FW.R(2);
+      FW.calculateBasicMoments();
+      R2 = FW.getR(2);
 
       // KSFW moments
       TLorentzVector p_cms_B = T.rotateLabToCms() * particle->get4Vector();

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CONTINUUMSUPPRESSION_H
-#define CONTINUUMSUPPRESSION_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -55,14 +54,14 @@ namespace Belle2 {
      *
      * @param TVector3 B thrust axis
      */
-    void addThrustB(TVector3 thrustB);
+    void addThrustB(const TVector3& thrustB);
 
     /**
      * Add ROE thrust axis.
      *
      * @param TVector3 ROE thrust axis
      */
-    void addThrustO(TVector3 thrustO);
+    void addThrustO(const TVector3& thrustO);
 
     /**
      * Add magnitude of B thrust axis.
@@ -104,28 +103,28 @@ namespace Belle2 {
      *
      * @param vector of KSFW moments, Et, and mm2 for final state = 0
      */
-    void addKsfwFS0(std::vector<float> ksfwFS0);
+    void addKsfwFS0(const std::vector<float>& ksfwFS0);
 
     /**
      * Add vector of KSFW moments, Et, and mm2 for final state = 1.
      *
      * @param vector of KSFW moments, Et, and mm2 for final state = 1
      */
-    void addKsfwFS1(std::vector<float> ksfwFS1);
+    void addKsfwFS1(const std::vector<float>& ksfwFS1);
 
     /**
      * Add vector of Cleo Cones constructed of all final state particles
      *
      * @param vector of Cleo Cones constructed of all final state particles
      */
-    void addCleoConesALL(std::vector<float> cleoConesALL);
+    void addCleoConesALL(const std::vector<float>& cleoConesALL);
 
     /**
      * Add vector of Cleo Cones constructed of only ROE particles
      *
      * @param vector of Cleo Cones constructed of only ROE particles
      */
-    void addCleoConesROE(std::vector<float> cleoConesROE);
+    void addCleoConesROE(const std::vector<float>& cleoConesROE);
 
     // getters
     /**
@@ -263,5 +262,3 @@ namespace Belle2 {
 
 
 } // end namespace Belle2
-
-#endif

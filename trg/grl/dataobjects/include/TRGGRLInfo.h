@@ -14,11 +14,14 @@
 #pragma once
 #include <TObject.h>
 #include <TVector3.h>
+#include <string>
 namespace Belle2 {
 
+  /// a class to store TRGGRL TSIM info
   class TRGGRLInfo : public TObject {
   public:
 
+    /// Constructor
     TRGGRLInfo():
       m_n_2dfinder_track(-1),
       m_n_2dfitter_track(-1),
@@ -39,6 +42,7 @@ namespace Belle2 {
       m_n_high_2000_cluster414(-1),
       m_n_high_2000_cluster231516(-1),
       m_n_high_2000_cluster117(-1),
+      m_n_high_2000_endcap_cluster(-1),
       m_nbbc(-1),
       m_nbbtc(-1),
       m_n_klm_track(-1),
@@ -49,7 +53,25 @@ namespace Belle2 {
       m_n_PhiPairLow(-1),
       m_n_3DPair(-1),
       m_n_SameHem1Trk(-1),
-      m_n_OppHem1Trk(-1)
+      m_n_OppHem1Trk(-1),
+      m_Trk_b2b_1to3(-1),
+      m_Trk_b2b_1to5(-1),
+      m_Trk_b2b_1to7(-1),
+      m_Trk_b2b_1to9(-1),
+      m_Trk_open90(-1),
+      m_cluster_b2b_1to3(-1),
+      m_cluster_b2b_1to5(-1),
+      m_cluster_b2b_1to7(-1),
+      m_cluster_b2b_1to9(-1),
+      m_Trkcluster_b2b_1to3(-1),
+      m_Trkcluster_b2b_1to5(-1),
+      m_Trkcluster_b2b_1to7(-1),
+      m_Trkcluster_b2b_1to9(-1),
+      m_eed(-1),
+      m_fed(-1),
+      m_fp(-1),
+      m_eeb(-1),
+      m_fep(-1)
     {}
     ~TRGGRLInfo() {}
 
@@ -102,17 +124,54 @@ namespace Belle2 {
     int getBhabhaVeto() const {return m_bhabhaveto;}
     /**get eclbhabha*/
     int geteclBhabhaVeto() const {return m_eclbhabhaveto;}
-    /***/
+    /**get PhiPairHigh*/
     int getPhiPairHigh() const {return m_n_PhiPairHigh;}
-    /***/
+    /**get PhiPairLow*/
     int getPhiPairLow() const {return m_n_PhiPairLow;}
-    /***/
+    /**3D pair*/
     int get3DPair() const {return m_n_3DPair;}
-    /***/
+    /**NSameHem1Trk*/
     int getNSameHem1Trk() const {return m_n_SameHem1Trk;}
-    /***/
+    /**NOppHem1Trk*/
     int getNOppHem1Trk() const {return m_n_OppHem1Trk;}
-
+    /**get Trk_b2b_1to3*/
+    int getTrk_b2b_1to3() const {return m_Trk_b2b_1to3;}
+    /**get Trk_b2b_1to5*/
+    int getTrk_b2b_1to5() const {return m_Trk_b2b_1to5;}
+    /**get Trk_b2b_1to7*/
+    int getTrk_b2b_1to7() const {return m_Trk_b2b_1to7;}
+    /**get Trk_b2b_1to9*/
+    int getTrk_b2b_1to9() const {return m_Trk_b2b_1to9;}
+    /**get Trk_open90*/
+    int getTrk_open90() const {return m_Trk_open90;}
+    /**get cluster_b2b_1to3*/
+    int getcluster_b2b_1to3() const {return m_cluster_b2b_1to3;}
+    /**get cluster_b2b_1to5*/
+    int getcluster_b2b_1to5() const {return m_cluster_b2b_1to5;}
+    /**get cluster_b2b_1to7*/
+    int getcluster_b2b_1to7() const {return m_cluster_b2b_1to7;}
+    /**get cluster_b2b_1to9*/
+    int getcluster_b2b_1to9() const {return m_cluster_b2b_1to9;}
+    /**get Trkcluster_b2b_1to3*/
+    int getTrkcluster_b2b_1to3() const {return m_Trkcluster_b2b_1to3;}
+    /**get Trkcluster_b2b_1to5*/
+    int getTrkcluster_b2b_1to5() const {return m_Trkcluster_b2b_1to5;}
+    /**get Trkcluster_b2b_1to7*/
+    int getTrkcluster_b2b_1to7() const {return m_Trkcluster_b2b_1to7;}
+    /**get Trkcluster_b2b_1to9*/
+    int getTrkcluster_b2b_1to9() const {return m_Trkcluster_b2b_1to9;}
+    /**get eed: two matched & cluster b2b */
+    int geteed() const {return m_eed;}
+    /**get fed: one track & one matched & cluster b2b */
+    int getfed() const {return m_fed;}
+    /**get fp: one track & track-cluster b2b */
+    int getfp() const {return m_fp;}
+    /**get eeb: two matched & track b2b */
+    int geteeb() const {return m_eeb;}
+    /**get fep: one track & one matched & track-cluster b2b */
+    int getfep() const {return m_fep;}
+    /**get GDL input bit */
+    bool getInputBits(int i) const {return m_InputBits[i];}
 
     /**set the number of 2D tracks*/
     void setN2Dfindertrk(int N2Dfindertrk)  {m_n_2dfinder_track = N2Dfindertrk;}
@@ -160,16 +219,54 @@ namespace Belle2 {
     void setBhabhaVeto(int bha)  {m_bhabhaveto = bha;}
     /**set the value of sbhabha*/
     void seteclBhabhaVeto(int eclbha)  {m_eclbhabhaveto = eclbha;}
-    /***/
+    /**set PairHigh*/
     void setPairHigh(int PhiPairHigh) {m_n_PhiPairHigh = PhiPairHigh;}
-    /***/
+    /**set PairLow*/
     void setPairLow(int PhiPairLow) {m_n_PhiPairLow = PhiPairLow;}
-    /***/
+    /**set 3DPair*/
     void set3DPair(int n3DPair) {m_n_3DPair = n3DPair;}
-    /***/
+    /**set NSameHem1Trk*/
     void setNSameHem1Trk(int SameHem1Trk) {m_n_SameHem1Trk = SameHem1Trk;}
-    /***/
+    /**set NOppHem1Trk*/
     void setNOppHem1Trk(int OppHem1Trk) {m_n_OppHem1Trk = OppHem1Trk;}
+    /**set the value of Trk_b2b_1to3*/
+    void setTrk_b2b_1to3(int Trk_b2b_1to3) {m_Trk_b2b_1to3 = Trk_b2b_1to3;}
+    /**set the value of Trk_b2b_1to5*/
+    void setTrk_b2b_1to5(int Trk_b2b_1to5) {m_Trk_b2b_1to5 = Trk_b2b_1to5;}
+    /**set the value of Trk_b2b_1to7*/
+    void setTrk_b2b_1to7(int Trk_b2b_1to7) {m_Trk_b2b_1to7 = Trk_b2b_1to7;}
+    /**set the value of Trk_b2b_1to9*/
+    void setTrk_b2b_1to9(int Trk_b2b_1to9) {m_Trk_b2b_1to9 = Trk_b2b_1to9;}
+    /**set the value of Trk_open90*/
+    void setTrk_open90(int Trk_open90) {m_Trk_open90 = Trk_open90;}
+    /**set the value of cluster_b2b_1to3*/
+    void setcluster_b2b_1to3(int cluster_b2b_1to3) {m_cluster_b2b_1to3 = cluster_b2b_1to3;}
+    /**set the value of cluster_b2b_1to5*/
+    void setcluster_b2b_1to5(int cluster_b2b_1to5) {m_cluster_b2b_1to5 = cluster_b2b_1to5;}
+    /**set the value of cluster_b2b_1to7*/
+    void setcluster_b2b_1to7(int cluster_b2b_1to7) {m_cluster_b2b_1to7 = cluster_b2b_1to7;}
+    /**set the value of cluster_b2b_1to9*/
+    void setcluster_b2b_1to9(int cluster_b2b_1to9) {m_cluster_b2b_1to9 = cluster_b2b_1to9;}
+    /**set the value of Trkcluster_b2b_1to3*/
+    void setTrkcluster_b2b_1to3(int Trkcluster_b2b_1to3) {m_Trkcluster_b2b_1to3 = Trkcluster_b2b_1to3;}
+    /**set the value of Trkcluster_b2b_1to5*/
+    void setTrkcluster_b2b_1to5(int Trkcluster_b2b_1to5) {m_Trkcluster_b2b_1to5 = Trkcluster_b2b_1to5;}
+    /**set the value of Trkcluster_b2b_1to7*/
+    void setTrkcluster_b2b_1to7(int Trkcluster_b2b_1to7) {m_Trkcluster_b2b_1to7 = Trkcluster_b2b_1to7;}
+    /**set the value of Trkcluster_b2b_1to9*/
+    void setTrkcluster_b2b_1to9(int Trkcluster_b2b_1to9) {m_Trkcluster_b2b_1to9 = Trkcluster_b2b_1to9;}
+    /**set eed: two matched & cluster b2b*/
+    void seteed(int eed) {m_eed = eed;}
+    /**set fed: one track & one matched & cluster b2b*/
+    void setfed(int fed) {m_fed = fed;}
+    /**set fp: one track & track-cluster b2b*/
+    void setfp(int fp) {m_fp = fp;}
+    /**set eeb: two matched & track b2b*/
+    void seteeb(int eeb) {m_eeb = eeb;}
+    /**set fep: one track & one matched & track-cluster b2b*/
+    void setfep(int fep) {m_fep = fep;}
+    /**set GDL input bit*/
+    void setInputBits(int i, bool bit) {m_InputBits[i] = bit;}
 
 
   private:
@@ -227,16 +324,54 @@ namespace Belle2 {
     int m_bhabhaveto;
     /**ecl Bhabha veto (only ecl information is used), eclbahbah:1, non-eclbhabha:0*/
     int m_eclbhabhaveto;
-    /***/
+    /**number of PhiPairHigh*/
     int m_n_PhiPairHigh;
-    /***/
+    /**number of PhiPairLow*/
     int m_n_PhiPairLow;
-    /***/
+    /**number of 3DPair*/
     int m_n_3DPair;
-    /***/
+    /**number of SameHem+1Trk*/
     int m_n_SameHem1Trk;
-    /***/
+    /**number of OppHem+1Trk*/
     int m_n_OppHem1Trk;
+    /**Trk_b2b_1to3*/
+    int m_Trk_b2b_1to3;
+    /**Trk_b2b_1to5*/
+    int m_Trk_b2b_1to5;
+    /**Trk_b2b_1to7*/
+    int m_Trk_b2b_1to7;
+    /**Trk_b2b_1to9*/
+    int m_Trk_b2b_1to9;
+    /**Trk_open90*/
+    int m_Trk_open90;
+    /**cluster_b2b_1to3*/
+    int m_cluster_b2b_1to3;
+    /**cluster_b2b_1to5*/
+    int m_cluster_b2b_1to5;
+    /**cluster_b2b_1to7*/
+    int m_cluster_b2b_1to7;
+    /**cluster_b2b_1to9*/
+    int m_cluster_b2b_1to9;
+    /**Trkcluster_b2b_1to3*/
+    int m_Trkcluster_b2b_1to3;
+    /**Trkcluster_b2b_1to5*/
+    int m_Trkcluster_b2b_1to5;
+    /**Trkcluster_b2b_1to7*/
+    int m_Trkcluster_b2b_1to7;
+    /**Trkcluster_b2b_1to9*/
+    int m_Trkcluster_b2b_1to9;
+    /**eed: two matched & cluster b2b*/
+    int m_eed;
+    /**fed: one track & one matched & cluster b2b*/
+    int m_fed;
+    /**fp: one track & track-cluster b2b*/
+    int m_fp;
+    /**eeb: two matched & track b2b*/
+    int m_eeb;
+    /**fep: one track & one matched & track-cluster b2b*/
+    int m_fep;
+    /**GDL input bits**/
+    std::vector<bool> m_InputBits = std::vector<bool>(320, false);
 
     /**! The Class title*/
     ClassDef(TRGGRLInfo, 2); /*< the class title */

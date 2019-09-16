@@ -40,10 +40,10 @@ namespace Belle2 {
     OverlapCheckerModule();
 
     /** Initialize the module. */
-    void initialize();
+    void initialize() override;
 
     /** event function: this runs the overlap checker for each event */
-    void event();
+    void event() override;
 
   private:
 

@@ -13,14 +13,11 @@ namespace Belle2 {
 
   public:
     static void add(DBInterface& db, const std::string& tablename,
-                    const std::string& vname, int val)
-    throw(DBHandlerException);
+                    const std::string& vname, int val);
     static void add(DBInterface& db, const std::string& tablename,
-                    const std::string& vname, float val)
-    throw(DBHandlerException);
+                    const std::string& vname, float val);
     static void add(DBInterface& db, const std::string& tablename,
-                    const std::string& vname, const std::string& val)
-    throw(DBHandlerException);
+                    const std::string& vname, const std::string& val);
     static NSMVarList get(DBInterface& db,
                           const std::string& tablename,
                           const std::string& vname);

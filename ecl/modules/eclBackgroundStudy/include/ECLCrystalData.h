@@ -1,11 +1,21 @@
-// ECLCrystalData.h : Class
-// for obtaining crystal details for a given crystal cell
-// An evolved look-up table.
-#ifndef ECLCrystalData_h
-#define ECLCrystalData_h
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Sam de Jong                                              *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#pragma once
 
 namespace Belle2 {
 
+  /**
+   * Class for obtaining crystal details for a given crystal cell
+   * An evolved look-up table.
+   */
   class ECLCrystalData {
   private :
 
@@ -131,5 +141,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif

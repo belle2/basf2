@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import create_path, pretty_print_table, B2ERROR, B2INFO
+from basf2 import create_path, B2ERROR, B2INFO
+from basf2.utils import pretty_print_table
 import os
 import glob
 

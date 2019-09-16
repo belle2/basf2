@@ -11,10 +11,10 @@
 </header>
 """
 
-from basf2 import *
+from basf2 import set_random_seed, create_path, process, statistics, \
+    register_module
 from simulation import add_simulation
 from beamparameters import add_beamparameters
-import glob
 
 set_random_seed(12345)
 
@@ -24,7 +24,7 @@ main = create_path()
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [1])
+eventinfosetter.param('expList', [0])
 main.add_module(eventinfosetter)
 
 # beam parameters
@@ -61,8 +61,16 @@ process(main)
 print(statistics)
 
 from validation import *
-statistics_plots('KLongGenSimNoBkg_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation job with generic KLongGenSimNoBkg events', prefix='KLongGenSimNoBkg')
-event_timing_plot('../KLongGenSimNoBkg.root', 'KLongGenSimNoBkg_statistics.root',
-                  contact='tkuhr',
-                  jobDesc='a standard simulation job with Klong events', prefix='KLongGenSimNoBkg')
+statistics_plots(
+    'KLongGenSimNoBkg_statistics.root',
+    contact='tkuhr',
+    job_desc='a standard simulation job with generic KLongGenSimNoBkg events',
+    prefix='KLongGenSimNoBkg'
+)
+event_timing_plot(
+    '../KLongGenSimNoBkg.root',
+    'KLongGenSimNoBkg_statistics.root',
+    contact='tkuhr',
+    job_desc='a standard simulation job with Klong events',
+    prefix='KLongGenSimNoBkg'
+)

@@ -57,7 +57,7 @@ particlegun.param({
     'zVertexParams': [0.0, 0.5],
     # all one track sharing the same vertex per event
     'independentVertices': False,
-    })
+})
 
 # Select subdetectors to be built
 geometry.param('components', ['MagneticField', 'PXD'])

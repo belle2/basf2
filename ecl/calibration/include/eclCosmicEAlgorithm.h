@@ -44,7 +44,7 @@ namespace Belle2 {
     protected:
 
       /** Run algorithm on events */
-      virtual EResult calibrate();
+      virtual EResult calibrate() override;
 
     private:
       int fitOK = 16; /**< fit is OK */

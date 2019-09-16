@@ -38,19 +38,19 @@ namespace Belle2 {
     virtual ~TRGGRLMatchModule();
 
     /** Initialize the parameters */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Called when entering a new run. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Event processor. */
-    virtual void event();
+    virtual void event() override;
 
     /** End-of-run action. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Termination action. */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /**calculate dr and dz between track and cluster*/
     void calculationdistance(CDCTriggerTrack* track, TRGECLCluster* cluster, double* ds, int _match3D);

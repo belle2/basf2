@@ -11,8 +11,10 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-#include <vxd/dataobjects/VxdID.h> //<pxd/geometry/SensorInfo.h>
+#include <vxd/dataobjects/VxdID.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDRawHit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 
 namespace Belle2 {
 
@@ -25,6 +27,10 @@ namespace Belle2 {
     /** Default constructor.
      */
     ROIid();
+
+    /** Constructor providing the ROI information */
+    ROIid(int minUid, int maxUid, int minVid, int maxVid, VxdID sensorID) :
+      m_minUid(minUid), m_maxUid(maxUid), m_minVid(minVid), m_maxVid(maxVid), m_sensorID(sensorID) {}
 
 
     /** Destructor.
@@ -44,7 +50,9 @@ namespace Belle2 {
     void setMaxVid(double user_maxVid) { m_maxVid = user_maxVid; } /**< set the maximum V id of the ROI*/
     void setSensorID(VxdID user_sensorID) { m_sensorID = user_sensorID;} /**< set the sensor ID of the ROI*/
 
-    bool Contains(const Belle2::PXDDigit& thePXDDigit) const; /**< true id the ROI contains the thePXDDigit*/
+    bool Contains(const Belle2::PXDRawHit& thePXDRawHit) const; /**< true if the ROI contains the thePXDRawHit*/
+    bool Contains(const Belle2::PXDDigit& thePXDDigit) const; /**< true if the ROI contains the thePXDDigit*/
+    bool Contains(const Belle2::SVDShaperDigit& theSVDDigit) const; /**< true if the ROI contains the theSVDDigit*/
 
   private:
 

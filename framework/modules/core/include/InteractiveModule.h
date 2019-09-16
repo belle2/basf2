@@ -32,6 +32,6 @@ namespace Belle2 {
 
     ~InteractiveModule();
 
-    virtual void event();
+    virtual void event() override;
   };
 }

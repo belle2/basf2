@@ -1,17 +1,21 @@
 /**************************************************************************
- * Copyright(C) 2016 - Yu Hu                                              *
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
- * Author: Yu Hu                                                          *
- * Contributor: J. Tanaka and                                             *
- *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Yu Hu                                                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 
-#include <stdio.h>
+#include <cstdio>
+
+#include <TMatrixFSym.h>
 
 #include <analysis/KFit/FourCFitKFit.h>
+#include <analysis/KFit/MakeMotherKFit.h>
+#include <analysis/utility/CLHEPToROOT.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <TLorentzVector.h>
 
@@ -21,7 +25,7 @@ using namespace Belle2;
 using namespace Belle2::analysis;
 using namespace CLHEP;
 
-FourCFitKFit::FourCFitKFit(void)
+FourCFitKFit::FourCFitKFit()
 {
   m_FlagFitted = false;
   m_FlagTrackVertexError = false;
@@ -30,16 +34,14 @@ FourCFitKFit::FourCFitKFit(void)
   m_NecessaryTrackCount = 2;
   m_d   = HepMatrix(4, 1, 0);
   m_V_D = HepMatrix(4, 4, 0);
-  m_lam = HepMatrix(1, 4, 0);
+  m_lam = HepMatrix(4, 1, 0);
   m_AfterVertexError = HepSymMatrix(3, 0);
   m_InvariantMass = -1.0;
   m_FourMomentum = TLorentzVector();
 }
 
 
-FourCFitKFit::~FourCFitKFit(void)
-{
-}
+FourCFitKFit::~FourCFitKFit() = default;
 
 
 enum KFitError::ECode
@@ -75,10 +77,8 @@ FourCFitKFit::setInvariantMass(const double m) {
 
 
 enum KFitError::ECode
-FourCFitKFit::setFourMomentum(const  TLorentzVector m) {
+FourCFitKFit::setFourMomentum(const  TLorentzVector& m) {
   m_FourMomentum = m;
-//  PCmsLabTransform T;
-//  m_FourMomentum = T.getBoostVector();
 
   return m_ErrorCode = KFitError::kNoError;
 }
@@ -93,7 +93,7 @@ FourCFitKFit::setFlagAtDecayPoint(const bool flag) {
 
 
 enum KFitError::ECode
-FourCFitKFit::fixMass(void) {
+FourCFitKFit::fixMass() {
   m_IsFixMass.push_back(true);
 
   return m_ErrorCode = KFitError::kNoError;
@@ -101,7 +101,7 @@ FourCFitKFit::fixMass(void) {
 
 
 enum KFitError::ECode
-FourCFitKFit::unfixMass(void) {
+FourCFitKFit::unfixMass() {
   m_IsFixMass.push_back(false);
 
   return m_ErrorCode = KFitError::kNoError;
@@ -126,7 +126,7 @@ FourCFitKFit::setTrackVertexError(const HepMatrix& e) {
 
 
 enum KFitError::ECode
-FourCFitKFit::setTrackZeroVertexError(void) {
+FourCFitKFit::setTrackZeroVertexError() {
   HepMatrix zero(3, KFitConst::kNumber7, 0);
 
   return this->setTrackVertexError(zero);
@@ -140,7 +140,7 @@ FourCFitKFit::setCorrelation(const HepMatrix& m) {
 
 
 enum KFitError::ECode
-FourCFitKFit::setZeroCorrelation(void) {
+FourCFitKFit::setZeroCorrelation() {
   return KFitBase::setZeroCorrelation();
 }
 
@@ -181,28 +181,28 @@ FourCFitKFit::getVertexError(const int flag) const
 
 
 double
-FourCFitKFit::getInvariantMass(void) const
+FourCFitKFit::getInvariantMass() const
 {
   return m_InvariantMass;
 }
 
 
 bool
-FourCFitKFit::getFlagAtDecayPoint(void) const
+FourCFitKFit::getFlagAtDecayPoint() const
 {
   return m_FlagAtDecayPoint;
 }
 
 
 bool
-FourCFitKFit::getFlagFitWithVertex(void) const
+FourCFitKFit::getFlagFitWithVertex() const
 {
   return m_FlagFitIncludingVertex;
 }
 
 
 double
-FourCFitKFit::getCHIsq(void) const
+FourCFitKFit::getCHIsq() const
 {
   return m_CHIsq;
 }
@@ -289,13 +289,13 @@ FourCFitKFit::getCorrelation(const int id1, const int id2, const int flag) const
 
 
 enum KFitError::ECode
-FourCFitKFit::doFit(void) {
+FourCFitKFit::doFit() {
   return KFitBase::doFit1();
 }
 
 
 enum KFitError::ECode
-FourCFitKFit::prepareInputMatrix(void) {
+FourCFitKFit::prepareInputMatrix() {
   if (m_TrackCount > KFitConst::kMaxTrackCount)
   {
     m_ErrorCode = KFitError::kBadTrackSize;
@@ -324,23 +324,23 @@ FourCFitKFit::prepareInputMatrix(void) {
     m_property = HepMatrix(m_TrackCount, 3, 0);
     m_V_al_0   = HepSymMatrix(KFitConst::kNumber7 * m_TrackCount, 0);
 
-    for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it) {
+    for (auto& track : m_Tracks) {
       // momentum x,y,z and position x,y,z
-      m_al_0[index * KFitConst::kNumber7 + 0][0] = it->getMomentum(KFitConst::kBeforeFit).x();
-      m_al_0[index * KFitConst::kNumber7 + 1][0] = it->getMomentum(KFitConst::kBeforeFit).y();
-      m_al_0[index * KFitConst::kNumber7 + 2][0] = it->getMomentum(KFitConst::kBeforeFit).z();
-      m_al_0[index * KFitConst::kNumber7 + 3][0] = it->getMomentum(KFitConst::kBeforeFit).t();
-      m_al_0[index * KFitConst::kNumber7 + 4][0] = it->getPosition(KFitConst::kBeforeFit).x();
-      m_al_0[index * KFitConst::kNumber7 + 5][0] = it->getPosition(KFitConst::kBeforeFit).y();
-      m_al_0[index * KFitConst::kNumber7 + 6][0] = it->getPosition(KFitConst::kBeforeFit).z();
+      m_al_0[index * KFitConst::kNumber7 + 0][0] = track.getMomentum(KFitConst::kBeforeFit).x();
+      m_al_0[index * KFitConst::kNumber7 + 1][0] = track.getMomentum(KFitConst::kBeforeFit).y();
+      m_al_0[index * KFitConst::kNumber7 + 2][0] = track.getMomentum(KFitConst::kBeforeFit).z();
+      m_al_0[index * KFitConst::kNumber7 + 3][0] = track.getMomentum(KFitConst::kBeforeFit).t();
+      m_al_0[index * KFitConst::kNumber7 + 4][0] = track.getPosition(KFitConst::kBeforeFit).x();
+      m_al_0[index * KFitConst::kNumber7 + 5][0] = track.getPosition(KFitConst::kBeforeFit).y();
+      m_al_0[index * KFitConst::kNumber7 + 6][0] = track.getPosition(KFitConst::kBeforeFit).z();
       // these error
-      m_V_al_0.sub(index * KFitConst::kNumber7 + 1, it->getError(KFitConst::kBeforeFit));
+      m_V_al_0.sub(index * KFitConst::kNumber7 + 1, track.getError(KFitConst::kBeforeFit));
       // charge, mass, a
-      m_property[index][0] =  it->getCharge();
-      m_property[index][1] =  it->getMass();
+      m_property[index][0] =  track.getCharge();
+      m_property[index][1] =  track.getMass();
       const double c = KFitConst::kLightSpeed; // C++ bug?
       // m_property[index][2] = -KFitConst::kLightSpeed * m_MagneticField * it->getCharge();
-      m_property[index][2] = -c * m_MagneticField * it->getCharge();
+      m_property[index][2] = -c * m_MagneticField * track.getCharge();
       index++;
     }
 
@@ -367,24 +367,24 @@ FourCFitKFit::prepareInputMatrix(void) {
     m_property = HepMatrix(m_TrackCount, 3, 0);
     m_V_al_0   = HepSymMatrix(KFitConst::kNumber7 * m_TrackCount + 3, 0);
 
-    for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it)
+    for (auto& track : m_Tracks)
     {
       // momentum x,y,z and position x,y,z
-      m_al_0[index * KFitConst::kNumber7 + 0][0] = it->getMomentum(KFitConst::kBeforeFit).x();
-      m_al_0[index * KFitConst::kNumber7 + 1][0] = it->getMomentum(KFitConst::kBeforeFit).y();
-      m_al_0[index * KFitConst::kNumber7 + 2][0] = it->getMomentum(KFitConst::kBeforeFit).z();
-      m_al_0[index * KFitConst::kNumber7 + 3][0] = it->getMomentum(KFitConst::kBeforeFit).t();
-      m_al_0[index * KFitConst::kNumber7 + 4][0] = it->getPosition(KFitConst::kBeforeFit).x();
-      m_al_0[index * KFitConst::kNumber7 + 5][0] = it->getPosition(KFitConst::kBeforeFit).y();
-      m_al_0[index * KFitConst::kNumber7 + 6][0] = it->getPosition(KFitConst::kBeforeFit).z();
+      m_al_0[index * KFitConst::kNumber7 + 0][0] = track.getMomentum(KFitConst::kBeforeFit).x();
+      m_al_0[index * KFitConst::kNumber7 + 1][0] = track.getMomentum(KFitConst::kBeforeFit).y();
+      m_al_0[index * KFitConst::kNumber7 + 2][0] = track.getMomentum(KFitConst::kBeforeFit).z();
+      m_al_0[index * KFitConst::kNumber7 + 3][0] = track.getMomentum(KFitConst::kBeforeFit).t();
+      m_al_0[index * KFitConst::kNumber7 + 4][0] = track.getPosition(KFitConst::kBeforeFit).x();
+      m_al_0[index * KFitConst::kNumber7 + 5][0] = track.getPosition(KFitConst::kBeforeFit).y();
+      m_al_0[index * KFitConst::kNumber7 + 6][0] = track.getPosition(KFitConst::kBeforeFit).z();
       // these error
-      m_V_al_0.sub(index * KFitConst::kNumber7 + 1, it->getError(KFitConst::kBeforeFit));
+      m_V_al_0.sub(index * KFitConst::kNumber7 + 1, track.getError(KFitConst::kBeforeFit));
       // charge, mass, a
-      m_property[index][0] =  it->getCharge();
-      m_property[index][1] =  it->getMass();
+      m_property[index][0] =  track.getCharge();
+      m_property[index][1] =  track.getMass();
       const double c = KFitConst::kLightSpeed; // C++ bug?
       // m_property[index][2] = -KFitConst::kLightSpeed * m_MagneticField * it->getCharge();
-      m_property[index][2] = -c * m_MagneticField * it->getCharge();
+      m_property[index][2] = -c * m_MagneticField * track.getCharge();
       index++;
     }
 
@@ -417,7 +417,7 @@ FourCFitKFit::prepareInputMatrix(void) {
 
 
 enum KFitError::ECode
-FourCFitKFit::prepareInputSubMatrix(void) { // unused
+FourCFitKFit::prepareInputSubMatrix() { // unused
   char buf[1024];
   sprintf(buf, "%s:%s(): internal error; this function should never be called", __FILE__, __func__);
   B2FATAL(buf);
@@ -428,7 +428,7 @@ FourCFitKFit::prepareInputSubMatrix(void) { // unused
 
 
 enum KFitError::ECode
-FourCFitKFit::prepareCorrelation(void) {
+FourCFitKFit::prepareCorrelation() {
   if (m_BeforeCorrelation.size() != static_cast<unsigned int>(m_TrackCount * (m_TrackCount - 1) / 2))
   {
     m_ErrorCode = KFitError::kBadCorrelationSize;
@@ -438,10 +438,8 @@ FourCFitKFit::prepareCorrelation(void) {
 
   int row = 0, col = 0;
 
-  for (vector<HepMatrix>::const_iterator it = m_BeforeCorrelation.begin(), endIt = m_BeforeCorrelation.end(); it != endIt; ++it)
+  for (auto& hm : m_BeforeCorrelation)
   {
-    const HepMatrix& hm = *it;
-
     // counter
     row++;
     if (row == m_TrackCount) {
@@ -474,9 +472,7 @@ FourCFitKFit::prepareCorrelation(void) {
       }
 
       int i = 0;
-      for (vector<HepMatrix>::const_iterator it = m_BeforeTrackVertexError.begin(), endIt = m_BeforeTrackVertexError.end(); it != endIt;
-           ++it) {
-        const HepMatrix& hm = *it;
+      for (auto& hm : m_BeforeTrackVertexError) {
         for (int j = 0; j < 3; j++) for (int k = 0; k < KFitConst::kNumber7; k++) {
             m_V_al_0[j + KFitConst::kNumber7 * m_TrackCount][k + i * KFitConst::kNumber7] = hm[j][k];
           }
@@ -490,21 +486,17 @@ FourCFitKFit::prepareCorrelation(void) {
 
 
 enum KFitError::ECode
-FourCFitKFit::prepareOutputMatrix(void) {
+FourCFitKFit::prepareOutputMatrix() {
   Hep3Vector h3v;
   int index = 0;
-  for (vector<KFitTrack>::iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it)
+  for (auto& pdata : m_Tracks)
   {
-    KFitTrack& pdata = *it;
     // tracks
     // momentum
     h3v.setX(m_al_1[index * KFitConst::kNumber7 + 0][0]);
     h3v.setY(m_al_1[index * KFitConst::kNumber7 + 1][0]);
     h3v.setZ(m_al_1[index * KFitConst::kNumber7 + 2][0]);
-    if (m_IsFixMass[index])
-      pdata.setMomentum(HepLorentzVector(h3v, sqrt(h3v.mag2() + pdata.getMass()*pdata.getMass())), KFitConst::kAfterFit);
-    else
-      pdata.setMomentum(HepLorentzVector(h3v, m_al_1[index * KFitConst::kNumber7 + 3][0]), KFitConst::kAfterFit);
+    pdata.setMomentum(HepLorentzVector(h3v, m_al_1[index * KFitConst::kNumber7 + 3][0]), KFitConst::kAfterFit);
     // position
     pdata.setPosition(HepPoint3D(
       m_al_1[index * KFitConst::kNumber7 + 4][0],
@@ -553,20 +545,15 @@ FourCFitKFit::prepareOutputMatrix(void) {
 
 
 enum KFitError::ECode
-FourCFitKFit::makeCoreMatrix(void) {
+FourCFitKFit::makeCoreMatrix() {
   if (!m_FlagFitIncludingVertex)
   {
 
     HepMatrix al_1_prime(m_al_1);
     HepMatrix Sum_al_1(4, 1, 0);
     double energy[KFitConst::kMaxTrackCount2];
-    double a;
 
     for (int i = 0; i < m_TrackCount; i++) {
-      a = m_property[i][2];
-      if (!m_FlagAtDecayPoint) a = 0.;
-      al_1_prime[i * KFitConst::kNumber7 + 0][0] -= a * (m_BeforeVertex.y() - al_1_prime[i * KFitConst::kNumber7 + 5][0]);
-      al_1_prime[i * KFitConst::kNumber7 + 1][0] += a * (m_BeforeVertex.x() - al_1_prime[i * KFitConst::kNumber7 + 4][0]);
       energy[i] = sqrt(al_1_prime[i * KFitConst::kNumber7 + 0][0] * al_1_prime[i * KFitConst::kNumber7 + 0][0] +
       al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
       al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
@@ -574,12 +561,8 @@ FourCFitKFit::makeCoreMatrix(void) {
     }
 
     for (int i = 0; i < m_TrackCount; i++) {
-      if (m_IsFixMass[i])
-        Sum_al_1[3][0] += energy[i];
-      else
-        Sum_al_1[3][0] += al_1_prime[i * KFitConst::kNumber7 + 3][0];
-
-      for (int j = 0; j < 3; j++) Sum_al_1[j][0] += al_1_prime[i * KFitConst::kNumber7 + j][0];
+      // 3->4
+      for (int j = 0; j < 4; j++) Sum_al_1[j][0] += al_1_prime[i * KFitConst::kNumber7 + j][0];
     }
 
     m_d[0][0] = Sum_al_1[0][0]  - m_FourMomentum.Px();
@@ -594,8 +577,6 @@ FourCFitKFit::makeCoreMatrix(void) {
         break;
       }
 
-      a = m_property[i][2];
-      if (!m_FlagAtDecayPoint) a = 0.;
       for (int l = 0; l < 4; l++) {
         for (int n = 0; n < 6; n++) {
           if (l == n) m_D[l][i * KFitConst::kNumber7 + n] = 1;
@@ -610,11 +591,10 @@ FourCFitKFit::makeCoreMatrix(void) {
     HepMatrix al_1_prime(m_al_1);
     HepMatrix Sum_al_1(7, 1, 0);
     double energy[KFitConst::kMaxTrackCount2];
-    double a;
 
     for (int i = 0; i < m_TrackCount; i++)
     {
-      a = m_property[i][2];
+      const double a = m_property[i][2];
       al_1_prime[i * KFitConst::kNumber7 + 0][0] -= a * (al_1_prime[KFitConst::kNumber7 * m_TrackCount + 1][0] - al_1_prime[i *
       KFitConst::kNumber7 + 5][0]);
       al_1_prime[i * KFitConst::kNumber7 + 1][0] += a * (al_1_prime[KFitConst::kNumber7 * m_TrackCount + 0][0] - al_1_prime[i *
@@ -659,7 +639,6 @@ FourCFitKFit::makeCoreMatrix(void) {
         break;
       }
 
-      a = m_property[i][2];
       for (int l = 0; l < 4; l++) {
         for (int n = 0; n < 6; n++) {
           if (l == n) m_D[l][i * KFitConst::kNumber7 + n] = 1;
@@ -678,9 +657,50 @@ FourCFitKFit::makeCoreMatrix(void) {
 
 
 enum KFitError::ECode
-FourCFitKFit::calculateNDF(void) {
-  m_NDF = 1;
+FourCFitKFit::calculateNDF() {
+  m_NDF = 4;
 
   return m_ErrorCode = KFitError::kNoError;
 }
 
+enum KFitError::ECode FourCFitKFit::updateMother(Particle* mother)
+{
+  MakeMotherKFit kmm;
+  kmm.setMagneticField(m_MagneticField);
+  unsigned n = getTrackCount();
+  for (unsigned i = 0; i < n; ++i) {
+    kmm.addTrack(getTrackMomentum(i), getTrackPosition(i), getTrackError(i),
+                 getTrack(i).getCharge());
+    if (getFlagFitWithVertex())
+      kmm.setTrackVertexError(getTrackVertexError(i));
+    for (unsigned j = i + 1; j < n; ++j) {
+      kmm.setCorrelation(getCorrelation(i, j));
+    }
+  }
+  kmm.setVertex(getVertex());
+  if (getFlagFitWithVertex())
+    kmm.setVertexError(getVertexError());
+  m_ErrorCode = kmm.doMake();
+  if (m_ErrorCode != KFitError::kNoError)
+    return m_ErrorCode;
+  double chi2 = getCHIsq();
+  int ndf = getNDF();
+  double prob = TMath::Prob(chi2, ndf);
+  //
+  bool haschi2 = mother->hasExtraInfo("chiSquared");
+  if (haschi2) {
+    mother->setExtraInfo("chiSquared", chi2);
+    mother->setExtraInfo("ndf", ndf);
+  } else if (!haschi2) {
+    mother->addExtraInfo("chiSquared", chi2);
+    mother->addExtraInfo("ndf", ndf);
+  }
+
+  mother->updateMomentum(
+    CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
+    CLHEPToROOT::getTVector3(kmm.getMotherPosition()),
+    CLHEPToROOT::getTMatrixFSym(kmm.getMotherError()),
+    prob);
+  m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode;
+}

@@ -43,19 +43,29 @@ namespace Belle2 {
   public:
 
     /** set ICN for each part(Fw,Br,Bw) */
+    void setICN(std::vector<int>);
+    /** set Belle 2 Clustering */
     void setICN(std::vector<int> , std::vector<double>, std::vector<double>);
     /** Save Cluster information in TRGECLCluster Table */
     void save(int);
-    /**  calculate ICN in Barrel */
-    int setBarrelICN(int);
-    /**  calculate ICN in Foward endcap */
-    int setForwardICN(int);
-    /** calculate ICN in Backward endcap */
-    int setBackwardICN(int);
+    /**  calculate  Belle 2 Cluster in Barrel */
+    void setBarrelICN(int);
+    /**  calculate Belle2 Cluster in Foward endcap */
+    void setForwardICN(int);
+    /** calculate Belle 2 Cluster in Backward endcap */
+    void setBackwardICN(int);
+    /**  calculate Belle ICN in Barrel */
+    int setBarrelICN();
+    /**  calculate Belle  ICN in Foward endcap */
+    int setForwardICN();
+    /** calculate Belle ICN in Backward endcap */
+    int setBackwardICN();
     /** Set EventId */
     void setEventId(int eventId) {_EventId = eventId; }
     /** Set */
     void setClusteringMethod(int method) {_Method = method; }
+    /** Set Limit of Cluster*/
+    void setClusterLimit(int limit) {_LimitNCluster = limit; }
 
     //
     //
@@ -77,7 +87,9 @@ namespace Belle2 {
     /** */
     int getFwICNCluster(int ICNId, int);///0 : center , 1; upper , 2: right , 3: lower , 4: lower right
     /** Output # of cluster */
-    int getNofCluster() {return _BRICN + _FWDICN + _BWDICN;}
+    int getNofCluster() {return _BWDNofCluster + _FWDNofCluster + _BRNofCluster;}
+    /** get # Cluster in case of exceeding limit*/
+    int getNofExceedCluster();
 
 
     //
@@ -95,14 +107,24 @@ namespace Belle2 {
     int _FWDICN;
     /** ICN in Backward Endcap */
     int _BWDICN;
+    /** Cluster in Barrel */
+    int _BRNofCluster;
+    /** Cluster in Forward Endcap */
+    int _FWDNofCluster;
+    /** Cluster in Backward Endcap */
+    int _BWDNofCluster;
     /** event number */
     int _EventId;
     /** Clustering method */
     int _Method;
+    /** the Limit Number of Cluster */
+    int _LimitNCluster;
+    /** Position calculation method(0:Most energetic TC Postion,  1 : Energy weighted Postion) */
+    int _Position;
+
 
     /** icn  */
     std::vector<int> _icnfwbrbw;
-
     /**  TC Id */
     std::vector<int> TCId;
     /**  TC timing */
@@ -110,6 +132,8 @@ namespace Belle2 {
     /** TC energy  */
     std::vector<double> Energy;
 
+    /** Quadrant for Beam Backgournd veto */
+    std::vector<std::vector<int>>  _Quadrant;
 
     /**  cluster in barrel */
     std::vector<std::vector<int>> _BrCluster;

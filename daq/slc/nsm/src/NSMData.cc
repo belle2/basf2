@@ -25,8 +25,8 @@ using namespace Belle2;
 
 NSMData::NSMData(const std::string& dataname,
                  const std::string& format, int revision)
-throw() : AbstractDBObject(), m_allocated(false),
-  m_pdata(NULL), m_size(0), m_offset(0)
+  : AbstractDBObject(), m_allocated(false),
+    m_pdata(NULL), m_size(0), m_offset(0)
 {
   setName(dataname);
   setFormat(format);
@@ -34,13 +34,13 @@ throw() : AbstractDBObject(), m_allocated(false),
 }
 
 NSMData::NSMData()
-throw() : AbstractDBObject(), m_allocated(false),
-  m_pdata(NULL), m_size(0), m_offset(0)
+  : AbstractDBObject(), m_allocated(false),
+    m_pdata(NULL), m_size(0), m_offset(0)
 {
   setRevision(-1);
 }
 
-NSMData::NSMData(const NSMData& data) throw()
+NSMData::NSMData(const NSMData& data)
   : AbstractDBObject(data)
 {
   m_allocated = data.m_allocated;
@@ -74,7 +74,7 @@ NSMData::NSMData(const NSMData& data) throw()
   }
 }
 
-NSMData::~NSMData() throw()
+NSMData::~NSMData()
 {
   reset();
   if (m_allocated && m_pdata != NULL) {
@@ -83,7 +83,7 @@ NSMData::~NSMData() throw()
   }
 }
 
-void NSMData::reset() throw()
+void NSMData::reset()
 {
   AbstractDBObject::reset();
   if (m_allocated && m_pdata != NULL) {
@@ -93,7 +93,7 @@ void NSMData::reset() throw()
 }
 
 void NSMData::addValue(const std::string& name, const void* data,
-                       DBField::Type type, int length) throw()
+                       DBField::Type type, int length)
 {
   DBField::Property pro(type, length, m_offset);
   if (length == 0) length = 1;
@@ -109,7 +109,7 @@ void NSMData::addValue(const std::string& name, const void* data,
 }
 
 void NSMData::setValue(const std::string& name, const void* data,
-                       int length) throw()
+                       int length)
 {
   const DBField::Property& pro(getProperty(name));
   if (length == 0) length = 1;
@@ -119,7 +119,7 @@ void NSMData::setValue(const std::string& name, const void* data,
   }
 }
 
-void* NSMData::open(NSMCommunicator& com) throw(NSMHandlerException)
+void* NSMData::open(NSMCommunicator& com)
 {
   if (m_pdata == NULL) {
     b2nsm_context(com.getContext());
@@ -138,7 +138,7 @@ void* NSMData::open(NSMCommunicator& com) throw(NSMHandlerException)
   return m_pdata;
 }
 
-void* NSMData::allocate(NSMCommunicator& com, int interval) throw(NSMHandlerException)
+void* NSMData::allocate(NSMCommunicator& com, int interval)
 {
   if (m_pdata == NULL) {
     b2nsm_context(com.getContext());
@@ -155,16 +155,17 @@ void* NSMData::allocate(NSMCommunicator& com, int interval) throw(NSMHandlerExce
     memset(m_pdata, 0, m_size);
     m_com = &com;
     m_tstamp = 0;
+    /*
+    com.getCallback().add(new NSMVHandlerText("nsmdata.name", true, false, getName()));
+    com.getCallback().add(new NSMVHandlerText("nsmdata.format", true, false, getFormat()));
+    com.getCallback().add(new NSMVHandlerInt("nsmdata.revision", true, false, getRevision()));
+    com.getCallback().add(new NSMVHandlerInt("nsmdata.tstamp", true, false, m_tstamp));
+    */
   }
-  com.getCallback().add(new NSMVHandlerText("nsmdata.name", true, false, getName()));
-  com.getCallback().add(new NSMVHandlerText("nsmdata.format", true, false, getFormat()));
-  com.getCallback().add(new NSMVHandlerInt("nsmdata.revision", true, false, getRevision()));
-  com.getCallback().add(new NSMVHandlerInt("nsmdata.tstamp", true, false, m_tstamp));
   return m_pdata;
 }
 
 void* NSMData::parse(const char* incpath, bool malloc_new)
-throw(NSMHandlerException)
 {
 #if NSM_PACKAGE_VERSION >= 1914
   if (getenv("NSM2_INCDIR") == NULL) {
@@ -195,7 +196,7 @@ throw(NSMHandlerException)
   return NULL;
 }
 
-void NSMData::flush() throw(NSMHandlerException)
+void NSMData::flush()
 {
 #if NSM_PACKAGE_VERSION >= 1914
   m_tstamp = Time().getSecond();
@@ -205,8 +206,7 @@ void NSMData::flush() throw(NSMHandlerException)
 }
 
 #if NSM_PACKAGE_VERSION >= 1914
-NSMparse* NSMData::parse(NSMparse* ptr, int& length,
-                         std::string& name_in) throw(NSMHandlerException)
+NSMparse* NSMData::parse(NSMparse* ptr, int& length, std::string& name_in)
 {
   m_size = 0;
   while (ptr != NULL) {
@@ -257,7 +257,7 @@ NSMparse* NSMData::parse(NSMparse* ptr, int& length,
 }
 #endif
 
-void* NSMData::getValue(const std::string& name) throw(std::out_of_range)
+void* NSMData::getValue(const std::string& name)
 {
   if (!hasValue(name)) return NULL;
   char* data = (char*)get();
@@ -265,14 +265,14 @@ void* NSMData::getValue(const std::string& name) throw(std::out_of_range)
 }
 
 const void* NSMData::getValue(const std::string& name)
-const throw(std::out_of_range)
+const
 {
   if (!hasValue(name)) return NULL;
   char* data = (char*)get();
   return (data + getProperty(name).getOffset());
 }
 
-void NSMData::readObject(Reader& reader) throw(IOException)
+void NSMData::readObject(Reader& reader)
 {
   setName(reader.readString());
   setFormat(reader.readString());
@@ -318,7 +318,7 @@ void NSMData::readObject(Reader& reader) throw(IOException)
   }
 }
 
-void NSMData::writeObject(Writer& writer) const throw(IOException)
+void NSMData::writeObject(Writer& writer) const
 {
   writer.writeString(getName());
   writer.writeString(getFormat());
@@ -358,7 +358,7 @@ void NSMData::writeObject(Writer& writer) const throw(IOException)
   }
 }
 
-void NSMData::print(const std::string& name_in) const throw()
+void NSMData::print(const std::string& name_in) const
 {
   NameValueList map;
   search(map, name_in);
@@ -375,7 +375,7 @@ void NSMData::print(const std::string& name_in) const throw()
 }
 
 void NSMData::search(NSMData::NameValueList& map,
-                     const std::string& name_in) const throw()
+                     const std::string& name_in) const
 {
   const DBField::NameList& name_v(getFieldNames());
   for (DBField::NameList::const_iterator it = name_v.begin();
@@ -439,7 +439,7 @@ void NSMData::search(NSMData::NameValueList& map,
   }
 }
 
-void NSMData::printPV(const std::string& name_in) const throw()
+void NSMData::printPV(const std::string& name_in) const
 {
   const DBField::NameList& name_v(getFieldNames());
   for (DBField::NameList::const_iterator it = name_v.begin();
@@ -493,8 +493,7 @@ void NSMData::printPV(const std::string& name_in) const throw()
   }
 }
 
-const void* NSMData::find(const std::string& name_in, DBField::Type& type, int& length)
-const throw()
+const void* NSMData::find(const std::string& name_in, DBField::Type& type, int& length) const
 {
   size_t pos;
   std::string name_out = name_in;
@@ -532,35 +531,35 @@ const throw()
   return NULL;
 }
 
-int NSMData::getNObjects(const std::string& name) const throw()
+int NSMData::getNObjects(const std::string& name) const
 {
   NSMDataListMap::const_iterator it = m_data_v_m.find(name);
   if (it != m_data_v_m.end()) return it->second.size();
   return 0;
 }
 
-const NSMData& NSMData::getObject(const std::string& name, int index) const throw(std::out_of_range)
+const NSMData& NSMData::getObject(const std::string& name, int index) const
 {
   NSMDataListMap::const_iterator it = m_data_v_m.find(name);
   if (it != m_data_v_m.end()) return it->second[index];
   else throw (std::out_of_range(StringUtil::form("%s:%d", __FILE__, __LINE__)));
 }
 
-NSMData& NSMData::getObject(const std::string& name, int index) throw(std::out_of_range)
+NSMData& NSMData::getObject(const std::string& name, int index)
 {
   NSMDataListMap::iterator it = m_data_v_m.find(name);
   if (it != m_data_v_m.end()) return it->second[index];
   else throw (std::out_of_range(StringUtil::form("%s:%d", __FILE__, __LINE__)));
 }
 
-const NSMData::NSMDataList& NSMData::getObjects(const std::string& name) const throw(std::out_of_range)
+const NSMData::NSMDataList& NSMData::getObjects(const std::string& name) const
 {
   NSMDataListMap::const_iterator it = m_data_v_m.find(name);
   if (it != m_data_v_m.end()) return it->second;
   else throw (std::out_of_range(StringUtil::form("%s:%d", __FILE__, __LINE__)));
 }
 
-NSMData::NSMDataList& NSMData::getObjects(const std::string& name) throw(std::out_of_range)
+NSMData::NSMDataList& NSMData::getObjects(const std::string& name)
 {
   NSMDataListMap::iterator it = m_data_v_m.find(name);
   if (it != m_data_v_m.end()) return it->second;

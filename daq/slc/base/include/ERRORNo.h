@@ -16,21 +16,21 @@ namespace Belle2 {
     static const ERRORNo DATABASE;
 
   public:
-    ERRORNo() throw() {}
-    ERRORNo(const Enum& e) throw() : Enum(e) {}
-    ERRORNo(const ERRORNo& cmd) throw() : Enum(cmd) {}
-    ERRORNo(const char* label) throw() { *this = label; }
-    ERRORNo(int id) throw() { *this = id; }
-    ~ERRORNo() throw() {}
+    ERRORNo() {}
+    ERRORNo(const Enum& e) : Enum(e) {}
+    ERRORNo(const ERRORNo& cmd) : Enum(cmd) {}
+    ERRORNo(const char* label) { *this = label; }
+    ERRORNo(int id) { *this = id; }
+    ~ERRORNo() {}
 
   protected:
     ERRORNo(int id, const char* label)
-    throw() : Enum(id, label) {}
+      : Enum(id, label) {}
 
   public:
-    const ERRORNo& operator=(const std::string& label) throw();
-    const ERRORNo& operator=(const char* label) throw();
-    const ERRORNo& operator=(int id) throw();
+    const ERRORNo& operator=(const std::string& label);
+    const ERRORNo& operator=(const char* label);
+    const ERRORNo& operator=(int id);
 
   };
 

@@ -69,7 +69,7 @@ namespace Belle2 {
        * Train a mva method using the given dataset returning a Weightfile
        * @param training_data used to train the method
        */
-      virtual Weightfile train(Dataset& training_data) const;
+      virtual Weightfile train(Dataset& training_data) const override;
 
     private:
       TrivialOptions m_specific_options; /**< Method specific options */

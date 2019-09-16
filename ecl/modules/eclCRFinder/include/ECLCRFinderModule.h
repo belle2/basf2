@@ -17,21 +17,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLCRFINDERMODULE_H_
-#define ECLCRFINDERMODULE_H_
+#pragma once
 
 // FRAMEWORK
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-// ECL
-#include <ecl/geometry/ECLNeighbours.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
-
 namespace Belle2 {
+  class ECLConnectedRegion;
+  class ECLCalDigit;
+  class EventLevelClusteringInfo;
+
+  namespace ECL {
+    class ECLNeighbours;
+  }
 
   /** Class to find connected regions */
   class ECLCRFinderModule : public Module {
@@ -44,19 +44,19 @@ namespace Belle2 {
     virtual ~ECLCRFinderModule();
 
     /** Initialize. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Begin. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Event. */
-    virtual void event();
+    virtual void event() override;
 
     /** End run. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Terminate (close ROOT files here if you have opened any). */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Store array: ECLCalDigit. */
     StoreArray<ECLCalDigit> m_eclCalDigits;
@@ -64,8 +64,8 @@ namespace Belle2 {
     /** Store array: ECLConnectedRegion. */
     StoreArray<ECLConnectedRegion> m_eclConnectedRegions;
 
-    /** Store object pointer: ECLEventInformation. */
-    StoreObjPtr<ECLEventInformation> m_eclEventInformation;
+    /** Store object pointer: EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
     /** Name to be used for default or PureCsI option: ECLCalDigits.*/
     virtual const char* eclCalDigitArrayName() const
@@ -75,9 +75,9 @@ namespace Belle2 {
     virtual const char* eclConnectedRegionArrayName() const
     { return "ECLConnectedRegions" ; }
 
-    /** Name to be used for default option: ECLEventInformation.*/
-    virtual const char* eclEventInformationName() const
-    { return "ECLEventInformation" ; }
+    /** Name to be used for default option: EventLevelClusteringInfo.*/
+    virtual const char* eventLevelClusteringInfoName() const
+    { return "EventLevelClusteringInfo" ; }
 
   private:
 
@@ -92,8 +92,8 @@ namespace Belle2 {
     int m_fullBkgdCount; /**< Number of expected background digits at full background. TODO move to DB*/
 
     /** Other variables. */
-    double m_energyCutMod[3]; /**< modified energy cut taking into account bkgd per event for seed, neighbours, ...*/
-    int m_tempCRId; /**< Temporary CR ID*/
+    double m_energyCutMod[3] {}; /**< modified energy cut taking into account bkgd per event for seed, neighbours, ...*/
+    int m_tempCRId = -1; /**< Temporary CR ID*/
 
     /** Digit vectors. */
     std::vector <int>  m_cellIdToSeedVec; /**< cellid -> seed digit. */
@@ -131,12 +131,10 @@ namespace Belle2 {
     virtual const char* eclConnectedRegionArrayName() const override
     { return "ECLConnectedRegionsPureCsI" ; }
 
-    /** Name to be used for PureCsI option: ECLEventInformationPureCsI.*/
-    virtual const char* eclEventInformationName() const override
-    { return "ECLEventInformationPureCsI" ; }
+    /** Name to be used for PureCsI option: EventLevelClusteringInfoPureCsI.*/
+    virtual const char* eventLevelClusteringInfoName() const override
+    { return "EventLevelClusteringInfoPureCsI" ; }
 
   }; // end of ECLCovarianceMatrixPureCsIModule
 
 } // end of Belle2 namespace
-
-#endif // ECLCRFINDERMODULE_H_

@@ -80,13 +80,14 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(aVxdID, testPoint.getVxdID());
 
     // needing globalized position and error:
-    TVector3 aPosition = sensorInfoBase.pointToGlobal(TVector3(aCluster.getU(), aCluster.getV(), 0));
+    TVector3 aPosition = sensorInfoBase.pointToGlobal(TVector3(aCluster.getU(), aCluster.getV(), 0), true);
     TVector3 globalizedVariances = sensorInfoBase.vectorToGlobal(
                                      TVector3(
                                        aCluster.getUSigma() * aCluster.getUSigma(),
                                        aCluster.getVSigma() * aCluster.getVSigma(),
                                        0
-                                     )
+                                     ),
+                                     true
                                    );
 
     TVector3 globalError;
@@ -151,13 +152,14 @@ namespace Belle2 {
 
 
     // check results for full 2D cluster-combi:
-    TVector3 aPositionFor2D = sensorInfoBase.pointToGlobal(TVector3(clusterU1.getPosition(), clusterV1.getPosition(), 0));
+    TVector3 aPositionFor2D = sensorInfoBase.pointToGlobal(TVector3(clusterU1.getPosition(), clusterV1.getPosition(), 0), true);
     TVector3 globalizedVariancesFor2D = sensorInfoBase.vectorToGlobal(
                                           TVector3(
                                             clusterU1.getPositionSigma() * clusterU1.getPositionSigma(),
                                             clusterV1.getPositionSigma() * clusterV1.getPositionSigma(),
                                             0
-                                          )
+                                          ),
+                                          true
                                         );
     TVector3 globalErrorFor2D;
     for (int i = 0; i < 3; i++) { globalErrorFor2D[i] = sqrt(abs(globalizedVariancesFor2D[i])); }
@@ -178,13 +180,14 @@ namespace Belle2 {
 
 
     // check results for single-cluster-only-case:
-    TVector3 aPositionFor1D = anotherSensorInfoBase.pointToGlobal(TVector3(clusterU3.getPosition(), 0, 0));
+    TVector3 aPositionFor1D = anotherSensorInfoBase.pointToGlobal(TVector3(clusterU3.getPosition(), 0, 0), true);
     TVector3 globalizedVariancesFor1D = anotherSensorInfoBase.vectorToGlobal(
                                           TVector3(
                                             clusterU3.getPositionSigma() * clusterU3.getPositionSigma(),
                                             anotherSensorInfoBase.getVSize() * anotherSensorInfoBase.getVSize() / 12.,
                                             0
-                                          )
+                                          ),
+                                          true
                                         );
     TVector3 globalErrorFor1D;
     for (int i = 0; i < 3; i++) { globalErrorFor1D[i] = sqrt(abs(globalizedVariancesFor1D[i])); }
@@ -473,40 +476,6 @@ namespace Belle2 {
   //     static pair<float, float> convertToLocalCoordinates(const pair<float, float>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
-
-  /**  Testing member of spacePoint: getGlobalCoordinates
-   */
-  TEST_F(SpacePointTest, testGetGlobalCoordinates)
-  {
-    VxdID aVxdID = VxdID(1, 1, 1);
-    VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2);
-  }
-  /** converts a local hit on a given sensor into global coordinates.
-   *
-   * first parameter is the local hit stored as a pair of floats.
-   * second parameter is the coded vxdID, which carries the sensorID.
-   * third parameter, a sensorInfo can be passed for testing purposes.
-   *  If no sensorInfo is passed, the member gets its own pointer to it.
-   */
-  //     static TVector3 getGlobalCoordinates(const pair<float, float>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
-
-
-
-  /**  Testing member of spacePoint: convertToLocalCoordinatesNormalized
-   */
-  TEST_F(SpacePointTest, testConvertToLocalCoordinatesNormalized)
-  {
-    VxdID aVxdID = VxdID(1, 1, 1);
-    VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2);
-  }
-  /** converts a hit in sensor-independent relative coordinates into local coordinate of given sensor.
-   *
-   * first parameter is the hit in sensor-independent normalized ! coordinates stored as a pair of floats.
-   * second parameter is the coded vxdID, which carries the sensorID.
-   * third parameter, a sensorInfo can be passed for testing purposes.
-   *  If no sensorInfo is passed, the member gets its own pointer to it.
-   */
-  //     static pair<float, float> convertToLocalCoordinatesNormalized(const pair<float, float>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
   /** Test if the number of assigned Clusters is obtained correctly
    * NOTE: using the same constructors as in previous tests!

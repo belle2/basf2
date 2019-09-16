@@ -26,7 +26,7 @@
 namespace Belle2 {
 
   /** Quality estimation module for SpacePointTrackCandidates using multivariate analysis (MVA).
-  * This module calculates a QualityIndex (QI) for each SpacePointTrackCandidate.
+  * This module calculates a qualityIndicator (QI) for each SpacePointTrackCandidate.
   * This module can support most estimation strategies that implement the interface QualityEstimatorBase
   * and use them together with cluster information to calculate a new QI using MVA.
   *  */

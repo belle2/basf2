@@ -56,7 +56,7 @@ namespace {
 
   class MockDetectorInterface : public IGlobalParamInterface {
   public:
-    MockDetectorInterface(int id) : m_id(id) {}
+    explicit MockDetectorInterface(int id) : m_id(id) {}
     int hasBeenCalled() { return m_called; }
     virtual void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>&,
                                 GlobalParamVector&) override final
@@ -94,8 +94,8 @@ namespace {
   {
     // Full vector
     GlobalParamVector gpv;
-    // Vector restricted to BeamParameters
-    GlobalParamVector gpvComp({"BeamParameters"});
+    // Vector restricted to BeamSpot
+    GlobalParamVector gpvComp({"BeamSpot"});
 
     // Interfaces for testing
     auto interface1 = new MockDetectorInterface(1);
@@ -108,7 +108,7 @@ namespace {
 
     // Init the vectors with db objects and interfaces (see GlobalCalibrationManager::initGlobalVector(...))
     for (auto vect : std::vector<GlobalParamVector*>({&gpv, &gpvComp})) {
-      vect->addDBObj<BeamParameters>(iptr1);
+      vect->addDBObj<BeamSpot>(iptr1);
       vect->addDBObj<VXDAlignment>(iptr2);
       vect->addDBObj<CDCAlignment>(iptr2);
       vect->addDBObj<CDCTimeZeros>();
@@ -135,7 +135,7 @@ namespace {
     EXPECT_EQ(interface2->hasBeenCalled() , 1); // only one more read due to uniqueness
     EXPECT_EQ(interface3->hasBeenCalled() , 1);
 
-    // BeamParameters have interface 1 and interface 3 (added for any components configuration)
+    // BeamSpot have interface 1 and interface 3 (added for any components configuration)
     // Interface 2 should not be stored/called in 'gpvComp'
     gpvComp.postReadFromResult(emptyResult);
     EXPECT_EQ(interface1->hasBeenCalled() , 2);
@@ -150,17 +150,17 @@ namespace {
 
     // Full vector contains all objects
     EXPECT_EQ(!!gpv.getDBObj<VXDAlignment>(), true);
-    EXPECT_EQ(!!gpv.getDBObj<BeamParameters>(), true);
-    // BeamParameters global vector should only containt BeamParameters
+    EXPECT_EQ(!!gpv.getDBObj<BeamSpot>(), true);
+    // BeamSpot global vector should only containt BeamSpot
     EXPECT_EQ(!!gpvComp.getDBObj<VXDAlignment>(), false);
-    EXPECT_EQ(!!gpvComp.getDBObj<BeamParameters>(), true);
+    EXPECT_EQ(!!gpvComp.getDBObj<BeamSpot>(), true);
 
     // Full vector contains all objects
     EXPECT_EQ(gpv.getGlobalParamSet<VXDAlignment>().isConstructed(), true);
-    EXPECT_EQ(gpv.getGlobalParamSet<BeamParameters>().isConstructed(), true);
-    // BeamParameters global vector should only containt BeamParameters
+    EXPECT_EQ(gpv.getGlobalParamSet<BeamSpot>().isConstructed(), true);
+    // BeamSpot global vector should only containt BeamSpot
     EXPECT_EQ(gpvComp.getGlobalParamSet<VXDAlignment>().isConstructed(), false);
-    EXPECT_EQ(gpvComp.getGlobalParamSet<BeamParameters>().isConstructed(), true);
+    EXPECT_EQ(gpvComp.getGlobalParamSet<BeamSpot>().isConstructed(), true);
 
     // Accessing non-existing object will return an empty set
     EXPECT_EQ(gpvComp.getGlobalParamSet<VXDAlignment>().is<VXDAlignment>(), false);
@@ -169,34 +169,56 @@ namespace {
     EXPECT_EQ(gpvComp.getGlobalParamSet<VXDAlignment>().isConstructed(), false);
     EXPECT_EQ((bool) gpvComp.getGlobalParamSet<VXDAlignment>(), false);
 
-    EXPECT_EQ(gpv.getGlobalParamSet<BeamParameters>().is<BeamParameters>(), true);
-    EXPECT_EQ(gpv.getGlobalParamSet<BeamParameters>().is<EmptyGlobalParamSet>(), false);
-    EXPECT_EQ(gpv.getGlobalParamSet<BeamParameters>().empty(), false);
-    EXPECT_EQ(gpv.getGlobalParamSet<BeamParameters>().isConstructed(), true);
-    EXPECT_EQ((bool) gpv.getGlobalParamSet<BeamParameters>(), true);
+    EXPECT_EQ(gpv.getGlobalParamSet<BeamSpot>().is<BeamSpot>(), true);
+    EXPECT_EQ(gpv.getGlobalParamSet<BeamSpot>().is<EmptyGlobalParamSet>(), false);
+    EXPECT_EQ(gpv.getGlobalParamSet<BeamSpot>().empty(), false);
+    EXPECT_EQ(gpv.getGlobalParamSet<BeamSpot>().isConstructed(), true);
+    EXPECT_EQ((bool) gpv.getGlobalParamSet<BeamSpot>(), true);
 
 
     EXPECT_EQ(gpvComp.getGlobalParamSet<EmptyGlobalParamSet>().is<EmptyGlobalParamSet>(), true);
 
-    GlobalParamVector newgpv({"BeamParameters", "CDCAlignment"});
+    // This commented because BeamSpot is not yet in the DB. Instead, for now
+    // test VXDAlignment and once I get to this back, I want to have test for
+    // all supported db objects.
+    /*
+    GlobalParamVector newgpv({"BeamSpot", "CDCAlignment"});
     GlobalCalibrationManager::initGlobalVector(newgpv);
 
-    EXPECT_EQ(newgpv.getGlobalParamSet<BeamParameters>().isConstructed(), false);
+    EXPECT_EQ(newgpv.getGlobalParamSet<BeamSpot>().isConstructed(), false);
     newgpv.construct();
-    EXPECT_EQ(newgpv.getGlobalParamSet<BeamParameters>().isConstructed(), true);
+    EXPECT_EQ(newgpv.getGlobalParamSet<BeamSpot>().isConstructed(), true);
 
-    newgpv.setGlobalParam(42., BeamParameters::getGlobalUniqueID(), 0, 1);
-    EXPECT_EQ(newgpv.getGlobalParam(BeamParameters::getGlobalUniqueID(), 0, 1), 42.);
-    newgpv.loadFromDB(EventMetaData(1, 1, 1));
-    EXPECT_EQ(newgpv.getGlobalParam(BeamParameters::getGlobalUniqueID(), 0, 1), 0.);
+    newgpv.setGlobalParam(42., BeamSpot::getGlobalUniqueID(), 0, 1);
+    EXPECT_EQ(newgpv.getGlobalParam(BeamSpot::getGlobalUniqueID(), 0, 1), 42.);
+    newgpv.loadFromDB(EventMetaData(1, 0, 0));
+    EXPECT_EQ(newgpv.getGlobalParam(BeamSpot::getGlobalUniqueID(), 0, 1), 0.);
 
-    newgpv.updateGlobalParam(42., BeamParameters::getGlobalUniqueID(), 0, 1);
-    EXPECT_EQ(newgpv.getGlobalParam(BeamParameters::getGlobalUniqueID(), 0, 1), 42.);
+    newgpv.updateGlobalParam(42., BeamSpot::getGlobalUniqueID(), 0, 1);
+    EXPECT_EQ(newgpv.getGlobalParam(BeamSpot::getGlobalUniqueID(), 0, 1), 42.);
 
-    // CDCAlignment does not contain automatic global params -> set/get does nothing
-    // Filled manually by interface from pede result
     newgpv.setGlobalParam(42., CDCAlignment::getGlobalUniqueID(), 0, 1);
-    EXPECT_EQ(newgpv.getGlobalParam(CDCAlignment::getGlobalUniqueID(), 0, 1), 0.);
+    EXPECT_EQ(newgpv.getGlobalParam(CDCAlignment::getGlobalUniqueID(), 0, 1), 42.);
+    */
+
+    GlobalParamVector newgpv({"VXDAlignment", "CDCAlignment"});
+    GlobalCalibrationManager::initGlobalVector(newgpv);
+
+    EXPECT_EQ(newgpv.getGlobalParamSet<VXDAlignment>().isConstructed(), false);
+    newgpv.construct();
+    EXPECT_EQ(newgpv.getGlobalParamSet<VXDAlignment>().isConstructed(), true);
+
+    newgpv.setGlobalParam(42., VXDAlignment::getGlobalUniqueID(), 0, 1);
+    EXPECT_EQ(newgpv.getGlobalParam(VXDAlignment::getGlobalUniqueID(), 0, 1), 42.);
+    newgpv.loadFromDB(EventMetaData(1, 0, 0));
+    EXPECT_EQ(newgpv.getGlobalParam(VXDAlignment::getGlobalUniqueID(), 0, 1), 0.);
+
+    newgpv.updateGlobalParam(42., VXDAlignment::getGlobalUniqueID(), 0, 1);
+    EXPECT_EQ(newgpv.getGlobalParam(VXDAlignment::getGlobalUniqueID(), 0, 1), 42.);
+
+    newgpv.setGlobalParam(42., CDCAlignment::getGlobalUniqueID(), 0, 1);
+    EXPECT_EQ(newgpv.getGlobalParam(CDCAlignment::getGlobalUniqueID(), 0, 1), 42.);
+
   }
 
 }  // namespace

@@ -1,19 +1,16 @@
-/* BASF2 (Belle Analysis Framework 2)                                     *
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thomas Keck                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
- *                                                                        *
  **************************************************************************/
 
 #pragma once
-#ifndef ANALYSIS_UTILITY_INCLUDE_DECAYTREE_H_
-#define ANALYSIS_UTILITY_INCLUDE_DECAYTREE_H_
 
 #include <analysis/utility/DecayNode.h>
-
 
 #include <vector>
 #include <list>
@@ -34,7 +31,7 @@ namespace Belle2 {
     /**
      * Create a new Decay tree from a decaystring
      */
-    DecayTree(const std::string& decaystring, bool removeRadiativeGammaFlag = false);
+    explicit DecayTree(const std::string& decaystring, bool removeRadiativeGammaFlag = false);
 
     /**
      * Copy constructor
@@ -109,10 +106,5 @@ namespace Belle2 {
     DecayNode m_root_node; /**< root DecayNode */
     std::vector<DecayNode*>
     m_nodes_cache; /**< Vector of decay nodes of the particles in the order of their appearance in the decay string for fast access */
-
   };
-
 }
-
-
-#endif /* ANALYSIS_UTILITY_INCLUDE_DECAYTREE_H_ */

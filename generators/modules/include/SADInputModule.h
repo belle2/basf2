@@ -47,10 +47,10 @@ namespace Belle2 {
      * Checks the validity of the module parameters.
      * Checks if the filepath of the given filename exists.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Reads the data and stores it into the MCParticle collection. */
-    virtual void event();
+    virtual void event() override;
 
 
   protected:

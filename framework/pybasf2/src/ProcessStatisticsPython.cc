@@ -9,9 +9,9 @@
  **************************************************************************/
 
 #include <boost/python.hpp>
-
 #include <framework/pybasf2/ProcessStatisticsPython.h>
 #include <framework/core/Module.h>
+#include <framework/core/Environment.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/PyObjConvUtils.h>
@@ -30,7 +30,9 @@ ProcessStatistics* ProcessStatisticsPython::getWrapped()
 {
   StoreObjPtr<ProcessStatistics> stats("", DataStore::c_Persistent);
   if (!stats) {
-    B2ERROR("ProcessStatistics data object is not available, you either disabled statistics with --no-stats or didn't run process(path) yet.");
+    if (!Environment::Instance().getDryRun()) {
+      B2ERROR("ProcessStatistics data object is not available, you either disabled statistics with --no-stats or didn't run process(path) yet.");
+    }
     return nullptr;
   }
   return &(*stats);
@@ -52,7 +54,7 @@ string ProcessStatisticsPython::getModuleStatistics(const boost::python::list& m
 
   std::vector<ModuleStatistics> moduleStats;
   auto modules = PyObjConvUtils::convertPythonObject(modulesPyList, std::vector<ModulePtr>());
-  for (ModulePtr ptr : modules) {
+  for (const ModulePtr& ptr : modules) {
     ModuleStatistics& stats = getWrapped()->getStatistics(ptr.get());
     //Name could be empty if module has never been called
     if (stats.getName().empty()) stats.setName(ptr->getName());
@@ -72,7 +74,7 @@ boost::python::list ProcessStatisticsPython::getAll()
   return result;
 }
 
-const ModuleStatistics* ProcessStatisticsPython::get(ModulePtr module)
+const ModuleStatistics* ProcessStatisticsPython::get(const ModulePtr& module)
 {
   if (!getWrapped())
     return nullptr;

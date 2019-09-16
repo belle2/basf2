@@ -30,6 +30,8 @@ Ds2SampleModule::Ds2SampleModule() : Module()
            string("OutputRbuf"));
   addParam("CompressionLevel", m_compressionLevel, "Compression level",
            0);
+  vector<string> emptyvector;
+  addParam("saveObjs", m_saveObjs, "List of objects/arrays to be saved", emptyvector);
 
   m_rbuf = NULL;
   m_nsent = 0;
@@ -50,6 +52,7 @@ void Ds2SampleModule::initialize()
   //  m_rbuf = new RingBuffer(m_rbufname.c_str(), RBUFSIZE);
   m_rbuf = new RingBuffer(m_rbufname.c_str());
   m_streamer = new DataStoreStreamer(m_compressionLevel);
+  m_streamer->setStreamingObjects(m_saveObjs);
 
   B2INFO("Ds2Sample initialized.");
 }

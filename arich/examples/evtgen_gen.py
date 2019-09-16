@@ -20,10 +20,10 @@
 ######################################################
 
 from basf2 import *
-from modularAnalysis import generateY4S
+from generators import add_evtgen_generator
+from modularAnalysis import setupEventInfo
 from modularAnalysis import loadGearbox
 from reconstruction import add_mdst_output
-from modularAnalysis import analysis_main
 from optparse import OptionParser
 from ROOT import Belle2
 
@@ -41,18 +41,19 @@ set_log_level(LogLevel.ERROR)
 # generation of 1000 events according to the specified DECAY table
 # Y(4S) -> B0 B0bar
 # one B0->K+pi-, other generic decay
-generateY4S(int(options.nevents), Belle2.FileSystem.findFile('arich/examples/B2kpi.dec'))
+mypath = create_path()
+setupEventInfo(int(options.nevents), mypath)
+add_evtgen_generator(mypath, 'signal', Belle2.FileSystem.findFile('arich/examples/B2kpi.dec'))
 
 # If the simulation and reconstruction is not performed in the sam job,
 # then the Gearbox needs to be loaded with the loadGearbox() function.
-loadGearbox()
+loadGearbox(mypath)
 
 # dump generated events in MDST format to the output ROOT file
-add_mdst_output(analysis_main, True, options.filename)
+add_mdst_output(mypath, True, options.filename)
 
-# process all modules added to the analysis_main path
-# (note: analysis_main is the default path created in the modularAnapys.py)
-process(analysis_main)
+# process all modules added to the mypath path
+process(mypath)
 
 # print out the summary
 print(statistics)

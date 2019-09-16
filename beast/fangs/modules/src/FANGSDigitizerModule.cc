@@ -10,11 +10,8 @@
 
 #include <beast/fangs/modules/FANGSDigitizerModule.h>
 #include <beast/fangs/dataobjects/FANGSSimHit.h>
-#include <beast/fangs/dataobjects/FANGSHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
@@ -65,7 +62,7 @@ FANGSDigitizerModule::~FANGSDigitizerModule()
 void FANGSDigitizerModule::initialize()
 {
   B2INFO("FANGSDigitizer: Initializing");
-  StoreArray<FANGSHit>::registerPersistent();
+  m_fangsHit.registerInDataStore();
 
   //get xml data
   getXMLData();
@@ -135,11 +132,13 @@ void FANGSDigitizerModule::event()
       m_dchip_trkID_map.clear();
     }
 
+    // There is some issue with these cuts! please check, remove for now!
     //check if ionization within sensitive volume
-    if ((-m_ChipColumnX < chipPosition.X() && chipPosition.X() < m_ChipColumnX) &&
+    /*if ((-m_ChipColumnX < chipPosition.X() && chipPosition.X() < m_ChipColumnX) &&
         (-m_ChipRowY < chipPosition.Y() && chipPosition.Y() <  m_ChipRowY) &&
         (0. < chipPosition.Z() && chipPosition.Z() <  m_sensor_width) &&
-        (m_lowerTimingCut < T0[detNb] && T0[detNb] < m_upperTimingCut)) {
+        (m_lowerTimingCut < T0[detNb] && T0[detNb] < m_upperTimingCut)) {*/
+    if (1) {
 
       if (edep <  m_Workfct) break;
       ////////////////////////////////

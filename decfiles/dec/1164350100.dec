@@ -1,0 +1,68 @@
+# EventType: 1164350100 
+# Descriptor: [B0 -> D(*) tau nu]cc with [anti-B0 -> D+ pi- or J/psi Ks]
+# NickName: Bd_Xctaunu_Dpi_Jpsiks
+# Documentation: b->c tau nu process, D and D* modes
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Racha Cheaib
+# Email: rachac@mail.ubc.ca
+# Cuts: None
+# Date: 20181108
+#
+#
+
+Alias mytau+ tau+
+Alias mytau- tau-
+ChargeConj mytau- mytau+
+
+Alias myD+ D+
+Alias myD- D-
+ChargeConj myD- myD+
+
+Alias myJpsi J/psi
+ChargeConj myJpsi myJpsi
+
+Alias myK_S0 K_S0
+ChargeConj myK_S0 myK_S0
+
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
+Enddecay
+#
+
+# 18.09.2018: updated to values used in main DECAY_BELLE2.DEC
+Decay B0sig
+0.0125416     D*-   mytau+ nu_tau        PHOTOS       HQET3 0.912 1.205 1.15 1.404 0.854; 
+0.0063687     D-    mytau+ nu_tau        PHOTOS       HQET3 1.0541 1.128 1.0;
+Enddecay
+CDecay anti-B0sig
+#
+
+Decay mytau-
+0.154002925 e-      anti-nu_e nu_tau                        PHOTOS TAULNUNU; 
+0.17000000  mu-     anti-nu_mu nu_tau                       PHOTOS  TAULNUNU; 
+Enddecay
+CDecay mytau+
+
+Decay myJpsi
+0.05940 e+      e-                                      PHOTOS   VLL; 
+0.05930 mu+     mu-                                     PHOTOS   VLL; 
+Enddecay
+
+Decay myK_S0
+1.00 pi+ pi-    PHSP;
+Enddecay
+
+Decay myD-
+1.00 K+ pi- pi-    PHSP;
+Enddecay
+CDecay myD+
+
+Decay B0
+0.002680000 myD- pi+                    PHSP;
+0.000436500 myJpsi  myK_S0                    SVS;
+Enddecay
+CDecay anti-B0
+
+End

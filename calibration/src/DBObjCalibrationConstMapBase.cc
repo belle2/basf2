@@ -2,7 +2,7 @@
 
 using namespace Belle2;
 
-void DBObjCalibrationConstMapBase::dump()
+void DBObjCalibrationConstMapBase::dump() const
 {
   for (auto& elementParam : m_constants) {
     std::cout << " Element " << elementParam.first.first << " Param " << elementParam.first.second << " Value = " << elementParam.second
@@ -15,14 +15,15 @@ DBObjCalibrationConstMapBase::~DBObjCalibrationConstMapBase()
   m_constants.clear();
 }
 
-double DBObjCalibrationConstMapBase::get(DBObjCalibrationConstMapBase::baseType id, DBObjCalibrationConstMapBase::baseType param)
+double DBObjCalibrationConstMapBase::get(DBObjCalibrationConstMapBase::baseType id,
+                                         DBObjCalibrationConstMapBase::baseType param) const
 {
 
   auto constant = m_constants.find({id, param});
   if (constant == m_constants.end()) {
     return 0.;
   }
-  return m_constants[ {id, param}];
+  return constant->second;
 }
 
 void DBObjCalibrationConstMapBase::set(DBObjCalibrationConstMapBase::baseType id, DBObjCalibrationConstMapBase::baseType param,

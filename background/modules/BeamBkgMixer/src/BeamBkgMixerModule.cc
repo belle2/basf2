@@ -32,8 +32,8 @@
 #include <top/dataobjects/TOPSimHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <ecl/dataobjects/ECLHit.h>
-#include <bklm/dataobjects/BKLMSimHit.h>
-#include <eklm/dataobjects/EKLMSimHit.h>
+#include <klm/bklm/dataobjects/BKLMSimHit.h>
+#include <klm/eklm/dataobjects/EKLMSimHit.h>
 #include <simulation/dataobjects/BeamBackHit.h>
 
 // MetaData
@@ -125,8 +125,7 @@ namespace Belle2 {
     m_TOP = isComponentIncluded(components, "TOP");
     m_ARICH = isComponentIncluded(components, "ARICH");
     m_ECL = isComponentIncluded(components, "ECL");
-    m_BKLM = isComponentIncluded(components, "BKLM");
-    m_EKLM = isComponentIncluded(components, "EKLM");
+    m_KLM = isComponentIncluded(components, "KLM");
 
     // ignore these ones
 
@@ -242,7 +241,7 @@ namespace Belle2 {
     for (auto& bkg : m_backgrounds) {
 
       // define TChain for reading SimHits
-      bkg.tree = new TChain("tree");
+      bkg.tree.reset(new TChain("tree"));
       for (unsigned i = 0; i < bkg.fileNames.size(); ++i) {
         bkg.numFiles += bkg.tree->Add(bkg.fileNames[i].c_str());
       }
@@ -264,9 +263,9 @@ namespace Belle2 {
         bkg.tree->SetBranchAddress("ARICHSimHits", &m_simHits.ARICH);
       if (m_ECL and bkg.tree->GetBranch("ECLHits"))
         bkg.tree->SetBranchAddress("ECLHits", &m_simHits.ECL);
-      if (m_BKLM and bkg.tree->GetBranch("BKLMSimHits"))
+      if (m_KLM and bkg.tree->GetBranch("BKLMSimHits"))
         bkg.tree->SetBranchAddress("BKLMSimHits", &m_simHits.BKLM);
-      if (m_EKLM and bkg.tree->GetBranch("EKLMSimHits"))
+      if (m_KLM and bkg.tree->GetBranch("EKLMSimHits"))
         bkg.tree->SetBranchAddress("EKLMSimHits", &m_simHits.EKLM);
 
       if (m_BeamBackHits and bkg.tree->GetBranch("BeamBackHits"))
@@ -309,10 +308,10 @@ namespace Belle2 {
     if (m_ECL) eclHits.registerInDataStore();
 
     StoreArray<BKLMSimHit> bklmSimHits;
-    if (m_BKLM) bklmSimHits.registerInDataStore();
+    if (m_KLM) bklmSimHits.registerInDataStore();
 
     StoreArray<EKLMSimHit> eklmSimHits;
-    if (m_EKLM) eklmSimHits.registerInDataStore();
+    if (m_KLM) eklmSimHits.registerInDataStore();
 
     StoreArray<BeamBackHit> beamBackHits;
     if (m_BeamBackHits) beamBackHits.registerInDataStore();
@@ -515,7 +514,7 @@ namespace Belle2 {
     }
 
     for (auto& bkg : m_backgrounds) {
-      delete bkg.tree;
+      bkg.tree.reset();
     }
 
   }

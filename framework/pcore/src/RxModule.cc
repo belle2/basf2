@@ -16,7 +16,7 @@
 using namespace std;
 using namespace Belle2;
 
-RxModule::RxModule(RingBuffer* rbuf) : Module(), m_streamer(0), m_nrecv(-1)
+RxModule::RxModule(RingBuffer* rbuf) : Module(), m_streamer(nullptr), m_nrecv(-1)
 {
   //Set module properties
   setDescription("Decode data from RingBuffer into DataStore");
@@ -27,26 +27,27 @@ RxModule::RxModule(RingBuffer* rbuf) : Module(), m_streamer(0), m_nrecv(-1)
   m_compressionLevel = 0;
   if (rbuf) {
     setName("Rx" + std::to_string(rbuf->shmid()));
-    B2INFO("Rx: Constructor with RingBuffer done.");
+    B2DEBUG(32, "Rx: Constructor with RingBuffer done.");
   }
 }
 
 
 
-RxModule::~RxModule() { }
+RxModule::~RxModule() = default;
 
 void RxModule::initStreamer()
 {
+  delete m_streamer;
   m_streamer = new DataStoreStreamer(m_compressionLevel, m_handleMergeable);
 }
 
 void RxModule::readEvent()
 {
-  char* evtbuf = new char[EvtMessage::c_MaxEventSize];
+  auto* evtbuf = new char[EvtMessage::c_MaxEventSize];
   while (!m_rbuf->isDead()) {
     int size = m_rbuf->remq((int*)evtbuf);
     if (size != 0) {
-      B2DEBUG(100, "Rx: got an event from RingBuffer, size=" << size);
+      B2DEBUG(35, "Rx: got an event from RingBuffer, size=" << size);
 
       // Restore objects in DataStore
       EvtMessage evtmsg(evtbuf);
@@ -93,6 +94,6 @@ void RxModule::endRun() { }
 
 void RxModule::terminate()
 {
-  B2INFO("Rx: terminate called");
+  B2DEBUG(32, "Rx: terminate called");
   delete m_streamer;
 }

@@ -12,14 +12,14 @@
 
 import sys
 import math
-from basf2 import *
+import basf2
 
 # reenable GUI thread for our canvas
 from ROOT import PyConfig
 PyConfig.StartGuiThread = True
 
 # Set the global log level
-logging.log_level = LogLevel.WARNING
+basf2.logging.log_level = basf2.LogLevel.WARNING
 
 # Load the required libraries
 import ROOT
@@ -43,10 +43,10 @@ h_vertex = ROOT.TH2D(
     200,
     -10,
     10,
-    )
+)
 
 
-class ShowMCParticles(Module):
+class ShowMCParticles(basf2.Module):
 
     """Simple module to collect some information about MCParticles"""
 
@@ -69,13 +69,14 @@ class ShowMCParticles(Module):
                 h_vertex.Fill(mc.getProductionVertex().X(),
                               mc.getProductionVertex().Y())
 
-main = create_path()
+
+main = basf2.create_path()
 
 # event info setter
-main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
+main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=100)
 
 # Register the BHWideInput module
-koralw = register_module('KoralWInput')
+koralw = basf2.register_module('KoralWInput')
 
 # Set the mode for the boost of the generated particles 0 = no boost 1 = BELLE
 
@@ -84,24 +85,22 @@ koralw.param('RandomSeed', 2710)
 
 # Set the logging level for the KoralW module to INFO in order to see the total
 # cross section
-koralw.set_log_level(LogLevel.INFO)
+koralw.set_log_level(basf2.LogLevel.INFO)
 
 # Register the Progress module and the Python histogram module
-progress = register_module('Progress')
-gearbox = register_module('Gearbox')
+progress = basf2.register_module('Progress')
 showMCPart = ShowMCParticles()
 
 # Create the main path and add the modules
 main.add_module(progress)
-main.add_module(gearbox)
 main.add_module(koralw)
 main.add_module(showMCPart)
 
 # generate events
-process(main)
+basf2.process(main)
 
 # show call statistics
-print(statistics)
+print(basf2.statistics)
 
 # Create a Canvas to show histograms
 c = ROOT.TCanvas('Canvas', 'Canvas', 1536, 768)
@@ -116,7 +115,7 @@ histograms = [
     h_theta,
     h_costheta,
     h_phi,
-    ]
+]
 for (i, h) in enumerate(histograms):
     c.cd(i + 1)
     h.SetMinimum(0)

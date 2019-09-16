@@ -13,25 +13,30 @@
 //     S.P. Ahlen, Rev. Mod. Phys 52(1980), p121
 // [2] K.A. Milton arXiv:hep-ex/0602040
 // [3] S.P. Ahlen and K. Kinoshita, Phys. Rev. D26 (1982) 2347
+// [4] Y. Kazama et al., Phys. Rev. D15 (1977) 2287-2299
+// [5] S.P. Ahlen, Phys. Rev. D17 (1978) 229-233
 
 // modified from GEANT4 exoticphysics/monopole/*
-// works only for low magnetic charge, higher charge corrections are not used
 
 #include <simulation/monopoles/G4mplIonisationWithDeltaModel.h>
 
 #include <Randomize.hh>
-#include <G4PhysicalConstants.hh>
-#include <G4SystemOfUnits.hh>
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
 #include <G4ParticleChangeForLoss.hh>
 #include <G4Electron.hh>
 #include <G4DynamicParticle.hh>
 #include <G4ProductionCutsTable.hh>
 #include <G4MaterialCutsCouple.hh>
 #include <G4Log.hh>
+#include <G4Pow.hh>
+
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
+using namespace CLHEP;
 
 std::vector<G4double>* G4mplIonisationWithDeltaModel::dedx0 = nullptr;
 
@@ -46,13 +51,16 @@ G4mplIonisationWithDeltaModel::G4mplIonisationWithDeltaModel(G4double mCharge,
     bg2lim(beta2lim * (1.0 + beta2lim))
 {
   pi_hbarc2_over_mc2 = pi * hbarc * hbarc / electron_mass_c2;
+  nmpl = magCharge * 2 * fine_structure_const;
   chargeSquare = magCharge * magCharge * 4 * fine_structure_const *
-                 fine_structure_const; //Formulas below assume Dirac charge units for magnetic charge, g_D = 68.5e
+                 fine_structure_const;
+  //NOTE Formulas below assume Dirac charge units for magnetic charge, g_D = 68.5e
   dedxlim = 45. * chargeSquare * GeV * cm2 / g;
   fParticleChange = nullptr;
   theElectron = G4Electron::Electron();
-  G4cout << "### Monopole ionisation model with d-electron production, Gmag= "
-         << magCharge / eplus << G4endl;//TODO print it with B2INFO
+  B2INFO("Monopole ionisation model with d-electron production, Gmag= "  << magCharge / eplus);
+  if (nmpl >= 6)
+    B2WARNING("Monopole charge Gmag= " << magCharge / eplus << "e not reasonable. Please choose a value smaller than 411e.");
   monopole = nullptr;
   mass = 0.0;
 }
@@ -87,6 +95,7 @@ G4mplIonisationWithDeltaModel::Initialise(const G4ParticleDefinition* p,
     G4int numOfCouples = theCoupleTable->GetTableSize();
     G4int n = dedx0->size();
     if (n < numOfCouples) { dedx0->resize(numOfCouples); }
+    G4Pow* g4calc = G4Pow::GetInstance();
 
     // initialise vector
     for (G4int i = 0; i < numOfCouples; ++i) {
@@ -94,11 +103,18 @@ G4mplIonisationWithDeltaModel::Initialise(const G4ParticleDefinition* p,
       const G4Material* material =
         theCoupleTable->GetMaterialCutsCouple(i)->GetMaterial();
       G4double eDensity = material->GetElectronDensity();
-      G4double vF = electron_Compton_length * pow(3.*pi * pi * eDensity, 0.3333333333);
+      G4double vF = electron_Compton_length * g4calc->A13(3.*pi * pi * eDensity);
       (*dedx0)[i] = pi_hbarc2_over_mc2 * eDensity * chargeSquare *
                     (G4Log(2 * vF / fine_structure_const) - 0.5) / vF;
     }
   }
+}
+
+G4double
+G4mplIonisationWithDeltaModel::MinEnergyCut(const G4ParticleDefinition*,
+                                            const G4MaterialCutsCouple* couple)
+{
+  return couple->GetMaterial()->GetIonisation()->GetMeanExcitationEnergy();
 }
 
 G4double
@@ -153,9 +169,19 @@ G4mplIonisationWithDeltaModel::ComputeDEDXAhlen(const G4Material* material,
 
   // Ahlen's formula for nonconductors, [1]p157, f(5.7)
   G4double dedx =
-    0.5 * (log(2.0 * electron_mass_c2 * bg2 * cutEnergy / (eexc * eexc)) - 1.0);//"Conventional" ionisation
+    0.5 * (G4Log(2.0 * electron_mass_c2 * bg2 * cutEnergy / (eexc * eexc)) - 1.0);//"Conventional" ionisation
 //   G4double dedx =
-//     1.0 * (log(2.0 * electron_mass_c2 * bg2 * cutEnergy / (eexc * eexc)));//Fryberger magneticon double ionisation
+//     1.0 * (G4Log(2.0 * electron_mass_c2 * bg2 * cutEnergy / (eexc * eexc)));//Fryberger magneticon double ionisation
+
+
+  G4double k = 0;   // Cross-section correction
+  if (nmpl >= 0.5) { k = 0.406; }
+  if (nmpl >= 1) { k = 0.346; }
+  if (nmpl >= 1.5) { k = 0.3; }
+  const G4double B[7] = { 0.0, 0.248, 0.672, 1.022, 1.243, 1.464, 1.685};   // Bloch correction
+  if (nmpl < 6)
+    dedx += 0.5 * k - B[int(floor(nmpl + 0.5))];
+
 
   // density effect correction
   G4double x = G4Log(bg2) / twoln10;
@@ -164,7 +190,7 @@ G4mplIonisationWithDeltaModel::ComputeDEDXAhlen(const G4Material* material,
   // now compute the total ionization loss
   dedx *=  pi_hbarc2_over_mc2 * eDensity * chargeSquare;
 
-  if (dedx < 0.0) { dedx = 0.; }
+  dedx = std::max(dedx, 0.0);
   return dedx;
 }
 
@@ -176,13 +202,13 @@ G4mplIonisationWithDeltaModel::ComputeCrossSectionPerElectron(
   G4double maxKinEnergy)
 {
   if (!monopole) { SetParticle(p); }
-  G4double cross = 0.0;
   G4double tmax = MaxSecondaryEnergy(p, kineticEnergy);
   G4double maxEnergy = std::min(tmax, maxKinEnergy);
   G4double cutEnergy = std::max(LowEnergyLimit(), cut);
-  if (cutEnergy < maxEnergy) {
-    cross = (0.5 / cutEnergy - 0.5 / maxEnergy) * pi_hbarc2_over_mc2 * chargeSquare;
-  }
+  G4double cross = (cutEnergy < maxEnergy)
+                   ? (1.0 / cutEnergy - 1.0 / maxEnergy) * twopi_mc2_rcl2 * chargeSquare : 0.0; //cross section used in ATLAS
+//   G4double cross = (cutEnergy < maxEnergy)
+//                    ? (0.5 / cutEnergy - 0.5 / maxEnergy) * pi_hbarc2_over_mc2 * chargeSquare : 0.0; //one coming with GEANT4; causes 4 orders higher values
   return cross;
 }
 
@@ -212,10 +238,6 @@ G4mplIonisationWithDeltaModel::SampleSecondaries(vector<G4DynamicParticle*>* vdp
   G4double maxKinEnergy = std::min(maxEnergy, tmax);
   if (minKinEnergy >= maxKinEnergy) { return; }
 
-  //G4cout << "G4mplIonisationWithDeltaModel::SampleSecondaries: E(GeV)= "
-  //   << kineticEnergy/GeV << " M(GeV)= " << mass/GeV
-  //   << " tmin(MeV)= " << minKinEnergy/MeV << G4endl;//TODO print with B2DEBUG or remove altogether
-
   G4double totEnergy     = kineticEnergy + mass;
   G4double etot2         = totEnergy * totEnergy;
   G4double beta2         = kineticEnergy * (kineticEnergy + 2.0 * mass) / etot2;
@@ -231,7 +253,7 @@ G4mplIonisationWithDeltaModel::SampleSecondaries(vector<G4DynamicParticle*>* vdp
     sqrt(deltaKinEnergy * (deltaKinEnergy + 2.0 * electron_mass_c2));
   G4double cost = deltaKinEnergy * (totEnergy + electron_mass_c2) /
                   (deltaMomentum * totMomentum);
-  if (cost > 1.0) { cost = 1.0; }
+  cost = std::min(cost, 1.0);
 
   G4double sint = sqrt((1.0 - cost) * (1.0 + cost));
 

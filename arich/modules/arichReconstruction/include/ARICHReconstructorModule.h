@@ -50,33 +50,33 @@ namespace Belle2 {
      * Initialize the Module.
      *
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      *
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      *
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      *
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      *
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   protected:
 
@@ -90,8 +90,9 @@ namespace Belle2 {
     double m_trackPositionResolution;/**< Track position resolution; simulation smearing. */
     double m_trackAngleResolution;   /**< Track direction resolution; simulation smearing. */
     int m_inputTrackType;            /**< Input tracks from the tracking (0) or from MCParticles>AeroHits (1). */
-    int    m_storePhot;              /**< If == 1 individual reconstruced photon information (cherenkov angle,...) is stored in ARICHTrack */
+    int m_storePhot;              /**< If == 1 individual reconstruced photon information (cherenkov angle,...) is stored in ARICHTrack */
     bool m_align;                    /** If==1 alignment constants are used for global->local track transformation */
+    bool m_alignMirrors;             /** If==1 alignment constants for mirrors are used */
   };
 
 } // Belle2 namespace

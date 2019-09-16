@@ -24,35 +24,36 @@ namespace Belle2 {
     friend class NSMCallback;
 
   public:
-    Callback() throw() : m_revision(1) {}
-    virtual ~Callback() throw() {}
+    Callback() : m_revision(1) {}
+    virtual ~Callback() {}
 
   public:
-    virtual void notify(const NSMVar& var) throw() = 0;
+    virtual void notify(const NSMVar& var) = 0;
     int reset();
-    int add(NSMVHandler* handler);
+    int add(NSMVHandler* handler, bool overwrite = true, bool isdump = true);
     void remove(const std::string& node, const std::string& name);
     void remove(const std::string& name) { remove("", name); }
     void remove(const DBObject& obj);
+    StringList& getHandlerNames() { return m_hnames; }
     NSMVHandlerList& getHandlers() { return m_handler; }
-    NSMVHandler& getHandler(const std::string& name) throw(std::out_of_range)
+    NSMVHandler& getHandler(const std::string& name)
     {
       return getHandler("", name);
     }
     NSMVHandler& getHandler(const std::string& node, const std::string& name)
-    throw(std::out_of_range);
-    void setUseGet(const std::string& name, bool use) throw(std::out_of_range)
+    ;
+    void setUseGet(const std::string& name, bool use)
     {
       getHandler(name).setUseGet(use);
     }
-    void setUseSet(const std::string& name, bool use) throw(std::out_of_range)
+    void setUseSet(const std::string& name, bool use)
     {
       getHandler(name).setUseSet(use);
     }
 
   public:
-    void setRevision(int revision) throw () { m_revision = revision; }
-    int getRevision() const throw () { return m_revision; }
+    void setRevision(int revision) { m_revision = revision; }
+    int getRevision() const { return m_revision; }
 
   private:
     NSMVHandler* getHandler_p(const std::string& node, const std::string& name);
@@ -60,6 +61,7 @@ namespace Belle2 {
   private:
     int m_revision;
     NSMVHandlerList m_handler;
+    StringList m_hnames;
 
   };
 

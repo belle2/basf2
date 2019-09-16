@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FLAVORTAGGERINFO_H
-#define FLAVORTAGGERINFO_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <analysis/dataobjects/Particle.h>
@@ -78,13 +77,13 @@ namespace Belle2 {
     * Saves the usemode of the FlavorTagger
     * @param mode "Teacher" or "Expert"
     */
-    void setUseModeFlavorTagger(std::string mode);
+    void setUseModeFlavorTagger(const std::string& mode);
 
     /**
     * Saves the method and the correspondig FlavorTaggerMap
     * @param method "TMVA" or "FANN".
     */
-    void addMethodMap(std::string method);
+    void addMethodMap(const std::string& method);
 
     /**
     * Vector filler: Set the pointer of the track with the highest probability for each category.
@@ -147,7 +146,7 @@ namespace Belle2 {
     * Vector filler: Set the name of the categories
     * @param catName name of each category
     */
-    void setCategories(std::string catName);
+    void setCategories(const std::string& catName);
 
     /**
     * Vector filler: Set the impact parameter D0 of each track in an accesible way
@@ -229,13 +228,13 @@ namespace Belle2 {
     * @param method "TMVA" or "FANN".
     * @return FlavorTaggerInfoMap with all FlavorTagger Information
     */
-    FlavorTaggerInfoMap* getMethodMap(std::string method);
+    FlavorTaggerInfoMap* getMethodMap(const std::string& method);
 
     /** checks if the given method method is used for the FlavorTagger with a corresponding FlavorTaggerInfoMap
     * @param method "TMVA" or "FANN".
     * @return True if the given method is in the FlavorTaggerInfo
     */
-    bool isMethodInMap(std::string method);
+    bool isMethodInMap(const std::string& method);
 
     /**
     * Get all the tracks
@@ -396,4 +395,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif

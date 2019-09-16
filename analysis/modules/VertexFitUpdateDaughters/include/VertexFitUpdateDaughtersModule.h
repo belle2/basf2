@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef VERTEXFITUPDATEDAUGHTERSMODULE_H
-#define VERTEXFITUPDATEDAUGHTERSMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -19,12 +18,12 @@
 #include <framework/database/DBObjPtr.h>
 
 // DataObjects
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 
 // rave
-#include <analysis/raveInterface/RaveSetup.h>
-#include <analysis/raveInterface/RaveVertexFitter.h>
-#include <analysis/raveInterface/RaveKinematicVertexFitter.h>
+#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
+#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
+#include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
 
 namespace Belle2 {
   /**
@@ -45,19 +44,19 @@ namespace Belle2 {
     virtual ~VertexFitUpdateDaughtersModule();
 
     /** sdf */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** sdf */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** sdf */
-    virtual void event();
+    virtual void event() override;
 
     /** sdfy */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** sdf */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   private:
@@ -70,7 +69,7 @@ namespace Belle2 {
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
-    DBObjPtr<BeamParameters> m_beamParams;/**< Beam parameters */
+    DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
 
     /**
      * Main steering routine
@@ -85,4 +84,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* VERTEXFITUPDATEDAUGHTERSMODULE_H */

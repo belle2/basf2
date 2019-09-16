@@ -11,36 +11,36 @@ namespace Belle2 {
 
     // constructors & destructors
   public:
-    explicit Time() throw();
-    Time(const double) throw();
-    Time(const long, const long) throw();
-    ~Time() throw();
+    explicit Time();
+    Time(const double);
+    Time(const long, const long);
+    ~Time();
 
     // member methods
   private:
-    void adjust() throw();
+    void adjust();
 
   public:
-    void clear() throw();
-    void set() throw();
-    void set(const double) throw();
-    void set(const long, const long) throw();
-    double get() const throw();
-    long getSecond() const throw();
-    long getMicroSecond() const throw();
-    std::string toString() const throw();
+    void clear();
+    void set();
+    void set(const double);
+    void set(const long, const long);
+    double get() const;
+    long getSecond() const;
+    long getMicroSecond() const;
+    std::string toString() const;
 
     // for serialization
   public:
-    virtual void readObject(Reader&) throw(IOException);
-    virtual void writeObject(Writer&) const throw(IOException);
+    virtual void readObject(Reader&);
+    virtual void writeObject(Writer&) const;
 
     // operators
   public:
-    Time& operator = (const Time&) throw();
-    bool operator == (const Time&) const throw();
-    Time operator + (const Time&) const throw();
-    Time operator - (const Time&) const throw();
+    Time& operator = (const Time&);
+    bool operator == (const Time&) const;
+    Time operator + (const Time&) const;
+    Time operator - (const Time&) const;
 
     // member data
   private:

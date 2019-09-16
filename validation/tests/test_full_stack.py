@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# standard
 import sys
-import time
 import subprocess
-import validationserver
 import tempfile
 import os
 import time
 import requests
 import traceback
 
+# ours
+import validationserver
 import validationpath
 from validationtestutil import check_excecute
 
@@ -33,7 +34,8 @@ def http_post(command, json_args):
     r = requests.post(call_url,
                       json=json_args)
     if not r.ok:
-        print("REST call {} with arguments {} failed".format(call_url, json_args))
+        print("REST call {} with arguments {} failed".format(
+            call_url, json_args))
         print(str(r))
         return None
 
@@ -43,6 +45,9 @@ def http_post(command, json_args):
 def check_for_plotting(revs, tmp_folder):
     """
     Checks if creating new plots for a revision combination works
+    :param revs: List of revisions
+    :type revs: List[str]
+    :param tmp_folder: Temporary folder
     """
 
     print("Trying to recreate plots for revisions {}".format(revs))
@@ -55,9 +60,9 @@ def check_for_plotting(revs, tmp_folder):
     prog_key = res.json()["progress_key"]
 
     done = False
-    waitTime = 0.1  # in seconds
-    maxWaitTime = 3
-    summedWaitTime = 0
+    wait_time = 0.1  # in seconds
+    max_wait_time = 3
+    summed_wait_time = 0
 
     # check the plot status with the webserver and only exit after a timeout
     # or if the plot combination has been created
@@ -71,15 +76,18 @@ def check_for_plotting(revs, tmp_folder):
                 # plots are done
                 break
 
-        time.sleep(waitTime)
-        summedWaitTime += waitTime
-        if summedWaitTime > maxWaitTime:
-            print("Waited for {} seconds for the requested plots to complete and nothing happened".format(summedWaitTime))
+        time.sleep(wait_time)
+        summed_wait_time += wait_time
+        if summed_wait_time > max_wait_time:
+            print("Waited for {} seconds for the requested plots to complete "
+                  "and nothing happened".format(summed_wait_time))
             return False
 
     # check if the plots are really present
-    comp_folder = validationpath.get_html_plots_tag_comparison_folder(tmp_folder, revs)
-    comp_json = validationpath.get_html_plots_tag_comparison_json(tmp_folder, revs)
+    comp_folder = \
+        validationpath.get_html_plots_tag_comparison_folder(tmp_folder, revs)
+    comp_json = \
+        validationpath.get_html_plots_tag_comparison_json(tmp_folder, revs)
 
     if not os.path.exists(comp_folder):
         print("Comparison folder {} does not exist".format(comp_folder))
@@ -89,7 +97,11 @@ def check_for_plotting(revs, tmp_folder):
         return False
 
     # just check for one random plot
-    some_plot = os.path.join(comp_folder, "validation-test/validationTestPlotsB_gaus_histogram.pdf")
+    some_plot = os.path.join(
+        comp_folder,
+        "validation-test",
+        "validationTestPlotsB_gaus_histogram.pdf"
+    )
     if not os.path.isfile(some_plot):
         print("Comparison plot {} does not exist".format(some_plot))
         return False
@@ -105,8 +117,10 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
     try:
         import splinter
     except ImportError:
-        print("The splinter package is required to run this test. Run 'pip3 install splinter' to install")
-        # don't give an error exit code here to not fail if splinter is not available
+        print("The splinter package is required to run this test. Run 'pip3 "
+              "install splinter' to install")
+        # don't give an error exit code here to not fail if splinter is not
+        # available
         return True
 
     with splinter.Browser() as browser:
@@ -124,14 +138,17 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
         for r in revs:
             rr = [web_r for web_r in found_revs if web_r.value == r]
             if len(rr) == 0:
-                print("Revsion {} was not found on validation website. It should be there.".format(r))
+                print("Revsion {} was not found on validation website. It "
+                      "should be there.".format(r))
                 return False
 
         plot_objects = browser.find_by_css(".object")
 
-        print("Checking for a minimum number of {} plot objects", min_plot_objects)
+        print("Checking for a minimum number of {} plot objects",
+              min_plot_objects)
         if len(plot_objects) < min_plot_objects:
-            print("Only {} plots found, while {} are expected".format(len(plot_objects), min_plot_objects))
+            print("Only {} plots found, while {} are expected".format(
+                len(plot_objects), min_plot_objects))
             return False
 
         # click the overview check box
@@ -152,12 +169,14 @@ def main():
     Runs two test validations, starts the web server and queries data
     """
 
+    # fixme: See if we can reenable this test or at least run it locally
     print("TEST SKIPPED: Not properly runnable on build bot", file=sys.stderr)
     sys.exit(1)
+    # noinspection PyUnreachableCode
 
-    # only run the test on dev machines with splinter installed. Also for the tests which
-    # don't use splinter, there are currently some connection problems to the test webserver
-    # on the central build system
+    # only run the test on dev machines with splinter installed. Also for the
+    # tests which don't use splinter, there are currently some connection
+    # problems to the test webserver on the central build system
     try:
         import splinter
     except ImportError:
@@ -188,11 +207,12 @@ def main():
             # wait for one second for the server to start
             time.sleep(2)
             # check the content of the webserver, will need splinter
-            success = success and check_for_content(revs_to_gen + ["reference"], 7, 7)
+            success = success and \
+                check_for_content(revs_to_gen + ["reference"], 7, 7)
 
             # check if the plott creating triggering works
             success = success and check_for_plotting(revs_to_gen[:-1], str(tmpdir))
-        except:
+        except BaseException:
             # catch any exceptions so the finally block can terminate the
             # webserver process properly
             e = sys.exc_info()[0]
@@ -208,6 +228,7 @@ def main():
 
         if not success:
             sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

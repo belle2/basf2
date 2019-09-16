@@ -41,19 +41,24 @@ void LogListener::run()
       if (c == '\n' && count > 0) {
         s = m_con->getParName() + " : " + ss.str();
         ss.str("");
-        m_con->lock();
+        //m_con->lock();
         if (priority == LogFile::UNKNOWN) {
           priority = LogFile::DEBUG;
         }
-        m_con->getCallback()->log(priority, s);
+        if (priority > LogFile::DEBUG) {
+          m_con->getCallback()->log(priority, s);
+        } else {
+          LogFile::debug(s);
+        }
         if (m_con->getCallback()->getNode().getState() == RCState::RUNNING_S) {
           if (priority == LogFile::ERROR) {
-            m_con->getCallback()->reply(NSMMessage(NSMCommand::ERROR, s));
+            // m_con->getCallback()->log(LogFile::ERROR, s);
           } else if (priority == LogFile::FATAL) {
-            m_con->getCallback()->reply(NSMMessage(NSMCommand::ERROR, s));
+            // m_con->getCallback()->log(LogFile::FATAL, s));
+            m_con->getCallback()->setState(RCState::ERROR_ES);
           }
         }
-        m_con->unlock();
+        //m_con->unlock();
         count = 0;
         priority = LogFile::UNKNOWN;
       } else if (isprint(c)) {
@@ -70,6 +75,19 @@ void LogListener::run()
               else if (s == "[WARNING]") priority = LogFile::WARNING;
               else if (s == "[ERROR]") priority = LogFile::ERROR;
               else if (s == "[FATAL]") priority = LogFile::FATAL;
+              else if (s.find("STOP") != std::string::npos) {
+                StringList sl = StringUtil::split(s, '=');
+                if (sl.size() > 1) {
+                  std::string nodename = StringUtil::replace(sl[1], "]", "");
+                  try {
+                    NSMCommunicator::send(NSMMessage(NSMNode(nodename), RCCommand::STOP));
+                  } catch (const std::exception& e) {
+                  }
+                }
+                count = 0;
+                ss.str("");
+                break;
+              }
               if (priority > 0) {
                 count = 0;
                 ss.str("");
@@ -93,19 +111,20 @@ void LogListener::run()
     if (count > 0) {
       s = m_con->getParName() + " : " + ss.str();
       ss.str("");
-      m_con->lock();
+      //m_con->lock();
       if (priority == LogFile::UNKNOWN) {
         priority = LogFile::DEBUG;
       }
       m_con->getCallback()->log(priority, s);
       if (m_con->getCallback()->getNode().getState() == RCState::RUNNING_S) {
         if (priority == LogFile::ERROR) {
-          m_con->getCallback()->reply(NSMMessage(NSMCommand::ERROR, s));
+          //m_con->getCallback()->reply(NSMMessage(NSMCommand::ERROR, s));
         } else if (priority == LogFile::FATAL) {
-          m_con->getCallback()->reply(NSMMessage(NSMCommand::ERROR, s));
+          //m_con->getCallback()->reply(NSMMessage(NSMCommand::ERROR, s));
+          m_con->getCallback()->setState(RCState::ERROR_ES);
         }
       }
-      m_con->unlock();
+      //m_con->unlock();
     }
   }
   close(m_pipe[0]);

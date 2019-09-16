@@ -54,6 +54,8 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
            "If true, CDCHit objects will be assigned to trigger segments and trigger tracks will be shown.", false);
   addParam("showBKLM2dHits", m_showBKLM2dHits,
            "If true, BKLM2dHit objects will be shown in the display", true);
+  addParam("showEKLM2dHits", m_showEKLM2dHits,
+           "If true, EKLMHit2d objects will be shown in the display", true);
   addParam("showARICHHits", m_showARICHHits,
            "If true, ARICHHit objects will be shown.", false);
   addParam("automatic", m_automatic,
@@ -65,8 +67,11 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("hideObjects", m_hideObjects,
            "Objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event'. (Note that this won't work for objects somewhere deep in the tree, only for those immediately below 'Event'.)", {});
   addParam("customGeometryExtractPath", m_customGeometryExtractPath, "Path to custom file with geometry extract.", std::string(""));
-  addParam("customGeometryExtractPathTop", m_customGeometryExtractPathTop,
-           "Path to custom file with geometry extract with corrected placement of TOP bars.", std::string(""));
+  addParam("hideVolumes", m_hideVolumes,
+           "List of volumes to be hidden (can be re-enabled in Eve panel / Geometry scene. The volume and all its daughters will be hidden.", {});
+  addParam("deleteVolumes", m_deleteVolumes,
+           "List of volumes to be deleted. The volume and all its daughters will be deleted completely. Uses Regular Expressions (RE)! If the expression starts with '#', only daughters are removed (# is removed for RE)", {});
+
 
   //create gApplication so we can use graphics support. Needs to be done before ROOT has a chance to do it for us.
   if ((!gApplication) || (gApplication->TestBit(TApplication::kDefaultApplication))) {
@@ -88,6 +93,7 @@ void DisplayModule::initialize()
   StoreArray<ECLCluster> ECLClusters; ECLClusters.isOptional();
   StoreArray<KLMCluster> KLMClusters; KLMClusters.isOptional();
   StoreArray<BKLMHit2d> BKLMHit2ds; BKLMHit2ds.isOptional();
+  StoreArray<EKLMHit2d> EKLMHit2ds; EKLMHit2ds.isOptional();
   StoreArray<Track> Tracks; Tracks.isOptional();
   StoreArray<TrackFitResult> TrackFitResults; TrackFitResults.isOptional();
   StoreArray<RecoTrack> RecoTracks; RecoTracks.isOptional();
@@ -132,7 +138,9 @@ void DisplayModule::initialize()
   }
 
   if (!m_customGeometryExtractPath.empty()) EveGeometry::setCustomExtractPath(m_customGeometryExtractPath);
-  if (!m_customGeometryExtractPathTop.empty()) EveGeometry::setCustomExtractPathTop(m_customGeometryExtractPathTop);
+
+  EveGeometry::setHideVolumes(m_hideVolumes);
+  EveGeometry::setDeleteVolumes(m_deleteVolumes);
 
   EveGeometry::addGeometry(m_fullGeometry ? EveGeometry::c_Full : EveGeometry::c_Simplified);
   m_visualizer = new EVEVisualization();
@@ -188,7 +196,11 @@ void DisplayModule::event()
     for (std::string colName : recoTrackArrays) {
       StoreArray<RecoTrack> recoTracks(colName);
       for (const RecoTrack& recoTrack : recoTracks) {
-        m_visualizer->addTrackCandidate(colName, recoTrack);
+        if (colName != "RecoTracksMpl") {
+          m_visualizer->addTrackCandidate(colName, recoTrack);
+        } else {
+          m_visualizer->addTrackCandidateImproved(colName, recoTrack);
+        }
       }
     }
 
@@ -237,6 +249,12 @@ void DisplayModule::event()
       m_visualizer->addBKLMHit2d(&hit);
   }
 
+  if (m_showEKLM2dHits) {
+    StoreArray<EKLMHit2d> eklmhits;
+    for (auto& hit : eklmhits)
+      m_visualizer->addEKLMHit2d(&hit);
+  }
+
   if (m_showARICHHits) {
     StoreArray<ARICHHit> arichhits;
     for (auto& hit : arichhits)
@@ -257,14 +275,16 @@ void DisplayModule::event()
 
     StoreArray<ECLCluster> clusters;
     for (const ECLCluster& cluster : clusters) {
-      if (m_showMCInfo) {
-        //make sure we add particles producing these
-        const MCParticle* mcpart = cluster.getRelated<MCParticle>();
-        if (mcpart)
-          m_visualizer->addMCParticle(mcpart);
-      }
+      if (cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+        if (m_showMCInfo) {
+          //make sure we add particles producing these
+          const MCParticle* mcpart = cluster.getRelated<MCParticle>();
+          if (mcpart)
+            m_visualizer->addMCParticle(mcpart);
+        }
 
-      m_visualizer->addECLCluster(&cluster);
+        m_visualizer->addECLCluster(&cluster);
+      }
     }
 
     StoreArray<KLMCluster> klmclusters;

@@ -22,7 +22,7 @@ BinData::BinData(void* buf)
   }
 }
 
-BinData::~BinData() throw()
+BinData::~BinData() noexcept
 {
 
 }
@@ -39,7 +39,6 @@ void BinData::setBuffer(void* buf)
 }
 
 unsigned int BinData::recvEvent(TCPSocket& socket)
-throw(IOException)
 {
   unsigned int count = socket.read(m_header, sizeof(BinHeader));
   if (m_header->nword_in_header * 4 != sizeof(BinHeader)) {
@@ -56,12 +55,12 @@ throw(IOException)
   return count;
 }
 
-unsigned int BinData::sendEvent(TCPSocket& socket) const throw(IOException)
+unsigned int BinData::sendEvent(TCPSocket& socket) const
 {
   return socket.write(m_buf, getByteSize());
 }
 
-void BinData::print() throw()
+void BinData::print() noexcept
 {
   printf("headerwords=%d, nwords=%d, nboard=%d, nevent=%d, evtno=%d, expno=%d, runno=%d, subno=%d, nodeid=%d, trailer=%04x\n",
          getHeaderWordSize(),

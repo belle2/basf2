@@ -41,10 +41,6 @@ PXDdigiFilterModule::PXDdigiFilterModule() : Module()
 
 }
 
-PXDdigiFilterModule::~PXDdigiFilterModule()
-{
-}
-
 void PXDdigiFilterModule::initialize()
 {
 
@@ -53,17 +49,21 @@ void PXDdigiFilterModule::initialize()
 
   StoreArray<PXDDigit> PXDDigits(m_PXDDigitsName);   /**< The PXDDigits to be filtered */
   PXDDigits.isRequired();
-  m_selectorIN.registerSubset(PXDDigits, m_PXDDigitsInsideROIName);
-  m_selectorIN.inheritAllRelations();
+  if (m_PXDDigitsName == m_PXDDigitsInsideROIName) {
+    m_selectorIN.registerSubset(PXDDigits);
+  } else {
+    m_selectorIN.registerSubset(PXDDigits, m_PXDDigitsInsideROIName);
+    m_selectorIN.inheritAllRelations();
+  }
 
   if (m_CreateOutside) {
-    m_selectorOUT.registerSubset(PXDDigits, m_PXDDigitsOutsideROIName);
-    m_selectorOUT.inheritAllRelations();
+    if (m_PXDDigitsName == m_PXDDigitsOutsideROIName) {
+      m_selectorOUT.registerSubset(PXDDigits);
+    } else {
+      m_selectorOUT.registerSubset(PXDDigits, m_PXDDigitsOutsideROIName);
+      m_selectorOUT.inheritAllRelations();
+    }
   }
-}
-
-void PXDdigiFilterModule::beginRun()
-{
 }
 
 void PXDdigiFilterModule::event()
@@ -96,12 +96,4 @@ void PXDdigiFilterModule::event()
     });
   }
 
-}
-
-void PXDdigiFilterModule::endRun()
-{
-}
-
-void PXDdigiFilterModule::terminate()
-{
 }

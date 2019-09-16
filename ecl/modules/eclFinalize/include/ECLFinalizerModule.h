@@ -13,14 +13,16 @@
 #pragma once
 
 #include <framework/core/Module.h>
-
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
 
+  class EventT0;
   class ECLShower;
   class ECLCluster;
   class ECLCalDigit;
+  class EventLevelClusteringInfo;
 
   /** Class to perform the shower correction */
   class ECLFinalizerModule : public Module {
@@ -33,27 +35,32 @@ namespace Belle2 {
     ~ECLFinalizerModule();
 
     /** Initialize. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Begin run. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Event. */
-    virtual void event();
+    virtual void event() override;
 
     /** End run. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Terminate. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
     double m_clusterEnergyCutMin; /**< Min value for the cluster energy cut. */
     double m_clusterTimeCutMaxEnergy; /**< Above this energy, keep all cluster */
+    double m_clusterLossyFraction; /**< Maximum allowed fractional difference between nPhotons and neutralHadron number of crystals */
 
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< ECLCalDigits */
     StoreArray<ECLShower> m_eclShowers; /**< ECLShowers */
     StoreArray<ECLCluster> m_eclClusters; /**< ECLClusters */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo; /**< EventLevelClusteringInfo */
+    StoreObjPtr<EventT0> m_eventT0; /**< Event T0 */
+
+    int makeCluster(int, double); /**< Make a cluster from a given shower array index */
 
   public:
     /** We need names for the data objects to differentiate between PureCsI and default*/
@@ -86,7 +93,7 @@ namespace Belle2 {
     { return "ECLClustersPureCsI"; }
 
     /** PureCsI name ECLCalDigits */
-    virtual const char* eclCalDigitArrayName() const
+    virtual const char* eclCalDigitArrayName() const override
     {return "ECLCalDigitsPureCsI";}
   }; // end of ECLFinalizerPureCsIModule
 

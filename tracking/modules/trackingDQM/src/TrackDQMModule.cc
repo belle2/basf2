@@ -68,6 +68,17 @@ TrackDQMModule::~TrackDQMModule()
 
 void TrackDQMModule::initialize()
 {
+  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
+  if (!recoTracks.isOptional()) {
+    B2WARNING("Missing recoTracks array, Track-DQM is skipped.");
+    return;
+  }
+  StoreArray<Track> Tracks(m_TracksStoreArrayName);
+  if (!Tracks.isOptional()) {
+    B2WARNING("Missing Tracks array, Track-DQM is skipped.");
+    return;
+  }
+
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
@@ -88,23 +99,16 @@ void TrackDQMModule::defineHisto()
 
   // Create a separate histogram directories and cd into it.
   TDirectory* oldDir = gDirectory;
-  TDirectory* DirTracks = NULL;
-  DirTracks = oldDir->mkdir("TracksDQM");
-  TDirectory* DirTracksAlignment = NULL;
-  DirTracksAlignment = oldDir->mkdir("TracksDQMAlignment");
-  DirTracks->cd();
+
+  gDirectory->mkdir("TracksDQM"); // dont use return value, it might be zero ptr if dir is existing already
+  gDirectory->cd("TracksDQM");
+
   // Momentum Phi
   string name = str(format("MomPhi"));
   string title = str(format("Momentum Phi of fit"));
   m_MomPhi = new TH1F(name.c_str(), title.c_str(), 180, -180, 180);
   m_MomPhi->GetXaxis()->SetTitle("Mom Phi [deg]");
   m_MomPhi->GetYaxis()->SetTitle("counts");
-  // Momentum Theta
-  name = str(format("MomTheta"));
-  title = str(format("Momentum Theta of fit"));
-  m_MomTheta = new TH1F(name.c_str(), title.c_str(), 90, 0, 180);
-  m_MomTheta->GetXaxis()->SetTitle("Mom Theta [deg]");
-  m_MomTheta->GetYaxis()->SetTitle("counts");
   // Momentum CosTheta
   name = str(format("MomCosTheta"));
   title = str(format("Cos of Momentum Theta of fit"));
@@ -193,7 +197,7 @@ void TrackDQMModule::defineHisto()
   int iHits = 200;
   int iTracks = 30;
   int iMomRange = 600;
-  float fMomRange = 3.0;
+  float fMomRange = 6.0;
   name = str(format("TrackMomentumX"));
   title = str(format("Track Momentum X"));
   m_MomX = new TH1F(name.c_str(), title.c_str(), 2 * iMomRange, -fMomRange, fMomRange);
@@ -219,6 +223,45 @@ void TrackDQMModule::defineHisto()
   m_Mom = new TH1F(name.c_str(), title.c_str(), 2 * iMomRange, 0.0, fMomRange);
   m_Mom->GetXaxis()->SetTitle("Momentum");
   m_Mom->GetYaxis()->SetTitle("counts");
+  name = str(format("TrackZ0"));
+  title = str(format("z0 - the z coordinate of the perigee (beam spot position)"));
+  m_Z0 = new TH1F(name.c_str(), title.c_str(), 200, -10.0, 10.0);
+  m_Z0->GetXaxis()->SetTitle("z0 [cm]");
+  m_Z0->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackD0"));
+  title = str(format("d0 - the signed distance to the IP in the r-phi plane"));
+  m_D0 = new TH1F(name.c_str(), title.c_str(), 200, -1.0, 1.0);
+  m_D0->GetXaxis()->SetTitle("d0 [cm]");
+  m_D0->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackD0Phi"));
+  title = str(format("d0 vs Phi - the signed distance to the IP in the r-phi plane"));
+  m_D0Phi = new TH2F(name.c_str(), title.c_str(), 72, -180.0, 180.0, 80, -0.4, 0.4);
+  m_D0Phi->GetXaxis()->SetTitle("#phi0 [deg]");
+  m_D0Phi->GetYaxis()->SetTitle("d0 [cm]");
+  m_D0Phi->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackD0Z0"));
+  title = str(
+            format("z0 vs d0 - signed distance to the IP in r-phi vs. z0 of the perigee (to see primary vertex shifts along R or z)"));
+  m_D0Z0 = new TH2F(name.c_str(), title.c_str(), 200, -10.0, 10.0, 80, -0.4, 0.4);
+  m_D0Z0->GetXaxis()->SetTitle("z0 [cm]");
+  m_D0Z0->GetYaxis()->SetTitle("d0 [cm]");
+  m_D0Z0->GetZaxis()->SetTitle("Arb. Units");
+
+  name = str(format("TrackPhi"));
+  title = str(format("Phi - angle of the transverse momentum in the r-phi plane, with CDF naming convention"));
+  m_Phi = new TH1F(name.c_str(), title.c_str(), 72, -180.0, 180.0);
+  m_Phi->GetXaxis()->SetTitle("#phi [deg]");
+  m_Phi->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackTanLambda"));
+  title = str(format("TanLambda - the slope of the track in the r-z plane"));
+  m_TanLambda = new TH1F(name.c_str(), title.c_str(), 400, -4.0, 4.0);
+  m_TanLambda->GetXaxis()->SetTitle("Tan Lambda");
+  m_TanLambda->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackOmega"));
+  title = str(format("Omega - the curvature of the track. It's sign is defined by the charge of the particle"));
+  m_Omega = new TH1F(name.c_str(), title.c_str(), 400, -0.1, 0.1);
+  m_Omega->GetXaxis()->SetTitle("Omega");
+  m_Omega->GetYaxis()->SetTitle("Arb. Units");
 
   name = str(format("NoOfHitsInTrack_PXD"));
   title = str(format("No Of Hits In Track - PXD"));
@@ -309,7 +352,10 @@ void TrackDQMModule::defineHisto()
     m_TRClusterCorrelationsTheta[index]->GetZaxis()->SetTitle("counts");
   }
 
-  DirTracksAlignment->cd();
+  oldDir->cd();
+  oldDir->mkdir("TracksDQMAlignment");// dont use returned ptr, it might be zero
+  oldDir->cd("TracksDQMAlignment");
+
   for (int i = 0; i < nVXDSensors; i++) {
     VxdID id = gTools->getSensorIDFromIndex(i);
     int iLayer = id.getLayerNumber();
@@ -342,16 +388,19 @@ void TrackDQMModule::defineHisto()
   }
 
   oldDir->cd();
-
 }
 
 void TrackDQMModule::beginRun()
 {
+  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
+  if (!recoTracks.isOptional())  return;
+  StoreArray<Track> Tracks(m_TracksStoreArrayName);
+  if (!Tracks.isOptional()) return;
+
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   if (m_MomPhi != NULL) m_MomPhi->Reset();
-  if (m_MomTheta != NULL) m_MomTheta->Reset();
   if (m_MomCosTheta != NULL) m_MomCosTheta->Reset();
   if (m_PValue != NULL) m_PValue->Reset();
   if (m_Chi2 != NULL) m_Chi2->Reset();
@@ -368,6 +417,14 @@ void TrackDQMModule::beginRun()
   if (m_MomY != NULL) m_MomY->Reset();
   if (m_MomZ != NULL) m_MomZ->Reset();
   if (m_Mom != NULL) m_Mom->Reset();
+  if (m_D0 != NULL) m_D0->Reset();
+  if (m_D0Phi != NULL) m_D0Phi->Reset();
+  if (m_D0Z0 != NULL) m_D0Z0->Reset();
+
+  if (m_Z0 != NULL) m_Z0->Reset();
+  if (m_Phi != NULL) m_Phi->Reset();
+  if (m_TanLambda != NULL) m_TanLambda->Reset();
+  if (m_Omega != NULL) m_Omega->Reset();
   if (m_HitsPXD != NULL) m_HitsPXD->Reset();
   if (m_HitsSVD != NULL) m_HitsSVD->Reset();
   if (m_HitsCDC != NULL) m_HitsCDC->Reset();
@@ -401,6 +458,11 @@ void TrackDQMModule::beginRun()
 
 void TrackDQMModule::event()
 {
+  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
+  if (!recoTracks.isOptional() || !recoTracks.getEntries())  return;
+  StoreArray<Track> tracks(m_TracksStoreArrayName);
+  if (!tracks.isOptional() || !tracks.getEntries()) return;
+
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   try {
     int iTrack = 0;
@@ -408,25 +470,25 @@ void TrackDQMModule::event()
     int iTrackCDC = 0;
     int iTrackVXDCDC = 0;
 
-    StoreArray<Track> tracks;
     for (const Track& track : tracks) {  // over tracks
-      RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);
-      RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(theRC[0]);
+      RelationVector<RecoTrack> recoTrack = track.getRelationsTo<RecoTrack>(m_RecoTracksStoreArrayName);
+      if (!recoTrack.size()) continue;
+      RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(recoTrack[0]);
       int nPXD = (int)pxdClustersTrack.size();
-      RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(theRC[0]);
+      RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(recoTrack[0]);
       int nSVD = (int)svdClustersTrack.size();
-      RelationVector<CDCHit> cdcHitTrack = DataStore::getRelationsWithObj<CDCHit>(theRC[0]);
+      RelationVector<CDCHit> cdcHitTrack = DataStore::getRelationsWithObj<CDCHit>(recoTrack[0]);
       int nCDC = (int)cdcHitTrack.size();
       const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
       /*
-          const auto& resmap = track.getTrackFitResults();
-          auto hypot = max_element(
-            resmap.begin(),
-            resmap.end(),
-            [](const pair<Const::ChargedStable, const TrackFitResult*>& x1, const pair<Const::ChargedStable, const TrackFitResult*>& x2)->bool
-            {return x1.second->getPValue() < x2.second->getPValue();}
-            );
-          const TrackFitResult* tfr = hypot->second;
+      const auto& resmap = track.getTrackFitResults();
+      auto hypot = max_element(
+      resmap.begin(),
+      resmap.end(),
+      [](const pair<Const::ChargedStable, const TrackFitResult*>& x1, const pair<Const::ChargedStable, const TrackFitResult*>& x2)->bool
+      {return x1.second->getPValue() < x2.second->getPValue();}
+      );
+      const TrackFitResult* tfr = hypot->second;
       */
       if (tfr == nullptr) continue;
 
@@ -439,40 +501,31 @@ void TrackDQMModule::event()
                              (float)tfr->getMomentum().Mag(),
                              nPXD, nSVD, nCDC, nPXD + nSVD + nCDC
                             );
-      B2DEBUG(230, message.Data());
+      B2DEBUG(20, message.Data());
       iTrack++;
 
-      float Phi = 90;
-      if (fabs(tfr->getMomentum().Px()) > 0.00000001) {
-        Phi = atan2(tfr->getMomentum().Py(), tfr->getMomentum().Px()) * TMath::RadToDeg();
-      }
+      float Phi = atan2(tfr->getMomentum().Py(), tfr->getMomentum().Px()) * TMath::RadToDeg();
       float pxy = sqrt(tfr->getMomentum().Px() * tfr->getMomentum().Px() + tfr->getMomentum().Py() * tfr->getMomentum().Py());
-      float Theta = 90;
-      if (fabs(tfr->getMomentum().Pz()) > 0.00000001) {
-        Theta = atan2(pxy, tfr->getMomentum().Pz()) * TMath::RadToDeg();
-      }
+      float Theta = atan2(pxy, tfr->getMomentum().Pz());
       m_MomPhi->Fill(Phi);
-      m_MomTheta->Fill(Theta);
-      m_MomCosTheta->Fill(cos(Theta - 90.0));
+      m_MomCosTheta->Fill(cos(Theta));
 
-      float Chi2NDF = 0;
-      float NDF = 0;
-      float pValue = 0;
-      if (theRC[0]->wasFitSuccessful()) {
-        if (!theRC[0]->getTrackFitStatus())
+      if (recoTrack[0]->wasFitSuccessful()) {
+        if (!recoTrack[0]->getTrackFitStatus())
           continue;
 
+
         // add NDF:
-        NDF = theRC[0]->getTrackFitStatus()->getNdf();
+        float NDF = recoTrack[0]->getTrackFitStatus()->getNdf();
         m_NDF->Fill(NDF);
         // add Chi2/NDF:
-        m_Chi2->Fill(theRC[0]->getTrackFitStatus()->getChi2());
+        m_Chi2->Fill(recoTrack[0]->getTrackFitStatus()->getChi2());
         if (NDF) {
-          Chi2NDF = theRC[0]->getTrackFitStatus()->getChi2() / NDF;
+          float Chi2NDF = recoTrack[0]->getTrackFitStatus()->getChi2() / NDF;
           m_Chi2NDF->Fill(Chi2NDF);
         }
         // add p-value:
-        pValue = theRC[0]->getTrackFitStatus()->getPVal();
+        float pValue = recoTrack[0]->getTrackFitStatus()->getPVal();
         m_PValue->Fill(pValue);
         // add residuals:
         int iHit = 0;
@@ -490,9 +543,9 @@ void TrackDQMModule::event()
         int iLayer = 0;
 
         int IsSVDU = -1;
-        for (auto recoHitInfo : theRC[0]->getRecoHitInformations()) {  // over recohits
+        for (auto recoHitInfo : recoTrack[0]->getRecoHitInformations()) {  // over recohits
           if (!recoHitInfo) {
-            B2DEBUG(200, "No genfit::pxd recoHitInfo is missing.");
+            B2DEBUG(20, "No genfit::pxd recoHitInfo is missing.");
             continue;
           }
           if (!recoHitInfo->useInFit())
@@ -501,7 +554,7 @@ void TrackDQMModule::event()
                 (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_SVD)))
             continue;
 
-          auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(*theRC[0]);
+          auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack[0]);
 
           bool biased = false;
           if (!genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo()) continue;
@@ -512,7 +565,7 @@ void TrackDQMModule::event()
             VxdID sensorID = recoHitInfo->getRelatedTo<PXDCluster>()->getSensorID();
             auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
             iLayer = sensorID.getLayerNumber();
-            TVector3 ral = info.pointToGlobal(rLocal);
+            TVector3 ral = info.pointToGlobal(rLocal, true);
             fPosSPU = ral.Phi() / TMath::Pi() * 180;
             fPosSPV = ral.Theta() / TMath::Pi() * 180;
             ResidUPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
@@ -542,7 +595,7 @@ void TrackDQMModule::event()
             iLayer = sensorID.getLayerNumber();
             if (IsSVDU) {
               TVector3 rLocal(recoHitInfo->getRelatedTo<SVDCluster>()->getPosition(), 0 , 0);
-              TVector3 ral = info.pointToGlobal(rLocal);
+              TVector3 ral = info.pointToGlobal(rLocal, true);
               fPosSPU = ral.Phi() / TMath::Pi() * 180;
               ResidUPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
               if (sensorIDPrew != sensorID) { // other sensor, reset
@@ -552,7 +605,7 @@ void TrackDQMModule::event()
               sensorIDPrew = sensorID;
             } else {
               TVector3 rLocal(0, recoHitInfo->getRelatedTo<SVDCluster>()->getPosition(), 0);
-              TVector3 ral = info.pointToGlobal(rLocal);
+              TVector3 ral = info.pointToGlobal(rLocal, true);
               fPosSPV = ral.Theta() / TMath::Pi() * 180;
               ResidVPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
               if (sensorIDPrew == sensorID) { // evaluate
@@ -592,6 +645,15 @@ void TrackDQMModule::event()
       if (m_MomZ != NULL) m_MomZ->Fill(tfr->getMomentum().Pz());
       if (m_MomPt != NULL) m_MomPt->Fill(tfr->getMomentum().Pt());
       if (m_Mom != NULL) m_Mom->Fill(tfr->getMomentum().Mag());
+      if (m_D0 != NULL) m_D0->Fill(tfr->getD0());
+      if (m_D0Phi != NULL) m_D0Phi->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getD0());
+      if (m_Z0 != NULL) m_Z0->Fill(tfr->getZ0());
+      if (m_D0Z0 != NULL) m_D0Z0->Fill(tfr->getZ0(), tfr->getD0());
+
+      if (m_Phi != NULL) m_Phi->Fill(tfr->getPhi() * Unit::convertValueToUnit(1.0, "deg"));
+      if (m_TanLambda != NULL) m_TanLambda->Fill(tfr->getTanLambda());
+      if (m_Omega != NULL) m_Omega->Fill(tfr->getOmega());
+
       if (m_HitsPXD != NULL) m_HitsPXD->Fill(nPXD);
       if (m_HitsSVD != NULL) m_HitsSVD->Fill(nSVD);
       if (m_HitsCDC != NULL) m_HitsCDC->Fill(nCDC);
@@ -602,6 +664,6 @@ void TrackDQMModule::event()
     if (m_TracksVXDCDC != NULL) m_TracksVXDCDC->Fill(iTrackVXDCDC);
     if (m_Tracks != NULL) m_Tracks->Fill(iTrack);
   } catch (...) {
-    B2DEBUG(70, "Some problem in Track DQM module!");
+    B2DEBUG(20, "Some problem in Track DQM module!");
   }
 }

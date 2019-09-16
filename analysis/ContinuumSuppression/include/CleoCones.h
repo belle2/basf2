@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CLEOCONES_H
-#define CLEOCONES_H
+#pragma once
 
 #include <TVector3.h>
 
@@ -24,8 +23,8 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CleoCones(std::vector<TVector3> p3_cms_all, std::vector<TVector3> p3_cms_roe, TVector3 thrustB, bool calc_CleoCones_with_all,
-              bool calc_CleoCones_with_roe);
+    CleoCones(const std::vector<TVector3>& p3_cms_all, const std::vector<TVector3>& p3_cms_roe, const TVector3& thrustB,
+              bool calc_CleoCones_with_all, bool calc_CleoCones_with_roe);
 
     /**
      * Destructor
@@ -50,5 +49,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

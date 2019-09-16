@@ -17,9 +17,6 @@ from reconstruction import add_cosmics_reconstruction
 from cdc.cr import *
 
 # use the CDC CR tag
-reset_database()
-use_database_chain()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
 use_central_database("cdc_cr_test1", LogLevel.WARNING)
 
 # create path

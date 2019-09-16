@@ -12,6 +12,9 @@
 #define FANGSDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <beast/fangs/dataobjects/FANGSHit.h>
 
 #include <TRandom3.h>
 #include <TF1.h>
@@ -72,6 +75,7 @@ namespace Belle2 {
 
 
     private:
+      StoreArray<FANGSHit> m_fangsHit; /** array for FANGSHit */
 
       /** reads data from MICROFANGS.xml: tube location, drift data filename, sigma of impulse response function */
       void getXMLData();

@@ -11,6 +11,7 @@
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <TRandom.h>
+#include <cdc/geometry/CDCGeoControlPar.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -78,6 +79,7 @@ namespace Belle2 {
       {
         unsigned short iCLayer = wireID.getICLayer();
         const CDC::CDCGeometryPar& geometryPar = CDC::CDCGeometryPar::Instance();
+        const CDC::CDCGeoControlPar& controlPar = CDC::CDCGeoControlPar::getInstance();
         TVector3 backwardWirePos =
           geometryPar.wireBackwardPosition(wireID, CDC::CDCGeometryPar::c_Aligned);
         TVector3 forwardWirePos =
@@ -89,6 +91,9 @@ namespace Belle2 {
           (forwardWirePos - backwardWirePos).Mag() / (forwardWirePos.Z() - backwardWirePos.Z());
 
         double distance = zDistance * stereoFactor;
+        if (controlPar.getSenseWireZposMode() == 1) {
+          distance += geometryPar.getBwdDeltaZ(iCLayer);
+        }
         return distance * geometryPar.getPropSpeedInv(iCLayer);
       }
 

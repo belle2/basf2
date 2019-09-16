@@ -17,6 +17,10 @@
 #include <vector>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+
 #include <beast/microtpc/dataobjects/TPCG4TrackInfo.h>
 #include <beast/he3tube/dataobjects/HE3G4TrackInfo.h>
 #include <generators/SAD/dataobjects/SADMetaHit.h>
@@ -50,21 +54,25 @@ namespace Belle2 {
     virtual ~ReprocessorModule();
 
     /**  */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**  */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**  */
-    virtual void event();
+    virtual void event() override;
 
     /**  */
-    virtual void endRun();
+    virtual void endRun() override;
     /**  */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   private:
+
+
+    StoreObjPtr<EventMetaData> m_evtMetaData; /**< event meta data Object pointer */
+    StoreArray<MCParticle> m_mcParticle; /**< mc Particle Array */
 
     /** Set PDG*/
     int m_input_TPC_PDG;

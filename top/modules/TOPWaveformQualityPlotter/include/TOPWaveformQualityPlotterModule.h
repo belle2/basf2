@@ -43,23 +43,23 @@ namespace Belle2 {
     /**
      * Books the empty histograms
      */
-    void defineHisto();
+    void defineHisto() override;
 
     /**
      * Module initialization, calls defineHisto and gets waveform
      */
-    void initialize();
+    void initialize() override;
 
     /**
      * Event processor.
      */
-    void event();
+    void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    void endRun();
+    void endRun() override;
 
     /**
      * Draws the full waveforms onto the TProfiles

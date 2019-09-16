@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
+ * Copyright(C) 2014-2019 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thomas Keck, Anze Zupanc                                 *
+ *               Sam Cunliffe, Torben Ferber                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -129,7 +130,7 @@ namespace Belle2 {
      * @param decayString
      * @param cutParameter
      */
-    explicit ParticleGenerator(std::string decayString, std::string cutParameter = "");
+    explicit ParticleGenerator(const std::string& decayString, const std::string& cutParameter = "");
 
     /**
      * Initialises the generator to produce the given type of sublist
@@ -213,6 +214,15 @@ namespace Belle2 {
     bool currentCombinationIsUnique();
 
     /**
+     * Check that: if the current combination has at least two particles from an ECL source,
+     * then they are from different connected regions or from the same connected region but have
+     * the same hypothesis.
+     *
+     * @return true if indices not found in the stack; if true indices pushed to stack
+     */
+    bool currentCombinationIsECLCRUnique();
+
+    /**
      * In the case input daughter particle lists collide (two or more lists contain copies of Particles)
      * the Particle's Store Array index can not be longer used as its unique identifier, which is needed
      * to check for uniqueness of accpeted combinations. Instead unique identifier is created for all particles
@@ -237,6 +247,17 @@ namespace Belle2 {
     int m_pdgCode; /**< PDG Code of the particle which is combined */
     bool m_isSelfConjugated; /**< True if the combined particle is self-conjugated */
     unsigned int m_iParticleType; /**< The type of particle which is currently generated */
+    bool m_isUnspecified; /**< True if the particle is marked as unspecified by using "@" */
+    /** Ignore radiated photons? */
+    bool m_isIgnoreRadiatedPhotons;
+    /** Ignore intermediate particles or resonances? */
+    bool m_isIgnoreIntermediate;
+    /** Ignore missing massive final state particles? */
+    bool m_isIgnoreMassive;
+    /** Ignore missing neutrino? */
+    bool m_isIgnoreNeutrino;
+    /** Ignore missing gamma? */
+    bool m_isIgnoreGamma;
 
     unsigned int m_numberOfLists; /**< Number of lists which are combined */
     std::vector<StoreObjPtr<ParticleList>> m_plists; /**< particle lists */

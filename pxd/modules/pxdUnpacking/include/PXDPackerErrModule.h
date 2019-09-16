@@ -13,7 +13,10 @@
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <rawdata/dataobjects/RawPXD.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
+#include <pxd/dataobjects/PXDErrorFlags.h>
 
 namespace Belle2 {
 
@@ -45,7 +48,9 @@ namespace Belle2 {
       std::string m_RawPXDsName;  /**< The name of the StoreArray of generated RawPXDs */
 
       bool m_InvertMapping; /**< Flag if we invert mapping to DHP row/col or use premapped coordinates */
-      bool m_Clusterize; /** Use clusterizer (FCE format) */
+      bool m_Clusterize; /**< Use clusterizer (FCE format) */
+      bool m_Check; /**< false=Pack Raw Data, true=Check unpacked result */
+      std::string m_PXDDAQEvtStatsName;  /**< The name of the StoreObjPtr of PXDDAQStatus to be read */
 
       /** Parameter dhc<->dhe list, mapping from steering file */
       std::vector< std::vector<int >> m_dhe_to_dhc;
@@ -54,17 +59,25 @@ namespace Belle2 {
       std::map <int, std::vector <int>> m_dhc_mapto_dhe;
 
       /** Event counter */
-      unsigned int m_packed_events;
+      unsigned int m_packed_events{0};
       /** Real Trigger Nr */
-      unsigned int m_real_trigger_nr;
+      unsigned int m_real_trigger_nr{0};
       /** Trigger Nr */
-      unsigned int m_trigger_nr;
+      unsigned int m_trigger_nr{0};
       /** Run+Subrun Nr */
-      unsigned short m_run_nr_word1;
+      unsigned short m_run_nr_word1{0};
       /** Exp+Run Nr */
-      unsigned short m_run_nr_word2;
+      unsigned short m_run_nr_word2{0};
       /** Time(Tag) from MetaInfo */
-      unsigned long long int m_meta_time;
+      unsigned long long int m_meta_time{0};
+
+      /** DHP Readout Frame Nr for DHP and DHE headers */
+      unsigned int m_trigger_dhp_framenr{0};
+      /** DHE Trigger Gate for DHE headers */
+      unsigned int m_trigger_dhe_gate{0};
+
+      /** flag if we found one test failing */
+      bool m_found_fatal {false};
 
       /** For one DHC event, we utilize one header (writing out, beware of endianess!) */
       std::vector <unsigned int> m_onsen_header;
@@ -77,6 +90,9 @@ namespace Belle2 {
 
       /** Output array for RawPxds */
       StoreArray<RawPXD> m_storeRaws;
+
+      /** Output array for RawPxds */
+      StoreObjPtr<PXDDAQStatus> m_daqStatus;
 
       /** Pack one event (several DHC) stored in seperate RawPXD object.
        */
@@ -96,19 +112,14 @@ namespace Belle2 {
 
       /** Pack one DHP RAW to buffer.
        */
-      void pack_dhp_raw(int dhp_id, int dhe_id, bool adcpedestal);
+      /* cppcheck-suppress unusedPrivateFunction */
+      void pack_dhp_raw(int dhp_id, int dhe_id);
 
-      /** Swap endianes inside all shorts of this frame besides CRC.
-       * @param data pointer to frame
-       * @param len length of frame
-       */
-      void endian_swap_frame(unsigned short* data, int len);
-
-      void start_frame(void);//! Start with a new Frame
-      void append_int8(unsigned char w);//! cat 8bit value to frame
-      void append_int16(unsigned short w);//! cat 16bit value to frame
-      void append_int32(unsigned int w);//! cat 32value value to frame
-      void add_frame_to_payload(void);//! Add Frame to Event payload
+      void start_frame(void); ///< Start with a new Frame
+      void append_int8(unsigned char w); ///< cat 8bit value to frame
+      void append_int16(unsigned short w); ///< cat 16bit value to frame
+      void append_int32(unsigned int w); ///< cat 32value value to frame
+      void add_frame_to_payload(void); ///< Add Frame to Event payload
 
       void do_the_reverse_mapping(unsigned int& row, unsigned int& col, unsigned short layer, unsigned short sensor);
 
@@ -119,10 +130,15 @@ namespace Belle2 {
       std::map <VxdID , int> startOfVxdID;
 
       /** temporary hitmap buffer for pixel to raw data conversion */
-      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS];
+      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS] = {0};
 
-      unsigned int dhe_byte_count;/**< Byte count in current DHE package */
-      unsigned int dhc_byte_count;/**< Byte count in current DHC package */
+      unsigned int dhe_byte_count{0}; /**< Byte count in current DHE package */
+      unsigned int dhc_byte_count{0}; /**< Byte count in current DHC package */
+
+      bool CheckErrorMaskInEvent(unsigned int eventnr, PXDError::PXDErrorFlags mask);
+
+      /// The pxd error flags
+      static std::vector <PXDErrorFlags> m_errors;
 
     };//end class declaration
 

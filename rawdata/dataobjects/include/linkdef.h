@@ -31,7 +31,6 @@
 #pragma link C++ class Belle2::RawFTSW+;
 #pragma link C++ class Belle2::RawTLU+;
 #pragma link C++ class Belle2::RawPXD+;
-#pragma link C++ class Belle2::RawDHH+;
 #pragma link C++ class Belle2::RawTRG+;
 
 #endif

@@ -19,19 +19,27 @@ using namespace Belle2;
 using namespace CDC;
 
 RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagationDelay) :
-  m_useInWirePropagationDelay(useInWirePropagationDelay), m_gcp(CDCGeoControlPar::getInstance()), m_cdcp(CDCGeometryPar::Instance()),
+  m_useInWirePropagationDelay(useInWirePropagationDelay), m_gcp(CDCGeoControlPar::getInstance()),
+  m_scp(CDCSimControlPar::getInstance()), m_cdcp(CDCGeometryPar::Instance()),
   m_tdcBinWidth(m_cdcp.getTdcBinWidth())
 {
   StoreObjPtr<FileMetaData> filPtr("", DataStore::c_Persistent);
   if (filPtr) {
     if (filPtr->getMcEvents() == 0) m_realData = true;
-//    B2INFO("RealisticTDCCountTranslator:: judge from FileMetaData.");
+    //    B2INFO("RealisticTDCCountTranslator:: judge from FileMetaData.");
   } else { //judge from MCParticle
     StoreArray<MCParticle> mcp;
     if (!mcp) m_realData = true;
-//    B2INFO("RealisticTDCCountTranslator:: judge from MCParticle.");
+    //    B2INFO("RealisticTDCCountTranslator:: judge from MCParticle.");
   }
-//  B2INFO("RealisticTDCCountTranslator:: m_realData= " << m_realData);
+  //  B2INFO("RealisticTDCCountTranslator:: m_realData= " << m_realData);
+
+  if (m_realData) {
+    m_fudgeFactor = m_cdcp.getFudgeFactorForSigma(0);
+  } else {
+    m_fudgeFactor = m_cdcp.getFudgeFactorForSigma(1);
+  }
+  //  B2INFO("RealisticTDCCountTranslator:: m_fudgeFactor= " << m_fudgeFactor);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
@@ -83,12 +91,12 @@ double RealisticTDCCountTranslator::getDriftTime(unsigned short tdcCount,
   driftTime -= timeOfFlightEstimator;
 
   //Forth: Time-walk correction
-  //Correct for data only now. Eventually correct also for MC (don't forget to switch on this effect in digitizer in that case).
-  if (m_realData) {
+  if (m_realData) { //for data, always correct
     driftTime -= m_cdcp.getTimeWalk(wireID, adcCount);
     //    B2INFO("RealisticTDCCountTranslator:: time-walk corr. done.");
-    //  } else {
-    //    B2INFO("RealisticTDCCountTranslator:: no time-walk corr. for MC now.");
+  } else if (m_scp.getTimeWalk()) { //for MC, ccorrect if the flag is on
+    driftTime -= m_cdcp.getTimeWalk(wireID, adcCount);
+    //    B2INFO("RealisticTDCCountTranslator:: time-walk corr. done for MC.");
   }
 
   return driftTime;
@@ -133,7 +141,8 @@ double RealisticTDCCountTranslator::getDriftLengthResolution(double driftLength,
     double alpha, double theta)
 {
   static_cast<void>(z); //just to suppress warning of unused
-  double resol = m_cdcp.getSigma(driftLength, wireID.getICLayer(), leftRight, alpha, theta);
+  double resol = m_fudgeFactor * m_cdcp.getSigma(driftLength, wireID.getICLayer(), leftRight, alpha, theta);
+  //  B2DEBUG(29, "fudgeFactor in TDCTranslator= " << m_fudgeFactor);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;

@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Manca Mrvar, Thomas Kuhr, Luka Santel, Leonid Burmistrov *
+ *               Rok Pestotnik                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,6 +13,7 @@
 
 #include <TObject.h>
 #include <TGraph.h>
+#include <TH1.h>
 #include <TH2F.h>
 #include <TH3F.h>
 #include <TTimeStamp.h>
@@ -19,7 +21,8 @@
 #include <tuple>
 #include <vector>
 #include <iostream>
-
+#include <string>
+#include <framework/database/IntervalOfValidity.h>
 
 namespace Belle2 {
 
@@ -34,7 +37,7 @@ namespace Belle2 {
      * Default constructor
      */
     ARICHDatabaseImporter(): m_inputFilesHapdQA(), m_inputFilesAsicRoot(), m_inputFilesAsicTxt(), m_inputFilesHapdQE(),
-      m_inputFilesFebTest() {};
+      m_inputFilesFebTest(), m_iov(0, 0, -1, -1) {};
 
     /**
      * Constructor
@@ -43,11 +46,18 @@ namespace Belle2 {
                           const std::vector<std::string>& inputFilesAsicTxt, const std::vector<std::string>& inputFilesHapdQE,
                           const std::vector<std::string>& inputFilesFebTest);
 
+
+    ARICHDatabaseImporter(int experiment, int run);
+
+
     /**
      * Destructor
      */
     virtual ~ARICHDatabaseImporter() {};
 
+    void SetIOV(int experimentLow, int runLow, int experimentHigh , int runHigh);
+
+    void setExperimentAndRun(int experiment, int run);
 
     // classes used in simulation/reconstruction software
 
@@ -86,6 +96,16 @@ namespace Belle2 {
     void setHAPDQE(unsigned modID, double qe = 0.27, bool import = false);
 
     /**
+     * Import global alignment parameters from ARICH-GlobalAlignment.xml
+     */
+    void importGlobalAlignment();
+
+    /**
+     * Import mirror alignment parameters from ARICH-MirrorAlignment.xml
+     */
+    void importMirrorAlignment();
+
+    /**
      * Import channel mask for all HAPD modules from the database (list of dead channels)
      * Goes through the list of installed modules in ARICH-InstalledModules.xml,
      * finds corresponding lists of dead channels in the database and imports lightweight
@@ -94,9 +114,17 @@ namespace Belle2 {
     void importChannelMask();
 
     /**
+     * Import channel mask from the calibration histogram  ( list of dead and hot channels )
+     * to ARICHChannelMask class into database.
+     * @param h   TH1F root histogram with 420*144 bins
+     */
+    void importChannelMask(TH1* h);
+
+
+    /**
      * Print channel mask of all HAPD modules from the database (lightweight class for sim/rec)
      */
-    void printChannelMask();
+    void printChannelMask(bool makeHist = false);
 
     /**
      * Imports HAPD (asic) channel mappings from the xml file
@@ -115,9 +143,19 @@ namespace Belle2 {
     void importFEMappings();
 
     /**
-     * Prints mappings of FE electronics from the database
+     * Prints merger to FEB mappings from the database
      */
-    void printFEMappings();
+    void printMergerMapping();
+
+    /**
+     * Prints Copper to merger mappings from the database
+     */
+    void printCopperMapping();
+
+    /**
+     * Prints reconstruction parameters
+     */
+    void printReconstructionPar();
 
     /**
      * Prints geometry configuration parameters from the database
@@ -133,6 +171,21 @@ namespace Belle2 {
     void dumpQEMap(bool simple = false);
 
     /**
+     * Dumps detector map of HAPD modules to HV cable channels
+     */
+    void dumpHvMappings();
+
+    /**
+     * Prints electronics mappings for all modules (merger ID + SN, merger port, copper, finnese)
+     */
+    void printFEMappings();
+
+    /**
+     * Dumps module - merger mapping into root file
+     */
+    void dumpMergerMapping(bool sn = true);
+
+    /**
      * Dumps module numbering scheme into root file (module position on the detector plane -> module number)
      */
     void dumpModuleNumbering();
@@ -142,7 +195,7 @@ namespace Belle2 {
      * arich/utility/ARICHAerogelHist histos
      * @param string with output name
      */
-    void dumpAOP(std::string outRootFileName = "ARICH_AOP.root");
+    void dumpAerogelOpticalProperties(std::string outRootFileName = "ARICH_AerogelOpticalProperties.root");
 
     /**
      * Import parameters of the cosmic test geometry configuration
@@ -160,6 +213,11 @@ namespace Belle2 {
     void importAeroTilesInfo();
 
     /**
+    * Import optical information of aerogel tiles into database
+    */
+    void importAeroRayleighScatteringFit(std::string commentSingleWord = "");
+
+    /**
      * Get aerogel ring number from global indetifier
      */
     int getAeroTileRing(int slot);
@@ -174,6 +232,15 @@ namespace Belle2 {
      */
     void printAeroTileInfo();
 
+    /**
+     * Prints global alignment constants
+     */
+    void printGlobalAlignment();
+
+    /**
+     * Prints mirror alignment constants
+     */
+    void printMirrorAlignment();
 
     // DAQ classes
 
@@ -234,7 +301,7 @@ namespace Belle2 {
     /**
      * Import ARICH aerogel data in the database.
      */
-    void importAerogelInfo();
+    void importAerogelInfo(TString coreNameSuffix = "");
 
     /**
      * Export ARICH aerogel data from the database.
@@ -502,6 +569,7 @@ namespace Belle2 {
     std::vector<std::string> m_inputFilesHapdQE;        /**< Input root files for HAPD quantum efficiency */
     std::vector<std::string> m_inputFilesFebTest;       /**< Input root files from FEB test (coarse/fine offset settings, test pulse) */
 
+    IntervalOfValidity m_iov;
 
     /**
      * @brief printContainer used for debugging purposes...

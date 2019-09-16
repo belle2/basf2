@@ -90,11 +90,11 @@ namespace Belle2 {
      * where the wire direction is pointing towards +z except for small
      * corrections such as stereo angle, sagging
      */
-    virtual void setLeftRightResolution(int lr) { m_leftRight = lr; }
+    void setLeftRightResolution(int lr) { m_leftRight = lr; }
 
-    virtual bool isLeftRightMeasurement() const override { return true; }
+    bool isLeftRightMeasurement() const override { return true; }
     /** Getter for left/right passage flag. */
-    virtual int getLeftRightResolution() const override { return m_leftRight; }
+    int getLeftRightResolution() const override { return m_leftRight; }
 
 
     /** get the pointer to the CDCHit object that was used to create this CDCRecoHit object.

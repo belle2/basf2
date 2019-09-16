@@ -39,6 +39,12 @@ namespace FastBDT {
 namespace Belle2 {
   namespace MVA {
 
+
+    /**
+     * checks if the vector actually contains two classes
+     */
+    bool isValidSignal(const std::vector<bool>& Signals);
+
     /**
      * Options for the FANN MVA method
      */

@@ -43,9 +43,9 @@ namespace Belle2 {
     virtual void event() override;
 
 
-    int m_nSample; /**< minimum number of samples required to be above threshold*/
-    float m_cutSN; /**< SN ratio threshold*/
-    bool m_createOutside; /**<if true a StoreArray of Strips zero-suppressed is created*/
+    int m_nSample = 1; /**< minimum number of samples required to be above threshold*/
+    float m_cutSN = 3; /**< SN ratio threshold*/
+    bool m_createOutside = false; /**<if true a StoreArray of Strips zero-suppressed is created*/
 
   private:
 
@@ -58,14 +58,15 @@ namespace Belle2 {
     bool passesZS(const SVDShaperDigit*);  /**< returns true if the strip passes the ZS cut*/
 
     //calibration objects
-    SVDNoiseCalibrations m_NoiseCal;
+    SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibration db object*/
 
   protected:
 
     /** Name of the collections to use for the SVDShaperDigits */
     std::string m_storeShaperDigitsName;
-    std::string m_SVDShaperDigitsIN;
-    std::string m_SVDShaperDigitsOUT;
+    std::string m_SVDShaperDigitsIN; /**< name of SVDShaperDigits passing ZS*/
+    std::string m_SVDShaperDigitsOUT; /**< name of SVDShaperDigits NOT passing ZS*/
+    bool m_FADCmode = true; /**< if true, same algorithm as on FADC is applied*/
 
   };
 }

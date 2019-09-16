@@ -67,6 +67,10 @@ namespace Belle2 {
     /** Required for MCInfo method, activates its strict version */
     bool m_MCStrictQualityEstimator;
 
+    /** Bool to indicate if mva target requiring complete agreement in SVD Clusters between MC and PR track to yield 1
+     *  should be written out as target for the mva training. */
+    bool m_mva_target = false;
+
     /** name of the output rootfile */
     std::string m_TrainingDataOutputName;
 

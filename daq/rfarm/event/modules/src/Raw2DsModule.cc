@@ -68,19 +68,19 @@ void Raw2DsModule::initialize()
   m_rbuf = new RingBuffer(m_rbufname.c_str());
 
   // Initialize EvtMetaData
-  StoreObjPtr<EventMetaData>::registerPersistent();
+  m_eventMetaData.registerInDataStore();
 
   // Initialize Array of RawCOPPER
-  StoreArray<RawDataBlock>::registerPersistent();
-  StoreArray<RawCOPPER>::registerPersistent();
-  StoreArray<RawSVD>::registerPersistent();
-  StoreArray<RawCDC>::registerPersistent();
-  StoreArray<RawTOP>::registerPersistent();
-  StoreArray<RawARICH>::registerPersistent();
-  StoreArray<RawECL>::registerPersistent();
-  StoreArray<RawKLM>::registerPersistent();
-  StoreArray<RawTRG>::registerPersistent();
-  StoreArray<RawFTSW>::registerPersistent();
+  m_rawDataBlock.registerInDataStore();
+  m_rawCOPPER.registerInDataStore();
+  m_rawSVD.registerInDataStore();
+  m_rawCDC.registerInDataStore();
+  m_rawTOP.registerInDataStore();
+  m_rawARICH.registerInDataStore();
+  m_rawECL.registerInDataStore();
+  m_rawKLM.registerInDataStore();
+  m_rawTRG.registerInDataStore();
+  m_rawFTSW.registerInDataStore();
 
   // Read the first event in RingBuffer and restore in DataStore.
   // This is necessary to create object tables before TTree initialization
@@ -128,7 +128,7 @@ void Raw2DsModule::registerRawCOPPERs()
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
     //    usleep(100);
     //    usleep(20);
-    if (signalled != 0) break;
+    if (signalled != 0) return;
     usleep(5);
   }
   //  B2INFO("Raw2Ds: got an event from RingBuffer, size=" << size <<
@@ -165,6 +165,8 @@ void Raw2DsModule::registerRawCOPPERs()
   unsigned int ctime = 0;
   unsigned long long int mtime = 0;
 
+  int store_time_flag = 0;
+
   // Store data contents in Corresponding RawXXXX
   for (int cprid = 0; cprid < ncprs * npackedevts; cprid++) {
     // Pick up one COPPER and copy data in a temporary buffer
@@ -181,9 +183,18 @@ void Raw2DsModule::registerRawCOPPERs()
       // Tentative for DESY TB 2017
       utime = (unsigned int)(ftsw->GetTTUtime(0));
       ctime = (unsigned int)(ftsw->GetTTCtime(0));
-      mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(ctime / 0.127216);
-
+      mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(std::round(ctime / 0.127216));
+      store_time_flag = 1;
       continue;
+    } else if (store_time_flag == 0) {
+      // Tentative until RawFTSW data stream is established. 2018.5.28
+      // Not store RawCOPPER here. 2018.11.23
+      RawCOPPER tempcpr_time;
+      tempcpr_time.SetBuffer(cprbuf, nwds_buf, false, 1, 1);
+      utime = (unsigned int)(tempcpr_time.GetTTUtime(0));
+      ctime = (unsigned int)(tempcpr_time.GetTTCtime(0));
+      mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(std::round(ctime / 0.127216));
+      store_time_flag = 1;
     }
 
     // Set one block to RawCOPPER
@@ -222,12 +233,24 @@ void Raw2DsModule::registerRawCOPPERs()
       StoreArray<RawTRG> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     } else {
-      StoreArray<RawCOPPER> ary;
-      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+
+      // Do not store Unknown RawCOPPER object. 2018.11.25
+      printf("[WARNING] Unknown COPPER ID : ");
+      for (int i = 0; i < 12; i++) {
+        printf("0x%.8x ", cprbuf[ i ]);
+      }
+      printf("\n");
+      B2FATAL("Unknown COPPER ID is found. CPRID = " << hex << subsysid << " Please check. Exiting...");
+      exit(1);
+      // StoreArray<RawCOPPER> ary;
+      // (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     }
     //    delete[] cprbuf;
   }
 
+  if (store_time_flag != 1) {
+    B2FATAL("No time information could be extracted from Data. That should not happen. Exiting...");
+  }
   StoreObjPtr<EventMetaData> evtmetadata;
   evtmetadata.create();
   evtmetadata->setExperiment(sndhdr.GetExpNum());

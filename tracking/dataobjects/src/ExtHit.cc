@@ -107,6 +107,26 @@ ExtHit::ExtHit(const ExtHit& h) :
   }
 }
 
+// Assignment operator
+ExtHit& ExtHit::operator=(const ExtHit& h)
+{
+  m_PdgCode = h.m_PdgCode;
+  m_DetectorID = h.m_DetectorID;
+  m_CopyID = h.m_CopyID;
+  m_Status = h.m_Status;
+  m_TOF = h.m_TOF;
+  m_Position[0] = h.m_Position[0];
+  m_Position[1] = h.m_Position[1];
+  m_Position[2] = h.m_Position[2];
+  m_Momentum[0] = h.m_Momentum[0];
+  m_Momentum[1] = h.m_Momentum[1];
+  m_Momentum[2] = h.m_Momentum[2];
+  for (int k = 0; k < 21; ++k) {
+    m_Covariance[k] = h.m_Covariance[k];
+  }
+  return *this;
+}
+
 // Get phase-space covariance at this extrapolation hit
 TMatrixDSym ExtHit::getCovariance() const
 {

@@ -11,19 +11,18 @@
 </header>
 """
 
-from basf2 import *
+from basf2 import set_random_seed, create_path, process, statistics
 from simulation import add_simulation
 from L1trigger import add_tsim
 from validation import statistics_plots, event_timing_plot
 from background import get_background_files
-import validationtools
 
 set_random_seed(12345)
 
 main = create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[1])
+main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[0])
 
 # generate BBbar events
 main.add_module('EvtGenInput')
@@ -45,9 +44,15 @@ process(main)
 # Print call statistics
 print(statistics)
 
-statistics_plots('EvtGenSim_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation job with generic EvtGen events',
-                 prefix='EvtGenSim')
-event_timing_plot('../EvtGenSim.root', 'EvtGenSim_statistics.root', contact='tkuhr',
-                  jobDesc='a standard simulation job with generic EvtGen events',
-                  prefix='EvtGenSim')
+statistics_plots(
+    'EvtGenSim_statistics.root',
+    contact='tkuhr',
+    job_desc='a standard simulation job with generic EvtGen events',
+    prefix='EvtGenSim'
+)
+event_timing_plot(
+    '../EvtGenSim.root', 'EvtGenSim_statistics.root',
+    contact='tkuhr',
+    job_desc='a standard simulation job with generic EvtGen events',
+    prefix='EvtGenSim'
+)

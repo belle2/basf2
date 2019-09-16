@@ -36,6 +36,15 @@ namespace Belle2 {
      */
     ~CDCDedxRunGain() {};
 
+    /**
+     * Combine payloads
+     **/
+    CDCDedxRunGain& operator*=(CDCDedxRunGain const& rhs)
+    {
+      m_gain *= rhs.getRunGain();
+      return *this;
+    }
+
     /** Return run gain
      * @return run gain
      */
@@ -49,6 +58,6 @@ namespace Belle2 {
   private:
     double m_gain; /**< Run gain */
 
-    ClassDef(CDCDedxRunGain, 3); /**< ClassDef */
+    ClassDef(CDCDedxRunGain, 4); /**< ClassDef */
   };
 } // end namespace Belle2

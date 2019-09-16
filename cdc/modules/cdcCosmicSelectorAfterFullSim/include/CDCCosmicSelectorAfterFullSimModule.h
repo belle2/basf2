@@ -32,13 +32,13 @@ namespace Belle2 {
     CDCCosmicSelectorAfterFullSimModule();
 
     /** Initialize variables, print info, and start CPU clock. */
-    void initialize();
+    void initialize() override;
 
     /** Actual digitization of all hits in the CDC.
      *
      *  The digitized hits are written into the DataStore.
      */
-    void event();
+    void event() override;
 
   private:
     StoreArray<MCParticle> m_mcParticles; /**< array of MCParticle */

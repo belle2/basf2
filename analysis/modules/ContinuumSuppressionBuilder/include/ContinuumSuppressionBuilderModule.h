@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CONTINUUMSUPPRESSIONBUILDERMODULE_H
-#define CONTINUUMSUPPRESSIONBUILDERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <analysis/dataobjects/Particle.h>
@@ -20,41 +19,28 @@
 
 namespace Belle2 {
   /**
-   * Creates for each Particle in given ParticleList an ContinuumSuppression dataobject and makes BASF2 relation between them.
-   *
-   *    *
+   * Creates for each Particle in given ParticleList an ContinuumSuppression
+   * dataobject and makes BASF2 relation between them.
    */
   class ContinuumSuppressionBuilderModule : public Module {
-
   public:
 
-    /**
-     * Constructor: Sets the description, the properties and the parameters of the module.
-     */
+    /** constructor */
     ContinuumSuppressionBuilderModule();
-
-    /**  */
+    /** initialize the module (setup the data store) */
     virtual void initialize() override;
-
-    /** n */
+    /** process event */
     virtual void event() override;
-
 
   private:
 
     std::string m_particleList;  /**< Name of the ParticleList */
     std::string m_ROEMask;  /**< ROE mask */
 
-    /**
-     * for debugging purposes
-     */
+    /** print an event for debugging purposes */
     void printEvent();
-
-    /**
-     * for debugging purposes
-     */
+    /** print a particle for debugging purposes */
     void printParticle(const Particle* particle);
   };
 }
 
-#endif /* CONTINUUMSUPPRESSIONBUILDERMODULE_H */

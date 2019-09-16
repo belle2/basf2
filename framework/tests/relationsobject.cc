@@ -14,7 +14,7 @@ namespace {
   class RelationsObjectTest : public ::testing::Test {
   protected:
     /** fill StoreArrays with entries from 0..9 */
-    virtual void SetUp()
+    void SetUp() override
     {
       evtData.registerInDataStore();
       profileData.registerInDataStore();
@@ -28,7 +28,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -85,20 +85,20 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     //not yet set
-    EXPECT_FALSE((relObjData)[0]->getRelated<ProfileInfo>() != NULL);
+    EXPECT_FALSE((relObjData)[0]->getRelated<ProfileInfo>() != nullptr);
 
     (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
 
     //now it should be found (index updated because RelationContainer was just created)
-    EXPECT_TRUE((relObjData)[0]->getRelated<ProfileInfo>() != NULL);
+    EXPECT_TRUE((relObjData)[0]->getRelated<ProfileInfo>() != nullptr);
 
     //test again with different object
-    EXPECT_FALSE((relObjData)[1]->getRelated<ProfileInfo>() != NULL);
+    EXPECT_FALSE((relObjData)[1]->getRelated<ProfileInfo>() != nullptr);
 
     (relObjData)[1]->addRelationTo((profileData)[0], -42.0);
 
     //now it should be found (index updated because addRelation marks RelationContainer as modified)
-    EXPECT_TRUE((relObjData)[1]->getRelated<ProfileInfo>() != NULL);
+    EXPECT_TRUE((relObjData)[1]->getRelated<ProfileInfo>() != nullptr);
   }
 
   /** Test getting array name/index from a RelationsObject. */
@@ -200,5 +200,64 @@ namespace {
     EXPECT_EQ(0u, relObjData[0]->getRelationsWith<ProfileInfo>().size());
   }
 
+  /** Test using named relations */
+  TEST_F(RelationsObjectTest, NamedRelationsWithInvalidName)
+  {
+    const std::string relationName = "ExtraRelation WithSpaceInName";
+    EXPECT_B2FATAL(relObjData.registerRelationTo(profileData, DataStore::c_Event, DataStore::c_WriteOut, relationName));
+  }
+
+  /** Test using named relations */
+  TEST_F(RelationsObjectTest, NamedRelations)
+  {
+    const std::string relationName = "ExtraRelation";
+    relObjData.registerRelationTo(profileData, DataStore::c_Event, DataStore::c_WriteOut, relationName);
+    DataStore::Instance().setInitializeActive(false);
+
+    //check the hasRelation finder works with and without names
+    EXPECT_TRUE(relObjData.hasRelationTo(profileData, DataStore::c_Event, relationName));
+    EXPECT_FALSE(profileData.hasRelationTo(relObjData, DataStore::c_Event, relationName));
+    EXPECT_FALSE(profileData.hasRelationTo(evtData, DataStore::c_Event, relationName));
+    EXPECT_FALSE(relObjData.hasRelationTo(profileData));
+    EXPECT_FALSE(profileData.hasRelationTo(relObjData));
+
+    (relObjData)[0]->addRelationTo((profileData)[0], -42.0, relationName);
+
+    //getRelations
+    RelationVector<ProfileInfo> rels = (relObjData)[0]->getRelationsTo<ProfileInfo>("", relationName);
+    EXPECT_TRUE(rels.size() == 1);
+    EXPECT_TRUE(rels.object(0) == (profileData)[0]);
+    EXPECT_DOUBLE_EQ(rels.weight(0), -42.0);
+    EXPECT_EQ(0u, relObjData[1]->getRelationsTo<ProfileInfo>("", relationName).size());
+    EXPECT_EQ(0u, relObjData[0]->getRelationsFrom<ProfileInfo>("", relationName).size());
+    EXPECT_EQ(1u, relObjData[0]->getRelationsWith<ProfileInfo>("", relationName).size());
+
+    //getRelated
+    EXPECT_TRUE(profileData[0] == relObjData[0]->getRelatedTo<ProfileInfo>("", relationName));
+    EXPECT_TRUE(nullptr == relObjData[1]->getRelatedTo<ProfileInfo>("", relationName));
+    EXPECT_TRUE(nullptr == relObjData[0]->getRelatedFrom<ProfileInfo>("", relationName));
+    EXPECT_TRUE(profileData[0] == relObjData[0]->getRelated<ProfileInfo>("", relationName));
+
+    //getRelatedWithWeight
+    EXPECT_TRUE(std::make_pair(profileData[0], -42.0f) == relObjData[0]->getRelatedToWithWeight<ProfileInfo>("", relationName));
+    ProfileInfo* profileNullPtr = nullptr;
+    EXPECT_TRUE(std::make_pair(profileNullPtr, 1.0f) == relObjData[1]->getRelatedToWithWeight<ProfileInfo>("", relationName));
+    EXPECT_TRUE(std::make_pair(profileNullPtr, 1.0f) == relObjData[0]->getRelatedFromWithWeight<ProfileInfo>("", relationName));
+    EXPECT_TRUE(std::make_pair(profileData[0], -42.0f) == relObjData[0]->getRelatedWithWeight<ProfileInfo>("", relationName));
+
+    // Check if the "ALL" parameter also works
+    StoreEntry* storeEntry = nullptr;
+    int index = -1;
+    auto allRelations = DataStore::Instance().getRelationsWith(DataStore::c_FromSide, (relObjData)[0], storeEntry, index,
+                                                               TObject::Class(), "ALL", "");
+
+    //adding relations to NULL is safe and doesn't do anything
+    (relObjData)[0]->addRelationTo(static_cast<TObject*>(nullptr), 1.0, relationName);
+    (relObjData)[0]->addRelationTo(static_cast<ProfileInfo*>(nullptr), 1.0, relationName);
+
+    //if we cannot create a relation to an actual object given, this is obivously wrong
+    ProfileInfo notInArray;
+    EXPECT_B2FATAL((relObjData)[0]->addRelationTo(&notInArray, 1.0, relationName));
+  }
 
 }  // namespace

@@ -22,7 +22,7 @@ REG_MODULE(ExtraInfoRemover)
 ExtraInfoRemoverModule::ExtraInfoRemoverModule() : Module()
 {
   //Set module properties
-  setDescription("Filter based on ParticleLists, by setting return value to true if at least one of the given lists is not empty.");
+  setDescription("Deletes the ExtraInfo from each particle in the given ParticleLists.");
   setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
   addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
@@ -57,8 +57,3 @@ void ExtraInfoRemoverModule::event()
   }
 
 }
-
-void ExtraInfoRemoverModule::terminate()
-{
-}
-

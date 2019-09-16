@@ -45,10 +45,10 @@ namespace Belle2 {
     const unsigned short NApvPerHybrid   = 6;
 
     const unsigned short nSensorID   =
-      (const unsigned short)(nSensor_L3 * nLadder_L3 +
-                             nSensor_L4 * nLadder_L4 +
-                             nSensor_L5 * nLadder_L5 +
-                             nSensor_L6* nLadder_L6)* nPN;
+      (unsigned short)(nSensor_L3 * nLadder_L3 +
+                       nSensor_L4 * nLadder_L4 +
+                       nSensor_L5 * nLadder_L5 +
+                       nSensor_L6* nLadder_L6) * nPN;
 
 
     short getSVDSensorID(const unsigned short layer,

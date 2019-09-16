@@ -8,12 +8,15 @@ from simulation import add_simulation
 from reconstruction import add_reconstruction
 from ROOT import Belle2
 
-# reset_database()
-# use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
+numEvents = 10000
 
-numEvents = 2000
-
-# first register the modules
+# CoG calibration - CAF - BEGIN
+use_database_chain()
+# no cuts on cluster time
+# use_central_database("svd_testGT_noSVDHitTimeSelection")
+# no time in the sectormaps:
+use_local_database("centraldb/dbcache.txt", "centraldb", invertLogging=True)
+# CoG calibration - CAF - END
 
 set_random_seed(1)
 
@@ -34,13 +37,29 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(evtgeninput)
-add_simulation(main, components=['MagneticField', 'SVD'], usePXDDataReduction=False)
-add_reconstruction(main, components=['MagneticField', 'SVD'])
+add_simulation(main)
+add_reconstruction(main)
+
+# CoG calibration - CAF - BEGIN
+fil = register_module('SVDShaperDigitsFromTracks')
+fil.param('outputINArrayName', 'SVDShaperDigitsFromTracks')
+main.add_module(fil)
+
+input_branches = [
+    'SVDShaperDigitsFromTracks',
+    'EventT0',
+    'SVDShaperDigits'
+]
+
+main.add_module("RootOutput", branchNames=input_branches, outputFileName="RootOutput_CoGCalibration_10k.root")
+
+# CoG calibration - CAF - END
 
 # display = register_module("Display")
 # main.add_module(display)
+# main.add_module('RootOutput')
 
-main.add_module('RootOutput')
+print_path(main)
 
 # Process events
 process(main)

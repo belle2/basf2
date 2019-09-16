@@ -8,40 +8,30 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_FRAME
-#define ECL_FRAME
+#pragma once
 
 #define ECLDISPLAY_OPENGL_PAINTER
 
-#include <TGClient.h>
-#include <TCanvas.h>
-#include <TFrame.h>
-#include <TRandom.h>
-#include <TGButton.h>
+//Root
 #include <TGFrame.h>
-#include <TGDoubleSlider.h>
-#include <TRootEmbeddedCanvas.h>
-#include <TGNumberEntry.h>
-#include <TGListTree.h>
-#include <TGFileDialog.h>
-#include <TGMenu.h>
-#include <TTimer.h>
-#include <TCanvas.h>
-#include <TGeoVolume.h>
-#include <TGComboBox.h>
-#include <TGLabel.h>
-#include <TStyle.h>
-#include <TSystem.h>
 
-#include <ecl/utility/ECLChannelMapper.h>
-
+//ECL
 #include <ecl/modules/eclDisplay/EclData.h>
-#include <ecl/modules/eclDisplay/geometry.h>
-#include <ecl/modules/eclDisplay/MultilineWidget.h>
 #include <ecl/modules/eclDisplay/EclPainterFactory.h>
-#include <ecl/modules/eclDisplay/EclPainter.h>
+
+class TRootEmbeddedCanvas;
+class TGDoubleHSlider;
+class TGNumberEntry;
+class TGListTreeItem;
+class TGListTree;
+class TGCheckButton;
 
 namespace Belle2 {
+
+  class MultilineWidget;
+  class ECLChannelMapper;
+  class ECLPainter;
+
   /**
    * Root TGMainFrame that contains multiple widgets that display the
    * ECLSimHit's w.r.t. structure of ECL geometry and its data acquisition
@@ -207,5 +197,3 @@ namespace Belle2 {
     ClassDef(EclFrame, 0)
   };
 }
-
-#endif // ECL_FRAME

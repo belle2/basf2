@@ -14,7 +14,7 @@
 #include "daq/roisend/b2_socket.h"
 
 
-const int
+int
 b2_timed_blocking_io(const int sd, const int timeout /* secs */)
 {
   int ret;
@@ -63,7 +63,7 @@ b2_timed_blocking_io(const int sd, const int timeout /* secs */)
 }
 
 
-const int
+int
 b2_build_sockaddr_in(const char* hostname, const unsigned short port, struct sockaddr_in* in)
 {
   memset(in, 0, sizeof(struct sockaddr_in));
@@ -85,7 +85,7 @@ b2_build_sockaddr_in(const char* hostname, const unsigned short port, struct soc
 }
 
 
-static const int
+static int
 b2_create_tcp_socket(void)
 {
   int sd, ret, one = 1;
@@ -116,7 +116,7 @@ b2_create_tcp_socket(void)
 }
 
 
-const int /* returns socket descriptor */
+int /* returns socket descriptor */
 b2_create_accept_socket(const unsigned short port) /* in reality DOES NOT accept */
 {
   int sd, ret;
@@ -152,7 +152,7 @@ b2_create_accept_socket(const unsigned short port) /* in reality DOES NOT accept
 }
 
 
-const int /* returns socket descriptor */
+int /* returns socket descriptor */
 b2_create_connect_socket(const char* hostname, const unsigned short port)
 {
   int sd, ret;
@@ -182,7 +182,7 @@ b2_create_connect_socket(const char* hostname, const unsigned short port)
 }
 
 
-const int
+int
 b2_send(const int sd, const void* buf, const size_t size)
 {
   unsigned char* ptr = (unsigned char*)buf;
@@ -208,14 +208,15 @@ b2_send(const int sd, const void* buf, const size_t size)
 
     n_bytes_send      = ret;
     ptr              += n_bytes_send;
-    n_bytes_remained -= n_bytes_send;
 
-    if (n_bytes_remained < 0)
+    if (n_bytes_remained < size_t(n_bytes_send))
       /* overrun: internal error */
     {
       fprintf(stderr, "%s:%d: send(): Internal error\n", __FILE__, __LINE__);
       return -1;
     }
+    n_bytes_remained -= n_bytes_send;
+
     if (n_bytes_remained == 0)
       /* fully sendout */
     {
@@ -228,7 +229,7 @@ b2_send(const int sd, const void* buf, const size_t size)
 }
 
 
-const int
+int
 b2_recv(const int sd,       void* buf, const size_t size)
 {
   unsigned char* ptr = (unsigned char*)buf;
@@ -254,14 +255,14 @@ b2_recv(const int sd,       void* buf, const size_t size)
 
     n_bytes_recv      = ret;
     ptr              += n_bytes_recv;
-    n_bytes_remained -= n_bytes_recv;
-
-    if (n_bytes_remained < 0)
+    if (n_bytes_remained < size_t(n_bytes_recv))
       /* overrun: internal error */
     {
       fprintf(stderr, "%s:%d: recv(): Internal error\n", __FILE__, __LINE__);
       return -1;
     }
+    n_bytes_remained -= n_bytes_recv;
+
     if (n_bytes_remained == 0)
       /* fully readout */
     {

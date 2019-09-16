@@ -28,10 +28,12 @@ DQMHistAnalysisInputModule::DQMHistAnalysisInputModule()
   //Parameter definition
   addParam("HistMemoryPath", m_mempath, "Path to Input Hist memory", std::string(""));
   addParam("HistMemorySize", m_memsize, "Size of Input Hist memory", 10000000);
+  addParam("HistMemoryName", m_memname, "Name of Input Hist memory", std::string(""));
   addParam("RefreshInterval", m_interval, "Refresh interval of histograms", 10);
   addParam("AutoCanvas", m_autocanvas, "Automatic creation of canvas", true);
   addParam("AutoCanvasFolders", m_acfolders, "List of folders for which to automatically create canvases, empty for all",
            std::vector<std::string>());
+  addParam("RemoveEmpty", m_remove_empty, "Remove empty histograms", false);
   B2DEBUG(1, "DQMHistAnalysisInput: Constructor done.");
 }
 
@@ -40,17 +42,18 @@ DQMHistAnalysisInputModule::~DQMHistAnalysisInputModule() { }
 
 void DQMHistAnalysisInputModule::initialize()
 {
-  m_expno = m_runno = 0;
-  m_count = 0;
+  if (m_memory != nullptr) delete m_memory;
   m_memory = new DqmMemFile(m_mempath.c_str());
   m_eventMetaDataPtr.registerInDataStore();
+  m_c_info = new TCanvas("DQMInfo/c_info", "");
   B2INFO("DQMHistAnalysisInput: initialized.");
 }
 
 
 void DQMHistAnalysisInputModule::beginRun()
 {
-  //B2INFO("DQMHistAnalysisInput: beginRun called.");
+  B2INFO("DQMHistAnalysisInput: beginRun called.");
+  m_c_info->SetTitle("");
 }
 
 void DQMHistAnalysisInputModule::event()
@@ -58,17 +61,30 @@ void DQMHistAnalysisInputModule::event()
   sleep(m_interval);
   std::vector<TH1*> hs;
   TMemFile* file = m_memory->LoadMemFile();
+
+  const TDatime& mt = file->GetModificationDate();
+  std::string expno("UNKNOWN"), runno("UNKNOWN");
+
   file->cd();
   TIter next(file->GetListOfKeys());
   TKey* key = NULL;
   while ((key = (TKey*)next())) {
     TH1* h = (TH1*)key->ReadObj();
     if (h == NULL) continue; // would be strange, but better check
+    if (m_remove_empty && h->GetEntries() == 0) continue;
     // Remove ":" from folder name, workaround!
     TString a = h->GetName();
     a.ReplaceAll(":", "");
     h->SetName(a);
+    B2DEBUG(1, "DQMHistAnalysisInput: get histo " << a.Data());
+
+    if (StringUtil::split(a.Data(), '/').size() <= 1) continue;
+
+    std::string dir_name = StringUtil::split(a.Data(), '/')[0];
+
     hs.push_back(h);
+    if (std::string(h->GetName()) == std::string("DQMInfo/expno")) expno = h->GetTitle();
+    if (std::string(h->GetName()) == std::string("DQMInfo/runno")) runno = h->GetTitle();
     if (m_autocanvas) {
       StringList s = StringUtil::split(a.Data(), '/');
 
@@ -101,6 +117,7 @@ void DQMHistAnalysisInputModule::event()
           }
         }
         TCanvas* c = m_cs[name];
+        B2DEBUG(1, "DQMHistAnalysisInput: new canvas " << c->GetName());
         c->cd();
         if (h->GetDimension() == 1) {
           h->Draw("hist");
@@ -111,11 +128,16 @@ void DQMHistAnalysisInputModule::event()
       }
     }
   }
+  if (expno == std::string("UNKNOWN") || runno == std::string("UNKNOWN"))
+    m_c_info->SetTitle((m_memname + ": Last Updated " + mt.AsString()).c_str());
+  else
+    m_c_info->SetTitle((m_memname + ": Exp " + expno + ", Run " + runno + ", Last Updated " + mt.AsString()).c_str());
+  B2INFO("DQMHistAnalysisInput: " << m_memname + ": Exp " + expno + ", Run " + runno + ", Last Updated " + mt.AsString());
   resetHist();
   for (size_t i = 0; i < hs.size(); i++) {
     TH1* h = hs[i];
     addHist("", h->GetName(), h);
-    B2INFO("Found : " << h->GetName() << " : " << h->GetEntries());
+    B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());
     std::string vname = h->GetName();
     setFloatValue(vname + ".entries", h->GetEntries());
     if (h->GetDimension() == 1) {

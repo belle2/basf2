@@ -39,10 +39,6 @@ PXDclusterFilterModule::PXDclusterFilterModule() : Module()
 
 }
 
-PXDclusterFilterModule::~PXDclusterFilterModule()
-{
-}
-
 void PXDclusterFilterModule::initialize()
 {
 
@@ -60,10 +56,6 @@ void PXDclusterFilterModule::initialize()
     m_selectorOUT.registerSubset(PXDClusters, m_PXDClustersOutsideROIName);
     m_selectorOUT.inheritAllRelations();
   }
-}
-
-void PXDclusterFilterModule::beginRun()
-{
 }
 
 bool PXDclusterFilterModule::Overlaps(const ROIid& theROI, const PXDCluster& thePXDCluster)
@@ -117,12 +109,4 @@ void PXDclusterFilterModule::event()
     });
   }
 
-}
-
-void PXDclusterFilterModule::endRun()
-{
-}
-
-void PXDclusterFilterModule::terminate()
-{
 }

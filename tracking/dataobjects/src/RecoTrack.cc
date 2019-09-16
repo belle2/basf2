@@ -6,6 +6,9 @@
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/WireTrackCandHit.h>
+#include <genfit/RKTrackRep.h>
+#include <genfit/MplTrackRep.h>
+#include <simulation/monopoles/MonopoleConstants.h>
 
 #include <framework/dataobjects/Helix.h>
 
@@ -129,7 +132,7 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
     genfit::TrackCandHit* trackCandHit = trackCand.getHit(hitIndex);
     const int detID = trackCandHit->getDetId();
     const int hitID = trackCandHit->getHitId();
-    const unsigned int sortingParameter = recreateSortingParameters ? hitIndex : static_cast<const unsigned int>
+    const unsigned int sortingParameter = recreateSortingParameters ? hitIndex : static_cast<unsigned int>
                                           (trackCandHit->getSortingParameter());
     if (detID == Const::CDC) {
       UsedCDCHit* cdcHit = cdcHits[hitID];
@@ -343,8 +346,7 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
   }
 
   // make sure we only consider fitted if the Kalman method was used
-  const genfit::KalmanFitStatus* kfs = dynamic_cast<const genfit::KalmanFitStatus*>(fs);
-  if (not kfs) {
+  if (not dynamic_cast<const genfit::KalmanFitStatus*>(fs)) {
     return false;
   }
 
@@ -380,7 +382,6 @@ void RecoTrack::prune()
     dynamic_cast<RecoHitInformation*>(relatedRecoHitInformations[i].object)->setCreatedTrackPointID(-1);
   }
 
-
   // Genfits prune method fails, if the number of hits is too small.
   if (getHitPointsWithMeasurement().size() >= 2) {
     m_genfitTrack.prune("FL");
@@ -390,6 +391,23 @@ void RecoTrack::prune()
 genfit::Track& RecoTrackGenfitAccess::getGenfitTrack(RecoTrack& recoTrack)
 {
   return recoTrack.m_genfitTrack;
+}
+
+genfit::AbsTrackRep* RecoTrackGenfitAccess::createOrReturnRKTrackRep(RecoTrack& recoTrack, int PDGcode)
+{
+  // try to get the trackRep, if it has already been added
+  genfit::AbsTrackRep* trackRepresentation = recoTrack.getTrackRepresentationForPDG(std::abs(PDGcode));
+
+  // not available? create one
+  if (trackRepresentation == nullptr) {
+    if (PDGcode == Monopoles::c_monopolePDGCode) {
+      trackRepresentation = new genfit::MplTrackRep(PDGcode, Monopoles::monopoleMagCharge);
+    } else {
+      trackRepresentation = new genfit::RKTrackRep(PDGcode);
+    }
+    RecoTrackGenfitAccess::getGenfitTrack(recoTrack).addTrackRep(trackRepresentation);
+  }
+  return trackRepresentation;
 }
 
 const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
@@ -424,10 +442,38 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(
 void RecoTrack::deleteFittedInformation()
 {
   // Delete all fitted information for all representations
-  for (unsigned int i = 0; i < getRepresentations().size(); i++) {
-    m_genfitTrack.deleteTrackRep(i);
+  for (const genfit::AbsTrackRep* rep : getRepresentations()) {
+    deleteFittedInformationForRepresentation(rep);
   }
 }
+
+void RecoTrack::deleteFittedInformationForRepresentation(const genfit::AbsTrackRep* rep)
+{
+  m_genfitTrack.deleteFittedState(rep);
+}
+
+genfit::AbsTrackRep* RecoTrack::getTrackRepresentationForPDG(int pdgCode)
+{
+  if (pdgCode < 0) {
+    B2FATAL("Only positive pdgCode is possible when calling getTrackRepresentationForPDG, got " << pdgCode);
+  }
+
+  const std::vector<genfit::AbsTrackRep*>& trackRepresentations = getRepresentations();
+
+  for (genfit::AbsTrackRep* trackRepresentation : trackRepresentations) {
+    // Check if the track representation is a RKTrackRep.
+    const genfit::RKTrackRep* rkTrackRepresenation = dynamic_cast<const genfit::RKTrackRep*>(trackRepresentation);
+    if (rkTrackRepresenation != nullptr) {
+      // take the aboslute value of the PDG code as the TrackRep holds the PDG code including the charge (so -13 or 13)
+      if (std::abs(rkTrackRepresenation->getPDG()) == pdgCode) {
+        return trackRepresentation;
+      }
+    }
+  }
+
+  return nullptr;
+}
+
 
 /// Helper function to get the seed or the measured state on plane from a track
 std::tuple<TVector3, TVector3, short> RecoTrack::extractTrackState() const
@@ -492,6 +538,7 @@ std::vector<RecoHitInformation*> RecoTrack::getRecoHitInformations(bool getSorte
 
   hitList.reserve(recoHitInformations.size());
   for (auto& recoHit : recoHitInformations) {
+    // cppcheck-suppress useStlAlgorithm
     hitList.push_back(&recoHit);
   }
 

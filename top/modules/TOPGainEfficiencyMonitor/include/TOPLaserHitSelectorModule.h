@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Maeda Yosuke                                             *
+ * Contributors: Maeda Yosuke, Okuto Rikuya                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -55,55 +55,63 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /**
      * create timing-height 2D histograms for all 8192 pixels
      */
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   private:
 
-    TH2F* m_timeHeightHistogram[c_NPixelPerModule *
-                                c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) */
-    TH1F* m_nCalPulseHistogram; /**< histogram to store the number of events with calibration pulse(s) identified for each asic (1,024 in total),
+    TH2F* m_TimeHeightHistogramForFit[c_NPixelPerModule *
+                                      c_NModule] = {0}; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for gain*/
+    TH2F* m_TimeHeightHistogramForHitRate[c_NPixelPerModule *
+                                          c_NModule] = {0}; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for efficiency */
+    TH2F* m_TimeIntegralHistogramForFit[c_NPixelPerModule *
+                                        c_NModule] = {0}; /**< array of histogram pointer to 2D histogram of hit timing vs integral distribution for each pixel (all 8,192 pixels) for gain*/
+    TH1F* m_nCalPulseHistogram =
+      0; /**< histogram to store the number of events with calibration pulse(s) identified for each asic (1,024 in total),
          the x-axis means global asic ID, defined as (slotNum-1)*64+(pixelID-1) */
 
     std::vector<int>
     m_timeHistogramBinning; /**< histogram binning of hit timing distribution, in the order of number of bins, lower limit, upper limit */
     std::vector<int>
-    m_heightHistogramBinning; /**< histogram binning of pulse height distribution, in the order of number of bins, lower limit, upper limit */
+    m_chargeHistogramBinning; /**< histogram binning of pulse height distribution, in the order of number of bins, lower limit, upper limit */
 
     bool m_useDoublePulse = true; /**< set true when you require both of double calibration pulses for reference timing */
     float m_calibrationPulseThreshold1 =
-      600; /**< minimum pulse height for the first calibration pulse to be qualified as calibration signals */
+      300; /**< minimum pulse height for the first calibration pulse to be qualified as calibration signals */
     float m_calibrationPulseThreshold2 =
-      450; /**< minimum pulse height for the secon calibration pulse to be qualified as calibration signals */
-    float m_calibrationPulseInterval = 21.85; /**< nominal DeltaT value (time interval of two calibration signals) in a unit of ns */
+      100; /**< minimum pulse height for the secon calibration pulse to be qualified as calibration signals */
+    float m_calibrationPulseInterval = 25.5; /**< nominal DeltaT value (time interval of two calibration signals) in a unit of ns */
     float m_calibrationPulseIntervalRange = 2; /**< tolerable shift of DeltaT from its nominal before calibration in a unit of ns */
+    int m_windowSelect = 0; /**< select window number is [All=0, Odd=2, Even=1]*/
+    bool m_includePrimaryChargeShare = false; /**< set true when you require without chargeshare cut for making 2D histogram */
+    bool m_includeAllChargeShare = false; /**< set true when you require without chargeshare cut for making 2D histogram */
   };
 
 }  //namespace Belle2

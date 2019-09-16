@@ -21,10 +21,10 @@ namespace Belle2 {
     static void g_handler_int(int) { exit(0); }
 
   public:
-    Fork() throw() : m_pid(-1) {}
+    Fork() : m_pid(-1) {}
 
     template<class WORKER>
-    Fork(WORKER* worker, bool detached = true) throw()
+    Fork(WORKER* worker, bool detached = true)
     {
       m_pid = fork();
       if (m_pid == 0) {
@@ -38,7 +38,7 @@ namespace Belle2 {
         delete worker;
       }
     }
-    ~Fork() throw() {}
+    ~Fork() {}
 
   public:
     pid_t get_id() const { return m_pid; }

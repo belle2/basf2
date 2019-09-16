@@ -39,3 +39,24 @@ double Belle2::ECL::ShaperDSP(double Ti, const double* s)
   }
   return svp * scale;
 }
+//
+double Belle2::ECL::ShaperDSPofflineFit(double Ti, const double* s, double scale)
+{
+  //
+  //Used to fit and draw offline fit results.
+  //
+  double t  = Ti - s[0];
+  const double dt = 0.2;
+  // Sv123 is defined everywhere so no restriction on t
+  double fm = Sv123(t - dt, s[2], s[3], s[7], s[8], s[1], s[4]);
+  double f0 = Sv123(t   , s[2], s[3], s[7], s[8], s[1], s[4]);
+  double fp = Sv123(t + dt, s[2], s[3], s[7], s[8], s[1], s[4]);
+  double w = s[9];
+  double svp = (1 - w) * f0 + (0.5 * w) * (fp + fm);
+
+  if (t > 0) {
+    double y = t / s[6], z = t / s[2];
+    svp -= s[5] * exp(-y) * (1 - exp(-z) * (1 + z * (1 + z * (1 / 2. + z * (1 / 6. + z * (1 / 24. + z * (1 / 120.)))))));
+  }
+  return svp * scale;
+}

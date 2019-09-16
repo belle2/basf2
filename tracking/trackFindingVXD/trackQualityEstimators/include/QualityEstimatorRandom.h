@@ -14,11 +14,14 @@
 #include <TRandom.h>
 
 namespace Belle2 {
+  /// Class implementing a random quality estimation
   class QualityEstimatorRandom : public QualityEstimatorBase {
 
   public:
-
+    /** Returning a random quality indicator for the given track candidate
+     * Value is uniformly distributed between 0.0 and 1.0.
+     * @return : random quality indicator value
+     */
     virtual double estimateQuality(std::vector<SpacePoint const*> const&) final { return gRandom->Uniform(1.0); };
   };
 }
-

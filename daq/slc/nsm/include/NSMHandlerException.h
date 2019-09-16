@@ -8,8 +8,13 @@ namespace Belle2 {
   class NSMHandlerException : public IOException {
 
   public:
-    NSMHandlerException(const std::string& format, ...) throw();
-    NSMHandlerException() throw() {}
+    NSMHandlerException(const std::string& format, ...);
+    NSMHandlerException() {}
+#if __GNUC__ >= 7
+    ~NSMHandlerException() {}
+#else
+    ~NSMHandlerException() throw() {}
+#endif
 
   };
 

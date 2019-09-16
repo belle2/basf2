@@ -41,6 +41,7 @@ namespace Belle2 {
     enum EventErrorFlag {
       c_B2LinkPacketCRCError = 0x1, /**< Belle2link CRC error  is detected in the event */
       c_B2LinkEventCRCError = 0x2, /**< HSLB_COPPER CRC error  is detected in the event */
+      c_HLTCrash = 0x4, /**< The HLT reconstruction crashed in this event or the event before. */
     };
 
     /** Event Setter.
@@ -91,8 +92,17 @@ namespace Belle2 {
      */
     void setEndOfData();
 
+    /** Marks the end of the current run. Is only used and understood in special HLT processing.
+     *
+     * Can only be used by the first ZMQ input module.
+     */
+    void setEndOfRun(unsigned int experimentNumber, unsigned int runNumber);
+
     /** is end-of-data set? (see setEndOfData()). */
     bool isEndOfData() const;
+
+    /** is end-of-run set? (see setEndOfRun()). */
+    bool isEndOfRun() const;
 
     /** Parent LFN Setter.
      *

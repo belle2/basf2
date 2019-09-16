@@ -9,45 +9,44 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DelayDQMMODULE_H_
-#define DelayDQMMODULE_H_
+#pragma once
 
 #include <framework/core/HistoModule.h>
-
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include "TH1D.h"
 
 namespace Belle2 {
 
-  /**  Delay DQM  Module */
+  /** Processing Delay DQM Module */
   class DelayDQMModule : public HistoModule {
 
   public:
 
     /** Constructor */
     DelayDQMModule();
-    /* Destructor */
-    virtual ~DelayDQMModule();
+
+  private:
 
     /** Module functions */
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void initialize() override final;
+    void beginRun() override final;
+    void event() override final;
 
-    virtual void defineHisto();
+    void defineHisto() override final;
 
   private:
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
     std::string m_title; /**< Prefix for title (NOT histo name) */
 
-    TH1D* m_DelayS;          /**< Delay between trigger and end of processing in s */
-    TH1D* m_DelayMs;          /**< Delay between trigger and end of processing in ms*/
-    TH1D* m_DelayLog;          /**< Delay between trigger and end of processing log scale */
+    /** Input ptr for EventMetaData. */
+    StoreObjPtr<EventMetaData> m_eventMetaData;
 
-    void BinLogX(TH1* h);
+    TH1D* m_DelayS = nullptr;        /**< Delay between trigger and end of processing in s */
+    TH1D* m_DelayMs = nullptr;        /**< Delay between trigger and end of processing in ms*/
+    TH1D* m_DelayLog = nullptr;        /**< Delay between trigger and end of processing log scale */
+
+    void BinLogX(TH1* h); /**< helper function to replace X axis by a log scaled axis */
   };
 
 }
-#endif
-

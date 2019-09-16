@@ -6,17 +6,19 @@
   <output>BabagagaNLOBhabhaSimRec.root</output>
   <cacheable/>
   <contact>ferber</contact>
-  <description>This steering file produces 1000 radiative Bhabha events with Babayaga.NLO,
-  runs the detector simulation with mixed in background, and performs the standard reconstruction.</description>
+  <description>
+    This steering file produces 1000 radiative Bhabha events with
+    Babayaga.NLO, runs the detector simulation with mixed in background, and
+    performs the standard reconstruction.
+  </description>
 </header>
 """
 
-from basf2 import *
+from basf2 import set_random_seed, create_path, process, statistics
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from validation import statistics_plots, event_timing_plot
 from background import get_background_files
-import validationtools
 
 set_random_seed(12345)
 
@@ -24,7 +26,7 @@ main = create_path()
 emptypath = create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[1])
+main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[0])
 
 # generate Bhabha events
 main.add_module('BabayagaNLOInput')
@@ -61,11 +63,18 @@ process(main)
 # Print call statistics
 print(statistics)
 
-statistics_plots('BabayagaNLOBhabhaSimRec_statistics.root', contact='ferber',
-                 jobDesc='a standard simulation and reconstruction job with '
-                 'radiative Bhabha events using Babayaga.NLO',
-                 prefix='BabayagaNLOBhabhaSimRec')
-event_timing_plot('../BabayagaNLOBhabhaSimRec.root', 'BabayagaNLOBhabhaSimRec_statistics.root', contact='ferber',
-                  jobDesc='a standard simulation and reconstruction job with '
-                  'radiative Bhabha events using Babayaga.NLO',
-                  prefix='BabayagaNLOBhabhaSimRec')
+statistics_plots(
+    'BabayagaNLOBhabhaSimRec_statistics.root',
+    contact='ferber',
+    job_desc='a standard simulation and reconstruction job with radiative '
+             'Bhabha events using Babayaga.NLO',
+    prefix='BabayagaNLOBhabhaSimRec'
+)
+event_timing_plot(
+    '../BabayagaNLOBhabhaSimRec.root',
+    'BabayagaNLOBhabhaSimRec_statistics.root',
+    contact='ferber',
+    job_desc='a standard simulation and reconstruction job with radiative '
+             'Bhabha events using Babayaga.NLO',
+    prefix='BabayagaNLOBhabhaSimRec'
+)

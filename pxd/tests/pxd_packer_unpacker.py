@@ -17,7 +17,6 @@ from rawdata import add_unpackers
 pxd_rawhits_pack_unpack_collection = "PXDRawHits_test"
 pxd_rawhits_pack_unpack_collection_digits = "PXDDigits_test"
 pxd_rawhits_pack_unpack_collection_adc = pxd_rawhits_pack_unpack_collection + "_adc"
-pxd_rawhits_pack_unpack_collection_pedestal = pxd_rawhits_pack_unpack_collection + "_pedestal"
 pxd_rawhits_pack_unpack_collection_roi = pxd_rawhits_pack_unpack_collection + "_roi"
 set_random_seed(42)
 
@@ -36,7 +35,9 @@ class PxdPackerUnpackerTestModule(Module):
         # call constructor of base class, required if you implement __init__ yourself!
         super().__init__()
         # and do whatever else is necessary like declaring member variables
+        #: the PXDRawHits
         self.rawhits_collection = rawhits_collection
+        #: the PXDDigits
         self.digits_collection = digits_collection
 
     def sortDigits(self, unsortedPyStoreArray):
@@ -114,7 +115,7 @@ particlegun.param('nTracks', 10)
 
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [50]})
 # Show progress of processing
 progress = register_module('Progress')
 
@@ -124,6 +125,7 @@ main.add_module(eventinfosetter)
 main.add_module(particlegun)
 # add simulation for pxd only
 simulation.add_simulation(main, components=['PXD'], usePXDDataReduction=False)
+set_module_parameters(main, type="Geometry", useDB=False, components=["PXD"])
 
 main.add_module(progress)
 
@@ -138,7 +140,6 @@ for e in main.modules():
     if e.name() == 'PXDUnpacker':
         e.param("PXDRawHitsName", pxd_rawhits_pack_unpack_collection)
         e.param("PXDRawAdcsName", pxd_rawhits_pack_unpack_collection_adc)
-        e.param("PXDRawPedestalsName", pxd_rawhits_pack_unpack_collection_pedestal)
         e.param("PXDRawROIsName", pxd_rawhits_pack_unpack_collection_roi)
 
     if e.name() == 'PXDRawHitSorter':

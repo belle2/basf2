@@ -13,7 +13,7 @@ using namespace Belle2;
 
 #define MEGA 1000000
 
-Time::Time() throw()
+Time::Time()
 {
   timeval tv;
   gettimeofday(&tv, 0);
@@ -21,22 +21,22 @@ Time::Time() throw()
   m_us = tv.tv_usec;
 }
 
-Time::Time(const double t) throw()
+Time::Time(const double t)
 {
   set(t);
 }
 
-Time::Time(const long s, const long us) throw()
+Time::Time(const long s, const long us)
   : m_s(s), m_us(us)
 {
   adjust();
 }
 
-Time::~Time() throw()
+Time::~Time()
 {
 }
 
-void Time::adjust() throw()
+void Time::adjust()
 {
   if (MEGA <= labs(m_us)) {
     m_s += m_us / MEGA;
@@ -52,12 +52,12 @@ void Time::adjust() throw()
   }
 }
 
-void Time::clear() throw()
+void Time::clear()
 {
   m_s = m_us = 0;
 }
 
-void Time::set() throw()
+void Time::set()
 {
   timeval tv;
   gettimeofday(&tv, 0);
@@ -65,7 +65,7 @@ void Time::set() throw()
   m_us = tv.tv_usec;
 }
 
-void Time::set(const double t) throw()
+void Time::set(const double t)
 {
   double s, us;
   us = modf(t, &s);
@@ -74,60 +74,60 @@ void Time::set(const double t) throw()
   adjust();
 }
 
-void Time::set(const long s, const long us) throw()
+void Time::set(const long s, const long us)
 {
   m_s = s;
   m_us = us;
   adjust();
 }
 
-double Time::get() const throw()
+double Time::get() const
 {
   return (double)m_s + ((double)m_us) / 1000000.;
 }
 
-long Time::getSecond() const throw()
+long Time::getSecond() const
 {
   return m_s;
 }
 
-long Time::getMicroSecond() const throw()
+long Time::getMicroSecond() const
 {
   return m_us;
 }
 
-std::string Time::toString() const throw()
+std::string Time::toString() const
 {
   std::stringstream ss;
   ss << m_s << "." << m_us;
   return ss.str();
 }
 
-void Time::readObject(Reader& r) throw(IOException)
+void Time::readObject(Reader& r)
 {
   m_s = r.readLong();
   m_us = r.readLong();
 }
 
-void Time::writeObject(Writer& w) const throw(IOException)
+void Time::writeObject(Writer& w) const
 {
   w.writeLong(m_s);
   w.writeLong(m_us);
 }
 
-Time& Time::operator = (const Time& t) throw()
+Time& Time::operator = (const Time& t)
 {
   m_s =  t.m_s;
   m_us =  t.m_us;
   return *this;
 }
 
-bool Time::operator == (const Time& t) const throw()
+bool Time::operator == (const Time& t) const
 {
   return (m_s == t.m_s) && (m_us == t.m_us);
 }
 
-Time Time::operator + (const Time& t) const throw()
+Time Time::operator + (const Time& t) const
 {
   Time tt = *this;
   tt.m_s += t.m_s;
@@ -135,7 +135,7 @@ Time Time::operator + (const Time& t) const throw()
   return tt;
 }
 
-Time Time::operator - (const Time& t) const throw()
+Time Time::operator - (const Time& t) const
 {
   Time tt = *this;
   tt.m_s -= t.m_s;

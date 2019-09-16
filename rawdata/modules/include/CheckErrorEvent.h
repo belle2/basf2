@@ -26,13 +26,13 @@ namespace Belle2 {
     virtual ~CheckErrorEventModule();
 
     //! initialization
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! event module
-    virtual void event();
+    virtual void event() override;
 
     //! termination
-    virtual void terminate();
+    virtual void terminate() override;
 
     //! Check if a RawCOPPER object contains CRC error flag in RawCOPPER header/trailer
     void checkCRCError(RawCOPPER* rawcpr, int i);

@@ -17,11 +17,12 @@ getting the payload information and payloads and then we run through different s
     - payload file checksum mismatch
 """
 
-from basf2 import *
-from ROOT import Belle2
+import sys
+import os
+import basf2
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
-from b2test_utils import clean_working_directory, safe_process, skip_test
+from b2test_utils import clean_working_directory, safe_process, skip_test, configure_logging_for_tests
 import multiprocessing
 import shutil
 
@@ -31,6 +32,16 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
     test the interface: get a list of payloads for the current run and download
     a payloadfile. It will return different payloads for the experiments to
     check for different error conditions"""
+
+    #: json string with the defined globaltag states
+    globaltag_states = """[
+      { "name": "OPEN" },
+      { "name": "TESTING" },
+      { "name": "VALIDATED" },
+      { "name": "PUBLISHED" },
+      { "name": "RUNNING" },
+      { "name": "INVALID" }
+    ]"""
 
     #: json string containing information for one payload
     example_payload = """[{{
@@ -60,13 +71,20 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
         # let's provide one correct payload
         "3": example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="1"),
         # same payload but checksum mismatch
-        "4": example_payload.format(checksum="[wrong checksum]", revision="1"),
+        "4": example_payload.format(checksum="00[wrong checksum]", revision="1"),
         # non existing payload file
-        "5": example_payload.format(checksum="missing", revision="2"),
+        "5": example_payload.format(checksum="00[missing]", revision="2"),
         # duplicate payload, or in this case triple
         "6": example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="2")[:-1] + "," +
              example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="1")[1:-1] + "," +
              example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="3")[1:],
+    }
+
+    #: Map a list of known global tag names to their global tag state
+    globaltags = {
+        "localtest": "PUBLISHED",
+        "newgt": "NEW",
+        "invalidgt": "INVALID",
     }
 
     def reply(self, xml):
@@ -87,7 +105,17 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
         """Parse a get request"""
         url = urlparse(self.path)
         params = parse_qs(url.query)
+        if url.path == "/v2/globalTagStatus":
+            return self.reply(self.globaltag_states)
         # return mock payload info
+        elif url.path.startswith("/v2/globalTag"):
+            # gt info
+            gtname = url.path.split("/")[-1]
+            if gtname in self.globaltags:
+                return self.reply('{ "name": "%s", "globalTagStatus": { "name": "%s" } }' % (gtname, self.globaltags[gtname]))
+            else:
+                return self.send_error(404)
+
         if url.path.endswith("/iovPayloads/"):
             exp = params["expNumber"][0]
             run = params["runNumber"][0]
@@ -103,11 +131,11 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
                 baseurl = "http://%s:%s" % self.server.socket.getsockname()
                 return self.reply(self.payloads[exp] % dict(exp=exp, run=run, baseurl=baseurl))
         else:
-            # check if a fallback payload file exists in the data/framework directory
+            # check if a fallback payload file exists in the conditions_testpayloads directory
             filename = os.path.basename(url.path)
             # replace rev_3 with rev_1
             filename = filename.replace("rev_3", "rev_1")
-            basedir = Belle2.FileSystem.findFile("data/framework")
+            basedir = basf2.find_file("framework/tests/conditions_testpayloads")
             path = os.path.join(basedir, filename)
             if os.path.isfile(path):
                 # ok, file exists. let's serve it
@@ -141,27 +169,62 @@ def run_mockdb(pipe):
     httpd.serve_forever()
 
 
-def dbprocess(host, path):
+def run_redirect(pipe, redir_port):
+    """Startup the redirection server: any request should be transparently forwarded
+    to the other using 308 http replies"""
+
+    class SimpleRedirectServer(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(308)
+            self.send_header("Location", f"http://127.0.0.1:{redir_port}{self.path}")
+            self.end_headers()
+
+        def log_message(self, format, *args):
+            """Override default logging to remove timestamp"""
+            print("Redirect Server:", format % args)
+
+        def log_error(self, *args):
+            """Disable error logs"""
+            pass
+
+    try:
+        httpd = HTTPServer(("127.0.0.1", 12702), SimpleRedirectServer)
+        pipe.send(12702)
+    except OSError:
+        pipe.send(None)
+        skip_test("Socket 12702 is in use, cannot continue")
+        return
+
+    # now start listening
+    httpd.serve_forever()
+
+
+def dbprocess(host, path, lastChangeCallback=lambda: None, *, globaltag="localtest"):
     """Process a given path in a child process so that FATAL will not abort this
     script but just the child and configure to use a central database at the given host"""
     # reset the database so that there is no chain
-    reset_database()
+    basf2.reset_database()
     # now run the path in a child process inside of a clean working directory
-    with clean_working_directory() as tempdir:
-        use_central_database("localtest", host, host, "", LogLevel.WARNING)
+    with clean_working_directory():
+        # make logging more reproducible by replacing some strings
+        configure_logging_for_tests()
+        basf2.logging.log_level = basf2.LogLevel.DEBUG
+        basf2.logging.debug_level = 30
+        basf2.conditions.reset()
+        basf2.conditions.expert_settings(download_cache_location="db-cache")
+        basf2.conditions.override_globaltags([globaltag])
+        if host:
+            basf2.conditions.metadata_providers = [host]
+        basf2.conditions.payload_locations = []
+        lastChangeCallback()
         safe_process(path)
 
+
 # keep timeouts short for testing
-set_central_database_networkparams(backoff_factor=1, connection_timeout=5, stalled_timeout=5)
+basf2.conditions.expert_settings(backoff_factor=1, connection_timeout=5, stalled_timeout=5)
 
 # set the random seed to something fixed
-set_random_seed("something important")
-# simplify logging output to just the type and the message
-for level in LogLevel.values.values():
-    logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE)
-# disable error summary, we don't need it for these short tests and it basically
-# doubles the output
-logging.enable_summary(False)
+basf2.set_random_seed("something important")
 # and create a pipe so we can send the port we listen on from child to parent
 conn = multiprocessing.Pipe(False)
 # now start the mock conditions database as daemon so it gets killed at the end
@@ -170,43 +233,90 @@ mock_conditionsdb = multiprocessing.Process(target=run_mockdb, args=(conn[1],))
 mock_conditionsdb.daemon = True
 mock_conditionsdb.start()
 # mock db has started when we recieve the port number from the child, so wait for that
-port = conn[0].recv()
+mock_port = conn[0].recv()
 # if the port we got is None the server didn't start ... so bail
-if port is None:
+if mock_port is None:
     sys.exit(1)
+
+# startup redirect server, same as conditionsdb_
+redir_server = multiprocessing.Process(target=run_redirect, args=(conn[1], mock_port))
+redir_server.daemon = True
+redir_server.start()
+redir_port = conn[0].recv()
+if redir_port is None:
+    sys.exit(1)
+
 # and remember host for database access
-host = "http://localhost:%d/" % port
+mock_host = f"http://localhost:{mock_port}/"
+redir_host = f"http://localhost:{redir_port}/"
 
 # create a simple processing path with just event info setter an a module which
 # prints the beamparameters from the database
-main = create_path()
+main = basf2.Path()
 evtinfo = main.add_module("EventInfoSetter")
 main.add_module("PrintBeamParameters")
 
 # run trough a set of experiments, each time we want to process two runs to make
 # sure that it works correctly for more than one run
 for exp in range(len(SimpleConditionsDB.payloads) + 1):
+    try:
+        basf2.B2INFO(f">>> check exp {exp}: {SimpleConditionsDB.payloads[str(exp)][0:20]}...)")
+    except KeyError:
+        basf2.B2INFO(f">>> check exp {exp}")
     evtinfo.param({"expList": [exp, exp, exp], "runList": [0, 1, 2], "evtNumList": [1, 1, 1]})
-    dbprocess(host, main)
+    dbprocess(mock_host, main)
+    # and again using redirection
+    dbprocess(redir_host, main)
 
-# check 503 retry
+basf2.B2INFO(">>> check that a invalid global tag or a misspelled global tag actually throw errors")
+evtinfo.param({"expList": [3], "runList": [0], "evtNumList": [1]})
+for gt in ["newgt", "invalidgt", "horriblymisspelled",
+           "h͌̉e̳̞̞͆ͨ̏͋̕ ͍͚̱̰̀͡c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢!̋̽̍̈͐ͫ͏̠̹̺̜̬͍ͅ"]:
+    dbprocess(mock_host, main, globaltag=gt)
+
+basf2.B2INFO(">>> check retry on 503 errors")
 evtinfo.param({"expList": [503], "runList": [0], "evtNumList": [1]})
-dbprocess(host, main)
-# check again with different amount of retries
-set_central_database_networkparams(max_retries=0)
-dbprocess(host, main)
+dbprocess(mock_host, main)
+basf2.B2INFO(">>> check again without retries")
+basf2.conditions.expert_settings(max_retries=0)
+dbprocess(mock_host, main)
 
 # the following ones fail, no need for 3 times
 evtinfo.param({"expList": [0], "runList": [0], "evtNumList": [1]})
 
-# try to open localhost on port 0, this should always be refused
+basf2.B2INFO(">>> try to open localhost on port 0, this should always be refused")
 dbprocess("http://localhost:0", main)
 
-# and once more with a non existing host name to check for lookup errors
+basf2.B2INFO(">>> and once more with a non existing host name to check for lookup errors")
 dbprocess("http://nosuchurl/", main)
 
-# and once more with a non existing protocol
+basf2.B2INFO(">>> and once more with a non existing protocol")
 dbprocess("nosuchproto://nosuchurl/", main)
 
-# and once more with a totally bogus url
+basf2.B2INFO(">>> and once more with a totally bogus url")
 dbprocess("h͌̉e̳̞̞͆ͨ̏͋̕ ͍͚̱̰̀͡c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢!̋̽̍̈͐ͫ͏̠̹̺̜̬͍ͅ", main)
+
+basf2.B2INFO(""">>> try to have a list of servers from environment variable
+    We expect that it fails over to the third server, {mock_host}, but then succeeds
+""")
+evtinfo.param({"expList": [3], "runList": [0], "evtNumList": [1]})
+serverlist = [
+    "http://localhost:0",
+    "http://h͌̉e̳̞̞͆ͨ̏͋̕c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢",
+    mock_host
+]
+os.environ["BELLE2_CONDB_SERVERLIST"] = " ".join(serverlist)
+dbprocess("", main)
+
+# ok, try again with the steering file settings instead of environment variable
+basf2.B2INFO(""">>> try to have a list of servers from steering file
+    We expect that it fails over to the third server, {mock_host}, but then succeeds
+""")
+dbprocess("", main, lastChangeCallback=lambda: basf2.set_central_serverlist(serverlist))
+
+if "ssl" in sys.argv:
+    # ok, test SSL connectivity ... for now we just want to accept anything. This
+    # is disabled by default since I don't want to depend on badssl.com to be
+    # available
+    for hostname in ("expired", "wrong.host", "self-signed", "untrusted-root"):
+        dbprocess(f"https://{hostname}.badssl.com/", main)

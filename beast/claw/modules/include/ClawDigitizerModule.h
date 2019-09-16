@@ -12,6 +12,9 @@
 #define CLAWDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <beast/claw/dataobjects/ClawHit.h>
 #include <string>
 #include <vector>
 
@@ -46,21 +49,23 @@ namespace Belle2 {
       virtual ~ClawDigitizerModule();
 
       /**  */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /**  */
-      virtual void beginRun();
+      virtual void beginRun() override;
 
       /**  */
-      virtual void event();
+      virtual void event() override;
 
       /**  */
-      virtual void endRun();
+      virtual void endRun() override;
       /**  */
-      virtual void terminate();
+      virtual void terminate() override;
 
 
     private:
+
+      StoreArray<ClawHit> m_clawHit; /** array for ClawHit */
 
       /** reads data from CLAW.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();

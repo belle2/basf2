@@ -51,13 +51,13 @@ namespace Belle2 {
     virtual ~PrintEventRateModule();
 
     //! Module function to be called from event process
-    virtual void event();
+    virtual void event() override;
 
     //! Module function to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module function to be called after main process
-    virtual void endRun();
+    virtual void endRun() override;
 
     //! print an event
     virtual void printCOPPEREvent(RawCOPPER* raw_array, int i);
@@ -126,78 +126,6 @@ namespace Belle2 {
 
     //! previous value of processed data size
     double m_prev_tot_bytes;
-
-    //! blocksize of RawDatablock object
-    int m_datablk_blksize;
-
-    //! blocksize of RawCOPPER object
-    int m_cpr_blksize;
-
-    //! blocksize of RawTLU object
-    int m_tlu_blksize;
-
-    //! blocksize of RawFTSW object
-    int m_ftsw_blksize;
-
-    //! blocksize of RawPXD object
-    int m_pxd_blksize;
-
-    //! blocksize of RawSVD object
-    int m_svd_blksize;
-
-    //! blocksize of RawCDC object
-    int m_cdc_blksize;
-
-    //! blocksize of RawTOP object
-    int m_top_blksize;
-
-    //! blocksize of RawARICH object
-    int m_arich_blksize;
-
-    //! blocksize of RawECl object
-    int m_ecl_blksize;
-
-    //! blocksize of RawKLM object
-    int m_klm_blksize;
-
-    //! blocksize of RawTRG object
-    int m_trg_blksize;
-
-    //! # of RawDatablock events
-    int m_datablk_evecnt;
-
-    //! # of RawSVD events
-    int m_cpr_evecnt;
-
-    //! # of RawTLU events
-    int m_tlu_evecnt;
-
-    //! # of RawFTSW events
-    int m_ftsw_evecnt;
-
-    //! # of RawDatablock events
-    int m_pxd_evecnt;
-
-    //! # of RawDatablock events
-    int m_svd_evecnt;
-
-    //! # of RawDatablock events
-    int m_cdc_evecnt;
-
-    //! # of RawDatablock events
-    int m_top_evecnt;
-
-    //! # of RawDatablock events
-    int m_arich_evecnt;
-
-    //! # of RawDatablock events
-    int m_ecl_evecnt;
-
-    //! # of RawDatablock events
-    int m_klm_evecnt;
-
-    //! # of RawDatablock events
-    int m_trg_evecnt;
 
     //! # of RawDatablock events
     int m_evecnt;

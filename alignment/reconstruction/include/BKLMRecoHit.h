@@ -9,8 +9,8 @@
  **************************************************************************/
 
 #pragma once
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <bklm/geometry/GeometryPar.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/geometry/GeometryPar.h>
 
 
 // ROOT includes
@@ -34,19 +34,19 @@ namespace Belle2 {
     BKLMRecoHit() {};
 
     /** Construct BKLMRecoHit from a BKLMHit2d */
-    BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit* trackCandHit = NULL);
+    explicit BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit* trackCandHit = NULL);
 
     /** Destructor. */
     virtual ~BKLMRecoHit() {}
 
     /** Creating a deep copy of this hit. */
-    genfit::AbsMeasurement* clone() const;
+    genfit::AbsMeasurement* clone() const override;
 
     /** Methods that actually interface to Genfit.  */
-    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
+    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const override;
 
     /** Get the genfit projection H matrix (to U,V)  */
-    virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const { return new genfit::HMatrixUV(); };
+    virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const override { return new genfit::HMatrixUV(); };
 
     /** @brief Labels and derivatives of residuals (local measurement coordinates) w.r.t. alignment/calibration parameters
     * Matrix "G" of derivatives valid for given prediction of track state:
@@ -78,7 +78,7 @@ namespace Belle2 {
     * @return pair<vector<int>, TMatrixD> With matrix with #rows = dimension of residual, #columns = number of parameters.
     * #columns must match vector<int>.size().
     */
-    virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop);
+    virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop) override;
 
   private:
 
@@ -86,8 +86,8 @@ namespace Belle2 {
 
     unsigned short m_moduleID; /**< Unique module identifier.*/
 
-    /** Forward or not. */
-    bool m_IsForward;
+    /** Section number. */
+    int m_Section;
 
     /** Sector number. */
     int m_Sector;
@@ -110,7 +110,7 @@ namespace Belle2 {
     //int m_numZStrips;
 
     /** Needed to make object storable. */
-    ClassDef(BKLMRecoHit, 2);
+    ClassDefOverride(BKLMRecoHit, 3);
 
   };
 

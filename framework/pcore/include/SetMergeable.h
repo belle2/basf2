@@ -53,7 +53,7 @@ namespace Belle2 {
      *
      * Note that 'other' will be deleted after the merge, so make sure you copy all data from it that you will need.
      */
-    virtual void merge(const Mergeable* other)
+    virtual void merge(const Mergeable* other) override
     {
       auto* otherMergeable = static_cast<const SetMergeable*>(other);
       for (const auto& element : otherMergeable->get()) {
@@ -69,7 +69,7 @@ namespace Belle2 {
      * Called after sending the objects to another process. If no clearing is performed, the same data (e.g. histogram
      * entries) might be added again and again in each event.
      */
-    virtual void clear()
+    virtual void clear() override
     {
       m_wrapped.clear();
     }
@@ -78,6 +78,6 @@ namespace Belle2 {
     /** Wrapped object. */
     T m_wrapped;
 
-    ClassDef(SetMergeable, 1); /**< Wrap an STL set to make it mergeable. */
+    ClassDefOverride(SetMergeable, 1); /**< Wrap an STL set to make it mergeable. */
   };
 }

@@ -41,10 +41,10 @@ namespace Belle2 {
      * Checks the validity of the module parameters.
      * Checks if the filepath of the given filename exists.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Saves the geometry to a root file for every run. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
 
   protected:

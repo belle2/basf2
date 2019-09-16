@@ -52,13 +52,13 @@
 		<length unit="mm">125.580</length>
 		<height unit="um">300</height>
 		<Active>
-			<u unit="mm"> 1.520</u>
-			<v unit="mm"> 1.390</v>
+			<u unit="mm"> 1.515</u>
+			<v unit="mm"> 1.350</v>
 			<stripsU>768</stripsU>
 			<stripsV>512</stripsV>
-			<width  unit="mm">57.590</width>
-			<width2 unit="mm">38.420</width2>
-			<length unit="mm">122.760</length>
+			<width  unit="mm">57.600</width>
+			<width2 unit="mm">38.400</width2>
+			<length unit="mm">122.880</length>
 			<height unit="um"> 300</height>
                         <stripEdgeU unit="um">100</stripEdgeU>
                         <stripEdgeV unit="um">100</stripEdgeV>
@@ -68,15 +68,15 @@
 			<DepletionVoltage unit="V">40.0</DepletionVoltage>
 			<BiasVoltage unit="V">100</BiasVoltage>
 			<BackplaneCapacitanceU unit="pF/cm">0.11</BackplaneCapacitanceU>
-			<InterstripCapacitanceU unit="pF/cm">0.85</InterstripCapacitanceU>
+			<InterstripCapacitanceU unit="pF/cm">0.45</InterstripCapacitanceU>
                         <CouplingCapacitanceU unit="pF/cm">15</CouplingCapacitanceU>
 			<BackplaneCapacitanceV unit="pF/cm">0.42</BackplaneCapacitanceV>
-			<InterstripCapacitanceV unit="pF/cm">0.65</InterstripCapacitanceV>
+			<InterstripCapacitanceV unit="pF/cm">0.58</InterstripCapacitanceV>
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
-                        <ADUEquivalentU unit="e">375</ADUEquivalentU>
-                        <ADUEquivalentV unit="e">375</ADUEquivalentV>
-                        <ElectronicNoiseU unit="e">900</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">700</ElectronicNoiseV>
+                        <ADUEquivalentU unit="e">270</ADUEquivalentU>
+                        <ADUEquivalentV unit="e">259</ADUEquivalentV>
+                        <ElectronicNoiseU unit="e">820</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">716</ElectronicNoiseV>
 		</Active>
 	</SensorBase>
 
@@ -87,12 +87,12 @@
 		<length unit="mm">124.880</length>
 		<height unit="um">320</height>
 		<Active>
-			<u unit="mm"> 0.940</u>
-			<v unit="mm"> 0.990</v>
+			<u unit="mm"> 1.000</u>
+			<v unit="mm"> 1.000</v>
 			<stripsU>768</stripsU>
 			<stripsV>512</stripsV>
-			<width  unit="mm">57.720</width>
-			<length unit="mm">122.900</length>
+			<width  unit="mm">57.600</width>
+			<length unit="mm">122.880</length>
 			<height unit="um"> 320</height>
                         <stripEdgeU unit="um">100</stripEdgeU>
                         <stripEdgeV unit="um">100</stripEdgeV>
@@ -102,20 +102,20 @@
 			<DepletionVoltage unit="V">60.0</DepletionVoltage>
 			<BiasVoltage unit="V">100</BiasVoltage>
                         <BackplaneCapacitanceU unit="pF/cm">0.12</BackplaneCapacitanceU>
-			<InterstripCapacitanceU unit="pF/cm">0.75</InterstripCapacitanceU>
+			<InterstripCapacitanceU unit="pF/cm">0.40</InterstripCapacitanceU>
 			<CouplingCapacitanceU unit="pF/cm">15</CouplingCapacitanceU>
                         <BackplaneCapacitanceV unit="pF/cm">0.39</BackplaneCapacitanceV>
-			<InterstripCapacitanceV unit="pF/cm">0.65</InterstripCapacitanceV>
+			<InterstripCapacitanceV unit="pF/cm">0.58</InterstripCapacitanceV>
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
                         <!-- All except backward sensors are on Origami -->
-                        <ADUEquivalentU unit="e">375</ADUEquivalentU>
-                        <ADUEquivalentV unit="e">375</ADUEquivalentV>
-                        <ElectronicNoiseU unit="e">1100</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">650</ElectronicNoiseV>
-                        <ADUEquivalentSbwU unit="e">375</ADUEquivalentSbwU>
-                        <ADUEquivalentSbwV unit="e">375</ADUEquivalentSbwV>
-                        <ElectronicNoiseSbwU unit="e">950</ElectronicNoiseSbwU>
-                        <ElectronicNoiseSbwV unit="e">750</ElectronicNoiseSbwV>
+                        <ADUEquivalentU unit="e">297</ADUEquivalentU>
+                        <ADUEquivalentV unit="e">231</ADUEquivalentV>
+                        <ElectronicNoiseU unit="e">984</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">527</ElectronicNoiseV>
+                        <ADUEquivalentSbwU unit="e">274</ADUEquivalentSbwU>
+                        <ADUEquivalentSbwV unit="e">260</ADUEquivalentSbwV>
+                        <ElectronicNoiseSbwU unit="e">853</ElectronicNoiseSbwU>
+                        <ElectronicNoiseSbwV unit="e">716</ElectronicNoiseSbwV>
 		</Active>
 	</SensorBase>
 
@@ -126,12 +126,12 @@
 		<length unit="mm">124.880</length>
 		<height unit="um">320.000</height>
 		<Active>
-			<u unit="mm"> 0.940</u>
-			<v unit="mm"> 0.990</v>
+			<u unit="mm"> 1.015</u>
+			<v unit="mm"> 1.000</v>
 			<stripsU>768</stripsU>
 			<stripsV>768</stripsV>
-			<width  unit="mm">38.520</width>
-			<length unit="mm">122.900</length>
+			<width  unit="mm">38.400</width>
+			<length unit="mm">122.880</length>
 			<height unit="um">320.000</height>
                         <stripEdgeU unit="um">100</stripEdgeU>
                         <stripEdgeV unit="um">100</stripEdgeV>
@@ -141,15 +141,15 @@
 			<DepletionVoltage unit="V">60.0</DepletionVoltage>
 			<BiasVoltage unit="V">100</BiasVoltage>
 			<BackplaneCapacitanceU unit="pF/cm">0.08</BackplaneCapacitanceU>
-			<InterstripCapacitanceU unit="pF/cm">0.92</InterstripCapacitanceU>
+			<InterstripCapacitanceU unit="pF/cm">1.04</InterstripCapacitanceU>
 			<CouplingCapacitanceU unit="pF/cm">15</CouplingCapacitanceU>
 			<BackplaneCapacitanceV unit="pF/cm">0.26</BackplaneCapacitanceV>
-	        	<InterstripCapacitanceV unit="pF/cm">0.75</InterstripCapacitanceV>
+	        	<InterstripCapacitanceV unit="pF/cm">0.41</InterstripCapacitanceV>
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
-                        <ADUEquivalentU unit="e">375</ADUEquivalentU>
-                        <ADUEquivalentV unit="e">375</ADUEquivalentV>
-                        <ElectronicNoiseU unit="e">1100</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">800</ElectronicNoiseV>
+                        <ADUEquivalentU unit="e">320</ADUEquivalentU>
+                        <ADUEquivalentV unit="e">323</ADUEquivalentV>
+                        <ElectronicNoiseU unit="e">1054</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">798</ElectronicNoiseV>
 		</Active>
 		<!-- For now, layer 3 only has a flex on top -->
 		<Component name="KaptonLayer3">

@@ -141,7 +141,6 @@ namespace Belle2 {
 
   void NtuplePhase1_v6Module::initialize()
   {
-    loadDictionaries();
     // read TFile with histograms
 
     // expand possible wildcards

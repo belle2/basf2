@@ -230,6 +230,10 @@ SocketRecv::SocketRecv(u_short p)
   setsockopt(s, SOL_SOCKET, SO_SNDBUF, &sizeval, 4);
   setsockopt(s, SOL_SOCKET, SO_RCVBUF, &sizeval, 4);
 
+  signal(SIGPIPE, SIG_IGN);    // ignore SIGPIPE
+  //  printf ( "SocketRecv: SIGPIPE will be ignored\n" );
+  //  fflush ( stdout );
+
   if ((bind(s, (struct sockaddr*)&sa, sizeof(sa))) < 0) {
     m_errno = errno;
     perror("SocketRecv::bind");
@@ -461,6 +465,10 @@ SocketSend::SocketSend(const char* node, u_short port)
   int sizeval = D2_SOCKBUF_SIZE;
   setsockopt(s, SOL_SOCKET, SO_SNDBUF, &sizeval, 4);
   setsockopt(s, SOL_SOCKET, SO_RCVBUF, &sizeval, 4);
+
+  signal(SIGPIPE, SIG_IGN);    // ignore SIGPIPE
+  //  printf ( "SocketSend: SIGPIPE will be ignored\n" );
+  //  fflush ( stdout );
 
   int maxretry = 10;
 tryagain:

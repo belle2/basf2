@@ -1,0 +1,7 @@
+Import('env')
+
+env['SUBLIB'] = True
+env['LIBS'] = ['framework', 'analysis_dataobjects', 'mdst_dataobjects', 'mdst_dbobjects', 
+	       'RaveBase', '$ROOT_LIBS', 'CLHEP', 'EG', 'analysis_ClusterUtility', ]
+
+Return('env')

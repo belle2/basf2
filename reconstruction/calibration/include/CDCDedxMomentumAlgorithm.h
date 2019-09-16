@@ -12,6 +12,7 @@
 
 #include <reconstruction/dbobjects/CDCDedxMomentumCor.h>
 #include <calibration/CalibrationAlgorithm.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   /**
@@ -35,9 +36,9 @@ namespace Belle2 {
   protected:
 
     /**
-     * Run algorithm
+     * Scale Momentum algorithm
      */
-    virtual EResult calibrate();
+    virtual EResult calibrate() override;
 
   private:
 

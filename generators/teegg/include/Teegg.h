@@ -39,7 +39,7 @@ namespace Belle2 {
     /** specifies which vacuum polarization code (NOT IMPLEMENTED YET)
     * @param vacpol vacuum polarization code (NOT IMPLEMENTED YET)
     */
-    void setVACPOL(std::string vacpol = "HLMNT") {m_sVACPOL = vacpol;}
+    void setVACPOL(const std::string& vacpol = "HLMNT") {m_sVACPOL = vacpol;}
 
     /** set maximum theta of e+ in final state (in radians)
      * @param teveto maximum theta of e+ in final state (in radians)
@@ -124,22 +124,22 @@ namespace Belle2 {
     /** specifies radiative correction (NONE SOFT or HARD)
     * @param radcor radiative correction (NONE SOFT or HARD)
     */
-    void setRADCOR(std::string radcor = "NONE") {m_sRADCOR = radcor;}
+    void setRADCOR(const std::string& radcor = "NONE") {m_sRADCOR = radcor;}
 
     /** specifies the event configuration (EGAMMA GAMMA or ETRON)
     * @param config event configuration (EGAMMA GAMMA or ETRON)
     */
-    void setCONFIG(std::string config = "NONE") {m_sCONFIG = config;}
+    void setCONFIG(const std::string& config = "NONE") {m_sCONFIG = config;}
 
     /** specifies which eeg matrix element (BK BKM2 TCHAN or EPA)
     * @param matrix eeg matrix element (BK BKM2 TCHAN or EPA)
     */
-    void setMATRIX(std::string matrix = "NONE") {m_sMATRIX = matrix;}
+    void setMATRIX(const std::string& matrix = "NONE") {m_sMATRIX = matrix;}
 
     /** specifies which eegg matrix element (EPADC BEEGG or MEEGG)
     * @param mtrxgg eegg matrix element (EPADC BEEGG or MEEGG)
     */
-    void setMTRXGG(std::string mtrxgg = "NONE") {m_sMTRXGG = mtrxgg;}
+    void setMTRXGG(const std::string& mtrxgg = "NONE") {m_sMTRXGG = mtrxgg;}
 
     /** set logical variable. If true then generate unweighted events
       * @param wghtmx logical variable. If true then generate unweighted events

@@ -9,7 +9,7 @@ import simulation
 # ######## Register modules  ########
 eventInfoSetterModule = register_module('EventInfoSetter')
 eventInfoSetterModule.param({'evtNumList': [10], 'runList': [1],
-                             'expList': [1]})
+                             'expList': [0]})
 
 progressModule = register_module('Progress')
 

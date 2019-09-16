@@ -85,7 +85,7 @@ void ReaderSAD::initialize(TGeoHMatrix* transMatrix, double sRange, ReaderSAD::A
 }
 
 
-void ReaderSAD::open(const string& filename) throw(SADCouldNotOpenFileError)
+void ReaderSAD::open(const string& filename)
 {
   if (m_file != NULL) {
     m_file->Close();
@@ -375,12 +375,12 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
   double ssraw = 0.;
   if (ring == 1) {
     if (m_inputSAD_ssraw >= 0) ssraw = m_inputSAD_ssraw / 100.;
-    else if (m_inputSAD_ssraw < 0) ssraw = 3000. + m_inputSAD_ssraw / 100.;
+    else  ssraw = 3000. + m_inputSAD_ssraw / 100.;
   } else if (ring == 2) {
     //if (m_inputSAD_ssraw >= 0) ssraw = 3000. - m_inputSAD_ssraw / 100.;
     //else if (m_inputSAD_ssraw < 0) ssraw = -m_inputSAD_ssraw / 100.;
     if (m_inputSAD_ssraw >= 0) ssraw = m_inputSAD_ssraw / 100.;
-    else if (m_inputSAD_ssraw < 0) ssraw = 3000. + m_inputSAD_ssraw / 100.;
+    else  ssraw = 3000. + m_inputSAD_ssraw / 100.;
   }
   int ring_section = section_ordering[(int)((ssraw) / 250.)];
 

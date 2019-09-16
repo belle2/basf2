@@ -39,25 +39,26 @@ namespace Belle2 {
 
       //! Constructor / Destructor
       PXDReadRawONSENModule();
-      virtual ~PXDReadRawONSENModule();
+      ~PXDReadRawONSENModule();
 
-      //! Module functions to be called from main process
-      virtual void initialize();
 
-      //! Module functions to be called from event process
-      virtual void beginRun();
-      virtual void event();
-      virtual void endRun();
-      virtual void terminate();
-
-      // Data members
     private:
 
-      // Parallel processing parameters
+      //! Module functions to be called from main process
+      void initialize() override final;
+
+      //! Module functions to be called from event process
+      void event() override final;
+      void terminate() override final;
+
+
+      // Data members
 
       //! Event Meta Data
       StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
+      //! Set Event Meta Info
+      bool m_setEvtMeta;
       //! File Name
       std::string m_filename;
 
@@ -76,10 +77,10 @@ namespace Belle2 {
       //! File handle
       FILE* fh;
 
-      int readOneEvent(void);//! Read data of one Event from File
-      int read_data(char* data, size_t len);//! Read amount of data (len bytes) from file to ptr data
-      bool getTrigNr(RawPXD& px);
-      bool unpack_dhc_frame(void* data);
+      int readOneEvent(void); //!< Read data of one Event from File
+      int read_data(char* data, size_t len); //!< Read amount of data (len bytes) from file to ptr data
+      bool getTrigNr(RawPXD& px); //!< get the trigger number
+      bool unpack_dhc_frame(void* data); //!< unpack the dhc frame
     };
 
   } // end namespace PXD

@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef PARTICLESTATSMODULE_H
-#define PARTICLESTATSMODULE_H
+#pragma once
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -28,8 +27,6 @@ namespace Belle2 {
 
   class ParticleStatsModule : public Module {
   private:
-    /** Event counter **/
-    int m_nEvents;
     /** Number of events with Particle candidates**/
     int m_nPass;
     /** Count the total number of particles */
@@ -59,4 +56,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif // PARTICLESTATSMODULE_H

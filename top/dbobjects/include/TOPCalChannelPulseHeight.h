@@ -12,6 +12,7 @@
 
 #include <TObject.h>
 #include <framework/logging/Logger.h>
+#include <top/dbobjects/TOPPulseHeightPar.h>
 
 namespace Belle2 {
 
@@ -30,15 +31,6 @@ namespace Belle2 {
       c_Default = 0,    /**< uncalibrated default value */
       c_Calibrated = 1, /**< good calibrated value */
       c_Unusable = 2    /**< bad calibrated value */
-    };
-
-    /**
-     * Parameters of the pulse height distribution P(x) = (x/x0)^p1 * exp(-(x/x0)^p2)
-     */
-    struct PulseHeightPar {
-      float x0 = 0; /**< distribution parameter x0 [ADC counts] */
-      float p1 = 0; /**< distribution parameter p1 */
-      float p2 = 0; /**< distribution parameter p2 */
     };
 
     /**
@@ -67,18 +59,24 @@ namespace Belle2 {
         return;
       }
       if (x0 <= 0) {
-        B2ERROR("Invalid parameter value x0 (" << x0 << ") for slot " << moduleID
-                << " channel " << channel << ", constant not set (" << ClassName() << ")");
+        B2ERROR("Invalid parameter value x0, constant not set (" << ClassName() << ")."
+                << LogVar("x0", x0)
+                << LogVar("slot", moduleID)
+                << LogVar("channel", channel));
         return;
       }
       if (p1 < 0) {
-        B2ERROR("Invalid parameter value p1 (" << p1 << ") for slot " << moduleID
-                << " channel " << channel << ", constant not set (" << ClassName() << ")");
+        B2ERROR("Invalid parameter value p1, constant not set (" << ClassName() << ")."
+                << LogVar("p1", p1)
+                << LogVar("slot", moduleID)
+                << LogVar("channel", channel));
         return;
       }
       if (p2 <= 0) {
-        B2ERROR("Invalid parameter value p2 (" << p2 << ") for slot " << moduleID
-                << " channel " << channel << ", constant not set (" << ClassName() << ")");
+        B2ERROR("Invalid parameter value p2, constant not set (" << ClassName() << ")."
+                << LogVar("p2", p2)
+                << LogVar("slot", moduleID)
+                << LogVar("channel", channel));
         return;
       }
       m_par[module][channel].x0 = x0;
@@ -112,18 +110,19 @@ namespace Belle2 {
      * @param channel hardware channel number (0-based)
      * @return parameters of pulse heigth distribution
      */
-    const PulseHeightPar& getParameters(int moduleID, unsigned channel) const
+    const TOPPulseHeightPar& getParameters(int moduleID, unsigned channel) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Invalid slot number " << moduleID
-                  << ", returning parameters of slot 0 channel 0 (" << ClassName() << ")");
+        B2WARNING("Invalid slot number, "
+                  "returning parameters of slot 1 channel 0 (" << ClassName() << ")"
+                  << LogVar("slot", moduleID));
         return m_par[0][0];
       }
       if (channel >= c_numChannels) {
-        B2WARNING("Invalid channel " << channel
-                  << ", returning parameters of slot " << moduleID << " channel 0 ("
-                  << ClassName() << ")");
+        B2WARNING("Invalid channel, "
+                  "returning parameters of channel 0 (" << ClassName() << ")"
+                  << LogVar("channel", channel));
         return m_par[module][0];
       }
       return m_par[module][channel];
@@ -182,10 +181,10 @@ namespace Belle2 {
       c_numChannels = 512 /**< number of channels per module */
     };
 
-    PulseHeightPar m_par[c_numModules][c_numChannels]; /**< calibration constants */
+    TOPPulseHeightPar m_par[c_numModules][c_numChannels]; /**< calibration constants */
     EStatus m_status[c_numModules][c_numChannels] = {{c_Default}}; /**< calibration status */
 
-    ClassDef(TOPCalChannelPulseHeight, 2); /**< ClassDef */
+    ClassDef(TOPCalChannelPulseHeight, 3); /**< ClassDef */
 
   };
 

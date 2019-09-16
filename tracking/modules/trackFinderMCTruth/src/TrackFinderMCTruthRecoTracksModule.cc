@@ -29,6 +29,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/WireTrackCandHit.h>
+#include <simulation/monopoles/MonopoleConstants.h>
 
 #include <framework/geometry/BFieldManager.h>
 
@@ -456,8 +457,8 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
     }
 
-    // ignore neutrals (unless requested)
-    if (!m_neutrals && aMcParticlePtr->getCharge() == 0) {
+    // ignore neutrals (unless requested) (and unless monopoles)
+    if (!m_neutrals && (aMcParticlePtr->getCharge() == 0 && abs(aMcParticlePtr->getPDG()) != Monopoles::c_monopolePDGCode)) {
       B2DEBUG(100, "particle does not have the right charge. MC particle will be skipped");
       continue; //goto next mcParticle, do not make track candidate
     }
@@ -511,7 +512,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
           }
 
           // Mark higher order hits as auxiliary, if m_useNLoops has been set
-          if (not std::isnan(m_useNLoops) and not isWithinNLoops<PXDCluster, PXDTrueHit>(Bz, relatedClusters.object(i), m_useNLoops)) {
+          if (std::isfinite(m_useNLoops) and not isWithinNLoops<PXDCluster, PXDTrueHit>(Bz, relatedClusters.object(i), m_useNLoops)) {
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
@@ -576,7 +577,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
           }
 
           // Mark higher order hits as auxiliary, if m_useNLoops has been set
-          if (not std::isnan(m_useNLoops) and not isWithinNLoops<SVDCluster, SVDTrueHit>(Bz, relatedClusters.object(i), m_useNLoops)) {
+          if (std::isfinite(m_useNLoops) and not isWithinNLoops<SVDCluster, SVDTrueHit>(Bz, relatedClusters.object(i), m_useNLoops)) {
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
@@ -672,7 +673,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
           }
 
           // Mark higher order hits as auxiliary, if m_useNLoops has been set
-          if (not std::isnan(m_useNLoops) and not isWithinNLoops<CDCHit, CDCSimHit>(Bz, cdcHit, m_useNLoops)) {
+          if (std::isfinite(m_useNLoops) and not isWithinNLoops<CDCHit, CDCSimHit>(Bz, cdcHit, m_useNLoops)) {
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
@@ -890,7 +891,7 @@ template< class THit, class TSimHit>
 bool TrackFinderMCTruthRecoTracksModule::isWithinNLoops(double Bz, const THit* aHit, double nLoops)
 {
   // for SVD there are cases with more than one simhit attached
-  const RelationVector<TSimHit>& relatedSimHits = aHit->template getRelationsTo<TSimHit>();
+  const RelationVector<TSimHit>& relatedSimHits = aHit->template getRelationsWith<TSimHit>();
 
   // take the first best simhit with mcParticle attached
   const MCParticle* mcParticle = nullptr;

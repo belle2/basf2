@@ -24,6 +24,11 @@ namespace Belle2 {
    * node to the ONSEN system, containing the trigger decision and the Region od Interest (ROI)
    * for data selection on the PXD modules
    * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+   *
+   * Warning: The class does not allow to be updated in data store! (BII-3191)
+   * -> a module might corrupt entries in the data store if a previous ROIpayload is already in the DataStore
+   * A complete rewrite of gthe class might be needed for that. For now, you have to check that there
+   * is no object in data store before, and raise a FATAL if so.
    */
 
   class ROIpayload : public TObject {
@@ -31,6 +36,7 @@ namespace Belle2 {
     enum { HEADER_SIZE_WO_LENGTH = 3, HEADER_SIZE_WITH_LENGTH = 5, HEADER_SIZE_WITH_LENGTH_AND_CRC = 6};
 
   public:
+    /** Shorthand for 32-bit integer stored in big-endian format */
     typedef boost::spirit::endian::ubig32_t ubig32_t;
 
     /** Default constructor.
@@ -42,13 +48,17 @@ namespace Belle2 {
      */
     virtual ~ROIpayload() { delete[] m_rootdata; };
 
-    int m_packetLengthByte; /**< packet length  in byte*/
+    int m_packetLengthByte = 0; /**< packet length  in byte*/
     int m_length; /**< packet length*/
-    int*  m_rootdata; //[m_length] /**< */
+    /** pointer to data packet of m_length words*/
+    int*  m_rootdata; //[m_length]
 
-    int m_index; //! transient value /**< index*/
-    uint32_t* m_data32; //! transient value /**< data32*/
-    ROIrawID::baseType* m_data64; //! transient value /**< data64*/
+    /** transient index*/
+    int m_index; //! transient value
+    /** pointer to transient 32-bit value*/
+    uint32_t* m_data32; //! transient value
+    /** pointer to transient 64-bit value*/
+    ROIrawID::baseType* m_data64; //! transient value
 
     void setPayloadLength(int length); /**< set payload length*/
     void setPayloadLength(); /**< set payload length*/
@@ -62,9 +72,10 @@ namespace Belle2 {
     void addROIraw(unsigned long int roiraw); /**< add a ROIrawID */
     void setCRC(); /**< set CRC */
 
-    int getPacketLengthByte() {return m_packetLengthByte;}; /**< get packet length in byte*/
-    int getLength() {return m_length;}; /**< get length*/
-    int* getRootdata() {return m_rootdata;}; //[m_length] /**< */
+    int getPacketLengthByte() {return m_packetLengthByte;} /**< get packet length in bytes*/
+    int getLength() {return m_length;} /**< get packet length*/
+    /** get pointer to the data packet*/
+    int* getRootdata() {return m_rootdata;} //[m_length]
 
     void init(int length); /**< initializer*/
 
@@ -139,6 +150,6 @@ namespace Belle2 {
 
   private:
     //! Needed to make the ROOT object storable
-    ClassDef(ROIpayload, 1)
+    ClassDef(ROIpayload, 2)
   };
 }

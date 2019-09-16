@@ -87,7 +87,7 @@ namespace Belle2 {
     * Enables BG overlay module to identify uniquely the physical channel of this Digit.
     * @return unique channel ID, composed of VxdID (1 - 16), u pixel number (17-23), and v pixel number (24-32).
     */
-    unsigned int getUniqueChannelID() const
+    unsigned int getUniqueChannelID() const override
     {
       // shift segment part of sensorID by two bits to make place for u+v
       VxdID sensorID(m_sensorID);
@@ -101,7 +101,7 @@ namespace Belle2 {
     * @param bg BG digit
     * @return append status
     */
-    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg)
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg) override
     {
       m_charge += dynamic_cast<const PXDDigit*>(bg)->getCharge();
       return DigitBase::c_DontAppend;
@@ -115,7 +115,7 @@ namespace Belle2 {
     unsigned short m_vCellID;  /**< Cell z coordinate in pitch units. */
     unsigned short m_charge;   /**< Digitized charge in ADC units. */
 
-    ClassDef(PXDDigit, 5)
+    ClassDefOverride(PXDDigit, 5)
 
   }; // class PXDDigit
 

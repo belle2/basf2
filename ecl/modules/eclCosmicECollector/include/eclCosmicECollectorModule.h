@@ -10,14 +10,18 @@
 
 #pragma once
 
-#include <calibration/CalibrationCollectorModule.h>
-#include <ecl/geometry/ECLNeighbours.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
+//Framework
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <ecl/dataobjects/ECLDigit.h>
+
+//Calibration
+#include <calibration/CalibrationCollectorModule.h>
 
 namespace Belle2 {
+
+  class ECLDigit;
+  class EventMetaData;
+  class ECLCrystalCalib;
 
   /** class eclCosmicECollectorModule. Select real or MC cosmic ray events for ecl
    * single crystal energy calibration and accumulate normalized energy distributions
@@ -30,10 +34,10 @@ namespace Belle2 {
     eclCosmicECollectorModule();
 
     /** prepare. Define histograms to be filled and stored; ecl geometry calculations */
-    void prepare();
+    void prepare() override;
 
     /** collect. Select events and fill histograms */
-    void collect();
+    void collect() override;
 
   private:
 
@@ -44,7 +48,9 @@ namespace Belle2 {
 
     int iEvent = 0; /**< event counter */
 
-    StoreArray<ECLDigit> eclDigitArray; /**< Required input array of eclDigits */
+    StoreArray<ECLDigit> m_eclDigitArray; /**< Required input array of eclDigits */
+
+    StoreObjPtr<EventMetaData> m_evtMetaData; /**< Store array: EventMetaData. */
 
     /** Sets of three crystals that define a useful cosmic */
     std::vector<short int> CenterCrys; /**< crystal ID whose signal will be recorded */
@@ -75,14 +81,5 @@ namespace Belle2 {
     /** Existing single crystal calibration from DB; will be updated by CAF */
     DBObjPtr<ECLCrystalCalib> m_CosmicECalib; /**< database object */
     std::vector<float> CosmicECalib; /**< vector obtained from DB object */
-
-    //** Time offset from electronics calibration from database */
-    DBObjPtr<ECLCrystalCalib> m_ElectronicsTime; /**< database object */
-    std::vector<float> ElectronicsTime; /**< vector obtained from DB object */
-
-    //** Time offset from cosmic calibration from database */
-    DBObjPtr<ECLCrystalCalib> m_TimeOffset; /**< database object */
-    std::vector<float> TimeOffset; /**< vector obtained from DB object */
   };
 }
-

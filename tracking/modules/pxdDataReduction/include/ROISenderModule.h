@@ -3,15 +3,17 @@
  * Copyright(C) 2011 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Giulia Casarosa, Eugenio Paoloni                         *
+ * Contributors: Giulia Casarosa, Eugenio Paoloni, Bjoern Spruck          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROI_SENDER_H_
-#define ROI_SENDER_H_
+#pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <tracking/dataobjects/ROIpayload.h>
 #include <string>
 
 #include <fcntl.h>           /* For O_* constants */
@@ -22,7 +24,7 @@ namespace Belle2 {
 
   /** The ROI to ONSEN Module
    *
-   * this module is used to check the payload produced by the ROItoOnsen Module
+   * this module is used to send out the payload to ONSEN
    *
    */
 
@@ -35,29 +37,27 @@ namespace Belle2 {
      */
     ROISenderModule();
 
-    /**
-     * Destructor of the module.
-     */
-    ~ROISenderModule();
+
+  private:
+
+    /** Input ptr for RoiPayload. */
+    StoreObjPtr<ROIpayload> m_roiPayload;
+    /** Input ptr for EventMetaData. */
+    StoreObjPtr<EventMetaData> m_eventMetaData;
+    /** poor mans histogramming in a vector */
+    std::vector <int> m_histo;
 
     /**
      *Initializes the Module.
      */
-    void initialize() override;
+    void initialize() override final;
 
-    void beginRun() override;
-
-    void event() override;
-
-    void endRun() override;
+    void event() override final;
 
     /**
      * Termination action.
      */
-    void terminate() override;
-
-  protected:
-
+    void terminate() override final;
 
     std::string  m_messageQueueName; /**< message queue name*/
     const char* m_messageQueueNameCstring; /**< message queue name c string */
@@ -66,13 +66,12 @@ namespace Belle2 {
     int          m_messageQueueDepth; /**< message queue depth*/
     int          m_messageQueueMsgSize; /**< message queue message size*/
 
-  private:
     mqd_t        m_messageQueue; /**< message queue*/
 
 
     void openMessageQueue(const char* log_string); /**< open message queue*/
     void closeMessageQueue(const char* log_string); /**< close message queue*/
+    /* cppcheck-suppress unusedPrivateFunction */
     void unlinkMessageQueue(const char* log_string); /**< unlink message queue*/
   };
 }
-#endif

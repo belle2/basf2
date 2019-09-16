@@ -128,13 +128,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    virtual void print(const std::string& title = "QBB honeycomb panel geometry parameters") const;
+    virtual void print(const std::string& title = "QBB honeycomb panel geometry parameters") const override;
 
   private:
 
@@ -149,7 +149,7 @@ namespace Belle2 {
     std::string m_material; /**< material name */
     std::string m_edgeMaterial; /**< material name of reinforced edge */
 
-    ClassDef(TOPGeoHoneycombPanel, 1); /**< ClassDef */
+    ClassDefOverride(TOPGeoHoneycombPanel, 1); /**< ClassDef */
 
   };
 

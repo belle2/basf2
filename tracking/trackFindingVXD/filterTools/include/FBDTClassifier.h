@@ -44,8 +44,8 @@ namespace Belle2 {
     FBDTClassifier() { ; }// = default; /**< default constructor */
 
     /** constructor from three main parts. (for testing purposes mainly) */
-    FBDTClassifier(FBDTForest forest, std::vector<FastBDT::FeatureBinning<double> > fB, Belle2::DecorrelationMatrix<9> dM) :
-      m_forest(forest), m_featBins(fB), m_decorrMat(dM) { ; }
+    FBDTClassifier(const FBDTForest& forest, const std::vector<FastBDT::FeatureBinning<double> >& fB,
+                   const Belle2::DecorrelationMatrix<9>& dM) : m_forest(forest), m_featBins(fB), m_decorrMat(dM) { ; }
 
     ~FBDTClassifier() { ; } /**< TODO destructor */
 
@@ -87,6 +87,7 @@ namespace Belle2 {
     Belle2::DecorrelationMatrix<Ndims> m_decorrMat{}; /**< the decorrelation matrix used in this classifier */
 
     // TODO: make this work with the externals -> tell Thomas Keck what is needed for this stuff to work in the externals
+    /// Making this Class a ROOT class
     ClassDef(FBDTClassifier, 2); // first version: only Forest and FeatureBinnings present
   };
 

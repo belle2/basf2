@@ -26,7 +26,7 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
     "The Track Segment Finder module of the CDC trigger.\n"
     "Combines CDCHits from the same super layer to CDCTriggerSegmentHits.\n"
   );
-
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("CDCHitCollectionName",
            m_CDCHitCollectionName,
            "Name of the input StoreArray of CDCHits.",
@@ -276,11 +276,12 @@ CDCTriggerTSFModule::event()
     TRGSignal signal = rise & fall;
     w.addSignal(signal);
 
+    if (w.hit()) continue;
     // make a trigger wire hit (needed for relations)
     // all unneeded variables are set to 0 (TODO: remove them completely?)
     TRGCDCWireHit* hit = new TRGCDCWireHit(w, i,
                                            0, 0, 0, 0, 0, 0, 0, 0);
-    if (!w.hit()) w.hit(hit);
+    w.hit(hit);
   }
 
   // simulate track segments and create track segment hits

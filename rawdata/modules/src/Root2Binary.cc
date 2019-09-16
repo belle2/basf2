@@ -23,6 +23,7 @@ REG_MODULE(Root2Binary)
 
 Root2BinaryModule::Root2BinaryModule() : PrintDataTemplateModule()
 {
+  m_fp_out = NULL;
   addParam("outputFileName", m_fname_out, "Output binary filename", string(""));
 }
 
@@ -98,7 +99,7 @@ void Root2BinaryModule::writeEvent(RawDataBlock* raw_dblk, int* first_flag, int*
       return;
     } else {
       fwrite((char*)temp_buf, 1, nwords * 4,  m_fp_out);
-      printf("eve %d size %d j %d\n", *dblk_eve, nwords * 4, j);
+      printf("eve %u size %d j %d\n", *dblk_eve, nwords * 4, j);
     }
 
     *first_flag = 1;
@@ -116,7 +117,7 @@ void Root2BinaryModule::event()
 
 
   B2INFO("Root2Binary: event() started.");
-  int array_entries;
+
 
 
   //
@@ -177,7 +178,7 @@ void Root2BinaryModule::event()
     break_flag = 0;
     first_flag = 0;
     dblk_eve = 0;
-    array_entries = raw_dblkarray.getEntries();
+    int array_entries = raw_dblkarray.getEntries();
     for (int i = dblk_array; i < array_entries; i++) {
       write_flag = 1;
       writeEvent(raw_dblkarray[ i ], &first_flag, &break_flag, &dblk_pos, &dblk_eve);

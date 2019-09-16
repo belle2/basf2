@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef EXTRAINFOREMOVERMODULE_H
-#define EXTRAINFOREMOVERMODULE_H
+#pragma once
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -40,10 +39,7 @@ namespace Belle2 {
     virtual void initialize() override;
     /** Method called for each event. */
     virtual void event() override;
-    /** Write TTree to file, and close file if necessary. */
-    virtual void terminate() override;
   };
 } // end namespace Belle2
 
-#endif // EXTRAINFOREMOVERMODULE_H
 

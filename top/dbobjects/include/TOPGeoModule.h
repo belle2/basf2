@@ -360,13 +360,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Module geometry parameters") const;
+    void print(const std::string& title = "Module geometry parameters") const override;
 
 
   private:
@@ -397,7 +397,7 @@ namespace Belle2 {
     /** cache for translation vector (from internal to Belle II frame) */
     mutable TVector3* m_translation = 0;  //!
 
-    ClassDef(TOPGeoModule, 3); /**< ClassDef */
+    ClassDefOverride(TOPGeoModule, 3); /**< ClassDef */
 
   };
 

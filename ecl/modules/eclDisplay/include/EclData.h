@@ -8,19 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_DATA
-#define ECL_DATA
+#pragma once
 
-#include <TTree.h>
-#include <TH1F.h>
-#include <TFile.h>
-#include <TLeaf.h>
+//STL
 #include <vector>
 #include <set>
-#include <framework/logging/Logger.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
+
+//Root
+#include <TTree.h>
+#include <TH1F.h>
+
+class TTree;
+
 
 namespace Belle2 {
+
+  class ECLCalDigit;
+
   /**
    * This class contains data for ECLSimHit's and provides several
    * relevant conversion functions for better event display.
@@ -280,5 +284,3 @@ namespace Belle2 {
     void fillTimeHistogram(TH1F* hist, int time_min, int time_max, EclSubsystem subsys);
   };
 }
-
-#endif // ECL_DATA

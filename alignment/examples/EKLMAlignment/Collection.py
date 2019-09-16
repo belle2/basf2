@@ -20,6 +20,7 @@ main.add_module(geometry)
 
 main.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False,
                 noiseCoulomb=False, noiseBrems=False)
+main.add_module('DAFRecoFitter')
 main.add_module('MillepedeCollector', components='EKLMAlignment',
                 useGblTree=False)
 

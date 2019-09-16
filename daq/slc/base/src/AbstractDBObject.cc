@@ -16,12 +16,12 @@ AbstractDBObject::AbstractDBObject(const AbstractDBObject& obj)
     m_id(obj.m_id),
     m_name(obj.m_name) {}
 
-AbstractDBObject::~AbstractDBObject() throw()
+AbstractDBObject::~AbstractDBObject()
 {
   reset();
 }
 
-void AbstractDBObject::reset() throw()
+void AbstractDBObject::reset()
 {
   m_path = "";
   m_id = 0;
@@ -30,20 +30,20 @@ void AbstractDBObject::reset() throw()
   m_pro_m = DBField::PropertyList();
 }
 
-DBField::Property AbstractDBObject::getProperty(const std::string& name) const throw()
+DBField::Property AbstractDBObject::getProperty(const std::string& name) const
 {
   DBField::PropertyList::const_iterator it = m_pro_m.find(name);
   if (it != m_pro_m.end()) return it->second;
   return DBField::Property();
 }
 
-bool AbstractDBObject::hasField(const std::string& name) const throw()
+bool AbstractDBObject::hasField(const std::string& name) const
 {
   DBField::PropertyList::const_iterator it = m_pro_m.find(name);
   return (it != m_pro_m.end());
 }
 
-bool AbstractDBObject::hasValue(const std::string& name) const throw()
+bool AbstractDBObject::hasValue(const std::string& name) const
 {
   DBField::PropertyList::const_iterator it = m_pro_m.find(name);
   return hasField(name) &&
@@ -51,20 +51,20 @@ bool AbstractDBObject::hasValue(const std::string& name) const throw()
          it->second.getType() != DBField::OBJECT;
 }
 
-bool AbstractDBObject::hasText(const std::string& name) const throw()
+bool AbstractDBObject::hasText(const std::string& name) const
 {
   DBField::PropertyList::const_iterator it = m_pro_m.find(name);
   return hasField(name) && it->second.getType() == DBField::TEXT;
 }
 
-bool AbstractDBObject::hasObject(const std::string& name) const throw()
+bool AbstractDBObject::hasObject(const std::string& name) const
 {
   DBField::PropertyList::const_iterator it = m_pro_m.find(name);
   return hasField(name) &&
          it->second.getType() == DBField::OBJECT;
 }
 
-void AbstractDBObject::add(const std::string& name, DBField::Property pro) throw()
+void AbstractDBObject::add(const std::string& name, DBField::Property pro)
 {
   if (!hasField(name)) {
     m_name_v.push_back(name);
@@ -73,7 +73,7 @@ void AbstractDBObject::add(const std::string& name, DBField::Property pro) throw
 }
 
 const std::string AbstractDBObject::getValueText(const std::string& name)
-const throw(std::out_of_range)
+const
 {
   if (hasField(name)) {
     switch (getProperty(name).getType()) {
@@ -92,7 +92,7 @@ const throw(std::out_of_range)
 }
 
 void AbstractDBObject::setValueText(const std::string& name,
-                                    const std::string& value) throw(std::out_of_range)
+                                    const std::string& value)
 {
   if (hasField(name)) {
     switch (getProperty(name).getType()) {

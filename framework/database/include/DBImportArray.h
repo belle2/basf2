@@ -120,7 +120,7 @@ namespace Belle2 {
      * add event dependency
      * @param eventNumber event number
      */
-    void addEventDependency(unsigned int eventNumber)
+    void addEventDependency(unsigned int eventNumber) override
     {
       addIntraRunDependency(eventNumber, c_Event);
       m_object = new TClonesArray(T::Class());
@@ -130,7 +130,7 @@ namespace Belle2 {
      * add time stamp dependency
      * @param timeStamp time stamp
      */
-    void addTimeStampDependency(unsigned long long int timeStamp)
+    void addTimeStampDependency(unsigned long long int timeStamp) override
     {
       addIntraRunDependency(timeStamp, c_TimeStamp);
       m_object = new TClonesArray(T::Class());
@@ -140,7 +140,7 @@ namespace Belle2 {
      * add subrun dependency
      * @param subrun subrun number
      */
-    void addSubrunDependency(int subrun)
+    void addSubrunDependency(int subrun) override
     {
       addIntraRunDependency(subrun, c_Subrun);
       m_object = new TClonesArray(T::Class());
@@ -149,7 +149,7 @@ namespace Belle2 {
     /**
      * Clear the content, e.g. destroy allocated objects and prepare for the new DB import.
      */
-    void clear()
+    void clear() override
     {
       DBImportBase::clear();
       m_object = new TClonesArray(T::Class());

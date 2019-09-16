@@ -18,6 +18,7 @@
 #include <framework/datastore/RelationEntry.h>
 #endif
 
+#include <regex>
 #include <array>
 #include <vector>
 #include <string>
@@ -174,13 +175,20 @@ namespace Belle2 {
     }
 
     /** Return storage name for a relation between two arrays of the given names. */
-    static std::string relationName(const std::string& fromName, const std::string& toName)
+    static std::string relationName(const std::string& fromName, const std::string& toName,
+                                    std::string const& namedRelation = "")
     {
       std::string s;
       s.reserve(fromName.length() + toName.length() + 2);
       s += fromName;
       s += "To";
       s += toName;
+      if (namedRelation.length() > 0) {
+        s += "Named";
+        // Characters are not escaped here, because in registerRelation, the namedRelation
+        // given is checked to contain no special characters or white spaces
+        s += namedRelation;
+      }
       return s;
     }
 
@@ -209,11 +217,24 @@ namespace Belle2 {
      *  @param toArray    Target of the relation
      *  @param durability Decide with which durability map you want to perform the requested action.
      *  @param storeFlags ORed combination of DataStore::EStoreFlags.
+     *  @param namedRelation Additional name for the relation, or "" for the default naming
      *  @return           True if the registration succeeded.
      *  @sa DependencyMap
      */
     bool registerRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
-                          EStoreFlags storeFlags);
+                          EStoreFlags storeFlags, const std::string& namedRelation);
+
+    /** Check for the existence of a relation in the DataStore map.
+     *
+     *  @param fromArray  Origin of the relation
+     *  @param toArray    Target of the relation
+     *  @param durability Decide with which durability map you want to perform the requested action.
+     *  @param namedRelation Additional name for the relation, or "" for the default naming.
+     *  @return           True if there is a registered relation.
+     *  @sa DependencyMap
+     */
+    bool hasRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
+                     const std::string& namedRelation);
 
     /** Produce ERROR message if no entry of the given type is registered in the DataStore.
      *
@@ -230,13 +251,15 @@ namespace Belle2 {
      *  @return           True if the requested object exists.
      *  @sa DependencyMap
      */
-    bool requireRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability);
+    bool requireRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
+                         std::string const& namedRelation);
 
     /** Register the given object/array as an optional input.
      *
      *  Mainly useful for creating diagrams of module inputs and outputs.
      *
      *  @param accessor   Encapsulates name, durability, and type
+     *  @param namedRelation Additional name for the relation, or "" for the default naming
      *  @return           True if the requested object exists.
      *  @sa DependencyMap
      */
@@ -245,11 +268,12 @@ namespace Belle2 {
     /** Register the given relation as an optional input.
      *
      *  Mainly useful for creating diagrams of module inputs and outputs.
-     *
+     *  @param namedRelation Additional name for the relation, or "" for the default naming
      *  @return           True if the requested object exists.
      *  @sa DependencyMap
      */
-    bool optionalRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability);
+    bool optionalRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
+                          std::string const& namedRelation);
 
     /** Check whether an entry with the correct type is registered in the DataStore map and return it.
      *
@@ -302,9 +326,10 @@ namespace Belle2 {
      *  @param toEntry        Data store entry that contains the toObject. Used for caching. Will be set if NULL.
      *  @param toIndex        Index in TClonesArray that contains the toObject. Used for caching. Will be set if < 0.
      *  @param weight         Weight of the relation.
+     *  @param namedRelation  Additional name for the relation, or "" for the default naming
      */
     void addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, StoreEntry*& toEntry,
-                     int& toIndex, float weight);
+                     int& toIndex, float weight, const std::string& namedRelation);
 
 
     /** Get the relations between an object and other objects in a store array.
@@ -317,10 +342,12 @@ namespace Belle2 {
      *  @param withName        The name of the store array to or from which the relations point.
      *                        If empty the default store array name for withClass will be used.
      *                        If the special name "ALL" is given all store arrays containing object of type withClass are considered.
+     *  @param namedRelation  Additional name for the relation, or "" for the default naming. If withName is "ALL", the
+     *                        namedRelation parameter is ignored and all related objects are returned.
      *  @return               Vector of relation entry objects (not type-safe).
      */
     RelationVectorBase getRelationsWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index,
-                                        const TClass* withClass, const std::string& withName);
+                                        const TClass* withClass, const std::string& withName, const std::string& namedRelation);
 
     /** Get the first relation between an object and another object in a store array.
      *
@@ -332,10 +359,12 @@ namespace Belle2 {
      *  @param withName       The name of the store array to or from which the relation points.
      *                        If empty the default store array name for withClass will be used.
      *                        If the special name "ALL" is given all store arrays containing object of type withClass are considered.
+     *  @param namedRelation Additional name for the relation, or "" for the default naming. If withName is "ALL", the
+     *                        namedRelation parameter is ignored and all related objects are returned.
      *  @return               The entry of the first related object.
      */
     Belle2::RelationEntry getRelationWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index,
-                                          const TClass* withClass, const std::string& withName);
+                                          const TClass* withClass, const std::string& withName, const std::string& namedRelation);
 
     /** Add a relation from an object in a store array to another object in a store array.
      *
@@ -345,14 +374,16 @@ namespace Belle2 {
      *  @param fromObject     Pointer to the object from which the relation points.
      *  @param toObject       Pointer to the object to which the relation points.
      *  @param weight         Weight of the relation.
+     *  @param namedRelation  Additional name for the relation, or "" for the default naming
      */
-    static void addRelationFromTo(const TObject* fromObject, const TObject* toObject, float weight = 1.0)
+    static void addRelationFromTo(const TObject* fromObject, const TObject* toObject, float weight = 1.0,
+                                  const std::string& namedRelation = "")
     {
       DataStore::StoreEntry* fromEntry = nullptr;
       int fromIndex = -1;
       StoreEntry* toEntry = nullptr;
       int toIndex = -1;
-      Instance().addRelation(fromObject, fromEntry, fromIndex, toObject, toEntry, toIndex, weight);
+      Instance().addRelation(fromObject, fromEntry, fromIndex, toObject, toEntry, toIndex, weight, namedRelation);
     }
 
     /** Get the relations between an object and other objects in a store array.
@@ -367,13 +398,15 @@ namespace Belle2 {
      *  @param name           The name of the store array to or from which the relations point.
      *                        If empty the default store array name for withClass will be used.
      *                        If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *  @param namedRelation  Additional name for the relation, or "" for the default naming
      *  @return               Vector of relation entry objects.
      */
-    template <class T> static RelationVector<T> getRelationsWithObj(const TObject* object, const std::string& name = "")
+    template <class T> static RelationVector<T> getRelationsWithObj(const TObject* object, const std::string& name = "",
+        const std::string& namedRelation = "")
     {
       StoreEntry* storeEntry = nullptr;
       int index = -1;
-      return RelationVector<T>(Instance().getRelationsWith(c_BothSides, object, storeEntry, index, T::Class(), name));
+      return RelationVector<T>(Instance().getRelationsWith(c_BothSides, object, storeEntry, index, T::Class(), name, namedRelation));
     }
 
     /** Get the object to or from which another object has a relation.
@@ -385,14 +418,16 @@ namespace Belle2 {
      *  @param name    The name of the store array to or from which the relation points.
      *                 If empty the default store array name for class T will be used.
      *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *  @param namedRelation Additional name for the relation, or "" for the default naming
      *  @return        The related object or a null pointer.
      */
-    template <class T> static T* getRelated(const TObject* object, const std::string& name = "")
+    template <class T> static T* getRelated(const TObject* object, const std::string& name = "", const std::string& namedRelation = "")
     {
       if (!object) return nullptr;
       StoreEntry* storeEntry = nullptr;
       int index = -1;
-      return static_cast<T*>(DataStore::Instance().getRelationWith(c_BothSides, object, storeEntry, index, T::Class(), name).object);
+      return static_cast<T*>(DataStore::Instance().getRelationWith(c_BothSides, object, storeEntry, index, T::Class(), name,
+                             namedRelation).object);
     }
 
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
@@ -489,6 +524,8 @@ namespace Belle2 {
     explicit DataStore();
     /** no copy constructor */
     DataStore(const DataStore&) = delete;
+    /** no assignment operator */
+    DataStore& operator=(const DataStore&) = delete;
     /** Destructor. */
     ~DataStore();
 
@@ -565,6 +602,12 @@ namespace Belle2 {
      * Creating new map slots is only allowed in a Module's initialize() function.
      */
     bool m_initializeActive;
+
+    /**
+     * Regular expression to check that no special characters and no
+     * white spaces are in the string given for namedRelations.
+     */
+    const std::regex m_regexNamedRelationCheck = std::regex("^[a-zA-Z]*$");
 
     /** Collect information about the dependencies between modules. */
     DependencyMap* m_dependencyMap;

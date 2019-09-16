@@ -34,17 +34,17 @@ namespace Belle2 {
     /** Destructor */
     ~ PXDClusterPositionEstimatorPar() {}
 
-    /** Add grid for pixelkind */
-    void addGrid(int pixelkind, const TH2F& grid)
+    /** Add grid for clusterkind */
+    void addGrid(int clusterkind, const TH2F& grid)
     {
-      m_gridmap[pixelkind] = grid;
-      m_shapeClassifiers[pixelkind] = std::vector<PXDClusterShapeClassifierPar>();
+      m_gridmap[clusterkind] = grid;
+      m_shapeClassifiers[clusterkind] = std::vector<PXDClusterShapeClassifierPar>();
 
-      for (auto uBin = 1; uBin <= m_gridmap[pixelkind].GetXaxis()->GetNbins(); uBin++) {
-        for (auto vBin = 1; vBin <= m_gridmap[pixelkind].GetYaxis()->GetNbins(); vBin++) {
-          auto size = m_shapeClassifiers[pixelkind].size();
-          m_gridmap[pixelkind].SetBinContent(uBin, vBin, size);
-          m_shapeClassifiers[pixelkind].push_back(PXDClusterShapeClassifierPar());
+      for (auto uBin = 1; uBin <= m_gridmap[clusterkind].GetXaxis()->GetNbins(); uBin++) {
+        for (auto vBin = 1; vBin <= m_gridmap[clusterkind].GetYaxis()->GetNbins(); vBin++) {
+          auto size = m_shapeClassifiers[clusterkind].size();
+          m_gridmap[clusterkind].SetBinContent(uBin, vBin, size);
+          m_shapeClassifiers[clusterkind].push_back(PXDClusterShapeClassifierPar());
         }
       }
     }
@@ -56,40 +56,40 @@ namespace Belle2 {
     }
 
     /** Set shape classifier*/
-    void setShapeClassifier(const PXDClusterShapeClassifierPar& classifier, int uBin, int vBin, int pixelkind)
+    void setShapeClassifier(const PXDClusterShapeClassifierPar& classifier, int uBin, int vBin, int clusterkind)
     {
-      int key = m_gridmap[pixelkind].GetBinContent(uBin, vBin);
-      m_shapeClassifiers[pixelkind][key] = classifier;
+      int key = m_gridmap[clusterkind].GetBinContent(uBin, vBin);
+      m_shapeClassifiers[clusterkind][key] = classifier;
     }
 
     /** Returns shape classifier */
-    const PXDClusterShapeClassifierPar& getShapeClassifier(int uBin, int vBin, int pixelkind) const
+    const PXDClusterShapeClassifierPar& getShapeClassifier(int uBin, int vBin, int clusterkind) const
     {
-      int key = m_gridmap.at(pixelkind).GetBinContent(uBin, vBin);
-      const PXDClusterShapeClassifierPar& classifier = m_shapeClassifiers.at(pixelkind)[key];
+      int key = m_gridmap.at(clusterkind).GetBinContent(uBin, vBin);
+      const PXDClusterShapeClassifierPar& classifier = m_shapeClassifiers.at(clusterkind)[key];
       return classifier;
     }
 
-    /** Returns shape classifier for incidence angles and pixelkind */
-    const PXDClusterShapeClassifierPar& getShapeClassifier(double thetaU, double thetaV, int pixelkind) const
+    /** Returns shape classifier for incidence angles and clusterkind */
+    const PXDClusterShapeClassifierPar& getShapeClassifier(double thetaU, double thetaV, int clusterkind) const
     {
-      auto grid = m_gridmap.at(pixelkind);
+      auto grid = m_gridmap.at(clusterkind);
       int uBin = grid.GetXaxis()->FindBin(thetaU);
       int vBin = grid.GetYaxis()->FindBin(thetaV);
       int key = grid.GetBinContent(uBin, vBin);
-      return m_shapeClassifiers.at(pixelkind)[key];
+      return m_shapeClassifiers.at(clusterkind)[key];
     }
 
     /** Returns True if there is a classifier available */
-    bool hasClassifier(double thetaU, double thetaV, int pixelkind) const
+    bool hasClassifier(double thetaU, double thetaV, int clusterkind) const
     {
-      //Check pixelkind is valid
-      if (m_gridmap.find(pixelkind) == m_gridmap.end()) {
+      //Check clusterkind is valid
+      if (m_gridmap.find(clusterkind) == m_gridmap.end()) {
         return false;
       }
 
       // Check thetaU, thetaV are inside grid
-      auto grid = m_gridmap.at(pixelkind);
+      auto grid = m_gridmap.at(clusterkind);
       int uBin = grid.GetXaxis()->FindBin(thetaU);
       int vBin = grid.GetYaxis()->FindBin(thetaV);
       int uBins = grid.GetXaxis()->GetNbins();
@@ -100,36 +100,25 @@ namespace Belle2 {
       return true;
     }
 
-    /** Returns True if there are valid position corrections available */
-    bool hasOffset(int shape_index, float eta, double thetaU, double thetaV, int pixelkind) const
+    /** Returns correction (offset) for cluster shape relative to center of pixel (startU/startV) if available, otherwise returns nullptr.*/
+    const PXDClusterOffsetPar* getOffset(int shape_index, float eta, double thetaU, double thetaV, int clusterkind) const
     {
       //Check if there is a classifier
-      if (not hasClassifier(thetaU, thetaV, pixelkind)) {
-        return false;
+      if (not hasClassifier(thetaU, thetaV, clusterkind)) {
+        return nullptr;
       }
-      const PXDClusterShapeClassifierPar& classifier = getShapeClassifier(thetaU, thetaV, pixelkind);
-      // Check if classifier has offset correction
-      if (not classifier.hasOffset(shape_index, eta))
-        return false;
-
-      return true;
-    }
-
-    /** Returns correction (offset) for cluster shape relative to center of pixel (startU/startV)*/
-    const PXDClusterOffsetPar& getOffset(int shape_index, float eta, double thetaU, double thetaV, int pixelkind) const
-    {
-      const PXDClusterShapeClassifierPar& classifier = getShapeClassifier(thetaU, thetaV, pixelkind);
+      const PXDClusterShapeClassifierPar& classifier = getShapeClassifier(thetaU, thetaV, clusterkind);
       return classifier.getOffset(shape_index, eta);
     }
 
     /** Returns shape likelyhood. Returns zero if shape not known, otherwise positive float*/
-    float getShapeLikelyhood(int shape_index, double thetaU, double thetaV, int pixelkind) const
+    float getShapeLikelyhood(int shape_index, double thetaU, double thetaV, int clusterkind) const
     {
       // Return zero if there no classifier
-      if (not hasClassifier(thetaU, thetaV, pixelkind)) {
+      if (not hasClassifier(thetaU, thetaV, clusterkind)) {
         return 0;
       }
-      auto likelyhoodMap = getShapeClassifier(thetaU, thetaV, pixelkind).getShapeLikelyhoodMap();
+      auto likelyhoodMap = getShapeClassifier(thetaU, thetaV, clusterkind).getShapeLikelyhoodMap();
 
       // Return zero if no likelyhood was estimated
       auto it = likelyhoodMap.find(shape_index);
@@ -141,11 +130,11 @@ namespace Belle2 {
 
   private:
 
-    /** Map of angular grids for different pixelkinds  */
+    /** Map of angular grids for different clusterkinds  */
     std::map<int, TH2F> m_gridmap;
-    /** Map of cluster shape classifiers for different pixelkinds*/
+    /** Map of cluster shape classifiers for different clusterkinds*/
     std::map<int, std::vector<PXDClusterShapeClassifierPar> > m_shapeClassifiers;
 
-    ClassDef(PXDClusterPositionEstimatorPar, 1);   /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(PXDClusterPositionEstimatorPar, 2);   /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2

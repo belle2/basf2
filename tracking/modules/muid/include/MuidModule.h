@@ -134,6 +134,9 @@ namespace Belle2 {
     //! maximum miss-distance between the trajectory curve and its linear chord(s) approximation
     double m_DeltaChordInMagneticField;
 
+    //! Parameter to add the found hits also to the reco tracks or not. Is turned off by default.
+    bool m_addHitsToRecoTrack = false;
+
     //! A list of Geant4 UI commands that should be applied before the extrapolation starts
     std::vector<std::string> m_UICommands;
 

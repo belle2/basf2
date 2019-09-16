@@ -7,28 +7,21 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-
 #pragma once
 
-//basf2 framework headers
+//STL
+#include <string>
+
+//Framework
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+
+//ECL
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/dataobjects/ECLSimHit.h>
-
-//C++/C standard lib elements.
-#include <string>
-#include <vector>
-#include <queue>
-#include <map>
-
-//ROOT
-#include <TRandom3.h>
-
 
 namespace Belle2 {
   class ECLDebugHit;
+  class ECLSimHit;
 
   /** Class to represent the hit of one cell */
   class ECLHitDebugModule : public Module {
@@ -41,22 +34,22 @@ namespace Belle2 {
     virtual ~ECLHitDebugModule();
 
     /** Initialize variables, print info, and start CPU clock. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Nothing so far.*/
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Actual digitization of all hits in the ECL.
      *
      *  The digitized hits are written into the DataStore.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** Nothing so far. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Stopping of CPU clock.*/
-    virtual void terminate();
+    virtual void terminate() override;
 
   protected:
     /** Input array name. */
@@ -65,18 +58,19 @@ namespace Belle2 {
     std::string m_eclHitOutColName;
 
     /** The current number of created hits in an event. Used to fill the DataStore ECL array.*/
-    int m_hitNum;
+    int m_hitNum{ -1};
 
   private:
     /** CPU time     */
-    double m_timeCPU;
+    double m_timeCPU{ -1.0};
     /** Run number   */
-    int    m_nRun;
+    int    m_nRun{ -1};
     /** Event number */
-    int    m_nEvent;
+    int    m_nEvent{ -1};
 
     //DataStore variables
     StoreArray<ECLDebugHit> m_eclDebugHits; /**< ECLDebugHit datastore object */
+    StoreArray<ECLSimHit> m_eclSimArray; /**< StoreArray ECLSimHit */
 
   };
 } // end of Belle2 namespace

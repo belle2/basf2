@@ -52,8 +52,6 @@ int HistoServer::server()
   while (m_force_exit == 0) {
     int exam_stat = m_man->examine();
     if (exam_stat == 0) {
-      printf("Initial connection request detected!\n");
-      //      int fd = recvsock[;
     } else if (exam_stat == 1) { //
       // printf ( "Histo data ready on socket\n" );
       vector<int>& recvsock = m_man->connected_socket_list();
@@ -83,12 +81,9 @@ int HistoServer::server()
             //      printf ( "Object : %s received, class = %s\n", (strlist.at(i)).c_str(),
             //                     (objlist.at(i))->ClassName() );
             string objname = strlist.at(i);
-            int lpos = objname.find_first_not_of("SUBDIR:", 0);
-            //      printf ( "lpos = %d\n", lpos );
-            //            if (lpos != (int)string::npos) {
-            if (lpos > 1) {
-              //              subdir = objname.substr(lpos - 1);
-              subdir = objname.substr(lpos - 1);
+            int lpos = objname.find("SUBDIR:");
+            if (lpos != string::npos) {
+              subdir = objname.substr(7);
               if (subdir == "EXIT") subdir = "";
               //              printf("HistoServer : subdirectory set to %s (%s)\n", subdir.c_str(), objname.c_str());
             } else {

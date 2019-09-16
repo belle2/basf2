@@ -9,7 +9,6 @@
  **************************************************************************/
 
 // Own include
-#include <arich/modules/arichDQM/newTHs.h>
 #include <arich/modules/arichDQM/hitMapMaker.h>
 
 // ARICH
@@ -18,7 +17,6 @@
 #include <arich/dbobjects/ARICHMergerMapping.h>
 #include <arich/dbobjects/ARICHCopperMapping.h>
 #include <arich/dbobjects/ARICHGeoDetectorPlane.h>
-#include <framework/database/DBObjPtr.h>
 
 #include <arich/dataobjects/ARICHHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
@@ -65,25 +63,17 @@ using namespace std;
 
 namespace Belle2 {
 
-  int m_moduleID = 0;
-  int m_mergerID = 0;
-  //int deadPalette[50];
-  TH1* m_hitMap = NULL;
-  TH2* m_moduleHitMap = NULL;
-  TH2* m_moduleDeadMap = NULL;
-  TCanvas* m_sectorHitMap = NULL;
-  TCanvas* m_sectorDeadMap = NULL;
-  TExec* ex1 = NULL;
-
   TH2* moduleHitMap(TH1* hitMap, int moduleID)
   {
 
+    int m_moduleID = moduleID;
+
     DBObjPtr<ARICHChannelMapping> arichChMap;
 
-    TH2* m_moduleHitMap = newTH2(Form("HAPDHitMapMod%d", moduleID), Form("HAPD hit map module %d;nChX;nChY", moduleID), 12, 0.5, 12.5,
-                                 12, 0.5, 12.5, kRed, kRed);
-    m_hitMap = hitMap;
-    m_moduleID = moduleID;
+    TH2* m_moduleHitMap = new TH2D(Form("HAPDHitMapMod%d", moduleID), Form("HAPD hit map module %d;nChX;nChY", moduleID), 12, 0.5, 12.5,
+                                   12,
+                                   0.5, 12.5);
+    TH1* m_hitMap = hitMap;
 
     for (int i = 0; i < 144; i++) {
       int hitsNum = m_hitMap->GetBinContent((m_moduleID - 1) * 144 + i);
@@ -99,13 +89,14 @@ namespace Belle2 {
 
   TH2* moduleDeadMap(TH1* hitMap, int moduleID)
   {
+    int m_moduleID = moduleID;
 
     DBObjPtr<ARICHChannelMapping> arichChMap;
 
-    TH2* m_moduleDeadMap = newTH2(Form("HAPDDeadMapMod%d", moduleID), Form("HAPD alive/dead module %d;nChX;nChY", moduleID), 2, 0.5,
-                                  2.5, 2, 0.5, 2.5, kRed, kRed);
-    m_hitMap = hitMap;
-    m_moduleID = moduleID;
+    TH2* m_moduleDeadMap = new TH2D(Form("HAPDDeadMapMod%d", moduleID), Form("HAPD alive/dead module %d;nChX;nChY", moduleID), 2, 0.5,
+                                    2.5,
+                                    2, 0.5, 2.5);
+    TH1* m_hitMap = hitMap;
 
     int deadCh[2][2] = {};
 
@@ -125,13 +116,6 @@ namespace Belle2 {
         }
       }
     }
-    const Int_t Number = 3;
-    Double_t Red[Number]    = { 1.00, 0.00, 0.00};
-    Double_t Green[Number]  = { 0.00, 0.00, 0.00};
-    Double_t Blue[Number]   = { 0.00, 1.00, 1.00};
-    Double_t Length[Number] = { 0.00, 0.20, 1.00 };
-    Int_t nb = 50;
-    Int_t fl = TColor::CreateGradientColorTable(Number, Length, Red, Green, Blue, nb);
 
     return m_moduleDeadMap;
   }
@@ -139,11 +123,12 @@ namespace Belle2 {
   TH1* mergerClusterHitMap1D(TH1* hitMap, int mergerID)
   {
 
+    int m_mergerID = mergerID;
+
     DBObjPtr<ARICHChannelMapping> arichChMap;
     DBObjPtr<ARICHMergerMapping> arichMergerMap;
 
-    m_hitMap = hitMap;
-    m_mergerID = mergerID;
+    TH1* m_hitMap = hitMap;
 
     std::vector<int> moduleIDs;
     for (int i = 1; i < 7; i++) {
@@ -162,12 +147,13 @@ namespace Belle2 {
 
   TCanvas* mergerClusterHitMap2D(TH1* hitMap, int mergerID)
   {
+    int m_mergerID = mergerID;
 
     DBObjPtr<ARICHChannelMapping> arichChMap;
     DBObjPtr<ARICHMergerMapping> arichMergerMap;
 
-    m_hitMap = hitMap;
-    m_mergerID = mergerID;
+    TH1* m_hitMap = hitMap;
+
 
     std::vector<int> moduleIDs;
     for (int i = 1; i < 7; i++) {
@@ -185,9 +171,12 @@ namespace Belle2 {
 
   TCanvas* sectorHitMap(TH1* hitMap, int sector)
   {
-    m_hitMap = hitMap;
+    //    TH1* m_hitMap = NULL;
+    TH2* m_moduleHitMap = NULL;
+
+    //m_hitMap = hitMap;
     TPad* p_hitMaps[421] = {};
-    m_sectorHitMap = new TCanvas(Form("c_hitMap%d", sector - 1), Form("Hit map of sector%d", sector - 1), 600, 400);
+    TCanvas* m_sectorHitMap = new TCanvas(Form("c_hitMap%d", sector - 1), Form("Hit map of sector%d", sector - 1), 600, 400);
     for (int i = 1; i < 421; i++) {
       for (int iRing = 0; iRing < 7; iRing++) {
         if (((iRing + 13)*iRing / 2) * 6 + (iRing + 7) * (sector - 1) < i && i <= ((iRing + 13)*iRing / 2) * 6 + (iRing + 7) * (sector)) {
@@ -214,9 +203,13 @@ namespace Belle2 {
 
   TCanvas* sectorDeadMap(TH1* hitMap, int sector)
   {
-    m_hitMap = hitMap;
+    //TH1* m_hitMap = NULL;
+    TH2* m_moduleDeadMap = NULL;
+    TExec* ex1 = NULL;
+
+    //m_hitMap = hitMap;
     TPad* p_hitMaps[421] = {};
-    m_sectorDeadMap = new TCanvas(Form("c_deadMap%d", sector - 1), Form("Dead chip map of sector%d", sector - 1), 600, 400);
+    TCanvas* m_sectorDeadMap = new TCanvas(Form("c_deadMap%d", sector - 1), Form("Dead chip map of sector%d", sector - 1), 600, 400);
     for (int i = 1; i < 421; i++) {
       for (int iRing = 0; iRing < 7; iRing++) {
         if (((iRing + 13)*iRing / 2) * 6 + (iRing + 7) * (sector - 1) < i && i <= ((iRing + 13)*iRing / 2) * 6 + (iRing + 7) * (sector)) {

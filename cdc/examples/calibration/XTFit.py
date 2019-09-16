@@ -12,7 +12,7 @@ gSystem.Load('libcdc')
 
 reset_database()
 use_database_chain()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
+use_central_database("Calibration_Offline_Development", LogLevel.INFO)
 logging.log_level = LogLevel.INFO
 set_debug_level(200)
 

@@ -85,6 +85,10 @@ namespace Belle2 {
 
     /** returns the vector of spacepoints which have been used to evaluate the filters */
     std::vector<SpacePointInfo> getHits() { return m_hits; };
+
+    /** Returns the i-th hit
+     * @param i: hit index
+    */
     SpacePointInfo getHit(int i)
     {
       if (i < 0 || i > (int)m_hits.size()) return SpacePointInfo();  // return a dummy object

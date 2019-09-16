@@ -12,6 +12,8 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <svd/geometry/SensorInfo.h>
+#include <vxd/geometry/GeoCache.h>
 
 using namespace Belle2;
 using namespace std;
@@ -72,18 +74,20 @@ SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename): m_MapUn
     // SVDDigits filling
     return;
   }
-
 }
-
 
 const SVDOnlineToOfflineMap::SensorInfo& SVDOnlineToOfflineMap::getSensorInfo(unsigned char FADC, unsigned char APV25)
 {
+
   ChipID id(FADC, APV25);
   auto sensorIter = m_sensors.find(id);
 
   if (sensorIter == m_sensors.end()) {
-    B2WARNING(" FADC #" <<  int(FADC) << " and " << "APV # " << int(APV25) <<
-              " : combination not found in the SVD On-line to Off-line map ");
+    nBadMappingErrors++;
+
+    if (!(nBadMappingErrors % m_errorRate)) B2ERROR("Combination not found in the SVD On-line to Off-line map:" << LogVar("FADC",
+                                                      int(FADC)) << LogVar("APV", int(APV25)));
+
     m_currentSensorInfo.m_sensorID = 0;
     m_currentSensorInfo.m_channel0 = 0;
     m_currentSensorInfo.m_channel127 = 0;
@@ -101,33 +105,64 @@ const SVDOnlineToOfflineMap::ChipInfo& SVDOnlineToOfflineMap::getChipInfo(unsign
   SensorID id(layer, ladder, dssd, side);
   auto chipIter = m_chips.find(id);
 
-  if (chipIter == m_chips.end()) {
-    B2WARNING(" sensorID: " <<  layer << "." << ladder << "." << dssd << ", isU=" << side << ", strip=" << strip <<
-              " : combination not found in the SVD Off-line to On-line map ");
+  if (chipIter == m_chips.end())  B2WARNING(" The following combination: sensorID: " <<  layer << "." << ladder << "." << dssd <<
+                                              ", isU=" << side << ", strip=" << strip <<
+                                              " - is not found in the SVD Off-line to On-line map! The payload retrieved from database may be wrong! ");
 
-    m_currentChipInfo.fadc = 0;
-    m_currentChipInfo.apv = 0;
-    m_currentChipInfo.stripFirst = 0;
-    m_currentChipInfo.stripLast = 0;
-    m_currentChipInfo.apvChannel = 0;
-    return m_currentChipInfo;
-  }
 
   vector<ChipInfo> vecChipInfo = chipIter->second;
 
-  ChipInfo* pinfo = &vecChipInfo.at(0);
+  ChipInfo info = {0, 0, 0, 0, 0};
+  ChipInfo* pinfo = &info;
 
   for (std::vector<ChipInfo>::iterator it = vecChipInfo.begin() ; it != vecChipInfo.end(); ++it) {
     ChipInfo& chipInfo = *it;
-    if (strip >= chipInfo.stripFirst and strip <= chipInfo.stripLast) {
-      pinfo = &chipInfo;
-      pinfo->apvChannel = strip - (pinfo->stripFirst);
-    }
+    unsigned short channelFirst = min(chipInfo.stripFirst, chipInfo.stripLast);
+    unsigned short channelLast = max(chipInfo.stripFirst, chipInfo.stripLast);
 
+    if (strip >= channelFirst and strip <= channelLast) {
+      pinfo = &chipInfo;
+      pinfo->apvChannel = abs(strip - (pinfo->stripFirst));
+    }
   }
+  if (pinfo->fadc == 0) B2WARNING("The strip number " << strip << " is not found in the SVDOnlineToOfflineMap for sensor " << layer <<
+                                    "." << ladder << "." << dssd << " on side " << (side ? "u" : "v") << "! Related APV chip is excluded in the hardware mapping.");
 
   m_currentChipInfo = *pinfo;
   return m_currentChipInfo;
+}
+
+bool SVDOnlineToOfflineMap::isAPVinMap(unsigned short layer,  unsigned short ladder,
+                                       unsigned short dssd, bool side, unsigned short strip)
+{
+  SensorID id(layer, ladder, dssd, side);
+  auto chipIter = m_chips.find(id);
+
+  if (chipIter == m_chips.end()) return false;
+
+  vector<ChipInfo> vecChipInfo = chipIter->second;
+
+  ChipInfo info = {0, 0, 0, 0, 0};
+  ChipInfo* pinfo = &info;
+
+  for (std::vector<ChipInfo>::iterator it = vecChipInfo.begin() ; it != vecChipInfo.end(); ++it) {
+    ChipInfo& chipInfo = *it;
+    unsigned short channelFirst = min(chipInfo.stripFirst, chipInfo.stripLast);
+    unsigned short channelLast = max(chipInfo.stripFirst, chipInfo.stripLast);
+
+    if (strip >= channelFirst and strip <= channelLast) {
+      pinfo = &chipInfo;
+      pinfo->apvChannel = abs(strip - (pinfo->stripFirst));
+    }
+  }
+  if (pinfo->fadc == 0) return false;
+
+  return true;
+}
+
+bool SVDOnlineToOfflineMap::isAPVinMap(VxdID sensorID, bool side, unsigned short strip)
+{
+  return isAPVinMap(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(), side, strip);
 }
 
 
@@ -138,13 +173,17 @@ SVDDigit* SVDOnlineToOfflineMap::NewDigit(unsigned char FADC,
 {
   // Issue a warning, we'll be sending out a null pointer.
   if (channel > 127) {
-    B2WARNING(" channel #" <<  int(channel) << " out of range (0-127).");
+    B2WARNING(" channel out of range (0-127):" << LogVar("channel", int(channel)));
     return NULL;
   }
   const SensorInfo& info = getSensorInfo(FADC, APV25);
   short strip = getStripNumber(channel, info);
 
-  return new SVDDigit(info.m_sensorID, info.m_uSide, strip, 0., charge, time);
+  if (info.m_sensorID) {
+    return new SVDDigit(info.m_sensorID, info.m_uSide, strip, 0., charge, time);
+  } else {
+    return NULL;
+  }
 }
 
 SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
@@ -152,7 +191,7 @@ SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
 {
   // Issue a warning, we'll be sending out a null pointer.
   if (channel > 127) {
-    B2WARNING(" channel #" <<  int(channel) << " out of range (0-127).");
+    B2WARNING(" channel out of range (0-127):" << LogVar("channel", int(channel)));
     return NULL;
   }
   const SensorInfo& info = getSensorInfo(FADC, APV25);
@@ -161,7 +200,12 @@ SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
   SVDShaperDigit::APVRawSamples rawSamples;
   copy(samples, samples + SVDShaperDigit::c_nAPVSamples, rawSamples.begin());
 
-  return new SVDShaperDigit(info.m_sensorID, info.m_uSide, strip, rawSamples, time, mode);
+  // create SVDShaperDigit only for existing sensor
+  if (info.m_sensorID) {
+    return new SVDShaperDigit(info.m_sensorID, info.m_uSide, strip, rawSamples, time, mode);
+  } else {
+    return NULL;
+  }
 }
 
 
@@ -284,3 +328,37 @@ void SVDOnlineToOfflineMap::prepFADCmaps(FADCmap& map1, FADCmap& map2)
   }
 }
 
+void SVDOnlineToOfflineMap::prepareListOfMissingAPVs()
+{
+
+
+  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
+
+  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD))
+    for (auto ladder : geoCache.getLadders(layer))
+      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
+        for (int view = 0; view < 2; view++) {
+
+          int nAPVs = 6;
+          if (layer.getLayerNumber() != 3 && view == 0)
+            nAPVs = 4;
+
+          //loop on all APVs of the side
+          for (int apv = 0; apv < nAPVs; apv++) {
+            B2DEBUG(29, "checking " << sensor.getLayerNumber() << "." << sensor.getLadderNumber() << "." << sensor.getSensorNumber() <<
+                    ", view = " << view << ", apv = " << apv);
+            if (! isAPVinMap(sensor, view, apv * 128 + 63.5)) {
+              missingAPV tmp_missingAPV;
+              tmp_missingAPV.m_sensorID = sensor;
+              tmp_missingAPV.m_isUSide = view;
+              tmp_missingAPV.m_halfStrip = apv * 128 + 63.5;
+
+              m_missingAPVs.push_back(tmp_missingAPV);
+              B2DEBUG(29, "FOUND MISSING APV: " << sensor << ", " << view << ", " << apv);
+            }
+
+          }
+
+        }
+
+}

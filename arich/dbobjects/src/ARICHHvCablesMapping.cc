@@ -70,7 +70,7 @@ void ARICHHvCablesMapping::addMapping(int moduleID, int sectorID, int cableID, i
 
 }
 
-void ARICHHvCablesMapping::print()
+void ARICHHvCablesMapping::print() const
 {
 
   for (int moduleID = 1; moduleID < N_MODULES + 1; moduleID++) {

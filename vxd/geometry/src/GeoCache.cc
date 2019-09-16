@@ -14,9 +14,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-#include <framework/database/DBObjPtr.h>
-#include <alignment/dbobjects/VXDAlignment.h>
-
 #include <stack>
 #include <memory>
 
@@ -29,6 +26,12 @@ using namespace std;
 
 namespace Belle2 {
   namespace VXD {
+    GeoCache::GeoCache()
+    {
+      // Add callback to update ReconstructionTransformation whenever alignment changes
+      m_vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
+    }
+
     void GeoCache::clear()
     {
       m_pxdLayers.clear();
@@ -118,6 +121,7 @@ namespace Belle2 {
           transform.SetDy(g4transform[13]*Unit::mm);
           transform.SetDz(g4transform[14]*Unit::mm);
           info->setTransformation(transform);
+          info->setTransformation(transform, true);
 
           addSensor(info);
         }
@@ -133,7 +137,7 @@ namespace Belle2 {
         }
       }
 
-      // Finally set-up reconstruction transformations (adds a callback to itself for updates)
+      // Finally set-up reconstruction transformations
       setupReconstructionTransformations();
     }
 
@@ -212,25 +216,24 @@ namespace Belle2 {
 
     void GeoCache::addSensorPlacement(VxdID ladder, VxdID sensor, const G4Transform3D& placement)
     {
-      auto sensorsPlacements = m_sensorPlacements.find(ladder);
-      if (sensorsPlacements == m_sensorPlacements.end())
-        m_sensorPlacements.insert(std::make_pair(ladder, std::vector<std::pair<VxdID, TGeoHMatrix>>()));
-
       m_sensorPlacements[ladder].push_back(std::make_pair(sensor, g4Transform3DToTGeo(placement)));
     }
 
     void GeoCache::addLadderPlacement(VxdID halfShell, VxdID ladder, const G4Transform3D& placement)
     {
-      auto laddersPlacements = m_ladderPlacements.find(halfShell);
-      if (laddersPlacements == m_ladderPlacements.end())
-        m_ladderPlacements.insert(std::make_pair(halfShell, std::vector<std::pair<VxdID, TGeoHMatrix>>()));
-
       m_ladderPlacements[halfShell].push_back(std::make_pair(ladder, g4Transform3DToTGeo(placement)));
+      // Add the (empty) container for sensor placements inside this ladder
+      m_sensorPlacements[ladder] = std::vector<std::pair<VxdID, TGeoHMatrix>>();
     }
 
-    void GeoCache::addHalfShellPlacement(VxdID halfShell, const G4Transform3D& placement) {m_halfShellPlacements.push_back(std::make_pair(halfShell, g4Transform3DToTGeo(placement)));}
+    void GeoCache::addHalfShellPlacement(VxdID halfShell, const G4Transform3D& placement)
+    {
+      m_halfShellPlacements[halfShell] = g4Transform3DToTGeo(placement);
+      // Add the (empty) container for ladder placements inside this halfshell
+      m_ladderPlacements[halfShell] = std::vector<std::pair<VxdID, TGeoHMatrix>>();
+    }
 
-    const vector< pair< VxdID, TGeoHMatrix > >& GeoCache::getHalfShellPlacements() const {return m_halfShellPlacements;}
+    const map<VxdID, TGeoHMatrix>& GeoCache::getHalfShellPlacements() const {return m_halfShellPlacements;}
 
     const vector< pair< VxdID, TGeoHMatrix > >& GeoCache::getSensorPlacements(VxdID ladder) const
     {
@@ -252,9 +255,38 @@ namespace Belle2 {
 
     void GeoCache::setupReconstructionTransformations()
     {
-      DBObjPtr<VXDAlignment> vxdAlignments;
-      if (!vxdAlignments.isValid())
-        B2FATAL("No VXD alignment data.");
+      if (!m_vxdAlignments.isValid()) {
+        B2WARNING("No VXD alignment data. Defaults (0's) will be used!");
+        return;
+      }
+
+      // Loop over VXD sensors to read parameters for description of planar defomration
+      for (auto& sensorID : getListOfSensors()) {
+        std::vector<double> planarParameters = {
+          // Numbering of VXD alignment parameters:
+          //  -> 0-6:   Rigid body alignment
+          //  -> 31-33: First level of surface deformation
+          //  -> 41-44: Second level of surface deformation
+          //  -> 51-55: Third level of surface deformation
+          m_vxdAlignments->get(sensorID, 31),
+          m_vxdAlignments->get(sensorID, 32),
+          m_vxdAlignments->get(sensorID, 33),
+          m_vxdAlignments->get(sensorID, 41),
+          m_vxdAlignments->get(sensorID, 42),
+          m_vxdAlignments->get(sensorID, 43),
+          m_vxdAlignments->get(sensorID, 44),
+          m_vxdAlignments->get(sensorID, 51),
+          m_vxdAlignments->get(sensorID, 52),
+          m_vxdAlignments->get(sensorID, 53),
+          m_vxdAlignments->get(sensorID, 54),
+          m_vxdAlignments->get(sensorID, 55),
+        };
+
+        // Store parameters for planar deformation
+        VXD::SensorInfoBase& sensorInfo = const_cast<VXD::SensorInfoBase&>(getSensorInfo(sensorID));
+        sensorInfo.setSurfaceParameters(planarParameters);
+      }
+
       /**
       So the hierarchy is as follows:
                   Belle 2
@@ -269,36 +301,36 @@ namespace Belle2 {
       for (auto& halfShellPlacement : getHalfShellPlacements()) {
         TGeoHMatrix trafoHalfShell = halfShellPlacement.second;
         trafoHalfShell *= getTGeoFromRigidBodyParams(
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dU),
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dV),
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dW),
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dAlpha),
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dBeta),
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dGamma)
+                            m_vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dU),
+                            m_vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dV),
+                            m_vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dW),
+                            m_vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dAlpha),
+                            m_vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dBeta),
+                            m_vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dGamma)
                           );
 
         for (auto& ladderPlacement : getLadderPlacements(halfShellPlacement.first)) {
           // Updated trafo
           TGeoHMatrix trafoLadder = ladderPlacement.second;
           trafoLadder *= getTGeoFromRigidBodyParams(
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dU),
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dV),
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dW),
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dAlpha),
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dBeta),
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dGamma)
+                           m_vxdAlignments->get(ladderPlacement.first, VXDAlignment::dU),
+                           m_vxdAlignments->get(ladderPlacement.first, VXDAlignment::dV),
+                           m_vxdAlignments->get(ladderPlacement.first, VXDAlignment::dW),
+                           m_vxdAlignments->get(ladderPlacement.first, VXDAlignment::dAlpha),
+                           m_vxdAlignments->get(ladderPlacement.first, VXDAlignment::dBeta),
+                           m_vxdAlignments->get(ladderPlacement.first, VXDAlignment::dGamma)
                          );
 
           for (auto& sensorPlacement : getSensorPlacements(ladderPlacement.first)) {
             // Updated trafo
             TGeoHMatrix trafoSensor = sensorPlacement.second;
             trafoSensor *= getTGeoFromRigidBodyParams(
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dU),
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dV),
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dW),
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dAlpha),
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dBeta),
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dGamma)
+                             m_vxdAlignments->get(sensorPlacement.first, VXDAlignment::dU),
+                             m_vxdAlignments->get(sensorPlacement.first, VXDAlignment::dV),
+                             m_vxdAlignments->get(sensorPlacement.first, VXDAlignment::dW),
+                             m_vxdAlignments->get(sensorPlacement.first, VXDAlignment::dAlpha),
+                             m_vxdAlignments->get(sensorPlacement.first, VXDAlignment::dBeta),
+                             m_vxdAlignments->get(sensorPlacement.first, VXDAlignment::dGamma)
                            );
 
             // Store new reco-transformation
@@ -308,9 +340,6 @@ namespace Belle2 {
           }
         }
       }
-
-      // Add callback to itself. Callback are unique, so further calls should not change anything
-      vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
 
     }
 

@@ -9,9 +9,7 @@
  **************************************************************************/
 
 #include <analysis/dataobjects/EventExtraInfo.h>
-
 #include <framework/utilities/HTML.h>
-
 #include <stdexcept>
 
 using namespace Belle2;
@@ -49,8 +47,16 @@ void EventExtraInfo::setExtraInfo(const std::string& name, float value)
 std::string EventExtraInfo::getInfoHTML() const
 {
   std::string s;
-  for (auto pair : eventExtraInfo) {
+  for (const auto& pair : eventExtraInfo) {
     s += HTML::escape(pair.first) + " = " + std::to_string(pair.second) + "<br />";
   }
   return s;
+}
+
+std::vector<std::string> EventExtraInfo::getNames() const
+{
+  std::vector<std::string> out;
+  for (const auto& pair : eventExtraInfo)
+    out.push_back(pair.first);
+  return out;
 }

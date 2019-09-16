@@ -21,10 +21,10 @@ namespace Belle2 {
     static void g_handler_int(int) { exit(0); }
 
   public:
-    Process() throw() : m_pid(-1) {}
+    Process() : m_pid(-1) {}
 
     template<class WORKER>
-    Process(WORKER* worker, bool detached = true) throw()
+    Process(WORKER* worker, bool detached = true)
     {
       m_pid = fork();
       if (m_pid == 0) {
@@ -38,7 +38,7 @@ namespace Belle2 {
         delete worker;
       }
     }
-    ~Process() throw() {}
+    ~Process() {}
 
   public:
     pid_t get_id() const { return m_pid; }
@@ -53,15 +53,25 @@ namespace Belle2 {
     bool wait(int opt = 0)
     {
       if (m_pid < 0) return false;
-      if (::waitpid(m_pid, NULL, opt)) {
+      if (m_waitpid_result = ::waitpid(m_pid, &m_waitpid_status, opt)) {
         m_pid = -1;
       }
       return true;
     }
     bool cancel() { return kill(SIGINT); }
+    int waitpid_result() const
+    {
+      return m_waitpid_result;
+    };
+    int waitpid_status() const
+    {
+      return m_waitpid_status;
+    };
 
   private:
     pid_t m_pid;
+    int m_waitpid_result;
+    int m_waitpid_status;
 
   };
 

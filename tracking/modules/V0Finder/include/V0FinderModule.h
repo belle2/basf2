@@ -59,8 +59,8 @@ namespace Belle2 {
     bool m_validation;                         ///< Flag if use validation.
     std::string m_arrayNameV0ValidationVertex; ///< StoreArray name of the V0ValidationVertex.
 
-    std::tuple<float, float> m_MassRangeKshort = {0.3, 0.7}; ///< range for reconstructed Kshort mass used for pre-selection
-    std::tuple<float, float> m_MassRangeLambda = {0.9, 1.3}; ///< range for reconstructed Lambda mass used for pre-selection
-    std::tuple<float, float> m_MassRangeGamma = { -0.4, 0.4}; ///< range for reconstructed photon mass used for pre-selection
+    std::tuple<double, double> m_MassRangeKshort = {0.3, 0.7}; ///< range for reconstructed Kshort mass used for pre-selection
+    std::tuple<double, double> m_MassRangeLambda = {0.9, 1.3}; ///< range for reconstructed Lambda mass used for pre-selection
+    std::tuple<double, double> m_MassRangeGamma = { -0.4, 0.4}; ///< range for reconstructed photon mass used for pre-selection
   };
 }

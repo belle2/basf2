@@ -54,11 +54,11 @@ V0FinderModule::V0FinderModule() : Module()
            "Maximum chi² for the vertex fit (NDF = 1)", 50.);
 
 
-  addParam("massRangeKshort", m_MassRangeKshort, "mass range for reconstructed Kshort used for pre-selection of candidates"
+  addParam("massRangeKshort", m_MassRangeKshort, "mass range in GeV for reconstructed Kshort used for pre-selection of candidates"
            " (to be chosen loosely as used momenta are not very precise)", m_MassRangeKshort);
-  addParam("massRangeLambda", m_MassRangeLambda, "mass range for reconstructed Lambda used for pre-selection of candidates"
+  addParam("massRangeLambda", m_MassRangeLambda, "mass range in GeV for reconstructed Lambda used for pre-selection of candidates"
            " (to be chosen loosely as used momenta are not very precise)", m_MassRangeLambda);
-  addParam("massRangeGamma", m_MassRangeGamma, "mass range for reconstructed photon mass used for pre-selection of candidates"
+  addParam("massRangeGamma", m_MassRangeGamma, "mass range in GeV for reconstructed photon mass used for pre-selection of candidates"
            " (to be chosen loosely as used momenta are not very precise)", m_MassRangeGamma);
 }
 
@@ -112,9 +112,13 @@ void V0FinderModule::event()
       // TODO: this will throw away all hypotheses if one of them fails! Not sure if that is a problem or how frequent it is?
       try {
         if (preFilterTracks(trackPlus, trackMinus, Const::Kshort)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort);
+        else std::cout << "rejected" << std::endl;
         if (preFilterTracks(trackPlus, trackMinus, Const::photon)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon);
+        else std::cout << "rejected" << std::endl;
         if (preFilterTracks(trackPlus, trackMinus, Const::Lambda))  m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda);
+        else std::cout << "rejected" << std::endl;
         if (preFilterTracks(trackPlus, trackMinus, Const::antiLambda)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda);
+        else std::cout << "rejected" << std::endl;
 
       } catch (const genfit::Exception& e) {
         // genfit exception raised, skip this track pair
@@ -142,17 +146,34 @@ V0FinderModule::preFilterTracks(const Track* trackPlus, const Track* trackMinus,
   p4trackMinus.SetVectM(trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getMomentum(),
                         trackHypotheses.second.getMass());
 
+  // TODO: remove this
   float mass = (p4trackPlus + p4trackMinus).Mag();
 
-  std::tuple<float, float>  massrange = {0., 0.};
+  double E = p4trackPlus.E() + p4trackMinus.E();
+  double pmin = p4trackPlus.Rho() - p4trackMinus.Rho();
+  double pmax = p4trackPlus.Rho() + p4trackMinus.Rho();
+  double m_min2 = E * E - pmax * pmax;
+  double m_max2 = E * E - pmin * pmin;
+  //std::cout << std::endl;
+  //std::cout << v0Hypothesis.__repr__() << " mass " << mass*mass << " mass min " << m_min2 << " mass max2 " << m_max2 << std::endl;
+
+  std::tuple<double, double>  massrange = {0., 0.};
   if (v0Hypothesis == Const::Kshort) {
     massrange = m_MassRangeKshort;
   } else if (v0Hypothesis == Const::photon) {
     massrange = m_MassRangeGamma;
   } else if (v0Hypothesis == Const::Lambda or v0Hypothesis == Const::antiLambda) {
-    massrange = m_MassRangeKshort;
+    massrange = m_MassRangeLambda;
   } else {
     B2WARNING("This should not happen!");
   }
-  return (mass > std::get<0>(massrange) and mass < std::get<1>(massrange));
+
+  //return true;
+  double range_min2 = std::get<0>(massrange) < 0 ? -std::get<0>(massrange) * std::get<0>(massrange) : std::get<0>
+                      (massrange) * std::get<0>(massrange);
+  double range_max2 = std::get<1>(massrange) < 0 ? -std::get<1>(massrange) * std::get<1>(massrange) : std::get<1>
+                      (massrange) * std::get<1>(massrange);
+  //std::cout << "range min " << range_min2 << " range max " << range_max2 <<  "  org range min max " <<  std::get<0>(massrange) << " " <<   std::get<1>(massrange) << std::endl;
+  return (not(m_max2 < range_min2 or m_min2 > range_max2));
+  //return (not (mass*mass < std::get<0>(massrange)*std::get<0>(massrange) or mass*mass > std::get<1>(massrange)*std::get<1>(massrange)));
 }

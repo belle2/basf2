@@ -434,9 +434,9 @@ void SpaceResolutionCalibrationAlgorithm::storeHisto()
   TDirectory* top = gDirectory;
   TDirectory* Direct[56];
 
-  TH1F* hNDF =   getObjectPtr<TH1F>("hNDF");
-  TH1F* hPval =   getObjectPtr<TH1F>("hPval");
-  TH1F* hEvtT0 =   getObjectPtr<TH1F>("hEventT0");
+  auto hNDF =   getObjectPtr<TH1F>("hNDF");
+  auto hPval =   getObjectPtr<TH1F>("hPval");
+  auto hEvtT0 =   getObjectPtr<TH1F>("hEventT0");
   //store NDF, P-val. EventT0 histogram for monitoring during calibration
   if (hNDF && hPval && hEvtT0) {
     hEvtT0->Write();

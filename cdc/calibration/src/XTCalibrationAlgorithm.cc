@@ -418,9 +418,9 @@ void XTCalibrationAlgorithm::write()
 void XTCalibrationAlgorithm::storeHisto()
 {
 
-  TH1F* hNDF =   getObjectPtr<TH1F>("hNDF");
-  TH1F* hPval =   getObjectPtr<TH1F>("hPval");
-  TH1F* hEvtT0 =   getObjectPtr<TH1F>("hEventT0");
+  auto hNDF =   getObjectPtr<TH1F>("hNDF");
+  auto hPval =   getObjectPtr<TH1F>("hPval");
+  auto hEvtT0 =   getObjectPtr<TH1F>("hEventT0");
   B2INFO("saving histograms");
   TFile* fout = new TFile(m_histName.c_str(), "RECREATE");
   TDirectory* top = gDirectory;

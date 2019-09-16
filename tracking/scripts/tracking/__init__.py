@@ -192,7 +192,6 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     svd_cdc_reco_tracks = "SVDCDCRecoTracks"
     ecl_reco_tracks = "ECLRecoTracks"
     combined_ecl_reco_tracks = "combinedECLRecoTracks"
-    pxd_svd_cdc_reco_tracks = "PXDSVDCDCRecoTracks"
 
     # temporary collections
     svd_reco_tracks = "SVDRecoTracks"

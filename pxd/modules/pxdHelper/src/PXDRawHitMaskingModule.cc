@@ -1,14 +1,14 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
+ * Contributors: Bjoern.Spruck@belle2.org                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdReconstruction/PXDRawHitMaskingModule.h>
+#include <pxd/modules/pxdHelper/PXDRawHitMaskingModule.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/RelationArray.h>
@@ -42,7 +42,7 @@ PXDRawHitMaskingModule::PXDRawHitMaskingModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("zeroSuppressionCut", m_0cut, "Minimum charge for a digit to carry", 0);
-  addParam("trimOutOfRange", m_trimOutOfRange, "Discard rawhits whith out-of-range coordinates", true);
+  addParam("trimOutOfRange", m_trimOutOfRange, "Discard rawhits whit out-of-range coordinates", true);
   addParam("rawHits", m_storeRawHitsName, "PXDRawHit collection name", string(""));
   addParam("rawHitsOut", m_storeRawHitsNameOut, "PXDRawHit Out collection name", string("PXDRawHitsOut"));
 }

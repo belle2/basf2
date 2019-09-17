@@ -9,42 +9,42 @@
  **************************************************************************/
 
 #pragma once
+
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
-#include <tracking/trackFindingVXD/mva/MVAExpert.h>
+#include <tracking/trackFindingVXD/variableExtractors/SimpleVariableRecorder.h>
 #include <tracking/trackFindingVXD/variableExtractors/ClusterInfoExtractor.h>
 #include <tracking/trackFindingVXD/variableExtractors/QEResultsExtractor.h>
+
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
 
 #include <memory>
-#include <string>
-#include <vector>
 
 
 namespace Belle2 {
 
-  /** Quality estimation module for SpacePointTrackCandidates using multivariate analysis (MVA).
-  * This module calculates a qualityIndicator (QI) for each SpacePointTrackCandidate.
-  * This module can support most estimation strategies that implement the interface QualityEstimatorBase
-  * and use them together with cluster information to calculate a new QI using MVA.
-  *  */
-  class QualityEstimatorMVAModule : public Module {
+  /** VXD Quality Estimator Data Collector Module to collect data for a MVA training using VXDQE_teacher.py.
+   *  Runs in addition to VXDTF2 and mc_matcher, see VXDQE_TrainingDataCollector.py for example.
+   * */
+  class VXDQETrainingDataCollectorModule : public Module {
 
   public:
-
     /** Constructor of the module. */
-    QualityEstimatorMVAModule();
+    VXDQETrainingDataCollectorModule();
 
     /** Initializes the Module. */
     void initialize() override;
 
-    /** Launches mvaExpert and sets the magnetic field strength */
+    /** sets magnetic field strength */
     void beginRun() override;
 
-    /** Applies the selected quality estimation method for a given set of TCs */
+    /** applies the selected quality estimation method for a given set of TCs */
     void event() override;
+
+    /** write out data from m_recorder */
+    void terminate() override;
 
 
   protected:
@@ -61,14 +61,24 @@ namespace Belle2 {
     /** sets the name of the expected StoreArray containing SpacePointTrackCands */
     std::string m_SpacePointTrackCandsStoreArrayName;
 
-    /** identifier of weightfile in Database or local root/xml file */
-    std::string m_WeightFileIdentifier;
+    /** sets the name of the expected StoreArray containing MCRecoTracks. Only required for MCInfo method */
+    std::string m_MCRecoTracksStoreArrayName;
 
-    /** whether to use timing information available in the weight file */
-    bool m_UseTimingInfo;
+    /** Required for MCInfo method, activates its strict version */
+    bool m_MCStrictQualityEstimator;
 
-    /** how to compile information from clusters ['Average'] */
+    /** Bool to indicate if mva target requiring complete agreement in SVD Clusters between MC and PR track to yield 1
+     *  should be written out as target for the mva training. */
+    bool m_mva_target = false;
+
+    /** name of the output rootfile */
+    std::string m_TrainingDataOutputName;
+
+    /** how to compile information from clusters ['Average'] **/
     std::string m_ClusterInformation;
+
+    /** whether to collect timing information */
+    bool m_UseTimingInfo;
 
     // -------------------------
 
@@ -78,8 +88,8 @@ namespace Belle2 {
     /** pointer to the selected QualityEstimator */
     std::unique_ptr<QualityEstimatorBase> m_estimator;
 
-    /** pointer to the object to interact with the MVA package */
-    std::unique_ptr<MVAExpert> m_mvaExpert;
+    /** QualityEstimatorMC as target for training */
+    std::unique_ptr<QualityEstimatorBase> m_estimatorMC;
 
     /** pointer to object that extracts the results from the estimation mehtod
     * (including QI, chi2, p_t and p_mag) */
@@ -88,12 +98,19 @@ namespace Belle2 {
     /** pointer to object that extracts info from the clusters of a SPTC */
     std::unique_ptr<ClusterInfoExtractor> m_clusterInfoExtractor;
 
-    /** set of named variables to be used in MVA */
-    std::vector<Named<float*>>  m_variableSet;
+    /** pointer to the object that writes out the collected data into a root file */
+    std::unique_ptr<SimpleVariableRecorder> m_recorder;
 
-    /** number of SpacePoints in SPTC as additional info for MVA,
-     * type is float to be consistend with m_variableSet (and MVA implementation) */
+    /** set of named variables to be collected */
+    std::vector<Named<float*>> m_variableSet;
+
+    /** number of SpacePoints in SPTC as additional info to be collected,
+     * type is float to be consistend with m_variableSet (and TTree + MVA implementation) */
     float m_nSpacePoints = NAN;
+
+    /** truth information collected with m_estimatorMC
+     * type is float to be consistend with m_variableSet (and TTree + MVA implementation) */
+    float m_truth = NAN;
 
   };
 }

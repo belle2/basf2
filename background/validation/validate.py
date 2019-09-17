@@ -56,6 +56,8 @@ class BGHistogrammer(Module):
             self.hist[i].GetListOfFunctions().Add(check)
             contact = TNamed('Contact', 'marko.staric@ijs.si')
             self.hist[i].GetListOfFunctions().Add(contact)
+            options = TNamed('MetaOptions', 'shifter')
+            self.hist[i].GetListOfFunctions().Add(options)
 
     def event(self):
         ''' Event processor: fill histograms '''

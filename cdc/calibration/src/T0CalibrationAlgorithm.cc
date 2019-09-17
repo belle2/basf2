@@ -52,6 +52,17 @@ void T0CalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("weight", &w);
   tree->SetBranchAddress("ndf", &ndf);
   tree->SetBranchAddress("Pval", &Pval);
+
+
+  /* Disable unused branch */
+  std::vector<TString> list_vars = {"lay", "IWire", "x_u", "t", "t_fit",  "weight", "Pval", "ndf"};
+  tree->SetBranchStatus("*", 0);
+
+  for (TString brname : list_vars) {
+    tree->SetBranchStatus(brname, 1);
+  }
+
+
   double halfCSize[56];
 
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
@@ -120,6 +131,8 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   B2INFO("Creating CDCGeometryPar object");
   CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
 
+  auto hEvtT0 =   getObjectPtr<TH1F>("hEventT0");
+  double dEventT0 = hEvtT0->GetMean();
   createHisto();
   TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels", 500, -10, 10);
   TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all chanels", 100, 0, 10);
@@ -176,10 +189,10 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   }
 
   // mean shift
-  const double dt0Mean = hm_All->GetMean();
+  //  const double dt0Mean = hm_All->GetMean();
   for (int ilay = 0; ilay < 56; ++ilay) {
     for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
-      dt[ilay][iwire] -= dt0Mean;
+      dt[ilay][iwire] -= dEventT0;
     }
   }
 
@@ -187,11 +200,19 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
   if (m_storeHisto) {
     B2INFO("Storing histograms");
-
+    auto hNDF =   getObjectPtr<TH1F>("hNDF");
+    auto hPval =   getObjectPtr<TH1F>("hPval");
     TFile* fout = new TFile(m_histName.c_str(), "RECREATE");
     fout->cd();
     TGraphErrors* gr[56];
     TDirectory* top = gDirectory;
+
+    //store NDF, P-val. EventT0 histogram for monitoring during calibration
+    if (hNDF && hPval && hEvtT0) {
+      hEvtT0->Write();
+      hPval->Write();
+      hNDF->Write();
+    }
     m_hTotal->Write();
     hm_All->Write();
     hs_All->Write();

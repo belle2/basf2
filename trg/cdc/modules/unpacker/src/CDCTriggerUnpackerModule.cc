@@ -538,13 +538,27 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
 
   std::vector<int> defaultDelayNNOutput = {10, 10, 10, 10};
   std::vector<int> defaultDelayNNSelect = {4, 4, 4, 4};
+  std::vector<float> defaultOutputScale = { -50., 50., 0, M_PI};
   addParam("delayNNOutput", m_delayNNOutput,
            "delay of the NN output values clock cycle after the NN enable bit (by quadrant)", defaultDelayNNOutput);
   addParam("delayNNSelect", m_delayNNSelect,
            "delay of the NN selected TS clock cycle after the NN enable bit (by quadrant)", defaultDelayNNSelect);
+  addParam("NNOutputScale", m_NNOutputScale,
+           "Scaling factors to be applied onto the NN Output."
+           "Leave it empty to load values from the Conditions DB",
+           defaultOutputScale);
+
 
 }
-
+std::vector<float> CDCTriggerUnpackerModule::unscaleNNOutput(std::vector<float> input) const
+{
+  std::vector<float> unscaled;
+  unscaled.assign(input.size(), 0.);
+  for (unsigned i = 0; i < input.size(); ++i) {
+    unscaled[i] = (input[i] + 1.) * (m_NNOutputScale[2 * i + 1] - m_NNOutputScale[2 * i]) / 2. + m_NNOutputScale[2 * i];
+  }
+  return unscaled;
+}
 
 void CDCTriggerUnpackerModule::initialize()
 {
@@ -627,6 +641,25 @@ void CDCTriggerUnpackerModule::initialize()
                   m_neuroNodeID[iTracker], m_NeuroDelay, m_NeuroCnttrg,  m_debugLevel);
       m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_neuro));
     }
+  }
+  if (m_NNOutputScale.size() < 2) {
+    B2DEBUG(2, "Load unscaling weights from network in database: " << m_cdctriggerneuroconfig->getNNName());
+    m_mlp_scale = m_cdctriggerneuroconfig->getMLPs()[0];
+  } else {
+    std::vector<unsigned short> nodes = {27, 27, 2};
+    unsigned short targets = 2.;
+    std::vector<float> outputscale = m_NNOutputScale;
+    std::vector<float>  phirange = {0., 2. * M_PI};
+    std::vector<float> invptrange = { -5., 5.};
+    std::vector<float> thetarange = {0., M_PI};
+    unsigned short maxHits = 1;
+    unsigned long pattern = 0;
+    unsigned long patternMask = 0;
+    unsigned short tmax = 256;
+    bool calcT0 = false;
+    std::string etoption = "etf_or_fastestpriority";
+    m_mlp_scale = CDCTriggerMLP(nodes, targets, outputscale, phirange, invptrange, thetarange, maxHits, pattern, patternMask, tmax,
+                                calcT0, etoption);
   }
 }
 
@@ -736,7 +769,7 @@ void CDCTriggerUnpackerModule::event()
   B2DEBUG(99, "now unpack neuro ");
   if (m_decodeNeuro) {
     decodeNNIO(&m_bitsToNN, &m_bitsFromNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NeuroInputs, m_delayNNOutput,
-               m_delayNNSelect);
+               m_delayNNSelect, m_mlp_scale);
   }
   B2DEBUG(99, " all is unpacked ##### ");
 }

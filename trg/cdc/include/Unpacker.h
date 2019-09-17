@@ -12,6 +12,7 @@
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerFinderClone.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
+#include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 #include <framework/gearbox/Const.h>
 
 namespace Belle2 {
@@ -366,15 +367,19 @@ namespace Belle2 {
      *
      *  @return         TRGNeuroTrack containing z, theta, sector, MLP input and related TS hit
      */
-    TRGNeuroTrack decodeNNTrack(std::string trackIn, std::string selectIn)
+    TRGNeuroTrack decodeNNTrack(std::string trackIn, std::string selectIn, const CDCTriggerMLP& mlp)
     {
       constexpr unsigned lenMLP = 13;
       float scale = 1. / (1 << (lenMLP - 1));
       TRGNeuroTrack foundTrack;
       int theta_raw = mlp_bin_to_signed_int(trackIn.substr(1, lenMLP));
-      foundTrack.theta = theta_raw * scale * M_PI_2 + M_PI_2;
+      //foundTrack.theta = theta_raw * scale * M_PI_2 + M_PI_2;
       int z_raw = mlp_bin_to_signed_int(trackIn.substr(lenMLP + 1, lenMLP));
-      foundTrack.z = z_raw * scale * 50.;
+      //float z = z_raw * scale)
+      std::vector<float> unscaledT = mlp.unscaleTarget({(z_raw * scale), (theta_raw * scale)});
+      foundTrack.z = unscaledT[0];
+      foundTrack.theta = unscaledT[1];
+      //foundTrack.z = z_raw * scale * 50.;
       foundTrack.sector = std::bitset<3>(trackIn.substr(2 * lenMLP + 1, 3)).to_ulong();
       for (unsigned iSL = 0; iSL < 9; ++iSL) {
         foundTrack.inputAlpha[iSL] =
@@ -661,13 +666,14 @@ namespace Belle2 {
                         StoreArray<CDCTriggerTrack>* storeNNTracks,
                         StoreArray<CDCTriggerSegmentHit>* tsHits,
                         StoreArray<CDCTriggerMLPInput>* storeNNInputs,
-                        CDCTriggerTrack* track2D)
+                        CDCTriggerTrack* track2D,
+                        const CDCTriggerMLP& mlp)
     {
       const auto slvOut = bitsOut->signal()[iTracker];
       std::string strTrack = slv_to_bin_string(slvOut);
       const auto slvSelect = bitsSelectTS->signal()[iTracker];
       std::string strSelect = slv_to_bin_string(slvSelect);
-      TRGNeuroTrack trkNN = decodeNNTrack(strTrack, strSelect);
+      TRGNeuroTrack trkNN = decodeNNTrack(strTrack, strSelect, mlp);
       B2DEBUG(15, "make new NN track with , z:" << trkNN.z << ", theta:" << trkNN.theta <<
               ", sector:" << trkNN.sector << ", clock " << foundTime);
       double phi0 = 0;
@@ -727,7 +733,8 @@ namespace Belle2 {
       StoreArray<CDCTriggerSegmentHit>* tsHits,
       StoreArray<CDCTriggerMLPInput>* storeNNInputs,
       std::vector<int> delayNNOutput,
-      std::vector<int> delayNNSelect)
+      std::vector<int> delayNNSelect,
+      const CDCTriggerMLP& mlp)
     {
       for (short iclock = 0; iclock < bitsFromNN->getEntries(); ++iclock) {
         NNInputBitStream* bitsIn = (*bitsToNN)[iclock];
@@ -744,7 +751,7 @@ namespace Belle2 {
                 NNOutputBitStream* bitsSelectTS = (*bitsFromNN)[iclock + delayNNSelect[iTracker]];
                 decodeNNOutput(iclock, iTracker, bitsOut, bitsSelectTS,
                                storeNNTracks, tsHits, storeNNInputs,
-                               track2D);
+                               track2D, mlp);
               }
             }
           }

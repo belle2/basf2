@@ -23,7 +23,7 @@ namespace Belle2 {
       const std::string& variableName)
     {
       auto lowerBoundIterator = m_variableNameToVariable.lower_bound(variableName);
-      if (lowerBoundIterator == m_variableNameToVariable.end()) {
+      if (lowerBoundIterator == m_variableNameToVariable.end() or lowerBoundIterator->first != variableName) {
         lowerBoundIterator = m_variableNameToVariable.insert(lowerBoundIterator,
         {variableName, std::shared_ptr<SoftwareTriggerVariable>(new SoftwareTriggerVariable(variableName))});
       }

@@ -90,8 +90,10 @@ ma.applyCuts('B-:sigT', 'abs(mcPDG)==521', path=my_path)
 ma.reconstructDecay('Upsilon(4S):sig -> B+:tag B-:sigT', '', path=my_path)
 
 mytestmodule2 = ma.register_module('BtubeCreator')
-my_path.add_module(mytestmodule2,
-                   listName='Upsilon(4S):sig')
+# select the daughter which will be used as reference to create Btube.
+# Order of daughters should be identical to decay string used in
+# reconstructDecay
+my_path.add_module(mytestmodule2, listName='Upsilon(4S):sig', decayString='Upsilon(4S):sig -> ^B+:tag B-:sigT')
 vx.vertexRave('B-:sigT', 0.0, '', 'btube', path=my_path)
 # Saving variables to ntuple
 output_file = 'test.root'

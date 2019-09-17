@@ -65,6 +65,16 @@ void T0Correction::CreateHisto()
   tree->SetBranchAddress("weight", &w);
   tree->SetBranchAddress("ndf", &ndf);
   tree->SetBranchAddress("Pval", &Pval);
+
+  /* Disable unused branch */
+  std::vector<TString> list_vars = {"lay", "IWire", "x_u", "t", "t_fit",  "weight", "Pval", "ndf"};
+  tree->SetBranchStatus("*", 0);
+
+  for (TString brname : list_vars) {
+    tree->SetBranchStatus(brname, 1);
+  }
+
+
   double halfCSize[56];
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   for (int i = 0; i < 56; ++i) {

@@ -333,27 +333,27 @@ namespace {
     timeid = 0;
     ev = gotoNextChangeRunWise(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 0);
-    EXPECT_EQ(ev, EventMetaData(0, 0, 0));
+    EXPECT_EQ(ev, EventMetaData(0, 1, 0));
 
     timeid = 1;
     ev = gotoNextChangeRunWise(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 1);
-    EXPECT_EQ(ev, EventMetaData(0, 1, 0));
+    EXPECT_EQ(ev, EventMetaData(0, 2, 0));
 
     timeid = 2;
     ev = gotoNextChangeRunWise(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 3);
-    EXPECT_EQ(ev, EventMetaData(530532, 2, 0));
+    EXPECT_EQ(ev, EventMetaData(0, 3, 0));
 
     timeid = 3;
     ev = gotoNextChangeRunWise(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 3);
-    EXPECT_EQ(ev, EventMetaData(530532, 2, 0));
+    EXPECT_EQ(ev, EventMetaData(0, 3, 0));
 
     timeid = 4;
     ev = gotoNextChangeRunWise(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 4);
-    EXPECT_EQ(ev, EventMetaData(0, 3, 0));
+    EXPECT_EQ(ev, EventMetaData(0, 4, 0));
 
     timeid = 5;
     ev = gotoNextChangeRunWise(timeTable, 1, timeid);
@@ -365,10 +365,10 @@ namespace {
     timeid = 0;
     ev = gotoNextChangeRunWise(timeTable, 10, timeid);
     EXPECT_EQ(timeid, 3);
-    EXPECT_EQ(ev, EventMetaData(530532, 2, 0));
+    EXPECT_EQ(ev, EventMetaData(0, 3, 0));
     ev = gotoNextChangeRunWise(timeTable, 10, timeid);
     EXPECT_EQ(timeid, 3);
-    EXPECT_EQ(ev, EventMetaData(530532, 2, 0));
+    EXPECT_EQ(ev, EventMetaData(0, 3, 0));
 
     timeid = 4;
     ev = gotoNextChangeRunWise(timeTable, 10, timeid);

@@ -36,7 +36,6 @@ using namespace genfit;
 
 REG_MODULE(CDCCalibrationCollector)
 
-//                 Implementation
 
 CDCCalibrationCollectorModule::CDCCalibrationCollectorModule() : CalibrationCollectorModule()
 {
@@ -45,11 +44,10 @@ CDCCalibrationCollectorModule::CDCCalibrationCollectorModule() : CalibrationColl
   addParam("recoTracksColName", m_recoTrackArrayName, "Name of collection hold genfit::Track", std::string(""));
   addParam("bField", m_bField, "If true -> #Params ==5 else #params ==4 for calculate P-Val", false);
   addParam("calExpectedDriftTime", m_calExpectedDriftTime, "if true module will calculate expected drift time, it take a time",
-           false);
-
+           true);
   addParam("storeTrackParams", m_storeTrackParams, "Store Track Parameter or not, it will be multicount for each hit", false);
-  addParam("eventT0Extraction", m_eventT0Extraction, "use event t0 extract t0 or not", false);
-  addParam("minimumPt", m_minimumPt, "Tracks with tranverse momentum small than this will not recored", 0.);
+  addParam("eventT0Extraction", m_eventT0Extraction, "use event t0 extract t0 or not", true);
+  addParam("minimumPt", m_minimumPt, "Tracks with tranverse momentum smaller than this value will not used", 0.15);
   addParam("isCosmic", m_isCosmic, "True when we process cosmic events, else False (collision)", m_isCosmic);
 }
 
@@ -117,6 +115,19 @@ void CDCCalibrationCollectorModule::collect()
   /* CDCHit distribution */
   //  make evt t0 incase we dont use evt t0
   evtT0 = 0;
+
+  //reject events don't have eventT0
+  if (m_eventT0Extraction) {
+    // event with is fail to extract t0 will be exclude from analysis
+    if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
+      evtT0 =  m_eventTimeStoreObject->getEventT0();
+      getObjectPtr<TH1F>("hEventT0")->Fill(evtT0);
+    } else {
+      return;
+    }
+  }
+
+
   const int nTr = recoTracks.getEntries();
 
   for (int i = 0; i < nTr; ++i) {
@@ -134,10 +145,9 @@ void CDCCalibrationCollectorModule::collect()
       B2WARNING("track was fitted but Relation not found");
       continue;
     }
+    ndf = fs->getNdf();
     if (!m_bField) {
-      ndf = fs->getNdf() + 1;
-    } else {
-      ndf = fs->getNdf();
+      ndf += 1;
     }
 
     getObjectPtr<TH1F>("hPval")->Fill(Pval);
@@ -145,7 +155,7 @@ void CDCCalibrationCollectorModule::collect()
     B2DEBUG(99, "ndf = " << ndf);
     B2DEBUG(99, "Pval = " << Pval);
 
-    if (ndf < 15) continue;
+    if (ndf < 15) continue; //hard code,
     double Chi2 = fs->getChi2();
     Pval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
     //store track parameters
@@ -161,19 +171,7 @@ void CDCCalibrationCollectorModule::collect()
     if (m_isCosmic == true && phi0 > 0.0) continue;
 
     //cut at Pt
-
     if (fitresult->getMomentum().Perp() < m_minimumPt) continue;
-    //reject events don't have eventT0
-    if (m_eventT0Extraction) {
-      // event with is fail to extract t0 will be exclude from analysis
-      if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
-        evtT0 =  m_eventTimeStoreObject->getEventT0();
-        getObjectPtr<TH1F>("hEventT0")->Fill(evtT0);
-      } else {
-        continue;
-      }
-    }
-
     try {
       harvest(track);
     } catch (...) {
@@ -193,6 +191,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
 
   for (const RecoHitInformation::UsedCDCHit* hit : track->getCDCHitList()) {
     const genfit::TrackPoint* tp = track->getCreatedTrackPoint(track->getRecoHitInformation(hit));
+    if (!tp) continue;
     lay = hit->getICLayer();
     IWire = hit->getIWire();
     adc = hit->getADCCount();

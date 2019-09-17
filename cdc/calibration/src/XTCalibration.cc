@@ -67,7 +67,7 @@ void XTCalibration::CreateHisto()
     gSystem->Exec("echo rootfile do not exits or something wrong >> error");
     return;
   }
-  int lay, trighit;
+  int lay;
   double dt;
   double dx;
   double Pval, alpha, theta;
@@ -79,8 +79,16 @@ void XTCalibration::CreateHisto()
   tree->SetBranchAddress("alpha", &alpha);
   tree->SetBranchAddress("theta", &theta);
   tree->SetBranchAddress("Pval", &Pval);
-  tree->SetBranchAddress("trighit", &trighit);
   tree->SetBranchAddress("ndf", &ndf);
+
+  /* Disable unused branch */
+  std::vector<TString> list_vars = {"lay", "t", "x_u", "alpha", "theta", "Pval", "ndf"};
+  tree->SetBranchStatus("*", 0);
+
+  for (TString brname : list_vars) {
+    tree->SetBranchStatus(brname, 1);
+  }
+
 
   /*Create histogram*/
   for (int i = 0; i < 56; ++i) {
@@ -282,18 +290,6 @@ bool XTCalibration::calibrate()
           } else {
             hprof[l][lr][al][th] = (TProfile*)xt->getFittedHisto();
           }
-          // TH1D* h1 = (TH1D*)xt->getFittedHisto();
-
-          //    if(m_debug){
-          //TCanvas* c1  = new TCanvas("c1","c1",500,500);
-          // h1->Draw();
-          //xtf5r[l][lr][al][th]->DrawF1(0,400,"same");
-          //c1->Print(Form("pic/xt/%i_layer_%i_%i_%i_%i.png",fitflag[l][lr][al][th],l,lr,al,th));}
-          /*Revert param for left side to draw*/
-          //    if(lr==0 && fitflag[l][lr][al][th]!=0 ){
-          //xtf5r[l][lr][al][th]->GetParameters(parN);
-          //    xtf5rLeft_draw[l][lr][al][th]->SetParameters(-1*parN[0],-1*parN[1],-1*parN[2],-1*parN[3],-1*parN[4],-1*parN[5],parN[6],-1*parN[7]);
-          //}
         }
       }
     }

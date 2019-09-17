@@ -42,6 +42,9 @@ namespace Belle2 {
       virtual void setMode(unsigned short mode = 1) {m_xtmode = mode;}
       /// set to store histogram or not.
       virtual void setStoreHisto(bool storeHist = false) {m_storeHisto = storeHist;}
+      /// Set LR separate mode (default is true).
+      void setLRSeparate(bool lr = true) {m_LRseparate = lr;}
+
 
       /// Run calibration
       void execute()

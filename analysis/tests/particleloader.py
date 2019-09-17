@@ -15,7 +15,7 @@ b2test_utils.configure_logging_for_tests()
 conditions.disable_globaltag_replay()
 set_random_seed("1337")
 testinput = [b2test_utils.require_file('analysis/tests/mdst.root')]
-fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0 -> pi+ pi-', 'Lambda0 -> p+ pi-', 'K_L0', 'gamma']
+fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0 -> pi+ pi-', 'Lambda0 -> p+ pi-', 'K_L0', 'gamma', 'n0']
 
 ###############################################################################
 # a new ParticleLoader for each fsp

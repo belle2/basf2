@@ -24,6 +24,18 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+#include <framework/io/RootIOUtilities.h>
+#include <framework/core/RandomNumbers.h>
+#include <framework/core/Environment.h>
+#include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/database/Database.h>
+#include <framework/utilities/EnvironmentVariables.h>
+
+#include <boost/python.hpp>
+#include <boost/optional.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 
@@ -68,6 +80,10 @@ namespace Belle2 {
              "TOP: time window in which to count hits [ns]", 100.0);
     addParam("svdShaperDigitsName", m_svdShaperDigitsName,
              "SVDShaperDigits collection name", string(""));
+    addParam("additionalDataDescription", m_additionalDataDescription,
+             "Additional dictionary of "
+             "name->value pairs to be added to the file metadata to describe the data",
+             m_additionalDataDescription);
 
   }
 
@@ -87,6 +103,7 @@ namespace Belle2 {
     } else {
       m_trgSummary.isRequired();
     }
+    m_fileMetaData.isOptional(); // enables to run the module with simulation
 
     // create, set and append hit rate monitoring classes
     auto* pxd = new Background::PXDHitRateCounter();
@@ -114,6 +131,10 @@ namespace Belle2 {
 
     // create tree
     m_tree = new TTree(m_treeName.c_str(), "hit rates of selected events");
+
+    // create persistent tree to store fileMetaData
+    m_persistent = new TTree("persistent", "persistent data");
+    m_persistent->Branch("FileMetaData", &m_outputFileMetaData);
 
     // set tree branches
     m_tree->Branch("run", &m_run, "run/I");
@@ -162,6 +183,9 @@ namespace Belle2 {
     m_utimeMin = std::min(m_utimeMin, utime);
     m_utimeMax = std::max(m_utimeMax, utime + 1);
 
+    // collect file meta data
+    collectFileMetaData();
+
     // event selection
     if (not isEventSelected()) return;
     m_numEventsSelected++;
@@ -190,6 +214,9 @@ namespace Belle2 {
       m_tree->Fill();
     }
 
+    // count selected events in all runs
+    m_allEventsSelected += m_numEventsSelected;
+
     // print a summary for this run
     std::string trigs;
     for (const auto& trgType : m_trgTypesCount) {
@@ -208,6 +235,8 @@ namespace Belle2 {
 
   void BeamBkgHitRateMonitorModule::terminate()
   {
+    setFileMetaData();
+    m_persistent->Fill();
 
     // write to file and close
     m_file->cd();
@@ -238,6 +267,83 @@ namespace Belle2 {
     return false;
   }
 
+
+  void BeamBkgHitRateMonitorModule::collectFileMetaData()
+  {
+    // add file name to the list
+    if (m_fileMetaData.isValid()) {
+      std::string lfn = m_fileMetaData->getLfn();
+      if (not lfn.empty() and (m_parentLfns.empty() or (m_parentLfns.back() != lfn))) {
+        m_parentLfns.push_back(lfn);
+      }
+    }
+
+    // low and high experiment, run and event numbers
+    unsigned long experiment =  m_eventMetaData->getExperiment();
+    unsigned long run =  m_eventMetaData->getRun();
+    unsigned long event = m_eventMetaData->getEvent();
+    if (m_experimentLow > m_experimentHigh) { //starting condition
+      m_experimentLow = m_experimentHigh = experiment;
+      m_runLow = m_runHigh = run;
+      m_eventLow = m_eventHigh = event;
+    } else {
+      if ((experiment < m_experimentLow) or ((experiment == m_experimentLow) and ((run < m_runLow) or ((run == m_runLow)
+                                             and (event < m_eventLow))))) {
+        m_experimentLow = experiment;
+        m_runLow = run;
+        m_eventLow = event;
+      }
+      if ((experiment > m_experimentHigh) or ((experiment == m_experimentHigh) and ((run > m_runHigh) or ((run == m_runHigh)
+                                              and (event > m_eventHigh))))) {
+        m_experimentHigh = experiment;
+        m_runHigh = run;
+        m_eventHigh = event;
+      }
+    }
+
+  }
+
+
+  void BeamBkgHitRateMonitorModule::setFileMetaData()
+  {
+
+    if (m_fileMetaData.isValid() and not m_fileMetaData->isMC()) {
+      m_outputFileMetaData.declareRealData();
+    }
+
+    m_outputFileMetaData.setNEvents(m_allEventsSelected);
+
+    if (m_experimentLow > m_experimentHigh) {
+      // starting condition so apparently no events at all
+      m_outputFileMetaData.setLow(-1, -1, 0);
+      m_outputFileMetaData.setHigh(-1, -1, 0);
+    } else {
+      m_outputFileMetaData.setLow(m_experimentLow, m_runLow, m_eventLow);
+      m_outputFileMetaData.setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
+    }
+
+    m_outputFileMetaData.setParents(m_parentLfns);
+    RootIOUtilities::setCreationData(m_outputFileMetaData);
+    m_outputFileMetaData.setRandomSeed(RandomNumbers::getSeed());
+    m_outputFileMetaData.setSteering(Environment::Instance().getSteering());
+    auto mcEvents = Environment::Instance().getNumberOfMCEvents();
+    m_outputFileMetaData.setMcEvents(mcEvents);
+    m_outputFileMetaData.setDatabaseGlobalTag(Database::Instance().getGlobalTags());
+
+    for (const auto& item : m_additionalDataDescription) {
+      m_outputFileMetaData.setDataDescription(item.first, item.second);
+    }
+
+    std::string lfn = m_file->GetName();
+    lfn = boost::filesystem::absolute(lfn, boost::filesystem::initial_path()).string();
+    std::string format = EnvironmentVariables::get("BELLE2_LFN_FORMATSTRING", "");
+    if (!format.empty()) {
+      auto format_filename = boost::python::import("B2Tools.format").attr("format_filename");
+      lfn = boost::python::extract<std::string>(format_filename(format, m_outputFileName, m_outputFileMetaData.getJsonStr()));
+    }
+    m_outputFileMetaData.setLfn(lfn);
+
+  }
 
 
 } // end Belle2 namespace

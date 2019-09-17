@@ -659,9 +659,9 @@ void CDCTriggerUnpackerModule::event()
       }
 
       for (auto trg : m_subTrigger) {
-        trg->reserve(subDetectorId, nWords);
         // only unpack when there are enough words in the event
         if (trg->getHeaders(subDetectorId, data32tab, nWords)) {
+          trg->reserve(subDetectorId, nWords);
           B2DEBUG(99, "starting to unpack a subTrigger, subDetectorId" << std::hex << subDetectorId);
           trg->unpack(subDetectorId, data32tab, nWords);
           setReturnValue(1);

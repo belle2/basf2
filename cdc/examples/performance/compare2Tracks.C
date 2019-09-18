@@ -10,8 +10,13 @@ void loadStyle();
 void fit(TH1D* h1);
 
 
-void compare2Tracks()
+
+void compare2Tracks( bool compare = true)
 {
+  // "compare" this result with a previous result.
+  // The previous result should be defined by result4Compare.
+
+
   // Input file names:
   std::vector<std::string> input_filenames = {"cosmic/rootfile/twotracks*"};
 
@@ -21,9 +26,6 @@ void compare2Tracks()
   // Run analysis for positve (pos) or negative (neg) or both (all)
   TString sCharge = "all";
 
-  // Option to compare this result with a previous result.
-  // The previous result is defined in result4Compare.
-  bool compare(true);
 
   // Root file contain histograms for comparing with this results.
   // it must be set properly if compare= true
@@ -101,8 +103,8 @@ void compare2Tracks()
                           max_dPhi0);
   TH1D* hdtanL = new TH1D("hdtanL", "#Deltatan#lambda/#surd2 ;#Deltatan#lambda/#sqrt{2}   ; Events ", 100, -1 * max_dTanl, max_dTanl);
   //Tanlambda dependence
-  double binWidth(45.);
-  int nbin = floor(180 / binWidth);
+  int nbin = 4;
+  double binWidth = 180/nbin;
   TH2D* hdD0TanPhi0[nbin];
   TH2D* hdZ0TanPhi0[nbin];
   TH2D* hdD0TanL = new TH2D("hdD0TanL", "#Deltad_{0}/#surd2 vs. tan#lambda; tan#lambda;#Deltad_{0} [cm]", 50, -1., 1., 100,

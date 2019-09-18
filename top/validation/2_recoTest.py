@@ -4,7 +4,7 @@
 """
 <header>
   <output>TOPNtupleRecoTest.root</output>
-  <contact>staric</contact>
+  <contact>marko.staric@ijs.si</contact>
   <description>Makes a flat ntuple for validation of top reconstruction </description>
 </header>
 """

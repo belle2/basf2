@@ -27,7 +27,7 @@ TrackQETrainingDataCollectorModule::TrackQETrainingDataCollectorModule() : Modul
            std::string("SVDCDCRecoTracks"));
   addParam("SVDPlusCDCStandaloneRecoTracksStoreArrayName", m_svdPlusCDCStandaloneRecoTracksStoreArrayName,
            "Name of the combined CDC-SVD StoreArray with tracks added from the CDC to SVD CKF.",
-           std::string("SVDplusRecoTracks"));
+           std::string("SVDPlusCDCStandaloneRecoTracks"));
   addParam("CDCRecoTracksStoreArrayName", m_cdcRecoTracksStoreArrayName, "Name of the CDC StoreArray.",
            std::string("CDCRecoTracks"));
   addParam("SVDRecoTracksStoreArrayName", m_svdRecoTracksStoreArrayName, "Name of the SVD StoreArray.",
@@ -77,7 +77,7 @@ void TrackQETrainingDataCollectorModule::event()
 
     if (svdCDCRecoTrackPtr) {
       // Relation graph when SVD-to-CDC CFK is enabled:
-      // SVDCDCRecoTracks -> SVDplusRecoTracks -> CDCRecoTracks & SVDRecoTracks
+      // SVDCDCRecoTracks -> SVDPlusCDCStandaloneRecoTracks -> CDCRecoTracks & SVDRecoTracks
       svdPlusCDCStandaloneRecoTrackPtr = svdCDCRecoTrackPtr->getRelatedTo<RecoTrack>(
                                            m_svdPlusCDCStandaloneRecoTracksStoreArrayName);
       if (not svdPlusCDCStandaloneRecoTrackPtr) {

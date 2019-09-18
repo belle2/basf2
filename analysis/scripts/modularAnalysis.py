@@ -1545,6 +1545,33 @@ def variablesToDaughterExtraInfo(
     path.add_module(mod)
 
 
+def variablesToEventExtraInfo(
+    particleList,
+    variables,
+    option=0,
+    path=None,
+):
+    """
+    For each particle in the input list the selected variables are saved in an event-extra-info field with the given name,
+    Can be used to same MC truth information, for example, in a ntuple of reconstructed particle.
+
+    An existing extra info with the same name will be overwritten if the new
+    value is lower / will never be overwritten / will be overwritten if the
+    new value is higher / will always be overwritten (-1/0/1/2).
+
+    @param particleList  The input ParticleList
+    @param variables     Dictionary of Variables and extraInfo names.
+    @param path          modules are added to this path
+    """
+
+    mod = register_module('VariablesToEventExtraInfo')
+    mod.set_name('VariablesToEventExtraInfo_' + particleList)
+    mod.param('particleList', particleList)
+    mod.param('variables', variables)
+    mod.param('overwrite', option)
+    path.add_module(mod)
+
+
 def variableToSignalSideExtraInfo(
     particleList,
     varToExtraInfo,

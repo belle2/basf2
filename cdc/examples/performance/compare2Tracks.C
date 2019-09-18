@@ -23,7 +23,7 @@ void compare2Tracks()
 
   // Option to compare this result with a previous result.
   // The previous result is defined in result4Compare.
-  bool compare = true;
+  bool compare(true);
 
   // Root file contain histograms for comparing with this results.
   // it must be set properly if compare= true
@@ -101,7 +101,7 @@ void compare2Tracks()
                           max_dPhi0);
   TH1D* hdtanL = new TH1D("hdtanL", "#Deltatan#lambda/#surd2 ;#Deltatan#lambda/#sqrt{2}   ; Events ", 100, -1 * max_dTanl, max_dTanl);
   //Tanlambda dependence
-  double binWidth = 45;
+  double binWidth(45.);
   int nbin = floor(180 / binWidth);
   TH2D* hdD0TanPhi0[nbin];
   TH2D* hdZ0TanPhi0[nbin];
@@ -159,8 +159,6 @@ void compare2Tracks()
   //Phi0 dependence of dPt
   TH2D* hdPtPhi0 = new TH2D("hdPtPhi0", "#DeltaPt vs. #varphi_{0}; #varphi_{0}; #DeltaP_{T}/P_{T}",
                             36, -180, 0., 100, -1 * max_dPt, max_dPt); //dpt
-
-  double ndf, Phi0, tanLambda, D0, Z0, Pval, Omega;
 
   hNDF1->SetLineColor(kRed);
   hPval1->SetLineColor(kRed);
@@ -768,7 +766,7 @@ void compare2Tracks()
   c3->Print("cdc_performance_with_cr.pdf", "Title:angle_vs_Pt");
   delete c3;
   c3 = new TCanvas("c3", "", 900, 800); c3->Divide(2, 2);
-  pad1 = (TPad*)c3->GetPrimitive("c3_1");
+  //  pad1 = (TPad*)c3->GetPrimitive("c3_1");
   TPad* pad3 = (TPad*)c3->GetPrimitive("c3_3");
 
   hdPtPt_neg->FitSlicesY(0, 0, -1, 20);

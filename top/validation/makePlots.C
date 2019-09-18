@@ -2,7 +2,7 @@
 <header>
   <input>TOPNtuple.root</input>
   <output>kaonID.root, numberOfPhotons.root, trackResolutions.root</output>
-  <contact>staric</contact>
+  <contact>marko.staric@ijs.si</contact>
   <description>Makes validation histograms</description>
 </header>
 */

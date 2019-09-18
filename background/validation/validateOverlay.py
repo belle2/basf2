@@ -4,7 +4,7 @@
 """
 <header>
   <output>overlayPlots.root</output>
-  <contact>staric</contact>
+  <contact>marko.staric@ijs.si</contact>
   <description>Runs BG overlay and makes validation histograms</description>
 </header>
 """

@@ -2,7 +2,7 @@
 <header>
   <input>TOPNtupleRecoTest.root</input>
   <output>efficiency.root</output>
-  <contact>staric</contact>
+  <contact>marko.staric@ijs.si</contact>
   <description>Makes validation histograms</description>
 </header>
 */

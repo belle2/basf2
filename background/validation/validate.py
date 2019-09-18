@@ -4,7 +4,7 @@
 """
 <header>
   <output>timeDistributions.root</output>
-  <contact>staric</contact>
+  <contact>marko.staric@ijs.si</contact>
   <description>Runs BG mixer and makes validation histograms</description>
 </header>
 """

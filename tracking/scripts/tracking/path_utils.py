@@ -1,11 +1,27 @@
 from pybasf2 import B2WARNING
 
-from basf2 import register_module, create_path
+from basf2 import register_module, create_path, set_module_parameters
 from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 
 from iov_conditional import phase_2_conditional
+
+
+def use_local_sectormap(path, pathToLocalSM):
+    """
+    Helper function that sets up the SectorMapBootstrapModule in that way that a local sectormap will be
+    loaded instead the one from the DB
+
+    :param path: The path the SectorMapBootstrapModule is in.
+    :param pathToLocalSM: the local storage position of the sectormap (including the name)
+    """
+    for mod in path.modules():
+        if mod.name() == 'SectorMapBootstrap':
+            B2WARNING("Warning will load local SectorMap from:  " + pathToLocalSM)
+            set_module_parameters(path, "SectorMapBootstrap", ReadSecMapFromDB=False)
+            set_module_parameters(path, "SectorMapBootstrap", ReadSectorMap=True)
+            set_module_parameters(path, "SectorMapBootstrap", SectorMapsInputFile=pathToLocalSM)
 
 
 def add_geometry_modules(path, components=None):

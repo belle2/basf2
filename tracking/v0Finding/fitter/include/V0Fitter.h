@@ -8,14 +8,12 @@
 
 #include <TVector3.h>
 
-#include <genfit/Track.h>
-
 #include <utility>
 
 namespace genfit {
   class MeasuredStateOnPlane;
   class GFRaveVertex;
-  //class Track;
+  class Track;
 }
 
 namespace Belle2 {

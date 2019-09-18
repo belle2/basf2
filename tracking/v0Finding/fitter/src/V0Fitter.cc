@@ -12,6 +12,7 @@
 #include <genfit/FieldManager.h>
 #include "genfit/MaterialEffects.h"
 #include <genfit/Exception.h>
+#include <genfit/Track.h>
 
 #include <framework/utilities/IOIntercept.h>
 

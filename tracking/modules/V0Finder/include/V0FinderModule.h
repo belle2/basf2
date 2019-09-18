@@ -43,7 +43,6 @@ namespace Belle2 {
     void event() override;
 
   private:
-    bool preFilterTracks(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
 
     std::string m_arrayNameTrack;     ///< StoreArray name of the Tracks          (Input).
     StoreArray<Track> m_tracks;       ///< Actually array of mdst Tracks.
@@ -61,6 +60,16 @@ namespace Belle2 {
 
     std::tuple<double, double> m_MassRangeKshort = {0.3, 0.7}; ///< range for reconstructed Kshort mass used for pre-selection
     std::tuple<double, double> m_MassRangeLambda = {0.9, 1.3}; ///< range for reconstructed Lambda mass used for pre-selection
-    std::tuple<double, double> m_MassRangeGamma = { -0.4, 0.4}; ///< range for reconstructed photon mass used for pre-selection
+    std::tuple<double, double> m_MassRangeGamma = { -0.2, 0.2}; ///< range for reconstructed photon mass used for pre-selection
+
+
+    bool preFilterTracks(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
+    // buffer some variables to speed up time
+    double m_mGammaMin2;
+    double m_mGammaMax2;
+    double m_mKshortMin2;
+    double m_mKshortMax2;
+    double m_mLambdaMin2;
+    double m_mLambdaMax2;
   };
 }

@@ -11,11 +11,8 @@ void fit(TH1D* h1);
 
 
 
-void compare2Tracks( bool compare = true)
+void compare2Tracks()
 {
-  // "compare" this result with a previous result.
-  // The previous result should be defined by result4Compare.
-
 
   // Input file names:
   std::vector<std::string> input_filenames = {"cosmic/rootfile/twotracks*"};
@@ -26,6 +23,9 @@ void compare2Tracks( bool compare = true)
   // Run analysis for positve (pos) or negative (neg) or both (all)
   TString sCharge = "all";
 
+  // "compare" this result with a previous result.
+  // The previous result should be defined by result4Compare.
+  bool compare = true
 
   // Root file contain histograms for comparing with this results.
   // it must be set properly if compare= true
@@ -37,7 +37,7 @@ void compare2Tracks( bool compare = true)
   //std::string label4Compare = "July"; //label of input histo
   int color4Compare = 2;
 
-  //label of the input histograms
+  // Legend of the input histograms
   std::string label4Compare = "Exp2 (Feb-2018)";
 
   // Belle CDC parameters
@@ -103,7 +103,7 @@ void compare2Tracks( bool compare = true)
                           max_dPhi0);
   TH1D* hdtanL = new TH1D("hdtanL", "#Deltatan#lambda/#surd2 ;#Deltatan#lambda/#sqrt{2}   ; Events ", 100, -1 * max_dTanl, max_dTanl);
   //Tanlambda dependence
-  int nbin = 4;
+  const int nbin(4);
   double binWidth = 180/nbin;
   TH2D* hdD0TanPhi0[nbin];
   TH2D* hdZ0TanPhi0[nbin];

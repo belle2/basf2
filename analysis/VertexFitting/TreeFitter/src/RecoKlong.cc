@@ -110,7 +110,8 @@ namespace TreeFitter {
     m_clusterPars(0) = cluster_pos.X();
     m_clusterPars(1) = cluster_pos.Y();
     m_clusterPars(2) = cluster_pos.Z();
-    m_clusterPars(3) = cluster->getEnergy();
+    m_clusterPars(3) = sqrt(particle()->getPDGMass() * particle()->getPDGMass() + cluster->getMomentumMag() *
+                            cluster->getMomentumMag());
 
     return ErrCode(ErrCode::Status::success);
   }

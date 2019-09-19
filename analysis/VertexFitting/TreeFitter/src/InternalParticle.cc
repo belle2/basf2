@@ -145,12 +145,13 @@ namespace TreeFitter {
             dau2->setFlightLength(flt2);
 
           } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {
+            // TODO switched off waiting for refactoring of init1 and init2 functions (does not affect performance)
             // check if this is a hadronic resonance that is attached to a well constrained daughter vertex
             bool vertex_defined_by_daughter = false;
             for (auto daughter : vtxdaughters) {
-              //if (daughter->m_shares_vertex_with_mother) {
-              //  vertex_defined_by_daughter = true;
-              //}
+              if (daughter->m_shares_vertex_with_mother) {
+                vertex_defined_by_daughter = true;
+              }
             }
             if (!vertex_defined_by_daughter) {
 

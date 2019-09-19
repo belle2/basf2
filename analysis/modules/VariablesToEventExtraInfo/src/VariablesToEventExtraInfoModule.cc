@@ -63,22 +63,10 @@ void VariablesToEventExtraInfoModule::event()
     return;
   }
 
-
   const unsigned int numParticles = m_inputList->getListSize();
   for (unsigned int i = 0; i < numParticles; i++) {
     Particle* p = m_inputList->getParticle(i);
     addEventExtraInfo(p);
-  }
-
-  if (numParticles == 0) {
-    StoreObjPtr<EventExtraInfo> eventExtraInfo;
-    if (not eventExtraInfo.isValid()) eventExtraInfo.create();
-
-    const unsigned int nVars = m_functions.size();
-    for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-      // If number of particles is 0, set -999 to the eventExtraInfo
-      eventExtraInfo->addExtraInfo(m_extraInfoNames[iVar], -999);
-    }
   }
 
 }

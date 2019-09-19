@@ -1,0 +1,40 @@
+from collections import namedtuple
+import json
+
+
+class CalibrationRequirements(namedtuple('CalReq_Factory', ['input_data_formats', 'input_data_names'])):
+    """
+    Simple class to hold and display required information for a prompt calibration script (process).
+
+    Parameters:
+
+        input_data_formats frozenset(str): The data formats {'raw', 'cdst', 'mdst', 'udst'} of the input files
+            that should be used as input to the process. Used to figure out if this calibration should occurr
+            before the relevant data production e.g. before cdst files are created.
+
+        input_data_names frozenset(str): The names that you will use when accessing the input data given to the
+            prompt calibration process i.e. Use these in the 'getcalibrations' function to access the correct input
+            data files.
+    """
+    allowed_data_formats = frozenset({"raw", "cdst", "mdst", "udst"})
+
+    def __new__(cls, input_data_formats=None, input_data_names=None):
+        """
+        The special method to create the tuple instance. Returning the instance
+        calls the __init__ method
+        """
+        if not input_data_formats:
+            raise ValueError("You must specify at least one input data format")
+        input_data_formats = frozenset(map(lambda x: x.lower(), input_data_formats))
+        if input_data_formats.difference(cls.allowed_data_formats):
+            raise ValueError("There was a data format that is not in the allowed_data_formats attribute.")
+        if not input_data_names:
+            raise ValueError("You must specify at least one input data name")
+        input_data_names = frozenset(input_data_names)
+        return super().__new__(cls, input_data_formats, input_data_names)
+
+    def json_dumps(self):
+        """Return a valid JSON format string of the attributes"""
+        return json.dumps({"input_data_formats": list(self.input_data_formats),
+                           "input_data_names": list(self.input_data_names)
+                           })

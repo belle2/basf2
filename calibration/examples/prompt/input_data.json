@@ -1,0 +1,5 @@
+{
+    "physics": [["/group/belle2/dataprod/Data/Raw/e0008/r01977", [8, 1977]], ["/group/belle2/dataprod/Data/Raw/e0008/r01995", [8, 1995]]],
+    "cosmics": [["/group/belle2/dataprod/Data/Raw/e0008/r03458", [8, 3458]], ["/group/belle2/dataprod/Data/Raw/e0008/r03447", [8, 3447]]],
+    "Bcosmics": [["/group/belle2/dataprod/Data/Raw/e0008/r03458", [8, 3458]], ["/group/belle2/dataprod/Data/Raw/e0008/r03447", [8, 3447]]]
+}

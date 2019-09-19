@@ -58,18 +58,20 @@ namespace Belle2 {
     bool m_validation;                         ///< Flag if use validation.
     std::string m_arrayNameV0ValidationVertex; ///< StoreArray name of the V0ValidationVertex.
 
-    std::tuple<double, double> m_MassRangeKshort = {0.3, 0.7}; ///< range for reconstructed Kshort mass used for pre-selection
-    std::tuple<double, double> m_MassRangeLambda = {0.9, 1.3}; ///< range for reconstructed Lambda mass used for pre-selection
-    std::tuple<double, double> m_MassRangeGamma = { -0.2, 0.2}; ///< range for reconstructed photon mass used for pre-selection
+    std::tuple<double, double> m_MassRangeKshort = {0.4, 0.6}; ///< range for reconstructed Kshort mass used for pre-selection
+    std::tuple<double, double> m_MassRangeLambda = {1.0, 1.2}; ///< range for reconstructed Lambda mass used for pre-selection
 
-
+    /** helper function that gets the approximate mass range for the two given tracks and rejects candidates which
+      do not fall into a user given mass range for lambda and Kshort.
+      @param trackPlus: the track for the positively charged candidate
+      @param trackMinus: the track for the negatively charged candidate
+      @param v0Hypothesis: the hypothesis for the V0 (Lambda, or Kshort, for all others nothing happens)
+    */
     bool preFilterTracks(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
     // buffer some variables to speed up time
-    double m_mGammaMin2;
-    double m_mGammaMax2;
-    double m_mKshortMin2;
-    double m_mKshortMax2;
-    double m_mLambdaMin2;
-    double m_mLambdaMax2;
+    double m_mKshortMin2; ///< pre-calculated mininum Kshort mass squared
+    double m_mKshortMax2; ///< pre-calculated maximum Kshort mass squared
+    double m_mLambdaMin2; ///< pre-calculated mininum Lambda mass squared
+    double m_mLambdaMax2; ///< pre-calculated maximum Lambda mass squared
   };
 }

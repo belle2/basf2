@@ -58,8 +58,6 @@ V0FinderModule::V0FinderModule() : Module()
            " (to be chosen loosely as used momenta are ignore material effects)", m_MassRangeKshort);
   addParam("massRangeLambda", m_MassRangeLambda, "mass range in GeV for reconstructed Lambda used for pre-selection of candidates"
            " (to be chosen loosely as used momenta are ignore material effects)", m_MassRangeLambda);
-  addParam("massRangeGamma", m_MassRangeGamma, "mass range in GeV for reconstructed photon mass used for pre-selection of candidates"
-           " (to be chosen loosely as used momenta are ignore material effects)", m_MassRangeGamma);
 }
 
 
@@ -75,10 +73,6 @@ void V0FinderModule::initialize()
   m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
 
   // precalculate the mass range squared
-  m_mGammaMin2 = std::get<0>(m_MassRangeGamma) < 0 ? -std::get<0>(m_MassRangeGamma) * std::get<0>(m_MassRangeGamma) : std::get<0>
-                 (m_MassRangeGamma) * std::get<0>(m_MassRangeGamma);
-  m_mGammaMax2 = std::get<1>(m_MassRangeGamma) < 0 ? -std::get<1>(m_MassRangeGamma) * std::get<1>(m_MassRangeGamma) : std::get<1>
-                 (m_MassRangeGamma) * std::get<1>(m_MassRangeGamma);
   m_mKshortMin2 = std::get<0>(m_MassRangeKshort) < 0 ? -std::get<0>(m_MassRangeKshort) * std::get<0>(m_MassRangeKshort) : std::get<0>
                   (m_MassRangeKshort) * std::get<0>(m_MassRangeKshort);
   m_mKshortMax2 = std::get<1>(m_MassRangeKshort) < 0 ? -std::get<1>(m_MassRangeKshort) * std::get<1>(m_MassRangeKshort) : std::get<1>
@@ -127,14 +121,10 @@ void V0FinderModule::event()
       // TODO: this will throw away all hypotheses if one of them fails! Not sure if that is a problem or how frequent it is?
       try {
         if (preFilterTracks(trackPlus, trackMinus, Const::Kshort)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort);
-        //else std::cout << "rejected" << std::endl;
-        if (preFilterTracks(trackPlus, trackMinus, Const::photon)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon);
-        //else std::cout << "rejected" << std::endl;
+        // the pre-filter is not able to reject photons, so no need to test for photons
+        m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon);
         if (preFilterTracks(trackPlus, trackMinus, Const::Lambda))  m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda);
-        //else std::cout << "rejected" << std::endl;
         if (preFilterTracks(trackPlus, trackMinus, Const::antiLambda)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda);
-        //else std::cout << "rejected" << std::endl;
-
       } catch (const genfit::Exception& e) {
         // genfit exception raised, skip this track pair
         B2DEBUG(27, "Genfit exception caught: " << e.what() << "skip the track pair and continue");
@@ -148,10 +138,16 @@ void V0FinderModule::event()
 bool
 V0FinderModule::preFilterTracks(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis)
 {
-  // the used method is not able to reject photons
-  if (v0Hypothesis == Const::photon) {
-    //std::cout << "I am a gamma, so no filtering" << std::endl;
-    //std::cout << "accepted 1" << std::endl;
+  const double* range_m2_min = nullptr;
+  const double* range_m2_max = nullptr;
+  if (v0Hypothesis == Const::Kshort) {
+    range_m2_min = &m_mKshortMin2;
+    range_m2_max = &m_mKshortMax2;
+  } else if (v0Hypothesis == Const::Lambda or v0Hypothesis == Const::antiLambda) {
+    range_m2_min = &m_mLambdaMin2;
+    range_m2_max = &m_mLambdaMax2;
+  } else {
+    // this case is not covered so accept everything
     return true;
   }
 
@@ -174,33 +170,8 @@ V0FinderModule::preFilterTracks(const Track* trackPlus, const Track* trackMinus,
   double candmass_min2 = sum_E2 - (p_plus + p_minus) * (p_plus + p_minus);
   double candmass_max2 = sum_E2 - (p_plus - p_minus) * (p_plus - p_minus);
 
-
-  const double* range_m2_min = nullptr;
-  const double* range_m2_max = nullptr;
-  if (v0Hypothesis == Const::Kshort) {
-    range_m2_min = &m_mKshortMin2;
-    range_m2_max = &m_mKshortMax2;
-  } else if (v0Hypothesis == Const::Lambda or v0Hypothesis == Const::antiLambda) {
-    range_m2_min = &m_mLambdaMin2;
-    range_m2_max = &m_mLambdaMax2;
-  } else if (v0Hypothesis == Const::photon) {
-    range_m2_min = &m_mGammaMin2;
-    range_m2_max = &m_mGammaMax2;
-  } else {
-    B2WARNING("This should not happen!");
-  }
-
   // if true possible candiate mass overlaps with the user specified range
   bool in_range = candmass_max2 > *range_m2_min and candmass_min2 < *range_m2_max;
-
-  // debugging output
-  //std::cout << std::endl;
-  //std::cout << v0Hypothesis.__repr__() << std::endl;
-  //std::cout << "cand plus m " << m_plus << " p " << p_plus << " E " << E_plus << std::endl;
-  //std::cout << "cand plus m " << m_minus << " p " << p_minus << " E " << E_minus << std::endl;
-  //std::cout << "cand mass2 min " << candmass_min2 << " max " << candmass_max2 << std::endl;
-  //std::cout << "user range " << *range_m2_min << " " << *range_m2_max << std::endl;
-  //std::cout << "accepted " << in_range << std::endl;
 
   return in_range;
 }

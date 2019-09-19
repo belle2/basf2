@@ -70,7 +70,7 @@ void SVD3SamplesEmulatorModule::beginRun()
 
 void SVD3SamplesEmulatorModule::event()
 {
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo("svdEventInfoSim");
   SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
 
   StoreArray<SVDShaperDigit> ShaperDigit3Samples(m_outputArrayName);

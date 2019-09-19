@@ -59,6 +59,8 @@ SVDNNShapeReconstructorModule::SVDNNShapeReconstructorModule() : Module()
            "MCParticles collection name", string(""));
   addParam("WriteRecoDigits", m_writeRecoDigits,
            "Write RecoDigits to output?", m_writeRecoDigits);
+  addParam("SVDEventInfo", m_svdEventInfoName,
+           "SVDEventInfo name", string(""));
   // 2. Calibration and time fitter sources
   addParam("TimeFitterName", m_timeFitterName,
            "Name of time fitter data file", string("SVDTimeNet_6samples"));
@@ -84,7 +86,9 @@ void SVDNNShapeReconstructorModule::initialize()
   storeShaperDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
-  m_storeSVDEvtInfo.isRequired();
+
+  if (!m_storeSVDEvtInfo.isOptional(m_svdEventInfoName)) m_svdEventInfoName = "SVDEventInfoSim";
+  m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
 
   RelationArray relRecoDigitShaperDigits(storeRecoDigits, storeShaperDigits);
   RelationArray relRecoDigitTrueHits(storeRecoDigits, storeTrueHits);

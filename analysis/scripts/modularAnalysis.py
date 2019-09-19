@@ -1822,7 +1822,7 @@ def appendROEMask(
     roeMask = register_module('RestOfEventInterpreter')
     roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + mask_name)
     roeMask.param('particleList', list_name)
-    roeMask.param('ROEMasksWithFractions', [(mask_name, trackSelection, eclClusterSelection)])
+    roeMask.param('ROEMasks', [(mask_name, trackSelection, eclClusterSelection)])
     path.add_module(roeMask)
 
 

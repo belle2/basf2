@@ -124,6 +124,9 @@ namespace Belle2 {
       m_variables.at(prefix + "_diff_Eta") = fabs(cdcTrackVector->Eta() - svdTrackVector->Eta());
     }
 
+    /** Extrapolate fitted RecoTracks from CDC standalone and VXDTF2 tracking to the CDC wall
+     * and extract the difference variables there.
+     */
     void cdcWallExtrapolation(RecoTrack const* CDCRecoTrack, RecoTrack const* SVDRecoTrack)
     {
       // position and momentum used for extrapolations to the CDC Wall
@@ -172,6 +175,9 @@ namespace Belle2 {
       }
     }
 
+    /** Extrapolate fitted RecoTracks from CDC standalone and VXDTF2 tracking to the
+     * POCA and extract the difference variables there.
+     */
     void pocaExtrapolation(RecoTrack const* CDCRecoTrack, RecoTrack const* SVDRecoTrack)
     {
       // position and momentum used for extrapolations to the CDC Wall

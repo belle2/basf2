@@ -127,7 +127,11 @@ namespace Belle2 {
           if (particle == nullptr)
           {
             StoreObjPtr<EventExtraInfo> eventExtraInfo;
-            return eventExtraInfo->getExtraInfo(extraInfoName);
+            try {
+              return eventExtraInfo->getExtraInfo(extraInfoName);
+            } catch (const std::runtime_error& error) {
+              return -999.;
+            }
           }
           try {
             return particle->getExtraInfo(extraInfoName);
@@ -149,7 +153,12 @@ namespace Belle2 {
         auto extraInfoName = arguments[0];
         auto func = [extraInfoName](const Particle*) -> double {
           StoreObjPtr<EventExtraInfo> eventExtraInfo;
-          return eventExtraInfo->getExtraInfo(extraInfoName);
+          try {
+            return eventExtraInfo->getExtraInfo(extraInfoName);
+          } catch (const std::runtime_error& error)
+          {
+            return -999.;
+          }
         };
         return func;
       } else {
@@ -2352,6 +2361,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_VARIABLE("eventExtraInfo(name)", eventExtraInfo,
                       "[Eventbased] Returns extra info stored under the given name in the event extra info.\n"
                       "The extraInfo has to be set first by another module like MVAExpert in event mode.\n"
+                      "If nothing is set under this name, -999 is returned.\n"
                       "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the MVAExpert for an event.");
     REGISTER_VARIABLE("eventCached(variable)", eventCached,
                       "[Eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"

@@ -36,13 +36,13 @@ void makePlotsReco()
     "Kaon efficiency at 3 GeV/c versus cosine of track polar angle"));
   kaonEffi->GetListOfFunctions()->Add(new TNamed("Check",
     "Efficiency should follow its reference."));
-  h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
+  kaonEffi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
 
   pionEffi->GetListOfFunctions()->Add(new TNamed("Description",
     "Pion fake rate at 3 GeV/c versus cosine of track polar angle"));
   pionEffi->GetListOfFunctions()->Add(new TNamed("Check",
     "Fake rate should follow its reference."));
-  h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
+  pionEffi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
   
   kaonEffi->Write();
   pionEffi->Write();

@@ -4,8 +4,24 @@ from basf2 import register_module, create_path
 from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
+from tracking.adjustments import adjust_module
 
 from iov_conditional import phase_2_conditional
+
+
+def use_local_sectormap(path, pathToLocalSM):
+    """
+    Helper function that sets up the SectorMapBootstrapModule in that way that a local sectormap will be
+    loaded instead the one from the DB. Has to be applied on the path after the SectorMapBootstrap was
+    put into the path (usually in add_reconstructin)
+
+    :param path: The path the SectorMapBootstrapModule is in.
+    :param pathToLocalSM: the local storage position of the sectormap (including the name)
+
+    """
+    B2WARNING("Warning will load local SectorMap from:  " + pathToLocalSM)
+    adjust_module(path, 'SectorMapBootstrap', **{"ReadSecMapFromDB": False,
+                                                 "ReadSectorMap": True, "SectorMapsInputFile": pathToLocalSM})
 
 
 def add_geometry_modules(path, components=None):

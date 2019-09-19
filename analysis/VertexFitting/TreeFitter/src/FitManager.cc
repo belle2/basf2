@@ -100,7 +100,7 @@ namespace TreeFitter {
         if (m_errCode.failure()) {
           finished = true ;
           m_status = VertexStatus::Failed;
-          setExtraInfo(m_particle, "failed", 5);
+          setExtraInfo(m_particle, "failed", 1);
         } else {
           if (m_niter > 0) {
             if ((std::abs(deltachisq) / m_chiSquare < dChisqConv)) {
@@ -123,11 +123,11 @@ namespace TreeFitter {
         }
       }
       if (m_niter == nitermax && m_status != VertexStatus::Success) {
-        setExtraInfo(m_particle, "failed", 4);
+        setExtraInfo(m_particle, "failed", 3);
         m_status = VertexStatus::NonConverged;
       }
       if (!(m_fitparams->testCovariance())) {
-        setExtraInfo(m_particle, "failed", 3);
+        setExtraInfo(m_particle, "failed", 4);
         m_status = VertexStatus::Failed;
       }
     }

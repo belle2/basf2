@@ -79,8 +79,8 @@ namespace TreeFitter {
     const int momindex = momIndex();
     const int posindex  = mother()->posIndex();
 
-    const double factorE = 1000 * m_covariance(3, 3);
-    const double factorX = 1000; // ~ 10cm error on initial vertex
+    const double factorE = 10 * m_covariance(3, 3);
+    const double factorX = 1; // ~ 10cm error on initial vertex
 
     fitparams.getCovariance().block<4, 4>(momindex, momindex) =
       Eigen::Matrix<double, 4, 4>::Identity(4, 4) * factorE;

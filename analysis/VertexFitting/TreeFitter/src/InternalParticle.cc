@@ -129,8 +129,10 @@ namespace TreeFitter {
             RecoTrack* dau1 = trkdaughters[0];
             RecoTrack* dau2 = trkdaughters[1];
 
-            Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
-            Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
+            Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
+                                     dau1->particle()->getPDGCode())))->getHelix();
+            Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
+                                     dau2->particle()->getPDGCode())))->getHelix();
 
             double flt1(0), flt2(0);
             HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
@@ -142,9 +144,26 @@ namespace TreeFitter {
             dau1->setFlightLength(flt1);
             dau2->setFlightLength(flt2);
 
-            /** temporarily disabled */
           } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {
-            B2DEBUG(12, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
+            // check if this is a hadronic resonance that is attached to a well constrained daughter vertex
+            bool vertex_defined_by_daughter = false;
+            for (auto daughter : vtxdaughters) {
+              //if (daughter->m_shares_vertex_with_mother) {
+              //  vertex_defined_by_daughter = true;
+              //}
+            }
+            if (!vertex_defined_by_daughter) {
+
+              RecoTrack* dau1 = trkdaughters[0];
+              const TVector3 pos = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
+                                     dau1->particle()->getPDGCode())))->getPosition();
+              fitparams.getStateVector()(posindex) = pos.X();
+              fitparams.getStateVector()(posindex + 1) = pos.Y();
+              const int dim = m_config->m_originDimension;
+              if (dim == 3) {
+                fitparams.getStateVector()(posindex + 2) = pos.Z();
+              }
+            }//vertex defined by daughter
 
           } else if (mother() && mother()->posIndex() >= 0) {
             const int posindexmother = mother()->posIndex();

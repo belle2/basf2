@@ -30,6 +30,10 @@ namespace TreeFitter {
 
   ErrCode Constraint::filter(FitParams& fitpar)
   {
+    /**
+     * We don't have reference state yet so we use the k-1 last state
+     * to lineraize non-linear constraints
+     * */
     ErrCode status;
     Projection p(fitpar.getDimensionOfState(), m_dim);
     KalmanCalculator kalman(m_dim, fitpar.getDimensionOfState());
@@ -57,84 +61,8 @@ namespace TreeFitter {
         if (!status.failure()) {
           kalman.updateState(fitpar);
 
-          double newchisq = 0;
-          // the chi2 of exact constraints is different
-          if (m_type == Type::geometric || m_type == Type::kinematic || m_type == Type::mass) {
-            // for exact cosntriants (= constraints without V)
-            // we use  2 r^t R^-1 r
-            newchisq = 2 * kalman.getChiSquare();
-          } else {
-            // for measurement constraints use the measurement covariance
-            // explicit because Eigen::View does not implement '.inverse()'
-            const Eigen::Matrix < double, -1, -1, 0, 5, 5 > V = p.getV().selfadjointView<Eigen::Lower>();
-            newchisq = p.getResiduals().transpose() * V.inverse() * p.getResiduals();
-          }
-
-          double dchisqconverged = 0.001 ;
-
-          double dchisq = newchisq - chisq;
-          bool diverging = iter > 0 && dchisq > 0;
-          bool converged = std::abs(dchisq) < dchisqconverged;
-          finished  = ++iter >= m_maxNIter || diverging || converged;
-          chisq = newchisq;
-        }
-      }
-    }
-
-    const unsigned int number_of_constraints = kalman.getConstraintDim();
-    fitpar.addChiSquare(accumulated_chi2, number_of_constraints);
-    kalman.updateCovariance(fitpar);
-
-    return status;
-  }
-
-  ErrCode Constraint::filterWithReference(FitParams& fitpar, const FitParams& oldState)
-  {
-    ErrCode status;
-    Projection p(fitpar.getDimensionOfState(), m_dim);
-    KalmanCalculator kalman(m_dim, fitpar.getDimensionOfState());
-
-    double chisq(0);
-    int iter(0);
-    bool finished(false) ;
-
-    // for non-linear cosntraitns we have to sum the chi2 of each iteration
-    double accumulated_chi2 = 0;
-
-    while (!finished && !status.failure()) {
-      p.resetProjection();
-
-      /** here we project the old state and use only the change with respect to the new state
-       * instead of the new state in the update . the advantage is smaller steps */
-      status |= project(oldState, p);
-
-      p.getResiduals() += p.getH() * (fitpar.getStateVector() - oldState.getStateVector());
-
-      if (!status.failure()) {
-        status |= kalman.calculateGainMatrix(
-                    p.getResiduals(),
-                    p.getH(),
-                    fitpar,
-                    &p.getV(),
-                    1
-                  );
-
-        if (!status.failure()) {
-          kalman.updateState(fitpar);
-
-          double newchisq = 0;
-          // the chi2 of exact constraints is different
-          if (m_type == Type::geometric || m_type == Type::kinematic || m_type == Type::mass) {
-            // for exact cosntriants (= constraints without V)
-            // we use  2 r^t R^-1 r
-            newchisq = 2 * kalman.getChiSquare();
-          } else {
-            // for measurement constraints use the measurement covariance
-            // explicit because Eigen::View does not implement '.inverse()'
-            const Eigen::Matrix < double, -1, -1, 0, 5, 5 > V = p.getV().selfadjointView<Eigen::Lower>();
-            newchisq = p.getResiduals().transpose() * V.inverse() * p.getResiduals();
-
-          }
+          // r R^-1 r
+          double newchisq = kalman.getChiSquare();
 
           double dchisqconverged = 0.001 ;
 
@@ -150,6 +78,48 @@ namespace TreeFitter {
 
     const unsigned int number_of_constraints = kalman.getConstraintDim();
     fitpar.addChiSquare(accumulated_chi2, number_of_constraints);
+
+    kalman.updateCovariance(fitpar);
+    return status;
+  }
+
+  ErrCode Constraint::filterWithReference(FitParams& fitpar, const FitParams& oldState)
+  {
+    /**
+     * We now linearise around the last iteration \alpha (const FitParams& oldState)
+     * In this implementation we can no longer linearize non-linear constraints
+     * but we ensured by the linearisation around the last state that the step size is small enough
+     * so we just use them as if they were linear
+     * */
+    ErrCode status;
+    Projection p(fitpar.getDimensionOfState(), m_dim);
+    KalmanCalculator kalman(m_dim, fitpar.getDimensionOfState());
+
+    p.resetProjection();
+    status |= project(oldState, p);
+
+    /** here we project the old state and use only the change with respect to the new state
+     * instead of the new state in the update . the advantage is more stable fit
+     * Downside: non-linear constraints cant be filtered multiple times anymore.
+     * */
+    p.getResiduals() += p.getH() * (fitpar.getStateVector() - oldState.getStateVector());
+    if (!status.failure()) {
+      status |= kalman.calculateGainMatrix(
+                  p.getResiduals(),
+                  p.getH(),
+                  fitpar,
+                  &p.getV(),
+                  1
+                );
+
+      if (!status.failure()) {
+        kalman.updateState(fitpar);
+      }
+    }
+
+    const unsigned int number_of_constraints = kalman.getConstraintDim();
+    fitpar.addChiSquare(kalman.getChiSquare(), number_of_constraints);
+
     kalman.updateCovariance(fitpar);
     return status;
   }

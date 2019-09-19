@@ -255,12 +255,10 @@ namespace Belle2 {
       std::sort(selectedGammas.begin(), selectedGammas.end());
 
       //Add to this 4-momentum those of the selected photon(s)
-      if (selectedGammas.size() > 0) { //for the case of more than one brems photon
-        for (auto const& bremsPair : selectedGammas) {
-          Particle* g = bremsPair.second;
-          new4Vec += g->get4Vector();
-          if (! m_addMultiplePhotons) break; //stop after adding the first photon
-        }
+      for (auto const& bremsPair : selectedGammas) {
+        Particle* g = bremsPair.second;
+        new4Vec += g->get4Vector();
+        if (! m_addMultiplePhotons) break; //stop after adding the first photon
       }
 
       //Create the new particle with the 4-momentum calculated before
@@ -273,26 +271,22 @@ namespace Belle2 {
       const TMatrixFSym& lepErrorMatrix = lepton->getMomentumVertexErrorMatrix();
       TMatrixFSym corLepMatrix(lepErrorMatrix);
 
-      bool bremsGammaFound = false;
       //Now, if there are any, add the brems photons as daughters as well. As before, we distinguish between the multiple and only one brems photon cases
-      if (selectedGammas.size() > 0) {
-        bremsGammaFound = true;
-        int photonIndex = 0;
-        for (auto const& bremsPair : selectedGammas) {
-          //Add the weights as extra info of the mother
-          Particle* bremsGamma = bremsPair.second;
-          std::string extraInfoName = "bremsWeightWithPhoton" + std::to_string(photonIndex);
-          correctedLepton.addExtraInfo(extraInfoName, bremsPair.first);
-          photonIndex++;
+      int photonIndex = 0;
+      for (auto const& bremsPair : selectedGammas) {
+        //Add the weights as extra info of the mother
+        Particle* bremsGamma = bremsPair.second;
+        std::string extraInfoName = "bremsWeightWithPhoton" + std::to_string(photonIndex);
+        correctedLepton.addExtraInfo(extraInfoName, bremsPair.first);
+        photonIndex++;
 
-          const TMatrixFSym& gammaErrorMatrix = bremsGamma->getMomentumVertexErrorMatrix();
-          for (int irow = 0; irow <= 3; irow++) {
-            for (int icol = irow; icol <= 3; icol++) corLepMatrix(irow, icol) += gammaErrorMatrix(irow, icol);
-          }
-          correctedLepton.appendDaughter(bremsGamma, false);
-          B2DEBUG(10, "[BremsFinderModule] Found a bremsstrahlung gamma and added its 4-vector to the charged particle");
-          if (! m_addMultiplePhotons) break; //stop after adding the first photon
+        const TMatrixFSym& gammaErrorMatrix = bremsGamma->getMomentumVertexErrorMatrix();
+        for (int irow = 0; irow <= 3; irow++) {
+          for (int icol = irow; icol <= 3; icol++) corLepMatrix(irow, icol) += gammaErrorMatrix(irow, icol);
         }
+        correctedLepton.appendDaughter(bremsGamma, false);
+        B2DEBUG(10, "[BremsFinderModule] Found a bremsstrahlung gamma and added its 4-vector to the charged particle");
+        if (! m_addMultiplePhotons) break; //stop after adding the first photon
       }
 
       correctedLepton.setMomentumVertexErrorMatrix(corLepMatrix);
@@ -300,7 +294,7 @@ namespace Belle2 {
       // add the info from original lepton to the new lepton
       correctedLepton.setVertex(lepton->getVertex());
       correctedLepton.setPValue(lepton->getPValue());
-      correctedLepton.addExtraInfo("bremsCorrected", float(bremsGammaFound));
+      correctedLepton.addExtraInfo("bremsCorrected", float(selectedGammas.size() > 0));
 
       // add the mc relation
       Particle* newLepton = particles.appendNew(correctedLepton);

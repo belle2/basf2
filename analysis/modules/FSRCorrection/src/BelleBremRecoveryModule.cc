@@ -178,6 +178,7 @@ namespace Belle2 {
       correctedLepton.setMomentumVertexErrorMatrix(corLepMatrix);
       correctedLepton.setVertex(lepton->getVertex());
       correctedLepton.setPValue(lepton->getPValue());
+      correctedLepton.addExtraInfo("bremsCorrected", float(selectedGammas.size() > 0));
       // add the mc relation
       Particle* newLepton = particles.appendNew(correctedLepton);
       const MCParticle* mcLepton = lepton->getRelated<MCParticle>();

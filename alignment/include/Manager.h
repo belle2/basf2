@@ -285,7 +285,7 @@ namespace Belle2 {
       /// The global vector for unified access to DB constants
       std::unique_ptr<GlobalParamVector> m_globalVector {new GlobalParamVector()};
       /// Map of constraints {unique label, labels and coefficients}
-      std::map<int, Constraint> m_constraints {};
+      std::map<long, Constraint> m_constraints {};
 
       /// Vector of EventMetaData containing the time slicing of the calibration job
       std::vector<EventMetaData> m_dbTimeSlicing {};

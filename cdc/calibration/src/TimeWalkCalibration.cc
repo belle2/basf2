@@ -57,6 +57,16 @@ void TimeWalkCalibration::CreateHisto()
   tree->SetBranchAddress("ndf", &ndf);
   tree->SetBranchAddress("Pval", &Pval);
   tree->SetBranchAddress("adc", &adc);
+
+  /* Disable unused branch */
+  std::vector<TString> list_vars = {"lay", "IWire", "x_u", "t", "t_fit",  "weight", "Pval", "ndf", "adc"};
+  tree->SetBranchStatus("*", 0);
+
+  for (TString brname : list_vars) {
+    tree->SetBranchStatus(brname, 1);
+  }
+
+
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   double halfCSize[56];
   for (int i = 0; i < 56; ++i) {

@@ -27,6 +27,9 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
+
+#include <mdst/dataobjects/HitPatternCDC.h>
+
 #ifdef ALIGNMENT_USING_BHABHA
 #include <mdst/dataobjects/ECLCluster.h>
 #endif
@@ -119,6 +122,8 @@ namespace Belle2 {
     m_tree->Branch("mcHit",  &m_arich.mcHit,  "PDG/I:x/F:y:z:p:theta:phi");
     m_tree->Branch("winHit",  &m_arich.winHit,  "x/F:y");
     m_tree->Branch("nrec", &m_arich.nRec, "nRec/I");
+    m_tree->Branch("nCDC", &m_arich.nCDC, "nCDC/I");
+    m_tree->Branch("inAcceptance", &m_arich.inAcc, "inAcc/O");
     m_tree->Branch("photons", "std::vector<Belle2::ARICHPhoton>", &m_arich.photons);
 
     // required input
@@ -179,7 +184,6 @@ namespace Belle2 {
       else lkh = arichTrack.getRelated<ARICHLikelihood>();
 
       if (!lkh) continue;
-      if (lkh->getFlag() != 1) continue;
 
       m_arich.clear();
 
@@ -194,6 +198,7 @@ namespace Belle2 {
         m_arich.winHit[1] = winHit.Y();
       }
 
+      if (lkh->getFlag() == 1) m_arich.inAcc = 1;
       m_arich.logL.e = lkh->getLogL(Const::electron);
       m_arich.logL.mu = lkh->getLogL(Const::muon);
       m_arich.logL.pi = lkh->getLogL(Const::pion);
@@ -231,6 +236,7 @@ namespace Belle2 {
           m_arich.charge = fitResult->getChargeSign();
           m_arich.z0 = trkPos.Z();
           m_arich.d0 = (trkPos.XYvector()).Mod();
+          m_arich.nCDC = fitResult->getHitPatternCDC().getNHits();
 #ifdef ALIGNMENT_USING_BHABHA
           TVector3 trkMom = fitResult->getMomentum();
           const ECLCluster* eclTrack = mdstTrack->getRelated<ECLCluster>();

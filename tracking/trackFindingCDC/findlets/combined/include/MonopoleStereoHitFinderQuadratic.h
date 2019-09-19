@@ -75,10 +75,9 @@ namespace Belle2 {
       SingleMatchSelector<CDCTrack, CDCRLWireHit, HitComperator> m_singleMatchSelector;
       /// Add the hits to the tracks
       StereoHitTrackAdder m_adder;
-      // Print found tracks
+      /// Print found tracks if requested in module options
       TrackInspector m_inspector;
-      /// Fit the tracks after creation TODO the fitter obviously should be different
-//       TrackSZFitter m_szFitter;
+      // TODO it would be nice to fit the hits while they are still a CDCTrack object and not wait for the final genfit
 
       // Object pools
       /// Vector holding all possible wire hits with all possible RL combinations

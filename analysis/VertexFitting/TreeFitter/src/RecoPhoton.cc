@@ -206,7 +206,6 @@ namespace TreeFitter {
     P(1, m_i1) = - p_vec[m_i3] / p_vec[m_i1];
     P(2, 3) = 1; // dE/dEc
 
-
     p.getResiduals().segment(0, 3) = residual3;
 
     p.getV() = P * m_covariance.selfadjointView<Eigen::Lower>() * P.transpose();

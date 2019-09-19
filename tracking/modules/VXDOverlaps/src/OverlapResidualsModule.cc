@@ -15,11 +15,10 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
-#include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
 #include <genfit/TrackPoint.h>
 #include <framework/gearbox/Const.h>
 #include <set>

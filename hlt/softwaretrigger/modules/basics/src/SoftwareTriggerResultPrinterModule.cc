@@ -77,19 +77,24 @@ void SoftwareTriggerResultPrinterModule::terminate()
   }
   debugTTree->Fill();
 
+  // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
   cut = true;
+  // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
   prescaled = true;
+  // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
   accepted = false;
   counter = 0;
   for (auto& cutResult : m_passedEventsPerTrigger) {
-    // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
     value[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_reject]);
     counter++;
   }
   debugTTree->Fill();
 
+  // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
   cut = true;
+  // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
   prescaled = false;
+  // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
   accepted = true;
   counter = 0;
   for (auto& cutResult : m_passedEventsPerTrigger) {
@@ -103,8 +108,11 @@ void SoftwareTriggerResultPrinterModule::terminate()
   }
   debugTTree->Fill();
 
+  // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
   cut = true;
+  // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
   prescaled = false;
+  // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
   accepted = false;
   counter = 0;
   for (auto& cutResult : m_passedEventsPerTrigger) {
@@ -118,8 +126,11 @@ void SoftwareTriggerResultPrinterModule::terminate()
   }
   debugTTree->Fill();
 
+  // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
   cut = false;
+  // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
   prescaled = false;
+  // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
   accepted = false;
   counter = 0;
   for (auto& cutResult : m_passedEventsPerTrigger) {

@@ -29,7 +29,7 @@ testpath.add_module('RestOfEventBuilder', particleList=fsps[0],
                     particleListsInput=['pi+', 'gamma', 'K_L0'])
 mask = ('cleanMask', 'E > 0.05', 'E > 0.05', [0, 0, 0, 0, 0, 0])
 testpath.add_module('RestOfEventInterpreter', particleList=fsps[0],
-                    ROEMasksWithFractions=mask)
+                    ROEMasks=mask)
 
 ###############################################################################
 roe_path = create_path()

@@ -58,8 +58,6 @@ namespace Belle2 {
     std::shared_ptr<Variable::Cut> m_cut; /**< Cut object which performs the cuts */
     bool m_discard; /**< Update the ROE mask by passing or discarding particles in the provided particle list. Default is to pass. */
 
-    std::vector<double>
-    m_fractions; /**< A priori fractions used for newly added masks. Fractions of existing masks will not be changed (default: pion always) */
 
     // Methods:
     /**

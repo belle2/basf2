@@ -145,26 +145,7 @@ namespace TreeFitter {
             dau2->setFlightLength(flt2);
 
           } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {
-            // check if this is a hadronic resonance that is attached to a well constrained daughter vertex
-            bool vertex_defined_by_daughter = false;
-            for (auto daughter : vtxdaughters) {
-              //if (daughter->m_shares_vertex_with_mother) {
-              //  vertex_defined_by_daughter = true;
-              //}
-            }
-            if (!vertex_defined_by_daughter) {
-
-              RecoTrack* dau1 = trkdaughters[0];
-              const TVector3 pos = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
-                                     dau1->particle()->getPDGCode())))->getPosition();
-              fitparams.getStateVector()(posindex) = pos.X();
-              fitparams.getStateVector()(posindex + 1) = pos.Y();
-              const int dim = m_config->m_originDimension;
-              if (dim == 3) {
-                fitparams.getStateVector()(posindex + 2) = pos.Z();
-              }
-            }//vertex defined by daughter
-
+            // TODO switched off waiting for refactoring of init1 and init2 functions (does not affect performance)
           } else if (mother() && mother()->posIndex() >= 0) {
             const int posindexmother = mother()->posIndex();
             const int dim = m_config->m_originDimension; //TODO acess mother

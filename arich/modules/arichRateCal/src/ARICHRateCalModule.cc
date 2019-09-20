@@ -127,7 +127,7 @@ namespace Belle2 {
     //int runno = m_internalmode ? m_run_count : evtmetadata->getRun();
     //int raw_evtno = m_internalmode ? m_evt_count : evtmetadata->getEvent();
     int runno = evtmetadata->getRun();
-    int raw_evtno = evtmetadata->getEvent();
+    //int raw_evtno = evtmetadata->getEvent();
 
     ARICHThParam param(runno, m_dth, m_th0, m_nrun);
     StoreArray<ARICHRawDigit> rawdigits;

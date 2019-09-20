@@ -217,8 +217,8 @@ void PXDDQMClustersModule::defineHisto()
     //----------------------------------------------------------------
     name = str(format("DQM_PXD_%1%_ClusterEnergy") % sensorDescr);
     title = str(format("DQM PXD Sensor %1% Cluster Energy") % sensorDescr);
-    m_clusterEnergy[i] = new TH1F(name.c_str(), title.c_str(), 100, 0, 60000);
-    m_clusterEnergy[i]->GetXaxis()->SetTitle("energy of clusters [eV]");
+    m_clusterEnergy[i] = new TH1F(name.c_str(), title.c_str(), 100, 0, 50);
+    m_clusterEnergy[i]->GetXaxis()->SetTitle("energy of clusters [keV]");
     m_clusterEnergy[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
     // Pixel Signal
@@ -449,7 +449,7 @@ void PXDDQMClustersModule::event()
     auto cluster_uID = SensorInfo.getUCellID(cluster.getU());
     auto cluster_vID = SensorInfo.getVCellID(cluster.getV());
     auto ADUToEnergy =  PXDGainCalibrator::getInstance().getADUToEnergy(sensorID, cluster_uID, cluster_vID);
-    if (m_clusterEnergy[index] != nullptr) m_clusterEnergy[index]->Fill(cluster.getCharge()* ADUToEnergy / Unit::eV);
+    if (m_clusterEnergy[index] != nullptr) m_clusterEnergy[index]->Fill(cluster.getCharge()* ADUToEnergy / Unit::keV);
     if (m_clusterSizeU[index] != nullptr) m_clusterSizeU[index]->Fill(cluster.getUSize());
     if (m_clusterSizeV[index] != nullptr) m_clusterSizeV[index]->Fill(cluster.getVSize());
     if (m_clusterSizeUV[index] != nullptr) m_clusterSizeUV[index]->Fill(cluster.getSize());

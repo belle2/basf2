@@ -315,7 +315,7 @@ class CalibrationBase(ABC, Thread):
         """
         for key, value in defaults.items():
             try:
-                if not getattr(self, key):
+                if getattr(self, key) is None:
                     setattr(self, key, value)
             except AttributeError:
                 print("The calibration", self.name, "does not support the attribute", key)

@@ -32,7 +32,7 @@ namespace TreeFitter {
   {
     /**
      * We don't have reference state yet so we use the k-1 last state
-     * to lineraize non-linear constraints
+     * to linearize non-linear constraints
      * */
     ErrCode status;
     Projection p(fitpar.getDimensionOfState(), m_dim);

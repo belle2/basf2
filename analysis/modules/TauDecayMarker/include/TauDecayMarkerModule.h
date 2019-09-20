@@ -10,21 +10,8 @@
 
 #pragma once
 
-#include <TMath.h>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <iterator>
-
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
-#include <framework/gearbox/GearDir.h>
-
 #include <mdst/dataobjects/MCParticle.h>
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/TauPairDecay.h>
-
 
 namespace Belle2 {
   /**

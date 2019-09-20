@@ -15,8 +15,6 @@
 #include <Eigen/Eigenvalues>
 
 #include <string>
-#include <sstream>
-#include <iostream>
 
 using namespace Belle2;
 

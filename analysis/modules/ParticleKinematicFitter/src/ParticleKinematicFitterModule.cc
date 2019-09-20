@@ -13,20 +13,18 @@
 
 // kinfitter
 #include <analysis/modules/ParticleKinematicFitter/ParticleKinematicFitterModule.h>
-#include <analysis/OrcaKinFit/PxPyPzMFitObject.h>
-#include <analysis/OrcaKinFit/JetFitObject.h>
-#include <analysis/OrcaKinFit/TextTracer.h>
 #include <analysis/OrcaKinFit/BaseFitter.h>
 #include <analysis/OrcaKinFit/BaseFitObject.h>
+#include <analysis/OrcaKinFit/OPALFitterGSL.h>
+#include <analysis/OrcaKinFit/JetFitObject.h>
+#include <analysis/OrcaKinFit/NewtonFitterGSL.h>
+#include <analysis/OrcaKinFit/NewFitterGSL.h>
+#include <analysis/OrcaKinFit/PxPyPzMFitObject.h>
+#include <analysis/OrcaKinFit/TextTracer.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
 
-// framework datastore
-#include <framework/datastore/StoreArray.h>
-
 // framework utilities
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // analysis dataobjects
@@ -37,18 +35,9 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
 
-
-// others
-#include <Math/SMatrix.h>
-#include <TMath.h>
-#include <TMatrixD.h>
-
 // CLHEP
-#include <CLHEP/Matrix/Matrix.h>
 #include <CLHEP/Matrix/SymMatrix.h>
-#include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Vector/LorentzVector.h>
-#include <CLHEP/Geometry/Point3D.h>
 
 using namespace CLHEP;
 using namespace std;

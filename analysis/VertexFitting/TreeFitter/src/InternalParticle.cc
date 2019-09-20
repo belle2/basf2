@@ -14,7 +14,8 @@
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/logging/Logger.h>
-#include <iostream>
+#include <mdst/dataobjects/Track.h>
+
 using std::vector;
 
 namespace TreeFitter {

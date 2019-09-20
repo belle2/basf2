@@ -10,15 +10,11 @@
 
 #include <analysis/modules/ParticleMassUpdater/ParticleMassUpdaterModule.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/algorithm/string/classification.hpp>
-#include <cmath>
-#include <algorithm>
-#include <TParameter.h>
+
+#include <framework/datastore/StoreObjPtr.h>
+
 using namespace std;
 using namespace Belle2;
-using namespace boost::algorithm;
 
 // Register module in the framework
 REG_MODULE(ParticleMassUpdater)

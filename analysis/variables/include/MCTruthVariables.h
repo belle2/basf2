@@ -83,6 +83,11 @@ namespace Belle2 {
     double isSignalAcceptMissingGamma(const Particle* part);
 
     /**
+     * return 1 if Particle is correctly reconstructed (SIGNAL including bremsstrahlung photons), 0 otherwise
+     */
+    double isSignalAcceptBremsPhotons(const Particle* part);
+
+    /**
      * return 1 if Particle is correctly reconstructed (SIGNAL including missing all particles), 0 otherwise
      */
     double isSignalAcceptMissing(const Particle* part);

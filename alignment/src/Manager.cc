@@ -1,6 +1,13 @@
 
 /* Belle2 headers. */
+#include <alignment/dbobjects/VXDAlignment.h>
+#include <alignment/dbobjects/BKLMAlignment.h>
 #include <alignment/GlobalTimeLine.h>
+#include <cdc/dbobjects/CDCAlignment.h>
+#include <cdc/dbobjects/CDCTimeWalks.h>
+#include <cdc/dbobjects/CDCTimeZeros.h>
+#include <cdc/dbobjects/CDCXtRelations.h>
+#include <klm/eklm/dbobjects/EKLMAlignment.h>
 
 /* Own header. */
 #include <alignment/Manager.h>

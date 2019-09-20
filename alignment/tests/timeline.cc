@@ -22,8 +22,10 @@
 #include <gtest/gtest.h>
 
 /* Belle2 headers. */
+#include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/GlobalTimeLine.h>
 #include <alignment/Manager.h>
+#include <cdc/dbobjects/CDCAlignment.h>
 #include <framework/database/Configuration.h>
 #include <framework/database/Database.h>
 #include <framework/database/EventDependency.h>

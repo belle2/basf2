@@ -68,16 +68,15 @@ namespace Belle2 {
     template<class T>
     T* getObject(const std::string& name, const Belle2::Calibration::ExpRun expRun)
     {
-      // Is the object name known to us? (user problem if not)
-      if (not isRegistered(name)) {
-        B2ERROR("The requested object name '" << name << "' isn't known to CalibObjManager!");
-        return nullptr;
-      }
-
       std::string objectDirName = name + '/' + getObjectExpRunName(name, expRun);
       TDirectory* objectDir = m_dir->GetDirectory(objectDirName.c_str());
       // Does the object name have a directory available? (framework problem if not)
       if (not objectDir) {
+        // Is the object name known to us? (user problem if not)
+        if (not isRegistered(name)) {
+          B2ERROR("The requested object name '" << name << "' isn't known to CalibObjManager!");
+          return nullptr;
+        }
         B2FATAL("TDirectory for registered object " << name << " not found: " << objectDirName);
       }
       unsigned int highestIndex = getHighestIndexObject(name, objectDir);

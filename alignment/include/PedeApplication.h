@@ -11,12 +11,12 @@
 #ifndef PEDEAPPLICATION_H
 #define PEDEAPPLICATION_H
 
+/* C++ headers. */
+#include <string>
+
+/* Belle2 headers. */
 #include <alignment/dataobjects/PedeSteering.h>
 #include <alignment/PedeResult.h>
-
-#include <string>
-#include <vector>
-
 
 namespace Belle2 {
   namespace alignment {

@@ -10,11 +10,8 @@
 
 #pragma once
 
+/* Genfit headers. */
 #include <genfit/GblTrackSegmentController.h>
-
-#include <framework/geometry/B2Vector3.h>
-
-class GblFitter;
 
 namespace Belle2 {
 

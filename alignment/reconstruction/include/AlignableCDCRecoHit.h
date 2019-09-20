@@ -11,19 +11,11 @@
 #ifndef ALIGNABLECDCRECOHIT_H
 #define ALIGNABLECDCRECOHIT_H
 
-
-#include <cdc/dataobjects/CDCRecoHit.h>
-#include <cdc/dataobjects/CDCHit.h>
-
-#include <genfit/AbsMeasurement.h>
-#include <genfit/MeasurementOnPlane.h>
-#include <genfit/TrackCandHit.h>
-#include <genfit/HMatrixU.h>
-
+/* Genfit headers. */
 #include <genfit/ICalibrationParametersDerivatives.h>
 
-#include <memory>
-
+/* Belle2 headers. */
+#include <cdc/dataobjects/CDCRecoHit.h>
 
 namespace Belle2 {
   /// This class is used to transfer CDC information to the track fit and Millepede.

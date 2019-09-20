@@ -1,6 +1,9 @@
-#include <alignment/Manager.h>
-#include <cdc/dbobjects/CDCLayerAlignment.h>
+
+/* Belle2 headers. */
 #include <alignment/GlobalTimeLine.h>
+
+/* Own header. */
+#include <alignment/Manager.h>
 
 namespace Belle2 {
   namespace alignment {

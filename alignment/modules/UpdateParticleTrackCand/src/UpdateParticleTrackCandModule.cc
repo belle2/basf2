@@ -8,16 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <alignment/modules/UpdateParticleTrackCand/UpdateParticleTrackCandModule.h>
+/* Genfit headers. */
+#include <genfit/TrackCand.h>
 
+/* Belle2 headers. */
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <genfit/TrackCand.h>
-#include <TVectorD.h>
-
 #include <framework/geometry/B2Vector3.h>
+#include <mdst/dataobjects/Track.h>
+
+/* Own header. */
+#include <alignment/modules/UpdateParticleTrackCand/UpdateParticleTrackCandModule.h>
 
 using namespace Belle2;
 

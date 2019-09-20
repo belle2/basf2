@@ -10,8 +10,10 @@
 
 #pragma once
 
-#include <string>
+/* C++ headers. */
 #include <vector>
+
+/* ROOT headers. */
 #include <root/TMatrixD.h>
 
 namespace Belle2 {

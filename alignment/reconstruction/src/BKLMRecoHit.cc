@@ -8,22 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
-#include <alignment/reconstruction/BKLMRecoHit.h>
+/* Genfit headers. */
+#include <genfit/DetPlane.h>
+
+/* Belle2 headers. */
+#include <alignment/dbobjects/BKLMAlignment.h>
+#include <alignment/GlobalDerivatives.h>
+#include <alignment/GlobalLabel.h>
+#include <alignment/Hierarchy.h>
+#include <framework/geometry/B2Vector3.h>
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
 #include <klm/bklm/geometry/GeometryPar.h>
-#include <alignment/GlobalLabel.h>
 #include <klm/bklm/dataobjects/BKLMElementID.h>
-#include <alignment/dbobjects/BKLMAlignment.h>
 
-#include <alignment/Hierarchy.h>
-#include <alignment/GlobalDerivatives.h>
-
-#include <framework/geometry/B2Vector3.h>
-
-#include <genfit/DetPlane.h>
-#include <TRandom.h>
+/* Own header. */
+#include <alignment/reconstruction/BKLMRecoHit.h>
 
 using namespace std;
 using namespace Belle2;

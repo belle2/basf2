@@ -1,16 +1,19 @@
 #ifndef COSMICS_VAL_H
 #define COSMICS_VAL_H
 
-#include <framework/core/Module.h>
-class TH1;
-class TH2;
-class TNtuple;
+/* C++ headres. */
+#include <string>
+
+/* ROOT forward declarations. */
 class TTree;
 class TFile;
-#include <mdst/dataobjects/TrackFitResult.h>
+
+/* Genfit headers. */
 #include <genfit/Track.h>
 
-#include <string>
+/* Belle2 headers. */
+#include <framework/core/Module.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 namespace Belle2 {
   /** Module to find Track correlation in cosmic events

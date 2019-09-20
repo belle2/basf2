@@ -1,24 +1,18 @@
-#include <alignment/GlobalLabel.h>
-#include <alignment/PedeResult.h>
 
-#include <vxd/dataobjects/VxdID.h>
-#include <cdc/dataobjects/WireID.h>
-#include <gtest/gtest.h>
+/* C++ headers. */
 #include <iostream>
 #include <string>
 
-#include <framework/database/Database.h>
+/* Cppcheck headers. */
+#include <gtest/gtest.h>
 
-#include <TFile.h>
-#include <TTree.h>
-#include <TH1F.h>
-
-#include <TClonesArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
+/* Belle2 headers. */
 #include <alignment/dbobjects/VXDAlignment.h>
+#include <alignment/GlobalLabel.h>
+#include <alignment/PedeResult.h>
+#include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCAlignment.h>
-
+#include <vxd/dataobjects/VxdID.h>
 
 using namespace std;
 using namespace Belle2;

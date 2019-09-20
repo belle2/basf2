@@ -8,9 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <alignment/PedeApplication.h>
+/* C++ headers. */
 #include <fstream>
 #include <sstream>
+
+/* Own header. */
+#include <alignment/PedeApplication.h>
 
 using namespace std;
 namespace Belle2 {

@@ -11,20 +11,18 @@
 #ifndef ALIGNABLEEKLMRECOHIT_H
 #define ALIGNABLEEKLMRECOHIT_H
 
-/* External headers. */
+/* ROOT headers. */
 #include <TMatrixD.h>
 
 /* Genfit headers. */
 #include <genfit/ICalibrationParametersDerivatives.h>
-#include <genfit/HMatrixUV.h>
 #include <genfit/PlanarMeasurement.h>
 #include <genfit/TrackCandHit.h>
 
 /* Belle2 headers. */
+#include <framework/geometry/B2Vector3.h>
 #include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
 #include <klm/eklm/dataobjects/EKLMElementID.h>
-
-#include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
 

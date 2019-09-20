@@ -10,19 +10,12 @@
 
 #pragma once
 
+/* Belle2 headers. */
 #include <calibration/DBObjCalibrationConstMapBase.h>
-
-#include <fstream>
-#include <map>
-#include <TObject.h>
-
 #include <cdc/dataobjects/WireID.h>
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
 
 namespace Belle2 {
 
-  class FileSystem;
   /// CDC alignment and calibration constants
   class CDCCalibration: public DBObjCalibrationConstMapBase {
 

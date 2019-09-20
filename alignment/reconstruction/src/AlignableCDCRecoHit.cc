@@ -8,18 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <alignment/reconstruction/AlignableCDCRecoHit.h>
-
-#include <cdc/dataobjects/WireID.h>
-#include <cdc/geometry/CDCGeometryPar.h>
-
-#include <cdc/dbobjects/CDCTimeZeros.h>
-#include <cdc/dbobjects/CDCTimeWalks.h>
-#include <cdc/dbobjects/CDCLayerAlignment.h>
-
+/* Belle2 headers. */
 #include <alignment/GlobalLabel.h>
 #include <alignment/GlobalDerivatives.h>
-#include <alignment/Hierarchy.h>
+#include <cdc/dataobjects/WireID.h>
+#include <cdc/dbobjects/CDCTimeZeros.h>
+#include <cdc/dbobjects/CDCTimeWalks.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+
+/* Own header. */
+#include <alignment/reconstruction/AlignableCDCRecoHit.h>
 
 using namespace std;
 using namespace Belle2;

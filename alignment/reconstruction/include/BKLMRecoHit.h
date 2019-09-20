@@ -9,19 +9,19 @@
  **************************************************************************/
 
 #pragma once
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/bklm/geometry/GeometryPar.h>
 
-
-// ROOT includes
+/* ROOT headers. */
 #include <TMatrixD.h>
 
-// GenFit includes
+/* GenFit headers. */
 #include <genfit/PlanarMeasurement.h>
 #include <genfit/HMatrixUV.h>
 #include <genfit/TrackCandHit.h>
-// Calibration/Alignment interface
 #include <genfit/ICalibrationParametersDerivatives.h>
+
+/* Belle2 headers. */
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/geometry/Module.h>
 
 namespace Belle2 {
   /**

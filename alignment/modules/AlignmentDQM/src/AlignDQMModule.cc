@@ -10,26 +10,25 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <alignment/modules/AlignmentDQM/AlignDQMModule.h>
-
-#include <genfit/MeasurementOnPlane.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/RecoHitInformation.h>
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
-#include <pxd/reconstruction/PXDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit.h>
-#include <svd/geometry/SensorInfo.h>
-#include <pxd/geometry/SensorInfo.h>
-
-#include <vxd/geometry/GeoTools.h>
-
-#include <framework/geometry/B2Vector3.h>
-
+/* ROOT headers. */
 #include <TDirectory.h>
 #include <TVectorD.h>
+
+/* Genfit headers. */
+#include <genfit/MeasurementOnPlane.h>
+
+/* Belle2 headers. */
+#include <framework/datastore/StoreArray.h>
+#include <framework/geometry/B2Vector3.h>
+#include <mdst/dataobjects/Track.h>
+#include <pxd/geometry/SensorInfo.h>
+#include <svd/geometry/SensorInfo.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/RecoHitInformation.h>
+#include <vxd/geometry/GeoTools.h>
+
+/* Own header. */
+#include <alignment/modules/AlignmentDQM/AlignDQMModule.h>
 
 using namespace Belle2;
 using namespace std;

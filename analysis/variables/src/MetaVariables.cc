@@ -127,10 +127,10 @@ namespace Belle2 {
           if (particle == nullptr)
           {
             StoreObjPtr<EventExtraInfo> eventExtraInfo;
-            try {
+            if (eventExtraInfo->hasExtraInfo(extraInfoName)) {
               return eventExtraInfo->getExtraInfo(extraInfoName);
-            } catch (const std::runtime_error& error) {
-              return -999.;
+            } else {
+              return -999;
             }
           }
           try {
@@ -153,11 +153,11 @@ namespace Belle2 {
         auto extraInfoName = arguments[0];
         auto func = [extraInfoName](const Particle*) -> double {
           StoreObjPtr<EventExtraInfo> eventExtraInfo;
-          try {
-            return eventExtraInfo->getExtraInfo(extraInfoName);
-          } catch (const std::runtime_error& error)
+          if (eventExtraInfo->hasExtraInfo(extraInfoName))
           {
-            return -999.;
+            return eventExtraInfo->getExtraInfo(extraInfoName);
+          } else {
+            return -999;
           }
         };
         return func;

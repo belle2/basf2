@@ -13,7 +13,6 @@
 #include <vector>
 #include <map>
 #include <TObject.h>
-#include <iostream>
 
 //number of channels per HAPD
 #define N_MERGERS 72

@@ -12,8 +12,10 @@
 #include <TFile.h>
 
 /* Belle2 headers. */
-#include <alignment/calibration/MillepedeTreeConversionAlgorithm.h>
 #include <genfit/GblData.h>
+
+/* Own header. */
+#include <alignment/calibration/MillepedeTreeConversionAlgorithm.h>
 
 using namespace Belle2;
 

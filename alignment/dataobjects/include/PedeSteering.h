@@ -1,8 +1,10 @@
 #pragma once
 
+/* C++ headers. */
 #include <string>
 #include <vector>
 
+/* ROOT headers. */
 #include <TObject.h>
 
 namespace Belle2 {

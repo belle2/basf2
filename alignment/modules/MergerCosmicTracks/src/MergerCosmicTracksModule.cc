@@ -8,17 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <alignment/modules/MergerCosmicTracks/MergerCosmicTracksModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/Track.h>
+/* Framework headers. */
+#include <cdc/geometry/CDCGeometryPar.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLShower.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/geometry/B2Vector3.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <cdc/geometry/CDCGeometryPar.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <framework/geometry/B2Vector3.h>
+/* Own header. */
+#include <alignment/modules/MergerCosmicTracks/MergerCosmicTracksModule.h>
 
 using namespace Belle2;
 

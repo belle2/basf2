@@ -8,8 +8,11 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <alignment/modules/SetRecoTrackMomentum/SetRecoTrackMomentumModule.h>
+/* Belle2 headers. */
 #include <framework/geometry/BFieldManager.h>
+
+/* Own header. */
+#include <alignment/modules/SetRecoTrackMomentum/SetRecoTrackMomentumModule.h>
 
 using namespace Belle2;
 

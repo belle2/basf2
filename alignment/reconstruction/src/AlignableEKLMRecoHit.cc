@@ -11,12 +11,14 @@
 /* Belle2 headers. */
 #include <alignment/GlobalDerivatives.h>
 #include <alignment/GlobalLabel.h>
-#include <alignment/reconstruction/AlignableEKLMRecoHit.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
+
+/* Own header. */
+#include <alignment/reconstruction/AlignableEKLMRecoHit.h>
 
 using namespace Belle2;
 using namespace alignment;

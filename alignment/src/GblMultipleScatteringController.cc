@@ -8,8 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <alignment/GblMultipleScatteringController.h>
+/* Genfit headers. */
 #include <genfit/GblFitter.h>
+
+/* Own header. */
+#include <alignment/GblMultipleScatteringController.h>
 
 using namespace std;
 using namespace Belle2;

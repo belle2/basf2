@@ -8,8 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <alignment/GlobalLabel.h>
+/* C++ headers. */
 #include <iostream>
+
+/* Own header. */
+#include <alignment/GlobalLabel.h>
 
 using namespace std;
 

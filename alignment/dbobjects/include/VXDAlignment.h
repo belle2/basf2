@@ -10,6 +10,7 @@
 
 #pragma once
 
+/* Belle2 headers. */
 #include <calibration/DBObjCalibrationConstMapBase.h>
 
 namespace Belle2 {

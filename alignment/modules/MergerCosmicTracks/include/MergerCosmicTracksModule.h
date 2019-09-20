@@ -8,9 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
+/* Belle2 headers. */
 #include <framework/core/Module.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <framework/datastore/StoreArray.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
   /**

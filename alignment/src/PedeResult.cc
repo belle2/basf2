@@ -8,10 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <alignment/PedeResult.h>
+/* C++ headers. */
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <sstream>
+
+/* Own header. */
+#include <alignment/PedeResult.h>
 
 using namespace std;
 

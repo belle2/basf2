@@ -25,7 +25,7 @@ void compare2Tracks()
 
   // "compare" this result with a previous result.
   // The previous result should be defined by result4Compare.
-  bool compare = true
+  bool compare(true);
 
   // Root file contain histograms for comparing with this results.
   // it must be set properly if compare= true

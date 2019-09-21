@@ -4,7 +4,7 @@
 """
 <header>
   <output>EvtGenSimRec_B2Kpi.root</output>
-  <contact>staric</contact>
+  <contact>marko.staric@ijs.si</contact>
   <description>Generates signal MC of B0 -> K-pi+, 200 events</description>
 </header>
 """

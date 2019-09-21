@@ -370,7 +370,6 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   // Radiative Bhabha skim (radee) for CDC dE/dx calib studies
   double radee = 0.;
-  int chargep1 = -10, chargep2 = -10;
   const double lowdEdxEdge = 0.8, highdEdxEdge = 1.2;
   const double lowEoPEdge = 0.8, highEoPEdge = 1.2;
 
@@ -382,7 +381,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       Particle* part1 = m_pionParticles->getParticle(i);
       if (!part1) continue;
 
-      chargep1 = part1->getCharge();
+      const auto chargep1 = part1->getCharge();
       if (abs(chargep1) != 1) continue;
 
       const ECLCluster* eclTrack1 = part1->getECLCluster();
@@ -409,7 +408,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         Particle* part2 = m_pionParticles->getParticle(j);
         if (!part2) continue;
 
-        chargep2 = part2->getCharge();
+        const auto chargep2 = part2->getCharge();
         if (abs(chargep2) != 1 || (chargep1 + chargep2 != 0)) continue;
 
         const ECLCluster* eclTrack2 = part2->getECLCluster();

@@ -1180,6 +1180,7 @@ class CAF():
 
         # Get an ordered dictionary of the sort order but including all implicit dependencies.
         ordered_full_dependencies = all_dependencies(self.future_dependencies, order)
+
         # Return all the implicit+explicit past dependencies
         full_past_dependencies = past_from_future_dependencies(ordered_full_dependencies)
         # Correct each calibration's dependency list to reflect the implicit dependencies
@@ -1189,6 +1190,13 @@ class CAF():
             for dep in full_deps:
                 if dep not in explicit_deps:
                     calibration.dependencies.append(self.calibrations[dep])
+            # At this point the calibrations have their full dependencies but they aren't in topological
+            # sort order. Correct that here
+            ordered_dependency_list = []
+            for ordered_calibration_name in order:
+                if ordered_calibration_name in [dep.name for dep in calibration.dependencies]:
+                    ordered_dependency_list.append(self.calibrations[ordered_calibration_name])
+            calibration.dependencies = ordered_dependency_list
         order = ordered_full_dependencies
         # We should also patch in all of the implicit dependencies for the calibrations
         return order

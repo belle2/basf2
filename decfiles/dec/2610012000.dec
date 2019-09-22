@@ -37,7 +37,8 @@ PythiaBothParam StringZ:usePetersonH=off
 PythiaBothParam StringZ:rFactC=1.0
 
 Alias MyD0 D0
-Alias MyaD0 anti-D0
+Alias Myanti-D0 anti-D0
+ChargeConj MyD0 Myanti-D0
 
 Decay vpho
 1.000 c anti-c PYTHIA 32;
@@ -48,15 +49,13 @@ Decay D*+
 Enddecay
 
 Decay D*-
-1.0 MyaD0 pi- PHOTOS VSS;
-Enddecay
-
-Decay MyaD0
-1.0 gamma gamma PHSP;
+1.0 Myanti-D0 pi- PHOTOS VSS;
 Enddecay
 
 Decay MyD0
 1.0 gamma gamma PHSP;
 Enddecay
+
+CDecay Myanti-D0
 
 End

@@ -28,7 +28,8 @@ from caf.utils import IoV
 
 default_collection_heartbeat = 60
 default_max_files_per_collector_job = 1
-prompt_script_package = "prompt.calibrations."
+
+from prompt import prompt_script_package
 
 
 def get_input_data(args):

@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Lists details about the available prompt calibration scripts to save some time.
+"""
+
+import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+
+import basf2
+from basf2 import B2ERROR, B2INFO, B2WARNING
+import json
+from pathlib import Path
+
+from prompt import prompt_script_package, prompt_script_dir 
+
+def get_all_script_paths():
+    script_path = Path(basf2.find_file(prompt_script_dir))
+    return script_path.glob("*.py")
+
+
+def get_script_requirements(name):
+    import importlib
+    cal_module = importlib.import_module(prompt_script_package + name.rstrip(".py"))
+    return cal_module.requirements
+
+
+def get_argparser():
+    """Setup the argparser for this command line tool"""
+    import argparse
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
+                                     description="Prints details about the available prompt calibration scripts."
+                                    )
+    parser.add_argument("--script-name", dest="script_name", metavar="",
+                        help="The script to print details about. If this is not given, a list of available scripts "
+                             "will instead be printed."
+                       )
+    parser.add_argument("--json", dest="json", action="store_true",
+                        help="Script details will be printed as a JSON string instead of nice stdout."
+                       )
+    parser.set_defaults(json=False)
+
+    return parser
+
+
+def main():
+    parser = get_argparser()
+    args = parser.parse_args()
+    if not args.script_name:
+        print("All available prompt calibration scripts (for usage in b2caf-prompt-run input config file):")
+        for script_path in get_all_script_paths():
+            print(script_path.name)
+    else:
+        requirements = get_script_requirements(args.script_name)
+        if args.json:
+            print(requirements.json_dumps())
+        else:
+            print(f"Details for {args.script_name}")
+            print(requirements)
+
+
+if __name__ == "__main__":
+    import sys
+    sys.exit(main())

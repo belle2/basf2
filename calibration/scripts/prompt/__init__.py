@@ -1,6 +1,9 @@
 from collections import namedtuple
 import json
 
+prompt_script_package = "prompt.calibrations."
+prompt_script_dir = "calibration/scripts/prompt/calibrations"
+
 
 class CalibrationRequirements(namedtuple('CalReq_Factory', ['input_data_formats', 'input_data_names'])):
     """
@@ -38,3 +41,9 @@ class CalibrationRequirements(namedtuple('CalReq_Factory', ['input_data_formats'
         return json.dumps({"input_data_formats": list(self.input_data_formats),
                            "input_data_names": list(self.input_data_names)
                            })
+
+    def __str__(self):
+        output_str = str(self.__class__.__name__) + ":\n"
+        output_str += f"  input_data_formats={list(self.input_data_formats)}\n"
+        output_str += f"  input_data_names={list(self.input_data_names)}"
+        return output_str

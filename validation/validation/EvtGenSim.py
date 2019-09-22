@@ -5,7 +5,7 @@
 <header>
   <output>EvtGenSim.root</output>
   <cacheable/>
-  <contact>tkuhr</contact>
+  <contact>Software team b2soft@mail.desy.de</contact>
   <description>This steering file produces 1000 generic BBbar events with EvtGen
   and runs the detector simulation with mixed in background.</description>
 </header>
@@ -46,13 +46,13 @@ print(statistics)
 
 statistics_plots(
     'EvtGenSim_statistics.root',
-    contact='tkuhr',
+    contact='Software team b2soft@mail.desy.de',
     job_desc='a standard simulation job with generic EvtGen events',
     prefix='EvtGenSim'
 )
 event_timing_plot(
     '../EvtGenSim.root', 'EvtGenSim_statistics.root',
-    contact='tkuhr',
+    contact='Software team b2soft@mail.desy.de',
     job_desc='a standard simulation job with generic EvtGen events',
     prefix='EvtGenSim'
 )

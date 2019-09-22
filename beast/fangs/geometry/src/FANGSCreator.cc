@@ -15,7 +15,6 @@
 #include <geometry/CreatorFactory.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>

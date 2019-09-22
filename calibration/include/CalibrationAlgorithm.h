@@ -19,7 +19,7 @@
 #include <TClonesArray.h>
 #include <TDirectory.h>
 #include <TFile.h>
-#include <TChain.h>
+#include <TTree.h>
 #include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>

@@ -4,6 +4,7 @@
 #include <boost/python.hpp>
 #include <boost/python/list.hpp>
 #include <boost/filesystem.hpp>
+#include <TChain.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/PyObjConvUtils.h>

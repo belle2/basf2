@@ -3,9 +3,7 @@
 #include <TObject.h>
 #include <string>
 #include <fstream>
-#include <streambuf>
 #include <boost/property_tree/xml_parser.hpp>
-
 
 namespace Belle2 {
   /// DB object which stores whole xml

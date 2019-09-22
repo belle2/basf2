@@ -11,7 +11,6 @@
 #ifndef ARICHDATABASEIMPORTER_H
 #define ARICHDATABASEIMPORTER_H
 
-#include <TObject.h>
 #include <TGraph.h>
 #include <TH1.h>
 #include <TH2F.h>

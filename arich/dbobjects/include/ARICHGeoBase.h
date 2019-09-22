@@ -13,8 +13,6 @@
 #include <TObject.h>
 #include <geometry/dbobjects/GeoOpticalSurface.h>
 #include <string>
-#include <framework/gearbox/Unit.h>
-
 
 namespace Belle2 {
 

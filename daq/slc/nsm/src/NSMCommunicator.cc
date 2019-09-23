@@ -10,13 +10,10 @@
 
 #include "daq/slc/nsm/NSMCommunicator.h"
 
-#include <daq/slc/system/LogFile.h>
-#include <daq/slc/runcontrol/RCCommand.h>
-
+#include <daq/slc/base/TimeoutException.h>
 #include <daq/slc/nsm/NSMCallback.h>
-
-#include <daq/slc/base/StringUtil.h>
-#include <daq/slc/base/Date.h>
+#include <daq/slc/nsm/NSMHandlerException.h>
+#include <daq/slc/nsm/NSMNotConnectedException.h>
 
 extern "C" {
 #include <nsm2/nsm2.h>
@@ -24,15 +21,13 @@ extern "C" {
 #include <nsm2/belle2nsm.h>
 }
 
-#include <iostream>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 
-#include <unistd.h>
 #include <sys/select.h>
 #include <errno.h>
 
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <daq/slc/system/LockGuard.h>

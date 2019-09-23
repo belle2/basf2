@@ -3,18 +3,18 @@
 #include "daq/slc/readout/ProcessController.h"
 
 #include <daq/slc/runcontrol/RCCallback.h>
+#include <daq/slc/runcontrol/RCCommand.h>
 #include <daq/slc/nsm/NSMCommunicator.h>
 
 #include <daq/slc/system/File.h>
 #include <daq/slc/system/FileReader.h>
 
+#include <daq/slc/base/IOException.h>
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/system/LogFile.h>
 
 #include <iostream>
 #include <sstream>
-#include <cerrno>
-#include <stdio.h>
 #include <ctype.h>
 
 namespace Belle2 {

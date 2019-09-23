@@ -1,16 +1,10 @@
 #include "daq/slc/readout/IOInfo.h"
 
-#include "daq/slc/system/LogFile.h"
-
-#include <cstring>
 #include <cstdlib>
 #include <cstdio>
 
-#include <iostream>
 #include <fstream>
 #include <sstream>
-#include <sys/socket.h>
-#include <sys/types.h>
 #include <arpa/inet.h>
 
 using namespace Belle2;

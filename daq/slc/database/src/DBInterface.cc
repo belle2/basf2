@@ -6,7 +6,6 @@
 
 #include <cstdarg>
 #include <cstdio>
-#include <iostream>
 
 using namespace Belle2;
 

@@ -14,7 +14,8 @@
 #include "TH1D.h"
 #include "TF1.h"
 #include <calibration/CalibrationAlgorithm.h>
-#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/dbobjects/CDCGeometry.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   namespace CDC {

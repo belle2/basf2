@@ -14,7 +14,6 @@
 
 #include <framework/core/Module.h>
 #include <cdc/dataobjects/CDCHit.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <string>

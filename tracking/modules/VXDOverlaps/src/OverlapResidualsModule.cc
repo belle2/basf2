@@ -13,6 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/gearbox/Unit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>

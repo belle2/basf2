@@ -9,27 +9,20 @@
  **************************************************************************/
 
 #include <iostream>
-#include <iomanip>
 #include <cdc/calibration/SpaceResolutionCalibrationAlgorithm.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCSpaceResols.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 
+#include "TF1.h"
 #include "TH1F.h"
 #include "TH2F.h"
-#include "TMultiGraph.h"
-#include "TPad.h"
-#include "TCanvas.h"
-#include "TSystem.h"
-#include "TChain.h"
 #include "TROOT.h"
 #include "TError.h"
 #include "TMinuit.h"
+
 using namespace std;
 using namespace Belle2;
 using namespace CDC;

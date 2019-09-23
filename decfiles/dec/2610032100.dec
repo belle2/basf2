@@ -1,6 +1,13 @@
-#EventType : 
-#Descriptor : [ccbar Dstar2D0Pip D02KsPi0]
-
+# EventType: 2610032100
+# Descriptor: [ccbar Dstar2D0Pip D02KsPi0]
+# NickName: Dst_D0pi_KsPi0
+# Documentation: 
+# Tested: Yes
+# PhysicsWG: CHARM
+# Responsible: Latika Aggarwal
+# Email: garg.latika15@gmail.com
+# Cuts: None
+# Date: 23/09/2019
 
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 
@@ -37,38 +44,36 @@ PythiaBothParam StringZ:usePetersonH=off
 #JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
 PythiaBothParam StringZ:rFactC=1.0
 
+Alias D0sig D0
+Alias anti-D0sig anti-D0
+ChargeConj D0sig anti-D0sig
 
-
-Alias MyD0 D0
-Alias Myanti-D0 anti-D0
-ChargeConj MyD0 Myanti-D0
-
-Alias MyK_S0 K_S0
-Alias Mypi0 pi0
+Alias K_S0sig K_S0
+Alias pi0sig pi0
 
 Decay vpho
 1.00 c anti-c PYTHIA 32;
 Enddecay
 
 Decay D*+
-1.00 MyD0 pi+ PHOTOS VSS;
+1.00 D0sig pi+ PHOTOS VSS;
 Enddecay
 
 Decay D*-
-1.00 Myanti-D0 pi- PHOTOS VSS;
+1.00 anti-D0sig pi- PHOTOS VSS;
 Enddecay
 
-Decay MyD0
+Decay D0sig
 1.00 K_S0 pi0 PHSP;
 Enddecay
 
-CDecay Myanti-D0
+CDecay anti-D0sig
 
-Decay  MyK_S0
+Decay  K_S0sig
 1.00 pi+ pi- PHSP;
 Enddecay
 
-Decay Mypi0
+Decay pi0sig
 1.0000 gamma gamma PHSP;
 Enddecay
 

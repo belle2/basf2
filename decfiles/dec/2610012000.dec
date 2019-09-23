@@ -1,5 +1,14 @@
-# EventType: 
+# EventType: 2610012000
 # Descriptor: [ccbar Dstar2D0Pip D02GammaGamma]
+# NickName: Dst_D0pi_GammaGamma
+# Documentation: 
+# Tested: Yes
+# PhysicsWG: CHARM
+# Responsible: Latika Aggarwal
+# Email: garg.latika15@gmail.com
+# Cuts: None
+# Date: 23/09/2019
+
 
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 
@@ -36,26 +45,26 @@ PythiaBothParam StringZ:usePetersonH=off
 #JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
 PythiaBothParam StringZ:rFactC=1.0
 
-Alias MyD0 D0
-Alias Myanti-D0 anti-D0
-ChargeConj MyD0 Myanti-D0
+Alias D0sig D0
+Alias anti-D0sig anti-D0
+ChargeConj D0sig anti-D0sig
 
 Decay vpho
 1.000 c anti-c PYTHIA 32;
 Enddecay
 
 Decay D*+
-1.0 MyD0  pi+ PHOTOS VSS;
+1.0 D0sig  pi+ PHOTOS VSS;
 Enddecay
 
 Decay D*-
-1.0 Myanti-D0 pi- PHOTOS VSS;
+1.0 anti-D0sig pi- PHOTOS VSS;
 Enddecay
 
-Decay MyD0
+Decay D0sig
 1.0 gamma gamma PHSP;
 Enddecay
 
-CDecay Myanti-D0
+CDecay anti-D0sig
 
 End

@@ -14,29 +14,15 @@
 
 using namespace Belle2;
 
-Eigen::Matrix<double, 3, 1> Btube::getTubeCenter()
-{
-  return m_tubecenter;
-}
-
-TMatrixFSym Btube::getTubeMatrix()
-{
-  return m_tubematrix;
-}
-
-void Btube::setTubeCenter(const Eigen::Matrix<double, 3, 1>& tubecenter)
-{
-  m_tubecenter = tubecenter;
-}
-
-void Btube::setTubeMatrix(const TMatrixFSym& tubematrix)
-{
-  m_tubematrix = tubematrix;
-}
-
 void  Btube::resetTubeMatrix()
 {
   TMatrixFSym temp(3);
   m_tubematrix.ResizeTo(temp);
   m_tubematrix = temp;
+}
+void  Btube::resetTubeCenterErrorMatrix()
+{
+  TMatrixFSym temp2(3);
+  m_tubecentererrormatrix.ResizeTo(temp2);
+  m_tubecentererrormatrix = temp2;
 }

@@ -192,6 +192,9 @@ void BtubeCreatorModule::event()
       TMatrixFSym tubeMat(3);
       tubeMat.SetSub(0, 0, pvNew);
 
+      TMatrixFSym tubeMatCenterError(3);
+      tubeMatCenterError.SetSub(0, 0, pv);
+
       if (m_verbose) {
         B2DEBUG(10, "B origin error matrix  :  ");
         B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << pv(0, 0) << "," << std::fixed << std::setprecision(20) << pv(0,
@@ -220,6 +223,7 @@ void BtubeCreatorModule::event()
       otherB->addRelationTo(tubeconstraint);
       tubeconstraint->setTubeCenter(fullRecoBOriginpos);
       tubeconstraint->setTubeMatrix(tubeMat);
+      tubeconstraint->setTubeCenterErrorMatrix(tubeMatCenterError);
 
       otherB->writeExtraInfo("TubePosX", fullRecoBCopy.getVertex()[0]);
       otherB->writeExtraInfo("TubePosY", fullRecoBCopy.getVertex()[1]);

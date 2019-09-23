@@ -7,7 +7,6 @@ import stdCharged as stdc
 import sys
 import b2test_utils
 
-from basf2 import conditions
 from variables import variables
 from ROOT import Belle2
 from ROOT import TFile
@@ -53,6 +52,21 @@ variables.addAlias('tube_dir_Z', 'extraInfo(TubeDirZ)')
 variables.addAlias('truex', 'matchedMC(x)')
 variables.addAlias('truey', 'matchedMC(y)')
 variables.addAlias('truez', 'matchedMC(z)')
+
+variables.addAlias('Distance', 'extraInfo(CalculatedDistance)')
+variables.addAlias('DistanceError', 'extraInfo(CalculatedDistanceError)')
+variables.addAlias('DistanceVector_X', 'extraInfo(CalculatedDistanceVector_X)')
+variables.addAlias('DistanceVector_Y', 'extraInfo(CalculatedDistanceVector_Y)')
+variables.addAlias('DistanceVector_Z', 'extraInfo(CalculatedDistanceVector_Z)')
+variables.addAlias('DistanceCovMatrixXX', 'extraInfo(CalculatedDistanceCovMatrixXX)')
+variables.addAlias('DistanceCovMatrixXY', 'extraInfo(CalculatedDistanceCovMatrixXY)')
+variables.addAlias('DistanceCovMatrixXZ', 'extraInfo(CalculatedDistanceCovMatrixXZ)')
+variables.addAlias('DistanceCovMatrixYX', 'extraInfo(CalculatedDistanceCovMatrixYX)')
+variables.addAlias('DistanceCovMatrixYY', 'extraInfo(CalculatedDistanceCovMatrixYY)')
+variables.addAlias('DistanceCovMatrixYZ', 'extraInfo(CalculatedDistanceCovMatrixYZ)')
+variables.addAlias('DistanceCovMatrixZX', 'extraInfo(CalculatedDistanceCovMatrixZX)')
+variables.addAlias('DistanceCovMatrixZY', 'extraInfo(CalculatedDistanceCovMatrixZY)')
+variables.addAlias('DistanceCovMatrixZZ', 'extraInfo(CalculatedDistanceCovMatrixZZ)')
 # create path
 my_path = b2.create_path()
 
@@ -94,6 +108,8 @@ mytestmodule2 = ma.register_module('BtubeCreator')
 my_path.add_module(mytestmodule2,
                    listName='Upsilon(4S):sig')
 vx.vertexRave('B-:sigT', 0.0, '', 'btube', path=my_path)
+
+ma.calculateDistance('B-:sigT', 'B- -> ^J/psi K- pi+ pi-', "vertexbtube", path=my_path)
 # Saving variables to ntuple
 output_file = 'test.root'
 true_vars = ['truex', 'truey', 'truez']
@@ -117,6 +133,27 @@ tube_vars = [
 
 common_vars = vc.kinematics + vc.vertex + vc.mc_vertex + vc.mc_truth + \
     vc.mc_kinematics + ['InvM', 'mcPxCms', 'mcPyCms', 'mcPzCms', 'mcECms']
+distance_vars = [
+    'Distance',
+    'DistanceError',
+    'DistanceVector_X',
+    'DistanceVector_Y',
+    'DistanceVector_Z',
+    'DistanceCovMatrixXX',
+    'DistanceCovMatrixX\
+Y',
+    'DistanceCovMatrixXZ',
+    'DistanceCovMatrixYX',
+    'DistanceCovMatrixYY',
+    'DistanceCovMatrixYZ',
+    'DistanceCovMatrixZX',
+    'DistanceCovMatrixZY',
+    'Distan\
+ceCovMatrixZZ']
+Distance_vars_sig = vu.create_aliases_for_selected(
+    list_of_variables=distance_vars,
+    decay_string='Upsilon(4S):sig -> B+:tag ^B-:sigT',
+    prefix='Distance')
 D_vars_tagside = vu.create_aliases_for_selected(
     list_of_variables=common_vars,
     decay_string='B+:tag -> ^anti-D0:kpi pi+:all',
@@ -129,11 +166,10 @@ U4S_vars_tag = vu.create_aliases_for_selected(
     list_of_variables=common_vars + avf_vars + true_vars,
     decay_string='Upsilon(4S):sig -> ^B+:tag B-:sigT',
     prefix='tagB')
-U4S_vars = common_vars + U4S_vars_tag + U4S_vars_sig + D_vars_tagside
+U4S_vars = common_vars + U4S_vars_tag + U4S_vars_sig + D_vars_tagside + Distance_vars_sig
 ma.variablesToNtuple('Upsilon(4S):sig', U4S_vars,
                      filename=output_file, treename='u4stree', path=my_path)
 ma.variablesToNtuple('B+:tag', common_vars,
                      filename=output_file, treename='tagtree', path=my_path)
-
 with b2test_utils.clean_working_directory():
     b2test_utils.safe_process(my_path)

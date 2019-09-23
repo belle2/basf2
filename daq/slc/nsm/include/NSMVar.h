@@ -5,6 +5,7 @@
 #include <daq/slc/base/Date.h>
 
 #include <vector>
+#include <string>
 
 namespace Belle2 {
 

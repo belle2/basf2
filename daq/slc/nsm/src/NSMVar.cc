@@ -1,10 +1,7 @@
 #include "daq/slc/nsm/NSMVar.h"
 
 #include <string.h>
-#include <unistd.h>
-#include <errno.h>
 #include <stdlib.h>
-#include <iostream>
 
 #include <daq/slc/base/Reader.h>
 #include <daq/slc/base/Writer.h>

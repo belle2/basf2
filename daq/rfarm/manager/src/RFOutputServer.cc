@@ -9,6 +9,15 @@
 
 #include "daq/rfarm/manager/RFOutputServer.h"
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+#include <unistd.h>
+
+#include <csignal>
+#include <cstring>
+
 #define RFOTSOUT stdout
 
 using namespace std;

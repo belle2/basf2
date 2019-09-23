@@ -8,6 +8,7 @@
 
 #include <daq/rawdata/modules/DeSerializerFILE.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 
 using namespace std;
 using namespace Belle2;

@@ -3,14 +3,8 @@
 
 #include <daq/slc/runcontrol/RCCallback.h>
 
-#include <daq/slc/nsm/NSMCommunicator.h>
-
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/Process.h>
-
-#include <daq/slc/base/StringUtil.h>
-
-#include <iostream>
 
 using namespace Belle2;
 

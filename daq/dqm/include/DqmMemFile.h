@@ -14,15 +14,7 @@
 #include <framework/pcore/EvtMessage.h>
 
 #include "TMemFile.h"
-#include "TObject.h"
-#include "TText.h"
-#include "TChain.h"
-#include "TH1.h"
-#include "TTree.h"
-#include "TKey.h"
-#include "TIterator.h"
 #include "TDirectory.h"
-
 
 #define MEMFILESIZE 128000000
 

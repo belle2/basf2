@@ -7,17 +7,6 @@
 //        26 - Apr - 2012, for Belle II RFARM
 //-
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <netdb.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <signal.h>
-#include <sys/time.h>
-
-#include <vector>
 #include <string>
 
 #include "framework/pcore/RingBuffer.h"

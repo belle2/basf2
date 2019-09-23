@@ -10,12 +10,12 @@
 #include <daq/rfarm/event/hltsocket/HLTMainLoop.h>
 #include <daq/rfarm/event/hltsocket/HLTFile.h>
 #include <daq/rfarm/event/hltsocket/HLTSocket.h>
-#include <framework/logging/LogMethod.h>
+#include <framework/logging/Logger.h>
 #include <framework/pcore/EvtMessage.h>
 
 #include <boost/program_options.hpp>
+#include <chrono>
 #include <iostream>
-#include <memory>
 
 #define MAXEVTSIZE 80000000
 

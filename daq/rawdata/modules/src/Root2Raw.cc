@@ -8,6 +8,23 @@
 
 #include <daq/rawdata/modules/Root2Raw.h>
 
+#include <daq/dataobjects/SendHeader.h>
+#include <daq/dataobjects/SendTrailer.h>
+#include <framework/core/Module.h>
+#include <framework/core/ModuleParamBase.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
+#include <rawdata/dataobjects/RawARICH.h>
+#include <rawdata/dataobjects/RawCDC.h>
+#include <rawdata/dataobjects/RawECL.h>
+#include <rawdata/dataobjects/RawFTSW.h>
+#include <rawdata/dataobjects/RawHeader_v1.h>
+#include <rawdata/dataobjects/RawKLM.h>
+#include <rawdata/dataobjects/RawSVD.h>
+#include <rawdata/dataobjects/RawTOP.h>
+
+#include <fcntl.h>
+
 using namespace std;
 using namespace Belle2;
 

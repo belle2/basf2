@@ -7,7 +7,6 @@
 //-
 
 #include <daq/modules/ElapsedTime/ElapsedTimeModule.h>
-#include <stdlib.h>
 
 using namespace std;
 using namespace Belle2;

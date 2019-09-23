@@ -7,13 +7,12 @@
 // Date : 14 - May - 2017
 //-
 #include <string>
-#include <vector>
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include "daq/expreco/ERecoEventSampler.h"
+#include "daq/rfarm/manager/RFNSM.h"
 
 using namespace Belle2;
 using namespace std;

@@ -1,9 +1,8 @@
 #include "daq/slc/system/File.h"
 
-#include <daq/slc/base/StringUtil.h>
+#include <daq/slc/base/IOException.h>
 
 #include <unistd.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>

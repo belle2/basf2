@@ -8,6 +8,7 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisOutputNSM.h>
 
+#include <daq/slc/nsm/NSMNotConnectedException.h>
 #include <daq/slc/runcontrol/RCNode.h>
 
 #include <daq/slc/system/PThread.h>

@@ -1,28 +1,17 @@
 #ifndef _Belle2_NSMCommunicator_hh
 #define _Belle2_NSMCommunicator_hh
 
-#include "daq/slc/nsm/NSMHandlerException.h"
-#include "daq/slc/nsm/NSMNotConnectedException.h"
 #include "daq/slc/nsm/NSMMessage.h"
 #include "daq/slc/nsm/NSMNode.h"
 
 #include <daq/slc/system/Mutex.h>
 
-#include <daq/slc/database/DAQLogMessage.h>
-
-#include <daq/slc/base/TimeoutException.h>
-#include <daq/slc/base/Serializable.h>
-#include <daq/slc/base/ERRORNo.h>
-
 extern "C" {
 #include <nsm2/nsm2.h>
 }
 
-#include <math.h>
-
 #include <queue>
 #include <vector>
-#include <map>
 
 namespace Belle2 {
 

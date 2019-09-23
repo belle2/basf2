@@ -10,35 +10,10 @@
 #define DESSERMAIN_H
 
 #include <string>
-#include <vector>
-#include <stdlib.h>
-#include <sys/time.h>
-
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
-
-#include <daq/dataflow/EvtSocket.h>
-#include <daq/slc/readout/RunInfoBuffer.h>
-#include <daq/rawdata/CprErrorMessage.h>
-#include <daq/rawdata/modules/DAQConsts.h>
-
-#include <rawdata/dataobjects/RawDataBlock.h>
-//#include <rawdata/dataobjects/RawCOPPER.h>
-
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
 using namespace std;
 using namespace Belle2;

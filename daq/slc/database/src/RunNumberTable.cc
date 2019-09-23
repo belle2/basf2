@@ -1,13 +1,9 @@
 #include "daq/slc/database/RunNumberTable.h"
 
+#include <daq/slc/database/DBHandlerException.h>
 #include <daq/slc/database/DBInterface.h>
 
 #include <daq/slc/system/LogFile.h>
-
-#include <daq/slc/base/StringUtil.h>
-
-#include <sstream>
-#include <iostream>
 
 using namespace Belle2;
 

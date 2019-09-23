@@ -2,6 +2,7 @@
 
 #include "daq/slc/nsm/NSMCommunicator.h"
 #include "daq/slc/nsm/NSMCallback.h"
+#include "daq/slc/nsm/NSMHandlerException.h"
 
 #include <daq/slc/system/Time.h>
 
@@ -15,7 +16,6 @@ extern "C" {
 #include <nsm2/nsmlib2.h>
 }
 
-#include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>

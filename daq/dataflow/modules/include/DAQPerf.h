@@ -11,21 +11,7 @@
 
 #include <framework/core/Module.h>
 
-#include <boost/shared_ptr.hpp>
-#include <string>
-#include <vector>
-#include <iostream>
-
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/time.h>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-
-#include <framework/dataobjects/EventMetaData.h>
-#include <rawdata/dataobjects/RawCOPPER.h>
 
 namespace Belle2 {
 

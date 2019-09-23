@@ -11,13 +11,6 @@
 
 #include <framework/core/Module.h>
 
-#include <boost/shared_ptr.hpp>
-#include <string>
-#include <vector>
-
-#include <sys/time.h>
-
-
 namespace Belle2 {
 
   /*! A class definition of an input module for Sequential ROOT I/O */

@@ -8,6 +8,16 @@
 
 #include "daq/expreco/ERecoMaster.h"
 
+#include "daq/rfarm/manager/RFNSM.h"
+
+#include <nsm2/belle2nsm.h>
+
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include <cstring>
+
 using namespace std;
 using namespace Belle2;
 

@@ -1,11 +1,8 @@
 #include "daq/storage/EventBuffer.h"
 
-#include <daq/slc/system/LogFile.h>
-
-#include <cstring>
 #include <cstdio>
-#include <unistd.h>
-#include <iostream>
+#include <cstdlib>
+#include <cstring>
 
 using namespace Belle2;
 

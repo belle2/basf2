@@ -9,29 +9,14 @@
 #ifndef DESERIALIZERCOPPER_H
 #define DESERIALIZERCOPPER_H
 
-#include <string>
-#include <vector>
-#include <stdlib.h>
 #include <fcntl.h>
-#include <sys/ioctl.h>
 #include <errno.h>
-#include "copper.h"
 
-#include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <daq/dataflow/EvtSocket.h>
-
-#include <framework/dataobjects/EventMetaData.h>
 #include <daq/rawdata/modules/DeSerializer.h>
 
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
-#include <rawdata/dataobjects/RawCOPPERFormat_latest.h>
-
-
 
 namespace Belle2 {
 

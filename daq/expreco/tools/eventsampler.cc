@@ -6,14 +6,16 @@
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 31 - Jul - 2017
 //-
+
+#include <cstring>
 #include <string>
 #include <vector>
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include "daq/expreco/EventSampler.h"
+#include "daq/rfarm/manager/RFConf.h"
 
 using namespace Belle2;
 using namespace std;

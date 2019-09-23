@@ -9,6 +9,8 @@
 
 #include "daq/rfarm/event/RevRb2Sock.h"
 
+#include <unistd.h>
+
 using namespace std;
 using namespace Belle2;
 

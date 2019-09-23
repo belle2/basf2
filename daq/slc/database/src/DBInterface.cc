@@ -1,11 +1,9 @@
 #include "daq/slc/database/DBInterface.h"
 
-#include <daq/slc/system/LogFile.h>
 #include <daq/slc/base/StringUtil.h>
 
 #include <cstdarg>
 #include <cstdio>
-#include <iostream>
 
 using namespace Belle2;
 

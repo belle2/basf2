@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <daq/dqm/HistoServer.h>
 #include <framework/pcore/RbTuple.h>
 
 using namespace Belle2;

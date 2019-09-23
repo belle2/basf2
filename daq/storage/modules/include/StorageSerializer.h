@@ -11,28 +11,12 @@
 #define STORAGE_OUTPUT_H
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
-#include <framework/pcore/SeqFile.h>
 #include <framework/pcore/DataStoreStreamer.h>
-#include <framework/pcore/RingBuffer.h>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <daq/storage/SharedEventBuffer.h>
 
-#include <daq/slc/system/Time.h>
-
 #include <string>
-
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <cmath>
-#include <fcntl.h>
-
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */

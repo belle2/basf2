@@ -1,20 +1,12 @@
 #ifndef _Belle2_Callback_hh
 #define _Belle2_Callback_hh
 
-#include "daq/slc/nsm/NSMHandlerException.h"
 #include "daq/slc/nsm/NSMVar.h"
-#include "daq/slc/nsm/NSMNode.h"
 #include "daq/slc/nsm/NSMVHandler.h"
 
 #include "daq/slc/database/DBObject.h"
 
-#include "daq/slc/system/LogFile.h"
-
 #include <cstring>
-#include <cstdlib>
-#include <string>
-#include <vector>
-#include <stdexcept>
 
 namespace Belle2 {
 

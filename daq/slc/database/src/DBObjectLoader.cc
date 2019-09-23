@@ -4,8 +4,8 @@
 
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/ConfigFile.h>
+#include <daq/slc/database/DBHandlerException.h>
 
-#include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <cstdio>

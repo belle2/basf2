@@ -7,14 +7,8 @@
 // Date : 20 - June - 2013
 //-
 
-#include <unistd.h>
 #include <stdio.h>
-#include <string.h>
-#include <sys/time.h>
 #include <sys/types.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <sys/wait.h>
 
 #include <vector>
 

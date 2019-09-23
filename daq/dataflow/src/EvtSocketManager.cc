@@ -8,6 +8,10 @@
 
 #include <daq/dataflow/EvtSocketManager.h>
 
+#include <algorithm>
+#include <cstring>
+#include <unistd.h>
+
 using namespace Belle2;
 using namespace std;
 

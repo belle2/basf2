@@ -11,13 +11,8 @@
 #include <string>
 #include <vector>
 
-#include <daq/dataflow/SocketLib.h>
 #include <daq/dataflow/EvtSocket.h>
-#include <daq/dataflow/EvtSocketManager.h>
-#include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/RingBuffer.h>
-#include <framework/pcore/MsgHandler.h>
-#include <daq/rfarm/manager/RFConf.h>
 
 #define MAXEVTSIZE 80000000
 

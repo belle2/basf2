@@ -3,7 +3,8 @@
 
 #include "daq/slc/system/FileDescriptor.h"
 
-#include "daq/slc/base/IOException.h"
+#include <cstddef>
+#include <string>
 
 namespace Belle2 {
 

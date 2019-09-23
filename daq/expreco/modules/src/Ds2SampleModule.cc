@@ -7,6 +7,8 @@
 //-
 
 #include <daq/expreco/modules/Ds2SampleModule.h>
+#include <framework/datastore/DataStore.h>
+
 #include <stdlib.h>
 
 using namespace std;

@@ -1,20 +1,11 @@
 #ifndef DATASTOREPACKAGE_H
 #define DATASTOREPACKAGE_H
 
-#include <vector>
-#include <queue>
-#include <string>
-
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/DataStoreStreamer.h>
 
 #include <daq/slc/system/Mutex.h>
 #include <rawdata/dataobjects/RawPXD.h>
-//#include <daq/dataobjects/SndHdrTemp.h>
-
 
 #include "daq/storage/BinData.h"
 

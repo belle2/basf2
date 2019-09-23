@@ -7,11 +7,6 @@
 // Date : 25 - Jul - 2013
 //-
 #include <string>
-#include <vector>
-
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <unistd.h>
 
 #include "daq/rfarm/event/RevRb2Sock.h"
 

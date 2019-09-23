@@ -8,14 +8,9 @@
 // Date : 31 - Jul - 2013
 //-
 
-#include <sys/types.h>
-#include <sys/wait.h>
-
 #include "daq/rfarm/manager/RFConf.h"
 #include "daq/rfarm/manager/RFSharedMem.h"
-#include "daq/rfarm/manager/RFProcessManager.h"
 #include "daq/rfarm/manager/RFLogManager.h"
-#include "daq/rfarm/manager/RFNSM.h"
 
 #include "daq/rfarm/manager/RFServerBase.h"
 

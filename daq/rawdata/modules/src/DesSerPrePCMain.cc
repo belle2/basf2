@@ -5,9 +5,7 @@
 // Author : Satoru Yamada Itoh, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
-#include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/rawdata/modules/DesSerPrePCMain.h>
-//#include <daq/rawdata/modules/DesSerPrePC.h>
 #include <daq/rawdata/DesSerPrePC.h>
 
 //#define MAXEVTSIZE 400000000

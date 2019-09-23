@@ -13,7 +13,6 @@
 #include <framework/logging/Logger.h>
 
 #include <daq/storage/BinData.h>
-#include <daq/storage/EventBuffer.h>
 
 #include <daq/slc/system/PThread.h>
 #include <daq/slc/system/Cond.h>
@@ -24,7 +23,7 @@
 #include <daq/slc/system/TCPSocketWriter.h>
 #include <daq/slc/system/Time.h>
 #include <daq/slc/system/LogFile.h>
-#include <daq/slc/base/Date.h>
+#include <daq/slc/base/IOException.h>
 
 const unsigned int NWORD_BUFFER = 10000000;//10Mword
 

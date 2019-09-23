@@ -8,8 +8,11 @@
 
 #include <daq/dqm/modules/DqmHistoManagerModule.h>
 
+#include <framework/core/Environment.h>
 #include <framework/pcore/ProcHandler.h>
+#include <framework/pcore/RbTuple.h>
 
+#include "TKey.h"
 #include "TText.h"
 
 using namespace Belle2;

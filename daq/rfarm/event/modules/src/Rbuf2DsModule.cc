@@ -11,8 +11,6 @@
 #include <stdlib.h>
 #include <signal.h>
 
-#include "framework/datastore/StoreObjPtr.h"
-#include "framework/dataobjects/EventMetaData.h"
 #include "framework/core/Environment.h"
 
 //extern int basf2SignalReceived;

@@ -6,7 +6,6 @@
 #include <string.h>
 #include <poll.h>
 #include <signal.h>
-#include <sys/types.h>
 #include <netinet/in.h>
 
 #include "daq/roisend/util.h"

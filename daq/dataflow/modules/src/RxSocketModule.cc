@@ -7,6 +7,9 @@
 //-
 
 #include <daq/dataflow/modules/RxSocketModule.h>
+
+#include <TSystem.h>
+
 #include <stdlib.h>
 
 //#define MAXEVTSIZE 400000000

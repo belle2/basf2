@@ -1,5 +1,6 @@
 #include "daq/dqm/DqmMemFile.h"
 
+#include <TH1F.h>
 
 using namespace Belle2;
 using namespace std;

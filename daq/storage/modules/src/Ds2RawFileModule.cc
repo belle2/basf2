@@ -7,9 +7,13 @@
 //-
 
 #include <daq/storage/modules/Ds2RawFileModule.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+
+#include <daq/dataobjects/SendHeader.h>
+#include <daq/dataobjects/SendTrailer.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+
 #include <fcntl.h>
 
 using namespace std;

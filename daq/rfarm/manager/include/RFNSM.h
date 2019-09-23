@@ -23,13 +23,8 @@
 #define RFSTATE_IDLE 4
 
 #include <string>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 
 #include "nsm2/nsm2.h"
-#include "nsm2/belle2nsm.h"
 
 #include "daq/rfarm/manager/RFServerBase.h"
 #include "daq/rfarm/manager/RfNodeInfo.h"

@@ -8,28 +8,7 @@
 // Date :  5 - Sep - 2013
 //-
 
-#include <stdlib.h>
-#include <string>
-#include <vector>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <sys/resource.h>
-#include <sys/uio.h>
-
 #include <framework/core/HistoModule.h>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-
-#include <daq/rawdata/modules/DAQConsts.h>
-#include <rawdata/dataobjects/RawCOPPER.h>
-#include <daq/dataobjects/SendHeader.h>
-#include <daq/dataobjects/SendTrailer.h>
 
 #include "TH1F.h"
 #include "TH2F.h"

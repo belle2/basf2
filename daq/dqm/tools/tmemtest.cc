@@ -1,6 +1,7 @@
-#include "daq/dqm/HistoServer.h"
 
 #include "daq/rfarm/manager/SharedMem.h"
+
+#include "TH1F.h"
 #include "TMemFile.h"
 #include "TObject.h"
 

@@ -8,7 +8,6 @@
 #include "daq/slc/system/PThread.h"
 #include "daq/slc/system/Process.h"
 #include "daq/slc/system/Mutex.h"
-#include "daq/slc/system/Cond.h"
 
 #include <vector>
 #include <sstream>

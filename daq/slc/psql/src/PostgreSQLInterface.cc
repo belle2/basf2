@@ -5,11 +5,9 @@
 #include <pgsql/libpq-fe.h>
 #endif
 
-#include <daq/slc/system/LogFile.h>
-
 #include <daq/slc/base/StringUtil.h>
+#include <daq/slc/database/DBHandlerException.h>
 
-#include <iostream>
 #include <daq/slc/system/LockGuard.h>
 
 using namespace Belle2;

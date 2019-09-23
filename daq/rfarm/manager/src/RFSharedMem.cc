@@ -8,6 +8,8 @@
 
 #include "daq/rfarm/manager/RFSharedMem.h"
 
+#include <strings.h>
+
 using namespace std;
 using namespace Belle2;
 

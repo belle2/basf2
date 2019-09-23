@@ -7,7 +7,12 @@
 //-
 
 #include <daq/dqm/modules/TrackAna.h>
-#include <stdlib.h>
+
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 using namespace std;
 using namespace Belle2;

@@ -17,10 +17,6 @@
 #include <rawdata/dataobjects/RawARICH.h>
 #include <rawdata/dataobjects/RawTOP.h>
 #include <rawdata/dataobjects/RawKLM.h>
-#include <rawdata/dataobjects/RawFTSW.h>
-#include <daq/rawdata/modules/DAQConsts.h>
-
-
 
 namespace Belle2 {
 

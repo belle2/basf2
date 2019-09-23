@@ -9,19 +9,15 @@
 //-
 
 #include <string>
-#include <vector>
 
 #include <daq/rfarm/manager/RFConf.h>
 #include <daq/rfarm/manager/RFProcessManager.h>
 #include <daq/rfarm/manager/RFLogManager.h>
-#include <daq/rfarm/manager/RFNSM.h>
+#include <daq/rfarm/manager/RFServerBase.h>
 
-#include <daq/dataflow/SocketLib.h>
-#include <daq/dataflow/EvtSocket.h>
-#include <daq/dataflow/EvtSocketManager.h>
-#include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/RingBuffer.h>
-#include <framework/pcore/MsgHandler.h>
+
+#include <nsm2/nsm2.h>
 
 #define MAXEVTSIZE 80000000
 

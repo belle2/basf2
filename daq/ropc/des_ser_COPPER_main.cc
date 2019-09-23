@@ -11,7 +11,6 @@
 //#include <daq/rawdata/modules/DesSerPrePC.h>
 //#include <daq/rawdata/DesSerPrePC.h>
 #include <daq/rawdata/DesSerCOPPER.h>
-#include <unistd.h>
 //#define MAXEVTSIZE 400000000
 
 using namespace std;

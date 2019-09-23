@@ -7,7 +7,6 @@
 //-
 
 #include <daq/rfarm/event/modules/CertifyParallelModule.h>
-#include <stdlib.h>
 
 using namespace std;
 using namespace Belle2;

@@ -1,21 +1,14 @@
 #include "daq/slc/system/UDPSocket.h"
 
-#include <daq/slc/base/StringUtil.h>
+#include <daq/slc/base/IOException.h>
 
-#include <cstdlib>
 #include <cstdio>
 #include <cstring>
-#include <cerrno>
-
-#include <sstream>
-#include <vector>
 
 #include <unistd.h>
 #include <errno.h>
 
 #include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/select.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>

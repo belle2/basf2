@@ -1,18 +1,12 @@
 #ifndef _Belle2_RFMasterCallback_h
 #define _Belle2_RFMasterCallback_h
 
-#include "daq/rfarm/manager/RFConf.h"
-#include "daq/rfarm/manager/RFCommand.h"
-
 #include <daq/slc/runcontrol/RCState.h>
 #include <daq/slc/runcontrol/RCCallback.h>
-
-#include <daq/slc/nsm/NSMData.h>
 
 #include <daq/slc/base/StringUtil.h>
 
 #include <vector>
-#include <map>
 
 namespace Belle2 {
 

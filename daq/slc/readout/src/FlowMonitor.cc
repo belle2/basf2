@@ -1,6 +1,5 @@
 #include "daq/slc/readout/FlowMonitor.h"
 
-#include "daq/slc/system/LogFile.h"
 #include <daq/slc/system/Time.h>
 
 #include <cstring>

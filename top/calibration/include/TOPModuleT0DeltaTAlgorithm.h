@@ -20,6 +20,8 @@ namespace Belle2 {
      * Algorithm for module T0 calibration with chi2 minimization of time differences
      * between slots (method DeltaT).
      *
+     * For the method see M. Staric, NIM A 586 (2008) 174-179, sect. 2.2.
+     *
      * Useful for initial (rough) calibration, since the results are found slightly biased
      * For the final (precise) calibration one has to use LL method.
      */
@@ -75,14 +77,21 @@ namespace Belle2 {
        * @param h histogram
        * @return fit status
        */
-      TFitResultPtr fitSingleGaus(std::shared_ptr<TH1F> h);
+      int fitSingleGaus(std::shared_ptr<TH1F> h);
 
       /**
        * Fit double gaus w/ same mean + constant
        * @param h histogram
        * @return fit status
        */
-      TFitResultPtr fitDoubleGaus(std::shared_ptr<TH1F> h);
+      int fitDoubleGaus(std::shared_ptr<TH1F> h);
+
+      /**
+       * Fit histogram
+       * @param h histogram
+       * @return fit status
+       */
+      int fitHistogram(std::shared_ptr<TH1F> h);
 
       // algorithm parameters
       int m_minEntries = 10; /**< minimal number of histogram entries to perform fit */
@@ -90,7 +99,13 @@ namespace Belle2 {
       double m_sigmaTailInit = 0.240; /**< tail gaussian sigma [ns] */
       double m_tailFractInit = 0.20; /**< fraction of tail gaussian */
       int m_cutoffEntries = 100; /**< cutoff entries for single/double gaussian fit */
-      double m_minError = 0.100; /**< minimal commonT0 uncertainty [ns] to declare c_OK */
+      double m_minError = 0.100; /**< minimal moduleT0 uncertainty [ns] to declare c_OK */
+
+      // temporary store for results of a single fit
+      double m_delT0; /**< fitted delta T0 */
+      double m_error; /**< error on fitted delta T0 */
+      double m_chi2;  /**< chi2 of the fit */
+      double m_ndf;  /**< NDF of the fit */
 
     };
 

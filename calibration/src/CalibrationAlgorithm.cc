@@ -452,6 +452,10 @@ namespace Belle2 {
             // Get the path/directory of the Exp,Run TDirectory that holds the object(s)
             std::string objDirName = getFullObjectPath(name, expRunRequested);
             TDirectory* objDir = f->GetDirectory(objDirName.c_str());
+            if (!objDir) {
+              B2ERROR("Directory for requested object " << name << " not found: " << objDirName);
+              return nullptr;
+            }
             // Find all the objects inside, there may be more than one
             for (auto key : * (objDir->GetListOfKeys())) {
               string keyName = key->GetName();

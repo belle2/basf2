@@ -35,10 +35,10 @@ path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatchin
 path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
 
 # Apply final B0 hadronic tag cuts
-B0hadronicList = B0hadronic(path)
+B0HadronicList = B0Hadronic(path)
 skimCode1 = encodeSkimName('feiHadronicB0')
-skimOutputUdst(skimCode1, B0hadronicList, path=path)
-summaryOfLists(B0hadronicList, path=path)
+skimOutputUdst(skimCode1, B0HadronicList, path=path)
+summaryOfLists(B0HadronicList, path=path)
 
 # Apply final B+ hadronic tag cuts
 BphadronicList = BplusHadronic(path)

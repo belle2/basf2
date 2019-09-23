@@ -15,17 +15,7 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/database/DBObjPtr.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <calibration/CalibrationCollectorModule.h>
-#include <framework/geometry/B2Vector3.h>
 #include <TTree.h>
-#include <TFile.h>
-#include <TH1.h>
-#include <functional>
-#include <algorithm>
 
 namespace Belle2 {
   namespace Background {

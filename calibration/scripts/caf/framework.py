@@ -18,7 +18,7 @@ import sqlite3
 import shutil
 
 from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
-from basf2 import get_default_global_tags
+from basf2 import conditions as b2conditions
 
 from abc import ABC, abstractmethod
 import ROOT
@@ -112,12 +112,16 @@ class Collection():
             self.database_chain = database_chain
         else:
             self.database_chain = []
-            self.use_central_database(get_default_global_tags())
+            # This may seem weird but the changes to the DB interface mean that they have effectively swapped from being
+            # described well by appending to a list to a deque. So we do bit of reversal to translate it back and make the
+            # most important GT the last one encountered.
+            for tag in reversed(b2conditions.default_globaltags):
+                self.use_central_database(tag)
 
     def reset_database(self):
         """
         Remove everything in the database_chain of this Calibration, including the default central database
-        tag automatically included from `basf2.get_default_global_tags`
+        tag automatically included from `basf2.conditions.default_globaltags`
         """
         self.database_chain = []
 
@@ -126,12 +130,21 @@ class Collection():
         Parameters:
             global_tag (str): The central database global tag to use for this calibration.
 
-        Using this allows you to append a central database to the database chain for this collection.
-        The default database chain is just the central one from `basf2.get_default_global_tags`.
+        Using this allows you to add a central database to the head of the global tag database chain for this collection.
+        The default database chain is just the central one from `basf2.conditions.default_globaltags`.
+        The input file global tag will always be overrided and never used unless explicitly set.
+
         To turn off central database completely or use a custom tag as the base, you should call `Calibration.reset_database`
         and start adding databases with `Calibration.use_local_database` and `Calibration.use_central_database`.
 
         Alternatively you could set an empty list as the input database_chain when adding the Collection to the Calibration.
+
+        NOTE!! Since release-04-00-00 the behaviour of basf2 conditions databases has changed.
+        All local database files MUST now be at the head of the 'chain', with all central database global tags in their own
+        list which will be checked after all local database files have been checked.
+
+        So even if you ask for ["global_tag1", "localdb/database.txt", "global_tag2"] to be the database chain, the real order
+        that basf2 will use them is ["global_tag1", "global_tag2", "localdb/database.txt"] where the file is checked first.
         """
         central_db = CentralDatabase(global_tag)
         self.database_chain.append(central_db)
@@ -147,6 +160,13 @@ class Collection():
         Append a local database to the chain for this collection.
         You can call this function multiple times and each database will be added to the chain IN ORDER.
         The databases are applied to this collection ONLY.
+
+        NOTE!! Since release-04-00-00 the behaviour of basf2 conditions databases has changed.
+        All local database files MUST now be at the head of the 'chain', with all central database global tags in their own
+        list which will be checked after all local database files have been checked.
+
+        So even if you ask for ["global_tag1", "localdb/database.txt", "global_tag2"] to be the database chain, the real order
+        that basf2 will use them is ["global_tag1", "global_tag2", "localdb/database.txt"] where the file is checked first.
         """
         local_db = LocalDatabase(filename, directory)
         self.database_chain.append(local_db)
@@ -295,7 +315,7 @@ class CalibrationBase(ABC, Thread):
         """
         for key, value in defaults.items():
             try:
-                if not getattr(self, key):
+                if getattr(self, key) is None:
                     setattr(self, key, value)
             except AttributeError:
                 print("The calibration", self.name, "does not support the attribute", key)
@@ -450,7 +470,8 @@ class Calibration(CalibrationBase):
         else:
             self.database_chain = []
             # This database is already applied to the `Collection` automatically, so don't do it again
-            self.use_central_database(get_default_global_tags(), apply_to_default_collection=False)
+            for tag in reversed(b2conditions.default_globaltags):
+                self.use_central_database(tag, apply_to_default_collection=False)
         #: The class that runs all the algorithms in this Calibration using their assigned
         #: :py:class:`caf.strategies.AlgorithmStrategy`.
         #: Plugin your own runner class to change how your calibration will run the list of algorithms.
@@ -531,7 +552,7 @@ class Calibration(CalibrationBase):
             apply_to_default_collection (bool): Should we also reset the default collection?
 
         Remove everything in the database_chain of this Calibration, including the default central database
-        tag automatically included from `basf2.get_default_global_tags`. This will NOT affect the database chain of any
+        tag automatically included from `basf2.conditions.default_globaltags`. This will NOT affect the database chain of any
         `Collection` other than the default one. You can prevent the default Collection from having its chain reset by setting
         'apply_to_default_collection' to False.
         """
@@ -548,7 +569,7 @@ class Calibration(CalibrationBase):
             apply_to_default_collection (bool): Should we also call use_central_database on the default collection (if it exists)
 
         Using this allows you to append a central database to the database chain for this calibration.
-        The default database chain is just the central one from `basf2.get_default_global_tags`.
+        The default database chain is just the central one from `basf2.conditions.default_globaltags`.
         To turn off central database completely or use a custom tag as the base, you should call `Calibration.reset_database`
         and start adding databases with `Calibration.use_local_database` and `Calibration.use_central_database`.
 
@@ -1159,6 +1180,7 @@ class CAF():
 
         # Get an ordered dictionary of the sort order but including all implicit dependencies.
         ordered_full_dependencies = all_dependencies(self.future_dependencies, order)
+
         # Return all the implicit+explicit past dependencies
         full_past_dependencies = past_from_future_dependencies(ordered_full_dependencies)
         # Correct each calibration's dependency list to reflect the implicit dependencies
@@ -1168,6 +1190,13 @@ class CAF():
             for dep in full_deps:
                 if dep not in explicit_deps:
                     calibration.dependencies.append(self.calibrations[dep])
+            # At this point the calibrations have their full dependencies but they aren't in topological
+            # sort order. Correct that here
+            ordered_dependency_list = []
+            for ordered_calibration_name in order:
+                if ordered_calibration_name in [dep.name for dep in calibration.dependencies]:
+                    ordered_dependency_list.append(self.calibrations[ordered_calibration_name])
+            calibration.dependencies = ordered_dependency_list
         order = ordered_full_dependencies
         # We should also patch in all of the implicit dependencies for the calibrations
         return order
@@ -1320,19 +1349,17 @@ class CAF():
         Returns:
             str: The absolute path of the new output_dir
         """
-        if os.path.isdir(self.output_dir):
+        p = Path(self.output_dir).resolve()
+        if p.is_dir():
             B2INFO('{0} output directory already exists. '
-                   'We will try to restart from the previous finishing state.'.format(self.output_dir))
-            abs_output_dir = os.path.join(os.getcwd(), self.output_dir)
-            return abs_output_dir
+                   'We will try to restart from the previous finishing state.'.format(p.as_posix()))
+            return p.as_posix()
         else:
-            os.mkdir(self.output_dir)
-            abs_output_dir = os.path.join(os.getcwd(), self.output_dir)
-            if os.path.exists(abs_output_dir):
-                return abs_output_dir
+            p.mkdir(parents=True)
+            if p.is_dir():
+                return p.as_posix()
             else:
-                B2ERROR("Attempted to create output_dir {0}, but it didn't work.".format(abs_output_dir))
-                sys.exit(1)
+                raise FileNotFoundError("Attempted to create output_dir {0}, but it didn't work.".format(p.as_posix()))
 
     def _make_database(self):
         """

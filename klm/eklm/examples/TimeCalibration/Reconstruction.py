@@ -3,22 +3,23 @@
 
 # Reconstruction with EKLM time calibration data collection.
 
-from basf2 import *
-from reconstruction import *
+import sys
+import basf2
+from reconstruction import add_reconstruction
 import sys
 
 # Set the global log level
-set_log_level(LogLevel.INFO)
+basf2.set_log_level(basf2.LogLevel.INFO)
 
-input = register_module('RootInput')
+input = basf2.register_module('RootInput')
 input.param('inputFileName', sys.argv[1])
 
-gearbox = register_module('Gearbox')
+gearbox = basf2.register_module('Gearbox')
 
-eklmtimecalibration = register_module('EKLMTimeCalibrationCollector')
+eklmtimecalibration = basf2.register_module('EKLMTimeCalibrationCollector')
 
 # Create the main path and add the modules
-main = create_path()
+main = basf2.create_path()
 main.add_module(input)
 main.add_module("HistoManager", histoFileName=sys.argv[2])
 main.add_module(gearbox)
@@ -26,7 +27,7 @@ add_reconstruction(main)
 main.add_module(eklmtimecalibration)
 
 # generate events
-process(main)
+basf2.process(main)
 
 # show call statistics
-print(statistics)
+print(basf2.statistics)

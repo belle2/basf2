@@ -115,7 +115,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
 
   //Switch for database
   addParam("UseDB4FEE", m_useDB4FEE, "Fetch and use FEE params. from database or not", true);
-  addParam("UseDB4EDepToADC", m_useDB4EDepToADC, "Fetch and use edep-to-ADC conversion params. from database or not", true);
+  addParam("UseDB4EDepToADC", m_useDB4EDepToADC, "Uuse edep-to-ADC conversion params. from database or not", true);
   addParam("UseDB4RunGain", m_useDB4RunGain, "Fetch and use run gain from database or not", true);
   addParam("OverallGainFactor", m_overallGainFactor, "Overall gain factor for adjustment", 1.0);
 
@@ -223,6 +223,12 @@ void CDCDigitizerModule::initialize()
     cout << "m_mean2= " <<  m_mean2 << endl;
   */
 #endif
+
+  if (m_useDB4EDepToADC) {
+    if (m_cdcgp->getEDepToADCMainFactor(0, 0) == 0.) {
+      B2FATAL("CDCEDepToADCConversion payloads are unavailable!");
+    }
+  }
 
 }
 

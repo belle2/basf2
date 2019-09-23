@@ -223,18 +223,18 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
   storeErrorMatrix(clustercovmat);
 }
 
-Particle::Particle(const KLMCluster* klmCluster) :
+Particle::Particle(const KLMCluster* klmCluster, const int pdgCode) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
   if (!klmCluster) return;
 
-  // TODO: avoid hard coded values
-  m_pdgCode = 130;
+  m_pdgCode = pdgCode;
   setFlavorType();
 
   set4Vector(klmCluster->getMomentum());
   setVertex(klmCluster->getPosition());
+  updateMass(m_pdgCode); // KLMCluster internally use Klong mass, overwrite here to allow neutrons
 
   m_particleType = c_KLMCluster;
   setMdstArrayIndex(klmCluster->getArrayIndex());

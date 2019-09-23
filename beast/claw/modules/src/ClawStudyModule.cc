@@ -12,29 +12,17 @@
 #include <beast/claw/dataobjects/ClawSimHit.h>
 #include <beast/claw/dataobjects/ClawHit.h>
 #include <generators/SAD/dataobjects/SADMetaHit.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <cmath>
-#include <boost/foreach.hpp>
 
-
-#include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
 
 // ROOT
-#include <TVector3.h>
-#include <TRandom.h>
 #include <TH1.h>
 #include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
 
 int eventNum = 0;
 

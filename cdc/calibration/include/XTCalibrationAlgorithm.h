@@ -83,6 +83,9 @@ namespace Belle2 {
       /// Set LR separate mode (default is true).
       void setLRSeparate(bool lr = true) {m_LRseparate = lr;}
 
+      /// Set threshold for the fraction of fitted results.
+      void setThreshold(double th = 0.6) {m_threshold = th;}
+
 
     protected:
 
@@ -110,6 +113,7 @@ namespace Belle2 {
       bool m_storeHisto = true;  /**< Store histogram or not*/
       bool m_LRseparate = true; /**< Separate LR in calibration or mix*/
       bool m_bField = true;  /**< with b field or none*/
+      double m_threshold = 0.6;  /**< minimal requirement for the fraction of fitted results */
 
       TProfile* m_hProf[56][2][20][10];     /**< Profile xt histo*/
       TH2F* m_hist2d[56][2][20][10];        /**< 2D histo of xt*/

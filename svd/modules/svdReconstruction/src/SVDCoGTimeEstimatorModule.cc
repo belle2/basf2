@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <svd/modules/svdReconstruction/SVDCoGTimeEstimatorModule.h>
-#include <svd/dataobjects/SVDEventInfo.h>
 
 using namespace Belle2;
 using namespace std;
@@ -58,6 +57,7 @@ void SVDCoGTimeEstimatorModule::initialize()
 
   //Inizialization of needed store array
   m_storeShaper.isRequired(m_storeShaperDigitsName);
+  m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
 
   //Initialize the new RecoDigit
   m_storeReco.registerInDataStore(m_storeRecoDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
@@ -104,14 +104,14 @@ void SVDCoGTimeEstimatorModule::beginRun()
 
 void SVDCoGTimeEstimatorModule::event()
 {
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
-  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
 
   /** Probabilities, to be defined here */
   std::vector<float> probabilities = {0.5};
 
-  // If no digits, nothing to do
-  if (!m_storeShaper || !m_storeShaper.getEntries()) return;
+  // If no digits or no SVDEventInfo, nothing to do
+  if (!m_storeShaper || !m_storeShaper.getEntries() || !m_storeSVDEvtInfo.isValid()) return;
+
+  SVDModeByte modeByte = m_storeSVDEvtInfo->getModeByte();
 
   size_t nDigits = m_storeShaper.getEntries();
 

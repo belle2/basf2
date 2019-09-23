@@ -12,18 +12,8 @@
 #define CSIDIGITIZER_V2MODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <beast/csi/dataobjects/CsiHit_v2.h>
-#include <string>
-#include <vector>
-
-//ROOT
-#include <TRandom3.h>
-#include <TMath.h>
-#include <TF1.h>
-#include <TVector3.h>
-
 
 namespace Belle2 {
   namespace csi {

@@ -12,10 +12,8 @@
 
 #include <TObject.h>
 #include <string>
-#include <cmath>
 #include <vector>
 
-#include <TROOT.h>
 #include <TClass.h>
 
 namespace Belle2 {

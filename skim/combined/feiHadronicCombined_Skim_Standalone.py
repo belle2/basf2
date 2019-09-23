@@ -43,10 +43,10 @@ path.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=Tru
 path.add_module('MCMatcherParticles', listName='B+:generic', looseMCMatching=True)
 
 # Apply final B0 tag cuts
-B0hadronicList = B0hadronic(path)
+B0HadronicList = B0Hadronic(path)
 skimCode1 = encodeSkimName('feiHadronicB0')
-skimOutputUdst(skimCode1, B0hadronicList, path=path)
-summaryOfLists(B0hadronicList, path=path)
+skimOutputUdst(skimCode1, B0HadronicList, path=path)
+summaryOfLists(B0HadronicList, path=path)
 
 # Apply final B+ tag cuts
 BphadronicList = BplusHadronic(path)

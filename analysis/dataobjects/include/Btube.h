@@ -1,5 +1,5 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
+ 1;95;0c* BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -14,7 +14,9 @@
 
 #include <TVector3.h>
 #include <TMatrixFSym.h>
-
+#include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
+#include <iostream>
 #include <vector>
 #include <set>
 #include <Eigen/Core>
@@ -38,41 +40,54 @@ namespace Belle2 {
     }
 
     /**
-     * Returns Btube center
-     */
-    Eigen::Matrix<double, 3, 1> getTubeCenter() const;
-    /**
-     * Returns Btube direction
-     */
-    Eigen::Matrix<double, 3, 1> getTubeDirection() const;
-    /**
-     * Returns Btube matrix
-     */
-    TMatrixFSym getTubeMatrix() const;
-    /**
-     * Returns Btube Center Error Matrix
-     */
-    TMatrixFSym getTubeCenterErrorMatrix() const;
-    /**
      * Sets Btube Center
      */
-    void setTubeCenter(const Eigen::Matrix<double, 3, 1>& tubecenter);
+    void setTubeCenter(const Eigen::Matrix<double, 3, 1>& tubecenter) {m_tubecenter = tubecenter;}
     /**
      * Sets Btube Direction
      */
-    void setTubeDirection(const Eigen::Matrix<double, 3, 1>& tubedirection);
+    void setTubeDirection(const Eigen::Matrix<double, 3, 1>& tubedirection) {m_tubedirection = tubedirection;}
     /**
      * Sets Btube Matrix
      */
-    void setTubeMatrix(const TMatrixFSym& tubematrix);
+    void setTubeMatrix(const TMatrixFSym& tubematrix) {m_tubematrix = tubematrix;}
+
     /**
      * Sets Btube Center Error Matrix
      */
-    void setTubeCenterErrorMatrix(const TMatrixFSym& tubecentererrormatrix);
+    void setTubeCenterErrorMatrix(const TMatrixFSym& tubecentererrormatrix) {m_tubecentererrormatrix = tubecentererrormatrix;}
+
+    /**
+     * Returns Btube center
+     */
+    Eigen::Matrix<double, 3, 1> getTubeCenter() const
+    {
+      return m_tubecenter;
+    }
+    /**
+     * Returns Btube direction
+     */
+    Eigen::Matrix<double, 3, 1> getTubeDirection() const
+    {
+      return m_tubedirection;
+    }
+    /**
+     * Returns Btube matrix
+     */
+    TMatrixFSym getTubeMatrix() const
+    {
+      return m_tubematrix;
+    }
+    /**
+     * Returns Btube Center Error Matrix
+     */
+    TMatrixFSym getTubeCenterErrorMatrix() const
+    {
+      return m_tubecentererrormatrix;
+    }
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~Btube() { }
-
 
   private:
     Eigen::Matrix<double, 3, 1> m_tubecenter;   /**< Btube center */
@@ -88,6 +103,4 @@ namespace Belle2 {
     ClassDef(Btube, 1); /**< For each MCParticle with hits in the CDC, this class stores some summarising information on those hits .*/
   };
 }
-
-
 

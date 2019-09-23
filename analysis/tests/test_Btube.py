@@ -8,12 +8,6 @@ import sys
 import b2test_utils
 
 from basf2 import conditions
-
-# make logging more reproducible by replacing some strings
-# b2test_utils.configure_logging_for_tests()
-conditions.disable_globaltag_replay()
-
-
 from variables import variables
 from ROOT import Belle2
 from ROOT import TFile

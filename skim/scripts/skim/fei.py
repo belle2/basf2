@@ -19,6 +19,7 @@ from variables import *
 variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
 variables.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
 variables.addAlias('dmID', 'extraInfo(decayModeID)')
+variables.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
 variables.addAlias('cosThetaBY', 'cosThetaBetweenParticleAndNominalB')
 variables.addAlias('d1_p_CMSframe', 'useCMSFrame(daughter(1,p))')
 variables.addAlias('d2_p_CMSframe', 'useCMSFrame(daughter(2,p))')
@@ -94,7 +95,9 @@ def B0Hadronic(path):
         * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all
           neutral clusters with :math:`E>0.1\\,\\text{GeV}`, and all
-          charged tracks with :math:`p_T>0.1\\,\\text{GeV}`)
+          charged tracks with :math:`p_T>0.1\\,\\text{GeV}`. If there
+          are no tracks or clusters of sufficient energy, then the
+          event is given an :math:`R_2` value of 1.)
         * :math:`n_{\\text{tracks}} \\geq 4`
 
         Tag side :math:`B` cuts:
@@ -184,7 +187,9 @@ def BplusHadronic(path):
         * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all
           neutral clusters with :math:`E>0.1\\,\\text{GeV}`, and all
-          charged tracks with :math:`p_T>0.1\\,\\text{GeV}`)
+          charged tracks with :math:`p_T>0.1\\,\\text{GeV}`. If there
+          are no tracks or clusters of sufficient energy, then the
+          event is given an :math:`R_2` value of 1.)
         * :math:`n_{\\text{tracks}} \\geq 4`
 
         Tag side :math:`B` cuts:
@@ -246,7 +251,7 @@ def runFEIforB0Hadronic(path):
                     checkForDuplicates=False,
                     path=path)
 
-    applyEventCuts('foxWolframR2<0.4 and nTracks>=4', path=path)
+    applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -293,7 +298,7 @@ def runFEIforBplusHadronic(path):
                     checkForDuplicates=False,
                     path=path)
 
-    applyEventCuts('foxWolframR2<0.4 and nTracks>=4', path=path)
+    applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -344,7 +349,7 @@ def runFEIforHadronicCombined(path):
                     checkForDuplicates=False,
                     path=path)
 
-    applyEventCuts('foxWolframR2<0.4 and nTracks>=4', path=path)
+    applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -399,7 +404,9 @@ def B0SL(path):
         * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all
           neutral clusters with :math:`E>0.1\\,\\text{GeV}`, and all
-          charged tracks with :math:`p_T>0.1\\,\\text{GeV}`)
+          charged tracks with :math:`p_T>0.1\\,\\text{GeV}`. If there
+          are no tracks or clusters of sufficient energy, then the
+          event is given an :math:`R_2` value of 1.)
         * :math:`n_{\\text{tracks}} \\geq 4`
 
         Tag side :math:`B` cuts:
@@ -475,7 +482,9 @@ def BplusSL(path):
         * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all
           neutral clusters with :math:`E>0.1\\,\\text{GeV}`, and all
-          charged tracks with :math:`p_T>0.1\\,\\text{GeV}`)
+          charged tracks with :math:`p_T>0.1\\,\\text{GeV}`. If there
+          are no tracks or clusters of sufficient energy, then the
+          event is given an :math:`R_2` value of 1.)
         * :math:`n_{\\text{tracks}} \\geq 4`
 
         Tag side :math:`B` cuts:
@@ -545,7 +554,7 @@ def runFEIforB0SL(path):
                     checkForDuplicates=False,
                     path=path)
 
-    applyEventCuts('foxWolframR2<0.4 and nTracks>=4', path=path)
+    applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -600,7 +609,7 @@ def runFEIforBplusSL(path):
                     checkForDuplicates=False,
                     path=path)
 
-    applyEventCuts('foxWolframR2<0.4 and nTracks>=4', path=path)
+    applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -659,7 +668,7 @@ def runFEIforSLCombined(path):
                     checkForDuplicates=False,
                     path=path)
 
-    applyEventCuts('foxWolframR2<0.4 and nTracks>=4', path=path)
+    applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -720,7 +729,7 @@ def runFEIforSkimCombined(path):
                     checkForDuplicates=False,
                     path=path)
 
-    applyEventCuts('foxWolframR2<0.4 and nTracks>=4', path=path)
+    applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')

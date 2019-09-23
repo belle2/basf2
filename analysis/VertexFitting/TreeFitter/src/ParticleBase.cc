@@ -252,32 +252,27 @@ namespace TreeFitter {
 
   ErrCode ParticleBase::initCovariance(FitParams& fitparams) const
   {
+    // this is very sensitive and can heavily affect the efficency of the fit
     ErrCode status;
 
     const int posindex = posIndex();
     if (posindex >= 0) {
       for (int i = 0; i < 3; ++i) {
-        fitparams.getCovariance()(posindex + i, posindex + i) = 1000;
+        fitparams.getCovariance()(posindex + i, posindex + i) = 1.;
       }
     }
 
-    // momentum
     const int momindex = momIndex();
     if (momindex >= 0) {
-      const double initVal = 10;
       const int maxrow = hasEnergy() ? 4 : 3;
-
       for (int i = 0; i < maxrow; ++i) {
-        fitparams.getCovariance()(momindex + i, momindex + i) = initVal;
+        fitparams.getCovariance()(momindex + i, momindex + i) = 10.;
       }
     }
 
     const int tauindex = tauIndex();
-
     if (tauindex >= 0) {
-      // this is very sensitive and can heavily effect the
-      // efficency of the fits
-      fitparams.getCovariance()(tauindex, tauindex) = 1;
+      fitparams.getCovariance()(tauindex, tauindex) = 1.;
     }
     return status;
   }

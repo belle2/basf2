@@ -175,7 +175,7 @@ void MillepedeCollectorModule::prepare()
   emd.isRequired();
 
   StoreObjPtr<EventT0> eventT0;
-  eventT0.isRequired();
+  //eventT0.isRequired();
 
   if (m_tracks.empty() &&
       m_particles.empty() &&
@@ -260,7 +260,7 @@ void MillepedeCollectorModule::prepare()
     B2ERROR("Cannot set both, event list and timedep config.");
   }
 
-  Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
+//   Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
 
   AlignableCDCRecoHit::s_enableTrackT0LocalDerivative = m_fitTrackT0;
   AlignableCDCRecoHit::s_enableWireSaggingGlobalDerivative = m_enableWireSagging;
@@ -1000,6 +1000,7 @@ void MillepedeCollectorModule::closeRun()
 
 void MillepedeCollectorModule::finish()
 {
+  Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
 
   StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
   if (!fileMetaData.isValid()) {

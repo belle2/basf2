@@ -18,12 +18,9 @@
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <TTree.h>
-#include <TH1F.h>
 #include <map>
 
 #include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-
 
 namespace Belle2 {
   namespace Background {

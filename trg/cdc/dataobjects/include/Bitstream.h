@@ -49,7 +49,7 @@ namespace Belle2 {
     Bitstream() {};
 
     /** constructor from Signal Bus */
-    Bitstream(SignalBus bus)
+    explicit Bitstream(SignalBus bus) : m_signal(bus)
     {
       m_signal = bus;
     };

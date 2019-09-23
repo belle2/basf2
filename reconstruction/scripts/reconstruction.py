@@ -338,6 +338,14 @@ def add_cdst_output(
         'TRGECLUnpackerEvtStores',
         'BKLMHit2ds',
         'TRGGRLUnpackerStore',
+        'CDCTriggerSegmentHits',
+        'CDCTrigger2DFinderTracks',
+        'CDCTrigger2DFinderClones',
+        'CDCTriggerNNInputSegmentHits',
+        'CDCTriggerNNInput2DFinderTracks',
+        'CDCTriggerNeuroTracks',
+        'CDCTriggerNeuroTracksInput',
+        'TRGGDLUnpackerStores',
         'TracksToBKLMHit2ds',
         'RecoHitInformations',
         'RecoHitInformationsToBKLMHit2ds',
@@ -470,8 +478,8 @@ def add_klm_modules(path, components=None):
         path.add_module(eklm_rec)
         bklm_rec = register_module('BKLMReconstructor')
         path.add_module(bklm_rec)
-        klm_k0l_rec = register_module('KLMK0LReconstructor')
-        path.add_module(klm_k0l_rec)
+        klm_clusters_rec = register_module('KLMClustersReconstructor')
+        path.add_module(klm_clusters_rec)
 
 
 def add_klm_mc_matcher_module(path, components=None):

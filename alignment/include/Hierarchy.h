@@ -34,7 +34,7 @@ namespace Belle2 {
     /// A (null) constraint, vector of pairs of global label and its factor in the constraint
     typedef std::vector<std::pair<int, double>> Constraint;
     /// vector of constraints
-    typedef std::map<int, Constraint> Constraints;
+    typedef std::map<long, Constraint> Constraints;
 
     /// Class for alignment/calibration parameter hierarchy & constraints
     class GlobalDerivativesHierarchy {

@@ -12,12 +12,13 @@
 
 #include <framework/utilities/HTML.h>
 
+#include <TClass.h>
+#include <TClassRef.h>
 #include <TDataType.h>
 #include <TDataMember.h>
-#include <TClass.h>
-#include <TStreamerInfo.h>
-#include <TStreamerElement.h>
 #include <TROOT.h>
+#include <TStreamerElement.h>
+#include <TVirtualStreamerInfo.h>
 
 #include <string>
 

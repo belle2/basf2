@@ -6,6 +6,7 @@
 #include <display/EveGeometry.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <simulation/dataobjects/MCParticleTrajectory.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

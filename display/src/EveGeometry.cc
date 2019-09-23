@@ -10,7 +10,6 @@
 #include <TEveManager.h>
 #include <TEveGeoNode.h>
 #include <TEveGeoShapeExtract.h>
-#include <TEveScene.h>
 #include <TFile.h>
 
 #include <cassert>

@@ -13,15 +13,11 @@
 #include <framework/core/Module.h>
 #include <string>
 
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationVector.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventT0.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <genfit/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include "TTree.h"
 #include "TFile.h"
+#include "TVector3.h"
 
 namespace Belle2 {
 

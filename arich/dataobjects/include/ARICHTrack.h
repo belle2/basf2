@@ -12,7 +12,6 @@
 #define ARICHTRACK_H
 
 #include <tracking/dataobjects/ExtHit.h>
-#include <TObject.h>
 #include <arich/dataobjects/ARICHPhoton.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
 #include <vector>

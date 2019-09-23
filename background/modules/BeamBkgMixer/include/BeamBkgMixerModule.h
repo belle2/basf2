@@ -18,7 +18,6 @@
 #include <string>
 #include <map>
 
-#include "TFile.h"
 #include "TChain.h"
 #include "TClonesArray.h"
 

@@ -59,13 +59,13 @@ Study was done for different cut set for electrons and muons.
 Possible cuts for electron:
 0.01, 0.10, 0.50, 0.60, 0.80, 0.90
 
-Possible ctus for muons:
+Possible cuts for muons:
 0.10, 0.80, 0.90, 0.95, 0.97
 
 Sources of original Belle results are here:
 https://belle.kek.jp/group/pid_joint/lid/final/
 
-Here we add PID correction information that is imporatant for
+Here we add PID correction information that is important for
 electrons selected with "eIDBelle>0.9" cut.
 """
 lid_table = "BelleLIDe_0.90"
@@ -98,12 +98,12 @@ Kaon ID
 Several weight tables were produced for kaon/pion ID corrections at Belle.
 Naming scheme for payloads is:
 
-BelleKID<K|Pi><Eff|Fake><Combined|Plus|Munis>_<PID cut:[1..9]>
+BelleKID<K|Pi><Eff|Fake><Combined|Plus|Minus>_<PID cut:[1..9]>
 
 Here,
-  - K or Pi reffers for correction information obtained for kaons or pions, accordingly
-  - Eff or Fake reffers for efficiency or fake rate corrections
-  - Combined, Plus or Minus reffers the charge of tracks used for the study
+  - K or Pi refers to correction information obtained for kaons or pions, accordingly
+  - Eff or Fake refers to efficiency or fake rate corrections
+  - Combined, Plus or Minus refers to the charge of tracks used for the study
   - PID cut is an integer number from 1 to 9 that correspond to "cut > 0.number"
 
 Information is taken from here:
@@ -154,7 +154,7 @@ Naming scheme for payloads is:
 BellePID<Plus|Minus>_<PID cut>
 
 Here,
-  - Plus or Minus reffers the charge of tracks used for the study
+  - Plus or Minus refers to the charge of tracks used for the study
   - PID cut can be 0.6, 0.7, 0.8 or 0.9
 
 Information is taken from here:

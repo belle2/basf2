@@ -11,7 +11,6 @@
 
 #include <framework/core/FrameworkExceptions.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
-#include <boost/tokenizer.hpp>
 
 #include <string>
 #include <fstream>
@@ -19,7 +18,7 @@
 #include <TLorentzRotation.h>
 
 #include "HepMC/GenEvent.h"
-#include "HepMC/IO_GenEvent.h"
+
 namespace Belle2 {
 
   /**

@@ -10,10 +10,7 @@
 
 #include <generators/modules/TouschekTURTLEInputModule.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
@@ -21,10 +18,6 @@
 #include <framework/utilities/FileSystem.h>
 
 #include <generators/touschek/TouschekReaderTURTLE.h>
-
-#include <TGeoManager.h>
-#include <TGeoVolume.h>
-#include <TGeoNode.h>
 
 #include <fstream>
 

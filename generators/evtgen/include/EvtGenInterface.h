@@ -13,19 +13,14 @@
 
 
 #include <EvtGen/EvtGen.hh>
-#include <EvtGenBase/EvtCPUtil.hh>
 #include <EvtGenBase/EvtParticle.hh>
-#include <EvtGenBase/EvtParticleFactory.hh>
-#include <EvtGenBase/EvtRandom.hh>
 #include <EvtGenBase/EvtVector4R.hh>
 #include <generators/evtgen/EvtGenFwRandEngine.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-#include <framework/logging/Logger.h>
 #include <framework/utilities/IOIntercept.h>
 
 #include <string>
-#include <fstream>
 
 namespace Belle2 {
 

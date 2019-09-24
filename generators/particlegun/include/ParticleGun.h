@@ -11,11 +11,9 @@
 #ifndef PARTICLEGUN_H
 #define PARTICLEGUN_H
 
-#include <framework/core/FrameworkExceptions.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <vector>
-#include <TRandom3.h>
 
 namespace Belle2 {
 

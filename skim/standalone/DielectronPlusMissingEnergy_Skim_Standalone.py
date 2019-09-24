@@ -14,7 +14,7 @@ import stdCharged as charged
 import skimExpertFunctions as skimExp
 
 b2.set_log_level(b2.LogLevel.INFO)
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 
 dielectron_path = b2.Path()
 

@@ -15,7 +15,7 @@ from stdPhotons import *
 from stdPi0s import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb_setuprel = 'release-03-02-00'
+gb_setuprel = 'release-04-00-00'
 
 import sys
 import os

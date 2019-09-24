@@ -2,7 +2,7 @@ import subprocess
 from skimExpertFunctions import get_test_file
 
 all_skims = [
-    "Dark", "Charm", "BtoCharmless", "BtoCharm", "CombinedSystematics", "EWP", "MiscCombined", "feiHadronic",
+    "Dark",  "BtoCharmless", "BtoCharm", "CombinedSystematics", "EWP", "MiscCombined", "feiHadronicCombined",
     "Semileptonic", "Quarkonium", "feiSLCombined"
 ]
 
@@ -19,7 +19,7 @@ for skim in all_skims:
         script = f"../combined/{skim}_Skim_Standalone.py"
         log_file = f"{skim}_{MCCampaign}_{MCType}.out"
         err_file = f"{skim}_{MCCampaign}_{MCType}.err"
-        output_file = f"combinedFiles/{skim}_{MCCampaign}_{MCType}.udst.root"
+        output_file = f"{skim}_{MCCampaign}_{MCType}.udst.root"
 
         print(f'Running {script} on {input_file} (MC type {MCCampaign}_{MCType}) to {output_file}')
         subprocess.run(["bsub", "-q", "l", "-oo", log_file, "-e", err_file, "basf2", script,

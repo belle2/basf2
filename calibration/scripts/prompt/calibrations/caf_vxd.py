@@ -1,23 +1,43 @@
 # -*- coding: utf-8 -*-
 
+"""VXD alignment with Millepede. uses a mixture of input data from raw magnet on/off cosmics and physics."""
 
-def get_calibrations(caf_config, input_data):
+from prompt import CalibrationSettings
+
+#: Tells the automated system some details of this script
+settings = CalibrationSettings(name="VXD Alignment",
+                               description=__doc__,
+                               input_data_formats=["raw"],
+                               input_data_names=["physics", "cosmics", "Bcosmics"])
+
+################################################
+# Required function called by b2caf-prompt-run #
+################################################
+
+
+def get_calibrations(input_data, **kwargs):
+
+    # Get your input data files separated into your input_data_names.
+    # You could also get each file's IoV from input_data["physics"].values()/items() if you wanted.
+    input_files_physics = list(input_data["physics"].keys())
+    input_files_cosmics = list(input_data["cosmics"].keys())
+    input_files_Bcosmics = list(input_data["Bcosmics"].keys())
+
+    # Get the overall IoV we want to cover, including the end values (probably -1,-1 for open ended)
+    overall_iov = kwargs.get("output_iov", None)
+
     import basf2
-    basf2.set_log_level(basf2.LogLevel.WARNING)
 
     import ROOT
     from ROOT import Belle2
     from ROOT.Belle2 import MillepedeAlgorithm
 
-    from caf.framework import Calibration, Collection, LocalDatabase, CentralDatabase
+    from caf.framework import Calibration, Collection
     from caf import strategies
 
     import rawdata as raw
     import reconstruction as reco
     import modularAnalysis as ana
-
-    db_chain = caf_config["database_chain"]
-    backend_args = caf_config["backend_args"]
 
     db_components = ['VXDAlignment']
     reco_components = None  # ['CDC', 'PXD', 'SVD']
@@ -55,7 +75,6 @@ def get_calibrations(caf_config, input_data):
         calibration.algorithms = millepede
 
         calibration.strategies = strategies.SingleIOV  # .SequentialRunByRun
-        Setup_Databases(calibration)
 
         return calibration
 
@@ -196,12 +215,6 @@ def get_calibrations(caf_config, input_data):
 
         return path
 
-    def Setup_Databases(object_to_call=None, reset=False):
-        database_chain = []
-        for tag in db_chain:
-            database_chain.append(CentralDatabase(tag))
-        return database_chain
-
     def Collection_Physics(files):
         path = Path_StdReco()
 
@@ -262,9 +275,7 @@ def get_calibrations(caf_config, input_data):
         collection = Collection(collector=collector,
                                 input_files=files,
                                 pre_collector_path=path,
-                                backend_args=backend_args,
-                                max_files_per_collector_job=1,
-                                database_chain=Setup_Databases())
+                                )
         return collection
 
     def Collection_Cosmics(files):
@@ -274,9 +285,7 @@ def get_calibrations(caf_config, input_data):
         collection = Collection(collector=collector,
                                 input_files=files,
                                 pre_collector_path=path,
-                                max_files_per_collector_job=1,
-                                backend_args=backend_args,
-                                database_chain=Setup_Databases())
+                                )
         return collection
 
     def Collection_BCosmics(files):
@@ -286,9 +295,7 @@ def get_calibrations(caf_config, input_data):
         collection = Collection(collector=collector,
                                 input_files=files,
                                 pre_collector_path=path,
-                                max_files_per_collector_job=1,
-                                backend_args=backend_args,
-                                database_chain=Setup_Databases())
+                                )
         return collection
 
     def Collector_Millepede(**argk):
@@ -311,17 +318,14 @@ def get_calibrations(caf_config, input_data):
 
         return collector
 
-    input_files_physics = list(input_data["physics"].keys())[:10]
-    input_files_cosmics = list(input_data["cosmics"].keys())[:10]
-    input_files_Bcosmics = list(input_data["Bcosmics"].keys())[:10]
-
-#    print("Physics Files")
-#    print(input_files_physics)
-#    print("Cosmics Files")
-#    print(input_files_cosmics)
-#    print("B_Cosmics Files")
-#    print(input_files_Bcosmics)
-
     mp2_full = MillepedeAligmentVXD(input_files_physics, input_files_cosmics, input_files_Bcosmics)
+
+    # Most values like database chain and backend args are overwritten by b2caf-prompt-run. But some can be set.
     mp2_full.max_iterations = 3
+
+    # Force the output payload IoV to be correct.
+    # It may be different if you are using another strategy like SequentialRunByRun so we ask you to set this up correctly.
+    for algorithm in mp2_full.algorithms:
+        algorithm.params = {"apply_iov": overall_iov}
+
     return [mp2_full]

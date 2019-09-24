@@ -1,8 +1,46 @@
 # -*- coding: utf-8 -*-
-#
-# CDC calibration (tz0)
-#
 
+"""CDC tracking calibration. Performs the T0 determination using HLT skimmed raw data."""
+
+from prompt import CalibrationSettings
+
+#: Tells the automated system some details of this script
+settings = CalibrationSettings(name="CDC Tracking",
+                               description=__doc__,
+                               input_data_formats=["raw"],
+                               input_data_names=["hlt_mumu", "hlt_hadron"]
+                               )
+
+
+################################################
+# Required function called by b2caf-prompt-run #
+################################################
+
+def get_calibrations(input_data, **kwargs):
+    # Gets the input files, but not the IoV objects of those files, which are also passed in.
+    input_file_dict = {"hlt_mumu": list(input_data["hlt_mumu"].keys()),
+                       "hlt_hadron": list(input_data["hlt_hadron"].keys()),
+                       }
+
+    # Get the overall IoV we want to cover, including the end values (probably -1,-1 for open ended)
+    overall_iov = kwargs.get("output_iov", None)
+
+    # t0
+    cal0 = CDCCalibration(name='tz0',
+                          algorithms=[tz_algo()],
+                          input_file_dict=input_file_dict,
+                          max_iterations=1,
+                          )
+
+    # Force the output payload IoV to be correct.
+    # It may be different if you are using another strategy like SequentialRunByRun
+    for algorithm in cal0.algorithms:
+        algorithm.params = {"apply_iov": overall_iov}
+
+    return [cal0, ]
+
+
+#################################################
 
 def pre_collector(max_events=None):
     """
@@ -93,8 +131,6 @@ class CDCCalibration(Calibration):
                  name,
                  algorithms,
                  input_file_dict,
-                 queue,
-                 database_chain,
                  max_iterations=5,
                  dependencies=None):
         for algo in algorithms:
@@ -111,42 +147,12 @@ class CDCCalibration(Calibration):
             collection = Collection(collector=collector(),
                                     input_files=file_list,
                                     pre_collector_path=pre_collector(max_events=max_events),
-                                    max_files_per_collector_job=1,
-                                    database_chain=database_chain,
-                                    backend_args={'queue', queue}
                                     )
             collection.backend_args = {'queue': queue}
             self.add_collection(name=skim_type, collection=collection)
 
         self.max_iterations = max_iterations
-        self.database_chain = database_chain
 
         if dependencies is not None:
             for dep in dependencies:
                 self.depends_on(dep)
-
-
-#######################################
-# The Magic function called by b2cal  #
-#######################################
-
-def get_calibrations(caf_config, input_data):
-    from caf.utils import CentralDatabase
-
-    database_chain = [CentralDatabase(tag) for tag in caf_config["database_chain"]]
-    backend_args = caf_config["backend_args"]
-
-    input_file_dict = {"hlt_mumu": list(input_data["hlt_mumu"].keys())[:10],
-                       "hlt_hadron": list(input_data["hlt_hadron"].keys())[:10],
-                       }
-
-    # t0
-    cal0 = CDCCalibration(name='tz0',
-                          algorithms=[tz_algo()],
-                          input_file_dict=input_file_dict,
-                          max_iterations=1,
-                          database_chain=database_chain,
-                          queue=backend_args["queue"]
-                          )
-
-    return [cal0, ]

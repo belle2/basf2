@@ -20,10 +20,10 @@ def get_all_script_paths():
     return script_path.glob("*.py")
 
 
-def get_script_requirements(name):
+def get_script_settings(name):
     import importlib
     cal_module = importlib.import_module(prompt_script_package + name.rstrip(".py"))
-    return cal_module.requirements
+    return cal_module.settings
 
 
 def get_argparser():
@@ -41,23 +41,46 @@ def get_argparser():
                        )
     parser.set_defaults(json=False)
 
+    parser.add_argument("--check", dest="check", action="store_true",
+                        help="A check will be made to see if there are duplicate CalibrationSettings 'name' values. "
+                             "Script will exit early and with return code=1 if there are."
+                       )
+    parser.set_defaults(check=False)
+
     return parser
 
 
 def main():
     parser = get_argparser()
     args = parser.parse_args()
+    if args.check:
+        all_script_paths = [p.name for p in get_all_script_paths()]
+        calibration_names = [get_script_settings(script_path).name for script_path in all_script_paths]
+        if len(calibration_names) != len(set(calibration_names)):
+            B2WARNING("Duplicate calibration name(s) found in settings!!!")
+            from collections import Counter
+            c = Counter(calibration_names)
+            for name, count in c.items():
+                if count > 1:
+                    print(f"{name} was used {count} times in the prompt scripts.")
+            return 1
+
     if not args.script_name:
-        print("All available prompt calibration scripts (for usage in b2caf-prompt-run input config file):")
-        for script_path in get_all_script_paths():
-            print(script_path.name)
-    else:
-        requirements = get_script_requirements(args.script_name)
+        all_script_paths = [p.name for p in get_all_script_paths()]
         if args.json:
-            print(requirements.json_dumps())
+            print(json.dumps(all_script_paths))
+        else:
+            print("All available prompt calibration scripts (for usage in b2caf-prompt-run input config file):")
+            for script_path in all_script_paths:
+                print(script_path)
+    else:
+        settings = get_script_settings(args.script_name)
+        if args.json:
+            print(settings.json_dumps())
         else:
             print(f"Details for {args.script_name}")
-            print(requirements)
+            print(settings)
+    return 0
 
 
 if __name__ == "__main__":

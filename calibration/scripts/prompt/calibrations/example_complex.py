@@ -1,17 +1,23 @@
 # -*- coding: utf-8 -*-
 
-from prompt import CalibrationRequirements
+"""A complicated example calibration that takes several input data lists from raw data and performs
+multiple calibrations."""
+
+from prompt import CalibrationSettings
 
 ##############################
 # REQUIRED VARIABLE #
 ##############################
 # Used to identify the keys in input_data that your get_calibrations function will need in order
-# to assign data correctly. Will be used to construct the input data in the automated system.
-# You can view the available input data formats from CalibrationRequirements.allowed_data_formats
+# to assign data correctly.
+# Will be used to construct the calibration in the automated system, as well as set up the submission web forms.
+# You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
-#: Tells the automated system some rough requirements of this script
-requirements = CalibrationRequirements(input_data_formats=["raw"],
-                                       input_data_names=["physics", "cosmics", "Bcosmics"])
+#: Tells the automated system some details of this script
+settings = CalibrationSettings(name="Example Complex",
+                               description=__doc__,
+                               input_data_formats=["raw"],
+                               input_data_names=["physics", "cosmics", "Bcosmics"])
 
 ##############################
 
@@ -78,17 +84,27 @@ def get_calibrations(input_data, **kwargs):
     # Reconstruction path setup
     # create the basf2 paths to run before each Collector module
 
+    # Let's specify that not all events will be used per file
+    # This assumes that we will be using the default max_files_per_collector_job=1 in b2caf-prompt-run!
+    max_events = 100
+    root_input = register_module('RootInput',
+                                 entrySequences=[f'0:{max_events}']
+                                 )
+
     rec_path_physics = create_path()
+    rec_path_physics.add_module(root_input)
     rec_path_physics.add_module('Gearbox')
     rec_path_physics.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'ARICH', 'BeamPipe', 'EKLM'])
     # could now add reconstruction modules dependent on the type on input data
 
     rec_path_cosmics = create_path()
+    rec_path_cosmics.add_module(root_input)
     rec_path_cosmics.add_module('Gearbox')
     rec_path_cosmics.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'CDC', 'BeamPipe', 'EKLM'])
     # could now add reconstruction modules dependent on the type on input data
 
     rec_path_Bcosmics = create_path()
+    rec_path_Bcosmics.add_module(root_input)
     rec_path_Bcosmics.add_module('Gearbox')
     rec_path_Bcosmics.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'CDC', 'BeamPipe', 'EKLM'])
     # could now add reconstruction modules dependent on the type on input data

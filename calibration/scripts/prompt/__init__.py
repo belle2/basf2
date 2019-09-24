@@ -5,11 +5,14 @@ prompt_script_package = "prompt.calibrations."
 prompt_script_dir = "calibration/scripts/prompt/calibrations"
 
 
-class CalibrationRequirements(namedtuple('CalReq_Factory', ['input_data_formats', 'input_data_names'])):
+class CalibrationSettings(namedtuple('CalSet_Factory', ['name', 'description', 'input_data_formats', 'input_data_names'])):
     """
     Simple class to hold and display required information for a prompt calibration script (process).
 
     Parameters:
+        name str: The unique calibration name, not longer than 64 characters.
+
+        description: Long form description of the calibration and what it does. Feel free to make this as long as you need.
 
         input_data_formats frozenset(str): The data formats {'raw', 'cdst', 'mdst', 'udst'} of the input files
             that should be used as input to the process. Used to figure out if this calibration should occurr
@@ -21,11 +24,13 @@ class CalibrationRequirements(namedtuple('CalReq_Factory', ['input_data_formats'
     """
     allowed_data_formats = frozenset({"raw", "cdst", "mdst", "udst"})
 
-    def __new__(cls, input_data_formats=None, input_data_names=None):
+    def __new__(cls, name, description, input_data_formats=None, input_data_names=None):
         """
         The special method to create the tuple instance. Returning the instance
         calls the __init__ method
         """
+        if len(name) > 64:
+            raise ValueError("name cannot be longer than 64 characters!")
         if not input_data_formats:
             raise ValueError("You must specify at least one input data format")
         input_data_formats = frozenset(map(lambda x: x.lower(), input_data_formats))
@@ -34,16 +39,19 @@ class CalibrationRequirements(namedtuple('CalReq_Factory', ['input_data_formats'
         if not input_data_names:
             raise ValueError("You must specify at least one input data name")
         input_data_names = frozenset(input_data_names)
-        return super().__new__(cls, input_data_formats, input_data_names)
+        return super().__new__(cls, name, description, input_data_formats, input_data_names)
 
     def json_dumps(self):
         """Return a valid JSON format string of the attributes"""
-        return json.dumps({"input_data_formats": list(self.input_data_formats),
-                           "input_data_names": list(self.input_data_names)
+        return json.dumps({"name": self.name,
+                           "input_data_formats": list(self.input_data_formats),
+                           "input_data_names": list(self.input_data_names),
+                           "description": self.description
                            })
 
     def __str__(self):
-        output_str = str(self.__class__.__name__) + ":\n"
+        output_str = str(self.__class__.__name__) + f"(name='{self.name}'):\n"
         output_str += f"  input_data_formats={list(self.input_data_formats)}\n"
-        output_str += f"  input_data_names={list(self.input_data_names)}"
+        output_str += f"  input_data_names={list(self.input_data_names)}\n"
+        output_str += f"  description='{self.description}'"
         return output_str

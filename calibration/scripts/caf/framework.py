@@ -1269,6 +1269,7 @@ class CAF():
                 # Apply defaults given to the `CAF` to the calibrations if they aren't set
                 calibration._apply_calibration_defaults(self.calibration_defaults)
                 calibration._db_path = self._db_path
+                calibration.output_database_dir = Path(self.output_dir, calibration.name, "outputdb").as_posix()
                 calibration.iov = iov
                 if not calibration.backend:
                     calibration.backend = self.backend

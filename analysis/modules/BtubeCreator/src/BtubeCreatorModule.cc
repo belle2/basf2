@@ -103,7 +103,7 @@ void BtubeCreatorModule::event()
     }
 
     int selectindex = 1;
-    if (daughtervec.at(0) == selParticles.at(0)) selectindex = 0 ;
+    if ((daughtervec.at(0))->getArrayIndex() == (selParticles.at(0))->getArrayIndex()) selectindex = 0 ;
 
     Particle* tubecreatorB = const_cast<Particle*>(particle->getDaughter(selectindex));
     Particle* otherB = const_cast<Particle*>(particle->getDaughter(1 - selectindex));

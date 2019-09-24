@@ -45,7 +45,7 @@ loadStdDiLeptons(True, path=skimpath)
 cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=skimpath)
 
 
-# Tau Skim
+# TauLFV Skim
 from skim.taupair import TauLFVList
 add_skim('TauLFV', TauLFVList(path=skimpath), path=skimpath)
 
@@ -58,7 +58,7 @@ add_skim('TCPV', TCPVList(path=skimpath), path=skimpath)
 from skim.taupair import TauList
 add_skim('TauGeneric', TauList(path=skimpath), path=skimpath)
 
-# Tau Generic
+# Tau Thrust
 from skim.taupair import *
 add_skim('TauThrust', TauThrustList(path=skimpath), path=skimpath)
 

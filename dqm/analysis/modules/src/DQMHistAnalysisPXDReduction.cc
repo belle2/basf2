@@ -9,8 +9,6 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisPXDReduction.h>
 #include <TROOT.h>
-#include <TStyle.h>
-#include <TClass.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;

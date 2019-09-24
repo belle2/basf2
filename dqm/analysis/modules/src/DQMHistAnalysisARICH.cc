@@ -14,33 +14,14 @@
 //DQM
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
-// framework
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-// Dataobject classes
-#include <framework/database/DBObjPtr.h>
-//#include <framework/dbobjects/RunInfo.h>
-
-
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TF1.h>
-#include <TColor.h>
 #include <TCanvas.h>
 #include <TLine.h>
 #include <TClass.h>
-#include <TStyle.h>
-#include <TFile.h>
-#include <TDirectory.h>
-#include <TImage.h>
-#include <TPad.h>
+#include <TROOT.h>
 
-#include <sstream>
 #include <fstream>
-#include <math.h>
-#include <algorithm>
 
 using namespace std;
 using namespace Belle2;

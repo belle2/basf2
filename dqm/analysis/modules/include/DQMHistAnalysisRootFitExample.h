@@ -14,11 +14,8 @@
 #include "cadef.h"
 #endif
 
-#include <framework/core/Module.h>
-
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
-#include <TF1.h>
 #include <TCanvas.h>
 #include <RooWorkspace.h>
 #include <RooDataHist.h>

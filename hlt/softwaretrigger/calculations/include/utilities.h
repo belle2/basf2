@@ -12,7 +12,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <analysis/utility/PCmsLabTransform.h>

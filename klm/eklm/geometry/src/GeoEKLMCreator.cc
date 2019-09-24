@@ -14,19 +14,17 @@
 #include <string>
 
 /* External headers. */
-#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Polyhedra.hh>
 #include <G4PVPlacement.hh>
-#include <G4Transform3D.hh>
-#include <G4ReflectedSolid.hh>
+#include <G4UnionSolid.hh>
 
 /* Belle2 headers. */
 #include <klm/eklm/geometry/G4TriangularPrism.h>
 #include <klm/eklm/geometry/GeoEKLMCreator.h>
 #include <klm/eklm/simulation/EKLMSensitiveDetector.h>
-#include <framework/gearbox/Unit.h>
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
 #include <geometry/utilities.h>

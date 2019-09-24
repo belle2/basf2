@@ -11,14 +11,10 @@
 /* C++ headers. */
 #include <algorithm>
 
-/* External headers. */
-#include <TDatabasePDG.h>
-
 /* Belle2 headers. */
 #include <klm/bklm/dbobjects/BKLMGeometryPar.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Const.h>
 #include <klm/modules/KLMClustersReconstructor/KLMClustersReconstructorModule.h>
+#include <klm/modules/KLMClustersReconstructor/KLMHit2d.h>
 
 using namespace Belle2;
 

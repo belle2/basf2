@@ -13,7 +13,6 @@
 
 /* Belle2 headers. */
 #include <klm/eklm/modules/EKLMDataChecker/EKLMDataCheckerModule.h>
-#include <framework/gearbox/Const.h>
 
 using namespace Belle2;
 

@@ -11,8 +11,6 @@
 #pragma once
 
 #include <TObject.h>
-#include <string>
-#include <cmath>
 
 namespace Belle2 {
 

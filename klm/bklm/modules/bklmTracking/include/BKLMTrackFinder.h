@@ -12,7 +12,6 @@
 
 #include <list>
 
-#include <klm/bklm/dataobjects/BKLMStatus.h>
 #include "klm/bklm/dataobjects/BKLMHit2d.h"
 #include "klm/bklm/modules/bklmTracking/BKLMTrackFitter.h"
 

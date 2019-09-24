@@ -43,6 +43,10 @@ stdPi('all', path=charmpath)
 stdK('all', path=charmpath)
 stdE('all', path=charmpath)
 stdMu('all', path=charmpath)
+stdPi('95eff', path=charmpath)
+stdK('95eff', path=charmpath)
+stdE('95eff', path=charmpath)
+stdMu('95eff', path=charmpath)
 stdKshorts(path=charmpath)
 mergedKshorts(path=charmpath)
 
@@ -66,19 +70,12 @@ add_skim("DstToD0Pi_D0ToKsOmega", DstList, path=charmpath)
 from skim.charm import DstToD0Neutrals
 add_skim("DstToD0Pi_D0ToNeutrals", DstToD0Neutrals(charmpath), path=charmpath)
 
-from skim.charm import D0ToNeutrals
-add_skim('XToD0_D0ToNeutrals', D0ToNeutrals(path=skimpath), path=skimpath)
-
 from skim.charm import CharmRare
 DstToD0Pi_D0ToRareList = CharmRare(charmpath)
 add_skim("DstToD0Pi_D0ToRare", DstToD0Pi_D0ToRareList, path=charmpath)
 
-from skim.charm import DpToKsHp
-DpToKsHpList = DpToKsHp(charmpath)
-add_skim("XToDp_DpToKsHp", DpToKsHpList, path=charmpath)
-
 from skim.charm import CharmSemileptonic
-CSLList = CharmSemileptonic(cslpath)
+CSLList = CharmSemileptonic(charmpath)
 add_skim("DstToD0Pi_D0ToSemileptonic", CSLList, path=charmpath)
 
 setSkimLogging(path=charmpath)

@@ -56,14 +56,13 @@ from skim.charm import DstToD0PiD0ToHpJmPi0
 DstToD0PiD0ToHpJmPi0List = DstToD0PiD0ToHpJmPi0(charmpath)
 add_skim("DstToD0Pi_D0ToHpJmPi0", DstToD0PiD0ToHpJmPi0List, path=charmpath)
 
+from skim.charm import D0ToNeutrals
+add_skim('XToD0_D0ToNeutrals', D0ToNeutrals(path=charmpath), path=charmpath)
+
 
 from skim.charm import DstToD0PiD0ToHpHmPi0
 DstToD0PiD0ToHpHmPi0List = DstToD0PiD0ToHpHmPi0(path=charmpath)
 add_skim("DstToD0Pi_D0ToHpHmPi0", DstToD0PiD0ToHpHmPi0List, path=charmpath)
-
-from skim.charm import DstToD0PiD0ToKsOmega
-DstList = DstToD0PiD0ToKsOmega(charmpath)
-add_skim("DstToD0Pi_D0ToKsOmega", DstList, path=charmpath)
 
 from skim.charm import DpToKsHp
 DpToKsHpList = DpToKsHp(charmpath)

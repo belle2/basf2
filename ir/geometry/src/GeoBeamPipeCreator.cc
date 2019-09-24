@@ -14,11 +14,8 @@
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
 #include <geometry/utilities.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 #include <ir/simulation/SensitiveDetector.h>
-#include <simulation/background/BkgSensitiveDetector.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -27,11 +24,9 @@
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
-#include <G4AssemblyVolume.hh>
 
 //Shapes
 #include <G4Trd.hh>
-#include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Polycone.hh>
 #include <G4UnionSolid.hh>

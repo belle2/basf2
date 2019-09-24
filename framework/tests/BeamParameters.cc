@@ -1,8 +1,5 @@
 #include <framework/utilities/TestHelpers.h>
-#include <framework/logging/Logger.h>
 #include <framework/dbobjects/BeamParameters.h>
-#include <TRandom.h>
-#include <TMath.h>
 
 #include <gtest/gtest.h>
 

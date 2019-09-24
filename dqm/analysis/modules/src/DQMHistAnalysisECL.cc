@@ -18,6 +18,8 @@
 //THIS MODULE
 #include <dqm/analysis/modules/DQMHistAnalysisECL.h>
 
+#include <boost/format.hpp>
+
 using namespace Belle2;
 
 REG_MODULE(DQMHistAnalysisECL)

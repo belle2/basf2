@@ -13,9 +13,6 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include <numeric>
-#include <iomanip>
-
 namespace Belle2::Conditions {
   bool MetadataProvider::setTags(const std::vector<std::string>& tags)
   {

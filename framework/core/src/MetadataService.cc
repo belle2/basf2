@@ -12,14 +12,11 @@
 #include <framework/core/ProcessStatistics.h>
 #include <framework/core/Environment.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/Logger.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/utilities/FileSystem.h>
 #include <framework/utilities/Utils.h>
 #include <fstream>
-
-#include <iostream>
 
 using namespace Belle2;
 

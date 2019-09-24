@@ -4,10 +4,8 @@
 #include <framework/logging/Logger.h>
 
 #include <sys/time.h>
-#include <sys/types.h>
 #include <unistd.h>
 
-#include <cstdlib>
 #include <cstdio>
 #include <iomanip>
 #include <utility>

@@ -11,9 +11,10 @@
 #include <TROOT.h>
 #include <TClass.h>
 
+#include <boost/format.hpp>
+
 using namespace std;
 using namespace Belle2;
-
 
 using boost::format;
 

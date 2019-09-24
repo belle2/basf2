@@ -12,13 +12,13 @@
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/database/Downloader.h>
+#include <framework/utilities/Utils.h>
 #include <boost/python.hpp>
 #include <framework/core/PyObjConvUtils.h>
 #include <boost/algorithm/string.hpp>
 
 #include <set>
 #include <TPython.h>
-#include <TClass.h>
 
 // Current default globaltag when generating events.
 #define CURRENT_DEFAULT_TAG "master_2019-08-14"

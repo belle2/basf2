@@ -72,7 +72,7 @@ for skim in skims.split():
         partSkim = 'TauThrust TauGeneric TauLFV'
 
     if (skim == 'Dark'):
-        nSkims = 4
+        nSkims = 6
         partSkim = 'ALP3Gamma SinglePhotonDark LFVZpVisible DimuonPlusMissingEnergy'
         partSkim += ' ElectronMuonPlusMissingEnergy DielectronPlusMissingEnergy'
 

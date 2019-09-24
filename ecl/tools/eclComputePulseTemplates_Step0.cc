@@ -13,12 +13,9 @@
 #include<iostream>
 #include<fstream>
 #include<stdlib.h>
-#include<string>
 #include"TTree.h"
 #include"TString.h"
 #include"TFile.h"
-#include"TGraph.h"
-#include"TF1.h"
 #include <assert.h>
 
 using namespace std;

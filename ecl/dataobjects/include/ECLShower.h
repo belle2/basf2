@@ -15,7 +15,6 @@
 #define ECLSHOWER_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <framework/logging/Logger.h>
 #include <TVector3.h>
 #include <math.h>
 #include <TMatrixDSym.h>

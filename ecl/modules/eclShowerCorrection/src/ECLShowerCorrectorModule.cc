@@ -28,7 +28,6 @@
 #include <ecl/dbobjects/ECLShowerEnergyCorrectionTemporary.h>
 
 // MDST
-#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 using namespace Belle2;

@@ -15,7 +15,6 @@
 
 //Root
 #include <TObject.h>
-#include <TTree.h>
 
 namespace Belle2 {
 

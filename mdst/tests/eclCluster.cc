@@ -1,7 +1,4 @@
 #include <mdst/dataobjects/ECLCluster.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-#include <framework/datastore/StoreArray.h>
 #include <gtest/gtest.h>
 #include <cmath>
 #include <TMatrixD.h>

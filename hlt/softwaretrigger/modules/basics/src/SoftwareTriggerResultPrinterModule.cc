@@ -11,6 +11,7 @@
 #include <hlt/softwaretrigger/modules/basics/SoftwareTriggerResultPrinterModule.h>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <mdst/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <TFile.h>
 #include <TTree.h>

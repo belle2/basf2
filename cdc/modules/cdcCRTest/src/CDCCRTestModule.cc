@@ -12,7 +12,6 @@
 #include <TTree.h>
 #include <framework/gearbox/Const.h>
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -21,22 +20,18 @@
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackPoint.h>
-#include <genfit/KalmanFitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/MeasurementOnPlane.h>
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/StateOnPlane.h>
-#include <set>
-#include <boost/format.hpp>
 #include <boost/foreach.hpp>
 
 #include <cdc/translators/RealisticCDCGeometryTranslator.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include "TDirectory.h"
-#include "TMath.h"
 #include <Math/ProbFuncMathCore.h>
-#include "iostream"
 
 using namespace std;
 using namespace Belle2;

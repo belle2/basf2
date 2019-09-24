@@ -1180,6 +1180,7 @@ class CAF():
 
         # Get an ordered dictionary of the sort order but including all implicit dependencies.
         ordered_full_dependencies = all_dependencies(self.future_dependencies, order)
+
         # Return all the implicit+explicit past dependencies
         full_past_dependencies = past_from_future_dependencies(ordered_full_dependencies)
         # Correct each calibration's dependency list to reflect the implicit dependencies
@@ -1189,6 +1190,13 @@ class CAF():
             for dep in full_deps:
                 if dep not in explicit_deps:
                     calibration.dependencies.append(self.calibrations[dep])
+            # At this point the calibrations have their full dependencies but they aren't in topological
+            # sort order. Correct that here
+            ordered_dependency_list = []
+            for ordered_calibration_name in order:
+                if ordered_calibration_name in [dep.name for dep in calibration.dependencies]:
+                    ordered_dependency_list.append(self.calibrations[ordered_calibration_name])
+            calibration.dependencies = ordered_dependency_list
         order = ordered_full_dependencies
         # We should also patch in all of the implicit dependencies for the calibrations
         return order
@@ -1341,19 +1349,17 @@ class CAF():
         Returns:
             str: The absolute path of the new output_dir
         """
-        if os.path.isdir(self.output_dir):
+        p = Path(self.output_dir).resolve()
+        if p.is_dir():
             B2INFO('{0} output directory already exists. '
-                   'We will try to restart from the previous finishing state.'.format(self.output_dir))
-            abs_output_dir = os.path.join(os.getcwd(), self.output_dir)
-            return abs_output_dir
+                   'We will try to restart from the previous finishing state.'.format(p.as_posix()))
+            return p.as_posix()
         else:
-            os.mkdir(self.output_dir)
-            abs_output_dir = os.path.join(os.getcwd(), self.output_dir)
-            if os.path.exists(abs_output_dir):
-                return abs_output_dir
+            p.mkdir(parents=True)
+            if p.is_dir():
+                return p.as_posix()
             else:
-                B2ERROR("Attempted to create output_dir {0}, but it didn't work.".format(abs_output_dir))
-                sys.exit(1)
+                raise FileNotFoundError("Attempted to create output_dir {0}, but it didn't work.".format(p.as_posix()))
 
     def _make_database(self):
         """

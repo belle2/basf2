@@ -4,7 +4,7 @@
 """
 <header>
   <output>timeDistributions.root</output>
-  <contact>staric</contact>
+  <contact>marko.staric@ijs.si</contact>
   <description>Runs BG mixer and makes validation histograms</description>
 </header>
 """
@@ -56,6 +56,8 @@ class BGHistogrammer(Module):
             self.hist[i].GetListOfFunctions().Add(check)
             contact = TNamed('Contact', 'marko.staric@ijs.si')
             self.hist[i].GetListOfFunctions().Add(contact)
+            options = TNamed('MetaOptions', 'shifter')
+            self.hist[i].GetListOfFunctions().Add(options)
 
     def event(self):
         ''' Event processor: fill histograms '''

@@ -4,7 +4,6 @@
 
 #include <TTree.h>
 #include <TH1F.h>
-#include <TRandom.h>
 #include <TClonesArray.h>
 
 #include <alignment/dataobjects/MilleData.h>

@@ -13,11 +13,6 @@
 
 #include <simulation/dataobjects/SimHitBase.h>
 
-// ROOT
-#include <TObject.h>
-#include <TVector3.h>
-#include <vector>
-
 namespace Belle2 {
   /**
   * ClassPlumeHit - digitization simulated hit for the Microtpc detector.

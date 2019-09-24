@@ -12,16 +12,13 @@
 #pragma once
 
 #include <memory>
-#include <utility>
 
 #include <TDirectory.h>
-#include <TFile.h>
 #include <TRandom.h>
 
 #include <framework/core/HistoModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/Logger.h>
 
 #include <calibration/dataobjects/RunRange.h>
 #include <calibration/CalibObjManager.h>

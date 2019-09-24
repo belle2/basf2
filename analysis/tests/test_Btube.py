@@ -7,6 +7,7 @@ import stdCharged as stdc
 import sys
 import b2test_utils
 
+from basf2 import conditions
 from variables import variables
 from ROOT import Belle2
 from ROOT import TFile

@@ -49,7 +49,7 @@ namespace Belle2 {
       while (expNo.length() < 4) expNo.insert(0, "0");
       string runNo = to_string(expRun[0].second);
       while (runNo.length() < 5) runNo.insert(0, "0");
-      string outputFileName = "moduleT0-e" + expNo + "-r" + runNo + ".root";
+      string outputFileName = "moduleT0_rough-e" + expNo + "-r" + runNo + ".root";
       auto* file = TFile::Open(outputFileName.c_str(), "recreate");
 
       slotPairs->Write();

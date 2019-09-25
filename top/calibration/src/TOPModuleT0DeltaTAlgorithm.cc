@@ -16,6 +16,7 @@
 #include <TF1.h>
 #include <TH2F.h>
 #include <TMatrixDSym.h>
+#include <TDecompChol.h>
 #include <string>
 #include <vector>
 #include <sstream>
@@ -115,14 +116,14 @@ namespace Belle2 {
         }
       }
 
-      // invert the matrix and return if singular
+      // invert the matrix and return if not positive definite
 
-      double det = 0;
-      B.Invert(&det);
-      if (det == 0) {
+      TDecompChol C(B); // Choletski decomposition to check also for positive definitness
+      bool ok = C.Invert(B);
+      if (not ok) {
         file->Write();
         file->Close();
-        B2INFO("TOPModuleT0DeltaTAlgorithm: matrix is singular");
+        B2INFO("TOPModuleT0DeltaTAlgorithm: matrix is not positive definite");
         return c_NotEnoughData;
       }
 

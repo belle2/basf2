@@ -122,7 +122,8 @@ void SVDOccupancyCalibrationsCollectorModule::finish()
 void SVDOccupancyCalibrationsCollectorModule::closeRun()
 {
 
-  int nevents =  getObjectPtr<TH1F>("HNevents")->GetEntries(); //number of events processed in events
+  int nevents = m_hnevents->GetEntries(); //number of events processed in events
+  //getObjectPtr<TH1F>("HNevents")->GetEntries(); //number of events processed in events
 
   B2RESULT("number of events " << nevents);
 

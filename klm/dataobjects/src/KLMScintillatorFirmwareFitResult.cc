@@ -9,7 +9,6 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <framework/logging/Logger.h>
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 
 using namespace Belle2;

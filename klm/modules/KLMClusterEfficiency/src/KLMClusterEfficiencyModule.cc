@@ -8,9 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <set>
-
 /* External headers. */
 #include <TH2F.h>
 #include <TMarker.h>
@@ -20,7 +17,6 @@
 /* Belle2 headers. */
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
-#include <framework/datastore/RelationArray.h>
 #include <klm/modules/KLMClusterEfficiency/KLMClusterEfficiencyModule.h>
 
 using namespace Belle2;

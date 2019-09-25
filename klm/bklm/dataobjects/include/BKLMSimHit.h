@@ -12,7 +12,6 @@
 
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
-#include <framework/datastore/RelationsObject.h>
 #include <simulation/dataobjects/SimHitBase.h>
 
 //#define BKLM_INNER 1

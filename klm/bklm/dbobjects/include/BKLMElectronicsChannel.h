@@ -10,9 +10,6 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <map>
-
 /* External headers. */
 #include <TObject.h>
 

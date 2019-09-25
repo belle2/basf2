@@ -98,13 +98,18 @@ namespace {
     int id = 100000101;
 
     // Constraints are named by mother (here top) level parameters
-    EXPECT_TRUE(constraints.find(id) != constraints.end());
+    //EXPECT_TRUE(constraints.find(id) != constraints.end());
+    // WARNING: not the case anymore, constraints are key-indexed using their CRC checksum.
+    //TODO: extend the Constraints structure to hold this additional info to add it text files
 
     // Here each child parameter exactly corresponds to mother parameter
     // we have two childs, so there should be two entries in constraint coefficients
-    EXPECT_EQ(constraints[id].size(), 2);
-    // ... and the coefficients should be just ones
-    EXPECT_EQ(fabs(constraints[id][0].second), 1.);
+    for (auto checksum_constraint : constraints) {
+      auto& constraint = checksum_constraint.second;
+      EXPECT_EQ(constraint.size(), 2);
+      // ... and the coefficients should be just ones
+      EXPECT_EQ(fabs(constraint[0].second), 1.);
+    }
 
     //HierarchyManager::getInstance().writeConstraints("constraints.txt");
 

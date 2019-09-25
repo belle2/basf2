@@ -3,34 +3,23 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Yinghui GUAN, VIPIN GAUR, Z. S. Stottler                 *
+ * Contributors: Yinghui Guan, Vipin GAUR, Z. S. Stottler,                *
+ *               Giacomo De Pietro                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 
-// ROOT include
-#include <TObject.h>
-
-#include <stdio.h>
-#include <string>
-#include <vector>
-#include <map>
-#include <fstream>
-#include <iostream>
-
 #include <klm/bklm/dbobjects/BKLMADCThreshold.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
-#include <framework/database/DBImportObjPtr.h>
+#include <klm/bklm/dbobjects/BKLMElectronicsChannel.h>
+#include <klm/bklm/dbobjects/BKLMTimeWindow.h>
 
 namespace Belle2 {
 
-//! BKLM database importer.
-
-  /*!
+  /**
    This module writes BKLM data to database
-  */
+   */
   class BKLMDatabaseImporter {
   public:
 
@@ -45,15 +34,20 @@ namespace Belle2 {
     virtual ~BKLMDatabaseImporter() {};
 
     /**
+     * Set interval of validity.
+     */
+    void setIOV(int experimentLow, int runLow, int experimentHigh, int runHigh);
+
+    /**
      * Load default electronics mapping.
      */
-    void loadDefaultBklmElectronicMapping();
+    void loadDefaultElectronicMapping();
 
     /**
      * Set non-default lane.
      * @param[in] section Section.
      * @param[in] sector  Sector.
-     * @param[in] leyar   Layer.
+     * @param[in] layer   Layer.
      * @param[in] lane    Lane.
      */
     void setElectronicMappingLane(
@@ -62,63 +56,56 @@ namespace Belle2 {
     /**
      * Import BKLM electronics mapping in the database.
      */
-    void importBklmElectronicMapping();
+    void importElectronicMapping();
 
-    //! Import BKLM geometry parameters into the database
-    void importBklmGeometryPar();
+    /**
+     * Import BKLM geometry parameters into the database
+     */
+    void importGeometryPar();
 
-    //! Export BKLM geometry parameters from the database
-    void exportBklmGeometryPar();
+    /**
+     * Import BKLM simulation parameters into the database
+     */
+    void importSimulationPar();
 
-    //! Import BKLM simulation parameters into the database
-    void importBklmSimulationPar(int expStart, int runStart, int expStop, int runStop);
+    /**
+     * Import BKLM Alignment parameters into the database
+     */
+    void importAlignment();
 
-    //! Export BKLM simulation parameters from the database
-    void exportBklmSimulationPar();
+    /**
+     * Import BKLM displaced-geometry parameters into the database
+     */
+    void importDisplacement();
 
-    //! Import BKLM Misalignment parameters into the database
-    void importBklmMisAlignment();
+    /**
+     * Import BKLM scintillator ADC parameters into the database
+     */
+    void importADCThreshold(BKLMADCThreshold* inputThreshold);
 
-    //! Export BKLM Misalignment parameters from the database
-    void exportBklmMisAlignment();
-
-    //! Import BKLM Alignment parameters into the database
-    void importBklmAlignment();
-
-    //! Export BKLM Alignment parameters from the database
-    void exportBklmAlignment();
-
-    //! Import BKLM displaced-geometry parameters into the database
-    void importBklmDisplacement();
-
-    //! Export BKLM displaced-geometry parameters from the database
-    void exportBklmDisplacement();
-
-    //! Import BKLM scintillator digitization parameters in database
-    void importBklmDigitizationParams();
-
-    //! Export BKLM scintillator digitization parameters from database
-    void exportBklmDigitizationParams();
-
-    //! Import BKLM scintillator ADC parameters in database
-    void importBklmADCThreshold(BKLMADCThreshold* threshold);
-
-    //! Export BKLM scintillator ADC parameters from database
-    void exportBklmADCThreshold();
-
-    //! Import BKLM time window cut
-    void importBklmTimeWindow();
-
-    //! Export BKLM time window cut
-    void exportBklmTimeWindow();
+    /**
+     * Import BKLM time window cuts into the database
+     */
+    void importTimeWindow(BKLMTimeWindow* inputWindow);
 
   private:
 
     /** Electronics mapping. */
     std::vector< std::pair<uint16_t, BKLMElectronicsChannel> > m_ElectronicsChannels;
 
-    /** Class version. */
-    ClassDef(BKLMDatabaseImporter, 1);
+    /** Low experiment. */
+    int m_ExperimentLow;
+
+    /** Low run. */
+    int m_RunLow;
+
+    /** High experiment. */
+    int m_ExperimentHigh;
+
+    /** High run. */
+    int m_RunHigh;
 
   };
+
 }
+

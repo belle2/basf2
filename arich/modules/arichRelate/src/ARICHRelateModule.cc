@@ -13,14 +13,10 @@
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-
 
 using namespace std;
 

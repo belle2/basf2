@@ -99,6 +99,7 @@ namespace Belle2 {
       for (const SVDCluster* vCluster : aSensor.clustersV) {
         //         if (vCluster->getClsTime() < minClusterTime)
         //           continue;
+        // cppcheck-suppress useStlAlgorithm
         foundCombinations.push_back({uCluster, vCluster});
 
       }

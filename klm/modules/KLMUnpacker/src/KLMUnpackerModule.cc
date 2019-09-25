@@ -13,10 +13,9 @@
 
 /* Belle2 headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/modules/KLMUnpacker/KLMUnpackerModule.h>
 #include <klm/rawdata/RawData.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -80,13 +79,18 @@ void KLMUnpackerModule::initialize()
 void KLMUnpackerModule::beginRun()
 {
   if (!m_eklmElectronicsMap.isValid())
-    B2FATAL("No EKLM electronics map.");
+    B2FATAL("EKLM electronics map is not available.");
   if (!m_TimeConversion.isValid())
     B2FATAL("EKLM time conversion parameters are not available.");
-  if (!m_Channels.isValid())
+  if (!m_eklmChannels.isValid())
     B2FATAL("EKLM channel data are not available.");
-  if (m_loadThresholdFromDB)
-    m_scintThreshold = m_ADCParams->getADCThreshold();
+  if (!m_bklmElectronicsMap.isValid())
+    B2FATAL("BKLM electronics map is not available.");
+  if (m_loadThresholdFromDB) {
+    if (!m_bklmADCParams.isValid())
+      B2FATAL("BKLM ADC threshold paramenters are not available.");
+    m_scintThreshold = m_bklmADCParams->getADCThreshold();
+  }
   m_triggerCTimeOfPreviousEvent = 0;
 }
 
@@ -161,7 +165,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
     int stripGlobal = m_ElementNumbers->stripNumber(
                         section, layer, sector, plane, strip);
     const EKLMChannelData* channelData =
-      m_Channels->getChannelData(stripGlobal);
+      m_eklmChannels->getChannelData(stripGlobal);
     if (channelData == nullptr)
       B2FATAL("Incomplete EKLM channel data.");
     if (raw.charge < channelData->getThreshold())

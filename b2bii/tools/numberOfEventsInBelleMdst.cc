@@ -19,7 +19,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <algorithm>
-
+#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -66,6 +66,12 @@ int main(int argc, char* argv[])
   BsInit(0);
   // delete existing FileIO
   BsClrTab(BBS_CLEAR_ALL);
+  // Check if file exists
+  if (!boost::filesystem::exists(filename)) {
+    std::cout << "Couldn't find file!" << std::endl;
+    return 1;
+  }
+
   // Open data file
   Belle::Panther_FileIO* fd = new Belle::Panther_FileIO(filename.c_str(), BBS_READ);
 

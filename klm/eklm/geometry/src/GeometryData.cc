@@ -13,7 +13,7 @@
 
 /* External headers. */
 #include <CLHEP/Geometry/Point3D.h>
-#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
 
 /* Belle2 headers. */
 #include <klm/eklm/geometry/Circle2D.h>

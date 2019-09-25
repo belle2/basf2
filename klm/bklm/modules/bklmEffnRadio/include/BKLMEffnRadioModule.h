@@ -15,18 +15,11 @@
 #include "TBox.h"
 #include "TCanvas.h"
 #include "TH2D.h"
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
 
-#include "CLHEP/Vector/ThreeVector.h"
-#include "CLHEP/Matrix/Matrix.h"
-
 #include <klm/bklm/geometry/Module.h>
-#include <iostream>
 #include <set>
-
 
 namespace Belle2 {
   namespace bklm {

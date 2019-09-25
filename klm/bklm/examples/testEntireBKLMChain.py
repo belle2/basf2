@@ -14,13 +14,10 @@
 
 import basf2
 import simulation as sim
-from ROOT import Belle2
 
-components = ['KLM']
 bklm_dataObjects = ['BKLMDigits',
                     'BKLMDigitOutOfRanges',
-                    'BKLMDigitRaws',
-                    'BKLMDigitEventInfos',
+                    'KLMDigitEventInfos',
                     'BKLMHit1ds',
                     'BKLMHit2ds',
                     'BKLMTracks']
@@ -32,7 +29,7 @@ main = basf2.create_path()
 # Set EventInfoSetter and add a progress bar
 main.add_module('EventInfoSetter',
                 expList=0,
-                runList=1,
+                runList=0,
                 evtNumList=1000)
 main.add_module('Progress')
 main.add_module('ProgressBar')
@@ -54,7 +51,7 @@ else:  # Use ParticleGun to generate 4GeV mu+ and mu-
 
 # Add simulation
 sim.add_simulation(path=main,
-                   components=components)
+                   components=['KLM'])
 
 # Pack and unpack data
 main.add_module('BKLMRawPacker')
@@ -65,18 +62,16 @@ main.add_module('BKLMDigitAnalyzer',
                 outputRootName='bklmHitmap')
 
 # Add the reconstruction
-reco = basf2.register_module('BKLMReconstructor')
-reco.param('Prompt window (ns)', 2000)
-main.add_module(reco)
+main.add_module('BKLMReconstructor')
 
 # Add the self-tracking
 main.add_module('BKLMTracking',
                 StudyEffiMode=True,
-                outputName='bklmEfficiency_test.root')
+                outputName='bklmEfficiency.root')
 
 # Save the dataobjects in a .root output
 main.add_module('RootOutput',
-                outputFileName='bklm_dataObjects_test.root',
+                outputFileName='bklm_dataObjects.root',
                 branchNames=bklm_dataObjects,
                 branchNamesPersistent='FileMetaData')
 

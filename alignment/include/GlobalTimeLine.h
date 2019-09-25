@@ -172,7 +172,10 @@ namespace Belle2 {
         /// about its validity in time intervals -> all payloads are updated until the end of validity of this
         /// parameter
         /// @param correction the value to be added to the given constant
-        void updateGlobalParam(GlobalLabel label, double correction);
+        /// @param resetParam if True, the parameters is not updated with correction, but set to 'correction' value
+        /// This has special use-case when filling the objects with errors/corrections data instead of absolute
+        /// parameter values
+        void updateGlobalParam(GlobalLabel label, double correction, bool resetParam = false);
 
         /// Release all the objects (you become the owner!) for DB storage
         /// @return vector of pairs. First is the IoV to store this in DB. Second is the object (payload) itself.

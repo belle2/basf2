@@ -9,6 +9,7 @@
  **************************************************************************/
 
 /* External headers. */
+#include <TFile.h>
 #include <TH1.h>
 #include <TTree.h>
 

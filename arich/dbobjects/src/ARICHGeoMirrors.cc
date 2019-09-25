@@ -9,10 +9,8 @@
  **************************************************************************/
 
 #include <arich/dbobjects/ARICHGeoMirrors.h>
-#include <framework/gearbox/Unit.h>
 #include <math.h>
 #include <iostream>
-#include <TVector2.h>
 #include <iomanip>
 
 using namespace std;

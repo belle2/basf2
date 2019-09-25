@@ -86,6 +86,7 @@ void SVDNNShapeReconstructorModule::initialize()
   storeShaperDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
+  m_storeSVDEvtInfo.isRequired();
 
   if (!m_storeSVDEvtInfo.isOptional(m_svdEventInfoName)) m_svdEventInfoName = "SVDEventInfoSim";
   m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);

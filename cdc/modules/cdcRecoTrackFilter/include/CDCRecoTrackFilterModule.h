@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <string>
 
 namespace Belle2 {

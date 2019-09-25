@@ -186,6 +186,7 @@ template <class FilterType> SectorGraph<FilterType> RawSecMapMergerModule::build
 
   // creating main graph containing all subgraphs:
   vector<string> filterNames;
+  // cppcheck-suppress useStlAlgorithm
   for (auto& entry : filterBranches) { filterNames.push_back(entry.name); }
   SectorGraph<FilterType> mainGraph(filterNames);
 

@@ -13,7 +13,6 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 
-#include <utility>
 #include <iostream>
 
 using namespace std;

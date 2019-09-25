@@ -10,13 +10,8 @@
 
 #pragma once
 
-#include <map>
-
-#include "CLHEP/Vector/ThreeVector.h"
-
 #include <TObject.h>
 #include <string>
-#include <cmath>
 #include <vector>
 
 static const int NLAYER = 15;
@@ -52,12 +47,6 @@ namespace Belle2 {
 
     //! Get geometry parameters from Gearbox
     void read(const GearDir&);
-
-    //! Get BKLM-geometry version
-    int getVersion() const { return m_version; }
-
-    //! Set BKLM geometry version
-    void setVersion(int version) { m_version = version; }
 
     //! Get the beam background study flag
     bool doBeamBackgroundStudy(void) const { return m_DoBeamBackgroundStudy; }
@@ -606,9 +595,6 @@ namespace Belle2 {
 
   private:
 
-    //! Geometry version
-    int m_version;
-
     //! Flag for enabling beam background study (=alternate sensitive-detector function)
     bool m_DoBeamBackgroundStudy;
 
@@ -913,7 +899,8 @@ namespace Belle2 {
     //! Optional comment
     std::string m_comment;
 
-    ClassDef(BKLMGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
+    /** Class version. */
+    ClassDef(BKLMGeometryPar, 6);
 
   };
 } // end of namespace Belle2

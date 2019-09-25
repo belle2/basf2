@@ -13,7 +13,6 @@
 /* Belle2 headers. */
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <klm/eklm/dataobjects/EKLMSimHit.h>
-#include <klm/eklm/dbobjects/EKLMGeometry.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <framework/datastore/StoreArray.h>
 

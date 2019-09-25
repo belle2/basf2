@@ -33,10 +33,6 @@ namespace Belle2 {
 
   namespace bklm {
 
-    class GeometryPar;
-    class Sector;
-    class Module;
-
     //!   This class creates the BKLM geometry of the Belle II detector
 
     class GeoBKLMCreator : public geometry::CreatorBase {

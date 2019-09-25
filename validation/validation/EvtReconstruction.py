@@ -6,7 +6,7 @@
   <input>EvtGenSim.root</input>
   <output>EvtRec.root,EvtRec_mdst.root</output>
   <cacheable/>
-  <contact>tkuhr</contact>
+  <contact>Software team b2soft@mail.desy.de</contact>
   <description>
     This steering file runs the standard reconstruction on an input file with
     generic BBbar events.
@@ -49,14 +49,14 @@ print(statistics)
 
 statistics_plots(
     'EvtRec_statistics.root',
-    contact='tkuhr',
+    contact='Software team b2soft@mail.desy.de',
     job_desc='a standard reconstruction job with generic EvtGen events',
     prefix='EvtRec'
 )
 event_timing_plot(
     '../EvtRec.root',
     'EvtRec_statistics.root',
-    contact='tkuhr',
+    contact='Software team b2soft@mail.desy.de',
     job_desc='a standard reconstruction job with generic EvtGen events',
     prefix='EvtRec'
 )

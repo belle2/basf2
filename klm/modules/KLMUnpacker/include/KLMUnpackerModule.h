@@ -22,7 +22,6 @@
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/eklm/dbobjects/EKLMChannels.h>
 #include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
-#include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -166,7 +165,7 @@ namespace Belle2 {
     DBObjPtr<EKLMElectronicsMap> m_eklmElectronicsMap;
 
     /** Channels. */
-    DBObjPtr<EKLMChannels> m_Channels;
+    DBObjPtr<EKLMChannels> m_eklmChannels;
 
     /** EKLM digits. */
     StoreArray<EKLMDigit> m_eklmDigits;
@@ -177,7 +176,7 @@ namespace Belle2 {
     DBObjPtr<BKLMElectronicsMap> m_bklmElectronicsMap;
 
     /** ADC offset and threshold read from database. */
-    DBObjPtr<BKLMADCThreshold> m_ADCParams;
+    DBObjPtr<BKLMADCThreshold> m_bklmADCParams;
 
     /** BKLM digits. */
     StoreArray<BKLMDigit> m_bklmDigits;

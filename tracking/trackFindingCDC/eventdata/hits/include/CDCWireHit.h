@@ -89,9 +89,9 @@ namespace Belle2 {
        *
        *  @param  ptrHit          Reference to the CDCHit.
        */
-      CDCWireHit(const CDCHit* ptrHit,
-                 CDC::TDCCountTranslatorBase* ptrTDCCountTranslator = nullptr,
-                 CDC::ADCCountTranslatorBase* ptrADCCountTranslator = nullptr);
+      explicit CDCWireHit(const CDCHit* ptrHit,
+                          CDC::TDCCountTranslatorBase* ptrTDCCountTranslator = nullptr,
+                          CDC::ADCCountTranslatorBase* ptrADCCountTranslator = nullptr);
 
       /// Constructor that takes a wire ID and a driftlength at the reference. For testing only!
       CDCWireHit(const WireID& wireID,

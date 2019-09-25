@@ -10,7 +10,6 @@
 
 /* Belle2 headers. */
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <klm/eklm/modules/EKLMTrackEff/EKLMTrackEffModule.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
@@ -20,17 +19,17 @@
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+/* ROOT headers. */
+#include <TGraphErrors.h>
+
 /* CLHEP headers. */
-#include <CLHEP/Vector/LorentzVector.h>
-#include <CLHEP/Geometry/Point3D.h>
+#include <CLHEP/Units/SystemOfUnits.h>
 
 /* C++ headers. */
 #include <vector>
 #include <map>
-#include <iostream>
 #include <string>
 #include <cmath>
-#include <fstream>
 #include <tuple>
 
 using namespace Belle2;

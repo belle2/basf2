@@ -17,23 +17,13 @@
 #include <cdc/dbobjects/CDCChannelMap.h>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 // framework - Database
-#include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBImportArray.h>
 
-
-#include <sstream>
 #include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <cstring>
 
 using namespace std;
 using namespace Belle2;
@@ -313,6 +303,11 @@ void CDCUnpackerModule::event()
                 CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId);
                 secondHit->setOtherHitIndices(firstHit);
                 secondHit->set2ndHitFlag();
+              }
+              if (m_enableStoreCDCRawHit == true) {
+                for (int iSample = 0; iSample < nSamples; ++iSample) {
+                  cdcHits[cdcHits.getEntries() - 1]->addRelationTo(cdcRawHitWFs[cdcRawHitWFs.getEntries() - 1 + iSample - (nSamples - 1) ]);
+                }
               }
             }
 

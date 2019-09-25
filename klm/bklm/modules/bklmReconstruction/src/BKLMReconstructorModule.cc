@@ -10,8 +10,6 @@
 
 #include <klm/bklm/modules/bklmReconstruction/BKLMReconstructorModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
@@ -20,7 +18,6 @@
 #include <klm/bklm/dataobjects/BKLMStatus.h>
 
 #include "CLHEP/Vector/ThreeVector.h"
-#include "CLHEP/Matrix/Matrix.h"
 
 using namespace std;
 using namespace Belle2;
@@ -80,9 +77,9 @@ void BKLMReconstructorModule::initialize()
 
 void BKLMReconstructorModule::beginRun()
 {
-  StoreObjPtr<EventMetaData> evtMetaData;
-
   if (m_loadTimingFromDB) {
+    if (!m_timing.isValid())
+      B2FATAL("BKLM time window data are not available.");
     m_DtMax = m_timing->getCoincidenceWindow();
     m_PromptTime = m_timing->getPromptTime();
     m_PromptWindow = m_timing->getPromptWindow();

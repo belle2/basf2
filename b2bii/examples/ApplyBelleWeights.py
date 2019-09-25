@@ -22,6 +22,7 @@ import os
 from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase
 
 # Usual b2bii magic
+os.environ['PGUSER'] = 'g0db'
 os.environ['BELLE_POSTGRES_SERVER'] = 'can01'
 os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 
@@ -29,12 +30,10 @@ my_path = b2.create_path()
 setupB2BIIDatabase(True)
 
 # Adding database with weight tables
-b2.use_local_database('weightdb/database.txt',
-                      directory="/group/belle2/users/ikomarov/weightdb/",
-                      readonly=True)
+b2.use_central_database("BellePID")
 
 # More b2bii magic
-input_file = "/home/belle/zupanc/public/B2BII/mdst/evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst"
+input_file = "b2bii_input_evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst"
 convertBelleMdstToBelleIIMdst(input_file, path=my_path)
 ma.loadGearbox(path=my_path)
 

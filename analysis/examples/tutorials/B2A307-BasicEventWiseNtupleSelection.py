@@ -48,9 +48,33 @@ ma.inputMdstList(environmentType='default',
                            b2.find_file('ccbar_background.root', 'examples', False)],
                  path=my_path)
 
+# We want to apply cut on event shape. For this, we are createing events shape object
+# First, create a list of all the good tracks (using the pion mass hypothesys)
+# and good gammas with very minimal cuts
+ma.fillParticleList(decayString='pi+:all',
+                    cut='pt> 0.1',
+                    path=my_path)
+ma.fillParticleList(decayString='gamma:all',
+                    cut='E > 0.1',
+                    path=my_path)
+
+# Second, create event shape
+ma.buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+                   allMoments=True,
+                   foxWolfram=True,
+                   harmonicMoments=True,
+                   cleoCones=True,
+                   thrust=True,
+                   collisionAxis=True,
+                   jets=True,
+                   sphericity=True,
+                   checkForDuplicates=False,
+                   path=my_path)
+
 # Apply a selection at the event level, to avoid
 # processing useless events
-ma.applyEventCuts(cut='R2EventLevel < 0.3', path=my_path)
+ma.applyEventCuts(cut='foxWolframR2 < 0.3', path=my_path)
+
 
 # The following lines cut&pasted from A304
 
@@ -66,6 +90,7 @@ stdc.stdMu(listtype='loose', path=my_path)
 
 # creates "pi0:looseFit" ParticleList
 stdPi0s(listtype='looseFit', path=my_path)
+
 
 # 1. reconstruct D0 in multiple decay modes
 ma.reconstructDecay(decayString='D0:ch1 -> K-:loose pi+:loose',
@@ -121,7 +146,7 @@ ma.matchMCTruth(list_name='Upsilon(4S)', path=my_path)
 # 5. build rest of the event
 ma.buildRestOfEvent(target_list_name='Upsilon(4S)', path=my_path)
 
-d_vars = vc.mc_truth + vc.kinematics + vc.inv_mass + ['R2EventLevel']
+d_vars = vc.mc_truth + vc.kinematics + vc.inv_mass + ['foxWolframR2']
 mu_vars = vc.mc_truth
 
 b_vars = vc.mc_truth + \
@@ -131,7 +156,7 @@ b_vars = vc.mc_truth + \
     vu.create_aliases(list_of_variables=['decayModeID'],
                       wrapper='daughter(0,extraInfo(variable))',
                       prefix="D") + \
-    ['R2EventLevel']
+    ['foxWolframR2']
 
 u4s_vars = vc.mc_truth + \
     vc.roe_multiplicities + \

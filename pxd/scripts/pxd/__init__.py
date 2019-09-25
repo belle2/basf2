@@ -3,6 +3,7 @@
 
 from basf2 import *
 from ROOT import Belle2
+import math
 
 
 def add_pxd_unpacker(path):
@@ -138,6 +139,33 @@ def add_pxd_fullframe(path, min_ladders=(1, 1), max_ladders=(8, 12)):
 
 def add_pxd_fullframe_phase3_early(path):
     add_pxd_fullframe(path, min_ladders=(1, 4), max_ladders=(8, 5))
+
+
+def add_pxd_percentframe(path, min_ladders=(1, 1), max_ladders=(8, 12), fraction=0.1, random_position=False):
+    modules = []
+    for layer in [1, 2]:
+        min_ladder = min_ladders[layer - 1]
+        max_ladder = max_ladders[layer - 1]
+        for ladder in range(min_ladder, max_ladder + 1):
+            for sensor in [1, 2]:
+                modules.append((layer, ladder, sensor))
+
+    # Center ROI and make them a bit more realistic, enlarge in z ;-)
+    # Random position not supported yet -> need change in module code
+    s = math.sqrt(fraction)
+    MinU = max(0, 250/2*(1-0.5*s))
+    MaxU = 249-MinU
+    MinV = max(0, 768/2*(1-2.0*s))
+    MaxV = 767-MinV
+
+    for (layer, ladder, sensor) in modules:
+        path.add_module('ROIGenerator', ROIListName='ROIs', nROIs=1, TrigDivider=1,
+                        Layer=layer, Ladder=ladder, Sensor=sensor,
+                        MinU=MinU, MaxU=MaxU, MinV=MinV, MaxV=MaxV)
+
+
+def add_pxd_percentframe_phase3_early(path, fraction=0.1, random_position=False):
+    add_pxd_percentframe(path, min_ladders=(1, 4), max_ladders=(8, 5), fraction=fraction, random_position=random_position)
 
 
 def add_roi_payload_assembler(path, ignore_hlt_decision):

@@ -12,18 +12,14 @@
 #include <tracking/dbobjects/MuidParameters.h>
 #include <tracking/trackExtrapolateG4e/MuidPar.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/IntervalOfValidity.h>
-#include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBImportObjPtr.h>
 
 #include <string>
 #include <vector>
-#include <map>
 #include <fstream>
-#include <iostream>
 
 using namespace std;
 using namespace Belle2;

@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.dcl.h>
 #include <tracking/ckf/svd/filters/results/SVDResultVarSet.h>
-#include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 
 namespace Belle2 {
   /// Base filter for CKF SVD results (on overlap check)

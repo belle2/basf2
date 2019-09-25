@@ -11,7 +11,6 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/Track.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 

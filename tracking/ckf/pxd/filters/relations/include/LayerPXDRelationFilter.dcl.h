@@ -12,13 +12,6 @@
 #include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
 #include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 
-#include <tracking/trackFindingCDC/utilities/Relation.h>
-
-#include <tracking/trackFindingCDC/utilities/Range.h>
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
-
-#include <vxd/dataobjects/VxdID.h>
-
 namespace Belle2 {
   /// Base filter for CKF PXD states
   template <class AFilter>

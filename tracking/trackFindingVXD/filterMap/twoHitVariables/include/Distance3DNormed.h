@@ -11,7 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariable.h>
-#include <math.h>
+#include <cmath>
 
 #define DISTANCE3DNORMED_NAME Distance3DNormed
 namespace Belle2 {

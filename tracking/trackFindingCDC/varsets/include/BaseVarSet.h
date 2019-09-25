@@ -9,12 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
-
 #include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
 
 #include <tracking/trackFindingCDC/utilities/Named.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+
+#include <RtypesCore.h>
 
 #include <map>
 #include <vector>

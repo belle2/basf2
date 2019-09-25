@@ -13,17 +13,11 @@
 #include <tracking/ckf/general/findlets/StateCreator.icc.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.icc.h>
 #include <tracking/ckf/general/findlets/StateRejecter.icc.h>
-#include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
-#include <tracking/ckf/general/findlets/LimitedOnStateApplier.icc.h>
-#include <tracking/ckf/general/findlets/LayerToggledApplier.icc.h>
 #include <tracking/ckf/general/findlets/StateCreatorWithReversal.icc.h>
 
 #include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 
 #include <framework/core/ModuleParamList.h>
-
-#include <tracking/ckf/general/utilities/ClassMnemomics.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

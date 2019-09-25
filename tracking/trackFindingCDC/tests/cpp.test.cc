@@ -19,8 +19,6 @@
 
 #include <boost/optional.hpp>
 
-#include <functional>
-
 #include <map>
 #include <vector>
 

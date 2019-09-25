@@ -19,8 +19,6 @@ namespace genfit {
 
 namespace Belle2 {
 
-  class RecoTrack;
-
   /** A base class for all modules that implement a fitter for reco tracks. */
   class BaseRecoFitterModule : public Module {
 

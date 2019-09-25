@@ -10,9 +10,6 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-#include <framework/datastore/RelationVector.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment3DLookUp.h>
@@ -26,7 +23,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 

@@ -1553,7 +1553,7 @@ def variablesToEventExtraInfo(
 ):
     """
     For each particle in the input list the selected variables are saved in an event-extra-info field with the given name,
-    Can be used to same MC truth information, for example, in a ntuple of reconstructed particle.
+    Can be used to save MC truth information, for example, in a ntuple of reconstructed particles.
 
     An existing extra info with the same name will be overwritten if the new
     value is lower / will never be overwritten / will be overwritten if the

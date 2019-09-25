@@ -33,7 +33,7 @@ setupB2BIIDatabase(True)
 b2.use_central_database("BellePID")
 
 # More b2bii magic
-input_file = "b2bii_input_evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst"
+input_file = "/home/belle/zupanc/public/B2BII/mdst/evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst"
 convertBelleMdstToBelleIIMdst(input_file, path=my_path)
 ma.loadGearbox(path=my_path)
 

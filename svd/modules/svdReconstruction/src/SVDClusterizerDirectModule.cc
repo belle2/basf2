@@ -22,7 +22,6 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-#include <svd/dataobjects/SVDEventInfo.h>
 
 #include <svd/reconstruction/NNWaveFitTool.h>
 
@@ -61,6 +60,8 @@ SVDClusterizerDirectModule::SVDClusterizerDirectModule() : Module()
            "TrueHit collection name", string(""));
   addParam("MCParticles", m_storeMCParticlesName,
            "MCParticles collection name", string(""));
+  addParam("SVDEventInfo", m_svdEventInfoName,
+           "SVDEventInfo name", string(""));
 
   // 2. Calibration and time fitter sources
   addParam("TimeFitterName", m_timeFitterName,
@@ -92,6 +93,9 @@ void SVDClusterizerDirectModule::initialize()
   storeShaperDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
+
+  if (!m_storeSVDEvtInfo.isOptional(m_svdEventInfoName)) m_svdEventInfoName = "SVDEventInfoSim";
+  m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
 
   RelationArray relClusterShaperDigits(storeClusters, storeShaperDigits);
   RelationArray relClusterTrueHits(storeClusters, storeTrueHits);
@@ -175,12 +179,12 @@ void SVDClusterizerDirectModule::fillRelationMap(const RelationLookup& lookup,
 
 void SVDClusterizerDirectModule::event()
 {
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
-  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
 
   const StoreArray<SVDShaperDigit> storeShaperDigits(m_storeShaperDigitsName);
-  // If no digits, nothing to do
-  if (!storeShaperDigits || !storeShaperDigits.getEntries()) return;
+  // If no digits or no SVDEventInfo, nothing to do
+  if (!storeShaperDigits || !storeShaperDigits.getEntries() || !m_storeSVDEvtInfo.isValid()) return;
+
+  SVDModeByte modeByte = m_storeSVDEvtInfo->getModeByte();
 
   size_t nDigits = storeShaperDigits.getEntries();
   B2DEBUG(90, "Initial size of StoreDigits array: " << nDigits);

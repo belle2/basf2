@@ -69,10 +69,13 @@ def get_overview(df):
 
     worker_information = pd.DataFrame(worker_information).T
 
-    worker_information["hosts"] = pd.to_numeric(worker_information["hosts"], errors="coerce", downcast="integer")
+    if "hosts" in worker_information:
+        worker_information["hosts"] = pd.to_numeric(worker_information["hosts"], errors="coerce", downcast="integer")
     worker_information["ready messages"] = pd.to_numeric(worker_information["ready messages"], errors="coerce", downcast="integer")
-    worker_information["events"] = pd.to_numeric(worker_information["events"], errors="coerce", downcast="integer")
-    worker_information["data size"] = worker_information["data size"] / worker_information["hosts"]
+    if "events" in worker_information:
+        worker_information["events"] = pd.to_numeric(worker_information["events"], errors="coerce", downcast="integer")
+    if "data size" in worker_information and "hosts" in worker_information:
+        worker_information["data size"] = worker_information["data size"] / worker_information["hosts"]
 
     worker_information = worker_information.fillna("")
 

@@ -13,7 +13,8 @@
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Vector/Rotation.h"
 #include <CLHEP/Geometry/Transform3D.h>
-#include "vector"
+
+#include <vector>
 
 namespace Belle2 {
 

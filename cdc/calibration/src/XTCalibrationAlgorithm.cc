@@ -1,28 +1,17 @@
 #include <cdc/calibration/XTCalibrationAlgorithm.h>
 #include <cdc/calibration/XTFunction.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCXtRelations.h>
 
 #include <TError.h>
 #include <TROOT.h>
-#include <TH1D.h>
-#include <TGraphErrors.h>
 #include <TProfile.h>
 #include <TF1.h>
 #include <TFile.h>
-#include <TChain.h>
 #include <TTree.h>
-#include <TSystem.h>
 #include <iostream>
-#include <iomanip>
 
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/device/file.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-#include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
-
 
 using namespace std;
 using namespace Belle2;

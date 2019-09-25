@@ -2,13 +2,6 @@
 #include "TH2D.h"
 #include "TH1D.h"
 #include "TF1.h"
-#include <framework/logging/Logger.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/Database.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
-//#include <framework/database/DBImportObjPtr.h>
-#include <cdc/dbobjects/CDCXtRelations.h>
 namespace Belle2 {
   namespace CDC {
     /**

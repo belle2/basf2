@@ -12,17 +12,11 @@
 #define FANGSDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <beast/fangs/dataobjects/FANGSHit.h>
 
-#include <TRandom3.h>
 #include <TF1.h>
-#include <TVector3.h>
-#include <TVector2.h>
-#include <TLorentzVector.h>
 
-#include <vector>
 #include <map>
 #include <tuple>
 

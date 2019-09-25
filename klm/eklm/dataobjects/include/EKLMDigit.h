@@ -16,7 +16,6 @@
 #include <klm/eklm/dataobjects/EKLMSimHit.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <framework/dataobjects/DigitBase.h>
-#include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 
 namespace Belle2 {
 

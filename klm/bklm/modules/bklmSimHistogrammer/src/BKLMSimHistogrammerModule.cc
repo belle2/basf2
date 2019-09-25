@@ -13,20 +13,16 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/gearbox/GearDir.h>
 
-#include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/dataobjects/BKLMSimHit.h>
-
-#include <klm/bklm/dataobjects/BKLMSimHitPosition.h>
 #include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <simulation/dataobjects/SimHitBase.h>
 
 #include "TMath.h"
 
+#include <iostream>
+
 using namespace std;
 using namespace Belle2;
-using namespace Belle2::bklm;
 
 //-----------------------------------------------------------------
 //                 Register the Module

@@ -12,7 +12,6 @@
 #include <ir/dataobjects/IRSimHit.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
@@ -28,7 +27,6 @@
 #include <G4UserLimits.hh>
 
 #include <string>
-#include <cmath>
 
 using namespace std;
 

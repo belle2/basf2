@@ -18,7 +18,6 @@
 #include <TObject.h>
 
 /* Belle2 headers. */
-#include <klm/eklm/dataobjects/EKLMElementID.h>
 #include <klm/eklm/dbobjects/EKLMAlignmentData.h>
 
 namespace Belle2 {

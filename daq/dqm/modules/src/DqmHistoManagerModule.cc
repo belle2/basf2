@@ -173,7 +173,7 @@ void DqmHistoManagerModule::terminate()
     (msg->header())->reserved[1] = m_nobjs;
     (msg->header())->reserved[2] = 0;
 
-    m_sock->send(msg);
+    //m_sock->send(msg);
 
     delete(msg);
 

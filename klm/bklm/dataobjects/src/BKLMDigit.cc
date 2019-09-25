@@ -11,8 +11,6 @@
 #include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/dataobjects/BKLMSimHit.h>
 
-#include <framework/logging/Logger.h>
-
 using namespace Belle2;
 
 // empty constructor for ROOT - do not use this

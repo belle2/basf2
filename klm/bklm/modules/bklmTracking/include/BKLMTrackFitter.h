@@ -15,16 +15,10 @@
 #include "CLHEP/Matrix/Matrix.h"
 #include "CLHEP/Matrix/SymMatrix.h"
 #include "CLHEP/Matrix/DiagMatrix.h"
-#include "klm/bklm/geometry/Module.h"
 #include <klm/bklm/geometry/GeometryPar.h>
 #include "klm/bklm/dataobjects/BKLMHit2d.h"
 
-
 namespace Belle2 {
-
-  namespace bklm {
-    class Module;
-  }
 
   //! track fitting procedure
   class BKLMTrackFitter {

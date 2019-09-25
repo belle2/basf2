@@ -12,22 +12,14 @@
 
 #include <klm/bklm/modules/bklmEffnRadio/BKLMEffnRadioModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <math.h>
 
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
-#include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/dataobjects/BKLMHit1d.h>
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/bklm/dataobjects/BKLMStatus.h>
-
-#include "CLHEP/Matrix/Matrix.h"
 
 #include "TMath.h"
 #include "TCanvas.h"
@@ -38,9 +30,6 @@
 #include "TLatex.h"
 
 #include "CLHEP/Vector/ThreeVector.h"
-#include "CLHEP/Units/PhysicalConstants.h"
-#include "CLHEP/Units/SystemOfUnits.h"
-
 
 using namespace std;
 using namespace CLHEP;

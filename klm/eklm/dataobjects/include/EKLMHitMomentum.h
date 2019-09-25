@@ -12,7 +12,6 @@
 
 /* External headers. */
 #include <TLorentzVector.h>
-#include <TObject.h>
 
 namespace Belle2 {
 

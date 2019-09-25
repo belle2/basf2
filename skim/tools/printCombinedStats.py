@@ -40,14 +40,15 @@ from skimExpertFunctions import get_eventN, get_total_infiles, get_test_file, en
 import subprocess
 import json
 
-skims = 'Dark Semileptonic BtoCharm BtoCharmless Quarkonium  CombinedSystematics MiscCombined CharmHigh CharmLow'
+
+skims = 'Dark Semileptonic BtoCharm BtoCharmless Quarkonium EWP CombinedSystematics MiscCombined feiHadronicCombined feiSLCombined'
+skims += 'CharmHigh CharmLow'
 
 bkgs = 'MC12_chargedBGx1  MC12_chargedBGx1 MC12_ccbarBGx1 MC12_ssbarBGx1 MC12_uubarBGx0  MC12_ddbarBGx1  MC12_taupairBGx1'
 bkgs += ' MC12_mixedBGx0 MC12_chargedBGx0 MC12_ccbarBGx0 MC12_ssbarBGx0 MC12_uubarBGx0 MC12_ddbarBGx0 MC12_taupairBGx0'
 jsonMergeFactorInput = open('JsonMergeFactorInput.txt', 'w')
 jsonEvtSizeInput = open('JsonEvtSizeInput.txt', 'w')
 jsonTimeInput = open('JsonTimeInput.txt', 'w')
-skimCampaign = 'MC9'
 
 nFullFiles = 10000
 nFullEvents = 200000
@@ -69,16 +70,20 @@ for skim in skims.split():
 
     if (skim == 'MiscCombined'):
         nSkims = 3
-        partSkim = 'BtoPi0Pi0 TauGeneric TauLFV'
+        partSkim = 'TauThrust TauGeneric TauLFV'
 
     if (skim == 'Dark'):
-        nSkims = 4
-        partSkim = 'ALP3Gamma SinglePhotonDark LFVZpVisible LFVZpInvisible'
+        nSkims = 6
+        partSkim = 'ALP3Gamma SinglePhotonDark LFVZpVisible DimuonPlusMissingEnergy'
+        partSkim += ' ElectronMuonPlusMissingEnergy DielectronPlusMissingEnergy'
 
-    if (skim == 'feiHadronic'):
+    if (skim == 'feiHadronicCombined'):
         nSkims = 2
         partSkim = 'feiHadronicB0 feiHadronicBplus'
 
+    if (skim == 'feiSLCombined'):
+        nSkims = 2
+        partSkim = 'feiSLB0 feiSLBplus'
     if (skim == 'Quarkonium'):
         nSkims = 3
         partSkim = 'ISRpipicc BottomoniumEtabExclusive BottomoniumUpsilon'

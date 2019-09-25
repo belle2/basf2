@@ -4,6 +4,9 @@
 #######################################################
 #
 # Charm skims
+# Charm skim lists with retentions. for all kinds of MC, lower
+# than 3% are added to Charm_Skim_Standalone_Low.py, other
+# charm skim lists are added to Charm_Skim_Standalone_High.py
 #
 ######################################################
 
@@ -40,29 +43,17 @@ stdPi('all', path=charmpath)
 stdK('all', path=charmpath)
 stdE('all', path=charmpath)
 stdMu('all', path=charmpath)
+stdPi('95eff', path=charmpath)
+stdK('95eff', path=charmpath)
+stdE('95eff', path=charmpath)
+stdMu('95eff', path=charmpath)
 stdKshorts(path=charmpath)
 mergedKshorts(path=charmpath)
-
-
-from skim.charm import D0ToHpJm
-D0ToHpJmList = D0ToHpJm(charmpath)
-add_skim("XToD0_D0ToHpJm", D0ToHpJmList, path=charmpath)
 
 
 from skim.charm import DstToD0PiD0ToHpJm
 DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm(charmpath)
 add_skim("DstToD0Pi_D0ToHpJm", DstToD0PiD0ToHpJmList, path=charmpath)
-
-
-from skim.charm import DstToD0PiD0ToHpJmPi0
-DstToD0PiD0ToHpJmPi0List = DstToD0PiD0ToHpJmPi0(charmpath)
-add_skim("DstToD0Pi_D0ToHpJmPi0", DstToD0PiD0ToHpJmPi0List, path=charmpath)
-
-
-from skim.charm import DstToD0PiD0ToHpHmPi0
-DstToD0PiD0ToHpHmPi0List = DstToD0PiD0ToHpHmPi0(path=charmpath)
-add_skim("DstToD0Pi_D0ToHpHmPi0", DstToD0PiD0ToHpHmPi0List, path=charmpath)
-
 
 from skim.charm import DstToD0PiD0ToHpHmKs
 DstToD0PiD0ToHpHmKsList = DstToD0PiD0ToHpHmKs(charmpath)
@@ -83,9 +74,9 @@ from skim.charm import CharmRare
 DstToD0Pi_D0ToRareList = CharmRare(charmpath)
 add_skim("DstToD0Pi_D0ToRare", DstToD0Pi_D0ToRareList, path=charmpath)
 
-from skim.charm import DpToKsHp
-DpToKsHpList = DpToKsHp(charmpath)
-add_skim("XToDp_DpToKsHp", DpToKsHpList, path=charmpath)
+from skim.charm import CharmSemileptonic
+CSLList = CharmSemileptonic(charmpath)
+add_skim("DstToD0Pi_D0ToSemileptonic", CSLList, path=charmpath)
 
 setSkimLogging(path=charmpath)
 process(charmpath)

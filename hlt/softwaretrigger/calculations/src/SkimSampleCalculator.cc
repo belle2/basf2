@@ -16,14 +16,8 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
-#include <framework/core/Module.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
-#include <genfit/Track.h>
 #include <numeric>
-#include <iostream>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;

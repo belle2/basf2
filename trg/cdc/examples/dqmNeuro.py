@@ -40,6 +40,7 @@ def add_neuro_2d_unpackers(path, debug_level=4, debugout=True):
     unpacker.param('decodeNeuro', True)
     unpacker.param('delayNNOutput', [9, 9, 9, 9])
     unpacker.param('delayNNSelect', [4, 4, 4, 4])
+    unpacker.param('NNOutputScale', [-50.0, 50.0, 0.0, 3.1415927410125732])
     path.add_module(unpacker)
 
 
@@ -94,7 +95,10 @@ def add_filter(path, checkBranchName='CDCTriggerNNInputSegmentHits'):
 
 
 set_log_level(LogLevel.ERROR)
+use_database_chain()
 use_central_database("data_reprocessing_prompt")
+use_central_database("data_reprocessing_prompt_rel4_patch")
+use_central_database("staging_rel4_patch")
 
 main = create_path()
 

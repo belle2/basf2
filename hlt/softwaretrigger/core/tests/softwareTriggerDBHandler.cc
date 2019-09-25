@@ -11,8 +11,6 @@
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 #include <framework/database/Configuration.h>
 #include <framework/database/Database.h>
-#include <framework/database/DBImportObjPtr.h>
-#include <boost/filesystem.hpp>
 
 #include <framework/utilities/TestHelpers.h>
 #include <gtest/gtest.h>

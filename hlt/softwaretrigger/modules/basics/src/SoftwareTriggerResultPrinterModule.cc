@@ -18,7 +18,6 @@
 
 #include <boost/algorithm/string/replace.hpp>
 #include <memory>
-#include <iomanip>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;

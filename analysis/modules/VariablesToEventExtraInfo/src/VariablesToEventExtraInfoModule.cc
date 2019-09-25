@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Yo Sato                                                  *
@@ -9,6 +9,10 @@
  **************************************************************************/
 
 #include <analysis/modules/VariablesToEventExtraInfo/VariablesToEventExtraInfoModule.h>
+
+#include <framework/datastore/StoreArray.h>
+
+#include <analysis/dataobjects/EventExtraInfo.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParam.templateDetails.h>
@@ -20,7 +24,7 @@ REG_MODULE(VariablesToEventExtraInfo)
 
 VariablesToEventExtraInfoModule::VariablesToEventExtraInfoModule()
 {
-  setDescription("For each particle in the input list the selected variables are saved in an event-extra-info field with the given name. Can be used to same MC truth information, for example, in a ntuple of reconstructed particle.");
+  setDescription("For each particle in the input list the selected variables are saved in an event-extra-info field with the given name. Can be used to save MC truth information, for example, in a ntuple of reconstructed particles.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   std::map<std::string, std::string> emptymap;

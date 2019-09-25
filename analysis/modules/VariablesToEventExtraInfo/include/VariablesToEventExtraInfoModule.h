@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Yo Sato                                   *
+ * Contributors: Yo Sato                                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,14 +12,11 @@
 
 #include <framework/core/Module.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
-
-#include <analysis/dataobjects/EventExtraInfo.h>
 
 #include <string>
 #include <map>
@@ -30,7 +27,7 @@ namespace Belle2 {
 
   /**
    *  For each particle in the input list the selected variables are saved in an event-extra-info field with the given name,
-   *  Can be used to same MC truth information, for example, in a ntuple of reconstructed particle.
+   *  Can be used to save MC truth information, for example, in a ntuple of reconstructed particles.
    */
   class VariablesToEventExtraInfoModule : public Module {
   public:

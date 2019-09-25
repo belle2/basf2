@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <mva/interface/Dataset.h>
-#include <framework/utilities/FileSystem.h>
 #include <framework/utilities/TestHelpers.h>
 
 #include <boost/filesystem/operations.hpp>

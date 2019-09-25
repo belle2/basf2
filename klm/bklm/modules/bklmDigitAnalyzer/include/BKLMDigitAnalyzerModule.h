@@ -11,10 +11,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/dataobjects/BKLMDigitOutOfRange.h>

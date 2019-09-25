@@ -12,25 +12,20 @@
 
 /* C++ headers. */
 #include <string>
-#include <vector>
 
 /* External headers. */
 #include <G4LogicalVolume.hh>
 #include <G4Material.hh>
-#include <G4PVPlacement.hh>
 #include <G4Tubs.hh>
 #include <G4Box.hh>
 #include <G4Transform3D.hh>
-#include <G4UnionSolid.hh>
 #include <G4SubtractionSolid.hh>
-#include <G4IntersectionSolid.hh>
 
 /* Belle2 headers. */
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <klm/eklm/simulation/EKLMSensitiveDetector.h>
 #include <klm/eklm/geometry/GeometryData.h>
-#include <klm/eklm/geometry/G4TriangularPrism.h>
 #include <klm/eklm/geometry/TransformData.h>
 
 /**

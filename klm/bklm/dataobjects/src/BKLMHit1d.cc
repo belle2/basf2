@@ -13,7 +13,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <cmath>
 #include <climits>
 #include <algorithm>
 

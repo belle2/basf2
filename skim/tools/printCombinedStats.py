@@ -42,6 +42,7 @@ import json
 
 
 skims = 'Dark Semileptonic BtoCharm BtoCharmless Quarkonium EWP CombinedSystematics MiscCombined feiHadronicCombined feiSLCombined'
+skims += 'CharmHigh CharmLow'
 
 bkgs = 'MC12_chargedBGx1  MC12_chargedBGx1 MC12_ccbarBGx1 MC12_ssbarBGx1 MC12_uubarBGx0  MC12_ddbarBGx1  MC12_taupairBGx1'
 bkgs += ' MC12_mixedBGx0 MC12_chargedBGx0 MC12_ccbarBGx0 MC12_ssbarBGx0 MC12_uubarBGx0 MC12_ddbarBGx0 MC12_taupairBGx0'
@@ -94,6 +95,20 @@ for skim in skims.split():
     if (skim == 'BtoCharm'):
         nSkims = 4
         partSkim = 'BtoDh_Kshh BtoDh_hh BtoDh_Kspi0 BtoDh_Kspipipi0'
+
+    if (skim == 'BtoCharm'):
+        nSkims = 4
+        partSkim = 'BtoDh_Kshh BtoDh_hh BtoDh_Kspi0 BtoDh_Kspipipi0'
+
+    if (skim == 'CharmLow'):
+        partSkim = 'DstToD0Pi_D0ToHpJm DstToD0Pi_D0ToHpHmKs DstToD0Pi_D0ToHpJmEta DstToD0Pi_D0ToKsOmega '
+        partSkim = 'DstToD0Pi_D0ToNeutrals DstToD0Pi_D0ToRare DstToD0Pi_D0ToSemileptonic'
+        nSkims = partSkim.count(' ') + 1
+
+    if (skim == 'CharmHigh'):
+        partSkim = 'XToD0_D0ToHpJm DstToD0Pi_D0ToHpJmPi0 DstToD0Pi_D0ToHpHmPi0 XToD0_D0ToNeutrals XToDp_DpToKsHp'
+        nSkims = partSkim.count(' ') + 1
+
     print('|Skim:' + skim + '_Skim_Standalone Statistics|')
     title = '|Bkg        |  InputEvents  |  Skimmed Events  |   Retention   | Time/Evt(HEPSEC)| Total Time (s) |uDSTSize/Evt(KB)|'
     title += ' uDSTSize(MB)|  ACMPE   |Log Size/evt(KB)|Log Size(MB)|'
@@ -137,6 +152,7 @@ for skim in skims.split():
         maxMemory = 0
         diff = 1
         with open(inputFileName, 'r') as inF:
+            print("checking: " + inputFileName)
             content = []
             for line in inF:
                 lineCounter += 1

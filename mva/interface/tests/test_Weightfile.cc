@@ -9,10 +9,10 @@
 
 #include <mva/interface/Weightfile.h>
 #include <mva/interface/Options.h>
-#include <framework/utilities/FileSystem.h>
 #include <framework/utilities/TestHelpers.h>
 
 #include <framework/database/Configuration.h>
+#include <framework/database/Database.h>
 #include <boost/filesystem/operations.hpp>
 
 #include <TFile.h>

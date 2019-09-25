@@ -12,7 +12,6 @@
 
 /* C++ headers. */
 #include <cstdint>
-#include <map>
 
 /* Belle2 headers. */
 #include <klm/eklm/dataobjects/EKLMDigit.h>

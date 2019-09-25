@@ -10,6 +10,8 @@
 
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
 
+#include <framework/logging/Logger.h>
+
 namespace Belle2 {
   namespace SoftwareTrigger {
     void SoftwareTriggerCalculation::writeDebugOutput(const std::unique_ptr<TTree>& debugOutputTTree)

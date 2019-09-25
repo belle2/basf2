@@ -6,9 +6,7 @@
 
 // Load the eudaq part
 #include <eutel/eudaq/DetectorEvent.h>
-#include <eutel/eudaq/RawDataEvent.h>
 #include <eutel/eudaq/PluginManager.h>
-#include <eutel/eudaq/Utils.h>
 #include <eutel/eudaq/TBTelEvent.h>
 
 // load the datastore objects

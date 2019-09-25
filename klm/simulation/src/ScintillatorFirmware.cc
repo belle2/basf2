@@ -10,8 +10,6 @@
 
 /* Belle2 headers. */
 #include <klm/simulation/ScintillatorFirmware.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

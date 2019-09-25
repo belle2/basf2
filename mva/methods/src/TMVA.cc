@@ -9,7 +9,10 @@
  **************************************************************************/
 
 #include <mva/methods/TMVA.h>
+#include <framework/logging/Logger.h>
+#include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/utilities/ScopeGuard.h>
+
 #include <TPluginManager.h>
 
 #include <boost/algorithm/string.hpp>

@@ -16,7 +16,7 @@ all_skims = [
     'SystematicsLambda', 'Systematics', 'SystematicsTracking', 'Resonance',
     'TauThrust', 'TauLFV', 'TCPV', 'TauGeneric',
     'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0', 'feiSLBplus'
-]
+      ]
 
 
 MCTypes = ['mixedBGx1', 'chargedBGx1', 'ccbarBGx1', 'ssbarBGx1',

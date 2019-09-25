@@ -15,6 +15,7 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventT0.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include "TTree.h"
 #include "TFile.h"
 #include "TVector3.h"

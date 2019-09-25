@@ -10,12 +10,11 @@
 
 #include <analysis/modules/VariablesToEventExtraInfo/VariablesToEventExtraInfoModule.h>
 
+#include <framework/logging/Logger.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <analysis/dataobjects/EventExtraInfo.h>
-
-#include <framework/logging/Logger.h>
-#include <framework/core/ModuleParam.templateDetails.h>
 
 using namespace std;
 using namespace Belle2;

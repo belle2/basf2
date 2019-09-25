@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <analysis/dataobjects/Particle.h>

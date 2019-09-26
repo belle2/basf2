@@ -18,8 +18,6 @@
 
 #include <string>
 
-class TGeoMatrix;
-
 namespace Belle2 {
 
   class MCParticleGraph;

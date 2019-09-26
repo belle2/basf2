@@ -51,6 +51,8 @@ namespace Belle2 {
 
     int m_nROIs; /**< number of ROIs per event*/
 
+    bool m_random; /**< move single roi pseudo randomly */
+
   };
 }
 

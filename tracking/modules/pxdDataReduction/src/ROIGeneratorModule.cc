@@ -49,7 +49,7 @@ ROIGeneratorModule::ROIGeneratorModule() : Module()
   addParam("MinV"       , m_minV   , " min V (pixel column hopefully) ", 0);
   addParam("MaxV"       , m_maxV   , " max v (pixel column hopefully) ", 768 - 1);
 
-
+  addParam("Random"       , m_random   , "dont use fix position, move pseudo randomly", false);
 }
 
 void ROIGeneratorModule::initialize()
@@ -83,10 +83,61 @@ void ROIGeneratorModule::event()
   sensorID.setSensorNumber(m_sensor);
 
   // Always create one FULL size ROI
-  tmp_ROIid.setMinUid(m_minU);
-  tmp_ROIid.setMinVid(m_minV);
-  tmp_ROIid.setMaxUid(m_maxU);
-  tmp_ROIid.setMaxVid(m_maxV);
+  int minU = m_minU, maxU = m_maxU, minV = m_minV, maxV = m_maxV;
+  int w = maxU - minU;
+  int h = maxV - minV;
+  if (m_nROIs == 1 && m_random) {
+    switch (tNr % 9) {
+      case 0:
+        minU = 0;
+        maxU = w;
+        minV = 0;
+        maxV = h;
+        break;
+      case 1:
+        minU = 0;
+        maxU = w;
+        break;
+      case 2:
+        minU = 0;
+        maxU = w;
+        minV = 768 - 1 - h;
+        maxV = 768 - 1;
+        break;
+      case 3:
+        minV = 0;
+        maxV = h;
+        break;
+      case 4:
+        break;
+      case 5:
+        minV = 768 - 1 - h;
+        maxV = 768 - 1;
+        break;
+      case 6:
+        minU = 250 - 1 - w;
+        maxU = 250 - 1;
+        minV = 0;
+        maxV = h;
+        break;
+      case 7:
+        minU = 250 - 1 - w;
+        maxU = 250 - 1;
+        break;
+      case 8:
+        minU = 250 - 1 - w;
+        maxU = 250 - 1;
+        minV = 768 - 1 - h;
+        maxV = 768 - 1;
+        break;
+      default:
+        break;
+    }
+  }
+  tmp_ROIid.setMinUid(minU);
+  tmp_ROIid.setMinVid(minV);
+  tmp_ROIid.setMaxUid(maxU);
+  tmp_ROIid.setMaxVid(maxV);
   tmp_ROIid.setSensorID(sensorID);
 
   ROIList.appendNew(tmp_ROIid);
@@ -98,10 +149,10 @@ void ROIGeneratorModule::event()
     int dV = (m_maxV - m_minV) / (m_nROIs + 1);
     for (int iROI = 1; iROI < m_nROIs; iROI++) {
       // Create a chain of ROIs from top left to bottom right
-      int minU = m_minU + dU * iROI;
-      int maxU = minU + dU;
-      int minV = m_minV + dV * iROI;
-      int maxV = minV + dV;
+      minU = m_minU + dU * iROI;
+      maxU = minU + dU;
+      minV = m_minV + dV * iROI;
+      maxV = minV + dV;
 
       tmp_ROIid.setMinUid(minU);
       tmp_ROIid.setMinVid(minV);

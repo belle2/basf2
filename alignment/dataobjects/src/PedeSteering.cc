@@ -1,9 +1,7 @@
 
-/* C++ headers. */
-#include <fstream>
-
-/* Own header. */
 #include <alignment/dataobjects/PedeSteering.h>
+
+#include <fstream>
 
 using namespace Belle2;
 using namespace std;

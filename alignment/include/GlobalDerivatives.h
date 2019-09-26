@@ -10,11 +10,9 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <vector>
-
-/* ROOT headers. */
 #include <root/TMatrixD.h>
+
+#include <vector>
 
 namespace Belle2 {
   namespace alignment {

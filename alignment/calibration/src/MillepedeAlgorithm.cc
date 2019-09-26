@@ -1,9 +1,6 @@
 
-/* ROOT headers. */
-#include <TH1F.h>
-#include <TTree.h>
+#include <alignment/calibration/MillepedeAlgorithm.h>
 
-/* Belle2 headers. */
 #include <alignment/dataobjects/MilleData.h>
 #include <alignment/dataobjects/PedeSteering.h>
 #include <alignment/GlobalLabel.h>
@@ -14,8 +11,8 @@
 #include <alignment/PedeResult.h>
 #include <framework/database/EventDependency.h>
 
-/* Own header. */
-#include <alignment/calibration/MillepedeAlgorithm.h>
+#include <TH1F.h>
+#include <TTree.h>
 
 using namespace std;
 using namespace Belle2;

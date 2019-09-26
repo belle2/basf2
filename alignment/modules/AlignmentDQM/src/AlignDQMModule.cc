@@ -10,14 +10,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* ROOT headers. */
-#include <TDirectory.h>
-#include <TVectorD.h>
+#include <alignment/modules/AlignmentDQM/AlignDQMModule.h>
 
-/* Genfit headers. */
-#include <genfit/MeasurementOnPlane.h>
-
-/* Belle2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <framework/geometry/B2Vector3.h>
 #include <mdst/dataobjects/Track.h>
@@ -27,8 +21,10 @@
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <vxd/geometry/GeoTools.h>
 
-/* Own header. */
-#include <alignment/modules/AlignmentDQM/AlignDQMModule.h>
+#include <genfit/MeasurementOnPlane.h>
+
+#include <TDirectory.h>
+#include <TVectorD.h>
 
 using namespace Belle2;
 using namespace std;

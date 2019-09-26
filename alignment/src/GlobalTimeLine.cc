@@ -8,13 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+#include <alignment/GlobalTimeLine.h>
+
 #include <alignment/Manager.h>
 #include <framework/core/PyObjConvUtils.h>
 #include <framework/database/EventDependency.h>
-
-/* Own header. */
-#include <alignment/GlobalTimeLine.h>
 
 namespace Belle2 {
   namespace alignment {

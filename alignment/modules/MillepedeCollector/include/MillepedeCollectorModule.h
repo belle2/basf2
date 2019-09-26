@@ -11,17 +11,15 @@
 #ifndef MILLEPEDECOLLECTORMODULE_H
 #define MILLEPEDECOLLECTORMODULE_H
 
-/* Genfit headers. */
-#include <genfit/GblTrajectory.h>
-#include <genfit/Track.h>
-#include <genfit/MeasuredStateOnPlane.h>
-
-/* Belle2 headers. */
 #include <analysis/dataobjects/Particle.h>
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/geometry/B2Vector3.h>
 #include <tracking/dataobjects/RecoTrack.h>
+
+#include <genfit/GblTrajectory.h>
+#include <genfit/Track.h>
+#include <genfit/MeasuredStateOnPlane.h>
 
 namespace Belle2 {
   /**

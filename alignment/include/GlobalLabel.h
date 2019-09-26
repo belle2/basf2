@@ -11,7 +11,6 @@
 #ifndef GLOBALLABEL_H
 #define GLOBALLABEL_H
 
-/* C++ headers. */
 #include <map>
 #include <set>
 

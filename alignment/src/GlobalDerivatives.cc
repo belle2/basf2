@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Own header. */
 #include <alignment/GlobalDerivatives.h>
 
 namespace Belle2 {

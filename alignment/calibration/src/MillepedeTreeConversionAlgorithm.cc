@@ -8,14 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TFile.h>
+#include <alignment/calibration/MillepedeTreeConversionAlgorithm.h>
 
-/* Belle2 headers. */
 #include <genfit/GblData.h>
 
-/* Own header. */
-#include <alignment/calibration/MillepedeTreeConversionAlgorithm.h>
+#include <TFile.h>
 
 using namespace Belle2;
 

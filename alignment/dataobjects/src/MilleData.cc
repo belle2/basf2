@@ -1,12 +1,9 @@
 
-/* C++ headers. */
-#include <cstdlib>
+#include <alignment/dataobjects/MilleData.h>
 
-/* Belle2 headers. */
 #include <framework/utilities/FileSystem.h>
 
-/* Own header. */
-#include <alignment/dataobjects/MilleData.h>
+#include <cstdlib>
 
 char* full_path = realpath("foo.dat", NULL);
 using namespace std;

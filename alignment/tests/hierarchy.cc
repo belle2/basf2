@@ -1,16 +1,13 @@
 
-/* C++ headers. */
-#include <iostream>
-
-/* Cppcheck headers. */
-#include <gtest/gtest.h>
-
-/* Belle2 headers. */
 #include <alignment/Hierarchy.h>
 #include <alignment/Manager.h>
 #include <alignment/PedeResult.h>
 #include <framework/database/EventDependency.h>
 #include <vxd/dataobjects/VxdID.h>
+
+#include <gtest/gtest.h>
+
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;

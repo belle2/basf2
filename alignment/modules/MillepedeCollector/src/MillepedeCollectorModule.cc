@@ -8,20 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* ROOT headers. */
-#include <TMath.h>
-#include <TH1F.h>
-#include <TTree.h>
-#include <TDecompSVD.h>
+#include <alignment/modules/MillepedeCollector/MillepedeCollectorModule.h>
 
-/* Genfit headers. */
-#include <genfit/FullMeasurement.h>
-#include <genfit/GblFitter.h>
-#include <genfit/KalmanFitterInfo.h>
-#include <genfit/PlanarMeasurement.h>
-#include <genfit/Track.h>
-
-/* Belle2 headers. */
 #include <alignment/dataobjects/MilleData.h>
 #include <alignment/GblMultipleScatteringController.h>
 #include <alignment/GlobalDerivatives.h>
@@ -51,8 +39,16 @@
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <tracking/trackFitting/measurementCreator/adder/MeasurementAdder.h>
 
-/* Own header. */
-#include <alignment/modules/MillepedeCollector/MillepedeCollectorModule.h>
+#include <genfit/FullMeasurement.h>
+#include <genfit/GblFitter.h>
+#include <genfit/KalmanFitterInfo.h>
+#include <genfit/PlanarMeasurement.h>
+#include <genfit/Track.h>
+
+#include <TMath.h>
+#include <TH1F.h>
+#include <TTree.h>
+#include <TDecompSVD.h>
 
 using namespace std;
 using namespace Belle2;

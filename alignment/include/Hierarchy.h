@@ -10,23 +10,18 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <map>
-#include <set>
-#include <vector>
+#include <framework/geometry/B2Vector3.h>
 
-/* Geant4 headers. */
-#include <Geant4/G4Transform3D.hh>
+#include <genfit/StateOnPlane.h>
 
-/* ROOT headers. */
 #include <root/TMatrixD.h>
 #include <root/TGeoMatrix.h>
 
-/* Genfit headers. */
-#include <genfit/StateOnPlane.h>
+#include <Geant4/G4Transform3D.hh>
 
-/* Belle2 headers. */
-#include <framework/geometry/B2Vector3.h>
+#include <map>
+#include <set>
+#include <vector>
 
 namespace Belle2 {
   namespace alignment {

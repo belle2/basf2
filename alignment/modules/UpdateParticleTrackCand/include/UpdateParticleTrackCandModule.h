@@ -11,7 +11,6 @@
 #ifndef UPDATEPARTICLETRACKCANDMODULE_H
 #define UPDATEPARTICLETRACKCANDMODULE_H
 
-/* Belle2 headers. */
 #include <framework/core/Module.h>
 
 namespace Belle2 {

@@ -8,20 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <iostream>
-#include <string>
-
-/* Boost headers. */
-#include <boost/filesystem.hpp>
-
-/* ROOT headers. */
-#include <TFile.h>
-
-/* Cppcheck headers. */
-#include <gtest/gtest.h>
-
-/* Belle2 headers. */
 #include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/GlobalTimeLine.h>
 #include <alignment/Manager.h>
@@ -31,6 +17,15 @@
 #include <framework/database/EventDependency.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <vxd/dataobjects/VxdID.h>
+
+#include <gtest/gtest.h>
+
+#include <TFile.h>
+
+#include <boost/filesystem.hpp>
+
+#include <iostream>
+#include <string>
 
 using namespace std;
 using namespace Belle2;

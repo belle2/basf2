@@ -11,7 +11,6 @@
 #ifndef PEDERESULT_H
 #define PEDERESULT_H
 
-/* C++ headers. */
 #include <map>
 #include <string>
 #include <vector>

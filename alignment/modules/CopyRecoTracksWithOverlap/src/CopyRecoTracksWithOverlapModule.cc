@@ -8,16 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+#include <alignment/modules/CopyRecoTracksWithOverlap/CopyRecoTracksWithOverlapModule.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
-
-/* Own header. */
-#include <alignment/modules/CopyRecoTracksWithOverlap/CopyRecoTracksWithOverlapModule.h>
 
 using namespace Belle2;
 

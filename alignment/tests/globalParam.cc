@@ -1,12 +1,4 @@
 
-/* C++ headers. */
-#include <iostream>
-#include <string>
-
-/* Cppcheck headers. */
-#include <gtest/gtest.h>
-
-/* Belle2 headers. */
 #include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <alignment/GlobalParam.h>
@@ -17,6 +9,11 @@
 #include <cdc/dbobjects/CDCXtRelations.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
+
+#include <gtest/gtest.h>
+
+#include <iostream>
+#include <string>
 
 using namespace std;
 using namespace Belle2;

@@ -8,7 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+#include <alignment/reconstruction/AlignablePXDRecoHit.h>
+
 #include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/GlobalDerivatives.h>
 #include <alignment/Hierarchy.h>
@@ -16,9 +17,6 @@
 #include <framework/geometry/BFieldManager.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
-
-/* Own header. */
-#include <alignment/reconstruction/AlignablePXDRecoHit.h>
 
 using namespace std;
 using namespace Belle2;

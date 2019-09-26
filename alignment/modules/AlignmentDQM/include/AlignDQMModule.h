@@ -13,12 +13,10 @@
 
 #pragma once
 
-/* ROOT headers. */
+#include <framework/core/HistoModule.h>
+
 #include <TH1F.h>
 #include <TH2F.h>
-
-/* Belle2 headers. */
-#include <framework/core/HistoModule.h>
 
 namespace Belle2 {
 

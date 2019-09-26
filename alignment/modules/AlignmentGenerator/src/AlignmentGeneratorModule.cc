@@ -8,20 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Boost headers. */
-#include <boost/algorithm/string.hpp>
+#include <alignment/modules/AlignmentGenerator/AlignmentGeneratorModule.h>
 
-/* ROOT headers. */
-#include <TRandom.h>
-
-/* Belle2 headers. */
 #include <alignment/dbobjects/VXDAlignment.h>
 #include <framework/database/Database.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
 
-/* Own header. */
-#include <alignment/modules/AlignmentGenerator/AlignmentGeneratorModule.h>
+#include <TRandom.h>
+
+#include <boost/algorithm/string.hpp>
 
 using namespace Belle2;
 

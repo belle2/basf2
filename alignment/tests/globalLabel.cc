@@ -1,18 +1,15 @@
 
-/* C++ headers. */
-#include <iostream>
-#include <string>
-
-/* Cppcheck headers. */
-#include <gtest/gtest.h>
-
-/* Belle2 headers. */
 #include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/GlobalLabel.h>
 #include <alignment/PedeResult.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCAlignment.h>
 #include <vxd/dataobjects/VxdID.h>
+
+#include <gtest/gtest.h>
+
+#include <iostream>
+#include <string>
 
 using namespace std;
 using namespace Belle2;

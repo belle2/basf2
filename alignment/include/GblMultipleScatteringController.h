@@ -10,7 +10,6 @@
 
 #pragma once
 
-/* Genfit headers. */
 #include <genfit/GblTrackSegmentController.h>
 
 namespace Belle2 {

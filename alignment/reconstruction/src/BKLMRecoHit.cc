@@ -8,10 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Genfit headers. */
-#include <genfit/DetPlane.h>
+#include <alignment/reconstruction/BKLMRecoHit.h>
 
-/* Belle2 headers. */
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <alignment/GlobalDerivatives.h>
 #include <alignment/GlobalLabel.h>
@@ -21,8 +19,7 @@
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/dataobjects/BKLMElementID.h>
 
-/* Own header. */
-#include <alignment/reconstruction/BKLMRecoHit.h>
+#include <genfit/DetPlane.h>
 
 using namespace std;
 using namespace Belle2;

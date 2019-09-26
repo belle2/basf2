@@ -10,7 +10,6 @@
 
 #pragma once
 
-/* Belle2 headers. */
 #include <framework/core/Module.h>
 
 namespace Belle2 {

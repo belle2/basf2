@@ -1,5 +1,6 @@
 
-/* Belle2 headers. */
+#include <alignment/Manager.h>
+
 #include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <alignment/GlobalTimeLine.h>
@@ -8,9 +9,6 @@
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dbobjects/CDCXtRelations.h>
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
-
-/* Own header. */
-#include <alignment/Manager.h>
 
 namespace Belle2 {
   namespace alignment {

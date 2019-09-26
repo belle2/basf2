@@ -10,7 +10,6 @@
 
 #pragma once
 
-/* Belle2 headers. */
 #include <alignment/dataobjects/PedeSteering.h>
 #include <alignment/GlobalTimeLine.h>
 #include <alignment/PedeResult.h>

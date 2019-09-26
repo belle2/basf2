@@ -11,7 +11,6 @@
 #ifndef ALIGNMENTGENERATORMODULE_H
 #define ALIGNMENTGENERATORMODULE_H
 
-/* Belle2 headers. */
 #include <framework/core/Module.h>
 
 namespace Belle2 {

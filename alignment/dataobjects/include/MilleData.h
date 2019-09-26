@@ -1,15 +1,12 @@
 #pragma once
 
-/* C++ headers. */
-#include <string>
-#include <vector>
+#include <calibration/core/MergeableNamed.h>
 
-/* Genfit headers. */
 #include <genfit/MilleBinary.h>
 #include <genfit/GblTrajectory.h>
 
-/* Belle2 headers. */
-#include <calibration/core/MergeableNamed.h>
+#include <string>
+#include <vector>
 
 namespace Belle2 {
   /// Mergeable class holding list of so far opened mille binaries and providing the binaries

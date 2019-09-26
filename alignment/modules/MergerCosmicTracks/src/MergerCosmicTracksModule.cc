@@ -8,7 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Framework headers. */
+#include <alignment/modules/MergerCosmicTracks/MergerCosmicTracksModule.h>
+
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLShower.h>
@@ -18,9 +19,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <vxd/geometry/GeoCache.h>
-
-/* Own header. */
-#include <alignment/modules/MergerCosmicTracks/MergerCosmicTracksModule.h>
 
 using namespace Belle2;
 

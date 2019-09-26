@@ -8,14 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Boost headers. */
-#include <boost/crc.hpp>
+#include <alignment/Hierarchy.h>
 
-/* Belle2 headers. */
 #include <alignment/GlobalLabel.h>
 
-/* Own header. */
-#include <alignment/Hierarchy.h>
+#include <boost/crc.hpp>
 
 namespace Belle2 {
   namespace alignment {

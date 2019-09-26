@@ -10,15 +10,13 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <map>
-#include <string>
-#include <vector>
-
-/* Belle2 headers. */
 #include <alignment/GlobalParam.h>
 #include <alignment/GlobalTimeLine.h>
 #include <alignment/Hierarchy.h>
+
+#include <map>
+#include <string>
+#include <vector>
 
 namespace Belle2 {
   namespace alignment {

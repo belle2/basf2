@@ -10,7 +10,6 @@
 
 #pragma once
 
-/* Belle2 headers. */
 #include <calibration/DBObjCalibrationConstMapBase.h>
 #include <cdc/dataobjects/WireID.h>
 

@@ -10,16 +10,13 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <memory>
-
-/* Pyhon headers. */
-#include <Python.h>
-
-/* Belle2 headers. */
 #include <alignment/GlobalLabel.h>
 #include <alignment/GlobalParam.h>
 #include <framework/dataobjects/EventMetaData.h>
+
+#include <Python.h>
+
+#include <memory>
 
 namespace Belle2 {
   namespace alignment {

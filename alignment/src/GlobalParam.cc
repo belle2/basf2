@@ -8,12 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <map>
-#include <string>
-#include <vector>
+#include <alignment/GlobalParam.h>
 
-/* Belle2 headers. */
 #include <alignment/Hierarchy.h>
 #include <cdc/dbobjects/CDCLayerAlignment.h>
 #include <framework/database/Database.h>
@@ -21,8 +17,9 @@
 #include <framework/logging/Logger.h>
 #include <vxd/geometry/GeoCache.h>
 
-/* Own header. */
-#include <alignment/GlobalParam.h>
+#include <map>
+#include <string>
+#include <vector>
 
 namespace Belle2 {
   namespace alignment {

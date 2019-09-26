@@ -10,18 +10,16 @@
 
 #pragma once
 
-/* C++ headers. */
+#include <framework/logging/Logger.h>
+#include <framework/database/Database.h>
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
+
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
-
-/* Belle2 headers. */
-#include <framework/logging/Logger.h>
-#include <framework/database/Database.h>
-#include <framework/database/DBObjPtr.h>
-#include <mdst/dbobjects/BeamSpot.h>
 
 namespace Belle2 {
   namespace alignment {

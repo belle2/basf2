@@ -10,18 +10,15 @@
 
 #pragma once
 
-/* ROOT headers. */
-#include <TMatrixD.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/geometry/Module.h>
 
-/* GenFit headers. */
 #include <genfit/PlanarMeasurement.h>
 #include <genfit/HMatrixUV.h>
 #include <genfit/TrackCandHit.h>
 #include <genfit/ICalibrationParametersDerivatives.h>
 
-/* Belle2 headers. */
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/bklm/geometry/Module.h>
+#include <TMatrixD.h>
 
 namespace Belle2 {
   /**

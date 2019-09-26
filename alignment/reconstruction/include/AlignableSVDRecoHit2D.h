@@ -10,14 +10,11 @@
 
 #pragma once
 
-/* ROOT headers. */
-#include <TMatrix.h>
+#include <svd/reconstruction/SVDRecoHit2D.h>
 
-/* Genfit headers. */
 #include <genfit/ICalibrationParametersDerivatives.h>
 
-/* Belle2 headers. */
-#include <svd/reconstruction/SVDRecoHit2D.h>
+#include <TMatrix.h>
 
 namespace genfit {
   class AbsMeasurement;

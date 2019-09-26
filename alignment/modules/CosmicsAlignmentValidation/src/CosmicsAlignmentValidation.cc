@@ -1,21 +1,16 @@
 
-/* Boost headers. */
-#include <boost/foreach.hpp>
+#include <alignment/modules/CosmicsAlignmentValidation/CosmicsAlignmentValidation.h>
 
-/* Genfit headers. */
-#include <genfit/Track.h>
-
-/* ROOT headers. */
-#include <root/TFile.h>
-#include <root/TTree.h>
-
-/* Belle2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-/* Own header. */
-#include <alignment/modules/CosmicsAlignmentValidation/CosmicsAlignmentValidation.h>
+#include <genfit/Track.h>
+
+#include <root/TFile.h>
+#include <root/TTree.h>
+
+#include <boost/foreach.hpp>
 
 //avoid having to wrap everything in the namespace explicitly
 //only permissible in .cc files!

@@ -317,17 +317,17 @@ void SVDValidation()
   name = "Residual for cluster size = 1";
   plotThis(Type, Side, "cResidualSize1", name, 100, -0.010, 0.010, Form("%s (cm)",name),
            tree, "cluster_residual", "Residual (clusterPos - truehitPos) distributions for clusters size = 1",
-           "Should be peak around zero", contact_str, 1);
+           "Should be peak around zero", contact_str, false, 1);
   
   name = "ResidualSize2";
   plotThis(Type, Side, "cResidualSize2", name, 100, -0.010, 0.010, Form("%s (cm)",name),
            tree, "cluster_residual", "Residual (clusterPos - truehitPos) distributions for clusters size = 2",
-           "Should be peak around zero", contact_str, 2);
+           "Should be peak around zero", contact_str, false, 2);
 
   name = "ResidualSize3";
   plotThis(Type, Side, "cResidualSize3", name, 100, -0.010, 0.010, Form("%s (cm)",name),
            tree, "cluster_residual", "Residual (clusterPos - truehitPos) distributions for clusters size > 2",
-           "Should be peak around zero", contact_str, 3);
+           "Should be peak around zero", contact_str, false, 3);
   
   // Pull
   name = "Pull";
@@ -338,17 +338,17 @@ void SVDValidation()
   name = "PullSize1";
   plotThis(Type, Side, "cPullSize1", name, 100, -5, 5, name,
            tree, "cluster_pull", "Pull (clusterPos - truehitPos)/clusterPosSignma distributions for cluster size = 1",
-           "Should be centered at 0 with RMS equal to 1", contact_str, 1);
+           "Should be centered at 0 with RMS equal to 1", contact_str, false, 1);
   
   name = "PullSize2";
   plotThis(Type, Side, "cPullSize2", name, 100, -5, 5, name,
            tree, "cluster_pull", "Pull (clusterPos - truehitPos)/clusterPosSignma distributions for cluster size = 2",
-           "Should be centered at 0 with RMS equal to 1", contact_str, 2);
+           "Should be centered at 0 with RMS equal to 1", contact_str, false, 2);
   
   name = "PullSize3";
   plotThis(Type, Side, "cPullSize3", name, 100, -5, 5, name,
            tree, "cluster_pull", "Pull (clusterPos - truehitPos)/clusterPosSignma distributions for cluster size > 2",
-           "Should be centered at 0 with RMS equal to 1", contact_str, 3);
+           "Should be centered at 0 with RMS equal to 1", contact_str, false, 3);
   
   // Cluster charge     
   name = "Cluster Charge";

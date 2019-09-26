@@ -72,6 +72,9 @@ def DstToD0PiD0ToHpJmPi0(path):
     D0cuts = '1.70 < M < 2.10'
     Dstcuts = 'massDifference(0) < 0.160 and useCMSFrame(p) > 2.0'
 
+    eventcuts = 'nCleanedTracks(abs(d0) < 0.5 and abs(z0) < 1.0) >= 3'
+    applyEventCuts(eventcuts, path=path)
+
     DstList = []
     reconstructDecay('D0:HpJmPi0 -> K-:myhjp0 pi+:myhjp0 pi0:myhjp0', D0cuts, path=path)
     # vertexTree('D0:HpJmPi0', 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
@@ -94,6 +97,9 @@ def DstToD0PiD0ToHpHmPi0(path):
 
     D0cuts = '1.70 < M < 2.10'
     Dstcuts = 'massDifference(0) < 0.160 and useCMSFrame(p) > 2.0'
+
+    eventcuts = 'nCleanedTracks(abs(d0) < 0.5 and abs(z0) < 1.0) >= 3'
+    applyEventCuts(eventcuts, path=path)
 
     D0_Channels = ['pi+:myhhp0 pi-:myhhp0 pi0:myhhp0',
                    'K+:myhhp0 K-:myhhp0 pi0:myhhp0',

@@ -500,8 +500,8 @@ In case you have something really analysis-specific that noone else will need. Y
 
 Below are step-by-step instructions for implementation of helicity angle for arbitrary granddaughter particle.
 
-Step 1. Check whether you function would fit in any of existing source files
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Step 1. Check whether your function would fit in any of the existing source files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If yes, go to the next step. 
 
@@ -582,17 +582,19 @@ Step 3. Implement the function in the source file
     // daughter_indices[1] = index of the granddaughter
    
     if (!particle)
-      return -999.9;
+      return std::numeric_limits<float>::quiet_NaN();
     int nDaughters = particle->getNDaughters();
     if(nDaughters < 2)
-      return -999.9;
+      return std::numeric_limits<float>::quiet_NaN();
+    if (daughter_indices.size() != 2) 
+      return std::numeric_limits<float>::quiet_NaN();
    
     // get the daughter particle
     int daughterIndex = daughter_indices[0];
     const Particle *daughter = particle->getDaughter(daughterIndex);
     nDaughters = daughter->getNDaughters();
     if(nDaughters < 2)
-      return -999.9;
+      return std::numeric_limits<float>::quiet_NaN();
    
     // get the granddaughter
     int grandDaughterIndex = daughter_indices[1];
@@ -641,7 +643,7 @@ You can use your variable in the same way as you use standard variables.
 How to use my variable at grid?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  * Prepare the envitonment with `b2analysis-create` tool.
+  * Prepare the environment with `b2analysis-create` tool.
 
 >>> b2analysis-create myanalysis <current central release, e.g. release-04-00-00> 
 >>> cd myanalysis

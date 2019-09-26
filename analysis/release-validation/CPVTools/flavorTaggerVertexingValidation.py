@@ -24,6 +24,7 @@
 import basf2 as b2
 import modularAnalysis as ma
 import flavorTagger as ft
+from dft import DeepFlavorTagger
 import vertex as vx
 import variables.collections as vc
 import variables.utils as vu
@@ -200,6 +201,17 @@ def applyCPVTools(mode='Expert'):
             samplerFileId=str(fileNumber),
             path=cp_val_path)
 
+        # DNN Identifier has to be set by hand when validating
+
+        # DeepFlavorTagger.DeepFlavorTagger('B0:sig',
+        #         mode='expert',
+        #         working_dir='',
+        #         uniqueIdentifier=dnnIdentifier,
+        #         output_variable='dnn_output',
+        #         path=cp_val_path)
+
+        # vu._variablemanager.addAlias('DNN_qrCombined', 'formula(2*extraInfo(dnn_output) - 1)')
+
     if doVertex or mode == 'Expert':
 
         if doVertex:
@@ -230,7 +242,7 @@ def applyCPVTools(mode='Expert'):
                 vu.create_aliases_for_selected(list_of_variables=vertex_vars,
                                                decay_string='B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]')
         if mode == 'Expert':
-            bvars += ft.flavor_tagging
+            bvars += ft.flavor_tagging  # + ['DNN_qrCombined', 'extraInfo(dnn_output)']
         else:
             vu._variablemanager.addAlias('qrMC', 'isRelatedRestOfEventB0Flavor')
             bvars += ['qrMC']

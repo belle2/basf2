@@ -104,7 +104,7 @@ been completely rewritten in a more coherent and modular way. We now have a new
 and consistent configuration interface, global tag replay and advanced checks:
 If users specify a global tag to be used which is either marked as invalid in
 the database or which cannot be found in the database the processing is now
-aborted. See :ref:`conditonsdb_overview` for details.
+aborted. See :ref:`conditionsdb_overview` for details.
 
 .. rubric:: Restrict usage of ``useDB=False`` for Geometry creation
 

@@ -12,6 +12,8 @@
 #include <framework/gearbox/Unit.h>
 #include <generators/particlegun/ParticleGun.h>
 
+#include <TRandom.h>
+
 #include <cmath>
 #include <limits>
 

@@ -10,9 +10,6 @@
 
 #include "EvtGenBase/EvtParticle.hh"
 #include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtReport.hh"
-#include "EvtGenBase/EvtTensor4C.hh"
-#include "EvtGenBase/EvtVector4C.hh"
 #include "EvtGenBase/EvtScalarParticle.hh"
 #include "EvtGenBase/EvtDiracSpinor.hh"
 #include "EvtGenBase/EvtId.hh"

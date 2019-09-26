@@ -14,10 +14,6 @@
 
 #include <string>
 
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/MCParticleGraph.h>
-
-#include "HepMC/GenEvent.h"
 #include "HepMC/IO_GenEvent.h"
 #include "HepMC/IO_HEPEVT.h"
 

@@ -175,10 +175,10 @@ Using decay hashes
 
 The use of decay hashes is demonstrated in :code:`B2A502-WriteOutDecayHash.py` and :code:`B2A503-ReadDecayHash.py`.
 
-:code:`B2A502-WriteOutDecayHash.py` creates one ROOT file, via `modularAnalysis.variablesToNtuple` 
-containing the requested variables including the two decay hashes, and a second root file containing the two decay hashes,
-and the full decay string.  
-The decay strings can be related to the candidates that they are associated with by matching up the decay hashes. 
+:code:`B2A502-WriteOutDecayHash.py` creates one ROOT file, via `modularAnalysis.variablesToNtuple`
+containing the requested variables including the two decay hashes, and a second root file containing the two decay hashes
+and the full decay string.
+The decay strings can be related to the candidates that they are associated with by matching up the decay hashes.
 An example of this using python is shown in :code:`B2A503-ReadDecayHash.py`.
 
 .. code-block:: python

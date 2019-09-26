@@ -1,3 +1,5 @@
+.. _conditionsdb_overview:
+
 Conditions Database Overview
 ============================
 
@@ -20,13 +22,13 @@ Interval of Validity (iov)
     * consists of four values: ``first_exp``, ``first_run``, ``final_exp``,
       ``final_run``
     * it is still valid for the final run (inclusive end)
-    * `final_exp>=0 && final_run<0`: valid for all runs in `final_exp`
-    * `final_exp <0 && final_run<0`: valid forever
+    * ``final_exp>=0 && final_run<0``: valid for all runs in ``final_exp``
+    * ``final_exp <0 && final_run<0``: valid forever, starting with ``fist_exp, first_run``
 
 Globaltag:
     A collection of payloads and iovs
 
-    * have a unique name and a description
+    * has a unique name and a description
     * can have gaps and overlaps, a payload is not guaranteed to be present for
       all possible runs.
     * are not necessarily valid for all data
@@ -46,15 +48,16 @@ further to ensure reproducibility of analyses: different processing iterations
 will use different globaltags. The only exceptions are the globaltag used online
 during data taking and for prompt processing of data directly after data taking:
 These two globaltags are flagged as running and information for new runs is
-constantly added to them as more data becomes available. Otherwise all
-globaltags to be used in analysis need to be fixed. Globaltags which are not
-fixed, i.e. "OPEN", cannot be used for data processing.
+constantly added to them as more data becomes available. 
+
+All globaltags to be used in analysis need to be fixed. Globaltags which are
+not fixed, i.e. "OPEN", cannot be used for data processing. Otherwise it is not possible to know exactly which conditions were used. If a globaltag in the processing chain is in "OPEN" state processing will not be possible.
 
 .. versionchanged:: release-04-00-00
    Prior to release-04-00-00 no check was performed on the state of globaltags
    so all globaltags could be used in analysis
 
-When processing data the software needs to know, which payloads to use for which
+When processing data the software needs to know which payloads to use for which
 runs so the globaltag (or multiple globaltags) to be used needs to be specified.
 This is done automatically in most cases as the globaltag used to create the
 file will be used when processing, the so called **globaltag replay**. However
@@ -65,7 +68,7 @@ globaltag selection completely and disable globaltag replay.
    Prior to release-04 the globaltag needed to always be configured manually and
    no automatic replay was in place
 
-If multiple globaltas are selected the software will look for all necessary
+If multiple globaltags are selected the software will look for all necessary
 payloads in each of them in turn and always take each payload from the first
 globaltag it can be found in.
 
@@ -74,16 +77,15 @@ Configuring the Conditions Database
 
 By default the software will look for conditions data in
 
-1. user globatags: Look in all globaltags provided by the user by setting `conditions.globaltags <ConditionsConfiguration.globaltags>`
+1. user globaltags: Look in all globaltags provided by the user by setting `conditions.globaltags <ConditionsConfiguration.globaltags>`
 2. globaltag replay: Look in different base globaltags depending on the use case:
 
-    - the default globaltags for the current software version (`conditions.default_globaltags <ConditionsConfiguration.default_globaltags>`
-      when generating events
-    - the globaltags specified in the input file when processing existing files.
+    - **Procesing existing files (i.e. mdst)**: the globaltags specified in the input file are used.
+    - **Generating and events**: the default globaltags for the current software version (`conditions.default_globaltags <ConditionsConfiguration.default_globaltags>` are used.
 
 The globaltag replay can be disabled by calling `conditions.override_globaltags() <ConditionsConfiguration.override_globaltags>`
 If multiple files are processed all need to have the same globaltags specified,
-otherwise processing cannot contiue unless globaltag replay is disabled.
+otherwise processing cannot continue unless globaltag replay is disabled.
 
 There are more advanced settings available via the `conditions <ConditionsConfiguration>`
 object which should not be needed by most users, like setting the URL to the central
@@ -152,7 +154,7 @@ These settings can be modified by setting environment variables
 
 .. envvar:: BELLE2_CONDB_METADATA
 
-   a whitespace separated list of urls and sqlite file to look for payload
+   a whitespace separated list of urls and sqlite files to look for payload
    information. Will be used to populate
    `conditions.metadata_providers <ConditionsConfiguration.metadata_providers`
 
@@ -222,11 +224,11 @@ payload files themselves before running the software:
    if you want to run over some existing files you might want to check what
    globaltags are stored in the file information using ::
 
-       b2file-metadata-show --all inputfile.ROOT
+       b2file-metadata-show --all inputfile.root
 
 2. Download all the necessary information using the :ref:`b2conditionsdb <b2conditionsdb>`
    command line tool. The tool will automatically download all information in a
-   globaltag as well as the payload files and put it all in a sqlte file and the
+   globaltag as well as the payload files and put it all in a sqlite file and the
    payload files in the same directory ::
 
        b2conditionsdb download -o /path/where/to/download/metadata.sqlite globaltag1 globaltag2 ...

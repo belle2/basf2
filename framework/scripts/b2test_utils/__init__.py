@@ -48,7 +48,7 @@ def require_file(filename, data_type="", py_case=None):
 
     Parameters:
         filename (str): relative filename to look for, either in a central place or in the current working directory
-        data_type (str): case insensitive data type to fine.  Either empty string or one of ``"examples"`` or ``"validation"``.
+        data_type (str): case insensitive data type to find.  Either empty string or one of ``"examples"`` or ``"validation"``.
         py_case (unittest.TestCase): if this is to be skipped within python's native unittest then pass the TestCase instance
 
     Returns:

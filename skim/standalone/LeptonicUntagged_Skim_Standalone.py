@@ -20,7 +20,7 @@ set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 skimCode = encodeSkimName('LeptonicUntagged')
 
 fileList = get_test_file("mixedBGx1", "MC12")

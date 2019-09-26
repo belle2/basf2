@@ -13,8 +13,8 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <framework/core/HistoModule.h>
+
 #include <TH1F.h>
 #include <TH2F.h>
 

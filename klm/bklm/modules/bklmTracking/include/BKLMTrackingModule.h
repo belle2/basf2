@@ -14,8 +14,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
 #include <klm/bklm/dataobjects/BKLMTrack.h>
-#include <klm/bklm/modules/bklmTracking/BKLMTrackFinder.h>
-#include <klm/bklm/geometry/Module.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <TFile.h>

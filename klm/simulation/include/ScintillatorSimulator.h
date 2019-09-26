@@ -12,7 +12,7 @@
 
 /* Belle2 headers. */
 #include <klm/bklm/dataobjects/BKLMSimHit.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/EKLMHitMCTime.h>
 #include <klm/eklm/dataobjects/EKLMSimHit.h>
 #include <klm/eklm/dbobjects/EKLMChannelData.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>

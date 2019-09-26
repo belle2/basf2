@@ -15,17 +15,10 @@
 #include <framework/gearbox/GearDir.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-//Start my addition
 #include <generators/SAD/dataobjects/SADMetaHit.h>
-// framework - DataStore
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
-// DataStore classes
-#include <framework/io/RootIOUtilities.h>
-#include <framework/dataobjects/EventMetaData.h>
-//End my addition
+// framework - DataStore
+#include <framework/datastore/StoreArray.h>
 
 #include <TRandom3.h>
 

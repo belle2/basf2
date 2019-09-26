@@ -9,8 +9,8 @@
  **************************************************************************/
 
 #include <alignment/Hierarchy.h>
+
 #include <alignment/GlobalLabel.h>
-#include <fstream>
 
 #include <boost/crc.hpp>
 

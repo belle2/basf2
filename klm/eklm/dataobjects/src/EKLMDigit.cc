@@ -9,9 +9,8 @@
  **************************************************************************/
 
 /* Belle2 headers. */
+#include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <framework/logging/Logger.h>
-#include <klm/dataobjects/KLMDigitEventInfo.h>
 
 using namespace Belle2;
 

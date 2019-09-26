@@ -21,13 +21,9 @@
 //------------------------------------------------------------------------
 //
 #include <generators/evtgen/EvtGenModelRegister.h>
-#include "EvtGenBase/EvtPatches.hh"
-#include <stdlib.h>
 #include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtGenKine.hh"
 #include "EvtGenBase/EvtPDL.hh"
 #include "generators/evtgen/models/EvtEtaPi0Dalitz.h"
-#include "EvtGenBase/EvtReport.hh"
 #include <string>
 
 namespace Belle2 {

@@ -9,7 +9,6 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisPXDFits.h>
 #include <TROOT.h>
-#include <TClass.h>
 
 #include <boost/format.hpp>
 

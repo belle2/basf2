@@ -447,6 +447,8 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
     } else {
       getEventTime(isector, track, "zero");
     }
+  } else {
+    B2ERROR("No valid parameter for et_option (" << et_option << " )!");
   }
 
 }

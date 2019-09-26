@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerObject.h>
 #include <hlt/softwaretrigger/dataobjects/SoftwareTriggerVariables.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <TTree.h>

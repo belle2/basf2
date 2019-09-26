@@ -13,7 +13,6 @@
 
 /* Belle2 headers. */
 #include <klm/eklm/modules/EKLMAlignmentAlongStrips/EKLMAlignmentAlongStripsCollectorModule.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
 #include <tracking/dataobjects/ExtHit.h>
 

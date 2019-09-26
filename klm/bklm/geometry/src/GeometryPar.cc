@@ -10,7 +10,6 @@
 
 /* Belle2 headers. */
 #include <alignment/dbobjects/BKLMAlignment.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/DBObjPtr.h>

@@ -14,7 +14,6 @@
 #include <framework/core/Module.h>
 
 #include <string>
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <generators/lhe/LHEReader.h>

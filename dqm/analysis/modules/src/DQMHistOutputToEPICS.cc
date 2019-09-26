@@ -8,8 +8,6 @@
 
 
 #include <dqm/analysis/modules/DQMHistOutputToEPICS.h>
-#include <TROOT.h>
-#include <TClass.h>
 
 using namespace std;
 using namespace Belle2;

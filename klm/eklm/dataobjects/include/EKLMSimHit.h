@@ -10,9 +10,6 @@
 
 #pragma once
 
-/* External headers. */
-#include <TObject.h>
-
 /* Belle2 headers. */
 #include <simulation/dataobjects/SimHitBase.h>
 #include <klm/eklm/dataobjects/EKLMHitBase.h>

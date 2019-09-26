@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <klm/bklm/modules/bklmTracking/BKLMTrackingModule.h>
+#include <klm/bklm/modules/bklmTracking/BKLMTrackFinder.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>

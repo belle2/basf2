@@ -998,9 +998,8 @@ class AlgorithmMachine(Machine):
     #: Required attributes that must exist before the machine can run properly.
     #: Some are allowed be values that return False whe tested e.g. "" or []
     required_attrs = ["algorithm",
-                      "global_tag",
-                      "local_database_chain",
                       "dependent_databases",
+                      "database_chain",
                       "output_dir",
                       "output_database_dir",
                       "input_files"
@@ -1028,14 +1027,13 @@ class AlgorithmMachine(Machine):
 
         #: Algorithm() object whose state we are modelling
         self.algorithm = algorithm
-        #: Global tag for this calibration
-        self.global_tag = ""
         #: Collector output files, will contain all files retured by the output patterns
         self.input_files = []
-        #: User defined local database chain i.e. if you have localdb's for custom alignment etc
-        self.local_database_chain = []
         #: CAF created local databases from previous calibrations that this calibration/algorithm depends on
         self.dependent_databases = []
+        #: Assigned database chain to the overall Calibration object, or to the 'default' Collection.
+        #: Database chains for manually created Collections have no effect here.
+        self.database_chain = []
         #: The algorithm output directory which is mostly used to store the stdout file
         self.output_dir = ""
         #: The output database directory for the localdb that the algorithm will commit to
@@ -1045,6 +1043,7 @@ class AlgorithmMachine(Machine):
 
         self.add_transition("setup_algorithm", "init", "ready",
                             before=[self._setup_logging,
+                                    self._change_working_dir,
                                     self._setup_database_chain,
                                     self._set_input_data,
                                     self._pre_algorithm])
@@ -1141,6 +1140,12 @@ class AlgorithmMachine(Machine):
 #        set_log_level(basf2.LogLevel.DEBUG)
 #        set_debug_level(100)
         basf2.log_to_file(log_file)
+
+    def _change_working_dir(self, **kwargs):
+        """
+        """
+        B2INFO("Changing current working directory to {}".format(self.output_dir))
+        os.chdir(self.output_dir)
 
     def _pre_algorithm(self, **kwargs):
         """

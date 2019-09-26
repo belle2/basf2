@@ -19,6 +19,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysisECL.h>
 
 #include <boost/format.hpp>
+#include <TROOT.h>
 
 using namespace Belle2;
 

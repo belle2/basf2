@@ -12,7 +12,6 @@
 #include <boost/format.hpp>
 #include <daq/slc/base/StringUtil.h>
 #include <TClass.h>
-#include <TDirectory.h>
 #include "TROOT.h"
 
 using namespace std;

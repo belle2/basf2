@@ -16,11 +16,11 @@
 #include <klm/bklm/dataobjects/BKLMSimHitPosition.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include "CLHEP/Vector/ThreeVector.h"
-#include "CLHEP/Units/PhysicalConstants.h"
 #include "CLHEP/Units/SystemOfUnits.h"
 
 #include "TRandom3.h"

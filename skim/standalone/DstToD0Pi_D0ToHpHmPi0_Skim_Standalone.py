@@ -38,7 +38,6 @@ stdPi('all', path=c3bh1path)
 stdK('all', path=c3bh1path)
 stdE('all', path=c3bh1path)
 stdMu('all', path=c3bh1path)
-stdKshorts(path=c3bh1path)
 
 from skim.charm import DstToD0PiD0ToHpHmPi0
 DstToD0PiD0ToHpHmPi0List = DstToD0PiD0ToHpHmPi0(path=c3bh1path)

@@ -62,15 +62,21 @@ def DstToD0PiD0ToHpJm(path):
 
 
 def DstToD0PiD0ToHpJmPi0(path):
+    mySel = 'abs(d0) < 0.5 and abs(z0) < 1.0'  # IP cut, tighter than previous skims
+    mySel += ' and 0.296706 < theta < 2.61799'  # CDC acceptance cut
+    fillParticleList('pi+:myhjp0', mySel, path=path)
+    fillParticleList('K+:myhjp0', mySel, path=path)
+
+    cutAndCopyList('pi0:myhjp0', 'pi0:skim', '', path=path)  # see analysis/scripts/stdPi0s.py for cuts
+
+    D0cuts = '1.70 < M < 2.10'
     Dstcuts = 'massDifference(0) < 0.160 and useCMSFrame(p) > 2.0'
-    charmcuts = '1.70 < M < 2.10'
-    cutAndCopyList('pi0:myskim', 'pi0:skim', '', path=path)  # additional cuts removed 27 Jun 2019 by Emma Oxford
 
     DstList = []
-    reconstructDecay('D0:HpJmPi0 -> K-:loose pi+:loose pi0:myskim', charmcuts, path=path)
+    reconstructDecay('D0:HpJmPi0 -> K-:myhjp0 pi+:myhjp0 pi0:myhjp0', D0cuts, path=path)
     # vertexTree('D0:HpJmPi0', 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
-    reconstructDecay('D*+:HpJmPi0RS -> D0:HpJmPi0 pi+:all', Dstcuts, path=path)
-    reconstructDecay('D*-:HpJmPi0WS -> D0:HpJmPi0 pi-:all', Dstcuts, path=path)
+    reconstructDecay('D*+:HpJmPi0RS -> D0:HpJmPi0 pi+:myhjp0', Dstcuts, path=path)
+    reconstructDecay('D*-:HpJmPi0WS -> D0:HpJmPi0 pi-:myhjp0', Dstcuts, path=path)
     copyLists('D*+:HpJmPi0', ['D*+:HpJmPi0RS', 'D*+:HpJmPi0WS'], path=path)
     # vertexKFit('D*+:HpJmPi0', 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
     DstList.append('D*+:HpJmPi0')
@@ -79,20 +85,27 @@ def DstToD0PiD0ToHpJmPi0(path):
 
 
 def DstToD0PiD0ToHpHmPi0(path):
+    mySel = 'abs(d0) < 0.5 and abs(z0) < 1.0'  # IP cut, tighter than previous skims
+    mySel += ' and 0.296706 < theta < 2.61799'  # CDC acceptance cut
+    fillParticleList('pi+:myhhp0', mySel, path=path)
+    fillParticleList('K+:myhhp0', mySel, path=path)
+
+    cutAndCopyList('pi0:myhhp0', 'pi0:skim', '', path=path)  # see analysis/scripts/stdPi0s.py for cuts
+
+    D0cuts = '1.70 < M < 2.10'
     Dstcuts = 'massDifference(0) < 0.160 and useCMSFrame(p) > 2.0'
-    charmcuts = '1.70 < M < 2.10'
-    cutAndCopyList('pi0:myskim', 'pi0:skim', '', path=path)  # additional cuts removed 27 Jun 2019 by Emma Oxford
-    D0_Channels = ['pi+:loose pi-:loose pi0:myskim',
-                   'K+:loose K-:loose pi0:myskim',
+
+    D0_Channels = ['pi+:myhhp0 pi-:myhhp0 pi0:myhhp0',
+                   'K+:myhhp0 K-:myhhp0 pi0:myhhp0',
                    ]
 
     DstList = []
 
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:HpHmPi0' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
+        reconstructDecay('D0:HpHmPi0' + str(chID) + ' -> ' + channel, D0cuts, chID, path=path)
         # vertexTree('D0:HpHmPi0' + str(chID), 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
         # reconstructDecay('D*+:HpHmPi0' + str(chID) + ' -> pi+:all D0:HpHmPi0' + str(chID), Dstcuts, chID, path=path)
-        reconstructDecay('D*+:HpHmPi0' + str(chID) + ' -> D0:HpHmPi0' + str(chID) + ' pi+:all', Dstcuts, chID, path=path)
+        reconstructDecay('D*+:HpHmPi0' + str(chID) + ' -> D0:HpHmPi0' + str(chID) + ' pi+:myhhp0', Dstcuts, chID, path=path)
         # vertexKFit('D*+:HpHmPi0' + str(chID), 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
         DstList.append('D*+:HpHmPi0' + str(chID))
 

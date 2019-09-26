@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <alignment/GblMultipleScatteringController.h>
+
 #include <genfit/GblFitter.h>
 
 using namespace std;

@@ -10,18 +10,16 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-#include <map>
-#include <set>
-
-#include <memory>
 #include <framework/logging/Logger.h>
 #include <framework/database/Database.h>
-
 #include <framework/database/DBObjPtr.h>
-#include <alignment/GlobalLabel.h>
 #include <mdst/dbobjects/BeamSpot.h>
+
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <vector>
 
 namespace Belle2 {
   namespace alignment {

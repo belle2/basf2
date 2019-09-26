@@ -14,9 +14,9 @@
 
 #include "dqm/analysis/modules/DQMHistAnalysisPXDER.h"
 
-#include <framework/core/HistoModule.h>
-
+#include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/geometry/GeoCache.h>
 
 #include <boost/format.hpp>
 
@@ -24,7 +24,7 @@
 #include <TKey.h>
 #include <TDirectory.h>
 #include <TFile.h>
-#include <TF1.h>
+#include <TROOT.h>
 
 #include <memory>
 

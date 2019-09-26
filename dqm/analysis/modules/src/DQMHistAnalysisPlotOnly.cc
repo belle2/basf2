@@ -8,11 +8,8 @@
 
 
 #include <dqm/analysis/modules/DQMHistAnalysisPlotOnly.h>
-#include <TSystem.h>
 #include <TDirectory.h>
 #include <TROOT.h>
-#include <TH1F.h>
-#include <TH2F.h>
 #include <TClass.h>
 
 using namespace std;

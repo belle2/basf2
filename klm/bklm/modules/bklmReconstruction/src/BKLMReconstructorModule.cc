@@ -18,7 +18,6 @@
 #include <klm/bklm/dataobjects/BKLMStatus.h>
 
 #include "CLHEP/Vector/ThreeVector.h"
-#include "CLHEP/Matrix/Matrix.h"
 
 using namespace std;
 using namespace Belle2;

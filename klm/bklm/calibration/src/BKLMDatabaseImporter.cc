@@ -13,21 +13,18 @@
 #include <klm/bklm/dbobjects/BKLMAlignment.h>
 #include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <klm/bklm/dbobjects/BKLMSimulationPar.h>
+#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
 #include <klm/bklm/dbobjects/BKLMTimeWindow.h>
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 
 #include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
 
 #include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportArray.h>
 #include <framework/database/DBImportObjPtr.h>
-
-#include <TFile.h>
-#include <TTree.h>
 
 using namespace std;
 using namespace Belle2;

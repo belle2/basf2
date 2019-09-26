@@ -1,27 +1,19 @@
-#include <alignment/GlobalParam.h>
-#include <alignment/PedeResult.h>
 
-#include <vxd/dataobjects/VxdID.h>
-#include <cdc/dataobjects/WireID.h>
+#include <alignment/dbobjects/VXDAlignment.h>
+#include <alignment/GlobalParam.h>
+#include <alignment/Manager.h>
+#include <cdc/dbobjects/CDCTimeZeros.h>
+#include <cdc/dbobjects/CDCTimeWalks.h>
+#include <cdc/dbobjects/CDCAlignment.h>
+#include <cdc/dbobjects/CDCXtRelations.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <klm/bklm/dbobjects/BKLMAlignment.h>
+#include <klm/eklm/dbobjects/EKLMAlignment.h>
+
 #include <gtest/gtest.h>
+
 #include <iostream>
 #include <string>
-
-#include <framework/database/Database.h>
-
-#include <TFile.h>
-#include <TTree.h>
-#include <TH1F.h>
-
-#include <TClonesArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <alignment/dbobjects/VXDAlignment.h>
-#include <alignment/Hierarchy.h>
-#include <alignment/Manager.h>
-#include <TMath.h>
-
-
 
 using namespace std;
 using namespace Belle2;

@@ -11,14 +11,12 @@
 #include <dqm/analysis/modules/DQMHistComparitor.h>
 #include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
-#include <TSystem.h>
 #include <TStyle.h>
 #include <TClass.h>
 #include <TDirectory.h>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TKey.h>
-#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace Belle2;

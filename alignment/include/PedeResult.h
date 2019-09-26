@@ -11,9 +11,9 @@
 #ifndef PEDERESULT_H
 #define PEDERESULT_H
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 namespace Belle2 {
   namespace alignment {

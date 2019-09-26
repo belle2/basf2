@@ -13,10 +13,6 @@
 
 #include <map>
 #include <set>
-#include <vxd/dataobjects/VxdID.h>
-#include <cdc/dataobjects/WireID.h>
-
-#include <framework/gearbox/Const.h>
 
 namespace Belle2 {
 

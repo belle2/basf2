@@ -8,16 +8,17 @@ Based on a bash script by Mikhail Remnev mikhail.remnev@desy.de
 https://confluence.desy.de/display/BI/ECL+LM+Integrated+luminosity+in+Phase+3
 
 Usage:
-    b2info-luminosity-online --exp <E> --runs <Range> --plot [DATE|RUN] [--verbose] [--db db_path]
+    b2info-luminosity --exp <E> --runs <Range> --what [online|offline] --plot [DATE|RUN] [--verbose]
 
 <E> experiment number (mandatory) A range is allowed
 <Range> run range (mandatory)
     syntax is: xx-yy,zz
     all runs between xx and yy (included) and run zz. Can have multiple ranges xx-yy,zz-ww
     not allowed if exp has range as well
+--what Use Offline (default) or Online luminosity
 --plot Produce plot of integrated luminosity vs day (DATE) or vs run (RUN)
 --verbose print lumi for each run
---db path of database to use
+--dbon|offline path of database to use (for developers)
 
 """
 
@@ -84,16 +85,29 @@ def argparser():
                         required=False,
                         default=None,
                         help="Process only the selected run range. Syntax is xx-yy,zz")
+    parser.add_argument("--what",
+                        dest="what",
+                        action="store",
+                        type=str,
+                        required=False,
+                        default='offline',
+                        choices=["offline","online"],
+                        help="Offline (default) or online luminosity")
     parser.add_argument("--verbose",
                         dest="verb",
                         action="store_true",
                         default=False,
                         help="Print each run luminosity")
-    parser.add_argument("--db",
-                        dest="db",
+    parser.add_argument("--dbonline",
+                        dest="dbonlie",
                         action="store",
                         default="/gpfs/group/belle2/group/detector/ECL/ecl_lom.db",
                         help="EC: DataBase path")
+    parser.add_argument("--dboffline",
+                        dest="dbofflie",
+                        action="store",
+                        default="/group/belle2/dataprod/Luminosity/OffLineLuminosity.db",
+                        help="DataBase path for OffLine Lumi")
 
     plot_actions = {
         "DATE" : "Histogram of integrated luminosity per date",
@@ -121,7 +135,9 @@ class Luminosity:
 
         :param args: command-line args.
         """
-        self.DB = args.db
+        self.DBonline = args.dbonlie
+        self.DBoffline = args.dbofflie
+        self.what=args.what
         self.conn = self.create_connection()
         self.exp=args.exp
         self.expstr="-".join(str(_) for _ in args.exp)
@@ -141,9 +157,13 @@ class Luminosity:
         if not self.conn:
             b2.B2FATAL(f"could not establish connection to db: {db}")
 
-        self.col_lumi = "lum_det_shift"
+        if self.what=='offline':
+            self.col_lumi = "lee"
+            self.df = self.getDataFrameFromDBOffLine()
+        else:
+            self.col_lumi = "lum_det_shift"
+            self.df = self.getDataFrameFromDBOnline()
 
-        self.df = self.getDataFrameFromDB()
     
         
 
@@ -155,29 +175,59 @@ class Luminosity:
         :return: Connection object or None
         """
 
-        if not os.path.exists(self.DB):
-            b2.B2FATAL(f"DB {self.DB} not found. The live luminosity is only available on KEKCC (sorry)")
+        DB=None
+        if self.what=='offline':
+            DB=self.DBoffline
+        else:
+            DB=self.DBonline
+
+        if not os.path.exists(DB):
+            b2.B2FATAL(f"DB {DB} not found. The live luminosity is only available on KEKCC (sorry)")
 
         connection = None
         try:
-            connection = sqlite3.connect(self.DB)
+            connection = sqlite3.connect(DB)
         except sqlite3.Error as e:
             print(e)
 
         return connection
 
-    def getDataFrameFromDB(self):
+    def getDataFrameFromDBOffLine(self):
         """
-        crete a panda dataframe from DB
+        create a panda dataframe from Offline DB
         """
-
-        #cmdexp = f"SELECT {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = :exp "
-        cmdexp = f"SELECT {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp IN ({', '.join(['?' for _ in self.exp])})  "
+        cmdexp = f"SELECT {self.col_lumi} as lumi, exp, run, start_time as date FROM RunLumi WHERE exp IN ({', '.join(['?' for _ in self.exp])})  "
         if args.runs:
             cmdexp += f" AND run >= {min(self.runs)} AND run <= {max(self.runs)}"
 
         # Get the DB as a pandas.Dataframe.
         df = pd.read_sql(cmdexp, self.conn, params=self.exp)
+        df = df.sort_values(by=['date'])
+        print(f"Read {len(df)} runs for experiment {self.expstr}")
+
+        # # convert epoch to date
+        df['date'] = pd.to_datetime(df['date'],unit='s')
+
+        # lumi in /fb
+        df['lumi'] *= 1E-6
+        # cumulative integrated luminosity
+        df['intLumi'] = df['lumi'].cumsum()
+
+        return df
+
+    def getDataFrameFromDBOnline(self):
+        """
+        create a panda dataframe from DB
+        """
+
+        #cmdexp = f"SELECT {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = :exp "
+        cmdexp = f"SELECT exp, {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp IN ({', '.join(['?' for _ in self.exp])})  "
+        if args.runs:
+            cmdexp += f" AND run >= {min(self.runs)} AND run <= {max(self.runs)}"
+
+        # Get the DB as a pandas.Dataframe.
+        df = pd.read_sql(cmdexp, self.conn, params=self.exp)
+        df = df.sort_values(by=['date'])
         print(f"Read {len(df)} runs for experiment {self.expstr}")
 
         # convert epoch to date
@@ -243,12 +293,12 @@ class Luminosity:
         ax2.legend(h1+h2, l1+l2,loc="best",title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
 
         # Text box. Use axis coords.
-        plt.text(0., 1.03, rf"Belle II online luminosity", transform=ax1.transAxes, fontsize=12)
+        plt.text(0., 1.03, rf"Belle II {self.what.title()} luminosity", transform=ax1.transAxes, fontsize=12)
         plt.text(.5, 1.03, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, fontsize=12)
         plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
         plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
-        filename=f"LumiPer{label}_Exp{self.expstr}"
+        filename=f"Lumi{self.what.title()}Per{label}_Exp{self.expstr}"
         if self.runs:
             filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
         print(f"Creating {filename}.pdf|png files")
@@ -291,12 +341,12 @@ class Luminosity:
         ax2.legend(h1+h2, l1+l2, loc=2, title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
 
         # Text box. Use axis coords.
-        plt.text(0., 1.03, rf"Belle II online luminosity", transform=ax1.transAxes, fontsize=12)
+        plt.text(0., 1.03, rf"Belle II {self.what.title()} luminosity", transform=ax1.transAxes, fontsize=12)
         plt.text(.5, 1.03, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, fontsize=12)
         plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {dfRuns['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
         plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
-        filename=f"LumiPerRun_Exp{self.expstr}"
+        filename=f"Lumi{self.what.title()}PerRun_Exp{self.expstr}"
         if self.runs:
             filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
         print(f"Creating {filename}.pdf|png files")
@@ -315,12 +365,16 @@ class Luminosity:
             dfRuns=self.df
         # create a reduced dataframe with only runs selected
 
-        cols=['run','lumi','date','intLumi']
+        cols=['exp','run','lumi','date','intLumi']
         if (self.verb):
+            print('-' * 61)
+            print('-' * 20,f"{self.what} Luminosity",'-'*20)
             print('-' * 61)
             print(dfRuns[cols]
                 .to_string(index=False,
-                    formatters={"run" : "{:5d}".format,
+                    formatters={
+                    "exp" : "{:3d}".format,
+                    "run" : "{:5d}".format,
                     "lumi" : "{:,.2f}".format,
                     "data" : "".format,
                     "intLumi" : "{:,.2f}".format,
@@ -328,7 +382,7 @@ class Luminosity:
                                 ))
             print('-' * 61)
         L=dfRuns['lumi'].sum()
-        print(f"TOTAL    : L = {L*1E6:8.2f} /nb = {L*1E3:8.2f} /pb = {L:8.3f} /fb = {L/1E3:8.4f} /ab")
+        print(f"TOTAL {self.what}   : L = {L*1E6:8.2f} /nb = {L*1E3:8.2f} /pb = {L:8.3f} /fb = {L/1E3:8.4f} /ab")
         
         pass
 

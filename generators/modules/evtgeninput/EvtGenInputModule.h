@@ -14,13 +14,11 @@
 #include <generators/evtgen/EvtGenInterface.h>
 
 #include <generators/utilities/InitialParticleGeneration.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <framework/core/Module.h>
 
 #include <string>
-#include <vector>
 
 namespace Belle2 {
 

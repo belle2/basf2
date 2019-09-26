@@ -8,18 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <alignment/Hierarchy.h>
+#include <alignment/reconstruction/AlignableBKLMRecoHit.h>
+
 #include <alignment/GlobalDerivatives.h>
 #include <alignment/GlobalLabel.h>
-#include <alignment/reconstruction/AlignableBKLMRecoHit.h>
-#include <framework/gearbox/Const.h>
+#include <alignment/Hierarchy.h>
 #include <framework/geometry/B2Vector3.h>
-#include <framework/logging/Logger.h>
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/dbobjects/BKLMAlignment.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
+
+#include <genfit/DetPlane.h>
 
 using namespace std;
 using namespace Belle2;

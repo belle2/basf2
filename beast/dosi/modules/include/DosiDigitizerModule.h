@@ -12,18 +12,8 @@
 #define DOSIDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <beast/dosi/dataobjects/DosiHit.h>
-#include <string>
-#include <vector>
-
-//ROOT
-#include <TRandom3.h>
-#include <TMath.h>
-#include <TF1.h>
-#include <TVector3.h>
-
 
 namespace Belle2 {
   namespace dosi {

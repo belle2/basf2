@@ -11,8 +11,8 @@
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
 #include <TH1F.h>
-#include <cdc/geometry/CDCGeometryPar.h>
-#include "vector"
+#include <cdc/dbobjects/CDCGeometry.h>
+#include <framework/database/DBObjPtr.h>
 #include "string"
 namespace Belle2 {
   namespace CDC {

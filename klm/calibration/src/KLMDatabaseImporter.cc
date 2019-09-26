@@ -9,7 +9,6 @@
  **************************************************************************/
 
 /* C++ headers. */
-#include <cmath>
 #include <string>
 
 /* External headers. */
@@ -19,7 +18,6 @@
 /* Belle2 headers. */
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <klm/calibration/KLMDatabaseImporter.h>
 

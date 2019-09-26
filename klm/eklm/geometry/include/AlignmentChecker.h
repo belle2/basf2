@@ -10,9 +10,6 @@
 
 #pragma once
 
-/* External headers. */
-#include <CLHEP/Geometry/Point3D.h>
-
 /* Belle2 headers. */
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
 #include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>

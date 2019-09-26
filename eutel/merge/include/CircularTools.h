@@ -10,7 +10,6 @@
 
 #include <algorithm>
 #include <functional>
-#include <set>
 
 namespace CIRC {
 

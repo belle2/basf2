@@ -10,9 +10,6 @@
 #pragma once
 
 #include <mdst/dbobjects/SoftwareTriggerCutBase.h>
-#include <framework/database/Database.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
 
 #include <TObject.h>
 

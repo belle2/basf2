@@ -9,11 +9,9 @@
  **************************************************************************/
 
 #include <mdst/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
-#include <mdst/dbobjects/SoftwareTriggerCutBase.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerCut.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 #include <framework/database/LocalDatabase.h>
-#include <framework/database/DBImportObjPtr.h>
 #include <boost/filesystem.hpp>
 
 #include <framework/utilities/TestHelpers.h>

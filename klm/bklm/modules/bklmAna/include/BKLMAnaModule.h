@@ -12,8 +12,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include "klm/bklm/geometry/Module.h"
-#include <klm/bklm/geometry/GeometryPar.h>
 #include <mdst/dataobjects/Track.h>
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
 #include <tracking/dataobjects/ExtHit.h>
@@ -21,12 +19,6 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include "TTree.h"
-
-#include <map>
-#include <iostream>
-#include <set>
-
-//using namespace std;
 
 namespace Belle2 {
 

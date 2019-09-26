@@ -9,7 +9,7 @@
 **************************************************************************/
 #pragma once
 
-#include <Rtypes.h>
+#include <RtypesCore.h>
 
 #include <bitset>
 #include <map>

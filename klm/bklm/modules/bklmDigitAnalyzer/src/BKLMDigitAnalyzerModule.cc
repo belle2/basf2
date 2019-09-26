@@ -10,6 +10,9 @@
 
 #include <TGaxis.h>
 
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+
 #include <klm/bklm/modules/bklmDigitAnalyzer/BKLMDigitAnalyzerModule.h>
 
 using namespace Belle2;

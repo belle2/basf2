@@ -12,6 +12,9 @@
 #include <TDirectory.h>
 
 /* Belle2 headers. */
+#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/dataobjects/BKLMHit1d.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/modules/KLMDQM/KLMDQMModule.h>
 

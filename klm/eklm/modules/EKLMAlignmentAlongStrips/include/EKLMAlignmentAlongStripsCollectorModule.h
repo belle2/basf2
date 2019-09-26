@@ -10,9 +10,6 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <string>
-
 /* Belle2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
 #include <klm/eklm/calibration/EKLMAlignmentAlongStripsAlgorithm.h>

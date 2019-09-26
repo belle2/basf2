@@ -13,7 +13,6 @@
 
 #include <string>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <generators/hepmc/HepMCReader.h>

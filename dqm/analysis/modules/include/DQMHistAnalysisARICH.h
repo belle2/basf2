@@ -13,8 +13,6 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-
 //DQM
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
@@ -22,18 +20,8 @@
 #include <arich/utility/ARICHChannelHist.h>
 
 #include <TCanvas.h>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TH3F.h>
-#include <TVector2.h>
-#include <TText.h>
 #include <TLine.h>
-#include <TFile.h>
 #include <TH2Poly.h>
-#include <chrono>
-#include <vector>
-#include <string>
-#include <map>
 
 namespace Belle2 {
 

@@ -14,12 +14,6 @@
 #include "klm/bklm/dbobjects/BKLMGeometryPar.h"
 
 #include <geometry/Materials.h>
-#include <geometry/CreatorFactory.h>
-#include <geometry/utilities.h>
-
-#include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -29,7 +23,6 @@
 #include <G4SubtractionSolid.hh>
 #include <G4UnionSolid.hh>
 #include <G4Transform3D.hh>
-#include <G4UserLimits.hh>
 #include <G4VisAttributes.hh>
 #include <G4String.hh>
 

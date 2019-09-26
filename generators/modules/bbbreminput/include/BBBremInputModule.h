@@ -16,10 +16,7 @@
 #include <generators/bbbrem/BBBrem.h>
 #include <generators/utilities/InitialParticleGeneration.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
-
-#include <string>
 
 namespace Belle2 {
 

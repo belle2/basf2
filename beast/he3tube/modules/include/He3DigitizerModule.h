@@ -14,15 +14,8 @@
 #include <beast/he3tube/dataobjects/He3tubeSimHit.h>
 
 #include <framework/core/Module.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <beast/he3tube/dataobjects/He3tubeHit.h>
-#include <string>
-#include <vector>
-
-#include <TFile.h>
-#include <TTree.h>
-#include <TRandom.h>
 
 namespace Belle2 {
   namespace he3tube {

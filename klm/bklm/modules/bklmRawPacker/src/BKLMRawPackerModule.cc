@@ -6,7 +6,6 @@
 //-
 
 #include <klm/bklm/modules/bklmRawPacker/BKLMRawPackerModule.h>
-#include <framework/database/DBArray.h>
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 
 #include <framework/logging/Logger.h>

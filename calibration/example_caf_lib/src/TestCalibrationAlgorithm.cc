@@ -5,6 +5,8 @@
 #include <TTree.h>
 #include <TH1F.h>
 #include <TClonesArray.h>
+#include <TRandom.h>
+
 
 #include <alignment/dataobjects/MilleData.h>
 #include <calibration/dbobjects/TestCalibObject.h>

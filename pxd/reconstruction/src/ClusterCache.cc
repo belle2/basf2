@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <pxd/reconstruction/ClusterCache.h>
-#include <iostream>
 
 namespace Belle2 {
 

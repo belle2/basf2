@@ -294,6 +294,9 @@ KId = {'Belle': 'kIDBelle', 'Belle2': 'kaonID'}
 muId = {'Belle': 'muIDBelle', 'Belle2': 'muonID'}
 eId = {'Belle': 'eIDBelle', 'Belle2': 'electronID'}
 
+# Below some input variables are commented because they lead to large data/MC discrepancies.
+# Uncomment them, when their distributions will have good data/MC agreement.
+
 
 def setVariables():
     """
@@ -307,7 +310,7 @@ def setVariables():
         'pt',
         'cosTheta',
         eId[getBelleOrBelle2()],
-        'eid_dEdx',
+        # 'eid_dEdx',
         'eid_TOP',
         'eid_ARICH',
         'eid_ECL',
@@ -316,8 +319,8 @@ def setVariables():
         'BtagToWBosonVariables(cosThetaMissCMS)',
         'BtagToWBosonVariables(EW90)',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
+        # 'ImpactXY',
+        # 'distance',
         'chiProb',
     ]
     variables['IntermediateElectron'] = variables['Electron']
@@ -328,7 +331,7 @@ def setVariables():
         'pt',
         'cosTheta',
         muId[getBelleOrBelle2()],
-        'muid_dEdx',
+        # 'muid_dEdx',
         'muid_TOP',
         'muid_ARICH',
         'muid_KLM',
@@ -337,11 +340,30 @@ def setVariables():
         'BtagToWBosonVariables(cosThetaMissCMS)',
         'BtagToWBosonVariables(EW90)',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
+        # 'ImpactXY',
+        # 'distance',
+        # 'chiProb',
+    ]
+    variables['IntermediateMuon'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'p',
+        'pt',
+        'cosTheta',
+        muId[getBelleOrBelle2()],
+        # 'muid_dEdx',
+        'muid_TOP',
+        'muid_ARICH',
+        'muid_KLM',
+        'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(pMissCMS)',
+        'BtagToWBosonVariables(cosThetaMissCMS)',
+        'BtagToWBosonVariables(EW90)',
+        'cosTPTO',
+        # 'ImpactXY',
+        # 'distance',
         'chiProb',
     ]
-    variables['IntermediateMuon'] = variables['Muon']
     variables['KinLepton'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
@@ -349,12 +371,12 @@ def setVariables():
         'pt',
         'cosTheta',
         muId[getBelleOrBelle2()],
-        'muid_dEdx',
+        # 'muid_dEdx',
         'muid_TOP',
         'muid_ARICH',
         'muid_KLM',
         eId[getBelleOrBelle2()],
-        'eid_dEdx',
+        # 'eid_dEdx',
         'eid_TOP',
         'eid_ARICH',
         'eid_ECL',
@@ -363,16 +385,41 @@ def setVariables():
         'BtagToWBosonVariables(cosThetaMissCMS)',
         'BtagToWBosonVariables(EW90)',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
+        # 'ImpactXY',
+        # 'distance',
+        # 'chiProb',
+    ]
+    variables['IntermediateKinLepton'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'p',
+        'pt',
+        'cosTheta',
+        muId[getBelleOrBelle2()],
+        # 'muid_dEdx',
+        'muid_TOP',
+        'muid_ARICH',
+        'muid_KLM',
+        eId[getBelleOrBelle2()],
+        # 'eid_dEdx',
+        'eid_TOP',
+        'eid_ARICH',
+        'eid_ECL',
+        'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(pMissCMS)',
+        'BtagToWBosonVariables(cosThetaMissCMS)',
+        'BtagToWBosonVariables(EW90)',
+        'cosTPTO',
+        # 'ImpactXY',
+        # 'distance',
         'chiProb',
     ]
-    variables['IntermediateKinLepton'] = variables['KinLepton']
     variables['Kaon'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
-        'cosTheta',
+        'p',
         'pt',
+        'cosTheta',
         KId[getBelleOrBelle2()],
         'Kid_dEdx',
         'Kid_TOP',
@@ -384,11 +431,38 @@ def setVariables():
         'BtagToWBosonVariables(cosThetaMissCMS)',
         'BtagToWBosonVariables(EW90)',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
+        # 'ImpactXY',
+        # 'distance',
         'chiProb',
     ]
     variables['SlowPion'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'cosTheta',
+        'p',
+        'pt',
+        'pionID',
+        # 'piid_dEdx',
+        'piid_TOP',
+        'piid_ARICH',
+        'pi_vs_edEdxid',
+        KId[getBelleOrBelle2()],
+        'Kid_dEdx',
+        'Kid_TOP',
+        'Kid_ARICH',
+        'NumberOfKShortsInRoe',
+        'ptTracksRoe',
+        eId[getBelleOrBelle2()],
+        'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(EW90)',
+        'BtagToWBosonVariables(cosThetaMissCMS)',
+        'BtagToWBosonVariables(pMissCMS)',
+        'cosTPTO',
+        # 'ImpactXY',
+        # 'distance',
+        # 'chiProb'
+    ]
+    variables['FastHadron'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
         'cosTheta',
@@ -409,13 +483,12 @@ def setVariables():
         'BtagToWBosonVariables(recoilMassSqrd)',
         'BtagToWBosonVariables(EW90)',
         'BtagToWBosonVariables(cosThetaMissCMS)',
-        'BtagToWBosonVariables(pMissCMS)',
+        # 'BtagToWBosonVariables(pMissCMS)',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
-        'chiProb'
+        # 'ImpactXY',
+        # 'distance',
+        # 'chiProb'
     ]
-    variables['FastHadron'] = variables['SlowPion']
     variables['Lambda'] = [
         'lambdaFlavor',
         'NumberOfKShortsInRoe',
@@ -428,7 +501,7 @@ def setVariables():
         'daughter(1,useCMSFrame(p))',
         'useCMSFrame(p)',
         'p',
-        'distance',
+        # 'distance',
         'chiProb',
     ]
     if getBelleOrBelle2() != "Belle":
@@ -441,8 +514,8 @@ def setVariables():
         'p',
         'pt',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
+        # 'ImpactXY',
+        # 'distance',
     ]
 
     variables['FSC'] = [

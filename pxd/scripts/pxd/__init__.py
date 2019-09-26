@@ -153,15 +153,15 @@ def add_pxd_percentframe(path, min_ladders=(1, 1), max_ladders=(8, 12), fraction
     # Center ROI and make them a bit more realistic, enlarge in z ;-)
     # Random position not supported yet -> need change in module code
     s = math.sqrt(fraction)
-    MinU = max(0, 250/2*(1-0.5*s))
-    MaxU = 249-MinU
-    MinV = max(0, 768/2*(1-2.0*s))
-    MaxV = 767-MinV
+    MinU = max(0, 250 / 2 * (1 - 0.5 * s))
+    MaxU = 249 - MinU
+    MinV = max(0, 768 / 2 * (1 - 2.0 * s))
+    MaxV = 767 - MinV
 
     for (layer, ladder, sensor) in modules:
         path.add_module('ROIGenerator', ROIListName='ROIs', nROIs=1, TrigDivider=1,
                         Layer=layer, Ladder=ladder, Sensor=sensor,
-                        MinU=MinU, MaxU=MaxU, MinV=MinV, MaxV=MaxV)
+                        MinU=MinU, MaxU=MaxU, MinV=MinV, MaxV=MaxV, Random=random_position)
 
 
 def add_pxd_percentframe_phase3_early(path, fraction=0.1, random_position=False):

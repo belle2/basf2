@@ -48,8 +48,8 @@ ma.inputMdstList(environmentType='default',
                  filelist=[b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False)],
                  path=my_path)
 
-# We want to apply cut on event shape. For this, we are createing events shape object
-# First, create a list of all the good tracks (using the pion mass hypothesys)
+# We want to apply cut on event shape. For this, we are creating events shape object
+# First, create a list of all the good tracks (using the pion mass hypothesis)
 # and good gammas with very minimal cuts
 ma.fillParticleList(decayString='pi+:all',
                     cut='pt> 0.1',

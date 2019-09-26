@@ -201,8 +201,10 @@ def applyCPVTools(mode='Expert'):
             samplerFileId=str(fileNumber),
             path=cp_val_path)
 
-        # DNN Identifier has to be set by hand when validating
-
+        # # Preliminar DNN Identifier has to be set by hand when validating
+        # # The standard name should be however
+        # dnnIdentifier = "FlavorTagger_" + belleOrBelle2Flag + "_B2nunubarBGx1DNN_1"
+        #
         # DeepFlavorTagger.DeepFlavorTagger('B0:sig',
         #         mode='expert',
         #         working_dir='',

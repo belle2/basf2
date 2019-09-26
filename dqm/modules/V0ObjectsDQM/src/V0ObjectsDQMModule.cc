@@ -8,7 +8,6 @@
 
 #include <dqm/modules/V0ObjectsDQM/V0ObjectsDQMModule.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <TDirectory.h>
 

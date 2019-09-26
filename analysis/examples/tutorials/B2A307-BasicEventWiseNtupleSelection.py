@@ -29,6 +29,7 @@
 #               S. Spataro (October 2017)
 #               I. Komarov (December 2017)
 #               I. Komarov (September 2018)
+#               I. Komarov (September 2019)
 #
 ################################################################################
 
@@ -44,8 +45,7 @@ my_path = b2.create_path()
 
 # load input ROOT file
 ma.inputMdstList(environmentType='default',
-                 filelist=['B2munu.root',
-                           'ccbar_background.root'],
+                 filelist=[b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False)],
                  path=my_path)
 
 # We want to apply cut on event shape. For this, we are createing events shape object

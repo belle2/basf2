@@ -153,9 +153,9 @@ def add_pxd_percentframe(path, min_ladders=(1, 1), max_ladders=(8, 12), fraction
     # Center ROI and make them a bit more realistic, enlarge in z ;-)
     # Random position not supported yet -> need change in module code
     s = math.sqrt(fraction)
-    MinU = max(0, 250 / 2 * (1 - 0.5 * s))
+    MinU = max(0, int(250 / 2 * (1 - 0.5 * s)))
     MaxU = 249 - MinU
-    MinV = max(0, 768 / 2 * (1 - 2.0 * s))
+    MinV = max(0, int(768 / 2 * (1 - 2.0 * s)))
     MaxV = 767 - MinV
 
     for (layer, ladder, sensor) in modules:

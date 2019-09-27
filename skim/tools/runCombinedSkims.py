@@ -21,4 +21,4 @@ for skim in all_skims:
 
         print(f'Running {script} on {input_file} (MC type {MCCampaign}_{MCType}) to {output_file}')
         subprocess.run(["bsub", "-q", "l", "-oo", log_file, "-e", err_file, "basf2", script,
-                        "-o", output_file, "-i", input_file, "-n", "10000"])
+                        "-o", output_file, "-i", input_file])

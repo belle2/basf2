@@ -180,18 +180,12 @@ void DQMHistAnalysisPXDCMModule::event()
     m_line2->Draw();
     m_line3->Draw();
   }
-  {
-    auto tt = new TLatex(5.5, 3, "1.3.2 Module is broken, please ignore");
-    tt->SetTextAngle(90);// Rotated
-    tt->SetTextAlign(12);// Centered
-    tt->Draw();
-  }
-  {
-    auto tt = new TLatex(14.5, 3, "1.8.1 Module is broken, please ignore");
-    tt->SetTextAngle(90);// Rotated
-    tt->SetTextAlign(12);// Centered
-    tt->Draw();
-  }
+
+  auto tt = new TLatex(5.5, 3, "1.3.2 Module is broken, please ignore");
+  tt->SetTextAngle(90);// Rotated
+  tt->SetTextAlign(12);// Centered
+  tt->Draw();
+
   m_cCommonMode->Modified();
   m_cCommonMode->Update();
 #ifdef _BELLE2_EPICS

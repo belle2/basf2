@@ -2333,13 +2333,13 @@ def writePi0EtaVeto(
         if downloadFlag:
             # use_central_database('development') // The development GT can no longer be used
             basf2_mva.download('Pi0VetoIdentifier', workingDirectory + '/pi0veto.root')
-            B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
+            # B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
 
     if not os.path.isfile(workingDirectory + '/etaveto.root'):
         if downloadFlag:
             # use_central_database('development') // The development GT can no longer be used
             basf2_mva.download('EtaVetoIdentifier', workingDirectory + '/etaveto.root')
-            B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
+            # B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
 
     roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO'], extraInfoName='Pi0Veto',
                         identifier=workingDirectory + '/pi0veto.root')

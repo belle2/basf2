@@ -216,10 +216,18 @@ void DQMHistAnalysisPXDChargeModule::event()
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 
-  auto tt = new TLatex(5.5, 0, "1.3.2 Module is broken, please ignore");
-  tt->SetTextAngle(90);// Rotated
-  tt->SetTextAlign(12);// Centered
-  tt->Draw();
+  {
+    auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken, please ignore");
+    tt->SetTextAngle(90);// Rotated
+    tt->SetTextAlign(12);// Centered
+    tt->Draw();
+  }
+  {
+    auto tt = new TLatex(14.5, 0.1, "1.8.1 Module is broken, please ignore");
+    tt->SetTextAngle(90);// Rotated
+    tt->SetTextAlign(12);// Centered
+    tt->Draw();
+  }
 
   m_cCharge->Modified();
   m_cCharge->Update();

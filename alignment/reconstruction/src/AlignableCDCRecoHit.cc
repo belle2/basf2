@@ -182,6 +182,47 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
     );
   }
 
+  // X-t relations calibration
+  if (driftTime > 20 && driftTime < 500 && fabs(driftVelocity) < 1.0e-2) {
+    // TODO: ugly to need to ask XTRelations for something here...
+    // Can't I get this CDCGeometryPar or sth. like this?
+    DBObjPtr<CDCXtRelations> xts;
+    auto xtid = xts->getXtID(getWireID().getICLayer(), LR, (float)alpha, (float)theta);
+    auto boundary = xts->getXtParams(xtid).at(6);
+
+    if (driftTime < boundary) {
+      globals.add(
+        GlobalLabel::construct<CDCXtRelations>(xtid, 0),
+        1. * double(int(m_leftRight))
+
+      );
+      globals.add(
+        GlobalLabel::construct<CDCXtRelations>(xtid, 1),
+        driftTime * double(int(m_leftRight))
+
+      );
+      globals.add(
+        GlobalLabel::construct<CDCXtRelations>(xtid, 2),
+        (2. * driftTime * driftTime - 1.) * double(int(m_leftRight))
+
+      );
+      // TODO: params 3, 4, 5
+
+    } else {
+      globals.add(
+        GlobalLabel::construct<CDCXtRelations>(xtid, 7),
+        (driftTime - boundary) * double(int(m_leftRight))
+
+      );
+      globals.add(
+        GlobalLabel::construct<CDCXtRelations>(xtid, 8),
+        1. * double(int(m_leftRight))
+
+      );
+    }
+  }
+
+
   return globals;
 }
 

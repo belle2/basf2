@@ -271,7 +271,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 
   double data = 0;
   double diff = 0;
-  if (m_gCharge) {
+  if (m_gCharge && enough) {
 //     double currentMin, currentMax;
     m_gCharge->Fit(m_fMean, "R");
     double mean = m_gCharge->GetMean(2);
@@ -291,11 +291,11 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     m_line_mean->Draw();
     m_line_low->Draw();
 
-#ifdef _BELLE2_EPICS
-    SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
-    SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
-#endif
   }
+#ifdef _BELLE2_EPICS
+  SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
+  SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
+#endif
 
   int status = 0;
 

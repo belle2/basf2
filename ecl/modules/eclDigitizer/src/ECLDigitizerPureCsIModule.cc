@@ -22,12 +22,10 @@
 #include <framework/utilities/FileSystem.h>
 
 //ECL
-#include <ecl/digitization/shaperdsp.h>
 #include <ecl/digitization/ECLDspFitterPure.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLPureCsIInfo.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLWaveformData.h>

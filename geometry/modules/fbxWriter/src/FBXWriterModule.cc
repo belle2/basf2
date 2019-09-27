@@ -23,7 +23,6 @@
 #include "G4ThreeVector.hh"
 #include "G4RotationMatrix.hh"
 #include "G4Transform3D.hh"
-#include "G4AffineTransform.hh"
 #include "G4VPVParameterisation.hh"
 #include <G4Tubs.hh>
 #include <G4Polyhedron.hh>

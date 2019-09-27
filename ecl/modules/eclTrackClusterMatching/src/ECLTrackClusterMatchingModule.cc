@@ -14,6 +14,7 @@
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
 
 using namespace std;
 using namespace Belle2;

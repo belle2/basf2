@@ -13,8 +13,9 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
 
 #include <root/TFile.h>
 #include <root/TTree.h>

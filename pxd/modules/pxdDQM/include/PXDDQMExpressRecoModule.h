@@ -13,18 +13,12 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <pxd/geometry/SensorInfo.h>
-#include <vxd/geometry/GeoCache.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
-#include <vector>
 #include "TH1I.h"
 #include "TH1F.h"
-#include "TH2F.h"
 
 namespace Belle2 {
 

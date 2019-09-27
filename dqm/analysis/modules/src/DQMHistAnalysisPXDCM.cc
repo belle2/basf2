@@ -9,8 +9,6 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisPXDCM.h>
 #include <TROOT.h>
-#include <TStyle.h>
-#include <TClass.h>
 #include <TLatex.h>
 #include <vxd/geometry/GeoCache.h>
 

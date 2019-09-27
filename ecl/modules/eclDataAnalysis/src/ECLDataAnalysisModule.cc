@@ -28,7 +28,6 @@
 // ECL
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLSimHit.h>

@@ -13,7 +13,6 @@
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <pxd/dataobjects/PXDCluster.h>
 

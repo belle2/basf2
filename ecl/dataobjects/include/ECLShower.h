@@ -96,6 +96,7 @@ namespace Belle2 {
       m_ShowerHadronIntensity = 0.0;         /**< Shower Hadron Intensity. Will be removed in release-04.*/
       m_PulseShapeDiscriminationMVA = 0.5;        /**< Digit level MVA classifier that uses pulse shape discrimination.*/
       m_NumberOfHadronDigits = 0.0;         /**< Shower Number of hadron digits*/
+      m_sumOfCrystalsForEnergy = 0.0;         /**< Shower sum of crystals used for energy calculation*/
 
     }
 
@@ -222,6 +223,10 @@ namespace Belle2 {
     /*! Set numver of hadron digits
      */
     void setNumberOfHadronDigits(double NumberOfHadronDigits) { m_NumberOfHadronDigits = NumberOfHadronDigits; }
+
+    /*! Set sum of weights of crystals
+     */
+    void setSumOfCrystalsForEnergy(double sumOfCrystalsForEnergy) { m_sumOfCrystalsForEnergy = sumOfCrystalsForEnergy; }
 
     /*! Get if matched with a Track
      * @return flag for track Matching
@@ -388,6 +393,11 @@ namespace Belle2 {
      */
     double getNumberOfHadronDigits() const { return m_NumberOfHadronDigits; }
 
+    /*! Get sum of crystals used for energy calculation
+     * @return m_sumOfCrystalsForEnergy
+     */
+    double getSumOfCrystalsForEnergy() const { return m_sumOfCrystalsForEnergy; }
+
     //! The method to get return  TVector3 Momentum
     TVector3 getMomentum() const
     {
@@ -501,6 +511,7 @@ namespace Belle2 {
     m_PulseShapeDiscriminationMVA;        /**< MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers. */
     Double32_t
     m_NumberOfHadronDigits;         /**< Number of hadron digits in shower (pulse shape discrimination variable).  Weighted sum of digits in shower with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. (SL)*/
+    Double32_t m_sumOfCrystalsForEnergy; /**< sum (can generally be weighgted) of crystals used for energy calculation (TF)*/
 
     // 2: added uniqueID and highestE (TF)
     // 3: added LAT and distance to closest track and trk match flag (GDN)
@@ -514,7 +525,8 @@ namespace Belle2 {
     // 11: added m_ShowerHadronIntensity and m_NumberOfHadronDigits variables (SL)
     // 12: added m_PulseShapeDiscriminationMVA.  Noted m_ShowerHadronIntensity will be removed in release-04 (SL)
     // 13: made enums strongly typed
-    ClassDef(ECLShower, 13);/**< ClassDef */
+    // 14: added m_sumOfCrystalsForEnergy of crystals for energy determination
+    ClassDef(ECLShower, 14);/**< ClassDef */
 
   };
 

@@ -347,7 +347,7 @@ def create_configuration(db_components,
         c.set_command(cmd)
 
     if algo is None:
-        algo = create_algorithm(db_components, ignore_undetermined=ignore_undetermined, min_entries=min_entries, commands=commands)
+        algo = create_algorithm(db_components, ignore_undetermined=ignore_undetermined, min_entries=min_entries)
 
     c.reco_components = reco_components
     if path is None:

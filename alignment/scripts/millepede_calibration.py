@@ -373,7 +373,7 @@ def create_calibration(cfg, name='MillepedeCalibration', tags=None, files=None, 
     algo = Belle2.MillepedeAlgorithm(cfg.algo)
 
     for cmd_name, cmd in cfg.commands.items():
-        algorithm.steering().command(cmd)
+        algo.steering().command(cmd)
 
     consts = cfg.constraints
     if len(consts):

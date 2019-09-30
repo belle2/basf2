@@ -22,7 +22,6 @@
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
 #include <vector>
-#include <string>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

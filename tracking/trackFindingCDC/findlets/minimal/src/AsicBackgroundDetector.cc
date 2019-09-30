@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <cdc/dataobjects/CDCHit.h>
-#include <iostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

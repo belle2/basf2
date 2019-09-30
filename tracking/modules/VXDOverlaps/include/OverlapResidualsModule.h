@@ -11,11 +11,12 @@
 #ifndef OVERLAPRESIDUALSMODULE_H
 #define OVERLAPRESIDUALSMODULE_H
 
+#include <pxd/dataobjects/PXDCluster.h>
+#include <svd/dataobjects/SVDCluster.h>
+
 #include <framework/core/HistoModule.h>
-#include <tracking/dataobjects/RecoHitInformation.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TTree.h>

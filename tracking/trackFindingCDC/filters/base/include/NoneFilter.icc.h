@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.dcl.h>
 
+#include <cmath>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 

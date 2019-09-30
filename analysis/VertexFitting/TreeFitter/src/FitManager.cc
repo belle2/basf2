@@ -8,21 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <TMath.h>
-#include <TVector.h>
 
 #include <analysis/dataobjects/Particle.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-
-#include <analysis/VertexFitting/TreeFitter/EigenStackConfig.h>
 
 #include <analysis/VertexFitting/TreeFitter/FitManager.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/DecayChain.h>
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
-
 
 namespace TreeFitter {
 

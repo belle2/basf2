@@ -10,7 +10,6 @@
 
 #include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
 
-#include <iostream>
 namespace TreeFitter {
 
   KalmanCalculator::KalmanCalculator(

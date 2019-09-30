@@ -10,6 +10,9 @@
 
 #include <analysis/modules/V0DaughterMassUpdater/V0DaughterMassUpdaterModule.h>
 #include <analysis/dataobjects/ParticleList.h>
+
+#include <framework/datastore/StoreObjPtr.h>
+
 using namespace std;
 using namespace Belle2;
 

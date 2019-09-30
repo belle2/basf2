@@ -8,9 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <analysis/dataobjects/Btube.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
-#include <iostream>
 
 using namespace Belle2;
 

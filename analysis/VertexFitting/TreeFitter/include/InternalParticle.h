@@ -11,7 +11,6 @@
 
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
-#include <vector>
 
 namespace TreeFitter {
 

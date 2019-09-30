@@ -76,11 +76,13 @@ namespace Belle2 {
       TVector3 getLocalPositionMCMatch(const Particle* particle)
       {
         const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
-        if (mcparticle == nullptr)
+        if (mcparticle == nullptr) {
           return TVector3(0, 0, 0);
+        }
         const auto* barHit = mcparticle->getRelated<TOPBarHit>();
-        if (!barHit)
+        if (!barHit) {
           return TVector3(0, 0, 0);
+        }
         int slotID = barHit->getModuleID();
         const auto& position = barHit->getPosition(); // TVector3
         const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
@@ -580,12 +582,12 @@ namespace Belle2 {
     } // TOPVariable
 
     VARIABLE_GROUP("TOP Calibration");
-    REGISTER_VARIABLE("extrapTrackToTOPz", TOPVariable::extrapTrackToTOPz,
-                      "[calibration] z coordinate of the track extrapolated to TOP using helix data from TrackFitResult");
-    REGISTER_VARIABLE("extrapTrackToTOPtheta", TOPVariable::extrapTrackToTOPtheta,
-                      "[calibration] theta coordinate of the track extrapolated to TOP using helix data from TrackFitResult");
-    REGISTER_VARIABLE("extrapTrackToTOPphi", TOPVariable::extrapTrackToTOPphi,
-                      "[calibration] phi coordinate of the track extrapolated to TOP using helix data from TrackFitResult");
+    REGISTER_VARIABLE("extrapTrackToTOPimpactZ", TOPVariable::extrapTrackToTOPz,
+                      "[calibration] z coordinate of the impact point of the track extrapolated to TOP using helix data from TrackFitResult");
+    REGISTER_VARIABLE("extrapTrackToTOPimpactTheta", TOPVariable::extrapTrackToTOPtheta,
+                      "[calibration] theta coordinate of the impact point of the track extrapolated to TOP using helix data from TrackFitResult");
+    REGISTER_VARIABLE("extrapTrackToTOPimpactPhi", TOPVariable::extrapTrackToTOPphi,
+                      "[calibration] phi coordinate of the impact point of the track extrapolated to TOP using helix data from TrackFitResult");
     REGISTER_VARIABLE("topDigitCount", TOPVariable::topDigitCount,
                       "[calibration] The number of TOPDigits in the module to which the track was extrapolated");
     REGISTER_VARIABLE("topBackgroundDigitCount", TOPVariable::topBackgroundDigitCount,

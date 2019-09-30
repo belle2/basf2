@@ -13,8 +13,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 #include <TMatrixFSym.h>
 #include <TLorentzVector.h>
 

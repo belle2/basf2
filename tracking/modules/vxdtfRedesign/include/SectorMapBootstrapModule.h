@@ -12,7 +12,6 @@
 
 //framework:
 #include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/database/PayloadFile.h>
 
 #include <vector>
@@ -21,7 +20,6 @@
 
 namespace Belle2 {
 
-  class VXDTFSecMap;
   struct SectorMapConfig;
 
   /** The SegmentFilterConverterModule is a module able to read the

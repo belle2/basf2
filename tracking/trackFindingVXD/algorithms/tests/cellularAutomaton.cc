@@ -15,10 +15,7 @@
 #include <framework/logging/Logger.h>
 
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNode.h>
-#include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetwork.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
-#include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
-#include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
 #include <tracking/trackFindingVXD/segmentNetwork/CACell.h>
 #include <tracking/trackFindingVXD/algorithms/CellularAutomaton.h>
 #include <tracking/trackFindingVXD/algorithms/CAValidator.h>

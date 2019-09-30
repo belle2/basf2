@@ -12,17 +12,14 @@
 
 #include <framework/core/Module.h>
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <string>
-#include <TTree.h>
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TGraphErrors.h>
 
 namespace Belle2 {
 

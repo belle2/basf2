@@ -14,7 +14,6 @@
 #include <vector>
 #include <iterator>
 #include <algorithm>
-#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

@@ -9,9 +9,6 @@
  **************************************************************************/
 
 #include "tracking/vxdCaTracking/TwoHitFilters.h"
-#include <boost/math/special_functions/fpclassify.hpp>
-
-
 
 using namespace std;
 using namespace Belle2;

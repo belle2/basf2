@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <framework/logging/Logger.h>
-
 #include <analysis/KFit/KFitConst.h>
 #include <analysis/KFit/KFitError.h>
 #include <analysis/KFit/KFitBase.h>

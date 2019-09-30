@@ -199,7 +199,7 @@ std::string Framework::findFile(const std::string& filename, const std::string& 
   std::string result;
   if (type.empty()) {
     //behave like FileSystem.findFile by using it
-    result = FileSystem::findFile(filename, true);
+    result = FileSystem::findFile(filename, ignore_errors);
   } else {
     result = FileSystem::findFile(filename, type, ignore_errors);
   }

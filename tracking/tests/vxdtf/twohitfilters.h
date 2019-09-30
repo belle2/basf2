@@ -1,8 +1,4 @@
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 #include <tracking/vxdCaTracking/TwoHitFilters.h>
-// #include <TMatrixF.h>
-// #include <RKTrackRep.h>
 #include <gtest/gtest.h>
 
 namespace Belle2 {

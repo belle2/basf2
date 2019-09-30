@@ -12,8 +12,8 @@
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 
+#include <array>
 #include <vector>
-#include <map>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/ckf/cdc/filters/pathPairs/BaseCDCPathPairFilter.h>
-#include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 

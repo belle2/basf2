@@ -12,7 +12,7 @@ to calculate the random generator state.
 """
 
 import struct
-from basf2 import *
+import basf2
 from ROOT import gRandom
 
 
@@ -23,13 +23,13 @@ def double_to_hex(double):
     return "%016X" % struct.unpack("<Q", struct.pack("<d", double))[0]
 
 
-class RandomTestModule(Module):
+class RandomTestModule(basf2.Module):
     """Print some random numbers to check reproducibility"""
 
     def __init__(self, name):
         """Make sure we can run in multiple processes"""
         super(RandomTestModule, self).__init__()
-        self.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
+        self.set_property_flags(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
         #: save a name for the module to print it
         self.name = name
 
@@ -38,7 +38,7 @@ class RandomTestModule(Module):
         numbers = ["First 20 random values in %s::%s()" % (self.name, name)]
         for row in range(5):
             numbers.append(", ".join(double_to_hex(gRandom.Rndm()) for i in range(4)))
-        B2INFO("\n  ".join(numbers))
+        basf2.B2INFO("\n  ".join(numbers))
 
     def initialize(self):
         """Show random numbers in initialize"""
@@ -58,7 +58,7 @@ class RandomTestModule(Module):
 
 
 #: path used for processing
-main = create_path()
+main = basf2.Path()
 # generate a few runs which look good in hex
 main.add_module("EventInfoSetter", evtNumList=[3, 4, 5],
                 runList=[0x11121314, 0x21222324, 0x31323334],
@@ -74,10 +74,10 @@ main.add_module(RandomTestModule("test2"))
 
 # now the libraries are loaded so we can set the loglevel to debug, set the seed
 # and start processing
-logging_framework = logging.package("framework")
-logging_framework.set_log_level(LogLevel.DEBUG)
+logging_framework = basf2.logging.package("framework")
+logging_framework.set_log_level(basf2.LogLevel.DEBUG)
 logging_framework.set_debug_level(200)
-logging_framework.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
-set_random_seed("this is the seed")
+logging_framework.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
+basf2.set_random_seed("this is the seed")
 
-process(main)
+basf2.process(main)

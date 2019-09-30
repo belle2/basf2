@@ -12,8 +12,6 @@
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
 #include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
-#include <iostream>
-#include <framework/logging/Logger.h>
 
 namespace TreeFitter {
 

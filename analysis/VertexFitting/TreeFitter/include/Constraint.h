@@ -10,7 +10,6 @@
 #pragma once
 
 #include <string>
-#include <iostream>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
 
 namespace TreeFitter {

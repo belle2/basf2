@@ -14,8 +14,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/database/DBObjPtr.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
-
 
 // framework aux
 #include <framework/logging/Logger.h>

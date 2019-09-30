@@ -23,7 +23,9 @@
 #include <analysis/VertexFitting/TreeFitter/Resonance.h>
 #include <analysis/VertexFitting/TreeFitter/Origin.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
-#include <iostream>
+
+#include <framework/geometry/BFieldManager.h>
+
 namespace TreeFitter {
 
   ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration* config) :

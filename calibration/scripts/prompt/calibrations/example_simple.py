@@ -55,8 +55,13 @@ def get_calibrations(input_data, **kwargs):
     # Get the input files from the input_data variable
     input_files_physics = list(input_data["physics"].keys())
 
-    # Get the overall IoV we want to cover, including the end values (probably -1,-1 for open ended)
-    overall_iov = kwargs.get("output_iov", None)
+    # Get the overall IoV we our process should cover. Includes the end values that we may want to ignore since our output
+    # IoV should be open ended. We could also use this as part of the input data selection in some way.
+    requested_iov = kwargs.get("requested_iov", None)
+
+    from caf.utils import IoV
+    # The actual value our output IoV payload should have. Notice that we've set it open ended.
+    output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
     ###################################################
     # Algorithm setup
@@ -79,7 +84,7 @@ def get_calibrations(input_data, **kwargs):
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun
     for algorithm in cal_test.algorithms:
-        algorithm.params = {"apply_iov": overall_iov}
+        algorithm.params = {"apply_iov": output_iov}
 
     # Most other options like database chain and backend args will be overwritten by b2caf-prompt-run.
     # So we don't bother setting them.

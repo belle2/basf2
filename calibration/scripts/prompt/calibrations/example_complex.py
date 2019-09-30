@@ -43,7 +43,7 @@ def get_calibrations(input_data, **kwargs):
         backwards compatibility problems. But you could use the correct arguments in b2caf-prompt-run for this
         release explicitly if you want to.
 
-        Currently only kwargs["output_iov"] is used. This is the output IoV range that your payloads should
+        Currently only kwargs["requested_iov"] is used. This is the output IoV range that your payloads should
         correspond to. Generally your highest ExpRun payload should be open ended e.g. IoV(3,4,-1,-1)
 
     Returns:
@@ -62,8 +62,13 @@ def get_calibrations(input_data, **kwargs):
     input_files_cosmics = list(input_data["cosmics"].keys())
     input_files_Bcosmics = list(input_data["Bcosmics"].keys())
 
-    # Get the overall IoV we want to cover, including the end values (probably -1,-1 for open ended)
-    overall_iov = kwargs.get("output_iov", None)
+    # Get the overall request IoV we want to cover, including the end values. But we will probably want to replace the end values
+    # with -1, -1 when setting the output payload IoVs.
+    requested_iov = kwargs.get("requested_iov", None)
+
+    from caf.utils import IoV
+    # The actual value our output IoV payload should have. Notice that we've set it open ended.
+    output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
     ###################################################
     # Collector setup
@@ -135,20 +140,27 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Calibration setup
 
+    # We will set up two Calibrations. One which depends on the other.
+    # However, the first Calibration will generate payloads that we don't want to save in our output database for upload.
+    # Basically we want to ignore the payloads during the b2caf-prompt-run copying of the outputdb contents.
+    # But we still use them as input to the next calibration.
+
     cal_test1 = Calibration("TestCalibration_cosmics")
     # Add collections in with unique names
     cal_test1.add_collection(name="cosmics", collection=collection_cosmics)
     cal_test1.add_collection(name='Bcosmics', collection=collection_Bcosmics)
     cal_test1.algorithms = [alg_test1]
     # Do this for the default AlgorithmStrategy to force the output payload IoV
-    cal_test1.algorithms[0].params = {"apply_iov": overall_iov}
+    cal_test1.algorithms[0].params = {"apply_iov": output_iov}
+    # Mark this calibration as one whose payloads should not be copied at the end.
+    cal_test1.save_payloads = False
 
     cal_test2 = Calibration("TestCalibration_physics")
     # Add collections in with unique names
     cal_test2.add_collection(name="physics", collection=collection_physics)
     cal_test2.algorithms = [alg_test2]
     # Do this for the default AlgorithmStrategy to force the output payload IoV
-    cal_test2.algorithms[0].params = {"apply_iov": overall_iov}
+    cal_test2.algorithms[0].params = {"apply_iov": output_iov}
 
     cal_test2.depends_on(cal_test1)
 

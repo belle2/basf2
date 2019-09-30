@@ -17,16 +17,20 @@ settings = CalibrationSettings(name="VXD Alignment",
 
 def get_calibrations(input_data, **kwargs):
 
+    import basf2
+
     # Get your input data files separated into your input_data_names.
     # You could also get each file's IoV from input_data["physics"].values()/items() if you wanted.
     input_files_physics = list(input_data["physics"].keys())
     input_files_cosmics = list(input_data["cosmics"].keys())
     input_files_Bcosmics = list(input_data["Bcosmics"].keys())
 
-    # Get the overall IoV we want to cover, including the end values (probably -1,-1 for open ended)
-    overall_iov = kwargs.get("output_iov", None)
+    # Get the overall IoV we want to cover for this request, including the end values
+    requested_iov = kwargs.get("requested_iov", None)
 
-    import basf2
+    from caf.utils import IoV
+    # The actual value our output IoV payload should have. Notice that we've set it open ended.
+    output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
     import ROOT
     from ROOT import Belle2
@@ -326,6 +330,6 @@ def get_calibrations(input_data, **kwargs):
     # Force the output payload IoV to be correct.
     # It may be different if you are using another strategy like SequentialRunByRun so we ask you to set this up correctly.
     for algorithm in mp2_full.algorithms:
-        algorithm.params = {"apply_iov": overall_iov}
+        algorithm.params = {"apply_iov": output_iov}
 
     return [mp2_full]

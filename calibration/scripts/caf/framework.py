@@ -250,6 +250,9 @@ class CalibrationBase(ABC, Thread):
         self.iov = None
         #: The directory where we'll store the local database payloads from this calibration
         self.output_database_dir = ""
+        #: Marks this Calibration as one which has payloads that should be copied and uploaded.
+        #: Defaults to True, and should only be False if this is an intermediate Calibration who's payloads are never needed.
+        self.save_payloads = True
 
     @abstractmethod
     def run(self):

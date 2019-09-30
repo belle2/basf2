@@ -22,8 +22,12 @@ def get_calibrations(input_data, **kwargs):
                        "hlt_hadron": list(input_data["hlt_hadron"].keys()),
                        }
 
-    # Get the overall IoV we want to cover, including the end values (probably -1,-1 for open ended)
-    overall_iov = kwargs.get("output_iov", None)
+    # Get the overall IoV we want to cover, including the end values
+    requested_iov = kwargs.get("requested_iov", None)
+
+    from caf.utils import IoV
+    # The actuall IoV we want for any prompt request is open-ended
+    output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
     # t0
     cal0 = CDCCalibration(name='tz0',
@@ -35,7 +39,7 @@ def get_calibrations(input_data, **kwargs):
     # Force the output payload IoV to be correct.
     # It may be different if you are using another strategy like SequentialRunByRun
     for algorithm in cal0.algorithms:
-        algorithm.params = {"apply_iov": overall_iov}
+        algorithm.params = {"apply_iov": output_iov}
 
     return [cal0, ]
 

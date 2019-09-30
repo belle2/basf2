@@ -30,7 +30,7 @@ input_branches = [
     'RawSVDs'
 ]
 
-# set_log_level(LogLevel.WARNING)
+set_log_level(LogLevel.INFO)
 
 
 def SVDOccupancyCalibrations(files, tags):
@@ -54,9 +54,16 @@ def SVDOccupancyCalibrations(files, tags):
     # Not needed for di-muon skim cdst or mdst, but needed to re-run reconstruction
     # with possibly changed global tags
     raw.add_unpackers(path, components=['SVD'])
+    path.add_module(
+        'SVDZeroSuppressionEmulator',
+        SNthreshold=5,
+        ShaperDigits='SVDShaperDigits',
+        ShaperDigitsIN='SVDShaperDigitsZS5',
+        FADCmode=True)
 
     collector = register_module('SVDOccupancyCalibrationsCollector')
-    collector.param("SVDShaperDigitsName", "SVDShaperDigits")
+#    collector.param("SVDShaperDigitsName", "SVDShaperDigits")
+    collector.param("SVDShaperDigitsName", "SVDShaperDigitsZS5")
     algorithm = SVDOccupancyCalibrationsAlgorithm("SVDOccupancyCAF")
 
     calibration = Calibration('SVDOccupancy',
@@ -66,7 +73,7 @@ def SVDOccupancyCalibrations(files, tags):
                               pre_collector_path=path,
                               database_chain=[CentralDatabase(tag) for tag in tags],
                               output_patterns=None,
-                              max_files_per_collector_job=-1,
+                              max_files_per_collector_job=1,
                               backend_args=None
                               )
 
@@ -78,9 +85,10 @@ def SVDOccupancyCalibrations(files, tags):
 if __name__ == "__main__":
     # use by default raw data from cdst of exp8, run1309 (shaperDigits need to be unpacked, not available in cdst format)
     input_files = [os.path.abspath(file) for file in [
-            "/group/belle2/dataprod/Data/Raw/e0008/r01309/sub00/physics.0008.01309.HLT*"]]
-# "/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009/\
-# e0008/4S/r01309/skim/hlt_bhabha/cdst/sub00/cdst.physics.0008.01309.HLT*"]]
+            "/group/belle2/dataprod/Data/Raw/e0008/r01309/sub00/physics.0008.01309.HLT5.f00098.root"]]
+    #  "/group/belle2/dataprod/Data/Raw/e0008/r01309/sub00/physics.0008.01309.HLT5*"]]
+    # "/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009/\
+    # e0008/4S/r01309/skim/hlt_bhabha/cdst/sub00/cdst.physics.0008.01309.HLT*"]]
 
     if not len(input_files):
         print("You have to specify some input file(s)\n"
@@ -91,13 +99,14 @@ if __name__ == "__main__":
     svdOccupCAF = SVDOccupancyCalibrations(input_files,
                                            ['giulia_CDCEDepToADCConversions_rel4_patch',
                                             'data_reprocessing_prompt_rel4_patch'])
-    # beamspot.max_iterations = 0
+# beamspot.max_iterations = 0
 
     cal_fw = CAF()
     cal_fw.add_calibration(svdOccupCAF)
+
     cal_fw.backend = backends.LSF()
 
-    # Try to guess if we are at KEKCC and change the backend to Local if not
+# Try to guess if we are at KEKCC and change the backend to Local if not
     if multiprocessing.cpu_count() < 10:
         cal_fw.backend = backends.Local(8)
 

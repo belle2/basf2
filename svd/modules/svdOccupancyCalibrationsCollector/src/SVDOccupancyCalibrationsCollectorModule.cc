@@ -130,7 +130,7 @@ void SVDOccupancyCalibrationsCollectorModule::closeRun()
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
   std::set<Belle2::VxdID> svdLayers = aGeometry.getLayers(VXD::SensorInfoBase::SVD);
   std::set<Belle2::VxdID>::iterator itSvdLayers = svdLayers.begin();
-  int itsensor = 0; //sensor numbering
+  //int itsensor = 0; //sensor numbering
   while ((itSvdLayers != svdLayers.end())
          && (itSvdLayers->getLayerNumber() != 7)) { //loop on Layers
 
@@ -147,6 +147,7 @@ void SVDOccupancyCalibrationsCollectorModule::closeRun()
         for (int k = 0; k < m_nSides; k ++) { //loop on Sides , k = isU(), k=0 is v-side, k=1 is u-side
 
           (hm_occupancy->getHistogram(*itSvdSensors, k))->Scale(1. / nevents);
+          B2INFO("occupancy histo scaled by the number of events");
           m_hist = hm_occupancy->getHistogram(*itSvdSensors, k);
           m_layer = itSvdSensors->getLayerNumber();
           m_ladder = itSvdSensors->getLadderNumber();
@@ -154,10 +155,14 @@ void SVDOccupancyCalibrationsCollectorModule::closeRun()
           m_side = k;
 
           getObjectPtr<TTree>("HTreeOccupancyCalib")->Fill();
-
+          B2INFO("Filled sensors:" << m_layer << "." << m_ladder << "." << m_sensor << "." << m_side);
         }
+        ++itSvdSensors;
       }
+      ++itSvdLadders;
     }
+    ++itSvdLayers;
   }
+
 
 }

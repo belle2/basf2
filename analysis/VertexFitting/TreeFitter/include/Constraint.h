@@ -68,7 +68,6 @@ namespace TreeFitter {
     /** constructor  */
     Constraint() :
       m_node(0),
-      m_chi2(1e10),
       m_depth(0),
       m_type(unknown),
       m_dim(0),
@@ -82,7 +81,6 @@ namespace TreeFitter {
                unsigned int dim,
                int maxniter = 1) :
       m_node(node),
-      m_chi2(1e10),
       m_depth(depth),
       m_type(type),
       m_dim(dim),
@@ -109,15 +107,11 @@ namespace TreeFitter {
      * */
     [[gnu::unused]] void setWeight(int w) { m_weight = w < 0 ? -1 : 1; }
 
-    /** get chi2 of last kalman iteration for this constraint */
-    double getChi2() const {return m_chi2;}
-
   protected:
 
     /**  constructor */
     explicit Constraint(Constraint::Type type) :
       m_node(0),
-      m_chi2(1e10),
       m_depth(0),
       m_type(type),
       m_dim(0),
@@ -136,7 +130,6 @@ namespace TreeFitter {
     const ParticleBase* m_node;
 
     /** chi2 coming from the constraint */
-    double m_chi2;
 
     /** depth of the constraint in the tree
      * (determines for example the order of the track constraints)  */

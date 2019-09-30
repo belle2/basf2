@@ -6,3 +6,7 @@ Modules
 
  * The :b2mod:`ParticleLoader` can create neutron particle lists now. ECL
    cluster with the hadron hypothesis as well as KLM cluster are used as source.
+ * In :b2mod:`TreeFitter` bugfix in mass constraint: chi2 correctly calculated now.
+ * In :b2mod:`TreeFitter` change of initialisation values increases performance in all fits with tracks.
+ * In :b2mod:`TreeFitter` max iterations set to 100, increases efficiency slightly in many cases.
+

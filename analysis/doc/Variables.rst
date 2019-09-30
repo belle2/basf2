@@ -691,6 +691,7 @@ module to the path, it just needs to be registered to load the library.
 In the end you can run your analysis on the grid adding the `.so` and `.map` files to the input sandbox 
 with the -f option of `gbasf2`:
 
->>> gbasf2 ./steering.py –p project -i dataset -f myanalysis.so myanalysis.b2modmap
+>>> gbasf2 ./steering.py -p project -i dataset -f myanalysis.so myanalysis.b2modmap
 
-
+.. warning:: This line implies that you already have working `gbasf2` installation and `gbasf2` syntax didn't 
+  change since the moment of writing. Please refer gbasf2 `documentation <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ for more details.

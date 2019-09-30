@@ -76,7 +76,7 @@ CDCTriggerNeuroModule::initialize()
   // in the Neurotrigger class itself to avoid bigger changes in the code.
   if (m_et_option.size() < 1) {
     m_et_option = m_cdctriggerneuroconfig->getUseETF() ? "etf_or_fastestpriority" : "fastestpriority";
-    B2INFO("The firmware version of the Neurotrigger boards is: " + m_cdctriggerneuroconfig->getNNTFirmwareVersionID());
+    B2DEBUG(2, "The firmware version of the Neurotrigger boards is: " + m_cdctriggerneuroconfig->getNNTFirmwareVersionID());
   }
   if (!m_NeuroTrigger.load(m_filename, m_arrayname))
     B2ERROR("NeuroTrigger could not be loaded correctly.");

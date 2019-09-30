@@ -388,7 +388,41 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
       m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
       m_hasT0 = true;
     } else {
-      getEventTime(isector, track, "fastestpriority");
+      m_T0 = 9999;
+      // find shortest time of related and relevant axial hits
+      RelationVector<CDCTriggerSegmentHit> axialHits =
+        track.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
+      for (unsigned ihit = 0; ihit < axialHits.size(); ++ihit) {
+        // skip hits with negative relation weight (not selected in finder)
+        if (axialHits.weight(ihit) < 0) continue;
+        unsigned short iSL = axialHits[ihit]->getISuperLayer();
+        // skip stereo hits (should not be related to track, but check anyway)
+        if (iSL % 2 == 1) continue;
+        // get shortest time of relevant hits
+        double relId = getRelId(*axialHits[ihit]);
+        if (m_MLPs[isector].isRelevant(relId, iSL) &&
+            axialHits[ihit]->priorityTime() < m_T0) {
+          m_T0 = axialHits[ihit]->priorityTime();
+        }
+      }
+      // find shortest time of relevant stereo hits
+      StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
+      for (int ihit = 0; ihit < hits.getEntries(); ++ihit) {
+        unsigned short iSL = hits[ihit]->getISuperLayer();
+        // skip axial hits
+        if (iSL % 2 == 0) continue;
+        // get shortest time of relevant hits
+        double relId = getRelId(*hits[ihit]);
+        if (m_MLPs[isector].isRelevant(relId, iSL) && hits[ihit]->priorityTime() < m_T0) {
+          m_T0 = hits[ihit]->priorityTime();
+        }
+      }
+      if (m_T0 < 9999) {
+        m_hasT0 = true;
+      } else {
+        m_T0 = 0;
+        m_hasT0 = false;
+      }
     }
   } else if (et_option == "fastestpriority") {
     m_T0 = 9999;
@@ -445,7 +479,8 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
       m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
       m_hasT0 = true;
     } else {
-      getEventTime(isector, track, "zero");
+      m_hasT0 = true;
+      m_T0 = 0;
     }
   } else {
     B2ERROR("No valid parameter for et_option (" << et_option << " )!");
@@ -788,7 +823,11 @@ NeuroTrigger::load(const string& filename, const string& arrayname)
   if (filename.size() < 1) {
     m_MLPs.clear();
     m_MLPs = m_cdctriggerneuroconfig->getMLPs();
-    B2INFO("Loaded Neurotrigger MLP weights from database: " +  m_cdctriggerneuroconfig->getNNName());
+    if (m_MLPs.size() == 0) {
+      B2ERROR("Could not load Neurotrigger weights from database!");
+      return false;
+    }
+    B2DEBUG(2, "Loaded Neurotrigger MLP weights from database: " +  m_cdctriggerneuroconfig->getNNName());
     B2DEBUG(100, "loaded " << m_MLPs.size() << " networks from database");
     return true;
   } else {

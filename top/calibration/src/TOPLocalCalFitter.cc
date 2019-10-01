@@ -200,7 +200,9 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
 {
 
   // loads the TTS infos and the fit constraint for the given channel and slot
-  if (m_fitterMode != "MC")
+  if (m_fitterMode == "monitoring")
+    m_treeConstraints->GetEntry(iChannel + 512 * iSlot);
+  else if (m_fitterMode == "calibration") // The MC-based constraint file has only slot 1 at the moment
     m_treeConstraints->GetEntry(iChannel);
 
   m_treeTTS->GetEntry(iChannel + 512 * iSlot);
@@ -449,6 +451,7 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
   //hitTree->Draw("hitTime:(channel)>>h_hitTime", "dVdt > 80 && amplitude > 80 && refTimeValid");
 
   m_histFile->cd();
+  h_hitTime->Write();
 
   for (short iSlot = 0; iSlot < 16; iSlot++) {
     std::cout << "fitting slot " << iSlot + 1 << std::endl;

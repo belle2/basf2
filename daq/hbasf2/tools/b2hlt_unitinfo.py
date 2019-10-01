@@ -20,6 +20,9 @@ from collections import defaultdict
 
 
 def get_overview(df):
+    if df is None:
+        return None, None
+
     import pandas as pd
     tmp = pd.Series({tuple(key.split(".")): value for key, value in df.items()}).unstack(0).T
 
@@ -118,6 +121,7 @@ if __name__ == '__main__':
 
     # Create and connect all needed sockets
     ctx = zmq.Context()
+    ctx.setsockopt(zmq.LINGER, 0)
     sockets = {address: ctx.socket(zmq.DEALER) for address in addresses}
 
     for address, socket in sockets.items():

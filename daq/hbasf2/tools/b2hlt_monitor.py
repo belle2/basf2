@@ -51,6 +51,7 @@ if __name__ == '__main__':
 
     # Create and connect all needed sockets
     ctx = zmq.Context()
+    ctx.setsockopt(zmq.LINGER, 0)
     sockets = {address: ctx.socket(zmq.DEALER) for address in addresses}
 
     for address, socket in sockets.items():

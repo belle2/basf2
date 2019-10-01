@@ -28,7 +28,7 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    KLMElementArrayIndex(enum KLMChannelIndex::IndexLevel indexLevel);
+    explicit KLMElementArrayIndex(enum KLMChannelIndex::IndexLevel indexLevel);
 
     /**
      * Destructor.

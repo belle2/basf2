@@ -11,10 +11,8 @@
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-#include <math.h>
-#include <root/TObject.h>
-#include <root/TVector3.h>
-
+#include <TObject.h>
+#include <TVector2.h>
 
 namespace Belle2 {
 

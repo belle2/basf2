@@ -7,11 +7,11 @@
 //-
 
 #include <dqm/modules/PhysicsObjectsDQM/PhysicsObjectsDQMModule.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/variables/ContinuumSuppressionVariables.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
-#include <TLorentzVector.h>
 #include <TDirectory.h>
-#include <iostream>
 #include <map>
 
 using namespace Belle2;

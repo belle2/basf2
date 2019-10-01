@@ -13,11 +13,9 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 #include <string>
 #include <vector>
-
 
 namespace Belle2 {
 

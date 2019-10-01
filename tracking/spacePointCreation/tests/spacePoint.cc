@@ -8,31 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/TestHelpers.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
-#include <vxd/geometry/SensorPlane.h>
-
-#include <pxd/reconstruction/PXDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit.h>
-
-#include <genfit/Track.h>
-#include <genfit/AbsTrackRep.h>
-#include <genfit/RKTrackRep.h>
 
 #include <gtest/gtest.h>
 
-
 //root stuff
-// #include <TRandom.h>
 #include "TFile.h"
 #include "TKey.h"
-// #include "TCollection.h"
 
 using namespace std;
 

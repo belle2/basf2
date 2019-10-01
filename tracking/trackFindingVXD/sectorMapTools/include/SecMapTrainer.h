@@ -30,7 +30,6 @@
 #include <string>
 #include <vector>
 #include <utility> // std::pair, std::move
-#include <functional>
 #include <limits>       // std::numeric_limits
 
 

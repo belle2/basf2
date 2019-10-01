@@ -25,9 +25,6 @@
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

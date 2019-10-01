@@ -13,12 +13,6 @@
 
 #include <map>
 #include <set>
-#include <vxd/dataobjects/VxdID.h>
-#include <cdc/dataobjects/WireID.h>
-#include <klm/bklm/dataobjects/BKLMElementID.h>
-#include <klm/eklm/dataobjects/EKLMElementID.h>
-
-#include <framework/gearbox/Const.h>
 
 namespace Belle2 {
 
@@ -185,7 +179,7 @@ namespace Belle2 {
     int     getEndOfValidity()
     {
       if (!tif)
-        return 0;
+        return maxTID;
       auto it = GlobalLabel::getTimeIntervals().find(makeEIDPID(eid, pid));
       if (it == GlobalLabel::getTimeIntervals().end())
         return tid;

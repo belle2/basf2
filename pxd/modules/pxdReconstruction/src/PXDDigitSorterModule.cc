@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdReconstruction/PXDDigitSorterModule.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
@@ -19,7 +18,6 @@
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/reconstruction/Pixel.h>
 #include <pxd/reconstruction/PXDPixelMasker.h>
-#include <functional>
 
 using namespace std;
 using namespace Belle2;

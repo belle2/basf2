@@ -9,11 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/display/PrimitivePlotter.h>
 
-
-#include <algorithm>
-#include <utility>
-#include <cmath>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

@@ -12,16 +12,8 @@
 #define QCSMONITORDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <beast/qcsmonitor/dataobjects/QcsmonitorHit.h>
-#include <string>
-#include <vector>
-
-//ROOT
-#include <TRandom3.h>
-#include <TF1.h>
-#include <TVector3.h>
 
 /** size of hit */
 const Int_t MAXSIZE         = 10000;

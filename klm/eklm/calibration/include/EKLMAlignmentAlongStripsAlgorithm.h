@@ -12,7 +12,6 @@
 
 /* Belle2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
-#include <klm/eklm/geometry/GeometryData.h>
 
 namespace Belle2 {
 

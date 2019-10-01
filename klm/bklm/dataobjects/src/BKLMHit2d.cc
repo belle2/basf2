@@ -15,8 +15,6 @@
 
 #include <CLHEP/Vector/ThreeVector.h>
 
-#include <cmath>
-
 using namespace Belle2;
 
 // empty constructor for ROOT - do not use this

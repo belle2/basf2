@@ -13,16 +13,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#include <TFile.h>
-#include <TChain.h>
-#include <TH2.h>
-#include <TH1.h>
-#include <TF1.h>
-#include <TMath.h>
 #include <stdio.h>
 #include <iostream>
 #include <cassert>
+#include <cmath>
+#include <cstring>
 #include <string>
 #include <ecl/digitization/algorithms.h>
 #include <ecl/digitization/WrapArray2D.h>

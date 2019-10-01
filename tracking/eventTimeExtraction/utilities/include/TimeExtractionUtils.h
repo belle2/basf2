@@ -13,7 +13,6 @@
 #include <framework/dataobjects/EventT0.h>
 
 #include <vector>
-#include <memory>
 #include <TVectorD.h>
 #include <TMatrixDSym.h>
 

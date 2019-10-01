@@ -11,10 +11,9 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariable.h>
-#include <tracking/trackFindingVXD/filterMap/threeHitVariables/CosAngleXY.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/CosDirectionXY.h>
 #include <framework/geometry/B2Vector3.h>
-#include <math.h>
+#include <cmath>
 
 #define ANGLEXYFULL_NAME AngleXYFull
 

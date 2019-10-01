@@ -1,18 +1,9 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TGraphErrors.h>
-#include <TProfile.h>
 #include <TF1.h>
-#include <TFile.h>
-#include <TChain.h>
-#include <TTree.h>
-#include <TSystem.h>
-#include <framework/logging/Logger.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/Database.h>
 #include <cdc/dbobjects/CDCSpaceResols.h>
-#include <framework/database/IntervalOfValidity.h>
 
 namespace Belle2 {
   namespace CDC {
@@ -142,6 +133,34 @@ namespace Belle2 {
 
       unsigned short m_sigmaParamMode_old; /**< sigma mode from input. */
       unsigned short m_sigmaParamMode = 1; /**< sigma mode for this calibration.*/
+
+      /**
+       * search max point at boundary region
+       */
+      double getUpperBoundaryForFit(TGraphErrors* graph)
+      {
+        double ymax = 0;
+        double xmax = 0;
+        int imax = 0;
+        double x, y;
+        int unCount = floor(0.05 / m_binWidth);
+        int N = graph->GetN();
+        int Nstart = floor(0.5 * (N - unCount));
+        int Nend = N - unCount;
+        for (int i  = Nstart; i < Nend; ++i) {
+          graph->GetPoint(i, x, y);
+          if (graph->GetErrorY(i) > 0.06E-3) continue;
+          if (y > ymax) {
+            xmax = x; ymax = y;
+            imax = i;
+          }
+        }
+        if (imax <= Nstart) {
+          graph->GetPoint(Nend, x, y);
+          xmax = x;
+        }
+        return xmax;
+      }
 
       ClassDef(SpaceResolutionCalibration, 0); /**< Class for calibraion CDC space resolution */
     };

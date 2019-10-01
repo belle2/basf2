@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/logging/Logger.h>
-
 #include <map>
 #include <string>
 #include <TObject.h>

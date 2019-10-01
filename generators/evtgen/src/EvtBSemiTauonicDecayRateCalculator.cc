@@ -11,9 +11,8 @@
 #include "EvtGenBase/EvtComplex.hh"
 #include "generators/evtgen/EvtBSemiTauonicDecayRateCalculator.h"
 #include "generators/evtgen/models/EvtBSemiTauonicHelicityAmplitudeCalculator.h"
-#include "framework/logging/Logger.h"
 #include <cmath>
-#include <boost/format.hpp>
+#include <complex>
 
 #include "TF1.h"
 #include "TF2.h"

@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <alignment/GlobalLabel.h>
+
 #include <iostream>
 
 using namespace std;
@@ -23,12 +24,12 @@ GlobalLabel::GlobalLabel(GlobalLabel::gidTYPE globalLabel) :
   if (globalLabel > maxLabel)
     return;
   gid = globalLabel;
-  pid = gid % eidOffest / pidOffset;
   tif = gid / tifOffset;
+  pid = gid % eidOffest / pidOffset;
 
-  if (!tif)
+  if (!tif) {
     eid = gid % tifOffset / eidOffest;
-  else {
+  } else {
     // Time-dep label
     gidTYPE teid = gid % tidOffset / teidOffset;
     gidTYPE teidpid = makeTEIDPID(teid, pid);
@@ -96,6 +97,8 @@ void GlobalLabel::construct(GlobalLabel::gidTYPE elementId,
 
   if (teidpid)
     tif = 1;
+  else
+    tif = 0;
 
   if (!tif)
     gid = (tif * tifOffset + eid * eidOffest + pid * pidOffset);

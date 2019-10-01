@@ -15,14 +15,10 @@
 #include <tracking/trackFindingVXD/filterMap/trackletVariables/ZiggZaggXY.h>
 #include <tracking/trackFindingVXD/filterMap/trackletVariables/ZiggZaggXYWithSigma.h>
 #include <tracking/trackFindingVXD/filterMap/trackletVariables/ZiggZaggRZ.h>
-#include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
-
-#include <math.h>
-
 
 using namespace std;
 using namespace Belle2;

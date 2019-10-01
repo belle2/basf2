@@ -32,7 +32,6 @@
 #include <framework/logging/Logger.h>
 
 #include <cmath>
-#include <climits>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

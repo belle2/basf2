@@ -11,7 +11,6 @@
 #include <analysis/dbobjects/PIDPriorsTable.h>
 #include <framework/logging/Logger.h>
 #include <iostream>
-#include <float.h>
 
 using namespace Belle2;
 

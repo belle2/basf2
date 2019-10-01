@@ -10,20 +10,16 @@
 
 #include <alignment/GlobalParam.h>
 
+#include <alignment/Hierarchy.h>
+#include <cdc/dbobjects/CDCLayerAlignment.h>
+#include <framework/database/Database.h>
+#include <framework/geometry/B2Vector3.h>
+#include <framework/logging/Logger.h>
+#include <vxd/geometry/GeoCache.h>
+
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
-
-#include <framework/logging/Logger.h>
-
-#include <framework/database/Database.h>
-
-#include <framework/geometry/B2Vector3.h>
-
-#include <vxd/geometry/GeoCache.h>
-#include <alignment/Hierarchy.h>
-
-#include <cdc/dbobjects/CDCLayerAlignment.h>
 
 namespace Belle2 {
   namespace alignment {

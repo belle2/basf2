@@ -9,13 +9,11 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisV0.h>
 
+#include <TFile.h>
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TString.h>
-#include <TPaletteAxis.h>
-#include <TAxis.h>
 #include <TH2.h>
-#include <TPad.h>
 #include <TGraph.h>
 
 using namespace std;

@@ -13,7 +13,7 @@
 #include <new>
 
 /* External headers. */
-#include "CLHEP/Units/PhysicalConstants.h"
+#include <CLHEP/Units/SystemOfUnits.h>
 
 /* Belle2 headers. */
 #include <klm/eklm/geometry/G4TriangularPrism.h>

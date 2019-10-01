@@ -28,7 +28,6 @@
 
 //C++/C standard lib elements.
 #include <string>
-#include <vector>
 //#include <queue>
 #include <limits>
 
@@ -65,6 +64,7 @@ namespace Belle2 {
     {
       if (m_fEElectronicsFromDB) delete m_fEElectronicsFromDB;
       //      if (m_eDepToADCConversionsFromDB) delete m_eDepToADCConversionsFromDB;
+      if (m_runGainFromDB) delete m_runGainFromDB;
     };
 
   private:

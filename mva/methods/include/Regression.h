@@ -9,10 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <mva/interface/Options.h>
 #include <mva/interface/Dataset.h>
+#include <mva/interface/Expert.h>
+#include <mva/interface/Options.h>
+#include <mva/interface/Teacher.h>
 #include <mva/interface/Weightfile.h>
-#include <mva/methods/FastBDT.h>
 
 #include <framework/logging/Logger.h>
 

@@ -8,14 +8,8 @@
 #include <analysis/ContinuumSuppression/HarmonicMoments.h>
 #include <analysis/ContinuumSuppression/SphericityEigenvalues.h>
 
-
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-#include <framework/utilities/TestHelpers.h>
-
 #include <TVector3.h>
 #include <TRandom3.h>
-#include <TLorentzVector.h>
 #include <TMath.h>
 #include <boost/math/special_functions/legendre.hpp>
 

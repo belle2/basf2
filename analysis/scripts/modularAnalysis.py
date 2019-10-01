@@ -357,6 +357,55 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None):
     path.add_module(mcparticleprinter)
 
 
+def correctBrems(
+    outputList,
+    inputList,
+    gammaList,
+    maximumAcceptance=3.0,
+    multiplePhotons=False,
+    usePhotonOnlyOnce=False,
+    writeOut=False,
+    path=None,
+):
+    """
+    For each particle in the given `inputList`, copies it to the `outputList` and adds the
+    4-vector of the photon(s) in the `gammaList` which has(have) a weighted named relation to
+    the particle's track, set by the :b2:mod:`eclTrackBremFinder` module during reconstruction.
+
+    Warning:
+        This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
+        up to and including MC12 and proc9 **do not** contain this. Newer production campaigns (from proc10 and MC13) will.
+
+    Information:
+        Please note that a new particle is always generated, with the old particle and -if found- one or more
+        photons as daughters.
+
+        The `inputList` should contain particles with associated tracks. Otherwise the module will exit with an error.
+
+        The `gammaList` should contain photons. Otherwise the module will exit with an error.
+
+    @param outputList   The output particle list name containing the corrected particles
+    @param inputList    The initial particle list name containing the particles to correct. *It should already exist.*
+    @param gammaList    The photon list containing possibly bremsstrahlung photons; *It should already exist.*
+    @param maximumAcceptance Maximum value of the relation weight. Should be a number between [0,3)
+    @param multiplePhotons Whether to use only one photon (the one with the smallest acceptance) or as many as possible
+    @param usePhotonOnlyOnce If true, each brems candidate is used to correct only the track with the smallest relation weight
+    @param writeOut      Whether `RootOutput` module should save the created `outputList`
+    @param path          The module is added to this path
+    """
+
+    bremscorrector = register_module('BremsFinder')
+    bremscorrector.set_name('bremsCorrector_' + outputList)
+    bremscorrector.param('inputList', inputList)
+    bremscorrector.param('outputList', outputList)
+    bremscorrector.param('gammaList', gammaList)
+    bremscorrector.param('maximumAcceptance', maximumAcceptance)
+    bremscorrector.param('multiplePhotons', multiplePhotons)
+    bremscorrector.param('usePhotonOnlyOnce', usePhotonOnlyOnce)
+    bremscorrector.param('writeOut', writeOut)
+    path.add_module(bremscorrector)
+
+
 def copyList(
     outputListName,
     inputListName,
@@ -1496,6 +1545,33 @@ def variablesToDaughterExtraInfo(
     path.add_module(mod)
 
 
+def variablesToEventExtraInfo(
+    particleList,
+    variables,
+    option=0,
+    path=None,
+):
+    """
+    For each particle in the input list the selected variables are saved in an event-extra-info field with the given name,
+    Can be used to save MC truth information, for example, in a ntuple of reconstructed particles.
+
+    An existing extra info with the same name will be overwritten if the new
+    value is lower / will never be overwritten / will be overwritten if the
+    new value is higher / will always be overwritten (-1/0/1/2).
+
+    @param particleList  The input ParticleList
+    @param variables     Dictionary of Variables and extraInfo names.
+    @param path          modules are added to this path
+    """
+
+    mod = register_module('VariablesToEventExtraInfo')
+    mod.set_name('VariablesToEventExtraInfo_' + particleList)
+    mod.param('particleList', particleList)
+    mod.param('variables', variables)
+    mod.param('overwrite', option)
+    path.add_module(mod)
+
+
 def variableToSignalSideExtraInfo(
     particleList,
     varToExtraInfo,
@@ -2225,6 +2301,20 @@ def writePi0EtaVeto(
     @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
     @param path       modules are added to this path
     """
+
+    if not os.path.isfile(workingDirectory + '/pi0veto.root') and downloadFlag:
+        pi0veto_error_message = (
+            "The necessary weight file pi0veto.root is not present in the provided working directory.\n"
+            "Unfortunately, it can not be downloaded from the database in this release."
+        )
+        B2ERROR(pi0veto_error_message)
+    if not os.path.isfile(workingDirectory + '/etaveto.root') and downloadFlag:
+        etaveto_error_message = (
+            "The necessary weight file etaveto.root is not present in the provided working directory.\n"
+            "Unfortunately, it can not be downloaded from the database in this release."
+        )
+        B2ERROR(etaveto_error_message)
+
     global PI0ETAVETO_COUNTER
 
     if PI0ETAVETO_COUNTER == 0:
@@ -2268,15 +2358,15 @@ def writePi0EtaVeto(
 
     if not os.path.isfile(workingDirectory + '/pi0veto.root'):
         if downloadFlag:
-            use_central_database('development')
+            # use_central_database('development') // The development GT can no longer be used
             basf2_mva.download('Pi0VetoIdentifier', workingDirectory + '/pi0veto.root')
-            B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
+            # B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
 
     if not os.path.isfile(workingDirectory + '/etaveto.root'):
         if downloadFlag:
-            use_central_database('development')
+            # use_central_database('development') // The development GT can no longer be used
             basf2_mva.download('EtaVetoIdentifier', workingDirectory + '/etaveto.root')
-            B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
+            # B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
 
     roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO'], extraInfoName='Pi0Veto',
                         identifier=workingDirectory + '/pi0veto.root')
@@ -2568,6 +2658,40 @@ def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path):
 
     path.add_module(chargedpid)
 
+
+def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
+    """
+    Calculates distance between two vertices, distance of closest approach between a vertex and a track,\
+    distance of closest approach between a vertex and btube. For track, this calculation ignores track curvature,\
+    it's negligible for small distances.The user should use extraInfo(CalculatedDistance)\
+    to get it. A full example steering file is at analysis/tests/test_DistanceCalculator.py
+
+    Example:
+      >>> from modularAnalysis import calculateDistance
+      >>>calculateDistance('list_name', 'decay_string', "mode", path=user_path)
+
+    @param list_name              name of the input ParticleList
+    @param decay_string           select particles between the distance of closest approch will be calculated
+    @param mode                   Specifies how the distance is calculated
+                                  vertextrack: calculate the distance of closest appreach between a track and a\
+                                   vertex, taking the first candidate as vertex, default
+                                  trackvertex: calculate the distance of closest appreach between a track and a\
+                                   vertex, taking the first candidate as track
+                                  2tracks: calculates the distance of closest appreach between two tracks
+                                  2vertices: calculates the distance between two vertices
+                                  vertexbtube: calculates the distance of closest appreach between a vertex and btube
+                                  trackbtube: calculates the distance of closest appreach between a track and btube
+    @param path                   modules are added to this path
+
+    """
+
+    dist_mod = register_module('DistanceCalculator')
+
+    dist_mod.set_name('DistanceCalculator_' + list_name)
+    dist_mod.param('listName', list_name)
+    dist_mod.param('decayString', decay_string)
+    dist_mod.param('mode', mode)
+    path.add_module(dist_mod)
 
 if __name__ == '__main__':
     from basf2.utils import pretty_print_module

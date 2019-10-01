@@ -20,8 +20,6 @@
 #include "TH1I.h"
 #include "TH2D.h"
 #include <string>
-#include <map>
-#include <iostream>
 
 namespace Belle2 {
 

@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/eventTimeExtraction/findlets/DriftLengthBasedEventTimeExtractor.h>
-#include <tracking/eventTimeExtraction/findlets/BaseEventTimeExtractor.icc.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/DriftTimeUtil.h>
 

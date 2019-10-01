@@ -13,23 +13,16 @@
 
 #include <framework/core/Module.h>
 #include <string>
-#include <TTree.h>
 #include <TFile.h>
 #include <TList.h>
 #include <TH1F.h>
-#include <TH2F.h>
 #include <TH3F.h>
 #include <time.h>
 
-#include <framework/datastore/SelectSubset.h>
-#include <genfit/TrackCand.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/MCParticleInfo.h>
 #include <vxd/dataobjects/VXDTrueHit.h>
 
 namespace Belle2 {
-
-  class  MCParticleInfo;
 
   /** The MCTrackCandClassifier Definition Module
    *

@@ -19,7 +19,7 @@ from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-gb2_setuprel = "release-03-02-00"
+gb2_setuprel = "release-04-00-00"
 
 # Create skim path
 charmless3skimpath = Path()

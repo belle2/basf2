@@ -14,7 +14,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
@@ -30,8 +29,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <boost/lexical_cast.hpp>
@@ -126,13 +123,13 @@ namespace Belle2 {
         auto func = [extraInfoName](const Particle * particle) -> double {
           if (particle == nullptr)
           {
-            StoreObjPtr<EventExtraInfo> eventExtraInfo;
-            return eventExtraInfo->getExtraInfo(extraInfoName);
+            B2WARNING("Returns -999 because the particle is nullptr! If you want EventExtraInfo variables, please use eventExtraInfo() instead");
+            return -999.;
           }
-          try {
-            return particle->getExtraInfo(extraInfoName);
-          } catch (const std::runtime_error& error)
+          if (particle->hasExtraInfo(extraInfoName))
           {
+            return particle->getExtraInfo(extraInfoName);
+          } else {
             return -999.;
           }
         };
@@ -149,7 +146,12 @@ namespace Belle2 {
         auto extraInfoName = arguments[0];
         auto func = [extraInfoName](const Particle*) -> double {
           StoreObjPtr<EventExtraInfo> eventExtraInfo;
-          return eventExtraInfo->getExtraInfo(extraInfoName);
+          if (eventExtraInfo->hasExtraInfo(extraInfoName))
+          {
+            return eventExtraInfo->getExtraInfo(extraInfoName);
+          } else {
+            return -999;
+          }
         };
         return func;
       } else {
@@ -2348,11 +2350,12 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_VARIABLE("extraInfo(name)", extraInfo,
                       "Returns extra info stored under the given name.\n"
                       "The extraInfo has to be set first by a module like MVAExpert. If nothing is set under this name, -999 is returned.\n"
+                      "If particle is a nullptr, -999 is returned. Please use eventExtraInfo(name) if you want EventExtraInfo variable.\n"
                       "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the MVAExpert.");
     REGISTER_VARIABLE("eventExtraInfo(name)", eventExtraInfo,
                       "[Eventbased] Returns extra info stored under the given name in the event extra info.\n"
                       "The extraInfo has to be set first by another module like MVAExpert in event mode.\n"
-                      "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the MVAExpert for an event.");
+                      "If nothing is set under this name, -999 is returned.");
     REGISTER_VARIABLE("eventCached(variable)", eventCached,
                       "[Eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
                       "The result of second call to this variable in the same event will be provided from the cache.");

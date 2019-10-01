@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.dcl.h>
 #include <tracking/ckf/pxd/filters/results/PXDResultVarSet.h>
-#include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
 
 namespace Belle2 {
   /// Base filter for CKF PXD results (on overlap check)

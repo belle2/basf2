@@ -32,59 +32,72 @@ SVDCoGTimeCalibrationAlgorithm::SVDCoGTimeCalibrationAlgorithm(std::string str) 
 CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
 {
 
+  int layer_num = 0;
+  int ladder_num = 0;
+  int sensor_num = 0;
+
+  int ladderOfLayer[4] = {7, 10, 12, 16};
+  int sensorOnLayer[4] = {2, 3, 4, 5};
+
   auto timeCal = new Belle2::SVDCoGCalibrationFunction();
   auto payload = new Belle2::SVDCoGTimeCalibrations::t_payload(*timeCal, m_id);
 
-  TF1* pol = new TF1("pol", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -150, 150);
+  TF1* pol = new TF1("pol", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -50, 50);
   pol->SetParameters(-50, 1.5, 0.001, 0.00001);
+  /*
+  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
-  TH2F* hEventT0vsCoG = new TH2F(" ", " ", 300, -150, 150, 300, -150, 150);
-  //TProfile* pfx = new TProfile("hprof", " ", 300, -150, 150);
+  cout << "STARTING GEOMETRY CICLE" << endl;
 
-  TFile* f = new TFile("profileOutput.root", "RECREATE");
+  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
+    layer_num =  layer.getLayerNumber();
+    cout << layer_num << endl;
+    for (auto ladder : geoCache.getLadders(layer)) {
+      ladder_num = ladder.getLadderNumber();
+      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
+        sensor_num = sensor.getSensorNumber();
+        for (int view = SVDHistograms<TH2F>::VIndex ; view < SVDHistograms<TH2F>::UIndex + 1; view++) {*/
 
-  auto tree = getObjectPtr<TTree>("HTreeCoGTimeCalib");
-  auto h = getObjectPtr<TH1F>("hEventT0");
-  float meanT0 = h->GetMean();
+  for (int layer = 0; layer < 4; layer++) {
+    layer_num = layer + 3;
+    for (int ladder = 0; ladder < (int)ladderOfLayer[layer]; ladder++) {
+      ladder_num = ladder + 1;
+      for (int sensor = 0; sensor < (int)sensorOnLayer[layer]; sensor++) {
+        sensor_num = sensor + 1;
+        for (int view  = 0; view < 2; view++) {
+          char side = 'U';
+          if (view == 0)
+            side = 'V';
+          auto hEventT0vsCoG = getObjectPtr<TH2F>(Form("eventT0vsCoG__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          auto hEventT0 = getObjectPtr<TH1F>(Form("eventT0__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          cout << " " << endl;
+          cout << typeid(hEventT0vsCoG).name() << " " << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << endl;
+          if (layer_num == 3 && hEventT0vsCoG->GetEntries() < 40000) {
+            cout << " " << endl;
+            cout << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << endl;
+            cout << "Not enough data, adding one run to the collector" << endl;
+            return c_NotEnoughData;
+          }
+          cout << " " << endl;
+          TProfile* pfx = hEventT0vsCoG->ProfileX();
+          std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
+          pfx->SetName(name.c_str());
+          pfx->Fit("pol", "Q0");
+          double par[4];
+          pol->GetParameters(par);
+          double meanT0 = hEventT0->GetMean();
+          timeCal->set_current(1);
+          timeCal->set_pol3parameters(par[0] - meanT0, par[1], par[2], par[3]); // par[0] - meanT0
 
-  if (!tree) {
-    B2WARNING("No tree object.");
-  } else if (!tree->GetEntries()) {
-    B2WARNING("No data in the tree.");
+          payload->set(layer_num, ladder_num, sensor_num, bool(view), 1, *timeCal);
+
+        }
+      }
+    }
   }
-
-  int layer = 0;
-  int ladder = 0;
-  int sensor = 0;
-  int side = 0;
-
-  tree->SetBranchAddress("hist", &hEventT0vsCoG);
-  tree->SetBranchAddress("layer", &layer);
-  tree->SetBranchAddress("ladder", &ladder);
-  tree->SetBranchAddress("sensor", &sensor);
-  tree->SetBranchAddress("view", &side);
-
-  for (int i = 0; i < tree->GetEntries(); i++) {
-    tree->GetEntry(i);
-    TProfile* pfx = hEventT0vsCoG->ProfileX();
-    std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
-    pfx->SetName(name.c_str());
-    pfx->Fit("pol", "0");
-    double par[4];
-    pol->GetParameters(par);
-    timeCal->set_current(1);
-    timeCal->set_pol3parameters(par[0] - meanT0, par[1], par[2], par[3]);
-
-    payload->set(layer, ladder, sensor, bool(side), 1, *timeCal);
-    f->cd();
-    pfx->Write();
-    hEventT0vsCoG->Clear();
-  }
-  h->Write();
-  f->Close();
   saveCalibration(payload, "SVDCoGTimeCalibrations");
 
   // probably not needed - would trigger re-doing the collection
-  //if ( ... too large corrections ... ) return c_Iterate;
+  // if ( ... too large corrections ... ) return c_Iterate;
   return c_OK;
 }

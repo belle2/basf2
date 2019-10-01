@@ -12,6 +12,12 @@
 
 #include <calibration/CalibrationAlgorithm.h>
 
+#include <svd/dataobjects/SVDHistograms.h>
+#include <framework/core/Module.h>
+#include <vxd/dataobjects/VxdID.h>
+#include <vxd/geometry/GeoCache.h>
+#include <svd/geometry/SensorInfo.h>
+
 namespace Belle2 {
   /**
    * Class implementing SVDCoGTimeCalibration calibration algorithm
@@ -33,6 +39,7 @@ namespace Belle2 {
   private:
 
     std::string m_id;
+    int m_ent = 0;
 
   };
 } // namespace Belle2

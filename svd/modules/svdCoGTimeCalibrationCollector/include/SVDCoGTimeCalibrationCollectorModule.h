@@ -92,17 +92,19 @@ namespace Belle2 {
 
     /** SVDHistograms */
     SVDHistograms<TH2F>* m_hEventT0vsCoG = NULL;
+    SVDHistograms<TH1F>* m_hEventT0 = NULL;
 
     /** Tree */
     std::string m_tree;
     TTree* m_histogramTree = NULL;
     TH2F* m_hist = NULL;
+    TH1F* m_hist_evttime = NULL;
     int m_layer = 0;
     int m_ladder = 0;
     int m_sensor = 0;
     int m_side = 0;
 
-    TH1F* m_hEventT0 = NULL;
+    // TH1F* m_hEventT0 = NULL;
   };
 
 } // end namespace Belle2

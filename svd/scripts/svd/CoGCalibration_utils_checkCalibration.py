@@ -15,7 +15,7 @@ from basf2 import *
 from svd import *
 import ROOT
 from ROOT import Belle2, TFile, TTree, TH1F, TH2F, TH2D, TGraph, TFitResultPtr
-from ROOT import TROOT, gROOT, TF1, TMath, gStyle, gDirectory
+from ROOT import TROOT, gROOT, TF1, TMath, gStyle, gDirectory, TTree
 import os
 # import numpy
 import math
@@ -82,9 +82,14 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
     def set_localdb(self, localDB):
         self.localdb = localDB
 
-    def initialize(self):
-        self.outputFileName = "SVDCoGCalibrationCheck_" + self.localdb + ".root"
+    def set_run_number(self, run):
+        self.runnumber = run
 
+    def set_exp_number(self, exp):
+        self.expnumber = exp
+
+    def initialize(self):
+        self.outputFileName = "../caf/tree/SVDCoGCalibrationCheck_" + str(self.runnumber) + ".root"
         self.resList = []
         self.spList = []
         self.cogList = []
@@ -143,16 +148,20 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
                     sensorN = k.getSensorNumber()
                     si = sensorN - 1
                     for s in range(2):
-                        self.resList[li][ldi][si].append(
-                            TH1F("res" + "_" + str(k) + "." + str(s), " ", 200, -100, 100))
-                        self.spList[li][ldi][si].append(
-                            TH2D("sp" + "_" + str(k) + "." + str(s), " ", 300, -150, 150, 300, -150, 150))
-                        self.cogList[li][ldi][si].append(
-                            TH1F("cog" + "_" + str(k) + "." + str(s), " ", 200, -100, 100))
-                        self.cdcList[li][ldi][si].append(
-                            TH1F("cdc" + "_" + str(k) + "." + str(s), " ", 200, -100, 100))
-                        self.snrList[li][ldi][si].append(
-                            TH1F("snr" + "_" + str(k) + "." + str(s), " ", 100, 0, 100))
+                        self.resList[li][ldi][si].append(TH1F("res" + "_" + str(layerN) + "." +
+                                                              str(ladderN) + "." + str(sensorN) + "." +
+                                                              str(s), " ", 200, -100, 100))
+                        self.spList[li][ldi][si].append(TH2D("sp" + "_" + str(layerN) + "." +
+                                                             str(ladderN) + "." + str(sensorN) + "." +
+                                                             str(s), " ", 300, -150, 150, 300, -150, 150))
+                        self.cogList[li][ldi][si].append(TH1F("cog" + "_" + str(layerN) + "." +
+                                                              str(ladderN) + "." + str(sensorN) + "." + str(s),
+                                                              " ", 200, -100, 100))
+                        self.cdcList[li][ldi][si].append(TH1F("cdc" + "_" + str(layerN) + "." +
+                                                              str(ladderN) + "." + str(sensorN) + "." + str(s),
+                                                              " ", 200, -100, 100))
+                        self.snrList[li][ldi][si].append(TH1F("snr" + "_" + str(layerN) + "." +
+                                                              str(ladderN) + "." + str(sensorN) + "." + str(s), " ", 100, 0, 100))
 
         self.EventT0Hist = TH1F("EventT0", " ", 160, -40, 40)
         self.alphaU = TH1F("alphaU", "first order coefficient ~ U side", 100, 0, 2)
@@ -160,8 +169,8 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         self.betaU = TH1F("betaU", "beta - EventT0Sync average ~ U side", 100, -5, 5)
         self.betaV = TH1F("betaV", "beta - EventT0Sync average ~ V side", 100, -5, 5)
 
-        self.gaus = TF1("gaus", 'gaus(0)', -150, 100)
-        self.pol1 = TF1("pol1", "[0] + [1]*x", -150, 150)
+        self.gaus = TF1("gaus", 'gaus(0)', -150, 150)
+        self.pol1 = TF1("pol1", "[0] + [1]*x", -30, 30)
 
         self.NTOT = 0
 
@@ -190,29 +199,70 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
 
     def terminate(self):
 
+        # tfileHist = TFile(self.outputHistFileName, 'recreate')
+        # tfile = TFile("../caf/cogVsRunNumber.txt", "recreate")
+        layerNumberTree = np.zeros(1, dtype=int)
+        ladderNumberTree = np.zeros(1, dtype=int)
+        sensorNumberTree = np.zeros(1, dtype=int)
+        sideTree = np.zeros(1, dtype=int)
+        mean = np.zeros(1, dtype=float)
+        meanerr = np.zeros(1, dtype=float)
+        width = np.zeros(1, dtype=float)
+        widtherr = np.zeros(1, dtype=float)
+        cogmean = np.zeros(1, dtype=float)
+        cogmeanerr = np.zeros(1, dtype=float)
+        runnumber = np.zeros(1, dtype=int)
+        runnumber[0] = int(self.runnumber)
+        expnumber = np.zeros(1, dtype=int)
+        expnumber[0] = int(self.expnumber)
+        evttime = np.zeros(1, dtype=float)
+        evttimeerr = np.zeros(1, dtype=float)
+
         tfile = TFile(self.outputFileName, 'recreate')
+        tfile.cd()
+        tree = TTree("CoGPerformances", "tree")
+        tree.Branch("Layer", layerNumberTree, "Layer/I")
+        tree.Branch("Ladder", ladderNumberTree, "Ladder/I")
+        tree.Branch("Sensor", sensorNumberTree, "Sensor/I")
+        tree.Branch("Side", sideTree, "Side/I")
+        tree.Branch("ResMean", mean, "ResMean/D")
+        tree.Branch("ResMeanErr", meanerr, "ResMeanErr/D")
+        tree.Branch("ResWidth", width, "ResWidth/D")
+        tree.Branch("ResWidthErr", widtherr, "ResWidthErr/D")
+        tree.Branch("CoGMean", cogmean, "CoGMean/D")
+        tree.Branch("CoGMeanErr", cogmeanerr, "CoGMeanErr/D")
+        tree.Branch("RunNumber", runnumber, "RunNumber/I")
+        tree.Branch("ExpNumber", expnumber, "ExpNumber/I")
+        tree.Branch("EvtT0Mean", evttime, "EvtT0Mean/D")
+        tree.Branch("EvtT0MeanErr", evttimeerr, "EvtT0MeanErr/D")
         par = [0, 1]
 
+        # tfileHist.cd()
         geoCache = Belle2.VXD.GeoCache.getInstance()
         gDirectory.mkdir("plots")
         gDirectory.cd("plots")
         for layer in geoCache.getLayers(Belle2.VXD.SensorInfoBase.SVD):
             layerNumber = layer.getLayerNumber()
+            layerNumberTree[0] = layerNumber
             li = layerNumber - 3
-            gDirectory.mkdir("layer" + str(layer))
-            gDirectory.cd("layer" + str(layer))
+            gDirectory.mkdir("layer" + str(layerNumber))
+            gDirectory.cd("layer" + str(layerNumber))
             for ladder in geoCache.getLadders(layer):
                 ladderNumber = ladder.getLadderNumber()
+                ladderNumberTree[0] = ladderNumber
                 ldi = ladderNumber - 1
                 for sensor in geoCache.getSensors(ladder):
                     sensorNumber = sensor.getSensorNumber()
+                    sensorNumberTree[0] = sensorNumber
                     si = sensorNumber - 1
                     for side in range(2):
+                        sideTree[0] = side
+                        print("SIDE: " + str(side))
 
                         # Resolution distribution Histograms with Gaussian Fit
                         res = self.resList[li][ldi][si][side]
                         res.GetXaxis().SetTitle("cluster time - Synchronized EventT0 (ns)")
-                        # fitResult = int(TFitResultPtr(res.Fit(self.gaus, "R")))
+                        fitResult = int(TFitResultPtr(res.Fit(self.gaus, "R")))
                         res.Write()
                         # COG Distribution Histograms
                         cog = self.cogList[li][ldi][si][side]
@@ -240,10 +290,44 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
 
                         if side is 1:
                             self.alphaU.Fill(self.pol1.GetParameter(1))
-                            self.betaU.Fill(self.pol1.GetParameter(0) - cdc.GetMean())
+                            self.betaU.Fill(self.pol1.GetParameter(0))  # - cdc.GetMean())
                         else:
                             self.alphaV.Fill(self.pol1.GetParameter(1))
-                            self.betaV.Fill(self.pol1.GetParameter(0) - cdc.GetMean())
+                            self.betaV.Fill(self.pol1.GetParameter(0))  # - cdc.GetMean())
+
+                        mean[0] = self.gaus.GetParameter(1)
+                        meanerr[0] = self.gaus.GetParError(1)
+                        width[0] = self.gaus.GetParameter(2)
+                        widtherr[0] = self.gaus.GetParError(2)
+                        cogmean[0] = cog.GetMean()
+                        if cog.GetEntries() == 0:
+                            cogmeanerr[0] = 2
+                        else:
+                            cogmeanerr[0] = cog.GetRMS()/math.sqrt(cog.GetEntries())
+                        evttime[0] = cdc.GetMean()
+                        if cdc.GetEntries() == 0:
+                            evttimeerr[0] = 2
+                        else:
+                            evttimeerr[0] = cdc.GetRMS()/math.sqrt(cdc.GetEntries())
+
+                        print("AFTER FITS")
+
+                        if fitResult == -1:
+                            mean[0] = -100.0
+                            meanerr[0] = -100.0
+                            width[0] = -100.0
+                            widtherr[0] = -100.0
+
+                        # print(" ")
+                        # print(" WHAT I NEED ")
+                        # print(str(self.runnumber) + " " + str(layerNumber) + " " + str(ladderNumber)
+                        #               + " " + str(sensorNumber) + " " + str(side) + " " + str(mean) + " " + str(meanerr)
+                        #               + " " + str(width) + " " + str(widtherr) +  " " + str(cogmean) + "\n")
+                        # print(" ")
+                        # print(str(type(mean[0])))
+                        # print(" ")
+
+                        tree.Fill()
 
             gDirectory.cd("../")
 
@@ -253,4 +337,7 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         self.alphaV.Write()
         self.betaU.Write()
         self.betaV.Write()
+        tree.Write()
+        tfile.Purge()
         tfile.Close()
+        del tfile

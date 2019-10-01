@@ -24,19 +24,29 @@ from ROOT.Belle2 import SVDCoGCalibrationFunction
 from ROOT.Belle2 import SVDCoGTimeCalibrations
 from svd import *
 from svd.CoGCalibration_utils_checkCalibration import SVDCoGTimeCalibrationCheckModule
+from basf2 import conditions
 
 import matplotlib.pyplot as plt
 import simulation
 
+
+def remove_module(path, name):
+    new_path = create_path()
+    for m in path.modules():
+        if name != m.name():
+            new_path.add_module(m)
+    return new_path
+
 localdb = sys.argv[1]
 filename = sys.argv[2]
+run = sys.argv[3]
+exp = sys.argv[4]
 branches = ['SVDShaperDigits', 'SVDShaperDigitsFromTracks', 'EventT0']
 
 trk_outputFile = "TrackFilterControlNtuples_" + localdb + ".root"
 nSVD = 6
 nCDC = 1
 pVal = 0.0  # 0001
-
 
 # inputFileList = [
 #    "/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009/\
@@ -53,8 +63,15 @@ else:
 
 
 # reset_database()
-use_database_chain()
-use_local_database(str(localdb) + "/database.txt", str(localdb), invertLogging=True)
+# use_database_chain()
+# use_local_database(str(localdb) + "/database.txt", str(localdb), invertLogging=True)
+
+conditions.globaltags = [
+    'data_reprocessing_prompt_rel4_patch',
+]
+conditions.testing_payloads = [
+    str(localdb) + "/database.txt",
+]
 
 main = create_path()
 
@@ -92,8 +109,12 @@ for moda in main.modules():
     if moda.name() == 'SVDSpacePointCreator':
         moda.param("SVDClusters", 'SVDClustersFromTracks')
 
+main = remove_module(main, 'SVDMissingAPVsClusterCreator')
+
 check = SVDCoGTimeCalibrationCheckModule()
 check.set_localdb(localdb)
+check.set_run_number(run)
+check.set_exp_number(exp)
 main.add_module(check)
 
 # Show progress of processing

@@ -1925,6 +1925,7 @@ def keepInROEMasks(
     particle list (e.g. 'gamma:someLabel'). To update the Track masks, the input particle list should be a charged
     pion particle list (e.g. 'pi+:someLabel').
 
+    Updating a non-existing mask will create a new one.
 
     - keep only those tracks that were used in provided particle list
 
@@ -1966,6 +1967,8 @@ def discardFromROEMasks(
     particle list (e.g. 'gamma:someLabel'). To update the Track masks, the input particle list should be a charged
     pion particle list (e.g. 'pi+:someLabel').
 
+    Updating a non-existing mask will create a new one.
+
     - discard tracks that were used in provided particle list
 
        >>> discardFromROEMasks('pi+:badTracks', 'mask', '')
@@ -2003,7 +2006,9 @@ def optimizeROEWithV0(
     passing it can be applied.
 
     The input particle list should be a V0 particle list: K_S0 ('K_S0:someLabel', ''),
-    Lambda ('Lambda:someLabel', '') or converted photons ('gamma:someLabel')
+    Lambda ('Lambda:someLabel', '') or converted photons ('gamma:someLabel').
+
+    Updating a non-existing mask will create a new one.
 
     - treat tracks from K_S0 inside mass window separately, replace track momenta with K_S0 momentum
 

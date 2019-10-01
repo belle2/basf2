@@ -19,15 +19,13 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
 
 #include <analysis/utility/ParticleCopy.h>
-
-#include <framework/geometry/BFieldManager.h>
 
 #include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 #include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
 
-#include <framework/particledb/EvtGenDatabasePDG.h>
 using namespace Belle2;
 
 REG_MODULE(TreeFitter)
@@ -35,6 +33,8 @@ REG_MODULE(TreeFitter)
 TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_nCandidatesAfter(-1)
 {
   setDescription("Tree Fitter module. Performs simultaneous fit of all vertices in a decay chain. Can also be used to just fit a single vertex.");
+  setPropertyFlags(c_ParallelProcessingCertified);
+  //
   addParam("particleList", m_particleList,
            "Type::[string]. Input mother of the decay tree to fit. For example 'B0:myB0particleList'.");
   addParam("confidenceLevel", m_confidenceLevel,

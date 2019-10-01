@@ -73,9 +73,7 @@ You can write several trees to the same file by calling the module several times
                           path=mypath)
 
 
-Modular analysis convenience function
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Here is the full function documentation of the modular analysis convenience function:
+As with many modules, there is a `modularAnalysis` convenience function:
 
 .. autofunction:: modularAnalysis.variablesToNtuple
 
@@ -104,10 +102,7 @@ Here is an example of use:
         ]
         variablesToHistogram('pi+:all', list_of_variables_and_bins)
 
-Modular analysis convenience function
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Here is the full function documentation of the modular analysis convenience function:
+Here is the full function documentation of the `modularAnalysis` convenience function:
 
 .. autofunction:: modularAnalysis.variablesToHistogram
 

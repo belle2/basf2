@@ -38,14 +38,16 @@ namespace Belle2 {
 
     /** Initializes the Module.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Stores the SVD event info into the DataStore.
      *
      * Based on the parameters set by the user the current SVD event info
      * is calculated and stored into the DataStore.
      */
-    virtual void event();
+    virtual void event() override;
+
+    std::string m_svdEventInfoName; /**< Name of the SVDEventInfo object */
 
   private:
     StoreObjPtr<SVDEventInfo> m_svdEventInfoPtr; /**< Output object. */
@@ -55,6 +57,7 @@ namespace Belle2 {
     int m_eventType; /**< event type */
     int m_daqMode; /**< DAQ mode */
     int m_triggerBin; /**< trigger time */
+    bool m_randomTriggerBin = true; /**< if true randomize trigger bin 0/1/2/3 */
     uint8_t m_triggerType; /**<  Trigger type content to be set */
 
     bool m_xTalk; /**<  Cross-talk flag to be set */

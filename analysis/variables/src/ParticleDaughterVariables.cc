@@ -12,7 +12,6 @@
 #include <analysis/variables/ParticleDaughterVariables.h>
 
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/variables/Variables.h>
 #include <analysis/variables/MCTruthVariables.h>
 
 // dataobjects
@@ -23,7 +22,6 @@
 #include <framework/logging/Logger.h>
 
 #include <iostream>
-#include <algorithm>
 #include <cmath>
 
 using namespace std;

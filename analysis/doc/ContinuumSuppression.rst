@@ -92,24 +92,6 @@ from the Belle software):
 
 Again, as shown in this example, you can store both cases in your ntuple.
 
-
-If you are using :doc:`NtupleMaker` (aka ``NtupleTools``), the way to store the
-entire set of :b2:var:`CleoConeCS` constructed from only ROE particles is by adding
-``CcROE`` as an argument.  Similarly, to store the KSFW moments calculated from
-the B final state particles, you need to add ``KsfwFS1``. To store all sets of
-CleoCones and KSFW variables, you can do the following:
-
-::
-
-  tools = ['ContinuumSuppression[KsfwFS1CcROE]', '^B0']
-  tools += ['ContinuumSuppression', '^B0']
-
-For the time-being, this also stores two identical sets of :b2:var:`thrustBm`, :b2:var:`thrustOm`,
-:b2:var:`cosTBTO`, :b2:var:`cosTBz`, and :b2:var:`R2` variables.
-This is due to the fact that the ``FS1`` and ``CcROE`` cases to not affect the
-calculation of these variables, so they are simply written out twice. This will
-be fixed in the near future. 
-
 Deep Continuum Suppression
 --------------------------
 
@@ -155,8 +137,8 @@ which are correlated.
 
 
 
-..
-  Documentation about continuum suppression framework is not yet migrated from our `confluence page <https://confluence.desy.de/display/BI/Continuum+Suppression+Framework>`_. Please go there.
-  If you have time to do the migration, feel free to take `agira ticket <https://agira.desy.de/browse/BII-2978>`_. In this case you might need nice guid on Sphinx documentation: :ref:`doctools` .
 
+Old Documentation
+=================
+  Documentation about FEI was migrated from our `confluence page <https://confluence.desy.de/display/BI/Continuum+Suppression+Framework>`_.
 

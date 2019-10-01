@@ -3,10 +3,10 @@
 
 # --------------------------------------------------------------------------------
 # Calibrate module T0 with Bhabha's or dimuons using time difference between slots
-# (M. Staric, May 2019)
+# (M. Staric, 2019-07-10)
 #
-# usage: basf2 cdst_chi2ModuleT0calibration.py runFirst runLast
-#   job: bsub -q l "basf2 cdst_chi2ModuleT0calibration.py runFirst runLast"
+# usage: basf2 cdst_chi2ModuleT0calibration.py experiment runFirst runLast
+#   job: bsub -q l "basf2 cdst_chi2ModuleT0calibration.py experiment runFirst runLast"
 #
 # note: runLast is inclusive
 # --------------------------------------------------------------------------------
@@ -22,37 +22,42 @@ import os
 
 # ----- those need to be adjusted before running --------------------------------------
 #
-experiment = 7
-input_dir = '/ghi/fs01/belle2/bdata/Data/e0007/4S/Bucket4/release-03-01-01/DB00000598/'
+sampleType = 'bhabha'  # sample type: 'bhabha' or 'dimuon'
+data_dir = '/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009_nofilter'
 skim_dir = 'skim/hlt_bhabha/cdst/sub00/'
 globalTag = 'data_reprocessing_prompt'  # base global tag
-stagingTags = []  # list of staging tags with new calibration constants
-localDB = []  # list of local databases with new calibration constants
+stagingTags = ['staging_data_reprocessing']  # list of tags with new calibration
+localDB = []  # list of local databases with new calibration
 minEntries = 10  # minimal number of histogram entries required to perform a fit
-output_dir = 'chi2ModuleT0'  # main output folder
+output_dir = 'moduleT0'  # main output folder
 #
 # -------------------------------------------------------------------------------------
 
 # Argument parsing
 argvs = sys.argv
-if len(argvs) < 3:
-    print("usage: basf2", argvs[0], "runFirst runLast")
+if len(argvs) < 4:
+    print("usage: basf2", argvs[0], "experiment runFirst runLast")
     sys.exit()
-run_first = int(argvs[1])
-run_last = int(argvs[2])
+experiment = int(argvs[1])
+run_first = int(argvs[2])
+run_last = int(argvs[3])
+
+expNo = 'e' + '{:0=4d}'.format(experiment)
 
 # Make list of files
 files = []
 for run in range(run_first, run_last + 1):
     runNo = 'r' + '{:0=5d}'.format(run)
-    files += glob.glob(input_dir + '/' + runNo + '/' + skim_dir + '/cdst.*.root')
+    for typ in ['4S', 'Continuum', 'Scan']:
+        folder = data_dir + '/' + expNo + '/' + typ + '/' + runNo + '/' + skim_dir
+        files += glob.glob(folder + '/cdst.*.root')
 if len(files) == 0:
     B2ERROR('No cdst files found')
     sys.exit()
 
 # Output folder
-expNo = 'e' + '{:0=4d}'.format(experiment)
-output_folder = output_dir + '/' + expNo
+method = 'chi2'
+output_folder = output_dir + '/' + expNo + '/' + sampleType + '/' + method
 if not os.path.isdir(output_folder):
     os.makedirs(output_folder)
     print('New folder created: ' + output_folder)
@@ -62,6 +67,18 @@ fileName = output_folder + '/moduleT0-' + expNo + '-'
 run1 = 'r' + '{:0=5d}'.format(run_first)
 run2 = 'r' + '{:0=5d}'.format(run_last)
 fileName += run1 + '_to_' + run2 + '.root'
+print('Output file:', fileName)
+
+
+class Mask_BS13d(Module):
+    ''' exclude (mask-out) BS 13d '''
+
+    def event(self):
+        ''' event processing '''
+
+        for digit in Belle2.PyStoreArray('TOPDigits'):
+            if digit.getModuleID() == 13 and digit.getBoardstackNumber() == 3:
+                digit.setHitQuality(Belle2.TOPDigit.c_Junk)
 
 
 class ModuleT0cal(Module):
@@ -312,8 +329,11 @@ main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
 # Channel masking
 main.add_module('TOPChannelMasker')
 
+# Exclude BS13d
+main.add_module(Mask_BS13d())
+
 # Bunch finder
-main.add_module('TOPBunchFinder', usePIDLikelihoods=True)
+main.add_module('TOPBunchFinder', usePIDLikelihoods=True, subtractRunningOffset=False)
 
 # Module T0 calibrator
 main.add_module(ModuleT0cal())

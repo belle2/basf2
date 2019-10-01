@@ -10,17 +10,13 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <rawdata/dataobjects/RawPXD.h>
 
 #include <string>
-#include <vector>
 #include <stdlib.h>
 
 
@@ -77,10 +73,10 @@ namespace Belle2 {
       //! File handle
       FILE* fh;
 
-      int readOneEvent(void);//! Read data of one Event from File
-      int read_data(char* data, size_t len);//! Read amount of data (len bytes) from file to ptr data
-      bool getTrigNr(RawPXD& px);
-      bool unpack_dhc_frame(void* data);
+      int readOneEvent(void); //!< Read data of one Event from File
+      int read_data(char* data, size_t len); //!< Read amount of data (len bytes) from file to ptr data
+      bool getTrigNr(RawPXD& px); //!< get the trigger number
+      bool unpack_dhc_frame(void* data); //!< unpack the dhc frame
     };
 
   } // end namespace PXD

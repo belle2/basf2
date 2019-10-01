@@ -14,8 +14,6 @@
 #include <framework/logging/Logger.h>
 
 //Root
-#include <TObject.h>
-#include <TGraph.h>
 #include <TFile.h>
 
 namespace Belle2 {

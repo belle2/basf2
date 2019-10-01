@@ -12,7 +12,6 @@
 #include "tracking/trackFindingVXD/sectorMapTools/SectorFriendship.h"
 
 #include "tracking/dataobjects/FullSecID.h"
-#include <framework/logging/Logger.h>
 #include <boost/format.hpp> // formatting output
 
 using namespace std;

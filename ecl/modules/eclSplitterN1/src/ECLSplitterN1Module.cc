@@ -31,7 +31,6 @@
 #include "TH1F.h"
 
 // FRAMEWORK
-#include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <framework/geometry/B2Vector3.h>
@@ -46,7 +45,6 @@
 #include <ecl/geometry/ECLGeometryPar.h>
 
 // MDST
-#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 // NAMESPACES

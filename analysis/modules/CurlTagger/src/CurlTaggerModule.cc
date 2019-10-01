@@ -10,24 +10,16 @@
 
 #include <analysis/modules/CurlTagger/CurlTaggerModule.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
 
-#include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/TrackVariables.h>
 #include <analysis/variables/Variables.h>
 #include <analysis/variables/MCTruthVariables.h>
 
-#include <iostream>
 #include <vector>
 #include <string>
-
-#include "TLorentzVector.h"
-#include "TVector3.h"
-#include "TMath.h"
 
 //Module Includes
 #include <analysis/modules/CurlTagger/Bundle.h>
@@ -72,7 +64,7 @@ CurlTaggerModule::~CurlTaggerModule() = default;
 bool CurlTaggerModule::passesPreSelection(Particle* p)
 {
   if (Variable::particlePt(p) > m_PtCut) {return false;}
-  if (Variable::trackNCDCHits(p) == 0 && Variable::trackNVXDHits(p) == 0) {return false;} //should never happen anyway but might as well check
+  if (!(Variable::trackNCDCHits(p) > 0 || Variable::trackNVXDHits(p) > 0)) {return false;} //should never happen anyway but might as well check
   if (p -> getCharge() == 0) {return false;}
   return true;
 }

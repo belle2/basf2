@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <ecl/dataobjects/ECLDigit.h>

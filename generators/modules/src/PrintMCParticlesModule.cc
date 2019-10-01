@@ -10,6 +10,8 @@
 
 #include <generators/modules/PrintMCParticlesModule.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+
 #include <boost/format.hpp>
 
 #include <TDatabasePDG.h>

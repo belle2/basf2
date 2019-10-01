@@ -10,8 +10,6 @@
 
 #include <generators/modules/HepevtOutputModule.h>
 
-#include <framework/logging/Logger.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>

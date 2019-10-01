@@ -142,11 +142,11 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   // 1) if radiated photons are to be ignored, the MCParticle must
   // have at least as many daughters as the decaydescriptor
   // 2) if radiated photons are included the number of daughters has to be equal!
-  bool isIgnorePhotons = d->isIgnorePhotons();
-  if (isIgnorePhotons && nDaughtersD > nDaughtersP) {
+  bool isIgnoreRadiatedPhotons = d->isIgnoreRadiatedPhotons();
+  if (isIgnoreRadiatedPhotons && nDaughtersD > nDaughtersP) {
     B2DEBUG(10, "DecayDescriptor has more daughters than MCParticle!");
     return decay;
-  } else if (!isIgnorePhotons && nDaughtersD != nDaughtersP) {
+  } else if (!isIgnoreRadiatedPhotons && nDaughtersD != nDaughtersP) {
     B2DEBUG(10, "DecayDescriptor must have same number of daughters as MCParticle!");
     return decay;
   }
@@ -193,12 +193,12 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   }
   // Ok, it seems that everything from the DecayDescriptor could be matched.
   // If the decay is NOT INCLUSIVE,  no unmatched MCParticles should be left
-  bool isInclusive = d->isInclusive();
+  bool isInclusive = (d->isIgnoreMassive() or d->isIgnoreNeutrino() or d->isIgnoreGamma());
   if (!isInclusive) {
     B2DEBUG(10, "Decay is not inclusive, check for left over MCParticles!\n");
     for (int& itDP : daughtersPIndex) {
       // Check if additional photons are to be ignored
-      if (isIgnorePhotons && daughtersP[itDP]->getPDG() == 22) continue;
+      if (isIgnoreRadiatedPhotons && daughtersP[itDP]->getPDG() == 22) continue;
       B2DEBUG(10, "There was an additional particle left which is not a photon. Found " << daughtersP[itDP]->getPDG());
       return decay;
     }

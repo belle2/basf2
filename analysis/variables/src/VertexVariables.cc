@@ -9,6 +9,8 @@
 **************************************************************************/
 
 #include <analysis/variables/VertexVariables.h>
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <framework/logging/Logger.h>
@@ -31,7 +33,7 @@ namespace Belle2 {
       if (mcparticle) {
         return mcparticle->getDecayVertex().X();
       }
-      return -999;
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     double particleMCY(const Particle* part)
@@ -40,7 +42,7 @@ namespace Belle2 {
       if (mcparticle) {
         return mcparticle->getDecayVertex().Y();
       }
-      return -999;
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     double particleMCZ(const Particle* part)
@@ -49,73 +51,148 @@ namespace Belle2 {
       if (mcparticle) {
         return mcparticle->getDecayVertex().Z();
       }
-      return -999;
-    }
-
-
-
-
-    double particleMCDistance(const Particle* part)
-    {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle) {
-        const auto& frame = ReferenceFrame::GetCurrent();
-        return frame.getVertex(mcparticle->getDecayVertex()).Mag();
-      }
-      return -999;
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     double particleMCRho(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
-        const auto& frame = ReferenceFrame::GetCurrent();
-        return frame.getVertex(mcparticle->getDecayVertex()).Perp();
+        return mcparticle->getDecayVertex().Perp();
       }
-      return -999;
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double particleMCDX(const Particle* part)
+    {
+      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle) {
+        static DBObjPtr<BeamSpot> beamSpotDB;
+        const auto& frame = ReferenceFrame::GetCurrent();
+        return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition()).X();
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double particleMCDY(const Particle* part)
+    {
+      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle) {
+        static DBObjPtr<BeamSpot> beamSpotDB;
+        const auto& frame = ReferenceFrame::GetCurrent();
+        return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition()).Y();
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double particleMCDZ(const Particle* part)
+    {
+      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle) {
+        static DBObjPtr<BeamSpot> beamSpotDB;
+        const auto& frame = ReferenceFrame::GetCurrent();
+        return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition()).Z();
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double particleMCDRho(const Particle* part)
+    {
+      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle) {
+        static DBObjPtr<BeamSpot> beamSpotDB;
+        const auto& frame = ReferenceFrame::GetCurrent();
+        return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition()).Perp();
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double particleMCDistance(const Particle* part)
+    {
+      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle) {
+        static DBObjPtr<BeamSpot> beamSpotDB;
+        const auto& frame = ReferenceFrame::GetCurrent();
+        return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition()).Mag();
+      }
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     double particleMCProductionX(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
-        return mcparticle->getVertex().X();
+        return mcparticle->getProductionVertex().X();
       }
-      return -999;
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     double particleMCProductionY(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
-        return mcparticle->getVertex().Y();
+        return mcparticle->getProductionVertex().Y();
       }
-      return -999;
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     double particleMCProductionZ(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
-        return mcparticle->getVertex().Z();
+        return mcparticle->getProductionVertex().Z();
       }
-      return -999;
+      return std::numeric_limits<double>::quiet_NaN();
     }
-    // vertex or POCA in respect to IP ------------------------------
 
-    double particleDX(const Particle* part)
+    double particleMCProductionDX(const Particle* part)
+    {
+      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle) {
+        static DBObjPtr<BeamSpot> beamSpotDB;
+        const auto& frame = ReferenceFrame::GetCurrent();
+        return frame.getVertex(mcparticle->getProductionVertex() - beamSpotDB->getIPPosition()).X();
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double particleMCProductionDY(const Particle* part)
+    {
+      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle) {
+        static DBObjPtr<BeamSpot> beamSpotDB;
+        const auto& frame = ReferenceFrame::GetCurrent();
+        return frame.getVertex(mcparticle->getProductionVertex() - beamSpotDB->getIPPosition()).Y();
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double particleMCProductionDZ(const Particle* part)
+    {
+      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle) {
+        static DBObjPtr<BeamSpot> beamSpotDB;
+        const auto& frame = ReferenceFrame::GetCurrent();
+        return frame.getVertex(mcparticle->getProductionVertex() - beamSpotDB->getIPPosition()).Z();
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    // vertex or POCA in respect to origin ------------------------------
+
+    double particleX(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getVertex(part).X();
     }
 
-    double particleDY(const Particle* part)
+    double particleY(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getVertex(part).Y();
     }
 
-    double particleDZ(const Particle* part)
+    double particleZ(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getVertex(part).Z();
@@ -132,41 +209,71 @@ namespace Belle2 {
 
     double particleDXUncertainty(const Particle* part)
     {
+      // uncertainty on x (with respect to the origin)
       return getParticleUncertaintyByIndex(part, 0);
     }
 
     double particleDYUncertainty(const Particle* part)
     {
+      // uncertainty on y (with respect to the origin)
       return getParticleUncertaintyByIndex(part, 1);
     }
 
     double particleDZUncertainty(const Particle* part)
     {
+      // uncertainty on z (with respect to the origin)
       return getParticleUncertaintyByIndex(part, 2);
+    }
+
+    //----------------------------------------------------------------------------------
+    // vertex or POCA in respect to measured IP
+    double particleDX(const Particle* part)
+    {
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).X();
+    }
+
+    double particleDY(const Particle* part)
+    {
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Y();
+    }
+
+    double particleDZ(const Particle* part)
+    {
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Z();
     }
 
     double particleDRho(const Particle* part)
     {
+      static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).Perp();
+      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Perp();
     }
 
     double particleDPhi(const Particle* part)
     {
+      static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).Phi();
+      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Phi();
     }
 
     double particleDCosTheta(const Particle* part)
     {
+      static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).CosTheta();
+      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).CosTheta();
     }
 
     double particleDistance(const Particle* part)
     {
+      static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).Mag();
+      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Mag();
     }
 
     double particleDistanceSignificance(const Particle* part)
@@ -177,9 +284,11 @@ namespace Belle2 {
       // where:
       // r &= \sqrt{\vec{x}*\vec{x}}
       // and V_{ij} is the covariance matrix
+      static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      const auto& vertex = frame.getVertex(part);
-      const auto& vertexErr = frame.getVertexErrorMatrix(part->getVertexErrorMatrix());
+      const auto& vertex = frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition());
+      const auto& vertexErr = frame.getVertexErrorMatrix(static_cast<TMatrixDSym>(part->getVertexErrorMatrix()) +
+                                                         beamSpotDB->getCovVertex());
       auto denominator = vertex * (vertexErr * vertex);
       if (denominator <= 0) {
         return -999;
@@ -270,44 +379,52 @@ namespace Belle2 {
     VARIABLE_GROUP("Vertex Information");
     // Generated vertex information
     REGISTER_VARIABLE("mcX", particleMCX,
-                      "Returns the x position of decay vertex of matched generated particle. Returns -999 if particle has no matched generated particle.");
+                      "Returns the x position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
     REGISTER_VARIABLE("mcY", particleMCY,
-                      "Returns the y position of decay vertex of matched generated particle.");
+                      "Returns the y position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
     REGISTER_VARIABLE("mcZ", particleMCZ,
-                      "Returns the z position of decay vertex of matched generated particle.");
-    REGISTER_VARIABLE("mcDX", particleMCX,
-                      "Returns the x position of decay vertex of matched generated particle. Returns -999 if particle has no matched generated particle."
-                      " Warning: mcDX, mcDY and mcDZ truth variables are duplicates of mcX, mcY and mcZ. They are going to be removed in the future releases. ");
-    REGISTER_VARIABLE("mcDY", particleMCY,
-                      "Returns the y position of decay vertex of matched generated particle.");
-    REGISTER_VARIABLE("mcDZ", particleMCZ,
-                      "Returns the z position of decay vertex of matched generated particle.");
-    REGISTER_VARIABLE("mcDistance", particleMCDistance,
-                      "Returns the distance to IP of decay vertex of matched generated particle. Returns -999 if particle has no matched generated particle.");
+                      "Returns the z position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
     REGISTER_VARIABLE("mcRho", particleMCRho,
-                      "Returns the transverse position of decay vertex of matched generated particle. Returns -999 if particle has no matched generated particle.");
+                      "Returns the transverse position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
+    REGISTER_VARIABLE("mcDX", particleMCDX,
+                      "Returns the x position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
+    REGISTER_VARIABLE("mcDY", particleMCDY,
+                      "Returns the y position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
+    REGISTER_VARIABLE("mcDZ", particleMCDZ,
+                      "Returns the z position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
+    REGISTER_VARIABLE("mcDRho", particleMCDRho,
+                      "Returns the transverse position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
+    REGISTER_VARIABLE("mcDistance", particleMCDistance,
+                      "Returns the distance of the decay vertex of the matched generated particle from the IP. Returns nan if the particle has no matched generated particle.");
     REGISTER_VARIABLE("mcProdVertexX", particleMCProductionX,
-                      "Returns the x position of production vertex of matched generated particle. Returns -999 if particle has no matched generated particle.");
+                      "Returns the x position of production vertex of matched generated particle. Returns nan if the particle has no matched generated particle.");
     REGISTER_VARIABLE("mcProdVertexY", particleMCProductionY,
-                      "Returns the y position of production vertex of matched generated particle.");
+                      "Returns the y position of production vertex of matched generated particle. Returns nan if the particle has no matched generated particle.");
     REGISTER_VARIABLE("mcProdVertexZ", particleMCProductionZ,
-                      "Returns the z position of production vertex of matched generated particle.");
+                      "Returns the z position of production vertex of matched generated particle. Returns nan if the particle has no matched generated particle.");
+    REGISTER_VARIABLE("mcProdVertexDX", particleMCProductionDX,
+                      "Returns the x position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
+    REGISTER_VARIABLE("mcProdVertexDY", particleMCProductionDY,
+                      "Returns the y position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
+    REGISTER_VARIABLE("mcProdVertexDZ", particleMCProductionDZ,
+                      "Returns the z position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
 
     // Decay vertex position
-    REGISTER_VARIABLE("distance", particleDistance,
-                      "3D distance relative to interaction point");
+    REGISTER_VARIABLE("distance", particleDistance, "3D distance relative to interaction point");
     REGISTER_VARIABLE("significanceOfDistance", particleDistanceSignificance,
                       "significance of distance relative to interaction point(-1 in case of numerical problems)");
     REGISTER_VARIABLE("dx", particleDX, "x in respect to IP");
     REGISTER_VARIABLE("dy", particleDY, "y in respect to IP");
     REGISTER_VARIABLE("dz", particleDZ, "z in respect to IP");
-    REGISTER_VARIABLE("x", particleDX,
-                      "x coordinate of vertex in case of composite particle, or point of the closest approach (POCA) in case of a track");
-    REGISTER_VARIABLE("y", particleDY, "y coordinate of vertex");
-    REGISTER_VARIABLE("z", particleDZ, "z coordinate of vertex");
-    REGISTER_VARIABLE("x_uncertainty", particleDXUncertainty, "uncertainty on x");
-    REGISTER_VARIABLE("y_uncertainty", particleDYUncertainty, "uncertainty on y");
-    REGISTER_VARIABLE("z_uncertainty", particleDZUncertainty, "uncertainty on z");
+    REGISTER_VARIABLE("x", particleX,
+                      "x coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
+    REGISTER_VARIABLE("y", particleY,
+                      "y coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
+    REGISTER_VARIABLE("z", particleZ,
+                      "z coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
+    REGISTER_VARIABLE("x_uncertainty", particleDXUncertainty, "uncertainty on x (measured with respect to the origin)");
+    REGISTER_VARIABLE("y_uncertainty", particleDYUncertainty, "uncertainty on y (measured with respect to the origin)");
+    REGISTER_VARIABLE("z_uncertainty", particleDZUncertainty, "uncertainty on z (measured with respect to the origin)");
     REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP");
     REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle in degrees in respect to IP");
     REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex polar angle in respect to IP");

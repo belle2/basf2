@@ -11,16 +11,6 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
-#include <framework/logging/Logger.h>
-
-#include <typeinfo>
-
-#include <memory>       // std::unique_ptr
-#include <utility>      // std::move, std::replace
-#include <string>
-#include <unordered_map>
-
-#include <functional>
 
 namespace Belle2 {
 

@@ -11,10 +11,8 @@
 
 #include <tracking/eventTimeExtraction/findlets/BaseEventTimeExtractor.dcl.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <framework/dataobjects/EventT0.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 

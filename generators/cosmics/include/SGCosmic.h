@@ -12,9 +12,7 @@
 #ifndef SGCOSMIC_H
 #define SGCOSMIC_H
 
-#include <framework/core/FrameworkExceptions.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
-#include <TRandom3.h>
 
 namespace Belle2 {
 

@@ -8,31 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/variables/ParameterVariables.h>
-#include <analysis/variables/ROEVariables.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventShapeContainer.h>
 
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/utilities/Conversion.h>
-
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
 
 #include <TLorentzVector.h>
 #include <TVectorF.h>
 #include <TVector3.h>
-
-#include <cmath>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -583,7 +570,7 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         auto variableName = arguments[0];
 
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
 
         auto func = [var](const Particle * particle) -> double {
           StoreObjPtr<EventShapeContainer> evtShapeCont;

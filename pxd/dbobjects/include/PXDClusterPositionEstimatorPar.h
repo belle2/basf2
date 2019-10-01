@@ -13,12 +13,8 @@
 #include <TH2F.h>
 #include <map>
 
-
 #include <pxd/dbobjects/PXDClusterShapeClassifierPar.h>
 #include <pxd/dbobjects/PXDClusterOffsetPar.h>
-
-#include <framework/logging/Logger.h>
-
 
 namespace Belle2 {
 

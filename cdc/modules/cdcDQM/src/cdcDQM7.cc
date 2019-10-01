@@ -6,26 +6,14 @@
 /* update shifter's plots */
 
 #include "cdc/modules/cdcDQM/cdcDQM7.h"
-// add
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
+
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-//
 #include <framework/core/HistoModule.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
 
-#include "TH1F.h"
-#include "TH1D.h"
-#include "TH2D.h"
-#include <stdio.h>
-
 #include <TDirectory.h>
-#include <TStyle.h>
-
-#include <TProfile.h>//
 
 using namespace std;
 using namespace Belle2;
@@ -234,7 +222,7 @@ void cdcDQM7Module::event()
   // each layer
   int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
   for (int b = 0; b < 56; b++) {
-    int n_wire;
+    int n_wire = 0;
     if (b < 8) {
       n_wire = ndiv[0];
     } else if (b >= 8 && b < 14) {

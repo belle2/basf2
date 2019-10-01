@@ -20,12 +20,8 @@
 //ECL
 #include <ecl/digitization/EclConfigurationPure.h>
 
-
-class TH1F;
-
 namespace Belle2 {
 
-  class ECLWaveformData;
   class ECLNoiseData;
   class ECLDsp;
   class ECLHit;

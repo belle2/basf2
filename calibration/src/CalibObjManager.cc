@@ -3,7 +3,6 @@
 #include <string>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <TKey.h>
 #include <TTree.h>
 
 using namespace std;
@@ -12,7 +11,7 @@ using namespace Calibration;
 
 namespace Belle2 {
   template<>
-  TTree* CalibObjManager::cloneObj(TTree* source, std::string newName) const
+  TTree* CalibObjManager::cloneObj(TTree* source, const std::string& newName) const
   {
     B2DEBUG(100, "Held object is a TTree which will be have CloneTree() called.");
     // Construct the TTree by making a copy
@@ -27,7 +26,7 @@ namespace Belle2 {
     m_templateObjects.clear();
   }
 
-  void CalibObjManager::addObject(string name, shared_ptr<TNamed> object)
+  void CalibObjManager::addObject(const string& name, shared_ptr<TNamed> object)
   {
     if (m_templateObjects.find(name) != m_templateObjects.end()) {
       m_templateObjects[name].reset();
@@ -85,7 +84,7 @@ namespace Belle2 {
     }
   }
 
-  unsigned int CalibObjManager::getHighestIndexObject(const string name, const TDirectory* dir) const
+  unsigned int CalibObjManager::getHighestIndexObject(const string& name, const TDirectory* dir) const
   {
     unsigned int index = 0;
     // Try from the list of objects
@@ -130,11 +129,17 @@ namespace Belle2 {
     return name + getSuffix(expRun);
   }
 
-  unsigned int CalibObjManager::extractKeyIndex(string& keyName) const
+  unsigned int CalibObjManager::extractKeyIndex(const string& keyName) const
   {
     vector<string> strs;
     boost::split(strs, keyName, boost::is_any_of("_"));
     string indexString = strs.back();
     return stoi(indexString);
+  }
+
+  bool CalibObjManager::isRegistered(const std::string& name) const
+  {
+    if (m_templateObjects.count(name)) return true;
+    else return false;
   }
 }

@@ -26,13 +26,9 @@
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
 //MDST
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
-
-//ROOT
-#include <TVector3.h>
 
 #include <cmath>
 #include <stack>
@@ -106,23 +102,6 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
-    bool isGoodBelleGamma(int region, double energy)
-    {
-      bool goodGammaRegion1, goodGammaRegion2, goodGammaRegion3;
-      goodGammaRegion1 = region == 1 && energy > 0.100;
-      goodGammaRegion2 = region == 2 && energy > 0.050;
-      goodGammaRegion3 = region == 3 && energy > 0.150;
-
-      return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
-    }
-
-    double goodBelleGamma(const Particle* particle)
-    {
-      double energy = eclClusterE(particle);
-      int region = eclClusterDetectionRegion(particle);
-
-      return (double) isGoodBelleGamma(region, energy);
-    }
 
     double eclClusterErrorE(const Particle* particle)
     {
@@ -188,12 +167,30 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
+    double eclClusterHasFailedTiming(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        return cluster->hasFailedFitTime();
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
     double eclClusterErrorTiming(const Particle* particle)
     {
 
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         return cluster->getDeltaTime99();
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
+    double eclClusterHasFailedErrorTiming(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        return cluster->hasFailedTimeResolution();
       }
       return std::numeric_limits<float>::quiet_NaN();
     }
@@ -1286,6 +1283,11 @@ should have a time that corresponds to the event trigger time :math:`t_{0}`
     | Upper limit: :math:`1000.0`
     | Precision: :math:`12` bit
 )DOC");
+    REGISTER_VARIABLE("clusterHasFailedTiming", eclClusterHasFailedTiming, R"DOC(
+Status bit for if the ECL cluster's timing fit failed. Photon timing is given by the fitted time
+of the recorded waveform of the highest energetic crystal in a cluster; however, that fit can fail and so
+this variable tells the user if that has happened.
+)DOC");
     REGISTER_VARIABLE("clusterErrorTiming", eclClusterErrorTiming, R"DOC(
 Returns ECL cluster's timing uncertainty that contains :math:`99\%` of true photons (dt99).
 
@@ -1310,6 +1312,11 @@ We remove such clusters in most physics photon lists.
     (from previous or later bunch collisions) that can easily be rejected by timing cuts.
     However, these events create large ECL clusters that can overlap with other ECL clusters
     and it is not clear that a simple rejection is the correction strategy.
+)DOC");
+    REGISTER_VARIABLE("clusterHasFailedErrorTiming", eclClusterHasFailedErrorTiming, R"DOC(
+Status bit for if the ECL cluster's timing uncertainty calculation failed. Photon timing is given by the fitted time
+of the recorded waveform of the highest energetic crystal in a cluster; however, that fit can fail and so
+this variable tells the user if that has happened.
 )DOC");
     REGISTER_VARIABLE("clusterHighestE", eclClusterHighestE, R"DOC(
 Returns energy of the highest energetic crystal in the ECL cluster after reweighting.
@@ -1572,15 +1579,6 @@ cluster-matched tracks using the cluster 4-momenta.
 Used for ECL-based dark sector physics and debugging track-cluster matching.
 )DOC");
 
-    VARIABLE_GROUP("Belle Variables");
-    REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma, R"DOC(
-[Legacy] Returns 1.0 if photon candidate passes simple region dependent
-energy selection for Belle data and MC (50/100/150 MeV).
-)DOC");
-    REGISTER_VARIABLE("clusterBelleQuality", eclClusterDeltaL, R"DOC(
-[Legacy] Returns ECL cluster's quality indicating a good cluster in GSIM (stored in deltaL of ECL cluster object).
-Belle analysis typically used clusters with quality == 0 in their :math:`E_{\text{extra ECL}}` (Belle only).
-)DOC");
 
     // These variables require cDST inputs and the eclTrackCalDigitMatch module run first
     VARIABLE_GROUP("ECL calibration");

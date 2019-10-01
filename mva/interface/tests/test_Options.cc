@@ -8,8 +8,6 @@
  **************************************************************************/
 
 #include <mva/interface/Options.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/utilities/TestHelpers.h>
 
 #include <boost/property_tree/ptree.hpp>
 #include <gtest/gtest.h>

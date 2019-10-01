@@ -9,11 +9,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#include <iostream>
 #include <TMath.h>
 
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 

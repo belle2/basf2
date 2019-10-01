@@ -18,15 +18,12 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // MetaData
 #include <framework/dataobjects/EventMetaData.h>
 #include <background/dataobjects/BackgroundMetaData.h>
 
-#include <unordered_map>
 using namespace std;
 
 namespace Belle2 {

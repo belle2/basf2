@@ -12,15 +12,7 @@
 
 #include <framework/utilities/FileSystem.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/GearDir.h>
-
-#include <TLorentzVector.h>
 
 using namespace std;
 using namespace Belle2;

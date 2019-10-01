@@ -65,22 +65,36 @@ namespace Belle2 {
     double getLeakageCorrection(const double theta, const double phi, const double energy, const double background) const;
 
     /** Get correction for BGx1 (temporary)*/
-    double getLeakageCorrectionTemporary(const double theta, const double energy, const double background);
+    double getLeakageCorrectionTemporary(const double theta, const double phi, const double energy, const double background);
 
   private:
     DBObjPtr<ECLShowerCorrectorLeakageCorrection> m_leakageCorrectionPtr_bgx0;  /**< Leakage corrections from DB for BGx0 */
+    // Elisa's and Claudia's corrections
     DBObjPtr<ECLShowerEnergyCorrectionTemporary>
-    m_leakageCorrectionPtr_phase2bgx1;  /**< Leakage corrections from DB for Phase2 BG15x1.0*/
+    m_leakageCorrectionPtr_thetaGeo_phase2bgx1;  /**< Leakage corrections from DB for Phase2 BG15x1.0, geometry correction as a function of theta*/
     DBObjPtr<ECLShowerEnergyCorrectionTemporary>
-    m_leakageCorrectionPtr_phase3bgx1;  /**< Leakage corrections from DB for Phase3 BG15x1.0 */
+    m_leakageCorrectionPtr_thetaGeo_phase3bgx1;  /**< Leakage corrections from DB for Phase3 BG15x1.0, geometry correction as a function of theta*/
+    DBObjPtr<ECLShowerEnergyCorrectionTemporary>
+    m_leakageCorrectionPtr_phiGeo_phase2bgx1;  /**< Leakage corrections from DB for Phase2 BG15x1.0, geometry correction as a function of phi*/
+    DBObjPtr<ECLShowerEnergyCorrectionTemporary>
+    m_leakageCorrectionPtr_phiGeo_phase3bgx1;  /**< Leakage corrections from DB for Phase3 BG15x1.0, geometry correction as a function of phi*/
+    DBObjPtr<ECLShowerEnergyCorrectionTemporary>
+    m_leakageCorrectionPtr_thetaEn_phase2bgx1;  /**< Leakage corrections from DB for Phase2 BG15x1.0, energy correction as a function of theta*/
+    DBObjPtr<ECLShowerEnergyCorrectionTemporary>
+    m_leakageCorrectionPtr_thetaEn_phase3bgx1;  /**< Leakage corrections from DB for Phase3 BG15x1.0, energy correction as a function of theta*/
+    DBObjPtr<ECLShowerEnergyCorrectionTemporary>
+    m_leakageCorrectionPtr_phiEn_phase2bgx1;  /**< Leakage corrections from DB for Phase2 BG15x1.0, energy correction as a function of phi*/
+    DBObjPtr<ECLShowerEnergyCorrectionTemporary>
+    m_leakageCorrectionPtr_phiEn_phase3bgx1;  /**< Leakage corrections from DB for Phase3 BG15x1.0, energy correction as a function of phi*/
 
+    // TO BE UPDATED
     const double m_fullBkgdCount = 183.0; /**< Nominal Background at BGx1.0 (MC12) */
 
     // For temporary BGx1
     /** the leakage in BGx1 */
-    TGraph2D m_leakage_bgx1[2]; // 0: phase2, 1: phase3
+    TGraph2D m_leakage_bgx1[8]; //0: theta_geo ph2, 1: theta_geo ph3, 2: phi_geo ph2, 3: phi_geo ph3, 4: theta_en ph2, 5: theta_en ph3, 6: phi_en ph2, 7 : phi_en ph3,
     /** limits for the leakage in BGx1 */
-    std::vector<double> m_leakage_bgx1_limits[2];
+    std::vector<double> m_leakage_bgx1_limits[8];
 
     // For BGx0 (complicated theta and phi dependency)
     // Vectors with one entry each:

@@ -15,7 +15,6 @@
 #include <genfit/FitStatus.h>
 #include <genfit/AbsFitter.h>
 #include <genfit/DAF.h>
-#include <genfit/RKTrackRep.h>
 #include <genfit/KalmanFitterInfo.h>
 
 using namespace Belle2;
@@ -59,6 +58,14 @@ bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particle
   const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(particleType, recoTrack);
   genfit::AbsTrackRep* trackRepresentation = RecoTrackGenfitAccess::createOrReturnRKTrackRep(recoTrack,
                                              currentPdgCode);
+
+  return fit(recoTrack, trackRepresentation);
+}
+
+bool TrackFitter::fit(RecoTrack& recoTrack, const int pdgCode) const
+{
+  genfit::AbsTrackRep* trackRepresentation = RecoTrackGenfitAccess::createOrReturnRKTrackRep(recoTrack,
+                                             pdgCode);
 
   return fit(recoTrack, trackRepresentation);
 }

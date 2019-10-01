@@ -12,11 +12,6 @@
 
 #include "tracking/trackFindingVXD/trackSetEvaluator/HopfieldNetwork.h"
 
-#include <numeric>
-
-#include <TMatrixD.h>
-
-
 using namespace Belle2;
 
 

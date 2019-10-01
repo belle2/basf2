@@ -18,6 +18,9 @@
 
 namespace Belle2 {
 
+  /**
+   * Class to store Trigger Type information
+   */
   class SVDTriggerType {
 
   public:
@@ -25,7 +28,7 @@ namespace Belle2 {
     typedef uint8_t baseType;
 
     /** Constructor using the unique type.  */
-    SVDTriggerType(baseType type = 0)
+    explicit SVDTriggerType(baseType type = 0)
     {
       m_triggerID.type = type;
     }

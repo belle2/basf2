@@ -15,14 +15,9 @@
 #include <arich/dataobjects/ARICHInfo.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-
-// Dataobject classes
-#include <rawdata/dataobjects/RawARICH.h>
-
-#include <framework/database/DBObjPtr.h>
 
 /*
 #include <daq/slc/database/DBObjectLoader.h>
@@ -32,9 +27,7 @@
 */
 
 #include <sstream>
-#include <TH1F.h>
 #include <TH2F.h>
-#include <TF1.h>
 
 using namespace std;
 
@@ -127,7 +120,7 @@ namespace Belle2 {
     //int runno = m_internalmode ? m_run_count : evtmetadata->getRun();
     //int raw_evtno = m_internalmode ? m_evt_count : evtmetadata->getEvent();
     int runno = evtmetadata->getRun();
-    int raw_evtno = evtmetadata->getEvent();
+    //int raw_evtno = evtmetadata->getEvent();
 
     ARICHThParam param(runno, m_dth, m_th0, m_nrun);
     StoreArray<ARICHRawDigit> rawdigits;

@@ -47,7 +47,7 @@ namespace Belle2 {
 
       std::string m_PXDRawROIsName;        /**< RawROI StoreArray name */
 
-      bool m_eachModule{false};// create a histo per module
+      bool m_eachModule{false}; ///< create a histo per module
 
       /** Storearray for ROIs  */
       StoreArray<PXDRawROIs> m_storeROIs{};

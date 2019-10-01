@@ -65,7 +65,7 @@ particlegun.param('independentVertices', False)
 main.add_module(particlegun)
 
 # Simulation & Digitizer of inner detectors
-add_simulation(main, components=['MagneticField', 'PXD', 'SVD', 'CDC', 'ARICH'], usePXDDataReduction=False)
+add_simulation(main, usePXDDataReduction=False)
 # tracking
 add_tracking_reconstruction(main)
 

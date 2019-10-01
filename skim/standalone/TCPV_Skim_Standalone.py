@@ -21,25 +21,14 @@ from stdV0s import *
 from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import loadStdDiLeptons
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 set_log_level(LogLevel.INFO)
 
 
 import sys
 import os
 import glob
-import argparse
 skimCode = encodeSkimName('TCPV')
-
-# Read optional --data argument
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
-
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
 
 # create a path
 path = Path()

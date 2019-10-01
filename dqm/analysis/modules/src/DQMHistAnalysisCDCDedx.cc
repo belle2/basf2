@@ -11,12 +11,9 @@
 #include <dqm/analysis/modules/DQMHistAnalysisCDCDedx.h>
 #include <boost/format.hpp>
 #include <TROOT.h>
-#include <TClass.h>
 
 #include <TF1.h>
-#include <TH2F.h>
 #include <TCanvas.h>
-
 
 using namespace std;
 using namespace Belle2;

@@ -29,6 +29,8 @@ from stdV0s import stdKshorts
 from stdPi0s import stdPi0s
 from stdKlongs import stdKlongs
 
+b2.conditions.disable_globaltag_replay()
+
 # create path
 my_path = b2.create_path()
 
@@ -60,10 +62,10 @@ ma.fillParticleList(decayString='p+:good', cut='protonID > 0.1', path=my_path)
 
 # another possibility is to use default functions
 # for example stdKshorts() from stdV0s.py that:
-# - takes all V0 candidates, performs vertex fit, and fills 'K_S0:all' ParticleList
+# - takes all V0 candidates, performs vertex fit, and fills 'K_S0:merged' ParticleList
 # (-> for more details about V0s have a look at B2A203-LoadV0s.py)
 # or for example stdPi0s() from stdPi0s.py:
-stdKshorts(path=my_path)
+stdKshorts(prioritiseV0=True, path=my_path)
 stdPi0s(listtype='looseFit', path=my_path)
 stdKlongs(listtype='all', path=my_path)  # only create the 'all' list with no cuts
 
@@ -83,7 +85,7 @@ ma.printList('K-:all', False, path=my_path)
 ma.printList('K-:good', False, path=my_path)
 ma.printList('anti-p-:all', False, path=my_path)
 ma.printList('anti-p-:good', False, path=my_path)
-ma.printList('K_S0:all', False, path=my_path)
+ma.printList('K_S0:merged', False, path=my_path)
 ma.printList('pi0:looseFit', False, path=my_path)
 ma.printList('K_L0:all', False, path=my_path)
 
@@ -164,7 +166,7 @@ ma.variablesToNtuple(decayString='pi0:looseFit',
 
 # Here for pions from K0s we do the same thing, but here we add custom aliases
 # (see ntuples to see the difference)
-ma.variablesToNtuple(decayString='K_S0:all',
+ma.variablesToNtuple(decayString='K_S0:merged',
                      variables=K0s_variables +
                      vu.create_aliases_for_selected(charged_particle_variables, 'K_S0 -> ^pi+ pi-', 'pip') +
                      vu.create_aliases_for_selected(charged_particle_variables, 'K_S0 -> pi+ ^pi-', 'pim'),

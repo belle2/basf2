@@ -9,7 +9,6 @@
  **************************************************************************/
 
 /* C++ headers. */
-#include <cmath>
 #include <string>
 
 /* External headers. */
@@ -19,7 +18,6 @@
 /* Belle2 headers. */
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <klm/calibration/KLMDatabaseImporter.h>
 
@@ -76,11 +74,9 @@ void KLMDatabaseImporter::importTimeConversion(
   timeConversionImport.import(iov);
 }
 
-void KLMDatabaseImporter::importStripEfficiency(std::string fileName)
+void KLMDatabaseImporter::loadStripEfficiency(
+  KLMStripEfficiency* stripEfficiency, std::string fileName)
 {
-  DBImportObjPtr<KLMStripEfficiency> stripEfficiency;
-  stripEfficiency.construct();
-
   TFile* file = TFile::Open(fileName.c_str(), "r");
   if (!file) {
     B2ERROR("KLMDatabaseImporter: calibration file " << fileName << " *** failed to open");
@@ -92,8 +88,8 @@ void KLMDatabaseImporter::importStripEfficiency(std::string fileName)
     } else {
       int isBarrel = 0;
       tree->SetBranchAddress("isBarrel", &isBarrel);
-      int isForward = 0;
-      tree->SetBranchAddress("isForward", &isForward);
+      int section = 0;
+      tree->SetBranchAddress("isForward", &section);
       int sector = 0;
       tree->SetBranchAddress("sector", &sector);
       int layer = 0;
@@ -110,18 +106,22 @@ void KLMDatabaseImporter::importStripEfficiency(std::string fileName)
       for (int i = 0; i < tree->GetEntries(); i++) {
         tree->GetEntry(i);
         if (isBarrel)
-          stripEfficiency->setBarrelEfficiency(isForward, sector, layer, plane, strip, efficiency, efficiencyError);
+          stripEfficiency->setBarrelEfficiency(section, sector, layer, plane, strip, efficiency, efficiencyError);
         else
-          stripEfficiency->setEndcapEfficiency(isForward, sector, layer, plane, strip, efficiency, efficiencyError);
+          stripEfficiency->setEndcapEfficiency(section, sector, layer, plane, strip, efficiency, efficiencyError);
       }
     }
     file->Close();
   }
+}
 
+void KLMDatabaseImporter::importStripEfficiency(
+  const KLMStripEfficiency* stripEfficiency)
+{
+  DBImportObjPtr<KLMStripEfficiency> stripEfficiencyImport;
+  stripEfficiencyImport.construct(*stripEfficiency);
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
-  stripEfficiency.import(iov);
-
-  B2INFO("KLMDatabaseImporter: strip efficiencies imported and calibration file " << fileName << " closed");
+  stripEfficiencyImport.import(iov);
 }
 

@@ -13,6 +13,7 @@
 
 namespace Belle2 {
 
+  //! DQM module of TRGCDCTSF
   class TRGCDCTSFDQMModule : public HistoModule {
 
   public:
@@ -36,38 +37,39 @@ namespace Belle2 {
     virtual void defineHisto();
 
   protected:
-    //Total number of TSF hits per event in each superlayer
-    TH1I* h_nhit;
+    //! Total number of TSF hits per event in each superlayer
+    TH1I* h_nhit = nullptr;
 
-    //Total number of hits in each TSF
-    TH1I* h_nhit_tsf;
+    //! Total number of hits in each TSF
+    TH1I* h_nhit_tsf = nullptr;
 
-    //Valid type of TSF hits in each superlayer
-    TH1I* h_valid;
+    //! Valid type of TSF hits in each superlayer
+    TH1I* h_valid = nullptr;
 
-    //Timing of TSF hits in each superlayer
-    TH1I* h_timing;
+    //! Timing of TSF hits in each superlayer
+    TH1I* h_timing = nullptr;
 
-    //TDirectories
-    TDirectory* oldDir;
-    TDirectory* dirDQM;
+    //! TDirectories
+    TDirectory* oldDir = nullptr;
+    //! TDirectories
+    TDirectory* dirDQM = nullptr;
 
-    //flag to save ps file
+    //! flag to save ps file
     bool m_generatePostscript;
 
-    //name of ps file
+    //! name of ps file
     std::string m_postScriptName;
 
-    //experiment number
-    unsigned _exp;
+    //! experiment number
+    unsigned _exp = 0;
 
-    //run number
-    unsigned _run;
+    //! run number
+    unsigned _run = 0;
 
-    //TSF module number
-    int m_TSFMOD;
+    //! TSF module number
+    int m_TSFMOD = 0;
 
-    //TSF data store
+    //! TSF data store
     StoreArray<TRGCDCTSFUnpackerStore> entAry;
 
   };

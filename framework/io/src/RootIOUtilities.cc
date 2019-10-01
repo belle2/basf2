@@ -32,7 +32,9 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
       B2WARNING(c_SteerBranchNames[durability] << " has duplicate entry " << b);
   }
   for (const std::string& b : excludeBranches) {
-    if (branchesToFilter.count(b) == 0 and not quiet)
+    // FIXME: ProcessStatistics is excluded by default but not always present. We should switch that to not write it out
+    // in the first place but the info message is meaningless for almost everyone
+    if (branchesToFilter.count(b) == 0 and not quiet and b != "ProcessStatistics")
       B2INFO("The branch " << b << " given in " << c_SteerExcludeBranchNames[durability] << " does not exist.");
     if (!excludeBranchSet.insert(b).second and not quiet)
       B2WARNING(c_SteerExcludeBranchNames[durability] << " has duplicate entry " << b);

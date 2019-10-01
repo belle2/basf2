@@ -249,7 +249,6 @@ VertexFitKFit::doFit3() {
 
 
   double chisq = 0;
-  double tmp_chisq = KFitConst::kInitialCHIsq;
   double tmp2_chisq = KFitConst::kInitialCHIsq;
   int err_inverse = 0;
 
@@ -270,7 +269,7 @@ VertexFitKFit::doFit3() {
   for (int j = 0; j < KFitConst::kMaxIterationCount; j++)   // j'th loop start
   {
 
-    tmp_chisq = KFitConst::kInitialCHIsq;
+    double tmp_chisq = KFitConst::kInitialCHIsq;
 
     for (int i = 0; i < KFitConst::kMaxIterationCount; i++) { // i'th loop start
 
@@ -925,6 +924,16 @@ enum KFitError::ECode VertexFitKFit::updateMother(Particle* mother)
   double chi2 = getCHIsq();
   int ndf = getNDF();
   double prob = TMath::Prob(chi2, ndf);
+  //
+  bool haschi2 = mother->hasExtraInfo("chiSquared");
+  if (haschi2) {
+    mother->setExtraInfo("chiSquared", chi2);
+    mother->setExtraInfo("ndf", ndf);
+  } else if (!haschi2) {
+    mother->addExtraInfo("chiSquared", chi2);
+    mother->addExtraInfo("ndf", ndf);
+  }
+
   mother->updateMomentum(
     CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
     CLHEPToROOT::getTVector3(kmm.getMotherPosition()),

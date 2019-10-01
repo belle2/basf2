@@ -13,12 +13,9 @@
 
 #include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
 
-#include <tracking/trackFindingCDC/numerics/ToFinite.h>
-
 #include <vector>
 #include <string>
 #include <limits>
-#include <cassert>
 #include <cmath>
 
 namespace Belle2 {

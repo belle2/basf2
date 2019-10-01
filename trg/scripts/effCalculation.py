@@ -15,9 +15,12 @@ class EffModule(Module):
     Ntrg_event = 0
     #: The number of events passing each L1 trigger line
     Nsubtrg_event = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    #: prescale factors for phase2
     prescale_phase2 = [1, 1, 20, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    #: prescale factors for phase3
     prescale_phase3 = [1, 1, 20, 2, 1, 1, 1, 1, 2, 1, 1, 20, 20, 1, 5, 1, 3, 5, 1, 1, 1, 1, 1]
 #   trglog = ['n_2d_finder>=3', 'n_2d_finder==2&&BhabhaVeto==0',
+    #: trigger bit log for phase2
     trglog_phase2 = ['3 or more 3D tracks',
                      '2 3D tracks, ≥1 within 25 cm, not a trkBhabha',
                      '2 3D tracks, not a trkBhabha',
@@ -43,6 +46,7 @@ class EffModule(Module):
                      'fep: one track & one matched & track-cluster b2b'
                      ]
 
+    #: trigger bit log for phase3
     trglog_phase3 = ['3 or more 3D tracks',
                      '2 3D tracks, ≥1 within 10 cm, not a trkBhabha',
                      '2 3D tracks, not a trkBhabha',
@@ -76,7 +80,9 @@ class EffModule(Module):
     # trglog+=['new trg logics']
 
     def __init__(self, Belle2Phase):
+        """Initialization of EffModule"""
         super(EffModule, self).__init__()
+        #: Belle2 phase
         self.Belle2Phase = Belle2Phase
 
     def event(self):
@@ -107,6 +113,7 @@ class EffModule(Module):
             trglog = self.trglog_phase3
             prescale = self.prescale_phase3
 
+        #: Total number of events
         if self.Ntot_event == 0:
             return
         sp = ' '

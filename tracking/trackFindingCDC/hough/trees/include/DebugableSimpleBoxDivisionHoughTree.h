@@ -12,7 +12,6 @@
 #include <TTree.h>
 #include <TFile.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <TGraph.h>
 #include <TF1.h>
 #include <TCanvas.h>

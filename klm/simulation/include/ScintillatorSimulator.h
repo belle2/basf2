@@ -11,10 +11,10 @@
 #pragma once
 
 /* Belle2 headers. */
-#include <bklm/dataobjects/BKLMSimHit.h>
-#include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/dataobjects/EKLMSimHit.h>
-#include <eklm/dbobjects/EKLMChannelData.h>
+#include <klm/bklm/dataobjects/BKLMSimHit.h>
+#include <klm/eklm/dataobjects/EKLMHitMCTime.h>
+#include <klm/eklm/dataobjects/EKLMSimHit.h>
+#include <klm/eklm/dbobjects/EKLMChannelData.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
@@ -68,16 +68,16 @@ namespace Belle2 {
        * @param[in] firstHit First hit in this strip.
        * @param[in] end      End of hit range.
        */
-      void simulate(std::multimap<int, BKLMSimHit*>::iterator& firstHit,
-                    std::multimap<int, BKLMSimHit*>::iterator& end);
+      void simulate(std::multimap<uint16_t, BKLMSimHit*>::iterator& firstHit,
+                    std::multimap<uint16_t, BKLMSimHit*>::iterator& end);
 
       /**
        * Simulate EKLM strip.
        * @param[in] firstHit First hit in this strip.
        * @param[in] end      End of hit range.
        */
-      void simulate(std::multimap<int, EKLMSimHit*>::iterator& firstHit,
-                    std::multimap<int, EKLMSimHit*>::iterator& end);
+      void simulate(std::multimap<uint16_t, EKLMSimHit*>::iterator& firstHit,
+                    std::multimap<uint16_t, EKLMSimHit*>::iterator& end);
 
       /**
        * Get fit data.

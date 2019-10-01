@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Anze Zupanc, Marko Staric, Christian Pulvermacher,       *
- *               Sam Cunliffe, Torben Ferber                              *
+ *               Sam Cunliffe, Torben Ferber, Thomas Kuhr                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,9 +19,12 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dbobjects/CollisionBoostVector.h>
+#include <mdst/dbobjects/CollisionInvariantMass.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/HTML.h>
 
@@ -220,18 +223,18 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
   storeErrorMatrix(clustercovmat);
 }
 
-Particle::Particle(const KLMCluster* klmCluster) :
+Particle::Particle(const KLMCluster* klmCluster, const int pdgCode) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
   if (!klmCluster) return;
 
-  // TODO: avoid hard coded values
-  m_pdgCode = 130;
+  m_pdgCode = pdgCode;
   setFlavorType();
 
   set4Vector(klmCluster->getMomentum());
   setVertex(klmCluster->getPosition());
+  updateMass(m_pdgCode); // KLMCluster internally use Klong mass, overwrite here to allow neutrons
 
   m_particleType = c_KLMCluster;
   setMdstArrayIndex(klmCluster->getArrayIndex());
@@ -373,6 +376,123 @@ TMatrixFSym Particle::getVertexErrorMatrix() const
   return pos;
 }
 
+float Particle::getCosHelicity(const Particle* mother) const
+{
+  // boost vector to the rest frame of the particle
+  TVector3 boost = -get4Vector().BoostVector();
+
+  // momentum of the mother in the particle's rest frame
+  TLorentzVector pMother;
+  if (mother) {
+    pMother = mother->get4Vector();
+  } else {
+    static DBObjPtr<CollisionBoostVector> cmsBoost;
+    static DBObjPtr<CollisionInvariantMass> cmsMass;
+    pMother.SetE(cmsMass->getMass());
+    pMother.Boost(cmsBoost->getBoost());
+  }
+  pMother.Boost(boost);
+
+  // momentum of the daughter (or normal vector) in the particle's rest frame
+  TLorentzVector pDaughter;
+  if (getNDaughters() == 2) {  // two body decay
+    pDaughter = getDaughter(0)->get4Vector();
+    pDaughter.Boost(boost);
+  } else if (getNDaughters() == 3) {
+    if (getPDGCode() == Const::pi0.getPDGCode()) {  // pi0 Dalitz decay
+      for (auto& daughter : getDaughters()) {
+        if (daughter->getPDGCode() == Const::photon.getPDGCode()) {
+          pDaughter = daughter->get4Vector();
+        }
+      }
+      pDaughter.Boost(boost);
+    } else {  // three body decay
+      TLorentzVector pDaughter0 = getDaughter(0)->get4Vector();
+      pDaughter0.Boost(boost);
+      TLorentzVector pDaughter1 = getDaughter(1)->get4Vector();
+      pDaughter1.Boost(boost);
+      pDaughter.SetVect(pDaughter0.Vect().Cross(pDaughter1.Vect()));
+    }
+  }
+
+  double mag2 = pMother.Vect().Mag2() * pDaughter.Vect().Mag2();
+  if (mag2 <= 0) return std::numeric_limits<float>::quiet_NaN();
+  return (-pMother.Vect()) * pDaughter.Vect() / sqrt(mag2);
+}
+
+float Particle::getCosHelicityDaughter(unsigned iDaughter, unsigned iGrandDaughter) const
+{
+  // check existence of daughter
+  if (getNDaughters() <= iDaughter) {
+    B2ERROR("No daughter of particle 'name' with index 'iDaughter' for calculation of helicity angle"
+            << LogVar("name", getName()) << LogVar("iDaughter", iDaughter));
+    return std::numeric_limits<float>::quiet_NaN();
+  }
+
+  // boost vector to the rest frame of the daughter particle
+  const Particle* daughter = getDaughter(iDaughter);
+  TVector3 boost = -daughter->get4Vector().BoostVector();
+
+  // momentum of the this particle in the daughter's rest frame
+  TLorentzVector pMother = get4Vector();
+  pMother.Boost(boost);
+
+  // check existence of grand daughter
+  if (daughter->getNDaughters() <= iGrandDaughter) {
+    B2ERROR("No grand daughter of daugher 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle"
+            << LogVar("name", getName()) << LogVar("iDaughter", iDaughter) << LogVar("iGrandDaughter", iGrandDaughter));
+    return std::numeric_limits<float>::quiet_NaN();
+  }
+
+  // momentum of the grand daughter in the daughter's rest frame
+  TLorentzVector pGrandDaughter = daughter->getDaughter(iGrandDaughter)->get4Vector();
+  pGrandDaughter.Boost(boost);
+
+  double mag2 = pMother.Vect().Mag2() * pGrandDaughter.Vect().Mag2();
+  if (mag2 <= 0) return std::numeric_limits<float>::quiet_NaN();
+  return (-pMother.Vect()) * pGrandDaughter.Vect() / sqrt(mag2);
+}
+
+float Particle::getAcoplanarity() const
+{
+  // check that we have a decay to two daughters and then two grand daughters each
+  if (getNDaughters() != 2) {
+    B2ERROR("Cannot calculate acoplanarity of particle 'name' because the number of daughters is not 2"
+            << LogVar("name", getName()) << LogVar("# of daughters", getNDaughters()));
+    return std::numeric_limits<float>::quiet_NaN();
+  }
+  const Particle* daughter0 = getDaughter(0);
+  const Particle* daughter1 = getDaughter(1);
+  if ((daughter0->getNDaughters() != 2) || (daughter1->getNDaughters() != 2)) {
+    B2ERROR("Cannot calculate acoplanarity of particle 'name' because the number of grand daughters is not 2"
+            << LogVar("name", getName()) << LogVar("# of grand daughters of first daughter", daughter0->getNDaughters())
+            << LogVar("# of grand daughters of second daughter", daughter1->getNDaughters()));
+    return std::numeric_limits<float>::quiet_NaN();
+  }
+
+  // boost vector to the rest frame of the particle
+  TVector3 boost = -get4Vector().BoostVector();
+
+  // momenta of the daughters and grand daughters in the particle's rest frame
+  TLorentzVector pDaughter0 = daughter0->get4Vector();
+  pDaughter0.Boost(boost);
+  TLorentzVector pGrandDaughter0 = daughter0->getDaughter(0)->get4Vector();
+  pGrandDaughter0.Boost(boost);
+  TLorentzVector pDaughter1 = daughter1->get4Vector();
+  pDaughter1.Boost(boost);
+  TLorentzVector pGrandDaughter1 = daughter1->getDaughter(0)->get4Vector();
+  pGrandDaughter1.Boost(boost);
+
+  // calculate angle between normal vectors
+  TVector3 normal0 = pDaughter0.Vect().Cross(pGrandDaughter0.Vect());
+  TVector3 normal1 = -pDaughter1.Vect().Cross(pGrandDaughter1.Vect());
+  double result = normal0.Angle(normal1);
+  if (normal0.Cross(normal1) * pDaughter0.Vect() < 0) result = -result;
+
+  return result;
+}
+
+
 /*
 float Particle::getMassError(void) const
 {
@@ -464,10 +584,12 @@ std::vector<int> Particle::getMdstArrayIndices(EParticleType type) const
 }
 
 
-void Particle::appendDaughter(const Particle* daughter)
+void Particle::appendDaughter(const Particle* daughter, const bool updateType)
 {
-  // it's a composite particle
-  m_particleType = c_Composite;
+  if (updateType) {
+    // is it a composite particle or fsr corrected?
+    m_particleType = c_Composite;
+  }
 
   // add daughter index
   m_daughterIndices.push_back(daughter->getArrayIndex());
@@ -597,20 +719,10 @@ const KLMCluster* Particle::getKLMCluster() const
     StoreArray<KLMCluster> klmClusters;
     return klmClusters[m_mdstIndex];
   } else if (m_particleType == c_Track) {
-    // a track may be matched to several clusters under different hypotheses
-    // take the cluster with largest number of layers as "the" cluster
+    // If there is an associated KLMCluster, it's the closest one
     StoreArray<Track> tracks;
-    const KLMCluster* longestTrackMatchedCluster = nullptr;
-    int numberOfLayers = -1;
-    // loop over all clusters matched to this track
-    for (const KLMCluster& cluster : tracks[m_mdstIndex]->getRelationsTo<KLMCluster>()) {
-      // check if we're the longest cluster thus far
-      if (cluster.getLayers() > numberOfLayers) {
-        numberOfLayers = cluster.getLayers();
-        longestTrackMatchedCluster = &cluster;
-      }
-    }
-    return longestTrackMatchedCluster;
+    const KLMCluster* klmCluster = tracks[m_mdstIndex]->getRelatedTo<KLMCluster>();
+    return klmCluster;
   } else {
     return nullptr;
   }

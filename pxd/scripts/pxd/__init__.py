@@ -14,7 +14,8 @@ def add_pxd_unpacker(path):
 
     pxdhitsorter = register_module('PXDRawHitSorter')
     path.add_module(pxdhitsorter)
-    path.add_module('ActivatePXDPixelMasker')
+    if 'ActivatePXDPixelMasker' not in [e.name() for e in path.modules()]:
+        path.add_module('ActivatePXDPixelMasker')
 
 
 def add_pxd_packer(path):
@@ -107,7 +108,12 @@ def add_pxd_reconstruction(path, clusterName=None, digitsName=None, usePXDCluste
         path.add_module(clusterizer)
 
 
-def add_pxd_simulation(path, digitsName=None):
+def add_pxd_simulation(path, digitsName=None, activatePixelMasks=True, activateGainCorrection=True):
+
+    if activatePixelMasks and 'ActivatePXDPixelMasker' not in [e.name() for e in path.modules()]:
+        path.add_module('ActivatePXDPixelMasker')
+    if activateGainCorrection and 'ActivatePXDGainCalibrator' not in [e.name() for e in path.modules()]:
+        path.add_module('ActivatePXDGainCalibrator')
 
     digitizer = register_module('PXDDigitizer')
     if digitsName:

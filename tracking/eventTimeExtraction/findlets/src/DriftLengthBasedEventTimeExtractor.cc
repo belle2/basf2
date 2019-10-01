@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/eventTimeExtraction/findlets/DriftLengthBasedEventTimeExtractor.h>
-#include <tracking/eventTimeExtraction/findlets/BaseEventTimeExtractor.icc.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/DriftTimeUtil.h>
 
@@ -108,6 +107,7 @@ void DriftLengthBasedEventTimeExtractor::apply(std::vector<RecoTrack*>& recoTrac
 
   double weightSum = 0;
   for (const auto& pair : eventT0WithWeights) {
+    // cppcheck-suppress useStlAlgorithm
     weightSum += pair.second;
   }
 

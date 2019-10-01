@@ -9,7 +9,11 @@
  **************************************************************************/
 
 #include <pxd/reconstruction/PXDClusterShape.h>
+
 #include <pxd/geometry/SensorInfo.h>
+#include <pxd/reconstruction/ClusterProjection.h>
+
+#include <vxd/geometry/GeoCache.h>
 
 using namespace std;
 

@@ -14,8 +14,9 @@
 
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
-#include <vector>
 #include <cassert>
+#include <cmath>
+#include <vector>
 
 namespace Belle2 {
 
@@ -101,6 +102,7 @@ namespace Belle2 {
                                                         cellHolder));
 
           for (const WeightedRelation<ACellHolder>& relation : continuations) {
+            // cppcheck-suppress useStlAlgorithm
             if (isHighestContinuation(relation)) {
               ACellHolder* neighbor = relation.getTo();
               path.push_back(neighbor);

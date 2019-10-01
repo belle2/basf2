@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
+#include <cmath>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
     /**

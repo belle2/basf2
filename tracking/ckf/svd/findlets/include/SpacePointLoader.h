@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/base/StoreArrayLoader.h>
 

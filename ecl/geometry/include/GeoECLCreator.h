@@ -11,12 +11,9 @@
 #ifndef GEOECLCREATOR_H
 #define GEOECLCREATOR_H
 
-#include <vector>
-
 #include <geometry/CreatorBase.h>
 
 #include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
 class G4LogicalVolume;

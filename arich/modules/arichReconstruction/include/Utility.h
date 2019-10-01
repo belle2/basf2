@@ -11,8 +11,6 @@
 #ifndef ARICHUTILITY_H
 #define ARICHUTILITY_H
 
-#include <vector>
-#include <stdlib.h>
 #include <TVector3.h>
 #include <TRotation.h>
 

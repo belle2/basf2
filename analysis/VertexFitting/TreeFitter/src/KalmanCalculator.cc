@@ -10,7 +10,6 @@
 
 #include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
 
-#include <iostream>
 namespace TreeFitter {
 
   KalmanCalculator::KalmanCalculator(
@@ -40,17 +39,11 @@ namespace TreeFitter {
   {
     m_res = residuals;
     m_G = G;
-    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > C =
-      Eigen::Matrix < double, -1, -1, 0 , MAX_MATRIX_SIZE, MAX_MATRIX_SIZE >
-      ::Zero(m_stateDim, m_stateDim).triangularView<Eigen::Lower>();
 
-    Eigen::Matrix < double, -1, -1, 0, 5, 5 > Rtemp =
-      Eigen::Matrix < double, -1, -1, 0, 5, 5 >
-      ::Zero(m_constrDim, m_constrDim).triangularView<Eigen::Lower>();
+    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > C = fitparams.getCovariance().triangularView<Eigen::Lower>();
 
-    C  = fitparams.getCovariance().triangularView<Eigen::Lower>();
     m_CGt = C.selfadjointView<Eigen::Lower>() * G.transpose();
-    Rtemp = G * m_CGt;
+    Eigen::Matrix < double, -1, -1, 0, 5, 5 > Rtemp = G * m_CGt;
     if (V && (weight) && ((*V).diagonal().array() != 0).all()) {
 
       const Eigen::Matrix < double, -1, -1, 0, 5, 5 > weightedV  =
@@ -103,14 +96,6 @@ namespace TreeFitter {
       fitCov - deltaCov;
 
     fitparams.getCovariance().triangularView<Eigen::Lower>() = delta.triangularView<Eigen::Lower>();
-
-    for (int col = 0; col < m_constrDim; ++col) {
-      for (int k = 0; k < m_stateDim; ++k) {
-        if (m_G(col, k) != 0) {
-          ++(fitparams.incrementNConstraintsVec(k));
-        }
-      }
-    }//end for block
 
   }//end function
 

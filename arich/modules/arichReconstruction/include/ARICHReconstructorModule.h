@@ -12,14 +12,8 @@
 #define ARICHRECONSTRUCTORMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
-#include <arich/dataobjects/ARICHTrack.h>
-#include <mdst/dataobjects/Track.h>
-
 
 #include <arich/modules/arichReconstruction/ARICHReconstruction.h>
-
-#include <string>
 
 namespace Belle2 {
 

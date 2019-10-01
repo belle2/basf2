@@ -19,7 +19,6 @@
 #include <TCanvas.h>
 #include <TGraph.h>
 #include <TAxis.h>
-#include <TLine.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

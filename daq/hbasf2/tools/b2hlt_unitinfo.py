@@ -25,15 +25,29 @@ def get_overview(df):
 
     df_to_show = pd.DataFrame(columns=tmp.index).T
 
-    df_to_show["dead workers"] = tmp["input"]["dead_workers"]
-    # this actually only exists for one, so we will the other with empty data
-    df_to_show["registered workers"] = tmp["input"]["registered_workers"].fillna(0) + tmp["output"]["registered_workers"].fillna(0)
-    df_to_show["ready queue size"] = tmp["output"]["ready_queue_size"]
-    df_to_show["raw socket state"] = tmp["input"]["socket_state"].fillna("") + tmp["output"]["socket_state"].fillna("")
+    if "input" in tmp and "dead_workers" in tmp["input"]:
+        df_to_show["dead workers"] = tmp["input"]["dead_workers"]
 
-    # average between input and output
-    df_to_show["data size"] = (tmp["input"]["data_size"].fillna(0) + tmp["output"]["data_size"].fillna(0))/2
-    df_to_show["event rate"] = (tmp["input"]["event_rate"].fillna(0) + tmp["output"]["event_rate"].fillna(0))/2
+    if "output" in tmp and "ready_queue_size" in tmp["output"]:
+        df_to_show["ready queue size"] = tmp["output"]["ready_queue_size"]
+
+    if "input" in tmp and "output" in tmp:
+        input_df = tmp["input"]
+        output_df = tmp["output"]
+
+        # average between input and output
+        if "data_size" in input_df and "data_size" in output_df:
+            df_to_show["data size"] = (input_df["data_size"].fillna(0) + output_df["data_size"].fillna(0)) / 2
+
+        if "event_rate" in input_df and "event_rate" in output_df:
+            df_to_show["event rate"] = (input_df["event_rate"].fillna(0) + output_df["event_rate"].fillna(0)) / 2
+
+        # this actually only exists for one, so we fill the other with empty data
+        if "registered_workers" in input_df and "registered_workers" in output_df:
+            df_to_show["registered workers"] = input_df["registered_workers"].fillna(0) + output_df["registered_workers"].fillna(0)
+
+        if "socket_state" in input_df and "socket_state" in output_df:
+            df_to_show["raw socket state"] = input_df["socket_state"].fillna("") + output_df["socket_state"].fillna("")
 
     df_to_show = df_to_show.T.fillna("")
 
@@ -59,26 +73,29 @@ def get_overview(df):
         if key == "data size":
             worker_information[prefix + hostname]["hosts"] += 1
 
-    grouped_input = tmp["input"]
-    for col in grouped_input.columns:
-        add_information(col, grouped_input, "from ")
+    if "input" in tmp:
+        grouped_input = tmp["input"]
+        for col in grouped_input.columns:
+            add_information(col, grouped_input, "from ")
 
-    grouped_output = tmp["output"]
-    for col in grouped_output.columns:
-        add_information(col, grouped_output, "to ")
+    if "output" in tmp:
+        grouped_output = tmp["output"]
+        for col in grouped_output.columns:
+            add_information(col, grouped_output, "to ")
 
     worker_information = pd.DataFrame(worker_information).T
 
     if "hosts" in worker_information:
         worker_information["hosts"] = pd.to_numeric(worker_information["hosts"], errors="coerce", downcast="integer")
-    worker_information["ready messages"] = pd.to_numeric(worker_information["ready messages"], errors="coerce", downcast="integer")
+    if "ready messages" in worker_information:
+        worker_information["ready messages"] = pd.to_numeric(
+            worker_information["ready messages"], errors="coerce", downcast="integer")
     if "events" in worker_information:
         worker_information["events"] = pd.to_numeric(worker_information["events"], errors="coerce", downcast="integer")
     if "data size" in worker_information and "hosts" in worker_information:
         worker_information["data size"] = worker_information["data size"] / worker_information["hosts"]
 
     worker_information = worker_information.fillna("")
-
     worker_information = worker_information.loc[sorted(worker_information.index, key=lambda x: x.split(" ")[::-1])]
 
     return df_to_show, worker_information

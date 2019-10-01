@@ -7,6 +7,8 @@
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/utilities/ReversedRange.h>
 
+#include <TVector2.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

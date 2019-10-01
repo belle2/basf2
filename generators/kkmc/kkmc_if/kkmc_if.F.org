@@ -2,45 +2,57 @@ C
 C     KK interface
 C
 CCCCCC
-      subroutine KK_init (DatX_d,DatX_u,DatX_p,IRAND1)
+      subroutine KK_init (DatX_d,DatX_u,DatX_p,IRAND1,DatX_o)
       implicit         none
-      character*132 DatX_d, DatX_u, DatX_p
+      character*132 DatX_d, DatX_u, DatX_p, DatX_o
 
       integer imax
       parameter (imax = 10000)
       double precision xpar(imax)
 
       integer iflong, IRAND1
-
+      integer ijetset
+      common /KK_pythia/ ijetset
+      
       double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
       double precision dum(4)
 
 C   Input environment
+      open(16,FILE=DatX_o,STATUS='new',ACTION='write')
+
       Print *,'KK DATAX_0 : '//DatX_d
       Print *,'KK DATAX_1 : '//DatX_u
       Print *,'KK DATAX_P : '//DatX_p
 
-      open(1,FILE=DatX_u)
+      open(1,FILE=DatX_u,STATUS='old',ACTION='read')
 
 C   Input beam momentum for boost
 C      read(1,*) Pb1(1), Pb1(2), Pb1(3), Pb1(4)
 C      read(1,*) Pb2(1), Pb2(2), Pb2(3), Pb2(4)
-C###### Dummy
+C      Print *,'KK P(e+)= ',Pb1
+C      Print *,'KK P(e-)= ',Pb2
+C###### Dummy (for backward compatibility)
+      read(1,*,err=99) ctau, dum(2), dum(3), dum(4)
       read(1,*) dum(1), dum(2), dum(3), dum(4)
-      read(1,*) dum(1), dum(2), dum(3), dum(4)
-      Print *,'KK P(e+)= ',Pb1
-      Print *,'KK P(e-)= ',Pb2
+      Print *,'KK ignored the input of beam momentum from DATAX_1'
 
 C   Input c*tau
       read(1,*) ctau
-      Print *,'KK ctau= ',ctau
+ 99   Print *,'KK ctau= ',ctau
 
 C   Input flag for long lived particle (1:no decay, 0:decay)
       read(1,*) iflong
       Print *,'KK decay switch for long lived particle =',iflong
 
+C   Input flag for long lived particle (1:no decay, 0:decay)
+      read(1,*) ijetset
+      Print *,'KK switch for using KKMC-JETSET/PYTHIA6 =',ijetset
+
       close(1)  ! end of input-file open
+
+      Print *,'KK P(e+)= ',Pb1
+      Print *,'KK P(e-)= ',Pb2
 
 C   Random seed init for init
       Print *,'KK init random seed for init by ',IRAND1
@@ -50,10 +62,10 @@ C   Random seed init for init
 C   KK initialize
       CALL KK2f_ReaDataX(DatX_d, 1,imax,xpar)
       CALL KK2f_ReaDataX(DatX_u, 0,imax,xpar)
-      xpar(1)=sqrt((Pb1(4)+Pb2(4))**2-(Pb1(1)+Pb2(1))**2
-     &            -(Pb1(2)+Pb2(2))**2-(Pb1(3)+Pb2(3))**2)
-      Print *,'KK CMS energy changes to ',xpar(1),' (GeV)'
-      CALL KK2f_Initialize(xpar)                  ! initialize generator
+C      xpar(1)=sqrt((Pb1(4)+Pb2(4))**2-(Pb1(1)+Pb2(1))**2
+C     &            -(Pb1(2)+Pb2(2))**2-(Pb1(3)+Pb2(3))**2)
+C      Print *,'KK CMS energy changes to ',xpar(1),' (GeV)'
+C      CALL KK2f_Initialize(xpar)                  ! initialize generator
 
 C   Pythia initialize
 c      call KK_Pythia_output_table  ! output default table (for tempolary use)
@@ -62,12 +74,42 @@ c     switch for long lived particle
          call PYGIVE('MSTJ(22)=2!No decay for long lived particle')
       endif
 c     input particle data file for pythia
-      open(1,FILE=DatX_p,ERR=101)
+      open(1,FILE=DatX_p,STATUS='old',ACTION='read',ERR=101)
       call PYUPDA(3,1)
       close(1)
       goto 100
  101  Print *,'KK  No input for Pythia'
  100  continue
+
+C   TAUOLA fifo initialize
+      call YesFifo
+C     call TAUFIF(-1)  ! open outcome.dat
+
+C      call NoFifo
+
+C      call KK_Boost_flush
+
+      end
+
+      subroutine KK_begin_run(Espread)
+      implicit         none
+      double precision Espread
+      integer imax
+      parameter (imax = 10000)
+      double precision xpar(imax)
+
+      integer iflong, IRAND1
+
+      double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
+      double precision dum(4)
+
+      xpar(1)=sqrt((Pb1(4)+Pb2(4))**2-(Pb1(1)+Pb2(1))**2
+     &            -(Pb1(2)+Pb2(2))**2-(Pb1(3)+Pb2(3))**2)
+      xpar(2)=Espread
+      Print *,'KK CMS energy changes to ',xpar(1),' (GeV)'
+      Print *,'KK CMS energy spread changes to ',xpar(2),' (GeV)'
+      CALL KK2f_Initialize(xpar)                  ! initialize generator
 
       call KK_Boost_flush
 
@@ -98,8 +140,11 @@ CCCCCC
 
       double precision xSecPb, xErrPb
 
+C      call TAUFIF(2)                              ! TAUOLA fifo
       CALL KK2f_Finalize
       CALL KK2f_GetXsecMC(xSecPb, xErrPb)         ! get MC x-section
+
+      close(16)
 
       end
 
@@ -109,7 +154,7 @@ CCCCCC
       integer*4 status
 c
 c  HepEvt
-      INCLUDE 'KK2f/HepEvt.h'
+      INCLUDE 'KK2f/HepEvt.fi'
 C      integer nmxhep   ! maximum number of particles
 C      parameter (nmxhep=4000)
 C      double precision phep, vhep
@@ -130,16 +175,28 @@ c
       double precision p(4)
       integer i
 
+      integer imax
+      parameter (imax = 10000)
+      double precision xpar(imax)
+
       double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
+      integer ijetset
+      common /KK_pythia/ ijetset
+
+C   TAUOLA fifo clear
+      call TAUFIF(0)
 
 C   Select decay channel
       call KK_select_decay_channel(-15)  !tau+
       call KK_select_decay_channel(15)   !tau-
 C   Make single event by KK2f
       CALL KK2f_Make
-C   Do subsequent decays by Pythia
-      call PYEXEC
+C   Switch on internal JETSET? (this is the default of Belle)
+      IF(ijetset.eq.1) THEN
+	call PYEXEC
+      ENDIF
+      
       call PYHEPC(1)       ! Pythia -> Hepevt
       
 c  test print
@@ -167,7 +224,9 @@ C   Shift vertex point due to tau life time
       call KK_ShiftTauDecayVtx
 
 C   HepEvt to panther
-      CALL KK_HEPEVT_BBS    
+C      CALL KK_HEPEVT_BBS    
+C   TAUOLA fifo, KKMC tables to panther
+C      call KK_KKMC_BBS
 
       end
 
@@ -178,8 +237,12 @@ CCCCCC
 C  input: Pb1(4), Pb2(4)
 C  output: BoostV(3), cosA, sinA
 
+      integer imax
+      parameter (imax = 10000)
+      double precision xpar(imax)
+
       double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
       double precision Pb4, PbKK(4), dtemp
 
 C   Make boost vector and rotation angle
@@ -232,8 +295,12 @@ CCCCCC
       implicit none
       double precision p(4)
 
+      integer imax
+      parameter (imax = 10000)
+      double precision xpar(imax)
+
       double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
 
       double precision b2, gamma, gamma2, bp, tpz, dca, dsa
 
@@ -261,67 +328,72 @@ C  boost
       end
 
 CCCCCC
-      subroutine KK_HEPEVT_BBS
-      implicit none
+c      subroutine KK_HEPEVT_BBS
+c      implicit none
+cc
+cc  HepEvt
+c      INCLUDE 'KK2f/HepEvt.fi'
+c#include "panther/panther.inc"
+c#include HEPEVT_INC
+cc
+cc BBS table
+cc
+cc
+cc Var
+cc
+c      Integer * 4      I, J
+c      BBSOffset        I4, I8
+cc
+cc Main
+cc
+cc --- clear the table
+cc      Call BsDelEnt( Gen_HEPEVT, BBS_ID_ALL )
 c
-c  HepEvt
-      INCLUDE 'KK2f/HepEvt.h'
-#include "panther/panther.inc"
-#include HEPEVT_INC
+cc --- loop over the particle
+cc      Do I = 1, NHEP
+cc    --- a new table
+cc        Call BsNewEnt(Gen_HEPEVT, I4, I8)
+cc
+ccc    --- status, particle code, mother
+cc        Gen_HEPEVT_isthep(I4)  = ISTHEP(I)
+cc        Gen_HEPEVT_idhep(I4)   = IDHEP(I)
+cc        Gen_HEPEVT_mother(I4)  = JMOHEP(1,I)
+cc
+cc    --- mother and daughter
+cc        Do J = 1, 2
+cc          Gen_HEPEVT_mo(I4, J) = JMOHEP(J, I)
+cc          Gen_HEPEVT_da(I4, J) = JDAHEP(J, I)
+cc        Enddo
 c
-c BBS table
+cc c       if(JDAHEP(1,I).eq.0) then
+cc           Gen_HEPEVT_da(I4, 2) = -1
+cc        endif
 c
+cc    --- four momentum and mass
+cc        Do J = 1, 5
+cc          Gen_HEPEVT_P(I4, J) = PHEP(J, I)
+cc        Enddo
 c
-c Var
-c
-      Integer * 4      I, J
-      BBSOffset        I4, I8
-c
-c Main
-c
-c --- clear the table
-      Call BsDelEnt( Gen_HEPEVT, BBS_ID_ALL )
-
-c --- loop over the particle
-      Do I = 1, NHEP
-c    --- a new table
-        Call BsNewEnt(Gen_HEPEVT, I4, I8)
-
-c    --- status, particle code, mother
-        Gen_HEPEVT_isthep(I4)  = ISTHEP(I)
-        Gen_HEPEVT_idhep(I4)   = IDHEP(I)
-        Gen_HEPEVT_mother(I4)  = JMOHEP(1,I)
-
-c    --- mother and daughter
-        Do J = 1, 2
-          Gen_HEPEVT_mo(I4, J) = JMOHEP(J, I)
-          Gen_HEPEVT_da(I4, J) = JDAHEP(J, I)
-        Enddo
-
-        if(JDAHEP(1,I).eq.0) then
-           Gen_HEPEVT_da(I4, 2) = -1
-        endif
-
-c    --- four momentum and mass
-        Do J = 1, 5
-          Gen_HEPEVT_P(I4, J) = PHEP(J, I)
-        Enddo
-
-c    --- decay vertex and flight length
-        Do J = 1, 4
-          Gen_HEPEVT_V(I4, J) = VHEP(J, I)
-        Enddo
-      Enddo
-      Return
-      End
+cc    --- decay vertex and flight length
+cc        Do J = 1, 4
+cc          Gen_HEPEVT_V(I4, J) = VHEP(J, I)
+cc        Enddo
+cc      Enddo
+c      Return
+c      End
 
 CCCCCC
       subroutine KK_GetBeam ( PXH, PYH, PZH, EH, PXL, PYL, PZL, EL )
       implicit none
-      double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau
 
-      REAL PXH, PYH, PZH, EH, PXL, PYL, PZL, EL
+      integer imax
+      parameter (imax = 10000)
+      double precision xpar(imax)
+
+      double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
+
+      double precision PXH, PYH, PZH, EH, PXL, PYL, PZL, EL
 
       PXH = Pb2(1)
       PYH = Pb2(2)
@@ -338,10 +410,15 @@ CCCCCC
 CCCCCC
       subroutine KK_PutBeam ( PXH, PYH, PZH, EH, PXL, PYL, PZL, EL )
       implicit none
-      double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau
 
-      REAL PXH, PYH, PZH, EH, PXL, PYL, PZL, EL
+      integer imax
+      parameter (imax = 10000)
+      double precision xpar(imax)
+
+      double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
+
+      double precision PXH, PYH, PZH, EH, PXL, PYL, PZL, EL
 
       Pb2(1) = PXH
       Pb2(2) = PYH
@@ -359,13 +436,17 @@ CCCCCC
       subroutine KK_ShiftTauDecayVtx
       implicit none
 
+      integer imax
+      parameter (imax = 10000)
+      double precision xpar(imax)
+
       integer itau,i,j
-      double precision p, betagamma, flen, rvec(1), vtx(4)
+      double precision p, betagamma, flen, rvec(1), vtx(4), vtx0(4)
 
       double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
 c  HepEvt
-      INCLUDE 'KK2f/HepEvt.h'
+      INCLUDE 'KK2f/HepEvt.fi'
       
       do itau=1,2
          do i=1,nhep
@@ -375,8 +456,11 @@ c  HepEvt
                call KK_RandExp(rvec,1)
                flen = betagamma*ctau*rvec(1)
                do j=1,4
-                  vtx(j) = flen*phep(j,i)/p
+                  vtx0(j) = VHEP(j,jdahep(1,i))-VHEP(j,i)
+                  vtx(j) = flen*phep(j,i)/p - vtx0(j)
                enddo
+c               write(17,'(9(1x,f13.6))') 
+c     +              flen, (phep(j,i),j=1,5), (vtx0(j),j=1,4)
                call KK_Shift_Daughters_Vtx(i,vtx)
             endif
          enddo
@@ -391,7 +475,7 @@ CCCCCC
       integer id
       double precision vtx(4)
 c  HepEvt
-      INCLUDE 'KK2f/HepEvt.h'
+      INCLUDE 'KK2f/HepEvt.fi'
 
       integer i(nmxhep)
       
@@ -423,7 +507,7 @@ CCCCCC
       integer id,i
       double precision vtx(4)
 c  HepEvt
-      INCLUDE 'KK2f/HepEvt.h'
+      INCLUDE 'KK2f/HepEvt.fi'
 
       do i=1,4
          VHEP(i,id) = VHEP(i,id)+vtx(i)
@@ -536,6 +620,8 @@ C...Sum branching ratios of allowed decay channels.
  
 C...Select decay channel among allowed ones.
   240 call RANECU(dum,1,1)
+
+
       RBR=BRSU*dum(1)
       IDL=MDCY(KC,2)-1
   250 IDL=IDL+1
@@ -569,3 +655,111 @@ c     store for TAUOLA
 
       return
       end
+CCCCCC
+c      subroutine KK_KKMC_BBS
+c      implicit none
+c
+cc TAUOLA fifo common block
+c      Integer NMWT2
+c      PARAMETER (NMWT2=44)
+c      COMMON /CHERE/  WTCHE,KK,iffifo  ! need separate space for tau+tau-
+c      REAL*8          WTCHE(NMWT2)
+c      Integer  KK
+c      LOGICAL  iffifo
+c      COMMON /OLAoutA/  MNUMA,IDA,JAK1A,JAK2A,JAKPA,JAKMA,KTOMA,AMPLITA,
+c     $                  HVA,PTA,PNA,PIM1A,PIM2A,PIPLA,PIM3A,PIM4A,DGAMTA
+c      REAL  PTA(4),PNA(4),PIM1A(4),PIM2A(4),PIPLA(4),HVA(4),PIM3A(4),PIM4A(4)
+c      Integer MNUMA,IDA,JAK1A,JAK2A,JAKPA,JAKMA,KTOMA
+c      Real  AMPLITA,DGAMTA
+c      COMMON /OLAoutB/  MNUMB,IDB,JAK1B,JAK2B,JAKPB,JAKMB,KTOMB,AMPLITB,
+c     $                  HVB,PTB,PNB,PIM1B,PIM2B,PIPLB,PIM3B,PIM4B,DGAMTB
+c      REAL  PTB(4),PNB(4),PIM1B(4),PIM2B(4),PIPLB(4),HVB(4),PIM3B(4),PIM4B(4)
+c      Integer MNUMB,IDB,JAK1B,JAK2B,JAKPB,JAKMB,KTOMB
+c      Real  AMPLITB,DGAMTB
+c
+cc BBS table
+c#include "panther/panther.inc"
+c#include KKMC_INC
+c
+cc Var
+c      Integer * 4      I, J
+c      BBSOffset        I4, I8
+c
+cc      DOUBLE PRECISION WtMain,WtCrud
+c      Integer NISR,NFSR
+c
+c      INCLUDE 'KK2f/KK2f.fi'
+cc
+cc Main
+cc
+c      IF(.not.iffifo) return
+c
+cc  count number of ISR/FSR photons
+cc      call KK2f_GetNphot(Nphot)
+cc      call KK2f_GetIsr(isr)
+c      NISR = 0
+c      NFSR = 0
+c      Do I = 1, m_nphot
+c         if(m_isr(I) .eq. 1) then
+c            NISR = NISR + 1
+c         else
+c            NFSR = NFSR + 1
+c         endif
+c      Enddo
+c
+cc --- clear the table
+cc      Call BsDelEnt(Gen_KKMC_Info, BBS_ID_ALL)
+cc --- new table
+cc      Call BsNewEnt(Gen_KKMC_Info, I4, I8)
+c
+cc --- KK2f
+cc      call KK2f_GetWt(WtMain,WtCrud)
+cc      Gen_KKMC_Info_WtMain(I4) = SNGL(m_WtMain)
+cc      Gen_KKMC_Info_WtCrud(I4) = SNGL(m_WtCrud)
+cc      Gen_KKMC_Info_NISR(I4) = NISR
+cc      Gen_KKMC_Info_NFSR(I4) = NFSR
+c
+cc --- OLAoutA
+cc      Gen_KKMC_Info_MNUMA(I4) = MNUMA
+cc      Gen_KKMC_Info_IDA(I4) = IDA
+cc      Gen_KKMC_Info_JAK1A(I4) = JAK1A
+cc      Gen_KKMC_Info_JAK2A(I4) = JAK2A
+cc      Gen_KKMC_Info_JAKPA(I4) = JAKPA
+cc      Gen_KKMC_Info_JAKMA(I4) = JAKMA
+cc      Gen_KKMC_Info_KTOMA(I4) = KTOMA
+cc      Gen_KKMC_Info_AMPLITA(I4) = AMPLITA
+cc      Gen_KKMC_Info_DGAMTA(I4) = DGAMTA
+cc      Do J = 1, 4
+cc         Gen_KKMC_Info_HVA(I4, J) = HVA(J)
+cc         Gen_KKMC_Info_PTA(I4, J) = PTA(J)
+cc         Gen_KKMC_Info_PNA(I4, J) = PNA(J)
+cc         Gen_KKMC_Info_PIPLA(I4, J) = PIPLA(J)
+cc         Gen_KKMC_Info_PIM1A(I4, J) = PIM1A(J)
+cc         Gen_KKMC_Info_PIM2A(I4, J) = PIM2A(J)
+cc         Gen_KKMC_Info_PIM3A(I4, J) = PIM3A(J)
+cc         Gen_KKMC_Info_PIM4A(I4, J) = PIM4A(J)
+cc      Enddo
+c
+cc --- OLAoutB
+cc      Gen_KKMC_Info_MNUMB(I4) = MNUMB
+cc      Gen_KKMC_Info_IDB(I4) = IDB
+cc      Gen_KKMC_Info_JAK1B(I4) = JAK1B
+cc      Gen_KKMC_Info_JAK2B(I4) = JAK2B
+cc      Gen_KKMC_Info_JAKPB(I4) = JAKPB
+cc      Gen_KKMC_Info_JAKMB(I4) = JAKMB
+cc      Gen_KKMC_Info_KTOMB(I4) = KTOMB
+cc      Gen_KKMC_Info_AMPLITB(I4) = AMPLITB
+cc      Gen_KKMC_Info_DGAMTB(I4) = DGAMTB
+cc      Do J = 1, 4
+cc         Gen_KKMC_Info_HVB(I4, J) = HVB(J)
+cc         Gen_KKMC_Info_PTB(I4, J) = PTB(J)
+cc         Gen_KKMC_Info_PNB(I4, J) = PNB(J)
+cc         Gen_KKMC_Info_PIPLB(I4, J) = PIPLB(J)
+cc         Gen_KKMC_Info_PIM1B(I4, J) = PIM1B(J)
+cc         Gen_KKMC_Info_PIM2B(I4, J) = PIM2B(J)
+cc         Gen_KKMC_Info_PIM3B(I4, J) = PIM3B(J)
+cc         Gen_KKMC_Info_PIM4B(I4, J) = PIM4B(J)
+cc      Enddo
+c
+c      Return
+c      End

@@ -100,12 +100,9 @@ C
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
-      COMMON /SETINI/ IFBABAR
-      INTEGER         IFBABAR
 
       COMPLEX FORMA1,FORMK1,FORMRO,FORMKS
-      COMPLEX FA1A1P,FK1AB,F3PI,F3PI_RCHT
-      WIGNER(A,B,C)= CMPLX(1.0,0.0)/CMPLX(A-B**2,B*C)
+      COMPLEX FA1A1P,FK1AB,F3PI
 C
       IF     (MNUM.EQ.0) THEN
 C ------------  3 pi hadronic state (a1)
@@ -113,113 +110,47 @@ C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
 C       FORMRO = F3PI(1,QQ,S1,SDWA)
 C       FORMA1 = FA1A1P(QQ)
 C       FORM1 = FORMA1*FORMRO
-      if (IFBABAR.eq.1)then
-           GAMAX=GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-           FORM1=AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else if (IFBABAR.EQ.2) THEN
-        FORM1 = F3PI_RCHT(1,QQ,S1,SDWA)
-      ELSE
-        FORM1 = F3PI(1,QQ,S1,SDWA)
-      ENDIF
+       FORM1 = F3PI(1,QQ,S1,SDWA)
 
       ELSEIF (MNUM.EQ.1) THEN
 C ------------ K- pi- K+ (K*0 K-)
-      if (IFBABAR.eq.1)then
-      FORM1 = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
-      GAMAX = GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-      FORM1 = AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FORM1
-      else ! CLEO
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
        FORMA1 = FA1A1P(QQ)
        FORM1 = FORMA1*FORMKS
-      endif
 
       ELSEIF (MNUM.EQ.2) THEN
 C ------------ K0 pi- K0B (K*- K0)
-      if (IFBABAR.eq.1)then
-      FORM1 = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
-      GAMAX = GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-      FORM1 = AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FORM1
-      else ! CLEO
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
        FORMA1 = FA1A1P(QQ)
        FORM1 = FORMA1*FORMKS
-      endif
 
       ELSEIF (MNUM.EQ.3) THEN
 C ------------ K- pi0 K0 (K*0 K-)
-      if (IFBABAR.eq.1)then
-      FORM1 = 0.0
-      GAMAX = GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-      FORM1 = AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FORM1
-      else ! CLEO
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
        FORMA1 = FA1A1P(QQ)
        FORM1 = FORMA1*FORMKS
-      endif
 
       ELSEIF (MNUM.EQ.4) THEN
 C ------------ pi0 pi0 K-  (K*-pi0)
-      if (IFBABAR.eq.1)then
-      XM2   = 1.402
-      GAM2  = 0.174
-      FORM1 = BWIGM(S1,AMKST,GAMKST,AMK,AMPI)
-      FORM1 = WIGFOR(QQ,XM2,GAM2)*FORM1
-      else ! CLEO
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
        FORMK1 = FK1AB(QQ,3)
        FORM1 = FORMK1*FORMKS
-      endif
+
       ELSEIF (MNUM.EQ.5) THEN
 C ------------ K- pi- pi+ (rho0 K-)
-      if (IFBABAR.eq.1)then
-      XM2   = 1.402
-      GAM2  = 0.174
-      FORM1 = WIGFOR(QQ,XM2,GAM2)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else ! CLEO
        FORMK1 = FK1AB(QQ,4)
        FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
        FORM1 = FORMK1*FORMRO
-      endif
 
       ELSEIF (MNUM.EQ.6) THEN
 C ------------ pi- K0B pi0 (pi- K*0B)
-      if (IFBABAR.eq.1)then
-      FORM1=0.0
-      else ! CLEO
        FORMK1 = FK1AB(QQ,1)
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMK,AMPI)
        FORM1 = FORMK1*FORMKS
-      endif
 
       ELSEIF (MNUM.EQ.7) THEN
 C -------------- eta pi- pi0 final state
        FORM1=0.0
-      ELSEIF     (MNUM.EQ.9) THEN
-C ------------  3 pi hadronic state (a1) 2 neutral pions
-C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
-C       FORMRO = F3PI(1,QQ,S1,SDWA)
-C       FORMA1 = FA1A1P(QQ)
-C       FORM1 = FORMA1*FORMRO
-      if (IFBABAR.eq.1)then
-           GAMAX=GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-           FORM1=AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else if (IFBABAR.EQ.2) THEN
-        FORM1 = F3PI_RCHT(1,QQ,S1,SDWA)
-      ELSE
-        FORM1 = F3PI(1,QQ,S1,SDWA)
-      ENDIF
-
-!       write(*,*) 's1sdwa= ',QQ,S1,SDWA,form1
-      ELSEIF     (MNUM.gt.9.and.MNUM.lt.20 ) THEN
-C ------------  3 pi hadronic state (a1) basically dummy
-C ------------  3 pi hadronic state (a1) 2 neutral pions
-C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
-C       FORMRO = F3PI(1,QQ,S1,SDWA)
-C       FORMA1 = FA1A1P(QQ)
-C       FORM1 = FORMA1*FORMRO
-       FORM1 = F3PI(1,QQ,S1,SDWA)
-!       write(*,*) 's1sdwa= ',QQ,S1,SDWA,form1
       ENDIF
 
       END
@@ -241,12 +172,9 @@ C
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
-      COMMON /SETINI/ IFBABAR
-      INTEGER         IFBABAR
 
       COMPLEX FORMA1,FORMK1,FORMRO,FORMKS
-      COMPLEX FA1A1P,FK1AB,F3PI,F3PI_RCHT
-      wigner(a,b,c)=cmplx(1.0,0.0)/cmplx(a-b**2,b*c)
+      COMPLEX FA1A1P,FK1AB,F3PI
 
       IF     (MNUM.EQ.0) THEN
 C ------------  3 pi hadronic state (a1)
@@ -254,113 +182,47 @@ C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
 C       FORMRO = F3PI(2,QQ,S1,SDWA)
 C       FORMA1 = FA1A1P(QQ)
 C       FORM2 = FORMA1*FORMRO
-C       FORM2 = F3PI(2,QQ,S1,SDWA)
-      if (IFBABAR.eq.1)then
-           GAMAX=GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-           FORM2=AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else if (IFBABAR.EQ.2) THEN
-        FORM2 = F3PI_RCHT(2,QQ,S1,SDWA)
-      ELSE
-        FORM2 = F3PI(2,QQ,S1,SDWA)
-      ENDIF
+       FORM2 = F3PI(2,QQ,S1,SDWA)
 
       ELSEIF (MNUM.EQ.1) THEN
 C ------------ K- pi- K+ (rho0 pi-)
-      if (IFBABAR.eq.1)then
-      GAMAX = GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-      FORM2 = AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else ! cleo
        FORMRO = FPIKM(SQRT(S1),AMK,AMK)
        FORMA1 = FA1A1P(QQ)
        FORM2 = FORMA1*FORMRO
-      endif
 
       ELSEIF (MNUM.EQ.2) THEN
 C ------------ K0 pi- K0B (rho0 pi-)
-      if (IFBABAR.eq.1)then
-      GAMAX = GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-      FORM2 = AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else ! cleo
        FORMRO = FPIKM(SQRT(S1),AMK,AMK)
        FORMA1 = FA1A1P(QQ)
        FORM2 = FORMA1*FORMRO
-      endif
 
       ELSEIF (MNUM.EQ.3) THEN
 C ------------ K- pi0 K0 (rho- pi0)
-      if (IFBABAR.eq.1)then
-      GAMAX = GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-      FORM2 = AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else ! cleo
        FORMRO = FPIKM(SQRT(S1),AMK,AMK)
        FORMA1 = FA1A1P(QQ)
        FORM2 = FORMA1*FORMRO
-      endif
 
       ELSEIF (MNUM.EQ.4) THEN
 C ------------ pi0 pi0 K-  (K*-pi0)
-      if (IFBABAR.eq.1)then
-      XM2   = 1.402
-      GAM2  = 0.174
-      FORM2 = BWIGM(S1,AMKST,GAMKST,AMK,AMPI)
-      FORM2 = WIGFOR(QQ,XM2,GAM2)*FORM2
-      else ! cleo
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
        FORMK1 = FK1AB(QQ,3)
        FORM2 = FORMK1*FORMKS
-      endif
 
       ELSEIF (MNUM.EQ.5) THEN
 C ------------ K- pi- pi+  (K*0B pi-)
-      if (IFBABAR.eq.1)then
-      XM2   = 1.402
-      GAM2  = 0.174
-      FORM2 = BWIGM(S1,AMKST,GAMKST,AMK,AMPI)
-      FORM2 = WIGFOR(QQ,XM2,GAM2)*FORM2
-      else ! cleo
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
        FORMK1 = FK1AB(QQ,1)
        FORM2 = FORMK1*FORMKS
-      endif
 C
       ELSEIF (MNUM.EQ.6) THEN
 C ------------ pi- K0B pi0 (rho- K0B)
-      if (IFBABAR.eq.1)then
-      XM2   = 1.402
-      GAM2  = 0.174
-      FORM2 = WIGFOR(QQ,XM2,GAM2)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else ! cleo
        FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
        FORMK1 = FK1AB(QQ,2)
        FORM2 = FORMK1*FORMRO
-      endif
 C
       ELSEIF (MNUM.EQ.7) THEN
 C -------------- eta pi- pi0 final state
        FORM2=0.0
-      ELSEIF     (MNUM.EQ.9) THEN
-C ------------  3 pi hadronic state (a1) 2 neutral
-C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
-C       FORMRO = F3PI(2,QQ,S1,SDWA)
-C       FORMA1 = FA1A1P(QQ)
-C       FORM2 = FORMA1*FORMRO
-      if (IFBABAR.eq.1)then
-           GAMAX=GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-           FORM2=AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else if (IFBABAR.EQ.2) THEN
-        FORM2 = F3PI_RCHT(2,QQ,S1,SDWA)
-      ELSE
-        FORM2 = F3PI(2,QQ,S1,SDWA)
-      ENDIF
-
-      ELSEIF     (MNUM.gt.9.and.MNUM.lt.20 ) THEN
-C ------------  3 pi hadronic state (a1) basically dummy
-C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
-C       FORMRO = F3PI(2,QQ,S1,SDWA)
-C       FORMA1 = FA1A1P(QQ)
-C       FORM2 = FORMA1*FORMRO
-       FORM2 = F3PI(2,QQ,S1,SDWA)
-
       ENDIF
 C
 
@@ -464,11 +326,10 @@ C
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
-      COMMON /SETINI/ IFBABAR
-      INTEGER         IFBABAR
+
       COMPLEX FORM3,BWIGM
       COMPLEX FORMA1,FORMK1,FORMRO,FORMKS
-      COMPLEX FA1A1P,FK1AB,F3PI,F3PI_RCHT
+      COMPLEX FA1A1P,FK1AB,F3PI
 C
       IF (MNUM.EQ.0) THEN
 C ------------  3 pi hadronic state (a1)
@@ -476,52 +337,19 @@ C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
 C       FORMRO = F3PI(3,QQ,S1,SDWA)
 C       FORMA1 = FA1A1P(QQ)
 C       FORM3 = FORMA1*FORMRO
-      if (IFBABAR.EQ.1) THEN
-        FORM3 = (0.,0.)
-      else
-        FORM3 = F3PI(3,QQ,S1,SDWA)
-      endif
+       FORM3 = F3PI(3,QQ,S1,SDWA)
 
       ELSEIF (MNUM.EQ.3) THEN
 C ------------ K- pi0 K0  (K*- K0)
-      if (IFBABAR.EQ.1) THEN
-        FORM3 = (0.,0.)
-      else
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMPIZ,AMK)
        FORMA1 = FA1A1P(QQ)
        FORM3 = FORMA1*FORMKS
-      endif
 
       ELSEIF (MNUM.EQ.6) THEN
 C ------------ pi- K0B pi0 (K*- pi0)
-      if (IFBABAR.EQ.1) THEN
-        FORM3 = (0.,0.)
-      else
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMK,AMPI)
        FORMK1 = FK1AB(QQ,3)
        FORM3 = FORMK1*FORMKS
-      endif
-
-      ELSEIF (MNUM.EQ.9) THEN
-C ------------  3 pi hadronic state (a1) 2 neutral
-C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
-C       FORMRO = F3PI(3,QQ,S1,SDWA)
-C       FORMA1 = FA1A1P(QQ)
-C       FORM3 = FORMA1*FORMRO
-      if (IFBABAR.EQ.1) THEN
-        FORM3 = (0.,0.)
-      else
-        FORM3 = F3PI(3,QQ,S1,SDWA)
-      endif
-
-      ELSEIF     (MNUM.gt.9.and.MNUM.lt.20 ) THEN
-C ------------  3 pi hadronic state (a1) basically dummy
-C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
-C       FORMRO = F3PI(3,QQ,S1,SDWA)
-C       FORMA1 = FA1A1P(QQ)
-C       FORM3 = FORMA1*FORMRO
-       FORM3 = F3PI(3,QQ,S1,SDWA)
-
 
       ELSE
        FORM3=CMPLX(0.,0.)
@@ -543,24 +371,13 @@ C
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
-      COMMON /SETINI/ IFBABAR
-      INTEGER         IFBABAR
-
-      COMPLEX FORM4,WIGNER,FPIKM,F3PI_RCHT
+      COMPLEX FORM4,WIGNER,FPIKM
       REAL*4 M
-C ---- this formfactor is switched off for cleo version
+
+
+
+C ---- this formfactor is switched off .. .
        FORM4=CMPLX(0.0,0.0)
-      IF (MNUM.EQ.0) THEN
-C ------------  3 pi hadronic state (a1)
-C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
-C       FORMRO = F3PI(3,QQ,S1,SDWA)
-C       FORMA1 = FA1A1P(QQ)
-C       FORM3 = FORMA1*FORMRO
-C        FORM4 = CMPLX(-1., 0.) 
-       IF (IFBABAR.EQ.2) FORM4 = F3PI_RCHT(4,QQ,S1,S2)* CMPLX(0., 1.)
-      ELSEIF (MNUM.EQ.9) THEN
-       IF (IFBABAR.EQ.2) FORM4 = F3PI_RCHT(4,QQ,S1,S2)* CMPLX(0., 1.)
-      ENDIF
 
       END
       FUNCTION FORM5(MNUM,QQ,S1,S2)
@@ -584,7 +401,7 @@ C
       IF     (MNUM.EQ.0) THEN
 C ------------  3 pi hadronic state (a1)
         FORM5=0.0
-       ELSEIF (MNUM.EQ.1) THEN
+      ELSEIF (MNUM.EQ.1) THEN
 C ------------ K- pi- K+
          ELPHA=-0.2
          FORM5=FPIKMD(SQRT(QQ),AMPI,AMPI)/(1+ELPHA)
@@ -617,12 +434,6 @@ C ------------ pi- K0B pi0
       ELSEIF (MNUM.EQ.7) THEN
 C -------------- eta pi- pi0 final state
        FORM5=FPIKMD(SQRT(QQ),AMPI,AMPI)*FPIKM(SQRT(S1),AMPI,AMPI)
-      ELSEIF (MNUM.EQ.9) THEN
-C ------------  3 pi hadronic state (a1)
-        FORM5=0.0
-      ELSEIF     (MNUM.gt.9.and.MNUM.lt.20 ) THEN
-C ------------  3 pi hadronic state (a1) basically dummy
-        FORM5=0.0
       ENDIF
 C
       END
@@ -846,9 +657,9 @@ c                    print *, 'here is curinf'
      . /,   ' *************************************************** ',
      . /,   '   YOU ARE USING THE 4 PION DECAY MODE FORM FACTORS    ',
      . /,   '   WHICH HAVE BEEN DESCRIBED IN:',
-     . /,   '   R. DECKER, M. FINKEMEIER, P. HEILIGER AND H.H. JONSSON ',
-     . /,   '   TAU DECAYS INTO FOUR PIONS ',
-     . /,   '   UNIVERSITAET KARLSRUHE PREPRINT TTP 94-13 (1994)',
+     . /,   '   R. DECKER, M. FINKEMEIER, P. HEILIGER AND H.H. JONSSON',	
+     . /,   '   "TAU DECAYS INTO FOUR PIONS" ',
+     . /,   '   UNIVERSITAET KARLSRUHE PREPRINT TTP 94-13 (1994);',
      . /,   '                    LNF-94/066(IR); HEP-PH/9410260  ',
      . /,   '  ',
      . /,   ' PLEASE NOTE THAT THIS ROUTINE IS USING PARAMETERS',
@@ -1002,9 +813,9 @@ C
       BWIGN(A,XM,XG)=1.0/CMPLX(A-XM**2,XM*XG)
 C
       IF (INIT.EQ.0) THEN
-      CALL CURINI
-      CALL CURINF
-      INIT = 1
+	CALL CURINI
+	CALL CURINF
+	INIT = 1
       ENDIF	        	
 C
 C --- MASSES AND CONSTANTS

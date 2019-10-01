@@ -27,18 +27,18 @@ beamparameters = add_beamparameters(main, "Y4S")
 
 # to run the framework the used modules need to be registered
 kkgeninput = register_module('KKGenInput')
-kkgeninput.param('tauinputFile', Belle2.FileSystem.findFile('data/generators/kkmc/tau.input.dat'))
+kkgeninput.param('tauinputFile', Belle2.FileSystem.findFile('data/generators/kkmc/tauola_bbb.input.dat'))
 kkgeninput.param('KKdefaultFile', Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'))
-kkgeninput.param('taudecaytableFile', Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat'))
+# kkgeninput.param('taudecaytableFile', Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat'))
 # above line makes decay table to be read by Pythia; uncomment next line to make tau decay table to be read by Tauola
-# kkgeninput.param('taudecaytableFile', ' ')
+kkgeninput.param('taudecaytableFile', ' ')
 kkgeninput.param('kkmcoutputfilename', 'kkmc_tautau.txt')
 
 # run
 main.add_module("Progress")
 main.add_module(kkgeninput)
-# main.add_module("RootOutput", outputFileName="kkmc_tautau.root")
-main.add_module("HepMCOutput", OutputFilename='kkmc_tautau.hepmc', StoreVirtualParticles=True)
+# main.add_module("RootOutput", outputFileName="kkmc_tautau_bbb.root")
+main.add_module("HepMCOutput", OutputFilename='kkmc_tautau_bbb.hepmc', StoreVirtualParticles=True)
 # main.add_module("PrintTauTauMCParticles", logLevel=LogLevel.INFO, onlyPrimaries=False)
 # main.add_module("PrintMCParticles", logLevel=LogLevel.INFO, onlyPrimaries=False)
 

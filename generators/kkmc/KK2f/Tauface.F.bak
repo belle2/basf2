@@ -19,7 +19,7 @@
 
 
       SUBROUTINE INIETC(ITAUXPAR,xpar)
-      INCLUDE "BXformat.h"
+      INCLUDE "BXformat.fi"
       REAL*8 xpar(*)
       INTEGER   INUT,IOUT
       COMMON /INOUT/  
@@ -72,7 +72,7 @@ C  KeyA1 is used for formfactors actually not in use
 *
 *     called by : KORALZ
 * ----------------------------------------------------------------------
-      INCLUDE "BXformat.h"
+      INCLUDE "BXformat.fi"
       INTEGER   INUT,IOUT
       COMMON /INOUT/  
      $     INUT,         ! Input  unit  number (not used)
@@ -308,7 +308,7 @@ C initialization form KK
 *
 *     called by : KORALZ
 * ----------------------------------------------------------------------
-      INCLUDE "BXformat.h"
+      INCLUDE "BXformat.fi"
       INTEGER   INUT,IOUT
       COMMON /INOUT/  
      $     INUT,         ! Input  unit  number (not used)

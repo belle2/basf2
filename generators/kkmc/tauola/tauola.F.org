@@ -3074,6 +3074,7 @@ C TWO, FOR TWO MODES OF A1 DECAY NAMELLY PI+PI-PI- AND PI-PI0PI0
 
       ENDIF
       DGAMT=1/(2.*AMTAU)*AMPLIT*PHSPAC
+      CALL TAUR3(MNUM,PT,PN,PIM1,PIM2,PIPL,AMPLIT,HV,DGAMT)
       END
       SUBROUTINE DAMPAA(PT,PN,PIM1,PIM2,PIPL,AMPLIT,HV)
 C ----------------------------------------------------------------------
@@ -4221,6 +4222,11 @@ C      AMPLIT=CCABIB**2*GFERMI**2/2. * BRAK * AMX2*SIGEE(AMX2,1)
       ENDIF
 
       DGAMT=1/(2.*AMTAU)*AMPLIT*PHSPAC
+      IF     (JNPI.EQ.1) THEN
+        CALL TAUR4 (JNPI,PT,PN,PIM1,PIM2,PIZ,PIPL,AMPLIT,HV,DGAMT)
+      ELSEIF (JNPI.EQ.2) THEN
+        CALL TAUR4 (JNPI,PT,PN,PIM1,PIM2,PIPL,PIZ,AMPLIT,HV,DGAMT)
+      ENDIF
 C PHASE SPACE CHECK
 C      DGAMT=PHSPAC
       DO 77 K=1,4
@@ -5623,3 +5629,311 @@ C=======================================================================
 C===================END OF CPC PART ====================================
 C=======================================================================
       END
+
+
+C=======================================================================
+C==============Library for filredump stuff (and howtodo) ===============
+C=======================================================================
+
+
+C ###########################################################################
+C ###########################################################################
+C
+C    BASF dump interface starts here  (version as of Oct 3, 2008)
+C Written by  Tomasz Przedzinski and Zbigniew Was, 
+C
+C ###########################################################################
+C ###########################################################################
+      SUBROUTINE NoFifo
+C this routine must be called from TAUOLA initialization to assure
+C that fifo or dumping will remain inactive, in default operation
+      PARAMETER (NMWT=22)
+      PARAMETER (NMWT2=44)
+      COMMON /CHERE/  WTCHE(nmwt2),KK,iffifo  ! need separate space for tau+tau-
+      REAL*8         WTCHE
+      LOGICAL  iffifo
+      iffifo=.false.
+      END
+
+      SUBROUTINE YesFifo
+C this routine must be called from TAUOLA initialization to assure
+C that fifo will remain inactive, in default operation
+      PARAMETER (NMWT=22)
+      PARAMETER (NMWT2=44)
+      COMMON /CHERE/  WTCHE(nmwt2),KK,iffifo  ! need separate space for tau+tau-
+      REAL*8         WTCHE
+      LOGICAL  iffifo
+      iffifo=.true.
+      END
+
+      SUBROUTINE TAUFIF(mode)
+C this is main routine for dumping variables. It initializes files (MODE=-1)
+C prepares data storage before each event (MODE=0),  
+C writes information into outcome.dat (MODE=1), Finalization is handled by (MODE=2)
+C and is at present empty. Structure of calls is like for calculation of extra 
+C weights but simpler.
+C It may be called from your main Fortran program (including tauola)
+C IF iffifo is at its default value that is IFFIFO=.false. all added code 
+C will remain dormant.
+C 
+C in this first version there are 3 fifo files:
+C flap.dat handles transmission of weights into user analyzing program
+C flap1.dat takes care for transmission of data for calculation of formfactors 
+C or current (in your code)
+C and flap2.dat is used for transmission of formfactors back to TAUOLA for
+C weight vector calculation. For weight calculation the same code
+C as for normal Tauola operation is used.
+C WARNING: your weights are for matrix element spin averaged only!   
+C          no spin correlations with production process will be modified.
+C          this may be will be done in future for KK=0 (sorry for shortcut) 
+      PARAMETER (NMWT=22)
+      PARAMETER (NMWT2=44)
+      COMMON /CHERE/  WTCHE(nmwt2),KK,iffifo  ! need separate space for tau+tau-
+      REAL*8         WTCHE
+      LOGICAL  iffifo
+      COMMON /OLAoutA/  MNUMA,IDA,JAK1A,JAK2A,JAKPA,JAKMA,KTOMA,AMPLITA,
+     $                  HVA,PTA,PNA,PIM1A,PIM2A,PIPLA,PIM3A,PIM4A,DGAMTA
+      REAL  PTA(4),PNA(4),PIM1A(4),PIM2A(4),PIPLA(4),HVA(4),PIM3A(4),PIM4A(4)
+
+      COMMON /OLAoutB/  MNUMB,IDB,JAK1B,JAK2B,JAKPB,JAKMB,KTOMB,AMPLITB,
+     $                  HVB,PTB,PNB,PIM1B,PIM2B,PIPLB,PIM3B,PIM4B,DGAMTB
+      REAL  PTB(4),PNB(4),PIM1B(4),PIM2B(4),PIPLB(4),HVB(4),PIM3B(4),PIM4B(4)
+
+      IF(.not.iffifo) return
+
+      IF     (MODE.EQ.-1) THEN ! initialization
+        OPEN(15,FILE="./outcome.dat",STATUS='OLD')
+      ELSEIF (MODE.EQ. 0) THEN  ! clearing space
+          MNUMA=0
+          IDA=0
+          JAK1A=0
+          JAK2A=0
+          JAKPA=0
+          JAKMA=0
+          KTOMA=0
+          AMPLITA=0
+          DGAMTA=0
+c
+          MNUMB=0
+          IDB=0
+          JAK1B=0
+          JAK2B=0
+          JAKPB=0
+          JAKMB=0
+          KTOMB=0
+          AMPLITB=0
+          DGAMTB=0
+        
+       DO I=1,4
+          HVA(I)=0
+          PTA(I)=0
+          PNA(I)=0
+          PIM1A(I)=0
+          PIM2A(I)=0
+          PIPLA(I)=0
+          PIM3A(I)=0
+          PIM4A(I)=0
+c
+          HVB(I)=0
+          PTB(I)=0
+          PNB(I)=0
+          PIM1B(I)=0
+          PIM2B(I)=0
+          PIPLB(I)=0
+          PIM3B(I)=0
+          PIM4B(I)=0
+       ENDDO
+
+
+      ELSEIF (MODE.EQ. 1) THEN ! once after tau+ and tau- event must be accepted
+C we write information for weight calculation.
+  
+          WRITE(15,66)
+
+          WRITE(15,68) MNUMA,IDA, JAK1A,JAK2A,JAKPA,JAKMA,KTOMA,AMPLITA
+          WRITE(15,67) HVA
+          WRITE(15,67) PTA
+          WRITE(15,67) PNA
+          WRITE(15,67) PIM1A
+          WRITE(15,67) PIM2A
+          WRITE(15,67) PIPLA
+          WRITE(15,67) PIM3A
+          WRITE(15,67) PIM4A
+
+  
+          WRITE(15,68) MNUMB,IDB, JAK1B,JAK2B,JAKPB,JAKMB,KTOMB,AMPLITB
+          WRITE(15,67) HVB
+          WRITE(15,67) PTB
+          WRITE(15,67) PNB
+          WRITE(15,67) PIM1B
+          WRITE(15,67) PIM2B
+          WRITE(15,67) PIPLB
+          WRITE(15,67) PIM3B
+          WRITE(15,67) PIM4B
+
+
+      ELSE  !(MODE.EQ. 1) 
+        CALL ENDGAME(15)
+      ENDIF 
+
+
+ 66   FORMAT(///1X, 'NEW EVENT')
+ 67   FORMAT( 4(1x,e12.6,1X))
+ 68   FORMAT(7(1x,I5), 1x,e12.6)
+
+      END
+      subroutine endgame(iout)
+C      write(iout,1) 'endss'
+C 1    format(1x,a5)
+      end
+      subroutine conti(iout)
+C      write(iout,1) 'conti'
+C 1    format(1x,a5)
+      end
+      SUBROUTINE TAUR3(MNUM,PT,PN,PIM1,PIM2,PIPL,AMPLIT,HV,DGAMT)
+C case of 3 scalars
+      REAL  PT(4),PN(4),PIM1(4),PIM2(4),PIPL(4),HV(4)
+      CALL TAUR(MNUM,3,PT,PN,PIM1,PIM2,PIPL,PIM3,PIM4,AMPLIT,HV,DGAMT)
+      END
+
+      SUBROUTINE TAUR4(MNUM,PT,PN,PIM1,PIM2,PIPL,PIM3,AMPLIT,HV,DGAMT)
+C case of 4 scalars
+      REAL  PT(4),PN(4),PIM1(4),PIM2(4),PIPL(4),HV(4),PIM3(4),PIM4(4)
+      CALL TAUR(MNUM,4,PT,PN,PIM1,PIM2,PIPL,PIM3,PIM4,AMPLIT,HV,DGAMT)
+      END
+
+      SUBROUTINE TAUR5(MNUM,PT,PN,PIM1,PIM2,PIPL,AMPLIT,HV,DGAMT)
+C case of 5 scalars
+      REAL  PT(4),PN(4),PIM1(4),PIM2(4),PIPL(4),HV(4),PIM3(4),PIM4(4)
+      CALL TAUR(MNUM,5,PT,PN,PIM1,PIM2,PIPL,PIM3,PIM4,AMPLIT,HV,DGAMT)
+      END
+
+      SUBROUTINE TAUR(MNUM,ID,PT,PN,PIM1,PIM2,PIPL,PIM3,PIM4,AMPLIT,HV,DGAMT)
+C Written by Vladimir Cherepanov and Zbigniew Was, Cracow 04.08.2008.
+C this piece of code need to be called from SUBROUTINE DPHTRE just after
+C IF-elseif call to DAMPOG DAMPPK. It calculates optional weights for the tau+ or tau-
+C decays and stores them accordingly into upper or lower half of  WTCHE(nmwt2)
+C in principle we can use MNUM here, but it is version dependent so we will use 
+C JAKP,JAKM,KTOM which is easier for external user of TAUOLA
+      REAL  PT(4),PN(4),PIM1(4),PIM2(4),PIPL(4),HV(4),PIM3(4),PIM4(4)
+
+      COMMON / JAKI   /  JAK1,JAK2,JAKP,JAKM,KTOM
+
+      COMMON /OLAoutA/  MNUMA,IDA,JAK1A,JAK2A,JAKPA,JAKMA,KTOMA,AMPLITA,
+     $                  HVA,PTA,PNA,PIM1A,PIM2A,PIPLA,PIM3A,PIM4A,DGAMTA
+      REAL  PTA(4),PNA(4),PIM1A(4),PIM2A(4),PIPLA(4),HVA(4),PIM3A(4),PIM4A(4)
+
+      COMMON /OLAoutB/  MNUMB,IDB,JAK1B,JAK2B,JAKPB,JAKMB,KTOMB,AMPLITB,
+     $                  HVB,PTB,PNB,PIM1B,PIM2B,PIPLB,PIM3B,PIM4B,DGAMTB
+      REAL  PTB(4),PNB(4),PIM1B(4),PIM2B(4),PIPLB(4),HVB(4),PIM3B(4),PIM4B(4)
+  
+      IF (KTOM.EQ.1) THEN  ! THIS condition may have versions !!!          
+          MNUMA=MNUM
+          IDA=ID
+          JAK1A=JAK1
+          JAK2A=JAK2
+          JAKPA=JAKP
+          JAKMA=JAKM
+          KTOMA=KTOM
+          AMPLITA=AMPLIT
+          DGAMTA=DGAMT
+         DO I=1,4
+          HVA(I)=HV(I)
+          PTA(I)=PT(I)
+          PNA(I)=PN(I)
+          PIM1A(I)=PIM1(I)
+          PIM2A(I)=PIM2(I)
+          PIPLA(I)=PIPL(I)
+          PIM3A(I)=PIM3(I)
+          PIM4A(I)=PIM4(I)
+         ENDDO
+
+      ELSE ! we write to other part of the storage space
+          MNUMB=MNUM
+          IDB=ID
+          JAK1B=JAK1
+          JAK2B=JAK2
+          JAKPB=JAKP
+          JAKMB= JAKM
+          KTOMB=KTOM
+          AMPLITB=AMPLIT        
+          DGAMTB=DGAMT
+         DO I=1,4
+          HVB(I)=HV(I)
+          PTB(I)=PT(I)
+          PNB(I)=PN(I)
+          PIM1B(I)=PIM1(I)
+          PIM2B(I)=PIM2(I)
+          PIPLB(I)=PIPL(I)
+          PIM3B(I)=PIM3(I)
+          PIM4B(I)=PIM4(I)
+         ENDDO
+       ENDIF
+
+      END
+
+C references to line numbers are approximate. Also code may differ depending to code version
+C in case of Belle software curr_cleo should read curr_binp
+
+C We have to modify our main program as given in example above. 
+C On top of that we have to (line numbers from TAUOLA standard distribution):
+
+C changes on tauola.f
+     
+C 2972a2973,2974
+C      ELSE
+C        CALL DAMPPK(MNUM,PT,PN,PIM1,PIM2,PIPL,AMPLIT,HV)
+C > C here we may overwrite with external code action
+C >       CALL TAUR3(MNUM,PT,PN,PIM1,PIM2,PIPL,AMPLIT)
+C      ENDIF
+C similar changes for 4-pions  
+C      IF     (JNPI.EQ.1) THEN
+C        CALL DAM4PI(JNPI,PT,PN,PIM1,PIM2,PIZ,PIPL,AMPLIT,HV)
+C        CALL TAUR4 (JNPI,PT,PN,PIM1,PIM2,PIZ,PIPL,AMPLIT,HV)
+C      ELSEIF (JNPI.EQ.2) THEN
+C        CALL DAM4PI(JNPI,PT,PN,PIM1,PIM2,PIPL,PIZ,AMPLIT,HV)
+C        CALL TAUR4 (JNPI,PT,PN,PIM1,PIM2,PIPL,PIZ,AMPLIT,HV)
+C      ENDIF
+
+C changes on taumain.f from demo-standalone 
+
+C 55a56
+C >       CALL TAUFIF(-1)
+C 131a133
+C >       CALL TAUFIF(0)
+C 154a157,158
+C >       CALL TAUFIF(1)
+C 166a171
+C >       CALL TAUFIF(2)
+
+C If we run uncder C++ env. such as belle software we need to add to main program:
+
+C extern "C"
+C {
+C   nofifo_();
+C   yesfifo_();
+C   taufif_(int*);
+C }
+
+C To use fifo, we need to add:
+C   yesfifo_();
+C once, at the initialization,
+C and in appropriate places lines like:
+C   int x=-1;
+C   taufif_(&x);
+C with x being equal -1, 0 ,1 and 2 respectively.
+
+C In case of belle kkmc software:
+C   yesfifo_();
+C   int x=-1;
+C   taufif_(&x);
+C needs to be added at kkmc::init() function,
+C   int x=1;
+C   taufif_(&x);
+C   kk_event_(status);
+C   x=2;
+C   taufif(&x);
+C needs to be changed in kkmc::event() function, and
+C   int x=2;
+C   taufif_(&x);
+C needs to be added to kkmc::term() function.

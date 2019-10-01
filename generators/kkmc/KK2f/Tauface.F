@@ -72,7 +72,8 @@ C  KeyA1 is used for formfactors actually not in use
 *
 *     called by : KORALZ
 * ----------------------------------------------------------------------
-      INCLUDE "BXformat.fi"
+      include '../tauola/TAUDCD_size.inc'
+      INCLUDE "BXformat.fi"      
       INTEGER   INUT,IOUT
       COMMON /INOUT/  
      $     INUT,         ! Input  unit  number (not used)
@@ -88,12 +89,11 @@ C  KeyA1 is used for formfactors actually not in use
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
-      COMMON / TAUBRA / GAMPRT(30),JLIST(30),NCHAN
+      COMMON / TAUBRA / GAMPRT(NBMC),JLIST(NBMC),NCHAN
       COMMON / TAUKLE / BRA1,BRK0,BRK0B,BRKS
       REAL*4            BRA1,BRK0,BRK0B,BRKS
 
-      PARAMETER (NMODE=15,NM1=0,NM2=1,NM3=8,NM4=2,NM5=1,NM6=3)
-      COMMON / TAUDCD /IDFFIN(9,NMODE),MULPIK(NMODE)
+      COMMON / TAUDCD /IDFFIN(JMAX,NMODE),MULPIK(NMODE)
      &                ,NAMES
       CHARACTER NAMES(NMODE)*31
 
@@ -149,7 +149,7 @@ C AJWMOD fix sign bug, 2/22/99
 
 * LIST OF BRANCHING RATIOS
       NCHAN = NMODE + 7
-      DO 1 I = 1,30
+      DO 1 I = 1,NBMC
       IF (I.LE.NCHAN) THEN
         JLIST(I) = I
 
@@ -308,6 +308,7 @@ C initialization form KK
 *
 *     called by : KORALZ
 * ----------------------------------------------------------------------
+      include '../tauola/RChL-currents/parameter.inc'
       INCLUDE "BXformat.fi"
       INTEGER   INUT,IOUT
       COMMON /INOUT/  
@@ -325,7 +326,9 @@ C initialization form KK
       PARAMETER (
      $  bxINIT ='(1x,1h*,g17.8,            16x, a31,a4,a4, 1x,1h*)'
      $ )
-*
+C initialize rchl_parameters first
+      CALL rchl_parameters(1)
+*     
 * IN-COMING / OUT-GOING  FERMION MASSES
       AMTAU  = xpar(656)
       AMNUTA = 0.010
@@ -375,7 +378,6 @@ C
       WRITE(iout,bxINIT) amel , 'AMEL  electron-mass        ','****','***'
       WRITE(iout,bxINIT) ammu , 'AMMU  muon-mass            ','****','***'
       WRITE(iout,bxclo)
-
       END
       SUBROUTINE CHOICE(MNUM,RR,ICHAN,PROB1,PROB2,PROB3,
      $            AMRX,GAMRX,AMRA,GAMRA,AMRB,GAMRB)
@@ -386,6 +388,8 @@ C
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
+C
+C      PRINT *, 'CHOICE : MNUM = ', MNUM 
 C
       AMROP=1.1
       GAMROP=0.36
@@ -553,12 +557,53 @@ C
         APKMAS=0.5488
       ELSEIF  (IDENT.EQ.-9) THEN
         APKMAS=0.5488
+      ELSEIF  (ABS(IDENT).EQ.13) THEN
+        APKMAS=AMMU
+      ELSEIF  (ABS(IDENT).EQ.11) THEN
+        APKMAS=AMEL
+      ELSEIF  (ABS(IDENT).EQ.12) THEN
+        APKMAS=0.0
+      ELSEIF  (ABS(IDENT).EQ.14) THEN
+        APKMAS=0.0
+      ELSEIF  (ABS(IDENT).EQ.22) THEN
+        APKMAS=0.0
+      ELSEIF  (ABS(IDENT).EQ.223) THEN
+        APKMAS=0.7826
+      ELSEIF  (ABS(IDENT).EQ.333) THEN
+        APKMAS=1.019
+      ELSEIF  (ABS(IDENT).EQ.113) THEN
+        APKMAS=0.7755
+      ELSEIF  (ABS(IDENT).EQ.331) THEN
+        APKMAS=0.958
+      ELSEIF  (ABS(IDENT).EQ.2212) THEN
+         APKMAS=0.938272046
+      ELSEIF  (ABS(IDENT).EQ.10211) THEN
+         APKMAS=1.45
+      ELSEIF  (ABS(IDENT).EQ.10213) THEN
+         APKMAS=1.235
+      ELSEIF  (ABS(IDENT).EQ.311) THEN
+         APKMAS=AMPIZ
+      ELSEIF  (ABS(IDENT).EQ.111) THEN
+         APKMAS=AMPIZ
+      ELSEIF  (ABS(IDENT).EQ. 221) THEN
+         APKMAS=0.5488
+      ELSEIF  (ABS(IDENT).EQ. 310) THEN
+         APKMAS=0.497614
+      ELSEIF  (ABS(IDENT).EQ. 313) THEN
+         APKMAS=0.89166
+      ELSEIF  (ABS(IDENT).EQ. 3122) THEN
+         APKMAS=1.15683
+      ELSEIF  (ABS(IDENT).EQ. 10111) THEN
+         APKMAS=0.98  
+      ELSEIF  (ABS(IDENT).EQ. 10221) THEN
+         APKMAS=0.98
       ELSE
         PRINT *, 'STOP IN APKMAS, WRONG IDENT=',IDENT
         STOP
       ENDIF
       DCDMAS=APKMAS
       END
+
       FUNCTION LUNPIK(ID,ISGN)
       COMMON / TAUKLE / BRA1,BRK0,BRK0B,BRKS
       REAL*4            BRA1,BRK0,BRK0B,BRKS
@@ -577,7 +622,7 @@ C
         IPKDEF=-321
       ELSEIF  (IDENT.EQ.-3) THEN
         IPKDEF= 321
-
+        
       ELSEIF  (IDENT.EQ. 4) THEN
 *
 * K0 --> K0_LONG (IS 130) / K0_SHORT (IS 310) = 1/1
@@ -604,6 +649,49 @@ C
         IPKDEF= 221
       ELSEIF  (IDENT.EQ.-9) THEN
         IPKDEF= 221
+      ELSEIF  (ABS(IDENT).EQ.13) THEN
+        IPKDEF=IDENT
+      ELSEIF  (ABS(IDENT).EQ.11) THEN
+        IPKDEF=IDENT 
+      ELSEIF  (ABS(IDENT).EQ.12) THEN
+        IPKDEF=IDENT
+      ELSEIF  (ABS(IDENT).EQ.14) THEN
+        IPKDEF=IDENT 
+      ELSEIF  (ABS(IDENT).EQ.223) THEN
+        IPKDEF=ABS(IDENT)
+      ELSEIF  (ABS(IDENT).EQ.333) THEN
+        IPKDEF=ABS(IDENT)
+      ELSEIF  (ABS(IDENT).EQ.113) THEN
+        IPKDEF=ABS(IDENT)
+       ELSEIF  (ABS(IDENT).EQ.331) THEN
+        IPKDEF=ABS(IDENT)
+      ELSEIF  ((IDENT).EQ.22) THEN
+        IPKDEF=IDENT
+      ELSEIF  (ABS(IDENT).EQ.2212) THEN
+        IPKDEF=IDENT
+      ELSEIF  (ABS(IDENT).EQ.10211) THEN
+        IPKDEF=IDENT
+      ELSEIF  (ABS(IDENT).EQ.10213) THEN
+        IPKDEF=IDENT
+      ELSEIF  (ABS(IDENT).EQ.311) THEN
+         IPKDEF=IDENT
+      ELSEIF  (ABS(IDENT).EQ.311) THEN
+         IPKDEF=IDENT
+      ELSEIF  (ABS(IDENT).EQ.221) THEN
+         IPKDEF=IDENT
+      ELSEIF  (ABS(IDENT).EQ.310) THEN
+         IPKDEF=ABS(IDENT)
+      ELSEIF  (ABS(IDENT).EQ.313) THEN
+         IPKDEF=IDENT   
+      ELSEIF  (ABS(IDENT).EQ.3122) THEN
+         IPKDEF=IDENT   
+      ELSEIF  (ABS(IDENT).EQ.10111 ) THEN
+         IPKDEF=ABS(IDENT)   
+      ELSEIF  (ABS(IDENT).EQ.10221 ) THEN
+         IPKDEF=ABS(IDENT)
+
+
+         
       ELSE
         PRINT *, 'STOP IN IPKDEF, WRONG IDENT=',IDENT
         STOP
@@ -611,16 +699,14 @@ C
       LUNPIK=IPKDEF
       END
 
-
-
-
       SUBROUTINE TAURDF(KTO)
 C THIS ROUTINE CAN BE CALLED BEFORE ANY TAU+ OR TAU- EVENT IS GENERATED
 C IT CAN BE USED TO GENERATE TAU+ AND TAU- SAMPLES OF DIFFERENT
 C CONTENTS
+      include '../tauola/TAUDCD_size.inc'
       COMMON / TAUKLE / BRA1,BRK0,BRK0B,BRKS
       REAL*4            BRA1,BRK0,BRK0B,BRKS
-      COMMON / TAUBRA / GAMPRT(30),JLIST(30),NCHAN
+      COMMON / TAUBRA / GAMPRT(NBMC),JLIST(NBMC),NCHAN
       IF (KTO.EQ.1) THEN
 C     ==================
 C AJWMOD: Set the BRs for (A1+ -> rho+ pi0) and (K*+ -> K0 pi+)

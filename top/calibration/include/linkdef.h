@@ -10,5 +10,6 @@
 #pragma link C++ class Belle2::TOP::TOPAsicShiftsBS13dAlgorithm-;
 #pragma link C++ class Belle2::TOP::TOPCommonT0BFAlgorithm-;
 #pragma link C++ class Belle2::TOP::TOPCommonT0LLAlgorithm-;
+#pragma link C++ class Belle2::TOP::TOPPulseHeightAlgorithm-;
 
 #endif

@@ -148,6 +148,7 @@ namespace Belle2::Conditions {
 
   void Configuration::setInputMetadata(const std::vector<FileMetaData>& inputMetadata)
   {
+    ensureEditable();
     m_inputMetadata = inputMetadata;
     // make sure the list of globaltags to be used is created but empty
     m_inputGlobaltags.emplace();

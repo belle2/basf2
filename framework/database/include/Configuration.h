@@ -113,7 +113,7 @@ namespace Belle2::Conditions {
       m_inputGlobaltags = inputTags;
     }
 
-    /** To be called by input modules wit hthe list of all input FileMetaData
+    /** To be called by input modules with the list of all input FileMetaData
      *
      * This method is to be called by input modules which have a full list of
      * FileMetaData instances for all input files. It will then check if all

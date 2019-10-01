@@ -11,7 +11,6 @@
 #include <analysis/utility/DecayNode.h>
 #include <iostream>
 #include <sstream>
-#include <cassert>
 
 namespace Belle2 {
 

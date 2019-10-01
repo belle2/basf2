@@ -14,21 +14,14 @@
 
 #include <genfit/MeasurementOnPlane.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
-#include <pxd/reconstruction/PXDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit.h>
 #include <svd/geometry/SensorInfo.h>
 #include <pxd/geometry/SensorInfo.h>
 
 #include <vxd/geometry/GeoTools.h>
 
-//#include <framework/database/DBObjPtr.h>
-
-#include <algorithm>
 #include <TDirectory.h>
 #include <TVectorD.h>
 

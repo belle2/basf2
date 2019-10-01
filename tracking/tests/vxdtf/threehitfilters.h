@@ -1,5 +1,3 @@
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 #include <tracking/vxdCaTracking/ThreeHitFilters.h>
 #include <gtest/gtest.h>
 

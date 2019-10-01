@@ -314,24 +314,6 @@ Use the central database to obtain conditions data. Usually users should only
 need to call this with one parameter which is the global tag to identify the
 payloads.
 
->>> use_central_database("my_global_tag")
-
-It might be useful to also specify the log level and invert the log messages
-when adding an additional global tag for lookups
-
->>> use_central_database("my_additional_tag", loglevel=LogLevel.WARNING, invertLogging=True)
-
-The ``payloaddir`` specifies a directory where payloads which needed to be
-downloaded will be placed. This could be set to a common absolute directory for
-all jobs to make sure the payloads only need to be downloaded once. The default
-is to place payloads into a directory called :file:`centraldb` in the local
-working directory.
-
-Warning:
-    For debugging purposes this function also allows to set the base URL for
-    the REST api and the file server but these should generally not be
-    modified.
-
 Parameters:
   globalTag (str): name of the global tag to use for payload lookup
   restBaseName (str): base URL for the REST api. This parameter is no longer supported,

@@ -6,11 +6,8 @@
 #include <analysis/dbobjects/PIDPriors.h>
 
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 #include <framework/utilities/TestHelpers.h>
-#include <TStopwatch.h>
 #include <TRandom3.h>
-#include <TMath.h>
 #include <TH2F.h>
 
 #include <gtest/gtest.h>

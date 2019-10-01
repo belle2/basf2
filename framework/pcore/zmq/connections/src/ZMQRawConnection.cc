@@ -20,6 +20,7 @@ ZMQRawInput::ZMQRawInput(const std::string& inputAddress, unsigned int maximalBu
   m_maximalBufferSize(maximalBufferSize),
   m_receiveEventMessages(receiveEventMessages)
 {
+  // We clear all our internal state and counters
   log("data_size", 0.0);
   log("received_events", 0l);
   log("event_rate", 0.0);
@@ -32,6 +33,7 @@ ZMQRawInput::ZMQRawInput(const std::string& inputAddress, unsigned int maximalBu
   log("write_address", 0l);
   log("average_number_of_events_per_package", 0l);
 
+  // STREAM is the ZMQ type for raw, non ZMQ connections
   m_socket = m_parent->createSocket<ZMQ_STREAM>(inputAddress);
 
   m_buffer.reserve(maximalBufferSize);
@@ -47,7 +49,7 @@ std::vector<zmq::message_t> ZMQRawInput::handleIncomingData()
 {
   std::vector<zmq::message_t> receivedMessages;
 
-  /// Get next event and confirm
+  // We will always get one or two parts. The first one is the identity..
   zmq::message_t identity;
   m_socket->recv(&identity);
   std::string identityString(identity.data<char>(), identity.size());
@@ -55,11 +57,12 @@ std::vector<zmq::message_t> ZMQRawInput::handleIncomingData()
   B2ASSERT("The app can only handle a single connection!",
            m_inputIdentity == identityString or m_inputIdentity.empty());
 
+  // ... and the second one is the message itself.
   const size_t remainingSpace = m_maximalBufferSize - m_writeAddress;
   const size_t receivedBytes = m_socket->recv(&m_buffer[m_writeAddress], remainingSpace);
-  B2ASSERT("The message is longer than expected!", m_socket->getsockopt<int>(ZMQ_RCVMORE) == 0);
+  B2ASSERT("The message is longer than expected! Increase the buffer size.", m_socket->getsockopt<int>(ZMQ_RCVMORE) == 0);
   if (receivedBytes == 0) {
-    // Server connects or disconnects
+    // Empty message means the client connected or disconnected
     if (m_inputIdentity.empty()) {
       m_inputIdentity = identityString;
       log("socket_state", "connected");
@@ -71,10 +74,15 @@ std::vector<zmq::message_t> ZMQRawInput::handleIncomingData()
     }
     return receivedMessages;
   }
+  // We can maximal write `remainingSpace` into the buffer. If the message was longer, ZMQ will just cut it.
+  // This means we are loosing data and the buffer size should be increased.
   if (receivedBytes > remainingSpace) {
     B2FATAL("The size of the buffer is too small! " << receivedBytes << " > " << remainingSpace);
   }
   average("average_received_byte_packages", receivedBytes);
+
+  // `m_writeAddress` always points to the index on where we will write next.
+  // As we have written `receivedBytes` we need to advance
   m_writeAddress += receivedBytes;
 
   log("write_address", static_cast<long>(m_writeAddress));
@@ -82,7 +90,11 @@ std::vector<zmq::message_t> ZMQRawInput::handleIncomingData()
   // If the current buffer is smaller than an int, we can not get the size
   while (m_writeAddress >= sizeof(int)) {
     if (m_currentSize == 0) {
+      // we do not know the size of the data package already, so lets get it from the buffer.
+      // It is always in the first sizeof(int) of the data
       memcpy(&m_currentSize, &m_buffer[0], sizeof(int));
+
+      // Here the two different message formats differ
       if (m_receiveEventMessages) {
         m_currentSize = ntohl(m_currentSize);
       }
@@ -96,12 +108,16 @@ std::vector<zmq::message_t> ZMQRawInput::handleIncomingData()
       log("current_size", static_cast<long>(m_currentSize));
     }
     if (m_writeAddress >= m_currentSize) {
+      // Now we know the size already, and we have enough data received so we have actually the full
+      // data. We can build the total message.
       average("data_size", m_currentSize);
       increment("received_events");
       timeit("event_rate");
 
+      // Again, here the two different message formats differ. One includes the first int with the length...
       unsigned int startAddress = 0;
       if (m_receiveEventMessages) {
+        // .. and the other does not
         startAddress = sizeof(int);
       }
       zmq::message_t dataMessage(&m_buffer[startAddress], static_cast<size_t>(m_currentSize - startAddress));
@@ -128,6 +144,7 @@ ZMQRawOutput::ZMQRawOutput(const std::string& outputAddress, bool addEventSize,
                            const std::shared_ptr<ZMQParent>& parent) : ZMQConnectionOverSocket(
                                parent), m_addEventSize(addEventSize)
 {
+  // We clear all our internal state and counters
   log("data_size", 0.0);
   log("sent_events", 0l);
   log("event_rate", 0.0);
@@ -136,11 +153,13 @@ ZMQRawOutput::ZMQRawOutput(const std::string& outputAddress, bool addEventSize,
   log("socket_connects", 0l);
   log("socket_disconnects", 0l);
 
+  // STREAM is the ZMQ type for raw, non ZMQ connections
   m_socket = m_parent->createSocket<ZMQ_STREAM>(outputAddress);
 }
 
 void ZMQRawOutput::handleEvent(zmq::message_t message)
 {
+  // Send the message. If requested, add the message size in front of the message
   B2ASSERT("Data Socket needs to be connected", not m_dataIdentity.empty());
 
   const auto dataSize = message.size();
@@ -163,6 +182,7 @@ void ZMQRawOutput::handleEvent(zmq::message_t message)
 
 void ZMQRawOutput::handleIncomingData()
 {
+  // The only possibility that we can receive a message is when the client connects or disconnects
   zmq::message_t identity;
   m_socket->recv(&identity);
   zmq::message_t nullMessage;
@@ -183,5 +203,6 @@ void ZMQRawOutput::handleIncomingData()
 
 bool ZMQRawOutput::isReady() const
 {
+  // Only ready of the client connected
   return not m_dataIdentity.empty();
 }

@@ -26,10 +26,11 @@ namespace Belle2 {
    * message is complete it is returned wrapped up as a zmq:message_t.
    *
    * Two message formats are understood:
-   * * of receiveEventMessages is set to false, the first int of the message must be
-   *   the size of the message in ints (so full message size in bytes = first int * sizeof(int))
-   *   Please note that this size also includes this first int (so the real data message is
-   *   first int * sizeof(int) - sizeof(int))
+   * * if receiveEventMessages is set to false, the first int of the message must be
+   *   the size L of the message, in units of sizeof(int) = words.
+   *   (so full message size in bytes = L * sizeof(int))
+   *   Please note that this size also includes this first int, so the real data message
+   *   has a size in bytes of L * sizeof(int) - sizeof(int)
    * * if it is true, the first int of the message must be the ntohl-converted
    *   size of the message in bytes *without this first size int*.
    *
@@ -46,7 +47,7 @@ namespace Belle2 {
      * Returns only full messages as zmq:message_t. Please note that this can be
      * * 0 messages if there has not been a full message so far
      * * 1 message if there was
-     * * more than 1 of the message size is smaller than the TCP package size (~8kB)
+     * * more than 1 if the message size is smaller than the TCP package size (~8kB)
      */
     std::vector<zmq::message_t> handleIncomingData();
 

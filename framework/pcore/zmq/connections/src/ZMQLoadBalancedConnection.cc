@@ -17,13 +17,16 @@ using namespace Belle2;
 ZMQLoadBalancedInput::ZMQLoadBalancedInput(const std::string& inputAddress, unsigned int bufferSize,
                                            const std::shared_ptr<ZMQParent>& parent) : ZMQConnectionOverSocket(parent)
 {
+  // We clear all our internal state and counters
   log("sent_ready", 0l);
   log("data_size", 0.0);
   log("received_events", 0l);
   log("event_rate", 0.0);
 
+  // Create a non-binding DEALER socket
   m_socket = m_parent->createSocket<ZMQ_DEALER>(inputAddress, false);
 
+  // Send as many ready message as our buffer size is. This means we will get that many events, which will then be "in flight"
   for (unsigned int i = 0; i < bufferSize; i++) {
     auto readyMessage = ZMQMessageFactory::createMessage(EMessageTypes::c_readyMessage);
     ZMQParent::send(m_socket, std::move(readyMessage));
@@ -36,10 +39,12 @@ std::unique_ptr<ZMQNoIdMessage> ZMQLoadBalancedInput::handleIncomingData()
   auto message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
 
   if (message->isMessage(EMessageTypes::c_rawDataMessage) or message->isMessage(EMessageTypes::c_eventMessage)) {
+    // if it is an event message, return a ready message back. If not, no need for that.
     auto readyMessage = ZMQMessageFactory::createMessage(EMessageTypes::c_readyMessage);
     ZMQParent::send(m_socket, std::move(readyMessage));
     increment("sent_ready");
 
+    // and also do some logging
     const auto dataSize = message->getDataMessage().size();
 
     average("data_size", dataSize);
@@ -54,6 +59,7 @@ ZMQLoadBalancedOutput::ZMQLoadBalancedOutput(const std::string& outputAddress, b
                                              const std::shared_ptr<ZMQParent>& parent) : ZMQConnectionOverSocket(
                                                  parent), m_lax(lax)
 {
+  // We clear all our internal state and counters
   log("ready_queue_size", static_cast<long>(m_readyWorkers.size()));
   log("registered_workers", static_cast<long>(m_allWorkers.size()));
 
@@ -70,6 +76,7 @@ ZMQLoadBalancedOutput::ZMQLoadBalancedOutput(const std::string& outputAddress, b
   log("sent_terminate_messages",  0l);
   log("last_terminate_sent",  "");
 
+  // Create a binding ROUTER socket
   m_socket = m_parent->createSocket<ZMQ_ROUTER>(outputAddress, true);
 }
 
@@ -100,6 +107,7 @@ void ZMQLoadBalancedOutput::handleEvent(std::unique_ptr<ZMQNoIdMessage> message)
   }
 
   if (m_lax and m_readyWorkers.empty()) {
+    // There is no one that can handle the event in the moment, dismiss it (if lax is true)
     increment("dismissed_events");
     return;
   }
@@ -136,18 +144,22 @@ void ZMQLoadBalancedOutput::handleIncomingData()
   auto readyMessage = ZMQMessageFactory::fromSocket<ZMQIdMessage>(m_socket);
   B2ASSERT("Should be a ready message", readyMessage->isMessage(EMessageTypes::c_readyMessage));
 
+  // Register it as another ready worker
   const auto toIdentity = readyMessage->getIdentity();
   m_readyWorkers.push_back(toIdentity);
 
   if (m_allWorkers.find(toIdentity) == m_allWorkers.end()) {
+    // Aha, we did never see this worker so far, so add it to our list.
     m_allWorkers.emplace(toIdentity);
 
     if (m_sentStopMessages) {
+      // If it turned up late (everyone else has already stopped), send a stop message directly
       auto sendMessage = ZMQMessageFactory::createMessage(toIdentity, EMessageTypes::c_lastEventMessage);
       ZMQParent::send(m_socket, std::move(sendMessage));
     }
 
     if (m_sentTerminateMessages) {
+      // If it turned up late (everyone else has already terminates), send a terminate message directly
       auto sendMessage = ZMQMessageFactory::createMessage(toIdentity, EMessageTypes::c_terminateMessage);
       ZMQParent::send(m_socket, std::move(sendMessage));
     }
@@ -169,5 +181,6 @@ void ZMQLoadBalancedOutput::clear()
 
 bool ZMQLoadBalancedOutput::isReady() const
 {
+  // if we are lax, we are always ready. If not, we need to have at least a single ready worker. This prevents the B2ASSERT to fail.
   return m_lax or not m_readyWorkers.empty();
 }

@@ -21,6 +21,7 @@ bool ZMQConnection::isReady() const
 
 bool ZMQConnection::hasMessage(const ZMQConnection* connection)
 {
+  // Just poll with 0 timeout and no reaction function. Hacky trick to reduce code duplication
   const auto emptyFunction = []() {};
   return ZMQConnection::poll({{connection, emptyFunction}}, 0);
 }
@@ -30,6 +31,7 @@ bool ZMQConnection::poll(const std::map<const ZMQConnection*, ZMQConnection::Rea
   std::vector<const ReactorFunction*> socketMapping;
   std::vector<zmq::pollitem_t> pollItems;
 
+  // zmq needs a special format for its polling, so create it here.
   for (const auto& [connection, function] : connectionList) {
     auto sockets = connection->getSockets();
     for (zmq::socket_t* socket : sockets) {
@@ -39,6 +41,7 @@ bool ZMQConnection::poll(const std::map<const ZMQConnection*, ZMQConnection::Rea
       pollItem.revents = 0;
       pollItems.push_back(std::move(pollItem));
 
+      // but keep reference to the original function, so we can call the correct one later
       socketMapping.push_back(&function);
     }
   }
@@ -65,6 +68,7 @@ bool ZMQConnection::poll(const std::map<const ZMQConnection*, ZMQConnection::Rea
     return anySocket;
   } catch (zmq::error_t& error) {
     if (error.num() == EINTR) {
+      // Could happen if there was an interrupt, return false so the caller knows the time did not pass already
       return false;
     } else {
       // cannot handle, rethrow exception

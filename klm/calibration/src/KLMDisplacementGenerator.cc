@@ -18,9 +18,6 @@
 #include <klm/calibration/KLMDisplacementGenerator.h>
 
 #include <framework/core/RandomNumbers.h>
-#include <framework/database/Database.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
 #include <framework/gearbox/Unit.h>
 
 using namespace Belle2;
@@ -61,7 +58,6 @@ void KLMDisplacementGenerator::fillZeroDisplacements(
 void KLMDisplacementGenerator::generateFixedModuleDisplacement(
   double deltaU, double deltaV, double deltaGamma)
 {
-  IntervalOfValidity iov(0, 0, -1, -1);
   EKLMAlignment alignment;
   EKLMSegmentAlignment segmentAlignment;
   KLMAlignmentData moduleAlignment(deltaU, deltaV, 0, 0, 0, deltaGamma);
@@ -83,7 +79,6 @@ void KLMDisplacementGenerator::generateRandomDisplacement(
   bool displaceModule, bool displaceSegment, bool moduleSameDisplacement,
   bool moduleZeroDeltaU, bool moduleZeroDeltaV, bool moduleZeroDeltaGamma)
 {
-  IntervalOfValidity iov(0, 0, -1, -1);
   const double moduleMaxDeltaU = 5. * Unit::cm;
   const double moduleMinDeltaU = -5. * Unit::cm;
   const double moduleMaxDeltaV = 5. * Unit::cm;
@@ -192,7 +187,6 @@ void KLMDisplacementGenerator::readDisplacementFromROOTFile(
   /* cppcheck-suppress variableScope */
   int i, n, iSection, iLayer, iSector, iPlane, iSegment, segment, param;
   float value;
-  IntervalOfValidity iov(0, 0, -1, -1);
   TFile* f;
   TTree* tEKLMModule, *tEKLMSegment;
   KLMAlignmentData* alignmentData;

@@ -37,7 +37,7 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
       Create a new alias.
 
       Variable names are deliberately verbose and explicit (to avoid ambiguity).
-      However, it is often not desirable to deal with long unwieldy variable names particularly in the context of :doc:`Variable Manager Output`.
+      However, it is often not desirable to deal with long unwieldy variable names particularly in the context of :doc:`VariableManagerOutput`.
 
       Example:
 
@@ -192,7 +192,7 @@ All ECLCluster-based variables return NaN if no ECLCluster is found.
         - All ECL cluster variables are clipped at the lower and upper boundaries: Values below (above)
           these boundaries will be set to the lower (upper) bound.
     
-    Lower and uppper limits, and precision of these variables are mentioned inside the note box below them.
+    Lower and upper limits, and precision of these variables are mentioned inside the note box below them.
     One should note this in the context of binning effects.
 
 
@@ -496,7 +496,7 @@ Writing your own variable
 
 The code of VariableManager lives inside the analysis package. If you want to write your own variables you have a couple of options. You can (and should) try to make your variables general, so that they are useful for many collaborators. In this case, we recommend you make a pull request. Then your variables will be made available in a central release to many people.
 
-In case you have something really analysis-specific that noone else will need. You can still use the VariableManager.
+In case you have something really analysis-specific that no one else will need. You can still use the VariableManager.
 
 Below are step-by-step instructions for implementation of helicity angle for arbitrary granddaughter particle.
 
@@ -505,9 +505,9 @@ Step 1. Check whether your function would fit in any of the existing source file
 
 If yes, go to the next step. 
 
-If not, create new header/source files. In case of our example, we will create `AngularVariables.h` and `AngularVariables.cc`
+If not, create new header/source files. In case of our example, we will create ``AngularVariables.h`` and ``AngularVariables.cc``
 
-`AngularVariables.h` in `analysis/VariableManager/include/`:
+``AngularVariables.h`` in ``analysis/VariableManager/include/``:
 
 .. code:: C++
 
@@ -528,7 +528,7 @@ If not, create new header/source files. In case of our example, we will create `
   } // Belle2 namespace
 
 
-`AngularVariables.cc` in `analysis/VariableManager/src/`:
+``AngularVariables.cc`` in ``analysis/VariableManager/src/``:
 
 .. code:: C++
 
@@ -552,7 +552,7 @@ Here we define a method helicityAngle that has 3 arguments:
   * index of the daughter Particle
   * index of the granddaughter (daughter's daughter) Particle
 
-in the `AngularVariable.h` header file. The return value of every variable has to be double.
+in the ``AngularVariable.h`` header file. The return value of every variable has to be double.
 
 .. code:: C++
 
@@ -643,7 +643,7 @@ You can use your variable in the same way as you use standard variables.
 How to use my variable at grid?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  * Prepare the environment with `b2analysis-create` tool.
+  * Prepare the environment with the ``b2analysis-create`` tool.
 
 >>> b2analysis-create myanalysis <current central release, e.g. release-04-00-00> 
 >>> cd myanalysis
@@ -671,7 +671,7 @@ How to use my variable at grid?
 
 Then:
 
-  * Run scons and you will get a `.so` and a `.b2modmap` files in `modules/Linux_x86_64/opt`.
+  * Run scons and you will get a ``.so`` and a ``.b2modmap`` files in ``modules/Linux_x86_64/opt``.
 
   * Load the libraries and make the variables available you need to add these lines to your steering file:
 
@@ -688,10 +688,10 @@ This is enough to load the library and register the variables.
 Now you should be able to use your custom variables for your analysis and there is no need to add this 
 module to the path, it just needs to be registered to load the library.
 
-In the end you can run your analysis on the grid adding the `.so` and `.map` files to the input sandbox 
-with the -f option of `gbasf2`:
+In the end you can run your analysis on the grid adding the ``.so`` and ``.map`` files to the input sandbox 
+with the -f option of ``gbasf2``:
 
 >>> gbasf2 ./steering.py -p project -i dataset -f myanalysis.so myanalysis.b2modmap
 
-.. warning:: This line implies that you already have working `gbasf2` installation and `gbasf2` syntax didn't 
+.. warning:: This line implies that you already have working ``gbasf2`` installation and ``gbasf2`` syntax didn't 
   change since the moment of writing. Please refer gbasf2 `documentation <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ for more details.

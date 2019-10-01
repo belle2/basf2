@@ -10,7 +10,7 @@ First, you must run it
 MCMatching relates ``Particle`` and ``MCParticle`` objects. 
 
 .. important:: 
-        Most MC matching variables will have non-trivial values only if the :b2:mod:`MCMatching` module is actually executed.
+        Most MC matching variables will have non-trivial values only if the :b2:mod:`MCMatcherParticles` module is actually executed.
         It can be executed by adding the module to your path, there is a `modularAnalysis.matchMCTruth` convenience function to do this.
 
 
@@ -49,11 +49,11 @@ The error flags
 
 The error flag :b2:var:`mcErrors` is a bit set where each bit flag describes
  a different kind of discrepancy between reconstruction and ``MCParticle``. 
- The individual flags are described by the `MCMatching::MCErrorFlags` enum. 
+ The individual flags are described by the ``MCMatching::MCErrorFlags`` enum.
  A value of mcErrors equal to 0 indicates perfect reconstruction (signal). 
  Usually candidates with only FSR photons missing are also considered as signal, 
- so you might want to ignore the corresponding `c_MissFSR` flag. 
- The same is true for `c_MissingResonance`, which is set for any missing composite particle (e.g. :math:`K_1`, but also :math:`D^{*0}`).
+ so you might want to ignore the corresponding ``c_MissFSR`` flag.
+ The same is true for ``c_MissingResonance``, which is set for any missing composite particle (e.g. :math:`K_1`, but also :math:`D^{*0}`).
 
 
 =============================  ================================================================================================
@@ -190,7 +190,7 @@ This will produce a file with all of the decay strings in it, along with the dec
 (hashes the decay string of the mother and daughter particles).  
 The mapping of hashes to full MC decay strings is stored in a ROOT file determined by the fileName parameter.
 
-Then the :b2:mod:`decayHash` and :b2:mod:`decayHashExtended` are available in the `VariableManager`.
+Then the variables ``extraInfo(decayHash)`` and ``extraInfo(decayHashExtended)`` are available in the `VariableManager`.
 
 ------------------
 Tau decay MC modes

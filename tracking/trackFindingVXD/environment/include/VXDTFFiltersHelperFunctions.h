@@ -11,7 +11,6 @@
 
 #include <fstream>
 #include <string>
-#include <sstream>
 
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>

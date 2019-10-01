@@ -9,10 +9,7 @@
  **************************************************************************/
 
 #include <analysis/modules/TauDecayMarker/TauDecayMarkerModule.h>
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/Particle.h>
-
-#include <mdst/dataobjects/MCParticleGraph.h>
+#include <analysis/dataobjects/TauPairDecay.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

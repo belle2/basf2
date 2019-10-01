@@ -13,7 +13,6 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <svd/dataobjects/SVDRecoDigit.h>
@@ -22,15 +21,10 @@
 #include <tracking/dataobjects/SVDIntercept.h>
 
 #include <unordered_map>
-#include <map>
-#include <vector>
 #include <utility>
 #include <functional>
 #include <TH1.h>
 #include <TH1F.h>
-#include <TH2F.h>
-#include <TFile.h>
-#include <iostream>
 
 namespace Belle2 {
 

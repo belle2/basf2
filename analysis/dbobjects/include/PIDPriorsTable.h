@@ -9,8 +9,9 @@
  **************************************************************************/
 
 #pragma once
-#include <framework/logging/Logger.h>
-#include <cfloat>
+
+#include <vector>
+#include <string>
 
 namespace Belle2 {
 

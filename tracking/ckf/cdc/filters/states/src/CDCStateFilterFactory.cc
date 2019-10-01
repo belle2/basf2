@@ -13,15 +13,11 @@
 #include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/AndFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NegativeFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 #include <tracking/ckf/cdc/filters/states/CDCStateBasicVarSet.h>
-#include <tracking/ckf/cdc/filters/states/CDCStateTruthVarSet.h>
 #include <tracking/ckf/cdc/filters/states/CDCfromEclStateTruthVarSet.h>
 
 #include <tracking/ckf/cdc/filters/states/MCTruthCDCStateFilter.h>

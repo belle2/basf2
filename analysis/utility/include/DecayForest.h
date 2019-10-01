@@ -13,12 +13,8 @@
 
 #include <analysis/utility/DecayTree.h>
 
-
 #include <vector>
-#include <list>
 #include <string>
-#include <algorithm>
-
 
 namespace Belle2 {
   /**

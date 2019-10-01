@@ -17,7 +17,6 @@
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <string>
-#include <TTree.h>
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>

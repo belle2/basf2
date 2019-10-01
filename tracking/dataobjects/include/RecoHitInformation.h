@@ -18,10 +18,6 @@
 
 #include <framework/datastore/RelationsObject.h>
 
-namespace genfit {
-  class TrackPoint;
-}
-
 namespace Belle2 {
   /**
    * This class stores additional information to every CDC/SVD/PXD hit stored in a RecoTrack.

@@ -16,6 +16,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
+#include <framework/datastore/StoreArray.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>

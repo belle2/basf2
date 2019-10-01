@@ -10,7 +10,6 @@
 
 #include <tracking/modules/pruneRecoTracks/PruneRecoHitsModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;
 

@@ -17,16 +17,12 @@
 
 // OrcaKinFit
 #include <analysis/OrcaKinFit/BaseFitter.h>
-#include <analysis/OrcaKinFit/OPALFitterGSL.h>
-#include <analysis/OrcaKinFit/NewtonFitterGSL.h>
-#include <analysis/OrcaKinFit/NewFitterGSL.h>
 #include <analysis/OrcaKinFit/TextTracer.h>
 
 // Constraints
 #include <analysis/OrcaKinFit/MomentumConstraint.h>
 #include <analysis/OrcaKinFit/RecoilMassConstraint.h>
 #include <analysis/OrcaKinFit/MassConstraint.h>
-#include <analysis/OrcaKinFit/SoftGaussMomentumConstraint.h>
 
 // Fitobjects
 #include <analysis/OrcaKinFit/ParticleFitObject.h>
@@ -35,22 +31,15 @@
 #include <analysis/dataobjects/EventExtraInfo.h>
 
 // framework datastore
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // ROOT
 #include <TLorentzVector.h>
 #include <TMatrixFSym.h>
-#include <TH1D.h>
-#include <TFile.h>
 
 // CLHEOP
-#include <CLHEP/Matrix/Matrix.h>
 #include <CLHEP/Matrix/SymMatrix.h>
-#include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Vector/LorentzVector.h>
-#include <CLHEP/Geometry/Point3D.h>
-
 
 namespace Belle2 {
   class Particle;

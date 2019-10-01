@@ -11,9 +11,7 @@
 #pragma once
 
 #include <TTree.h>
-#include <TObject.h>
 #include <tracking/trackFindingVXD/filterMap/filterFramework/TBranchLeafType.h>
-#include <type_traits>
 
 namespace Belle2 {
 

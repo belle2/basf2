@@ -13,7 +13,6 @@
 #include <tracking/dataobjects/FullSecID.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include <string>
 #include <vector>
 #include <utility> // std::pair
 

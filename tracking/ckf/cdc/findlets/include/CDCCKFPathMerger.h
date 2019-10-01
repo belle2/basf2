@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
-#include <tracking/ckf/general/utilities/CKFFunctors.h>
 
 #include <boost/range/adaptor/reversed.hpp>
 #include <boost/functional/hash.hpp>

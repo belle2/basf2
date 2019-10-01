@@ -7,7 +7,6 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/Logger.h>
 
 #include <gtest/gtest.h>
 

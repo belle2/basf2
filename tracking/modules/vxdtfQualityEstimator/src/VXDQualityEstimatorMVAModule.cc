@@ -11,7 +11,6 @@
 #include <tracking/modules/vxdtfQualityEstimator/VXDQualityEstimatorMVAModule.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRandom.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <framework/geometry/BFieldManager.h>
 

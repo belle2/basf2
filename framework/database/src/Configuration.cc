@@ -12,6 +12,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/database/Downloader.h>
+#include <framework/database/Database.h>
 #include <boost/python.hpp>
 #include <framework/core/PyObjConvUtils.h>
 #include <boost/algorithm/string.hpp>
@@ -120,6 +121,14 @@ namespace Belle2::Conditions {
     std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", "http://belle2db.sdcc.bnl.gov/b2s/rest/");
     fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", serverList + " /cvms/belle.cern.ch/conditions/database.sqlite");
     fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", "/cvmfs/belle.cern.ch/conditions");
+  }
+
+  void Configuration::reset()
+  {
+    if (m_databaseInitialized) {
+      Database::Instance().reset(true);
+    }
+    *this = Configuration();
   }
 
   std::vector<std::string> Configuration::getDefaultGlobalTags() const

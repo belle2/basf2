@@ -74,7 +74,7 @@ static bool compareDistance(KLMHit2d& hit1, KLMHit2d& hit2)
 void KLMClustersReconstructorModule::event()
 {
   //static double mass = TDatabasePDG::Instance()->GetParticle(130)->Mass();
-  int i, n, nLayers, innermostLayer, nHits;
+  int i, nLayers, innermostLayer, nHits;
   int nLayersBKLM = BKLMElementNumbers::getMaximalLayerNumber();
   int nLayersEKLM = EKLMElementNumbers::getMaximalLayerNumber();
   int* layerHitsBKLM, *layerHitsEKLM;
@@ -87,14 +87,14 @@ void KLMClustersReconstructorModule::event()
   layerHitsBKLM = new int[nLayersBKLM];
   layerHitsEKLM = new int[nLayersEKLM];
   /* Fill vector of 2d hits. */
-  nHits = m_BKLMHit2ds.getEntries();
-  for (i = 0; i < nHits; i++) {
+  int nHitsBKLM = m_BKLMHit2ds.getEntries();
+  for (i = 0; i < nHitsBKLM; i++) {
     if (m_BKLMHit2ds[i]->isOutOfTime())
       continue;
     klmHit2ds.push_back(KLMHit2d(m_BKLMHit2ds[i]));
   }
-  nHits = m_EKLMHit2ds.getEntries();
-  for (i = 0; i < n; i++) {
+  int nHitsEKLM = m_EKLMHit2ds.getEntries();
+  for (i = 0; i < nHitsEKLM; i++) {
     klmHit2ds.push_back(KLMHit2d(m_EKLMHit2ds[i]));
   }
   /* Sort by the distance from center. */

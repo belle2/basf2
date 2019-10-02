@@ -2084,7 +2084,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("bssMassDifference(maskName)", bssMassDifference,
                       "Bs* - Bs mass difference");
 
-    REGISTER_VARIABLE("wecosThetaEll(maskName)", WE_cosThetaEll, R"DOC(
+    REGISTER_VARIABLE("weCosThetaEll(maskName)", WE_cosThetaEll, R"DOC(
 
 Returns the angle between $M$ and lepton in W rest frame in the decays of the type:
 :math`M \to h_1 ... h_n \ell`, where W 4-momentum is given as

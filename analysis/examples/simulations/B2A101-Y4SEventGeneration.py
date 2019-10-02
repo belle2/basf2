@@ -42,7 +42,7 @@ ma.setupEventInfo(noEvents=100, path=my_path)
 ge.add_evtgen_generator(path=my_path,
                         finalstate='signal',
                         signaldecfile=b2.find_file(
-                            'analysis/examples/tutorials/B2A101-Y4SEventGeneration.dec'))
+                            'analysis/examples/simulations/B2A101-Y4SEventGeneration.dec'))
 
 # If the simulation and reconstruction is not performed in the sam job,
 # then the Gearbox needs to be loaded with the loadGearbox() function.

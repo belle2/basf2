@@ -19,7 +19,7 @@ for the IP position.
 
 This script requires access to the BELLE postgres database so it should be run on
 KEKCC or proper port forwarding needs to be setup and BELLE_POSTGRESS_SERVER
-needs to point to it prior to runing this script.
+needs to point to it prior to running this script.
 """
 
 from ROOT import PyConfig

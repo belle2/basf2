@@ -51,6 +51,7 @@ To access the event shape variables you have to append the EventShapeCalculator 
 making them available to the `VariableManager`. You can do this simply adding the `modularAnalysis.buildEventShape()` function to your analysis path:
 
 .. autofunction:: modularAnalysis.buildEventShape
+   :noindex:
 
 
 This is a very minimal implementation of the event shape in a steering file:

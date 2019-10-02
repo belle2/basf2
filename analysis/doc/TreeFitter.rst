@@ -32,6 +32,7 @@ For example, a selection of :math:`0.130 < \texttt{InvM} < 0.14~\rm{GeV}/c^2` al
 
 
 .. autofunction:: vertex.vertexTree
+   :noindex:
 
 Troubleshooting
 ---------------

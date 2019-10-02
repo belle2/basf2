@@ -50,7 +50,8 @@ namespace Belle2 {
     Module(), m_pdgCode(0)
   {
     // set module description (e.g. insert text)
-    setDescription(R"DOC(This module copies each particle in the ``inputList`` to the ``outputList`` and uses
+    setDescription(R"DOC(
+    This module copies each particle in the ``inputList`` to the ``outputList`` and uses
     the results of the **eclTrackBremFinder** module to look for possible bremsstrahlung photons; if these 
     photons exists, it adds their four momentum to the particle in the ``outputList``. 
     It also adds the original particle and these photons as daughters of the new, corrected particle. 

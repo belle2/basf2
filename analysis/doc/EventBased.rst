@@ -62,6 +62,7 @@ This builds the list of all pions but only processes events where the event-leve
 .. See :download:`B2A307 </analysis/examples/tutorials/B2A307-BasicEventWiseNtupleSelection.py>` for a full example.
 
 .. autofunction:: modularAnalysis.applyEventCuts
+   :noindex:
 
 Event based variables
 ~~~~~~~~~~~~~~~~~~~~~

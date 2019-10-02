@@ -30,7 +30,7 @@ buildContinuumSuppression('B-:all', 'basic', path=path)
 variables.addAlias('d0_p', 'daughter(0,p)')
 variables.addAlias('d0_electronID', 'daughter(0,electronID)')
 variables.addAlias('d0_muonID', 'daughter(0,muonID)')
-variables.addAlias('MissP', 'WE_MissP(basic,0)')
+variables.addAlias('MissP', 'weMissP(basic,0)')
 
 histogramFilename = 'LeptonicUntagged_Validation.root'
 myEmail = 'Phil Grace <philip.grace@adelaide.edu.au>'

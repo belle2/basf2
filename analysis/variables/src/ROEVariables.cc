@@ -2047,10 +2047,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("roeMbc(maskName)", ROE_Mbc,
                       "Returns beam constrained mass of the related RestOfEvent object with respect to E_cms/2.");
 
-    REGISTER_VARIABLE("wedeltae(maskName, opt)", WE_DeltaE,
+    REGISTER_VARIABLE("weDeltae(maskName, opt)", WE_DeltaE,
                       "Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.");
 
-    REGISTER_VARIABLE("wembc(maskName, opt)", WE_Mbc,
+    REGISTER_VARIABLE("weMbc(maskName, opt)", WE_Mbc,
                       "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.");
 
     REGISTER_VARIABLE("weMissM2(maskName, opt)", WE_MissM2,
@@ -2078,7 +2078,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("weMissE(maskName, opt)", WE_MissE,
                       "Returns the energy of the missing momentum");
 
-    REGISTER_VARIABLE("wexiZ(maskName)", WE_xiZ,
+    REGISTER_VARIABLE("weXiZ(maskName)", WE_xiZ,
                       "Returns Xi_z in event (for Bhabha suppression and two-photon scattering)");
 
     REGISTER_VARIABLE("bssMassDifference(maskName)", bssMassDifference,

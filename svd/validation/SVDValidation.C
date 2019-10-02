@@ -53,7 +53,7 @@ void addDetails(TH1F* h, const char* descr, const char* check, const char* conta
   h->GetListOfFunctions()->Add(new TNamed("Check", check));
   h->GetListOfFunctions()->Add(new TNamed("Contact", contact_str));
   if (isShifter)
-    h->GetListOfFunctions()->Add(new TNamed("MetaOption", "shifter"));
+    h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
   
 }
 
@@ -63,7 +63,7 @@ void add2Details(TH2F* h, const char* descr, const char* check, const char* cont
   h->GetListOfFunctions()->Add(new TNamed("Check", check));
   h->GetListOfFunctions()->Add(new TNamed("Contact", contact_str));
   if (isShifter)
-    h->GetListOfFunctions()->Add(new TNamed("MetaOption", "shifter"));
+    h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
   
 }
 

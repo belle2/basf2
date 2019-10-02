@@ -368,9 +368,9 @@ def correctBrems(
     path=None,
 ):
     """
-    For each particle in the given `inputList`, copies it to the `outputList` and adds the
-    4-vector of the photon(s) in the `gammaList` which has(have) a weighted named relation to
-    the particle's track, set by the :b2:mod:`eclTrackBremFinder` module during reconstruction.
+    For each particle in the given ``inputList``, copies it to the ``outputList`` and adds the
+    4-vector of the photon(s) in the ``gammaList`` which has(have) a weighted named relation to
+    the particle's track, set by the ``ECLTrackBremFinder`` module during reconstruction.
 
     Warning:
         This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
@@ -380,9 +380,9 @@ def correctBrems(
         Please note that a new particle is always generated, with the old particle and -if found- one or more
         photons as daughters.
 
-        The `inputList` should contain particles with associated tracks. Otherwise the module will exit with an error.
+        The ``inputList`` should contain particles with associated tracks. Otherwise the module will exit with an error.
 
-        The `gammaList` should contain photons. Otherwise the module will exit with an error.
+        The ``gammaList`` should contain photons. Otherwise the module will exit with an error.
 
     @param outputList   The output particle list name containing the corrected particles
     @param inputList    The initial particle list name containing the particles to correct. *It should already exist.*
@@ -390,7 +390,7 @@ def correctBrems(
     @param maximumAcceptance Maximum value of the relation weight. Should be a number between [0,3)
     @param multiplePhotons Whether to use only one photon (the one with the smallest acceptance) or as many as possible
     @param usePhotonOnlyOnce If true, each brems candidate is used to correct only the track with the smallest relation weight
-    @param writeOut      Whether `RootOutput` module should save the created `outputList`
+    @param writeOut      Whether `RootOutput` module should save the created ``outputList``
     @param path          The module is added to this path
     """
 
@@ -484,9 +484,9 @@ def correctBremsBelle(
        gammaListName (str): The gammas list containing possibly radiative gammas, should already exist.
        multiplePhotons (bool): How many photons should be added to the charged particle? nearest one -> False,
              add all the photons within the cone -> True
-       angleThreshold (double): The maximum angle in radians between the charged particle and the (radiative)
+       angleThreshold (float): The maximum angle in radians between the charged particle and the (radiative)
               gamma to be accepted.
-       minimumEnergy (double): The minimum energy in GeV of the (radiative) gamma to be accepted.
+       minimumEnergy (float): The minimum energy in GeV of the (radiative) gamma to be accepted.
        writeOut (bool): whether RootOutput module should save the created ParticleList
        path (basf2.Path): modules are added to this path
     """

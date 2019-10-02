@@ -73,7 +73,7 @@ To use the module add it to the path::
 There are more parameters which are based on optimisations we made. I strongly recommend to not touch them.
 
 FAQ:
-###############
+####
 - The TreeFitter is extremely sensitive to how the initial covariance matrix is initialised, we haven't found a good general way to do it. If you see that the signal efficiency of you fit is below 95% this might be the problem. Feel free to report this. But keep in mind garbage in -> garbage out.  
 - Currently we are constraint by stack sizes to not extract more than 100 parameters per fit. If this is a problem report this and this can be extended (at the cost of speed of the fits).
 

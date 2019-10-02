@@ -323,20 +323,29 @@ def setupEventInfo(noEvents, path):
     path.add_module(evtnumbers)
 
 
-def loadGearbox(path):
+def loadGearbox(path, silence_warning=False):
     """
     Loads Gearbox module to the path.
 
     Warning:
-        Should be used in a job with event generation only
+        Should be used in a job with *cosmic event generation only*
 
-    Needed for scripts which only generate events (without simulation
-    and reconstruction) in order to load the geometry.
-
-    See also: the tutorial ``B2A101-Y4SEventGeneration.py``.
+    Needed for scripts which only generate cosmic events in order to
+    load the geometry.
 
     @param path modules are added to this path
+    @param silence_warning stops a verbose warning message if you know you want to use this function
     """
+
+    if not silence_warning:
+        B2WARNING("""You are overwriting the geometry from the database with Gearbox.
+This is fine if you're generating cosmic events. But in most other cases you probably don't want this.
+
+If you're really sure you know what you're doing you can suppress this message with:
+
+>>> loadGearbox(silence_warning=True)
+
+                  """)
 
     paramloader = register_module('Gearbox')
     path.add_module(paramloader)

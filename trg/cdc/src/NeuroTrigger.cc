@@ -4,9 +4,12 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
-
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/DataStore.h>
+#include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-
+#include <string>
 #include <cmath>
 #include <TFile.h>
 
@@ -249,7 +252,7 @@ void
 NeuroTrigger::initializeCollections(string hitCollectionName, string eventTimeName, std::string et_option)
 {
   m_segmentHits.isRequired(hitCollectionName);
-  if (!(et_option == "fastestpriority") || !(et_option == "zero")) {
+  if (!((et_option == "fastestpriority") || (et_option == "zero"))) {
     m_eventTime.isRequired(eventTimeName);
   }
   m_hitCollectionName = hitCollectionName;
@@ -374,10 +377,11 @@ NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
 void
 NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::string et_option)
 {
-  //if (et_option != m_MLPs[isector].get_et_option()) {
-  //    B2WARNING("Used event time option is different to the one set in the MLP"
-  //              << LogVar("et_option", et_option) << LogVar("isector", isector)
-  //              << LogVar("et_option_mlp", m_MLPs[isector].get_et_option()));
+  if (et_option != m_MLPs[isector].get_et_option()) {
+    B2WARNING("Used event time option is different to the one set in the MLP"
+              << LogVar("et_option", et_option) << LogVar("isector", isector)
+              << LogVar("et_option_mlp", m_MLPs[isector].get_et_option()));
+  }
   if (et_option == "etf_or_fastestpriority") {
     bool hasT0 = m_eventTime->hasBinnedEventT0(Const::CDC);
     if (hasT0) {
@@ -443,6 +447,8 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
     } else {
       getEventTime(isector, track, "zero");
     }
+  } else {
+    B2ERROR("No valid parameter for et_option (" << et_option << " )!");
   }
 
 }
@@ -779,30 +785,39 @@ NeuroTrigger::save(const string& filename, const string& arrayname)
 bool
 NeuroTrigger::load(const string& filename, const string& arrayname)
 {
-  TFile datafile(filename.c_str(), "READ");
-  if (!datafile.IsOpen()) {
-    B2WARNING("Could not open file " << filename);
-    return false;
-  }
-  TObjArray* MLPs = (TObjArray*)datafile.Get(arrayname.c_str());
-  if (!MLPs) {
+  if (filename.size() < 1) {
+    m_MLPs.clear();
+    m_MLPs = m_cdctriggerneuroconfig->getMLPs();
+    B2INFO("Loaded Neurotrigger MLP weights from database: " +  m_cdctriggerneuroconfig->getNNName());
+    B2DEBUG(100, "loaded " << m_MLPs.size() << " networks from database");
+    return true;
+  } else {
+    TFile datafile(filename.c_str(), "READ");
+    if (!datafile.IsOpen()) {
+      B2WARNING("Could not open file " << filename);
+      return false;
+    }
+
+    TObjArray* MLPs = (TObjArray*)datafile.Get(arrayname.c_str());
+    if (!MLPs) {
+      datafile.Close();
+      B2WARNING("File " << filename << " does not contain key " << arrayname);
+      return false;
+    }
+    m_MLPs.clear();
+    for (int isector = 0; isector < MLPs->GetEntriesFast(); ++isector) {
+      CDCTriggerMLP* expert = dynamic_cast<CDCTriggerMLP*>(MLPs->At(isector));
+      if (expert) m_MLPs.push_back(*expert);
+      else B2WARNING("Wrong type " << MLPs->At(isector)->ClassName() << ", ignoring this entry.");
+    }
+    MLPs->Clear();
+    delete MLPs;
     datafile.Close();
-    B2WARNING("File " << filename << " does not contain key " << arrayname);
-    return false;
-  }
-  m_MLPs.clear();
-  for (int isector = 0; isector < MLPs->GetEntriesFast(); ++isector) {
-    CDCTriggerMLP* expert = dynamic_cast<CDCTriggerMLP*>(MLPs->At(isector));
-    if (expert) m_MLPs.push_back(*expert);
-    else B2WARNING("Wrong type " << MLPs->At(isector)->ClassName() << ", ignoring this entry.");
-  }
-  MLPs->Clear();
-  delete MLPs;
-  datafile.Close();
-  B2DEBUG(100, "loaded " << m_MLPs.size() << " networks");
+    B2DEBUG(100, "loaded " << m_MLPs.size() << " networks");
 
-  // load some values from the geometry that will be needed for the input
-  setConstants();
+    // load some values from the geometry that will be needed for the input
+    setConstants();
 
-  return true;
+    return true;
+  }
 }

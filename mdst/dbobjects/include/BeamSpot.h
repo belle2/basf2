@@ -25,9 +25,9 @@ namespace Belle2 {
      * error on the position 0 in all directions
      * Luminous region size set to 0 in all directions
      */
-    BeamSpot():  m_position(),
-      m_positionError(3),
-      m_size(3)
+    BeamSpot():  m_IPPosition(),
+      m_IPPositionCovMatrix(3),
+      m_sizeCovMatrix(3)
     { }
 
     /**  Destructor */
@@ -38,51 +38,51 @@ namespace Belle2 {
     bool operator==(const BeamSpot& b) const
     {
       return
-        b.m_position == m_position &&
-        b.m_positionError == m_positionError &&
-        b.m_size == m_size;
+        b.m_IPPosition == m_IPPosition &&
+        b.m_IPPositionCovMatrix == m_IPPositionCovMatrix &&
+        b.m_sizeCovMatrix == m_sizeCovMatrix;
     }
 
-    /** Set the size of the vertex position.
+    /** Set the covariance matrix of the size of the IP position.
      * The upper triangle will be saved. */
-    void setSize(const TMatrixDSym& size)
+    void setSizeCovMatrix(const TMatrixDSym& size)
     {
-      m_size = size;
+      m_sizeCovMatrix = size;
     }
 
-    /** Set the vertex position and its error matrix.
-     * @param vertex position in BASF2 units: cm
+    /** Set the IP position and its error matrix.
+     * @param ipPosition position in BASF2 units: cm
      * @param error covariance matrix of the vertext position.
      */
-    void setVertex(const TVector3& vertex, const TMatrixDSym& covariance)
+    void setIP(const TVector3& ipPosition, const TMatrixDSym& covariance)
     {
-      m_position = vertex;
-      m_positionError = covariance;
+      m_IPPosition = ipPosition;
+      m_IPPositionCovMatrix = covariance;
     }
 
-    /** Get the interaction point position */
-    const TVector3& getVertex()
+    /** Get the IP position */
+    const TVector3& getIPPosition() const
     {
-      return m_position;
+      return m_IPPosition;
     }
 
-    /** Get the covariance matrix of the measured vertex position */
-    const TMatrixDSym& getPositionError()
+    /** Get the covariance matrix of the measured IP position */
+    const TMatrixDSym& getIPPositionCovMatrix() const
     {
-      return m_positionError;
+      return m_IPPositionCovMatrix;
     }
 
-    /** Get the size of the luminous regione modeled as a gaussian */
-    const TMatrixDSym& getSize()
+    /** Get the covariance matrix of the size of the IP position modeled as a gaussian */
+    const TMatrixDSym& getSizeCovMatrix() const
     {
-      return m_size;
+      return m_sizeCovMatrix;
     }
 
-    /** Get the covariance matrix of the vertex position
+    /** Get the total covariance matrix of theIP position
      * (for compatibility with BeamParameters)*/
-    const TMatrixDSym& getCovVertex()
+    TMatrixDSym getCovVertex() const
     {
-      return getSize();
+      return  getSizeCovMatrix() + getIPPositionCovMatrix();
     }
 
     /** Return unique ID of BeamSpot in global Millepede calibration (1) */
@@ -92,16 +92,16 @@ namespace Belle2 {
 
     /** Beam spot position
      * defined as the average position of the primary vertex */
-    TVector3 m_position;
+    TVector3 m_IPPosition;
 
-    /** Error of the measured beam spot position*/
-    TMatrixDSym m_positionError;
+    /** CovMatrix of the measured beam spot position*/
+    TMatrixDSym m_IPPositionCovMatrix;
 
     /** Size of the luminous region modeled with a
      * three dimensional gaussian. Covariance matrix */
-    TMatrixDSym m_size;
+    TMatrixDSym m_sizeCovMatrix;
 
-    ClassDef(BeamSpot, 1); /**<  beam spot position and size **/
+    ClassDef(BeamSpot, 2); /**<  beam spot position and size **/
   };
 
 } //Belle2 namespace

@@ -14,7 +14,6 @@
 #include <generators/hepevt/HepevtReader.h>
 
 #include <string>
-#include <stdexcept>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>

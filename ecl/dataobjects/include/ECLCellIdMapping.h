@@ -12,9 +12,9 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/datastore/RelationsObject.h>
 #include <framework/logging/Logger.h>
-#include <limits>
+
+#include <TObject.h>
 
 namespace Belle2 {
 

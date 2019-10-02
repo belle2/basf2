@@ -6,10 +6,10 @@
 //
 
 #include <dirent.h>
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cstdlib>
 
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -39,10 +39,10 @@ int main(int argc, char** argv)
   }
 
   DIR* dir;
-  if ((dir = opendir("/tmp")) != NULL) {
+  if ((dir = opendir("/tmp")) != nullptr) {
     int ret = 0;
     struct dirent* ent;
-    while ((ent = readdir(dir)) != NULL) {
+    while ((ent = readdir(dir)) != nullptr) {
       if (strncmp(ent->d_name, "SHM", 3) == 0) {
         //  printf ("%s\n", ent->d_name);
         int shmid, semid;
@@ -68,7 +68,7 @@ int main(int argc, char** argv)
                 continue;
               }
 
-              if (shmctl(shmid, IPC_RMID, (struct shmid_ds*) NULL) == 0) {
+              if (shmctl(shmid, IPC_RMID, (struct shmid_ds*) nullptr) == 0) {
                 printf("SHM %d deleted. ", shmid);
                 deleted = true;
               }

@@ -26,32 +26,40 @@
 #include <bitset>
 #include <vector>
 #include <string>
+#include <iostream>
+#include <iomanip>
 #include <utility>
 #include <typeinfo>
 
 namespace Belle2 {
 
+  /// Node list
   using NodeList = std::vector<std::vector<int> >;
 
+  /** Merger data width */
   static constexpr int mergerWidth = 256;
+  /** Number of Mergers */
   static constexpr int nAllMergers = 146;
   /** width of a single word in the raw int buffer */
   static constexpr int wordWidth = 32;
+  /** Number of FINESSE in the copper */
   static constexpr int nFinesse = 4;
+  /** Merger data bus */
   using MergerBus = std::array<std::bitset<mergerWidth>, nAllMergers>;
+  /** Merger data bus Bitstream */
   using MergerBits = Bitstream<MergerBus>;
 
-  /* enum class SubTriggerType : unsigned char {Merger, TSF, T2D, T3D, Neuro, ETF}; */
-
+  /** enum class SubTriggerType : unsigned char {Merger, TSF, T2D, T3D, Neuro, ETF}; */
   struct SubTrigger {
     /** constructor */
     SubTrigger(std::string inName,
                unsigned inEventWidth, unsigned inOffset,
                int inHeaderSize, std::vector<int> inNodeID,
-               int& inDelay, int inDebugLevel = 0) :
+               int& inDelay, int& inCnttrg, int inDebugLevel = 0) :
       name(inName), eventWidth(inEventWidth), offset(inOffset),
       headerSize(inHeaderSize), iNode(inNodeID.front()),
       iFinesse(inNodeID.back()), delay(inDelay),
+      cnttrg(inCnttrg),
       debugLevel(inDebugLevel) {};
 
     /** Name of the UT3 */
@@ -74,6 +82,8 @@ namespace Belle2 {
     std::string firmwareVersion;
     /** Reference to the variable of its Belle2Link delay */
     int& delay;
+    /** counter of trgger signal, total 32 bits, the 20 LSBs recorded in the event header */
+    int& cnttrg;
 
     /** debug level in the steering file */
     int debugLevel;
@@ -119,6 +129,7 @@ namespace Belle2 {
       if (subDetectorId != iNode) {
         return 0;
       }
+      // int nWordsize = 3075;  // temporary solution to hard coded the correct event size (for 2D only?)
       // empty data buffer
       if (nWords[iFinesse] < headerSize) {
         B2WARNING("The module " << name << " does not have enough data (" <<
@@ -130,6 +141,28 @@ namespace Belle2 {
         return 0;
       }
 
+      // need one more check, give a warning if the event has wrong data size
+
+      // event data block header:
+      // 0xdddd  --> correct event data (for 2D only?)
+      // 0xbbbb  --> dummy buffer supposed to be used for only suppressed events.
+      if (nWords[iFinesse] > headerSize) {
+        //dataHeader = CDCTriggerUnpacker::rawIntToAscii(data32tab.at(iFinesse)[headerSize]&0xFFFF0000 >> 16);
+        //bool dataHeader = ( (data32tab.at(iFinesse)[headerSize]&0xffff0000) == 0xdddd0000);
+        long dataHeader = (data32tab.at(iFinesse)[headerSize] & 0xffff0000);
+        if (dataHeader != 0xdddd0000) {
+          B2DEBUG(30, "The module " << name << " has an event data header " << std::hex << std::setfill('0') << std::setw(4) <<
+                  (dataHeader >> 16) <<
+                  " in this event. It will be ignore.");
+          return 0;
+        }
+        B2DEBUG(50, "subdet and head size " <<  std::setfill('0') << std::hex << std::setw(8) << iNode << ", " << std::dec <<  std::setw(
+                  0) << nWords[iFinesse] <<
+                " : " << std::hex << std::setw(8) << data32tab.at(iFinesse)[0] << " " << data32tab.at(iFinesse)[1] << " " << data32tab.at(
+                  iFinesse)[2] <<
+                " " << data32tab.at(iFinesse)[3] << " dataheader = " << dataHeader);
+      }
+
       /* get event header information
        * Ideally, these parameters should not change in the same run,
        * so it is more efficiency to do it in beginRun().
@@ -137,26 +170,44 @@ namespace Belle2 {
        * let's check if they really remain unchanged.
        */
       if (headerSize >= 2) {
+        // supposedly these two Words will stay for all the versions
         firmwareType = CDCTriggerUnpacker::rawIntToAscii(data32tab.at(iFinesse)[0]);
         firmwareVersion = CDCTriggerUnpacker::rawIntToString(data32tab.at(iFinesse)[1]);
-        // get the Belle2Link delay
-        // TODO: what is the exact date that this word is introduced?
-        if (headerSize >= 3 || firmwareVersion > "17121900") {
+        //int cnttrg = 0;    // temporary solution, this should be one as a reference for comparison
+        int l1_revoclk = -1;
+
+        if (headerSize >= 3) {
           std::bitset<wordWidth> thirdWord(data32tab.at(iFinesse)[2]);
-          int newDelay = CDCTriggerUnpacker::subset<32, 12, 20>(thirdWord).to_ulong();
-          if (delay > 0 && delay != newDelay) {
-            B2WARNING(" the Belle2Link delay for " << name <<
-                      "has changed from " << delay << " to " << newDelay << "!");
+          l1_revoclk = CDCTriggerUnpacker::subset<32, 0, 11>(thirdWord).to_ulong();
+
+          if (firmwareType == "2D  ") {  // temporary solcuion, the following version number check is valid only for 2D
+
+            if (firmwareVersion >  "19041700")  {  // started since 19041705
+              // the third word is cnttrg and L1_revoclk
+              int newCnttrg = CDCTriggerUnpacker::subset<32, 12, 31>(thirdWord).to_ulong();
+              cnttrg = newCnttrg;
+            } else if (firmwareVersion > "17121900") {  // upto that version, headerSize == 2?
+              // the third word is b2l delay and L1_revoclk
+              int newDelay = CDCTriggerUnpacker::subset<32, 12, 20>
+                             (thirdWord).to_ulong();   // or should be <32,12,19>? bit 31-20 are for prescale?
+              if (delay > 0 && delay != newDelay) {
+                B2WARNING(" the Belle2Link delay for " << name <<
+                          "has changed from " << delay << " to " << newDelay << "!");
+              }
+              delay = newDelay;
+            }
           }
-          delay = newDelay;
         }
-        B2DEBUG(50, name << ": " << firmwareType << ", version " <<
+
+        B2DEBUG(20, name << ": " << firmwareType << ", version " <<
                 firmwareVersion << ", node " << std::hex << iNode <<
-                ", finesse " << iFinesse << ", delay: " << delay);
+                ", finesse " << iFinesse << ", delay: " << delay <<
+                ", cnttrg: " << cnttrg << std::dec << " == " << cnttrg <<  ", L1_revoclk " << l1_revoclk);
+
+
       }
       return 1;
     };
-
     /** destructor */
     virtual ~SubTrigger() {};
   };
@@ -201,7 +252,7 @@ namespace Belle2 {
 
     NodeList m_mergerNodeID; /**< list of (COPPER ID, HSLB ID) of Merger reader (TSF) */
     bool m_unpackMerger;  /**< flag to unpack merger data (recorded by Merger Reader / TSF) */
-    MergerBits m_mergerBitsPerClock;
+    MergerBits m_mergerBitsPerClock; /**< Merger bits per clock*/
     StoreArray<MergerBits> m_mergerBits; /**< merger output bitstream */
 
     bool m_decodeTSHit;  /**< flag to decode track segment  */
@@ -214,6 +265,9 @@ namespace Belle2 {
     NodeList m_neuroNodeID;  /**< list of (COPPER ID, HSLB ID) of neurotrigger */
     bool m_unpackNeuro;  /**< flag to unpack neurotrigger data */
     bool m_decodeNeuro;  /**< flag to decode neurotrigger data */
+
+    std::vector<int> m_delayNNOutput; /**< delay of the NN output values clock cycle after the NN enable bit (by quadrant) */
+    std::vector<int> m_delayNNSelect; /**< delay of the NN selected TS clock cycle after the NN enable bit (by quadrant) */
 
     /** bitstream of TSF output to 2D tracker */
     StoreArray<CDCTriggerUnpacker::TSFOutputBitStream> m_bitsTo2D;
@@ -249,16 +303,27 @@ namespace Belle2 {
     StoreArray<CDCTriggerSegmentHit> m_NNInputTSHits;
 
     /** debug level specified in the steering file */
-    int m_debugLevel;
+    int m_debugLevel = 0;
 
     /** Belle2Link delay of the merger reader */
     int m_mergerDelay = 0;
 
     /** Belle2Link delay of the 2D finder */
-    int m_2DFinderDelay = 0;
+    //int m_2DFinderDelay = 0;
+    // since version 19041705, the B2L delay is removed, it should a fixed number for a long period and recorded in database.
+    int m_2DFinderDelay = 45;   // 0x2d: changed from 0x28 since some time in 201902-03
 
     /** Belle2Link delay of the neurotrigger */
     int m_NeuroDelay = 0;
+
+    /** cnttrg */
+    // int m_Cnttrg = 0; // not used, commented out at 2019/07/31 by ytlai
+    /** Merger cnttrg */
+    int m_mergerCnttrg = 0;
+    /** 2D cnttrg */
+    int m_2DFinderCnttrg = 0;
+    /** NN cnttrg */
+    int m_NeuroCnttrg = 0;
 
     /** vector holding the pointers to all the dynamically allocated SubTriggers */
     std::vector<SubTrigger*> m_subTrigger;

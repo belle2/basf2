@@ -24,6 +24,11 @@ import simulation as si
 import reconstruction as re
 import modularAnalysis as ma
 
+# We previously generated events but we want to simulate them with the
+# currently best values, not whatever whas valid back then. So we have to
+# disable reuse of the same globaltag from when the events were generated
+b2.conditions.disable_globaltag_replay()
+
 # create path
 my_path = b2.create_path()
 
@@ -31,9 +36,6 @@ my_path = b2.create_path()
 ma.inputMdst(environmentType='default',
              filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu_evtgen.root', 'examples', False),
              path=my_path)
-
-# In case of conflict with geometry, you may use this line instead:
-# analysis_main.add_module("RootInput", inputFileName='B2A101-Y4SEventGeneration-evtgen.root')
 
 # simulation
 si.add_simulation(path=my_path)

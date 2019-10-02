@@ -14,7 +14,6 @@
 #include <simulation/dataobjects/SimHitBase.h>
 #include <stdint.h>
 
-#include <TObject.h>
 #include <TVector3.h>
 #include <algorithm>
 

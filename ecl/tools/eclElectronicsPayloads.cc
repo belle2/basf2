@@ -18,7 +18,7 @@
  * writes these to a root file.                                           *
  *                                                                        *
  * Payloads are read from localdb if present, otherwise from              *
- * Calibration_Offline_Development, or Data_Taking_HLT.                   *
+ * ECL_localrun_data                                                      *
  * They are written to localdb with iov = exp,run,-1,-1                   *
  *                                                                        *
  * Usage:                                                                 *
@@ -45,7 +45,6 @@
 #include <framework/logging/LogSystem.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <iostream>
-#include <fstream>
 #include <TFile.h>
 #include <TH1F.h>
 
@@ -95,8 +94,7 @@ int main(int argc, char** argv)
   Database::reset();
   bool resetIovs = false;
   DatabaseChain::createInstance(resetIovs);
-  ConditionsDatabase::createDefaultInstance("Data_Taking_HLT", LogConfig::c_Debug);
-  ConditionsDatabase::createInstance("Calibration_Offline_Development", "", "", "", LogConfig::c_Debug);
+  ConditionsDatabase::createDefaultInstance("ECL_localrun_data", LogConfig::c_Debug);
   LocalDatabase::createInstance("localdb/database.txt", "", LogConfig::c_Debug);
 
   //..set debug level
@@ -179,6 +177,7 @@ int main(int argc, char** argv)
     std::cout << "cellID " << ic + 1 << " existing = " << currentValues[ic] << " +/- " << currentUnc[ic] << " new = " << newValues[ic]
               << " +/- " << newUnc[ic] << std::endl;
   }
+  std::cout << std::endl;
 
   TString payloadTitle = payloadName;
   payloadTitle += "_";
@@ -191,15 +190,30 @@ int main(int argc, char** argv)
   TString htitle = payloadTitle;
   htitle += " existing calibration values;cellID";
   TH1F* existingCalib = new TH1F("existingCalib", htitle, 8736, 1, 8737);
+
   htitle = payloadTitle;
   htitle += " new calibration values;cellID";
   TH1F* newCalib = new TH1F("newCalib", htitle, 8736, 1, 8737);
+
   htitle = payloadTitle;
   htitle += " ratio";
   TH1F* calibRatio = new TH1F("calibRatio", htitle, 200, 0.9, 1.1);
+
   htitle = payloadTitle;
   htitle += " difference";
   TH1F* calibDiff = new TH1F("calibDiff", htitle, 200, -100, 100);
+
+  htitle = payloadTitle;
+  htitle += " reference";
+  TH1F* refValues = new TH1F("refValues", htitle, 8736, 1, 8737);
+
+  htitle = payloadTitle;
+  htitle += " ratio vs cellID;cellID;new/old";
+  TH1F* ratioVsCellID = new TH1F("ratioVsCellID", htitle, 8736, 1, 8737);
+
+  htitle = payloadTitle;
+  htitle += " diff vs cellID;cellID;new - old";
+  TH1F* diffVsCellID = new TH1F("diffVsCellID", htitle, 8736, 1, 8737);
 
   for (int cellID = 1; cellID <= 8736; cellID++) {
     float oldValue = currentValues[cellID - 1];
@@ -216,13 +230,33 @@ int main(int argc, char** argv)
     newCalib->SetBinContent(cellID, newValue);
     newCalib->SetBinError(cellID, newUnc[cellID - 1]);
     calibRatio->Fill(ratio);
+    ratioVsCellID->SetBinContent(cellID, ratio);
+    ratioVsCellID->SetBinError(cellID, 0);
     calibDiff->Fill(newValue - oldValue);
+    diffVsCellID->SetBinContent(cellID, newValue - oldValue);
+    diffVsCellID->SetBinError(cellID, 0);
+    if (payloadName == "ECLCrystalElectronics" or payloadName == "ECLRefAmplNom") {
+      refValues->SetBinContent(cellID, refAmpl[cellID - 1]);
+      refValues->SetBinError(cellID, refAmplUnc[cellID - 1]);
+    } else {
+      refValues->SetBinContent(cellID, refTime[cellID - 1]);
+      refValues->SetBinError(cellID, refTimeUnc[cellID - 1]);
+    }
+
+    //..Note any large changes
+    if ((payloadName == "ECLCrystalElectronics" or payloadName == "ECLRefAmplNom") and (ratio<0.99 or ratio>1.01)) {
+      std::cout << "Ratio = " << ratio << " for cellID = " << cellID << " refAmpl = " << refAmpl[cellID - 1] << " refAmplNom = " <<
+                refAmplNom[cellID - 1] << std::endl;
+    } else if (abs(newValue - oldValue) > 20.) {
+      std::cout << "Difference = " << newValue - oldValue << " for cellID = " << cellID << " refTime = " << refTime[cellID - 1] <<
+                " refTimeNom = " << refTimeNom[cellID - 1] << std::endl;
+    }
   }
 
   hfile.cd();
   hfile.Write();
   hfile.Close();
-  std::cout << "Comparison of existing and new calibration values written to " << fname << std::endl;
+  std::cout << std::endl << "Comparison of existing and new calibration values written to " << fname << std::endl;
 
   //------------------------------------------------------------------------
   //..Write out to localdb if requested

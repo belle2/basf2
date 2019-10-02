@@ -29,11 +29,16 @@ def setupFinderModule(path):
 
 
 class CKFBkg(TrackingValidationRun):
+    """Validate the track-finding chain, excluding the Kalman fitter/filter, with Y(4S) events and background overlay"""
+    #: number of events to generate
     n_events = N_EVENTS
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
+    #: Y(4S) events with background overlay
     root_input_file = '../EvtGenSim.root'
+    #: insert the track-finding components into the basf2 path
     finder_module = staticmethod(setupFinderModule)
+    #: Define the user parameters for the track-finding module
     tracking_coverage = {
         'WhichParticles': [],  # Include all particles, also secondaries
         'UsePXDHits': True,
@@ -43,11 +48,15 @@ class CKFBkg(TrackingValidationRun):
         'UseOnlyBeforeTOP': True,
         'UseNLoops': 1
     }
+    #: fit the tracks in each event
     fit_tracks = True
-    # But we need to tell the validation module to use the fit information
+    #: tell the validation module to use the fit information
     use_fit_information = True
+    #: Include pulls in the validation output
     pulls = True
+    #: Include resolution information in the validation output
     resolution = True
+    #: name of the output ROOT file
     output_file_name = VALIDATION_OUTPUT_FILE
 
 

@@ -17,17 +17,12 @@
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
 //Framework
-#include <framework/gearbox/Const.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationVector.h>
-#include <boost/optional.hpp>
 
 //MDST
 #include <mdst/dataobjects/TRGSummary.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/Track.h>
 
 //ECL
 #include <ecl/dataobjects/ECLDigit.h>

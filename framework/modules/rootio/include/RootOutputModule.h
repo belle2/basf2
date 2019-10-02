@@ -215,5 +215,7 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaData;
     /** Pointer to the file meta data */
     StoreObjPtr<FileMetaData> m_fileMetaData{"", DataStore::c_Persistent};
+    /** File meta data finally stored in the output file */
+    FileMetaData m_outputFileMetaData;
   };
 } // end namespace Belle2

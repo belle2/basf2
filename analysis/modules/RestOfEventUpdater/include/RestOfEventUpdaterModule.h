@@ -21,7 +21,6 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <tuple>
 
 namespace Belle2 {
 
@@ -73,14 +72,14 @@ namespace Belle2 {
      * @param Reference to particle collection
      * @param ParticleType of the collection
      */
-    void updateMasksWithParticles(StoreObjPtr<RestOfEvent> roe, std::vector<const Particle*>& particlesToUpdate,
+    void updateMasksWithParticles(const StoreObjPtr<RestOfEvent>& roe, std::vector<const Particle*>& particlesToUpdate,
                                   Particle::EParticleType listType);
     /**
      * Update ROE masks with provided composite particle collection
      * @param Pointer to RestOfEvent object for update
      * @param Reference to composite particle collection
      */
-    void updateMasksWithV0(StoreObjPtr<RestOfEvent> roe, std::vector<const Particle*>& particlesToUpdate);
+    void updateMasksWithV0(const StoreObjPtr<RestOfEvent>& roe, std::vector<const Particle*>& particlesToUpdate);
   };
 }
 

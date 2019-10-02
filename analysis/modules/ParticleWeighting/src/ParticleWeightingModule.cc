@@ -14,11 +14,11 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/database/DBObjPtr.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
-
 
 // framework aux
 #include <framework/logging/Logger.h>
+
+#include <memory>
 
 
 using namespace std;
@@ -50,7 +50,7 @@ namespace Belle2 {
     std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
                                             *m_ParticleWeightingLookUpTable.get())->getAxesNames());
     std::map<std::string, double> values;
-    for (auto i_variable : variables) {
+    for (const auto& i_variable : variables) {
       const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(i_variable);
       if (!var) {
         B2ERROR("Variable '" << i_variable << "' is not available in Variable::Manager!");
@@ -66,7 +66,7 @@ namespace Belle2 {
   {
     StoreArray<Particle>().isRequired();
     m_inputList.isRequired(m_inputListName);
-    m_ParticleWeightingLookUpTable.reset(new DBObjPtr<ParticleWeightingLookUpTable>(m_tableName));
+    m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_tableName);
   }
 
 
@@ -83,7 +83,7 @@ namespace Belle2 {
       double index = ppointer->getArrayIndex();
       Particle* p = particles[index];
       WeightInfo info = getInfo(p);
-      for (auto entry : info) {
+      for (const auto& entry : info) {
         p->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
       }
     }

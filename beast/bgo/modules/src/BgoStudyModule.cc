@@ -11,30 +11,16 @@
 #include <beast/bgo/modules/BgoStudyModule.h>
 #include <beast/bgo/dataobjects/BgoSimHit.h>
 #include <beast/bgo/dataobjects/BgoHit.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
 #include <cmath>
-#include <boost/foreach.hpp>
 
-
-#include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
 
 // ROOT
-#include <TVector3.h>
-#include <TRandom.h>
 #include <TH1.h>
 #include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
-#include <TMath.h>
 
 #include <generators/SAD/dataobjects/SADMetaHit.h>
 

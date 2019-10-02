@@ -11,15 +11,11 @@
 #include <analysis/modules/ParticleStats/ParticleStatsModule.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/core/Environment.h>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/algorithm/string/classification.hpp>
-#include <cmath>
-#include <algorithm>
-#include <TParameter.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 using namespace std;
 using namespace Belle2;
-using namespace boost::algorithm;
 
 // Register module in the framework
 REG_MODULE(ParticleStats)
@@ -34,8 +30,8 @@ ParticleStatsModule::ParticleStatsModule() : Module()
   // initializing the rest of private memebers
   m_nPass   = 0;
   m_nParticles = 0;
-  m_PassMatrix = 0;
-  m_MultiplicityMatrix = 0;
+  m_PassMatrix = nullptr;
+  m_MultiplicityMatrix = nullptr;
 }
 
 void ParticleStatsModule::initialize()
@@ -129,7 +125,7 @@ void ParticleStatsModule::event()
 void ParticleStatsModule::terminate()
 {
   B2INFO("ParticleStats Summary: \n");
-  float m_nEvents = (float)Environment::Instance().getNumberOfEvents();
+  auto m_nEvents = (float)Environment::Instance().getNumberOfEvents();
   int nParticleLists = m_strParticleLists.size();
   for (int iList = 0; iList < nParticleLists; ++iList) {
     for (int jList = 0; jList < nParticleLists + 1; ++jList) {

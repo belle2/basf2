@@ -14,33 +14,14 @@
 //DQM
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
-// framework
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-// Dataobject classes
-#include <framework/database/DBObjPtr.h>
-//#include <framework/dbobjects/RunInfo.h>
-
-
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TF1.h>
-#include <TColor.h>
 #include <TCanvas.h>
 #include <TLine.h>
 #include <TClass.h>
-#include <TStyle.h>
-#include <TFile.h>
-#include <TDirectory.h>
-#include <TImage.h>
-#include <TPad.h>
+#include <TROOT.h>
 
-#include <sstream>
 #include <fstream>
-#include <math.h>
-#include <algorithm>
 
 using namespace std;
 using namespace Belle2;
@@ -58,6 +39,7 @@ DQMHistAnalysisARICHModule::DQMHistAnalysisARICHModule()
   setDescription("Modify and analyze the data quality histograms of ARICH");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("debug", m_debug, "debug mode", false);
+  addParam("alert", m_enableAlert, "Enable color alert", true);
 }
 
 DQMHistAnalysisARICHModule::~DQMHistAnalysisARICHModule()
@@ -75,7 +57,6 @@ void DQMHistAnalysisARICHModule::initialize()
     m_LineForMB[i]->SetLineWidth(1);
     m_LineForMB[i]->SetLineColor(kBlack);
   }
-  m_c_mergerHit = new TCanvas("ARICH/c_mergerHitModified");
 
   m_apdHist = new ARICHChannelHist("tmpChHist", "tmpChHist", 2); /**<ARICH TObject to draw hit map for each APD*/
   m_apdPoly = new TH2Poly();
@@ -94,19 +75,84 @@ void DQMHistAnalysisARICHModule::beginRun()
 void DQMHistAnalysisARICHModule::event()
 {
 
+  int alertBits = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
+  int alertMerger = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
+  int alertHitsPerEvent = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
+  //int alertTheta = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
+
+
+  //Show alert by empty bins = red and strange entries = yellow
   //Draw lines on mergerHits histogram for shifters to divide sectors
   TH1* m_h_mergerHit = findHist("ARICH/mergerHit");/**<The number of hits in each Merger Boards*/
-  if (m_h_mergerHit != NULL) {
+  m_c_mergerHit = find_canvas("ARICH/c_mergerHit");
+  if (m_h_mergerHit != NULL && m_c_mergerHit != NULL) {
     m_c_mergerHit->Clear();
     m_c_mergerHit->cd();
+    m_h_mergerHit->SetMinimum(0);
     m_h_mergerHit->Draw("hist");
     gPad->Update();
+
+    double mean = m_h_mergerHit->Integral() / 72;
+    for (int i = 0; i < 72; i++) {
+      int hit = m_h_mergerHit->GetBinContent(i + 1);
+      if ((bool)hit ^ (bool)m_h_mergerHit->GetEntries()) {
+        alertMerger = 2;
+        break;
+      }
+      if (hit > mean * 100 && alertMerger < 1) alertMerger = 1;
+    }
+    if (m_enableAlert && m_minStats < m_h_mergerHit->GetEntries()) m_c_mergerHit->SetFillColor(alertColor[alertMerger]);
+
     for (int i = 0; i < 5; i++) {
       m_LineForMB[i]->DrawLine(12 * (i + 1) + 0.5, 0, 12 * (i + 1) + 0.5, gPad->GetUymax());
     }
+
     m_c_mergerHit->Modified();
   } else {
-    B2INFO("Histogram named mergerHit is not found.");
+    B2INFO("Histogram/canvas named mergerHit is not found.");
+  }
+
+
+  //Show alert by the ratio of center 2 bins to side 2bins. <1.5 = red, <2 = yellow
+  TH1* m_h_bits = findHist("ARICH/bits");/**<The number of hits in each timing bit*/
+  m_c_bits = find_canvas("ARICH/c_bits");
+  if (m_h_bits != NULL && m_c_bits != NULL) {
+    m_c_bits->Clear();
+    m_c_bits->cd();
+    m_h_bits->SetMinimum(0);
+    m_h_bits->Draw("hist");
+    gPad->Update();
+
+    double side = m_h_bits->GetBinContent(2) + m_h_bits->GetBinContent(5);
+    double center = m_h_bits->GetBinContent(3) + m_h_bits->GetBinContent(4);
+    if (center / side < 2) alertBits = 1;
+    if (center / side < 1.5) alertBits = 2;
+    if (m_enableAlert && m_minStats < m_h_bits->GetEntries()) m_c_bits->SetFillColor(alertColor[alertBits]);
+
+    m_c_bits->Modified();
+  } else {
+    B2INFO("Histogram/canvas named bits is not found.");
+  }
+
+  //Show alert by no entry = red and 0 peak = yellow
+  TH1* m_h_hitsPerEvent = findHist("ARICH/hitsPerEvent");/**<The number of hits in each triggered event*/
+  m_c_hitsPerEvent = find_canvas("ARICH/c_hitsPerEvent");
+  if (m_h_hitsPerEvent != NULL && m_c_hitsPerEvent  != NULL) {
+    m_c_hitsPerEvent->Clear();
+    m_c_hitsPerEvent->cd();
+    m_h_hitsPerEvent->SetMinimum(0);
+    m_h_hitsPerEvent->Draw("hist");
+    gPad->Update();
+
+    double mean = m_h_hitsPerEvent->GetMean();
+    if (mean < 1) alertHitsPerEvent = 1;
+    double entry = m_h_hitsPerEvent->GetEntries();
+    if (entry == 0) alertHitsPerEvent = 2;
+    if (m_enableAlert) m_c_hitsPerEvent->SetFillColor(alertColor[alertHitsPerEvent]);
+
+    m_c_hitsPerEvent->Modified();
+  } else {
+    B2INFO("Histogram/canvas named hitsPerEvent is not found.");
   }
 
   //Draw 2D hit map of channels and APDs
@@ -144,4 +190,16 @@ void DQMHistAnalysisARICHModule::terminate()
   B2DEBUG(20, "terminate called");
 }
 
+TCanvas* DQMHistAnalysisARICHModule::find_canvas(TString canvas_name)
+{
+  TIter nextckey(gROOT->GetListOfCanvases());
+  TObject* cobj = NULL;
 
+  while ((cobj = (TObject*)nextckey())) {
+    if (cobj->IsA()->InheritsFrom("TCanvas")) {
+      if (cobj->GetName() == canvas_name)
+        break;
+    }
+  }
+  return (TCanvas*)cobj;
+}

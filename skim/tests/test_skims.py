@@ -15,6 +15,7 @@ from skim.standardlists.charm import *
 from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import *
 set_log_level(LogLevel.INFO)
+conditions.disable_globaltag_replay()
 
 from skimExpertFunctions import setSkimLogging, add_skim
 skimpath = Path()
@@ -96,43 +97,47 @@ add_skim('CharmlessHad3Body', Had3BodyList, path=skimpath)
 # Charm skims
 # charm Skim: D0 -> K pi/ pi pi /K K
 from skim.charm import D0ToHpJm
-add_skim('Charm2BodyHadronicD0', D0ToHpJm(path=skimpath), path=skimpath)
+add_skim('XToD0_D0ToHpJm', D0ToHpJm(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> K pi/ pi pi /K K) pi
 from skim.charm import DstToD0PiD0ToHpJm
-add_skim('Charm2BodyHadronic', DstToD0PiD0ToHpJm(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToHpJm', DstToD0PiD0ToHpJm(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> K pi pi0) pi
 from skim.charm import DstToD0PiD0ToHpJmPi0
-add_skim('Charm3BodyHadronic', DstToD0PiD0ToHpJmPi0(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToHpJmPi0', DstToD0PiD0ToHpJmPi0(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> pi pi pi0/K K pi0) pi
 from skim.charm import DstToD0PiD0ToHpHmPi0
-add_skim('Charm3BodyHadronic1', DstToD0PiD0ToHpHmPi0(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToHpHmPi0', DstToD0PiD0ToHpHmPi0(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> K pi eta) pi
 from skim.charm import DstToD0PiD0ToHpJmEta
-add_skim('Charm3BodyHadronic3', DstToD0PiD0ToHpJmEta(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToHpJmEta', DstToD0PiD0ToHpJmEta(path=skimpath), path=skimpath)
 
 # charm Skim: D*+ -> D0 (-> Ks omega/eta (-> pi pi pi0)) pi
 from skim.charm import DstToD0PiD0ToKsOmega
-add_skim('Charm2BodyNeutrals2', DstToD0PiD0ToKsOmega(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToKsOmega', DstToD0PiD0ToKsOmega(path=skimpath), path=skimpath)
 
 # charm Skim: D0 -> pi0 pi0/Ks pi0/Ks Ks
 from skim.charm import D0ToNeutrals
-add_skim('Charm2BodyNeutralsD0', D0ToNeutrals(path=skimpath), path=skimpath)
+add_skim('XToD0_D0ToNeutrals', D0ToNeutrals(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> pi0 pi0/Ks pi0/Ks Ks) pi
 from skim.charm import DstToD0Neutrals
-add_skim('Charm2BodyNeutrals', DstToD0Neutrals(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToNeutrals', DstToD0Neutrals(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> pi pi Ks/ K K Ks) pi
 from skim.charm import DstToD0PiD0ToHpHmKs
-add_skim('Charm3BodyHadronic2', DstToD0PiD0ToHpHmKs(path=skimpath), path=skimpath)
+add_skim('DstToD0Pi_D0ToHpHmKs', DstToD0PiD0ToHpHmKs(path=skimpath), path=skimpath)
 
 # charm Skim: D -> gamma gamma/ e e/ mu mu
-from skim.charm import CharmRareList
-add_skim('CharmRare', CharmRareList(path=skimpath), path=skimpath)
+from skim.charm import CharmRare
+add_skim('DstToD0Pi_D0ToRare', CharmRare(path=skimpath), path=skimpath)
+
+# charm Skim: D+ -> Ks pi+/ Ks K+
+from skim.charm import DpToKsHp
+add_skim('XToDp_DpToKsHp', DpToKsHp(path=skimpath), path=skimpath)
 
 
 # Systematics skim
@@ -215,32 +220,25 @@ path = skimpath.add_path(feistate.path)
 
 
 from skim.fei import *
-add_skim('feiHadronicB0', B0hadronic(path=skimpath), path=skimpath)
+add_skim('feiHadronicB0', B0Hadronic(path=skimpath), path=skimpath)
 
 from skim.fei import*
 add_skim('feiHadronicBplus', BplusHadronic(path=skimpath), path=skimpath)
 
 from skim.fei import*
-add_skim('feiSLBplusWithOneLep', BplusSLWithOneLep(path=skimpath), path=skimpath)
-
+add_skim('feiSLBplus', BplusSL(path=skimpath), path=skimpath)
 
 from skim.fei import*
-add_skim('feiSLB0WithOneLep', B0SLWithOneLep(path=skimpath), path=skimpath)
+add_skim('feiSLB0', B0SL(path=skimpath), path=skimpath)
 
-
-from skim.dark import SinglePhotonDarkList
-add_skim('SinglePhotonDark', SinglePhotonDarkList(path=skimpath), path=skimpath)
-
-
-from skim.dark import LFVZpInvisibleList
-add_skim('LFVZpInvisible', LFVZpInvisibleList(path=skimpath), path=skimpath)
-
-
-from skim.dark import LFVZpVisibleList
-add_skim('LFVZpVisible', LFVZpVisibleList(path=skimpath), path=skimpath)
-
-from skim.dark import ALP3GammaList
-add_skim('ALP3Gamma', ALP3GammaList(path=skimpath), path=skimpath)
+# Dark Sector Skims
+from skim import dark
+add_skim('SinglePhotonDark', dark.SinglePhotonDarkList(path=skimpath), path=skimpath)
+add_skim('ALP3Gamma', dark.ALP3GammaList(path=skimpath), path=skimpath)
+add_skim('DimuonPlusMissingEnergy', dark.DimuonPlusMissingEnergyList(path=skimpath), path=skimpath)
+add_skim('ElectronMuonPlusMissingEnergy', dark.ElectronMuonPlusMissingEnergyList(path=skimpath), path=skimpath)
+add_skim('DielectronPlusMissingEnergy', dark.DielectronPlusMissingEnergyList(path=skimpath), path=skimpath)
+add_skim('LFVZpVisible', dark.LFVZpVisibleList(path=skimpath), path=skimpath)
 
 setSkimLogging(path=skimpath)
 

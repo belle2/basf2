@@ -46,7 +46,7 @@ namespace Belle2 {
   // A class to manage cells
   class RFSharedMem : public SharedMem {
   public:
-    RFSharedMem(char* name);
+    RFSharedMem(const char* name);
     ~RFSharedMem();
 
     RfShm_Cell& GetCell(int id);

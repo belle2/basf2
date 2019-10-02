@@ -35,7 +35,7 @@ namespace TreeFitter {
     /** update or init params */
     ErrCode initParams();
 
-    /** project photon consztraint */
+    /** project photon constraint */
     ErrCode projectRecoConstraint(const FitParams& fitparams, Projection& p) const override;
 
     /** sets the size of the corresponding residual projection */
@@ -56,7 +56,7 @@ namespace TreeFitter {
       alist.push_back(Constraint(this, Constraint::photon, depth, dimM())) ;
     }
 
-    /**  has energy in fit params? */
+    /** has energy in fit params? */
     static bool useEnergy(Belle2::Particle& cand) ;
 
   private:
@@ -70,11 +70,19 @@ namespace TreeFitter {
     /** has energy ins statevector */
     bool m_useEnergy ;
 
-    /** constains measured params (x_c, y_c, z_c, E_c) */
+    /** constrains measured params (x_c, y_c, z_c, E_c) */
     Eigen::Matrix<double, 1, 4> m_clusterPars;
 
     /** covariance (x_c,y_c,z_c,E_c) of measured pars */
     Eigen::Matrix<double, 4, 4> m_covariance;
+
+    /** index with the highest momentum. We have to make sure this does not change during the fit.  */
+    int m_i1;
+    /** random other index */
+    int m_i2;
+    /**  another random index */
+    int m_i3;
+
   };
 
 }

@@ -16,6 +16,7 @@
 #include <boost/python/overloads.hpp>
 #include <boost/python/enum.hpp>
 #include <boost/python/docstring_options.hpp>
+#include <utility>
 
 #include <framework/core/Module.h>
 #include <framework/core/ModuleCondition.h>
@@ -77,18 +78,18 @@ void Module::setLogInfo(int logLevel, unsigned int logInfo)
 }
 
 
-void Module::if_value(const std::string& expression, std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
+void Module::if_value(const std::string& expression, const std::shared_ptr<Path>& path, EAfterConditionPath afterConditionPath)
 {
   m_conditions.emplace_back(expression, path, afterConditionPath);
 }
 
 
-void Module::if_false(std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
+void Module::if_false(const std::shared_ptr<Path>& path, EAfterConditionPath afterConditionPath)
 {
   if_value("<1", path, afterConditionPath);
 }
 
-void Module::if_true(std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
+void Module::if_true(const std::shared_ptr<Path>& path, EAfterConditionPath afterConditionPath)
 {
   if_value(">=1", path, afterConditionPath);
 }
@@ -168,7 +169,7 @@ bool Module::hasUnsetForcedParams() const
 {
   auto missing = m_moduleParamList.getUnsetForcedParams();
   std::string allMissing = "";
-  for (auto s : missing)
+  for (const auto& s : missing)
     allMissing += s + " ";
   if (!missing.empty())
     B2ERROR("The following required parameters of Module '" << getName() << "' were not specified: " << allMissing <<
@@ -236,10 +237,14 @@ void Module::setParamPython(const std::string& name, const boost::python::object
 {
   LogSystem& logSystem = LogSystem::Instance();
   logSystem.updateModule(&(getLogConfig()), getName());
+  try {
+    m_moduleParamList.setParamPython(name, pyObj);
+  } catch (std::runtime_error& e) {
+    throw std::runtime_error("Cannot set parameter '" + name + "' for module '"
+                             + m_name + "': " + e.what());
+  }
 
-  m_moduleParamList.setParamPython(name, pyObj);
-
-  logSystem.updateModule(NULL);
+  logSystem.updateModule(nullptr);
 }
 
 
@@ -265,7 +270,7 @@ void Module::setParamPythonDict(const boost::python::dict& dictionary)
     }
   }
 
-  logSystem.updateModule(NULL);
+  logSystem.updateModule(nullptr);
 }
 
 
@@ -423,9 +428,16 @@ Parameters:
   properties (int): bitmask of `ModulePropFlags` to check for.
 )DOCSTRING")
   .def("set_property_flags", &Module::setPropertyFlags, args("property_mask"),
-       "Set module properties in the form of an OR combination of `ModulePropFlags`.")
-  .def("if_value", &Module::if_value, (bp::arg("expression"), bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
-       R"DOCSTRING(Sets a conditional sub path which will be executed after this
+       "Set module properties in the form of an OR combination of `ModulePropFlags`.");
+  {
+    // python signature is too crowded, make ourselves
+    docstring_options subOptions(true, false, false); //userdef, py sigs, c++ sigs
+    module
+    .def("if_value", &Module::if_value,
+         (bp::arg("expression"), bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
+         R"DOCSTRING(if_value(expression, condition_path, after_condition_path=AfterConditionPath.END)
+
+Sets a conditional sub path which will be executed after this
 module if the return value set in the module passes the given ``expression``.
 
 Modules can define a return value (int or bool) using ``setReturnValue()``,
@@ -451,14 +463,22 @@ Parameters:
   condition_path (Path): path to execute in case the expression is fulfilled
   after_condition_path (AfterConditionPath): What to do once the ``condition_path`` has been executed.
 )DOCSTRING")
-  .def("if_false", &Module::if_false, (bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
-       "Sets a conditional sub path which will be executed after this module if "
-       "the return value of the module evaluates to False. This is equivalent to "
-       "calling `if_value` with ``expression=\"<1\"``")
-  .def("if_true", &Module::if_true, (bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
-       "Sets a conditional sub path which will be executed after this module if "
-       "the return value of the module evaluates to True. It is equivalent to "
-       "calling `if_value` with ``expression=\">=1\"``")
+    .def("if_false", &Module::if_false,
+         (bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
+         R"DOC(if_false(condition_path, after_condition_path=AfterConditionPath.END)
+
+Sets a conditional sub path which will be executed after this module if
+the return value of the module evaluates to False. This is equivalent to
+calling `if_value` with ``expression=\"<1\"``)DOC")
+    .def("if_true", &Module::if_true,
+         (bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
+         R"DOC(if_true(condition_path, after_condition_path=AfterConditionPath.END)
+
+Sets a conditional sub path which will be executed after this module if
+the return value of the module evaluates to True. It is equivalent to
+calling `if_value` with ``expression=\">=1\"``)DOC");
+  }
+  module
   .def("has_condition", &Module::hasCondition,
        "Return true if a conditional path has been set for this module "
        "using `if_value`, `if_true` or `if_false`")
@@ -538,8 +558,8 @@ calling this function:
 //                          ModuleProxyBase
 //=====================================================================
 
-ModuleProxyBase::ModuleProxyBase(const std::string& moduleType, const std::string& package) : m_moduleType(moduleType),
-  m_package(package)
+ModuleProxyBase::ModuleProxyBase(std::string  moduleType, std::string  package) : m_moduleType(std::move(moduleType)),
+  m_package(std::move(package))
 {
   ModuleManager::Instance().registerModuleProxy(this);
 }

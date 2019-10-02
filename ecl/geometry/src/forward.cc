@@ -3,24 +3,19 @@
 #include "ecl/geometry/BelleCrystal.h"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
-#include "G4NistManager.hh"
 #include <G4VisAttributes.hh>
 #include <G4Tubs.hh>
 #include <G4Box.hh>
 #include <G4AssemblyVolume.hh>
-#include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
 #include <G4UnionSolid.hh>
-#include <G4Trd.hh>
 #include <G4TwoVector.hh>
-#include <G4ExtrudedSolid.hh>
 #include <G4PVReplica.hh>
-#include "G4UserLimits.hh"
 #include "G4ReflectionFactory.hh"
+#include <G4Trap.hh>
 
 #include <iostream>
 #include "CLHEP/Matrix/Vector.h"
-#include "CLHEP/Matrix/Matrix.h"
 #include "G4Vector3D.hh"
 #include "G4Point3D.hh"
 #include "ecl/geometry/shapes.h"
@@ -58,8 +53,10 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
 
   //  vector<cplacement_t> bp = load_placements("/ecl/data/crystal_placement_forward.dat");
   vector<cplacement_t> bp = load_placements(m_sap, ECLParts::forward);
-  const int ECL_forward_part = 1000;
-  vector<cplacement_t>::iterator fp = find_if(bp.begin(), bp.end(), [ECL_forward_part](const cplacement_t& p) {return p.nshape == ECL_forward_part;});
+  vector<cplacement_t>::iterator fp = find_if(bp.begin(), bp.end(), [](const cplacement_t& p) {
+    const int ECL_forward_part = 1000;
+    return p.nshape == ECL_forward_part;
+  });
   // global transformation before placing the whole forward part in the top logical volume
   G4Transform3D gTrans = (fp == bp.end()) ? G4Translate3D(0, 0, 1960) : get_transform(*fp);
   // since the calorimeter supporting structures attach to the yoke at

@@ -22,7 +22,6 @@
 #include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
-#include <tuple>
 #include <iostream>
 #include <math.h>
 

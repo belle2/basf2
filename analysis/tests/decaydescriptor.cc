@@ -43,9 +43,8 @@ namespace {
     EXPECT_EQ(initok, true);
 
     // standard arrow, not an inclusive decay
-    EXPECT_EQ(dd.isIgnorePhotons(), false);
-    EXPECT_EQ(dd.isIgnoreIntermediate(), false);
-    EXPECT_EQ(dd.isInclusive(), false);
+    EXPECT_EQ(dd.isIgnoreRadiatedPhotons(), true);
+    EXPECT_EQ(dd.isIgnoreIntermediate(), true);
 
     ASSERT_NE(dd.getMother(), nullptr);
     EXPECT_EQ(dd.getMother()->getName(), "B0");
@@ -111,39 +110,150 @@ namespace {
     ASSERT_EQ(dd.getDaughter(2), nullptr);
   }
 
-  TEST(DecayDescriptorTest, ArrowsAndInclusiveDecaysGrammar)
+  TEST(DecayDescriptorTest, ArrowsDecaysGrammar)
   {
-    // --> means ignore intermediate resonances
+    // =direct=> means ignore intermediate resonances
     DecayDescriptor dd1;
-    bool initok = dd1.init("B0:candidates --> K+:loose pi-:loose gamma:clean");
+    bool initok = dd1.init("B0:candidates =direct=> K+:loose pi-:loose gamma:clean");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd1.isIgnorePhotons(), false);
-    EXPECT_EQ(dd1.isIgnoreIntermediate(), true);
-    EXPECT_EQ(dd1.isInclusive(), false);
+    EXPECT_EQ(dd1.isIgnoreRadiatedPhotons(), true);
+    EXPECT_EQ(dd1.isIgnoreIntermediate(), false);
 
-    // => means ignore photons
+    // =norad=> means ignore photons
     DecayDescriptor dd2;
-    initok = dd2.init("B0:candidates => K+:loose pi-:loose gamma:clean");
+    initok = dd2.init("B0:candidates =norad=> K+:loose pi-:loose gamma:clean");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd2.isIgnorePhotons(), true);
-    EXPECT_EQ(dd2.isIgnoreIntermediate(), false);
-    EXPECT_EQ(dd2.isInclusive(), false);
+    EXPECT_EQ(dd2.isIgnoreRadiatedPhotons(), false);
+    EXPECT_EQ(dd2.isIgnoreIntermediate(), true);
 
-    // ==> means ignore intermediate resonances *and* photons
+    // =exact=> means ignore intermediate resonances *and* photons
     DecayDescriptor dd3;
-    initok = dd3.init("B0:candidates ==> K+:loose pi-:loose gamma:clean");
+    initok = dd3.init("B0:candidates =exact=> K+:loose pi-:loose gamma:clean");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd3.isIgnorePhotons(), true);
-    EXPECT_EQ(dd3.isIgnoreIntermediate(), true);
-    EXPECT_EQ(dd3.isInclusive(), false);
+    EXPECT_EQ(dd3.isIgnoreRadiatedPhotons(), false);
+    EXPECT_EQ(dd3.isIgnoreIntermediate(), false);
 
-    // ... means inclusive, for example B -> Xs gamma
-    DecayDescriptor dd4;
-    initok = dd4.init("B0:candidates -> K+:loose gamma:clean ...");
+  }
+
+  TEST(DecayDescriptorTest, KeywordDecaysGrammar)
+  {
+    // ... means accept missing massive
+    DecayDescriptor dd1;
+    bool initok = dd1.init("B0:candidates -> K+:loose gamma:clean ...");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd4.isIgnorePhotons(), false);
-    EXPECT_EQ(dd4.isIgnoreIntermediate(), false);
-    EXPECT_EQ(dd4.isInclusive(), true);
+    EXPECT_EQ(dd1.isIgnoreRadiatedPhotons(), true);
+    EXPECT_EQ(dd1.isIgnoreIntermediate(), true);
+    EXPECT_EQ(dd1.isIgnoreMassive(), true);
+    EXPECT_EQ(dd1.isIgnoreNeutrino(), false);
+    EXPECT_EQ(dd1.isIgnoreGamma(), false);
+
+    // ?nu means accept missing neutrino
+    DecayDescriptor dd2;
+    initok = dd2.init("B0:candidates -> K+:loose pi-:loose ?nu");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd2.isIgnoreRadiatedPhotons(), true);
+    EXPECT_EQ(dd2.isIgnoreIntermediate(), true);
+    EXPECT_EQ(dd2.isIgnoreMassive(), false);
+    EXPECT_EQ(dd2.isIgnoreNeutrino(), true);
+    EXPECT_EQ(dd2.isIgnoreGamma(), false);
+
+    // !nu does not change anything. It is reserved for future updates.
+    DecayDescriptor dd3;
+    initok = dd3.init("B0:candidates -> K+:loose pi-:loose !nu");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd3.isIgnoreRadiatedPhotons(), true);
+    EXPECT_EQ(dd3.isIgnoreIntermediate(), true);
+    EXPECT_EQ(dd3.isIgnoreMassive(), false);
+    EXPECT_EQ(dd3.isIgnoreNeutrino(), false);
+    EXPECT_EQ(dd3.isIgnoreGamma(), false);
+
+    // ?gamma means ignore missing gamma
+    DecayDescriptor dd4;
+    initok = dd4.init("B0:candidates -> K+:loose pi-:loose ?gamma");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd4.isIgnoreRadiatedPhotons(), true);
+    EXPECT_EQ(dd4.isIgnoreIntermediate(), true);
+    EXPECT_EQ(dd4.isIgnoreMassive(), false);
+    EXPECT_EQ(dd4.isIgnoreNeutrino(), false);
+    EXPECT_EQ(dd4.isIgnoreGamma(), true);
+
+    // !gamma does not change anything. It is reserved for future updates.
+    DecayDescriptor dd5;
+    initok = dd5.init("B0:candidates -> K+:loose pi-:loose !gamma");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd5.isIgnoreRadiatedPhotons(), true);
+    EXPECT_EQ(dd5.isIgnoreIntermediate(), true);
+    EXPECT_EQ(dd5.isIgnoreMassive(), false);
+    EXPECT_EQ(dd5.isIgnoreNeutrino(), false);
+    EXPECT_EQ(dd5.isIgnoreGamma(), false);
+
+    // ... ?nu ?gamma means accept missing massive
+    DecayDescriptor dd6;
+    initok = dd6.init("B0:candidates -> e-:loose ... ?nu ?gamma");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd6.isIgnoreRadiatedPhotons(), true);
+    EXPECT_EQ(dd6.isIgnoreIntermediate(), true);
+    EXPECT_EQ(dd6.isIgnoreMassive(), true);
+    EXPECT_EQ(dd6.isIgnoreNeutrino(), true);
+    EXPECT_EQ(dd6.isIgnoreGamma(), true);
+
+  }
+
+  TEST(DecayDescriptorTest, UnspecifiedParticleGrammar)
+  {
+    // @ means unspecified particle, for example @Xsd -> K+ pi-
+    DecayDescriptor dd1;
+    bool initok = dd1.init("@Xsd:candidates -> K+:loose pi-:loose");
+    EXPECT_EQ(initok, true);
+    ASSERT_NE(dd1.getMother(), nullptr);
+    EXPECT_EQ(dd1.getMother()->getName(), "Xsd");
+    EXPECT_EQ(dd1.getMother()->isUnspecified(), true);
+    EXPECT_EQ(dd1.getMother()->isSelected(), false);
+
+    // Both selectors, @ and ^, can be used at the same time
+    DecayDescriptor dd2;
+    initok = dd2.init("^@Xsd:candidates -> K+:loose pi-:loose");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd2.getMother()->getName(), "Xsd");
+    EXPECT_EQ(dd2.getMother()->isUnspecified(), true);
+    EXPECT_EQ(dd2.getMother()->isSelected(), true);
+
+    DecayDescriptor dd3;
+    initok = dd3.init("@^Xsd:candidates -> K+:loose pi-:loose");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd3.getMother()->getName(), "Xsd");
+    EXPECT_EQ(dd3.getMother()->isUnspecified(), true);
+    EXPECT_EQ(dd3.getMother()->isSelected(), true);
+
+
+    // @ can be attached to a daughter
+    DecayDescriptor dd4;
+    initok = dd4.init("B0:Xsdee -> @Xsd e+:loose e-:loose");
+    EXPECT_EQ(initok, true);
+
+    ASSERT_NE(dd4.getMother(), nullptr);
+    EXPECT_EQ(dd4.getMother()->isUnspecified(), false);
+    EXPECT_EQ(dd4.getMother()->isSelected(), false);
+
+    EXPECT_EQ(dd4.getDaughter(0)->getMother()->getName(), "Xsd");
+    EXPECT_EQ(dd4.getDaughter(0)->getMother()->isUnspecified(), true);
+    EXPECT_EQ(dd4.getDaughter(0)->getMother()->isSelected(), false);
+
+    // Both selectors, @ and ^, can be used at the same time
+    DecayDescriptor dd5;
+    initok = dd5.init("B0:Xsdee -> ^@Xsd e+:loose e-:loose");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd5.getDaughter(0)->getMother()->getName(), "Xsd");
+    EXPECT_EQ(dd5.getDaughter(0)->getMother()->isUnspecified(), true);
+    EXPECT_EQ(dd5.getDaughter(0)->getMother()->isSelected(), true);
+
+    DecayDescriptor dd6;
+    initok = dd6.init("B0:Xsdee -> @^Xsd e+:loose e-:loose");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd6.getDaughter(0)->getMother()->getName(), "Xsd");
+    EXPECT_EQ(dd6.getDaughter(0)->getMother()->isUnspecified(), true);
+    EXPECT_EQ(dd6.getDaughter(0)->getMother()->isSelected(), true);
+
   }
 
   TEST(DecayDescriptorTest, SelectionParticles)
@@ -306,12 +416,12 @@ namespace {
     std::vector<std::pair<int, std::string>> K_path;
     std::vector<std::pair<int, std::string>> pi0_path;
 
-    K_path.push_back(std::make_pair(0, std::string("B")));
-    K_path.push_back(std::make_pair(0, std::string("D")));
-    K_path.push_back(std::make_pair(0, std::string("K")));
+    K_path.emplace_back(0, std::string("B"));
+    K_path.emplace_back(0, std::string("D"));
+    K_path.emplace_back(0, std::string("K"));
 
-    pi0_path.push_back(std::make_pair(0, std::string("B")));
-    pi0_path.push_back(std::make_pair(1, std::string("pi0")));
+    pi0_path.emplace_back(0, std::string("B"));
+    pi0_path.emplace_back(1, std::string("pi0"));
 
     EXPECT_NE(expected_hierarchies, selected_hierarchies);
     expected_hierarchies.push_back(K_path);

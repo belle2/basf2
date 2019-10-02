@@ -14,7 +14,6 @@
 #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariable.h>
 #include <framework/geometry/B2Vector3.h>
 #include <framework/core/FrameworkExceptions.h>
-#include <math.h>
 
 #define CIRCLECENTERXY_NAME CircleCenterXY
 

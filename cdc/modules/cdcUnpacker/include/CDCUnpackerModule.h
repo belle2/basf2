@@ -13,21 +13,12 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCRawHit.h>
-#include <cdc/dataobjects/CDCRawHitWaveForm.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
-#include <rawdata/dataobjects/RawDataBlock.h>
-
-#include <rawdata/dataobjects/RawFTSW.h>
-#include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawCDC.h>
-
 
 namespace Belle2 {
 

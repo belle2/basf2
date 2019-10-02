@@ -14,7 +14,6 @@
 #include "G4Types.hh"
 
 #include "G4CSGSolid.hh"
-#include "G4Trap.hh"
 #include "G4Polyhedron.hh"
 #include <vector>
 

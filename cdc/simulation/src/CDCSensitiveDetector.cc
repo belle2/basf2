@@ -14,29 +14,21 @@
 #include <cdc/simulation/CDCSimControlPar.h>
 #include <cdc/simulation/Helix.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/geometry/GeoCDCCreator.h>
 #include <cdc/utilities/ClosestApproach.h>
 #include <framework/logging/Logger.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
-#include <simulation/monopoles/G4Monopole.h>
 
 #include "G4Step.hh"
-#include "G4SteppingManager.hh"
-#include "G4SDManager.hh"
 #include "G4TransportationManager.hh"
+#include "G4Field.hh"
 #include "G4FieldManager.hh"
-#include "G4MagneticField.hh"
 
 #include "CLHEP/Geometry/Vector3D.h"
 #include "CLHEP/Geometry/Point3D.h"
 
 #include "TVector3.h"
-
-//#include <iomanip>
 
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
@@ -187,8 +179,6 @@ namespace Belle2 {
 
     const G4int pid = t.GetDefinition()->GetPDGEncoding();
     const G4double charge = t.GetDefinition()->GetPDGCharge();
-    const auto def = dynamic_cast<Monopoles::G4Monopole*>(t.GetDefinition());
-    const G4double magCharge = def ? def->MagneticCharge() : 0.0; //G4Monopole inherits from G4ParticleDefinition
     const G4int trackID = t.GetTrackID();
     //    std::cout << "pid,stepl,trackID,trackl,weight= " << pid <<" "<< stepLength <<" "<< trackID <<" "<< t.GetTrackLength() <<" "<< hitWeight << std::endl;
 

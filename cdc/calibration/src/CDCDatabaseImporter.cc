@@ -12,19 +12,13 @@
 #include <cdc/calibration/CDCDatabaseImporter.h>
 
 // framework - Database
-#include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportArray.h>
 #include <framework/database/DBImportObjPtr.h>
 
-// framework - xml
-#include <framework/gearbox/GearDir.h>
-
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // DB objects
@@ -42,6 +36,7 @@
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
 #include <cdc/dbobjects/CDCEDepToADCConversions.h>
+#include <cdc/dbobjects/CDCWireHitRequirements.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 
@@ -51,6 +46,9 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -889,6 +887,44 @@ void CDCDatabaseImporter::printADCDeltaPedestal()
   DBObjPtr<CDCADCDeltaPedestals> dbPed;
   dbPed->dump();
 }
+
+void CDCDatabaseImporter::importCDCWireHitRequirements(const std::string& jsonFileName) const
+{
+
+  // Create a property tree
+  boost::property_tree::ptree tree;
+
+  try {
+
+    // Load the json file in this property tree.
+    B2INFO("Loading json file: " << jsonFileName);
+    boost::property_tree::read_json(jsonFileName, tree);
+
+  } catch (boost::property_tree::ptree_error& e) {
+    B2FATAL("Error when loading json file: " << e.what());
+  }
+
+  DBImportObjPtr<CDCWireHitRequirements> dbWireHitReq;
+  dbWireHitReq.construct(tree);
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  dbWireHitReq.import(iov);
+
+  B2RESULT("CDCWireHit requirements imported to database.");
+}
+
+void CDCDatabaseImporter::printCDCWireHitRequirements() const
+{
+
+  DBObjPtr<CDCWireHitRequirements> dbWireHitReq;
+  if (dbWireHitReq.isValid()) {
+    dbWireHitReq->dump();
+  } else {
+    B2WARNING("DBObjPtr<CDCWireHitRequirements> not valid for the current run.");
+  }
+}
+
 
 //Note; the following function is no longer needed
 #if 0

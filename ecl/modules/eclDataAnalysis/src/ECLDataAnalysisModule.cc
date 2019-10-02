@@ -28,7 +28,6 @@
 // ECL
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLSimHit.h>
@@ -182,6 +181,7 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclClusterTimingError(0),
     m_eclClusterE9oE21(0),
     m_eclClusterHighestE(0),
+    m_eclClusterCellId(0),
     m_eclClusterNofCrystals(0),
     m_eclClusterCrystalHealth(0),
     m_eclClusterIsTrack(0),
@@ -279,6 +279,7 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclPureClusterTimingError(0),
     m_eclPureClusterE9oE21(0),
     m_eclPureClusterHighestE(0),
+    m_eclPureClusterCellId(0),
     m_eclPureClusterLat(0),
     m_eclPureClusterNofCrystals(0),
     m_eclPureClusterCrystalHealth(0),
@@ -372,6 +373,7 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclShowerMCFlightMatch(0),
     m_eclShowerMCFFlightMatch(0),
     m_eclShowerHighestE1mE2(0),
+    m_eclShowerNumberOfCrystalsForEnergy(0),
 //MC
     m_mcMultip(0),
     m_mcIdx(0),
@@ -606,6 +608,7 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclClusterTimingError",  "std::vector<double>",    &m_eclClusterTimingError);
   m_tree->Branch("eclClusterE9oE21",     "std::vector<double>",    &m_eclClusterE9oE21);
   m_tree->Branch("eclClusterHighestE",   "std::vector<double>",    &m_eclClusterHighestE);
+  m_tree->Branch("eclClusterCellId",   "std::vector<int>",    &m_eclClusterCellId);
   m_tree->Branch("eclClusterNofCrystals",   "std::vector<int>",       &m_eclClusterNofCrystals);
   m_tree->Branch("eclClusterCrystalHealth", "std::vector<int>",       &m_eclClusterCrystalHealth);
   m_tree->Branch("eclClusterIsTrack",    "std::vector<bool>",       &m_eclClusterIsTrack);
@@ -706,6 +709,7 @@ void ECLDataAnalysisModule::initialize()
     m_tree->Branch("eclPureClusterTimingError",  "std::vector<double>",    &m_eclPureClusterTimingError);
     m_tree->Branch("eclPureClusterE9oE21",     "std::vector<double>",    &m_eclPureClusterE9oE21);
     m_tree->Branch("eclPureClusterHighestE",   "std::vector<double>",    &m_eclPureClusterHighestE);
+    m_tree->Branch("eclPureClusterCellId",   "std::vector<int>",    &m_eclPureClusterCellId);
     m_tree->Branch("eclPureClusterLat",        "std::vector<double>",    &m_eclPureClusterLat);
     m_tree->Branch("eclPureClusterNofCrystals",   "std::vector<int>",       &m_eclPureClusterNofCrystals);
     m_tree->Branch("eclPureClusterCrystalHealth", "std::vector<int>",       &m_eclPureClusterCrystalHealth);
@@ -800,6 +804,7 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclShowerMCFlightMatch",     "std::vector<int>",    &m_eclShowerMCFlightMatch);
   m_tree->Branch("eclShowerMCFFlightMatch",     "std::vector<int>",    &m_eclShowerMCFFlightMatch);
   m_tree->Branch("eclShowerHighestE1mE2",     "std::vector<double>",    &m_eclShowerHighestE1mE2);
+  m_tree->Branch("eclShowerNumberOfCrystalsForEnergy",     "std::vector<double>",    &m_eclShowerNumberOfCrystalsForEnergy);
 
   //MC Truth
   m_tree->Branch("mcMultip",     &m_mcMultip,           "mcMultip/I");
@@ -981,6 +986,7 @@ void ECLDataAnalysisModule::event()
   m_eclClusterTimingError->clear();
   m_eclClusterE9oE21->clear();
   m_eclClusterHighestE->clear();
+  m_eclClusterCellId->clear();
   m_eclClusterNofCrystals->clear();
   m_eclClusterCrystalHealth->clear();
   m_eclClusterIsTrack->clear();
@@ -1075,6 +1081,7 @@ void ECLDataAnalysisModule::event()
   m_eclShowerMCFlightMatch->clear();
   m_eclShowerMCFFlightMatch->clear();
   m_eclShowerHighestE1mE2->clear();
+  m_eclShowerNumberOfCrystalsForEnergy->clear();
 
   ///Pure Digits
   if (m_doPureCsIStudy == true) {
@@ -1162,6 +1169,7 @@ void ECLDataAnalysisModule::event()
     m_eclPureClusterTimingError->clear();
     m_eclPureClusterE9oE21->clear();
     m_eclPureClusterHighestE->clear();
+    m_eclPureClusterCellId->clear();
     m_eclPureClusterLat->clear();
     m_eclPureClusterNofCrystals->clear();
     m_eclPureClusterCrystalHealth->clear();
@@ -1505,6 +1513,7 @@ void ECLDataAnalysisModule::event()
     m_eclClusterTimingError->push_back(aECLClusters->getDeltaTime99());
     m_eclClusterE9oE21->push_back(aECLClusters->getE9oE21());
     m_eclClusterHighestE->push_back(aECLClusters->getEnergyHighestCrystal());
+    m_eclClusterCellId->push_back(aECLClusters->getMaxECellId());
     m_eclClusterNofCrystals->push_back(aECLClusters->getNumberOfCrystals());
     m_eclClusterCrystalHealth->push_back(aECLClusters->getStatus());
 
@@ -1817,6 +1826,7 @@ void ECLDataAnalysisModule::event()
       m_eclPureClusterTimingError->push_back(aECLClusters->getDeltaTime99());
       m_eclPureClusterE9oE21->push_back(aECLClusters->getE9oE21());
       m_eclPureClusterHighestE->push_back(aECLClusters->getEnergyHighestCrystal());
+      m_eclPureClusterCellId->push_back(aECLClusters->getMaxECellId());
       m_eclPureClusterLat->push_back(aECLClusters->getLAT());
       m_eclPureClusterNofCrystals->push_back(aECLClusters->getNumberOfCrystals());
       m_eclPureClusterCrystalHealth->push_back(aECLClusters->getStatus());
@@ -1965,6 +1975,7 @@ void ECLDataAnalysisModule::event()
     m_eclShowerSecondMoment->push_back(aECLShowers->getSecondMoment());
     m_eclShowerE1oE9->push_back(aECLShowers->getE1oE9());
     m_eclShowerIsTrack->push_back(aECLShowers->getIsTrack());
+    m_eclShowerNumberOfCrystalsForEnergy->push_back(aECLShowers->getNumberOfCrystalsForEnergy());
 
     double fe = 0.;
     double se = 0.;

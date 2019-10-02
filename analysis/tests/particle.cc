@@ -3,9 +3,9 @@
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/Logger.h>
 #include <framework/utilities/TestHelpers.h>
 
 #include <analysis/utility/ParticleCopy.h>
@@ -21,7 +21,7 @@ namespace {
   class ParticleTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap> particleExtraInfo;
@@ -29,18 +29,20 @@ namespace {
       StoreArray<MCParticle> mcparticles;
       StoreArray<RestOfEvent> roes;
       StoreArray<ECLCluster> eclClusters;
+      StoreArray<KLMCluster> klmClusters;
       particleExtraInfo.registerInDataStore();
       particles.registerInDataStore();
       mcparticles.registerInDataStore();
       eclClusters.registerInDataStore();
       roes.registerInDataStore();
+      klmClusters.registerInDataStore();
       particles.registerRelationTo(mcparticles);
       particles.registerRelationTo(roes);
       DataStore::Instance().setInitializeActive(false);
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -594,8 +596,6 @@ namespace {
       EXPECT_FLOAT_EQ(0.497614, p.getMass());
     }
 
-    /*
-    // when neutrons exist
     {
       ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
       cluster->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
@@ -607,8 +607,42 @@ namespace {
       EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
       EXPECT_FLOAT_EQ(2., p.getEnergy());
       EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
-      EXPECT_FLOAT_EQ(0.939565, p.getMass());
+      EXPECT_FLOAT_EQ(0.93956536, p.getMass());
     }
-    */
+  }
+
+  /** test particle creation from KLMCluster */
+  TEST_F(ParticleTest, KLMClusterBased)
+  {
+    StoreArray<KLMCluster> klmClusters;
+    {
+      KLMCluster* cluster = klmClusters.appendNew(KLMCluster());
+      cluster->setTime(1.1);
+      cluster->setClusterPosition(1.1, 1.1, 1.0);
+      cluster->setLayers(1);
+      cluster->setInnermostLayer(1);
+      cluster->setMomentumMag(1.0);
+
+      Particle p(cluster);
+      EXPECT_EQ(130, p.getPDGCode());
+      EXPECT_FLOAT_EQ(sqrt(1. + 0.497614 * 0.497614), p.getEnergy());
+      EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
+      EXPECT_FLOAT_EQ(0.497614, p.getMass());
+    }
+
+    {
+      KLMCluster* cluster = klmClusters.appendNew(KLMCluster());
+      cluster->setTime(1.1);
+      cluster->setClusterPosition(1.1, 1.1, 1.0);
+      cluster->setLayers(1);
+      cluster->setInnermostLayer(1);
+      cluster->setMomentumMag(1.0);
+
+      Particle p(cluster, Const::neutron.getPDGCode());
+      EXPECT_EQ(2112, p.getPDGCode());
+      EXPECT_FLOAT_EQ(sqrt(1. + 0.93956536 * 0.93956536), p.getEnergy());
+      EXPECT_EQ(Particle::c_Flavored, p.getFlavorType());
+      EXPECT_FLOAT_EQ(0.93956536, p.getMass());
+    }
   }
 }  // namespace

@@ -33,22 +33,36 @@ CONTACT = "oliver.frost@desy.de"
 
 
 class SegmentFitValidationRun(HarvestingRun):
+    """Harvester to read, postprocess and inspect MC events for track-segment fit validation"""
+
+    #: number of events to generate
     n_events = 10000
+    #: use the low-momentum particle gun event generator
     generator_module = "low_gun"  # Rather high momentum tracks should make the tracks rather straight.
+    #: read generated/simulated/reconstructed events from this ROOT file
     root_input_file = "low_gun.root"
 
+    #: do not generate new events
     monte_carlo = "no"
+    #: use the Riemann fit instead of the Karimaki fit
     karimaki_fit = False
+    #: do not estimate the flight time
     flight_time_estimation = "none"
+    #: do not re-estimate the flight time
     flight_time_reestimation = False
+    #: use the alpha parameter for drift length
     use_alpha_in_drift_length = True
+    #: assume a very heavy particle for flight time calculation
     flight_time_mass_scale = float("nan")
 
+    #: fit the reconstructed hit position for the segment fit
     fit_positions = "recoPos"
+    #: use the drift-length variance in the segment fit
     fit_variance = "proper"
 
     @property
     def output_file_name(self):
+        """Get the output ROOT filename"""
         file_name = "karimaki" if self.karimaki_fit else "riemann"
         file_name += "-mc-" + self.monte_carlo
         if self.flight_time_reestimation:
@@ -61,12 +75,14 @@ class SegmentFitValidationRun(HarvestingRun):
         return file_name
 
     def harvesting_module(self, path=None):
+        """Harvest and post-process the MC events"""
         harvesting_module = SegmentFitValidationModule(self.output_file_name)
         if path:
             path.add_module(harvesting_module)
         return harvesting_module
 
     def create_argument_parser(self, **kwds):
+        """Convert command-line arguments to basf2 argument list"""
         argument_parser = super().create_argument_parser(**kwds)
 
         argument_parser.add_argument(
@@ -151,8 +167,10 @@ class SegmentFitValidationRun(HarvestingRun):
         return argument_parser
 
     def create_path(self):
-        # Sets up a path that plays back pregenerated events or generates events
-        # based on the properties in the base class.
+        """
+        Sets up a path that plays back pregenerated events or generates events
+        based on the properties in the base class.
+        """
         path = super().create_path()
 
         path.add_module("TFCDC_WireHitPreparer",
@@ -162,6 +180,7 @@ class SegmentFitValidationRun(HarvestingRun):
 
         path.add_module("TFCDC_ClusterPreparer")
 
+        #: Degree of refinement of the segment generation
         if self.monte_carlo == "no":
             # MC free - default
             path.add_module(
@@ -206,20 +225,28 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
     compose validation plots on terminate."""
 
     def __init__(self, output_file_name):
+        """Constructor"""
         super().__init__(foreach='CDCSegment2DVector',
                          output_file_name=output_file_name)
 
+        #: by default, there is no method to find matching MC track segments
         self.mc_segment_lookup = None
 
     def initialize(self):
+        """Receive signal at the start of event processing"""
         super().initialize()
+
+        #: Method to find matching MC track segments
         self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
+        #: Method to find matching MC hits
         self.mc_hit_lookup = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
 
     def prepare(self):
+        """Initialize the MC-hit lookup method"""
         Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
 
     def pick(self, segment):
+        """Select segments with 4 or more hits and a matching primary MC particle"""
         mc_segment_lookup = self.mc_segment_lookup
         mc_particle = mc_segment_lookup.getMCParticle(segment)
 
@@ -227,6 +254,8 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         return mc_particle and is_primary(mc_particle) and segment.size() > 3
 
     def peel(self, segment):
+        """Aggregate the track and MC information for track-segment analysis"""
+
         mc_segment_lookup = self.mc_segment_lookup
         mc_hit_lookup = self.mc_hit_lookup
 
@@ -310,9 +339,12 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         return segment_crops
 
     # Refiners to be executed at the end of the harvesting / termination of the module
+    #: Save histograms in a sub folder
     save_histograms = refiners.save_histograms(outlier_z_score=5.0, allow_discrete=True)
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree()
 
+    #: Save curvature-pull information in a sub folder
     save_curvature_pull = refiners.save_pull_analysis(
         part_name="curvature",
         unit="1/cm",
@@ -325,6 +357,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         outlier_z_score=4.0,
         title_postfix="")
 
+    #: Save right-left curvature-pull information in a sub folder
     save_curvature_pull_rl_pure = refiners.save_pull_analysis(
         part_name="curvature",
         unit="1/cm",
@@ -341,6 +374,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         folder_name="rl_pure/{groupby_addition}"
     )
 
+    #: Save absolute curvature-pull information in a sub folder
     save_absolute_curvature_pull = refiners.save_pull_analysis(
         part_name="curvature",
         unit="1/cm",
@@ -353,6 +387,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         outlier_z_score=4.0,
         title_postfix="")
 
+    #: Save fit-quality histograms in a sub folder
     save_fit_quality_histograms = refiners.save_histograms(
         outlier_z_score=5.0,
         select={

@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/ckf/cdc/filters/states/BaseCDCStateFilter.h>
-#include <tracking/ckf/cdc/entities/CDCCKFState.h>
 
 #include <tracking/ckf/general/utilities/Advancer.h>
 #include <tracking/ckf/general/utilities/KalmanStepper.h>

@@ -19,7 +19,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/Logger.h>
 
 #include <utility>
 #include <algorithm>
@@ -35,7 +34,7 @@ namespace {
   class ParticleCombinerTest : public ::testing::Test {
   protected:
     /** register Particle array */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreArray<Particle> particles;
@@ -46,7 +45,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -291,8 +290,8 @@ namespace {
 
     void addExpectedParticle(Particle::EFlavorType flavourType, int pdg_code, std::vector<int> daughter_indices)
     {
-      expected_particles.push_back(std::make_tuple(flavourType, pdg_code, std::set<int>(daughter_indices.begin(),
-                                                   daughter_indices.end())));
+      expected_particles.emplace_back(flavourType, pdg_code, std::set<int>(daughter_indices.begin(),
+                                      daughter_indices.end()));
     }
 
     void addAndCheckParticlesFromGenerator()
@@ -314,8 +313,8 @@ namespace {
           Particle* part = particles.appendNew(particle);
           added_particles.push_back(part);
           auto daughter_indices = part->getDaughterIndices();
-          received_particles.push_back(std::make_tuple(part->getFlavorType(), part->getPDGCode(), std::set<int>(daughter_indices.begin(),
-                                                       daughter_indices.end())));
+          received_particles.emplace_back(part->getFlavorType(), part->getPDGCode(), std::set<int>(daughter_indices.begin(),
+                                          daughter_indices.end()));
         }
       }
       EXPECT_FALSE(generator.loadNext());
@@ -806,7 +805,7 @@ namespace {
     while (combiner3.loadNext()) {
       const Particle& particle = combiner3.getCurrentParticle();
 
-      std::vector<int> indices = particle.getDaughterIndices();
+      const std::vector<int>& indices = particle.getDaughterIndices();
       EXPECT_FALSE(isForbidden(indices)); // check we don't have particles 3 and 4
 
       particles.appendNew(particle);
@@ -823,7 +822,7 @@ namespace {
     while (combiner2.loadNext()) {
       const Particle& particle = combiner2.getCurrentParticle();
 
-      std::vector<int> indices = particle.getDaughterIndices();
+      const std::vector<int>& indices = particle.getDaughterIndices();
       EXPECT_FALSE(isForbidden(indices)); // check we don't have particles 3 and 4
 
       particles.appendNew(particle);
@@ -1085,15 +1084,15 @@ namespace {
         // loop over all pairs of particles within these two lists
         // this is overkill (not optimal), but for testing purposes
         // the execution time is not a concern
-        for (unsigned int k = 0; k < iAll.size(); k++) {
-          for (unsigned int m = 0; m < jAll.size(); m++) {
-            const Particle* iP = particles[iAll[k]];
-            const Particle* jP = particles[jAll[m]];
+        for (int k : iAll) {
+          for (int m : jAll) {
+            const Particle* iP = particles[k];
+            const Particle* jP = particles[m];
 
             bool copies = iP->isCopyOf(jP);
 
-            int iID = comb7.getUniqueID(iAll[k]);
-            int jID = comb7.getUniqueID(jAll[m]);
+            int iID = comb7.getUniqueID(k);
+            int jID = comb7.getUniqueID(m);
 
             EXPECT_TRUE(iID > 0);
             EXPECT_TRUE(jID > 0);

@@ -9,7 +9,6 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisPXDFits.h>
 #include <TROOT.h>
-#include <TClass.h>
 
 using namespace std;
 using namespace Belle2;
@@ -31,7 +30,7 @@ DQMHistAnalysisPXDFitsModule::DQMHistAnalysisPXDFitsModule()
 {
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
-           std::string("pxdraw"));
+           std::string("PXDRAW"));
 //  addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
   for (auto i = 0, j = 0; i < 64; i++) {
     auto layer = (((i >> 5) & 0x1) + 1);
@@ -65,28 +64,28 @@ void DQMHistAnalysisPXDFitsModule::initialize()
 
   a = "pxdraw/hSignalAll";
   a.ReplaceAll("/", "_");
-  m_cSignalAll = new TCanvas("c_" + a);
+  m_cSignalAll = new TCanvas((m_histogramDirectoryName + "/c_").data() + a);
   m_hSignalAll = new TH1F(a, a, NUM_MODULES, 0, NUM_MODULES);
   m_hSignalAll->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hSignalAll->SetStats(false);
 
   a = "pxdraw/hCommonAll";
   a.ReplaceAll("/", "_");
-  m_cCommonAll = new TCanvas("c_" + a);
+  m_cCommonAll = new TCanvas((m_histogramDirectoryName + "/c_").data() + a);
   m_hCommonAll = new TH1F(a, a, NUM_MODULES, 0, NUM_MODULES);
   m_hCommonAll->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonAll->SetStats(false);
 
   a = "pxdraw/hCountsAll";
   a.ReplaceAll("/", "_");
-  m_cCountsAll = new TCanvas("c_" + a);
+  m_cCountsAll = new TCanvas((m_histogramDirectoryName + "/c_").data() + a);
   m_hCountsAll = new TH1F(a, a, NUM_MODULES, 0, NUM_MODULES);
   m_hCountsAll->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCountsAll->SetStats(false);
 
   a = "pxdraw/hOccupancyAll";
   a.ReplaceAll("/", "_");
-  m_cOccupancyAll = new TCanvas("c_" + a);
+  m_cOccupancyAll = new TCanvas((m_histogramDirectoryName + "/c_").data() + a);
   m_hOccupancyAll = new TH1F(a, a, NUM_MODULES, 0, NUM_MODULES);
   m_hOccupancyAll->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hOccupancyAll->SetStats(false);
@@ -107,7 +106,7 @@ void DQMHistAnalysisPXDFitsModule::initialize()
     a.ReplaceAll("/", "_");
     a += s2;
 
-    m_cSignal[i] = new TCanvas("c_" + a);
+    m_cSignal[i] = new TCanvas((m_histogramDirectoryName + "/c_").data() + a);
     m_hSignal[i] = new TH2F(a, a, 6, 0, 6, 4, 0, 4);
     m_hSignal[i]->SetDirectory(0);// dont mess with it, this is MY histogram
     m_hSignal[i]->SetStats(false);
@@ -117,7 +116,7 @@ void DQMHistAnalysisPXDFitsModule::initialize()
     a = "pxdraw/hCommon";
     a.ReplaceAll("/", "_");
     a += s2;
-    m_cCommon[i] = new TCanvas("c_" + a);
+    m_cCommon[i] = new TCanvas((m_histogramDirectoryName + "/c_").data() + a);
     m_hCommon[i] = new TH2F(a, a, 6, 0, 6, 4, 0, 4);
     m_hCommon[i]->SetDirectory(0);// dont mess with it, this is MY histogram
     m_hCommon[i]->SetStats(false);
@@ -127,7 +126,7 @@ void DQMHistAnalysisPXDFitsModule::initialize()
     a = "pxdraw/hCounts";
     a.ReplaceAll("/", "_");
     a += s2;
-    m_cCounts[i] = new TCanvas("c_" + a);
+    m_cCounts[i] = new TCanvas((m_histogramDirectoryName + "/c_").data() + a);
     m_hCounts[i] = new TH2F(a, a, 6, 0, 6, 4, 0, 4);
     m_hCounts[i]->SetDirectory(0);// dont mess with it, this is MY histogram
     m_hCounts[i]->SetStats(false);

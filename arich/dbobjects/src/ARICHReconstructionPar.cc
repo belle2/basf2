@@ -10,10 +10,8 @@
 
 #include <arich/dbobjects/ARICHReconstructionPar.h>
 
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 #include <iostream>
-#include <iomanip>
+#include <vector>
 
 using namespace std;
 using namespace Belle2;
@@ -85,8 +83,8 @@ void ARICHReconstructionPar::print() const
   cout << endl << "-----bkg PDF-----" << endl;
   m_bkgPDF->Print();
   int Npar = m_bkgPDF->GetNpar();
-  double bkgPars[Npar];
-  m_bkgPDF->GetParameters(bkgPars);
+  std::vector<double> bkgPars(Npar, 0);
+  m_bkgPDF->GetParameters(bkgPars.data());
   for (int i = 0; i < Npar; i++)cout << Form("bkg Pars %d = %e", i, bkgPars[i]) << endl;
 
   cout << endl << "-----flat backgroud per pad-----"  << endl;

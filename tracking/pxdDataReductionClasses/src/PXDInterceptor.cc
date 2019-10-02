@@ -9,10 +9,7 @@
  **************************************************************************/
 
 #include <tracking/dataobjects/RecoTrack.h>
-#include <genfit/MeasurementFactory.h>
-#include <genfit/AbsTrackRep.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/pxdDataReductionClasses/PXDInterceptor.h>
 #include <vxd/geometry/GeoCache.h>
@@ -91,42 +88,37 @@ PXDInterceptor::appendIntercepts(StoreArray<PXDIntercept>* interceptList, std::l
   double lambda = 0;
 
 
-  for (int propDir = -1; propDir <= 1; propDir += 2) {
-    gfTrack.getCardinalRep()->setPropDir(propDir);
+  while (itPlanes != planeList.end()) {
 
-    while (itPlanes != planeList.end()) {
+    genfit::MeasuredStateOnPlane state;
 
-      genfit::MeasuredStateOnPlane state;
-
-      try {
-        state = gfTrack.getFittedState();
-        lambda = state.extrapolateToPlane(itPlanes->getSharedPlanePtr());
-      }  catch (...) {
-        B2DEBUG(20, "extrapolation to plane failed");
-        ++itPlanes;
-        continue;
-      }
-
-      const TVectorD& predictedIntersect = state.getState();
-      const TMatrixDSym& covMatrix = state.getCov();
-
-      tmpPXDIntercept.setCoorU(predictedIntersect[3]);
-      tmpPXDIntercept.setCoorV(predictedIntersect[4]);
-      tmpPXDIntercept.setSigmaU(sqrt(covMatrix(3, 3)));
-      tmpPXDIntercept.setSigmaV(sqrt(covMatrix(4, 4)));
-      tmpPXDIntercept.setSigmaUprime(sqrt(covMatrix(1, 1)));
-      tmpPXDIntercept.setSigmaVprime(sqrt(covMatrix(2, 2)));
-      tmpPXDIntercept.setLambda(lambda);
-      tmpPXDIntercept.setVxdID(itPlanes->getVxdID());
-
-      interceptList->appendNew(tmpPXDIntercept);
-
-      recoTrackToPXDIntercepts->add(recoTrackIndex, interceptList->getEntries() - 1);
-
+    try {
+      state = gfTrack.getFittedState();
+      lambda = state.extrapolateToPlane(itPlanes->getSharedPlanePtr());
+    }  catch (...) {
+      B2DEBUG(20, "extrapolation to plane failed");
       ++itPlanes;
-
+      continue;
     }
-  }
 
+    const TVectorD& predictedIntersect = state.getState();
+    const TMatrixDSym& covMatrix = state.getCov();
+
+    tmpPXDIntercept.setCoorU(predictedIntersect[3]);
+    tmpPXDIntercept.setCoorV(predictedIntersect[4]);
+    tmpPXDIntercept.setSigmaU(sqrt(covMatrix(3, 3)));
+    tmpPXDIntercept.setSigmaV(sqrt(covMatrix(4, 4)));
+    tmpPXDIntercept.setSigmaUprime(sqrt(covMatrix(1, 1)));
+    tmpPXDIntercept.setSigmaVprime(sqrt(covMatrix(2, 2)));
+    tmpPXDIntercept.setLambda(lambda);
+    tmpPXDIntercept.setVxdID(itPlanes->getVxdID());
+
+    interceptList->appendNew(tmpPXDIntercept);
+
+    recoTrackToPXDIntercepts->add(recoTrackIndex, interceptList->getEntries() - 1);
+
+    ++itPlanes;
+
+  }
 
 }

@@ -19,7 +19,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 
 #include <cmath>
-#include <algorithm>
 
 using namespace std;
 using namespace Belle2;

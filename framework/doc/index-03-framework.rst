@@ -12,14 +12,8 @@ also simple algorithms can be implemented directly in python. All main
 functions are implemented in a module called `basf2` and most people will just
 start their steering file or script with ::
 
-    from basf2 import *
-    main = create_path()
-
-but it is recommended (escpecially in scripts to be used by others) to import
-the module and call all methods by prefix::
-
     import basf2
-    main = basf2.create_path()
+    main = basf2.Path()
 
 .. _general_modpath:
 
@@ -40,12 +34,17 @@ the framework executes the modules of a path, starting with the first one and
 proceeding with the module next to it. The modules are executed one at a time,
 exactly in the order in which they were placed into the path.
 
+Modules can have conditions attached to them to steer the processing flow
+depending of the outcome of the calculation in each module.
+
 The data, to be processed by the modules, is stored in a common storage, the
-DataStore. Each module has read and write access to the storage.
+DataStore. Each module has read and write access to the storage. In addition
+there's also non-event data, the so called conditions, which will be loaded from
+a central conditions database and are available in the DBStore.
 
 .. _framework_modpath_diagram:
 
-.. figure:: ModulePath.png
+.. figure:: modules_paths.png
   :width: 40em
 
   Schematic view of the processing flow in the Belle II Software
@@ -54,10 +53,15 @@ DataStore. Each module has read and write access to the storage.
 .. Functions concerning modules and Paths
 .. ++++++++++++++++++++++++++++++++++++++
 
-Usually each script needs to create a new path using `create_path`, add
+Usually each script needs to create a new path using `Path()`, add
 all required modules in the correct order and finally call :py:func:`process` on
-the fully configured path. The following functions are all related to the
-handling of modules and paths:
+the fully configured path.
+
+.. warning:: Preparing a `Path` and adding `Modules <Module>` to it **does not
+   execute anything**, it only prepares the computation which is only done when
+   `process` is called.
+
+The following functions are all related to the handling of modules and paths:
 
 .. autofunction:: basf2.create_path
 .. autofunction:: basf2.register_module
@@ -246,129 +250,14 @@ directly in python if needed. See
 Conditions Database
 -------------------
 
-The conditions database is used for configuration objects (payloads) which
-might change over time. There are two different "backends" to obtain conditions
-data:
+The conditions database is the place where we store additional data needed to
+interpret and analyse the data that can change over time, for example the
+detector configuration or calibration constants.
 
-1. A local database which stores configuration objects in local files. The
-   valid set of configuration constants is configured in a plain text file.
+In many cases it should not be necessary to change the configuration but except for
+maybe adding an extra globaltag to the list via `conditions.globaltags <ConditionsConfiguration.globaltags>`
 
-2. A central database where the conditions are stored on a central server and
-   are downloaded on demand. In this case the valid set of configuration
-   constants is identified by a ``globalTag`` which is a text identifier known
-   to the database.
-
-   .. note::
-
-      To inspect (and modify) this central database please have a look at
-      :ref:`b2conditionsdb`
-
-The default configuration of the Belle2 software is to look in a chain of
-backends one at a time until the required constants can be found:
-
-1. in a local database configured in :file:`localdb/database.txt` in the
-   current working directory.
-
-   If conditions are found there use them but emit a `WARNING
-   <LogLevel.WARNING>` message to indicate that custom condtitions have been
-   used.
-
-2. in the central database under a default global tag name which is dependent
-   on the software version and can be queried with `get_default_global_tags()`
-   and is also displayed when running :program:`basf2 --info`
-
-   If possible the payloads are not downloaded but taken from
-   :file:`/cvmfs/belle.cern.ch/conditions`, otherwise they are downloaded from
-   the server and cached in a directory :file:`centraldb` in the current
-   working directory.
-
-3. in a local database configures in
-   :file:`/cvmfs/belle.cern.ch/conditions/{globalTag}.txt` where ``globalTag``
-   is the default global tag as mentioned above.
-
-
-Environment Variables
-+++++++++++++++++++++
-
-These settings can be modified by setting environment variables
-
-.. envvar:: BELLE2_CONDB_GLOBALTAG
-
-   if set this overrides the default global tag returned by
-   `get_default_global_tags`. This can be a list of tags separated by white
-   space in which case all global tags are searched.
-
-   ::
-
-       export BELLE2_CONDB_FALLBACK="defaultTag additionalTag"
-
-   If set to an empty value
-   access to the central database is disabled.
-
-.. envvar:: BELLE2_CONDB_FALLBACK
-
-   if set this overrides the fallback local database which is searched if the
-   constants could not be found in the central database. This can either be a
-   filename or a directory or a combination of both separated by whitespace. In
-   case of a directory the database configuration is taken from
-   :file:`{directory}/{globalTag}.txt` for each globalTag returned by
-   `get_default_global_tags`.
-
-   ::
-
-       export BELLE2_CONDB_FALLBACK="/cvmfs/belle.cern.ch/conditions ./mylocaldb.txt"
-
-   If set to an empty value no fallback database will be configured.
-
-.. envvar:: BELLE2_CONDB_PROXY
-
-   Can be set to specify a proxy server to use for all connections to the
-   central database. The parameter should be a string holding the host name or
-   dotted numerical IP address. A numerical IPv6 address must be written within
-   [brackets]. To specify port number in this string, append ``:[port]`` to the
-   end of the host name. If not specified, libcurl will default to using port
-   1080 for proxies. The proxy string should be prefixed with ``[scheme]://``
-   to specify which kind of proxy is used.
-
-   *http*
-     HTTP Proxy. Default when no scheme or proxy type is specified.
-
-   *https*
-     HTTPS Proxy.
-
-   *socks4*
-     SOCKS4 Proxy.
-
-   *socks4a*
-     SOCKS4a Proxy. Proxy resolves URL hostname.
-
-   *socks5*
-     SOCKS5 Proxy.
-
-   *socks5h*
-     SOCKS5 Proxy. Proxy resolves URL hostname.
-
-   ::
-
-      export BELLE2_CONDB_PROXY="http://192.168.178.1:8081"
-
-   If it is not set the default proxy configuration is used (e.g. honor
-   ``$http_proxy``). If it is set to an empty value direct connection is
-   used.
-
-Settings in Python
-++++++++++++++++++
-
-All the configurations of the conditions database access can also be performed
-directly in python using the following functions:
-
-.. autofunction:: basf2.get_default_global_tags
-.. autofunction:: basf2.reset_database
-.. autofunction:: basf2.use_database_chain
-.. autofunction:: basf2.use_local_database
-.. autofunction:: basf2.use_central_database
-.. autofunction:: basf2.set_central_database_networkparams
-
+.. toctree:: conditions-database
 
 Additional Functions
 --------------------

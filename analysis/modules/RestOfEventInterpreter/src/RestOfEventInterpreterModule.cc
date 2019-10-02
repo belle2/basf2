@@ -12,13 +12,7 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
-
-#include <analysis/variables/Variables.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/MCParticle.h>
+#include <analysis/dataobjects/RestOfEvent.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -27,7 +21,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 
 #include <iostream>
-#include <utility>
 
 using namespace std;
 
@@ -98,7 +91,7 @@ namespace Belle2 {
 
     for (unsigned i = 0; i < nParts; i++) {
       const Particle* particle = plist->getParticle(i);
-      RestOfEvent* roe = particle->getRelated<RestOfEvent>();
+      auto* roe = particle->getRelated<RestOfEvent>();
       for (auto& maskName : m_maskNames) {
         if (!m_update) {
           roe->initializeMask(maskName, "ROEInterpreterModule");

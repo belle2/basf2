@@ -8,28 +8,19 @@
  *   This file tests the variables used for flavor tagging.     *
  ****************************************************************/
 
-#include <analysis/variables/FlavorTaggingVariables.h>
-
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/utility/MCMatching.h>
-#include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
-#include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -38,9 +29,7 @@
 #include <gtest/gtest.h>
 
 #include <TMatrixFSym.h>
-#include <TRandom3.h>
 #include <TLorentzVector.h>
-#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
@@ -51,7 +40,7 @@ namespace {
   class FlavorTaggingVariablesTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreArray<ECLCluster> testsECLClusters;
@@ -84,7 +73,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -297,9 +286,9 @@ namespace {
 
     double refsBtagToWBosonPMissCMS = 0.542734;
 
-    for (unsigned i = 0; i < roeChargedParticles.size(); i++) {
+    for (auto& roeChargedParticle : roeChargedParticles) {
 
-      double output = var -> function(roeChargedParticles[i]);
+      double output = var -> function(roeChargedParticle);
 
       EXPECT_NEAR(output, refsBtagToWBosonPMissCMS, 0.000005);
 
@@ -382,9 +371,9 @@ namespace {
     * analysis/utility/include/MCMatching.h */
     vector<int> notAcceptedMCErrorFlags{4, 8, 16, 32, 64, 128, 256, 512};
 
-    for (unsigned i = 0; i < notAcceptedMCErrorFlags.size(); i++) {
+    for (int notAcceptedMCErrorFlag : notAcceptedMCErrorFlags) {
 
-      savedB0->setExtraInfo(MCMatching::c_extraInfoMCErrors, notAcceptedMCErrorFlags[i]);
+      savedB0->setExtraInfo(MCMatching::c_extraInfoMCErrors, notAcceptedMCErrorFlag);
       double output = var -> function(savedB0);
       ASSERT_EQ(output, 0);
 

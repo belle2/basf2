@@ -10,7 +10,9 @@
 
 #include <tracking/modules/pxdDataReduction/ROIDQMModule.h>
 #include <vxd/geometry/GeoCache.h>
+
 #include <TDirectory.h>
+#include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;

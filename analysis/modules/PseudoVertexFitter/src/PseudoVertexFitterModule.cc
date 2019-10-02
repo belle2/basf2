@@ -10,7 +10,8 @@
 
 #include <analysis/modules/PseudoVertexFitter/PseudoVertexFitterModule.h>
 #include <analysis/dataobjects/Particle.h>
-#include <TMath.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <framework/database/DBObjPtr.h>
 
 using namespace std;
 
@@ -75,8 +76,9 @@ namespace Belle2 {
 
     const std::vector<Particle*> daughters = mother->getDaughters();
     std::vector<TMatrixFSym> daughter_matrices;
-    for (unsigned int i = 0; i < daughters.size(); i++) {
-      daughter_matrices.push_back(daughters[i]->getMomentumVertexErrorMatrix());
+    daughter_matrices.reserve(daughters.size());
+    for (auto daughter : daughters) {
+      daughter_matrices.push_back(daughter->getMomentumVertexErrorMatrix());
     }
 
     TMatrixFSym mother_errMatrix(7);

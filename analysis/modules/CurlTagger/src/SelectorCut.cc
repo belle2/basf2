@@ -11,7 +11,6 @@
 #include <analysis/modules/CurlTagger/SelectorCut.h>
 
 //Root includes
-#include "TLorentzVector.h"
 #include "TVector3.h"
 #include "TMath.h"
 
@@ -34,9 +33,7 @@ SelectorCut::SelectorCut(bool belleFlag)
 
 }
 
-SelectorCut::~SelectorCut()
-{
-}
+SelectorCut::~SelectorCut() = default;
 
 std::vector<float> SelectorCut::getVariables(Particle* iPart, Particle* jPart)
 {

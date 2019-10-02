@@ -605,7 +605,7 @@ void TRGGRLProjectsModule::event()
   //..Other input bits
 
   bool cdc_active = false;
-  if (m_eventTime.isValid()) {
+  if (m_eventTime->hasBinnedEventT0(Const::CDC)) {
     if (m_eventTime->getBinnedEventT0(Const::CDC) != 0) { cdc_active = true; }
   }
 

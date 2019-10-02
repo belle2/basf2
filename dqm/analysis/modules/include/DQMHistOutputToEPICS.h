@@ -8,9 +8,7 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <TF1.h>
 #include <string>
 
 #ifdef _BELLE2_EPICS

@@ -12,6 +12,7 @@
 #include <svd/reconstruction/SimpleClusterCandidate.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
+#include <framework/core/Environment.h>
 
 using namespace std;
 
@@ -149,9 +150,16 @@ namespace Belle2 {
                                              0.5 * landauTail * landauTail);
       }
 
-      //Lorentz shift correction
+      //Lorentz shift correction - PATCHED
+      //NOTE: layer 3 is upside down with respect to L4,5,6 in the real data (real SVD), but _not_ in the simulation. We need to change the sign of the Lorentz correction on L3 only if reconstructing data, i.e. if Environment::Instance().isMC() is FALSE.
       const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(m_vxdID));
-      m_position -= sensorInfo.getLorentzShift(m_isUside, m_position);
+
+      bool isMC = Environment::Instance().isMC();
+
+      if ((m_vxdID.getLayerNumber() == 3) && ! isMC)
+        m_position += sensorInfo.getLorentzShift(m_isUside, m_position);
+      else
+        m_position -= sensorInfo.getLorentzShift(m_isUside, m_position);
 
       m_timeError = 6; //order of magnitude
     };

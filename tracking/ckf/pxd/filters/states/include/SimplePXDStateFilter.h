@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/ckf/pxd/filters/states/BasePXDStateFilter.h>
-#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 #include <tracking/ckf/pxd/utilities/PXDKalmanStepper.h>
 
 namespace Belle2 {
@@ -29,6 +28,7 @@ namespace Belle2 {
     /// Cache for the B field at the IP
     double m_cachedBField;
 
+    /// Kalman stepper (CKF) for PXD
     PXDKalmanStepper m_kalmanStepper;
 
     /// Shortcut for a 2x3 array.

@@ -103,6 +103,9 @@ namespace Belle2 {
     /** For index files, this creates TEventList/TEntryListArray to enable better cache use. */
     void addEventListForIndexFile(const std::string& parentLfn);
 
+    /** Correct isMC flag for raw data recorded before experiment 8 run 2364. */
+    void realDataWorkaround(FileMetaData& metaData);
+
     //first the steerable variables:
     /** File to read from. Cannot be used together with m_inputFileNames. */
     std::string m_inputFileName;
@@ -145,10 +148,6 @@ namespace Belle2 {
 
     /** experiment, run, event number of first event to load */
     std::vector<int> m_skipToEvent;
-
-    /** Try recovery when reading corrupted files. Might allow reading some of the data (FileMetaData likely to be missing) */
-    bool m_recovery;
-
 
     //then those for purely internal use:
 

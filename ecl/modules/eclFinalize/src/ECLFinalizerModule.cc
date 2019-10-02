@@ -7,6 +7,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
  *               Guglielmo De Nardo (denardo@na.infn.it)                  *
+ *               Ewan Hill (ehill@mail.ubc.ca)                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -224,6 +225,7 @@ int ECLFinalizerModule::makeCluster(int index, double evtt0)
   eclCluster->setEnergy(eclShower->getEnergy());
   eclCluster->setEnergyRaw(eclShower->getEnergyRaw());
   eclCluster->setEnergyHighestCrystal(eclShower->getEnergyHighestCrystal());
+  eclCluster->setMaxECellId(static_cast<unsigned short>(eclShower->getCentralCellId()));
 
   double covmat[6] = {
     eclShower->getUncertaintyEnergy()* eclShower->getUncertaintyEnergy(),
@@ -243,25 +245,41 @@ int ECLFinalizerModule::makeCluster(int index, double evtt0)
   eclCluster->setSecondMoment(eclShower->getSecondMoment());
   eclCluster->setLAT(eclShower->getLateralEnergy());
   eclCluster->setNumberOfCrystals(eclShower->getNumberOfCrystals());
-  eclCluster->setTime(eclShower->getTime() - evtt0);
+  eclCluster->setTime(eclShower->getTime() - evtt0);   // If bad timing fit, this value is changed later in the code
   eclCluster->setDeltaTime99(eclShower->getDeltaTime99());
   eclCluster->setTheta(eclShower->getTheta());
   eclCluster->setPhi(eclShower->getPhi());
   eclCluster->setR(eclShower->getR());
   eclCluster->setPulseShapeDiscriminationMVA(eclShower->getPulseShapeDiscriminationMVA());
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   eclCluster->setClusterHadronIntensity(eclShower->getShowerHadronIntensity());
+#pragma GCC diagnostic pop
   eclCluster->setNumberOfHadronDigits(eclShower->getNumberOfHadronDigits());
 
   // set relation to ECLShower
   eclCluster->addRelationTo(eclShower);
 
-  // set relation to ECLCalDigits
+  // set relation to ECLCalDigits and set failed timing flags
+  auto cellIDOfMaxEnergyCrystal = eclShower->getCentralCellId() ;
   auto showerDigitRelations = eclShower->getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
   for (unsigned int iRel = 0; iRel < showerDigitRelations.size(); ++iRel) {
     const auto calDigit = showerDigitRelations.object(iRel);
     const auto weight = showerDigitRelations.weight(iRel);
 
     eclCluster->addRelationTo(calDigit, weight);
+
+
+    // Set the failed timing flag for the crystal that defines the cluster time
+    if (calDigit->getCellId() == cellIDOfMaxEnergyCrystal) {
+      if (calDigit->isFailedFit()) {
+        eclCluster->addStatus(ECLCluster::EStatusBit::c_fitTimeFailed);
+        eclCluster->setTime(eclShower->getTime());
+      }
+      if (calDigit->isTimeResolutionFailed()) {
+        eclCluster->addStatus(ECLCluster::EStatusBit::c_timeResolutionFailed);
+      }
+    }
   }
 
   return eclCluster->getArrayIndex();

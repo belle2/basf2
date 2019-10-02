@@ -3,7 +3,7 @@
 
 """
 <header>
-    <input>CharmlessHad2BodyCharged.udst.root</input>
+    <input>../CharmlessHad2BodyCharged.udst.root</input>
     <output>CharmlessHad2BodyCharged_Validation.root</output>
     <contact>khsmith@student.unimelb.edu.au</contact>
 </header>
@@ -11,23 +11,47 @@
 
 from basf2 import *
 from modularAnalysis import *
+from variables import variables
+from validation_tools.metadata import create_validation_histograms
 
 charmless2chargedpath = Path()
+myEmail = 'khsmith@student.unimelb.edu.au'
 
-# the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
-inputMdst('MC9', 'CharmlessHad2BodyCharged.udst.root', path=charmless2chargedpath)
+# the variables that are printed out are: Mbc, deltaE and Mbc vs deltaE
+inputMdst('default', '../CharmlessHad2BodyCharged.udst.root', path=charmless2chargedpath)
 
-from variables import variables
-variablesToHistogram(
-    filename='CharmlessHad2BodyCharged_Validation.root',
-    decayString='B-:2BodyBm',
-    variables=[
-        ('Mbc', 100, 5.2, 5.3),
-        ('deltaE', 100, -1, 1),
-        ('daughter(0, InvM)', 100, 0.5, 1.2),  # K*+ invariant mass
-        ('daughter(1, InvM)', 100, 0.5, 1.2)],  # rho0 invariant mass
-    variables_2d=[
-        ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7)])
+create_validation_histograms(
+    rootfile='CharmlessHad2BodyCharged_Validation.root',
+    particlelist='B-:2BodySkim',
+    variables_1d=[(
+        'deltaE', 100, -1, 1,
+        '#Delta E',
+        myEmail,
+        '$\\Delta E$ of event',
+        'Peak around zero',
+        '#Delta E [GeV]', 'Candidates',
+        'shifter'
+    ), (
+        'Mbc', 100, 5.2, 5.3,
+        'Mbc',
+        myEmail,
+        'Beam-constrained mass of event',
+        'Peaking around B mass (5.28 GeV)',
+        'M_{bc} [GeV]', 'Candidates',
+        'shifter'
+    )],
+    variables_2d=[(
+        'deltaE', 50, -0.7, 0.7,
+        'Mbc', 50, 5.23, 5.31,
+        'Mbc vs deltaE',
+        myEmail,
+        'Plot of the $\\Delta E$ of the event against the beam constrained mass',
+        'Peak of $\\Delta E$ around zero, and $M_{bc}$ around B mass (5.28 GeV)',
+        '#Delta E [GeV]', 'M_{bc} [GeV]',
+        'colz, shifter'
+    )],
+    path=charmless2chargedpath
+)
 
 process(charmless2chargedpath)
 print(statistics)

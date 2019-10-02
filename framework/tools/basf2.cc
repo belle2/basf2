@@ -34,17 +34,19 @@
 
 #include <framework/core/Environment.h>
 #include <framework/core/DataFlowVisualization.h>
+#include <framework/core/RandomNumbers.h>
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogSystem.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/core/MetadataService.h>
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/predicate.hpp> //for iequals()
 
 #include <unistd.h>
-#include <signal.h>
+#include <csignal>
 #include <cstdlib>
 #include <iostream>
 #include <algorithm>
@@ -135,6 +137,10 @@ int main(int argc, char* argv[])
     ("arg", prog::value<vector<string> >(&arguments), "Additional arguments to be passed to the steering file")
     ("log_level,l", prog::value<string>(),
      "Set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
+    ("random-seed", prog::value<string>(),
+     "Set the default initial seed for the random number generator. "
+     "This does not take precedence over calls to set_random_seed() in the steering file, but just changes the default. "
+     "If no seed is set via either of these mechanisms, the initial seed will be taken from the system's entropy pool.")
     ("debug_level,d", prog::value<unsigned int>(), "Set default debug level. Also sets the log level to DEBUG.")
     ("events,n", prog::value<unsigned int>(), "Override number of events for EventInfoSetter; otherwise set maximum number of events.")
     ("run", prog::value<int>(), "Override run for EventInfoSetter, must be used with -n and --experiment")
@@ -167,6 +173,8 @@ int main(int argc, char* argv[])
      "Do not read any provided steering file, instead execute the pickled (serialized) path from the given file.")
     ("zmq",
      "Use ZMQ for multiprocessing instead of a RingBuffer. This has many implications and should only be used by experts.")
+    ("job-information", prog::value<string>(),
+     "Create json file with metadata of output files and basf2 execution status.")
 #ifdef HAS_CALLGRIND
     ("profile", prog::value<string>(),
      "Name of a module to profile using callgrind. If more than one module of that name is registered only the first one will be profiled.")
@@ -252,7 +260,8 @@ int main(int argc, char* argv[])
           "--callgrind-out-file=callgrind." + profileModule + ".%p",
         };
         //As execvp wants non-const char* pointers we have to copy the string contents.
-        for (auto arg : valgrind_argv) { cmd.push_back(strdup(arg.c_str())); }
+        cmd.reserve(valgrind_argv.size());
+        for (const auto& arg : valgrind_argv) { cmd.push_back(strdup(arg.c_str())); }
         //And now we add our own arguments, including the program name.
         for (int i = 0; i < argc; ++i)  { cmd.push_back(argv[i]); }
         //Finally, execvp wants a nullptr as last argument
@@ -304,13 +313,13 @@ int main(int argc, char* argv[])
 
     // -i
     if (varMap.count("input")) {
-      const vector<string>& names = varMap["input"].as<vector<string> >();
+      const auto& names = varMap["input"].as<vector<string>>();
       Environment::Instance().setInputFilesOverride(names);
     }
 
     // -S
     if (varMap.count("sequence")) {
-      const vector<string>& sequences = varMap["sequence"].as<vector<string> >();
+      const auto& sequences = varMap["sequence"].as<vector<string>>();
       Environment::Instance().setEntrySequencesOverride(sequences);
     }
 
@@ -365,6 +374,16 @@ int main(int argc, char* argv[])
 
     if (varMap.count("dump-path")) {
       Environment::Instance().setPicklePath(varMap["dump-path"].as<string>());
+    }
+
+    if (varMap.count("random-seed")) {
+      RandomNumbers::initialize(varMap["random-seed"].as<string>());
+    }
+
+    if (varMap.count("job-information")) {
+      string jobInfoFile = varMap["job-information"].as<string>();
+      MetadataService::Instance().setJsonFileName(jobInfoFile);
+      B2INFO("Job information file: " << jobInfoFile);
     }
 
 
@@ -425,6 +444,10 @@ int main(int argc, char* argv[])
     if (Environment::Instance().getDryRun()) {
       Environment::Instance().printJobInformation();
     }
+
+    //Report completion in json metadata
+    MetadataService::Instance().addBasf2Status("finished successfully");
+    MetadataService::Instance().finishBasf2();
   } catch (error_already_set&) {
     //Apparently an exception occured which wasn't handled. So print the traceback
     PyErr_Print();

@@ -10,13 +10,13 @@
 
 #include <gtest/gtest.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapMatrixCreator.h>
 
 using namespace std;
 using namespace Belle2;
 
 
+/// Test the overlap-matrix creator using known input
 class OverlapMatrixCreatorTest : public ::testing::Test {
 protected:
   /// A hitRelatedTracks matrix for Testing purposes:

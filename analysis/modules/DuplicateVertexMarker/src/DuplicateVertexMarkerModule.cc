@@ -16,12 +16,9 @@
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/variables/Variables.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
-
-#include <set>
 
 using namespace std;
 using namespace Belle2;

@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
-#include <tracking/ckf/general/utilities/CKFFunctors.h>
 
 #include <boost/range/adaptor/reversed.hpp>
 #include <boost/functional/hash.hpp>
@@ -26,13 +25,13 @@ namespace Belle2 {
       /// TODO: Merging does not work properly, as the tracks we compare must not have the same number of hits (and must not be at the same stage)
       std::unordered_map<size_t, CDCCKFPath> hashToPathList;
       for (const CDCCKFPath& path : newPaths) {
-        const auto hash = lastThreeHitHash(path);
-        if (hashToPathList.find(hash) != hashToPathList.end()) {
-          if (hashToPathList[hash].size() < path.size()) {
-            hashToPathList[hash] = path;
+        const auto lastHitsHash = lastThreeHitHash(path);
+        if (hashToPathList.find(lastHitsHash) != hashToPathList.end()) {
+          if (hashToPathList[lastHitsHash].size() < path.size()) {
+            hashToPathList[lastHitsHash] = path;
           }
         } else {
-          hashToPathList[hash] = path;
+          hashToPathList[lastHitsHash] = path;
         }
       }
 

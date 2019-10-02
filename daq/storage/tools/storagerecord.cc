@@ -45,6 +45,10 @@ const char* g_table = "datafiles";
 unsigned int g_streamersize = 0;
 char* g_streamerinfo = new char[1000000];
 int g_diskid = 0;
+std::string g_file_diskid;
+int g_runno = 0;
+int g_expno = 0;
+bool g_is_arich = false;
 
 class FileHandler {
 
@@ -75,21 +79,22 @@ public:
     m_chksum = 1;
     m_nevents = 0;
     m_filesize = 0;
-    m_expno = expno;
-    m_runno = runno;
+    m_expno = (g_expno > 0) ? g_expno : expno;
+    m_runno = (g_runno > 0) ? g_runno : runno;
     m_fileid = fileid;
     bool available = false;
     char filename[1024];
     struct statvfs statfs;
     if (g_diskid > 0) {
-      sprintf(filename, "%s%02d", dir.c_str(), g_diskid);
-      statvfs(filename, &statfs);
-      float usage = 1 - ((float)statfs.f_bfree / statfs.f_blocks);
-      if (usage < 0.9) {
-        m_diskid = g_diskid;
-        available = true;
-      }
+      m_diskid = g_diskid;
+      available = true;
     } else {
+      {
+        int diskid = 1;
+        std::ifstream fin(g_file_diskid.c_str());
+        fin >> diskid;
+        m_diskid = diskid;
+      }
       for (int i = 0; i < ndisks; i++) {
         sprintf(filename, "%s%02d", dir.c_str(), m_diskid);
         statvfs(filename, &statfs);
@@ -98,22 +103,25 @@ public:
         std::ifstream fin(filename);
         int flag = 0;
         fin >> flag;
-        if (usage < 0.05) {
+        fin.close();
+        /*
+        if (usage < 0.1) {
+          fin.close();
+          //::unlink(filename);
           if (flag == 1) {
-            ::unlink(filename);
             std::cout << "[DEBUG] disk : " << m_diskid << " is available again (full_flag removed)" << std::endl;
           }
           available = true;
           std::cout << "[DEBUG] disk : " << m_diskid << " is available" << std::endl;
-          fin.close();
           break;
-        } else if (usage < 0.9) {
+              } else
+        */
+        if (usage < 0.9) {
           if (flag != 1) {
             available = true;
             std::cout << "[DEBUG] disk : " << m_diskid << " is available" << std::endl;
             break;
           }
-          fin.close();
           std::cout << "[DEBUG] disk : " << m_diskid << " is with full_flag" << std::endl;
         } else {
           std::ofstream fout(filename);
@@ -129,18 +137,15 @@ public:
       B2FATAL("No disk available for writing " << __FILE__ << ":" << __LINE__);
       exit(1);
     }
-    std::string filedir = dir + StringUtil::form("%02d/storage/%4.4d/%5.5d/",
-                                                 m_diskid, expno, runno);
+    std::string filedir = dir + StringUtil::form("%02d/storage/%4.4d/%5.5d/", m_diskid, expno, runno);
     system(("mkdir -p " + filedir).c_str());
     m_filename = StringUtil::form("%s.%4.4d.%5.5d.%s.f%5.5d.sroot",
                                   m_runtype.c_str(), expno, runno, m_host.c_str(), m_fileid);
     m_path = filedir + m_filename;
     m_file = ::open(m_path.c_str(),  O_WRONLY | O_CREAT | O_EXCL, 0664);
-    if (g_diskid > 0 && g_diskid != m_diskid) {
-      B2FATAL("disk-" << m_diskid << " is already full! Terminating process..");
-      exit(1);
-    }
     g_diskid = m_diskid;
+    std::ofstream fout(g_file_diskid.c_str());
+    fout << g_diskid;
     if (m_file < 0) {
       B2FATAL("Failed to open file : " << m_path);
       exit(1);
@@ -169,7 +174,6 @@ public:
         struct stat st;
         stat(m_path.c_str(), &st);
         std::string d = Date(st.st_mtime).toString();
-        //if (m_fileid == 0) m_nevents--;//1 entry for StreamerInfo
         m_db->connect();
         m_db->execute("update %s set time_close = '%s', chksum = %lu, nevents = %lu, "
                       "size = %lu where name = '%s' and host = '%s';",
@@ -232,7 +236,6 @@ int main(int argc, char** argv)
            "<filepath_dbtmp> [<obufname> <obufsize> nodename, nodeid]\n", argv[0]);
     return 1;
   }
-  //storagerecord STORE02:REC 10 HLT2 debug /rawdata/disk 11 /home/usr/stordaq/data/dbtmp.txt STORE02:OUT 10 store02_storagerecord 3
   const unsigned interval = 1;
   const char* ibufname = argv[1];
   const int ibufsize = atoi(argv[2]);
@@ -245,8 +248,10 @@ int main(int argc, char** argv)
   const char* obufname = (argc > 7) ? argv[8] : "";
   const int obufsize = (argc > 8) ? atoi(argv[9]) : -1;
   const char* nodename = (argc > 9) ? argv[10] : "";
+  g_is_arich = StringUtil::find(runtype, "arich");
   const int nodeid = (argc > 10) ? atoi(argv[11]) : -1;
   const unsigned int ninput = (argc > 11) ? atoi(argv[12]) : 1;
+  g_file_diskid = StringUtil::form("/tmp/%s_diskid", nodename);
 
   RunInfoBuffer info;
   const bool use_info = nodeid >= 0;
@@ -289,6 +294,15 @@ int main(int argc, char** argv)
   g_streamersize = 0;
   while (true) {
     if (use_info) info.reportRunning();
+    if (g_is_arich) {
+      if (g_runno == 0) {
+        while ((g_runno = info.getRunNumber()) <= 0) {
+          usleep(500);
+        }
+        g_expno = info.getExpNumber();
+        std::cout << "[DEBUG] expno = " << g_expno << ", runno =" << g_runno << std::endl;
+      }
+    }
     for (unsigned int ib = 0; ib < ninput; ib++) {
       ibuf[ib].lock();
       ibuf[ib].read((int*)&hd, true, true);
@@ -297,14 +311,13 @@ int main(int argc, char** argv)
       int nbyte = evtbuf[0];
       int nword = (nbyte - 1) / 4 + 1;
       bool isnew = false;
-      //      if (not_record) continue;
       if (hd.type == MSG_STREAMERINFO) {
         memcpy(g_streamerinfo, evtbuf, nbyte);
         g_streamersize = nbyte;
       }
       if (expno > hd.expno || runno > hd.runno) {
-        B2WARNING("Old run was detected => discard event exp = " << hd.expno << " (" << expno << "), runno" << hd.runno << "(" << runno <<
-                  ")");
+        B2WARNING("The old run was detected => discard event exp = " << hd.expno <<
+                  " (" << expno << "), runno" << hd.runno << "(" << runno << ")");
         continue;
       }
       if (!newrun || expno < hd.expno || runno < hd.runno) {
@@ -333,7 +346,13 @@ int main(int argc, char** argv)
           if (file) {
             file.close();
           }
+          std::string filename = StringUtil::form("%s%02d", path, g_diskid);
+          struct statvfs statfs;
+          statvfs(filename.c_str(), &statfs);
+          float usage = 1 - ((float)statfs.f_bfree / statfs.f_blocks);
+          if (usage > 0.9) g_diskid = 0;
           file.open(path, ndisks, expno, runno, fileid);
+          ecount = 0;
           nbyte_out += nbyte;
           fileid++;
         }
@@ -350,7 +369,19 @@ int main(int argc, char** argv)
         if (nbyte_out > MAX_FILE_SIZE) {
           file.close();
           nbyte_out = 0;
+          if (g_diskid > 0) {
+            std::string filename = StringUtil::form("%s%02d", path, g_diskid);
+            struct statvfs statfs;
+            statvfs(filename.c_str(), &statfs);
+            float usage = 1 - ((float)statfs.f_bfree / statfs.f_blocks);
+            if (usage > 0.9) {
+              B2WARNING("disk-" << g_diskid << " is already full. Stopping Run#" << runno);
+              std::cout << "[STOP=RUNCONTROL]" << std::endl;
+              continue;
+            }
+          }
           file.open(path, ndisks, expno, runno, fileid);
+          ecount = 0;
           fileid++;
         }
         file.write((char*)evtbuf, nbyte);

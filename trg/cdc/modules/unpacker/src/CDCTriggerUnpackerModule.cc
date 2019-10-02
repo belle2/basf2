@@ -53,13 +53,15 @@ namespace Belle2 {
 
   /** unpacker for the merger reader (TSF which reads the merger output) */
   struct Merger : SubTrigger {
+    /** Constructor */
     Merger(StoreArray<MergerBits>* inArrayPtr, std::string inName,
            unsigned inEventWidth, unsigned inOffset,
            int inHeaderSize, std::vector<int> inNodeID,
            unsigned inNInnerMergers, int& inDelay,
+           int& inCnttrg,
            int inDebugLevel) :
       SubTrigger(inName, inEventWidth, inOffset,
-                 inHeaderSize, inNodeID, inDelay, inDebugLevel),
+                 inHeaderSize, inNodeID, inDelay, inCnttrg, inDebugLevel),
       arrayPtr(inArrayPtr),
       nInnerMergers(inNInnerMergers) {};
 
@@ -88,6 +90,7 @@ namespace Belle2 {
       }
     };
 
+    /** Unpack function */
     void unpack(int subDetectorId,
                 std::array<int*, 4> data32tab,
                 std::array<int, 4> nWords)
@@ -117,7 +120,7 @@ namespace Belle2 {
           }
         }
       }
-      if (debugLevel >= 100) {
+      if (debugLevel >= 300) {
         printBuffer(data32tab[iFinesse] + headerSize, eventWidth);
         B2DEBUG(20, "");
         printBuffer(data32tab[iFinesse] + headerSize + eventWidth, eventWidth);
@@ -135,9 +138,11 @@ namespace Belle2 {
               StoreArray<T2DOutputBitStream>* outArrayPtr,
               std::string inName, unsigned inEventWidth, unsigned inOffset,
               unsigned inHeaderSize, std::vector<int> inNodeID,
-              unsigned inNumTS, int& inDelay, int inDebugLevel) :
+              unsigned inNumTS, int& inDelay,
+              int& inCnttrg,
+              int inDebugLevel) :
       SubTrigger(inName, inEventWidth, inOffset / wordWidth, inHeaderSize, inNodeID,
-                 inDelay, inDebugLevel),
+                 inDelay, inCnttrg, inDebugLevel),
       inputArrayPtr(inArrayPtr), outputArrayPtr(outArrayPtr),
       iTracker(std::stoul(inName.substr(inName.length() - 1))),
       numTS(inNumTS), offsetBitWidth(inOffset) {};
@@ -180,7 +185,7 @@ namespace Belle2 {
           }
           B2DEBUG(20, name << ": " << nClocks << " clocks");
         } else if (entries != nClocks) {
-          B2ERROR("Number of clocks in " << name << "conflicts with others!");
+          B2ERROR("Number of clocks in " << name << " conflicts with others!");
         }
       }
     };
@@ -211,10 +216,31 @@ namespace Belle2 {
       for (int iclock = 0; iclock < inputArrayPtr->getEntries(); ++iclock) {
         counters.emplace_back(data32tab[iFinesse]
                               [headerSize + eventWidth * iclock] & 0xffff);
+        B2DEBUG(100, "iclock " << iclock << " --> " << counters.at(iclock).to_ulong() << " : " << std::hex << counters.at(iclock));
       }
+      bool counter_correct_error = false;
       while (counters.at(1).to_ulong() - counters.at(0).to_ulong() != 4) {
         std::rotate(counters.begin(), counters.begin() + 1, counters.end());
         ccShift++;
+        // 2019,0410 This situation, looks like clockcounter shifted 6 bits left, was first seen in exp5 data.
+        //           Later it has been understood that it is due to data from a dummy BRAM buffer, which is supposed to be used for suppressed data only.
+        //           The data header is 0xbbbb instead of 0xdddd.
+        //           getHeader in the CDCTriggerUnpackerModule.h is modified to skip this kind event.
+        // 2019,0419 unfortunately, clockcounter found disorder since expt 7, run 2553, after update of B2L firmware to replace the b2dly with trigger counter.
+        //           for that run, it seems the problem happens only at 2D1, 2D2, and 2D3.
+        if (ccShift >= inputArrayPtr->getEntries()) {
+          B2DEBUG(90, "PHYSJG: clock counter rotation over one cycle: " << ccShift);
+          for (const auto& c : counters) {
+            B2DEBUG(90, "" << c.to_ulong() << " : " << std::hex << c);
+          }
+          counter_correct_error = true;
+          break;
+        }
+      }
+      if (counter_correct_error) {
+        B2WARNING("PHYSJG: " <<  name << " too many clock counter rotation corrections: " << ccShift << " data object skipped.");
+        // maybe implement an option for user to decide if this data block should be kept or not?!
+        return;
       }
       if (! std::is_sorted(counters.begin(), counters.end(),
       [](halfDataWord i, halfDataWord j) {
@@ -225,6 +251,7 @@ namespace Belle2 {
           B2DEBUG(90, "" << c.to_ulong());
         }
       }
+      // This could happen when the clock counter is over 1279 and roll back to 0, since only 48 clock counter will be in the data.
       if (ccShift) {
         B2DEBUG(15, "shifting the first " << ccShift <<
                 " clock(s) to the end for " << name);
@@ -243,7 +270,7 @@ namespace Belle2 {
         // clear output bitstream
         outputClock->m_signal[iTracker].fill(zero_val);
         B2DEBUG(90, "unpacker clock " << iclock);
-        if (debugLevel >= 100) {
+        if (debugLevel >= 300) {
           printBuffer(data32tab[iFinesse] + headerSize + eventWidth * iclock,
                       eventWidth);
         }
@@ -315,7 +342,7 @@ namespace Belle2 {
               cc(3) & tsfs(3)(209 downto 0) &
               cc(2) & tsfs(2)(209 downto 0) &
               cc(1) & tsfs(1)(209 downto 0) &
-              cc(4) & tsfs(0)(209 downto 0) &
+              cc(0) & tsfs(0)(209 downto 0) &
             */
             // fill the cc and TS hit
             offsetBitWidth = 64;
@@ -369,21 +396,28 @@ namespace Belle2 {
     }
   };
 
+  /** unpacker for the Neuro */
   struct Neuro : SubTrigger {
+    /** Constructor */
     Neuro(StoreArray<NNInputBitStream>* inArrayPtr,
           StoreArray<NNOutputBitStream>* outArrayPtr,
           std::string inName, unsigned inEventWidth, unsigned inOffset,
           unsigned inHeaderSize, std::vector<int> inNodeID, int& inDelay,
+          int& inCnttrg,
           int inDebugLevel) :
       SubTrigger(inName, inEventWidth, inOffset / wordWidth, inHeaderSize, inNodeID,
-                 inDelay, inDebugLevel),
+                 inDelay, inCnttrg, inDebugLevel),
       inputArrayPtr(inArrayPtr), outputArrayPtr(outArrayPtr),
       iTracker(std::stoul(inName.substr(inName.length() - 1))),
       offsetBitWidth(inOffset) {};
 
+    /** Input array pointer for NN */
     StoreArray<NNInputBitStream>* inputArrayPtr;
+    /** Output array pointer for NN */
     StoreArray<NNOutputBitStream>* outputArrayPtr;
+    /** Tracker board ID */
     unsigned iTracker;
+    /** Offset bit width */
     unsigned offsetBitWidth;
 
     void reserve(int subDetectorId, std::array<int, nFinesse> nWords)
@@ -403,7 +437,7 @@ namespace Belle2 {
           }
           B2DEBUG(20, name << ": " << nClocks << " clocks");
         } else if (entries != nClocks) {
-          B2ERROR("Number of clocks in " << name << "conflicts with others!");
+          B2ERROR("Number of clocks in " << name << " conflicts with others!");
         }
       }
     };
@@ -422,7 +456,7 @@ namespace Belle2 {
         auto inputClock = (*inputArrayPtr)[iclock];
         auto outputClock = (*outputArrayPtr)[iclock];
         B2DEBUG(20, "clock " << iclock);
-        if (debugLevel >= 100) {
+        if (debugLevel >= 300) {
           printBuffer(data32tab[iFinesse] + headerSize + eventWidth * iclock,
                       eventWidth);
         }
@@ -455,6 +489,7 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
 {
   // Set module properties
   setDescription("Unpack the CDC trigger data recorded in B2L");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("unpackMerger", m_unpackMerger,
@@ -469,7 +504,8 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            "flag to decode input TS to 2D", false);
   addParam("decodeNeuro", m_decodeNeuro,
            "flag to decode neurotrigger data", false);
-  NodeList defaultMergerNodeID = {
+  //  https://confluence.desy.de/display/BI/DAQ+and+Operation for CPR/HSLB
+  NodeList defaultMergerNodeID = {    // These should be very temporary ones since no merger to B2L yet.
     {0x11000001, 0},
     {0x11000003, 0},
     {0x11000001, 1},
@@ -487,10 +523,10 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
   addParam("2DNodeId", m_tracker2DNodeID,
            "list of COPPER and HSLB ID of 2D tracker", defaultTracker2DNodeID);
   NodeList defaultNeuroNodeID = {
-    {0x11000003, 1},
-    {0, 0},
-    {0, 0},
-    {0, 0}
+    {0x11000005, 0},
+    {0x11000005, 1},
+    {0x11000006, 0},
+    {0x11000006, 1}
   };
   addParam("NeuroNodeId", m_neuroNodeID,
            "list of COPPER and HSLB ID of neurotrigger", defaultNeuroNodeID);
@@ -499,13 +535,20 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
   addParam("alignFoundTime", m_alignFoundTime,
            "Whether to align out-of-sync Belle2Link data between different sub-modules", true);
 
+  std::vector<int> defaultDelayNNOutput = {10, 10, 10, 10};
+  std::vector<int> defaultDelayNNSelect = {4, 4, 4, 4};
+  addParam("delayNNOutput", m_delayNNOutput,
+           "delay of the NN output values clock cycle after the NN enable bit (by quadrant)", defaultDelayNNOutput);
+  addParam("delayNNSelect", m_delayNNSelect,
+           "delay of the NN selected TS clock cycle after the NN enable bit (by quadrant)", defaultDelayNNSelect);
+
 }
 
 
 void CDCTriggerUnpackerModule::initialize()
 {
   m_debugLevel = getLogConfig().getDebugLevel();
-  m_rawTriggers.isRequired();
+  //m_rawTriggers.isRequired();
   if (m_unpackMerger) {
     m_mergerBits.registerInDataStore("CDCTriggerMergerBits");
   }
@@ -531,14 +574,12 @@ void CDCTriggerUnpackerModule::initialize()
     m_NNInputTSHits.registerInDataStore("CDCTriggerNNInputSegmentHits");
     m_NNInput2DFinderTracks.registerInDataStore("CDCTriggerNNInput2DFinderTracks");
     m_NeuroTracks.registerInDataStore("CDCTriggerNeuroTracks");
-    m_NeuroInputs.registerInDataStore("CDCTriggerNeuroTracksInput",
-                                      DataStore::c_DontWriteOut);
+    m_NeuroInputs.registerInDataStore("CDCTriggerNeuroTracksInput");
     m_NeuroTracks.registerRelationTo(m_NNInputTSHits);
     m_NNInput2DFinderTracks.registerRelationTo(m_NNInputTSHits);
     m_NNInput2DFinderTracks.registerRelationTo(m_NeuroTracks);
     m_NeuroTracks.registerRelationTo(m_NNInput2DFinderTracks);
-    m_NeuroTracks.registerRelationTo(m_NeuroInputs, DataStore::c_Event,
-                                     DataStore::c_DontWriteOut);
+    m_NeuroTracks.registerRelationTo(m_NeuroInputs);
   }
   for (int iSL = 0; iSL < 9; iSL += 2) {
     if (m_unpackMerger) {
@@ -550,7 +591,7 @@ void CDCTriggerUnpackerModule::initialize()
                    "Merger" + std::to_string(iSL), mergerWidth * nMergers[8] / wordWidth,
                    mergerWidth * (nMergers[8] - nMergers[iSL]) / wordWidth, m_headerSize,
                    m_mergerNodeID[iSL / 2], nInnerMergers,
-                   m_mergerDelay,
+                   m_mergerDelay, m_mergerCnttrg,
                    m_debugLevel);
       m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_merger));
     }
@@ -565,7 +606,7 @@ void CDCTriggerUnpackerModule::initialize()
         new Tracker2D(&m_bitsTo2D, &m_bits2DTo3D,
                       "Tracker2D" + std::to_string(iTracker), 64, 82, m_headerSize,
                       m_tracker2DNodeID[iTracker], 10,
-                      m_2DFinderDelay,
+                      m_2DFinderDelay, m_2DFinderCnttrg,
                       m_debugLevel);
       m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_tracker2d));
     }
@@ -573,7 +614,7 @@ void CDCTriggerUnpackerModule::initialize()
       Neuro* m_neuro =
         new Neuro(&m_bitsToNN, &m_bitsFromNN,
                   "Neuro" + std::to_string(iTracker), 64, 496, m_headerSize,
-                  m_neuroNodeID[iTracker], m_NeuroDelay, m_debugLevel);
+                  m_neuroNodeID[iTracker], m_NeuroDelay, m_NeuroCnttrg,  m_debugLevel);
       m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_neuro));
     }
   }
@@ -618,15 +659,18 @@ void CDCTriggerUnpackerModule::event()
       }
 
       for (auto trg : m_subTrigger) {
-        trg->reserve(subDetectorId, nWords);
         // only unpack when there are enough words in the event
         if (trg->getHeaders(subDetectorId, data32tab, nWords)) {
+          trg->reserve(subDetectorId, nWords);
+          B2DEBUG(99, "starting to unpack a subTrigger, subDetectorId" << std::hex << subDetectorId);
           trg->unpack(subDetectorId, data32tab, nWords);
           setReturnValue(1);
         }
       }
     }
+    B2DEBUG(99, "looped over entries and filled words " << nEntriesRawTRG);
   }
+  B2DEBUG(99, "looped over rawTriggers, unpacking 2D ");
 
   // decode bitstream and make TSIM objects
   if (m_decode2DFinderTrack) {
@@ -638,6 +682,7 @@ void CDCTriggerUnpackerModule::event()
                      &m_TSHits);
     }
   }
+  B2DEBUG(99, "unpack 2D Input TS ");
   if (m_decode2DFinderInputTS) {
     std::array<int, 4> clockCounter2D = {0, 0, 0, 0};
     std::array<int, 4> timeOffset2D = {0, 0, 0, 0};
@@ -650,18 +695,27 @@ void CDCTriggerUnpackerModule::event()
       std::string strInput = slv_to_bin_string(trackerData);
       clockCounter2D[iTracker] = std::stoi(strInput.substr(0, clockCounterWidth), 0, 2);
       int clockCounterDiff = clockCounter2D[iTracker] - clockCounter2D[0];
+      /*
       // clock counter rolls back to 0 from 319
       if (clockCounterDiff > 300) {
         clockCounterDiff -= 320;
       } else if (clockCounterDiff < -300) {
         clockCounterDiff += 320;
       }
+      */
+      // clock counter rolls back to 0 from 1279, since certain B2L version, it has been changed to like this
+      if (clockCounterDiff > 1250) {
+        clockCounterDiff -= 1280;
+      } else if (clockCounterDiff < -1250) {
+        clockCounterDiff += 1280;
+      }
       timeOffset2D[iTracker] = clockCounterDiff;
       if (clockCounterDiff != 0) {
         B2DEBUG(100, "Adding " << clockCounterDiff << " clock(s) to 2D" << iTracker << " found time");
       }
       if (std::abs(clockCounterDiff) > 2) {
-        B2WARNING("Clock counters between 2D differ by " << clockCounterDiff << " clocks!");
+        B2WARNING("Clock counters between 2D [0," << iTracker << "] differ by " << clockCounterDiff << " clocks! (" \
+                  << clockCounter2D[0] << ", " << clockCounter2D[iTracker] << ")");
       }
     }
     for (short iclock = 0; iclock < m_bitsTo2D.getEntries(); ++iclock) {
@@ -669,8 +723,11 @@ void CDCTriggerUnpackerModule::event()
       decode2DInput(iclock - m_2DFinderDelay, timeOffset2D, m_bitsTo2D[iclock], &m_TSHits);
     }
   }
+  B2DEBUG(99, "now unpack neuro ");
   if (m_decodeNeuro) {
-    decodeNNIO(&m_bitsToNN, &m_bitsFromNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NeuroInputs);
+    decodeNNIO(&m_bitsToNN, &m_bitsFromNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NeuroInputs, m_delayNNOutput,
+               m_delayNNSelect);
   }
+  B2DEBUG(99, " all is unpacked ##### ");
 }
 

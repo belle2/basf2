@@ -15,7 +15,6 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -27,7 +26,6 @@
 #include <cmath>
 
 #include <TRandom.h>
-#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
@@ -42,8 +40,11 @@ REG_MODULE(PXDDigitizer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDDigitizerModule::PXDDigitizerModule() :
-  Module()
+PXDDigitizerModule::PXDDigitizerModule() : Module()
+  , m_noiseFraction(0), m_eToADU(0), m_chargeThreshold(0), m_chargeThresholdElectrons(0)
+  , m_currentHit(nullptr), m_currentParticle(0), m_currentTrueHit(0), m_currentSensor(nullptr)
+  , m_currentSensorInfo(nullptr), m_nGates(0), m_pxdIntegrationTime(0), m_timePerGate(0)
+  , m_triggerGate(0), m_gated(false)
 {
   //Set module properties
   setDescription("Digitize PXDSimHits");
@@ -519,10 +520,8 @@ void PXDDigitizerModule::addNoiseDigits()
 
 bool PXDDigitizerModule::checkIfGated(int gate)
 {
-  for (auto interval : m_gatedChannelIntervals) {
-    if (gate >= interval.first && gate < interval.second) return true;
-  }
-  return false;
+  return std::any_of(m_gatedChannelIntervals.begin(), m_gatedChannelIntervals.end(),
+  [gate](auto interval) {return gate >= interval.first && gate < interval.second;});
 }
 
 void PXDDigitizerModule::saveDigits()

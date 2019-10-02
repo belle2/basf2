@@ -16,31 +16,21 @@
 #include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 #include <tracking/dataobjects/SectorMapConfig.h>
-#include <tracking/trackFindingVXD/sectorMapTools/MinMaxCollector.h>
 #include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
-#include <framework/datastore/StoreObjPtr.h>
-
 
 #include <tracking/trackFindingVXD/sectorMapTools/BranchInterface.h>
-#include <tracking/trackFindingVXD/sectorMapTools/MinMax.h>
-#include <tracking/trackFindingVXD/sectorMapTools/RawDataCollectedMinMax.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SectorGraph.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SubGraph.h>
-#include <tracking/trackFindingVXD/sectorMapTools/SubGraphID.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 // stl:
 #include <string>
 #include <vector>
-#include <map>
 #include <unordered_map>
 #include <utility> // std::pair
 #include <memory> // std::unique_ptr
-#include <limits>       // std::numeric_limits
-#include <functional>
 
 #include <TChain.h>
-#include <boost/chrono.hpp>
 
 namespace Belle2 {
 

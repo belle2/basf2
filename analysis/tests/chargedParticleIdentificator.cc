@@ -14,7 +14,6 @@
 
 #include <analysis/dbobjects/ChargedPidMVAWeights.h>
 
-#include <utility>
 #include <gtest/gtest.h>
 
 #include <TH2F.h>
@@ -73,7 +72,7 @@ namespace Belle2 {
     /**
      * Prepare resources for the tests.
      */
-    virtual void SetUp()
+    void SetUp() override
     {
 
       m_grid = std::make_unique<TH2F>("theta_p_binsgrid",
@@ -107,7 +106,7 @@ namespace Belle2 {
     /**
      * Release all resources.
      */
-    virtual void TearDown()
+    void TearDown() override
     {
 
       // Delete all dummy files.

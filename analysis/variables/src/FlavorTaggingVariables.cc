@@ -12,24 +12,20 @@
 #include <analysis/variables/FlavorTaggingVariables.h>
 #include <analysis/variables/MCTruthVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/ReferenceFrame.h>
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
 #include <analysis/utility/MCMatching.h>
 
 // framework - DataStore
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
 #include <analysis/ContinuumSuppression/Thrust.h>
-#include <analysis/dataobjects/Vertex.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -39,13 +35,10 @@
 
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <TLorentzVector.h>
-#include <TRandom.h>
-#include <TVectorF.h>
 #include <TVector3.h>
 
 #include <iostream>
@@ -68,11 +61,11 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (roe.isValid()) {
         const auto& tracks = roe->getTracks();
-        for (unsigned int i = 0; i < tracks.size(); ++i) {
-          const PIDLikelihood* trackiPidLikelihood = tracks[i]->getRelated<PIDLikelihood>();
+        for (auto track : tracks) {
+          const PIDLikelihood* trackiPidLikelihood = track->getRelated<PIDLikelihood>();
           const Const::ChargedStable trackiChargedStable = trackiPidLikelihood ? trackiPidLikelihood->getMostLikely() : Const::pion;
           double trackiMassHypothesis = trackiChargedStable.getMass();
-          const TrackFitResult* tracki = tracks[i]->getTrackFitResultWithClosestMass(trackiChargedStable);
+          const TrackFitResult* tracki = track->getTrackFitResultWithClosestMass(trackiChargedStable);
           if (tracki == nullptr) continue;
           double energy = sqrt(trackiMassHypothesis * trackiMassHypothesis + (tracki->getMomentum()).Dot(tracki->getMomentum()));
           TLorentzVector trackiVec(tracki->getMomentum(), energy);
@@ -1849,7 +1842,7 @@ namespace Belle2 {
         auto func = [combinerMethod](const Particle * particle) -> double {
 
           double output = -2;
-          FlavorTaggerInfo* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
+          auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
           {
@@ -1873,7 +1866,7 @@ namespace Belle2 {
         auto func = [combinerMethod](const Particle * particle) -> double {
 
           double output = -2;
-          FlavorTaggerInfo* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
+          auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
           {
@@ -1897,7 +1890,7 @@ namespace Belle2 {
         auto func = [combinerMethod](const Particle * particle) -> double {
 
           int output = -2;
-          FlavorTaggerInfo* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
+          auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
           {
@@ -1928,7 +1921,7 @@ namespace Belle2 {
         auto func = [categoryName](const Particle * particle) -> double {
 
           double output = -2;
-          FlavorTaggerInfo* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
+          auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
           {
@@ -1955,7 +1948,7 @@ namespace Belle2 {
         auto func = [categoryName](const Particle * particle) -> double {
 
           double output = -2;
-          FlavorTaggerInfo* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
+          auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
           {
@@ -1982,7 +1975,7 @@ namespace Belle2 {
         auto func = [categoryName](const Particle * particle) -> double {
 
           double output = -2;
-          FlavorTaggerInfo* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
+          auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
           {

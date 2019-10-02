@@ -14,15 +14,16 @@ from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPi0s import *
 from stdV0s import stdKshorts
 from skim.standardlists.charm import *
-from skimExpertFunctions import *
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+
 set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
-gb2_setuprel = 'release-03-00-03'
+gb2_setuprel = 'release-04-00-00'
 skimCode = encodeSkimName('LeptonicUntagged')
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 
 leppath = Path()
 

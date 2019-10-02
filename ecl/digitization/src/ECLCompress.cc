@@ -11,8 +11,6 @@
 #include <ecl/digitization/ECLCompress.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <math.h>
-#include <assert.h>
-#include <stdio.h>
 
 using namespace Belle2;
 using namespace ECL;

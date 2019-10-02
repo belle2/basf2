@@ -11,12 +11,10 @@
 #pragma once
 
 #include <framework/logging/Logger.h>
-#include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 #include <string>
 #include <vector>
 #include <utility> // std::pair, std::move
 #include <functional>
-
 
 namespace Belle2 {
 

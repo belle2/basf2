@@ -131,7 +131,7 @@ namespace Belle2 {
 
   double Unit::convertValue(double value, const std::string& unitString)
   {
-    map<string, double>::const_iterator it = s_conversionFactors.find(unitString);
+    auto it = s_conversionFactors.find(unitString);
     if (it == s_conversionFactors.end()) {
       B2ERROR("Could not find conversion factor for unit " << unitString << ", assuming 1.0");
       return value;
@@ -141,7 +141,7 @@ namespace Belle2 {
 
   double Unit::convertValueToUnit(double value, const std::string& unitString)
   {
-    map<string, double>::const_iterator it = s_conversionFactors.find(unitString);
+    auto it = s_conversionFactors.find(unitString);
     if (it == s_conversionFactors.end()) {
       B2ERROR("Could not find conversion factor for unit " << unitString << ", assuming 1.0");
       return value;
@@ -359,7 +359,7 @@ void Const::ParticleSet::add(const Const::ParticleType& p)
 {
   if (contains(p))
     return;
-  m_particles.push_back(Const::ParticleType(p.getPDGCode(), this, m_particles.size()));
+  m_particles.emplace_back(p.getPDGCode(), this, m_particles.size());
 }
 
 bool Const::ParticleSet::contains(const Const::ParticleType& p) const

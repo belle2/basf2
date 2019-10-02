@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #include <geometry/bfieldmap/BFieldComponentConstant.h>
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 using namespace std;
 using namespace Belle2;

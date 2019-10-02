@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/ckf/svd/filters/states/BaseSVDStateFilter.h>
-#include <tracking/ckf/svd/entities/CKFToSVDState.h>
 #include <tracking/ckf/svd/utilities/SVDKalmanStepper.h>
 
 namespace Belle2 {
@@ -29,6 +28,7 @@ namespace Belle2 {
     /// Cache for the B field at the IP
     double m_cachedBField;
 
+    /// Kalman stepper (CKF) for SVD
     SVDKalmanStepper m_kalmanStepper;
 
     /// Shortcut for a 4x3 array.

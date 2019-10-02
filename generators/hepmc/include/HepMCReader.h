@@ -7,13 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef HEPMCREADER_H
-#define HEPMCREADER_H
+#pragma once
 
 #include <framework/core/FrameworkExceptions.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
-#include <boost/tokenizer.hpp>
 
 #include <string>
 #include <fstream>
@@ -21,7 +18,7 @@
 #include <TLorentzRotation.h>
 
 #include "HepMC/GenEvent.h"
-#include "HepMC/IO_GenEvent.h"
+
 namespace Belle2 {
 
   /**
@@ -103,4 +100,3 @@ namespace Belle2 {
 
 }
 
-#endif

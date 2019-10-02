@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <iomanip>
+#include <utility>
 
 using namespace Belle2;
 
@@ -36,7 +37,7 @@ namespace {
       stream = fopen(statm.c_str(), "r");
       // If we use buffering we might get the same value each time we read so
       // disable buffering
-      setvbuf(stream, NULL, _IONBF, 0);
+      setvbuf(stream, nullptr, _IONBF, 0);
     }
     unsigned long vmSizePages{0};
     unsigned long rssPages{0};
@@ -46,41 +47,57 @@ namespace {
   }
 }
 
-namespace Belle2 {
-  namespace Utils {
+namespace Belle2::Utils {
 
-    double getClock()
-    {
-      timespec ts;
-      clock_gettime(CLOCK_REALTIME, &ts);
-      return (ts.tv_sec * Unit::s) + (ts.tv_nsec * Unit::ns);
-    }
-    double getCPUClock()
-    {
-      timespec ts;
-      clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts);
-      return (ts.tv_sec * Unit::s) + (ts.tv_nsec * Unit::ns);
-    }
+  double getClock()
+  {
+    timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    return (ts.tv_sec * Unit::s) + (ts.tv_nsec * Unit::ns);
+  }
+  double getCPUClock()
+  {
+    timespec ts;
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts);
+    return (ts.tv_sec * Unit::s) + (ts.tv_nsec * Unit::ns);
+  }
 
-    unsigned long getVirtualMemoryKB()
-    {
-      return getStatmSize().first;
-    }
+  unsigned long getVirtualMemoryKB()
+  {
+    return getStatmSize().first;
+  }
 
-    unsigned long getRssMemoryKB()
-    {
-      return getStatmSize().second;
-    }
+  unsigned long getRssMemoryKB()
+  {
+    return getStatmSize().second;
+  }
 
-    Timer::Timer(const std::string& text):
-      m_startTime(getClock()),
-      m_text(text)
-    { }
+  Timer::Timer(std::string  text):
+    m_startTime(getClock()),
+    m_text(std::move(text))
+  { }
 
-    Timer::~Timer()
-    {
-      double elapsed = (getClock() - m_startTime) / Unit::ms;
-      B2INFO(m_text << " " << std::fixed << std::setprecision(3) << elapsed << " ms");
+  Timer::~Timer()
+  {
+    double elapsed = (getClock() - m_startTime) / Unit::ms;
+    B2INFO(m_text << " " << std::fixed << std::setprecision(3) << elapsed << " ms");
+  }
+
+  std::string getCommandOutput(const std::string& command, const std::vector<std::string>& arguments,
+                               bool searchPath [[maybe_unused]])
+  {
+    std::string cmd = command;
+    for (auto& arg : arguments) {
+      cmd += " " + arg;
     }
+    std::string result;
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
+    if (pipe) {
+      std::array<char, 256> buffer;
+      while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+        result += buffer.data();
+      }
+    }
+    return result;
   }
 }

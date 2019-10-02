@@ -22,7 +22,6 @@
 #include <TMath.h>
 
 // FRAMEWORK
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
 #include <framework/geometry/B2Vector3.h>

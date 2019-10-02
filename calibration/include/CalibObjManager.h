@@ -36,7 +36,7 @@ namespace Belle2 {
     /** Add a new object to manage, this is used as a template for creating future/missing objects.
       * We take ownership of this object but cannot guarantee that a user won't alter the wrapped ROOT object :(
       */
-    void addObject(std::string name, std::shared_ptr<TNamed> object);
+    void addObject(const std::string& name, std::shared_ptr<TNamed> object);
 
     /// For each templated object we know about, we find an in memory object for this exprun and write to the TDirectory
     void writeCurrentObjects(const Calibration::ExpRun& expRun);
@@ -53,20 +53,32 @@ namespace Belle2 {
     void createExpRunDirectories(Calibration::ExpRun& expRun) const;
 
     /// Scans the directory to get the highest "_i" index of an object with this name
-    unsigned int getHighestIndexObject(const std::string name, const TDirectory* dir) const;
+    unsigned int getHighestIndexObject(const std::string& name, const TDirectory* dir) const;
 
     /// Clears the map of templated objects -> causing their destruction
     void deleteHeldObjects();
+
+    /// Checks for the existence of a name in the templated object map to see if we registered the object
+    bool isRegistered(const std::string& name) const;
 
     /** Gets the collector object of this name for the given exprun. If there already exists
       * some objects it gets the highest index one if it is in-memory. If the highest index
       * object is file resident it creates a new in memory object with a higher index.
       */
     template<class T>
-    T* getObject(const std::string name, const Belle2::Calibration::ExpRun expRun)
+    T* getObject(const std::string& name, const Belle2::Calibration::ExpRun expRun)
     {
       std::string objectDirName = name + '/' + getObjectExpRunName(name, expRun);
       TDirectory* objectDir = m_dir->GetDirectory(objectDirName.c_str());
+      // Does the object name have a directory available? (framework problem if not)
+      if (not objectDir) {
+        // Is the object name known to us? (user problem if not)
+        if (not isRegistered(name)) {
+          B2ERROR("The requested object name '" << name << "' isn't known to CalibObjManager!");
+          return nullptr;
+        }
+        B2FATAL("TDirectory for registered object " << name << " not found: " << objectDirName);
+      }
       unsigned int highestIndex = getHighestIndexObject(name, objectDir);
       std::string highestIndexName = name + "_" + std::to_string(highestIndex);
       // First check if we currently have an object we're using.
@@ -92,7 +104,7 @@ namespace Belle2 {
   private:
 
     template<class T>
-    T* cloneObj(T* source, std::string newName) const
+    T* cloneObj(T* source, const std::string& newName) const
     {
       B2DEBUG(100, "Held object " << source->GetName() << " will be treated as a generic TNamed and have Clone(newname) called.");
       return dynamic_cast<T*>(source->Clone(newName.c_str()));
@@ -115,9 +127,9 @@ namespace Belle2 {
 
     std::string getObjectExpRunName(const std::string& name, const Calibration::ExpRun& expRun) const;
 
-    unsigned int extractKeyIndex(std::string& keyName) const;
+    unsigned int extractKeyIndex(const std::string& keyName) const;
   };
   /// Template specialization for TTree needs to be defined here to prevent automatic specialization being created
   template<>
-  TTree* CalibObjManager::cloneObj(TTree* source, std::string newName) const;
+  TTree* CalibObjManager::cloneObj(TTree* source, const std::string& newName) const;
 }

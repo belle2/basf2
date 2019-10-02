@@ -9,11 +9,15 @@
  **************************************************************************/
 
 #include <mva/methods/TMVA.h>
+#include <framework/logging/Logger.h>
+#include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/utilities/ScopeGuard.h>
+
 #include <TPluginManager.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <memory>
 
 namespace Belle2 {
   namespace MVA {
@@ -233,8 +237,8 @@ namespace Belle2 {
       factory.SetWeightExpression(Belle2::makeROOTCompatible(m_general_options.m_weight_variable));
 #endif
 
-      TTree* signal_tree = new TTree("signal_tree", "signal_tree");
-      TTree* background_tree = new TTree("background_tree", "background_tree");
+      auto* signal_tree = new TTree("signal_tree", "signal_tree");
+      auto* background_tree = new TTree("background_tree", "background_tree");
 
       for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
         signal_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
@@ -343,7 +347,7 @@ namespace Belle2 {
 #endif
 
 
-      TTree* regression_tree = new TTree("regression_tree", "regression_tree");
+      auto* regression_tree = new TTree("regression_tree", "regression_tree");
 
       for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
         regression_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
@@ -392,7 +396,7 @@ namespace Belle2 {
       // Initialize TMVA and ROOT stuff
       TMVA::Tools::Instance();
 
-      m_expert = std::unique_ptr<TMVA::Reader>(new TMVA::Reader("!Color:!Silent"));
+      m_expert = std::make_unique<TMVA::Reader>("!Color:!Silent");
 
       GeneralOptions general_options;
       weightfile.getOptions(general_options);

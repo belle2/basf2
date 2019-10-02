@@ -13,8 +13,6 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-
 //DQM
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
@@ -22,18 +20,8 @@
 #include <arich/utility/ARICHChannelHist.h>
 
 #include <TCanvas.h>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TH3F.h>
-#include <TVector2.h>
-#include <TText.h>
 #include <TLine.h>
-#include <TFile.h>
 #include <TH2Poly.h>
-#include <chrono>
-#include <vector>
-#include <string>
-#include <map>
 
 namespace Belle2 {
 
@@ -83,12 +71,27 @@ namespace Belle2 {
      */
     virtual void terminate() override;
 
+    /**
+    * Find canvas by name
+    * @param cname Name of the canvas
+    * @return The pointer to the canvas, or nullptr if not found.
+    */
+    TCanvas* find_canvas(TString cname);
+
   protected:
     bool m_debug;/**<debug*/
+    bool m_enableAlert;/**<Enable alert by base color of canvases*/
+
+    int alertColor[3] = {kWhite, kYellow, kRed};/**<Alert color of canvases*/
+
+    int m_minStats = 10000;/**<The lower limit on the number of events to enable the alert*/
 
     //TObjects for DQM analysis
     TLine* m_LineForMB[5] = {}; /**<Lines to divide the sectors on mergerHit histogram*/
+    TCanvas* m_c_bits = NULL; /**<Canvas for modified bits histogram*/
     TCanvas* m_c_mergerHit = NULL; /**<Canvas for modified mergerHit histogram*/
+    TCanvas* m_c_hitsPerEvent = NULL; /**<Canvas for modified hitsPerTrack histogram*/
+    TCanvas* m_c_theta = NULL; /**<Canvas for modified theta histogram*/
 
     Belle2::ARICHChannelHist* m_apdHist = NULL; /**<ARICH TObject to draw hit map for each APD*/
     TH2Poly* m_apdPoly = NULL;  /**< hit map for each APD */

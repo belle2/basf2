@@ -11,7 +11,6 @@
 #include <tracking/modules/VXDTFHelperTools/RawSecMapMergerModule.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
-#include <tracking/trackFindingVXD/filterTools/ObserverCheckMCPurity.h>
 #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariableNamesToFunctions.h>
 #include <vxd/geometry/GeoCache.h>
 
@@ -186,6 +185,7 @@ template <class FilterType> SectorGraph<FilterType> RawSecMapMergerModule::build
 
   // creating main graph containing all subgraphs:
   vector<string> filterNames;
+  // cppcheck-suppress useStlAlgorithm
   for (auto& entry : filterBranches) { filterNames.push_back(entry.name); }
   SectorGraph<FilterType> mainGraph(filterNames);
 

@@ -12,12 +12,8 @@
 #include <tracking/trackFindingVXD/utilities/CalcCurvatureSignum.h>
 #include <math.h>
 #include <Eigen/Dense>
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/math/special_functions/sign.hpp>
 #include <framework/logging/Logger.h>
 #include <TMath.h>
-
-
 
 using namespace Belle2;
 // Set precision to be used for Eigen Library

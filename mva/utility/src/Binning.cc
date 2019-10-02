@@ -114,7 +114,7 @@ namespace Belle2 {
         unsigned int index = indices[iEvent];
         current_weight += weights[index];
         if (current_weight >= weight_per_bin and bin < nBins and binning.m_boundaries[bin - 1] < data[index]) {
-          unsigned int number_of_bins = static_cast<unsigned int>(current_weight / weight_per_bin);
+          auto number_of_bins = static_cast<unsigned int>(current_weight / weight_per_bin);
           current_weight -= weight_per_bin * number_of_bins;
           for (unsigned int i = 0; i < number_of_bins; ++i) {
             binning.m_boundaries[bin] = data[index];

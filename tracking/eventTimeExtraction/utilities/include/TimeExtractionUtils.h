@@ -13,7 +13,6 @@
 #include <framework/dataobjects/EventT0.h>
 
 #include <vector>
-#include <memory>
 #include <TVectorD.h>
 #include <TMatrixDSym.h>
 
@@ -53,6 +52,7 @@ namespace Belle2 {
     static std::pair<double, double> getExtractedTimeAndUncertaintyWithFit(const std::vector<RecoTrack*>& recoTracks,
         bool setDirtyFlag);
 
+    /// Append an event-t0 value with quality information
     static void addEventT0WithQuality(std::vector<RecoTrack*>& recoTracks, StoreObjPtr<EventT0>& eventT0,
                                       std::vector<EventT0::EventT0Component>& eventT0WithQualityIndex);
 

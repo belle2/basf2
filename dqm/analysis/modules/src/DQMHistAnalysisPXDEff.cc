@@ -11,7 +11,6 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisPXDEff.h>
 #include <TROOT.h>
-#include <TClass.h>
 #include <TLatex.h>
 #include <TGraphAsymmErrors.h>
 #include <vxd/geometry/GeoCache.h>
@@ -39,9 +38,9 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("binsU", m_u_bins, "histogram bins in u direction, needs to be the same as in PXDDQMEfficiency", int(4));
   addParam("binsV", m_v_bins, "histogram bins in v direction, needs to be the same as in PXDDQMEfficiency", int(6));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
-           std::string("pxdeff"));
+           std::string("PXDEFF"));
   addParam("singleHists", m_singleHists, "Also plot one efficiency histogram per module", bool(false));
-  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff"));
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
@@ -89,14 +88,14 @@ void DQMHistAnalysisPXDEffModule::initialize()
     buff.ReplaceAll(".", "_");
     TString histTitle = "Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
     if (m_singleHists) {
-      m_cEffModules[aPXDModule] = new TCanvas("c_Eff_" + buff);
+      m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_").data() + buff);
+      m_hEffModules[aPXDModule] = new TEfficiency("HitEff_" + buff, histTitle,
+                                                  m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
     }
-    m_hEffModules[aPXDModule] = new TEfficiency("HitEff_" + buff, histTitle,
-                                                m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   }
 
   //One bin for each module in the geometry, one histogram for each layer
-  m_cEffAll = new TCanvas("c_EffAll");
+  m_cEffAll = new TCanvas((m_histogramDirectoryName + "/c_EffAll").data());
 
   m_hEffAll = new TEfficiency("HitEffAll", "Integrated Efficiency of each module;PXD Module;",
                               m_PXDModules.size(), 0, m_PXDModules.size());
@@ -121,7 +120,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
 #ifdef _BELLE2_EPICS
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
   B2DEBUG(1, "DQMHistAnalysisPXDEff: initialized.");
@@ -135,7 +134,7 @@ void DQMHistAnalysisPXDEffModule::beginRun()
   m_cEffAll->Clear();
 
   for (auto single_cmap : m_cEffModules) {
-    single_cmap.second->Clear();
+    if (single_cmap.second) single_cmap.second->Clear();
   }
 }
 
@@ -176,15 +175,17 @@ void DQMHistAnalysisPXDEffModule::event()
     } else {
       mapHits[aPXDModule] = Hits;
       mapMatches[aPXDModule] = Matches;
-      m_hEffModules[aPXDModule]->SetTotalHistogram(*Hits, "f");
-      m_hEffModules[aPXDModule]->SetPassedHistogram(*Matches, "f");
-    }
+      if (m_singleHists) {
+        if (m_cEffModules[aPXDModule] && m_hEffModules[aPXDModule]) {// this check creates them with a nullptr ..bad
+          m_hEffModules[aPXDModule]->SetTotalHistogram(*Hits, "f");
+          m_hEffModules[aPXDModule]->SetPassedHistogram(*Matches, "f");
 
-    if (m_cEffModules[aPXDModule]) {
-      m_cEffModules[aPXDModule]->cd();
-      m_hEffModules[aPXDModule]->Draw("colz");
-      m_cEffModules[aPXDModule]->Modified();
-      m_cEffModules[aPXDModule]->Update();
+          m_cEffModules[aPXDModule]->cd();
+          m_hEffModules[aPXDModule]->Draw("colz");
+          m_cEffModules[aPXDModule]->Modified();
+          m_cEffModules[aPXDModule]->Update();
+        }
+      }
     }
   }//One-Module histos finished
 

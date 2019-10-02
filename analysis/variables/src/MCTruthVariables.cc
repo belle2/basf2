@@ -313,7 +313,7 @@ namespace Belle2 {
       status &= (~MCMatching::c_MissFSR);
       status &= (~MCMatching::c_MissPHOTOS);
       status &= (~MCMatching::c_MissingResonance);
-      status &= (~MCMatching::c_AddedWrongBremsPhoton);
+      status &= (~MCMatching::c_AddedRecoBremsPhoton);
       //status &= (~MCMatching::c_DecayInFlight);
 
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
@@ -890,7 +890,7 @@ namespace Belle2 {
                       "1.0 if Particle is correctly reconstructed (SIGNAL) and primary, 0.0 otherwise");
     REGISTER_VARIABLE("isSignalAcceptBremsPhotons", isSignalAcceptBremsPhotons,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
-                      "Particles with gamm daughters attached through the bremsstrahlung recovery modules are allowed.");
+                      "Particles with gamma daughters attached through the bremsstrahlung recovery modules are allowed.");
 
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
                       "Check the PDG code of a particles MC mother particle");

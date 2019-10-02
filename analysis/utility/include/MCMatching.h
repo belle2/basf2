@@ -42,7 +42,7 @@ namespace Belle2 {
       c_AddedWrongParticle    = 256, /**< A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters) belongs to another Particle. */
       c_InternalError         = 512, /**< There was an error in MC matching. Not a valid match. Might indicate fake/background track or cluster. */
       c_MissPHOTOS            = 1024, /**< A photon created by PHOTOS was not reconstructed (based on MCParticle::c_IsPHOTOSPhoton) */
-      c_AddedWrongBremsPhoton = 2048, /**< A photon added with the bremsstrahlung recovery tools (correctBrems or correctBremsBelle) has no MC particle assigned, or it doesn't belong to the decay chain */
+      c_AddedRecoBremsPhoton = 2048, /**< A photon added with the bremsstrahlung recovery tools (correctBrems or correctBremsBelle) has no MC particle assigned, or it doesn't belong to the decay chain */
     };
 
     /** Return string with all human-readable flags, e.g. explainFlags(402) returns "c_MissingResonance | c_MissGamma | c_MisID | c_AddedWrongParticle".

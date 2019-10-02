@@ -46,7 +46,7 @@ std::string MCMatching::explainFlags(unsigned int flags)
         case c_AddedWrongParticle    : s += "c_AddedWrongParticle"; break;
         case c_InternalError         : s += "c_InternalError"; break;
         case c_MissPHOTOS            : s += "c_MissPHOTOS"; break;
-        case c_AddedWrongBremsPhoton : s += "c_AddedWrongBremsPhoton"; break;
+        case c_AddedRecoBremsPhoton : s += "c_AddedRecoBremsPhoton"; break;
         default:
           s += to_string(f);
           B2ERROR("MCMatching::explainFlags() doesn't know about flag " << f << ", please update it.");
@@ -268,19 +268,14 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
   }
 
   //add up all (accepted) status flags we collected for our daughters
-  const int daughterStatusAcceptMask = c_MisID | c_AddedWrongParticle | c_DecayInFlight | c_InternalError | c_AddedWrongBremsPhoton;
+  const int daughterStatusAcceptMask = c_MisID | c_AddedWrongParticle | c_DecayInFlight | c_InternalError | c_AddedRecoBremsPhoton;
   int daughterStatus = 0;
 
-  //Vector to store all the MC (n*grand-)daughters of the first mother
+  //Vector to store all the MC (n*grand-)daughters of the mother of the bremsstrahlung corrected particle
   vector<const MCParticle*> genParts;
-
-  //We only need it to check if the brems photons do not belong to the decay chain. So fill it only in the case we have a particle
-  //that has been brems corrected
+  //Fill it only in the case we have a particle that has been brems corrected
   if (particle->hasExtraInfo("bremsCorrected") && nChildren > 1) {
-    auto primary = mcParticle;
-    while (primary and !primary->hasStatus(MCParticle::c_PrimaryParticle)) primary = primary->getMother();
-
-    appendParticles(primary, genParts);
+    if (mcParticle && mcParticle->getMother()) appendParticles(mcParticle->getMother(), genParts);
   }
 
   for (unsigned i = 0; i < nChildren; ++i) {
@@ -289,14 +284,14 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
     if (particle->hasExtraInfo("bremsCorrected") && daughter->getPDGCode() == Const::photon.getPDGCode()) {
       //First, check if the daugther has an MC particle related
       const MCParticle* mcDaughter = daughter->getRelatedTo<MCParticle>();
-      //If it doesn't, add the c_BremsPhotonAdded flag to the mother and stop the propagation of c_InternalError
+      //If it hasn't, add the c_BremsPhotonAdded flag to the mother and stop the propagation of c_InternalError
       if (!mcDaughter) {
         daughterStatus |= getMCErrors(daughter) & (~c_InternalError);
-        daughterStatus |= c_AddedWrongBremsPhoton;
+        daughterStatus |= c_AddedRecoBremsPhoton;
       }
-      //If it does, check if the MC particle is (n*grand)-daughter of the reconstructed B. If it isn't, well add the error flag
+      //If it has, check if the MC particle is (n*grand)-daughter of the reconstructed B. If it isn't, we'll add the error flag
       else if (std::find(genParts.begin(), genParts.end(),
-                         mcDaughter) == genParts.end()) daughterStatus = getMCErrors(daughter) | c_AddedWrongBremsPhoton;
+                         mcDaughter) == genParts.end()) daughterStatus = getMCErrors(daughter) | c_AddedRecoBremsPhoton;
     } else daughterStatus |= getMCErrors(daughter);
   }
   status |= (daughterStatus & daughterStatusAcceptMask);

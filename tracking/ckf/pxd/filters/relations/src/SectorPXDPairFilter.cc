@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/pxd/filters/relations/SectorPXDPairFilter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>

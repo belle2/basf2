@@ -63,7 +63,7 @@ namespace Belle2::Conditions {
         // otherwise look for the payload in the list of existing payloads for this run
         if (auto && it = existing.find(payload.name); it != existing.end()) {
           payload.update(it->second);
-          B2DEBUG(35, "Fround requested payload metadata"
+          B2DEBUG(35, "Found requested payload metadata"
                   << LogVar("globaltag", payload.globaltag)
                   << LogVar("name", payload.name)
                   << LogVar("revision", payload.revision)

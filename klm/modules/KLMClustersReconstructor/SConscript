@@ -2,6 +2,6 @@ Import('env')
 
 env['LIBS'] = ['framework', 'klm', 'klm_bklm_dataobjects',
                'klm_eklm_dataobjects', 'mdst_dataobjects',
-	       '$ROOT_LIBS', 'CLHEP']
+               '$ROOT_LIBS', 'CLHEP']
 
 Return('env')

@@ -15,8 +15,8 @@
 #include <set>
 #include <vxd/dataobjects/VxdID.h>
 #include <cdc/dataobjects/WireID.h>
-#include <bklm/dataobjects/BKLMElementID.h>
-#include <eklm/dataobjects/EKLMElementID.h>
+#include <klm/bklm/dataobjects/BKLMElementID.h>
+#include <klm/eklm/dataobjects/EKLMElementID.h>
 
 #include <framework/gearbox/Const.h>
 
@@ -85,9 +85,9 @@ namespace Belle2 {
     template<class DBObjType>
     static GlobalLabel construct(gidTYPE element, gidTYPE param)
     {
-      GlobalLabel label;
-      label.construct(DBObjType::getGlobalUniqueID(), element, param);
-      return label;
+      GlobalLabel theLabel;
+      theLabel.construct(DBObjType::getGlobalUniqueID(), element, param);
+      return theLabel;
     }
 
     /**
@@ -185,7 +185,7 @@ namespace Belle2 {
     int     getEndOfValidity()
     {
       if (!tif)
-        return 0;
+        return maxTID;
       auto it = GlobalLabel::getTimeIntervals().find(makeEIDPID(eid, pid));
       if (it == GlobalLabel::getTimeIntervals().end())
         return tid;
@@ -230,6 +230,7 @@ namespace Belle2 {
     //! @param elementId Unique id of Belle2 detector element (sensor, layer, wire...)
     void construct(gidTYPE elementId, gidTYPE paramId);
 
+  public:
     //! Struct to hold intervals of validity
     struct TimeInterval {
 
@@ -273,7 +274,7 @@ namespace Belle2 {
         }
       }
     };
-
+  public:
     //! Reference to map EIDPID -> (TEIDPID, time intervals)
     static std::map<gidTYPE, TimeInterval >& getTimeIntervals()
     {
@@ -295,7 +296,7 @@ namespace Belle2 {
 
     //! Helper to compose time elemnt id & param id
     gidTYPE makeTEIDPID(gidTYPE teid_, gidTYPE pid_) {return pid_ * pidOffset + teid_ * teidOffset;}
-
+  private:
     //! global id
     gidTYPE gid {0};
 

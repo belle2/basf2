@@ -12,6 +12,8 @@
 #include <alignment/GlobalLabel.h>
 #include <fstream>
 
+#include <boost/crc.hpp>
+
 namespace Belle2 {
   namespace alignment {
 
@@ -23,21 +25,48 @@ namespace Belle2 {
         auto parent = parent_childs.first;
         auto childs = parent_childs.second;
 
+        // We need to check if such constraint entry already exists.
+        // For timedep parameters, some to all labels (and coefficients optionally, too) can change and
+        // in such case, we need a new constraint entry.
+        // Note the checksum for a constraint does not depend on the parent element. If parent object changes,
+        // the relative transofrmation to its children are unchanged. While if (some of) the childs change,
+        // for each time interval they are constant, there must a new constraint entry as this is an independent
+        // linear combination of parameters (because there are other parameters).
+        // Continued bellow...
+        boost::crc_32_type crc32;
+
         auto parentLabels = getElementLabels(parent);
         for (unsigned int iCon = 0; iCon < parentLabels.size(); iCon++) {
-          auto& constraint = constraints.insert(std::make_pair(parentLabels[iCon], Constraint())).first->second;
+          auto constraint = Constraint();
           //auto & constraint = constraints[parentLabels[iCon]];
+
+          // No constraints if parent is global reference frame
+          // All subdetectors are actually nominally placed at constant position and rotation
+          // and rotating the detectors could only happen due cohherent movements of sub-structures (CDC layers, VXD half-shells)
+          if (parentLabels[iCon] == 0) continue;
 
           for (unsigned int j = 0; j < childs.size(); j++) {
             auto child = childs[j];
             auto childLabels = getElementLabels(child);
+
             for (unsigned int iPar = 0; iPar < childLabels.size(); iPar++) {
               double coefficient = getChildToMotherTransform(child).second(iCon, iPar);
               if (fabs(coefficient) > 1.0e-14) {
-                constraint.push_back(std::make_pair(childLabels[iPar], coefficient));
+                auto childLabel = childLabels[iPar];
+                constraint.push_back(std::make_pair(childLabel, coefficient));
+                // On the other hand, if the labels do not change, the checksum should not change.
+                // In future I should add second checksum and warn user if this happens. It means user has ignored the fact,
+                // that the objects already change in the input global tag. The point here is, it still might be reasonable
+                // to use the constraint coefficients we already have, as the alignment changes are usually small and do not change
+                // the constraint coefficients in first order for most use-cases. The warning should be enough -> TODO
+                crc32.process_bytes(&childLabel, sizeof(childLabel));
               }
             }
           }
+
+          //constraints.insert(std::make_pair(parentLabels[iCon], constraint));
+          constraints.insert(std::make_pair(crc32.checksum(), constraint));
+
         }
       }
     }
@@ -114,7 +143,7 @@ namespace Belle2 {
       return labels;
     }
 
-    TMatrixD LorentShiftHierarchy::getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, TVector3 bField)
+    TMatrixD LorentShiftHierarchy::getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, B2Vector3D bField)
     {
       // values for global derivatives
       //TMatrixD derGlobal(2, 6);
@@ -122,13 +151,13 @@ namespace Belle2 {
       derGlobal.Zero();
 
       // electrons in device go in local w-direction to P-side
-      TVector3 v = sop->getPlane()->getNormal();
+      B2Vector3D v = sop->getPlane()->getNormal();
       // Lorentz force (without E-field) direction
-      TVector3 F_dir = v.Cross(bField);
+      B2Vector3D F_dir = v.Cross(bField);
       // ... projected to sensor coordinates:
       genfit::StateOnPlane localForce(*sop);
       localForce.setPosMom(sop->getPos(), F_dir);
-      TVector3 lorentzLocal(localForce.getState()[3], localForce.getState()[4], 0); // or 0,1?
+      B2Vector3D lorentzLocal(localForce.getState()[3], localForce.getState()[4], 0); // or 0,1?
       // Lorentz shift = parameter(layer) * B_local
       derGlobal(0, 0) = lorentzLocal(0);
       derGlobal(1, 0) = lorentzLocal(1);
@@ -151,6 +180,21 @@ namespace Belle2 {
       labels.push_back(label.setParameterId(5));
       labels.push_back(label.setParameterId(6));
 
+
+//       // TODO: constants instead of numbers
+//       label.construct(element.first, element.second, 1);
+//       labels.push_back(label.label());
+//       label.construct(element.first, element.second, 2);
+//       labels.push_back(label.label());
+//       label.construct(element.first, element.second, 3);
+//       labels.push_back(label.label());
+//       label.construct(element.first, element.second, 4);
+//       labels.push_back(label.label());
+//       label.construct(element.first, element.second, 5);
+//       labels.push_back(label.label());
+//       label.construct(element.first, element.second, 6);
+//       labels.push_back(label.label());
+//
       return labels;
     }
 

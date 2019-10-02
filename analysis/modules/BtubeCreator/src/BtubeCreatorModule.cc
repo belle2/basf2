@@ -14,7 +14,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/dbobjects/BeamParameters.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -62,9 +61,9 @@ void BtubeCreatorModule::initialize()
   // magnetic field
   m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
 
-  m_BeamSpotCenter = m_beamParams->getVertex();
+  m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
   m_beamSpotCov.ResizeTo(3, 3);
-  m_beamSpotCov = m_beamParams->getCovVertex();
+  m_beamSpotCov = m_beamSpotDB->getCovVertex();
   B2INFO("BtubeCreator : magnetic field = " << m_Bfield);
 
   tubeArray.registerInDataStore();
@@ -193,6 +192,9 @@ void BtubeCreatorModule::event()
       TMatrixFSym tubeMat(3);
       tubeMat.SetSub(0, 0, pvNew);
 
+      TMatrixFSym tubeMatCenterError(3);
+      tubeMatCenterError.SetSub(0, 0, pv);
+
       if (m_verbose) {
         B2DEBUG(10, "B origin error matrix  :  ");
         B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << pv(0, 0) << "," << std::fixed << std::setprecision(20) << pv(0,
@@ -221,6 +223,7 @@ void BtubeCreatorModule::event()
       otherB->addRelationTo(tubeconstraint);
       tubeconstraint->setTubeCenter(fullRecoBOriginpos);
       tubeconstraint->setTubeMatrix(tubeMat);
+      tubeconstraint->setTubeCenterErrorMatrix(tubeMatCenterError);
 
       otherB->writeExtraInfo("TubePosX", fullRecoBCopy.getVertex()[0]);
       otherB->writeExtraInfo("TubePosY", fullRecoBCopy.getVertex()[1]);

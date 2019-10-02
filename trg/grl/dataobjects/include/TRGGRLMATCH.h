@@ -18,12 +18,16 @@
 
 namespace Belle2 {
 
+  /// a class for CDC2D-ECL Matching in TRGGRL
   class TRGGRLMATCH : public RelationsObject {
   public:
 
+    /// Constructor
     TRGGRLMATCH(): m_deltar(-999.), m_deltaz(-999.) {}
+    /// Destructor
     ~TRGGRLMATCH() {}
 
+    /** get deltaR */
     double getDeltaR() const {return m_deltar;}
 
     /**Get the Delta Z (distance along Z-axis between the ECL cluster and the expected position

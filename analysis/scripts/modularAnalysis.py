@@ -143,9 +143,7 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
             Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
     elif environmentType in ["MC8", "MC9", "MC10"]:
         # make sure the last database setup is the magnetic field for MC8-10
-        use_database_chain()
-        use_central_database("Legacy_MagneticField_MC8_MC9_MC10", "", "", "centraldb",
-                             loglevel=LogLevel.INFO, invertLogging=True)
+        conditions.globaltags += ["Legacy_MagneticField_MC8_MC9_MC10"]
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
@@ -359,6 +357,55 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None):
     path.add_module(mcparticleprinter)
 
 
+def correctBrems(
+    outputList,
+    inputList,
+    gammaList,
+    maximumAcceptance=3.0,
+    multiplePhotons=False,
+    usePhotonOnlyOnce=False,
+    writeOut=False,
+    path=None,
+):
+    """
+    For each particle in the given `inputList`, copies it to the `outputList` and adds the
+    4-vector of the photon(s) in the `gammaList` which has(have) a weighted named relation to
+    the particle's track, set by the :b2:mod:`eclTrackBremFinder` module during reconstruction.
+
+    Warning:
+        This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
+        up to and including MC12 and proc9 **do not** contain this. Newer production campaigns (from proc10 and MC13) will.
+
+    Information:
+        Please note that a new particle is always generated, with the old particle and -if found- one or more
+        photons as daughters.
+
+        The `inputList` should contain particles with associated tracks. Otherwise the module will exit with an error.
+
+        The `gammaList` should contain photons. Otherwise the module will exit with an error.
+
+    @param outputList   The output particle list name containing the corrected particles
+    @param inputList    The initial particle list name containing the particles to correct. *It should already exist.*
+    @param gammaList    The photon list containing possibly bremsstrahlung photons; *It should already exist.*
+    @param maximumAcceptance Maximum value of the relation weight. Should be a number between [0,3)
+    @param multiplePhotons Whether to use only one photon (the one with the smallest acceptance) or as many as possible
+    @param usePhotonOnlyOnce If true, each brems candidate is used to correct only the track with the smallest relation weight
+    @param writeOut      Whether `RootOutput` module should save the created `outputList`
+    @param path          The module is added to this path
+    """
+
+    bremscorrector = register_module('BremsFinder')
+    bremscorrector.set_name('bremsCorrector_' + outputList)
+    bremscorrector.param('inputList', inputList)
+    bremscorrector.param('outputList', outputList)
+    bremscorrector.param('gammaList', gammaList)
+    bremscorrector.param('maximumAcceptance', maximumAcceptance)
+    bremscorrector.param('multiplePhotons', multiplePhotons)
+    bremscorrector.param('usePhotonOnlyOnce', usePhotonOnlyOnce)
+    bremscorrector.param('writeOut', writeOut)
+    path.add_module(bremscorrector)
+
+
 def copyList(
     outputListName,
     inputListName,
@@ -412,6 +459,46 @@ def correctFSR(
     fsrcorrector.param('gammaListName', gammaListName)
     fsrcorrector.param('angleThreshold', angleThreshold)
     fsrcorrector.param('energyThreshold', energyThreshold)
+    fsrcorrector.param('writeOut', writeOut)
+    path.add_module(fsrcorrector)
+
+
+def correctBremsBelle(
+    outputListName,
+    inputListName,
+    gammaListName,
+    multiplePhotons=True,
+    minimumEnergy=0.05,
+    angleThreshold=0.05,
+    writeOut=False,
+    path=None
+):
+    """
+    Run the Belle - like brems finding on the ``inputListName`` of charged particles.
+    Adds all photons in ``gammaListName`` to a copy of the charged particle that are within
+    ``angleThreshold`` and above ``minimumEnergy``.
+
+    Parameters:
+       outputListName (str): The output charged particle list containing the corrected charged particles
+       inputListName (str): The initial charged particle list containing the charged particles to correct.
+       gammaListName (str): The gammas list containing possibly radiative gammas, should already exist.
+       multiplePhotons (bool): How many photons should be added to the charged particle? nearest one -> False,
+             add all the photons within the cone -> True
+       angleThreshold (double): The maximum angle in radians between the charged particle and the (radiative)
+              gamma to be accepted.
+       minimumEnergy (double): The minimum energy in GeV of the (radiative) gamma to be accepted.
+       writeOut (bool): whether RootOutput module should save the created ParticleList
+       path (basf2.Path): modules are added to this path
+    """
+
+    fsrcorrector = register_module('BelleBremRecovery')
+    fsrcorrector.set_name('BelleFSRCorrection_' + outputListName)
+    fsrcorrector.param('inputListName', inputListName)
+    fsrcorrector.param('outputListName', outputListName)
+    fsrcorrector.param('gammaListName', gammaListName)
+    fsrcorrector.param('multiplePhotons', multiplePhotons)
+    fsrcorrector.param('angleThreshold', angleThreshold)
+    fsrcorrector.param('minimumEnergy', minimumEnergy)
     fsrcorrector.param('writeOut', writeOut)
     path.add_module(fsrcorrector)
 
@@ -940,12 +1027,26 @@ def reconstructDecay(
     their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All
     possible combinations are created (overlaps are forbidden) and combinations that pass the specified selection
     criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
-    reconstructed as well (meaning that the charge conjugated mother list is created as well). One cay use an
-    at-sign '@' to mark a particle as unspecified, e.g. in form of a DecayString: '\@Xsd -> K+ pi-'. If the particle
-    is marked as unspecified, it will not checked for its identity when doing :ref:`MCMatching`. Any particle which
+    reconstructed as well (meaning that the charge conjugated mother list is created as well).
+
+    One can use an at-sign '@' to mark a particle as unspecified, e.g. in form of a DecayString: '\@Xsd -> K+ pi-'. If the particle
+    is marked as unspecified, its identity will not be checked when doing :ref:`MCMatching`. Any particle which
     decays into the correct daughters will be flagged as correct. For example the DecayString '\@Xsd -> K+ pi-'
     would match all particles which decay into a Kaon and a pion, for example K*, B0, D0. Still the daughters
     need to be stated correctly so this can be used for "sum of exclusive" decays
+
+    .. warning::
+        The input ParticleLists are typically ordered according to the upstream reconstruction algorithm.
+        Therefore, if you combine two or more identical particles in the decay chain you should not expect to see the same
+        distribution for the daughter kinematics as they may be sorted by geometry, momentum etc.
+
+        For example, in the decay ``D0 -> pi0 pi0`` the momentum distributions of the two ``pi0`` s are not identical.
+        This can be solved by manually randomising the lists before combining.
+
+    See Also:
+
+        * `Particle combiner how does it work? <https://questions.belle2.org/question/4318/particle-combiner-how-does-it-work/>`_
+        * `Identical particles in decay chain <https://questions.belle2.org/question/5724/identical-particles-in-decay-chain/>`_
 
     @param decayString :ref:`DecayString` specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
@@ -2296,25 +2397,54 @@ def buildEventShape(inputListNames=[],
                     checkForDuplicates=False,
                     path=None):
     """
-    Calculates the event shape quantities (thrust, sphericity, Fox-Wolfram moments...) using the
-    particles in the lists provided by the user.
-    The results of the calculation are then store in the EventShapeContainer dataobject, and are accessible
-    byt the variabels of the EventShape group.
+    Calculates the event-level shape quantities (thrust, sphericity, Fox-Wolfram moments...)
+    using the particles in the lists provided by the user. If no particle list is provided,
+    the function will internally create a list of good tracks and a list of good photons
+    with (optionally) minimal quality cuts.
 
-    @param inputListNames   list of ParticleLists used to calculate the global event kinematics.
-                            If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
-    @param default_cleanup  if True,  applyes some very standard cuts on pt and costTheta when defines the interanl lists.
-    @param path             modules are added to this path
-    @param allMoments  Enables the calculation of FW and harmonic moments from 5 to 8
-    @param cleoCones  Enables the calculation of the CLEO cones.
-    @param collisionAxis  Enables the calculation of the  quantities related to the collision axis.
-    @param foxWolfram    Enables the calculation of the Fox-Wolfram moments.
-    @param jets   Enables the calculation of jet-related quantities.
-    @param harmonicMoments   Enables the calculation of the Harmonic moments.
-    @param sphericity  Enables the calculation of the sphericity-related quantities.
-    @param thrust  Enables the calculation of thust-related quantities.
-    @param checkForDuplicates Perform a check for duplicate particles before adding them.
 
+    The results of the calculation are then stored into the EventShapeContainer dataobject,
+    and are accessible using the variables of the EventShape group.
+
+    The user can switch the calculation of certain quantities on or off to save computing
+    time. By default the calculation of the high-order moments (5-8) is turned off.
+    Switching off an option will make the corresponding variables not available.
+
+    Warning:
+       The user can provide as many particle lists
+       as needed, using also combined particles, but the function will always assume that
+       the lists are independent.
+       If the lists provided by the user contain several times the same track (either with
+       different mass hypothesis, or once as an independent particle and once as daughter of a
+       combined particle) the results won't be reliable.
+       A basic check for duplicates is available setting the checkForDuplicate flags,
+       but is usually quite time consuming.
+
+
+    @param inputListNames     List of ParticleLists used to calculate the
+                              event shape variables. If the list is empty the default
+                              particleLists pi+:evtshape and gamma:evtshape are filled.
+    @param default_cleanup    If True, applies standard cuts on pt and cosTheta when
+                              defining the internal lists. This option is ignored if the
+                              particleLists are provided by the user.
+    @param path               Path to append the eventShape modules to.
+    @param thrust             Enables the calculation of thrust-related quantities (CLEO
+                              cones, Harmonic moments, jets).
+    @param collisionAxis      Enables the calculation of the  quantities related to the
+                              collision axis .
+    @param foxWolfram         Enables the calculation of the Fox-Wolfram moments.
+    @param harmonicMoments    Enables the calculation of the Harmonic moments with respect
+                              to both the thrust axis and, if collisionAxis = True, the collision axis.
+    @param allMoments         If True, calculates also the  FW and harmonic moments from order
+                              5 to 8 instead of the low-order ones only.
+    @param cleoCones          Enables the calculation of the CLEO cones with respect to both the thrust
+                              axis and, if collisionAxis = True, the collision axis.
+    @param jets               Enables the calculation of the hemisphere momenta and masses.
+                              Requires thrust = True.
+    @param sphericity         Enables the calculation of the sphericity-related quantities.
+    @param checkForDuplicates Perform a check for duplicate particles before adding them. This option
+                              is quite time consuming, instead of using it consider sanitizing
+                              the lists you are passing to the function.
     """
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
@@ -2323,7 +2453,7 @@ def buildEventShape(inputListNames=[],
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 
         if default_cleanup:
-            B2INFO("Using the default lists for the EventShape module.")
+            B2INFO("Applying standard cuts")
             trackCuts = 'pt > 0.1'
             trackCuts += ' and -0.8660 < cosTheta < 0.9535'
             trackCuts += ' and -3.0 < dz < 3.0'
@@ -2334,7 +2464,7 @@ def buildEventShape(inputListNames=[],
             gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
             applyCuts('gamma:evtshape', gammaCuts, path=path)
         else:
-            B2WARNING("Creating the default lists with no cleanup. This can be potentially dangerous")
+            B2WARNING("Creating the default lists with no cleanup.")
     else:
         particleLists = inputListNames
 
@@ -2487,6 +2617,40 @@ def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path):
 
     path.add_module(chargedpid)
 
+
+def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
+    """
+    Calculates distance between two vertices, distance of closest approach between a vertex and a track,\
+    distance of closest approach between a vertex and btube. For track, this calculation ignores track curvature,\
+    it's negligible for small distances.The user should use extraInfo(CalculatedDistance)\
+    to get it. A full example steering file is at analysis/tests/test_DistanceCalculator.py
+
+    Example:
+      >>> from modularAnalysis import calculateDistance
+      >>>calculateDistance('list_name', 'decay_string', "mode", path=user_path)
+
+    @param list_name              name of the input ParticleList
+    @param decay_string           select particles between the distance of closest approch will be calculated
+    @param mode                   Specifies how the distance is calculated
+                                  vertextrack: calculate the distance of closest appreach between a track and a\
+                                   vertex, taking the first candidate as vertex, default
+                                  trackvertex: calculate the distance of closest appreach between a track and a\
+                                   vertex, taking the first candidate as track
+                                  2tracks: calculates the distance of closest appreach between two tracks
+                                  2vertices: calculates the distance between two vertices
+                                  vertexbtube: calculates the distance of closest appreach between a vertex and btube
+                                  trackbtube: calculates the distance of closest appreach between a track and btube
+    @param path                   modules are added to this path
+
+    """
+
+    dist_mod = register_module('DistanceCalculator')
+
+    dist_mod.set_name('DistanceCalculator_' + list_name)
+    dist_mod.param('listName', list_name)
+    dist_mod.param('decayString', decay_string)
+    dist_mod.param('mode', mode)
+    path.add_module(dist_mod)
 
 if __name__ == '__main__':
     from basf2.utils import pretty_print_module

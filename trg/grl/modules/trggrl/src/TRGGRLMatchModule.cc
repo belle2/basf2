@@ -392,7 +392,7 @@ void TRGGRLMatchModule::calculationphiangle(CDCTriggerTrack* _track, TRGECLClust
   else if (abs(phi_ECL_d - phi_CDC_d) == 15 || abs(phi_ECL_d - phi_CDC_d) == 21) {dphi_d = 15;}
   else if (abs(phi_ECL_d - phi_CDC_d) == 16 || abs(phi_ECL_d - phi_CDC_d) == 20) {dphi_d = 16;}
   else if (abs(phi_ECL_d - phi_CDC_d) == 17 || abs(phi_ECL_d - phi_CDC_d) == 19) {dphi_d = 17;}
-  else if (abs(phi_ECL_d - phi_CDC_d) == 18 || abs(phi_ECL_d - phi_CDC_d) == 18) {dphi_d = 18;}
+  else if (abs(phi_ECL_d - phi_CDC_d) == 18) {dphi_d = 18;}
 
 }
 

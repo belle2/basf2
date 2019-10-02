@@ -13,7 +13,6 @@
 
 #include <cdc/dataobjects/WireID.h>
 #include <simulation/dataobjects/SimHitBase.h>
-#include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>
 

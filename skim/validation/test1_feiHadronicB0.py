@@ -30,9 +30,9 @@ runFEIforB0Hadronic(path)
 path.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=True)
 
 # Apply final B0 tag cuts
-B0hadronicList = B0hadronic(path)
-skimOutputUdst('../feiHadronicB0', B0hadronicList, path=path)
-summaryOfLists(B0hadronicList, path=path)
+B0HadronicList = B0Hadronic(path)
+skimOutputUdst('../feiHadronicB0', B0HadronicList, path=path)
+summaryOfLists(B0HadronicList, path=path)
 
 # Suppress noisy modules, and then process
 setSkimLogging(path)

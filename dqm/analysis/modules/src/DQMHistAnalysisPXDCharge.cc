@@ -164,6 +164,7 @@ void DQMHistAnalysisPXDChargeModule::event()
       m_cCharge->cd();
       hh1->Draw();
       if (hh1->GetEntries() > 100) m_fLandau->Draw("same");
+//      m_cCharge->Print(str(format("cc_%d.pdf") % i).data());
 
       if (hh1->GetEntries() > 1000) enough = true;
     }

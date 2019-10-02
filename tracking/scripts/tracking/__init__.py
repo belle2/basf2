@@ -8,7 +8,8 @@ from tracking.path_utils import *
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trackFitHypotheses=None,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
-                                use_second_cdc_hits=False, skipHitPreparerAdding=False):
+                                use_second_cdc_hits=False, skipHitPreparerAdding=False,
+                                use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -29,6 +30,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param fit_tracks: If false, the final track find and the TrackCreator module will no be executed
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
+    :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
     """
 
     if not is_svd_used(components) and not is_cdc_used(components):
@@ -51,7 +54,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     else:
         add_track_finding(path, components=components, reco_tracks=reco_tracks,
                           prune_temporary_tracks=prune_temporary_tracks,
-                          use_second_cdc_hits=use_second_cdc_hits)
+                          use_second_cdc_hits=use_second_cdc_hits,
+                          use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
+                          use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
@@ -64,6 +69,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
                                         trackFitHypotheses=trackFitHypotheses,
                                         reco_tracks=reco_tracks)
+    if prune_temporary_tracks or pruneTracks:
+        path.add_module("PruneRecoHits")
 
 
 def add_time_extraction(path, components=None):
@@ -152,7 +159,8 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use
 
 def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       prune_temporary_tracks=True, use_second_cdc_hits=False,
-                      use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True, use_svd_to_cdc_ckf=True):
+                      use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True,
+                      use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False):
     """
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to
@@ -166,27 +174,46 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
     :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
+    :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
     """
     if not is_svd_used(components) and not is_cdc_used(components):
         return
 
+    if use_ecl_to_cdc_ckf and not is_cdc_used(components):
+        B2WARNING("ECL CKF cannot be used without CDC. Turning it off.")
+        use_ecl_to_cdc_ckf = False
+
+    if use_ecl_to_cdc_ckf and not is_ecl_used(components):
+        B2ERROR("ECL CKF cannot be used without ECL. Turning it off.")
+        use_ecl_to_cdc_ckf = False
+
+    # output tracks
     cdc_reco_tracks = "CDCRecoTracks"
-    if not is_pxd_used(components) and not is_svd_used(components):
-        cdc_reco_tracks = reco_tracks
-
     svd_cdc_reco_tracks = "SVDCDCRecoTracks"
-    if not is_pxd_used(components):
-        svd_cdc_reco_tracks = reco_tracks
+    ecl_reco_tracks = "ECLRecoTracks"
+    combined_ecl_reco_tracks = "combinedECLRecoTracks"
 
+    # temporary collections
     svd_reco_tracks = "SVDRecoTracks"
     pxd_reco_tracks = "PXDRecoTracks"
 
-    full_reco_tracks = reco_tracks
+    # collections that will be pruned
+    temporary_reco_track_list = []
 
+    # the name of the most recent track collection
     latest_reco_tracks = None
+
+    if not is_pxd_used(components):
+        if use_ecl_to_cdc_ckf and is_cdc_used(components):
+            combined_ecl_reco_tracks = reco_tracks
+        elif (not use_ecl_to_cdc_ckf) and is_svd_used(components):
+            svd_cdc_reco_tracks = reco_tracks
+        elif (not use_ecl_to_cdc_ckf) and (not is_svd_used(components)) and is_cdc_used(components):
+            cdc_reco_tracks = reco_tracks
 
     if is_cdc_used(components):
         add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks)
+        temporary_reco_track_list.append(cdc_reco_tracks)
         latest_reco_tracks = cdc_reco_tracks
 
     if is_svd_used(components):
@@ -195,16 +222,33 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                               temporary_reco_tracks=svd_reco_tracks,
                               svd_ckf_mode=svd_ckf_mode, add_both_directions=add_both_directions,
                               use_svd_to_cdc_ckf=use_svd_to_cdc_ckf, prune_temporary_tracks=prune_temporary_tracks)
+        temporary_reco_track_list.append(svd_reco_tracks)
+        temporary_reco_track_list.append(svd_cdc_reco_tracks)
         latest_reco_tracks = svd_cdc_reco_tracks
+
+    if use_ecl_to_cdc_ckf and is_cdc_used(components):
+        add_eclcdc_track_finding(path, components=components, output_reco_tracks=ecl_reco_tracks,
+                                 prune_temporary_tracks=prune_temporary_tracks)
+
+        # TODO: add another merging step? (SVD track found by vxdtf2, and CDC track found by ECL CKF)?
+
+        path.add_module("RecoTrackStoreArrayCombiner",
+                        Temp1RecoTracksStoreArrayName=latest_reco_tracks,
+                        Temp2RecoTracksStoreArrayName=ecl_reco_tracks,
+                        recoTracksStoreArrayName=combined_ecl_reco_tracks)
+        temporary_reco_track_list.append(ecl_reco_tracks)
+        temporary_reco_track_list.append(combined_ecl_reco_tracks)
+        latest_reco_tracks = combined_ecl_reco_tracks
 
     if is_pxd_used(components):
         add_pxd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                              use_mc_truth=use_mc_truth, output_reco_tracks=full_reco_tracks,
+                              use_mc_truth=use_mc_truth, output_reco_tracks=reco_tracks,
                               temporary_reco_tracks=pxd_reco_tracks,
                               add_both_directions=add_both_directions)
+        temporary_reco_track_list.append(pxd_reco_tracks)
 
     if prune_temporary_tracks:
-        for temporary_reco_track_name in [pxd_reco_tracks, svd_reco_tracks, cdc_reco_tracks, svd_cdc_reco_tracks]:
+        for temporary_reco_track_name in temporary_reco_track_list:
             if temporary_reco_track_name != reco_tracks:
                 path.add_module('PruneRecoTracks', storeArrayName=temporary_reco_track_name)
 
@@ -282,8 +326,8 @@ def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_se
 
 def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='__ROIsvdClusters'):
     """
-    This function adds the standard reconstruction modules for tracking to be used for the simulation of PXD data reduction
-    to a path.
+    This function adds the standard reconstruction modules for tracking to be used for the simulation of PXD data
+    reduction to a path.
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components, always exclude the PXD.

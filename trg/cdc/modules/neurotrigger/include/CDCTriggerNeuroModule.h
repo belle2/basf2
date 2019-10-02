@@ -3,8 +3,9 @@
 
 #include <framework/core/Module.h>
 #include <trg/cdc/NeuroTrigger.h>
-
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
+#include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
@@ -91,6 +92,8 @@ namespace Belle2 {
     StoreArray<CDCTriggerSegmentHit> m_segmentHits;
     /** list of input vectors for each NN track */
     StoreArray<CDCTriggerMLPInput> m_mlpInput;
+    /** get NNT payload from database. */
+    DBObjPtr<CDCTriggerNeuroConfig> m_cdctriggerneuroconfig;
   };
 }
 #endif

@@ -18,10 +18,10 @@
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <bklm/dataobjects/BKLMSimHit.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <eklm/dataobjects/EKLMSimHit.h>
-#include <eklm/dataobjects/EKLMHit2d.h>
+#include <klm/bklm/dataobjects/BKLMSimHit.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/eklm/dataobjects/EKLMSimHit.h>
+#include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <vxd/geometry/GeoCache.h>
@@ -122,6 +122,12 @@ namespace Belle2 {
     /** Add a RecoTrack, to evaluate track finding. */
     void addTrackCandidate(const std::string& collectionName,
                            const RecoTrack& recoTrack);
+
+    /** Add a RecoTrack, but use stored genfit track representation
+     * to make visualisation objects.
+     * FIXME this is mostly just a workaround for monopoles.*/
+    void addTrackCandidateImproved(const std::string& collectionName,
+                                   const RecoTrack& recoTrack);
 
     /** Add a CDCTriggerTrack. */
     void addCDCTriggerTrack(const std::string& collectionName,

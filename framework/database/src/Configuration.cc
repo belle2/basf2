@@ -21,7 +21,7 @@
 #include <TClass.h>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "master_2019-07-15"
+#define CURRENT_DEFAULT_TAG "master_2019-08-14"
 
 namespace py = boost::python;
 
@@ -46,7 +46,7 @@ namespace {
    * on each object in the list and use the string representation. So it should
    * work with basically any python object.
    */
-  std::vector<std::string> extractStringList(py::object obj)
+  std::vector<std::string> extractStringList(const py::object& obj)
   {
     std::vector<std::string> result;
     Belle2::PyObjConvUtils::iteratePythonObject(obj, [&result](const boost::python::object & item) {
@@ -117,8 +117,8 @@ namespace Belle2::Conditions {
       fillFromEnv(m_globalTags, "BELLE2_CONDB_GLOBALTAG", "");
       overrideGlobalTags();
     }
-    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA",
-                "http://belle2db.sdcc.bnl.gov/b2s/rest/ /cvms/belle.cern.ch/conditions/database.sqlite");
+    std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", "http://belle2db.sdcc.bnl.gov/b2s/rest/");
+    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", serverList + " /cvms/belle.cern.ch/conditions/database.sqlite");
     fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", "/cvmfs/belle.cern.ch/conditions");
   }
 
@@ -143,7 +143,9 @@ namespace Belle2::Conditions {
     // make sure the list of globaltags to be used is created but empty
     m_inputGlobaltags.emplace();
     // now check for compatibility: make sure all metadata have the same globaltag
-    // setting
+    // setting. Unless we don't have metadata ...
+    if (inputMetadata.empty()) return;
+
     std::optional<std::string> inputGlobaltags;
     for (const auto& metadata : inputMetadata) {
       if (!inputGlobaltags) {
@@ -152,7 +154,6 @@ namespace Belle2::Conditions {
         if (inputGlobaltags != metadata.getDatabaseGlobalTag()) {
           B2WARNING("Input files metadata contain incompatible globaltag settings, globaltag replay not possible");
           // no need to set anything
-          inputGlobaltags.reset();
           return;
         }
       }
@@ -162,8 +163,30 @@ namespace Belle2::Conditions {
       B2WARNING("Input files metadata all have empty globaltag setting, globaltag replay not possible");
       return;
     }
-    // set the list of globaltags from the
+    // set the list of globaltags from the string containing the globaltags
     boost::split(*m_inputGlobaltags, *inputGlobaltags, boost::is_any_of(","));
+
+    // HACK: So, we successfully set the input globaltags from the input file,
+    // however we also decided that we want to add new payloads for
+    // boost/invariant mass/beam spot. So if any of the files was created
+    // before the first of October 2019 we assume their globaltag might be
+    // missing these new payloads and we append an extra globaltag containing
+    // just this information with lowest priority. If the files actually had
+    // all payloads these legacy payloads will never be used as they have
+    // lowest priority. Otherwise this should enable running over old files.
+    //
+    // TODO: Once we're sure all files being used contain all payloads remove this.
+    std::optional<std::string> youngest;
+    for (const auto& metadata : inputMetadata) {
+      if (!youngest or * youngest > metadata.getDate()) {
+        youngest = metadata.getDate();
+      }
+    }
+    if (youngest->compare("2019-10-01") < 0) {
+      B2DEBUG(30, "Enabling legacy IP information globaltag in tag replay");
+      m_inputGlobaltags->emplace_back("Legacy_IP_Information");
+    }
+    // END TODO/HACK
   }
 
   std::vector<std::string> Configuration::getBaseTags() const
@@ -248,12 +271,11 @@ namespace Belle2::Conditions {
     /** Configure the network settings for the Conditions database downloads */
     boost::python::dict expertSettings(const boost::python::tuple& args, boost::python::dict kwargs)
     {
-      using namespace boost::python;
-      if (len(args) != 1) {
+      if (py::len(args) != 1) {
         // keyword only function: raise typerror on non-keyword arguments
         PyErr_SetString(PyExc_TypeError, ("expert_settings() takes one positional argument but " +
                                           std::to_string(len(args)) + " were given").c_str());
-        throw_error_already_set();
+        py::throw_error_already_set();
       }
       Configuration& self = py::extract<Configuration&>(args[0]);
 
@@ -273,7 +295,7 @@ namespace Belle2::Conditions {
             std::stringstream error;
             error << "Cannot convert argument '" << name << "' to " << PyObjConvUtils::Type<value_type>::name();
             PyErr_SetString(PyExc_TypeError, error.str().c_str());
-            throw_error_already_set();
+            py::throw_error_already_set();
           }
           setter(value);
           // remove key from kwargs so we can easily check for ones we don't understand later
@@ -309,15 +331,15 @@ namespace Belle2::Conditions {
       [&downloader](unsigned int factor) { downloader.setBackoffFactor(factor);},
       [&downloader]() { return downloader.getBackoffFactor();});
       // And lastly check if there is something in the kwargs we don't understand ...
-      if (len(kwargs) > 0) {
+      if (py::len(kwargs) > 0) {
         std::string message = "Unrecognized keyword arguments: ";
         auto keys = kwargs.keys();
         for (int i = 0; i < len(keys); ++i) {
           if (i > 0) message += ", ";
-          message += extract<std::string>(keys[i]);
+          message += py::extract<std::string>(keys[i]);
         }
         PyErr_SetString(PyExc_TypeError, message.c_str());
-        throw_error_already_set();
+        py::throw_error_already_set();
       }
       return result;
     }
@@ -402,6 +424,17 @@ Parameters:
 
 Warning:
     it's still possible to modify `globaltags` after this call.
+)DOC")
+    .def("disable_globaltag_replay", &Configuration::disableGlobalTagReplay, R"DOC("disable_globaltag_replay()
+
+Disable global tag replay and revert to the old behavior that the default
+globaltag will be used if no other globaltags are specified.
+
+This is a shortcut to just calling
+
+    >>> conditions.override_globaltags()
+    >>> conditions.globaltags += list(conditions.default_globaltags)
+
 )DOC")
     .def("append_testing_payloads", &Configuration::appendTestingPayloadLocation, py::args("filename"), R"DOC(append_testing_payloads(filename)
 

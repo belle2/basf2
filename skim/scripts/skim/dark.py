@@ -6,13 +6,14 @@
 __authors__ = [
     "Sam Cunliffe",
     "Michael De Nuccio",
-    "Ilya Komarov"
+    "Ilya Komarov",
+    "Giacomo De Pietro"
 ]
 
 
 import pdg
 from modularAnalysis import cutAndCopyList, applyEventCuts, fillParticleList, \
-    reconstructDecay
+    reconstructDecay, B2WARNING
 
 
 def SinglePhotonDarkList(path):
@@ -27,7 +28,7 @@ def SinglePhotonDarkList(path):
     invisible final state analysis.
 
     Parameters:
-        path (basf2.Path) the path to add the skim
+        path (basf2.Path): the path to add the skim
 
     Returns:
         list name of the skim candidates
@@ -68,7 +69,7 @@ def _initialALP(path):
     `ALP3GammaList` skim functions.
 
     Parameters:
-        path (basf2.Path) the path to add the skim
+        path (basf2.Path): the path to add the skim
 
     Returns:
         list name of the ALP decays candidates
@@ -110,7 +111,7 @@ def ALP3GammaList(path):
         * Skim category: physics, dark sector
 
     Parameters:
-        path (basf2.Path) the path to add the skim list builders
+        path (basf2.Path): the path to add the skim list builders
 
     Returns:
         list name of the skim candidates
@@ -138,56 +139,18 @@ def ALP3GammaList(path):
     return beamList
 
 
-def LFVZpInvisibleList(path):
-    """
-    Note:
-        * Lepton flavour violating Z' skim, Z' to invisible FS
-        * Skim code:  18520400
-        * Physics channel: ee --> e mu Z'; Z' --> invisible
-        * Skim category: physics, dark sector
-
-    The skim list for the LFV Z' to invisible final state search
-
-    Parameters:
-        path (basf2.Path) the path to add the skim list builders
-
-    Returns:
-        list containing the candidate names
-    """
-    __author__ = "Ilya Komarov"
-
-    lfvzp_list = []
-
-    # Some loose PID cuts for leptons
-    muID_cuts = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pidProbabilityExpert(13, all) > 0.1'
-    eID_cuts = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pidProbabilityExpert(11, all) > 0.1'
-
-    # We want exaclty 2 good tracks
-    Event_cuts = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2'
-
-    cutAndCopyList('mu+:lfvzp', 'mu+:all', muID_cuts, path=path)
-    cutAndCopyList('e+:lfvzp', 'e+:all', eID_cuts, path=path)
-
-    # Z' to invisible
-    LFVZpInvChannel = 'mu+:lfvzp e-:lfvzp'
-    reconstructDecay('vpho:invlfvzp -> ' + LFVZpInvChannel, Event_cuts, path=path)
-    lfvzp_list.append('vpho:invlfvzp')
-
-    return lfvzp_list
-
-
 def LFVZpVisibleList(path):
     """
     Note:
         * Lepton flavour violating Z' skim, Z' to visible FS
-        * Skim code:  18520500
+        * Skim code:  18520400
         * Physics channel: ee --> e mu Z'; Z' --> e mu
         * Skim category: physics, dark sector
 
     The skim list for the LFV Z' to visible final state search
 
     Parameters:
-        path (basf2.Path) the path to add the skim list builders
+        path (basf2.Path): the path to add the skim list builders
 
     Returns:
         list containing the candidate names
@@ -225,3 +188,131 @@ def LFVZpVisibleList(path):
     lfvzp_list.append('vpho:2tr_vislfvzp')
 
     return lfvzp_list
+
+
+def DimuonPlusMissingEnergyList(path):
+    """
+    Note:
+        * Dimuon + missing energy skim,
+          needed for :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
+        * Skim code: 18520100
+        * Physics channel: :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} \, +` missing energy
+        * Skim category: physics, dark sector
+
+    Parameters:
+        path (basf2.Path): the path to add the skim
+
+    Returns:
+        list containing the candidate names
+    """
+    __author__ = 'Giacomo De Pietro'
+
+    dimuon_list = []
+    skim_label = 'forDimuonMissingEnergySkim'
+    dimuon_name = 'Z0:' + skim_label
+
+    # Define some cuts
+    fromIP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'
+    muonID_cut = '[muonID > 0.3]'
+    # We want exactly 2 tracks from IP
+    dimuon_cut = '[nCleanedTracks(' + fromIP_cut + ') < 4]'
+    # And the pair must have pt > 200 MeV in CMS frame
+    dimuon_cut += ' and [useCMSFrame(pt) > 0.2]'
+
+    # Reconstruct the dimuon candidate
+    cutAndCopyList('mu+:' + skim_label, 'mu+:all', fromIP_cut + ' and ' + muonID_cut, path=path)
+    reconstructDecay(dimuon_name + ' -> mu+:' + skim_label + ' mu-:' + skim_label, dimuon_cut, path=path)
+
+    # And return the dimuon list
+    dimuon_list.append(dimuon_name)
+    return dimuon_list
+
+
+def ElectronMuonPlusMissingEnergyList(path):
+    """
+    Note:
+        * Electron-muon pair + missing energy skim,
+          needed for :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
+        * Skim code: 18520200
+        * Physics channel: :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} \, +` missing energy
+        * Skim category: physics, dark sector
+
+    Parameters:
+        path (basf2.Path): the path to add the skim
+
+    Returns:
+        list containing the candidate names
+    """
+    __author__ = 'Giacomo De Pietro'
+
+    emu_list = []
+    skim_label = 'forElectronMuonMissingEnergySkim'
+    emu_name = 'Z0:' + skim_label
+
+    # Define some basic cuts
+    fromIP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'
+    electronID_cut = '[electronID > 0.3]'
+    muonID_cut = '[muonID > 0.3]'
+    # We require that the electron points to the barrel ECL + 10 degrees
+    theta_cut = '[0.387 < theta < 2.421]'
+    # We want exactly 2 tracks from IP
+    emu_cut = '[nCleanedTracks(' + fromIP_cut + ') < 4]'
+    # And the pair must have pt > 200 MeV in CMS frame
+    emu_cut += ' and [useCMSFrame(pt) > 0.2]'
+
+    # Reconstruct the dimuon candidate
+    cutAndCopyList('e+:' + skim_label, 'e+:all', fromIP_cut + ' and ' + electronID_cut + ' and ' + theta_cut, path=path)
+    cutAndCopyList('mu+:' + skim_label, 'mu+:all', fromIP_cut + ' and ' + muonID_cut, path=path)
+    reconstructDecay(emu_name + ' -> e+:' + skim_label + ' mu-:' + skim_label, emu_cut, path=path)
+
+    # And return the dimuon list
+    emu_list.append(emu_name)
+    return emu_list
+
+
+def DielectronPlusMissingEnergyList(path):
+    """
+    Warning:
+        This skim is currently deactivated, since the retention rate is too high
+
+    Note:
+        * Dielectron skim, needed for :math:`e^{+}e^{-} \\to A^{\prime} h^{\prime};`
+          :math:`A^{\prime} \\to e^{+}e^{-}; \, h^{\prime} \\to \mathrm{invisible}` and other searches
+        * Skim code: 18520300
+        * Physics channel: :math:`e^{+}e^{-} \\to e^{+}e^{-}`
+        * Skim category: physics, dark sector
+
+    Parameters:
+        path (basf2.Path): the path to add the skim
+
+    Returns:
+        list containing the candidate names
+    """
+    __author__ = 'Giacomo De Pietro'
+
+    # FIXME this skim is currently deactivated: delete the following two lines to activate it
+    # and update the Sphinx documentation
+    B2WARNING("The skim 'DielectronPlusMissingEnergy' is currently deactivated.")
+    return []
+
+    dielectron_list = []
+    skim_label = 'forDielectronMissingEnergySkim'
+    dielectron_name = 'Z0:' + skim_label
+
+    # Define some basic cuts
+    fromIP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'
+    electronID_cut = '[electronID > 0.2]'
+    # We require that the electron points to the barrel ECL + 10 degrees
+    theta_cut = '[0.387 < theta < 2.421]'
+    # We want exactly 2 tracks from IP
+    dielectron_cut = '[nCleanedTracks(' + fromIP_cut + ') == 2]'
+    # And the pair must have pt > 200 MeV in CMS frame
+    dielectron_cut += ' and [useCMSFrame(pt) > 0.2]'
+
+    # Reconstruct the dielectron candidate
+    cutAndCopyList('e+:' + skim_label, 'e+:all', fromIP_cut + ' and ' + electronID_cut + ' and ' + theta_cut, path=path)
+    reconstructDecay(dielectron_name + ' -> e+:' + skim_label + ' e-:' + skim_label, dielectron_cut, path=path)
+
+    # And return the dielectron list
+    dielectron_list.append(dielectron_name)
+    return dielectron_list

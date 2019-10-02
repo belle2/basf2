@@ -184,15 +184,6 @@ namespace Belle2 {
         result += VXD::GeoCache::getInstance().getSensors(ladderID).size();
       return result;
     }
-
-    /** Get total number of sensors */
-    inline int PXDBackgroundModule::getTotalSensors()
-    {
-      int result = 0;
-      for (auto layerID : VXD::GeoCache::getInstance().getLayers(VXD::SensorInfoBase::PXD))
-        result += getNumSensors(layerID.getLayerNumber());
-      return result;
-    }
   } // namespace PXD
 } // namespace Belle2
 #endif

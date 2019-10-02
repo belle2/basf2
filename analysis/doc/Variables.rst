@@ -37,7 +37,7 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
       Create a new alias.
 
       Variable names are deliberately verbose and explicit (to avoid ambiguity).
-      However, it is often not desirable to deal with long unwieldy variable names particularly in the context of `VariableManagerOutput`.
+      However, it is often not desirable to deal with long unwieldy variable names particularly in the context of :doc:`Variable Manager Output`.
 
       Example:
 
@@ -84,7 +84,7 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
          It's probably easier to use `variables.utils.add_collection` which wraps this function for you.
 
       :param str collection: The new collection to create.
-      :param ROOT.vector(str) variables: A ``ROOT.vector<string>`` of variables to add as the variable collection.
+      :param variables: A ``ROOT.std.vector(string)`` instance of variables to add as the variable collection.
 
       :returns: True if the collection was successfully added
 
@@ -116,6 +116,12 @@ Kinematics
 .. b2-variables::
    :group: Kinematics
 
+Helicity 
+~~~~~~~~
+
+.. b2-variables::
+      :group: Helicity variables
+
 Tracking
 ~~~~~~~~
 
@@ -143,8 +149,6 @@ Here is a list of particle identification variables:
 
   In other words, pionID was sensitive only to the pion-kaon mis-id, and not to
   the pion-proton or pion-muon mis-identification.
-
-More information in `this confluence page <https://confluence.desy.de/display/BI/Physics+charged+particle+identification>`_
 
 .. b2-variables::
    :group: PID   
@@ -322,6 +326,8 @@ Rest of Event
 Continuum Suppression
 ~~~~~~~~~~~~~~~~~~~~~
 
+For a detailed description of the continuum suppression, see `ContinuumSuppression`
+
 .. b2-variables::
     :group: Continuum Suppression
 
@@ -333,6 +339,7 @@ Event Shape
 
 These variables are available after adding the event shape builder modules.
 This can be done with the function `modularAnalysis.buildEventShape`.
+For a detailed description of the event shape variables,  see `EventShape`
 
 .. b2-variables::
     :group: EventShape
@@ -412,8 +419,6 @@ They have a **[Calibration]** pretag.
    :group: ECL calibration
 .. b2-variables::
    :group: ECL trigger calibration
-.. b2-variables::
-   :group: KLM Calibration | PID
 
 
 Collections and Lists

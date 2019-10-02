@@ -33,7 +33,7 @@ main.add_module(input)
 main.add_module(histo)
 main.add_module(gearbox)
 main.add_module(geometry)
-add_common_dqm(main, components=['EKLM', 'BKLM'])
+add_common_dqm(main, components=['KLM'])
 
 # Process events
 basf2.process(main)

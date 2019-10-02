@@ -93,25 +93,25 @@ def TCPVList(path):
     btotcpvcuts = '5.2 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
     bd_qqs_Channels = [
-        'phi:loose K_S0:all',
-        'eta\':loose K_S0:all',
-        'eta:loose K_S0:all',
-        'K_S0:all K_S0:all K_S0:all',
-        'pi0:skim K_S0:all',
-        'rho0:loose K_S0:all',
-        'omega:loose K_S0:all',
-        'f_0:loose K_S0:all',
-        'pi0:skim pi0:skim K_S0:all',
-        'phi:loose K_S0:all pi0:skim',
-        'pi+:all pi-:all K_S0:all',
-        'pi+:all pi-:all K_S0:all gamma:E15',
-        'pi0:skim K_S0:all gamma:E15',
+        'phi:loose K_S0:merged',
+        'eta\':loose K_S0:merged',
+        'eta:loose K_S0:merged',
+        'K_S0:merged K_S0:merged K_S0:merged',
+        'pi0:skim K_S0:merged',
+        'rho0:loose K_S0:merged',
+        'omega:loose K_S0:merged',
+        'f_0:loose K_S0:merged',
+        'pi0:skim pi0:skim K_S0:merged',
+        'phi:loose K_S0:merged pi0:skim',
+        'pi+:all pi-:all K_S0:merged',
+        'pi+:all pi-:all K_S0:merged gamma:E15',
+        'pi0:skim K_S0:merged gamma:E15',
     ]
 
-    bd_ccs_Channels = ['J/psi:eeLoose K_S0:all',
-                       'J/psi:mumuLoose K_S0:all',
-                       'psi(2S):eeLoose K_S0:all',
-                       'psi(2S):mumuLoose K_S0:all',
+    bd_ccs_Channels = ['J/psi:eeLoose K_S0:merged',
+                       'J/psi:mumuLoose K_S0:merged',
+                       'psi(2S):eeLoose K_S0:merged',
+                       'psi(2S):mumuLoose K_S0:merged',
                        'J/psi:eeLoose K*0:loose',
                        'J/psi:mumuLoose K*0:loose']
 

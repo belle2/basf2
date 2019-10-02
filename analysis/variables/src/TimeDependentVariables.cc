@@ -10,7 +10,9 @@
 
 // Own include
 #include <analysis/variables/TimeDependentVariables.h>
+
 #include <analysis/utility/PCmsLabTransform.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -286,7 +288,7 @@ namespace Belle2 {
 
       if (vert) {
         PCmsLabTransform T;
-        TVector3 boost = T.getBoostVector().BoostVector();
+        TVector3 boost = T.getBoostVector();
         double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
         double c = Const::speedOfLight / 1000.; // cm ps-1
         result = vert->getDeltaT() * bg * c;
@@ -302,7 +304,7 @@ namespace Belle2 {
 
       if (vert) {
         PCmsLabTransform T;
-        TVector3 boost = T.getBoostVector().BoostVector();
+        TVector3 boost = T.getBoostVector();
         double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
         double c = Const::speedOfLight / 1000.; // cm ps-1
         result = vert->getDeltaTErr() * bg * c;
@@ -316,7 +318,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
+      TVector3 boost = T.getBoostVector();
       TVector3 boostDir = boost.Unit();
 
       TVector3 pos = part->getVertex();
@@ -329,10 +331,11 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
-      TVector3 boostDir = boost.Unit();
+      TVector3 boost = T.getBoostVector();
 
-      TVector3 orthBoostDir(boostDir.Z(), boostDir.Y(), -1 * boostDir.X());
+      TVector3 orthBoost(boost.Z(), 0, -1 * boost.X());
+      TVector3 orthBoostDir = orthBoost.Unit();
+
       TVector3 pos = part->getVertex();
       double l = pos.Dot(orthBoostDir);
 
@@ -343,7 +346,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
+      TVector3 boost = T.getBoostVector();
       TVector3 boostDir = boost.Unit();
 
       const MCParticle* mcPart = part->getRelated<MCParticle>();
@@ -356,11 +359,12 @@ namespace Belle2 {
 
     double vertexTruthOrthogonalBoostDirection(const Particle* part)
     {
-      PCmsLabTransform T;
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      TLorentzVector trueBeamEnergy = beamParamsDB->getHER() + beamParamsDB->getLER();
+      TVector3 boost = trueBeamEnergy.BoostVector();
 
-      TVector3 boost = T.getBoostVector().BoostVector();
-      TVector3 boostDir = boost.Unit();
-      TVector3 orthBoostDir(boostDir.Z(), boostDir.Y(), -1 * boostDir.X());
+      TVector3 orthBoost(boost.Z(), 0, -1 * boost.X());
+      TVector3 orthBoostDir = orthBoost.Unit();
 
       const MCParticle* mcPart = part->getRelated<MCParticle>();
       if (mcPart == nullptr) return -1111;
@@ -375,8 +379,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
-      TVector3 boostDir = boost.Unit();
+      TVector3 boost = T.getBoostVector();
 
       double cy = boost.Z() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
       double sy = boost.X() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
@@ -411,9 +414,9 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
-      TVector3 boostDir = boost.Unit();
-      TVector3 orthBoostDir(boostDir.Z(), boostDir.Y(), -1 * boostDir.X());
+      TVector3 boost = T.getBoostVector();
+      TVector3 orthBoost(boost.Z(), 0, -1 * boost.X());
+      TVector3 orthBoostDir = orthBoost.Unit();
 
       double cy = orthBoostDir.Z() / TMath::Sqrt(orthBoostDir.Z() * orthBoostDir.Z() + orthBoostDir.X() * orthBoostDir.X());
       double sy = orthBoostDir.X() / TMath::Sqrt(orthBoostDir.Z() * orthBoostDir.Z() + orthBoostDir.X() * orthBoostDir.X());

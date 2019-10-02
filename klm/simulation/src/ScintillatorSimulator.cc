@@ -16,8 +16,8 @@
 #include <TFile.h>
 
 /* Belle2 headers. */
-#include <bklm/geometry/GeometryPar.h>
-#include <eklm/geometry/GeometryData.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/eklm/geometry/GeometryData.h>
 #include <klm/simulation/ScintillatorSimulator.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -154,7 +154,7 @@ void KLM::ScintillatorSimulator::simulate(
   bklm::GeometryPar* geoPar = bklm::GeometryPar::instance();
   const BKLMSimHit* hit = firstHit->second;
   const bklm::Module* module =
-    geoPar->findModule(hit->getForward(), hit->getSector(), hit->getLayer());
+    geoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
   double stripLength =
     2.0 * (hit->isPhiReadout() ?
            module->getPhiScintHalfLength(hit->getStrip()) :

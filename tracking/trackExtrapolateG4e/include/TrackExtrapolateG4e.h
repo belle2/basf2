@@ -15,9 +15,9 @@
 #include <framework/gearbox/Const.h>
 #include <framework/database/DBObjPtr.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
-#include <eklm/dbobjects/EKLMChannels.h>
-#include <bklm/geometry/GeometryPar.h>
-#include <eklm/geometry/TransformDataGlobalAligned.h>
+#include <klm/eklm/dbobjects/EKLMChannels.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <tracking/dataobjects/ExtHit.h>

@@ -14,15 +14,17 @@
 #include <gtest/gtest.h>
 
 using namespace Belle2;
+using namespace Conditions;
 
 namespace {
+  using PayloadMetadata = PayloadMetadata;
   /** Dummy Metadata provider for testing: given a list of payloads on construction return those when requested */
-  class TestMetadataProvider final: public Conditions::MetadataProvider {
+  class TestMetadataProvider final: public MetadataProvider {
     /** payloads available */
-    std::vector<Conditions::PayloadMetadata> m_payloads;
+    std::vector<PayloadMetadata> m_testpayloads;
   public:
     /** Create with a list of payloads */
-    TestMetadataProvider(const std::vector<Conditions::PayloadMetadata>& payloads): m_payloads(payloads) {}
+    explicit TestMetadataProvider(const std::vector<PayloadMetadata>& payloads): m_testpayloads(payloads) {}
     /** Check global tag status: basically just return either PUBLISHED if the
      * name starts with "tag" or the name of the tag itself otherwise to be able
      * to test rejection of tag states */
@@ -45,7 +47,7 @@ namespace {
     {
       IntervalOfValidity iov(exp, run, exp, run);
       int count{0};
-      for (auto p : m_payloads) {
+      for (auto p : m_testpayloads) {
         if (p.globaltag == globaltag and p.iov.contains(iov)) {
           addPayload(std::move(p), "testprovider");
           ++count;
@@ -71,7 +73,7 @@ namespace {
     // also fail if the OPEN one is somewhere in the middle
     EXPECT_FALSE(provider.setTags({"TESTING", "VALIDATED", "OPEN", "RUNNING", "PUBLISHED"}));
     expectErrorWithVariables({{"globaltag", "OPEN"}, {"status", "OPEN"}});
-    provider.setValidTagStates({"OPEN", "INVALID"});
+    provider.setUsableTagStates({"OPEN", "INVALID"});
     EXPECT_TRUE(provider.setTags({"OPEN"}));
     EXPECT_FALSE(provider.setTags({"INVALID"}));
     expectErrorWithVariables({{"globaltag", "INVALID"}, {"status", "INVALID"}});
@@ -83,7 +85,7 @@ namespace {
   TEST_F(MetadataProviderTest, exception)
   {
     TestMetadataProvider provider({});
-    std::vector<Conditions::PayloadMetadata> query{{"A"}};
+    std::vector<PayloadMetadata> query{PayloadMetadata{"A"}};
     ASSERT_TRUE(provider.setTags({"tag1"}));
     ASSERT_THROW(provider.getPayloads(0, 0, query), std::runtime_error);
   }
@@ -94,9 +96,9 @@ namespace {
   {
     TestMetadataProvider provider({
       //name, tag, ignore, ignore, ignore, exp, run, exp, run, revision
-      {"A", "tag1", "", "", "", 0, 0, -1, -1, 2},
+      PayloadMetadata{"A", "tag1", "", "", "", 0, 0, -1, -1, 2},
     });
-    std::vector<Conditions::PayloadMetadata> query{{"A"}, {"B"}};
+    std::vector<PayloadMetadata> query{PayloadMetadata{"A"}, PayloadMetadata{"B"}};
     // A is in the tag but already set. B isn't in the tag but already set so no error
     query[0].revision = 1;
     query[1].revision = 1;
@@ -116,12 +118,12 @@ namespace {
   {
     TestMetadataProvider provider({
       //name, tag, ignore, ignore, ignore, exp, run, exp, run, revision
-      {"A", "tag1", "", "", "", 0, 0, -1, -1, 1},
-      {"A", "tag1", "", "", "", 1, 0, 1, 10, 3},
-      {"A", "tag1", "", "", "", 1, 0, 1, 10, 2},
-      {"B", "tag1", "", "", "", 1, 0, 1, 10, 1},
+      PayloadMetadata{"A", "tag1", "", "", "", 0, 0, -1, -1, 1},
+      PayloadMetadata{"A", "tag1", "", "", "", 1, 0, 1, 10, 3},
+      PayloadMetadata{"A", "tag1", "", "", "", 1, 0, 1, 10, 2},
+      PayloadMetadata{"B", "tag1", "", "", "", 1, 0, 1, 10, 1},
     });
-    std::vector<Conditions::PayloadMetadata> query{{"A"}, {"B"}};
+    std::vector<PayloadMetadata> query{PayloadMetadata{"A"}, PayloadMetadata{"B"}};
     ASSERT_TRUE(provider.setTags({"tag1"}));
     ASSERT_FALSE(provider.getPayloads(0, 0, query));
     expectErrorWithVariables({{"globaltags", "tag1"}, {"name", "B"}, {"experiment", "0"}, {"run", "0"}});
@@ -129,18 +131,18 @@ namespace {
     EXPECT_EQ(query[1].revision, 0);
     // try for exp 1, there should be something for both payloads and A should be in revision 3.
     // Howewer metadata provider only fills missing info so we need new query structure
-    query = {{"A"}, {"B"}};
+    query = {PayloadMetadata{"A"}, PayloadMetadata{"B"}};
     EXPECT_TRUE(provider.getPayloads(1, 0, query));
     EXPECT_EQ(query[0].revision, 3);
     EXPECT_EQ(query[1].revision, 1);
     // and back to exp 0 and we want the same result as before.
-    query = {{"A"}, {"B"}};
+    query = {PayloadMetadata{"A"}, PayloadMetadata{"B"}};
     EXPECT_FALSE(provider.getPayloads(0, 0, query));
     expectErrorWithVariables({{"globaltags", "tag1"}, {"name", "B"}, {"experiment", "0"}, {"run", "0"}});
     EXPECT_EQ(query[0].revision, 1);
     EXPECT_EQ(query[1].revision, 0);
     // so let's try this again but mark B as optional. Same result but no error
-    query = {{"A"}, {"B", false}};
+    query = {PayloadMetadata{"A"}, PayloadMetadata{"B", false}};
     EXPECT_TRUE(provider.getPayloads(0, 0, query));
     EXPECT_EQ(query[0].revision, 1);
     EXPECT_EQ(query[1].revision, 0);
@@ -151,14 +153,14 @@ namespace {
   {
     TestMetadataProvider provider({
       //name, tag, ignore, ignore, ignore, exp, run, exp, run, revision
-      {"A", "tag1", "", "", "", 0, 0, -1, -1, 1},
-      {"A", "tag2", "", "", "", 0, 0, -1, -1, 2},
-      {"B", "tag2", "", "", "", 0, 0, -1, -1, 2},
+      PayloadMetadata{"A", "tag1", "", "", "", 0, 0, -1, -1, 1},
+      PayloadMetadata{"A", "tag2", "", "", "", 0, 0, -1, -1, 2},
+      PayloadMetadata{"B", "tag2", "", "", "", 0, 0, -1, -1, 2},
     });
     // In this case A should be taken from tag1 even if it exists in tag2.
     // But B can only come from tag2
     ASSERT_TRUE(provider.setTags({"tag1", "tag2"}));
-    std::vector<Conditions::PayloadMetadata> query = {{"A"}, {"B"}};
+    std::vector<PayloadMetadata> query = {PayloadMetadata{"A"}, PayloadMetadata{"B"}};
     EXPECT_TRUE(provider.getPayloads(1, 0, query));
     EXPECT_EQ(query[0].revision, 1);
     EXPECT_EQ(query[1].revision, 2);

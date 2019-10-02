@@ -92,21 +92,17 @@ void TauDecayMarkerModule::IdentifyTauPair()
   numOfTauMinus = 0;
   idOfTauPlus = 0;
   idOfTauMinus = 0;
-  TLorentzVector P4p, P4m;
   for (int i = 0; i < MCParticles.getEntries(); i++) {
     MCParticle& p = *MCParticles[i];
 
     if (p.getStatus() == 1 && p.getPDG() == 15) {
       numOfTauMinus++;
       idOfTauMinus = p.getIndex();
-      P4m = p.get4Vector();
     }
     if (p.getStatus() == 1 && p.getPDG() == -15) {
       numOfTauPlus++;
       idOfTauPlus = p.getIndex();
-      P4p = p.get4Vector();
     }
-
   }
   if (numOfTauPlus == 1 && numOfTauMinus == 1) {
     tauPair = true;

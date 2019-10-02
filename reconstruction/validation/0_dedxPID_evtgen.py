@@ -24,17 +24,8 @@ main.add_module("Gearbox")
 # Create geometry.
 main.add_module("Geometry")
 
-# only up to CDC
-components = [
-    'MagneticFieldConstant4LimitedRCDC',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-]
-
 # Reconstruct events.
-add_reconstruction(main, components)
+add_reconstruction(main)
 
 # enable debug output for the module added by add_reconstruction()
 for m in main.modules():

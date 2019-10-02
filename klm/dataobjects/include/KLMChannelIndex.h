@@ -30,7 +30,7 @@ namespace Belle2 {
       /** Subdetector (BKLM or EKLM). */
       c_IndexLevelSubdetector = 1,
 
-      /** Section ("forward" for BKLM, "endcap" for EKLM). */
+      /** Section. */
       c_IndexLevelSection = 2,
 
       /** Sector. */
@@ -77,6 +77,14 @@ namespace Belle2 {
      * to the first element of the higher-order level.
      */
     void setIndexLevel(enum IndexLevel indexLevel);
+
+    /**
+     * Iterate over EKLM segments instead of strips. Turning this on does not
+     * make sense for BKLM, in this case the iteration would still be performed
+     * over BKLM strips. Make sure that the iteration is performed for EKLM
+     * only, e. g. by using beginEKLM() and endEKLM().
+     */
+    void useEKLMSegments(bool useSegments = true);
 
     /**
      * Get subdetector.
@@ -142,6 +150,11 @@ namespace Belle2 {
     uint16_t getKLMSectorNumber() const;
 
     /**
+     * Get EKLM segment number.
+     */
+    int getEKLMSegmentNumber() const;
+
+    /**
      * First channel for BKLM.
      */
     KLMChannelIndex beginBKLM();
@@ -205,6 +218,11 @@ namespace Belle2 {
   protected:
 
     /**
+     * Set number of strips in the current plane.
+     */
+    void setNStripsPlane();
+
+    /**
      * Increment the index.
      */
     void increment(enum IndexLevel indexLevel);
@@ -229,6 +247,9 @@ namespace Belle2 {
 
     /** Strip. */
     int m_Strip;
+
+    /** Iterate over EKLM segments instead of strips. */
+    bool m_UseEKLMSegments = false;
 
     /** Number of strips in current plane. */
     int m_NStripsPlane;

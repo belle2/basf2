@@ -12,7 +12,6 @@
 #include <TObject.h>
 #include <TTimeStamp.h>
 #include <string>
-#include <arich/dbobjects/ARICHAerogelInfo.h>
 
 namespace Belle2 {
   /**

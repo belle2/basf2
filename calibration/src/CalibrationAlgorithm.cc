@@ -4,6 +4,7 @@
 #include <boost/python.hpp>
 #include <boost/python/list.hpp>
 #include <boost/filesystem.hpp>
+#include <TChain.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/PyObjConvUtils.h>
@@ -27,7 +28,6 @@ bool CalibrationAlgorithm::checkPyExpRun(PyObject* pyObj)
       B2DEBUG(29, "ExpRun was a Python sequence which didn't have exactly 2 entries!");
       return false;
     }
-    long value1, value2;
     PyObject* item1, *item2;
     item1 = PySequence_GetItem(pyObj, 0);
     item2 = PySequence_GetItem(pyObj, 1);
@@ -38,6 +38,7 @@ bool CalibrationAlgorithm::checkPyExpRun(PyObject* pyObj)
     }
     // Are they longs?
     if (PyLong_Check(item1) && PyLong_Check(item2)) {
+      long value1, value2;
       value1 = PyLong_AsLong(item1);
       value2 = PyLong_AsLong(item2);
       if (((value1 == -1) || (value2 == -1)) && PyErr_Occurred()) {
@@ -451,6 +452,10 @@ namespace Belle2 {
             // Get the path/directory of the Exp,Run TDirectory that holds the object(s)
             std::string objDirName = getFullObjectPath(name, expRunRequested);
             TDirectory* objDir = f->GetDirectory(objDirName.c_str());
+            if (!objDir) {
+              B2ERROR("Directory for requested object " << name << " not found: " << objDirName);
+              return nullptr;
+            }
             // Find all the objects inside, there may be more than one
             for (auto key : * (objDir->GetListOfKeys())) {
               string keyName = key->GetName();

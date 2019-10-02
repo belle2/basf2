@@ -26,7 +26,10 @@ using namespace Belle2;
 
 PXDClusterPositionCalibrationAlgorithm::PXDClusterPositionCalibrationAlgorithm():
   CalibrationAlgorithm("PXDClusterPositionCollector"),
-  minClusterForShapeLikelyhood(500), minClusterForPositionOffset(2000), maxEtaBins(10)
+  minClusterForShapeLikelyhood(500), minClusterForPositionOffset(2000), maxEtaBins(10),
+  // Branches from TTree
+  m_clusterEta(0), m_positionOffsetU(0), m_positionOffsetV(0), m_sizeV(0),
+  m_pitchV(0), m_clusterKind(0)
 {
   setDescription(
     " -------------------------- PXDClusterPositionCalibrationAlgorithm ----------------------\n"

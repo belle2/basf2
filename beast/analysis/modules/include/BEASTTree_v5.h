@@ -11,7 +11,9 @@
 #ifndef BEASTTREE_V5_H
 #define BEASTTREE_V5_H
 
-#include <TTree.h>
+#include <RtypesCore.h>
+
+#include <vector>
 
 namespace Belle2 {
   namespace BEAST_v5 {

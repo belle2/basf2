@@ -56,7 +56,7 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of generated PXDRawROIs", std::string(""));
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
   addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask which stops processing by returning false by task", (uint64_t)0);
-  addParam("SuppressErrorMask", m_suppressErrorMask, "Set mask for errors msgs which are not printed", (uint64_t)0);
+  addParam("SuppressErrorMask", m_suppressErrorMask, "Set mask for errors msgs which are not printed", (uint64_t)getSilenceMask());
   addParam("ForceMapping", m_forceMapping, "Force Mapping even if DHH bit is NOT requesting it", false);
   addParam("ForceNoMapping", m_forceNoMapping, "Force NO Mapping even if DHH bit is requesting it", false);
   addParam("CheckPaddingCRC", m_checkPaddingCRC, "Check for susp. padding (debug option, many false positive)", false);
@@ -1049,6 +1049,9 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
       m_errorMaskDHC = m_errorMask; // forget about anything before this frame
       daqpktstat.newDHC(currentDHCID, m_errorMask);
+      daqpktstat.dhc_back().setGatedFlag(dhc.data_dhc_start_frame->get_gated_flag());
+      daqpktstat.dhc_back().setGatedHER(dhc.data_dhc_start_frame->get_gated_isher());
+
       break;
     };
     case EDHCFrameHeaderDataType::c_DHE_START: {

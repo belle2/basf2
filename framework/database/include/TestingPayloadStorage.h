@@ -77,7 +77,7 @@ namespace Belle2 {
        * then call the writer function to write the payload to the given
        * filename. If the writer function returns success the payload is added
        * to the storage file */
-      bool store(const std::string& name, const IntervalOfValidity& iov, std::function<bool(const std::string&)> writer);
+      bool store(const std::string& name, const IntervalOfValidity& iov, const std::function<bool(const std::string&)>& writer);
     };
   } // Conditions namespace
 } // Belle2 namespace

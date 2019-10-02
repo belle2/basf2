@@ -325,7 +325,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
       // Get the optimal number of neighbours as function of raw energy and background level
       const unsigned int nOptimal = getOptimalNumberOfDigits(highestEnergyID, energyEstimation, backgroundLevel);
-      aECLShower->setSumOfCrystalsForEnergy(static_cast<double>(nOptimal));
+      aECLShower->setNumberOfCrystalsForEnergy(static_cast<double>(nOptimal));
 
       std::vector < std::pair<double, double> > weighteddigits;
       weighteddigits.resize(digits.size());
@@ -717,7 +717,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
         // Get the optimal number of neighbours as function of raw energy and background level
         const unsigned int nOptimal = getOptimalNumberOfDigits(locmaxcellid, energyEstimation, backgroundLevel);
-        aECLShower->setSumOfCrystalsForEnergy(static_cast<double>(nOptimal));
+        aECLShower->setNumberOfCrystalsForEnergy(static_cast<double>(nOptimal));
 
         std::vector < std::pair<double, double> > weighteddigits;
         weighteddigits.resize(newdigits.size());

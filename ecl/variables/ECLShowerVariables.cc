@@ -28,21 +28,21 @@ namespace Belle2 {
 
   namespace Variable {
 
-    //! @returns sum of crystals used to calculate energy
-    double getShowerSumOfCrystalsForEnergy(const Particle* particle)
+    //! @returns number of crystals used to calculate energy
+    double getShowerNumberOfCrystalsForEnergy(const Particle* particle)
     {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        double showerSumOfCrystalsForEnergy = -1.0;
+        double showerNumberOfCrystalsForEnergy = -1.0;
 
         auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>();
         for (unsigned int ir = 0; ir < clusterShowerRelations.size(); ++ir) {
           const auto shower = clusterShowerRelations.object(ir);
 
-          showerSumOfCrystalsForEnergy = shower->getSumOfCrystalsForEnergy();
+          showerNumberOfCrystalsForEnergy = shower->getNumberOfCrystalsForEnergy();
         }
 
-        return showerSumOfCrystalsForEnergy;
+        return showerNumberOfCrystalsForEnergy;
       }
 
       return std::numeric_limits<float>::quiet_NaN();
@@ -51,8 +51,8 @@ namespace Belle2 {
 
     VARIABLE_GROUP("ECL Shower Debugging (cDST)");
 
-    REGISTER_VARIABLE("eclShowerSumOfCrystalsForEnergy", getShowerSumOfCrystalsForEnergy,
-                      "[debugging] Returns the sum of the weights used to calculated the shower energy (optimized to minimize the energy resolution). This should not be confused with the number of crystals contained in the cluster. ");
+    REGISTER_VARIABLE("eclShowerNumberOfCrystalsForEnergy", getShowerNumberOfCrystalsForEnergy,
+                      "[debugging] Returns the number of crystals ued to calculate the shower energy (optimized to minimize the energy resolution). This should not be confused with the number of crystals contained in the cluster. ");
 
   }
 }

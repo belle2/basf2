@@ -54,11 +54,13 @@ namespace Belle2 {
 
   void Database::reset(bool keepConfig)
   {
+    auto& conf = Conditions::Configuration::getInstance();
+    conf.setInitialized(false);
     DBStore::Instance().reset(true);
     Instance().m_metadataProvider.reset();
     Instance().m_payloadCreation.reset();
     if (not keepConfig)
-      Conditions::Configuration::getInstance().reset();
+      conf.reset();
   }
 
   ScopeGuard Database::createScopedUpdateSession()
@@ -198,6 +200,7 @@ namespace Belle2 {
   void Database::initialize()
   {
     auto conf = Conditions::Configuration::getInstance();
+    conf.setInitialized(true);
     m_globalTags = conf.getFinalListOfTags();
     m_usableTagStates = conf.getUsableTagStates();
     m_metadataConfigurations = conf.getMetadataProviders();

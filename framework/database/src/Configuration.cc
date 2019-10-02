@@ -12,6 +12,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/database/Downloader.h>
+#include <framework/database/Database.h>
 #include <boost/python.hpp>
 #include <framework/core/PyObjConvUtils.h>
 #include <boost/algorithm/string.hpp>
@@ -122,6 +123,14 @@ namespace Belle2::Conditions {
     fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", "/cvmfs/belle.cern.ch/conditions");
   }
 
+  void Configuration::reset()
+  {
+    if (m_databaseInitialized) {
+      Database::Instance().reset(true);
+    }
+    *this = Configuration();
+  }
+
   std::vector<std::string> Configuration::getDefaultGlobalTags() const
   {
     // currently the default globaltag can be overwritten by environment variable
@@ -139,6 +148,7 @@ namespace Belle2::Conditions {
 
   void Configuration::setInputMetadata(const std::vector<FileMetaData>& inputMetadata)
   {
+    ensureEditable();
     m_inputMetadata = inputMetadata;
     // make sure the list of globaltags to be used is created but empty
     m_inputGlobaltags.emplace();

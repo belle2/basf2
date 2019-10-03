@@ -16,10 +16,7 @@
 #include <mva/interface/Options.h>
 
 #include <TFile.h>
-#include <TTree.h>
 #include <TChain.h>
-#include <TLeaf.h>
-#include <TROOT.h>
 
 #include <string>
 

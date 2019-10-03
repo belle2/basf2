@@ -19,7 +19,6 @@
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/dataobjects/EKLMSimHit.h>
-#include <framework/datastore/RelationArray.h>
 #include <klm/modules/MCMatcherKLMClusters/MCMatcherKLMClustersModule.h>
 #include <mdst/dataobjects/MCParticle.h>
 

@@ -7,7 +7,8 @@
 # Example steering file - 2011 Belle II Collaboration
 ######################################################
 
-from basf2 import *
+from basf2 import Path, process, logging, set_log_level, set_debug_level, \
+                  LogConfig, LogLevel, LogInfo, B2DEBUG, B2INFO, B2WARNING
 
 # show default loglevel
 print('Default loglevel:', logging.log_level)
@@ -51,7 +52,6 @@ logging.add_console(True)
 # print some log messages
 B2DEBUG(100, 'Debug Message')
 B2INFO('Info Message')
-B2RESULT('Result Message')
 B2WARNING('Warning Message')
 # B2ERROR('Error Message')
 
@@ -71,7 +71,7 @@ B2INFO('Some other message')
 for (level, num) in logging.log_stats.items():
     print('Messages for level %8s: %2d' % (level.name, num))
 
-main = create_path()
+main = Path()
 eventinfosetter = main.add_module('EventInfoSetter')
 # configure logging for the EventInfoSetter module:
 # loglevel ERROR and info for ERROR message is file name and line number

@@ -12,13 +12,8 @@
 #include <tracking/dataobjects/Muid.h>
 
 #include <fstream>
-#include <exception>
 #include <cmath>
 
-#include <framework/utilities/FileSystem.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;

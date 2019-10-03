@@ -11,7 +11,6 @@
 #pragma once
 
 /* External headers. */
-#include <TObject.h>
 #include <TVector3.h>
 
 namespace Belle2 {

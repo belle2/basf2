@@ -10,13 +10,8 @@
 
 #pragma once
 
-#include <map>
-
-#include "CLHEP/Vector/ThreeVector.h"
-
 #include <TObject.h>
 #include <string>
-#include <cmath>
 #include <vector>
 
 static const int NLAYER = 15;

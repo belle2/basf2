@@ -11,21 +11,19 @@
 /* C++ headers. */
 #include <algorithm>
 
-/* External headers. */
-#include <TDatabasePDG.h>
-
 /* Belle2 headers. */
-#include <klm/bklm/dbobjects/BKLMGeometryPar.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Const.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
 #include <klm/modules/KLMClustersReconstructor/KLMClustersReconstructorModule.h>
+#include <klm/modules/KLMClustersReconstructor/KLMHit2d.h>
 
 using namespace Belle2;
 
 REG_MODULE(KLMClustersReconstructor)
 
 KLMClustersReconstructorModule::KLMClustersReconstructorModule() : Module(),
-  m_GeoDat(nullptr), m_PositionMode(c_FirstLayer), m_ClusterMode(c_AnyHit)
+  m_PositionMode(c_FirstLayer),
+  m_ClusterMode(c_AnyHit)
 {
   setDescription("Unified BKLM/EKLM module for the reconstruction of KLMClusters.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -50,7 +48,6 @@ void KLMClustersReconstructorModule::initialize()
   m_EKLMHit2ds.isRequired();
   m_KLMClusters.registerRelationTo(m_BKLMHit2ds);
   m_KLMClusters.registerRelationTo(m_EKLMHit2ds);
-  m_GeoDat = &(EKLM::GeometryData::Instance());
   if (m_PositionModeString == "FullAverage")
     m_PositionMode = c_FullAverage;
   else if (m_PositionModeString == "FirstLayer")
@@ -77,8 +74,9 @@ static bool compareDistance(KLMHit2d& hit1, KLMHit2d& hit2)
 void KLMClustersReconstructorModule::event()
 {
   //static double mass = TDatabasePDG::Instance()->GetParticle(130)->Mass();
-  int i, n, nLayers, innermostLayer, nHits;
-  int nLayersBKLM = NLAYER, nLayersEKLM;
+  int i, nLayers, innermostLayer, nHits;
+  int nLayersBKLM = BKLMElementNumbers::getMaximalLayerNumber();
+  int nLayersEKLM = EKLMElementNumbers::getMaximalLayerNumber();
   int* layerHitsBKLM, *layerHitsEKLM;
   float minTime = -1;
   double p;//, v;
@@ -86,18 +84,17 @@ void KLMClustersReconstructorModule::event()
   std::vector<KLMHit2d>::iterator it, it0, it2;
   KLMCluster* klmCluster;
   TVector3 hitPos;
-  nLayersEKLM = m_GeoDat->getNLayers();
   layerHitsBKLM = new int[nLayersBKLM];
   layerHitsEKLM = new int[nLayersEKLM];
   /* Fill vector of 2d hits. */
-  n = m_BKLMHit2ds.getEntries();
-  for (i = 0; i < n; i++) {
+  int nHitsBKLM = m_BKLMHit2ds.getEntries();
+  for (i = 0; i < nHitsBKLM; i++) {
     if (m_BKLMHit2ds[i]->isOutOfTime())
       continue;
     klmHit2ds.push_back(KLMHit2d(m_BKLMHit2ds[i]));
   }
-  n = m_EKLMHit2ds.getEntries();
-  for (i = 0; i < n; i++) {
+  int nHitsEKLM = m_EKLMHit2ds.getEntries();
+  for (i = 0; i < nHitsEKLM; i++) {
     klmHit2ds.push_back(KLMHit2d(m_EKLMHit2ds[i]));
   }
   /* Sort by the distance from center. */

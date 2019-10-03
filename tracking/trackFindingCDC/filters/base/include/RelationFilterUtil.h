@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/utilities/Relation.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
-#include <framework/logging/LogMethod.h>
+#include <framework/logging/Logger.h>
 
 #include <vector>
 #include <limits>

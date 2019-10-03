@@ -13,7 +13,6 @@
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRandom.h>
 #include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;

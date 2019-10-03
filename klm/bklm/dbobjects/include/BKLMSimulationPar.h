@@ -11,7 +11,6 @@
 #pragma once
 
 #include <TObject.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 
 namespace Belle2 {

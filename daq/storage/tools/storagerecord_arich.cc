@@ -1,7 +1,6 @@
 #include <cstdlib>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/pcore/EvtMessage.h>

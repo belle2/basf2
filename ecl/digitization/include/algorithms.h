@@ -1,4 +1,3 @@
-#include <vector>
 
 namespace Belle2 {
   namespace ECL {

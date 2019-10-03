@@ -15,7 +15,6 @@
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleRadius.h>
 #include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 #include <framework/geometry/B2Vector3.h>
-#include <math.h>
 
 #define PT_NAME Pt
 

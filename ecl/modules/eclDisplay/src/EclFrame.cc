@@ -22,7 +22,6 @@
 #include <TStyle.h>
 #include <TGLabel.h>
 #include <TGComboBox.h>
-#include <TGeoVolume.h>
 #include <TGMenu.h>
 
 //ECL

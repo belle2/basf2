@@ -9,6 +9,9 @@
 
 #include <pxd/modules/pxdUnpacking/PXDReadRawONSEN.h>
 #include <pxd/unpacking/PXDRawDataDefinitions.h>
+
+#include <framework/datastore/StoreArray.h>
+
 #include <boost/spirit/home/support/detail/endian.hpp>
 
 using namespace std;

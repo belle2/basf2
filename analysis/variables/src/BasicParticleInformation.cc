@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <analysis/variables/BasicParticleInformation.h>
+#include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {

@@ -10,16 +10,13 @@
 
 #include <alignment/reconstruction/AlignableSVDRecoHit2D.h>
 
-#include <alignment/Manager.h>
-#include <alignment/Hierarchy.h>
 #include <alignment/dbobjects/VXDAlignment.h>
-
 #include <alignment/GlobalDerivatives.h>
-
+#include <alignment/Hierarchy.h>
+#include <alignment/Manager.h>
+#include <framework/geometry/BFieldManager.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
-
-#include <framework/geometry/BFieldManager.h>
 
 using namespace std;
 using namespace Belle2;

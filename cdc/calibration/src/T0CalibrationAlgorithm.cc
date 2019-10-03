@@ -2,22 +2,19 @@
 #include <calibration/CalibrationAlgorithm.h>
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dataobjects/WireID.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <TError.h>
 #include <TROOT.h>
-#include <TH1F.h>
 #include <TGraphErrors.h>
 #include <TF1.h>
 #include <TFile.h>
-#include <TChain.h>
 #include <TTree.h>
-#include "iostream"
-#include "string"
 
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBImportObjPtr.h>
 #include <framework/logging/Logger.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace CDC;

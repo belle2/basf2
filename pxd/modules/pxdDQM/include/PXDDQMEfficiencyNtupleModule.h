@@ -11,9 +11,8 @@
 
 #pragma once
 
-#include <framework/core/HistoModule.h>
+#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <pxd/dataobjects/PXDCluster.h>
 
@@ -25,7 +24,6 @@
 
 
 //root stuff
-#include "TString.h"
 #include "TVector3.h"
 
 #include "TFile.h"

@@ -8,10 +8,7 @@
  **************************************************************************/
 
 #include <mva/interface/Interface.h>
-#include <framework/utilities/FileSystem.h>
 #include <framework/utilities/TestHelpers.h>
-
-#include <framework/database/LocalDatabase.h>
 
 #include <gtest/gtest.h>
 

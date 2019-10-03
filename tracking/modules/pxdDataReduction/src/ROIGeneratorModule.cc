@@ -11,7 +11,6 @@
 #include <tracking/modules/pxdDataReduction/ROIGeneratorModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <pxd/geometry/SensorInfo.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/ROIid.h>
 

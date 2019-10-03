@@ -14,7 +14,6 @@
 /* Belle2 headers. */
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/modules/EKLMTimeCalibration/EKLMTimeCalibrationCollectorModule.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
 #include <tracking/dataobjects/ExtHit.h>
 

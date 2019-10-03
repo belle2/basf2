@@ -73,13 +73,17 @@ for bkg in bkgs.split():
             partSkim = 'BtoPi0Pi0 TauGeneric TauLFV'
 
         if (skim == 'Dark'):
-            nSkims = 4
-            partSkim = 'ALP3Gamma SinglePhotonDark LFVZpVisible LFVZpInvisible'
+            nSkims = 6
+            partSkim = 'ALP3Gamma SinglePhotonDark LFVZpVisible DimuonPlusMissingEnergy'
+            partSkim += ' ElectronMuonPlusMissingEnergy DielectronPlusMissingEnergy'
 
-        if (skim == 'feiHadronic'):
+        if (skim == 'feiHadronicCombined'):
             nSkims = 2
             partSkim = 'feiHadronicB0 feiHadronicBplus'
 
+        if (skim == 'feiSLCombined'):
+            nSkims = 2
+            partSkim = 'feiSLB0 feiSLBplus'
         if (skim == 'Quarkonium'):
             nSkims = 3
             partSkim = 'ISRpipicc BottomoniumEtabExclusive BottomoniumUpsilon'

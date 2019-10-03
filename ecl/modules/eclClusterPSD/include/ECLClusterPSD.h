@@ -14,10 +14,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
-
-// STL
-#include <vector>
 
 namespace Belle2 {
 

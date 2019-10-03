@@ -10,20 +10,9 @@
 
 #include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationVector.h>
+#include <framework/logging/Logger.h>
 
-#include <root/TTree.h>
 #include <root/TAxis.h>
-#include <root/TObject.h>
-
-#include <boost/foreach.hpp>
-
-#include <typeinfo>
-#include <cxxabi.h>
 
 using namespace Belle2;
 

@@ -10,7 +10,6 @@
 
 /* Belle2 headers. */
 #include <klm/eklm/dataobjects/EKLMSimHit.h>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

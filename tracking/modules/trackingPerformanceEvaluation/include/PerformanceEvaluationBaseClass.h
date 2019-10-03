@@ -10,10 +10,6 @@
 #ifndef PERFORMANCEEVALUATIONBASECLASS_H_
 #define PERFORMANCEEVALUATIONBASECLASS_H_
 
-#include <framework/core/Module.h>
-#include <TDirectory.h>
-#include <TCollection.h>
-#include <TTree.h>
 #include <TFile.h>
 #include <TList.h>
 #include <TH1F.h>
@@ -21,13 +17,9 @@
 #include <TH3F.h>
 
 // forward declarations
-class TTree;
 class TFile;
 
 namespace Belle2 {
-
-  template< class T >
-  class StoreArray;
 
   /** This module takes the MCParticles, the genfit Tracks, the genfit TrackCand,
    *  and the MCTrackCands input and produce a root file containing various histograms

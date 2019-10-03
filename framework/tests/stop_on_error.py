@@ -2,61 +2,61 @@
 # -*- coding: utf-8 -*-
 
 import os
-from basf2 import *
+import basf2
 from ROOT import Belle2
 
-set_random_seed("")
+basf2.set_random_seed("")
 
 
-class ErrorInInit(Module):
+class ErrorInInit(basf2.Module):
     """test"""
 
     def initialize(self):
         """reimplementation of Module::initialize()."""
-        B2ERROR("In module " + self.name())
+        basf2.B2ERROR("In module " + self.name())
 
 
-class ErrorInEvent(Module):
+class ErrorInEvent(basf2.Module):
     """test"""
 
     def event(self):
         """reimplementation of Module::event()."""
         # error level to check that this doesn't prevent execution
-        B2ERROR("In module " + self.name())
+        basf2.B2ERROR("In module " + self.name())
 
 
-noerrors = create_path()
+noerrors = basf2.Path()
 noerrors.add_module('EventInfoSetter')
 
 # no errors at all
-process(noerrors)
+basf2.process(noerrors)
 
-errorsinevent = create_path()
+errorsinevent = basf2.Path()
 errorsinevent.add_module('EventInfoSetter')
 errorsinevent.add_module(ErrorInEvent())
 
 # no errors before event processing
-process(errorsinevent)
+basf2.process(errorsinevent)
 
 # there were errors in event() of previous run
-process(noerrors)
-process(noerrors)
-process(errorsinevent)
+basf2.process(noerrors)
+basf2.process(noerrors)
+basf2.process(errorsinevent)
 # there were some more errors in event() of previous run
-process(noerrors)
+basf2.process(noerrors)
 
 # errors in initialize() -> fail
 if os.fork() == 0:
     noerrors.add_module(ErrorInInit())
-    process(noerrors)
+    basf2.process(noerrors)
 else:
     assert os.wait()[1] != 0
 
 # errors before process() -> fail
 if os.fork() == 0:
-    B2ERROR("htns")
-    process(noerrors)
+    basf2.B2ERROR("htns")
+    basf2.process(noerrors)
 else:
     assert os.wait()[1] != 0
 
-B2INFO('everything was OK.')
+basf2.B2INFO('everything was OK.')

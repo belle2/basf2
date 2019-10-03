@@ -15,7 +15,6 @@
 #include <vector>
 #include <deque>
 #include <map>
-#include <algorithm>
 #include <functional>
 #include <type_traits>
 

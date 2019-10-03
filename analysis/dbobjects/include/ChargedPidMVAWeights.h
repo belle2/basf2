@@ -14,9 +14,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/Database.h>
-#include <framework/database/DBImportArray.h>
 
 // MVA
 #include <mva/interface/Weightfile.h>

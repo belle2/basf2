@@ -5,7 +5,7 @@
 #include <numeric>
 #include <algorithm>
 #include <iostream>
-#include <cassert>
+
 using namespace Belle2;
 using namespace Belle2::ECL;
 using namespace std;

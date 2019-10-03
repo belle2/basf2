@@ -13,27 +13,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <math.h>
+
 // FRAMEWORK
-#include <framework/database/Database.h>
-#include <framework/database/LocalDatabase.h>
-#include <framework/database/ConditionsDatabase.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/database/DBImportObjPtr.h>
-#include <framework/database/DBObjPtr.h>
+
 // ECL
 #include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibratorModule.h>
 #include <ecl/dataobjects/ECLTrig.h>
-// STL
-#include <cmath>
-#include <limits>
-#include <iostream>
-// BOOST
-#include <boost/format.hpp>
+
 // ROOT
 #include "TFile.h"
+
 using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module

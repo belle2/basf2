@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <alignment/GlobalLabel.h>
+
 #include <iostream>
 
 using namespace std;

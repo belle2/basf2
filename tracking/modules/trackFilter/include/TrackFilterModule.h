@@ -16,7 +16,6 @@
 #include <mdst/dataobjects/Track.h>
 
 #include <TFile.h>
-#include <TDirectory.h>
 #include <TNtuple.h>
 
 

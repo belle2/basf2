@@ -9,8 +9,8 @@
  **************************************************************************/
 
 /* Belle2 headers. */
+#include <klm/eklm/dataobjects/EKLMElementID.h>
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
-#include <klm/eklm/geometry/GeometryData.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;

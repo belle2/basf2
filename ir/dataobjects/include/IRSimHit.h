@@ -11,7 +11,6 @@
 #ifndef IRSIMHIT_H
 #define IRSIMHIT_H
 
-#include <TObject.h>
 #include <TVector3.h>
 #include <string>
 #include <simulation/dataobjects/SimHitBase.h>

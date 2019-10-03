@@ -13,10 +13,9 @@
 
 /* Belle2 headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/modules/KLMUnpacker/KLMUnpackerModule.h>
 #include <klm/rawdata/RawData.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;

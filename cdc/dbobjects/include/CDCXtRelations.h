@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <framework/logging/Logger.h>
+
 #include <map>
 #include <array>
 #include <iostream>

@@ -12,10 +12,10 @@
 #include <TH1F.h>
 
 /* Belle2 headers. */
-
 #include <framework/gearbox/Unit.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/modules/EKLMADC/EKLMADCModule.h>
+#include <klm/simulation/ScintillatorSimulator.h>
 
 using namespace Belle2;
 

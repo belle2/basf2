@@ -10,11 +10,8 @@
 
 #include <pxd/modules/pxdBackground/PXDBeamBackHitFilterModule.h>
 
-#include <framework/datastore/DataStore.h>
+#include <simulation/dataobjects/BeamBackHit.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
-
-#include <functional>
 
 using namespace std;
 using namespace Belle2;

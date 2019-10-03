@@ -9,27 +9,20 @@
  **************************************************************************/
 
 #include <iostream>
-#include <iomanip>
 #include <cdc/calibration/SpaceResolutionCalibrationAlgorithm.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCSpaceResols.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 
+#include "TF1.h"
 #include "TH1F.h"
 #include "TH2F.h"
-#include "TMultiGraph.h"
-#include "TPad.h"
-#include "TCanvas.h"
-#include "TSystem.h"
-#include "TChain.h"
 #include "TROOT.h"
 #include "TError.h"
 #include "TMinuit.h"
+
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -338,23 +331,23 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nAlphaBins; ++al) {
         for (int th = 0; th < m_nThetaBins; ++th) {
-
-          upFit = getUpperBoundaryForFit(m_gFit[i][lr][al][th]);
-          intp6 = upFit + 0.2;
-          B2DEBUG(199, "xmax for fitting: " << upFit);
-
-          func->SetParameters(5E-6, 0.007, 1E-4, 1E-5, 0.00008, -30, intp6);
-          func->SetParLimits(0, 1E-7, 1E-4);
-          func->SetParLimits(1, 0.0045, 0.02);
-          func->SetParLimits(2, 1E-6, 0.0005);
-          func->SetParLimits(3, 1E-8, 0.0005);
-          func->SetParLimits(4, 0., 0.001);
-          func->SetParLimits(5, -40, 0.);
-          func->SetParLimits(6, intp6 - 0.5, intp6 + 0.2);
-          B2DEBUG(21, "Fitting for layer: " << i << "lr: " << lr << " ial" << al << " ith:" << th);
-          B2DEBUG(21, "Fit status before fit:" << m_fitStatus[i][lr][al][th]);
           if (!m_gFit[i][lr][al][th]) continue;
           if (m_fitStatus[i][lr][al][th] != -1) { /*if graph exist, do fitting*/
+            upFit = getUpperBoundaryForFit(m_gFit[i][lr][al][th]);
+            intp6 = upFit + 0.2;
+            B2DEBUG(199, "xmax for fitting: " << upFit);
+
+            func->SetParameters(5E-6, 0.007, 1E-4, 1E-5, 0.00008, -30, intp6);
+            func->SetParLimits(0, 1E-7, 1E-4);
+            func->SetParLimits(1, 0.0045, 0.02);
+            func->SetParLimits(2, 1E-6, 0.0005);
+            func->SetParLimits(3, 1E-8, 0.0005);
+            func->SetParLimits(4, 0., 0.001);
+            func->SetParLimits(5, -40, 0.);
+            func->SetParLimits(6, intp6 - 0.5, intp6 + 0.2);
+
+            B2DEBUG(21, "Fitting for layer: " << i << "lr: " << lr << " ial" << al << " ith:" << th);
+            B2DEBUG(21, "Fit status before fit:" << m_fitStatus[i][lr][al][th]);
 
             for (int j = 0; j < 10; j++) {
 

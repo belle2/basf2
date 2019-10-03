@@ -21,7 +21,7 @@ from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 from skim.standardlists.charm import *
 set_log_level(LogLevel.INFO)
 
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 
 skimCode = encodeSkimName('PRsemileptonicUntagged')
 

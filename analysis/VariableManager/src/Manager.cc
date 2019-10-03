@@ -9,19 +9,14 @@
  **************************************************************************/
 
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
+#include <framework/utilities/GeneralCut.h>
 
 #include <boost/algorithm/string.hpp>
 
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-#include <exception>
 #include <string>
 #include <regex>
 

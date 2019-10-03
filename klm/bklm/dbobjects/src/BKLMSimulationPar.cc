@@ -10,7 +10,6 @@
 
 #include <klm/bklm/dbobjects/BKLMSimulationPar.h>
 
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 

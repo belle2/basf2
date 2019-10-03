@@ -11,7 +11,6 @@
 #include <math.h>
 #include <TMath.h>
 
-#include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
 #include <svd/geometry/SensorInfo.h>

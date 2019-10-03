@@ -7,29 +7,16 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-#include <stdlib.h>
-#include <sys/time.h>
-
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/database/DBObjPtr.h>
 #include <klm/bklm/dbobjects/BKLMADCThreshold.h>
 #include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
 
-#include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawKLM.h>
 #include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <iostream>
 
 namespace Belle2 {
 

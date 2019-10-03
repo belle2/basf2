@@ -11,7 +11,6 @@
 #include <framework/logging/Logger.h>
 #include <tracking/modules/DATCON/DATCONSVDSimpleClusterCandidate.h>
 #include <vxd/geometry/GeoCache.h>
-#include <svd/geometry/SensorInfo.h>
 
 using namespace std;
 

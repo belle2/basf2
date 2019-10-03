@@ -14,18 +14,11 @@
 //FRAMEWORK
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/gearbox/Unit.h>
 
 //MDST
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
 
 //ECL
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <ecl/dbobjects/ECLChargedPidPDFs.h>
 

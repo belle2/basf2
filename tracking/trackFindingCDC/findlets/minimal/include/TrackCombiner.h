@@ -14,9 +14,6 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
-#include <tracking/trackFindingCDC/ca/Path.h>
-
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <vector>
 #include <string>

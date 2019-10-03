@@ -11,13 +11,6 @@
 #include <ecl/utility/ECLDspEmulator.h>
 //Framework
 #include <framework/logging/Logger.h>
-//STL
-#include <stdio.h>
-#include <math.h>
-#include <time.h>
-#include <sys/timeb.h>
-#include <stdlib.h>
-#include <string.h>
 
 namespace Belle2 {
   namespace ECL {

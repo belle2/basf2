@@ -368,9 +368,9 @@ def correctBrems(
     path=None,
 ):
     """
-    For each particle in the given `inputList`, copies it to the `outputList` and adds the
-    4-vector of the photon(s) in the `gammaList` which has(have) a weighted named relation to
-    the particle's track, set by the :b2:mod:`eclTrackBremFinder` module during reconstruction.
+    For each particle in the given ``inputList``, copies it to the ``outputList`` and adds the
+    4-vector of the photon(s) in the ``gammaList`` which has(have) a weighted named relation to
+    the particle's track, set by the ``ECLTrackBremFinder`` module during reconstruction.
 
     Warning:
         This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
@@ -380,9 +380,9 @@ def correctBrems(
         Please note that a new particle is always generated, with the old particle and -if found- one or more
         photons as daughters.
 
-        The `inputList` should contain particles with associated tracks. Otherwise the module will exit with an error.
+        The ``inputList`` should contain particles with associated tracks. Otherwise the module will exit with an error.
 
-        The `gammaList` should contain photons. Otherwise the module will exit with an error.
+        The ``gammaList`` should contain photons. Otherwise the module will exit with an error.
 
     @param outputList   The output particle list name containing the corrected particles
     @param inputList    The initial particle list name containing the particles to correct. *It should already exist.*
@@ -390,7 +390,7 @@ def correctBrems(
     @param maximumAcceptance Maximum value of the relation weight. Should be a number between [0,3)
     @param multiplePhotons Whether to use only one photon (the one with the smallest acceptance) or as many as possible
     @param usePhotonOnlyOnce If true, each brems candidate is used to correct only the track with the smallest relation weight
-    @param writeOut      Whether `RootOutput` module should save the created `outputList`
+    @param writeOut      Whether `RootOutput` module should save the created ``outputList``
     @param path          The module is added to this path
     """
 
@@ -484,9 +484,9 @@ def correctBremsBelle(
        gammaListName (str): The gammas list containing possibly radiative gammas, should already exist.
        multiplePhotons (bool): How many photons should be added to the charged particle? nearest one -> False,
              add all the photons within the cone -> True
-       angleThreshold (double): The maximum angle in radians between the charged particle and the (radiative)
+       angleThreshold (float): The maximum angle in radians between the charged particle and the (radiative)
               gamma to be accepted.
-       minimumEnergy (double): The minimum energy in GeV of the (radiative) gamma to be accepted.
+       minimumEnergy (float): The minimum energy in GeV of the (radiative) gamma to be accepted.
        writeOut (bool): whether RootOutput module should save the created ParticleList
        path (basf2.Path): modules are added to this path
     """
@@ -1545,6 +1545,33 @@ def variablesToDaughterExtraInfo(
     path.add_module(mod)
 
 
+def variablesToEventExtraInfo(
+    particleList,
+    variables,
+    option=0,
+    path=None,
+):
+    """
+    For each particle in the input list the selected variables are saved in an event-extra-info field with the given name,
+    Can be used to save MC truth information, for example, in a ntuple of reconstructed particles.
+
+    An existing extra info with the same name will be overwritten if the new
+    value is lower / will never be overwritten / will be overwritten if the
+    new value is higher / will always be overwritten (-1/0/1/2).
+
+    @param particleList  The input ParticleList
+    @param variables     Dictionary of Variables and extraInfo names.
+    @param path          modules are added to this path
+    """
+
+    mod = register_module('VariablesToEventExtraInfo')
+    mod.set_name('VariablesToEventExtraInfo_' + particleList)
+    mod.param('particleList', particleList)
+    mod.param('variables', variables)
+    mod.param('overwrite', option)
+    path.add_module(mod)
+
+
 def variableToSignalSideExtraInfo(
     particleList,
     varToExtraInfo,
@@ -2274,6 +2301,20 @@ def writePi0EtaVeto(
     @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
     @param path       modules are added to this path
     """
+
+    if not os.path.isfile(workingDirectory + '/pi0veto.root') and downloadFlag:
+        pi0veto_error_message = (
+            "The necessary weight file pi0veto.root is not present in the provided working directory.\n"
+            "Unfortunately, it can not be downloaded from the database in this release."
+        )
+        B2ERROR(pi0veto_error_message)
+    if not os.path.isfile(workingDirectory + '/etaveto.root') and downloadFlag:
+        etaveto_error_message = (
+            "The necessary weight file etaveto.root is not present in the provided working directory.\n"
+            "Unfortunately, it can not be downloaded from the database in this release."
+        )
+        B2ERROR(etaveto_error_message)
+
     global PI0ETAVETO_COUNTER
 
     if PI0ETAVETO_COUNTER == 0:
@@ -2317,15 +2358,15 @@ def writePi0EtaVeto(
 
     if not os.path.isfile(workingDirectory + '/pi0veto.root'):
         if downloadFlag:
-            use_central_database('development')
+            # use_central_database('development') // The development GT can no longer be used
             basf2_mva.download('Pi0VetoIdentifier', workingDirectory + '/pi0veto.root')
-            B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
+            # B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
 
     if not os.path.isfile(workingDirectory + '/etaveto.root'):
         if downloadFlag:
-            use_central_database('development')
+            # use_central_database('development') // The development GT can no longer be used
             basf2_mva.download('EtaVetoIdentifier', workingDirectory + '/etaveto.root')
-            B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
+            # B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
 
     roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO'], extraInfoName='Pi0Veto',
                         identifier=workingDirectory + '/pi0veto.root')

@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <framework/logging/Logger.h>
 #include <tracking/spacePointCreation/MCVXDPurityInfo.h>
 #include <tracking/spacePointCreation/PurityCalculatorTools.h> // determines purity
 #include <tracking/trackFindingVXD/filterMap/filterFramework/TBranchLeafType.h>
@@ -20,9 +19,7 @@
 #include <vector>
 #include <map>
 #include <string>
-// #include <memory> // unique_ptr
 
-#include <TFile.h>
 #include <TTree.h>
 
 namespace Belle2 {

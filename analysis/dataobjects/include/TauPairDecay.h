@@ -12,8 +12,6 @@
 
 #include <framework/datastore/RelationsObject.h>
 
-#include <set>
-
 namespace Belle2 {
 
 

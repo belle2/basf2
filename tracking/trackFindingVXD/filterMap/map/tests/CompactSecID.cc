@@ -14,8 +14,6 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <vector>
-#include <list>
-#include <utility>
 
 using namespace std;
 using namespace Belle2;

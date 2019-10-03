@@ -12,9 +12,7 @@
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
 
-// #include <framework/datastore/RelationVector.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <genfit/TrackCand.h>
 
 namespace Belle2 {
   /**

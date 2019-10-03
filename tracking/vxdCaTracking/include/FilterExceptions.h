@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/core/FrameworkExceptions.h>
-#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 

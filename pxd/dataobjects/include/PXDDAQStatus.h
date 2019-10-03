@@ -14,8 +14,6 @@
 #include <pxd/dataobjects/PXDDAQPacketStatus.h>
 #include <TObject.h>
 #include <pxd/dataobjects/PXDErrorFlags.h>
-#include <memory>
-
 
 namespace Belle2 {
 

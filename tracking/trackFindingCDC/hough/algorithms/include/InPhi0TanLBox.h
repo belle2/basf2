@@ -10,12 +10,8 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
-#include <tracking/trackFindingCDC/hough/perigee/Phi0Rep.h>
 #include <tracking/trackFindingCDC/hough/boxes/Box.h>
-#include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
 #include <tracking/trackFindingCDC/topology/ILayer.h>
-
-#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

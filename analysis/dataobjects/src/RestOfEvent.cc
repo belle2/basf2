@@ -21,7 +21,6 @@
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
 #include <TLorentzVector.h>
-#include <iostream>
 
 using namespace Belle2;
 // New methods:

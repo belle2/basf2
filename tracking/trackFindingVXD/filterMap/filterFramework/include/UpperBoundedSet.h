@@ -16,8 +16,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <typeinfo>
-
 namespace Belle2 {
 
   /** Represents an upper bounded set of arithmetic types.

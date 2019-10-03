@@ -11,7 +11,6 @@
 #ifndef TRACKEXTRAPOLATEG4E_H
 #define TRACKEXTRAPOLATEG4E_H
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/database/DBObjPtr.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
@@ -37,7 +36,6 @@ class G4StepPoint;
 namespace Belle2 {
 
   class Track;
-  class RecoTrack;
   class Muid;
   class MuidPar;
   class KLMCluster;

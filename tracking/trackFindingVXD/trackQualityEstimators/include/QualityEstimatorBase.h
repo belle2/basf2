@@ -11,7 +11,6 @@
 #pragma once
 
 #include <boost/optional.hpp>
-#include <math.h>
 
 #include <framework/geometry/B2Vector3.h>
 #include <tracking/spacePointCreation/SpacePoint.h>

@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
-
 #include <tracking/ckf/pxd/filters/states/BasePXDStateFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>

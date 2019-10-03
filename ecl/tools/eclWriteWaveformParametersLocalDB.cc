@@ -1,7 +1,6 @@
 #include <framework/database/DBImportObjPtr.h>
 #include <ecl/dbobjects/ECLDigitWaveformParameters.h>
 #include <iostream>
-#include <fstream>
 #include <TFile.h>
 #include <TTree.h>
 //

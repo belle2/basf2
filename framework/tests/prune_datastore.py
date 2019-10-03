@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2
 from ROOT import Belle2
 from b2test_utils import clean_working_directory, safe_process
 
 
-class TestModule(Module):
+class TestModule(basf2.Module):
     """Test if the DataStore contains the expected content."""
 
     def __init__(self, is_inverted):
@@ -40,16 +40,16 @@ class TestModule(Module):
         evtmetadata = Belle2.PyStoreObj('EventMetaData')
         assert evtmetadata
 
-set_log_level(LogLevel.ERROR)
-set_random_seed("something important")
+basf2.set_log_level(basf2.LogLevel.ERROR)
+basf2.set_random_seed("something important")
 # make sure FATAL messages don't have the function signature as this makes
 # problems with clang printing namespaces differently
-logging.set_info(LogLevel.FATAL, logging.get_info(LogLevel.ERROR))
+basf2.logging.set_info(basf2.LogLevel.FATAL, basf2.logging.get_info(basf2.LogLevel.ERROR))
 # find file to read
-input_file = Belle2.FileSystem.findFile('framework/tests/root_input.root')
+input_file = basf2.find_file('framework/tests/root_input.root')
 
 with clean_working_directory():
-    main = create_path()
+    main = basf2.Path()
 
     main.add_module('RootInput', inputFileName=input_file)
     main.add_module('EventInfoPrinter')
@@ -62,10 +62,10 @@ with clean_working_directory():
     main.add_module('RootOutput', outputFileName='prune_datastore_output_test.root', updateFileCatalog=False)
 
     # Process events
-    process(main)
+    basf2.process(main)
 
     # now test if the negated logic works, too
-    main = create_path()
+    main = basf2.Path()
 
     main.add_module('RootInput', inputFileName=input_file)
     main.add_module('EventInfoPrinter')
@@ -78,10 +78,10 @@ with clean_working_directory():
     main.add_module('RootOutput', outputFileName='prune_datastore_output_test.root', updateFileCatalog=False)
 
     # Process events
-    process(main)
+    basf2.process(main)
 
     # now test if a regex which cannot be compiled is properly reported
-    main = create_path()
+    main = basf2.Path()
 
     main.add_module('RootInput', inputFileName=input_file)
     main.add_module('EventInfoPrinter')

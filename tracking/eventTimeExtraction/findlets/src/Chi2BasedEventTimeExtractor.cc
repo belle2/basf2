@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/eventTimeExtraction/findlets/Chi2BasedEventTimeExtractor.h>
-#include <tracking/eventTimeExtraction/findlets/BaseEventTimeExtractor.icc.h>
 
 #include <tracking/eventTimeExtraction/utilities/TimeExtractionUtils.h>
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

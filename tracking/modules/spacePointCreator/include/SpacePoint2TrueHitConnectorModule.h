@@ -26,8 +26,6 @@
 
 #include <unordered_map> // needed for typedef of defaultMap
 
-#include <numeric> // std::accumulate
-
 // root output
 #include <TFile.h>
 #include <TTree.h>

@@ -13,7 +13,6 @@
 
 #include <analysis/VariableManager/Manager.h>
 #include <framework/utilities/GeneralCut.h>
-#include <string.h>
 
 namespace Belle2 {
 

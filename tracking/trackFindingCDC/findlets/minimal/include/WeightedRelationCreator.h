@@ -23,8 +23,6 @@
 #include <framework/core/ModuleParamList.h>
 #include <framework/logging/Logger.h>
 
-#include <memory>
-
 #include <vector>
 #include <string>
 #include <algorithm>

@@ -11,7 +11,6 @@
 
 
 #include <pxd/modules/pxdBackground/PXDBgTupleProducerModule.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -20,14 +19,10 @@
 
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
-#include <cmath>
-#include <algorithm>
-#include <numeric>
 #include <boost/format.hpp>
 
-#include "TDirectory.h"
-#include "TFile.h"
-#include "TChain.h"
+#include <TFile.h>
+#include <TTree.h>
 
 using namespace std;
 using boost::format;

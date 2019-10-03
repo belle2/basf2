@@ -14,7 +14,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
-#include <utility>
 
 namespace Belle2 {
   class ECLCluster;

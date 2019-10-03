@@ -16,9 +16,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-//ECL
-#include <ecl/geometry/ECLGeometryPar.h>
-
 namespace Belle2 {
   class ECLDebugHit;
   class ECLSimHit;

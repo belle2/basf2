@@ -11,12 +11,12 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDRawHit.h>
+
+#include <TH1F.h>
+
 #include <string>
-//#include <map>
-#include <TH2.h>
 
 namespace Belle2 {
 

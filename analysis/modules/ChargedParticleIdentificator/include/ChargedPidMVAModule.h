@@ -12,26 +12,17 @@
 
 // FRAMEWORK
 #include <framework/core/Module.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/database/DBObjPtr.h>
 
 // MVA
 #include <mva/interface/Expert.h>
-#include <mva/interface/Interface.h>
-#include <mva/interface/Weightfile.h>
 #include <mva/interface/Dataset.h>
 
 // ANALYSIS
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dbobjects/ChargedPidMVAWeights.h>
-
 
 namespace Belle2 {
 

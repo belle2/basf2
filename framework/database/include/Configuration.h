@@ -67,7 +67,7 @@ namespace Belle2::Conditions {
     /** Get a reference to the instance which will be used when the Database is initialized */
     static Configuration& getInstance();
     /** Reset to default values */
-    void reset() { *this = Configuration(); }
+    void reset();
 
     /** @name Configuration of globaltags
      *
@@ -77,13 +77,13 @@ namespace Belle2::Conditions {
     ///@{
 
     /** Append a globaltag */
-    void appendGlobalTag(const std::string& globalTag) { m_globalTags.append(globalTag); }
+    void appendGlobalTag(const std::string& globalTag) { ensureEditable(); m_globalTags.append(globalTag); }
     /** preprend a globaltag */
-    void prependGlobalTag(const std::string& globalTag) { m_globalTags.prepend(globalTag); }
+    void prependGlobalTag(const std::string& globalTag) { ensureEditable(); m_globalTags.prepend(globalTag); }
     /** Set the list of globaltags */
-    void setGlobalTags(const std::vector<std::string>& list) { m_globalTags.ensureCpp() = list; }
+    void setGlobalTags(const std::vector<std::string>& list) { ensureEditable(); m_globalTags.ensureCpp() = list; }
     /** Set the list of globaltags from python */
-    void setGlobalTagsPy(const boost::python::list& globalTags) { m_globalTags.shallowCopy(globalTags); }
+    void setGlobalTagsPy(const boost::python::list& globalTags) { ensureEditable(); m_globalTags.shallowCopy(globalTags); }
     /** Get the list of user globaltags */
     std::vector<std::string> getGlobalTags() { return m_globalTags.ensureCpp(); }
     /** Get the list of user globaltags as python version */
@@ -109,10 +109,11 @@ namespace Belle2::Conditions {
      */
     void setInputGlobaltags(const std::vector<std::string>& inputTags)
     {
+      ensureEditable();
       m_inputGlobaltags = inputTags;
     }
 
-    /** To be called by input modules wit hthe list of all input FileMetaData
+    /** To be called by input modules with the list of all input FileMetaData
      *
      * This method is to be called by input modules which have a full list of
      * FileMetaData instances for all input files. It will then check if all
@@ -137,7 +138,7 @@ namespace Belle2::Conditions {
     /** Enable globaltag override: If this is called once than overrideEnabled()
      * will return true and getFinalListOfTags() will just return
      * getGlobalTags() */
-    void overrideGlobalTags() { m_overrideEnabled = true; }
+    void overrideGlobalTags() { ensureEditable(); m_overrideEnabled = true; }
     /** Enable globaltag override and set the list of user globaltags in one go */
     void overrideGlobalTagsPy(const boost::python::list& globalTags);
     /** Check if override is enabled by previous calls to overrideGlobalTags() */
@@ -192,13 +193,13 @@ namespace Belle2::Conditions {
     ///@{
 
     /** Add a local text file with testing payloads */
-    void appendTestingPayloadLocation(const std::string& filename) { m_testingPayloadLocations.append(filename); }
+    void appendTestingPayloadLocation(const std::string& filename) { ensureEditable(); m_testingPayloadLocations.append(filename); }
     /** Prepend a local text file with testing payloads to the list */
-    void prependTestingPayloadLocation(const std::string& filename) { m_testingPayloadLocations.prepend(filename); }
+    void prependTestingPayloadLocation(const std::string& filename) { ensureEditable(); m_testingPayloadLocations.prepend(filename); }
     /** Set the list of local text files to look for testing payloads */
-    void setTestingPayloadLocations(const std::vector<std::string>& list) { m_testingPayloadLocations.ensureCpp() = list;}
+    void setTestingPayloadLocations(const std::vector<std::string>& list) { ensureEditable(); m_testingPayloadLocations.ensureCpp() = list;}
     /** Set the list of text files containing test payloads in python */
-    void setTestingPayloadLocationsPy(const boost::python::list& list) { m_testingPayloadLocations.shallowCopy(list); }
+    void setTestingPayloadLocationsPy(const boost::python::list& list) { ensureEditable(); m_testingPayloadLocations.shallowCopy(list); }
     /** Get the list of testing payload locations */
     std::vector<std::string> getTestingPayloadLocations() { return m_testingPayloadLocations.ensureCpp(); }
     /** Get the list of text files containing test payloads in python */
@@ -220,13 +221,13 @@ namespace Belle2::Conditions {
     ///@{
 
     /** Append a metadata provider to the list */
-    void appendMetadataProvider(const std::string& provider) { m_metadataProviders.append(provider); }
+    void appendMetadataProvider(const std::string& provider) { ensureEditable(); m_metadataProviders.append(provider); }
     /** Prepend a metadata provider to the list */
-    void prependMetadataProvider(const std::string& provider) { m_metadataProviders.prepend(provider); }
+    void prependMetadataProvider(const std::string& provider) { ensureEditable(); m_metadataProviders.prepend(provider); }
     /** Set the list of metadata providers */
-    void setMetadataProviders(const std::vector<std::string>& list) { m_metadataProviders.ensureCpp() = list; }
+    void setMetadataProviders(const std::vector<std::string>& list) { ensureEditable(); m_metadataProviders.ensureCpp() = list; }
     /** Set the list of metadata providers in python */
-    void setMetadataProvidersPy(const boost::python::list& list) { m_metadataProviders.shallowCopy(list); }
+    void setMetadataProvidersPy(const boost::python::list& list) { ensureEditable(); m_metadataProviders.shallowCopy(list); }
     /** Get the list of metadata providers */
     std::vector<std::string> getMetadataProviders() { return m_metadataProviders.ensureCpp(); }
     /** Get the list of metadata providers in python */
@@ -244,13 +245,13 @@ namespace Belle2::Conditions {
     ///@{
 
     /** Append a payload to the list of locations */
-    void appendPayloadLocation(const std::string& location) { m_payloadLocations.append(location); }
+    void appendPayloadLocation(const std::string& location) { ensureEditable(); m_payloadLocations.append(location); }
     /** Prepend a payload to the list of locations */
-    void prependPayloadLocation(const std::string& location) { m_payloadLocations.prepend(location); }
+    void prependPayloadLocation(const std::string& location) { ensureEditable(); m_payloadLocations.prepend(location); }
     /** Set the list of payload locations */
-    void setPayloadLocations(const std::vector<std::string>& list) { m_payloadLocations.ensureCpp() = list; }
+    void setPayloadLocations(const std::vector<std::string>& list) { ensureEditable(); m_payloadLocations.ensureCpp() = list; }
     /** Set the list of payload locations in python */
-    void setPayloadLocationsPy(const boost::python::list& list) { m_payloadLocations.shallowCopy(list); }
+    void setPayloadLocationsPy(const boost::python::list& list) { ensureEditable(); m_payloadLocations.shallowCopy(list); }
     /** Get the list of payload locations */
     std::vector<std::string> getPayloadLocations() { return m_payloadLocations.ensureCpp(); }
     /** Get the list og payload locations in python */
@@ -269,35 +270,37 @@ namespace Belle2::Conditions {
     ///@{
 
     /** Set the file where to save newly created payload information */
-    void setNewPayloadLocation(const std::string& filename) { m_newPayloadFile = filename; }
+    void setNewPayloadLocation(const std::string& filename) { ensureEditable(); m_newPayloadFile = filename; }
     /** Get the filename where to save newly created payload information */
     std::string getNewPayloadLocation() const { return m_newPayloadFile; }
 
     /** Set the directory where to place downloaded payloads. Empty string is
      * shorthand to put them in a folder `basf2-conditions` in the temp dir */
-    void setDownloadCacheDirectory(const std::string& directory) { m_downloadCacheDirectory = directory; }
+    void setDownloadCacheDirectory(const std::string& directory) { ensureEditable(); m_downloadCacheDirectory = directory; }
     /** Get the directory where to place downloaded payloads. Empty string is
      * shorthand to put them in a folder `basf2-conditions` in the temp dir */
     std::string getDownloadCacheDirectory() const { return m_downloadCacheDirectory; }
 
     /** Set the timout we try to lock a file in the download cache directory for downloading */
-    void setDownloadLockTimeout(size_t timeout) { m_downloadLockTimeout = timeout; }
+    void setDownloadLockTimeout(size_t timeout) { ensureEditable(); m_downloadLockTimeout = timeout; }
     /** Get the timout we try to lock a file in the download cache directory for downloading */
     size_t getDownloadLockTimeout() const { return m_downloadLockTimeout; }
 
     /** Set the set of usable globaltag states to be allowed for processing.
      * The state INVALID will always be ignored and not permitted */
-    void setUsableTagStates(const std::set<std::string>& states) { m_usableTagStates = states; }
+    void setUsableTagStates(const std::set<std::string>& states) { ensureEditable(); m_usableTagStates = states; }
     /** Get the set of usable globaltag states allowed to be used for processing */
     const std::set<std::string>& getUsableTagStates() const { return m_usableTagStates; }
 
     /** Set a callback function from python which will be called when processing starts
      * and should return the final list of globaltags to be used. See the python documentation
      * for more details */
-    void setGlobaltagCallbackPy(const boost::python::object& obj) { m_callback = obj; }
+    void setGlobaltagCallbackPy(const boost::python::object& obj) { ensureEditable(); m_callback = obj; }
 
     ///@}
 
+    /** Set by the Database singleton upon initialization and cleanup */
+    void setInitialized(bool value) { m_databaseInitialized = value; }
     /** expose this class to python */
     static void exposePythonAPI();
   private:
@@ -306,6 +309,12 @@ namespace Belle2::Conditions {
     {
       const auto values = EnvironmentVariables::getOrCreateList(envName, defaultValue);
       for (const std::string& v : values) target.append(v);
+    }
+    /** Check whether the configuration object can be edited or if the database has been initialized already */
+    void ensureEditable() const
+    {
+      if (m_databaseInitialized)
+        throw std::runtime_error("Database already initialized, please reset before changing the configuration object");
     }
     /** is the globaltag override enabled? */
     bool m_overrideEnabled{false};
@@ -332,5 +341,8 @@ namespace Belle2::Conditions {
     std::set<std::string> m_usableTagStates{"TESTING", "VALIDATED", "PUBLISHED", "RUNNING"};
     /** the callback function to determine the final final list of globaltags */
     std::optional<boost::python::object> m_callback;
+    /** bool indicating whether the database has been initialized, in which case any changes to the configuration object
+     * would not be reflected by the database setup so we refuse them */
+    bool m_databaseInitialized{false};
   };
 } // Belle2::Conditions namespace

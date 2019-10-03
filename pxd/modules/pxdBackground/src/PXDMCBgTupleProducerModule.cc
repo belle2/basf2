@@ -14,24 +14,16 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/dataobjects/FileMetaData.h>
 #include <background/dataobjects/BackgroundMetaData.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
 #include <pxd/reconstruction/PXDPixelMasker.h>
 
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
-#include <pxd/dataobjects/PXDSimHit.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <cmath>
-#include <algorithm>
-#include <numeric>
 #include <boost/format.hpp>
 
-#include "TDirectory.h"
-#include "TFile.h"
-#include "TChain.h"
+#include <TFile.h>
+#include <TTree.h>
 
 using namespace std;
 using boost::format;

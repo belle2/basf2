@@ -10,10 +10,11 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
-#include <klm/eklm/geometry/GeometryData.h>
+
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -81,9 +82,6 @@ namespace Belle2 {
     void terminate() override;
 
   private:
-
-    /** Geometry data. */
-    const EKLM::GeometryData* m_GeoDat;
 
     /** Clustering angle. */
     double m_ClusteringAngle;

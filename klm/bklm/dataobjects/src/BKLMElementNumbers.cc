@@ -8,9 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMStatus.h>
+
+/* Belle 2 headers. */
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 
 using namespace Belle2;

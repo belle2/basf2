@@ -10,23 +10,27 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
-
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/dataobjects/BKLMDigitOutOfRange.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
 
-#include "TFile.h"
-#include "TTree.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TList.h"
+/* Belle 2 headers. */
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 
+/* ROOT headers. */
+#include <TFile.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TList.h>
+#include <TTree.h>
+
+/* C++ headers. */
+#include <ctime>
 #include <sstream>
 #include <string>
-#include <time.h>
 
 namespace Belle2 {
 

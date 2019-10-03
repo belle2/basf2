@@ -12,7 +12,7 @@
 #include <analysis/VertexFitting/TreeFitter/EigenStackConfig.h>
 #include <Eigen/Core>
 #include <vector>
-#include <framework/logging/Logger.h>
+
 namespace TreeFitter {
 
   class ParticleBase;

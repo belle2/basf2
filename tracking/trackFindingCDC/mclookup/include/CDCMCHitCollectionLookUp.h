@@ -18,7 +18,6 @@
 
 namespace Belle2 {
   class MCParticle;
-  class CDCSimHit;
   class CDCHit;
 
   namespace TrackFindingCDC {

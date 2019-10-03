@@ -14,13 +14,11 @@
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <vector>
 #include <string>
 #include <set>
-#include <map>
 
 class TLorentzVector;
 

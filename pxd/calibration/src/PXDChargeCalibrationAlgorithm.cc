@@ -13,15 +13,12 @@
 
 #include <string>
 #include <algorithm>
-#include <map>
 #include <set>
 
 #include <sstream>
 #include <iostream>
 
 #include <boost/format.hpp>
-#include <cmath>
-
 
 //ROOT
 #include <TRandom.h>

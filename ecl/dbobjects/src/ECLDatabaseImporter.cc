@@ -30,7 +30,6 @@
 #include <ecl/dataobjects/ECLShower.h>
 
 // FRAMEWORK
-#include <framework/gearbox/GearDir.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
 #include <framework/database/DBImportArray.h>
@@ -41,9 +40,7 @@
 #include <TKey.h>
 #include <TClonesArray.h>
 #include <TTree.h>
-#include <TDirectory.h>
 #include <TGraph2D.h>
-
 
 // NAMESPACES
 using namespace std;

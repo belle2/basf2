@@ -13,9 +13,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
-
-#include <analysis/dataobjects/ParticleList.h>
 
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>

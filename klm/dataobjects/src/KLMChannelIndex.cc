@@ -8,10 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* Own header. */
+#include <klm/dataobjects/KLMChannelIndex.h>
+
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
-#include <klm/dataobjects/KLMChannelIndex.h>
 
 using namespace Belle2;
 

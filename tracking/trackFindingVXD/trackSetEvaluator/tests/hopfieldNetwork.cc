@@ -11,9 +11,9 @@
 #include <gtest/gtest.h>
 
 #include <tracking/trackFindingVXD/trackSetEvaluator/HopfieldNetwork.h>
-#include <tracking/trackFindingVXD/trackSetEvaluator/Scrooge.h>
-
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapResolverNodeInfo.h>
+
+#include <framework/logging/Logger.h>
 
 #include <stdlib.h>
 

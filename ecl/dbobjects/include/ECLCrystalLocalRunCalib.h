@@ -12,14 +12,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
 #pragma once
-// ROOT
-#include <TObject.h>
-// FRAMEWORK
-#include <framework/logging/Logger.h>
+
 // ECL
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/dbobjects/ECLLocalRunCalibRef.h>
+
 namespace Belle2 {
   /**
    * ECLCrystalLocalRunCalib is designed

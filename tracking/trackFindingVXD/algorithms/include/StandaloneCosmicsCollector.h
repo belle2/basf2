@@ -17,7 +17,6 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 namespace Belle2 {
   /**

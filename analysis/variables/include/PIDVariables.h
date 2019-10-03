@@ -11,7 +11,6 @@
 #pragma once
 
 #include <analysis/dataobjects/Particle.h>
-#include <framework/gearbox/Const.h>
 #include <analysis/VariableManager/Manager.h>
 
 namespace Belle2 {

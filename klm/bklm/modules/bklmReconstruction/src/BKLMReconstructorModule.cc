@@ -8,16 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/modules/bklmReconstruction/BKLMReconstructorModule.h>
 
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMStatus.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/bklm/geometry/Module.h>
+
+/* Belle 2 headers. */
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-#include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/bklm/geometry/Module.h>
-#include <klm/bklm/dataobjects/BKLMStatus.h>
-
-#include "CLHEP/Vector/ThreeVector.h"
+/* CLHEP headers. */
+#include <CLHEP/Vector/ThreeVector.h>
 
 using namespace std;
 using namespace Belle2;

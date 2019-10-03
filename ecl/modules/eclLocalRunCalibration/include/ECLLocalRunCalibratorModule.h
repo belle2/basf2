@@ -17,21 +17,19 @@
 
 // STL
 #include <cstdint>
-#include <vector>
-#include <unordered_map>
 #include <string>
-#include <utility>
+
 // FRAMEWORK
 #include <framework/core/Module.h>
-#include <framework/database/IntervalOfValidity.h>
+
 // ECL
 #include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dbobjects/ECLCrystalLocalRunCalib.h>
 #include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibUnit.h>
+
 // ROOT
-#include <TObject.h>
 #include <TTree.h>
 #include <TH1F.h>
+
 namespace Belle2 {
   /**
    * ECLLocalRunCalibratorModule

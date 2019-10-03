@@ -8,25 +8,32 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/simulation/SensitiveDetector.h>
-#include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/bklm/geometry/Module.h>
+
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dataobjects/BKLMSimHit.h>
 #include <klm/bklm/dataobjects/BKLMSimHitPosition.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/bklm/geometry/Module.h>
 
+/* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include "CLHEP/Vector/ThreeVector.h"
-#include "CLHEP/Units/SystemOfUnits.h"
+/* Geant4 headers. */
+#include <G4Step.hh>
+#include <G4VProcess.hh>
 
-#include "TRandom3.h"
+/* CLHEP headers. */
+#include <CLHEP/Units/SystemOfUnits.h>
+#include <CLHEP/Vector/ThreeVector.h>
 
-#include "G4Step.hh"
-#include "G4VProcess.hh"
+/* ROOT headers. */
+#include <TRandom3.h>
 
 #define DEPTH_SECTION 2
 #define DEPTH_SECTOR 3

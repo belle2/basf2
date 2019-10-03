@@ -37,7 +37,7 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
       Create a new alias.
 
       Variable names are deliberately verbose and explicit (to avoid ambiguity).
-      However, it is often not desirable to deal with long unwieldy variable names particularly in the context of :doc:`Variable Manager Output`.
+      However, it is often not desirable to deal with long unwieldy variable names particularly in the context of :doc:`VariableManagerOutput`.
 
       Example:
 
@@ -192,7 +192,7 @@ All ECLCluster-based variables return NaN if no ECLCluster is found.
         - All ECL cluster variables are clipped at the lower and upper boundaries: Values below (above)
           these boundaries will be set to the lower (upper) bound.
     
-    Lower and uppper limits, and precision of these variables are mentioned inside the note box below them.
+    Lower and upper limits, and precision of these variables are mentioned inside the note box below them.
     One should note this in the context of binning effects.
 
 
@@ -489,3 +489,209 @@ Miscellaneous helpers for using variables
 .. autofunction:: variables.getAllTrgNames
 .. autofunction:: variables.std_vector
 .. autofunction:: variables.printVars
+
+
+Writing your own variable
+=========================
+
+The code of VariableManager lives inside the analysis package. If you want to write your own variables you have a couple of options. You can (and should) try to make your variables general, so that they are useful for many collaborators. In this case, we recommend you make a pull request. Then your variables will be made available in a central release to many people.
+
+In case you have something really analysis-specific that no one else will need. You can still use the VariableManager.
+
+Below are step-by-step instructions for implementation of helicity angle for arbitrary granddaughter particle.
+
+Step 1. Check whether your function would fit in any of the existing source files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If yes, go to the next step. 
+
+If not, create new header/source files. In case of our example, we will create ``AngularVariables.h`` and ``AngularVariables.cc``
+
+``AngularVariables.h`` in ``analysis/VariableManager/include/``:
+
+.. code:: C++
+
+  #pragma once
+  // include VariableManager
+  #include <analysis/VariableManager/Manager.h>
+ 
+  // include the Belle II Particle class
+  #include <analysis/dataobjects/Particle.h>
+ 
+  // put variable in the Belle2::Variable namespace
+  namespace Belle2 {
+    namespace Variable {
+ 
+      // Your code goes here
+ 
+    } // Variable namespace
+  } // Belle2 namespace
+
+
+``AngularVariables.cc`` in ``analysis/VariableManager/src/``:
+
+.. code:: C++
+
+  // Own include
+  #include <analysis/VariableManager/AngularVariables.h>
+   
+  // put variable in the Belle2::Variable namespace
+  namespace Belle2 {
+    namespace Variable {
+   
+      // Your code goes here
+    } // Variable namespace
+  } // Belle2 namespace
+
+Step 2. Add function definition in the header file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here we define a method helicityAngle that has 3 arguments:
+
+  * pointer to a Particle
+  * index of the daughter Particle
+  * index of the granddaughter (daughter's daughter) Particle
+
+in the ``AngularVariable.h`` header file. The return value of every variable has to be double.
+
+.. code:: C++
+
+  /**
+    * returns cosine of the helicity angle: angle between granddaughter and this particle in the daughter's rest frame.
+    * The daughter and granddaughter particles are specified with the additional parameter.
+    */
+  double helicityAngle(const Particle* particle, const std::vector<double>& daughter_indices);
+
+Step 3. Implement the function in the source file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  * Info on getters for the Particle class
+  * Info on getters for the TLorentzVector class
+  * Pictorial definition of the helicity angle
+
+.. figure:: figs/hel_simple_model_def.jpg
+  :align: center
+
+.. code:: C++
+
+  double helicityAngle(const Particle* particle, const std::vector<double>& daughter_indices) {
+    // for the calculation of the helicity angle we need particle (=particle in the argument)
+    // its daughter and granddaughter. The particle is given as an argument, but the daughter
+    // and granddaughter are specified as the indices in the vector (second argument)
+    // daughter_indices[0] = index of the daughter
+    // daughter_indices[1] = index of the granddaughter
+   
+    if (!particle)
+      return std::numeric_limits<float>::quiet_NaN();
+    int nDaughters = particle->getNDaughters();
+    if(nDaughters < 2)
+      return std::numeric_limits<float>::quiet_NaN();
+    if (daughter_indices.size() != 2) 
+      return std::numeric_limits<float>::quiet_NaN();
+   
+    // get the daughter particle
+    int daughterIndex = daughter_indices[0];
+    const Particle *daughter = particle->getDaughter(daughterIndex);
+    nDaughters = daughter->getNDaughters();
+    if(nDaughters < 2)
+      return std::numeric_limits<float>::quiet_NaN();
+   
+    // get the granddaughter
+    int grandDaughterIndex = daughter_indices[1];
+    const Particle *grandDaughter = daughter->getDaughter(grandDaughterIndex);
+   
+    // do the calculation
+    TLorentzVector particle4Vector = particle->get4Vector();
+    TLorentzVector daughter4Vector = daughter->get4Vector();
+    TLorentzVector gDaughter4Vector = grandDaughter->get4Vector();
+    TVector3 boost2daughter = -(daughter4Vector.BoostVector());
+    particle4Vector.Boost(boost2daughter);
+    gDaughter4Vector.Boost(boost2daughter);
+    TVector3 particle3Vector = particle4Vector.Vect();
+    TVector3 gDaughter3Vector = gDaughter4Vector.Vect();
+    double numerator = gDaughter3Vector.Dot(particle3Vector);
+    double denominator = (gDaughter3Vector.Mag())*(particle3Vector.Mag());
+    return numerator/denominator;
+  }
+
+Step 4. Register the new variable
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+At the end of the source file, add the following lines:
+
+.. code:: C++
+
+  VARIABLE_GROUP("AngularVariables");
+  REGISTER_VARIABLE("helicityAngle(i,j)", helicityAngle,
+                  "cosine of the angle between particle->getDaughter(i)->getDaughter(j) and this particle in the  particle->getDaughter(i) rest frame.");
+
+Step 5. Compile
+~~~~~~~~~~~~~~~
+
+Execute scons in your local release directory
+
+Step 6. Done!
+~~~~~~~~~~~~~
+
+You can check if your variable is visible to VariableManager
+
+>>> basf2 analysis/scripts/variables.py  
+AngularVariables: helicityAngle(i,j) cosine of the angle between particle->getDaughter(i)->getDaughter(j) and this particle in the particle->getDaughter(i) rest frame. 
+
+You can use your variable in the same way as you use standard variables.
+
+How to use my variable at grid?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  * Prepare the environment with the ``b2analysis-create`` tool.
+
+>>> b2analysis-create myanalysis <current central release, e.g. release-04-00-00> 
+>>> cd myanalysis
+>>> setupana
+
+  * Define the new variables/functions in a .cc and register them with the variable manager. 
+    This means that in the new .cc you should add:
+
+.. code:: C++
+
+  #include <framework/core/Module.h>
+  #include <analysis/VariableManager/Manager.h>
+  #include <analysis/dataobjects/Particle.h>
+  namespace Belle2 {
+    namespace Variable {
+        double myVarFunction(const Particle* particle) { **your code** }
+        VARIABLE_GROUP("CUSTOM_VARIABLES");
+        REGISTER_VARIABLE("myVar", myVarFunction, "My custom variable");
+    }
+    // Create an empty module which does nothing at all. What it does is allowing
+    // basf2 to easily find the library and load it from the steering file
+    class EnableMyVariableModule: public Module {}; // And register this module to create a .map lookup file.
+    REG_MODULE(EnableMyVariable);
+  }
+
+Then:
+
+  * Run scons and you will get a ``.so`` and a ``.b2modmap`` files in ``modules/Linux_x86_64/opt``.
+
+  * Load the libraries and make the variables available you need to add these lines to your steering file:
+
+.. code:: python
+
+  import basf2
+  basf2.fw.add_module_search_path(".")
+  basf2.register_module("EnableMyVariable") # now you can use it
+  from variables import variables
+  print(variables.getVariable("myVar").description)
+
+These lines will add the local directory to the module search path and instantiate the module we created. 
+This is enough to load the library and register the variables. 
+Now you should be able to use your custom variables for your analysis and there is no need to add this 
+module to the path, it just needs to be registered to load the library.
+
+In the end you can run your analysis on the grid adding the ``.so`` and ``.map`` files to the input sandbox 
+with the -f option of ``gbasf2``:
+
+>>> gbasf2 ./steering.py -p project -i dataset -f myanalysis.so myanalysis.b2modmap
+
+.. warning:: This line implies that you already have working ``gbasf2`` installation and ``gbasf2`` syntax didn't 
+  change since the moment of writing. Please refer gbasf2 `documentation <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ for more details.

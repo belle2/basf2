@@ -10,13 +10,16 @@
 
 #pragma once
 
-#include <geometry/CreatorBase.h>
-#include <klm/bklm/geometry/GeometryPar.h>
+/* KLM headers. */
 #include <klm/bklm/dbobjects/BKLMGeometryPar.h>
-#include <framework/logging/Logger.h>
-#include <framework/database/DBObjPtr.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+
+/* Belle 2 headers. */
 #include <framework/database/DBImportObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
+#include <framework/logging/Logger.h>
+#include <geometry/CreatorBase.h>
 
 class G4VSolid;
 class G4Box;

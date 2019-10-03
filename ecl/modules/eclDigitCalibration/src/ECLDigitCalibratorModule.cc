@@ -37,9 +37,6 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
 // FRAMEWORK
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>

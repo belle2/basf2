@@ -11,14 +11,11 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
-#include <tracking/trackFindingCDC/processing/LowHitsAxialTrackUtil.h>
 
 #include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class Vector2D;
 
     /**
      *  Base class that receives candidates found by quadtree.

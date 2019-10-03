@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <analysis/variables/ContinuumSuppressionVariables.h>
-#include <analysis/variables/ParameterVariables.h>
 #include <analysis/variables/ROEVariables.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
@@ -24,14 +23,11 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/Conversion.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
 
 #include <TLorentzVector.h>
-#include <TVectorF.h>
 #include <TVector3.h>
 
 #include <cmath>

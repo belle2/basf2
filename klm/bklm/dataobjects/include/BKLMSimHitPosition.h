@@ -10,7 +10,10 @@
 
 #pragma once
 
+/* Belle 2 headers. */
 #include <framework/datastore/RelationsObject.h>
+
+/* ROOT headers. */
 #include <TVector3.h>
 
 namespace Belle2 {

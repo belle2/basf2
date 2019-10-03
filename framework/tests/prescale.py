@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-set_random_seed(501)
+import basf2
+basf2.set_random_seed(501)
 
 
-class CountEvents(Module):
+class CountEvents(basf2.Module):
     """Count the number of events passing this module"""
 
     def initialize(self):
@@ -21,16 +21,16 @@ class CountEvents(Module):
 input_events = 1000
 expected_success_events = 6
 
-main = create_path()
+main = basf2.Path()
 main.add_module("EventInfoSetter", evtNumList=[input_events], expList=[0], runList=[0])
 prescale_mod = main.add_module('Prescale', prescale=0.01)
 
-success_path = create_path()
+success_path = basf2.Path()
 success_count = success_path.add_module(CountEvents())
 prescale_mod.if_true(success_path)
 
-process(main)
+basf2.process(main)
 
-print(statistics)
+print(basf2.statistics)
 
 assert success_count.num_events == expected_success_events

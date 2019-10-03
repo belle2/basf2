@@ -5,9 +5,13 @@
 // Author : Anselm Vossen, based on Satoru Yamada's BKLMRawPackerModule
 //-
 
+/* Own header. */
 #include <klm/bklm/modules/bklmRawPacker/BKLMRawPackerModule.h>
+
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
 using namespace std;

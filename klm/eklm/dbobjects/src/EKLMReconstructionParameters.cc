@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.            *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/eklm/dbobjects/EKLMReconstructionParameters.h>
 
 using namespace Belle2;

@@ -8,12 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/eklm/calibration/EKLMDatabaseImporter.h>
+
+/* KLM headers. */
 #include <klm/eklm/dbobjects/EKLMReconstructionParameters.h>
 #include <klm/eklm/dbobjects/EKLMSimulationParameters.h>
 #include <klm/eklm/geometry/AlignmentChecker.h>
 #include <klm/eklm/geometry/GeometryData.h>
+
+/* Belle 2 headers. */
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/gearbox/GearDir.h>

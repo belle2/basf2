@@ -8,11 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
+
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMHit1d.h>
 
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
+/* CLHEP headers. */
 #include <CLHEP/Vector/ThreeVector.h>
 
 using namespace Belle2;

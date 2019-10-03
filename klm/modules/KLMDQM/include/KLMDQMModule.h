@@ -10,18 +10,20 @@
 
 #pragma once
 
-/* External headers. */
-#include <TH1F.h>
-
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <framework/core/HistoModule.h>
-#include <framework/datastore/StoreArray.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMSectorArrayIndex.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+
+/* Belle 2 headers. */
+#include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreArray.h>
+
+/* ROOT headers. */
+#include <TH1F.h>
 
 namespace Belle2 {
 

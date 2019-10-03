@@ -8,20 +8,24 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <string>
-
-/* External headers. */
-#include <CLHEP/Geometry/Point3D.h>
-#include <CLHEP/Units/SystemOfUnits.h>
-
-/* Belle2 headers. */
-#include <klm/eklm/geometry/Circle2D.h>
+/* Own header. */
 #include <klm/eklm/geometry/GeometryData.h>
+
+/* KLM headers. */
+#include <klm/eklm/geometry/Circle2D.h>
 #include <klm/eklm/geometry/Line2D.h>
+
+/* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/Database.h>
 #include <framework/logging/Logger.h>
+
+/* CLHEP headers. */
+#include <CLHEP/Geometry/Point3D.h>
+#include <CLHEP/Units/SystemOfUnits.h>
+
+/* C++ headers. */
+#include <string>
 
 using namespace Belle2;
 

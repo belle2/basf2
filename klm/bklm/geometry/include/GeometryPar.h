@@ -10,13 +10,16 @@
 
 #pragma once
 
-#include "klm/bklm/geometry/Module.h"
-#include "klm/bklm/dbobjects/BKLMGeometryPar.h"
+/* KLM headers. */
+#include <klm/bklm/dbobjects/BKLMGeometryPar.h>
+#include <klm/bklm/geometry/Module.h>
 
-#include <vector>
+/* CLHEP headers. */
+#include <CLHEP/Vector/ThreeVector.h>
+
+/* C++ headers. */
 #include <map>
-
-#include "CLHEP/Vector/ThreeVector.h"
+#include <vector>
 
 namespace Belle2 {
 

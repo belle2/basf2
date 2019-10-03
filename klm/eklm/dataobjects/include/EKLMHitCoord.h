@@ -10,11 +10,11 @@
 
 #pragma once
 
-/* External headers. */
-#include <TVector3.h>
-
-/* Belle2 headers. */
+/* Belle 2 headers. */
 #include <klm/eklm/dataobjects/EKLMHitGlobalCoord.h>
+
+/* ROOT headers. */
+#include <TVector3.h>
 
 namespace Belle2 {
 

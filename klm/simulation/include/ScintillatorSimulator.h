@@ -10,7 +10,7 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMSimHit.h>
 #include <klm/eklm/dataobjects/EKLMHitMCTime.h>
 #include <klm/eklm/dataobjects/EKLMSimHit.h>

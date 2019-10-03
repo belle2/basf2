@@ -10,18 +10,20 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* KLM headers. */
+#include <klm/dataobjects/KLMDigitEventInfo.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+#include <klm/eklm/geometry/GeometryData.h>
+
+/* Belle 2 headers. */
+#include <calibration/CalibrationCollectorModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/dataobjects/KLMDigitEventInfo.h>
-#include <klm/eklm/geometry/GeometryData.h>
-#include <calibration/CalibrationCollectorModule.h>
 
 namespace Belle2 {
 

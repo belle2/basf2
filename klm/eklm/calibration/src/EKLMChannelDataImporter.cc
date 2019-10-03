@@ -8,20 +8,24 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TFile.h>
-#include <TTree.h>
-
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/eklm/calibration/EKLMChannelDataImporter.h>
+
+/* KLM headers. */
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/eklm/dbobjects/EKLMChannels.h>
 #include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
 #include <klm/eklm/geometry/GeometryData.h>
+
+/* Belle 2 headers. */
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TTree.h>
 
 using namespace Belle2;
 

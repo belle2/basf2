@@ -8,17 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* Own header. */
+#include <klm/bklm/geometry/GeometryPar.h>
+
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMElementID.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/bklm/dataobjects/BKLMStatus.h>
+#include <klm/bklm/dbobjects/BKLMDisplacement.h>
+
+/* Belle 2 headers. */
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBArray.h>
-#include <klm/bklm/dataobjects/BKLMElementID.h>
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dataobjects/BKLMStatus.h>
-#include <klm/bklm/dbobjects/BKLMDisplacement.h>
-#include <klm/bklm/geometry/GeometryPar.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 
 using namespace std;

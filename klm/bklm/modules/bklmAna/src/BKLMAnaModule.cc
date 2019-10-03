@@ -8,15 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/modules/bklmAna/BKLMAnaModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
+/* Belle 2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
-
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/Muid.h>
 
+/* CLHEP headers. */
 #include <CLHEP/Units/SystemOfUnits.h>
 
 using namespace std;

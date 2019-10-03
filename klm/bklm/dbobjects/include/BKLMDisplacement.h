@@ -17,7 +17,7 @@
 
 #pragma once
 
-//#include <klm/bklm/dataobjects/BKLMElementID.h>
+/* ROOT headers. */
 #include <TObject.h>
 
 namespace Belle2 {

@@ -3,13 +3,13 @@
 
 #############################################################
 # This steering file generates, simulates, and reconstructs
-# a sample of 10 BBbar events.
+# a sample of 10 ee -> mu+mu- events.
 #
 # Usage: basf2 B2A111-SimulateMuonPairs.py
 #
 # Input: None
-# Output: output.root
-#
+# Output: B2A111-SimulateMuonPairs.root
+# Contributors: U.Tamponi (October 2019)
 #
 # Example steering file - 2019 Belle II Collaboration
 #############################################################
@@ -51,7 +51,7 @@ re.add_reconstruction(path=main)
 re.add_mdst_output(
     path=main,
     mc=True,
-    filename='B2A424-SimulateMuonPairs.root',
+    filename='B2A111-SimulateMuonPairs.root',
     additionalBranches=[
         'MCInitialParticles'])
 

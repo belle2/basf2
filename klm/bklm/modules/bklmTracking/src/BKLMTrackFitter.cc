@@ -8,12 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <cfloat>
+/* Own header. */
+#include <klm/bklm/modules/bklmTracking/BKLMTrackFitter.h>
 
-#include "klm/bklm/modules/bklmTracking/BKLMTrackFitter.h"
+/* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
+
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
+
+/* C++ headers. */
+#include <cfloat>
 
 using namespace std;
 using namespace CLHEP;

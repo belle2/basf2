@@ -10,11 +10,12 @@
 
 #pragma once
 
-#include <simulation/kernel/SensitiveDetectorBase.h>
-
-#include <framework/database/DBObjPtr.h>
-
+/* KLM headers. */
 #include <klm/bklm/dbobjects/BKLMSimulationPar.h>
+
+/* Belle 2 headers. */
+#include <framework/database/DBObjPtr.h>
+#include <simulation/kernel/SensitiveDetectorBase.h>
 
 namespace Belle2 {
 

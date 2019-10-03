@@ -8,13 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/dataobjects/BKLMHit1d.h>
+
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMDigit.h>
 
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
-#include <climits>
+/* C++ headers. */
 #include <algorithm>
+#include <climits>
 
 using namespace Belle2;
 

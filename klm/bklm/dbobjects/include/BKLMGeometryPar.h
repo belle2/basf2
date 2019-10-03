@@ -10,7 +10,10 @@
 
 #pragma once
 
+/* ROOT headers. */
 #include <TObject.h>
+
+/* C++ headers. */
 #include <string>
 #include <vector>
 

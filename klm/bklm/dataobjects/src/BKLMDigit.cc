@@ -8,7 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/dataobjects/BKLMDigit.h>
+
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMSimHit.h>
 
 using namespace Belle2;

@@ -10,12 +10,12 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMStatus.h>
+
 /* C++ headers. */
 #include <cstdint>
 #include <string>
-
-/* Belle2 headers. */
-#include <klm/bklm/dataobjects/BKLMStatus.h>
 
 namespace Belle2 {
 

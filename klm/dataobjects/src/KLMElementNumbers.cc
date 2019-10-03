@@ -8,10 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <framework/logging/Logger.h>
+/* Own header. */
 #include <klm/dataobjects/KLMElementNumbers.h>
+
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+
+/* Belle 2 headers. */
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

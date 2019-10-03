@@ -10,10 +10,12 @@
 
 #pragma once
 
-//#include <framework/datastore/RelationsObject.h>
-#include <framework/dataobjects/DigitBase.h>
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
+
+/* Belle 2 headers. */
+#include <framework/dataobjects/DigitBase.h>
 
 namespace Belle2 {
   class BKLMSimHit;

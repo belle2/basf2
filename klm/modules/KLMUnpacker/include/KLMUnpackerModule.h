@@ -10,9 +10,6 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <string>
-
 /* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/dataobjects/BKLMDigitOutOfRange.h>
@@ -31,6 +28,9 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawKLM.h>
+
+/* C++ headers. */
+#include <string>
 
 namespace Belle2 {
 

@@ -13,11 +13,11 @@
 
 #include <framework/gearbox/Const.h>
 #include <framework/database/DBObjPtr.h>
-#include <klm/dbobjects/KLMStripEfficiency.h>
-#include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
+#include <klm/dbobjects/KLMStripEfficiency.h>
+#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dbobjects/MuidParameters.h>
 

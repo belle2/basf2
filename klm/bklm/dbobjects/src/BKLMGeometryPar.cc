@@ -11,9 +11,6 @@
 /* Own header. */
 #include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 
-/* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-
 /* Belle 2 headers. */
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>

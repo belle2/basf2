@@ -438,8 +438,8 @@ namespace Belle2 {
     double m_BarrelScintVariance;
 
     //! hit-plane radius (cm) at closest distance to IP of each barrel end | sector | layer
-    double m_BarrelModuleMiddleRadius[2][BKLMElementNumbers::getMaximalSectorNumber() + 1][BKLMElementNumbers::getMaximalLayerNumber() +
-        1];
+    double m_BarrelModuleMiddleRadius[2][BKLMElementNumbers::getMaximalSectorNumber() + 1]
+    [BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! normal unit vector of each barrel sector
     G4ThreeVector m_BarrelSectorPerp[BKLMElementNumbers::getMaximalSectorNumber() + 1];

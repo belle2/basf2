@@ -429,22 +429,23 @@ namespace Belle2 {
     int m_OutermostActiveBarrelLayer;
 
     //! BKLM RPC phi-measuring strip position variance (cm^2) by layer
-    double m_BarrelPhiStripVariance[NLAYER + 1];
+    double m_BarrelPhiStripVariance[BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! BKLM RPC z-measuring strip position variance (cm^2) by layer
-    double m_BarrelZStripVariance[NLAYER + 1];
+    double m_BarrelZStripVariance[BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! BKLM scintillator strip position variance (cm^2)
     double m_BarrelScintVariance;
 
     //! hit-plane radius (cm) at closest distance to IP of each barrel end | sector | layer
-    double m_BarrelModuleMiddleRadius[2][NSECTOR + 1][NLAYER + 1];
+    double m_BarrelModuleMiddleRadius[2][BKLMElementNumbers::getMaximalSectorNumber() + 1][BKLMElementNumbers::getMaximalLayerNumber() +
+        1];
 
     //! normal unit vector of each barrel sector
-    G4ThreeVector m_BarrelSectorPerp[NSECTOR + 1];
+    G4ThreeVector m_BarrelSectorPerp[BKLMElementNumbers::getMaximalSectorNumber() + 1];
 
     //! azimuthal unit vector of each barrel sector
-    G4ThreeVector m_BarrelSectorPhi[NSECTOR + 1];
+    G4ThreeVector m_BarrelSectorPhi[BKLMElementNumbers::getMaximalSectorNumber() + 1];
 
     //! maximum radius (cm) of the endcaps
     double m_EndcapMaxR;
@@ -468,7 +469,7 @@ namespace Belle2 {
     double m_EndcapScintVariance;
 
     //! hit-plane z (cm) of each IP layer relative to KLM midpoint
-    double m_EndcapModuleMiddleZ[NLAYER + 1];
+    double m_EndcapModuleMiddleZ[BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! experiment number for the current set of particle-hypothesis PDFs
     int m_ExpNo;

@@ -140,14 +140,14 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_ElectronPar(NULL), // modified later
   m_PositronPar(NULL) // modified later
 {
-  for (int j = 0; j < NLAYER + 1; ++j) {
+  for (int j = 0; j < BKLMElementNumbers::getMaximalLayerNumber() + 1; ++j) {
     m_BarrelPhiStripVariance[j] = 0.0;
     m_BarrelZStripVariance[j] = 0.0;
     m_BarrelPhiStripVariance[j] = 0.0;
     m_EndcapModuleMiddleZ[j] = 0.0;
   }
-  for (int s = 0; s < NSECTOR + 1; ++s) {
-    for (int j = 0; j < NLAYER + 1; ++j) {
+  for (int s = 0; s < BKLMElementNumbers::getMaximalSectorNumber() + 1; ++s) {
+    for (int j = 0; j < BKLMElementNumbers::getMaximalLayerNumber() + 1; ++j) {
       m_BarrelModuleMiddleRadius[0][s][j] = 0.0;
       m_BarrelModuleMiddleRadius[1][s][j] = 0.0;
     }

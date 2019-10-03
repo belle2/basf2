@@ -73,7 +73,8 @@ namespace Belle2 {
       enum E_VXDHierarchyType {
         c_None = 0,
         c_Flat = 1,
-        c_Full = 2
+        c_HalfShells = 2,
+        c_Full = 3
       };
       /// What type of hierarchy to use for VXD?
       static E_VXDHierarchyType s_hierarchyType;

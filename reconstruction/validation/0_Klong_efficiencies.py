@@ -38,6 +38,7 @@ if 'BELLE2_BACKGROUND_DIR' in os.environ:
     sim.add_simulation(path=main,
                        bkgfiles=bg)
 else:
+    b2.B2WARNING('Beam background files not found!')
     sim.add_simulation(path=main)
 
 rec.add_reconstruction(path=main)

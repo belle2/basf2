@@ -181,6 +181,10 @@ namespace Belle2 {
     if (m_usePhotonOnlyOnce) {
       for (unsigned n = 0; n < nGamma; n++) {
         Particle* gamma = m_gammaList->getParticle(n);
+        //Skip this if it the best match has already been asigned (pathological case: happens only if you use the same gamma list
+        //to correct more than once. Performance studies, in which the same list is used with different options, are an example
+        if (gamma->hasExtraInfo("bestMatchIndex")) continue;
+
         auto cluster = gamma->getECLCluster();
         //Get the tracks related to each photon...
         RelationVector<Track> relatedTracks = cluster->getRelationsTo<Track>("", relationName);

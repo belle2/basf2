@@ -61,7 +61,7 @@ def DstToD0PiD0ToHpJm(path):
     return DstList
 
 
-def EarlyData_DstToD0PiD0ToHpJmPi0(path):
+def DstToD0PiD0ToHpJmPi0(path):
     Dstcuts = 'massDifference(0) < 0.160 and useCMSFrame(p) > 2.0'
     charmcuts = '1.70 < M < 2.10'
     cutAndCopyList('pi0:myskim', 'pi0:skim', '', path=path)  # additional cuts removed 27 Jun 2019 by Emma Oxford
@@ -78,7 +78,7 @@ def EarlyData_DstToD0PiD0ToHpJmPi0(path):
     return DstList
 
 
-def DstToD0PiD0ToHpJmPi0(path):
+def EarlyData_DstToD0PiD0ToHpJmPi0(path):
     mySel = 'abs(d0) < 0.5 and abs(z0) < 1.0'  # IP cut, tighter than previous skims
     mySel += ' and 0.296706 < theta < 2.61799'  # CDC acceptance cut
     fillParticleList('pi+:myhjp0', mySel, path=path)
@@ -104,7 +104,7 @@ def DstToD0PiD0ToHpJmPi0(path):
     return DstList
 
 
-def EarlyData_DstToD0PiD0ToHpHmPi0(path):
+def DstToD0PiD0ToHpHmPi0(path):
     Dstcuts = 'massDifference(0) < 0.160 and useCMSFrame(p) > 2.0'
     charmcuts = '1.70 < M < 2.10'
     cutAndCopyList('pi0:myskim', 'pi0:skim', '', path=path)  # additional cuts removed 27 Jun 2019 by Emma Oxford
@@ -125,7 +125,7 @@ def EarlyData_DstToD0PiD0ToHpHmPi0(path):
     return DstList
 
 
-def DstToD0PiD0ToHpHmPi0(path):
+def EarlyData_DstToD0PiD0ToHpHmPi0(path):
     mySel = 'abs(d0) < 0.5 and abs(z0) < 1.0'  # IP cut, tighter than previous skims
     mySel += ' and 0.296706 < theta < 2.61799'  # CDC acceptance cut
     fillParticleList('pi+:myhhp0', mySel, path=path)

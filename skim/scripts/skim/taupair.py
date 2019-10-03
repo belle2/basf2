@@ -254,7 +254,7 @@ def SetTauThrustSkimVariables(path):
     __author__ = "Ami Rostomyan, Kenji Inami"
 
     # Track and gamma cuts
-    trackCuts = '-5.0 < dz < 5.0 and dr < 1.0 and nSVDHits >= 6'
+    trackCuts = '-3.0 < dz < 7.0 and dr < 1.0'
     cutAndCopyList('pi+:thrust', 'pi+:all', trackCuts, path=path)
     gammaCuts = 'E > 0.20 and clusterNHits > 1.5 and -0.8660 < cosTheta < 0.9563'
     cutAndCopyList('gamma:thrust', 'gamma:all', gammaCuts, path=path)

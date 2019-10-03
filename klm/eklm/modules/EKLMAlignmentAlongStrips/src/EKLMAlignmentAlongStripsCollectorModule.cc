@@ -15,7 +15,7 @@
 #include <framework/gearbox/Unit.h>
 #include <tracking/dataobjects/ExtHit.h>
 
-/* External headers. */
+/* ROOT headers. */
 #include <TTree.h>
 
 using namespace Belle2;

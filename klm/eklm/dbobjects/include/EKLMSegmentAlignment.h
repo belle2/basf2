@@ -10,15 +10,15 @@
 
 #pragma once
 
+/* Belle2 headers. */
+#include <klm/dbobjects/KLMAlignmentData.h>
+
+/* ROOT headers. */
+#include <TObject.h>
+
 /* C++ headers. */
 #include <cstdint>
 #include <map>
-
-/* External headers. */
-#include <TObject.h>
-
-/* Belle2 headers. */
-#include <klm/dbobjects/KLMAlignmentData.h>
 
 namespace Belle2 {
 

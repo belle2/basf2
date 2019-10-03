@@ -289,9 +289,9 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
         daughterStatus |= getMCErrors(daughter) & (~c_InternalError);
         daughterStatus |= c_AddedRecoBremsPhoton;
       }
-      //If it has, check if the MC particle is (n*grand)-daughter of the reconstructed B. If it isn't, we'll add the error flag
+      //If it has, check if the MC particle is (n*grand)-daughter of the particle mother. If it isn't, we'll add the error flag
       else if (std::find(genParts.begin(), genParts.end(),
-                         mcDaughter) == genParts.end()) daughterStatus = getMCErrors(daughter) | c_AddedRecoBremsPhoton;
+                         mcDaughter) == genParts.end()) daughterStatus |= getMCErrors(daughter) | c_AddedRecoBremsPhoton;
     } else daughterStatus |= getMCErrors(daughter);
   }
   status |= (daughterStatus & daughterStatusAcceptMask);

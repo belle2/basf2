@@ -31,7 +31,7 @@ uint16_t BKLMElementNumbers::channelNumber(
   int section, int sector, int layer, int plane, int strip)
 {
   checkChannelNumber(section, sector, layer, plane, strip);
-  return (section ? BKLM_END_MASK : 0)
+  return (section << BKLM_END_BIT)
          | ((sector - 1) << BKLM_SECTOR_BIT)
          | ((layer - 1) << BKLM_LAYER_BIT)
          | ((plane) << BKLM_PLANE_BIT)
@@ -54,7 +54,7 @@ uint16_t BKLMElementNumbers::moduleNumber(int section, int sector, int layer, bo
   checkSection(section);
   checkSector(sector, fatalError);
   checkLayer(layer, fatalError);
-  return (section ? BKLM_END_MASK : 0)
+  return (section << BKLM_END_BIT)
          | ((sector - 1) << BKLM_SECTOR_BIT)
          | ((layer - 1) << BKLM_LAYER_BIT);
 }

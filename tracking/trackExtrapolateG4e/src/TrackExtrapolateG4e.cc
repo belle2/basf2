@@ -1020,10 +1020,8 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
         // int plane = touch->GetCopyNumber(0);
         int layer = touch->GetCopyNumber(4);
         int sector = touch->GetCopyNumber(6);
-        bool isForward = (touch->GetCopyNumber(7) == BKLMElementNumbers::c_ForwardSection);
-        copyID = (isForward ? BKLM_END_MASK : 0)
-                 | ((sector - 1) << BKLM_SECTOR_BIT)
-                 | ((layer - 1) << BKLM_LAYER_BIT)
+        int section = touch->GetCopyNumber(7);
+        copyID = BKLMElementNumbers::moduleNumber(section, sector, layer)
                  | BKLM_INRPC_MASK
                  | BKLM_MC_MASK;
       }
@@ -1031,18 +1029,15 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
     case VOLTYPE_BKLM2: // BKLM scints
       detID = Const::EDetector::BKLM;
       if (touch->GetHistoryDepth() == DEPTH_SCINT) {
-        int scint = touch->GetCopyNumber(1);
+        int strip = touch->GetCopyNumber(1);
         int plane = touch->GetCopyNumber(2);
         int layer = touch->GetCopyNumber(6);
         int sector = touch->GetCopyNumber(8);
-        bool isForward = (touch->GetCopyNumber(9) == BKLMElementNumbers::c_ForwardSection);
-        copyID = (isForward ? BKLM_END_MASK : 0)
-                 | ((sector - 1) << BKLM_SECTOR_BIT)
-                 | ((layer - 1) << BKLM_LAYER_BIT)
-                 | ((scint - 1) << BKLM_STRIP_BIT)
-                 | ((scint - 1) << BKLM_MAXSTRIP_BIT)
-                 | (plane == BKLM_INNER ? BKLM_PLANE_MASK : 0)
+        int section = touch->GetCopyNumber(9);
+        copyID = BKLMElementNumbers::channelNumber(
+                   section, sector, layer, plane, strip)
                  | BKLM_MC_MASK;
+        BKLMStatus::setMaximalStrip(copyID, strip);
       }
       return;
     case VOLTYPE_EKLM:
@@ -1382,9 +1377,11 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
               if (zStrip >= 0 && phiStrip >= 0) {
                 uint16_t channel1, channel2;
                 channel1 = m_klmElementNumbers->channelNumberBKLM(
-                             section, sector, layer, 0, zStrip);
+                             section, sector, layer,
+                             BKLMElementNumbers::c_ZPlane, zStrip);
                 channel2 = m_klmElementNumbers->channelNumberBKLM(
-                             section, sector, layer, 1, phiStrip);
+                             section, sector, layer,
+                             BKLMElementNumbers::c_PhiPlane, phiStrip);
                 enum KLMChannelStatus::ChannelStatus status1, status2;
                 status1 = m_klmChannelStatus->getChannelStatus(channel1);
                 status2 = m_klmChannelStatus->getChannelStatus(channel2);
@@ -1403,10 +1400,14 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           }
           if (!isDead) {
             extState.extLayerPattern |= (0x00000001 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
-            float phiBarrelEfficiency = m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0), intersection.sector + 1,
-                                        intersection.layer + 1, 1, 1);
-            float zBarrelEfficiency = m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0), intersection.sector + 1,
-                                      intersection.layer + 1, 0, 1);
+            float phiBarrelEfficiency =
+              m_klmStripEfficiency->getBarrelEfficiency(
+                (intersection.isForward ? 1 : 0), intersection.sector + 1,
+                intersection.layer + 1, BKLMElementNumbers::c_PhiPlane, 1);
+            float zBarrelEfficiency =
+              m_klmStripEfficiency->getBarrelEfficiency(
+                (intersection.isForward ? 1 : 0), intersection.sector + 1,
+                intersection.layer + 1, BKLMElementNumbers::c_ZPlane, 1);
             muid->setExtBKLMEfficiencyValue(intersection.layer, phiBarrelEfficiency * zBarrelEfficiency);
           } else {
             muid->setExtBKLMEfficiencyValue(intersection.layer, 0);

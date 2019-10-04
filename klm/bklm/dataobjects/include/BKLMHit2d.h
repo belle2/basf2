@@ -11,6 +11,7 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
 
 /* Belle 2 headers. */
@@ -54,47 +55,66 @@ namespace Belle2 {
     bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
 
     //! Get section number
-    //! @return section number (1=forward or 0=backward) of this 2d hit.
-    int getSection() const { return ((m_ModuleID & BKLM_END_MASK) >> BKLM_END_BIT); }
+    //! @return section number (1=forward or 0=backward) of this 2D hit.
+    int getSection() const
+    {
+      return BKLMElementNumbers::getSectionByModule(m_ModuleID);
+    }
 
     //! Get sector number
     //! @return sector number (1..8) of this 2D hit
-    int getSector() const { return (((m_ModuleID & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1); }
+    int getSector() const
+    {
+      return BKLMElementNumbers::getSectorByModule(m_ModuleID);
+    }
 
     //! Get layer number
     //! @return layer number (1..15) of this 2D hit
-    int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
+    int getLayer() const
+    {
+      return BKLMElementNumbers::getLayerByModule(m_ModuleID);
+    }
 
     //! Get lowest phi-measuring strip number
     //! @return lowest phi-measuring strip number of this 2D hit
-    int getPhiStripMin() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
+    int getPhiStripMin() const
+    {
+      return BKLMElementNumbers::getStripByModule(m_ModuleID);
+    }
 
     //! Get highest phi-measuring strip number
     //! @return highest phi-measuring strip number of this 2D hit
-    int getPhiStripMax() const { return (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1); }
+    int getPhiStripMax() const
+    {
+      return BKLMStatus::getMaximalStrip(m_ModuleID);
+    }
 
     //! Get average phi-measuring strip number
     //! @return average phi-measuring strip number of this 2D hit
     double getPhiStripAve() const
     {
-      return 0.5 * ((((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1) +
-                    (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1));
+      return 0.5 * (getPhiStripMin() + getPhiStripMax());
     }
 
     //! Get lowest z-measuring strip number
     //! @return lowest z-measuring strip number of this 2D hit
-    int getZStripMin() const { return (((m_ZStrips & BKLM_ZSTRIP_MASK) >> BKLM_ZSTRIP_BIT) + 1); }
+    int getZStripMin() const
+    {
+      return (((m_ZStrips & BKLM_ZSTRIP_MASK) >> BKLM_ZSTRIP_BIT) + 1);
+    }
 
     //! Get highest z-measuring strip number
     //! @return highest z-measuring strip number of this 2D hit
-    int getZStripMax() const { return (((m_ZStrips & BKLM_ZMAXSTRIP_MASK) >> BKLM_ZMAXSTRIP_BIT) + 1); }
+    int getZStripMax() const
+    {
+      return (((m_ZStrips & BKLM_ZMAXSTRIP_MASK) >> BKLM_ZMAXSTRIP_BIT) + 1);
+    }
 
     //! Get average z-measuring strip number
     //! @return average z-measuring strip number of this 2D hit
     double getZStripAve() const
     {
-      return 0.5 * ((((m_ZStrips & BKLM_ZSTRIP_MASK) >> BKLM_ZSTRIP_BIT) + 1) +
-                    (((m_ZStrips & BKLM_ZMAXSTRIP_MASK) >> BKLM_ZMAXSTRIP_BIT) + 1));
+      return 0.5 * (getZStripMin() + getZStripMax());
     }
 
     //! Get detector-module identifier
@@ -144,7 +164,10 @@ namespace Belle2 {
 
     //! Determine whether the two BKLMHit2ds are in the same module
     //! @return whether the two BKLMHit2ds are in the same module (true) or not (false)
-    bool match(const BKLMHit2d* h) const { return (((h->getModuleID() ^ m_ModuleID) & BKLM_MODULEID_MASK) == 0); }
+    bool match(const BKLMHit2d* h) const
+    {
+      return BKLMElementNumbers::hitsFromSameModule(m_ModuleID, h->getModuleID());
+    }
 
     //! Set or clear the OutOfTime flag
     //! @param flag whether this hit is outside the trigger-coincidence window (true) or not (false)
@@ -163,6 +186,18 @@ namespace Belle2 {
     void isInefficient(bool flag) { if (flag) { m_ModuleID |= BKLM_INEFFICIENT_MASK; } else { m_ModuleID &= ~BKLM_INEFFICIENT_MASK; } }
 
   private:
+
+    //! BKLMHit2d Zstrips bit position for strip-1 [0..47]
+    static constexpr int BKLM_ZSTRIP_BIT = 0;
+
+    //! BKLMHit2d Zstrips bit position for maxStrip-1 [0..47]
+    static constexpr int BKLM_ZMAXSTRIP_BIT = 6;
+
+    //! BKLMHit2d Zstrips bit mask for strip-1 [0..47]
+    static constexpr int BKLM_ZSTRIP_MASK = (63 << BKLM_ZSTRIP_BIT);
+
+    //! BKLMHit2d Zstrips bit mask for maxStrip-1 [0..47]
+    static constexpr int BKLM_ZMAXSTRIP_MASK = (63 << BKLM_ZMAXSTRIP_BIT);
 
     //! detector-module identifier
     //! @sa BKLMStatus.h

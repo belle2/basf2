@@ -728,12 +728,13 @@ namespace Belle2 {
 
     const Module* GeometryPar::findModule(int layer, bool hasChimney) const
     {
-      int moduleID = ((layer - 1) << BKLM_LAYER_BIT);
-      if (hasChimney) { // Chimney module is in backward sector 3
-        moduleID |= ((3 - 1) << BKLM_SECTOR_BIT);
-      }
-      map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
-      return (iM == m_Modules.end() ? NULL : iM->second);
+      int sector;
+      /* Chimney module is in backward sector 3. */
+      if (hasChimney)
+        sector = 3;
+      else
+        sector = 1;
+      return findModule(BKLMElementNumbers::c_BackwardSection, sector, 1);
     }
 
     const HepGeom::Transform3D GeometryPar::getModuleAlignment(int section, int sector, int layer) const

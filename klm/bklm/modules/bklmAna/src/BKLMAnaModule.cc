@@ -203,11 +203,10 @@ void BKLMAnaModule::event()
     for (unsigned int t = 0; t < relatedExtHit.size(); t++) {
       ExtHit* exthit =  relatedExtHit[t];
       if (exthit->getDetectorID() != Const::EDetector::BKLM) continue;
-      int copyid = exthit->getCopyID();
-      int section = ((copyid & BKLM_END_MASK) >> BKLM_END_BIT);
-      int sector = ((copyid & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1;
-      int layer = ((copyid & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1;
-      //int plane = (copyid & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;//only for sci
+      int module = exthit->getCopyID();
+      int section = BKLMElementNumbers::getSectionByModule(module);
+      int sector = BKLMElementNumbers::getSectorByModule(module);
+      int layer = BKLMElementNumbers::getLayerByModule(module);
       //do we need to require Muid ?
       bool crossed = false; // should be only once ?
       for (unsigned int mu = 0; mu < Muids.size(); mu++) {

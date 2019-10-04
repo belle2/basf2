@@ -15,24 +15,6 @@
 //! proper sorting in bklmReconstructor module.
 //! Also, definition of each status bit/mask.
 
-//! bit position for strip-1 [0..47]
-#define BKLM_STRIP_BIT 0
-
-//! bit position for plane-1 [0..1]; 0 is inner-plane and phiReadout plane
-#define BKLM_PLANE_BIT 6
-
-//! bit position for layer-1 [0..14]; 0 is innermost
-#define BKLM_LAYER_BIT 7
-
-//! bit position for sector-1 [0..7]; 0 is on the +x axis and 2 is on the +y axis
-#define BKLM_SECTOR_BIT 11
-
-//! bit position for detector end [0..1]; forward is 0
-#define BKLM_END_BIT 14
-
-//! bit position for maxStrip-1 [0..47]
-#define BKLM_MAXSTRIP_BIT 15
-
 //! bit position for inRPC flag
 #define BKLM_INRPC_BIT 21
 
@@ -59,24 +41,6 @@
 
 //! bit position for used-on-BKLM-stand-alone-track flag (from BKLMTracking reconstruction)
 #define BKLM_ONSTATRACK_BIT 29
-
-//! bit mask for strip-1 [0..47]
-#define BKLM_STRIP_MASK (63 << BKLM_STRIP_BIT)
-
-//! bit mask for plane-1 [0..1]; 0 is inner-plane and phiReadout plane
-#define BKLM_PLANE_MASK (1 << BKLM_PLANE_BIT)
-
-//! bit mask for layer-1 [0..15]; 0 is innermost and 14 is outermost
-#define BKLM_LAYER_MASK (15 << BKLM_LAYER_BIT)
-
-//! bit mask for sector-1 [0..7]; 0 is on the +x axis and 2 is on the +y axis
-#define BKLM_SECTOR_MASK (7 << BKLM_SECTOR_BIT)
-
-//! bit mask for detector end [0..1]; forward is 0
-#define BKLM_END_MASK (1<<BKLM_END_BIT)
-
-//! bit mask for maxStrip-1 [0..47]
-#define BKLM_MAXSTRIP_MASK (63 << BKLM_MAXSTRIP_BIT)
 
 //! bit mask for inRPC flag
 #define BKLM_INRPC_MASK (1 << BKLM_INRPC_BIT)
@@ -105,23 +69,56 @@
 //! bit mask for used-on-BKLM-stand-alone-track flag (from BKLMTracking reconstruction)
 #define BKLM_ONSTATRACK_MASK (1 << BKLM_ONSTATRACK_BIT)
 
-//! bit mask for module identifier
-#define BKLM_MODULEID_MASK (BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK)
-
-//! bit mask for module-and-strip identifier
-#define BKLM_MODULESTRIPID_MASK (BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK | BKLM_PLANE_MASK | BKLM_STRIP_MASK)
-
 //! bit mask for status bits
 #define BKLM_STATUS_MASK (BKLM_INRPC_MASK | BKLM_MC_MASK | BKLM_DECAYED_MASK | BKLM_OUTOFTIME_MASK | BKLM_INEFFICIENT_MASK | BKLM_ONTRACK_MASK | BKLM_ABOVETHRESHOLD_MASK | BKLM_ONSTATRACK_MASK)
 
-//! BKLMHit2d Zstrips bit position for strip-1 [0..47]
-#define BKLM_ZSTRIP_BIT 0
+namespace Belle2 {
 
-//! BKLMHit2d Zstrips bit position for maxStrip-1 [0..47]
-#define BKLM_ZMAXSTRIP_BIT 6
+  /**
+   * BKLM hit status.
+   */
+  class BKLMStatus {
 
-//! BKLMHit2d Zstrips bit mask for strip-1 [0..47]
-#define BKLM_ZSTRIP_MASK (63 << BKLM_ZSTRIP_BIT)
+  public:
 
-//! BKLMHit2d Zstrips bit mask for maxStrip-1 [0..47]
-#define BKLM_ZMAXSTRIP_MASK (63 << BKLM_ZMAXSTRIP_BIT)
+    /**
+     * Constructor.
+     */
+    BKLMStatus()
+    {
+    }
+
+    /**
+     * Destructor.
+     */
+    ~BKLMStatus()
+    {
+    }
+
+    /**
+     * Get maximal strip number.
+     */
+    static int getMaximalStrip(int module)
+    {
+      return ((module & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1;
+    }
+
+    /**
+     * Set maximal strip number.
+     */
+    static void setMaximalStrip(int& module, int strip)
+    {
+      module = (module & (~BKLM_MAXSTRIP_MASK)) | ((strip - 1) << BKLM_MAXSTRIP_BIT);
+    }
+
+  protected:
+
+    /** Bit position for maxStrip-1 [0..47]. */
+    static constexpr int BKLM_MAXSTRIP_BIT = 15;
+
+    /** Bit mask for maxStrip-1 [0..47]. */
+    static constexpr int BKLM_MAXSTRIP_MASK = (63 << BKLM_MAXSTRIP_BIT);
+
+  };
+
+}

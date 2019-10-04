@@ -1030,7 +1030,9 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
       detID = Const::EDetector::BKLM;
       if (touch->GetHistoryDepth() == DEPTH_SCINT) {
         int strip = touch->GetCopyNumber(1);
-        int plane = touch->GetCopyNumber(2);
+        int plane = (touch->GetCopyNumber(2) == BKLM_INNER) ?
+                    BKLMElementNumbers::c_PhiPlane :
+                    BKLMElementNumbers::c_ZPlane;
         int layer = touch->GetCopyNumber(6);
         int sector = touch->GetCopyNumber(8);
         int section = touch->GetCopyNumber(9);

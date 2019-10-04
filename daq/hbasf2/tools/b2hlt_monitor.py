@@ -14,7 +14,6 @@ import zmq
 from argparse import ArgumentParser, FileType
 from zmq_daq.utils import get_monitor_table, normalize_addresses, write_monitoring, show_monitoring
 
-import os
 from time import sleep
 
 if __name__ == '__main__':
@@ -80,8 +79,7 @@ if __name__ == '__main__':
         while True:
             df = get_monitor_table(sockets, show_detail=args.show_detail)
             if args.watch:
-                os.system("clear")
-                show_monitoring(df)
+                show_monitoring(df, clear=True)
 
             if args.dat:
                 write_monitoring(df, f)

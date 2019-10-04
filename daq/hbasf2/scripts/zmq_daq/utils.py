@@ -12,10 +12,13 @@ from time import sleep
 
 def _receive(socket, filtering=True):
     """Internal helper function to ask a socket for monitoring and get the answer as JSON"""
-    try:
-        _, message, _ = socket.recv_multipart(flags=zmq.NOBLOCK)
-    except zmq.ZMQError:
-        return dict()
+    poller = zmq.Poller()
+    poller.register(socket, zmq.POLLIN)
+    answers = dict(poller.poll(1000))
+    if socket in answers:
+        _, message, _ = socket.recv_multipart()
+    else:
+        raise RuntimeError("Socket not connected! Is service running?")
 
     message = json.loads(message.decode())
 
@@ -51,7 +54,7 @@ def get_monitor_table(sockets, show_detail):
     return dict(_get_monitor_table_impl(sockets=sockets, show_detail=show_detail))
 
 
-def show_monitoring(df):
+def show_monitoring(df, clear=False):
     """
     Print the monitoring data produced by "get_monitor_table"
     in a human readable form to the console.
@@ -59,6 +62,8 @@ def show_monitoring(df):
     tmp = pd.Series({tuple(key.split(".")): value for key, value in df.items()}).unstack(0)
     tmp = tmp.fillna("-")
     pd.set_option("max_rows", len(tmp))
+    if clear:
+        os.system("clear")
     print(tmp)
 
 

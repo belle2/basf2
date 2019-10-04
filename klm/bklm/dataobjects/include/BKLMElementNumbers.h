@@ -276,7 +276,7 @@ namespace Belle2 {
      */
     static void setPlaneInModule(int& module, int plane)
     {
-      module = (module & (~BKLM_PLANE_MASK)) | (plane << BKLM_STRIP_BIT);
+      module = (module & (~BKLM_PLANE_MASK)) | (plane << BKLM_PLANE_BIT);
     }
 
     /**

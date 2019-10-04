@@ -2065,29 +2065,37 @@ namespace Belle2 {
                       "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.");
 
     REGISTER_VARIABLE("WE_MissM2(maskName, opt)", WE_MissM2,
-                      "Returns the invariant mass squared of the missing momentum (see possible options)");
+                      "Returns the invariant mass squared of the missing momentum (see WE_MissE possible options)");
 
     REGISTER_VARIABLE("REC_MissM2", REC_MissM2,
                       "Returns the invariant mass squared of the missing momentum calculated assumings the"
                       "reco B is at rest and calculating the neutrino (missing) momentum from p_nu = pB - p_had - p_lep");
 
     REGISTER_VARIABLE("WE_MissPTheta(maskName, opt)", WE_MissPTheta,
-                      "Returns the polar angle of the missing momentum (see possible options)");
+                      "Returns the polar angle of the missing momentum (see possible WE_MissE options)");
 
     REGISTER_VARIABLE("WE_MissP(maskName, opt)", WE_MissP,
-                      "Returns the magnitude of the missing momentum (see possible options)");
+                      "Returns the magnitude of the missing momentum (see possible WE_MissE options)");
 
     REGISTER_VARIABLE("WE_MissPx(maskName, opt)", WE_MissPx,
-                      "Returns the x component of the missing momentum (see possible options)");
+                      "Returns the x component of the missing momentum (see WE_MissE possible options)");
 
     REGISTER_VARIABLE("WE_MissPy(maskName, opt)", WE_MissPy,
-                      "Returns the y component of the missing momentum (see possible options)");
+                      "Returns the y component of the missing momentum (see WE_MissE possible options)");
 
     REGISTER_VARIABLE("WE_MissPz(maskName, opt)", WE_MissPz,
-                      "Returns the z component of the missing momentum (see possible options)");
+                      "Returns the z component of the missing momentum (see WE_MissE possible options)");
 
     REGISTER_VARIABLE("WE_MissE(maskName, opt)", WE_MissE,
-                      "Returns the energy of the missing momentum (see possible options)");
+                      R"DOC(Returns the energy of the missing momentum, possible options are the following:
+opt = 0: CMS, use energy and momentum of charged particles and photons; 
+opt = 1: CMS, same as 0, fix Emiss = pmiss; 
+opt = 2: CMS, same as 0, fix Eroe = Ecms/2; 
+opt = 3: CMS, use only energy and momentum of signal side; 
+opt = 4: CMS, same as 3, update with direction of ROE momentum; 
+opt = 5: LAB, use energy and momentum of charged particles and photons from whole event; 
+opt = 6: LAB, same as 5, fix Emiss = pmiss; 
+opt = 7: CMS, correct pmiss 3-momentum vector with factor alpha so that dE = 0 (used for Mbc calculation).)DOC");
 
     REGISTER_VARIABLE("WE_xiZ(maskName)", WE_xiZ,
                       "Returns Xi_z in event (for Bhabha suppression and two-photon scattering)");

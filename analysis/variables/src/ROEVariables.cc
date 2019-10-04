@@ -102,20 +102,29 @@ namespace Belle2 {
 
     Manager::FunctionPtr currentROEIsInList(const std::vector<std::string>& arguments)
     {
-      std::string listName;
-
       if (arguments.size() != 1)
         B2FATAL("Wrong number of arguments (1 required) for meta function currentROEIsInList");
+
+      std::string listName = arguments[0];
 
       auto func = [listName](const Particle*) -> double {
 
         StoreObjPtr<ParticleList> particleList(listName);
+        if (!(particleList.isValid()))
+        {
+          B2FATAL("Invalid Listname " << listName << " given to currentROEIsInList!");
+        }
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 
         if (not roe.isValid())
           return 0;
 
-        auto* particle = roe->getRelatedTo<Particle>();
+        auto* particle = roe->getRelatedFrom<Particle>();
+        if (particle == nullptr)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist! currentROEIsInList() variable has to be called from ROE loop");
+          return -999.;
+        }
         return particleList->contains(particle) ? 1 : 0;
 
       };
@@ -124,8 +133,6 @@ namespace Belle2 {
 
     Manager::FunctionPtr particleRelatedToCurrentROE(const std::vector<std::string>& arguments)
     {
-      std::string listName;
-
       if (arguments.size() != 1)
         B2FATAL("Wrong number of arguments (1 required) for meta function particleRelatedToCurrentROE");
 
@@ -137,7 +144,12 @@ namespace Belle2 {
         if (not roe.isValid())
           return -999;
 
-        auto* particle = roe->getRelatedTo<Particle>();
+        auto* particle = roe->getRelatedFrom<Particle>();
+        if (particle == nullptr)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist! particleRelatedToCurrentROE() variable has to be called from ROE loop");
+          return -999.;
+        }
         return var->function(particle);
 
       };

@@ -8,14 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TH1F.h>
-
-/* Belle2 headers. */
-
-#include <framework/gearbox/Unit.h>
-#include <klm/eklm/geometry/GeometryData.h>
+/* Own header. */
 #include <klm/eklm/modules/EKLMADC/EKLMADCModule.h>
+
+/* KLM headers. */
+#include <klm/eklm/geometry/GeometryData.h>
+#include <klm/simulation/ScintillatorSimulator.h>
+
+/* Belle 2 headers. */
+#include <framework/gearbox/Unit.h>
+
+/* ROOT headers. */
+#include <TH1F.h>
 
 using namespace Belle2;
 

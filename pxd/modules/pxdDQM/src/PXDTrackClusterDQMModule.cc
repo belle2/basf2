@@ -10,7 +10,6 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDTrackClusterDQMModule.h>
-#include <framework/datastore/RelationArray.h>
 #include <TDirectory.h>
 
 using namespace Belle2;

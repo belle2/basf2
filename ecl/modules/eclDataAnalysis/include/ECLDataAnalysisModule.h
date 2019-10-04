@@ -496,6 +496,7 @@ namespace Belle2 {
     std::vector<int>*
     m_eclShowerMCFFlightMatch; /**< Int, 1 if primary particle flight direction is "well" reconstructed in ECL, 0 otherwise, DEBUG PURPOSE*/
     std::vector<double>*   m_eclShowerHighestE1mE2; /**< Energy difference for 2 highest energy deposits in shower*/
+    std::vector<double>*   m_eclShowerNumberOfCrystalsForEnergy; /**< Number of crystals used for energy calculation*/
 
     int m_mcMultip; /**< Multiplicity of MCParticles */
     std::vector<int>* m_mcIdx; /**< MCParticle index */

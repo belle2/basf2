@@ -17,7 +17,6 @@
 #include <geometry/bfieldmap/BFieldComponentBeamline.h>
 #include <geometry/bfieldmap/BFieldComponentKlm1.h>
 #include <geometry/bfieldmap/BFieldComponent3d.h>
-#include <geometry/bfieldmap/BFieldFrameworkInterface.h>
 #include <geometry/dbobjects/MagneticFieldComponent3D.h>
 #include <geometry/CreatorFactory.h>
 #include <framework/database/DBImportObjPtr.h>
@@ -32,8 +31,6 @@
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/bind.hpp>
-#include <boost/foreach.hpp>
-#include <TFile.h>
 
 using namespace std;
 using namespace boost;

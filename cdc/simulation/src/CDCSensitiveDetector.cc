@@ -14,29 +14,21 @@
 #include <cdc/simulation/CDCSimControlPar.h>
 #include <cdc/simulation/Helix.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/geometry/GeoCDCCreator.h>
 #include <cdc/utilities/ClosestApproach.h>
 #include <framework/logging/Logger.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
-#include <simulation/monopoles/G4Monopole.h>
 
 #include "G4Step.hh"
-#include "G4SteppingManager.hh"
-#include "G4SDManager.hh"
 #include "G4TransportationManager.hh"
+#include "G4Field.hh"
 #include "G4FieldManager.hh"
-#include "G4MagneticField.hh"
 
 #include "CLHEP/Geometry/Vector3D.h"
 #include "CLHEP/Geometry/Point3D.h"
 
 #include "TVector3.h"
-
-//#include <iomanip>
 
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;

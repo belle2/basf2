@@ -10,11 +10,8 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <calibration/CalibrationCollectorModule.h>
 
-#include <framework/datastore/RelationIndex.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <framework/dataobjects/EventT0.h>
 #include <string>
 

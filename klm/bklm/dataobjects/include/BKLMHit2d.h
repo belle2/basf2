@@ -10,9 +10,14 @@
 
 #pragma once
 
-#include <TVector3.h>
-#include <framework/datastore/RelationsObject.h>
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMStatus.h>
+
+/* Belle 2 headers. */
+#include <framework/datastore/RelationsObject.h>
+
+/* ROOT headers. */
+#include <TVector3.h>
 
 namespace CLHEP {
   class Hep3Vector;

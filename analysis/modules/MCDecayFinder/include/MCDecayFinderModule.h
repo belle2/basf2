@@ -12,7 +12,6 @@
 #include <framework/core/Module.h>
 #include <analysis/modules/MCDecayFinder/DecayTree.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <vector>
 
 namespace Belle2 {
   /** Find decays in MCParticle list matching a given DecayString.

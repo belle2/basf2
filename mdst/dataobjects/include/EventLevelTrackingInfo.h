@@ -11,8 +11,9 @@
 
 #include <mdst/dataobjects/HitPatternCDC.h>
 
-#include <framework/datastore/RelationsObject.h>
 #include <framework/logging/Logger.h>
+
+#include <TObject.h>
 
 #include <algorithm>
 #include <bitset>

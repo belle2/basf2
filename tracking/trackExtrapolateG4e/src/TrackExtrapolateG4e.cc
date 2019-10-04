@@ -46,7 +46,6 @@
 #include <CLHEP/Units/SystemOfUnits.h>
 #include <CLHEP/Matrix/Vector.h>
 
-#include <globals.hh>
 #include <G4PhysicalVolumeStore.hh>
 #include <G4VPhysicalVolume.hh>
 #include <G4Track.hh>
@@ -54,7 +53,6 @@
 #include <G4StepPoint.hh>
 #include <G4VTouchable.hh>
 #include <G4TouchableHandle.hh>
-#include <G4NavigationHistory.hh>
 #include <G4ParticleTable.hh>
 #include <G4ErrorPropagatorData.hh>
 #include <G4ErrorFreeTrajState.hh>

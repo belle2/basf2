@@ -15,9 +15,6 @@
 #include <TVector3.h>
 #include <TMatrixFSym.h>
 
-#include <vector>
-#include <set>
-
 namespace Belle2 {
 
 

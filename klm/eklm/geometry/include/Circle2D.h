@@ -10,7 +10,7 @@
 
 #pragma once
 
-/* External headers. */
+/* CLHEP headers. */
 #include <CLHEP/Geometry/Point3D.h>
 
 namespace Belle2 {

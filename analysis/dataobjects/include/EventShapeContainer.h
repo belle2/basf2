@@ -15,9 +15,7 @@
 
 #include <TVector3.h>
 #include <TLorentzVector.h>
-#include <TMatrixT.h>
 #include <vector>
-#include <set>
 
 namespace Belle2 {
   /**

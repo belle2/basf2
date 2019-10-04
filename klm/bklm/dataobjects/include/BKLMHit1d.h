@@ -10,10 +10,14 @@
 
 #pragma once
 
-#include <framework/datastore/RelationsObject.h>
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
 
+/* Belle 2 headers. */
+#include <framework/datastore/RelationsObject.h>
+
+/* C++ headers. */
 #include <vector>
 
 namespace Belle2 {

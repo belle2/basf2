@@ -28,7 +28,6 @@
 #include <framework/utilities/RootFileCreationManager.h>
 
 #include <cmath>
-#include <algorithm>
 
 using namespace std;
 using namespace Belle2;

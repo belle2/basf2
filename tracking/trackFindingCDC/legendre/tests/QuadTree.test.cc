@@ -13,7 +13,6 @@
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/PrecisionUtil.h>
 
 #include <vector>
-#include <cmath>
 #include <gtest/gtest.h>
 
 using namespace Belle2;

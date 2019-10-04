@@ -11,9 +11,7 @@
 #pragma once
 
 #include <framework/logging/Logger.h>
-#include <limits>
 #include <TObject.h>
-
 
 namespace Belle2 {
 

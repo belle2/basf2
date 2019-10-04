@@ -14,7 +14,8 @@
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/logging/Logger.h>
-#include <iostream>
+#include <mdst/dataobjects/Track.h>
+
 using std::vector;
 
 namespace TreeFitter {
@@ -129,8 +130,10 @@ namespace TreeFitter {
             RecoTrack* dau1 = trkdaughters[0];
             RecoTrack* dau2 = trkdaughters[1];
 
-            Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
-            Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
+            Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
+                                     dau1->particle()->getPDGCode())))->getHelix();
+            Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
+                                     dau2->particle()->getPDGCode())))->getHelix();
 
             double flt1(0), flt2(0);
             HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
@@ -142,10 +145,8 @@ namespace TreeFitter {
             dau1->setFlightLength(flt1);
             dau2->setFlightLength(flt2);
 
-            /** temporarily disabled */
           } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {
-            B2DEBUG(12, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
-
+            // TODO switched off waiting for refactoring of init1 and init2 functions (does not affect performance)
           } else if (mother() && mother()->posIndex() >= 0) {
             const int posindexmother = mother()->posIndex();
             const int dim = m_config->m_originDimension; //TODO acess mother

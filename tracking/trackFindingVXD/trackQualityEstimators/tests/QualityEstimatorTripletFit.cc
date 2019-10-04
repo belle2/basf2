@@ -11,8 +11,6 @@
 #include <gtest/gtest.h>
 
 #include <vector>
-#include <utility> // pair
-#include <math.h>
 
 #include <framework/geometry/B2Vector3.h>
 

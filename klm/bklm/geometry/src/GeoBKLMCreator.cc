@@ -8,30 +8,28 @@
 *  This software is provided "as is" without any warranty.               *
 *************************************************************************/
 
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+/* Own header. */
 #include <klm/bklm/geometry/GeoBKLMCreator.h>
+
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <klm/bklm/simulation/SensitiveDetector.h>
-#include "klm/bklm/dbobjects/BKLMGeometryPar.h"
 
+/* Belle 2 headers. */
 #include <geometry/Materials.h>
-#include <geometry/CreatorFactory.h>
-#include <geometry/utilities.h>
 
-#include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
-
-#include <G4LogicalVolume.hh>
-#include <G4PVPlacement.hh>
-#include <G4Tubs.hh>
-#include <G4Polyhedra.hh>
+/* Geant 4 headers. */
 #include <G4Box.hh>
-#include <G4SubtractionSolid.hh>
-#include <G4UnionSolid.hh>
-#include <G4Transform3D.hh>
-#include <G4UserLimits.hh>
-#include <G4VisAttributes.hh>
+#include <G4LogicalVolume.hh>
+#include <G4Polyhedra.hh>
+#include <G4PVPlacement.hh>
 #include <G4String.hh>
+#include <G4SubtractionSolid.hh>
+#include <G4Transform3D.hh>
+#include <G4Tubs.hh>
+#include <G4UnionSolid.hh>
+#include <G4VisAttributes.hh>
 
 using namespace std;
 

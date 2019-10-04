@@ -12,8 +12,6 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
-
 #include <tracking/trackFindingCDC/utilities/Named.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
@@ -23,7 +21,6 @@
 #include <memory>
 
 namespace Belle2 {
-  class ModuleParamList;
   namespace TrackFindingCDC {
 
     /// Vehicle class to transport the variable names

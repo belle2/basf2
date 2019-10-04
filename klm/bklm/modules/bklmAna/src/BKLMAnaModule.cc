@@ -8,27 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/modules/bklmAna/BKLMAnaModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
+/* Belle 2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/gearbox/GearDir.h>
-
-#include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/bklm/dataobjects/BKLMSimHit.h>
-#include <klm/bklm/dataobjects/BKLMSimHitPosition.h>
-#include <klm/bklm/dataobjects/BKLMTrack.h>
-#include <tracking/dataobjects/RecoTrack.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <genfit/Track.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <tracking/dataobjects/MuidHit.h>
 #include <tracking/dataobjects/Muid.h>
+
+/* CLHEP headers. */
+#include <CLHEP/Units/SystemOfUnits.h>
 
 using namespace std;
 using namespace Belle2;
-using namespace Belle2::bklm;
 using namespace CLHEP;
 
 //-----------------------------------------------------------------

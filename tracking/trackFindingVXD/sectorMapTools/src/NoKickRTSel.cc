@@ -11,6 +11,12 @@
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 
+#include <tracking/dataobjects/hitXPDerivate.h>
+
+#include <mdst/dataobjects/MCParticle.h>
+#include <pxd/dataobjects/PXDTrueHit.h>
+#include <svd/dataobjects/SVDTrueHit.h>
+
 using namespace Belle2;
 
 

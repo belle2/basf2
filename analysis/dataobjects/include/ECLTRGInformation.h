@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <framework/datastore/RelationsObject.h>
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {

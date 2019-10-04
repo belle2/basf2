@@ -17,7 +17,6 @@
 
 #include <tracking/trackFindingCDC/numerics/Median.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

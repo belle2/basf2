@@ -10,13 +10,11 @@
 
 #pragma once
 
-#include <map>
-
-#include "CLHEP/Vector/ThreeVector.h"
-
+/* ROOT headers. */
 #include <TObject.h>
+
+/* C++ headers. */
 #include <string>
-#include <cmath>
 #include <vector>
 
 static const int NLAYER = 15;

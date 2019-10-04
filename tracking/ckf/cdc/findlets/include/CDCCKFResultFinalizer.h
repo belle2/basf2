@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 #include <tracking/ckf/cdc/filters/paths/CDCPathFilterFactory.h>
 
-#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>

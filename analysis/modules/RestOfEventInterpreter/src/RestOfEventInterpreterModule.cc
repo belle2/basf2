@@ -12,13 +12,7 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
-
-#include <analysis/variables/Variables.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/MCParticle.h>
+#include <analysis/dataobjects/RestOfEvent.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -27,7 +21,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 
 #include <iostream>
-#include <utility>
 
 using namespace std;
 

@@ -8,16 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
+#include <klm/modules/KLMUnpacker/KLMUnpackerModule.h>
+
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
+#include <klm/rawdata/RawData.h>
+
+/* Belle 2 headers. */
+#include <framework/logging/Logger.h>
+
 /* C++ headers. */
 #include <cstdint>
-
-/* Belle2 headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/modules/KLMUnpacker/KLMUnpackerModule.h>
-#include <klm/rawdata/RawData.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;

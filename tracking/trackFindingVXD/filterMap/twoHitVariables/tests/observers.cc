@@ -14,32 +14,20 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DSquared.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance2DXYSquared.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZ.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/SlopeRZ.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DNormed.h>
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
 
-#include <tracking/vxdCaTracking/TwoHitFilters.h>
-
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDCluster.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <svd/dataobjects/SVDTrueHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/dataobjects/ProfileInfo.h>
-#include <framework/datastore/RelationsObject.h>
 
-#include <tuple>
 #include <utility>
 #include <map>
 #include <string>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 #include <functional>
 

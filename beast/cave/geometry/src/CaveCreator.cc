@@ -11,15 +11,10 @@
 #include <beast/cave/geometry/CaveCreator.h>
 #include <beast/cave/simulation/SensitiveDetector.h>
 
-#include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
-#include <geometry/utilities.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-//#include <cave/simulation/SensitiveDetector.h>
 
-#include <cmath>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
@@ -28,14 +23,8 @@
 #include <G4PVPlacement.hh>
 
 //Shapes
-#include <G4Trap.hh>
 #include <G4Box.hh>
-#include <G4Polycone.hh>
-#include "G4UnionSolid.hh"
-#include "G4SubtractionSolid.hh"
 #include <G4UserLimits.hh>
-#include <G4RegionStore.hh>
-#include "G4Tubs.hh"
 
 using namespace std;
 using namespace boost;

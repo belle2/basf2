@@ -23,16 +23,12 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
 
 // utility
-#include <analysis/utility/MCMatching.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <TRandom.h>

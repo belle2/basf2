@@ -1,13 +1,16 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <klm/bklm/dbobjects/BKLMTimeWindow.h>
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/dataobjects/BKLMHit1d.h>
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/dbobjects/BKLMTimeWindow.h>
+
+/* Belle 2 headers. */
+#include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
 

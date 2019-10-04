@@ -11,11 +11,9 @@
 #ifndef TRACKEXTRAPOLATEG4E_H
 #define TRACKEXTRAPOLATEG4E_H
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/database/DBObjPtr.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
-#include <klm/eklm/dbobjects/EKLMChannels.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
@@ -38,7 +36,6 @@ class G4StepPoint;
 namespace Belle2 {
 
   class Track;
-  class RecoTrack;
   class Muid;
   class MuidPar;
   class KLMCluster;
@@ -487,9 +484,6 @@ namespace Belle2 {
 
     //! Conditions-database object for KLM strip efficiency
     DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;
-
-    //! Conditions-database object for EKLM dead-channel list (updated at start of each run)
-    DBObjPtr<EKLMChannels> m_eklmChannels;
 
     //! Conditions-database object for KLM channel status (updated at start of each run)
     DBObjPtr<KLMChannelStatus> m_klmChannelStatus;

@@ -13,13 +13,11 @@
 #include <analysis/utility/ValueIndexPairSorting.h>
 
 #include <analysis/VariableManager/Utility.h>
-
 #include <analysis/dataobjects/Particle.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/MakeROOTCompatible.h>
-
-#include <map>
 
 using namespace std;
 using namespace Belle2;

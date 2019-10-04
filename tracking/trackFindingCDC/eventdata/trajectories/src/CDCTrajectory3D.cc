@@ -43,7 +43,6 @@
 #include <TVector3.h>
 
 #include <ostream>
-#include <cmath>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

@@ -10,13 +10,10 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisOutputRelayMsg.h>
 #include <TROOT.h>
-#include <TSystem.h>
 #include <TClass.h>
 #include <TObject.h>
 #include <TCanvas.h>
 #include <TMessage.h>
-#include "TKey.h"
-#include "TIterator.h"
 #include <ctime>
 
 using namespace std;

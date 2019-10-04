@@ -12,12 +12,8 @@
 #include <TObject.h>
 #include <map>
 #include <vector>
-#include <utility>
-#include <algorithm>
 
 #include <pxd/dbobjects/PXDClusterOffsetPar.h>
-
-#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 

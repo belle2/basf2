@@ -1,14 +1,11 @@
 #include "dqm/analysis/HistMemory.h"
 
+#include <daq/slc/base/IOException.h>
 #include <daq/slc/base/StringUtil.h>
 
 #include <unistd.h>
-#include <stdlib.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
-#include <stdint.h>
 #include <sys/mman.h>
 
 using namespace Belle2;

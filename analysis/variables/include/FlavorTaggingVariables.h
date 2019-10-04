@@ -189,16 +189,26 @@ namespace Belle2 {
     Manager::FunctionPtr isRightCategory(const std::vector<std::string>& arguments);
 
     /**
-     * Returns function which returns the q*r value for a given list (argument[0]). The r value is stored via extraInfo
-     * before and is accessed via argument[1]. This is a Flavor Tagging specific variable on event level!
+     * Returns function which returns the q*p value for a given list (argument[0]). The value p is the probability
+     * of a category stored as extraInfo (argument[1]). The particle is selected after ranking according to a flavor tagging extraInfo (argument[2]).
+     * This is a Flavor Tagging specific variable on event level!
      */
-    Manager::FunctionPtr QrOf(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr QpOf(const std::vector<std::string>& arguments);
 
     /**
-     * Returns function which returns the q*r value for a given list (argument[0]). The r value is stored via extraInfo
-     * before and is accessed via argument[1]. This is a Flavor Tagging specific variable on event level!
+     * Returns function which returns the weighted q*p value for a given list (argument[0]). The value p is the probability
+     * of a category stored as extraInfo (argument[1]). The particles in the list are ranked according to a flavor tagging extraInfo (argument[2]).
+     * The values for the three top particles is combined into an effective (weighted) output.
+     * This is a Flavor Tagging specific variable on event level!
      */
-    Manager::FunctionPtr weightedQrOf(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr weightedQpOf(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the value of an input variable (argument[1]) for a particle selected from the given list (argument[0]).
+     * The particles are ranked according to a flavor tagging extraInfo (argument[2]).
+     * This is a Flavor Tagging specific variable on event level!
+     */
+    Manager::FunctionPtr variableOfTarget(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns 1.0 if the given category has at least one target.

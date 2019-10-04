@@ -923,7 +923,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments (2 required) for meta function hasHighestProbInCat");
+        B2FATAL("Wrong number of arguments (2 required) for meta function HighestProbInCat");
       }
     }
 
@@ -1690,6 +1690,96 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr variableOfTarget(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 3) {
+        auto particleListName = arguments[0];
+        auto inputVariable = arguments[1];
+        auto rankingExtraInfo = arguments[2];
+
+        int indexRanking = -1;
+
+
+        std::vector<std::string> availableExtraInfos = {     "isRightTrack(Electron)",             // 0
+                                                             "isRightTrack(IntermediateElectron)", // 1
+                                                             "isRightTrack(Muon)",                 // 2
+                                                             "isRightTrack(IntermediateMuon)",     // 3
+                                                             "isRightTrack(KinLepton)",            // 4
+                                                             "isRightTrack(IntermediateKinLepton)",// 5
+                                                             "isRightTrack(Kaon)",                 // 6
+                                                             "isRightTrack(SlowPion)",             // 7
+                                                             "isRightTrack(FastHadron)",             // 8
+                                                             "isRightTrack(MaximumPstar)",         // 9
+                                                             "isRightTrack(Lambda)",                // 10
+                                                             "isRightCategory(Electron)",             // 11
+                                                             "isRightCategory(IntermediateElectron)", // 12
+                                                             "isRightCategory(Muon)",                 // 13
+                                                             "isRightCategory(IntermediateMuon)",     // 14
+                                                             "isRightCategory(KinLepton)",            // 15
+                                                             "isRightCategory(IntermediateKinLepton)",// 16
+                                                             "isRightCategory(Kaon)",                 // 17
+                                                             "isRightCategory(SlowPion)",             // 18
+                                                             "isRightCategory(FastHadron)",             // 19
+                                                             "isRightCategory(MaximumPstar)",         // 20
+                                                             "isRightCategory(Lambda)",                // 21
+                                                             "isRightCategory(KaonPion)",             // 22
+                                                             "isRightCategory(FSC)",                  // 23
+                                                       };
+
+        for (unsigned i = 0; i < availableExtraInfos.size(); ++i) {
+          if (rankingExtraInfo == availableExtraInfos[i]) indexRanking = i;
+        }
+
+        if (indexRanking == -1) {
+          B2FATAL("variableOfTarget: Not available category " << rankingExtraInfo <<
+                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
+                  <<
+                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
+        }
+
+
+        auto func = [particleListName, inputVariable, indexRanking, availableExtraInfos](const Particle*) -> double {
+          StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+          PCmsLabTransform T;
+          Particle* target = nullptr; //Particle selected as target
+          double output = std::numeric_limits<float>::quiet_NaN();
+
+          if (ListOfParticles.isValid())
+          {
+            float maximumTargetProb = 0; //Probability of being the target track from the track level
+            for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+              Particle* particlei = ListOfParticles->getParticle(i);
+              if (particlei != nullptr) {
+                double target_prob = 0;
+                if (indexRanking == 9 || indexRanking == 20) { // MaximumPstar
+                  TLorentzVector momParticlei = T.rotateLabToCms() * particlei -> get4Vector();
+                  if (momParticlei == momParticlei) {
+                    target_prob = momParticlei.P();
+                  }
+                } else {
+                  if (particlei->hasExtraInfo(availableExtraInfos[indexRanking])) {
+                    target_prob = particlei->getExtraInfo(availableExtraInfos[indexRanking]);
+                  }
+                }
+                if (target_prob > maximumTargetProb) {
+                  maximumTargetProb = target_prob;
+                  target = particlei;
+                }
+              }
+            }
+            if (target != nullptr) {
+              Variable::Manager& manager = Variable::Manager::Instance();
+              output = manager.getVariable(inputVariable)-> function(target);
+            }
+          }
+          return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments (3 required) for meta function variableOfTarget");
+      }
+    }
+
     Manager::FunctionPtr hasTrueTarget(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -1698,7 +1788,7 @@ namespace Belle2 {
           if (!(categoryName == "Electron" || categoryName == "IntermediateElectron" || categoryName == "Muon" ||  categoryName == "IntermediateMuon" || categoryName == "KinLepton" || categoryName == "IntermediateKinLepton" || categoryName == "Kaon"
           || categoryName == "SlowPion" ||  categoryName == "FastHadron" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
           {
-            B2FATAL("isCategoryTrue: Not available category" << categoryName <<
+            B2FATAL("hasTrueTarget: Not available category" << categoryName <<
             ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
             return 0.0;
           }
@@ -1762,7 +1852,7 @@ namespace Belle2 {
           if (!(categoryName == "Electron" || categoryName == "IntermediateElectron" || categoryName == "Muon" ||  categoryName == "IntermediateMuon" || categoryName == "KinLepton" || categoryName == "IntermediateKinLepton" || categoryName == "Kaon"
           || categoryName == "SlowPion" ||  categoryName == "FastHadron" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
           {
-            B2FATAL("isCategoryTrue: Not available category" << categoryName <<
+            B2FATAL("isTrueCategory: Not available category" << categoryName <<
             ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
             return 0.0;
           }
@@ -1831,7 +1921,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments (1 required) for meta function isCategoryTrue");
+        B2FATAL("Wrong number of arguments (1 required) for meta function isTrueCategory");
       }
     }
 
@@ -1910,7 +2000,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function rBin");
+        B2FATAL("Wrong number of arguments for meta function rBinBelle");
       }
     }
 
@@ -2059,9 +2149,16 @@ namespace Belle2 {
     REGISTER_VARIABLE("isRightCategory(particleName)", isRightCategory,
                       "FlavorTagging: returns 1 if the class track by particleName category has the same flavor as the MC target track 0 else also if there is no target track");
     REGISTER_VARIABLE("QpOf(particleListName, outputExtraInfo, rankingExtraInfo)", QpOf,
-                      "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
+                      "FlavorTagging: [Eventbased] Returns the q*p value for a given list (argument[0]), where p is the probability of a category stored as extraInfo (argument[1]).\n"
+                      "The particle is selected after ranking according to a flavor tagging extraInfo (argument[2]).");
     REGISTER_VARIABLE("weightedQpOf(particleListName, outputExtraInfo, rankingExtraInfo)", weightedQpOf,
-                      "FlavorTagging: [Eventbased] weighted q*r where r is calculated from the output of event level for the 3 particles with highest track probability in particlelistName.");
+                      "FlavorTagging: [Eventbased] Returns the weighted q*p value for a given list (argument[0]), where p is the probability of a category stored as extraInfo (argument[1]).\n"
+                      "The particles in the list are ranked according to a flavor tagging extraInfo (argument[2]). \n"
+                      "The values for the three top particles is combined into an effective (weighted) output.");
+    REGISTER_VARIABLE("variableOfTarget(particleListName, inputVariable, rankingExtraInfo)", variableOfTarget,
+                      "FlavorTagging: [Eventbased] Returns the value of an input variable (argument[1]) for a particle selected from the given list (argument[0]).\n"
+                      "The particles are ranked according to a flavor tagging extraInfo (argument[2]).");
+
     REGISTER_VARIABLE("hasTrueTarget(categoryName)", hasTrueTarget,
                       "Returns 1 if the given category has a target. 0 Else.")
     REGISTER_VARIABLE("isTrueCategory(categoryName)", isTrueCategory,

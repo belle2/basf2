@@ -4,6 +4,7 @@
 #include <framework/core/HistoModule.h>
 #include <trg/cdc/dataobjects/TRGCDCT3DUnpackerStore.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/modules/trgcdct3dUnpacker/TRGCDCT3DUnpackerModule.h>
 #include <stdlib.h>
 #include <iostream>
@@ -50,6 +51,30 @@ namespace Belle2 {
     TH1D* h_phi_2D = nullptr;
     //! pt (from 2D) of T3D in each module
     TH1D* h_pt_2D = nullptr;
+    //! TSF1 ID of T3D in each module
+    TH1D* h_ID_TSF1 = nullptr;
+    //! TSF3 ID of T3D in each module
+    TH1D* h_ID_TSF3 = nullptr;
+    //! TSF5 ID of T3D in each module
+    TH1D* h_ID_TSF5 = nullptr;
+    //! TSF7 ID of T3D in each module
+    TH1D* h_ID_TSF7 = nullptr;
+    //! TSF1 priority time of T3D in each module
+    TH1D* h_rt_TSF1 = nullptr;
+    //! TSF3 priority time of T3D in each module
+    TH1D* h_rt_TSF3 = nullptr;
+    //! TSF5 priority time of T3D in each module
+    TH1D* h_rt_TSF5 = nullptr;
+    //! TSF7 priority time of T3D in each module
+    TH1D* h_rt_TSF7 = nullptr;
+    //! TSF1 validity of T3D in each module
+    TH1D* h_validity_TSF1 = nullptr;
+    //! TSF3 validity of T3D in each module
+    TH1D* h_validity_TSF3 = nullptr;
+    //! TSF5 validity of T3D in each module
+    TH1D* h_validity_TSF5 = nullptr;
+    //! TSF7 validity of T3D in each module
+    TH1D* h_validity_TSF7 = nullptr;
 
 
     //! TDirectories for DQM histograms
@@ -77,6 +102,9 @@ namespace Belle2 {
 
     /// 2D data store
     StoreArray<CDCTriggerTrack> entAry_2D;
+
+    /// Stereo TSF data store
+    StoreArray<CDCTriggerSegmentHit> entAry_TSF;
   };
 
 }

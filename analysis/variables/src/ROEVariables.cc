@@ -144,6 +144,40 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr useROERecoilFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          // Here we prioritize old variable behaviour first:
+          const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+          // if related ROE not found, get the StoreArray pointer
+          if (roe == nullptr)
+          {
+            StoreObjPtr<RestOfEvent> roeObjPtr("RestOfEvent");
+            if (roeObjPtr.isValid()) {
+              roe = &*roeObjPtr;
+            }
+          }
+          if (roe == nullptr)
+          {
+            B2ERROR("Neither relation between particle and ROE doesn't exist nor ROE object has not been found!");
+            return -999.;
+          }
+          PCmsLabTransform T;
+          TLorentzVector pRecoil = T.getBeamFourMomentum() - roe->get4Vector();
+          Particle tmp(pRecoil, 0);
+          UseReferenceFrame<RestFrame> frame(&tmp);
+          double result = var->function(particle);
+          return result;
+        };
+        return func;
+      } else {
+        B2WARNING("Wrong number of arguments for meta function useROERecoilFrame");
+        return nullptr;
+      }
+    }
+
     // only the helper function
     double nRemainingTracksInROE(const Particle* particle, const std::string& maskName)
     {
@@ -1917,6 +1951,11 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("Rest Of Event");
+
+    REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
+                      "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
+                      "Can be used inside and outside of for_each loop.\n"
+                      "E.g. useROERecoilFrame(E) returns the energy of a particle in the ROE recoil frame.");
 
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
                       "Returns 1 if a track, ecl or klmCluster associated to particle is in the current RestOfEvent object, 0 otherwise."

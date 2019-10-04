@@ -54,6 +54,11 @@ namespace Belle2 {
     Manager::FunctionPtr nROE_RemainingTracksWithMask(const std::vector<std::string>& arguments);
 
     /**
+     * Returns variable in Rest of Event rest frame.
+     */
+    Manager::FunctionPtr useROERecoilFrame(const std::vector<std::string>& arguments);
+
+    /**
      * Returns number of tracks in the event minus in the current RestOfEvent object
      */
     double nROE_RemainingTracks(const Particle* particle);

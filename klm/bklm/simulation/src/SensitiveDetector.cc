@@ -144,6 +144,8 @@ namespace Belle2 {
           convertHitToRPCStrips(localPosition, m, phiStripLower, phiStripUpper, zStripLower, zStripUpper);
           if (zStripLower > 0) {
             int moduleIDZ = moduleID;
+            BKLMElementNumbers::setPlaneInModule(
+              moduleIDZ, BKLMElementNumbers::c_ZPlane);
             BKLMElementNumbers::setStripInModule(moduleIDZ, zStripLower);
             BKLMStatus::setMaximalStrip(moduleIDZ, zStripUpper);
             BKLMSimHit* simHit = simHits.appendNew(moduleIDZ, propagationTimes.z(), time, eDep);
@@ -152,6 +154,8 @@ namespace Belle2 {
             simHitPosition->addRelationTo(simHit);
           }
           if (phiStripLower > 0) {
+            BKLMElementNumbers::setPlaneInModule(
+              moduleID, BKLMElementNumbers::c_PhiPlane);
             BKLMElementNumbers::setStripInModule(moduleID, phiStripLower);
             BKLMStatus::setMaximalStrip(moduleID, phiStripUpper);
             BKLMSimHit* simHit = simHits.appendNew(moduleID, propagationTimes.y(), time, eDep);

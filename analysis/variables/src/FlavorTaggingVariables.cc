@@ -1441,6 +1441,34 @@ namespace Belle2 {
       }
     }
 
+
+    // List of available extrainfos used in QpOf, weightedQpOf and variableOfTarget.
+    std::vector<std::string> availableExtraInfos = {     "isRightTrack(Electron)",             // 0
+                                                         "isRightTrack(IntermediateElectron)", // 1
+                                                         "isRightTrack(Muon)",                 // 2
+                                                         "isRightTrack(IntermediateMuon)",     // 3
+                                                         "isRightTrack(KinLepton)",            // 4
+                                                         "isRightTrack(IntermediateKinLepton)",// 5
+                                                         "isRightTrack(Kaon)",                 // 6
+                                                         "isRightTrack(SlowPion)",             // 7
+                                                         "isRightTrack(FastHadron)",             // 8
+                                                         "isRightTrack(MaximumPstar)",         // 9
+                                                         "isRightTrack(Lambda)",                // 10
+                                                         "isRightCategory(Electron)",             // 11
+                                                         "isRightCategory(IntermediateElectron)", // 12
+                                                         "isRightCategory(Muon)",                 // 13
+                                                         "isRightCategory(IntermediateMuon)",     // 14
+                                                         "isRightCategory(KinLepton)",            // 15
+                                                         "isRightCategory(IntermediateKinLepton)",// 16
+                                                         "isRightCategory(Kaon)",                 // 17
+                                                         "isRightCategory(SlowPion)",             // 18
+                                                         "isRightCategory(FastHadron)",             // 19
+                                                         "isRightCategory(MaximumPstar)",         // 20
+                                                         "isRightCategory(Lambda)",                // 21
+                                                         "isRightCategory(KaonPion)",             // 22
+                                                         "isRightCategory(FSC)",                  // 23
+                                                   };
+
     Manager::FunctionPtr QpOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
@@ -1450,33 +1478,6 @@ namespace Belle2 {
 
         int indexOutput = -1;
         int indexRanking = -1;
-
-
-        std::vector<std::string> availableExtraInfos = {     "isRightTrack(Electron)",             // 0
-                                                             "isRightTrack(IntermediateElectron)", // 1
-                                                             "isRightTrack(Muon)",                 // 2
-                                                             "isRightTrack(IntermediateMuon)",     // 3
-                                                             "isRightTrack(KinLepton)",            // 4
-                                                             "isRightTrack(IntermediateKinLepton)",// 5
-                                                             "isRightTrack(Kaon)",                 // 6
-                                                             "isRightTrack(SlowPion)",             // 7
-                                                             "isRightTrack(FastHadron)",             // 8
-                                                             "isRightTrack(MaximumPstar)",         // 9
-                                                             "isRightTrack(Lambda)",                // 10
-                                                             "isRightCategory(Electron)",             // 11
-                                                             "isRightCategory(IntermediateElectron)", // 12
-                                                             "isRightCategory(Muon)",                 // 13
-                                                             "isRightCategory(IntermediateMuon)",     // 14
-                                                             "isRightCategory(KinLepton)",            // 15
-                                                             "isRightCategory(IntermediateKinLepton)",// 16
-                                                             "isRightCategory(Kaon)",                 // 17
-                                                             "isRightCategory(SlowPion)",             // 18
-                                                             "isRightCategory(FastHadron)",             // 19
-                                                             "isRightCategory(MaximumPstar)",         // 20
-                                                             "isRightCategory(Lambda)",                // 21
-                                                             "isRightCategory(KaonPion)",             // 22
-                                                             "isRightCategory(FSC)",                  // 23
-                                                       };
 
         for (unsigned i = 0; i < availableExtraInfos.size(); ++i) {
           if (rankingExtraInfo == availableExtraInfos[i]) indexRanking = i;
@@ -1502,7 +1503,7 @@ namespace Belle2 {
         }
 
 
-        auto func = [particleListName, indexOutput, indexRanking, availableExtraInfos](const Particle*) -> double {
+        auto func = [particleListName, indexOutput, indexRanking](const Particle*) -> double {
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
           PCmsLabTransform T;
           Particle* target = nullptr; //Particle selected as target
@@ -1569,32 +1570,6 @@ namespace Belle2 {
         int indexRanking = -1;
 
 
-        std::vector<std::string> availableExtraInfos = {     "isRightTrack(Electron)",             // 0
-                                                             "isRightTrack(IntermediateElectron)", // 1
-                                                             "isRightTrack(Muon)",                 // 2
-                                                             "isRightTrack(IntermediateMuon)",     // 3
-                                                             "isRightTrack(KinLepton)",            // 4
-                                                             "isRightTrack(IntermediateKinLepton)",// 5
-                                                             "isRightTrack(Kaon)",                 // 6
-                                                             "isRightTrack(SlowPion)",             // 7
-                                                             "isRightTrack(FastHadron)",             // 8
-                                                             "isRightTrack(MaximumPstar)",         // 9
-                                                             "isRightTrack(Lambda)",                // 10
-                                                             "isRightCategory(Electron)",             // 11
-                                                             "isRightCategory(IntermediateElectron)", // 12
-                                                             "isRightCategory(Muon)",                 // 13
-                                                             "isRightCategory(IntermediateMuon)",     // 14
-                                                             "isRightCategory(KinLepton)",            // 15
-                                                             "isRightCategory(IntermediateKinLepton)",// 16
-                                                             "isRightCategory(Kaon)",                 // 17
-                                                             "isRightCategory(SlowPion)",             // 18
-                                                             "isRightCategory(FastHadron)",             // 19
-                                                             "isRightCategory(MaximumPstar)",         // 20
-                                                             "isRightCategory(Lambda)",                // 21
-                                                             "isRightCategory(KaonPion)",             // 22
-                                                             "isRightCategory(FSC)",                  // 23
-                                                       };
-
         for (unsigned i = 0; i < availableExtraInfos.size(); ++i) {
           if (rankingExtraInfo == availableExtraInfos[i]) indexRanking = i;
         }
@@ -1618,7 +1593,7 @@ namespace Belle2 {
                   ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
         }
 
-        auto func = [particleListName, indexOutput, indexRanking, rankingExtraInfo, availableExtraInfos](const Particle*) -> double {
+        auto func = [particleListName, indexOutput, indexRanking, rankingExtraInfo](const Particle*) -> double {
 
           double final_value = 0.0;
 
@@ -1692,92 +1667,65 @@ namespace Belle2 {
 
     Manager::FunctionPtr variableOfTarget(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 3) {
-        auto particleListName = arguments[0];
-        auto inputVariable = arguments[1];
-        auto rankingExtraInfo = arguments[2];
 
-        int indexRanking = -1;
+      if (arguments.size() != 3)
+        B2FATAL("Wrong number of arguments (3 required) for meta function variableOfTarget");
 
+      auto particleListName = arguments[0];
+      auto inputVariable = arguments[1];
+      auto rankingExtraInfo = arguments[2];
 
-        std::vector<std::string> availableExtraInfos = {     "isRightTrack(Electron)",             // 0
-                                                             "isRightTrack(IntermediateElectron)", // 1
-                                                             "isRightTrack(Muon)",                 // 2
-                                                             "isRightTrack(IntermediateMuon)",     // 3
-                                                             "isRightTrack(KinLepton)",            // 4
-                                                             "isRightTrack(IntermediateKinLepton)",// 5
-                                                             "isRightTrack(Kaon)",                 // 6
-                                                             "isRightTrack(SlowPion)",             // 7
-                                                             "isRightTrack(FastHadron)",             // 8
-                                                             "isRightTrack(MaximumPstar)",         // 9
-                                                             "isRightTrack(Lambda)",                // 10
-                                                             "isRightCategory(Electron)",             // 11
-                                                             "isRightCategory(IntermediateElectron)", // 12
-                                                             "isRightCategory(Muon)",                 // 13
-                                                             "isRightCategory(IntermediateMuon)",     // 14
-                                                             "isRightCategory(KinLepton)",            // 15
-                                                             "isRightCategory(IntermediateKinLepton)",// 16
-                                                             "isRightCategory(Kaon)",                 // 17
-                                                             "isRightCategory(SlowPion)",             // 18
-                                                             "isRightCategory(FastHadron)",             // 19
-                                                             "isRightCategory(MaximumPstar)",         // 20
-                                                             "isRightCategory(Lambda)",                // 21
-                                                             "isRightCategory(KaonPion)",             // 22
-                                                             "isRightCategory(FSC)",                  // 23
-                                                       };
+      int indexRanking = -1;
 
-        for (unsigned i = 0; i < availableExtraInfos.size(); ++i) {
-          if (rankingExtraInfo == availableExtraInfos[i]) indexRanking = i;
-        }
+      for (unsigned i = 0; i < availableExtraInfos.size(); ++i) {
+        if (rankingExtraInfo == availableExtraInfos[i]) indexRanking = i;
+      }
 
-        if (indexRanking == -1) {
-          B2FATAL("variableOfTarget: Not available category " << rankingExtraInfo <<
-                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
-                  <<
-                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
-        }
+      if (indexRanking == -1) {
+        B2FATAL("variableOfTarget: Not available category " << rankingExtraInfo <<
+                ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
+                <<
+                ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
+      }
 
 
-        auto func = [particleListName, inputVariable, indexRanking, availableExtraInfos](const Particle*) -> double {
-          StoreObjPtr<ParticleList> ListOfParticles(particleListName);
-          PCmsLabTransform T;
-          Particle* target = nullptr; //Particle selected as target
-          double output = std::numeric_limits<float>::quiet_NaN();
+      auto func = [particleListName, inputVariable, indexRanking](const Particle*) -> double {
+        StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+        PCmsLabTransform T;
+        Particle* target = nullptr; //Particle selected as target
+        double output = std::numeric_limits<float>::quiet_NaN();
 
-          if (ListOfParticles.isValid())
-          {
-            float maximumTargetProb = 0; //Probability of being the target track from the track level
-            for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
-              Particle* particlei = ListOfParticles->getParticle(i);
-              if (particlei != nullptr) {
-                double target_prob = 0;
-                if (indexRanking == 9 || indexRanking == 20) { // MaximumPstar
-                  TLorentzVector momParticlei = T.rotateLabToCms() * particlei -> get4Vector();
-                  if (momParticlei == momParticlei) {
-                    target_prob = momParticlei.P();
-                  }
-                } else {
-                  if (particlei->hasExtraInfo(availableExtraInfos[indexRanking])) {
-                    target_prob = particlei->getExtraInfo(availableExtraInfos[indexRanking]);
-                  }
+        if (ListOfParticles.isValid())
+        {
+          float maximumTargetProb = 0; //Probability of being the target track from the track level
+          for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+            Particle* particlei = ListOfParticles->getParticle(i);
+            if (particlei != nullptr) {
+              double target_prob = 0;
+              if (indexRanking == 9 || indexRanking == 20) { // MaximumPstar
+                TLorentzVector momParticlei = T.rotateLabToCms() * particlei -> get4Vector();
+                if (momParticlei == momParticlei) {
+                  target_prob = momParticlei.P();
                 }
-                if (target_prob > maximumTargetProb) {
-                  maximumTargetProb = target_prob;
-                  target = particlei;
+              } else {
+                if (particlei->hasExtraInfo(availableExtraInfos[indexRanking])) {
+                  target_prob = particlei->getExtraInfo(availableExtraInfos[indexRanking]);
                 }
               }
-            }
-            if (target != nullptr) {
-              Variable::Manager& manager = Variable::Manager::Instance();
-              output = manager.getVariable(inputVariable)-> function(target);
+              if (target_prob > maximumTargetProb) {
+                maximumTargetProb = target_prob;
+                target = particlei;
+              }
             }
           }
-          return output;
-        };
-        return func;
-      } else {
-        B2FATAL("Wrong number of arguments (3 required) for meta function variableOfTarget");
-      }
+          if (target != nullptr) {
+            Variable::Manager& manager = Variable::Manager::Instance();
+            output = manager.getVariable(inputVariable)-> function(target);
+          }
+        }
+        return output;
+      };
+      return func;
     }
 
     Manager::FunctionPtr hasTrueTarget(const std::vector<std::string>& arguments)

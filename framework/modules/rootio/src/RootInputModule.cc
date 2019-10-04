@@ -13,6 +13,7 @@
 
 #include <framework/io/RootIOUtilities.h>
 #include <framework/io/RootFileInfo.h>
+#include <framework/core/FileCatalog.h>
 #include <framework/core/InputController.h>
 #include <framework/pcore/Mergeable.h>
 #include <framework/datastore/StoreObjPtr.h>

@@ -94,7 +94,8 @@ int BKLMElementNumbers::getNStrips(
   checkLayer(layer);
   checkPlane(plane);
   int strips = 0;
-  if (section == BKLMElementNumbers::c_BackwardSection && sector == 3 && plane == 0) {
+  if (section == BKLMElementNumbers::c_BackwardSection && sector == 3 &&
+      plane == BKLMElementNumbers::c_ZPlane) {
     /* Chimney sector. */
     if (layer < 3)
       strips = 38;
@@ -102,19 +103,19 @@ int BKLMElementNumbers::getNStrips(
       strips = 34;
   } else {
     /* Other sectors. */
-    if (layer == 1 && plane == 1)
+    if (layer == 1 && plane == BKLMElementNumbers::c_PhiPlane)
       strips = 37;
-    if (layer == 2 && plane == 1)
+    if (layer == 2 && plane == BKLMElementNumbers::c_PhiPlane)
       strips = 42;
-    if (layer > 2 && layer < 7 && plane == 1)
+    if (layer > 2 && layer < 7 && plane == BKLMElementNumbers::c_PhiPlane)
       strips = 36;
-    if (layer > 6 && plane == 1)
+    if (layer > 6 && plane == BKLMElementNumbers::c_PhiPlane)
       strips = 48;
-    if (layer == 1 && plane == 0)
+    if (layer == 1 && plane == BKLMElementNumbers::c_ZPlane)
       strips = 54;
-    if (layer == 2 && plane == 0)
+    if (layer == 2 && plane == BKLMElementNumbers::c_ZPlane)
       strips = 54;
-    if (layer > 2 && plane == 0)
+    if (layer > 2 && plane == BKLMElementNumbers::c_ZPlane)
       strips = 48;
   }
   return strips;

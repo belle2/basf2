@@ -3,6 +3,8 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
+#include <boost/process.hpp>
+
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -82,20 +84,18 @@ namespace Belle2::Utils {
   }
 
   std::string getCommandOutput(const std::string& command, const std::vector<std::string>& arguments,
-                               bool searchPath [[maybe_unused]])
+                               bool searchPath)
   {
-    std::string cmd = command;
-    for (auto& arg : arguments) {
-      cmd += " " + arg;
-    }
+    namespace bp = boost::process;
+    auto cmd = searchPath ? bp::search_path(command) : boost::filesystem::path(command);
+    bp::ipstream stdout;
+    bp::child child(cmd, bp::args(arguments), bp::std_in.close(), bp::std_out > stdout);
+    char buffer[4096];
     std::string result;
-    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
-    if (pipe) {
-      std::array<char, 256> buffer;
-      while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-        result += buffer.data();
-      }
+    while (child.running() && stdout.read(buffer, sizeof(buffer))) {
+      result.append(buffer, sizeof(buffer));
     }
+    if (stdout.gcount()) result.append(buffer, stdout.gcount());
     return result;
   }
 }

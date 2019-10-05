@@ -46,6 +46,7 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   m_Charge(0.0),
   m_FitStatus(0)
 {
+  m_ModuleID = simHit->getModuleID();
   BKLMElementNumbers::setStripInModule(m_ModuleID, strip);
   BKLMStatus::setMaximalStrip(m_ModuleID, strip);
 }

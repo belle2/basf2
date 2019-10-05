@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-import reconstruction as re
-import simulation as si
 import os
 
 # ---------------------------------------------------------------
 # example of using OpticalGun to simulate laser light sources
 # two sources at the left and right side of prism, outside quartz
+#
+# Contributors: Marko Staric
+#               Stefano Lacaprara
+#               Umberto Tamponi
 # ---------------------------------------------------------------
 
 

@@ -4,7 +4,8 @@
  * Copyright(C) 2013-2018 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Christian Pulvermacher, Yo Sato             *
+ * Contributors: Anze Zupanc, Christian Pulvermacher, Yo Sato,            *
+ *               Alejandro Mora                                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -46,7 +47,7 @@ std::string MCMatching::explainFlags(unsigned int flags)
         case c_AddedWrongParticle    : s += "c_AddedWrongParticle"; break;
         case c_InternalError         : s += "c_InternalError"; break;
         case c_MissPHOTOS            : s += "c_MissPHOTOS"; break;
-        case c_AddedRecoBremsPhoton : s += "c_AddedRecoBremsPhoton"; break;
+        case c_AddedRecoBremsPhoton  : s += "c_AddedRecoBremsPhoton"; break;
         default:
           s += to_string(f);
           B2ERROR("MCMatching::explainFlags() doesn't know about flag " << f << ", please update it.");
@@ -290,8 +291,12 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
         daughterStatus |= c_AddedRecoBremsPhoton;
       }
       //If it has, check if the MC particle is (n*grand)-daughter of the particle mother. If it isn't, we'll add the error flag
-      else if (std::find(genParts.begin(), genParts.end(),
-                         mcDaughter) == genParts.end()) daughterStatus |= getMCErrors(daughter) | c_AddedRecoBremsPhoton;
+      else if (std::find(genParts.begin(), genParts.end(), mcDaughter) == genParts.end()) {
+        daughterStatus |= getMCErrors(daughter) | c_AddedRecoBremsPhoton;
+        //If it is, just perform the normal matching without error flags of any type
+      } else {
+        daughterStatus |= getMCErrors(daughter);
+      }
     } else daughterStatus |= getMCErrors(daughter);
   }
   status |= (daughterStatus & daughterStatusAcceptMask);

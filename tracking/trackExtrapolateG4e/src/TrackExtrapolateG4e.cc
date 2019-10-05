@@ -315,7 +315,8 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_BarrelScintVariance = width * width / 12.0;
   int nBarrelLayers = bklmGeometry->getNLayer();
   for (int layer = 1; layer <= nBarrelLayers; ++layer) {
-    const bklm::Module* module = bklmGeometry->findModule(false);
+    const bklm::Module* module =
+      bklmGeometry->findModule(BKLMElementNumbers::c_ForwardSection, 1, layer);
     width = module->getPhiStripWidth(); // in G4e units (cm)
     m_BarrelPhiStripVariance[layer - 1] = width * width / 12.0;
     width = module->getZStripWidth(); // in G4e units (cm)

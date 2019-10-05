@@ -726,17 +726,6 @@ namespace Belle2 {
       return (iM == m_Modules.end() ? NULL : iM->second);
     }
 
-    const Module* GeometryPar::findModule(bool hasChimney) const
-    {
-      int sector;
-      /* Chimney module is in backward sector 3. */
-      if (hasChimney)
-        sector = BKLMElementNumbers::c_ChimneySector;
-      else
-        sector = 1;
-      return findModule(BKLMElementNumbers::c_BackwardSection, sector, 1);
-    }
-
     const HepGeom::Transform3D GeometryPar::getModuleAlignment(int section, int sector, int layer) const
     {
       int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);

@@ -22,14 +22,14 @@ def addSource(x, angle, slotID, path):
     @param slotID 1-16, slot number. If it's 0, then all the coorinates are in the BelleII frame
     '''
     path.add_module('OpticalGun',
-                    minAlpha=0.0,  # not used if angulardistribution =0 'Gaussian'
-                    maxAlpha=33.0,
-                    na=0.50,
+                    minAlpha=0.0,  # not used if angulardistribution == 'Gaussian'
+                    maxAlpha=33.0,  # not used if angulardistribution == 'Gaussian'
+                    na=0.50,       # used only if angulardistribution == 'Gaussian'
                     startTime=0,
-                    pulseWidth=10.0e-3,
+                    pulseWidth=10.0e-3,  # laser time jitter (1 Gaussian sigma), [ns]
                     numPhotons=10,
-                    diameter=10.0e-3,
-                    slotID=slotID,  # if nonzero, local (bar) frame, otherwise Belle II
+                    diameter=10.0e-3,  # source diameter in cm
+                    slotID=slotID,  # if nonzero, local (slot) frame, otherwise Belle II
                     x=x,
                     y=-3.26,
                     z=-131.33,

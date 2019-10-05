@@ -423,7 +423,7 @@ namespace Belle2 {
       for (int section = 0; section <= BKLMElementNumbers::getMaximalSectionNumber(); ++section) {
         bool isForward = (section == BKLMElementNumbers::c_ForwardSection);
         for (int sector = 1; sector <= m_NSector; ++sector) {
-          bool hasChimney = (!isForward) && (sector == CHIMNEY_SECTOR);
+          bool hasChimney = (!isForward) && (sector == BKLMElementNumbers::c_ChimneySector);
           int nZStrips = (hasChimney ? m_NZStripsChimney : m_NZStrips);
           int nZScints = (hasChimney ? m_NZScintsChimney : m_NZScints);
           CLHEP::HepRotation rotation;
@@ -731,7 +731,7 @@ namespace Belle2 {
       int sector;
       /* Chimney module is in backward sector 3. */
       if (hasChimney)
-        sector = 3;
+        sector = BKLMElementNumbers::c_ChimneySector;
       else
         sector = 1;
       return findModule(BKLMElementNumbers::c_BackwardSection, sector, 1);

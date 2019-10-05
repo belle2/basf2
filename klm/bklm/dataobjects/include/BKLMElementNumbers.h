@@ -40,6 +40,20 @@ namespace Belle2 {
     };
 
     /**
+     * Constants for sector numbers.
+     */
+    enum Sector {
+
+      /**
+       * Chimney sector:
+       * BB3 in 1-based notation;
+       * BB2 in 0-based notation.
+      */
+      c_ChimneySector = 3,
+
+    };
+
+    /**
      * Constants for plane numbers.
      */
     enum Plane {

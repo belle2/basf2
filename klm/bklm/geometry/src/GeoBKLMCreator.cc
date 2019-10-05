@@ -190,7 +190,7 @@ namespace Belle2 {
       char name[80] = "";
       for (int s = 0; s < m_GeoPar->getNSector(); ++s) {
         int sector = (section == BKLMElementNumbers::c_ForwardSection ? s : ((12 - s) % 8)) + 1;
-        bool hasChimney = (section == BKLMElementNumbers::c_BackwardSection) && (sector == CHIMNEY_SECTOR);
+        bool hasChimney = (section == BKLMElementNumbers::c_BackwardSection) && (sector == BKLMElementNumbers::c_ChimneySector);
         bool hasInnerSupport = (sector <= m_GeoPar->getNSector() / 2 + 1);
         sprintf(name, "BKLM.%sSector%dLogical", (section == BKLMElementNumbers::c_ForwardSection ? "Forward" : "Backward"), sector);
         m_SectorLogical[section][sector - 1] =

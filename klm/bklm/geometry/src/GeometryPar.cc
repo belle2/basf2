@@ -726,7 +726,7 @@ namespace Belle2 {
       return (iM == m_Modules.end() ? NULL : iM->second);
     }
 
-    const Module* GeometryPar::findModule(int layer, bool hasChimney) const
+    const Module* GeometryPar::findModule(bool hasChimney) const
     {
       int sector;
       /* Chimney module is in backward sector 3. */

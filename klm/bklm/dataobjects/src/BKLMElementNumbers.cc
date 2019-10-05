@@ -11,9 +11,6 @@
 /* Own header. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 
-/* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMStatus.h>
-
 /* Belle 2 headers. */
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 

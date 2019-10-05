@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
+import reconstruction as re
+import simulation as si
 import os
 
 # ---------------------------------------------------------------
@@ -9,55 +11,55 @@ import os
 # two sources at the left and right side of prism, outside quartz
 # ---------------------------------------------------------------
 
+
+def addSource(x, angle, slotID, path):
+    '''
+    Adds a laser source to the path
+    @param x local x coordinate of teh source in the bar frame
+    @param angle vertical tilt of the source
+    @param slotID 1-16, slot number. If it's 0, then all the coorinates are in the BelleII frame
+    '''
+    path.add_module('OpticalGun',
+                    minAlpha=0.0,  # not used if angulardistribution =0 'Gaussian'
+                    maxAlpha=33.0,
+                    na=0.50,
+                    startTime=0,
+                    pulseWidth=10.0e-3,
+                    numPhotons=10,
+                    diameter=10.0e-3,
+                    slotID=slotID,  # if nonzero, local (bar) frame, otherwise Belle II
+                    x=x,
+                    y=-3.26,
+                    z=-131.33,
+                    theta=180 + angle,
+                    phi=0.0,
+                    psi=0.0,
+                    angularDistribution='uniform'
+                    #                    angularDistribution = '(10-x)*TMath::Sin(x)'
+
+                    )
+
 # Create path
-main = create_path()
-
-
-# Optical sources
-
-def fiber(
-    x,
-    angle,
-    barID=1,
-    path=main,
-):
-
-    source1 = register_module('OpticalGun')
-    source1.param('alpha', 60.0)
-    source1.param('na', 0.50)
-    source1.param('startTime', 0)
-    source1.param('pulseWidth', 10.0e-3)
-    source1.param('numPhotons', 10)
-    source1.param('diameter', 10.0e-3)
-    source1.param('barID', barID)  # if nonzero, local (bar) frame, otherwise Belle II
-    source1.param('x', x)
-    source1.param('y', -3.26)
-    source1.param('z', -131.33)
-    source1.param('theta', 180 + angle)
-    source1.param('phi', 0.0)
-    source1.param('psi', 0.0)
-    source1.param('angularDistribution', 'Gaussian')
-    # source1.param('angularDistribution', 'Lambertian')
-    path.add_module(source1)
+main = b2.create_path()
 
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [100])
-main.add_module(eventinfosetter)
+main.add_module('EventInfoSetter',
+                expList=[1003],  # 0 for nominal phase 3, 1002 for phase II, 1003 for early phase III
+                evtNumList=[100])
 
 # Gearbox: access to database (xml files)
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
+main.add_module('Gearbox')
 
 # Geometry
-geometry = register_module('Geometry')
-geometry.param('useDB', False)
-geometry.param('components', ['TOP'])
-main.add_module(geometry)
+# geometry = register_module('Geometry')
+# geometry.param('useDB', False)
+# geometry.param('components', ['TOP'])
+# main.add_module(geometry)
+main.add_module('Geometry')
 
 # Optical sources
-for barId in range(16):
+for slotId in range(1, 17):
     for pos in [
         0.9,
         5.7,
@@ -71,27 +73,23 @@ for barId in range(16):
     ]:
         angle = 17
         x = -45. / 2. + pos
-        fiber(x, angle, barId + 1, main)
+        addSource(x, angle, slotId, main)
 
 # Simulation
-simulation = register_module('FullSim')
-main.add_module(simulation)
+main.add_module('FullSim')
 
 # TOP digitization
-topdigi = register_module('TOPDigitizer')
-main.add_module(topdigi)
+main.add_module('TOPDigitizer')
 
 # Output
-output = register_module('RootOutput')
-output.param('outputFileName', 'opticalGun.root')
-main.add_module(output)
+main.add_module('RootOutput',
+                outputFileName='opticalGun.root')
 
 # Show progress of processing
-progress = register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

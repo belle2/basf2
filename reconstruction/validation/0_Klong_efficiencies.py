@@ -18,12 +18,18 @@ import reconstruction as rec
 import os
 import glob
 
+bg = None
+if 'BELLE2_BACKGROUND_DIR' in os.environ:
+    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+else:
+    b2.B2FATAL('The variable BELLE2_BACKGROUND_DIR is not set!')
+
 b2.set_random_seed('L1V0RN0')
 
 main = b2.create_path()
 
 main.add_module('EventInfoSetter',
-                expList=1003,
+                expList=0,
                 runList=0,
                 evtNumList=1000)
 
@@ -33,13 +39,8 @@ main.add_module('ParticleGun',
                 momentumParams=[0.05, 5.0],
                 pdgCodes=[130, 321, 311, 2212, 2112, 211, 13, 11])
 
-if 'BELLE2_BACKGROUND_DIR' in os.environ:
-    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
-    sim.add_simulation(path=main,
-                       bkgfiles=bg)
-else:
-    b2.B2WARNING('Beam background files not found!')
-    sim.add_simulation(path=main)
+sim.add_simulation(path=main,
+                   bkgfiles=bg)
 
 rec.add_reconstruction(path=main)
 
@@ -50,7 +51,7 @@ main.add_module('KlongValidation',
 
 # add_mdst_output(main, True, 'Klong_validation_check.root')
 
-main.add_module('ProgressBar')
+main.add_module('Progress')
 
 b2.process(main)
 print(b2.statistics)

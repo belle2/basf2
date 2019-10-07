@@ -61,6 +61,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
     else
       m_HitNumberEKLM += hits;
   }
+  clearCalibrationData();
   if (m_ChannelStatus != nullptr)
     delete m_ChannelStatus;
   m_ChannelStatus = new KLMChannelStatus();

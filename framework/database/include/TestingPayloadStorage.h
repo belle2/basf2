@@ -55,7 +55,7 @@ namespace Belle2 {
       /** Read the given storage file, done lazily on first access to get() after construction or call to reset() */
       void read();
       /** Map of known payloads to a list of known revisions and their interval of validity */
-      std::unordered_map<std::string, std::vector<std::tuple<size_t, IntervalOfValidity>>> m_payloads;
+      std::unordered_map<std::string, std::vector<std::tuple<std::string, IntervalOfValidity>>> m_payloads;
       /** Storage file where to look for payloads. This is the logical file name as given by the user */
       std::string m_filename;
       /** Storage file where to look for payloads converted to an absolute path to be robust against directory changes */
@@ -67,7 +67,7 @@ namespace Belle2 {
       /** Remember whether we read the file already */
       bool m_initialized{false};
       /** Build the filename for a new payload with a given name and revision in a directory */
-      static std::string payloadFilename(const std::string& path, const std::string& name, int revision);
+      static std::string payloadFilename(const std::string& path, const std::string& name, const std::string& revision);
       /** Write a payload file from the given object and name. Will create new
        * root file containing object under the Key name with the name fileName
        */
@@ -76,8 +76,15 @@ namespace Belle2 {
        * validity. This function first tries to find the next free revision and
        * then call the writer function to write the payload to the given
        * filename. If the writer function returns success the payload is added
-       * to the storage file */
-      bool store(const std::string& name, const IntervalOfValidity& iov, const std::function<bool(const std::string&)>& writer);
+       * to the storage file
+       *
+       * @param name payload name
+       * @param iov iov for the payload
+       * @param source source filename to use. If this is empty there is no file yet and it has to be created first
+       * @param writer callback function to create a file. Will be called with a destination filename if the source parameter was emty
+       */
+      bool store(const std::string& name, const IntervalOfValidity& iov, const std::string& source,
+                 const std::function<bool(const std::string&)>& writer);
     };
   } // Conditions namespace
 } // Belle2 namespace

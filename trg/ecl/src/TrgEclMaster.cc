@@ -584,12 +584,9 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   int nBin = 2 * 8000 / TimeWindow ;
   double WindowStart = 0;
   double WindowEnd = 0;
-  //  double fluctuation = ((gRandom ->Uniform(-1, 0))) * 125;
+  double fluctuation = ((gRandom ->Uniform(-1, 0))) * 125;
 
-  double fluctuation = 0;
-
-  //  int startBin = nBin / 2 - 1; //start previous bin near 0s
-  int startBin = 32; //start previous bin near 0s
+  int startBin = nBin / 2 - 1; //start previous bin near 0s
 
   int endBin = nBin / 2 + 1; //start next bin near 0s
 

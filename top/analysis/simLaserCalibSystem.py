@@ -36,8 +36,8 @@ def addSource(x, angle, slotID, path):
                     theta=180 + angle,
                     phi=0.0,
                     psi=0.0,
-                    angularDistribution='uniform'
-                    #                    angularDistribution = '(10-x)*TMath::Sin(x)'
+                    # angularDistribution='uniform'
+                    angularDistribution='(40-x)*TMath::Sin(x)'
 
                     )
 
@@ -54,10 +54,6 @@ main.add_module('EventInfoSetter',
 main.add_module('Gearbox')
 
 # Geometry
-# geometry = register_module('Geometry')
-# geometry.param('useDB', False)
-# geometry.param('components', ['TOP'])
-# main.add_module(geometry)
 main.add_module('Geometry')
 
 # Optical sources

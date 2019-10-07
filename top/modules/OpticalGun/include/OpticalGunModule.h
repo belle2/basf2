@@ -16,6 +16,7 @@
 #include <string>
 #include <TVector3.h>
 #include <TRotation.h>
+#include <TF1.h>
 
 // DataStore
 #include <framework/datastore/StoreArray.h>
@@ -121,6 +122,8 @@ namespace Belle2 {
     TVector3 m_translate;  /**< translation to Belle II frame */
     TRotation m_rotate;    /**< rotation to Belle II frame */
     TRotation m_rotateBar; /**< rotation of a bar */
+
+    TF1* m_customDistribution = 0; /**< Custom angular distribution, that uses m_angularDistribution as formula. */
 
     // data store objects
     StoreArray<MCParticle> m_MCParticles; /**< MC particles collection */

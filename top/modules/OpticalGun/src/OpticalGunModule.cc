@@ -62,7 +62,7 @@ namespace Belle2 {
     addParam("maxAlpha", m_maxAlpha, "source maximum emission angle [deg]. ", 30.);
     addParam("na", m_na, "source numerical aperture. It is used only by the Gaussian distribution", 0.50);
     addParam("angularDistribution", m_angularDistribution,
-             "source angular distribution: uniform, Lambertian, an arbitrary TFormula, or  Gaussian (only one to use na and ignore m_minAlpha dn m_maxAlpha)",
+             "source angular distribution: uniform, Lambertian, an arbitrary TFormula, or  Gaussian (only one to use na and ignore m_minAlpha dn m_maxAlpha). If you are writing a TFormula, assume the angles are measured in degrees. The conversion to rad is done internally.",
              string("Gaussian"));
     addParam("wavelength", m_wavelength, "wavelength of photons [nm]", 405.0);
     addParam("phi", m_phi, "first rotation angle (around z) [deg]", 0.0);
@@ -88,6 +88,7 @@ namespace Belle2 {
 
   OpticalGunModule::~OpticalGunModule()
   {
+    delete m_customDistribution;
   }
 
   void OpticalGunModule::initialize()
@@ -98,9 +99,43 @@ namespace Belle2 {
 
     // parameters check
     if (m_wavelength < 150 or m_wavelength > 1000)
-      B2FATAL("Wavelength does not correspond to optical photons");
+      B2FATAL("Wavelength does not correspond to optical photons.");
     if (m_na < 0 or m_na > 1)
-      B2FATAL("Numerical aperture must be between 0 and 1");
+      B2FATAL("Numerical aperture must be between 0 and 1.");
+    if (m_minAlpha < 0)
+      B2FATAL("Minimum emission angle must be positive");
+    if (m_maxAlpha < 0)
+      B2FATAL("Maximum emission angle must be positive");
+    if (m_minAlpha >= m_maxAlpha)
+      B2FATAL("Minimum emission angle msut me smaller than the maximum emission angle");
+
+
+    if (m_angularDistribution == string("uniform") ||
+        m_angularDistribution == string("Lambertian") ||
+        m_angularDistribution == string("Gaussian"))
+      B2INFO("Using the  pre-defined angular distribution " << m_angularDistribution);
+    else {
+      B2INFO(m_angularDistribution << " is not a pre-defined distribution. Checking if it's a valid, positively-defined TFormula.");
+      TFormula testFormula("testFormula", m_angularDistribution.c_str());
+      int result = testFormula.Compile();
+      if (result != 0) {
+        B2FATAL(m_angularDistribution << " is not a valid angular distribution keyword, or it's a TFormula that does not compile.");
+      }
+      double testPoint = m_minAlpha; // let's test if the function is postive defined everywhere
+      while (testPoint < m_maxAlpha) {
+        double value = testFormula.Eval(testPoint * Unit::deg);
+        if (value < 0) {
+          B2FATAL("The formula " << m_angularDistribution << " is not positively defined in the test point " << testPoint << " deg (value = "
+                  <<
+                  value << ")");
+        }
+        testPoint += (m_maxAlpha - m_minAlpha) / 100.;
+      }
+      m_customDistribution = new TF1("m_customDistribution", m_angularDistribution.c_str(), m_minAlpha * Unit::deg,
+                                     m_maxAlpha * Unit::deg);
+    }
+
+
 
     // set other private variables
     m_cosMinAlpha = cos(m_minAlpha * Unit::deg);
@@ -167,20 +202,7 @@ namespace Belle2 {
         direction = getDirectionLambertian();
       } else if (m_angularDistribution == string("Gaussian")) {
         direction = getDirectionGaussian();
-      } else {
-        TFormula testFormula("testFormula", m_angularDistribution.c_str());
-        int result = testFormula.Compile();
-        if (result != 0) {
-          B2FATAL(m_angularDistribution << " is not a valid angular distribution keyword, or it's a TFormula that does not compile.");
-        }
-        float testPoint = m_minAlpha; // let's test if the function is postive defined everywhere
-        while (testPoint < m_minAlpha) {
-          float value = testFormula.Eval(testPoint);
-          if (value < 0) {
-            B2FATAL("The formula " << m_angularDistribution << " is not positively defined over the whole range (" << m_minAlpha << ", " <<
-                    m_maxAlpha << ")");
-          }
-        }
+      } else { // we already have tested the formula and initialized the TF1 in the initialize() method
         direction = getDirectionCustom();
       }
       TVector3 momentum = m_energy * direction;
@@ -288,8 +310,7 @@ namespace Belle2 {
 
   TVector3 OpticalGunModule::getDirectionCustom() const
   {
-    TF1 customDistribution("customDistribution", m_angularDistribution.c_str(), m_minAlpha * Unit::deg, m_maxAlpha * Unit::deg);
-    double alpha = customDistribution.GetRandom();
+    double alpha = m_customDistribution->GetRandom();
     double phi = 2.0 * M_PI * gRandom->Rndm();
     return TVector3(cos(phi) * sin(alpha), sin(phi) * sin(alpha), cos(alpha));
   }

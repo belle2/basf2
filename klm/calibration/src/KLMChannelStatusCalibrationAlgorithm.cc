@@ -27,6 +27,8 @@ KLMChannelStatusCalibrationAlgorithm::KLMChannelStatusCalibrationAlgorithm() :
 
 KLMChannelStatusCalibrationAlgorithm::~KLMChannelStatusCalibrationAlgorithm()
 {
+  if (m_ChannelStatus != nullptr)
+    delete m_ChannelStatus;
   if (m_ModuleStatus != nullptr)
     delete m_ModuleStatus;
 }
@@ -59,6 +61,8 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
     else
       m_HitNumberEKLM += hits;
   }
+  if (m_ChannelStatus != nullptr)
+    delete m_ChannelStatus;
   m_ChannelStatus = new KLMChannelStatus();
   m_ChannelStatus->setStatusAllChannels(KLMChannelStatus::c_Undetermined);
   /* If there are no hits, then mark all channels as dead. */

@@ -12,14 +12,7 @@ from time import sleep
 
 def _receive(socket, filtering=True):
     """Internal helper function to ask a socket for monitoring and get the answer as JSON"""
-    poller = zmq.Poller()
-    poller.register(socket, zmq.POLLIN)
-    answers = dict(poller.poll(1000))
-    if socket in answers:
-        _, message, _ = socket.recv_multipart()
-    else:
-        raise RuntimeError("Socket not connected! Is service running?")
-
+    _, message, _ = socket.recv_multipart()
     message = json.loads(message.decode())
 
     def normalize(value):

@@ -6,6 +6,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::KLMChannelStatusCalibrationAlgorithm;
+#pragma link C++ class Belle2::KLMTimeCalibrationAlgorithm;
 #pragma link C++ class Belle2::KLMDatabaseImporter+;
 
 #endif

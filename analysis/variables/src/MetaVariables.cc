@@ -91,30 +91,6 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr useROERecoilFrame(const std::vector<std::string>& arguments)
-    {
-      if (arguments.size() == 1) {
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double {
-          const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-          if (!roe)
-          {
-            B2ERROR("Relation between particle and ROE doesn't exist!");
-            return -999.;
-          }
-          PCmsLabTransform T;
-          TLorentzVector pRecoil = T.getBeamFourMomentum() - roe->get4Vector();
-          Particle tmp(pRecoil, 0);
-          UseReferenceFrame<RestFrame> frame(&tmp);
-          double result = var->function(particle);
-          return result;
-        };
-        return func;
-      } else {
-        B2WARNING("Wrong number of arguments for meta function useROERecoilFrame");
-        return nullptr;
-      }
-    }
 
     Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments)
     {
@@ -2197,9 +2173,6 @@ Returns the value of ``variable`` in the *lab* frame.
 Specifying the lab frame is useful in some corner-cases. For example:
 ``useRestFrame(daughter(0, formula(E - useLabFrame(E))))`` which is the difference of the first daughter's energy in the rest frame of the mother (current particle) with the same daughter's lab-frame energy.
 )DOC");
-    REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
-                      "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
-                      "E.g. useROERecoilFrame(E) returns the energy of a particle in the ROE recoil frame.");
     REGISTER_VARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
                       "Useful if you want to write out if a particle would have passed a cut or not.\n"

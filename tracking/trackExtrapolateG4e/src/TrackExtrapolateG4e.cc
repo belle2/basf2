@@ -1023,7 +1023,6 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
         int sector = touch->GetCopyNumber(6);
         int section = touch->GetCopyNumber(7);
         copyID = BKLMElementNumbers::moduleNumber(section, sector, layer)
-                 | BKLM_INRPC_MASK
                  | BKLM_MC_MASK;
       }
       return;

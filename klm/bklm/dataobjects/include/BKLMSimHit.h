@@ -46,7 +46,10 @@ namespace Belle2 {
 
     //! Determine whether this hit is in an RPC or scintillator
     //! @return whether this hit is in an RPC (true) or scintillator (false)
-    bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
+    bool inRPC() const
+    {
+      return getLayer() >= BKLMElementNumbers::c_FirstRPCLayer;
+    }
 
     //! Get section number
     //! @return section number (1=forward or 0=backward) of this hit

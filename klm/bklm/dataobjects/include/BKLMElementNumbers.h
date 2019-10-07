@@ -45,8 +45,18 @@ namespace Belle2 {
        * Chimney sector:
        * BB3 in 1-based notation;
        * BB2 in 0-based notation.
-      */
+       */
       c_ChimneySector = 3,
+
+    };
+
+    /**
+     * Constants for layer numbers.
+     */
+    enum Layer {
+
+      /** First RPC layer. */
+      c_FirstRPCLayer = 3,
 
     };
 

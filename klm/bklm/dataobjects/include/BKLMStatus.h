@@ -15,9 +15,6 @@
 //! proper sorting in bklmReconstructor module.
 //! Also, definition of each status bit/mask.
 
-//! bit position for inRPC flag
-#define BKLM_INRPC_BIT 21
-
 //! bit position for MC-generated hit
 #define BKLM_MC_BIT 22
 
@@ -41,9 +38,6 @@
 
 //! bit position for used-on-BKLM-stand-alone-track flag (from BKLMTracking reconstruction)
 #define BKLM_ONSTATRACK_BIT 29
-
-//! bit mask for inRPC flag
-#define BKLM_INRPC_MASK (1 << BKLM_INRPC_BIT)
 
 //! bit mask for MC-generated hit
 #define BKLM_MC_MASK (1 << BKLM_MC_BIT)
@@ -70,7 +64,7 @@
 #define BKLM_ONSTATRACK_MASK (1 << BKLM_ONSTATRACK_BIT)
 
 //! bit mask for status bits
-#define BKLM_STATUS_MASK (BKLM_INRPC_MASK | BKLM_MC_MASK | BKLM_DECAYED_MASK | BKLM_OUTOFTIME_MASK | BKLM_INEFFICIENT_MASK | BKLM_ONTRACK_MASK | BKLM_ABOVETHRESHOLD_MASK | BKLM_ONSTATRACK_MASK)
+#define BKLM_STATUS_MASK (BKLM_MC_MASK | BKLM_DECAYED_MASK | BKLM_OUTOFTIME_MASK | BKLM_INEFFICIENT_MASK | BKLM_ONTRACK_MASK | BKLM_ABOVETHRESHOLD_MASK | BKLM_ONSTATRACK_MASK)
 
 namespace Belle2 {
 

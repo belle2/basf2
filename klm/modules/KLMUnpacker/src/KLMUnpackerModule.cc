@@ -232,7 +232,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
     return;
   int channel = BKLMElementNumbers::getStripByModule(moduleId);
 
-  if (layer > 15) {
+  if (layer > BKLMElementNumbers::getMaximalLayerNumber()) {
     B2DEBUG(20, "KLMUnpackerModule:: strange that the layer number is larger than 15 "
             << LogVar("Layer", layer));
     return;
@@ -242,8 +242,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
   BKLMStatus::setMaximalStrip(moduleId, channel);
 
   BKLMDigit* bklmDigit;
-  if (layer > 2) {
-    moduleId |= BKLM_INRPC_MASK;
+  if (layer >= BKLMElementNumbers::c_FirstRPCLayer) {
     klmDigitEventInfo->increaseRPCHits();
     // For RPC hits, digitize both the coarse (ctime) and fine (tdc) times relative
     // to the revo9 trigger time rather than the event header's TriggerCTime.

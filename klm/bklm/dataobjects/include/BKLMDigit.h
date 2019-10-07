@@ -69,7 +69,10 @@ namespace Belle2 {
 
     //! Determine whether hit is in RPC or scintillator
     //! @return whether hit is in RPC (true) or scintillator (false)
-    bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
+    bool inRPC() const
+    {
+      return getLayer() >= BKLMElementNumbers::c_FirstRPCLayer;
+    }
 
     //! Determine whether the scint hit is usable in fit
     //! @return whether the scint hit is usable (true) or not (false) in pulse-shape fit

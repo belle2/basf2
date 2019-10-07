@@ -136,7 +136,6 @@ namespace Belle2 {
         }
         int trackID = track->GetTrackID();
         if (m->hasRPCs()) {
-          moduleID |= BKLM_INRPC_MASK;
           int phiStripLower = -1;
           int phiStripUpper = -1;
           int zStripLower = -1;

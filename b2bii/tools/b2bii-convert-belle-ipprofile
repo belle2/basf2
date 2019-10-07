@@ -31,10 +31,41 @@ import argparse
 import sys
 import os
 import shutil
+import time
+import subprocess
 import numpy as np
 import multiprocessing
 from conditions_db.testing_payloads import parse_testing_payloads_file
 from collections import defaultdict
+
+
+class TCPWaiter(b2.Module):
+    """
+    Apparently the belle one software doesn't believe in reusing TCP connections
+    so if we convert too fast we will run out of available ports until the
+    database gets around to send the final FIN which seems to be much slower
+    than we can convert. So let's monitor the number of open ports and wait if
+    the number gets too high
+    """
+    def __init__(self, delay=10, max_open=30000):
+        super().__init__()
+        self._last = time.time() - delay
+        self._delay = delay
+        self._max_open = max_open
+
+    def event(self):
+        now = time.time()
+        if now - self._last < self._delay:
+            return
+
+        while True:
+            open_ports = int(subprocess.check_output("wc -l < /proc/net/tcp", shell=True))
+            if open_ports < self._max_open:
+                break
+            b2.B2WARNING(f"Waiting for ports to free up, currently {open_ports}>{self._max_open}")
+            time.sleep(self._delay)
+
+        self._last = time.time()
 
 
 def get_argument_parser():
@@ -87,11 +118,15 @@ def run_conversion(rundata):
 
     # get rid of some annoying messages about random seed and globaltags
     b2.logging.log_level = b2.LogLevel.WARNING
+
     # and create and run the conversion path
     main = b2.Path()
     main.add_module("EventInfoSetter", expList=experiments, runList=runs, evtNumList=events)
+    main.add_module(TCPWaiter())
     main.add_module("B2BIIConvertBeamParams", mcFlag=1, missingBenergy=missing_benergy, missingIp=missing_ip, logLevel=b2.LogLevel.INFO)
     b2.process(main)
+    # and revert to normal logging
+    b2.logging.log_level = b2.LogLevel.INFO
     return len(runs)
 
 

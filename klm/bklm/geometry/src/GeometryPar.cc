@@ -423,7 +423,7 @@ namespace Belle2 {
       for (int section = 0; section <= BKLMElementNumbers::getMaximalSectionNumber(); ++section) {
         bool isForward = (section == BKLMElementNumbers::c_ForwardSection);
         for (int sector = 1; sector <= m_NSector; ++sector) {
-          bool hasChimney = (!isForward) && (sector == CHIMNEY_SECTOR);
+          bool hasChimney = (!isForward) && (sector == BKLMElementNumbers::c_ChimneySector);
           int nZStrips = (hasChimney ? m_NZStripsChimney : m_NZStrips);
           int nZScints = (hasChimney ? m_NZScintsChimney : m_NZScints);
           CLHEP::HepRotation rotation;
@@ -722,16 +722,6 @@ namespace Belle2 {
     const Module* GeometryPar::findModule(int section, int sector, int layer) const
     {
       int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);
-      map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
-      return (iM == m_Modules.end() ? NULL : iM->second);
-    }
-
-    const Module* GeometryPar::findModule(int layer, bool hasChimney) const
-    {
-      int moduleID = ((layer - 1) << BKLM_LAYER_BIT);
-      if (hasChimney) { // Chimney module is in backward sector 3
-        moduleID |= ((3 - 1) << BKLM_SECTOR_BIT);
-      }
       map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
       return (iM == m_Modules.end() ? NULL : iM->second);
     }

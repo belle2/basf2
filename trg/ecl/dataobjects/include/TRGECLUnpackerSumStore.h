@@ -84,8 +84,8 @@ namespace Belle2 {
     //! Total Energy Type of this hit.
     int s_etot_type;
 
-    //! The case of Total Energy > 20GeV  of this hit.
-    int s_etot_20gev;
+    //! The case of ECL Burst  of this hit.
+    int s_ecl_bst;
 
     //! Timing of this hit.
     int s_time;
@@ -179,8 +179,8 @@ namespace Belle2 {
     //! The mothod to set Total Energy Type
     void setEtotType(int etot_type) {s_etot_type = etot_type;}
 
-    //! The mothod to set Total Energy more than 20 gev
-    void setEtot20GeV(int etot_20gev) {s_etot_20gev = etot_20gev;}
+    //! The mothod to set ECL Burst
+    void setECLBST(int ecl_bst) {s_ecl_bst = ecl_bst;}
 
     //! The mothod to set Timing Type
     void setTimeType(int time_type) {s_time_type = time_type;}
@@ -248,8 +248,8 @@ namespace Belle2 {
     //! The mothod to get Total Energy Type
     int getEtotType() const {return s_etot_type;}
 
-    //! The mothod to get Total Energy more than 20GeV
-    int getEtot20GeV() const {return s_etot_20gev;}
+    //! The mothod to get ECL Burst
+    int getECLBST() const {return s_ecl_bst;}
 
     //! The mothod to get Timing
     int getTime() const {return s_time;}
@@ -278,7 +278,7 @@ namespace Belle2 {
       s_bg_veto    = 0;
       s_etot       = 0;
       s_etot_type  = 0;
-      s_etot_20gev = 0;
+      s_ecl_bst    = 0;
       s_time       = 0;
       s_time_type  = 0;
     }
@@ -304,7 +304,7 @@ namespace Belle2 {
       int bg_veto,
       int etot,
       int etot_type,
-      int etot_20gev,
+      int ecl_bst,
       int time,
       int time_type
     )
@@ -330,12 +330,12 @@ namespace Belle2 {
       s_bg_veto    = bg_veto;
       s_etot       = etot;
       s_etot_type  = etot_type;
-      s_etot_20gev = etot_20gev;
+      s_ecl_bst    = ecl_bst;
       s_time       = time;
       s_time_type  = time_type;
     }
     /** the class title */
-    ClassDef(TRGECLUnpackerSumStore, 4);
+    ClassDef(TRGECLUnpackerSumStore, 5);
   };
 
 } // end namespace Belle2

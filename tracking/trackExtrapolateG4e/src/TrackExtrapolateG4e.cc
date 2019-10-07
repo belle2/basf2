@@ -1022,8 +1022,7 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
         int layer = touch->GetCopyNumber(4);
         int sector = touch->GetCopyNumber(6);
         int section = touch->GetCopyNumber(7);
-        copyID = BKLMElementNumbers::moduleNumber(section, sector, layer)
-                 | BKLM_MC_MASK;
+        copyID = BKLMElementNumbers::moduleNumber(section, sector, layer);
       }
       return;
     case VOLTYPE_BKLM2: // BKLM scints
@@ -1037,8 +1036,7 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
         int sector = touch->GetCopyNumber(8);
         int section = touch->GetCopyNumber(9);
         copyID = BKLMElementNumbers::channelNumber(
-                   section, sector, layer, plane, strip)
-                 | BKLM_MC_MASK;
+                   section, sector, layer, plane, strip);
         BKLMStatus::setMaximalStrip(copyID, strip);
       }
       return;

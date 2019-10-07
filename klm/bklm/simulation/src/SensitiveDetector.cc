@@ -122,8 +122,7 @@ namespace Belle2 {
         int sector = hist->GetCopyNumber(depth - DEPTH_SECTOR);
         int section = hist->GetCopyNumber(depth - DEPTH_SECTION);
         int moduleID =
-          int(BKLMElementNumbers::moduleNumber(section, sector, layer))
-          | BKLM_MC_MASK;
+          int(BKLMElementNumbers::moduleNumber(section, sector, layer));
         double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
         if (time > m_HitTimeMax)
           return false;

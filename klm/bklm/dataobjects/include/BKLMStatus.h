@@ -15,17 +15,11 @@
 //! proper sorting in bklmReconstructor module.
 //! Also, definition of each status bit/mask.
 
-//! bit position for MC-generated hit
-#define BKLM_MC_BIT 22
-
 //! bit position for MC-generated hit that represents a particle-decay point
 #define BKLM_DECAYED_BIT 23
 
 //! bit position for out-of-time-window flag (from BKLM hit reconstruction)
 #define BKLM_OUTOFTIME_BIT 24
-
-//! bit position for MC-generated hit lost due to inefficiency (from BKLM hit reconstruction)
-#define BKLM_INEFFICIENT_BIT 25
 
 //! bit position for above-threshold flag (scintillators only, from BKLM hit reconstruction)
 #define BKLM_ABOVETHRESHOLD_BIT 26
@@ -39,17 +33,11 @@
 //! bit position for used-on-BKLM-stand-alone-track flag (from BKLMTracking reconstruction)
 #define BKLM_ONSTATRACK_BIT 29
 
-//! bit mask for MC-generated hit
-#define BKLM_MC_MASK (1 << BKLM_MC_BIT)
-
 //! bit mask for MC-generated hit that represents a particle-decay point
 #define BKLM_DECAYED_MASK (1 << BKLM_DECAYED_BIT)
 
 //! bit mask for out-of-time-window flag (from BKLM hit reconstruction)
 #define BKLM_OUTOFTIME_MASK (1 << BKLM_OUTOFTIME_BIT)
-
-//! bit mask for MC-generated hit lost due to inefficiency (from BKLM hit reconstruction)
-#define BKLM_INEFFICIENT_MASK (1 << BKLM_INEFFICIENT_BIT)
 
 //! bit mask for above-threshold flag (scintillators only, from BKLM hit reconstruction)
 #define BKLM_ABOVETHRESHOLD_MASK (1 << BKLM_ABOVETHRESHOLD_BIT)
@@ -64,7 +52,7 @@
 #define BKLM_ONSTATRACK_MASK (1 << BKLM_ONSTATRACK_BIT)
 
 //! bit mask for status bits
-#define BKLM_STATUS_MASK (BKLM_MC_MASK | BKLM_DECAYED_MASK | BKLM_OUTOFTIME_MASK | BKLM_INEFFICIENT_MASK | BKLM_ONTRACK_MASK | BKLM_ABOVETHRESHOLD_MASK | BKLM_ONSTATRACK_MASK)
+#define BKLM_STATUS_MASK (BKLM_DECAYED_MASK | BKLM_OUTOFTIME_MASK | BKLM_ONTRACK_MASK | BKLM_ABOVETHRESHOLD_MASK | BKLM_ONSTATRACK_MASK)
 
 namespace Belle2 {
 

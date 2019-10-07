@@ -1,0 +1,7 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'klm', 'klm_dataobjects', 'klm_bklm_dataobjects', 'klm_eklm_dataobjects',
+               'calibration', 'calibration_dataobjects', '$ROOT_LIBS',
+               'CLHEP','tracking_dataobjects']
+
+Return('env')

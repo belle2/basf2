@@ -9,7 +9,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 mcTrackFinding=False, trackFitHypotheses=None,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
-                                use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False):
+                                use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
+                                add_mva_quality_indicator=True):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -32,6 +33,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
     :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
     :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
+    :param add_mva_quality_indicator: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found tracks.
+        Requires ``fit_tracks`` to be also true for the final quality estimation step to work.
     """
 
     if not is_svd_used(components) and not is_cdc_used(components):
@@ -56,7 +60,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                           prune_temporary_tracks=prune_temporary_tracks,
                           use_second_cdc_hits=use_second_cdc_hits,
                           use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
-                          use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf)
+                          use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
+                          add_mva_quality_indicator=add_mva_quality_indicator)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
@@ -69,6 +74,12 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
                                         trackFitHypotheses=trackFitHypotheses,
                                         reco_tracks=reco_tracks)
+        if add_mva_quality_indicator:
+            path.add_module(
+                "TrackQualityEstimatorMVA",
+                collectEventFeatures=True,
+            )
+
     if prune_temporary_tracks or pruneTracks:
         path.add_module("PruneRecoHits")
 
@@ -160,7 +171,8 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use
 def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       prune_temporary_tracks=True, use_second_cdc_hits=False,
                       use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True,
-                      use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False):
+                      use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
+                      add_mva_quality_indicator=True):
     """
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to
@@ -175,6 +187,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         If true, prune them.
     :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
     :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
+    :param add_mva_quality_indicator: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found tracks.
     """
     if not is_svd_used(components) and not is_cdc_used(components):
         return

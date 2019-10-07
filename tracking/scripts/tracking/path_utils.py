@@ -59,7 +59,7 @@ def add_hit_preparation_modules(path, components=None):
 
 
 def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, trackFitHypotheses=None,
-                                    reco_tracks="RecoTracks"):
+                                    reco_tracks="RecoTracks", add_mva_quality_indicator=False):
     """
     Helper function to add the modules performing the
     track fit, the V0 fit and the Belle2 track creation to the path.
@@ -68,6 +68,8 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
+    :param add_mva_quality_indicator: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found tracks.
     """
     # Correct time seed
     path.add_module("IPTrackTimeEstimator",

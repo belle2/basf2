@@ -82,11 +82,6 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   t_tin->SetBranchAddress("eDep",         &ev.eDep);
   t_tin->SetBranchAddress("nPE",          &ev.nPE);
   t_tin->SetBranchAddress("channelId",    &ev.channelId);
-  t_tin->SetBranchAddress("forward",      &ev.forward);
-  t_tin->SetBranchAddress("sector",       &ev.sector);
-  t_tin->SetBranchAddress("layer",        &ev.layer);
-  t_tin->SetBranchAddress("plane",        &ev.plane);
-  t_tin->SetBranchAddress("strip",        &ev.strip);
   t_tin->SetBranchAddress("inRPC",        &ev.inRPC);
   t_tin->SetBranchAddress("isFlipped",    &ev.isFlipped);
 
@@ -477,9 +472,9 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
   m_timeShift.clear();
 
+  double tmpMean_rpc_global = h_time_rpc_tc->GetMean();
   double tmpMean_scint_global = h_time_scint_tc->GetMean();
   double tmpMean_scint_global_end = h_time_scint_tc_end->GetMean();
-  double tmpMean_rpc_global = h_time_rpc_tc->GetMean();
 
   for (int iF = 0; iF < 2; ++iF) {
     for (int iS = 0; iS < 8; ++iS) {

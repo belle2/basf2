@@ -427,7 +427,7 @@ void KLMTimeCalibrationCollectorModule::collect_scint(RelationVector<BKLMHit2d> 
         if (fabs(diffLocal.z()) > stripWidth_Z  || fabs(diffLocal.y()) > stripWidth_Phi) continue;
 
         const CLHEP::Hep3Vector propaLengthV3 = corMod->getPropagationDistance(positionLocal_extHit);
-        double propaLength = propaLengthV3[2 - int(m_ev.plane)];
+        double propaLength = propaLengthV3[2 - digitHit->isPhiReadout()];
 
         m_ev.recTime = digitHit->getTime();
         m_ev.dist = propaLength;

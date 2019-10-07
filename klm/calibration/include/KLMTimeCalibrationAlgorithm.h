@@ -45,11 +45,6 @@ namespace Belle2 {
       double   nPE;         // number of photon electron.
       int      channelId;   // unique channel id Barral and endcap combined.
       // BKLM or EKLM local mapping
-      int      forward;
-      int      sector;
-      int      layer;
-      int      plane;
-      int      strip;
       // BKLM RPC flag, used for testing and not necessary
       bool     inRPC;
       // If phi and z plane flipped, used for testing and not necessary

@@ -1954,7 +1954,7 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
                       "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
-                      "Can be used inside and outside of for_each loop.\n"
+                      "Can be used inside for_each loop or outside of it if the particle has associated Rest of Event.\n"
                       "E.g. useROERecoilFrame(E) returns the energy of a particle in the ROE recoil frame.");
 
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,

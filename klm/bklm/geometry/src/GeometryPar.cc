@@ -98,19 +98,19 @@ namespace Belle2 {
       m_OffsetZ = content.getLength("OffsetZ");
       m_Phi = content.getLength("Phi");
       m_NSector = content.getNumberNodes("Sectors/Forward/Sector");
-      if (m_NSector > NSECTOR) { // array-bounds check
+      if (m_NSector > BKLMElementNumbers::getMaximalSectorNumber()) { // array-bounds check
         B2FATAL("BKLM GeometryPar::read(): sector array size exceeded:"
                 << LogVar("# of sectors", m_NSector)
-                << LogVar("array size", NSECTOR));
+                << LogVar("array size", BKLMElementNumbers::getMaximalSectorNumber()));
       }
       m_SolenoidOuterRadius = content.getLength("SolenoidOuterRadius");
       m_OuterRadius = content.getLength("OuterRadius");
       m_HalfLength = content.getLength("HalfLength");
       m_NLayer = content.getNumberNodes("Layers/Layer");
-      if (m_NLayer > NLAYER) { // array-bounds check
+      if (m_NLayer > BKLMElementNumbers::getMaximalLayerNumber()) { // array-bounds check
         B2FATAL("BKLM GeometryPar::read(): layer array size exceeded:"
                 << LogVar("# of layers", m_NLayer)
-                << LogVar("array size", NLAYER));
+                << LogVar("array size", BKLMElementNumbers::getMaximalLayerNumber()));
       }
 
       m_IronNominalHeight = content.getLength("Layers/IronNominalHeight");

@@ -228,7 +228,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
 
   int moduleId = *detectorChannel;
   int layer = BKLMElementNumbers::getLayerByModule(moduleId);
-  if ((layer < 3) && ((raw.triggerBits & 0x10) != 0))
+  if ((layer < BKLMElementNumbers::c_FirstRPCLayer) && ((raw.triggerBits & 0x10) != 0))
     return;
   int channel = BKLMElementNumbers::getStripByModule(moduleId);
 

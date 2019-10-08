@@ -9,7 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/trackingPerformanceEvaluation/SVDPerformanceTTreeModule.h>
+#include <svd/modules/svdPerformance/SVDPerformanceTTreeModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/core/Environment.h>

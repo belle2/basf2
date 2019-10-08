@@ -23,6 +23,7 @@ import basf2
 from basf2 import B2ERROR, B2INFO, B2WARNING
 import json
 from pathlib import Path
+from collections import OrderedDict
 
 from caf.utils import IoV
 
@@ -56,9 +57,9 @@ The experiment and run numbers are also required."""
     input_data_files = {}
     for input_name, run_list in input_data.items():
         B2INFO(f"Gathering files for '{input_name}' from {input_data_path.as_posix()}")
-        file_to_iov = {}
+        file_to_iov = OrderedDict()
         for run_path, exp_run in run_list:
-            file_list = [p.as_posix() for p in Path(run_path).glob("**/*.root")]
+            file_list = sorted([p.as_posix() for p in Path(run_path).glob("**/*.root")])
             for file_path in file_list:
                 file_to_iov[file_path] = IoV(exp_low=exp_run[0], run_low=exp_run[1], exp_high=exp_run[0], run_high=exp_run[1])
         B2INFO(f"Found {len(file_to_iov)} files in '{input_name}'")

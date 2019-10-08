@@ -49,11 +49,25 @@ def get_calibrations(input_data, **kwargs):
     Returns:
       list(caf.framework.Calibration): All of the calibration objects we want to assign to the CAF process
     """
+    import basf2
     # Set up config options
 
     # In this script we want to use one sources of input data.
-    # Get the input files from the input_data variable
-    input_files_physics = list(input_data["physics"].keys())
+    # Get the input files  from the input_data variable
+    file_to_iov_physics = input_data["physics"]
+
+    # We might have requested an enormous amount of data across a run range.
+    # There's a LOT more files than runs!
+    # Lets set some limits because this calibration doesn't need that much to run.
+    max_files_per_run = 2
+
+    # We filter out any more than 2 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
+    # already. This procedure respects that ordering
+    from prompt.utils import filter_by_max_files_per_run
+
+    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run)
+    input_files_physics = list(reduced_file_to_iov_physics.keys())
+    basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_physics)}")
 
     # Get the overall IoV we our process should cover. Includes the end values that we may want to ignore since our output
     # IoV should be open ended. We could also use this as part of the input data selection in some way.

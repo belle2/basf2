@@ -2,19 +2,19 @@
 # -*- coding: utf-8 -*-
 
 """
-Essentially just a CAF setup -> run -> post-process script.
-This tool is to be used by the prompt calibration automation system and
-by developers testing their scripts for it.
+This tool is essentially just a CAF setup -> run -> post-process script.
+It will be used by the prompt calibration automation system and
+by developers testing their prompt scripts.
 
-It basically takes a few config files (or optionally input arguments) as 
-input in order to do the CAF and input data setup.
-It then runs a CAF process by finding the correct module in the current release's
-calibration/scripts/prompt/calibrations directory and running all calibrations returned
-by its `get_calibrations` function.
+It basically takes a two config files as input in order to do the CAF and input data setup.
+It then runs a CAF process by finding the correct script in the current release's
+``calibration/scripts/prompt/calibrations`` directory and running all calibrations returned
+by its ``get_calibrations`` function.
 
-To test a new prompt calibration script it is recommended to place it in this
-directory to check if this tool can correctly use it.
+To test a new prompt calibration script it is recommended to place it in the correct
+directory to check if this tool can use it.
 """
+
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
@@ -39,13 +39,17 @@ Also to create the IoV for each run so the calibrations can use it if necessary.
 
 Note that the input data json file should have the form:
 
+.. code-block:: python
+
   {"hlt_mumu": [["/path/to/run/hlt_mumu_2trk/raw", [8, 1977]], ... ]
    "hlt_hadron": [["/path/to/run/hlt_hadron/raw", [8, 1977]], ...]
   }
 
-where the key is the same as the one used by the calibrations to set the input files.
-The experiment and run numbers are also required."""
+where the key is the same as the one used by the ``settings`` variable's ``input_data_names`` in the
+prompt calibration script you are running.
 
+The values are lists of directory paths and the corresponding (Experiment, Run).
+"""
 
     input_data_path = Path(args.input_data)
     if not input_data_path.is_file():
@@ -70,10 +74,19 @@ The experiment and run numbers are also required."""
 
 
 def setup_caf(args, input_data_files, prompt_caf):
-    """Path to config json file, used to set up the CAF and calibrations used 
+    """Path to config JSON file, used to set up the CAF and calibrations used 
 in this CAF process.
 
-Required keys = "caf_script" (str), "database_chain" array[str], "backend_args" dict, "requested_iov" array[4](int)
+Required format of JSON file:
+
+.. code-block:: python
+
+    {
+     "caf_script": (str),
+     "database_chain" array[str],
+     "backend_args" dict,
+     "requested_iov" array[4](int)
+    }
 """
 
     caf_config_path = Path(args.caf_config)
@@ -166,12 +179,12 @@ def get_argparser():
     parser.add_argument("input_data", help=get_input_data.__doc__)
     parser.add_argument("--files-per-job", dest="files_per_job", metavar="",
                         type=int, default=default_max_files_per_collector_job,
-                        help="Sets the number of input files that wil be used per collector job for all calibrations"
-                             f" (default={default_max_files_per_collector_job})"
+                        help="Sets the number of input files that wil be used per collector job for all calibrations."
                        )
     parser.add_argument("--dry-run", dest="dry_run", action="store_true",
                         help="Flags if the CAF process should be set up but not run. "
-                             "Good for testing to prevent lots of jobs being submitted."
+                             "Good for testing if your prompt script and config files are well formed without attempting "
+                             "to submit any jobs."
                        )
     parser.set_defaults(dry_run=False)
 

@@ -10,18 +10,20 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ['name', 'description', '
     Simple class to hold and display required information for a prompt calibration script (process).
 
     Parameters:
-        name str: The unique calibration name, not longer than 64 characters.
+        name (str): The unique calibration name, not longer than 64 characters.
 
-        description: Long form description of the calibration and what it does. Feel free to make this as long as you need.
+        description (str): Long form description of the calibration and what it does. Feel free to make this as long as you need.
 
-        input_data_formats frozenset(str): The data formats {'raw', 'cdst', 'mdst', 'udst'} of the input files
+        input_data_formats (frozenset(str)): The data formats {'raw', 'cdst', 'mdst', 'udst'} of the input files
             that should be used as input to the process. Used to figure out if this calibration should occurr
-            before the relevant data production e.g. before cdst files are created.
+            before the relevant data production e.g. before cDST files are created.
 
-        input_data_names frozenset(str): The names that you will use when accessing the input data given to the
-            prompt calibration process i.e. Use these in the 'getcalibrations' function to access the correct input
+        input_data_names (frozenset(str)): The names that you will use when accessing the input data given to the
+            prompt calibration process i.e. Use these in the ``get_calibrations`` function to access the correct input
             data files.
     """
+
+    #: Allowed data file formats. You should use these values for `CalibrationSettings.input_data_formats`.
     allowed_data_formats = frozenset({"raw", "cdst", "mdst", "udst"})
 
     def __new__(cls, name, description, input_data_formats=None, input_data_names=None):
@@ -42,7 +44,10 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ['name', 'description', '
         return super().__new__(cls, name, description, input_data_formats, input_data_names)
 
     def json_dumps(self):
-        """Return a valid JSON format string of the attributes"""
+        """
+        Returns:
+             str: A valid JSON format string of the attributes.
+        """
         return json.dumps({"name": self.name,
                            "input_data_formats": list(self.input_data_formats),
                            "input_data_names": list(self.input_data_names),

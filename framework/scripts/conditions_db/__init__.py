@@ -40,13 +40,16 @@ class PayloadInformation:
     comparison between globaltags"""
 
     @classmethod
-    def from_json(cls, payload, iov):
+    def from_json(cls, payload, iov=None):
         """Set all internal members from the json information of the payload and the iov.
 
         Arguments:
             payload (dict): json information of the payload as returned by REST api
             iov (dict): json information of the iov as returned by REST api
         """
+        if iov is None:
+            iov = {"payloadIovId": None, "expStart": None, "runStart": None, "expEnd": None, "runEnd": None}
+
         return cls(
             payload['payloadId'],
             payload['basf2Module']['name'],
@@ -78,6 +81,11 @@ class PayloadInformation:
         self.base_url = base_url
         #: payload url
         self.payload_url = payload_url
+
+    @property
+    def url(self):
+        """Return the full url to the payload on the server"""
+        return urllib.parse.urljoin(self.base_url + '/', self.payload_url)
 
     def __hash__(self):
         """Make object hashable"""

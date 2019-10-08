@@ -657,6 +657,11 @@ def command_dump(args, db):
 
         $ b2conditionsdb dump -r BeamParameters 59449
 
+    Dump the content of the payload by name which is valid in a given globaltag
+    for a given experiment and run::
+
+        $ b2conditionsdb dump -g BeamParameters master_2019-09-26 0 0
+
     Or directly by payload id from a previous call to ``b2conditionsdb iov``::
 
         $ b2conditionsdb dump -i 59685
@@ -665,14 +670,17 @@ def command_dump(args, db):
 
     Depending on whether you want to display a payload by its id in the
     database, its name and revision in the database or from a local file
-    provide **one** of the arguments ``-i``, ``-r`` or ``-f``
+    provide **one** of the arguments ``-i``, ``-r``, ``-f`` or ``-g``
     """
     if db is None:
         group = args.add_mutually_exclusive_group(required=True)
-        group.add_argument("-i", "--id", metavar="PAYLOADID", help="payload id to dump")
-        group.add_argument("-r", "--revision", metavar=("NAME", "REVISION"), nargs=2,
-                           help="Name and revision of the payload to dump")
-        group.add_argument("-f", "--file", metavar="FILENAME", help="Dump local payload file")
+        choice = group.add_mutually_exclusive_group()
+        choice.add_argument("-i", "--id", metavar="PAYLOADID", help="payload id to dump")
+        choice.add_argument("-r", "--revision", metavar=("NAME", "REVISION"), nargs=2,
+                            help="Name and revision of the payload to dump")
+        choice.add_argument("-f", "--file", metavar="FILENAME", help="Dump local payload file")
+        choice.add_argument("-g", "--valid", metavar=("NAME", "GLOBALTAG", "EXP", "RUN"), nargs=4,
+                            help="Dump the payload valid for the given exp, run number in the given globaltag")
         args.add_argument("--show-typenames", default=False, action="store_true",
                           help="If given show the type names of all classes. "
                           "This makes output more crowded but can be helpful for complex objects.")
@@ -691,38 +699,45 @@ def command_dump(args, db):
             B2ERROR(f"Payloadfile {filename} could not be found")
             return 1
 
-        match = re.match(r"^dbstore_(.*)_rev_(\d*).root$", os.path.basename(filename))
+        match = re.match(r"^dbstore_(.*)_rev_(.*).root$", os.path.basename(filename))
         if not match:
             B2ERROR("Filename doesn't follow database convention. Should be dbstore_${payloadname}_rev_${revision}.root")
             return 1
         name = match.group(1)
-        revision = int(match.group(2))
+        revision = match.group(2)
         payloadId = "Unknown"
     else:
         # otherwise do just that: query the database for either payload id or
         # the name,revision
         if args.id:
             req = db.request("GET", f"/payload/{args.id}", "Getting payload info")
-            payload = req.json()
+            payload = PayloadInformation.from_json(req.json(), {"payloadIov"})
         elif args.revision:
             name, rev = args.revision
             rev = int(rev)
             req = db.request("GET", f"/module/{name}/payloads", "Getting payload info")
             for p in req.json():
                 if p["revision"] == rev:
-                    payload = p
+                    payload = PayloadInformation.from_json(p)
                     break
             else:
                 B2ERROR(f"Cannot find payload {name} with revision {rev}")
                 return 1
+        elif args.valid:
+            name, globaltag, exp, run = args.valid
+            payload = None
+            for p in db.get_all_iovs(globaltag, exp, run, f", name={name}"):
+                if p.name == name and payload is None or p.revision > payload.revision:
+                    payload = p
 
-        name = payload["basf2Module"]["name"]
-        url = payload["payloadUrl"]
-        base = payload["baseUrl"]
-        payloadId = payload["payloadId"]
-        filename = urljoin(base + "/", url)
-        revision = payload["revision"]
-        del payload, base, url
+            if payload is None:
+                B2ERROR(f"Cannot find payload {name} in globaltag {globaltag} for exp,run {exp},{run}")
+                return 1
+
+        filename = payload.url
+        revision = payload.revision
+        payloadId = payload.payload_id
+        del payload
 
     # late import of ROOT because of all the side effects
     from ROOT import TFile, TBufferJSON, cout

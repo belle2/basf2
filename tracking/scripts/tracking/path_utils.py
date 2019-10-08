@@ -496,7 +496,6 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
             "TFCDC_TrackQualityEstimator",
             inputTracks=output_tracks,
             filter='mva',
-            deleteTracks=False,
         )
 
     # Export CDCTracks to RecoTracks representation
@@ -831,16 +830,9 @@ def add_vxd_track_finding_vxdtf2(
         path.add_module(pxdSVDCut)
 
     if add_mva_quality_indicator:
-        vxdtf_quality_estimator_weightfile = (
-            'tracking/data/VXDQE_weight_files/MVE_QE_weights_noTiming_03August2018.xml'
-        )
-
         path.add_module(
             "VXDQualityEstimatorMVA",
-            WeightFileIdentifier=vxdtf_quality_estimator_weightfile,
-            EstimationMethod="tripletFit",
             SpacePointTrackCandsStoreArrayName=nameSPTCs,
-            ClusterInformation="Average",
         )
     else:
         path.add_module(

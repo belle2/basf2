@@ -12,4 +12,5 @@
 
 using namespace Belle2;
 
+template class TrackFindingCDC::Chooseable<BasePXDResultFilter>;
 template class TrackFindingCDC::ChooseableFilter<PXDResultFilterFactory>;

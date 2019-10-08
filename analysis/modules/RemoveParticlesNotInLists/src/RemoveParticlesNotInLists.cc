@@ -9,8 +9,10 @@
  **************************************************************************/
 
 #include <analysis/modules/RemoveParticlesNotInLists/RemoveParticlesNotInLists.h>
+#include <analysis/dataobjects/ParticleList.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 using namespace std;
 using namespace Belle2;
@@ -32,7 +34,7 @@ void RemoveParticlesNotInListsModule::initialize()
   particles.isRequired();
   m_subset.registerSubset(particles);
 
-  for (auto l : m_particleLists) {
+  for (const auto& l : m_particleLists) {
     StoreObjPtr<ParticleList>(l).isRequired();
   }
 }

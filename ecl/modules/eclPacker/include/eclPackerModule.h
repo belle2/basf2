@@ -9,18 +9,13 @@
  **************************************************************************/
 #pragma once
 
-
+//Framework
+#include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <rawdata/dataobjects/RawDataBlock.h>
-#include <rawdata/dataobjects/RawCOPPER.h>
-#include <rawdata/dataobjects/RawECL.h>
-
+//ECL
 #include <ecl/utility/ECLChannelMapper.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLDsp.h>
-
 
 namespace Belle2 {
 
@@ -30,17 +25,24 @@ namespace Belle2 {
 
   class ECLDigit;
   class ECLDsp;
+  class RawECL;
 
+  /** Module that pack's MC info into a dataformat that comes from the detector */
   class ECLPackerModule : public Module {
   public:
     ECLPackerModule();
     virtual ~ECLPackerModule();
 
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    /** initialize */
+    virtual void initialize() override;
+    /** beginRun */
+    virtual void beginRun() override;
+    /** event */
+    virtual void event() override;
+    /** endRun */
+    virtual void endRun() override;
+    /** terminate */
+    virtual void terminate() override;
 
     /// exception for errors during packing ADC data buffer
     BELLE2_DEFINE_EXCEPTION(Write_adc_samples_error,
@@ -49,13 +51,9 @@ namespace Belle2 {
     BELLE2_DEFINE_EXCEPTION(eclPacker_internal_error,
                             "Something wrong with ECL Packer");
 
-
-  protected:
-
-
   private:
     /** Event number */
-    int    m_EvtNum;
+    int m_EvtNum;
 
     /** position in the  data array */
     int m_bufPos;
@@ -85,12 +83,12 @@ namespace Belle2 {
     int m_EclWaveformSamples[ECL_ADC_SAMPLES_PER_CHANNEL]; // == 31
 
     /** channel mapper */
-    ECL::ECLChannelMapper* m_eclMapper;
+    ECL::ECLChannelMapper m_eclMapper;
 
     /** Output data  */
     StoreArray<RawECL> m_eclRawCOPPERs;
 
-    /* temporary buffer to store ADC data */
+    /** temporary buffer to store ADC data */
     unsigned int adcBuffer_temp[ECL::ECL_CHANNELS_IN_SHAPER * ECL_ADC_SAMPLES_PER_CHANNEL];
 
     // number of hits, masks etc ...
@@ -106,10 +104,10 @@ namespace Belle2 {
     int shaperNHits[ECL::ECL_CRATES][ECL::ECL_BARREL_SHAPERS_IN_CRATE];
 
     /** indexes of related eclDigits*/
-    int* iEclDigIndices;
+    int iEclDigIndices[ECL::ECL_TOTAL_CHANNELS];
 
     /** indexes of related waveforms*/
-    int* iEclWfIndices;
+    int iEclWfIndices[ECL::ECL_TOTAL_CHANNELS];
 
     //DataStore variables
     StoreArray<ECLDigit> m_eclDigits; /**< ECLDigit dataStore object*/

@@ -10,34 +10,15 @@
 
 #include <beast/claw/modules/ClawDigitizerModule.h>
 #include <beast/claw/dataobjects/ClawSimHit.h>
-#include <beast/claw/dataobjects/ClawHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/core/RandomNumbers.h>
 
 //c++
-#include <cmath>
-#include <boost/foreach.hpp>
 #include <string>
-#include <sstream>
-#include <iostream>
 #include <fstream>
 #include <vector>
-
-// ROOT
-#include <TH1.h>
-#include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -75,7 +56,7 @@ ClawDigitizerModule::~ClawDigitizerModule()
 void ClawDigitizerModule::initialize()
 {
   B2INFO("ClawDigitizer: Initializing");
-  StoreArray<ClawHit>::registerPersistent();
+  m_clawHit.registerInDataStore();
 
   //get the garfield drift data, gas, and CLAW paramters
   getXMLData();

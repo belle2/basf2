@@ -13,7 +13,6 @@
 
 #include <framework/core/Module.h>
 
-
 namespace Belle2 {
   /**
    * Generate VXD misalignment and store in database
@@ -31,7 +30,7 @@ namespace Belle2 {
     AlignmentGeneratorModule();
 
     /** Generate misalignment and store in database */
-    virtual void initialize();
+    virtual void initialize() override;
 
 
   private:

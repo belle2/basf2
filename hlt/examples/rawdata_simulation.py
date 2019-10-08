@@ -8,24 +8,15 @@
 import basf2
 
 from simulation import add_simulation
-import os
+from softwaretrigger import constants
 
 from rawdata import add_packers
 
-from softwaretrigger.path_functions import (
-    setup_softwaretrigger_database_access,
-    RAW_SAVE_STORE_ARRAYS,
-    DEFAULT_HLT_COMPONENTS,
-)
-
-# Create a path to generate some raw-data samples and then use the software trigger path(s) to reconstruct them.
-setup_softwaretrigger_database_access()
-
 # You could use your own components here or just use the default for the HLT (everything except PXD)
 # e.g. without SVD
-# components = ["CDC", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
+# components = ["CDC", "ECL", "TOP", "ARICH", "KLM"]
 # if you leave out the components in all calls, the default will be used
-components = DEFAULT_HLT_COMPONENTS
+components = constants.DEFAULT_HLT_COMPONENTS
 
 main_path = basf2.create_path()
 
@@ -36,7 +27,8 @@ add_simulation(main_path, components)
 add_packers(main_path, components=components)
 
 main_path.add_module("SeqRootOutput",
-                     saveObjs=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS)
+                     outputFileName="hlt_rawdata_simulation.sroot",
+                     saveObjs=["EventMetaData"] + constants.RAWDATA_OBJECTS)
 
 basf2.print_path(main_path)
 basf2.process(main_path)

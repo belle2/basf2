@@ -18,13 +18,9 @@
 #include <generators/teegg/Teegg.h>
 #include <generators/utilities/InitialParticleGeneration.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <vector>
-#include <TFile.h>
-#include <TNtuple.h>
-
 
 namespace Belle2 {
 
@@ -45,13 +41,13 @@ namespace Belle2 {
     virtual ~TeeggInputModule();
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
     /** Method is called at the end of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   protected:
 

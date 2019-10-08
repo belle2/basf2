@@ -8,16 +8,10 @@
 #include <iostream>
 #include <fstream>
 #include <iterator>
-#include <unistd.h>
 #include "CLHEP/Matrix/Vector.h"
 #include "CLHEP/Matrix/Matrix.h"
 #include <G4TwoVector.hh>
 #include <G4Vector3D.hh>
-#include <G4Polycone.hh>
-#include <G4LogicalVolume.hh>
-#include "ecl/geometry/BelleLathe.h"
-#include "G4NistManager.hh"
-#include "G4PVPlacement.hh"
 #include <framework/utilities/FileSystem.h>
 
 using namespace std;
@@ -110,7 +104,7 @@ namespace Belle2 {
       virtual ~quadrilateral_t() {}
       virtual map<int, G4ThreeVector> make_verticies(double wrapthick) const = 0;
 
-      G4VSolid* get_tesselatedsolid(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const
+      G4VSolid* get_tesselatedsolid(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const override
       {
         map<int, G4ThreeVector> v = make_verticies(wrapthick);
 
@@ -134,7 +128,7 @@ namespace Belle2 {
         return s;
       }
 
-      G4VSolid* get_extrudedsolid(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const
+      G4VSolid* get_extrudedsolid(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const override
       {
         map<int, G4ThreeVector> v = make_verticies(wrapthick);
 
@@ -174,7 +168,7 @@ namespace Belle2 {
         return new G4ExtrudedSolid(name, p1, abs(v[1].z()), off1, 1, -off2, scale);
       }
 
-      G4VSolid* get_trapezoid(const string& prefix, double wrapthick, G4Translate3D& shift) const
+      G4VSolid* get_trapezoid(const string& prefix, double wrapthick, G4Translate3D& shift) const override
       {
         map<int, G4ThreeVector> v = make_verticies(wrapthick);
 
@@ -247,7 +241,7 @@ namespace Belle2 {
         return shape;
       }
 
-      G4VSolid* get_bellecrystal(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const
+      G4VSolid* get_bellecrystal(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const override
       {
         map<int, G4ThreeVector> v = make_verticies(wrapthick);
 
@@ -286,12 +280,12 @@ namespace Belle2 {
       quadrilateral_barrel_t() {}
       virtual ~quadrilateral_barrel_t() {}
 
-      bool istrap() const
+      bool istrap() const override
       {
         return true;
       }
 
-      map<int, G4ThreeVector> make_verticies(double wrapthick) const
+      map<int, G4ThreeVector> make_verticies(double wrapthick) const override
       {
         map<int, G4ThreeVector> v;
         v[1] = G4ThreeVector(-a / 2, -h / 2, 150);
@@ -339,13 +333,13 @@ namespace Belle2 {
       quadrilateral_endcap_t() {}
       virtual ~quadrilateral_endcap_t() {}
 
-      bool istrap() const
+      bool istrap() const override
       {
         double h1 = sind(a1) * D, h4 = sind(a4) * C;
         return abs(h1 - h4) < 0.01 * h1;
       }
 
-      map<int, G4ThreeVector> make_verticies(double wrapthick) const
+      map<int, G4ThreeVector> make_verticies(double wrapthick) const override
       {
         double minh = std::min(sind(a1) * D, sind(a4) * C);
         double h2 = minh / 2;
@@ -415,7 +409,7 @@ namespace Belle2 {
         }
       }
 
-      bool istrap() const { return false;}
+      bool istrap() const override { return false;}
 
       map<int, G4ThreeVector> make_verticies(double wrapthick) const
       {
@@ -453,7 +447,7 @@ namespace Belle2 {
         return v;
       }
 
-      G4VSolid* get_tesselatedsolid(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const
+      G4VSolid* get_tesselatedsolid(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const override
       {
         if (nshape != 36) return NULL; // only one crystal has pentagon shape
 
@@ -484,7 +478,7 @@ namespace Belle2 {
         return s;
       }
 
-      G4VSolid* get_extrudedsolid(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const
+      G4VSolid* get_extrudedsolid(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const override
       {
         map<int, G4ThreeVector> v = make_verticies(wrapthick);
 
@@ -528,7 +522,7 @@ namespace Belle2 {
         return new G4ExtrudedSolid(name, p1, abs(v[1].z()), off1, 1, -off2, scale);
       }
 
-      G4VSolid* get_trapezoid(const string& prefix, double wrapthick, G4Translate3D& shift) const
+      G4VSolid* get_trapezoid(const string& prefix, double wrapthick, G4Translate3D& shift) const override
       {
         if (nshape != 36) return NULL; // only one crystal has pentagon shape
 
@@ -582,7 +576,7 @@ namespace Belle2 {
         return shape;
       }
 
-      G4VSolid* get_bellecrystal(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const
+      G4VSolid* get_bellecrystal(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const override
       {
         map<int, G4ThreeVector> v = make_verticies(wrapthick);
 

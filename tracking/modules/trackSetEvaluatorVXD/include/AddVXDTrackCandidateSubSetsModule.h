@@ -13,9 +13,6 @@
 #include <tracking/trackFindingVXD/tcTools/SpacePointTrackCandCreator.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include <framework/datastore/SelectSubset.h>
-
-
 
 namespace Belle2 {
 

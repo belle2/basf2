@@ -22,9 +22,11 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/geometry/BFieldManager.h>
 
 // dataobjects
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
@@ -102,6 +104,7 @@ namespace Belle2 {
 
     for (const auto& mcParticle : mcParticles) {
       if (mcParticle.getStatus(MCParticle::c_PrimaryParticle) == 0) continue;
+      if (mcParticle.getCharge() == 0) continue;
       const auto* barHit = mcParticle.getRelated<TOPBarHit>();
       if (!barHit) continue;
 
@@ -112,8 +115,8 @@ namespace Belle2 {
                            mcParticle.getCharge(),
                            Const::pion,
                            1.0,            // pValue
-                           1.5,            // B field (?)
-                           0,
+                           BFieldManager::getField(0, 0, 0).Z() / Unit::T,
+                           0x38FFFFFFFFFFFFFF, // 56 hits, in all CDC layers
                            0);
       auto* track = tracks.appendNew();
       track->setTrackFitResultIndex(Const::pion, fitResults.getEntries() - 1);

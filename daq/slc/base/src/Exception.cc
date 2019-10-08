@@ -4,29 +4,27 @@
 
 using namespace Belle2;
 
-Exception::Exception() throw()
+Exception::Exception()
   : m_comment(""), m_err(0)
 {
 }
 
-Exception::Exception(const std::string& comment) throw()
+Exception::Exception(const std::string& comment)
   : m_comment(comment), m_err(0)
 {
 }
 
 Exception::Exception(const std::string& comment,
-                     int err) throw()
+                     int err)
   : m_comment(comment), m_err(err)
 {
 }
 
-Exception::~Exception() throw()
-{
-
-}
-
-
+#if __GNUC__ >= 7
+const char* Exception::what() const noexcept
+#else
 const char* Exception::what() const throw()
+#endif
 {
   return m_comment.c_str();
 }

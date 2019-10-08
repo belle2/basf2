@@ -11,30 +11,18 @@
 #include <beast/beamabort/modules/BeamabortStudyModule.h>
 #include <beast/beamabort/dataobjects/BeamabortSimHit.h>
 #include <beast/beamabort/dataobjects/BeamabortHit.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <cmath>
-#include <boost/foreach.hpp>
 
-
-#include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
 
 // ROOT
-#include <TVector3.h>
 #include <TRandom.h>
 #include <TH1.h>
 #include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
-#include <TMath.h>
 
 #include <generators/SAD/dataobjects/SADMetaHit.h>
 
@@ -66,9 +54,26 @@ BeamabortStudyModule::~BeamabortStudyModule()
 {
 }
 
-//This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void BeamabortStudyModule::defineHisto()
 {
+  B2INFO("BeamabortStudyModule: Initialize");
+
+  for (int i = 0; i < 8; i++) {
+    h_dia_dose[i] = new TH1F(TString::Format("dia_dose_%d", i), "", 10000, 0., 10000.);
+    h_dia_dose[i]->Sumw2();
+  }
+
+  //read beamabort xml file
+
+}
+
+//This module is a histomodule. Any histogram created here will be saved by the HistoManager module
+void BeamabortStudyModule::initialize()
+{
+  getXMLData();
+
+
+
   //Default values are set here. New values can be in BEAMABORT.xml.
   for (int i = 0; i < 4; i++) {
     h_dia_rate[i] = new TH1F(TString::Format("dia_rate_%d", i), "Count", 8, 0., 8.);
@@ -78,8 +83,8 @@ void BeamabortStudyModule::defineHisto()
     h_dia_rs_rate[i] = new TH2F(TString::Format("dia_rs_rate_%d", i), "Count vs ring section", 8, 0., 8., 12, 0., 12.);
     h_dia_rs_rate[i]->Sumw2();
   }
+
   for (int i = 0; i < 8; i++) {
-    h_dia_dose[i] = new TH1F(TString::Format("dia_dose_%d", i), "", 10000, 0., 10000.);
     h_dia_doseWeight[i] = new TH1F(TString::Format("dia_doseWeight_%d", i), "", 10000, 0., 10000.);
     h_dia_amp[i] = new TH1F(TString::Format("dia_amp_%d", i), "", 10000, 0., 10000.);
     h_dia_time[i] = new TH1F(TString::Format("dia_time_%d", i), "", 1000, 0., 100.);
@@ -94,26 +99,16 @@ void BeamabortStudyModule::defineHisto()
     h_dia_Amp[i] = new TH1F(TString::Format("dia_Amp_%d", i), "", 100000, 0., 100000.);
     h_dia_edep[i] = new TH1F(TString::Format("dia_edep_%d", i), "", 4000, 0., 4000.);
 
-    h_dia_dose[i]->Sumw2();
     h_dia_doseWeight[i]->Sumw2();
     h_dia_idose[i]->Sumw2();
     h_dia_idoseWeight[i]->Sumw2();
     h_dia_rs_idose[i]->Sumw2();
     h_dia_rs_idoseWeight[i]->Sumw2();
   }
-}
-
-
-void BeamabortStudyModule::initialize()
-{
-  B2INFO("BeamabortStudyModule: Initialize");
-
-  //read beamabort xml file
-  getXMLData();
 
   REG_HISTOGRAM
-
 }
+
 
 void BeamabortStudyModule::beginRun()
 {

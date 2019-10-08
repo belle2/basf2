@@ -13,18 +13,15 @@ def build_library(name, dirs, alias_name, libs = []):
     source_files = []
     for dir in dirs:
         includes = env.Install(os.path.join(env['INCDIR'], 'nsm2'), Glob(os.path.join(src_dir, dir, '*.h')))
-        source_files.append([os.path.join(src_dir, str(source_file))
-                             for source_file in Glob(os.path.join(src_dir, dir, '*.c'))])
         env.Alias(alias_name, includes)
+        source_files.append([os.path.join(env['BUILDDIR'], "daq/slc/nsm2", str(source_file))
+                             for source_file in Glob(os.path.join(src_dir, dir, '*.c'))])
     lib = env.SharedLibrary(os.path.join(env['LIBDIR'], name), [source_files], LIBS=libs)
     env.Alias(alias_name, lib)
 
-build_library("libnsm2_corelib.so", ['corelib'], "nsm2_corelib")
-build_library("libnsm2_b2lib.so", ['b2lib'], "nsm2_b2lib", libs=["nsm2_corelib"])
-
-# build nsmd2, one file needs special CPPFLAGS, therefor a listing of files here and no Glob
-source_files = ['./daemon/nsmd2.cc','./daemon/nsmhash.c', env.Object('./daemon/nsminfo2.cc', CPPFLAGS='-DNSMD2INFO')]
-env.Program(target = os.path.join(env['BINDIR'], "nsmd2" ), source = [source_files])
+# We build a single library out of the nsm2 copied to the basf2 repository.
+# To not interfere with any other nsm library on any system, we give it a basf2 related name
+build_library("libnsm2_basf2.so", ['corelib', 'b2lib'], "nsm2_basf2")
 
 # stop scons from further exploring the nsm2 folder
 env['CONTINUE'] = False

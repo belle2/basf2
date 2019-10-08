@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Luka Santelj                                             *
- *                                                                        *
+ *               Leonid Burmistrov                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -97,14 +97,41 @@ namespace Belle2 {
       //! build the HAPD modules
       G4LogicalVolume* buildHAPD(const ARICHGeoHAPD& hapdPar);
 
+      //! build the merger PCB logical volume
+      G4LogicalVolume* buildMerger(const ARICHGeoMerger& mergerGeo);
+
+      //! build the cables envelop with effective material describing cables
+      G4LogicalVolume* buildCables(const ARICHGeoCablesEnvelope& cablesGeo);
+
       //! build mirrors
       G4LogicalVolume* buildMirror(const ARICHGeometryConfig& detectorGeo);
 
       //! build detector plane
       G4LogicalVolume* buildDetectorPlane(const ARICHGeometryConfig& detectorGeo);
 
+      //! build merger PCB assembly envelope plane
+      G4LogicalVolume* buildMergerPCBEnvelopePlane(const ARICHGeometryConfig& detectorGeo);
+
+      //! build cooling system assembly envelope plane
+      G4LogicalVolume* buildCoolingEnvelopePlane(const ARICHGeoCooling& coolingGeo);
+
+      //! build cooling tube (G4Tubs)
+      G4LogicalVolume* buildCoolingTube(const unsigned i_volumeID, const ARICHGeoCooling& coolingGeo);
+
+      //! build cooling tube (G4Torus)
+      G4LogicalVolume* buildCoolingTorus(const unsigned i_volumeID, const ARICHGeoCooling& coolingGeo);
+
+      //! build cooling test plates
+      G4LogicalVolume* buildCoolingTestPlate(const ARICHGeoCooling& coolingGeo);
+
       //! build aerogel plane
       G4LogicalVolume* buildAerogelPlane(const ARICHGeometryConfig& detectorGeo);
+
+      //! build aerogel plane with average properties of aerogel per layer
+      G4LogicalVolume* buildAerogelPlaneAveragedOverLayers(const ARICHGeometryConfig& detectorGeo);
+
+      //! with individual properties of aerogel tiles
+      G4LogicalVolume* buildAerogelPlaneWithIndividualTilesProp(const ARICHGeometryConfig& detectorGeo);
 
       //! build simple aerogel plane (for cosmic test)
       G4LogicalVolume* buildSimpleAerogelPlane(const ARICHGeometryConfig& detectorGeo);

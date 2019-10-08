@@ -1,19 +1,16 @@
 #include "dqm/analysis/HistMemory.h"
 
+#include <daq/slc/base/IOException.h>
 #include <daq/slc/base/StringUtil.h>
 
 #include <unistd.h>
-#include <stdlib.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
-#include <stdint.h>
 #include <sys/mman.h>
 
 using namespace Belle2;
 
-void HistMemory::open(const char* path, unsigned int size, const char* mode) throw(IOException)
+void HistMemory::open(const char* path, unsigned int size, const char* mode)
 {
   m_path = path;
   m_size = size;
@@ -44,13 +41,13 @@ void HistMemory::open(const char* path, unsigned int size, const char* mode) thr
   char* buf = (char*)mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0);
   m_mutex = MMutex(buf);
   buf += m_mutex.size();
-  m_header = (Header*)buf;
+  m_header = reinterpret_cast<Header*>(buf);
   buf += sizeof(Header);
   m_body = (char*)buf;
   if (recreate) init();
 }
 
-void HistMemory::init() throw(IOException)
+void HistMemory::init()
 {
   if (m_body == NULL) {
     throw (IOException("%s is not opened", m_path.c_str()));

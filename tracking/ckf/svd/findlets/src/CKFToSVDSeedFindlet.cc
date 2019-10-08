@@ -13,17 +13,11 @@
 #include <tracking/ckf/general/findlets/StateCreator.icc.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.icc.h>
 #include <tracking/ckf/general/findlets/StateRejecter.icc.h>
-#include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
-#include <tracking/ckf/general/findlets/LimitedOnStateApplier.icc.h>
-#include <tracking/ckf/general/findlets/LayerToggledApplier.icc.h>
 #include <tracking/ckf/general/findlets/StateCreatorWithReversal.icc.h>
 
 #include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 
 #include <framework/core/ModuleParamList.h>
-
-#include <tracking/ckf/general/utilities/ClassMnemomics.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -92,6 +86,10 @@ void CKFToSVDSeedFindlet::apply()
 {
   m_dataHandler.apply(m_cdcRecoTrackVector);
   m_hitsLoader.apply(m_spacePointVector);
+
+  if (m_spacePointVector.empty() or m_cdcRecoTrackVector.empty()) {
+    return;
+  }
 
   m_stateCreatorFromTracks.apply(m_cdcRecoTrackVector, m_seedStates);
   m_stateCreatorFromHits.apply(m_spacePointVector, m_states);

@@ -14,7 +14,6 @@
 #include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>
-#include <TLorentzVector.h>
 #include <TMatrixDSym.h>
 
 #include <cmath>
@@ -27,38 +26,49 @@ namespace Belle2 {
   class ECLCluster : public RelationsObject {
   public:
 
-    /** The hypothis ID for this ECLCluster (Connected region (CR) is split using this hypothesis.*/
-    enum Hypothesis {
+    /** The hypothesis bits for this ECLCluster (Connected region (CR) is split using this hypothesis.*/
+    enum class EHypothesisBit : short unsigned int {
+      /** None as initializer */
+      c_none = 1 << 0,
       /** CR is split into a muon and n photons (T1) */
-      c_muonNPhotons = 1,
+      c_muonNPhotons = 1 << 1,
       /** CR is reconstructed as a charged hadron (T2) */
-      c_chargedHadron = 2,
+      c_chargedHadron = 1 << 2,
       /** CR is split into an electron and n photons (T3) */
-      c_electronNPhotons = 3,
+      c_electronNPhotons = 1 << 3,
       /** CR is split into n photons (N1) */
-      c_nPhotons = 5,
+      c_nPhotons = 1 << 4,
       /** CR is reconstructed as a neutral hadron (N2) */
-      c_neutralHadron = 6,
-      /** CR is reconstructed as merged pi0 (N3) */
-      c_mergedPi0 = 7
+      c_neutralHadron = 1 << 5,
+      /** CR is reconstructed as merged pi0 (N3)*/
+      c_mergedPi0 = 1 << 6
     };
 
     /** The status information for the ECLCluster. */
-    enum StatusBit {
+    enum class EStatusBit : short unsigned int {
       /** bit 0: ECLCluster is matched to a ECL trigger cluster */
       c_TriggerCluster   = 1 << 0,
       /** bit 1: ECLCluster to ECLTRGCluster matcher was run */
       c_TriggerClusterMatching = 1 << 1,
+      /** bit 2: ECLCluster has pulse shape discrimination variables.*/
+      c_PulseShapeDiscrimination = 1 << 2,
+      /** bit 3: ECLCluster has fit time that failed.*/
+      c_fitTimeFailed = 1 << 3,
+      /** bit 4: ECLCluster has time resolution calculation that failed.*/
+      c_timeResolutionFailed = 1 << 4,
+
     };
 
     /**
      *default constructor : all values are set to 0, IDs set to -1, flags to false
      */
+
     ECLCluster() :
       m_isTrack(false),
       m_status(0),
+      m_hypotheses(static_cast<unsigned short>(EHypothesisBit::c_nPhotons)), // set to c_nPhotons for b2bii
+      m_maxECellId(0),
       m_connectedRegionId(0),
-      m_hypothesisId(c_nPhotons), // set to c_nPhotons for b2bii
       m_clusterId(0),
       m_sqrtcovmat_00(0.),
       m_covmat_10(0.),
@@ -83,32 +93,51 @@ namespace Belle2 {
       m_r(0.),
       m_logEnergy(-5.),
       m_logEnergyRaw(-5.),
-      m_logEnergyHighestCrystal(-5.) {}
+      m_logEnergyHighestCrystal(-5.),
+      m_PulseShapeDiscriminationMVA(0.5),
+      m_ClusterHadronIntensity(0.),
+      m_NumberOfHadronDigits(0.) {}
 
     /** Set m_isTrack true if the cluster matches with a track. */
     void setIsTrack(bool istrack) { m_isTrack = istrack; }
 
     /** Set status. */
-    void setStatus(unsigned short status) { m_status = status; }
+    void setStatus(EStatusBit status) { m_status = static_cast<short unsigned>(status); }
 
     /**
      * Add bitmask to current status.
      * @param bitmask The status code which should be added.
      */
-    void addStatus(unsigned short int bitmask) { m_status |= bitmask; }
+    void addStatus(EStatusBit bitmask) { m_status |= static_cast<short unsigned>(bitmask); }
 
     /**
      * Remove bitmask from current status.
      * @param bitmask The status code which should be removed.
 
      */
-    void removeStatus(unsigned short int bitmask) { m_status &= (~bitmask); }
+    void removeStatus(EStatusBit bitmask) { m_status &= (~static_cast<short unsigned>(bitmask)); }
+
+    /** Set hypotheses. */
+    void setHypothesis(EHypothesisBit hypothesis) { m_hypotheses = static_cast<short unsigned>(hypothesis); }
+
+    /**
+     * Add bitmask to current hypothesis.
+     * @param bitmask The status code which should be added.
+     */
+    void addHypothesis(EHypothesisBit bitmask) { m_hypotheses |= static_cast<short unsigned>(bitmask); }
+
+    /**
+     * Remove bitmask from current hypothesis.
+     * @param bitmask The hypothesis code which should be removed.
+
+     */
+    void removeHypothesis(EHypothesisBit bitmask) { m_hypotheses &= (~static_cast<short unsigned>(bitmask)); }
+
+    /** Set cellID of maximum energy crystal */
+    void setMaxECellId(unsigned short cellid) {m_maxECellId = cellid;}
 
     /** Set connected region id. */
     void setConnectedRegionId(int crid) { m_connectedRegionId = crid; }
-
-    /** Set hypothesis id. */
-    void setHypothesisId(int hypothesisid) { m_hypothesisId = hypothesisid; }
 
     /** Set cluster id. */
     void setClusterId(int clusterid) { m_clusterId = clusterid; }
@@ -158,6 +187,16 @@ namespace Belle2 {
     /** Set E9/E21 energy ratio. */
     void setE9oE21(double E9oE21) { m_E9oE21 = E9oE21; }
 
+    /** set Cluster Hadron Component Intensity. */
+    [[deprecated("will be removed in release-04.")]]
+    void setClusterHadronIntensity(double ClusterHadronIntensity) { m_ClusterHadronIntensity = ClusterHadronIntensity; }
+
+    /** set Pulse Shape Discrimination MVA */
+    void setPulseShapeDiscriminationMVA(double PulseShapeDiscriminationMVA) { m_PulseShapeDiscriminationMVA = PulseShapeDiscriminationMVA; }
+
+    /** set Number of hadron digits in cluster . */
+    void setNumberOfHadronDigits(double NumberOfHadronDigits) { m_NumberOfHadronDigits = NumberOfHadronDigits; }
+
     /** Set SecondMoment. */
     void setSecondMoment(double secondmoment) { m_secondMoment = secondmoment; }
 
@@ -200,11 +239,23 @@ namespace Belle2 {
     /** Return status. */
     unsigned short getStatus() const {return m_status;}
 
+    /** Return hypothesis (expert only, this returns a bti pattern). */
+    unsigned short getHypotheses() const {return m_hypotheses;}
+
+    /** Return cellID of maximum energy crystal */
+    unsigned short getMaxECellId() const {return m_maxECellId;}
+
     /** Return connected region id. */
     int getConnectedRegionId() const {return m_connectedRegionId;}
 
     /** Return hypothesis id */
-    int getHypothesisId() const {return m_hypothesisId;}
+    [[deprecated("Please use hasHypothesis().")]]
+    int getHypothesisId() const
+    {
+      if (hasHypothesis(EHypothesisBit::c_nPhotons)) return 5;
+      else if (hasHypothesis(EHypothesisBit::c_neutralHadron)) return 6;
+      else return 0;
+    }
 
     /** Return cluster id */
     int getClusterId() const {return m_clusterId;}
@@ -230,6 +281,16 @@ namespace Belle2 {
     /** Return E9/E21 (shower shape variable). */
     double getE9oE21() const { return m_E9oE21; }
 
+    /** Return Cluster hadron intensity*/
+    [[deprecated("will be removed in release-04.")]]
+    double getClusterHadronIntensity() const { return m_ClusterHadronIntensity; }
+
+    /** Return MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers.*/
+    double getPulseShapeDiscriminationMVA() const { return m_PulseShapeDiscriminationMVA; }
+
+    /** Return number of hadron digits in cluster*/
+    double getNumberOfHadronDigits() const { return m_NumberOfHadronDigits; }
+
     /** Return second moment (shower shape variable). */
     double getSecondMoment() const { return m_secondMoment; }
 
@@ -254,10 +315,10 @@ namespace Belle2 {
     /** Return R. */
     double getR() const { return m_r; }
 
-    /** Return Corrected Energy (GeV). */
-    double getEnergy() const {return exp(m_logEnergy);}
+    /** Return Energy (GeV). */
+    double getEnergy(const EHypothesisBit& hypothesis) const;
 
-    /** Return Uncorrect Energy deposited (GeV) */
+    /** Return Uncorrected Energy deposited (GeV) */
     double getEnergyRaw() const {return exp(m_logEnergyRaw);}
 
     /** Return energy of highest energetic crystal in cluster (GeV) */
@@ -278,15 +339,11 @@ namespace Belle2 {
     /** Return TMatrixDsym 3x3 covariance matrix for E, Phi and Theta */
     TMatrixDSym getCovarianceMatrix3x3() const;
 
-    /*! Get covariance matrix as array for Energy->[0], Phi->[2], Theta->[5]
-     * @return covariance matrix array for Energy->[0], Phi->[2], Theta->[5]
-     */
-    void getCovarianceMatrixAsArray(double covArray[6]) const;
-
     /** Return detector region: 0: below acceptance, 1: FWD, 2: BRL, 3: BWD, 11: FWDGAP, 13: BWDGAP */
     int getDetectorRegion() const;
 
     /** Return (pseudo) unique Id based on CRId, ShowerId and HypothesisID */
+    [[deprecated("will be removed in release-04.")]]
     int getUniqueId() const;
 
     /**
@@ -294,13 +351,30 @@ namespace Belle2 {
      * @param bitmask The bitmask which is compared to the status of the cluster.
      * @return Returns true if the bitmask matches the status code of the cluster.
      */
-    bool hasStatus(unsigned short int bitmask) const { return (m_status & bitmask) == bitmask; }
+    bool hasStatus(EStatusBit bitmask) const { return (m_status & static_cast<short unsigned>(bitmask)) == static_cast<short unsigned>(bitmask); }
+
+    /**
+     * Return if specific hypothesis bit is set.
+     * @param bitmask The bitmask which is compared to the hypothesis of the cluster.
+     * @return Returns true if the bitmask matches the hypothesis code of the cluster.
+     */
+    bool hasHypothesis(EHypothesisBit bitmask) const { return (m_hypotheses & static_cast<short unsigned>(bitmask)) == static_cast<short unsigned>(bitmask); }
 
     /** Check if ECLCluster is matched to an ECLTRGCluster */
-    bool isTriggerCluster() const {return hasStatus(c_TriggerCluster);}
+    bool isTriggerCluster() const {return hasStatus(EStatusBit::c_TriggerCluster);}
 
     /** Check if ECLTRGCluster to ECLCluster matcher has run */
-    bool hasTriggerClusterMatching() const {return hasStatus(c_TriggerClusterMatching);}
+    bool hasTriggerClusterMatching() const {return hasStatus(EStatusBit::c_TriggerClusterMatching);}
+
+    /** Check if ECLCluster has any ECLDigits with waveforms that also passed two component fit chi2 threshold in eclClusterPSD module. */
+    bool hasPulseShapeDiscrimination() const {return hasStatus(EStatusBit::c_PulseShapeDiscrimination);}
+
+    /** Check if ECLCluster has a fit time that failed. */
+    bool hasFailedFitTime() const {return hasStatus(EStatusBit::c_fitTimeFailed);}
+
+    /** Check if ECLCluster has a time resolution calculation that failed. */
+    bool hasFailedTimeResolution() const {return hasStatus(EStatusBit::c_timeResolutionFailed);}
+
 
   private:
 
@@ -310,11 +384,14 @@ namespace Belle2 {
     /** Cluster status. */
     unsigned short m_status;
 
+    /** Hypothesis. */
+    unsigned short m_hypotheses;
+
+    /** CellID of maximum energy crystal */
+    unsigned short m_maxECellId;
+
     /** Connected Region of this cluster. */
     int m_connectedRegionId;
-
-    /** Cluster hypothesis. */
-    int m_hypothesisId;
 
     /** Cluster id */
     int m_clusterId;
@@ -396,8 +473,21 @@ namespace Belle2 {
     /** Log. Highest Crystal Energy [GeV]. */
     Double32_t  m_logEnergyHighestCrystal;  //[-5, 3., 18]
 
+    /** MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers. Classifier value is 1.0 EM showers and 0.0 for hadronic showers. */
+    Double32_t  m_PulseShapeDiscriminationMVA;  //[0.0, 1.0, 18]
+
+    /** Cluster Hadron Component Intensity (pulse shape discrimination variable). Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission.  Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2. Will be removed in release-04*/
+    Double32_t  m_ClusterHadronIntensity;  //[-0.1, 0.8, 18]
+
+    /** Number of hadron digits in cluster (pulse shape discrimination variable).  Weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component.*/
+    Double32_t m_NumberOfHadronDigits;  //[0, 255, 18]
+
     /** Class definition */
-    ClassDef(ECLCluster, 10);
+    ClassDef(ECLCluster, 14);
+    // 14: Added m_maxECellId
+    // 13: Added m_hypotheses
+    // 12: Added m_PulseShapeDiscriminationMVA. Indicated that m_ClusterHadronIntensity will be removed in release-04.
+    // 11: Added m_ClusterHadronIntensity an m_NumberOfHadronDigits variables
     // 10: Added status enum, added status setter
     // 9: Removed all momentum, 4x4, and 7x7 covariance matrix getters.
     // 8: Added clusterId, getUniqueId

@@ -36,7 +36,7 @@ def main(argv):
     millepede = setups.setup_VXDHalfShells()
 
     # Align primary beamspot simultaneously with VXD half shells in addition
-    millepede.set_components(['VXDAlignment', 'BeamVertex'])
+    millepede.set_components(['VXDAlignment', 'BeamSpot'])
 
     caf.add_calibration(millepede.create('vxd_shells_beamspot', inputFiles))
 

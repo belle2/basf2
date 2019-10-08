@@ -26,20 +26,28 @@ REG_MODULE(DQMHistAnalysisRooFitExample)
 DQMHistAnalysisRooFitExampleModule::DQMHistAnalysisRooFitExampleModule()
   : DQMHistAnalysisModule()
 {
+  // This module CAN NOT be run in parallel!
+
   //Parameter definition
   B2DEBUG(1, "DQMHistAnalysisRooFitExample: Constructor done.");
 }
 
-
-DQMHistAnalysisRooFitExampleModule::~DQMHistAnalysisRooFitExampleModule() { }
+DQMHistAnalysisRooFitExampleModule::~DQMHistAnalysisRooFitExampleModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
 
 void DQMHistAnalysisRooFitExampleModule::initialize()
 {
   B2INFO("DQMHistAnalysisRooFitExample: initialized.");
 
-//   SEVCHK(ca_context_create(ca_disable_preemptive_callback),"ca_context_create");
-//   SEVCHK(ca_create_channel("fit_value",NULL,NULL,10,&mychid),"ca_create_channel failure");
-//   SEVCHK(ca_pend_io(5.0),"ca_pend_io failure");
+#ifdef _BELLE2_EPICS
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  SEVCHK(ca_create_channel("fit_value", NULL, NULL, 10, &mychid), "ca_create_channel failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
 
   w = new RooWorkspace("w");
   w->factory("Gaussian::f(x[-20,20],mean[0,-5,5],sigma[3,1,10])");
@@ -112,9 +120,10 @@ void DQMHistAnalysisRooFitExampleModule::event()
   }
 
 #ifdef _BELLE2_EPICS
-//   double data=0;
-//   SEVCHK(ca_put(DBR_DOUBLE,mychid,(void*)&data),"ca_set failure");
-//   SEVCHK(ca_pend_io(5.0),"ca_pend_io failure");
+  double fitdata = 0;
+
+  SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&fitdata), "ca_set failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }
 
@@ -126,6 +135,10 @@ void DQMHistAnalysisRooFitExampleModule::endRun()
 
 void DQMHistAnalysisRooFitExampleModule::terminate()
 {
+#ifdef _BELLE2_EPICS
+  SEVCHK(ca_clear_channel(mychid), "ca_clear_channel failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
   B2INFO("DQMHistAnalysisRooFitExample: terminate called");
 }
 

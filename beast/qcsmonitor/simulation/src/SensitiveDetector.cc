@@ -11,10 +11,8 @@
 #include <beast/qcsmonitor/simulation/SensitiveDetector.h>
 #include <beast/qcsmonitor/dataobjects/QcsmonitorSimHit.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
 
 #include <G4Track.hh>
 #include <G4Step.hh>
@@ -27,7 +25,6 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector():
       Simulation::SensitiveDetectorBase("QcsmonitorSensitiveDetector", Const::invalidDetector)
     {
-      m_simhitNumber = 0;
       m_hitNum = 0;
       m_EvnetNumber = 0;
       m_oldEvnetNumber = 0;
@@ -157,10 +154,10 @@ namespace Belle2 {
       RelationArray qcsmonitorSimHitRel(mcParticles, QcsmonitorHits);
       TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
       QcsmonitorHits.appendNew(cellId, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);
-      B2DEBUG(150, "HitNumber: " << m_simhitNumber);
-      int m_simhitNumber = QcsmonitorHits.getEntries() - 1;
-      qcsmonitorSimHitRel.add(trackID, m_simhitNumber);
-      return (m_simhitNumber);
+      int simhitNumber = QcsmonitorHits.getEntries() - 1;
+      B2DEBUG(150, "HitNumber: " << simhitNumber);
+      qcsmonitorSimHitRel.add(trackID, simhitNumber);
+      return (simhitNumber);
     }//saveSimHit
 
 

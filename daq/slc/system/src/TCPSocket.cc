@@ -23,14 +23,13 @@
 using namespace Belle2;
 
 int TCPSocket::connect(const std::string& ip, unsigned short port)
-throw (IOException)
 {
   m_ip = ip;
   m_port = port;
   return connect();
 }
 
-int TCPSocket::connect() throw (IOException)
+int TCPSocket::connect()
 {
   if (m_fd > 0) {
     throw (IOException("Socket is working already."));
@@ -70,7 +69,7 @@ int TCPSocket::connect() throw (IOException)
   return m_fd;
 }
 
-void TCPSocket::setBufferSize(int size) throw(IOException)
+void TCPSocket::setBufferSize(int size)
 {
   if (size > 0) {
     if (setsockopt(m_fd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size)) != 0) {
@@ -82,7 +81,7 @@ void TCPSocket::setBufferSize(int size) throw(IOException)
   }
 }
 
-size_t TCPSocket::write(const void* buf, size_t count) throw(IOException)
+size_t TCPSocket::write(const void* buf, size_t count)
 {
   size_t c = 0;
   int ret;
@@ -106,7 +105,7 @@ size_t TCPSocket::write(const void* buf, size_t count) throw(IOException)
   return c;
 }
 
-size_t TCPSocket::read(void* buf, size_t count) throw(IOException)
+size_t TCPSocket::read(void* buf, size_t count)
 {
   size_t c = 0;
   int ret;
@@ -126,7 +125,7 @@ size_t TCPSocket::read(void* buf, size_t count) throw(IOException)
   return c;
 }
 
-size_t TCPSocket::read_once(void* buf, size_t count) throw(IOException)
+size_t TCPSocket::read_once(void* buf, size_t count)
 {
   int ret;
   errno = 0;
@@ -190,7 +189,7 @@ int TCPSocket::getLocalPort()
   return ntohs(sa.sin_port);
 }
 
-unsigned int TCPSocket::getAddress() throw(IOException)
+unsigned int TCPSocket::getAddress()
 {
   struct hostent* host = NULL;
   host = gethostbyname(m_ip.c_str());

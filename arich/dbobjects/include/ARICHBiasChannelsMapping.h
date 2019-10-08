@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <vector>
 #include <TObject.h>
 #include <map>
 #include <vector>
@@ -99,7 +98,7 @@ namespace Belle2 {
     /**
      * Print properties
      */
-    void print();
+    void print() const;
 
   private:
 

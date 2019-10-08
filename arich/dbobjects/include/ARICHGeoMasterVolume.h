@@ -9,13 +9,10 @@
  **************************************************************************/
 
 #pragma once
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 #include <arich/dbobjects/ARICHGeoBase.h>
 #include <string>
 #include <TVector3.h>
-#include <TVector2.h>
 #include <TRotation.h>
 
 namespace Belle2 {
@@ -51,13 +48,13 @@ namespace Belle2 {
      * Check of geometry parameters consistency
      * @return true if consistent
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "ARICH Master Volume geometry parameters") const;
+    void print(const std::string& title = "ARICH Master Volume geometry parameters") const override;
 
     /**
      * Sets positioning of ARICH master volume in global Belle II coordinate system
@@ -165,7 +162,7 @@ namespace Belle2 {
     mutable TRotation* m_rotationInverse = 0;
     mutable TVector3*  m_translation = 0;
 
-    ClassDef(ARICHGeoMasterVolume, 1); /**< ClassDef */
+    ClassDefOverride(ARICHGeoMasterVolume, 1); /**< ClassDef */
 
   };
 

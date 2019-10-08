@@ -22,7 +22,7 @@ namespace Belle2 {
     cout << "PMT gain parameters:" << endl;
     cout << " Serial number: " << getSerialNumber() << endl;
     cout << " Nominal HV: " << getNominalHV() << " V" << endl;
-    for (unsigned channel = 1; channel <= c_NumChannels; channel++) {
+    for (unsigned channel = 1; channel <= c_NumPmtPixels; channel++) {
       cout << setw(4) << channel;
       cout << setw(12) << getConstant(channel);
       cout << setw(12) << getSlope(channel);

@@ -95,12 +95,12 @@ namespace Belle2 {
     /**
      * Implementation of abstract class function
      */
-    virtual void merge(const Mergeable* other);
+    virtual void merge(const Mergeable* other) override;
 
     /**
      * Implementation of abstract class function
      */
-    virtual void clear();
+    virtual void clear() override;
 
 
   private:
@@ -120,7 +120,7 @@ namespace Belle2 {
     /**
      * Class definition required for creation of ROOT dictionary.
      */
-    ClassDef(BackgroundMetaData, 3);
+    ClassDefOverride(BackgroundMetaData, 3);
   };
 }
 

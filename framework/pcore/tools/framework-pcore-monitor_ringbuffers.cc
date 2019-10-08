@@ -5,23 +5,21 @@
 #include <iomanip>
 
 #include <dirent.h>
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cstring>
 
-#include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
 
 void rbinfo(int shmid)
 {
-  const int* shmadr = (int*) shmat(shmid, 0, SHM_RDONLY);
+  const int* shmadr = (int*) shmat(shmid, nullptr, SHM_RDONLY);
   if (shmadr == (int*) - 1) {
     B2FATAL("RingBuffer: Attaching to shared memory segment via shmat() failed");
   }
-  const Belle2::RingBufInfo* m_bufinfo = reinterpret_cast<const Belle2::RingBufInfo*>(shmadr);
+  const auto* m_bufinfo = reinterpret_cast<const Belle2::RingBufInfo*>(shmadr);
 
   long filled_bytes = m_bufinfo->wptr - m_bufinfo->rptr;
   if (filled_bytes < 0)
@@ -42,9 +40,9 @@ std::vector<int> findRingBuffers()
 {
   std::vector<int> buffer_SHMs;
   DIR* dir;
-  if ((dir = opendir("/tmp")) != NULL) {
+  if ((dir = opendir("/tmp")) != nullptr) {
     struct dirent* ent;
-    while ((ent = readdir(dir)) != NULL) {
+    while ((ent = readdir(dir)) != nullptr) {
       if (strncmp(ent->d_name, "SHM", 3) == 0) {
         int shmid, semid;
         char name[256];

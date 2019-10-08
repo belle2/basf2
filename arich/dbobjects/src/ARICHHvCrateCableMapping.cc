@@ -12,7 +12,6 @@
 
 #include <arich/dbobjects/ARICHHvCrateCableMapping.h>
 #include <iostream>
-#include <iomanip>
 
 using namespace std;
 using namespace Belle2;
@@ -48,7 +47,7 @@ void ARICHHvCrateCableMapping::addMapping(int connectionID, std::vector<int> sec
   m_connection2cable.insert(std::pair<int, std::vector<int>>(connectionID, sectorCable));
 }
 
-void ARICHHvCrateCableMapping::print()
+void ARICHHvCrateCableMapping::print() const
 {
   for (auto const& x : m_connection2cable)  {
     int connectionID = x.first;

@@ -3,23 +3,26 @@
 
 """
 <header>
-  <contact>tkuhr</contact>
+  <contact>Software team b2soft@mail.desy.de</contact>
   <output>EvtGenSimRecLarge.root</output>
-  <description>This steering file produces 10000 generic BBbar events with EvtGen,
-  runs the detector simulation with mixed in background, and performs the standard reconstruction.
-  It will only be run for release validation in order to test the software on a larger set of events to
-  be more closer to the typical runtime on a grid site.</description>
+  <description>
+    This steering file produces 10000 generic BBbar events with
+    EvtGen, runs the detector simulation with mixed in background, and performs
+    the standard reconstruction. It will only be run for release validation in
+    order to test the software on a larger set of events to be more closer to
+    the typical runtime on a grid site.
+  </description>
   <interval>release</interval>
 </header>
 """
 
-from basf2 import *
+from basf2 import set_random_seed, create_path, process, statistics, \
+    register_module
 from simulation import add_simulation
 from L1trigger import add_tsim
 from reconstruction import add_reconstruction
 from beamparameters import add_beamparameters
 from background import get_background_files
-import validationtools
 
 set_random_seed(12345)
 
@@ -30,7 +33,7 @@ eventinfosetter = register_module('EventInfoSetter')
 # will roughly run for 10 hours
 eventinfosetter.param('evtNumList', [40000])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [1])
+eventinfosetter.param('expList', [0])
 main.add_module(eventinfosetter)
 
 # beam parameters
@@ -60,8 +63,18 @@ process(main)
 print(statistics)
 
 from validation import *
-statistics_plots('EvtGenSimRecLarge_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation and reconstruction job with generic EvtGen events', prefix='EvtGenSimRecLarge')
-event_timing_plot('../EvtGenSimRecLarge.root', 'EvtGenSimRecLarge_statistics.root',
-                  contact='tkuhr',
-                  jobDesc='a standard simulation and reconstruction job with generic EvtGen events', prefix='EvtGenSimRecLarge')
+statistics_plots(
+    'EvtGenSimRecLarge_statistics.root',
+    contact='Software team b2soft@mail.desy.de',
+    job_desc='a standard simulation and reconstruction job with generic '
+             'EvtGen events',
+    prefix='EvtGenSimRecLarge'
+)
+event_timing_plot(
+    '../EvtGenSimRecLarge.root',
+    'EvtGenSimRecLarge_statistics.root',
+    contact='Software team b2soft@mail.desy.de',
+    job_desc='a standard simulation and reconstruction job with generic '
+             'EvtGen events',
+    prefix='EvtGenSimRecLarge'
+)

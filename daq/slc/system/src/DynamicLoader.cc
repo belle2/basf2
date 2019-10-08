@@ -6,11 +6,11 @@
 
 using namespace Belle2;
 
-DynamicLoader::~DynamicLoader() throw()
+DynamicLoader::~DynamicLoader()
 {
 }
 
-void DynamicLoader::close() throw()
+void DynamicLoader::close()
 {
   if (m_handle != NULL) {
     dlclose(m_handle);
@@ -19,7 +19,6 @@ void DynamicLoader::close() throw()
 }
 
 void* DynamicLoader::open(const std::string& lib_path)
-throw(DynamicLoadException)
 {
   void* handle = dlopen(lib_path.c_str(), RTLD_LAZY);
   if (!handle) {
@@ -30,7 +29,6 @@ throw(DynamicLoadException)
 }
 
 void* DynamicLoader::load(const std::string& funcname)
-throw(DynamicLoadException)
 {
   char* error = NULL;
   void* func = dlsym(m_handle, funcname.c_str());

@@ -14,28 +14,16 @@
 
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/particledb/EvtGenDatabasePDG.h>
 #include <framework/utilities/FileSystem.h>
 
-#include <boost/format.hpp>
-#include <stdio.h>
-
-#include <TDatabasePDG.h>
 #include <TRandom3.h>
 
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/IOIntercept.h>
 
 #include <string>
-#include <queue>
-
-#include <EvtGenExternal/EvtExternalGenList.hh>
-#include <EvtGenBase/EvtAbsRadCorr.hh>
-#include <EvtGenBase/EvtDecayBase.hh>
 
 using namespace std;
 using namespace Belle2;
@@ -60,7 +48,7 @@ FragmentationModule::FragmentationModule() : Module()
   addParam("ListPYTHIAEvent", m_listEvent, "List event record of PYTHIA after hadronization", 0);
   addParam("UseEvtGen", m_useEvtGen, "Use EvtGen for specific decays", 1);
   addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)",
-           FileSystem::findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC", true));
+           FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true));
   addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string(""));
   addParam("useEvtGenParticleData", m_useEvtGenParticleData, "Use evt.pdl particle data in PYTHIA as well", 0);
 
@@ -71,7 +59,6 @@ FragmentationModule::FragmentationModule() : Module()
   nVpho   = 0;
   nAll    = 0;
   nGood   = 0;
-
   pythia = nullptr;
   PythiaEvent = nullptr;
 }
@@ -91,10 +78,16 @@ void FragmentationModule::terminate()
   pythia->stat();
   statLogCapture.finish();
 
+  if (nAll != nGood) {
+    double ratio = 0.; //ratio of good over all events
+    if (nAll) ratio = 100.0 * nGood / nAll;
 
-  double ratio = 0.; //ratio of good over all events
-  if (nAll) ratio = 100.0 * nGood / nAll;
-  B2RESULT("Total number of events: " << nAll << ", of these fragmented: " << nGood << ", ratio: " << ratio << "%");
+    B2WARNING("Not all events could be fragmented: " << nAll - nGood << " events failed.");
+    B2WARNING("Total number of events: " << nAll << ", of these fragmented: " << nGood << ", success-ratio (should be >97%): " << ratio
+              << "%");
+    B2WARNING("Please contact the generator librarian if the success ratio is below 97%.");
+    B2WARNING("Please treat the success-ratio as correction of the effective cross section due to unphysical events.");
+  }
 }
 
 //-----------------------------------------------------------------
@@ -136,7 +129,7 @@ void FragmentationModule::initialize()
 
   if (m_useEvtGen) {
     B2INFO("Using PYTHIA EvtGen Interface");
-    const std::string defaultDecFile = FileSystem::findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC", true);
+    const std::string defaultDecFile = FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true);
     if (m_DecFile.empty()) {
       B2ERROR("No global decay file defined, please make sure the parameter 'DecFile' is set correctly");
       return;
@@ -230,7 +223,6 @@ void FragmentationModule::event()
   eventLogCapture.finish();
 
   if (!success) {
-    B2WARNING("pythia->next() failed, event generation aborted prematurely! Set LogLevel to Debug 50 to see PYTHIA event listing.");
     IOIntercept::OutputToLogMessages listLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Error, 50, 100);
     listLogCapture.start();
     PythiaEvent->list();

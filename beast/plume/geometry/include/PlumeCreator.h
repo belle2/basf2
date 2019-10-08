@@ -12,23 +12,9 @@
 #define PLUMECREATOR_H_
 
 #include <geometry/CreatorBase.h>
-#include "G4VUserDetectorConstruction.hh"
-#include "globals.hh"
-#include "TString.h"
-#include "Riostream.h"
 
-class G4Box;
-class G4Tubs;
 class G4LogicalVolume;
-class G4VPhysicalVolume;
-class G4Material;
-class G4UniformMagField;
-class DetectorMessenger;
-class G4ProductionCuts;
-class G4Region;
-class G4VSolid;
-class G4UnionSolid;
-class G4SubtractionSolid;
+class G4AssemblyVolume;
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for the PLUME detector */
@@ -45,6 +31,10 @@ namespace Belle2 {
     protected:
       /**  SensitiveDetector PLUME */
       SensitiveDetector* m_sensitive;
+      G4AssemblyVolume* buildSupport1();
+      G4AssemblyVolume* buildSupport2();
+      G4AssemblyVolume* buildSupport3();
+      G4AssemblyVolume* buildSupport4();
     };
 
   }

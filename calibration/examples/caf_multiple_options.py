@@ -4,6 +4,8 @@
 # or just make your own any change the input data below.
 
 from basf2 import *
+# set_log_level(LogLevel.DEBUG)
+# set_debug_level(29)
 set_log_level(LogLevel.INFO)
 
 import os
@@ -20,7 +22,7 @@ def main(argv):
     if len(argv) == 1:
         data_dir = argv[0]
     else:
-        print("Usage: basf2 caf_multiple_options.py <data directory>")
+        print("Usage: python3 caf_multiple_options.py <data directory>")
         sys.exit(1)
 
     ###################################################
@@ -37,6 +39,8 @@ def main(argv):
         """
         Just to show that the function is correctly applied
         """
+        from basf2 import set_log_level, LogLevel
+        set_log_level(LogLevel.DEBUG)
         B2INFO("Running Test Algorithm Setup For Iteration {0}".format(iteration))
         B2INFO("Can access the {0} class from Calibration().pre_algorithms.".format(algorithm.__cppname__))
 
@@ -55,6 +59,7 @@ def main(argv):
         # different names. TestCalibrationAlgorithm outputs to the database using the prefix name so we change it
         # slightly for each calibration. Not something you'd usually have to do.
         alg_test.setPrefix('Test{}'.format(i))  # Must be the same as colllector prefix
+        alg_test.setDebugHisto(True)
 
         cal_test = Calibration(name='TestCalibration{}'.format(i),
                                collector=col_test,
@@ -63,6 +68,7 @@ def main(argv):
         cal_test.pre_algorithms = pre_alg_test
 
         cal_test.max_files_per_collector_job = 1
+        cal_test.max_iterations = 5  # Each calibration will end iteration after this many attempts (if reached)
         # If you have some local databases or want to override the default global tag for this calibration you can do that
         # with these functions
 #        cal_test.use_local_database("mylocaldb/database.txt")
@@ -83,7 +89,6 @@ def main(argv):
     ###################################################
     # Create a CAF instance to configure how we will run
     cal_fw = CAF()
-    cal_fw.max_iterations = 5  # Each calibration will end iteration after this many attempts (if reached)
     # Add in our list of calibrations
     for cal in calibrations:
         cal_fw.add_calibration(cal)

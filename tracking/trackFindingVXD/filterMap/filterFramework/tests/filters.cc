@@ -25,8 +25,9 @@ namespace VXDTFfilterTest {
   /** just a small proto-container storing coordinates */
   class spacePoint: public tuple<float, float, float> {
   public:
+    /** Constructor accepting coordinates. */
     spacePoint(float x, float y, float z): tuple<float, float, float>(x, y, z)
-    {}; /**< constructor accepting coordinates. */
+    {};
   private:
     /** private copy constructor to test that all the
     * arguments are passed by reference. */
@@ -375,7 +376,6 @@ namespace VXDTFfilterTest {
     EXPECT_FALSE(filterMin2.accept(x1, x2));
     EXPECT_TRUE(filterMin2.accept(x1, x4));
 
-    // cppcheck-suppress compareBoolExpressionWithInt
     auto filterRange = (0. < SquaredDistance3D() < 1);
     EXPECT_FALSE(filterRange.accept(x1, x1));
     EXPECT_TRUE(filterRange.accept(x1, x2));

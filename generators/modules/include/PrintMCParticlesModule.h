@@ -13,11 +13,9 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 #include <string>
 #include <vector>
-
 
 namespace Belle2 {
 
@@ -41,9 +39,9 @@ namespace Belle2 {
     virtual ~PrintMCParticlesModule() {}
 
     /** init. */
-    virtual void initialize();
+    virtual void initialize() override;
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
 

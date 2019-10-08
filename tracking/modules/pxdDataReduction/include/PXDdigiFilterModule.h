@@ -8,11 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDIGIFILTERMODULE_H
-#define PXDDIGIFILTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/SelectSubset.h>
 #include <pxd/dataobjects/PXDDigit.h>
 
@@ -20,8 +18,8 @@ namespace Belle2 {
 
   /**
    * The module produce a StoreArray of PXDDigit inside the ROIs.
-   *
-   *    *
+   * Thus simulation "ONSEN" ROI selection.
+   * An oitside of ROI array can be produced on demand.
    */
   class PXDdigiFilterModule : public Module {
 
@@ -32,26 +30,15 @@ namespace Belle2 {
      */
     PXDdigiFilterModule();
 
-    /**  */
-    ~PXDdigiFilterModule();
-
-    /**  */
-    void initialize() override;
-
-    /**  */
-    void beginRun() override;
-
-    /**  */
-    void event() override;
-
-    /**  */
-    void endRun() override;
-
-    /**  */
-    void terminate() override;
-
-
   private:
+
+    /**  */
+    void initialize() override final;
+
+
+    /**  */
+    void event() override final;
+
 
     bool m_CreateOutside; /**< if set, create list of outside pixels, too */
     std::string m_PXDDigitsName;  /**< The name of the StoreArray of PXDDigits to be filtered */
@@ -64,5 +51,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* PXDDIGIFILTERMODULE_H */

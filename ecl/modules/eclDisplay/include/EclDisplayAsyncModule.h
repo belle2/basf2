@@ -8,14 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDISPLAY_ASYNCMODULE_H
-#define ECLDISPLAY_ASYNCMODULE_H
+#pragma once
 
-// #include <framework/core/Module.h>
+//Framework
 #include <framework/pcore/AsyncWrapper.h>
-#include <ecl/modules/eclDisplay/EclDisplayModule.h>
-// #include <ecl/modules/eclDisplay/EclFrame.h>
-// #include <TThread.h>
+
 
 namespace Belle2 {
   /**
@@ -38,5 +35,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* ECLDISPLAY_ASYNCMODULE_H */

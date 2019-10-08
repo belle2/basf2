@@ -318,17 +318,28 @@ namespace Belle2 {
      */
     void getXYChannelPos(int chX, int chY, double& x, double& y) const;
 
+
+    /**
+     * Returns distance between photocathode and APD
+     * @return photacathod APD distance
+     */
+    double getPhotocathodeApdDistance() const
+    {
+      return (m_HAPDSizeZ - m_winThickness - m_wallThickness - m_APDSizeZ) / s_unit;
+    }
+
+
     /**
      * Check consistency of geometry parameters
      * @return true if consistent
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "HAPD module geometry parameters") const;
+    void print(const std::string& title = "HAPD module geometry parameters") const override;
 
   private:
 
@@ -356,7 +367,7 @@ namespace Belle2 {
     double m_moduleSizeZ = 0;   /**< HAPD module Z size (HAPD + FEB height)*/
     GeoOpticalSurface m_apdSurface; /**< optical surface of APD (for reflectivity) */
 
-    ClassDef(ARICHGeoHAPD, 1); /**< ClassDef */
+    ClassDefOverride(ARICHGeoHAPD, 1); /**< ClassDef */
 
   };
 

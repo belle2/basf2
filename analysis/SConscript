@@ -4,8 +4,10 @@ env['LIBS'] = [
     'framework',
     'analysis_dataobjects',
     'mdst_dataobjects',
+    'mdst_dbobjects',
     '$ROOT_LIBS',
     'EG',
+    'CLHEP',
     'RooFit',
     'RooFitCore',
     'RooStats',
@@ -15,6 +17,5 @@ env['LIBS'] = [
     'analysis_ContinuumSuppression',
     'analysis_ClusterUtility'
 ]
-
 
 Return('env')

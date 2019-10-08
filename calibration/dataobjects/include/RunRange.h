@@ -18,7 +18,7 @@ namespace Belle2 {
     RunRange() : TNamed() {};
 
     /// Constructor from vector of ExpRun objects
-    RunRange(std::vector<Calibration::ExpRun> expRuns) : TNamed()
+    explicit RunRange(std::vector<Calibration::ExpRun> expRuns) : TNamed()
     {
       for (auto expRun : expRuns) {
         this->add(expRun.first, expRun.second);

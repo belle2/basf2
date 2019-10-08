@@ -13,6 +13,7 @@
 #pragma once
 
 #include <CLHEP/Units/SystemOfUnits.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 
@@ -87,9 +88,9 @@ namespace Belle2 {
     inline void G4MonopoleTransportation::ResetKilledStatistics(G4int report)
     {
       if (report) {
-        G4cout << " G4MonopoleTransportation: Statistics for looping particles " << G4endl; //TODO move to B2INFO
-        G4cout << "   Sum of energy of loopers killed: " <<  fSumEnergyKilled << G4endl;
-        G4cout << "   Max energy of loopers killed: " <<  fMaxEnergyKilled << G4endl;
+        B2INFO(" G4MonopoleTransportation: Statistics for looping particles ");
+        B2INFO("   Sum of energy of loopers killed: " <<  fSumEnergyKilled);
+        B2INFO("   Max energy of loopers killed: " <<  fMaxEnergyKilled);
       }
 
       fSumEnergyKilled = 0;

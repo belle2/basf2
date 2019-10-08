@@ -162,10 +162,10 @@ B2Vector3D StudyMaterialEffectsModule::getGlobalPosition(const SVDTrueHit* trueH
   const Belle2::VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
 
   if (useEntry) {
-    B2Vector3D pos = aSensorInfo->pointToGlobal(TVector3(trueHit->getEntryU(), trueHit->getEntryV(), 0));
+    B2Vector3D pos = aSensorInfo->pointToGlobal(TVector3(trueHit->getEntryU(), trueHit->getEntryV(), 0), true);
     return pos;
   }
-  B2Vector3D pos = aSensorInfo->pointToGlobal(TVector3(trueHit->getExitU(), trueHit->getExitV(), 0));
+  B2Vector3D pos = aSensorInfo->pointToGlobal(TVector3(trueHit->getExitU(), trueHit->getExitV(), 0), true);
   return pos;
 }
 
@@ -195,8 +195,8 @@ B2Vector3D StudyMaterialEffectsModule::getGlobalMomentumVector(const SVDTrueHit*
 
   if (useEntry) {
 //  B2Vector3D mom = aSensorInfo->pointToGlobal(trueHit->getEntryMomentum());
-    return aSensorInfo->vectorToGlobal(trueHit->getEntryMomentum());;
+    return aSensorInfo->vectorToGlobal(trueHit->getEntryMomentum(), true);
   }
 //   B2Vector3D pos = aSensorInfo->pointToGlobal(trueHit->getExitMomentum());
-  return aSensorInfo->vectorToGlobal(trueHit->getExitMomentum());;
+  return aSensorInfo->vectorToGlobal(trueHit->getExitMomentum(), true);
 }

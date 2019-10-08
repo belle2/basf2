@@ -26,7 +26,7 @@ namespace Belle2 {
 
   public:
     /** Constructor */
-    VXDHalfShellPar(std::string name = "", double shellAngle = 0) : m_name(name), m_shellAngle(shellAngle) {}
+    VXDHalfShellPar(std::string const& name = "", double shellAngle = 0) : m_name(name), m_shellAngle(shellAngle) {}
     /** get shell name */
     std::string getName() const { return m_name; }
     /** get shellAngle */

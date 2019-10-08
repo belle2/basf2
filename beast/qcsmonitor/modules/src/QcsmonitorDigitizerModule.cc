@@ -10,34 +10,14 @@
 
 #include <beast/qcsmonitor/modules/QcsmonitorDigitizerModule.h>
 #include <beast/qcsmonitor/dataobjects/QcsmonitorSimHit.h>
-#include <beast/qcsmonitor/dataobjects/QcsmonitorHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/core/RandomNumbers.h>
 
 //c++
-#include <cmath>
-#include <boost/foreach.hpp>
 #include <string>
-#include <sstream>
-#include <iostream>
 #include <fstream>
-#include <vector>
-
-// ROOT
-#include <TH1.h>
-#include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -75,7 +55,7 @@ QcsmonitorDigitizerModule::~QcsmonitorDigitizerModule()
 void QcsmonitorDigitizerModule::initialize()
 {
   B2INFO("QcsmonitorDigitizer: Initializing");
-  StoreArray<QcsmonitorHit>::registerPersistent();
+  m_qcsmonitorHit.registerInDataStore();
 
   //get the garfield drift data, gas, and QCSMONITOR paramters
   getXMLData();

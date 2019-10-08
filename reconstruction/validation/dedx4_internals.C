@@ -1,7 +1,7 @@
 /*
 <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <contact>jvbennett@cmu.edu</contact>
+  <contact>jkumar@andrew.cmu.edu</contact>
   <description>Check some internals of the module</description>
 </header>
 */
@@ -40,7 +40,7 @@ void plot(const TString &input_filename)
   TFile *output_file = new TFile("dedx_internals.root", "RECREATE");
   output_file->cd();
 
-  tree->Project("layer_ID(70,-10,60)", "CDCDedxTracks.l_layer", "");
+  tree->Project("layer_ID(70,-10,60)", "CDCDedxTracks.m_lLayer", "");
   tree->Project("vxd_layer_ID(70,-10,60)", "VXDDedxTracks.dedxLayer", "");
 
   TH1* hist = (TH1*)output_file->Get("layer_ID");
@@ -50,7 +50,8 @@ void plot(const TString &input_filename)
   hist->SetTitle("layer ID for each dE/dx measurement");
   hist->GetListOfFunctions()->Add(new TNamed("Description", "layer ID for each dE/dx measurement (negative values for PXD/SVD)"));
   hist->GetListOfFunctions()->Add(new TNamed("Check", "Smooth distribution for values > 0, VXD measurements (< 0) at around the same level (in particular, should not be twice as high). Gap at -1, -2 indicates PXD is not being used (=default)."));
-  hist->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+  hist->GetListOfFunctions()->Add(new TNamed("Contact","Jitendra Kumar: jkumar@andrew.cmu.edu"));
+  hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
   hist->Write();
 
   output_file->Close();

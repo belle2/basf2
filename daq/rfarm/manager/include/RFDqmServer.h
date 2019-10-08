@@ -39,6 +39,9 @@ namespace Belle2 {
     // Server function
     void server();
 
+    // Cleanup
+    void cleanup();
+
   private:
     RFConf*            m_conf;
     RFProcessManager*  m_proc;

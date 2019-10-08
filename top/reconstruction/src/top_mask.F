@@ -3,6 +3,8 @@
 ! M. Staric, mar-2017, 
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 ! mar-2017: change in some commons
+! feb-2018: change in some commons
+! oct-2018: change in some commons
 !----------------------------------------------------------------------
 
       SUBROUTINE SET_CHANNEL_MASK(MDN, ICH, FLAG)
@@ -24,6 +26,23 @@
       IF(MDN.LT.0.OR.MDN.GE.NSIZ_MOD) RETURN
       IF(ICH.LT.0.OR.ICH.GE.NUM_CHA) RETURN
       CH_MASK(ICH,MDN)=FLAG.NE.0
+      
+      END
+
+
+      SUBROUTINE SET_CHANNEL_OFF(MDN, ICH)
+
+      IMPLICIT NONE
+      INTEGER MDN               ! module ID
+      INTEGER ICH               ! channel (i.e. pixelID-1)
+
+#include "TOP_GEO.fi"
+#include "TOP_PIK.fi"
+#include "TOP_MASK.fi"
+      
+      IF(MDN.LT.0.OR.MDN.GE.NSIZ_MOD) RETURN
+      IF(ICH.LT.0.OR.ICH.GE.NUM_CHA) RETURN
+      CH_MASK(ICH,MDN)=.FALSE.
       
       END
 
@@ -94,6 +113,31 @@
          PRINT '(A,A)','   ',TXT
          PRINT*
       ENDDO
+      
+      END
+
+      
+      LOGICAL FUNCTION ALL_INACTIVE(MODUL)
+c--   returns true if all channels of a module are inactive
+
+      IMPLICIT NONE
+      INTEGER MODUL               ! module ID
+
+#include "TOP_GEO.fi"
+#include "TOP_PIK.fi"
+#include "TOP_MASK.fi"
+#include "TOP_PMT.fi"
+      INTEGER NUMCH, ICH
+      
+      ALL_INACTIVE=.TRUE.
+      IF(MODUL.LT.0.OR.MODUL.GE.NUM_MOD) RETURN
+
+      NUMCH=PMT_NX*PMT_NY*(N_PMT(0,MODUL)+N_PMT(1,MODUL))
+      ALL_INACTIVE=.FALSE.
+      DO ICH=0,NUMCH-1
+         IF(CH_MASK(ICH,MODUL)) RETURN
+      ENDDO
+      ALL_INACTIVE=.TRUE.
       
       END
 

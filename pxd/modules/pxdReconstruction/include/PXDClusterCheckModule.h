@@ -12,13 +12,9 @@
 #define PXDClusterCheckModule_H
 
 #include <framework/core/Module.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <pxd/reconstruction/Pixel.h>
 #include <string>
 
 namespace Belle2 {
-  class RelationArray;
-  class RelationElement;
 
   namespace PXD {
 
@@ -35,9 +31,9 @@ namespace Belle2 {
       /** Constructor defining the parameters */
       PXDClusterCheckModule();
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
       /** do the clustering */
-      virtual void event();
+      virtual void event() override;
     private:
       /** Name of the first PXDCluster StoreArray */
       std::string m_clustersOld;

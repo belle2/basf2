@@ -10,10 +10,7 @@
 
 #pragma once
 
-#include <vector>
-#include <framework/gearbox/GearDir.h>
 #include <TObject.h>
-#include <TTree.h>
 #include <arich/dbobjects/ARICHModulesInfo.h>
 
 namespace Belle2 {
@@ -64,7 +61,7 @@ namespace Belle2 {
     /**
      * dump content
      */
-    void print();
+    void print() const;
 
   private:
 

@@ -24,8 +24,6 @@
 #include <rawdata/dataobjects/PreRawCOPPERFormat_v1.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 #include <rawdata/RawCOPPERPackerInfo.h>
-
-
 #include <TObject.h>
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
@@ -64,7 +62,7 @@ namespace Belle2 {
     //
 
     //! set buffer ( delete_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
-    void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes);
+    void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes) OVERRIDE_CPP17;
 
     ///////////////////////////////////////////////////////////////////////////////////////
     // POINTER TO "DETECTOR BUFFER"
@@ -102,7 +100,7 @@ namespace Belle2 {
     ///////////////////////////////////////////////////////////////////////////////////////
 
     //! get posistion of COPPER block in unit of word
-    virtual int GetBufferPos(int n);
+    virtual int GetBufferPos(int n) OVERRIDE_CPP17;
 
     //! get buffer pointer of rawcopper header(Currently same as GetBufferPos)
     virtual int* GetRawHdrBufPtr(int n);
@@ -327,7 +325,7 @@ namespace Belle2 {
     ///ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)
     ///ver.3 Change FEE format as presented at B2GM in Nov.2013 ( May 1, 2014)
     ///ver.4 Do not record m_access pointer ( Dec 19, 2014)
-    ClassDef(RawCOPPER, 3);
+    ClassDefOverride(RawCOPPER, 3);
 
   };
 

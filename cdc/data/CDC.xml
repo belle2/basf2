@@ -1016,8 +1016,11 @@
           <Name>BackwardEndplate</Name>
           <InnerR desc="Inner radius" unit="mm">163</InnerR>
           <OuterR desc="Outer radius" unit="mm">166</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-323.1</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-312.0</ForwardZ>
+          <!--<BackwardZ desc="Backward z position" unit="mm">-323.1</BackwardZ>
+          <ForwardZ desc="Forward z position" unit="mm">-312.0</ForwardZ> 2018.05.30 Nakano -->
+	  <ForwardZ desc="Forward z position" unit="mm">-312.0</ForwardZ>
+	  <!--<ForwardZ desc="Forward z position" unit="mm">-313.1</ForwardZ> Temporary commented this line out. should be used -->
+	  <BackwardZ desc="Backward z position" unit="mm">-322.1</BackwardZ>
         </EndplateLayer>
         <EndplateLayer id="1">
           <Name>BackwardEndplate</Name>
@@ -1044,8 +1047,10 @@
           <Name>ForwardEndplate</Name>
           <InnerR desc="Inner radius" unit="mm">163</InnerR>
           <OuterR desc="Outer radius" unit="mm">166</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">572.0</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">583.1</ForwardZ>
+          <BackwardZ desc="Backward z position" unit="mm">572.0</BackwardZ>-->
+          <!--<ForwardZ desc="Forward z position" unit="mm">583.1</ForwardZ> 2018.05.30 Nakano-->
+          <!--<BackwardZ desc="Backward z position" unit="mm">573.1</BackwardZ>-->
+	  <ForwardZ desc="Forward z position" unit="mm">582.1</ForwardZ>
         </EndplateLayer>
         <EndplateLayer id="5">
           <Name>ForwardEndplate</Name>
@@ -1523,7 +1528,8 @@
           <BackwardZ desc="Backward z position" unit="mm">-443.34</BackwardZ>
           <ForwardZ desc="Forward z position" unit="mm">-433.34</ForwardZ>
         </EndplateLayer>
-        <EndplateLayer id="3">
+        <!-- -->
+	<EndplateLayer id="3">
           <Name>BackwardEndplate</Name>
           <InnerR desc="Inner radius" unit="mm">240</InnerR>
           <OuterR desc="Outer radius" unit="mm">242</OuterR>
@@ -1536,7 +1542,21 @@
           <OuterR desc="Outer radius" unit="mm">243</OuterR>
           <BackwardZ desc="Backward z position" unit="mm">-452.0</BackwardZ>
           <ForwardZ desc="Forward z position" unit="mm">-442.0</ForwardZ>
+        </EndplateLayer><!-- should be commented out 2018.05.30 Nakano -->
+        <!-- <EndplateLayer id="3">
+          <Name>BackwardEndplate</Name>
+          <InnerR desc="Inner radius" unit="mm">240</InnerR>
+          <OuterR desc="Outer radius" unit="mm">242</OuterR>
+          <BackwardZ desc="Backward z position" unit="mm">-443.34</BackwardZ>
+          <ForwardZ desc="Forward z position" unit="mm">-433.34</ForwardZ>
         </EndplateLayer>
+        <EndplateLayer id="4">
+          <Name>BackwardEndplate</Name>
+          <InnerR desc="Inner radius" unit="mm">242</InnerR>
+          <OuterR desc="Outer radius" unit="mm">243</OuterR>
+          <BackwardZ desc="Backward z position" unit="mm">-443.34</BackwardZ>
+          <ForwardZ desc="Forward z position" unit="mm">-433.34</ForwardZ>
+        </EndplateLayer> 2018.06.07 Temporary comment out Nakano -->
         <EndplateLayer id="5">
           <Name>ForwardEndplate</Name>
           <InnerR desc="Inner radius" unit="mm">233</InnerR>
@@ -1574,7 +1594,8 @@
         </EndplateLayer>
       </Endplate>
       <Endplate id="8">
-        <EndplateLayer id="0">
+        <!-- -->
+	<EndplateLayer id="0">
           <Name>BackwardEndplate</Name>
           <InnerR desc="Inner radius" unit="mm">243</InnerR>
           <OuterR desc="Outer radius" unit="mm">244.647</OuterR>
@@ -1601,7 +1622,35 @@
           <OuterR desc="Outer radius" unit="mm">263.37</OuterR>
           <BackwardZ desc="Backward z position" unit="mm">-489.91</BackwardZ>
           <ForwardZ desc="Forward z position" unit="mm">-464.15</ForwardZ>
+        </EndplateLayer><!-- 2018.05.30 Nakano -->
+        <!--<EndplateLayer id="0">
+          <Name>BackwardEndplate</Name>
+          <InnerR desc="Inner radius" unit="mm">243</InnerR>
+          <OuterR desc="Outer radius" unit="mm">244.5</OuterR>
+          <BackwardZ desc="Backward z position" unit="mm">-443.34</BackwardZ>
+          <ForwardZ desc="Forward z position" unit="mm">-433.34</ForwardZ>
         </EndplateLayer>
+        <EndplateLayer id="1">
+          <Name>BackwardEndplate</Name>
+          <InnerR desc="Inner radius" unit="mm">244.5</InnerR>
+          <OuterR desc="Outer radius" unit="mm">247.0</OuterR>
+          <BackwardZ desc="Backward z position" unit="mm">-472.1</BackwardZ>
+          <ForwardZ desc="Forward z position" unit="mm">-433.34</ForwardZ>
+        </EndplateLayer>
+        <EndplateLayer id="2">
+          <Name>BackwardEndplate</Name>
+          <InnerR desc="Inner radius" unit="mm">247.0</InnerR>
+          <OuterR desc="Outer radius" unit="mm">259.73</OuterR>
+          <BackwardZ desc="Backward z position" unit="mm">-472.1</BackwardZ>
+          <ForwardZ desc="Forward z position" unit="mm">-462.1</ForwardZ>
+        </EndplateLayer>
+        <EndplateLayer id="3">
+          <Name>BackwardEndplate</Name>
+          <InnerR desc="Inner radius" unit="mm">259.73</InnerR>
+          <OuterR desc="Outer radius" unit="mm">263.37</OuterR>
+          <BackwardZ desc="Backward z position" unit="mm">-489.91</BackwardZ>
+          <ForwardZ desc="Forward z position" unit="mm">-462.1</ForwardZ>
+        </EndplateLayer> 2018.06.07 Temporary comment out Nakano -->
         <EndplateLayer id="4">
           <Name>BackwardEndplate</Name>
           <InnerR desc="Inner radius" unit="mm">263.37</InnerR>
@@ -1609,7 +1658,8 @@
           <BackwardZ desc="Backward z position" unit="mm">-489.91</BackwardZ>
           <ForwardZ desc="Forward z position" unit="mm">-479.91</ForwardZ>
         </EndplateLayer>
-        <EndplateLayer id="5">
+        <!-- -->
+	<EndplateLayer id="5">
           <Name>ForwardEndplate</Name>
           <InnerR desc="Inner radius" unit="mm">243</InnerR>
           <OuterR desc="Outer radius" unit="mm">244.647</OuterR>
@@ -1629,7 +1679,28 @@
           <OuterR desc="Outer radius" unit="mm">259.73</OuterR>
           <BackwardZ desc="Backward z position" unit="mm">855.1</BackwardZ>
           <ForwardZ desc="Forward z position" unit="mm">871.1</ForwardZ>
+        </EndplateLayer><!-- 2018.05.30 Nakano -->
+        <!--<EndplateLayer id="5">
+          <Name>ForwardEndplate</Name>
+          <InnerR desc="Inner radius" unit="mm">243</InnerR>
+          <OuterR desc="Outer radius" unit="mm">244.5</OuterR>
+          <BackwardZ desc="Backward z position" unit="mm">817.41</BackwardZ>
+          <ForwardZ desc="Forward z position" unit="mm">827.41</ForwardZ>
         </EndplateLayer>
+        <EndplateLayer id="6">
+          <Name>ForwardEndplate</Name>
+          <InnerR desc="Inner radius" unit="mm">244.5</InnerR>
+          <OuterR desc="Outer radius" unit="mm">247.0</OuterR>
+          <BackwardZ desc="Backward z position" unit="mm">817.41</BackwardZ>
+          <ForwardZ desc="Forward z position" unit="mm">871.1</ForwardZ>
+        </EndplateLayer>
+        <EndplateLayer id="7">
+          <Name>ForwardEndplate</Name>
+          <InnerR desc="Inner radius" unit="mm">247.0</InnerR>
+          <OuterR desc="Outer radius" unit="mm">259.73</OuterR>
+          <BackwardZ desc="Backward z position" unit="mm">855.1</BackwardZ>
+          <ForwardZ desc="Forward z position" unit="mm">871.1</ForwardZ>
+        </EndplateLayer> 2018.06.07 Temporary comment out Nakano -->
         <EndplateLayer id="8">
           <Name>ForwardEndplate</Name>
           <InnerR desc="Inner radius" unit="mm">259.73</InnerR>
@@ -3889,6 +3960,8 @@
           <OuterR desc="Outer radius" unit="mm">1120.5</OuterR>
 	  <BackwardZ desc="Backward z position" unit="mm">-734</BackwardZ>
 	  <ForwardZ desc="Forward z position" unit="mm">-724</ForwardZ>
+	  <!--<BackwardZ desc="Backward z position" unit="mm">-735</BackwardZ>
+	  <ForwardZ desc="Forward z position" unit="mm">-725</ForwardZ> 2018.05.30 Nakano these values should be used. temporary comment out -->
         </EndplateLayer>
         <EndplateLayer id="3">
           <Name>ForwardEndplate</Name>
@@ -3910,9 +3983,12 @@
           <OuterR desc="Outer radius" unit="mm">1120.5</OuterR>
           <BackwardZ desc="Backward z position" unit="mm">1579</BackwardZ>
           <ForwardZ desc="Forward z position" unit="mm">1589</ForwardZ>
+	  <!--<BackwardZ desc="Backward z position" unit="mm">1580</BackwardZ>
+	  <ForwardZ desc="Forward z position" unit="mm">1590</ForwardZ> 2018.05.30 Nakano these values should be used. temporary comment out -->
         </EndplateLayer>
       </Endplate>
     </Endplates>
+<!-- removed by Nakano Apr.19, 2018
     <ElectronicsBoards>
       <ElectronicsBoard id="0">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">326.0</EBInnerR>
@@ -4029,56 +4105,80 @@
         <EBForwardZ desc="Forward z position of electronics board" unit="mm">-792.0</EBForwardZ>
       </ElectronicsBoard>
     </ElectronicsBoards>
-
+-->
     <InnerWalls desc="Definition of the Inner Wall" >
       <InnerWall id="0" desc="Definition of Al Wall 0.1 mm t">
         <Name>Shield</Name>
-        <InnerR desc="Inner radius" unit="mm">163.01</InnerR>
+        <!--<InnerR desc="Inner radius" unit="mm">163.01</InnerR>
         <OuterR desc="Outer radius" unit="mm">163.11</OuterR>
         <BackwardZ desc="z position at backward endplate" unit="mm">-292.1</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">552.1</ForwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">552.1</ForwardZ> 2018.05.30 Nakano-->
+        <InnerR desc="Inner radius" unit="mm">162.9</InnerR>
+        <OuterR desc="Outer radius" unit="mm">163.0</OuterR>
+	<BackwardZ desc="z position at backward endplate" unit="mm">-313.1</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">573.1</ForwardZ>
       </InnerWall>
       <InnerWall id="1" desc="Definition of CFRP 0.46 mm t">
         <Name>MiddleWall</Name>
-        <InnerR desc="Inner radius" unit="mm">162.5</InnerR>
+        <!--<InnerR desc="Inner radius" unit="mm">162.5</InnerR>
         <OuterR desc="Outer radius" unit="mm">162.96</OuterR>
         <BackwardZ desc="z position at backward endplate" unit="mm">-292.1</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">552.1</ForwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">552.1</ForwardZ> 2018.05.30 Nakano -->
+	<InnerR desc="Inner radius" unit="mm">162.39</InnerR>
+        <OuterR desc="Outer radius" unit="mm">162.85</OuterR>
+        	<BackwardZ desc="z position at backward endplate" unit="mm">-313.1</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">573.1</ForwardZ>
       </InnerWall>
       <InnerWall id="2">
         <Name>InnerBackwardWall</Name>
-        <InnerR desc="Inner radius" unit="mm">160.0</InnerR>
+        <!--<InnerR desc="Inner radius" unit="mm">160.0</InnerR>
         <OuterR desc="Outer radius" unit="mm">162.35</OuterR>
         <BackwardZ desc="z position at backward endplate" unit="mm">-307.1</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">-292.1</ForwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">-292.1</ForwardZ> 2018.05.30 Nakano-->
+	<InnerR desc="Inner radius" unit="mm">160.0</InnerR>
+        <OuterR desc="Outer radius" unit="mm">162.24</OuterR>
+        <BackwardZ desc="z position at backward endplate" unit="mm">-313.1</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">-298.1</ForwardZ>
       </InnerWall>
       <InnerWall id="3">
         <Name>OuterBackwardWall</Name>
         <InnerR desc="Inner radius" unit="mm">160.0</InnerR>
         <OuterR desc="Outer radius" unit="mm">163.0</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">-312.1</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">-307.1</ForwardZ>
+        <!--<BackwardZ desc="z position at backward endplate" unit="mm">-312.1</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">-307.1</ForwardZ> 2018.05.30 Nakano-->
+	<BackwardZ desc="z position at backward endplate" unit="mm">-322.1</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">-313.1</ForwardZ>
       </InnerWall>
       <InnerWall id="4">
         <Name>InnerForwardWall</Name>
-        <InnerR desc="Inner radius" unit="mm">160</InnerR>
+        <!--<InnerR desc="Inner radius" unit="mm">160</InnerR>
         <OuterR desc="Outer radius" unit="mm">162.35</OuterR>
         <BackwardZ desc="z position at backward endplate" unit="mm">552.1</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">567.1</ForwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">567.1</ForwardZ> 2018.05.30 Nakano -->
+        <InnerR desc="Inner radius" unit="mm">160</InnerR>
+        <OuterR desc="Outer radius" unit="mm">162.24</OuterR>
+        <BackwardZ desc="z position at backward endplate" unit="mm">558.1</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">573.1</ForwardZ>
       </InnerWall>
       <InnerWall id="5">
         <Name>OuterForwardWall</Name>
         <InnerR desc="Inner radius" unit="mm">160</InnerR>
         <OuterR desc="Outer radius" unit="mm">163.0</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">567.1</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">572.1</ForwardZ>
+        <!--<BackwardZ desc="z position at backward endplate" unit="mm">567.1</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">572.1</ForwardZ> 2018.05.30 Nakano-->
+        <BackwardZ desc="z position at backward endplate" unit="mm">573.1</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">582.1</ForwardZ>
       </InnerWall>
       <InnerWall id="6" desc="Definition of glue 0.05 mm t">
         <Name>MiddleGlue</Name>
-        <InnerR desc="Inner radius" unit="mm">162.96</InnerR>
+        <!--<InnerR desc="Inner radius" unit="mm">162.96</InnerR>
         <OuterR desc="Outer radius" unit="mm">163.01</OuterR>
         <BackwardZ desc="z position at backward endplate" unit="mm">-292.1</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">552.1</ForwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">552.1</ForwardZ> 2018.05.30 -->
+	<InnerR desc="Inner radius" unit="mm">162.85</InnerR>
+        <OuterR desc="Outer radius" unit="mm">162.9</OuterR>
+        <BackwardZ desc="z position at backward endplate" unit="mm">-313.1</BackwardZ>
+	<ForwardZ desc="z position at forward endplate" unit="mm">573.1</ForwardZ>
       </InnerWall>
     </InnerWalls>
     <OuterWalls>
@@ -4086,43 +4186,59 @@
         <Name>Shield</Name>
         <InnerR desc="Inner radius" unit="mm">1120.5</InnerR>
         <OuterR desc="Outer radius" unit="mm">1120.6</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">-683</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">1533</ForwardZ>
+        <!--<BackwardZ desc="z position at backward endplate" unit="mm">-683</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1533</ForwardZ> 2018.05.30 Nakano-->
+        <!--<BackwardZ desc="z position at backward endplate" unit="mm">-714.415</BackwardZ> -714.415 may not be correct 2018.06.07 Nakano-->
+        <BackwardZ desc="z position at backward endplate" unit="mm">-703</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1569.41</ForwardZ>
       </OuterWall>
       <OuterWall id="1">
         <Name>MiddleWall</Name>
         <InnerR desc="Inner radius" unit="mm">1120.6</InnerR>
         <OuterR desc="Outer radius" unit="mm">1126.065</OuterR>
         <BackwardZ desc="z position at backward endplate" unit="mm">-703</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">1553</ForwardZ>
+        <!--<ForwardZ desc="z position at forward endplate" unit="mm">1553</ForwardZ> 2018.05.30 Nakano-->
+        <!--<BackwardZ desc="z position at backward endplate" unit="mm">-714.415</BackwardZ> -703 mm may be correct 2018.06.07 Nakano-->
+        <ForwardZ desc="z position at forward endplate" unit="mm">1569.41</ForwardZ>-->
       </OuterWall>
       <OuterWall id="2">
         <Name>InnerBackwardWall</Name>
         <InnerR desc="Inner radius" unit="mm">1120.5</InnerR>
         <OuterR desc="Outer radius" unit="mm">1126.065</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">-713.585</BackwardZ>
+        <!--<BackwardZ desc="z position at backward endplate" unit="mm">-713.585</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">-703</ForwardZ> 2018.05.30 Nakano -->
+	<BackwardZ desc="z position at backward endplate" unit="mm">-725.0</BackwardZ>
+        <!--<ForwardZ desc="z position at forward endplate" unit="mm">-714.415</ForwardZ> -703 mm may be correct 2018.06.07 Nakano-->
         <ForwardZ desc="z position at forward endplate" unit="mm">-703</ForwardZ>
       </OuterWall>
       <OuterWall id="3">
         <Name>OuterBackwardWall</Name>
         <InnerR desc="Inner radius" unit="mm">1120.5</InnerR>
-        <OuterR desc="Outer radius" unit="mm">1127.6</OuterR>
+        <!--<OuterR desc="Outer radius" unit="mm">1127.6</OuterR>
         <BackwardZ desc="z position at backward endplate" unit="mm">-723.585</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">-713.585</ForwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">-713.585</ForwardZ> 2018.05.30 Nakano -->
+	<OuterR desc="Outer radius" unit="mm">1130.0</OuterR>
+	<BackwardZ desc="z position at backward endplate" unit="mm">-735.0</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">-725.0</ForwardZ>
       </OuterWall>
       <OuterWall id="4">
         <Name>InnerForwardWall</Name>
         <InnerR desc="Inner radius" unit="mm">1120.5</InnerR>
         <OuterR desc="Outer radius" unit="mm">1126.065</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">1553</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">1563.59</ForwardZ>
+        <!--<BackwardZ desc="z position at backward endplate" unit="mm">1553</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1563.59</ForwardZ> 2018.05.30 Nakano -->
+	<BackwardZ desc="z position at backward endplate" unit="mm">1569.41</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1580.0</ForwardZ>
       </OuterWall>
       <OuterWall id="5">
         <Name>OuterForwardWall</Name>
         <InnerR desc="Inner radius" unit="mm">1120.5</InnerR>
-        <OuterR desc="Outer radius" unit="mm">1127.6</OuterR>
+        <!--<OuterR desc="Outer radius" unit="mm">1127.6</OuterR>
         <BackwardZ desc="z position at backward endplate" unit="mm">1563.59</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">1573.59</ForwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1573.59</ForwardZ> 2018.05.30 Nakano -->
+        <OuterR desc="Outer radius" unit="mm">1130.0</OuterR>
+        <BackwardZ desc="z position at backward endplate" unit="mm">1580.0</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1590.0</ForwardZ>
       </OuterWall>
     </OuterWalls>
     <SenseWire name="SenseWire">

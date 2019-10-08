@@ -24,15 +24,15 @@ namespace Belle2 {
      */
     SwitchDataStoreModule();
     /** setter for Path. */
-    void init(std::string to, bool doCopy, std::vector<std::string> mergeBack);
+    void init(const std::string& to, bool doCopy, const std::vector<std::string>& mergeBack);
 
     ~SwitchDataStoreModule();
 
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void endRun();
-    virtual void event();
-    virtual void terminate();
+    virtual void initialize() override;
+    virtual void beginRun() override;
+    virtual void endRun() override;
+    virtual void event() override;
+    virtual void terminate() override;
 
   private:
     std::string m_from; /**< active DataStore ID before this module. */

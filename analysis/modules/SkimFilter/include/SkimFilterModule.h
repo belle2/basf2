@@ -8,17 +8,10 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef SKIMFILTERMODULE_H
-#define SKIMFILTERMODULE_H
+#pragma once
+
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <analysis/dataobjects/Particle.h>
-#include <boost/ptr_container/ptr_vector.hpp>
 #include <string>
-#include <TTree.h>
-#include <TFile.h>
-#include <TMatrix.h>
 
 namespace Belle2 {
 
@@ -27,8 +20,6 @@ namespace Belle2 {
 
   class SkimFilterModule : public Module {
   private:
-    /** Event counter **/
-    int m_nEvents;
     /** Number of events with Particle candidates**/
     int m_nPass;
     /** Name of the lists */
@@ -48,5 +39,4 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif // SKIMFILTERMODULE_H
 

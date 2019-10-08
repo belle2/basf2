@@ -30,8 +30,6 @@ set_log_level(LogLevel.INFO)
 # Set database
 reset_database()
 use_database_chain()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-# use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
 # For GCR, July and August 2017.
 use_central_database("GT_gen_data_003.04_gcr2017-08", LogLevel.WARNING)
 

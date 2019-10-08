@@ -10,33 +10,21 @@
 
 #include <beast/he3tube/modules/He3DigitizerModule.h>
 #include <beast/he3tube/dataobjects/He3tubeSimHit.h>
-#include <beast/he3tube/dataobjects/He3tubeHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 
 //c++
 #include <cmath>
 #include <boost/foreach.hpp>
 #include <string>
-#include <iostream>
 #include <fstream>
-#include <vector>
 #include <stdlib.h>
 
 // ROOT
-#include <TVector3.h>
-#include <TFile.h>
-#include <TTree.h>
-#include <TString.h>
-#include <TSystem.h>
 #include <TRandom.h>
 
 using namespace std;
@@ -71,7 +59,7 @@ He3DigitizerModule::~He3DigitizerModule()
 void He3DigitizerModule::initialize()
 {
   B2INFO("He3Digitizer: Initializing");
-  StoreArray<He3tubeHit>::registerPersistent();
+  m_he3tubeHit.registerInDataStore();
 
   StoreArray<MCParticle>   mcParticles;
   StoreArray<He3tubeSimHit>  simHits;

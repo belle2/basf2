@@ -156,15 +156,14 @@ namespace Belle2 {
     private:
 
       /**
-       * Private constructor. This class gets instantiated by MCParticleGraph::addParticle()
+       * No default constructor. This class gets instantiated by MCParticleGraph::addParticle()
        */
-      GraphParticle() {}
+      GraphParticle() = delete;
 
       /**
-       * No copying allowed.
-       * @param copy Reference to the particle which should be copied.
+       * No copy constructor.
        */
-      GraphParticle(const GraphParticle& copy): MCParticle(copy) {}
+      GraphParticle(const GraphParticle&) = delete;
 
       /**
        * Hide MCParticle "almost copy" constructor.
@@ -178,7 +177,7 @@ namespace Belle2 {
        * @param index The vertex id of the particle in the graph.
        */
       GraphParticle(MCParticleGraph* graph, unsigned int vertexId): MCParticle(),
-        m_graph(graph), m_vertexId(vertexId), m_ignore(false), m_primary(true), m_trackID(0)
+        m_graph(graph), m_vertexId(vertexId)
       {
         //The pointer to the TClonesArray the MCParticle is stored in makes no
         //sense inside the Graph so we set it to some invalid value to avoid
@@ -192,11 +191,11 @@ namespace Belle2 {
        */
       void setIndex(int index) { m_index = index; }
 
-      MCParticleGraph* m_graph; /**< internal pointer to the graph this particle belongs to */
-      unsigned int m_vertexId;  /**< vertex id in the graph */
-      bool m_ignore;            /**< ignore particle when writing MCParticle list ? */
-      bool m_primary;           /**< Is this a primary particle ? */
-      int m_trackID;            /**< The track ID from geant4 that created this particle. */
+      MCParticleGraph* m_graph{0}; /**< internal pointer to the graph this particle belongs to */
+      unsigned int m_vertexId{0};  /**< vertex id in the graph */
+      bool m_ignore{false};        /**< ignore particle when writing MCParticle list ? */
+      bool m_primary{true};        /**< Is this a primary particle ? */
+      int m_trackID{0};            /**< The track ID from geant4 that created this particle. */
 
       friend class MCParticleGraph;
       friend class ParticleSorter;
@@ -227,7 +226,7 @@ namespace Belle2 {
      * @param mother The mother particle which decays.
      * @param daughter The daughter particle in which the mother particle decays.
      */
-    void addDecay(GraphParticle& mother, GraphParticle& daughter) throw(NotSameGraphError, DaughterHasMotherError);
+    void addDecay(GraphParticle& mother, GraphParticle& daughter);
 
     /**
      * Return reference to added particle with range check.
@@ -300,7 +299,6 @@ namespace Belle2 {
 
 
   inline void MCParticleGraph::addDecay(MCParticleGraph::GraphParticle& mother, MCParticleGraph::GraphParticle& daughter)
-  throw(MCParticleGraph::NotSameGraphError, MCParticleGraph::DaughterHasMotherError)
   {
     if (this != mother.m_graph || this != daughter.m_graph) throw NotSameGraphError();
     //if (daughter.getMother() != NULL) throw DaughterHasMotherError();

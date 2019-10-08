@@ -9,14 +9,16 @@
  **************************************************************************/
 #include <tracking/ckf/general/findlets/TrackFitterAndDeleter.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;
 
 void TrackFitterAndDeleter::apply(std::vector<RecoTrack*>& recoTracks)
 {
+  TrackFitter trackFitter;
   for (RecoTrack* recoTrack : recoTracks) {
-    m_trackFitter->fit(*recoTrack);
+    trackFitter.fit(*recoTrack);
   }
 
   // Remove all non-fitted tracks
@@ -24,9 +26,4 @@ void TrackFitterAndDeleter::apply(std::vector<RecoTrack*>& recoTracks)
     return not recoTrack->wasFitSuccessful();
   };
   TrackFindingCDC::erase_remove_if(recoTracks, trackWasNotFitted);
-}
-
-void TrackFitterAndDeleter::beginRun()
-{
-  m_trackFitter = std::make_unique<Belle2::TrackFitter>();
 }

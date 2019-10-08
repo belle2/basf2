@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/modules/fitter/timeEstimator/BaseTrackTimeEstimatorModule.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -27,9 +26,9 @@ namespace Belle2 {
     double m_param_radiusForExtrapolation = 0;
 
     /// Extrapolate the measured state on plane to the given radius.
-    double estimateFlightLengthUsingFittedInformation(genfit::MeasuredStateOnPlane& measuredStateOnPlane) const;
+    double estimateFlightLengthUsingFittedInformation(genfit::MeasuredStateOnPlane& measuredStateOnPlane) const override;
 
     /// Use some helix functionality to calculate the distance to given the radius.
-    double estimateFlightLengthUsingSeedInformation(const RecoTrack& recoTrack) const;
+    double estimateFlightLengthUsingSeedInformation(const RecoTrack& recoTrack) const override;
   };
 }

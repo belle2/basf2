@@ -16,9 +16,7 @@
 #include <vector>
 
 #include <CLHEP/Units/SystemOfUnits.h>
-#include <CLHEP/Units/PhysicalConstants.h>
 
-#include <globals.hh>
 #include <G4UImanager.hh>
 
 using namespace std;
@@ -72,7 +70,10 @@ MuidModule::MuidModule() :
   addParam("TrackClusterSeparationsColName", m_TrackClusterSeparationsColName,
            "Name of collection holding the TrackClusterSeparations", string(""));
   addParam("MeanDt", m_MeanDt, "[ns] Mean hit-trigger time for coincident hits (default 0)", double(0.0));
-  addParam("MaxDt", m_MaxDt, "[ns] Coincidence window half-width for in-time KLM hits (default +-2000)", double(2000.0));
+  // Raw KLM scintillator hit times are in the range from -5000 to -4000 ns
+  // approximately. The time window can be readjusted after completion of
+  // the implementation of KLM time calibration.
+  addParam("MaxDt", m_MaxDt, "[ns] Coincidence window half-width for in-time KLM hits.", double(10000.0));
   addParam("MinPt", m_MinPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated (default 0.1)",
            double(0.1));
   addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation (default 0.002)", double(0.002));
@@ -95,6 +96,10 @@ MuidModule::MuidModule() :
            0.0);
   addParam("deltaChordInMagneticField", m_DeltaChordInMagneticField,
            "[mm] The maximum miss-distance between the trajectory curve and its linear cord(s) approximation", 0.25);
+  addParam("addHitsToRecoTrack", m_addHitsToRecoTrack,
+           "Parameter to add the found hits also to the reco tracks or not. Is turned off by default. "
+           "Make sure to refit the track afterwards.",
+           m_addHitsToRecoTrack);
   vector<string> defaultCommands;
   addParam("UICommands", m_UICommands, "A list of Geant4 UI commands that should be applied at the start of the job.",
            defaultCommands);
@@ -161,7 +166,7 @@ void MuidModule::initialize()
   m_Extrapolator->setECLClustersColName(m_ECLClustersColName);
   m_Extrapolator->setTrackClusterSeparationsColName(m_TrackClusterSeparationsColName);
   m_Extrapolator->initialize(m_MeanDt, m_MaxDt, m_MaxDistSqInVariances, m_MaxKLMTrackClusterDistance,
-                             m_MaxECLTrackClusterDistance, m_MinPt, m_MinKE, m_Hypotheses);
+                             m_MaxECLTrackClusterDistance, m_MinPt, m_MinKE, m_addHitsToRecoTrack, m_Hypotheses);
 
   return;
 

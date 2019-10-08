@@ -14,13 +14,11 @@
 #include <generators/evtgen/EvtGenInterface.h>
 
 #include <generators/utilities/InitialParticleGeneration.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <framework/core/Module.h>
 
 #include <string>
-#include <vector>
 
 namespace Belle2 {
 
@@ -42,13 +40,13 @@ namespace Belle2 {
     virtual ~EvtGenInputModule() {}
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each run. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Method is called for each event. */
-    virtual  void event();
+    virtual  void event() override;
 
   protected:
 

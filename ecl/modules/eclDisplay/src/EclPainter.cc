@@ -7,10 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
-
+//This module
 #include <ecl/modules/eclDisplay/EclPainter.h>
 
+//Root
+#include <TString.h>
+
+//ECL
+#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/modules/eclDisplay/MultilineWidget.h>
+
 using namespace Belle2;
+using namespace ECL;
 
 int EclPainter::m_obj_counter = 0;
 
@@ -24,16 +32,6 @@ EclPainter::EclPainter(EclData* data) :
 EclPainter::~EclPainter()
 {
 
-}
-
-void EclPainter::setData(EclData* data)
-{
-  m_ecl_data = data;
-}
-
-EclData* EclPainter::getData()
-{
-  return m_ecl_data;
 }
 
 void EclPainter::setMapper(ECL::ECLChannelMapper* mapper)
@@ -92,3 +90,11 @@ void EclPainter::getNewRootObjectName(char* buf, int n)
 {
   snprintf(buf, n, "ECL DATA_%d", m_obj_counter++);
 }
+
+void EclPainter::cloneFrom(const EclPainter& other)
+{
+  m_ecl_data = new EclData(*other.m_ecl_data);
+  m_mapper = other.m_mapper;
+  displayed_subsys = other.displayed_subsys;
+}
+

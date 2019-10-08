@@ -29,6 +29,10 @@ namespace Belle2 {
             bool filenameIsPattern = false);
     /** Destructor */
     ~SeqFile();
+    /** No copying */
+    SeqFile(const SeqFile&) = delete;
+    /** No assignment */
+    SeqFile& operator=(const SeqFile&) = delete;
     /** Returns status after constructor call. If success, fd is returned. If not, -1 */
     int status() const;
 

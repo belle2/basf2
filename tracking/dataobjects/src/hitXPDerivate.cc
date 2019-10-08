@@ -8,12 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/dataobjects/hitXP.h>
 #include <tracking/dataobjects/hitXPDerivate.h>
+#include <tracking/dataobjects/MCParticleInfo.h>
 
 using namespace Belle2;
 
-hitXPDerivate::hitXPDerivate(const SVDTrueHit& hit, const SVDCluster cluster, const MCParticle& particle,
+hitXPDerivate::hitXPDerivate(const SVDTrueHit& hit, const SVDCluster& cluster, const MCParticle& particle,
                              const VXD::SensorInfoBase& sensor)
 {
   m_positionMid = sensor.pointToGlobal(TVector3(hit.getU(), hit.getV(), hit.getW()), false); /** position at midpoint */

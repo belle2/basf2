@@ -9,41 +9,35 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/core/Module.h>
 #include <string>
 
-// ECL
-#include <ecl/dataobjects/ECLSimHit.h>
-#include <ecl/dataobjects/ECLHit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/dataobjects/ECLLocalMaximum.h>
-#include <ecl/dataobjects/ECLShower.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
-#include <mdst/dataobjects/MCParticle.h>
-
 // FRAMEWORK
-#include <framework/gearbox/Unit.h>
+#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-
-// GEOMETRY
-#include <ecl/geometry/ECLNeighbours.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 
 class TFile;
 class TTree;
 
 namespace Belle2 {
+
+  //MDST
+  class MCParticle;
+  class ECLCluster;
   class Track;
   class TrackFitResult;
+  class EventLevelClusteringInfo;
+  class EventMetaData;
+
+  //ECL
+  class ECLShower;
   class ECLPidLikelihood;
-
-
-
-
+  class ECLLocalMaximum;
+  class ECLConnectedRegion;
+  class ECLCalDigit;
+  class ECLDigit;
+  class ECLHit;
+  class ECLSimHit;
 
   /** The ECL Data Analysis Module
    *
@@ -68,18 +62,18 @@ namespace Belle2 {
     /**
      *Initializes the Module.
      */
-    virtual void initialize();
-
-    virtual void beginRun();
-
-    virtual void event();
-
-    virtual void endRun();
+    virtual void initialize() override;
+    /** beginRun */
+    virtual void beginRun() override;
+    /** event */
+    virtual void event() override;
+    /** endRun */
+    virtual void endRun() override;
 
     /**
      * Termination action.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -95,25 +89,16 @@ namespace Belle2 {
     StoreArray<Track> m_tracks;  /**< Tracks storeArray */
     StoreArray<TrackFitResult> m_trackFitResults;  /**< TrackFitResult storeArray */
     StoreArray<ECLPidLikelihood> m_eclPidLikelihoods; /**< ECLPidLikelihood storeArray */
-
-    /** Store array: ECLSimHit. */
-    StoreArray<ECLSimHit> m_eclSimHits;
-    /** Store array: ECLHit. */
-    StoreArray<ECLHit> m_eclHits;
-    /** Store array: ECLDigit. */
-    StoreArray<ECLDigit> m_eclDigits;
-    /** Store array: ECLCalDigit. */
-    StoreArray<ECLCalDigit> m_eclCalDigits;
-    /** Store array: ECLConnectedRegion. */
-    StoreArray<ECLConnectedRegion> m_eclConnectedRegions;
-    /** Store array: ECLShower. */
-    StoreArray<ECLShower> m_eclShowers;
-    /** Store array: ECLCluster. */
-    StoreArray<ECLCluster> m_eclClusters;
-    /** Store array: ECLLocalMaximum. */
-    StoreArray<ECLLocalMaximum> m_eclLocalMaximums;
-    /** Store object pointer: ECLEventInformation. */
-    StoreObjPtr<ECLEventInformation> m_eclEventInformation;
+    StoreArray<ECLSimHit> m_eclSimHits; /**< Store array: ECLSimHit. */
+    StoreArray<ECLHit> m_eclHits; /**< Store array: ECLHit. */
+    StoreArray<ECLDigit> m_eclDigits; /**< Store array: ECLDigit. */
+    StoreArray<ECLCalDigit> m_eclCalDigits; /**< Store array: ECLCalDigit. */
+    StoreArray<ECLConnectedRegion> m_eclConnectedRegions; /**< Store array: ECLConnectedRegion. */
+    StoreArray<ECLShower> m_eclShowers; /**< Store array: ECLShower. */
+    StoreArray<ECLCluster> m_eclClusters; /**< Store array: ECLCluster. */
+    StoreArray<ECLLocalMaximum> m_eclLocalMaximums; /**< Store array: ECLLocalMaximum. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo; /**< Store object pointer: EventLevelClusteringInfo. */
+    StoreObjPtr<EventMetaData> m_eventmetadata; /**< Store object pointer: EventMetaData. */
 
     /** Default name ECLCalDigits array*/
     virtual const char* eclSimHitArrayName() const
@@ -181,6 +166,20 @@ namespace Belle2 {
     int m_iExperiment; /**< Experiment number */
     int m_iRun; /**< Run number */
     int m_iEvent; /**< Event number */
+
+    //EventLevelClusteringInfo
+    /** Number of out of time, energetic ECLCalDigits, FWD. */
+    uint16_t m_nECLCalDigitsOutOfTimeFWD {0};
+    /** Number of out of time, energetic ECLCalDigits, Barrel. */
+    uint16_t m_nECLCalDigitsOutOfTimeBarrel {0};
+    /** Number of out of time, energetic ECLCalDigits, BWD. */
+    uint16_t m_nECLCalDigitsOutOfTimeBWD {0};
+    /** Number of photon showers that are rejected before storing to mdst (max. 255), FWD. */
+    uint8_t m_nECLShowersRejectedFWD {0};
+    /** Number of photon showers that are rejected before storing to mdst (max. 255), Barrel. */
+    uint8_t m_nECLShowersRejectedBarrel {0};
+    /** Number of photon showers that are rejected before storing to mdst (max. 255), BWD. */
+    uint8_t m_nECLShowersRejectedBWD {0};
 
     int m_eclDigitMultip; /**< Number of ECLDigits per event */
     std::vector<int>* m_eclDigitIdx; /**< ECLDigit index */
@@ -293,6 +292,7 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterTimingError;  /**< ECLCluster time error */
     std::vector<double>* m_eclClusterE9oE21;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for ECLCluster*/
     std::vector<double>* m_eclClusterHighestE; /**< Highest energy deposit (per crystal) in ECLCluster */
+    std::vector<int>* m_eclClusterCellId; /**< CellId with highest energy deposit in ECLCluster */
     std::vector<int>* m_eclClusterNofCrystals;  /**< Number of crystals in ECLCluster */
     std::vector<int>* m_eclClusterCrystalHealth;  /**< Crystal healt flag */
     std::vector<bool>* m_eclClusterIsTrack; /**< Flag for charged clusters */
@@ -306,7 +306,8 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterLAT; /**< Reconstructed LAT */
     std::vector<double>* m_eclClusterDeltaTime99; /**< DeltaTime99 */
     std::vector<int>* m_eclClusterDetectorRegion; /**< Cluster Detector Region */
-    std::vector<int>* m_eclClusterHypothesisId; /**< Cluster Detector Region */
+    std::vector<int>* m_eclClusterHasNPhotonHypothesis; /**< Cluster has n-photon hypothesis */
+    std::vector<int>* m_eclClusterHasNeutralHadronHypothesis; /**< Cluster has neutral hadron hypothesis */
 
     int m_eclPureDigitMultip; /**< Number of ECLDigits per event, PureCsI option */
     std::vector<int>* m_eclPureDigitIdx; /**< ECLDigit index, PureCsI option */
@@ -400,6 +401,7 @@ namespace Belle2 {
     std::vector<double>* m_eclPureClusterTimingError;  /**< Cluster time error, PureCsI option */
     std::vector<double>* m_eclPureClusterE9oE21;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for Cluster, PureCsI option */
     std::vector<double>* m_eclPureClusterHighestE; /**< Highest energy deposit (per crystal) in Cluster, PureCsI option */
+    std::vector<int>* m_eclPureClusterCellId; /**< CellId with highest energy deposit in Cluster, PureCsI option */
     std::vector<double>* m_eclPureClusterLat; /**< Cluster shape parameter LAT, PureCsI option */
     std::vector<int>* m_eclPureClusterNofCrystals;  /**< Number of crystals in Cluster, PureCsI option */
     std::vector<int>* m_eclPureClusterCrystalHealth;  /**< Crystal healt flag, PureCsI option */
@@ -413,7 +415,8 @@ namespace Belle2 {
     std::vector<double>* m_eclPureClusterE1oE9;  /**< Reconstructed E1oE9, PureCsI option */
     std::vector<double>* m_eclPureClusterDeltaTime99;  /**< Reconstructed DeltaT99, PureCsI option */
     std::vector<int>* m_eclPureClusterDetectorRegion; /**< Clusters detector region, PureCsI option */
-    std::vector<int>* m_eclPureClusterHypothesisId; /**< Cluster ID Hyp, PureCsI option */
+    std::vector<int>* m_eclPureClusterHasNPhotonHypothesis; /**< Cluster has n-photon hypothesis, PureCsI option */
+    std::vector<int>* m_eclPureClusterHasNeutralHadronHypothesis; /**< Cluster has neutral hadron hypothesis, PureCsI option */
 
     int m_eclShowerMultip; /**< Number of ECLShowers per event */
     std::vector<int>* m_eclShowerIdx; /**< Shower Index */
@@ -493,6 +496,7 @@ namespace Belle2 {
     std::vector<int>*
     m_eclShowerMCFFlightMatch; /**< Int, 1 if primary particle flight direction is "well" reconstructed in ECL, 0 otherwise, DEBUG PURPOSE*/
     std::vector<double>*   m_eclShowerHighestE1mE2; /**< Energy difference for 2 highest energy deposits in shower*/
+    std::vector<double>*   m_eclShowerNumberOfCrystalsForEnergy; /**< Number of crystals used for energy calculation*/
 
     int m_mcMultip; /**< Multiplicity of MCParticles */
     std::vector<int>* m_mcIdx; /**< MCParticle index */

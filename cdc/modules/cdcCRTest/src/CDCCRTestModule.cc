@@ -12,7 +12,6 @@
 #include <TTree.h>
 #include <framework/gearbox/Const.h>
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -21,22 +20,18 @@
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackPoint.h>
-#include <genfit/KalmanFitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/MeasurementOnPlane.h>
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/StateOnPlane.h>
-#include <set>
-#include <boost/format.hpp>
 #include <boost/foreach.hpp>
 
 #include <cdc/translators/RealisticCDCGeometryTranslator.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include "TDirectory.h"
-#include "TMath.h"
 #include <Math/ProbFuncMathCore.h>
-#include "iostream"
 
 using namespace std;
 using namespace Belle2;
@@ -58,11 +53,11 @@ CDCCRTestModule::CDCCRTestModule() : HistoModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "Track fit results histograms will be put into this directory", std::string("trackfit"));
   addParam("NameOfTree", m_treeName, "name of tree in output file", string("tree"));
-  addParam("fillExpertHistograms", m_fillExpertHistos, "Fill additional histograms", false);
-  addParam("noBFit", m_noBFit, "If true -> #Params ==4, #params ==5 for calculate P-Val", true);
+  addParam("fillExpertHistograms", m_fillExpertHistos, "Fill additional histograms", true);
+  addParam("noBFit", m_noBFit, "If true -> #Params ==4, #params ==5 for calculate P-Val", false);
   addParam("plotResidual", m_plotResidual, "plot biased residual, normalized res and xtplot for all layer", false);
   addParam("calExpectedDriftTime", m_calExpectedDriftTime, "if true module will calculate expected drift time, it take a time",
-           false);
+           true);
   addParam("hitEfficiency", m_hitEfficiency, "calculate hit efficiency(Not work now) true:yes false:No", false);
   addParam("TriggerPos", m_TriggerPos, "Trigger position use for cut and reconstruct Trigger image", std::vector<double> { -0.6, -13.25, 17.3});
   addParam("NormTriggerPlaneDirection", m_TriggerPlaneDirection, "Normal trigger plane direction and reconstruct Trigger image",
@@ -74,10 +69,10 @@ CDCCRTestModule::CDCCRTestModule() : HistoModule()
            false);
   addParam("EstimateResultForUnFittedLayer", m_EstimateResultForUnFittedLayer,
            "Calculate residual for Layer that is set unUseInFit", true);
-  addParam("SmallerOutput", m_SmallerOutput, "If true, trigghit position, residual cov,absRes, will not be stored", true);
+  addParam("SmallerOutput", m_SmallerOutput, "If true, trigghit position, residual cov,absRes, will not be stored", false);
   addParam("StoreTrackParams", m_StoreTrackParams, "Store Track Parameter or not, it will be multicount for each hit", true);
-  addParam("StoreHitDistribution", m_MakeHitDist, "Make hit distribution or not", false);
-  addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", false);
+  addParam("StoreHitDistribution", m_MakeHitDist, "Make hit distribution or not", true);
+  addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", true);
   addParam("MinimumPt", m_MinimumPt, "Tracks with tranverse momentum small than this will not recored", 0.);
 }
 
@@ -380,6 +375,7 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
   if (hittrig) {trighit = 1;}
   else {trighit = 0;}
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  static CDC::RealisticTDCCountTranslator* tdcTrans = new RealisticTDCCountTranslator(true);
   m_hNHits->Fill(track->getNumberOfCDCHits());
 
   std::vector<genfit::TrackPoint*> tps = track->getHitPointsWithMeasurement();
@@ -449,26 +445,8 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
           res_b_err = std::sqrt(residual_b.getCov()(0, 0));
           res_u_err = std::sqrt(residual_u.getCov()(0, 0));
 
-          t = cdcgeo.getT0(wireid) - tdc * cdcgeo.getTdcBinWidth(); // - dt_flight - dt_prop;
-          dt_flight = mop.getTime();
-          if (dt_flight < 50 && m_ToF) {t -= dt_flight;}
-          //          else{B2WARNING("Flight length larger than cdc volume :"<<r_flight); dt_flight}
-          //estimate length for propagation
+          t = tdcTrans->getDriftTime(tdc, wireid, mop.getTime(), pocaOnWire.Z(), adc);
           z = pocaOnWire.Z();
-          TVector3 m_backWirePos = cdcgeo.wireBackwardPosition(wireid, CDCGeometryPar::c_Aligned);
-          z_prop = z - m_backWirePos.Z();
-          B2DEBUG(199, "z_prop = " << z_prop << " |z " << z << " |back wire poss: " << m_backWirePos.Z());
-          dt_prop = z_prop * cdcgeo.getPropSpeedInv(lay);
-          if (z_prop < 240 && m_ToP) {t -= dt_prop;}
-
-          /*Time Walk*/
-          t -= cdcgeo.getTimeWalk(wireid, adc);
-
-          // Second: correct for event time. If this wasn't simulated, m_eventTime can just be set to 0.
-          if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
-            //            evtT0 =  m_eventTimeStoreObject->getEventT0();
-            t -= evtT0;
-          }
 
           //    t = getCorrectedDriftTime(wireid, tdc, adc, z, z0);
           if (m_StoreCDCSimHitInfo) {

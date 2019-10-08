@@ -12,10 +12,8 @@
 #include <beast/plume/dataobjects/PlumeSimHit.h>
 #include <beast/plume/dataobjects/PlumeHit.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
 
 #include <G4Track.hh>
 #include <G4Step.hh>
@@ -105,7 +103,7 @@ namespace Belle2 {
         current_trackVertex_y = track.GetVertexPosition().y();
         current_trackVertex_z = track.GetVertexPosition().z();
         current_pdgID = track.GetDefinition()->GetPDGEncoding();
-        current_sensorID = track.GetVolume()->GetCopyNo();
+        current_sensorID =  preStepPoint.GetTouchableHandle()->GetReplicaNumber(1);
 
         // since this is first step in volume store track incidence and momentum and reset energy loss
         G4ThreeVector preStepPointPosition = preStepPoint.GetPosition();

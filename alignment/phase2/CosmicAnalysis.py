@@ -37,9 +37,11 @@ class CosmicAnalysis(Module):
 
         super(CosmicAnalysis, self).__init__()
 
+        #: Input root file
         self.rootfile = ROOT.TFile('cosmicAnalysis.root', 'recreate')
-
+        #: Tree with track data
         self.tree_track = ROOT.TTree('track', '')
+        #: Tree with dE/dx data
         self.tree_DEDX = ROOT.TTree('dedx', '')
 
         ROOT.gStyle.Reset()
@@ -54,6 +56,7 @@ class CosmicAnalysis(Module):
         ROOT.gStyle.SetFrameBorderMode(0)
         ROOT.gStyle.SetOptStat(0)
 
+        #: struct with track data
         self.trackData = TrackData()
         # Declare tree branches
         for key in TrackData.__dict__:
@@ -62,7 +65,7 @@ class CosmicAnalysis(Module):
                 if isinstance(self.trackData.__getattribute__(key), int):
                     formstring = '/I'
                 self.tree_track.Branch(key, AddressOf(self.trackData, key), key + formstring)
-
+        #: struct with dE/dx data
         self.dedxData = DEDXData()
         # Declare tree branches
         for key in DEDXData.__dict__:
@@ -71,18 +74,30 @@ class CosmicAnalysis(Module):
                 if isinstance(self.dedxData.__getattribute__(key), int):
                     formstring = '/I'
                 self.tree_DEDX.Branch(key, AddressOf(self.dedxData, key), key + formstring)
-
+        #: Histogram with total number of hits on track
         self.TotalNumberOfHits = ROOT.TH1F('TotalNumberOfHits', '', 6, 0.5, 6.5)
+        #: Histogram with number of hits vs. layer
         self.HitsVsLayer = ROOT.TH2F('HitsVsLayer', '', 6, 0.5, 6.5, 6, 0.5, 6.5)
+        #: Histogram with number of hits vs. sensor
         self.HitsVsSensor = ROOT.TH2F('HitsVsSensor', '', 6, 0.5, 6.5, 5, 0.5, 5.5)
+        #: Histogram with hitted layer vs. sensor
         self.LayerVsSensor = ROOT.TH2F('LayerVsSensor', '', 6, 0.5, 6.5, 5, 0.5, 5.5)
+        #: Histogram with PXD cluster size
+        self.PXDClusterSize = ROOT.TH1F('PXDClusterSize', '', 20, 0.5, 20.5)
+        #: Histogram with track Chi2
         self.Chi2 = ROOT.TH1F('Chi2', '', 300, 0.0, 500)
+        #: Histogram with track NDF
         self.NDF = ROOT.TH1F('NDF', '', 200, 0.0, 200)
+        #: Histogram with track Chi2/NDF
         self.Chi2OverNDF = ROOT.TH1F('Chi2OverNDF', '', 300, 0.0, 5)
+        #: Histogram with track momentum
         self.Momentum = ROOT.TH1F('Momentum', '', 500, 0.0, 1000)
+        #: Histogram with ADC count vs. number of hits in CDC
         self.ADCCountOverNumberOfHitsInCDC = ROOT.TH1F('ADCCountOverNumberOfHitsInCDC', '', 200, 0.0, 300)
+        #: Profile with ADC count vs. number of hits vs. momentum
         self.ADCCountOverNumberOfHitsInCDCVsMomentum = ROOT.TProfile(
             'ADCCountOverNumberOfHitsInCDCVsMomentum', '', 200, 0.0, 300, 0.0, 1000)
+        #: Profile with ADC count vs. number of hits
         self.MomentumVsADCCountOverNumberOfHitsInCDC = ROOT.TProfile(
             'MomentumVsADCCountOverNumberOfHitsInCDC', '', 100, 0.0, 100, 0.0, 1000)
 
@@ -90,6 +105,8 @@ class CosmicAnalysis(Module):
         """Do nothing"""
 
     def event(self):
+        """ Fill histograms """
+
         # Study dEdx (CDC) as prediction of momentum
         cdcDedxTracks = Belle2.PyStoreArray('CDCDedxTracks')
         nCDCDedxTracks = cdcDedxTracks.getEntries()
@@ -145,7 +162,7 @@ class CosmicAnalysis(Module):
                         totalNumberOfHits = track.getNumberOfPXDHits() + (track.getNumberOfSVDHits() - 1) / 2
 
                     self.TotalNumberOfHits.Fill(totalNumberOfHits)
-                    print('Total number of hits:', totalNumberOfHits)
+                    # print('Total number of hits:', totalNumberOfHits)
 
                     self.Chi2.Fill(track.getTrackFitStatus().getChi2())
                     self.NDF.Fill(track.getTrackFitStatus().getNdf())
@@ -154,7 +171,7 @@ class CosmicAnalysis(Module):
                     self.trackData.chi2 = track.getTrackFitStatus().getChi2()
                     self.trackData.ndf = track.getTrackFitStatus().getNdf()
                     self.trackData.chiSquaredOverNdf = track.getTrackFitStatus().getChi2() / track.getTrackFitStatus().getNdf()
-                    print('Chi2/NDF:', self.trackData.chiSquaredOverNdf, 'Chi2:', self.trackData.chi2)
+                    # print('Chi2/NDF:', self.trackData.chiSquaredOverNdf, 'Chi2:', self.trackData.chi2)
                     self.rootfile.cd()
                     self.tree_track.Fill()
 
@@ -165,7 +182,7 @@ class CosmicAnalysis(Module):
                     EventMetaData = Belle2.PyStoreObj('EventMetaData')
                     event = EventMetaData.getEvent()
                     nPxdHits = track.getNumberOfPXDHits()
-                    print('Event', event, 'has PXD', nPxdHits, 'hit(s):')
+                    # print('Event', event, 'has PXD', nPxdHits, 'hit(s):')
 
                     # First loop over PXD Hits
                     for n in range(0, len(track.getPXDHitList())):
@@ -175,10 +192,11 @@ class CosmicAnalysis(Module):
                         layer = sensorID.getLayerNumber()
                         ladder = sensorID.getLadderNumber()
                         sensor = sensorID.getSensorNumber()
-                        print('Hit information: #hit:', n, 'sensor information:', layer, ladder, sensor)
+                        # print('Hit information: #hit:', n, 'sensor information:', layer, ladder, sensor)
                         self.HitsVsLayer.Fill(totalNumberOfHits, layer)
                         self.HitsVsSensor.Fill(totalNumberOfHits, sensor)
                         self.LayerVsSensor.Fill(layer, sensor)
+                        self.PXDClusterSize.Fill(track.getPXDHitList()[n].getSize())
 
                 # Check overlaps in SVD ladders
                 if track.hasSVDHits():
@@ -187,7 +205,7 @@ class CosmicAnalysis(Module):
                     EventMetaData = Belle2.PyStoreObj('EventMetaData')
                     event = EventMetaData.getEvent()
                     nSvdHits = track.getNumberOfSVDHits()
-                    print('Event', event, 'has SVD', nSvdHits, 'hit(s):')
+                    # print('Event', event, 'has SVD', nSvdHits, 'hit(s):')
 
                     # First loop over SVD Hits
                     measured = ROOT.TVector3(0, 0, 0)
@@ -201,13 +219,13 @@ class CosmicAnalysis(Module):
                         sensor = sensorID.getSensorNumber()
 
                         if svdHit.isUCluster():
-                            print('Hit information: #hit:', n, 'sensor information:', layer, ladder, sensor, 'isU')
+                            # print('Hit information: #hit:', n, 'sensor information:', layer, ladder, sensor, 'isU')
                             for l in range(0, len(track.getSVDHitList())):
                                 svdHitA = track.getSVDHitList()[l]
                                 sensorIDA = Belle2.VxdID(svdHitA.getSensorID())
                                 if info == geoCache.get(sensorIDA):
                                     if svdHitA.isUCluster() == 0:
-                                        print('Hit information: #hit:', n, 'sensor information:', layer, ladder, sensor)
+                                        # print('Hit information: #hit:', n, 'sensor information:', layer, ladder, sensor)
                                         self.HitsVsLayer.Fill(totalNumberOfHits, layer)
                                         self.HitsVsSensor.Fill(totalNumberOfHits, sensor)
                                         self.LayerVsSensor.Fill(layer, sensor)
@@ -376,6 +394,17 @@ class CosmicAnalysis(Module):
 
         print('Parameters of fitted function y = exp((-p0+x)/p1) + p2, where x ~ ADCCounts/NumberOfCDCHits, y ~ momentum')
         print('p0 =', inverse_function.GetParameter(0), 'p1 =', inverse_function.GetParameter(1), 'p2 =', constant.GetParameter(0))
+
+        self.PXDClusterSize.GetXaxis().SetTitle("Size of PXD Clusters")
+        self.PXDClusterSize.GetYaxis().SetTitle("Number of tracks")
+        self.PXDClusterSize.GetYaxis().CenterTitle()
+        self.PXDClusterSize.GetXaxis().CenterTitle()
+        self.PXDClusterSize.GetYaxis().SetTitleOffset(1.3)
+        self.PXDClusterSize.GetXaxis().SetTitleOffset(1.3)
+        self.PXDClusterSize.SetFillStyle(3365)
+        self.PXDClusterSize.SetFillColor(9)
+        self.PXDClusterSize.SetLineColor(9)
+        self.PXDClusterSize.Draw()
 
         self.rootfile.Write()
         self.rootfile.Close()

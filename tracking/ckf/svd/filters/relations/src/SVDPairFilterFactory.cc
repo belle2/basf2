@@ -10,6 +10,7 @@
 #include <tracking/ckf/svd/filters/relations/SVDPairFilterFactory.h>
 #include <tracking/ckf/svd/filters/relations/SectorSVDPairFilter.h>
 #include <tracking/ckf/svd/filters/relations/DistanceSVDPairFilter.h>
+#include <tracking/ckf/svd/filters/relations/SectorMapBasedSVDPairFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
@@ -43,6 +44,7 @@ std::map<std::string, std::string> SVDPairFilterFactory::getValidFilterNamesAndD
     {"all", "all combinations are valid"},
     {"none", "no combination is valid"},
     {"sensor", "use sensor/ladder information"},
+    {"sectormap", "use the sector map"},
     {"distance", "based on the position distance"},
   };
 }
@@ -64,6 +66,10 @@ SVDPairFilterFactory::create(const std::string& filterName) const
 
   if (filterName == "distance") {
     return std::make_unique<DistanceSVDPairFilter>();
+  }
+
+  if (filterName == "sectormap") {
+    return std::make_unique<SectorMapBasedSVDPairFilter>();
   }
 
   return Super::create(filterName);

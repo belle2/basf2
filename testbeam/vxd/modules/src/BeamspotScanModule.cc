@@ -56,7 +56,7 @@ BeamspotScanModule::BeamspotScanModule() : HistoModule(),
 
 void BeamspotScanModule::initialize()
 {
-  StoreArray<PXDTrueHit>::required();
+  StoreArray<PXDTrueHit> PXDTrueHit;  PXDTrueHit.isRequired();
   RbTupleManager::Instance().register_module(this);
 }
 

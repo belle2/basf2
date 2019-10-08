@@ -10,12 +10,10 @@
 
 #include <arich/dbobjects/ARICHCopperMapping.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 #include <arich/dbobjects/ARICHMergerMapping.h>
 
 #include <iostream>
-#include <iomanip>
 #include <vector>
 #include <algorithm>
 
@@ -59,14 +57,15 @@ void ARICHCopperMapping::addMapping(unsigned mergerID, unsigned copperID, unsign
   if (std::find(m_copperIDs.begin(), m_copperIDs.end(), uint16_t(copperID)) == m_copperIDs.end()) m_copperIDs.push_back(copperID);
 }
 
-unsigned ARICHCopperMapping::getMergerID(unsigned copperID, unsigned finesse)
+unsigned ARICHCopperMapping::getMergerID(unsigned copperID, unsigned finesse) const
 {
   if (finesse > 3) B2ERROR("ARICHCopperMapping::getMergerID: invalid finesse number (0-3)!");
-  if (m_copper2merger.find(copperID) == m_copper2merger.end()) return 0;
-  return (unsigned)m_copper2merger[copperID][finesse];
+  auto it = m_copper2merger.find(copperID);
+  if (it == m_copper2merger.end()) return 0;
+  return (unsigned)it->second[finesse];
 }
 
-void ARICHCopperMapping::print()
+void ARICHCopperMapping::print() const
 {
   cout << endl;
   cout << "Mapping of merger to copper boards" << endl;

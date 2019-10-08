@@ -12,7 +12,6 @@
 #define PXDBeamBackHitFilterModule_H
 
 #include <framework/core/Module.h>
-#include <simulation/dataobjects/BeamBackHit.h>
 
 namespace Belle2 {
   namespace PXD {
@@ -28,9 +27,9 @@ namespace Belle2 {
       PXDBeamBackHitFilterModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
       /** do the sorting */
-      virtual void event();
+      virtual void event() override;
 
     private:
 

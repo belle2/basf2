@@ -1,7 +1,7 @@
-#include <framework/datastore/RelationIndex.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/ProfileInfo.h>
-#include <framework/datastore/RelationsObject.h>
+#include <framework/datastore/RelationArray.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <gtest/gtest.h>
 
@@ -13,7 +13,7 @@ namespace {
   class RelationConsolidateTest : public ::testing::Test {
   protected:
     /** fill StoreArrays with entries from 0..9 */
-    virtual void SetUp()
+    void SetUp() override
     {
       evtData = new StoreArray<EventMetaData>;
       profileData = new StoreArray<ProfileInfo>;
@@ -38,7 +38,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
       delete evtData;

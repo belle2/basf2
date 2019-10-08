@@ -1,7 +1,0 @@
-Import('env')
-
-env['LIBS'] = [ 'framework', 'calibration_dataobjects', 'calibration', '$ROOT_LIBS', 'alignment_dataobjects']
-
-
-Return('env')
-

@@ -9,14 +9,13 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
+
+#include <iostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

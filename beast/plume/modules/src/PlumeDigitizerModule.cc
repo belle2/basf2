@@ -13,31 +13,13 @@
 #include <beast/plume/dataobjects/PlumeHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
-
 
 //c++
-#include <cmath>
-#include <boost/foreach.hpp>
 #include <string>
-#include <sstream>
-#include <iostream>
 #include <fstream>
-
-// ROOT
-#include <TVector3.h>
-#include <TRandom.h>
-#include <TH1.h>
-#include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
 
 using namespace std;
 using namespace Belle2;
@@ -70,7 +52,10 @@ PlumeDigitizerModule::~PlumeDigitizerModule()
 void PlumeDigitizerModule::initialize()
 {
   B2INFO("Initializing PlumeDigitizer");
-  StoreArray<PlumeHit>::registerPersistent();
+  m_plumeHits.registerInDataStore();
+
+  m_plumeSimHits.isRequired();
+  m_particles.isOptional();
 
   //get the sensor parameters and set the parameters of the response function
   getXMLData();
@@ -80,24 +65,21 @@ void PlumeDigitizerModule::initialize()
 
 void PlumeDigitizerModule::beginRun()
 {
+
 }
 
 void PlumeDigitizerModule::event()
 {
 
-  StoreArray<MCParticle> particles;
-  StoreArray<PlumeSimHit> plumeSimHits;
-  StoreArray<PlumeHit> plumeHits;
-
   //skip events with no plumeSimHits, but continue the event counter
-  if (plumeSimHits.getEntries() == 0) {
+  if (m_plumeSimHits.getEntries() == 0) {
     Event++;
     return;
   }
 
 
-  for (int i = 0; i < plumeSimHits.getEntries(); i++) {
-    PlumeSimHit* aHit = plumeSimHits[i];
+  for (int i = 0; i < m_plumeSimHits.getEntries(); i++) {
+    PlumeSimHit* aHit = m_plumeSimHits[i];
 
     // This is where the detailed response function shall be called
     m_nofPixels = 3;
@@ -108,8 +90,8 @@ void PlumeDigitizerModule::event()
     m_posmm_z = aHit->getposIN_z();
 
     //create PlumeHit
-    plumeHits.appendNew(PlumeHit(aHit->getsensorID(), m_nofPixels, m_posmm_u, m_posmm_v, m_posmm_x, m_posmm_y,
-                                 m_posmm_z));
+    m_plumeHits.appendNew(PlumeHit(aHit->getsensorID(), m_nofPixels, m_posmm_u, m_posmm_v, m_posmm_x, m_posmm_y,
+                                   m_posmm_z));
 
   }
 

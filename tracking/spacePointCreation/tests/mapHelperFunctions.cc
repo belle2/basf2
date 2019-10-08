@@ -16,9 +16,7 @@
 
 #include <unordered_map>
 // #include <map> // only testing unordered maps here, but should be the same for maps (only slower)
-#include <complex>
 #include <cmath>
-#include <tuple>
 #include <numeric>
 
 using namespace std;
@@ -148,7 +146,6 @@ namespace Belle2 {
       }
     }
 
-    i2dMap::iterator _nanMapIt;
     for (unsigned int i = 0; i < N; ++i) {
       auto range = _nanMap.equal_range(i);
       i2dMap::iterator mapIt = range.first;

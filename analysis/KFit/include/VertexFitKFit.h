@@ -8,12 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef VERTEXFITKFIT_H
-#define VERTEXFITKFIT_H
-
-
-#include <framework/logging/Logger.h>
+#pragma once
 
 #include <analysis/KFit/KFitConst.h>
 #include <analysis/KFit/KFitError.h>
@@ -45,17 +40,26 @@ namespace Belle2 {
        * @return error code (zero if success)
        */
       enum KFitError::ECode       setInitialVertex(const HepPoint3D& v);
-      /** Set an IP-ellipsoid shape for the vertex-vertex constraint fit.
+      /** Set an initial vertex point for the mass-vertex constraint fit.
+       * @param v initial vertex point
+       * @return error code (zero if success)
+       */
+      enum KFitError::ECode       setInitialVertex(const TVector3& v);
+      /** Set an IP-ellipsoid shape for the vertex constraint fit.
        * @param ip IP position
        * @param ipe error matrix of the IP
        * @return error code (zero if success)
        */
       enum KFitError::ECode       setIpProfile(const HepPoint3D& ip, const CLHEP::HepSymMatrix& ipe);
-      /** Set a virtual IP-tube track for the vertex-vertex constraint fit.
-       * @param p virtual IP-tube track
+      /** Set a virtual IP-tube track for the vertex constraint fit.
+       * @param p Lorentz vector of the virtual IP-tube track
+       * @param x IP position
+       * @param e error matrix of IP-tube track and IP position
+       * @param q charge of the virtual IP-tube track
        * @return error code (zero if success)
        */
-      enum KFitError::ECode       setIpTubeProfile(const KFitTrack& p);
+      enum KFitError::ECode       setIpTubeProfile(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e,
+                                                   const double q);
       /** Tell the object to perform a fit with vertex position fixed.
        * @param flag true for fixed vertex, false for otherwise
        * @return error code (zero if success)
@@ -78,7 +82,7 @@ namespace Belle2 {
        * @return vertex error matrix
        */
       const CLHEP::HepSymMatrix          getVertexError(void) const;
-      double                      getCHIsq(void) const;
+      double                      getCHIsq(void) const override;
       /** Get a chi-square of the fit excluding IP-constraint part.
        * @return chi-square of the fit excluding IP-constraint part.
        */
@@ -89,7 +93,7 @@ namespace Belle2 {
        * @return vertex error matrix
        */
       const CLHEP::HepMatrix             getTrackVertexError(const int id) const;
-      double                      getTrackCHIsq(const int id) const;
+      double                      getTrackCHIsq(const int id) const override;
       /** Get a sum of the chi-square associated to the input tracks.
        *  The return value should be the same as the one from getCHIsqVertex().
        * @return sum of the chi-square associated to the input tracks
@@ -107,6 +111,11 @@ namespace Belle2 {
        */
       enum KFitError::ECode doFit(void);
 
+      /**
+       * Update mother particle.
+       * @param[in] mother Mother particle.
+       */
+      enum KFitError::ECode updateMother(Particle* mother);
 
     private:
       /** Perform a standard vertex-constraint fit including IP-tube constraint.
@@ -124,11 +133,11 @@ namespace Belle2 {
 
 
     private:
-      enum KFitError::ECode prepareInputMatrix(void);
-      enum KFitError::ECode prepareInputSubMatrix(void);
-      enum KFitError::ECode prepareOutputMatrix(void);
-      enum KFitError::ECode makeCoreMatrix(void);
-      enum KFitError::ECode calculateNDF(void);
+      enum KFitError::ECode prepareInputMatrix(void) override;
+      enum KFitError::ECode prepareInputSubMatrix(void) override;
+      enum KFitError::ECode prepareOutputMatrix(void) override;
+      enum KFitError::ECode makeCoreMatrix(void) override;
+      enum KFitError::ECode calculateNDF(void) override;
 
 
     private:
@@ -179,6 +188,3 @@ namespace Belle2 {
   } // namespace analysis
 
 } // namespace Belle2
-
-#endif /* VERTEXFITKFIT_H */
-

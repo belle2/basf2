@@ -8,13 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_PAINTER_COMMON
-#define ECL_PAINTER_COMMON
+#pragma once
 
+//ECL
 #include <ecl/modules/eclDisplay/EclPainter.h>
-#include <TH1.h>
 
 // TODO: Dynamic bin count for ENERGY_SUM
+
+class TH1F;
 
 namespace Belle2 {
   /**
@@ -46,10 +47,6 @@ namespace Belle2 {
     TH1F* m_hist;
 
     /**
-     * Return number of X bins.
-     */
-    int getBinCount();
-    /**
      * Return m_x_min.
      */
     int getMinX();
@@ -78,13 +75,11 @@ namespace Belle2 {
      * @param px X coordinate of mouse cursor.
      * @param py Y coordinate of mouse cursor.
      */
-    virtual void getInformation(int px, int py, MultilineWidget* panel);
+    virtual void getInformation(int px, int py, MultilineWidget* panel) override;
 
     /**
      * Redraw the canvas.
      */
-    void Draw();
+    void Draw() override;
   };
 }
-
-#endif // ECL_PAINTER_COMMON

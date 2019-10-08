@@ -12,7 +12,6 @@
 
 #include <arich/dbobjects/ARICHBiasVoltages.h>
 #include <iostream>
-#include <iomanip>
 
 using namespace std;
 using namespace Belle2;
@@ -36,7 +35,7 @@ void ARICHBiasVoltages::addVoltages(const std::string& hapdID, std::vector<int> 
   m_hapd2voltages.insert(std::pair<std::string, std::vector<int>>(hapdID, biasVoltages));
 }
 
-void ARICHBiasVoltages::print()
+void ARICHBiasVoltages::print() const
 {
 
   for (auto const& x : m_hapd2voltages)  {

@@ -1,6 +1,0 @@
-* Scientific Linux 6 or CentOS 6 (``sl6``)
-* Enterprise Linux 7 or CentOS 7 (``el7``)
-* Ubuntu 16.04 (``ubuntu1604``)
-
-.. hint:: to find which distribution you are running on you can use
-  ``lsb_release -a``

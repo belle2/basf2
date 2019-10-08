@@ -17,12 +17,12 @@ using namespace std;
 
 namespace Belle2 {
 
-  double TOPNominalQE::getQE(double energy) const
+  double TOPNominalQE::getQE(double lambda) const
   {
-    double dlam = 1240 / energy - m_lambdaFirst;
-    if (dlam < 0 or dlam >= (m_QE.size() - 1) * m_lambdaStep) return 0;
+    double dlam = lambda - m_lambdaFirst;
+    if (dlam < 0 or dlam > (m_QE.size() - 1) * m_lambdaStep) return 0;
     unsigned i = int(dlam / m_lambdaStep);
-    if (i > m_QE.size() - 2) return 0;
+    if (i > m_QE.size() - 2) return m_QE.back();
     return m_QE[i] + (m_QE[i + 1] - m_QE[i]) / m_lambdaStep * (dlam - i * m_lambdaStep);
   }
 

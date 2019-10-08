@@ -9,10 +9,8 @@
  **************************************************************************/
 
 #include <framework/pybasf2/PyDBObj.h>
-#include <framework/database/DBStore.h>
 #include <framework/datastore/DataStore.h>
 
-#include <TClonesArray.h>
 #include <TClass.h>
 
 using namespace Belle2;
@@ -33,12 +31,8 @@ namespace {
   }
 }
 
-PyDBObj::PyDBObj(const std::string& name): PyDBObj(name, getDefaultClass(name)) {}
+PyDBObj::PyDBObj(const std::string& name, bool required): PyDBObj(name, getDefaultClass(name), required) {}
 
-PyDBObj::PyDBObj(const TClass* objClass): PyDBObj(DataStore::defaultObjectName(objClass), objClass) {}
+PyDBObj::PyDBObj(const TClass* objClass, bool required): PyDBObj(DataStore::defaultObjectName(objClass), objClass, required) {}
 
-PyDBObj::PyDBObj(const std::string& name, const TClass* objClass): DBAccessorBase(name, objClass, false)
-{
-  m_object = &m_entry->object;
-}
-
+PyDBObj::PyDBObj(const std::string& name, const TClass* objClass, bool required): DBAccessorBase(name, objClass, false, required) {}

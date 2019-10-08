@@ -66,6 +66,15 @@
       <length desc="length of neutron shield tube" unit="mm">71</length>
       <zPosition unit="mm">11</zPosition>
     </Tube-->
+    <Tube id="9">
+      <material>Al</material>
+      <name>ARICH.BackwardCoverageWall</name>
+      <innerR unit="mm">435</innerR>
+      <outerR unit="mm">1139.0</outerR>
+      <length unit="mm">1.0</length>
+      <!-- 29.5 + 245.0 - 1 -->
+      <zPosition unit="mm">273.5</zPosition>
+    </Tube>
   </Tubes>
   
   <material>Al</material>

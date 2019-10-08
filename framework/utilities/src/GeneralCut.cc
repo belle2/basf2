@@ -5,13 +5,15 @@ namespace Belle2 {
 
   bool almostEqualFloat(const float& a, const float& b)
   {
-    assert(sizeof(float) == sizeof(int32_t));
+    static_assert(sizeof(float) == sizeof(int32_t));
+    // cppcheck-suppress invalidPointerCast
     return std::fabs(*(int32_t*)&a - * (int32_t*)&b) <= 2 or (a == b);
   }
 
   bool almostEqualDouble(const double& a, const double& b)
   {
-    assert(sizeof(double) == sizeof(int64_t));
+    static_assert(sizeof(double) == sizeof(int64_t));
+    // cppcheck-suppress invalidPointerCast
     return std::fabs(*(int64_t*)&a - * (int64_t*)&b) <= 2 or (a == b);
   }
 

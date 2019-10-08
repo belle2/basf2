@@ -1,4 +1,4 @@
-#include "daq/slc/nsm/NSMMessage.h"
+#include "daq/slc/nsm/NSMVar.h"
 
 #include <string.h>
 #include <unistd.h>
@@ -12,6 +12,7 @@
 using namespace Belle2;
 
 NSMVar::NSMVar(const std::string& name, const std::vector<int>& value)
+  : m_value(NULL)
 {
   int* v = (int*)malloc(value.size() * sizeof(int));
   for (size_t i = 0; i < value.size(); i++)
@@ -21,10 +22,11 @@ NSMVar::NSMVar(const std::string& name, const std::vector<int>& value)
   m_len = value.size();
   m_value = v;
   m_id = 0;
-  m_rev = 0;
+  m_date = Date().get();
 }
 
 NSMVar::NSMVar(const std::string& name, const std::vector<float>& value)
+  : m_value(NULL)
 {
   float* v = (float*)malloc(value.size() * sizeof(float));
   for (size_t i = 0; i < value.size(); i++)
@@ -34,7 +36,7 @@ NSMVar::NSMVar(const std::string& name, const std::vector<float>& value)
   m_len = value.size();
   m_value = v;
   m_id = 0;
-  m_rev = 0;
+  m_date = Date().get();
 }
 
 const NSMVar& NSMVar::operator=(const std::vector<int>& val)
@@ -46,6 +48,7 @@ const NSMVar& NSMVar::operator=(const std::vector<int>& val)
   m_value = v;
   m_type = INT;
   m_len = val.size();
+  m_date = Date().get();
   return *this;
 }
 
@@ -58,6 +61,7 @@ const NSMVar& NSMVar::operator=(const std::vector<float>& val)
   m_value = v;
   m_type = FLOAT;
   m_len = val.size();
+  m_date = Date().get();
   return *this;
 }
 
@@ -91,38 +95,39 @@ const char* NSMVar::getTypeLabel() const
 
 void NSMVar::copy(const std::string& name,
                   Type type, int len, const void* value,
-                  int id, int rev)
+                  int id, int date)
 {
+  if (m_value) free(m_value);
+  m_value = NULL;
   m_name = name;
   m_type = type;
   m_len = len;
   m_id = id;
-  m_rev = rev;
+  m_date = (date > 0) ? date : Date().get();
   int s = size();
   if (s > 0) {
     m_value = malloc(s);
     memcpy(m_value, value, s);
   } else {
-    m_name = "";
     m_type = NONE;
     m_len = 0;
     m_value = NULL;
   }
 }
 
-NSMVar::~NSMVar() throw()
+NSMVar::~NSMVar()
 {
   if (m_value) free(m_value);
 }
 
-void NSMVar::readObject(Reader& reader) throw(IOException)
+void NSMVar::readObject(Reader& reader)
 {
   m_node = reader.readString();
   m_name = reader.readString();
   m_type = (Type)reader.readInt();
   m_len = reader.readInt();
   m_id = reader.readInt();
-  m_rev = reader.readInt();
+  m_date = reader.readInt();
   int len = (m_len > 0) ? m_len : 1;
   int s = size();
   if (s > 0) {
@@ -153,14 +158,14 @@ void NSMVar::readObject(Reader& reader) throw(IOException)
   }
 }
 
-void NSMVar::writeObject(Writer& writer) const throw(IOException)
+void NSMVar::writeObject(Writer& writer) const
 {
   writer.writeString(m_node);
   writer.writeString(m_name);
   writer.writeInt((int)m_type);
   writer.writeInt(m_len);
   writer.writeInt(m_id);
-  writer.writeInt(m_rev);
+  writer.writeInt(m_date);
   int len = (m_len > 0) ? m_len : 1;
   switch (m_type) {
     case INT: {

@@ -54,10 +54,10 @@ namespace Belle2 {
     GearboxModule();
 
     /** Define backends */
-    void initialize();
+    void initialize() override;
 
     /** Load the (possibly rundependent) parameters from the chosen backends */
-    void beginRun();
+    void beginRun() override;
 
   private:
     std::vector<std::string> m_backends;   /**< The backend specifier. */

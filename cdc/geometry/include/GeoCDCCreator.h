@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Makoto Uchida                                            *
+ * Contributors: Makoto Uchida, Eiichi Nakano                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,16 +19,13 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
 
-
 #include <cdc/simulation/CDCSensitiveDetector.h>
 #include <cdc/dbobjects/CDCGeometry.h>
-#include <iostream>
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;
 class G4VisAttributes;
 class G4UserLimits;
-
 
 namespace Belle2 {
 
@@ -104,6 +101,16 @@ namespace Belle2 {
       void createNeutronShields(const CDCGeometry& geom);
 
       /**
+       * Create CDC cover2s from gear box.
+       */
+      void createCover2s(const GearDir& content);
+
+      /**
+       * Create CDC cover2s from DB.
+       */
+      void createCover2s(const CDCGeometry& geom);
+
+      /**
        * Create G4Cone.
        */
       void createCone(const double rmin1, const double rmax1,
@@ -125,6 +132,22 @@ namespace Belle2 {
                       const double thick, const double posZ,
                       const int id, G4Material* med,
                       const std::string& name);
+      /**
+       * Create G4Torus.
+       */
+      void createTorus(const double rmin1, const double rmax1,
+                       const double thick, const double posZ,
+                       const int id, G4Material* med,
+                       const std::string& name);
+
+      /**
+       * Create G4Tube2.
+       */
+      void createTube2(const double rmin, const double rmax,
+                       const double phis, const double phie,
+                       const double thick, const double posZ,
+                       const int id, G4Material* med,
+                       const std::string& name);
 
     protected:
 
@@ -155,10 +178,10 @@ namespace Belle2 {
       G4VPhysicalVolume* physical_cdc;
 
       //! Sensitive detector
-      CDCSensitiveDetector* m_sensitive;
+      CDCSensitiveDetector* m_sensitive = nullptr;
 
       //! Sensitive detector for background studies
-      BkgSensitiveDetector* m_bkgsensitive;
+      BkgSensitiveDetector* m_bkgsensitive = nullptr;
 
       //! Vector of pointers to G4VisAttributes
       std::vector<G4VisAttributes*> m_VisAttributes;

@@ -14,33 +14,20 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DSquared.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance2DXYSquared.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZ.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/SlopeRZ.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DNormed.h>
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
 
-#include <tracking/vxdCaTracking/TwoHitFilters.h>
-
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDCluster.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <svd/dataobjects/SVDTrueHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/dataobjects/ProfileInfo.h>
-#include <framework/datastore/RelationsObject.h>
-// #include <boost/concept_check.hpp>
 
-#include <tuple>
 #include <utility>
 #include <map>
 #include <string>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 #include <functional>
 
@@ -72,6 +59,8 @@ namespace VXDTFObserversTest {
     TGeoCombiTrans c1(t1, r1);
     TGeoHMatrix transform = c1;
     sensorInfoBase.setTransformation(transform);
+    // also need the reco transform
+    sensorInfoBase.setTransformation(transform, true);
 
     return sensorInfoBase;
   }
@@ -234,6 +223,9 @@ namespace VXDTFObserversTest {
     struct AcceptRejectPair {
       AcceptRejectPair() : accept(0), reject(0) {}
 
+      /** Increase respective counter if accepted or not
+       * @param accepted : bool indicating if accepted or not
+       */
       void Increase(bool accepted)
       {
         if (accepted) {
@@ -313,7 +305,7 @@ namespace VXDTFObserversTest {
 
 
     /** for easy printing of results collected so far */
-    void PrintResults(string identifier = "unknown")
+    void PrintResults(const string& identifier = "unknown")
     {
       for (auto& entry : m_container) {
         B2WARNING(" for " << identifier << "-combination: " <<

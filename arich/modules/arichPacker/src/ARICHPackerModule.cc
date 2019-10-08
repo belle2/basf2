@@ -11,16 +11,11 @@
 // Own include
 #include <arich/modules/arichPacker/ARICHPackerModule.h>
 
-#include <framework/core/ModuleManager.h>
-
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // Dataobject classes
@@ -115,13 +110,14 @@ namespace Belle2 {
 
         // get corresponding merger ID
         unsigned mergerID = m_copperMap->getMergerID(copperID, finesse);
+        unsigned mergerSN = m_mergerMap->getMergerSN(mergerID);
         if (!mergerID) continue;
 
         ARICHRawHeader mergerHead;
         unsigned dataFormat = m_nonSuppressed + 1; // production data -> TODO: use enum
         mergerHead.type = dataFormat;
         mergerHead.version = m_version;
-        mergerHead.mergerID = mergerID;
+        mergerHead.mergerID = mergerSN;
         mergerHead.FEBSlot = 0;
         mergerHead.trigger = evtMetaData->getEvent();
         // mergerHead.length dont forget
@@ -139,7 +135,7 @@ namespace Belle2 {
           ARICHRawHeader FEBHead;
           FEBHead.type = dataFormat;
           FEBHead.version = m_version;
-          FEBHead.mergerID = mergerID;
+          FEBHead.mergerID = mergerSN;
           FEBHead.FEBSlot = k; // board slots go from 0-5 for now, if firmware is updated to 1-6 add +1 !!
           FEBHead.trigger = evtMetaData->getEvent();
 

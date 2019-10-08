@@ -15,14 +15,10 @@
 #include <tracking/trackFindingVXD/filterMap/trackletVariables/ZiggZaggXY.h>
 #include <tracking/trackFindingVXD/filterMap/trackletVariables/ZiggZaggXYWithSigma.h>
 #include <tracking/trackFindingVXD/filterMap/trackletVariables/ZiggZaggRZ.h>
-#include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
-
-#include <math.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -48,6 +44,8 @@ namespace VXDTFtrackletFilterTest {
     TGeoCombiTrans c1(t1, r1);
     TGeoHMatrix transform = c1;
     sensorInfoBase.setTransformation(transform);
+    // also need the reco-transform
+    sensorInfoBase.setTransformation(transform, true);
 
     return sensorInfoBase;
   }

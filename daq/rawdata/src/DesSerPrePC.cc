@@ -6,7 +6,7 @@
 // Date : 2 - Aug - 2013
 //-
 #include <daq/rawdata/DesSerPrePC.h>
-#include <rawdata/dataobjects/RawFTSWFormat.h>
+#include <rawdata/dataobjects/RawFTSWFormat_latest.h>
 #include <rawdata/dataobjects/RawTLUFormat.h>
 
 //#define NO_DATA_CHECK
@@ -405,7 +405,7 @@ void DesSerPrePC::checkData(RawDataBlockFormat* raw_datablk, unsigned int* eve_c
       // RawFTSW
       //
       if (raw_datablk->CheckFTSWID(entry_id)) {
-        RawFTSWFormat* temp_rawftsw = new RawFTSWFormat;
+        RawFTSWFormat_latest* temp_rawftsw = new RawFTSWFormat_latest;
         int block_id = 0;
         temp_rawftsw->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                 raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);

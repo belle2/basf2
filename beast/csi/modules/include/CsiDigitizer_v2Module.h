@@ -12,15 +12,8 @@
 #define CSIDIGITIZER_V2MODULE_H
 
 #include <framework/core/Module.h>
-#include <string>
-#include <vector>
-
-//ROOT
-#include <TRandom3.h>
-#include <TMath.h>
-#include <TF1.h>
-#include <TVector3.h>
-
+#include <framework/datastore/StoreArray.h>
+#include <beast/csi/dataobjects/CsiHit_v2.h>
 
 namespace Belle2 {
   namespace csi {
@@ -43,21 +36,22 @@ namespace Belle2 {
       virtual ~CsiDigitizer_v2Module();
 
       /**  */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /**  */
-      virtual void beginRun();
+      virtual void beginRun() override;
 
       /**  */
-      virtual void event();
+      virtual void event() override;
 
       /**  */
-      virtual void endRun();
+      virtual void endRun() override;
       /**  */
-      virtual void terminate();
+      virtual void terminate() override;
 
 
     private:
+      StoreArray<CsiHit_v2> m_csiHit_v2; /** array for CsiHit_v2 */
 
       /** reads data from CSI.xml: threshold in MeV, range in MeV, and resolution in % */
       virtual void getXMLData();

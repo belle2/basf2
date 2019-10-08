@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <arich/simulation/SensitiveDetector.h>
-#include <framework/logging/Logger.h>
 #include <arich/dataobjects/ARICHSimHit.h>
 
 // geant4
@@ -21,10 +20,8 @@
 #include <G4Track.hh>
 #include <G4Step.hh>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <TVector2.h>
 #include <TRandom3.h>
 
@@ -94,6 +91,7 @@ namespace Belle2 {
 
       // if photon is internally reflected and going backward, do nothing
       if (theStatus == 3 && dir < 0) return 0;
+      if (theStatus == 4 && dir < 0) { if (gRandom->Uniform() < 0.5) track.SetTrackStatus(fStopAndKill); return 0; }
 
       // apply quantum efficiency if not yet done
       bool applyQE = true;

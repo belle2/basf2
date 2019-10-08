@@ -19,7 +19,7 @@ public:
 
   /** Constructor takes NIEL table for a particle as input
    * @param FileName String containing the table filename. */
-  TNiel(const std::string FileName);
+  explicit TNiel(const std::string& FileName);
   /** Get NIEL factor for a given particle energy.
    * @param particle kinetic energy in MeV.
    * @return NIEL factor for a particle with a given energy.

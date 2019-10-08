@@ -20,7 +20,7 @@ def autoclean_dir(env, dirname):
         for node in dirnode.all_children():
             if isinstance(node, Node.FS.Dir):
                 stack.append(node)
-            elif node.has_explicit_builder():
+            elif node.is_derived():
                 targets.add(str(node))
 
     # Now delete all files found in the directory which are not in the target set
@@ -31,7 +31,7 @@ def autoclean_dir(env, dirname):
             fullname = os.path.join(dirname, filename)
             if fullname not in targets and not filename.startswith('.') and not \
                     (fullname.endswith('.pyc') and fullname[:-1] in targets):
-                print env['CLEANUPCOMSTR'] % fullname
+                print(env['CLEANUPCOMSTR'] % fullname)
                 os.remove(fullname)
 
 

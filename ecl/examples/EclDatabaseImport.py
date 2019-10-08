@@ -7,7 +7,7 @@
 #
 # The user should provide input and output root filname
 # as first and second argument respectively. Comment
-# in the importer you need at the end.Upload the local DB
+# in the importer you need at the end. Upload the local DB
 # afterwards.
 #
 # Example steering file - 2015 Belle II Collaboration
@@ -48,3 +48,9 @@ eclDBImporter.importDigitEnergyCalibration()
 
 # Import ECL leakage corrections to showers (input file from Suman Koirala)
 # eclDBImporter.importShowerCorrectorLeakageCorrections()
+
+# Import threshold values for track ECL cluster matching (input file from Frank Meier)
+# eclDBImporter.importTrackClusterMatchingThresholds()
+
+# Import RMS parameterizations for track ECL cluster matching (input file from Frank Meier)
+# eclDBImporter.importTrackClusterMatchingParameterizations()

@@ -35,16 +35,16 @@ namespace Belle2 {
     StatisticsSummaryModule();
 
     /** Record initialize statistics sum */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Record begin run statistics sum */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Record event statistics sum */
-    virtual void event();
+    virtual void event() override;
 
     /** Record end run statistics sum */
-    virtual void endRun();
+    virtual void endRun() override;
 
   private:
     /** Record the statistics of given type */

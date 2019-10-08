@@ -48,19 +48,19 @@ void RawInputModule::initialize()
   gSystem->Load("libdataobjects");
 
   // Initialize EvtMetaData
-  StoreObjPtr<EventMetaData>::registerPersistent();
+  m_eventMetaData.registerInDataStore();
 
   // Initialize Array of RawCOPPER
-  StoreArray<RawDataBlock>::registerPersistent();
-  StoreArray<RawCOPPER>::registerPersistent();
-  StoreArray<RawSVD>::registerPersistent();
-  StoreArray<RawCDC>::registerPersistent();
-  StoreArray<RawTOP>::registerPersistent();
-  StoreArray<RawARICH>::registerPersistent();
-  StoreArray<RawECL>::registerPersistent();
-  StoreArray<RawKLM>::registerPersistent();
-  StoreArray<RawTRG>::registerPersistent();
-  StoreArray<RawFTSW>::registerPersistent();
+  m_rawDataBlock.registerInDataStore();
+  m_rawCOPPER.registerInDataStore();
+  m_rawSVD.registerInDataStore();
+  m_rawCDC.registerInDataStore();
+  m_rawTOP.registerInDataStore();
+  m_rawARICH.registerInDataStore();
+  m_rawECL.registerInDataStore();
+  m_rawKLM.registerInDataStore();
+  m_rawTRG.registerInDataStore();
+  m_rawFTSW.registerInDataStore();
 
   // Open input file
   printf("RawInput : Opening file %s\n", m_inputFileName.c_str());
@@ -119,13 +119,15 @@ void RawInputModule::registerRawCOPPERs()
 
   B2INFO("RawInput: got an event from a file, size=" << recsize <<
          " (proc= " << (int)getpid() << ")");
+  //  printf ( "%8.8x %8.8x %8.8x %8.8x ", *evtbuf, *(evtbuf+1), *(evtbuf+2), *(evtbuf+3) );
+  //  printf ( "%8.8x %8.8x %8.8x %8.8x\n", *(evtbuf+4), *(evtbuf+5), *(evtbuf+6), *(evtbuf+7) );
 
   // Unpack SendHeader
   SendHeader sndhdr;
   sndhdr.SetBuffer((int*)evtbuf);
   int npackedevts = sndhdr.GetNumEventsinPacket();
   if (npackedevts != 1) {
-    B2FATAL("Raw2DsModule::number of events in packet is not 1");
+    B2FATAL("Raw2DsModule::number of events in packet is not 1 " << npackedevts);
   }
   int ncprs = sndhdr.GetNumNodesinPacket();
   int nwords = sndhdr.GetTotalNwords() - SendHeader::SENDHDR_NWORDS - SendTrailer::SENDTRL_NWORDS;

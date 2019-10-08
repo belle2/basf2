@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
-
+//This module
 #include <ecl/modules/eclDisplay/geometry.h>
 
 using namespace Belle2::ECLDisplayUtility;

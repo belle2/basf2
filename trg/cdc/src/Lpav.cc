@@ -22,10 +22,12 @@ namespace Belle2 {
 //
 // constants, enums and typedefs
 //
+  /// prob function
   extern "C" {
     float prob_(float*, int*);
   }
 
+  /// distance error
   static double err_dis_inv(double x, double y, double w, double a, double b)
   {
     if (a == 0 && b == 0) {
@@ -45,7 +47,30 @@ namespace Belle2 {
 //
 // constructors and destructor
 //
-  TRGCDCLpav::TRGCDCLpav()
+  TRGCDCLpav::TRGCDCLpav() :
+    m_wsum(),
+    m_xsum(),
+    m_ysum(),
+    m_xxsum(),
+    m_yysum(),
+    m_xysum(),
+    m_xrrsum(),
+    m_yrrsum(),
+    m_rrrrsum(),
+    m_wsum_temp(),
+    m_xav(),
+    m_yav(),
+    m_xyavp(),
+    m_rscale(),
+    m_xxavp(),
+    m_yyavp(),
+    m_xrravp(),
+    m_yrravp(),
+    m_rrrravp(),
+    m_sinrot(),
+    m_cosrot(),
+    m_nc(),
+    m_chisq() // 2019/07/31 by ytlai
   {
     clear();
   }
@@ -237,7 +262,7 @@ namespace Belle2 {
 // static member functions
 //
 
-
+  /// ostream operator
   std::ostream& operator<<(std::ostream& o, const TRGCDCLpav& a)
   {
 //  o << "wsum=" << a.m_wsum << " xsum=" << a.m_xsum << " ysum=" << a.m_ysum
@@ -568,15 +593,14 @@ namespace Belle2 {
     return l;
   }
 
-  void TRGCDCLpav::add(double xi, double yi, double w, double a, double b)
-  {
-//register double wi = err_dis_inv(xi, yi, w, a, b);
-    double wi = err_dis_inv(xi, yi, w, a, b);
-    add(xi, yi, wi);
-  }
-
-  void TRGCDCLpav::add_point(register double xi, register double yi,
-                             register double wi)
+//  void TRGCDCLpav::add(double xi, double yi, double w, double a, double b)
+//  {
+//double wi = err_dis_inv(xi, yi, w, a, b);
+//    add(xi, yi, wi); calling itself with output
+//  }
+//
+  void TRGCDCLpav::add_point(double xi, double yi,
+                             double wi)
   {
     m_wsum += wi;
     m_xsum += wi * xi;
@@ -584,8 +608,8 @@ namespace Belle2 {
     m_xxsum += wi * xi * xi;
     m_yysum += wi * yi * yi;
     m_xysum += wi * xi * yi;
-//register double rri = ( xi * xi + yi * yi );
-//register double wrri = wi * rri;
+//double rri = ( xi * xi + yi * yi );
+//double wrri = wi * rri;
     double rri = (xi * xi + yi * yi);
     double wrri = wi * rri;
     m_xrrsum += wrri * xi;
@@ -596,7 +620,7 @@ namespace Belle2 {
 
   void TRGCDCLpav::add_point_frac(double xi, double yi, double w, double a)
   {
-//register double wi = w * a;
+//double wi = w * a;
     double wi = w * a;
     m_wsum += wi;
     m_xsum += wi * xi;
@@ -604,8 +628,8 @@ namespace Belle2 {
     m_xxsum += wi * xi * xi;
     m_yysum += wi * yi * yi;
     m_xysum += wi * xi * yi;
-//register double rri = ( xi * xi + yi * yi );
-//register double wrri = wi * rri;
+//double rri = ( xi * xi + yi * yi );
+//double wrri = wi * rri;
     double rri = (xi * xi + yi * yi);
     double wrri = wi * rri;
     m_xrrsum += wrri * xi;
@@ -616,7 +640,7 @@ namespace Belle2 {
 
   void TRGCDCLpav::sub(double xi, double yi, double w, double a, double b)
   {
-//register double wi = err_dis_inv(xi, yi, w, a, b);
+//double wi = err_dis_inv(xi, yi, w, a, b);
     double wi = err_dis_inv(xi, yi, w, a, b);
     m_wsum -= wi;
     m_xsum -= wi * xi;
@@ -624,8 +648,8 @@ namespace Belle2 {
     m_xxsum -= wi * xi * xi;
     m_yysum -= wi * yi * yi;
     m_xysum -= wi * xi * yi;
-//register double rri = ( xi * xi + yi * yi );
-//register double wrri = wi * rri;
+//double rri = ( xi * xi + yi * yi );
+//double wrri = wi * rri;
     double rri = (xi * xi + yi * yi);
     double wrri = wi * rri;
     m_xrrsum -= wrri * xi;

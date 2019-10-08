@@ -59,6 +59,8 @@ namespace VXDTFthreeHitFilterTest {
     TGeoCombiTrans c1(t1, r1);
     TGeoHMatrix transform = c1;
     sensorInfoBase.setTransformation(transform);
+    // also need reco-transform
+    sensorInfoBase.setTransformation(transform, true);
 
     return sensorInfoBase;
   }

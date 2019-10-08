@@ -156,11 +156,11 @@ void SVDCheckDigitsModule::event()
   //Number of 6-Digits
   const size_t nShaperDigits = storeShaperDigits.getEntries();
 
-  for (unsigned int i = 0; i < nShaperDigits; ++i) {
+  for (unsigned int iShaperDigit = 0; iShaperDigit < nShaperDigits; ++iShaperDigit) {
     // Loop through 6-digits, get the original 1-digits and compre digit data
     // and relations. We don't care about small deviations, so we use loose comparison
     // rather than ==.
-    const SVDShaperDigit& shaperDigit = *storeShaperDigits[i];
+    const SVDShaperDigit& shaperDigit = *storeShaperDigits[iShaperDigit];
     B2DEBUG(99, shaperDigit.toString());
     const RelationVector<SVDDigit>& onedigits =
       shaperDigit.getRelationsTo<SVDDigit>(storeDigits.getName());

@@ -37,6 +37,7 @@ REG_MODULE(SVDShaperDigitSorter);
 
 SVDShaperDigitSorterModule::SVDShaperDigitSorterModule() : Module()
 {
+  //
   //Set module properties
   setDescription("This module sorts an existing SVDShaperDigits collection and also "
                  "updates the corresponding relations to MCParticles and TrueHits. This is "
@@ -95,7 +96,7 @@ void SVDShaperDigitSorterModule::event()
 
   std::vector<indexElement> digitIndex;
 
-  const int nSamples = storeShaperDigits.getEntries();
+  const unsigned int nSamples = storeShaperDigits.getEntries();
   for (size_t i = 0; i < nSamples; i++)
     digitIndex.emplace_back(i, storeShaperDigits[i]->getUniqueChannelID());
 

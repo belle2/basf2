@@ -14,7 +14,6 @@
 #include <vector>
 #include <iterator>
 #include <algorithm>
-#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -55,6 +54,13 @@ namespace Belle2 {
     void erase_remove_if(Ts& ts, const APredicate& predicate)
     {
       ts.erase(std::remove_if(std::begin(ts), std::end(ts), predicate), std::end(ts));
+    }
+
+    template<class Ts>
+    void only_best_N(Ts& ts, const size_t N)
+    {
+      auto newEnd = std::next(ts.begin(), std::min(N, ts.size()));
+      ts.erase(newEnd, ts.end());
     }
 
     /**
@@ -231,6 +237,21 @@ namespace Belle2 {
       }
       return result;
     }
+
+    /**
+    Return a container which contains only the elements of inputContainer where pred is true.
+    Shortcut for std::copy_if function.
+    */
+    template <class Ts, class TCopyIfPredicate>
+    Ts copy_if(Ts const& inputContainer, TCopyIfPredicate pred)
+    {
+      Ts outputContainer;
+
+      // copy only if predicate is true
+      std::copy_if(inputContainer.begin(), inputContainer.end(), std::back_inserter(outputContainer), pred);
+      return outputContainer;
+    }
+
 
     /**
      * Shortcut for applying the std::any_of function.

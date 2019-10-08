@@ -36,7 +36,7 @@ namespace Belle2 {
     /// Constructor.
     TRGCDCJSignal();
     /// Copy constructor.
-    TRGCDCJSignal(TRGCDCJSignalData*);
+    explicit TRGCDCJSignal(TRGCDCJSignalData*);
     /// Actual to integer constructor with clock.
     TRGCDCJSignal(int const& bitwidth, double const& value, double const& min, double const& max, int const& clock, TRGCDCJSignalData*);
     /// Actual to integer constructor with clock set to 0.

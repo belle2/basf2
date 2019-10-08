@@ -14,13 +14,6 @@
 // THIS MODULE
 #include <ecl/modules/eclShowerCalibration/ECLShowerCalibratorModule.h>
 
-// FRAMEWORK
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
-
 // ECL
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLShower.h>
@@ -53,11 +46,8 @@ ECLShowerCalibratorModule::~ECLShowerCalibratorModule()
 void ECLShowerCalibratorModule::initialize()
 {
   // Register in datastore
-  StoreArray<ECLShower> eclShowers(eclShowerArrayName());
-  StoreArray<ECLConnectedRegion> eclCRs(eclConnectedRegionArrayName());
-
-  eclShowers.registerInDataStore();
-  eclCRs.registerInDataStore();
+  m_eclShowers.registerInDataStore(eclShowerArrayName());
+  m_eclCRs.registerInDataStore(eclConnectedRegionArrayName());
 }
 
 void ECLShowerCalibratorModule::beginRun()
@@ -68,8 +58,6 @@ void ECLShowerCalibratorModule::beginRun()
 
 void ECLShowerCalibratorModule::event()
 {
-  // input array
-  StoreArray<ECLShower> eclShowers(eclShowerArrayName());
 
   // loop over all ECLShowers
 //  for (const auto& eclShower : eclShowers) {

@@ -17,15 +17,8 @@
 #include <ecl/dataobjects/ECLWaveformData.h>
 #include <ecl/digitization/algorithms.h>
 #include <iostream>
-#include <TH1.h>
-#include <TF1.h>
-#include <TH2.h>
-#include <TMath.h>
-#include <math.h>
-#include <unistd.h>
 #include <stdio.h>
 #include "stdlib.h"
-#include <TChain.h>
 #include <string>
 #include <fstream>
 #include <vector>
@@ -337,11 +330,13 @@ void writeWF(int typ, char* dataFileDir, char* paramsDir)
     string dataFileName(dataFileDir);
     dataFileName += "/corr" + to_string(typ) + "/Binmcor" + to_string(n) + "_L.dat";
 
-    ifstream inputFile(dataFileName, ios::binary | ios::in);
+    ifstream inputFile2(dataFileName, ios::binary | ios::in);
     for (int index = 0; index < 256; index++) {
-      inputFile.read(reinterpret_cast< char*>(&ss1[index]), sizeof(double));
+      int i = index / 16;
+      int j = index % 16;
+      inputFile2.read(reinterpret_cast< char*>(&ss1[i][j]), sizeof(double));
     }
-    inputFile.close();
+    inputFile2.close();
 
     vector<int>& v = grmap[n];
     if (v.size() == 0) continue;

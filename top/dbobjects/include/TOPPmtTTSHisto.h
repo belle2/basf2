@@ -10,37 +10,37 @@
 
 #pragma once
 
-#include <vector>
 #include <TObject.h>
+#include <framework/logging/Logger.h>
+#include <vector>
 #include <TH1F.h>
 
 namespace Belle2 {
 
   /**
-   * Raw measurements of TTS (histograms) for each PMT channel
+   * Raw measurements of TTS (histograms) for each PMT pixel
    */
   class TOPPmtTTSHisto : public TObject {
   public:
     /**
-     * number of PMT channels
+     * number of PMT pixels
      */
-    enum {c_NumChannels = 16};
+    enum {c_NumPmtPixels = 16};
 
     /**
      * Default constructor
      */
-    TOPPmtTTSHisto():
-      m_serialNumber(""), m_hv(0), m_histo()
+    TOPPmtTTSHisto()
     {}
 
     /**
      * Full constructor
-     * @param serialNumber serial number
-     * @param hv HV setting
+     * @param serialNumber PMT serial number
+     * @param HV high voltage used for the measurement
      */
     TOPPmtTTSHisto(const std::string& serialNumber,
-                   int hv):
-      m_serialNumber(serialNumber), m_hv(hv), m_histo()
+                   float HV):
+      m_serialNumber(serialNumber), m_HV(HV)
     {}
 
     /**
@@ -50,20 +50,36 @@ namespace Belle2 {
     void setSerialNumber(const std::string& serNum) {m_serialNumber = serNum;}
 
     /**
-     * Set HV setting used for TTS measurement
-     * @param hv high voltage setting
+     * Set high voltage used for TTS measurement
+     * @param HV high voltage
      */
-    void setHv(int hv) {m_hv = hv;}
+    void setHV(float HV) {m_HV = HV;}
 
     /**
-     * Append new element to the array
-     * @param channel channel number (1-based)
-     * @param histo vector of TH1F's for the TTS histograms
+     * Set histogram for a given pixel (make a copy)
+     * @param pmtPixel pmtPixel number (1-based)
+     * @param histo TTS histogram
      */
-    void setHistogram(int channel, TH1F histo)
+    void setHistogram(unsigned pmtPixel, const TH1F* histo)
     {
-      m_histo[channel - 1] = histo;
+      if (!histo) {
+        B2ERROR("TOPPmtTTSHisto::setHistogram: null pointer received");
+        return;
+      }
+      pmtPixel--;
+      if (pmtPixel >= c_NumPmtPixels) {
+        B2ERROR("TOPPmtTTSHisto::setHistogram: invalid PMT pixel "
+                << LogVar("PMT pixel", pmtPixel + 1));
+        return;
+      }
+      m_histo[pmtPixel] = *histo;
     }
+
+    /**
+     * Returns number of PMT pixels
+     * @return number of pixels
+     */
+    int getNumOfPixels() const {return c_NumPmtPixels;}
 
     /**
      * Returns PMT serial number
@@ -72,33 +88,31 @@ namespace Belle2 {
     const std::string& getSerialNumber() const {return m_serialNumber;}
 
     /**
-     * Returns HV setting used for TTS measurement
-     * @return hv
+     * Returns high voltage used for TTS measurement
+     * @return high voltage
      */
-    int getHv() const {return m_hv;}
+    float getHV() const {return m_HV;}
 
     /**
-     * Returns TTS histogram for a specified channel and HV setting
-     * @param channel channel number
-     * @return TTS histogram (TH1F*)
+     * Returns TTS histogram for a specified pmtPixel
+     * @param pmtPixel pmtPixel number (1-based)
+     * @return TTS histogram pointer or nullptr for invalid pmtPixel
      */
-    TH1F getTtsHisto(int channel) const
+    const TH1F* getHistogram(unsigned pmtPixel) const
     {
-      if (channel > c_NumChannels) channel = c_NumChannels;
-      channel--;
-      return m_histo[channel];
+      pmtPixel--;
+      if (pmtPixel >= c_NumPmtPixels) return 0;
+      return &m_histo[pmtPixel];
     }
 
 
   private:
 
-    std::string m_serialNumber;      /**< serial number, e.g. JTxxxx */
-    int m_hv;                        /**< HV setting for which the set of histograms were taken */
-    TH1F m_histo[c_NumChannels];     /**< array of TTS histograms of measured TTS (one for each channel),
-              *   for the specific HV setting
-              */
+    std::string m_serialNumber;      /**< PMT serial number, e.g. JTxxxx */
+    float m_HV = 0;  /**< HV setting for which the set of histograms were taken */
+    TH1F m_histo[c_NumPmtPixels];  /**< histograms of measured TTS (one per pmtPixel) */
 
-    ClassDef(TOPPmtTTSHisto, 1); /**< ClassDef */
+    ClassDef(TOPPmtTTSHisto, 3); /**< ClassDef */
 
   };
 

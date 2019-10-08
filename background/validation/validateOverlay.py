@@ -4,13 +4,14 @@
 """
 <header>
   <output>overlayPlots.root</output>
-  <contact>staric</contact>
+  <contact>marko.staric@ijs.si</contact>
   <description>Runs BG overlay and makes validation histograms</description>
 </header>
 """
 
 from basf2 import *
 from simulation import add_simulation
+import os
 import glob
 import sys
 import math
@@ -33,9 +34,9 @@ class Histogrammer(Module):
         self.hist = []
         self.hist.append(TH1F('PXDDigits', 'PXDDigits (no data reduction)',
                               100, 30000, 40000))
-        self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 2000))
-        self.hist.append(TH1F('CDCHits', 'CDCHits', 100, 1000, 2000))
-        self.hist.append(TH1F('TOPDigits', 'TOPDigits', 100, 0, 700))
+        self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 4000))
+        self.hist.append(TH1F('CDCHits', 'CDCHits', 100, 0, 4000))
+        self.hist.append(TH1F('TOPDigits', 'TOPDigits', 100, 0, 2000))
         self.hist.append(TH1F('ARICHDigits', 'ARICHDigits', 100, 0, 300))
         self.hist.append(TH1F('ECLDigits', 'ECLDigits, m_Amp > 500 (roughly 25 MeV)',
                               100, 0, 100))
@@ -52,6 +53,8 @@ class Histogrammer(Module):
             h.GetListOfFunctions().Add(check)
             contact = TNamed('Contact', 'marko.staric@ijs.si')
             h.GetListOfFunctions().Add(contact)
+            options = TNamed('MetaOptions', 'shifter')
+            h.GetListOfFunctions().Add(options)
 
     def event(self):
         ''' Event processor: fill histograms '''

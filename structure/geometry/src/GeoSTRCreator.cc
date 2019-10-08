@@ -40,12 +40,11 @@ namespace Belle2 {
     //-----------------------------------------------------------------
     //                 Register the Creator
     //-----------------------------------------------------------------
-
+    /** Create factory instance so that the framework can instantiate the STRCreator*/
     geometry::CreatorFactory<GeoSTRCreator> GeoSTRFactory("STRCreator");
     //-----------------------------------------------------------------
     //                 Implementation
     //-----------------------------------------------------------------
-
     GeoSTRCreator::GeoSTRCreator()
     {
 
@@ -165,7 +164,7 @@ namespace Belle2 {
       std::size_t foundF = side.find("PolePieceR");
       std::size_t foundB = side.find("PolePieceL");
 
-      int iPole;
+      int iPole = 0;
       if (foundF != std::string::npos) { iPole = parameters.FWD_POLEPIECE; }
       else if (foundB != std::string::npos) { iPole = parameters.BWD_POLEPIECE; }
       else { B2FATAL("No data for the Pole Piece requested " << side << "(not found)");}
@@ -201,7 +200,7 @@ namespace Belle2 {
       std::size_t foundF = side.find("FWD_Shield");
       std::size_t foundB = side.find("BWD_Shield");
 
-      int iShield;
+      int iShield = 0;
       if (foundF != std::string::npos) { iShield = parameters.FWD_ECLSHIELD; }
       else if (foundB != std::string::npos) { iShield = parameters.BWD_ECLSHIELD; }
       else { B2FATAL("No data for the ECL shield called " << side << "(not found)");}

@@ -4,10 +4,11 @@
 # Documentation: Rare b->d gamma process
 # Tested: Yes
 # PhysicsWG: EWP
-# Responsible: Phillip Urquijo
-# Email: purquijo@unimelb.edu.au
+# Responsible: Phillip Urquijo, Saurabh Sandilya
+# Comments: Modified in MC9 : J. Tan
+# Email: purquijo@unimelb.edu.au, saurabhsandilya@gmail.com
 # Cuts: None
-# Date: 20151103
+# Date: v1:20151103/v2:20170729
 #
 #
 
@@ -19,8 +20,17 @@ Particle anti-Xdd 1.6 2.5
 LSNONRELBW anti-Xdd
 ChangeMassMin anti-Xdd 0.3
 
+Decay Xdd
+1.0 d anti-d PHOTOS PYTHIA 11;
+Enddecay
+
+Decay Xdu+
+1.0 u anti-d PHOTOS PYTHIA 11;
+Enddecay
+CDecay anti-Xdu-
+
 Decay Upsilon(4S)
-1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
 Enddecay
 #
 Decay B0sig

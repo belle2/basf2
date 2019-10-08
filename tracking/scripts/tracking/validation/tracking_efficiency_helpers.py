@@ -115,7 +115,7 @@ def additional_options(path):
             m.param('pdgCodesToUseForFitting', [get_generated_pdg_code()])
 
         if m.type() == "TrackCreator":
-            m.param('pdgCodes', [get_generated_pdg_code()])
+            m.param('pdgCodes', [get_generated_pdg_code(), 211])
 
 
 def run_simulation(path, pt_value, output_filename=''):
@@ -125,7 +125,7 @@ def run_simulation(path, pt_value, output_filename=''):
     eventinfosetter = register_module('EventInfoSetter')
 
     # generate one event
-    eventinfosetter.param('expList', [1])
+    eventinfosetter.param('expList', [0])
     eventinfosetter.param('runList', [1])
     eventinfosetter.param('evtNumList', [200])
 
@@ -156,11 +156,12 @@ def run_simulation(path, pt_value, output_filename=''):
 
     background_files = []
     if 'BELLE2_BACKGROUND_DIR' in os.environ:
-        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/PXD*.root')
-        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/SVD*.root')
-        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/CDC*.root')
+        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 
         print('Number of used background files (%d): ' % len(background_files))
+
+    if len(background_files) == 0:
+        background_files = None
 
     # add simulation modules to the path
     add_simulation(path, get_simulation_components(), background_files)
@@ -183,8 +184,7 @@ def run_reconstruction(path, output_file_name, input_file_name=''):
         path.add_module(gearbox)
 
         geometry = register_module('Geometry')
-        if get_reconstruction_components() is not None:
-            geometry.param('components', get_reconstruction_components())
+        geometry.param("useDB", True)
         path.add_module(geometry)
 
     add_reconstruction(path, get_reconstruction_components(), pruneTracks=0)

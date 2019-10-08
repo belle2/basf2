@@ -11,7 +11,6 @@ Belle 2 Software or for additional information, please
 
 * look at the `Confluence Pages <https://confluence.desy.de/display/BI>`_
 * check `Belle 2 Questions <https://questions.belle2.org>`_
-* or ask on `HipChat <https://belle2.hipchat.com/chat/room/3918710>`_
 
 ----
 
@@ -22,10 +21,12 @@ Belle 2 Software or for additional information, please
 .. toctree::
    :glob:
    :maxdepth: 2
+   :numbered: 3
 
+   whatsnew
+   build/tools_doc/index*
    framework/doc/index*
    */doc/index*
-   */sphinx_*
    framework/doc/atend*
 
 .. only:: format_html

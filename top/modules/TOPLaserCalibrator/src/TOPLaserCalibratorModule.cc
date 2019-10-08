@@ -32,7 +32,6 @@
 
 // database classes
 #include <framework/database/DBStore.h>
-#include <top/dbobjects/TOPASICChannel.h>
 
 #include <Math/PdfFuncMathCore.h>
 #include <TFile.h>
@@ -85,6 +84,7 @@ namespace Belle2 {
 
   void TOPLaserCalibratorModule::initialize()
   {
+    B2WARNING("You are using an old version of the laser fitter, now deprecated. This module has been superseded by the CAF collector TOPLaserCalibratorCollector and the CAF fitter TOPLocalCalFitter.");
     m_digits.isRequired();
   }
 
@@ -150,7 +150,7 @@ namespace Belle2 {
 
     //read laser propagation time from MC (TOPChannelT0MC)
     auto mcFile = new TFile(m_mcInput.c_str());
-    auto tree = (TTree*)mcFile->Get("t0MC");
+    auto tree = static_cast<TTree*>(mcFile->Get("t0MC"));
     int channel_mc;
     double maxpos;
 

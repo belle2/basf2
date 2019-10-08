@@ -10,12 +10,12 @@
 
 #include <analysis/modules/SkimFilter/SkimFilterModule.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <framework/core/Environment.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <cmath>
-#include <algorithm>
-#include <TParameter.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace boost::algorithm;
@@ -32,7 +32,6 @@ SkimFilterModule::SkimFilterModule() : Module()
   addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
 
   // initializing the rest of private memebers
-  m_nEvents = 0;
   m_nPass   = 0;
 }
 
@@ -42,7 +41,6 @@ void SkimFilterModule::initialize()
   int nParticleLists = m_strParticleLists.size();
   B2INFO("Number of ParticleLists studied " << nParticleLists << " ");
 
-  m_nEvents = 0;
   m_nPass = 0;
 }
 
@@ -67,7 +65,6 @@ void SkimFilterModule::event()
 
   }
 
-  m_nEvents++;
   if (pass) m_nPass++;
   //module condition
   setReturnValue(pass);
@@ -77,9 +74,10 @@ void SkimFilterModule::event()
 void SkimFilterModule::terminate()
 {
   B2INFO("SkimFilter Summary: \n");
-
-  std::cout << "\n=======================================================\n";
-  std::cout << "Total Retention: " << Form("%6.4f\n", (float)m_nPass / (float)m_nEvents);
-  std::cout << "\n=======================================================\n";
+  std::ostringstream stream;
+  stream <<  "\n=======================================================\n";
+  stream <<  "Total Retention: " << Form("%6.4f\n", (float)m_nPass / (float)Environment::Instance().getNumberOfEvents());
+  stream <<  "\n=======================================================\n";
+  B2INFO(stream.str());
 }
 

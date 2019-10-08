@@ -9,10 +9,10 @@
 
 #include <mva/interface/Weightfile.h>
 #include <mva/interface/Options.h>
-#include <framework/utilities/FileSystem.h>
 #include <framework/utilities/TestHelpers.h>
 
-#include <framework/database/LocalDatabase.h>
+#include <framework/database/Configuration.h>
+#include <framework/database/Database.h>
 #include <boost/filesystem/operations.hpp>
 
 #include <TFile.h>
@@ -29,9 +29,9 @@ namespace {
 
   public:
     TestOptions(const std::string& _x, const std::string& _y) : x(_x), y(_y) { }
-    virtual void load(const boost::property_tree::ptree& pt) override { y = pt.get<std::string>(x); }
-    virtual void save(boost::property_tree::ptree& pt) const override { pt.put(x, y); }
-    virtual po::options_description getDescription() override
+    void load(const boost::property_tree::ptree& pt) override { y = pt.get<std::string>(x); }
+    void save(boost::property_tree::ptree& pt) const override { pt.put(x, y); }
+    po::options_description getDescription() override
     {
       po::options_description description("General options");
       description.add_options()
@@ -134,7 +134,10 @@ namespace {
   {
 
     TestHelpers::TempDirCreator tmp_dir;
-    LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+
+    auto& conf = Conditions::Configuration::getInstance();
+    conf.overrideGlobalTags();
+    conf.prependTestingPayloadLocation("localdb/database.txt");
 
     MVA::Weightfile weightfile;
     weightfile.addElement("Test", "a");
@@ -198,6 +201,7 @@ namespace {
     EXPECT_THROW(MVA::Weightfile::loadFromROOTFile("DOES_NOT_EXIST.root"), std::runtime_error);
 
     {
+      // cppcheck-suppress unreadVariable
       std::fstream file("INVALID.root");
     }
     EXPECT_THROW(MVA::Weightfile::loadFromROOTFile("INVALID.root"), std::runtime_error);
@@ -208,7 +212,9 @@ namespace {
   {
 
     TestHelpers::TempDirCreator tmp_dir;
-    LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+    auto& conf = Conditions::Configuration::getInstance();
+    conf.overrideGlobalTags();
+    conf.prependTestingPayloadLocation("localdb/database.txt");
 
     MVA::Weightfile weightfile;
     weightfile.addElement("Test", "a");
@@ -228,7 +234,9 @@ namespace {
   {
 
     TestHelpers::TempDirCreator tmp_dir;
-    LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+    auto& conf = Conditions::Configuration::getInstance();
+    conf.overrideGlobalTags();
+    conf.prependTestingPayloadLocation("localdb/database.txt");
 
     MVA::Weightfile weightfile;
     weightfile.addElement("Test", "a");
@@ -309,6 +317,7 @@ namespace {
       weightfile2.setRemoveTemporaryDirectories(true);
       filename = weightfile2.generateFileName(".xml");
       {
+        // cppcheck-suppress unreadVariable
         std::ofstream a(filename);
       }
       EXPECT_TRUE(boost::filesystem::exists(filename));
@@ -320,6 +329,7 @@ namespace {
       weightfile2.setRemoveTemporaryDirectories(false);
       filename = weightfile2.generateFileName(".xml");
       {
+        // cppcheck-suppress unreadVariable
         std::ofstream a(filename);
       }
       EXPECT_TRUE(boost::filesystem::exists(filename));

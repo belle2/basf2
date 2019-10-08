@@ -32,8 +32,9 @@ namespace Belle2 {
 
   /**set the total number of trigger lines and prescalefactor*/
   const int ntrgline = 18;
-  /**prescale factor*/
+  /**prescale factor for phase2*/
   double scalef_phase2[ntrgline] = {1, 1, 20, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1};
+  /**prescale factor for phase3*/
   double scalef_phase3[ntrgline] = {1, 1, 20, 2, 1, 1, 1, 1, 2, 1, 1, 20, 20, 1, 5, 1, 3, 5};
 
   /**select one event in number of prescale factor events*/
@@ -47,52 +48,52 @@ namespace Belle2 {
   }
 
   /**do trigger with the import objects, and export the trigger results to trgres*/
-  void dotrigger(std::vector<int>& trgres, std::vector<int> objects, std::string phase)
-  {
-    /**Trigger Logics are defined in TRGGDL!!!*/
+//  void dotrigger(std::vector<int>& trgres, std::vector<int> objects, std::string phase) // the function is commended out entirely to avoid warning
+//  {
+  /**Trigger Logics are defined in TRGGDL!!!*/
 
-    /*
-    //line 0
-        if (objects[0] >= 3) trgres.push_back(doprescale(scalef[0]));
-        else trgres.push_back(0);
-    //line 1
-        if (objects[0] == 2 && objects[9] == 0) trgres.push_back(doprescale(scalef[1]));
-        else trgres.push_back(0);
-    //line 2
-        if (objects[0] >= 1 && objects[6] >= 1 && objects[9] == 0 && objects[10] == 0)trgres.push_back(doprescale(scalef[2]));
-        else trgres.push_back(0);
-    //line 3
-        if (objects[1] >= 3 && objects[2] >= 1 && objects[11] == 0) trgres.push_back(doprescale(scalef[3]));
-        else trgres.push_back(0);
-    //line 4
-        if (objects[1] >= 2 && objects[5] == 0 && objects[7] >= 1 && objects[11] == 0) trgres.push_back(doprescale(scalef[4]));
-        else trgres.push_back(0);
-    //line 5
-        if (objects[3] >= 1 && objects[11] == 0) trgres.push_back(doprescale(scalef[5]));
-        else trgres.push_back(0);
-    //line 6
-        if (objects[1] >= 2 && objects[7] >= 1) trgres.push_back(doprescale(scalef[6]));
-        else trgres.push_back(0);
-    //line 7
-        if (objects[0] >= 1 && objects[6] >= 1) trgres.push_back(doprescale(scalef[7]));
-        else trgres.push_back(0);
-    //line 8
-        if (objects[3] >= 1) trgres.push_back(doprescale(scalef[8]));
-        else trgres.push_back(0);
-    //line 9
-        if (objects[11] == 1) trgres.push_back(doprescale(scalef[9]));
-        else trgres.push_back(0);
-    //line 10
-        if (objects[0] >= 1 && objects[4] >= 1 && objects[8] >= 1) trgres.push_back(doprescale(scalef[11]));
-        else trgres.push_back(0);
-    //line 11
-        if (objects[0] == 0 && objects[4] >= 1) trgres.push_back(doprescale(scalef[11]));
-        else trgres.push_back(0);
-    //add new trigger line by users here, e.g.
-        //if(objects[0]==0)trgres.push_back(doprescale(1));
-        //else trgres.push_back(0);
-    */
-  }
+  /*
+  //line 0
+      if (objects[0] >= 3) trgres.push_back(doprescale(scalef[0]));
+      else trgres.push_back(0);
+  //line 1
+      if (objects[0] == 2 && objects[9] == 0) trgres.push_back(doprescale(scalef[1]));
+      else trgres.push_back(0);
+  //line 2
+      if (objects[0] >= 1 && objects[6] >= 1 && objects[9] == 0 && objects[10] == 0)trgres.push_back(doprescale(scalef[2]));
+      else trgres.push_back(0);
+  //line 3
+      if (objects[1] >= 3 && objects[2] >= 1 && objects[11] == 0) trgres.push_back(doprescale(scalef[3]));
+      else trgres.push_back(0);
+  //line 4
+      if (objects[1] >= 2 && objects[5] == 0 && objects[7] >= 1 && objects[11] == 0) trgres.push_back(doprescale(scalef[4]));
+      else trgres.push_back(0);
+  //line 5
+      if (objects[3] >= 1 && objects[11] == 0) trgres.push_back(doprescale(scalef[5]));
+      else trgres.push_back(0);
+  //line 6
+      if (objects[1] >= 2 && objects[7] >= 1) trgres.push_back(doprescale(scalef[6]));
+      else trgres.push_back(0);
+  //line 7
+      if (objects[0] >= 1 && objects[6] >= 1) trgres.push_back(doprescale(scalef[7]));
+      else trgres.push_back(0);
+  //line 8
+      if (objects[3] >= 1) trgres.push_back(doprescale(scalef[8]));
+      else trgres.push_back(0);
+  //line 9
+      if (objects[11] == 1) trgres.push_back(doprescale(scalef[9]));
+      else trgres.push_back(0);
+  //line 10
+      if (objects[0] >= 1 && objects[4] >= 1 && objects[8] >= 1) trgres.push_back(doprescale(scalef[11]));
+      else trgres.push_back(0);
+  //line 11
+      if (objects[0] == 0 && objects[4] >= 1) trgres.push_back(doprescale(scalef[11]));
+      else trgres.push_back(0);
+  //add new trigger line by users here, e.g.
+      //if(objects[0]==0)trgres.push_back(doprescale(1));
+      //else trgres.push_back(0);
+  */
+//  }
 
 }
 

@@ -36,6 +36,16 @@
 #include <top/dbobjects/TOPCalChannelT0.h>
 #include <top/dbobjects/TOPCalModuleT0.h>
 #include <top/dbobjects/TOPCalChannelMask.h>
+#include <top/dbobjects/TOPCalChannelPulseHeight.h>
+#include <top/dbobjects/TOPCalChannelThresholdEff.h>
+#include <top/dbobjects/TOPCalChannelNoise.h>
+#include <top/dbobjects/TOPCalChannelRQE.h>
+#include <top/dbobjects/TOPCalChannelThreshold.h>
+#include <top/dbobjects/TOPCalCommonT0.h>
+#include <top/dbobjects/TOPCalIntegratedCharge.h>
+#include <top/dbobjects/TOPCalModuleAlignment.h>
+#include <top/dbobjects/TOPCalAsicShift.h>
+
 #include <top/dbobjects/TOPPmtGainPar.h>
 #include <top/dbobjects/TOPPmtQE.h>
 #include <top/dbobjects/TOPPmtInstallation.h>
@@ -43,14 +53,20 @@
 #include <top/dbobjects/TOPPmtTTSPar.h>
 #include <top/dbobjects/TOPPmtTTSHisto.h>
 
+#include <top/dbobjects/TOPFrontEndSetting.h>
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <set>
+#include <map>
 
 #include "TFile.h"
 #include "TTree.h"
 
+extern "C" {
+  float phind_lambda_(float*); // phase refractive index of quartz (top_geo.F)
+}
 
 using namespace std;
 
@@ -58,8 +74,9 @@ namespace Belle2 {
 
   using namespace TOP;
 
-
-  void TOPDatabaseImporter::importSampleTimeCalibration(string fNames)
+  void TOPDatabaseImporter::importSampleTimeCalibration(string fNames,
+                                                        int firstExp, int firstRun,
+                                                        int lastExp, int lastRun)
   {
 
     // make vector out of files separated with space
@@ -84,7 +101,7 @@ namespace Belle2 {
     // read constants from files and put them to DB object
 
     for (const auto& fileName : fileNames) {
-      TFile* file = new TFile(fileName.c_str(), "r");
+      TFile* file = TFile::Open(fileName.c_str(), "r");
       if (!file) {
         B2ERROR("openFile: " << fileName << " *** failed to open");
         continue;
@@ -167,7 +184,7 @@ namespace Belle2 {
     }
 
     // import constants
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     timeBase.import(iov);
 
     // final message
@@ -183,7 +200,9 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importLocalT0Calibration(string fNames)
+  void TOPDatabaseImporter::importLocalT0Calibration(string fNames,
+                                                     int firstExp, int firstRun,
+                                                     int lastExp, int lastRun)
   {
     vector<string> fileNames;
     stringstream ss(fNames);
@@ -200,7 +219,7 @@ namespace Belle2 {
     int nCal[16] = {0}; // number of calibrated channels per slot
 
     for (const auto& fileName : fileNames) {
-      TFile* file = new TFile(fileName.c_str(), "r");
+      TFile* file = TFile::Open(fileName.c_str(), "r");
       B2INFO("--> Opening constants file " << fileName);
 
       if (!file) {
@@ -213,40 +232,52 @@ namespace Belle2 {
 
       if (!treeCal) {
         B2ERROR("openFile: no tree named chT0 found in " << fileName);
+        file->Close();
         continue;
       }
 
       double t0Cal = 0.;
+      double t0CalErr = 0.;
       int channelID = 0; // 0-511
       int slotID = 0;    // 1-16
+      int fitStatus = 0; // fit status, 0 = OK
 
       treeCal->SetBranchAddress("channel", &channelID);
       treeCal->SetBranchAddress("slot", &slotID);
-      treeCal->SetBranchAddress("t0Const", &t0Cal);
+      treeCal->SetBranchAddress("channelT0", &t0Cal);
+      treeCal->SetBranchAddress("channelT0Err", &t0CalErr);
+      treeCal->SetBranchAddress("fitStatus", &fitStatus);
 
       B2INFO("--> importing constats");
 
       for (int iCal = 0; iCal < treeCal->GetEntries(); iCal++) {
         treeCal->GetEntry(iCal);
         if (!geo->isModuleIDValid(slotID)) {
-          B2ERROR("Slot ID is not valid (fileName = " << fileName << ", SlotID = " << slotID << ", ChannelID = " << channelID <<
+          B2ERROR("Slot ID is not valid (fileName = " << fileName
+                  << ", SlotID = " << slotID << ", ChannelID = " << channelID <<
                   "). Skipping the entry.");
           continue;
         }
-        if (channelID < 0 || channelID > 511) {
-          B2ERROR("Channel ID is not valid (fileName = " << fileName << ", SlotID = " << slotID << ", ChannelID = " << channelID <<
+        if (channelID < 0 or channelID > 511) {
+          B2ERROR("Channel ID is not valid (fileName = " << fileName
+                  << ", SlotID = " << slotID << ", ChannelID = " << channelID <<
                   "). Skipping the entry.");
           continue;
         }
-        double err = 0.; // No error provided yet!!
-        channelT0->setT0(slotID, channelID, t0Cal, err);
-        nCal[slotID - 1]++;
+        channelT0->setT0(slotID, channelID, t0Cal, t0CalErr);
+        if (fitStatus == 0) {
+          nCal[slotID - 1]++;
+        } else {
+          channelT0->setUnusable(slotID, channelID);
+        }
       }
 
       file->Close();
       B2INFO("--> Input file closed");
     }
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    channelT0->suppressAverage();
+
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     channelT0.import(iov);
 
     short nCalTot = 0;
@@ -264,8 +295,180 @@ namespace Belle2 {
   }
 
 
+  void TOPDatabaseImporter::importChannelT0(std::string fileName,
+                                            int expNo, int firstRun, int lastRun)
+  {
+    // declare db object to be imported -- and construct it
+    DBImportObjPtr<TOPCalChannelT0> channelT0;
+    channelT0.construct();
 
-  void TOPDatabaseImporter::importModuleT0Calibration(string fileName)
+    // open the root file
+    TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("openFile: " << fileName << " *** failed to open");
+      return;
+    }
+    B2INFO(fileName << ": open for reading");
+
+    // loop over slots and set channel T0
+    int nModules = TOPGeometryPar::Instance()->getGeometry()->getNumModules();
+    int count = 0; // counter of calibrated constants
+    for (int moduleID = 1; moduleID <= nModules; moduleID++) {
+      std::string name = "channelT0_slot";
+      if (moduleID < 10) name += "0";
+      name += std::to_string(moduleID);
+      auto* h = (TH1F*) file->Get(name.c_str());
+      if (!h) {
+        B2ERROR("Histogram with name '" + name + "' not found");
+        continue;
+      }
+      for (int channel = 0; channel < h->GetNbinsX(); channel++) {
+        double value = h->GetBinContent(channel + 1);
+        double error = h->GetBinError(channel + 1);
+        channelT0->setT0(moduleID, channel, value, error);
+        if (error > 0) {
+          count++;
+        } else {
+          channelT0->setUnusable(moduleID, channel);
+        }
+      }
+    }
+    file->Close();
+
+    channelT0->suppressAverage();
+
+    // import to database
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    channelT0.import(iov);
+
+    B2INFO("Channel T0 for exp " << expNo << " run " << firstRun << " to " << lastRun
+           << " imported. Calibrated channels: " << count << "/" << nModules * 512);
+
+  }
+
+
+  void TOPDatabaseImporter::importAsicShifts_BS13d(double s0, double s1, double s2, double s3,
+                                                   int expNo, int firstRun, int lastRun)
+  {
+
+    std::vector<double> shifts;
+    shifts.push_back(s0);
+    shifts.push_back(s1);
+    shifts.push_back(s2);
+    shifts.push_back(s3);
+
+    DBImportObjPtr<TOPCalAsicShift> asicShift;
+    asicShift.construct();
+
+    int moduleID = 13;
+    unsigned bs = 3;
+    for (unsigned carrier = 0; carrier < 4; carrier++) {
+      for (unsigned a = 0; a < 4; a++) {
+        unsigned asic = a + carrier * 4 + bs * 16;
+        asicShift->setT0(moduleID, asic, shifts[carrier]);
+      }
+    }
+
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    asicShift.import(iov);
+
+    B2INFO("ASIC shifts of BS13d imported for exp " << expNo << " run " << firstRun <<
+           " to " << lastRun);
+  }
+
+
+  void TOPDatabaseImporter::importOfflineCommonT0Calibration(string fileName,
+                                                             int firstExp, int firstRun,
+                                                             int lastExp, int lastRun)
+  {
+    TFile* file = TFile::Open(fileName.c_str(), "r");
+    B2INFO("--> Opening constants file " << fileName);
+
+    if (!file) {
+      B2ERROR("openFile: " << fileName << " *** failed to open");
+      return;
+    }
+    B2INFO("--> " << fileName << ": open for reading");
+
+    TTree* treeCal = (TTree*)file->Get("tree");
+
+    if (!treeCal) {
+      B2ERROR("openFile: no tree named tree found in " << fileName);
+      file->Close();
+      return;
+    }
+
+    float t0 = 0.;
+    float t0Err = 0;
+    float chi2 = 0;
+    float integral = 0;
+    float sigma = 0;
+    int runNum = 0;
+    int fitStatus = 0;
+
+    treeCal->SetBranchAddress("offset", &t0);
+    treeCal->SetBranchAddress("runNum", &runNum);
+    treeCal->SetBranchAddress("sigma", &sigma);
+    treeCal->SetBranchAddress("offsetErr", &t0Err);
+    treeCal->SetBranchAddress("chi2", &chi2);
+    treeCal->SetBranchAddress("integral", &integral);
+    treeCal->SetBranchAddress("fitStatus", &fitStatus);
+
+    treeCal->GetEntry(0);
+
+    if (lastRun == -1 and firstRun == -1) {
+      lastRun = runNum;
+      firstRun = runNum;
+      B2INFO("Using the run number from the tree ");
+    } else {
+      B2INFO("Using the run numbers passed to the importer");
+    }
+    B2INFO("IOV = (" << firstExp << ", "  << firstRun << ", "
+           << lastExp << ", "  << lastRun << ")");
+
+    DBImportObjPtr<TOPCalCommonT0> commonT0;
+    commonT0.construct(t0, t0Err);
+
+    if (fitStatus == 0 and integral > 10 and sigma > 0.05 and sigma < 0.33) {
+      B2INFO("Good calibration found ");
+      B2INFO("t0 = " << t0 << " +- "  << t0Err);
+      B2INFO("sigma = " << sigma);
+      B2INFO("chi2 = " << chi2);
+    } else {
+      B2INFO("BAD calibration found - set calibration to 'unusable'");
+      B2INFO("t0 = " << t0 << " +- "  << t0Err);
+      B2INFO("sigma = " << sigma);
+      B2INFO("chi2 = " << chi2);
+      B2INFO("fit status = " << fitStatus);
+      commonT0->setUnusable();
+    }
+
+    file->Close();
+
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    commonT0.import(iov);
+    B2INFO("--> constants imported");
+    B2INFO("   ");
+  }
+
+  void TOPDatabaseImporter::importCommonT0(double value, double error,
+                                           int expNo, int firstRun, int lastRun,
+                                           bool roughlyCalibrated)
+  {
+    DBImportObjPtr<TOPCalCommonT0> commonT0;
+    commonT0.construct(value, error);
+    if (roughlyCalibrated) commonT0->setRoughlyCalibrated();
+
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    commonT0.import(iov);
+
+    B2INFO("--> constants for exp = " << expNo
+           << " run = " << firstRun << " to " << lastRun << " imported");
+  }
+
+  void TOPDatabaseImporter::importModuleT0Calibration(string fileName,
+                                                      int firstExp, int firstRun,
+                                                      int lastExp, int lastRun)
   {
 
 
@@ -302,7 +505,9 @@ namespace Belle2 {
     inFile.close();
     B2INFO("--> Input file closed");
 
-    IntervalOfValidity iov(0, 0, -1, -1);
+    moduleT0->suppressAverage();
+
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     moduleT0.import(iov);
 
     B2INFO("Summary: ");
@@ -310,6 +515,53 @@ namespace Belle2 {
       B2INFO("--> Time offset of Slot " << iSlot << " = " << moduleT0->getT0(iSlot));
     }
 
+
+  }
+
+
+  void TOPDatabaseImporter::importModuleT0(std::string fileName,
+                                           int expNo, int firstRun, int lastRun)
+  {
+
+    // construct DB import object
+    DBImportObjPtr<TOPCalModuleT0> moduleT0;
+    moduleT0.construct();
+
+    // open the root file
+    TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("openFile: " << fileName << " *** failed to open");
+      return;
+    }
+    B2INFO(fileName << ": open for reading");
+
+    // get histogram and set the DB import object
+    auto* h = (TH1F*) file->Get("moduleT0");
+    if (not h) {
+      B2ERROR("no histogram 'moduleT0' found in the file, nothing imported");
+      return;
+    }
+    int count = 0; // counter of calibrated
+    for (int slot = 1; slot <= h->GetNbinsX(); slot++) {
+      double value = h->GetBinContent(slot);
+      double error = h->GetBinError(slot);
+      moduleT0->setT0(slot, value, error);
+      if (error > 0) {
+        count++;
+      } else {
+        moduleT0->setUnusable(slot);
+      }
+    }
+    file->Close();
+
+    moduleT0->suppressAverage();
+
+    // import the object
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    moduleT0.import(iov);
+
+    B2INFO("Module T0 for exp " << expNo << " run " << firstRun << " to " << lastRun
+           << " imported. Calibrated modules: " << count << "/" << 16);
 
   }
 
@@ -373,7 +625,62 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::generateFakeChannelMask(double fractionDead, double fractionHot)
+  void TOPDatabaseImporter::importChannelMask(std::string fileName,
+                                              int expNo, int firstRun, int lastRun)
+  {
+    // declare db object to be imported -- and construct it
+    DBImportObjPtr<TOPCalChannelMask> channelMask;
+    channelMask.construct();
+
+    // open the root file
+    TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("openFile: " << fileName << " *** failed to open");
+      return;
+    }
+    B2INFO(fileName << ": open for reading");
+
+    // loop over slots and set channel mask
+    int nModules = TOPGeometryPar::Instance()->getGeometry()->getNumModules();
+    int active = 0, dead = 0, noisy = 0;
+    for (int moduleID = 1; moduleID <= nModules; moduleID++) {
+      std::string name = "slot_" + std::to_string(moduleID);
+      auto* h = (TH1F*) file->Get(name.c_str());
+      if (!h) {
+        B2ERROR("Histogram with name '" + name + "' not found");
+        continue;
+      }
+      for (int channel = 0; channel < h->GetNbinsX(); channel++) {
+        int value = h->GetBinContent(channel + 1);
+        if (value == 0) {
+          channelMask->setActive(moduleID, channel);
+          active++;
+        } else if (value == 1) {
+          channelMask->setDead(moduleID, channel);
+          dead++;
+        } else {
+          channelMask->setNoisy(moduleID, channel);
+          noisy++;
+        }
+      }
+    }
+    file->Close();
+
+    // import to database
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    channelMask.import(iov);
+
+    B2INFO("Channel mask for exp " << expNo << " run " << firstRun << " to " << lastRun
+           << " imported. Active channels: " << active << ", dead: " << dead
+           << ", noisy: " << noisy);
+
+  }
+
+
+  void TOPDatabaseImporter::generateFakeChannelMask(double fractionDead,
+                                                    double fractionHot,
+                                                    int firstExp, int firstRun,
+                                                    int lastExp, int lastRun)
   {
     // declare db object to be imported -- and construct it
     DBImportObjPtr<TOPCalChannelMask> channelMask;
@@ -411,16 +718,18 @@ namespace Belle2 {
     } // module
 
     // declare interval of validity
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     channelMask.import(iov);
 
-    B2WARNING("Generated and imported a fake channel mask to database for testing: "
-              << ncall << "/" << nall);
+    B2RESULT("Generated and imported a fake channel mask to database for testing: "
+             << ncall << "/" << nall);
     return;
   }
 
 
-  void TOPDatabaseImporter::importPmtQEData(string fileName, string treeName = "qePmtData")
+  void TOPDatabaseImporter::importPmtQEData(string fileName, string treeName,
+                                            int firstExp, int firstRun,
+                                            int lastExp, int lastRun)
   {
 
     // declare db objects to be imported
@@ -434,8 +743,17 @@ namespace Belle2 {
     TBranch* bQE_data[nChann];
 
     // open root file and get tree
-    TFile* file = new TFile(fileName.c_str(), "r");
+    TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("Cannot open the file " << fileName);
+      return;
+    }
     TTree* tQeData = (TTree*)file->Get(treeName.c_str());
+    if (!tQeData) {
+      B2ERROR("No TTree with name " << treeName << " in file " << fileName);
+      file->Close();
+      return;
+    }
 
     tQeData->SetBranchAddress("serialNum", &serialNum);
     tQeData->SetBranchAddress("lambdaFirst", &lambdaFirst);
@@ -471,8 +789,9 @@ namespace Belle2 {
 
       countPMTs++;
     }
+    file->Close();
 
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     pmtQEs.import(iov);
 
     B2RESULT("PMT QE data imported to database for " << countPMTs << " PMT's.");
@@ -481,7 +800,9 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtGainData(string fileName, string treeName = "gainPmtData")
+  void TOPDatabaseImporter::importPmtGainData(string fileName, string treeName,
+                                              int firstExp, int firstRun,
+                                              int lastExp, int lastRun)
   {
 
     // declare db objects to be imported
@@ -493,8 +814,17 @@ namespace Belle2 {
     float hv_op0, hv_op;
 
     // open root file and get tree
-    TFile* file = new TFile(fileName.c_str(), "r");
+    TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("Cannot open the file " << fileName);
+      return;
+    }
     TTree* tGainData = (TTree*)file->Get(treeName.c_str());
+    if (!tGainData) {
+      B2ERROR("No TTree with name " << treeName << " in file " << fileName);
+      file->Close();
+      return;
+    }
 
     tGainData->SetBranchAddress("serialNum", &serialNum);
     tGainData->SetBranchAddress("gain_const", &gain_const);
@@ -511,19 +841,16 @@ namespace Belle2 {
       tGainData->GetEntry(ient);
       auto* pmtGain = pmtGains.appendNew(*serialNum);
 
-      int out_hv0 = int(-fabs(hv_op0));
-      int out_hv = int(-fabs(hv_op));
-      if (out_hv0 > 0 || out_hv > 0) B2FATAL("HV settings must be negative integers. Quitting...");
-
       for (int ic = 0; ic < nChann; ic++) {
-        pmtGain->setChannelData(ic + 1, gain_const[ic], gain_slope[ic], gain_ratio[ic]);
-        pmtGain->setNominalHV0(out_hv0);
-        pmtGain->setNominalHV(out_hv);
+        pmtGain->setPmtPixelData(ic + 1, gain_const[ic], gain_slope[ic], gain_ratio[ic]);
+        pmtGain->setNominalHV0(-fabs(hv_op0));
+        pmtGain->setNominalHV(-fabs(hv_op));
       }
       countPMTs++;
     }
+    file->Close();
 
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     pmtGains.import(iov);
 
     B2RESULT("PMT gain data imported to database for " << countPMTs << " PMT's.");
@@ -532,7 +859,9 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtInstallationData(string fileName, string treeName = "installationPmtData")
+  void TOPDatabaseImporter::importPmtInstallationData(string fileName, string treeName ,
+                                                      int firstExp, int firstRun,
+                                                      int lastExp, int lastRun)
   {
 
     // declare db objects to be imported
@@ -540,36 +869,49 @@ namespace Belle2 {
 
     std::string* serialNum = 0;
     int moduleCNum, slotNum, arrayNum, PMTposition;
+    TOPPmtObsoleteData::EType type;
 
     // open root file and get tree
-    TFile* file = new TFile(fileName.c_str(), "r");
+    TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("Cannot open the file " << fileName);
+      return;
+    }
     TTree* tInstData = (TTree*)file->Get(treeName.c_str());
+    if (!tInstData) {
+      B2ERROR("No TTree with name " << treeName << " in file " << fileName);
+      file->Close();
+      return;
+    }
 
     tInstData->SetBranchAddress("serialNum", &serialNum);
     tInstData->SetBranchAddress("moduleCNum", &moduleCNum);
     tInstData->SetBranchAddress("slotNum", &slotNum);
     tInstData->SetBranchAddress("arrayNum", &arrayNum);
     tInstData->SetBranchAddress("PMTposition", &PMTposition);
+    tInstData->SetBranchAddress("type", &type);
 
     // loop on input tree entries and construct the pmtInstallation objects
     int countPMTs = 0;
 
     for (int ient = 0; ient < tInstData->GetEntries(); ient++) {
       tInstData->GetEntry(ient);
-      pmtInst.appendNew(*serialNum, moduleCNum, slotNum, arrayNum, PMTposition);
+      pmtInst.appendNew(*serialNum, moduleCNum, slotNum, arrayNum, PMTposition, type);
       countPMTs++;
     }
+    file->Close();
 
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     pmtInst.import(iov);
 
     B2RESULT("PMT installation data imported to database for " << countPMTs << " PMT's.");
 
-    return;
   }
 
 
-  void TOPDatabaseImporter::importPmtObsoleteData(string fileName, string treeName = "obsPmtData")
+  void TOPDatabaseImporter::importPmtObsoleteData(string fileName, string treeName,
+                                                  int firstExp, int firstRun,
+                                                  int lastExp, int lastRun)
   {
 
     // declare db objects to be imported
@@ -580,18 +922,25 @@ namespace Belle2 {
     float hv_spec, dark_spec, qe380_spec;
     TOPPmtObsoleteData::EType type;
 
-    // the HV value must be a negative int
-    int obs_hv(0);
-
     // open root file and get tree
-    TFile* file = new TFile(fileName.c_str(), "r");
+    TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("Cannot open the file " << fileName);
+      return;
+    }
     TTree* tObsData = (TTree*)file->Get(treeName.c_str());
+    if (!tObsData) {
+      B2ERROR("No TTree with name " << treeName << " in file " << fileName);
+      file->Close();
+      return;
+    }
 
     tObsData->SetBranchAddress("serialNum", &serialNum);
     tObsData->SetBranchAddress("cathode", &cathode);
     tObsData->SetBranchAddress("hv_spec", &hv_spec);
     tObsData->SetBranchAddress("dark_spec", &dark_spec);
     tObsData->SetBranchAddress("qe380_spec", &qe380_spec);
+    tObsData->SetBranchAddress("type", &type);
 
     // loop on input tree entries and construct the pmt obsolete data objects
     int countPMTs = 0;
@@ -599,17 +948,14 @@ namespace Belle2 {
     for (int ient = 0; ient < tObsData->GetEntries(); ient++) {
       tObsData->GetEntry(ient);
 
-      // set type to unknown for now
-      type = TOPPmtObsoleteData::c_Unknown;
+      // make sure the HV from specifications is negative
+      hv_spec = -fabs(hv_spec);
 
-      obs_hv = (int)hv_spec;
-      if (obs_hv > 0) B2FATAL("The obsolete HV must be negative! Quitting...");
-
-      pmtObsData.appendNew(*serialNum, type, *cathode, obs_hv, dark_spec, qe380_spec);
+      pmtObsData.appendNew(*serialNum, type, *cathode, hv_spec, dark_spec, qe380_spec);
       countPMTs++;
     }
 
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     pmtObsData.import(iov);
 
     B2RESULT("PMT obsolete data imported to database for " << countPMTs << " PMT's.");
@@ -623,7 +969,9 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtTTSPar(string fileName, string treeName = "ttsPmtPar")
+  void TOPDatabaseImporter::importPmtTTSPar(string fileName, string treeName,
+                                            int firstExp, int firstRun,
+                                            int lastExp, int lastRun)
   {
 
     // declare db objects to be imported
@@ -641,8 +989,17 @@ namespace Belle2 {
 
 
     // open root file and get tree
-    TFile* file = new TFile(fileName.c_str(), "r");
+    TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("Cannot open the file " << fileName);
+      return;
+    }
     TTree* tTtsPar = (TTree*)file->Get(treeName.c_str());
+    if (!tTtsPar) {
+      B2ERROR("No TTree with name " << treeName << " in file " << fileName);
+      file->Close();
+      return;
+    }
 
     tTtsPar->SetBranchAddress("serialNum", &serialNum);
     for (int ic = 0; ic < nChann; ic++) {
@@ -702,8 +1059,9 @@ namespace Belle2 {
       }
       countPMTs++;
     }
+    file->Close();
 
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     pmtTtsPars.import(iov);
 
     B2RESULT("PMT TTS parameters imported to database for " << countPMTs << " PMT's.");
@@ -712,20 +1070,32 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtTTSHisto(string fileName, string treeName = "ttsPmtHisto")
+  void TOPDatabaseImporter::importPmtTTSHisto(string fileName,
+                                              string treeName,
+                                              int firstExp, int firstRun,
+                                              int lastExp, int lastRun)
   {
 
-    // define data array
-    TClonesArray pmtTtsHistos("Belle2::TOPPmtTTSHisto");
+    // declare db objects to be imported
+    DBImportArray<TOPPmtTTSHisto> pmtTtsHistos;
 
     static const int nChann = 16;
     std::string* serialNum = 0;
-    float hv(-9.);
+    float hv = 0;
     TH1F* histo[nChann] = {0};
 
     // open root file and get tree
-    TFile* file = new TFile(fileName.c_str(), "r");
+    TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("Cannot open the file " << fileName);
+      return;
+    }
     TTree* tTtsHisto = (TTree*)file->Get(treeName.c_str());
+    if (!tTtsHisto) {
+      B2ERROR("No TTree with name " << treeName << " in file " << fileName);
+      file->Close();
+      return;
+    }
 
     tTtsHisto->SetBranchAddress("serialNum", &serialNum);
     tTtsHisto->SetBranchAddress("hv", &hv);
@@ -735,7 +1105,6 @@ namespace Belle2 {
       tTtsHisto->SetBranchAddress(hString, &histo[ic]);
     }
 
-
     // loop on input tree entries and construct the pmt tts histo objects
     int countHists = 0;
 
@@ -743,50 +1112,132 @@ namespace Belle2 {
 
       tTtsHisto->GetEntry(ient);
 
-      int out_hv = int(-fabs(hv));
-      if (out_hv > 0) B2FATAL("HV setting must be negative. Quitting...");
+      // make sure the HV used in the test is negative
+      hv = -fabs(hv);
 
-      B2INFO("Saving TTS histograms for PMT " << *serialNum << ", HV = " << out_hv);
+      B2INFO("Saving TTS histograms for PMT " << *serialNum << ", HV = " << hv);
 
-      new(pmtTtsHistos[ient]) TOPPmtTTSHisto();
-      auto* pmtTtsHisto = static_cast<TOPPmtTTSHisto*>(pmtTtsHistos[ient]);
-
-      pmtTtsHisto->setSerialNumber(*serialNum);
-      pmtTtsHisto->setHv(out_hv);
+      auto* pmtTtsHisto = pmtTtsHistos.appendNew(*serialNum, hv);
       for (int ic = 0; ic < nChann; ic++) {
-        pmtTtsHisto->setHistogram(ic + 1, *histo[ic]);
+        pmtTtsHisto->setHistogram(ic + 1, histo[ic]);
       }
       countHists++;
     }
+    file->Close();
 
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
-    Database::Instance().storeData("TOPPmtTTSHistos", &pmtTtsHistos, iov);
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    pmtTtsHistos.import(iov);
 
     B2RESULT("Imported " << countHists << " sets of TTS histograms from " << fileName << " file.");
 
     return;
   }
 
+  void TOPDatabaseImporter::importPmtPulseHeightFitResult(std::string fileName,
+                                                          int firstExp, int firstRun,
+                                                          int lastExp, int lastRun)
+  {
+    // declare db objects to be imported
+    DBImportObjPtr<TOPCalChannelPulseHeight> calChannelPulseHeight;
+    DBImportObjPtr<TOPCalChannelThresholdEff> calChannelThresholdEff;
+    calChannelPulseHeight.construct();
+    calChannelThresholdEff.construct();
 
-  void TOPDatabaseImporter::exportPmtTTSHisto(string outFileName = "RetrievedHistos.root")
+    TFile* file = TFile::Open(fileName.c_str());
+    if (!file) {
+      B2ERROR("openFile: " << fileName << " *** failed to open");
+      return;
+    }
+    TTree* tr = (TTree*)file->Get("tree");   // defined in TOPGainEfficiencyCalculatorModule
+    if (!tr) {
+      B2ERROR("No TTree with name tree found in " << fileName);
+      file->Close();
+      return;
+    }
+
+    short slotId = 0;
+    short pixelId = 0;
+    float p1 = -1;
+    float p2 = -1;
+    float x0 = -1;
+    float threshold = -1;
+    float efficiency = -1;
+    float chisquare = -1;
+    int ndf = 0;
+    tr->SetBranchAddress("slotId", &slotId);
+    tr->SetBranchAddress("pixelId", &pixelId);
+    tr->SetBranchAddress("p1UseIntegral", &p1);
+    tr->SetBranchAddress("p2UseIntegral", &p2);
+    tr->SetBranchAddress("x0UseIntegral", &x0);
+    tr->SetBranchAddress("thresholdForIntegral", &threshold);
+    tr->SetBranchAddress("efficiencyUseIntegral", &efficiency);
+    tr->SetBranchAddress("chisquareUseIntegral", &chisquare);
+    tr->SetBranchAddress("ndfUseIntegral", &ndf);
+
+    const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
+    if (!channelMapper.isValid()) {
+      B2ERROR("No valid channel mapper found");
+      file->Close();
+      return;
+    }
+
+    long nEntries = tr->GetEntries();
+    std::map<short, float> reducedChisqMap;
+    for (long iEntry = 0 ; iEntry < nEntries ; iEntry++) {
+      tr->GetEntry(iEntry);
+
+      if (efficiency < 0) continue;
+
+      if (!channelMapper.isPixelIDValid(pixelId)) {
+        B2ERROR("invalid pixelID" << pixelId);
+        continue;
+      }
+      auto channel = channelMapper.getChannel(pixelId);
+      short globalChannelNumber = slotId * 1000 + channel;
+      float redChisq = chisquare / ndf;
+
+      //in case entries for the same channel appears multiple time, use data with smaller reduced chisquare
+      //(This can happen when distribution is fit manually and results are appended for channels with fit failure)
+      if (reducedChisqMap.count(globalChannelNumber) == 0
+          or reducedChisqMap[globalChannelNumber] > redChisq) {
+        reducedChisqMap[globalChannelNumber] = redChisq;
+        calChannelPulseHeight->setParameters(slotId, channel, x0, p1, p2);
+        calChannelThresholdEff->setThrEff(slotId, channel, efficiency, (short)threshold);
+
+        if (redChisq > 10.) {
+          calChannelPulseHeight->setUnusable(slotId, channel);
+          calChannelThresholdEff->setUnusable(slotId, channel);
+        }
+      }
+    }
+    file->Close();
+
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    calChannelPulseHeight.import(iov);
+    calChannelThresholdEff.import(iov);
+
+    B2RESULT("Imported channel-by-channel gain and efficiency data from fitting of pulse height distribution for "
+             << reducedChisqMap.size() << " channels from " << fileName << " file.");
+
+    return;
+  }
+
+
+  void TOPDatabaseImporter::exportPmtTTSHisto(string outFileName)
   {
 
     // this is just an example on how to retrieve TTS histograms
     DBArray<TOPPmtTTSHisto> elements("TOPPmtTTSHistos");
-    elements.getEntries();
-
-    static const int nChann = 16;
 
     TFile file(outFileName.c_str(), "recreate");
 
     // prints serialNum of PMTs and hv setting used, and saves TTS histograms to root file
     for (const auto& element : elements) {
 
-      B2INFO("serialNum = " << element.getSerialNumber() << ", HV = " << element.getHv());
-      TH1F ttsHisto[nChann];
-      for (int ic = 0; ic < nChann; ic++) {
-        ttsHisto[ic] = element.getTtsHisto(ic + 1);
-        ttsHisto[ic].Write();
+      B2INFO("serialNum = " << element.getSerialNumber() << ", HV = " << element.getHV());
+      for (int ic = 0; ic < element.getNumOfPixels(); ic++) {
+        const auto* ttsHisto = element.getHistogram(ic + 1);
+        if (ttsHisto) ttsHisto->Write();
       }
     }
 
@@ -795,9 +1246,204 @@ namespace Belle2 {
     return;
   }
 
+  void TOPDatabaseImporter::importFrontEndSettings(int lookback, int readoutWin,
+                                                   int extraWin, int offset,
+                                                   int expNo, int firstRun, int lastRun)
+  {
+    DBImportObjPtr<TOPFrontEndSetting> feSetting;
+    feSetting.construct();
+
+    // write-window depths (write-window is 128 samples)
+    std::vector<int> writeDepths;
+    for (int i = 0; i < 3; i++) {
+      writeDepths.push_back(214);
+      writeDepths.push_back(212);
+      writeDepths.push_back(214);
+    }
+    feSetting->setWriteDepths(writeDepths);
+    feSetting->setLookbackWindows(lookback);
+    feSetting->setReadoutWindows(readoutWin);
+    feSetting->setExtraWindows(extraWin);
+    feSetting->setOffset(offset);
+
+    // window shifts
+    std::vector<int> shifts = {0, 0, 1, 1, 1, 2};
+    feSetting->setWindowShifts(shifts);
+
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    feSetting.import(iov);
+
+    B2INFO("Front-end settings imported for exp " << expNo << " run " << firstRun <<
+           " to " << lastRun);
+  }
 
 
+  void TOPDatabaseImporter::importDummyCalModuleAlignment(int firstExp, int firstRun,
+                                                          int lastExp, int lastRun)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalModuleAlignment> moduleAlignment;
+    moduleAlignment.construct();
+    moduleAlignment.import(iov);
+    B2INFO("Dummy TOPCalModuleAlignment imported");
+    return;
+  }
 
+  void TOPDatabaseImporter::importDummyCalModuleT0(int firstExp, int firstRun,
+                                                   int lastExp, int lastRun)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalModuleT0> moduleT0;
+    moduleT0.construct();
+    moduleT0.import(iov);
+    B2INFO("Dummy TOPCalModuleT0 imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelT0(int firstExp, int firstRun,
+                                                    int lastExp, int lastRun)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalChannelT0> channelT0;
+    channelT0.construct();
+    channelT0.import(iov);
+    B2INFO("Dummy TOPCalChannelT0 imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalTimebase(int firstExp, int firstRun,
+                                                   int lastExp, int lastRun)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalTimebase> timebase;
+    timebase.construct();
+    timebase.import(iov);
+    B2INFO("Dummy TOPCalTimebase imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelNoise(int firstExp, int firstRun,
+                                                       int lastExp, int lastRun)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalChannelNoise> channelNoise;
+    channelNoise.construct();
+    channelNoise.import(iov);
+    B2INFO("Dummy TOPCalChannelNoise imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelPulseHeight(int firstExp, int firstRun,
+                                                             int lastExp, int lastRun)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalChannelPulseHeight> pulseHeight;
+    pulseHeight.construct();
+    pulseHeight.import(iov);
+    B2INFO("Dummy TOPCalChannelPulseHeight imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelRQE(int firstExp, int firstRun,
+                                                     int lastExp, int lastRun)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalChannelRQE> channelRQE;
+    channelRQE.construct();
+    channelRQE.import(iov);
+    B2INFO("Dummy TOPCalChannelRQE imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelThresholdEff(int firstExp, int firstRun,
+                                                              int lastExp, int lastRun)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalChannelThresholdEff> channelThresholdEff;
+    channelThresholdEff.construct();
+    channelThresholdEff.import(iov);
+    B2INFO("Dummy TOPCalChannelThresholdEff imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelThreshold(int firstExp, int firstRun,
+                                                           int lastExp, int lastRun)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalChannelThreshold> channelThreshold;
+    channelThreshold.construct();
+    channelThreshold.import(iov);
+    B2INFO("Dummy TOPCalChannelThreshold imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalCommonT0(int firstExp, int firstRun,
+                                                   int lastExp, int lastRun)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalCommonT0> commonT0;
+    commonT0.construct();
+    commonT0.import(iov);
+    B2INFO("Dummy TOPCalCommonT0 imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalIntegratedCharge(int firstExp, int firstRun,
+                                                           int lastExp, int lastRun)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalIntegratedCharge> integratedCharge;
+    integratedCharge.construct();
+    integratedCharge.import(iov);
+    B2INFO("Dummy TOPCalIntegratedCharge imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalAsicShift(int firstExp, int firstRun,
+                                                    int lastExp, int lastRun)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalAsicShift> asicShift;
+    asicShift.construct();
+    asicShift.import(iov);
+    B2INFO("Dummy TOPCalAsicShift imported");
+  }
+
+  void TOPDatabaseImporter::correctTOPPmtQE()
+  {
+    B2ERROR("Function disabled since the corrected payload TOPPmtQEs already imported");
+    return;
+
+    DBArray<TOPPmtQE> pmtQEData;
+    DBImportArray<TOPPmtQE> pmtQECorrected;
+
+    for (const auto& pmt : pmtQEData) {
+      auto* pmtCorr = pmtQECorrected.appendNew(pmt.getSerialNumber(),
+                                               pmt.getLambdaFirst(),
+                                               pmt.getLambdaStep(),
+                                               pmt.getCE(false),
+                                               pmt.getCE(true));
+      for (unsigned pmtPixel = 1; pmtPixel <= TOPPmtQE::c_NumPmtPixels; pmtPixel++) {
+        auto qeData = pmt.getQE(pmtPixel);
+        float lambda = pmt.getLambdaFirst();
+        float step = pmt.getLambdaStep();
+        for (auto& qe : qeData) {
+          double n = phind_lambda_(&lambda); // phase refractive index of quartz
+          double reflectance = pow((n - 1) / (n + 1), 2);
+          qe /= (1 - reflectance);
+          lambda += step;
+        }
+        pmtCorr->setQE(pmtPixel, qeData);
+      }
+    }
+
+    IntervalOfValidity iov(0, 0, -1, -1);
+    pmtQECorrected.import(iov);
+
+    B2RESULT("Corrected PMT QE data imported to database for "
+             << pmtQECorrected.getEntries() << " PMT's.");
+
+  }
 
 
 //---- for testing only -- will be removed --------------------------------
@@ -843,13 +1489,13 @@ namespace Belle2 {
     auto* pmtGain = pmtGains.appendNew("JT00123");
     pmtGain->setNominalHV(3520);
     for (unsigned channel = 1; channel <= 16; channel++) {
-      pmtGain->setChannelData(channel, -13.77, 0.0042, 0.4);
+      pmtGain->setPmtPixelData(channel, -13.77, 0.0042, 0.4);
     }
 
     pmtGain = pmtGains.appendNew("JT02135");
     pmtGain->setNominalHV(3450);
     for (unsigned channel = 1; channel <= 16; channel++) {
-      pmtGain->setChannelData(channel, -12.77, 0.0045, 0.4);
+      pmtGain->setPmtPixelData(channel, -12.77, 0.0045, 0.4);
     }
 
     for (const auto& gain : pmtGains) gain.print();

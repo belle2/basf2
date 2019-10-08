@@ -19,6 +19,7 @@
 #include <string>
 #include <tuple>
 #include <cmath>
+#include <functional>
 
 using namespace std;
 
@@ -77,16 +78,15 @@ namespace Belle2 {
         getline(sline, cell, ','); // index
         getline(sline, cell, ','); // test
 
-        // true values
-        double true_amp, true_t0, width, noise;
+        // true values. Read from the file, though not used.
         getline(sline, cell, ',');
-        true_amp = stod(cell);
+        [[maybe_unused]] double true_amp = stod(cell);
         getline(sline, cell, ',');
-        true_t0 = stod(cell);
+        [[maybe_unused]] double true_t0 = stod(cell);
         getline(sline, cell, ',');
-        width = stod(cell);
+        [[maybe_unused]] double width = stod(cell);
         getline(sline, cell, ',');
-        noise = stod(cell);
+        [[maybe_unused]] double noise = stod(cell);
 
         // normalized samples
         apvSamples normedSamples;
@@ -107,19 +107,17 @@ namespace Belle2 {
           ProbsPy[iSample] = stod(cell);
         }
 
-
         // fit results
-        double fitPy_amp, fitPy_ampSigma, fitPy_chi2, fitPy_t0, fitPy_t0Sigma;
         getline(sline, cell, ',');
-        fitPy_amp = stod(cell);
+        double fitPy_amp = stod(cell);
         getline(sline, cell, ',');
-        fitPy_ampSigma = stod(cell);
+        double fitPy_ampSigma = stod(cell);
         getline(sline, cell, ',');
-        fitPy_chi2 = stod(cell);
+        [[maybe_unused]] double fitPy_chi2 = stod(cell);
         getline(sline, cell, ',');
-        fitPy_t0 = stod(cell);
+        double fitPy_t0 = stod(cell);
         getline(sline, cell, ',');
-        fitPy_t0Sigma = stod(cell);
+        double fitPy_t0Sigma = stod(cell);
 
         // now do the Cpp fit
         const shared_ptr<nnFitterBinData> ProbsCpp = fitter.getFit(normedSamples, width);

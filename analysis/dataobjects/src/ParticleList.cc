@@ -11,7 +11,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -30,7 +29,7 @@ ParticleList::~ParticleList()
   delete m_antiList;
 }
 
-void ParticleList::initialize(int pdg, std::string name, std::string particleStoreName)
+void ParticleList::initialize(int pdg, const std::string& name, const std::string& particleStoreName)
 {
   m_pdg    = pdg;
   m_pdgbar = pdg;
@@ -40,7 +39,7 @@ void ParticleList::initialize(int pdg, std::string name, std::string particleSto
   m_antiListName.clear();
 }
 
-void ParticleList::setParticleCollectionName(std::string name, bool forAntiParticle)
+void ParticleList::setParticleCollectionName(const std::string& name, bool forAntiParticle)
 {
   m_particleStore = name;
 
@@ -129,17 +128,17 @@ void ParticleList::removeParticles(const std::vector<unsigned int>& toRemove, bo
 {
   std::vector<int> newList;
   // remove Particles from flavor-specific list of this Particle List
-  for (unsigned i = 0; i < m_fsList.size(); ++i) {
-    if (std::find(toRemove.begin(), toRemove.end(), m_fsList[i]) == toRemove.end())
-      newList.push_back(m_fsList[i]);
+  for (int i : m_fsList) {
+    if (std::find(toRemove.begin(), toRemove.end(), i) == toRemove.end())
+      newList.push_back(i);
   }
   m_fsList = newList;
 
   // remove Particles from self-conjugated list of this Particle List
   newList.clear();
-  for (unsigned i = 0; i < m_scList.size(); ++i) {
-    if (std::find(toRemove.begin(), toRemove.end(), m_scList[i]) == toRemove.end())
-      newList.push_back(m_scList[i]);
+  for (int i : m_scList) {
+    if (std::find(toRemove.begin(), toRemove.end(), i) == toRemove.end())
+      newList.push_back(i);
   }
   m_scList = newList;
 

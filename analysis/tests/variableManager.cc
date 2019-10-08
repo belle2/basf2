@@ -1,9 +1,7 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/utilities/TestHelpers.h>
-#include <framework/logging/Logger.h>
 
 #include <gtest/gtest.h>
 
@@ -31,10 +29,10 @@ namespace {
   }
 
   /** test VariableManager. */
-  TEST(VariableTest, Manager)
+  TEST(VariableTest, ManagerDeathTest)
   {
-    const Manager::Var* v = Manager::Instance().getVariable("THISDOESNTEXIST");
-    EXPECT_TRUE(v == nullptr);
+
+    EXPECT_B2FATAL(Manager::Instance().getVariable("THISDOESNTEXIST"));
 
     //this exists
     const Manager::Var* pvar = Manager::Instance().getVariable("p");
@@ -56,12 +54,9 @@ namespace {
     const Manager::Var* nested = Manager::Instance().getVariable("daughterSumOf(daughter(1, extraInfo(signalProbability)))");
     EXPECT_TRUE(nested != nullptr);
 
-    const Manager::Var* funcDoesNotExists = Manager::Instance().getVariable("funcDoesNotExist(p)");
-    EXPECT_TRUE(funcDoesNotExists == nullptr);
+    EXPECT_B2FATAL(Manager::Instance().getVariable("funcDoesNotExist(p)"));
 
-    const Manager::Var* nestedDoesNotExist =
-      Manager::Instance().getVariable("daughterSumOf(daughter(1, ExtraInfoWrongName(signalProbability)))");
-    EXPECT_TRUE(nestedDoesNotExist != nullptr); // TODO This should actually return nullptr, but this is not easy to implement.
+    EXPECT_B2FATAL(Manager::Instance().getVariable("daughterSumOf(daughter(1, ExtraInfoWrongName(signalProbability)))"));
 
     // Test collection
     auto vec = Manager::Instance().resolveCollections({"myCollection"});
@@ -77,13 +72,13 @@ namespace {
     EXPECT_EQ(vec2[3], "pz");
 
     // Test alias
-    const Manager::Var* aliasDoesNotExists = Manager::Instance().getVariable("myAlias");
-    EXPECT_TRUE(aliasDoesNotExists == nullptr);
+    EXPECT_B2FATAL(Manager::Instance().getVariable("myAlias"));
     Manager::Instance().addAlias("myAlias", "daughterSumOf(daughter(1, extraInfo(signalProbability)))");
     const Manager::Var* aliasDoesExists = Manager::Instance().getVariable("myAlias");
     EXPECT_TRUE(aliasDoesExists != nullptr);
 
-    EXPECT_B2WARNING(Manager::Instance().addAlias("myAlias", "daughterSumOf(daughter(1, extraInfo(signalProbability)))"));
+    EXPECT_NO_B2WARNING(Manager::Instance().addAlias("myAlias", "daughterSumOf(daughter(1, extraInfo(signalProbability)))"));
+    EXPECT_B2WARNING(Manager::Instance().addAlias("myAlias", "daughterSumOf(daughter(0, extraInfo(signalProbability)))"));
     EXPECT_B2ERROR(Manager::Instance().addAlias("M", "daughterSumOf(daughter(1, extraInfo(signalProbability)))"));
 
     //re-registration not allowed

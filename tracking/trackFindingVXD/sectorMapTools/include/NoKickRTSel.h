@@ -8,36 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/trackingPerformanceEvaluation/HitXPModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <svd/dataobjects/SVDDigit.h>
-#include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDTrueHit.h>
 #include <TFile.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/hitXPDerivate.h>
 #include <tracking/dataobjects/hitXP.h>
 #include <TObject.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
-#include <cstdio>
-#include <stdio.h>
-#include <stdlib.h>
-#include "TFile.h"
-#include <TCanvas.h>
-#include <iostream>
-#include <fstream>
 #include <string>
-#include "TH1.h"
-#include "TF1.h"
-#include "TH2.h"
-#include "TF2.h"
-#include "TMath.h"
 #include "TLatex.h"
-#include <algorithm>
-#include <functional>
+#include <TH1F.h>
+#include <TTree.h>
 
 #pragma once
 
@@ -68,15 +47,15 @@ namespace Belle2 {
     TH1F* m_PDGIDSel; /**< histogram for PDGID of selected track */
     TH1F* m_PDGIDEff; /**< histogram for efficiency for each PDGID */
     TH1F* m_nCutHit; /**< histogram for number of cutted hist per track */
-    bool m_isCutted;
-    double m_pMag;
-    double m_pt;
-    double m_pdgID;
-    int m_Ncuts;
-    TTree* m_noKickTree;
+    bool m_isCutted; /**< Indicator if cut is applied */
+    double m_pMag; /**< momentum magnitut */
+    double m_pt; /**< transverse momentum */
+    double m_pdgID; /**< pdg Code */
+    int m_Ncuts; /**< number of times the cut is applied on a particle */
+    TTree* m_noKickTree; /**< TTree to which the information is written */
 
     /** Constructor with input file for use specific cuts file and allows validation */
-    NoKickRTSel(std::string fileName, bool outputHisto) :
+    NoKickRTSel(const std::string& fileName, bool outputHisto) :
       m_trackCuts(fileName)
     {
       m_outputFlag = false;
@@ -166,8 +145,7 @@ namespace Belle2 {
     */
     void produceHistoNoKick();
 
-
+    /// Making this class a ROOT class
     ClassDef(NoKickRTSel, 1);
   };
-
 } /** end namespace Belle2 */

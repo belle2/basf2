@@ -11,7 +11,7 @@
 
 using namespace Belle2;
 
-Fifo Fifo::mkfifo(const std::string& path) throw(IOException)
+Fifo Fifo::mkfifo(const std::string& path)
 {
   ::mkfifo(path.c_str(), 0666);
   Fifo fifo;
@@ -20,7 +20,6 @@ Fifo Fifo::mkfifo(const std::string& path) throw(IOException)
 }
 
 void Fifo::open(const std::string& path, const std::string& mode_s)
-throw(IOException)
 {
   int mode = O_RDONLY;
   if (mode_s.find("w") != std::string::npos) {
@@ -35,7 +34,7 @@ throw(IOException)
   }
 }
 
-void Fifo::unlink(const std::string& path) throw(IOException)
+void Fifo::unlink(const std::string& path)
 {
   if ((::unlink(path.c_str())) < 0) {
     perror("unlink");
@@ -43,12 +42,12 @@ void Fifo::unlink(const std::string& path) throw(IOException)
   close();
 }
 
-size_t Fifo::write(const void* buf, size_t count) throw(IOException)
+size_t Fifo::write(const void* buf, size_t count)
 {
   return ::write(m_fd, buf, count);
 }
 
-size_t Fifo::read(void* buf, size_t count) throw(IOException)
+size_t Fifo::read(void* buf, size_t count)
 {
   return ::read(m_fd, buf, count);
 }

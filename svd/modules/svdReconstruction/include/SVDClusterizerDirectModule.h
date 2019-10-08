@@ -17,6 +17,7 @@
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/reconstruction/NNWaveFitter.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <map>
 #include <vector>
 #include <memory>
@@ -44,10 +45,10 @@ namespace Belle2 {
       SVDClusterizerDirectModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /** do the clustering */
-      virtual void event();
+      virtual void event() override;
 
     protected:
 
@@ -73,6 +74,10 @@ namespace Belle2 {
                            relation, unsigned int index);
 
       // Data members
+
+      /** Storage for SVDEventInfo object */
+      StoreObjPtr<SVDEventInfo> m_storeSVDEvtInfo;
+
       //1. Collections
       /** Name of the collection to use for the MCParticles */
       std::string m_storeMCParticlesName;
@@ -92,6 +97,8 @@ namespace Belle2 {
       std::string m_relClusterTrueHitName;
       /** Name of the relation between SVDClusters and SVDShaperDigits */
       std::string m_relClusterShaperDigitName;
+      /** Name of the SVDEventInfo object */
+      std::string m_svdEventInfoName;
 
       //2. Strip and time fitter data
       /** Name of the time fitter (db label) */

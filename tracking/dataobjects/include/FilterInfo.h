@@ -27,7 +27,7 @@ namespace Belle2 {
     };
 
     /// no setters so use this one to put in the information!
-    FilterInfo(std::string aname, double aresult, bool accepted, bool used) :
+    FilterInfo(const std::string& aname, double aresult, bool accepted, bool used) :
       m_name(aname),
       m_result(aresult),
       m_wasAccepted(accepted),
@@ -57,6 +57,7 @@ namespace Belle2 {
     /// stores if filter was evaluated
     bool m_wasUsed;
 
+    /// Class definition to make this a ROOT class.
     ClassDef(FilterInfo, 1);
   };
 }

@@ -15,7 +15,7 @@ Cond::Cond(const Cond& cond)
   m_cond_t = cond.m_cond_t;
 }
 
-bool Cond::init() throw()
+bool Cond::init()
 {
   pthread_condattr_t mattr;
   pthread_condattr_init(&mattr);
@@ -28,19 +28,19 @@ bool Cond::init() throw()
   return true;
 }
 
-bool Cond::signal() throw()
+bool Cond::signal()
 {
   if (pthread_cond_signal(&m_cond_t) == 0) return true;
   else return false;
 }
 
-bool Cond::broadcast() throw()
+bool Cond::broadcast()
 {
   if (pthread_cond_broadcast(&m_cond_t) == 0) return true;
   else return false;
 }
 
-bool Cond::wait(Mutex& mutex) throw()
+bool Cond::wait(Mutex& mutex)
 {
   if (pthread_cond_wait(&m_cond_t, &mutex.m_mu) != 0) {
     return false;
@@ -48,7 +48,7 @@ bool Cond::wait(Mutex& mutex) throw()
   return true;
 }
 
-bool Cond::wait(Mutex& mutex, const unsigned int sec, const unsigned int msec) throw()
+bool Cond::wait(Mutex& mutex, const unsigned int sec, const unsigned int msec)
 {
   struct timeval now;
   struct timespec timeout;
@@ -63,7 +63,7 @@ bool Cond::wait(Mutex& mutex, const unsigned int sec, const unsigned int msec) t
   return true;
 }
 
-bool Cond::destroy() throw()
+bool Cond::destroy()
 {
   if (pthread_cond_destroy(&m_cond_t) == 0) return true;
   else return false;

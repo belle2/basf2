@@ -9,11 +9,9 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 #include <arich/dbobjects/ARICHBiasCablesMapping.h>
 #include <iostream>
-#include <iomanip>
 
 using namespace std;
 using namespace Belle2;
@@ -70,7 +68,7 @@ void ARICHBiasCablesMapping::addMapping(int moduleID, int sectorID, int cableID,
 
 }
 
-void ARICHBiasCablesMapping::print()
+void ARICHBiasCablesMapping::print() const
 {
 
   for (int moduleID = 1; moduleID < N_MODULES + 1; moduleID++) {

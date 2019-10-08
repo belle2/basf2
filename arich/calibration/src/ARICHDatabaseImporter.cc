@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Manca Mrvar, Thomas Kuhr                                 *
+ * Contributors: Manca Mrvar, Thomas Kuhr, Leonid Burmistrov              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,6 +11,8 @@
 #include <arich/calibration/ARICHDatabaseImporter.h>
 #include <arich/calibration/ARICHDatabaseTools.h>
 #include <arich/dbobjects/ARICHAerogelMap.h>
+#include <arich/dbobjects/ARICHAerogelInfo.h>
+#include <arich/dbobjects/ARICHAerogelRayleighScatteringFit.h>
 #include <arich/dbobjects/ARICHAsicInfo.h>
 #include <arich/dbobjects/ARICHHapdQA.h>
 #include <arich/dbobjects/ARICHFebTest.h>
@@ -38,9 +40,13 @@
 #include <arich/dbobjects/ARICHReconstructionPar.h>
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <arich/dbobjects/ARICHAeroTilesInfo.h>
+#include <arich/dbobjects/ARICHGlobalAlignment.h>
+#include <arich/dbobjects/ARICHMirrorAlignment.h>
+#include <arich/dbobjects/ARICHPositionElement.h>
 
 // channel histogram
 #include <arich/utility/ARICHChannelHist.h>
+#include <arich/utility/ARICHAerogelHist.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
@@ -49,8 +55,6 @@
 
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
-#include <framework/database/DBStore.h>
-#include <framework/database/LocalDatabase.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBImportObjPtr.h>
@@ -60,9 +64,9 @@
 #include <TH3.h>
 #include <TGraph.h>
 #include <TGraph2D.h>
-#include <TCanvas.h>
 #include <TFile.h>
 #include <TKey.h>
+#include <TString.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -72,11 +76,9 @@
 #include <TTree.h>
 #include <tuple>
 #include <iomanip>
-#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace Belle2;
-
 
 ARICHDatabaseImporter::ARICHDatabaseImporter(const vector<string>& inputFilesHapdQA, const vector<string>& inputFilesAsicRoot,
                                              const vector<string>& inputFilesAsicTxt, const vector<string>& inputFilesHapdQE, const vector<string>& inputFilesFebTest)
@@ -91,9 +93,29 @@ ARICHDatabaseImporter::ARICHDatabaseImporter(const vector<string>& inputFilesHap
   for (unsigned int i = 0; i < inputFilesAsicTxt.size(); i++) {  m_inputFilesAsicTxt.push_back(inputFilesAsicTxt[i]); }
   for (unsigned int i = 0; i < inputFilesHapdQE.size(); i++) {  m_inputFilesHapdQE.push_back(inputFilesHapdQE[i]); }
   for (unsigned int i = 0; i < inputFilesFebTest.size(); i++) {  m_inputFilesFebTest.push_back(inputFilesFebTest[i]); }
+  m_iov = IntervalOfValidity(0, 0, -1, -1);
+}
+
+ARICHDatabaseImporter::ARICHDatabaseImporter(int experiment, int run)
+{
+  StoreObjPtr<EventMetaData> meta;
+  meta->setRun(run); meta->setExperiment(experiment);
+  B2INFO("Experiment " << experiment << ", run " << run);
+  m_iov = IntervalOfValidity(0, 0, -1, -1);
+}
+
+void ARICHDatabaseImporter::SetIOV(int experimentLow, int runLow, int experimentHigh , int runHigh)
+{
+  m_iov = IntervalOfValidity(experimentLow, runLow, experimentHigh, runHigh);
 }
 
 
+void ARICHDatabaseImporter::setExperimentAndRun(int experiment, int run)
+{
+  StoreObjPtr<EventMetaData> meta;
+  meta->setRun(run); meta->setExperiment(experiment);
+  B2INFO("Experiment " << experiment << ", run " << run);
+}
 
 // classses for simulation/reconstruction software
 void ARICHDatabaseImporter::importModulesInfo()
@@ -169,31 +191,57 @@ void ARICHDatabaseImporter::importModulesInfo()
 
   }
 
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   DBImportObjPtr<ARICHModulesInfo> importObj;
   importObj.construct(modInfo);
-  importObj.import(iov);
+  importObj.import(m_iov);
 
 }
 
-void ARICHDatabaseImporter::setHAPDQE(unsigned modID, double qe, bool import)
+void ARICHDatabaseImporter::importGlobalAlignment()
 {
 
-  DBObjPtr<ARICHModulesInfo> modInfo;
-  if (modID < 1 || modID > 420) { B2ERROR("Module ID out of range!"); return;}
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  GearDir alignPars(content, "GlobalAlignment");
+  ARICHGlobalAlignment arichAlign;
+  ARICHPositionElement alignel(alignPars.getLength("x"), alignPars.getLength("y"), alignPars.getLength("z"),
+                               alignPars.getAngle("alpha"), alignPars.getAngle("beta"), alignPars.getAngle("gamma"));
+  arichAlign.setAlignmentElement(alignel);
 
-  for (int k = 0; k < 144; k++) {
-    modInfo->setChannelQE(modID, k, qe);
-  }
-
-  if (import) {
-    IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-    DBImportObjPtr<ARICHModulesInfo> importObj;
-    importObj.construct(*modInfo);
-    importObj.import(iov);
-  }
+  DBImportObjPtr<ARICHGlobalAlignment> importObj;
+  importObj.construct(arichAlign);
+  importObj.import(m_iov);
 }
 
+
+void ARICHDatabaseImporter::importMirrorAlignment()
+{
+
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  GearDir alignPars(content, "MirrorAlignment");
+
+  DBObjPtr<ARICHGeometryConfig> geoConfig;
+
+  ARICHMirrorAlignment mirrAlign;
+
+  for (auto plate : alignPars.getNodes("Plate")) {
+    int id = plate.getInt("@id");
+    double r = plate.getLength("r");
+    double phi = plate.getAngle("phi");
+    double z = plate.getLength("z");
+    double alpha = plate.getLength("alpha");
+    double beta = plate.getLength("beta");
+    double gamma = plate.getLength("gamma");
+    double origPhi = geoConfig->getMirrors().getPoint(id).Phi();
+    ARICHPositionElement alignEl(r * cos(origPhi + phi), r * sin(origPhi + phi), z, alpha, beta, gamma);
+    mirrAlign.setAlignmentElement(id, alignEl);
+    alignEl.print();
+  }
+
+  DBImportObjPtr<ARICHMirrorAlignment> importObj;
+  importObj.construct(mirrAlign);
+  importObj.import(m_iov);
+
+}
 
 void ARICHDatabaseImporter::importChannelMask()
 {
@@ -240,12 +288,47 @@ void ARICHDatabaseImporter::importChannelMask()
     }
   }
 
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   DBImportObjPtr<ARICHChannelMask> importObj;
   importObj.construct(chanMask);
-  importObj.import(iov);
+  importObj.import(m_iov);
 
 }
+
+
+void ARICHDatabaseImporter::importChannelMask(TH1* h)
+{
+  if (h == NULL) {
+    B2ERROR("--> NULL Histogram");
+    return;
+  }
+
+  ARICHChannelMask mask;
+  int inactive = 0;
+  int numChannels = h->GetNbinsX();
+  const int NumberOfChannelsPerHapd = 144;
+  const int NumberOfHapds = 420;
+
+  if (numChannels != NumberOfHapds * NumberOfChannelsPerHapd) {
+    B2ERROR("There should be " << NumberOfHapds * NumberOfChannelsPerHapd << " in the histogram!");
+    return;
+  }
+
+  for (int bin = 1; bin <= numChannels; ++bin) {
+    int moduleID = (bin - 1) / NumberOfChannelsPerHapd + 1;
+    int channelID = (bin - 1) % NumberOfChannelsPerHapd;
+    bool value   = (h->GetBinContent(bin) > 0);
+    if (!value) inactive++;
+    //B2INFO("--> moduleID " << moduleID << " channelID " << channelID << " ACTIVE:" << inactive);
+
+    mask.setActiveCh(moduleID, channelID, value);
+  }
+
+  DBImportObjPtr<ARICHChannelMask> importObj;
+  importObj.construct(mask);
+  importObj.import(m_iov);
+  B2INFO("--> Channel Mask imported. Number of disabled channels=" << inactive << " Number of all channels=" << numChannels);
+}
+
 
 
 void ARICHDatabaseImporter::importReconstructionParams()
@@ -253,10 +336,9 @@ void ARICHDatabaseImporter::importReconstructionParams()
   ARICHReconstructionPar recPar;
   recPar.initializeDefault();
 
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   DBImportObjPtr<ARICHReconstructionPar> importObj;
   importObj.construct(recPar);
-  importObj.import(iov);
+  importObj.import(m_iov);
 
 }
 
@@ -291,10 +373,9 @@ void ARICHDatabaseImporter::importSimulationParams()
 
   simPar.print();
 
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   DBImportObjPtr<ARICHSimulationPar> importObj;
   importObj.construct(simPar);
-  importObj.import(iov);
+  importObj.import(m_iov);
 
 }
 
@@ -314,10 +395,9 @@ void ARICHDatabaseImporter::importChannelMapping()
     B2INFO(" " << setw(2) << x << "  " << setw(2) << y << "   " << setw(3) << asic << '\n');
   }
 
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   DBImportObjPtr<ARICHChannelMapping> importObjMap;
   importObjMap.construct(chMap);
-  importObjMap.import(iov);
+  importObjMap.import(m_iov);
 
 }
 
@@ -371,14 +451,13 @@ void ARICHDatabaseImporter::importFEMappings()
 
   }
 
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   DBImportObjPtr<ARICHMergerMapping> importObjMerger;
   importObjMerger.construct(mergerMap);
-  importObjMerger.import(iov);
+  importObjMerger.import(m_iov);
 
   DBImportObjPtr<ARICHCopperMapping> importObjCopper;
   importObjCopper.construct(copperMap);
-  importObjCopper.import(iov);
+  importObjCopper.import(m_iov);
 
 }
 
@@ -388,10 +467,9 @@ void ARICHDatabaseImporter::importGeometryConfig()
   GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
   ARICHGeometryConfig arichGeometryConfig(content);
 
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   DBImportObjPtr<ARICHGeometryConfig> importObj;
   importObj.construct(arichGeometryConfig);
-  importObj.import(iov);
+  importObj.import(m_iov);
 
 }
 
@@ -401,25 +479,30 @@ void ARICHDatabaseImporter::importCosmicTestGeometry()
   GearDir cosmic(content, "CosmicTest");
   DBObjPtr<ARICHGeometryConfig> geoConfig;
 
+  DBImportObjPtr<ARICHGeometryConfig> geoImport;
+  geoImport.construct(*geoConfig);
+
+  ARICHGeometryConfig& geo = (ARICHGeometryConfig&)geoImport;
+
   GearDir masterDir(cosmic, "MasterVolume");
-  ARICHGeoMasterVolume master = geoConfig->getMasterVolume();
+  ARICHGeoMasterVolume master = geo.getMasterVolume();
   master.setPlacement(masterDir.getLength("Position/x"), masterDir.getLength("Position/y"), masterDir.getLength("Position/z"),
                       masterDir.getAngle("Rotation/x"), masterDir.getAngle("Rotation/y"), masterDir.getAngle("Rotation/z"));
   master.setVolume(master.getInnerRadius(), master.getOuterRadius(), 100., master.getMaterial());
-  geoConfig->setMasterVolume(master);
+  geo.setMasterVolume(master);
 
 
   GearDir aerogel(cosmic, "Aerogel");
   std::vector<double> par = {aerogel.getLength("xSize"), aerogel.getLength("ySize"), aerogel.getLength("xPosition"), aerogel.getLength("yPosition"), aerogel.getAngle("zRotation")};
-  ARICHGeoAerogelPlane plane = geoConfig->getAerogelPlane();
+  ARICHGeoAerogelPlane plane = geo.getAerogelPlane();
   plane.setSimple(par);
-  geoConfig->setAerogelPlane(plane);
+  geo.setAerogelPlane(plane);
 
   GearDir scints(cosmic, "Scintilators");
   double size[3] = {scints.getLength("xSize"), scints.getLength("ySize"), scints.getLength("zSize")};
   std::string scintMat = scints.getString("Material");
 
-  ARICHGeoSupport support = geoConfig->getSupportStructure();
+  ARICHGeoSupport support = geo.getSupportStructure();
   support.clearBoxes();
   for (const GearDir& scint : scints.getNodes("Scintilator")) {
     std::string name = scint.getString("@name");
@@ -428,11 +511,9 @@ void ARICHDatabaseImporter::importCosmicTestGeometry()
     support.addBox(name, scintMat, size, position, rotation);
   }
 
-  geoConfig->setSupportStructure(support);
+  geo.setSupportStructure(support);
 
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-  DBImportObjPtr<ARICHGeometryConfig> geoImport;
-  geoImport.construct(*geoConfig);
   geoImport.import(iov);
 
 }
@@ -452,6 +533,7 @@ void ARICHDatabaseImporter::importAeroTilesInfo()
     std::string aeroID = "";
     float refractiveIndex = 0.;
     float transmissionLength = 0.;
+    float thickness = 0.;
     for (int layer = 0; layer < 2; layer++) {
       for (const auto& element : elements) {
         if (element.getAerogelLayer(layer) == 1 && element.getAerogelRingID() == ring
@@ -461,20 +543,23 @@ void ARICHDatabaseImporter::importAeroTilesInfo()
         if (elementInfo.getAerogelSN() == aeroID) {
           refractiveIndex = elementInfo.getAerogelRefractiveIndex();
           transmissionLength = elementInfo.getAerogelTransmissionLength();
+          thickness = elementInfo.getAerogelThickness();
         }
       }
 
-      B2INFO("adding mapping... slot " << slot << ", layer " << layer << ", refIn " << refractiveIndex << ", transLen " <<
-             transmissionLength << '\n');
-      tilesInfo.addMapping(slot, layer, refractiveIndex, transmissionLength);
+      B2INFO("adding mapping... slot " << slot
+             << ", layer " << layer
+             << ", refIn " << refractiveIndex
+             << ", transLen " << transmissionLength
+             << ", thick " << thickness << '\n');
+      tilesInfo.addMapping(slot, layer, refractiveIndex, transmissionLength, thickness);
 
     }
   }
 
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   DBImportObjPtr<ARICHAeroTilesInfo> importObj;
   importObj.construct(tilesInfo);
-  importObj.import(iov);
+  importObj.import(m_iov);
 }
 
 int ARICHDatabaseImporter::getAeroTileRing(int slot)
@@ -506,6 +591,17 @@ void ARICHDatabaseImporter::printAeroTileInfo()
   tilesInfo->print();
 }
 
+void ARICHDatabaseImporter::printGlobalAlignment()
+{
+  DBObjPtr<ARICHGlobalAlignment> align;
+  align->print();
+}
+
+void ARICHDatabaseImporter::printMirrorAlignment()
+{
+  DBObjPtr<ARICHMirrorAlignment> align;
+  align->print();
+}
 
 // classes for DAQ
 
@@ -556,19 +652,17 @@ void ARICHDatabaseImporter::importBiasMappings()
     crateMap.addMapping(connectionID, sectorCable);
   }
 
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-
   DBImportObjPtr<ARICHBiasCablesMapping> importObjBias;
   importObjBias.construct(biasMap);
-  importObjBias.import(iov);
+  importObjBias.import(m_iov);
 
   DBImportObjPtr<ARICHBiasChannelsMapping> importObjBiasCH;
   importObjBiasCH.construct(channelsMap);
-  importObjBiasCH.import(iov);
+  importObjBiasCH.import(m_iov);
 
   DBImportObjPtr<ARICHBiasCrateCableMapping> importObjBiasCrate;
   importObjBiasCrate.construct(crateMap);
-  importObjBiasCrate.import(iov);
+  importObjBiasCrate.import(m_iov);
 }
 
 void ARICHDatabaseImporter::importHvMappings()
@@ -616,19 +710,17 @@ void ARICHDatabaseImporter::importHvMappings()
     crateMap.addMapping(connectionID, sectorCable);
   }
 
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-
   DBImportObjPtr<ARICHHvCablesMapping> importObjHv;
   importObjHv.construct(hvMap);
-  importObjHv.import(iov);
+  importObjHv.import(m_iov);
 
   DBImportObjPtr<ARICHHvChannelsMapping> importObjHvCH;
   importObjHvCH.construct(channelsMap);
-  importObjHvCH.import(iov);
+  importObjHvCH.import(m_iov);
 
   DBImportObjPtr<ARICHHvCrateCableMapping> importObjHvCrate;
   importObjHvCrate.construct(crateMap);
-  importObjHvCrate.import(iov);
+  importObjHvCrate.import(m_iov);
 }
 
 
@@ -654,11 +746,9 @@ void ARICHDatabaseImporter::importNominalBiasVoltages()
     biasVolt.addVoltages(hapdID, voltages);
   }
 
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-
   DBImportObjPtr<ARICHBiasVoltages> importObjBiasVolt;
   importObjBiasVolt.construct(biasVolt);
-  importObjBiasVolt.import(iov);
+  importObjBiasVolt.import(m_iov);
 }
 
 
@@ -678,6 +768,19 @@ void ARICHDatabaseImporter::printHvMappings()
   hvMap->print();
   DBObjPtr<ARICHHvCrateCableMapping> crateMap;
   crateMap->print();
+}
+
+void ARICHDatabaseImporter::dumpHvMappings()
+{
+  DBObjPtr<ARICHHvCablesMapping> hvMap;
+
+  ARICHChannelHist* hist = new ARICHChannelHist("hvMapping", "module - HV cable mapping", 1);
+  for (int hapdID = 1; hapdID < 421; hapdID++) {
+    int val = hvMap->getCableID(hapdID) * 100 + hvMap->getInnerID(hapdID);
+    hist->setBinContent(hapdID, val);
+  }
+  hist->SetOption("TEXT");
+  hist->SaveAs("HVMapping.root");
 }
 
 void ARICHDatabaseImporter::printNominalBiasVoltages()
@@ -793,11 +896,15 @@ void ARICHDatabaseImporter::printChannelMapping()
   chMap->print();
 }
 
-void ARICHDatabaseImporter::printFEMappings()
+void ARICHDatabaseImporter::printMergerMapping()
 {
   DBObjPtr<ARICHMergerMapping> mrgMap;
-  DBObjPtr<ARICHCopperMapping> copMap;
   mrgMap->print();
+}
+
+void ARICHDatabaseImporter::printCopperMapping()
+{
+  DBObjPtr<ARICHCopperMapping> copMap;
   copMap->print();
 }
 
@@ -807,10 +914,79 @@ void ARICHDatabaseImporter::printModulesInfo()
   modinfo->print();
 }
 
-void ARICHDatabaseImporter::printChannelMask()
+void ARICHDatabaseImporter::printReconstructionPar()
 {
+  DBObjPtr<ARICHReconstructionPar> recPar;
+  recPar->print();
+}
+
+
+void ARICHDatabaseImporter::printChannelMask(bool makeHist)
+{
+
   DBObjPtr<ARICHChannelMask> chMask;
   chMask->print();
+
+  if (makeHist) {
+    ARICHChannelHist* hist = new ARICHChannelHist("channelMask", "Map of active channels");
+    for (int hapdID = 1; hapdID < 421; hapdID++) {
+      for (int ichn = 0; ichn < 144; ichn++) {
+        if (chMask->isActive(hapdID, ichn)) hist->setBinContent(hapdID, ichn, 1.0);
+      }
+    }
+    hist->SaveAs("channelMask.root");
+  }
+}
+
+void ARICHDatabaseImporter::dumpMergerMapping(bool sn)
+{
+  DBObjPtr<ARICHMergerMapping> mgrMap;
+  ARICHChannelHist* hist = new ARICHChannelHist("mergerNum", "module - merger mapping", 1);
+  for (int hapdID = 1; hapdID < 421; hapdID++) {
+    int val = mgrMap->getMergerID(hapdID);
+    if (sn) val = mgrMap->getMergerSN(val);
+    hist->setBinContent(hapdID, val);
+  }
+  hist->SetOption("TEXT");
+  hist->SaveAs("MergerMapping.root");
+
+}
+
+void ARICHDatabaseImporter::printFEMappings()
+{
+
+  DBObjPtr<ARICHMergerMapping> mgrMap;
+  DBObjPtr<ARICHCopperMapping> cprMap;
+  DBObjPtr<ARICHGeometryConfig> geoConfig;
+
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
+
+  cout << "{ \"hapdmap\": [" << endl;
+  for (unsigned hapdID = 1; hapdID < 421; hapdID++) {
+    std::string hapdsn;
+    for (const GearDir& module : content.getNodes("Module")) {
+      hapdsn = module.getString("@hapdID");
+      unsigned sector = module.getInt("Sector");
+      unsigned ring = module.getInt("Ring");
+      unsigned azimuth = module.getInt("Azimuth");
+      unsigned moduleID = geoConfig->getDetectorPlane().getSlotIDFromSRF(sector, ring, azimuth);
+      if (moduleID == hapdID) break;
+    }
+
+    int val = mgrMap->getMergerID(hapdID);
+    cout << "{\n" << "\"ID\": \"" << hapdID << "\"," << endl;
+    cout << "\"sn\": \"" << hapdsn << "\"," << endl;
+    cout << "\"mrg\": \"" << val << "\"," << endl;
+    cout << "\"mrgSN\": \"" << mgrMap->getMergerSN(val) << "\"," << endl;
+    cout << "\"feb\": \"" << mgrMap->getFEBSlot(hapdID) - 1 << "\"," << endl;
+    cout << "\"cpr\": \"" << cprMap->getCopperID(val) << "\"," << endl;
+    cout << "\"hslb\": \"" << cprMap->getFinesse(val) << "\"" << endl;
+    if (hapdID < 420) cout << "}," << endl;
+    else  cout << "}" << endl;
+  }
+  cout << "]}" << endl;
+
+
 }
 
 void ARICHDatabaseImporter::dumpModuleNumbering()
@@ -858,11 +1034,123 @@ void ARICHDatabaseImporter::dumpQEMap(bool simple)
   }
 }
 
+void ARICHDatabaseImporter::dumpAerogelOpticalProperties(std::string outRootFileName)
+{
 
+  ARICHAerogelHist* h2_aerogel_up_n = new ARICHAerogelHist("h2_aerogel_up_n", "aerogel up n");
+  ARICHAerogelHist* h2_aerogel_up_transmL = new ARICHAerogelHist("h2_aerogel_up_transmL", "aerogel up transmL");
+  ARICHAerogelHist* h2_aerogel_up_thick = new ARICHAerogelHist("h2_aerogel_up_thick", "aerogel up thick");
+  ARICHAerogelHist* h2_aerogel_down_n = new ARICHAerogelHist("h2_aerogel_down_n", "aerogel down n");
+  ARICHAerogelHist* h2_aerogel_down_transmL = new ARICHAerogelHist("h2_aerogel_down_transmL", "aerogel down transmL");
+  ARICHAerogelHist* h2_aerogel_down_thick = new ARICHAerogelHist("h2_aerogel_down_thick", "aerogel down thick");
 
+  std::string condDBname = "ARICHdata";
+
+  if (condDBname == "ARICHdata") {
+
+    //
+    DBArray<ARICHAerogelMap> elementsM("ARICHAerogelMap");
+    elementsM.getEntries();
+    DBArray<ARICHAerogelInfo> elementsI("ARICHAerogelInfo");
+    elementsI.getEntries();
+
+    //
+    for (const auto& elementM : elementsM) {
+      if (elementM.getAerogelLayer(0) == 1) {
+        for (const auto& elementI : elementsI) {
+          if (elementI.getAerogelSN() == elementM.getAerogelSN()) {
+            //down
+            h2_aerogel_down_n->SetBinContent(h2_aerogel_down_n->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                             elementM.getAerogelColumnID()), elementI.getAerogelRefractiveIndex());
+            h2_aerogel_down_transmL->SetBinContent(h2_aerogel_down_transmL->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                                   elementM.getAerogelColumnID()), elementI.getAerogelTransmissionLength());
+            h2_aerogel_down_thick->SetBinContent(h2_aerogel_down_thick->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                                 elementM.getAerogelColumnID()), elementI.getAerogelThickness());
+          }// if (elementI.getAerogelSN() == elementM.getAerogelSN()){
+        }// for (const auto& elementI : elementsI) {
+      }
+      if (elementM.getAerogelLayer(1) == 1) {
+        for (const auto& elementI : elementsI) {
+          if (elementI.getAerogelSN() == elementM.getAerogelSN()) {
+            //up
+            h2_aerogel_up_n->SetBinContent(h2_aerogel_up_n->GetBinIDFromRingColumn(elementM.getAerogelRingID(), elementM.getAerogelColumnID()),
+                                           elementI.getAerogelRefractiveIndex());
+            h2_aerogel_up_transmL->SetBinContent(h2_aerogel_up_transmL->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                                 elementM.getAerogelColumnID()), elementI.getAerogelTransmissionLength());
+            h2_aerogel_up_thick->SetBinContent(h2_aerogel_up_thick->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                               elementM.getAerogelColumnID()), elementI.getAerogelThickness());
+          }// if (elementI.getAerogelSN() == elementM.getAerogelSN()){
+        }// for (const auto& elementI : elementsI) {
+      }
+    }//  for (const auto& elementM : elementsM) {
+
+  }//  if (condDBname = "ARICHdata") {
+  //else { //  if (condDBname = "ARICHdata") {
+  //To be added later when the information about aerogel optical properties
+  //would be available not only in ARICHdata
+  //}
+
+  TFile* rootFile = new TFile(outRootFileName.c_str(), "RECREATE", " Histograms", 1);
+  rootFile->cd();
+  if (rootFile->IsZombie()) {
+    B2ERROR("  ERROR ---> file : " << outRootFileName.c_str() << " is zombi");
+  }
+  h2_aerogel_up_n->Write();
+  h2_aerogel_up_transmL->Write();
+  h2_aerogel_up_thick->Write();
+  h2_aerogel_down_n->Write();
+  h2_aerogel_down_transmL->Write();
+  h2_aerogel_down_thick->Write();
+  rootFile->Close();
+}
+
+//class for ARICH aerogel Rayleigh scattering fit parameters
+void ARICHDatabaseImporter::importAeroRayleighScatteringFit(std::string commentSingleWord)
+{
+  GearDir content = GearDir("/aerogelFit");
+
+  //cout<<" ARICHDatabaseImporter::importAeroRayleighScatteringFit "<<endl;
+
+  // define data array
+  TClonesArray agelFitConstants("Belle2::ARICHAerogelRayleighScatteringFit");
+  int agel = 0;
+  string serial;
+  float version = (float) content.getDouble("version");
+
+  // loop over xml files and extract the data
+  for (const auto& aerogel : content.getNodes("aerogeltile")) {
+    //cout<<agel<<" serial : "<<<<endl;
+    serial = aerogel.getString("serial");
+    vector<float> vPar;
+    vPar.push_back((float)aerogel.getDouble("p0"));
+    vPar.push_back((float)aerogel.getDouble("p1"));
+    vPar.push_back((float)aerogel.getDouble("p2"));
+    vPar.push_back((float)aerogel.getDouble("p3"));
+    vPar.push_back((float)aerogel.getDouble("p4"));
+    vPar.push_back((float)aerogel.getDouble("p5"));
+    vPar.push_back((float)aerogel.getDouble("p6"));
+    ARICHAerogelRayleighScatteringFit* aeroRayScatFit = new ARICHAerogelRayleighScatteringFit(version, serial, commentSingleWord, vPar);
+    //if(agel == 0)
+    //  aeroRayScatFit->printContent(true);
+    //else
+    //  aeroRayScatFit->printContent();
+    agelFitConstants[agel] = aeroRayScatFit;
+    agel++;
+  }
+
+  // store under default name:
+  // Database::Instance().storeData(&agelConstants, iov);
+  // store under user defined name:
+  TString coreName = "ARICHAerogelRayleighScatteringFit";
+  TString coreNameSuffix = commentSingleWord;
+  if (coreNameSuffix != "")
+    coreName += coreNameSuffix;
+  Database::Instance().storeData(coreName.Data(), &agelFitConstants, m_iov);
+
+}
 
 // classes for quality assessment and test data
-void ARICHDatabaseImporter::importAerogelInfo()
+void ARICHDatabaseImporter::importAerogelInfo(TString coreNameSuffix)
 {
   GearDir content = GearDir("/ArichData/AllData/AerogelData/Content");
 
@@ -893,16 +1181,17 @@ void ARICHDatabaseImporter::importAerogelInfo()
   }
 
   // define interval of validity
-//  IntervalOfValidity iov(0, 0, 1, 99);
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
 
   // store under default name:
   // Database::Instance().storeData(&agelConstants, iov);
   // store under user defined name:
-  Database::Instance().storeData("ARICHAerogelInfo", &agelConstants, iov);
+  TString coreName = "ARICHAerogelInfo";
+  if (coreNameSuffix != "")
+    coreName += coreNameSuffix;
+  Database::Instance().storeData(coreName.Data(), &agelConstants, m_iov);
 }
 
-void ARICHDatabaseImporter::exportAerogelInfo()
+void ARICHDatabaseImporter::exportAerogelInfo(int verboseLevel)
 {
 
   // Definition:
@@ -946,7 +1235,20 @@ void ARICHDatabaseImporter::exportAerogelInfo()
     B2INFO("Version = " << element.getAerogelVersion() << ", serial = " << element.getAerogelSN() <<
            ", id = " << element.getAerogelID() << ", n = " << element.getAerogelRefractiveIndex() << ", transmLength = " <<
            element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness());
-  }
+    if (verboseLevel > 0) {
+      unsigned int ii = 0;
+      int lllambda = 200;
+      while (lllambda > 0) {
+        lllambda = element.getAerogelTransmittanceLambda(ii);
+        if (lllambda < 0)
+          break;
+        float llval = element.getAerogelTransmittance(ii);
+        B2INFO("   Lambda = " << lllambda << " Transmittance = " << llval);
+        ii++;
+      }// while(lllambda > 0){
+    }// if(verboseLevel>0){
+  }// for (const auto& element : elements) {
+
 }
 
 
@@ -979,11 +1281,8 @@ void ARICHDatabaseImporter::importAerogelMap()
     }
   }
 
-  // define interval of validity
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-
   // store under user defined name:
-  Database::Instance().storeData("ARICHAerogelMap", &agelMap, iov);
+  Database::Instance().storeData("ARICHAerogelMap", &agelMap, m_iov);
 }
 
 
@@ -1051,10 +1350,6 @@ void ARICHDatabaseImporter::importAerogelInfoEventDep()
     }
   }
 
-  // set interval of validity
-  IntervalOfValidity iov(0, 0, 0, 99);
-//  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-
   // convert pointers to ARICHAerogelInfo into pointers to TObject
   TObject* agelObj[3];
   agelObj[0] = static_cast<TObject*>(&agelConstantsA);
@@ -1067,7 +1362,7 @@ void ARICHDatabaseImporter::importAerogelInfoEventDep()
   intraRun.add(1000, agelObj[2]);  // valid from event number 1000
 
   // store under user defined name
-  Database::Instance().storeData("ARICHAerogelInfoEventDep", &intraRun, iov);
+  Database::Instance().storeData("ARICHAerogelInfoEventDep", &intraRun, m_iov);
 
 }
 
@@ -1199,8 +1494,7 @@ void ARICHDatabaseImporter::importHapdQA()
   }
 
   // define IOV and store data to the DB
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-  Database::Instance().storeData("ARICHHapdQA", &hapdQAConstants, iov);
+  Database::Instance().storeData("ARICHHapdQA", &hapdQAConstants, m_iov);
 }
 
 
@@ -1260,8 +1554,7 @@ void ARICHDatabaseImporter::importAsicInfo()
     asic++;
   }
 
-  IntervalOfValidity iov(0, 0, -1, -1);
-  Database::Instance().storeData("ARICHAsicInfo", &asicConstants, iov);
+  Database::Instance().storeData("ARICHAsicInfo", &asicConstants, m_iov);
 }
 
 void ARICHDatabaseImporter::importAsicInfoRoot()
@@ -1322,8 +1615,7 @@ void ARICHDatabaseImporter::importAsicInfoRoot()
   f1.Close();
 
 //   define IOV and store data to the DB
-  IntervalOfValidity iov(0, 0, -1, -1);
-  Database::Instance().addPayload("ARICHAsicInfoRoot", "asicInfoHistograms.root", iov);
+  Database::Instance().addPayload("ARICHAsicInfoRoot", "asicInfoHistograms.root", m_iov);
 }
 
 TTimeStamp ARICHDatabaseImporter::getAsicDate(const std::string& asicSerial, const std::string& type)
@@ -1532,8 +1824,7 @@ void ARICHDatabaseImporter::importFebTest()
   }
 
 //   define IOV and store data to the DB
-  IntervalOfValidity iov(0, 0, -1, -1);
-  Database::Instance().storeData("ARICHFebTest", &febConstants, iov);
+  Database::Instance().storeData("ARICHFebTest", &febConstants, m_iov);
 }
 
 
@@ -1619,8 +1910,7 @@ void ARICHDatabaseImporter::importFebTestRoot()
 
 
 //   define IOV and store data to the DB
-  IntervalOfValidity iov(0, 0, -1, -1);
-  Database::Instance().addPayload("ARICHFebTestRoot", "febTestHistograms.root", iov);
+  Database::Instance().addPayload("ARICHFebTestRoot", "febTestHistograms.root", m_iov);
 
 }
 
@@ -1998,8 +2288,7 @@ void ARICHDatabaseImporter::importHapdChipInfo()
   }
 
   // define IOV and store data to the DB
-  IntervalOfValidity iov(0, 0, -1, -1);
-  Database::Instance().storeData("ARICHHapdChipInfo", &chipConstants, iov);
+  Database::Instance().storeData("ARICHHapdChipInfo", &chipConstants, m_iov);
 }
 
 void ARICHDatabaseImporter::exportHapdChipInfo()
@@ -2094,8 +2383,7 @@ void ARICHDatabaseImporter::importHapdInfo()
   }
 
   // define IOV and store data to the DB
-  IntervalOfValidity iov(0, 0, -1, -1);
-  Database::Instance().storeData("ARICHHapdInfo", &hapdConstants, iov);
+  Database::Instance().storeData("ARICHHapdInfo", &hapdConstants, m_iov);
 }
 
 
@@ -2248,8 +2536,7 @@ void ARICHDatabaseImporter::importHapdQE()
   }
 
   // define IOV and store data to the DB
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-  Database::Instance().storeData("ARICHHapdQE", &hapdQEConstants, iov);
+  Database::Instance().storeData("ARICHHapdQE", &hapdQEConstants, m_iov);
 }
 
 
@@ -2415,11 +2702,8 @@ void ARICHDatabaseImporter::importFEBoardInfo()
     feb++;
   }
 
-  // define interval of validity
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-
   // store under user defined name:
-  Database::Instance().storeData("ARICHFEBoardInfo", &febConstants, iov);
+  Database::Instance().storeData("ARICHFEBoardInfo", &febConstants, m_iov);
 }
 
 void ARICHDatabaseImporter::exportFEBoardInfo()
@@ -2628,12 +2912,9 @@ void ARICHDatabaseImporter::importModuleTest(const std::string& mypath, const st
     f->Close();
   }
 
-  // define interval of validity
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-
   // store under user defined name:
-  if (HVtest == "no")  Database::Instance().storeData("ARICHModuleTest", &moduleConstants, iov);
-  if (HVtest == "yes")  Database::Instance().storeData("ARICHModuleTestHV", &moduleConstants, iov);
+  if (HVtest == "no")  Database::Instance().storeData("ARICHModuleTest", &moduleConstants, m_iov);
+  if (HVtest == "yes")  Database::Instance().storeData("ARICHModuleTestHV", &moduleConstants, m_iov);
 }
 
 void ARICHDatabaseImporter::exportModuleTest(const std::string& HVtest)
@@ -2720,11 +3001,8 @@ void ARICHDatabaseImporter::importSensorModuleInfo()
     module++;
   }
 
-  // define interval of validity
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-
   // store under default name:
-  Database::Instance().storeData("ARICHSensorModuleInfo", &moduleInfoConstants, iov);
+  Database::Instance().storeData("ARICHSensorModuleInfo", &moduleInfoConstants, m_iov);
 }
 
 
@@ -2765,11 +3043,8 @@ void ARICHDatabaseImporter::importSensorModuleMap()
     module++;
   }
 
-  // define interval of validity
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-
   // store under default name:
-  Database::Instance().storeData("ARICHSensorModuleMap", &moduleMapConstants, iov);
+  Database::Instance().storeData("ARICHSensorModuleMap", &moduleMapConstants, m_iov);
 }
 
 void ARICHDatabaseImporter::exportSensorModuleMap()
@@ -2861,11 +3136,8 @@ void ARICHDatabaseImporter::importMagnetTest()
     num++;
   }
 
-  // define interval of validity
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-
   // store under default name:
-  Database::Instance().storeData("ARICHMagnetTest", &magnetConstants, iov);
+  Database::Instance().storeData("ARICHMagnetTest", &magnetConstants, m_iov);
 }
 
 void ARICHDatabaseImporter::exportMagnetTest()

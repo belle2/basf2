@@ -25,10 +25,10 @@ namespace Belle2 {
     virtual ~CDCTrigger2DFitterModule() {}
 
     /** Initialize the module and register DataStore arrays. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Run the 2D fitter for an event. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
     /** Name of the StoreArray containing the input track segment hits. */

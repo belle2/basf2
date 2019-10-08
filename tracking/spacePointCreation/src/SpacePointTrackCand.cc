@@ -8,16 +8,11 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-// framework
-#include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Const.h>
-
 // SpacePointTrackCand.h
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 #include <TDatabasePDG.h>
 #include <TVectorD.h>
-#include <TMatrixD.h>
 
 // debugging
 #include <sstream> // used in print method
@@ -122,6 +117,7 @@ const std::vector<const SpacePoint*> SpacePointTrackCand::getSortedHits() const
   std::vector<const SpacePoint*> sortedSpacePoints;
   //sortedSpacePoints.reserve(m_trackSpacePoints.size());
   for (auto pair : sortVector) {
+    // cppcheck-suppress useStlAlgorithm
     sortedSpacePoints.push_back(pair.first);
   }
 
@@ -180,7 +176,7 @@ void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
   output << "estimates of Track Candidate: \n";
   output << "q = " << m_q << "\n";
   output << "pdgCode = " << m_pdg << "\n";
-  output << ", QI = " << m_qualityIndex << "\n";
+  output << ", QI = " << m_qualityIndicator << "\n";
 
   unsigned nSP = 0;
   for (const SpacePoint* spacePoint : getHits()) {

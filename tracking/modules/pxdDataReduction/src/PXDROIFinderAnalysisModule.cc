@@ -10,25 +10,18 @@
 
 #include <tracking/modules/pxdDataReduction/PXDROIFinderAnalysisModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/RelationIndex.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDTrueHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDSimHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
-#include <list>
-#include <iostream>
 #include <TVector3.h>
 
-//giulia
 #include <vxd/geometry/GeoCache.h>
 
 
@@ -45,123 +38,11 @@ REG_MODULE(PXDROIFinderAnalysis)
 //-----------------------------------------------------------------
 
 PXDROIFinderAnalysisModule::PXDROIFinderAnalysisModule() : Module()
-  , m_recoTrackListName()
-  , m_PXDInterceptListName()
-  , m_ROIListName()
-  , m_rootFilePtr(NULL)
-  , m_rootFileName("")
   , m_writeToRoot(false)
   , m_rootEvent(-1)
   //pxd sensors
   , m_nSensorsL1(0)
   , m_nSensorsL2(0)
-  //efficiency graphs
-  , m_gEff2(NULL)
-  , m_gEff(NULL)
-  , m_h1DigitsPerParticle(NULL)
-  , m_h1RecoTracksPerParticle(NULL)
-  //tracks with no digit in ROI
-  , m_h1TrackOneDigiIn(NULL)
-  , m_h1nnotINtrack2(NULL)
-  , m_h1nnotINtrack3(NULL)
-  , m_h1nnotINtrack4(NULL)
-  , m_h1nnotINtrack5(NULL)
-  //all tracks
-  , m_h1Track(NULL)
-  , m_h1Track_pt(NULL)
-  , m_h1Track_phi(NULL)
-  , m_h1Track_lambda(NULL)
-  , m_h1Track_cosTheta(NULL)
-  , m_h1Track_pVal(NULL)
-  , m_h1Track_nSVDhits(NULL)
-  , m_h1Track_nCDChits(NULL)
-  //tracks with at least one digit in ROI
-  , m_h1INtrack1(NULL)
-  , m_h1INtrack1_pt(NULL)
-  , m_h1INtrack1_phi(NULL)
-  , m_h1INtrack1_lambda(NULL)
-  , m_h1INtrack1_cosTheta(NULL)
-  , m_h1INtrack1_pVal(NULL)
-  , m_h1INtrack1_nSVDhits(NULL)
-  , m_h1INtrack1_nCDChits(NULL)
-  //tracks with no intercept
-  , m_h1notINtrack5(NULL)
-  , m_h1notINtrack5_pt(NULL)
-  , m_h1notINtrack5_phi(NULL)
-  , m_h1notINtrack5_lambda(NULL)
-  , m_h1notINtrack5_cosTheta(NULL)
-  , m_h1notINtrack5_pVal(NULL)
-  , m_h1notINtrack5_nSVDhits(NULL)
-  , m_h1notINtrack5_nCDChits(NULL)
-  //digits inside ROI
-  , m_h1PullU(NULL)
-  , m_h1PullV(NULL)
-  , m_h2sigmaUphi(NULL)
-  , m_h2sigmaVphi(NULL)
-  , m_h1ResidU(NULL)
-  , m_h1ResidV(NULL)
-  , m_h1SigmaU(NULL)
-  , m_h1SigmaV(NULL)
-  , m_h1GlobalTime(NULL)
-  , m_h2Mapglob(NULL)
-  , m_h2MaplocL1(NULL)
-  , m_h2MaplocL2(NULL)
-  //digits outside2 ROI
-  , m_h2sigmaUphi_out2(NULL)
-  , m_h2sigmaVphi_out2(NULL)
-  , m_h1ResidU_out2(NULL)
-  , m_h1ResidV_out2(NULL)
-  , m_h1SigmaU_out2(NULL)
-  , m_h1SigmaV_out2(NULL)
-  , m_h1GlobalTime_out2(NULL)
-  , m_h2Mapglob_out2(NULL)
-  , m_h2MaplocL1_out2(NULL)
-  , m_h2MaplocL2_out2(NULL)
-  //digits outside3 ROI
-  , m_h2sigmaUphi_out3(NULL)
-  , m_h2sigmaVphi_out3(NULL)
-  , m_h1ResidU_out3(NULL)
-  , m_h1ResidV_out3(NULL)
-  , m_h1SigmaU_out3(NULL)
-  , m_h1SigmaV_out3(NULL)
-  , m_h1GlobalTime_out3(NULL)
-  , m_h2Mapglob_out3(NULL)
-  , m_h2MaplocL1_out3(NULL)
-  , m_h2MaplocL2_out3(NULL)
-  //digits outside4 ROI
-  , m_h2sigmaUphi_out4(NULL)
-  , m_h2sigmaVphi_out4(NULL)
-  , m_h1SigmaU_out4(NULL)
-  , m_h1SigmaV_out4(NULL)
-  , m_h1GlobalTime_out4(NULL)
-  , m_h2Mapglob_out4(NULL)
-  , m_h2MaplocL1_out4(NULL)
-  , m_h2MaplocL2_out4(NULL)
-  //digits outside5 ROI
-  , m_h1GlobalTime_out5(NULL)
-  , m_h2Mapglob_out5(NULL)
-  , m_h2MaplocL1_out5(NULL)
-  , m_h2MaplocL2_out5(NULL)
-
-  //  ,m_h2_VXDhitsPR_xy(NULL)
-  //  ,m_h2_VXDhitsPR_rz(NULL)
-
-  //ROI stuff
-  , m_h2ROIbottomLeft(NULL)
-  , m_h2ROItopRight(NULL)
-  , m_h2ROIuMinMax(NULL)
-  , m_h2ROIvMinMax(NULL)
-  , m_h1totROIs(NULL)
-  , m_h1okROIs(NULL)
-  , m_h1okROIfrac(NULL)
-  , m_h1redFactor(NULL)
-  , m_h1redFactor_L1(NULL)
-  , m_h1redFactor_L2(NULL)
-
-  , m_h1totArea(NULL)
-  , m_h1okArea(NULL)
-
-  , m_h1effPerTrack(NULL)
 
   //variables
   , m_globalTime(0.)
@@ -240,10 +121,6 @@ PXDROIFinderAnalysisModule::PXDROIFinderAnalysisModule() : Module()
            "name of the list of ROIs", std::string(""));
 
   m_rootEvent = 0;
-}
-
-PXDROIFinderAnalysisModule::~PXDROIFinderAnalysisModule()
-{
 }
 
 
@@ -660,7 +537,7 @@ void PXDROIFinderAnalysisModule::event()
       m_coorVmc = aSensorInfo.getVCellPosition(m_Vidmc);   //pxdDigits_MCParticle[iPXDDigit]->getVCellPosition();
 
       TVector3 local(m_coorUmc, m_coorVmc, 0);
-      TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local);
+      TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local, true);
 
 
       if (m_pTmc > 1) npxdDigit[5]++;
@@ -944,11 +821,6 @@ void PXDROIFinderAnalysisModule::event()
   cout << "" << endl;
 
 
-}
-
-
-void PXDROIFinderAnalysisModule::endRun()
-{
 }
 
 
@@ -1280,9 +1152,6 @@ void PXDROIFinderAnalysisModule::terminate()
     m_h1redFactor->Write();
     m_h1redFactor_L1->Write();
     m_h1redFactor_L2->Write();
-
-    //    m_h2_VXDhitsPR_xy->Write();
-    //    m_h2_VXDhitsPR_rz->Write();
 
 
     m_h2ROIbottomLeft->Write();

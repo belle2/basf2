@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Poyuan Chen                                              *
+ * Contributor: Alexei Sibidanov e-mail:sibid@uvic.ca                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,7 +11,6 @@
 #include "G4Transform3D.hh"
 #include "G4PVPlacement.hh"
 #include "G4SDManager.hh"
-#include "G4NistManager.hh"
 #include "G4UserLimits.hh"
 #include <G4VisAttributes.hh>
 #include <G4Box.hh>
@@ -19,7 +18,6 @@
 #include <ecl/geometry/GeoECLCreator.h>
 #include <ecl/geometry/shapes.h>
 #include <ecl/simulation/SensitiveDetector.h>
-#include <simulation/background/BkgSensitiveDetector.h>
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
 #include <framework/gearbox/GearDir.h>

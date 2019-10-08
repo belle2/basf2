@@ -8,14 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 #include <arich/dbobjects/ARICHChannelMask.h>
 #include <iostream>
-#include<iomanip>
 
 using namespace std;
 using namespace Belle2;
@@ -59,7 +55,7 @@ bool ARICHChannelMask::isActive(unsigned moduleID, unsigned channelID) const
   return false;
 }
 
-void ARICHChannelMask::print()
+void ARICHChannelMask::print() const
 {
 
   cout << endl << "ARICH masked channels" << endl << endl;

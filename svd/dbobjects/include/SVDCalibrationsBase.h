@@ -10,40 +10,44 @@
  **************************************************************************/
 
 #pragma once
+#include <framework/logging/Logger.h>
+
 #include <TObject.h>
 #include <vector>
 #include <TString.h>
+
 namespace Belle2 {
 
   template < class T  >
   class SVDCalibrationsBase: public TObject {
 
-    // T::payloadContainerType can be a vector whose length is the
-    // number of strips per side or a list of defect on a given side
-    // This vector will have length 2.
-    // Index 0 for the V side, index 1 for the U side
-    // Please, please, pleaseeeee use SVDCalibrationBase<...>::UIndex
-    // and SVDCalibrationBase<...>::VIndex instead of  1 and 0 for better
-    // code readibility
+    /** T::payloadContainerType can be a vector whose length is the
+     * number of strips per side or a list of defect on a given side
+     * This vector will have length 2.
+     * Index 0 for the V side, index 1 for the U side
+     * Please, please, pleaseeeee use SVDCalibrationBase<...>::UIndex
+     * and SVDCalibrationBase<...>::VIndex instead of  1 and 0 for better
+     * code readibility
+     */
     typedef std::vector< typename T::payloadContainerType > SVDSensor;
 
-    // An SVDLAdder is a vector of SVDSensors
+    /**An SVDLadder is a vector of SVDSensors */
     typedef std::vector< SVDSensor > SVDLadder;
 
-    // An SVDLayer is a vector of SVDLAdders
+    /** An SVDLayer is a vector of SVDLadders */
     typedef std::vector< SVDLadder > SVDLayer;
 
-    // The SVD is a vector of SVDLayers
+    /** The SVD is a vector of SVDLayers */
     typedef std::vector< SVDLayer > SVD;
 
-
+    /** an SVD calibration*/
     SVD calibrations;
 
 
   public:
 
-    // This enumeration assure the same semantic of the
-    // isU methods defined by Peter Kv.
+    /** This enumeration assure the same semantic of the
+    isU methods defined by Peter Kv.*/
     enum E_side { Vindex = 0 , Uindex = 1 };
 
     /** The default constructor initialize all the vectors
@@ -91,8 +95,29 @@ namespace Belle2 {
                                     unsigned int side,
                                     unsigned int strip) const
     {
-      return T::get(calibrations.at(layer).at(ladder).at(sensor).at(side) , strip);
+      if (calibrations.size() <= layer) {
+        B2FATAL("Layers vector is smaller than " << layer);
+      }
+      const auto& ladders = calibrations[layer];
+      if (ladders.size() <= ladder) {
+        B2FATAL("Ladders vector is smaller than " << ladder);
+      }
+      const auto& sensors = ladders[ladder];
+      if (sensors.size() <= sensor) {
+        B2FATAL("Sensors vector is smaller than " << sensor);
+      }
+      const auto& sides = sensors[sensor];
+      if (sides.size() <= side) {
+        B2FATAL("Sides vector is smaller than " << side);
+      }
+
+      return T::get(sides[side] , strip);
     }
+
+    /**
+     * Get the unique ID  of the calibration
+     */
+    TString get_uniqueID() const {return m_uniqueID;}
 
     /**
      * Set the calibration associated to a given strip.
@@ -111,7 +136,23 @@ namespace Belle2 {
              unsigned int strip,
              typename T::calibrationType value)
     {
-      T::set(calibrations.at(layer).at(ladder).at(sensor).at(side) , strip , value);
+      if (calibrations.size() <= layer) {
+        B2FATAL("Layers vector is smaller than " << layer);
+      }
+      auto& ladders = calibrations[layer];
+      if (ladders.size() <= ladder) {
+        B2FATAL("Ladders vector is smaller than " << ladder);
+      }
+      auto& sensors = ladders[ladder];
+      if (sensors.size() <= sensor) {
+        B2FATAL("Sensors vector is smaller than " << sensor);
+      }
+      auto& sides = sensors[sensor];
+      if (sides.size() <= side) {
+        B2FATAL("Sides vector is smaller than " << side);
+      }
+
+      return T::set(sides[side] , strip, value);
     }
 
     /**
@@ -127,11 +168,12 @@ namespace Belle2 {
       // tertium non datur
     }
 
-    typedef T t_perSideContainer;
+    typedef T t_perSideContainer; /**< typedef of the container of each side*/
   private:
-    TString m_uniqueID; //The unique identifier is a private member of SVDCalibrationsBase, whose value is assigned in the constructor.
 
-    ClassDef(SVDCalibrationsBase, 2)
+    TString m_uniqueID; /**<The unique identifier is a private member of SVDCalibrationsBase, whose value is assigned in the constructor.*/
+
+    ClassDef(SVDCalibrationsBase, 2) /**< needed by root*/
   };
 
 }

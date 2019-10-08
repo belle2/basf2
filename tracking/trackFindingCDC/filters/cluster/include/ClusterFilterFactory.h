@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Constructor forwarding the default filter name
-      ClusterFilterFactory(const std::string& defaultFilterName = "mva_bkg");
+      explicit ClusterFilterFactory(const std::string& defaultFilterName = "mva_bkg");
 
       /// Default destructor
       ~ClusterFilterFactory();

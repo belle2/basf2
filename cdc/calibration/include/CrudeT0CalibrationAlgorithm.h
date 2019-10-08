@@ -12,7 +12,6 @@
 #include <calibration/CalibrationAlgorithm.h>
 #include <TH1F.h>
 #include "vector"
-#include "string"
 namespace Belle2 {
   namespace CDC {
     /**
@@ -65,13 +64,19 @@ namespace Belle2 {
       {
         m_cosmic = b;
       }
+
+      /**
+       * Save hitograms of the calibration results.
+       *
+       */
+      void saveHisto();
     protected:
       /// Run algo on data
-      virtual EResult calibrate();
+      EResult calibrate() override;
       ///create histo for each channel
-      virtual void createHisto();
+      virtual void createHisto(StoreObjPtr<EventMetaData>& evtPtr);
       /// write outut or store db
-      virtual void write();
+      virtual void write(StoreObjPtr<EventMetaData>& evtPtr);
     private:
 
       double m_t0b[300];    /**< T0 for each board*/

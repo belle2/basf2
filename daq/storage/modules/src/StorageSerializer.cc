@@ -37,6 +37,7 @@ StorageSerializerModule::StorageSerializerModule() : Module()
   addParam("compressionLevel", m_compressionLevel, "Compression Level", 0);
   addParam("OutputBufferName", m_obuf_name, "Output buffer name", string(""));
   addParam("OutputBufferSize", m_obuf_size, "Output buffer size", 10);
+  addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);
   B2DEBUG(100, "StorageSerializer: Constructor done.");
 }
 
@@ -110,11 +111,6 @@ void StorageSerializerModule::event()
     unsigned int expno;
     unsigned int runno;
   } hd;
-  hd.nword = 4;
-  hd.type = MSG_EVENT;
-  hd.expno = expno;
-  hd.runno = runno;
-  m_obuf.write((int*)&hd, hd.nword, false, 0, true);
   if (header->runno < runno || header->expno < expno) {
     m_count = 0;
     B2INFO("New run detected: expno = " << expno << " runno = "
@@ -122,8 +118,18 @@ void StorageSerializerModule::event()
     header->expno = expno;
     header->runno = runno;
     header->subno = subno;
+    hd.nword = 4;
+    hd.type = MSG_STREAMERINFO;
+    hd.expno = expno;
+    hd.runno = runno;
+    m_obuf.write((int*)&hd, hd.nword, false, 0, true);
     m_nbyte = writeStreamerInfos();
   }
+  hd.nword = 4;
+  hd.type = MSG_EVENT;
+  hd.expno = expno;
+  hd.runno = runno;
+  m_obuf.write((int*)&hd, hd.nword, false, 0, true);
   EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
   int nword = (msg->size() - 1) / 4 + 1;
   m_obuf.write((int*)msg->buffer(), nword, false, 0, true);

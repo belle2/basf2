@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cablesEnvelope desc="Parameters of ARICH cables envelop">
+  <material desc="Effective material describing cables">ARICH_cablesEffectiveMaterial</material>
+  <!-- Detector support plate + 4 mm -->
+  <outerRadius desc="Outer radius of cables envelop" unit="mm">1136</outerRadius>
+  <!-- Same as detector support plate -->
+  <innerRadius desc="Inner radius of cables envelop" unit="mm">435</innerRadius>
+  <thickness desc="Thickness of cables envelop" unit="mm">3</thickness>
+  <x0 desc="x0 of ARICH cables envelop center" unit="mm">0</x0>
+  <y0 desc="y0 of ARICH cables envelop center" unit="mm">0</y0>
+  <!--                  236.0 +                          20 +                      2 +                      3.0/2.0 + 1 = 260.5-->
+  <!-- SupportPlate.zPosition + supportPlate.backWallHeight + supportPlate.thickness + cablesEnvelope.thickness/2.0 + 1 -->
+  <!-- 1 - is 1 mm space between two volumes -->
+  <!-- We need to subtract half length of the ARICH envelope since we define position within ARICH envelope frame -->
+  <!-- 260.5 - 280/2 = 120.5 -->
+  <z0 desc="z0 of ARICH cables envelop center" unit="mm">120.5</z0>
+</cablesEnvelope>

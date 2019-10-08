@@ -14,9 +14,6 @@
 #include <framework/utilities/FileSystem.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 
 using namespace std;
 using namespace Belle2;
@@ -40,7 +37,7 @@ EvtGenInputModule::EvtGenInputModule() : Module(),
   //Parameter definition
   addParam("userDECFile", m_userDECFileName, "user DECfile name", string(""));
   addParam("DECFile", m_DECFileName, "global DECfile to be used",
-           FileSystem::findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC", true));
+           FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true));
   addParam("ParentParticle", m_parentParticle, "Parent Particle Name", string("Upsilon(4S)"));
   addParam("InclusiveType", m_inclusiveType, "inclusive decay type (0: generic, 1: inclusive, 2: inclusive (charge conjugate)", 0);
   addParam("InclusiveParticle", m_inclusiveParticle, "Inclusive Particle Name", string(""));
@@ -55,7 +52,7 @@ EvtGenInputModule::EvtGenInputModule() : Module(),
 
 void EvtGenInputModule::initialize()
 {
-  const std::string defaultDecFile = FileSystem::findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC", true);
+  const std::string defaultDecFile = FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true);
   if (m_DECFileName.empty()) {
     B2ERROR("No global decay file defined, please make sure the parameter 'DECFile' is set correctly");
     return;
@@ -120,7 +117,7 @@ void EvtGenInputModule::event()
   TLorentzVector pParentParticle;
 
   //Initialize the beam energy for each event separatly
-  if (m_parentId.getId() == 93) {
+  if (EvtPDL::getStdHep(m_parentId) == 10022) {
     //virtual photon (vpho), no mass window, we accept everything
     pParentParticle = createBeamParticle();
   } else {

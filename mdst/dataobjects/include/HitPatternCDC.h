@@ -9,11 +9,12 @@
 **************************************************************************/
 #pragma once
 
-#include <Rtypes.h>
+#include <RtypesCore.h>
 
 #include <bitset>
 #include <map>
 #include <utility>
+#include <string>
 
 namespace Belle2 {
 
@@ -148,6 +149,8 @@ namespace Belle2 {
     /** True, if at least one axial layer is true.*/
     bool hasStereoLayer() const;
 
+    /** String for printing in python.*/
+    std::string __repr__() const;
 
   private:
     std::bitset<64> m_pattern;                     /**<  Saves the actual pattern.*/

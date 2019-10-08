@@ -8,36 +8,26 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 
-#ifndef KFITBASE_H
-#define KFITBASE_H
-
-
-#include <iostream>
 #include <vector>
 
 #include <CLHEP/Matrix/Matrix.h>
 #include <CLHEP/Matrix/SymMatrix.h>
-#include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Vector/LorentzVector.h>
 #include <CLHEP/Geometry/Point3D.h>
 
-#include <framework/logging/Logger.h>
-
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/KFit/KFitConst.h>
 #include <analysis/KFit/KFitError.h>
 #include <analysis/KFit/KFitTrack.h>
-
 
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
 #endif
 
-
 namespace Belle2 {
-
   namespace analysis {
-
     /**
      * KFitBase is a base class for kinematical fitters.
      */
@@ -63,7 +53,15 @@ namespace Belle2 {
        * @param q charge of the track
        * @return error code (zero if success)
        */
-      enum KFitError::ECode               addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e, const double q);
+      enum KFitError::ECode               addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e,
+                                                   const double q);
+      /** Add a particle to the fitter.
+       * The function gets track parameters from the Particle dataobject and
+       * calls addTrack().
+       * @param[in] particle Particle.
+       * @return error code (zero if success)
+       */
+      enum KFitError::ECode addParticle(const Particle* particle);
       /** Set a correlation matrix.  Not intended for end user's use.
        * @param c (7x7) correlation matrix
        * @return error code (zero if success)
@@ -109,7 +107,7 @@ namespace Belle2 {
        * @param id track id
        * @return Lorentz vector of the track
        */
-      const CLHEP::HepLorentzVector              getTrackMomentum(const int id) const;
+      const CLHEP::HepLorentzVector       getTrackMomentum(const int id) const;
       /** Get a position of the track.
        * @param id track id
        * @return position of the track
@@ -119,7 +117,7 @@ namespace Belle2 {
        * @param id track id
        * @return error matrix of the track
        */
-      const CLHEP::HepSymMatrix                  getTrackError(const int id) const;
+      const CLHEP::HepSymMatrix           getTrackError(const int id) const;
       /** Get a specified track object.
        * @param id track id
        * @return specified track object
@@ -131,7 +129,8 @@ namespace Belle2 {
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return (7x7) correlation matrix
        */
-      virtual const CLHEP::HepMatrix             getCorrelation(const int id1, const int id2, const int flag = KFitConst::kAfterFit) const;
+      virtual const CLHEP::HepMatrix             getCorrelation(const int id1, const int id2,
+                                                                const int flag = KFitConst::kAfterFit) const;
 
 
     public:
@@ -154,7 +153,8 @@ namespace Belle2 {
        * @param e (6x6) error matrix
        * @return (7x7) error matrix
        */
-      const CLHEP::HepMatrix    makeError1(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2, const CLHEP::HepMatrix& e) const;
+      const CLHEP::HepMatrix    makeError1(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2,
+                                           const CLHEP::HepMatrix& e) const;
       /** Rebuild an error matrix from a Lorentz vector and an error matrix.
        * @param p Lorentz vector
        * @param e (3x6) error matrix
@@ -175,7 +175,8 @@ namespace Belle2 {
        * @param is_fix_mass true to recalculate energy term from other parameters, false to do nothing
        * @return (7x7) error matrix
        */
-      const CLHEP::HepMatrix    makeError3(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2, const CLHEP::HepMatrix& e, const bool is_fix_mass1, const bool is_fix_mass2) const;
+      const CLHEP::HepMatrix    makeError3(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2,
+                                           const CLHEP::HepMatrix& e, const bool is_fix_mass1, const bool is_fix_mass2) const;
       /** Rebuild an error matrix from a Lorentz vector and an error matrix.
        * @param p Lorentz vector
        * @param e (3x7) error matrix
@@ -310,5 +311,4 @@ namespace Belle2 {
 
 } // namespace Belle2
 
-#endif /* B2KFIT_BASE_H */
 

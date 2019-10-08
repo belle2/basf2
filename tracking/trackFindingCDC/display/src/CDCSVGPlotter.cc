@@ -16,7 +16,6 @@
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/MCAxialSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/MCSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTriple/MCSegmentTripleFilter.h>
-
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
@@ -26,7 +25,6 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
@@ -37,9 +35,6 @@
 
 #include <framework/datastore/StoreArray.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
-
-#include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 
@@ -106,9 +101,8 @@ const AttributeMap c_defaultSVGAttributes({
   {"transform", "translate(0, 1120) scale(1,-1)"}
 });
 
-CDCSVGPlotter::CDCSVGPlotter(bool animate, bool forwardFade)
-  : m_animate(animate)
-  , m_eventdataPlotter(std::make_unique<SVGPrimitivePlotter>(c_defaultSVGAttributes), animate, forwardFade)
+CDCSVGPlotter::CDCSVGPlotter(bool animate, bool forwardFade) :
+  m_eventdataPlotter(std::make_unique<SVGPrimitivePlotter>(c_defaultSVGAttributes), animate, forwardFade)
 {
   int top = -112;
   int left = -112;
@@ -183,6 +177,7 @@ void CDCSVGPlotter::drawSimHits(const std::string& storeArrayName,
   }
   std::vector<CDCSimHit> simHitsRelatedToHits;
   for (const CDCHit& hit : storeArray) {
+    // cppcheck-suppress useStlAlgorithm
     simHitsRelatedToHits.push_back(*hit.getRelated<CDCSimHit>("CDCSimHits"));
   }
   B2INFO("#CDCSimHits: " << storeArray.getEntries());
@@ -334,6 +329,7 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
   }
   std::vector<CDCSimHit*> simHits;
   for (const CDCHit& hit : hitStoreArray) {
+    // cppcheck-suppress useStlAlgorithm
     simHits.push_back(hit.getRelated<CDCSimHit>());
   }
 
@@ -401,6 +397,7 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
       return false;
     };
 
+    // cppcheck-suppress ignoredReturnValue
     std::adjacent_find(simHitsForMcParticle.begin(),
                        simHitsForMcParticle.end(),
                        drawConnectSimHits);

@@ -22,28 +22,28 @@ namespace Belle2 {
     static const RCCommand STATUS;
 
   public:
-    RCCommand() throw() {}
-    RCCommand(const Enum& e) throw() : NSMCommand(e) {}
-    RCCommand(const NSMCommand& e) throw() : NSMCommand(e) {}
-    RCCommand(const RCCommand& cmd) throw() : NSMCommand(cmd) {}
-    RCCommand(const std::string& label) throw() { *this = label; }
-    RCCommand(const char* label) throw() { *this = label; }
-    RCCommand(int id) throw() { *this = id; }
-    ~RCCommand() throw() {}
+    RCCommand() {}
+    RCCommand(const Enum& e) : NSMCommand(e) {}
+    RCCommand(const NSMCommand& e) : NSMCommand(e) {}
+    RCCommand(const RCCommand& cmd) : NSMCommand(cmd) {}
+    RCCommand(const std::string& label) { *this = label; }
+    RCCommand(const char* label) { *this = label; }
+    RCCommand(int id) { *this = id; }
+    ~RCCommand() {}
 
   protected:
     RCCommand(int id, const char* label)
-    throw() : NSMCommand(id, label) {}
+      : NSMCommand(id, label) {}
 
   public:
-    int isAvailable(const RCState& state) const throw();
-    RCState nextState() const throw();
-    RCState nextTState() const throw();
+    int isAvailable(const RCState& state) const;
+    RCState nextState() const;
+    RCState nextTState() const;
 
   public:
-    const RCCommand& operator=(const std::string& label) throw();
-    const RCCommand& operator=(const char* label) throw();
-    const RCCommand& operator=(int id) throw();
+    const RCCommand& operator=(const std::string& label);
+    const RCCommand& operator=(const char* label);
+    const RCCommand& operator=(int id);
 
   };
 

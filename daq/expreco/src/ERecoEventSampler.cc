@@ -59,9 +59,11 @@ ERecoEventSampler::~ERecoEventSampler()
 int ERecoEventSampler::Configure(NSMmsg*, NSMcontext*)
 {
 
+  /*
   // 1. Run EventSampler
   char* sampler = m_conf->getconf("eventsampler", "script");
   m_pid_sampler = m_proc->Execute(sampler, (char*)m_conffile.c_str());
+  */
 
   /* Public event server moved outside
   // 2. Run EventServer
@@ -77,6 +79,7 @@ int ERecoEventSampler::Configure(NSMmsg*, NSMcontext*)
 
 int ERecoEventSampler::UnConfigure(NSMmsg*, NSMcontext*)
 {
+  /*
   int status;
   printf("ERecoEventSampler: Unconfigure pids = %d %d\n", m_pid_sampler, m_pid_server);
   fflush(stdout);
@@ -85,6 +88,7 @@ int ERecoEventSampler::UnConfigure(NSMmsg*, NSMcontext*)
     waitpid(m_pid_sampler, &status, 0);
     m_pid_sampler = 0;
   }
+  */
   /*
   if (m_pid_server != 0) {
     kill(m_pid_server, SIGINT);
@@ -98,13 +102,37 @@ int ERecoEventSampler::UnConfigure(NSMmsg*, NSMcontext*)
 
 int ERecoEventSampler::Start(NSMmsg*, NSMcontext*)
 {
+  // 1. Run EventSampler
+  char* sampler = m_conf->getconf("eventsampler", "script");
+  m_pid_sampler = m_proc->Execute(sampler, (char*)m_conffile.c_str());
+
+  /* Public event server moved outside
+  // 2. Run EventServer
+  char* server = m_conf->getconf("eventsampler", "server", "script");
+  char* rbuf = m_conf->getconf("eventsampler", "ringbufout");
+  char* port = m_conf->getconf("eventsampler", "server", "port");
+  m_pid_server = m_proc->Execute(server, rbuf, port);
+  */
+
+  printf("ERecoEventSampler : Configure done\n");
+
+
   //  m_rbufin->clear();
   return 0;
 }
 
 int ERecoEventSampler::Stop(NSMmsg*, NSMcontext*)
 {
-  //  m_rbufin->clear();
+  int status;
+  printf("ERecoEventSampler: Unconfigure pids = %d %d\n", m_pid_sampler, m_pid_server);
+  fflush(stdout);
+  if (m_pid_sampler != 0) {
+    kill(m_pid_sampler, SIGINT);
+    waitpid(m_pid_sampler, &status, 0);
+    m_pid_sampler = 0;
+  }
+
+//  m_rbufin->clear();
   return 0;
 }
 

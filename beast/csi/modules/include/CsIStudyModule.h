@@ -30,7 +30,7 @@ namespace Belle2 {
    * Analyze simulations of CsI readings in BEAST. Requires HistoManager
    *
    * Calculates the dose seen by each crystal. Todo: implement showers and digitization to differentiate between two types of channels.
-   * Requires HistoManager to be added to path RIGHT AFTER the input module. See https://belle2.cc.kek.jp/~twiki/bin/view/Software/HistogramManagement
+   * Requires HistoManager to be added to path RIGHT AFTER the input module. See https://confluence.desy.de/display/BI/Software+HistogramManagement
    *
    */
   class CsIStudyModule : public HistoModule {
@@ -46,20 +46,20 @@ namespace Belle2 {
     virtual ~CsIStudyModule();
 
     /** Initialization: building histograms */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** To do at the beginning of each runs */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** To do at the end of each runs. Write histos to file.*/
-    virtual void endRun();
+    virtual void endRun() override;
 
 
     /** Read each event, calculate doses and fill histograms */
-    virtual void event();
+    virtual void event() override;
 
     /** Clean everything up */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
     //! function to define histograms
@@ -67,7 +67,7 @@ namespace Belle2 {
        Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
        to be placed in this function.
     */
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
 
     /** Reads  and unpacks the status bits of the digitizer

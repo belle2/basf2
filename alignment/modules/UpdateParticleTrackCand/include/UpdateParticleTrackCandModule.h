@@ -13,7 +13,6 @@
 
 #include <framework/core/Module.h>
 
-
 namespace Belle2 {
   /**
    * Updates the seed in TrackCand based on fitted state (at vertex)
@@ -31,10 +30,10 @@ namespace Belle2 {
     UpdateParticleTrackCandModule();
 
     /** init */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** update candidates */
-    virtual void event();
+    virtual void event() override;
 
 
   private:

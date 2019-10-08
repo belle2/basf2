@@ -17,7 +17,6 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <svd/reconstruction/SVDRecoHit.h>
 
 using namespace std;
 using namespace Belle2;
@@ -38,6 +37,7 @@ bool SVDStateBasicVarSet::extract(const BaseSVDStateFilter::Object* pair)
   if (state->mSoPSet()) {
     firstMeasurement = state->getMeasuredStateOnPlane();
   } else {
+    B2ASSERT("Previous state was not fitted?", previousStates.back()->mSoPSet());
     firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
 

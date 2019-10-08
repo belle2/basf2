@@ -13,10 +13,6 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCGeometryLoader.h>
 
-#include <framework/logging/Logger.h>
-
-#include <gtest/gtest.h>
-
 #include <cmath>
 
 using namespace Belle2;
@@ -26,7 +22,7 @@ using namespace TrackFindingCDC;
 void TrackFindingCDCTestWithTopology::SetUpTestCase()
 {
   /// Manually open the database and prepare the cdc geometry parameters.
-  CDCGeometryLoader::loadLocalDatabase();
+  CDCGeometryLoader::loadDatabase();
 
   // Prepare the wires for the cdc track finders.
   CDCWireTopology::getInstance();

@@ -8,13 +8,16 @@
 
 #pragma once
 
+#include <daq/slc/nsm/NSMCommunicator.h>
+#include <daq/slc/nsm/NSMNodeDaemon.h>
+
 #include <dqm/analysis/modules/DQMHistAnalysisOutput.h>
 
 namespace Belle2 {
 
-  /*! Class definition for the output module of Sequential ROOT I/O */
-  class NSMCallback;
-
+  /**
+   * The module to output values to NSM network.
+   */
   class DQMHistAnalysisOutputNSMModule : public DQMHistAnalysisOutputModule {
 
     // Public functions
@@ -25,19 +28,22 @@ namespace Belle2 {
     virtual ~DQMHistAnalysisOutputNSMModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     // Data members
   private:
+    /** The NSM node name. */
     std::string m_nodename;
+    /** The RC node name. */
     std::string m_rcnodename;
-    NSMCallback* m_callback;
+    /** The NSM callback object. */
+    NSMCallback* m_callback = nullptr;
 
   };
 } // end namespace Belle2

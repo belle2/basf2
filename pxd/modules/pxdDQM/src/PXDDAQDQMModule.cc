@@ -9,11 +9,10 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDDAQDQMModule.h>
-#include <vxd/geometry/GeoCache.h>
-//#include <vxd/geometry/SensorInfoBase.h>
 
-#include "TDirectory.h"
+#include <TDirectory.h>
 #include <TAxis.h>
+#include <boost/format.hpp>
 #include <string>
 
 using namespace std;
@@ -44,12 +43,18 @@ PXDDAQDQMModule::PXDDAQDQMModule() : HistoModule() , m_vxdGeometry(VXD::GeoCache
 void PXDDAQDQMModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
-  oldDir->cd(m_histogramDirectoryName.c_str());
+  if (m_histogramDirectoryName != "") {
+    oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
+    oldDir->cd(m_histogramDirectoryName.c_str());
+  }
 
   hDAQErrorEvent = new TH1F("PXDDAQError", "PXDDAQError/Event;;Count", ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
-  hDAQErrorDHC = new TH2F("PXDDAQDHCError", "PXDDAQError/DHC;DHC ID;", 6, 0, 6, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
+  hDAQErrorDHC = new TH2F("PXDDAQDHCError", "PXDDAQError/DHC;DHC ID;", 16, 0, 16, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
   hDAQErrorDHE = new TH2F("PXDDAQDHEError", "PXDDAQError/DHE;DHE ID;", 64, 0, 64, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
+  hDAQUseableModule = new TH1F("PXDDAQUseableModule", "PXDDAQUseableModule/DHE;DHE ID;", 64, 0, 64);
+  hDAQNotUseableModule = new TH1F("PXDDAQNotUseableModule", "PXDDAQNotUseableModule/DHE;DHE ID;", 64, 0, 64);
+  hDAQEndErrorDHC = new TH2F("PXDDAQDHCEndError", "PXDDAQEndError/DHC;DHC ID;", 16, 0, 16, 32, 0, 32);
+  hDAQEndErrorDHE = new TH2F("PXDDAQDHEEndError", "PXDDAQEndError/DHE;DHE ID;", 64, 0, 64, 32, 0, 32);
 
   // histograms might get unreadable, but, if necessary, you can zoom in anyways.
   // we could use full alphanumeric histograms, but then, the labels would change (in the worst case) depending on observed errors
@@ -77,15 +82,18 @@ void PXDDAQDQMModule::defineHisto()
 //     string s = str(format("DHE %d:%d:%d (DHH ID %02Xh)") % num1 % num2 % num3 % i);
 //     string s2 = str(format("_%d.%d.%d") % num1 % num2 % num3);
 
-    hDAQDHETriggerRowOffset[avxdid] = new TH1F("PXDDAQDHETriggerRowOffset_" + bufful, "TriggerRowOffset DHE " + buff, 768, 0, 768);
-    hDAQDHEReduction[avxdid] = new TH1F("PXDDAQDHEDataReduction_" + bufful, "Data Reduction DHE " + buff, 200, 0,
+    hDAQDHETriggerGate[avxdid] = new TH1F("PXDDAQDHETriggerGate_" + bufful,
+                                          "TriggerGate DHE " + buff + "; Trigger Gate; Counts", 192, 0, 192);
+    hDAQDHEReduction[avxdid] = new TH1F("PXDDAQDHEDataReduction_" + bufful, "Data Reduction DHE " + buff + "; Raw/Red; Counts", 200, 0,
                                         40);// If max changed, check overflow copy below
+    hDAQCM[avxdid] = new TH2F("PXDDAQCM_" + bufful, "Common Mode on DHE " + buff + "; Gate+Chip*192; Common Mode", 192 * 4, 0, 192 * 4,
+                              64, 0, 64);
+    hDAQCM2[avxdid] = new TH1F("PXDDAQCM2_" + bufful, "Common Mode on DHE " + buff + "; Common Mode", 64, 0, 64);
   }
-  for (int i = 0; i < 6; i++) {
-    //cppcheck-suppress zerodiv
+  for (int i = 0; i < 16; i++) {
     hDAQDHCReduction[i] = new TH1F(("PXDDAQDHCDataReduction_" + str(format("%d") % i)).c_str(),
-                                   ("Data Reduction DHC " + str(format(" %d") % i)).c_str(), 200, 0, 40);// If max changed, check overflow copy below
-    //cppcheck-suppress zerodiv
+                                   ("Data Reduction DHC " + str(format(" %d") % i) + "; Raw/Red; Counts").c_str(), 200, 0,
+                                   40); // If max changed, check overflow copy below
   }
 //   hDAQErrorEvent->LabelsDeflate("X");
 //   hDAQErrorEvent->LabelsOption("v");
@@ -106,6 +114,15 @@ void PXDDAQDQMModule::beginRun()
   hDAQErrorEvent->Reset();
   hDAQErrorDHC->Reset();
   hDAQErrorDHE->Reset();
+  hDAQUseableModule->Reset();
+  hDAQNotUseableModule->Reset();
+  hDAQEndErrorDHC->Reset();
+  hDAQEndErrorDHE->Reset();
+  for (auto& it : hDAQDHETriggerGate) if (it.second) it.second->Reset();
+  for (auto& it : hDAQDHCReduction) if (it.second) it.second->Reset();
+  for (auto& it : hDAQDHEReduction) if (it.second) it.second->Reset();
+  for (auto& it : hDAQCM) if (it.second) it.second->Reset();
+  for (auto& it : hDAQCM2) if (it.second) it.second->Reset();
 }
 
 void PXDDAQDQMModule::event()
@@ -126,8 +143,14 @@ void PXDDAQDQMModule::event()
         PXDErrorFlags mask = (1ull << i);
         if ((dhc_emask & mask) == mask) hDAQErrorDHC->Fill(dhc.getDHCID(), i);
       }
+      unsigned int cmask = dhc.getEndErrorInfo();
+      for (int i = 0; i < 32; i++) {
+        unsigned int mask = (1 << i);
+        if ((cmask & mask) == mask) hDAQEndErrorDHC->Fill(dhc.getDHCID(), i);
+      }
       if (hDAQDHCReduction[dhc.getDHCID()]) {
         float red = dhc.getRedCnt() ? float(dhc.getRawCnt()) / dhc.getRedCnt() : 0.;
+        B2DEBUG(98, "==DHC " << dhc.getDHCID() << "(Raw)" << dhc.getRawCnt() << " / (Red)" << dhc.getRedCnt() << " = " << red);
         if (red >= 40.) red = 39.999999999; // Bad, bad workaround. but we want to see the overflows
         hDAQDHCReduction[dhc.getDHCID()]->Fill(red);
       }
@@ -139,12 +162,29 @@ void PXDDAQDQMModule::event()
           PXDErrorFlags mask = (1ull << i);
           if ((dhe_emask & mask) == mask) hDAQErrorDHE->Fill(dhe.getDHEID(), i);
         }
+        if (dhe.isUsable()) {
+          hDAQUseableModule->Fill(dhe.getDHEID());
+        } else {
+          hDAQNotUseableModule->Fill(dhe.getDHEID());
+        }
 
-        if (hDAQDHETriggerRowOffset[dhe.getSensorID()]) hDAQDHETriggerRowOffset[dhe.getSensorID()]->Fill(dhe.getStartRow());
+        unsigned int emask = dhe.getEndErrorInfo();
+        for (int i = 0; i < 32; i++) {
+          unsigned int mask = (1 << i);
+          if ((emask & mask) == mask) hDAQEndErrorDHE->Fill(dhe.getDHEID(), i);
+        }
+
+        if (hDAQDHETriggerGate[dhe.getSensorID()]) hDAQDHETriggerGate[dhe.getSensorID()]->Fill(dhe.getTriggerGate());
         if (hDAQDHEReduction[dhe.getSensorID()]) {
           float red = dhe.getRedCnt() ? float(dhe.getRawCnt()) / dhe.getRedCnt() : 0.;
+          B2DEBUG(98, "==DHE " << dhe.getSensorID() << "(Raw)" << dhe.getRawCnt() << " / (Red)" << dhe.getRedCnt() << " = " << red);
           if (red >= 40.) red = 39.999999999; // Bad, bad workaround. but we want to see the overflows
           hDAQDHEReduction[dhe.getSensorID()]->Fill(red);
+        }
+        for (auto cm = dhe.cm_begin(); cm < dhe.cm_end(); ++cm) {
+          // uint8_t, uint16_t, uint8_t ; tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
+          if (hDAQCM[dhe.getSensorID()]) hDAQCM[dhe.getSensorID()]->Fill(std::get<0>(*cm) * 192 + std::get<1>(*cm) / 4, std::get<2>(*cm));
+          if (hDAQCM2[dhe.getSensorID()]) hDAQCM2[dhe.getSensorID()]->Fill(std::get<2>(*cm));
         }
       }
     }

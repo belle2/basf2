@@ -137,12 +137,15 @@ void RFNSM::AllocMem(char* format)
 void RFNSM::m_Configure(NSMmsg* msg, NSMcontext* ctx)
 {
   fflush(stdout);
+  int nsmstate = RFNSM_Status::Instance().get_state();
+  RFNSM_Status::Instance().set_state(RFSTATE_TRANSITION);
   int stat = g_nsmserver->Configure(msg, ctx);
   fflush(stdout);
   if (stat == 0) {
     RFNSM_Status::Instance().set_state(RFSTATE_CONFIGURED);
     b2nsm_ok(msg, "Configured", NULL);
   } else {
+    RFNSM_Status::Instance().set_state(nsmstate);
     b2nsm_error(msg, NULL);
   }
 }
@@ -150,63 +153,87 @@ void RFNSM::m_Configure(NSMmsg* msg, NSMcontext* ctx)
 void RFNSM::m_UnConfigure(NSMmsg* msg, NSMcontext* ctx)
 {
   fflush(stdout);
+  int nsmstate = RFNSM_Status::Instance().get_state();
+  RFNSM_Status::Instance().set_state(RFSTATE_TRANSITION);
   int stat = g_nsmserver->UnConfigure(msg, ctx);
   fflush(stdout);
   if (stat == 0) {
     RFNSM_Status::Instance().set_state(RFSTATE_UNCONFIGURED);
     b2nsm_ok(msg, "Unconfigured", NULL);
-  } else
+  } else {
+    RFNSM_Status::Instance().set_state(nsmstate);
     b2nsm_error(msg, NULL);
+  }
 }
 
 void RFNSM::m_Start(NSMmsg* msg, NSMcontext* ctx)
 {
+  int nsmstate = RFNSM_Status::Instance().get_state();
+  RFNSM_Status::Instance().set_state(RFSTATE_TRANSITION);
   int stat = g_nsmserver->Start(msg, ctx);
   if (stat == 0) {
     RFNSM_Status::Instance().set_state(RFSTATE_RUNNING);
     b2nsm_ok(msg, "Running", NULL);
-  } else
+  } else {
+    RFNSM_Status::Instance().set_state(nsmstate);
     b2nsm_error(msg, NULL);
+  }
 }
 
 void RFNSM::m_Stop(NSMmsg* msg, NSMcontext* ctx)
 {
+  int nsmstate = RFNSM_Status::Instance().get_state();
+  RFNSM_Status::Instance().set_state(RFSTATE_TRANSITION);
   int stat = g_nsmserver->Stop(msg, ctx);
   if (stat == 0) {
     RFNSM_Status::Instance().set_state(RFSTATE_CONFIGURED);
     b2nsm_ok(msg, "Stopped", NULL);
-  } else
+  } else {
+    RFNSM_Status::Instance().set_state(nsmstate);
     b2nsm_error(msg, NULL);
+  }
 }
 
 void RFNSM::m_Pause(NSMmsg* msg, NSMcontext* ctx)
 {
+  int nsmstate = RFNSM_Status::Instance().get_state();
+  RFNSM_Status::Instance().set_state(RFSTATE_TRANSITION);
   int stat = g_nsmserver->Pause(msg, ctx);
   if (stat == 0) {
     RFNSM_Status::Instance().set_state(RFSTATE_IDLE);
     b2nsm_ok(msg, "Idle", NULL);
-  } else
+  } else {
+    RFNSM_Status::Instance().set_state(nsmstate);
     b2nsm_error(msg, NULL);
+  }
 }
 
 void RFNSM::m_Resume(NSMmsg* msg, NSMcontext* ctx)
 {
+  int nsmstate = RFNSM_Status::Instance().get_state();
+  RFNSM_Status::Instance().set_state(RFSTATE_TRANSITION);
   int stat = g_nsmserver->Resume(msg, ctx);
   if (stat == 0) {
     RFNSM_Status::Instance().set_state(RFSTATE_RUNNING);
     b2nsm_ok(msg, "Running", NULL);
-  } else
+  } else {
+    RFNSM_Status::Instance().set_state(nsmstate);
     b2nsm_error(msg, NULL);
+  }
 }
 
 void RFNSM::m_Restart(NSMmsg* msg, NSMcontext* ctx)
 {
+  int nsmstate = RFNSM_Status::Instance().get_state();
+  RFNSM_Status::Instance().set_state(RFSTATE_TRANSITION);
   int stat = g_nsmserver->Restart(msg, ctx);
   if (stat == 0) {
     RFNSM_Status::Instance().set_state(RFSTATE_CONFIGURED);
     b2nsm_ok(msg, "Configured", NULL);
-  } else
+  } else {
+    RFNSM_Status::Instance().set_state(nsmstate);
     b2nsm_error(msg, NULL);
+  }
 }
 
 void RFNSM::m_Status(NSMmsg* msg, NSMcontext* ctx)

@@ -10,6 +10,7 @@
 
 #include <mva/interface/Interface.h>
 #include <mva/methods/FastBDT.h>
+#include <mva/methods/RegressionFastBDT.h>
 #include <mva/methods/TMVA.h>
 #include <mva/methods/Python.h>
 #include <mva/methods/FANN.h>
@@ -21,7 +22,7 @@
 namespace Belle2 {
   namespace MVA {
 
-    AbstractInterface::AbstractInterface(std::string name) : m_name(name)
+    AbstractInterface::AbstractInterface(const std::string& name) : m_name(name)
     {
       if (s_supported_interfaces.find(m_name) != s_supported_interfaces.end()) {
         B2WARNING("An interface with the name " << m_name << " already exists!");
@@ -42,6 +43,7 @@ namespace Belle2 {
     void AbstractInterface::initSupportedInterfaces()
     {
       static Interface<FastBDTOptions, FastBDTTeacher, FastBDTExpert> interface_FastBDT;
+      static Interface<RegressionFastBDTOptions, RegressionFastBDTTeacher, RegressionFastBDTExpert> interface_RegressionFastBDT;
       static Interface<FANNOptions, FANNTeacher, FANNExpert> interface_FANN;
       static Interface<TMVAOptionsClassification, TMVATeacherClassification, TMVAExpertClassification>
       interface_TMVAClassification;

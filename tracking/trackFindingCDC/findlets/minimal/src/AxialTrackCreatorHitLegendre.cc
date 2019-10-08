@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Bastian Kronenbitter, Thomas Hauth, Viktor Trusov,       *
- *               Nils Braun                                               *
+ *               Nils Braun, Dmitrii Neverov                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -22,41 +22,50 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-namespace {
-  using EPass = AxialTrackCreatorHitLegendre::EPass;
-  std::unique_ptr<AxialHitQuadTreeProcessor> constructQTProcessor(EPass pass)
-  {
-    using XYSpans = AxialHitQuadTreeProcessor::XYSpans;
-    using PrecisionFunction = PrecisionUtil::PrecisionFunction;
-    const int maxTheta = std::pow(2, PrecisionUtil::getLookupGridLevel());
+using EPass = AxialTrackCreatorHitLegendre::EPass;
+std::unique_ptr<AxialHitQuadTreeProcessor> AxialTrackCreatorHitLegendre::constructQTProcessor(EPass pass)
+{
+  using XYSpans = AxialHitQuadTreeProcessor::XYSpans;
+  using PrecisionFunction = PrecisionUtil::PrecisionFunction;
+  const int maxTheta = std::pow(2, PrecisionUtil::getLookupGridLevel());
 
-    if (pass == EPass::NonCurlers) {
-      int maxLevel = 12;
-      int seedLevel = 4;
-      XYSpans xySpans({{0, maxTheta}, { -0.02, 0.14}});
-      PrecisionFunction precisionFunction = &PrecisionUtil::getOriginCurvPrecision;
+  if (pass == EPass::NonCurlers) {
+    int maxLevel = 12;
+    int seedLevel = 4;
+    XYSpans xySpans({{0, maxTheta}, { -0.02, 0.14}});
+    PrecisionFunction precisionFunction = &PrecisionUtil::getOriginCurvPrecision;
 
-      return std::make_unique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
+    return std::make_unique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
 
-    } else if (pass == EPass::NonCurlersWithIncreasingThreshold) {
-      int maxLevel = 10;
-      int seedLevel = 4;
-      XYSpans xySpans({{0, maxTheta}, { -0.02, 0.14}});
-      PrecisionFunction precisionFunction = &PrecisionUtil::getNonOriginCurvPrecision;
+  } else if (pass == EPass::NonCurlersWithIncreasingThreshold) {
+    int maxLevel = 10;
+    int seedLevel = 4;
+    XYSpans xySpans({{0, maxTheta}, { -0.02, 0.14}});
+    PrecisionFunction precisionFunction = &PrecisionUtil::getNonOriginCurvPrecision;
 
-      return std::make_unique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
+    return std::make_unique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
 
-    } else if (pass == EPass::FullRange) {
-      int maxLevel = 10;
-      int seedLevel = 1;
-      XYSpans xySpans({{0, maxTheta}, {0.00, 0.30}});
-      PrecisionFunction precisionFunction = &PrecisionUtil::getNonOriginCurvPrecision;
+  } else if (pass == EPass::FullRange) {
+    int maxLevel = 10;
+    int seedLevel = 1;
+    XYSpans xySpans({{0, maxTheta}, {0.00, 0.30}});
+    PrecisionFunction precisionFunction = &PrecisionUtil::getNonOriginCurvPrecision;
 
-      return std::make_unique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
-    }
-    B2FATAL("Invalid pass");
+    return std::make_unique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
+
+  } else if (pass == EPass::Straight) {
+    int maxLevel = 10;
+    int seedLevel = 4;
+    XYSpans xySpans({{0, maxTheta}, { -0.02, 0.02}});
+//       PrecisionFunction precisionFunction = &PrecisionUtil::getBasicCurvPrecision; //That is 0.3 / pow(2, 16)
+    PrecisionFunction precisionFunction = [this](double curv __attribute__((unused))) {return m_param_precision ;};
+
+    return std::make_unique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
+
   }
+  B2FATAL("Invalid pass");
 }
+
 
 AxialTrackCreatorHitLegendre::AxialTrackCreatorHitLegendre() = default;
 
@@ -70,9 +79,19 @@ std::string AxialTrackCreatorHitLegendre::getDescription()
   return "Generates axial tracks from hits using several increasingly relaxed legendre space search over phi0 and curvature.";
 }
 
-void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
-                                                    const std::string& prefix __attribute__((unused)))
+void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParamList,
+                                                    const std::string& prefix)
 {
+  moduleParamList->addParameter(prefixed(prefix, "minNHits"),
+                                m_param_minNHits,
+                                "Parameter to define minimal threshold of number of hits.",
+                                m_param_minNHits);
+  if (m_pass == EPass::Straight) {
+    moduleParamList->addParameter(prefixed(prefix, "precision"),
+                                  m_param_precision,
+                                  "Parameter to define precision of quadtree search.",
+                                  m_param_precision);
+  }
 }
 
 void AxialTrackCreatorHitLegendre::initialize()
@@ -95,14 +114,20 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
   // Create quadtree processor
   std::unique_ptr<AxialHitQuadTreeProcessor> qtProcessor = constructQTProcessor(m_pass);
   qtProcessor->seed(unusedAxialWireHits);
+//   qtProcessor->drawHits(unusedAxialWireHits, 9);
 
   // Create object which contains interface between quadtree processor and track processor (module)
-  OffOriginExtension offOriginExtension(unusedAxialWireHits);
+  std::unique_ptr<BaseCandidateReceiver> receiver;
+  if (not(m_pass == EPass::Straight)) {
+    receiver = std::make_unique<OffOriginExtension>(unusedAxialWireHits);
+  } else {
+    receiver = std::make_unique<BaseCandidateReceiver>(unusedAxialWireHits);
+  }
 
   // Start candidate finding
-  this->executeRelaxation(std::ref(offOriginExtension), *qtProcessor);
+  this->executeRelaxation(std::ref(*receiver), *qtProcessor);
 
-  const std::vector<CDCTrack>& newTracks = offOriginExtension.getTracks();
+  const std::vector<CDCTrack>& newTracks = receiver->getTracks();
   tracks.insert(tracks.end(), newTracks.begin(), newTracks.end());
 }
 

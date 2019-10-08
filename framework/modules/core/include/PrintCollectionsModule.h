@@ -30,10 +30,10 @@ namespace Belle2 {
     virtual ~PrintCollectionsModule();
 
     /** initialization. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Prints information for each collection in the DataStore. */
-    virtual void event();
+    virtual void event() override;
 
 
   protected:
@@ -46,8 +46,11 @@ namespace Belle2 {
 
   private:
 
-    /** Parameter to set the event number for which the collections should be printed. 0 means that
-     * the collections will be printed for all events. */
-    unsigned int m_printForEvent = 1;
+    /** Parameter to set the event number for which the collections should be printed.
+     * -1 means that only the first event will be printer, 0 means that the collections will be printed for all events. */
+    int m_printForEvent = -1;
+
+    /** boolean to check if the current event is the first encountered */
+    bool m_firstEvent = true;
   };
 }

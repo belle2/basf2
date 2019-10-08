@@ -57,6 +57,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             mcTrackCandidatesColumnName='MCRecoTracks',
             cdcHitsColumnName='CDCHits',
             write_tables=False):
+        """Constructor"""
 
         TrackingValidationModule.__init__(
             self,
@@ -75,40 +76,58 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             trackCandidatesColumnName,
             mcTrackCandidatesColumnName)
 
+        #: cached name of the CDCHits StoreArray
         self.cdcHitsColumnname = cdcHitsColumnName
+        #: cached value of the flag to write the validation figures of merit
         self.write_tables = write_tables
 
     def initialize(self):
+        """Receive signal at the start of event processing"""
         TrackingValidationModule.initialize(self)
-        # Use deques in favour of lists to prevent repeated memory allocation of cost O(n)
 
+        # Use deques in favour of lists to prevent repeated memory allocation of cost O(n)
+        #: number of all hits
         self.number_of_total_hits = collections.deque()
+        #: number of hits on MC track
         self.number_of_mc_hits = collections.deque()
+        #: number of hits on pattern reconstructed tracks
         self.number_of_pr_hits = collections.deque()
+        #: list of flags for [not-]found hits
         self.is_hit_found = collections.deque()
+        #: list of flags for [not-]matched hits
         self.is_hit_matched = collections.deque()
 
         # MC information
+        #: list of flags where MCRecoTrack is [not] missing MCTrackCand
         self.mc_missing = collections.deque()
+        #: list of fraction of number of hits in MC track but not in PR track
         self.ratio_hits_in_mc_tracks_and_not_in_pr_tracks = collections.deque()
+        #: list of fraction of number of hits in MC track and in PR track
         self.ratio_hits_in_mc_tracks_and_in_pr_tracks = collections.deque()
+        #: list of fraction of number of hits in missing MC track and in PR track
         self.ratio_hits_in_missing_mc_tracks_and_in_pr_tracks = collections.deque()
+        #: list of fraction of number of hits in MC track and in fake PR track
         self.ratio_hits_in_mc_tracks_and_in_fake_pr_tracks = \
             collections.deque()
+        #: list of fraction of number of hits in MC track and in good PR track
         self.ratio_hits_in_mc_tracks_and_in_good_pr_tracks = \
             collections.deque()
+        #: list of flags indicating that the MC track is [not] a primary MCParticle
         self.mc_is_primary = collections.deque()
+        #: list of the number of MCTrackCandHits on the MC track
         self.mc_number_of_hits = collections.deque()
 
         # PT information
-        # This is the number of mcTrackCands sharing a hit with the track cand.
+        #: This is the number of mcTrackCands sharing a hit with the track cand.
         self.number_of_connected_tracks = collections.deque()
-        # This number gives information about the "badness" of the fake.
+        #: This number gives information about the "badness" of the fake.
         self.number_of_wrong_hits = collections.deque()
         # It is calculated by going through all hits of the fake track and the connected mc track cands and counting the number.
         # These numbers are than summed up and substracted by the biggest number
         # of hits this candidates shares with the mc track cands.
+        #: list of the number of pattern-reconstructed hits
         self.pr_number_of_hits = collections.deque()
+        #: list of the number of pattern-reconstructed hits matched to MC track
         self.pr_number_of_matched_hits = collections.deque()
 
     def event(self):
@@ -118,6 +137,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         self.examine_hits_in_event()
 
     def examine_hits_in_event(self):
+        """Classify all of the hits in the event according to the parent track(s)"""
 
         trackCands = Belle2.PyStoreArray(self.trackCandidatesColumnName)
         mcTrackCands = Belle2.PyStoreArray(self.mcTrackCandidatesColumnName)
@@ -138,7 +158,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 cdcHitIDs = set(cdcHitIDs)
             totalHitListMC.extend(cdcHitIDs)
 
-        # Make the ids unqiue
+        # Make the ids unique
         totalHitListMC = set(totalHitListMC)
 
         # # CDC Hits in PR tracks
@@ -169,7 +189,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                     self.trackMatchLookUp.isBackgroundPRRecoTrack(trackCand)):
                 totalHitListPRFake.extend(cdcHitIDs)
 
-        # Make the ids unqiue
+        # Make the ids unique
         totalHitListPR = set(totalHitListPR)
         totalHitListPRGood = set(totalHitListPRGood)
         totalHitListPRClone = set(totalHitListPRClone)
@@ -282,6 +302,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         self.is_hit_matched.append(is_hit_matched)
 
     def terminate(self):
+        """Receive signal at the end of event processing"""
         TrackingValidationModule.terminate(self)
 
         output_tfile = ROOT.TFile(self.output_file_name, 'update')

@@ -8,12 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 
-#ifndef MAKEMOTHERKFIT_H
-#define MAKEMOTHERKFIT_H
-
-
-#include <iostream>
 #include <vector>
 
 #include <CLHEP/Matrix/Matrix.h>
@@ -21,8 +17,6 @@
 #include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Vector/LorentzVector.h>
 #include <CLHEP/Geometry/Point3D.h>
-
-#include <framework/logging/Logger.h>
 
 #include <analysis/KFit/KFitConst.h>
 #include <analysis/KFit/KFitError.h>
@@ -61,7 +55,8 @@ namespace Belle2 {
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return error code (zero if success)
        */
-      enum KFitError::ECode       addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e, const double q, const int flag = KFitConst::kAfterFit);
+      enum KFitError::ECode       addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e,
+                                           const double q, const int flag = KFitConst::kAfterFit);
       /** Change a magnetic field from the default value KFitConst::kDefaultMagneticField.
        * @param mf magnetic field to set
        * @return error code (zero if success)
@@ -132,7 +127,6 @@ namespace Belle2 {
        */
       enum KFitError::ECode doMake(void);
 
-
     private:
       /** Make a matrix to calculate error matrix of the mother particle.
        * @param e error matrix container
@@ -188,6 +182,3 @@ namespace Belle2 {
   } // namespace analysis
 
 } // namespace Belle2
-
-#endif /* MAKEMOTHERKFIT_H */
-

@@ -14,8 +14,6 @@
 #include <TMessage.h>
 #include <RZip.h>
 
-#include <stdlib.h>
-
 using namespace std;
 using namespace Belle2;
 
@@ -38,9 +36,7 @@ MsgHandler::MsgHandler(int complevel):
   m_msg->SetWriteMode();
 }
 
-MsgHandler::~MsgHandler()
-{
-}
+MsgHandler::~MsgHandler()  = default;
 
 void MsgHandler::clear()
 {
@@ -72,7 +68,7 @@ void MsgHandler::add(const TObject* obj, const string& name)
 EvtMessage* MsgHandler::encode_msg(ERecordType rectype)
 {
   if (rectype == MSG_TERMINATE) {
-    EvtMessage* eod = new EvtMessage(NULL, 0, rectype);
+    auto* eod = new EvtMessage(nullptr, 0, rectype);
     return eod;
   }
 
@@ -87,7 +83,8 @@ EvtMessage* MsgHandler::encode_msg(ERecordType rectype)
     const int algorithm = m_complevel / 100;
     const int level = m_complevel % 100;
     int irep{0}, nin{(int)m_buf.size()}, nout{nin};
-    R__zipMultipleAlgorithm(level, &nin, m_buf.data(), &nout, m_compBuf.data(), &irep, algorithm);
+    R__zipMultipleAlgorithm(level, &nin, m_buf.data(), &nout, m_compBuf.data(), &irep,
+                            (ROOT::RCompressionSetting::EAlgorithm::EValues) algorithm);
     // it returns the number of bytes of the output in irep. If that is zero or
     // to big compression failed and we transmit uncompressed.
     if (irep > 0 && irep <= nin) {
@@ -100,7 +97,7 @@ EvtMessage* MsgHandler::encode_msg(ERecordType rectype)
     }
   }
 
-  EvtMessage* evtmsg = new EvtMessage(buf->data(), buf->size(), rectype);
+  auto* evtmsg = new EvtMessage(buf->data(), buf->size(), rectype);
   evtmsg->setMsgFlags(flags);
   clear();
 
@@ -118,7 +115,7 @@ void MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
     m_compBuf.clear();
     int nzip{0}, nout{0};
     // ROOT wants unsigned char so make a new pointer to the data
-    unsigned char* zipptr = (unsigned char*) msgptr;
+    auto* zipptr = (unsigned char*) msgptr;
     // and uncompress everything
     while (zipptr < (unsigned char*)end) {
       // first get a header of the next block so we know how big the output will be

@@ -10,34 +10,14 @@
 
 #include <beast/pindiode/modules/PinDigitizerModule.h>
 #include <beast/pindiode/dataobjects/PindiodeSimHit.h>
-#include <beast/pindiode/dataobjects/PindiodeHit.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/core/RandomNumbers.h>
 
 //c++
 #include <cmath>
-#include <boost/foreach.hpp>
 #include <string>
-#include <sstream>
-#include <iostream>
 #include <fstream>
-#include <vector>
-
-// ROOT
-#include <TH1.h>
-#include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -72,7 +52,7 @@ PinDigitizerModule::~PinDigitizerModule()
 void PinDigitizerModule::initialize()
 {
   B2INFO("PinDigitizer: Initializing");
-  StoreArray<PindiodeHit>::registerPersistent();
+  m_pindiodeHit.registerInDataStore();
 
 }
 

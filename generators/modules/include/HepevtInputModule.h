@@ -15,7 +15,6 @@
 
 #include <string>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <generators/hepevt/HepevtReader.h>
@@ -41,10 +40,10 @@ namespace Belle2 {
     virtual ~HepevtInputModule() {}
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
 

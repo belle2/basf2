@@ -1,4 +1,3 @@
-#include <framework/gearbox/Const.h>
 
 #pragma link off all globals;
 #pragma link off all classes;
@@ -32,12 +31,19 @@
 
 #pragma link C++ class Belle2::ROIid+;
 #pragma link C++ class Belle2::ROIpayload+;
+#pragma link C++ class Belle2::VXDIntercept+;
 #pragma link C++ class Belle2::PXDIntercept+;
+#pragma link C++ class Belle2::SVDIntercept+;
 #pragma link C++ class Belle2::RecoTrack+;
 #pragma link C++ class Belle2::RecoHitInformation+;
+#pragma link C++ class Belle2::BremHit+;
 #pragma link C++ class Belle2::SectorMapConfig+;
 #pragma link C++ class Belle2::hitXP+;
 #pragma link C++ class Belle2::hitXPDerivate+;
+#pragma link C++ class Belle2::DATCONSVDDigit+;
+#pragma link C++ class Belle2::DATCONSVDSpacePoint+;
+#pragma link C++ class Belle2::DATCONMostProbableHit+;
+#pragma link C++ class Belle2::DATCONTrack+;
 #pragma link C++ class std::vector<Belle2::hitXP>+;
 #pragma link C++ class std::vector<Belle2::hitXPDerivate>+;
 

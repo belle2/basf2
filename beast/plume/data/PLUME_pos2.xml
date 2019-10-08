@@ -1,79 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DetectorComponent name="PLUME">
+<DetectorComponent name="PLUME" xmlns:xi="http://www.w3.org/2001/XInclude">
   <Creator library="beast">PLUMECreator</Creator>
   <Content>
-    <!-- normally, parameters should be defined with a unit attribute. This
-         enables automatic conversion to the default framework unit --> 
-    <stepSize unit="um">200</stepSize>
-    <!--if we don't supply a unit there can be no conversion but is still valid -->
-    <divisions>32</divisions>
-    <!-- valid values for false are: "", "0", "off", "false" (case
-         insensitive), everything else will be interpreted as true -->
-    <foo>true</foo>
-    <!-- we can also have arrays as parameters which makes it easy to get a
-         number of values as vector<double>.  The numbers can be divided by
-         whitespace, comma or semi-colon -->
-    <bar unit="cm">1 2 
-    </bar>
+    <xi:include href="SensorAlignment.xml"/>
     
-    <Active>
-      <Material>PLUME-Material</Material>
-
-      <z_plume unit="cm">4.22</z_plume>
-      <r_plume unit="cm">6.1</r_plume>
-      <ThetaZ unit="deg">178.0</ThetaZ>
-      <Phi unit="deg">135.0</Phi>      
-      
-      <elecBandX unit="mm">0.300</elecBandX>
-      <integrationTime unit="us">100.0</integrationTime>
-      
-      <AirGap unit="um">0.1</AirGap>
-      
+    <stepSize unit="um">200</stepSize>
+    
+    <Ladder>
+      <integrationTime unit="us">100.0</integrationTime>      
+      <AirGap unit="um">0.1</AirGap>      
       <MetalThickness unit="um">5.0</MetalThickness>
       <SubstrateThickness unit="um">30.0</SubstrateThickness>
       <EpitaxialThickness unit="um">15.0</EpitaxialThickness>
-      
-      <ElecBandY unit="mm">3.0</ElecBandY>      
+
       <SensorDistance unit="um">500.0</SensorDistance>
+
       <nPixelsX>1152</nPixelsX>
       <nPixelsY>576</nPixelsY>
       <pitchX unit="um"> 18.4</pitchX>
       <pitchY unit="um"> 18.4</pitchY>
-      <DistanceFromFoamCenter unit="um">1000.0</DistanceFromFoamCenter>
+      
       <GlueThickness unit="um">10.0</GlueThickness>
       <KaptonThickness unit="um">100.0</KaptonThickness>
-      <AluminiumThickness unit="um">20.0</AluminiumThickness>
-    </Active>
-
-
-    <Active>
-      <Material>PLUME-Material</Material>
-
-      <z_plume unit="cm">-2.18</z_plume>
-      <r_plume unit="cm">8.4</r_plume>
-      <ThetaZ unit="deg">20.0</ThetaZ>
-      <Phi unit="deg">225.0</Phi>      
+      <AluminiumThickness unit="um">20.0</AluminiumThickness>      
       
-      <elecBandX unit="mm">0.300</elecBandX>
-      <integrationTime unit="us">100.0</integrationTime>
+      <Foam>
+	<length unit="mm">166</length>
+	<width unit="mm">14</width>
+	<thickness unit="mm">2</thickness>
+	<zPosition unit="mm">-64.7</zPosition>
+	<yShift unit="mm">1.5</yShift>
+      </Foam>
 
-      <AirGap unit="um">0.1</AirGap>
+      <Flex>
+	<length unit="mm">206</length>
+	<width unit="mm">18</width>
+	<zPosition unit="mm">-34.2</zPosition>
+      </Flex>
 
-      <MetalThickness unit="um">5.0</MetalThickness>
-      <SubstrateThickness unit="um">30.0</SubstrateThickness>
-      <EpitaxialThickness unit="um">15.0</EpitaxialThickness>
+      <AlBat>
+	<length1 unit="mm">44</length1>
+	<length2 unit="mm">26</length2>
+	<length3 unit="mm">10</length3>
+	<thickness1 unit="mm">2.0</thickness1>
+	<thickness2 unit="mm">0.9</thickness2>
+	<thickness3 unit="mm">2.0</thickness3>
+	<width unit="mm">19</width>	
+      </AlBat>
       
-      <ElecBandY unit="mm">3.0</ElecBandY>      
-      <SensorDistance unit="um">500.0</SensorDistance>
-      <nPixelsX>1152</nPixelsX>
-      <nPixelsY>576</nPixelsY>
-      <pitchX unit="um"> 18.4</pitchX>
-      <pitchY unit="um"> 18.4</pitchY>
-      <DistanceFromFoamCenter unit="um">1000.0</DistanceFromFoamCenter>
-      <GlueThickness unit="um">10.0</GlueThickness>
-      <KaptonThickness unit="um">100.0</KaptonThickness>
-      <AluminiumThickness unit="um">20.0</AluminiumThickness>
-    </Active>
-
+    </Ladder>
+    
+    <CoolingPipes>
+      <rIn unit="mm">1.5</rIn>
+      <rOut unit="mm">2.0</rOut>
+      <length unit="mm">250</length>
+      <x unit="mm">-6.6</x>
+      <y unit="mm">-8.0</y>
+      <z unit="mm">-22.17</z>
+      <alpha unit="deg">-1.8</alpha>
+    </CoolingPipes>
+    
+    <Placements>
+      <Ladder id="CC4">
+	<z_plume unit="mm">77.23</z_plume>
+	<r_plume unit="mm">91.39</r_plume>
+	<ThetaZ unit="deg">18.0</ThetaZ>
+	<Phi unit="deg">135.0</Phi>
+	<Alpha unit="deg">180.0</Alpha>
+      </Ladder>
+      <Ladder id="CC5">
+	<z_plume unit="mm">155.288</z_plume>
+	<r_plume unit="mm">52.32</r_plume>
+	<ThetaZ unit="deg">-2</ThetaZ>
+	<Phi unit="deg">225.0</Phi>
+	<Alpha unit="deg">0.0</Alpha>
+      </Ladder>
+    </Placements>
+    
   </Content>
+  
 </DetectorComponent>

@@ -9,23 +9,23 @@ namespace Belle2 {
 
     // constructors & destructors
   public:
-    BufferedWriter() throw();
-    BufferedWriter(size_t size, unsigned char* memory = NULL) throw();
-    BufferedWriter(const BufferedWriter& w) throw();
-    virtual ~BufferedWriter() throw();
+    BufferedWriter();
+    BufferedWriter(size_t size, unsigned char* memory = NULL);
+    BufferedWriter(const BufferedWriter& w);
+    virtual ~BufferedWriter();
 
     // member methods implemented
   public:
-    void seekTo(size_t pos) throw() { m_pos = pos; }
-    unsigned char* ptr() throw() { return m_memory; }
-    size_t count() const throw() { return m_pos; }
-    size_t size() const throw() { return m_size; }
-    virtual size_t write(const void*, size_t) throw(IOException);
-    virtual bool available() throw() { return true; }
+    void seekTo(size_t pos) { m_pos = pos; }
+    unsigned char* ptr() { return m_memory; }
+    size_t count() const { return m_pos; }
+    size_t size() const { return m_size; }
+    virtual size_t write(const void*, size_t);
+    virtual bool available() { return true; }
 
     // operators
   public:
-    const BufferedWriter& operator = (const BufferedWriter&) throw();
+    const BufferedWriter& operator = (const BufferedWriter&);
 
     // member data
   protected:

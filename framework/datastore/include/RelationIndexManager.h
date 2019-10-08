@@ -66,18 +66,30 @@ namespace Belle2 {
     /** Clear the cache of RelationIndexContainers with the given
      *  durability.
      *
-     *  Since we check for modification of the RelationArrays, this
-     *  function is normally not needed.
-     *
      *  @param durability Which cache to clear
      */
     void clear(DataStore::EDurability durability = DataStore::c_Event);
 
+    /** Reset the cache completely, that is clear all caches and don't even
+     * keep the Index objects around. Needed when the DataStore is reset to
+     * make sure we don't have dangling pointer into the previous DataStore
+     * contents.
+     */
+    void reset()
+    {
+      for (int i = 0; i < DataStore::c_NDurabilityTypes; i++)
+        m_cache[i].clear();
+    }
+
   protected:
-    /** Constructor hidden. */
-    RelationIndexManager() { }
-    /** Same for copy-constructor. */
-    RelationIndexManager(const RelationIndexManager&) { }
+    /** No Constructor hidden. */
+    RelationIndexManager() = default;
+    /** No copy-constructor. */
+    RelationIndexManager(const RelationIndexManager&) = delete;
+    /** No move constructor */
+    RelationIndexManager(RelationIndexManager&&) = delete;
+    /** Also no assignment */
+    RelationIndexManager& operator=(const RelationIndexManager&) = delete;
 
     /** if the index exists in the cache, it is returned; otherwise NULL.
      *
@@ -98,8 +110,7 @@ namespace Belle2 {
     /** Clean cache on exit. */
     ~RelationIndexManager()
     {
-      for (int i = 0; i < DataStore::c_NDurabilityTypes; i++)
-        clear((DataStore::EDurability)i);
+      reset();
     }
 
     /** Maptype to keep track of all Containers of one durability */

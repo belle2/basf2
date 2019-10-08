@@ -2,26 +2,22 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-import math
 import collections
 import numbers
 import copy
-
-from tracking.root_utils import root_save_name
 
 from . import scores
 from . import statistics
 
 from .plot import ValidationPlot, compose_axis_label
 from .fom import ValidationFiguresOfMerit
-# get error function as a np.ufunc vectorised for numpy array
-from .utilities import erf
 from .tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
 formatter = TolerateMissingKeyFormatter()
 
 
 class ClassificationAnalysis(object):
+    """Perform truth-classification analysis"""
 
     def __init__(
         self,
@@ -35,21 +31,32 @@ class ClassificationAnalysis(object):
         allow_discrete=None,
         unit=None
     ):
-        """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
+        """Compare an estimated quantity to the truths by generating standardized validation plots."""
 
+        #: cached contact person of the truth-classification analysis
         self._contact = contact
+        #: cached name of the quantity in the truth-classification analysis
         self.quantity_name = quantity_name
 
+        #: cached dictionary of plots in the truth-classification analysis
         self.plots = collections.OrderedDict()
+        #: cached value of the figure of merit in the truth-classification analysis
         self.fom = None
 
+        #: cached value of the cut direction (< or >) in the truth-classification analysis
         self.cut_direction = cut_direction
+        #: cached value of the threshold in the truth-classification analysis
         self.cut = cut
 
+        #: cached lower bound for this truth-classification analysis
         self.lower_bound = lower_bound
+        #: cached upper bound for this truth-classification analysis
         self.upper_bound = upper_bound
+        #: cached Z-score (for outlier detection) for this truth-classification analysis
         self.outlier_z_score = outlier_z_score
+        #: cached discrete-value flag for this truth-classification analysis
         self.allow_discrete = allow_discrete
+        #: cached measurement unit for this truth-classification analysis
         self.unit = unit
 
     def analyse(
@@ -456,14 +463,17 @@ class ClassificationAnalysis(object):
 
             self.plots["efficiency_over_bkg_rejection"] = efficiency_over_bkg_rejection_profile
 
+        #: contact person
         self.contact = self.contact
 
     @property
     def contact(self):
+        """Get the name of the contact person"""
         return self._contact
 
     @contact.setter
     def contact(self, contact):
+        """Set the name of the contact person"""
         self._contact = contact
 
         for plot in list(self.plots.values()):
@@ -473,6 +483,7 @@ class ClassificationAnalysis(object):
             self.fom.contact = contact
 
     def write(self, tdirectory=None):
+        """Write the plots to the ROOT TDirectory"""
         for plot in list(self.plots.values()):
             plot.write(tdirectory)
 
@@ -485,28 +496,37 @@ class CutClassifier(object):
     """Simple classifier cutting on a single variable"""
 
     def __init__(self, cut_direction=1, cut_value=np.nan):
+        """Constructor"""
+        #: cached copy of the cut direction (< or >)
         self.cut_direction_ = cut_direction
+        #: cached copy of the cut threshold
         self.cut_value_ = cut_value
 
     @property
     def cut_direction(self):
+        """Get the value of the cut direction"""
         return self.cut_direction_
 
     @property
     def cut_value(self):
+        """Get the value of the cut threshold"""
         return self.cut_value_
 
     def clone(self):
+        """Return a clone of this object"""
         return copy.copy(self)
 
     def determine_cut_value(self, estimates, truths):
+        """Get the value of the cut threshold"""
         return self.cut_value_  # do not change cut value from constructed one
 
     def fit(self, estimates, truths):
+        """Fit to determine the cut threshold"""
         self.cut_value_ = self.determine_cut_value(estimates, truths)
         return self
 
     def predict(self, estimates):
+        """Select estimates that satisfy the cut"""
         if self.cut_value_ is None:
             raise ValueError("Cut value not set. Forgot to fit?")
 
@@ -518,6 +538,7 @@ class CutClassifier(object):
         return binary_estimates
 
     def describe(self, estimates, truths):
+        """Describe the cut selection and its efficiency, purity and background rejection"""
         if self.cut_direction_ < 0:
             print("Cut accepts >= ", self.cut_value_, 'with')
         else:
@@ -539,12 +560,16 @@ def cut_at_background_rejection(background_rejection=0.5, cut_direction=1):
 
 
 class CutAtBackgroundRejectionClassifier(CutClassifier):
+    """Apply cut on the background rejection"""
 
     def __init__(self, background_rejection=0.5, cut_direction=1):
+        """Constructor"""
         super(CutAtBackgroundRejectionClassifier, self).__init__(cut_direction=cut_direction, cut_value=np.nan)
+        #: cachec copy of the background-rejection threshold
         self.background_rejection = background_rejection
 
     def determine_cut_value(self, estimates, truths):
+        """Find the cut value that satisfies the desired background-rejection level"""
         n_data = len(estimates)
         n_signals = scores.signal_amount(truths, estimates)
         n_bkgs = n_data - n_signals

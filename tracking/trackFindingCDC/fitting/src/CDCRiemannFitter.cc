@@ -25,6 +25,14 @@ const CDCRiemannFitter& CDCRiemannFitter::getFitter()
   return fitter;
 }
 
+const CDCRiemannFitter& CDCRiemannFitter::getFitter(bool fromOrigin, bool line)
+{
+  static CDCRiemannFitter fitter;
+  if (fromOrigin) fitter.setOriginConstrained();
+  if (line) fitter.setLineConstrained();
+  return fitter;
+}
+
 const CDCRiemannFitter& CDCRiemannFitter::getLineFitter()
 {
   static CDCRiemannFitter lineFitter;

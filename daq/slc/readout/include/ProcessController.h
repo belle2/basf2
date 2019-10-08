@@ -5,6 +5,7 @@
 
 #include "daq/slc/runcontrol/RCCallback.h"
 
+#include "daq/slc/system/PThread.h"
 #include "daq/slc/system/Process.h"
 #include "daq/slc/system/Mutex.h"
 #include "daq/slc/system/Cond.h"
@@ -19,15 +20,15 @@ namespace Belle2 {
     friend class ProcessSubmitter;
 
   public:
-    ProcessController() throw()
+    ProcessController()
     {
       m_callback = NULL;
     }
-    ProcessController(RCCallback* callback) throw()
+    ProcessController(RCCallback* callback)
     {
       m_callback = callback;
     }
-    ~ProcessController() throw()
+    ~ProcessController()
     {
       m_info.close();
     }
@@ -56,8 +57,8 @@ namespace Belle2 {
     template<typename T>
     void addArgument(T arg);
     void clearArguments() { m_arg_v = std::vector<std::string>(); }
-    bool isAlive() throw() { return m_process.isAlive(); }
-    bool waitReady(int timeout) throw();
+    bool isAlive() { return m_process.isAlive(); }
+    bool waitReady(int timeout);
 
   public:
     void lock() { m_mutex.lock(); }
@@ -73,6 +74,9 @@ namespace Belle2 {
     Process m_process;
     Mutex m_mutex;
     std::string m_message;
+    PThread m_th_log;
+    PThread m_th_process;
+    int m_iopipe[2];
 
   };
 

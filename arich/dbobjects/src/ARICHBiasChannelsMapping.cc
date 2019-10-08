@@ -9,11 +9,9 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 #include <arich/dbobjects/ARICHBiasChannelsMapping.h>
 #include <iostream>
-#include <iomanip>
 
 using namespace std;
 using namespace Belle2;
@@ -90,7 +88,7 @@ void ARICHBiasChannelsMapping::addMapping(int crate, int slot, int channelID, in
 
 }
 
-void ARICHBiasChannelsMapping::print()
+void ARICHBiasChannelsMapping::print() const
 {
 
   for (int crate = 0; crate < 3 ; crate++) {

@@ -12,13 +12,11 @@
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 #include <TVector3.h>
 #include <TMatrixDSym.h>
 
 #include <genfit/FitStatus.h>
-#include <genfit/KalmanFitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/Track.h>
 #include <genfit/TrackPoint.h>
@@ -120,21 +118,18 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
   if (newTrack.getNumberOfFittedHypotheses() > 0) {
     Track* addedTrack = tracks.appendNew(newTrack);
     addedTrack->addRelationTo(&recoTrack);
-    const MCParticle* mcParticle = recoTrack.getRelated<MCParticle>(m_mcParticleColName);
+    const auto& mcParticleWithWeight = recoTrack.getRelatedToWithWeight<MCParticle>(m_mcParticleColName);
+    const MCParticle* mcParticle = mcParticleWithWeight.first;
     if (mcParticle) {
       B2DEBUG(200, "Relation to MCParticle set.");
-      addedTrack->addRelationTo(mcParticle);
+      addedTrack->addRelationTo(mcParticle, mcParticleWithWeight.second);
     } else {
       B2DEBUG(200, "Relation to MCParticle not set. No related MCParticle to RecoTrack.");
     }
-    // false positive due to new with placement (cppcheck issue #7163)
-    // cppcheck-suppress memleak
     return true;
   } else {
     B2DEBUG(200, "Relation to MCParticle not set. No related MCParticle to RecoTrack.");
   }
-  // false positive due to new with placement (cppcheck issue #7163)
-  // cppcheck-suppress memleak
   return true;
 }
 

@@ -22,7 +22,6 @@
 #include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
-#include <tuple>
 #include <iostream>
 #include <math.h>
 
@@ -52,6 +51,8 @@ namespace VXDTFtwoHitFilterTest {
     TGeoCombiTrans c1(t1, r1);
     TGeoHMatrix transform = c1;
     sensorInfoBase.setTransformation(transform);
+    // also need the reco transform
+    sensorInfoBase.setTransformation(transform, true);
 
     return sensorInfoBase;
   }
@@ -517,6 +518,8 @@ namespace VXDTFtwoHitFilterTest {
     EXPECT_FALSE(filter.accept(x1, x2));
     EXPECT_EQ(1 , myCounter.used);
 
+    // creates a false positive as the reference of bypassControl is used in the filter which is not recognized by cppcheck
+    // cppcheck-suppress unreadVariable
     bypassControl = true;
     EXPECT_TRUE(filter.accept(x1, x2));
     EXPECT_EQ(2 , myCounter.used);

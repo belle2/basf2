@@ -12,29 +12,16 @@
 #include <beast/claws/dataobjects/CLAWSSimHit.h>
 #include <beast/claws/dataobjects/ClawsHit.h>
 #include <generators/SAD/dataobjects/SADMetaHit.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
-#include <cmath>
-#include <boost/foreach.hpp>
 
-
-#include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
 
 // ROOT
-#include <TVector3.h>
-#include <TRandom.h>
 #include <TH1.h>
 #include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
 
 using namespace std;
 
@@ -100,19 +87,19 @@ void ClawsStudyModule::defineHisto()
   h_clawss_rs_hitrate2W->Sumw2();
 
   for (int i = 0; i < 16; i++) {
-    h_clawss_rate1[i] = new TH1F(TString::Format("clawss_rate1_%d", i), "PE distributions", 500, 0., 5000.);
-    h_clawss_rate2[i] = new TH1F(TString::Format("clawss_rate2_%d", i), "PE distributions", 500, 0., 5000.);
-    h_clawss_rate1W[i] = new TH1F(TString::Format("clawss_rate1W_%d", i), "PE distributions", 500, 0., 5000.);
-    h_clawss_rate2W[i] = new TH1F(TString::Format("clawss_rate2W_%d", i), "PE distributions", 500, 0., 5000.);
-    h_clawss_pe1[i] = new TH2F(TString::Format("clawss_pe1_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
-    h_clawss_pe2[i] = new TH2F(TString::Format("clawss_pe2_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
-    h_clawss_pe1W[i] = new TH2F(TString::Format("clawss_pe1W_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
-    h_clawss_pe2W[i] = new TH2F(TString::Format("clawss_pe2W_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
+    h_clawss_rate1[i] = new TH1F(TString::Format("clawss_rate1_%d", i), "PE distributions", 500, 0., 500.);
+    h_clawss_rate2[i] = new TH1F(TString::Format("clawss_rate2_%d", i), "PE distributions", 500, 0., 500.);
+    h_clawss_rate1W[i] = new TH1F(TString::Format("clawss_rate1W_%d", i), "PE distributions", 500, 0., 500.);
+    h_clawss_rate2W[i] = new TH1F(TString::Format("clawss_rate2W_%d", i), "PE distributions", 500, 0., 500.);
+    h_clawss_pe1[i] = new TH2F(TString::Format("clawss_pe1_%d", i), "PE distributions", 500, 0., 500., 100, 0., 1000.);
+    h_clawss_pe2[i] = new TH2F(TString::Format("clawss_pe2_%d", i), "PE distributions", 500, 0., 500., 100, 0., 1000.);
+    h_clawss_pe1W[i] = new TH2F(TString::Format("clawss_pe1W_%d", i), "PE distributions", 500, 0., 500., 100, 0., 1000.);
+    h_clawss_pe2W[i] = new TH2F(TString::Format("clawss_pe2W_%d", i), "PE distributions", 500, 0., 500., 100, 0., 1000.);
 
-    h_clawss_rs_rate1[i] = new TH2F(TString::Format("clawss_rs_rate1_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
-    h_clawss_rs_rate2[i] = new TH2F(TString::Format("clawss_rs_rate2_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
-    h_clawss_rs_rate1W[i] = new TH2F(TString::Format("clawss_rs_rate1W_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
-    h_clawss_rs_rate2W[i] = new TH2F(TString::Format("clawss_rs_rate2W_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
+    h_clawss_rs_rate1[i] = new TH2F(TString::Format("clawss_rs_rate1_%d", i), "PE distributions", 500, 0., 500., 12, 0., 12.);
+    h_clawss_rs_rate2[i] = new TH2F(TString::Format("clawss_rs_rate2_%d", i), "PE distributions", 500, 0., 500., 12, 0., 12.);
+    h_clawss_rs_rate1W[i] = new TH2F(TString::Format("clawss_rs_rate1W_%d", i), "PE distributions", 500, 0., 500., 12, 0., 12.);
+    h_clawss_rs_rate2W[i] = new TH2F(TString::Format("clawss_rs_rate2W_%d", i), "PE distributions", 500, 0., 500., 12, 0., 12.);
 
     h_clawss_rate1[i]->Sumw2();
     h_clawss_rate2[i]->Sumw2();
@@ -158,9 +145,10 @@ void ClawsStudyModule::event()
     ring_section = MetaHit.getring_section() - 1;
   }
 
+  /*
   //number of entries in SimHits
   int nSimHits = SimHits.getEntries();
-  /*
+
   //loop over all SimHit entries
   for (int i = 0; i < nSimHits; i++) {
     CLAWSSimHit* aHit = SimHits[i];

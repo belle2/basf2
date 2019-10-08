@@ -9,12 +9,8 @@
  **************************************************************************/
 
 #include <tracking/modules/trackingPerformanceEvaluation/TrackingPerformanceEvaluationModule.h>
-#include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
 #include <framework/geometry/BFieldManager.h>
@@ -33,20 +29,16 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <genfit/KalmanFitterInfo.h>
 
-#include <root/TTree.h>
-#include <root/TAxis.h>
 #include <root/TObject.h>
 
 #include <boost/foreach.hpp>
-
-#include <typeinfo>
-#include <cxxabi.h>
 
 using namespace Belle2;
 
@@ -208,6 +200,11 @@ void TrackingPerformanceEvaluationModule::initialize()
                                      100, 0, 0.1, "#sigma_{z0} (cm)",
                                      m_histoList_firstHit);
 
+  m_h2_z0errVSpt_wtpxd = (TH2F*)duplicateHistogram("h2z0errVSpt_wTruePXD", "#sigma_{z0} VS p_{t}, with True PXD hits", m_h2_z0errVSpt,
+                                                   m_histoList_firstHit);
+  m_h2_z0errVSpt_wfpxd = (TH2F*)duplicateHistogram("h2z0errVSpt_wFalsePXD", "#sigma_{z0} VS p_{t}, with False PXD hits",
+                                                   m_h2_z0errVSpt,
+                                                   m_histoList_firstHit);
   m_h2_z0errVSpt_wpxd = (TH2F*)duplicateHistogram("h2z0errVSpt_wPXD", "#sigma_{z0} VS p_{t}, with PXD hits", m_h2_z0errVSpt,
                                                   m_histoList_firstHit);
 
@@ -218,13 +215,16 @@ void TrackingPerformanceEvaluationModule::initialize()
                                      100, 0, 3, "p_{t} (GeV/c)",
                                      100, 0, 0.1, "#sigma_{d0} (cm)",
                                      m_histoList_firstHit);
-
+  m_h2_d0errVSpt_wtpxd = (TH2F*)duplicateHistogram("h2d0errVSpt_wTruePXD", "#sigma_{d0} VS p_{t}, with True PXD hits", m_h2_d0errVSpt,
+                                                   m_histoList_firstHit);
+  m_h2_d0errVSpt_wfpxd = (TH2F*)duplicateHistogram("h2d0errVSpt_wFalsePXD", "#sigma_{d0} VS p_{t}, with False PXD hits",
+                                                   m_h2_d0errVSpt,
+                                                   m_histoList_firstHit);
   m_h2_d0errVSpt_wpxd = (TH2F*)duplicateHistogram("h2d0errVSpt_wPXD", "#sigma_{d0} VS p_{t}, with PXD hits", m_h2_d0errVSpt,
                                                   m_histoList_firstHit);
 
   m_h2_d0errVSpt_wopxd = (TH2F*)duplicateHistogram("h2d0errVSpt_woPXD", "#sigma_{d0} VS p_{t}, no PXD hits", m_h2_d0errVSpt,
                                                    m_histoList_firstHit);
-
   m_h2_d0errMSVSpt = createHistogram2D("h2d0errMSVSpt", "#sigma_{d0} * #betapsin^{3/2}#theta VS p_{t}",
                                        50, 0, 2.5, "p_{t} (GeV/c)",
                                        500, 0, 1, "cm",
@@ -434,7 +434,7 @@ void TrackingPerformanceEvaluationModule::event()
       const TrackFitResult* fitResult = Tracks_fromMCParticle[trk]->getTrackFitResult(Const::ChargedStable(m_ParticleHypothesis));
 
       if ((fitResult == NULL) || (fitResult->getParticleType() != Const::ChargedStable(m_ParticleHypothesis)))
-        B2DEBUG(99, " the TrackFitResult is not found!");
+        B2WARNING(" the TrackFitResult is not found!");
 
       else { // valid TrackFitResult found
 
@@ -548,12 +548,11 @@ void TrackingPerformanceEvaluationModule::event()
   StoreArray<SVDCluster> svdClusters;
   StoreArray<CDCHit> cdcHit;
 
-  bool hasRecoTrack = false;
 
   BOOST_FOREACH(RecoTrack & mcRecoTrack, mcRecoTracks) {
 
     int nRecoTrack = 0;
-    hasRecoTrack = false;
+    bool hasRecoTrack = false;
 
     //3.a retrieve the RecoTrack
     RelationVector<RecoTrack> RecoTracks_fromMCRecoTrack = DataStore::getRelationsWithObj<RecoTrack>(&mcRecoTrack);
@@ -572,46 +571,9 @@ void TrackingPerformanceEvaluationModule::event()
 
       B2DEBUG(99, "~~~~~ " << RecoTracks_fromMCParticle.size() << " RecoTracks related to this MCParticle");
       for (int tc = 0; tc < (int)RecoTracks_fromMCParticle.size(); tc++)
-
         if (!hasRecoTrack) {
-
           hasRecoTrack = true;
           nRecoTrack++;
-
-          /*
-                genfit::TrackCandHit* thehitMCRT = 0;
-                for (int hitMCRT = 0; hitMCRT < (int)mcTrackCand.getNHits(); hitMCRT++) {
-
-                  thehitMCRT = mcTrackCand.getHit(hitMCRT);
-                  if (!thehitMCRT)
-                    continue;
-
-                  int hitId = thehitMCRT->getHitId();
-                  int detId = thehitMCRT->getDetId();
-                  if (detId == 1)
-                    m_h1_HitsMCRecoTrack->Fill(pxdClusters[hitId]->getSensorID().getLayerNumber());
-                  if (detId == 2)
-                    m_h1_HitsMCRecoTrack->Fill(svdClusters[hitId]->getSensorID().getLayerNumber());
-                  //      if(thehitMCRT->getDetId() == 3)
-                  //        m_h1_HitsMCRecoTrack->Fill( cdcHit[hitId]->getLayer() );
-
-                  genfit::TrackCandHit* thehitTC = 0;
-                  for (int hitTC = 0; hitTC < (int)TrackCands_fromMCParticle[tc]->getNHits(); hitTC++) {
-
-                    thehitTC = TrackCands_fromMCParticle[tc]->getHit(hitTC);
-                    if (!thehitTC)
-                      continue;
-
-                    if ((*thehitTC) == (*thehitMCRT)) {
-                      if (detId == Const::PXD)
-                        m_h1_HitsRecoTrackPerMCRecoTrack->Fill(pxdClusters[hitId]->getSensorID().getLayerNumber());
-                      if (detId == Const::SVD)
-                        m_h1_HitsRecoTrackPerMCRecoTrack->Fill(svdClusters[hitId]->getSensorID().getLayerNumber());
-                      continue;
-                    }
-                  }
-            }
-          */
         }
 
     }
@@ -876,6 +838,8 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   bool hasPXDhit = false;
+  bool isTrueHit = false;
+
   double d0_err = -999;
   double z0_err = -999;
   double pt = -999;
@@ -921,6 +885,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
         if (pxdHit) {
           hasPXDhit = true;
+          isTrueHit = false;
 
           if (kalmanInfo)
             weight = weights.at(mea);
@@ -936,7 +901,27 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
+
+
+          const PXDCluster* pxdcl = pxdHit->getCluster();
+          RelationVector<PXDTrueHit> pxdth_fromcl = DataStore::getRelationsWithObj<PXDTrueHit>(pxdcl);
+
+          if ((int)pxdth_fromcl.size() != 0) {
+            const PXDTrueHit* trueHit = pxdth_fromcl[0];
+
+            if (trueHit) {
+              int trueHitIndex = trueHit->getArrayIndex();
+              RelationVector<MCParticle> MCParticles_fromTrack = DataStore::getRelationsWithObj<MCParticle>(&theTrack);
+              for (int mcp = 0; mcp < (int)MCParticles_fromTrack.size(); mcp++) {
+                RelationVector<PXDTrueHit> trueHit_fromMCParticles = DataStore::getRelationsWithObj<PXDTrueHit>(MCParticles_fromTrack[mcp]);
+                for (int th = 0; th < (int)trueHit_fromMCParticles.size(); th++) {
+                  if (trueHit_fromMCParticles[th]->getArrayIndex() == trueHitIndex)
+                    isTrueHit = true;
+                }
+              }
+            }
+          }
 
         } else if (svdHit2D) {
 
@@ -955,7 +940,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
 
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
 
         } else if (svdHit) {
 
@@ -977,7 +962,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
         } else if (cdcHit) {
 
           if (kalmanInfo)
@@ -1010,6 +995,13 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
     if (hasPXDhit) {
       m_h2_d0errVSpt_wpxd->Fill(pt, d0_err);
       m_h2_z0errVSpt_wpxd->Fill(pt, z0_err);
+      if (isTrueHit) {
+        m_h2_d0errVSpt_wtpxd->Fill(pt, d0_err);
+        m_h2_z0errVSpt_wtpxd->Fill(pt, z0_err);
+      } else {
+        m_h2_d0errVSpt_wfpxd->Fill(pt, d0_err);
+        m_h2_z0errVSpt_wfpxd->Fill(pt, z0_err);
+      }
     } else {
       m_h2_d0errVSpt_wopxd->Fill(pt, d0_err);
       m_h2_z0errVSpt_wopxd->Fill(pt, z0_err);

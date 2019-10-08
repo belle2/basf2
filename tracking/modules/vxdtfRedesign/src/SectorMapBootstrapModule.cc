@@ -14,12 +14,8 @@
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 #include "tracking/modules/vxdtfRedesign/SectorMapBootstrapModule.h"
 //#include "tracking/dataobjects/VXDTFSecMap.h"
-#include "tracking/dataobjects/FilterID.h"
 #include "tracking/dataobjects/SectorMapConfig.h"
 #include <tracking/spacePointCreation/SpacePoint.h>
-
-#include "framework/gearbox/Const.h"
-#include "framework/datastore/StoreObjPtr.h"
 
 // needed for complicated parameter types to not get an undefined reference error
 #include <framework/core/ModuleParam.templateDetails.h>
@@ -31,7 +27,6 @@
 #include <TFile.h>
 #include <TTree.h>
 
-#include <math.h>
 #include <algorithm>
 #include <fstream>
 
@@ -108,8 +103,8 @@ SectorMapBootstrapModule::initialize()
 
   // in case sector map is read from the DB one needs to set the DB pointer
   if (m_readSecMapFromDB) {
-    B2DEBUG(1, "SectorMapBootstrapModule: Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile.c_str());
-    m_ptrDBObjPtr = new DBObjPtr<PayloadFile>(m_sectorMapsInputFile.c_str());
+    B2DEBUG(1, "SectorMapBootstrapModule: Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile);
+    m_ptrDBObjPtr = new DBObjPtr<PayloadFile>(m_sectorMapsInputFile);
     if (m_ptrDBObjPtr == nullptr) B2FATAL("SectorMapBootstrapModule: the DBObjPtr is not initialized");
     // add a callback function so that the sectormap is updated each time the DBObj changes
     m_ptrDBObjPtr->addCallback(this,  &SectorMapBootstrapModule::retrieveSectorMap);
@@ -207,93 +202,6 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1point1.quantiles = {0., 1.};  //{0.005, 1. - 0.005};
   bootstrapSectorMap(config1point1);
 
-  SectorMapConfig config2;
-//   config2.pTCuts = {0.075, 0.300};
-  config2.pTmin = 0.075;
-  config2.pTmax = 0.300;
-  config2.pTSmear = 0.;
-  config2.allowedLayers = {0, 3, 4, 5, 6};
-  config2.uSectorDivider = { .15, .5, .85, 1.};
-  config2.vSectorDivider = { .1, .3, .5, .7, .9, 1.};
-  config2.pdgCodesAllowed = {};
-  config2.seedMaxDist2IPXY = 23.5;
-  config2.seedMaxDist2IPZ = 23.5;
-  config2.nHitsMin = 3;
-  config2.vIP = B2Vector3D(0, 0, 0);
-  config2.secMapName = "medTestRedesign";
-  config2.mField = 1.5;
-  config2.rarenessThreshold = 0.001;
-  config2.quantiles = {0.005, 1. - 0.005};
-  bootstrapSectorMap(config2);
-
-  SectorMapConfig config3;
-//   config3.pTCuts = {0.290, 3.5};
-  config3.pTmin = 0.290;
-  config3.pTmax = 6.0;
-  config3.pTSmear = 0.;
-  config3.allowedLayers = {0, 3, 4, 5, 6};
-  config3.uSectorDivider = { .15, .5, .85, 1.};
-  config3.vSectorDivider = { .1, .3, .5, .7, .9, 1.};
-  config3.pdgCodesAllowed = {};
-  config3.seedMaxDist2IPXY = 23.5;
-  config3.seedMaxDist2IPZ = 23.5;
-  config3.nHitsMin = 3;
-  config3.vIP = B2Vector3D(0, 0, 0);
-  config3.secMapName = "highTestRedesign";
-  config3.mField = 1.5;
-  config3.rarenessThreshold = 0.001;
-  config3.quantiles = {0.005, 1. - 0.005};
-  bootstrapSectorMap(config3);
-
-
-  SectorMapConfig config4;
-
-  config4.pTmin = 0.290;
-  config4.pTmax = 3.5;
-  config4.pTSmear = 0.;
-  config4.allowedLayers = {0, 3, 4, 5, 6};
-  config4.uSectorDivider = {};
-  config4.vSectorDivider = {};
-  config4.pdgCodesAllowed = {};
-  config4.seedMaxDist2IPXY = 23.5;
-  config4.seedMaxDist2IPZ = 23.5;
-  config4.nHitsMin = 3;
-  config4.vIP = B2Vector3D(0, 0, 0);
-  config4.secMapName = "STRESS";
-  config4.mField = 1.5;
-  config4.rarenessThreshold = 0.001;
-  config4.quantiles = {0.005, 1. - 0.005};
-  for (double stress = .1; stress < 1.; stress += .1) {
-    config4.uSectorDivider.push_back(stress);
-    config4.vSectorDivider.push_back(stress);
-  }
-
-  bootstrapSectorMap(config4);
-
-
-  SectorMapConfig configTB;
-  configTB.pTmin = 1.0; // minimal relevant version
-  configTB.pTmax = 8.0; // minimal relevant version // Feb18-onePass-Test
-  configTB.pTSmear = 0.;
-  configTB.allowedLayers = {0, 3, 4, 5, 6};
-  configTB.uSectorDivider = { .3, .7, 1.}; // standard relevant version
-  configTB.vSectorDivider = { .3, .7, 1.}; // standard relevant version
-  //configTB.uSectorDivider = { 1.}; // standard relevant version // was the first version
-  //configTB.vSectorDivider = { 1.}; // standard relevant version // was the first version
-  configTB.pdgCodesAllowed = { -11, 11};
-  configTB.seedMaxDist2IPXY = 23.5;
-  configTB.seedMaxDist2IPZ = 23.5;
-  configTB.nHitsMin = 3;
-  configTB.vIP = B2Vector3D(-100, 0, 0); // should be the same as for the MC generation!
-  configTB.secMapName = "testbeamTEST";
-  configTB.mField = 1.;
-  configTB.rarenessThreshold = 0.; //0.001;
-  configTB.quantiles = {0., 1.};  //{0.005, 1. - 0.005};
-  // TODO: still missing: minimal sample-size, quantiles for smaller samplesizes, threshshold small <-> big sampleSize.
-  bootstrapSectorMap(configTB);
-
-
-
 }
 
 void
@@ -322,7 +230,6 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
 
   vector< vector< FullSecID > > sectors;
 
-//   sectors.resize(uSup.size() + 1);
   sectors.resize(config.uSectorDivider.size());
   unsigned nSectorsInU = config.uSectorDivider.size(),
            nSectorsInV = config.vSectorDivider.size();
@@ -361,7 +268,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
   if (std::find(config.allowedLayers.begin(), config.allowedLayers.end(), 0) != config.allowedLayers.end()) {
     std::vector<double> uCuts4vIP = {}, vCuts4vIP = {};
     sectors.clear();
-    sectors = {{0}};
+    sectors = {{ FullSecID(0) }};
     segmentFilters->addSectorsOnSensor(uCuts4vIP, vCuts4vIP, sectors);
   }
 

@@ -255,16 +255,24 @@ namespace Belle2 {
     unsigned getPixelRow(double y) const;
 
     /**
+     * Converts x and y coordinates to PMT pixel ID (1-based)
+     * @param x coordinate
+     * @param y coordinate
+     * @return pixel ID or 0 if x or y outside sensitive area
+     */
+    unsigned getPixelID(double x, double y) const;
+
+    /**
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "MCP-PMT geometry parameters") const;
+    void print(const std::string& title = "MCP-PMT geometry parameters") const override;
 
   private:
 
@@ -292,7 +300,7 @@ namespace Belle2 {
     float m_reflEdgeThickness = 0; /**< reflective edge thickness */
     GeoOpticalSurface m_reflEdgeSurface; /**< reflective edge optical surface */
 
-    ClassDef(TOPGeoPMT, 1); /**< ClassDef */
+    ClassDefOverride(TOPGeoPMT, 1); /**< ClassDef */
 
   };
 

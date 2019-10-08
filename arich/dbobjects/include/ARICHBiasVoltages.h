@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <vector>
 #include <TObject.h>
 #include <map>
 #include <vector>
@@ -44,7 +43,7 @@ namespace Belle2 {
     /**
     * Print voltages for PS channels
     */
-    void print();
+    void print() const;
 
   private:
 

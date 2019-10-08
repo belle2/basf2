@@ -14,7 +14,6 @@
 #include <type_traits>
 #include <utility>
 #include <array>
-#include <algorithm>
 #include <cassert>
 #include <numeric>
 #include <ostream>

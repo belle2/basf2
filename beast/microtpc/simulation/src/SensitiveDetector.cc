@@ -12,14 +12,11 @@
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
 #include <beast/microtpc/dataobjects/TPCG4TrackInfo.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
 
 #include <G4Track.hh>
 #include <G4Step.hh>
-#include "G4VProcess.hh"
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for the MICROTPC detector */
@@ -28,7 +25,6 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector():
       Simulation::SensitiveDetectorBase("MicrotpcSensitiveDetector", Const::invalidDetector)
     {
-      m_simhitNumber = 0;
       m_trackID = 0;
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;
@@ -152,9 +148,9 @@ namespace Belle2 {
 
       TPCG4TrackInfos.appendNew(TPCG4TrackInfo(trackID, PDG, Mass, Energy, vtx, mom));
 
-      int m_simhitNumber = TPCG4TrackInfos.getEntries() - 1;
+      int simhitNumber = TPCG4TrackInfos.getEntries() - 1;
 
-      return (m_simhitNumber);
+      return (simhitNumber);
     }//saveG4TrackInfo
 
   } //microtpc namespace

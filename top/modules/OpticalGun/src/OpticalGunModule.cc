@@ -100,7 +100,7 @@ namespace Belle2 {
 
     // set other private variables
     m_cosAlpha = cos(m_alpha * Unit::deg);
-    m_energy = 1240.0 / m_wavelength * Unit::eV;
+    m_energy = TOPGeometryPar::c_hc / m_wavelength * Unit::eV;
 
     double barY0 = 0;
     double barZ0 = 0;

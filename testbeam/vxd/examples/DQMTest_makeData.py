@@ -86,9 +86,6 @@ TelDigi = register_module('TelDigitizer')
 # TelDigi.param('ElectronicNoise', 200)
 # TelDigi.param("NoiseSN", 5.0)
 
-# PXD DAQ produces PXDRawHits, not PXDDigits.
-PXDConv = register_module("PXDRawHitProducer")
-
 # Save output of simulation
 output = register_module('RootOutput')
 output.param('outputFileName', 'TBSimulation.root')
@@ -104,7 +101,6 @@ main.add_module(geometry)
 main.add_module(particlegun)
 main.add_module(simulation)
 main.add_module(PXDDigi)
-main.add_module(PXDConv)
 main.add_module(SVDDigi)
 main.add_module(TelDigi)
 main.add_module(output)

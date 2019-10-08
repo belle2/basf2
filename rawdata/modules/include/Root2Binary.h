@@ -26,16 +26,16 @@ namespace Belle2 {
     virtual ~Root2BinaryModule();
 
     //!
-    virtual void initialize();
+    virtual void initialize() override;
 
     //!
-    virtual void event();
+    virtual void event() override;
 
     //!
-    virtual void endRun();
+    virtual void endRun() override;
 
     //!
-    virtual void terminate();
+    virtual void terminate() override;
 
     //! write the contents of an event
     virtual void writeEvent(RawDataBlock* raw_dblk, int* first_flag, int* break_flag,

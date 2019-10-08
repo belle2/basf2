@@ -7,13 +7,9 @@
 
 #include "G4VPVParameterisation.hh"
 
-#include "Randomize.hh"
-
 #include "G4VGraphicsScene.hh"
 
-#include "G4GenericPolycone.hh"
-
-#include <map>
+#include "CLHEP/Random/RandFlat.h"
 
 using namespace std;
 using namespace Belle2;
@@ -1061,7 +1057,7 @@ G4ThreeVector BelleLathe::SurfaceNormal(const G4ThreeVector& p) const
 {
   COUNTER(1);
 
-  auto side = [this, &p](const zr_t & r, double d, int iside) {
+  auto side = [this](const zr_t & r, double d, int iside) {
     double nx = (iside) ? fn1x : fn0x, ny = (iside) ? fn1y : fn0y;
     if (wn_poly(r) == 2) return G4ThreeVector(nx, ny, 0);
     double cphi = (iside) ? fc1 : fc0, sphi = (iside) ? fs1 : fc0;
@@ -1888,7 +1884,7 @@ PolyhedronBelleLathe::PolyhedronBelleLathe(const std::vector<zr_t>& v, const std
     int nf = n * (nphi - 1) + 2 * t.size();
     AllocateMemory(nv, nf);
 
-    auto vnum = [nphi, n](int iphi, int ip) {
+    auto vnum = [n](int iphi, int ip) {
       return iphi * n + (ip % n) + 1;
     };
 

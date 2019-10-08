@@ -14,7 +14,6 @@
 #include <algorithm>
 
 namespace Belle2 {
-  class TrackFitResult;
   /** Class that bundles various TrackFitResults.
    *
    *  As the RecoTrack has a lot of information that is only necessary during the fit,
@@ -37,7 +36,7 @@ namespace Belle2 {
      *  which is an invalid index.
      *  @param qualityIndicator   Initialises m_qualityIndicator with 0, a value associated typically with fake tracks.
      */
-    Track(float qualityIndicator = 0.) : m_qualityIndicator(qualityIndicator)
+    explicit Track(float qualityIndicator = 0.) : m_qualityIndicator(qualityIndicator)
     {
       std::fill(m_trackFitIndices, m_trackFitIndices + Const::chargedStableSet.size(), -1);
     }
@@ -118,6 +117,9 @@ namespace Belle2 {
       return m_qualityIndicator;
     }
 
+    /** Return a short summary of this object's contents in HTML format. */
+    virtual std::string getInfoHTML() const override;
+
   private:
     /** Index list of the TrackFitResults associated with this Track. */
     short int m_trackFitIndices[Const::ChargedStable::c_SetSize];
@@ -135,6 +137,6 @@ namespace Belle2 {
      */
     float const m_qualityIndicator;
 
-    ClassDef(Track, 4); /**< Class that bundles various TrackFitResults. */
+    ClassDefOverride(Track, 4); /**< Class that bundles various TrackFitResults. */
   };
 }

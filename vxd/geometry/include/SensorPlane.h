@@ -42,7 +42,8 @@ namespace Belle2 {
        * This angle will be used to rotate coordinate parameters in inActive() method.
        * @param phi The angle by which the plane was rotated.
        */
-      void setRotation(double phi) {
+      void setRotation(double phi)
+      {
         m_cosPhi = cos(phi);
         m_sinPhi = sin(phi);
       }
@@ -54,7 +55,8 @@ namespace Belle2 {
        * @param v v-coordinate of the point.
        * @return true if (u,v) is within the sensor plane, otherwise false.
        */
-      bool isInActive(double u, double v) const {
+      bool isInActive(double u, double v) const override
+      {
 #ifndef __CINT__
         //If running in ROOT CINT we do not know about GeoCache so we cannot get
         //the SensorInfo
@@ -72,13 +74,14 @@ namespace Belle2 {
       }
 
       /** Prints object data. */
-      void Print(const Option_t* option = "") const;
+      void Print(const Option_t* option = "") const override;
 
       /**
        * Deep copy of the object.
        * @return Pointer to a deep copy of the object.
        */
-      virtual genfit::AbsFinitePlane* clone() const {
+      virtual genfit::AbsFinitePlane* clone() const override
+      {
         return new SensorPlane(*this);
       }
 
@@ -96,7 +99,7 @@ namespace Belle2 {
       /** Pointer to the SensorInfo which contains the geometry information for the given sensor plane */
       mutable const SensorInfoBase* m_sensorInfo; //! transient member
 
-      ClassDef(SensorPlane, 2)
+      ClassDefOverride(SensorPlane, 2)
     };
   } // vxd namespace
 } // Belle2 namespace

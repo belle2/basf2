@@ -13,7 +13,7 @@ namespace Belle2 {
 
   public:
     IOInfo() {}
-    ~IOInfo() throw() {}
+    ~IOInfo() {}
 
   public:
     const char* getLocalIP() const;

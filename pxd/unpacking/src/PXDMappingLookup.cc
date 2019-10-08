@@ -10,7 +10,6 @@
 
 #include <pxd/unpacking/PXDMappingLookup.h>
 #include <framework/logging/Logger.h>
-#include <vxd/geometry/GeoCache.h>
 
 #include <stdio.h>
 #include <vector>
@@ -108,7 +107,8 @@ void PXDMappingLookup::map_rc_to_uv_IF_OB(unsigned int& v_cellID, unsigned int& 
 //  B2DEBUG(99,"Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }
 
-void PXDMappingLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id,
+void PXDMappingLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID,
+                                          __attribute__((unused)) unsigned int& dhp_id,
                                           const unsigned int dhe_ID)
 {
   B2FATAL("Code to be written");
@@ -179,7 +179,8 @@ void PXDMappingLookup::map_rc_to_uv_IB_OF(unsigned int& v_cellID, unsigned int& 
 //  B2DEBUG(99,"Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }
 
-void PXDMappingLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id,
+void PXDMappingLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID,
+                                          __attribute__((unused)) unsigned int& dhp_id,
                                           const unsigned int dhe_ID)
 {
   B2FATAL("Code to be written");
@@ -206,11 +207,11 @@ void PXDMappingLookup::write_mapping_to_file(void)
           coli = col;
           rowi = row;
           map_rc_to_uv_IF_OB(rowi,   coli,   dhp_id, 0x00);
-          fprintf(file, "%d; %d; %d; %d; %d; " , row, dhp_id, col, rowi, coli);
+          fprintf(file, "%u; %u; %u; %u; %u; " , row, dhp_id, col, rowi, coli);
           coli = col;
           rowi = row;
           map_rc_to_uv_IB_OF(rowi,  coli,  dhp_id, 0x00);
-          fprintf(file, "%d; %d\n" , rowi, coli);
+          fprintf(file, "%u; %u\n" , rowi, coli);
         }
       }
     }
@@ -223,11 +224,11 @@ void PXDMappingLookup::write_mapping_to_file(void)
           coli = col;
           rowi = row;
           map_rc_to_uv_IF_OB(rowi,   coli,   dhp_id, 0x01);
-          fprintf(file, "%d; %d; %d; %d; %d; " , row, dhp_id, col, rowi, coli);
+          fprintf(file, "%u; %u; %u; %u; %u; " , row, dhp_id, col, rowi, coli);
           coli = col;
           rowi = row;
           map_rc_to_uv_IB_OF(rowi,  coli,  dhp_id, 0x01);
-          fprintf(file, "%d; %d\n" , rowi, coli);
+          fprintf(file, "%u; %u\n" , rowi, coli);
         }
       }
     }
@@ -241,11 +242,11 @@ void PXDMappingLookup::write_mapping_to_file(void)
           coli = col;
           rowi = row;
           map_rc_to_uv_IF_OB(rowi,   coli,   dhp_id, 0x20);
-          fprintf(file, "%d; %d; %d; %d; %d; " , row, dhp_id, col, rowi, coli);
+          fprintf(file, "%u; %u; %u; %u; %u; " , row, dhp_id, col, rowi, coli);
           coli = col;
           rowi = row;
           map_rc_to_uv_IB_OF(rowi,  coli,  dhp_id, 0x20);
-          fprintf(file, "%d; %d\n" , rowi, coli);
+          fprintf(file, "%u; %u\n" , rowi, coli);
         }
       }
     }
@@ -259,11 +260,11 @@ void PXDMappingLookup::write_mapping_to_file(void)
           coli = col;
           rowi = row;
           map_rc_to_uv_IF_OB(rowi,   coli,   dhp_id, 0x21);
-          fprintf(file, "%d; %d; %d; %d; %d; " , row, dhp_id, col, rowi, coli);
+          fprintf(file, "%u; %u; %u; %u; %u; " , row, dhp_id, col, rowi, coli);
           coli = col;
           rowi = row;
           map_rc_to_uv_IB_OF(rowi,  coli,  dhp_id, 0x21);
-          fprintf(file, "%d; %d\n" , rowi, coli);
+          fprintf(file, "%u; %u\n" , rowi, coli);
         }
       }
     }
@@ -290,7 +291,6 @@ void PXDMappingLookup::check(void)
 
         // if we call IF-OB with wrong DHE ID, we do not expect the correct result _BUT_ still it should be consistent
         c = u_org;
-        v = v_org;
         map_uv_to_rc_IF_OB(r, c, dhp_id, dhe);
         v = r;
         u = c;

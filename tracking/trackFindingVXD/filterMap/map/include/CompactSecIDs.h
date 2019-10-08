@@ -11,12 +11,10 @@
 
 #include "tracking/dataobjects/FullSecID.h"
 #include <tracking/trackFindingVXD/filterMap/map/SectorsOnSensor.h>
-#include "framework/core/FrameworkExceptions.h"
-#include <TTree.h>
-#include <TFile.h>
+#include <framework/core/FrameworkExceptions.h>
+#include <framework/logging/Logger.h>
 #include <cstdint>
 #include <vector>
-
 
 namespace Belle2 {
 
@@ -121,6 +119,12 @@ namespace Belle2 {
                                  fullID.getSecID());
     }
 
+    /** Getter for IDs of all sectors on a sensor
+     * @param layer : layer number of the sensor
+     * @param ladder : ladder number of the sensor
+     * @param sensor : sensor number
+     * @return vector containing the IDs of the sectors on the sensor
+     */
     SectorsOnSensor<sectorID_t>
     getSectorsOnSensor(unsigned layer, unsigned ladder, unsigned sensor)
     const
@@ -289,9 +293,12 @@ namespace Belle2 {
       return m_compactSectorsIDMap[layer][ladder][sensor].areCoordinatesValid(normalizedU, normalizedV);
     }
 
-    typedef std::vector< SectorsOnSensor<sectorID_t> > SensorsOnLadder_t;
-    typedef std::vector< SensorsOnLadder_t > LaddersOnLayer_t;
-    typedef std::vector< LaddersOnLayer_t > LayersLookUpTable_t;
+    /// Typedef for vector of IDs of sectors on a sensors
+    typedef std::vector<SectorsOnSensor<sectorID_t> > SensorsOnLadder_t;
+    /// Typedef for vector of vector of IDs of sectors on a Ladder
+    typedef std::vector<SensorsOnLadder_t> LaddersOnLayer_t;
+    /// Typedef for vector of vector of vector of IDs of sectors on a layer
+    typedef std::vector<LaddersOnLayer_t> LayersLookUpTable_t;
 
 
     /// Get access to the whole map
@@ -336,9 +343,10 @@ namespace Belle2 {
 
 
   private:
-
+    /// Counter for sectors
     sectorID_t m_sectorCounter;
 
+    /// Lookup table containing all sectorIDs
     LayersLookUpTable_t m_compactSectorsIDMap;
 
     /// The hidden private method that recursively manage the size of everything.

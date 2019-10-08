@@ -1,9 +1,15 @@
-#pragma once
-// ******************************************************************
-// MC Matching
-// authors: A. Zupanc (anze.zupanc@ijs.si), C. Pulvermacher (christian.pulvermacher@kit.edu)
-// ******************************************************************
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ *                                                                        *
+ * Copyright(C) 2013-2018 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Anze Zupanc, Christian Pulvermacher, Yo Sato             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
+#pragma once
 
 #include <vector>
 #include <string>
@@ -75,10 +81,12 @@ namespace Belle2 {
      *
      * @param particle pointer to the particle. setMCTruth() must have been called previously (usually via the MCMatching module)!
      * @param mc pointer to the matched MCParticle. Can be specified to avoid repeated lookups.
+     * @param option to ignore corresponding flags with PropertyFlags of particle which are set by decaystring grammar.
      *
      * @return ORed combination of MCErrorFlags describing differences between reconstructed particle and MC truth.
      */
-    static int getMCErrors(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle = nullptr);
+    static int getMCErrors(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle = nullptr,
+                           const bool honorProperty = true);
 
     /** Sets error flags in extra-info (also returns it).
      *
@@ -148,5 +156,20 @@ namespace Belle2 {
      * @return number of daughters which are not neutrinos
      */
     static int getNumberOfDaughtersWithoutNeutrinos(const MCParticle* mcParticle);
+
+    /**
+     * Count the number of missing daughters of the 'particle'.
+     * @return number of missing daughters having given PDG codes
+     */
+    static int countMissingParticle(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle,
+                                    const std::vector<int>& daughterPDG);
+
+    /**
+     * Returns the flags ignored by PropertyFlags of given particle.
+     * Only c_isIgnored... flags are considered. c_isUnspecified is already considered in setMCErrorsExtraInfo function.
+     * @return ORed combination of corresponding MCErrorFlags with PropertyFlags of given particle
+     */
+    static int getFlagsIgnoredByProperty(const Belle2::Particle* particle);
+
   };
 }

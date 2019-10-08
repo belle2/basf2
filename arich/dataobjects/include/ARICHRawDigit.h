@@ -16,7 +16,6 @@
 
 // std
 #include <vector>
-#include <map>
 
 namespace Belle2 {
 
@@ -60,11 +59,15 @@ namespace Belle2 {
     ARICHRawDigit()
     {
       set(0, 0, 0, 0, 0, 0);
+      m_copperid = 0;
+      m_hslb = 0;
     }
 
     ARICHRawDigit(int type, int ver, int boardid, int febno, unsigned int length, unsigned int trgno = 0)
     {
       set(type, ver, boardid, febno, length, trgno);
+      m_copperid = 0;
+      m_hslb = 0;
     }
 
     //! Destructor

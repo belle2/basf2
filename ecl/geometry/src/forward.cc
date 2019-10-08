@@ -3,24 +3,19 @@
 #include "ecl/geometry/BelleCrystal.h"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
-#include "G4NistManager.hh"
 #include <G4VisAttributes.hh>
 #include <G4Tubs.hh>
 #include <G4Box.hh>
 #include <G4AssemblyVolume.hh>
-#include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
 #include <G4UnionSolid.hh>
-#include <G4Trd.hh>
 #include <G4TwoVector.hh>
-#include <G4ExtrudedSolid.hh>
 #include <G4PVReplica.hh>
-#include "G4UserLimits.hh"
 #include "G4ReflectionFactory.hh"
+#include <G4Trap.hh>
 
 #include <iostream>
 #include "CLHEP/Matrix/Vector.h"
-#include "CLHEP/Matrix/Matrix.h"
 #include "G4Vector3D.hh"
 #include "G4Point3D.hh"
 #include "ecl/geometry/shapes.h"
@@ -55,17 +50,35 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
   b_boards &= b_support_structure_15;
 
   int overlap = m_overlap;
+
+  //  vector<cplacement_t> bp = load_placements("/ecl/data/crystal_placement_forward.dat");
+  vector<cplacement_t> bp = load_placements(m_sap, ECLParts::forward);
+  vector<cplacement_t>::iterator fp = find_if(bp.begin(), bp.end(), [](const cplacement_t& p) {
+    const int ECL_forward_part = 1000;
+    return p.nshape == ECL_forward_part;
+  });
+  // global transformation before placing the whole forward part in the top logical volume
+  G4Transform3D gTrans = (fp == bp.end()) ? G4Translate3D(0, 0, 1960) : get_transform(*fp);
+  // since the calorimeter supporting structures attach to the yoke at
+  // the same place we need to modify supporting legs by milling
+  // necessary thickness of steel when moving forward part outward in
+  // z-direction
+  double milled_thickness = gTrans.dz() - 1960; // [mm]
+  if (fp != bp.end()) bp.erase(fp); // now not needed
+
   const double th0 = 13.12, th1 = 32.98;
   const double ZT = 437, ZI = 434, RI = 431, RIp = 532.2, RC = 1200.4, RT = 1415;
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_inner_support_ring) {
     zr_t vc1[] = {{ZI - 487, 410}, {ZT - (RIp - 410 - 20 / cosd(th0)) / tand(th0), 410}, {ZT, RIp - 20 / cosd(th0)}, {ZT, RIp}, {3., RI}, {3., 418}, {ZI - 487, 418}};
     std::vector<zr_t> contour1(vc1, vc1 + sizeof(vc1) / sizeof(zr_t));
     G4VSolid* part1solid = new BelleLathe("fwd_part1solid", phi0, dphi, contour1);
     G4LogicalVolume* part1logical = new G4LogicalVolume(part1solid, Materials::get("SUS304"), "part1logical", 0, 0, 0);
     part1logical->SetVisAttributes(att("iron"));
-    new G4PVPlacement(G4Translate3D(0, 0, 1960), part1logical, "part1physical", top, false, 0, overlap);
+    new G4PVPlacement(gTrans, part1logical, "part1physical", top, false, 0, overlap);
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_support_wall) {
     // solving equation to get L : 3+L*cosd(th1)+1.6*cosd(th1+90) = 434 + 3 - 107.24
     double L = (ZT - 107.24 - 3 - 1.6 * cosd(th1 + 90)) / cosd(th1);
@@ -77,16 +90,17 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     G4VSolid* part23solid = new BelleLathe("fwd_part23solid", phi0, dphi, contour23);
     G4LogicalVolume* part23logical = new G4LogicalVolume(part23solid, Materials::get("A5052"), "part23logical", 0, 0, 0);
     part23logical->SetVisAttributes(att("alum"));
-    new G4PVPlacement(G4Translate3D(0, 0, 1960), part23logical, "part23physical", top, false, 0, overlap);
+    new G4PVPlacement(gTrans, part23logical, "part23physical", top, false, 0, overlap);
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_outer_support_ring) {
     zr_t vc4[] = {{3 + (RT - 20 - RC) / tand(th1), RT - 20}, {ZT, RT - 20}, {ZT, RT}, {3 + (RT - RC) / tand(th1), RT}};
     std::vector<zr_t> contour4(vc4, vc4 + sizeof(vc4) / sizeof(zr_t));
     G4VSolid* part4solid = new BelleLathe("fwd_part4solid", phi0, dphi, contour4);
     G4LogicalVolume* part4logical = new G4LogicalVolume(part4solid, Materials::get("SUS304"), "part4logical", 0, 0, 0);
     part4logical->SetVisAttributes(att("iron"));
-    new G4PVPlacement(G4Translate3D(0, 0, 1960), part4logical, "part4physical", top, false, 0, overlap);
+    new G4PVPlacement(gTrans, part4logical, "part4physical", top, false, 0, overlap);
   }
 
   zr_t cont_array_in[] = {{3., RI}, {ZT, RIp}, {ZT, RT - 20}, {3 + (RT - 20 - RC) / tand(th1), RT - 20}, {3, RC}};
@@ -95,7 +109,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
   G4LogicalVolume* innervolume_logical = new G4LogicalVolume(innervolume_solid, Materials::get("G4_AIR"),
                                                              "innervolume_logical", 0, 0, 0);
   innervolume_logical->SetVisAttributes(att("air"));
-  new G4PVPlacement(G4Translate3D(0, 0, 1960), innervolume_logical, "ECLForwardPhysical", top, false, 0, overlap);
+  new G4PVPlacement(gTrans, innervolume_logical, "ECLForwardPhysical", top, false, 0, overlap);
 
   G4VSolid* innervolumesector_solid = new BelleLathe("fwd_innervolumesector_solid", -M_PI / 8, M_PI / 4, contour_in);
   G4LogicalVolume* innervolumesector_logical = new G4LogicalVolume(innervolumesector_solid, Materials::get("G4_AIR"),
@@ -103,6 +117,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
   innervolumesector_logical->SetVisAttributes(att("air"));
   new G4PVReplica("ECLForwardSectorPhysical", innervolumesector_logical, innervolume_logical, kPhi, 8, M_PI / 4, 0);
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_ribs) {
     double H = 60, W = 20;
     double X0 = RIp, X1 = RT - 20;
@@ -158,6 +173,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
 
 
   double zsep = 125;
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_septum_wall) {
     double d = 5;
     Point_t vin[] = {{ZT - zsep, RIp - tand(th0)* zsep}, {ZT - 60, RIp - tand(th0) * 60}, {ZT - 60, RT - 20 - d}, {ZT - zsep, RT - 20 - d}};
@@ -200,6 +216,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
   new G4PVPlacement(G4RotateZ3D(0), crystalvolume_logical, "ECLForwardCrystalSectorPhysical_1", innervolumesector_logical, false, 1,
                     overlap);
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_septum_wall) {
     double d = 5, aRC = RC - 30e-6;
     Point_t vin[] = {{3., RI}, {ZT - zsep, RIp - tand(th0)* zsep}, {ZT - zsep, RT - 20 - d}, {3 + (RT - 20 - d - aRC) / tand(th1), RT - 20 - d}, {3, aRC}};
@@ -221,8 +238,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
                       septumwall3_logical, "septumwall3_physical_1", crystalvolume_logical, false, 1, overlap);
   }
 
-  //  vector<cplacement_t> bp = load_placements("/ecl/data/crystal_placement_forward.dat");
-  vector<cplacement_t> bp = load_placements(m_sap, ECLParts::forward);
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_crystals) {
     //    vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_forward.dat");
     vector<shape_t*> cryst = load_shapes(m_sap, ECLParts::forward);
@@ -244,6 +260,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     }
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_preamplifier) {
     for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); ++it) {
       G4Transform3D twc = G4Translate3D(0, 0, 3) * get_transform(*it);
@@ -254,12 +271,13 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     }
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_support_leg) {
     const G4VisAttributes* batt = att("iron");
 
-    G4VSolid* s1 = new G4Box("fwd_leg_p1", 130. / 2, 170. / 2, 40. / 2);
+    G4VSolid* s1 = new G4Box("fwd_leg_p1", 130. / 2, 170. / 2, (40. - milled_thickness) / 2);
     G4LogicalVolume* l1 = new G4LogicalVolume(s1, Materials::get("SUS304"), "l1", 0, 0, 0);
-    G4Transform3D t1 = G4Translate3D(0, 170. / 2, 40. / 2);
+    G4Transform3D t1 = G4Translate3D(0, 170. / 2, (40. - milled_thickness) / 2 + milled_thickness);
     l1->SetVisAttributes(batt);
 
     G4VSolid* s2 = new G4Box("fwd_leg_p2", 60. / 2, 130. / 2, 137. / 2);
@@ -279,9 +297,9 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     G4Transform3D t3 = G4Translate3D(0, 265. / 2 + 35, 40. + 137. + 75. / 2) * G4RotateY3D(-M_PI / 2);
     l3->SetVisAttributes(batt);
 
-    G4VSolid* s4 = new G4Box("fwd_leg_p4", 130. / 2, 5. / 2, 5. / 2);
+    G4VSolid* s4 = new G4Box("fwd_leg_p4", 130. / 2, 5. / 2, (5. + milled_thickness) / 2);
     G4LogicalVolume* l4 = new G4LogicalVolume(s4, Materials::get("SUS304"), "l4", 0, 0, 0);
-    G4Transform3D t4 = G4Translate3D(0, 170. - 5. / 2, -5. / 2);
+    G4Transform3D t4 = G4Translate3D(0, 170. - 5. / 2, (milled_thickness - 5.) / 2);
     l4->SetVisAttributes(batt);
 
     G4VSolid* s5 = new G4Box("fwd_leg_p5", 140. / 2, 130. / 2, 80. / 2);
@@ -323,8 +341,8 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     support_leg->AddPlacedVolume(l6, t6);
 
     for (int i = 0; i < 8; i++) {
-      G4Transform3D tp = G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4) * G4Translate3D(0, 1415 - 165 + 420. / 2,
-                         1960 + ZT + (97. + 160.) / 2) * G4Translate3D(0, -420. / 2, -(97. + 160.) / 2);
+      G4Transform3D tp =  G4Translate3D(0, 0, 1960) * G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4) *
+                          G4Translate3D(0, 1415 - 165 + 420. / 2, ZT + (97. + 160.) / 2) * G4Translate3D(0, -420. / 2, -(97. + 160.) / 2);
       support_leg->MakeImprint(top, tp, 0, overlap);
     }
 
@@ -344,6 +362,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
   }
 
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_support_structure_13) { // numbering scheme as in ECL-004K102.pdf page 13
 
     // Define one layer as one assembly volume
@@ -671,6 +690,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     acs->MakeImprint(innervolumesector_logical,  tr, 1, overlap);
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_support_structure_15) { // numbering scheme as in ECL-004K102.pdf page 15
     G4AssemblyVolume* acs = new G4AssemblyVolume();
 
@@ -809,6 +829,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     acs->AddPlacedVolume(lsolid10, tsolid10_p1);
     //      new G4PVPlacement(tsolid10_p1, lsolid10, "psolid10", crystalSectorLogical, false, 0, overlap);
 
+    // cppcheck-suppress knownConditionTrueFalse
     if (b_connectors) {
       double t = 2, h20 = 32;
       G4VSolid* solid_connector = new G4Box("fwd_solid_connector", (110 + 2 * 20) / 2, (250 + 2 * 20) / 2, h20 / 2);
@@ -873,6 +894,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
       for (int i = 0; i < 10; i++) place(lv8, G4Translate3D(0, 25 * (i - 4.5), -h20 / 2 + t + 30 / 2), i);
     }
 
+    // cppcheck-suppress knownConditionTrueFalse
     if (b_boards) {
       double hbv = 30;
       G4VSolid* solid_board = new G4Box("fwd_solid_board", (210) / 2, (110) / 2, hbv / 2);
@@ -978,6 +1000,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     acs->MakeImprint(innervolumesector_logical,  tr, 1, overlap);
   }// end of ECL-004K102.pdf page 15
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_cover) {
     G4VSolid* solid8_p1 = new G4Tubs("fwd_solid8_p1", RI + tand(13.12) * (434 + 1) - 20 / cosd(13.12), 1415, 1. / 2, -M_PI / 16,
                                      M_PI / 8);
@@ -1005,7 +1028,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     G4LogicalVolume* lsolid8 = new G4LogicalVolume(solid8, Materials::get("A5052"), "lsolid8", 0, 0, 0);
     lsolid8->SetVisAttributes(att("alum"));
     for (int i = 0; i < 8; i++) {
-      G4Transform3D tc = G4Translate3D(0, 0, 1960 + 3 + 434 + 0.5) * G4RotateZ3D(M_PI / 8 + i * M_PI / 4);
+      G4Transform3D tc = gTrans * G4Translate3D(0, 0, 3 + 434 + 0.5) * G4RotateZ3D(M_PI / 8 + i * M_PI / 4);
       new G4PVPlacement(tc * G4RotateZ3D(M_PI / 16), lsolid8, suf("cover", 0 + 2 * i), top, false, 0 + 2 * i, overlap);
       G4ReflectionFactory::Instance()->Place(tc * G4RotateZ3D(-M_PI / 16)*G4ReflectY3D(), suf("cover", 0 + 2 * i), lsolid8, top, false,
                                              1 + 2 * i, overlap);

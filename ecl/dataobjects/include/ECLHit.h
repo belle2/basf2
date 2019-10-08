@@ -76,12 +76,12 @@ namespace Belle2 {
     /*! Get average time (implementation of base class function)
      *  @return average time
      *  by Marko Staric */
-    float getGlobalTime() const { return m_TimeAve; }
+    float getGlobalTime() const override { return m_TimeAve; }
 
     /** Shift the Hit in time (needed for beam background mixing)
      * @param delta The value of the time shift.
      */
-    void shiftInTime(float delta) {  m_TimeAve += delta; }
+    void shiftInTime(float delta) override {  m_TimeAve += delta; }
 
 
   private:
@@ -90,7 +90,7 @@ namespace Belle2 {
     double m_Edep;      /**< deposited energy */
     double m_TimeAve;   /**< average time */
 
-    ClassDef(ECLHit, 4); /**< ClassDef */
+    ClassDefOverride(ECLHit, 4); /**< ClassDef */
 
   };
 

@@ -24,51 +24,77 @@
 
 namespace Belle2 {
 
+  /// TRGCDCLpav class
   class TRGCDCLpav : public TRGCDCLpar {
     // friend classes and functions
 
   public:
     // constants, enums and typedefs
 
-    // Constructors and destructor
+    /// Constructor
     TRGCDCLpav();
+    /// Destructor
     virtual ~TRGCDCLpav();
 
-    // member functions
+    /// member functions for calculation
     void calculate_average(void);
+    /// member functions for calculation
     void calculate_average3(void);
+    /// member functions for calculation
     void calculate_average(double x, double y, double w = 1);
+    /// member functions for calculation
     void calculate_average3(double x, double y, double w = 1);
+    /// member functions for calculation
     double calculate_lpar(void);
+    /// member functions for calculation
     double calculate_lpar3(void);
+    /// member functions for fit
     double fit();
+    /// member functions for fit
     double fit(double x, double y, double w = 1);
+    /// member functions for clear
     inline void clear();
+    /// member functions to add point
     void add_point(double x, double y, double w = 1);
+    /// member functions to add point
     void add_point_frac(double x, double y, double w, double f);
 
-    // const member functions
+    /// const member function nc
     double nc() const { return m_nc; }
+    /// const member function cov
     CLHEP::HepSymMatrix cov(int = 0) const;
+    /// const member function cov_c
     CLHEP::HepSymMatrix cov_c(int = 0) const;
+    /// const member function for extrapolation
     int extrapolate(double, double&, double&) const;
+    /// const member function similarity
     double similarity(double, double) const;
+    /// const member function for delta chisq
     double delta_chisq(double x, double y, double w = 1) const;
+    /// get chisq
     double chisq() const { return m_chisq; }
+    /// const member function prob
     double prob() const;
+    /// const member function chi_deg
     double chi_deg() const;
 
     // static member functions
 
-    // assignment operator(s)
+    /// assignment operator(s)
     inline const TRGCDCLpav& operator=(const TRGCDCLpav&);
+    /// assignment operator(s)
     const TRGCDCLpav& operator=(const TRGCDCLpar&);
+    /// assignment operator(s)
     const TRGCDCLpav& operator+=(const TRGCDCLpav&);
 
+    /// ostream operator
     friend std::ostream& operator<<(std::ostream& o, const TRGCDCLpav& s);
+    /// + operator
     friend TRGCDCLpav operator+(const TRGCDCLpav&, const TRGCDCLpav&);
-    class Singular {}; // exception class, no covarience matrix.
-    class Singular_c {}; // exception class, no covarience matrix_c
+    /// exception class, no covarience matrix.
+    class Singular {};
+    /// exception class, no covarience matrix_c
+    class Singular_c {};
 
   protected:
     // protected member functions
@@ -76,58 +102,87 @@ namespace Belle2 {
     // protected const member functions
 
   private:
-    // Constructors and destructor
+    /// Constructors and destructor
     inline TRGCDCLpav(const TRGCDCLpav&);
 
-    // comparison operators
+    /// comparison operators
     bool operator==(const TRGCDCLpav&) const;
+    /// comparison operators
     bool operator!=(const TRGCDCLpav&) const;
 
-    // private member functions
-    void add(double x, double y, double w = 1, double a = 0, double b = 0);
+    /// private member functions
+//    void add(double x, double y, double w = 1, double a = 0, double b = 0);
+    /// private member function sub
     void sub(double x, double y, double w = 1, double a = 0, double b = 0);
+    /// private member function calculate_average_n
     void calculate_average_n(double xxav, double yyav, double xyav,
                              double xrrav, double yrrav, double rrrrav);
+    /// private member function chisq
     double chisq(double chisq) { m_chisq = chisq; return m_chisq; }
+    /// private member function nc
     double nc(double nc) { m_nc = nc; return m_nc; }
+    /// private member function solve_lambda
     double solve_lambda(void);
+    /// private member function solve_lambda3
     double solve_lambda3(void);
 
     // private const member functions
 
-    // data members
+    /// data members
     double m_wsum;
+    /// data members
     double m_xsum;
+    /// data members
     double m_ysum;
+    /// data members
     double m_xxsum;
+    /// data members
     double m_yysum;
+    /// data members
     double m_xysum;
+    /// data members
     double m_xrrsum;
+    /// data members
     double m_yrrsum;
+    /// data members
     double m_rrrrsum;
 
+    /// data members
     double m_wsum_temp;
+    /// data members
     double m_xav;
+    /// data members
     double m_yav;
+    /// data members
     double m_xyavp;
 
+    /// data members
     double m_rscale;
+    /// data members
     double m_xxavp;
+    /// data members
     double m_yyavp;
+    /// data members
     double m_xrravp;
+    /// data members
     double m_yrravp;
+    /// data members
     double m_rrrravp;
+    /// data members
     double m_sinrot;
+    /// data members
     double m_cosrot;
 
+    /// data members
     double m_nc;
+    /// data members
     double m_chisq;
 
     // static data members
 
   };
 
-// inline function definitions
+/// inline function definitions
   inline const TRGCDCLpav& TRGCDCLpav::operator=(const TRGCDCLpav& lp)
   {
     TRGCDCLpar::operator=(lp);

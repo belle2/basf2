@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2014-2018 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Thomas Keck, Christian Pulvermacher                      *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #pragma once
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -75,19 +85,21 @@ namespace Belle2 {
      *  <h2>Python interface</h2>
      *  This class is exported to Python, and can be used to use variables in Python basf2 modules:
         \code
-        from variables import *
-        # for convenience, a Manager instance is already created (called 'variables')
+        from variables import variables
 
         from ROOT import TLorentzVector
         someParticle = Belle2.Particle(TLorentzVector(1.0, 0, 0, 0), 321)
         print(variables.evaluate('E', someParticle))
         \endcode
      *
-     *
-     *  \note You should probably also update this page if you add a useful function
-     *        https://confluence.desy.de/display/BI/Physics+ParticleSelectorFunctions
      */
     class Manager {
+      /**
+       * NOTE: the python interface is documented manually in analysis/doc/Variables.rst
+       * (because we use ROOT to expose this in python rather than boost::python).
+       *
+       * Please also keep that up-to-date with any modifications.
+       */
 
     public:
       /** functions stored take a const Particle* and return double. */
@@ -105,28 +117,32 @@ namespace Belle2 {
         std::string description; /**< Description of what this function does. */
         std::string group; /**< Associated group. */
         /** ctor */
-        VarBase(std::string n, std::string d, std::string g) : name(n), description(d), group(g) { }
+        VarBase(const std::string& n, const std::string& d, const std::string& g)
+          : name(n), description(d), group(g) { }
       };
 
       /** A variable returning a floating-point value for a given Particle. */
       struct Var : public VarBase {
         FunctionPtr function; /**< Pointer to function. */
         /** ctor */
-        Var(std::string n, FunctionPtr f, std::string d, std::string g = "") : VarBase(n, d, g), function(f) { }
+        Var(const std::string& n, FunctionPtr f, const std::string& d, const std::string& g = "")
+          : VarBase(n, d, g), function(f) { }
       };
 
       /** A variable taking additional floating-point arguments to influence the behaviour. */
       struct ParameterVar : public VarBase {
         ParameterFunctionPtr function; /**< Pointer to function. */
         /** ctor */
-        ParameterVar(std::string n, ParameterFunctionPtr f, std::string d, std::string g = "") : VarBase(n, d, g), function(f) { }
+        ParameterVar(const std::string& n, ParameterFunctionPtr f, const std::string& d, const std::string& g = "")
+          : VarBase(n, d, g), function(f) { }
       };
 
       /** A variable taking string arguments returning a variable. */
       struct MetaVar : public VarBase {
         MetaFunctionPtr function; /**< Pointer to function. */
         /** ctor */
-        MetaVar(std::string n, MetaFunctionPtr f, std::string d, std::string g = "") : VarBase(n, d, g), function(f) { }
+        explicit MetaVar(const std::string& n, MetaFunctionPtr f, const std::string& d, const std::string& g = "")
+          : VarBase(n, d, g), function(f) { }
       };
 
       /** get singleton instance. */
@@ -147,6 +163,11 @@ namespace Belle2 {
        * Return true if the alias was successfully added
        */
       bool addAlias(const std::string& alias, const std::string& variable);
+
+      /**
+       * Print existing aliases
+       */
+      void printAliases();
 
       /** Add collection
        * Return true if the collection was successfully added
@@ -171,11 +192,11 @@ namespace Belle2 {
       void setVariableGroup(const std::string& groupName);
 
       /** Register a variable. */
-      void registerVariable(const std::string& name, Manager::FunctionPtr f, const std::string& description);
+      void registerVariable(const std::string& name, const Manager::FunctionPtr& f, const std::string& description);
       /** Register a variable that takes floating-point arguments (see Variable::Manager::ParameterFunctionPtr). */
-      void registerVariable(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description);
+      void registerVariable(const std::string& name, const Manager::ParameterFunctionPtr& f, const std::string& description);
       /** Register a meta-variable that takes string arguments and returns a variable(see Variable::Manager::MetaFunctionPtr). */
-      void registerVariable(const std::string& name, Manager::MetaFunctionPtr f, const std::string& description);
+      void registerVariable(const std::string& name, const Manager::MetaFunctionPtr& f, const std::string& description);
 
       /** evaluate variable 'varName' on given Particle.
        *
@@ -187,6 +208,9 @@ namespace Belle2 {
 
       /** Return list of all variable names (in order registered). */
       std::vector<std::string> getNames() const;
+
+      /** Return a list of all variable alias names (in reverse order added). */
+      std::vector<std::string> getAliasNames() const;
 
       /** Abort with B2FATAL if name is not a valid name for a variable. */
       void assertValidName(const std::string& name);

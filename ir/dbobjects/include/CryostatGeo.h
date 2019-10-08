@@ -1,0 +1,43 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Luka Santelj                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#pragma once
+
+#include <ir/dbobjects/IRGeoBase.h>
+#include <framework/gearbox/GearDir.h>
+
+namespace Belle2 {
+
+  /**
+   * Geometry parameters of Cryostat
+   */
+  class CryostatGeo:  public IRGeoBase {
+
+  public:
+
+    /**
+     * Default constructor
+     */
+    CryostatGeo()
+    {}
+
+    /**
+     * Initialize from gearbox (xml file)
+     * @param content gearbox folder
+     */
+    void initialize(const GearDir& content);
+
+  private:
+
+    ClassDef(CryostatGeo, 1); /**< ClassDef */
+
+  };
+
+} // end namespace Belle2

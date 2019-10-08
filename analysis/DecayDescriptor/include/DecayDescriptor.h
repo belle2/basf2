@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef DECAYDESCRIPTOR_H
-#define DECAYDESCRIPTOR_H
+#pragma once
 
 #include <analysis/DecayDescriptor/DecayString.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
@@ -38,19 +37,40 @@ namespace Belle2 {
     /** Direct daughters of the decaying particle. */
     std::vector<DecayDescriptor> m_daughters;
     /** Ignore radiated photons? */
-    bool m_isIgnorePhotons;
+    bool m_isIgnoreRadiatedPhotons;
     /** Ignore intermediate particles or resonances? */
     bool m_isIgnoreIntermediate;
-    /** Is this decay inclusive? */
-    bool m_isInclusive;
+    /** Ignore missing massive final state particles? */
+    bool m_isIgnoreMassive;
+    /** Ignore missing neutrino? */
+    bool m_isIgnoreNeutrino;
+    /** Ignore missing gamma? */
+    bool m_isIgnoreGamma;
     /** Is this the NULL object? */
     bool m_isNULL;
     /** Internally called by match(Particle*) and match(MCParticle*) function. */
     template <class T>
     int match(const T* p, int iDaughter_p);
+    /** Collection of hierarchy pathes of selected particles.
+    Hierarchy path is vector of pairs of relative daughter numbers and particle names.
+    For instance, in decay
+    B+ -> [ D+ -> ^K+ pi0 ] pi0
+    decay path of K+ is
+    [(0, B), (0, D), (0 K)]
+    Every selected partcile has its own hierarchy path and
+    they are stored as a vector in this variable:
+    For the decayString
+    B+ -> [ D+ -> ^K+ pi0 ] ^pi0
+    m_hierarchy, once filled, is
+    [[(0, B), (0, D), (0, K)],
+    [(0, B), (1, pi0)]]
+    */
+    std::vector<std::vector<std::pair<int, std::string>>> m_hierarchy;
+
   public:
     /** Singleton object representing NULL. */
     const static DecayDescriptor& s_NULL;
+
     /** Dereference operator. */
     operator DecayDescriptor* ()
     {
@@ -58,8 +78,19 @@ namespace Belle2 {
     }
     /** Defaut ctor. */
     DecayDescriptor();
-    /** Copy ctor. */
-    DecayDescriptor(const DecayDescriptor& other);
+
+    /** Want the default copy ctor. */
+    DecayDescriptor(const DecayDescriptor&) = default;
+
+    /** Want the default assignment operator */
+    DecayDescriptor& operator=(const DecayDescriptor&) = default;
+
+    /** Function to get hierarchy of selected particles  and their names (for python use) */
+    std::vector<std::vector<std::pair<int, std::string>>>  getHierarchyOfSelected();
+
+    /** Helper function to get hierarchy of selected particles  and their names. Called iteratively and get hierarchy path of a particle as an argument */
+    std::vector<std::vector<std::pair<int, std::string>>>  getHierarchyOfSelected(const std::vector<std::pair<int, std::string>>&
+        currentPath);
 
     /** Initialise the DecayDescriptor from given string.
         Typically, the string is a parameter of an analysis module. */
@@ -108,20 +139,30 @@ namespace Belle2 {
     {
       return (i < getNDaughters()) ? &(m_daughters[i]) : NULL;
     }
-    /** Check if additional photons shall be ignored. */
-    bool isIgnorePhotons() const
+    /** Check if additional radiated photons shall be ignored. */
+    bool isIgnoreRadiatedPhotons() const
     {
-      return m_isIgnorePhotons;
+      return m_isIgnoreRadiatedPhotons;
     }
     /** Check if intermediate resonances/particles shall be ignored. */
     bool isIgnoreIntermediate() const
     {
       return m_isIgnoreIntermediate;
     }
-    /** Is the decay inclusive? */
-    bool isInclusive() const
+    /** Check if missing massive final state particles shall be ignored. */
+    bool isIgnoreMassive() const
     {
-      return m_isInclusive;
+      return m_isIgnoreMassive;
+    }
+    /** Check if missing neutrinos shall be ignored. */
+    bool isIgnoreNeutrino() const
+    {
+      return m_isIgnoreNeutrino;
+    }
+    /** Check if missing gammas shall be ignored. */
+    bool isIgnoreGamma() const
+    {
+      return m_isIgnoreGamma;
     }
 
     /** Is the decay or the particle self conjugated */
@@ -136,4 +177,3 @@ namespace Belle2 {
 
 }
 
-#endif // DECAYDESCRIPTOR_H

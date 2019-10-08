@@ -33,12 +33,12 @@ EventServerCallback::EventServerCallback()
   s_eventserver = this;
 }
 
-EventServerCallback::~EventServerCallback() throw()
+EventServerCallback::~EventServerCallback() noexcept
 {
 
 }
 
-void EventServerCallback::load(const DBObject&) throw(RCHandlerException)
+void EventServerCallback::load(const DBObject&)
 {
 
   // 1. Set execution directory
@@ -74,15 +74,15 @@ void EventServerCallback::load(const DBObject&) throw(RCHandlerException)
 
 }
 
-void EventServerCallback::start() throw(RCHandlerException)
+void EventServerCallback::start()
 {
 }
 
-void EventServerCallback::stop() throw(RCHandlerException)
+void EventServerCallback::stop()
 {
 }
 
-void EventServerCallback::abort() throw(RCHandlerException)
+void EventServerCallback::abort()
 {
   // Kill processes
   int status;
@@ -96,7 +96,7 @@ void EventServerCallback::abort() throw(RCHandlerException)
 
 }
 
-void EventServerCallback::recover(const DBObject&) throw(RCHandlerException)
+void EventServerCallback::recover(const DBObject&)
 {
 
 }

@@ -10,18 +10,10 @@
 
 #pragma once
 
-#include <iostream>
-#include <fstream>
 #include <utility>
 #include <map>
 #include <TObject.h>
-#include <TClonesArray.h>
 #include <TClass.h>
-
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-
-
 
 namespace Belle2 {
 
@@ -60,7 +52,7 @@ namespace Belle2 {
     virtual ~DBObjCalibrationConstMapBase();
 
     /// Get parameter value for given element and parameter number
-    virtual double get(baseType id, baseType param);;
+    virtual double get(baseType id, baseType param) const;
 
     /// Set parameter correction for given WireID and parameter number
     virtual void set(baseType id, baseType param, double value);;
@@ -69,7 +61,7 @@ namespace Belle2 {
     virtual double add(baseType id, baseType param, double value, bool subtractInsteadOfAdd = false);
 
     /// Write all elements' parameters' values to standard output
-    virtual void dump();
+    virtual void dump() const;
   private:
     ElementParameterMap m_constants; /**< Map of map of all calibration elements' constants */
 

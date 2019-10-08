@@ -46,15 +46,13 @@ InclusiveBtagReconstructionModule::InclusiveBtagReconstructionModule() : Module(
   addParam("inputListsNames", m_inputListsNames, "List of names of the ParticleLists which are used to reconstruct Btag from");
 }
 
-InclusiveBtagReconstructionModule::~InclusiveBtagReconstructionModule()
-{
-}
+InclusiveBtagReconstructionModule::~InclusiveBtagReconstructionModule() = default;
 
 void InclusiveBtagReconstructionModule::initialize()
 {
   StoreObjPtr<ParticleList> bsigList(m_bsigListName);
   bsigList.isRequired();
-  for (std::string inputListName : m_inputListsNames) {
+  for (const std::string& inputListName : m_inputListsNames) {
     StoreObjPtr<ParticleList> inputList(inputListName);
     inputList.isRequired();
   }
@@ -103,10 +101,10 @@ void InclusiveBtagReconstructionModule::event()
     for (const Particle* daughter : bsigFinalStateDaughters) {
       mdstSourcesOfBsigFinalStateDaughters.insert(daughter->getMdstSource());
     }
-    std::unordered_set<int>::iterator mdstSourcesEnd = mdstSourcesOfBsigFinalStateDaughters.end();
+    auto mdstSourcesEnd = mdstSourcesOfBsigFinalStateDaughters.end();
 
     // make a map of Btag daughters
-    for (std::string inputListName : m_inputListsNames) {
+    for (const std::string& inputListName : m_inputListsNames) {
       StoreObjPtr<ParticleList> inputList(inputListName);
       const unsigned int m = inputList->getListSize();
       for (unsigned j = 0; j < m; j++) {
@@ -114,16 +112,15 @@ void InclusiveBtagReconstructionModule::event()
         const std::vector<const Particle*>& particleFinalStateDaughters = particle->getFinalStateDaughters();
 
         // check if particle shares something with bsig...
-        int mdstSource;
         bool append = true;
         for (const Particle* daughter : particleFinalStateDaughters) {
-          mdstSource = daughter->getMdstSource();
+          int mdstSource = daughter->getMdstSource();
           if (mdstSourcesOfBsigFinalStateDaughters.find(mdstSource) != mdstSourcesEnd) {
             append = false;
             break;
           }
           if (append) {
-            std::map<int, std::vector<int>>::iterator it = btagDaughtersMap.find(mdstSource);
+            auto it = btagDaughtersMap.find(mdstSource);
             if (it != btagDaughtersMap.end()) { // check for mdstSource overlaps
               it->second.push_back(particle->getArrayIndex());
             } else {
@@ -147,7 +144,7 @@ void InclusiveBtagReconstructionModule::event()
       for (int index : daughterIndices) {
         // check if there are non-final-state particles. If yes, the momentum should be added just once.
         if ((particles[index]->getFinalStateDaughters()).size() > 1) {
-          std::map<int, size_t>::iterator it = nonFinalStateIndicesCount.find(index);
+          auto it = nonFinalStateIndicesCount.find(index);
           if (it != nonFinalStateIndicesCount.end()) {
             nonFinalStateIndicesCount[index]++;
             continue;
@@ -159,8 +156,8 @@ void InclusiveBtagReconstructionModule::event()
       }
       // check the number of the daughters to make sure that the not-final-state particles are not mixed with the other particles that come from the same mdstSource
       bool rightDaughtersCount = true;
-      for (std::map<int, size_t>::iterator it = nonFinalStateIndicesCount.begin(); it != nonFinalStateIndicesCount.end(); ++it) {
-        if (it->second != (particles[(it->first)]->getFinalStateDaughters()).size()) {
+      for (auto& it : nonFinalStateIndicesCount) {
+        if (it.second != (particles[(it.first)]->getFinalStateDaughters()).size()) {
           rightDaughtersCount = false;
           break;
         }

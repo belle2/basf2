@@ -7,10 +7,10 @@
 #include <framework/core/InputController.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/EventProcessor.h>
+#include <framework/pcore/GlobalProcHandler.h>
 
 #include <vector>
 
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
 #include <cstdio>
@@ -19,7 +19,6 @@
 #include <cstring>
 #include <unistd.h>
 #include <Python.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -194,9 +193,10 @@ ProcHandler::ProcHandler(unsigned int nWorkerProc, bool markChildrenAsLocal):
   //s_pidVector size shouldn't be changed once processes are forked (race condition)
   s_pidVector.reserve(s_pidVector.size() + nWorkerProc + 2);
   s_pids = s_pidVector.data();
+  setsid();
 
 }
-ProcHandler::~ProcHandler() { }
+ProcHandler::~ProcHandler() = default;
 
 
 void ProcHandler::startInputProcess()
@@ -218,13 +218,13 @@ void ProcHandler::startOutputProcess()
     s_processID = 20000;
 }
 
-bool ProcHandler::parallelProcessingUsed() { return s_processID != -1; }
+bool ProcHandler::parallelProcessingUsed() { return s_processID != -1 or GlobalProcHandler::parallelProcessingUsed(); }
 
-bool ProcHandler::isInputProcess() { return (s_processID >= 10000 and s_processID < 20000); }
+bool ProcHandler::isInputProcess() { return (s_processID >= 10000 and s_processID < 20000) or GlobalProcHandler::isInputProcess(); }
 
-bool ProcHandler::isWorkerProcess() { return (parallelProcessingUsed() and s_processID < 10000); }
+bool ProcHandler::isWorkerProcess() { return (parallelProcessingUsed() and s_processID < 10000) or GlobalProcHandler::isWorkerProcess(); }
 
-bool ProcHandler::isOutputProcess() { return s_processID >= 20000; }
+bool ProcHandler::isOutputProcess() { return s_processID >= 20000 or GlobalProcHandler::isOutputProcess(); }
 
 int ProcHandler::numEventProcesses()
 {

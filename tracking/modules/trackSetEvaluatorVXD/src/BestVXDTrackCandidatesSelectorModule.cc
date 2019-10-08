@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include "tracking/modules/trackSetEvaluatorVXD/BestVXDTrackCandidatesSelectorModule.h"
-#include <framework/logging/Logger.h>
 #include <vector>
 #include <numeric>
 
@@ -20,7 +19,7 @@ REG_MODULE(BestVXDTrackCandidatesSelector)
 
 BestVXDTrackCandidatesSelectorModule::BestVXDTrackCandidatesSelectorModule() : Module()
 {
-  setDescription("Module that selects a subset with a fixed size x out of all SpacePointTrackCandidates. Based on qualityIndex.");
+  setDescription("Module that selects a subset with a fixed size x out of all SpacePointTrackCandidates. Based on qualityIndicator.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
 
@@ -96,8 +95,9 @@ std::vector<int> BestVXDTrackCandidatesSelectorModule::getSortedTrackCandIndices
 
   std::sort(sortedTrackCandIndices.begin(), sortedTrackCandIndices.end(),
   [this, increasing](const int lhs, const int rhs) {
-    if (increasing) return m_spacePointTrackCands[lhs]->getQualityIndex() < m_spacePointTrackCands[rhs]->getQualityIndex();
-    else return m_spacePointTrackCands[lhs]->getQualityIndex() > m_spacePointTrackCands[rhs]->getQualityIndex();
+    if (increasing) return m_spacePointTrackCands[lhs]->getQualityIndicator() <
+                             m_spacePointTrackCands[rhs]->getQualityIndicator();
+    else return m_spacePointTrackCands[lhs]->getQualityIndicator() > m_spacePointTrackCands[rhs]->getQualityIndicator();
   });
 
   return sortedTrackCandIndices;

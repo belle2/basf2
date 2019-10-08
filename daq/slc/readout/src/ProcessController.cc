@@ -8,10 +8,12 @@
 #include "daq/slc/system/LogFile.h"
 
 #include "daq/slc/base/StringUtil.h"
+#include <daq/slc/system/LockGuard.h>
 
 #include <cstdlib>
 #include <cstdio>
 #include <unistd.h>
+
 
 using namespace Belle2;
 
@@ -23,7 +25,7 @@ bool ProcessController::init(const std::string& parname, int nodeid)
   if (!m_info.open(m_name + "_" + m_parname, nodeid, true)) {
     return false;
   }
-  m_callback->add(new NSMVHandlerInt(m_parname + ".pid", true, false, 0));
+  m_callback->add(new NSMVHandlerInt(m_parname + ".pid", true, false, 0), false, false);
   return true;
 }
 
@@ -32,7 +34,7 @@ void ProcessController::clear()
   m_info.clear();
 }
 
-bool ProcessController::waitReady(int timeout) throw()
+bool ProcessController::waitReady(int timeout)
 {
   if (!m_info.waitReady(timeout)) {
     return false;
@@ -45,15 +47,14 @@ bool ProcessController::load(int timeout)
   m_info.clear();
   m_process.cancel();
   m_process.kill(SIGQUIT);
-  int iopipe[2];
-  if (pipe(iopipe) < 0) {
+  if (pipe(m_iopipe) < 0) {
     perror("pipe");
     return false;
   }
-  m_process = Process(new ProcessSubmitter(this, iopipe));
-  PThread(new LogListener(this, iopipe));
-  PThread(new ProcessListener(this));
-  close(iopipe[1]);
+  m_process = Process(new ProcessSubmitter(this, m_iopipe));
+  m_th_log = PThread(new LogListener(this, m_iopipe));
+  m_th_process = PThread(new ProcessListener(this));
+  //close(iopipe[1]);
   if (timeout > 0) {
     if (!m_info.waitReady(timeout)) {
       throw (RCHandlerException("Failed to boot " + m_parname));
@@ -66,23 +67,21 @@ bool ProcessController::load(int timeout)
 
 bool ProcessController::start(int expno, int runno)
 {
-  m_info.lock();
+  GenericLockGuard<RunInfoBuffer> lockGuard(m_info);
   m_info.setExpNumber(expno);
   m_info.setRunNumber(runno);
   m_info.setSubNumber(0);
   /*
   if (m_info.getState() != RunInfoBuffer::RUNNING) {
-    m_info.unlock();
     throw (RCHandlerException(m_parname + " is not running"));
   }
   */
-  m_info.unlock();
   return true;
 }
 
 bool ProcessController::stop()
 {
-  m_info.lock();
+  GenericLockGuard<RunInfoBuffer> lockGuard(m_info);
   m_info.setExpNumber(0);
   m_info.setRunNumber(0);
   m_info.setSubNumber(0);
@@ -90,31 +89,28 @@ bool ProcessController::stop()
   m_info.setInputNBytes(0);
   m_info.setOutputCount(0);
   m_info.setOutputNBytes(0);
-  m_info.unlock();
   return true;
 }
 
 bool ProcessController::pause()
 {
-  m_info.lock();
+  GenericLockGuard<RunInfoBuffer> lockGuard(m_info);
   if (m_info.isRunning()) {
     m_info.setState(RunInfoBuffer::PAUSING);
   } else {
     LogFile::warning("Process is not running. Pause request was ignored.");
   }
-  m_info.unlock();
   return true;
 }
 
 bool ProcessController::resume()
 {
-  m_info.lock();
+  GenericLockGuard<RunInfoBuffer> lockGuard(m_info);
   if (m_info.isPaused()) {
     m_info.setState(RunInfoBuffer::RESUMING);
   } else {
     LogFile::warning("Process is not paused. Resume request was ignored.");
   }
-  m_info.unlock();
   return true;
 }
 
@@ -123,12 +119,17 @@ bool ProcessController::abort()
   m_info.clear();
   m_process.kill(SIGINT);
   if (getExecutable() == "basf2") {
-    usleep(10000);
+    usleep(100000);
     m_process.kill(SIGQUIT);
     m_process.kill(SIGKILL);
   }
   if (m_callback != NULL)
     m_callback->set(m_parname + ".pid", -1);
+  m_process.wait();
+  m_th_log.cancel();
+  m_th_process.cancel();
+  close(m_iopipe[1]);
+  close(m_iopipe[0]);
   return true;
 }
 

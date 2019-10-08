@@ -24,22 +24,22 @@ namespace Belle2 {
     friend class NSMCallback;
 
   public:
-    AbstractNSMCallback(int timeout) throw();
-    virtual ~AbstractNSMCallback() throw() {}
+    AbstractNSMCallback(int timeout);
+    virtual ~AbstractNSMCallback() {}
 
   public:
     int addDB(const DBObject& obj);
-    bool get(const NSMNode& node, const std::string& name, int& val, int timeout = 5) throw(IOException);
-    bool get(const NSMNode& node, const std::string& name, float& val, int timeout = 5) throw(IOException);
-    bool get(const NSMNode& node, const std::string& name, std::string& val, int timeout = 5) throw(IOException);
-    bool get(const NSMNode& node, const std::string& name, std::vector<int>& val, int timeout = 5) throw(IOException);
-    bool get(const NSMNode& node, const std::string& name, std::vector<float>& val, int timeout = 5) throw(IOException);
-    bool set(const NSMNode& node, const std::string& name, int val, int timeout = 5) throw(IOException);
-    bool set(const NSMNode& node, const std::string& name, float val, int timeout = 5) throw(IOException);
-    bool set(const NSMNode& node, const std::string& name, const std::string& val, int timeout = 5) throw(IOException);
-    bool set(const NSMNode& node, const std::string& name, const std::vector<int>& val, int timeout = 5) throw(IOException);
-    bool set(const NSMNode& node, const std::string& name, const std::vector<float>& val, int timeout = 5) throw(IOException);
-    bool get(const NSMNode& node, NSMVHandler* handler, int timeout = 5) throw(IOException);
+    bool get(const NSMNode& node, const std::string& name, int& val, int timeout = 5);
+    bool get(const NSMNode& node, const std::string& name, float& val, int timeout = 5);
+    bool get(const NSMNode& node, const std::string& name, std::string& val, int timeout = 5);
+    bool get(const NSMNode& node, const std::string& name, std::vector<int>& val, int timeout = 5);
+    bool get(const NSMNode& node, const std::string& name, std::vector<float>& val, int timeout = 5);
+    bool set(const NSMNode& node, const std::string& name, int val, int timeout = 5);
+    bool set(const NSMNode& node, const std::string& name, float val, int timeout = 5);
+    bool set(const NSMNode& node, const std::string& name, const std::string& val, int timeout = 5);
+    bool set(const NSMNode& node, const std::string& name, const std::vector<int>& val, int timeout = 5);
+    bool set(const NSMNode& node, const std::string& name, const std::vector<float>& val, int timeout = 5);
+    bool get(const NSMNode& node, NSMVHandler* handler, int timeout = 5);
     bool get(DBObject& obj);
     bool get(const std::string& name, int& val) { return get("", name, val); }
     bool get(const std::string& name, float& val) { return get("", name, val); }
@@ -61,23 +61,21 @@ namespace Belle2 {
     bool set(const std::string& node, const std::string& name, const std::string& val) { return set_t(node, name, val); }
     bool set(const std::string& node, const std::string& name, const std::vector<int>& val) { return set_t(node, name, val); }
     bool set(const std::string& node, const std::string& name, const std::vector<float>& val) { return set_t(node, name, val); }
-    int wait(double timeout = 5) throw(IOException);
-
-  protected:
+    int wait(double timeout = 5);
     NSMCommunicator& wait(const NSMNode& node, const NSMCommand& cmd,
-                          double timeout = 5) throw(IOException);
-    virtual void notify(const NSMVar& var) throw() = 0;
-    bool try_wait() throw();
+                          double timeout = 5);
+    virtual void notify(const NSMVar& var) = 0;
+    bool try_wait();
 
   public:
-    NSMNode& getNode() throw() { return m_node; }
-    const NSMNode& getNode() const throw() { return m_node; }
-    void setNode(const NSMNode& node) throw() { m_node = node; }
+    NSMNode& getNode() { return m_node; }
+    const NSMNode& getNode() const { return m_node; }
+    void setNode(const NSMNode& node) { m_node = node; }
     int getTimeout() const { return m_timeout; }
     void setTimeout(int timeout) { m_timeout = timeout; }
 
   protected:
-    virtual bool perform(NSMCommunicator& com) throw() = 0;
+    virtual bool perform(NSMCommunicator& com) = 0;
     void readVar(const NSMMessage& msg, NSMVar& var);
 
   private:
@@ -86,13 +84,13 @@ namespace Belle2 {
     NSMNodeMapMap m_node_v_m;
 
   public:
-    bool get(const NSMNode& node, NSMVar& var, int timeout = 5)  throw(IOException);
-    bool set(const NSMNode& node, const NSMVar& var, int timeout = 5) throw(IOException);
+    bool get(const NSMNode& node, NSMVar& var, int timeout = 5) ;
+    bool set(const NSMNode& node, const NSMVar& var, int timeout = 5);
 
   private:
     template<typename T>
     bool get_t(const NSMNode& node, const std::string& name,
-               T& val, int timeout, NSMVar::Type type = NSMVar::NONE, int len = 0) throw(IOException)
+               T& val, int timeout, NSMVar::Type type = NSMVar::NONE, int len = 0)
     {
       NSMVar var(name);
       var.setNode(node.getName());
@@ -110,34 +108,25 @@ namespace Belle2 {
     template<typename T>
     bool get_t(const std::string& node, const std::string& name, T& val)
     {
-      for (size_t i = 0; i < m_handler.size(); i++) {
-        if (node == m_handler[i]->getNode() &&
-            name == m_handler[i]->getName()) {
-          NSMVar var;
-          m_handler[i]->handleGet(var);
-          var >> val;
-          return true;
-        }
+      NSMVHandler* handler = getHandler_p(node, name);
+      if (handler) {
+        NSMVar var;
+        handler->handleGet(var);
+        var >> val;
+        return true;
       }
       return false;
     }
     template<typename T>
     bool set_t(const std::string& node, const std::string& name, const T& val)
     {
-      for (size_t i = 0; i < m_handler.size(); i++) {
-        if (node == m_handler[i]->getNode() &&
-            name == m_handler[i]->getName()) {
-          try {
-            m_handler[i]->set(val);
-            if (node.size() == 0) {
-              m_handler[i]->get().setNode(getNode().getName());
-              notify(m_handler[i]->get());
-            }
-            return true;
-          } catch (const std::bad_cast& e) {
-            return false;
-          }
+      NSMVHandler* handler = getHandler_p(node, name);
+      if (handler) {
+        handler->set(val);
+        if (node.size() == 0) {
+          notify(handler->get());
         }
+        return true;
       }
       return false;
     }

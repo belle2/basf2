@@ -254,13 +254,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Nominal time-to-digit conversion parameters") const;
+    void print(const std::string& title = "Nominal time-to-digit conversion parameters") const override;
 
 
   private:
@@ -282,7 +282,7 @@ namespace Belle2 {
     unsigned m_adcBits = 12; /**< number of ADC bits */
     int m_averagePedestal = 0; /**< average of pedestals [ADC bins] */
 
-    ClassDef(TOPNominalTDC, 3); /**< ClassDef */
+    ClassDefOverride(TOPNominalTDC, 3); /**< ClassDef */
 
   };
 

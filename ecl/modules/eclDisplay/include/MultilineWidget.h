@@ -8,12 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef MULTILINE_WIDGET
-#define MULTILINE_WIDGET
+#pragma once
 
+//STL
 #include <vector>
-#include <TGLabel.h>
+
+//Root
 #include <TGFrame.h>
+
+class TGLabel;
 
 namespace Belle2 {
   /**
@@ -62,5 +65,3 @@ namespace Belle2 {
     void addLine(const char* text = 0);
   };
 }
-
-#endif // MULTILINE_WIDGET

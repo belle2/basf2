@@ -28,8 +28,6 @@ using std::sin;
 using std::cos;
 using std::sqrt;
 
-#include <iostream>
-
 //root stuff
 #include <TRandom.h>
 

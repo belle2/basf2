@@ -56,8 +56,7 @@ whitespace, comma or semi-colon -->
 <zBase unit="cm">50,50</zBase>
 <!--110, 111, 140, 139 -->
 <lbgoBeamv unit="cm">92.837</lbgoBeamv>
-<!--xbgoBeamv unit="cm">19.428999954,-16.971000046,19.428999954,-16.971000046</xbgoBeamv-->
-<xbgoBeamv unit="cm">19.428999954,-17.971000046,19.428999954,-17.971000046</xbgoBeamv>
+<xbgoBeamv unit="cm">19.428999954,-16.971000046,19.428999954,-16.971000046</xbgoBeamv>
 <!-- (69.17375-29.77325)/2. -->
 <ybgoBeamv unit="cm">-19.7002,-19.7002,-19.7002,-19.7002</ybgoBeamv>
 <zbgoBeamv unit="cm">34.94625,34.94625,-20.00875,-20.00875</zbgoBeamv>
@@ -84,14 +83,12 @@ whitespace, comma or semi-colon -->
 <!-- 803-->
 <lfangsBeamhf unit="cm">63.0</lfangsBeamhf>
 <xfangsBeamhf unit="cm">40.</xfangsBeamhf>
-<!--yfangsBeamhf unit="cm">17.1941948963</yfangsBeamhf-->
-<yfangsBeamhf unit="cm">65</yfangsBeamhf>
+<yfangsBeamhf unit="cm">17.1941948963</yfangsBeamhf>
 <zfangsBeamhf unit="cm">212.6</zfangsBeamhf>
 <!-- 804-->
 <lfangsBeamhb unit="cm">158.258</lfangsBeamhb>
 <xfangsBeamhb unit="cm">-7.43625</xfangsBeamhb>
 <yfangsBeamhb unit="cm">30.0</yfangsBeamhb>
-<!--yfangsBeamhb unit="cm">65.0</yfangsBeamhb-->
 <zfangsBeamhb unit="cm">-111.466</zfangsBeamhb>      
 </Active>
 </Content>

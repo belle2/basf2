@@ -11,7 +11,7 @@ extern "C" {
 /* -- version info */
 
 #define NSM_PROTOCOL_VERSION 1944 /* protocol version */
-#define NSM_PACKAGE_VERSION  1958 /* package  version */
+#define NSM_PACKAGE_VERSION  1995 /* package  version */
 
 /*
   20120723 1900 file created
@@ -60,17 +60,46 @@ extern "C" {
   20150808 1945 updates for PNNL summer school tutorial
   20160420 1946 suppress debug output of nsmd2 and b2lib
   20170613 1947 nsmd2 update for USRCPYMEM protection
-  20170927 1948 nsmd2 touchsys pos fix, log cleanup for send/recv
-  20170929 1949 nsmd2 ackdaemon fix
-  20170102 1950 nsmd2 ackdaemon more fix
-  20171002 1951 nsmd2 destroyconn/ackdaemon fix
-  20171002 1952 nsmd2 recv buffer to global
-  20180111 1953 debug orphan node
-  20180118 1954 nsmlib fix on select timeout, conid fix, message cleanup
-  20180118 1955 put more priority to less frequent messages
-  20180120 1956 b2nsm_wait to accept usec precision time
-  20180121 1957 b2nsm_nodename added
-  20180124 1958 smarter nsmd2 debug messages
+  20180326 1959 based on 1947, just change the handling of -o option
+  20180327 1960 delconn/touchsys fix, better log, nsminfo2 hostname
+  20180328 1961 limit syscpymem.pos in uint16 range
+  20180329 1962 nsmlib.h fix for nsmlib_parsefile type
+  20180404 1963 nsminfo2 no hostname resolving by default
+  20180412 1964 one more nsminfo2 update on hostname cache
+  20180417 1965 suppress "bad" in usrcpymem if not ready
+  20180423 1966 destroyconn when write error at tcpwriteq
+  20180430 1967 src/dest at command and lastmsg at delconn for debug
+  20180502 1968 fix nsmd_dbg of 1967 printing all DBG messages
+  20180504 1969 b2nsm_nodename restored from 1957
+  20180515 1970 int16_t fix for owner in usrcpymem
+  20180519 1971 tcprecv static buffer shift upon delcon
+  20180521 1972 further debug of 1971
+  20180523 1973 nsminfo2 usage print
+  20180709 1974 nsmlib memory leak fix, etc, nsmd2 is rolled back to 1970
+  20180711 1975 nsmlib update again
+  20180801 1976 nsmd2 for better shm handling, b2nsm_term (experimental)
+  20180802 1977 example update, shmget fix, pipe close, USRCPYMEM delay
+  20180811 1978 fix prio, ready, forward, etc for master switch
+  20180815 1979 nsmd2 fix conid on master, nsminfo2 -X fix
+  20180815 1980 nsmd2 partial fix of node already exists
+  20180815 1981 nsmd2 hopefully final fix of node already exists
+  20180820 1982 nsmd2 kill HUP when connection is closed
+  20180820 1983 nsmd2 tcprecv local conid shift upon delcon, c++example added
+  20180822 1984 nsmd2 quick patch to avoid kill 0 HUP
+  20180823 1985 nsmd2 debug for tcprecv assert
+  20180824 1986 nsmd2 tcprecv debug continue, localtime => localtime_r
+  20180826 1987 nsmd2 tcprecv debug done, nsmd_localtime_r, verbose log
+  20180826 1988 nsmd2 code cleanup and suppress log for release version
+  20180902 1989 c++example fix, simplest.cc is added
+  20180927 1990 nsmd2 another orphan node fix, b2lib fixes
+  20181009 1991 restoring 1970 and cope with 1978 gen/prio fix
+  20181029 1992 double free bug fix
+  20181029 1993 experimental: do not die in do_delclient bad ip
+  20190415 1994 add: NSMESHMNOSYS, NSMESHMACCMEM, nsmc->errn
+  20190524 1994 mod: NSMENODEST, shm handling, nodeproc, makefile
+  20190524 1995 add: nsmstat2, fix: nsmd2 ocnt/osiz/otim
+  20190529 1994 fix: nsmlib2.c null sysp handling
+  20190529 1995 merge: fix in 1994
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */
@@ -126,7 +155,7 @@ typedef struct NSMcontext_struct NSMcontext;
 #define NSMEINVPAR    (-3) /* invalid parameter(s) */
 #define NSMENODEEXIST (-4) /* node already exist */
 #define NSMEFULNODE   (-5) /* no more NSM node */
-#define NSMENODEST    (-6) /* destination node is gone */
+#define NSMENODEST    (-6) /* destination node does not exist */
 #define NSMEINVFMT    (-7) /* invalid data format */
 #define NSMEMEMEXIST  (-8) /* data already exists */
 #define NSMENOMOREMEM (-9) /* no more data area */
@@ -157,6 +186,9 @@ typedef struct NSMcontext_struct NSMcontext;
 #define NSMEPARSE     (-34) /* data format parse error (openmem) */
 #define NSMECONNECT   (-35) /* connection error */
 #define NSMEINVPTR    (-36) /* invalid data pointer */
+#define NSMESHMNOSYS  (-37) /* ESHMGETSYS and ENOENT */
+#define NSMESHMACCES  (-38) /* ESHMGETMEM and EACCES */
+#define NSMEEMPTYDEST (-39) /* empty string for destination node */
 
 /* NSMmsg (in host byte order) */
 typedef struct {

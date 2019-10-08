@@ -12,13 +12,9 @@
 #define CLAWSDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
-#include <string>
+#include <framework/datastore/StoreArray.h>
+#include <beast/claws/dataobjects/ClawsHit.h>
 #include <vector>
-
-//ROOT
-#include <TRandom3.h>
-#include <TF1.h>
-#include <TVector3.h>
 
 /** size of hit */
 const Int_t MAXSIZE         = 10000;
@@ -46,21 +42,22 @@ namespace Belle2 {
       virtual ~ClawsDigitizerModule();
 
       /**  */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /**  */
-      virtual void beginRun();
+      virtual void beginRun() override;
 
       /**  */
-      virtual void event();
+      virtual void event() override;
 
       /**  */
-      virtual void endRun();
+      virtual void endRun() override;
       /**  */
-      virtual void terminate();
+      virtual void terminate() override;
 
 
     private:
+      StoreArray<ClawsHit> m_clawsHit; /** Array for ClawsHit */
 
       /** reads data from CLAWS.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();

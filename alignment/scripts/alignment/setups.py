@@ -125,7 +125,7 @@ def setup_Global():
 
 def setup_BeamVertex():
     millepede = setup_default()
-    millepede.set_components(['BeamParameters'])
+    millepede.set_components(['BeamSpot'])
     return millepede
 
 

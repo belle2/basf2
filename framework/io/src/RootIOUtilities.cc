@@ -13,10 +13,6 @@
 
 #include <wordexp.h>
 
-#include <algorithm>
-
-
-using namespace std;
 using namespace Belle2;
 
 const std::string RootIOUtilities::c_treeNames[] = { "tree", "persistent" };
@@ -25,24 +21,27 @@ const std::string RootIOUtilities::c_SteerExcludeBranchNames[] = { "excludeBranc
 const std::string RootIOUtilities::c_SteerAdditionalBranchNames[] = { "additionalBranchNames", "additionalBranchNamesPersistent" };
 
 std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string>& branchesToFilter,
-                                                      const std::vector<std::string>& branches, const std::vector<std::string>& excludeBranches, int durability)
+                                                      const std::vector<std::string>& branches,
+                                                      const std::vector<std::string>& excludeBranches, int durability, bool quiet)
 {
-  set<string> branchSet, excludeBranchSet;
-  for (string b : branches) {
-    if (branchesToFilter.count(b) == 0)
+  std::set<std::string> branchSet, excludeBranchSet;
+  for (const std::string& b : branches) {
+    if (branchesToFilter.count(b) == 0 and not quiet)
       B2WARNING("The branch " << b << " given in " << c_SteerBranchNames[durability] << " does not exist.");
-    if (!branchSet.insert(b).second)
+    if (!branchSet.insert(b).second and not quiet)
       B2WARNING(c_SteerBranchNames[durability] << " has duplicate entry " << b);
   }
-  for (string b : excludeBranches) {
-    if (branchesToFilter.count(b) == 0)
+  for (const std::string& b : excludeBranches) {
+    // FIXME: ProcessStatistics is excluded by default but not always present. We should switch that to not write it out
+    // in the first place but the info message is meaningless for almost everyone
+    if (branchesToFilter.count(b) == 0 and not quiet and b != "ProcessStatistics")
       B2INFO("The branch " << b << " given in " << c_SteerExcludeBranchNames[durability] << " does not exist.");
-    if (!excludeBranchSet.insert(b).second)
+    if (!excludeBranchSet.insert(b).second and not quiet)
       B2WARNING(c_SteerExcludeBranchNames[durability] << " has duplicate entry " << b);
   }
 
-  set<string> out, relations, excluderelations;
-  for (string branch : branchesToFilter) {
+  std::set<std::string> out, relations, excluderelations;
+  for (const std::string& branch : branchesToFilter) {
     if (excludeBranchSet.count(branch))
       continue;
     if (branchSet.empty() or branchSet.count(branch))
@@ -50,9 +49,9 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
   }
   if (!excludeBranchSet.empty()) {
     //remove relations for excluded things
-    for (string from : branchesToFilter) {
-      for (string to : branchesToFilter) {
-        string branch = DataStore::relationName(from, to);
+    for (const std::string& from : branchesToFilter) {
+      for (const std::string& to : branchesToFilter) {
+        std::string branch = DataStore::relationName(from, to);
         if (out.count(branch) == 0)
           continue; //not selected
         if (excludeBranchSet.count(from) == 0 and excludeBranchSet.count(to) == 0)
@@ -62,14 +61,14 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
         excluderelations.insert(branch);
       }
     }
-    for (string rel : excluderelations) {
+    for (const std::string& rel : excluderelations) {
       out.erase(rel);
     }
   }
   //add relations between accepted branches
-  for (string from : out) {
-    for (string to : out) {
-      string branch = DataStore::relationName(from, to);
+  for (const std::string& from : out) {
+    for (const std::string& to : out) {
+      std::string branch = DataStore::relationName(from, to);
       if (branchesToFilter.count(branch) == 0)
         continue; //not in input
       if (excludeBranchSet.count(branch))
@@ -83,10 +82,10 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
 
 std::vector<std::string> RootIOUtilities::expandWordExpansions(const std::vector<std::string>& filenames)
 {
-  vector<string> out;
+  std::vector<std::string> out;
   wordexp_t expansions;
   wordexp("", &expansions, 0);
-  for (const string& pattern : filenames) {
+  for (const std::string& pattern : filenames) {
     if (wordexp(pattern.c_str(), &expansions, WRDE_APPEND | WRDE_NOCMD | WRDE_UNDEF) != 0) {
       B2ERROR("Failed to expand pattern '" << pattern << "'!");
     }
@@ -133,7 +132,7 @@ bool RootIOUtilities::hasStreamer(const TClass* cl)
     // version number == 0 means no streamers for this class, check base classes
     TList* baseClasses = const_cast<TClass*>(cl)->GetListOfBases(); //method might update an internal cache, but is const otherwise
     TIter it(baseClasses);
-    while (TBaseClass* base = static_cast<TBaseClass*>(it())) {
+    while (auto* base = static_cast<TBaseClass*>(it())) {
       if (hasStreamer(base->GetClassPointer()))
         return true;
     }
@@ -151,27 +150,11 @@ bool RootIOUtilities::hasCustomStreamer(const TClass* cl)
   return cl->TestBit(TClass::kHasCustomStreamerMember);
 }
 
-void RootIOUtilities::loadDictionaries()
-{
-  static bool loaded = false;
-  if (loaded)
-    return;
-
-  gSystem->Load("libdataobjects");
-  gSystem->Load("libTreePlayer");
-  gSystem->Load("libgenfit2");    // Because genfit2 classes need custom streamers.
-  gSystem->Load("libvxd");
-  gSystem->Load("libsvd");
-  gSystem->Load("libpxd");
-  gSystem->Load("libcdc");
-  loaded = true;
-}
-
 void RootIOUtilities::setCreationData(FileMetaData& metadata)
 {
   std::string site;
   char date[100];
-  auto now = time(0);
+  auto now = time(nullptr);
   strftime(date, 100, "%Y-%m-%d %H:%M:%S", gmtime(&now));
   const char* belle2_site = getenv("BELLE2_SITE");
   if (belle2_site) {

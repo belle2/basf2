@@ -3,7 +3,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/VariableManager/Variables.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>

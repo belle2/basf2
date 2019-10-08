@@ -52,7 +52,8 @@ namespace Belle2 {
     double GetEventTiming02();
     //! Set # of  considered TC  in Energy weighted timing method.
     void SetNofTopTC(int NtopTC) {NofTopTC = NtopTC;}
-
+    //! Get Timing Source
+    int GetTimingSource() {return Source;}
   private:
     //! TC Energy
     std::vector<double> TCEnergy;
@@ -65,6 +66,8 @@ namespace Belle2 {
     int NofTopTC;
     /** Object of TC Mapping */
     TrgEclMapping* _TCMap;
+    //! Timing Source (FWD, Barrel, Backward)
+    int Source;
   };
 //
 //

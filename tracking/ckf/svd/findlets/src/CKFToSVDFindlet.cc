@@ -17,17 +17,12 @@
 #include <tracking/ckf/general/findlets/TreeSearcher.icc.h>
 #include <tracking/ckf/general/findlets/OverlapResolver.icc.h>
 #include <tracking/ckf/general/findlets/StateRejecter.icc.h>
-#include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
-#include <tracking/ckf/general/findlets/LimitedOnStateApplier.icc.h>
-#include <tracking/ckf/general/findlets/LayerToggledApplier.icc.h>
 #include <tracking/ckf/general/findlets/ResultStorer.icc.h>
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 #include <tracking/ckf/svd/filters/relations/LayerSVDRelationFilter.icc.h>
 
 #include <framework/core/ModuleParamList.h>
-
-#include <tracking/ckf/general/utilities/ClassMnemomics.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -74,7 +69,7 @@ void CKFToSVDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   moduleParamList->getParameter<std::string>("filter").setDefaultValue("mva");
 
   moduleParamList->getParameter<std::string>("hitFilter").setDefaultValue("sensor");
-  moduleParamList->getParameter<std::string>("seedFilter").setDefaultValue("sensor");
+  moduleParamList->getParameter<std::string>("seedFilter").setDefaultValue("all");
 
   moduleParamList->getParameter<std::string>("hitsSpacePointsStoreArrayName").setDefaultValue("SVDSpacePoints");
 
@@ -103,12 +98,15 @@ void CKFToSVDFindlet::apply()
 
   B2DEBUG(50, "Now have " << m_spacePointVector.size() << " hits.");
 
+  if (m_spacePointVector.empty() or m_cdcRecoTrackVector.empty()) {
+    return;
+  }
+
   m_stateCreatorFromTracks.apply(m_cdcRecoTrackVector, m_seedStates);
   m_stateCreatorFromHits.apply(m_spacePointVector, m_states);
   m_relationCreator.apply(m_seedStates, m_states, m_relations);
 
   B2DEBUG(50, "Created " << m_relations.size() << " relations.");
-
   m_treeSearchFindlet.apply(m_seedStates, m_states, m_relations, m_results);
 
   B2DEBUG(50, "Having found " << m_results.size() << " results before overlap check");

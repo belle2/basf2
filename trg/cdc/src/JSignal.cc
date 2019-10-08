@@ -2074,31 +2074,31 @@ namespace Belle2 {
 
     // For if else
     for (unsigned iCondition = 1; iCondition < data.size() - 1; iCondition++) {
-      TRGCDCJSignal from = data[iCondition][1];
-      TRGCDCJSignal to = data[iCondition][2];
-      TRGCDCJSignal assign = data[iCondition][0];
-      if (from.m_vhdlCode == "") from.initVhdlCode();
-      if (to.m_vhdlCode == "") to.initVhdlCode();
-      if (reference.m_type == -1 && from.m_type == 1) {
+      TRGCDCJSignal from1 = data[iCondition][1];
+      TRGCDCJSignal to1 = data[iCondition][2];
+      TRGCDCJSignal assign1 = data[iCondition][0];
+      if (from1.m_vhdlCode == "") from1.initVhdlCode();
+      if (to1.m_vhdlCode == "") to1.initVhdlCode();
+      if (reference.m_type == -1 && from1.m_type == 1) {
         t_fromPrefixSigned = "signed('0'&";
         t_fromPostfixSigned = ")";
       } else {
         t_fromPrefixSigned = "";
         t_fromPostfixSigned = "";
       }
-      if (reference.m_type == -1 && to.m_type == 1) {
+      if (reference.m_type == -1 && to1.m_type == 1) {
         t_toPrefixSigned = "signed('0'&";
         t_toPostfixSigned = ")";
       } else {
         t_toPrefixSigned = "";
         t_toPostfixSigned = "";
       }
-      t_fromVhdlCode = replaceWithSignalNames(from.m_vhdlCode, from.m_argumentSignals, target.m_finishClock,
+      t_fromVhdlCode = replaceWithSignalNames(from1.m_vhdlCode, from1.m_argumentSignals, target.m_finishClock,
                                               target.m_commonData->m_buffers);
-      t_toVhdlCode = replaceWithSignalNames(to.m_vhdlCode, to.m_argumentSignals, target.m_finishClock, target.m_commonData->m_buffers);
+      t_toVhdlCode = replaceWithSignalNames(to1.m_vhdlCode, to1.m_argumentSignals, target.m_finishClock, target.m_commonData->m_buffers);
       t_vhdlCode << "elsif (" << t_referenceVhdlCode << " >= " << t_fromPrefixSigned << t_fromVhdlCode << t_fromPostfixSigned << ") and ("
                  << t_referenceVhdlCode << " <= " << t_toPrefixSigned << t_toVhdlCode << t_toPostfixSigned << ") then" << endl;
-      t_vhdlCode << "  " << assignVhdlCode(target, assign) << endl;
+      t_vhdlCode << "  " << assignVhdlCode(target, assign1) << endl;
     }
     t_vhdlCode << "else" << endl;
     t_vhdlCode << "  " << assignVhdlCode(target, (*(data.end() - 1))[0]) << endl;

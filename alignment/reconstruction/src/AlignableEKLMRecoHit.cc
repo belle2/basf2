@@ -8,16 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <alignment/GlobalLabel.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
-#include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/dataobjects/EKLMHit2d.h>
-#include <eklm/geometry/GeometryData.h>
-#include <eklm/geometry/TransformDataGlobalAligned.h>
+
 #include <alignment/GlobalDerivatives.h>
 #include <alignment/GlobalLabel.h>
-#include <eklm/dbobjects/EKLMAlignment.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/eklm/dbobjects/EKLMAlignment.h>
+#include <klm/eklm/geometry/GeometryData.h>
+#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 
 using namespace Belle2;
 using namespace alignment;
@@ -37,7 +36,7 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   CLHEP::Hep3Vector origin;
   CLHEP::Hep3Vector u(1, 0, 0);
   CLHEP::Hep3Vector v(0, 1, 0);
-  TVector3 origin2, u2, v2;
+  B2Vector3D origin2, u2, v2;
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   const EKLM::TransformDataGlobalAligned* transformData =
     &(EKLM::TransformDataGlobalAligned::Instance());
@@ -48,7 +47,7 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   if (eklmDigits.size() != 2)
     B2FATAL("Incorrect number of related EKLMDigits.");
   digit = hit->getDigitIdentifier();
-  endcap = eklmDigits[digit]->getEndcap();
+  endcap = eklmDigits[digit]->getSection();
   layer = eklmDigits[digit]->getLayer();
   sector = eklmDigits[digit]->getSector();
   plane = eklmDigits[digit]->getPlane();
@@ -56,11 +55,11 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
             + 1;
   strip = (segment - 1) * geoDat->getNStripsSegment() + 1;
   m_Sector.setType(EKLMElementID::c_Sector);
-  m_Sector.setEndcap(endcap);
+  m_Sector.setSection(endcap);
   m_Sector.setLayer(layer);
   m_Sector.setSector(sector);
   m_Segment.setType(EKLMElementID::c_Segment);
-  m_Segment.setEndcap(endcap);
+  m_Segment.setSection(endcap);
   m_Segment.setLayer(layer);
   m_Segment.setSector(sector);
   m_Segment.setPlane(plane);
@@ -122,7 +121,7 @@ std::pair<std::vector<int>, TMatrixD> AlignableEKLMRecoHit::globalDerivatives(co
   HepGeom::Transform3D t;
   const EKLM::TransformDataGlobalAligned* transformData =
     &(EKLM::TransformDataGlobalAligned::Instance());
-  t = (*transformData->getSectorTransform(m_Sector.getEndcap(),
+  t = (*transformData->getSectorTransform(m_Sector.getSection(),
                                           m_Sector.getLayer(),
                                           m_Sector.getSector())).inverse();
   globalPos.setX(sop->getPos().X() / Unit::cm * CLHEP::cm);
@@ -132,17 +131,20 @@ std::pair<std::vector<int>, TMatrixD> AlignableEKLMRecoHit::globalDerivatives(co
   double x = globalPos.x() / CLHEP::cm * Unit::cm;
   double y = globalPos.y() / CLHEP::cm * Unit::cm;
   /*
-   * Matrix of global derivatives (second dimension is added because of
-   * resizing in GblFitterInfo::constructGblPoint()).
+   * Matrix of global derivatives of local coordinate (second dimension is
+   * added because of resizing in GblFitterInfo::constructGblPoint()) by
+   * variations of the detector element position.
+   * The sign is inverted to match the convention for other detectors.
    */
   TMatrixD derGlobal(2, 3);
   derGlobal(0, 0) = 0;
   derGlobal(0, 1) = 0;
   derGlobal(0, 2) = 0;
-  derGlobal(1, 0) = -(cosda * m_StripV.X() - sinda * m_StripV.Y());
-  derGlobal(1, 1) = -(sinda * m_StripV.X() + cosda * m_StripV.Y());
-  derGlobal(1, 2) = (x - dxs) * (-sinda * m_StripV.X() - cosda * m_StripV.Y()) +
-                    (y - dys) * (cosda * m_StripV.X() - sinda * m_StripV.Y());
+  derGlobal(1, 0) = cosda * m_StripV.X() - sinda * m_StripV.Y();
+  derGlobal(1, 1) = sinda * m_StripV.X() + cosda * m_StripV.Y();
+  derGlobal(1, 2) =
+    -((x - dxs) * (-sinda * m_StripV.X() - cosda * m_StripV.Y()) +
+      (y - dys) * (cosda * m_StripV.X() - sinda * m_StripV.Y()));
   //derGlobal(1, 3) = -cosda;
   //derGlobal(1, 4) = -u * cosda - (v - dy) * sinda;
 

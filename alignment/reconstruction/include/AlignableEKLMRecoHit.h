@@ -11,18 +11,15 @@
 #ifndef ALIGNABLEEKLMRECOHIT_H
 #define ALIGNABLEEKLMRECOHIT_H
 
-/* External headers. */
-#include <TMatrixD.h>
+#include <framework/geometry/B2Vector3.h>
+#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
+#include <klm/eklm/dataobjects/EKLMElementID.h>
 
-/* Genfit headers. */
 #include <genfit/ICalibrationParametersDerivatives.h>
-#include <genfit/HMatrixUV.h>
 #include <genfit/PlanarMeasurement.h>
 #include <genfit/TrackCandHit.h>
 
-/* Belle2 headers. */
-#include <eklm/dataobjects/EKLMAlignmentHit.h>
-#include <eklm/dataobjects/EKLMElementID.h>
+#include <TMatrixD.h>
 
 namespace Belle2 {
 
@@ -80,12 +77,12 @@ namespace Belle2 {
     * @return pair<vector<int>, TMatrixD> With matrix with #rows = dimension of residual, #columns = number of parameters.
     * #columns must match vector<int>.size().
     */
-    virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop);
+    virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop) override;
 
     /**
      * Clone.
      */
-    genfit::AbsMeasurement* clone() const;
+    genfit::AbsMeasurement* clone() const override;
 
   private:
 
@@ -96,10 +93,10 @@ namespace Belle2 {
     EKLMElementID m_Segment;
 
     /** V direction. */
-    TVector3 m_StripV;
+    B2Vector3D m_StripV;
 
     /** Needed to make objects storable. */
-    ClassDef(AlignableEKLMRecoHit, 2);
+    ClassDefOverride(AlignableEKLMRecoHit, 2);
 
   };
 

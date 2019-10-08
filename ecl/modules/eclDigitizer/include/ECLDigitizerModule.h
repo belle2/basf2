@@ -10,29 +10,37 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDIGITIZERMODULE_H_
-#define ECLDIGITIZERMODULE_H_
+#pragma once
 
-#include <framework/core/Module.h>
-#include <ecl/dataobjects/ECLWaveformData.h>
-#include <ecl/digitization/EclConfiguration.h>
-#include <ecl/dataobjects/ECLHit.h>
-#include <ecl/dataobjects/ECLSimHit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLTrig.h>
-#include <ecl/dataobjects/ECLWaveforms.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
+//STL
 #include <vector>
 
+//Framework
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
+#include <framework/database/DBObjPtr.h>
+
+//ECL
+#include <ecl/digitization/EclConfiguration.h>
 
 namespace Belle2 {
+
+  class ECLWaveformData;
+  class ECLNoiseData;
+  class ECLWFAlgoParams;
+  class ECLHit;
+  class ECLSimHit;
+  class ECLDigit;
+  class ECLDsp;
+  class ECLTrig;
+  class ECLWaveforms;
+
   /** The ECLDigitizer module.
    *
    * This module is responsible to digitize all hits found in the ECL from ECLHit
-   * First, we simualte the sampling array by waveform and amplitude of hit, and
+   * First, we simulate the sampling array by waveform and amplitude of hit, and
    * smear this sampling array by corresponding error matrix.
    * We then fit the array as hardware of shaper DSP board to obtain the fit result
    * of amplitude, time and quality.
@@ -64,33 +72,33 @@ namespace Belle2 {
 
 
     /** Initialize variables  */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Nothing so far.*/
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Actual digitization of all hits in the ECL.
      *
      *  The digitized hits are written into the DataStore.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** Nothing so far. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Free memory */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
-    using algoparams_t   = ECL::EclConfiguration::algoparams_t;
-    using fitparams_t    = ECL::EclConfiguration::fitparams_t;
-    using signalsample_t = ECL::EclConfiguration::signalsample_t;
-    using adccounts_t    = ECL::EclConfiguration::adccounts_t;
+    using algoparams_t   = ECL::EclConfiguration::algoparams_t;   /**< algorithm parameters */
+    using fitparams_t    = ECL::EclConfiguration::fitparams_t;    /**< fit parameters */
+    using signalsample_t = ECL::EclConfiguration::signalsample_t; /**< signal sample */
+    using adccounts_t    = ECL::EclConfiguration::adccounts_t;    /**< ADC counts */
 
     using int_array_192x16_t = fitparams_t::int_array_192x16_t; /**<  weighting coefficients for time and amplitude calculation */
     using int_array_24x16_t  =
       fitparams_t::int_array_24x16_t;  /**<  weighting coefficients amplitude calculation. Time is fixed by trigger */
-    using uint_pair_t        = std::pair<unsigned int, unsigned int>;
+    using uint_pair_t        = std::pair<unsigned int, unsigned int>; /**< a pair of unsigned ints */
 
     /** ffsets for storages of ECL channels */
     struct crystallinks_t {
@@ -107,6 +115,7 @@ namespace Belle2 {
     std::vector<fitparams_t> m_fitparams; /**<  */
     std::vector<ECLNoiseData> m_noise; /**< parameters for correlated noise simulation */
     std::vector<signalsample_t> m_ss; /**< tabulated shape line */
+    std::vector<signalsample_t> m_ss_HadronShapeSimulations; /**< tabulated shape line for hadron shape simulations */
 
     /** Storage for adc hits from entire calorimeter (8736 crystals) */
     std::vector<adccounts_t> m_adc;  /**< ACD counts */
@@ -122,6 +131,12 @@ namespace Belle2 {
     /** function wrapper for waveform fit */
     void shapeFitterWrapper(const int j, const int* FitA, const int m_ttrig,
                             int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const ;
+
+    /** dbobject for hadron signal shapes*/
+    DBObjPtr<ECLDigitWaveformParametersForMC> m_waveformParametersMC;
+
+    /** callback hadron signal shapes from database*/
+    void callbackHadronSignalShapes();
 
     /** read Shaper-DSP data from root file */
     void readDSPDB();
@@ -142,6 +157,7 @@ namespace Belle2 {
     StoreArray<ECLSimHit> m_eclSimHits; /**< SimHits array  */
     StoreObjPtr<ECLWaveforms> m_eclWaveforms; /**< compressed waveforms  */
     bool m_HadronPulseShape; /**< hadron pulse shape flag */
+
     /** Output Arrays */
     StoreArray<ECLDigit>  m_eclDigits;/**<  waveform fit result */
     StoreArray<ECLDsp>    m_eclDsps;/**<  generated waveforms */
@@ -153,8 +169,7 @@ namespace Belle2 {
     bool m_inter; /**< internuclear counter effect */
     bool m_waveformMaker; /**< produce only waveform digits */
     unsigned int m_compAlgo; /**< compression algorithm for background waveforms */
+    int m_ADCThreshold; /**< ADC threshold for wavefom fits*/
     std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
   };
 }//Belle2
-
-#endif /* ECLDIGITIZERMODULE_H_ */

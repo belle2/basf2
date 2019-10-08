@@ -19,13 +19,15 @@
 #include <G4SafetyHelper.hh>
 #include <G4FieldManagerStore.hh>
 #include <G4TransportationProcessType.hh>
-#include <G4SystemOfUnits.hh>
+#include <CLHEP/Units/SystemOfUnits.h>
+#include <framework/logging/Logger.h>
 
 class G4VSensitiveDetector;
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
+using namespace CLHEP;
 
 G4MonopoleTransportation::G4MonopoleTransportation(const G4Monopole* mpl,
                                                    G4int verb)
@@ -80,11 +82,10 @@ G4MonopoleTransportation::G4MonopoleTransportation(const G4Monopole* mpl,
 
 G4MonopoleTransportation::~G4MonopoleTransportation()
 {
-  if ((verboseLevel > 0) && (fSumEnergyKilled > 0.0)) {//TODO print with B2DEBUG
-    G4cout << " G4MonopoleTransportation: Statistics for looping particles "
-           << G4endl;
-    G4cout << "   Sum of energy of loopers killed: " <<  fSumEnergyKilled << G4endl;
-    G4cout << "   Max energy of loopers killed: " <<  fMaxEnergyKilled << G4endl;
+  if ((verboseLevel > 0) && (fSumEnergyKilled > 0.0)) {
+    B2DEBUG(25, " G4MonopoleTransportation: Statistics for looping particles ");
+    B2DEBUG(25, "   Sum of energy of loopers killed: " <<  fSumEnergyKilled);
+    B2DEBUG(25, "   Max energy of loopers killed: " <<  fMaxEnergyKilled);
   }
 }
 
@@ -168,9 +169,6 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
     }
   }
 
-  // G4cout << " G4Transport:  field exerts force= " << fieldExertsForce
-  //          << "  fieldMgr= " << fieldMgr << G4endl;//TODO print with B2DEBUG or remove altogether
-
   // Choose the calculation of the transportation: Field or not
   //
   if (!fieldExertsForce) {
@@ -230,15 +228,15 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
                               fParticleDef->GetPDGSpin(),
                               0,   //  Magnetic moment:  pParticleDef->GetMagneticMoment(),
                               0,   //  Electric Dipole moment - not in Particle Definition
-                              particleMagneticCharge);    // in Mev/c
+                              particleMagneticCharge);    // in units of the positron charge
 
     G4EquationOfMotion* equationOfMotion =
       (fFieldPropagator->GetChordFinder()->GetIntegrationDriver()->GetStepper())
       ->GetEquationOfMotion();
 
     equationOfMotion
-    ->SetChargeMomentumMass(chargeState,        //  Was particleMagneticCharge - in Mev/c
-                            momentumMagnitude, //  Was particleElectricCharge
+    ->SetChargeMomentumMass(chargeState,
+                            momentumMagnitude,
                             restMass) ;
     // SetChargeMomentumMass now passes both the electric and magnetic charge - in chargeState
 
@@ -430,25 +428,21 @@ G4VParticleChange* G4MonopoleTransportation::AlongStepDoIt(const G4Track& track,
 
 #ifdef G4VERBOSE
       if ((verboseLevel > 1) ||
-          (endEnergy > fThreshold_Warning_Energy)) {//TODO print with B2DEBUG or remove altogether
-        G4cout << " G4MonopoleTransportation is killing track that is looping or stuck "
-               << G4endl
-               << "   This track has " << track.GetKineticEnergy() / MeV
-               << " MeV energy." << G4endl;
-        G4cout << "   Number of trials = " << fNoLooperTrials
-               << "   No of calls to AlongStepDoIt = " << noCalls
-               << G4endl;
+          (endEnergy > fThreshold_Warning_Energy)) {
+        B2DEBUG(25, " G4MonopoleTransportation is killing track that is looping or stuck ");
+        B2DEBUG(25, "   This track has " << track.GetKineticEnergy() / MeV << " MeV energy.");
+        B2DEBUG(25, "   Number of trials = " << fNoLooperTrials
+                << "   No of calls to AlongStepDoIt = " << noCalls);
       }
 #endif
       fNoLooperTrials = 0;
     } else {
       fNoLooperTrials ++;
 #ifdef G4VERBOSE
-      if ((verboseLevel > 2)) {//TODO print with B2DEBUG or remove altogether
-        G4cout << "   G4MonopoleTransportation::AlongStepDoIt(): Particle looping -  "
-               << "   Number of trials = " << fNoLooperTrials
-               << "   No of calls to  = " << noCalls
-               << G4endl;
+      if ((verboseLevel > 2)) {
+        B2DEBUG(25, "   G4MonopoleTransportation::AlongStepDoIt(): Particle looping -  "
+                << "   Number of trials = " << fNoLooperTrials
+                << "   No of calls to  = " << noCalls);
       }
 #endif
     }
@@ -467,12 +461,8 @@ G4VParticleChange* G4MonopoleTransportation::AlongStepDoIt(const G4Track& track,
   //Monopole bounding
   if (fTransportEndKineticEnergy < fThreshold_Trap_Energy) {
     fParticleChange.ProposeTrackStatus(fStopAndKill);
-#ifdef G4VERBOSE
-    if ((verboseLevel > 2)) {//TODO print with B2DEBUG
-      G4cout << "### Monopole bound in " << fCurrentTouchableHandle->GetVolume()->GetName() << G4endl;
-      G4cout << "### with energy " << fTransportEndKineticEnergy << " MeV" << G4endl;
-    }
-#endif
+    B2DEBUG(150, "Monopole bound in " << fCurrentTouchableHandle->GetVolume()->GetName());
+    B2DEBUG(150, "with energy " << fTransportEndKineticEnergy << " MeV");
   }
 
   return &fParticleChange ;
@@ -539,21 +529,18 @@ G4VParticleChange* G4MonopoleTransportation::PostStepDoIt(const G4Track& track,
   }         // endif ( fGeometryLimitedStep )
 
   const G4VPhysicalVolume* pNewVol = retCurrentTouchable->GetVolume() ;
-  const G4Material* pNewMaterial   = 0 ;
-  const G4VSensitiveDetector* pNewSensitiveDetector   = 0 ;
+  G4Material* pNewMaterial   = nullptr ;
+  G4VSensitiveDetector* pNewSensitiveDetector   = nullptr ;
 
   if (pNewVol != 0) {
     pNewMaterial = pNewVol->GetLogicalVolume()->GetMaterial();
     pNewSensitiveDetector = pNewVol->GetLogicalVolume()->GetSensitiveDetector();
   }
 
-  // ( <const_cast> pNewMaterial ) ;
-  // ( <const_cast> pNewSensitiveDetector) ;
-
   fParticleChange.SetMaterialInTouchable(
-    (G4Material*) pNewMaterial) ;
+    pNewMaterial) ;
   fParticleChange.SetSensitiveDetectorInTouchable(
-    (G4VSensitiveDetector*) pNewSensitiveDetector) ;
+    pNewSensitiveDetector) ;
 
   const G4MaterialCutsCouple* pNewMaterialCutsCouple = 0;
   if (pNewVol != 0) {

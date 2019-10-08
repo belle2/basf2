@@ -1,7 +1,7 @@
 Import('env')
 
 env['LIBS'] = [
-    'framework','pxd','svd','vxd'
+    'framework'
 ]
 
 Return('env')

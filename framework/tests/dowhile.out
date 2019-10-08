@@ -1,0 +1,89 @@
+[INFO] Steering file: framework/tests/dowhile.py
+[INFO] The random number seed is set to "something important"
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] ========================================================================
+[INFO] >>> Start new run: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        0        EVT:        1
+[INFO] Current Iteration: 1.0
+[INFO] First 5 random numbers: ['0.6476', '0.3841', '0.5471', '0.2820', '0.6089']
+[INFO] EXP:        0        RUN:        0        EVT:        2
+[INFO] Current Iteration: 1.0
+[INFO] First 5 random numbers: ['0.9865', '0.4264', '0.6924', '0.4049', '0.4921']
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 0
+[INFO] ========================================================================
+[INFO] ========================================================================
+[INFO] >>> Start new run: 3
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        1        RUN:        3        EVT:        1
+[INFO] Current Iteration: 1.0
+[INFO] First 5 random numbers: ['0.4505', '0.1915', '0.3821', '0.7243', '0.7846']
+[INFO] Current Iteration: 2.0
+[INFO] First 5 random numbers: ['0.7770', '0.7412', '0.0483', '0.9641', '0.0190']
+[INFO] Current Iteration: 3.0
+[INFO] First 5 random numbers: ['0.3958', '0.9560', '0.4315', '0.6136', '0.5315']
+[INFO] EXP:        1        RUN:        3        EVT:        2
+[INFO] Current Iteration: 1.0
+[INFO] First 5 random numbers: ['0.6922', '0.3400', '0.3626', '0.1739', '0.7111']
+[INFO] Current Iteration: 2.0
+[INFO] First 5 random numbers: ['0.1113', '0.9253', '0.0082', '0.2051', '0.2660']
+[INFO] Current Iteration: 3.0
+[INFO] First 5 random numbers: ['0.8527', '0.8946', '0.9976', '0.5863', '0.0492']
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 3
+[INFO] ========================================================================
+[INFO] ========================================================================
+[INFO] >>> Start new run: 5
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        3        RUN:        5        EVT:        1
+[INFO] Current Iteration: 1.0
+[INFO] First 5 random numbers: ['0.7595', '0.3499', '0.4373', '0.3368', '0.2321']
+[INFO] Current Iteration: 2.0
+[INFO] First 5 random numbers: ['0.4247', '0.0255', '0.5197', '0.6233', '0.2675']
+[INFO] Current Iteration: 3.0
+[INFO] First 5 random numbers: ['0.3556', '0.7973', '0.5154', '0.7143', '0.3200']
+[FATAL] do_while(TestDoWhile<1): Maximum number of 3 iterations reached
+[FATAL] Modules in a Path.do_while() cannot have any conditions
+[FATAL] do_while(): Cannot loop over empty path
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] ========================================================================
+[INFO] >>> Start new run: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        0        EVT:        1
+[FATAL] Module EventInfoPrinter did not set a return value, cannot loop
+[FATAL] Modules in a Path.do_while() cannot have any conditions
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] ========================================================================
+[INFO] >>> Start new run: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        0        EVT:        1
+ ... message repeated 5 times
+[INFO] EXP:        0        RUN:        0        EVT:        2
+ ... message repeated 12 times
+[INFO] EXP:        0        RUN:        0        EVT:        3
+ ... message repeated 4 times
+[INFO] EXP:        0        RUN:        0        EVT:        4
+ ... message repeated 3 times
+[INFO] EXP:        0        RUN:        0        EVT:        5
+ ... message repeated 1 times
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 0
+[INFO] ========================================================================
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] ========================================================================
+[INFO] >>> Start new run: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        0        EVT:        1
+ ... message repeated 5 times
+[INFO] EXP:        0        RUN:        0        EVT:        2
+ ... message repeated 12 times
+[INFO] EXP:        0        RUN:        0        EVT:        3
+ ... message repeated 4 times
+[INFO] EXP:        0        RUN:        0        EVT:        4
+ ... message repeated 3 times
+[INFO] EXP:        0        RUN:        0        EVT:        5
+ ... message repeated 1 times
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 0
+[INFO] ========================================================================

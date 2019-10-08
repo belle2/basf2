@@ -13,7 +13,6 @@
 #include <framework/logging/Logger.h>
 
 #include <vector>
-#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

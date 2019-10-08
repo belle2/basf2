@@ -33,7 +33,6 @@
 #include "trg/trg/Signal.h"
 #include "trg/trg/Constants.h"
 #include "trg/trg/Channel.h"
-#include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Layer.h"
 #include "trg/cdc/Cell.h"
@@ -55,7 +54,6 @@
 #include "trg/cdc/JSignalData.h"
 #include "trg/cdc/WireHitMC.h"
 #include "trg/cdc/TrackMC.h"
-#include "trg/cdc/Relation.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/LUT.h"
@@ -112,9 +110,9 @@ namespace Belle2 {
       }
 
       //...Ignore lines not starting with a digit...
-      string ignore;
+      string ignores;
       while (!isdigit(infile.peek())) {
-        getline(infile, ignore);
+        getline(infile, ignores);
       }
 
       //...Read Hough plane cell number and limits...
@@ -690,12 +688,12 @@ namespace Belle2 {
       vector<vector<unsigned>> tsf;
 
       //...Ignore lines not starting with a digit...
-      string ignore;
+      string ignores;
       while (!isdigit(infile.peek())) {
-        getline(infile, ignore);
+        getline(infile, ignores);
       }
       //...Skip the first line (read in constructor)...
-      getline(infile, ignore);
+      getline(infile, ignores);
 
       //...Read map file...
       string car;

@@ -12,15 +12,10 @@ also simple algorithms can be implemented directly in python. All main
 functions are implemented in a module called `basf2` and most people will just
 start their steering file or script with ::
 
-    from basf2 import *
-    main = create_path()
-
-but it is recommended (escpecially in scripts to be used by others) to import
-the module and call all methods by prefix::
-
     import basf2
-    main = basf2.create_path()
+    main = basf2.Path()
 
+.. _general_modpath:
 
 Modules and Paths
 -----------------
@@ -39,10 +34,17 @@ the framework executes the modules of a path, starting with the first one and
 proceeding with the module next to it. The modules are executed one at a time,
 exactly in the order in which they were placed into the path.
 
-The data, to be processed by the modules, is stored in a common storage, the
-DataStore. Each module has read and write access to the storage.
+Modules can have conditions attached to them to steer the processing flow
+depending of the outcome of the calculation in each module.
 
-.. figure:: ModulePath.png
+The data, to be processed by the modules, is stored in a common storage, the
+DataStore. Each module has read and write access to the storage. In addition
+there's also non-event data, the so called conditions, which will be loaded from
+a central conditions database and are available in the DBStore.
+
+.. _framework_modpath_diagram:
+
+.. figure:: modules_paths.png
   :width: 40em
 
   Schematic view of the processing flow in the Belle II Software
@@ -51,10 +53,15 @@ DataStore. Each module has read and write access to the storage.
 .. Functions concerning modules and Paths
 .. ++++++++++++++++++++++++++++++++++++++
 
-Usually each script needs to create a new path using `create_path`, add
+Usually each script needs to create a new path using `Path()`, add
 all required modules in the correct order and finally call :py:func:`process` on
-the fully configured path. The following functions are all related to the
-handling of modules and paths:
+the fully configured path.
+
+.. warning:: Preparing a `Path` and adding `Modules <Module>` to it **does not
+   execute anything**, it only prepares the computation which is only done when
+   `process` is called.
+
+The following functions are all related to the handling of modules and paths:
 
 .. autofunction:: basf2.create_path
 .. autofunction:: basf2.register_module
@@ -108,14 +115,89 @@ separately. The existing log levels are defined as
     An instance of the `LogPythonInterface` class for fine grained control
     over all settings of the logging system.
 
+Creating Log Messages
++++++++++++++++++++++
+
+Log messages can be created in a very similar way in python and C++. You can
+call one of the logging functions like `B2INFO` and supply the message as
+string, for example
+
+.. code-block:: python
+
+   B2INFO("This is a log message of severity INFO")
+
+In Python you can supply multiple arguments which will all be converted to
+string and concatenated to form the log message
+
+.. code-block:: python
+
+   for i in range(1,4):
+       B2INFO("This is log message number ", i)
+
+which will produce
+
+.. code-block:: text
+
+  [INFO] This is log message number 1
+  [INFO] This is log message number 2
+  [INFO] This is log message number 3
+
+This works almost the same way in C++ except that you need the ``<<`` operator
+to construct the log message from multiple parts
+
+.. code-block:: c++
+
+   for(int i=1; i<4; ++i) {
+     B2INFO("This is log message " << i << " in C++");
+   }
+
+.. _logging_logvariables:
+
+.. rubric:: Log Variables
+
+.. versionadded:: release-03-00-00
+
+However, the log system has an additional feature to include variable parts in
+a fixed message to simplify grouping of similar log messages: If a log message only
+differs by a number or detector name it is very hard to filter repeating
+messages. So we have log message variables which can be used to specify varying
+parts while having a fixed message.
+
+In Python these can just be given as keyword arguments to the logging functions
+
+.. code-block:: python
+
+   B2INFO("This is a log message", number=3.14, text="some text")
+
+In C++ this again almost works the same way but we need to specify the
+variables a bit more explicitly.
+
+.. code-block:: c++
+
+   B2INFO("This is a log message" << LogVar("number", 3.14) << LogVar("text", "some text"));
+
+In both cases the names of the variables can be chosen feely and the output
+should be something like
+
+.. code-block:: text
+
+   [INFO] This is a log message
+           number = 3.14
+           text = some text
+
+.. rubric:: Logging functions
+
+
 To emit log messages from within Python we have these functions:
 
-.. autofunction:: basf2.B2FATAL
-.. autofunction:: basf2.B2ERROR
-.. autofunction:: basf2.B2WARNING
+.. autofunction:: basf2.B2DEBUG
 .. autofunction:: basf2.B2INFO
 .. autofunction:: basf2.B2RESULT
-.. autofunction:: basf2.B2DEBUG
+.. autofunction:: basf2.B2WARNING
+.. autofunction:: basf2.B2ERROR
+.. autofunction:: basf2.B2FATAL
+
+The same functions are available in C++ as macros once you included ``<framework/logging/Logger.h>``
 
 The Logging Configuration Objects
 +++++++++++++++++++++++++++++++++
@@ -168,154 +250,27 @@ directly in python if needed. See
 Conditions Database
 -------------------
 
-The conditions database is used for configuration objects (payloads) which
-might change over time. There are two different "backends" to obtain conditions
-data:
+The conditions database is the place where we store additional data needed to
+interpret and analyse the data that can change over time, for example the
+detector configuration or calibration constants.
 
-1. A local database which stores configuration objects in local files. The
-   valid set of configuration constants is configured in a plain text file.
+In many cases it should not be necessary to change the configuration but except for
+maybe adding an extra globaltag to the list via `conditions.globaltags <ConditionsConfiguration.globaltags>`
 
-2. A central database where the conditions are stored on a central server and
-   are downloaded on demand. In this case the valid set of configuration
-   constants is identified by a ``globalTag`` which is a text identifier known
-   to the database.
-
-   .. note::
-
-      To inspect (and modify) this central database please have a look at
-      :ref:`b2conditionsdb`
-
-The default configuration of the Belle2 software is to look in a chain of
-backends one at a time until the required constants can be found:
-
-1. in a local database configured in :file:`localdb/database.txt` in the
-   current working directory.
-
-   If conditions are found there use them but emit a `WARNING
-   <LogLevel.WARNING>` message to indicate that custom condtitions have been
-   used.
-
-2. in the central database under a default global tag name which is dependent
-   on the software version and can be queried with `get_default_global_tags()`
-   and is also displayed when running :program:`basf2 --info`
-
-   If possible the payloads are not downloaded but taken from
-   :file:`/cvmfs/belle.cern.ch/conditions`, otherwise they are downloaded from
-   the server and cached in a directory :file:`centraldb` in the current
-   working directory.
-
-3. in a local database configures in
-   :file:`/cvmfs/belle.cern.ch/conditions/{globalTag}.txt` where ``globalTag``
-   is the default global tag as mentioned above.
-
-
-Environment Variables
-+++++++++++++++++++++
-
-These settings can be modified by setting environment variables
-
-.. envvar:: BELLE2_CONDB_GLOBALTAG
-
-   if set this overrides the default global tag returned by
-   `get_default_global_tags`. This can be a list of tags separated by white
-   space in which case all global tags are searched.
-
-   ::
-
-       export BELLE2_CONDB_FALLBACK="defaultTag additionalTag"
-
-   If set to an empty value
-   access to the central database is disabled.
-
-.. envvar:: BELLE2_CONDB_FALLBACK
-
-   if set this overrides the fallback local database which is searched if the
-   constants could not be found in the central database. This can either be a
-   filename or a directory or a combination of both separated by whitespace. In
-   case of a directory the database configuration is taken from
-   :file:`{directory}/{globalTag}.txt` for each globalTag returned by
-   `get_default_global_tags`.
-
-   ::
-
-       export BELLE2_CONDB_FALLBACK="/cvmfs/belle.cern.ch/conditions ./mylocaldb.txt"
-
-   If set to an empty value no fallback database will be configured.
-
-.. envvar:: BELLE2_CONDB_PROXY
-
-   Can be set to specify a proxy server to use for all connections to the
-   central database. The parameter should be a string holding the host name or
-   dotted numerical IP address. A numerical IPv6 address must be written within
-   [brackets]. To specify port number in this string, append ``:[port]`` to the
-   end of the host name. If not specified, libcurl will default to using port
-   1080 for proxies. The proxy string should be prefixed with ``[scheme]://``
-   to specify which kind of proxy is used.
-
-   *http*
-     HTTP Proxy. Default when no scheme or proxy type is specified.
-
-   *https*
-     HTTPS Proxy.
-
-   *socks4*
-     SOCKS4 Proxy.
-
-   *socks4a*
-     SOCKS4a Proxy. Proxy resolves URL hostname.
-
-   *socks5*
-     SOCKS5 Proxy.
-
-   *socks5h*
-     SOCKS5 Proxy. Proxy resolves URL hostname.
-
-   ::
-
-      export BELLE2_CONDB_PROXY="http://192.168.178.1:8081"
-
-   If it is not set the default proxy configuration is used (e.g. honor
-   ``$http_proxy``). If it is set to an empty value direct connection is
-   used.
-
-Settings in Python
-++++++++++++++++++
-
-All the configurations of the conditions database access can also be performed
-directly in python using the following functions:
-
-.. autofunction:: basf2.get_default_global_tags
-.. autofunction:: basf2.reset_database
-.. autofunction:: basf2.use_database_chain
-.. autofunction:: basf2.use_local_database
-.. autofunction:: basf2.use_central_database
-.. autofunction:: basf2.set_central_database_networkparams
-
+.. toctree:: conditions-database
 
 Additional Functions
 --------------------
 
-
-.. 
-  .. autofunction:: deserialize_conditions
-  .. autofunction:: deserialize_module
-  .. autofunction:: deserialize_path
-  .. autofunction:: deserialize_value
-  .. autofunction:: get_path_from_file
+.. autofunction:: find_file
 
 .. autofunction:: get_random_seed
-.. autofunction:: get_terminal_width
 
 ..
   .. autofunction:: is_mod_function
 
-.. autofunction:: list_functions
 .. autofunction:: log_to_console
 .. autofunction:: log_to_file
-.. autofunction:: make_code_pickable
-.. autofunction:: pretty_print_description_list
-.. autofunction:: pretty_print_table
-.. autofunction:: print_all_modules
 .. autofunction:: reset_log
 
 ..

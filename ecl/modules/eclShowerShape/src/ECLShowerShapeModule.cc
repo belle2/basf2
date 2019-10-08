@@ -15,31 +15,31 @@
 // THIS MODULE
 #include <ecl/modules/eclShowerShape/ECLShowerShapeModule.h>
 
-// FRAMEWORK
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationVector.h>
+//BOOST
+#include <boost/algorithm/string/predicate.hpp>
 
+// ROOT
+#include <TMath.h>
+
+// FRAMEWORK
+#include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
 #include <framework/geometry/B2Vector3.h>
+
+//MVA
+#include <mva/interface/Expert.h>
+#include <mva/interface/Weightfile.h>
+#include <mva/interface/Interface.h>
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 // ECL
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/geometry/ECLNeighbours.h>
+#include <ecl/dbobjects/ECLShowerShapeSecondMomentCorrection.h>
 
-// MDST
-#include <mdst/dataobjects/ECLCluster.h>
-
-// MVA package
-#include <mva/interface/Interface.h>
-
-// ROOT
-#include <TMath.h>
-
-//BOOST
-#include <boost/algorithm/string/predicate.hpp>
 using namespace Belle2;
 using namespace ECL;
 
@@ -53,7 +53,9 @@ REG_MODULE(ECLShowerShapePureCsI)
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLShowerShapeModule::ECLShowerShapeModule() : Module(), m_secondMomentCorrectionArray("ecl_shower_shape_second_moment_corrections")
+ECLShowerShapeModule::ECLShowerShapeModule() : Module(),
+  m_eclConnectedRegions(eclConnectedRegionArrayName()),
+  m_secondMomentCorrectionArray("ecl_shower_shape_second_moment_corrections")
 {
   // Set description
   setDescription("ECLShowerShapeModule: Calculate ECL shower shape variables (e.g. E9oE21)");
@@ -100,13 +102,15 @@ void ECLShowerShapeModule::initializeMVAweightFiles(const std::string& identifie
 
 void ECLShowerShapeModule::initialize()
 {
+
   // Initialize neighbour maps.
-  m_neighbourMap9 = new ECLNeighbours("N", 1);
-  m_neighbourMap21 = new ECLNeighbours("NC", 2);
+  m_neighbourMap9 = std::unique_ptr<ECL::ECLNeighbours>(new ECL::ECLNeighbours("N", 1));
+  m_neighbourMap21 = std::unique_ptr<ECL::ECLNeighbours>(new ECL::ECLNeighbours("NC", 2));
 
   initializeMVAweightFiles(m_zernike_MVAidentifier_FWD, m_weightfile_representation_FWD);
   initializeMVAweightFiles(m_zernike_MVAidentifier_BRL, m_weightfile_representation_BRL);
   initializeMVAweightFiles(m_zernike_MVAidentifier_BWD, m_weightfile_representation_BWD);
+
 
   //Add callback to fill m_secondMomentCorrections when m_secondMomentCorrectionArray changes
   //21-Oct-2016 - The callback doesn't seem to be called at the begining of the run so I commented it out and added a call to prepareSecondMomentCorrectionsCallback in the beginRun
@@ -185,8 +189,8 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
   //Choose rho0 according to shower hypothesis
   double rho0 = 0.0;
   const int hypothesisID = eclShower->getHypothesisId();
-  if (hypothesisID == ECLCluster::c_nPhotons) rho0 = m_zernike_n1_rho0;
-  else if (hypothesisID == ECLCluster::c_neutralHadron) rho0 = m_zernike_n2_rho0;
+  if (hypothesisID == ECLShower::c_nPhotons) rho0 = m_zernike_n1_rho0;
+  else if (hypothesisID == ECLShower::c_neutralHadron) rho0 = m_zernike_n2_rho0;
 
   const double absZernike40 = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 4, 0, rho0);
   const double absZernike51 = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 5, 1, rho0);
@@ -212,8 +216,8 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
     //Set Zernike moments that will be used in MVA calculation
     // m_dataset holds 22 entries, 11 Zernike moments of N2 shower, followed by 11 Zernike moments of N1 shower
     int indexOffset = 0;//Offset entries depending on hypothesis type
-    if (hypothesisID == ECLCluster::c_nPhotons) indexOffset = (m_numZernikeMVAvariables / 2);
-    else if (hypothesisID == ECLCluster::c_neutralHadron) indexOffset = 0;
+    if (hypothesisID == ECLShower::c_nPhotons) indexOffset = (m_numZernikeMVAvariables / 2);
+    else if (hypothesisID == ECLShower::c_neutralHadron) indexOffset = 0;
 
     m_dataset->m_input[0 + indexOffset] = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 1, 1, rho0);
     m_dataset->m_input[1 + indexOffset] = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 2, 0, rho0);
@@ -228,7 +232,7 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
     m_dataset->m_input[10 + indexOffset] = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 5, 5, rho0);
     //Set zernikeMVA for N1 showers
     //This assumes that the N2 zernike moments have already been set in m_dataset!!!!
-    if (hypothesisID == ECLCluster::c_nPhotons) {
+    if (hypothesisID == ECLShower::c_nPhotons) {
       //FWD
       if (eclShower->getTheta() < m_BRLthetaMin) eclShower->setZernikeMVA(m_expert_FWD->apply(*m_dataset)[0]);
       //BWD
@@ -241,15 +245,13 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
 
 void ECLShowerShapeModule::event()
 {
-  StoreArray<ECLConnectedRegion> eclConnectedRegions(eclConnectedRegionArrayName());
-
-  for (auto& eclCR : eclConnectedRegions) {
+  for (auto& eclCR : m_eclConnectedRegions) {
 
     //Start by finding the N2 shower and calculating it's shower shape variables
     //Assumes that there is only 1 N2 Shower per CR!!!!!!
     ECLShower* N2shower = nullptr;
     for (auto& eclShower : eclCR.getRelationsWith<ECLShower>(eclShowerArrayName())) {
-      if (eclShower.getHypothesisId() == ECLCluster::c_neutralHadron) {
+      if (eclShower.getHypothesisId() == ECLShower::c_neutralHadron) {
         N2shower = &eclShower;
         setShowerShapeVariables(N2shower, true);
         break;
@@ -263,15 +265,15 @@ void ECLShowerShapeModule::event()
     double prodN1zernikeMVAs = 1.0;
     //Calculate shower shape variables for the rest of the showers
     for (auto& eclShower : eclCR.getRelationsWith<ECLShower>(eclShowerArrayName())) {
-      if (eclShower.getHypothesisId() == ECLCluster::c_neutralHadron)
+      if (eclShower.getHypothesisId() == ECLShower::c_neutralHadron)
         continue; //shower shape variables already calculated for neutral hadrons
 
       bool calculateZernikeMVA = true;
-      if (!found_N2shower || eclShower.getHypothesisId() != ECLCluster::c_nPhotons) calculateZernikeMVA = false;
+      if (!found_N2shower || eclShower.getHypothesisId() != ECLShower::c_nPhotons) calculateZernikeMVA = false;
 
       setShowerShapeVariables(&eclShower, calculateZernikeMVA);
 
-      if (eclShower.getHypothesisId() == ECLCluster::c_nPhotons) prodN1zernikeMVAs *= eclShower.getZernikeMVA();
+      if (eclShower.getHypothesisId() == ECLShower::c_nPhotons) prodN1zernikeMVAs *= eclShower.getZernikeMVA();
     }
 
     //Set zernikeMVA for the N2 shower
@@ -358,8 +360,7 @@ void ECLShowerShapeModule::endRun()
 
 void ECLShowerShapeModule::terminate()
 {
-  if (m_neighbourMap9) delete m_neighbourMap9;
-  if (m_neighbourMap21) delete m_neighbourMap21;
+
 }
 
 double ECLShowerShapeModule::computeLateralEnergy(const std::vector<ProjectedECLDigit>& projectedDigits,
@@ -572,10 +573,10 @@ void ECLShowerShapeModule::prepareSecondMomentCorrectionsCallback()
   }
 
   //   Check that all corrections are there
-  if (m_secondMomentCorrections[c_thetaType][ECLCluster::c_nPhotons].GetN() == 0 or
-      m_secondMomentCorrections[c_phiType][ECLCluster::c_nPhotons].GetN() == 0 or
-      m_secondMomentCorrections[c_thetaType][ECLCluster::c_neutralHadron].GetN() == 0 or
-      m_secondMomentCorrections[c_phiType][ECLCluster::c_neutralHadron].GetN() == 0) {
+  if (m_secondMomentCorrections[c_thetaType][ECLShower::c_nPhotons].GetN() == 0 or
+      m_secondMomentCorrections[c_phiType][ECLShower::c_nPhotons].GetN() == 0 or
+      m_secondMomentCorrections[c_thetaType][ECLShower::c_neutralHadron].GetN() == 0 or
+      m_secondMomentCorrections[c_phiType][ECLShower::c_neutralHadron].GetN() == 0) {
     B2FATAL("Missing corrections for second moments..");
   }
 }

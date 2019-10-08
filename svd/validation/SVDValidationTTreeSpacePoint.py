@@ -67,7 +67,7 @@ class SVDValidationTTreeSpacePoint(Module):
 
         # Start with SpacePoints and use the relation to get the corresponding
         # digits
-        spacepoints = Belle2.PyStoreArray('SpacePoints')
+        spacepoints = Belle2.PyStoreArray('SVDSpacePoints')
 
         for sp in spacepoints:
 

@@ -1,6 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['framework', '$ROOT_LIBS', 'trg_cdc_dataobjects',
-               'trg_cdc', 'mdst_dataobjects', 'cdc_dataobjects', 'cdc']
-
-Return('env')

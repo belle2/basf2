@@ -9,10 +9,15 @@
  **************************************************************************/
 
 #include <mva/methods/TMVA.h>
+#include <framework/logging/Logger.h>
+#include <framework/utilities/MakeROOTCompatible.h>
+#include <framework/utilities/ScopeGuard.h>
+
 #include <TPluginManager.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <memory>
 
 namespace Belle2 {
   namespace MVA {
@@ -193,7 +198,7 @@ namespace Belle2 {
         free(directory_template);
       }
 
-      WorkingDirectoryManager dummy(directory);
+      auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;
       if (jobName.empty())
@@ -232,8 +237,8 @@ namespace Belle2 {
       factory.SetWeightExpression(Belle2::makeROOTCompatible(m_general_options.m_weight_variable));
 #endif
 
-      TTree* signal_tree = new TTree("signal_tree", "signal_tree");
-      TTree* background_tree = new TTree("background_tree", "background_tree");
+      auto* signal_tree = new TTree("signal_tree", "signal_tree");
+      auto* background_tree = new TTree("background_tree", "background_tree");
 
       for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
         signal_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
@@ -303,7 +308,7 @@ namespace Belle2 {
         free(directory_template);
       }
 
-      WorkingDirectoryManager dummy(directory);
+      auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;
       if (jobName.empty())
@@ -342,7 +347,7 @@ namespace Belle2 {
 #endif
 
 
-      TTree* regression_tree = new TTree("regression_tree", "regression_tree");
+      auto* regression_tree = new TTree("regression_tree", "regression_tree");
 
       for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
         regression_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
@@ -391,13 +396,17 @@ namespace Belle2 {
       // Initialize TMVA and ROOT stuff
       TMVA::Tools::Instance();
 
-      m_expert = std::unique_ptr<TMVA::Reader>(new TMVA::Reader("!Color:!Silent"));
+      m_expert = std::make_unique<TMVA::Reader>("!Color:!Silent");
 
       GeneralOptions general_options;
       weightfile.getOptions(general_options);
       m_input_cache.resize(general_options.m_variables.size(), 0);
       for (unsigned int i = 0; i < general_options.m_variables.size(); ++i) {
         m_expert->AddVariable(Belle2::makeROOTCompatible(general_options.m_variables[i]), &m_input_cache[i]);
+      }
+      m_spectators_cache.resize(general_options.m_spectators.size(), 0);
+      for (unsigned int i = 0; i < general_options.m_spectators.size(); ++i) {
+        m_expert->AddSpectator(Belle2::makeROOTCompatible(general_options.m_spectators[i]), &m_spectators_cache[i]);
       }
 
       if (weightfile.containsElement("TMVA_Logfile")) {
@@ -411,7 +420,9 @@ namespace Belle2 {
     {
 
       weightfile.getOptions(specific_options);
-      expert_signalFraction = weightfile.getSignalFraction();
+      if (specific_options.transform2probability) {
+        expert_signalFraction = weightfile.getSignalFraction();
+      }
 
       // TMVA parses the method type for plugins out of the weightfile name, so we must ensure that it has the expected format
       std::string custom_weightfile = weightfile.generateFileName(std::string("_") + specific_options.m_method + ".weights.xml");
@@ -478,6 +489,8 @@ namespace Belle2 {
         test_data.loadEvent(iEvent);
         for (unsigned int i = 0; i < m_input_cache.size(); ++i)
           m_input_cache[i] = test_data.m_input[i];
+        for (unsigned int i = 0; i < m_spectators_cache.size(); ++i)
+          m_spectators_cache[i] = test_data.m_spectators[i];
         if (specific_options.transform2probability)
           probabilities[iEvent] = m_expert->GetProba(specific_options.m_method, expert_signalFraction);
         else

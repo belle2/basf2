@@ -12,11 +12,11 @@ namespace Belle2 {
 
   public:
     ERecoRunControlCallback(ERecoMasterCallback* callback);
-    virtual ~ERecoRunControlCallback() throw() {}
+    virtual ~ERecoRunControlCallback() {}
 
   public:
-    virtual void initialize(const DBObject& obj) throw(RCHandlerException);
-    virtual bool perform(NSMCommunicator& com) throw();
+    virtual void initialize(const DBObject& obj);
+    virtual bool perform(NSMCommunicator& com);
 
   private:
     ERecoMasterCallback* m_callback;

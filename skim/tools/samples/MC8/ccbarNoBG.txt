@@ -1,0 +1,1 @@
+/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/prod00000973/s00/e0000/4S/r00000/ccbar/sub00/mdst_001159_prod00000973_task00001159.root

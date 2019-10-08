@@ -10,6 +10,7 @@
 
 #include <analysis/modules/VariablesToExtraInfo/VariablesToExtraInfoModule.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
@@ -32,12 +33,11 @@ VariablesToExtraInfoModule::VariablesToExtraInfoModule()
   addParam("decayString", m_decayString, "DecayString specifying the daughter Particle to be included in the ParticleList",
            std::string(""));
   addParam("overwrite", m_overwrite,
-           "-1/0/1: Overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given name already exists", 0);
+           "-1/0/1/2: Overwrite if lower / don't overwrite / overwrite if higher / always overwrite, in case if extra info with given name already exists",
+           0);
 }
 
-VariablesToExtraInfoModule::~VariablesToExtraInfoModule()
-{
-}
+VariablesToExtraInfoModule::~VariablesToExtraInfoModule() = default;
 
 void VariablesToExtraInfoModule::initialize()
 {
@@ -82,8 +82,8 @@ void VariablesToExtraInfoModule::event()
       addExtraInfo(p, p);
     } else {
       std::vector<const Particle*> selparticles = m_pDDescriptor.getSelectionParticles(p);
-      for (unsigned int iDaug = 0; iDaug < selparticles.size(); iDaug++) {
-        Particle* daug = particles[selparticles[iDaug]->getArrayIndex()];
+      for (auto& selparticle : selparticles) {
+        Particle* daug = particles[selparticle->getArrayIndex()];
         addExtraInfo(p, daug);
       }
     }
@@ -105,6 +105,8 @@ void VariablesToExtraInfoModule::addExtraInfo(const Particle* source, Particle* 
           destination->setExtraInfo(m_extraInfoNames[iVar], value);
       } else if (m_overwrite == 0) {
         B2WARNING("Extra info with given name " << m_extraInfoNames[iVar] << " already set, I won't set it again.");
+      } else if (m_overwrite == 2) {
+        destination->setExtraInfo(m_extraInfoNames[iVar], value);
       }
 
     } else {

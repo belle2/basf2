@@ -14,6 +14,7 @@
 #include <genfit/MeasuredStateOnPlane.h>
 
 #include <vector>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
   /**
@@ -34,6 +35,7 @@ namespace Belle2 {
     {
       AState* currentState = pair.second;
 
+      B2ASSERT("Can not update with nothing", currentState->mSoPSet());
       genfit::MeasuredStateOnPlane measuredStateOnPlane = currentState->getMeasuredStateOnPlane();
 
       const double chi2 = m_kalmanStepper.kalmanStep(measuredStateOnPlane, *currentState);

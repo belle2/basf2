@@ -11,10 +11,8 @@
 #include <beast/pindiode/simulation/SensitiveDetector.h>
 #include <beast/pindiode/dataobjects/PindiodeSimHit.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
 
 #include <G4Track.hh>
 #include <G4Step.hh>
@@ -26,7 +24,6 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector():
       Simulation::SensitiveDetectorBase("PindiodeSensitiveDetector", Const::invalidDetector)
     {
-      m_simhitNumber = 0;
       m_hitNum = 0;
       m_EvnetNumber = 0;
       m_oldEvnetNumber = 0;
@@ -201,10 +198,10 @@ namespace Belle2 {
       RelationArray pindiodeSimHitRel(mcParticles, PindiodeHits);
       TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
       PindiodeHits.appendNew(cellId, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);
-      B2DEBUG(150, "HitNumber: " << m_simhitNumber);
-      int m_simhitNumber = PindiodeHits.getEntries() - 1;
-      pindiodeSimHitRel.add(trackID, m_simhitNumber);
-      return (m_simhitNumber);
+      int simhitNumber = PindiodeHits.getEntries() - 1;
+      B2DEBUG(150, "HitNumber: " << simhitNumber);
+      pindiodeSimHitRel.add(trackID, simhitNumber);
+      return (simhitNumber);
     }//saveSimHit
 
 

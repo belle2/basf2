@@ -16,8 +16,6 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/member.hpp>
 
-#include <string>
-
 namespace Belle2 {
 
   /** Baseclass for all RelationIndexContainers.
@@ -32,6 +30,9 @@ namespace Belle2 {
 
     /** Virtual destructor to create vtable. */
     virtual ~RelationIndexBase() {}
+
+    /** Clear the index (at the end of the event) */
+    virtual void clear() = 0;
   };
 
   /** Class to store a bidirectional index between two StoreArrays.
@@ -125,6 +126,9 @@ namespace Belle2 {
      *               RelationArray says that it has not been modified
      */
     void rebuild(bool force = false);
+
+    /** Clear the index (at the end of an event) */
+    virtual void clear() override { m_index.clear(); }
 
     /** Instance of the index. */
     ElementIndex m_index;

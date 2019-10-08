@@ -29,7 +29,8 @@ from caf.framework import Calibration, CAF
 ROOT.gROOT.SetBatch(True)
 
 # Specify the input file(s)
-input_files = [os.path.abspath('/group/belle2/users/jbennett/GCR1/test/r03118/dedx.cosmic.0001.3118.*.root')]
+input_files = [os.path.abspath(
+    '/group/belle2/users/jbennett/GCR2/release-01-02-01/DB00000359/r00282/dst.cosmic.0002.0282.f00000.root')]
 
 # Modify the collector to apply other calibration constants
 momentum_col = register_module('CDCDedxElectronCollector')

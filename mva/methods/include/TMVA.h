@@ -16,12 +16,6 @@
 #include <mva/interface/Teacher.h>
 #include <mva/interface/Expert.h>
 
-#include <framework/utilities/MakeROOTCompatible.h>
-#include <framework/utilities/WorkingDirectoryManager.h>
-#include <framework/logging/LogSystem.h>
-#include <framework/utilities/Utils.h>
-#include <framework/logging/Logger.h>
-
 #include <TMVA/Factory.h>
 #include <TMVA/Tools.h>
 #include <TMVA/Reader.h>
@@ -196,7 +190,7 @@ namespace Belle2 {
        * Train a mva method using the given dataset returning a Weightfile
        * @param training_data used to train the method
        */
-      virtual Weightfile train(Dataset& training_data) const;
+      virtual Weightfile train(Dataset& training_data) const override;
 
     protected:
       TMVAOptionsClassification specific_options; /**< Method specific options */
@@ -219,7 +213,7 @@ namespace Belle2 {
        * Train a mva method using the given dataset returning a Weightfile
        * @param training_data used to train the method
        */
-      virtual Weightfile train(Dataset& training_data) const;
+      virtual Weightfile train(Dataset& training_data) const override;
 
     protected:
       TMVAOptionsRegression specific_options; /**< Method specific options */
@@ -241,6 +235,8 @@ namespace Belle2 {
       std::unique_ptr<TMVA::Reader> m_expert; /**< TMVA::Reader pointer */
       mutable std::vector<float>
       m_input_cache; /**< Input Cache for TMVA::Reader: Otherwise we would have to set the branch addresses in each apply call */
+      mutable std::vector<float>
+      m_spectators_cache; /**< Spectators Cache for TMVA::Reader: Otherwise we would have to set the branch addresses in each apply call */
     };
 
     /**

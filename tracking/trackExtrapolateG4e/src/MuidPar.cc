@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
+ * Contributors: Alberto Martini                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,26 +12,42 @@
 #include <tracking/dataobjects/Muid.h>
 
 #include <fstream>
-#include <exception>
 #include <cmath>
 
-#include <framework/utilities/FileSystem.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
-
 namespace Belle2 {
 
   MuidPar::MuidPar() : m_ReducedChiSquaredDx(0.0)
   {
+    for (int outcome = 1; outcome <= MUID_MaxOutcome; ++outcome) {
+      for (int lastLayer = 0; lastLayer <= MUID_MaxBarrelLayer; ++lastLayer) {
+        for (unsigned int layer = 0; layer < MUID_MaxBarrelLayer + MUID_MaxForwardEndcapLayer + 2;
+             ++layer) { // MUID_MaxBarrelLayer and MUID_MaxForwardEndcapLayer are 0 index based thus an addition of 2 is needed
+          m_LayerPDF[outcome][lastLayer][layer] = 0.0;
+        }
+      }
+    }
+    for (int detector = 0; detector <= MUID_MaxDetector; ++detector) {
+      for (int halfNdof = 0; halfNdof <= MUID_MaxHalfNdof; ++halfNdof) {
+        m_ReducedChiSquaredThreshold[detector][halfNdof] = 0.0;
+        m_ReducedChiSquaredScaleY[detector][halfNdof] = 0.0;
+        m_ReducedChiSquaredScaleX[detector][halfNdof] = 0.0;
+        for (int i = 0; i < MUID_ReducedChiSquaredNbins; ++i) {
+          m_ReducedChiSquaredPDF[detector][halfNdof][i] = 0.0;
+          m_ReducedChiSquaredD1[detector][halfNdof][i] = 0.0;
+          m_ReducedChiSquaredD2[detector][halfNdof][i] = 0.0;
+          m_ReducedChiSquaredD3[detector][halfNdof][i] = 0.0;
+        }
+      }
+    }
   }
 
   MuidPar::MuidPar(int expNo, const char hypothesisName[]) : m_ReducedChiSquaredDx(0.0)
   {
-    fillPDFs(expNo, hypothesisName);
+    //fill PDFs by reading database
+    fillPDFs(hypothesisName);
     if (m_ReducedChiSquaredDx == 0.0) { B2FATAL("Failed to read " << hypothesisName << " PDFs for experiment " << expNo); }
   }
 
@@ -39,41 +55,40 @@ namespace Belle2 {
   {
   }
 
-  void MuidPar::fillPDFs(int expNo, const char hypothesisName[])
-  {
 
-    int myExpNo = expNo + 1;
-    char line[128];
-    GearDir content("/Detector/Tracking/MuidParameters");
-    bool exists = false;
-    while (!exists && (myExpNo > 0)) {
-      sprintf(line, "/Experiment[@exp=\"%d\"]/%s/", --myExpNo, hypothesisName);
-      exists = content.exists(line);
-    }
-    if (exists) {
-      content.append(line);
-    } else {
-      B2FATAL("MuidPar::fillPDFs(): Required XML content /Detector/Tracking/MuidParameters not found for expt #" << expNo <<
-              " or earlier");
-    }
+  void MuidPar::fillPDFs(const char hypothesisName[])
+  {
+    vector<string> const hypotheses = {"Positron", "Electron" , "Deuteron", "Antideuteron", "Proton", "Antiproton", "PionPlus", "PionMinus", "KaonPlus", "KaonMinus", "MuonPlus", "MuonMinus" };
+    int hypothesis = -1;
+    for (unsigned int ii = 0; ii < hypotheses.size(); ii++) { if (hypothesisName == hypotheses[ii]) {hypothesis = ii; break;}}
+    if (hypothesis == -1) B2FATAL("MuidPar::fillPDFs(): hypothesisName " << hypothesisName << "is not expected. ");
 
     for (int outcome = 1; outcome <= MUID_MaxOutcome; ++outcome) {
-      sprintf(line, "LayerProfile/Outcome[@outcome=\"%d\"]/", outcome);
-      GearDir outcomeContent(content);
-      outcomeContent.append(line);
       for (int lastLayer = 0; lastLayer <= MUID_MaxBarrelLayer; ++lastLayer) {
-        if ((outcome == 1) && (lastLayer > MUID_MaxBarrelLayer - 1)) break; // barrel stop: never in layer 14
-        if ((outcome == 2) && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // forward endcap stop: never in layer 13
-        if ((outcome == 3) && (lastLayer > MUID_MaxBarrelLayer)) break; // barrel exit: no layers 15+
-        if ((outcome == 4) && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // forward endcap exit: no layers 14+
-        if ((outcome == 5) && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // backward endcap stop: never in layer 11
-        if ((outcome == 6) && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // backward endcap exit: no layers 12+
-        if ((outcome >= 7) && (outcome <= 21) && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // like outcome == 2
-        if ((outcome >= 22) && (outcome <= 36) && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // like outcome == 5
-        if ((outcome >= 37) && (outcome <= 51) && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // like outcome == 4
-        if ((outcome >= 52) && (outcome <= 66) && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // like outcome == 6
-        sprintf(line, "LastLayer[@layer=\"%d\"]", lastLayer);
-        std::vector<double> layerPDF = outcomeContent.getArray(line);
+        if ((outcome == MuidPar::EMuidOutcome::c_StopInBarrel)
+            && (lastLayer > MUID_MaxBarrelLayer - 1)) break; // barrel stop: never in layer 14
+        if ((outcome == MuidPar::EMuidOutcome::c_StopInForwardEndcap)
+            && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // forward endcap stop: never in layer 13
+        if ((outcome == MuidPar::EMuidOutcome::c_ExitBarrel) && (lastLayer > MUID_MaxBarrelLayer)) break; // barrel exit: no layers 15+
+        if ((outcome == MuidPar::EMuidOutcome::c_ExitForwardEndcap)
+            && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // forward endcap exit: no layers 14+
+        if ((outcome == MuidPar::EMuidOutcome::c_StopInBackwardEndcap)
+            && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // backward endcap stop: never in layer 11
+        if ((outcome == MuidPar::EMuidOutcome::c_ExitBackWardEndcap)
+            && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // backward endcap exit: no layers 12+
+        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelStopInForwardMin)
+            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelStopInForwardMax)
+            && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // like outcome == 2
+        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelStopInBackwardMin)
+            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelStopInBackwardMax)
+            && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // like outcome == 5
+        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelExitForwardMin)
+            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelExitForwardMax)
+            && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // like outcome == 4
+        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelExitBackwardMin)
+            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelExitBackwardMax)
+            && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // like outcome == 6
+        std::vector<double> layerPDF = m_muidParameters->getProfile(hypothesis, outcome, lastLayer);
         for (unsigned int layer = 0; layer < layerPDF.size(); ++layer) {
           m_LayerPDF[outcome][lastLayer][layer] = layerPDF[layer];
         }
@@ -82,21 +97,12 @@ namespace Belle2 {
 
     m_ReducedChiSquaredDx = MUID_ReducedChiSquaredLimit / MUID_ReducedChiSquaredNbins;   // bin size
     for (int detector = 0; detector <= MUID_MaxDetector; ++detector) {
-      sprintf(line, "TransversePDF/BarrelAndEndcap");
-      if (detector == 1) { sprintf(line, "TransversePDF/BarrelOnly"); }
-      if (detector == 2) { sprintf(line, "TransversePDF/EndcapOnly"); }
-      GearDir detectorContent(content);
-      detectorContent.append(line);
 
       for (int halfNdof = 1; halfNdof <= MUID_MaxHalfNdof; ++halfNdof) {
-        sprintf(line, "DegreesOfFreedom[@ndof=\"%d\"]/Tail/Threshold", 2 * halfNdof);
-        m_ReducedChiSquaredThreshold[detector][halfNdof] = detectorContent.getDouble(line);
-        sprintf(line, "DegreesOfFreedom[@ndof=\"%d\"]/Tail/ScaleY", 2 * halfNdof);
-        m_ReducedChiSquaredScaleY[detector][halfNdof] = detectorContent.getDouble(line);
-        sprintf(line, "DegreesOfFreedom[@ndof=\"%d\"]/Tail/ScaleX", 2 * halfNdof);
-        m_ReducedChiSquaredScaleX[detector][halfNdof] = detectorContent.getDouble(line);
-        sprintf(line, "DegreesOfFreedom[@ndof=\"%d\"]/Histogram", 2 * halfNdof);
-        std::vector<double> reducedChiSquaredPDF = detectorContent.getArray(line);
+        m_ReducedChiSquaredThreshold[detector][halfNdof] = m_muidParameters->getThreshold(hypothesis, detector, halfNdof * 2);
+        m_ReducedChiSquaredScaleY[detector][halfNdof] = m_muidParameters->getScaleY(hypothesis, detector, halfNdof * 2);
+        m_ReducedChiSquaredScaleX[detector][halfNdof] = m_muidParameters->getScaleX(hypothesis, detector, halfNdof * 2);
+        std::vector<double> reducedChiSquaredPDF = m_muidParameters->getPDF(hypothesis, detector, halfNdof * 2);
         if (reducedChiSquaredPDF.size() != MUID_ReducedChiSquaredNbins) {
           B2ERROR("TransversePDF vector for hypothesis " << hypothesisName << "  detector " << detector
                   << " has " << reducedChiSquaredPDF.size() << " entries; should be " << MUID_ReducedChiSquaredNbins);
@@ -117,11 +123,6 @@ namespace Belle2 {
       }
     }
 
-    if (myExpNo == expNo) {
-      B2DEBUG(1, "MuidPar::fillPDFs(): Loaded " << hypothesisName << " PDFs for expt #" << myExpNo);
-    } else {
-      B2DEBUG(1, "MuidPar::fillPDFs(): Loaded " << hypothesisName << " PDFs for expt #" << myExpNo << " (requested #" << expNo << ")");
-    }
   }
 
   void MuidPar::spline(int n, double dx, double Y[], double B[], double C[], double D[])
@@ -161,18 +162,18 @@ namespace Belle2 {
     D[n - 1] = D[n - 2];
   }
 
+
   double MuidPar::getPDF(const Muid* muid, bool isForward) const
   {
     return getPDFLayer(muid, isForward) * getPDFRchisq(muid);
   }
 
+
   double MuidPar::getPDFLayer(const Muid* muid, bool isForward) const
   {
 
-    // outcome:  0=Not in KLM, 1=Barrel Stop, 2=Endcap Stop, 3=Barrel Exit, 4=Endcap Exit
-
     int outcome = muid->getOutcome();
-    if ((outcome <= 0) || (outcome > 4)) return 0.0;
+    if ((outcome <= 0) || (outcome > c_ExitForwardEndcap)) return 0.0;
 
     int barrelExtLayer = muid->getBarrelExtLayer();
     int endcapExtLayer = muid->getEndcapExtLayer();
@@ -181,59 +182,53 @@ namespace Belle2 {
     unsigned int extLayerPattern = muid->getExtLayerPattern();
     unsigned int hitLayerPattern = muid->getHitLayerPattern();
 
-    // Use finer granularity for non-zero outcome:
-    //  1: stop in barrel
-    //  2: stop in forward endcap (without crossing barrel)
-    //  3: exit from barrel (without crossing endcap)
-    //  4: exit from forward endcap (without crossing barrel)
-    //  5: stop in forward endcap (after crossing barrel)
-    //  6: exit from forward endcap (after crossing barrel)
-    //  7-21: stop in forward endcap (after crossing barrel)
-    //  22-36: stop in backward endcap (after crossing barrel)
-    //  37-51: exit from forward endcap (after crossing barrel)
-    //  52-66: exit from backward endcap (after crossing barrel)
-
     int lastLayer = barrelExtLayer;
-    if (outcome == 2) { // forward endcap stop (no barrel hits)
+    if (outcome == c_StopInForwardEndcap) { // forward endcap stop (no barrel hits)
       lastLayer = endcapExtLayer;
       if (barrelExtLayer < 0) {
-        outcome = isForward ? 2 : 5; // forward or backward endcap stop (no barrel hits)
+        outcome = isForward ? c_StopInForwardEndcap : c_StopInBackwardEndcap; // forward or backward endcap stop (no barrel hits)
       } else {
-        outcome = (isForward ? 7 : 22) + barrelExtLayer; // forward/backward endcap stop (B+E)
+        outcome = (isForward ? c_CrossBarrelStopInForwardMin : c_CrossBarrelStopInBackwardMin) +
+                  barrelExtLayer; // forward/backward endcap stop (B+E)
       }
-    } else if (outcome == 4) { // forward endcap exit (no barrel hits)
+    } else if (outcome == c_ExitForwardEndcap) { // forward endcap exit (no barrel hits)
       lastLayer = endcapExtLayer;
       if (barrelExtLayer < 0) {
-        outcome = isForward ? 4 : 6;  // forward or backward endcap exit (no barrel hits)
+        outcome = isForward ? c_ExitForwardEndcap : c_ExitBackWardEndcap;  // forward or backward endcap exit (no barrel hits)
       } else {
-        outcome = (isForward ? 37 : 52) + barrelExtLayer; // forward/backward endcap exit (B+E)
+        outcome = (isForward ? c_CrossBarrelExitForwardMin : c_CrossBarrelExitBackwardMin) +
+                  barrelExtLayer; // forward/backward endcap exit (B+E)
       }
     }
 
-    // Get probability density that each crossed layer should have a hit.
 
+    //Pdf treatment used to avoid layer inefficiency problems
     double pdf = 1.0;
     unsigned int testBit = 1;
+
     for (int layer = 0; layer <= barrelExtLayer; ++layer) {
       if ((testBit & extLayerPattern) != 0) {
-        if ((testBit & hitLayerPattern) != 0) {
+        if ((testBit & hitLayerPattern) != 0) {//checking the presence of a hit in the layer
           pdf *= m_LayerPDF[outcome][lastLayer][layer];
         } else {
-          if (((layer == 0) && (outcome < 7)) || (layer == MUID_MaxBarrelLayer) || (layer < barrelExtLayer))
-            pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer]);
+          if (((layer == 0) && (outcome < c_CrossBarrelStopInForwardMin)) || (layer == MUID_MaxBarrelLayer) || (layer < barrelExtLayer)) {
+            pdf *= 1 - m_LayerPDF[outcome][lastLayer][layer] * muid->getExtBKLMEfficiencyValue(layer);
+          }
         }
       }
       testBit <<= 1; // move to next bit
     }
+
     int maxLayer = isForward ? MUID_MaxForwardEndcapLayer : MUID_MaxBackwardEndcapLayer;
     testBit = 1 << (MUID_MaxBarrelLayer + 1);
     for (int layer = 0; layer <= endcapExtLayer; ++layer) {
       if ((testBit & extLayerPattern) != 0) {
-        if ((testBit & hitLayerPattern) != 0) {
+        if ((testBit & hitLayerPattern) != 0) {//checking the presence of a hit in the layer
           pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
         } else {
-          if ((layer == 0) || (layer == maxLayer) || (layer < endcapExtLayer))
-            pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]);
+          if ((layer == 0) || (layer == maxLayer) || (layer < endcapExtLayer)) {
+            pdf *= 1 - m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1] * muid->getExtEKLMEfficiencyValue(layer);
+          }
         }
       }
       testBit <<= 1; // move to next bit
@@ -242,6 +237,7 @@ namespace Belle2 {
     return pdf;
 
   }
+
 
   double MuidPar::getPDFRchisq(const Muid* muid) const
   {
@@ -269,15 +265,7 @@ namespace Belle2 {
     double pdf = 0.0;
     if (halfNdof > MUID_MaxHalfNdof) { // extremely rare
       x *= m_ReducedChiSquaredScaleX[detector][MUID_MaxHalfNdof] * halfNdof;
-      if (halfNdof == 1) {
-        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * std::exp(-x);
-      } else if (halfNdof == 2) {
-        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * x * std::exp(-x);
-      } else if (halfNdof == 3) {
-        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * x * x * std::exp(-x);
-      } else {
-        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * std::pow(x, halfNdof - 1.0) * std::exp(-x);
-      }
+      pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * std::pow(x, halfNdof - 1.0) * std::exp(-x);
     } else {
       if (x > m_ReducedChiSquaredThreshold[detector][halfNdof]) { // tail function for large x
         x *= m_ReducedChiSquaredScaleX[detector][halfNdof] * halfNdof;

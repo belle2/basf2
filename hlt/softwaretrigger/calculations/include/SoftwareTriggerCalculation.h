@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerObject.h>
 #include <hlt/softwaretrigger/dataobjects/SoftwareTriggerVariables.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <TTree.h>
@@ -62,7 +62,10 @@ namespace Belle2 {
       const SoftwareTriggerObject& fillInCalculations();
 
       /// Override this function to implement your calculation.
-      virtual void doCalculation(SoftwareTriggerObject& m_calculationResult) const = 0;
+      virtual void doCalculation(SoftwareTriggerObject& m_calculationResult) = 0;
+
+      /// Default but virtual desctructor
+      virtual ~SoftwareTriggerCalculation() = default;
 
     private:
       /// Internal storage of the result of the calculation.

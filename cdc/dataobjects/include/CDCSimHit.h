@@ -13,7 +13,6 @@
 
 #include <cdc/dataobjects/WireID.h>
 #include <simulation/dataobjects/SimHitBase.h>
-#include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>
 
@@ -251,7 +250,7 @@ namespace Belle2 {
 
 
     //! The method to get global time
-    float getGlobalTime() const { return m_globalTime; }
+    float getGlobalTime() const override { return m_globalTime; }
 
     //! Empty constructor
     /*! Recommended for ROOT IO
@@ -312,14 +311,14 @@ namespace Belle2 {
     /** Shift the SimHit in time
      * @param delta The value of the time shift.
      */
-    virtual void shiftInTime(float delta)
+    virtual void shiftInTime(float delta) override
     {
-      m_globalTime = m_flightTime + delta;
+      m_globalTime += delta;
     }
 
 
     /** ROOT Macro. */
-    ClassDef(CDCSimHit, 5);
+    ClassDefOverride(CDCSimHit, 6);
   };
 } // end namespace Belle2
 #endif

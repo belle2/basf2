@@ -90,7 +90,7 @@ namespace Belle2 {
     /** Creating a deep copy of this hit.
      * Overrides the method inherited from GFRecoHit.
      */
-    genfit::AbsMeasurement* clone() const;
+    genfit::AbsMeasurement* clone() const override;
 
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
@@ -122,7 +122,7 @@ namespace Belle2 {
 
     /** Methods that actually interface to Genfit.  */
     //virtual genfit::SharedPlanePtr constructPlane(const genfit::StateOnPlane&) const;
-    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
+    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const override;
 
   private:
 
@@ -139,7 +139,10 @@ namespace Belle2 {
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(SVDRecoHit2D, 7)
+    /** Apply planar deformation of sensors */
+    TVectorD applyPlanarDeformation(TVectorD rawHit, std::vector<double> planarParameters, const genfit::StateOnPlane& state) const;
+
+    ClassDefOverride(SVDRecoHit2D, 7)
   };
 
 } // namespace Belle2

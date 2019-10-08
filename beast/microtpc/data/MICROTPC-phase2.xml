@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DetectorComponent name="MICROTPC">
+<DetectorComponent name="MICROTPC"  xmlns:xi="http://www.w3.org/2001/XInclude">
 <Creator library="beast">MICROTPCCreator</Creator>
 <Content>
+<xi:include href="MICROTPC-recoilProb.xml"/>
 <!-- normally, parameters should be defined with a unit attribute. This
 enables automatic conversion to the default framework unit --> 
 <stepSize unit="um">200</stepSize>
@@ -81,7 +82,7 @@ whitespace, comma or semi-colon -->
       <AngleX unit="deg">0.0</AngleX>
       <AngleZ unit="deg">0.0</AngleZ>
       <TPCpos_x unit="cm">0.0</TPCpos_x>
-      <TPCpos_y unit="cm">33.7</TPCpos_y>
+      <TPCpos_y unit="cm">34.7</TPCpos_y>
       <TPCpos_z unit="cm">190.6</TPCpos_z>
       <SensVol_x unit="cm">0</SensVol_x>
       <SensVol_y unit="cm">33.7</SensVol_y>
@@ -113,7 +114,7 @@ whitespace, comma or semi-colon -->
       <!--AngleZ unit="deg">0.0</AngleZ-->
       <AngleZ unit="deg">180.0</AngleZ>
       <TPCpos_x unit="cm">0</TPCpos_x>
-      <TPCpos_y unit="cm">-33.7</TPCpos_y>
+      <TPCpos_y unit="cm">-34.7</TPCpos_y>
       <TPCpos_z unit="cm">190.6</TPCpos_z>
       <SensVol_x unit="cm">0</SensVol_x>
       <SensVol_y unit="cm">-33.7</SensVol_y>

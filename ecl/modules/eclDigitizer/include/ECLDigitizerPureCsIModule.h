@@ -8,18 +8,26 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDIGITIZERPURECSIMODULE_H_
-#define ECLDIGITIZERPURECSIMODULE_H_
+#pragma once
 
-#include <framework/core/Module.h>
-#include <ecl/digitization/EclConfigurationPure.h>
-#include <ecl/dataobjects/ECLWaveformData.h>
-#include <ecl/geometry/ECLGeometryPar.h>
+//STL
 #include <vector>
 
-class TH1F;
+//Framework
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+
+//ECL
+#include <ecl/digitization/EclConfigurationPure.h>
 
 namespace Belle2 {
+
+  class ECLNoiseData;
+  class ECLDsp;
+  class ECLHit;
+  class ECLPureCsIInfo;
+  class ECLDigit;
+
   /** The ECLDigitizerPureCsI module.
    *
    * This module is responsible to digitize all hits found in the ECL from ECLHit
@@ -44,26 +52,26 @@ namespace Belle2 {
 
 
     /** Initialize variables  */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Nothing so far.*/
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Actual digitization of all pure CsI hits in the ECL.
      *
      *  The digitized hits are written into the DataStore.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** Nothing so far. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Free memory. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
     /** ECL ring ID. */
-    int m_thetaID[ECL::EclConfigurationPure::m_nch];
+    int m_thetaID[ECL::EclConfigurationPure::m_nch] {};
     /** Returns ring ID for a certain crystal. */
     void mapGeometry();
     /** Returns 1 if corresponding crystal is set as pure CsI crystal. */
@@ -93,6 +101,15 @@ namespace Belle2 {
     /** Type of ADC counts. */
     using adccounts_type = ECL::EclConfigurationPure::adccountspure_t;
 
+    /** StoreArray ECLDsp */
+    StoreArray<ECLDsp> m_ecldsps;
+    /** StoreArray ECLDigit */
+    StoreArray<ECLDigit> m_ecldigits;
+    /** StoreArray ECLPureCsIInfo */
+    StoreArray<ECLPureCsIInfo> m_eclpurecsiinfo;
+    /** StoreArray ECLHit */
+    StoreArray<ECLHit> m_hitLists;
+
     /** Fitting parameters. */
     std::vector<fitparams_type> m_fitparams;
     /** Tabulated shape line. */
@@ -104,10 +121,8 @@ namespace Belle2 {
     std::vector<ECLNoiseData> m_noise;
     /** read Shaper-DSP data from root file. */
     void readDSPDB();
-
     /** Event number */
-    int    m_nEvent;
-
+    int m_nEvent = 0;
     /** Module parameters. */
     /** Ring ID of first pure CsI ring. */
     int m_thetaIdMin;
@@ -143,5 +158,3 @@ namespace Belle2 {
     static constexpr const char* eclPureCsIInfoArrayName() { return "ECLPureCsIInfo"; }
   };
 }//Belle2
-
-#endif /* ECLDIGITIZERPURECSIMODULE_H_ */

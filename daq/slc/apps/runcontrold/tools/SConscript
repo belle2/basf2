@@ -1,5 +1,0 @@
-Import('env')
-
-env['TOOLS_LIBS']['runcontrold'] = ['pthread', 'daq', 'nsm2_b2lib', 'nsm2_corelib', '$PGSQL_LIBS']
-#'framework', 
-Return('env')

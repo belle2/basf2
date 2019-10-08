@@ -54,6 +54,13 @@ RFOutputServer::RFOutputServer(string conffile)
   // 6. Initialize data flow monitor
   m_flow = new RFFlowStat((char*)shmname.c_str());
 
+  // 7. Clear PID list
+  m_pid_sender = 0;
+  m_pid_basf2 = 0;
+  m_nnodes = m_conf->getconfi("processor", "nnodes");
+  for (int i = 0; i < m_nnodes; i++)
+    m_pid_receiver[i] = 0;
+
 }
 
 RFOutputServer::~RFOutputServer()
@@ -149,6 +156,9 @@ int RFOutputServer::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
       m_nnodes++;
     }
   }
+
+  m_rbufin->forceClear();
+  m_rbufout->forceClear();
   return 0;
 }
 
@@ -163,7 +173,7 @@ int RFOutputServer::UnConfigure(NSMmsg*, NSMcontext*)
   if (m_pid_sender != 0) {
     printf("killing sender %d\n", m_pid_sender);
     //    kill(m_pid_sender, SIGINT);
-    kill(m_pid_sender, SIGKILL);
+    kill(m_pid_sender, SIGINT);
     ws = waitpid(m_pid_sender, &status, 0);
     printf("wait return = %d, status = %d\n", ws, status);
   }
@@ -199,8 +209,8 @@ int RFOutputServer::UnConfigure(NSMmsg*, NSMcontext*)
 int RFOutputServer::Start(NSMmsg*, NSMcontext*)
 {
   // Clear RingBuffer
-  m_rbufin->forceClear();
   m_rbufout->forceClear();
+  //  m_rbufin->forceClear();
   return 0;
 }
 
@@ -269,6 +279,13 @@ void RFOutputServer::server()
     m_flow->fillProcessStatus(GetNodeInfo(), m_pid_receiver[recv_id], m_pid_sender,
                               m_pid_basf2);
   }
+}
+void RFOutputServer::cleanup()
+{
+  printf("RFOutputServer : cleaning up\n");
+  UnConfigure(NULL, NULL);
+  printf("RFOutputServer: Done. Exitting\n");
+  exit(-1);
 }
 
 

@@ -32,11 +32,12 @@
 // #include "G4CashKarpRKF45.hh"
 // #include "G4RKG3_Stepper.hh"
 
-#include <G4SystemOfUnits.hh>
+#include <CLHEP/Units/SystemOfUnits.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
+using namespace CLHEP;
 
 G4MonopoleFieldSetup* G4MonopoleFieldSetup::fMonopoleFieldSetup = 0;
 
@@ -79,9 +80,4 @@ void G4MonopoleFieldSetup::SwitchChordFinder(G4int val)
       fFieldManager->SetChordFinder(fMonopoleChordFinder);
       break;
   }
-}
-
-G4FieldManager*  G4MonopoleFieldSetup::GetGlobalFieldManager()
-{
-  return G4TransportationManager::GetTransportationManager()->GetFieldManager();
 }

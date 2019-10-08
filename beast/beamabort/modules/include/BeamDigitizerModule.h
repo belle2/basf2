@@ -12,13 +12,8 @@
 #define BEAMDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
-#include <string>
-#include <vector>
-
-//ROOT
-#include <TRandom3.h>
-#include <TF1.h>
-#include <TVector3.h>
+#include <framework/datastore/StoreArray.h>
+#include <beast/beamabort/dataobjects/BeamabortHit.h>
 
 /** size of hit */
 const Int_t MAXSIZE         = 10000;
@@ -46,21 +41,23 @@ namespace Belle2 {
       virtual ~BeamDigitizerModule();
 
       /**  */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /**  */
-      virtual void beginRun();
+      virtual void beginRun() override;
 
       /**  */
-      virtual void event();
+      virtual void event() override;
 
       /**  */
-      virtual void endRun();
+      virtual void endRun() override;
       /**  */
-      virtual void terminate();
+      virtual void terminate() override;
 
 
     private:
+
+      StoreArray<BeamabortHit> m_beamabortHit; /** Array for BemaabortHit */
 
       /** Work function */
       double m_WorkFunction;

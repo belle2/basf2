@@ -8,7 +8,7 @@
 """
 <header>
 <output>ECLBkgOutput.root</output>
-<contact>Benjamin Oberhof, ecl2ml@bpost.kek.jp</contact>
+<contact>Elisa Manoni, elisa.manoni@pg.infn.it</contact>
 </header>
 """
 
@@ -25,6 +25,25 @@ main = create_path()
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 main.add_module(eventinfosetter)
+
+# pGun is used as artifact, otherwise FullSim will complain that no MCParticles Array is available
+pGun = register_module('ParticleGun')
+param_pGun = {
+    'pdgCodes': [2212],
+    'nTracks': 1,
+    'momentumGeneration': 'fixed',
+    'momentumParams': [0.0],
+    'thetaGeneration': 'fixed',
+    'thetaParams': [0.],
+    'phiGeneration': 'fixed',
+    'phiParams': [0., ],
+    'vertexGeneration': 'fixed',
+    'xVertexParams': [0.0, 0.0],
+    'yVertexParams': [0.0, 0.0],
+    'zVertexParams': [0.0, 0.0],
+}
+pGun.param(param_pGun)
+main.add_module(pGun)
 
 # random number for generation
 # import random

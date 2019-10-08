@@ -45,7 +45,15 @@ namespace Belle2 {
 
   TRGCDCEventTime::TRGCDCEventTime(const TRGCDC& TRGCDC, bool makeRootFile)
     : _cdc(TRGCDC),
-      m_makeRootFile(makeRootFile)
+      cnt{{0}},
+  ft{{{0}}},
+  m_foundT0(0), // 2019/07/31 by ytlai
+  m_minusET(0),
+  m_noET(0),
+  threshold(0),
+  m_eventN(0),
+  m_makeRootFile(makeRootFile),
+  m_ver(0)
   {
 
     if (m_makeRootFile) m_fileEvtTime = new TFile("ETF.root", "RECREATE");
@@ -61,6 +69,15 @@ namespace Belle2 {
 
     h = new TH1D("h", "h", 1000, -500, 499);
 
+    memset(cnt, 0, sizeof cnt);
+    memset(ft, 0, sizeof ft);
+
+    // move to constructor
+    //m_minusET = 0;
+    //m_noET = 0;
+    //m_eventN = 0;
+    //m_ver = 0;
+    //m_foundT0 = 0;
   }
   TRGCDCEventTime::~TRGCDCEventTime()
   {
@@ -199,7 +216,7 @@ namespace Belle2 {
       for (int iSL = 0; iSL < 9; iSL++) {
         int hmbw = 160 + 32 * (iSL - 1); //set bit width of hitmap part
         if (iSL == 0) hmbw = 160;
-        string h[10];
+        string hs[10];
         string t[10];
         char file[30];
         sprintf(file, "SL%d.coe", iSL);
@@ -208,9 +225,9 @@ namespace Belle2 {
         string clk = bitset<9>(iClk + 64 * (m_eventN - 1)).to_string();
         string clk2 = bitset<5>(iClk).to_string();
         for (int i = 0; i < 10; i++) {
-          h[i] = bitset<4>(ft[iSL][iClk][i]).to_string();
-          if (cnt[iSL][iClk] > i) t[i] = clk2 + h[i];
-          else t[i] = "00000" + h[i];
+          hs[i] = bitset<4>(ft[iSL][iClk][i]).to_string();
+          if (cnt[iSL][iClk] > i) t[i] = clk2 + hs[i];
+          else t[i] = "00000" + hs[i];
         }
         ofstream fout;
         fout.open(file, ios::app);

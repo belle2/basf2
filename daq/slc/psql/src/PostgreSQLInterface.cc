@@ -10,6 +10,7 @@
 #include <daq/slc/base/StringUtil.h>
 
 #include <iostream>
+#include <daq/slc/system/LockGuard.h>
 
 using namespace Belle2;
 
@@ -17,14 +18,14 @@ PostgreSQLInterface::PostgreSQLInterface(const std::string& host,
                                          const std::string& database,
                                          const std::string& user,
                                          const std::string& password,
-                                         int port) throw()
+                                         int port)
 {
   init(host, database, user, password, port);
   m_sq_conn = NULL;
   m_sq_result = NULL;
 }
 
-PostgreSQLInterface::PostgreSQLInterface() throw()
+PostgreSQLInterface::PostgreSQLInterface()
 {
   ConfigFile config("slowcontrol");
   init(config.get("database.host"),
@@ -36,33 +37,30 @@ PostgreSQLInterface::PostgreSQLInterface() throw()
   m_sq_result = NULL;
 }
 
-void PostgreSQLInterface::connect() throw(DBHandlerException)
+void PostgreSQLInterface::connect()
 {
 #ifndef NOT_USE_PSQL
   if (isConnected()) return;
-  m_mutex.lock();
+  LockGuard lockGuard(m_mutex);
   m_sq_conn = PQconnectdb(StringUtil::form("host=%s dbname=%s user=%s password=%s port=%d",
                                            m_host.c_str(), m_database.c_str(),
                                            m_user.c_str(), m_password.c_str(),
                                            m_port).c_str());
   if (PQstatus(m_sq_conn) == CONNECTION_BAD) {
-    m_mutex.unlock();
     close();
     throw (DBHandlerException("Failed to connect to the database : (%s)",
                               PQerrorMessage(m_sq_conn)));
   }
-  m_mutex.unlock();
 #else
   throw (DBHandlerException("PGLIB is not available"));
 #endif
 }
 
-bool PostgreSQLInterface::isConnected() throw()
+bool PostgreSQLInterface::isConnected()
 {
 #ifndef NOT_USE_PSQL
-  m_mutex.lock();
+  LockGuard lockGuard(m_mutex);
   bool connected = m_sq_conn != NULL && PQstatus(m_sq_conn) == CONNECTION_OK;
-  m_mutex.unlock();
   return connected;
 #else
   return false;
@@ -70,30 +68,29 @@ bool PostgreSQLInterface::isConnected() throw()
 }
 
 void PostgreSQLInterface::execute_imp(const char* command)
-throw(DBHandlerException)
 {
   clear();
 #ifndef NOT_USE_PSQL
-  m_mutex.lock();
+  LockGuard lockGuard(m_mutex);
   m_sq_result = PQexec(m_sq_conn, command);
   ExecStatusType status = PQresultStatus(m_sq_result);
   if (status == PGRES_FATAL_ERROR) {
-    m_mutex.unlock();
-    throw (DBHandlerException("Failed to execute command : %s (%s)",
-                              command, PQerrorMessage(m_sq_conn)));
+    // Need to pre-generate exception to avoid data race
+    // on PQerrorMessage.
+    DBHandlerException exception("Failed to execute command : %s (%s)",
+                                 command, PQerrorMessage(m_sq_conn));
+    throw (exception);
   }
-  m_mutex.unlock();
 #else
   throw (DBHandlerException("libpg is not available"));
 #endif
 }
 
-DBRecordList PostgreSQLInterface::loadRecords() throw(DBHandlerException)
+DBRecordList PostgreSQLInterface::loadRecords()
 {
 #ifndef NOT_USE_PSQL
-  m_mutex.lock();
+  LockGuard lockGuard(m_mutex);
   if (PQresultStatus(m_sq_result) != PGRES_TUPLES_OK) {
-    m_mutex.unlock();
     throw (DBHandlerException("DB records are not ready for reading"));
   }
   const size_t nrecords = PQntuples(m_sq_result);
@@ -116,43 +113,45 @@ DBRecordList PostgreSQLInterface::loadRecords() throw(DBHandlerException)
     }
     m_record_v.push_back(record);
   }
-  m_mutex.unlock();
-  return m_record_v;
+
+  // Vector copy must be done before mutex release,
+  // otherwise data race is introduced.
+  DBRecordList ret(m_record_v);
+
+  return ret;
 #else
   throw (DBHandlerException("libpg is not available"));
 #endif
 }
 
-void PostgreSQLInterface::clear() throw()
+void PostgreSQLInterface::clear()
 {
 #ifndef NOT_USE_PSQL
-  m_mutex.lock();
+  LockGuard lockGuard(m_mutex);
   if (m_sq_result != NULL) {
     PQclear(m_sq_result);
     m_sq_result = NULL;
   }
-  m_mutex.unlock();
 #else
   throw (DBHandlerException("libpg is not available"));
 #endif
 }
 
-void PostgreSQLInterface::close() throw(DBHandlerException)
+void PostgreSQLInterface::close()
 {
   clear();
 #ifndef NOT_USE_PSQL
-  m_mutex.lock();
+  LockGuard lockGuard(m_mutex);
   if (m_sq_conn != NULL) {
     PQfinish(m_sq_conn);
     m_sq_conn = NULL;
   }
-  m_mutex.unlock();
 #else
   throw (DBHandlerException("libpg is not available"));
 #endif
 }
 
-bool PostgreSQLInterface::checkTable(const std::string& tablename) throw(DBHandlerException)
+bool PostgreSQLInterface::checkTable(const std::string& tablename)
 {
 #ifndef NOT_USE_PSQL
   execute("select relname from pg_stat_user_tables where relname='%s';",
@@ -165,7 +164,6 @@ bool PostgreSQLInterface::checkTable(const std::string& tablename) throw(DBHandl
 }
 
 DBFieldTypeList PostgreSQLInterface::getTableContents(const std::string& tablename)
-throw(DBHandlerException)
 {
 #ifndef NOT_USE_PSQL
   DBFieldTypeList name_m;

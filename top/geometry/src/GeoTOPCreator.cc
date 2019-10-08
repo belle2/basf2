@@ -585,11 +585,11 @@ namespace Belle2 {
       auto* optics = new G4AssemblyVolume();
       Simulation::RunManager::Instance().addAssemblyVolume(optics);
 
-      double Lm = geo.getMirrorSegment().getFullLength();
-      double L1 = geo.getBarSegment1().getFullLength();
-      double L2 = geo.getBarSegment2().getFullLength();
-      double Lp = geo.getPrism().getFullLength();
-      double La = geo.getPMTArray().getSizeZ();
+      const double Lm = geo.getMirrorSegment().getFullLength();
+      const double L1 = geo.getBarSegment1().getFullLength();
+      const double L2 = geo.getBarSegment2().getFullLength();
+      const double Lp = geo.getPrism().getFullLength();
+      const double La = geo.getPMTArray().getSizeZ();
 
       // note: z = 0 is at prism-bar joint
 
@@ -622,6 +622,24 @@ namespace Belle2 {
                                                 geo.getModuleID());
       move.setZ(L2 + L1 + Lm / 2);
       optics->AddPlacedVolume(mirrorSegment, move, 0);
+
+      // peek frame approximation (in order to shadow total reflection at prism end)
+      // a call to getFilterThickness is added for backward compatibility
+      const double length = geo.getPrism().getFilterThickness() + 3.5; //mm
+      const double thickness = 1.0; //mm
+      const double width = geo.getPrism().getWidth();
+      const double Yup = geo.getPrism().getThickness() / 2;
+      const double Ydn = Yup - geo.getPrism().getExitThickness();
+
+      auto* peekFrameAbove = createBox("PeekFrameAbove", width, thickness, length, "Al");
+      move.setZ(-(Lp - length / 2));
+      move.setY(Yup + thickness / 2);
+      optics->AddPlacedVolume(peekFrameAbove, move, 0);
+
+      auto* peekFrameBelow = createBox("PeekFrameBelow", width, thickness, length, "Al");
+      move.setZ(-(Lp - length / 2));
+      move.setY(Ydn - thickness / 2);
+      optics->AddPlacedVolume(peekFrameBelow, move, 0);
 
       return optics;
     }
@@ -740,6 +758,7 @@ namespace Belle2 {
       G4Transform3D move;
 
       // mother volume
+
       std::vector<G4TwoVector> polygon;
       polygon.push_back(G4TwoVector(0, geo.getThickness() / 2));
       polygon.push_back(G4TwoVector(geo.getFullLength(), geo.getThickness() / 2));
@@ -755,48 +774,62 @@ namespace Belle2 {
       if (!material) B2FATAL("Material '" << geo.getMaterial() << "' not found");
       auto* prism = new G4LogicalVolume(volume, material, geo.getName());
 
-      // wavelenght filter
-      auto* filter = createBox(geo.getName() + "Filter",
-                               geo.getFilterThickness(),
-                               geo.getExitThickness(),
-                               geo.getWidth(),
-                               geo.getFilterMaterial());
-      // place peel-off regions (if any) into filter
-      int numRegions = 0;
-      std::string message = addNumber("peel-off cookie regions of Slot", moduleID) + ":";
-      for (const auto& region : geo.getPeelOffRegions()) {
-        if (region.fraction <= 0) continue;
-        std::string name = addNumber(geo.getName() + "PeelOff", region.ID);
-        double thickness = geo.getPeelOffThickness();
-        auto* peelOff = createExtrudedSolid(name,
-                                            geo.getPeelOffContour(region),
-                                            thickness,
-                                            geo.getPeelOffMaterial());
-        G4Transform3D T = G4Translate3D((geo.getFilterThickness() - thickness) / 2,
-                                        0,
-                                        geo.getPeelOffCenter(region));
-        G4Transform3D R = G4RotateY3D(-M_PI / 2);
-        G4Transform3D moveRegion = T * R;
-        new G4PVPlacement(moveRegion, peelOff, name, filter, false, 1);
-        message += addNumber(" ", region.ID);
-        numRegions++;
-      }
-      if (numRegions > 0) B2RESULT("GeoTOPCreator, " << message);
-      m_numPeelOffRegions += numRegions;
+      // wavelenght filter (old payload) and peel-off regions (if defined)
+      // new payload: wavelength filter is a part of PMT array
 
-      // place filter to +x side
-      move = G4Translate3D(geo.getFullLength() - geo.getFilterThickness() / 2,
-                           (geo.getThickness() - geo.getExitThickness()) / 2,
-                           0);
-      new G4PVPlacement(move, filter, geo.getName() + "Filter", prism, false, 1);
+      if (geo.getFilterThickness() > 0 or !geo.getPeelOffRegions().empty()) {
+        double filterThickness = geo.getFilterThickness();
+        std::string filterMaterial;
+        if (filterThickness > 0) { // old payload, put wavelength filter into prism
+          filterMaterial = geo.getFilterMaterial();
+        } else { // new payload, make a dummy volume in which to put peel-off regions
+          filterThickness = geo.getPeelOffThickness();
+          filterMaterial = geo.getMaterial();
+        }
+        auto* filter = createBox(geo.getName() + "Filter",
+                                 filterThickness,
+                                 geo.getExitThickness(),
+                                 geo.getWidth(),
+                                 filterMaterial);
+        // place peel-off regions (if any) into filter
+        int numRegions = 0;
+        std::string message = addNumber("peel-off cookie regions of Slot", moduleID) + ":";
+        for (const auto& region : geo.getPeelOffRegions()) {
+          if (region.fraction <= 0) continue;
+          std::string name = addNumber(geo.getName() + "PeelOff", region.ID);
+          double thickness = geo.getPeelOffThickness();
+          auto* peelOff = createExtrudedSolid(name,
+                                              geo.getPeelOffContour(region),
+                                              thickness,
+                                              geo.getPeelOffMaterial());
+          G4Transform3D T = G4Translate3D((geo.getFilterThickness() - thickness) / 2,
+                                          0,
+                                          geo.getPeelOffCenter(region));
+          G4Transform3D R = G4RotateY3D(-M_PI / 2);
+          G4Transform3D moveRegion = T * R;
+          new G4PVPlacement(moveRegion, peelOff, name, filter, false, 1);
+          message += addNumber(" ", region.ID);
+          numRegions++;
+        }
+        if (numRegions > 0) B2RESULT("GeoTOPCreator, " << message);
+        m_numPeelOffRegions += numRegions;
+
+        // place filter to +x side
+        move = G4Translate3D(geo.getFullLength() - geo.getFilterThickness() / 2,
+                             (geo.getThickness() - geo.getExitThickness()) / 2,
+                             0);
+        new G4PVPlacement(move, filter, geo.getName() + "Filter", prism, false, 1);
+      }
 
       // optical surface
+
       auto& materials = Materials::getInstance();
       auto* optSurf = materials.createOpticalSurface(geo.getSurface());
       optSurf->SetSigmaAlpha(geo.getSigmaAlpha());
       new G4LogicalSkinSurface("opticalSurface", prism, optSurf);
 
       // Activate sensitive volume
+
       prism->SetSensitiveDetector(m_sensitiveBar);
 
       return prism;
@@ -816,21 +849,41 @@ namespace Belle2 {
       auto* pmt = createPMT(geo.getPMT());
 
       // place PMT's
-      double halfGap = geo.getAirGap() / 2;
       std::string message = addNumber("optically decoupled PMT's of Slot", moduleID) + ":";
       for (unsigned row = 1; row <= geo.getNumRows(); row++) {
         for (unsigned col = 1; col <= geo.getNumColumns(); col++) {
           auto id = geo.getPmtID(row, col);
-          double z = halfGap;
+          double z = geo.getAirGap();
           if (geo.isPMTDecoupled(id)) {
-            z = -halfGap;
+            z = 0;
             message += addNumber(" ", id);
             m_numDecoupledPMTs++;
           }
+          z -= (geo.getSizeZ() - geo.getPMT().getSizeZ()) / 2;
           G4Transform3D move = G4Translate3D(geo.getX(col), geo.getY(row), z);
           new G4PVPlacement(move, pmt, addNumber(geo.getPMT().getName(), id), pmtArray,
                             false, id);
         }
+      }
+
+      // wavelenght filter and silicone cookies (new payload)
+      if (geo.getFilterThickness() > 0) { // new payload
+        double fullThickness = geo.getFilterThickness() + geo.getCookieThickness();
+        auto* filter = createBox(geo.getName() + "Filter+Cookie",
+                                 geo.getSizeX(), geo.getSizeY(),
+                                 fullThickness,
+                                 geo.getFilterMaterial());
+        double cookieThickness = geo.getCookieThickness();
+        auto* cookie = createBox(geo.getName() + "Cookie",
+                                 geo.getSizeX(), geo.getSizeY(),
+                                 cookieThickness,
+                                 geo.getCookieMaterial());
+        G4Transform3D move = G4Translate3D(0, 0, (fullThickness - cookieThickness) / 2);
+        new G4PVPlacement(move, cookie, geo.getName() + "Cookie", filter, false, 1);
+
+        move = G4Translate3D(0, 0, (geo.getSizeZ() - fullThickness) / 2);
+        new G4PVPlacement(move, filter, geo.getName() + "Filter+Cookie", pmtArray,
+                          false, 1);
       }
 
       if (!geo.getDecoupledPMTs().empty()) B2RESULT("GeoTOPCreator, " << message);

@@ -26,7 +26,7 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
     "The Track Segment Finder module of the CDC trigger.\n"
     "Combines CDCHits from the same super layer to CDCTriggerSegmentHits.\n"
   );
-
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("CDCHitCollectionName",
            m_CDCHitCollectionName,
            "Name of the input StoreArray of CDCHits.",
@@ -276,11 +276,29 @@ CDCTriggerTSFModule::event()
     TRGSignal signal = rise & fall;
     w.addSignal(signal);
 
+    if (w.hit()) continue;
     // make a trigger wire hit (needed for relations)
     // all unneeded variables are set to 0 (TODO: remove them completely?)
     TRGCDCWireHit* hit = new TRGCDCWireHit(w, i,
                                            0, 0, 0, 0, 0, 0, 0, 0);
-    if (!w.hit()) w.hit(hit);
+    w.hit(hit);
+  }
+
+
+
+  // neibor supression
+  unsigned neibor_hit[10][1000] = {};
+  for (unsigned isl = 0; isl < tsLayers.size(); ++isl) {
+    for (unsigned its = 0; its < tsLayers[isl]->nCells(); ++its) {
+      TRGCDCSegment& s = (TRGCDCSegment&) tsLayers[isl]->cell(its);
+      // simulate with logicLUTFlag = true
+      // TODO: either add parameter or remove the option in Segment::simulate()
+      s.simulate(m_clockSimulation, true,
+                 m_CDCHitCollectionName, m_TSHitCollectionName);
+      if (!m_clockSimulation && s.signal().active() && s.priorityPosition() == 3) {
+        neibor_hit[isl][its] = 1;
+      }
+    }
   }
 
   // simulate track segments and create track segment hits
@@ -295,6 +313,11 @@ CDCTriggerTSFModule::event()
       // for clock simulation already done in simulate
       // TODO: move it to simulate also for simulateWithoutClock?
       if (!m_clockSimulation && s.signal().active()) {
+
+        //neibor supression
+        if (s.priorityPosition() != 3 && (neibor_hit[isl][(its - 1) % tsLayers[isl]->nCells()] == 1
+                                          || neibor_hit[isl][(its + 1) % tsLayers[isl]->nCells()] == 1))continue;
+
         const CDCHit* priorityHit = m_cdcHits[s.priority().hit()->iCDCHit()];
         const CDCTriggerSegmentHit* tsHit =
           m_segmentHits.appendNew(*priorityHit,

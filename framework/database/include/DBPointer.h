@@ -47,12 +47,12 @@ namespace Belle2 {
     /** Is this pointer's data safe to access? */
     inline operator bool() const {return isValid();}
 
-    inline T& operator *()  const {return *getPointer();}  /**< Imitate pointer functionality. */
-    inline T* operator ->() const {return getPointer();}   /**< Imitate pointer functionality. */
+    inline const T& operator *()  const {return *getPointer();}  /**< Imitate pointer functionality. */
+    inline const T* operator ->() const {return getPointer();}   /**< Imitate pointer functionality. */
 
   private:
     /** Find the referred object and set m_object to it */
-    inline T* getPointer() const
+    inline const T* getPointer() const
     {
       if (!m_object) {
         DBArray<T> array(NAME);
@@ -65,6 +65,6 @@ namespace Belle2 {
     KEY m_key;
 
     /** Pointer to actual object. */
-    mutable T* m_object;   //!
+    mutable const T* m_object;   //!
   };
 }

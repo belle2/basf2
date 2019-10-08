@@ -15,7 +15,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 // dataobjects
@@ -71,8 +70,6 @@ namespace Belle2 {
 
   void ParticlePrinterModule::event()
   {
-    B2INFO("[ParticlePrinterModule] START ------------------------------");
-
     bool includingVars = !(m_variables.empty());
 
     // print event based variables (particle list is empty)
@@ -87,6 +84,10 @@ namespace Belle2 {
       B2ERROR("ParticleList " << m_listName << " not found");
       return;
     }
+
+    if (!m_listName.empty() && plist->getListSize() == 0) return;
+
+    B2INFO("[ParticlePrinterModule] START ------------------------------");
 
     plist->print();
 

@@ -3,7 +3,8 @@
 * Copyright(C) 2014 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Viktor Trusov, Thomas Hauth, Nils Braun                  *
+* Contributors: Viktor Trusov, Thomas Hauth, Nils Braun,                 *
+*               Dmitrii Neverov                                          *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -96,8 +97,10 @@ namespace Belle2 {
       bool checkExtremum(QuadTree* node, const CDCWireHit* wireHit) const;
 
     public: // debug stuff
-      /// Draw QuadTree nodes
-      void drawNode();
+      /// Draw QuadTree node
+      void drawHits(std::vector<const CDCWireHit*> hits, unsigned int color = 46) const;
+      /// Draw QuadTree node
+      void drawNode(QuadTree* node) const;
 
     private:
       /// Pinned lookup table for precompute cosine and sine values

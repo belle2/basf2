@@ -9,8 +9,6 @@
 #include <libxml/xmlIO.h>
 #include <cstring>
 #include <boost/algorithm/string.hpp>
-#include <regex>
-#include <list>
 
 #include <TObject.h>
 
@@ -41,7 +39,7 @@ namespace Belle2 {
     static int readXmlData(void* context, char* buffer, int buffsize)
     {
       //B2DEBUG(200,"Calling read to get " << buffsize << " bytes");
-      InputContext* gearContext = static_cast<InputContext*>(context);
+      auto* gearContext = static_cast<InputContext*>(context);
       return gearContext->readXmlData(buffer, buffsize);
     }
 
@@ -49,13 +47,14 @@ namespace Belle2 {
     static int closeXmlContext(void* context)
     {
       B2DEBUG(200, "Closing context");
-      InputContext* gearContext = static_cast<InputContext*>(context);
+      auto* gearContext = static_cast<InputContext*>(context);
       delete gearContext;
       return 0;
     }
   }
 
-  Gearbox::Gearbox(): m_xmlDocument(0), m_xpathContext(0), m_parameterCache(new MRUCache<std::string, PathValue>(c_DefaultCacheSize))
+  Gearbox::Gearbox(): m_xmlDocument(nullptr), m_xpathContext(nullptr),
+    m_parameterCache(new MRUCache<std::string, PathValue>(c_DefaultCacheSize))
   {
     xmlInitParser();
     LIBXML_TEST_VERSION;
@@ -83,7 +82,7 @@ namespace Belle2 {
       if (context) return context;
     }
     B2ERROR("Could not find data for uri '" << uri << "'");
-    return 0;
+    return nullptr;
   }
 
   void Gearbox::setBackends(const vector<string>& backends)
@@ -95,12 +94,12 @@ namespace Belle2 {
       //uri
       string prefix("file");
       string accessinfo(backend);
-      size_t colon = backend.find(":");
+      size_t colon = backend.find(':');
       if (colon != string::npos) {
         prefix = backend.substr(0, colon);
         accessinfo = backend.substr(colon + 1);
       }
-      map<string, gearbox::InputHandler::Factory*>::const_iterator it = m_registeredHandlers.find(prefix);
+      auto it = m_registeredHandlers.find(prefix);
       if (it == m_registeredHandlers.end()) {
         B2ERROR("Could not find input handler to handle '" << backend << "', ignoring");
         continue;
@@ -160,8 +159,8 @@ namespace Belle2 {
   {
     if (m_xpathContext) xmlXPathFreeContext(m_xpathContext);
     if (m_xmlDocument) xmlFreeDoc(m_xmlDocument);
-    m_xpathContext = 0;
-    m_xmlDocument = 0;
+    m_xpathContext = nullptr;
+    m_xmlDocument = nullptr;
 
     for (auto& entry : m_ownedObjects) {
       delete entry.second;
@@ -173,14 +172,14 @@ namespace Belle2 {
 
   void Gearbox::overridePathValue(const PathOverride& poverride)
   {
-    if (m_xpathContext == NULL) B2FATAL("Gearbox is not connected");
+    if (m_xpathContext == nullptr) B2FATAL("Gearbox is not connected");
     //Make sure it ends with a slash
     string query = ensureNode(poverride.path);
     //Ok, lets search for the path
     B2INFO("Override '" << poverride.path << "' with '" << poverride.value
            << "' (unit: '" << poverride.unit << "')");
     xmlXPathObjectPtr result = xmlXPathEvalExpression((xmlChar*) query.c_str(), m_xpathContext);
-    if (result != NULL && result->type == XPATH_NODESET && !xmlXPathNodeSetIsEmpty(result->nodesetval)) {
+    if (result != nullptr && result->type == XPATH_NODESET && !xmlXPathNodeSetIsEmpty(result->nodesetval)) {
       //Found it, so let's replace the content
       int numNodes = xmlXPathNodeSetGetLength(result->nodesetval);
       if (!poverride.multiple && numNodes > 1) {
@@ -226,7 +225,7 @@ namespace Belle2 {
         //  - remove the reference to the modified nodes from the node set
         //    as they are processed, if they are not namespace nodes.
         if (node->type != XML_NAMESPACE_DECL)
-          result->nodesetval->nodeTab[i] = NULL;
+          result->nodesetval->nodeTab[i] = nullptr;
       }
     } else {
       B2ERROR("Cannot override '" << poverride.path << "': not found");
@@ -237,7 +236,7 @@ namespace Belle2 {
   Gearbox::PathValue Gearbox::getPathValue(const std::string& path) const
   {
     PathValue value;
-    if (m_xpathContext == NULL) B2FATAL("Gearbox is not connected");
+    if (m_xpathContext == nullptr) B2FATAL("Gearbox is not connected");
     //Get from cache if possible
     if (m_parameterCache->retrieve(path, value)) {
       return value;
@@ -246,7 +245,7 @@ namespace Belle2 {
     string query = ensureNode(path);
     B2DEBUG(1000, "Gearbox XPath query: " << query);
     xmlXPathObjectPtr result = xmlXPathEvalExpression((xmlChar*) query.c_str(), m_xpathContext);
-    if (result != NULL && result->type == XPATH_NODESET && !xmlXPathNodeSetIsEmpty(result->nodesetval)) {
+    if (result != nullptr && result->type == XPATH_NODESET && !xmlXPathNodeSetIsEmpty(result->nodesetval)) {
       value.numNodes = xmlXPathNodeSetGetLength(result->nodesetval);
       xmlNodePtr node = result->nodesetval->nodeTab[0];
       //Example: <foo><bar/></foo>
@@ -285,7 +284,7 @@ namespace Belle2 {
   const TObject* Gearbox::getTObject(const std::string& path) const noexcept(false)
   {
     //do we already have an object for this path?
-    std::map<std::string, TObject*>::const_iterator it = m_ownedObjects.find(path);
+    auto it = m_ownedObjects.find(path);
     if (it != m_ownedObjects.end())
       return it->second;
 

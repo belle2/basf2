@@ -12,6 +12,7 @@
 #include <boost/python/class.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/docstring_options.hpp>
+#include <utility>
 
 #include <framework/core/Path.h>
 #include <framework/core/Module.h>
@@ -23,25 +24,16 @@
 using namespace Belle2;
 using namespace boost::python;
 
+Path::Path() = default;
 
-Path::Path()
-{
+Path::~Path() = default;
 
-}
-
-
-Path::~Path()
-{
-
-}
-
-
-void Path::addModule(ModulePtr module)
+void Path::addModule(const ModulePtr& module)
 {
   m_elements.push_back(module);
 }
 
-void Path::addPath(PathPtr path)
+void Path::addPath(const PathPtr& path)
 {
   if (path.get() == this) {
     B2FATAL("Attempting to add a path to itself!");
@@ -58,7 +50,7 @@ std::list<ModulePtr> Path::getModules() const
 {
   std::list<ModulePtr> modules;
   for (const std::shared_ptr<PathElement>& elem : m_elements) {
-    if (dynamic_cast<Module*>(elem.get()) != 0) {
+    if (dynamic_cast<Module*>(elem.get()) != nullptr) {
       //this path element is a Module, create a ModulePtr that shares ownership with 'elem'
       modules.push_back(std::static_pointer_cast<Module>(elem));
     } else {
@@ -81,6 +73,8 @@ ModulePtrList Path::buildModulePathList(bool unique) const
       //If the module has a condition, call the method recursively
       if (module->hasCondition()) {
         for (const auto& conditionPath : module->getAllConditionPaths()) {
+          // Avoid loops in path conditions
+          if (conditionPath.get() == this) B2FATAL("Found recursion in conditional path");
           const std::list<ModulePtr>& modulesInElem = conditionPath->buildModulePathList(unique);
           modList.insert(modList.end(), modulesInElem.begin(), modulesInElem.end());
         }
@@ -97,14 +91,21 @@ void Path::putModules(const std::list<std::shared_ptr<Module> >& mlist)
 }
 
 
-void Path::forEach(std::string loopObjectName, std::string arrayName, PathPtr path)
+void Path::forEach(const std::string& loopObjectName, const std::string& arrayName, PathPtr path)
 {
   ModulePtr module = ModuleManager::Instance().registerModule("SubEvent");
-  static_cast<SubEventModule&>(*module).initSubEvent(loopObjectName, arrayName, path);
+  static_cast<SubEventModule&>(*module).initSubEvent(loopObjectName, arrayName, std::move(path));
   addModule(module);
 }
 
-void Path::addIndependentPath(PathPtr independent_path, std::string ds_ID, boost::python::list merge_back)
+void Path::doWhile(PathPtr path, const std::string& condition, unsigned int maxIterations)
+{
+  ModulePtr module = ModuleManager::Instance().registerModule("SubEvent");
+  static_cast<SubEventModule&>(*module).initSubLoop(std::move(path), condition, maxIterations);
+  addModule(module);
+}
+
+void Path::addIndependentPath(const PathPtr& independent_path, std::string ds_ID, const boost::python::list& merge_back)
 {
   if (ds_ID.empty()) {
     static int dscount = 1;
@@ -130,11 +131,11 @@ void Path::addIndependentPath(PathPtr independent_path, std::string ds_ID, boost
   addModule(switchEnd);
 }
 
-bool Path::contains(std::string moduleType) const
+bool Path::contains(const std::string& moduleType) const
 {
   const std::list<ModulePtr>& modules = getModules();
 
-  auto sameTypeFunc = [moduleType](ModulePtr m) -> bool { return m->getType() == moduleType; };
+  auto sameTypeFunc = [moduleType](const ModulePtr & m) -> bool { return m->getType() == moduleType; };
   return std::find_if(modules.begin(), modules.end(), sameTypeFunc) != modules.end();
 }
 
@@ -142,7 +143,7 @@ std::shared_ptr<PathElement> Path::clone() const
 {
   PathPtr path(new Path);
   for (const auto& elem : m_elements) {
-    const Module* m = dynamic_cast<const Module*>(elem.get());
+    const auto* m = dynamic_cast<const Module*>(elem.get());
     if (m and m->getType() == "PyModule") {
       //B2WARNING("Python module " << m->getName() << " encountered, please make sure it correctly reinitialises itself to ensure multiple process() calls work.");
       path->addModule(std::static_pointer_cast<Module>(elem));
@@ -192,48 +193,101 @@ namespace {
 
 void Path::exposePythonAPI()
 {
-  docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
+  docstring_options options(true, false, false); //userdef, py sigs, c++ sigs
+  using bparg = boost::python::arg;
 
   class_<Path>("Path",
-               R"(Implements a path consisting of Module and/or Path objects (arranged in a linear order). Use `basf2.create_path()` to create a new object.
+               R"(Implements a path consisting of Module and/or Path objects (arranged in a linear order).
 
 .. seealso:: :func:`basf2.process`)")
   .def("__str__", &Path::getPathString)
   .def("_add_module_object", &Path::addModule) // actual add_module() is found in basf2.py
-  .def("add_path", &Path::addPath, args("path"), R"(Insert another path at the end of this one.
+  .def("add_path", &Path::addPath, args("path"), R"(add_path(path)
+
+Insert another path at the end of this one.
 For example,
 
     >>> path.add_module('A')
     >>> path.add_path(otherPath)
     >>> path.add_module('B')
 
-would create a path [ A -> [ contents of otherPath ] -> B ].)")
-  .def("modules", &_getModulesPython, "Returns an ordered list of all modules in this path.")
-  .def("for_each", &Path::forEach, R"(Similar to add_path(), this will execute path at the current position, but
-will run it once for each object in the given array 'arrayName', and set the loop variable
-'loopObjectName' (a StoreObjPtr of same type as array) to the current object.
+would create a path [ A -> [ contents of otherPath ] -> B ].)
 
-Main use case is after using the RestOfEventBuilder on a ParticeList, where
-you can use this feature to perform actions on only a part of the event
-for a given list of candidates:
+Parameters:
+  path (Path): path to add to this path)")
+  .def("modules", &_getModulesPython, R"(modules()
+
+Returns an ordered list of all modules in this path.)")
+  .def("for_each", &Path::forEach, R"(for_each(loop_object_name, array_name, path)
+
+Similar to `add_path()`, this will
+execute the given ``path`` at the current position, but in each event it will
+execute it once for each object in the given StoreArray ``arrayName``. It will
+create a StoreObject named ``loop_object_name``  of same type as array which will
+point to each element in turn for each execution.
+
+This has the effect of calling the ``event()`` methods of modules in ``path``
+for each entry in ``arrayName``.
+
+The main use case is to use it after using the `RestOfEventBuilder` on a
+``ParticeList``, where you can use this feature to perform actions on only a part
+of the event for a given list of candidates:
 
     >>> path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
-    read: for each  $objName   in $arrayName   run over $path
 
-If 'RestOfEvents' contains two elements, during the execution of roe_path a StoreObjectPtr 'RestOfEvent'
-will be available, which will point to the first element in the first run, and the second element
-in the second run. You can use the variable 'isInRestOfEvent' to select Particles that
-originate from this part of the event.
+You can read this as
 
-Changes to existing arrays / objects will be available to all modules after the for_each(),
-including those made to the loop variable (it will simply modify the i'th item in the array looped over.)
-Arrays / objects of event durability created inside the loop will however be limited to the validity of the loop variable. That is,
-creating a list of Particles matching the current MCParticle (loop object) will no longer exist after switching
-to the next MCParticle or exiting the loop.)", args("loopObjectName", "arrayName", "path"))
+  "for each ``RestOfEvent`` in the array of "RestOfEvents", execute ``roe_path``"
+
+For example, if 'RestOfEvents' contains two elements then ``roe_path`` will be
+executed twice and during the execution a StoreObjectPtr 'RestOfEvent' will be
+available, which will point to the first element in the first execution, and
+the second element in the second execution.
+
+.. seealso::
+    A working example of this `for_each` RestOfEvent is to build a veto against
+    photons from :math:`\pi^0\to\gamma\gamma`. It is described in `HowToVeto`.
+
+.. note:: This feature is used by both the `FlavorTagger` and `FullEventInterpretation` algorithms.
+
+Changes to existing arrays / objects will be available to all modules after the
+`for_each()`, including those made to the loop object itself (it will simply modify
+the i'th item in the array looped over.)
+
+StoreArrays / StoreObjects (of event durability) *created* inside the loop will
+be removed at the end of each iteration. So if you create a new particle list
+inside a `for_each()` path execution the particle list will not exist for the
+next iteration or after the `for_each()` is complete.
+
+Parameters:
+  loop_object_name (str): The name of the object in the datastore during each execution
+  array_name (str): The name of the StoreArray to loop over where the i-th
+    element will be available as ``loop_object_name`` during the i-th execution
+    of ``path``
+  path (basf2.Path): The path to execute for each element in ``array_name``)",
+       args("loop_object_name", "array_name", "path"))
+  .def("do_while", &Path::doWhile, R"(do_while(path, condition='<1', max_iterations=10000)
+
+Similar to `add_path()` this will execute a path at the current position but it
+will repeat execution of this path as long as the return value of the last
+module in the path fulfills the given ``condition``.
+
+This is useful for event generation with special cuts like inclusive particle generation.
+
+See Also:
+  `Module.if_value` for an explanation of the condition expression.
+
+Parameters:
+  path (basf2.Path): sub path to execute repeatedly
+  condition (str): condition on the return value of the last module in ``path``.
+    The execution will be repeated as long as this condition is fulfilled.
+  max_iterations (int): Maximum number of iterations per event. If this number is exceeded
+    the execution is aborted.
+       )", (bparg("path"), bparg("condition") = "<1", bparg("max_iterations") = 10000))
   .def("_add_independent_path", &Path::addIndependentPath)
   .def("__contains__", &Path::contains, R"(Does this Path contain a module of the given type?
 
-    >>> path = create_path()
+    >>> path = basf2.Path()
     >>> 'RootInput' in path
     False
     >>> path.add_module('RootInput')

@@ -8,10 +8,14 @@ namespace Belle2 {
   class TimeoutException : public IOException {
 
   public:
-    TimeoutException() throw() {}
-    TimeoutException(const std::string& comment, ...) throw();
-    TimeoutException(int err, const std::string& comment, ...) throw();
+    TimeoutException() {}
+    TimeoutException(const std::string& comment, ...);
+    TimeoutException(int err, const std::string& comment, ...);
+#if __GNUC__ >= 7
+    ~TimeoutException() {}
+#else
     ~TimeoutException() throw() {}
+#endif
 
   };
 

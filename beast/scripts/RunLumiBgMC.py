@@ -64,6 +64,7 @@ def add_cut(name, minParticles, maxParticles, minTheta, maxTheta=None):
     selection.if_value("!=11", kill)
     selection.set_name("generator cut: " + name)
 
+
 # beam parameters
 beamparameters = add_beamparameters(main, "Y4S")
 beamparameters.param("smearVertex", True)

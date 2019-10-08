@@ -13,21 +13,17 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
-#include <vxd/dataobjects/VxdID.h>
-#include <pxd/geometry/SensorInfo.h>
-#include <vxd/geometry/GeoCache.h>
-#include <TROOT.h>
-#include <vector>
+#include "TFile.h"
 #include "TH1I.h"
 #include "TH1F.h"
-#include "TH2F.h"
+
+#include <vector>
 
 namespace Belle2 {
+  /*! PXD DQM AnalysisModule */
 
-  /** PXD DQM AnalysisModule */
   class DQMHistAnalysisPXDERModule : public DQMHistAnalysisModule {
 
   public:
@@ -49,32 +45,32 @@ namespace Belle2 {
   private:
 
     /** Basic Directory in output file */
-    TDirectory* m_oldDir;
+    //TDirectory* m_oldDir;
 
     /** Flags of Hitmaps of Digits */
 //     TH1I* m_fHitMapCountsFlag;
     /** Flags of Hitmaps of Clusters*/
 //     TH1I* m_fHitMapClCountsFlag;
     /** Flags of Fired Digits */
-    TH1I* m_fFiredFlag;
+    TH1I* m_fFiredFlag = nullptr;
     /** Flags of Clusters per event */
-    TH1I* m_fClustersFlag;
+    TH1I* m_fClustersFlag = nullptr;
     /** Flags of Start row distribution */
-    TH1I* m_fStartRowFlag;
+    TH1I* m_fStartRowFlag = nullptr;
     /** Flags of Cluster seed charge by distance from the start row */
-    TH1I* m_fChargStartRowFlag;
+    TH1I* m_fChargStartRowFlag = nullptr;
     /** Flags of counter for Cluster seed charge by distance from the start row */
-    TH1I* m_fStartRowCountFlag;
+    TH1I* m_fStartRowCountFlag = nullptr;
     /** Flags of Charge of clusters */
-    TH1I* m_fClusterChargeFlag;
+    TH1I* m_fClusterChargeFlag = nullptr;
     /** Flags of Charge of pixels */
-    TH1I* m_fPixelSignalFlag;
+    TH1I* m_fPixelSignalFlag = nullptr;
     /** Flags of u cluster size */
-    TH1I* m_fClusterSizeUFlag;
+    TH1I* m_fClusterSizeUFlag = nullptr;
     /** Flags of v cluster size */
-    TH1I* m_fClusterSizeVFlag;
+    TH1I* m_fClusterSizeVFlag = nullptr;
     /** Flags of Cluster size */
-    TH1I* m_fClusterSizeUVFlag;
+    TH1I* m_fClusterSizeUVFlag = nullptr;
 
     // Name the histograms, we have to find them anyway every event
     /** Hitmaps of Digits */
@@ -126,35 +122,28 @@ namespace Belle2 {
     std::vector <std::string> m_ref_clusterSizeUV;
 
     /** Number of pixels on PXD v direction */
-    int m_nPixels;
+    //int m_nPixels;
     /** Number of VXD layers on Belle II */
-    int c_nVXDLayers;
+    int c_nVXDLayers = 0;
     /** Number of PXD layers on Belle II */
-    int c_nPXDLayers;
+    int c_nPXDLayers = 0;
     /** Number of SVD layers on Belle II */
-    int c_nSVDLayers;
+    int c_nSVDLayers = 0;
     /** First VXD layer on Belle II */
-    int c_firstVXDLayer;
+    int c_firstVXDLayer = 0;
     /** Last VXD layer on Belle II */
-    int c_lastVXDLayer;
+    int c_lastVXDLayer = 0;
     /** First PXD layer on Belle II */
-    int c_firstPXDLayer;
+    int c_firstPXDLayer = 0;
     /** Last PXD layer on Belle II */
-    int c_lastPXDLayer;
+    int c_lastPXDLayer = 0;
     /** First SVD layer on Belle II */
-    int c_firstSVDLayer;
+    int c_firstSVDLayer = 0;
     /** Last SVD layer on Belle II */
-    int c_lastSVDLayer;
+    int c_lastSVDLayer = 0;
     /** Number of PXD sensors on Belle II */
-    int c_nPXDSensors;
+    int c_nPXDSensors = 0;
 
-    /** Function return index of sensor in plots.
-       * @param Layer Layer position of sensor
-       * @param Ladder Ladder position of sensor
-       * @param Sensor Sensor position of sensor
-       * @return Index of sensor in plots.
-       */
-    int getSensorIndex(const int Layer, const int Ladder, const int Sensor) const;
     /** Function return index of sensor in plots.
        * @param Index Index of sensor in plots.
        * @param Layer return Layer position of sensor
@@ -187,7 +176,8 @@ namespace Belle2 {
        * @param flag Histogram of flags.
        * @return Indication of succes of realizing of condition, 1: OK.
        */
-    int SetFlag(int Type, int bin, double* pars, double ratio, std::string name_hist, std::string name_refhist, TH1I* flaghist);
+    int SetFlag(int Type, int bin, double* pars, double ratio, const std::string& name_hist, const std::string& name_refhist,
+                TH1I* flaghist);
     /** Function return flag histogram filled based on condition from TH1I source.
        * Flag values:
        * -3: nonexisting Type
@@ -218,8 +208,13 @@ namespace Belle2 {
     /** Reference Histogram Root file name */
     std::string m_refFileName;
     /** The pointer to the reference file */
-    TFile* m_refFile;
-    //TH1* findHistLocal(TString& a);
+    TFile* m_refFile = nullptr;
+
+    /**
+     * Get a histogram by name (DEPRECATED), better use function from base class!
+     * @param histogram The name of the histogram.
+     * @return The pointer to the histogram, or nullptr if not found.
+     */
     TH1* GetHisto(TString histoname);
 
   };

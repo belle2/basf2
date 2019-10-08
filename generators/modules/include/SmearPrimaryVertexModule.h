@@ -16,15 +16,8 @@
 #include <TVector3.h>
 
 #include <string>
-#include <vector>
-
-//TODO: delete
-#include <TFile.h>
-#include <TTree.h>
 
 namespace Belle2 {
-
-  class MCParticle;
 
   /**
    * The SmearPrimaryVertex module moves the Primary Vertex (e+e- collision point) to
@@ -45,14 +38,14 @@ namespace Belle2 {
     /** Destructor. */
     virtual ~SmearPrimaryVertexModule() {}
 
-    virtual void initialize();
-    virtual void terminate();
+    virtual void initialize() override; /**< initialize the module */
+    virtual void terminate() override;  /**< terminate the module */
 
     /** Method is called for each run. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
   private:
 

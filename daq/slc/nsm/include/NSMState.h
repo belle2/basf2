@@ -11,14 +11,14 @@ namespace Belle2 {
     static const NSMState ONLINE_S;
 
   public:
-    NSMState() throw() : Enum(Enum::UNKNOWN) {}
-    NSMState(const Enum& num) throw() : Enum(num) {}
-    NSMState(const NSMState& st) throw() : Enum(st) {}
-    ~NSMState()  throw() {}
+    NSMState() : Enum(Enum::UNKNOWN) {}
+    NSMState(const Enum& num) : Enum(num) {}
+    NSMState(const NSMState& st) : Enum(st) {}
+    ~NSMState()  {}
 
   protected:
     NSMState(int id, const char* label)
-    throw() : Enum(id, label) {}
+      : Enum(id, label) {}
 
   };
 

@@ -12,14 +12,8 @@
 #define PINDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
-#include <string>
-#include <vector>
-
-//ROOT
-#include <TRandom3.h>
-#include <TF1.h>
-#include <TVector3.h>
-
+#include <beast/pindiode/dataobjects/PindiodeHit.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
   namespace pindiode {
@@ -42,21 +36,22 @@ namespace Belle2 {
       virtual ~PinDigitizerModule();
 
       /**  */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /**  */
-      virtual void beginRun();
+      virtual void beginRun() override;
 
       /**  */
-      virtual void event();
+      virtual void event() override;
 
       /**  */
-      virtual void endRun();
+      virtual void endRun() override;
       /**  */
-      virtual void terminate();
+      virtual void terminate() override;
 
 
     private:
+      StoreArray<PindiodeHit> m_pindiodeHit; /** Array for PindiodeHit */
 
       /** Cremat gain */
       double m_CrematGain;

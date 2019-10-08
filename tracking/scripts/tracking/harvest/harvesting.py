@@ -145,6 +145,7 @@ class HarvestingModule(basf2.Module):
     is a predefined method to output the MutableMapping of numpy arrays as a TTree.
     """
 
+    #: The default value of expert_level if not specified explicitly by the caller
     default_expert_level = 1
 
     def __init__(self,
@@ -225,6 +226,7 @@ class HarvestingModule(basf2.Module):
 
         Prepares the receiver stash of objects to be harvestered.
         """
+        #: stash of the harvested crops (start with those in the barn)
         self.stash = self.barn()
 
     def event(self):
@@ -261,7 +263,10 @@ class HarvestingModule(basf2.Module):
         self.stash.close()
         del self.stash
 
-        self.refine(self.crops)
+        try:
+            self.refine(self.crops)
+        except AttributeError:
+            pass
 
     @staticmethod
     def create_crop_part_collection():
@@ -312,7 +317,9 @@ class HarvestingModule(basf2.Module):
             )
             raise ValueError(msg)
 
+        #: the dictionaries from peel as a numpy.array of doubles
         self.raw_crops = raw_crops
+        #: the dictionaries from peel
         self.crops = crops
 
     def gather(self):

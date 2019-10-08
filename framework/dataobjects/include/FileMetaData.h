@@ -108,6 +108,10 @@ namespace Belle2 {
      */
     const std::string& getSteering() const {return m_steering;}
 
+    /** Is it generated data?.
+     */
+    bool isMC() const {return m_isMC;}
+
     /** Number of generated events getter.
      */
     unsigned int getMcEvents() const {return m_mcEvents;}
@@ -227,6 +231,10 @@ namespace Belle2 {
      */
     bool write(std::ostream& output, const std::string& physicalFileName) const;
 
+    /** Get a json representation.
+     */
+    std::string getJsonStr() const;
+
   private:
 
     std::string m_lfn; /**< Logical file name.  */
@@ -259,13 +267,25 @@ namespace Belle2 {
 
     std::string m_steering; /**< The steering file content.  */
 
+    bool m_isMC; /**< Is it generated or real data?.  */
+
     unsigned int m_mcEvents; /**< Number of generated events, 0 for real data.  */
 
     std::string m_databaseGlobalTag; /**< Global tag in the database used for production of this file */
 
     std::map<std::string, std::string> m_dataDescription; /**< key-value store to describe the data. (for use by the computing group) */
 
-    ClassDefOverride(FileMetaData, 9); /**< Metadata information about a file. */
+    /** Declare that this is not generated, but real data.
+     */
+    void declareRealData() {m_isMC = false;}
+
+    friend class SeqRootInputModule;
+    friend class RootInputModule;
+    friend class RootOutputModule;
+    friend class B2BIIMdstInputModule;
+    friend class BeamBkgHitRateMonitorModule;
+
+    ClassDefOverride(FileMetaData, 10); /**< Metadata information about a file. */
 
   }; //class
 

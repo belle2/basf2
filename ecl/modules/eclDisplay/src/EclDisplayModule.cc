@@ -8,8 +8,22 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+//This module
 #include <ecl/modules/eclDisplay/EclDisplayModule.h>
-#include <framework/utilities/FileSystem.h>
+
+//Root
+#include <TApplication.h>
+#include <TSystem.h>
+#include <TFile.h>
+
+//Framework
+#include <framework/utilities/EnvironmentVariables.h>
+
+//ECL
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/modules/eclDisplay/EclFrame.h>
+#include <ecl/modules/eclDisplay/EclData.h>
+#include <ecl/modules/eclDisplay/geometry.h>
 
 using namespace Belle2;
 using namespace ECLDisplayUtility;
@@ -29,6 +43,10 @@ EclDisplayModule::EclDisplayModule() : Module()
   setDescription("Event display module for ECL.");
 
   // Parameter definitions
+  addParam("showDisplay", m_showDisplay,
+           "Show GUI. Off by default because GUI crashes automatic tests.", false);
+  addParam("keepOpen", m_keepOpen,
+           "Keep window open after all events have been processed", false);
   addParam("displayEnergy", m_displayEnergy,
            "If true, energy distribution per channel (shaper, crate) is displayed. Otherwise, number of counts is displayed", false);
   addParam("displayMode", m_displayMode,
@@ -47,31 +65,41 @@ EclDisplayModule::~EclDisplayModule()
 
 void EclDisplayModule::initialize()
 {
-  eclarray.isRequired();
+  m_eclarray.isRequired();
 
-  // Loading code from ECLUnpacker
-  std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
-  if (!FileSystem::fileExists(ini_file_name)) {
-    B2FATAL("ECL Display : eclChannelMapper initialization file " << ini_file_name << " doesn't exist");
-  }
-  // TODO: DB initialization is necessary.
-  if (!m_mapper.initFromFile(ini_file_name.data())) {
-    B2FATAL("ECL Display:: Can't initialize eclChannelMapper");
+  if (!m_showDisplay) {
+    m_frame_closed = true;
+  } else {
+    // Check if X display is available.
+    std::string display = EnvironmentVariables::get("DISPLAY", "");
+    if (display == "") {
+      B2WARNING("Environment variable DISPLAY is not set, event display won't be opened");
+      m_frame_closed = true;
+    }
   }
 
-  initFrame();
+  if (!m_frame_closed)
+    initFrame();
 }
 
 void EclDisplayModule::initFrame()
 {
+  //== Init temporary file so TTree is not kept in memory.
+  m_tempname = "ecldisplay_tmp";
+
+  if (gSystem->TempFileName(m_tempname) == 0) {
+    throw std::runtime_error("ECLDisplay: failed to create temp file.");
+  } else {
+    m_tempfile = new TFile(m_tempname, "recreate");
+    gSystem->Unlink(m_tempname);
+  }
+
   SetMode(m_displayEnergy);
   m_app   = new TApplication("ECLDisplay App", 0, 0);
   m_data  = new EclData();
   m_frame = new EclFrame(m_displayMode, m_data, m_autoDisplay, &m_mapper);
 
   m_frame->Connect("CloseWindow()", "Belle2::EclDisplayModule", this, "handleClosedFrame()");
-
-  m_frame_closed = false;
 
   B2DEBUG(100, "EclDisplayModule::create ECLFrame");
 }
@@ -83,6 +111,11 @@ void EclDisplayModule::handleClosedFrame()
 
 void EclDisplayModule::beginRun()
 {
+  // Initialize channel mapper at run start to account for possible
+  // changes in ECL mapping between runs.
+  if (!m_mapper.initFromDB()) {
+    B2FATAL("ECL Display:: Can't initialize eclChannelMapper");
+  }
 }
 
 void EclDisplayModule::event()
@@ -92,8 +125,8 @@ void EclDisplayModule::event()
 
   int added_entries = 0;
 
-  for (int i = 0; i < eclarray.getEntries(); i++) {
-    ECLCalDigit* record = eclarray[i];
+  for (int i = 0; i < m_eclarray.getEntries(); i++) {
+    ECLCalDigit* record = m_eclarray[i];
     if (record->getEnergy() >= 1e-4) { //TODO: Move to constant ENERGY_THRESHOLD.
       if (m_data->addEvent(record, m_evtNum) == 0) {
         added_entries++;
@@ -117,17 +150,19 @@ void EclDisplayModule::endRun()
 
 void EclDisplayModule::terminate()
 {
-  if (!m_frame_closed) {
-    m_data->update(false);
-    m_frame->loadNewData();
+  if (m_keepOpen) {
+    if (!m_frame_closed) {
+      m_data->update(false);
+      m_frame->loadNewData();
+    }
+
+    while (!m_frame_closed) {
+      gSystem->ProcessEvents();
+      gSystem->Sleep(0);
+    }
   }
 
-  while (!m_frame_closed) {
-    gSystem->ProcessEvents();
-    gSystem->Sleep(0);
-  }
-
-  delete m_frame;
-  delete m_data;
+  if (m_frame) delete m_frame;
+  if (m_data) delete m_data;
 }
 

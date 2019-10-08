@@ -6,7 +6,7 @@
 
 using namespace Belle2;
 
-TimeoutException::TimeoutException(const std::string& format, ...) throw()
+TimeoutException::TimeoutException(const std::string& format, ...)
 {
   va_list ap;
   char ss[1024 * 100];
@@ -16,7 +16,7 @@ TimeoutException::TimeoutException(const std::string& format, ...) throw()
   m_comment = ss;
 }
 
-TimeoutException::TimeoutException(int err, const std::string& format, ...) throw()
+TimeoutException::TimeoutException(int err, const std::string& format, ...)
 {
   m_err = err;
   va_list ap;

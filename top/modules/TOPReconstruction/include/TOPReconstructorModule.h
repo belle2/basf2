@@ -13,6 +13,19 @@
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
 #include <string>
+// framework - DataStore
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+// Hit classes
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/ExtHit.h>
+#include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRecBunch.h>
+#include <top/dataobjects/TOPBarHit.h>
+#include <top/dataobjects/TOPLikelihood.h>
+#include <top/dataobjects/TOPPull.h>
+
 
 namespace Belle2 {
 
@@ -38,34 +51,34 @@ namespace Belle2 {
      *
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      *
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      *
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      *
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      *
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   private:
@@ -77,7 +90,8 @@ namespace Belle2 {
     double m_sigmaZ = 0;       /**< track smearing in Z (r.m.s) */
     double m_sigmaTheta = 0;   /**< track smearing in Theta (r.m.s) */
     double m_sigmaPhi = 0;     /**< track smearing in Phi (r.m.s) */
-    double m_maxTime = 0;      /**< optional time limit for photons */
+    double m_minTime = 0;      /**< optional lower time limit for photons */
+    double m_maxTime = 0;      /**< optional upper time limit for photons */
     int m_PDGCode = 0;   /**< PDG code of hypothesis to construct pulls */
 
     // others
@@ -86,8 +100,18 @@ namespace Belle2 {
 
     // Masses of particle hypotheses
 
-    double m_masses[Const::ChargedStable::c_SetSize];  /**< particle masses */
-    int m_pdgCodes[Const::ChargedStable::c_SetSize];   /**< particle codes */
+    double m_masses[Const::ChargedStable::c_SetSize] = {0};  /**< particle masses */
+    int m_pdgCodes[Const::ChargedStable::c_SetSize] = {0};   /**< particle codes */
+
+    // datastore objects
+
+    StoreArray<TOPDigit> m_digits; /**< collection of digits */
+    StoreArray<Track> m_tracks; /**< collection of tracks */
+    StoreArray<ExtHit> m_extHits; /**< collection of extrapolated hits */
+    StoreArray<TOPBarHit> m_barHits; /**< collection of bar hits */
+    StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
+    StoreArray<TOPLikelihood> m_likelihoods; /**< collection of likelihoods */
+    StoreArray<TOPPull> m_topPulls; /**< collection of pulls */
 
   };
 

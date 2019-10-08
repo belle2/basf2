@@ -12,17 +12,10 @@
 #define FANGSSTUDYMODULE_H
 
 #include <framework/core/HistoModule.h>
-#include <string>
-#include <vector>
 
-
-#include <TVector3.h>
-#include <TRandom.h>
 #include <TF1.h>
 #include <TH1.h>
 #include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
 
 /** size of hit */
 constexpr int maxSIZE = 3000;
@@ -48,22 +41,22 @@ namespace Belle2 {
       virtual ~FANGSStudyModule();
 
       /**  */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /**  */
-      virtual void beginRun();
+      virtual void beginRun() override;
 
       /**  */
-      virtual void event();
+      virtual void event() override;
 
       /**  */
-      virtual void endRun();
+      virtual void endRun() override;
 
       /**  */
-      virtual void terminate();
+      virtual void terminate() override;
 
       /** Defines the histograms*/
-      virtual void defineHisto();
+      virtual void defineHisto() override;
 
 
     private:

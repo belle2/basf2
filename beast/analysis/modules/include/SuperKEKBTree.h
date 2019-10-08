@@ -11,14 +11,11 @@
 #ifndef SUPERKEKBTREE_H
 #define SUPERKEKBTREE_H
 
-#include <TTree.h>
-
 namespace Belle2 {
   namespace SuperKEKB {
 
     /**
      * Structure for the input of the data SUPERKEKB (TTree "Data_SUPERKEKB")
-     * https://belle2.cc.kek.jp/~twiki/bin/view/Detector/SUPERKEKB/ROOTDataFormats
      */
     struct SuperKEKBTree {
 

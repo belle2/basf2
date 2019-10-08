@@ -49,12 +49,13 @@ CalibrationAlgorithm::EResult CDCDedxMomentumAlgorithm::calibrate()
   const int nbins = 100;
   TH1F dedxp[nbins];
   for (unsigned int i = 0; i < nbins; ++i) {
-    dedxp[i] = TH1F(TString::Format("dedxp%d", i), "dE/dx in bins of momentum", 100, 0, 2);
+    dedxp[i] = TH1F(TString::Format("dedxp%d", i), "dE/dx in bins of momentum", 200, 0, 4);
   }
 
   // fill histograms, bin size may be arbitrary
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
+    if (dedx == 0) continue;
     if (p <= 0.0 || p > 10.0) continue;
     int bin = std::floor(p / (10.0 / nbins));
     if (bin < 0 || bin >= nbins) continue;
@@ -74,14 +75,16 @@ CalibrationAlgorithm::EResult CDCDedxMomentumAlgorithm::calibrate()
     ctmp->cd(i % 9 + 1); // each canvas is 9x9
     dedxp[i].DrawCopy("hist");
 
+    double mean = 1.0;
     if (dedxp[i].Integral() < 10)
-      momentum.push_back(1.0); // FIXME! --> should return not enough data
+      momentum.push_back(mean); // FIXME! --> should return not enough data
     else {
-      int status = dedxp[i].Fit("gaus");
-      if (status != 0) {
-        momentum.push_back(1.0); // FIXME! --> should return not enough data
+      if (dedxp[i].Fit("gaus")) {
+        B2WARNING("Fit failed...");
+        momentum.push_back(mean); // FIXME! --> should return not enough data
       } else {
-        float mean = dedxp[i].GetFunction("gaus")->GetParameter(1);
+        B2WARNING("Fit succeeded: " << mean << "\t" << dedxp[i].GetFunction("gaus")->GetParameter(1));
+        mean *= dedxp[i].GetFunction("gaus")->GetParameter(1);
         momentum.push_back(mean);
       }
     }
@@ -91,12 +94,14 @@ CalibrationAlgorithm::EResult CDCDedxMomentumAlgorithm::calibrate()
 
   psname.str(""); psname << "dedx_momentum.ps]";
   ctmp->Print(psname.str().c_str());
-  delete ctmp;
 
   B2INFO("dE/dx Calibration done for CDC dE/dx momentum correction");
+  std::cout << "dE/dx Calibration done for CDC dE/dx momentum correction" << std::endl;
 
-  CDCDedxMomentumCor* gain = new CDCDedxMomentumCor(nbins, momentum);
+  CDCDedxMomentumCor* gain = new CDCDedxMomentumCor(momentum);
   saveCalibration(gain, "CDCDedxMomentumCor");
+
+  delete ctmp;
 
   return c_OK;
 }

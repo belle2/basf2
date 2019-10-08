@@ -12,23 +12,23 @@ namespace Belle2 {
   public:
     RCConfig();
     RCConfig(const RCConfig& config);
-    ~RCConfig() throw() {}
+    ~RCConfig() {}
 
   public:
-    void print() throw();
-    DBObject& getObject() throw() { return m_obj; }
-    const DBObject& getObject() const throw() { return m_obj; }
-    void setObject(const DBObject& obj) throw() { m_obj = obj; }
-    int getExpNumber() const throw() { return m_expno; }
-    int getRunNumber() const throw() { return m_runno; }
-    int getSubNumber() const throw() { return m_subno; }
-    void setExpNumber(int expno) throw() { m_expno = expno; }
-    void setRunNumber(int runno) throw() { m_runno = runno; }
-    void setSubNumber(int subno) throw() { m_subno = subno; }
+    void print();
+    DBObject& getObject() { return m_obj; }
+    const DBObject& getObject() const { return m_obj; }
+    void setObject(const DBObject& obj) { m_obj = obj; }
+    int getExpNumber() const { return m_expno; }
+    int getRunNumber() const { return m_runno; }
+    int getSubNumber() const { return m_subno; }
+    void setExpNumber(int expno) { m_expno = expno; }
+    void setRunNumber(int runno) { m_runno = runno; }
+    void setSubNumber(int subno) { m_subno = subno; }
 
   public:
-    int getConfigId() const throw() { return m_obj.getId(); }
-    const std::string& getConfigName() const throw()
+    int getConfigId() const { return m_obj.getId(); }
+    const std::string& getConfigName() const
     {
       return m_obj.getName();
     }

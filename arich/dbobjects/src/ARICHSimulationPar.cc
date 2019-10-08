@@ -11,9 +11,7 @@
 #include <arich/dbobjects/ARICHSimulationPar.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 #include <iostream>
-#include <iomanip>
 
 using namespace std;
 using namespace Belle2;
@@ -23,8 +21,9 @@ double ARICHSimulationPar::getQE(double e) const
   if (e < 0.001) return 0;
   if (m_qe.size() == 0) B2ERROR("ARICHSimulationPar: QE curve not initialized!");
   double dlam = 1240 / e - m_lambdaFirst;
-  if (dlam < 0) return 0;
+
   int i = int(dlam / m_lambdaStep);
+  if (i < 0) i = 0;
   if (i > int(m_qe.size()) - 2) return 0;
 
   // linear interpolation
@@ -39,7 +38,7 @@ void ARICHSimulationPar::setQECurve(float lambdaFirst, float lambdaStep, const s
   m_qe = qe;
 }
 
-void ARICHSimulationPar::print()
+void ARICHSimulationPar::print() const
 {
   cout << endl;
   cout << "ARICH simulation parameters" << endl;
@@ -58,5 +57,5 @@ void ARICHSimulationPar::print()
   cout << "  QE scaling for photons internally reflected in HAPD window: " << getQEScaling() << endl;
   cout << "  absorbtion probablity for internally reflected photons:     " << getWindowAbsorbtion() << endl;
   cout << "  channels negative crosstalk factor:                         " << getChipNegativeCrosstalk() << endl;
-
+  cout << "  collection efficiency:                                      " << m_colEff << endl;
 }

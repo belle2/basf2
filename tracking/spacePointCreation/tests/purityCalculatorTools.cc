@@ -167,9 +167,7 @@ namespace PurityCalcTests {
       m_assignedClusters.push_back(1);
 
       // add a PXD (non-ideal case: no TrueHit)
-      // false positive due to new with placement (cppcheck issue #7163)
-      // cppcheck-suppress memleak
-      spacePoint = m_spacePoints.appendNew(createSpacePoint(pxdId, true));
+      m_spacePoints.appendNew(createSpacePoint(pxdId, true));
       m_assignedClusters.push_back(1);
 
       // add a PXD (non-ideal case: more than one (i.e. two for the test) TrueHits -> 2 MCParticles)
@@ -210,7 +208,7 @@ namespace PurityCalcTests {
       spacePoint->addRelationTo(sTH2MC2, 21); // V-Cluster
 
       // add a SVD (non-ideal case: no related TrueHits)
-      spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 0));   // add twoCluster SP
+      m_spacePoints.appendNew(createSpacePoint(svdId, false, 0));   // add twoCluster SP
       m_assignedClusters.push_back(2);
 
       // add a SVD (non-ideal case: twoClusters -> 2 TrueHits -> 2 MCParticles with different numbers of related Clusters
@@ -244,12 +242,10 @@ namespace PurityCalcTests {
 
       // add singleCluster SpacePoints for testing the increaseCounterMethod. Do not need any relations!
       // NOTE: these shall not be included in the testing of the other methods!
-      spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, -1)); // add V-Cluster set only
+      m_spacePoints.appendNew(createSpacePoint(svdId, false, -1)); // add V-Cluster set only
       m_assignedClusters.push_back(1);
-      spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 1)); // add U-Cluster set only
+      m_spacePoints.appendNew(createSpacePoint(svdId, false, 1)); // add U-Cluster set only
       m_assignedClusters.push_back(1);
-      // false positive due to new with placement (cppcheck issue #7163)
-      // cppcheck-suppress memleak
     }
 
     /** tear down environment after test -> clear datastore */

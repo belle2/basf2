@@ -57,7 +57,16 @@ namespace Belle2 {
        * @param track mdst track pointer
        * @param chargedStable hypothesis used in mdst track extrapolation (default: pion)
        */
-      TOPtrack(const Track* track,
+      explicit TOPtrack(const Track* track,
+                        const Const::ChargedStable& chargedStable = Const::pion);
+
+      /**
+       * Constructor from mdst track - isValid() must be checked before using the object
+       * @param track mdst track pointer
+       * @param moduleID module (=slot) ID
+       * @param chargedStable hypothesis used in mdst track extrapolation (default: pion)
+       */
+      TOPtrack(const Track* track, int moduleID,
                const Const::ChargedStable& chargedStable = Const::pion);
 
       /**

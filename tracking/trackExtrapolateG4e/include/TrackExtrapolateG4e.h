@@ -11,10 +11,15 @@
 #ifndef TRACKEXTRAPOLATEG4E_H
 #define TRACKEXTRAPOLATEG4E_H
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
+#include <framework/database/DBObjPtr.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
+#include <klm/dbobjects/KLMStripEfficiency.h>
+#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <bklm/geometry/GeometryPar.h>
+#include <tracking/dbobjects/MuidParameters.h>
 
 #include <G4TouchableHandle.hh>
 #include <G4ErrorTrajErr.hh>
@@ -31,7 +36,6 @@ class G4StepPoint;
 namespace Belle2 {
 
   class Track;
-  class RecoTrack;
   class Muid;
   class MuidPar;
   class KLMCluster;
@@ -196,14 +200,14 @@ namespace Belle2 {
     //! @param meanDt Mean value of the in-time window (ns).
     //! @param maxDt Half-width of the in-time window (ns).
     //! @param maxSeparation Maximum separation between track crossing and matching hit in detector plane (#sigmas).
-    //! @param maxKLMTrackClusterDistance Maximum distance between associated track and KLMCluster (cm).
+    //! @param maxKLMTrackClusterDistance Maximum distance between associated track and KLMCluster (cm), criterion for matching relation Track->KLMCluster on MDST.
     //! @param maxECLTrackClusterDistance Maximum distance between associated track and ECLCluster (cm).
     //! @param minPt Minimum transverse momentum to begin extrapolation (GeV/c).
     //! @param minKE Minimum kinetic energy to continue extrapolation (GeV/c).
     //! @param hypotheses Vector of charged-particle hypotheses used in extrapolation of each track.
     void initialize(double meanDt, double maxDt, double maxSeparation,
                     double maxKLMTrackClusterDistance, double maxECLTrackClusterDistance,
-                    double minPt, double minKE, std::vector<Const::ChargedStable>& hypotheses);
+                    double minPt, double minKE, bool addHitsToRecoTrack, std::vector<Const::ChargedStable>& hypotheses);
 
     //! Perform beginning-of-run actions.
     //! @param flag True if called by Muid module, false if called by Ext module.
@@ -293,7 +297,7 @@ namespace Belle2 {
                       const std::pair<ECLCluster*, G4ThreeVector>&, double, double);
 
     //! Create another MUID extrapolation hit for a track candidate
-    bool createMuidHit(ExtState&, G4ErrorFreeTrajState&, std::vector<std::map<const Track*, double> >*);
+    bool createMuidHit(ExtState&, G4ErrorFreeTrajState&, Muid*, std::vector<std::map<const Track*, double> >*);
 
     //! Find the intersection point of the track with the crossed BKLM plane
     bool findBarrelIntersection(ExtState&, const G4ThreeVector&, Intersection&);
@@ -397,9 +401,6 @@ namespace Belle2 {
     //! Pointers to BKLM geant4 sensitive (physical) volumes
     std::vector<G4VPhysicalVolume*>* m_BKLMVolumes;
 
-    //! Pointers to EKLM geant4 sensitive (physical) volumes
-    std::vector<G4VPhysicalVolume*>* m_EKLMVolumes;
-
     //! virtual "target" cylinder for EXT (boundary beyond which extrapolation ends)
     Simulation::ExtCylSurfaceTarget* m_TargetExt;
 
@@ -428,22 +429,23 @@ namespace Belle2 {
     int m_OutermostActiveBarrelLayer;
 
     //! BKLM RPC phi-measuring strip position variance (cm^2) by layer
-    double m_BarrelPhiStripVariance[NLAYER + 1];
+    double m_BarrelPhiStripVariance[BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! BKLM RPC z-measuring strip position variance (cm^2) by layer
-    double m_BarrelZStripVariance[NLAYER + 1];
+    double m_BarrelZStripVariance[BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! BKLM scintillator strip position variance (cm^2)
     double m_BarrelScintVariance;
 
     //! hit-plane radius (cm) at closest distance to IP of each barrel end | sector | layer
-    double m_BarrelModuleMiddleRadius[2][NSECTOR + 1][NLAYER + 1];
+    double m_BarrelModuleMiddleRadius[2][BKLMElementNumbers::getMaximalSectorNumber() + 1]
+    [BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! normal unit vector of each barrel sector
-    G4ThreeVector m_BarrelSectorPerp[NSECTOR + 1];
+    G4ThreeVector m_BarrelSectorPerp[BKLMElementNumbers::getMaximalSectorNumber() + 1];
 
     //! azimuthal unit vector of each barrel sector
-    G4ThreeVector m_BarrelSectorPhi[NSECTOR + 1];
+    G4ThreeVector m_BarrelSectorPhi[BKLMElementNumbers::getMaximalSectorNumber() + 1];
 
     //! maximum radius (cm) of the endcaps
     double m_EndcapMaxR;
@@ -467,10 +469,31 @@ namespace Belle2 {
     double m_EndcapScintVariance;
 
     //! hit-plane z (cm) of each IP layer relative to KLM midpoint
-    double m_EndcapModuleMiddleZ[NLAYER + 1];
+    double m_EndcapModuleMiddleZ[BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! experiment number for the current set of particle-hypothesis PDFs
     int m_ExpNo;
+
+    //! Parameter to add the found hits also to the reco tracks or not. Is turned off by default.
+    bool m_addHitsToRecoTrack = false;
+
+    //! KLM element numbers.
+    const KLMElementNumbers* m_klmElementNumbers;
+
+    //! Conditions-database object for Muid parameters
+    DBObjPtr<MuidParameters> m_muidParameters;
+
+    //! Conditions-database object for KLM strip efficiency
+    DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;
+
+    //! Conditions-database object for KLM channel status (updated at start of each run)
+    DBObjPtr<KLMChannelStatus> m_klmChannelStatus;
+
+    //! Flag to indicate that the KLM channel status is valid for the given run
+    bool m_klmChannelStatusValid;
+
+    //! EKLM transformation data.
+    const EKLM::TransformDataGlobalAligned* m_eklmTransformData;
 
     //! probability density function for positive-muon hypothesis
     MuidPar* m_MuonPlusPar;

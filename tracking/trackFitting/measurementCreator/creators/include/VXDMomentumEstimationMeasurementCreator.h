@@ -12,7 +12,6 @@
 #include <tracking/trackFitting/measurementCreator/creators/BaseMeasurementCreatorFromCoordinateMeasurement.h>
 #include <tracking/vxdMomentumEstimation/VXDMomentumEstimation.h>
 #include <tracking/trackFitting/measurementCreator/measurements/PlanarVXDMomentumMeasurement.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <genfit/PlanarMeasurement.h>
 
 namespace Belle2 {
@@ -87,6 +86,7 @@ namespace Belle2 {
         return {};
       }
 
+      // cppcheck-suppress nullPointerRedundantCheck
       PlanarVXDMomentumMeasurement<HitType>* momentumMeasurement = new PlanarVXDMomentumMeasurement<HitType>(*planarMeasurement, hit,
           &recoTrack);
       momentumMeasurement->setCorrectionFitParameters(m_correctionFitParameters);

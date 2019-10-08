@@ -12,13 +12,8 @@
 #define QCSMONITORDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
-#include <string>
-#include <vector>
-
-//ROOT
-#include <TRandom3.h>
-#include <TF1.h>
-#include <TVector3.h>
+#include <framework/datastore/StoreArray.h>
+#include <beast/qcsmonitor/dataobjects/QcsmonitorHit.h>
 
 /** size of hit */
 const Int_t MAXSIZE         = 10000;
@@ -46,21 +41,22 @@ namespace Belle2 {
       virtual ~QcsmonitorDigitizerModule();
 
       /**  */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /**  */
-      virtual void beginRun();
+      virtual void beginRun() override;
 
       /**  */
-      virtual void event();
+      virtual void event() override;
 
       /**  */
-      virtual void endRun();
+      virtual void endRun() override;
       /**  */
-      virtual void terminate();
+      virtual void terminate() override;
 
 
     private:
+      StoreArray<QcsmonitorHit> m_qcsmonitorHit; /** Array for QcsmonitorHit */
 
       /** reads data from QCSMONITOR.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();

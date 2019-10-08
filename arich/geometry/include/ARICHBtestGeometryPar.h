@@ -13,20 +13,9 @@
 
 #include <utility>
 #include <vector>
-#include <string>
-#include <map>
 #include <framework/gearbox/GearDir.h>
 #include "TRotation.h"
 #include "TVector3.h"
-#include "TVector2.h"
-
-
-#include <G4ThreeVector.hh>
-#include <G4MaterialPropertyVector.hh>
-#include <cmath>
-#include <boost/format.hpp>
-#include <iomanip>
-
 
 namespace Belle2 {
   //!  Beamtest ARICH Geometry Tracking Class

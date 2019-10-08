@@ -277,10 +277,10 @@ def main():
 
             flight_time_estimate = measurement_on_plane.getTime()
             flight_time_truth = cdc_sim_hit.getFlightTime()
-            incoming_arm = time_truth < 0
+            incoming_arm = flight_time_truth < 0
 
-            yield dict(flight_time_estimate=time_estimate,
-                       flight_time_truth=time_truth,
+            yield dict(flight_time_estimate=flight_time_estimate,
+                       flight_time_truth=flight_time_truth,
                        incoming_arm=incoming_arm)
 
     # path.add_module(harvest_flight_times)

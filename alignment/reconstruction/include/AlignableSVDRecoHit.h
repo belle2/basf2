@@ -11,6 +11,7 @@
 #pragma once
 
 #include <svd/reconstruction/SVDRecoHit.h>
+
 #include <genfit/ICalibrationParametersDerivatives.h>
 
 #include <TMatrix.h>
@@ -25,6 +26,9 @@ namespace Belle2 {
   class AlignableSVDRecoHit : public SVDRecoHit, public genfit::ICalibrationParametersDerivatives  {
     friend class SVDRecoHit;
   public:
+    /// Static enabling(true) or disabling(false) addition of global derivatives for Lorentz shift
+    static bool s_enableLorentzGlobalDerivatives;
+
     /** Inherit constructors */
     using SVDRecoHit::SVDRecoHit;
 
@@ -32,7 +36,7 @@ namespace Belle2 {
     virtual ~AlignableSVDRecoHit() {}
 
     /** Creating a deep copy of this hit. */
-    genfit::AbsMeasurement* clone() const
+    genfit::AbsMeasurement* clone() const override
     {
       return new AlignableSVDRecoHit(*this);
     }
@@ -68,11 +72,11 @@ namespace Belle2 {
      * @return pair<vector<int>, TMatrixD> With matrix with #rows = dimension of residual, #columns = number of parameters.
      * #columns must match vector<int>.size().
      */
-    virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop);
+    virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop) override;
 
   private:
 
     /** ROOT Macro.*/
-    ClassDef(AlignableSVDRecoHit, 2);
+    ClassDefOverride(AlignableSVDRecoHit, 2);
   };
 }

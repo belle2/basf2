@@ -7,21 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-#include <ecl/geometry/ECLGeometryPar.h>
-
-#include <mdst/dataobjects/Track.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
 
 namespace Belle2 {
+  class Track;
+  class ECLCalDigit;
+  class ECLEnergyCloseToTrack;
 
+  namespace ECL {
+    class ECLGeometryPar;
+  }
   /**
    * Module to find the closest ECLCalDigits to an extrapolated track
    */
@@ -35,10 +33,10 @@ namespace Belle2 {
     ECLTrackCalDigitMatchModule();
 
     /** initialize */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** event */
-    virtual void event();
+    virtual void event() override;
 
   private:
 
@@ -59,7 +57,7 @@ namespace Belle2 {
     std::map <int , std::vector<int> > m_BWD3Barrel; /**< map between phi id and BWD3 cell ids on the barrel side */
     std::map <int , std::vector<int> > m_BWD3Endcap; /**< map between phi id and BWD3 cell ids on the endcap side */
 
-    ECL::ECLGeometryPar* geom; /**<ECL geometry */
+    ECL::ECLGeometryPar* geom{nullptr}; /**<ECL geometry */
 
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< Required input array of ECLCalDigits  */
     StoreArray<Track> m_tracks; /**< Required input array of Tracks */
@@ -67,4 +65,3 @@ namespace Belle2 {
     StoreArray<ECLEnergyCloseToTrack> m_anaEnergyCloseToTrack; /**< Analysis level information attached to a track*/
   };
 }
-

@@ -12,27 +12,27 @@
 
 #include <calibration/DBObjCalibrationConstMapBase.h>
 
-#include <fstream>
-#include <map>
-#include <TObject.h>
-
-#include <cdc/dataobjects/WireID.h>
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-
 namespace Belle2 {
-
-  class FileSystem;
   /// CDC layers alignment constants
   class CDCLayerAlignment: public DBObjCalibrationConstMapBase {
 
   public:
-    /// Layer shift in global X
+    //Numbering taken from Claus ... no need to change, good idea :-)
+    //(1: X(bwd), 2: Y(bwd), 6: Phi(bwd), 11: X(fwd-bwd), 12: Y(fwd-bwd), 16: Phi(fwd-bwd)
+
+    /// Layer shift in global X at backward endplate
     static const baseType layerX = 1;
-    /// Layer shift in global Y
+    /// Layer shift in global Y at backward endplate
     static const baseType layerY = 2;
-    /// Layer rotation in global X-Y plane (gamma)
+    /// Layer rotation in global X-Y plane (gamma) at backward endplate
     static const baseType layerPhi = 6;
+
+    /// Layer shift in global X  dX = foward - backward endplate
+    static const baseType layerDx = 11;
+    /// Layer shift in global Y  dY = foward - backward endplate
+    static const baseType layerDy = 12;
+    /// Layer rotation in global X-Y plane (gamma)  dPhi = foward - backward endplate
+    static const baseType layerDPhi = 16;
 
     /// Constructor
     CDCLayerAlignment() : DBObjCalibrationConstMapBase() {}

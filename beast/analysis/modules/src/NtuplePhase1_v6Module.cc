@@ -14,15 +14,9 @@
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-// framework core
-
-
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/RandomNumbers.h>
 
@@ -30,8 +24,6 @@
 #include <framework/io/RootIOUtilities.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-
-#include <TTimeStamp.h>
 #include <TMath.h>
 #include <TH1F.h>
 #include <TH2F.h>
@@ -141,7 +133,6 @@ namespace Belle2 {
 
   void NtuplePhase1_v6Module::initialize()
   {
-    loadDictionaries();
     // read TFile with histograms
 
     // expand possible wildcards

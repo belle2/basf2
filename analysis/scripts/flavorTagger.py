@@ -11,7 +11,7 @@
 from basf2 import *
 from modularAnalysis import *
 import basf2_mva
-from variables import variables as flavorTaggerVariables
+from variables import utils
 from ROOT import Belle2
 import os
 import glob
@@ -34,7 +34,7 @@ def getBelleOrBelle2():
     return belleOrBelle2Flag
 
 
-def setInteractionWithDatabase(downloadFromDatabaseIfNotfound=True, uploadToDatabaseAfterTraining=False):
+def setInteractionWithDatabase(downloadFromDatabaseIfNotFound=False, uploadToDatabaseAfterTraining=False):
     """
     Sets the interaction with the database: download trained weight files or upload weight files after training.
     """
@@ -42,8 +42,79 @@ def setInteractionWithDatabase(downloadFromDatabaseIfNotfound=True, uploadToData
     global downloadFlag
     global uploadFlag
 
-    downloadFlag = downloadFromDatabaseIfNotfound
+    downloadFlag = downloadFromDatabaseIfNotFound
     uploadFlag = uploadToDatabaseAfterTraining
+
+
+# Default list of aliases that should be used to save the flavor tagging information using VariablesToNtuple
+flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined', 'qrMC', 'mcFlavorOfOtherB0',
+                  'qpElectron', 'hasTrueTargetElectron', 'isRightCategoryElectron',
+                  'qpIntermediateElectron', 'hasTrueTargetIntermediateElectron', 'isRightCategoryIntermediateElectron',
+                  'qpMuon', 'hasTrueTargetMuon', 'isRightCategoryMuon',
+                  'qpIntermediateMuon', 'hasTrueTargetIntermediateMuon', 'isRightCategoryIntermediateMuon',
+                  'qpKinLepton', 'hasTrueTargetKinLepton', 'isRightCategoryKinLepton',
+                  'qpIntermediateKinLepton', 'hasTrueTargetIntermediateKinLepton', 'isRightCategoryIntermediateKinLepton',
+                  'qpKaon', 'hasTrueTargetKaon', 'isRightCategoryKaon',
+                  'qpSlowPion', 'hasTrueTargetSlowPion', 'isRightCategorySlowPion',
+                  'qpFastHadron', 'hasTrueTargetFastHadron', 'isRightCategoryFastHadron',
+                  'qpLambda', 'hasTrueTargetLambda', 'isRightCategoryLambda',
+                  'qpFSC', 'hasTrueTargetFSC', 'isRightCategoryFSC',
+                  'qpMaximumPstar', 'hasTrueTargetMaximumPstar', 'isRightCategoryMaximumPstar',
+                  'qpKaonPion', 'hasTrueTargetKaonPion', 'isRightCategoryKaonPion']
+
+
+def add_default_FlavorTagger_aliases():
+    """
+    This function adds the default aliases for flavor tagging variables
+    and defines the collection of flavor tagging variables.
+    """
+
+    utils._variablemanager.addAlias('FBDT_qrCombined', 'qrOutput(FBDT)')
+    utils._variablemanager.addAlias('FANN_qrCombined', 'qrOutput(FANN)')
+    utils._variablemanager.addAlias('qrMC', 'isRelatedRestOfEventB0Flavor')
+
+    for iCategory in AvailableCategories:
+        aliasForQp = 'qp' + iCategory
+        aliasForTrueTarget = 'hasTrueTarget' + iCategory
+        aliasForIsRightCategory = 'isRightCategory' + iCategory
+        utils._variablemanager.addAlias(aliasForQp, 'qpCategory(' + iCategory + ')')
+        utils._variablemanager.addAlias(aliasForTrueTarget, 'hasTrueTargets(' + iCategory + ')')
+        utils._variablemanager.addAlias(aliasForIsRightCategory, 'isTrueFTCategory(' + iCategory + ')')
+
+    utils.add_collection(flavor_tagging, 'flavor_tagging')
+
+
+def set_FlavorTagger_pid_aliases():
+    """
+    This function adds the pid aliases needed by the flavor tagger.
+    """
+    utils._variablemanager.addAlias('eid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, TOP), 0.5)')
+    utils._variablemanager.addAlias('eid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ARICH), 0.5)')
+    utils._variablemanager.addAlias('eid_ECL', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ECL), 0.5)')
+
+    utils._variablemanager.addAlias('muid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, TOP), 0.5)')
+    utils._variablemanager.addAlias('muid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, ARICH), 0.5)')
+    utils._variablemanager.addAlias('muid_KLM', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, KLM), 0.5)')
+
+    utils._variablemanager.addAlias('piid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, TOP), 0.5)')
+    utils._variablemanager.addAlias('piid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, ARICH), 0.5)')
+
+    utils._variablemanager.addAlias('Kid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, TOP), 0.5)')
+    utils._variablemanager.addAlias('Kid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, ARICH), 0.5)')
+
+    if getBelleOrBelle2() == "Belle":
+        utils._variablemanager.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
+        utils._variablemanager.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
+        utils._variablemanager.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
+        utils._variablemanager.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)')
+        utils._variablemanager.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)')
+    else:
+        # Removed SVD PID for Belle II MC and data as it is absent in release 4.
+        utils._variablemanager.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC), 0.5)')
+        utils._variablemanager.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC), 0.5)')
+        utils._variablemanager.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC), 0.5)')
+        utils._variablemanager.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC), 0.5)')
+        utils._variablemanager.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC), 0.5)')
 
 
 # Options for Track and Event Levels
@@ -83,7 +154,7 @@ mlpFANNCombiner.m_scale_target = False
 signalFraction = -2
 
 # Maximal number of events to train each method
-maxEventsNumber = 500000
+maxEventsNumber = 0  # 0 takes all the sampled events. The number in the past was 500000
 
 # Definition of all available categories, 'standard category name':
 # ['ParticleList', 'trackLevel category name', 'eventLevel category name',
@@ -207,7 +278,7 @@ def WhichCategories(categories=[
                 trackLevelParticleLists.append((AvailableCategories[category][0],
                                                 AvailableCategories[category][1]))
             if (AvailableCategories[category][0],
-                    AvailableCategories[category][2]) \
+                    AvailableCategories[category][2], AvailableCategories[category][3]) \
                     not in eventLevelParticleLists:
                 eventLevelParticleLists.append((AvailableCategories[category][0],
                                                 AvailableCategories[category][2], AvailableCategories[category][3]))
@@ -232,25 +303,6 @@ KId = {'Belle': 'kIDBelle', 'Belle2': 'kaonID'}
 muId = {'Belle': 'muIDBelle', 'Belle2': 'muonID'}
 eId = {'Belle': 'eIDBelle', 'Belle2': 'electronID'}
 
-flavorTaggerVariables.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
-flavorTaggerVariables.addAlias('eid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, TOP), 0.5)')
-flavorTaggerVariables.addAlias('eid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ARICH), 0.5)')
-flavorTaggerVariables.addAlias('eid_ECL', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ECL), 0.5)')
-
-flavorTaggerVariables.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
-flavorTaggerVariables.addAlias('muid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, TOP), 0.5)')
-flavorTaggerVariables.addAlias('muid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, ARICH), 0.5)')
-flavorTaggerVariables.addAlias('muid_KLM', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, KLM), 0.5)')
-
-flavorTaggerVariables.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
-flavorTaggerVariables.addAlias('piid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, TOP), 0.5)')
-flavorTaggerVariables.addAlias('piid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, ARICH), 0.5)')
-flavorTaggerVariables.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)')
-
-flavorTaggerVariables.addAlias('Kid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, TOP), 0.5)')
-flavorTaggerVariables.addAlias('Kid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, ARICH), 0.5)')
-flavorTaggerVariables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)')
-
 
 def setVariables():
     """
@@ -264,7 +316,6 @@ def setVariables():
         'pt',
         'cosTheta',
         eId[getBelleOrBelle2()],
-        'eid_dEdx',
         'eid_TOP',
         'eid_ARICH',
         'eid_ECL',
@@ -273,8 +324,6 @@ def setVariables():
         'BtagToWBosonVariables(cosThetaMissCMS)',
         'BtagToWBosonVariables(EW90)',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
         'chiProb',
     ]
     variables['IntermediateElectron'] = variables['Electron']
@@ -285,7 +334,6 @@ def setVariables():
         'pt',
         'cosTheta',
         muId[getBelleOrBelle2()],
-        'muid_dEdx',
         'muid_TOP',
         'muid_ARICH',
         'muid_KLM',
@@ -294,11 +342,24 @@ def setVariables():
         'BtagToWBosonVariables(cosThetaMissCMS)',
         'BtagToWBosonVariables(EW90)',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
+    ]
+    variables['IntermediateMuon'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'p',
+        'pt',
+        'cosTheta',
+        muId[getBelleOrBelle2()],
+        'muid_TOP',
+        'muid_ARICH',
+        'muid_KLM',
+        'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(pMissCMS)',
+        'BtagToWBosonVariables(cosThetaMissCMS)',
+        'BtagToWBosonVariables(EW90)',
+        'cosTPTO',
         'chiProb',
     ]
-    variables['IntermediateMuon'] = variables['Muon']
     variables['KinLepton'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
@@ -306,12 +367,10 @@ def setVariables():
         'pt',
         'cosTheta',
         muId[getBelleOrBelle2()],
-        'muid_dEdx',
         'muid_TOP',
         'muid_ARICH',
         'muid_KLM',
         eId[getBelleOrBelle2()],
-        'eid_dEdx',
         'eid_TOP',
         'eid_ARICH',
         'eid_ECL',
@@ -320,16 +379,34 @@ def setVariables():
         'BtagToWBosonVariables(cosThetaMissCMS)',
         'BtagToWBosonVariables(EW90)',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
+    ]
+    variables['IntermediateKinLepton'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'p',
+        'pt',
+        'cosTheta',
+        muId[getBelleOrBelle2()],
+        'muid_TOP',
+        'muid_ARICH',
+        'muid_KLM',
+        eId[getBelleOrBelle2()],
+        'eid_TOP',
+        'eid_ARICH',
+        'eid_ECL',
+        'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(pMissCMS)',
+        'BtagToWBosonVariables(cosThetaMissCMS)',
+        'BtagToWBosonVariables(EW90)',
+        'cosTPTO',
         'chiProb',
     ]
-    variables['IntermediateKinLepton'] = variables['KinLepton']
     variables['Kaon'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
-        'cosTheta',
+        'p',
         'pt',
+        'cosTheta',
         KId[getBelleOrBelle2()],
         'Kid_dEdx',
         'Kid_TOP',
@@ -341,11 +418,32 @@ def setVariables():
         'BtagToWBosonVariables(cosThetaMissCMS)',
         'BtagToWBosonVariables(EW90)',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
         'chiProb',
     ]
     variables['SlowPion'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'cosTheta',
+        'p',
+        'pt',
+        'pionID',
+        'piid_TOP',
+        'piid_ARICH',
+        'pi_vs_edEdxid',
+        KId[getBelleOrBelle2()],
+        'Kid_dEdx',
+        'Kid_TOP',
+        'Kid_ARICH',
+        'NumberOfKShortsInRoe',
+        'ptTracksRoe',
+        eId[getBelleOrBelle2()],
+        'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(EW90)',
+        'BtagToWBosonVariables(cosThetaMissCMS)',
+        'BtagToWBosonVariables(pMissCMS)',
+        'cosTPTO',
+    ]
+    variables['FastHadron'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
         'cosTheta',
@@ -366,13 +464,8 @@ def setVariables():
         'BtagToWBosonVariables(recoilMassSqrd)',
         'BtagToWBosonVariables(EW90)',
         'BtagToWBosonVariables(cosThetaMissCMS)',
-        'BtagToWBosonVariables(pMissCMS)',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
-        'chiProb'
     ]
-    variables['FastHadron'] = variables['SlowPion']
     variables['Lambda'] = [
         'lambdaFlavor',
         'NumberOfKShortsInRoe',
@@ -385,23 +478,15 @@ def setVariables():
         'daughter(1,useCMSFrame(p))',
         'useCMSFrame(p)',
         'p',
-        'distance',
         'chiProb',
     ]
-    if getBelleOrBelle2() != "Belle":
-        variables['Lambda'].append('daughter(1,protonID)')  # protonID always 0 in B2BII check in future
-        variables['Lambda'].append('daughter(0,pionID)')  # not very powerful in B2BII
-
     variables['MaximumPstar'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
         'p',
         'pt',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
     ]
-
     variables['FSC'] = [
         'useCMSFrame(p)',
         'cosTPTO',
@@ -417,8 +502,62 @@ def setVariables():
                              'HighestProbInCat(pi+:inRoe, isRightCategory(SlowPion))',
                              'KaonPionVariables(cosKaonPion)', 'KaonPionVariables(HaveOpositeCharges)', KId[getBelleOrBelle2()]]
 
+    # Special treatment for some input variables:
+    if getBelleOrBelle2() == "Belle2":
+        variables['Lambda'].append('daughter(1,protonID)')  # protonID always 0 in B2BII check in future
+        variables['Lambda'].append('daughter(0,pionID)')  # not very powerful in B2BII
+    else:
+        # Below we add some input variables in case of Belle B2BII samples.
+        # They are added only for Belle samples because they lead to large data/MC discrepancies at Belle II.
+        # Add them for Belle II samples, when their distributions will have good data/MC agreement.
+        variables['Electron'].append('eid_dEdx')
+        variables['Electron'].append('ImpactXY')
+        variables['Electron'].append('distance')
 
-def FillParticleLists(mode='Expert', path=analysis_main):
+        variables['IntermediateElectron'].append('eid_dEdx')
+        variables['IntermediateElectron'].append('ImpactXY')
+        variables['IntermediateElectron'].append('distance')
+
+        variables['Muon'].append('muid_dEdx')
+        variables['Muon'].append('ImpactXY')
+        variables['Muon'].append('distance')
+        variables['Muon'].append('chiProb')
+
+        variables['IntermediateMuon'].append('muid_dEdx')
+        variables['IntermediateMuon'].append('ImpactXY')
+        variables['IntermediateMuon'].append('distance')
+
+        variables['KinLepton'].append('muid_dEdx')
+        variables['KinLepton'].append('eid_dEdx')
+        variables['KinLepton'].append('ImpactXY')
+        variables['KinLepton'].append('distance')
+        variables['KinLepton'].append('chiProb')
+
+        variables['IntermediateKinLepton'].append('muid_dEdx')
+        variables['IntermediateKinLepton'].append('eid_dEdx')
+        variables['IntermediateKinLepton'].append('ImpactXY')
+        variables['IntermediateKinLepton'].append('distance')
+
+        variables['Kaon'].append('ImpactXY')
+        variables['Kaon'].append('distance')
+
+        variables['SlowPion'].append('piid_dEdx')
+        variables['SlowPion'].append('ImpactXY')
+        variables['SlowPion'].append('distance')
+        variables['SlowPion'].append('chiProb')
+
+        variables['FastHadron'].append('BtagToWBosonVariables(pMissCMS)')
+        variables['FastHadron'].append('ImpactXY')
+        variables['FastHadron'].append('distance')
+        variables['FastHadron'].append('chiProb')
+
+        variables['Lambda'].append('distance')
+
+        variables['MaximumPstar'].append('ImpactXY')
+        variables['MaximumPstar'].append('distance')
+
+
+def FillParticleLists(mode='Expert', path=None):
     """
     Fills the particle Lists for all categories.
     """
@@ -431,7 +570,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
             continue
 
         # Select particles in ROE for different categories according to mass hypothesis.
-        if particleList != ('Lambda0:inRoe' or 'K+:inRoe'):
+        if particleList != 'Lambda0:inRoe' and particleList != 'K+:inRoe' and particleList != 'pi+:inRoe':
 
             # Filling particle list for actual category
             fillParticleList(particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
@@ -448,21 +587,21 @@ def FillParticleLists(mode='Expert', path=analysis_main):
                     cutAndCopyList('K_S0:inRoe', 'K_S0:mdst', 'extraInfo(ksnbStandard) == 1 and isInRestOfEvent == 1', path=path)
                 else:
                     reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', False, path=path)
-                    fitVertex('K_S0:inRoe', 0.01, fitter='kfitter', path=path)
+                    vertexKFit('K_S0:inRoe', 0.01, path=path)
                 readyParticleLists.append('K_S0:inRoe')
 
             if particleList == 'K+:inRoe':
                 fillParticleList(
                     particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
-                # Precut done to prevent from overtraining, might be redundant
-                applyCuts(particleList, '0.1<' + KId[getBelleOrBelle2()], path=path)
+                # Precut done to prevent from overtraining, found not necessary now
+                # applyCuts(particleList, '0.1<' + KId[getBelleOrBelle2()], path=path)
                 readyParticleLists.append(particleList)
 
             if particleList == 'Lambda0:inRoe':
                 fillParticleList(
                     'p+:inRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
                 reconstructDecay(particleList + ' -> pi-:inRoe p+:inRoe', '1.00<=M<=1.23', False, path=path)
-                fitVertex(particleList, 0.01, fitter='kfitter', path=path)
+                vertexKFit(particleList, 0.01, path=path)
                 # if mode != 'Expert':
                 matchMCTruth(particleList, path=path)
                 readyParticleLists.append(particleList)
@@ -470,7 +609,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
     return True
 
 
-def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
+def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
     """
     Samples data for training or tests all categories all categories at event level.
     """
@@ -481,39 +620,52 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
     # Each category has its own Path in order to be skipped if the corresponding particle list is empty
     identifiersExtraInfosDict = dict()
-    isKaonPionReady = True
     identifiersExtraInfosKaonPion = []
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
-        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
-        identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
+        methodPrefixEventLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+        identifierEventLevel = methodPrefixEventLevel
         targetVariable = 'isRightCategory(' + category + ')'
         extraInfoName = targetVariable
 
-        if not os.path.isfile(identifierEventLevel) and mode == 'Expert':
-            if downloadFlag:
-                basf2_mva.download(methodPrefixEventLevel, identifierEventLevel)
+        if mode == 'Expert':
+
+            if downloadFlag or useOnlyLocalFlag:
+                identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
                 if not os.path.isfile(identifierEventLevel):
-                    B2FATAL('Flavor Tagger: Weight file ' + identifierEventLevel +
-                            ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
-            else:
-                B2FATAL(
-                    'Flavor Tagger: ' +
-                    particleList +
-                    ' Eventlevel was not trained. Weight file ' +
-                    identifierEventLevel + ' was not found. Stopped')
+                    if downloadFlag:
+                        basf2_mva.download(methodPrefixEventLevel, identifierEventLevel)
+                        if not os.path.isfile(identifierEventLevel):
+                            B2FATAL('Flavor Tagger: Weight file ' + identifierEventLevel +
+                                    ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+                    else:
+                        B2FATAL(
+                            'Flavor Tagger: ' + particleList + ' Eventlevel was not trained. Weight file ' +
+                            identifierEventLevel + ' was not found. Stopped')
 
-        if os.path.isfile(identifierEventLevel) and mode != 'Teacher':
+                else:
+                    B2INFO('flavorTagger: MVAExpert ' + methodPrefixEventLevel + ' ready.')
 
-            B2INFO('flavorTagger: MVAExpert ' + methodPrefixEventLevel + ' ready.')
+        elif mode == 'Sampler':
 
-            if mode == 'Sampler':
-                methodPrefixEventLevelKaonPion = belleOrBelle2Flag + "_" + weightFiles + 'EventLevelKaonPionFBDT'
-                identifierEventLevelKaonPion = filesDirectory + '/' + methodPrefixEventLevelKaonPion + '_1.root'
-                if not os.path.isfile(identifierEventLevelKaonPion):
-                    if category != "SlowPion" and category != "Kaon":
-                        continue
+            identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
+            if os.path.isfile(identifierEventLevel):
+                B2INFO('flavorTagger: MVAExpert ' + methodPrefixEventLevel + ' ready.')
+
+                if 'KaonPion' in [row[1] for row in eventLevelParticleLists]:
+                    methodPrefixEventLevelKaonPion = "FlavorTagger_" + belleOrBelle2Flag + \
+                        "_" + weightFiles + 'EventLevelKaonPionFBDT'
+                    identifierEventLevelKaonPion = filesDirectory + '/' + methodPrefixEventLevelKaonPion + '_1.root'
+                    if not os.path.isfile(identifierEventLevelKaonPion):
+                                # Slow Pion and Kaon categories are used if Kaon-Pion is lacking for
+                                # sampling. The others are not needed and skipped
+                        if category != "SlowPion" and category != "Kaon":
+                            continue
+
+        if mode == 'Expert' or (mode == 'Sampler' and os.path.isfile(identifierEventLevel)):
+
+            B2INFO('flavorTagger: Applying MVAExpert ' + methodPrefixEventLevel + '.')
 
             if particleList not in identifiersExtraInfosDict and category != 'KaonPion':
                 identifiersExtraInfosDict[particleList] = [(extraInfoName, identifierEventLevel)]
@@ -560,14 +712,14 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
-        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+        methodPrefixEventLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
         targetVariable = 'isRightCategory(' + category + ')'
 
         if not os.path.isfile(identifierEventLevel) and mode == 'Sampler':
 
             if category == 'KaonPion':
-                methodPrefixEventLevelSlowPion = belleOrBelle2Flag + "_" + weightFiles + 'EventLevelSlowPionFBDT'
+                methodPrefixEventLevelSlowPion = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevelSlowPionFBDT'
                 identifierEventLevelSlowPion = filesDirectory + '/' + methodPrefixEventLevelSlowPion + '_1.root'
                 if not os.path.isfile(identifierEventLevelSlowPion):
                     B2INFO("Flavor Tagger: event level weight file for the Slow Pion category is absent." +
@@ -618,7 +770,7 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
-        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+        methodPrefixEventLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         targetVariable = 'isRightCategory(' + category + ')'
         weightFile = filesDirectory + '/' + methodPrefixEventLevel + "_1.root"
 
@@ -656,7 +808,7 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
         return True
 
 
-def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
+def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
     """
     Samples the input data or tests the combiner according to the selected categories.
     """
@@ -669,7 +821,7 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
     B2INFO("Flavor Tagger: which corresponds to a weight file with categories combination code " + categoriesCombinationCode)
 
-    methodPrefixCombinerLevel = belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
+    methodPrefixCombinerLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
         + categoriesCombinationCode
 
     if mode == 'Sampler':
@@ -698,88 +850,100 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
         if TMVAfbdt and not FANNmlp:
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root') and downloadFlag:
-                basf2_mva.download(methodPrefixCombinerLevel + 'FBDT', filesDirectory +
-                                   '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root')
-                if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root'):
-                    B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FBDT' +
-                            '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+            identifier = methodPrefixCombinerLevel + 'FBDT'
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root'):
+            if downloadFlag or useOnlyLocalFlag:
 
-                B2FATAL('flavorTagger: Combinerlevel FastBDT was not trained with this combination of categories. Weight file ' +
-                        methodPrefixCombinerLevel + 'FBDT' + '_1.root not found. Stopped')
-            else:
-                B2INFO('flavorTagger: Ready to be used with weightFile ' + methodPrefixCombinerLevel + 'FBDT' + '_1.root')
-                B2INFO('flavorTagger: Apply FBDTMethod ' + methodPrefixCombinerLevel + 'FBDT')
-                path.add_module('MVAExpert', listNames=[], extraInfoName='qrCombined' + 'FBDT', signalFraction=signalFraction,
-                                identifier=filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + "_1.root")
-                return True
+                identifier = filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root'
+                if not os.path.isfile(identifier):
+                    if downloadFlag:
+                        basf2_mva.download(methodPrefixCombinerLevel + 'FBDT', identifier)
+                        if not os.path.isfile(identifier):
+                            B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FBDT' +
+                                    '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+                    else:
+                        B2FATAL(
+                            'flavorTagger: Combinerlevel FastBDT was not trained with this combination of categories.' +
+                            ' Weight file ' + methodPrefixCombinerLevel + 'FBDT' + '_1.root not found. Stopped')
+                else:
+                    B2INFO('flavorTagger: Ready to be used with weightFile ' + methodPrefixCombinerLevel + 'FBDT' + '_1.root')
+
+            B2INFO('flavorTagger: Apply FBDTMethod ' + methodPrefixCombinerLevel + 'FBDT')
+            path.add_module('MVAExpert', listNames=[], extraInfoName='qrCombined' + 'FBDT', signalFraction=signalFraction,
+                            identifier=identifier)
+            return True
 
         if FANNmlp and not TMVAfbdt:
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root') and downloadFlag:
-                basf2_mva.download(methodPrefixCombinerLevel + 'FANN', filesDirectory +
-                                   '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root')
-                if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root'):
-                    B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FANN' +
-                            '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+            identifier = methodPrefixCombinerLevel + 'FANN'
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root'):
+            if downloadFlag or useOnlyLocalFlag:
+                identifier = filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root'
 
-                B2FATAL('flavorTagger: Combinerlevel FANN was not trained with this combination of categories. Weight file ' +
-                        methodPrefixCombinerLevel + 'FANN' + '_1.root not found. Stopped')
+                if not os.path.isfile(identifier):
+                    if downloadFlag:
+                        basf2_mva.download(methodPrefixCombinerLevel + 'FANN', identifier)
+                        if not os.path.isfile(identifier):
+                            B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FANN' +
+                                    '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+                    else:
+                        B2FATAL(
+                            'flavorTagger: Combinerlevel FANNMLP was not trained with this combination of categories. ' +
+                            ' Weight file ' + methodPrefixCombinerLevel + 'FANN' + '_1.root not found. Stopped')
+                else:
+                    B2INFO('flavorTagger: Ready to be used with weightFile ' + methodPrefixCombinerLevel + 'FANN' + '_1.root')
 
-            else:
-                B2INFO('flavorTagger: Ready to be used with weightFile ' + methodPrefixCombinerLevel + 'FANN' + '_1.root')
-
-                B2INFO('flavorTagger: Apply FANNMethod on combiner level')
-                path.add_module('MVAExpert', listNames=[], extraInfoName='qrCombined' + 'FANN', signalFraction=signalFraction,
-                                identifier=filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + "_1.root")
-                return True
+            B2INFO('flavorTagger: Apply FANNMethod on combiner level')
+            path.add_module('MVAExpert', listNames=[], extraInfoName='qrCombined' + 'FANN', signalFraction=signalFraction,
+                            identifier=identifier)
+            return True
 
         if FANNmlp and TMVAfbdt:
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root') and downloadFlag:
-                basf2_mva.download(methodPrefixCombinerLevel + 'FBDT', filesDirectory +
-                                   '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root')
-                if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root'):
-                    B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FBDT' +
-                            '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+            identifierFBDT = methodPrefixCombinerLevel + 'FBDT'
+            identifierFANN = methodPrefixCombinerLevel + 'FANN'
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root') and downloadFlag:
-                basf2_mva.download(methodPrefixCombinerLevel + 'FANN', filesDirectory +
-                                   '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root')
-                if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root'):
-                    B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FANN' +
-                            '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+            if downloadFlag or useOnlyLocalFlag:
+                identifierFBDT = filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root'
+                identifierFANN = filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root'
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root'):
+                if not os.path.isfile(identifierFBDT):
+                    if downloadFlag:
+                        basf2_mva.download(methodPrefixCombinerLevel + 'FBDT', identifierFBDT)
+                        if not os.path.isfile(identifierFBDT):
+                            B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FBDT' +
+                                    '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+                    else:
+                        B2FATAL(
+                            'flavorTagger: Combinerlevel FastBDT was not trained with this combination of categories. ' +
+                            'Weight file ' + methodPrefixCombinerLevel + 'FBDT' + '_1.root not found. Stopped')
 
-                B2FATAL('flavorTagger: Combinerlevel FastBDT was not trained with this combination of categories. Weight file ' +
-                        methodPrefixCombinerLevel + 'FBDT' + '_1.root not found. Stopped')
+                if not os.path.isfile(identifierFANN):
+                    if downloadFlag:
+                        basf2_mva.download(methodPrefixCombinerLevel + 'FANN', identifierFANN)
+                        if not os.path.isfile(identifierFANN):
+                            B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FANN' +
+                                    '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+                    else:
+                        B2FATAL(
+                            'flavorTagger: Combinerlevel FANNMLP was not trained with this combination of categories. ' +
+                            'Weight file ' + methodPrefixCombinerLevel + 'FANN' + '_1.root not found. Stopped')
 
-            elif not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root'):
+                if os.path.isfile(identifierFBDT) and os.path.isfile(identifierFANN):
+                    B2INFO('flavorTagger: Ready to be used with weightFiles ' + methodPrefixCombinerLevel +
+                           'FBDT' + '_1.root and ' + methodPrefixCombinerLevel + 'FANN' + '_1.root')
 
-                B2FATAL('flavorTagger: Combinerlevel FANN was not trained with this combination of categories. Weight file ' +
-                        methodPrefixCombinerLevel + 'FANN' + '_1.root not found. Stopped')
+            B2INFO('flavorTagger: Apply FANNMethod and FBDTMethod  on combiner level')
 
-            else:
-                B2INFO('flavorTagger: Ready to be used with weightFiles ' + methodPrefixCombinerLevel + 'FBDT' + '_1.root and ' +
-                       methodPrefixCombinerLevel + 'FANN' + '_1.root')
+            mvaMultipleExperts = register_module('MVAMultipleExperts')
+            mvaMultipleExperts.set_name('MVAMultipleExperts_Combiners')
+            mvaMultipleExperts.param('listNames', [])
+            mvaMultipleExperts.param('extraInfoNames', ['qrCombined' + 'FBDT', 'qrCombined' + 'FANN'])
+            mvaMultipleExperts.param('signalFraction', signalFraction)
+            mvaMultipleExperts.param('identifiers', [identifierFBDT, identifierFANN])
+            path.add_module(mvaMultipleExperts)
 
-                B2INFO('flavorTagger: Apply FANNMethod on combiner level')
-
-                mvaMultipleExperts = register_module('MVAMultipleExperts')
-                mvaMultipleExperts.set_name('MVAMultipleExperts_Combiners')
-                mvaMultipleExperts.param('listNames', [])
-                mvaMultipleExperts.param('extraInfoNames', ['qrCombined' + 'FBDT', 'qrCombined' + 'FANN'])
-                mvaMultipleExperts.param('signalFraction', signalFraction)
-                mvaMultipleExperts.param('identifiers', [filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + "_1.root",
-                                                         filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + "_1.root"])
-                path.add_module(mvaMultipleExperts)
-
-                return True
+            return True
 
 
 def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
@@ -789,7 +953,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
     B2INFO('COMBINER LEVEL TEACHER')
 
-    methodPrefixCombinerLevel = belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
+    methodPrefixCombinerLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
         + categoriesCombinationCode
 
     sampledFilesList = glob.glob(filesDirectory + '/' + methodPrefixCombinerLevel + 'sampled*.root')
@@ -864,7 +1028,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
 def flavorTagger(
     particleLists=[],
     mode='Expert',
-    weightFiles='B2JpsiKs_muBGx1',
+    weightFiles='B2nunubarBGx1',
     workingDirectory='.',
     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
     categories=[
@@ -883,10 +1047,11 @@ def flavorTagger(
         'KaonPion'],
     belleOrBelle2="Belle2",
     saveCategoriesInfo=True,
-    downloadFromDatabaseIfNotfound=True,
+    useOnlyLocalWeightFiles=False,
+    downloadFromDatabaseIfNotFound=False,
     uploadToDatabaseAfterTraining=False,
     samplerFileId='',
-    path=analysis_main,
+    path=None,
 ):
     """
       Defines the whole flavor tagging process for each selected Rest of Event (ROE) built in the steering file.
@@ -895,16 +1060,34 @@ def flavorTagger(
       This module can be used to sample the training information, to train and/or to test the flavorTagger.
 
       @param particleLists                     The ROEs for flavor tagging are selected from the given particle lists.
-      @param mode                              The available modes are "Sampler", "Teacher" or "Expert".
-      @param weightFiles                       Weight files name. Default= "B2JpsiKs_muBGx1". Use 'B2JpsiKs_muBGx0' with BGx0 MC.
+      @param mode                              The available modes are
+                                               ``Expert`` (default), ``Sampler``, and ``Teacher``. In the ``Expert`` mode
+                                               Flavor Tagging is applied to the analysis,. In the ``Sampler`` mode you save
+                                               save the variables for training. In the ``Teacher`` mode the FlavorTagger is
+                                               trained, for this step you do not reconstruct any particle or do any analysis,
+                                               you just run the flavorTagger alone.
+      @param weightFiles                       Weight files name. Default=
+                                               ``B2nunubarBGx1`` (official weight files). If the user self
+                                               wants to train the FlavorTagger, the weightfiles name should correspond to the
+                                               analysed CP channel in order to avoid confusions. The default name
+                                               ``B2nunubarBGx1`` corresponds to
+                                               :math:`B^0_{\\rm sig}\\to \\nu \\overline{\\nu}`.
+                                               and ``B2JpsiKs_muBGx1`` to
+                                               :math:`B^0_{\\rm sig}\\to J/\\psi (\\to \\mu^+ \\mu^-) K_s (\\to \\pi^+ \\pi^-)`.
+                                               BGx1 stays for events simulated with background.
       @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder.
-      @param combinerMethods                   MVAs for the combiner: 'TMVA-FBDT' or 'FANN-MLP'. Both used by default.
+      @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT`` or ``FANN-MLP``. Both used by default.
       @param categories                        Categories used for flavor tagging. By default all are used.
-      @param belleOrBelle2                     Uses files trained for "Belle" or "Belle2" MC.
+      @param belleOrBelle2                     Uses files trained for ``Belle`` or ``Belle2`` MC.
       @param saveCategoriesInfo                Sets to save information of individual categories.
-      @param downloadFromDatabaseIfNotfound    Weight files are downloaded from the conditions database if not in workingDirectory.
-      @param uploadToDatabaseAfterTraining     For librarians: uploads weight files to localdb after training.
-      @param samplerFileId                     Identifier to paralellize sampling. Only used in "Sampler" mode.
+      @param useOnlyLocalWeightFiles           [Expert] Uses only locally saved weight files.
+      @param downloadFromDatabaseIfNotFound    [Expert] Weight files are downloaded from
+                                               the conditions database if not available in workingDirectory.
+      @param uploadToDatabaseAfterTraining     [Expert] For librarians only: uploads weight files to localdb after training.
+      @param samplerFileId                     Identifier to paralellize
+                                               sampling. Only used in ``Sampler`` mode.  If you are training by yourself and
+                                               want to parallelize the sampling, you can run several sampling scripts in
+                                               parallel. By changing this parameter you will not overwrite an older sample.
       @param path                              Modules are added to this path
 
     """
@@ -918,16 +1101,16 @@ def flavorTagger(
     if not Belle2.FileSystem.findFile(workingDirectory, True):
         B2FATAL('flavorTagger: THE GIVEN WORKING DIRECTORY "' + workingDirectory + '" DOES NOT EXIST! PLEASE SPECIFY A VALID PATH.')
 
-    if mode == 'Sampler' or (mode == 'Expert' and downloadFromDatabaseIfNotfound):
+    global filesDirectory
+    filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
+
+    if mode == 'Sampler' or (mode == 'Expert' and downloadFromDatabaseIfNotFound):
         if not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging', True):
             os.mkdir(workingDirectory + '/FlavorTagging')
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
         elif not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging/TrainedMethods', True):
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
-
-    global filesDirectory
-
-    filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
+        filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
 
     if not (belleOrBelle2 == 'Belle2' or belleOrBelle2 == 'Belle'):
         B2FATAL('flavorTagger: Wrong argument for belleOrBelle2 given: The available modes are "Belle2" or "Belle"')
@@ -950,8 +1133,10 @@ def flavorTagger(
             B2FATAL('flavorTagger: Invalid list of combinerMethods. The available methods are "TMVA-FBDT" and "FANN-MLP"')
 
     global fileId
-
     fileId = samplerFileId
+
+    global useOnlyLocalFlag
+    useOnlyLocalFlag = useOnlyLocalWeightFiles
 
     B2INFO('*** FLAVOR TAGGING ***')
     B2INFO(' ')
@@ -959,8 +1144,9 @@ def flavorTagger(
     B2INFO(' ')
 
     setBelleOrBelle2(belleOrBelle2)
-    setInteractionWithDatabase(downloadFromDatabaseIfNotfound, uploadToDatabaseAfterTraining)
+    setInteractionWithDatabase(downloadFromDatabaseIfNotFound, uploadToDatabaseAfterTraining)
     WhichCategories(categories)
+    set_FlavorTagger_pid_aliases()
     setVariables()
 
     roe_path = create_path()
@@ -993,6 +1179,7 @@ def flavorTagger(
                     flavorTaggerInfoFiller.param('targetProb', False)
                     flavorTaggerInfoFiller.param('trackPointers', False)
                     roe_path.add_module(flavorTaggerInfoFiller)  # Add FlavorTag Info filler to roe_path
+                    add_default_FlavorTagger_aliases()
 
     # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
     particleListsToRemoveExtraInfo = []
@@ -1002,6 +1189,7 @@ def flavorTagger(
 
     if mode == 'Expert':
         removeExtraInfo(particleListsToRemoveExtraInfo, True, roe_path)
+
     elif mode == 'Sampler':
         removeExtraInfo(particleListsToRemoveExtraInfo, False, roe_path)
 
@@ -1018,9 +1206,9 @@ if __name__ == '__main__':
 
     function = globals()["flavorTagger"]
     signature = inspect.formatargspec(*inspect.getfullargspec(function))
-    signature = signature.replace(repr(analysis_main), 'analysis_main')
     desc_list.append((function.__name__, signature + '\n' + function.__doc__))
 
-    from pager import Pager
+    from terminal_utils import Pager
+    from basf2.utils import pretty_print_description_list
     with Pager('Flavor Tagger function accepts the following arguments:'):
         pretty_print_description_list(desc_list)

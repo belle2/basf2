@@ -21,6 +21,9 @@
 
 
 namespace Belle2 {
+  /**
+   * Algorithm to collect the x best TrackCandidates per family based on a VXD Quality estimator method output.
+   */
   class SPTCSelectorXBestPerFamily {
 
   public:
@@ -30,7 +33,7 @@ namespace Belle2 {
      * @param xBest Maximal number of best candidates to be stored per family.
      * @param estimationMethod Quality estimator to be used.
      */
-    SPTCSelectorXBestPerFamily(unsigned short xBest = 5, std::string estimationMethod = std::string("tripletFit")):
+    SPTCSelectorXBestPerFamily(unsigned short xBest = 5, const std::string& estimationMethod = std::string("tripletFit")):
       m_xBest(xBest)
     {
       if (estimationMethod == "tripletFit") {
@@ -70,7 +73,7 @@ namespace Belle2 {
      */
     void testNewSPTC(SpacePointTrackCand& sptc)
     {
-      sptc.setQualityIndex(m_estimator->estimateQuality(sptc.getSortedHits()));
+      sptc.setQualityIndicator(m_estimator->estimateQuality(sptc.getSortedHits()));
       short family = sptc.getFamily();
 
       if (m_familyToIndex.at(family) == -1) {
@@ -84,7 +87,7 @@ namespace Belle2 {
 
       if (currentSet.size() == m_xBest) {
         std::multiset<SpacePointTrackCand>::iterator iter = currentSet.begin();
-        if (sptc.getQualityIndex() < iter->getQualityIndex()) {
+        if (sptc.getQualityIndicator() < iter->getQualityIndicator()) {
           return;
         }
         currentSet.erase(iter);

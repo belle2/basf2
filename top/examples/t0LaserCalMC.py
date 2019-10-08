@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import os
 
-gb2_setuprel = 'build-2017-06-14'
+# gb2_setuprel = 'build-2017-06-14'
 
 # Usage: basf2 t0LaserCalMC.py -n 10000
 
@@ -41,7 +42,7 @@ def fiber(
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
+eventinfosetter.param('evtNumList', [100])
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
@@ -50,6 +51,7 @@ main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 

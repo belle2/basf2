@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi                                            *
+ * Contributors: Luigi Li Gioi, Fernando Abudinen                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,7 +14,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/dbobjects/BeamParameters.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -59,9 +58,7 @@ VertexFitUpdateDaughtersModule::VertexFitUpdateDaughtersModule() : Module(),
   addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
 }
 
-VertexFitUpdateDaughtersModule::~VertexFitUpdateDaughtersModule()
-{
-}
+VertexFitUpdateDaughtersModule::~VertexFitUpdateDaughtersModule() = default;
 
 void VertexFitUpdateDaughtersModule::initialize()
 {
@@ -84,7 +81,7 @@ void VertexFitUpdateDaughtersModule::beginRun()
 
 void VertexFitUpdateDaughtersModule::event()
 {
-  //cout<<"DECAY STRING = "<<m_decayString<<endl;
+  //B2DEBUG(19,"DECAY STRING = "<<m_decayString);
 
   StoreObjPtr<ParticleList> plist(m_listName);
   if (!plist) {
@@ -94,10 +91,10 @@ void VertexFitUpdateDaughtersModule::event()
 
   analysis::RaveSetup::initialize(1, m_Bfield);
 
-  m_BeamSpotCenter = m_beamParams->getVertex();
+  m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
   m_beamSpotCov.ResizeTo(3, 3);
   TMatrixDSym beamSpotCov(3);
-  if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamParams->getCovVertex();
+  if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamSpotDB->getCovVertex();
   if (m_withConstraint == "iptube") VertexFitUpdateDaughtersModule::findConstraintBoost(2.);
 
   if (m_withConstraint != "ipprofile" && m_withConstraint != "iptube"  && m_withConstraint != "mother" && m_withConstraint != "")
@@ -144,17 +141,22 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
     tracksVertex = mother->getDaughters();
   } else {
     std::vector<const Particle*> ctracksVertex = m_decaydescriptor.getSelectionParticles(mother);
-    for (unsigned itrack = 0; itrack < ctracksVertex.size(); itrack++) {
-      tracksVertex.push_back(const_cast<Particle*>(ctracksVertex[itrack]));
+    for (auto& itrack : ctracksVertex) {
+      if (itrack == mother) B2FATAL("VertexFitUpdateDaughtersModule: Selected Mother is not used in the fit. " <<
+                                      "The Mother is used only if all daughters are used. " <<
+                                      "If you want to use and update the mother you " <<
+                                      "just leave the decay string argument " <<
+                                      "empty (this selects the mother and all daughters). But attention! The mother is not used in fits with a single track.");
+      else tracksVertex.push_back(const_cast<Particle*>(itrack));
     }
   }
 
+
+
   std::vector<std::string> tracksName = m_decaydescriptor.getSelectionNames();
 
-  int nvert = 0;
-
   if (tracksVertex.size() == 0) {
-    B2ERROR("VertexFitUpdateDaughtersModule: no track selected");
+    B2ERROR("VertexFitUpdateDaughtersModule: no track selected.");
     return false;
   }
 
@@ -165,18 +167,18 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
 
     if (m_decayString == "") rsf.setMother(mother);
 
-    for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
-      if (tracksVertex[itrack] != mother) {
-        rsf.addTrack(tracksVertex[itrack]);
-        B2DEBUG(1, "VertexFitUpdateDaughtersModule: Adding particle " << tracksName[itrack] << " to vertex fit ");
-      }
-      if (tracksVertex[itrack] == mother) B2WARNING("VertexFitUpdateDaughtersModule: Selected Mother not used in the fit");
+    for (auto& itrack : tracksVertex) {
+      rsf.addTrack(itrack);
+      B2DEBUG(10, "VertexFitUpdateDaughtersModule: Adding particle " << itrack -> getName() << " to the vertex fit.");
     }
+
 
 
     TVector3 pos; TMatrixDSym RerrMatrix(7);
 
-    nvert = rsf.fit();
+    int nvert = rsf.fit();
+
+
 
     if (nvert > 0) {
 
@@ -198,25 +200,26 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
           }
         }
         mother->updateMomentum(mom, pos, errMatrix, prob);
-        rsf.updateDaughters();
       }
+
+      rsf.updateDaughters();
 
     } else {return false;}
   }
 
 
   if (tracksVertex.size() == 1) {
-    if (m_withConstraint == "") B2FATAL("VertexFitUpdateDaughtersModule: sigle track fit needs a valid constraint");
+    if (m_withConstraint == "") B2FATAL("VertexFitUpdateDaughtersModule: A single track fit needs a valid constraint.");
 
     // One track fit cannot be kinematic
     analysis::RaveVertexFitter rsg;
     rsg.addTrack(tracksVertex[0]);
-    B2DEBUG(1, "VertexFitUpdateDaughtersModule: Adding particle " << tracksName[0] << " to vertex fit ");
-    if (tracksVertex[0] == mother) B2FATAL("VertexFitUpdateDaughtersModule: Selected Mother not used in sigle track fit");
+    B2DEBUG(10, "VertexFitUpdateDaughtersModule: Adding particle " << tracksVertex[0] -> getName()  << " with name "  << tracksName[0]
+            << " to vertex fit.");
 
     TVector3 pos; TMatrixDSym RerrMatrix(3);
 
-    nvert = rsg.fit("avf");
+    int nvert = rsg.fit("avf");
 
     if (nvert > 0) {
       pos = rsg.getPos(0);
@@ -256,11 +259,11 @@ void VertexFitUpdateDaughtersModule::findConstraintBoost(double cut)
 
   PCmsLabTransform T;
 
-  TVector3 boost = T.getBoostVector().BoostVector();
+  TVector3 boost = T.getBoostVector();
   TVector3 boostDir = boost.Unit();
 
   TMatrixDSym beamSpotCov(3);
-  beamSpotCov = m_beamParams->getCovVertex();
+  beamSpotCov = m_beamSpotDB->getCovVertex();
   beamSpotCov(2, 2) = cut * cut;
   double thetab = boostDir.Theta();
   double phib = boostDir.Phi();

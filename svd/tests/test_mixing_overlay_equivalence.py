@@ -2,6 +2,7 @@ import basf2
 import ROOT
 from ROOT import Belle2
 import b2test_utils
+from svd import add_svd_simulation
 
 # ====================================================================
 # This test does the following:
@@ -64,11 +65,6 @@ class InjectSimHits(basf2.Module):
 
 if __name__ == "__main__":
 
-    # Load ROOT libs before we change directory
-    dummy_simhit = Belle2.SVDSimHit()
-    dummy_digit = Belle2.SVDShaperDigit()
-    dummy_bdata = Belle2.BackgroundMetaData()
-
     with b2test_utils.clean_working_directory():
 
         basf2.B2INFO('Creating background data...')
@@ -92,7 +88,11 @@ if __name__ == "__main__":
         create_ovrfile.add_module('Geometry', components=['MagneticField', 'SVD'])
         create_ovrfile.add_module('BeamBkgMixer', backgroundFiles=['bgForMixing.root'], minTime=-150, maxTime=150)
         # Turn off generation of noise digits in SVDDigitizer.
-        create_ovrfile.add_module('SVDDigitizer', ElectronicEffects=False)
+        add_svd_simulation(create_ovrfile)
+        for m in create_ovrfile.modules():
+            if m.name() == "SVDDigitizer":
+                m.param('ElectronicEffects', False)
+
         create_ovrfile.add_module(SetAsideSimHits())
         create_ovrfile.add_module('RootOutput', outputFileName='bgForOverlay.root', branchNames=['SVDShaperDigits'])
         with b2test_utils.show_only_errors():
@@ -109,7 +109,11 @@ if __name__ == "__main__":
         # Time window for background file to just cover one event
         produce_mixed.add_module('BeamBkgMixer', backgroundFiles=['bgForMixing.root'], minTime=-150, maxTime=150)
         # Turn off generation of noise digits in SVDDigitizer.
-        produce_mixed.add_module('SVDDigitizer', ElectronicEffects=False)
+        add_svd_simulation(produce_mixed)
+        for m in produce_mixed.modules():
+            if m.name() == "SVDDigitizer":
+                m.param('ElectronicEffects', False)
+
         produce_mixed.add_module('SVDShaperDigitSorter')
         produce_mixed.add_module('RootOutput', outputFileName='mixedBg.root')
         with b2test_utils.show_only_errors():
@@ -123,7 +127,12 @@ if __name__ == "__main__":
         produce_overlaid.add_module('Geometry', components=['MagneticField', 'SVD'])
         produce_overlaid.add_module('BGOverlayInput', inputFileNames=['bgForOverlay.root'])
         produce_overlaid.add_module(InjectSimHits())
-        produce_overlaid.add_module('SVDDigitizer', ElectronicEffects=False)
+
+        add_svd_simulation(produce_overlaid)
+        for m in produce_overlaid.modules():
+            if m.name() == "SVDDigitizer":
+                m.param('ElectronicEffects', False)
+
         produce_overlaid.add_module('BGOverlayExecutor')
         # Sort digits after overlay
         produce_overlaid.add_module('SVDShaperDigitSorter')

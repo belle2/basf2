@@ -11,6 +11,7 @@
 #pragma once
 
 #include <pxd/reconstruction/PXDRecoHit.h>
+
 #include <genfit/ICalibrationParametersDerivatives.h>
 
 #include <TMatrix.h>
@@ -25,6 +26,9 @@ namespace Belle2 {
   class AlignablePXDRecoHit : public PXDRecoHit, public genfit::ICalibrationParametersDerivatives  {
     friend class PXDRecoHit;
   public:
+    /// Static enabling(true) or disabling(false) addition of global derivatives for Lorentz shift
+    static bool s_enableLorentzGlobalDerivatives;
+
     /** Inherit constructors */
     using PXDRecoHit::PXDRecoHit;
 
@@ -32,7 +36,7 @@ namespace Belle2 {
     virtual ~AlignablePXDRecoHit() {}
 
     /** Creating a deep copy of this hit. */
-    genfit::AbsMeasurement* clone() const
+    genfit::AbsMeasurement* clone() const override
     {
       return new AlignablePXDRecoHit(*this);
     }
@@ -68,10 +72,10 @@ namespace Belle2 {
      * @return pair<vector<int>, TMatrixD> With matrix with #rows = dimension of residual, #columns = number of parameters.
      * #columns must match vector<int>.size().
      */
-    virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop);
+    virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop) override;
 
   private:
 
-    ClassDef(AlignablePXDRecoHit, 3); /**< PXD RecoHit extended for alignment/calibration */
+    ClassDefOverride(AlignablePXDRecoHit, 3); /**< PXD RecoHit extended for alignment/calibration */
   };
 }

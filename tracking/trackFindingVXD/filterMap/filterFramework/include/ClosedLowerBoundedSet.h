@@ -16,8 +16,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <typeinfo>
-
 namespace Belle2 {
 
   /** Represents a closed lower bounded set of arithmetic types.
@@ -31,7 +29,9 @@ namespace Belle2 {
   public:
 
     /** Constructor */
-    ClosedLowerBoundedSet(MinType min): m_min(min) {};
+    explicit ClosedLowerBoundedSet(MinType min): m_min(min) {};
+
+    /** Constructor without argument */
     ClosedLowerBoundedSet(): m_min(0) {};
 
     /** Method used by the filter tools to decide on the fate of the pair.
@@ -81,7 +81,7 @@ namespace Belle2 {
     @param references: pointer to vector which contains a pair of char which indicates the type object pointed to
       and the actual pointers to the bounds, if equal to nullptr it will not be filled
     **/
-    std::string getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr, std::string varname = "X")
+    std::string getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr, const std::string& varname = "X")
     {
       std::string minVal = std::to_string(m_min);
       // if pointer to vector is provided fill it

@@ -8,24 +8,21 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <tracking/modules/vxdtfRedesign/FastBDTClassifierAnalyzerModule.h>
-#include <tracking/spacePointCreation/MapHelperFunctions.h>
-
+#include <fstream>
 #include <TFile.h>
 #include <TTree.h>
 
-#include <fstream>
-#include <utility>
-#include <algorithm>
+#include <tracking/modules/vxdtfRedesign/FastBDTClassifierAnalyzerModule.h>
+#include <tracking/spacePointCreation/MapHelperFunctions.h>
 
 using namespace Belle2;
-using namespace std;
 
 REG_MODULE(FastBDTClassifierAnalyzer);
 
 FastBDTClassifierAnalyzerModule::FastBDTClassifierAnalyzerModule() : Module()
 {
-  setDescription("analyzes performance of given FastBDT on a test and a training set and determines a global classification cut. TODO");
+  setDescription(
+    "analyzes performance of given FastBDT on a test and a training set and determines a global classification cut. TODO");
 
   addParam("fbdtFileName", m_PARAMfbdtFileName, "file name of the fbdtclassifier");
   addParam("trainSamples", m_PARAMtrainSampleFileName, "filename of the training samples");
@@ -35,17 +32,17 @@ FastBDTClassifierAnalyzerModule::FastBDTClassifierAnalyzerModule() : Module()
 
 void FastBDTClassifierAnalyzerModule::initialize()
 {
-  ifstream fbdt(m_PARAMfbdtFileName);
+  std::ifstream fbdt(m_PARAMfbdtFileName);
   if (!fbdt.is_open()) {
     B2ERROR("Could not open file: " << m_PARAMfbdtFileName << ".");
   }
 
-  ifstream train(m_PARAMtrainSampleFileName);
+  std::ifstream train(m_PARAMtrainSampleFileName);
   if (!train.is_open()) {
     B2ERROR("Could not open file: " << m_PARAMtrainSampleFileName << ".");
   }
 
-  ifstream test(m_PARAMtestSampleFileName);
+  std::ifstream test(m_PARAMtestSampleFileName);
   if (!test.is_open()) {
     B2ERROR("Could not open file: " << m_PARAMtestSampleFileName << ".");
   }
@@ -66,17 +63,17 @@ void FastBDTClassifierAnalyzerModule::initialize()
 
 void FastBDTClassifierAnalyzerModule::terminate()
 {
-  ofstream ofs("analyze_trout.dat");
+  std::ofstream ofs("analyze_trout.dat");
   B2DEBUG(10, "Processing the training sample");
   for (const auto& event : m_trainSample) {
-    m_trainOutput.insert(make_pair(event.signal, m_classifier.analyze(event.hits)));
+    m_trainOutput.insert(std::make_pair(event.signal, m_classifier.analyze(event.hits)));
     ofs << event.signal << " " << m_classifier.analyze(event.hits) << std::endl;
   }
   ofs.close();
 
   B2DEBUG(10, "Processing the test sample");
   for (const auto& event : m_testSample) {
-    m_testOutput.insert(make_pair(event.signal, m_classifier.analyze(event.hits)));
+    m_testOutput.insert(std::make_pair(event.signal, m_classifier.analyze(event.hits)));
   }
 
   auto trainBgOut = getValuesToKey(m_trainOutput, 0);

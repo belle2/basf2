@@ -1,31 +1,75 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Jochen Gemmler 2017
+##########################################################################
+# BASF2 (Belle Analysis Framework 2)                                     #
+# Copyright(C) 2016-2019  Belle II Collaboration                         #
+#                                                                        #
+# Author: The Belle II Collaboration                                     #
+# Contributors: Jochen Gemmler                                           #
+#                                                                        #
+# This software is provided "as is" without any warranty.                #
+##########################################################################
 
-# default python packages
+
 import os
+import json
 import tempfile
 import numpy as np
 import tensorflow as tf
 import pandas
 
-# mainly to benefit from the shared libraries which are loaded here
+# was still important for some shared libraries at some point
 import basf2_mva
 
-# defined State object necessary for saving and loading
 from basf2_mva_python_interface.tensorflow import State
 
-# necessary for preprocessing
 from dft import binning
 
-# model and data. this will be copied in this script
-try:
-    from dft import tensorflow_dnn_model as tfm
-    from dft.TfData import TfDataBasf2, TfDataBasf2Stub
-except ImportError:
-    # imports won't be necessary in expert mode
-    B2INFO('Expert mode. Model will not be imported.')
+from dft import tensorflow_dnn_model as tfm
+from dft.TfData import TfDataBasf2, TfDataBasf2Stub
+
+
+def get_tensorflow_model(number_of_features, parameters):
+    """
+    generates the tensorflow model
+    :param number_of_features: int, number of features is handled separately
+    :param parameters:
+    :return:
+    """
+
+    layers = parameters.get('layers', None)
+    wd_coeffs = parameters.get('wd_coeffs', [])
+
+    lr_dec_rate = parameters.get('lr_dec_rate', 1 / (1 + 2e-7)**1.2e5)
+    lr_init = parameters.get('lr_init', .05)
+    mom_init = parameters.get('mom_init', .9)
+    min_epochs = parameters.get('min_epochs', 300)
+    max_epochs = parameters.get('max_epochs', 400)
+    stop_epochs = parameters.get('stop_epochs', 10)
+
+    if layers is None:
+        layers = [['h0', 'tanh', number_of_features, 300, .0001, 1.0 / np.sqrt(300)],
+                  ['h1', 'tanh', 300, 300, .0001, 1.0 / np.sqrt(300)],
+                  ['h2', 'tanh', 300, 300, .0001, 1.0 / np.sqrt(300)],
+                  ['h3', 'tanh', 300, 300, .0001, 1.0 / np.sqrt(300)],
+                  ['h4', 'tanh', 300, 300, .0001, 1.0 / np.sqrt(300)],
+                  ['h5', 'tanh', 300, 300, .0001, 1.0 / np.sqrt(300)],
+                  ['h6', 'tanh', 300, 300, .0001, 1.0 / np.sqrt(300)],
+                  ['h7', 'tanh', 300, 300, .0001, 1.0 / np.sqrt(300)],
+                  ['y', 'sigmoid', 300, 1, .0001, 0.002 * 1.0 / np.sqrt(300)]]
+    else:
+        layers[0][2] = number_of_features
+
+    # None disables usage of wd_coeffs
+    if wd_coeffs is not None and not wd_coeffs:
+        wd_coeffs = [2e-5 for _ in layers]
+
+    mlp = tfm.MultilayerPerceptron.from_list(layers)
+    model = tfm.DefaultModel(mlp, lr_dec_rate=lr_dec_rate, lr_init=lr_init, mom_init=mom_init, wd_coeffs=wd_coeffs,
+                             min_epochs=min_epochs, max_epochs=max_epochs, stop_epochs=stop_epochs)
+
+    return model
 
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
@@ -46,53 +90,31 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         if not isinstance(parameters, dict):
             raise TypeError('parameters must be a dictionary')
 
-    cuda_mask = parameters.pop('cuda_visible_devices', '3')
-    tensorboard_dir = parameters.pop('tensorboard_dir', None)
-    layers = parameters.pop('layers', None)
-    wd_coeffs = parameters.pop('wd_coeffs', [])
+    cuda_mask = parameters.get('cuda_visible_devices', '3')
+    tensorboard_dir = parameters.get('tensorboard_dir', None)
 
-    batch_size = parameters.pop('batch_size', 100)
-    lr_dec_rate = parameters.pop('lr_dec_rate', 1 / (1 + 2e-7)**1.2e5)
-    lr_init = parameters.pop('lr_init', .05)
-    mom_init = parameters.pop('mom_init', .9)
-    min_epochs = parameters.pop('min_epochs', 300)
-    max_epochs = parameters.pop('max_epochs', 400)
-    stop_epochs = parameters.pop('stop_epochs', 10)
+    batch_size = parameters.get('batch_size', 100)
+    seed = parameters.get('seed', None)
 
     # postprocessing parameters, from dictionary
-    transform_to_probability = parameters.pop('transform_to_probability', False)
+    transform_to_probability = parameters.get('transform_to_probability', False)
 
-    if layers is None:
-        layers = [['h0', 'tanh', number_of_features, 300, .0001, 1.0 / np.sqrt(300)],
-                  ['h1', 'tanh', 300, 300, .0001, 1.0 / np.sqrt(300)],
-                  ['h2', 'tanh', 300, 300, .0001, 1.0 / np.sqrt(300)],
-                  ['h3', 'tanh', 300, 300, .0001, 1.0 / np.sqrt(300)],
-                  ['h4', 'tanh', 300, 300, .0001, 1.0 / np.sqrt(300)],
-                  ['h5', 'tanh', 300, 300, .0001, 1.0 / np.sqrt(300)],
-                  ['h6', 'tanh', 300, 300, .0001, 1.0 / np.sqrt(300)],
-                  ['h7', 'tanh', 300, 300, .0001, 1.0 / np.sqrt(300)],
-                  ['y', 'sigmoid', 300, 1, .0001, 0.002 * 1.0 / np.sqrt(300)]]
-    else:
-        layers[0][2] = number_of_features
+    # initialize session
+    tf.reset_default_graph()
+    gpu_options = tf.GPUOptions(allow_growth=True)
 
-    # None disables usage of wd_coeffs
-    if wd_coeffs is not None and not wd_coeffs:
-        wd_coeffs = [2e-5 for _ in layers]
+    # set random state
+    if seed:
+        print('Seed: ', seed)
+        tf.set_random_seed(seed)
 
     # mask cuda devices
     os.environ['CUDA_VISIBLE_DEVICES'] = cuda_mask
-
-    # initialize session
-    gpu_options = tf.GPUOptions(allow_growth=True)
     session = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 
     # initialize model
     x = tf.placeholder(tf.float32, [None, number_of_features])
     y = tf.placeholder(tf.float32, [None, 1])
-
-    mlp = tfm.MultilayerPerceptron.from_list(layers)
-    model = tfm.DefaultModel(mlp, lr_dec_rate=lr_dec_rate, lr_init=lr_init, mom_init=mom_init, wd_coeffs=wd_coeffs,
-                             min_epochs=min_epochs, max_epochs=max_epochs, stop_epochs=stop_epochs)
 
     # using a stub data set since there is no data available at this state
     stub_data_set = TfDataBasf2Stub(batch_size, number_of_features, number_of_events, training_fraction)
@@ -101,6 +123,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     save_dir = tempfile.TemporaryDirectory()
     save_name = os.path.join(save_dir.name, 'mymodel')
 
+    model = get_tensorflow_model(number_of_features, parameters)
     training = tfm.Trainer(model, stub_data_set, session, tensorboard_dir, save_name, input_placeholders=[x, y])
 
     state = State(x, y, session=session)
@@ -111,6 +134,12 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     state.save_dir = save_dir
 
     state.transform_to_probability = transform_to_probability
+
+    # save parameters
+    saved_parameters = parameters.copy()
+    saved_parameters['number_of_features'] = number_of_features
+    state.parameters = json.dumps(saved_parameters)
+    state.seed = seed
     return state
 
 
@@ -120,11 +149,16 @@ def apply(state, X):
     """
 
     binning.transform_ndarray(X, state.binning_parameters)
-    r = state.session.run(state.activation,
-                          feed_dict={state.x: X}).flatten()
-
+    chunk_size = 1000000
+    if len(X) > chunk_size:
+        results = list()
+        for i in range(0, len(X), chunk_size):
+            results.append(state.session.run(state.activation, feed_dict={state.x: X[i: i + chunk_size]}))
+        r = np.concatenate(results).flatten()
+    else:
+        r = state.session.run(state.activation, feed_dict={state.x: X}).flatten()
     if state.transform_to_probability:
-        binning.transform_array_to_sf(r, state.sig_back_tupe, signal_fraction=.5)
+        binning.transform_array_to_sf(r, state.sig_back_tuple, signal_fraction=.5)
 
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
@@ -138,9 +172,26 @@ def load(obj):
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
     session = tf.Session(config=config)
-    saver = tf.train.import_meta_graph(obj[0])
 
-    # load data from file
+    parameters = json.loads(obj[0])
+
+    number_of_features = parameters.pop('number_of_features')
+
+    x = tf.placeholder(tf.float32, [None, number_of_features])
+    y = tf.placeholder(tf.float32, [None, 1])
+
+    class DataStub:
+        """
+        simple stub obj
+        """
+        feature_number = number_of_features
+        batches = 1
+
+    model = get_tensorflow_model(number_of_features, parameters)
+    model.initialize(DataStub(), [x, y])
+    saver = tf.train.Saver()
+
+    # tensorflow is a moving target, file loading and saving of mid-level api changes rapidly. so we use the legacy here
     with tempfile.TemporaryDirectory() as path:
         with open(os.path.join(path, obj[1] + '.data-00000-of-00001'), 'w+b') as file1, open(
                 os.path.join(path, obj[1] + '.index'), 'w+b') as file2:
@@ -150,8 +201,8 @@ def load(obj):
         saver.restore(session, os.path.join(path, obj[1]))
 
     # load and initialize required objects
-    state = State(session=session)
-    state.get_from_collection()
+    state = State(x, y, session=session)
+    state.activation = model.mlp.output
 
     # preprocessing parameters
     state.binning_parameters = obj[4]
@@ -159,6 +210,9 @@ def load(obj):
     # postprocessing transform to probability, if pdf was sampled during training
     state.transform_to_probability = obj[5]
     state.sig_back_tuple = obj[6]
+
+    seed = obj[7]
+    print('Deep FlavorTagger loading... Training seed: ', seed)
 
     return state
 
@@ -200,7 +254,7 @@ def partial_fit(state, X, S, y, w, epoch):
         raise ValueError('NaN values in Dataset. Preprocessing transformations failed.')
 
     # replace stub dataset
-    data_set = TfDataBasf2(X, y, state.Xvalid, state.yvalid, state.batch_size)
+    data_set = TfDataBasf2(X, y, state.Xvalid, state.yvalid, state.batch_size, seed=state.seed)
 
     state.training.data_set = data_set
 
@@ -220,7 +274,6 @@ def end_fit(state):
     with open(filename + str('.data-00000-of-00001'), 'rb') as file1, open(filename + str('.index'), 'rb') as file2:
         data1 = file1.read()
         data2 = file2.read()
-    meta_graph = state.training.saver.export_meta_graph()
     binning_parameters = state.binning_parameters
 
     # transform to probability has to be saved since state object has to return untransformed network output
@@ -232,7 +285,8 @@ def end_fit(state):
     y_hat = apply(state, state.Xtest)
     test_df = pandas.DataFrame.from_dict({'y': state.ytest.reshape(-1), 'y_hat': y_hat.reshape(-1)})
     (sig_pdf, back_pdf) = binning.get_signal_background_pdf(test_df)
-
+    seed = state.seed
+    parameters = state.parameters
     del state
-    return [meta_graph, os.path.basename(filename), data1, data2, binning_parameters, transform_to_probability,
-            (sig_pdf, back_pdf)]
+    return [parameters, os.path.basename(filename), data1, data2, binning_parameters, transform_to_probability,
+            (sig_pdf, back_pdf), seed]

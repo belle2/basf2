@@ -1,0 +1,23 @@
+# EventType: 1210012000
+# Descriptor: [B+ -> K+ pi0]cc
+# NickName: Bu_K+pi0
+# Documentation: Study of Acp in B+ -> K+ pi0
+# Tested: Yes
+# PhysicsWG: BTOCHARMLESS
+# Responsible: Benedikt Wach
+# Email: wach@mpp.mpg.de
+# Cuts: None
+# Date: 25/01/2019
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0 K+ pi0 PHSP;
+Enddecay
+CDecay B-sig
+
+End
+

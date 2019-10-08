@@ -14,7 +14,6 @@
 #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariable.h>
 #include <framework/geometry/B2Vector3.h>
 #include <framework/core/FrameworkExceptions.h>
-#include <math.h>
 
 #define CIRCLECENTERXY_NAME CircleCenterXY
 
@@ -33,7 +32,7 @@ namespace Belle2 {
     PUT_NAME_FUNCTION(CIRCLECENTERXY_NAME);
 
     /** calculates an estimation of circleCenter position, result is returned as the x and y value of the B2Vector3. */
-    static B2Vector3<double> value(const PointType& a, const PointType& b, const PointType& c) throw(Straight_Line)
+    static B2Vector3<double> value(const PointType& a, const PointType& b, const PointType& c)
     {
       // calculates the intersection point using Cramer's rule.
       // x_1+s*n_1==x_2+t*n_2 --> n_1 *s - n_2 *t == x_2 - x_1 --> http://en.wikipedia.org/wiki/Cramer%27s_rule

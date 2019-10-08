@@ -54,7 +54,7 @@ namespace Belle2 {
     const std::vector<const TRGCDCWire*>& wires(void) const;
 
     /// returns name.
-    std::string name(void) const;
+    std::string name(void) const override;
 
     /// returns a wire.
     const TRGCDCWire* operator[](unsigned id) const;
@@ -66,7 +66,7 @@ namespace Belle2 {
     const TRGCDCWire& priority(void) const;
 
     /// returns trigger output. Null will returned if no signal.
-    const TRGSignal& signal(void) const;
+    const TRGSignal& signal(void) const override;
 
     /// returns a pointer to a TRGCDCSegmentHit.
     const TRGCDCSegmentHit* hit(void) const;
@@ -104,11 +104,12 @@ namespace Belle2 {
 
     /// dumps debug information.
     void dump(const std::string& message = std::string(""),
-              const std::string& prefix = std::string("")) const;
+              const std::string& prefix = std::string("")) const override;
 
 
     /// initilize variables.
     void initialize(void);
+    /// initilize variables.
     void initialize(bool fevtTime);
 
   public:// Utility functions
@@ -122,12 +123,12 @@ namespace Belle2 {
     nStereo(const std::vector<const TRGCDCSegment*>& list);
 
     /// returns true this has member named a.
-    virtual bool hasMember(const std::string& a) const;
+    virtual bool hasMember(const std::string& a) const override;
 
   public:// Modifiers
 
     /// clears information.
-    void clear(void);
+    void clear(void) override;
 
     /// simulates TF hit using wire information.
     void simulate(bool clockSimulation, bool logicLUTFlag,
@@ -152,7 +153,7 @@ namespace Belle2 {
   private:
 
     /// LookUp Table. 0: no hit, 1: right, 2: left, 3: not determined.
-    TRGCDCLUT* m_TSLUT;
+    TRGCDCLUT* m_TSLUT = nullptr;
 
     /// LookUp Table.
 //    const TRGCDCLUT * const _lut;  //Will be Removed.

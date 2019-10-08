@@ -42,9 +42,13 @@ namespace {
 RemoveMCParticlesModule::RemoveMCParticlesModule() : Module()
 {
   //Set module properties
-  setDescription("Remove particles from the MCParticle Collection.\n BEWARE: At "
-                 "the moment, Relations to that MCParticle collection will become "
-                 "invalid and are not fixed automatically");
+  setDescription(R"DOC(
+Remove particles from the MCParticle Collection.
+
+Warning:
+  At the moment, Relations to that MCParticle collection will become invalid
+  and are not fixed automatically
+)DOC");
 
   //Parameter definition
   addParam("collectionName", m_particleList, "Collection to perform the cuts on", std::string(""));

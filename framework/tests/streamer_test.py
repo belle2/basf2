@@ -2,25 +2,27 @@
 # -*- coding: utf-8 -*-
 
 import os
-from basf2 import *
+import basf2
 from ROOT import TFile, TTree
 
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
-main = create_path()
+main = basf2.Path()
 main.add_module('EventInfoSetter', evtNumList=[5])
 main.add_module('ParticleGun', pdgCodes=[211, -211, 321, -321], nTracks=2)
 
 # detector simulation
 components = ['MagneticField', 'BeamPipe', 'CDC']
-add_simulation(main, components)
-add_reconstruction(main, components)
+simulation_components = ['CDC']
+add_simulation(main, simulation_components)
+add_reconstruction(main, simulation_components)
+basf2.set_module_parameters(main, type="Geometry", useDB=False, components=components)
 
 # output path
 main.add_module('RootOutput', outputFileName='streamer_test.root')
 
-process(main)
+basf2.process(main)
 
 # load file and see if it can be read properly
 tfile = TFile('streamer_test.root')

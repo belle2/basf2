@@ -12,7 +12,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <analysis/utility/PCmsLabTransform.h>
@@ -27,47 +26,20 @@ namespace Belle2 {
 
     /// Helper function to extract a four vector out of an ECLCluster by combining the momentum information.
     template<>
-    inline TLorentzVector getFourVector(const ECLCluster& cluster)
+    inline TLorentzVector getFourVector(const std::reference_wrapper<const ECLCluster>& cluster)
     {
       ClusterUtils C;
-      const TLorentzVector& v = C.Get4MomentumFromCluster(&cluster);
+      const TLorentzVector& v = C.Get4MomentumFromCluster(&(cluster.get()), ECLCluster::EHypothesisBit::c_nPhotons);
       return TLorentzVector(v.Px(), v.Py(), v.Pz(), v.E());
     }
 
     /// Helper function to extract a four vector out of an ECLCluster by combining the momentum information and the pion mass.
     template<>
-    inline TLorentzVector getFourVector(const RecoTrack& cluster)
+    inline TLorentzVector getFourVector(const RecoTrack& track)
     {
-      const TVector3& positionSeed = cluster.getPositionSeed();
+      const TVector3& positionSeed = track.getPositionSeed();
       return TLorentzVector(positionSeed.X(), positionSeed.Y(), positionSeed.Z(),
                             sqrt(positionSeed.Mag2() + Const::pionMass * Const::pionMass));
-    }
-
-    /// Helper function to sort the entries in a store array by their energy.
-    template<class T>
-    static std::vector<double> getSortedEnergiesFrom(const StoreArray<T>& storeArray, const PCmsLabTransform& transformer)
-    {
-      std::vector<TLorentzVector> lorentzVectors;
-      lorentzVectors.reserve(storeArray.getEntries());
-
-      for (const T& item : storeArray) {
-        const TLorentzVector& fourVector = getFourVector(item);
-        lorentzVectors.push_back(transformer.rotateLabToCms() * fourVector);
-      }
-
-      std::sort(lorentzVectors.begin(), lorentzVectors.end(),
-      [](const TLorentzVector & lhs, const TLorentzVector & rhs) {
-        return lhs.Rho() > rhs.Rho();
-      });
-
-      std::vector<double> energies;
-      energies.reserve(lorentzVectors.size());
-
-      for (const TLorentzVector& lorentzVector : lorentzVectors) {
-        energies.push_back(lorentzVector.Energy());
-      }
-
-      return energies;
     }
 
     /// Helper function to get "something" from a particle, where "something" depends on the different implementations.
@@ -116,11 +88,8 @@ namespace Belle2 {
       }
 
       ClusterUtils C;
-      return PCmsLabTransform::labToCms(C.Get4MomentumFromCluster(entity)).Rho();
+      return PCmsLabTransform::labToCms(C.Get4MomentumFromCluster(entity, ECLCluster::EHypothesisBit::c_nPhotons)).Rho();
     }
-
-    /// Helper function to extract the ECL cluster from a particle - either directly or via the attached track.
-    extern const ECLCluster* getECLCluster(const Particle& particle, const bool fromTrack);
 
     /**
      * Helper function to get the element with the maximal rho in the CMS frame in the particle list, which has a rho

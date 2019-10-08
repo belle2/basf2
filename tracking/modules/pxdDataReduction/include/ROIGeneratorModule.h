@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROI_GENERATOR_H_
-#define ROI_GENERATOR_H_
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -18,7 +17,7 @@ namespace Belle2 {
   /** The ROI generator Module
    *
    * This module is used to generate a certain number of ROIs
-   *
+   * mainly for debugging purpose
    */
 
   class ROIGeneratorModule : public Module {
@@ -30,14 +29,12 @@ namespace Belle2 {
      */
     ROIGeneratorModule();
 
-    /**
-     *Initializes the Module.
-     */
-    void initialize() override;
+  private:
 
-    void event() override;
+    void initialize() override final;
 
-  protected:
+    void event() override final;
+
 
     std::string m_ROIListName; /**< ROi list name*/
     int m_divider; /**< generate one ROI every m_divider event*/
@@ -56,4 +53,4 @@ namespace Belle2 {
 
   };
 }
-#endif
+

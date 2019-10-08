@@ -13,21 +13,12 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCRawHit.h>
-#include <cdc/dataobjects/CDCRawHitWaveForm.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
-#include <rawdata/dataobjects/RawDataBlock.h>
-
-#include <rawdata/dataobjects/RawFTSW.h>
-#include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawCDC.h>
-
 
 namespace Belle2 {
 
@@ -53,30 +44,30 @@ namespace Belle2 {
       /**
        * Initializes the Module.
        */
-      virtual void initialize();
+      void initialize() override;
 
       /**
        * Begin run action.
        */
 
-      virtual void beginRun();
+      void beginRun() override;
 
       /**
        * Event action (main routine).
        *
        */
 
-      virtual void event();
+      void event() override;
 
       /**
        * End run action.
        */
-      virtual void endRun();
+      void endRun() override;
 
       /**
        * Termination action.
        */
-      virtual void terminate();
+      void terminate() override;
 
       /**
        * Set CDC Packet header
@@ -317,7 +308,8 @@ namespace Belle2 {
       /**
        * Channel map retrieved from DB.
        */
-      DBArray<CDCChannelMap> m_channelMapFromDB;
+      DBArray<CDCChannelMap>* m_channelMapFromDB;
+      // DBArray<CDCChannelMap> m_channelMapFromDB;
 
       /**
        * ADC delta pedestal.
@@ -327,7 +319,7 @@ namespace Belle2 {
       /**
        * Whether pedestal is subtracted (true) or not (false).
        */
-      bool m_pedestalSubtraction = false;
+      bool m_pedestalSubtraction = true;
       /**
        * Input array for CDC Raw.
        */

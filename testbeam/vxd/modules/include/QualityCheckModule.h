@@ -28,7 +28,6 @@
 #include <limits>
 
 #include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDFrame.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
 #include <pxd/online/PXDIgnoredPixelsMap.h>
@@ -48,12 +47,7 @@
 #include <eutel/eudaq/Exception.h>
 
 #include <testbeam/vxd/dataobjects/TelEventInfo.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawFTSW.h>
-
-
-
-#include <framework/core/HistoModule.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -232,7 +226,6 @@ namespace Belle2 {
     std::string m_storeTelDigitsName;        /**< TelDigits StoreArray name */
     std::string m_storeTelClustersName;      /**< TelClusters StoreArray name */
     std::string m_relTelClusterDigitName;    /**< TelClustersToPXDDigits RelationArray name */
-    std::string m_storeFramesName;           /**< PXDFrames StoreArray name */
     std::string m_histogramDirectoryName;    /**< Name of the histogram directory in ROOT file */
 
     std::string m_storeFileMetaDataName;     /**< Name of the persistent FileMetaData object */

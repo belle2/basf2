@@ -8,7 +8,7 @@
 #pragma link C++ class Belle2::SVDCluster+;
 #pragma link C++ class Belle2::SVDDigit+;
 #pragma link C++ class Belle2::SVDModeByte;
-#pragma link C++ class Belle2::SVDDAQDiagnostic;
+#pragma link C++ class Belle2::SVDDAQDiagnostic+;
 #pragma link C++ class Belle2::SVDRecoDigit+;
 #pragma link C++ class Belle2::SVDRecoTimeBase+;
 #pragma link C++ class Belle2::SVDShaperDigit+;
@@ -18,5 +18,20 @@
 #pragma link C++ class Belle2::SVDEnergyDepositionEvent+;
 #pragma link C++ class Belle2::SVDNeutronFluxEvent+;
 #pragma link C++ class Belle2::SVDOccupancyEvent+;
+#pragma link C++ class Belle2::SVDEventInfo+;
+
+#pragma link C++ class Belle2::SVDHistograms< TH1F > +;
+#pragma link C++ class Belle2::SVDHistograms< TH1D > +;
+#pragma link C++ class Belle2::SVDHistograms< TH2F > +;
+#pragma link C++ class Belle2::SVDHistograms< TH2D > +;
+#pragma link C++ class Belle2::SVDHistograms< TProfile > +;
+
+#pragma link C++ class Belle2::SVDAPVHistograms< TH1F > +;
+#pragma link C++ class Belle2::SVDAPVHistograms< TH1D > +;
+#pragma link C++ class Belle2::SVDAPVHistograms< TH2F > +;
+#pragma link C++ class Belle2::SVDAPVHistograms< TH2D > +;
+#pragma link C++ class Belle2::SVDAPVHistograms< TProfile > +;
+
+#pragma link C++ class Belle2::SVDSummaryPlots +;
 
 #endif

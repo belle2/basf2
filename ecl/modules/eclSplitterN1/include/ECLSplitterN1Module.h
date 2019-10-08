@@ -19,12 +19,8 @@
 
 #pragma once
 
-// ECL
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/dataobjects/ECLLocalMaximum.h>
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
+//STL
+#include <vector>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
@@ -32,20 +28,21 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-// GEOMETRY
-#include <ecl/geometry/ECLNeighbours.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-
-// ROOT
-#include "TH1F.h"
-#include "TH1D.h"
-#include "TFile.h"
-#include "TTree.h"
-#include "TGraph2D.h"
-
-#include <vector>    // std::vector
+class TGraph2D;
+class TFile;
+class TH1F;
 
 namespace Belle2 {
+  class ECLCalDigit;
+  class ECLConnectedRegion;
+  class ECLShower;
+  class ECLLocalMaximum;
+  class EventLevelClusteringInfo;
+
+  namespace ECL {
+    class ECLNeighbours;
+    class ECLGeometryPar;
+  }
 
   /** Class to perform the shower correction */
   class ECLSplitterN1Module : public Module {
@@ -58,19 +55,19 @@ namespace Belle2 {
     ~ECLSplitterN1Module();
 
     /** Initialize. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Begin run. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Event. */
-    virtual void event();
+    virtual void event() override;
 
     /** End run. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Terminate. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
     // Module parameters:
@@ -93,14 +90,14 @@ namespace Belle2 {
     std::string m_fileNOptimalFWDName; /**< FWD number of optimal neighbours filename. */
     std::string m_fileNOptimalBarrelName; /**< Barrel number of optimal neighbours filename. */
     std::string m_fileNOptimalBWDName; /**< BWD number of optimal neighbours filename. */
-    TFile* m_fileBackgroundNorm; /**< Background normalization file. */
-    TFile* m_fileNOptimalFWD; /**< FWD number of optimal neighbours. */
-    TFile* m_fileNOptimalBarrel; /**< Barrel number of optimal neighbours. */
-    TFile* m_fileNOptimalBWD; /**< BWD number of optimal neighbours. */
-    TH1D* m_th1dBackgroundNorm; /**< Background normalization histogram. */
-    TGraph2D* m_tg2dNOptimalFWD[13][9]; /**< Array of 2D graphs used for interpolation between background and energy. */
-    TGraph2D* m_tg2dNOptimalBWD[10][9]; /**< Array of 2D graphs used for interpolation between background and energy. */
-    TGraph2D* m_tg2dNOptimalBarrel; /**< Array of 2D graphs used for interpolation between background and energy. */
+    TFile* m_fileBackgroundNorm{nullptr}; /**< Background normalization file. */
+    TFile* m_fileNOptimalFWD{nullptr}; /**< FWD number of optimal neighbours. */
+    TFile* m_fileNOptimalBarrel{nullptr}; /**< Barrel number of optimal neighbours. */
+    TFile* m_fileNOptimalBWD{nullptr}; /**< BWD number of optimal neighbours. */
+    TH1F* m_th1fBackgroundNorm{nullptr}; /**< Background normalization histogram. */
+    TGraph2D* m_tg2dNOptimalFWD[13][9] {}; /**< Array of 2D graphs used for interpolation between background and energy. */
+    TGraph2D* m_tg2dNOptimalBWD[10][9] {}; /**< Array of 2D graphs used for interpolation between background and energy. */
+    TGraph2D* m_tg2dNOptimalBarrel{nullptr}; /**< Array of 2D graphs used for interpolation between background and energy. */
 
     // Position
     std::string m_positionMethod;  /**< Position calculation: lilo or linear */
@@ -111,6 +108,9 @@ namespace Belle2 {
 
     // Background
     int m_fullBkgdCount; /**< Number of expected background digits at full background, FIXME: move to database. */
+
+    const unsigned short c_nSectorCellIdBWD[10] = {9, 9, 6, 6, 6, 6, 6, 4, 4, 4}; /**< crystals per sector for theta rings */
+    const unsigned short c_nSectorCellIdFWD[13] = {3, 3, 4, 4, 4, 6, 6, 6, 6, 6, 6, 9, 9}; /**< crystals per sector for theta rings */
 
     // Crystals per Ring
     const unsigned short c_crystalsPerRing[69] = {48, 48, 64, 64, 64, 96, 96, 96, 96, 96, 96, 144, 144, //FWD (13)
@@ -132,8 +132,8 @@ namespace Belle2 {
     std::vector< int > m_cellIdInCR;
 
     /** Neighbour maps */
-    ECL::ECLNeighbours* m_NeighbourMap9; /**< 3x3 = 9 neighbours */
-    ECL::ECLNeighbours* m_NeighbourMap21; /**< 5x5 neighbours excluding corners = 21 */
+    ECL::ECLNeighbours* m_NeighbourMap9{nullptr}; /**< 3x3 = 9 neighbours */
+    ECL::ECLNeighbours* m_NeighbourMap21{nullptr}; /**< 5x5 neighbours excluding corners = 21 */
 
     /** Store array: ECLCalDigit. */
     StoreArray<ECLCalDigit> m_eclCalDigits;
@@ -147,8 +147,8 @@ namespace Belle2 {
     /** Store array: ECLLocalMaximum. */
     StoreArray<ECLLocalMaximum> m_eclLocalMaximums;
 
-    /** Store object pointer: ECLEventInformation. */
-    StoreObjPtr<ECLEventInformation> m_eclEventInformation;
+    /** Store object pointer: EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
     /** Default name ECLCalDigits */
     virtual const char* eclCalDigitArrayName() const
@@ -166,12 +166,12 @@ namespace Belle2 {
     virtual const char* eclShowerArrayName() const
     { return "ECLShowers" ; }
 
-    /** Name to be used for default option: ECLEventInformation.*/
-    virtual const char* eclEventInformationName() const
-    { return "ECLEventInformation" ; }
+    /** Name to be used for default option: EventLevelClusteringInfo.*/
+    virtual const char* eventLevelClusteringInfoName() const
+    { return "EventLevelClusteringInfo" ; }
 
     /** Geometry */
-    ECL::ECLGeometryPar* m_geom;
+    ECL::ECLGeometryPar* m_geom{nullptr};
 
     /** Split connected region into showers. */
     void splitConnectedRegion(ECLConnectedRegion& aCR);
@@ -210,11 +210,10 @@ namespace Belle2 {
     virtual const char* eclShowerArrayName() const override
     { return "ECLShowersPureCsI" ; }
 
-    /** Name to be used for PureCsI option: ECLEventInformationPureCsI.*/
-    virtual const char* eclEventInformationName() const override
-    { return "ECLEventInformationPureCsI" ; }
+    /** Name to be used for PureCsI option: EventLevelClusteringInfoPureCsI.*/
+    virtual const char* eventLevelClusteringInfoName() const override
+    { return "EventLevelClusteringInfoPureCsI" ; }
 
   }; // end of ECLSplitterN1PureCsIModule
 
 } // end of Belle2 namespace
-

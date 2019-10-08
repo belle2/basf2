@@ -46,16 +46,16 @@ namespace Belle2 {
      *  @param pxdCluster   Pointer to PXDCluster (typically owned by the DataStore).
      *  @param aSensorInfo  Only for testing purposes.
      */
-    SpacePoint(const PXDCluster* pxdCluster,
-               const VXD::SensorInfoBase* aSensorInfo = nullptr);
+    explicit SpacePoint(const PXDCluster* pxdCluster,
+                        const VXD::SensorInfoBase* aSensorInfo = nullptr);
 
     /** Constructor SpacePoint from ONE or TWO SVDClusters.
      *
      *  @param clusters            container carrying pointers to SVDCluster (1 or 2 (u+v), must not be nullptr).
      *  @param aSensorInfo         SensorInfoBase for testing purposes, usually derived from first cluster.
      */
-    SpacePoint(std::vector<SVDCluster const*>& clusters,
-               VXD::SensorInfoBase const* aSensorInfo = nullptr);
+    explicit SpacePoint(std::vector<SVDCluster const*>& clusters,
+                        VXD::SensorInfoBase const* aSensorInfo = nullptr);
 
     /** Default constructor for the ROOT IO. */
     SpacePoint() :
@@ -75,7 +75,7 @@ namespace Belle2 {
      *  @param UClusterTime       Time in ns of the cluster on the U side
      *  @param VClusterTime       Time in ns of the cluster on the V side
      */
-    SpacePoint(B2Vector3<double> pos, B2Vector3<double> posError, std::pair<double, double> normalizedLocal,
+    SpacePoint(const B2Vector3<double>& pos, const B2Vector3<double>& posError, std::pair<double, double> normalizedLocal,
                std::pair<bool, bool> clustersAssigned, VxdID sensorID, Belle2::VXD::SensorInfoBase::SensorType detID,
                double UClusterTime = 0. , double VClusterTime = 0.) :
       m_position(pos), m_positionError(posError),
@@ -187,6 +187,13 @@ namespace Belle2 {
 
     /** Getter for the quality of this SpacePoint.*/
     float getQualityEstimation() const { return m_qualityIndicator; }
+
+    /** Setter for the spacePoint quality index error */
+    void setQualityEstimationError(double qualityIndicatorError) {m_qualityIndicatorError = qualityIndicatorError;}
+
+    /** Getter for the spacePoint quality index error*/
+    float getQualityEstimationError() const {return m_qualityIndicatorError;}
+
 
 //---------------------------------------------------------------------------------------------------------------------
 //TODO: Some clarification, if the following conversions and especially the staticness of the functions below is needed
@@ -318,7 +325,8 @@ namespace Belle2 {
                             uSigma * uSigma,
                             vSigma * vSigma,
                             0
-                          )
+                          ),
+                          true // use alignment in transformation
                         );
       m_positionError.Sqrt();
     }
@@ -375,6 +383,13 @@ namespace Belle2 {
      */
     float m_qualityIndicator {0.5};
 
+
+    /** Stores the error on the quality indicator.
+     *
+     * The value comes from the binning error on the pdfs from which the QI is derived.
+     */
+    float m_qualityIndicatorError {0.5};
+
     /** Stores whether this SpacePoint is connected to a track.
      *
      *  We assume, that const for SpacePoint means, things like position et cetera remain constant.
@@ -383,6 +398,6 @@ namespace Belle2 {
      */
     mutable bool m_isAssigned {false};
 
-    ClassDefOverride(SpacePoint, 12)
+    ClassDefOverride(SpacePoint, 13)
   };
 }

@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <vector>
 #include <TObject.h>
 #include <map>
 #include <vector>
@@ -60,7 +59,7 @@ namespace Belle2 {
     * @param finesse finesse number
     * @return merger board ID
     */
-    unsigned getMergerID(unsigned copperID, unsigned finesse) ;
+    unsigned getMergerID(unsigned copperID, unsigned finesse) const;
 
     /**
      * Get vector of IDs of copper boards
@@ -71,7 +70,7 @@ namespace Belle2 {
     /**
     * Print mapping parameters
     */
-    void print();
+    void print() const;
 
   private:
 

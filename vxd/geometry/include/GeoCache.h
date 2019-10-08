@@ -13,10 +13,14 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/geometry/GeoTools.h>
 #include <vector>
 #include <set>
 #include <map>
 #include <unordered_map>
+#include <memory>
+#include <framework/database/DBObjPtr.h>
+#include <alignment/dbobjects/VXDAlignment.h>
 
 #include <TMath.h>
 
@@ -94,8 +98,8 @@ namespace Belle2 {
       // ------------------ Alignment constants in reconstruction + hierarchy ------------------------------
 
       /// Retrieve stored half-shell placements into world volume
-      /// @return vector of pairs, each pair contains a VxdID for half-shell (0.0.0#1-4) and its placement
-      const std::vector<std::pair<VxdID, TGeoHMatrix>>& getHalfShellPlacements() const;
+      /// @return map of VxdID for half-shell and its placement
+      const std::map<VxdID, TGeoHMatrix>& getHalfShellPlacements() const;
 
       /// Retrieve stored ladder placements into half-shell
       /// @return vector of pairs, each pair contains a VxdID for ladder (layer.ladder.0) and its placement
@@ -137,6 +141,16 @@ namespace Belle2 {
       /** Return a reference to the singleton instance */
       static GeoCache& getInstance();
 
+      /** Return a raw pointer to a GeoTools object.
+       * @return const GeoTools* : raw pointer, no onwership transfer
+       */
+      const GeoTools* getGeoTools()
+      {
+        if (!m_geoToolsPtr)
+          m_geoToolsPtr = std::unique_ptr<GeoTools>(new GeoTools());
+        return m_geoToolsPtr.get();
+      }
+
     private:
       /** Hash map to store pointers to all existing SensorInfos with constant lookup complexity */
       typedef std::unordered_map<VxdID::baseType, SensorInfoBase*> SensorInfoMap;
@@ -144,7 +158,7 @@ namespace Belle2 {
       typedef std::map<Belle2::VxdID, std::set<Belle2::VxdID> > SensorHierachy;
 
       /** Singleton class, hidden constructor */
-      GeoCache() {};
+      GeoCache();
       /** Singleton class, hidden copy constructor */
       GeoCache(const GeoCache&) = delete;
       /** Singleton class, hidden assignment operator */
@@ -161,14 +175,20 @@ namespace Belle2 {
       /** Map of all Sensor IDs belonging to a given Ladder ID */
       SensorHierachy m_sensors;
 
-      /// vector of shell ids and their placements in top volume
-      std::vector<std::pair<VxdID, TGeoHMatrix>> m_halfShellPlacements {};
+      /// Map of shell ids and their placements in top volume
+      std::map<VxdID, TGeoHMatrix> m_halfShellPlacements {};
       /// Map of shell ids and their associated ladder ids and their placements
       std::map<VxdID, std::vector<std::pair<VxdID, TGeoHMatrix>>> m_ladderPlacements {};
       /// Map of ladder ids and their associated sensor ids and their placements
       std::map<VxdID, std::vector<std::pair<VxdID, TGeoHMatrix>>> m_sensorPlacements {};
       /** Map to find the SensorInfo for a given Sensor ID */
       SensorInfoMap m_sensorInfo;
+
+      /** Pointer to a GeoTools object */
+      std::unique_ptr<GeoTools> m_geoToolsPtr;
+
+      /** DBObjPtr for the alignment */
+      DBObjPtr<VXDAlignment> m_vxdAlignments;
     };
   }
 } //Belle2 namespace

@@ -10,9 +10,7 @@
 
 #pragma once
 
-#include <tracking/trackFindingVXD/filterMap/filterFramework/TBranchLeafType.h>
 #include <TTree.h>
-#include <TBranch.h>
 #include <array>
 
 namespace Belle2 {
@@ -27,10 +25,16 @@ namespace Belle2 {
    */
   template<typename ClassifierType, size_t Ndims = 9, typename CutType = double>
   class MLRange {
+    /// Pointer to classifier to be used
     ClassifierType* m_classifier;
+    /// Cut value
     CutType m_cut;
 
   public:
+    /** Constructor
+     * @param classifier : classifier to be used
+     * @param cut : cut value
+     */
     MLRange(ClassifierType* classifier, CutType cut) : m_classifier(classifier), m_cut(cut) { ; }
 
     /**

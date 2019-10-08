@@ -3,7 +3,7 @@
   <numWindows descr="number of ASIC windows per waveform"> 4 </numWindows>
   <subBits descr="number of bits per sample"> 4 </subBits>
   <syncTimeBase descr="width of the two ASIC windows" unit="ns"> 47.163878 </syncTimeBase>
-  <numofBunches descr="number of bunches per two ASIC windows"> 24 </numofBunches>
+  <numofBunches descr="number of bunches per two ASIC windows"> 12 </numofBunches>
   <offset desc="offset" unit="ns">20</offset>
   <pileupTime desc="pile-up time" unit="ns">0.5</pileupTime>
   <doubleHitResolution unit="ns">5.0</doubleHitResolution>

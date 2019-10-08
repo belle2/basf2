@@ -5,31 +5,25 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Peter Kodys                                              *
  *                                                                        *
- * Prepared for Belle II geometry                                         *
+ * Prepared for Phase 2 and Belle II geometry                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SVDDQMExpressRecoMODULE_H_
-#define SVDDQMExpressRecoMODULE_H_
+#pragma once
 
-#undef DQM
-#ifndef DQM
 #include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vector>
-#include "TH1I.h"
+#include "TList.h"
 #include "TH1F.h"
 #include "TH2F.h"
 
 namespace Belle2 {
 
-  /** SVD DQM Module */
+  /** SVD DQM Module for Express Reco */
   class SVDDQMExpressRecoModule : public HistoModule {  // <- derived from HistoModule class
 
   public:
@@ -40,260 +34,172 @@ namespace Belle2 {
     virtual ~SVDDQMExpressRecoModule();
 
     /** Module function initialize */
-    virtual void initialize();
+    void initialize() override final;
     /** Module function beginRun */
-    virtual void beginRun();
+    void beginRun() override final;
     /** Module function event */
-    virtual void event();
-    /** Module function endRun */
-    virtual void endRun();
-    /** Module function terminate */
-    virtual void terminate();
+    void event() override final;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
      * to be placed in this function.
     */
-    virtual void defineHisto();
+    void defineHisto() override final;
 
   private:
 
-    /** cut for accepting to hitmap histogram, using strips only, default = 22 */
-    float m_CutSVDCharge = 22.0;
+    /** list of cumulative histograms */
+    TList* m_cumHistos = nullptr;
 
+    /** experiment number*/
+    int m_expNumber = 0;
+    /** run number*/
+    int m_runNumber = 0;
+
+    /** Flag to show all histos in DQM, default = 0 */
+    int m_ShowAllHistos = 0;
+
+    /** cut for accepting to hitmap histogram, using strips only, default = 0 ADU (was 22 ADU) */
+    float m_CutSVDCharge = 0.0;
+    /** cut for accepting clusters to hitmap histogram, default = 5 ke- */
+    float m_CutSVDClusterCharge = 0.0;
+
+    /** No of FADCs, for Phase2: 5,
+     *  TODO add to VXD::GeoCache& geo = VXD::Ge... geo.getFADCs() for
+     *  keep universal code for Phase 2 and 3
+    */
+    // int c_nFADC = 5;
+
+    /** Name of the histogram directory in ROOT file */
+    std::string m_histogramDirectoryName;
+
+    /** not zero-suppressed SVDShaperDigits StoreArray name */
+    std::string m_storeNoZSSVDShaperDigitsName;
     /** SVDShaperDigits StoreArray name */
     std::string m_storeSVDShaperDigitsName;
     /** SVDClusters StoreArray name */
     std::string m_storeSVDClustersName;
 
-    /** Basic Directory in output file */
-    TDirectory* m_oldDir;
-
-    /** Name of file contain reference histograms, default=VXD-ReferenceHistos */
-    std::string m_RefHistFileName = "vxd/data/VXD-DQMReferenceHistos.root";
-    /** Number of events */
-    int m_NoOfEvents;
-    /** Number of events in reference histogram */
-    int m_NoOfEventsRef;
-
-    /** Using local files instead of DataBase for reference histogram, default=0 */
-    int m_NotUseDB = 0;
-    /** Create and fill reference histograms in DataBase, default=0 */
-    int m_CreateDB = 0;
-
-    /** Flags of u Hitmaps of Digits */
-    TH1I* m_fHitMapCountsUFlag;
-    /** Flags of v Hitmaps of Digits */
-    TH1I* m_fHitMapCountsVFlag;
-    /** Flags of u Hitmaps of Clusters*/
-    TH1I* m_fHitMapClCountsUFlag;
-    /** Flags of v Hitmaps of Clusters*/
-    TH1I* m_fHitMapClCountsVFlag;
-    /** Flags of Hitmaps in U of Digits */
-    TH1I* m_fFiredUFlag;
-    /** Flags of Hitmaps in V of Digits */
-    TH1I* m_fFiredVFlag;
-    /** Flags of u Clusters per event */
-    TH1I* m_fClustersUFlag;
-    /** Flags of v Clusters per event */
-    TH1I* m_fClustersVFlag;
-    /** Flags of u Charge of clusters */
-    TH1I* m_fClusterChargeUFlag;
-    /** Flags of v Charge of clusters */
-    TH1I* m_fClusterChargeVFlag;
-    /** Flags of u Charge of strips */
-    TH1I* m_fStripSignalUFlag;
-    /** Flags of v Charge of strips */
-    TH1I* m_fStripSignalVFlag;
-    /** Flags of u cluster size */
-    TH1I* m_fClusterSizeUFlag;
-    /** Flags of v cluster size */
-    TH1I* m_fClusterSizeVFlag;
-    /** Flags of u time */
-    TH1I* m_fClusterTimeUFlag;
-    /** Flags of v time */
-    TH1I* m_fClusterTimeVFlag;
-
-    /** u charge of clusters for all sensors */
-    TH1F* m_clusterChargeUAll;
-    /** v charge of clusters for all sensors */
-    TH1F* m_clusterChargeVAll;
-    /** u charge of clusters for layer 3 sensors */
-    TH1F* m_clusterChargeU3;
-    /** v charge of clusters for layer 3  sensors */
-    TH1F* m_clusterChargeV3;
-    /** u charge of clusters for layer 4,5,6 sensors */
-    TH1F* m_clusterChargeU456;
-    /** v charge of clusters for layer 4,5,6 sensors */
-    TH1F* m_clusterChargeV456;
+    /** number of events */
+    TH1F* m_nEvents = nullptr;
 
     /** Hitmaps u of Digits */
-    TH1I* m_hitMapCountsU;
+    TH1F* m_hitMapCountsU = nullptr;
     /** Hitmaps v of Digits */
-    TH1I* m_hitMapCountsV;
+    TH1F* m_hitMapCountsV = nullptr;
     /** Hitmaps u of Clusters*/
-    TH1I* m_hitMapClCountsU;
+    TH1F* m_hitMapClCountsU = nullptr;
     /** Hitmaps v of Clusters*/
-    TH1I* m_hitMapClCountsV;
+    TH1F* m_hitMapClCountsV = nullptr;
+    /** Hitmaps of digits on chips */
+    TH1F* m_hitMapCountsChip = nullptr;
+    /** Hitmaps of clusters on chips */
+    TH1F* m_hitMapClCountsChip = nullptr;
     /** Fired u strips per event */
-    TH1F** m_firedU;
+    TH1F** m_firedU = nullptr;
     /** Fired v strips per event */
-    TH1F** m_firedV;
-    /** u clusters per event */
-    TH1F** m_clustersU;
-    /** v clusters per event */
-    TH1F** m_clustersV;
+    TH1F** m_firedV = nullptr;
+    /** number of u clusters per event */
+    TH1F** m_clustersU = nullptr;
+    /** number of v clusters per event */
+    TH1F** m_clustersV = nullptr;
+
     /** u charge of clusters */
-    TH1F** m_clusterChargeU;
+    TH1F** m_clusterChargeU = nullptr;
     /** v charge of clusters */
-    TH1F** m_clusterChargeV;
+    TH1F** m_clusterChargeV = nullptr;
+    /** u charge of clusters for all sensors */
+    TH1F* m_clusterChargeUAll = nullptr;
+    /** v charge of clusters for all sensors */
+    TH1F* m_clusterChargeVAll = nullptr;
+    /** u charge of clusters for layer 3 sensors */
+    TH1F* m_clusterChargeU3 = nullptr;
+    /** v charge of clusters for layer 3  sensors */
+    TH1F* m_clusterChargeV3 = nullptr;
+    /** u charge of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeU456 = nullptr;
+    /** v charge of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeV456 = nullptr;
+
+    /** u SNR of clusters per sensor */
+    TH1F** m_clusterSNRU = nullptr;
+    /** v SNR of clusters per sensor */
+    TH1F** m_clusterSNRV = nullptr;
+    /** u SNR of clusters for all sensors */
+    TH1F* m_clusterSNRUAll = nullptr;
+    /** v SNR of clusters for all sensors */
+    TH1F* m_clusterSNRVAll = nullptr;
+    /** u SNR of clusters for layer 3 sensors */
+    TH1F* m_clusterSNRU3 = nullptr;
+    /** v SNR of clusters for layer 3  sensors */
+    TH1F* m_clusterSNRV3 = nullptr;
+    /** u SNR of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterSNRU456 = nullptr;
+    /** v SNR of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterSNRV456 = nullptr;
+
+    /** u MaxBin of strips for all sensors (offline Zero Suppression)*/
+    TH1F* m_stripMaxBinUAll = nullptr;
+    /** v MaxBin of strips for all sensors (offline Zero Suppression)*/
+    TH1F* m_stripMaxBinVAll = nullptr;
+    /** u MaxBin of strips for layer 3 sensors (offline Zero Suppression)*/
+    TH1F* m_stripMaxBinU3 = nullptr;
+    /** v MaxBin of strips for layer 3  sensors (offline Zero Suppression)*/
+    TH1F* m_stripMaxBinV3 = nullptr;
+    /** u MaxBin of strips for layer 6 sensors (offline Zero Suppression)*/
+    TH1F* m_stripMaxBinU6 = nullptr;
+    /** v MaxBin of strips for layer 6 sensors (offline Zero Suppression)*/
+    TH1F* m_stripMaxBinV6 = nullptr;
+
     /** u charge of strips */
-    TH1F** m_stripSignalU;
+    TH1F** m_stripSignalU = nullptr;
     /** v charge of strips */
-    TH1F** m_stripSignalV;
+    TH1F** m_stripSignalV = nullptr;
+    /** u strip count */
+    TH1F** m_stripCountU = nullptr;
+    /** v strip count */
+    TH1F** m_stripCountV = nullptr;
+    /** u strip count (online Zero Suppression) */
+    TH1F** m_onlineZSstripCountU = nullptr;
+    /** v strip count (online Zero Suppression */
+    TH1F** m_onlineZSstripCountV = nullptr;
     /** u size */
-    TH1F** m_clusterSizeU;
+    TH1F** m_clusterSizeU = nullptr;
     /** v size */
-    TH1F** m_clusterSizeV;
+    TH1F** m_clusterSizeV = nullptr;
+
     /** u time */
-    TH1F** m_clusterTimeU;
+    TH1F** m_clusterTimeU = nullptr;
     /** v time */
-    TH1F** m_clusterTimeV;
+    TH1F** m_clusterTimeV = nullptr;
+    /** u time of clusters for all sensors */
+    TH1F* m_clusterTimeUAll = nullptr;
+    /** v time of clusters for all sensors */
+    TH1F* m_clusterTimeVAll = nullptr;
+    /** u Time of clusters for layer 3 sensors */
+    TH1F* m_clusterTimeU3 = nullptr;
+    /** v Time of clusters for layer 3  sensors */
+    TH1F* m_clusterTimeV3 = nullptr;
+    /** u Time of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterTimeU456 = nullptr;
+    /** v Time of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterTimeV456 = nullptr;
 
-    /** Number of VXD layers on Belle II */
-    int c_nVXDLayers;
-    /** Number of PXD layers on Belle II */
-    int c_nPXDLayers;
-    /** Number of SVD layers on Belle II */
-    int c_nSVDLayers;
-    /** First VXD layer on Belle II */
-    int c_firstVXDLayer;
-    /** Last VXD layer on Belle II */
-    int c_lastVXDLayer;
-    /** First PXD layer on Belle II */
-    int c_firstPXDLayer;
-    /** Last PXD layer on Belle II */
-    int c_lastPXDLayer;
-    /** First SVD layer on Belle II */
-    int c_firstSVDLayer;
-    /** Last SVD layer on Belle II */
-    int c_lastSVDLayer;
-    /** Number of SVD sensors on Belle II */
-    int c_nSVDSensors;
+    //----------------------------------------------------------------
+    // Additional histograms for out of ExpressReco
+    //----------------------------------------------------------------
 
-    /** Function return index of sensor in plots.
-       * @param Layer Layer position of sensor
-       * @param Ladder Ladder position of sensor
-       * @param Sensor Sensor position of sensor
-       * @return Index of sensor in plots.
-       */
-    int getSensorIndex(int Layer, int Ladder, int Sensor);
-    /** Function return index of sensor in plots.
-       * @param Index Index of sensor in plots.
-       * @param Layer return Layer position of sensor
-       * @param Ladder return Ladder position of sensor
-       * @param Sensor return Sensor position of sensor
-       */
-    void getIDsFromIndex(int Index, int* Layer, int* Ladder, int* Sensor);
-    /** Function return flag histogram filled based on condition from TH1F source.
-       * Flag values:
-       * -3: nonexisting Type
-       * -2: histogram is missing or masked
-       * -1: less than 100 samles, skip comparition
-       *  0: good much with reference
-       *  1: warning level = diff > 6 * sigma and < error level
-       *  2: error level = diff > 10 * sigma
-       * @param Type Set type of condition for flag calculation.
-       * 1: use counts, mean and RMS.
-       * 2: use counts only.
-       * 3: use mean only.
-       * 4: use RMS only.
-       * 5: use counts and mean.
-       * 9: use bin content only.
-       * 10: use Chi2 condition and pars[0] and pars[1].
-       * 100: nothing do just fill flags as OK.
-       * @param bin bin which is fill in flag histogram.
-       * @param pars array of parameters need for condition.
-       * @param ratio Ratio of acquired events to reference events.
-       * @param hist Histogram of sources.
-       * @param refhist Reference histogram.
-       * @param flag Histogram of flags.
-       * @return Indication of succes of realizing of condition, 1: OK.
-       */
-    int SetFlag(int Type, int bin, double* pars, double ratio, TH1F* hist, TH1F* refhist, TH1I* flaghist);
-    /** Function return flag histogram filled based on condition from TH1I source.
-       * Flag values:
-       * -3: nonexisting Type
-       * -2: histogram is missing or masked
-       * -1: less than 100 samles, skip comparition
-       *  0: good much with reference
-       *  1: warning level = diff > 6 * sigma and < error level
-       *  2: error level = diff > 10 * sigma
-       * @param Type Set type of condition for flag calculation.
-       * 1: use counts, mean and RMS.
-       * 2: use counts only.
-       * 3: use mean only.
-       * 4: use RMS only.
-       * 5: use counts and mean.
-       * 9: use bin content only.
-       * 10: use Chi2 condition and pars[0] and pars[1].
-       * 100: nothing do just fill flags as OK.
-       * @param bin bin which is fill in flag histogram.
-       * @param pars array of parameters need for condition.
-       * @param ratio Ratio of acquired events to reference events.
-       * @param hist Histogram of sources.
-       * @param refhist Reference histogram.
-       * @param flag Histogram of flags.
-       * @return Indication of succes of realizing of condition, 1: OK.
-       */
-    int SetFlag(int Type, int bin, double* pars, double ratio, TH1I* hist, TH1I* refhist, TH1I* flaghist);
+    /** Hitmaps pixels for u */
+    TH2F** m_hitMapU = nullptr;
+    /** Hitmaps pixels for v */
+    TH2F** m_hitMapV = nullptr;
+    /** Hitmaps clusters for u */
+    TH1F** m_hitMapUCl = nullptr;
+    /** Hitmaps clusters for v */
+    TH1F** m_hitMapVCl = nullptr;
 
-    /** Function for filling of TH1F histogram to database.
-       * @param HistoBD Histogram for DB.
-       */
-    void CreateDBHisto(TH1F* HistoBD);
-    /** Function for filling of TH1I histogram to database.
-       * @param HistoBD Histogram for DB.
-       */
-    void CreateDBHisto(TH1I* HistoBD);
 
-    /** Function for filling of group of TH1F histogram to database.
-       * @param HistoBD Histogram for DB.
-       * @param Number Number of histograms to glue to one.
-       */
-    void CreateDBHistoGroup(TH1F** HistoBD, int Number);
-    /** Function for filling of group of TH1I histogram to database.
-       * @param HistoBD Histogram for DB.
-       * @param Number Number of histograms to glue to one.
-       */
-    void CreateDBHistoGroup(TH1I** HistoBD, int Nomber);
-
-    /** Function for loading of TH1F histogram from database.
-       * @param HistoBD Histogram for DB.
-       * @return Indication of succes of realizing of condition, 1: OK.
-       */
-    int LoadDBHisto(TH1F* HistoBD);
-    /** Function for loading of TH1I histogram from database.
-       * @param HistoBD Histogram for DB.
-       * @return Indication of succes of realizing of condition, 1: OK.
-       */
-    int LoadDBHisto(TH1I* HistoBD);
-
-    /** Function for loading of group of TH1F histogram from database.
-       * @param HistoBD Histogram for DB.
-       * @param Number Number of histograms to extract from DB.
-       * @return Indication of succes of realizing of condition, 1: OK.
-       */
-    int LoadDBHistoGroup(TH1F** HistoBD, int Number);
-    /** Function for loading of group of TH1I histogram from database.
-       * @param HistoBD Histogram for DB.
-       * @param Number Number of histograms to extract from DB.
-       * @return Indication of succes of realizing of condition, 1: OK.
-       */
-    int LoadDBHistoGroup(TH1I** HistoBD, int Nomber);
 
   };
 
 }
-#endif
-

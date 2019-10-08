@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <string>
 
 namespace Belle2 {
@@ -38,24 +37,24 @@ namespace Belle2 {
       /**
        * Initializes the Module.
        */
-      virtual void initialize();
+      void initialize() override;
 
       /**
        * Begin run action.
        */
-      virtual void beginRun();
+      void beginRun() override;
       /**
        * Event action (main routine).
        */
-      virtual void event();
+      void event() override;
       /**
        * End run action.
        */
-      virtual void endRun();
+      void endRun() override;
       /**
        * Termination action.
        */
-      virtual void terminate();
+      void terminate() override;
 
 
     private:

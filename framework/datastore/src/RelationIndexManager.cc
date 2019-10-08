@@ -19,5 +19,7 @@ RelationIndexManager& RelationIndexManager::Instance()
 void RelationIndexManager::clear(DataStore::EDurability durability)
 {
   RelationMap& relations = m_cache[durability];
-  relations.clear();
+  for (auto& e : relations) {
+    if (e.second) e.second->clear();
+  }
 }

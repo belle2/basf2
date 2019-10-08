@@ -1,5 +1,0 @@
-Import('env')
-
-env['TOOLS_LIBS']['rc2eb1d'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', 'pthread']
-
-Return('env')

@@ -3,9 +3,9 @@
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/Logger.h>
 #include <framework/utilities/TestHelpers.h>
 
 #include <analysis/utility/ParticleCopy.h>
@@ -21,7 +21,7 @@ namespace {
   class ParticleTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap> particleExtraInfo;
@@ -29,18 +29,20 @@ namespace {
       StoreArray<MCParticle> mcparticles;
       StoreArray<RestOfEvent> roes;
       StoreArray<ECLCluster> eclClusters;
+      StoreArray<KLMCluster> klmClusters;
       particleExtraInfo.registerInDataStore();
       particles.registerInDataStore();
       mcparticles.registerInDataStore();
       eclClusters.registerInDataStore();
       roes.registerInDataStore();
+      klmClusters.registerInDataStore();
       particles.registerRelationTo(mcparticles);
       particles.registerRelationTo(roes);
       DataStore::Instance().setInitializeActive(false);
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -76,6 +78,23 @@ namespace {
       EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
       EXPECT_EQ(Particle::c_MCParticle, p.getParticleType());
       EXPECT_EQ(123u, p.getMdstArrayIndex());
+    }
+    {
+      // test constructor from ECLClusters
+      // (for now we can only create a photon this way)
+      StoreArray<ECLCluster> clusters;
+      ECLCluster* cluster = clusters.appendNew(ECLCluster());
+      cluster->setIsTrack(false);
+      cluster->addHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      cluster->setEnergy(1337);
+
+      Particle p(cluster);
+      EXPECT_EQ(22, p.getPDGCode());
+      EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
+      EXPECT_EQ(Particle::c_ECLCluster, p.getParticleType());
+      EXPECT_FLOAT_EQ(1337, p.getEnergy());
+      EXPECT_EQ(cluster, p.getECLCluster());
+      EXPECT_EQ(nullptr, p.getTrack());
     }
   }
 
@@ -115,6 +134,68 @@ namespace {
     EXPECT_B2FATAL(Particle p2 = Particle(momentum, 411, Particle::c_Unflavored, daughterIndices));
   }
 
+  /** Functor to count children of a particle */
+  struct ParticleChildrenCounter {
+    int count{0}; /**< number of calls to this object */
+    /** increase counter ... duh */
+    bool operator()(const Particle*) { ++count; return false; }
+  };
+
+  TEST_F(ParticleTest, ForEachDaughters)
+  {
+    // setup a particle with some daughters and grand daughters
+    TLorentzVector momentum;
+    const int nDaughters = 6;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    int nGrandDaughters = 0;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+      if (i % 2 == 0) {
+        Particle* grandDaughter = particles.appendNew(d);
+        newDaughters->appendDaughter(grandDaughter);
+        ++nGrandDaughters;
+      }
+    }
+    const Particle& p = *(particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices));
+
+    // Check if we get called the correct amount of times
+    int count{0};
+    auto counterFct = [&count](const Particle*) { ++count; return false; };
+    EXPECT_FALSE(p.forEachDaughter(counterFct, false, false));
+    EXPECT_EQ(count, nDaughters);
+    count = 0;
+    EXPECT_FALSE(p.forEachDaughter(counterFct, true, false));
+    EXPECT_EQ(count, nDaughters + nGrandDaughters);
+    count = 0;
+    EXPECT_FALSE(p.forEachDaughter(counterFct, false, true));
+    EXPECT_EQ(count, nDaughters + 1);
+    count = 0;
+    EXPECT_FALSE(p.forEachDaughter(counterFct, true, true));
+    EXPECT_EQ(count, nDaughters + nGrandDaughters + 1);
+
+    // Functors passed by value don't return the state
+    ParticleChildrenCounter counterStruct;
+    EXPECT_FALSE(p.forEachDaughter(counterStruct));
+    EXPECT_EQ(counterStruct.count, 0);
+    // But if reference_wrapped it should work fine
+    EXPECT_FALSE(p.forEachDaughter(std::reference_wrapper<ParticleChildrenCounter>(counterStruct)));
+    EXPECT_EQ(counterStruct.count, nDaughters + nGrandDaughters + 1);
+
+    // Test return value: if we return true the processing should be stopped so
+    // count should not be increased anymore
+    int maxchildren{1}, total{nDaughters + nGrandDaughters + 1};
+    auto returnFctTester = [&count, &maxchildren](const Particle*) {++count; return count >= maxchildren; };
+    for (; maxchildren < 2 * total; ++maxchildren) {
+      count = 0;
+      EXPECT_EQ(p.forEachDaughter(returnFctTester), maxchildren <= total);
+      EXPECT_EQ(count, std::min(maxchildren, total));
+    }
+  }
+
   /** test some basics for extra information. */
   TEST_F(ParticleTest, ExtraInfo)
   {
@@ -139,19 +220,19 @@ namespace {
     ECLCluster* eclGamma1 = eclClusters. appendNew(ECLCluster());
     eclGamma1->setConnectedRegionId(1);
     eclGamma1->setClusterId(1);
-    eclGamma1->setHypothesisId(5);
+    eclGamma1->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* eclGamma2 = eclClusters. appendNew(ECLCluster());
     eclGamma2->setConnectedRegionId(1);
     eclGamma2->setClusterId(2);
-    eclGamma2->setHypothesisId(5);
+    eclGamma2->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* eclGamma3 = eclClusters. appendNew(ECLCluster());
     eclGamma3->setConnectedRegionId(2);
     eclGamma3->setClusterId(1);
-    eclGamma3->setHypothesisId(5);
+    eclGamma3->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* eclKL = eclClusters. appendNew(ECLCluster());
     eclKL->setConnectedRegionId(2);
     eclKL->setClusterId(1);
-    eclKL->setHypothesisId(6);
+    eclKL->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
 
 
 
@@ -371,6 +452,8 @@ namespace {
     MC3->setPDG(3);
     T3Kaon->addExtraInfo("test_var", 3.0);
     T3Kaon->addRelationTo(MC3);
+    Particle* ROEPion    = particles.appendNew(Particle(TLorentzVector(3.5, 3.5, 3.5, 3.5),  211, Particle::c_Flavored,
+                                                        Particle::c_Track, 4));
 
     // Construct composite particles
     Particle* D0KK = particles.appendNew(Particle(TLorentzVector(4, 4, 4, 4), 421));
@@ -382,21 +465,21 @@ namespace {
     B0->appendDaughter(T1Pion);
 
     RestOfEvent* roe = roes.appendNew(RestOfEvent());
-    std::vector<int> roeTracks = {4, 5, 6, 7};
-    roe->addTracks(roeTracks);
+
+    roe->addParticles({ROEPion});
     B0->addRelationTo(roe);
 
     // Perform tests
     // First sanity check
-    // at this point the size of Particle/MCParticle/ROE StoreArray should be 5/3/1
-    EXPECT_EQ(particles.getEntries(), 5);
+    // at this point the size of Particle/MCParticle/ROE StoreArray should be 6/3/1
+    EXPECT_EQ(particles.getEntries(), 6);
     EXPECT_EQ(mcparticles.getEntries(), 3);
     EXPECT_EQ(roes.getEntries(), 1);
 
     // now make a copy of B0
     Particle* B0_copy = copyParticle(B0);
-    // at this point the size of Particle/MCParticle/ROE StoreArray should be 10/3/1
-    EXPECT_EQ(particles.getEntries(), 10);
+    // at this point the size of Particle/MCParticle/ROE StoreArray should be 11/3/1
+    EXPECT_EQ(particles.getEntries(), 11);
     EXPECT_EQ(mcparticles.getEntries(), 3);
     EXPECT_EQ(roes.getEntries(), 1);
 
@@ -446,7 +529,7 @@ namespace {
     EXPECT_TRUE(mc2orig->getPDG() == mc2copy->getPDG());
     EXPECT_TRUE(mc3orig->getPDG() == mc3copy->getPDG());
 
-    EXPECT_TRUE(roeorig->getNTracks() == roecopy->getNTracks());
+    EXPECT_TRUE(roeorig->hasParticle(ROEPion) && roecopy->hasParticle(ROEPion));
 
     // modify original and check the copy
     MCParticle* MC4      = mcparticles. appendNew(MCParticle());
@@ -482,4 +565,84 @@ namespace {
 
   }
 
+  /** test cluster based functionality: hypotheses and such */
+  TEST_F(ParticleTest, ECLClusterBased)
+  {
+    StoreArray<ECLCluster> eclclusters;
+    {
+      ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
+      cluster->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      cluster->setEnergy(1.);
+      cluster->setEnergyRaw(2.);
+
+      Particle p(cluster);
+      EXPECT_FLOAT_EQ(1., p.getECLClusterEnergy());
+      EXPECT_FLOAT_EQ(1., p.getEnergy());
+      EXPECT_EQ(ECLCluster::EHypothesisBit::c_nPhotons, p.getECLClusterEHypothesisBit());
+      EXPECT_FLOAT_EQ(0, p.getMass());
+    }
+
+    {
+      ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
+      cluster->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+      cluster->setEnergy(1.);
+      cluster->setEnergyRaw(2.);
+
+      Particle p(cluster, Const::Klong);
+      EXPECT_EQ(130, p.getPDGCode());
+      EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
+      EXPECT_FLOAT_EQ(2., p.getEnergy());
+      EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
+      EXPECT_FLOAT_EQ(0.497614, p.getMass());
+    }
+
+    {
+      ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
+      cluster->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+      cluster->setEnergy(1.);
+      cluster->setEnergyRaw(2.);
+
+      Particle p(cluster, Const::neutron);
+      EXPECT_EQ(2112, p.getPDGCode());
+      EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
+      EXPECT_FLOAT_EQ(2., p.getEnergy());
+      EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
+      EXPECT_FLOAT_EQ(0.93956536, p.getMass());
+    }
+  }
+
+  /** test particle creation from KLMCluster */
+  TEST_F(ParticleTest, KLMClusterBased)
+  {
+    StoreArray<KLMCluster> klmClusters;
+    {
+      KLMCluster* cluster = klmClusters.appendNew(KLMCluster());
+      cluster->setTime(1.1);
+      cluster->setClusterPosition(1.1, 1.1, 1.0);
+      cluster->setLayers(1);
+      cluster->setInnermostLayer(1);
+      cluster->setMomentumMag(1.0);
+
+      Particle p(cluster);
+      EXPECT_EQ(130, p.getPDGCode());
+      EXPECT_FLOAT_EQ(sqrt(1. + 0.497614 * 0.497614), p.getEnergy());
+      EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
+      EXPECT_FLOAT_EQ(0.497614, p.getMass());
+    }
+
+    {
+      KLMCluster* cluster = klmClusters.appendNew(KLMCluster());
+      cluster->setTime(1.1);
+      cluster->setClusterPosition(1.1, 1.1, 1.0);
+      cluster->setLayers(1);
+      cluster->setInnermostLayer(1);
+      cluster->setMomentumMag(1.0);
+
+      Particle p(cluster, Const::neutron.getPDGCode());
+      EXPECT_EQ(2112, p.getPDGCode());
+      EXPECT_FLOAT_EQ(sqrt(1. + 0.93956536 * 0.93956536), p.getEnergy());
+      EXPECT_EQ(Particle::c_Flavored, p.getFlavorType());
+      EXPECT_FLOAT_EQ(0.93956536, p.getMass());
+    }
+  }
 }  // namespace

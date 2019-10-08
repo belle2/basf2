@@ -12,8 +12,6 @@
 #include <framework/database/IntraRunDependency.h>
 #include <vector>
 
-class TClass;
-
 namespace Belle2 {
 
   /**
@@ -43,12 +41,12 @@ namespace Belle2 {
      * @param event   meta data of the event for which we want to have the conditions.
      * @return        array index of the object valid for the given event.
      */
-    virtual int getIndex(const EventMetaData& event) const;
+    virtual int getIndex(const EventMetaData& event) const override;
 
   private:
     /** Vector of event number boundaries. */
     std::vector<unsigned int> m_eventNumbers;
 
-    ClassDef(EventDependency, 1);  /**< class for event number dependent conditions. */
+    ClassDefOverride(EventDependency, 1);  /**< class for event number dependent conditions. */
   };
 }

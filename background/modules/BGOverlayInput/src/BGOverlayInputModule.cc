@@ -15,12 +15,9 @@
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // MetaData
@@ -71,8 +68,6 @@ namespace Belle2 {
   void BGOverlayInputModule::initialize()
   {
 
-    loadDictionaries();
-
     // expand possible wildcards
     m_inputFileNames = expandWordExpansions(m_inputFileNames);
     if (m_inputFileNames.empty()) {
@@ -86,7 +81,7 @@ namespace Belle2 {
       if (!f or !f->IsOpen()) {
         B2FATAL("Couldn't open input file " + fileName);
       }
-      auto* persistent = (TTree*) f->Get("persistent");
+      auto* persistent = static_cast<TTree*>(f->Get("persistent"));
       if (!persistent) B2ERROR("No 'persistent' tree found in " + fileName);
       // check and issue error if file is for BG mixing
       TBranch* branch = persistent->GetBranch("BackgroundMetaData");
@@ -218,7 +213,7 @@ namespace Belle2 {
         DataStore::StoreEntry& entry = (map.find(name))->second;
         m_tree->SetBranchAddress(branchName.c_str(), &(entry.object));
         m_storeEntries.push_back(&entry);
-      } else if (objName == "Belle2::ECLWaveforms") {
+      } else if (objName == "Belle2::ECLWaveforms" or objName == "Belle2::PXDInjectionBGTiming") {
         std::string name = branchName;// + m_extensionName;
         bool ok = DataStore::Instance().registerEntry(name, durability, objectPtr->IsA(),
                                                       false, storeFlags);

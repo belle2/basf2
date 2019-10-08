@@ -1,7 +1,4 @@
 #include <mdst/dataobjects/ECLCluster.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-#include <framework/datastore/StoreArray.h>
 #include <gtest/gtest.h>
 #include <cmath>
 #include <TMatrixD.h>
@@ -22,7 +19,7 @@ namespace Belle2 {
   {
     ECLCluster myECLCluster;
 
-    EXPECT_EQ(exp(-5.), myECLCluster.getEnergy());
+    EXPECT_EQ(exp(-5.), myECLCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
     EXPECT_EQ(exp(-5.), myECLCluster.getEnergyRaw());
     EXPECT_EQ(exp(-5.), myECLCluster.getEnergyHighestCrystal());
     EXPECT_EQ(0, myECLCluster.getTheta());
@@ -83,7 +80,7 @@ namespace Belle2 {
     const double highestEnergy = 32.1;
     const double lat = 0.5;
     const double   nOfCrystals = 4;
-    const int   status = 1;
+    const ECLCluster::EStatusBit status = ECLCluster::EStatusBit::c_PulseShapeDiscrimination;
     // Energy->[0], Phi->[2], Theta->[5]
     double error[6] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6};
 
@@ -101,8 +98,9 @@ namespace Belle2 {
     myECLCluster.setLAT(lat);
     myECLCluster.setCovarianceMatrix(error);
     myECLCluster.setIsTrack(isTrack);
+    myECLCluster.setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
 
-    EXPECT_FLOAT_EQ(energy, myECLCluster.getEnergy());
+    EXPECT_FLOAT_EQ(energy, myECLCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
     EXPECT_FLOAT_EQ(E9oE21, myECLCluster.getE9oE21());
     EXPECT_FLOAT_EQ(energyDepSum, myECLCluster.getEnergyRaw());
     EXPECT_FLOAT_EQ(theta, myECLCluster.getTheta());
@@ -111,7 +109,7 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(time, myECLCluster.getTime());
     EXPECT_FLOAT_EQ(deltaTime99, myECLCluster.getDeltaTime99());
     EXPECT_FLOAT_EQ(highestEnergy, myECLCluster.getEnergyHighestCrystal());
-    EXPECT_EQ(status, myECLCluster.getStatus());
+    EXPECT_TRUE(myECLCluster.hasStatus(status));
     EXPECT_FLOAT_EQ(nOfCrystals, myECLCluster.getNumberOfCrystals());
     EXPECT_FLOAT_EQ(lat, myECLCluster.getLAT());
 
@@ -132,27 +130,6 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(error[3], error3x3(2, 0));
     EXPECT_FLOAT_EQ(error[4], error3x3(2, 1));
     EXPECT_FLOAT_EQ(error[5], error3x3(2, 2));
-
-    TMatrixDSym errorecl = error3x3;
-    TMatrixD  jacobian(4, 3);
-    const double cosPhi = cos(phi);
-    const double sinPhi = sin(phi);
-    const double cosTheta = cos(theta);
-    const double sinTheta = sin(theta);
-    jacobian(0, 0) = cosPhi * sinTheta;
-    jacobian(0, 1) = -1.0 * energy * sinPhi * sinTheta;
-    jacobian(0, 2) = energy * cosPhi * cosTheta;
-    jacobian(1, 0) = sinPhi * sinTheta;
-    jacobian(1, 1) = energy * cosPhi * sinTheta;
-    jacobian(1, 2) = energy * sinPhi * cosTheta;
-    jacobian(2, 0) = cosTheta;
-    jacobian(2, 1) = 0.0;
-    jacobian(2, 2) = -1.0 * energy * sinTheta;
-    jacobian(3, 0) = 1.0;
-    jacobian(3, 1) = 0.0;
-    jacobian(3, 2) = 0.0;
-    TMatrixDSym error4x4expected(4);
-    error4x4expected = errorecl.Similarity(jacobian);
 
   } // default constructor
 

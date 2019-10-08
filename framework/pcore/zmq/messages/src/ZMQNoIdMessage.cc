@@ -1,5 +1,7 @@
 #include <framework/pcore/zmq/messages/ZMQNoIdMessage.h>
 
+#include <framework/logging/Logger.h>
+
 using namespace Belle2;
 
 /// Get the data as string

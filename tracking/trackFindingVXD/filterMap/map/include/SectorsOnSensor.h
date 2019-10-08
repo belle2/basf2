@@ -14,11 +14,6 @@
 #include <map>
 #include <vector>
 #include <cfloat>
-#include <utility>      // std::pair
-
-#include <assert.h>
-
-#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 

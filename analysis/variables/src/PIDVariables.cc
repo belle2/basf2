@@ -10,24 +10,17 @@
 
 // Own include
 #include <analysis/variables/PIDVariables.h>
-#include <analysis/VariableManager/Variable.h>
 
 #include <analysis/VariableManager/Manager.h>
-
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 #include <boost/algorithm/string.hpp>
 
 #include <iostream>
-#include <algorithm>
 #include <cmath>
 
 using namespace std;

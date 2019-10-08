@@ -203,8 +203,6 @@ def add_svd_unpacker(path):
 
 def add_svd_packer(path):
 
-    changeSVDEventInfoNameForPacker(path)
-
     packer = register_module('SVDPacker')
     path.add_module(packer)
 
@@ -227,10 +225,3 @@ def add_svd_SPcreation(path, isROIsimulation=False):
         spCreatorSVD.param('SpacePoints', nameSPs)
         spCreatorSVD.param('SVDClusters', svd_clusters)
         path.add_module(spCreatorSVD)
-
-
-def changeSVDEventInfoNameForPacker(path):
-
-    for module in path.modules():
-        if module.name() in["SVDEventInfoSetter", "SVDDigitizer"]:
-            module.param('SVDEventInfo', 'SVDEventInfoSim')

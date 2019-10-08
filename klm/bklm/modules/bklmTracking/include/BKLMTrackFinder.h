@@ -10,11 +10,12 @@
 
 #pragma once
 
-#include <list>
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/modules/bklmTracking/BKLMTrackFitter.h>
 
-#include <klm/bklm/dataobjects/BKLMStatus.h>
-#include "klm/bklm/dataobjects/BKLMHit2d.h"
-#include "klm/bklm/modules/bklmTracking/BKLMTrackFitter.h"
+/* C++ headers. */
+#include <list>
 
 namespace Belle2 {
 

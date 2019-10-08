@@ -99,6 +99,8 @@ namespace Belle2 {
       std::string m_relRecoDigitTrueHitName;
       /** Name of the relation between SVDRecoDigits and SVDShaperDigits */
       std::string m_relRecoDigitShaperDigitName;
+      /** Name of the SVDEventInfo object */
+      std::string m_svdEventInfoName;
 
       //2. Strip and time fitter data
       /** Name of the time fitter data xml */

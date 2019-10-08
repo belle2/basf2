@@ -26,13 +26,9 @@
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
 //MDST
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
-
-//ROOT
-#include <TVector3.h>
 
 #include <cmath>
 #include <stack>

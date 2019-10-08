@@ -10,8 +10,11 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/bklm/dbobjects/BKLMElectronicsChannel.h>
+
+/* C++ headers. */
+#include <map>
 
 namespace Belle2 {
 

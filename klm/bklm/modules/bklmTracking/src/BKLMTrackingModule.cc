@@ -8,11 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/modules/bklmTracking/BKLMTrackingModule.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/logging/Logger.h>
-#include <framework/datastore/StoreObjPtr.h>
+
+/* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/bklm/modules/bklmTracking/BKLMTrackFinder.h>
+
+/* Belle 2 headers. */
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;

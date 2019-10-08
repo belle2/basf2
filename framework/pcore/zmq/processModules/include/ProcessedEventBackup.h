@@ -12,11 +12,8 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
-#include <framework/logging/LogMethod.h>
 #include <memory>
 #include <chrono>
-#include <vector>
-
 
 namespace Belle2 {
   /// Storage item for the event backup storing the event message, the time stamp and the event meta data

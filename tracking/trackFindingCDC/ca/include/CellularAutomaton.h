@@ -17,7 +17,6 @@
 #include <framework/logging/Logger.h>
 
 #include <cmath>
-#include <cassert>
 
 namespace Belle2 {
 

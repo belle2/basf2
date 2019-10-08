@@ -23,8 +23,6 @@
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/utilities/EnvironmentVariables.h>
 #include <framework/database/LocalDatabase.h>
 #include <framework/database/ConditionsDatabase.h>
 #include <framework/database/DatabaseChain.h>
@@ -37,10 +35,7 @@
 #include <framework/database/CentralMetadataProvider.h>
 #include <framework/database/Configuration.h>
 
-#include <TFile.h>
-
 #include <cstdlib>
-#include <iomanip>
 
 namespace Belle2 {
 
@@ -54,11 +49,13 @@ namespace Belle2 {
 
   void Database::reset(bool keepConfig)
   {
+    auto& conf = Conditions::Configuration::getInstance();
+    conf.setInitialized(false);
     DBStore::Instance().reset(true);
     Instance().m_metadataProvider.reset();
     Instance().m_payloadCreation.reset();
     if (not keepConfig)
-      Conditions::Configuration::getInstance().reset();
+      conf.reset();
   }
 
   ScopeGuard Database::createScopedUpdateSession()
@@ -198,6 +195,7 @@ namespace Belle2 {
   void Database::initialize()
   {
     auto conf = Conditions::Configuration::getInstance();
+    conf.setInitialized(true);
     m_globalTags = conf.getFinalListOfTags();
     m_usableTagStates = conf.getUsableTagStates();
     m_metadataConfigurations = conf.getMetadataProviders();
@@ -313,24 +311,6 @@ Parameters:
 Use the central database to obtain conditions data. Usually users should only
 need to call this with one parameter which is the global tag to identify the
 payloads.
-
->>> use_central_database("my_global_tag")
-
-It might be useful to also specify the log level and invert the log messages
-when adding an additional global tag for lookups
-
->>> use_central_database("my_additional_tag", loglevel=LogLevel.WARNING, invertLogging=True)
-
-The ``payloaddir`` specifies a directory where payloads which needed to be
-downloaded will be placed. This could be set to a common absolute directory for
-all jobs to make sure the payloads only need to be downloaded once. The default
-is to place payloads into a directory called :file:`centraldb` in the local
-working directory.
-
-Warning:
-    For debugging purposes this function also allows to set the base URL for
-    the REST api and the file server but these should generally not be
-    modified.
 
 Parameters:
   globalTag (str): name of the global tag to use for payload lookup

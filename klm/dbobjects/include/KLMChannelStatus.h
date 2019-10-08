@@ -10,12 +10,12 @@
 
 #pragma once
 
+/* ROOT headers. */
+#include <TObject.h>
+
 /* C++ headers. */
 #include <cstdint>
 #include <map>
-
-/* External headers. */
-#include <TObject.h>
 
 namespace Belle2 {
 

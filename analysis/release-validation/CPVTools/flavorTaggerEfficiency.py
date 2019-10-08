@@ -68,6 +68,9 @@ if 'FBDT_qrCombined' in totalBranches:
 if 'FANN_qrCombined' in totalBranches:
     methods.append("FANN")
 
+if 'DNN_qrCombined' in totalBranches:
+    methods.append("DNN")
+
 usedCategories = []
 for cat in categories:
     catBranch = 'qp' + cat

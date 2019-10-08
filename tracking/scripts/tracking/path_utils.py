@@ -4,8 +4,24 @@ from basf2 import register_module, create_path
 from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
+from tracking.adjustments import adjust_module
 
 from iov_conditional import phase_2_conditional
+
+
+def use_local_sectormap(path, pathToLocalSM):
+    """
+    Helper function that sets up the SectorMapBootstrapModule in that way that a local sectormap will be
+    loaded instead the one from the DB. Has to be applied on the path after the SectorMapBootstrap was
+    put into the path (usually in add_reconstructin)
+
+    :param path: The path the SectorMapBootstrapModule is in.
+    :param pathToLocalSM: the local storage position of the sectormap (including the name)
+
+    """
+    B2WARNING("Warning will load local SectorMap from:  " + pathToLocalSM)
+    adjust_module(path, 'SectorMapBootstrap', **{"ReadSecMapFromDB": False,
+                                                 "ReadSectorMap": True, "SectorMapsInputFile": pathToLocalSM})
 
 
 def add_geometry_modules(path, components=None):
@@ -251,12 +267,36 @@ def add_svd_track_finding(
         use_mc_truth=False,
         add_both_directions=True,
         temporary_reco_tracks="SVDRecoTracks",
-        temporary_reco_tracks_two="SVDplusRecoTracks",
+        temporary_svd_cdc_reco_tracks="SVDPlusCDCStandaloneRecoTracks",
         use_svd_to_cdc_ckf=True,
         prune_temporary_tracks=True,
         use_vxdtf2_quality_estimator=False,
         **kwargs):
-    """Add SVD track finding to the path"""
+    """
+    Add SVD track finding to the path.
+
+    :param path: The path to add the tracking reconstruction modules to
+    :param components: The list of geometry components in use or None for all components.
+    :param input_reco_tracks: Name of the StoreArray with the input reco tracks (usually from CDC) that are used in the
+           CKF track finding and are merged with the newly found SVD tracks into the ``output_reco_tracks``.
+    :param output_reco_tracks: Name of the StoreArray where the reco tracks outputted by the SVD track finding should be
+           stored.
+    :param svd_ckf_mode: String designating the mode of the CDC-to-SVD CKF, that is how it is combined with the VXDTF2
+            standalone track finding. One of "VXDTF2_after", "VXDTF2_before", "VXDTF2_before_with_second_ckf",
+            "only_ckf", "VXDTF2_alone", "cosmics".
+    :param use_mc_truth: Add mc matching and use the MC information in the CKF (but not in the VXDTF2)
+    :param add_both_directions: Whether to add the CKF with both forward and backward extrapolation directions instead
+           of just one.
+    :param temporary_reco_tracks: Intermediate store array where the SVD tracks from the VXDTF2 standalone track finding
+           are stored, before they are merged with CDC tracks and extended via the CKF tracking.
+    :param temporary_svd_cdc_reco_tracks: Intermediate store array where the combination of ``temporary_reco_tracks``
+           (from SVD) and ``input_reco_tracks`` (from CDC standalone) is stored, before the CKF is applied.
+           It is only used if ``use_svd_to_cdc_ckf`` is true. Otherwise, the combination is stored directly in
+           ``output_reco_tracks``.
+    :param use_svd_to_cdc_ckf: Whether to enable the CKF extrapolation from the SVD into the CDC.
+           That CKF application is not affected by ``svd_ckf_mode``.
+    :param prune_temporary_tracks: Delete all hits expect the first and last from intermediate track objects.
+    """
 
     if not is_svd_used(components):
         return
@@ -337,24 +377,24 @@ def add_svd_track_finding(
         raise ValueError(f"Do not understand the svd_ckf_mode {svd_ckf_mode}")
 
     if use_svd_to_cdc_ckf:
-        comb_tracks = temporary_reco_tracks_two
+        combined_svd_cdc_standalone_tracks = temporary_svd_cdc_reco_tracks
     else:
-        comb_tracks = output_reco_tracks
+        combined_svd_cdc_standalone_tracks = output_reco_tracks
 
         # Write out the combinations of tracks
     path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=temporary_reco_tracks,
                     CDCRecoTracksStoreArrayName=input_reco_tracks,
-                    recoTracksStoreArrayName=comb_tracks)
+                    recoTracksStoreArrayName=combined_svd_cdc_standalone_tracks)
 
     if use_svd_to_cdc_ckf:
         path.add_module("ToCDCCKF",
                         inputWireHits="CDCWireHitVector",
-                        inputRecoTrackStoreArrayName=comb_tracks,
+                        inputRecoTrackStoreArrayName=combined_svd_cdc_standalone_tracks,
                         relatedRecoTrackStoreArrayName="CKFCDCRecoTracks",
                         relationCheckForDirection="backward",
                         ignoreTracksWithCDChits=True,
                         outputRecoTrackStoreArrayName="CKFCDCRecoTracks",
-                        outputRelationRecoTrackStoreArrayName=comb_tracks,
+                        outputRelationRecoTrackStoreArrayName=combined_svd_cdc_standalone_tracks,
                         writeOutDirection="backward",
                         stateBasicFilterParameters={"maximalHitDistance": 0.15},
                         pathFilter="arc_length",
@@ -362,11 +402,11 @@ def add_svd_track_finding(
 
         path.add_module("CDCCKFTracksCombiner",
                         CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",
-                        VXDRecoTracksStoreArrayName=comb_tracks,
+                        VXDRecoTracksStoreArrayName=combined_svd_cdc_standalone_tracks,
                         recoTracksStoreArrayName=output_reco_tracks)
 
         if prune_temporary_tracks:
-            for temp_reco_track in [comb_tracks, "CKFCDCRecoTracks"]:
+            for temp_reco_track in [combined_svd_cdc_standalone_tracks, "CKFCDCRecoTracks"]:
                 path.add_module('PruneRecoTracks', storeArrayName=temp_reco_track)
 
 

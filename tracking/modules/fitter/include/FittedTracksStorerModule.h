@@ -12,10 +12,8 @@
 #include <framework/core/Module.h>
 #include <boost/optional.hpp>
 #include <string>
-#include <cmath>
 
 namespace Belle2 {
-  class RecoTrack;
 
   /// A module to copy only the fitted reco tracks to the output store array.
   class FittedTracksStorerModule : public Module {

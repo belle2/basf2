@@ -10,14 +10,17 @@
 
 #pragma once
 
-/* Belle2 headers. */
-#include <calibration/CalibrationCollectorModule.h>
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/dataobjects/KLMChannelArrayIndex.h>
+#include <klm/dataobjects/KLMChannelMapValue.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
+
+/* Belle 2 headers. */
+#include <calibration/CalibrationCollectorModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <klm/dataobjects/KLMChannelArrayIndex.h>
-#include <klm/dataobjects/KLMElementNumbers.h>
 
 namespace Belle2 {
 

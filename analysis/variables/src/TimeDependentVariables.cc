@@ -10,13 +10,10 @@
 
 // Own include
 #include <analysis/variables/TimeDependentVariables.h>
+#include <analysis/VariableManager/Manager.h>
 
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/dbobjects/BeamParameters.h>
-
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -25,17 +22,13 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 
 #include <TLorentzVector.h>
-#include <TRandom.h>
-#include <TVectorF.h>
+#include <TMatrixD.h>
 #include <TVector3.h>
 
 #include <iostream>
-#include <algorithm>
 #include <cmath>
 
 using namespace std;

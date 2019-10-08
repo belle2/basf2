@@ -10,13 +10,17 @@
 
 #pragma once
 
+/* Belle 2 headers. */
 #include <framework/datastore/RelationsObject.h>
+
+/* ROOT headers. */
 #include <TVectorD.h>
 #include <TVector3.h>
 #include <TMatrixDSym.h>
 
-#include "CLHEP/Matrix/Vector.h"
-#include "CLHEP/Matrix/SymMatrix.h"
+/* CLHEP headers. */
+#include <CLHEP/Matrix/Vector.h>
+#include <CLHEP/Matrix/SymMatrix.h>
 
 namespace CLHEP {
   class HepVector;

@@ -8,12 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TDirectory.h>
-
-/* Belle2 headers. */
-#include <klm/dataobjects/KLMChannelIndex.h>
+/* Own header. */
 #include <klm/modules/KLMDQM/KLMDQMModule.h>
+
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/dataobjects/BKLMHit1d.h>
+#include <klm/dataobjects/KLMChannelIndex.h>
+
+/* ROOT headers. */
+#include <TDirectory.h>
 
 using namespace Belle2;
 

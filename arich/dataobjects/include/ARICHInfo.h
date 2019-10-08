@@ -12,7 +12,6 @@
 #define ARICHINFO_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 

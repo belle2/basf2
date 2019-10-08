@@ -29,10 +29,8 @@
 #include <framework/database/LocalDatabase.h>
 #include <framework/database/DatabaseChain.h>
 #include <framework/database/ConditionsDatabase.h>
-#include <framework/logging/LogSystem.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <iostream>
-#include <fstream>
 #include <TFile.h>
 #include <TH1F.h>
 

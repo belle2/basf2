@@ -130,6 +130,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         nmod_tsf = [0, 1, 2, 3, 4, 5, 6]
         for mod_tsf in nmod_tsf:
             path.add_module('TRGCDCTSFDQM', TSFMOD=mod_tsf)
+        # TRGCDC2D
+        trgcdct2ddqm = register_module('TRGCDCT2DDQM')
+        path.add_module(trgcdct2ddqm)
         # TRGCDC3D
         nmod_t3d = [0, 1, 2, 3]
         for mod_t3d in nmod_t3d:

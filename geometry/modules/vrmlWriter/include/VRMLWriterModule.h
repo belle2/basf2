@@ -16,12 +16,11 @@
 #include <string>
 #include <fstream>
 
-#include "G4Transform3D.hh"  // Using 'class G4Transform3D' conflicts with typedef here
 class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4VSolid;
-class G4AffineTransform;
 class G4Polyhedron;
+class G4String;
 class HepPolyhedron;
 
 namespace Belle2 {

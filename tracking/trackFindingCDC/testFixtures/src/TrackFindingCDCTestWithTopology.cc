@@ -13,10 +13,6 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCGeometryLoader.h>
 
-#include <framework/logging/Logger.h>
-
-#include <gtest/gtest.h>
-
 #include <cmath>
 
 using namespace Belle2;

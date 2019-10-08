@@ -12,12 +12,10 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <genfit/TrackCand.h>
-#include <TVectorD.h>
-
 #include <framework/geometry/B2Vector3.h>
+#include <mdst/dataobjects/Track.h>
+
+#include <genfit/TrackCand.h>
 
 using namespace Belle2;
 

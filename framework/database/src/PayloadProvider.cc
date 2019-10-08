@@ -15,7 +15,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include <sys/types.h>
 #include <sys/stat.h>
 
 namespace fs = boost::filesystem;

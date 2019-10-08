@@ -10,18 +10,19 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <cstdint>
-#include <map>
-
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
+
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawKLM.h>
+
+/* C++ headers. */
+#include <cstdint>
 
 namespace Belle2 {
 

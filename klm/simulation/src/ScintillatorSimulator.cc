@@ -8,22 +8,26 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <string>
+/* Own header. */
+#include <klm/simulation/ScintillatorSimulator.h>
 
-/* External headers. */
-#include <TH1D.h>
-#include <TFile.h>
-
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/eklm/geometry/GeometryData.h>
-#include <klm/simulation/ScintillatorSimulator.h>
+
+/* Belle 2 headers. */
 #include <framework/core/RandomNumbers.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TH1D.h>
+
+/* C++ headers. */
+#include <string>
 
 using namespace Belle2;
 

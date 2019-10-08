@@ -15,10 +15,8 @@
 
 #include <vector>
 
-#include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
 
-#include <globals.hh>
 #include <G4UImanager.hh>
 
 using namespace std;

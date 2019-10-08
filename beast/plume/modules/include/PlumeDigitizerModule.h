@@ -17,9 +17,6 @@
 #include <beast/plume/dataobjects/PlumeSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <string>
-
-
 namespace Belle2 {
   namespace plume {
     /**

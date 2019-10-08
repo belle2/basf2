@@ -1,9 +1,9 @@
+
 #include <alignment/dataobjects/MilleData.h>
 
 #include <framework/utilities/FileSystem.h>
-#include <framework/logging/Logger.h>
-#include <limits.h>
-#include <stdlib.h>
+
+#include <cstdlib>
 
 char* full_path = realpath("foo.dat", NULL);
 using namespace std;

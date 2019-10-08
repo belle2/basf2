@@ -12,10 +12,8 @@
 #define ARICHRATECALMODULE_H
 
 #include <framework/core/HistoModule.h>
-#include <arich/geometry/ARICHGeometryPar.h>
 #include <string>
 
-#include <TH1.h>
 #include <TH2.h>
 
 namespace Belle2 {

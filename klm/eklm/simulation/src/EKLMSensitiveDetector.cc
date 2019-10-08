@@ -8,17 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <CLHEP/Geometry/Point3D.h>
-#include <G4Step.hh>
+/* Own header. */
+#include <klm/eklm/simulation/EKLMSensitiveDetector.h>
 
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/eklm/dbobjects/EKLMSimulationParameters.h>
 #include <klm/eklm/geometry/GeometryData.h>
-#include <klm/eklm/simulation/EKLMSensitiveDetector.h>
+
+/* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+
+/* Geant4 headers. */
+#include <G4Step.hh>
+
+/* CLHEP headers. */
+#include <CLHEP/Geometry/Point3D.h>
 
 using namespace Belle2;
 

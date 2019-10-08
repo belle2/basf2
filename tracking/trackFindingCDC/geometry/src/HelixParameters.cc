@@ -14,8 +14,6 @@
 #include <tracking/trackFindingCDC/numerics/CovarianceMatrixUtil.h>
 #include <tracking/trackFindingCDC/numerics/ParameterVectorUtil.h>
 
-#include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
-
 #include <tracking/trackFindingCDC/numerics/Angle.h>
 
 using namespace Belle2;

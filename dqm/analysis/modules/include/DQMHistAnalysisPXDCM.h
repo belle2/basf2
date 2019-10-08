@@ -13,12 +13,10 @@
 #include "cadef.h"
 #endif
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/dataobjects/VxdID.h>
 
 #include <vector>
-#include <TF1.h>
 #include <TH2F.h>
 #include <TCanvas.h>
 #include <TLine.h>

@@ -12,7 +12,7 @@ from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPhotons import *
 
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 set_log_level(LogLevel.INFO)
 
 skimpath = Path()

@@ -8,14 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TH1.h>
-#include <TTree.h>
+/* Own header. */
+#include <klm/modules/KLMChannelStatusCalibration/KLMChannelStatusCalibrationCollectorModule.h>
 
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dataobjects/KLMChannelMapValue.h>
-#include <klm/modules/KLMChannelStatusCalibration/KLMChannelStatusCalibrationCollectorModule.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TH1.h>
+#include <TTree.h>
 
 using namespace Belle2;
 

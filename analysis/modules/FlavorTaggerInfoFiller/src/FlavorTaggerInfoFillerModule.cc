@@ -10,6 +10,8 @@
 
 #include <analysis/modules/FlavorTaggerInfoFiller/FlavorTaggerInfoFillerModule.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>

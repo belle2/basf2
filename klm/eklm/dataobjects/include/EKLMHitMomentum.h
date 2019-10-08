@@ -10,9 +10,8 @@
 
 #pragma once
 
-/* External headers. */
+/* ROOT headers. */
 #include <TLorentzVector.h>
-#include <TObject.h>
 
 namespace Belle2 {
 

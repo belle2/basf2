@@ -10,10 +10,12 @@
 
 #pragma once
 
-//#include <framework/datastore/RelationsObject.h>
-#include <framework/dataobjects/DigitBase.h>
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
+
+/* Belle 2 headers. */
+#include <framework/dataobjects/DigitBase.h>
 
 namespace Belle2 {
   class BKLMSimHit;
@@ -67,7 +69,10 @@ namespace Belle2 {
 
     //! Determine whether hit is in RPC or scintillator
     //! @return whether hit is in RPC (true) or scintillator (false)
-    bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
+    bool inRPC() const
+    {
+      return getLayer() >= BKLMElementNumbers::c_FirstRPCLayer;
+    }
 
     //! Determine whether the scint hit is usable in fit
     //! @return whether the scint hit is usable (true) or not (false) in pulse-shape fit
@@ -75,27 +80,46 @@ namespace Belle2 {
 
     //! Get section number
     //! @return section number (1=forward or 0=backward) of this strip
-    int getSection() const { return ((m_ModuleID & BKLM_END_MASK) >> BKLM_END_BIT); }
+    int getSection() const
+    {
+      return BKLMElementNumbers::getSectionByModule(m_ModuleID);
+    }
 
     //! Get sector number
     //! @return sector number of this strip (1..8)
-    int getSector() const { return (((m_ModuleID & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1); }
+    int getSector() const
+    {
+      return BKLMElementNumbers::getSectorByModule(m_ModuleID);
+    }
 
     //! Get layer number
     //! @return layer number of this strip (1..15)
-    int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
+    int getLayer() const
+    {
+      return BKLMElementNumbers::getLayerByModule(m_ModuleID);
+    }
 
     //! Get plane number.
     //! @return Plane number (0=z, 1=phi).
-    bool getPlane() const { return BKLMElementNumbers::getPlaneByModule(m_ModuleID);}
+    bool getPlane() const
+    {
+      return BKLMElementNumbers::getPlaneByModule(m_ModuleID);
+    }
 
     //! Get readout coordinate
     //! @return readout coordinate (TRUE=phi, FALSE=z) of this strip
-    bool isPhiReadout() const { return ((m_ModuleID & BKLM_PLANE_MASK) != 0); }
+    bool isPhiReadout() const
+    {
+      return BKLMElementNumbers::getPlaneByModule(m_ModuleID) ==
+             BKLMElementNumbers::c_PhiPlane;
+    }
 
     //! Get strip number
     //! @return strip number (1..64)
-    int getStrip() const { return BKLMElementNumbers::getStripByModule(m_ModuleID); }
+    int getStrip() const
+    {
+      return BKLMElementNumbers::getStripByModule(m_ModuleID);
+    }
 
     //! Get detector-module ID
     //! @return unique detector-module ID (internally calculated)
@@ -137,7 +161,10 @@ namespace Belle2 {
 
     //! Determine whether two BKLMDigits refer to the same strip
     //! @return whether two BKLMDigits refer to the same strip (true) or not (false)
-    bool match(const BKLMDigit* d) const { return (((d->getModuleID() ^ m_ModuleID) & BKLM_MODULESTRIPID_MASK) == 0); }
+    bool match(const BKLMDigit* d) const
+    {
+      return BKLMElementNumbers::hitsFromSameChannel(m_ModuleID, d->getModuleID());
+    }
 
     //! Sets whether scint hit is usable in fit
     //! @param flag above threshold (true) or not (false)

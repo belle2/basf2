@@ -9,16 +9,16 @@
  **************************************************************************/
 
 #include <alignment/modules/MergerCosmicTracks/MergerCosmicTracksModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/Track.h>
+
+#include <cdc/geometry/CDCGeometryPar.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLShower.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <cdc/geometry/CDCGeometryPar.h>
-#include <vxd/geometry/GeoCache.h>
-
+#include <framework/datastore/StoreArray.h>
 #include <framework/geometry/B2Vector3.h>
+#include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <vxd/geometry/GeoCache.h>
 
 using namespace Belle2;
 

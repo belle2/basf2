@@ -12,12 +12,9 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/datastore/RelationArray.h>
 
 #include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <list>
 #include <iostream>
 #include <TVector3.h>
 

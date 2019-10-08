@@ -1,6 +1,5 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/utility/utilityFunctions.h>
-#include <framework/logging/Logger.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include "TRandom.h"
 #include "TMath.h"

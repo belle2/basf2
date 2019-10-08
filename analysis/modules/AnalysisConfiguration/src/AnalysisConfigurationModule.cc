@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <string>
-#include <algorithm>
 #include <set>
 #include <analysis/modules/AnalysisConfiguration/AnalysisConfigurationModule.h>
 #include <analysis/utility/AnalysisConfiguration.h>

@@ -7,9 +7,9 @@
 # Example steering file - 2014 Belle II Collaboration
 ############################################################
 
-from basf2 import *
+from basf2 import Path, process, statistics
 
-main = create_path()
+main = Path()
 # EventInfoSetter - generate event meta data
 main.add_module('EventInfoSetter', evtNumList=[1])
 

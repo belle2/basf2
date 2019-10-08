@@ -16,8 +16,6 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <string>
-#include <map>
-#include <vector>
 #include <memory>
 
 namespace Belle2 {

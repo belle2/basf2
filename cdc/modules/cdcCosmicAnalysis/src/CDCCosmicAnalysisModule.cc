@@ -11,7 +11,6 @@
 #include "cdc/modules/cdcCosmicAnalysis/CDCCosmicAnalysisModule.h"
 #include <framework/geometry/BFieldManager.h>
 #include <framework/gearbox/Const.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -20,12 +19,8 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <genfit/KalmanFitStatus.h>
-#include <genfit/KalmanFitterInfo.h>
 
-#include "TMath.h"
 #include <Math/ProbFuncMathCore.h>
-#include "iostream"
 #include "algorithm"
 
 using namespace std;

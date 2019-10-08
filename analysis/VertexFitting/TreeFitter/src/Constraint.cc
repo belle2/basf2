@@ -12,8 +12,6 @@
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
 #include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
-#include <iostream>
-#include <framework/logging/Logger.h>
 
 namespace TreeFitter {
 
@@ -30,6 +28,10 @@ namespace TreeFitter {
 
   ErrCode Constraint::filter(FitParams& fitpar)
   {
+    /**
+     * We don't have reference state yet so we use the k-1 last state
+     * to linearize non-linear constraints
+     * */
     ErrCode status;
     Projection p(fitpar.getDimensionOfState(), m_dim);
     KalmanCalculator kalman(m_dim, fitpar.getDimensionOfState());
@@ -37,13 +39,8 @@ namespace TreeFitter {
     double chisq(0);
     int iter(0);
     bool finished(false) ;
-    bool deleteFitpars = false;
 
-    FitParams* unfilteredState = nullptr;
-    if (m_maxNIter > 1) {
-      unfilteredState = new FitParams(fitpar);
-      deleteFitpars = true;
-    }
+    double accumulated_chi2 = 0;
     while (!finished && !status.failure()) {
 
       p.resetProjection();
@@ -60,12 +57,9 @@ namespace TreeFitter {
                   );
 
         if (!status.failure()) {
-          if (iter > 0) {
-            kalman.updateState(fitpar, *unfilteredState);
-          } else {
-            kalman.updateState(fitpar);
-          }
+          kalman.updateState(fitpar);
 
+          // r R^-1 r
           double newchisq = kalman.getChiSquare();
 
           double dchisqconverged = 0.001 ;
@@ -75,66 +69,56 @@ namespace TreeFitter {
           bool converged = std::abs(dchisq) < dchisqconverged;
           finished  = ++iter >= m_maxNIter || diverging || converged;
           chisq = newchisq;
+          accumulated_chi2 += newchisq;
         }
       }
     }
 
-    const unsigned int NDF = kalman.getConstraintDim();
-    fitpar.addChiSquare(kalman.getChiSquare(), NDF);
+    const unsigned int number_of_constraints = kalman.getConstraintDim();
+    fitpar.addChiSquare(accumulated_chi2, number_of_constraints);
 
-    if (deleteFitpars) { delete unfilteredState; }
     kalman.updateCovariance(fitpar);
-    m_chi2 = kalman.getChiSquare();
     return status;
   }
 
   ErrCode Constraint::filterWithReference(FitParams& fitpar, const FitParams& oldState)
   {
+    /**
+     * We now linearise around the last iteration \alpha (const FitParams& oldState)
+     * In this implementation we can no longer linearize non-linear constraints
+     * but we ensured by the linearisation around the last state that the step size is small enough
+     * so we just use them as if they were linear
+     * */
     ErrCode status;
     Projection p(fitpar.getDimensionOfState(), m_dim);
     KalmanCalculator kalman(m_dim, fitpar.getDimensionOfState());
 
-    double chisq(0);
-    int iter(0);
-    bool finished(false) ;
-    while (!finished && !status.failure()) {
-      p.resetProjection();
+    p.resetProjection();
+    status |= project(oldState, p);
 
-      /** here we project the old state and use only the change with respect to the new state
-       * instead of the new state in the update . the advantage is smaller steps */
-      status |= project(oldState, p);
-
-      p.getResiduals() += p.getH() * (fitpar.getStateVector() - oldState.getStateVector());
+    /** here we project the old state and use only the change with respect to the new state
+     * instead of the new state in the update . the advantage is more stable fit
+     * Downside: non-linear constraints cant be filtered multiple times anymore.
+     * */
+    p.getResiduals() += p.getH() * (fitpar.getStateVector() - oldState.getStateVector());
+    if (!status.failure()) {
+      status |= kalman.calculateGainMatrix(
+                  p.getResiduals(),
+                  p.getH(),
+                  fitpar,
+                  &p.getV(),
+                  1
+                );
 
       if (!status.failure()) {
-        status |= kalman.calculateGainMatrix(
-                    p.getResiduals(),
-                    p.getH(),
-                    fitpar,
-                    &p.getV(),
-                    1
-                  );
-
-        if (!status.failure()) {
-          kalman.updateState(fitpar);
-          double newchisq = kalman.getChiSquare();
-
-          double dchisqconverged = 0.001 ;
-
-          double dchisq = newchisq - chisq;
-          bool diverging = iter > 0 && dchisq > 0;
-          bool converged = std::abs(dchisq) < dchisqconverged;
-          finished  = ++iter >= m_maxNIter || diverging || converged;
-          chisq = newchisq;
-        }
+        kalman.updateState(fitpar);
       }
     }
 
-    const unsigned int NDF = kalman.getConstraintDim();
-    fitpar.addChiSquare(kalman.getChiSquare(), NDF);
+    const unsigned int number_of_constraints = kalman.getConstraintDim();
+    fitpar.addChiSquare(kalman.getChiSquare(), number_of_constraints);
 
     kalman.updateCovariance(fitpar);
-    m_chi2 = kalman.getChiSquare();
     return status;
   }
 

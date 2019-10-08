@@ -15,8 +15,6 @@
 
 #include <string>
 #include <vector>
-#include <utility> // std::pair, std::move
-
 
 namespace Belle2 {
 

@@ -75,15 +75,12 @@ namespace Belle2 {
       }
 
       if (SVDRecoTrack and CDCRecoTrack and SVDRecoTrack->wasFitSuccessful() and CDCRecoTrack->wasFitSuccessful()) {
-
-        cdcWallExtrapolation(CDCRecoTrack, SVDRecoTrack);
-        pocaExtrapolation(CDCRecoTrack, SVDRecoTrack);
-
+        extractVariablesAtExtrapolationToCDCWall(CDCRecoTrack, SVDRecoTrack);
+        extractVariablesAtExtrapolationToPOCA(CDCRecoTrack, SVDRecoTrack);
       } else {
         setCDCSVDTrackDifferenceVariables("SVD_CDC_CDCwall_Pos", nullptr, nullptr);
         setCDCSVDTrackDifferenceVariables("SVD_CDC_CDCwall_Mom", nullptr, nullptr);
         m_variables.at("SVD_CDC_CDCwall_Chi2") = -1.;
-
         setCDCSVDTrackDifferenceVariables("SVD_CDC_POCA_Pos", nullptr, nullptr);
         setCDCSVDTrackDifferenceVariables("SVD_CDC_POCA_Mom", nullptr, nullptr);
       }
@@ -124,7 +121,10 @@ namespace Belle2 {
       m_variables.at(prefix + "_diff_Eta") = fabs(cdcTrackVector->Eta() - svdTrackVector->Eta());
     }
 
-    void cdcWallExtrapolation(RecoTrack const* CDCRecoTrack, RecoTrack const* SVDRecoTrack)
+    /** Extrapolate fitted RecoTracks from CDC standalone and VXDTF2 tracking to the CDC wall
+     * and extract the difference variables there.
+     */
+    void extractVariablesAtExtrapolationToCDCWall(RecoTrack const* CDCRecoTrack, RecoTrack const* SVDRecoTrack)
     {
       // position and momentum used for extrapolations to the CDC Wall
       TVector3 center(0., 0., 0.);
@@ -172,7 +172,10 @@ namespace Belle2 {
       }
     }
 
-    void pocaExtrapolation(RecoTrack const* CDCRecoTrack, RecoTrack const* SVDRecoTrack)
+    /** Extrapolate fitted RecoTracks from CDC standalone and VXDTF2 tracking to the
+     * POCA and extract the difference variables there.
+     */
+    void extractVariablesAtExtrapolationToPOCA(RecoTrack const* CDCRecoTrack, RecoTrack const* SVDRecoTrack)
     {
       // position and momentum used for extrapolations to the CDC Wall
       const TVector3 linePoint(0., 0., 0.);

@@ -69,6 +69,9 @@ typedef HepGeom::Point3D<double> HepPoint3D;
 // enable nisKsFinder (needs externals > v00-07-01)
 #define HAVE_NISKSFINDER
 
+// enable goodLambda (needs externals >= v01-08-00)
+#define HAVE_GOODLAMBDA
+
 namespace Belle2 {
 
   /**

@@ -783,11 +783,11 @@ class ConditionsDB:
 |*Type of request*       | {data['request']} |
 """
             if 'pull-request' in data.keys():
-                description += f"|*Pull request* | \#{data['pull-request']} |\n"
+                description += f"|*Pull request* | \\#{data['pull-request']} |\n"
             if 'backward-compatibility' in data.keys():
-                description += f"|*Backward compatibility* | \#{data['backward-compatibility']} |\”"
+                description += f"|*Backward compatibility* | \\#{data['backward-compatibility']} |\n"
             if 'forward-compatibility' in data.keys():
-                description += f"|*Forward compatibility* | \#{data['forward-compatibility']} |\”"
+                description += f"|*Forward compatibility* | \\#{data['forward-compatibility']} |\n"
             description += '|*Details* |' + ''.join(data['details']) + ' |\n'
 
         # add information about uploaded payloads/IoVs

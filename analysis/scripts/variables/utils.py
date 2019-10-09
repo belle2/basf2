@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import functools
 import collections
+import re
 from variables import variables as _variablemanager
 from variables import std_vector as _std_vector
 
@@ -11,18 +12,23 @@ def create_aliases(list_of_variables, wrapper, prefix):
     The function creates aliases for variables from the variables list with given wrapper
     and returns list of the aliases.
 
-    >>> list_of_variables = ['M','p']
+    If the variables in the list have arguments (like ``useLabFrame(p)``) all
+    non-alphanumeric characters in the variable will be replaced by underscores
+    (for example ``useLabFrame_x``) for the alias name.
+
+    >>> list_of_variables = ['M','p','matchedMC(useLabFrame(px))']
     >>> wrapper = 'daughter(1,{variable})'
     >>> prefix = 'pref'
     >>> print(create_aliases(list_of_variables, wrapper, prefix))
-    ['pref_M', 'pref_p']
+    ['pref_M', 'pref_p', 'pref_matchedMC_useLabFrame_px']
     >>> from variables import variables
     >>> variables.printAliases()
-    [INFO] =========================
-    [INFO] Following aliases exists:
-    [INFO] 'pref_M' --> 'daughter(1,M)'
-    [INFO] 'pref_p' --> 'daughter(1,p)'
-    [INFO] =========================
+    [INFO] =====================================
+    [INFO] The following aliases are registered:
+    [INFO] pref_M                        --> daughter(1,M)
+    [INFO] pref_matchedMC_useLabFrame_px --> daughter(1,matchedMC(useLabFrame(px)))
+    [INFO] pref_p                        --> daughter(1,p)
+    [INFO] =====================================
 
     Parameters:
         list_of_variables (list(str)): list of variable names
@@ -33,9 +39,13 @@ def create_aliases(list_of_variables, wrapper, prefix):
     Returns:
         list(str): new variables list
     """
-    aliases = [f"{prefix}_{e}" for e in list_of_variables]
-    for var, alias in zip(list_of_variables, aliases):
-        _variablemanager.addAlias(alias, wrapper.format(variable=var))
+    replacement = re.compile('[^a-zA-Z0-9]+')
+    aliases = []
+    for var in list_of_variables:
+        # replace all non-safe characters for alias name with _ (but remove from the end)
+        safe = replacement.sub("_", var).strip("_")
+        aliases.append(f"{prefix}_{safe}")
+        _variablemanager.addAlias(aliases[-1], wrapper.format(variable=var))
 
     return aliases
 

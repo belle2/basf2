@@ -10,7 +10,7 @@ The TreeFitter is a global fitting tool to simultaneously fit an entire decay ch
 The fit tries to find the solutions to a system of equations or at least the solution closest to the measurement given the measurement uncertainty and noise. The distance between (linearised) hypothesis and measurement is calculated using :math:`\chi^2 = \sum \frac{h-m}{\sigma}` the final goodness of the fit then can be evaluated using the p-value defined as the incomplete (lower = 1 - upper) gamma function of the :math:`\chi^2` and degrees of freedom :math:`r` devided by two: 
 :math:`1 -\int^{ \frac{\chi^2}{2} }_{0} t^{r/2-1} e^{-t} dt~/~\Gamma(\frac{r}{2}).` 
 
-This quantity denotes the probability the observed :math:`\chi^2` exceeds the expectations for a correct model by chance (see ROOT documentation `TMath::Prob(Double_t chi2,Int_t ndf)`).
+This quantity denotes the probability the observed :math:`\chi^2` exceeds the expectations for a correct model by chance (see ROOT documentation ``TMath::Prob(Double_t chi2,Int_t ndf)``).
 
 The number of degrees of freedom is the number of equations (constraints) minus the number of parameters extracted (vertices, momenta, ...) and has to be larger than zero, otherwise the fit will display a warning and do nothing.
 The constraints can be counted as following:
@@ -37,7 +37,8 @@ While for :math:`B \rightarrow D(K \pi \pi^0)\pi`:
 Usage: 
 ######
 
-The user reconstructs the desired decay chain and then passes the head of the tree to the vertex fitter. So when you are reconstructing :math:`B->D(K \pi)\pi` the list name of the B-meson has to be passed and the fit fits everything down the stream. The vertex fitter has a convenience function in `/analysis/scripts/vertex.py` the current name is `vertexTree()`. See the documentation there.
+The user reconstructs the desired decay chain and then passes the head of the tree to the vertex fitter. So when you are reconstructing :math:`B->D(K \pi)\pi` the list name of the B-meson has to be passed and the fit fits everything down the stream. 
+The vertex fitter has a convenience function: `modularAnalysis.vertexTree()`.
 
 
 Parameters of the convenience function
@@ -48,7 +49,7 @@ Import and use the convenience function:
    :noindex:
 
 All other parameters are the same as for the module, see below.
-The user has to set a parameter `confidenceLevel` that corresponds to the p-value as calculated above. Fits with values below the set value will be discarded as junk.
+The user has to set a parameter ``confidenceLevel`` that corresponds to the p-value as calculated above. Fits with values below the set value will be discarded as junk.
 
 Parameters of the MODULE:
 #########################

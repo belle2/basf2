@@ -229,9 +229,9 @@ class RetentionCheck(Module):
 
     Parameters:
 
-        module_name -- name of the module after which the retention rate is measured
-        module_number -- index of the module after which the retention rate is measured
-        particle_lists -- list of particle list names which will be tracked by the module
+        module_name (str): name of the module after which the retention rate is measured
+        module_number (int): index of the module after which the retention rate is measured
+        particle_lists (list(str)): list of particle list names which will be tracked by the module
     """
 
     summary = {}  # static dictionary containing the results (retention rates, number of candidates, ...)
@@ -271,15 +271,23 @@ class RetentionCheck(Module):
 
     def terminate(self):
 
+        N = Belle2.Environment.Instance().getNumberOfEvents()
+
         for particle_list in self.particle_lists:
 
-            retention_rate = float(self.event_with_candidate_count[particle_list]) / \
-                Belle2.Environment.Instance().getNumberOfEvents()
+            if N > 0:
+
+                retention_rate = float(self.event_with_candidate_count[particle_list]) / N
+
+            else:
+
+                B2WARNING("Belle2.Environment.Instance().getNumberOfEvents() gives 0 or less.")
+                retention_rate = 0
 
             type(self).summary[self._key][particle_list] = {"retention_rate": retention_rate,
                                                             "#candidates": self.candidate_count[particle_list],
                                                             "#evts_with_candidates": self.event_with_candidate_count[particle_list],
-                                                            "total_#events": Belle2.Environment.Instance().getNumberOfEvents()}
+                                                            "total_#events": N}
 
     @classmethod
     def print_results(cls):
@@ -333,10 +341,10 @@ class RetentionCheck(Module):
 
         Parameters:
 
-            particle_lists -- particle list name
-            title -- plot title (overwritten by the -o argument in basf2)
-            save_as -- output filename (overwritten by the -o argument in basf2)
-            module_name_max_length -- if the module name length is higher than this value, do not display the full name
+            particle_list (str): particle list name
+            title (str): plot title (overwritten by the -o argument in basf2)
+            save_as (str): output filename (overwritten by the -o argument in basf2)
+            module_name_max_length (int): if the module name length is higher than this value, do not display the full name
         """
         module_name = []
         retention = []
@@ -412,8 +420,8 @@ def pathWithRetentionCheck(particle_lists, path):
 
     Parameters:
 
-        particle_lists -- list of particle list names which will be tracked by RetentionCheck
-        path -- initial path (it is not modified, see warning above and example of use)
+        particle_lists (list(str)): list of particle list names which will be tracked by RetentionCheck
+        path (basf2.Path): initial path (it is not modified, see warning above and example of use)
     """
     new_path = Path()
     for module_number, module in enumerate(path.modules()):

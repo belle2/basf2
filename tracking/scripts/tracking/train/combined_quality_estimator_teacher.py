@@ -419,7 +419,7 @@ class VXDQEDataCollectionTask(Basf2PathTask):
         tracking.add_geometry_modules(path)
         tracking.add_hit_preparation_modules(path)  # only needed for simulated hits
         tracking.add_vxd_track_finding_vxdtf2(
-            path, components=["SVD"], use_vxdtf2_quality_estimator=False
+            path, components=["SVD"], add_mva_quality_indicator=False
         )
         path.add_module(
             "TrackFinderMCTruthRecoTracks",
@@ -486,7 +486,7 @@ class CDCQEDataCollectionTask(Basf2PathTask):
         path.add_module("Gearbox")
         tracking.add_geometry_modules(path)
         tracking.add_hit_preparation_modules(path)  # only needed for simulated hits
-        tracking.add_cdc_track_finding(path, use_cdc_quality_estimator=True)
+        tracking.add_cdc_track_finding(path, add_mva_quality_indicator=True)
 
         basf2.set_module_parameters(
             path,
@@ -557,25 +557,20 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
             inputFileNames=self.get_input_file_names(GenerateSimTask.output_file_name),
         )
         path.add_module("Gearbox")
-        tracking.add_geometry_modules(path)
-        tracking.add_hit_preparation_modules(path)  # only needed for simulated hits
-        tracking.add_cdc_track_finding(
+
+        # First add tracking reconstruction with default quality estimation modules
+        tracking.add_tracking_reconstruction(path, add_mva_quality_indicator=True)
+
+        # Replace weightfile identifiers from defaults (CDB payloads) to new
+        # weightfiles created by this b2luigi script
+        cdc_qe_mva_filter_parameters = {
+            "identifier":
+            self.get_input_file_names(CDCQETeacherTask.weightfile_identifier)[0]
+        }
+        basf2.set_module_parameters(
             path,
-            output_reco_tracks="CDCRecoTracks",
-            use_cdc_quality_estimator=True,
-            cdc_quality_estimator_weightfile=self.get_input_file_names(
-                CDCQETeacherTask.weightfile_identifier
-            )[0],
-        )
-        tracking.add_svd_track_finding(
-            path,
-            components=None,
-            input_reco_tracks="CDCRecoTracks",
-            output_reco_tracks="SVDCDCRecoTracks",
-            temporary_reco_tracks="SVDRecoTracks",
-            temporary_svd_cdc_reco_tracks="SVDPlusCDCStandaloneRecoTracks",
-            add_both_directions=True,
-            use_vxdtf2_quality_estimator=True,
+            name="TFCDC_TrackQualityEstimator",
+            filterParameters=cdc_qe_mva_filter_parameters,
         )
         basf2.set_module_parameters(
             path,
@@ -584,23 +579,25 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
                 VXDQETeacherTask.weightfile_identifier
             )[0],
         )
-        tracking.add_pxd_track_finding(
-            path,
-            components=None,
-            input_reco_tracks="SVDCDCRecoTracks",
-            output_reco_tracks="RecoTracks",
-            temporary_reco_tracks="PXDRecoTracks",
-            add_both_directions=True,
-        )
-        tracking.add_time_extraction(path)
-        tracking.add_mc_matcher(path)
-        tracking.add_track_fit_and_track_creator(path)
-        path.add_module(
-            "TrackQETrainingDataCollector",
-            TrainingDataOutputName=self.get_output_file_name(self.records_file_name),
-            collectEventFeatures=True,  # collect event features and then just don't train on them via ``exclude_features``
-            SVDPlusCDCStandaloneRecoTracksStoreArrayName="SVDPlusCDCStandaloneRecoTracks",
-        )
+
+        # Replace final quality estimator module by training data collector module
+        track_qe_module_name = "TrackQualityEstimatorMVA"
+        module_found = False
+        new_path = basf2.create_path()
+        for module in path.modules():
+            if module.name() != track_qe_module_name:
+                new_path.add_module(module)
+            else:
+                new_path.add_module(
+                    "TrackQETrainingDataCollector",
+                    TrainingDataOutputName=self.get_output_file_name(self.records_file_name),
+                    collectEventFeatures=True,
+                    SVDPlusCDCStandaloneRecoTracksStoreArrayName="SVDPlusCDCStandaloneRecoTracks",
+                )
+                module_found = True
+        if not module_found:
+            raise KeyError(f"No module {track_qe_module_name} found in path")
+        path = new_path
         return path
 
 
@@ -871,8 +868,10 @@ class VXDQEHarvestingValidationTask(HarvestingValidationBaseTask):
             path,
             components=["SVD"],
             reco_tracks="RecoTracks",
-            use_vxdtf2_quality_estimator=True,
+            add_mva_quality_indicator=True,
         )
+        # Replace the weightfiles of all quality estimator module by those
+        # produced in this training by b2luigi
         basf2.set_module_parameters(
             path,
             name="VXDQualityEstimatorMVA",
@@ -920,10 +919,17 @@ class CDCQEHarvestingValidationTask(HarvestingValidationBaseTask):
         tracking.add_cdc_track_finding(
             path,
             output_reco_tracks="RecoTracks",
-            use_cdc_quality_estimator=True,
-            cdc_quality_estimator_weightfile=self.get_input_file_names(
-                self.teacherTask.weightfile_identifier
-            )[0],
+            add_mva_quality_indicator=True,
+        )
+        # change weightfile of quality estimator to the one produced by this training script
+        cdc_qe_mva_filter_parameters = {
+            "identifier":
+            self.get_input_file_names(CDCQETeacherTask.weightfile_identifier)[0]
+        }
+        basf2.set_module_parameters(
+            path,
+            name="TFCDC_TrackQualityEstimator",
+            filterParameters=cdc_qe_mva_filter_parameters,
         )
         tracking.add_mc_matcher(path, components=["CDC"])
         tracking.add_track_fit_and_track_creator(path, components=["CDC"])
@@ -975,23 +981,25 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
         """
         Add modules for full tracking with all track quality estimators to basf2 path.
         """
-        tracking.add_cdc_track_finding(
+
+        # add tracking recontonstruction with quality estimator modules added
+        tracking.add_tracking_reconstruction(
             path,
-            output_reco_tracks="CDCRecoTracks",
-            use_cdc_quality_estimator=True,
-            cdc_quality_estimator_weightfile=self.get_input_file_names(
-                CDCQETeacherTask.weightfile_identifier
-            )[0],
+            add_mva_quality_indicator=True,
+            skipGeometryAdding=True,
+            skipHitPreparerAdding=False,
         )
-        tracking.add_svd_track_finding(
+
+        # Replace the weightfiles of all quality estimator modules by those
+        # produced in the training by b2luigi
+        cdc_qe_mva_filter_parameters = {
+            "identifier":
+            self.get_input_file_names(CDCQETeacherTask.weightfile_identifier)[0]
+        }
+        basf2.set_module_parameters(
             path,
-            components=None,
-            input_reco_tracks="CDCRecoTracks",
-            output_reco_tracks="SVDCDCRecoTracks",
-            temporary_reco_tracks="SVDRecoTracks",
-            temporary_reco_tracks_two="SVDplusRecoTracks",
-            add_both_directions=True,
-            use_vxdtf2_quality_estimator=True,
+            name="TFCDC_TrackQualityEstimator",
+            filterParameters=cdc_qe_mva_filter_parameters,
         )
         basf2.set_module_parameters(
             path,
@@ -1000,19 +1008,9 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
                 VXDQETeacherTask.weightfile_identifier
             )[0],
         )
-        tracking.add_pxd_track_finding(
+        basf2.set_module_parameters(
             path,
-            components=None,
-            input_reco_tracks="SVDCDCRecoTracks",
-            output_reco_tracks="RecoTracks",
-            temporary_reco_tracks="PXDRecoTracks",
-            add_both_directions=True,
-        )
-        tracking.add_time_extraction(path)
-        tracking.add_mc_matcher(path)
-        tracking.add_track_fit_and_track_creator(path)
-        path.add_module(
-            "TrackQualityEstimatorMVA",
+            name="TrackQualityEstimatorMVA",
             WeightFileIdentifier=self.get_input_file_names(
                 FullTrackQETeacherTask.weightfile_identifier
             )[0],

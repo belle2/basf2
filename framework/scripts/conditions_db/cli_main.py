@@ -550,6 +550,8 @@ def command_iov(args, db):
         args.add_argument("--human-readable", default=False, action="store_true",
                           help="If given the iovs will be written in a more human friendly format. "
                           "Also repeated payload names will be omitted to create a more readable listing.")
+        args.add_argument("--checksums", default=False, action="store_true",
+                          help="If given don't show the revision number but the md5 checksum")
         iovfilter.add_arguments("payloads")
         return
 
@@ -614,9 +616,9 @@ def command_iov(args, db):
         if not args.detail:
             payloads.sort()
             if args.human_readable:
-                table = [["Name", "Rev", "IoV", "IovId", "PayloadId"]]
-                table += [[p.name, p.revision, p.readable_iov(), p.iov_id, p.payload_id] for p in payloads]
-                columns = ["+", -8, -32, 6, 9]
+                table = [["Name", "Rev" if not args.checksums else "Checksum", "IoV"]]
+                table += [[p.name, p.revision if not args.checksums else p.checksum, p.readable_iov()] for p in payloads]
+                columns = ["+", -8 if not args.checksums else -32, -32]
                 # strip repeated names, revision, payloadid, to make it more readable
                 last_name = None
                 last_rev = None
@@ -630,9 +632,9 @@ def command_iov(args, db):
                     last_name, last_rev = cur_name, cur_rev
 
             else:
-                table = [["Name", "Rev", "First Exp", "First Run", "Final Exp", "Final Run", "IovId", "PayloadId"]]
-                table += [[p.name, p.revision] + list(p.iov) + [p.iov_id, p.payload_id] for p in payloads]
-                columns = ["+", -8, 6, 6, 6, 6, 6, 9]
+                table = [["Name", "Rev" if not args.checksums else "Checksum", "First Exp", "First Run", "Final Exp", "Final Run"]]
+                table += [[p.name, p.revision if not args.checksums else p.checksum] + list(p.iov) for p in payloads]
+                columns = ["+", -8 if not args.checksums else -32, 6, 6, 6, 6]
 
             pretty_print_table(table, columns)
 

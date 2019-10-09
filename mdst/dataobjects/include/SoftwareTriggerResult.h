@@ -10,11 +10,9 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-#include <framework/logging/Logger.h>
 
 #include <map>
 #include <string>
-#include <TObject.h>
 
 namespace Belle2 {
   /// Enumeration with all possible results of the SoftwareTriggerCut.

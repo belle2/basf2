@@ -12,8 +12,6 @@
 #include <tracking/trackFindingCDC/findlets/combined/WireHitPreparer.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitCreator.h>
-#include <tracking/trackFindingCDC/findlets/minimal/WireHitMCMultiLoopBlocker.h>
-#include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundBlocker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundDetector.h>
 #include <tracking/trackFindingCDC/findlets/minimal/HitReclaimer.h>
 

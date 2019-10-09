@@ -16,7 +16,6 @@
 #include <mva/interface/Expert.h>
 
 #include <map>
-#include <vector>
 #include <string>
 #include <memory>
 

@@ -7,6 +7,7 @@ from ROOT import Belle2
 algo = Belle2.TestCalibrationAlgorithm()
 # Set the prefix manually if you want to use the algorithm for a specific collector
 # algo.setPrefix("CaTest")
+algo.setDebugHisto(True)
 
 # Can use a Python list of input files/wildcards. It will resolve the existing files
 inputFileNames = ["CollectorOutput.root"]

@@ -10,8 +10,14 @@
 
 /* Belle2 headers. */
 #include <background/modules/BeamBkgHitRateMonitor/BKLMHitRateCounter.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2::Background;
+
+BKLMHitRateCounter::BKLMHitRateCounter()
+{
+  m_klmElementNumbers = &(KLMElementNumbers::Instance());
+}
 
 void BKLMHitRateCounter::initialize(TTree* tree)
 {
@@ -50,8 +56,13 @@ void BKLMHitRateCounter::accumulate(unsigned timeStamp)
     if (!digit.inRPC() && !digit.isAboveThreshold())
       continue;
 
-    int layerGlobal = BKLMElementNumbers::layerGlobalNumber(digit.getForward(), digit.getSector(), digit.getLayer());
-    rates.layerRates[layerGlobal]++;
+    int layerGlobal = BKLMElementNumbers::layerGlobalNumber(digit.getSection(), digit.getSector(), digit.getLayer());
+    if (layerGlobal >= 0 and layerGlobal < m_maxGlobalLayer) {
+      rates.layerRates[layerGlobal]++;
+    } else {
+      B2ERROR("BKLMHitRateCounter: global layer number out of range"
+              << LogVar("global layer", layerGlobal));
+    }
     rates.averageRate++;
   }
 
@@ -77,7 +88,8 @@ void BKLMHitRateCounter::normalize(unsigned timeStamp)
       m_rates.layerRates[layerGlobal] = 0;
     else {
       m_rates.layerRates[layerGlobal] /= activeStrips;
-      if ((layerGlobal % BKLMElementNumbers::getMaximalLayerNumber()) >= 2) {
+      // layerGlobal is 0-based, while c_FirstRPCLayer is 1-based
+      if ((layerGlobal % BKLMElementNumbers::getMaximalLayerNumber()) >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
         // The layer is an RPC-layer: there are two digits per "real" hit
         // so it's better to divide by 2 the rate
         m_rates.layerRates[layerGlobal] /= 2;
@@ -90,13 +102,12 @@ int BKLMHitRateCounter::getActiveStripsBKLMLayer(int layerGlobal) const
 {
   int active = 0;
 
-  int isForward, sector, layer;
-  BKLMElementNumbers::layerGlobalNumberToElementNumbers(layerGlobal, &isForward, &sector, &layer);
+  int forward, sector, layer;
+  BKLMElementNumbers::layerGlobalNumberToElementNumbers(layerGlobal, &forward, &sector, &layer);
 
   for (int plane = 0; plane < BKLMElementNumbers::getMaximalPlaneNumber(); ++plane) {
-    for (int strip = 1; strip <= BKLMElementNumbers::getNStrips(isForward, sector, layer, plane); ++strip) {
-      const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t channel = elementNumbers->channelNumberBKLM(isForward, sector, layer, plane, strip);
+    for (int strip = 1; strip <= BKLMElementNumbers::getNStrips(forward, sector, layer, plane); ++strip) {
+      uint16_t channel = m_klmElementNumbers->channelNumberBKLM(forward, sector, layer, plane, strip);
       enum KLMChannelStatus::ChannelStatus status = m_ChannelStatus->getChannelStatus(channel);
 
       // Ignore the unknown and dead channels

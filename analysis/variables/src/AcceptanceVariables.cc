@@ -10,6 +10,7 @@
 
 // Own include
 #include <analysis/variables/AcceptanceVariables.h>
+#include <analysis/VariableManager/Manager.h>
 
 using namespace std;
 
@@ -73,17 +74,19 @@ namespace Belle2 {
     double thetaInKLMAcceptance(const Particle* particle)
     {
       double theta = particle->get4Vector().Theta() * 180. / TMath::Pi();
-      if (theta < 25.)  return 0;
-      if (theta < 40.)  return 1; //forward
-      if (theta < 129.) return 2; //barrel
-      if (theta < 155.) return 3; //backwards
+      if (theta < 18.)  return 0;
+      if (theta < 37.)  return 1; //forward endcap
+      if (theta < 47.)  return 2; //forward overlap
+      if (theta < 122.) return 3; //barrel
+      if (theta < 130.) return 4; //backward overlap
+      if (theta < 155.) return 5; //backward endcap
       else return 0;
     }
 
     double thetaInBKLMAcceptance(const Particle* particle)
     {
       double acceptance = thetaInKLMAcceptance(particle);
-      if (acceptance == 2) {
+      if (acceptance == 2 || acceptance == 3 || acceptance == 4) {
         return 1;
       } else return 0;
     }
@@ -91,7 +94,15 @@ namespace Belle2 {
     double thetaInEKLMAcceptance(const Particle* particle)
     {
       double acceptance = thetaInKLMAcceptance(particle);
-      if (acceptance == 1 || acceptance == 3) {
+      if (acceptance != 0 && acceptance != 3) {
+        return 1;
+      } else return 0;
+    }
+
+    double thetaInKLMOverlapAcceptance(const Particle* particle)
+    {
+      double acceptance = thetaInKLMAcceptance(particle);
+      if (acceptance == 2 || acceptance == 4) {
         return 1;
       } else return 0;
     }
@@ -161,9 +172,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("thetaInBECLAcceptance",  thetaInBECLAcceptance, "Particle is within Barrel ECL angular acceptance.");
     REGISTER_VARIABLE("thetaInEECLAcceptance",  thetaInEECLAcceptance, "Particle is within Endcap ECL angular acceptance.");
     REGISTER_VARIABLE("thetaInKLMAcceptance",   thetaInKLMAcceptance,
-                      "Particle is within KLM angular acceptance. 1: Forward; 2: Barrel; 3: Backwards.");
+                      "Particle is within KLM angular acceptance. 1: Forward endcap; 2: Forward overalp; 3: Barrel; 4: Backward overlap; 5: Backward endcap.");
     REGISTER_VARIABLE("thetaInBKLMAcceptance",  thetaInBKLMAcceptance, "Particle is within Barrel KLM angular acceptance.");
     REGISTER_VARIABLE("thetaInEKLMAcceptance",  thetaInEKLMAcceptance, "Particle is within Endcap KLM angular acceptance.");
+    REGISTER_VARIABLE("thetaInKLMOverlapAcceptance",  thetaInKLMOverlapAcceptance,
+                      "Particle is within the angular region where KLM barrel and endcaps overlap.");
 
     REGISTER_VARIABLE("ptInTOPAcceptance",   ptInTOPAcceptance,  "Particle is within TOP transverse momentum acceptance.");
     REGISTER_VARIABLE("ptInBECLAcceptance",  ptInBECLAcceptance, "Particle is within Barrel ECL transverse momentum acceptance.");

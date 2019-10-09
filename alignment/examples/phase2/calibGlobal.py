@@ -38,7 +38,7 @@ ana.fillParticleList('mu+:qed', 'muonID > 0.1 and useCMSFrame(p) > 5.0', writeOu
 ana.reconstructDecay('Z0:mumu -> mu-:qed mu+:qed', '', writeOut=True, path=path)
 ana.vertexRaveDaughtersUpdate('Z0:mumu', 0.0, path=path, constraint='ipprofile')
 
-millepede = MillepedeCalibration(['BeamParameters',
+millepede = MillepedeCalibration(['BeamSpot',
                                   'VXDAlignment',
                                   'CDCAlignment',
                                   'CDCLayerAlignment',

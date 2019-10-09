@@ -143,9 +143,7 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
             Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
     elif environmentType in ["MC8", "MC9", "MC10"]:
         # make sure the last database setup is the magnetic field for MC8-10
-        use_database_chain()
-        use_central_database("Legacy_MagneticField_MC8_MC9_MC10", "", "", "centraldb",
-                             loglevel=LogLevel.INFO, invertLogging=True)
+        conditions.globaltags += ["Legacy_MagneticField_MC8_MC9_MC10"]
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
@@ -325,15 +323,29 @@ def setupEventInfo(noEvents, path):
     path.add_module(evtnumbers)
 
 
-def loadGearbox(path):
+def loadGearbox(path, silence_warning=False):
     """
     Loads Gearbox module to the path.
 
-    This is neccessary in a job with event generation only
-    (without reconstruction and reconstruction).
+    Warning:
+        Should be used in a job with *cosmic event generation only*
+
+    Needed for scripts which only generate cosmic events in order to
+    load the geometry.
 
     @param path modules are added to this path
+    @param silence_warning stops a verbose warning message if you know you want to use this function
     """
+
+    if not silence_warning:
+        B2WARNING("""You are overwriting the geometry from the database with Gearbox.
+This is fine if you're generating cosmic events. But in most other cases you probably don't want this.
+
+If you're really sure you know what you're doing you can suppress this message with:
+
+>>> loadGearbox(silence_warning=True)
+
+                  """)
 
     paramloader = register_module('Gearbox')
     path.add_module(paramloader)
@@ -357,6 +369,55 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None):
     mcparticleprinter.param('onlyPrimaries', onlyPrimaries)
     mcparticleprinter.param('maxLevel', maxLevel)
     path.add_module(mcparticleprinter)
+
+
+def correctBrems(
+    outputList,
+    inputList,
+    gammaList,
+    maximumAcceptance=3.0,
+    multiplePhotons=False,
+    usePhotonOnlyOnce=False,
+    writeOut=False,
+    path=None,
+):
+    """
+    For each particle in the given ``inputList``, copies it to the ``outputList`` and adds the
+    4-vector of the photon(s) in the ``gammaList`` which has(have) a weighted named relation to
+    the particle's track, set by the ``ECLTrackBremFinder`` module during reconstruction.
+
+    Warning:
+        This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
+        up to and including MC12 and proc9 **do not** contain this. Newer production campaigns (from proc10 and MC13) will.
+
+    Information:
+        Please note that a new particle is always generated, with the old particle and -if found- one or more
+        photons as daughters.
+
+        The ``inputList`` should contain particles with associated tracks. Otherwise the module will exit with an error.
+
+        The ``gammaList`` should contain photons. Otherwise the module will exit with an error.
+
+    @param outputList   The output particle list name containing the corrected particles
+    @param inputList    The initial particle list name containing the particles to correct. *It should already exist.*
+    @param gammaList    The photon list containing possibly bremsstrahlung photons; *It should already exist.*
+    @param maximumAcceptance Maximum value of the relation weight. Should be a number between [0,3)
+    @param multiplePhotons Whether to use only one photon (the one with the smallest acceptance) or as many as possible
+    @param usePhotonOnlyOnce If true, each brems candidate is used to correct only the track with the smallest relation weight
+    @param writeOut      Whether `RootOutput` module should save the created ``outputList``
+    @param path          The module is added to this path
+    """
+
+    bremscorrector = register_module('BremsFinder')
+    bremscorrector.set_name('bremsCorrector_' + outputList)
+    bremscorrector.param('inputList', inputList)
+    bremscorrector.param('outputList', outputList)
+    bremscorrector.param('gammaList', gammaList)
+    bremscorrector.param('maximumAcceptance', maximumAcceptance)
+    bremscorrector.param('multiplePhotons', multiplePhotons)
+    bremscorrector.param('usePhotonOnlyOnce', usePhotonOnlyOnce)
+    bremscorrector.param('writeOut', writeOut)
+    path.add_module(bremscorrector)
 
 
 def copyList(
@@ -412,6 +473,46 @@ def correctFSR(
     fsrcorrector.param('gammaListName', gammaListName)
     fsrcorrector.param('angleThreshold', angleThreshold)
     fsrcorrector.param('energyThreshold', energyThreshold)
+    fsrcorrector.param('writeOut', writeOut)
+    path.add_module(fsrcorrector)
+
+
+def correctBremsBelle(
+    outputListName,
+    inputListName,
+    gammaListName,
+    multiplePhotons=True,
+    minimumEnergy=0.05,
+    angleThreshold=0.05,
+    writeOut=False,
+    path=None
+):
+    """
+    Run the Belle - like brems finding on the ``inputListName`` of charged particles.
+    Adds all photons in ``gammaListName`` to a copy of the charged particle that are within
+    ``angleThreshold`` and above ``minimumEnergy``.
+
+    Parameters:
+       outputListName (str): The output charged particle list containing the corrected charged particles
+       inputListName (str): The initial charged particle list containing the charged particles to correct.
+       gammaListName (str): The gammas list containing possibly radiative gammas, should already exist.
+       multiplePhotons (bool): How many photons should be added to the charged particle? nearest one -> False,
+             add all the photons within the cone -> True
+       angleThreshold (float): The maximum angle in radians between the charged particle and the (radiative)
+              gamma to be accepted.
+       minimumEnergy (float): The minimum energy in GeV of the (radiative) gamma to be accepted.
+       writeOut (bool): whether RootOutput module should save the created ParticleList
+       path (basf2.Path): modules are added to this path
+    """
+
+    fsrcorrector = register_module('BelleBremRecovery')
+    fsrcorrector.set_name('BelleFSRCorrection_' + outputListName)
+    fsrcorrector.param('inputListName', inputListName)
+    fsrcorrector.param('outputListName', outputListName)
+    fsrcorrector.param('gammaListName', gammaListName)
+    fsrcorrector.param('multiplePhotons', multiplePhotons)
+    fsrcorrector.param('angleThreshold', angleThreshold)
+    fsrcorrector.param('minimumEnergy', minimumEnergy)
     fsrcorrector.param('writeOut', writeOut)
     path.add_module(fsrcorrector)
 
@@ -483,18 +584,28 @@ def cutAndCopyLists(
     path=None,
 ):
     """
-    Copy Particle indices that pass selection criteria from all input ParticleLists to
-    the single output ParticleList.
-    Note that the Particles themselves are not copied.The original and copied
-    ParticleLists will point to the same Particles.
+    Copy candidates from all lists in ``inputListNames`` to
+    ``outputListName`` if they pass ``cut`` (given selection criteria).
 
-    @param ouputListName copied ParticleList
-    @param inputListName vector of original ParticleLists to be copied
-    @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    Note:
+        Note the Particles themselves are not copied.
+        The original and copied ParticleLists will point to the same Particles.
+
+    Example:
+        Require energetic pions safely inside the cdc
+
+        >>> cutAndCopyLists("pi+:energeticPions", ["pi+:good", "pi+:loose"], "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        outputListName (str): the new ParticleList name
+        inputListName (list(str)): list of input ParticleList names
+        cut (str): Candidates that do not pass these selection criteria are removed from the ParticleList
+        writeOut (bool): whether RootOutput module should save the created ParticleList
+        path (basf2.Path): modules are added to this path
     """
-
     pmanipulate = register_module('ParticleListManipulator')
     pmanipulate.set_name('PListCutAndCopy_' + outputListName)
     pmanipulate.param('outputListName', outputListName)
@@ -512,18 +623,28 @@ def cutAndCopyList(
     path=None,
 ):
     """
-    Copy Particle indices that pass selection criteria from the input ParticleList to
-    the output ParticleList.
-    Note that the Particles themselves are not copied.The original and copied
-    ParticleLists will point to the same Particles.
+    Copy candidates from ``inputListName`` to ``outputListName`` if they pass
+    ``cut`` (given selection criteria).
 
-    @param ouputListName copied ParticleList
-    @param inputListName vector of original ParticleLists to be copied
-    @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    Note:
+        Note the Particles themselves are not copied.
+        The original and copied ParticleLists will point to the same Particles.
+
+    Example:
+        require energetic pions safely inside the cdc
+
+        >>> cutAndCopyLists("pi+:energeticPions", "pi+:loose", "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        outputListName (str): the new ParticleList name
+        inputListName (str): input ParticleList name
+        cut (str): Candidates that do not pass these selection criteria are removed from the ParticleList
+        writeOut (bool): whether RootOutput module should save the created ParticleList
+        path (basf2.Path): modules are added to this path
     """
-
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
@@ -756,6 +877,45 @@ def fillConvertedPhotonsList(
     path.add_module(pload)
 
 
+def fillParticleListFromROE(
+    decayString,
+    cut,
+    maskName='',
+    sourceParticleListName='',
+    useMissing=False,
+    writeOut=False,
+    path=None,
+):
+    """
+    Creates Particle object for each ROE of the desired type found in the
+    StoreArray<RestOfEvent>, loads them to the StoreArray<Particle>
+    and fills the ParticleList. If useMissing is True, then the missing
+    momentum is used instead of ROE.
+
+    The type of the particles to be loaded is specified via the decayString module parameter.
+
+    @param decayString             specifies type of Particles and determines the name of the ParticleList.
+                                   Source ROEs can be taken as a daughter list, for example:
+                                   'B0:tagFromROE -> B0:signal'
+    @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
+    @param maskName                Name of the ROE mask to use
+    @param sourceParticleListName  Use related ROEs to this particle list as a source
+    @param useMissing              Use missing momentum instead of ROE momentum
+    @param writeOut                whether RootOutput module should save the created ParticleList
+    @param path                    modules are added to this path
+    """
+
+    pload = register_module('ParticleLoader')
+    pload.set_name('ParticleLoader_' + decayString)
+    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('writeOut', writeOut)
+    pload.param('roeMaskName', maskName)
+    pload.param('useMissing', useMissing)
+    pload.param('sourceParticleListName', sourceParticleListName)
+    pload.param('useROEs', True)
+    path.add_module(pload)
+
+
 def fillParticleListFromMC(
     decayString,
     cut,
@@ -819,12 +979,21 @@ def fillParticleListsFromMC(
 
 def applyCuts(list_name, cut, path):
     """
-    Removes StoreArray<Particle> indices of Particles from given ParticleList
-    that do not pass the given selection criteria (given in ParticleSelector style).
+    Removes particle candidates from ``list_name`` that do not pass ``cut``
+    (given selection criteria).
 
-    @param list_name input ParticleList name
-    @param cut  Particles that do not pass these selection criteria are removed from the ParticleList
-    @param path      modules are added to this path
+    Example:
+        require energetic pions safely inside the cdc
+
+        >>> applyCuts("pi+:mypions", "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        list_name (str): input ParticleList name
+        cut (str): Candidates that do not pass these selection criteria are removed from the ParticleList
+        path (basf2.Path): modules are added to this path
     """
 
     pselect = register_module('ParticleSelector')
@@ -836,10 +1005,19 @@ def applyCuts(list_name, cut, path):
 
 def applyEventCuts(cut, path):
     """
-    Removes events that do not pass the given selection criteria (given in ParticleSelector style).
+    Removes events that do not pass the ``cut`` (given selection criteria).
 
-    @param cut  Events that do not pass these selection criteria are skipped
-    @param path      modules are added to this path
+    Example:
+        continuum events (in mc only) with more than 5 tracks
+
+        >>> applyEventCuts("[nTracks > 5] and [isContinuumEvent], path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        cut (str): Events that do not pass these selection criteria are skipped
+        path (basf2.Path): modules are added to this path
     """
 
     eselect = register_module('VariableToReturnValue')
@@ -863,12 +1041,26 @@ def reconstructDecay(
     their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All
     possible combinations are created (overlaps are forbidden) and combinations that pass the specified selection
     criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
-    reconstructed as well (meaning that the charge conjugated mother list is created as well). One cay use an
-    at-sign '@' to mark a particle as unspecified, e.g. in form of a DecayString: '\@Xsd -> K+ pi-'. If the particle
-    is marked as unspecified, it will not checked for its identity when doing :ref:`MCMatching`. Any particle which
+    reconstructed as well (meaning that the charge conjugated mother list is created as well).
+
+    One can use an at-sign '@' to mark a particle as unspecified, e.g. in form of a DecayString: '\@Xsd -> K+ pi-'. If the particle
+    is marked as unspecified, its identity will not be checked when doing :ref:`MCMatching`. Any particle which
     decays into the correct daughters will be flagged as correct. For example the DecayString '\@Xsd -> K+ pi-'
     would match all particles which decay into a Kaon and a pion, for example K*, B0, D0. Still the daughters
     need to be stated correctly so this can be used for "sum of exclusive" decays
+
+    .. warning::
+        The input ParticleLists are typically ordered according to the upstream reconstruction algorithm.
+        Therefore, if you combine two or more identical particles in the decay chain you should not expect to see the same
+        distribution for the daughter kinematics as they may be sorted by geometry, momentum etc.
+
+        For example, in the decay ``D0 -> pi0 pi0`` the momentum distributions of the two ``pi0`` s are not identical.
+        This can be solved by manually randomising the lists before combining.
+
+    See Also:
+
+        * `Particle combiner how does it work? <https://questions.belle2.org/question/4318/particle-combiner-how-does-it-work/>`_
+        * `Identical particles in decay chain <https://questions.belle2.org/question/5724/identical-particles-in-decay-chain/>`_
 
     @param decayString :ref:`DecayString` specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
@@ -942,12 +1134,12 @@ def reconstructMissingKlongDecayExpert(
     recoList="_reco",
 ):
     """
-    Creates mother particle accounting for missing momentum.
+    Creates a list of K_L0's with their momentum determined from kinematic constraints of B->K_L0 + something else.
 
     @param decayString DecayString specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
-    @param cut         created (mother) Particles are added to the mother ParticleList if they
-                       pass give cuts (in VariableManager style) and rejected otherwise
+    @param cut         Particles are added to the K_L0 ParticleList if they
+                       pass the given cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
     @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
@@ -1367,6 +1559,33 @@ def variablesToDaughterExtraInfo(
     path.add_module(mod)
 
 
+def variablesToEventExtraInfo(
+    particleList,
+    variables,
+    option=0,
+    path=None,
+):
+    """
+    For each particle in the input list the selected variables are saved in an event-extra-info field with the given name,
+    Can be used to save MC truth information, for example, in a ntuple of reconstructed particles.
+
+    An existing extra info with the same name will be overwritten if the new
+    value is lower / will never be overwritten / will be overwritten if the
+    new value is higher / will always be overwritten (-1/0/1/2).
+
+    @param particleList  The input ParticleList
+    @param variables     Dictionary of Variables and extraInfo names.
+    @param path          modules are added to this path
+    """
+
+    mod = register_module('VariablesToEventExtraInfo')
+    mod.set_name('VariablesToEventExtraInfo_' + particleList)
+    mod.param('particleList', particleList)
+    mod.param('variables', variables)
+    mod.param('overwrite', option)
+    path.add_module(mod)
+
+
 def variableToSignalSideExtraInfo(
     particleList,
     varToExtraInfo,
@@ -1386,6 +1605,48 @@ def variableToSignalSideExtraInfo(
     mod.param('particleListName', particleList)
     mod.param('variableToExtraInfo', varToExtraInfo)
     path.add_module(mod)
+
+
+def signalRegion(
+        particleList,
+        cut,
+        path=None,
+        name="isSignalRegion",
+        blind_data=True,
+):
+    """
+    Define and blind a signal region.
+    Per default, the defined signal region is cut out if ran on data.
+    This function will provide a new variable 'isSignalRegion' as default, which is either 0 or 1 depending on the cut
+    provided.
+
+    Example:
+        >>> ma.reconstructDecay("B+:sig -> D+ pi0", "Mbc>5.2", path=path)
+        >>> ma.signalRegion("B+:sig",
+        >>>                  "Mbc>5.27 and abs(deltaE)<0.2",
+        >>>                  blind_data=True,
+        >>>                  path=path)
+        >>> ma.variablesToNtuples("B+:sig", ["isSignalRegion"], path=path)
+
+    Parameters:
+        particleList (str):     The input ParticleList
+        cut (str):              Cut string describing the signal region
+        path (basf2.Path)::     Modules are added to this path
+        name (str):             Name of the Signal region in the variable manager
+        blind_data (bool):      Automatically exclude signal region from data
+
+    """
+
+    mod = register_module('VariablesToExtraInfo')
+    mod.set_name(f'{name}_' + particleList)
+    mod.param('particleList', particleList)
+    mod.param('variables', {f"passesCut({cut})": name})
+    variables.addAlias(name, f"extraInfo({name})")
+    path.add_module(mod)
+
+    # Check if we run on Data
+    if blind_data:
+        applyCuts(particleList, f"{name}==0 or isMC==1", path=path)
 
 
 def removeExtraInfo(particleLists=[], removeEventExtraInfo=False, path=None):
@@ -1531,7 +1792,7 @@ def looseMCTruth(list_name, path):
     path.add_module(mcMatch)
 
 
-def buildRestOfEvent(target_list_name, inputParticlelists=[], path=None):
+def buildRestOfEvent(target_list_name, inputParticlelists=[], belle_sources=False, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them. User can provide additional
@@ -1541,13 +1802,17 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], path=None):
     @param inputParticlelists list of input particle list names, which serve
                               as a source of particles to build ROE, the FSP particles from
                               target_list_name are excluded from ROE object
+    @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
     @param path      modules are added to this path
     """
     # if (len(inputParticlelists) < 3):
     fillParticleList('pi+:roe_default', '', path=path)
-    fillParticleList('gamma:roe_default', '', path=path)
-    fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
-    inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
+    if not belle_sources:
+        fillParticleList('gamma:roe_default', '', path=path)
+        fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
+        inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
+    else:
+        inputParticlelists += ['pi+:roe_default', 'gamma:mdst']
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
@@ -1899,7 +2164,7 @@ def printROEInfo(
     @param full_print   print out mask values for each Track/ECLCLuster in mask
     @param path         modules are added to this path
     """
-    if not isinstance(path, basf2.Path):
+    if not isinstance(path, Path):
         B2FATAL("Error from printROEInfo, please add this to the for_each path")
 
     printMask = register_module('RestOfEventPrinter')
@@ -2050,6 +2315,20 @@ def writePi0EtaVeto(
     @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
     @param path       modules are added to this path
     """
+
+    if not os.path.isfile(workingDirectory + '/pi0veto.root') and downloadFlag:
+        pi0veto_error_message = (
+            "The necessary weight file pi0veto.root is not present in the provided working directory.\n"
+            "Unfortunately, it can not be downloaded from the database in this release."
+        )
+        B2ERROR(pi0veto_error_message)
+    if not os.path.isfile(workingDirectory + '/etaveto.root') and downloadFlag:
+        etaveto_error_message = (
+            "The necessary weight file etaveto.root is not present in the provided working directory.\n"
+            "Unfortunately, it can not be downloaded from the database in this release."
+        )
+        B2ERROR(etaveto_error_message)
+
     global PI0ETAVETO_COUNTER
 
     if PI0ETAVETO_COUNTER == 0:
@@ -2093,15 +2372,15 @@ def writePi0EtaVeto(
 
     if not os.path.isfile(workingDirectory + '/pi0veto.root'):
         if downloadFlag:
-            use_central_database('development')
+            # use_central_database('development') // The development GT can no longer be used
             basf2_mva.download('Pi0VetoIdentifier', workingDirectory + '/pi0veto.root')
-            B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
+            # B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
 
     if not os.path.isfile(workingDirectory + '/etaveto.root'):
         if downloadFlag:
-            use_central_database('development')
+            # use_central_database('development') // The development GT can no longer be used
             basf2_mva.download('EtaVetoIdentifier', workingDirectory + '/etaveto.root')
-            B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
+            # B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
 
     roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO'], extraInfoName='Pi0Veto',
                         identifier=workingDirectory + '/pi0veto.root')
@@ -2173,25 +2452,54 @@ def buildEventShape(inputListNames=[],
                     checkForDuplicates=False,
                     path=None):
     """
-    Calculates the event shape quantities (thrust, sphericity, Fox-Wolfram moments...) using the
-    particles in the lists provided by the user.
-    The results of the calculation are then store in the EventShapeContainer dataobject, and are accessible
-    byt the variabels of the EventShape group.
+    Calculates the event-level shape quantities (thrust, sphericity, Fox-Wolfram moments...)
+    using the particles in the lists provided by the user. If no particle list is provided,
+    the function will internally create a list of good tracks and a list of good photons
+    with (optionally) minimal quality cuts.
 
-    @param inputListNames   list of ParticleLists used to calculate the global event kinematics.
-                            If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
-    @param default_cleanup  if True,  applyes some very standard cuts on pt and costTheta when defines the interanl lists.
-    @param path             modules are added to this path
-    @param allMoments  Enables the calculation of FW and harmonic moments from 5 to 8
-    @param cleoCones  Enables the calculation of the CLEO cones.
-    @param collisionAxis  Enables the calculation of the  quantities related to the collision axis.
-    @param foxWolfram    Enables the calculation of the Fox-Wolfram moments.
-    @param jets   Enables the calculation of jet-related quantities.
-    @param harmonicMoments   Enables the calculation of the Harmonic moments.
-    @param sphericity  Enables the calculation of the sphericity-related quantities.
-    @param thrust  Enables the calculation of thust-related quantities.
-    @param checkForDuplicates Perform a check for duplicate particles before adding them.
 
+    The results of the calculation are then stored into the EventShapeContainer dataobject,
+    and are accessible using the variables of the EventShape group.
+
+    The user can switch the calculation of certain quantities on or off to save computing
+    time. By default the calculation of the high-order moments (5-8) is turned off.
+    Switching off an option will make the corresponding variables not available.
+
+    Warning:
+       The user can provide as many particle lists
+       as needed, using also combined particles, but the function will always assume that
+       the lists are independent.
+       If the lists provided by the user contain several times the same track (either with
+       different mass hypothesis, or once as an independent particle and once as daughter of a
+       combined particle) the results won't be reliable.
+       A basic check for duplicates is available setting the checkForDuplicate flags,
+       but is usually quite time consuming.
+
+
+    @param inputListNames     List of ParticleLists used to calculate the
+                              event shape variables. If the list is empty the default
+                              particleLists pi+:evtshape and gamma:evtshape are filled.
+    @param default_cleanup    If True, applies standard cuts on pt and cosTheta when
+                              defining the internal lists. This option is ignored if the
+                              particleLists are provided by the user.
+    @param path               Path to append the eventShape modules to.
+    @param thrust             Enables the calculation of thrust-related quantities (CLEO
+                              cones, Harmonic moments, jets).
+    @param collisionAxis      Enables the calculation of the  quantities related to the
+                              collision axis .
+    @param foxWolfram         Enables the calculation of the Fox-Wolfram moments.
+    @param harmonicMoments    Enables the calculation of the Harmonic moments with respect
+                              to both the thrust axis and, if collisionAxis = True, the collision axis.
+    @param allMoments         If True, calculates also the  FW and harmonic moments from order
+                              5 to 8 instead of the low-order ones only.
+    @param cleoCones          Enables the calculation of the CLEO cones with respect to both the thrust
+                              axis and, if collisionAxis = True, the collision axis.
+    @param jets               Enables the calculation of the hemisphere momenta and masses.
+                              Requires thrust = True.
+    @param sphericity         Enables the calculation of the sphericity-related quantities.
+    @param checkForDuplicates Perform a check for duplicate particles before adding them. This option
+                              is quite time consuming, instead of using it consider sanitizing
+                              the lists you are passing to the function.
     """
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
@@ -2200,7 +2508,7 @@ def buildEventShape(inputListNames=[],
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 
         if default_cleanup:
-            B2INFO("Using the default lists for the EventShape module.")
+            B2INFO("Applying standard cuts")
             trackCuts = 'pt > 0.1'
             trackCuts += ' and -0.8660 < cosTheta < 0.9535'
             trackCuts += ' and -3.0 < dz < 3.0'
@@ -2211,7 +2519,7 @@ def buildEventShape(inputListNames=[],
             gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
             applyCuts('gamma:evtshape', gammaCuts, path=path)
         else:
-            B2WARNING("Creating the default lists with no cleanup. This can be potentially dangerous")
+            B2WARNING("Creating the default lists with no cleanup.")
     else:
         particleLists = inputListNames
 
@@ -2364,6 +2672,40 @@ def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path):
 
     path.add_module(chargedpid)
 
+
+def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
+    """
+    Calculates distance between two vertices, distance of closest approach between a vertex and a track,\
+    distance of closest approach between a vertex and btube. For track, this calculation ignores track curvature,\
+    it's negligible for small distances.The user should use extraInfo(CalculatedDistance)\
+    to get it. A full example steering file is at analysis/tests/test_DistanceCalculator.py
+
+    Example:
+      >>> from modularAnalysis import calculateDistance
+      >>>calculateDistance('list_name', 'decay_string', "mode", path=user_path)
+
+    @param list_name              name of the input ParticleList
+    @param decay_string           select particles between the distance of closest approch will be calculated
+    @param mode                   Specifies how the distance is calculated
+                                  vertextrack: calculate the distance of closest appreach between a track and a\
+                                   vertex, taking the first candidate as vertex, default
+                                  trackvertex: calculate the distance of closest appreach between a track and a\
+                                   vertex, taking the first candidate as track
+                                  2tracks: calculates the distance of closest appreach between two tracks
+                                  2vertices: calculates the distance between two vertices
+                                  vertexbtube: calculates the distance of closest appreach between a vertex and btube
+                                  trackbtube: calculates the distance of closest appreach between a track and btube
+    @param path                   modules are added to this path
+
+    """
+
+    dist_mod = register_module('DistanceCalculator')
+
+    dist_mod.set_name('DistanceCalculator_' + list_name)
+    dist_mod.param('listName', list_name)
+    dist_mod.param('decayString', decay_string)
+    dist_mod.param('mode', mode)
+    path.add_module(dist_mod)
 
 if __name__ == '__main__':
     from basf2.utils import pretty_print_module

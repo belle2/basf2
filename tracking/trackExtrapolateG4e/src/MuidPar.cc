@@ -12,13 +12,8 @@
 #include <tracking/dataobjects/Muid.h>
 
 #include <fstream>
-#include <exception>
 #include <cmath>
 
-#include <framework/utilities/FileSystem.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -232,7 +227,7 @@ namespace Belle2 {
           pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
         } else {
           if ((layer == 0) || (layer == maxLayer) || (layer < endcapExtLayer)) {
-            pdf *= 1.0 - std::min(0.95, m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]);
+            pdf *= 1 - m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1] * muid->getExtEKLMEfficiencyValue(layer);
           }
         }
       }

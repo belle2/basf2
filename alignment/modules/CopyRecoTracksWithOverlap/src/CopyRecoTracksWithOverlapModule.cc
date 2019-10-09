@@ -10,13 +10,12 @@
 
 #include <alignment/modules/CopyRecoTracksWithOverlap/CopyRecoTracksWithOverlapModule.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-#include <tracking/dataobjects/RecoTrack.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;
 

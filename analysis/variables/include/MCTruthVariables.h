@@ -44,14 +44,28 @@ namespace Belle2 {
 
     /**
      * return 1 if Particle is correctly reconstructed (SIGNAL), 0 otherwise
+     * It behaves according to DecayStringGrammar.
      */
     double isSignal(const Particle* part);
+
+    /**
+     * return 1 if Particle is correctly reconstructed (SIGNAL), 0 otherwise
+     * It does not consider the ignore particle flags of PropertyFlags of the particle.
+     */
+    double isSignalWithoutProperty(const Particle* part);
+
+    /**
+     * return 1 if Particle is almost correctly reconstructed (SIGNAL), 0 otherwise.
+     * Misidentification of charged FSP is allowed.
+     * It will be deprecated in release-05, please consider to use isSignalAcceptWrongFSPs.
+     */
+    double isExtendedSignal(const Particle* part);
 
     /**
      * return 1 if Particle is almost correctly reconstructed (SIGNAL), 0 otherwise.
      * Misidentification of charged FSP is allowed.
      */
-    double isExtendedSignal(const Particle* part);
+    double isSignalAcceptWrongFSPs(const Particle* part);
 
     /**
      * return 1 if Particle is correctly reconstructed (SIGNAL including missing neutrino), 0 otherwise
@@ -100,6 +114,16 @@ namespace Belle2 {
     double isMisidentified(const Particle* particle);
 
     /**
+     * Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.
+     */
+    double genNthMotherPDG(const Particle* part, const std::vector<double>& daughterIDs);
+
+    /**
+     * Check the array index of a particle n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.
+     */
+    double genNthMotherIndex(const Particle* part, const std::vector<double>& daughterIDs);
+
+    /**
      * check the PDG code of a particles MC mother
      */
     double genMotherPDG(const Particle* particle);
@@ -128,6 +152,11 @@ namespace Belle2 {
      * return combination of MCMatching::MCErrorFlags flags.
      */
     double particleMCErrors(const Particle* particle);
+
+    /**
+     * return combination of MCMatching::MCErrorFlags flags without considering PropertyFlags of particle which are set by decaystring grammar.
+     */
+    double particleMCErrorsWithoutProperty(const Particle* particle);
 
     /**
      * return the weight of the Particle -> MCParticle relation (only for the first Relation = largest weight)
@@ -258,6 +287,21 @@ namespace Belle2 {
     int genNMissingDaughter(const Particle* particle, const std::vector<double>& arguments);
 
     /**
+     * return energy of HER from generator level beam kinematics
+     */
+    double getHEREnergy(const Particle*);
+
+    /**
+     * return energy of LER from generator level beam kinematics
+     */
+    double getLEREnergy(const Particle*);
+
+    /**
+     * return crossing angle from generator level beam kinematics
+     */
+    double getCrossingAngle(const Particle*);
+
+    /**
      * retruns the weight of the ECLCluster -> MCParticle relation for the
      * MCParticle related to the particle provided.
      */
@@ -277,5 +321,13 @@ namespace Belle2 {
      * correspont to the track's mcmatch (== the particle)
      */
     double particleClusterBestMCPDGCode(const Particle*);
+
+
+    /**
+     * returns True if the environment is MC and False for data
+     */
+    double isMC(const Particle*);
+
   }
 }
+

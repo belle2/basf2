@@ -11,7 +11,6 @@
 #pragma once
 
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
 #include <tracking/trackFindingVXD/filterTools/MLRange.h>
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/MLHandover.h>
 #include <tracking/trackFindingVXD/filterTools/FBDTClassifier.h>
@@ -23,11 +22,7 @@
 
 // stl
 #include <string>
-#include <vector>
 #include <memory>
-
-#include <TFile.h>
-#include <TTree.h>
 
 namespace Belle2 {
 

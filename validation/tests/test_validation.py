@@ -29,7 +29,7 @@ class ValidationTest(unittest.TestCase):
                      b'<header>\n'
                      b'<interval>release</interval>'
                      b'<output>EvtGenSim.root</output>\n'
-                     b'<contact>tkuhr</contact>\n'
+                     b'<contact>Kilian Lieret kilian.lieret@lmu.de</contact>\n'
                      b'<description>description_text</description>\n'
                      b'</header>\n'
                      b'"""\n')
@@ -49,7 +49,7 @@ class ValidationTest(unittest.TestCase):
                      b'<header>\n'
                      b'<interval>nightly</interval>'
                      b'<output>EvtGenSim.root</output>\n'
-                     b'<contact>tkuhr</contact>\n'
+                     b'<contact>Kilian Lieret kilian.lieret@lmu.de</contact>\n'
                      b'<description>description_text</description>\n'
                      b'</header>\n'
                      b'"""\n')
@@ -73,7 +73,7 @@ class ValidationTest(unittest.TestCase):
                      b'"""\n'
                      b'<header>\n'
                      b'<output>EvtGenSim.root</output>\n'
-                     b'<contact>tkuhr</contact>\n'
+                     b'<contact>Kilian Lieret kilian.lieret@lmu.de</contact>\n'
                      b'<description>description_text</description>\n'
                      b'</header>\n'
                      b'"""\n')
@@ -159,7 +159,7 @@ class ValidationTest(unittest.TestCase):
                      b'<input>SomeIn.root</input>\n'
                      b'<output>EvtGenSim.root</output>\n'
                      b'<cacheable/>\n'
-                     b'<contact>tkuhr</contact>\n'
+                     b'<contact>Kilian Lieret kilian.lieret@lmu.de</contact>\n'
                      b'<description>description_text</description>\n'
                      b'</header>\n'
                      b'"""\n')
@@ -179,12 +179,12 @@ class ValidationTest(unittest.TestCase):
         Test if the meta options parsers behaves nice
         """
         p = metaoptions.MetaOptionParser(
-            ["expert", "pvalue-warn=0.9", "pvalue-error=0.4"]
+            ["shifter", "pvalue-warn=0.9", "pvalue-error=0.4"]
         )
 
         self.assertEqual(0.9, p.pvalue_warn())
         self.assertEqual(0.4, p.pvalue_error())
-        self.assertTrue(p.has_option("expert"))
+        self.assertTrue(p.has_option("shifter"))
         self.assertFalse(p.has_option("not is list"))
 
         p = metaoptions.MetaOptionParser(["expert", "pvalue-warn="])

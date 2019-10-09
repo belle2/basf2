@@ -15,7 +15,6 @@
 #include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
 
-#include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 #include <tracking/trackFindingCDC/eventdata/utils/DriftLengthEstimator.h>
 
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>

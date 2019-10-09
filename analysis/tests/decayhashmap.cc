@@ -2,12 +2,7 @@
 #include <analysis/utility/DecayTree.h>
 #include <analysis/utility/DecayForest.h>
 
-#include <framework/logging/Logger.h>
-#include <framework/utilities/TestHelpers.h>
-
 #include <gtest/gtest.h>
-
-#include <memory>
 
 using namespace std;
 using namespace Belle2;

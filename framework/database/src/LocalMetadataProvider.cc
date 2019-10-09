@@ -10,9 +10,12 @@
 
 #include <framework/database/LocalMetadataProvider.h>
 
+#include <framework/logging/Logger.h>
+
 namespace Belle2::Conditions {
 
-  LocalMetadataProvider::LocalMetadataProvider(std::string filename): m_filename{std::move(filename)}, m_connection{m_filename},
+  LocalMetadataProvider::LocalMetadataProvider(std::string filename, const std::set<std::string>& usableTagStates):
+    MetadataProvider(usableTagStates), m_filename{std::move(filename)}, m_connection{m_filename},
     m_globaltagStatus{m_connection, "SELECT globalTagStatus FROM globaltags WHERE globalTagName=:globaltag", true},
     m_selectPayloads{m_connection, R"SQL(
         SELECT

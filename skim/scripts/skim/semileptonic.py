@@ -17,28 +17,67 @@ from modularAnalysis import *
 def SemileptonicList(path):
     """
     Note:
-        * (Semi-)Leptonic Working Group skim for semi-leptonic analysis.
-        * To be used initially for for B semileptonic decays (B to D l v) (l= electron, muon)
-        * Skim code: 11160200
-        * Uses D:all lists
+        * **Skim description**: skim to be used initially for
+          semileptonic :math:`B: decays (:math:`B \\to D \\ell\\nu,`
+          where :math:`\\ell=e,\\mu`)
+        * **Skim LFN code**: 11160200
+        * **Working Group**: (Semi-)Leptonic and Missing Energy
+          Working Group (WG1)
 
-    **Decay Modes**:
+    Build leptonic untagged skim lists, and supply the names of the
+    lists. Uses the standard electron and muon particle lists, so
+    these must be added to the path first. Additionally, charm meson
+    decays are defined by the charm list functions, and these require
+    various photon, pion and kaon lists to be added to the path.
 
-        * B+ -> anti-D0 e+
-        * B+ -> anti-D0 mu+
-        * B+ -> anti-D*0 e+
-        * B+ -> anti-D*0 mu+
-        * B0 ->  D- e+
-        * B0 ->  D- mu+
-        * B0 ->  D*- e+
-        * B0 ->  D*- mu+
+    Example usage:
 
-    **Cuts applied**:
+    >>> from stdCharged import stdPi, stdK, stdE, stdMu
+    >>> from stdPi0s import stdPi0s, stdPhotons
+    >>> from stdV0s import stdKshorts
+    >>> from skim.standardlists.charm import loadStdD0, loadStdDplus, loadStdDstar0, loadStdDstarPlus
+    >>> from skim.semileptonic import SemileptonicList
+    >>> stdE('all', path=path)
+    >>> stdMu('all', path=path)
+    >>> stdPi('all', path=path)
+    >>> stdPi('loose', path=path)
+    >>> stdPi0s('loose', path=path)
+    >>> stdPhotons('loose', path=path)
+    >>> stdK('loose', path=path)
+    >>> stdKshorts(path=path)
+    >>> loadStdD0(path)
+    >>> loadStdDplus(path)
+    >>> loadStdDstar0(path)
+    >>> loadStdDstarPlus(path)
+    >>> SemileptonicList(path)
+    ['B+:SL1', 'B+:SL2', 'B+:SL3', 'B+:SL4', 'B0:SL1', 'B0:SL2', 'B0:SL3', 'B0:SL4']
 
-        * lepton momentum > 0.35 GeV
-        * 5.24 < B_Mbc < 5.29
-        * | deltaE | < 0.5
-        * nTracks > 4
+    Reconstructed decays
+        * :math:`B^+ \\to \\overline{D}^{0} e^+`
+        * :math:`B^+ \\to \\overline{D}^{0} \\mu^+`
+        * :math:`B^+ \\to \\overline{D}^{*0} e^+`
+        * :math:`B^+ \\to \\overline{D}^{*0} \\mu^+`
+        * :math:`B^0 \\to  D^{-} e^+`
+        * :math:`B^0 \\to  D^{-} \\mu^+`
+        * :math:`B^0 \\to  D^{*-} e^+`
+        * :math:`B^0 \\to  D^{*-} \\mu^+`
+
+    Cuts applied
+        * :math:`p_{\\ell} > 0.35\\,\\text{GeV}`
+        * :math:`5.24 < M_{\\text{bc}} < 5.29`
+        * :math:`|\\Delta E | < 0.5`
+        * :math:`n_{\\text{tracks}} > 4`
+
+    Parameters:
+        path (`basf2.Path`): the path to add the skim list builders.
+
+    Returns:
+        ``SLLists``, a Python list containing the strings
+        :code:`B+:SL1`, :code:`B+:SL2`, :code:`B+:SL3`,
+        :code:`B+:SL4`, :code:`B0:SL1`, :code:`B0:SL2`,
+        :code:`B0:SL3`, and :code:`B0:SL4`, the names of the particle
+        lists for semileptonic :math:`B^+` and :math:`B^0` skim
+        candidates.
     """
 
     __authors__ = [
@@ -74,8 +113,8 @@ def SemileptonicList(path):
         applyCuts('B+:SL' + str(chID), 'nTracks>4', path=path)
         b0List.append('B0:SL' + str(chID))
 
-    allLists = b0List + bplusList
-    return allLists
+    SLLists = b0List + bplusList
+    return SLLists
 
 
 def PRList(path):
@@ -105,12 +144,12 @@ def PRList(path):
         "Romulus Godang"
     ]
 
-    fillParticleList(decayString='pi+:all',
+    fillParticleList(decayString='pi+:eventShapeForSkims',
                      cut='pt> 0.1', path=path)
-    fillParticleList(decayString='gamma:all',
+    fillParticleList(decayString='gamma:eventShapeForSkims',
                      cut='E > 0.1', path=path)
 
-    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,

@@ -23,16 +23,12 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
 
 // utility
-#include <analysis/utility/MCMatching.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <TRandom.h>
@@ -208,7 +204,7 @@ namespace Belle2 {
         return -999;
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
@@ -223,7 +219,7 @@ namespace Belle2 {
         return -999;
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
@@ -238,7 +234,7 @@ namespace Belle2 {
         return -999;
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
@@ -254,7 +250,7 @@ namespace Belle2 {
         return -999;
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
@@ -270,7 +266,7 @@ namespace Belle2 {
         return -999;
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
@@ -286,7 +282,7 @@ namespace Belle2 {
         return -999;
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
@@ -302,7 +298,7 @@ namespace Belle2 {
         return -999;
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
@@ -318,7 +314,7 @@ namespace Belle2 {
         return -999;
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
 
       return (boostvec - mcp->get4Vector()).Mag();
     }
@@ -1037,7 +1033,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         PCmsLabTransform T;
-        TLorentzVector boostvec = T.getBoostVector();
+        TLorentzVector boostvec = T.getBeamFourMomentum();
         TLorentzVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
         TLorentzVector sig4vecLAB = particle->get4Vector();
         TLorentzVector neutrino4vec = missing4Vector(particle, maskName, "1");
@@ -1086,7 +1082,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         PCmsLabTransform T;
-        TLorentzVector boostvec = T.getBoostVector();
+        TLorentzVector boostvec = T.getBeamFourMomentum();
         TLorentzVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
         TLorentzVector sig4vecLAB = particle->get4Vector();
         TLorentzVector neutrino4vec;
@@ -1416,7 +1412,7 @@ namespace Belle2 {
 
         PCmsLabTransform T;
         TLorentzVector missing4Momentum;
-        TLorentzVector boostvec = T.getBoostVector();
+        TLorentzVector boostvec = T.getBeamFourMomentum();
 
         return missing4Vector(particle, maskName, "5").Mag2() / (2.0 * missing4Vector(particle, maskName, "5").Energy());
       };
@@ -1664,7 +1660,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         PCmsLabTransform T;
-        TLorentzVector boostvec = T.getBoostVector();
+        TLorentzVector boostvec = T.getBeamFourMomentum();
         TLorentzVector pNu = missing4Vector(particle, maskName, "6");
 
         TLorentzVector pLep;
@@ -1753,7 +1749,7 @@ namespace Belle2 {
       }
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
 
       TLorentzVector rec4vecLAB = particle->get4Vector();
       TLorentzVector roe4vecLAB = roe->get4Vector(maskName);
@@ -1947,7 +1943,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("nROE_RemainingTracks(maskName)", nROE_RemainingTracksWithMask,
                       "Returns number of remaining tracks between the ROE (specified via a mask) and the given particle. For the given particle only tracks are counted which are in the RoE."
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray."
-                      "Is required for the specific FEI.");
+                      "Is required for the specific FEI. :noindex:");
+    // nROE_RemainingTracks is overloaded (two C++ functions sharing one
+    // variable name) so one of the two needs to be made the indexed
+    // variable in sphinx
 
     REGISTER_VARIABLE("nROE_KLMClusters", nROE_KLMClusters,
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");

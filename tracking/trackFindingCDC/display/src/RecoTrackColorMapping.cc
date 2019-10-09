@@ -9,8 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/display/RecoTrackColorMapping.h>
 
-#include <tracking/trackFindingCDC/display/Colors.h>
-
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 
 #include <tracking/dataobjects/RecoTrack.h>

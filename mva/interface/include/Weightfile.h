@@ -13,11 +13,8 @@
 #define INCLUDE_GUARD_BELLE2_MVA_WEIGHTFILE_HEADER
 
 #include <mva/interface/Options.h>
-#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 #include <framework/database/IntervalOfValidity.h>
-#include <framework/database/Database.h>
-#include <framework/database/DBImportArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <boost/property_tree/ptree.hpp>
@@ -25,7 +22,6 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <cerrno>
 
 namespace Belle2 {
 

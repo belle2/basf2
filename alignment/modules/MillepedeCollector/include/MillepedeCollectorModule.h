@@ -11,14 +11,15 @@
 #ifndef MILLEPEDECOLLECTORMODULE_H
 #define MILLEPEDECOLLECTORMODULE_H
 
-#include <calibration/CalibrationCollectorModule.h>
-#include <genfit/Track.h>
-#include <genfit/StateOnPlane.h>
-#include <genfit/MeasuredStateOnPlane.h>
 #include <analysis/dataobjects/Particle.h>
-#include <genfit/GblTrajectory.h>
-
+#include <calibration/CalibrationCollectorModule.h>
+#include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/geometry/B2Vector3.h>
 #include <tracking/dataobjects/RecoTrack.h>
+
+#include <genfit/GblTrajectory.h>
+#include <genfit/Track.h>
+#include <genfit/MeasuredStateOnPlane.h>
 
 namespace Belle2 {
   /**
@@ -96,6 +97,13 @@ namespace Belle2 {
     /** Write down a GBL trajectory (to TTree or binary file) */
     void storeTrajectory(gbl::GblTrajectory& trajectory);
 
+    /** Get the primary vertex position estimation and its size
+     *  from BeamSpot
+     @return tuple<B2Vector3D, TMatrixDSym> tuple with position and size as covariance matrix
+     */
+    std::tuple<B2Vector3D, TMatrixDSym> getPrimaryVertexAndCov() const;
+
+
   private:
     /** Names of arrays with single RecoTracks fitted by GBL */
     std::vector<std::string> m_tracks;
@@ -156,8 +164,20 @@ namespace Belle2 {
     /** Enable global derivatives for wire sagging **/
     bool m_enableWireSagging;
 
+    /** List of event meta data entries at which payloads can change for timedep calibration */
+    std::vector<std::tuple<int, int, int>> m_eventNumbers{};
+
+    /** Config for time dependence: list( tuple( list( param1, param2, ... ), list( (ev, run, exp), ... )), ... */
+    std::vector< std::tuple< std::vector< int >, std::vector< std::tuple< int, int, int > > > > m_timedepConfig;
+
+    /** Map of list_name -> (mass, width) for custom mass and width setting */
+    std::map<std::string,  std::tuple<double, double>> m_customMassConfig;
+
     /** Current vector of GBL data from trajectory to be stored in a tree */
     std::vector<gbl::GblData> m_currentGblData{};
+
+    /** Update mass and width of the particle (mother in list) with user custom-defined values */
+    void updateMassWidthIfSet(std::string listName, double& mass, double& width);
   };
 }
 

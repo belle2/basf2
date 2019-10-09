@@ -11,9 +11,7 @@
 #include <tracking/ckf/pxd/utilities/PXDKalmanStepper.h>
 
 #include <tracking/ckf/pxd/entities/CKFToPXDState.h>
-#include <tracking/spacePointCreation/SpacePoint.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
-#include <pxd/dataobjects/PXDCluster.h>
 
 using namespace Belle2;
 

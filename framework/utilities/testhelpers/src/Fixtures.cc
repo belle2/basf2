@@ -11,7 +11,6 @@
 #include <framework/utilities/testhelpers/Fixtures.h>
 #include <framework/logging/LogConnectionBase.h>
 #include <framework/logging/LogConnectionConsole.h>
-#include <framework/logging/Logger.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptors.hpp>

@@ -11,19 +11,17 @@
 #include <framework/database/CentralMetadataProvider.h>
 #include <framework/logging/Logger.h>
 
-#include <numeric>
-#include <iomanip>
-
 using json = nlohmann::json;
 
 namespace Belle2::Conditions {
-  CentralMetadataProvider::CentralMetadataProvider(std::string baseUrl): m_baseUrl(std::move(baseUrl))
+  CentralMetadataProvider::CentralMetadataProvider(std::string baseUrl, const std::set<std::string>& usableTagStates):
+    MetadataProvider(usableTagStates), m_baseUrl(std::move(baseUrl))
   {
     // We want to be sure on construction that the server is working. So let's
     // just check the list of valid states
     const auto result = get("/v2/globalTagStatus");
     // check list of valid states
-    auto validStates = getValidTagStates();
+    auto validStates = getUsableTagStates();
     std::string invalidStates = "";
     for (const auto& info : result) {
       const std::string status = info.at("name");

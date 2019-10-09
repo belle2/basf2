@@ -18,7 +18,6 @@
 #include <array>
 #include <vector>
 #include <iostream>
-#include <iomanip>
 
 #if FastBDT_VERSION_MAJOR >= 3
 typedef FastBDT::Forest<unsigned int> FBDTForest;

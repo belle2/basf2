@@ -12,9 +12,7 @@
 #include <vector>
 #include <string>
 
-class TDirectory;
 class TFile;
-class TList;
 
 namespace Belle2 {
   class Module;
@@ -61,12 +59,11 @@ namespace Belle2 {
     /** Functions to add up all histogram files */
     int hadd(bool deleteflag = true);
 
+    /** Return the list of modules that have defined histograms */
     const std::vector<Module*>& getHistDefiningModules() const
     {
       return m_histdefs;
     }
-
-    //  private:
 
   private:
     static RbTupleManager* s_instance; /**< singleton instance. */

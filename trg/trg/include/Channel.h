@@ -51,6 +51,7 @@ namespace Belle2 {
     void dump(const std::string& message = "",
               const std::string& pre = "") const;
 
+    /// sender TRG board
     const TRGBoard& sender(void) const;
 
   public:// Modifiers.

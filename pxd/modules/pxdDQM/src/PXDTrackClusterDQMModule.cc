@@ -10,7 +10,6 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDTrackClusterDQMModule.h>
-#include <framework/datastore/RelationArray.h>
 #include <TDirectory.h>
 
 using namespace Belle2;
@@ -83,8 +82,8 @@ void PXDTrackClusterDQMModule::defineHisto()
 
 void PXDTrackClusterDQMModule::beginRun()
 {
-  for (auto& it : m_trackClusterCharge) it.second->Reset();
-  for (auto& it : m_trackClusterChargeUC) it.second->Reset();
+  for (auto& it : m_trackClusterCharge) if (it.second) it.second->Reset();
+  for (auto& it : m_trackClusterChargeUC) if (it.second) it.second->Reset();
 }
 
 

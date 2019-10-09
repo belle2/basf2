@@ -31,16 +31,16 @@ namespace Belle2 {
 
   public:
     /// Constructor.
-    TRGCDCWireHit(const TRGCDCWire&,
-                  unsigned indexCDCHit = 0,
-                  unsigned indexCDCSimHit = 0,
-                  unsigned indexMCParticle = 0,
-                  float driftLeft = 0,
-                  float driftLeftError = 0,
-                  float driftRight = 0,
-                  float driftRightError = 0,
-                  int mcLRflag = 1,
-                  float fudgeFacgtor = 1);
+    explicit TRGCDCWireHit(const TRGCDCWire&,
+                           unsigned indexCDCHit = 0,
+                           unsigned indexCDCSimHit = 0,
+                           unsigned indexMCParticle = 0,
+                           float driftLeft = 0,
+                           float driftLeftError = 0,
+                           float driftRight = 0,
+                           float driftRightError = 0,
+                           int mcLRflag = 1,
+                           float fudgeFacgtor = 1);
 
     /// Destructor
     virtual ~TRGCDCWireHit();

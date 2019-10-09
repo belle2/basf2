@@ -1,6 +1,5 @@
 
 #include <framework/dataobjects/EventT0.h>
-#include <cmath>
 #include <gtest/gtest.h>
 
 using namespace Belle2;

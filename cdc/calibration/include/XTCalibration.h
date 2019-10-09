@@ -2,13 +2,6 @@
 #include "TH2D.h"
 #include "TH1D.h"
 #include "TF1.h"
-#include <framework/logging/Logger.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/Database.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
-//#include <framework/database/DBImportObjPtr.h>
-#include <cdc/dbobjects/CDCXtRelations.h>
 namespace Belle2 {
   namespace CDC {
     /**
@@ -42,6 +35,9 @@ namespace Belle2 {
       virtual void setMode(unsigned short mode = 1) {m_xtmode = mode;}
       /// set to store histogram or not.
       virtual void setStoreHisto(bool storeHist = false) {m_storeHisto = storeHist;}
+      /// Set LR separate mode (default is true).
+      void setLRSeparate(bool lr = true) {m_LRseparate = lr;}
+
 
       /// Run calibration
       void execute()

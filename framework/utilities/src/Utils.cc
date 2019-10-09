@@ -4,10 +4,8 @@
 #include <framework/logging/Logger.h>
 
 #include <sys/time.h>
-#include <sys/types.h>
 #include <unistd.h>
 
-#include <cstdlib>
 #include <cstdio>
 #include <iomanip>
 #include <utility>
@@ -72,7 +70,6 @@ namespace Belle2::Utils {
     return getStatmSize().second;
   }
 
-  // cppcheck-suppress passedByValue ; We take a value to move it into a member so no performance penalty
   Timer::Timer(std::string  text):
     m_startTime(getClock()),
     m_text(std::move(text))
@@ -82,5 +79,23 @@ namespace Belle2::Utils {
   {
     double elapsed = (getClock() - m_startTime) / Unit::ms;
     B2INFO(m_text << " " << std::fixed << std::setprecision(3) << elapsed << " ms");
+  }
+
+  std::string getCommandOutput(const std::string& command, const std::vector<std::string>& arguments,
+                               bool searchPath [[maybe_unused]])
+  {
+    std::string cmd = command;
+    for (auto& arg : arguments) {
+      cmd += " " + arg;
+    }
+    std::string result;
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
+    if (pipe) {
+      std::array<char, 256> buffer;
+      while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+        result += buffer.data();
+      }
+    }
+    return result;
   }
 }

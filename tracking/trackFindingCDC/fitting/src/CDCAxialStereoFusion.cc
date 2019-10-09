@@ -12,8 +12,6 @@
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
@@ -22,10 +20,6 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
-
-#include <cdc/translators/RealisticTDCCountTranslator.h>
-
-#include <iterator>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -38,6 +32,7 @@ namespace {
     CDCTrajectory2D trajectory2D = trajectory3D.getTrajectory2D();
     CDCTrajectorySZ trajectorySZ = trajectory3D.getTrajectorySZ();
 
+    result.reserve(segment2D.size());
     for (const CDCRecoHit2D& recoHit2D : segment2D) {
       result.push_back(CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D, trajectorySZ));
     }

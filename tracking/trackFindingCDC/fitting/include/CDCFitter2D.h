@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/fitting/EFitVariance.h>
-#include <tracking/trackFindingCDC/fitting/EFitPos.h>
 
 #include <vector>
 

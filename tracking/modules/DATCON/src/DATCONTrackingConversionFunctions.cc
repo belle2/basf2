@@ -29,12 +29,11 @@ void DATCONTrackingModule::prepareDATCONSVDSpacePoints()
     VxdID sensorID = datconspacepoint.getVxdID();
     TVector3 pos = datconspacepoint.getPosition();
 
-    unsigned int uID = 10000000 * sensorID.getLayerNumber() + 100000 * sensorID.getLadderNumber() + 10000 * sensorID.getSensorNumber() +
-                       indexCounter;
-    unsigned int vID = 10000000 * sensorID.getLayerNumber() + 100000 * sensorID.getLadderNumber() + 10000 * sensorID.getSensorNumber() +
-                       indexCounter;
-    vClusters.insert(std::make_pair(vID, std::make_pair(sensorID, pos)));
-    uClusters.insert(std::make_pair(uID, std::make_pair(sensorID, pos)));
+    unsigned int uvID = 10000000 * sensorID.getLayerNumber() + 100000 * sensorID.getLadderNumber() + 10000 * sensorID.getSensorNumber()
+                        +
+                        indexCounter;
+    vClusters.insert(std::make_pair(uvID, std::make_pair(sensorID, pos)));
+    uClusters.insert(std::make_pair(uvID, std::make_pair(sensorID, pos)));
     ++indexCounter;
 
   }
@@ -56,12 +55,11 @@ void DATCONTrackingModule::prepareSVDSpacePoints()
     VxdID sensorID = svdspacepoint.getVxdID();
     TVector3 pos = svdspacepoint.getPosition();
 
-    unsigned int uID = 10000000 * sensorID.getLayerNumber() + 100000 * sensorID.getLadderNumber() + 10000 * sensorID.getSensorNumber() +
-                       indexCounter;
-    unsigned int vID = 10000000 * sensorID.getLayerNumber() + 100000 * sensorID.getLadderNumber() + 10000 * sensorID.getSensorNumber() +
-                       indexCounter;
-    vClusters.insert(std::make_pair(vID, std::make_pair(sensorID, pos)));
-    uClusters.insert(std::make_pair(uID, std::make_pair(sensorID, pos)));
+    unsigned int uvID = 10000000 * sensorID.getLayerNumber() + 100000 * sensorID.getLadderNumber() + 10000 * sensorID.getSensorNumber()
+                        +
+                        indexCounter;
+    vClusters.insert(std::make_pair(uvID, std::make_pair(sensorID, pos)));
+    uClusters.insert(std::make_pair(uvID, std::make_pair(sensorID, pos)));
     ++indexCounter;
 
   }

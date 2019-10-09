@@ -13,7 +13,7 @@
 // includes - rootStuff:
 // includes - stl:
 // includes - tf-related stuff
-#include "ActivatedSector.h"
+#include <tracking/trackFindingVXD/sectorMapTools/Sector.h>
 
 // includes - general fw stuff
 #include <framework/datastore/RelationsObject.h>

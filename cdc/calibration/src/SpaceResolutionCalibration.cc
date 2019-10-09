@@ -2,26 +2,22 @@
 #include <iomanip>
 #include <cdc/calibration/SpaceResolutionCalibration.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/dataobjects/WireID.h>
 #include <cdc/calibration/CDCDatabaseImporter.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBImportObjPtr.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
 
+#include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
-#include "TMultiGraph.h"
-#include "TPad.h"
 #include "TCanvas.h"
 #include "TSystem.h"
 #include "TChain.h"
 #include "TROOT.h"
 #include "TError.h"
 #include "TMinuit.h"
+
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -30,17 +26,7 @@ SpaceResolutionCalibration::SpaceResolutionCalibration():
   m_firstExperiment(0), m_firstRun(0),
   m_lastExperiment(-1), m_lastRun(-1)
 {
-  /*
-   setDescription(
-    " -------------------------- Test Calibration Algoritm -------------------------\n"
-    "                                                                               \n"
-    "  Testing algorithm which just gets mean of a test histogram collected by      \n"
-    "  CaTest module and provides a DB object with another histogram with one       \n"
-    "  entry at calibrated value.                                                   \n"
-    " ------------------------------------------------------------------------------\n"
-    );
-  */
-
+  /*Space resolution calibration*/
 }
 void SpaceResolutionCalibration::createHisto()
 {
@@ -79,6 +65,15 @@ void SpaceResolutionCalibration::createHisto()
   tree->SetBranchAddress("weight", &w);
   tree->SetBranchAddress("alpha", &alpha);
   tree->SetBranchAddress("theta", &theta);
+
+  /* Disable unused branch */
+  std::vector<TString> list_vars = {"lay", "ndf", "Pval", "x_u", "x_b", "x_mea", "weight", "alpha", "theta"};
+  tree->SetBranchStatus("*", 0);
+
+  for (TString brname : list_vars) {
+    tree->SetBranchStatus(brname, 1);
+  }
+
 
   vector<double> yu;
   vector <double> yb;
@@ -158,8 +153,8 @@ void SpaceResolutionCalibration::createHisto()
   TF1* gu = new TF1("gu", "gaus", -0.06, 0.06);
   TF1* g0b = new TF1("g0b", "gaus", -0.015, 0.07);
   TF1* g0u = new TF1("g0u", "gaus", -0.015, 0.08);
-  g0b->SetParLimits(1, -0.005, 0.004);
-  g0u->SetParLimits(1, -0.005, 0.004);
+  g0b->SetParLimits(1, -0.01, 0.004);
+  g0u->SetParLimits(1, -0.01, 0.004);
 
   std::vector<double> sigma;
   std::vector<double> dsigma;
@@ -169,7 +164,6 @@ void SpaceResolutionCalibration::createHisto()
   std::vector<double> dxl;
   std::vector<double> dxl0;
 
-  ofstream ofss("IntReso.dat");
   const int ib1 = int(0.1 / m_binWidth) + 1;
   int firstbin = 1;
   int minEntry = 10;
@@ -179,7 +173,7 @@ void SpaceResolutionCalibration::createHisto()
         for (int th = 0; th < m_ntheta; ++th) {
           //fit half gaus for first range near sense wire
           B2DEBUG(199, "layer-lr-al-th " << il << " - " << lr << " - " << al << " - " << th);
-          if (hist_b[il][lr][al][th]->GetEntries() < 5000) {
+          if (hist_b[il][lr][al][th]->GetEntries() < 20000) {
             m_fitflag[il][lr][al][th] = -1;
             continue;
           }
@@ -189,10 +183,15 @@ void SpaceResolutionCalibration::createHisto()
 
           hist_b[il][lr][al][th]->FitSlicesY(g0b, firstbin, ib1, minEntry);
 
-          hb_m[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th))->Clone(Form("hb_%d_%d_%d_%d_m", il, lr, al,
-                                 th));
-          hb_s[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th))->Clone(Form("hb_%d_%d_%d_%d_s", il, lr, al,
-                                 th));//sigma
+          TH1F* hm1 = (TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th));
+          TH1F* hs1 = (TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th));
+          if (!hm1 || !hs1) {
+            m_fitflag[il][lr][al][th] = -1;
+            continue;
+          }
+
+          hb_m[il][lr][al][th] = (TH1F*)hm1->Clone(Form("hb_%d_%d_%d_%d_m", il, lr, al, th));
+          hb_s[il][lr][al][th] = (TH1F*)hs1->Clone(Form("hb_%d_%d_%d_%d_s", il, lr, al, th));//sigma
 
           hb_m[il][lr][al][th]->SetDirectory(0);
           hb_s[il][lr][al][th]->SetDirectory(0);
@@ -203,6 +202,7 @@ void SpaceResolutionCalibration::createHisto()
           hb_m[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th))); //mean
           hb_s[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th))); //sigma
           B2DEBUG(199, "entries (2nd): " << hb_s[il][lr][al][th]->GetEntries());
+
           //fit half gaus for first range near sense wire
           hist_u[il][lr][al][th]->FitSlicesY(g0u, firstbin, ib1, minEntry);
           hu_m[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th))->Clone(Form("hu_%d_%d_%d_%d_m", il, lr, al,
@@ -241,8 +241,6 @@ void SpaceResolutionCalibration::createHisto()
             dsigma.push_back(ds_int);
             s2.push_back(s_int * s_int);
             ds2.push_back(2 * s_int * ds_int);
-            ofss << il << "   " << lr << "  " << al << "  " << th << "  " << j << "   " << XL << "   " << dXL << "   " << s_int << "   " <<
-                 ds_int << endl;
           }
 
           if (xl.size() < 8 || xl.size() > Max_np) {
@@ -275,25 +273,15 @@ void SpaceResolutionCalibration::createHisto()
       }
     }
   }
-  ofss.close();
 }
 
 bool SpaceResolutionCalibration::calibrate()
 {
-
-  B2INFO("calibrate");
-
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
   createHisto();
-  //half cell size
-  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-  double halfCSize[56];
-  for (int i = 0; i < 56; ++i) {
-    double R = cdcgeo.senseWireR(i);
-    double nW = cdcgeo.nWiresInLayer(i);
-    halfCSize[i] = M_PI * R / nW;
-  }
+  B2INFO("Start to calibrate");
+  gSystem->Exec("mkdir -p Sigma_Fit_Err"); //create a folder to store error histo
 
   TF1* func = new TF1("func", "[0]/(x*x + [1])+[2]* x+[3]+[4]*exp([5]*(x-[6])*(x-[6]))", 0, 1.);
   TH1F* hprob = new TH1F("h1", "", 20, 0, 1);
@@ -301,50 +289,27 @@ bool SpaceResolutionCalibration::calibrate()
   double intp6;
 
   for (int i = 0; i < 56; ++i) {
-    if (i < 8) {
-      upFit = halfCSize[i] + 0.1;
-      intp6 = halfCSize[i] + 0.1;
-    } else {
-      upFit = halfCSize[i] - 0.07;
-      intp6 = halfCSize[i];
-    }
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nalpha; ++al) {
         for (int th = 0; th < m_ntheta; ++th) {
-          //boundary parameters,
-          if (m_BField) {
-            if (i < 8) {
-              upFit = halfCSize[i] + 0.15; intp6 = halfCSize[i] + 0.1;
-            } else {
-              if (fabs(ialpha[al]) < 25) {
-                upFit = halfCSize[i]; intp6 = halfCSize[i];
-              } else {
-                upFit = halfCSize[i] + 0.2; intp6 = halfCSize[i] + 0.4 ;
-              }
-            }
-            //no B case
-          } else {
-            if (i < 8) {upFit = halfCSize[i] + 0.1; intp6 = halfCSize[i] + 0.1;}
-            else {  upFit = halfCSize[i] - 0.07; intp6 = halfCSize[i];}
-          }
-
-          if (upFit > 0.9) upFit = 0.9;
-
-
-          //          func->SetLineColor(1 + lr + al * 2 + th * 3);
-          func->SetParameters(5E-6, 0.007, 1E-4, 1E-5, 0.00008, -30, intp6);
-          func->SetParLimits(0, 1E-7, 1E-4);
-          func->SetParLimits(1, 0.0045, 0.02);
-          func->SetParLimits(2, 1E-6, 0.0005);
-          func->SetParLimits(3, 1E-8, 0.0005);
-          func->SetParLimits(4, 0., 0.001);
-          func->SetParLimits(5, -40, 0.);
-          func->SetParLimits(6, intp6 - 0.5, intp6 + 0.2);
-          B2DEBUG(199, "FITTING for layer: " << i << "lr: " << lr << " ial" << al << " ith:" << th);
-          B2DEBUG(199, "Fit flag before fit:" << m_fitflag[i][lr][al][th]);
-          if (!gfit[i][lr][al][th]) continue;
-          //    if(!(gfit[i][lr][al][th]->isValid())) continue;
           if (m_fitflag[i][lr][al][th] != -1) { /*if graph exist, do fitting*/
+
+
+            upFit = getUpperBoundaryForFit(gfit[i][lr][al][th]);
+            intp6 = upFit + 0.2;
+            B2DEBUG(199, "xmax for fitting: " << upFit);
+            //          func->SetLineColor(1 + lr + al * 2 + th * 3);
+            func->SetParameters(5E-6, 0.007, 1E-4, 1E-5, 0.00008, -30, intp6);
+            func->SetParLimits(0, 1E-7, 1E-4);
+            func->SetParLimits(1, 0.00001, 0.02);
+            func->SetParLimits(2, 1E-6, 0.0005);
+            func->SetParLimits(3, 1E-8, 0.0005);
+            func->SetParLimits(4, 0., 0.001);
+            func->SetParLimits(5, -40, 0.);
+            func->SetParLimits(6, intp6 - 0.5, intp6 + 0.3);
+            B2DEBUG(199, "FITTING for layer: " << i << "lr: " << lr << " ial" << al << " ith:" << th);
+            B2DEBUG(199, "Fit flag before fit:" << m_fitflag[i][lr][al][th]);
+            //    if(!(gfit[i][lr][al][th]->isValid())) continue;
             //      m_fitflag[i][lr][al][th] = 0;
             for (int j = 0; j < 10; j++) {
 
@@ -356,7 +321,10 @@ bool SpaceResolutionCalibration::calibrate()
               std::string Fit_status = gMinuit->fCstatu.Data();
               B2DEBUG(199, "FIT STATUS: " << Fit_status);
               //      stat=gfit[i]->Fit(Form("ffit[%d]",i),"M "+Q,"",0.0,cellsize(i)+0.05+j*0.005);
-              if (Fit_status == "OK" || Fit_status == "SUCCESSFUL") {//need to found better way
+              if (Fit_status == "OK" ||
+                  Fit_status == "SUCCESSFUL" ||
+                  Fit_status == "CALL LIMIT" ||
+                  Fit_status == "PROBLEMS") {
                 if (fabs(func->Eval(0.3)) > 0.00035 || func->Eval(0.3) < 0) {
                   func->SetParameters(5E-6, 0.007, 1E-4, 1E-7, 0.0007, -30, intp6 + 0.05 * j);
                   //    func->SetParameters(defaultparsmall);
@@ -369,16 +337,12 @@ bool SpaceResolutionCalibration::calibrate()
               } else {
                 m_fitflag[i][lr][al][th] = 0;
                 func->SetParameters(5E-6, 0.007, 1E-4, 1E-7, 0.0007, -30, intp6 + 0.05 * j);
-                upFit += 0.025;
+                //        upFit += 0.025;
                 if (j == 9) {
                   TCanvas* c1 =  new TCanvas("c1", "", 600, 600);
                   gfit[i][lr][al][th]->Draw();
-                  c1->SaveAs(Form("Sigma_Fit_Error_%s_%d_%d_%d_%d.png", Fit_status.c_str(), i, lr, al, th));
+                  c1->SaveAs(Form("Sigma_Fit_Err/%d_%d_al%d_th%d_%s.png", i, lr, al, th, Fit_status.c_str()));
                   B2WARNING("Fit error: " << i << " " << lr << " " << al << " " << th);
-                  //      fiterror=1;
-                  // TString command = Form("echo error fit sigma layer %d- %d- %f- %f>> error", i, lr, ialpha[al], itheta[th]);
-                  // gSystem->Exec(command);
-                  // B2FATAL("fit error////////////////////////////////////////");
                 }
               }
             }
@@ -392,9 +356,8 @@ bool SpaceResolutionCalibration::calibrate()
       }
     }
   }
-  //  ff->Close();
-  write();
   storeHisto();
+  write();
 
   return true;
 }
@@ -402,8 +365,6 @@ void SpaceResolutionCalibration::storeHisto()
 {
   B2INFO("storeHisto");
   TFile*  ff = new TFile("sigma_histo.root", "RECREATE");
-  //  TMultiGraph* mg[56];
-  //  TMultiGraph* mgfit[56];
   TDirectory* top = gDirectory;
   TDirectory* Direct[56];
 
@@ -411,18 +372,6 @@ void SpaceResolutionCalibration::storeHisto()
     top->cd();
     Direct[il] = gDirectory->mkdir(Form("lay_%d", il));
     Direct[il]->cd();
-    /*if(m_draw){
-     mg[il] = new TMultiGraph();
-     mg[il]->SetMinimum(0.);
-     mg[il]->SetMaximum(0.04);}
-
-     mgfit[i]=new TMultiGraph();
-     mgfit[i]->SetMinimum(0.);
-     mgfit[i]->SetMaximum(0.0015);
-     mgfit[i]->SetTitle(Form("Layer_%d; Drift Length [cm];#sigma_{int}^{2} [cm^{2}]",i));
-    }
-    */
-
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nalpha; ++al) {
         for (int th = 0; th < m_ntheta; ++th) {
@@ -438,55 +387,10 @@ void SpaceResolutionCalibration::storeHisto()
             gr[il][lr][al][th]->Write();
             gfit[il][lr][al][th]->Write();
           }
-          //    if(m_draw){
-          //    mgfit[i]->Add(gfit[i][lr][al][th]);
-          // mg[il]->Add(gr[il][lr][al][th]);}
         }
       }
     }
   }
-  /*
-  if(m_draw){
-    TH2F* frame[56];
-    TPad* pad[8];
-    TPad* pad1[6];
-    TCanvas* c3 = new TCanvas("c3","c3",1200,800);  c3->Divide(4,2);
-    TCanvas* c4 = new TCanvas("c4","c4",1200,800);  c4->Divide(3,2);
-    for (int p=0; p<6;++p){
-      pad1[p]=(TPad*)(c4->GetPrimitive(Form("c4_%d",p+1)));
-    }
-    for(int i=0;i<56;++i){
-      if (i<8){ c3->cd(i+1);
-  pad[i]=(TPad*)(c3->GetPrimitive(Form("c3_%d",i+1)));
-  pad[i]->cd();
-  pad[i]->SetGrid(kTRUE);
-  frame[i] = new TH2F(Form("frame_%d",i),Form("Layer_%d;Position x (cm);#sigma[cm]",i),100,0,1.,300,0,0.04);
-  frame[i]->SetDirectory(0);
-  frame[i]->Draw();
-  mg[i]->Draw("APL same");
-  pad[i]->BuildLegend();
-      }
-      else{ int index=(i-8)%6;
-  //cout<<"index: "<<index<<endl;
-  pad1[index]->cd();
-  pad1[index]->SetGrid(kTRUE);
-  frame[i] = new TH2F(Form("frame_%d",i),Form("Layer_%d;Position x (cm);#sigma[cm]",i),100,0,1.,300,0,0.04);
-  frame[i]->SetDirectory(0);
-  frame[i]->Draw();
-  mg[i]->Draw("same");
-  pad1[index]->BuildLegend();
-      }
-
-      if (i==7){c3->Print("IntResolution.pdf(","Title: intRes_Slayer_0"); delete c3;}
-      if ((i-8)%6==5) {
-  if ((i-7)/6==8){c4->Print("IntResolution.pdf)",Form("Title:intRes_Slayer_%d",(i-7)/6));}
-  else{c4->Print("IntResolution.pdf",Form("Title:intRes_Slayer_%d",(i-7)/6));}
-      }
-
-    }
-  }
-  */
-
   ff->Close();
   B2INFO("Finish store histogram");
 }

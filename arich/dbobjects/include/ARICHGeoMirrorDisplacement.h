@@ -12,8 +12,6 @@
 
 #include <arich/dbobjects/ARICHGeoBase.h>
 #include <arich/dbobjects/ARICHPositionElement.h>
-#include <TVector3.h>
-#include <TRotation.h>
 
 namespace Belle2 {
 

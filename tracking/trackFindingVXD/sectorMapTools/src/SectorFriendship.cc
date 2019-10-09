@@ -9,10 +9,9 @@
  **************************************************************************/
 
 #include "tracking/trackFindingVXD/sectorMapTools/SectorFriendship.h"
+#include "tracking/trackFindingVXD/sectorMapTools/ActivatedSector.h"
 
 #include "tracking/trackFindingVXD/trackSegmentTools/FilterBase.h"
-
-#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;

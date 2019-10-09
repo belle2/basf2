@@ -8,12 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <bklm/dataobjects/BKLMElementNumbers.h>
-#include <eklm/dataobjects/ElementNumbersSingleton.h>
+/* Own header. */
+#include <klm/dbobjects/KLMChannelStatus.h>
+
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dbobjects/KLMChannelStatus.h>
+
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -59,7 +63,7 @@ int KLMChannelStatus::getActiveStripsEKLMSector(int sectorGlobal) const
 {
   int active;
   int nPlanes, nStrips;
-  int endcap, layer, sector, plane, strip;
+  int section, layer, sector, plane, strip;
   const EKLM::ElementNumbersSingleton* eklmElementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
   const KLMElementNumbers* elementNumbers =
@@ -67,12 +71,12 @@ int KLMChannelStatus::getActiveStripsEKLMSector(int sectorGlobal) const
   nPlanes = eklmElementNumbers->getMaximalPlaneNumber();
   nStrips = eklmElementNumbers->getMaximalStripNumber();
   eklmElementNumbers->sectorNumberToElementNumbers(
-    sectorGlobal, &endcap, &layer, &sector);
+    sectorGlobal, &section, &layer, &sector);
   active = 0;
   for (plane = 1; plane <= nPlanes; ++plane) {
     for (strip = 1; strip <= nStrips; ++strip) {
       uint16_t channel = elementNumbers->channelNumberEKLM(
-                           endcap, sector, layer, plane, strip);
+                           section, sector, layer, plane, strip);
       enum ChannelStatus status = getChannelStatus(channel);
       if (status == c_Unknown)
         B2FATAL("Incomplete KLM channel data.");

@@ -50,9 +50,9 @@ namespace Belle2::Conditions {
      */
     size_t write_function(void* buffer, size_t size, size_t nmemb, void* userp)
     {
-      std::ostream& stream = *static_cast<std::ostream*>(userp);
       // size in bytes is size*nmemb so copy the correct amount and return it to curl
       try {
+        std::ostream& stream = *static_cast<std::ostream*>(userp);
         stream.write(static_cast<const char*>(buffer), size * nmemb);
       } catch (std::ios_base::failure& e) {
         B2ERROR("Writing error while downloading: " << e.code().message() << '(' << e.code().value() << ')');

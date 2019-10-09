@@ -7,8 +7,8 @@
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/WireTrackCandHit.h>
 #include <genfit/RKTrackRep.h>
-
-#include <framework/dataobjects/Helix.h>
+#include <genfit/MplTrackRep.h>
+#include <simulation/monopoles/MonopoleConstants.h>
 
 using namespace Belle2;
 
@@ -398,7 +398,11 @@ genfit::AbsTrackRep* RecoTrackGenfitAccess::createOrReturnRKTrackRep(RecoTrack& 
 
   // not available? create one
   if (trackRepresentation == nullptr) {
-    trackRepresentation = new genfit::RKTrackRep(PDGcode);
+    if (PDGcode == Monopoles::c_monopolePDGCode) {
+      trackRepresentation = new genfit::MplTrackRep(PDGcode, Monopoles::monopoleMagCharge);
+    } else {
+      trackRepresentation = new genfit::RKTrackRep(PDGcode);
+    }
     RecoTrackGenfitAccess::getGenfitTrack(recoTrack).addTrackRep(trackRepresentation);
   }
   return trackRepresentation;
@@ -532,6 +536,7 @@ std::vector<RecoHitInformation*> RecoTrack::getRecoHitInformations(bool getSorte
 
   hitList.reserve(recoHitInformations.size());
   for (auto& recoHit : recoHitInformations) {
+    // cppcheck-suppress useStlAlgorithm
     hitList.push_back(&recoHit);
   }
 

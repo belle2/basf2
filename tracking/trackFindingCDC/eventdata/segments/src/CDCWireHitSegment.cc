@@ -18,6 +18,7 @@ std::vector<const CDCWire*> CDCWireHitSegment::getWireSegment() const
 {
   std::vector<const CDCWire*> wireSegment;
   for (const CDCWireHit* ptrWireHit : *this) {
+    // cppcheck-suppress useStlAlgorithm
     wireSegment.push_back(&(ptrWireHit->getWire()));
   }
   return wireSegment;

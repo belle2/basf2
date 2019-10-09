@@ -17,7 +17,6 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <pxd/reconstruction/PXDRecoHit.h>
 
 using namespace std;
 using namespace Belle2;

@@ -23,19 +23,11 @@
 #include "G4ThreeVector.hh"
 #include "G4RotationMatrix.hh"
 #include "G4Transform3D.hh"
-#include "G4AffineTransform.hh"
 #include "G4VPVParameterisation.hh"
 #include <G4Tubs.hh>
-#include <G4Polyhedra.hh>
 #include <G4Box.hh>
-#include <G4SubtractionSolid.hh>
-#include <G4UnionSolid.hh>
-#include <G4Polycone.hh>
-#include <G4Cons.hh>
-#include <G4Trap.hh>
-#include <G4IntersectionSolid.hh>
-#include <G4ReflectedSolid.hh>
 #include <G4Polyhedron.hh>
+#include <G4DisplacedSolid.hh>
 
 #include <iomanip>
 

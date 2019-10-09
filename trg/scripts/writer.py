@@ -80,7 +80,10 @@ class VCDWriter(object):
     def __init__(self, file, timescale='1 us', date=None, comment='',
                  version='', default_scope_type='module', scope_sep='.',
                  check_values=True, init_timestamp=0):
+        """Initialization of VCDWriter"""
+        #: output file
         self._ofile = file
+        #: header keywords
         self._header_keywords = {
             '$timescale': self._check_timescale(timescale),
             '$date': str(datetime.datetime.now()) if date is None else date,
@@ -90,17 +93,29 @@ class VCDWriter(object):
         if default_scope_type not in self.SCOPE_TYPES:
             raise ValueError('Invalid default scope type ({})'.format(
                 default_scope_type))
+        #: set default_scope_type
         self._default_scope_type = default_scope_type
+        #: set scope_sep
         self._scope_sep = scope_sep
+        #: set check_values
         self._check_values = check_values
+        #: set registering
         self._registering = True
+        #: set closed
         self._closed = False
+        #: set dumping
         self._dumping = True
+        #: set next_var_id
         self._next_var_id = 0
+        #: set scope_var_strs
         self._scope_var_strs = {}
+        #: set scope_var_names
         self._scope_var_names = {}
+        #: set scopr_types
         self._scope_types = {}
+        #: set ident_values
         self._ident_values = OrderedDict()
+        #: set time_stamp
         self._timestamp = int(init_timestamp)
 
     def set_scope_type(self, scope, scope_type):
@@ -219,10 +234,12 @@ class VCDWriter(object):
     def dump_off(self, timestamp):
         """Suspend dumping to VCD file."""
         if self._dumping and not self._registering and self._ident_values:
+            """set dump_off"""
             self._dump_off(timestamp)
         self._dumping = False
 
     def _dump_off(self, timestamp):
+        """Stop dumping to VCD file."""
         print('#' + str(int(timestamp)), file=self._ofile)
         print('$dumpoff', file=self._ofile)
         for ident, val_str in six.iteritems(self._ident_values):
@@ -238,10 +255,12 @@ class VCDWriter(object):
         """Resume dumping to VCD file."""
         if not self._dumping and not self._registering and self._ident_values:
             print('#' + str(int(timestamp)), file=self._ofile)
+            """set dump_values"""
             self._dump_values('$dumpon')
         self._dumping = True
 
     def _dump_values(self, keyword):
+        """Dump values to VCD file."""
         print(keyword, file=self._ofile)
         # TODO: events should be excluded
         print(*six.itervalues(self._ident_values),
@@ -297,6 +316,7 @@ class VCDWriter(object):
             self._ident_values[var.ident] = val_str
 
     def _get_scope_tuple(self, scope):
+        """get scope tuple function of the VCDWrite"""
         if isinstance(scope, six.string_types):
             return tuple(scope.split(self._scope_sep))
         if isinstance(scope, (list, tuple)):
@@ -306,6 +326,7 @@ class VCDWriter(object):
 
     @classmethod
     def _check_timescale(cls, timescale):
+        """check time scale function of the VCDWrite"""
         if isinstance(timescale, (list, tuple)):
             if len(timescale) == 1:
                 num_str = '1'
@@ -338,9 +359,11 @@ class VCDWriter(object):
         return ' '.join([num_str, unit])
 
     def __enter__(self):
+        """enter of VCDWriter"""
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """exit of VCDWriter"""
         self.close()
 
     def close(self, timestamp=None):
@@ -383,6 +406,7 @@ class VCDWriter(object):
         self._ofile.flush()
 
     def _gen_header(self):
+        """generate header for VCDWriter"""
         for kwname, kwvalue in sorted(six.iteritems(self._header_keywords)):
             if not kwvalue:
                 continue
@@ -423,6 +447,7 @@ class VCDWriter(object):
         yield '$enddefinitions $end'
 
     def _finalize_registration(self):
+        """finalize registration of VCDWriter"""
         assert self._registering
         print(*self._gen_header(), sep='\n', file=self._ofile)
         if self._ident_values:
@@ -441,9 +466,11 @@ class VCDWriter(object):
 class Variable(object):
     """VCD variable details needed to call :meth:`VCDWriter.change()`."""
 
+    #: variables
     __slots__ = ('ident', 'type', 'size')
 
     def __init__(self, ident, type, size):
+        """Initialization of Variable function"""
         #: Identifier used in VCD output stream.
         self.ident = ident
         #: VCD variable type; one of :const:`VCDWriter.VAR_TYPES`.
@@ -463,6 +490,7 @@ class ScalarVariable(Variable):
 
     """
 
+    #: variables
     __slots__ = ()
 
     def format_value(self, value, check=True):
@@ -493,6 +521,7 @@ class RealVariable(Variable):
 
     """
 
+    #: variables
     __slots__ = ()
 
     def format_value(self, value, check=True):
@@ -518,6 +547,7 @@ class VectorVariable(Variable):
 
     """
 
+    #: variables
     __slots__ = ()
 
     def format_value(self, value, check=True):
@@ -567,6 +597,7 @@ class VectorVariable(Variable):
         return 'b{} {}'.format(value_str, self.ident)
 
     def _format_value(self, value, size, check):
+        """format value function of VCDWriter"""
         if isinstance(value, six.integer_types):
             max_val = 1 << size
             if check and (-value > (max_val >> 1) or value >= max_val):

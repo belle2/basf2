@@ -79,8 +79,8 @@ namespace Belle2 {
     DBObjPtr<TOPCalTimebase> m_timebase; /**< timebase */
 
     // database objects used only to check "hasChanged" status
-    DBArray<TOPPmtInstallation> m_pmtInstalled; /**< PMT installation data */
-    DBArray<TOPPmtQE> m_pmtQEData; /**< quantum efficiencies */
+    OptionalDBArray<TOPPmtInstallation> m_pmtInstalled; /**< PMT installation data */
+    OptionalDBArray<TOPPmtQE> m_pmtQEData; /**< quantum efficiencies */
     DBObjPtr<TOPCalChannelRQE> m_channelRQE; /**< channel relative quantum effi. */
     DBObjPtr<TOPCalChannelThresholdEff> m_thresholdEff; /**< channel threshold effi. */
 

@@ -35,7 +35,7 @@ beamparameters = add_beamparameters(main, "Y4S")
 # Geometry and Geant simulation
 paramloader = register_module('Gearbox')
 geometry = register_module('Geometry')
-geometry.param('components', ['BKLM', 'EKLM'])
+geometry.param('components', ['KLM'])
 geometry.param('useDB', False)
 g4sim = register_module('FullSim')
 
@@ -43,8 +43,12 @@ g4sim = register_module('FullSim')
 klmDigitizer = register_module('KLMDigitizer')
 bklmReconstructor = register_module('BKLMReconstructor')
 eklmReconstructor = register_module('EKLMReconstructor')
-klmK0LReconstructor = register_module('KLMK0LReconstructor')
+klmClustersReconstructor = register_module('KLMClustersReconstructor')
 mc_matcher = register_module('MCMatcherKLMClusters')
+
+# Add progress bars
+progress = register_module('Progress')
+progressBar = register_module('ProgressBar')
 
 # Output
 output = register_module('RootOutput')
@@ -60,10 +64,13 @@ main.add_module(g4sim)
 main.add_module(klmDigitizer)
 main.add_module(bklmReconstructor)
 main.add_module(eklmReconstructor)
-main.add_module(klmK0LReconstructor)
+main.add_module(klmClustersReconstructor)
 main.add_module(mc_matcher)
+
+main.add_module(progress)
+main.add_module(progressBar)
 
 main.add_module(output)
 
-# Process 100 events
+# Process the path
 process(main)

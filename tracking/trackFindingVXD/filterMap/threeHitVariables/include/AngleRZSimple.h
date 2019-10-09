@@ -13,7 +13,6 @@
 #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariable.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/CosDirectionXY.h>
 #include <framework/geometry/B2Vector3.h>
-#include <math.h>
 
 #define ANGLERZSIMPLE_NAME AngleRZSimple
 

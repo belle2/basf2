@@ -10,11 +10,11 @@
 
 #pragma once
 
-/* Belle2 headers. */
-#include <bklm/dataobjects/BKLMSimHit.h>
-#include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/dataobjects/EKLMSimHit.h>
-#include <eklm/dbobjects/EKLMChannelData.h>
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMSimHit.h>
+#include <klm/eklm/dataobjects/EKLMHitMCTime.h>
+#include <klm/eklm/dataobjects/EKLMSimHit.h>
+#include <klm/eklm/dbobjects/EKLMChannelData.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 

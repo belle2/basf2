@@ -8,9 +8,8 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/dataobjects/VxdID.h>
 
 #include <TFile.h>
 #include <TText.h>

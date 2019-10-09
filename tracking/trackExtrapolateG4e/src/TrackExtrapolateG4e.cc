@@ -17,23 +17,24 @@
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/geometry/BFieldManager.h>
-#include <bklm/dataobjects/BKLMStatus.h>
+#include <klm/bklm/dataobjects/BKLMStatus.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/Muid.h>
 #include <tracking/dataobjects/MuidHit.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <eklm/dataobjects/EKLMHit2d.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
 #include <simulation/kernel/ExtManager.h>
 #include <simulation/kernel/ExtCylSurfaceTarget.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <bklm/geometry/GeometryPar.h>
-#include <bklm/geometry/Module.h>
-#include <eklm/geometry/GeometryData.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/bklm/geometry/Module.h>
+#include <klm/eklm/geometry/GeometryData.h>
 #include <genfit/Exception.h>
 
 #include <cmath>
@@ -45,7 +46,6 @@
 #include <CLHEP/Units/SystemOfUnits.h>
 #include <CLHEP/Matrix/Vector.h>
 
-#include <globals.hh>
 #include <G4PhysicalVolumeStore.hh>
 #include <G4VPhysicalVolume.hh>
 #include <G4Track.hh>
@@ -53,7 +53,6 @@
 #include <G4StepPoint.hh>
 #include <G4VTouchable.hh>
 #include <G4TouchableHandle.hh>
-#include <G4NavigationHistory.hh>
 #include <G4ParticleTable.hh>
 #include <G4ErrorPropagatorData.hh>
 #include <G4ErrorFreeTrajState.hh>
@@ -141,14 +140,14 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_ElectronPar(NULL), // modified later
   m_PositronPar(NULL) // modified later
 {
-  for (int j = 0; j < NLAYER + 1; ++j) {
+  for (int j = 0; j < BKLMElementNumbers::getMaximalLayerNumber() + 1; ++j) {
     m_BarrelPhiStripVariance[j] = 0.0;
     m_BarrelZStripVariance[j] = 0.0;
     m_BarrelPhiStripVariance[j] = 0.0;
     m_EndcapModuleMiddleZ[j] = 0.0;
   }
-  for (int s = 0; s < NSECTOR + 1; ++s) {
-    for (int j = 0; j < NLAYER + 1; ++j) {
+  for (int s = 0; s < BKLMElementNumbers::getMaximalSectorNumber() + 1; ++s) {
+    for (int j = 0; j < BKLMElementNumbers::getMaximalLayerNumber() + 1; ++j) {
       m_BarrelModuleMiddleRadius[0][s][j] = 0.0;
       m_BarrelModuleMiddleRadius[1][s][j] = 0.0;
     }
@@ -291,7 +290,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
   const EKLM::GeometryData& eklmGeometry = EKLM::GeometryData::Instance();
   m_BarrelHalfLength = bklmGeometry->getHalfLength() * CLHEP::cm; // in G4 units (mm)
-  m_EndcapHalfLength = 0.5 * eklmGeometry.getEndcapPosition()->getLength(); // in G4 units (mm)
+  m_EndcapHalfLength = 0.5 * eklmGeometry.getSectionPosition()->getLength(); // in G4 units (mm)
   m_OffsetZ = bklmGeometry->getOffsetZ() * CLHEP::cm; // in G4 units (mm)
   double minZ = m_OffsetZ - (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
   double maxZ = m_OffsetZ + (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
@@ -305,8 +304,8 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_OffsetZ /= CLHEP::cm;                            // now in G4e units (cm)
   m_BarrelMinR = bklmGeometry->getGap1InnerRadius(); // in G4e units (cm)
   m_BarrelMaxR /= CLHEP::cm;                         // now in G4e units (cm)
-  m_EndcapMinR = eklmGeometry.getEndcapPosition()->getInnerR() / CLHEP::cm; // in G4e units (cm)
-  m_EndcapMaxR = eklmGeometry.getEndcapPosition()->getOuterR() / CLHEP::cm; // in G4e units (cm)
+  m_EndcapMinR = eklmGeometry.getSectionPosition()->getInnerR() / CLHEP::cm; // in G4e units (cm)
+  m_EndcapMaxR = eklmGeometry.getSectionPosition()->getOuterR() / CLHEP::cm; // in G4e units (cm)
   m_EndcapMiddleZ = m_BarrelHalfLength + m_EndcapHalfLength;                // in G4e units (cm)
 
   // Measurement uncertainties and acceptance windows
@@ -316,7 +315,8 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_BarrelScintVariance = width * width / 12.0;
   int nBarrelLayers = bklmGeometry->getNLayer();
   for (int layer = 1; layer <= nBarrelLayers; ++layer) {
-    const bklm::Module* module = bklmGeometry->findModule(layer, false);
+    const bklm::Module* module =
+      bklmGeometry->findModule(BKLMElementNumbers::c_ForwardSection, 1, layer);
     width = module->getPhiStripWidth(); // in G4e units (cm)
     m_BarrelPhiStripVariance[layer - 1] = width * width / 12.0;
     width = module->getZStripWidth(); // in G4e units (cm)
@@ -326,18 +326,18 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   // KLM geometry (for associating KLM hit with extrapolated crossing point)
 
   m_OutermostActiveBarrelLayer = nBarrelLayers - 1; // zero-based counting
-  for (int sector = 1; sector <= m_BarrelNSector; ++sector) {
-    for (int layer = 1; layer <= nBarrelLayers; ++layer) {
-      m_BarrelModuleMiddleRadius[BKLM_FORWARD - 1][sector - 1][layer - 1] = bklmGeometry->getActiveMiddleRadius(BKLM_FORWARD, sector,
-          layer); // in G4e units (cm)
-      m_BarrelModuleMiddleRadius[BKLM_BACKWARD - 1][sector - 1][layer - 1] = bklmGeometry->getActiveMiddleRadius(BKLM_BACKWARD, sector,
-          layer); // in G4e units (cm)
+  for (int section = 0; section <= BKLMElementNumbers::getMaximalSectionNumber(); ++section) {
+    for (int sector = 1; sector <= m_BarrelNSector; ++sector) {
+      for (int layer = 1; layer <= nBarrelLayers; ++layer) {
+        m_BarrelModuleMiddleRadius[section][sector - 1][layer - 1] =
+          bklmGeometry->getActiveMiddleRadius(section, sector, layer); // in G4e units (cm)
+      }
     }
   }
   double dz(eklmGeometry.getLayerShiftZ() / CLHEP::cm); // in G4e units (cm)
-  double z0((eklmGeometry.getEndcapPosition()->getZ()
+  double z0((eklmGeometry.getSectionPosition()->getZ()
              + eklmGeometry.getLayerShiftZ()
-             - 0.5 * eklmGeometry.getEndcapPosition()->getLength()
+             - 0.5 * eklmGeometry.getSectionPosition()->getLength()
              - 0.5 * eklmGeometry.getLayerPosition()->getLength()) / CLHEP::cm); // in G4e units (cm)
 
   int nEndcapLayers = eklmGeometry.getNLayers();
@@ -362,6 +362,8 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
   if (byMuid) {
     if (!m_muidParameters.isValid())
       B2FATAL("Muid parameters are not available.");
+    if (!m_klmStripEfficiency.isValid())
+      B2FATAL("KLM strip efficiency data are not available.");
     if (m_MuonPlusPar != NULL) {
       if (m_ExpNo == expNo) { return; }
       delete m_MuonPlusPar;
@@ -1019,29 +1021,23 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
         // int plane = touch->GetCopyNumber(0);
         int layer = touch->GetCopyNumber(4);
         int sector = touch->GetCopyNumber(6);
-        bool isForward = (touch->GetCopyNumber(7) == BKLM_FORWARD);
-        copyID = (isForward ? BKLM_END_MASK : 0)
-                 | ((sector - 1) << BKLM_SECTOR_BIT)
-                 | ((layer - 1) << BKLM_LAYER_BIT)
-                 | BKLM_INRPC_MASK
-                 | BKLM_MC_MASK;
+        int section = touch->GetCopyNumber(7);
+        copyID = BKLMElementNumbers::moduleNumber(section, sector, layer);
       }
       return;
     case VOLTYPE_BKLM2: // BKLM scints
       detID = Const::EDetector::BKLM;
       if (touch->GetHistoryDepth() == DEPTH_SCINT) {
-        int scint = touch->GetCopyNumber(1);
-        int plane = touch->GetCopyNumber(2);
+        int strip = touch->GetCopyNumber(1);
+        int plane = (touch->GetCopyNumber(2) == BKLM_INNER) ?
+                    BKLMElementNumbers::c_PhiPlane :
+                    BKLMElementNumbers::c_ZPlane;
         int layer = touch->GetCopyNumber(6);
         int sector = touch->GetCopyNumber(8);
-        bool isForward = (touch->GetCopyNumber(9) == BKLM_FORWARD);
-        copyID = (isForward ? BKLM_END_MASK : 0)
-                 | ((sector - 1) << BKLM_SECTOR_BIT)
-                 | ((layer - 1) << BKLM_LAYER_BIT)
-                 | ((scint - 1) << BKLM_STRIP_BIT)
-                 | ((scint - 1) << BKLM_MAXSTRIP_BIT)
-                 | (plane == BKLM_INNER ? BKLM_PLANE_MASK : 0)
-                 | BKLM_MC_MASK;
+        int section = touch->GetCopyNumber(9);
+        copyID = BKLMElementNumbers::channelNumber(
+                   section, sector, layer, plane, strip);
+        BKLMStatus::setMaximalStrip(copyID, strip);
       }
       return;
     case VOLTYPE_EKLM:
@@ -1343,8 +1339,12 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         (*bklmHitUsed)[intersection.hit].insert(std::pair<const Track*, double>(extState.track, intersection.chi2));
         extState.extLayerPattern |= (0x00000001 << intersection.layer);
         //efficiency implementation
-        muid->setExtBKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0),
-                                        intersection.sector + 1, intersection.layer + 1, 1, 1));
+        float phiBarrelEfficiency = m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0), intersection.sector + 1,
+                                    intersection.layer + 1, 1, 1);
+        float zBarrelEfficiency = m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0), intersection.sector + 1,
+                                  intersection.layer + 1, 0, 1);
+        muid->setExtBKLMEfficiencyValue(intersection.layer, phiBarrelEfficiency * zBarrelEfficiency);
+
         if (extState.lastBarrelExtLayer < intersection.layer) {
           extState.lastBarrelExtLayer = intersection.layer;
         }
@@ -1365,10 +1365,11 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           int layer = intersection.layer + 1; // from 0-based to 1-based enumeration
           bool isDead = true; // by default, the nearest orthogonal strips are dead
           if (m_klmChannelStatusValid) {
-            bool isForward = intersection.isForward;
-            int fb = (isForward ? 1 : 0);
+            int section = intersection.isForward ?
+                          BKLMElementNumbers::c_ForwardSection :
+                          BKLMElementNumbers::c_BackwardSection;
             int sector = intersection.sector + 1; // from 0-based to 1-based enumeration
-            const bklm::Module* m = bklm::GeometryPar::instance()->findModule(isForward, sector, layer); // uses 1-based enumeration
+            const bklm::Module* m = bklm::GeometryPar::instance()->findModule(section, sector, layer); // uses 1-based enumeration
             if (m) {
               const CLHEP::Hep3Vector localPosition = m->globalToLocal(intersection.position); // uses and returns position in cm
               int zStrip = m->getZStripNumber(localPosition);
@@ -1376,17 +1377,21 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
               if (zStrip >= 0 && phiStrip >= 0) {
                 uint16_t channel1, channel2;
                 channel1 = m_klmElementNumbers->channelNumberBKLM(
-                             fb, sector, layer, 0, zStrip);
+                             section, sector, layer,
+                             BKLMElementNumbers::c_ZPlane, zStrip);
                 channel2 = m_klmElementNumbers->channelNumberBKLM(
-                             fb, sector, layer, 1, phiStrip);
+                             section, sector, layer,
+                             BKLMElementNumbers::c_PhiPlane, phiStrip);
                 enum KLMChannelStatus::ChannelStatus status1, status2;
                 status1 = m_klmChannelStatus->getChannelStatus(channel1);
                 status2 = m_klmChannelStatus->getChannelStatus(channel2);
                 if (status1 == KLMChannelStatus::c_Unknown ||
                     status2 == KLMChannelStatus::c_Unknown)
                   B2ERROR("No KLM channel status data."
-                          << LogVar("Forward", fb) << LogVar("Sector", sector)
-                          << LogVar("Layer", layer) << LogVar("Z strip", zStrip)
+                          << LogVar("Section", section)
+                          << LogVar("Sector", sector)
+                          << LogVar("Layer", layer)
+                          << LogVar("Z strip", zStrip)
                           << LogVar("Phi strip", phiStrip));
                 isDead = (status1 == KLMChannelStatus::c_Dead ||
                           status2 == KLMChannelStatus::c_Dead);
@@ -1395,11 +1400,15 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           }
           if (!isDead) {
             extState.extLayerPattern |= (0x00000001 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
-            //efficiency storage
-            if (m_klmStripEfficiency.isValid()) {
-              muid->setExtBKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0),
-                                              intersection.sector + 1, intersection.layer + 1, 1, 1));
-            }
+            float phiBarrelEfficiency =
+              m_klmStripEfficiency->getBarrelEfficiency(
+                (intersection.isForward ? 1 : 0), intersection.sector + 1,
+                intersection.layer + 1, BKLMElementNumbers::c_PhiPlane, 1);
+            float zBarrelEfficiency =
+              m_klmStripEfficiency->getBarrelEfficiency(
+                (intersection.isForward ? 1 : 0), intersection.sector + 1,
+                intersection.layer + 1, BKLMElementNumbers::c_ZPlane, 1);
+            muid->setExtBKLMEfficiencyValue(intersection.layer, phiBarrelEfficiency * zBarrelEfficiency);
           } else {
             muid->setExtBKLMEfficiencyValue(intersection.layer, 0);
           }
@@ -1418,7 +1427,14 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
       fromG4eToPhasespace(g4eState, intersection.covariance);
       if (findMatchingEndcapHit(intersection, extState.track)) {
         extState.extLayerPattern |= (0x00008000 << intersection.layer);
-        //        extState.extEKLMEfficiencyVector[intersection.layer] == 1; TODO
+        //efficiency implementation
+        float layerEndcapEfficiency = 1.;
+        for (int plane = 1; plane <= EKLMElementNumbers::getMaximalPlaneNumber(); plane++) {
+          layerEndcapEfficiency *= m_klmStripEfficiency->getEndcapEfficiency((intersection.isForward ? 1 : 0) + 1, intersection.sector + 1,
+                                   intersection.layer + 1, plane, 1);
+        }
+        muid->setExtEKLMEfficiencyValue(intersection.layer, layerEndcapEfficiency);
+
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;
         }
@@ -1454,9 +1470,14 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         }
         if (!isDead) {
           extState.extLayerPattern |= (0x00008000 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
-          //          extState.extEKLMEfficiencyVector[intersection.layer] == 1; TODO
+          float layerEndcapEfficiency = 1.;
+          for (int plane = 1; plane <= EKLMElementNumbers::getMaximalPlaneNumber(); plane++) {
+            layerEndcapEfficiency *= m_klmStripEfficiency->getEndcapEfficiency((intersection.isForward ? 1 : 0) + 1, intersection.sector + 1,
+                                     intersection.layer + 1, plane, 1);
+          }
+          muid->setExtEKLMEfficiencyValue(intersection.layer, layerEndcapEfficiency);
         } else {
-          //          extState.extEKLMEfficiencyVector[intersection.layer] == 0; TODO
+          muid->setExtEKLMEfficiencyValue(intersection.layer, 0);
         }
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;
@@ -1510,14 +1531,16 @@ bool TrackExtrapolateG4e::findBarrelIntersection(ExtState& extState, const G4Thr
   if (phi < 0.0) { phi += TWOPI; }
   if (phi > TWOPI - PI_8) { phi -= TWOPI; }
   int sector = (int)((phi + PI_8) / M_PI_4);
-  int fb = (intersection.position.z() > m_OffsetZ ? BKLM_FORWARD : BKLM_BACKWARD) - 1;
+  int section = intersection.position.z() > m_OffsetZ ?
+                BKLMElementNumbers::c_ForwardSection :
+                BKLMElementNumbers::c_BackwardSection;
 
   double oldR = oldPosition * m_BarrelSectorPerp[sector];
   double newR = intersection.position * m_BarrelSectorPerp[sector];
 
   for (int layer = extState.firstBarrelLayer; layer <= m_OutermostActiveBarrelLayer; ++layer) {
-    if (newR <  m_BarrelModuleMiddleRadius[fb][sector][layer]) break;
-    if (oldR <= m_BarrelModuleMiddleRadius[fb][sector][layer]) {
+    if (newR <  m_BarrelModuleMiddleRadius[section][sector][layer]) break;
+    if (oldR <= m_BarrelModuleMiddleRadius[section][sector][layer]) {
       extState.firstBarrelLayer = layer + 1; // ratchet outward for next call's loop starting value
       if (extState.firstBarrelLayer > m_OutermostActiveBarrelLayer) extState.escaped = true;
       intersection.inBarrel = true;
@@ -1602,8 +1625,10 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
       if ((dSector != +1) && (dSector != m_BarrelNSector - 1)) continue;
       // Use the normal vector of the adjacent (hit's) sector
       G4ThreeVector nHit(m_BarrelSectorPerp[sector]);
-      int fb = (intersection.isForward ? BKLM_FORWARD : BKLM_BACKWARD) - 1;
-      double dn2 = intersection.position * nHit - m_BarrelModuleMiddleRadius[fb][sector][intersection.layer];
+      int section = intersection.isForward ?
+                    BKLMElementNumbers::c_ForwardSection :
+                    BKLMElementNumbers::c_BackwardSection;
+      double dn2 = intersection.position * nHit - m_BarrelModuleMiddleRadius[section][sector][intersection.layer];
       dn = diff * nHit + dn2;
       if (std::fabs(dn) > 1.0) continue;
       // Project extrapolated track to the hit's plane in the adjacent sector
@@ -1623,7 +1648,7 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
 
   if (bestHit >= 0) {
     BKLMHit2d* hit = bklmHits[bestHit];
-    intersection.isForward = (hit->getForward() == 1);
+    intersection.isForward = (hit->getSection() == 1);
     intersection.sector = hit->getSector() - 1;
     intersection.time = hit->getTime();
     double localVariance[2] = {m_BarrelScintVariance, m_BarrelScintVariance};
@@ -1667,7 +1692,7 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
   for (int h = 0; h < eklmHits.getEntries(); ++h) {
     EKLMHit2d* hit = eklmHits[h];
     if (hit->getLayer() != matchingLayer) continue;
-    if (hit->getEndcap() != matchingEndcap) continue;
+    if (hit->getSection() != matchingEndcap) continue;
     // DIVOT no such function for EKLM!
     // if (hit->isOutOfTime()) continue;
     if (std::fabs(hit->getTime() - m_MeanDt) > m_MaxDt) continue;
@@ -1686,7 +1711,7 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
   if (bestHit >= 0) {
     EKLMHit2d* hit = eklmHits[bestHit];
     intersection.hit = bestHit;
-    intersection.isForward = (hit->getEndcap() == 2);
+    intersection.isForward = (hit->getSection() == 2);
     intersection.sector = hit->getSector() - 1;
     intersection.time = hit->getTime();
     double localVariance[2] = {m_EndcapScintVariance, m_EndcapScintVariance};

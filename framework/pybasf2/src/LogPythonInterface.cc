@@ -12,13 +12,13 @@
 
 #include <framework/pybasf2/LogPythonInterface.h>
 
-#include <framework/logging/Logger.h>
 #include <framework/logging/LogConnectionFilter.h>
 #include <framework/logging/LogConnectionTxtFile.h>
 #include <framework/logging/LogConnectionJSON.h>
 #include <framework/logging/LogConnectionUDP.h>
 #include <framework/logging/LogConnectionConsole.h>
 #include <framework/logging/LogVariableStream.h>
+#include <framework/logging/LogSystem.h>
 
 #include <framework/core/Environment.h>
 

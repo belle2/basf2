@@ -76,6 +76,7 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   addParam("TrueHits", m_storeTrueHitsName, "TrueHit collection name",
            string(""));
   addParam("ShaperDigits", m_storeShaperDigitsName, "ShaperDigits collection name", string(""));
+  addParam("SVDEventInfo", m_svdEventInfoName, "SVDEventInfo name", string("SVDEventInfoSim"));
 
   // 2. Physics
   addParam("SegmentLength", m_segmentLength,
@@ -102,7 +103,7 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   addParam("ADCSamplingTime", m_samplingTime,
            "Interval between ADC samples in ns", double(31.44));
   addParam("StartSampling", m_startSampling,
-           "Start of the sampling window, in ns", double(-31.44));
+           "Start of the sampling window, in ns", double(47.16));
   addParam("RandomizeEventTimes", m_randomizeEventTimes,
            "Randomize event times over a frame interval", bool(false));
   addParam("TimeFrameLow", m_minTimeFrame,
@@ -649,7 +650,7 @@ double SVDDigitizerModule::addNoise(double charge, double noise)
 
 void SVDDigitizerModule::saveDigits()
 {
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
   SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
 
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);

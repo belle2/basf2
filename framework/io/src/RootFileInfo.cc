@@ -15,7 +15,6 @@
 
 #include <TTree.h>
 #include <TFile.h>
-#include <TBranchElement.h>
 
 namespace Belle2::RootIOUtilities {
   RootFileInfo::RootFileInfo(const std::string& filename)
@@ -36,7 +35,6 @@ namespace Belle2::RootIOUtilities {
     getTree("persistent", c_treeNames[DataStore::c_Persistent], m_persistent);
     getTree("event", c_treeNames[DataStore::c_Event], m_events);
     // And finally check the number of entries in the persistent tree
-    // cppcheck-suppress syntaxError ; if with initializer is not yet supported
     if (auto npersistent = m_persistent->GetEntries(); npersistent != 1) {
       throw std::runtime_error("Expected exactly one entry in persistent tree, found " + std::to_string(npersistent));
     }

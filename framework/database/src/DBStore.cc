@@ -9,15 +9,10 @@
  **************************************************************************/
 
 #include <framework/database/DBStore.h>
-#include <framework/database/IntraRunDependency.h>
 #include <framework/database/Database.h>
 #include <framework/logging/Logger.h>
 
-#include <TClonesArray.h>
 #include <TClass.h>
-#include <TFile.h>
-
-#include <list>
 
 namespace Belle2 {
 
@@ -105,7 +100,8 @@ namespace Belle2 {
     // fine from performance.
     // TODO: once we are sure somehow to not have duplicate iovs we can relax
     // this requirement.
-    std::list<Database::DBQuery> entries;
+    std::vector<Database::DBQuery> entries;
+    entries.reserve(m_dbEntries.size());
     for (auto& entry : m_dbEntries) {
       bool expired = !entry.second.getIoV().contains(event);
       if (expired) {

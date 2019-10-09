@@ -13,10 +13,8 @@
 
 #include <framework/utilities/Utils.h>
 
-#include <tuple>
 #include <utility>
 #include <vector>
-#include <iterator>
 #include <cassert>
 
 namespace Belle2 {

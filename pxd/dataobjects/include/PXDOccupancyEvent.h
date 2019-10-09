@@ -13,7 +13,6 @@
 #define PXD_DATAOBJECTS_PXDOCCUPANCYEVENT_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <algorithm>
 
 namespace Belle2 {
   /** Class PXDOccupancyEvent:

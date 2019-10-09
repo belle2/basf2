@@ -17,14 +17,9 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-#include <svd/geometry/SensorInfo.h>
 #include <svd/dataobjects/SVDCluster.h>
 
-#include <tracking/dataobjects/DATCONSVDDigit.h>
-
 #include <vxd/dataobjects/VxdID.h>
-
-#include <genfit/PlanarMeasurement.h>
 
 #include <vector>
 #include <string>
@@ -50,8 +45,8 @@ namespace Belle2 {
     *  @param clusters            container carrying pointers to DATCONSVDCluster (1 or 2 (u+v), must not be nullptr).
     *  @param aSensorInfo         SensorInfoBase for testing purposes, usually derived from first cluster.
     */
-    DATCONSVDSpacePoint(std::vector<SVDCluster const*>& clusters,
-                        VXD::SensorInfoBase const* aSensorInfo = nullptr);
+    explicit DATCONSVDSpacePoint(std::vector<SVDCluster const*>& clusters,
+                                 VXD::SensorInfoBase const* aSensorInfo = nullptr);
 
     /** Default constructor for the ROOT IO. */
     DATCONSVDSpacePoint() :

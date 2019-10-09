@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import unittest
-import os
 import tempfile
 import basf2
+import b2test_utils
 import modularAnalysis as ma
 from variables import variables
 from vertex import vertexKFit
@@ -19,14 +19,18 @@ class TestAllParticleCombiner(unittest.TestCase):
         """Run the test fit"""
 
         testFile = tempfile.NamedTemporaryFile()
-
-        main = basf2.create_path()
+        # make logging more reproducible by replacing some strings.
+        # Also make sure the testfile name is replaced if necessary
+        b2test_utils.configure_logging_for_tests({testFile.name: "${testfile}"})
+        basf2.conditions.disable_globaltag_replay()
 
         basf2.set_random_seed("1234")
+        main = basf2.create_path()
+        inputfile = b2test_utils.require_file(
+            'analysis/tests/mdst.root', py_case=self)
         main.add_module(
             'RootInput',
-            inputFileNames=[
-                Belle2.FileSystem.findFile('analysis/tests/mdst.root')],
+            inputFileNames=[inputfile],
             logLevel=basf2.LogLevel.ERROR)
 
         ma.fillParticleList('pi+:fromPV', 'dr < 2 and abs(dz) < 5', path=main)
@@ -38,7 +42,7 @@ class TestAllParticleCombiner(unittest.TestCase):
 
         ma.combineAllParticles(['pi+:fromPV'], 'vpho:PVFit', path=main)
 
-        vertexKFit('vpho:PVFit', conf_level=-1, constraint='iptube', path=main, silence_warning=True)
+        vertexKFit('vpho:PVFit', conf_level=-1, constraint='iptube', path=main)
 
         variables.addAlias('PVX', 'x')
         variables.addAlias('PVY', 'y')

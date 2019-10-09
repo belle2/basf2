@@ -11,10 +11,6 @@
 
 //basf2
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapResolverNodeInfo.h>
-#include <framework/logging/Logger.h>
-
-//STL
-#include <numeric>
 
 //ROOT
 #include <TRandom.h>

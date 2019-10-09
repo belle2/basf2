@@ -10,8 +10,6 @@
 
 #include <framework/logging/LogConnectionUDP.h>
 #include <framework/logging/LogMessage.h>
-#include <framework/logging/LogSystem.h>
-#include <iostream>
 
 using namespace boost::asio;
 using boost::asio::ip::udp;

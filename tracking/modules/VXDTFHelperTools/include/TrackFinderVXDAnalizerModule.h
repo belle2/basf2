@@ -19,9 +19,6 @@
 
 //stl-stuff
 #include <string>
-#include <algorithm>
-
-
 
 namespace Belle2 {
   namespace Tracking {
@@ -72,6 +69,7 @@ namespace Belle2 {
         PurityType bestResult = PurityType();
 
         for (const PurityType& iD : purities) {
+          // cppcheck-suppress useStlAlgorithm
           if (iD > bestResult) { bestResult = iD; }
         }
         return bestResult;

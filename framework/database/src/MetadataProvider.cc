@@ -13,9 +13,6 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include <numeric>
-#include <iomanip>
-
 namespace Belle2::Conditions {
   bool MetadataProvider::setTags(const std::vector<std::string>& tags)
   {
@@ -26,11 +23,11 @@ namespace Belle2::Conditions {
       // empty status: Unspecified error already dealt with
       if (status.empty()) return false;
       // otherwise check for valid states
-      if (m_validTagStates.count(status) == 0) {
+      if (m_usableTagStates.count(status) == 0) {
         B2ERROR("The globaltag has a status which is not permitted for use. This is for your own protection"
                 << LogVar("globaltag", name)
                 << LogVar("status", status)
-                << LogVar("allowed states", boost::algorithm::join(m_validTagStates, ", ")));
+                << LogVar("allowed states", boost::algorithm::join(m_usableTagStates, ", ")));
         return false;
       }
       return true;
@@ -63,7 +60,7 @@ namespace Belle2::Conditions {
         // otherwise look for the payload in the list of existing payloads for this run
         if (auto && it = existing.find(payload.name); it != existing.end()) {
           payload.update(it->second);
-          B2DEBUG(35, "Fround requested payload metadata"
+          B2DEBUG(35, "Found requested payload metadata"
                   << LogVar("globaltag", payload.globaltag)
                   << LogVar("name", payload.name)
                   << LogVar("revision", payload.revision)

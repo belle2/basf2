@@ -15,9 +15,7 @@
 #include <TRandom3.h>
 
 // VariableManager and particle(list)
-#include <analysis/variables/Variables.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
@@ -29,7 +27,6 @@
 // framework - set up mock events
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
 #include <framework/utilities/TestHelpers.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Gearbox.h>
@@ -250,9 +247,9 @@ namespace {
     const Manager::Var* clusterThetaCMS = Manager::Instance().getVariable("useCMSFrame(clusterTheta)");
 
     EXPECT_FLOAT_EQ(clusterPhi->function(gammalist->getParticle(1)), 2.0);
-    EXPECT_FLOAT_EQ(clusterPhiCMS->function(gammalist->getParticle(1)), 2.0442522);
+    EXPECT_FLOAT_EQ(clusterPhiCMS->function(gammalist->getParticle(1)), 2.042609);
     EXPECT_FLOAT_EQ(clusterTheta->function(gammalist->getParticle(1)), 1.0);
-    EXPECT_FLOAT_EQ(clusterThetaCMS->function(gammalist->getParticle(1)), 1.2625268);
+    EXPECT_FLOAT_EQ(clusterThetaCMS->function(gammalist->getParticle(1)), 1.2599005);
 
     // test cluster quantities directly (lab system only)
     EXPECT_FLOAT_EQ(clusterPhi->function(gammalist->getParticle(0)), eclclusters[0]->getPhi());

@@ -11,7 +11,6 @@
 #ifndef CDCHIT_H
 #define CDCHIT_H
 
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <cdc/dataobjects/WireID.h>
 #include <framework/dataobjects/DigitBase.h>

@@ -16,7 +16,6 @@
 //Framework
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventT0.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
 //ECL

@@ -18,7 +18,6 @@
 
 namespace Belle2 {
   class MCParticle;
-  class CDCSimHit;
   class CDCHit;
 
   namespace TrackFindingCDC {
@@ -71,6 +70,9 @@ namespace Belle2 {
     public:
       /// Clears all Monte Carlo information left from the last event
       void clear();
+
+      /// Dummy constructor to silence the intel-compiler warnings (NOTE: using "=default" will make the intel compilation fail)
+      CDCMCHitCollectionLookUp() {};
 
     private:
       /// Fill a map with the number of hits for each track id contained in the given hit range.

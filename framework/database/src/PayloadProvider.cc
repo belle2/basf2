@@ -15,6 +15,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <sys/stat.h>
+
 namespace fs = boost::filesystem;
 
 namespace Belle2::Conditions {
@@ -103,6 +105,9 @@ namespace Belle2::Conditions {
     try {
       // now we need to make the directories to the file
       try {
+        // Make sure that we create directories writable for all users
+        auto oldUmask = umask(0);
+        ScopeGuard umaskGuard([oldUmask] {umask(oldUmask);});
         fs::create_directories(local.parent_path());
       } catch (fs::filesystem_error& e) {
         B2WARNING("Cannot create local payload directory" << LogVar("directory", local.parent_path())
@@ -126,6 +131,9 @@ namespace Belle2::Conditions {
         B2ERROR("Cannot open file for writing" << LogVar("filename", local) << LogVar("error", strerror(errno)));
         throw std::runtime_error("cannot open file for writing????");
       }
+      // and make sure it's readable for all
+      boost::filesystem::permissions(local, boost::filesystem::all_all &
+                                     ~(boost::filesystem::owner_exe | boost::filesystem::group_exe | boost::filesystem::others_exe));
       // File is open. Someone might have downloaded the file
       // while we waited, check md5sum again.
       B2DEBUG(37, "Ok, check digest in case another process downloaded already...");
@@ -166,10 +174,10 @@ namespace Belle2::Conditions {
     switch (structure) {
       case EDirectoryLayout::c_hashed:
         path /= payload.checksum.substr(0, 2);
-        path /= "dbstore_" + payload.name + "_rev_" + std::to_string(payload.revision) + ".root";
+        path /= payload.name + "_r" + std::to_string(payload.revision) + ".root";
         break;
       case EDirectoryLayout::c_flat:
-        path /= payload.name + "_r" + std::to_string(payload.revision) + ".root";
+        path /= "dbstore_" + payload.name + "_rev_" + std::to_string(payload.revision) + ".root";
         break;
     };
     return path.string();

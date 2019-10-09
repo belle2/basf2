@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include "../include/PXDSVDCutModule.h"
-#include <framework/logging/Logger.h>
 
 #include <vector>
 

@@ -11,7 +11,6 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariable.h>
-#include <math.h>
 
 #define DISTANCE1DZSQUARED_NAME Distance1DZSquared
 

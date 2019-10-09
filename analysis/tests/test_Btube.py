@@ -7,6 +7,7 @@ import stdCharged as stdc
 import sys
 import b2test_utils
 
+from basf2 import conditions
 from variables import variables
 from ROOT import Belle2
 from ROOT import TFile
@@ -58,7 +59,7 @@ my_path = b2.create_path()
 # load input ROOT file
 
 ma.inputMdst('default',
-             Belle2.FileSystem.findFile('analysis/tests/mdst.root'),
+             b2test_utils.require_file('analysis/tests/mdst.root'),
              path=my_path)
 
 stdc.stdPi(listtype='all', path=my_path)
@@ -90,8 +91,10 @@ ma.applyCuts('B-:sigT', 'abs(mcPDG)==521', path=my_path)
 ma.reconstructDecay('Upsilon(4S):sig -> B+:tag B-:sigT', '', path=my_path)
 
 mytestmodule2 = ma.register_module('BtubeCreator')
-my_path.add_module(mytestmodule2,
-                   listName='Upsilon(4S):sig')
+# select the daughter which will be used as reference to create Btube.
+# Order of daughters should be identical to decay string used in
+# reconstructDecay
+my_path.add_module(mytestmodule2, listName='Upsilon(4S):sig', decayString='Upsilon(4S):sig -> ^B+:tag B-:sigT')
 vx.vertexRave('B-:sigT', 0.0, '', 'btube', path=my_path)
 # Saving variables to ntuple
 output_file = 'test.root'
@@ -133,5 +136,6 @@ ma.variablesToNtuple('Upsilon(4S):sig', U4S_vars,
                      filename=output_file, treename='u4stree', path=my_path)
 ma.variablesToNtuple('B+:tag', common_vars,
                      filename=output_file, treename='tagtree', path=my_path)
+
 with b2test_utils.clean_working_directory():
     b2test_utils.safe_process(my_path)

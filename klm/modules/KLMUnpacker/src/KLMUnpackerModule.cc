@@ -230,16 +230,11 @@ void KLMUnpackerModule::unpackBKLMDigit(
   int layer = BKLMElementNumbers::getLayerByModule(moduleId);
   if ((layer < BKLMElementNumbers::c_FirstRPCLayer) && ((raw.triggerBits & 0x10) != 0))
     return;
-  int channel = BKLMElementNumbers::getStripByModule(moduleId);
-
   if (layer > BKLMElementNumbers::getMaximalLayerNumber()) {
     B2DEBUG(20, "KLMUnpackerModule:: strange that the layer number is larger than 15 "
             << LogVar("Layer", layer));
     return;
   }
-
-  // still have to add channel and axis to moduleId
-  BKLMStatus::setMaximalStrip(moduleId, channel);
 
   BKLMDigit* bklmDigit;
   if (layer >= BKLMElementNumbers::c_FirstRPCLayer) {

@@ -65,8 +65,9 @@ namespace Belle2 {
       int fitChannels(std::shared_ptr<TH2F> h);
 
       /**
-       * Fit pulse-height distribution with P(x) = (x/x0)^p1 * exp(-(x/x0)^p2) and p1 = 1.
-       * Fitting with floating p1 found to be unstabe.
+       * Fit pulse-height distribution of a single channel with
+       *   P(x) = (x/x0)^p1 * exp(-(x/x0)^p2) and p1 = 1.
+       * Fitting with p1 floating found to be unstabe.
        * @param h histogram
        * @return fit status
        */
@@ -74,7 +75,7 @@ namespace Belle2 {
 
       /**
        * Calculate and return threshold efficiency
-       * @param k histogram
+       * @param h histogram
        * @param func fitted function
        * @return threshold efficiency
        */
@@ -96,10 +97,12 @@ namespace Belle2 {
       float m_p1err = 0; /**< error on p1 */
       float m_p2err = 0; /**< error on p2 */
       float m_effi = 0; /**< threshold efficiency */
-      float m_mean = 0; /**< fitted distribution mean value */
+      float m_meanHist = 0; /**< histogram mean value */
+      float m_meanFunc = 0; /**< fitted distribution mean value */
       float m_chi2 = 0;  /**< chi^2 */
       int m_ndf = 0; /**< NDF */
       int m_fitStatus = -1; /**< fit status */
+      bool m_good = false; /**< on true fit is good */
 
       // output file and tree
       TFile* m_file = 0; /**< root file */

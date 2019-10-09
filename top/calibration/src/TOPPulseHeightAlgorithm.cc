@@ -53,10 +53,23 @@ namespace Belle2 {
       m_tree->Branch<float>("p1err", &m_p1err);
       m_tree->Branch<float>("p2err", &m_p2err);
       m_tree->Branch<float>("effi", &m_effi);
-      m_tree->Branch<float>("mean", &m_mean);
+      m_tree->Branch<float>("meanHist", &m_meanHist);
+      m_tree->Branch<float>("meanFunc", &m_meanFunc);
       m_tree->Branch<float>("chi2", &m_chi2);
       m_tree->Branch<int>("ndf", &m_ndf);
       m_tree->Branch<int>("fitStatus", &m_fitStatus);
+      m_tree->Branch<bool>("good", &m_good);
+
+      // write-out control histograms
+
+      auto h1a = getObjectPtr<TH1F>("time");
+      if (h1a) h1a->Write();
+      auto h1b = getObjectPtr<TH1F>("time_sel");
+      if (h1b) h1b->Write();
+      auto h2a = getObjectPtr<TH2F>("ph_vs_width");
+      if (h2a) h2a->Write();
+      auto h2b = getObjectPtr<TH2F>("ph_vs_width_sel");
+      if (h2b) h2b->Write();
 
       // create payloads for storing results
 
@@ -87,7 +100,7 @@ namespace Belle2 {
       m_file->Write();
       m_file->Close();
 
-      // check the results and return if fraction of successfully fitted too small
+      // check the results and return if fraction of well fitted too small
 
       if (nsucc / 8192.0 < m_minCalibrated) {
         delete m_pulseHeight;
@@ -106,8 +119,8 @@ namespace Belle2 {
 
     int TOPPulseHeightAlgorithm::fitChannels(std::shared_ptr<TH2F> h2d)
     {
-
       int n = 0;
+
       for (int ch = 0; ch < h2d->GetNbinsX(); ch++) {
         m_channel =  ch;
         string chan = to_string(ch);
@@ -116,13 +129,16 @@ namespace Belle2 {
         auto* h = h2d->ProjectionY(name.c_str(), ch + 1, ch + 1);
         string title = "slot " + to_string(m_slot) + " channel " + to_string(ch);
         h->SetTitle(title.c_str());
+
         auto status = fitPulseHeight(h);
-        if (status == 0) {
+
+        if (status == 0 and m_good) {
           m_pulseHeight->setParameters(m_slot, m_channel, m_x0, m_p1, m_p2);
-          m_thresholdEffi->setThrEff(m_slot, m_channel, m_effi, m_xmin);
+          m_thresholdEffi->setThrEff(m_slot, m_channel, std::min(m_effi, 1.0f), m_xmin);
           n++;
         }
       }
+
       return n;
     }
 
@@ -138,20 +154,13 @@ namespace Belle2 {
       auto* func = new TF1("func", "[0]*x/[1]*exp(-pow(x/[1],[2]))", xmin, xmax);
 
       double p2 = 1.0;
-      double x0 = h->GetMean() / 3;
-      func->SetParameter(0, 1);
+      m_meanHist = h->GetMean();
+      double x0 = m_meanHist / 3;            // for p2 = 1 only
+      func->SetParameter(0, m_numPhot / x0); // for p2 = 1 only
       func->SetParameter(1, x0);
       func->SetParameter(2, p2);
-      double maxPosition = h->GetBinCenter(h->GetMaximumBin());
-      double fmax = h->GetMaximum() / func->Eval(maxPosition);
-      func->SetParameter(0, fmax);
 
       int status = h->Fit(func, "LRSQ", "", m_xmin, xmax);
-
-      if (status == 4) {
-        func->SetParameter(1, x0 / 2);
-        status = h->Fit(func, "LRSQ", "", m_xmin, xmax);
-      }
 
       m_x0 = func->GetParameter(1);
       m_p1 = 1.0;
@@ -161,8 +170,9 @@ namespace Belle2 {
       m_p2err = func->GetParError(2);
       m_chi2 = func->GetChisquare();
       m_effi = getEfficiency(h, func);
-      m_mean = TMath::Gamma((m_p1 + 2) / m_p2) / TMath::Gamma((m_p1 + 1) / m_p2) * m_x0;
+      m_meanFunc = TMath::Gamma((m_p1 + 2) / m_p2) / TMath::Gamma((m_p1 + 1) / m_p2) * m_x0;
       m_fitStatus = status;
+      m_good = (m_chi2 / m_ndf < 10 and m_p2 > 0.5 and m_p2 < 5);
       m_tree->Fill();
 
       return status;
@@ -171,7 +181,6 @@ namespace Belle2 {
 
     double TOPPulseHeightAlgorithm::getEfficiency(TH1D* h, TF1* func)
     {
-
       double fbelow = 0;
       double fabove = 0;
       double count = 0;

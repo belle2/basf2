@@ -382,9 +382,10 @@ def command_tag_state(args, db):
     if db is None:
         args.add_argument("tag", metavar="TAGNAME", help="globaltag to be changed")
         args.add_argument("state", metavar="STATE", help="new state for the globaltag")
+        args.add_argument("--force", default=False, action="store_true", help=argparse.SUPPRESS)
         return
 
-    return change_state(db, args.tag, args.state)
+    return change_state(db, args.tag, args.state, args.force)
 
 
 def command_tag_publish(args, db):

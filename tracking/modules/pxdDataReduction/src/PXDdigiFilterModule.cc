@@ -68,6 +68,8 @@ void PXDdigiFilterModule::initialize()
 
 void PXDdigiFilterModule::event()
 {
+  B2INFO("ROI finding performed!");
+
   StoreArray<PXDDigit> PXDDigits(m_PXDDigitsName);   /**< The PXDDigits to be filtered */
   StoreArray<ROIid> ROIids_store_array(m_ROIidsName); /**< The ROIs */
 

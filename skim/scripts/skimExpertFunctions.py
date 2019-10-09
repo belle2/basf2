@@ -229,9 +229,9 @@ class RetentionCheck(Module):
 
     Parameters:
 
-        module_name -- name of the module after which the retention rate is measured
-        module_number -- index of the module after which the retention rate is measured
-        particle_lists -- list of particle list names which will be tracked by the module
+        module_name (str): name of the module after which the retention rate is measured
+        module_number (int): index of the module after which the retention rate is measured
+        particle_lists (list(str)): list of particle list names which will be tracked by the module
     """
 
     summary = {}  # static dictionary containing the results (retention rates, number of candidates, ...)
@@ -333,10 +333,10 @@ class RetentionCheck(Module):
 
         Parameters:
 
-            particle_lists -- particle list name
-            title -- plot title (overwritten by the -o argument in basf2)
-            save_as -- output filename (overwritten by the -o argument in basf2)
-            module_name_max_length -- if the module name length is higher than this value, do not display the full name
+            particle_list (str): particle list name
+            title (str): plot title (overwritten by the -o argument in basf2)
+            save_as (str): output filename (overwritten by the -o argument in basf2)
+            module_name_max_length (int): if the module name length is higher than this value, do not display the full name
         """
         module_name = []
         retention = []

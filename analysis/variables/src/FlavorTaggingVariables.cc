@@ -1480,12 +1480,12 @@ namespace Belle2 {
         int indexRanking = -1;
 
         for (unsigned i = 0; i < availableExtraInfos.size(); ++i) {
-          if (rankingExtraInfo == availableExtraInfos[i]) indexRanking = i;
+          if (rankingExtraInfo == availableExtraInfos[i]) {indexRanking = i; break;}
         }
 
 
         for (unsigned i = 0; i < availableExtraInfos.size(); ++i) {
-          if (outputExtraInfo == availableExtraInfos[i]) indexOutput = i;
+          if (outputExtraInfo == availableExtraInfos[i]) {indexOutput = i; break;}
         }
 
         if (indexRanking == -1) {
@@ -1571,12 +1571,12 @@ namespace Belle2 {
 
 
         for (unsigned i = 0; i < availableExtraInfos.size(); ++i) {
-          if (rankingExtraInfo == availableExtraInfos[i]) indexRanking = i;
+          if (rankingExtraInfo == availableExtraInfos[i]) {indexRanking = i; break;}
         }
 
 
         for (unsigned i = 0; i < availableExtraInfos.size(); ++i) {
-          if (outputExtraInfo == availableExtraInfos[i]) indexOutput = i;
+          if (outputExtraInfo == availableExtraInfos[i]) {indexOutput = i; break;}
         }
 
         if (indexRanking == -1) {
@@ -1678,11 +1678,11 @@ namespace Belle2 {
       int indexRanking = -1;
 
       for (unsigned i = 0; i < availableExtraInfos.size(); ++i) {
-        if (rankingExtraInfo == availableExtraInfos[i]) indexRanking = i;
+        if (rankingExtraInfo == availableExtraInfos[i]) {indexRanking = i; break;}
       }
 
       if (indexRanking == -1) {
-        B2FATAL("variableOfTarget: Not available category " << rankingExtraInfo <<
+        B2FATAL("variableOfTarget: category " << rankingExtraInfo << "not available" <<
                 ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
                 <<
                 ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");

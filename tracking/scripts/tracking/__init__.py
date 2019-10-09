@@ -226,7 +226,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
             cdc_reco_tracks = reco_tracks
 
     if is_cdc_used(components):
-        add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks)
+        add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks,
+                              add_mva_quality_indicator=add_mva_quality_indicator)
         temporary_reco_track_list.append(cdc_reco_tracks)
         latest_reco_tracks = cdc_reco_tracks
 
@@ -235,7 +236,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                               output_reco_tracks=svd_cdc_reco_tracks, use_mc_truth=use_mc_truth,
                               temporary_reco_tracks=svd_reco_tracks,
                               svd_ckf_mode=svd_ckf_mode, add_both_directions=add_both_directions,
-                              use_svd_to_cdc_ckf=use_svd_to_cdc_ckf, prune_temporary_tracks=prune_temporary_tracks)
+                              use_svd_to_cdc_ckf=use_svd_to_cdc_ckf, prune_temporary_tracks=prune_temporary_tracks,
+                              add_mva_quality_indicator=add_mva_quality_indicator)
         temporary_reco_track_list.append(svd_reco_tracks)
         temporary_reco_track_list.append(svd_cdc_reco_tracks)
         latest_reco_tracks = svd_cdc_reco_tracks

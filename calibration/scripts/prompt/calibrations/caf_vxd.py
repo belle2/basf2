@@ -19,11 +19,31 @@ def get_calibrations(input_data, **kwargs):
 
     import basf2
 
-    # Get your input data files separated into your input_data_names.
-    # You could also get each file's IoV from input_data["physics"].values()/items() if you wanted.
-    input_files_physics = list(input_data["physics"].keys())
-    input_files_cosmics = list(input_data["cosmics"].keys())
-    input_files_Bcosmics = list(input_data["Bcosmics"].keys())
+    # Get your input data files + IoVs separated into your input_data_names.
+    file_to_iov_physics = input_data["physics"]
+    file_to_iov_cosmics = input_data["cosmics"]
+    file_to_iov_Bcosmics = input_data["Bcosmics"]
+
+    # We might have requested an enormous amount of data across a requested range.
+    # There's a LOT more files than runs!
+    # Lets set some limits because this calibration doesn't need that much to run.
+    max_files_per_run = 2
+
+    # We filter out any more than 2 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
+    # already. This procedure respects that ordering
+    from prompt.utils import filter_by_max_files_per_run
+
+    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run)
+    input_files_physics = list(reduced_file_to_iov_physics.keys())
+    basf2.B2INFO(f"Total number of physics files actually used as input = {len(input_files_physics)}")
+
+    reduced_file_to_iov_cosmics = filter_by_max_files_per_run(file_to_iov_cosmics, max_files_per_run)
+    input_files_cosmics = list(reduced_file_to_iov_cosmics.keys())
+    basf2.B2INFO(f"Total number of cosmics files actually used as input = {len(input_files_cosmics)}")
+
+    reduced_file_to_iov_Bcosmics = filter_by_max_files_per_run(file_to_iov_Bcosmics, max_files_per_run)
+    input_files_Bcosmics = list(reduced_file_to_iov_Bcosmics.keys())
+    basf2.B2INFO(f"Total number of Bcosmics files actually used as input = {len(input_files_Bcosmics)}")
 
     # Get the overall IoV we want to cover for this request, including the end values
     requested_iov = kwargs.get("requested_iov", None)

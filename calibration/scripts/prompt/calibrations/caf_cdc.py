@@ -17,10 +17,28 @@ settings = CalibrationSettings(name="CDC Tracking",
 ################################################
 
 def get_calibrations(input_data, **kwargs):
-    # Gets the input files, but not the IoV objects of those files, which are also passed in.
-    input_file_dict = {"hlt_mumu": list(input_data["hlt_mumu"].keys()),
-                       "hlt_hadron": list(input_data["hlt_hadron"].keys()),
-                       }
+    # Gets the input files and IoV objects associated with the files.
+    file_to_iov_mumu = input_data["hlt_mumu"]
+    file_to_iov_hadron = input_data["hlt_hadron"]
+
+    # We might have requested an enormous amount of data across a requested range.
+    # There's a LOT more files than runs!
+    # Lets set some limits because this calibration doesn't need that much to run.
+    max_files_per_run = 2
+
+    # We filter out any more than 2 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
+    # already. This procedure respects that ordering
+    from prompt.utils import filter_by_max_files_per_run
+
+    reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run)
+    input_files_mumu = list(reduced_file_to_iov_mumu.keys())
+    basf2.B2INFO(f"Total number of hlt_mumu files actually used as input = {len(input_files_mumu)}")
+
+    reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, max_files_per_run)
+    input_files_hadron = list(reduced_file_to_iov_cosmics.keys())
+    basf2.B2INFO(f"Total number of hlt_hadron files actually used as input = {len(input_files_hadron)}")
+
+    input_file_dict = {"hlt_mumu": input_files_mumu, "hlt_hadron": input_files_hadron}
 
     # Get the overall IoV we want to cover, including the end values
     requested_iov = kwargs.get("requested_iov", None)

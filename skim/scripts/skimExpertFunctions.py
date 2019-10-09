@@ -271,15 +271,23 @@ class RetentionCheck(Module):
 
     def terminate(self):
 
+        N = Belle2.Environment.Instance().getNumberOfEvents()
+
         for particle_list in self.particle_lists:
 
-            retention_rate = float(self.event_with_candidate_count[particle_list]) / \
-                Belle2.Environment.Instance().getNumberOfEvents()
+            if N > 0:
+
+                retention_rate = float(self.event_with_candidate_count[particle_list]) / N
+
+            else:
+
+                B2WARNING("Belle2.Environment.Instance().getNumberOfEvents() gives 0 or less.")
+                retention_rate = 0
 
             type(self).summary[self._key][particle_list] = {"retention_rate": retention_rate,
                                                             "#candidates": self.candidate_count[particle_list],
                                                             "#evts_with_candidates": self.event_with_candidate_count[particle_list],
-                                                            "total_#events": Belle2.Environment.Instance().getNumberOfEvents()}
+                                                            "total_#events": N}
 
     @classmethod
     def print_results(cls):
@@ -412,8 +420,8 @@ def pathWithRetentionCheck(particle_lists, path):
 
     Parameters:
 
-        particle_lists -- list of particle list names which will be tracked by RetentionCheck
-        path -- initial path (it is not modified, see warning above and example of use)
+        particle_lists (list(str)): list of particle list names which will be tracked by RetentionCheck
+        path (basf2.Path): initial path (it is not modified, see warning above and example of use)
     """
     new_path = Path()
     for module_number, module in enumerate(path.modules()):

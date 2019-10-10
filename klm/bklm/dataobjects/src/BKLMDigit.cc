@@ -13,6 +13,7 @@
 
 /* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMSimHit.h>
+#include <klm/bklm/dataobjects/BKLMStatus.h>
 
 using namespace Belle2;
 
@@ -45,9 +46,8 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   m_Charge(0.0),
   m_FitStatus(0)
 {
-  m_ModuleID = simHit->getModuleID() & ~(BKLM_STRIP_MASK | BKLM_MAXSTRIP_MASK);
-  m_ModuleID |= ((strip - 1) << BKLM_STRIP_BIT);
-  m_ModuleID |= ((strip - 1) << BKLM_MAXSTRIP_BIT);
+  m_ModuleID = simHit->getModuleID();
+  BKLMElementNumbers::setStripInModule(m_ModuleID, strip);
 }
 
 BKLMDigit::BKLMDigit(int moduleID, int ctime, short tdc, short charge) :

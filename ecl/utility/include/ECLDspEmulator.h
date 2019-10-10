@@ -12,6 +12,7 @@ namespace Belle2 {
     /**
      * @brief Function that emulates shape fitting algorithm used in ShaperDSP.
      *        f, f1, fg* are coefficients from ECLDspData
+     * See ecl/examples/EclShapeFitter.py for usage example.
      *
      * @param[in] f[16][192]    Array with tabulated signal waveform.
      * @param[in] f1[16][192]   Array with tabulated derivative of signal waveform

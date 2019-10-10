@@ -61,6 +61,11 @@ namespace Belle2 {
         m_iov = IntervalOfValidity();
         m_mapCalibData.clear();
       }
+      /// Clear calibration data
+      void clearCalibrationData()
+      {
+        m_mapCalibData.clear();
+      }
       /// Returns the vector of ExpRuns
       const std::vector<Calibration::ExpRun>& getRequestedRuns() const {return m_requestedRuns;}
       /// Sets the vector of ExpRuns
@@ -271,6 +276,9 @@ namespace Belle2 {
 
     /// Set algorithm description (in constructor)
     void setDescription(const std::string& description) {m_description = description;}
+
+    /// Clear calibration data
+    void clearCalibrationData() {m_data.clearCalibrationData();}
 
     /// Returns the Exp,Run pair that means 'Everything'. Currently unused.
     Calibration::ExpRun getAllGranularityExpRun() const {return m_allExpRun;}

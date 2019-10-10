@@ -390,7 +390,7 @@ void ECLDQMEXTENDEDModule::initDspfromFile()
     } else if (iCrate > 44) {
       if (iShaperPosition > 8) continue;
     }
-    ECLDspData* dspdata = readEclDsp(x.path().string().c_str(), iShaperPosition - 1);
+    ECLDspData* dspdata = ECLDspUtilities::readEclDsp(x.path().string().c_str(), iShaperPosition - 1);
     callbackCalibration(dspdata, map_vec, map_coef);
     map_container_vec[iShaper] = map_vec;
     map_container_coef[iShaper] = map_coef;

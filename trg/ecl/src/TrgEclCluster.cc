@@ -528,9 +528,12 @@ TrgEclCluster::setForwardICN(int Method)
   std::vector<double> TempClusterPositionX;
   std::vector<double> TempClusterPositionY;
   std::vector<double> TempClusterPositionZ;
+  std::vector<double> Sort1D;
+  std::vector<std::vector<double>> Sort2D;
+
   std::vector<int> TempNofTCinCluster;
   std::vector<int> TempMaxTCId;
-  std::vector<int> sortTCId;
+
   int TempICNTCId = 0;;
 
   TempClusterEnergy.clear();
@@ -540,7 +543,11 @@ TrgEclCluster::setForwardICN(int Method)
   TempClusterPositionZ.clear();
   TempNofTCinCluster.clear();
   TempMaxTCId.clear();
-  sortTCId.clear();
+
+  Sort2D.clear();
+  Sort1D.clear();
+
+
 
 
 
@@ -1002,23 +1009,39 @@ TrgEclCluster::setForwardICN(int Method)
       TempClusterPositionZ.push_back(clusterpositionZ);
       TempNofTCinCluster.push_back(noftcincluster);
       TempMaxTCId.push_back(maxTCId);
-      sortTCId.push_back(TempICNTCId);
+
+
+      Sort1D.push_back(TempICNTCId);
+      Sort1D.push_back(clusterenergy);
+      Sort1D.push_back(clustertiming);
+      Sort1D.push_back(clusterpositionX);
+      Sort1D.push_back(clusterpositionY);
+      Sort1D.push_back(clusterpositionZ);
+      Sort1D.push_back(noftcincluster);
+      Sort1D.push_back(maxTCId);
+
+      Sort2D.push_back(Sort1D);
+      Sort1D.clear();
+
     }
 
   }
 
   // Sorting in the order of TC Id
-  sort(sortTCId.begin(), sortTCId.end());
-  const int clustersize = sortTCId.size();
+
+  sort(Sort2D.begin(), Sort2D.end(),
+  [](const vector<double>& aa1, const vector<double>& aa2) {return aa1[0] < aa2[0];});
+
+  const int clustersize = Sort2D.size();
   for (int jtc = 0; jtc < clustersize; jtc++) {
 
-    ClusterEnergy[1].push_back(TempClusterEnergy[jtc]);
-    ClusterTiming[1].push_back(TempClusterTiming[jtc]);
-    ClusterPositionX[1].push_back(TempClusterPositionX[jtc]);
-    ClusterPositionY[1].push_back(TempClusterPositionY[jtc]);
-    ClusterPositionZ[1].push_back(TempClusterPositionZ[jtc]);
-    NofTCinCluster[1].push_back(TempNofTCinCluster[jtc]);
-    MaxTCId[1].push_back(TempMaxTCId[jtc]);
+    ClusterEnergy[1].push_back(Sort2D[jtc][1]);
+    ClusterTiming[1].push_back(Sort2D[jtc][2]);
+    ClusterPositionX[1].push_back(Sort2D[jtc][3]);
+    ClusterPositionY[1].push_back(Sort2D[jtc][4]);
+    ClusterPositionZ[1].push_back(Sort2D[jtc][5]);
+    NofTCinCluster[1].push_back(Sort2D[jtc][6]);
+    MaxTCId[1].push_back(Sort2D[jtc][7]);
 
 
   }
@@ -1047,7 +1070,10 @@ void TrgEclCluster::setBackwardICN(int Method)
   std::vector<double> TempClusterPositionZ;
   std::vector<int> TempNofTCinCluster;
   std::vector<int> TempMaxTCId;
-  std::vector<int> sortTCId;
+
+  std::vector<double> Sort1D;
+  std::vector<std::vector<double>> Sort2D;
+
   int TempICNTCId = 0;
 
   TempClusterEnergy.clear();
@@ -1057,7 +1083,8 @@ void TrgEclCluster::setBackwardICN(int Method)
   TempClusterPositionZ.clear();
   TempNofTCinCluster.clear();
   TempMaxTCId.clear();
-  sortTCId.clear();
+  Sort1D.clear();
+  Sort2D.clear();
 
 
 
@@ -1135,8 +1162,11 @@ void TrgEclCluster::setBackwardICN(int Method)
 
       if (iii == 0) {
         TempCluster[1] = TCFire[31]; // top
+        TempCluster[6] = TCFire[33]; //bottom left
         TempCluster[8] = TCFire[63]; //top left
+
       } else  if (iii == 31) {
+        TempCluster[1] = TCFire[30]; // top
         TempCluster[5] = TCFire[0]; //bottom
         TempCluster[6] = TCFire[32]; //bottom left
       } else {
@@ -1156,7 +1186,9 @@ void TrgEclCluster::setBackwardICN(int Method)
       if (iii == 32) {
         TempCluster[1] = TCFire[63]; // top
         TempCluster[2] = TCFire[31];// right top
+        TempCluster[5] = TCFire[33]; //bottom
       } else if (iii == 63) {
+        TempCluster[2] = TCFire[30];// right top
         TempCluster[5] = TCFire[32]; //bottom
         TempCluster[4] = TCFire[0]; //right bottom
 
@@ -1207,8 +1239,10 @@ void TrgEclCluster::setBackwardICN(int Method)
 
             if (kkk == 0) {
               TempCluster[1] = TCFire[31]; // top
+              TempCluster[6] = TCFire[33]; //bottom left
               TempCluster[8] = TCFire[63]; //top left
             } else    if (kkk == 31) {
+              TempCluster[1] = TCFire[30]; // top
               TempCluster[5] = TCFire[0]; //bottom
               TempCluster[6] = TCFire[32]; //bottom left
             } else {
@@ -1228,10 +1262,12 @@ void TrgEclCluster::setBackwardICN(int Method)
             if (kkk == 32) {
               TempCluster[1] = TCFire[63]; // top
               TempCluster[2] = TCFire[31];// right top
-
+              TempCluster[5] = TCFire[33]; //bottom
             } else if (kkk == 63) {
+              TempCluster[2] = TCFire[30];// right top
               TempCluster[5] = TCFire[32]; //bottom
               TempCluster[4] = TCFire[0]; //right bottom
+
             } else {
               TempCluster[2] = TCFire[kkk - 33]; // right top
               TempCluster[5] = TCFire[kkk + 1]; //bottom
@@ -1293,22 +1329,38 @@ void TrgEclCluster::setBackwardICN(int Method)
         TempClusterPositionZ.push_back(clusterpositionZ);
         TempNofTCinCluster.push_back(noftcincluster);
         TempMaxTCId.push_back(maxTCId);
-        sortTCId.push_back(TempICNTCId);
+
+
+        Sort1D.push_back(TempICNTCId);
+        Sort1D.push_back(clusterenergy);
+        Sort1D.push_back(clustertiming);
+        Sort1D.push_back(clusterpositionX);
+        Sort1D.push_back(clusterpositionY);
+        Sort1D.push_back(clusterpositionZ);
+        Sort1D.push_back(noftcincluster);
+        Sort1D.push_back(maxTCId);
+
+        Sort2D.push_back(Sort1D);
+        Sort1D.clear();
+
+
       }
     }
   }
-// Sorting in the order of TC Id
-  sort(sortTCId.begin(), sortTCId.end());
-  const int clustersize = sortTCId.size();
+
+  sort(Sort2D.begin(), Sort2D.end(),
+  [](const vector<double>& aa1, const vector<double>& aa2) {return aa1[0] < aa2[0];});
+
+  const int clustersize = Sort2D.size();
   for (int jtc = 0; jtc < clustersize; jtc++) {
 
-    ClusterEnergy[2].push_back(TempClusterEnergy[jtc]);
-    ClusterTiming[2].push_back(TempClusterTiming[jtc]);
-    ClusterPositionX[2].push_back(TempClusterPositionX[jtc]);
-    ClusterPositionY[2].push_back(TempClusterPositionY[jtc]);
-    ClusterPositionZ[2].push_back(TempClusterPositionZ[jtc]);
-    NofTCinCluster[2].push_back(TempNofTCinCluster[jtc]);
-    MaxTCId[2].push_back(TempMaxTCId[jtc]);
+    ClusterEnergy[2].push_back(Sort2D[jtc][1]);
+    ClusterTiming[2].push_back(Sort2D[jtc][2]);
+    ClusterPositionX[2].push_back(Sort2D[jtc][3]);
+    ClusterPositionY[2].push_back(Sort2D[jtc][4]);
+    ClusterPositionZ[2].push_back(Sort2D[jtc][5]);
+    NofTCinCluster[2].push_back(Sort2D[jtc][6]);
+    MaxTCId[2].push_back(Sort2D[jtc][7]);
 
 
   }

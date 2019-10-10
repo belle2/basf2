@@ -88,7 +88,8 @@ void BKLMHitRateCounter::normalize(unsigned timeStamp)
       m_rates.layerRates[layerGlobal] = 0;
     else {
       m_rates.layerRates[layerGlobal] /= activeStrips;
-      if ((layerGlobal % BKLMElementNumbers::getMaximalLayerNumber()) >= 2) {
+      // layerGlobal is 0-based, while c_FirstRPCLayer is 1-based
+      if ((layerGlobal % BKLMElementNumbers::getMaximalLayerNumber()) >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
         // The layer is an RPC-layer: there are two digits per "real" hit
         // so it's better to divide by 2 the rate
         m_rates.layerRates[layerGlobal] /= 2;

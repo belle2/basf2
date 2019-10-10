@@ -42,7 +42,7 @@ BKLMHit2d::BKLMHit2d(const BKLMHit1d* hitPhi, const BKLMHit1d* hitZ, const CLHEP
   m_ModuleID = hitPhi->getModuleID() | (hitZ->getModuleID() & BKLM_STATUS_MASK);
   m_ZStrips = ((hitZ->getStripMin() - 1) << BKLM_ZSTRIP_BIT) | ((hitZ->getStripMax() - 1) << BKLM_ZMAXSTRIP_BIT);
 
-  if (((hitZ->getModuleID() ^ m_ModuleID) & BKLM_MODULEID_MASK) != 0) {
+  if (!BKLMElementNumbers::hitsFromSameModule(m_ModuleID, hitZ->getModuleID())) {
     B2WARNING("Attempt to form a 2D hit from distinct-module 1D hits");
   }
 

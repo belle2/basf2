@@ -1979,31 +1979,31 @@ namespace Belle2 {
                       "[Eventbased] Returns variable applied to the particle which is related to the current RestOfEvent object"
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
-    REGISTER_VARIABLE("ROE_MC_E", ROE_MC_E,
+    REGISTER_VARIABLE("roeMC_E", ROE_MC_E,
                       "Returns true energy of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
-    REGISTER_VARIABLE("ROE_MC_M", ROE_MC_M,
+    REGISTER_VARIABLE("roeMC_M", ROE_MC_M,
                       "Returns true invariant mass of unused tracks and clusters in ROE");
 
-    REGISTER_VARIABLE("ROE_MC_P", ROE_MC_P,
+    REGISTER_VARIABLE("roeMC_P", ROE_MC_P,
                       "Returns true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
-    REGISTER_VARIABLE("ROE_MC_Px", ROE_MC_Px,
+    REGISTER_VARIABLE("roeMC_Px", ROE_MC_Px,
                       "Returns x component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
-    REGISTER_VARIABLE("ROE_MC_Py", ROE_MC_Py,
+    REGISTER_VARIABLE("roeMC_Py", ROE_MC_Py,
                       "Returns y component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
-    REGISTER_VARIABLE("ROE_MC_Pz", ROE_MC_Pz,
+    REGISTER_VARIABLE("roeMC_Pz", ROE_MC_Pz,
                       "Returns z component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
-    REGISTER_VARIABLE("ROE_MC_Pt", ROE_MC_Pt,
+    REGISTER_VARIABLE("roeMC_Pt", ROE_MC_Pt,
                       "Returns transverse component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
-    REGISTER_VARIABLE("ROE_MC_PTheta", ROE_MC_PTheta,
+    REGISTER_VARIABLE("roeMC_PTheta", ROE_MC_PTheta,
                       "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
-    REGISTER_VARIABLE("ROE_MC_MissFlags(maskName)", ROE_MC_MissingFlags,
+    REGISTER_VARIABLE("roeMC_MissFlags(maskName)", ROE_MC_MissingFlags,
                       "Returns flags corresponding to missing particles on ROE side.");
 
     REGISTER_VARIABLE("nROE_Tracks(maskName)",  nROE_Tracks,
@@ -2019,55 +2019,55 @@ namespace Belle2 {
                       "Returns the number of particles in ROE from the given particle list.\n"
                       "Use of variable aliases is advised.");
 
-    REGISTER_VARIABLE("ROE_charge(maskName)", ROE_Charge,
+    REGISTER_VARIABLE("roeCharge(maskName)", ROE_Charge,
                       "Returns total charge of the related RestOfEvent object.");
 
-    REGISTER_VARIABLE("ROE_eextra(maskName)", ROE_ExtraEnergy,
+    REGISTER_VARIABLE("roeEextra(maskName)", ROE_ExtraEnergy,
                       "Returns extra energy from ECLClusters in the calorimeter that is not associated to the given Particle");
 
-    REGISTER_VARIABLE("ROE_neextra(maskName)", ROE_NeutralExtraEnergy,
+    REGISTER_VARIABLE("roeNeextra(maskName)", ROE_NeutralExtraEnergy,
                       "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle, can be used with Use***Frame() function.");
 
-    REGISTER_VARIABLE("ROE_E(maskName)", ROE_E,
+    REGISTER_VARIABLE("roeE(maskName)", ROE_E,
                       "Returns energy of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
-    REGISTER_VARIABLE("ROE_M(maskName)", ROE_M,
+    REGISTER_VARIABLE("roeM(maskName)", ROE_M,
                       "Returns invariant mass of unused tracks and clusters in ROE");
 
-    REGISTER_VARIABLE("ROE_P(maskName)", ROE_P,
+    REGISTER_VARIABLE("roeP(maskName)", ROE_P,
                       "Returns momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
-    REGISTER_VARIABLE("ROE_Pt(maskName)", ROE_Pt,
+    REGISTER_VARIABLE("roePt(maskName)", ROE_Pt,
                       "Returns transverse component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
-    REGISTER_VARIABLE("ROE_Px(maskName)", ROE_Px,
+    REGISTER_VARIABLE("roePx(maskName)", ROE_Px,
                       "Returns x component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
-    REGISTER_VARIABLE("ROE_Py(maskName)", ROE_Py,
+    REGISTER_VARIABLE("roePy(maskName)", ROE_Py,
                       "Returns y component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
-    REGISTER_VARIABLE("ROE_Pz(maskName)", ROE_Pz,
+    REGISTER_VARIABLE("roePz(maskName)", ROE_Pz,
                       "Returns z component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
-    REGISTER_VARIABLE("ROE_PTheta(maskName)", ROE_PTheta,
+    REGISTER_VARIABLE("roePTheta(maskName)", ROE_PTheta,
                       "Returns theta angle of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
-    REGISTER_VARIABLE("ROE_deltae(maskName)", ROE_DeltaE,
+    REGISTER_VARIABLE("roeDeltae(maskName)", ROE_DeltaE,
                       "Returns energy difference of the related RestOfEvent object with respect to E_cms/2.");
 
-    REGISTER_VARIABLE("ROE_mbc(maskName)", ROE_Mbc,
+    REGISTER_VARIABLE("roeMbc(maskName)", ROE_Mbc,
                       "Returns beam constrained mass of the related RestOfEvent object with respect to E_cms/2.");
 
-    REGISTER_VARIABLE("WE_deltae(maskName, opt)", WE_DeltaE,
+    REGISTER_VARIABLE("weDeltae(maskName, opt)", WE_DeltaE,
                       "Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.");
 
-    REGISTER_VARIABLE("WE_mbc(maskName, opt)", WE_Mbc,
+    REGISTER_VARIABLE("weMbc(maskName, opt)", WE_Mbc,
                       "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.");
 
     REGISTER_VARIABLE("WE_MissM2(maskName, opt)", WE_MissM2,
                       "Returns the invariant mass squared of the missing momentum (see WE_MissE possible options)");
 
-    REGISTER_VARIABLE("REC_MissM2", REC_MissM2,
+    REGISTER_VARIABLE("recMissM2", REC_MissM2,
                       "Returns the invariant mass squared of the missing momentum calculated assumings the"
                       "reco B is at rest and calculating the neutrino (missing) momentum from p_nu = pB - p_had - p_lep");
 
@@ -2097,13 +2097,13 @@ opt = 5: LAB, use energy and momentum of charged particles and photons from whol
 opt = 6: LAB, same as 5, fix Emiss = pmiss; 
 opt = 7: CMS, correct pmiss 3-momentum vector with factor alpha so that dE = 0 (used for Mbc calculation).)DOC");
 
-    REGISTER_VARIABLE("WE_xiZ(maskName)", WE_xiZ,
+    REGISTER_VARIABLE("weXiZ(maskName)", WE_xiZ,
                       "Returns Xi_z in event (for Bhabha suppression and two-photon scattering)");
 
     REGISTER_VARIABLE("bssMassDifference(maskName)", bssMassDifference,
                       "Bs* - Bs mass difference");
 
-    REGISTER_VARIABLE("WE_cosThetaEll(maskName)", WE_cosThetaEll, R"DOC(
+    REGISTER_VARIABLE("weCosThetaEll(maskName)", WE_cosThetaEll, R"DOC(
 
 Returns the angle between $M$ and lepton in W rest frame in the decays of the type:
 :math`M \to h_1 ... h_n \ell`, where W 4-momentum is given as
@@ -2118,26 +2118,26 @@ The neutrino momentum is calculated from ROE taking into account the specified m
     
 )DOC");
 
-    REGISTER_VARIABLE("REC_q2BhSimple", REC_q2BhSimple,
+    REGISTER_VARIABLE("recQ2BhSimple", REC_q2BhSimple,
                       "Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2, \n"
                       "where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell.\n"
                       "The B meson momentum in CMS is assumed to be 0.");
 
-    REGISTER_VARIABLE("REC_q2Bh", REC_q2Bh,
+    REGISTER_VARIABLE("recQ2Bh", REC_q2Bh,
                       "Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2, \n"
                       "where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell.\n"
                       "This calculation uses a weighted average of the B meson around the reco B cone");
 
-    REGISTER_VARIABLE("WE_q2lnuSimple(maskName,option)", WE_q2lnuSimple,
+    REGISTER_VARIABLE("weQ2lnuSimple(maskName,option)", WE_q2lnuSimple,
                       "Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2, \n"
                       "where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter.");
 
-    REGISTER_VARIABLE("WE_q2lnu(maskName)", WE_q2lnu,
+    REGISTER_VARIABLE("weQ2lnu(maskName)", WE_q2lnu,
                       "Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2, \n"
                       "where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter. \n"
                       "This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction");
 
-    REGISTER_VARIABLE("WE_MissM2OverMissE(maskName)", WE_MissM2OverMissE,
+    REGISTER_VARIABLE("weMissM2OverMissE(maskName)", WE_MissM2OverMissE,
                       "Returns missing mass squared over missing energy");
 
     REGISTER_VARIABLE("passesROEMask(maskName)", passesROEMask,

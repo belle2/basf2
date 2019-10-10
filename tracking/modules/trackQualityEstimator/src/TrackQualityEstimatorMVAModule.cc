@@ -65,8 +65,8 @@ void TrackQualityEstimatorMVAModule::event()
     const RecoTrack* pxdRecoTrack = recoTrack.getRelatedTo<RecoTrack>(m_pxdRecoTracksStoreArrayName);
     const RecoTrack* svdcdcRecoTrack =
       recoTrack.getRelatedTo<RecoTrack>(m_svdcdcRecoTracksStoreArrayName);
-    RecoTrack* cdcRecoTrack;
-    RecoTrack* svdRecoTrack;
+    RecoTrack* cdcRecoTrack{nullptr};
+    RecoTrack* svdRecoTrack{nullptr};
     if (svdcdcRecoTrack) {
       cdcRecoTrack = svdcdcRecoTrack->getRelatedTo<RecoTrack>(m_cdcRecoTracksStoreArrayName);
       svdRecoTrack = svdcdcRecoTrack->getRelatedTo<RecoTrack>(m_svdRecoTracksStoreArrayName);

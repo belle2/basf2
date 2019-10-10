@@ -426,13 +426,13 @@ def B0SL(path):
         :code:`'B0:semileptonic'`, the name of the particle list for
         SL :math:`B^0` skim candidates.
     """
-    variables.addAlias('l_p_CMSframe', 'conditionalVariableSelector(dmID<4, d1_p_CMSframe, d2_p_CMSframe)')
+    variables.addAlias('p_lepton_CMSframe', 'conditionalVariableSelector(dmID<4, d1_p_CMSframe, d2_p_CMSframe)')
 
     # Apply cuts
     applyCuts('B0:semileptonic', 'dmID<8', path=path)
     applyCuts('B0:semileptonic', 'log10_sigProb>-2.4', path=path)
     applyCuts('B0:semileptonic', '-4.0<cosThetaBY<3.0', path=path)
-    applyCuts('B0:semileptonic', 'l_p_CMSframe>1.0', path=path)
+    applyCuts('B0:semileptonic', 'p_lepton_CMSframe>1.0', path=path)
 
     B0SLList = ['B0:semileptonic']
     return B0SLList
@@ -504,13 +504,13 @@ def BplusSL(path):
         :code:`'B+:semileptonic'`, the name of the particle list for
         SL :math:`B^+` skim candidates.
     """
-    variables.addAlias('l_p_CMSframe', 'conditionalVariableSelector(dmID<4, d1_p_CMSframe, d2_p_CMSframe)')
+    variables.addAlias('p_lepton_CMSframe', 'conditionalVariableSelector(dmID<4, d1_p_CMSframe, d2_p_CMSframe)')
 
     # Apply cuts
     applyCuts('B+:semileptonic', 'dmID<8', path=path)
     applyCuts('B+:semileptonic', 'log10_sigProb>-2.4', path=path)
     applyCuts('B+:semileptonic', '-4.0<cosThetaBY<3.0', path=path)
-    applyCuts('B+:semileptonic', 'l_p_CMSframe>1.0', path=path)
+    applyCuts('B+:semileptonic', 'p_lepton_CMSframe>1.0', path=path)
 
     BplusSLList = ['B+:semileptonic']
     return BplusSLList

@@ -108,8 +108,8 @@ def add_simulation(
         components=None,
         bkgfiles=None,
         bkgOverlay=True,
-        forceSetPXDDataReduction=False,
-        usePXDDataReduction=False,
+        forceSetPXDDataReduction=True,
+        usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
         generate_2nd_cdc_hits=False,
         simulateT0jitter=False,
@@ -262,7 +262,7 @@ def add_simulation(
             add_PXDDataReduction(
                 path_enableROI_Red,
                 components,
-                pxd_digits_name='pxd_unfiltered_digits',
+                pxd_unfiltered_digits='pxd_unfiltered_digits',
                 doCleanup=cleanupPXDDataReduction)
 
             roi_condition_module_Red = path.add_module("ROIfindingConditionFromDB")

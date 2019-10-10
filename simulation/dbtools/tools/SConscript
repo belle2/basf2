@@ -1,3 +1,0 @@
-Import('env')
-env['TOOLS_LIBS']['writeROIparametersToDB'] = ['$ROOT_LIBS', 'framework', 'simulation']
-Return('env')

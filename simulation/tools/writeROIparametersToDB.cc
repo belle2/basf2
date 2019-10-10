@@ -22,18 +22,21 @@
 //------------------------------------------------------------------------
 int main(int argc, char** argv)
 {
-  if (argc != 0 and argc != 1) {
-    std::cout << "Please specify IOV: 0/1 experiment run experimentEnd runEnd" << std::endl;
+  if (argc < 3 or !(std::stoi(argv[1]) == 0 or std::stoi(argv[1]) == 1)) {
+    std::cout << "Please specify IOV: 0/1 {=on/off} experiment run [experimentEnd] [runEnd]" << std::endl;
     return -1;
   }
-  int experiment = std::stoi(argv[0]);
-  int run = std::stoi(argv[1]);
-  int exp_end = std::stoi(argv[2]);
-  int run_end = std::stoi(argv[3]);
+
+  bool enableROI = std::stoi(argv[1]) == 1;
+  int experiment = std::stoi(argv[2]);
+  int run = std::stoi(argv[3]);
+  int exp_end = -1;
+  int run_end = -1;
+  if (argc > 4) exp_end = std::stoi(argv[4]);
+  if (argc > 5) run_end = std::stoi(argv[5]);
 
   //------------------------------------------------------------------------
   //..Specify database
-  Belle2::DatabaseChain::createInstance();
   Belle2::LocalDatabase::createInstance("localdb/database.txt", "", Belle2::LogConfig::c_Debug);
 
   //..set debug level
@@ -43,7 +46,7 @@ int main(int argc, char** argv)
 
   //..create ROI parameters
   Belle2::ROIParameters roiParameters;
-  roiParameters.setROIfinding(argc);
+  roiParameters.setROIfinding(enableROI);
 
   //------------------------------------------------------------------------
   //..Write out to localdb

@@ -35,7 +35,6 @@ def D0ToHpJm(path):
         haveRunD0ToHpJm = 1
         for chID, channel in enumerate(D0_Channels):
             reconstructDecay('D0:HpJm' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-            # vertexKFit('D0:HpJm' + str(chID), 0.000, path=path)
             D0List.append('D0:HpJm' + str(chID))
     else:
         for chID, channel in enumerate(D0_Channels):
@@ -54,9 +53,7 @@ def DstToD0PiD0ToHpJm(path):
     DstList = []
     for chID, channel in enumerate(D0List):
         reconstructDecay('D*+:HpJm' + str(chID) + ' -> D0:HpJm' + str(chID) + ' pi+:mygood', Dstcuts, chID, path=path)
-        # vertexRave('D*+:HpJm' + str(chID), 0.000, path=path)
         DstList.append('D*+:HpJm' + str(chID))
-        # DstList += D0List
 
     return DstList
 
@@ -68,11 +65,9 @@ def DstToD0PiD0ToHpJmPi0(path):
 
     DstList = []
     reconstructDecay('D0:HpJmPi0 -> K-:loose pi+:loose pi0:myskim', charmcuts, path=path)
-    # vertexTree('D0:HpJmPi0', 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
     reconstructDecay('D*+:HpJmPi0RS -> D0:HpJmPi0 pi+:all', Dstcuts, path=path)
     reconstructDecay('D*-:HpJmPi0WS -> D0:HpJmPi0 pi-:all', Dstcuts, path=path)
     copyLists('D*+:HpJmPi0', ['D*+:HpJmPi0RS', 'D*+:HpJmPi0WS'], path=path)
-    # vertexKFit('D*+:HpJmPi0', 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
     DstList.append('D*+:HpJmPi0')
 
     return DstList
@@ -94,11 +89,9 @@ def EarlyData_DstToD0PiD0ToHpJmPi0(path):
 
     DstList = []
     reconstructDecay('D0:HpJmPi0 -> K-:myhjp0 pi+:myhjp0 pi0:myhjp0', D0cuts, path=path)
-    # vertexTree('D0:HpJmPi0', 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
     reconstructDecay('D*+:HpJmPi0RS -> D0:HpJmPi0 pi+:myhjp0', Dstcuts, path=path)
     reconstructDecay('D*-:HpJmPi0WS -> D0:HpJmPi0 pi-:myhjp0', Dstcuts, path=path)
     copyLists('D*+:HpJmPi0', ['D*+:HpJmPi0RS', 'D*+:HpJmPi0WS'], path=path)
-    # vertexKFit('D*+:HpJmPi0', 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
     DstList.append('D*+:HpJmPi0')
 
     return DstList
@@ -116,10 +109,7 @@ def DstToD0PiD0ToHpHmPi0(path):
 
     for chID, channel in enumerate(D0_Channels):
         reconstructDecay('D0:HpHmPi0' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-        # vertexTree('D0:HpHmPi0' + str(chID), 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
-        # reconstructDecay('D*+:HpHmPi0' + str(chID) + ' -> pi+:all D0:HpHmPi0' + str(chID), Dstcuts, chID, path=path)
         reconstructDecay('D*+:HpHmPi0' + str(chID) + ' -> D0:HpHmPi0' + str(chID) + ' pi+:all', Dstcuts, chID, path=path)
-        # vertexKFit('D*+:HpHmPi0' + str(chID), 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
         DstList.append('D*+:HpHmPi0' + str(chID))
 
     return DstList
@@ -147,10 +137,7 @@ def EarlyData_DstToD0PiD0ToHpHmPi0(path):
 
     for chID, channel in enumerate(D0_Channels):
         reconstructDecay('D0:HpHmPi0' + str(chID) + ' -> ' + channel, D0cuts, chID, path=path)
-        # vertexTree('D0:HpHmPi0' + str(chID), 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
-        # reconstructDecay('D*+:HpHmPi0' + str(chID) + ' -> pi+:all D0:HpHmPi0' + str(chID), Dstcuts, chID, path=path)
         reconstructDecay('D*+:HpHmPi0' + str(chID) + ' -> D0:HpHmPi0' + str(chID) + ' pi+:myhhp0', Dstcuts, chID, path=path)
-        # vertexKFit('D*+:HpHmPi0' + str(chID), 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
         DstList.append('D*+:HpHmPi0' + str(chID))
 
     return DstList
@@ -208,7 +195,6 @@ def D0ToNeutrals(path):
         haveRunD0ToNeutrals = 1
         for chID, channel in enumerate(D0_Channels):
             reconstructDecay('D0:2Nbdy' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-            # vertexRave('D0:2Nbdy' + str(chID), 0.001, path=path)
             D0List.append('D0:2Nbdy' + str(chID))
     else:
         for chID, channel in enumerate(D0_Channels):
@@ -227,7 +213,6 @@ def DstToD0Neutrals(path):
     DstList = []
     for chID, channel in enumerate(D0List):
         reconstructDecay('D*+:2Nbdy' + str(chID) + ' -> pi+:all ' + channel, Dstcuts, chID, path=path)
-        # massVertexRave('D*+:2Nbdy' + str(chID), 0.001, path=path)
         DstList.append('D*+:2Nbdy' + str(chID))
 
     return DstList

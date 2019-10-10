@@ -1233,6 +1233,32 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr conditionalVariableSelector(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 3) {
+        auto func = [arguments](const Particle * particle) -> double {
+
+          std::string cutString = arguments[0];
+          std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
+
+          const Variable::Manager::Var* variable1 = Manager::Instance().getVariable(arguments[1]);
+          const Variable::Manager::Var* variable2 = Manager::Instance().getVariable(arguments[2]);
+
+          if (particle == nullptr)
+            return -999;
+          if (cut->check(particle))
+            return variable1->function(particle);
+          else
+            return variable2->function(particle);
+        };
+        return func;
+
+      } else {
+        B2FATAL("Wrong number of arguments for meta function conditionalVariableSelector");
+      }
+    }
+
+
     Manager::FunctionPtr pValueCombination(const std::vector<std::string>& arguments)
     {
       if (arguments.size() > 0) {
@@ -2389,6 +2415,9 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
                       "Useful for debugging.");
+    REGISTER_VARIABLE("conditionalVariableSelector(cut, variable, variable)", conditionalVariableSelector,
+                      "Returns one of the two supplied variables, depending on whether the particle passes the supplied cut.\n"
+                      "The first variable is returned if the particle passes the cut, and the second variable is returned otherwise.");
     REGISTER_VARIABLE("pValueCombination(p1, p2, ...)", pValueCombination,
                       "Returns the combined p-value of the provided p-values according to the formula given in `Nucl. Instr. and Meth. A 411 (1998) 449 <https://doi.org/10.1016/S0168-9002(98)00293-9>`_ .\n"
                       "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.");

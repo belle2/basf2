@@ -1,3 +1,9 @@
+// weird bug in intel compiler and or boost::process: If we include boost
+// process intel compile fails. It seems that including sys/wait.h after
+// other c++ std:: headers triggers a weird behavior failing two static
+// asserts. We work around that by including it right away
+#include <sys/wait.h>
+
 #include <framework/utilities/Utils.h>
 
 #include <framework/gearbox/Unit.h>

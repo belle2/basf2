@@ -108,7 +108,7 @@ def add_simulation(
         components=None,
         bkgfiles=None,
         bkgOverlay=True,
-        forceSetPXDDataReduction=True,
+        forceSetPXDDataReduction=False,
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
         generate_2nd_cdc_hits=False,

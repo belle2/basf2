@@ -64,10 +64,32 @@ void PXDdigiFilterModule::initialize()
       m_selectorOUT.inheritAllRelations();
     }
   }
+
+  m_countNthEvent = 0;
+}
+
+void PXDdigiFilterModule::beginRun()
+{
+  m_skipEveryNth = -1;
+  if (m_roiParameters) {
+    m_skipEveryNth = m_roiParameters->getDisableROIforEveryNth();
+  } else {
+    B2ERROR("No configuration for the current run found");
+  }
 }
 
 void PXDdigiFilterModule::event()
 {
+  m_countNthEvent++;
+
+  if (m_skipEveryNth > 0 and m_countNthEvent % m_skipEveryNth == 0) {
+    m_selectorIN.select([](const PXDDigit * thePxdDigit) {return true;});
+    m_countNthEvent = 0;
+
+    return;
+  }
+
+  // Perform data reduction
   StoreArray<PXDDigit> PXDDigits(m_PXDDigitsName);   /**< The PXDDigits to be filtered */
   StoreArray<ROIid> ROIids_store_array(m_ROIidsName); /**< The ROIs */
 

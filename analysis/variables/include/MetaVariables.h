@@ -243,7 +243,7 @@ namespace Belle2 {
     Manager::FunctionPtr isInfinity(const std::vector<std::string>& arguments);
 
     /**
-     * Returns one of two functions, which each return the value of a variable of a particle,
+     * Returns a function which returns the value of one of two variables of a particle,
      * depending on whether the particle passes the supplied cut. The first argument in the argument
      * vector must be a cut string, and the second and third arguments must be the name of the
      * variable to return if the particle does or does not pass the cut, respectively.

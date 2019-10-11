@@ -10,14 +10,11 @@
 #include <geometry/Materials.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <beast/csi/geometry/CsiGeometryPar.h>
 #include <cmath>
-#include <iostream>
-#include <iomanip>
 #include <fstream>
 
 

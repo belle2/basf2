@@ -15,15 +15,8 @@
 #include <pxd/geometry/SensorInfo.h>
 #include <framework/dataobjects/RelationElement.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <TRandom.h>
 #include <string>
-#include <set>
 #include <vector>
-#include <boost/array.hpp>
-
-#include <TFile.h>
-#include <TH1D.h>
-#include <TH2D.h>
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */

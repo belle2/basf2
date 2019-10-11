@@ -14,7 +14,6 @@
 
 #include <framework/datastore/RelationsObject.h>
 
-#include <stdint.h> //< For fixed-size integers
 #include <vector> //< For fixed-size integers
 namespace Belle2 {
 

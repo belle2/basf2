@@ -11,7 +11,6 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
-#include <svd/dataobjects/SVDEventInfo.h>
 
 #include <boost/foreach.hpp>
 
@@ -27,6 +26,7 @@ SVDPerformanceModule::SVDPerformanceModule() : Module()
   setDescription("This module check performances of SVD reconstruction of VXD TB data");
 
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDPerformance_output.root"));
+  addParam("SVDEventInfo", m_svdEventInfoName, "Defines the name of the EventInfo", string(""));
 
   addParam("is2017TBanalysis", m_is2017TBanalysis, "True if analyzing 2017 TB data.", bool(false));
   addParam("isSimulation", m_isSimulation, "True if analyzing simulated data.", bool(false));
@@ -55,6 +55,8 @@ void SVDPerformanceModule::initialize()
   //  m_recoTracks.isRequired();
   //  m_tfr.isRequired(m_TrackFitResultName);
 
+  if (!m_storeSVDEvtInfo.isOptional(m_svdEventInfoName)) m_svdEventInfoName = "SVDEventInfoSim";
+  m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
 
   B2INFO("    ShaperDigits: " << m_ShaperDigitName);
   B2INFO("      RecoDigits: " << m_RecoDigitName);
@@ -429,8 +431,8 @@ void SVDPerformanceModule::beginRun()
 
 void SVDPerformanceModule::event()
 {
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
-  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+
+  SVDModeByte modeByte = m_storeSVDEvtInfo->getModeByte();
 
   m_nEvents++;
   float c_eTOkeV = 3.6 / 1000; //keV = e * c_eTOkeV

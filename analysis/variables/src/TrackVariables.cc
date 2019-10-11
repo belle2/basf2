@@ -13,7 +13,6 @@
 #include <analysis/VariableManager/Manager.h>
 
 // framework - DataStore
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/Helix.h>
 
@@ -26,7 +25,6 @@
 #include <mdst/dataobjects/ECLCluster.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 #include <iostream>

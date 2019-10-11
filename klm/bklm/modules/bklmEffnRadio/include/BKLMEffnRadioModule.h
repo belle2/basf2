@@ -10,23 +10,22 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-#include "TFile.h"
-#include "TBox.h"
-#include "TCanvas.h"
-#include "TH2D.h"
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
-
-#include "CLHEP/Vector/ThreeVector.h"
-#include "CLHEP/Matrix/Matrix.h"
-
 #include <klm/bklm/geometry/Module.h>
-#include <iostream>
-#include <set>
 
+/* Belle 2 headers. */
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+
+/* ROOT headers. */
+#include <TBox.h>
+#include <TCanvas.h>
+#include <TFile.h>
+#include <TH2D.h>
+
+/* C++ headers. */
+#include <set>
 
 namespace Belle2 {
   namespace bklm {

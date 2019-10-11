@@ -10,34 +10,20 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/dataobjects/KLMDigitEventInfo.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+#include <klm/eklm/geometry/GeometryData.h>
 
-/* C++ headers. */
-#include<map>
-
-/* ROOT headers. */
-#include "TH1.h"
-#include "TH2F.h"
-#include "TFile.h"
-#include "TGraph.h"
-#include "TGraphErrors.h"
-
-/* Belle2 headers. */
-#include <framework/core/Module.h>
+/* Belle 2 headers. */
+#include <calibration/CalibrationCollectorModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
-#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/dataobjects/KLMDigitEventInfo.h>
-#include <klm/eklm/geometry/GeometryData.h>
-#include <klm/eklm/geometry/TransformData.h>
-#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
-#include <calibration/CalibrationCollectorModule.h>
 
 namespace Belle2 {
 

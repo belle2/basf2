@@ -101,7 +101,7 @@ namespace Belle2 {
      * three dimensional gaussian. Covariance matrix */
     TMatrixDSym m_sizeCovMatrix;
 
-    ClassDef(BeamSpot, 1); /**<  beam spot position and size **/
+    ClassDef(BeamSpot, 2); /**<  beam spot position and size **/
   };
 
 } //Belle2 namespace

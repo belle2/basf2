@@ -10,8 +10,15 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* KLM headers. */
+#include <klm/eklm/dbobjects/EKLMAlignment.h>
+#include <klm/eklm/geometry/GeometryData.h>
+
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
+
+/* ROOT headers. */
+#include <TFile.h>
 
 namespace Belle2 {
 

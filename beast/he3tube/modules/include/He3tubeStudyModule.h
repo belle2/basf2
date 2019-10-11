@@ -12,17 +12,9 @@
 #define HE3TUBESTUDYMODULE_H
 
 #include <framework/core/HistoModule.h>
-#include <string>
-#include <vector>
 
-
-#include <TVector3.h>
-#include <TRandom.h>
 #include <TH1.h>
 #include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
-
 
 namespace Belle2 {
   namespace he3tube {

@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <framework/utilities/TestHelpers.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
-#include <iostream>
 
 namespace Belle2 {
   /** Unit tests for the event level tracking information.*/

@@ -10,9 +10,9 @@
 
 #include <framework/logging/Logger.h>
 #include <svd/reconstruction/SimpleClusterCandidate.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
+#include <framework/core/Environment.h>
 
 using namespace std;
 
@@ -151,16 +151,12 @@ namespace Belle2 {
       }
 
       //Lorentz shift correction - PATCHED
-      //NOTE: layer 3 is upside down with respect to L4,5,6 in the real data (real SVD), but _not_ in the simulation. We need to change the sign of the Lorentz correction on L3 only if reconstructing data, i.e. if experiment number is NOT 0, 1002, 1003.
+      //NOTE: layer 3 is upside down with respect to L4,5,6 in the real data (real SVD), but _not_ in the simulation. We need to change the sign of the Lorentz correction on L3 only if reconstructing data, i.e. if Environment::Instance().isMC() is FALSE.
       const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(m_vxdID));
 
-      bool reconstructingMC = false;
-      StoreObjPtr<EventMetaData> eventMD;
-      int currentExperiment = eventMD->getExperiment();
-      if (currentExperiment == 0 || currentExperiment == 1003 || currentExperiment == 1002)
-        reconstructingMC = true;
+      bool isMC = Environment::Instance().isMC();
 
-      if ((m_vxdID.getLayerNumber() == 3) && ! reconstructingMC)
+      if ((m_vxdID.getLayerNumber() == 3) && ! isMC)
         m_position += sensorInfo.getLorentzShift(m_isUside, m_position);
       else
         m_position -= sensorInfo.getLorentzShift(m_isUside, m_position);

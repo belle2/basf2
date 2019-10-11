@@ -13,17 +13,13 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
-#include <vxd/dataobjects/VxdID.h>
-#include <pxd/geometry/SensorInfo.h>
-#include <vxd/geometry/GeoCache.h>
-#include <TROOT.h>
-#include <vector>
+#include "TFile.h"
 #include "TH1I.h"
 #include "TH1F.h"
-#include "TH2F.h"
+
+#include <vector>
 
 namespace Belle2 {
   /*! PXD DQM AnalysisModule */

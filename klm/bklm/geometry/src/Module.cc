@@ -8,11 +8,13 @@
 *  This software is provided "as is" without any warranty.               *
 *************************************************************************/
 
-#include "klm/bklm/geometry/Module.h"
+/* Own header. */
+#include <klm/bklm/geometry/Module.h>
 
-#include <framework/logging/Logger.h>
+/* Belle 2 headers. */
 #include <framework/gearbox/Const.h>
 
+/* C++ headers. */
 #include <iostream>
 
 using namespace std;

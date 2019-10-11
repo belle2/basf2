@@ -8,21 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TFile.h>
-#include <TTree.h>
+/* Own header. */
+#include <klm/eklm/modules/EKLMDisplacementGenerator/EKLMDisplacementGeneratorModule.h>
 
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
 #include <klm/eklm/geometry/AlignmentChecker.h>
 #include <klm/eklm/geometry/GeometryData.h>
-#include <klm/eklm/modules/EKLMDisplacementGenerator/EKLMDisplacementGeneratorModule.h>
 
+/* Belle 2 headers. */
 #include <framework/core/RandomNumbers.h>
 #include <framework/database/Database.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/gearbox/Unit.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TTree.h>
 
 using namespace Belle2;
 

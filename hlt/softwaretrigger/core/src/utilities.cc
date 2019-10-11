@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <hlt/softwaretrigger/core/utilities.h>
 #include <TRandom.h>
-#include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 
 namespace Belle2 {
   namespace SoftwareTrigger {

@@ -10,9 +10,8 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* Belle 2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
-#include <klm/eklm/geometry/GeometryData.h>
 
 namespace Belle2 {
 

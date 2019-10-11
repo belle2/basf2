@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
+#include <klm/rawdata/RawData.h>
+
 /* C++ headers. */
 #include <cstdint>
-
-/* Belle2 headers. */
-#include <klm/rawdata/RawData.h>
 
 using namespace Belle2;
 

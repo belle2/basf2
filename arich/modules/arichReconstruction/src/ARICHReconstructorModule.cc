@@ -21,12 +21,9 @@
 #include <arich/dataobjects/ARICHTrack.h>
 #include <arich/dataobjects/ARICHHit.h>
 
-#include <framework/core/ModuleManager.h>
-
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>

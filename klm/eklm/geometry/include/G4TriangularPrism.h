@@ -10,10 +10,10 @@
 
 #pragma once
 
-/* External headers. */
+/* Geant4 headers. */
+#include <G4Box.hh>
 #include <G4IntersectionSolid.hh>
 #include <G4Tubs.hh>
-#include <G4Box.hh>
 
 namespace Belle2 {
 

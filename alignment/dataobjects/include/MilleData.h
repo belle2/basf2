@@ -1,11 +1,12 @@
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include <calibration/core/MergeableNamed.h>
+
 #include <genfit/MilleBinary.h>
 #include <genfit/GblTrajectory.h>
+
+#include <string>
+#include <vector>
 
 namespace Belle2 {
   /// Mergeable class holding list of so far opened mille binaries and providing the binaries

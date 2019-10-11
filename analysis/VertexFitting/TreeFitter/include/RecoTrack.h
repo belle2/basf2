@@ -12,7 +12,6 @@
 #include <analysis/VertexFitting/TreeFitter/RecoParticle.h>
 
 #include <analysis/dataobjects/Particle.h>
-#include <mdst/dataobjects/Track.h>
 
 namespace TreeFitter {
 

@@ -11,11 +11,7 @@
 #include <generators/modules/SmearPrimaryVertexModule.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
 
 //TODO: use framework random number generator --> done
 #include <TRandom3.h>

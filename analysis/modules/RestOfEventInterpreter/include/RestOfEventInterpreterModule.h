@@ -11,10 +11,7 @@
 #pragma once
 #include <framework/core/Module.h>
 
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/VariableManager/Utility.h>
-#include <framework/gearbox/Const.h>
 
 #include <string>
 #include <vector>

@@ -16,7 +16,7 @@ from skimExpertFunctions import *
 
 set_log_level(LogLevel.INFO)
 
-gb2_setuprel = 'release-03-02-02'
+gb2_setuprel = 'release-04-00-00'
 
 import os
 import sys

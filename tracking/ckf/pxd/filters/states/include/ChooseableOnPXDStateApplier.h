@@ -15,7 +15,6 @@
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
-  class CDCToPXDState;
   // Guard to prevent repeated instantiations
   extern template class LayerToggledApplier<CKFToPXDState,
                                             LimitedOnStateApplier<CKFToPXDState, TrackFindingCDC::ChooseableFilter<PXDStateFilterFactory>>>;

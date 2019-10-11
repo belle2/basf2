@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include <framework/utilities/TestHelpers.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>

@@ -9,15 +9,10 @@
  **************************************************************************/
 
 #include <framework/database/DBStore.h>
-#include <framework/database/IntraRunDependency.h>
 #include <framework/database/Database.h>
 #include <framework/logging/Logger.h>
 
-#include <TClonesArray.h>
 #include <TClass.h>
-#include <TFile.h>
-
-#include <list>
 
 namespace Belle2 {
 

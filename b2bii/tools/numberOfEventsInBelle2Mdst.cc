@@ -9,17 +9,14 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/core/FileCatalog.h>
 #include <framework/dataobjects/FileMetaData.h>
 
 #include <TFile.h>
 #include <TTree.h>
-#include <TError.h>
-
-#include <sys/signal.h>
 
 #include <boost/program_options.hpp>
 
+#include <csignal>
 #include <string>
 #include <iostream>
 

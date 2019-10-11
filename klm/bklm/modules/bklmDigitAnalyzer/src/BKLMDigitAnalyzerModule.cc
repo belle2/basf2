@@ -8,9 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <TGaxis.h>
-
+/* Own header. */
 #include <klm/bklm/modules/bklmDigitAnalyzer/BKLMDigitAnalyzerModule.h>
+
+/* Belle 2 headers. */
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+
+/* ROOT headers. */
+#include <TGaxis.h>
 
 using namespace Belle2;
 

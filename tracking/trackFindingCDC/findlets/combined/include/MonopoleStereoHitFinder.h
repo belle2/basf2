@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/RLTaggedWireHitCreator.h>
-// #include <tracking/trackFindingCDC/findlets/minimal/TrackSZFitter.h>
 
 #include <tracking/trackFindingCDC/collectors/matchers/StereoHitTrackQuadTreeMatcher.h>
 #include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>

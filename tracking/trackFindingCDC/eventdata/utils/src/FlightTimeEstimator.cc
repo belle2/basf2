@@ -16,8 +16,6 @@
 
 #include <framework/gearbox/Const.h>
 
-#include <algorithm>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

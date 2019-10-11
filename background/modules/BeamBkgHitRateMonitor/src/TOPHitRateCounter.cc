@@ -14,7 +14,6 @@
 
 // framework aux
 #include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -32,7 +31,7 @@ namespace Belle2 {
 
       // create control histograms
       m_hits = new TH1F("top_hits", "time distribution of hits; digit.time [ns]",
-                        1000, 0, 1000);
+                        1000, -500, 500);
       m_hitsInWindow = new TH1F("top_hitsInWindow",
                                 "time distribution of hits; digit.time [ns]",
                                 100, m_timeOffset - m_timeWindow / 2,

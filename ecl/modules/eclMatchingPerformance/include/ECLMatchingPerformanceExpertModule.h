@@ -24,11 +24,6 @@ class TTree;
 class TFile;
 
 namespace Belle2 {
-  class MCParticle;
-  class Track;
-  class TrackFitResult;
-  class ExtHit;
-  class ECLCluster;
 
   template< class T >
   class StoreArray;

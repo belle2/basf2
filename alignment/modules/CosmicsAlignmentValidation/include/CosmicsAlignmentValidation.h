@@ -2,13 +2,12 @@
 #define COSMICS_VAL_H
 
 #include <framework/core/Module.h>
-class TH1;
-class TH2;
-class TNtuple;
+#include <mdst/dataobjects/TrackFitResult.h>
+
+#include <genfit/Track.h>
+
 class TTree;
 class TFile;
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <genfit/Track.h>
 
 #include <string>
 

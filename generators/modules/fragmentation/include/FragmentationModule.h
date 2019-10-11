@@ -19,7 +19,6 @@
 #include <generators/modules/fragmentation/EvtGenDecays.h>
 
 #include <string>
-#include <vector>
 
 namespace Belle2 {
 

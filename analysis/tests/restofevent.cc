@@ -5,19 +5,12 @@
 #include <analysis/dataobjects/RestOfEvent.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
-#include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/Const.h>
-#include <TMatrixFSym.h>
 #include <TLorentzVector.h>
-#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;

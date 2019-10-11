@@ -10,12 +10,14 @@
 
 #pragma once
 
-/* External headers. */
-#include <TObject.h>
-#include <CLHEP/Geometry/Point3D.h>
-
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
+
+/* ROOT headers. */
+#include <TObject.h>
+
+/* CLHEP headers. */
+#include <CLHEP/Geometry/Point3D.h>
 
 namespace Belle2 {
 

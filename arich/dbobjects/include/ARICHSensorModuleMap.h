@@ -10,7 +10,6 @@
 
 #pragma once
 #include <TObject.h>
-#include <vector>
 #include <TTimeStamp.h>
 #include <arich/dbobjects/ARICHMergerInfo.h>
 #include <arich/dbobjects/ARICHSensorModuleInfo.h>

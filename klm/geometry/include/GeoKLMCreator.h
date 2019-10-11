@@ -10,7 +10,7 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/bklm/geometry/GeoBKLMCreator.h>
 #include <klm/eklm/geometry/GeoEKLMCreator.h>
 

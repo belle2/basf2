@@ -1,28 +1,17 @@
 #include <cdc/calibration/XTCalibrationAlgorithm.h>
 #include <cdc/calibration/XTFunction.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCXtRelations.h>
 
 #include <TError.h>
 #include <TROOT.h>
-#include <TH1D.h>
-#include <TGraphErrors.h>
 #include <TProfile.h>
 #include <TF1.h>
 #include <TFile.h>
-#include <TChain.h>
 #include <TTree.h>
-#include <TSystem.h>
 #include <iostream>
-#include <iomanip>
 
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/device/file.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-#include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -78,6 +67,15 @@ void XTCalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("theta", &theta);
   tree->SetBranchAddress("Pval", &Pval);
   tree->SetBranchAddress("ndf", &ndf);
+
+  /* Disable unused branch */
+  std::vector<TString> list_vars = {"lay", "t", "x_u", "alpha", "theta", "Pval", "ndf"};
+  tree->SetBranchStatus("*", 0);
+
+  for (TString brname : list_vars) {
+    tree->SetBranchStatus(brname, 1);
+  }
+
 
   int al = 0;
   int th = 0;
@@ -249,21 +247,21 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::checkConvergence()
 {
 
   const int nTotal = 56 * 2 * m_nAlphaBins * m_nThetaBins;
-  int nFitFailed = 0;
+  int nFitCompleted = 0;
   for (int l = 0; l < 56; ++l) {
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nAlphaBins; ++al) {
         for (int th = 0; th < m_nThetaBins; ++th) {
-          if (m_fitStatus[l][lr][al][th] != FitStatus::c_OK) {
-            nFitFailed++;
+          if (m_fitStatus[l][lr][al][th] == FitStatus::c_OK) {
+            nFitCompleted++;
           }
         }
       }
     }
   }
 
-  if (static_cast<double>(nFitFailed) / nTotal < 0.6) {
-    B2WARNING("Less than 60 % of XTs were fitted.");
+  if (static_cast<double>(nFitCompleted) / nTotal < m_threshold) {
+    B2WARNING("Less than " << m_threshold * 100 << " % of XTs were fitted.");
     return c_NotEnoughData;
   }
   return c_OK;
@@ -363,10 +361,17 @@ void XTCalibrationAlgorithm::write()
                 B2DEBUG(21, "Probability of fit: " <<  m_xtFunc[l][lr][al][th]->GetProb());
               }
             }
-            // If fit is failed, previous xt is retqined.
-            for (int i = 0; i < 8; ++i) {
-              par[i] = m_xtPrior[l][lr][al][th][i];
+            // If fit is failed
+            // and mode of input xt (prior) is same as output, previous xt is used.
+            if (m_xtMode == m_xtModePrior) {
+              for (int i = 0; i < 8; ++i) {
+                par[i] = m_xtPrior[l][lr][al][th][i];
+              }
+            } else { // if modes are different, simple xt is used.
+              par[0] = 0; par[1] = 0.004; par[2] = 0; par[3] = 0; par[4] = 0; par[5] = 0; par[6] = m_par6[l]; par[7] = 0.00001;
             }
+
+
           } else {
             if (par[1] < 0) {
               for (int i = 0; i < 8; ++i) {
@@ -401,9 +406,21 @@ void XTCalibrationAlgorithm::write()
 
 void XTCalibrationAlgorithm::storeHisto()
 {
+
+  auto hNDF =   getObjectPtr<TH1F>("hNDF");
+  auto hPval =   getObjectPtr<TH1F>("hPval");
+  auto hEvtT0 =   getObjectPtr<TH1F>("hEventT0");
   B2INFO("saving histograms");
   TFile* fout = new TFile(m_histName.c_str(), "RECREATE");
   TDirectory* top = gDirectory;
+  //store NDF, P-val. EventT0 histogram for monitoring during calibration
+  if (hNDF && hPval && hEvtT0) {
+    hEvtT0->Write();
+    hPval->Write();
+    hNDF->Write();
+  }
+  // for each layer
+
   TDirectory* Direct[56];
   int nhisto = 0;
   for (int l = 0; l < 56; ++l) {

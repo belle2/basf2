@@ -1,10 +1,8 @@
 import subprocess
 from skimExpertFunctions import get_test_file
 
-all_skims = [
-    "Dark", "Charm", "BtoCharmless", "BtoCharm", "CombinedSystematics", "EWP", "MiscCombined", "feiHadronic",
-    "Semileptonic", "Quarkonium", "feiSLCombined"
-]
+all_skims = ["Dark", "CharmHigh", "CharmLow", "BtoCharmless", "BtoCharm", "CombinedSystematics",
+             "EWP", "MiscCombined", "feiHadronicCombined", "Semileptonic", "Quarkonium", "feiSLCombined"]
 
 MCTypes = ['mixedBGx1', 'chargedBGx1', 'ccbarBGx1', 'ssbarBGx1',
            'uubarBGx1', 'ddbarBGx1', 'taupairBGx1',
@@ -19,8 +17,8 @@ for skim in all_skims:
         script = f"../combined/{skim}_Skim_Standalone.py"
         log_file = f"{skim}_{MCCampaign}_{MCType}.out"
         err_file = f"{skim}_{MCCampaign}_{MCType}.err"
-        output_file = f"combinedFiles/{skim}_{MCCampaign}_{MCType}.udst.root"
+        output_file = f"{skim}_{MCCampaign}_{MCType}.udst.root"
 
         print(f'Running {script} on {input_file} (MC type {MCCampaign}_{MCType}) to {output_file}')
         subprocess.run(["bsub", "-q", "l", "-oo", log_file, "-e", err_file, "basf2", script,
-                        "-o", output_file, "-i", input_file])
+                        "-o", output_file, "-i", input_file, "-n", "10000"])

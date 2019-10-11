@@ -14,7 +14,7 @@ from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.charm import *
 from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 set_log_level(LogLevel.INFO)
 import sys
 import os

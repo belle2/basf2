@@ -11,12 +11,10 @@
 
 #include "tracking/dataobjects/FullSecID.h"
 #include <tracking/trackFindingVXD/filterMap/map/SectorsOnSensor.h>
-#include "framework/core/FrameworkExceptions.h"
-#include <TTree.h>
-#include <TFile.h>
+#include <framework/core/FrameworkExceptions.h>
+#include <framework/logging/Logger.h>
 #include <cstdint>
 #include <vector>
-
 
 namespace Belle2 {
 

@@ -17,15 +17,8 @@
 #include <ecl/dataobjects/ECLWaveformData.h>
 #include <ecl/digitization/algorithms.h>
 #include <iostream>
-#include <TH1.h>
-#include <TF1.h>
-#include <TH2.h>
-#include <TMath.h>
-#include <math.h>
-#include <unistd.h>
 #include <stdio.h>
 #include "stdlib.h"
-#include <TChain.h>
 #include <string>
 #include <fstream>
 #include <vector>

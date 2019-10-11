@@ -14,7 +14,6 @@
 #include <algorithm>
 
 namespace Belle2 {
-  class TrackFitResult;
   /** Class that bundles various TrackFitResults.
    *
    *  As the RecoTrack has a lot of information that is only necessary during the fit,

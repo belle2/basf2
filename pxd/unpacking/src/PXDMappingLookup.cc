@@ -10,7 +10,6 @@
 
 #include <pxd/unpacking/PXDMappingLookup.h>
 #include <framework/logging/Logger.h>
-#include <vxd/geometry/GeoCache.h>
 
 #include <stdio.h>
 #include <vector>

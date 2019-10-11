@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <vxd/dataobjects/VxdID.h>
 #include <pxd/dataobjects/PXDDAQDHEStatus.h>
 #include <pxd/dataobjects/PXDErrorFlags.h>
 

@@ -9,9 +9,10 @@
  **************************************************************************/
 
 #include <alignment/PedeResult.h>
+
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 

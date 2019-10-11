@@ -10,10 +10,7 @@
 
 #include "tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorLineFit3D.h"
 #include <math.h>
-#include <framework/logging/Logger.h>
 #include <TMath.h>
-
-
 
 using namespace Belle2;
 

@@ -16,6 +16,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
+#include <framework/datastore/StoreArray.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -49,9 +50,10 @@ namespace Belle2 {
     Module(), m_pdgCode(0)
   {
     // set module description (e.g. insert text)
-    setDescription(R"DOC(This module copies each particle in the `inputList` to the `outputList` and uses
+    setDescription(R"DOC(
+    This module copies each particle in the ``inputList`` to the ``outputList`` and uses
     the results of the **eclTrackBremFinder** module to look for possible bremsstrahlung photons; if these 
-    photons exists, it adds their four momentum to the particle in the `outputList`. 
+    photons exists, it adds their four momentum to the particle in the ``outputList``. 
     It also adds the original particle and these photons as daughters of the new, corrected particle. 
     Track and PID information of the original particle are copied onto the new one to facilitate their access 
     in the analysis scripts.
@@ -72,10 +74,10 @@ namespace Belle2 {
     smaller than 3.0 are stored. The user can further determine the maximum value of this weight required in order 
     to perform the bremsstrahlung correction.
 
-    This module looks for photons in the `gammaList` whose clusters have a *Bremsstrahlung* relation with the track 
-    of one of the particles in the `inputList`, and adds their 4-momentum to the particle's one. It also stores the value
-    of each relation weight as `extraInfo` of the corrected particle, under the name `"bremsWeightWithPhotonN"`, where
-    N is the index of the photon as daughter of the corrected particle; thus `"bremsWeightWithPhoton0" gives the weight
+    This module looks for photons in the ``gammaList`` whose clusters have a *Bremsstrahlung* relation with the track 
+    of one of the particles in the ``inputList``, and adds their 4-momentum to the particle's one. It also stores the value
+    of each relation weight as ``extraInfo`` of the corrected particle, under the name ``"bremsWeightWithPhotonN"``, where
+    N is the index of the photon as daughter of the corrected particle; thus ``"bremsWeightWithPhoton0"`` gives the weight
     of the Bremsstrahlung relation between the new, corrected particle, and the first photon daughter.
 
     Warning:
@@ -101,10 +103,10 @@ namespace Belle2 {
     addParam("multiplePhotons", m_addMultiplePhotons, "If true, use all possible photons to correct the particle's 4-momentum",
              m_addMultiplePhotons);
     addParam("usePhotonOnlyOnce", m_usePhotonOnlyOnce,
-             R"DOC(If true, each brems candidate is used to correct maximum 1 particle (the one with the lowest relation weight among all in the `inputList`).)DOC",
+             R"DOC(If true, each brems candidate is used to correct maximum 1 particle (the one with the lowest relation weight among all in the ``inputList``).)DOC",
              m_usePhotonOnlyOnce);
     addParam("writeOut", m_writeOut,
-             R"DOC(If true, the output `ParticleList` will be saved by `RootOutput`. If false, it will be ignored when writing the file.)DOC",
+             R"DOC(If true, the output ``ParticleList`` will be saved by `RootOutput`. If false, it will be ignored when writing the file.)DOC",
              m_writeOut);
   }
 

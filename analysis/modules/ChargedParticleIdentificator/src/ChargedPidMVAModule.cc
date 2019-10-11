@@ -1,11 +1,11 @@
 //THIS MODULE
 #include <analysis/modules/ChargedParticleIdentificator/ChargedPidMVAModule.h>
 
+//ANALYSIS
+#include <mva/interface/Interface.h>
+
 //MDST
 #include <mdst/dataobjects/ECLCluster.h>
-
-//C++
-#include <algorithm>
 
 using namespace Belle2;
 

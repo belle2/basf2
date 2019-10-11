@@ -11,11 +11,9 @@
 #include <framework/core/ProcessStatistics.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/pcore/ProcHelper.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/utilities/Utils.h>
-#include <framework/utilities/HTML.h>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <regex>

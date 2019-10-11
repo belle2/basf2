@@ -17,8 +17,6 @@ isMC = {"mc": True, "data": False}.get(mc_or_data, None)
 if isMC is None:
     sys.exit('First parameter must be "mc" or "data" to indicate whether we run on MC or real data')
 
-setupB2BIIDatabase(isMC)
-
 inputBelleMDSTFile = sys.argv[2]
 outputBelle2ROOTFile = sys.argv[3]
 

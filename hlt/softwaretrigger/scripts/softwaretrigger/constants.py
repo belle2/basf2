@@ -64,4 +64,4 @@ DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "KLM", "TRG"]
 DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
 
 #: Location of the database in the online system
-DEFAULT_DB_FILE_LOCATION = "/dev/shm/localdb/database.txt"
+DEFAULT_DB_FILE_LOCATION = "/cvmfs/basf2.daqnet.kek.jp/database/database.txt"

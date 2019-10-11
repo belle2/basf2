@@ -60,7 +60,7 @@ namespace Belle2 {
   class ZMQConnectionOverSocket : public ZMQConnection {
   public:
     /// Create a new instance passing the shared ZMQParent
-    ZMQConnectionOverSocket(const std::shared_ptr<ZMQParent>& parent);
+    explicit ZMQConnectionOverSocket(const std::shared_ptr<ZMQParent>& parent);
 
     /// The socket used for polling is just the stored socket.
     std::vector<zmq::socket_t*> getSockets() const final;

@@ -94,14 +94,14 @@ namespace Belle2::Utils {
   {
     namespace bp = boost::process;
     auto cmd = searchPath ? bp::search_path(command) : boost::filesystem::path(command);
-    bp::ipstream stdout;
-    bp::child child(cmd, bp::args(arguments), bp::std_in.close(), bp::std_out > stdout);
+    bp::ipstream cmdOut;
+    bp::child child(cmd, bp::args(arguments), bp::std_in.close(), bp::std_out > cmdOut);
     char buffer[4096];
     std::string result;
-    while (child.running() && stdout.read(buffer, sizeof(buffer))) {
+    while (child.running() && cmdOut.read(buffer, sizeof(buffer))) {
       result.append(buffer, sizeof(buffer));
     }
-    if (stdout.gcount()) result.append(buffer, stdout.gcount());
+    if (cmdOut.gcount()) result.append(buffer, cmdOut.gcount());
     return result;
   }
 }

@@ -52,12 +52,12 @@ def setup_basf2_and_db():
 
     # Local DB specification
     basf2.reset_database()
-    basf2.use_database_chain()
+    basf2.conditions.override_globaltags()
     if args.central_db_tag:
         for central_tag in args.central_db_tag:
-            basf2.use_central_database(central_tag)
+            basf2.conditions.prepend_globaltag(central_tag)
     else:
-        basf2.use_local_database(ROOT.Belle2.FileSystem.findFile(args.local_db_path))
+        basf2.conditions.prepend_testing_payloads(ROOT.Belle2.FileSystem.findFile(args.local_db_path))
 
     # Number of processes
     basf2.set_nprocesses(args.number_processes)

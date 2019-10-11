@@ -8,25 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SVDPERFORMANCETTREEMODULE_H
-#define SVDPERFORMANCETTREEMODULE_H
+#pragma once
 
 #include <svd/dataobjects/SVDCluster.h>
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <TH1F.h>
-#include <TH2F.h>
 #include <TTree.h>
 #include <TFile.h>
 
 namespace Belle2 {
 
-  /**The module studies VXD hits from overlapping sensors of a same VXD layer.
-   * In particular, it computes residuals differences sensitive to possible detector misalignments.
+  /**The module is used to create a TTree to study SVD clusters, genfit unbiased residuals and many other properties related to the track they belong to.
    *
-   * Overlapping residuals
    */
   class SVDPerformanceTTreeModule : public Module {
 
@@ -37,40 +32,36 @@ namespace Belle2 {
     void initialize();
     /** Write the TTrees to the file*/
     void terminate();
-    /** Compute the difference of coordinate residuals between two hits in overlapping sensors of a same VXD layer */
+    /** Compute the variables and fill the tree*/
     void event();
 
-    /* user-defined parameters */
-    std::string m_rootFileName = "";   /**< root file name */
+  private:
 
-    /* ROOT file related parameters */
+    std::string m_rootFileName = "";   /**< root file name */
     TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
 
-  private:
-    /** StoreArray name of the input and output RecoTracks */
-    std::string m_recoTracksStoreArrayName{"RecoTracks"};
-    /** Tree containing global information on SVD u-coordinate overlaps */
-    TTree* m_t_U = nullptr;
-    /** Tree containing global information on SVD v-coordinate overlaps */
-    TTree* m_t_V = nullptr;
+    std::string m_recoTracksStoreArrayName{"RecoTracks"};  /**< storeArray name of the input and output RecoTracks */
+
+    TTree* m_t_U = nullptr; /**< tree containing info related to the U side clusters*/
+    TTree* m_t_V = nullptr;  /**< tree containing info related to the V side clusters*/
     /* Branches of SVD u-clusters tree */
-    float m_svdClCharge = 0,      /**< cluster charge */
-          m_svdClSNR = 0,      /**< cluster SNR */
-          m_svdClTime = 0,      /**< cluster time */
-          m_svdRes = 0,   /**< residual computed by genfit */
-          m_svdClPos = 0,      /**< cluster position */
-          m_svdClPosErr = 0,      /**< cluster position error */
-          m_svdTruePos = -99,      /**< true position */
-          m_svdClPhi = 0,   /**< cluster global phi */
-          m_svdClZ = 0,     /**< cluster global Z */
-          m_svdTrkPos = 0, /**< track position*/
-          m_svdTrkPosErr = 0, /**< track position error*/
-          m_svdTrkQoP = 0, /**< track q/p*/
-          m_svdTrkPrime = 0;     /**< tan of incident angle projected on u,w*/
-    unsigned int m_svdLayer = 0,  /**< layer */
-                 m_svdLadder = 0, /**< ladder */
-                 m_svdSensor = 0, /**< sensor */
-                 m_svdSize = 0; /**< size */
+    float m_svdClCharge = 0;      /**< cluster charge */
+    float m_svdClSNR = 0;      /**< cluster SNR */
+    float m_svdClTime = 0;      /**< cluster time */
+    float m_svdRes = 0;   /**< residual computed by genfit */
+    float m_svdClPos = 0;      /**< cluster position */
+    float m_svdClPosErr = 0;      /**< cluster position error */
+    float m_svdTruePos = -99;      /**< true position */
+    float m_svdClPhi = 0;   /**< cluster global phi */
+    float m_svdClZ = 0;     /**< cluster global Z */
+    float m_svdTrkPos = 0; /**< track position*/
+    float m_svdTrkPosErr = 0; /**< track position error*/
+    float m_svdTrkQoP = 0; /**< track q/p*/
+    float m_svdTrkPrime = 0;     /**< tan of incident angle projected on u,w*/
+    unsigned int m_svdLayer = 0;  /**< layer */
+    unsigned int m_svdLadder = 0; /**< ladder */
+    unsigned int m_svdSensor = 0; /**< sensor */
+    unsigned int m_svdSize = 0; /**< size */
   };
 }
-#endif /* SVDPERFORMANCETTREEMODULE_H */
+

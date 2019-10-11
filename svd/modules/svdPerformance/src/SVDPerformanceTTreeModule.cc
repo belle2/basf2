@@ -5,7 +5,10 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Giulia Casarosa                                          *
  *                                                                        *
- * Module to study VXD hits from overlapping sensors of a same VXD layer. *
+ * Module used to create a TTree to study SVD clusters,                   *
+ * genfit unbiased residuals and many other properties related            *
+ * to the track they belong to.                                           *
+ *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -42,7 +45,7 @@ REG_MODULE(SVDPerformanceTTree)
 SVDPerformanceTTreeModule::SVDPerformanceTTreeModule() : Module()
 {
   //Set module properties
-  setDescription("The module studies SVD clusters, genfit unbiased residuals and many other properties related to the track they belong to.");
+  setDescription("The module is used to create a TTree to study SVD clusters, genfit unbiased residuals and many other properties related to the track they belong to.");
   //Parameter to take only specific RecoTracks as input
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDPerformanceTTree.root"));
   addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "StoreArray name of the input and output RecoTracks.",

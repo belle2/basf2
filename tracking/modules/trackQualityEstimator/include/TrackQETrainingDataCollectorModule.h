@@ -49,17 +49,23 @@ namespace Belle2 {
   protected:
 
     /// Name of the recoTrack StoreArray
-    std::string m_recoTracksStoreArrayName;
+    std::string m_recoTracksStoreArrayName = "RecoTracks";
     /// Name of the SVD-CDC StoreArray
-    std::string m_svdCDCRecoTracksStoreArrayName;
+    std::string m_svdCDCRecoTracksStoreArrayName = "SVDCDCRecoTracks";
     /// Name of the StoreArray of SVD tracks combined with CDC-tracks from standalone CDC tracking
-    std::string m_svdPlusCDCStandaloneRecoTracksStoreArrayName;
+    std::string m_svdPlusCDCStandaloneRecoTracksStoreArrayName = "SVDPlusCDCStandaloneRecoTracks";
     /// Name of the CDC StoreArray
-    std::string m_cdcRecoTracksStoreArrayName;
+    std::string m_cdcRecoTracksStoreArrayName = "CDCRecoTracks";
     /// Name of the SVD StoreArray
-    std::string m_svdRecoTracksStoreArrayName;
+    std::string m_svdRecoTracksStoreArrayName = "SVDRecoTracks";
     /// Name of the PXD StoreArray
-    std::string m_pxdRecoTracksStoreArrayName;
+    std::string m_pxdRecoTracksStoreArrayName = "PXDRecoTracks";
+
+    /** name of the output rootfile */
+    std::string m_TrainingDataOutputName = "QETrainingOutput.root";
+
+    /// Parameter to enable event-wise features
+    bool m_collectEventFeatures = false;
 
     /// Store Array of the recoTracks
     StoreArray<RecoTrack> m_recoTracks;
@@ -79,18 +85,8 @@ namespace Belle2 {
     /** set of named variables to be collected */
     std::vector<Named<float*>> m_variableSet;
 
-    /** name of the output rootfile */
-    std::string m_TrainingDataOutputName;
-
     /** truth information collected with m_estimatorMC
      * type is float to be consistend with m_variableSet (and TTree + MVA implementation) */
     float m_truth = NAN;
-
-    /// Parameter to enable event-wise features
-    bool m_param_collectEventFeatures = false;
-
-//    /** number of RecoTracks in an event*/
-//    float m_nRecoTracks = NAN;
-
   };
 }

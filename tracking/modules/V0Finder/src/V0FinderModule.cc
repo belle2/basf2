@@ -55,9 +55,9 @@ V0FinderModule::V0FinderModule() : Module()
 
 
   addParam("massRangeKshort", m_MassRangeKshort, "mass range in GeV for reconstructed Kshort used for pre-selection of candidates"
-           " (to be chosen loosely as used momenta are ignore material effects)", m_MassRangeKshort);
+           " (to be chosen loosely as used momenta ignore material effects)", m_MassRangeKshort);
   addParam("massRangeLambda", m_MassRangeLambda, "mass range in GeV for reconstructed Lambda used for pre-selection of candidates"
-           " (to be chosen loosely as used momenta are ignore material effects)", m_MassRangeLambda);
+           " (to be chosen loosely as used momenta ignore material effects)", m_MassRangeLambda);
 }
 
 
@@ -71,6 +71,16 @@ void V0FinderModule::initialize()
                                           m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack, m_validation);
 
   m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
+
+  // safeguard for users that try to break the code
+  if (std::get<0>(m_MassRangeKshort) > std::get<1>(m_MassRangeKshort)) {
+    B2FATAL("The minimum has to be smaller than the maximum of the Kshort mass range! min = " <<  std::get<0>
+            (m_MassRangeKshort) << " max = " << std::get<1>(m_MassRangeKshort));
+  }
+  if (std::get<0>(m_MassRangeLambda) > std::get<1>(m_MassRangeLambda)) {
+    B2FATAL("The minimum has to be smaller than the maximum of the Lambda mass range! min = " <<  std::get<0>
+            (m_MassRangeLambda) << " max = " << std::get<1>(m_MassRangeLambda));
+  }
 
   // precalculate the mass range squared
   m_mKshortMin2 = std::get<0>(m_MassRangeKshort) < 0 ? -std::get<0>(m_MassRangeKshort) * std::get<0>(m_MassRangeKshort) : std::get<0>
@@ -118,20 +128,38 @@ void V0FinderModule::event()
   // Pair up each positive track with each negative track.
   for (auto& trackPlus : tracksPlus) {
     for (auto& trackMinus : tracksMinus) {
-      // TODO: this will throw away all hypotheses if one of them fails! Not sure if that is a problem or how frequent it is?
       try {
         if (preFilterTracks(trackPlus, trackMinus, Const::Kshort)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort);
-        // the pre-filter is not able to reject photons, so no need to test for photons
+      } catch (const genfit::Exception& e) {
+        // genfit exception raised, skip this track pair for this hypothesis
+        B2WARNING("Genfit exception caught. Skipping this track pair for Kshort hypothesis. " << LogVar("Genfit exception:", e.what()));
+      }
+
+      try {
+        // the pre-filter is not able to reject photons, so no need to apply pre filter for photons
         m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon);
+      } catch (const genfit::Exception& e) {
+        // genfit exception raised, skip this track pair for this hypothesis
+        B2WARNING("Genfit exception caught. Skipping this track pair for photon hypothesis. " << LogVar("Genfit exception:", e.what()));
+      }
+
+      try {
         if (preFilterTracks(trackPlus, trackMinus, Const::Lambda))  m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda);
+      } catch (const genfit::Exception& e) {
+        // genfit exception raised, skip this track pair for this hypothesis
+        B2WARNING("Genfit exception caught. Skipping this track pair for Lambda hypothesis. " << LogVar("Genfit exception:", e.what()));
+      }
+
+      try {
         if (preFilterTracks(trackPlus, trackMinus, Const::antiLambda)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda);
       } catch (const genfit::Exception& e) {
-        // genfit exception raised, skip this track pair
-        B2DEBUG(27, "Genfit exception caught: " << e.what() << "skip the track pair and continue");
-        continue;
+        // genfit exception raised, skip this track pair for this hypothesis
+        B2WARNING("Genfit exception caught. Skipping this track pair for anti-Lambda hypothesis. " << LogVar("Genfit exception:",
+                  e.what()));
       }
     }
   }
+
 }
 
 

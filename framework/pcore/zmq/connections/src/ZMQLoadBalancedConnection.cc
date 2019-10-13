@@ -148,10 +148,8 @@ void ZMQLoadBalancedOutput::handleIncomingData()
   const auto toIdentity = readyMessage->getIdentity();
   m_readyWorkers.push_back(toIdentity);
 
-  if (m_allWorkers.find(toIdentity) == m_allWorkers.end()) {
+  if (m_allWorkers.emplace(toIdentity).second) {
     // Aha, we did never see this worker so far, so add it to our list.
-    m_allWorkers.emplace(toIdentity);
-
     if (m_sentStopMessages) {
       // If it turned up late (everyone else has already stopped), send a stop message directly
       auto sendMessage = ZMQMessageFactory::createMessage(toIdentity, EMessageTypes::c_lastEventMessage);

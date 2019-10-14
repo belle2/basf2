@@ -34,6 +34,8 @@ if numFiles is 0:
     print('No files found')
     sys.exit()
 
+if not os.path.exists('masks/imported'):
+    os.makedirs('masks/imported')
 
 for i, fileName in enumerate(fileNames):
     runFirst = int((fileName.split('_r')[1]).split('.')[0])
@@ -51,7 +53,5 @@ for i, fileName in enumerate(fileNames):
         B2ERROR("Last run is less than the first one: exiting!")
         sys.exit()
     dbImporter.importChannelMask(fileName, expNo, runFirst, runLast)
-    if not os.path.exists('masks/imported'):
-        os.makedirs('masks/imported')
     os.rename(fileName, fileName.replace('masks/', 'masks/imported/'))
 B2RESULT("Done")

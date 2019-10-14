@@ -15,9 +15,14 @@
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/ECLVariables.h>
 #include <analysis/variables/TrackVariables.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <analysis/variables/ParameterVariables.h>
 
 #include <framework/logging/Logger.h>
+
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
 
 namespace Belle2 {
   namespace Variable {
@@ -56,6 +61,24 @@ namespace Belle2 {
         return 0.0;
     }
 
+    // Convenience function to obtain track d0 with respect to IP
+    // Based on v0DaughterD0 function in ParameterVariables.cc
+    double trackD0FromIP(const Particle* particle)
+    {
+      const Track* track = particle->getTrack();
+      if (!track) return 0.;
+
+      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(particle->getPDGCode())));
+      if (!trackFit) return 0.;
+
+      static DBObjPtr<BeamSpot> beamSpotDB;
+
+      UncertainHelix helix = trackFit->getUncertainHelix();
+      helix.passiveMoveBy(beamSpotDB->getIPPosition());
+
+      return helix.getD0();
+    }
+
     double goodBelleLambda(const Particle* Lambda)
     {
       if (Lambda->getNDaughters() != 2) {
@@ -73,7 +96,7 @@ namespace Belle2 {
       }
 
       double p = particleP(Lambda);
-      double dr = std::min(abs(trackD0(d0)), abs(trackD0(d1)));
+      double dr = std::min(abs(trackD0FromIP(d0)), abs(trackD0FromIP(d1)));
       double zdist = v0DaughterZ0Diff(Lambda);
       double dphi = acos(cosAngleBetweenMomentumAndVertexVectorInXYPlane(Lambda));
       // Flight distance of Lambda0 in xy plane

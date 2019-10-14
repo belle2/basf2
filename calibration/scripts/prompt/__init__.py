@@ -13,10 +13,14 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
     Parameters:
         name (str): The unique calibration name, not longer than 64 characters.
 
+        expert_username (str): The JIRA username of the expert to contact about this script.
+            This username will be used to assign the default responsible person for submitting and checking prompt
+            calibration jobs.
+
         description (str): Long form description of the calibration and what it does. Feel free to make this as long as you need.
 
         input_data_formats (frozenset(str)): The data formats {'raw', 'cdst', 'mdst', 'udst'} of the input files
-            that should be used as input to the process. Used to figure out if this calibration should occurr
+            that should be used as input to the process. Used to figure out if this calibration should occur
             before the relevant data production e.g. before cDST files are created.
 
         input_data_names (frozenset(str)): The names that you will use when accessing the input data given to the

@@ -46,7 +46,7 @@ First Steps:
 #. Create a CalibrationCollectorModule (if a new one is necessary), and a CalibrationAlgorithm.
 #. Create a working CAF calibration python script using the :py:class:`Calibration <caf.framework.Calibration>` class.
 
-At this point you are working with the CAF and should be ready to add a prompt calibration script to basf2 an test it.
+At this point you are working with the CAF and should be ready to add a prompt calibration script to basf2 and test it.
 Now identify the requirements of your calibration:
 
 * Which data formats will it take as input (raw, cDST)?
@@ -154,6 +154,16 @@ b2caf-prompt-run
     :filename: calibration/tools/b2caf-prompt-run
     :func: get_argparser
     :prog: b2caf-prompt-run
+
+.. _b2caf_prompt_check:
+
+b2caf-prompt-check
+------------------
+
+.. argparse::
+    :filename: calibration/tools/b2caf-prompt-check
+    :func: get_argparser
+    :prog: b2caf-prompt-check
 
 
 Utility Functions

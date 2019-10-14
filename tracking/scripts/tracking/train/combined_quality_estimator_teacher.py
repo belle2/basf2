@@ -703,7 +703,7 @@ class VXDQETeacherTask(TrackQETeacherBaseTask):
     Task to run basf2 mva teacher on collected data for VXDTF2 track quality estimator
     """
     #: Name of the weightfile that is created.
-    weightfile_identifier = "trackfindingvxd_TrackQualityIndicator.weights.xml"
+    weightfile_identifier = "vxdtf2_mva_qe_weightFile_noTiming.weights.xml"
     #: Name of the TTree in the ROOT file from the ``dataCollectionTask`` that
     # contains the training data for the MVA teacher.
     tree_name = "tree"
@@ -736,7 +736,7 @@ class FullTrackQETeacherTask(TrackQETeacherBaseTask):
     track quality estimator
     """
     #: Name of the weightfile that is created.
-    weightfile_identifier = "fullTrackQualityIndicator.weights.xml"
+    weightfile_identifier = "MVATrackQualityIndicator.weights.xml"
     #: Name of the TTree in the ROOT file from the ``dataCollectionTask`` that
     # contains the training data for the MVA teacher.
     tree_name = "tree"

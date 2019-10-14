@@ -57,7 +57,7 @@ namespace Belle2 {
     std::string m_pxdRecoTracksStoreArrayName = "PXDRecoTracks";
 
     /** identifier of weightfile in Database or local root/xml file */
-    std::string m_WeightFileIdentifier = "";
+    std::string m_WeightFileIdentifier = "MVATrackQualityIndicator";
 
     /// Parameter to enable event-wise features
     bool m_param_collectEventFeatures = false;

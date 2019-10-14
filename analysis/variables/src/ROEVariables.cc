@@ -102,20 +102,29 @@ namespace Belle2 {
 
     Manager::FunctionPtr currentROEIsInList(const std::vector<std::string>& arguments)
     {
-      std::string listName;
-
       if (arguments.size() != 1)
         B2FATAL("Wrong number of arguments (1 required) for meta function currentROEIsInList");
+
+      std::string listName = arguments[0];
 
       auto func = [listName](const Particle*) -> double {
 
         StoreObjPtr<ParticleList> particleList(listName);
+        if (!(particleList.isValid()))
+        {
+          B2FATAL("Invalid Listname " << listName << " given to currentROEIsInList!");
+        }
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 
         if (not roe.isValid())
           return 0;
 
-        auto* particle = roe->getRelatedTo<Particle>();
+        auto* particle = roe->getRelatedFrom<Particle>();
+        if (particle == nullptr)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist! currentROEIsInList() variable has to be called from ROE loop");
+          return -999.;
+        }
         return particleList->contains(particle) ? 1 : 0;
 
       };
@@ -124,8 +133,6 @@ namespace Belle2 {
 
     Manager::FunctionPtr particleRelatedToCurrentROE(const std::vector<std::string>& arguments)
     {
-      std::string listName;
-
       if (arguments.size() != 1)
         B2FATAL("Wrong number of arguments (1 required) for meta function particleRelatedToCurrentROE");
 
@@ -137,7 +144,12 @@ namespace Belle2 {
         if (not roe.isValid())
           return -999;
 
-        auto* particle = roe->getRelatedTo<Particle>();
+        auto* particle = roe->getRelatedFrom<Particle>();
+        if (particle == nullptr)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist! particleRelatedToCurrentROE() variable has to be called from ROE loop");
+          return -999.;
+        }
         return var->function(particle);
 
       };
@@ -2092,29 +2104,37 @@ namespace Belle2 {
                       "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.");
 
     REGISTER_VARIABLE("weMissM2(maskName, opt)", WE_MissM2,
-                      "Returns the invariant mass squared of the missing momentum");
+                      "Returns the invariant mass squared of the missing momentum (see weMissE possible options)");
 
     REGISTER_VARIABLE("recMissM2", REC_MissM2,
                       "Returns the invariant mass squared of the missing momentum calculated assumings the"
                       "reco B is at rest and calculating the neutrino (missing) momentum from p_nu = pB - p_had - p_lep");
 
     REGISTER_VARIABLE("weMissPTheta(maskName, opt)", WE_MissPTheta,
-                      "Returns the polar angle of the missing momentum");
+                      "Returns the polar angle of the missing momentum (see possible weMissE options)");
 
     REGISTER_VARIABLE("weMissP(maskName, opt)", WE_MissP,
-                      "Returns the magnitude of the missing momentum");
+                      "Returns the magnitude of the missing momentum (see possible weMissE options)");
 
     REGISTER_VARIABLE("weMissPx(maskName, opt)", WE_MissPx,
-                      "Returns the x component of the missing momentum");
+                      "Returns the x component of the missing momentum (see weMissE possible options)");
 
     REGISTER_VARIABLE("weMissPy(maskName, opt)", WE_MissPy,
-                      "Returns the y component of the missing momentum");
+                      "Returns the y component of the missing momentum (see weMissE possible options)");
 
     REGISTER_VARIABLE("weMissPz(maskName, opt)", WE_MissPz,
-                      "Returns the z component of the missing momentum");
+                      "Returns the z component of the missing momentum (see weMissE possible options)");
 
     REGISTER_VARIABLE("weMissE(maskName, opt)", WE_MissE,
-                      "Returns the energy of the missing momentum");
+                      R"DOC(Returns the energy of the missing momentum, possible options are the following:
+opt = 0: CMS, use energy and momentum of charged particles and photons; 
+opt = 1: CMS, same as 0, fix Emiss = pmiss; 
+opt = 2: CMS, same as 0, fix Eroe = Ecms/2; 
+opt = 3: CMS, use only energy and momentum of signal side; 
+opt = 4: CMS, same as 3, update with direction of ROE momentum; 
+opt = 5: LAB, use energy and momentum of charged particles and photons from whole event; 
+opt = 6: LAB, same as 5, fix Emiss = pmiss; 
+opt = 7: CMS, correct pmiss 3-momentum vector with factor alpha so that dE = 0 (used for Mbc calculation).)DOC");
 
     REGISTER_VARIABLE("weXiZ(maskName)", WE_xiZ,
                       "Returns Xi_z in event (for Bhabha suppression and two-photon scattering)");

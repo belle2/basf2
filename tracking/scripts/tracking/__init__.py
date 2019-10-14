@@ -41,6 +41,10 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     if not is_svd_used(components) and not is_cdc_used(components):
         return
 
+    if add_mva_quality_indicator and not fit_tracks:
+        B2ERROR("MVA track qualiy indicator requires `fit_tracks` to be enabled. Turning it off.")
+        add_mva_quality_indicator = False
+
     if not skipGeometryAdding:
         add_geometry_modules(path, components=components)
 

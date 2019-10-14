@@ -57,6 +57,10 @@ def setup_basf2_and_db():
         for central_tag in args.central_db_tag:
             basf2.conditions.prepend_globaltag(central_tag)
     else:
+        # On HLT, we are still using the legacy database settings (e.g. database.txt) instead of the
+        # sqlite database. So we need to prevent the framework to use the sqlite database
+        # This should be changed as quickly as possible
+        basf2.conditions.metadata_providers = []
         basf2.conditions.prepend_testing_payloads(ROOT.Belle2.FileSystem.findFile(args.local_db_path))
 
     # Number of processes

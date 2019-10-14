@@ -211,18 +211,27 @@ def my_basf2_mva_teacher(
     :param tree_name: Name of the TTree in the ROOT file from the ``data_collection_task``
            that contains the training data for the MVA teacher.
     :param weightfile_identifier: Name of the weightfile that is created.
-           Usually ends with ".xml" for local weightfiles, or with ".root", when
-           the weightfile needs to be uploaded as a payload to the conditions
+           Should either end in ".xml" for local weightfiles or in ".root", when
+           the weightfile needs later to be uploaded as a payload to the conditions
            database.
     :param target_variable: Feature/variable to use as truth label in the quality estimator MVA classifier.
     :param exclude_variables: List of collected variables to not use in the training of the QE MVA classifier.
            In addition to variables containing the "truth" substring, which are excluded by default.
     """
 
+    # check that weightfile ends in one of [".xml", ".root"]. Otherwise,
+    # basf2_mva teacher would upload it directly to the conditions database,
+    # which I want to prevent
+    weightfile_extension = os.path.splitext(weightfile_identifier)[1]
+    if weightfile_extension not in {".xml", ".root"}:
+        raise ValueError(f"Weightfile Identifier should end in .xml or .root, but ends in {weightfile_extension}")
+
     # extract names of all variables from one record file
     with root_utils.root_open(records_files[0]) as records_tfile:
         input_tree = records_tfile.Get(tree_name)
         feature_names = [leave.GetName() for leave in input_tree.GetListOfLeaves()]
+
+    # get list of variables to use for training without MC truth
     truth_free_variable_names = [
         name
         for name in feature_names
@@ -240,6 +249,8 @@ def my_basf2_mva_teacher(
         weight_variable = "__weight__"
     else:
         weight_variable = ""
+
+    # Set options for MVA trainihng
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector(*records_files)
     general_options.m_treename = tree_name
@@ -248,6 +259,7 @@ def my_basf2_mva_teacher(
     general_options.m_variables = basf2_mva.vector(*truth_free_variable_names)
     general_options.m_target_variable = target_variable
     fastbdt_options = basf2_mva.FastBDTOptions()
+
     # Train a MVA method and store the weightfile (MVAFastBDT.root) locally.
     basf2_mva.teacher(general_options, fastbdt_options)
 
@@ -565,7 +577,7 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
         # weightfiles created by this b2luigi script
         cdc_qe_mva_filter_parameters = {
             "identifier":
-            self.get_input_file_names(CDCQETeacherTask.weightfile_identifier)[0]
+            self.get_input_file_names(CDCQETeacherTask.get_weightfile_xml_identifier(CDCQETeacherTask))[0]
         }
         basf2.set_module_parameters(
             path,
@@ -576,7 +588,7 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
             path,
             name="VXDQualityEstimatorMVA",
             WeightFileIdentifier=self.get_input_file_names(
-                VXDQETeacherTask.weightfile_identifier
+                VXDQETeacherTask.get_weightfile_xml_identifier(VXDQETeacherTask)
             )[0],
         )
 
@@ -621,17 +633,28 @@ class TrackQETeacherBaseTask(Basf2Task):
     exclude_variables = b2luigi.ListParameter(hashed=True, default=[])
 
     @property
-    def weightfile_identifier(self):
+    def weightfile_identifier_basename(self):
         """
-        Property defining the name for the weightfile that is created.
-        Usually ends with ".xml" for local weightfiles, or with ".root", when
-        the weightfile needs to be uploaded as a payload to the conditions
-        database.  Has to be implemented by the inheriting specific teacher task
-        class.
+        Property defining the basename for the .xml and .root weightfiles that are created.
+        Has to be implemented by the inheriting teacher task class.
         """
         raise NotImplementedError(
             "Teacher Task must define a static weightfile_identifier"
         )
+
+    def get_weightfile_xml_identifier(self):
+        """
+        Name of the xml weightfile that is created by the teacher task.
+        It is subsequently used as a local weightfile in the following validation tasks.
+        """
+        return self.weightfile_identifier_basename + ".weights.xml"
+
+    def get_weightfile_root_identifier(self):
+        """
+        Name of the root weightfile that is created by the teacher task.
+        It can be uploaded as a payload to the conditions database.
+        """
+        return self.weightfile_identifier_basename + ".weights.root"
 
     @property
     def tree_name(self):
@@ -676,7 +699,8 @@ class TrackQETeacherBaseTask(Basf2Task):
         Generate list of output files that the task should produce.
         The task is considered finished iff the outputs all exist.
         """
-        yield self.add_to_output(self.weightfile_identifier)
+        yield self.add_to_output(self.get_weightfile_xml_identifier())
+        yield self.add_to_output(self.get_weightfile_root_identifier())
 
     def process(self):
         """
@@ -687,15 +711,18 @@ class TrackQETeacherBaseTask(Basf2Task):
         is inherited from ``Basf2Task``.
         """
         records_files = self.get_input_file_names(
-            self.dataCollectionTask.records_file_name
+            self.data_collection_task.records_file_name
         )
-        my_basf2_mva_teacher(
-            records_files=records_files,
-            tree_name=self.tree_name,
-            weightfile_identifier=self.get_output_file_name(self.weightfile_identifier),
-            target_variable=self.training_target,
-            exclude_variables=self.exclude_variables,
-        )
+
+        for weightfile_identifier in (self.get_weightfile_xml_identifier(),
+                                      self.get_weightfile_root_identifier()):
+            my_basf2_mva_teacher(
+                records_files=records_files,
+                tree_name=self.tree_name,
+                weightfile_identifier=self.get_output_file_name(weightfile_identifier),
+                target_variable=self.training_target,
+                exclude_variables=self.exclude_variables,
+            )
 
 
 class VXDQETeacherTask(TrackQETeacherBaseTask):
@@ -703,7 +730,7 @@ class VXDQETeacherTask(TrackQETeacherBaseTask):
     Task to run basf2 mva teacher on collected data for VXDTF2 track quality estimator
     """
     #: Name of the weightfile that is created.
-    weightfile_identifier = "vxdtf2_mva_qe_weightFile_noTiming.weights.xml"
+    weightfile_identifier_basename = "vxdtf2_mva_qe_weightFile_noTiming"
     #: Name of the TTree in the ROOT file from the ``data_collection_task`` that
     # contains the training data for the MVA teacher.
     tree_name = "tree"
@@ -719,7 +746,7 @@ class CDCQETeacherTask(TrackQETeacherBaseTask):
     Task to run basf2 mva teacher on collected data for CDC track quality estimator
     """
     #: Name of the weightfile that is created.
-    weightfile_identifier = "trackfindingcdc_TrackQualityIndicator.weights.xml"
+    weightfile_identifier_basename = "trackfindingcdc_TrackQualityIndicator"
     #: Name of the TTree in the ROOT file from the ``data_collection_task`` that
     # contains the training data for the MVA teacher.
     tree_name = "records"
@@ -736,7 +763,7 @@ class FullTrackQETeacherTask(TrackQETeacherBaseTask):
     track quality estimator
     """
     #: Name of the weightfile that is created.
-    weightfile_identifier = "MVATrackQualityIndicator.weights.xml"
+    weightfile_identifier_basename = "MVATrackQualityIndicator"
     #: Name of the TTree in the ROOT file from the ``data_collection_task`` that
     # contains the training data for the MVA teacher.
     tree_name = "tree"
@@ -876,7 +903,7 @@ class VXDQEHarvestingValidationTask(HarvestingValidationBaseTask):
             path,
             name="VXDQualityEstimatorMVA",
             WeightFileIdentifier=self.get_input_file_names(
-                self.teacher_task.weightfile_identifier
+                self.teacher_task.get_weightfile_xml_identifier(self.teacher_task)
             )[0],
         )
         tracking.add_mc_matcher(path, components=["SVD"])
@@ -924,7 +951,8 @@ class CDCQEHarvestingValidationTask(HarvestingValidationBaseTask):
         # change weightfile of quality estimator to the one produced by this training script
         cdc_qe_mva_filter_parameters = {
             "identifier":
-            self.get_input_file_names(CDCQETeacherTask.weightfile_identifier)[0]
+            self.get_input_file_names(CDCQETeacherTask.get_weightfile_xml_identifier(CDCQETeacherTask))[0]
+
         }
         basf2.set_module_parameters(
             path,
@@ -994,7 +1022,7 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
         # produced in the training by b2luigi
         cdc_qe_mva_filter_parameters = {
             "identifier":
-            self.get_input_file_names(CDCQETeacherTask.weightfile_identifier)[0]
+            self.get_input_file_names(CDCQETeacherTask.get_weightfile_xml_identifier(CDCQETeacherTask))[0]
         }
         basf2.set_module_parameters(
             path,
@@ -1005,14 +1033,14 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
             path,
             name="VXDQualityEstimatorMVA",
             WeightFileIdentifier=self.get_input_file_names(
-                VXDQETeacherTask.weightfile_identifier
+                VXDQETeacherTask.get_weightfile_xml_identifier(VXDQETeacherTask)
             )[0],
         )
         basf2.set_module_parameters(
             path,
             name="TrackQualityEstimatorMVA",
             WeightFileIdentifier=self.get_input_file_names(
-                FullTrackQETeacherTask.weightfile_identifier
+                FullTrackQETeacherTask.get_weightfile_xml_identifier(FullTrackQETeacherTask)
             )[0],
             collectEventFeatures=True,
         )
@@ -1077,9 +1105,7 @@ class TrackQEEvaluationBaseTask(Task):
         Generate list of output files that the task should produce.
         The task is considered finished iff the outputs all exist.
         """
-        evaluation_pdf_output = (
-            self.teacher_task.weightfile_identifier.rsplit(".", 1)[0] + ".pdf"
-        )
+        evaluation_pdf_output = self.teacher_task.weightfile_identifier_basename + ".pdf"
         yield self.add_to_output(evaluation_pdf_output)
 
     @b2luigi.on_temporary_files
@@ -1090,13 +1116,14 @@ class TrackQEEvaluationBaseTask(Task):
         The MVA weight file created from training on the training data set is
         evaluated on separate test data.
         """
-        evaluation_pdf_output_basename = self.teacher_task.weightfile_identifier.rsplit(".", 1)[0] + ".pdf"
+        evaluation_pdf_output_basename = self.teacher_task.weightfile_identifier_basename + ".pdf"
+
         evaluation_pdf_output_path = self.get_output_file_name(evaluation_pdf_output_basename)
 
         cmd = [
             "basf2_mva_evaluate.py",
             "--identifiers",
-            self.get_input_file_names(self.teacher_task.weightfile_identifier)[0],
+            self.get_input_file_names(self.teacher_task.get_weightfile_xml_identifier(self.teacher_task))[0],
             "--datafiles",
             self.get_input_file_names(self.data_collection_task.records_file_name)[0],
             "--treename",
@@ -1276,12 +1303,14 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             titlepage_ax.axis("off")
             title = f"Quality Estimator validation plots from {self.__class__.__name__}"
             titlepage_ax.set_title(title)
+            teacher_task = self.harvesting_validation_task_instance.teacher_task
+            weightfile_identifier = teacher_task.get_weightfile_xml_identifier(teacher_task)
             meta_data = {
                 "Date": datetime.today().strftime("%Y-%m-%d %H:%M"),
                 "Created by steering file": os.path.realpath(__file__),
                 "Created from data in": validation_harvest_path,
                 "Background directory": MasterTask.bkgfiles_dir,
-                "weight file": self.harvesting_validation_task_instance.teacher_task.weightfile_identifier
+                "weight file": weightfile_identifier,
             }
             if hasattr(self, 'exclude_variables'):
                 meta_data["Excluded variables"] = ", ".join(self.exclude_variables)

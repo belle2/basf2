@@ -1236,20 +1236,20 @@ endloop:
     Manager::FunctionPtr conditionalVariableSelector(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
-        auto func = [arguments](const Particle * particle) -> double {
 
-          std::string cutString = arguments[0];
-          std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
+        std::string cutString = arguments[0];
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
-          const Variable::Manager::Var* variable1 = Manager::Instance().getVariable(arguments[1]);
-          const Variable::Manager::Var* variable2 = Manager::Instance().getVariable(arguments[2]);
+        const Variable::Manager::Var* variableIfTrue = Manager::Instance().getVariable(arguments[1]);
+        const Variable::Manager::Var* variableIfFalse = Manager::Instance().getVariable(arguments[2]);
 
+        auto func = [cut, variableIfTrue, variableIfFalse](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           if (cut->check(particle))
-            return variable1->function(particle);
+            return variableIfTrue->function(particle);
           else
-            return variable2->function(particle);
+            return variableIfFalse->function(particle);
         };
         return func;
 
@@ -2415,7 +2415,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
                       "Useful for debugging.");
-    REGISTER_VARIABLE("conditionalVariableSelector(cut, variable, variable)", conditionalVariableSelector,
+    REGISTER_VARIABLE("conditionalVariableSelector(cut, variableIfTrue, variableIfFalse)", conditionalVariableSelector,
                       "Returns one of the two supplied variables, depending on whether the particle passes the supplied cut.\n"
                       "The first variable is returned if the particle passes the cut, and the second variable is returned otherwise.");
     REGISTER_VARIABLE("pValueCombination(p1, p2, ...)", pValueCombination,

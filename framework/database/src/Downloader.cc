@@ -143,6 +143,7 @@ namespace Belle2::Conditions {
   std::string Downloader::escapeString(const std::string& text)
   {
     //make sure we have an active curl session ...
+    // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
     auto session = ensureSession();
     char* escaped = curl_easy_escape(m_session->curl, text.c_str(), text.size());
     if (!escaped) {

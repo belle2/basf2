@@ -1,9 +1,4 @@
-:tocdepth: 3
-
-===========
-Calibration
-===========
-
+===============================
 The Calibration Framework (CAF)
 ===============================
 
@@ -21,7 +16,7 @@ You are instead running a Python script that will create basf2 processes for you
 
 
 The Calibration Class
----------------------
+=====================
 
 The first part of the CAF to understand is the :py:class:`Calibration <caf.framework.Calibration>` class.
 This is where you specify which Collector module and which Algorithms you want to run.
@@ -48,7 +43,7 @@ Below is a simplified version of what is happening when `caf.framework.Calibrati
 
 
 The CAF Class
--------------
+=============
 
 The :py:class:`caf.framework.CAF` class is essentially an overall configuration object for the calibrations you want
 to run in a single processing run.
@@ -71,7 +66,7 @@ before running, and assigns some default options to calibrations if they weren't
 
 
 Restarting The CAF From Failure
--------------------------------
+===============================
 
 During development you will likely find that sometimes your Calibration fails to complete due to problems in the code.
 When using the full `caf.framework.CAF` class this can be quite problematic.
@@ -88,7 +83,7 @@ The CAF should restart from a safe position and try to run the (now fixed) code 
 
 
 Multiple Collections
---------------------
+====================
 
 Sometimes you may have multiple data types which you want to use as input to your `Calibration`.
 In this case you essentially want to run your Collector module with different pre-collection reconstruction
@@ -105,7 +100,7 @@ By using the `Calibration.add_collection` function you can add multiple differen
 
 
 The b2caf-status Tool
----------------------
+=====================
 
 In order to save these checkpoint states the CAF is creating a SQLite3 database file in your `CAF.output_dir` directory.
 The b2caf-status command line tool lets you show the current status of the Calibrations *even while the CAF is running*.
@@ -120,7 +115,7 @@ This could be useful if a Collector step succeeded previously, but now needs to 
 
 
 The b2caf-filemap Tool
-----------------------
+======================
 
 Sometimes you will want to run over many input files. If you are ignoring certain runs from these files the CAF requires
 that it knows which IoV each file corresponds to.
@@ -137,7 +132,7 @@ containing the dictionary.
 
 
 Job Submission Backends
------------------------
+=======================
 
 Quite often, your Collector processes will take some time to finish.
 You may be collecting data from many files, with a large amount of pre-processing happening.
@@ -198,20 +193,20 @@ If you are running at a site that uses the ``qsub`` command, you should use the 
     :inherited-members:
 
 Utility Functions + Objects
----------------------------
+===========================
 
 .. automodule:: caf.utils
     :members:
 
 Advanced Usage
---------------
+==============
 
 There are several options for the CAF that most users will never need.
 But for more adventurous calibration developers there are quite a lot of configuration options and possibilities for extending
 the functionality of the CAF.
 
 Writing Your Own Calibration Class
-++++++++++++++++++++++++++++++++++
+----------------------------------
 
 .. autoclass:: caf.framework.CalibrationBase
     :members:
@@ -219,7 +214,7 @@ Writing Your Own Calibration Class
     :show-inheritance:
 
 Strategy Objects
-++++++++++++++++
+----------------
 
 .. autoclass:: caf.framework.Algorithm
     :members:
@@ -239,7 +234,7 @@ Strategy Objects
     :show-inheritance:
 
 State Machine Framework
-+++++++++++++++++++++++
+-----------------------
 
 .. automodule:: caf.state_machines
     :members:
@@ -247,7 +242,7 @@ State Machine Framework
     :show-inheritance:
 
 Runner Objects
-++++++++++++++
+--------------
 
 .. automodule:: caf.runners
     :members:

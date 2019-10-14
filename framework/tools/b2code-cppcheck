@@ -28,7 +28,7 @@ To run it on single files or directories just supply them as arguments:
 To run on the full release directory run it without any arguments:
     `basename $0`
 
-Additional options can be passed to cppcheck as well, for example -j to run 
+Additional options can be passed to cppcheck as well, for example -j to run
 cppcheck in parallel:
     `basename $0` -j50 framework
 
@@ -70,7 +70,8 @@ EXCLUDES="-i ${SOFTWARE_DIR}/tracking/ckf/pxd/findlets/src/CKFToPXDFindlet.cc
           -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/hough/tests/LinearDivision.test.cc
 "
 
-cppcheck -q --enable=all --template=gcc --suppress=unusedFunction --inline-suppr --force --relative-paths=${SOFTWARE_DIR} \
+cppcheck -q --enable=all --template=gcc --std=c++17 --suppress=unusedFunction --suppress=useStlAlgorithm --inline-suppr \
+         --force --relative-paths=${SOFTWARE_DIR} \
          -D_PACKAGE_=PACKAGE -ULOG_NO_B2DEBUG -ULOG_NO_B2METHOD -ULOG_NO_B2INFO -ULOG_NO_B2WARNING -ULOG_NO_B2ASSERT -ULOG_NO_B2RESULT \
          -D__GNUC__=8 -UR__DICTIONARY_FILENAME -U__CINT__ -U__ROOTCLING__ -U__APPLE__ -U__ECC -U__ICC \
          -I ${SOFTWARE_DIR}/include/ -I ${SOFTWARE_DIR}/framework/data/cppcheck-includes/ \

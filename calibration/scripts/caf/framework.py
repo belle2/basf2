@@ -250,6 +250,9 @@ class CalibrationBase(ABC, Thread):
         self.iov = None
         #: The directory where we'll store the local database payloads from this calibration
         self.output_database_dir = ""
+        #: Marks this Calibration as one which has payloads that should be copied and uploaded.
+        #: Defaults to True, and should only be False if this is an intermediate Calibration who's payloads are never needed.
+        self.save_payloads = True
 
     @abstractmethod
     def run(self):
@@ -1269,6 +1272,7 @@ class CAF():
                 # Apply defaults given to the `CAF` to the calibrations if they aren't set
                 calibration._apply_calibration_defaults(self.calibration_defaults)
                 calibration._db_path = self._db_path
+                calibration.output_database_dir = Path(self.output_dir, calibration.name, "outputdb").as_posix()
                 calibration.iov = iov
                 if not calibration.backend:
                     calibration.backend = self.backend

@@ -34,6 +34,7 @@ MetadataService& MetadataService::Instance()
 
 void MetadataService::addRootOutputFile(const std::string& fileName, const FileMetaData* metaData)
 {
+  if (m_fileName.empty()) return;
   if (!FileSystem::isFile(fileName)) return;
 
   nlohmann::json file_json = {{"type", "RootOutput"}, {"filename", fileName}};
@@ -43,7 +44,7 @@ void MetadataService::addRootOutputFile(const std::string& fileName, const FileM
   }
 
   try {
-    std::string check = Utils::getCommandOutput("b2file-check", {"--json ", fileName});
+    std::string check = Utils::getCommandOutput("b2file-check", {"--json", fileName});
     file_json.merge_patch(nlohmann::json::parse(check));
   } catch (...) {}
 
@@ -57,6 +58,7 @@ void MetadataService::addRootOutputFile(const std::string& fileName, const FileM
 
 void MetadataService::addRootNtupleFile(const std::string& fileName)
 {
+  if (m_fileName.empty()) return;
   if (!FileSystem::isFile(fileName)) return;
 
   nlohmann::json file_json = {{"type", "RootNtuple"}, {"filename", fileName}};
@@ -75,6 +77,7 @@ static auto basf2StartTime = Utils::getClock();
 
 void MetadataService::addBasf2Status(const std::string& message)
 {
+  if (m_fileName.empty()) return;
   auto& status = m_json["basf2_status"];
   status["elapsed_walltime_sec"] = (Utils::getClock() - basf2StartTime) / Unit::s;
   status["resident_memory_mb"] = Utils::getRssMemoryKB() / 1024;

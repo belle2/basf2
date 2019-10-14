@@ -82,7 +82,10 @@ namespace Belle2 {
 
       /// Gives the layer by its layer id within the superlayer
       const CDCWireLayer& getWireLayer(ILayer iLayer) const
-      { return at(iLayer); }
+      {
+        // cppcheck-suppress returnTempReference
+        return at(iLayer);
+      }
       /**@}*/
 
       /**

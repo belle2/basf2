@@ -34,6 +34,7 @@ std::vector<const CDCFacet*> BaseFacetRelationFilter::getPossibleTos(
   const std::vector<const CDCFacet*>& facets) const
 {
   // Expensive assert has been deactivated - but true nonetheless
+  // TODO: ask Nils what this thing does!? It is always true and also there is a comparison of bool with string??
   assert(true or (std::is_sorted(facets.begin(), facets.end(), LessOf<Deref>()) &&
                   "Expected facets to be sorted"));
 

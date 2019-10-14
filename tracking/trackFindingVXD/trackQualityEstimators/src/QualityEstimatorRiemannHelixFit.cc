@@ -94,6 +94,7 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_over_sigma = W * d_trans;
   Precision chi2 = d_over_sigma.transpose() * d_over_sigma;
 
+  // TODO: ask Felix if that is has become permanent or if we should change in future?!
   // Temporary alternative calculation of chi2 for circle fit using Karimaeki circle fit
   Precision divisor = 1. / traceOfW;
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> unitvec = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1);
@@ -166,9 +167,6 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
                                                            1)).cwiseProduct(y_pos - X.col(1));
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> dist_neg = (x_neg - X.col(0)).cwiseProduct(x_neg - X.col(0)) + (y_neg - X.col(
                                                            1)).cwiseProduct(y_neg - X.col(1));
-
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> x_s = (dist_pos.cwiseEqual(dist_pos.cwiseMin(dist_neg))).select(x_pos, x_neg);
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> y_s = (dist_pos.cwiseEqual(dist_pos.cwiseMin(dist_neg))).select(y_pos, y_neg);
 
   // Arc length calculation
   Precision x_first = X.col(0)(0) - x0;

@@ -94,6 +94,8 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
 
   constexpr bool makeNoDifferenceForReassignedSecondaries = true;
 
+  // TODO: check if we want to keep makeNoDifferenceForReassignedSecondaries, if not: simplify the following conditions (remove all elses)
+  // cppcheck-suppress knownConditionTrueFalse
   if (makeNoDifferenceForReassignedSecondaries or
       (not startIsReassigned and not middleIsReassigned and not endIsReassigned)) {
 

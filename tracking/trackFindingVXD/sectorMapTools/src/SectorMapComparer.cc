@@ -3,7 +3,8 @@
 #include <TFile.h>
 #include <TLeaf.h>
 #include <TCanvas.h>
-
+#include <TObjArray.h>
+#include <TObject.h>
 
 #include <vector>
 #include <iostream>

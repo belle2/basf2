@@ -6,7 +6,6 @@
 
 
 
-
 /**TODOs:
   - implement cross checks for trying to compare different sectormaps, e.g. SectorSetups.
 */
@@ -21,12 +20,12 @@ namespace Belle2 {
     work with slightly different filters as long as the naming did not change. But if number of sectors on sensor is different the
     matching of sectors will not work and the results may become misleading!
   */
-  class SectorMapComparer {
+  class SectorMapComparer : public TObject {
   public:
-    SectorMapComparer() = delete;
+    SectorMapComparer() {}; // = delete;
     SectorMapComparer(const std::string& SMFileFirst, const std::string& SMFileSecond) : m_SMFileName_first(SMFileFirst),
       m_SMFileName_second(SMFileSecond) {};
-    ~SectorMapComparer() = default;
+    ~SectorMapComparer() {}; // = default;
 
 
     /// will create lots of Canvases!!!
@@ -72,5 +71,7 @@ namespace Belle2 {
 
     std::string m_SMFileName_first; ///< name of the file containing the first sectormap
     std::string m_SMFileName_second; ///< name of the file containing the second sectormap
+
+    ClassDef(SectorMapComparer, 0)
   };
 }// end namespace

@@ -11,6 +11,5 @@
 #pragma link C++ class Belle2::NoKickRTSel+;
 #pragma link C++ class Belle2::NoKickCuts+;
 
-// we do not want to stream that one
-#pragma link C++ class Belle2::SectorMapComparer-;
+#pragma link C++ class Belle2::SectorMapComparer+;
 

@@ -17,7 +17,6 @@
 /* External headers. */
 #include <TObject.h>
 
-/* Belle2 Headers. */
 
 namespace Belle2 {
 
@@ -39,44 +38,55 @@ namespace Belle2 {
     ~KLMTimeCableDelay();
 
     /**
-     * Set time calibration data.
-     * @param[in] strip Strip number.
-     * @param[in] dat TimeCalibration data.
+     * Set time calibration constant value.
+     * @param[in] KLM strip global element number.
+     * @param[in] calibration constant value for the strip.
      */
     void setTimeShift(uint16_t, double);
 
     /**
      * Get time calibration data.
-     * @param[in] strip Strip number.
+     * @param[in] KLM strip global element number.
      */
     double getTimeShift(uint16_t) const;
 
     /**
-     * Clean time calibration data.
+     * Clean time calibration constant.
      */
     void cleanTimeShift();
 
     /**
-     * Get effective light speed for scintillator.
+     * Get effective light speed of scintillators.
      */
     double getEffLightSpeed() const;
+
+    /**
+     * Get effective light speed of RPCs.
+     */
     double getEffLightSpeedRPC() const;
 
     /**
-     * Set effective light speed.
+     * Set effective light speed of scintillators.
      * @param[in] lightSpeed Effective light speed.
      */
     void setEffLightSpeed(double lightSpeed);
+
+    /**
+     * Set effective light speed of RPCs.
+     * @param[in] lightSpeed Effective light speed.
+     */
     void setEffLightSpeedRPC(double lightSpeed);
 
     /**
      * Get amplitude dependence time constant.
+     * This item is not supported by the firmwire so far.
      */
     double getAmpTimeConstant() const;
     double getAmpTimeConstantRPC() const;
 
     /**
      * Set amplitude dependence time constant.
+     * This item is not supported by the firmwire so far.
      * @param[in] amplitudeTimeConstant Amplitude dependence time constant.
      */
     void setAmpTimeConstant(double amplitudeTimeConstant);
@@ -85,15 +95,19 @@ namespace Belle2 {
 
   private:
 
-    /** Time calibration data. */
+    /** Container of time calibration constant value. */
     std::map<uint16_t, double> m_timeShift;
 
-    /** Effective light speed. */
+    /** Effective light speed of scintillators. */
     double m_effLightSpeed;
+
+    /** Effective light speed of RPCs. */
     double m_effLightSpeedRPC;
 
-    /** Amplitude dependence time constant. */
+    /** Amplitude dependence time constant of scintillators. */
     double m_ampTimeConstant;
+
+    /** Amplitude dependence time constant of RPCs. */
     double m_ampTimeConstantRPC;
 
     /** Class version. */

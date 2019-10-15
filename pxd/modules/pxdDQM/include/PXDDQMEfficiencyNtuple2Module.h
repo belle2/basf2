@@ -89,15 +89,15 @@ namespace Belle2 {
 
     std::string m_pxdClustersName; ///< name of the store array of pxd clusters
     std::string m_tracksName; ///< name of the store array of tracks
-    std::string m_recoTracksName;
+    std::string m_recoTracksName; ///< name of the store array of recotracks
     std::string m_ROIsName; ///< name of the store array of ROIs
     std::string m_PXDInterceptListName; /**< intercept list name*/
 
     StoreArray<PXDCluster> m_pxdclusters; ///< store array of pxd clusters
     StoreArray<Track> m_tracks; ///< store array of tracks
-    StoreArray<RecoTrack> m_recoTracks;
+    StoreArray<RecoTrack> m_recoTracks; ///< store array of reco tracks
     StoreArray<ROIid> m_ROIs; ///< store array of ROIs
-    StoreArray<PXDIntercept> m_intercepts;
+    StoreArray<PXDIntercept> m_intercepts; ///< store array of PXD Intercepts
 
     double m_pcut; ///< pValue-Cut for tracks
     double m_momCut; ///< Cut on fitted track momentum

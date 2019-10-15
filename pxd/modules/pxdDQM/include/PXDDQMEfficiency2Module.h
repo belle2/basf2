@@ -112,7 +112,7 @@ namespace Belle2 {
     StoreArray<PXDCluster> m_pxdclusters; ///< store array of pxd clusters
     StoreArray<RecoTrack> m_tracks; ///< store array of tracks
     StoreArray<ROIid> m_ROIs; ///< store array of ROIs
-    StoreArray<PXDIntercept> m_intercepts;
+    StoreArray<PXDIntercept> m_intercepts; ///< store array of PXD Intercepts
 
     double m_distcut; ///< distance cut in cm!
     double m_uFactor; ///< factor for track-error on distcut comparison

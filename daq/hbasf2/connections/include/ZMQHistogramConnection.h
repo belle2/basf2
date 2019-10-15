@@ -10,7 +10,7 @@
 #pragma once
 
 #include <framework/pcore/zmq/connections/ZMQConnection.h>
-#include <daq/hbasf2/utils/HistoTree.h>
+#include <daq/hbasf2/utils/HistogramMapping.h>
 
 #include <framework/pcore/zmq/connections/ZMQNullConnection.h>
 #include <framework/pcore/zmq/connections/ZMQConfirmedConnection.h>
@@ -55,7 +55,7 @@ namespace Belle2 {
                                const std::string& rootFileName);
 
     /// Merge the given histograms into a single set of histograms and store them to file/shm
-    void mergeAndSend(const std::map<std::string, HistogramTree>& storedMessages, const std::optional<unsigned int>& experiment,
+    void mergeAndSend(const std::map<std::string, HistogramMapping>& storedMessages, const std::optional<unsigned int>& experiment,
                       const std::optional<unsigned int>& run,
                       EMessageTypes messageType);
     /// Clear the shared memory
@@ -89,7 +89,7 @@ namespace Belle2 {
     ZMQHistoServerToZMQOutput(const std::string& outputAddress, const std::shared_ptr<ZMQParent>& parent);
 
     /// Merge the histograms and send them via the connection. Stop/Terminate messages are sent after that.
-    void mergeAndSend(const std::map<std::string, HistogramTree>& storedMessages, const std::optional<unsigned int>& experiment,
+    void mergeAndSend(const std::map<std::string, HistogramMapping>& storedMessages, const std::optional<unsigned int>& experiment,
                       const std::optional<unsigned int>& run,
                       EMessageTypes messageType);
     /// Nothing to do on clear.
@@ -127,7 +127,7 @@ namespace Belle2 {
     ZMQHistoServerToRawOutput(const std::string& outputAddress, const std::shared_ptr<ZMQParent>& parent);
 
     /// Merge the histograms and send them via the connection. Stop/Terminate messages are not sent.
-    void mergeAndSend(const std::map<std::string, HistogramTree>& storedMessages, const std::optional<unsigned int>& experiment,
+    void mergeAndSend(const std::map<std::string, HistogramMapping>& storedMessages, const std::optional<unsigned int>& experiment,
                       const std::optional<unsigned int>& run,
                       EMessageTypes messageType);
     /// Nothing to do on clear

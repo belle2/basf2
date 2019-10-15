@@ -43,7 +43,7 @@ ZMQHistoServerToFileOutput::ZMQHistoServerToFileOutput(unsigned int maximalUncom
   log("memory_file_size", 0l);
 }
 
-void ZMQHistoServerToFileOutput::mergeAndSend(const std::map<std::string, HistogramTree>& storedMessages,
+void ZMQHistoServerToFileOutput::mergeAndSend(const std::map<std::string, HistogramMapping>& storedMessages,
                                               const std::optional<unsigned int>& experiment,
                                               const std::optional<unsigned int>& run, EMessageTypes messageType)
 {
@@ -56,7 +56,7 @@ void ZMQHistoServerToFileOutput::mergeAndSend(const std::map<std::string, Histog
   increment("histogram_merges");
 
   // We do not care if this is the run end, or run start or anything. We just write it out.
-  HistogramTree mergeHistograms;
+  HistogramMapping mergeHistograms;
 
   TMemFile memFile(m_dqmMemFileName.c_str(), "RECREATE");
   memFile.cd();
@@ -125,7 +125,7 @@ ZMQHistoServerToZMQOutput::ZMQHistoServerToZMQOutput(const std::string& outputAd
   m_output.log("size_after_compression", 0.0);
 }
 
-void ZMQHistoServerToZMQOutput::mergeAndSend(const std::map<std::string, HistogramTree>& storedMessages,
+void ZMQHistoServerToZMQOutput::mergeAndSend(const std::map<std::string, HistogramMapping>& storedMessages,
                                              const std::optional<unsigned int>& experiment,
                                              const std::optional<unsigned int>& run, EMessageTypes messageType)
 {
@@ -156,7 +156,7 @@ void ZMQHistoServerToZMQOutput::mergeAndSend(const std::map<std::string, Histogr
 
   m_output.increment("histogram_merges");
 
-  HistogramTree mergeHistograms;
+  HistogramMapping mergeHistograms;
 
   m_output.log("last_merged_histograms", static_cast<long>(storedMessages.size()));
   m_output.average("average_merged_histograms", static_cast<double>(storedMessages.size()));
@@ -200,7 +200,7 @@ ZMQHistoServerToRawOutput::ZMQHistoServerToRawOutput(const std::string& outputAd
   m_output.log("size_before_compression", 0.0);
 }
 
-void ZMQHistoServerToRawOutput::mergeAndSend(const std::map<std::string, HistogramTree>& storedMessages,
+void ZMQHistoServerToRawOutput::mergeAndSend(const std::map<std::string, HistogramMapping>& storedMessages,
                                              const std::optional<unsigned int>& experiment,
                                              const std::optional<unsigned int>& run, EMessageTypes messageType)
 {
@@ -226,7 +226,7 @@ void ZMQHistoServerToRawOutput::mergeAndSend(const std::map<std::string, Histogr
 
   m_output.increment("histogram_merges");
 
-  HistogramTree mergeHistograms;
+  HistogramMapping mergeHistograms;
 
   m_output.log("last_merged_histograms", static_cast<long>(storedMessages.size()));
   m_output.average("average_merged_histograms", static_cast<double>(storedMessages.size()));

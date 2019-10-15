@@ -77,13 +77,13 @@ void ZMQHistogramOutput<AConnectionClass>::handleEvent(std::unique_ptr<ZMQIdMess
 
     B2DEBUG(10,
             "After decompression, the size is " << uncompressedSize << " and the message itself says " << msg->size());
-    HistogramTree histogram(std::move(msg));
+    HistogramMapping histogram(std::move(msg));
     if (not histogram.empty()) {
       m_storedMessages[identity] = std::move(histogram);
     }
   } else if (message->isMessage(Belle2::EMessageTypes::c_rawDataMessage)) {
     std::unique_ptr<Belle2::EvtMessage> msg(new Belle2::EvtMessage(dataMessage.data<char>()));
-    HistogramTree histogram(std::move(msg));
+    HistogramMapping histogram(std::move(msg));
     if (not histogram.empty()) {
       m_storedMessages[identity] = std::move(histogram);
     }

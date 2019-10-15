@@ -25,23 +25,23 @@ namespace Belle2 {
    * Internally, the tree structure is stored as a mapping name -> TH1 (unique) pointer,
    * where folder structure is mapped via "/" in the name.
    */
-  class HistogramTree {
+  class HistogramMapping {
   public:
     /// As this is a heavy object, make sure to not copy
-    HistogramTree& operator=(const HistogramTree& rhs) = delete;
+    HistogramMapping& operator=(const HistogramMapping& rhs) = delete;
     /// Moving is allowed
-    HistogramTree& operator=(HistogramTree&& rhs) = default;
+    HistogramMapping& operator=(HistogramMapping&& rhs) = default;
     /// As this is a heavy object, make sure to not copy
-    HistogramTree(const HistogramTree& rhs) = delete;
+    HistogramMapping(const HistogramMapping& rhs) = delete;
     /// Moving is allowed
-    HistogramTree(HistogramTree&& rhs) = default;
+    HistogramMapping(HistogramMapping&& rhs) = default;
     /// Default constructor needed during summation
-    HistogramTree() = default;
+    HistogramMapping() = default;
     /// Constructor via a received event message by deserializing the histograms
-    explicit HistogramTree(std::unique_ptr<Belle2::EvtMessage> msg);
+    explicit HistogramMapping(std::unique_ptr<Belle2::EvtMessage> msg);
 
     /// Add another histogramm tree instance by merging all histograms with the same name.
-    void operator+=(const HistogramTree& rhs);
+    void operator+=(const HistogramMapping& rhs);
 
     /// Write out all stored histograms in the currently selected ROOT gDirectory
     void write() const;

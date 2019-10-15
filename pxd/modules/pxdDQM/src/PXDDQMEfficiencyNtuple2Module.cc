@@ -40,17 +40,11 @@ PXDDQMEfficiencyNtuple2Module::PXDDQMEfficiencyNtuple2Module() : Module(), m_vxd
   addParam("tracksName", m_tracksName, "name of StoreArray with Tracks", std::string(""));
   addParam("ROIsName", m_ROIsName, "name of the list of HLT ROIs, if available in output", std::string(""));
   addParam("PXDInterceptListName", m_PXDInterceptListName, "name of the list of interceptions", std::string(""));
-
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", true);
-
   addParam("pCut", m_pcut, "Set a cut on the track fit p-value (0=no cut)", double(0));
-
   addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
-
   addParam("momCut", m_momCut, "Set a cut on the track momentum in GeV/c, 0 disables", double(0));
-
   addParam("pTCut", m_pTCut, "Set a cut on the track pT in GeV/c, 0 disables", double(0));
-
   addParam("maskedDistance", m_maskedDistance, "Distance inside which no masked pixel or sensor border is allowed", int(10));
 }
 
@@ -143,9 +137,7 @@ void PXDDQMEfficiencyNtuple2Module::event()
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
     for (auto intercept : interceptList) {
       auto aVxdID = intercept.getSensorID();
-
       auto& info = m_vxdGeometry.getSensorInfo(aVxdID);
-
       //Search for intersections of the track with all PXD layers
       //Traditional (aka the person before did it like this) method
       //If there is a way to find out sensors crossed by a track directly, that would most likely be faster

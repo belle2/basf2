@@ -18,9 +18,7 @@
 #include <framework/core/Module.h>
 #include <generators/evtgen/EvtGenInterface.h>
 #include <generators/utilities/InitialParticleGeneration.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
-
 
 namespace Belle2 {
 

@@ -11,6 +11,7 @@
 #pragma once
 
 #include <svd/reconstruction/SVDRecoHit.h>
+
 #include <genfit/ICalibrationParametersDerivatives.h>
 
 #include <TMatrix.h>
@@ -25,6 +26,9 @@ namespace Belle2 {
   class AlignableSVDRecoHit : public SVDRecoHit, public genfit::ICalibrationParametersDerivatives  {
     friend class SVDRecoHit;
   public:
+    /// Static enabling(true) or disabling(false) addition of global derivatives for Lorentz shift
+    static bool s_enableLorentzGlobalDerivatives;
+
     /** Inherit constructors */
     using SVDRecoHit::SVDRecoHit;
 

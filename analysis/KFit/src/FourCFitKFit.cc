@@ -16,7 +16,6 @@
 #include <analysis/KFit/FourCFitKFit.h>
 #include <analysis/KFit/MakeMotherKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
-#include <analysis/utility/PCmsLabTransform.h>
 #include <TLorentzVector.h>
 
 
@@ -591,11 +590,10 @@ FourCFitKFit::makeCoreMatrix() {
     HepMatrix al_1_prime(m_al_1);
     HepMatrix Sum_al_1(7, 1, 0);
     double energy[KFitConst::kMaxTrackCount2];
-    double a;
 
     for (int i = 0; i < m_TrackCount; i++)
     {
-      a = m_property[i][2];
+      const double a = m_property[i][2];
       al_1_prime[i * KFitConst::kNumber7 + 0][0] -= a * (al_1_prime[KFitConst::kNumber7 * m_TrackCount + 1][0] - al_1_prime[i *
       KFitConst::kNumber7 + 5][0]);
       al_1_prime[i * KFitConst::kNumber7 + 1][0] += a * (al_1_prime[KFitConst::kNumber7 * m_TrackCount + 0][0] - al_1_prime[i *
@@ -640,7 +638,6 @@ FourCFitKFit::makeCoreMatrix() {
         break;
       }
 
-      a = m_property[i][2];
       for (int l = 0; l < 4; l++) {
         for (int n = 0; n < 6; n++) {
           if (l == n) m_D[l][i * KFitConst::kNumber7 + n] = 1;
@@ -688,6 +685,16 @@ enum KFitError::ECode FourCFitKFit::updateMother(Particle* mother)
   double chi2 = getCHIsq();
   int ndf = getNDF();
   double prob = TMath::Prob(chi2, ndf);
+  //
+  bool haschi2 = mother->hasExtraInfo("chiSquared");
+  if (haschi2) {
+    mother->setExtraInfo("chiSquared", chi2);
+    mother->setExtraInfo("ndf", ndf);
+  } else if (!haschi2) {
+    mother->addExtraInfo("chiSquared", chi2);
+    mother->addExtraInfo("ndf", ndf);
+  }
+
   mother->updateMomentum(
     CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
     CLHEPToROOT::getTVector3(kmm.getMotherPosition()),

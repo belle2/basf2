@@ -13,20 +13,13 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/WireID.h>
 
-#include <TH1D.h>
-#include <TH2D.h>
 #include <TF1.h>
 #include <TFile.h>
-#include <TChain.h>
 #include <TDirectory.h>
 #include <TROOT.h>
 #include <TTree.h>
-#include "iostream"
-#include "string"
-#include <framework/utilities/FileSystem.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBImportObjPtr.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -62,12 +55,12 @@ void TimeWalkCalibrationAlgorithm::createHisto()
 
   auto tree = getObjectPtr<TTree>("tree");
 
-  double x;
-  double t_mea;
-  double w;
-  double t_fit;
-  double ndf;
-  double Pval;
+  float x;
+  float t_mea;
+  float w;
+  float t_fit;
+  float ndf;
+  float Pval;
   unsigned short adc;
   int IWire;
   int lay;
@@ -81,6 +74,14 @@ void TimeWalkCalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("ndf", &ndf);
   tree->SetBranchAddress("Pval", &Pval);
   tree->SetBranchAddress("adc", &adc);
+
+  /* Disable unused branch */
+  std::vector<TString> list_vars = {"lay", "IWire", "x_u", "t", "t_fit",  "weight", "Pval", "ndf", "adc"};
+  tree->SetBranchStatus("*", 0);
+
+  for (TString brname : list_vars) {
+    tree->SetBranchStatus(brname, 1);
+  }
 
   const int nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
@@ -172,6 +173,7 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
       m_tw_new[ib][i - 1] = f1->GetParameter(i);
     }
 
+
     B2DEBUG(21, "Prob of fitting:" << f1->GetProb());
     B2DEBUG(21, "Fitting Param 0-1:" << f1->GetParameter(0) << " - " << f1->GetParameter(1));
 
@@ -193,6 +195,16 @@ void TimeWalkCalibrationAlgorithm::storeHist()
   B2INFO("Storing histogram");
   B2DEBUG(21, "Store 1D histogram");
   TFile*  fhist = new TFile(m_histName.c_str(), "RECREATE");
+  auto hNDF =   getObjectPtr<TH1F>("hNDF");
+  auto hPval =   getObjectPtr<TH1F>("hPval");
+  auto hEvtT0 =   getObjectPtr<TH1F>("hEventT0");
+  //store NDF, P-val. EventT0 histogram for monitoring during calibration
+  if (hNDF && hPval && hEvtT0) {
+    hEvtT0->Write();
+    hPval->Write();
+    hNDF->Write();
+  }
+
   TDirectory* old = gDirectory;
   TDirectory* h1D = old->mkdir("h1D");
   TDirectory* h2D = old->mkdir("h2D");
@@ -224,7 +236,6 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::checkConvergence()
   for (int ib = 0; ib < 300; ++ib) {
     float dtw = (m_tw_new[ib][0] - m_tw_old[ib][0]) / m_tw_old[ib][0];
     if (std::isnan(dtw) == 0) {
-      //      std::cout << dtw << " " << m_tw_new[ib][0] << " " << m_tw_old[ib][0] << std::endl;
       hDtw->Fill(dtw);
     }
   }
@@ -244,14 +255,19 @@ void TimeWalkCalibrationAlgorithm::write()
   B2INFO("Save to the local DB");
   CDCTimeWalks* dbTw = new CDCTimeWalks();
   int nfailure = 0;
+
+  dbTw->setTwParamMode(m_twParamMode);
   for (int ib = 0; ib < 300; ++ib) {
     if (m_flag[ib] != 1) {
       nfailure += 1;
     }
-    const int num = static_cast<int>(m_tw_old[ib].size());
-    for (int i = 0; i < num; ++i) {
-      m_tw_new[ib][i] += m_tw_old[ib][i];
+    if (m_twParamMode == 0) {
+      const int num = static_cast<int>(m_tw_old[ib].size());
+      for (int i = 0; i < num; ++i) {
+        m_tw_new[ib][i] += m_tw_old[ib][i];
+      }
     }
+
     dbTw->setTimeWalkParams(ib, m_tw_new[ib]);
   }
 

@@ -9,10 +9,6 @@
  **************************************************************************/
 
 #include <analysis/dataobjects/ContinuumSuppression.h>
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <framework/logging/Logger.h>
-#include <iostream>
 
 using namespace Belle2;
 

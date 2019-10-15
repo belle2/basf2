@@ -8,7 +8,6 @@
 
 #include <dqm/modules/V0ObjectsDQM/V0ObjectsDQMModule.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <TDirectory.h>
 
@@ -84,7 +83,7 @@ void V0ObjectsDQMModule::event()
       float vtxz = V0->getZ();
       if (fabs(vtxz) < 75 && fabs(vtxx) < 10 && fabs(vtxy) < 10) {
         m_h_xvsy[int(floor((vtxz + 75) / 5))]->Fill(vtxx, vtxy);
-        m_h_xvsz->Fill(vtxz, vtxx);
+        if (vtxz <= -5. || vtxz >= 8.) m_h_xvsz->Fill(vtxz, vtxx);
       }
     }
   }

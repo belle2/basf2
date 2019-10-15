@@ -15,9 +15,6 @@
 #include <TVector3.h>
 #include <TMatrixFSym.h>
 
-#include <vector>
-#include <set>
-
 namespace Belle2 {
 
 
@@ -52,6 +49,9 @@ namespace Belle2 {
       m_tagVolErr = 0;
       m_truthTagVl = 0;
       m_truthTagVol = 0;
+      m_tagVNDF = 0;
+      m_tagVChi2 = 0;
+      m_tagVChi2IP = 0;
     }
 
     // get methods
@@ -135,6 +135,21 @@ namespace Belle2 {
      * Returns the error of the tagV component in the direction orthogonal to the boost
      */
     float getTagVolErr() ;
+
+    /**
+     * Returns the number of degrees of freedom in the tag vertex fit
+     */
+    float getTagVNDF() ;
+
+    /**
+     * Returns the chi^2 value of the tag vertex fit result
+     */
+    float getTagVChi2() ;
+
+    /**
+     * Returns the IP component of the chi^2 value of the tag vertex fit result
+     */
+    float getTagVChi2IP() ;
 
 
 
@@ -220,6 +235,21 @@ namespace Belle2 {
      */
     void setTagVolErr(float TagVolErr) ;
 
+    /**
+     * Set the number of degrees of freedom in the tag vertex fit
+     */
+    void setTagVNDF(float TagVNDF) ;
+
+    /**
+     * Set the chi^2 value of the tag vertex fit result
+     */
+    void setTagVChi2(float TagVChi2) ;
+
+    /**
+     * Set the IP component of the chi^2 value of the tag vertex fit result
+     */
+    void setTagVChi2IP(float TagVChi2IP) ;
+
 
 
   private:
@@ -239,6 +269,9 @@ namespace Belle2 {
     float m_tagVol;                     /**< tagV component in the direction orthogonal to the boost */
     float m_truthTagVol;                /**< MC tagV component in the direction orthogonal to the boost */
     float m_tagVolErr;                  /**< Error of the tagV component in the direction orthogonal to the boost */
+    float m_tagVNDF;                    /**< Number of degrees of freedom in the tag vertex fit */
+    float m_tagVChi2;                   /**< chi^2 value of the tag vertex fit result */
+    float m_tagVChi2IP;                 /**< IP component of chi^2 value of the tag vertex fit result */
 
     /**
      * Resets 3x3 tag vertex error matrix
@@ -246,7 +279,8 @@ namespace Belle2 {
      */
     void resetTagVertexErrorMatrix();
 
-    ClassDef(TagVertex, 2) /**<
+    ClassDef(TagVertex, 3) /**<
+           3. Add NDF, Chi2, Chi2IP
                              2. Name to contain "Tag"
                              1. class definition
                              */

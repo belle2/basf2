@@ -30,10 +30,24 @@ SetTauThrustSkimVariables(path=tauthrustskim)
 variablesToHistogram(
     filename='TauThrust_Validation.root',
     decayString='',
-    variables=[('nGoodTracks', 7, 1, 8),
+    variables=[('nGoodTracksThrust', 7, 1, 8),
                ('visibleEnergyOfEventCMS', 60, 0, 12),
                ('thrust', 50, 0.75, 1)],
     path=tauthrustskim
 )
 process(tauthrustskim)
 print(statistics)
+
+# add contact information to histogram
+contact = "kenji@hepl.phys.nagoya-u.ac.jp"
+
+import ROOT
+
+f = ROOT.TFile.Open('TauThrust_Validation.root', 'update')
+
+f.Get('nGoodTracksThrust').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+f.Get('visibleEnergyOfEventCMS').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+f.Get('thrust').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+
+f.Write("", ROOT.TObject.kOverwrite)
+f.Close()

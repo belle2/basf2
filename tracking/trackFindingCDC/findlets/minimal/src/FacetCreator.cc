@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
+#include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>

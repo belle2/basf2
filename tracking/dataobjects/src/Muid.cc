@@ -39,10 +39,14 @@ Muid::Muid() :
   m_ExtLayer(-1),
   m_HitLayer(-1),
   m_ExtLayerPattern(0),
-  m_HitLayerPattern(0),
-  m_ExtBKLMEfficiencyVector(0)
-  //  m_ExtEKLMEfficiencyVector(0)
+  m_HitLayerPattern(0)
 {
+  for (int i = 0; i < BKLMElementNumbers::getMaximalLayerNumber(); ++i) {
+    m_ExtBKLMEfficiencyValue[i] = 1.0;
+  }
+  for (int i = 0; i < EKLMElementNumbers::getMaximalLayerNumber(); ++i) {
+    m_ExtEKLMEfficiencyValue[i] = 1.0;
+  }
 }
 
 Muid::Muid(int pdgCode) :
@@ -71,8 +75,37 @@ Muid::Muid(int pdgCode) :
   m_ExtLayer(-1),
   m_HitLayer(-1),
   m_ExtLayerPattern(0),
-  m_HitLayerPattern(0),
-  m_ExtBKLMEfficiencyVector(0)
-  //  m_ExtEKLMEfficiencyVector(0)
+  m_HitLayerPattern(0)
 {
+  for (int i = 0; i < BKLMElementNumbers::getMaximalLayerNumber(); ++i) {
+    m_ExtBKLMEfficiencyValue[i] = 1.0;
+  }
+  for (int i = 0; i < EKLMElementNumbers::getMaximalLayerNumber(); ++i) {
+    m_ExtEKLMEfficiencyValue[i] = 1.0;
+  }
+}
+
+unsigned int Muid::getTotalBarrelHits() const
+{
+  unsigned int hits = 0;
+  unsigned int pattern = m_HitLayerPattern;
+  for (int bit = 0; bit < BKLMElementNumbers::getMaximalLayerNumber(); ++bit) {
+    if (pattern & (1 << bit)) {
+      hits++;
+    }
+  }
+  return hits;
+}
+
+unsigned int Muid::getTotalEndcapHits() const
+{
+  unsigned int hits = 0;
+  unsigned int pattern = m_HitLayerPattern;
+  for (int bit = BKLMElementNumbers::getMaximalLayerNumber();
+       bit < BKLMElementNumbers::getMaximalLayerNumber() + EKLMElementNumbers::getMaximalLayerNumber(); ++bit) {
+    if (pattern & (1 << bit)) {
+      hits++;
+    }
+  }
+  return hits;
 }

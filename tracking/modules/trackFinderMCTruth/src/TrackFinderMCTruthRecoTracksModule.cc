@@ -13,7 +13,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
@@ -26,13 +25,10 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <top/dataobjects/TOPBarHit.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <genfit/WireTrackCandHit.h>
+#include <simulation/monopoles/MonopoleConstants.h>
 
 #include <framework/geometry/BFieldManager.h>
-
-#include <boost/foreach.hpp>
 
 #include <TRandom.h>
 
@@ -457,7 +453,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
     }
 
     // ignore neutrals (unless requested) (and unless monopoles)
-    if (!m_neutrals && (aMcParticlePtr->getCharge() == 0 && abs(aMcParticlePtr->getPDG()) != 99666)) {
+    if (!m_neutrals && (aMcParticlePtr->getCharge() == 0 && abs(aMcParticlePtr->getPDG()) != Monopoles::c_monopolePDGCode)) {
       B2DEBUG(100, "particle does not have the right charge. MC particle will be skipped");
       continue; //goto next mcParticle, do not make track candidate
     }

@@ -16,7 +16,6 @@
 
 // std
 #include <vector>
-#include <map>
 
 namespace Belle2 {
 

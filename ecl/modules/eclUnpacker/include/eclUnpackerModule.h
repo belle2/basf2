@@ -10,6 +10,7 @@
 #pragma once
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
 #include "ecl/utility/ECLChannelMapper.h"
 

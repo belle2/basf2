@@ -10,7 +10,6 @@
 
 #pragma once
 #include <TObject.h>
-#include <TH1F.h>
 #include <string>
 #include <TGraph.h>
 #include <arich/dbobjects/ARICHHapdChipInfo.h>

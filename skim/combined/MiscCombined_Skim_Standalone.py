@@ -14,15 +14,12 @@ from stdV0s import *
 from skim.standardlists.charm import *
 from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import *
-from skimExpertFunctions import setSkimLogging, add_skim, encodeSkimName
-gb2_setuprel = 'release-03-00-00'
-skimpath = Path()
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-04-00-00'
 
-inputMdstList('MC9', fileList, path=skimpath)
+skimpath = Path()
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=skimpath)
 
 
 stdPi('loose', path=skimpath)
@@ -35,6 +32,7 @@ stdPi0s('loose', path=skimpath)
 stdPhotons('loose', path=skimpath)
 stdKshorts(path=skimpath)
 loadStdLightMesons(path=skimpath)
+stdPhotons('all', path=skimpath)
 loadStdSkimPi0(path=skimpath)
 loadStdSkimPhoton(path=skimpath)
 
@@ -47,10 +45,7 @@ loadStdDiLeptons(True, path=skimpath)
 cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=skimpath)
 
 
-# BtoPi0Pi0 Skim
-# from skim.btocharmless import BtoPi0Pi0List
-# add_skim('BtoPi0Pi0', BtoPi0Pi0List(path=skimpath))
-# Tau Skim
+# TauLFV Skim
 from skim.taupair import TauLFVList
 add_skim('TauLFV', TauLFVList(path=skimpath), path=skimpath)
 
@@ -63,6 +58,9 @@ add_skim('TCPV', TCPVList(path=skimpath), path=skimpath)
 from skim.taupair import TauList
 add_skim('TauGeneric', TauList(path=skimpath), path=skimpath)
 
+# Tau Thrust
+from skim.taupair import *
+add_skim('TauThrust', TauThrustList(path=skimpath), path=skimpath)
 
 setSkimLogging(path=skimpath)
 process(path=skimpath)

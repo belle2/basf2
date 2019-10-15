@@ -9,27 +9,20 @@
  **************************************************************************/
 
 #include <iostream>
-#include <iomanip>
 #include <cdc/calibration/SpaceResolutionCalibrationAlgorithm.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCSpaceResols.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 
+#include "TF1.h"
 #include "TH1F.h"
 #include "TH2F.h"
-#include "TMultiGraph.h"
-#include "TPad.h"
-#include "TCanvas.h"
-#include "TSystem.h"
-#include "TChain.h"
 #include "TROOT.h"
 #include "TError.h"
 #include "TMinuit.h"
+
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -82,16 +75,16 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
   auto tree = getObjectPtr<TTree>("tree");
 
   int lay;
-  double w;
-  double x_u;
-  double x_b;
-  double x_mea;
-  double Pval;
-  double alpha;
-  double theta;
-  double ndf;
-  double absRes_u;
-  double absRes_b;
+  float w;
+  float x_u;
+  float x_b;
+  float x_mea;
+  float Pval;
+  float alpha;
+  float theta;
+  float ndf;
+  float absRes_u;
+  float absRes_b;
   tree->SetBranchAddress("lay", &lay);
   tree->SetBranchAddress("ndf", &ndf);
   tree->SetBranchAddress("Pval", &Pval);
@@ -101,6 +94,15 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("weight", &w);
   tree->SetBranchAddress("alpha", &alpha);
   tree->SetBranchAddress("theta", &theta);
+
+  /* Disable unused branch */
+  std::vector<TString> list_vars = {"lay", "ndf", "Pval", "x_u", "x_b", "x_mea", "weight", "alpha", "theta"};
+  tree->SetBranchStatus("*", 0);
+
+  for (TString brname : list_vars) {
+    tree->SetBranchStatus(brname, 1);
+  }
+
 
   const int nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
@@ -314,20 +316,11 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
   const auto exprun = getRunList()[0];
   B2INFO("ExpRun used for DB Geometry : " << exprun.first << " " << exprun.second);
   updateDBObjPtrs(1, exprun.second, exprun.first);
-  B2INFO("Creating CDCGeometryPar object");
-  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
+  //  B2INFO("Creating CDCGeometryPar object");
+  //  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   prepare();
   createHisto();
-
-  //half cell size
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-  double halfCSize[56];
-  for (int i = 0; i < 56; ++i) {
-    double R = cdcgeo.senseWireR(i);
-    double nW = cdcgeo.nWiresInLayer(i);
-    halfCSize[i] = M_PI * R / nW;
-  }
 
   TF1* func = new TF1("func", "[0]/(x*x + [1])+[2]* x+[3]+[4]*exp([5]*(x-[6])*(x-[6]))", 0, 1.);
   TH1F* hprob = new TH1F("h1", "", 20, 0, 1);
@@ -335,58 +328,26 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
   double intp6;
 
   for (int i = 0; i < 56; ++i) {
-
-    if (i < 8) {
-      upFit = halfCSize[i] + 0.1;
-      intp6 = halfCSize[i] + 0.1;
-    } else {
-      upFit = halfCSize[i] - 0.07;
-      intp6 = halfCSize[i];
-    }
-
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nAlphaBins; ++al) {
         for (int th = 0; th < m_nThetaBins; ++th) {
-          //boundary parameters,
-          if (m_bField) {
-            if (i < 8) {
-              upFit = halfCSize[i] + 0.15;
-              intp6 = halfCSize[i] + 0.1;
-            } else {
-              if (fabs(m_iAlpha[al]) < 25) {
-                upFit = halfCSize[i];
-                intp6 = halfCSize[i];
-              } else {
-                upFit = halfCSize[i] + 0.2;
-                intp6 = halfCSize[i] + 0.4 ;
-              }
-            }
-            //no B case
-          } else {
-            if (i < 8) {
-              upFit = halfCSize[i] + 0.1;
-              intp6 = halfCSize[i] + 0.1;
-            } else {
-              upFit = halfCSize[i] - 0.07;
-              intp6 = halfCSize[i];
-            }
-          }
-
-          if (upFit > 0.9) upFit = 0.9;
-
-          //          func->SetLineColor(1 + lr + al * 2 + th * 3);
-          func->SetParameters(5E-6, 0.007, 1E-4, 1E-5, 0.00008, -30, intp6);
-          func->SetParLimits(0, 1E-7, 1E-4);
-          func->SetParLimits(1, 0.0045, 0.02);
-          func->SetParLimits(2, 1E-6, 0.0005);
-          func->SetParLimits(3, 1E-8, 0.0005);
-          func->SetParLimits(4, 0., 0.001);
-          func->SetParLimits(5, -40, 0.);
-          func->SetParLimits(6, intp6 - 0.5, intp6 + 0.2);
-          B2DEBUG(21, "Fitting for layer: " << i << "lr: " << lr << " ial" << al << " ith:" << th);
-          B2DEBUG(21, "Fit status before fit:" << m_fitStatus[i][lr][al][th]);
           if (!m_gFit[i][lr][al][th]) continue;
           if (m_fitStatus[i][lr][al][th] != -1) { /*if graph exist, do fitting*/
+            upFit = getUpperBoundaryForFit(m_gFit[i][lr][al][th]);
+            intp6 = upFit + 0.2;
+            B2DEBUG(199, "xmax for fitting: " << upFit);
+
+            func->SetParameters(5E-6, 0.007, 1E-4, 1E-5, 0.00008, -30, intp6);
+            func->SetParLimits(0, 1E-7, 1E-4);
+            func->SetParLimits(1, 0.0045, 0.02);
+            func->SetParLimits(2, 1E-6, 0.0005);
+            func->SetParLimits(3, 1E-8, 0.0005);
+            func->SetParLimits(4, 0., 0.001);
+            func->SetParLimits(5, -40, 0.);
+            func->SetParLimits(6, intp6 - 0.5, intp6 + 0.2);
+
+            B2DEBUG(21, "Fitting for layer: " << i << "lr: " << lr << " ial" << al << " ith:" << th);
+            B2DEBUG(21, "Fit status before fit:" << m_fitStatus[i][lr][al][th]);
 
             for (int j = 0; j < 10; j++) {
 
@@ -397,7 +358,8 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
               B2DEBUG(21, "stat of fit" << stat);
               std::string Fit_status = gMinuit->fCstatu.Data();
               B2DEBUG(21, "FIT STATUS: " << Fit_status);
-              if (Fit_status == "OK" || Fit_status == "SUCCESSFUL") {//need to found better way
+              if (Fit_status == "OK" || Fit_status == "SUCCESSFUL" || Fit_status == "CALL LIMIT"
+                  || Fit_status == "PROBLEMS") {//need to found better way
                 if (fabs(func->Eval(0.3)) > 0.00035 || func->Eval(0.3) < 0) {
                   func->SetParameters(5E-6, 0.007, 1E-4, 1E-7, 0.0007, -30, intp6 + 0.05 * j);
                   func->SetParLimits(6, intp6 + 0.05 * j - 0.5, intp6 + 0.05 * j + 0.2);
@@ -435,16 +397,46 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
   write();
   storeHisto();
 
+  const int nTotal = 56 * 2 * m_nAlphaBins * m_nThetaBins;
+  int nFitCompleted = 0;
+  for (int l = 0; l < 56; ++l) {
+    for (int lr = 0; lr < 2; ++lr) {
+      for (int al = 0; al < m_nAlphaBins; ++al) {
+        for (int th = 0; th < m_nThetaBins; ++th) {
+          if (m_fitStatus[l][lr][al][th] == 1) {
+            nFitCompleted += 1;
+          }
+        }
+      }
+    }
+  }
+
+  if (static_cast<double>(nFitCompleted) / nTotal < m_threshold) {
+    B2WARNING("Less than " << m_threshold * 100 << " % of Sigmas were fitted.");
+    return c_NotEnoughData;
+  }
+
   return c_OK;
 }
 
 void SpaceResolutionCalibrationAlgorithm::storeHisto()
 {
-  B2INFO("Storing histo");
+  B2INFO("saving histograms");
 
   TFile*  ff = new TFile(m_histName.c_str(), "RECREATE");
   TDirectory* top = gDirectory;
   TDirectory* Direct[56];
+
+  auto hNDF =   getObjectPtr<TH1F>("hNDF");
+  auto hPval =   getObjectPtr<TH1F>("hPval");
+  auto hEvtT0 =   getObjectPtr<TH1F>("hEventT0");
+  //store NDF, P-val. EventT0 histogram for monitoring during calibration
+  if (hNDF && hPval && hEvtT0) {
+    hEvtT0->Write();
+    hPval->Write();
+    hNDF->Write();
+  }
+
 
   for (int il = 0; il < 56; ++il) {
     top->cd();

@@ -7,6 +7,17 @@
 //-
 #include <dqm/modules/DAQMonitor.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawPXD.h>
+#include <rawdata/dataobjects/RawSVD.h>
+#include <rawdata/dataobjects/RawCDC.h>
+#include <rawdata/dataobjects/RawTOP.h>
+#include <rawdata/dataobjects/RawARICH.h>
+#include <rawdata/dataobjects/RawECL.h>
+#include <rawdata/dataobjects/RawKLM.h>
+#include <rawdata/dataobjects/RawTRG.h>
+
+#include <TDirectory.h>
 
 using namespace std;
 using namespace Belle2;

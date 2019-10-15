@@ -14,7 +14,6 @@
 
 
 // Framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
@@ -36,18 +35,12 @@
 
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TGraph.h>
 #include <TFile.h>
 #include <TNtuple.h>
-#include <TRandom.h>
 #include <TVector3.h>
 #include <TAxis.h>
 
-#include <libxml/xmlreader.h>
-
-
 // ifstream constructor.
-#include <iostream>
 #include <fstream>
 
 const char* record_strings[] = { "Event", "Begin_run", "Pause", "Resume", "End_run" };

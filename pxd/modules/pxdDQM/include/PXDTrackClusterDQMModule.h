@@ -12,15 +12,12 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <framework/core/HistoModule.h>
 #include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <TH1F.h>
-#include <TH2F.h>
 
 #include <map>
 
@@ -47,7 +44,7 @@ namespace Belle2 {
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
     bool m_moreHistos; /**< Fill aditional histograms */
 
-    //the geometry
+    /// the geometry
     VXD::GeoCache& m_vxdGeometry;
 
     /** StoreArray name where Tracks are written. */

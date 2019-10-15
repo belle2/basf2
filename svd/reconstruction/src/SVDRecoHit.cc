@@ -180,9 +180,6 @@ TVectorD SVDRecoHit::applyPlanarDeformation(TVectorD rawHit, std::vector<double>
 
 std::vector<genfit::MeasurementOnPlane*> SVDRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
-
-  DBObjPtr<VXDAlignment> vxdAlignment;
-
   if (!m_isU || m_rotationPhi == 0.0) {
 
     // Apply planar deformation to rectangular sensor or V coordinate of slanted sensor

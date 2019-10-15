@@ -182,6 +182,19 @@ restrictions apply:
     :nodefaultconst:
     :nogroupsections:
 
+.. _b2file-remove-branches:
+
+``b2file-remove-branches``: Create a copy of a basf2 output file removing a list of given branches in the process
+-----------------------------------------------------------------------------------------------------------------
+
+.. argparse::
+    :filename: framework/tools/b2file-remove-branches
+    :func: create_argumentparser
+    :prog: b2file-remove-branches
+    :nodefaultconst:
+    :nogroupsections:
+
+.. versionadded:: release-04-00-00
 
 ``b2file-size``: Show detailed size information about the content of a file
 ---------------------------------------------------------------------------
@@ -192,3 +205,29 @@ restrictions apply:
     :prog: b2file-size
     :nodefault:
     :nogroupsections:
+
+.. _b2file-normalize:
+
+``b2file-normalize``: Reset non-reproducible root file metadata and optionally the file name in the metadata
+------------------------------------------------------------------------------------------------------------
+
+.. argparse::
+    :filename: framework/tools/b2file-normalize
+    :func: get_argument_parser
+    :prog: b2file-normalize
+    :nodefaultconst:
+    :nogroupsections:
+
+.. versionadded:: release-04-00-00
+
+``b2file-md5sum``: Calculate a md5 checksum of a root file content excluding the root metadata
+----------------------------------------------------------------------------------------------
+
+.. argparse::
+    :filename: framework/tools/b2file-md5sum
+    :func: get_argument_parser
+    :prog: b2file-md5sum
+    :nodefaultconst:
+    :nogroupsections:
+
+.. versionadded:: release-04-00-00

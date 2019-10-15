@@ -1,0 +1,21 @@
+Changes in the analysis package
+-------------------------------
+
+Variables
++++++++++
+
+ * Renamed some `RestOfEvent` variables for consistency accross the `VariableManager`.
+   Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.
+   For example ``ROE_deltae`` is now :b2:var:`roeDeltae`.
+
+ * Removed ``clusterCRID`` which duplicates :b2:var:`clusterConnectedRegionID`.
+
+Modules
++++++++
+
+ * The :b2:mod:`ParticleLoader` can create neutron particle lists now. ECL
+   cluster with the hadron hypothesis as well as KLM cluster are used as source.
+ * In :b2:mod:`TreeFitter` bugfix in mass constraint: chi2 correctly calculated now.
+ * In :b2:mod:`TreeFitter` change of initialisation values increases performance in all fits with tracks.
+ * In :b2:mod:`TreeFitter` max iterations set to 100, increases efficiency slightly in many cases.
+

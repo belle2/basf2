@@ -12,6 +12,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (torben.ferber@desy.de) (TF)               *
  *               Chris Hearty (hearty@physics.ubc.ca) (CH)                *
+ *               Ewan Hill (ehill@mail.ubc.ca)                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -36,9 +37,6 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
 // FRAMEWORK
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
@@ -355,6 +353,11 @@ void ECLDigitCalibratorModule::event()
                               aECLCalDigit.hasStatus(ECLCalDigit::c_IsFailedFit),
                               bgCount); // calibrated time resolution
     aECLCalDigit.setTimeResolution(t99);
+
+    if (t99 == c_timeResolutionForFitFailed) {
+      aECLCalDigit.addStatus(ECLCalDigit::c_IsFailedTimeResolution);
+    }
+
     aECLCalDigit.addStatus(ECLCalDigit::c_IsTimeResolutionCalibrated);
   }
 }

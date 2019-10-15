@@ -55,8 +55,6 @@
 
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
-#include <framework/database/DBStore.h>
-#include <framework/database/LocalDatabase.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBImportObjPtr.h>
@@ -66,7 +64,6 @@
 #include <TH3.h>
 #include <TGraph.h>
 #include <TGraph2D.h>
-#include <TCanvas.h>
 #include <TFile.h>
 #include <TKey.h>
 #include <TString.h>
@@ -79,7 +76,6 @@
 #include <TTree.h>
 #include <tuple>
 #include <iomanip>
-#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace Belle2;

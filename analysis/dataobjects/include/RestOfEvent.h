@@ -14,13 +14,11 @@
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <vector>
 #include <string>
 #include <set>
-#include <map>
 
 class TLorentzVector;
 
@@ -97,10 +95,6 @@ namespace Belle2 {
        */
       void addParticles(std::vector<const Particle*>& particles)
       {
-        if (isValid()) {
-          B2INFO("Mask " + m_name + " is default and valid, cannot write to it!");
-          return;
-        }
         if (isValid()) {
           B2INFO("Mask " + m_name + " originating from "  + m_origin + " is  valid, cannot write to it!");
           return;
@@ -200,8 +194,7 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0 (all vectors are empty).
      */
-    explicit RestOfEvent(bool isNested = false): m_isNested(isNested) { };
-
+    explicit RestOfEvent(int pdgCode = 0, bool isNested = false): m_isNested(isNested), m_pdgCode(pdgCode) { };
     // setters
     /**
      * Add StoreArray indices of given Particles to the list of unused particles in the event.
@@ -209,6 +202,26 @@ namespace Belle2 {
      * @param Reference to a vector of unused Particles
      */
     void addParticles(const std::vector<const Particle*>& particle);
+    /**
+     * Sets the PDG code of the rest of event.
+     */
+    void setPDGCode(int pdgCode)
+    {
+      m_pdgCode = pdgCode;
+    }
+    /**
+     * Converts ROE to Particle and adds it to StoreArray
+     *
+     * @param Name of the ROE mask to use for 4-vector and daughters
+     */
+    Particle* convertToParticle(const std::string& maskName = "", int pdgCode = 0, bool isSelfConjugated = true);
+    /**
+     * Gets the PDG code of the rest of event.
+     */
+    int getPDGCode() const
+    {
+      return m_pdgCode;
+    }
     /**
      * Check if ROE has StoreArray index of given  to the list of unused tracks in the event.
      * @param Pointer to the Particle
@@ -412,6 +425,7 @@ namespace Belle2 {
     std::set<int> m_particleIndices;   /**< StoreArray indices to unused particles */
     std::vector<Mask> m_masks;         /**< List of the ROE masks */
     bool m_isNested;                   /**< Nested ROE indicator */
+    int m_pdgCode;                     /**< PDG code of the 'ROE particle' if we are going to create one */
     // Private methods
     /**
      *  Checks if a particle has its copy in the provided list

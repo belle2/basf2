@@ -15,8 +15,6 @@
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/Environment.h>
 
-#include <cstdlib>
-
 using namespace std;
 using namespace Belle2;
 
@@ -87,7 +85,7 @@ void TxModule::event()
 
   // Put the message in ring buffer
   for (;;) {
-    int stat = m_rbuf->insq((int*)msg->buffer(), msg->paddedSize());
+    int stat = m_rbuf->insq((int*)msg->buffer(), msg->paddedSize(), true);
     if (stat >= 0) break;
     if (!m_blockingInsert) {
       B2WARNING("Ring buffer seems full, removing some previous data.");

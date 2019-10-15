@@ -11,7 +11,6 @@
 
 #include <vector>
 
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
 #include <cstdio>
@@ -20,7 +19,6 @@
 #include <cstring>
 #include <unistd.h>
 #include <Python.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -195,6 +193,7 @@ ProcHandler::ProcHandler(unsigned int nWorkerProc, bool markChildrenAsLocal):
   //s_pidVector size shouldn't be changed once processes are forked (race condition)
   s_pidVector.reserve(s_pidVector.size() + nWorkerProc + 2);
   s_pids = s_pidVector.data();
+  setsid();
 
 }
 ProcHandler::~ProcHandler() = default;

@@ -10,11 +10,6 @@
 
 #include <analysis/dataobjects/TagVertex.h>
 
-#include <framework/datastore/StoreArray.h>
-
-#include <framework/logging/Logger.h>
-#include <iostream>
-
 using namespace Belle2;
 
 
@@ -98,6 +93,21 @@ float TagVertex::getTagVolErr()
   return m_tagVolErr;
 }
 
+float TagVertex::getTagVNDF()
+{
+  return m_tagVNDF;
+}
+
+float TagVertex::getTagVChi2()
+{
+  return m_tagVChi2;
+}
+
+float TagVertex::getTagVChi2IP()
+{
+  return m_tagVChi2IP;
+}
+
 
 
 void TagVertex::setTagVertex(const TVector3& tagVertex)
@@ -178,6 +188,21 @@ void TagVertex::setTruthTagVol(float TruthTagVol)
 void TagVertex::setTagVolErr(float TagVolErr)
 {
   m_tagVolErr = TagVolErr;
+}
+
+void TagVertex::setTagVNDF(float TagVNDF)
+{
+  m_tagVNDF = TagVNDF;
+}
+
+void TagVertex::setTagVChi2(float TagVChi2)
+{
+  m_tagVChi2 = TagVChi2;
+}
+
+void TagVertex::setTagVChi2IP(float TagVChi2IP)
+{
+  m_tagVChi2IP = TagVChi2IP;
 }
 
 

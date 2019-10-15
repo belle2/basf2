@@ -50,9 +50,14 @@ void EKLMHitRateCounter::accumulate(unsigned timeStamp)
     if (!eklmDigit.isGood())
       continue;
     int sector = m_ElementNumbers->sectorNumber(
-                   eklmDigit.getEndcap(), eklmDigit.getLayer(),
+                   eklmDigit.getSection(), eklmDigit.getLayer(),
                    eklmDigit.getSector()) - 1;
-    rates.sectorRates[sector] += 1;
+    if (sector >= 0 and sector < EKLMElementNumbers::getMaximalSectorGlobalNumber()) {
+      rates.sectorRates[sector] += 1;
+    } else {
+      B2ERROR("EKLMHitRateCounter: sector number out of range"
+              << LogVar("sector", sector));
+    }
     rates.averageRate += 1;
   }
 

@@ -1,6 +1,14 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
+"""
+<header>
+  <input>../BottomoniumPiPiUpsilon.udst.root</input>
+  <output>BottomoniumPiPiUpsilon_Validation.root</output>
+  <contact>jiasen@buaa.edu.cn</contact>
+</header>
+"""
+
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdMu
@@ -17,11 +25,11 @@ inputMdstList('default', filelist, path=BottomoniumPiPiUpsilonskimpath)
 
 # use standard final state particle lists
 stdMu('loose', path=BottomoniumPiPiUpsilonskimpath)
-stdPi('loose', path=BottomoniumPiPiUpsilonskimpath)
+stdPi('all', path=BottomoniumPiPiUpsilonskimpath)
 
 # [Y(3S) -> pi+pi- [Y(1S,2S) -> mu+mu-]] decay
 reconstructDecay('Upsilon:mumu -> mu+:loose mu-:loose', '', path=BottomoniumPiPiUpsilonskimpath)
-reconstructDecay('Upsilon(3S):pipirecoil -> pi+:loose pi-:loose', '', path=BottomoniumPiPiUpsilonskimpath)
+reconstructDecay('Upsilon(3S):pipirecoil -> pi+:all pi-:all', '', path=BottomoniumPiPiUpsilonskimpath)
 reconstructDecay('Upsilon(3S):12Smumu -> Upsilon(3S):pipirecoil Upsilon:mumu', '', path=BottomoniumPiPiUpsilonskimpath)
 
 # the variables that are printed out are: the invariant mass of Y(1S,2S), the invariant mass

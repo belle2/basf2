@@ -761,31 +761,34 @@ namespace Belle2 {
     /// 2D track information
     TClonesArray* _tracks2D;
 
-    // Switch for TRG CDC input mode
+    /// Switch for TRG CDC input mode
     int _trgCDCDataInputMode;
 
     /** name of the CDCHit DataStore array used as input */
     std::string _cdchitCollectionName;
 
-    // Debugging members for firmware ROOT input.
+    /// Debugging members for firmware ROOT input.
     //int m_minCDCTdc;
     //int m_maxCDCTdc;
     //int m_minTRGTdc;
     //int m_maxTRGTdc;
     /// root tree for ROOT input
     TTree* m_treeROOTInput;
-    // [0]: iLayer, [1]: iWire, [2]: CDCADC, [3]: CDCTDC, [4]: CDC FE TRG timing
+    /// [0]: iLayer, [1]: iWire, [2]: CDCADC, [3]: CDCTDC, [4]: CDC FE TRG timing
     TClonesArray* m_rootCDCHitInformation;
-    // [0]: iLayer, [1]: iWire, [2]: window number, [3]: priority timing
+    /// [0]: iLayer, [1]: iWire, [2]: window number, [3]: priority timing
     TClonesArray* m_rootTRGHitInformation;
-    // [0]: iLayer, [1]: iWire, [2]: Timing(CDC), [3]: MatchNumber
-    // MatchNumber: 1: Only CDC, 2: Only TRG, 3: Both CDC & TRG
+    /// [0]: iLayer, [1]: iWire, [2]: Timing(CDC), [3]: MatchNumber
+    /// MatchNumber: 1: Only CDC, 2: Only TRG, 3: Both CDC & TRG
     //TClonesArray* m_CDCTRGTimeMatch;
+    /// root tree for ROOT input, for TRG raw info
     TClonesArray* m_rootTRGRawInformation;
 
-    // Save functions for ROOT
+    /// Save functions for ROOT
     void saveCDCHitInformation(std::vector<std::vector<unsigned> >&);
+    /// Save functions for ROOT
     void saveTRGHitInformation(std::vector<std::vector<int > >&);
+    /// Save functions for ROOT
     void saveTRGRawInformation(std::vector<std::string >&);
     //void saveCDCTRGTimeMatchInformation(std::vector<std::vector<std::map<int, int > > >& );
 

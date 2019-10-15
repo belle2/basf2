@@ -17,9 +17,6 @@
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <string>
-#include <TTree.h>
-#include <TFile.h>
-#include <time.h>
 #include <tracking/pxdDataReductionClasses/ROIinfo.h>
 
 namespace Belle2 {
@@ -77,7 +74,7 @@ namespace Belle2 {
     std::string m_ROIListName; /**< ROI list name*/
     std::string m_recoTracksListName; /**< track list name*/
 
-    StoreArray<RecoTrack> m_recotracks; /**<reco trcks store array */
+    StoreArray<RecoTrack> m_recotracks; /**<reco tracks store array */
     StoreArray<ROIid> m_rois; /**< rois store array */
     StoreArray<SVDIntercept> m_intercepts; /**< svd intercept store array */
 

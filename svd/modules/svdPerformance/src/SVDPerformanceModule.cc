@@ -26,6 +26,7 @@ SVDPerformanceModule::SVDPerformanceModule() : Module()
   setDescription("This module check performances of SVD reconstruction of VXD TB data");
 
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDPerformance_output.root"));
+  addParam("SVDEventInfo", m_svdEventInfoName, "Defines the name of the EventInfo", string(""));
 
   addParam("is2017TBanalysis", m_is2017TBanalysis, "True if analyzing 2017 TB data.", bool(false));
   addParam("isSimulation", m_isSimulation, "True if analyzing simulated data.", bool(false));
@@ -54,6 +55,8 @@ void SVDPerformanceModule::initialize()
   //  m_recoTracks.isRequired();
   //  m_tfr.isRequired(m_TrackFitResultName);
 
+  if (!m_storeSVDEvtInfo.isOptional(m_svdEventInfoName)) m_svdEventInfoName = "SVDEventInfoSim";
+  m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
 
   B2INFO("    ShaperDigits: " << m_ShaperDigitName);
   B2INFO("      RecoDigits: " << m_RecoDigitName);
@@ -428,6 +431,9 @@ void SVDPerformanceModule::beginRun()
 
 void SVDPerformanceModule::event()
 {
+
+  SVDModeByte modeByte = m_storeSVDEvtInfo->getModeByte();
+
   m_nEvents++;
   float c_eTOkeV = 3.6 / 1000; //keV = e * c_eTOkeV
 
@@ -500,8 +506,7 @@ void SVDPerformanceModule::event()
       h_cltrkSN[layer][sensor][side]->Fill(clSN);
       h_cltrkTime[layer][sensor][side]->Fill(clTime);
 
-      RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svdClustersTrack[cl]);
-      SVDModeByte::baseType tb = (theRecoDigits[0]->getModeByte()).getTriggerBin();
+      SVDModeByte::baseType tb = modeByte.getTriggerBin();
       if ((int) tb == 0) h_cltrkTime_TB1[layer][sensor][side]->Fill(clTime);
       if ((int) tb == 1) h_cltrkTime_TB2[layer][sensor][side]->Fill(clTime);
       if ((int) tb == 2) h_cltrkTime_TB3[layer][sensor][side]->Fill(clTime);

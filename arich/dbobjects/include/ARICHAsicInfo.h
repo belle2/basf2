@@ -14,7 +14,6 @@
 #include <TObject.h>
 #include <TTimeStamp.h>
 #include <TH3F.h>
-#include <TH2F.h>
 
 namespace Belle2 {
   /**

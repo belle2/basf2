@@ -8,16 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
 #include <framework/core/Module.h>
 
-#include <cdc/dataobjects/WireID.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/geometry/CDCGeometryPar.h>
-
 #include <string>
-#include <vector>
 #include "TH1.h"
-#include "TFile.h"
+
 namespace Belle2 {
 
   /**

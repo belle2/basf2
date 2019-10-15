@@ -10,7 +10,6 @@
 
 #include <analysis/VertexFitting/TreeFitter/RecoParticle.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
-#include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 
 namespace TreeFitter {
 

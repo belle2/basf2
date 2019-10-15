@@ -12,21 +12,16 @@ from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
 from stdCharged import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-00'
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-04-00-00'
 
 # create a new path
 skimpath = Path()
 
 
-fileList = \
-    [
-        '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-        'mdst_000001_prod00002288_task00000001.root'
-    ]
+fileList = get_test_file("mixedBGx1", "MC12")
 
-
-inputMdstList('MC9', fileList, path=skimpath)
+inputMdstList('default', fileList, path=skimpath)
 
 # use standard final state particle lists
 

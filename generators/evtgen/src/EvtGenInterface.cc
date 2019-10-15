@@ -17,17 +17,20 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/evtgen/EvtGenModelRegister.h>
 
+#include <memory>
 #include <string>
 #include <queue>
 
 #include <EvtGenExternal/EvtExternalGenList.hh>
 #include <EvtGenBase/EvtAbsRadCorr.hh>
+#include <EvtGenBase/EvtCPUtil.hh>
 #include <EvtGenBase/EvtDecayTable.hh>
 #include <EvtGenBase/EvtDecayBase.hh>
+#include <EvtGenBase/EvtParticleFactory.hh>
 #include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtRandom.hh>
 
 #include <TLorentzVector.h>
-#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;

@@ -9,15 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <hlt/softwaretrigger/dbobjects/SoftwareTriggerCutBase.h>
+#include <mdst/dbobjects/SoftwareTriggerCutBase.h>
 #include <framework/utilities/GeneralCut.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 
-#include <framework/logging/Logger.h>
-
 namespace Belle2 {
-  class SoftwareTriggerResult;
 
   namespace SoftwareTrigger {
     /**

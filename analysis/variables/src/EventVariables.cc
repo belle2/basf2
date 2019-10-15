@@ -23,29 +23,24 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventKinematics.h>
-#include <analysis/dataobjects/TauPairDecay.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <framework/dataobjects/EventT0.h>
 
-// cluster utils
-#include <analysis/ClusterUtility/ClusterUtils.h>
+// database
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
 
 #include <analysis/utility/PCmsLabTransform.h>
-#include <framework/dbobjects/BeamParameters.h>
 
 #include <framework/logging/Logger.h>
 
 #include <TLorentzVector.h>
 #include <TVector3.h>
-
-#include <functional>
-#include <string>
 
 namespace Belle2 {
   namespace Variable {
@@ -127,16 +122,6 @@ namespace Belle2 {
       return klmClusters.getEntries();
     }
 
-    double KLMEnergy(const Particle*)
-    {
-      StoreArray<KLMCluster> klmClusters;
-      double result = 0;
-      for (int i = 0; i < klmClusters.getEntries(); ++i) {
-        result += klmClusters[i]->getMomentum().Energy();
-      }
-      return result;
-    }
-
     double expNum(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
@@ -166,70 +151,52 @@ namespace Belle2 {
     }
 
     // Beam Energies
-    double getHEREnergy(const Particle*)
-    {
-      PCmsLabTransform T;
-      return T.getBeamParams().getHER().E();
-    }
-
-    double getLEREnergy(const Particle*)
-    {
-      PCmsLabTransform T;
-      return T.getBeamParams().getLER().E();
-    }
-
-    double getCrossingAngle(const Particle*)
-    {
-      PCmsLabTransform T;
-      return T.getBeamParams().getHER().Vect().Angle(-1.0 * T.getBeamParams().getLER().Vect());
-    }
-
     double getCMSEnergy(const Particle*)
     {
       PCmsLabTransform T;
-      return T.getBeamParams().getMass();
+      return T.getCMSEnergy();
     }
 
     double getBeamPx(const Particle*)
     {
       PCmsLabTransform T;
-      return (T.getBeamParams().getHER() + T.getBeamParams().getLER()).Px();
+      return (T.getBeamFourMomentum()).Px();
     }
 
     double getBeamPy(const Particle*)
     {
       PCmsLabTransform T;
-      return (T.getBeamParams().getHER() + T.getBeamParams().getLER()).Py();
+      return (T.getBeamFourMomentum()).Py();
     }
 
     double getBeamPz(const Particle*)
     {
       PCmsLabTransform T;
-      return (T.getBeamParams().getHER() + T.getBeamParams().getLER()).Pz();
+      return (T.getBeamFourMomentum()).Pz();
     }
 
     double getBeamE(const Particle*)
     {
       PCmsLabTransform T;
-      return (T.getBeamParams().getHER() + T.getBeamParams().getLER()).E();
+      return (T.getBeamFourMomentum()).E();
     }
 
     double getIPX(const Particle*)
     {
-      PCmsLabTransform T;
-      return T.getBeamParams().getVertex().X();
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      return (beamSpotDB->getIPPosition()).X();
     }
 
     double getIPY(const Particle*)
     {
-      PCmsLabTransform T;
-      return T.getBeamParams().getVertex().Y();
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      return (beamSpotDB->getIPPosition()).Y();
     }
 
     double getIPZ(const Particle*)
     {
-      PCmsLabTransform T;
-      return T.getBeamParams().getVertex().Z();
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      return (beamSpotDB->getIPPosition()).Z();
     }
 
     double ipCovMatrixElement(const Particle*, const std::vector<double>& element)
@@ -246,8 +213,8 @@ namespace Belle2 {
         return 0;
       }
 
-      PCmsLabTransform T;
-      return T.getBeamParams().getCovVertex()(elementI, elementJ);
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      return beamSpotDB->getCovVertex()(elementI, elementJ);
     }
 
     // Event kinematics -> missing momentum in lab and CMS, missing energy and mass2, visible energy
@@ -500,8 +467,6 @@ namespace Belle2 {
                       "consider totalEnergyOfParticlesInList(gamma:all) instead");
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters,
                       "[Eventbased] number of KLM in the event");
-    REGISTER_VARIABLE("KLMEnergy", KLMEnergy,
-                      "[Eventbased] total energy in KLM in the event");
     REGISTER_VARIABLE("nMCParticles", nMCParticles,
                       "[Eventbased] number of MCParticles in the event");
 
@@ -510,10 +475,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("runNum", runNum, "[Eventbased] run number");
     REGISTER_VARIABLE("productionIdentifier", productionIdentifier, "[Eventbased] production identifier");
 
-    REGISTER_VARIABLE("Eher", getHEREnergy, "[Eventbased] HER energy");
-    REGISTER_VARIABLE("Eler", getLEREnergy, "[Eventbased] LER energy");
     REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] CMS energy");
-    REGISTER_VARIABLE("XAngle", getCrossingAngle, "[Eventbased] Crossing angle");
     REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Beam energy (lab)");
     REGISTER_VARIABLE("beamPx", getBeamPx, "[Eventbased] Beam momentum Px (lab)");
     REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Beam momentum Py (lab)");

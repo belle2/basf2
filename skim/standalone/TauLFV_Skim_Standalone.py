@@ -14,16 +14,15 @@ from stdPhotons import *
 from skim.standardlists.lightmesons import *
 from stdPi0s import *
 from stdV0s import *
-from skimExpertFunctions import *
-
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-00-03'
+gb2_setuprel = 'release-04-00-00'
 
 skimCode = encodeSkimName('TauLFV')
 
 taulfvskim = Path()
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=taulfvskim)
 
 stdPi('loose', path=taulfvskim)

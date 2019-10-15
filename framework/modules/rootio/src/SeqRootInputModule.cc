@@ -9,15 +9,11 @@
 #include <framework/core/Environment.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/io/RootIOUtilities.h>
+#include <framework/database/Configuration.h>
 
 #include <cmath>
-#include <cstdlib>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #include <cstdio>
 
 using namespace std;
@@ -123,8 +119,9 @@ void SeqRootInputModule::initialize()
     fileMetaData.create();
     fileMetaData->declareRealData();
   }
-
-  B2INFO("SeqRootInput: initialized.");
+  // make sure global tag replay is disabled and users have to specify a globaltag.
+  // We don't have input file metadata so this is all we can do.
+  Conditions::Configuration::getInstance().setInputGlobaltags({});
 }
 
 

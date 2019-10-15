@@ -14,7 +14,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/StringWrapper.h>
-#include <analysis/utility/MCMatching.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
@@ -132,6 +131,8 @@ namespace Belle2 {
       m_decayHash = bitconverter.f;
       particle->addExtraInfo(c_ExtraInfoName, m_decayHash);
 
+      // cppcheck doesn't like this use of union and throws warnings
+      // cppcheck-suppress redundantAssignment
       bitconverter.i = decayHashExtended;
       m_decayHashExtended = bitconverter.f;
       particle->addExtraInfo(c_ExtraInfoNameExtended, m_decayHashExtended);

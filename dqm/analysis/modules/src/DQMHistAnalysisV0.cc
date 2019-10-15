@@ -1,22 +1,20 @@
 //+
 // File : DQMHistAnalysisV0.cc
-// Description :
+// Description : Overlay plotting for V0
 //
-// Author : Bryan Fulsom (PNNL)
+// Author : Bryan Fulsom (PNNL), B Spruck
 // Date : 2019-01-17
 //-
 
 
 #include <dqm/analysis/modules/DQMHistAnalysisV0.h>
 
+#include <TFile.h>
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TString.h>
-#include <TPaletteAxis.h>
-#include <TAxis.h>
 #include <TH2.h>
-#include <TPad.h>
-#include <TImage.h>
+#include <TGraph.h>
 
 using namespace std;
 using namespace Belle2;
@@ -39,30 +37,44 @@ DQMHistAnalysisV0Module::DQMHistAnalysisV0Module()
 }
 
 
-DQMHistAnalysisV0Module::~DQMHistAnalysisV0Module() { }
-
 void DQMHistAnalysisV0Module::initialize()
 {
   B2INFO("DQMHistAnalysisV0: initialized.");
 
   gROOT->cd();
   for (int i = 0; i < 32; i++) {
-    m_c_xvsy[i] = new TCanvas(Form("c_xvsy[%i]", i), Form("c_xvsy[%i]", i), 800, 800);
-    m_img[i] = TImage::Open(Form("%s/%ic.png", m_OverlayPath.c_str(), i));
-    m_img[i]->SetConstRatio(kTRUE);
+    m_c_xvsy[i] = new TCanvas(Form("V0Object/c_xvsy[%i]", i), Form("c_xvsy[%i]", i), 800, 800);
   }
 
+  m_c_xvsz = new TCanvas("V0Object/c_xvsz", "c_xvsz", 1500, 400); //Stretch in x to enhance visibility
 
-  m_c_xvsz = new TCanvas("c_xvsz", "c_xvsz", 1500, 400); //Stretch in x to enhance visibility
-  m_img_xz = TImage::Open(Form("%s/xzc.png", m_OverlayPath.c_str()));
-  m_img_xz->SetConstRatio(kTRUE);
+  auto* m_fh = new TFile(Form("%s/v0cad.root", m_OverlayPath.c_str()));
 
-
-}
-
-
-void DQMHistAnalysisV0Module::beginRun()
-{
+  contLevelXY.resize(32);
+  for (int i = 0; i < 32; i++) {
+    contLevelXY[i] = new TList();
+    m_fh->cd();
+    if (m_fh->cd(Form("h_%dc", i))) {
+      for (int j = 0; j < 500; j++) {
+        auto curv = gDirectory->Get(Form("Graph_%d", j));
+        if (!curv) break;
+        contLevelXY[i]->AddLast(curv);
+      }
+    }
+  }
+  {
+    contLevelXZ = new TList();
+    m_fh->cd();
+    if (m_fh->cd("h_xzc")) {
+      for (int j = 0; true; j++) {
+        auto curv = gDirectory->Get(Form("Graph_%d", j));
+        if (!curv) break;
+        contLevelXZ->AddLast(curv);
+      }
+    }
+  }
+  /// m_fh.Close(); ? need to clone curves??
+  gROOT->cd();
 }
 
 
@@ -75,17 +87,18 @@ void DQMHistAnalysisV0Module::event()
   for (int i = 0; i < 32; i++) {
     TH2* h = (TH2*) findHist(Form("V0Objects/xvsy[%i]", i));
     m_c_xvsy[i]->cd();
-    m_img[i]->Draw("x");
-
-    p = new TPad("p", "p", 0, 0, 1, 1);
-    p->SetLogz();
-    p->SetFillStyle(4000);
-    p->SetFrameFillStyle(4000);
-
-    m_c_xvsy[i]->cd();
-    p->Draw();
-    p->cd();
     if (h) h->Draw("COLZ");
+
+    TList* c = contLevelXY[i];
+    if (c && c->GetSize() > 0) {
+      auto* curv = (TGraph*)c->First();
+      for (int j = 0; j < c->GetSize(); j++) {
+        //auto* gc = (TGraph*)curv->Clone();
+        //gc->Draw("C");
+        curv->Draw("L");
+        curv = (TGraph*)c->After(curv); // Get Next graph
+      }
+    }
 
     m_c_xvsy[i]->Modified();
     m_c_xvsy[i]->Update();
@@ -93,30 +106,26 @@ void DQMHistAnalysisV0Module::event()
 
   TH2* hxz = (TH2*) findHist("V0Objects/xvsz");
   m_c_xvsz->cd();
-  m_img_xz->Draw("x");
 
-  pxz = new TPad("pxz", "pxz", 0, 0, 1, 1);
-  pxz->SetLogz();
-  pxz->SetFillStyle(4000);
-  pxz->SetFrameFillStyle(4000);
+  // create a new pad for every event? -> mem leak!
 
   m_c_xvsz->cd();
-  pxz->Draw();
-  pxz->cd();
   if (hxz) hxz->Draw("COLZ");
+  {
+    TList* c = contLevelXZ;
+    if (c && c->GetSize() > 0) {
+      auto* curv = (TGraph*)c->First();
+      for (int j = 0; j < c->GetSize(); j++) {
+        //auto* gc = (TGraph*)curv->Clone();
+        //gc->Draw("C");
+        curv->Draw("L");
+        curv = (TGraph*)c->After(curv); // Get Next graph
+      }
+    }
+  }
 
   m_c_xvsz->Modified();
   m_c_xvsz->Update();
 
-}
-
-void DQMHistAnalysisV0Module::endRun()
-{
-}
-
-
-void DQMHistAnalysisV0Module::terminate()
-{
-  B2INFO("DQMHistAnalysisV0: terminated.");
 }
 

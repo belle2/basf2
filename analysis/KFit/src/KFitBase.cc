@@ -590,7 +590,6 @@ KFitBase::doFit2() {
 
 
   double chisq = 0;
-  double tmp_chisq = KFitConst::kInitialCHIsq;
   double tmp2_chisq = KFitConst::kInitialCHIsq;
   int err_inverse = 0;
 
@@ -609,7 +608,7 @@ KFitBase::doFit2() {
   for (int j = 0; j < KFitConst::kMaxIterationCount; j++)   // j'th loop start
   {
 
-    tmp_chisq = KFitConst::kInitialCHIsq;
+    double tmp_chisq = KFitConst::kInitialCHIsq;
 
     for (int i = 0; i < KFitConst::kMaxIterationCount; i++) { // i'th loop start
 

@@ -22,6 +22,7 @@ namespace Belle2 {
     class HitReclaimer : public Findlet<const CDCWireHit> {
 
     private:
+      /// Type of the base class
       using Super = Findlet<const CDCWireHit>;
 
     public:

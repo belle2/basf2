@@ -16,21 +16,14 @@
 #include <framework/pcore/PathUtils.h>
 
 #include <framework/pcore/ZMQEventProcessor.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/RingBuffer.h>
-#include <framework/pcore/RxModule.h>
-#include <framework/pcore/TxModule.h>
 #include <framework/pcore/DataStoreStreamer.h>
 #include <framework/pcore/RbTuple.h>
 
-#include <framework/core/ModuleManager.h>
 #include <framework/core/Environment.h>
 #include <framework/logging/LogSystem.h>
 
 #include <TROOT.h>
 
-#include <chrono>
-#include <thread>
 #include <sys/stat.h>
 
 #include <csignal>
@@ -276,7 +269,7 @@ void ZMQEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList
 
   // TODO: make sure to only send statistics!
   const auto& evtMessage = streamer.stream();
-  auto message = ZMQMessageFactory::createMessage(c_MessageTypes::c_statisticMessage, evtMessage);
+  auto message = ZMQMessageFactory::createMessage(EMessageTypes::c_statisticMessage, evtMessage);
   zmqClient.publish(std::move(message));
 
   B2DEBUG(10, "Finished an output process");

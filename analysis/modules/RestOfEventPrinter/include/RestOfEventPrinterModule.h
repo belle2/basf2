@@ -11,9 +11,6 @@
 #pragma once
 #include <framework/core/Module.h>
 #include <string>
-#include <map>
-
-#include <analysis/dataobjects/RestOfEvent.h>
 
 #include <analysis/dataobjects/Particle.h>
 

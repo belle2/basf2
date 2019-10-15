@@ -18,7 +18,6 @@
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <string>
-#include <vector>
 #include <memory>
 #include <map>
 #include <vxd/background/niel_fun.h>
@@ -182,15 +181,6 @@ namespace Belle2 {
       int result = 0;
       for (auto ladderID : VXD::GeoCache::getInstance().getLadders(layerID))
         result += VXD::GeoCache::getInstance().getSensors(ladderID).size();
-      return result;
-    }
-
-    /** Get total number of sensors */
-    inline int PXDBackgroundModule::getTotalSensors()
-    {
-      int result = 0;
-      for (auto layerID : VXD::GeoCache::getInstance().getLayers(VXD::SensorInfoBase::PXD))
-        result += getNumSensors(layerID.getLayerNumber());
       return result;
     }
   } // namespace PXD

@@ -11,10 +11,7 @@
 #pragma once
 
 #include <vector>
-#include <algorithm>
 #include <string>
-#include <TVector3.h>
-
 
 namespace Belle2 {
 

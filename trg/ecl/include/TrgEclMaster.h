@@ -31,24 +31,24 @@
 namespace Belle2 {
 //
 //
-  /*! ETM class */
+  /** ETM class */
   class TrgEclMaster;
 //
 //
 //
+  /** ETM class */
   class TrgEclMaster {
 
   public:
 
-    /**  get pointer of TrgEclMaster object  */
-
+    //!  get pointer of TrgEclMaster object
     static TrgEclMaster* getTrgEclMaster(void);
 
 
-    /** Constructor */
+    //! TrgEclMaster Constructor
     TrgEclMaster(void);
 
-    /** Destructor */
+    //! TrgEclMaster Destructor
     virtual ~TrgEclMaster();
 
   public:
@@ -92,10 +92,12 @@ namespace Belle2 {
     /** make LowMultiTriggerBit **/
     void makeLowMultiTriggerBit(std::vector<int>, std::vector<double>);
     /** make Trigger bit except for Low Multiplicity related bit **/
-    void makeTriggerBit(int, int, int, int, int, int, int, std::vector<int>, int, int, int, int, int, int, int, int);
+    void makeTriggerBit(int, int, int, int, int, int, int, std::vector<int>, int, int, int, int, int, int, int, int, int);
     /** Set Total Energy*/
     double setTotalEnergy(std::vector<double>);
+    //! Get ECL Trigger bit
     int getTriggerbit(int i) {return _Triggerbit[i];}
+    //! Get Low Multiplicity Trigger Bit
     int getLowmultibit() {return _Lowmultibit;}
     //! set 2D Bhabha Energy Threshold
     void set2DBhabhaThreshold(std::vector<double> i2DBhabhaThresholdFWD, std::vector<double> i2DBhabhaThresholdBWD)
@@ -103,8 +105,23 @@ namespace Belle2 {
       _2DBhabhaThresholdFWD = i2DBhabhaThresholdFWD;
       _2DBhabhaThresholdBWD = i2DBhabhaThresholdBWD;
     }
-    //! set 2D Bhabha Energy Threshold
-    void set3DBhabhaThreshold(std::vector<double> i3DBhabhaThreshold) { _3DBhabhaThreshold = i3DBhabhaThreshold; };
+    //! set 3D selection Bhabha Energy Threshold
+    void set3DBhabhaSelectionThreshold(std::vector<double> i3DBhabhaSelectionThreshold) { _3DBhabhaSelectionThreshold = i3DBhabhaSelectionThreshold; };
+    //! set 3D veto Bhabha Energy Threshold
+    void set3DBhabhaVetoThreshold(std::vector<double> i3DBhabhaVetoThreshold) { _3DBhabhaVetoThreshold = i3DBhabhaVetoThreshold; };
+
+    //! set 3D selection Bhabha Energy Angle
+    void set3DBhabhaSelectionAngle(std::vector<double> i3DBhabhaSelectionAngle) { _3DBhabhaSelectionAngle = i3DBhabhaSelectionAngle; };
+    //! set 3D veto Bhabha Energy Angle
+    void set3DBhabhaVetoAngle(std::vector<double> i3DBhabhaVetoAngle) { _3DBhabhaVetoAngle = i3DBhabhaVetoAngle; };
+    //! set mumu bit Threshold
+    void setmumuThreshold(int mumuThreshold) {_mumuThreshold = mumuThreshold; }
+    //! set mumu bit Angle selection
+    void setmumuAngle(std::vector<double>  imumuAngle) {_mumuAngle = imumuAngle; }
+    //! set the number of cluster exceeding 300 MeV
+    void setn300MeVClusterThreshold(int n300MeVCluster) {_n300MeVCluster = n300MeVCluster; }
+    //! set mumu bit Threshold
+    void setECLBurstThreshold(int ECLBurstThreshold) {_ECLBurstThreshold = ECLBurstThreshold; }
 
     //! set Total Energy Theshold (low, high, lum)
     void setTotalEnergyThreshold(std::vector<double>  iTotalEnergy) {_TotalEnergy = iTotalEnergy; }
@@ -162,26 +179,39 @@ namespace Belle2 {
     int _NofTopTC;
     /** The limit number of Cluster */
     int _ClusterLimit;
-    // ETM bit
+    //! ECL Trigger  bit
     int _Triggerbit[4];
-    //  LowMultibit
+    //!  Low Multiplicity bit
     int _Lowmultibit;
-    // Bhabha Prescale Factor
+    //!  Bhabha Prescale Factor
     int _PrescaleFactor;
-    // Bhabha Prescale Countor
+    //! Bhabha Prescale Countor
     int _PrescaleCounter;
 
     //! 2D Bhabha Energy Threshold
     std::vector<double> _2DBhabhaThresholdFWD;
     //! 2D Bhabha Energy Threshold
     std::vector<double> _2DBhabhaThresholdBWD;
-    //! 3D Bhabha Energy Threshold
-    std::vector<double> _3DBhabhaThreshold;
+    //! 3D Selection Bhabha Energy Threshold
+    std::vector<double> _3DBhabhaSelectionThreshold;
+    //! 3D Veto Bhabha Energy Threshold
+    std::vector<double> _3DBhabhaVetoThreshold;
+    //! 3D Selection Bhabha Energy Angle
+    std::vector<double> _3DBhabhaSelectionAngle;
+    //! 3D Veto Bhabha Energy Angle
+    std::vector<double> _3DBhabhaVetoAngle;
+    //! mumu bit Energy Threshold
+    double _mumuThreshold;
+    //! mumu bit  Angle
+    std::vector<double> _mumuAngle;
+    //! The number of Cluster exceeding 300 MeV
+    int _n300MeVCluster;
+    //!ECL Burst Bit Threshold
+    double _ECLBurstThreshold;
     //! Total Energy Theshold (low, high, lum)
     std::vector<double> _TotalEnergy;
     //! Low Multiplicity Threshold
     std::vector<double> _LowMultiThreshold;
-
 
     /** ecl object */
     static TrgEclMaster* _ecl;

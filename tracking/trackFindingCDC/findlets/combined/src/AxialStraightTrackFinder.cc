@@ -9,13 +9,9 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/AxialStraightTrackFinder.h>
 
-#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <mdst/dataobjects/ECLCluster.h>
-
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

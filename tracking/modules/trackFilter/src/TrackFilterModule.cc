@@ -143,6 +143,9 @@ bool TrackFilterModule::isSelected(const Track* track)
   if (tfr->getPValue() < m_min_Pval)
     isExcluded = true;
 
+  if (tfr->getMomentum().Perp() < m_min_pT)
+    isExcluded = true;
+
   HitPatternVXD hitPatternVXD = tfr->getHitPatternVXD();
   if (hitPatternVXD.getNSVDHits() < m_min_NumHitsSVD ||  hitPatternVXD.getNPXDHits() < m_min_NumHitsPXD)
     isExcluded = true;

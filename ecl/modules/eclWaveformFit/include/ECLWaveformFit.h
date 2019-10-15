@@ -14,13 +14,10 @@
 // FRAMEWORK
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/database/DBObjPtr.h>
 
 // ECL
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dbobjects/ECLDigitWaveformParameters.h>
-#include <ecl/digitization/shaperdsp.h>
 
 class TMinuit;
 

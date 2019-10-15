@@ -14,7 +14,6 @@
 #include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>
-#include <TLorentzVector.h>
 #include <TMatrixDSym.h>
 
 #include <cmath>
@@ -53,6 +52,11 @@ namespace Belle2 {
       c_TriggerClusterMatching = 1 << 1,
       /** bit 2: ECLCluster has pulse shape discrimination variables.*/
       c_PulseShapeDiscrimination = 1 << 2,
+      /** bit 3: ECLCluster has fit time that failed.*/
+      c_fitTimeFailed = 1 << 3,
+      /** bit 4: ECLCluster has time resolution calculation that failed.*/
+      c_timeResolutionFailed = 1 << 4,
+
     };
 
     /**
@@ -238,7 +242,7 @@ namespace Belle2 {
     /** Return hypothesis (expert only, this returns a bti pattern). */
     unsigned short getHypotheses() const {return m_hypotheses;}
 
-    //** Return cellID of maximum energy crystal */
+    /** Return cellID of maximum energy crystal */
     unsigned short getMaxECellId() const {return m_maxECellId;}
 
     /** Return connected region id. */
@@ -364,6 +368,13 @@ namespace Belle2 {
 
     /** Check if ECLCluster has any ECLDigits with waveforms that also passed two component fit chi2 threshold in eclClusterPSD module. */
     bool hasPulseShapeDiscrimination() const {return hasStatus(EStatusBit::c_PulseShapeDiscrimination);}
+
+    /** Check if ECLCluster has a fit time that failed. */
+    bool hasFailedFitTime() const {return hasStatus(EStatusBit::c_fitTimeFailed);}
+
+    /** Check if ECLCluster has a time resolution calculation that failed. */
+    bool hasFailedTimeResolution() const {return hasStatus(EStatusBit::c_timeResolutionFailed);}
+
 
   private:
 

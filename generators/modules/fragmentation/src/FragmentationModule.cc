@@ -14,13 +14,8 @@
 
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/particledb/EvtGenDatabasePDG.h>
 #include <framework/utilities/FileSystem.h>
 
-#include <boost/format.hpp>
-#include <stdio.h>
-
-#include <TDatabasePDG.h>
 #include <TRandom3.h>
 
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -29,11 +24,6 @@
 #include <framework/utilities/IOIntercept.h>
 
 #include <string>
-#include <queue>
-
-#include <EvtGenExternal/EvtExternalGenList.hh>
-#include <EvtGenBase/EvtAbsRadCorr.hh>
-#include <EvtGenBase/EvtDecayBase.hh>
 
 using namespace std;
 using namespace Belle2;

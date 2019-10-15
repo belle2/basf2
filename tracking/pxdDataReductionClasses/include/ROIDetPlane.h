@@ -11,7 +11,6 @@
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-#include <vxd/geometry/GeoCache.h>
 
 #include <genfit/DetPlane.h>
 #include <genfit/SharedPlanePtr.h>

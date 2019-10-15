@@ -13,9 +13,6 @@
 //Framework
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationsObject.h>
 
 //ECL
 #include <ecl/dataobjects/ECLCalDigit.h>

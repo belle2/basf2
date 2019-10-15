@@ -42,7 +42,7 @@ PXDDQMEfficiency2Module::PXDDQMEfficiency2Module() : HistoModule(), m_vxdGeometr
   addParam("ROIsName", m_ROIsName, "name of the list of HLT ROIs, if available in output", std::string(""));
   addParam("PXDInterceptListName", m_PXDInterceptListName, "name of the list of interceptions", std::string(""));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
-           std::string("pxdeff"));
+           std::string("PXDEFF"));
   addParam("binsU", m_u_bins, "histogram bins in u direction", int(4));
   addParam("binsV", m_v_bins, "histogram bins in v direction", int(6));
   addParam("distCut", m_distcut, "max distance in [cm] for cluster to be counted to a track", double(0.0500));

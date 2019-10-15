@@ -14,7 +14,6 @@
 #include <calibration/CalibrationAlgorithm.h>
 #include <klm/dbobjects/KLMTimeCableDelay.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-//#include <bklm/dataobjects/BKLMStatus.h>
 
 
 class TH1D;
@@ -43,8 +42,7 @@ namespace Belle2 {
       double   diffDistZ;   //
       double   eDep;        // energy eV.
       double   nPE;         // number of photon electron.
-      int      channelId;   // unique channel id Barral and endcap combined.
-      // BKLM or EKLM local mapping
+      int      channelId;   // unique channel id Barral and endcap merged.
       // BKLM RPC flag, used for testing and not necessary
       bool     inRPC;
       // If phi and z plane flipped, used for testing and not necessary
@@ -67,22 +65,56 @@ namespace Belle2 {
      * Turn on debug mode (prints histograms and output running log).
      */
     void setDebug() { m_debug = true; }
-    void useFit()   { m_fitted = true; }
+
+    /**
+     * If the input is MC sample.
+     * Different histogram scale of data and mc
+     */
     void isMC()     { m_mc = true; }
+
+    /**
+     * Use event T0 as the initial time point or not
+     */
     void useEvtT0() { m_useEventT0 = true; }
+
+    /**
+     * Set the lower number of hits collected on one sigle strip.
+     * If the hit number is lower than the limit, the strip will not be calibrated
+     * and set the average value of the calibration constant.
+     */
     void setLowerLimit(int counts) { m_lower_limit_counts = counts; }
+
+    /**
+     * Save histograms to file
+     */
     void saveHist();
 
-  protected:
 
+  protected:
     // Run algo on data
     virtual EResult calibrate() override;
 
+
   private:
+    /**
+     * data struct used in collector and alogrithm.
+     */
     struct Event ev;
+
+    /**
+     * TTree obtained from the collector.
+     */
     std::shared_ptr<TTree> t_tin;
 
+    /**
+     * container of hit information.
+     * the global element number of the strip is used as the key.
+     */
     std::map<uint16_t, std::vector<struct Event> > m_evts;
+
+    /**
+     * container of hit information of one sigle strip
+     */
     std::vector<struct Event> m_evtsChannel;
 
     std::map<uint16_t, int>   m_cFlag;
@@ -100,7 +132,7 @@ namespace Belle2 {
 
     int m_lower_limit_counts;
     int iSub;
-    int iSet;
+    int iFor;
     int iSec;
     int iLay;
     int iPla;
@@ -127,14 +159,18 @@ namespace Belle2 {
     /** if use event T0 from CDC **/
     bool m_useEventT0;
 
-    /** Monitor Hists **/
-    TH1D* h_diff;
+    /** Calibration Statistics for each channel **/
     TH1I* h_calibrated;
 
-    /** Time distribution for each level **/
+    /** distance between global and local position **/
+    TH1D* h_diff;
+
+    /** Calibration constant value of each channel **/
     TGraphErrors* gre_time_channel_rpc;
     TGraphErrors* gre_time_channel_scint;
     TGraphErrors* gre_time_channel_scint_end;
+
+    /** Profiles used for effected light speed estimation **/
     TProfile* hprf_rpc_phi_effC;
     TProfile* hprf_rpc_z_effC;
     TProfile* hprf_scint_phi_effC;
@@ -142,75 +178,95 @@ namespace Belle2 {
     TProfile* hprf_scint_phi_effC_end;
     TProfile* hprf_scint_z_effC_end;
 
+    /** Histograms of Global time distribution used for effected light speed estimation **/
     TH1D* h_time_rpc_tc;
     TH1D* h_time_scint_tc;
     TH1D* h_time_scint_tc_end;
 
+    /** Histograms of Global time distribution before calibration **/
     TH1D* h_time_rpc;
     TH1D* h_time_scint;
     TH1D* h_time_scint_end;
-
+    /** Histograms of Global time distribution after calibration **/
     TH1D* hc_time_rpc;
     TH1D* hc_time_scint;
     TH1D* hc_time_scint_end;
 
+    /** Histograms of Time distribution for forward(backward) before calibration **/
     TH1D* h_timeF_rpc[2];
     TH1D* h_timeF_scint[2];
     TH1D* h_timeF_scint_end[2];
-
+    /** Histograms of Time distribution for forward(backward) after calibration **/
     TH1D* hc_timeF_rpc[2];
     TH1D* hc_timeF_scint[2];
     TH1D* hc_timeF_scint_end[2];
 
+    /** Histograms of Time dependent on sector for forward(backward) before calibration **/
     TH2D* h2_timeF_rpc[2];
     TH2D* h2_timeF_scint[2];
     TH2D* h2_timeF_scint_end[2];
-
+    /** Histograms of Time dependent on sector for forward(backward) after calibration **/
     TH2D* h2c_timeF_rpc[2];
     TH2D* h2c_timeF_scint[2];
     TH2D* h2c_timeF_scint_end[2];
 
+    /** Histograms of Time distribution for sectors before calibration **/
     TH1D* h_timeFS_rpc[2][8];
     TH1D* h_timeFS_scint[2][8];
     TH1D* h_timeFS_scint_end[2][4];
-
+    /** Histograms of Time distribution for sectors after calibration **/
     TH1D* hc_timeFS_rpc[2][8];
     TH1D* hc_timeFS_scint[2][8];
     TH1D* hc_timeFS_scint_end[2][4];
 
+    /** Histograms of Time distribution dependent on layer
+     * of sectors before calibration
+     **/
     TH2D* h2_timeFS[2][8];
-    TH2D* h2c_timeFS[2][8];
     TH2D* h2_timeFS_end[2][4];
+    /** Histograms of Time distribution dependent on layer
+     * of sectors after calibration **/
+    TH2D* h2c_timeFS[2][8];
     TH2D* h2c_timeFS_end[2][4];
 
+    /** Histograms of Time distribution of one layer before calibration **/
     TH1D* h_timeFSL[2][8][15];
-    TH1D* hc_timeFSL[2][8][15];
     TH1D* h_timeFSL_end[2][4][14];
+    /** Histograms of Time distribution of one layer after calibration **/
+    TH1D* hc_timeFSL[2][8][15];
     TH1D* hc_timeFSL_end[2][4][14];
 
+    /** Histograms of Time distribution of one plane before calibration **/
     TH1D* h_timeFSLP[2][8][15][2];
-    TH1D* hc_timeFSLP[2][8][15][2];
     TH1D* h_timeFSLP_end[2][4][14][2];
+    /** Histograms of Time distribution of one plane after calibration **/
+    TH1D* hc_timeFSLP[2][8][15][2];
     TH1D* hc_timeFSLP_end[2][4][14][2];
 
+    /** Histograms of Time distribution dependent on channels before calibration **/
     TH2D* h2_timeFSLP[2][8][15][2];
-    TH2D* h2c_timeFSLP[2][8][15][2];
     TH2D* h2_timeFSLP_end[2][4][14][2];
+    /** Histograms of Time distribution dependent on channels after calibration **/
+    TH2D* h2c_timeFSLP[2][8][15][2];
     TH2D* h2c_timeFSLP_end[2][4][14][2];
 
+    /** Histograms of Time distribution of each channel befor calibration **/
     TH1D* h_timeFSLPC_tc[2][8][15][2][54];
     TH1D* h_timeFSLPC[2][8][15][2][54];
-    TH1D* hc_timeFSLPC[2][8][15][2][54];
     TH1D* h_timeFSLPC_tc_end[2][4][14][2][75];
     TH1D* h_timeFSLPC_end[2][4][14][2][75];
+    /** Histograms of Time distribution of each channel after calibration **/
+    TH1D* hc_timeFSLPC[2][8][15][2][54];
     TH1D* hc_timeFSLPC_end[2][4][14][2][75];
 
+    /** Formulas used for fitting **/
     TF1* fcn;
     TF1* fcn_pol1;
     TF1* fcn_const;
     TF1* fcn_gaus;
     TF1* fcn_land;
 
+    /** output file. **/
     TFile* m_outFile;
   };
 }

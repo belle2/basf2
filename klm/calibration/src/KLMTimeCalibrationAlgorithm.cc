@@ -30,7 +30,6 @@
 
 #include <klm/calibration/KLMTimeCalibrationAlgorithm.h>
 #include <klm/dbobjects/KLMTimeCableDelay.h>
-//#include <klm/dataobjects/KLMElementNumbers.h>
 
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
@@ -85,7 +84,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   t_tin->SetBranchAddress("inRPC",        &ev.inRPC);
   t_tin->SetBranchAddress("isFlipped",    &ev.isFlipped);
 
-  B2INFO(LogVar("total number of digit event:", t_tin->GetEntries()));
+  B2INFO(LogVar("Total number of digit event:", t_tin->GetEntries()));
   m_evts.clear();
 
   for (int i = 0; i < t_tin->GetEntries(); ++i) {
@@ -147,6 +146,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   h_time_scint_tc_end = new TH1D("h_time_scint_tc_end", "time distribtution for Scintillator (Endcap)", nBin_scint, lowEdge_scint,
                                  upEdge_scint);
 
+  /** Hist declaration Global time distribution **/
   h_time_rpc = new TH1D("h_time_rpc", "time distribtution for RPC; T_rec-T_0-T_fly-T_propagation[ns]", nBin, lowEdge_rpc, upEdge_rpc);
   h_time_scint = new TH1D("h_time_scint", "time distribtution for Scintillator; T_rec-T_0-T_fly-T_propagation[ns]", nBin_scint,
                           lowEdge_scint, upEdge_scint);
@@ -164,23 +164,23 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
   for (int iF = 0; iF < 2; ++iF) {
     hn = Form("h_timeF%d_rpc", iF);
-    ht = Form("time distribtution for RPC of %s; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
+    ht = Form("Time distribtution for RPC of %s; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
     h_timeF_rpc[iF] = new TH1D(hn.Data(), ht.Data(), nBin, lowEdge_rpc, upEdge_rpc);
     hn = Form("h_timeF%d_scint", iF);
-    ht = Form("time distribtution for Scintillator of %s; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
+    ht = Form("Time distribtution for Scintillator of %s; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
     h_timeF_scint[iF] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
     hn = Form("h_timeF%d_scint_end", iF);
-    ht = Form("time distribtution for Scintillator of %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
+    ht = Form("Time distribtution for Scintillator of %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
     h_timeF_scint_end[iF] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
 
     hn = Form("h2_timeF%d_rpc", iF);
-    ht = Form("time distribtution for RPC of %s; Sector Index; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
+    ht = Form("Time distribtution for RPC of %s; Sector Index; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
     h2_timeF_rpc[iF] = new TH2D(hn.Data(), ht.Data(), 8, 0, 8, nBin, lowEdge_rpc, upEdge_rpc);
     hn = Form("h2_timeF%d_scint", iF);
-    ht = Form("time distribtution for Scintillator of %s; Sector Index; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
+    ht = Form("Time distribtution for Scintillator of %s; Sector Index; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
     h2_timeF_scint[iF] = new TH2D(hn.Data(), ht.Data(), 8, 0, 8, nBin_scint, lowEdge_scint, upEdge_scint);
     hn = Form("h2_timeF%d_scint_end", iF);
-    ht = Form("time distribtution for Scintillator of %s (Endcap); Sector Index; T_rec-T_0-T_fly-T_propagation[ns]",
+    ht = Form("Time distribtution for Scintillator of %s (Endcap); Sector Index; T_rec-T_0-T_fly-T_propagation[ns]",
               iFstring[iF].Data());
     h2_timeF_scint_end[iF] = new TH2D(hn.Data(), ht.Data(), 4, 0, 4, nBin_scint, lowEdge_scint, upEdge_scint);
 
@@ -210,15 +210,15 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     h2c_timeF_scint_end[iF] = new TH2D(hn.Data(), ht.Data(), 4, 0, 4, nBin_scint, lowEdge_scint, upEdge_scint);
 
     for (int iS = 0; iS < 8; ++iS) {
+      // Barrel parts
       hn = Form("h_timeF%d_S%d_scint", iF, iS);
-      ht = Form("time distribtution for Scintillator of Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
+      ht = Form("Time distribtution for Scintillator of Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
       h_timeFS_scint[iF][iS] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
       hn = Form("h_timeF%d_S%d_rpc", iF, iS);
-      ht = Form("time distribtution for RPC of Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
+      ht = Form("Time distribtution for RPC of Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
       h_timeFS_rpc[iF][iS] = new TH1D(hn.Data(), ht.Data(), nBin, lowEdge_rpc, upEdge_rpc);
-
       hn = Form("h2_timeF%d_S%d", iF, iS);
-      ht = Form("time distribtution of Sector%d, %s; Layer Index; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
+      ht = Form("Time distribtution of Sector%d, %s; Layer Index; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
       h2_timeFS[iF][iS] = new TH2D(hn.Data(), ht.Data(), 15, 0, 15, nBin_scint, lowEdge_rpc, upEdge_scint);
 
       hn = Form("hc_timeF%d_S%d_scint", iF, iS);
@@ -229,18 +229,17 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
       ht = Form("Calibrated time distribtution for RPC of Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", iS,
                 iFstring[iF].Data());
       hc_timeFS_rpc[iF][iS] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_rpc, upEdge_rpc);
-
       hn = Form("h2c_timeF%d_S%d", iF, iS);
       ht = Form("Calibrated time distribtution of Sector%d, %s; Layer Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", iS,
                 iFstring[iF].Data());
       h2c_timeFS[iF][iS] = new TH2D(hn.Data(), ht.Data(), 15, 0, 15, nBin_scint, lowEdge_rpc, upEdge_scint);
 
+      // Inner 2 layers --> Scintillators
       for (int iL = 0; iL < 2; ++iL) {
         hn = Form("h_timeF%d_S%d_L%d", iF, iS, iL);
-        ht = Form("time distribtution for Scintillator of Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iL, iS,
+        ht = Form("Time distribtution for Scintillator of Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iL, iS,
                   iFstring[iF].Data());
         h_timeFSL[iF][iS][iL] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
-
         hn = Form("hc_timeF%d_S%d_L%d", iF, iS, iL);
         ht = Form("Calibrated time distribtution for Scintillator of Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                   iL, iS, iFstring[iF].Data());
@@ -248,12 +247,11 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
         for (int iP = 0; iP < 2; ++iP) {
           hn = Form("h_timeF%d_S%d_L%d_P%d", iF, iS, iL, iP);
-          ht = Form("time distribtution for Scintillator of %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]",
+          ht = Form("Time distribtution for Scintillator of %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           h_timeFSLP[iF][iS][iL][iP] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
-
           hn = Form("h2_timeF%d_S%d_L%d_P%d", iF, iS, iL, iP);
-          ht = Form("time distribtution for Scintillator of %s, Layer%d, Sector%d, %s; Channel Index; T_rec-T_0-T_fly-T_propagation[ns]",
+          ht = Form("Time distribtution for Scintillator of %s, Layer%d, Sector%d, %s; Channel Index; T_rec-T_0-T_fly-T_propagation[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           h2_timeFSLP[iF][iS][iL][iP] = new TH2D(hn.Data(), ht.Data(), 54, 0, 54, nBin_scint, lowEdge_scint, upEdge_scint);
 
@@ -261,7 +259,6 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
           ht = Form("Calibrated time distribtution for Scintillator of %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           hc_timeFSLP[iF][iS][iL][iP] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
-
           hn = Form("h2c_timeF%d_S%d_L%d_P%d", iF, iS, iL, iP);
           ht = Form("Calibrated time distribtution for Scintillator of %s, Layer%d, Sector%d, %s; Channel Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
@@ -321,12 +318,12 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
           int nchannel_max = BKLMElementNumbers::getNStrips(iF, iS + 1, iL + 1, iP);
           for (int iC = 0; iC < nchannel_max; ++iC) {
             hn = Form("h_timeF%d_S%d_L%d_P%d_C%d_tc", iF, iS, iL, iP, iC);
-            ht = Form("time distribtution for RPC of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
+            ht = Form("Time distribtution for RPC of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
                       iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
             h_timeFSLPC_tc[iF][iS][iL][iP][iC] = new TH1D(hn.Data(), ht.Data(), nBin, lowEdge_rpc, upEdge_rpc);
 
             hn = Form("h_timeF%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
-            ht = Form("time distribtution for RPC of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
+            ht = Form("Time distribtution for RPC of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
                       iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
             h_timeFSLPC[iF][iS][iL][iP][iC] = new TH1D(hn.Data(), ht.Data(), nBin, lowEdge_rpc, upEdge_rpc);
 
@@ -342,32 +339,26 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     int maxLay = 12 + 2 * iF;
     for (int iS = 0; iS < 4; ++iS) {
       hn = Form("h_timeF%d_S%d_scint_end", iF, iS);
-      ht = Form("time distribtution for Scintillator of Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]", iS,
+      ht = Form("Time distribtution for Scintillator of Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]", iS,
                 iFstring[iF].Data());
       h_timeFS_scint_end[iF][iS] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
-
       hn = Form("h2_timeF%d_S%d_end", iF, iS);
-      ht = Form("time distribtution of Sector%d, %s (Endcap); Layer Index; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
+      ht = Form("Time distribtution of Sector%d, %s (Endcap); Layer Index; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
       h2_timeFS_end[iF][iS] = new TH2D(hn.Data(), ht.Data(), maxLay, 0, maxLay, nBin_scint, lowEdge_rpc, upEdge_scint);
-
       hn = Form("hc_timeF%d_S%d_scint_end", iF, iS);
       ht = Form("Calibrated time distribtution for Scintillator of Sector%d (Endcap), %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
-                iS,
-                iFstring[iF].Data());
+                iS, iFstring[iF].Data());
       hc_timeFS_scint_end[iF][iS] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
-
       hn = Form("h2c_timeF%d_S%d_end", iF, iS);
       ht = Form("Calibrated time distribtution of Sector%d, %s (Endcap); Layer Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
-                iS,
-                iFstring[iF].Data());
+                iS, iFstring[iF].Data());
       h2c_timeFS_end[iF][iS] = new TH2D(hn.Data(), ht.Data(), maxLay, 0, maxLay, nBin_scint, lowEdge_rpc, upEdge_scint);
 
       for (int iL = 0; iL < maxLay; ++iL) {
         hn = Form("h_timeF%d_S%d_L%d_end", iF, iS, iL);
-        ht = Form("time distribtution for Scintillator of Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]", iL, iS,
+        ht = Form("Time distribtution for Scintillator of Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]", iL, iS,
                   iFstring[iF].Data());
         h_timeFSL_end[iF][iS][iL] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
-
         hn = Form("hc_timeF%d_S%d_L%d_end", iF, iS, iL);
         ht = Form("Calibrated time distribtution for Scintillator of Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                   iL, iS, iFstring[iF].Data());
@@ -375,12 +366,12 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
         for (int iP = 0; iP < 2; ++iP) {
           hn = Form("h_timeF%d_S%d_L%d_P%d_end", iF, iS, iL, iP);
-          ht = Form("time distribtution for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
+          ht = Form("Time distribtution for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           h_timeFSLP_end[iF][iS][iL][iP] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
 
           hn = Form("h2_timeF%d_S%d_L%d_P%d_end", iF, iS, iL, iP);
-          ht = Form("time distribtution for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); Channel Index; T_rec-T_0-T_fly-T_propagation[ns]",
+          ht = Form("Time distribtution for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); Channel Index; T_rec-T_0-T_fly-T_propagation[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           h2_timeFSLP_end[iF][iS][iL][iP] = new TH2D(hn.Data(), ht.Data(), 75, 0, 75, nBin_scint, lowEdge_scint, upEdge_scint);
 
@@ -396,15 +387,13 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
           for (int iC = 0; iC < 75; ++iC) {
             hn = Form("h_timeF%d_S%d_L%d_P%d_C%d_tc_end", iF, iS, iL, iP, iC);
-            ht = Form("time distribtution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
-                      iC,
-                      iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
+            ht = Form("Time distribtution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
+                      iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
             h_timeFSLPC_tc_end[iF][iS][iL][iP][iC] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
 
             hn = Form("h_timeF%d_S%d_L%d_P%d_C%d_end", iF, iS, iL, iP, iC);
-            ht = Form("time distribtution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
-                      iC,
-                      iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
+            ht = Form("Time distribtution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
+                      iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
             h_timeFSLPC_end[iF][iS][iL][iP][iC] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
 
             hn = Form("hc_timeF%d_S%d_L%d_P%d_C%d_end", iF, iS, iL, iP, iC);
@@ -444,7 +433,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     }
 
     m_cFlag[channelId] = 1;
-    m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iSet, &iSec, &iLay, &iPla, &iStr);
+    m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
 
     for (it_v = m_evtsChannel.begin(); it_v != m_evtsChannel.end(); ++it_v) {
       bool inRPC = it_v->inRPC;
@@ -455,8 +444,8 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
       double timeHit = it_v->time();
       if (m_useEventT0) timeHit = timeHit - it_v->t0;
 
-      h_timeFSLPC_tc[iSet][iSec - 1][iLay - 1][iPla][iStr - 1]->Fill(timeHit);
-      h_timeFSLPC_tc_end[iSet][iSec - 1][iLay - 1][iPla][iStr - 1]->Fill(timeHit);
+      h_timeFSLPC_tc[iFor][iSec - 1][iLay - 1][iPla][iStr - 1]->Fill(timeHit);
+      h_timeFSLPC_tc_end[iFor][iSec - 1][iLay - 1][iPla][iStr - 1]->Fill(timeHit);
       if (m_elementNum->isBKLMChannel(channelId)) {
         if (inRPC) {
           h_time_rpc_tc->Fill(timeHit);
@@ -539,7 +528,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     if (!m_cFlag[channelId]) continue;
     if (m_timeShift.find(channelId) == m_timeShift.end()) continue;
     m_evtsChannel = it_m->second;
-    m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iSet, &iSec, &iLay, &iPla, &iStr);
+    m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
 
     for (it_v = m_evtsChannel.begin(); it_v != m_evtsChannel.end(); ++it_v) {
       double timeHit = it_v->time() - m_timeShift[channelId];
@@ -640,8 +629,8 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   for (it_m = m_evts.begin(); it_m != m_evts.end(); ++it_m) {
     channelId = it_m->first;
     if (!m_cFlag[channelId]) continue;
-    m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iSet, &iSec, &iLay, &iPla, &iStr);
-    int iF = iSet;
+    m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
+    int iF = iFor;
     int iS = iSec - 1;
     int iL = iLay - 1;
     int iP = iPla;
@@ -744,7 +733,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
         }
       }
     }
-    // Insert EKLM part here
+    // EKLM part here
     int maxLayer = 12 + iF * 2;
     for (int iS = 0; iS < 4; ++iS) {
       for (int iL = 0; iL < maxLayer; ++iL) {
@@ -807,8 +796,8 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     m_timeCableDelay->setTimeShift(channelId, m_timeShift[channelId]);
 
     for (it_v = m_evtsChannel.begin(); it_v != m_evtsChannel.end(); ++it_v) {
-      m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iSet, &iSec, &iLay, &iPla, &iStr);
-      int iF = iSet;
+      m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
+      int iF = iFor;
       int iS = iSec - 1;
       int iL = iLay - 1;
       int iP = iPla;
@@ -901,9 +890,9 @@ void KLMTimeCalibrationAlgorithm::saveHist()
   h_time_rpc->SetDirectory(dir_time);
   hc_time_rpc->SetDirectory(dir_time);
 
-  gre_time_channel_scint->Write("gre_time_channel_scint");
-  gre_time_channel_scint_end->Write("gre_time_channel_scint");
   gre_time_channel_rpc->Write("gre_time_channel_rpc");
+  gre_time_channel_scint->Write("gre_time_channel_scint");
+  gre_time_channel_scint_end->Write("gre_time_channel_scint_end");
 
   B2INFO("Top file setup Done.");
 
@@ -973,7 +962,7 @@ void KLMTimeCalibrationAlgorithm::saveHist()
           h2_timeFSLP[iF][iS][iL][iP]->SetDirectory(dir_time_FSL[iF][iS][iL]);
           h2c_timeFSLP[iF][iS][iL][iP]->SetDirectory(dir_time_FSL[iF][iS][iL]);
 
-          sprintf(dirname, "isPhi_%d", iP);
+          sprintf(dirname, "Plane_%d", iP);
           dir_time_FSLP[iF][iS][iL][iP] = dir_time_FSL[iF][iS][iL]->mkdir(dirname);
           dir_time_FSLP[iF][iS][iL][iP]->cd();
 
@@ -987,7 +976,7 @@ void KLMTimeCalibrationAlgorithm::saveHist()
       }
     }
 
-    sprintf(dirname, "isForward_end_%d", iF + 1);
+    sprintf(dirname, "isForward_%d_end", iF + 1);
     dir_time_F_end[iF] = dir_time->mkdir(dirname);
     dir_time_F_end[iF]->cd();
     int maxLayer = 12 + 2 * iF;
@@ -998,14 +987,14 @@ void KLMTimeCalibrationAlgorithm::saveHist()
       h2_timeFS_end[iF][iS]->SetDirectory(dir_time_F_end[iF]);
       h2c_timeFS_end[iF][iS]->SetDirectory(dir_time_F_end[iF]);
 
-      sprintf(dirname, "Sector_end_%d", iF + 1);
+      sprintf(dirname, "Sector_%d_end", iF + 1);
       dir_time_FS_end[iF][iS] = dir_time_F_end[iF]->mkdir(dirname);
       dir_time_FS_end[iF][iS]->cd();
       for (int iL = 0; iL < maxLayer; ++iL) {
         h_timeFSL_end[iF][iS][iL]->SetDirectory(dir_time_FS_end[iF][iS]);
         hc_timeFSL_end[iF][iS][iL]->SetDirectory(dir_time_FS_end[iF][iS]);
 
-        sprintf(dirname, "Layer_end_%d", iL + 1);
+        sprintf(dirname, "Layer_%d_end", iL + 1);
         dir_time_FSL_end[iF][iS][iL] = dir_time_FS_end[iF][iS]->mkdir(dirname);
         dir_time_FSL_end[iF][iS][iL]->cd();
         for (int iP = 0; iP < 2; ++iP) {
@@ -1014,11 +1003,10 @@ void KLMTimeCalibrationAlgorithm::saveHist()
           h2_timeFSLP_end[iF][iS][iL][iP]->SetDirectory(dir_time_FSL_end[iF][iS][iL]);
           h2c_timeFSLP_end[iF][iS][iL][iP]->SetDirectory(dir_time_FSL_end[iF][iS][iL]);
 
-          sprintf(dirname, "isPhi_end_%d", iP);
+          sprintf(dirname, "plane_%d_end", iP);
           dir_time_FSLP_end[iF][iS][iL][iP] = dir_time_FSL_end[iF][iS][iL]->mkdir(dirname);
           dir_time_FSLP_end[iF][iS][iL][iP]->cd();
 
-          //int nchannel_max = BKLMElementNumbers::getNStrips(iF, iS + 1, iL + 1, iP);
           for (int iC = 0; iC < 75; ++iC) {
             h_timeFSLPC_end[iF][iS][iL][iP][iC]->SetDirectory(dir_time_FSLP_end[iF][iS][iL][iP]);
             hc_timeFSLPC_end[iF][iS][iL][iP][iC]->SetDirectory(dir_time_FSLP_end[iF][iS][iL][iP]);

@@ -619,10 +619,10 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
   effSpeed_RPC = 0.50 * Const::speedOfLight;
 
-  m_timeCableDelay->setEffLightSpeed(effSpeed);
-  m_timeCableDelay->setAmpTimeConstant(0);
-  m_timeCableDelay->setEffLightSpeedRPC(effSpeed_RPC);
-  m_timeCableDelay->setAmpTimeConstantRPC(0);
+  m_timeCableDelay->setEffLightSpeed(effSpeed, false);
+  m_timeCableDelay->setAmpTimeConstant(0, false);
+  m_timeCableDelay->setEffLightSpeed(effSpeed_RPC, true);
+  m_timeCableDelay->setAmpTimeConstant(0, true);
 
   /** ======================================================================================= **/
   B2INFO("Time distribution filling begins.");

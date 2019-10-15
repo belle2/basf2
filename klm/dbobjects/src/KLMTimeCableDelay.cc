@@ -16,8 +16,8 @@ using namespace Belle2;
 
 KLMTimeCableDelay::KLMTimeCableDelay()
 {
-  m_effLightSpeed = 0;
-  m_effLightSpeedRPC = 0;
+  m_effLightSpeed = 0.38;
+  m_effLightSpeedRPC = 0.5;
   m_ampTimeConstant = 0;
   m_ampTimeConstantRPC = 0;
 }
@@ -50,43 +50,39 @@ void KLMTimeCableDelay::cleanTimeShift()
   m_timeShift.clear();
 }
 
-double KLMTimeCableDelay::getEffLightSpeed() const
+double KLMTimeCableDelay::getEffLightSpeed(bool isRPC) const
 {
-  return m_effLightSpeed;
+  if (isRPC) {
+    return m_effLightSpeedRPC;
+  } else {
+    return m_effLightSpeed;
+  }
 }
 
-void KLMTimeCableDelay::setEffLightSpeed(double lightSpeed)
+void KLMTimeCableDelay::setEffLightSpeed(double lightSpeed, bool isRPC)
 {
-  m_effLightSpeed = lightSpeed;
+  if (isRPC) {
+    m_effLightSpeedRPC = lightSpeed;
+  } else {
+    m_effLightSpeed = lightSpeed;
+  }
 }
 
-double KLMTimeCableDelay::getAmpTimeConstant() const
+double KLMTimeCableDelay::getAmpTimeConstant(bool isRPC) const
 {
-  return m_ampTimeConstant;
+  if (isRPC) {
+    return m_ampTimeConstantRPC;
+  } else {
+    return m_ampTimeConstant;
+  }
 }
 
-void KLMTimeCableDelay::setAmpTimeConstant(double amplitudeTimeConstant)
+void KLMTimeCableDelay::setAmpTimeConstant(double amplitudeTimeConstant, bool isRPC)
 {
-  m_ampTimeConstant = amplitudeTimeConstant;
-}
-
-double KLMTimeCableDelay::getEffLightSpeedRPC() const
-{
-  return m_effLightSpeedRPC;
-}
-
-void KLMTimeCableDelay::setEffLightSpeedRPC(double lightSpeed)
-{
-  m_effLightSpeedRPC = lightSpeed;
-}
-
-double KLMTimeCableDelay::getAmpTimeConstantRPC() const
-{
-  return m_ampTimeConstantRPC;
-}
-
-void KLMTimeCableDelay::setAmpTimeConstantRPC(double amplitudeTimeConstant)
-{
-  m_ampTimeConstantRPC = amplitudeTimeConstant;
+  if (isRPC) {
+    m_ampTimeConstantRPC = amplitudeTimeConstant;
+  } else {
+    m_ampTimeConstant = amplitudeTimeConstant;
+  }
 }
 

@@ -57,40 +57,31 @@ namespace Belle2 {
 
     /**
      * Get effective light speed of scintillators.
+     * @param[in] isRPC get value for RPC(true) or Scintillator(false).
      */
-    double getEffLightSpeed() const;
-
-    /**
-     * Get effective light speed of RPCs.
-     */
-    double getEffLightSpeedRPC() const;
+    double getEffLightSpeed(bool isRPC) const;
 
     /**
      * Set effective light speed of scintillators.
      * @param[in] lightSpeed Effective light speed.
+     * @param[in] isRPC set value for RPC(true) or Scintillator(false).
      */
-    void setEffLightSpeed(double lightSpeed);
-
-    /**
-     * Set effective light speed of RPCs.
-     * @param[in] lightSpeed Effective light speed.
-     */
-    void setEffLightSpeedRPC(double lightSpeed);
+    void setEffLightSpeed(double lightSpeed, bool isRPC);
 
     /**
      * Get amplitude dependence time constant.
      * This item is not supported by the firmwire so far.
+     * @param[in] isRPC get value for RPC(true) or Scintillator(false).
      */
-    double getAmpTimeConstant() const;
-    double getAmpTimeConstantRPC() const;
+    double getAmpTimeConstant(bool isRPC) const;
 
     /**
      * Set amplitude dependence time constant.
      * This item is not supported by the firmwire so far.
      * @param[in] amplitudeTimeConstant Amplitude dependence time constant.
+     * @param[in] isRPC set value for RPC(true) or Scintillator(false).
      */
-    void setAmpTimeConstant(double amplitudeTimeConstant);
-    void setAmpTimeConstantRPC(double amplitudeTimeConstant);
+    void setAmpTimeConstant(double amplitudeTimeConstant, bool isRPC);
 
 
   private:

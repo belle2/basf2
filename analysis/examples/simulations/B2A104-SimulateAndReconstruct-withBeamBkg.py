@@ -18,54 +18,59 @@
 # (MCParticle objects stored in the StoreArray<MCParticle>) also
 # reconstructed MDST objects (Track/ECLCluster/KLMCluster/...).
 # Contributors: A. Zupanc (June 2014)
+#               U. Tamponi (October 2019)
 #
 # #####################################################
 
-from basf2 import *
-from modularAnalysis import inputMdst
-from modularAnalysis import analysis_main
-from simulation import add_simulation
-from reconstruction import add_reconstruction
-from reconstruction import add_mdst_output
+import basf2 as b2
+import modularAnalysis as ma
+import simulation as si
+import reconstruction as re
 import glob
-
-# check if the required input file exists (from B2A101 example)
 import os.path
 import sys
+
+
+# check if the required input file exists (from B2A101 example)
 if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
-    B2FATAL(
+    b2.B2FATAL(
         'Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist. \n'
         'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
 
+# create a path
+my_path = b2.create_path()
+
 # load input ROOT file
-inputMdst('default', 'B2A101-Y4SEventGeneration-evtgen.root')
+ma.inputMdst('default', 'B2A101-Y4SEventGeneration-evtgen.root', path=my_path)
 
 # background files
 # location of the files is obtained from a shell variable - check first if it is set
 if 'BELLE2_BACKGROUND_DIR' not in os.environ:
-    B2FATAL('BELLE2_BACKGROUND_DIR variable is not set. \n'
-            'Please export (setenv) the variable to the location of BG overlay samples')
+    b2.B2FATAL(
+        'BELLE2_BACKGROUND_DIR variable is not set. \n'
+        'Please export (setenv) the variable to the location of BG overlay sample. \n'
+        'Check https://confluence.desy.de/display/BI/Beam+background+samples to find them')
 # get list of files and check the list length
 bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 if len(bg) == 0:
-    B2FATAL('No files found in ', os.environ['BELLE2_BACKGROUND_DIR'])
+    b2.B2FATAL('No files found in ', os.environ['BELLE2_BACKGROUND_DIR'])
 
 # simulation
-add_simulation(analysis_main, bkgfiles=bg)
+si.add_simulation(path=my_path, bkgfiles=bg)
 
 # reconstruction
-add_reconstruction(analysis_main)
+re.add_reconstruction(path=my_path)
 
 # dump in MDST format
-add_mdst_output(analysis_main, True,
-                'B2A101-Y4SEventGeneration-gsim-BKGx1.root')
+re.add_mdst_output(path=my_path,
+                   mc=True,
+                   filename='B2A101-Y4SEventGeneration-gsim-BKGx1.root')
 
 # Show progress of processing
-progress = register_module('ProgressBar')
-analysis_main.add_module(progress)
+my_path.add_module('ProgressBar')
 
 # Process the events
-process(analysis_main)
+b2process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

@@ -161,13 +161,13 @@ void PXDPostErrorCheckerModule::event()
         B2DEBUG(25, "Iterate DHP in DHE " << dhe.getDHEID() << " TrigGate " << dhe.getTriggerGate() << " FrameNr " << dhe.getFrameNr());
         if (had_dhe) {
           if (dhe.getTriggerGate() != triggergate) {
-            if (!m_ignoreTriggerGate) B2ERROR("Trigger Gate of DHEs not identical" << LogVar("Triggergate 1",
-                                                triggergate) << LogVar("TriggerGate 2", dhe.getTriggerGate()));
+            if (!m_ignoreTriggerGate) B2WARNING("Trigger Gate of DHEs not identical" << LogVar("Triggergate 1",
+                                                  triggergate) << LogVar("TriggerGate 2", dhe.getTriggerGate()));
             mask |= EPXDErrMask::c_EVT_TRG_GATE_DIFFER;
           }
           if (dhe.getFrameNr() != dheframenr) {
-            if (!m_ignoreDHPFrame) B2ERROR("Frame Nr of DHEs not identical" << LogVar("FrameNr 1", dheframenr) << LogVar("FrameNr 2",
-                                             dhe.getFrameNr()));
+            if (!m_ignoreDHPFrame) B2WARNING("Frame Nr of DHEs not identical" << LogVar("FrameNr 1", dheframenr) << LogVar("FrameNr 2",
+                                               dhe.getFrameNr()));
             mask |= EPXDErrMask::c_EVT_TRG_FRM_NR_DIFFER;
           }
         } else {
@@ -180,14 +180,17 @@ void PXDPostErrorCheckerModule::event()
           // TODO check against other DHP (full bits) and DHE (limited bits)
           // TODO We know that this will fail with current firmware and most likely will not be fixed...
         }
+        bool error = false;
         for (auto it = dhe.cm_begin(); it < dhe.cm_end(); ++it)  {
           if (std::get<2>(*it) == 63) {
             // TODO Check that we dont have CM=63 indicating fifo overflow, check and set bits
             // mask |= c_DHH_MISC_ERROR; // unpacker should set this already, anyway we would want it set only on the DHP/DHE level...
-            B2ERROR("DHP data loss (CM=63) in " << LogVar("DHE", dhe.getDHEID()) << LogVar("DHP", int(std::get<0>(*it))) << LogVar("Row",
+            B2DEBUG(25, "DHP data loss (CM=63) in " << LogVar("DHE", dhe.getDHEID()) << LogVar("DHP", int(std::get<0>(*it))) << LogVar("Row",
                     std::get<1>(*it)));
+            error = true;
           }
         }
+        if (error) B2WARNING("DHP data loss (CM=63) in " << LogVar("DHE", dhe.getDHEID()));
       }
     }
   }

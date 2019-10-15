@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>

@@ -140,14 +140,14 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_ElectronPar(NULL), // modified later
   m_PositronPar(NULL) // modified later
 {
-  for (int j = 0; j < NLAYER + 1; ++j) {
+  for (int j = 0; j < BKLMElementNumbers::getMaximalLayerNumber() + 1; ++j) {
     m_BarrelPhiStripVariance[j] = 0.0;
     m_BarrelZStripVariance[j] = 0.0;
     m_BarrelPhiStripVariance[j] = 0.0;
     m_EndcapModuleMiddleZ[j] = 0.0;
   }
-  for (int s = 0; s < NSECTOR + 1; ++s) {
-    for (int j = 0; j < NLAYER + 1; ++j) {
+  for (int s = 0; s < BKLMElementNumbers::getMaximalSectorNumber() + 1; ++s) {
+    for (int j = 0; j < BKLMElementNumbers::getMaximalLayerNumber() + 1; ++j) {
       m_BarrelModuleMiddleRadius[0][s][j] = 0.0;
       m_BarrelModuleMiddleRadius[1][s][j] = 0.0;
     }
@@ -315,7 +315,8 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_BarrelScintVariance = width * width / 12.0;
   int nBarrelLayers = bklmGeometry->getNLayer();
   for (int layer = 1; layer <= nBarrelLayers; ++layer) {
-    const bklm::Module* module = bklmGeometry->findModule(layer, false);
+    const bklm::Module* module =
+      bklmGeometry->findModule(BKLMElementNumbers::c_ForwardSection, 1, layer);
     width = module->getPhiStripWidth(); // in G4e units (cm)
     m_BarrelPhiStripVariance[layer - 1] = width * width / 12.0;
     width = module->getZStripWidth(); // in G4e units (cm)
@@ -1020,29 +1021,23 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
         // int plane = touch->GetCopyNumber(0);
         int layer = touch->GetCopyNumber(4);
         int sector = touch->GetCopyNumber(6);
-        bool isForward = (touch->GetCopyNumber(7) == BKLMElementNumbers::c_ForwardSection);
-        copyID = (isForward ? BKLM_END_MASK : 0)
-                 | ((sector - 1) << BKLM_SECTOR_BIT)
-                 | ((layer - 1) << BKLM_LAYER_BIT)
-                 | BKLM_INRPC_MASK
-                 | BKLM_MC_MASK;
+        int section = touch->GetCopyNumber(7);
+        copyID = BKLMElementNumbers::moduleNumber(section, sector, layer);
       }
       return;
     case VOLTYPE_BKLM2: // BKLM scints
       detID = Const::EDetector::BKLM;
       if (touch->GetHistoryDepth() == DEPTH_SCINT) {
-        int scint = touch->GetCopyNumber(1);
-        int plane = touch->GetCopyNumber(2);
+        int strip = touch->GetCopyNumber(1);
+        int plane = (touch->GetCopyNumber(2) == BKLM_INNER) ?
+                    BKLMElementNumbers::c_PhiPlane :
+                    BKLMElementNumbers::c_ZPlane;
         int layer = touch->GetCopyNumber(6);
         int sector = touch->GetCopyNumber(8);
-        bool isForward = (touch->GetCopyNumber(9) == BKLMElementNumbers::c_ForwardSection);
-        copyID = (isForward ? BKLM_END_MASK : 0)
-                 | ((sector - 1) << BKLM_SECTOR_BIT)
-                 | ((layer - 1) << BKLM_LAYER_BIT)
-                 | ((scint - 1) << BKLM_STRIP_BIT)
-                 | ((scint - 1) << BKLM_MAXSTRIP_BIT)
-                 | (plane == BKLM_INNER ? BKLM_PLANE_MASK : 0)
-                 | BKLM_MC_MASK;
+        int section = touch->GetCopyNumber(9);
+        copyID = BKLMElementNumbers::channelNumber(
+                   section, sector, layer, plane, strip);
+        BKLMStatus::setMaximalStrip(copyID, strip);
       }
       return;
     case VOLTYPE_EKLM:
@@ -1382,9 +1377,11 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
               if (zStrip >= 0 && phiStrip >= 0) {
                 uint16_t channel1, channel2;
                 channel1 = m_klmElementNumbers->channelNumberBKLM(
-                             section, sector, layer, 0, zStrip);
+                             section, sector, layer,
+                             BKLMElementNumbers::c_ZPlane, zStrip);
                 channel2 = m_klmElementNumbers->channelNumberBKLM(
-                             section, sector, layer, 1, phiStrip);
+                             section, sector, layer,
+                             BKLMElementNumbers::c_PhiPlane, phiStrip);
                 enum KLMChannelStatus::ChannelStatus status1, status2;
                 status1 = m_klmChannelStatus->getChannelStatus(channel1);
                 status2 = m_klmChannelStatus->getChannelStatus(channel2);
@@ -1403,10 +1400,14 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           }
           if (!isDead) {
             extState.extLayerPattern |= (0x00000001 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
-            float phiBarrelEfficiency = m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0), intersection.sector + 1,
-                                        intersection.layer + 1, 1, 1);
-            float zBarrelEfficiency = m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0), intersection.sector + 1,
-                                      intersection.layer + 1, 0, 1);
+            float phiBarrelEfficiency =
+              m_klmStripEfficiency->getBarrelEfficiency(
+                (intersection.isForward ? 1 : 0), intersection.sector + 1,
+                intersection.layer + 1, BKLMElementNumbers::c_PhiPlane, 1);
+            float zBarrelEfficiency =
+              m_klmStripEfficiency->getBarrelEfficiency(
+                (intersection.isForward ? 1 : 0), intersection.sector + 1,
+                intersection.layer + 1, BKLMElementNumbers::c_ZPlane, 1);
             muid->setExtBKLMEfficiencyValue(intersection.layer, phiBarrelEfficiency * zBarrelEfficiency);
           } else {
             muid->setExtBKLMEfficiencyValue(intersection.layer, 0);

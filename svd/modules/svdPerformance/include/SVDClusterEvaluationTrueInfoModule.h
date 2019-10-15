@@ -17,9 +17,11 @@
 #include <TTree.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDTrueHit.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <TList.h>
 #include <svd/geometry/SensorInfo.h>
 #include <TFile.h>
@@ -67,6 +69,9 @@ namespace Belle2 {
     //  private:
     TFile* m_outputFile = nullptr; /**< output file*/
     std::string m_outputFileName = ""; /**<output file name*/
+
+    /** Name of the SVDEventInfo object */
+    std::string m_svdEventInfoName;
 
     /** Index used for the lists and for the vectors of histograms: it indicates the set of sensors we are looking at */
     int indexForHistosAndGraphs = 0;
@@ -168,7 +173,10 @@ namespace Belle2 {
     TH1F* m_histoControl_THToMCsize = nullptr; /**<control histo: true hit to mc size*/
     TList* m_histoList_Control = nullptr; /**<control histo*/
 
+
   protected:
+    /** Storage for SVDEventInfo object */
+    StoreObjPtr<SVDEventInfo> m_storeSVDEvtInfo;
 
     /** Function returning the index used for Histos */
     int indexFromLayerSensorSide(int LayerNumber, int SensorNumber, int UVNumber);

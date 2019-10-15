@@ -13,7 +13,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/RandomGenerator.h>
 
-#include <string>
 #include <memory>
 
 namespace Belle2 {

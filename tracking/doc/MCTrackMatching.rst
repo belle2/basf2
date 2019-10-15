@@ -9,9 +9,9 @@ The four main figures of merit for the track finder - the finding efficiency, th
 Overview: Available Status
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-After running the `TrackFinderMCTruthRecoTracksModule` which creates Genfit Track Candidates from MC information (in the following called MC track candidates) 
+After running the `TrackFinderMCTruthRecoTracks` which creates Genfit Track Candidates from MC information (in the following called MC track candidates) 
 and the "normal" track finder algorithm which uses hit information from the detector(in the following called PR track candidates), 
-you can apply the `MCRecoTracksMatcherModule`, which creates relations between the two `StoreArray` s 
+you can apply the `MCRecoTracksMatcher`, which creates relations between the two StoreArray s 
 of track candidates by looking on the hit content. 
 If the hit content of two track candidates has a non-zero intersection, 
 a relation is created with the ration between the intersection number of hits to the total number of 
@@ -29,7 +29,7 @@ Tracks from Pattern Recognition can be,
 *    clone, or
 *    fake (= background or ghost)
 
-as it can be seen in the `PRToMCMatchInfo` in ``TrackMatchLookUp.h``
+as it can be seen in the PRToMCMatchInfo in ``TrackMatchLookUp.h``
 
 Charged MCParticles can be
 
@@ -37,7 +37,7 @@ Charged MCParticles can be
 *    merged or
 *    missing.
 
-as it can be seen in the `MCToPRMatchInfo` in ``TrackMatchLookUp.h``.
+as it can be seen in the MCToPRMatchInfo in ``TrackMatchLookUp.h``.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When is a Track/MCParticle What?
@@ -137,7 +137,7 @@ The four main figures of merit, as also shown on the validation side, are:
 * Finding efficiency: Number of MC track candidates which are labeled found divided by the total number of MC track candidates
 * Hit efficiency: Mean of all single hit efficiency of the MC track candidates labeled as found. 
   The single hit efficiency is defined as the number of found hits divided by the number of all hits in a track. 
-  This information is encoded in the weight of the relations created by the `MCRecoTracksMatcherModule`.
+  This information is encoded in the weight of the relations created by the `MCRecoTracksMatcher`.
 * Clone rate: Number of PR track candidates which are labeled clone divided by the number of PR 
   track candidates which are labeled clone or matched
 * Fake rate: Number of PC track candidates which are labeled fake divided by the total number of PR track candidates.

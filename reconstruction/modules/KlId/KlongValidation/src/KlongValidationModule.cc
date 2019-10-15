@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  * **************************************************************************/
 
-
 #include <reconstruction/modules/KlId/KlongValidation/KlongValidationModule.h>
 #include <mdst/dataobjects/KlId.h>
 
@@ -16,7 +15,7 @@
 #include <framework/logging/Logger.h>
 
 // here's where the functions are hidden
-#include "reconstruction/modules/KlId/KLMExpert/KlId.h"
+#include <reconstruction/modules/KlId/KLMExpert/KlId.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
 
 #include <TTree.h>
@@ -35,23 +34,19 @@ REG_MODULE(KlongValidation);
 
 KlongValidationModule::KlongValidationModule(): Module()
 {
-  setDescription("Used to calculate validation variables for Klong efficiency validations etc...");
-  addParam("outPath", m_outPath,
-           "name your root file. has to end with .root",
-           m_outPath);
-  addParam("KlId_cut", m_KlIDCut,
-           "if cut < 0 then only the !trackFlag condition will be used (only neutral clusters). Otherwise the cut determines which Clusters will be used.",
-           m_KlIDCut);
+  setDescription("Module used by the validation server to generate root files for the K0L validation. It calculates fake rates and efficiencies.");
+  addParam("outputName", m_outputName,
+           "Name of the output root file (must end with .root)",
+           m_outputName);
+  addParam("KlIdCut", m_KlIdCut,
+           "If cut < 0, then only the neutral KLMClusters will be used. Otherwise, only the KLMClusters that satisfies the selection will be used.",
+           m_KlIdCut);
 }
-
-
 
 KlongValidationModule::~KlongValidationModule()
 {
 }
 
-
-// --------------------------------------Module----------------------------------------------
 void KlongValidationModule::initialize()
 {
   // require existence of necessary datastore obj
@@ -59,28 +54,28 @@ void KlongValidationModule::initialize()
   m_mcParticles.isRequired();
 
   // initialize root tree to write stuff into
-  m_f =     new TFile(m_outPath.c_str(), "recreate");
+  m_f =     new TFile(m_outputName.c_str(), "recreate");
   /** using TH1F because the validation server does not support TEfficiency  */
-  m_effPhi_Pass      = new TH1F("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 32, -3.2, 3.2);
-  m_Phi_all  = new TH1F("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 32, -3.2, 3.2);
+  m_Phi_Pass      = new TH1F("Phi Passed", "Passed #Phi;#Phi;Count", 32, -3.2, 3.2);
+  m_Phi_all  = new TH1F("Phi All", "All #Phi;#Phi;Count", 32, -3.2, 3.2);
   m_effPhi      = new TH1F("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 32, -3.2, 3.2);
 
-  m_effTheta_Pass    = new TH1F("Theta Efficiency", "Efficiency #Theta;#Theta;Efficiency", 32, 0, 3.2);
-  m_Theta_all  = new TH1F("Theta Efficiency", "Efficiency #Theta;#Theta;Efficiency", 32, 0, 3.2);
+  m_Theta_Pass    = new TH1F("Theta Passed", "Passed #Theta;#Theta;Count", 32, 0, 3.2);
+  m_Theta_all  = new TH1F("Theta All", "All #Theta;#Theta;Count", 32, 0, 3.2);
   m_effTheta  = new TH1F("Theta Efficiency", "Efficiency #Theta;#Theta;Efficiency", 32, 0, 3.2);
 
-  m_effMom_Pass      = new TH1F("Momentum Efficiency", "Efficiency Momentum;Momentum;Efficiency", 25, 0, 5);
+  m_Mom_Pass      = new TH1F("Momentum Efficiency", "Efficiency Momentum;Momentum;Efficiency", 25, 0, 5);
   m_Mom_all    = new TH1F("Momentum Efficiency normalise", "Efficiency Momentum;Momentum;Count", 25, 0, 5);
   m_Mom_all_plot    = new TH1F("Momentum Efficiency all, obtained from clusters", "Efficiency Momentum;Momentum;Count", 25, 0, 5);
   m_effMom    = new TH1F("Momentum Efficiency obtained from cluster", "Efficiency Momentum;Momentum;Efficiency", 25, 0, 5);
 
-  m_fakePhi_Pass     = new TH1F("Phi Fake Rate", "Fake Rate #Phi;#Phi;Fake Rate", 32, -3.2, 3.2);
+  m_fakePhi_Pass     = new TH1F("Phi Fake Passsed", "Fake Passed #Phi;#Phi;Count", 32, -3.2, 3.2);
   m_fakePhi     = new TH1F("Phi Fake Rate", "Fake Rate #Phi;#Phi;Fake Rate", 32, -3.2, 3.2);
 
-  m_fakeTheta_Pass = new TH1F("Theta Fake Rate", "Fake Rate #Theta;#Theta;Fake Rate", 32, 0, 3.2);
+  m_fakeTheta_Pass = new TH1F("Theta Fake Passed", "Fake Passed #Theta;#Theta;Count", 32, 0, 3.2);
   m_fakeTheta = new TH1F("Theta Fake Rate", "Fake Rate #Theta;#Theta;Fake Rate", 32, 0, 3.2);
 
-  m_fakeMom_Pass   = new TH1F("Momentum Fake Rate", "Momentum Fake Rate;Momentum;Fake Rate", 25, 0, 5);
+  m_fakeMom_Pass   = new TH1F("Momentum Fake Passed", "Momentum Fake Passed;Momentum;Count", 25, 0, 5);
   m_fakeMom     = new TH1F("Momentum Fake Rate", "Momentum Fake Rate;Momentum;Fake Rate", 25, 0, 5);
 
   m_time     = new TH1F("KLM Cluster Timing", "Cluster Timing;Momentum;Count", 100, -600, 600);
@@ -99,9 +94,7 @@ void KlongValidationModule::initialize()
   m_klidFake       = new TH1F("Klid Fake", "klid Fake;klid; Count", m_xbins.size() - 1, m_xbins.data());
   m_klidTrue       = new TH1F("Klid True", "Klid True;klid; Count", m_xbins.size() - 1, m_xbins.data());
   m_klidAll       = new TH1F("Klid all", "klid all clusters;klid; Count", m_xbins.size() - 1, m_xbins.data());
-
-}//initk
-
+}
 
 void KlongValidationModule::beginRun()
 {
@@ -113,7 +106,6 @@ void KlongValidationModule::endRun()
 
 void KlongValidationModule::event()
 {
-
   // the performance of the classifier depends on the cut on the classifier
   // output. This is generally arbitrary as it depends on what the user wants.
   // Finding K_L or rejecting?
@@ -125,9 +117,9 @@ void KlongValidationModule::event()
 
     auto klidObj = cluster.getRelatedTo<KlId>();
 
-    if (m_KlIDCut >= 0) {
+    if (m_KlIdCut >= 0) {
       if (klidObj) {
-        if (klidObj->getKlId() > m_KlIDCut) {
+        if (klidObj->getKlId() > m_KlIdCut) {
           m_reconstructedAsKl = true;
         } else {
           m_reconstructedAsKl = false;
@@ -179,12 +171,12 @@ void KlongValidationModule::event()
 
     m_phi      = cluster.getMomentum().Phi();
     m_theta    = cluster.getMomentum().Theta();
-    m_momentum = std::abs(cluster.getMomentumMag());//Mag2(); ??
+    m_momentum = std::abs(cluster.getMomentumMag());
 
     if (m_passed) {
-      m_effPhi_Pass    -> Fill(m_phi);
-      m_effTheta_Pass  -> Fill(m_theta);
-      m_effMom_Pass    -> Fill(m_momentum);
+      m_Phi_Pass    -> Fill(m_phi);
+      m_Theta_Pass  -> Fill(m_theta);
+      m_Mom_Pass    -> Fill(m_momentum);
     }
 
     if (m_faked) {
@@ -243,17 +235,16 @@ void KlongValidationModule::event()
     }
   }// for klm clusters
 
-} // event
-
+}
 
 void KlongValidationModule::terminate()
 {
   // write TEff to root file ,
   m_f         -> cd();
   // TH1F is not compatible with the validation server
-  m_effPhi->Divide(m_effPhi_Pass, m_Phi_all);
-  m_effTheta->Divide(m_effTheta_Pass, m_Theta_all);
-  m_effMom->Divide(m_effMom_Pass, m_Mom_all);
+  m_effPhi->Divide(m_Phi_Pass, m_Phi_all);
+  m_effTheta->Divide(m_Theta_Pass, m_Theta_all);
+  m_effMom->Divide(m_Mom_Pass, m_Mom_all);
 
   m_fakePhi->Divide(m_fakePhi_Pass, m_Phi_all);
   m_fakeTheta->Divide(m_fakeTheta_Pass, m_Theta_all);
@@ -325,4 +316,3 @@ void KlongValidationModule::terminate()
   m_backRej   -> Write();
   m_f         -> Close();
 }
-

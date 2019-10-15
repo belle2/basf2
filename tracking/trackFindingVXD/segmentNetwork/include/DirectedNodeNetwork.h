@@ -60,6 +60,7 @@ namespace Belle2 {
     bool addNode(NodeID nodeID, EntryType& newEntry)
     {
       if (m_nodeMap.count(nodeID) == 0) {
+        // cppcheck-suppress stlFindInsert
         m_nodeMap.emplace(nodeID, new Node(newEntry));
         m_isFinalized = false;
         return true;

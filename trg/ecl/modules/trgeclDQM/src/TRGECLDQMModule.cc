@@ -75,7 +75,7 @@ void TRGECLDQMModule::defineHisto()
   h_TRGTiming      = new TH1D("h_TRGTiming",     "TRG Timing  (ns)",     100, 3010, 3210);
   h_Cal_TCTiming       = new TH1D("h_Cal_TCTiming",      "Cal TC Timing  (ns)",      100, -400, 400);
   h_Cal_TRGTiming      = new TH1D("h_Cal_TRGTiming",     "TRG Timing  (ns)",     100, -400, 400);
-  h_ECL_TriggerBit      = new TH1D("h_ECL_TriggerBit",     "ECL Trigger Bit",     26, 0, 26);
+  h_ECL_TriggerBit      = new TH1D("h_ECL_TriggerBit",     "ECL Trigger Bit",     29, 0, 29);
   h_Cluster_Energy_Sum    = new TH1D("h_Cluster_Energy_Sum",   "Energy Sum of 2 Clusters (ADC)",       300, 0, 3000);
 
   oldDir->cd();
@@ -174,9 +174,10 @@ void TRGECLDQMModule::event()
   int b1type = 0;
   int etot = 0;
   int vlm = 0;
+  int eclburst = 0;
   //  int s_hit_win= 0;
   std::vector<int> trgbit ;
-  trgbit.resize(41, 0);
+  trgbit.resize(44, 0);
   for (int iii = 0; iii < trgeclSumArray.getEntries(); iii++) {
     TRGECLUnpackerSumStore* aTRGECLUnpackerSumStore = trgeclSumArray[iii];
 
@@ -191,7 +192,7 @@ void TRGECLDQMModule::event()
     vlm     = aTRGECLUnpackerSumStore ->  getLowMulti();
     mu      = aTRGECLUnpackerSumStore ->  getMumu();
     pre     = aTRGECLUnpackerSumStore ->  getPrescale();
-
+    eclburst = aTRGECLUnpackerSumStore -> getECLBST();
 
     //
     trgbit[0] = 1;
@@ -207,36 +208,38 @@ void TRGECLDQMModule::event()
     trgbit[10] = (etot >> 2) & 0x1;
     trgbit[11] = clover;
 
-    for (int j = 0; j < 12; j++) {
+    for (int j = 0; j < 14; j++) {
       trgbit[12 + j] = (vlm >> j) & 0x1;
     }
 
-    trgbit[24] = mu;
-    trgbit[25] = pre;
+    trgbit[26] = mu;
+    trgbit[27] = pre;
+    trgbit[28] = eclburst;
 
-    trgbit[26] = b1type & 0x1;
-    trgbit[27] = (b1type >> 1) & 0x1;
-    trgbit[28] = (b1type >> 2) & 0x1;
-    trgbit[29] = (b1type >> 3) & 0x1;
-    trgbit[30] = (b1type >> 4) & 0x1;
-    trgbit[31] = (b1type >> 5) & 0x1;
-    trgbit[32] = (b1type >> 6) & 0x1;
-    trgbit[33] = (b1type >> 7) & 0x1;
-    trgbit[34] = (b1type >> 8) & 0x1;
-    trgbit[35] = (b1type >> 9) & 0x1;
-    trgbit[36] = (b1type >> 10) & 0x1;
-    trgbit[37] = (b1type >> 11) & 0x1;
-    trgbit[38] = (b1type >> 12) & 0x1;
-    trgbit[39] = (b1type >> 13) & 0x1;
-    trgbit[40] = (b1type >> 14) & 0x1;
+    trgbit[29] = b1type & 0x1;
+    trgbit[30] = (b1type >> 1) & 0x1;
+    trgbit[31] = (b1type >> 2) & 0x1;
+    trgbit[32] = (b1type >> 3) & 0x1;
+    trgbit[33] = (b1type >> 4) & 0x1;
+    trgbit[34] = (b1type >> 5) & 0x1;
+    trgbit[35] = (b1type >> 6) & 0x1;
+    trgbit[36] = (b1type >> 7) & 0x1;
+    trgbit[37] = (b1type >> 8) & 0x1;
+    trgbit[38] = (b1type >> 9) & 0x1;
+    trgbit[39] = (b1type >> 10) & 0x1;
+    trgbit[40] = (b1type >> 11) & 0x1;
+    trgbit[41] = (b1type >> 12) & 0x1;
+    trgbit[42] = (b1type >> 13) & 0x1;
+    trgbit[43] = (b1type >> 14) & 0x1;
+
 
   }
 
-  const char* label[41] = {"Hit", "Timing Source(FWD)", "Timing Source(BR)", "Timing Source(BWD)", "physics Trigger", "2D Bhabha Veto", "3D Bhabha veto", "3D Bhabha Selection", "E Low", "E High", "E LOM", "Cluster Overflow", "Low multi bit 0", "Low multi bit 1", "Low multi bit 2", "Low multi bit 3", "Low multi bit 4", "Low multi bit 5", "Low multi bit 6", "Low multi bit 7", "Low multi bit 8", "Low multi bit 9", "Low multi bit 10", "Low multi bit 11", "mumu bit", "prescale bit", "2D Bhabha bit 1", "2D Bhabha bit 2"  , "2D Bhabha bit 3", "2D Bhabha bit 4", "2D Bhabha bit 5", "2D Bhabha bit 6", "2D Bhabha bit 7", "2D Bhabha bit 8", "2D Bhabha bit 9", "2D Bhabha bit 10", "2D Bhabha bit 11", "2D Bhabha bit 12", "2D Bhabha bit 13", "2D Bhabha bit 14"};
+  const char* label[44] = {"Hit", "Timing Source(FWD)", "Timing Source(BR)", "Timing Source(BWD)", "physics Trigger", "2D Bhabha Veto", "3D Bhabha veto", "3D Bhabha Selection", "E Low", "E High", "E LOM", "Cluster Overflow", "Low multi bit 0", "Low multi bit 1", "Low multi bit 2", "Low multi bit 3", "Low multi bit 4", "Low multi bit 5", "Low multi bit 6", "Low multi bit 7", "Low multi bit 8", "Low multi bit 9", "Low multi bit 10", "Low multi bit 11", "Low multi bit 12", "Low multi bit 13", "mumu bit", "prescale bit", "ECL burst bit" , "2D Bhabha bit 1", "2D Bhabha bit 2"  , "2D Bhabha bit 3", "2D Bhabha bit 4", "2D Bhabha bit 5", "2D Bhabha bit 6", "2D Bhabha bit 7", "2D Bhabha bit 8", "2D Bhabha bit 9", "2D Bhabha bit 10", "2D Bhabha bit 11", "2D Bhabha bit 12", "2D Bhabha bit 13", "2D Bhabha bit 14"};
 
 
 
-  for (int j = 0; j < 26; j++) {
+  for (int j = 0; j < 29; j++) {
     if (trgbit[j] == 0x1) {h_ECL_TriggerBit->Fill(j, 1);}
     h_ECL_TriggerBit->GetXaxis()-> SetBinLabel(j + 1, label[j]);
 

@@ -65,6 +65,8 @@ ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECL
   addParam("HadronPulseShapes", m_HadronPulseShape, "Flag to include hadron component in pulse shape construction (default: true)",
            true);
   addParam("ADCThreshold", m_ADCThreshold, "ADC threshold for waveform fits (default: 25)", 25);
+  addParam("WaveformThresholdOverride", m_WaveformThresholdOverride,
+           "If gt 0 value is applied to all crystals for waveform saving threshold. If lt 0 dbobject is used. (GeV)", -1.0);
 }
 
 ECLDigitizerModule::~ECLDigitizerModule()
@@ -113,7 +115,8 @@ void ECLDigitizerModule::beginRun()
       Tel("ECLCrystalElectronicsTime"),
       Ten("ECLCrystalTimeOffset"),
       Tct("ECLCrateTimeOffset"),
-      Tmc("ECLMCTimeOffset");
+      Tmc("ECLMCTimeOffset"),
+      Awave("ECL_FPGA_StoreWaveform");
   double ns_per_tick = 1.0 / (4.0 * ec.m_rf) * 1e3;// ~0.49126819903043308239 ns/tick
 
   calibration_t def = {1, 0};
@@ -126,6 +129,14 @@ void ECLDigitizerModule::beginRun()
   if (Ten) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Ten->getCalibVector()[i] * ns_per_tick;
   if (Tct) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tct->getCalibVector()[i] * ns_per_tick;
   if (Tmc) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tmc->getCalibVector()[i] * ns_per_tick;
+
+  m_Awave.assign(8736, -1);
+  if (m_WaveformThresholdOverride < 0) {
+    if (Awave) for (int i = 0; i < 8736; i++) m_Awave[i] = Awave->getCalibVector()[i];
+  } else {
+    //If m_WaveformThresholdOverride > 0 override ECL_FPGA_StoreWaveform;
+    for (int i = 0; i < 8736; i++) m_Awave[i] = m_WaveformThresholdOverride * m_calib[i].ascale; // convert GeV to ADC
+  }
 
   if (m_HadronPulseShape)  callbackHadronSignalShapes();
 
@@ -323,9 +334,14 @@ void ECLDigitizerModule::event()
 
     if (energyFit > m_ADCThreshold) {
       int CellId = j + 1;
-      const auto eclDsp = m_eclDsps.appendNew();
-      eclDsp->setCellId(CellId);
-      eclDsp->setDspA(FitA);
+
+      //note energyFit and m_Awave is in ADC units
+      if (energyFit > m_Awave[CellId - 1]) {
+        //only save waveforms above ADC threshold
+        const auto eclDsp = m_eclDsps.appendNew();
+        eclDsp->setCellId(CellId);
+        eclDsp->setDspA(FitA);
+      }
 
       const auto eclDigit = m_eclDigits.appendNew();
       eclDigit->setCellId(CellId); // cellId in range from 1 to 8736

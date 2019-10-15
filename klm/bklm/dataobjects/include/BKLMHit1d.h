@@ -47,42 +47,66 @@ namespace Belle2 {
 
     //! Determine whether this 1D hit is in RPC or scintillator
     //! @return whether this 1D hit is in RPC (true) or scintillator (false)
-    bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
+    bool inRPC() const
+    {
+      return getLayer() >= BKLMElementNumbers::c_FirstRPCLayer;
+    }
 
     //! Get section number
-    //! @return section number (1=forward or 0=backward) of this strip
-    int getSection() const { return ((m_ModuleID & BKLM_END_MASK) >> BKLM_END_BIT); }
+    //! @return section number (1=forward or 0=backward) of this 1D hit
+    int getSection() const
+    {
+      return BKLMElementNumbers::getSectionByModule(m_ModuleID);
+    }
 
     //! Get sector number
     //! @return sector number (1..8) of this 1D hit
-    int getSector() const { return (((m_ModuleID & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1); }
+    int getSector() const
+    {
+      return BKLMElementNumbers::getSectorByModule(m_ModuleID);
+    }
 
     //! Get layer number
     //! @return layer number (1..15) of this 1D hit
-    int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
+    int getLayer() const
+    {
+      return BKLMElementNumbers::getLayerByModule(m_ModuleID);
+    }
 
     //! Get plane number.
     //! @return Plane number (0=z, 1=phi).
-    bool getPlane() const { return BKLMElementNumbers::getPlaneByModule(m_ModuleID);}
+    bool getPlane() const
+    {
+      return BKLMElementNumbers::getPlaneByModule(m_ModuleID);
+    }
 
     //! Get readout coordinate
     //! @return readout coordinate of this 1D hit
-    bool isPhiReadout() const { return ((m_ModuleID & BKLM_PLANE_MASK) != 0); }
+    bool isPhiReadout() const
+    {
+      return BKLMElementNumbers::getPlaneByModule(m_ModuleID) ==
+             BKLMElementNumbers::c_PhiPlane;
+    }
 
     //! Get lowest strip number of this 1D hit
     //! @return lowest strip number of this 1D hit
-    int getStripMin() const { return BKLMElementNumbers::getStripByModule(m_ModuleID); }
+    int getStripMin() const
+    {
+      return BKLMElementNumbers::getStripByModule(m_ModuleID);
+    }
 
     //! Get highest strip number of this 1D hit
     //! @return highest strip number of this 1D hit
-    int getStripMax() const { return (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1); }
+    int getStripMax() const
+    {
+      return BKLMStatus::getMaximalStrip(m_ModuleID);
+    }
 
     //! Get average strip number
     //! @return average strip number of this 1D hit
     double getStripAve() const
     {
-      return 0.5 * ((((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1) +
-                    (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1));
+      return 0.5 * (getStripMin() + getStripMax());
     }
 
     //! Get detector-module identifier

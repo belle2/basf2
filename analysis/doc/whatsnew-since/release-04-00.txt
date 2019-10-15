@@ -1,21 +1,27 @@
 Changes in the analysis package
 -------------------------------
 
+Variables
++++++++++
+
+ * Renamed some `RestOfEvent` variables for consistency accross the `VariableManager`.
+   Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.
+   For example ``ROE_deltae`` is now :b2:var:`roeDeltae`.
+
+ * Removed ``clusterCRID`` which duplicates :b2:var:`clusterConnectedRegionID`.
+
 Modules
 +++++++
 
-* When merging ParticleLists using the :b2:mod:`ParticleListManipulator`
-  (`modularAnalysis.copyLists`) duplicates (not multiple candidates) are removed
-  on a first-come, first-served basis, i.e. the order of the input particles
-  matters. Now, the new parameter ``variable`` can be provided to determine
-  which duplicate should be preferred. The logic is the same as for the
-  :b2:mod:`BestCandidateSelector`.
-
-* The :b2:mod:`ParticleLoader` can create neutron particle lists now. ECL
-  cluster with the hadron hypothesis as well as KLM cluster are used as source.
+ * When merging ParticleLists using the :b2:mod:`ParticleListManipulator`
+   (`modularAnalysis.copyLists`) duplicates (not multiple candidates) are removed
+   on a first-come, first-served basis, i.e. the order of the input particles
+   matters. Now, the new parameter ``variable`` can be provided to determine
+   which duplicate should be preferred. The logic is the same as for the
+   :b2:mod:`BestCandidateSelector`.
  * The :b2:mod:`ParticleLoader` can create neutron particle lists now. ECL
    cluster with the hadron hypothesis as well as KLM cluster are used as source.
  * In :b2:mod:`TreeFitter` bugfix in mass constraint: chi2 correctly calculated now.
  * In :b2:mod:`TreeFitter` change of initialisation values increases performance in all fits with tracks.
  * In :b2:mod:`TreeFitter` max iterations set to 100, increases efficiency slightly in many cases.
-
+ * Fix to nested RestOfEvent objects (see :issue:`BII-5649`)

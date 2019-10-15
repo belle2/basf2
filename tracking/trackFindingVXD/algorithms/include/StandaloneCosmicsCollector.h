@@ -92,6 +92,7 @@ namespace Belle2 {
       bool fitting = true;
       int rejected = 0;
 
+      // cppcheck-suppress knownConditionTrueFalse
       while (m_reducedChi2 > qualityCut && fitting) {
         fitting = doLineFit(minSPs);
         if (not fitting) {return fitting;}

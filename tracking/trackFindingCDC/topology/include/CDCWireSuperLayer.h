@@ -82,7 +82,10 @@ namespace Belle2 {
 
       /// Gives the layer by its layer id within the superlayer
       const CDCWireLayer& getWireLayer(ILayer iLayer) const
-      { return at(iLayer); }
+      {
+        // cppcheck-suppress returnTempReference
+        return at(iLayer);
+      }
       /**@}*/
 
       /**
@@ -222,7 +225,7 @@ namespace Belle2 {
       /**@}*/
 
       /**
-       *  @name Secondary neighborhood
+       *  @getSecondaryNeighbor Secondary neighborhood
        *  The secondary neighbors are numbered like positions on the normal twelve hour clock.
        *
        *  Due to the hexogonal arrangement of the wires, the secondary neighbors are positioned

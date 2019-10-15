@@ -13,13 +13,13 @@
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/database/Downloader.h>
 #include <framework/database/Database.h>
+#include <framework/utilities/Utils.h>
 #include <boost/python.hpp>
 #include <framework/core/PyObjConvUtils.h>
 #include <boost/algorithm/string.hpp>
 
 #include <set>
 #include <TPython.h>
-#include <TClass.h>
 
 // Current default globaltag when generating events.
 #define CURRENT_DEFAULT_TAG "master_2019-09-26"
@@ -461,8 +461,8 @@ Warning:
     .def("prepend_testing_payloads", &Configuration::prependTestingPayloadLocation, py::args("filename"), R"DOC(prepend_testing_payloads(filename)
 
 Insert a text file containing local test payloads in the beginning of the list
-of `testing_payloads`. This will mean they will have lower priority than payloads in
-previously defined text files but still higher priority than globaltags.
+of `testing_payloads`. This will mean they will have higher priority than payloads in
+previously defined text files as well as higher priority than globaltags.
 
 Parameters:
     filename (str): file containing a local definition of payloads and their

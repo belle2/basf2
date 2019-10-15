@@ -615,8 +615,10 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   effSpeed = 0.5671 * Const::speedOfLight;
 
   effSpeed = (fabs(effC_scint_phi) + fabs(effC_scint_z)) / 2.0;
-  effSpeed_RPC = (fabs(effC_rpc_phi) + fabs(effC_rpc_z)) / 2.0;
+  effSpeed = effSpeed + (fabs(effC_scint_phi_end) + fabs(effC_scint_z_end)) / 2.0;
+  effSpeed = effSpeed / 2.0;
 
+  effSpeed_RPC = (fabs(effC_rpc_phi) + fabs(effC_rpc_z)) / 2.0;
   effSpeed_RPC = 0.50 * Const::speedOfLight;
 
   m_timeCableDelay->setEffLightSpeed(effSpeed, false);

@@ -89,7 +89,7 @@ namespace Belle2 {
 
     for (unsigned i = 0; i < nParts; i++) {
       const Particle* particle = plist->getParticle(i);
-      auto* roe = particle->getRelated<RestOfEvent>();
+      auto* roe = particle->getRelatedTo<RestOfEvent>("ALL");
       for (auto& maskName : m_maskNames) {
         if (!m_update) {
           roe->initializeMask(maskName, "ROEInterpreterModule");

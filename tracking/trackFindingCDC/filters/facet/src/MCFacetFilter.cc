@@ -76,23 +76,15 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
     return false;
   }
 
-  // Maybe be a bit more permissive for reassigned hits
-  bool startIsReassigned = mcHitLookUp.isReassignedSecondary(startWireHit.getHit());
-  bool middleIsReassigned = mcHitLookUp.isReassignedSecondary(middleWireHit.getHit());
-  bool endIsReassigned = mcHitLookUp.isReassignedSecondary(endWireHit.getHit());
-
-  // Now check the alignement in track
-  bool distanceInTrackIsSufficientlyLow = true;
-
   int startInTrackId = mcHitLookUp.getInTrackId(startWireHit.getHit());
   int middleInTrackId = mcHitLookUp.getInTrackId(middleWireHit.getHit());
   int endInTrackId = mcHitLookUp.getInTrackId(endWireHit.getHit());
 
   int startToMiddleInTrackDistance =  middleInTrackId - startInTrackId;
   int middleToEndInTrackDistance =  endInTrackId - middleInTrackId;
-  int startToEndInTrackDistance =  endInTrackId - startInTrackId;
 
-  distanceInTrackIsSufficientlyLow =
+  // Now check the alignement in track
+  bool distanceInTrackIsSufficientlyLow =
     0 < startToMiddleInTrackDistance and startToMiddleInTrackDistance <= maxInTrackHitIdDifference and
     0 < middleToEndInTrackDistance and middleToEndInTrackDistance <= maxInTrackHitIdDifference;
 

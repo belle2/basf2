@@ -92,35 +92,10 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
   int middleToEndInTrackDistance =  endInTrackId - middleInTrackId;
   int startToEndInTrackDistance =  endInTrackId - startInTrackId;
 
-  constexpr bool makeNoDifferenceForReassignedSecondaries = true;
+  distanceInTrackIsSufficientlyLow =
+    0 < startToMiddleInTrackDistance and startToMiddleInTrackDistance <= maxInTrackHitIdDifference and
+    0 < middleToEndInTrackDistance and middleToEndInTrackDistance <= maxInTrackHitIdDifference;
 
-  // TODO: check if we want to keep makeNoDifferenceForReassignedSecondaries, if not: simplify the following conditions (remove all elses)
-  // cppcheck-suppress knownConditionTrueFalse
-  if (makeNoDifferenceForReassignedSecondaries or
-      (not startIsReassigned and not middleIsReassigned and not endIsReassigned)) {
-
-    distanceInTrackIsSufficientlyLow =
-      0 < startToMiddleInTrackDistance and startToMiddleInTrackDistance <= maxInTrackHitIdDifference and
-      0 < middleToEndInTrackDistance and middleToEndInTrackDistance <= maxInTrackHitIdDifference;
-
-  } else if (not startIsReassigned and not middleIsReassigned) {
-
-    distanceInTrackIsSufficientlyLow =
-      0 < startToMiddleInTrackDistance and startToMiddleInTrackDistance <= maxInTrackHitIdDifference;
-
-  } else if (not middleIsReassigned and not endIsReassigned) {
-
-    distanceInTrackIsSufficientlyLow =
-      0 < middleToEndInTrackDistance and middleToEndInTrackDistance <= maxInTrackHitIdDifference;
-
-  } else if (not startIsReassigned and not endIsReassigned) {
-
-    distanceInTrackIsSufficientlyLow =
-      0 < startToEndInTrackDistance and startToEndInTrackDistance <= 2 * maxInTrackHitIdDifference;
-
-  } else {
-    // can not say anything about the two or more reassigned hits.
-  }
 
   if (not distanceInTrackIsSufficientlyLow) return false;
 

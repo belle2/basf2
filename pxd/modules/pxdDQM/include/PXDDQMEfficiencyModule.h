@@ -91,7 +91,7 @@ namespace Belle2 {
     bool m_maskDeadPixels;
     /// cut borders
     bool m_cutBorders;
-    /// add some verbose istograms for cuts
+    /// add some verbose histograms for cuts
     bool m_verboseHistos;
 
     /// the geometry

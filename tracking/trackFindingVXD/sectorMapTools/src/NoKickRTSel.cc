@@ -11,6 +11,12 @@
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 
+#include <tracking/dataobjects/hitXPDerivate.h>
+
+#include <mdst/dataobjects/MCParticle.h>
+#include <pxd/dataobjects/PXDTrueHit.h>
+#include <svd/dataobjects/SVDTrueHit.h>
+
 using namespace Belle2;
 
 
@@ -209,7 +215,7 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
       m_PDGIDCut->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
       m_noKickTree->Fill();
     }
-    return good;
+    return false;
   }
 
   if (track.getMomentumSeed().Mag() > m_pmax) {

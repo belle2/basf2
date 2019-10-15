@@ -13,7 +13,6 @@
 #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariable.h>
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleCenterXY.h>
 #include <framework/geometry/B2Vector3.h>
-#include <math.h>
 
 #define CIRCLERADIUS_NAME CircleRadius
 namespace Belle2 {

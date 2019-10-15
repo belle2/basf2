@@ -11,27 +11,16 @@
 #ifndef REPROCESSORMODULE_H
 #define REPROCESSORMODULE_H
 
-#include <mdst/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <framework/core/Module.h>
-#include <string>
-#include <vector>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <beast/microtpc/dataobjects/TPCG4TrackInfo.h>
 #include <beast/he3tube/dataobjects/HE3G4TrackInfo.h>
 #include <generators/SAD/dataobjects/SADMetaHit.h>
-
-
-//ROOT
-#include <TRandom3.h>
-#include <TMath.h>
-#include <TF1.h>
-#include <TVector3.h>
-
 
 namespace Belle2 {
   //  namespace reprocessor {

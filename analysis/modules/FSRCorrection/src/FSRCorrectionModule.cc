@@ -12,9 +12,9 @@
 #include <analysis/modules/FSRCorrection/FSRCorrectionModule.h>
 
 // framework aux
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/StoreArray.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -23,7 +23,6 @@
 #include <mdst/dataobjects/Track.h>
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
-#include <analysis/utility/PCmsLabTransform.h>
 
 #include <cmath>
 #include <algorithm>

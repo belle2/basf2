@@ -11,9 +11,6 @@
 #pragma once
 #include <framework/datastore/StoreArray.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
-#include <analysis/VariableManager/Utility.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>

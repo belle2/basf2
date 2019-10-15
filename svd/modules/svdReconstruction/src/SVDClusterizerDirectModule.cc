@@ -60,6 +60,8 @@ SVDClusterizerDirectModule::SVDClusterizerDirectModule() : Module()
            "TrueHit collection name", string(""));
   addParam("MCParticles", m_storeMCParticlesName,
            "MCParticles collection name", string(""));
+  addParam("SVDEventInfo", m_svdEventInfoName,
+           "SVDEventInfo name", string(""));
 
   // 2. Calibration and time fitter sources
   addParam("TimeFitterName", m_timeFitterName,
@@ -91,6 +93,10 @@ void SVDClusterizerDirectModule::initialize()
   storeShaperDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
+  m_storeSVDEvtInfo.isRequired();
+
+  if (!m_storeSVDEvtInfo.isOptional(m_svdEventInfoName)) m_svdEventInfoName = "SVDEventInfoSim";
+  m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
 
   RelationArray relClusterShaperDigits(storeClusters, storeShaperDigits);
   RelationArray relClusterTrueHits(storeClusters, storeTrueHits);
@@ -174,9 +180,12 @@ void SVDClusterizerDirectModule::fillRelationMap(const RelationLookup& lookup,
 
 void SVDClusterizerDirectModule::event()
 {
+
   const StoreArray<SVDShaperDigit> storeShaperDigits(m_storeShaperDigitsName);
-  // If no digits, nothing to do
-  if (!storeShaperDigits || !storeShaperDigits.getEntries()) return;
+  // If no digits or no SVDEventInfo, nothing to do
+  if (!storeShaperDigits || !storeShaperDigits.getEntries() || !m_storeSVDEvtInfo.isValid()) return;
+
+  SVDModeByte modeByte = m_storeSVDEvtInfo->getModeByte();
 
   size_t nDigits = storeShaperDigits.getEntries();
   B2DEBUG(90, "Initial size of StoreDigits array: " << nDigits);
@@ -376,7 +385,7 @@ void SVDClusterizerDirectModule::event()
         }
         // Correct with trigger bin information
         const double triggerBinSep = 4 * 1.96516; //in ns
-        double apvPhase = triggerBinSep * (0.5 + static_cast<int>(digit.getModeByte().getTriggerBin()));
+        double apvPhase = triggerBinSep * (0.5 + static_cast<int>(modeByte.getTriggerBin()));
         timeShift = timeShift + apvPhase;
         waveWidths.push_back(peakWidth);
         timeShifts.push_back(timeShift);

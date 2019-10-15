@@ -128,6 +128,9 @@ namespace Belle2 {
     /** Storage for calibration constants */
     std::vector<calibration_t> m_calib;
 
+    /** Storage for waveform saving thresholds*/
+    std::vector<double> m_Awave;
+
     /** function wrapper for waveform fit */
     void shapeFitterWrapper(const int j, const int* FitA, const int m_ttrig,
                             int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const ;
@@ -170,6 +173,7 @@ namespace Belle2 {
     bool m_waveformMaker; /**< produce only waveform digits */
     unsigned int m_compAlgo; /**< compression algorithm for background waveforms */
     int m_ADCThreshold; /**< ADC threshold for wavefom fits*/
+    double m_WaveformThresholdOverride; /**< If gt 0, value will override ECL_FPGA_StoreWaveform and apply value (in GeV) as threshold for all crystals for waveform saving*/
     std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
   };
 }//Belle2

@@ -14,6 +14,9 @@ from ROOT import Belle2
 # circumvent BII-1264
 ROOT.gInterpreter.Declare("#include <framework/utilities/MakeROOTCompatible.h>")
 
+# Unfortunately doxygen doesn't recognize our docstrings in this file :/
+# @cond SUPPRESS_DOXYGEN
+
 
 def file_description_set(rootfile: Union[ROOT.TFile, str, pathlib.PurePath],
                          description: str) -> None:
@@ -70,6 +73,11 @@ def validation_metadata_set(obj: ROOT.TObject, title: str, contact: str,
         ylabel (str): If given try to set this as the label for the y axis
         metaoptions (str): Metaoptions (additional options to influence the
             comparison between revisions, styling of the plot, etc.)
+
+    .. warning::
+
+        Different ways to specify LaTeX for different arguments:
+        see `create_validation_histograms`
     """
     obj.SetTitle(title)
     # For ntuples we add the metadata as aliases ...
@@ -127,6 +135,11 @@ def validation_metadata_update(
         ylabel (str): If given try to set this as the label for the y axis
         metaoptions (str): Metaoptions (additional options to influence the
             comparison between revisions, styling of the plot, etc.)
+
+    .. warning::
+
+        Different ways to specify LaTeX for different arguments:
+        see `create_validation_histograms`
     """
 
     opened = False
@@ -173,6 +186,7 @@ class ValidationMetadataSetter(basf2.Module):
     def __init__(self, variables: List[Tuple[str]],
                  rootfile: Union[str, pathlib.PurePath], description=""):
         """
+        Initialize ValidationMetadataSetter
 
         Arguments:
             variables (list(tuple(str))): List of objects to set the metadata
@@ -242,6 +256,27 @@ def create_validation_histograms(
             description, check_for [, xlabel [, ylabel [, metaoptions]]]``
         description: Common description/information of/about all plots in this
             ROOT file (will be displayed above the plots)
+
+    .. warning::
+
+        Sadly, there are two different ways to specify latex formulas.
+
+        1. The ROOT-style using ``#``:
+           ``"Einstein-Pythagoras a^{2} + b^{2} = #frac{E}{m}"``
+
+           This style should be used for histogram title and labels, that is the
+           ``title``, ``xlabel`` and ``ylabel`` arguments
+
+        2. The normal Latex style (with escaped backslashes or raw
+           string literals):
+           ``"Einstein-Pythagoras $a^2 + b^2 = \\\\frac{E}{m}$"``.
+
+           This style should be used for all other fields like ``description``,
+           ``check_for``
+
+    You can use the normal Latex style also for histogram title and descriptions
+    but the PDF version of the plots will still be buggy and not show all
+    formulas correctly.
     """
     if isinstance(rootfile, pathlib.PurePath):
         rootfile = str(rootfile)
@@ -270,3 +305,6 @@ def create_validation_histograms(
         variables_2d=histograms_2d,
         fileName=rootfile,
     )
+
+# End suppression of doxygen checks
+# @endcond

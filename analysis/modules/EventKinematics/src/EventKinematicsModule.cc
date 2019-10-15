@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/ReferenceFrame.h>
 
 #include <analysis/modules/EventKinematics/EventKinematicsModule.h>
 
@@ -17,7 +16,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventKinematics.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
@@ -130,7 +128,7 @@ void EventKinematicsModule::getParticleMomentumLists(vector<string> particleList
 TVector3 EventKinematicsModule::getMissingMomentum()
 {
   PCmsLabTransform T;
-  TLorentzVector beam = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+  TLorentzVector beam = T.getBeamFourMomentum();
   TVector3 p = beam.Vect();
   int nParticles = m_particleMomentumList.size();
   for (int i = 0; i < nParticles; ++i) {

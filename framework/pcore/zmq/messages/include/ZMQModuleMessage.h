@@ -10,7 +10,6 @@
 #pragma once
 
 #include <framework/pcore/zmq/messages/ZMQMessageHelper.h>
-#include <framework/logging/LogMethod.h>
 
 #include <zmq.hpp>
 #include <memory>

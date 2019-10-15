@@ -15,7 +15,6 @@
 #include <framework/dataobjects/DigitBase.h>
 #include <string>
 #include <map>
-#include <iostream>
 
 namespace Belle2 {
 

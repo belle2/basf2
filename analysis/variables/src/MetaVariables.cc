@@ -14,7 +14,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
@@ -30,8 +29,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <boost/lexical_cast.hpp>
@@ -94,30 +91,6 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr useROERecoilFrame(const std::vector<std::string>& arguments)
-    {
-      if (arguments.size() == 1) {
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double {
-          const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-          if (!roe)
-          {
-            B2ERROR("Relation between particle and ROE doesn't exist!");
-            return -999.;
-          }
-          PCmsLabTransform T;
-          TLorentzVector pRecoil = T.getBeamParams().getHER() + T.getBeamParams().getLER() - roe->get4Vector();
-          Particle tmp(pRecoil, 0);
-          UseReferenceFrame<RestFrame> frame(&tmp);
-          double result = var->function(particle);
-          return result;
-        };
-        return func;
-      } else {
-        B2WARNING("Wrong number of arguments for meta function useROERecoilFrame");
-        return nullptr;
-      }
-    }
 
     Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments)
     {
@@ -126,13 +99,13 @@ namespace Belle2 {
         auto func = [extraInfoName](const Particle * particle) -> double {
           if (particle == nullptr)
           {
-            StoreObjPtr<EventExtraInfo> eventExtraInfo;
-            return eventExtraInfo->getExtraInfo(extraInfoName);
+            B2WARNING("Returns -999 because the particle is nullptr! If you want EventExtraInfo variables, please use eventExtraInfo() instead");
+            return -999.;
           }
-          try {
-            return particle->getExtraInfo(extraInfoName);
-          } catch (const std::runtime_error& error)
+          if (particle->hasExtraInfo(extraInfoName))
           {
+            return particle->getExtraInfo(extraInfoName);
+          } else {
             return -999.;
           }
         };
@@ -149,7 +122,12 @@ namespace Belle2 {
         auto extraInfoName = arguments[0];
         auto func = [extraInfoName](const Particle*) -> double {
           StoreObjPtr<EventExtraInfo> eventExtraInfo;
-          return eventExtraInfo->getExtraInfo(extraInfoName);
+          if (eventExtraInfo->hasExtraInfo(extraInfoName))
+          {
+            return eventExtraInfo->getExtraInfo(extraInfoName);
+          } else {
+            return -999;
+          }
         };
         return func;
       } else {
@@ -352,6 +330,27 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function varFor");
+      }
+    }
+
+    Manager::FunctionPtr varForMCGen(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+
+          if (particle -> getMCParticle())
+          {
+            if (particle -> getMCParticle() -> getStatus(MCParticle::c_PrimaryParticle)
+            && (! particle -> getMCParticle() -> getStatus(MCParticle::c_IsVirtual))
+            && (! particle -> getMCParticle() -> getStatus(MCParticle::c_Initial))) {
+              return var -> function(particle);
+            } else return std::numeric_limits<float>::quiet_NaN();
+          } else return std::numeric_limits<float>::quiet_NaN();
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function varForMCGen");
       }
     }
 
@@ -596,7 +595,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -628,11 +626,8 @@ endloop:
         // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
-          // cppcheck-suppress unreadVariable
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-          // cppcheck-suppress unreadVariable
           agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
           bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&) {
@@ -668,7 +663,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -710,11 +704,8 @@ endloop:
         // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
-          // cppcheck-suppress unreadVariable
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-          // cppcheck-suppress unreadVariable
           agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
           bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&) {
@@ -760,7 +751,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -805,11 +795,8 @@ endloop:
         // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
-          // cppcheck-suppress unreadVariable
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-          // cppcheck-suppress unreadVariable
           agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
           bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&) {
@@ -858,7 +845,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -901,7 +887,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -947,7 +932,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -1569,6 +1553,11 @@ endloop:
         }
 
         auto flavourType = (Belle2::EvtPDLUtil::hasAntiParticle(pdgCode)) ? Particle::c_Flavored : Particle::c_Unflavored;
+        // cppcheck has problems understanding lambda function syntax and throws
+        // a warning here about cut being unread. but it is read in the if
+        // statements so suppress the false positive
+        //
+        // cppcheck-suppress unreadVariable
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
         auto func = [roeListName, cut, pdgCode, flavourType](const Particle * particle) -> double {
@@ -2184,9 +2173,6 @@ Returns the value of ``variable`` in the *lab* frame.
 Specifying the lab frame is useful in some corner-cases. For example:
 ``useRestFrame(daughter(0, formula(E - useLabFrame(E))))`` which is the difference of the first daughter's energy in the rest frame of the mother (current particle) with the same daughter's lab-frame energy.
 )DOC");
-    REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
-                      "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
-                      "E.g. useROERecoilFrame(E) returns the energy of a particle in the ROE recoil frame.");
     REGISTER_VARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
                       "Useful if you want to write out if a particle would have passed a cut or not.\n"
@@ -2201,6 +2187,10 @@ Specifying the lab frame is useful in some corner-cases. For example:
     REGISTER_VARIABLE("varFor(pdgCode, variable)", varFor,
                       "Returns the value of the variable for the given particle if its abs(pdgCode) agrees with the given one.\n"
                       "E.g. varFor(11, p) returns the momentum if the particle is an electron or a positron.");
+    REGISTER_VARIABLE("varForMCGen(variable)", varForMCGen,
+                      "Returns the value of the variable for the given particle if the MC particle related to it is primary, not virtual, and not initial.\n"
+                      "If no MC particle is related to the given particle, or the MC particle is not primary, virtual, or initial, NaN will be returned.\n"
+                      "E.g. varForMCGen(PDG) returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.");
     REGISTER_VARIABLE("nParticlesInList(particleListName)", nParticlesInList,
                       "Returns number of particles in the given particle List.");
     REGISTER_VARIABLE("isInList(particleListName)", isInList,
@@ -2333,11 +2323,12 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_VARIABLE("extraInfo(name)", extraInfo,
                       "Returns extra info stored under the given name.\n"
                       "The extraInfo has to be set first by a module like MVAExpert. If nothing is set under this name, -999 is returned.\n"
+                      "If particle is a nullptr, -999 is returned. Please use eventExtraInfo(name) if you want EventExtraInfo variable.\n"
                       "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the MVAExpert.");
     REGISTER_VARIABLE("eventExtraInfo(name)", eventExtraInfo,
                       "[Eventbased] Returns extra info stored under the given name in the event extra info.\n"
                       "The extraInfo has to be set first by another module like MVAExpert in event mode.\n"
-                      "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the MVAExpert for an event.");
+                      "If nothing is set under this name, -999 is returned.");
     REGISTER_VARIABLE("eventCached(variable)", eventCached,
                       "[Eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
                       "The result of second call to this variable in the same event will be provided from the cache.");

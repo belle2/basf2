@@ -38,9 +38,9 @@ target_variable = 'isSignal'
 training_path = basf2.core.Path()
 inputMdst('default', input_file_name, path=training_path)
 stdKshorts(path=training_path)
-matchMCTruth('K_S0:all', path=training_path)
+matchMCTruth('K_S0:merged', path=training_path)
 
-variablesToNtuple('K_S0:all',
+variablesToNtuple('K_S0:merged',
                   my_variables + [target_variable],
                   tree_name,
                   training_file_name,

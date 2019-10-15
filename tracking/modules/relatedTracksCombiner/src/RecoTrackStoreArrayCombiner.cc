@@ -11,9 +11,6 @@
 #include <tracking/modules/relatedTracksCombiner/RecoTrackStoreArrayCombiner.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
-#include <framework/dataobjects/Helix.h>
-#include <framework/geometry/BFieldManager.h>
-
 using namespace Belle2;
 
 REG_MODULE(RecoTrackStoreArrayCombiner);

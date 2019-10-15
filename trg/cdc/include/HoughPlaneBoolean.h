@@ -94,11 +94,15 @@ namespace Belle2 {
     void add(unsigned cellId, int weight) override;
 
   private:
+    /// nX * nY / 32 + 1
     unsigned _n;
     /// cell
     unsigned* const _cell;
+    /// number of patterns
     unsigned _nPatterns;
+    /// patterns
     unsigned** _patterns;
+    /// number of active cells
     unsigned* _nActive;
 
     /// Pattern ID's for each cell

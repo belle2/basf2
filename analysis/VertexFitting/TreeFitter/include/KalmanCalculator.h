@@ -61,9 +61,6 @@ namespace TreeFitter {
     /** dimension of the constraint  */
     int m_constrDim;
 
-    /**  dimension of the statevector */
-    int m_stateDim; // dimension of the state
-
     /**  chi2 */
     double m_chisq;
 

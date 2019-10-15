@@ -30,19 +30,26 @@ from tracking.validation.run import TrackingValidationRun
 
 
 class fullTrackingValidation_plusECL(TrackingValidationRun):
+    """Validate the full track-finding chain includung the ecl seeded ckf"""
+    #: number of events to generate
     n_events = N_EVENTS
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
+    #: no background overlay
     root_input_file = '../EvtGenSimNoBkg.root'
 
     @staticmethod
     def finder_module(path):
+        """Do the standard tracking reconstruction chain"""
+        #: ECL has to be added to the list of components for ECL seeding
         components = ["SVD", "CDC", "ECL"]
+
         reconstruction.add_pretracking_reconstruction(path, components=components)
 
         tracking.add_tracking_reconstruction(path, components=components,
                                              use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=True)
 
+    #: Define the user parameters for the track-finding module
     tracking_coverage = {
         'WhichParticles': [],  # Include all particles, also secondaries
         'UsePXDHits': False,
@@ -52,12 +59,17 @@ class fullTrackingValidation_plusECL(TrackingValidationRun):
         'UseNLoops': 1
     }
 
-    # Already fitted in the finder_module
+    #: tracks will be already fitted by the modules above
     fit_tracks = False
+    #: But we need to tell the validation module to use the fit information
     use_fit_information = True
+    #: Include pulls in the validation output
     pulls = True
+    #: Include resolution information in the validation output
     resolution = True
+    #: name of the output ROOT file
     output_file_name = VALIDATION_OUTPUT_FILE
+    #: Store additional information in output file (like the full trees)
     extended = True
 
 

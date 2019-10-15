@@ -10,14 +10,12 @@
 #include <tracking/modules/fitter/BaseRecoFitterModule.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <genfit/AbsKalmanFitter.h>
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/FitStatus.h>
 #include <genfit/MaterialEffects.h>
 #include <genfit/FieldManager.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 #include <simulation/monopoles/MonopoleConstants.h>

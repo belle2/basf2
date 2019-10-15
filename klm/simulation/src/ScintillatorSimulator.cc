@@ -8,22 +8,26 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <string>
-
-/* External headers. */
-#include <TH1D.h>
-#include <TFile.h>
-
-/* Belle2 headers. */
-#include <bklm/geometry/GeometryPar.h>
-#include <eklm/geometry/GeometryData.h>
+/* Own header. */
 #include <klm/simulation/ScintillatorSimulator.h>
+
+/* KLM headers. */
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/eklm/geometry/GeometryData.h>
+
+/* Belle 2 headers. */
 #include <framework/core/RandomNumbers.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TH1D.h>
+
+/* C++ headers. */
+#include <string>
 
 using namespace Belle2;
 
@@ -154,7 +158,7 @@ void KLM::ScintillatorSimulator::simulate(
   bklm::GeometryPar* geoPar = bklm::GeometryPar::instance();
   const BKLMSimHit* hit = firstHit->second;
   const bklm::Module* module =
-    geoPar->findModule(hit->getForward(), hit->getSector(), hit->getLayer());
+    geoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
   double stripLength =
     2.0 * (hit->isPhiReadout() ?
            module->getPhiScintHalfLength(hit->getStrip()) :

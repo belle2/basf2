@@ -228,10 +228,10 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
 {
 
   bool pass; // used to pass or fail events based on coverage
-  float pidval = -1.0;
 
   // fill rocs, efficiencies, and fake rates for hadrons
   for (unsigned int i = 0; i < chargedSet.size() + 3; ++i) {
+    float pidval = -1.0;
     int detnum = detset[i];
 
     Const::DetectorSet det;
@@ -326,6 +326,7 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
 
   // fill rocs, efficiencies, and fake rates for electrons
   for (unsigned int i = 0; i <= electronSet.size() + 1; ++i) {
+    float pidval = -1.0;
     int detnum = edetset[i];
 
     Const::DetectorSet det;
@@ -365,6 +366,7 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
 
   // fill rocs, efficiencies, and fake rates for muons
   for (unsigned int i = 0; i < muonSet.size(); ++i) {
+    float pidval = -1.0;
     Const::EDetector det = muonSet[i];
 
     // get pid LogL values for electrons and pions

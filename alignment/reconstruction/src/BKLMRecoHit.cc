@@ -8,22 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
 #include <alignment/reconstruction/BKLMRecoHit.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <bklm/geometry/GeometryPar.h>
-#include <alignment/GlobalLabel.h>
-#include <bklm/dataobjects/BKLMElementID.h>
+
 #include <alignment/dbobjects/BKLMAlignment.h>
-
-#include <alignment/Hierarchy.h>
 #include <alignment/GlobalDerivatives.h>
-
+#include <alignment/GlobalLabel.h>
+#include <alignment/Hierarchy.h>
+#include <framework/geometry/B2Vector3.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/bklm/dataobjects/BKLMElementID.h>
 
 #include <genfit/DetPlane.h>
-#include <TVector3.h>
-#include <TRandom.h>
 
 using namespace std;
 using namespace Belle2;
@@ -33,12 +29,12 @@ BKLMRecoHit::BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
   genfit::PlanarMeasurement(HIT_DIMENSIONS)
 {
   m_moduleID = hit->getModuleID();
-  m_Forward = hit->getForward();
+  m_Section = hit->getSection();
   m_Sector = hit->getSector();
   m_Layer = hit->getLayer();
 
   bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
-  module = m_GeoPar->findModule(m_Forward, m_Sector, m_Layer);
+  module = m_GeoPar->findModule(m_Section, m_Sector, m_Layer);
 
   //+++ global coordinates of the hit
   global[0] = hit->getGlobalPosition()[0];
@@ -86,12 +82,12 @@ BKLMRecoHit::BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
   CLHEP::Hep3Vector gVaxis = module->localToGlobal(vAxis) - gOrigin;
 
   //!the position (in global coordinates) of this module's sensitive-volume origin
-  TVector3 origin_mid(gOrigin_midway[0], gOrigin_midway[1], gOrigin_midway[2]);
+  B2Vector3D origin_mid(gOrigin_midway[0], gOrigin_midway[1], gOrigin_midway[2]);
 
   //!the directioin (in global coordinates) of this module's U axis
-  TVector3 uGlobal(gUaxis[0], gUaxis[1], gUaxis[2]);
+  B2Vector3D uGlobal(gUaxis[0], gUaxis[1], gUaxis[2]);
   //!the directioin (in global coordinates) of this module's V axis
-  TVector3 vGlobal(gVaxis[0], gVaxis[1], gVaxis[2]);
+  B2Vector3D vGlobal(gVaxis[0], gVaxis[1], gVaxis[2]);
 
   genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin_mid, uGlobal, vGlobal, 0));
   setPlane(detPlane, m_moduleID);
@@ -131,7 +127,7 @@ std::pair<std::vector<int>, TMatrixD> BKLMRecoHit::globalDerivatives(const genfi
 {
 
   BKLMElementID klmid;
-  klmid.setForward(m_Forward);
+  klmid.setSection(m_Section);
   klmid.setSectorNumber(m_Sector);
   klmid.setLayerNumber(m_Layer);
   std::vector<int> labGlobal;

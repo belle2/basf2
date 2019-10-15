@@ -8,20 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <cmath>
-#include <string>
+/* Own header. */
+#include <klm/calibration/KLMDatabaseImporter.h>
 
-/* External headers. */
+/* Belle 2 headers. */
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/logging/Logger.h>
+
+/* ROOT headers. */
 #include <TFile.h>
 #include <TTree.h>
 
-/* Belle2 headers. */
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBImportObjPtr.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
-#include <klm/calibration/KLMDatabaseImporter.h>
+/* C++ headers. */
+#include <string>
 
 using namespace Belle2;
 
@@ -90,8 +90,8 @@ void KLMDatabaseImporter::loadStripEfficiency(
     } else {
       int isBarrel = 0;
       tree->SetBranchAddress("isBarrel", &isBarrel);
-      int isForward = 0;
-      tree->SetBranchAddress("isForward", &isForward);
+      int section = 0;
+      tree->SetBranchAddress("isForward", &section);
       int sector = 0;
       tree->SetBranchAddress("sector", &sector);
       int layer = 0;
@@ -108,9 +108,9 @@ void KLMDatabaseImporter::loadStripEfficiency(
       for (int i = 0; i < tree->GetEntries(); i++) {
         tree->GetEntry(i);
         if (isBarrel)
-          stripEfficiency->setBarrelEfficiency(isForward, sector, layer, plane, strip, efficiency, efficiencyError);
+          stripEfficiency->setBarrelEfficiency(section, sector, layer, plane, strip, efficiency, efficiencyError);
         else
-          stripEfficiency->setEndcapEfficiency(isForward, sector, layer, plane, strip, efficiency, efficiencyError);
+          stripEfficiency->setEndcapEfficiency(section, sector, layer, plane, strip, efficiency, efficiencyError);
       }
     }
     file->Close();

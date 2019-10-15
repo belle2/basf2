@@ -23,8 +23,6 @@
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/utilities/EnvironmentVariables.h>
 #include <framework/database/LocalDatabase.h>
 #include <framework/database/ConditionsDatabase.h>
 #include <framework/database/DatabaseChain.h>
@@ -37,10 +35,7 @@
 #include <framework/database/CentralMetadataProvider.h>
 #include <framework/database/Configuration.h>
 
-#include <TFile.h>
-
 #include <cstdlib>
-#include <iomanip>
 
 namespace Belle2 {
 
@@ -52,12 +47,15 @@ namespace Belle2 {
 
   Database::~Database() = default;
 
-  void Database::reset()
+  void Database::reset(bool keepConfig)
   {
+    auto& conf = Conditions::Configuration::getInstance();
+    conf.setInitialized(false);
     DBStore::Instance().reset(true);
     Instance().m_metadataProvider.reset();
     Instance().m_payloadCreation.reset();
-    Conditions::Configuration::getInstance().reset();
+    if (not keepConfig)
+      conf.reset();
   }
 
   ScopeGuard Database::createScopedUpdateSession()
@@ -73,7 +71,7 @@ namespace Belle2 {
   std::pair<TObject*, IntervalOfValidity> Database::getData(const EventMetaData& event, const std::string& name)
   {
     DBStoreEntry entry(DBStoreEntry::c_Object, name, TObject::Class(), false, true);
-    std::vector<DBQuery> query{{name, true}};
+    std::vector<DBQuery> query{DBQuery{name, true}};
     getData(event, query);
     entry.updatePayload(query[0].revision, query[0].iov, query[0].filename, query[0].checksum, event);
     return std::make_pair(entry.releaseObject(), query[0].iov);
@@ -197,6 +195,7 @@ namespace Belle2 {
   void Database::initialize()
   {
     auto conf = Conditions::Configuration::getInstance();
+    conf.setInitialized(true);
     m_globalTags = conf.getFinalListOfTags();
     m_usableTagStates = conf.getUsableTagStates();
     m_metadataConfigurations = conf.getMetadataProviders();
@@ -258,8 +257,8 @@ namespace Belle2 {
     //don't show c++ signature in python doc to keep it simple
     py::docstring_options options(true, true, false);
 
-    //def("get_default_global_tags", &Database::getDefaultGlobalTags, "Get the default global tags for the central database");
-    py::def("reset_database", &Database::reset, R"DOC(Reset the database setup to have no database sources
+    py::def("reset_database", &Database::reset, (py::arg("keep_config") = false),
+        R"DOC(Reset the database setup to have no database sources
 
 .. deprecated:: release-04-00-00
    Please use `basf2.conditions` for all configuration of the conditions database)DOC");
@@ -312,24 +311,6 @@ Parameters:
 Use the central database to obtain conditions data. Usually users should only
 need to call this with one parameter which is the global tag to identify the
 payloads.
-
->>> use_central_database("my_global_tag")
-
-It might be useful to also specify the log level and invert the log messages
-when adding an additional global tag for lookups
-
->>> use_central_database("my_additional_tag", loglevel=LogLevel.WARNING, invertLogging=True)
-
-The ``payloaddir`` specifies a directory where payloads which needed to be
-downloaded will be placed. This could be set to a common absolute directory for
-all jobs to make sure the payloads only need to be downloaded once. The default
-is to place payloads into a directory called :file:`centraldb` in the local
-working directory.
-
-Warning:
-    For debugging purposes this function also allows to set the base URL for
-    the REST api and the file server but these should generally not be
-    modified.
 
 Parameters:
   globalTag (str): name of the global tag to use for payload lookup

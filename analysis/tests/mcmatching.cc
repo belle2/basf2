@@ -7,7 +7,6 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/Logger.h>
 
 #include <gtest/gtest.h>
 
@@ -56,6 +55,7 @@ namespace {
       c_ReconstructFrom, /**< Create Particle from given Decay (and associated daughters). */
     };
     /** create MCParticles for decay of particle with 'pdg' to given daughter PDG codes. */
+    // cppcheck-suppress noExplicitConstructor; yes, there is no explicit constructor for this class, and this isn't one
     Decay(int pdg, const std::vector<Decay>& daughters = std::vector<Decay>()):
       m_pdg(pdg), m_daughterDecays(daughters), m_mcparticle(nullptr), m_particle(nullptr)
     {
@@ -123,6 +123,7 @@ namespace {
 
     /** Helper for constructing Particles. */
     struct ReconstructedDecay {
+      // cppcheck-suppress noExplicitConstructor; yes, there is no explicit constructor for this class, and this isn't one
       ReconstructedDecay(int pdg, const std::vector<ReconstructedDecay>& daughters = std::vector<ReconstructedDecay>(),
                          EBehavior behavior = c_Default):
         m_pdg(pdg), m_daughterDecays(daughters), m_behavior(behavior), m_optMcPart(nullptr), m_optDecay(nullptr) { }
@@ -1199,5 +1200,6 @@ namespace {
     }
 
   }
+
 }  // namespace
 #endif

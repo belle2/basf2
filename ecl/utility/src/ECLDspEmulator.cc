@@ -11,13 +11,6 @@
 #include <ecl/utility/ECLDspEmulator.h>
 //Framework
 #include <framework/logging/Logger.h>
-//STL
-#include <stdio.h>
-#include <math.h>
-#include <time.h>
-#include <sys/timeb.h>
-#include <stdlib.h>
-#include <string.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -241,43 +234,35 @@ namespace Belle2 {
 
           //== Estimate t_new as t_0 - B/A
 
-          if (iter != 3) {
-            B2 = B1 >> (k_b - 9);
-            B2 += (A1 << 9);
-            B3 = (B2 / A1);
+          B2 = B1 >> (k_b - 13);
+          B2 += (A1 << 13);
+          B3 = (B2 / A1);
 
-            B1 >>= k_b;
+          int it_uncut = (B3 + 16) >> 5;
+          int delta_it = it_uncut - 256;
+          delta_it = setInRange(delta_it, -191, 191);
 
-            it += ((B3 + 1) >> 1) - 256;
-            it = setInRange(it, it_l, it_h);
-          } else {
-            B2 = B1 >> (k_b - 13);
-            B2 += (A1 << 13);
-            B3 = (B2 / A1);
+          int it_current = it;
 
-            int delta_T = ((B1 >> (k_b - 13)) + (A1 << 13)) / A1;
+          it += delta_it;
+          it = setInRange(it, it_l, it_h);
 
-            // 2048 == 2**11
-            if (delta_T < 2048) {
-              delta_T = 2733;
-            }
-            // 14366 == 2**14 - 2**11
-            if (delta_T > 14366) {
-              delta_T = 13651;
-            }
+          if (iter == 3) {
+            int delta_T;
 
-            T = 3072 - (it << 3) - (it << 2) - (((delta_T >> 1) + delta_T + 2) >> 2);
+            if (B3 >= 0x37FE)
+              delta_T = 2047;
+            else if (B3 <= 0x800)
+              delta_T = -2047;
+            else
+              delta_T = ((B3 * 3 + 4) >> 3) - 3072;
+
+            int t_uncut = it_current * 12 + delta_T;
+            t_uncut = setInRange(t_uncut, -4096, 4095);
+
+            T = -t_uncut;
             T += ((210 - ttrig2) << 3);
             T = setInRange(T, -2048, 2047);
-
-            B2 = B1 >> (k_b - 9);
-            B2 += A1 << 9;
-            B3 = B2 / A1;
-
-            B1 >>= k_b;
-
-            it += ((B3 + 1) >> 1) - 256;
-            it = setInRange(it, it_l, it_h);
 
             //== Estimate pedestal
 
@@ -320,21 +305,25 @@ namespace Belle2 {
         //
         long long chi_thr;
         chi_thr = (A1 >> 1) * (A1 >> 1);
-        chi_thr >>= (k2_chi - 2);
-        chi_thr += chi_thres;
+        chi_thr >>= (k2_chi - 2); // a1n
+        chi_thr += chi_thres; // ch2_int
 
         //== Get chi^2
         //
         long long chi;
 
-        chi = z00 - n_16 * C1;
+        int B1_chi = B1 >> k_b;
+
+        chi = A1 * f[it * 16] + B1_chi * f1[it * 16];
+        chi >>= k1_chi;
+        chi += C1;
+        chi = n_16 * chi - z00;
 
         chi_sq = chi * chi;
         chi_sq *= k_np[n_16 - 1];
         chi_sq >>= 16;
-
         for (int i = 1; i < 16; i++) {
-          chi = A1 * f[it * 16 + i] + B1 * f1[it * 16 + i];
+          chi = A1 * f[it * 16 + i] + B1_chi * f1[it * 16 + i];
           chi >>= k1_chi;
           chi += C1 - y[i + 15];
 
@@ -350,8 +339,10 @@ namespace Belle2 {
       //== Compare signal peak to HIT_THR (aka Ahard)
       //   (See https://confluence.desy.de/display/BI/Electronics+Thresholds)
 
-      int ss = (y[20] + y[21]);
-      if (ss <= Ahard) validity_code += 4;
+      int hit_val = y[20] + y[21] - (y[12] + y[13] + y[14] + y[15]) / 2;
+      if (hit_val < Ahard) {
+        validity_code += 4;
+      }
 
       //==
 
@@ -369,3 +360,4 @@ namespace Belle2 {
 
   }
 }
+

@@ -65,7 +65,7 @@ main.add_module('ECLChargedPID')
 
 main.add_module('EKLMReconstructor')
 main.add_module('BKLMReconstructor')
-main.add_module('KLMK0LReconstructor')
+main.add_module('KLMClustersReconstructor')
 main.add_module('Muid')
 main.add_module('KLMExpert')
 main.add_module('ClusterMatcher')

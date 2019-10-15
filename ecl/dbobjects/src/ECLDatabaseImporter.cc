@@ -30,7 +30,6 @@
 #include <ecl/dataobjects/ECLShower.h>
 
 // FRAMEWORK
-#include <framework/gearbox/GearDir.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
 #include <framework/database/DBImportArray.h>
@@ -41,9 +40,7 @@
 #include <TKey.h>
 #include <TClonesArray.h>
 #include <TTree.h>
-#include <TDirectory.h>
 #include <TGraph2D.h>
-
 
 // NAMESPACES
 using namespace std;
@@ -359,60 +356,35 @@ void ECLDatabaseImporter::importShowerEnergyCorrectionTemporary()
   if (m_inputFileNames.size() > 1)
     B2FATAL("Sorry, you must only import one file at a time for now!");
 
-  //Expect a txt file
+  //Expect a root file
   boost::filesystem::path path(m_inputFileNames[0]);
-  if (path.extension() != ".txt")
-    B2FATAL("Expecting a .txt file. Aborting");
+  if (path.extension() != ".root")
+    B2FATAL("Expecting a .root file. Aborting");
 
-  TGraph2D graph;
+  TFile* inputFile = new TFile(m_inputFileNames[0].data(), "READ");
 
-  std::string line;
-  std::ifstream infile(m_inputFileNames[0]);
-  double energy;
-  double bkgFactor;
-  double thetaMinInLine;
-  double thetaMaxInLine;
-  double correctionFactor;
+  TGraph2D* theta_geo_graph = getRootObjectFromFile<TGraph2D*>(inputFile, "LeakageCorrections_theta_geometry");
+  TGraph2D* phi_geo_graph = getRootObjectFromFile<TGraph2D*>(inputFile, "LeakageCorrections_phi_geometry");
+  TGraph2D* theta_en_graph = getRootObjectFromFile<TGraph2D*>(inputFile, "LeakageCorrections_theta_energy");
+  TGraph2D* phi_en_graph = getRootObjectFromFile<TGraph2D*>(inputFile, "LeakageCorrections_phi_energy");
+  TH1F* bg_histo = getRootObjectFromFile<TH1F*>(inputFile, "LeakageCorrections_background_fraction");
 
-  double thetaMin = DBL_MAX;
-  double thetaMax = -DBL_MAX;
-  double energyMin = DBL_MAX;
-  double energyMax = -DBL_MAX;
+  double bkgFactor = bg_histo->GetBinContent(1);
 
-  while (std::getline(infile, line)) {
-    std::istringstream iss(line);
-    iss >> energy;
-    iss >> bkgFactor;
-    iss >> thetaMinInLine;
-    iss >> thetaMaxInLine;
-    iss >> correctionFactor;
+  double thetaMin = theta_en_graph->GetXmin();
+  double thetaMax = theta_en_graph->GetXmax();
+  double phiMin = phi_en_graph->GetXmin();
+  double phiMax = phi_en_graph->GetXmax();
 
-    //    B2INFO(energy << " " << bkgFactor << " " << thetaMinInLine << " " << thetaMaxInLine << " " << correctionFactor);
-
-    const double theta = 0.5 * (thetaMinInLine + thetaMaxInLine);
-
-    //Find thetaMin and thetaMax
-    if (theta < thetaMin)
-      thetaMin = theta;
-
-    if (theta > thetaMax)
-      thetaMax = theta;
-
-    //Find energyMin and energyMax
-    if (energy < energyMin)
-      energyMin = energy;
-
-    if (energy > energyMax)
-      energyMax = energy;
+  double energyMin = theta_en_graph->GetYmin();
+  double energyMax = theta_en_graph->GetYmax();
 
 
+  B2DEBUG(28, "Leakage DBobjects angle boundaries: thetaMin=" << thetaMin << " thetaMax=" << thetaMax << " phiMin= " << phiMin <<
+          " phiMax= " << phiMax << " enmin=" << energyMin <<
+          " enmax=" << energyMax);
 
-    graph.SetPoint(graph.GetN(), theta, energy, correctionFactor);
-  }
-
-//  B2INFO(thetaMin << " " << thetaMax << " " << energyMin << " " << energyMax);
-
-//    Import to DB
+  //    Import to DB
   int startExp = 0;
   int startRun = 0;
   int endExp = -1;
@@ -420,18 +392,38 @@ void ECLDatabaseImporter::importShowerEnergyCorrectionTemporary()
   IntervalOfValidity iov(startExp, startRun, endExp, endRun);
 
   if (std::abs(bkgFactor - 1.0) < 1e-9) { //bkgFactor == 1 -> phase 2 backgrounds
-    DBImportObjPtr<ECLShowerEnergyCorrectionTemporary> dbPtr("ECLShowerEnergyCorrectionTemporary_phase2");
-    dbPtr.construct(graph, thetaMin, thetaMax, energyMin, energyMax);
+
+    DBImportObjPtr<ECLShowerEnergyCorrectionTemporary> dbPtr_theta_geo("ECLLeakageCorrection_thetaGeometry_phase2");
+    dbPtr_theta_geo.construct(*theta_geo_graph, thetaMin, thetaMax, energyMin, energyMax);
+    DBImportObjPtr<ECLShowerEnergyCorrectionTemporary> dbPtr_phi_geo("ECLLeakageCorrection_phiGeometry_phase2");
+    dbPtr_phi_geo.construct(*phi_geo_graph, phiMin, phiMax, energyMin, energyMax);
+    DBImportObjPtr<ECLShowerEnergyCorrectionTemporary> dbPtr_theta_en("ECLLeakageCorrection_thetaEnergy_phase2");
+    dbPtr_theta_en.construct(*theta_en_graph, thetaMin, thetaMax, energyMin, energyMax);
+    DBImportObjPtr<ECLShowerEnergyCorrectionTemporary> dbPtr_phi_en("ECLLeakageCorrection_phiEnergy_phase2");
+    dbPtr_phi_en.construct(*phi_en_graph, phiMin, phiMax, energyMin, energyMax);
 
     //Import into local db
-    dbPtr.import(iov);
+    dbPtr_theta_geo.import(iov);
+    dbPtr_phi_geo.import(iov);
+    dbPtr_theta_en.import(iov);
+    dbPtr_phi_en.import(iov);
   }
   /*else (because currently phase_2 and phase_3 are same payload*/ if (std::abs(bkgFactor - 1.0) < 1e-9) {
-    DBImportObjPtr<ECLShowerEnergyCorrectionTemporary> dbPtr("ECLShowerEnergyCorrectionTemporary_phase3");
-    dbPtr.construct(graph, thetaMin, thetaMax, energyMin, energyMax);
+
+    DBImportObjPtr<ECLShowerEnergyCorrectionTemporary> dbPtr_theta_geo("ECLLeakageCorrection_thetaGeometry_phase3");
+    dbPtr_theta_geo.construct(*theta_geo_graph, thetaMin, thetaMax, energyMin, energyMax);
+    DBImportObjPtr<ECLShowerEnergyCorrectionTemporary> dbPtr_phi_geo("ECLLeakageCorrection_phiGeometry_phase3");
+    dbPtr_phi_geo.construct(*phi_geo_graph, phiMin, phiMax, energyMin, energyMax);
+    DBImportObjPtr<ECLShowerEnergyCorrectionTemporary> dbPtr_theta_en("ECLLeakageCorrection_thetaEnergy_phase3");
+    dbPtr_theta_en.construct(*theta_en_graph, thetaMin, thetaMax, energyMin, energyMax);
+    DBImportObjPtr<ECLShowerEnergyCorrectionTemporary> dbPtr_phi_en("ECLLeakageCorrection_phiEnergy_phase3");
+    dbPtr_phi_en.construct(*phi_en_graph, phiMin, phiMax, energyMin, energyMax);
 
     //Import into local db
-    dbPtr.import(iov);
+    dbPtr_theta_geo.import(iov);
+    dbPtr_phi_geo.import(iov);
+    dbPtr_theta_en.import(iov);
+    dbPtr_phi_en.import(iov);
   }
 
 

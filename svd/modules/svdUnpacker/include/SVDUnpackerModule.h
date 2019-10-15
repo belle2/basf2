@@ -23,6 +23,8 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDTransparentDigit.h>
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
+#include <svd/dataobjects/SVDEventInfo.h>
+#include <svd/dataobjects/SVDTriggerType.h>
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <svd/online/SVDStripNoiseMap.h>
@@ -66,6 +68,7 @@ namespace Belle2 {
       bool m_generateOldDigits;  /**< whether to produce old SVDDigit format*/
       std::string m_svdShaperDigitListName; /**<SVDShaperDigit StoreArray name*/
       std::string m_svdDAQDiagnosticsListName; /**<SVDDAQDiagnostic StoreArray name*/
+      std::string m_svdEventInfoName; /**< SVDEventInfo name */
 
       int m_wrongFTBcrc; /**<FTB CRC no-Match counter*/
 
@@ -161,6 +164,9 @@ namespace Belle2 {
       };
 
       StoreObjPtr<EventMetaData> m_eventMetaDataPtr;   /**< Required input for EventMetaData */
+      StoreObjPtr<SVDEventInfo> m_svdEventInfoPtr;  /**< SVDEventInfo output per event */
+      SVDTriggerType m_SVDTriggerType;  /**<  SVDTriggerType object */
+
       StoreArray<RawSVD> m_rawSVD;   /**< output for RawSVD */
       StoreArray<SVDDigit> m_svdDigit; /**< Required input for SVDDigit */
 
@@ -199,7 +205,7 @@ namespace Belle2 {
       /** The parameter that indicates what fraction of B2ERRORs messages
        * should be suppressed to not overload HLT while data taking
        */
-      int m_errorRate;
+      int m_errorRate{1000};
 
       /** this 4-bits value should be 1111 if no headers/trailers are missing */
       unsigned short seenHeadersAndTrailers: 4;
@@ -213,6 +219,7 @@ namespace Belle2 {
       int nFADCMatchErrors;
       int nAPVErrors;
       int nFTBFlagsErrors;
+      int nEventInfoMatchErrors;
 
       /** Map to store a list of missing APVs */
       std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_missingAPVs;

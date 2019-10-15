@@ -10,9 +10,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -20,7 +17,6 @@
 #include <rawdata/dataobjects/RawPXD.h>
 
 #include <string>
-#include <vector>
 #include <stdlib.h>
 
 
@@ -47,8 +43,6 @@ namespace Belle2 {
 
       // Data members
 
-      // Parallel processing parameters
-
       //! Event Meta Data
       StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
@@ -57,15 +51,6 @@ namespace Belle2 {
 
       //! File Name
       std::string m_filename;
-
-      //! Message handler
-      MsgHandler* m_msghandler;
-
-      //! Compression Level
-      int m_compressionLevel;
-
-      //! No. of sent events
-      int m_nread;
 
       //! buffer
       int* m_buffer;
@@ -77,9 +62,8 @@ namespace Belle2 {
       unsigned int m_runNr; //!< set by Param
       unsigned int m_subRunNr; //!< set by Param
 
-      void endian_swapper(void* a, unsigned int len); ///!< swaps memory region, quick and dirty
-      int readOneEvent(void); ///!< Read data of one Event from File
-      int read_data(char* data, size_t len); ///!< Read amount of data (len bytes) from file to ptr data
+      int readOneEvent(void); //! Read data of one Event from File
+      int read_data(char* data, size_t len); //! Read amount of data (len bytes) from file to ptr data
     };
 
   } // end namespace PXD

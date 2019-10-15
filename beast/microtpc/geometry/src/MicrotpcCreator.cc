@@ -13,13 +13,9 @@
 
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
-#include <geometry/utilities.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-//#include <microtpc/simulation/SensitiveDetector.h>
 
-#include <cmath>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
@@ -29,11 +25,8 @@
 
 //Shapes
 #include <G4Box.hh>
-#include <G4Polycone.hh>
-#include "G4UnionSolid.hh"
 #include "G4SubtractionSolid.hh"
 #include <G4UserLimits.hh>
-#include <G4RegionStore.hh>
 #include "G4Tubs.hh"
 
 //Visualization

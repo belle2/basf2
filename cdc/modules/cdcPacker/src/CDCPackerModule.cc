@@ -15,20 +15,12 @@
 #include <cdc/dataobjects/CDCRawHit.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 
-#include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBImportArray.h>
 
-#include <sstream>
 #include <iostream>
-#include <fstream>
-#include <iomanip>
 #include <cstring>
 
 using namespace std;

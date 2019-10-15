@@ -143,8 +143,7 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
             Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
     elif environmentType in ["MC8", "MC9", "MC10"]:
         # make sure the last database setup is the magnetic field for MC8-10
-        use_database_chain()
-        use_central_database("Legacy_MagneticField_MC8_MC9_MC10")
+        conditions.globaltags += ["Legacy_MagneticField_MC8_MC9_MC10"]
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
@@ -324,15 +323,29 @@ def setupEventInfo(noEvents, path):
     path.add_module(evtnumbers)
 
 
-def loadGearbox(path):
+def loadGearbox(path, silence_warning=False):
     """
     Loads Gearbox module to the path.
 
-    This is neccessary in a job with event generation only
-    (without reconstruction and reconstruction).
+    Warning:
+        Should be used in a job with *cosmic event generation only*
+
+    Needed for scripts which only generate cosmic events in order to
+    load the geometry.
 
     @param path modules are added to this path
+    @param silence_warning stops a verbose warning message if you know you want to use this function
     """
+
+    if not silence_warning:
+        B2WARNING("""You are overwriting the geometry from the database with Gearbox.
+This is fine if you're generating cosmic events. But in most other cases you probably don't want this.
+
+If you're really sure you know what you're doing you can suppress this message with:
+
+>>> loadGearbox(silence_warning=True)
+
+                  """)
 
     paramloader = register_module('Gearbox')
     path.add_module(paramloader)
@@ -356,6 +369,55 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None):
     mcparticleprinter.param('onlyPrimaries', onlyPrimaries)
     mcparticleprinter.param('maxLevel', maxLevel)
     path.add_module(mcparticleprinter)
+
+
+def correctBrems(
+    outputList,
+    inputList,
+    gammaList,
+    maximumAcceptance=3.0,
+    multiplePhotons=False,
+    usePhotonOnlyOnce=False,
+    writeOut=False,
+    path=None,
+):
+    """
+    For each particle in the given ``inputList``, copies it to the ``outputList`` and adds the
+    4-vector of the photon(s) in the ``gammaList`` which has(have) a weighted named relation to
+    the particle's track, set by the ``ECLTrackBremFinder`` module during reconstruction.
+
+    Warning:
+        This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
+        up to and including MC12 and proc9 **do not** contain this. Newer production campaigns (from proc10 and MC13) will.
+
+    Information:
+        Please note that a new particle is always generated, with the old particle and -if found- one or more
+        photons as daughters.
+
+        The ``inputList`` should contain particles with associated tracks. Otherwise the module will exit with an error.
+
+        The ``gammaList`` should contain photons. Otherwise the module will exit with an error.
+
+    @param outputList   The output particle list name containing the corrected particles
+    @param inputList    The initial particle list name containing the particles to correct. *It should already exist.*
+    @param gammaList    The photon list containing possibly bremsstrahlung photons; *It should already exist.*
+    @param maximumAcceptance Maximum value of the relation weight. Should be a number between [0,3)
+    @param multiplePhotons Whether to use only one photon (the one with the smallest acceptance) or as many as possible
+    @param usePhotonOnlyOnce If true, each brems candidate is used to correct only the track with the smallest relation weight
+    @param writeOut      Whether `RootOutput` module should save the created ``outputList``
+    @param path          The module is added to this path
+    """
+
+    bremscorrector = register_module('BremsFinder')
+    bremscorrector.set_name('bremsCorrector_' + outputList)
+    bremscorrector.param('inputList', inputList)
+    bremscorrector.param('outputList', outputList)
+    bremscorrector.param('gammaList', gammaList)
+    bremscorrector.param('maximumAcceptance', maximumAcceptance)
+    bremscorrector.param('multiplePhotons', multiplePhotons)
+    bremscorrector.param('usePhotonOnlyOnce', usePhotonOnlyOnce)
+    bremscorrector.param('writeOut', writeOut)
+    path.add_module(bremscorrector)
 
 
 def copyList(
@@ -411,6 +473,46 @@ def correctFSR(
     fsrcorrector.param('gammaListName', gammaListName)
     fsrcorrector.param('angleThreshold', angleThreshold)
     fsrcorrector.param('energyThreshold', energyThreshold)
+    fsrcorrector.param('writeOut', writeOut)
+    path.add_module(fsrcorrector)
+
+
+def correctBremsBelle(
+    outputListName,
+    inputListName,
+    gammaListName,
+    multiplePhotons=True,
+    minimumEnergy=0.05,
+    angleThreshold=0.05,
+    writeOut=False,
+    path=None
+):
+    """
+    Run the Belle - like brems finding on the ``inputListName`` of charged particles.
+    Adds all photons in ``gammaListName`` to a copy of the charged particle that are within
+    ``angleThreshold`` and above ``minimumEnergy``.
+
+    Parameters:
+       outputListName (str): The output charged particle list containing the corrected charged particles
+       inputListName (str): The initial charged particle list containing the charged particles to correct.
+       gammaListName (str): The gammas list containing possibly radiative gammas, should already exist.
+       multiplePhotons (bool): How many photons should be added to the charged particle? nearest one -> False,
+             add all the photons within the cone -> True
+       angleThreshold (float): The maximum angle in radians between the charged particle and the (radiative)
+              gamma to be accepted.
+       minimumEnergy (float): The minimum energy in GeV of the (radiative) gamma to be accepted.
+       writeOut (bool): whether RootOutput module should save the created ParticleList
+       path (basf2.Path): modules are added to this path
+    """
+
+    fsrcorrector = register_module('BelleBremRecovery')
+    fsrcorrector.set_name('BelleFSRCorrection_' + outputListName)
+    fsrcorrector.param('inputListName', inputListName)
+    fsrcorrector.param('outputListName', outputListName)
+    fsrcorrector.param('gammaListName', gammaListName)
+    fsrcorrector.param('multiplePhotons', multiplePhotons)
+    fsrcorrector.param('angleThreshold', angleThreshold)
+    fsrcorrector.param('minimumEnergy', minimumEnergy)
     fsrcorrector.param('writeOut', writeOut)
     path.add_module(fsrcorrector)
 
@@ -939,12 +1041,26 @@ def reconstructDecay(
     their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All
     possible combinations are created (overlaps are forbidden) and combinations that pass the specified selection
     criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
-    reconstructed as well (meaning that the charge conjugated mother list is created as well). One cay use an
-    at-sign '@' to mark a particle as unspecified, e.g. in form of a DecayString: '\@Xsd -> K+ pi-'. If the particle
-    is marked as unspecified, it will not checked for its identity when doing :ref:`MCMatching`. Any particle which
+    reconstructed as well (meaning that the charge conjugated mother list is created as well).
+
+    One can use an at-sign '@' to mark a particle as unspecified, e.g. in form of a DecayString: '\@Xsd -> K+ pi-'. If the particle
+    is marked as unspecified, its identity will not be checked when doing :ref:`MCMatching`. Any particle which
     decays into the correct daughters will be flagged as correct. For example the DecayString '\@Xsd -> K+ pi-'
     would match all particles which decay into a Kaon and a pion, for example K*, B0, D0. Still the daughters
     need to be stated correctly so this can be used for "sum of exclusive" decays
+
+    .. warning::
+        The input ParticleLists are typically ordered according to the upstream reconstruction algorithm.
+        Therefore, if you combine two or more identical particles in the decay chain you should not expect to see the same
+        distribution for the daughter kinematics as they may be sorted by geometry, momentum etc.
+
+        For example, in the decay ``D0 -> pi0 pi0`` the momentum distributions of the two ``pi0`` s are not identical.
+        This can be solved by manually randomising the lists before combining.
+
+    See Also:
+
+        * `Particle combiner how does it work? <https://questions.belle2.org/question/4318/particle-combiner-how-does-it-work/>`_
+        * `Identical particles in decay chain <https://questions.belle2.org/question/5724/identical-particles-in-decay-chain/>`_
 
     @param decayString :ref:`DecayString` specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
@@ -1443,6 +1559,33 @@ def variablesToDaughterExtraInfo(
     path.add_module(mod)
 
 
+def variablesToEventExtraInfo(
+    particleList,
+    variables,
+    option=0,
+    path=None,
+):
+    """
+    For each particle in the input list the selected variables are saved in an event-extra-info field with the given name,
+    Can be used to save MC truth information, for example, in a ntuple of reconstructed particles.
+
+    An existing extra info with the same name will be overwritten if the new
+    value is lower / will never be overwritten / will be overwritten if the
+    new value is higher / will always be overwritten (-1/0/1/2).
+
+    @param particleList  The input ParticleList
+    @param variables     Dictionary of Variables and extraInfo names.
+    @param path          modules are added to this path
+    """
+
+    mod = register_module('VariablesToEventExtraInfo')
+    mod.set_name('VariablesToEventExtraInfo_' + particleList)
+    mod.param('particleList', particleList)
+    mod.param('variables', variables)
+    mod.param('overwrite', option)
+    path.add_module(mod)
+
+
 def variableToSignalSideExtraInfo(
     particleList,
     varToExtraInfo,
@@ -1694,13 +1837,11 @@ def appendROEMask(
     mask_name,
     trackSelection,
     eclClusterSelection,
-    fractions=[0, 0, 1, 0, 0, 0],
     path=None
 ):
     """
     Loads the ROE object of a particle and creates a ROE mask with a specific name. It applies
     selection criteria for tracks and eclClusters which will be used by variables in ROEVariables.cc.
-    A-priori ChargedStable fractions can be provided, otherwise pion mass hypothesis is used.
 
     - append a ROE mask with all tracks in ROE coming from the IP region
 
@@ -1711,22 +1852,18 @@ def appendROEMask(
        >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
        >>> appendROEMask('B+:sig', 'goodROEGamma', '', good_photons)
 
-    - append a ROE mask with track from IP, use equal a-priori probabilities
-
-       >>> appendROEMask('B+:sig', 'IPAndGoodGamma', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, [1,1,1,1,1,1])
 
     @param list_name             name of the input ParticleList
     @param mask_name             name of the appended ROEMask
     @param trackSelection        decay string for the tracks in ROE
     @param eclClusterSelection   decay string for the tracks in ROE
-    @param fractions             chargedStable particle fractions
     @param path                  modules are added to this path
     """
 
     roeMask = register_module('RestOfEventInterpreter')
     roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + mask_name)
     roeMask.param('particleList', list_name)
-    roeMask.param('ROEMasksWithFractions', [(mask_name, trackSelection, eclClusterSelection, fractions)])
+    roeMask.param('ROEMasks', [(mask_name, trackSelection, eclClusterSelection)])
     path.add_module(roeMask)
 
 
@@ -1734,17 +1871,16 @@ def appendROEMasks(list_name, mask_tuples, path=None):
     """
     Loads the ROE object of a particle and creates a ROE mask with a specific name. It applies
     selection criteria for tracks and eclClusters which will be used by variables in ROEVariables.cc.
-    A-priori ChargedStable fractions can be provided, otherwise pion mass hypothesis is used.
 
     The multiple ROE masks with their own selection criteria are specified
     via list of tuples (mask_name, trackSelection, eclClusterSelection) or
-    (mask_name, trackSelection, eclClusterSelection, chargedStable fractions) in case with fractions.
+    (mask_name, trackSelection, eclClusterSelection) in case with fractions.
 
     - Example for two tuples, one with and one without fractions
 
        >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
        >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
-       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, [1,1,1,1,1,1])
+       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons)
        >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma])
 
     @param list_name             name of the input ParticleList
@@ -1752,19 +1888,10 @@ def appendROEMasks(list_name, mask_tuples, path=None):
     @param path                  modules are added to this path
     """
 
-    new_tuples = []
-    appendix = ([0, 0, 1, 0, 0, 0],)
-
-    for entry in mask_tuples:
-        if len(entry) == 4:
-            new_tuples.append(entry)
-        if len(entry) == 3:
-            new_tuples.append(entry + appendix)
-
     roeMask = register_module('RestOfEventInterpreter')
     roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + 'MaskList')
     roeMask.param('particleList', list_name)
-    roeMask.param('ROEMasksWithFractions', new_tuples)
+    roeMask.param('ROEMasks', mask_tuples)
     path.add_module(roeMask)
 
 
@@ -1773,13 +1900,11 @@ def updateROEMask(
     mask_name,
     trackSelection,
     eclClusterSelection='',
-    fractions=[],
     path=None
 ):
     """
-    Update an existing ROE mask by applying additional selection cuts for tracks and/or clusters
-    and change a-priori charged stable fractions. Empty string or array containers result
-    in no change.
+    Update an existing ROE mask by applying additional selection cuts for
+    tracks and/or clusters.
 
     See function `appendROEMask`!
 
@@ -1787,37 +1912,13 @@ def updateROEMask(
     @param mask_name             name of the ROEMask to update
     @param trackSelection        decay string for the tracks in ROE
     @param eclClusterSelection   decay string for the tracks in ROE
-    @param fractions             chargedStable particle fractions
     @param path                  modules are added to this path
     """
 
     roeMask = register_module('RestOfEventInterpreter')
     roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + mask_name)
     roeMask.param('particleList', list_name)
-    roeMask.param('ROEMasksWithFractions', [(mask_name, trackSelection, eclClusterSelection, fractions)])
-    roeMask.param('update', True)
-    path.add_module(roeMask)
-
-
-def updateROEFractions(
-    list_name,
-    mask_name,
-    fractions,
-    path
-):
-    """
-    Update chargedStable fractions for an existing ROE mask.
-
-    @param list_name             name of the input ParticleList
-    @param mask_name             name of the ROEMask to update
-    @param fractions             chargedStable particle fractions
-    @param path                  modules are added to this path
-    """
-
-    roeMask = register_module('RestOfEventInterpreter')
-    roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + mask_name)
-    roeMask.param('particleList', list_name)
-    roeMask.param('ROEMasksWithFractions', [(mask_name, '', '', fractions)])
+    roeMask.param('ROEMasks', [(mask_name, trackSelection, eclClusterSelection)])
     roeMask.param('update', True)
     path.add_module(roeMask)
 
@@ -1828,13 +1929,11 @@ def updateROEMasks(
     path
 ):
     """
-    Update existing ROE masks by applying additional selection cuts for tracks and/or clusters
-    and change a-priori charged stable fractions. Empty string or array containers result
-    in no change.
+    Update existing ROE masks by applying additional selection cuts for tracks
+    and/or clusters.
 
     The multiple ROE masks with their own selection criteria are specified
-    via list tuples (mask_name, trackSelection, eclClusterSelection) or
-    (mask_name, trackSelection, eclClusterSelection, chargedStable fractions) in case with fractions.
+    via list tuples (mask_name, trackSelection, eclClusterSelection)
 
     See function `appendROEMasks`!
 
@@ -1846,7 +1945,7 @@ def updateROEMasks(
     roeMask = register_module('RestOfEventInterpreter')
     roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + 'MaskList')
     roeMask.param('particleList', list_name)
-    roeMask.param('ROEMasksWithFractions', mask_tuples)
+    roeMask.param('ROEMasks', mask_tuples)
     roeMask.param('update', True)
     path.add_module(roeMask)
 
@@ -1855,7 +1954,6 @@ def keepInROEMasks(
     list_name,
     mask_names,
     cut_string,
-    fractions=[],
     path=None
 ):
     """
@@ -1868,11 +1966,7 @@ def keepInROEMasks(
     particle list (e.g. 'gamma:someLabel'). To update the Track masks, the input particle list should be a charged
     pion particle list (e.g. 'pi+:someLabel').
 
-    It is possible to update a-priori fractions by providing them (see `appendROEMask()` and `updateROEFractions()`).
-    Empty array will result in no change.
-
-    Updating a non-existing mask will create a new one. If a-priori fractions for ChargedStable particles are not provided,
-    pion-mass hypothesis will be used as default.
+    Updating a non-existing mask will create a new one.
 
     - keep only those tracks that were used in provided particle list
 
@@ -1882,16 +1976,10 @@ def keepInROEMasks(
 
        >>> keepInROEMasks('gamma:goodClusters', ['mask1', 'mask2'], 'E > 0.1')
 
-    - create a ROE mask on-the-fly with some fractions and with tracks used in provided particle list
-
-       >>> keepInROEMasks('pi+:trueTracks', 'newMask', 'mcPrimary == 1', [1,1,1,1,1,1])
-       >>> # - or use [-1] fractions to use true MC mass hypothesis
-
 
     @param list_name    name of the input ParticleList
     @param mask_names   array of ROEMasks to be updated
     @param cut_string   decay string with which the mask will be updated
-    @param fractions    chargedStable particle fractions
     @param path         modules are added to this path
     """
 
@@ -1900,7 +1988,6 @@ def keepInROEMasks(
     updateMask.param('particleList', list_name)
     updateMask.param('updateMasks', mask_names)
     updateMask.param('cutString', cut_string)
-    updateMask.param('fractions', fractions)
     updateMask.param('discard', False)
     path.add_module(updateMask)
 
@@ -1909,7 +1996,6 @@ def discardFromROEMasks(
     list_name,
     mask_names,
     cut_string,
-    fractions=[],
     path=None
 ):
     """
@@ -1922,11 +2008,7 @@ def discardFromROEMasks(
     particle list (e.g. 'gamma:someLabel'). To update the Track masks, the input particle list should be a charged
     pion particle list (e.g. 'pi+:someLabel').
 
-    It is possible to update a-priori fractions by providing them (see appendROEMask or updateROEFractions).
-    Empty array will result in no change.
-
-    Updating a non-existing mask will create a new one. If a-priori fractions for ChargedStable particles are not provided,
-    pion-mass hypothesis will be used as default.
+    Updating a non-existing mask will create a new one.
 
     - discard tracks that were used in provided particle list
 
@@ -1936,15 +2018,10 @@ def discardFromROEMasks(
 
        >>> discardFromROEMasks('gamma:badClusters', ['mask1', 'mask2'], 'E < 0.1')
 
-    - create a ROE mask on-the-fly with some fractions and with tracks NOT used in provided particle list
-
-       >>> discardFromROEMasks('pi+:badTracks', 'newMask', 'mcPrimary != 1', [1,1,1,1,1,1])
-       >>> # or use [-1] fractions to use true MC mass hypothesis
 
     @param list_name    name of the input ParticleList
     @param mask_names   array of ROEMasks to be updated
     @param cut_string   decay string with which the mask will be updated
-    @param fractions    chargedStable particle fractions
     @param path         modules are added to this path
     """
 
@@ -1953,7 +2030,6 @@ def discardFromROEMasks(
     updateMask.param('particleList', list_name)
     updateMask.param('updateMasks', mask_names)
     updateMask.param('cutString', cut_string)
-    updateMask.param('fractions', fractions)
     updateMask.param('discard', True)
     path.add_module(updateMask)
 
@@ -1962,7 +2038,6 @@ def optimizeROEWithV0(
     list_name,
     mask_names,
     cut_string,
-    fractions=[],
     path=None
 ):
     """
@@ -1972,13 +2047,9 @@ def optimizeROEWithV0(
     passing it can be applied.
 
     The input particle list should be a V0 particle list: K_S0 ('K_S0:someLabel', ''),
-    Lambda ('Lambda:someLabel', '') or converted photons ('gamma:someLabel')
+    Lambda ('Lambda:someLabel', '') or converted photons ('gamma:someLabel').
 
-    It is possible to update a-priori fractions by providing them (see appendROEMask and updateROEFractions).
-    Empty array will result in no change.
-
-    Updating a non-existing mask will create a new one. If a-priori fractions for ChargedStable particles are not provided,
-    pion-mass hypothesis will be used as default.
+    Updating a non-existing mask will create a new one.
 
     - treat tracks from K_S0 inside mass window separately, replace track momenta with K_S0 momentum
 
@@ -1987,7 +2058,6 @@ def optimizeROEWithV0(
     @param list_name    name of the input ParticleList
     @param mask_names   array of ROEMasks to be updated
     @param cut_string   decay string with which the mask will be updated
-    @param fractions    chargedStable particle fractions
     @param path         modules are added to this path
     """
 
@@ -1996,7 +2066,6 @@ def optimizeROEWithV0(
     updateMask.param('particleList', list_name)
     updateMask.param('updateMasks', mask_names)
     updateMask.param('cutString', cut_string)
-    updateMask.param('fractions', fractions)
     path.add_module(updateMask)
 
 
@@ -2172,6 +2241,20 @@ def writePi0EtaVeto(
     @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
     @param path       modules are added to this path
     """
+
+    if not os.path.isfile(workingDirectory + '/pi0veto.root') and downloadFlag:
+        pi0veto_error_message = (
+            "The necessary weight file pi0veto.root is not present in the provided working directory.\n"
+            "Unfortunately, it can not be downloaded from the database in this release."
+        )
+        B2ERROR(pi0veto_error_message)
+    if not os.path.isfile(workingDirectory + '/etaveto.root') and downloadFlag:
+        etaveto_error_message = (
+            "The necessary weight file etaveto.root is not present in the provided working directory.\n"
+            "Unfortunately, it can not be downloaded from the database in this release."
+        )
+        B2ERROR(etaveto_error_message)
+
     global PI0ETAVETO_COUNTER
 
     if PI0ETAVETO_COUNTER == 0:
@@ -2215,15 +2298,15 @@ def writePi0EtaVeto(
 
     if not os.path.isfile(workingDirectory + '/pi0veto.root'):
         if downloadFlag:
-            use_central_database('development')
+            # use_central_database('development') // The development GT can no longer be used
             basf2_mva.download('Pi0VetoIdentifier', workingDirectory + '/pi0veto.root')
-            B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
+            # B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
 
     if not os.path.isfile(workingDirectory + '/etaveto.root'):
         if downloadFlag:
-            use_central_database('development')
+            # use_central_database('development') // The development GT can no longer be used
             basf2_mva.download('EtaVetoIdentifier', workingDirectory + '/etaveto.root')
-            B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
+            # B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
 
     roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO'], extraInfoName='Pi0Veto',
                         identifier=workingDirectory + '/pi0veto.root')
@@ -2515,6 +2598,40 @@ def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path):
 
     path.add_module(chargedpid)
 
+
+def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
+    """
+    Calculates distance between two vertices, distance of closest approach between a vertex and a track,\
+    distance of closest approach between a vertex and btube. For track, this calculation ignores track curvature,\
+    it's negligible for small distances.The user should use extraInfo(CalculatedDistance)\
+    to get it. A full example steering file is at analysis/tests/test_DistanceCalculator.py
+
+    Example:
+      >>> from modularAnalysis import calculateDistance
+      >>>calculateDistance('list_name', 'decay_string', "mode", path=user_path)
+
+    @param list_name              name of the input ParticleList
+    @param decay_string           select particles between the distance of closest approch will be calculated
+    @param mode                   Specifies how the distance is calculated
+                                  vertextrack: calculate the distance of closest appreach between a track and a\
+                                   vertex, taking the first candidate as vertex, default
+                                  trackvertex: calculate the distance of closest appreach between a track and a\
+                                   vertex, taking the first candidate as track
+                                  2tracks: calculates the distance of closest appreach between two tracks
+                                  2vertices: calculates the distance between two vertices
+                                  vertexbtube: calculates the distance of closest appreach between a vertex and btube
+                                  trackbtube: calculates the distance of closest appreach between a track and btube
+    @param path                   modules are added to this path
+
+    """
+
+    dist_mod = register_module('DistanceCalculator')
+
+    dist_mod.set_name('DistanceCalculator_' + list_name)
+    dist_mod.param('listName', list_name)
+    dist_mod.param('decayString', decay_string)
+    dist_mod.param('mode', mode)
+    path.add_module(dist_mod)
 
 if __name__ == '__main__':
     from basf2.utils import pretty_print_module

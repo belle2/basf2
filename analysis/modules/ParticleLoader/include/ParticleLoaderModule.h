@@ -5,6 +5,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric, Anze Zupanc                                *
  *               Sam Cunliffe, Torben Ferber                              *
+ *               Frank Meier                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,9 +13,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
-
-#include <analysis/dataobjects/ParticleList.h>
 
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -42,7 +40,7 @@ namespace Belle2 {
    * o) neutral final state particles
    *   - gamma                            (input MDST type = ECLCluster with 'n photons' ECLCluster::Hypothesis::c_nPhotons)
    *   - K_S0, Lambda0, converted photons (input MDST type = V0)
-   *   - K_L0                             (input MDST type = KLMCluster, or ECLCluster with neutral hadron hypothesis)
+   *   - K_L0, n0                         (input MDST type = KLMCluster, or ECLCluster with neutral hadron hypothesis)
    *
    * The following BASF2 relations are set by the ParticleLoader:
    *
@@ -151,7 +149,7 @@ namespace Belle2 {
 
     bool m_useROEs;  /**< Switch to load ROE as Particle */
 
-    DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specifed DecayString */
+    DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specified DecayString */
 
     std::vector<std::tuple<std::string, std::string>>
                                                    m_decayStringsWithCuts; /**< Input DecayString specifying the particle being created/loaded. Particles need as well pass the selection criteria */
@@ -175,6 +173,7 @@ namespace Belle2 {
       false; /**<If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available. */
 
     std::vector<int> m_chargeZeroTrackCounts; /**< internally used to count number of tracks with charge zero */
+    std::vector<int> m_sameChargeDaughtersV0Counts; /**< internally used to count the number of V0s with same charge daughters*/
   };
 
 } // Belle2 namespace

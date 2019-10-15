@@ -48,14 +48,18 @@ def get_argument_parser():
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument('--task', type=str, default=None,
-                        choices=['master', 'new', 'modify', 'online', 'prompt', 'data', 'mc', 'analysis'],
+                        choices=['master', 'new', 'modify', 'validation', 'online', 'prompt', 'data', 'mc', 'analysis'],
                         help="""Type of global tag that should be updated.
                                 Use new/modify if the request contains new/modified payload classes.""")
     normalize_group = parser.add_mutually_exclusive_group()
-    normalize_group.add_argument('--no-normalize', dest="normalize", default=True, action="store_false",
-                                 help="Don't normalize")
+    normalize_group.add_argument('--normalize', dest="normalize", default=False, action="store_true",
+                                 help="Normalize the payload files to have reproducible checksums. "
+                                 "This option should only be used if the payload files were created "
+                                 "with an older software version (before release-04)")
     normalize_group.add_argument('--normalize-name', type=str,
-                                 help="Set the file name in the root file metadata to the given value.")
+                                 help="Set the file name in the root file metadata to the given value. "
+                                 "This implicitly enables ``--normalize`` and should only be used if "
+                                 "the payload files were created with an older software version (before release-04)")
     parser.add_argument('--release', type=str,
                         help='Required release version')
     parser.add_argument('--reason', type=str,
@@ -96,11 +100,12 @@ if __name__ == "__main__":
             sys.exit(0)
 
     # normalize files?
-    normalize = args.normalize_name if hasattr(args, 'normalize_name') else args.normalize
-    if normalize is True and not args.confirm:
-        normalize = input('\nShould the payload root files be normalized (y/n) [y]? ').lower() in ['y', '']
+    normalize = args.normalize_name if args.normalize_name is not None else args.normalize
+    if normalize is False and not args.confirm:
+        normalize = input('\nShould the payload root files be normalized (y/n) [n]? ').lower() in ['y']
         if normalize:
-            normalize_filename = input('\nEnter the file name in the payload root file metadata if that should be normalized or presse enter to not change it []? ')
+            normalize_filename = input('\nEnter the file name in the payload root file metadata if that should be normalized or '
+                                       'press enter to not change it []? ')
             if normalize_filename:
                 normalize = normalize_filename
 
@@ -116,12 +121,12 @@ if __name__ == "__main__":
     else:
         if input('\nDoes the request contain new or modified payloads classes (y/n) [n]? ').lower() in ['n', '']:
             data['request'] = 'Update'
-            print('\nFor which type of global tags is the request, mas[t]er, [o]nline, [p]rompt, [d]ata, [m]c, or [a]nalysis?')
+            print('\nFor which type of global tags is the request, mas[t]er, [v]alidation, [o]nline, [p]rompt, [d]ata, [m]c, or [a]nalysis?')
             while True:
                 task = input('t/o/p/d/m/a: ').lower()
-                if task in ['t', 'o', 'p', 'd', 'm', 'a']:
+                if task in ['t', 'v', 'o', 'p', 'd', 'm', 'a']:
                     break
-            data['task'] = {'t': 'master', 'o': 'online', 'p': 'prompt', 'd': 'data', 'm': 'mc', 'a': 'analysis'}[task]
+            data['task'] = {'t': 'master', 'v': 'validation', 'o': 'online', 'p': 'prompt', 'd': 'data', 'm': 'mc', 'a': 'analysis'}[task]
         else:
             if input('\nDo payloads of the given names already exist, but the class definition has changed (y/n) [n]? ').lower() in ['n', '']:
                 ask_new(data)

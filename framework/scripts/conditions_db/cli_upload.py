@@ -18,7 +18,7 @@ def command_upload(args, db=None):
     Upload a local database to the conditions database.
 
     This command allows uploading a local database which was created by basf2 to
-    the central database. It assumes that the global tag already exists so
+    the central database. It assumes that the globaltag already exists so
     please create it before if necessary using 'tag create'.
 
     The command requires the tagname to upload the payloads to and a
@@ -29,13 +29,18 @@ def command_upload(args, db=None):
 
     if db is None:
         args.add_argument("tag", metavar="TAGNAME",
-                          help="Global tag to use for iov creation")
+                          help="globaltag to use for iov creation")
         args.add_argument("payloadsfile", metavar="PAYLOADSFILE",
                           help="Testing payload storage file containing list of iovs")
-        args.add_argument('--normalize', default=True,
-                          help="""By default payload root files are normalized to get the same checksum for the same content.
-                                  This can be disabled with the normalize option 'False'. Any other normalize option will
-                                  set the file name in the root file metadata to the given value.""")
+        normalize_group = args.add_mutually_exclusive_group()
+        normalize_group.add_argument('--normalize', dest="normalize", default=False, action="store_true",
+                                     help="Normalize the payload files to have reproducible checksums. "
+                                     "This option should only be used if the payload files were created "
+                                     "with an older software version (before release-04)")
+        normalize_group.add_argument('--normalize-name', type=str,
+                                     help="Set the file name in the root file metadata to the given value. "
+                                     "This implicitly enables ``--normalize`` and should only be used if "
+                                     "the payload files were created with an older software version (before release-04)")
         args.add_argument("-j", type=int, default=1, dest="nprocess",
                           help="Number of concurrent connections to use for database "
                           "connection (default: %(default)s)")
@@ -54,5 +59,5 @@ def command_upload(args, db=None):
         logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE | LogInfo.TIMESTAMP)
 
     # do the upload
-    normalize = False if normalize == 'False' else args.normalize
-    return 0 if db.upload(args.dbfile, args.tag, normalize, args.ignore_existing, args.nprocess) else 1
+    normalize = args.normalize_name if args.normalize_name is not None else args.normalize
+    return 0 if db.upload(args.payloadsfile, args.tag, normalize, args.ignore_existing, args.nprocess) else 1

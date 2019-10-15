@@ -1,0 +1,26 @@
+# EventType: 1250010000
+# Descriptor: [B+ -> pi+ nu_e anti-nu_e ]cc
+# NickName: Bu_pinunubar
+# Documentation: b->d nu nubar rare process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Borys Knysh
+# Email: borys.knysh@gmail.com
+# Cuts: None
+# Date: 20190912
+#
+#
+Decay Upsilon(4S)
+0.5000 B+sig B-              VSS;
+0.5000 B-sig B+              VSS;
+Enddecay
+#
+#
+Decay B+sig
+1.0000 pi+ nu_e anti-nu_e     PHOTOS PHSP ;
+Enddecay
+CDecay B-sig
+#
+# 
+End
+

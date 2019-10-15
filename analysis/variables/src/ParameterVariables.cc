@@ -10,22 +10,17 @@
 
 #include <analysis/variables/ParameterVariables.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <framework/dataobjects/Helix.h>
 
 #include <TLorentzVector.h>
 #include <TVectorF.h>
@@ -377,7 +372,7 @@ namespace Belle2 {
         return -999;
 
       PCmsLabTransform T;
-      TLorentzVector m = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+      TLorentzVector m = T.getBeamFourMomentum();
       TLorentzVector p = particle->get4Vector();
       TLorentzVector d1 = particle->getDaughter(daughter1)->get4Vector();
       TLorentzVector d2 = particle->getDaughter(daughter2)->get4Vector();

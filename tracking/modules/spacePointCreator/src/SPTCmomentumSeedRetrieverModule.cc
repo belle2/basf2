@@ -12,10 +12,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/geometry/BFieldManager.h>
 
-// ROOT
-#include <TVector3.h>
-#include <TMath.h>
-
 // using namespace std;
 using namespace Belle2;
 

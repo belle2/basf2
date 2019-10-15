@@ -16,19 +16,6 @@ elif (sys.argv[1] == 'mc'):
 else:
     inputFile = sys.argv[1]
 
-# Create main path
-main = basf2.create_path()
-basf2.set_log_level(basf2.LogLevel.INFO)
-
-# EventInfoSetter
-main.add_module('EventInfoSetter')
-
-# Gearbox
-main.add_module('Gearbox')
-
-# Process the main path
-basf2.process(main)
-
 dbImporter = KLMDatabaseImporter()
 
 stripEfficiency = KLMStripEfficiency()

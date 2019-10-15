@@ -13,7 +13,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
@@ -277,7 +276,6 @@ void StandardTrackingPerformanceModule::findSignalMCParticles(const StoreArray<M
 {
   std::sort(m_signalDaughterPDGs.begin(), m_signalDaughterPDGs.end());
 
-  std::vector<MCParticle*> daughterMcParticles;
   for (const MCParticle& mcParticle : mcParticles) {
     // continue if mcParticle is not a B meson
     if (abs(mcParticle.getPDG()) != 511 && abs(mcParticle.getPDG()) != 521)
@@ -299,6 +297,7 @@ bool StandardTrackingPerformanceModule::isSignalDecay(const MCParticle& mcPartic
   daughterMcParticles = removeFinalStateRadiation(daughterMcParticles);
 
   for (auto daughterMCParticle : daughterMcParticles) {
+    // cppcheck-suppress useStlAlgorithm
     daughterPDGs.push_back(daughterMCParticle->getPDG());
   }
 

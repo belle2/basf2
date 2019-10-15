@@ -44,7 +44,10 @@ namespace Belle2 {
 
   protected:
     //number of skims
-    static const int nskim_gdldqm = 7;
+    static const int nskim_gdldqm = 9;
+    int start_skim_gdldqm = 0;
+    int end_skim_gdldqm = 0;
+    int m_skim = -1;
 
     //! timestamp diff from gdlL1 to comL1 in LSB8nsec
     TH1I* h_c8_gdlL1TocomL1[nskim_gdldqm] = {nullptr};
@@ -128,8 +131,8 @@ namespace Belle2 {
     //private:
     //StoreArray<TRGGDLUnpackerStore> store;
 
-    static const int n_output_extra;
-    static const char* output_extra[4];
+    static const int n_output_extra = 42;
+    static const char* output_extra[n_output_extra];
 
     //condition database for unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
@@ -166,7 +169,9 @@ namespace Belle2 {
       "software_trigger_cut&skim&accept_mumu_1trk",
       "software_trigger_cut&skim&accept_mumu_2trk",
       "software_trigger_cut&skim&accept_gamma_gamma",
-      "software_trigger_cut&skim&accept_bhabha"
+      "software_trigger_cut&skim&accept_bhabha",
+      "software_trigger_cut&skim&accept_HadronB",
+      "software_trigger_cut&skim&accept_Dimuon"
     };
 
     //name of histgrams
@@ -177,7 +182,9 @@ namespace Belle2 {
       "mumu1trk",
       "mumu2trk",
       "gammagamma",
-      "bhabha"
+      "bhabha",
+      "HadronB",
+      "Dimuon"
     };
 
   };

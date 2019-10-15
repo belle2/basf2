@@ -11,12 +11,11 @@
 #include <analysis/dbobjects/PIDPriorsTable.h>
 #include <framework/logging/Logger.h>
 #include <iostream>
-#include <float.h>
 
 using namespace Belle2;
 
 
-void PIDPriorsTable::setBinEdges(std::vector<float>binEdgesX, std::vector<float>binEdgesY)
+void PIDPriorsTable::setBinEdges(const std::vector<float>& binEdgesX, const std::vector<float>& binEdgesY)
 {
   m_binEdgesX = binEdgesX;
   m_binEdgesY = binEdgesY;

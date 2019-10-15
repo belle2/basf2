@@ -13,14 +13,10 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <eklm/dataobjects/EKLMAlignmentHit.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
 
 #include <framework/datastore/RelationsObject.h>
-
-namespace genfit {
-  class TrackPoint;
-}
 
 namespace Belle2 {
   /**

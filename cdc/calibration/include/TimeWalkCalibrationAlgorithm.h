@@ -10,7 +10,8 @@
 
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
-#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/dbobjects/CDCGeometry.h>
+#include <framework/database/DBObjPtr.h>
 #include <TH1D.h>
 #include <TH2D.h>
 #include "string"

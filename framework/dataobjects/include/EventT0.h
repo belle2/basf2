@@ -10,13 +10,11 @@
 #pragma once
 
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 #include <TObject.h>
 
 #include <boost/optional.hpp>
 
 #include <vector>
-#include <utility>
 #include <cmath>
 
 namespace Belle2 {

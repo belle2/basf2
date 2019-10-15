@@ -15,7 +15,6 @@
 #include <framework/logging/Logger.h>
 
 #include <map>
-#include <vector>
 #include <string>
 
 namespace Belle2 {

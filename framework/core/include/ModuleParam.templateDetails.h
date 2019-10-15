@@ -23,24 +23,21 @@ namespace Belle2 {
   }
 
   template <class T>
-  ModuleParam<T>::ModuleParam(T& paramVariable,
-                              const std::string& description,
-                              bool force)
-    : ModuleParamBase(TypeInfo(), description, force)
-    , m_paramVariable(paramVariable) {};
+  ModuleParam<T>::ModuleParam(T& paramVariable, const std::string& description, bool force):
+    ModuleParamBase(TypeInfo(), description, force), m_paramVariable(paramVariable) {};
 
   template <class T>
   ModuleParam<T>::~ModuleParam() = default;
 
   template <class T>
-  void ModuleParam<T>::setValue(T value)
+  void ModuleParam<T>::setValue(const T& value)
   {
     m_paramVariable = value;
     m_setInSteering = true;
   }
 
   template <class T>
-  void ModuleParam<T>::setDefaultValue(T defaultValue)
+  void ModuleParam<T>::setDefaultValue(const T& defaultValue)
   {
     m_defaultValue = defaultValue;
     m_paramVariable = defaultValue;

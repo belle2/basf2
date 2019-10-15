@@ -134,7 +134,10 @@ namespace Belle2 {
 
       /// Gives the wire by its id in the layer.
       const CDCWire& getWire(IWire iWire) const
-      { return at(iWire); }
+      {
+        // cppcheck-suppress returnTempReference
+        return at(iWire);
+      }
 
       /// Gets the wire in this layer that is closest to the given position
       const CDCWire& getClosestWire(const Vector3D& pos3D) const;

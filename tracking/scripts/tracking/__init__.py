@@ -69,6 +69,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
                                         trackFitHypotheses=trackFitHypotheses,
                                         reco_tracks=reco_tracks)
+    if prune_temporary_tracks or pruneTracks:
+        path.add_module("PruneRecoHits")
 
 
 def add_time_extraction(path, components=None):
@@ -190,7 +192,6 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     svd_cdc_reco_tracks = "SVDCDCRecoTracks"
     ecl_reco_tracks = "ECLRecoTracks"
     combined_ecl_reco_tracks = "combinedECLRecoTracks"
-    pxd_svd_cdc_reco_tracks = "PXDSVDCDCRecoTracks"
 
     # temporary collections
     svd_reco_tracks = "SVDRecoTracks"
@@ -325,8 +326,8 @@ def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_se
 
 def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='__ROIsvdClusters'):
     """
-    This function adds the standard reconstruction modules for tracking to be used for the simulation of PXD data reduction
-    to a path.
+    This function adds the standard reconstruction modules for tracking to be used for the simulation of PXD data
+    reduction to a path.
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components, always exclude the PXD.

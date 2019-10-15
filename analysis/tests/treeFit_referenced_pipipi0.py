@@ -69,7 +69,7 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertTrue(falsePositives < 2548, "Background rejection increased.")
+        self.assertTrue(falsePositives < 2596, "Background rejection increased.")
 
         self.assertTrue(truePositives > 34, "Signal rejection too high")
         self.assertFalse(mustBeZero, "We should have dropped all candidates with confidence level less than {}.".format(conf))

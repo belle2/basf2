@@ -10,10 +10,11 @@ class PXDRawROIUnpackerModule(Module):
 
     def initialize(self):
         """reimplementation of Module::initialize()."""
+        #: PXDROIsHLT
         self.mHLT = Belle2.PyStoreArray(Belle2.ROIid.Class(), "PXDROIsHLT")
-        """ PXDROIsHLT """
+        #: PXDROIsDC
         self.mDC = Belle2.PyStoreArray(Belle2.ROIid.Class(), "PXDROIsDC")
-        """ PXDROIsDC """
+
         self.mHLT.registerInDataStore()
         self.mDC.registerInDataStore()
 
@@ -52,10 +53,11 @@ class PXDPayloadROIUnpackerModule(Module):
 
     def initialize(self):
         """reimplementation of Module::initialize()."""
+        #: PXDROIsPayHLT
         self.mPHLT = Belle2.PyStoreArray(Belle2.ROIid.Class(), "PXDROIsPayHLT")
-        """ PXDROIsPayHLT """
+        #: PXDROIsPayDC
         self.mPDC = Belle2.PyStoreArray(Belle2.ROIid.Class(), "PXDROIsPayDC")
-        """ PXDROIsPayDC """
+
         self.mPHLT.registerInDataStore()
         self.mPDC.registerInDataStore()
 

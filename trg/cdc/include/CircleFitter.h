@@ -31,7 +31,7 @@ namespace Belle2 {
 
   public:
     /// Constructor.
-    TRGCDCCircleFitter(const std::string& name);
+    explicit TRGCDCCircleFitter(const std::string& name);
 
     /// Destructor
     virtual ~TRGCDCCircleFitter();
@@ -42,7 +42,7 @@ namespace Belle2 {
               const std::string& prefix = std::string("")) const;
 
   public:// Modifiers
-    // Fitter
+    /// Fitter
     virtual int fit(TRGCDCTrackBase&) const override;
 
   private:

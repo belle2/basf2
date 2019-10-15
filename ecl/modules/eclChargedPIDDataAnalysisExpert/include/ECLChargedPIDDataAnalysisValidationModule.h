@@ -15,23 +15,10 @@
 #include <TFile.h>
 #include <TH1F.h>
 #include <TTree.h>
-#include <TEfficiency.h>
-
-// ECL
-#include <ecl/dataobjects/ECLPidLikelihood.h>
-
-// MDST
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
 
@@ -177,6 +164,16 @@ namespace Belle2 {
     std::vector<float> m_clusterTheta = std::vector<float>(c_chargedStableHypos);
 
     /**
+     * Cluster ECL region.
+     *
+     * Use the most energetic ECL cluster associated to the MC-matched reconstructed track w/ highest momentum.
+     * A NaN value is stored if no matching is found.
+     *
+     * Book one `int` for each charged stable particle (and antiparticle) candidate.
+     */
+    std::vector<float> m_clusterReg = std::vector<float>(c_chargedStableHypos);
+
+    /**
      * Cluster azimuthal angle in [rad].
      *
      * Use the most energetic ECL cluster associated to the MC-matched reconstructed track w/ highest momentum.
@@ -250,10 +247,10 @@ namespace Belle2 {
     std::vector<float> m_p_binedges = {0.0, 0.5, 0.75, 1.0, 3.0, 5.0};
 
     /**
-     * Binning w/ variable bin size for cluster polar angle (in [rad]).
-     * It should match the binning used for parametrisation of the PID likelihood.
+     * Binning w/ variable bin size for track polar angle (in [rad]).
+     * It follows the ECL geometry (although ECL gaps are not accounted for).
      */
-    std::vector<float> m_th_binedges = {0.0, 0.2164208, 0.5480334, 0.561996, 2.2462387, 2.2811453, 2.7070057, 3.1415926};
+    std::vector<float> m_th_binedges = {0.0, 0.2164208, 0.561996, 2.2462387, 2.7070057, 3.1415926};
 
     /**
      * Dump PID vars.

@@ -8,5 +8,6 @@
 // ROOT dictionaries will be build for all classes mentioned this way
 
 #pragma link C++ class Belle2::CDCTriggerNeuroConfig+;
+#pragma link C++ class Belle2::CDCTrigger2DConfig+;
 
 #endif

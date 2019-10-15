@@ -10,7 +10,6 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/utilities/Utils.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <geometry/GeometryManager.h>
 #include <geometry/Materials.h>
@@ -34,7 +33,7 @@
 #include "G4LogicalVolumeStore.hh"
 #include "G4SolidStore.hh"
 #include "G4RegionStore.hh"
-#include "G4OpticalSurface.hh"
+#include "G4SurfaceProperty.hh"
 #include "G4LogicalBorderSurface.hh"
 #include "G4LogicalSkinSurface.hh"
 #include "G4VisAttributes.hh"
@@ -269,6 +268,7 @@ namespace Belle2 {
 
       auto getDensityScale = [this](const std::string & name) {
         std::optional<double> scale;
+        // cppcheck-suppress stlIfFind ; cppcheck doesn't like if with initializer ...
         if (auto it = m_densityScaling.find(name); it != m_densityScaling.end()) {
           scale = it->second;
         }

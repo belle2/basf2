@@ -13,20 +13,11 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCRawHit.h>
-#include <rawdata/dataobjects/RawDataBlock.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/database/DBArray.h>
 
-#include <rawdata/dataobjects/RawFTSW.h>
-#include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawCDC.h>
-
 
 namespace Belle2 {
 

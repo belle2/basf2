@@ -18,7 +18,6 @@
 using namespace std;
 using namespace Belle2;
 
-// cppcheck-suppress passedByValue ; We take a value to move it into a member so no performance penalty
 LogMethod::LogMethod(const char* package, string  function, string  file, unsigned int line): m_package(package),
   m_function(std::move(function)), m_file(std::move(file)), m_line(line)
 {

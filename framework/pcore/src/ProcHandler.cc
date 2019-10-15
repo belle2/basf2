@@ -11,7 +11,6 @@
 
 #include <vector>
 
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
 #include <cstdio>
@@ -20,7 +19,6 @@
 #include <cstring>
 #include <unistd.h>
 #include <Python.h>
-
 
 using namespace std;
 using namespace Belle2;

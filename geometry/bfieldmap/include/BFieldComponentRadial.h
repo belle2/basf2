@@ -13,7 +13,6 @@
 
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 
-#include <boost/array.hpp>
 #include <string>
 
 namespace Belle2 {

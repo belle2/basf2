@@ -79,8 +79,9 @@ namespace Belle2 {
     int m_sector_KLM_int;
     /**m_sector_KLM map leaf*/
     std::vector<bool> m_sector_KLM = std::vector<bool>(8, 0);
-    /**m_sector_CDC leaf*/
+    /**m_sector_CDC integer leaf*/
     int m_sector_CDC_int;
+    /**m_sector_CDC map */
     std::vector<bool> m_sector_CDC = std::vector<bool>(8, 0);
     /**m_N_KLMmatch leaf*/
     int m_N_KLMmatch;
@@ -119,11 +120,13 @@ namespace Belle2 {
     /**m_CDCNN_jitter leaf*/
     int m_CDCNN_jitter;
 
-    /**m_slot_CDC leaf*/
+    /**m_slot_CDC integer leaf*/
     int m_slot_CDC_int;
+    /**m_slot_CDC map leaf*/
     std::vector<bool> m_slot_CDC = std::vector<bool>(15, 0);
-    /**m_slot_TOP leaf*/
+    /**m_slot_TOP integer leaf*/
     int m_slot_TOP_int;
+    /**m_slot_TOP map leaf*/
     std::vector<bool> m_slot_TOP = std::vector<bool>(15, 0);
     /**m_N_TOPmatch leaf*/
     int m_N_TOPmatch;

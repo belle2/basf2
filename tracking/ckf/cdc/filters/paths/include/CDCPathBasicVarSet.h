@@ -106,6 +106,7 @@ namespace Belle2 {
     virtual bool extract(const BaseCDCPathFilter::Object* path) override;
 
   private:
+    /// use this to get the eventNumber
     StoreObjPtr<EventMetaData> m_eventMetaData;
   };
 }

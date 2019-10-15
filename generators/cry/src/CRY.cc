@@ -20,10 +20,8 @@
 #include <framework/utilities/IOIntercept.h>
 
 #include <TDatabasePDG.h>
-#include <TLorentzVector.h>
 #include <TRandom3.h>
 
-#include <iostream>
 #include <string>
 #include <vector>
 #include <fstream>

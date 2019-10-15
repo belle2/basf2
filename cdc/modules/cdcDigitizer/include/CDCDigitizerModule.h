@@ -23,11 +23,11 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeoControlPar.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
+#include <reconstruction/dbobjects/CDCDedxRunGain.h>
 //#include <cdc/dbobjects/CDCEDepToADCConversions.h>
 
 //C++/C standard lib elements.
 #include <string>
-#include <vector>
 //#include <queue>
 #include <limits>
 
@@ -64,6 +64,7 @@ namespace Belle2 {
     {
       if (m_fEElectronicsFromDB) delete m_fEElectronicsFromDB;
       //      if (m_eDepToADCConversionsFromDB) delete m_eDepToADCConversionsFromDB;
+      if (m_runGainFromDB) delete m_runGainFromDB;
     };
 
   private:
@@ -113,6 +114,9 @@ namespace Belle2 {
 
     /** Set FEE parameters (from DB) */
     void setFEElectronics();
+
+    /** Set run-gain (from DB) */
+    void setRunGain();
 
     /** Set edep-to-ADC conversion params. (from DB) */
     //    void setEDepToADCConversions();
@@ -175,6 +179,8 @@ namespace Belle2 {
     double m_addFudgeFactorForSigma; /**< additional fudge factor for space resol. */
     double m_totalFudgeFactor = 1.;  /**< total fudge factor for space resol. */
 
+    double m_runGain = 1.;  /**< run gain. */
+    double m_overallGainFactor = 1.;  /**< Overall gain factor. */
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
     //    bool m_2015AprRun; /**< A flag indicates cosmic runs in April 2015. */
@@ -198,8 +204,10 @@ namespace Belle2 {
     unsigned short m_widthOfTimeWindow  [nBoards] = {0}; /*!< Width of time window */
 
     bool m_useDB4EDepToADC;             /**< Fetch edep-to-ADC conversion params. from DB */
+    bool m_useDB4RunGain;               /**< Fetch run gain from DB */
     bool m_spaceChargeEffect;           /**< Space charge effect */
 
+    DBObjPtr<CDCDedxRunGain>* m_runGainFromDB = nullptr; /*!< Pointer to run gain from DB. */
     //    DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB = nullptr; /*!< Pointer to edep-to-ADC conv. params. from DB. */
     //    float m_eDepToADCParams[MAX_N_SLAYERS][4]; /*!< edep-to-ADC conv. params. */
 

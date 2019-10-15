@@ -12,7 +12,6 @@
 
 #include <framework/database/DBAccessorBase.h>
 
-class TClonesArray;
 class TClass;
 class TObject;
 

@@ -18,19 +18,13 @@
 #include <framework/core/HistoModule.h>
 
 //STL
-#include <boost/filesystem.hpp>
-#include <regex>
 #include <map>
 #include <vector>
 #include <string>
-#include <iostream>
 
 //FRAMEWORK
-#include <framework/core/Module.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/Logger.h>
 
 //ECL
 #include <ecl/utility/ECLChannelMapper.h>
@@ -42,9 +36,6 @@ class TH1F;
 class TH2F;
 
 namespace Belle2 {
-
-  class ECLDspData;
-  class ECLCrystalCalib;
 
   /**
    * This module is created to monitor ECL electronics logic in frame of DQM system.

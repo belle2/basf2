@@ -35,6 +35,93 @@ def file_checksum(filename):
     return md5hash.hexdigest()
 
 
+class PayloadInformation:
+    """Small container class to help compare payload information for efficient
+    comparison between globaltags"""
+
+    @classmethod
+    def from_json(cls, payload, iov):
+        """Set all internal members from the json information of the payload and the iov.
+
+        Arguments:
+            payload (dict): json information of the payload as returned by REST api
+            iov (dict): json information of the iov as returned by REST api
+        """
+        return cls(
+            payload['payloadId'],
+            payload['basf2Module']['name'],
+            payload['revision'],
+            payload['checksum'],
+            payload['payloadUrl'],
+            payload['baseUrl'],
+            iov['payloadIovId'],
+            (iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"]),
+        )
+
+    def __init__(self, payload_id, name, revision, checksum, payload_url, base_url, iov_id=None, iov=None):
+        """
+        Create a new object from the given information
+        """
+        #: name of the payload
+        self.name = name
+        #: checksum of the payload
+        self.checksum = checksum
+        #: interval of validity
+        self.iov = iov
+        #: revision, not used for comparisons
+        self.revision = revision
+        #: payload id in CDB, not used for comparisons
+        self.payload_id = payload_id
+        #: iov id in CDB, not used for comparisons
+        self.iov_id = iov_id
+        #: base url
+        self.base_url = base_url
+        #: payload url
+        self.payload_url = payload_url
+
+    def __hash__(self):
+        """Make object hashable"""
+        return hash((self.name, self.checksum, self.iov))
+
+    def __eq__(self, other):
+        """Check if two payloads are equal"""
+        return (self.name, self.checksum, self.iov) == (other.name, other.checksum, other.iov)
+
+    def __lt__(self, other):
+        """Sort payloads by name, iov, revision"""
+        return (self.name.lower(), self.iov, self.revision) < (other.name.lower(), other.iov, other.revision)
+
+    def readable_iov(self):
+        """return a human readable name for the IoV"""
+        if self.iov is None:
+            return "none"
+
+        if self.iov == (0, 0, -1, -1):
+            return "always"
+
+        e1, r1, e2, r2 = self.iov
+        if e1 == e2:
+            if r1 == 0 and r2 == -1:
+                return f"exp {e1}"
+            elif r2 == -1:
+                return f"exp {e1}, runs {r1}+"
+            elif r1 == r2:
+                return f"exp {e1}, run {r1}"
+            else:
+                return f"exp {e1}, runs {r1} - {r2}"
+        else:
+            if e2 == -1 and r1 == 0:
+                return f"exp {e1} - forever"
+            elif e2 == -1:
+                return f"exp {e1}, run {r1} - forever"
+            elif r1 == 0 and r2 == -1:
+                return f"exp {e1}-{e2}, all runs"
+            elif r2 == -1:
+                return f"exp {e1}, run {r1} - exp {e2}, all runs"
+            else:
+                return f"exp {e1}, run {r1} - exp {e2}, run {r2}"
+
+
 class ConditionsDB:
     """Class to interface conditions db REST interface"""
 
@@ -185,13 +272,13 @@ class ConditionsDB:
         return req
 
     def get_globalTags(self):
-        """Get a list of all global tags. Returns a dictionary with the global
-        tag names and the corresponding ids in the database"""
+        """Get a list of all globaltags. Returns a dictionary with the globaltag
+        names and the corresponding ids in the database"""
 
         try:
             req = self.request("GET", "/globalTags")
         except ConditionsDB.RequestError as e:
-            B2ERROR("Could not get the list of global tags: {}".format(e))
+            B2ERROR("Could not get the list of globaltags: {}".format(e))
             return None
 
         result = {}
@@ -201,36 +288,36 @@ class ConditionsDB:
         return result
 
     def has_globalTag(self, name):
-        """Check whether the global tag with the given name exists."""
+        """Check whether the globaltag with the given name exists."""
 
         try:
-            req = self.request("GET", "/globalTag/{globalTagName}".format(globalTagName=encode_name(name)))
-        except ConditionsDB.RequestError as e:
+            self.request("GET", "/globalTag/{globalTagName}".format(globalTagName=encode_name(name)))
+        except ConditionsDB.RequestError:
             return False
 
         return True
 
     def get_globalTagInfo(self, name):
-        """Get the id of the global tag with the given name. Returns either the
+        """Get the id of the globaltag with the given name. Returns either the
         id or None if the tag was not found"""
 
         try:
             req = self.request("GET", "/globalTag/{globalTagName}".format(globalTagName=encode_name(name)))
         except ConditionsDB.RequestError as e:
-            B2ERROR("Cannot find global tag '{}': {}".format(name, e))
+            B2ERROR("Cannot find globaltag '{}': {}".format(name, e))
             return None
 
         return req.json()
 
     def get_globalTagType(self, name):
         """
-        Get the dictionary describing the given global tag type (currently
+        Get the dictionary describing the given globaltag type (currently
         one of DEV or RELEASE). Returns None if tag type was not found.
         """
         try:
             req = self.request("GET", "/globalTagType")
         except ConditionsDB.RequestError as e:
-            B2ERROR("Could not get list of valid global tag types: {}".format(e))
+            B2ERROR("Could not get list of valid globaltag types: {}".format(e))
             return None
 
         types = {e["name"]: e for e in req.json()}
@@ -238,21 +325,49 @@ class ConditionsDB:
         if name in types:
             return types[name]
 
-        B2ERROR("Unknown global tag type: '{}', please use one of {}".format(name, ", ".join(types)))
+        B2ERROR("Unknown globaltag type: '{}', please use one of {}".format(name, ", ".join(types)))
         return None
 
     def create_globalTag(self, name, description, user):
         """
-        Create a new global tag
+        Create a new globaltag
         """
         info = {"name": name, "description": description, "modifiedBy": user, "isDefault": False}
         try:
-            req = self.request("POST", f"/globalTag/DEV", f"Creating global tag {name}", json=info)
+            req = self.request("POST", f"/globalTag/DEV", f"Creating globaltag {name}", json=info)
         except ConditionsDB.RequestError as e:
-            B2ERROR(f"Could not create global tag {name}: {e}")
+            B2ERROR(f"Could not create globaltag {name}: {e}")
             return None
 
         return req.json()
+
+    def get_all_iovs(self, globalTag, exp=None, run=None, message=None):
+        """
+        Return list of all payloads in gt where each element is a named
+        tuple with (name, revision, payloadId, iovId, iov)
+        """
+        globalTag = encode_name(globalTag)
+        if message is None:
+            message = ""
+        if exp is not None:
+            msg = f"Obtaining list of iovs for globaltag {globalTag}, exp={exp}, run={run}{message}"
+            req = self.request("GET", "/iovPayloads", msg, params={'gtName': globalTag, 'expNumber': exp, 'runNumber': run})
+        else:
+            msg = f"Obtaining list of iovs for globaltag {globalTag}{message}"
+            req = self.request("GET", f"/globalTag/{globalTag}/globalTagPayloads", msg)
+        all_iovs = []
+        for item in req.json():
+            payload = item["payload" if 'payload' in item else "payloadId"]
+            if "payloadIov" in item:
+                iovs = [item['payloadIov']]
+            else:
+                iovs = item['payloadIovs']
+
+            for iov in iovs:
+                all_iovs.append(PayloadInformation.from_json(payload, iov))
+
+        all_iovs.sort()
+        return all_iovs
 
     def get_payloads(self, global_tag=None):
         """
@@ -379,7 +494,7 @@ class ConditionsDB:
         Create an iov.
 
         Args:
-            globalTagId (int): id of the global tag, obtain with get_globalTagId()
+            globalTagId (int): id of the globaltag, obtain with get_globalTagId()
             payloadId (int): id of the payload, obtain from create_payload() or get_payloads()
             firstExp (int): first experiment for which this iov is valid
             firstRun (int): first run for which this iov is valid
@@ -437,7 +552,7 @@ class ConditionsDB:
 
         Parameters:
           filename (str): filename of the testing payload storage file that should be uploaded
-          global_tage (str): name of the global tag to which the data should be uploaded
+          global_tage (str): name of the globaltag to which the data should be uploaded
           normalize (bool/str): if True the payload root files will be normalized to have the same checksum for the same content,
                                 if normalize is a string in addition the file name in the root file metadata will be set to it
           ignore_existing (bool): if True do not upload payloads that already exist
@@ -459,7 +574,7 @@ class ConditionsDB:
             B2INFO(f"No payloads found in {filename}, exiting")
             return True
 
-        # time to get the id for the global tag
+        # time to get the id for the globaltag
         tagId = self.get_globalTagInfo(global_tag)
         if tagId is None:
             return False
@@ -557,48 +672,53 @@ class ConditionsDB:
 
     def staging_request(self, filename, normalize, data, password):
         """
-        Upload a testing payload storage to a staging global tag and create or update a jira issue
+        Upload a testing payload storage to a staging globaltag and create or update a jira issue
 
         Parameters:
           filename (str): filename of the testing payload storage file that should be uploaded
-          normalize (bool/str): if True the payload root files will be normalized to have the same checksum for the same content,
-                                if normalize is a string in addition the file name in the root file metadata will be set to it
+          normalize (bool/str): if True the payload root files will be
+            normalized to have the same checksum for the same content, if
+            normalize is a string in addition the file name in the root file
+            metadata will be set to it
           data (dict): a dictionary with the information provided by the user:
-            task: category of global tag, either master, online, prompt, data, mc, or analysis
-            tag: the global tage name
-            request: type of request, either Update, New, or Modification. The latter two imply task == master because
+
+            * task: category of globaltag, either master, online, prompt, data, mc, or analysis
+            * tag: the globaltage name
+            * request: type of request, either Update, New, or Modification. The latter two imply task == master because
               if new payload classes are introduced or payload classes are modified then they will first be included in
-              the master global tag. Here a synchronization of code and payload changes has to be managed.
-              If new or modified payload classes should be included in other global tags they must already be in a release.
-            pull-request: number of the pull request containing new or modified payload classes, only for request == New or Modified
-            backward-compatibility: description of what happens if the old payload is encountered by the updated code,
+              the master globaltag. Here a synchronization of code and payload changes has to be managed.
+              If new or modified payload classes should be included in other globaltags they must already be in a release.
+            * pull-request: number of the pull request containing new or modified payload classes,
+              only for request == New or Modified
+            * backward-compatibility: description of what happens if the old payload is encountered by the updated code,
               only for request == Modified
-            forward-compatibility: description of what happens if a new payload is encountered by the existing code,
+            * forward-compatibility: description of what happens if a new payload is encountered by the existing code,
               only for request == Modified
-            release: the required release version
-            reason: the reason for the request
-            description: a detailed description for the global tag manager
-            issue: identifier of an existing jira issue (optional)
-            user: name of the user
-            time: time stamp of the request
+            * release: the required release version
+            * reason: the reason for the request
+            * description: a detailed description for the globaltag manager
+            * issue: identifier of an existing jira issue (optional)
+            * user: name of the user
+            * time: time stamp of the request
+
           password (str): the password for access to jira
 
         Returns:
           True if the upload and jira issue creation/upload was successful
         """
 
-        # determine the staging global tag name
+        # determine the staging globaltag name
         data['tag'] = upload_global_tag(data['task'])
         if data['tag'] is None:
             data['tag'] = f"staging_{data['task']}_{data['user']}_{data['time']}"
 
-        # create the staging global tag if it does not exists yet
+        # create the staging globaltag if it does not exists yet
         if not self.has_globalTag(data['tag']):
             if not self.create_globalTag(data['tag'], data['reason'], data['user']):
                 return False
 
         # upload the payloads
-        B2INFO(f"Uploading testing database {filename} to global tag {data['tag']}")
+        B2INFO(f"Uploading testing database {filename} to globaltag {data['tag']}")
         entries = []
         if not self.upload(filename, data['tag'], normalize, uploaded_entries=entries):
             return False
@@ -617,7 +737,7 @@ class ConditionsDB:
             issue = issue[0]
         else:
             description = f"""
-|*Upload global tag*     | {data['tag']} |
+|*Upload globaltag*     | {data['tag']} |
 |*Request reason*        | {data['reason']} |
 |*Required release*      | {data['release']} |
 |*Type of request*       | {data['request']} |
@@ -641,13 +761,13 @@ class ConditionsDB:
             if "summary" in issue.keys():
                 issue["summary"] = issue["summary"].format(**data)
             else:
-                issue["summary"] = f"Global tag request for {data['task']} by {data['user']} at {data['time']}"
+                issue["summary"] = f"Globaltag request for {data['task']} by {data['user']} at {data['time']}"
             if "project" not in issue.keys():
                 issue["project"] = {"key": "BII"}
             if "issuetype" not in issue.keys():
                 issue["issuetype"] = {"name": "Task"}
 
-            B2INFO(f"Creating jira issue for {data['task']} global tag request")
+            B2INFO(f"Creating jira issue for {data['task']} globaltag request")
             response = requests.post('https://agira.desy.de/rest/api/latest/issue', auth=(data['user'], password),
                                      json={'fields': issue})
             if response.status_code in range(200, 210):
@@ -658,7 +778,7 @@ class ConditionsDB:
 
         # comment on an existing issue
         else:
-            B2INFO(f"Commenting on jira issue {issue} for {data['task']} global tag request")
+            B2INFO(f"Commenting on jira issue {issue} for {data['task']} globaltag request")
             response = requests.post('https://agira.desy.de/rest/api/latest/issue/%s/comment' % issue,
                                      auth=(data['user'], password), json={'body': description})
             if response.status_code in range(200, 210):

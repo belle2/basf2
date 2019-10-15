@@ -30,6 +30,8 @@ def check(filename):
 
 testFile = tempfile.NamedTemporaryFile()
 
+conditions.disable_globaltag_replay()
+
 main = create_path()
 
 inputMdst('default', b2test_utils.require_file('analysis/tests/mdst.root'), path=main)

@@ -12,6 +12,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/ScopeGuard.h>
 
 #include <TDirectory.h>
 #include <TFile.h>
@@ -45,6 +46,7 @@ namespace Belle2::Conditions {
         info.baseUrl = "";
         info.payloadUrl = "";
         info.filename = payloadFilename(m_payloadDir, info.name, info.revision);
+        info.iov = iov;
         if (!FileSystem::fileExists(info.filename)) {
           B2FATAL("Could not find payload file specified in testing payload storage" << LogVar("storage filen", m_filename)
                   << LogVar("name", info.name) << LogVar("local revision", info.revision)
@@ -211,6 +213,9 @@ namespace Belle2::Conditions {
   {
     // Save the current gDirectory
     TDirectory::TContext saveDir;
+    // Change settings to create reproducible output files
+    // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
+    auto scopegard = ScopeGuard::guardGetterSetter(&TDirectory::IsReproducible, &TDirectory::MakeReproducible, true);
     // And create the file ...
     std::unique_ptr<TFile> file{TFile::Open(fileName.c_str(), "RECREATE")};
     if (!file || !file->IsOpen()) {

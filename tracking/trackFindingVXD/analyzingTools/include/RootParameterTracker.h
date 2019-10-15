@@ -25,10 +25,6 @@
 #include <string>
 #include <vector>
 #include <utility> // for pair
-#include <algorithm> // for find_if
-
-
-
 
 namespace Belle2 {
 

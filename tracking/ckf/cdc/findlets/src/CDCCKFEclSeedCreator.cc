@@ -9,8 +9,6 @@
  **************************************************************************/
 #include <tracking/ckf/cdc/findlets/CDCCKFEclSeedCreator.h>
 
-#include <tracking/ckf/general/utilities/SearchDirection.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/dataobjects/RecoTrack.h>

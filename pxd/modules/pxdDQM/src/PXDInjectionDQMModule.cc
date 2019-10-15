@@ -15,7 +15,6 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
 using namespace Belle2::VXD;
-using boost::format;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -41,8 +40,10 @@ PXDInjectionDQMModule::PXDInjectionDQMModule() : HistoModule() , m_vxdGeometry(V
 void PXDInjectionDQMModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
-  oldDir->cd(m_histogramDirectoryName.c_str());//changing to the right directory
+  if (m_histogramDirectoryName != "") {
+    oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
+    oldDir->cd(m_histogramDirectoryName.c_str());//changing to the right directory
+  }
 
   if (m_offlineStudy) {
     hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;Time in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);
@@ -124,12 +125,12 @@ void PXDInjectionDQMModule::beginRun()
   hEOccAfterInjHER->Reset();
   hMaxOccAfterInjLER->Reset();
   hMaxOccAfterInjHER->Reset();
-  for (auto& a : hOccModAfterInjLER) a.second->Reset();
-  for (auto& a : hOccModAfterInjHER) a.second->Reset();
-  for (auto& a : hEOccModAfterInjLER) a.second->Reset();
-  for (auto& a : hEOccModAfterInjHER) a.second->Reset();
-  for (auto& a : hMaxOccModAfterInjLER) a.second->Reset();
-  for (auto& a : hMaxOccModAfterInjHER) a.second->Reset();
+  for (auto& a : hOccModAfterInjLER) if (a.second) a.second->Reset();
+  for (auto& a : hOccModAfterInjHER) if (a.second) a.second->Reset();
+  for (auto& a : hEOccModAfterInjLER) if (a.second) a.second->Reset();
+  for (auto& a : hEOccModAfterInjHER) if (a.second) a.second->Reset();
+  for (auto& a : hMaxOccModAfterInjLER) if (a.second) a.second->Reset();
+  for (auto& a : hMaxOccModAfterInjHER) if (a.second) a.second->Reset();
 }
 
 void PXDInjectionDQMModule::event()

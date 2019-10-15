@@ -24,23 +24,23 @@ import reconstruction
 
 
 class toCDCfromEclCKF(TrackingValidationRun):
+    """Validate the ecl seeded ckf"""
+    #: number of events to generate
     n_events = N_EVENTS
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
+    #: no background overlay
     root_input_file = '../EvtGenSimNoBkg.root'
 
     @staticmethod
     def finder_module(path):
+        """Only run the following (necessary) modules"""
         path.add_module('SetupGenfitExtrapolation',
                         energyLossBrems=False, noiseBrems=False)
-
-        path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracksSVD")
 
         reconstruction.add_ecl_modules(path)
 
         # needed for truth matching
-        # tracking.add_mc_track_finding(path)
-        # same thing as below
         path.add_module('TrackFinderMCTruthRecoTracks',
                         RecoTracksStoreArrayName="MCRecoTracks",
                         WhichParticles=[],
@@ -94,6 +94,7 @@ class toCDCfromEclCKF(TrackingValidationRun):
                         UseSVDHits=False,
                         UsePXDHits=False)
 
+    #: Define the user parameters for the track-finding module
     tracking_coverage = {
         'UsePXDHits': False,
         'UseSVDHits': False,
@@ -101,12 +102,17 @@ class toCDCfromEclCKF(TrackingValidationRun):
         'WhichParticles': [],
     }
 
-    # Already fitted in the finder_module
+    #: tracks will be already fitted by the modules above
     fit_tracks = False
+    #: But we need to tell the validation module to use the fit information
     use_fit_information = True
+    #: Include pulls in the validation output
     pulls = True
+    #: Include resolution information in the validation output
     resolution = True
+    #: name of the output ROOT file
     output_file_name = VALIDATION_OUTPUT_FILE
+    #: Store additional information in output file (like the full trees)
     extended = True
 
 

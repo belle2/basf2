@@ -15,8 +15,6 @@
 #include "cry/CRYSetup.h"
 
 #include <mdst/dataobjects/MCParticleGraph.h>
-#include <utility>
-#include <TRandom3.h>
 
 namespace Belle2 {
   /**

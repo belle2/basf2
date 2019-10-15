@@ -14,8 +14,6 @@
 #include <TObject.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/logging/Logger.h>
-#include <memory>
-
 
 namespace Belle2 {
 
@@ -81,8 +79,10 @@ namespace Belle2 {
       }
     }
 
+    /** is the VCELL valid*/
     bool isVCellOK(VxdID id, int vCellId) const { return isGateOK(id, vCellId / 4); }
 
+    /** set gate status of specific gate */
     void setGateGatedL2(int gate, bool gated)
     {
       if (gate < 0 || gate >= 192) {

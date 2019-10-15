@@ -19,6 +19,8 @@ CHANGES since release-01-02-11:
   + hasPulseShapeDiscrimination
   + hasTriggerClusterMatching
   + isTriggerCluster
+  + hasFailedFitTime
+  + hasFailedTimeResolution
   * getCovarianceMatrixAsArray removed
 - KlIds are added
 - SoftwareTriggerResult:

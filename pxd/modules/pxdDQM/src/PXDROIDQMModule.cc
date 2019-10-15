@@ -15,7 +15,6 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
 using namespace Belle2::VXD;
-using boost::format;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -40,8 +39,10 @@ PXDROIDQMModule::PXDROIDQMModule() : HistoModule() , m_vxdGeometry(VXD::GeoCache
 void PXDROIDQMModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
-  oldDir->cd(m_histogramDirectoryName.c_str());//changing to the right directory
+  if (m_histogramDirectoryName != "") {
+    oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
+    oldDir->cd(m_histogramDirectoryName.c_str());//changing to the right directory
+  }
 
   hrawROIcount = new TH1F("hrawROIcount", "ROI count;Nr per Event", 250, 0, 250);
   hrawROItype = new TH1F("hrawROItype", "ROI type;Nr per Event", 2, 0, 2);

@@ -19,6 +19,7 @@ class TestGetComparison(unittest.TestCase):
 
     def setUp(self):
         """ Set up testing of get_comparison """
+        #: Mapping test case -> Metaoptions
         self.test_options = {
             "chi2": "",
             "kolmogorov": "kolmogorov",

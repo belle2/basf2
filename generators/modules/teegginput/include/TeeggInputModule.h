@@ -18,13 +18,9 @@
 #include <generators/teegg/Teegg.h>
 #include <generators/utilities/InitialParticleGeneration.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <vector>
-#include <TFile.h>
-#include <TNtuple.h>
-
 
 namespace Belle2 {
 

@@ -7,7 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
 
 #include <tracking/trackFindingCDC/hough/algorithms/InPhi0CurvBox.h>
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>

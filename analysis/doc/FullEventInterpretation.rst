@@ -318,7 +318,7 @@ Specific FEI Training
     buildRestOfEvent('B+:sig', path=path)
     clean_roe_mask = ('CleanROE', 'dr < 2 and abs(dz) < 4', 'clusterE9E25 > 0.9 and clusterTiming < 50 and goodGamma == 1 and trackMatchType==0')
     appendROEMasks('B+:sig', [clean_roe_mask], path=path)
-    applyCuts('B+:sig', 'ROE_deltae(CleanROE) < 2.0 and ROE_mbc(CleanROE) > 4.8', path=path)
+    applyCuts('B+:sig', 'roeDeltae(CleanROE) < 2.0 and roeMbc(CleanROE) > 4.8', path=path)
      
     skimfilter = register_module('SkimFilter')
     skimfilter.param('particleLists', ['B+:sig'])
@@ -505,7 +505,7 @@ Specific FEI
    buildRestOfEvent('B+:sig', path=path)
    clean_roe_mask = ('CleanROE', 'dr < 2 and abs(dz) < 4', 'clusterE9E25 > 0.9 and clusterTiming < 50 and goodGamma == 1 and trackMatchType==0')
    appendROEMasks('B+:sig', [clean_roe_mask], path=path)
-   applyCuts('B+:sig', 'ROE_deltae(CleanROE) < 2.0 and ROE_mbc(CleanROE) > 4.8', path=path)
+   applyCuts('B+:sig', 'roeDeltae(CleanROE) < 2.0 and roeMbc(CleanROE) > 4.8', path=path)
     
    skimfilter = register_module('SkimFilter')
    skimfilter.param('particleLists', ['B+:sig'])
@@ -547,7 +547,7 @@ Specific FEI
    upsilon_roe = ('UpsilonROE', 'dr < 2 and abs(dz) < 4', 'goodBelleGamma == 1')
    appendROEMasks('Upsilon(4S):all', [upsilon_roe], path=path)
    applyCuts('Upsilon(4S):all', '-2.0 < missingMass < 4.0', path=path)
-   applyCuts('Upsilon(4S):all', 'ROE_eextra(UpsilonROE) <= 0.9', path=path)
+   applyCuts('Upsilon(4S):all', 'roeEextra(UpsilonROE) <= 0.9', path=path)
    applyCuts('Upsilon(4S):all', 'nROETracks(UpsilonROE) <= 4', path=path)
     
    # Best candidate selection - only one candidate per event
@@ -802,11 +802,6 @@ Resources, Publications etc.
       Thomas's master thesis. Describes the proof-of-concept implementation of the FEI in Belle II, this twiki page is in large parts copied from here.
 *    `Machine learning algorithms for the Belle II experiment and their validation on Belle data <https://publikationen.bibliothek.kit.edu/1000078149>`_
       Thomas's PhD thesis. 
-
-Old Documentation
-#################
-Documentation about FEI was migrated from our `confluence page <https://confluence.desy.de/pages/viewpage.action?pageId=35004501>`_.
-
 
 
 

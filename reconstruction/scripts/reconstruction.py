@@ -3,6 +3,8 @@
 
 from basf2 import *
 
+from ROOT import Belle2
+
 from geometry import check_components
 
 from svd import add_svd_reconstruction
@@ -27,7 +29,8 @@ import mdst
 
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
-                       use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=False):
+                       use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=False,
+                       nCDCHitsMax=6000, nSVDShaperDigitsMax=70000):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -48,10 +51,17 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param add_trigger_calculation: add the software trigger modules for monitoring (do not make any cut)
     :param reconstruct_cdst: run only the minimal reconstruction needed to produce the cdsts (raw+tracking+dE/dx)
+    :param nCDCHitsMax: the max number of CDC hits for an event to be reconstructed.
+    :param nSVDShaperDigitsMax: the max number of SVD shaper digits for an event to be reconstructed.
     """
 
     # Check components.
     check_components(components)
+
+    # Do not even attempt at reconstructing events w/ abnormally large occupancy.
+    empty_path = create_path()
+    doom = path.add_module("EventsOfDoomBuster", nCDCHitsMax=nCDCHitsMax, nSVDShaperDigitsMax=nSVDShaperDigitsMax)
+    doom.if_true(empty_path, AfterConditionPath.END)
 
     # Add modules that have to be run BEFORE track reconstruction
     add_pretracking_reconstruction(path,
@@ -73,7 +83,6 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     if reconstruct_cdst:
         add_dedx_modules(main_path)
         add_prune_tracks(main_path, components=components)
-
     else:
         # Add further reconstruction modules
         add_posttracking_reconstruction(path,
@@ -84,7 +93,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
 
         # Add the modules calculating the software trigger cuts (but not performing them)
         if add_trigger_calculation and (not components or (
-                "CDC" in components and "ECL" in components and "EKLM" in components and "BKLM" in components)):
+                "CDC" in components and "ECL" in components and "KLM" in components)):
             add_filter_software_trigger(path)
             add_skim_software_trigger(path)
 
@@ -329,13 +338,22 @@ def add_cdst_output(
         'TRGECLUnpackerEvtStores',
         'BKLMHit2ds',
         'TRGGRLUnpackerStore',
+        'CDCTriggerSegmentHits',
+        'CDCTrigger2DFinderTracks',
+        'CDCTrigger2DFinderClones',
+        'CDCTriggerNNInputSegmentHits',
+        'CDCTriggerNNInput2DFinderTracks',
+        'CDCTriggerNeuroTracks',
+        'CDCTriggerNeuroTracksInput',
+        'TRGGDLUnpackerStores',
         'TracksToBKLMHit2ds',
         'RecoHitInformations',
         'RecoHitInformationsToBKLMHit2ds',
         'EKLMAlignmentHits',
-        'TracksToEKLMAlignmentHits',
+        'TracksToEKLMHit2ds',
         'EKLMHit2ds',
         'EKLMDigits',
+        'EKLMHit2dsToEKLMDigits',
         'Muids',
         'TracksToMuids',
         'TracksToARICHLikelihoods',
@@ -428,7 +446,7 @@ def add_cluster_expert_modules(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     # klong id and cluster matcher, whcih also builds "cluster"
-    if components is None or ('EKLM' in components and 'BKLM' in components and 'ECL' in components):
+    if components is None or ('KLM' in components and 'ECL' in components):
         KLMClassifier = register_module('KLMExpert')
         path.add_module(KLMClassifier)
         ClusterMatch = register_module('ClusterMatcher')
@@ -450,35 +468,29 @@ def add_pid_module(path, components=None):
 
 def add_klm_modules(path, components=None):
     """
-    Add the (E/B)KLM reconstruction modules to the path.
+    Add the KLM reconstruction modules to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or 'EKLM' in components:
+    if components is None or 'KLM' in components:
         eklm_rec = register_module('EKLMReconstructor')
         path.add_module(eklm_rec)
-
-    # BKLM reconstruction
-    if components is None or 'BKLM' in components:
         bklm_rec = register_module('BKLMReconstructor')
         path.add_module(bklm_rec)
-
-    # K0L reconstruction
-    if components is None or ('BKLM' in components and 'EKLM' in components):
-        klm_k0l_rec = register_module('KLMK0LReconstructor')
-        path.add_module(klm_k0l_rec)
+        klm_clusters_rec = register_module('KLMClustersReconstructor')
+        path.add_module(klm_clusters_rec)
 
 
 def add_klm_mc_matcher_module(path, components=None):
     """
-    Add the (E/B)KLM mc matcher module to the path.
+    Add the KLM mc matcher module to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
     # MC matching
-    if components is None or 'BKLM' in components or 'EKLM' in components:
+    if components is None or 'KLM' in components:
         klm_mc = register_module('MCMatcherKLMClusters')
         path.add_module(klm_mc)
 
@@ -491,7 +503,7 @@ def add_muid_module(path, add_hits_to_reco_track=False, components=None):
     :param add_hits_to_reco_track: Add the found KLM hits also to the RecoTrack. Make sure to refit the track afterwards.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or 'BKLM' in components and 'EKLM' in components:
+    if components is None or 'KLM' in components:
         muid = register_module('Muid', addHitsToRecoTrack=add_hits_to_reco_track)
         path.add_module(muid)
 

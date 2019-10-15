@@ -29,9 +29,11 @@ DecayDescriptor::DecayDescriptor() :
   m_mother(),
   m_iDaughter_p(-1),
   m_daughters(),
-  m_isIgnorePhotons(false),
+  m_isIgnoreRadiatedPhotons(false),
   m_isIgnoreIntermediate(false),
-  m_isInclusive(false),
+  m_isIgnoreMassive(false),
+  m_isIgnoreNeutrino(false),
+  m_isIgnoreGamma(false),
   m_isNULL(false)
 {
 }
@@ -54,10 +56,8 @@ bool DecayDescriptor::init(const DecayString& s)
   // a) DecayStringParticleList
   // b) DecayStringDecay
 
-  bool isInitOK = false;
-
   if (const DecayStringParticle* p = boost::get< DecayStringParticle >(&s)) {
-    isInitOK = m_mother.init(*p);
+    bool isInitOK = m_mother.init(*p);
     if (!isInitOK) {
       B2WARNING("Could not initialise mother particle " << p->m_strName);
       return false;
@@ -65,25 +65,28 @@ bool DecayDescriptor::init(const DecayString& s)
     return true;
   } else if (const DecayStringDecay* d = boost::get< DecayStringDecay > (&s)) {
     // Initialise list of mother particles
-    isInitOK = m_mother.init(d->m_mother);
+    bool isInitOK = m_mother.init(d->m_mother);
     if (!isInitOK) {
       B2WARNING("Could not initialise mother particle " << d->m_mother.m_strName);
       return false;
     }
 
     // Identify arrow type
-    if (d->m_strArrow == "->") {
-      m_isIgnorePhotons = false;
-      m_isIgnoreIntermediate = false;
-    } else if (d->m_strArrow == "=>") {
-      m_isIgnorePhotons = true;
-      m_isIgnoreIntermediate = false;
-    } else if (d->m_strArrow == "-->") {
-      m_isIgnorePhotons = false;
+    if (d->m_strArrow == "->" or d->m_strArrow == "-->"  or d->m_strArrow == "=>"  or d->m_strArrow == "==>") {
+      m_isIgnoreRadiatedPhotons = true;
       m_isIgnoreIntermediate = true;
-    } else if (d->m_strArrow == "==>") {
-      m_isIgnorePhotons = true;
+      if (d->m_strArrow == "-->"  or d->m_strArrow == "=>"  or d->m_strArrow == "==>") {
+        B2WARNING("Use of " << d->m_strArrow << " will be deprecated in release-05, please consider to use ->.");
+      }
+    } else if (d->m_strArrow == "=norad=>") {
+      m_isIgnoreRadiatedPhotons = false;
       m_isIgnoreIntermediate = true;
+    } else if (d->m_strArrow == "=direct=>") {
+      m_isIgnoreRadiatedPhotons = true;
+      m_isIgnoreIntermediate = false;
+    } else if (d->m_strArrow == "=exact=>") {
+      m_isIgnoreRadiatedPhotons = false;
+      m_isIgnoreIntermediate = false;
     } else {
       B2WARNING("Unknown arrow: " << d->m_strArrow);
       return false;
@@ -101,7 +104,21 @@ bool DecayDescriptor::init(const DecayString& s)
       }
       m_daughters.push_back(daughter);
     }
-    if (!d->m_strInclusive.empty()) m_isInclusive = true;
+
+    // Initialise list of keywords
+    // For neutrino
+    if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?nu")) !=  d->m_keywords.end()) {
+      m_isIgnoreNeutrino = true;
+    }
+    // For gamma
+    if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?gamma")) != d->m_keywords.end()) {
+      m_isIgnoreGamma = true;
+    }
+    // For massive FSP
+    if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "...")) != d->m_keywords.end()) {
+      m_isIgnoreMassive = true;
+    }
+
     return true;
   }
   return false;
@@ -172,7 +189,8 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
       int iPDGCode_daughter_p = 0;
       if (const auto* part_test = dynamic_cast<const Particle*>(daughter)) iPDGCode_daughter_p = part_test->getPDGCode();
       else if (const auto* mc_test = dynamic_cast<const MCParticle*>(daughter)) iPDGCode_daughter_p = mc_test->getPDG();
-      if (iDaughter_d == 0 && m_isIgnorePhotons && iPDGCode_daughter_p == 22) matches_global.insert(jDaughter_p);
+      if (iDaughter_d == 0 && (m_isIgnoreRadiatedPhotons or m_isIgnoreGamma)
+          && iPDGCode_daughter_p == 22) matches_global.insert(jDaughter_p);
       int iMatchResult = m_daughters[iDaughter_d].match(daughter, jDaughter_p);
       if (iMatchResult < 0) isAmbiguities = true;
       if (abs(iMatchResult) == 2 && iCC == 1) continue;
@@ -189,7 +207,7 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
   }
 
   // Now, all daughters of the particles should be matched to at least one DecayDescriptor daughter
-  if (!m_isInclusive && int(matches_global.size()) != nDaughters_p) return 0;
+  if (!(m_isIgnoreIntermediate or m_isIgnoreMassive or m_isIgnoreNeutrino) && int(matches_global.size()) != nDaughters_p) return 0;
 
   // In case that there are DecayDescriptor daughters with multiple matches, try to solve the problem
   // by removing the daughter candidates which are already used in other unambigous relations.

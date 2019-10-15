@@ -24,6 +24,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 
 #include <string>
 #include <TTree.h>
@@ -88,6 +89,12 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_recoTracks; /*<<RecoTracks store array*/
     StoreArray<Track> m_Tracks; /**<Tracks store array*/
     StoreArray<TrackFitResult> m_tfr; /**<TrackFitResult store array*/
+
+    /** Storage for SVDEventInfo object */
+    StoreObjPtr<SVDEventInfo> m_storeSVDEvtInfo;
+
+    /** Name of the SVDEventInfo object */
+    std::string m_svdEventInfoName;
 
     int m_ntracks = 0; /**<numner of tracks*/
 

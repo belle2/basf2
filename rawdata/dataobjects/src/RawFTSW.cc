@@ -50,9 +50,6 @@ void RawFTSW::SetVersion()
             m_buffer[ POS_HEADER_SIZE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     B2FATAL(err_buf);
-  } else if (m_buffer[ POS_NODE_FORMAT_ID ] == FORMAT_ID_VER_0TO3) { // Add on Aug. 20, 2019
-    m_access = new RawFTSWFormat_latest;
-    m_version = 3; // as of 2019.3.20 the latest version is 3.
   } else if (m_buffer[ POS_NODE_FORMAT_ID ] == FORMAT_ID_VER_0TO2) {
     if (m_buffer[ POS_HEADER_SIZE ] == VER_2_HEADER_SIZE) {
       m_access = new RawFTSWFormat_v2;
@@ -62,23 +59,41 @@ void RawFTSW::SetVersion()
       m_version = 1;
     } else {
       char err_buf[500];
-      sprintf(err_buf, "[FATAL] ERROR_EVENT : Invalid header size of FTSW data format(= 0x%.8x words). Exiting...\n %s %s %d\n",
+      sprintf(err_buf, "[FATAL] ERROR_EVENT : Invalid RawFTSW header size of FTSW data format(= 0x%.8x words). Exiting...\n %s %s %d\n",
               m_buffer[ POS_HEADER_SIZE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf); fflush(stdout);
       B2FATAL(err_buf);
     }
+  } else if (m_buffer[ POS_NODE_FORMAT_ID ] == FORMAT_ID_VER_0TO3 ||
+             m_buffer[ POS_NODE_FORMAT_ID ] == 0x54544432 ||
+             m_buffer[ POS_NODE_FORMAT_ID ] == 0x54544433 ||
+             m_buffer[ POS_NODE_FORMAT_ID ] == 0x54544434 ||
+             m_buffer[ POS_NODE_FORMAT_ID ] == 0x54544435 ||
+             m_buffer[ POS_NODE_FORMAT_ID ] == 0x54544436 ||
+             m_buffer[ POS_NODE_FORMAT_ID ] == 0x54544437 ||
+             m_buffer[ POS_NODE_FORMAT_ID ] == 0x54544438 ||
+             m_buffer[ POS_NODE_FORMAT_ID ] == 0x54544439) {
+    // Request from Nakao-san in Oct. 15, 2019
+    // - FORMAT_ID_VER_0TO3 should be changed to x"54544431" from x"5454421"
+    // - RawFTSWFormat_latest should accept newer format versions(= larger version number), so that this unpacker
+    //    will not stop due to version error, when Nakao-san updated version number in RawFTSW data.
+    // -- Since the latest format is basically the addition of some variables in RawFTSW data, probably it won't cause the problem.
+    m_access = new RawFTSWFormat_latest;
+    m_version = 3; // as of 2019.3.20 the latest version is 3.
   } else {
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] ERROR_EVENT : Invalid header size of FTSW data format(= 0x%.8x words). Exiting...\n %s %s %d\n",
-            m_buffer[ POS_HEADER_SIZE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sprintf(err_buf,
+            "[FATAL] ERROR_EVENT : Invalid RawFTSW header size(= 0x%.8x words) or version number.(=0x%.8x) Exiting...\n %s %s %d\n",
+            m_buffer[ POS_HEADER_SIZE ], m_buffer[ POS_NODE_FORMAT_ID ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     B2FATAL(err_buf);
   }
 
+
   if (temp_version >= 0 && temp_version != m_version) {
     char err_buf[500];
     sprintf(err_buf,
-            "[FATAL] Already assigned RawFTSW format version (= %.8x) is different from the one (= %.8x) from the current event. Exiting...\n %s %s %d\n",
+            "[FATAL] Already assigned RawFTSW format version (= %.8x) is different from the one (= 0x%.8x) from the current event. Exiting...\n %s %s %d\n",
             temp_version, m_version, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     B2FATAL(err_buf);

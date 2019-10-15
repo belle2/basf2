@@ -65,7 +65,6 @@ namespace VXDTFtwoHitFilterTest {
     VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, X, Y, Z);
 
     PXDCluster aCluster = PXDCluster(aVxdID, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
-    SpacePoint testPoint = SpacePoint(&aCluster, &sensorInfoBase);
 
     return SpacePoint(&aCluster, &sensorInfoBase);
   }
@@ -277,48 +276,8 @@ namespace VXDTFtwoHitFilterTest {
     filter.accept(x3, x1);
     EXPECT_EQ(0 , myCounter.used);
 
-
-    /** this following lines are just used for testing and do nothing! */
-    double b = 12.;
-    if (b == 3) b = 123.;
   }
 
-
-
-  /** ignore what is written in this test, is simply used as a temporary storage for currently not used code-snippets */
-  TEST_F(TwoHitFilterTest, ignoreMe)
-  {
-    //garbage:
-    //  VectorOfObservers<Distance3DSquared>::addObserver(CountingObserver::notify);
-    //  auto storeFunc = std::bind((void(*)(const SpacePoint&, const SpacePoint&, const Belle2::Distance3DSquared&, float))&CountingObserver::notify, std::placeholders::_1, std::placeholders::_2, Distance3DSquared(), std::placeholders::_3);
-//  auto storeFunc1 = std::bind(void(*)(const typename Distance3DSquared::argumentType&, const typename Distance3DSquared::argumentType&, const Distance3DSquared&, typename Distance3DSquared::variableType) /*&CountingObserver::notify*/), std::placeholders::_1, std::placeholders::_2, Distance3DSquared(), std::placeholders::_3);
-
-//  ObserverVector<Distance3DSquared>::sm_collectedObservers.push_back(storeFunc);
-    //  ObserverVector<Distance3DSquared>::sm_collectedObservers.push_back(std::bind((void(*)(const SpacePoint&, const SpacePoint&, const Belle2::Distance3DSquared&, float))&CountingObserver::notify, std::placeholders::_1, std::placeholders::_2, Distance3DSquared(), std::placeholders::_3));
-    // std::vector< typename ObserverVector<FilterType>::observerFunction >();
-    //     ObserverVector<VectorOfObservers>::sm_collectedObservers = std::vector< typename VectorOfObservers<Distance3DSquared>::observerFunction >();
-//  ErrorObserver anErrorBla();
-    //  WarningObserver aWarningBla();
-    //  ObserverVector<Distance3DSquared>::addObserver(aWarningBla/*, filterBla*/);
-    //  ObserverVector<Distance3DSquared>::addObserver(aBla/*, filterBla*/);
-    // // // // // //   Distance3DSquared filterBla();
-
-    /** a tiny CollectedObservers class for CollectedObservers stuff */
-//   template<class FilterType> class CollectedObservers {
-//   public:
-//  typedef std::function< void (const typename FilterType::argumentType&, const typename FilterType::argumentType&, const FilterType&, typename FilterType::variableType)> observerFunction;
-//
-//  /** collects observers to be executed during notify */
-//  static std::vector< observerFunction > collectedObservers;
-//  CollectedObservers() {};
-//  ~CollectedObservers() {};
-//   };
-
-    //  static void addObserver( CountingObserver& newObserver) {
-//    //  static void addObserver(observerFunction newObserver) {
-//    ObserverVector<FilterType>::sm_collectedObservers.push_back(std::bind(&newObserver::notify, std::placeholders::_1, std::placeholders::_2, FilterType(), std::placeholders::_3));
-//  }
-  }
 
 
   /** presents the functionality of the SpacePoint-creating function written above */
@@ -518,8 +477,6 @@ namespace VXDTFtwoHitFilterTest {
     EXPECT_FALSE(filter.accept(x1, x2));
     EXPECT_EQ(1 , myCounter.used);
 
-    // creates a false positive as the reference of bypassControl is used in the filter which is not recognized by cppcheck
-    // cppcheck-suppress unreadVariable
     bypassControl = true;
     EXPECT_TRUE(filter.accept(x1, x2));
     EXPECT_EQ(2 , myCounter.used);
@@ -601,7 +558,6 @@ namespace VXDTFtwoHitFilterTest {
     );
 
     SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);
-    SpacePoint x2 = provideSpacePointDummy(1.0f , 0.0f, 0.0f);
     SpacePoint x3 = provideSpacePointDummy(2.0f , 0.0f, 0.0f);
 
     auto counter3D = counter<Distance3DSquared<SpacePoint>>();

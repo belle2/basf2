@@ -238,7 +238,7 @@ void SpacePoint2TrueHitConnectorModule::event()
         registerAllRelations(spacePoint, trueHitMap, detType);
       } else { // find THE ONE TrueHit (to rule them all, one TrueHit to find them all ...)
         // COULDDO: wrap this up in a function
-        pair<VXDTrueHit*, double> trueHitwWeight = { nullptr, 0.0 };
+        pair<VXDTrueHit*, double> trueHitwWeight;
 
         if (detType == c_PXD) trueHitwWeight = getTHwithWeight<baseMapT, PXDTrueHit>(trueHitMap, m_PXDTrueHits, spacePoint, c_PXD);
         else trueHitwWeight = getTHwithWeight<baseMapT, SVDTrueHit>(trueHitMap, m_SVDTrueHits, spacePoint, c_SVD);

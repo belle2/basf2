@@ -65,7 +65,6 @@ namespace VXDTFfourHitFilterTest {
     VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, X, Y, Z);
 
     PXDCluster aCluster = PXDCluster(aVxdID, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
-    SpacePoint testPoint = SpacePoint(&aCluster, &sensorInfoBase);
 
     return SpacePoint(&aCluster, &sensorInfoBase);
   }

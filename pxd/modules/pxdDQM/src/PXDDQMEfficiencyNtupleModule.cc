@@ -39,19 +39,12 @@ PXDDQMEfficiencyNtupleModule::PXDDQMEfficiencyNtupleModule() : Module(), m_vxdGe
   addParam("recoTracksName", m_recoTracksName, "name of StoreArray with RecoTracks", std::string(""));
   addParam("tracksName", m_tracksName, "name of StoreArray with Tracks", std::string(""));
   addParam("ROIsName", m_ROIsName, "name of the list of HLT ROIs, if available in output", std::string(""));
-
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", true);
-
   addParam("pCut", m_pcut, "Set a cut on the track fit p-value (0=no cut)", double(0));
-
   addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
-
   addParam("momCut", m_momCut, "Set a cut on the track momentum in GeV/c, 0 disables", double(0));
-
   addParam("pTCut", m_pTCut, "Set a cut on the track pT in GeV/c, 0 disables", double(0));
-
   addParam("maskedDistance", m_maskedDistance, "Distance inside which no masked pixel or sensor border is allowed", int(10));
-
 }
 
 
@@ -218,7 +211,8 @@ void PXDDQMEfficiencyNtupleModule::event()
 
 
 
-TVector3 PXDDQMEfficiencyNtupleModule::getTrackInterSec(VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood,
+TVector3 PXDDQMEfficiencyNtupleModule::getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack,
+                                                        bool& isgood,
                                                         double& du, double& dv)
 {
   //will be set true if the intersect was found
@@ -278,7 +272,7 @@ TVector3 PXDDQMEfficiencyNtupleModule::getTrackInterSec(VXD::SensorInfoBase& pxd
 
 
 int
-PXDDQMEfficiencyNtupleModule::findClosestCluster(VxdID& avxdid, TVector3 intersection)
+PXDDQMEfficiencyNtupleModule::findClosestCluster(const VxdID& avxdid, TVector3 intersection)
 {
   int closest = -1;
   double mindist = 999999999999; //definitely outside of the sensor
@@ -323,7 +317,7 @@ bool PXDDQMEfficiencyNtupleModule::isCloseToBorder(int u, int v, int checkDistan
   return false;
 }
 
-bool PXDDQMEfficiencyNtupleModule::isDeadPixelClose(int u, int v, int checkDistance, VxdID& moduleID)
+bool PXDDQMEfficiencyNtupleModule::isDeadPixelClose(int u, int v, int checkDistance, const VxdID& moduleID)
 {
 
   //Iterate over square around the intersection to see if any close pixel is dead

@@ -71,13 +71,13 @@ namespace Belle2 {
       isgood: flag which is false if some error occured (do not use the point if false)
       du and dv are the uncertainties in u and v on the sensor plane of the fit (local coordinates)
      */
-    TVector3 getTrackInterSec(VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood, double& du, double& dv);
+    TVector3 getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood, double& du, double& dv);
     /** find the closest cluster*/
-    int findClosestCluster(VxdID& vxdid, TVector3 intersection);
+    int findClosestCluster(const VxdID& vxdid, TVector3 intersection);
     /** is it close to the border*/
     bool isCloseToBorder(int u, int v, int checkDistance);
     /** is a dead pixel close*/
-    bool isDeadPixelClose(int u, int v, int checkDistance, VxdID& moduleID);
+    bool isDeadPixelClose(int u, int v, int checkDistance, const VxdID& moduleID);
 
     /// if true alignment will be used!
     bool m_useAlignment;

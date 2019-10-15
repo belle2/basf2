@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas, Uwe                                              *
+ * Contributors: Bjoern Spruck                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -40,41 +40,26 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
   addParam("pxdClustersName", m_pxdClustersName, "name of StoreArray with PXD cluster", std::string(""));
   addParam("tracksName", m_tracksName, "name of StoreArray with RecoTracks", std::string(""));
   addParam("ROIsName", m_ROIsName, "name of the list of HLT ROIs, if available in output", std::string(""));
-
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("pxdeff"));
-
   addParam("binsU", m_u_bins, "histogram bins in u direction", int(4));
   addParam("binsV", m_v_bins, "histogram bins in v direction", int(6));
-
   addParam("distCut", m_distcut, "max distance in [cm] for cluster to be counted to a track", double(0.0500));
-
   addParam("pCut", m_pcut, "Set a cut on the track p-value", double(1e-20));
-
   addParam("requireROIs", m_requireROIs, "require tracks to lie inside a ROI", bool(false));
-
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(true));
-
   addParam("maskDeadPixels", m_maskDeadPixels, "Do not consider tracks going through known dead or hot pixels for the efficiency",
            bool(false));
-
   addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
-
   addParam("momCut", m_momCut, "Set a cut on the track momentum in GeV/c, 0 disables", double(0));
-
   addParam("pTCut", m_pTCut, "Set a cut on the track pT in GeV/c, 0 disables", double(1));
-
   addParam("cutBorders", m_cutBorders, "Do not use tracks near the borders of the sensor", bool(true));
-
   addParam("maskedDistance", m_maskedDistance, "Distance inside which no masked pixel or sensor border is allowed", int(10));
-
   addParam("trackUFactorDistCut", m_uFactor, "Set a cut on u error of track (factor*err<dist), 0 disables", double(2.0));
   addParam("trackVFactorDistCut", m_vFactor, "Set a cut on v error of track (factor*err<dist), 0 disables", double(2.0));
-
   addParam("z0minCut", m_z0minCut, "Set a cut z0 minimum in cm (large negativ value eg -9999 disables)", double(-1));
   addParam("z0maxCut", m_z0maxCut, "Set a cut z0 maximum in cm (large positiv value eg 9999 disables)", double(1));
   addParam("d0Cut", m_d0Cut, "Set a cut abs(d0) in cm (and negativ value eg -9999 disables)", double(0.5));
-
   addParam("verboseHistos", m_verboseHistos, "Add more verbose histograms for cuts (not for ereoc)", bool(false));
 }
 

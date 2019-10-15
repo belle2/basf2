@@ -92,6 +92,7 @@ namespace Belle2 {
     std::string m_recoTracksName;
     std::string m_tracksName;
     std::string m_ROIsName;
+    std::string m_PXDInterceptListName; /**< intercept list name*/
 
     StoreArray<PXDCluster> m_pxdclusters;
     StoreArray<RecoTrack> m_recoTracks;
@@ -107,9 +108,6 @@ namespace Belle2 {
 
     TFile* m_file{};
     TNtuple* m_tuple{};
-
-    PXDInterceptor* m_thePXDInterceptor = nullptr; /**< the pxd interceptor object*/
-    std::string m_PXDInterceptListName; /**< intercept list name*/
 
   };
 }

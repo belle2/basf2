@@ -39,6 +39,7 @@ PXDDQMEfficiencyNtuple2Module::PXDDQMEfficiencyNtuple2Module() : Module(), m_vxd
   addParam("recoTracksName", m_recoTracksName, "name of StoreArray with RecoTracks", std::string(""));
   addParam("tracksName", m_tracksName, "name of StoreArray with Tracks", std::string(""));
   addParam("ROIsName", m_ROIsName, "name of the list of HLT ROIs, if available in output", std::string(""));
+  addParam("PXDInterceptListName", m_PXDInterceptListName, "name of the list of interceptions", std::string(""));
 
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", true);
 
@@ -51,8 +52,6 @@ PXDDQMEfficiencyNtuple2Module::PXDDQMEfficiencyNtuple2Module() : Module(), m_vxd
   addParam("pTCut", m_pTCut, "Set a cut on the track pT in GeV/c, 0 disables", double(0));
 
   addParam("maskedDistance", m_maskedDistance, "Distance inside which no masked pixel or sensor border is allowed", int(10));
-
-  addParam("PXDInterceptListName", m_PXDInterceptListName, "name of the list of interceptions", std::string(""));
 }
 
 
@@ -90,7 +89,6 @@ void PXDDQMEfficiencyNtuple2Module::initialize()
   m_recoTracks.isOptional(m_recoTracksName);
   m_tracks.isOptional(m_tracksName);
   m_ROIs.isOptional(m_ROIsName);
-
   m_intercepts.isOptional(m_PXDInterceptListName);
 }
 

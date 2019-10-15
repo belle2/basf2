@@ -22,6 +22,8 @@
 #include <TROOT.h>
 
 #include <fstream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 using namespace Belle2;
@@ -96,13 +98,18 @@ void DQMHistAnalysisARICHModule::event()
     for (int i = 0; i < 72; i++) {
       int hit = m_h_mergerHit->GetBinContent(i + 1);
       if ((bool)hit ^ (bool)m_h_mergerHit->GetEntries()) {
-        alertMerger = 2;
-        break;
+        //only if the empty bin is not a masked merger, show alert.
+        auto itr = std::find(maskedMergers.begin(), maskedMergers.end(), i + 1);
+        if (itr == maskedMergers.end()) {
+          alertMerger = 2;
+          break;
+        }
       }
       if (hit > mean * 100 && alertMerger < 1) alertMerger = 1;
     }
     if (m_enableAlert && m_minStats < m_h_mergerHit->GetEntries()) m_c_mergerHit->SetFillColor(alertColor[alertMerger]);
 
+    //Draw lines divide the sectors
     for (int i = 0; i < 5; i++) {
       m_LineForMB[i]->DrawLine(12 * (i + 1) + 0.5, 0, 12 * (i + 1) + 0.5, gPad->GetUymax());
     }

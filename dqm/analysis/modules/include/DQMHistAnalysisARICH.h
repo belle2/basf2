@@ -19,6 +19,8 @@
 //ARICH
 #include <arich/utility/ARICHChannelHist.h>
 
+#include <vector>
+
 #include <TCanvas.h>
 #include <TLine.h>
 #include <TH2Poly.h>
@@ -96,6 +98,8 @@ namespace Belle2 {
     Belle2::ARICHChannelHist* m_apdHist = NULL; /**<ARICH TObject to draw hit map for each APD*/
     TH2Poly* m_apdPoly = NULL;  /**< hit map for each APD */
     TCanvas* m_c_apdHist = NULL; /**<Canvas for 2D hit map of APDs*/
+
+    std::vector<int> maskedMergers{53}; /**<The id numbers of masked merger boards to avoid unnecessary alert*/
   };
 
 } // Belle2 namespace

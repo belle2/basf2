@@ -42,13 +42,13 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    std::vector<std::tuple<std::string, std::string, std::string, std::vector<double>>> emptyROEMaskWithFractions;
+    std::vector<std::tuple<std::string, std::string, std::string>> emptyROEMask;
 
     addParam("particleList", m_particleList, "Name of the ParticleList");
 
-    addParam("ROEMasksWithFractions", m_ROEMasksWithFractions,
-             "List of (maskName, trackSelectionCut, eclClusterSelectionCut, ChargedStable fractions) tuples that specify all ROE masks of a specific particle to be created.",
-             emptyROEMaskWithFractions);
+    addParam("ROEMasks", m_ROEMasks,
+             "List of (maskName, trackSelectionCut, eclClusterSelectionCut) tuples that specify all ROE masks of a specific particle to be created.",
+             emptyROEMask);
 
     addParam("update", m_update, "Set true for updating a-priori charged stable fractions used in calculation of ROE 4-momentum",
              false);
@@ -62,13 +62,12 @@ namespace Belle2 {
     StoreArray<Particle> particles;
     particles.isRequired();
 
-    for (auto ROEMask : m_ROEMasksWithFractions) {
+    for (auto ROEMask : m_ROEMasks) {
       // parsing of the input tuple (maskName, trackSelectionCut, eclClusterSelectionCut, fractions)
 
       std::string maskName = get<0>(ROEMask);
       std::string trackSelection = get<1>(ROEMask);
       std::string eclClusterSelection = get<2>(ROEMask);
-      std::vector<double> fractions = get<3>(ROEMask);
 
       std::shared_ptr<Variable::Cut> trackCut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(trackSelection));
       std::shared_ptr<Variable::Cut> eclClusterCut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(eclClusterSelection));
@@ -76,7 +75,6 @@ namespace Belle2 {
       m_maskNames.push_back(maskName);
       m_trackCuts.insert(stringAndCutMap::value_type(maskName, trackCut));
       m_eclClusterCuts.insert(stringAndCutMap::value_type(maskName, eclClusterCut));
-      m_setOfFractions.insert(stringAndVectorMap::value_type(maskName, fractions));
 
       B2INFO("RestOfEventInterpreter added ROEMask with specific fractions under name \'" << maskName << "\' with track cuts: " <<
              trackSelection << " and eclCluster cuts: " << eclClusterSelection);
@@ -97,7 +95,6 @@ namespace Belle2 {
           roe->initializeMask(maskName, "ROEInterpreterModule");
         }
         roe->updateMaskWithCuts(maskName, m_trackCuts.at(maskName), m_eclClusterCuts.at(maskName), nullptr, m_update);
-        roe->updateChargedStableFractions(maskName, m_setOfFractions.at(maskName));
       }
     }
   }

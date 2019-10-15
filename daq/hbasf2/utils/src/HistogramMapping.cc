@@ -64,8 +64,7 @@ void HistogramMapping::operator+=(const HistogramMapping& rhs)
 
 void HistogramMapping::write() const
 {
-  for (const auto& keyValue : m_histograms) {
-    const auto& histogram = keyValue.second;
+  for (const auto& [key, histogram] : m_histograms) {
     histogram->SetDirectory(gDirectory);
     histogram->Write();
   }
@@ -83,10 +82,7 @@ bool HistogramMapping::empty() const
 
 void HistogramMapping::printMe() const
 {
-  for (const auto& keyValue : m_histograms) {
-    const auto& key = keyValue.first;
-    const auto& histogram = keyValue.second;
-
+  for (const auto& [key, histogram] : m_histograms) {
     B2INFO(key << ": " << histogram->GetName() << " -> " << histogram->GetEntries());
   }
 }
@@ -96,9 +92,7 @@ std::unique_ptr<Belle2::EvtMessage> HistogramMapping::toMessage() const
   Belle2::MsgHandler msgHandler;
 
   int objectCounter = 0;
-  for (const auto& keyValue : m_histograms) {
-    const auto& key = keyValue.first;
-    const auto& histogram = keyValue.second;
+  for (const auto& [key, histogram] : m_histograms) {
     msgHandler.add(histogram.get(), key);
     objectCounter++;
   }

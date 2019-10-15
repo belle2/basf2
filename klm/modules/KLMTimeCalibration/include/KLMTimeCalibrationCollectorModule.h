@@ -66,13 +66,13 @@ namespace Belle2 {
     void finish() override;
 
   private:
-    /** collect hits information for RPC of BKLM **/
+    /** collect hits information for RPC of BKLM */
     void collect_RPC(RelationVector<BKLMHit2d>);
 
-    /** collect hits information for scintillator of BKLM **/
+    /** collect hits information for scintillator of BKLM */
     void collect_scint(RelationVector<BKLMHit2d>);
 
-    /** collect hits information for scintillator of EKLM **/
+    /** collect hits information for scintillator of EKLM */
     void collect_scint_end(RelationVector<EKLMHit2d>);
 
     /** debug flag */
@@ -98,24 +98,31 @@ namespace Belle2 {
     /** Transformation data. */
     EKLM::TransformData* m_TransformData;
 
+    /** KLM element numbers pointer */
     const KLMElementNumbers* m_elementNum;
 
-    /** monitor histograms */
+    /**
+     * Monitor histograms
+     */
+    /** Event T0 distribution before track selection */
     TH1D* h_eventT0_0;
+    /** Event T0 distribution after track selection */
     TH1D* h_eventT0_1;
+    /** Number of tracks */
     TH1I* h_numTrack;
-
+    /** Number of BKLM hits related to track */
     TH1I* h_nBHit2dOfTrack;
+    /** Number of EKLM hits related to track */
     TH1I* h_nEHit2dOfTrack;
-
+    /** Difference between Global and Local position */
     TH1D* h_positionDiff;
     TH1D* h_positionXDiff;
     TH1D* h_positionYDiff;
     TH1D* h_positionZDiff;
-
+    /** Particle flying time versus detector layers */
     TH2D* h_flyTimeB;
     TH2D* h_flyTimeE;
-
+    /** Sum number of digits collected */
     TH1I* h_numDigit_scint_end;
     TH1I* h_numDigit_scint;
     TH1I* h_numDigit_rpc;

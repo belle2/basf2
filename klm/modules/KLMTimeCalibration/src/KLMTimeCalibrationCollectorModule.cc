@@ -78,13 +78,15 @@ KLMTimeCalibrationCollectorModule::~KLMTimeCalibrationCollectorModule()
 void KLMTimeCalibrationCollectorModule::prepare()
 {
   setDescription("Preparation for BKLM TimeCalibration Collector Module.");
+
+  /** Geommetry objects initialize. */
   m_geoParB = GeometryPar::instance();
   m_geoParE = &(EKLM::GeometryData::Instance());
   m_TransformData = new EKLM::TransformData(true, EKLM::TransformData::c_None);
   m_elementNum = &(KLMElementNumbers::Instance());
 
+  /** Require input dataobjects. */
   m_tracks.isRequired();
-
   m_eventT0.isRequired("EventT0");
 
   m_outTree = new TTree("time_calibration_data", "");
@@ -98,11 +100,6 @@ void KLMTimeCalibrationCollectorModule::prepare()
   m_outTree->Branch("eDep",      &m_ev.eDep,      "eDep/D");
   m_outTree->Branch("nPE",       &m_ev.nPE,       "nPE/D");
   m_outTree->Branch("channelId", &m_ev.channelId, "channelId/I");
-  //m_outTree->Branch("forward",   &m_ev.forward,   "forward/I");
-  //m_outTree->Branch("sector",    &m_ev.sector,    "sector/I");
-  //m_outTree->Branch("layer",     &m_ev.layer,     "layer/I");
-  //m_outTree->Branch("plane",     &m_ev.plane,     "plane/I");
-  //m_outTree->Branch("strip",     &m_ev.strip,     "strip/I");
   m_outTree->Branch("inRPC",     &m_ev.inRPC,     "inRPC/O");
   m_outTree->Branch("isFlipped", &m_ev.isFlipped, "isFlipped/O");
 
@@ -148,19 +145,21 @@ void KLMTimeCalibrationCollectorModule::prepare()
 
 void KLMTimeCalibrationCollectorModule::collect()
 {
-  B2INFO("Time Calibration Collector: collect begins");
-
+  setDescription("Time Calibration Collector. Main Collect Function of Collector Module Begins.");
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
 
+  /** Require event T0 determined from CDC */
   if (!m_eventT0.isValid()) return;
   if (!m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) return;
-
   const std::vector<EventT0::EventT0Component> evtT0C = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
+
+  /** Read data meta infor */
   int runId = eventMetaData->getRun();
   int evtId = eventMetaData->getEvent();
 
   m_ev.t0 = evtT0C.back().eventT0;
   getObjectPtr<TH1D>("h_evtT0_0")->Fill(m_ev.t0);
+
   unsigned n_track =  m_tracks.getEntries();
   if (n_track < 1) {
     B2DEBUG(20, "No necessary tracks in" << LogVar("run", runId) << LogVar("event", evtId));
@@ -175,6 +174,7 @@ void KLMTimeCalibrationCollectorModule::collect()
   /** Here begins the ext track sequence */
   B2DEBUG(20, "Track loop begins");
 
+  /** Main loop */
   for (unsigned iT = 0; iT < n_track; ++iT) {
     // Good track selection
     Track* track = m_tracks[iT];
@@ -195,12 +195,12 @@ void KLMTimeCalibrationCollectorModule::collect()
     getObjectPtr<TH1I>("h_nHit2d_bklm")->Fill(int(bklmHit2ds.size()));
     getObjectPtr<TH1I>("h_nHit2d_eklm")->Fill(int(eklmHit2ds.size()));
 
-    if (iT < 10) {
-      B2INFO("Track" << LogVar("exthits", extHits.size())
-             << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
-    }
+    B2DEBUG(20, "Track" << LogVar("exthits", extHits.size())
+            << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
     if (eklmHit2ds.size() < 2 && bklmHit2ds.size() < 2) continue;
+    if (extHits.size() < 2) continue;
 
+    // Loop for extroplate hits
     map_extHits.clear();
     for (unsigned iE = 0; iE < extHits.size(); ++iE) {
       ExtHit* extHit = extHits[iE];
@@ -226,7 +226,7 @@ void KLMTimeCalibrationCollectorModule::collect()
 
     B2DEBUG(20, "In KLM coverage: " << LogVar("exthits", map_extHits.size())
             << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
-    if (map_extHits.size() < 1) continue;
+    if (map_extHits.size() < 2) continue;
 
     collect_RPC(bklmHit2ds);
     collect_scint(bklmHit2ds);
@@ -236,11 +236,13 @@ void KLMTimeCalibrationCollectorModule::collect()
 
 void KLMTimeCalibrationCollectorModule::collect_scint_end(RelationVector<EKLMHit2d> hit2ds)
 {
+  setDescription("Time Calibration Collector. Collect Function for EKLM parts of Collector Module Begins.");
 
   const HepGeom::Transform3D* tr;
   HepGeom::Point3D<double> hitGlobal_extHit, hitLocal_extHit;
   double l;
   int iSub, iFor, iSec, iLay, iPla, iStr;
+  int iSubD, iForD, iSecD, iLayD, iPlaD, iStrD;
 
   for (unsigned i = 0; i < hit2ds.size(); ++i) {
     EKLMHit2d* hit2d = hit2ds[i];
@@ -258,6 +260,8 @@ void KLMTimeCalibrationCollectorModule::collect_scint_end(RelationVector<EKLMHit
       m_ev.channelId = m_elementNum->channelNumberEKLM(localID);
       m_ev.inRPC = 0;
 
+      m_elementNum->channelNumberToElementNumbers(m_ev.channelId, &iSubD, &iForD, &iSecD, &iLayD, &iPlaD, &iStrD);
+
       std::multimap<int, ExtHit*>::iterator it;
       ExtHit* extHit   = nullptr;
       ExtHit* entryHit = nullptr;
@@ -268,10 +272,16 @@ void KLMTimeCalibrationCollectorModule::collect_scint_end(RelationVector<EKLMHit
         m_elementNum->channelNumberToElementNumbers(copyid, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
         uint16_t globalID_extHit = m_elementNum->channelNumberEKLM(iFor, iSec, iLay, iPla, iStr);
 
-        B2INFO("EKLM element numbers check.\n" <<
-               "ExtHit copyID :: Digit channelID " << copyid << "  " << m_ev.channelId);
-
+        B2DEBUG(20, "EKLM element numbers check." << LogVar("copyID_extHit", copyid) << LogVar("globalID_extHit",
+                globalID_extHit) << LogVar("channelID", m_ev.channelId));
         if (m_ev.channelId != globalID_extHit) continue;
+        B2DEBUG(20, "EKLM element numbers check.\n" <<
+                "ExtHit Sub     :: Digit Sub       " << iSub   << "  " << iSubD << std::endl <<
+                "ExtHit Forward :: Digit Forward   " << iFor   << "  " << iForD << std::endl <<
+                "ExtHit Sector  :: Digit Sector    " << iSec   << "  " << iSecD << std::endl <<
+                "ExtHit Layer   :: Digit Layer     " << iLay   << "  " << iLayD << std::endl <<
+                "ExtHit Plane   :: Digit Plane     " << iPla   << "  " << iPlaD << std::endl <<
+                "ExtHit Channel :: Digit Channel   " << iStr   << "  " << iStrD);
 
         switch (extHit->getStatus()) {
           case EXT_ENTER:
@@ -371,10 +381,15 @@ void KLMTimeCalibrationCollectorModule::collect_scint(RelationVector<BKLMHit2d> 
           m_elementNum->channelNumberToElementNumbers(copyid, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
           uint16_t globalID_extHit = m_elementNum->channelNumberBKLM(iFor, iSec, iLay, iPla, iStr);
 
-          B2INFO("BKLM element numbers check (Scintillators).\n" <<
-                 "ExtHit copyID :: Digit channelID " << copyid << "  " << m_ev.channelId);
-
-          if (channelId_digit != globalID_extHit) continue;
+          B2DEBUG(20, "BKLM element numbers check. Scintillator Part." << LogVar("copyID_extHit", copyid) << LogVar("globalID_extHit",
+                  globalID_extHit) << LogVar("channelID", m_ev.channelId));
+          if (m_ev.channelId != globalID_extHit) continue;
+          B2DEBUG(20, "BKLM element numbers check. Scintillator Part.\n" <<
+                  "ExtHit Forward :: Digit Forward   " << iFor   << "  " << digitHit->getSection()   << std::endl <<
+                  "ExtHit Sector  :: Digit Sector    " << iSec   << "  " << digitHit->getSector()    << std::endl <<
+                  "ExtHit Layer   :: Digit Layer     " << iLay   << "  " << digitHit->getLayer()     << std::endl <<
+                  "ExtHit Plane   :: Digit Plane     " << iPla   << "  " << digitHit->isPhiReadout() << std::endl <<
+                  "ExtHit Channel :: Digit Channel   " << iStr   << "  " << digitHit->getStrip());
 
           switch (extHit->getStatus()) {
             case EXT_ENTER:
@@ -465,6 +480,10 @@ void KLMTimeCalibrationCollectorModule::collect_RPC(RelationVector<BKLMHit2d> bk
       extHit = it->second;
       int copyid = extHit->getCopyID();
       m_elementNum->channelNumberToElementNumbers(copyid, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
+      B2DEBUG(20, "BKLM element numbers check. RPC Part.\n" <<
+              "ExtHit Forward :: Digit Forward   " << iFor   << "  " << hit2d->getSection() << std::endl <<
+              "ExtHit Sector  :: Digit Sector    " << iSec   << "  " << hit2d->getSector()  << std::endl <<
+              "ExtHit Layer   :: Digit Layer     " << iLay   << "  " << hit2d->getLayer());
       if (iFor != hit2d->getSection() || iSec != hit2d->getSector() || iLay != hit2d->getLayer()) continue;
 
       switch (extHit->getStatus()) {
@@ -539,6 +558,10 @@ void KLMTimeCalibrationCollectorModule::collect_RPC(RelationVector<BKLMHit2d> bk
         uint16_t channelId_digit = m_elementNum->channelNumberBKLM(digitHit->getSection(), digitHit->getSector(), digitHit->getLayer(),
                                                                    digitHit->isPhiReadout(), digitHit->getStrip());
 
+        B2DEBUG(20, "BKLM element numbers check. RPC Part.\n" <<
+                "ExtHit Forward :: Digit Forward   " << iFor   << "  " << digitHit->getSection()   << std::endl <<
+                "ExtHit Sector  :: Digit Sector    " << iSec   << "  " << digitHit->getSector()    << std::endl <<
+                "ExtHit Layer   :: Digit Layer     " << iLay   << "  " << digitHit->getLayer());
         m_ev.recTime = digitHit->getTime();
         m_ev.dist = propaLength;
         m_ev.eDep = digitHit->getEDep();

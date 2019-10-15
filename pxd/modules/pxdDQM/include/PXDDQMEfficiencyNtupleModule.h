@@ -91,7 +91,7 @@ namespace Belle2 {
     std::string m_ROIsName; ///< name of the store array of ROIs
 
     StoreArray<PXDCluster> m_pxdclusters; ///< store array of pxd clusters
-    StoreArray<RecoTrack> m_tracks; ///< store array of tracks
+    StoreArray<Track> m_tracks; ///< store array of tracks
     StoreArray<RecoTrack> m_recoTracks;
     StoreArray<ROIid> m_ROIs; ///< store array of ROIs
 

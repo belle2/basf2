@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdDQM/PXDDQMEfficiencyNtuple2Module.h>
+#include <pxd/modules/pxdDQM/PXDDQMEfficiencyNtupleModule.h>
 #include <tracking/dataobjects/ROIid.h>
 
 #include <pxd/reconstruction/PXDPixelMasker.h>
@@ -21,13 +21,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDDQMEfficiencyNtuple2)
+REG_MODULE(PXDDQMEfficiencyNtuple)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDDQMEfficiencyNtuple2Module::PXDDQMEfficiencyNtuple2Module() : Module(), m_vxdGeometry(VXD::GeoCache::getInstance())
+PXDDQMEfficiencyNtupleModule::PXDDQMEfficiencyNtupleModule() : Module(), m_vxdGeometry(VXD::GeoCache::getInstance())
 {
   // Set module properties
   setDescription("Create basic histograms for PXD efficiency");
@@ -49,7 +49,7 @@ PXDDQMEfficiencyNtuple2Module::PXDDQMEfficiencyNtuple2Module() : Module(), m_vxd
 }
 
 
-void PXDDQMEfficiencyNtuple2Module::terminate()
+void PXDDQMEfficiencyNtupleModule::terminate()
 {
   auto dir = gDirectory;
   if (m_tuple) {
@@ -70,7 +70,7 @@ void PXDDQMEfficiencyNtuple2Module::terminate()
 }
 
 
-void PXDDQMEfficiencyNtuple2Module::initialize()
+void PXDDQMEfficiencyNtupleModule::initialize()
 {
   m_file = new TFile("test.root", "recreate");
   if (m_file) m_file->cd();
@@ -87,7 +87,7 @@ void PXDDQMEfficiencyNtuple2Module::initialize()
 }
 
 
-void PXDDQMEfficiencyNtuple2Module::event()
+void PXDDQMEfficiencyNtupleModule::event()
 {
   if (!m_pxdclusters.isValid()) {
     B2INFO("PXDClusters array is missing, no efficiencies");
@@ -223,9 +223,9 @@ void PXDDQMEfficiencyNtuple2Module::event()
 
 
 
-TVector3 PXDDQMEfficiencyNtuple2Module::getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack,
-                                                         bool& isgood,
-                                                         double& du, double& dv)
+TVector3 PXDDQMEfficiencyNtupleModule::getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack,
+                                                        bool& isgood,
+                                                        double& du, double& dv)
 {
   //will be set true if the intersect was found
   isgood = false;
@@ -284,7 +284,7 @@ TVector3 PXDDQMEfficiencyNtuple2Module::getTrackInterSec(const VXD::SensorInfoBa
 
 
 int
-PXDDQMEfficiencyNtuple2Module::findClosestCluster(const VxdID& avxdid, TVector3 intersection)
+PXDDQMEfficiencyNtupleModule::findClosestCluster(const VxdID& avxdid, TVector3 intersection)
 {
   int closest = -1;
   double mindist = 999999999999; //definitely outside of the sensor
@@ -319,7 +319,7 @@ PXDDQMEfficiencyNtuple2Module::findClosestCluster(const VxdID& avxdid, TVector3 
 
 }
 
-bool PXDDQMEfficiencyNtuple2Module::isCloseToBorder(int u, int v, int checkDistance)
+bool PXDDQMEfficiencyNtupleModule::isCloseToBorder(int u, int v, int checkDistance)
 {
 
   if (u - checkDistance < 0 || u + checkDistance >= 250 ||
@@ -329,7 +329,7 @@ bool PXDDQMEfficiencyNtuple2Module::isCloseToBorder(int u, int v, int checkDista
   return false;
 }
 
-bool PXDDQMEfficiencyNtuple2Module::isDeadPixelClose(int u, int v, int checkDistance, const VxdID& moduleID)
+bool PXDDQMEfficiencyNtupleModule::isDeadPixelClose(int u, int v, int checkDistance, const VxdID& moduleID)
 {
 
   //Iterate over square around the intersection to see if any close pixel is dead

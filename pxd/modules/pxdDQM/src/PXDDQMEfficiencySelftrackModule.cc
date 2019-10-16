@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdDQM/PXDDQMEfficiencyModule.h>
+#include <pxd/modules/pxdDQM/PXDDQMEfficiencySelftrackModule.h>
 #include <tracking/dataobjects/ROIid.h>
 
 #include <pxd/reconstruction/PXDPixelMasker.h>
@@ -22,13 +22,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDDQMEfficiency)
+REG_MODULE(PXDDQMEfficiencySelftrack)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(VXD::GeoCache::getInstance())
+PXDDQMEfficiencySelftrackModule::PXDDQMEfficiencySelftrackModule() : HistoModule(), m_vxdGeometry(VXD::GeoCache::getInstance())
 {
   // Set module properties
   setDescription("Create basic histograms for PXD efficiency");
@@ -64,7 +64,7 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 }
 
 
-void PXDDQMEfficiencyModule::initialize()
+void PXDDQMEfficiencySelftrackModule::initialize()
 {
   //calls the define histogram function
   REG_HISTOGRAM;
@@ -76,7 +76,7 @@ void PXDDQMEfficiencyModule::initialize()
   m_ROIs.isOptional(m_ROIsName);
 }
 
-void PXDDQMEfficiencyModule::beginRun()
+void PXDDQMEfficiencySelftrackModule::beginRun()
 {
   for (auto& h : m_h_track_hits) if (h.second) h.second->Reset();
   for (auto& h : m_h_matched_cluster) if (h.second) h.second->Reset();
@@ -90,7 +90,7 @@ void PXDDQMEfficiencyModule::beginRun()
   for (auto& h : m_h_sv2) if (h.second) h.second->Reset();
 }
 
-void PXDDQMEfficiencyModule::event()
+void PXDDQMEfficiencySelftrackModule::event()
 {
   if (!m_pxdclusters.isValid()) {
     B2INFO("PXDClusters array is missing, no efficiencies");
@@ -227,8 +227,9 @@ void PXDDQMEfficiencyModule::event()
 
 
 
-TVector3 PXDDQMEfficiencyModule::getTrackInterSec(VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood,
-                                                  double& du, double& dv)
+TVector3 PXDDQMEfficiencySelftrackModule::getTrackInterSec(VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack,
+                                                           bool& isgood,
+                                                           double& du, double& dv)
 {
   //will be set true if the intersect was found
   isgood = false;
@@ -286,7 +287,7 @@ TVector3 PXDDQMEfficiencyModule::getTrackInterSec(VXD::SensorInfoBase& pxdSensor
 }
 
 
-void PXDDQMEfficiencyModule::defineHisto()
+void PXDDQMEfficiencySelftrackModule::defineHisto()
 {
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
@@ -330,7 +331,7 @@ void PXDDQMEfficiencyModule::defineHisto()
 
 
 int
-PXDDQMEfficiencyModule::findClosestCluster(VxdID& avxdid, TVector3 intersection)
+PXDDQMEfficiencySelftrackModule::findClosestCluster(VxdID& avxdid, TVector3 intersection)
 {
   int closest = -1;
   double mindist = 999999999999; //definitely outside of the sensor
@@ -365,7 +366,7 @@ PXDDQMEfficiencyModule::findClosestCluster(VxdID& avxdid, TVector3 intersection)
 
 }
 
-bool PXDDQMEfficiencyModule::isCloseToBorder(int u, int v, int checkDistance)
+bool PXDDQMEfficiencySelftrackModule::isCloseToBorder(int u, int v, int checkDistance)
 {
 
   if (u - checkDistance < 0 || u + checkDistance >= 250 ||
@@ -375,7 +376,7 @@ bool PXDDQMEfficiencyModule::isCloseToBorder(int u, int v, int checkDistance)
   return false;
 }
 
-bool PXDDQMEfficiencyModule::isDeadPixelClose(int u, int v, int checkDistance, VxdID& moduleID)
+bool PXDDQMEfficiencySelftrackModule::isDeadPixelClose(int u, int v, int checkDistance, VxdID& moduleID)
 {
 
   //Iterate over square around the intersection to see if any close pixel is dead

@@ -38,14 +38,14 @@ namespace Belle2 {
    * Creates the basic histograms for PXD Efficiency DQM
    * Simplified and adopted version of the testbeam pxd efficiency module
    */
-  class PXDDQMEfficiencyNtuple2Module : public Module {
+  class PXDDQMEfficiencyNtupleModule : public Module {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    PXDDQMEfficiencyNtuple2Module();
+    PXDDQMEfficiencyNtupleModule();
 
   private:
 

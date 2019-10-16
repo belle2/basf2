@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Matic Lubej                                 *
+ * Contributors: Anze Zupanc, Matic Lubej, Sviatoslav Bilokin             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -59,7 +59,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe;
       if (not roe.isValid()) {
         B2WARNING("Please use isCloneOfSignalSide variable in for_each ROE loop!");
-        return -999.;
+        return std::numeric_limits<float>::quiet_NaN();
       }
       auto* particleMC = particle->getRelatedTo<MCParticle>();
       if (!particleMC) {
@@ -80,7 +80,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe;
       if (!roe.isValid()) {
         B2WARNING("Please use hasAncestorFromSignalSide variable in for_each ROE loop!");
-        return -999.;
+        return std::numeric_limits<float>::quiet_NaN();
       }
       auto* particleMC = particle->getRelatedTo<MCParticle>();
       if (!particleMC) {
@@ -123,7 +123,7 @@ namespace Belle2 {
         if (particle == nullptr)
         {
           B2ERROR("Relation between particle and ROE doesn't exist! currentROEIsInList() variable has to be called from ROE loop");
-          return -999.;
+          return std::numeric_limits<float>::quiet_NaN();
         }
         return particleList->contains(particle) ? 1 : 0;
 
@@ -142,13 +142,13 @@ namespace Belle2 {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 
         if (not roe.isValid())
-          return -999;
+          return std::numeric_limits<float>::quiet_NaN();
 
         auto* particle = roe->getRelatedFrom<Particle>();
         if (particle == nullptr)
         {
           B2ERROR("Relation between particle and ROE doesn't exist! particleRelatedToCurrentROE() variable has to be called from ROE loop");
-          return -999.;
+          return std::numeric_limits<float>::quiet_NaN();
         }
         return var->function(particle);
 
@@ -174,7 +174,7 @@ namespace Belle2 {
           if (roe == nullptr)
           {
             B2ERROR("Neither relation between particle and ROE doesn't exist nor ROE object has not been found!");
-            return -999.;
+            return std::numeric_limits<float>::quiet_NaN();
           }
           PCmsLabTransform T;
           TLorentzVector pRecoil = T.getBeamFourMomentum() - roe->get4Vector();
@@ -247,7 +247,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBeamFourMomentum();
@@ -262,7 +262,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBeamFourMomentum();
@@ -277,7 +277,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBeamFourMomentum();
@@ -293,7 +293,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBeamFourMomentum();
@@ -309,7 +309,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBeamFourMomentum();
@@ -325,7 +325,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBeamFourMomentum();
@@ -341,7 +341,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBeamFourMomentum();
@@ -357,7 +357,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBeamFourMomentum();
@@ -384,19 +384,19 @@ namespace Belle2 {
         const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
 
         if (!mcParticle)
-          return -999;
+          return std::numeric_limits<float>::quiet_NaN();
 
         // Get Mother
         const MCParticle* mcMother = mcParticle->getMother();
 
         if (!mcMother)
-          return -999;
+          return std::numeric_limits<float>::quiet_NaN();
 
         // Get daughters
         std::vector<MCParticle*> mcDaughters = mcMother->getDaughters();
 
         if (mcDaughters.size() != 2)
-          return -999;
+          return std::numeric_limits<float>::quiet_NaN();
 
         // Get the companion B meson
         MCParticle* mcROE = nullptr;
@@ -1085,7 +1085,7 @@ namespace Belle2 {
         TLorentzVector neutrino4vec = missing4Vector(particle, maskName, "1");
         TLorentzVector neutrino4vecLAB = missing4Vector(particle, maskName, "6");
 
-        double deltaE = -999.9;
+        double deltaE = std::numeric_limits<float>::quiet_NaN();
 
         // Definition 0: CMS
         if (opt == "0")
@@ -1133,7 +1133,7 @@ namespace Belle2 {
         TLorentzVector sig4vecLAB = particle->get4Vector();
         TLorentzVector neutrino4vec;
 
-        double mbc = -999.9;
+        double mbc = std::numeric_limits<float>::quiet_NaN();
 
         // Definition 0: CMS
         if (opt == "0")
@@ -1477,7 +1477,7 @@ namespace Belle2 {
       int n = particle->getNDaughters();
 
       if (n < 1)
-        return -999.9;
+        return std::numeric_limits<float>::quiet_NaN();
 
       // TODO: avoid hardocoded values
       for (unsigned i = 0; i < particle->getNDaughters(); i++) {
@@ -1509,7 +1509,7 @@ namespace Belle2 {
       int n = particle->getNDaughters();
 
       if (n < 1)
-        return -999.9;
+        return std::numeric_limits<float>::quiet_NaN();
 
       for (unsigned i = 0; i < particle->getNDaughters(); i++) {
         int absPDG = abs(particle->getDaughter(i)->getPDGCode());
@@ -1594,7 +1594,7 @@ namespace Belle2 {
         int n = particle->getNDaughters();
 
         if (n < 1)
-          return -999.9;
+          return std::numeric_limits<float>::quiet_NaN();
 
         // Assumes lepton is the last particle in the reco decay chain!
         PCmsLabTransform T;
@@ -1632,7 +1632,7 @@ namespace Belle2 {
         int n = particle->getNDaughters();
 
         if (n < 1)
-          return -999.9;
+          return std::numeric_limits<float>::quiet_NaN();
 
         PCmsLabTransform T;
         const Particle* lep = particle->getDaughter(n - 1);

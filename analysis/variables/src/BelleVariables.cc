@@ -61,24 +61,6 @@ namespace Belle2 {
         return 0.0;
     }
 
-    // Convenience function to obtain track d0 with respect to IP
-    // Based on v0DaughterD0 function in ParameterVariables.cc
-    double trackD0FromIP(const Particle* particle)
-    {
-      const Track* track = particle->getTrack();
-      if (!track) return 0.;
-
-      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(particle->getPDGCode())));
-      if (!trackFit) return 0.;
-
-      static DBObjPtr<BeamSpot> beamSpotDB;
-
-      UncertainHelix helix = trackFit->getUncertainHelix();
-      helix.passiveMoveBy(beamSpotDB->getIPPosition());
-
-      return helix.getD0();
-    }
-
     double goodBelleLambda(const Particle* Lambda)
     {
       if (Lambda->getNDaughters() != 2) {
@@ -95,30 +77,10 @@ namespace Belle2 {
         B2WARNING("goodBelleLambda is being applied to a candidate with PDG " << Lambda->getPDGCode());
       }
 
-      double p = particleP(Lambda);
-      double dr = std::min(abs(trackD0FromIP(d0)), abs(trackD0FromIP(d1)));
-      double zdist = v0DaughterZ0Diff(Lambda);
-      double dphi = acos(cosAngleBetweenMomentumAndVertexVectorInXYPlane(Lambda));
-      // Flight distance of Lambda0 in xy plane
-      double fl = particleDRho(Lambda);
-
-      // goodBelleLambda == 1 (optimized for proton PID > 0.6)
-      bool high1 = p >= 1.5 && abs(zdist) < 12.9 && dr > 0.008 && dphi < 0.09 && fl > 0.22;
-      bool mid1 = p >= 0.5 && p < 1.5 && abs(zdist) < 9.8 && dr > 0.01 && dphi < 0.18 && fl > 0.16;
-      bool low1 = p < 0.5 && abs(zdist) < 2.4 && dr > 0.027 && dphi < 1.2 && fl > 0.11;
-
-      // goodBelleLambda == 2 (optimized without PID selection)
-      bool high2 = p >= 1.5 && abs(zdist) < 7.7 && dr > 0.018 && dphi < 0.07 && fl > 0.35;
-      bool mid2 = p >= 0.5 && p < 1.5 && abs(zdist) < 2.1 && dr > 0.033 && dphi < 0.10 && fl > 0.24;
-      bool low2 = p < 0.5 && abs(zdist) < 1.9 && dr > 0.059 && dphi < 0.6 && fl > 0.17;
-
-      if (low2 || mid2 || high2) {
-        return 2.0;
-      } else if (low1 || mid1 || high1) {
-        return 1.0;
-      } else {
-        return 0.0;
-      }
+      if (Lambda->hasExtraInfo("goodLambda"))
+        return Lambda->getExtraInfo("goodLambda");
+      else
+        return 0.;
     }
 
 
@@ -162,11 +124,14 @@ It reproduces the ``goodLambda()`` function in Belle.
 
 ``goodBelleLambda`` selection 1 (selected with: ``goodBelleLambda>0``) should be used with ``atcPIDBelle(4,2) > 0.6``,
 and ``goodBelleLambda`` selecton 2 (``goodBelleLambda>1``) can be used without a proton PID cut. 
-The former cut is looser than the latter.". ``extraInfo(goodLambda)`` is recommended on Belle data
-since it retrieves the ``goodLambda`` information directly using Belle's ``LambaFinder`` class.
+The former cut is looser than the latter.". 
 
+Note:
+  This variable returns ``extraInfo(goodLambda)`` when it is available and 0.0 otherwise.
 
-See `BN-684`_ Lambda selection at Belle. K F Chen et al.
+See Also:
+  * `BN-684`_ Lambda selection at Belle. K F Chen et al.
+  * The ``FindLambda`` class can be found at ``/belle_legacy/findLambda/findLambda.h``
 
 .. _BN-684: https://belle.kek.jp/secured/belle_note/gn684/bn684.ps.gz
 

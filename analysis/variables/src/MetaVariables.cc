@@ -1216,6 +1216,7 @@ endloop:
         std::string cutString = arguments[0];
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
+        // cppcheck-suppress unreadVariable ; cppcheck has problems with lambda capture
         const Variable::Manager::Var* variableIfTrue = Manager::Instance().getVariable(arguments[1]);
         const Variable::Manager::Var* variableIfFalse = Manager::Instance().getVariable(arguments[2]);
 

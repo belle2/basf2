@@ -24,6 +24,8 @@
 class TH1D;
 class TH2D;
 
+#include <boost/optional.hpp>
+
 namespace Belle2 {
 
   /** Base class for Material Scans */

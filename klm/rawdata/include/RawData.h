@@ -10,8 +10,10 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/dataobjects/KLMDigitRaw.h>
+
+/* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {

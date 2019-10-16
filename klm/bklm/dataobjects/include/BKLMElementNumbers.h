@@ -14,9 +14,6 @@
 #include <cstdint>
 #include <string>
 
-/* Belle2 headers. */
-#include <klm/bklm/dataobjects/BKLMStatus.h>
-
 namespace Belle2 {
 
   /**
@@ -27,7 +24,7 @@ namespace Belle2 {
   public:
 
     /**
-     * Section symnolic constants.
+     * Constants for section numbers.
      */
     enum Section {
 
@@ -36,6 +33,43 @@ namespace Belle2 {
 
       /** Forward. */
       c_ForwardSection = 1,
+
+    };
+
+    /**
+     * Constants for sector numbers.
+     */
+    enum Sector {
+
+      /**
+       * Chimney sector:
+       * BB3 in 1-based notation;
+       * BB2 in 0-based notation.
+       */
+      c_ChimneySector = 3,
+
+    };
+
+    /**
+     * Constants for layer numbers.
+     */
+    enum Layer {
+
+      /** First RPC layer. */
+      c_FirstRPCLayer = 3,
+
+    };
+
+    /**
+     * Constants for plane numbers.
+     */
+    enum Plane {
+
+      /** Z. */
+      c_ZPlane = 0,
+
+      /** Phi. */
+      c_PhiPlane = 1,
 
     };
 
@@ -219,6 +253,30 @@ namespace Belle2 {
     static void layerGlobalNumberToElementNumbers(int layerGlobal, int* section, int* sector, int* layer);
 
     /**
+     * Get section number by module identifier.
+     */
+    static int getSectionByModule(int module)
+    {
+      return (module & BKLM_END_MASK) >> BKLM_END_BIT;
+    }
+
+    /**
+     * Get sector number by module identifier.
+     */
+    static int getSectorByModule(int module)
+    {
+      return ((module & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1;
+    }
+
+    /**
+     * Get layer number by module identifier.
+     */
+    static int getLayerByModule(int module)
+    {
+      return ((module & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1;
+    }
+
+    /**
      * Get plane number (0 = z, 1 = phi) by module identifier.
      */
     static int getPlaneByModule(int module)
@@ -234,6 +292,64 @@ namespace Belle2 {
       return ((module & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1;
     }
 
+    /**
+     * Set plane number in module identifier.
+     */
+    static void setPlaneInModule(int& module, int plane)
+    {
+      module = (module & (~BKLM_PLANE_MASK)) | (plane << BKLM_PLANE_BIT);
+    }
+
+    /**
+     * Set strip number in module identifier.
+     */
+    static void setStripInModule(int& module, int strip)
+    {
+      module = (module & (~BKLM_STRIP_MASK)) | ((strip - 1) << BKLM_STRIP_BIT);
+    }
+
+    /**
+     * Get module number by module identifier (the input identifier may contain
+     * other data).
+     */
+    static uint16_t getModuleByModule(int module)
+    {
+      return module & BKLM_MODULEID_MASK;
+    }
+
+    /**
+     * Get channel number by module identifier.
+     */
+    static uint16_t getChannelByModule(int module)
+    {
+      return module & BKLM_MODULESTRIPID_MASK;
+    }
+
+    /**
+     * Check whether the hits are from the same module.
+     */
+    static bool hitsFromSameModule(int module1, int module2)
+    {
+      return getModuleByModule(module1) == getModuleByModule(module2);
+    }
+
+    /**
+     * Check whether the hits are from the same plane.
+     */
+    static bool hitsFromSamePlane(int module1, int module2)
+    {
+      const int mask = BKLM_MODULEID_MASK | BKLM_PLANE_MASK;
+      return (module1 & mask) == (module2 & mask);
+    }
+
+    /**
+     * Check whether the hits are from the same channel.
+     */
+    static bool hitsFromSameChannel(int module1, int module2)
+    {
+      return getChannelByModule(module1) == getChannelByModule(module2);
+    }
+
   protected:
 
     /** Maximal section number (0-based). */
@@ -247,6 +363,54 @@ namespace Belle2 {
 
     /** Maximal plane number (0-based). */
     static constexpr int m_MaximalPlaneNumber = 1;
+
+    /** Bit position for strip-1 [0..47]. */
+    static constexpr int BKLM_STRIP_BIT = 0;
+
+    /**
+     * Bit position for plane-1 [0..1].
+     * 0 is inner-plane and phiReadout plane.
+     */
+    static constexpr int BKLM_PLANE_BIT = 6;
+
+    /** Bit position for layer-1 [0..14]; 0 is innermost. */
+    static constexpr int BKLM_LAYER_BIT = 7;
+
+    /**
+     * Bit position for sector-1 [0..7].
+     * 0 is on the +x axis and 2 is on the +y axis
+     */
+    static constexpr int BKLM_SECTOR_BIT = 11;
+
+    /** Bit position for detector end [0..1]; forward is 0. */
+    static constexpr int BKLM_END_BIT = 14;
+
+    /** Bit mask for strip-1 [0..47]. */
+    static constexpr int BKLM_STRIP_MASK = (63 << BKLM_STRIP_BIT);
+
+    /** Bit mask for plane-1 [0..1]; 0 is inner-plane and phiReadout plane, */
+    static constexpr int BKLM_PLANE_MASK = (1 << BKLM_PLANE_BIT);
+
+    /** Bit mask for layer-1 [0..15]; 0 is innermost and 14 is outermost. */
+    static constexpr int BKLM_LAYER_MASK = (15 << BKLM_LAYER_BIT);
+
+    /**
+     * Bit mask for sector-1 [0..7].
+     * 0 is on the +x axis and 2 is on the +y axis.
+     */
+    static constexpr int BKLM_SECTOR_MASK = (7 << BKLM_SECTOR_BIT);
+
+    /** Bit mask for detector end [0..1]; forward is 0. */
+    static constexpr int BKLM_END_MASK = (1 << BKLM_END_BIT);
+
+    /** Bit mask for module identifier. */
+    static constexpr int BKLM_MODULEID_MASK =
+      BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK;
+
+    /** Bit mask for module-and-strip identifier. */
+    static constexpr int BKLM_MODULESTRIPID_MASK =
+      BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK | BKLM_PLANE_MASK |
+      BKLM_STRIP_MASK;
 
   };
 

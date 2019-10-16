@@ -214,6 +214,7 @@ namespace Belle2::Conditions {
     // Save the current gDirectory
     TDirectory::TContext saveDir;
     // Change settings to create reproducible output files
+    // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
     auto scopegard = ScopeGuard::guardGetterSetter(&TDirectory::IsReproducible, &TDirectory::MakeReproducible, true);
     // And create the file ...
     std::unique_ptr<TFile> file{TFile::Open(fileName.c_str(), "RECREATE")};

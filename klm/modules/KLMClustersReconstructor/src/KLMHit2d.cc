@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/modules/KLMClustersReconstructor/KLMHit2d.h>
 
 using namespace Belle2;

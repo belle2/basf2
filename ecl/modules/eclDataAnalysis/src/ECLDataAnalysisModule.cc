@@ -373,6 +373,7 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclShowerMCFlightMatch(0),
     m_eclShowerMCFFlightMatch(0),
     m_eclShowerHighestE1mE2(0),
+    m_eclShowerNumberOfCrystalsForEnergy(0),
 //MC
     m_mcMultip(0),
     m_mcIdx(0),
@@ -803,6 +804,7 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclShowerMCFlightMatch",     "std::vector<int>",    &m_eclShowerMCFlightMatch);
   m_tree->Branch("eclShowerMCFFlightMatch",     "std::vector<int>",    &m_eclShowerMCFFlightMatch);
   m_tree->Branch("eclShowerHighestE1mE2",     "std::vector<double>",    &m_eclShowerHighestE1mE2);
+  m_tree->Branch("eclShowerNumberOfCrystalsForEnergy",     "std::vector<double>",    &m_eclShowerNumberOfCrystalsForEnergy);
 
   //MC Truth
   m_tree->Branch("mcMultip",     &m_mcMultip,           "mcMultip/I");
@@ -1079,6 +1081,7 @@ void ECLDataAnalysisModule::event()
   m_eclShowerMCFlightMatch->clear();
   m_eclShowerMCFFlightMatch->clear();
   m_eclShowerHighestE1mE2->clear();
+  m_eclShowerNumberOfCrystalsForEnergy->clear();
 
   ///Pure Digits
   if (m_doPureCsIStudy == true) {
@@ -1972,6 +1975,7 @@ void ECLDataAnalysisModule::event()
     m_eclShowerSecondMoment->push_back(aECLShowers->getSecondMoment());
     m_eclShowerE1oE9->push_back(aECLShowers->getE1oE9());
     m_eclShowerIsTrack->push_back(aECLShowers->getIsTrack());
+    m_eclShowerNumberOfCrystalsForEnergy->push_back(aECLShowers->getNumberOfCrystalsForEnergy());
 
     double fe = 0.;
     double se = 0.;

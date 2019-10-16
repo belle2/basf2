@@ -88,13 +88,8 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
   // Calculation of 3 different versions of a distance d for Chi Squared calculation
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> d = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1) * c + X * n;
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_trans = (d + d.cwiseProduct(X.col(2))) / sqrt(1 - n(2) * n(2));
-  // Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_r_phi = d_trans.cwiseQuotient((0.5 * X.col(2) / rho).array().asin().cos().matrix());
 
-  // Calculate Chi Squared for circle fit
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_over_sigma = W * d_trans;
-  Precision chi2 = d_over_sigma.transpose() * d_over_sigma;
-
-  // Temporary alternative calculation of chi2 for circle fit using Karimaeki circle fit
+  // calculation of chi2 for circle fit using Karimaeki circle fit
   Precision divisor = 1. / traceOfW;
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> unitvec = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1);
   Precision meanX = unitvec.transpose() * W * X.col(0);
@@ -145,8 +140,8 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
     pocaD = -pocaD;
   }
 
-  chi2 = traceOfW * (1. + pocaD / rho) * (1. + curvature * pocaD) *
-         (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2);
+  Precision chi2 = traceOfW * (1. + pocaD / rho) * (1. + curvature * pocaD) *
+                   (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2);
 
   // Line Fit for extension to Helix Fit
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> a = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1) * c + n(2) * X.col(2);
@@ -166,9 +161,6 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
                                                            1)).cwiseProduct(y_pos - X.col(1));
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> dist_neg = (x_neg - X.col(0)).cwiseProduct(x_neg - X.col(0)) + (y_neg - X.col(
                                                            1)).cwiseProduct(y_neg - X.col(1));
-
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> x_s = (dist_pos.cwiseEqual(dist_pos.cwiseMin(dist_neg))).select(x_pos, x_neg);
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> y_s = (dist_pos.cwiseEqual(dist_pos.cwiseMin(dist_neg))).select(y_pos, y_neg);
 
   // Arc length calculation
   Precision x_first = X.col(0)(0) - x0;

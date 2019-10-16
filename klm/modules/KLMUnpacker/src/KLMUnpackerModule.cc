@@ -8,15 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <cstdint>
+/* Own header. */
+#include <klm/modules/KLMUnpacker/KLMUnpackerModule.h>
 
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
-#include <klm/modules/KLMUnpacker/KLMUnpackerModule.h>
 #include <klm/rawdata/RawData.h>
+
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
+
+/* C++ headers. */
+#include <cstdint>
 
 using namespace std;
 using namespace Belle2;
@@ -222,25 +226,18 @@ void KLMUnpackerModule::unpackBKLMDigit(
     return;
   }
 
-  // moduleId counts are zero based
   int moduleId = *detectorChannel;
-  int layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
-  if ((layer < 2) && ((raw.triggerBits & 0x10) != 0))
+  int layer = BKLMElementNumbers::getLayerByModule(moduleId);
+  if ((layer < BKLMElementNumbers::c_FirstRPCLayer) && ((raw.triggerBits & 0x10) != 0))
     return;
-  int channel = (moduleId & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT;
-
-  if (layer > 14) {
-    B2DEBUG(20, "KLMUnpackerModule:: strange that the layer number is larger than 14 "
+  if (layer > BKLMElementNumbers::getMaximalLayerNumber()) {
+    B2DEBUG(20, "KLMUnpackerModule:: strange that the layer number is larger than 15 "
             << LogVar("Layer", layer));
     return;
   }
 
-  // still have to add channel and axis to moduleId
-  moduleId |= (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
-
   BKLMDigit* bklmDigit;
-  if (layer > 1) {
-    moduleId |= BKLM_INRPC_MASK;
+  if (layer >= BKLMElementNumbers::c_FirstRPCLayer) {
     klmDigitEventInfo->increaseRPCHits();
     // For RPC hits, digitize both the coarse (ctime) and fine (tdc) times relative
     // to the revo9 trigger time rather than the event header's TriggerCTime.

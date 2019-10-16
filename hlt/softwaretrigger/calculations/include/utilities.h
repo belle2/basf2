@@ -42,34 +42,6 @@ namespace Belle2 {
                             sqrt(positionSeed.Mag2() + Const::pionMass * Const::pionMass));
     }
 
-    /// Helper function to sort the entries in a store array by their energy.
-    template<class AListIterator>
-    static std::vector<double> getSortedEnergiesFrom(const AListIterator& begin, const AListIterator& end,
-                                                     const PCmsLabTransform& transformer)
-    {
-      std::vector<TLorentzVector> lorentzVectors;
-      lorentzVectors.reserve(std::distance(begin, end));
-
-      std::for_each(begin, end, [&](const auto & item) {
-        const TLorentzVector& fourVector = getFourVector(item);
-        lorentzVectors.push_back(transformer.rotateLabToCms() * fourVector);
-      });
-
-      std::sort(lorentzVectors.begin(), lorentzVectors.end(),
-      [](const TLorentzVector & lhs, const TLorentzVector & rhs) {
-        return lhs.Rho() > rhs.Rho();
-      });
-
-      std::vector<double> energies;
-      energies.reserve(lorentzVectors.size());
-
-      for (const TLorentzVector& lorentzVector : lorentzVectors) {
-        energies.push_back(lorentzVector.Energy());
-      }
-
-      return energies;
-    }
-
     /// Helper function to get "something" from a particle, where "something" depends on the different implementations.
     template<class AnEntityType>
     inline const AnEntityType* getElementFromParticle(const Particle& particle);

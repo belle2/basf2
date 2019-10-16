@@ -17,12 +17,10 @@
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/TxModule.h>
-#include <framework/logging/LogSystem.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <sys/wait.h>
-#include <unistd.h>
 
 #include <cstdlib>
 

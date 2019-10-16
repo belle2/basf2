@@ -74,14 +74,14 @@ class DownloadableDatabase:
         from ROOT import Belle2
         Belle2.DBStore.Instance().reset()
 
-        basf2.reset_database()
-        basf2.use_database_chain()
+        basf2.reset_database(False)
+        basf2.conditions.override_globaltags()
 
         for database in self._database:
             if os.path.exists(database):
-                basf2.use_local_database(database)
+                basf2.conditions.prepend_testing_payloads(database)
             else:
-                basf2.use_central_database(database)
+                basf2.conditions.prepend_globaltag(database)
 
         db_access.set_event_number(evt_number=0, run_number=int(self._run),
                                    exp_number=int(self._experiment))

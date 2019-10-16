@@ -56,19 +56,19 @@ namespace Belle2 {
      * circleFit
      * helixFit
      */
-    std::string m_EstimationMethod;
+    std::string m_EstimationMethod = "tripletFit";
 
-    /** sets the name of the expected StoreArray containing SpacePointTrackCands */
-    std::string m_SpacePointTrackCandsStoreArrayName;
+    /** Name of the expected StoreArray containing SpacePointTrackCands */
+    std::string m_SpacePointTrackCandsStoreArrayName = "SPTrackCands";
 
     /** identifier of weightfile in Database or local root/xml file */
-    std::string m_WeightFileIdentifier;
+    std::string m_WeightFileIdentifier = "tracking/data/VXDQE_weight_files/MVE_QE_weights_noTiming_03August2018.xml";
 
     /** whether to use timing information available in the weight file */
-    bool m_UseTimingInfo;
+    bool m_UseTimingInfo = false;
 
     /** how to compile information from clusters ['Average'] */
-    std::string m_ClusterInformation;
+    std::string m_ClusterInformation = "Average";
 
     // -------------------------
 

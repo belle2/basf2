@@ -15,4 +15,7 @@
 #pragma link C++ class Belle2::BKLMTrack+;
 #pragma link C++ class Belle2::BKLMDigitOutOfRange+;
 
+#pragma link C++ class Belle2::BKLMElementNumbers-;
+#pragma link C++ class Belle2::BKLMStatus-;
+
 #endif

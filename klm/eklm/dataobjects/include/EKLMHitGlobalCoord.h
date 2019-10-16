@@ -10,7 +10,7 @@
 
 #pragma once
 
-/* External headers. */
+/* ROOT headers. */
 #include <TVector3.h>
 
 namespace Belle2 {

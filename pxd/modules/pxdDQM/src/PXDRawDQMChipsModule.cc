@@ -12,6 +12,7 @@
 #include <vxd/geometry/GeoCache.h>
 
 #include <TDirectory.h>
+#include <boost/format.hpp>
 #include <string>
 
 using namespace std;

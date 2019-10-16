@@ -10,12 +10,12 @@
 
 #pragma once
 
-/* External headers. */
-#include <CLHEP/Geometry/Transform3D.h>
-
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/geometry/GeometryData.h>
+
+/* CLHEP headers. */
+#include <CLHEP/Geometry/Transform3D.h>
 
 /**
  * @file

@@ -10,6 +10,8 @@
 
 #include <framework/database/LocalMetadataProvider.h>
 
+#include <framework/logging/Logger.h>
+
 namespace Belle2::Conditions {
 
   LocalMetadataProvider::LocalMetadataProvider(std::string filename, const std::set<std::string>& usableTagStates):

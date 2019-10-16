@@ -268,9 +268,8 @@ namespace Belle2 {
 
     const CLHEP::Hep3Vector Module::getPropagationTimes(const CLHEP::Hep3Vector& local) const
     {
-      double dy = m_PhiPositionBase * m_PhiStripWidth - m_PhiSensorSide * local.y();
-      double dz = m_ZStripMax * m_ZStripWidth - local.z();
-      return CLHEP::Hep3Vector(0.0, dz / m_SignalSpeed, dy / m_SignalSpeed);
+      const CLHEP::Hep3Vector proDist = getPropagationDistance(local);
+      return CLHEP::Hep3Vector(0.0, proDist[1] / m_SignalSpeed, proDist[2] / m_SignalSpeed);
     }
 
     const CLHEP::Hep3Vector Module::localToGlobal(const CLHEP::Hep3Vector& v, bool m_reco) const

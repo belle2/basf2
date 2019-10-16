@@ -46,7 +46,7 @@ First Steps:
 #. Create a CalibrationCollectorModule (if a new one is necessary), and a CalibrationAlgorithm.
 #. Create a working CAF calibration python script using the :py:class:`Calibration <caf.framework.Calibration>` class.
 
-At this point you are working with the CAF and should be ready to add a prompt calibration script to basf2 an test it.
+At this point you are working with the CAF and should be ready to add a prompt calibration script to basf2 and test it.
 Now identify the requirements of your calibration:
 
 * Which data formats will it take as input (raw, cDST)?
@@ -77,6 +77,18 @@ The ``settings`` variable
 
 This must be a variable of the type :py:class:`prompt.CalibrationSettings`.
 It defines the input data requirements for the script and gives a human readable name and description.
+It also defines the contact expert username (which should be same as the one in JIRA), and a list of
+other prompt calibrations that the script depends on.
+This list will be used to define the task order in the automatic system, it will not affect running
+the script standalone.
+
+.. warning:: If you encounter an `ImportError` when running your script. Please check that you haven't created
+    a circular dependency by setting your ``depends_on`` calibrations to a calibration that depends on yours.
+    This dependency may well be implicit in the chain of dependencies (A -> B -> C means C depends on A), rather than explicit
+    (A -> C means C depends on A).
+
+    It may also be the case that you need to run ``scons`` again to make your new ``prompt/calibrations/`` script known to
+    basf2.
 
 .. autoclass:: prompt.CalibrationSettings
     :members: allowed_data_formats
@@ -142,6 +154,16 @@ b2caf-prompt-run
     :filename: calibration/tools/b2caf-prompt-run
     :func: get_argparser
     :prog: b2caf-prompt-run
+
+.. _b2caf_prompt_check:
+
+b2caf-prompt-check
+------------------
+
+.. argparse::
+    :filename: calibration/tools/b2caf-prompt-check
+    :func: get_argparser
+    :prog: b2caf-prompt-check
 
 
 Utility Functions

@@ -15,9 +15,11 @@ from prompt import CalibrationSettings
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="Example Simple",
+                               expert_username="ddossett",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["physics"])
+                               input_data_names=["physics"],
+                               depends_on=[])
 
 ##############################
 

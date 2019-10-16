@@ -426,13 +426,13 @@ def B0SL(path):
         :code:`'B0:semileptonic'`, the name of the particle list for
         SL :math:`B^0` skim candidates.
     """
+    variables.addAlias('p_lepton_CMSframe', 'conditionalVariableSelector(dmID<4, d1_p_CMSframe, d2_p_CMSframe)')
+
     # Apply cuts
+    applyCuts('B0:semileptonic', 'dmID<8', path=path)
     applyCuts('B0:semileptonic', 'log10_sigProb>-2.4', path=path)
     applyCuts('B0:semileptonic', '-4.0<cosThetaBY<3.0', path=path)
-    applyCuts('B0:semileptonic', 'dmID<8', path=path)
-    # Decay mode IDs 0--3 (B -> D l) need to be treated differently to
-    # IDs 4--7 (B -> D pi l) to make a cut on tag-side lepton momentum
-    applyCuts('B0:semileptonic', '[[dmID<4 and d1_p_CMSframe>1.0] or [dmID>=4 and d2_p_CMSframe>1.0]]', path=path)
+    applyCuts('B0:semileptonic', 'p_lepton_CMSframe>1.0', path=path)
 
     B0SLList = ['B0:semileptonic']
     return B0SLList
@@ -504,13 +504,13 @@ def BplusSL(path):
         :code:`'B+:semileptonic'`, the name of the particle list for
         SL :math:`B^+` skim candidates.
     """
-    # Apply cuts
-    BplusSLcuts = ['log10_sigProb>-2.4', '-4.0<cosThetaBY<3.0', 'dmID<8',
-                   # Decay mode IDs 0--3 (B -> D l) need to be treated differently to
-                   # IDs 4--7 (B -> D pi l) to make a cut on tag-side lepton momentum.
-                   '[[dmID<4 and d1_p_CMSframe>1.0] or [dmID>=4 and d2_p_CMSframe>1.0]]']
+    variables.addAlias('p_lepton_CMSframe', 'conditionalVariableSelector(dmID<4, d1_p_CMSframe, d2_p_CMSframe)')
 
-    applyCuts('B+:semileptonic', ' and '.join(BplusSLcuts), path=path)
+    # Apply cuts
+    applyCuts('B+:semileptonic', 'dmID<8', path=path)
+    applyCuts('B+:semileptonic', 'log10_sigProb>-2.4', path=path)
+    applyCuts('B+:semileptonic', '-4.0<cosThetaBY<3.0', path=path)
+    applyCuts('B+:semileptonic', 'p_lepton_CMSframe>1.0', path=path)
 
     BplusSLList = ['B+:semileptonic']
     return BplusSLList

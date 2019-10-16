@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdDQM/PXDDQMEfficiency2Module.h>
+#include <pxd/modules/pxdDQM/PXDDQMEfficiencyModule.h>
 #include <tracking/dataobjects/ROIid.h>
 
 #include <pxd/reconstruction/PXDPixelMasker.h>
@@ -22,13 +22,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDDQMEfficiency2)
+REG_MODULE(PXDDQMEfficiency)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDDQMEfficiency2Module::PXDDQMEfficiency2Module() : HistoModule(), m_vxdGeometry(VXD::GeoCache::getInstance())
+PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(VXD::GeoCache::getInstance())
 {
   // Set module properties
   setDescription("Create basic histograms for PXD efficiency");
@@ -40,7 +40,6 @@ PXDDQMEfficiency2Module::PXDDQMEfficiency2Module() : HistoModule(), m_vxdGeometr
   addParam("pxdClustersName", m_pxdClustersName, "name of StoreArray with PXD cluster", std::string(""));
   addParam("tracksName", m_tracksName, "name of StoreArray with RecoTracks", std::string(""));
   addParam("ROIsName", m_ROIsName, "name of the list of HLT ROIs, if available in output", std::string(""));
-  addParam("PXDInterceptListName", m_PXDInterceptListName, "name of the list of interceptions", std::string(""));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("PXDEFF"));
   addParam("binsU", m_u_bins, "histogram bins in u direction", int(4));
@@ -65,7 +64,7 @@ PXDDQMEfficiency2Module::PXDDQMEfficiency2Module() : HistoModule(), m_vxdGeometr
 }
 
 
-void PXDDQMEfficiency2Module::initialize()
+void PXDDQMEfficiencyModule::initialize()
 {
   //calls the define histogram function
   REG_HISTOGRAM;
@@ -75,10 +74,9 @@ void PXDDQMEfficiency2Module::initialize()
   m_pxdclusters.isOptional(m_pxdClustersName);
   m_tracks.isOptional(m_tracksName);
   m_ROIs.isOptional(m_ROIsName);
-  m_intercepts.isOptional(m_PXDInterceptListName);
 }
 
-void PXDDQMEfficiency2Module::beginRun()
+void PXDDQMEfficiencyModule::beginRun()
 {
   for (auto& h : m_h_track_hits) if (h.second) h.second->Reset();
   for (auto& h : m_h_matched_cluster) if (h.second) h.second->Reset();
@@ -92,7 +90,7 @@ void PXDDQMEfficiency2Module::beginRun()
   for (auto& h : m_h_sv2) if (h.second) h.second->Reset();
 }
 
-void PXDDQMEfficiency2Module::event()
+void PXDDQMEfficiencyModule::event()
 {
   if (!m_pxdclusters.isValid()) {
     B2INFO("PXDClusters array is missing, no efficiencies");
@@ -106,10 +104,6 @@ void PXDDQMEfficiency2Module::event()
     B2INFO("ROI array is missing but required hits in ROIs, aborting");
     return;
   }
-  if (!m_intercepts.isValid()) {
-    B2INFO("Intercept array is missing, no efficiencies");
-    return;
-  }
 
 
   for (auto& a_track : m_tracks) {
@@ -118,9 +112,6 @@ void PXDDQMEfficiency2Module::event()
     if (!a_track.wasFitSuccessful()) continue;
 
     if (a_track.getNumberOfSVDHits() < m_minSVDHits) continue;
-
-    RelationVector<PXDIntercept> interceptList = a_track.getRelationsTo<PXDIntercept>(m_PXDInterceptListName);
-    if (!interceptList.size()) continue;
 
     const genfit::FitStatus* fitstatus = a_track.getTrackFitStatus();
     if (fitstatus->getPVal() < m_pcut) continue;
@@ -147,9 +138,9 @@ void PXDDQMEfficiency2Module::event()
 
     //loop over all PXD sensors to get the intersections
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
-    for (auto intercept : interceptList) {
-      auto const aVxdID = intercept.getSensorID();
-      auto&  info = m_vxdGeometry.getSensorInfo(aVxdID);
+    for (VxdID& aVxdID : sensors) {
+      VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(aVxdID);
+      if (info.getType() != VXD::SensorInfoBase::PXD) continue;
       //Search for intersections of the track with all PXD layers
       //Traditional (aka the person before did it like this) method
       //If there is a way to find out sensors crossed by a track directly, that would most likely be faster
@@ -158,12 +149,11 @@ void PXDDQMEfficiency2Module::event()
       //true = track intersects current sensor
       double sigu(-9999);
       double sigv(-9999);
-//      TVector3 intersec_buff = getTrackInterSec(info, a_track, isgood, sigu, sigv);
+      TVector3 intersec_buff = getTrackInterSec(info, a_track, isgood, sigu, sigv);
 
-//      if (!isgood) {
-//        continue;//track does not go through this sensor-> nothing to measure anyway
-//      } else
-      {
+      if (!isgood) {
+        continue;//track does not go through this sensor-> nothing to measure anyway
+      } else {
         if (m_verboseHistos) {
           if (m_h_p[aVxdID]) m_h_p[aVxdID]->Fill(trackstate.getMom().Mag());
           if (m_h_pt[aVxdID]) m_h_pt[aVxdID]->Fill(trackstate.getMom().Pt());
@@ -173,11 +163,11 @@ void PXDDQMEfficiency2Module::event()
         if (m_uFactor * sigu > m_distcut) continue; // Error ufak*SigmaU > cut
         if (m_vFactor * sigv > m_distcut) continue; // Error vfak*SigmaV > cut
 
-        double u_fit = intercept.getCoorU();
-        double v_fit = intercept.getCoorV();
+        double u_fit = intersec_buff.X();
+        double v_fit = intersec_buff.Y();
 
-        int ucell_fit = info.getUCellID(u_fit); // check wie overflow!!!
-        int vcell_fit = info.getVCellID(v_fit); // Check wie overflow
+        int ucell_fit = info.getUCellID(intersec_buff.X());
+        int vcell_fit = info.getVCellID(intersec_buff.Y());
 
         if (m_cutBorders && isCloseToBorder(ucell_fit, vcell_fit, m_maskedDistance)) {
           continue;
@@ -213,7 +203,7 @@ void PXDDQMEfficiency2Module::event()
 
         //Now check if the sensor measured a hit here
 
-        int bestcluster = findClosestCluster(aVxdID, TVector3(u_fit, v_fit, 0));
+        int bestcluster = findClosestCluster(aVxdID, intersec_buff);
         if (bestcluster >= 0) {
           double u_clus = m_pxdclusters[bestcluster]->getU();
           double v_clus = m_pxdclusters[bestcluster]->getV();
@@ -237,8 +227,8 @@ void PXDDQMEfficiency2Module::event()
 
 
 
-TVector3 PXDDQMEfficiency2Module::getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood,
-                                                   double& du, double& dv)
+TVector3 PXDDQMEfficiencyModule::getTrackInterSec(VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood,
+                                                  double& du, double& dv)
 {
   //will be set true if the intersect was found
   isgood = false;
@@ -296,7 +286,7 @@ TVector3 PXDDQMEfficiency2Module::getTrackInterSec(const VXD::SensorInfoBase& px
 }
 
 
-void PXDDQMEfficiency2Module::defineHisto()
+void PXDDQMEfficiencyModule::defineHisto()
 {
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
@@ -340,7 +330,7 @@ void PXDDQMEfficiency2Module::defineHisto()
 
 
 int
-PXDDQMEfficiency2Module::findClosestCluster(const VxdID& avxdid, TVector3 intersection)
+PXDDQMEfficiencyModule::findClosestCluster(VxdID& avxdid, TVector3 intersection)
 {
   int closest = -1;
   double mindist = 999999999999; //definitely outside of the sensor
@@ -375,7 +365,7 @@ PXDDQMEfficiency2Module::findClosestCluster(const VxdID& avxdid, TVector3 inters
 
 }
 
-bool PXDDQMEfficiency2Module::isCloseToBorder(int u, int v, int checkDistance)
+bool PXDDQMEfficiencyModule::isCloseToBorder(int u, int v, int checkDistance)
 {
 
   if (u - checkDistance < 0 || u + checkDistance >= 250 ||
@@ -385,7 +375,7 @@ bool PXDDQMEfficiency2Module::isCloseToBorder(int u, int v, int checkDistance)
   return false;
 }
 
-bool PXDDQMEfficiency2Module::isDeadPixelClose(int u, int v, int checkDistance, const VxdID& moduleID)
+bool PXDDQMEfficiencyModule::isDeadPixelClose(int u, int v, int checkDistance, VxdID& moduleID)
 {
 
   //Iterate over square around the intersection to see if any close pixel is dead

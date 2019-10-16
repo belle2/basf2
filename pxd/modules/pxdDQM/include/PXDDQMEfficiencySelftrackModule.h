@@ -21,7 +21,6 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
-#include <tracking/pxdDataReductionClasses/PXDInterceptor.h>
 
 #include "TH1F.h"
 #include "TH2F.h"
@@ -34,14 +33,14 @@ namespace Belle2 {
    * Creates the basic histograms for PXD Efficiency DQM
    * Simplified and adopted version of the testbeam pxd efficiency module
    */
-  class PXDDQMEfficiency2Module : public HistoModule {
+  class PXDDQMEfficiencyModule : public HistoModule {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    PXDDQMEfficiency2Module();
+    PXDDQMEfficiencyModule();
 
   private:
 
@@ -75,13 +74,13 @@ namespace Belle2 {
       isgood: flag which is false if some error occured (do not use the point if false)
       du and dv are the uncertainties in u and v on the sensor plane of the fit (local coordinates)
      */
-    TVector3 getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood, double& du, double& dv);
+    TVector3 getTrackInterSec(VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood, double& du, double& dv);
     /** find the closest cluster*/
-    int findClosestCluster(const VxdID& vxdid, TVector3 intersection);
+    int findClosestCluster(VxdID& vxdid, TVector3 intersection);
     /** is it close to the border*/
     bool isCloseToBorder(int u, int v, int checkDistance);
     /** is a dead pixel close*/
-    bool isDeadPixelClose(int u, int v, int checkDistance, const VxdID& moduleID);
+    bool isDeadPixelClose(int u, int v, int checkDistance, VxdID& moduleID);
 
     /// Require tracks going through ROIs
     bool m_requireROIs;
@@ -104,7 +103,6 @@ namespace Belle2 {
     std::string m_pxdClustersName; ///< name of the store array of pxd clusters
     std::string m_tracksName; ///< name of the store array of tracks
     std::string m_ROIsName; ///< name of the store array of ROIs
-    std::string m_PXDInterceptListName; /**< intercept list name*/
 
     int m_u_bins; ///< the u bins
     int m_v_bins; ///< the v bins
@@ -112,7 +110,6 @@ namespace Belle2 {
     StoreArray<PXDCluster> m_pxdclusters; ///< store array of pxd clusters
     StoreArray<RecoTrack> m_tracks; ///< store array of tracks
     StoreArray<ROIid> m_ROIs; ///< store array of ROIs
-    StoreArray<PXDIntercept> m_intercepts; ///< store array of PXD Intercepts
 
     double m_distcut; ///< distance cut in cm!
     double m_uFactor; ///< factor for track-error on distcut comparison

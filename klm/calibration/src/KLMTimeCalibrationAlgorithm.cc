@@ -29,7 +29,6 @@
 #include <framework/gearbox/Const.h>
 
 #include <klm/calibration/KLMTimeCalibrationAlgorithm.h>
-#include <klm/dbobjects/KLMTimeCableDelay.h>
 
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
@@ -49,6 +48,12 @@ KLMTimeCalibrationAlgorithm::KLMTimeCalibrationAlgorithm() :
   m_useEventT0 = true;
   m_lower_limit_counts = 50;
   m_elementNum = &(KLMElementNumbers::Instance());
+  m_time_channelAvg_rpc = 0.0;
+  m_etime_channelAvg_rpc = 0.0;
+  m_time_channelAvg_scint = 0.0;
+  m_etime_channelAvg_scint = 0.0;
+  m_time_channelAvg_scint_end = 0.0;
+  m_etime_channelAvg_scint_end = 0.0;
 }
 
 KLMTimeCalibrationAlgorithm::~KLMTimeCalibrationAlgorithm()
@@ -613,9 +618,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   // Default Effected Light Speed in current Database
   effSpeed = 0.5671 * Const::speedOfLight;
 
-  effSpeed = (fabs(effC_scint_phi) + fabs(effC_scint_z)) / 2.0;
-  effSpeed = effSpeed + (fabs(effC_scint_phi_end) + fabs(effC_scint_z_end)) / 2.0;
-  effSpeed = effSpeed / 2.0;
+  effSpeed = (fabs(effC_scint_phi) + fabs(effC_scint_z) + fabs(effC_scint_phi_end) + fabs(effC_scint_z_end)) / 4.0;
 
   effSpeed_RPC = (fabs(effC_rpc_phi) + fabs(effC_rpc_z)) / 2.0;
   effSpeed_RPC = 0.50 * Const::speedOfLight;
@@ -936,14 +939,8 @@ void KLMTimeCalibrationAlgorithm::saveHist()
       h_timeFS_scint[iF][iS]->SetDirectory(dir_time_F[iF]);
       hc_timeFS_scint[iF][iS]->SetDirectory(dir_time_F[iF]);
 
-      h_timeFS_scint_end[iF][iS]->SetDirectory(dir_time_F[iF]);
-      hc_timeFS_scint_end[iF][iS]->SetDirectory(dir_time_F[iF]);
-
       h2_timeFS[iF][iS]->SetDirectory(dir_time_F[iF]);
       h2c_timeFS[iF][iS]->SetDirectory(dir_time_F[iF]);
-
-      h2_timeFS_end[iF][iS]->SetDirectory(dir_time_F[iF]);
-      h2c_timeFS_end[iF][iS]->SetDirectory(dir_time_F[iF]);
 
       sprintf(dirname, "Sector_%d", iS + 1);
       dir_time_FS[iF][iS] = dir_time_F[iF]->mkdir(dirname);

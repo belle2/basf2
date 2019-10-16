@@ -62,7 +62,6 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
   m_timeCableDelay = new Belle2::KLMTimeCableDelay();
 
-  fcn = new TF1("fcn", "crystalball");
   fcn_gaus = new TF1("fcn_gaus", "gaus");
   fcn_land = new TF1("fcn_land", "landau");
   fcn_pol1 = new TF1("fcn_pol1", "pol1");
@@ -621,10 +620,10 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   effSpeed_RPC = (fabs(effC_rpc_phi) + fabs(effC_rpc_z)) / 2.0;
   effSpeed_RPC = 0.50 * Const::speedOfLight;
 
-  m_timeCableDelay->setEffLightSpeed(effSpeed, false);
-  m_timeCableDelay->setAmpTimeConstant(0, false);
-  m_timeCableDelay->setEffLightSpeed(effSpeed_RPC, true);
-  m_timeCableDelay->setAmpTimeConstant(0, true);
+  m_timeDetParts->setEffLightSpeed(effSpeed, false);
+  m_timeDetParts->setAmpTimeConstant(0, false);
+  m_timeDetParts->setEffLightSpeed(effSpeed_RPC, true);
+  m_timeDetParts->setAmpTimeConstant(0, true);
 
   /** ======================================================================================= **/
   B2INFO("Time distribution filling begins.");
@@ -849,7 +848,6 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
   saveHist();
 
-  delete fcn;
   delete fcn_const;
   m_evts.clear();
   m_timeShift.clear();

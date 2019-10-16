@@ -116,15 +116,22 @@ namespace Belle2 {
     TH1I* h_nEHit2dOfTrack;
     /** Difference between Global and Local position */
     TH1D* h_positionDiff;
+    /** Difference between Global and Local position (X) */
     TH1D* h_positionXDiff;
+    /** Difference between Global and Local position (Y) */
     TH1D* h_positionYDiff;
+    /** Difference between Global and Local position (Z) */
     TH1D* h_positionZDiff;
-    /** Particle flying time versus detector layers */
+    /** Particle flying time versus detector layers (for BKLM)*/
     TH2D* h_flyTimeB;
+    /** Particle flying time versus detector layers (for EKLM)*/
     TH2D* h_flyTimeE;
     /** Sum number of digits collected */
+    /** EKLM parts */
     TH1I* h_numDigit_scint_end;
+    /** BKLM scitillator part */
     TH1I* h_numDigit_scint;
+    /** BKLM RPC part */
     TH1I* h_numDigit_rpc;
 
     /** data collection tree */

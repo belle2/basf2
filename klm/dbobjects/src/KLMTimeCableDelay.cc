@@ -14,12 +14,12 @@
 
 using namespace Belle2;
 
-KLMTimeCableDelay::KLMTimeCableDelay()
+KLMTimeCableDelay::KLMTimeCableDelay() :
+  m_effLightSpeed(0.0),
+  m_effLightSpeedRPC(0.0),
+  m_ampTimeConstant(0.0),
+  m_ampTimeConstantRPC(0.0)
 {
-  m_effLightSpeed = 0.38;
-  m_effLightSpeedRPC = 0.5;
-  m_ampTimeConstant = 0;
-  m_ampTimeConstantRPC = 0;
 }
 
 KLMTimeCableDelay::~KLMTimeCableDelay()

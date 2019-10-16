@@ -154,15 +154,9 @@ void PXDDQMEfficiencyModule::event()
       //Traditional (aka the person before did it like this) method
       //If there is a way to find out sensors crossed by a track directly, that would most likely be faster
 
-      bool isgood = false;
       //true = track intersects current sensor
       double sigu(-9999);
       double sigv(-9999);
-//      TVector3 intersec_buff = getTrackInterSec(info, a_track, isgood, sigu, sigv);
-
-//      if (!isgood) {
-//        continue;//track does not go through this sensor-> nothing to measure anyway
-//      } else
       {
         if (m_verboseHistos) {
           if (m_h_p[aVxdID]) m_h_p[aVxdID]->Fill(trackstate.getMom().Mag());

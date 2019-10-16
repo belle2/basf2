@@ -227,7 +227,7 @@ void PXDDQMEfficiencySelftrackModule::event()
 
 
 
-TVector3 PXDDQMEfficiencySelftrackModule::getTrackInterSec(VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack,
+TVector3 PXDDQMEfficiencySelftrackModule::getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack,
                                                            bool& isgood,
                                                            double& du, double& dv)
 {
@@ -331,7 +331,7 @@ void PXDDQMEfficiencySelftrackModule::defineHisto()
 
 
 int
-PXDDQMEfficiencySelftrackModule::findClosestCluster(VxdID& avxdid, TVector3 intersection)
+PXDDQMEfficiencySelftrackModule::findClosestCluster(const VxdID& avxdid, TVector3 intersection)
 {
   int closest = -1;
   double mindist = 999999999999; //definitely outside of the sensor
@@ -376,7 +376,7 @@ bool PXDDQMEfficiencySelftrackModule::isCloseToBorder(int u, int v, int checkDis
   return false;
 }
 
-bool PXDDQMEfficiencySelftrackModule::isDeadPixelClose(int u, int v, int checkDistance, VxdID& moduleID)
+bool PXDDQMEfficiencySelftrackModule::isDeadPixelClose(int u, int v, int checkDistance, const VxdID& moduleID)
 {
 
   //Iterate over square around the intersection to see if any close pixel is dead

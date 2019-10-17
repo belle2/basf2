@@ -10,7 +10,9 @@ Variables
 
  * Removed ``clusterCRID`` which duplicates :b2:var:`clusterConnectedRegionID`.
 
- * ROE variables return a quietNaN instead of -999 in case of errors
+.. note::
+        All variables will return a quietNaN instead of -999 or other out-of-the-sky numbers in case of errors
+
 Modules
 +++++++
 

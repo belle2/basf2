@@ -33,6 +33,8 @@ namespace Belle2 {
   /**
    * Creates the basic histograms for PXD Efficiency DQM
    * Simplified and adopted version of the testbeam pxd efficiency module
+   *
+   * This module relies on intercepts calculated by the interceptor module.
    */
   class PXDDQMEfficiencyModule : public HistoModule {
 

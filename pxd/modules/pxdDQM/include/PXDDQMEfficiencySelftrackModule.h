@@ -32,6 +32,11 @@ namespace Belle2 {
   /**
    * Creates the basic histograms for PXD Efficiency DQM
    * Simplified and adopted version of the testbeam pxd efficiency module
+   *
+   * This module is doing the tracking itself, thus checking for hits on in and
+   * outgoing leg of a track, which work only for cosmics. For tracks originating in IP
+   * we will end up at 50%, depending on module order.
+   * Do not use this module unless you know what to expect.
    */
   class PXDDQMEfficiencySelftrackModule : public HistoModule {
 

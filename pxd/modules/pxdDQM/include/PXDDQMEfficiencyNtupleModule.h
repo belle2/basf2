@@ -34,8 +34,9 @@
 namespace Belle2 {
 
   /**
-   * Creates the basic histograms for PXD Efficiency DQM
-   * Simplified and adopted version of the testbeam pxd efficiency module
+   * Creates Ntuples for PXD Efficiency analysis
+   *
+   * relies on PXD intercepts from the interceptor module which needs to be run before.´
    */
   class PXDDQMEfficiencyNtupleModule : public Module {
 

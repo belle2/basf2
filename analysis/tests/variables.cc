@@ -3468,7 +3468,7 @@ namespace {
 
     var = Manager::Instance().getVariable("flightDistanceOfDaughter(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+    EXPECT_TRUE(std::isnan(var->function(newDp)));
   }
   TEST_F(FlightInfoTest, flightDistanceOfDaughterErr)
   {
@@ -3481,7 +3481,7 @@ namespace {
 
     var = Manager::Instance().getVariable("flightDistanceOfDaughterErr(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+    EXPECT_TRUE(std::isnan(var->function(newDp)));
   }
   TEST_F(FlightInfoTest, flightTimeOfDaughter)
   {
@@ -3496,7 +3496,7 @@ namespace {
 
     var = Manager::Instance().getVariable("flightTimeOfDaughter(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+    EXPECT_TRUE(std::isnan(var->function(newDp)));
   }
   TEST_F(FlightInfoTest, flightTimeOfDaughterErr)
   {
@@ -3509,7 +3509,7 @@ namespace {
 
     var = Manager::Instance().getVariable("flightTimeOfDaughterErr(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+    EXPECT_TRUE(std::isnan(var->function(newDp)));
   }
   TEST_F(FlightInfoTest, mcFlightDistanceOfDaughter)
   {
@@ -3523,7 +3523,7 @@ namespace {
 
     var = Manager::Instance().getVariable("mcFlightDistanceOfDaughter(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+    EXPECT_TRUE(std::isnan(var->function(newDp)));
   }
   TEST_F(FlightInfoTest, mcFlightTimeOfDaughter)
   {
@@ -3540,7 +3540,7 @@ namespace {
 
     var = Manager::Instance().getVariable("mcFlightTimeOfDaughter(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+    EXPECT_TRUE(std::isnan(var->function(newDp)));
   }
 
   TEST_F(FlightInfoTest, vertexDistance)
@@ -3588,7 +3588,7 @@ namespace {
 
     var = Manager::Instance().getVariable("vertexDistanceOfDaughter(2)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), -999);
+    EXPECT_TRUE(std::isnan(var->function(newDp)));
   }
 
   TEST_F(FlightInfoTest, vertexDistanceOfDaughterError)

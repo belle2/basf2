@@ -62,7 +62,7 @@ namespace Belle2 {
     double isAncestorOf(const Particle* part, const std::vector<double>& daughterIDs)
     {
       if (part == nullptr)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       // If particle has no MC relation, MC chain doesn't exist
       const MCParticle* mcpart = part->getRelatedTo<MCParticle>();
@@ -85,7 +85,7 @@ namespace Belle2 {
                   << " daughters, but daughter at position " << daughterIDs[i] << " expected!");
         const Particle* curDaughter = curParticle->getDaughter(daughterIDs[i]);
         if (curDaughter == nullptr)
-          return -999;
+          return std::numeric_limits<float>::quiet_NaN();
         curParticle = curDaughter;
       }
 
@@ -117,7 +117,7 @@ namespace Belle2 {
     double hasAncestor(const Particle* part, const std::vector<double>& args)
     {
       if (part == nullptr)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       // If particle has no MC relation, MC chain doesn't exist
       const MCParticle* mcpart = part->getRelatedTo<MCParticle>();
@@ -173,7 +173,7 @@ namespace Belle2 {
     double daughterMCInvariantMass(const Particle* particle, const std::vector<double>& daughter_indexes)
     {
       if (!particle)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       TLorentzVector sum;
       const auto& daughters = particle->getDaughters();
@@ -182,11 +182,11 @@ namespace Belle2 {
       for (auto& double_daughter : daughter_indexes) {
         long daughter = std::lround(double_daughter);
         if (daughter >= nDaughters)
-          return -999;
+          return std::numeric_limits<float>::quiet_NaN();
 
         const MCParticle* mcdaughter = daughters[daughter]->getRelated<MCParticle>();
         if (!mcdaughter)
-          return -999;
+          return std::numeric_limits<float>::quiet_NaN();
 
         sum += mcdaughter->get4Vector();
       }
@@ -198,11 +198,11 @@ namespace Belle2 {
     double massDifference(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       long daughter = std::lround(daughters[0]);
       if (daughter >= static_cast<int>(particle->getNDaughters()))
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       double motherMass = particle->getMass();
       double daughterMass = particle->getDaughter(daughter)->getMass();
@@ -213,11 +213,11 @@ namespace Belle2 {
     double massDifferenceError(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       long daughter = std::lround(daughters[0]);
       if (daughter >= static_cast<int>(particle->getNDaughters()))
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       float result = 0.0;
 
@@ -262,11 +262,11 @@ namespace Belle2 {
     double massDifferenceSignificance(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       long daughter = std::lround(daughters[0]);
       if (daughter >= static_cast<int>(particle->getNDaughters()))
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       double massDiff = massDifference(particle, daughters);
       double massDiffErr = massDifferenceError(particle, daughters);
@@ -280,7 +280,7 @@ namespace Belle2 {
     double particleDecayAngle(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       double result = 0.0;
 
@@ -289,7 +289,7 @@ namespace Belle2 {
 
       long daughter = std::lround(daughters[0]);
       if (daughter >= static_cast<int>(particle->getNDaughters()))
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       TLorentzVector daugMomentum = particle->getDaughter(daughter)->get4Vector();
       daugMomentum.Boost(motherBoost);
@@ -302,14 +302,14 @@ namespace Belle2 {
     double particleDaughterAngle(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       int nDaughters = static_cast<int>(particle->getNDaughters());
 
       long daughter1 = std::lround(daughters[0]);
       long daughter2 = std::lround(daughters[1]);
       if (daughter1 >= nDaughters || daughter2 >= nDaughters)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       const auto& frame = ReferenceFrame::GetCurrent();
       TVector3 a = frame.getMomentum(particle->getDaughter(daughter1)).Vect();
@@ -320,14 +320,14 @@ namespace Belle2 {
     double pointingAngle(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       long daughter = std::lround(daughters[0]);
       if (daughter >= static_cast<int>(particle->getNDaughters()))
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       if (particle->getDaughter(daughter)->getNDaughters() < 2)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       TVector3 productionVertex = particle->getVertex();
       TVector3 decayVertex = particle->getDaughter(daughter)->getVertex();
@@ -343,14 +343,14 @@ namespace Belle2 {
     double azimuthalAngleInDecayPlane(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       int nDaughters = static_cast<int>(particle->getNDaughters());
 
       long daughter1 = std::lround(daughters[0]);
       long daughter2 = std::lround(daughters[1]);
       if (daughter1 >= nDaughters || daughter2 >= nDaughters)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
       TLorentzVector m = T.getBeamFourMomentum();
@@ -385,17 +385,17 @@ namespace Belle2 {
     double v0DaughterD0(const Particle* particle, const std::vector<double>& daughterID)
     {
       if (!particle)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       TVector3 v0Vertex = particle->getVertex();
 
       const Particle* daug = particle->getDaughter(daughterID[0]);
 
       const Track* track = daug->getTrack();
-      if (!track) return 999.9;
+      if (!track) return std::numeric_limits<float>::quiet_NaN();
 
       const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(daug->getPDGCode())));
-      if (!trackFit) return 999.9;
+      if (!trackFit) return std::numeric_limits<float>::quiet_NaN();
 
       UncertainHelix helix = trackFit->getUncertainHelix();
       helix.passiveMoveBy(v0Vertex);
@@ -411,17 +411,17 @@ namespace Belle2 {
     double v0DaughterZ0(const Particle* particle, const std::vector<double>& daughterID)
     {
       if (!particle)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       TVector3 v0Vertex = particle->getVertex();
 
       const Particle* daug = particle->getDaughter(daughterID[0]);
 
       const Track* track = daug->getTrack();
-      if (!track) return 999.9;
+      if (!track) return std::numeric_limits<float>::quiet_NaN();
 
       const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(daug->getPDGCode())));
-      if (!trackFit) return 999.9;
+      if (!trackFit) return std::numeric_limits<float>::quiet_NaN();
 
       UncertainHelix helix = trackFit->getUncertainHelix();
       helix.passiveMoveBy(v0Vertex);
@@ -452,7 +452,7 @@ namespace Belle2 {
                       Returns a positive integer if daughter at position particle->daughter(i)->daughter(j)... is an ancestor of the related MC particle, 0 otherwise.
 
                       Positive integer represents the number of steps needed to get from final MC daughter to ancestor.
-                      If any particle or MCparticle is a nullptr, -999 is returned. If MC relations of any particle doesn't exist, -1.0 is returned.)DOC");
+                      If any particle or MCparticle is a nullptr, NaN is returned. If MC relations of any particle doesn't exist, -1.0 is returned.)DOC");
     REGISTER_VARIABLE("hasAncestor(PDG, abs)", hasAncestor, R"DOC(
 
                       Returns a positive integer if an ancestor with the given PDG code is found, 0 otherwise.
@@ -461,7 +461,7 @@ namespace Belle2 {
 
                       Second argument is optional, 1 means that the sign of the PDG code is taken into account, default is 0.
 
-                      If there is no MC relations found, -1 is returned. In case of nullptr particle, -999 is returned.)DOC");
+                      If there is no MC relations found, -1 is returned. In case of nullptr particle, NaN is returned.)DOC");
     REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass ,
                       "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.");
     REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,

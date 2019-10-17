@@ -763,7 +763,7 @@ class FullTrackQETeacherTask(TrackQETeacherBaseTask):
     track quality estimator
     """
     #: Name of the weightfile that is created.
-    weightfile_identifier_basename = "MVATrackQualityIndicator"
+    weightfile_identifier_basename = "trackfitting_MVATrackQualityIndicator"
     #: Name of the TTree in the ROOT file from the ``data_collection_task`` that
     # contains the training data for the MVA teacher.
     tree_name = "tree"

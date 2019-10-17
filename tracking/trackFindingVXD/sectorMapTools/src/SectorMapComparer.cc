@@ -1,7 +1,11 @@
 #include "tracking/trackFindingVXD/sectorMapTools/SectorMapComparer.h"
 
+#include <framework/logging/LogConfig.h>
+
 #include <TFile.h>
 #include <TLeaf.h>
+#include <TLeafI.h>
+#include <TLeafD.h>
 #include <TCanvas.h>
 #include <TObjArray.h>
 #include <TObject.h>
@@ -13,6 +17,13 @@
 
 
 using namespace Belle2;
+
+SectorMapComparer::SectorMapComparer(const std::string& SMFileFirst,
+                                     const std::string& SMFileSecond) : m_SMFileName_first(SMFileFirst),
+  m_SMFileName_second(SMFileSecond)
+{
+  Belle2::LogSystem::Instance().getLogConfig()->setLogLevel(LogConfig::c_Info);
+};
 
 
 std::string
@@ -34,16 +45,18 @@ SectorMapComparer::SetLeafAddresses(TTree* t, std::unordered_map<std::string, do
   for (TObject* o : *leafList) {
     TLeaf* l = (TLeaf*)o;
     std::string name = l->GetName();
+    // cannot use TClass pointer here as it is TLeaf and not TLeafD or TLeafI, ClassName is virtual (gives the name of the derived)
+    TString classname = l->ClassName();
 
-    // filter sectorID leafs from the rest
-    // TODO: implement cross check for leaf type. Up to now we only used TLeafD and TLeafI
-    if (name.find("FullSecID") != std::string::npos) {
+    // filter leafs of type TLeafI (sector IDs) from the
+    if (classname.EqualTo("TLeafI")) {
       SecIDVals[name] = 0;
       l->SetAddress(&(SecIDVals[name]));
-    } else {
-      std::cout << "name " << name << std::endl;
+    } else if (classname.EqualTo("TLeafD")) {
       filterVals[name] = 0.0;
       l->SetAddress(&(filterVals[name]));
+    } else {
+      B2WARNING("Unsupported TLeaf type: " << l->ClassName() << ". Will skip this TLeaf.");
     }
 
   }
@@ -87,7 +100,7 @@ SectorMapComparer::FillSectorToTreeIndexMap(TTree* tree, std::unordered_map<std:
 
 // actually compares the trees (segment and triplet filters)
 void
-SectorMapComparer::CompareTrees(TTree* t_first, TTree* t_second)
+SectorMapComparer::CompareTrees(TTree* t_first, TTree* t_second, bool unmatchedEntries)
 {
 
   // clear the maps to be able to reuse them
@@ -109,8 +122,12 @@ SectorMapComparer::CompareTrees(TTree* t_first, TTree* t_second)
   std::unordered_map<std::string, uint> ids_t_second;
   SetLeafAddresses(t_second, vals_t_second, ids_t_second);
 
+  // some cross checks
+  if (vals_t_second.size() != vals_t_first.size()) {
+    B2WARNING("Number of filters stored in the two SectorMaps seem to differ! This is per se not dangerous, but some cuts may be compared to zero.");
+  }
 
-  // use the list of leaves  for indexing
+  // Creating histograms, using the list of leaves  for indexing the histograms
   TObjArray* leafList = t_first->GetListOfLeaves();
   for (TObject* o : *leafList) {
     TLeaf* l_first = (TLeaf*)o;
@@ -129,16 +146,27 @@ SectorMapComparer::CompareTrees(TTree* t_first, TTree* t_second)
     if (m_histo_map_first.find(leafName.Data()) != m_histo_map_first.end() ||
         m_histo_map_second.find(leafName.Data()) != m_histo_map_second.end() ||
         m_histo_map_diff.find(leafName.Data()) != m_histo_map_diff.end()) {
-      //TODO: replace by B2ERROR
-      std::cout << "ERROR: Histogram for key " << leafName.Data() << " already exists" << std::endl;
+
+      B2ERROR("ERROR: Histogram for key " << leafName.Data() << " already exists");
     }
 
-    m_histo_map_first[ leafName.Data() ] = TH1F(leafName + "_first", leafName + "_first", Nbins, min, max);
+
+    m_histo_map_first[ leafName.Data() ] = TH1F(leafName + "_first", leafName, Nbins, min, max);
     m_histo_map_first[ leafName.Data() ].SetDirectory(nullptr);
-    m_histo_map_second[ leafName.Data() ] = TH1F(leafName + "_second", leafName + "_second", Nbins, min, max);
+    m_histo_map_second[ leafName.Data() ] = TH1F(leafName + "_second", leafName , Nbins, min, max);
     m_histo_map_second[ leafName.Data() ].SetDirectory(nullptr);
-    m_histo_map_diff[ leafName.Data() ] = TH1F(leafName + "_diff", leafName + "_diff", Nbins, -0.2 * range, 0.2 * range);
+    m_histo_map_diff[ leafName.Data() ] = TH1F(leafName + "_diff", "difference " + leafName + " (SM1 - SM2)", Nbins, -0.2 * range,
+                                               0.2 * range);
     m_histo_map_diff[ leafName.Data() ].SetDirectory(nullptr);
+
+    // histograms containing the max minus the min
+    TString niceName = leafName;
+    niceName.ReplaceAll("_min", "");
+    niceName.ReplaceAll("_max", "");
+    m_histo_map_range_first[ leafName.Data() ] = TH1F(leafName + "_range_first", niceName + " range (max - min)", Nbins, 0, range);
+    m_histo_map_range_first[ leafName.Data() ].SetDirectory(nullptr);
+    m_histo_map_range_second[ leafName.Data() ] = TH1F(leafName + "_range_second", niceName + " range (max - min)", Nbins, 0, range);
+    m_histo_map_range_second[ leafName.Data() ].SetDirectory(nullptr);
   }
 
 
@@ -146,33 +174,72 @@ SectorMapComparer::CompareTrees(TTree* t_first, TTree* t_second)
   for (long i = 0; i < t_first->GetEntries(); i++) {
     t_first->GetEntry(i);
 
-
     std::string hash = GetHash(ids_t_first["innerFullSecID"], ids_t_first["centerFullSecID"], ids_t_first["outerFullSecID"]);
 
-    std::cout << hash << std::endl;
+    // filter connections inside both sector maps, if unmatchedEntries is true only the unmatched entries will be selected
     if (indexmap_t_second.find(hash) == indexmap_t_second.end()) {
-      std::cout << "sector combination not found (inner,center,outer) " << ids_t_first["innerFullSecID"] << " "
-                << ids_t_first["centerFullSecID"] << " " << ids_t_first["outerFullSecID"] << std::endl;
-      continue;
+      // case this sector combination not matched, can be thrown away if  unmatchedEntries is set false
+      if (!unmatchedEntries) continue;
     } else {
-      //std::cout << "found" << std::endl;
+      // sector combination is matched, read second tree and skip if unmatchedEntries is set
+      t_second->GetEntry(indexmap_t_second[hash]);
+      if (unmatchedEntries) continue;
     }
 
-    t_second->GetEntry(indexmap_t_second[hash]);
 
     // now fill the histograms
+    // NOTE: in case unmatchedEntries==true the values in the the second tree do not make any sense, so not fill any histograms with them
     for (TObject* o : *leafList) {
       TString leafName = o->GetName();
       // TODO: find a better way to destinguis the secid leaves from the others
       if (leafName.Contains("FullSecID")) continue;
       m_histo_map_first[ leafName.Data() ].Fill(vals_t_first[leafName.Data()]);
-      m_histo_map_second[ leafName.Data() ].Fill(vals_t_second[leafName.Data()]);
-      m_histo_map_diff[ leafName.Data() ].Fill(vals_t_first[leafName.Data()] - vals_t_second[leafName.Data()]);
+      if (!unmatchedEntries) m_histo_map_second[ leafName.Data() ].Fill(vals_t_second[leafName.Data()]);
+      if (!unmatchedEntries) m_histo_map_diff[ leafName.Data() ].Fill(vals_t_first[leafName.Data()] - vals_t_second[leafName.Data()]);
+      // calculate the range only for the max
+      if (leafName.Contains("_max")) {
+        TString minLeafName = leafName;
+        minLeafName.ReplaceAll("_max", "_min");
+        m_histo_map_range_first[ leafName.Data() ].Fill(vals_t_first[leafName.Data()] - vals_t_first[minLeafName.Data()]);
+        if (!unmatchedEntries) m_histo_map_range_second[ leafName.Data() ].Fill(vals_t_second[leafName.Data()] -
+              vals_t_second[minLeafName.Data()]);
+      }
     }
   }
 
 }
 
+void
+SectorMapComparer::ShowSetups(TString secmapFileName)
+{
+  TFile* f = TFile::Open(secmapFileName);
+  if (!f->IsOpen()) {
+    B2WARNING("File not opened: " << secmapFileName);
+    return;
+  }
+
+  TTree* t = (TTree*)f->Get(m_setupsTreeName.c_str());
+  if (t == nullptr) {
+    B2WARNING("tree not found! tree name: " << m_setupsTreeName);
+    return;
+  }
+
+  TString* setupKeyName = nullptr;
+  t->SetBranchAddress(m_setupsBranchName.c_str(), & setupKeyName);
+  if (setupKeyName == nullptr) {
+    B2WARNING("setupKeyName not found");
+    return;
+  }
+
+  B2INFO("Following setups found for file: " << secmapFileName);
+  B2INFO("================================ ");
+  for (long i = 0; i < t->GetEntries(); ++i) {
+    t->GetEntry();
+    B2INFO(*setupKeyName);
+  }
+
+  if (setupKeyName) delete setupKeyName;
+}
 
 // fills the listOfTrees with the names of all trees in this directory (including their full root-path)
 // loops recursively over all subdirectories
@@ -197,41 +264,57 @@ SectorMapComparer::FindTrees(TDirectory* aDir, std::vector<std::string>&  listOf
 
 
 void
-SectorMapComparer::Plot()
+SectorMapComparer::Plot(bool logScale, TString pdfFileName)
 {
+  int n = m_histo_map_first.size();
+  int counter = 1;
   for (const auto& hist : m_histo_map_first) {
     std::string aName = hist.first;
-
     TCanvas* can = new TCanvas((aName + "_can").c_str(), aName.c_str());
-    // dont want it yet to be put into some open files
-    // can->SetDirectory(nullptr);
-    can->Divide(1, 2);
-    can->cd(1);
+    can->Divide(1, 3);
+
+    can->cd(1)->SetLogy((int)logScale);
     m_histo_map_first[ aName ].DrawCopy();
     m_histo_map_second[ aName ].SetLineColor(kRed);
     m_histo_map_second[ aName ].DrawCopy("same");
 
-    can->cd(2);
+    can->cd(2)->SetLogy((int)logScale);;
     m_histo_map_diff[ aName ].DrawCopy();
 
+    if (TString(aName).Contains("_max")) {
+      can->cd(3)->SetLogy((int)logScale);
+      m_histo_map_range_first[ aName ].DrawCopy();
+      m_histo_map_range_second[ aName ].SetLineColor(kRed);
+      m_histo_map_range_second[ aName ].DrawCopy("same");
+    }
+
+    // if file name is specified plot directly to pdf file
+    if (pdfFileName != "") {
+      if (n == 1) can->SaveAs(pdfFileName);
+      else {
+        if (counter == 1) can->SaveAs(pdfFileName + "(");
+        else if (counter == n) can->SaveAs(pdfFileName + ")");
+        else can->SaveAs(pdfFileName);
+      }
+    }
+    counter++;
   }
 
 }
 
 
 void
-SectorMapComparer::Compare()
+SectorMapComparer::CompareMaps(TString setupName, bool unmatchedEntries)
 {
-  std::cout << "comparing SectorMaps in the following files" << std::endl;
-  std::cout << "first:  " << m_SMFileName_first << std::endl;
-  std::cout << "second: " << m_SMFileName_second << std::endl;
+  B2INFO("comparing SectorMaps in the following files");
+  B2INFO("first:  " << m_SMFileName_first);
+  B2INFO("second: " << m_SMFileName_second);
 
   TFile* f_first = TFile::Open(m_SMFileName_first.c_str());
   TFile* f_second = TFile::Open(m_SMFileName_second.c_str());
 
   if (!f_first->IsOpen() || !f_first->IsOpen()) {
-    // TODO: replace by error
-    std::cout << "ERROR: one of the files not open" << std::endl;
+    B2ERROR("ERROR: one of the files not open");
 
     if (f_first) f_first->Close();
     if (f_second) f_second->Close();
@@ -242,27 +325,46 @@ SectorMapComparer::Compare()
   std::vector<std::string> listOfTrees;
   FindTrees(f_first, listOfTrees);
 
-  for (const std::string& tname_first : listOfTrees) {
-    // may need to apply some filtering to the trees, e.g. Setups
+  // clear the maps, else old results will be mixed with this run
+  ClearMaps();
 
+  for (const std::string& tname_first : listOfTrees) {
+
+    // only look at the trees for the specified Setup
+    if (!TString(tname_first).Contains(setupName)) continue;
+
+
+    // assume second file has
     std::string tname_second = tname_first;
     tname_second.replace(0, m_SMFileName_first.length(), m_SMFileName_second);
-
 
 
 
     TTree* t_first = (TTree*)f_first->Get(tname_first.c_str());
     TTree* t_second = (TTree*)f_second->Get(tname_second.c_str());
 
-    std::cout << tname_first << " " << t_first <<  std::endl;
-    std::cout << tname_second << " " << t_second << std::endl;
-
-    if (!t_first || !t_second) {
-      std::cout << "ERROR: one of the trees not found" << std::endl;
+    // filter out the sector id and test for consistency
+    if (TString(tname_first).Contains("CompactSecIDs")) {
+      if (t_first->GetEntries() != t_second->GetEntries())
+        B2FATAL("The number of entries in CompactSecIDs should be identical! This indicates that two sectormaps with"
+                " different sectors on sensors are compared which will lead to wrong results! " << std::endl <<
+                "# CompactSecIDs SM1: " << t_first->GetEntries() << std::endl <<
+                "# CompactSecIDs SM2: " << t_second->GetEntries() << std::endl
+               );
+      // we dont compare those
       continue;
     }
 
-    CompareTrees(t_first, t_second);
+
+    B2INFO("Comparing tree: " << tname_first << " with tree: " << tname_second <<  std::endl);
+
+    if (!t_first || !t_second) {
+      B2ERROR("One of the trees not found!");
+      continue;
+    }
+
+
+    CompareTrees(t_first, t_second, unmatchedEntries);
 
 
   }
@@ -272,24 +374,6 @@ SectorMapComparer::Compare()
 }
 
 
-
-void
-SectorMapComparer::TEST()
-{
-
-  TFile* f1 = TFile::Open("/home/thomas/belle2/releases/myHead/buff/SectorMaps.root");
-  //TTree * t1 = (TTree*)f1.Get("SVDOnlyDefault/TripletsFilters");
-  TTree* t1 = (TTree*)f1->Get("SVDOnlyDefault/SegmentFilters");
-
-  TFile* f2 = TFile::Open("/home/thomas/belle2/releases/myHead/buff/dbstore_SVDSectorMap_v000.root_rev_18.root");
-  //TTree * t2 = (TTree*)f2.Get("SVDOnlyDefault/TripletsFilters");
-  TTree* t2 = (TTree*)f2->Get("SVDOnlyDefault/SegmentFilters");
-
-
-
-  CompareTrees(t1, t2);
-
-}
 
 
 

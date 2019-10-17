@@ -6,10 +6,11 @@ from prompt import CalibrationSettings
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="CDC Tracking",
+                               expert_username="uchida",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["hlt_mumu", "hlt_hadron"]
-                               )
+                               input_data_names=["hlt_mumu", "hlt_hadron"],
+                               depends_on=[])
 
 
 ################################################

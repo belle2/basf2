@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 
 """A complicated example calibration that takes several input data lists from raw data and performs
-multiple calibrations."""
+multiple calibrations. Only the second calibration will have its payloads placed into the final
+outputdb directory by b2caf-prompt-run.
+
+We make it so that this calibration depends on the result of a completely
+different one 'example_simple'. Even though that calibration will not be run in this process, the automated
+system can discover this dependency and use it when submitting tasks."""
 
 from prompt import CalibrationSettings
 
@@ -13,11 +18,21 @@ from prompt import CalibrationSettings
 # Will be used to construct the calibration in the automated system, as well as set up the submission web forms.
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
+# We decide to only run this script once the simple one has run. This only affects the automated system when scheduling
+# tasks. This script can always be run standalone.
+from prompt.calibrations.example_simple import settings as example_simple
+
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="Example Complex",
+                               expert_username="ddossett",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["physics", "cosmics", "Bcosmics"])
+                               input_data_names=["physics", "cosmics", "Bcosmics"],
+                               depends_on=[example_simple])
+
+# Note that you are forced to import the relevant script that you depend on, even though you never use it.
+# This is to make sure that this script won't run unless the dependent one exists, as well as automatically
+# checking for circular dependency via Python's import statements.
 
 ##############################
 

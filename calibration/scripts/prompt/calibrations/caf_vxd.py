@@ -6,9 +6,11 @@ from prompt import CalibrationSettings
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="VXD Alignment",
+                               expert_username="bilkat",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["physics", "cosmics", "Bcosmics"])
+                               input_data_names=["physics", "cosmics", "Bcosmics"],
+                               depends_on=[])
 
 ################################################
 # Required function called by b2caf-prompt-run #

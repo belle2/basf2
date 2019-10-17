@@ -169,6 +169,25 @@ namespace Belle2 {
     }
 
 
+    double daughterInvariantMass(const Particle* particle, const std::vector<double>& daughter_indexes)
+    {
+      if (!particle)
+        return std::numeric_limits<float>::quiet_NaN();
+
+      TLorentzVector sum;
+      const auto& daughters = particle->getDaughters();
+      int nDaughters = static_cast<int>(daughters.size());
+
+      for (auto& double_daughter : daughter_indexes) {
+        long daughter = std::lround(double_daughter);
+        if (daughter >= nDaughters)
+          return std::numeric_limits<float>::quiet_NaN();
+
+        sum += daughters[daughter]->get4Vector();
+      }
+
+      return sum.M();
+    }
 
     double daughterMCInvariantMass(const Particle* particle, const std::vector<double>& daughter_indexes)
     {
@@ -462,6 +481,15 @@ namespace Belle2 {
                       Second argument is optional, 1 means that the sign of the PDG code is taken into account, default is 0.
 
                       If there is no MC relations found, -1 is returned. In case of nullptr particle, NaN is returned.)DOC");
+    REGISTER_VARIABLE("daughterInvariantMass(i, j, ...)", daughterInvariantMass , R"DOC(
+                      Returns invariant mass of the given daughter particles. E.g.:
+
+                      * daughterInvariantMass(0, 1) returns the invariant mass of the first and second daughter.
+                      * daughterInvariantMass(0, 1, 2) returns the invariant mass of the first, second and third daughter.
+
+                      Useful to identify intermediate resonances in a decay, which weren't reconstructed explicitly.
+
+                      Returns -999 if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).)DOC");
     REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass ,
                       "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.");
     REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,

@@ -15,27 +15,13 @@
 #include <TH1I.h>
 #include <TH2D.h>
 
-/* C++ containers. */
-#include <vector>
-#include <map>
 
 /* Belle2 headers. */
-#include <klm/modules/KLMTimeCalibration/KLMTimeCalibrationCollectorModule.h>
-#include <klm/dataobjects/KLMElementNumbers.h>
-
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMHit1d.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
-
-#include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/eklm/geometry/GeometryData.h>
-#include <klm/eklm/geometry/TransformData.h>
-
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 
 #include <tracking/dataobjects/Muid.h>
 #include <tracking/dataobjects/MuidHit.h>
@@ -47,6 +33,12 @@
 #include <framework/logging/LogSystem.h>
 #include <framework/dataobjects/EventT0.h>
 
+#include <klm/modules/KLMTimeCalibration/KLMTimeCalibrationCollectorModule.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+
+#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/dataobjects/BKLMHit1d.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
 
 
 using namespace Belle2;
@@ -61,14 +53,14 @@ KLMTimeCalibrationCollectorModule::KLMTimeCalibrationCollectorModule() :
   setDescription("Module for BKLM time calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("deBug", m_debug, "debug modle.", false);
+  addParam("deBug", m_Debug, "debug mode.", false);
+  addParam("inputParticleList", m_inputListName, "input particle list.", std::string("mu:cali"));
 
   m_geoParB = nullptr;
   m_geoParE = nullptr;
   m_TransformData = nullptr;
   m_elementNum = nullptr;
   m_outTree = nullptr;
-  m_debug = false;
 }
 
 KLMTimeCalibrationCollectorModule::~KLMTimeCalibrationCollectorModule()
@@ -79,13 +71,13 @@ void KLMTimeCalibrationCollectorModule::prepare()
 {
   setDescription("Preparation for BKLM TimeCalibration Collector Module.");
 
-  /** Geommetry objects initialize. */
+  /* Geommetry objects initialize. */
   m_geoParB = GeometryPar::instance();
   m_geoParE = &(EKLM::GeometryData::Instance());
   m_TransformData = new EKLM::TransformData(true, EKLM::TransformData::c_None);
   m_elementNum = &(KLMElementNumbers::Instance());
 
-  /** Require input dataobjects. */
+  /* Require input dataobjects. */
   m_tracks.isRequired();
   m_eventT0.isRequired("EventT0");
 
@@ -105,42 +97,43 @@ void KLMTimeCalibrationCollectorModule::prepare()
 
   registerObject<TTree>("time_calibration_data", m_outTree);
 
-  h_eventT0_0 = new TH1D("h_eventT0_0", "collision time before track number request;t0[ns]", 200, -100, 100);
-  h_eventT0_1 = new TH1D("h_eventT0_1", "collision time after track number request;t0[ns]", 200, -100, 100);
-  h_numTrack = new TH1I("h_nnumTrack", "Number of Track;nTrack", 30, 0, 30);
+  m_HeventT0_0 = new TH1D("m_HeventT0_0", "collision time before track number request;t0[ns]", 200, -100, 100);
+  m_HeventT0_1 = new TH1D("m_HeventT0_1", "collision time after track number request;t0[ns]", 200, -100, 100);
+  m_HnumTrack = new TH1I("m_HnnumTrack", "Number of Track;nTrack", 30, 0, 30);
 
-  h_nBHit2dOfTrack = new TH1I("h_nBKLMHit2dOfTrack", "Number of BKLMHit2d belong to recTrack;num of BKLMHit2d", 20, 0, 20);
-  h_nEHit2dOfTrack = new TH1I("h_nEKLMHit2dOfTrack", "Number of EKLMHit2d belong to recTrack;num of EKLMHit2d", 15, 0, 15);
+  m_HnBHit2dOfTrack = new TH1I("m_HnBKLMHit2dOfTrack", "Number of BKLMHit2d belong to recTrack;num of BKLMHit2d", 20, 0, 20);
+  m_HnEHit2dOfTrack = new TH1I("m_HnEKLMHit2dOfTrack", "Number of EKLMHit2d belong to recTrack;num of EKLMHit2d", 15, 0, 15);
 
-  h_positionDiff = new TH1D("h_positionDiff", "Dist between extHit and KLMHit2d;dist", 160, 0, 8);
-  h_positionXDiff = new TH1D("h_positionXDiff", "DistX between extHit and KLMHit2d;distX", 100, 0, 5);
-  h_positionYDiff = new TH1D("h_positionYDiff", "DistY between extHit and KLMHit2d;distY", 100, 0, 5);
-  h_positionZDiff = new TH1D("h_positionZDiff", "DistZ between extHit and KLMHit2d;distZ", 100, 0, 5);
+  m_HpositionDiff = new TH1D("m_HpositionDiff", "Dist between extHit and KLMHit2d;dist", 160, 0, 8);
+  m_HpositionXDiff = new TH1D("m_HpositionXDiff", "DistX between extHit and KLMHit2d;distX", 100, 0, 5);
+  m_HpositionYDiff = new TH1D("m_HpositionYDiff", "DistY between extHit and KLMHit2d;distY", 100, 0, 5);
+  m_HpositionZDiff = new TH1D("m_HpositionZDiff", "DistZ between extHit and KLMHit2d;distZ", 100, 0, 5);
 
-  h_flyTimeB = new TH2D("h_flyTimeB", "flyTime;flyTime(wet)/ns;Layer", 32, 0, 16, 20, 0, 20);
-  h_flyTimeE = new TH2D("h_flyTimeE", "flyTime;flyTime(wet)/ns;Layer", 32, 0, 16, 20, 0, 20);
+  m_HflyTimeB = new TH2D("m_HflyTimeB", "flyTime;flyTime(wet)/ns;Layer", 32, 0, 16, 20, 0, 20);
+  m_HflyTimeE = new TH2D("m_HflyTimeE", "flyTime;flyTime(wet)/ns;Layer", 32, 0, 16, 20, 0, 20);
 
-  h_numDigit_rpc = new TH1I("h_numDigit_rpc", "Number of digit per bklmHit1d (RPC);number of digit", 15, 0, 15);
-  h_numDigit_scint = new TH1I("h_numDigit_scint", "Number of digit per bklmHit1d (scint);number of digit", 15, 0, 15);
-  h_numDigit_scint_end = new TH1I("h_numDigit_scint_end", "Number of eklmDigit per eklmHit1d (scint);number of eklmDigit", 15, 0, 15);
+  m_HnumDigit_rpc = new TH1I("m_HnumDigit_rpc", "Number of digit per bklmHit1d (RPC);number of digit", 15, 0, 15);
+  m_HnumDigit_scint = new TH1I("m_HnumDigit_scint", "Number of digit per bklmHit1d (scint);number of digit", 15, 0, 15);
+  m_HnumDigit_scint_end = new TH1I("m_HnumDigit_scint_end", "Number of eklmDigit per eklmHit1d (scint);number of eklmDigit", 15, 0,
+                                   15);
 
-  registerObject<TH1D>("h_evtT0_0", h_eventT0_0);
-  registerObject<TH1D>("h_evtT0_1", h_eventT0_1);
-  registerObject<TH1I>("h_nTrack", h_numTrack);
-  registerObject<TH1I>("h_nBHit2d", h_nBHit2dOfTrack);
-  registerObject<TH1I>("h_nEHit2d", h_nEHit2dOfTrack);
+  registerObject<TH1D>("m_HevtT0_0", m_HeventT0_0);
+  registerObject<TH1D>("m_HevtT0_1", m_HeventT0_1);
+  registerObject<TH1I>("m_HnTrack", m_HnumTrack);
+  registerObject<TH1I>("m_HnBHit2d", m_HnBHit2dOfTrack);
+  registerObject<TH1I>("m_HnEHit2d", m_HnEHit2dOfTrack);
 
-  registerObject<TH1D>("h_posiDiff", h_positionDiff);
-  registerObject<TH1D>("h_posiXDiff", h_positionXDiff);
-  registerObject<TH1D>("h_posiYDiff", h_positionYDiff);
-  registerObject<TH1D>("h_posiZDiff", h_positionZDiff);
+  registerObject<TH1D>("m_HposiDiff", m_HpositionDiff);
+  registerObject<TH1D>("m_HposiXDiff", m_HpositionXDiff);
+  registerObject<TH1D>("m_HposiYDiff", m_HpositionYDiff);
+  registerObject<TH1D>("m_HposiZDiff", m_HpositionZDiff);
 
-  registerObject<TH2D>("h_fTimeB", h_flyTimeB);
-  registerObject<TH2D>("h_fTimeE", h_flyTimeE);
+  registerObject<TH2D>("m_HfTimeB", m_HflyTimeB);
+  registerObject<TH2D>("m_HfTimeE", m_HflyTimeE);
 
-  registerObject<TH1I>("h_nDigit_rpc", h_numDigit_rpc);
-  registerObject<TH1I>("h_nDigit_scint", h_numDigit_scint);
-  registerObject<TH1I>("h_nDigit_scint_end", h_numDigit_scint_end);
+  registerObject<TH1I>("m_HnDigit_rpc", m_HnumDigit_rpc);
+  registerObject<TH1I>("m_HnDigit_scint", m_HnumDigit_scint);
+  registerObject<TH1I>("m_HnDigit_scint_end", m_HnumDigit_scint_end);
 }
 
 void KLMTimeCalibrationCollectorModule::collect()
@@ -148,19 +141,20 @@ void KLMTimeCalibrationCollectorModule::collect()
   setDescription("Time Calibration Collector. Main Collect Function of Collector Module Begins.");
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
 
-  /** Require event T0 determined from CDC */
+  /* Require event T0 determined from CDC */
   if (!m_eventT0.isValid()) return;
   if (!m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) return;
   const std::vector<EventT0::EventT0Component> evtT0C = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
 
-  /** Read data meta infor */
+  /* Read data meta infor */
   int runId = eventMetaData->getRun();
   int evtId = eventMetaData->getEvent();
 
   m_ev.t0 = evtT0C.back().eventT0;
-  getObjectPtr<TH1D>("h_evtT0_0")->Fill(m_ev.t0);
+  getObjectPtr<TH1D>("m_HevtT0_0")->Fill(m_ev.t0);
 
-  unsigned n_track =  m_tracks.getEntries();
+  const StoreObjPtr<ParticleList> inputList(m_inputListName);
+  unsigned n_track =  inputList->getListSize();
   if (n_track < 1) {
     B2DEBUG(20, "No necessary tracks in" << LogVar("run", runId) << LogVar("event", evtId));
     return;
@@ -168,23 +162,26 @@ void KLMTimeCalibrationCollectorModule::collect()
 
   B2DEBUG(20, "debug infor for" << LogVar("run", runId) << LogVar("event", evtId) << LogVar("number of rec tracks", n_track));
 
-  getObjectPtr<TH1D>("h_evtT0_1")->Fill(m_ev.t0);
-  getObjectPtr<TH1I>("h_nTrack")->Fill(n_track);
+  getObjectPtr<TH1D>("m_HevtT0_1")->Fill(m_ev.t0);
+  getObjectPtr<TH1I>("m_HnTrack")->Fill(n_track);
 
-  /** Here begins the ext track sequence */
+  /* Here begins the ext track sequence */
   B2DEBUG(20, "Track loop begins");
 
-  /** Main loop */
+  /* Main loop */
   for (unsigned iT = 0; iT < n_track; ++iT) {
     // Good track selection
-    Track* track = m_tracks[iT];
-    const TrackFitResult* tFtr = track->getTrackFitResultWithClosestMass(Const::muon);
-    double d_zero = tFtr->getD0();
-    double z_zero = tFtr->getZ0();
-    int nCDChits = tFtr->getHitPatternCDC().getNHits() ;
-    if (fabs(d_zero) > 0.5 || fabs(z_zero) > 2.0) continue;
-    if (tFtr->getMomentum().Mag() < 0.55) continue;
-    if (nCDChits < 20) continue;
+    const Particle* particle = inputList->getParticle(iT);
+    const Track* track = particle->getTrack();
+
+    //Track* track = m_tracks[iT];
+    //const TrackFitResult* tFtr = track->getTrackFitResultWithClosestMass(Const::muon);
+    //double d_zero = tFtr->getD0();
+    //double z_zero = tFtr->getZ0();
+    //int nCDChits = tFtr->getHitPatternCDC().getNHits() ;
+    //if (fabs(d_zero) > 0.5 || fabs(z_zero) > 2.0) continue;
+    //if (tFtr->getMomentum().Mag() < 0.55) continue;
+    //if (nCDChits < 20) continue;
 
     // Find data objects related to track
     RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
@@ -192,8 +189,8 @@ void KLMTimeCalibrationCollectorModule::collect()
     RelationVector<EKLMHit2d> eklmHit2ds = track->getRelationsTo<EKLMHit2d>();
     RelationVector<Muid> Muids = track->getRelationsTo<Muid>();
 
-    getObjectPtr<TH1I>("h_nHit2d_bklm")->Fill(int(bklmHit2ds.size()));
-    getObjectPtr<TH1I>("h_nHit2d_eklm")->Fill(int(eklmHit2ds.size()));
+    getObjectPtr<TH1I>("m_HnHit2d_bklm")->Fill(int(bklmHit2ds.size()));
+    getObjectPtr<TH1I>("m_HnHit2d_eklm")->Fill(int(eklmHit2ds.size()));
 
     B2DEBUG(20, "Track" << LogVar("exthits", extHits.size())
             << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
@@ -201,7 +198,7 @@ void KLMTimeCalibrationCollectorModule::collect()
     if (extHits.size() < 2) continue;
 
     // Loop for extroplate hits
-    map_extHits.clear();
+    m_mapExtHits.clear();
     for (unsigned iE = 0; iE < extHits.size(); ++iE) {
       ExtHit* extHit = extHits[iE];
       // Select extHits in the KLM range
@@ -221,20 +218,20 @@ void KLMTimeCalibrationCollectorModule::collect()
       }
       if (!crossed) continue;
 
-      map_extHits.insert(std::pair<int, ExtHit*>(copyId, extHit));
+      m_mapExtHits.insert(std::pair<int, ExtHit*>(copyId, extHit));
     }
 
-    B2DEBUG(20, "In KLM coverage: " << LogVar("exthits", map_extHits.size())
+    B2DEBUG(20, "In KLM coverage: " << LogVar("exthits", m_mapExtHits.size())
             << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
-    if (map_extHits.size() < 2) continue;
+    if (m_mapExtHits.size() < 2) continue;
 
-    collect_RPC(bklmHit2ds);
-    collect_scint(bklmHit2ds);
-    collect_scint_end(eklmHit2ds);
+    collectRPC(bklmHit2ds);
+    collectScint(bklmHit2ds);
+    collectScintEnd(eklmHit2ds);
   }
 }
 
-void KLMTimeCalibrationCollectorModule::collect_scint_end(RelationVector<EKLMHit2d> hit2ds)
+void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d> hit2ds)
 {
   setDescription("Time Calibration Collector. Collect Function for EKLM parts of Collector Module Begins.");
 
@@ -266,7 +263,7 @@ void KLMTimeCalibrationCollectorModule::collect_scint_end(RelationVector<EKLMHit
       ExtHit* extHit   = nullptr;
       ExtHit* entryHit = nullptr;
       ExtHit* exitHit  = nullptr;
-      for (it = map_extHits.begin(); it != map_extHits.end(); ++it) {
+      for (it = m_mapExtHits.begin(); it != m_mapExtHits.end(); ++it) {
         extHit = it->second;
         int copyid = extHit->getCopyID();
         m_elementNum->channelNumberToElementNumbers(copyid, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
@@ -314,10 +311,10 @@ void KLMTimeCalibrationCollectorModule::collect_scint_end(RelationVector<EKLMHit
       double diffX = positionGlobal_diff.X();
       double diffY = positionGlobal_diff.Y();
       double diffZ = positionGlobal_diff.Z();
-      getObjectPtr<TH1D>("h_posiDiff")->Fill(diffM);
-      getObjectPtr<TH1D>("h_posiXDiff")->Fill(diffX);
-      getObjectPtr<TH1D>("h_posiYDiff")->Fill(diffY);
-      getObjectPtr<TH1D>("h_posiZDiff")->Fill(diffZ);
+      getObjectPtr<TH1D>("m_HposiDiff")->Fill(diffM);
+      getObjectPtr<TH1D>("m_HposiXDiff")->Fill(diffX);
+      getObjectPtr<TH1D>("m_HposiYDiff")->Fill(diffY);
+      getObjectPtr<TH1D>("m_HposiZDiff")->Fill(diffZ);
       //if (diffM > 10.0) continue;
 
       l = m_geoParE->getStripLength(digitHit->getStrip()) / CLHEP::mm * Unit::mm;
@@ -333,16 +330,16 @@ void KLMTimeCalibrationCollectorModule::collect_scint_end(RelationVector<EKLMHit
       m_ev.eDep = digitHit->getCharge();
       m_ev.nPE = digitHit->getNPE();
 
-      getObjectPtr<TH2D>("h_fTime_end")->Fill(m_ev.flyTime, iLay);
+      getObjectPtr<TH2D>("m_HfTime_end")->Fill(m_ev.flyTime, iLay);
       getObjectPtr<TTree>("time_calibration_data")->Fill();
     }
   }
 }
 
-void KLMTimeCalibrationCollectorModule::collect_scint(RelationVector<BKLMHit2d> bklmHit2ds)
+void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d> bklmHit2ds)
 {
   int iSub, iFor, iSec, iLay, iPla, iStr;
-  double stripWidth_Z, stripWidth_Phi;
+  double stripWidtm_HZ, stripWidtm_HPhi;
 
   for (unsigned iH2 = 0; iH2 < bklmHit2ds.size(); ++iH2) {
     BKLMHit2d* hit2d = bklmHit2ds[iH2];
@@ -354,12 +351,12 @@ void KLMTimeCalibrationCollectorModule::collect_scint(RelationVector<BKLMHit2d> 
     TVector3 positionGlobal_hit2d = hit2d->getGlobalPosition();
 
     const bklm::Module* corMod = m_geoParB->findModule(hit2d->getSection(), hit2d->getSector(), hit2d->getLayer());
-    stripWidth_Z = corMod->getZStripWidth();
-    stripWidth_Phi = corMod->getPhiStripWidth();
+    stripWidtm_HZ = corMod->getZStripWidth();
+    stripWidtm_HPhi = corMod->getPhiStripWidth();
     for (unsigned iH1 = 0; iH1 < bklmHit1ds.size(); ++iH1) {
       BKLMHit1d* hit1d = bklmHit1ds[iH1];
       RelationVector<BKLMDigit> digits = hit1d->getRelationsTo<BKLMDigit>();
-      getObjectPtr<TH1I>("h_nDigit_scint")->Fill(digits.size());
+      getObjectPtr<TH1I>("m_HnDigit_scint")->Fill(digits.size());
       if (digits.size() > 5) continue;
 
       for (unsigned iHd = 0; iHd < digits.size(); ++iHd) {
@@ -375,7 +372,7 @@ void KLMTimeCalibrationCollectorModule::collect_scint(RelationVector<BKLMHit2d> 
         ExtHit* extHit   = nullptr;
         ExtHit* entryHit = nullptr;
         ExtHit* exitHit  = nullptr;
-        for (it = map_extHits.begin(); it != map_extHits.end(); ++it) {
+        for (it = m_mapExtHits.begin(); it != m_mapExtHits.end(); ++it) {
           extHit = it->second;
           int copyid = extHit->getCopyID();
           m_elementNum->channelNumberToElementNumbers(copyid, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
@@ -423,14 +420,13 @@ void KLMTimeCalibrationCollectorModule::collect_scint(RelationVector<BKLMHit2d> 
         double diffX = positionGlobal_diff.X();
         double diffY = positionGlobal_diff.Y();
         double diffZ = positionGlobal_diff.Z();
-        getObjectPtr<TH1D>("h_posiDiff")->Fill(diffM);
-        getObjectPtr<TH1D>("h_posiXDiff")->Fill(diffX);
-        getObjectPtr<TH1D>("h_posiYDiff")->Fill(diffY);
-        getObjectPtr<TH1D>("h_posiZDiff")->Fill(diffZ);
+        getObjectPtr<TH1D>("m_HposiDiff")->Fill(diffM);
+        getObjectPtr<TH1D>("m_HposiXDiff")->Fill(diffX);
+        getObjectPtr<TH1D>("m_HposiYDiff")->Fill(diffY);
+        getObjectPtr<TH1D>("m_HposiZDiff")->Fill(diffZ);
         m_ev.diffDistX = diffX;
         m_ev.diffDistY = diffY;
         m_ev.diffDistZ = diffZ;
-        //if (diffM > 10.0) continue;
 
         // If the Layer is filpped?
         m_ev.isFlipped = corMod->isFlipped();
@@ -439,7 +435,7 @@ void KLMTimeCalibrationCollectorModule::collect_scint(RelationVector<BKLMHit2d> 
         const CLHEP::Hep3Vector positionLocal_hit2d = corMod->globalToLocal(CLHEP::Hep3Vector(
                                                         positionGlobal_hit2d.X(), positionGlobal_hit2d.Y(), positionGlobal_hit2d.Z()), true);
         const CLHEP::Hep3Vector diffLocal = positionLocal_extHit - positionLocal_hit2d;
-        if (fabs(diffLocal.z()) > stripWidth_Z  || fabs(diffLocal.y()) > stripWidth_Phi) continue;
+        if (fabs(diffLocal.z()) > stripWidtm_HZ  || fabs(diffLocal.y()) > stripWidtm_HPhi) continue;
 
         const CLHEP::Hep3Vector propaLengthV3 = corMod->getPropagationDistance(positionLocal_extHit);
         double propaLength = propaLengthV3[2 - digitHit->isPhiReadout()];
@@ -450,14 +446,14 @@ void KLMTimeCalibrationCollectorModule::collect_scint(RelationVector<BKLMHit2d> 
         m_ev.nPE = digitHit->getNPixel();
         m_ev.channelId = channelId_digit;
 
-        getObjectPtr<TH2D>("h_fTime")->Fill(m_ev.flyTime, iLay);
+        getObjectPtr<TH2D>("m_HfTime")->Fill(m_ev.flyTime, iLay);
         getObjectPtr<TTree>("time_calibration_data")->Fill();
       }
     }
   }
 }
 
-void KLMTimeCalibrationCollectorModule::collect_RPC(RelationVector<BKLMHit2d> bklmHit2ds)
+void KLMTimeCalibrationCollectorModule::collectRPC(RelationVector<BKLMHit2d> bklmHit2ds)
 {
   int iSub, iFor, iSec, iLay, iPla, iStr;
 
@@ -476,7 +472,7 @@ void KLMTimeCalibrationCollectorModule::collect_RPC(RelationVector<BKLMHit2d> bk
     ExtHit* extHit   = nullptr;
     ExtHit* entryHit = nullptr;
     ExtHit* exitHit  = nullptr;
-    for (it = map_extHits.begin(); it != map_extHits.end(); ++it) {
+    for (it = m_mapExtHits.begin(); it != m_mapExtHits.end(); ++it) {
       extHit = it->second;
       int copyid = extHit->getCopyID();
       m_elementNum->channelNumberToElementNumbers(copyid, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
@@ -519,18 +515,17 @@ void KLMTimeCalibrationCollectorModule::collect_RPC(RelationVector<BKLMHit2d> bk
     double diffX = positionGlobal_diff.X();
     double diffY = positionGlobal_diff.Y();
     double diffZ = positionGlobal_diff.Z();
-    getObjectPtr<TH1D>("h_posiDiff")->Fill(diffM);
-    getObjectPtr<TH1D>("h_posiXDiff")->Fill(diffX);
-    getObjectPtr<TH1D>("h_posiYDiff")->Fill(diffY);
-    getObjectPtr<TH1D>("h_posiZDiff")->Fill(diffZ);
+    getObjectPtr<TH1D>("m_HposiDiff")->Fill(diffM);
+    getObjectPtr<TH1D>("m_HposiXDiff")->Fill(diffX);
+    getObjectPtr<TH1D>("m_HposiYDiff")->Fill(diffY);
+    getObjectPtr<TH1D>("m_HposiZDiff")->Fill(diffZ);
     m_ev.diffDistX = diffX;
     m_ev.diffDistY = diffY;
     m_ev.diffDistZ = diffZ;
-    //if (diffM > 10.0) continue;
 
     const bklm::Module* corMod = m_geoParB->findModule(hit2d->getSection(), hit2d->getSector(), hit2d->getLayer());
-    double stripWidth_Z = corMod->getZStripWidth();
-    double stripWidth_Phi = corMod->getPhiStripWidth();
+    double stripWidtm_HZ = corMod->getZStripWidth();
+    double stripWidtm_HPhi = corMod->getPhiStripWidth();
 
     // If the Layer is filpped?
     m_ev.isFlipped = corMod->isFlipped();
@@ -539,14 +534,14 @@ void KLMTimeCalibrationCollectorModule::collect_RPC(RelationVector<BKLMHit2d> bk
     const CLHEP::Hep3Vector positionLocal_hit2d = corMod->globalToLocal(CLHEP::Hep3Vector(
                                                     positionGlobal_hit2d.X(), positionGlobal_hit2d.Y(), positionGlobal_hit2d.Z()), true);
     const CLHEP::Hep3Vector diffLocal = positionLocal_extHit - positionLocal_hit2d;
-    if (fabs(diffLocal.z()) > stripWidth_Z  || fabs(diffLocal.y()) > stripWidth_Phi) continue;
+    if (fabs(diffLocal.z()) > stripWidtm_HZ  || fabs(diffLocal.y()) > stripWidtm_HPhi) continue;
 
     const CLHEP::Hep3Vector propaLengthV3 = corMod->getPropagationDistance(positionLocal_extHit);
 
     for (unsigned iH1 = 0; iH1 < bklmHit1ds.size(); ++iH1) {
       BKLMHit1d* hit1d = bklmHit1ds[iH1];
       RelationVector<BKLMDigit> digits = hit1d->getRelationsTo<BKLMDigit>();
-      getObjectPtr<TH1I>("h_nDigit_rpc")->Fill(digits.size());
+      getObjectPtr<TH1I>("m_HnDigit_rpc")->Fill(digits.size());
       if (digits.size() > 5) continue;
 
       double propaLength = propaLengthV3[2 - int(hit1d->isPhiReadout())];
@@ -568,7 +563,7 @@ void KLMTimeCalibrationCollectorModule::collect_RPC(RelationVector<BKLMHit2d> bk
         m_ev.nPE = digitHit->getNPixel();
         m_ev.channelId = channelId_digit;
 
-        getObjectPtr<TH2D>("h_fTime")->Fill(m_ev.flyTime, iLay);
+        getObjectPtr<TH2D>("m_HfTime")->Fill(m_ev.flyTime, iLay);
         getObjectPtr<TTree>("time_calibration_data")->Fill();
       }
     }

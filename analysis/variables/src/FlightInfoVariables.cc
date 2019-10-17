@@ -802,9 +802,9 @@ namespace Belle2 {
                       "Returns the MC flight time between mother and daughter particle using generated info");
     //Vertex Distance
     REGISTER_VARIABLE("vertexDistance", vertexDistance,
-                      "Returns the distance between the production and decay vertex of a particle. Returns -999 if particle has no production or decay vertex.");
+                      "Returns the distance between the production and decay vertex of a particle. Returns NaN if particle has no production or decay vertex.");
     REGISTER_VARIABLE("vertexDistanceErr", vertexDistanceErr,
-                      "Returns the uncertainty on the distance between the production and decay vertex of a particle. Returns -999 if particle has no production or decay vertex.");
+                      "Returns the uncertainty on the distance between the production and decay vertex of a particle. Returns NaN if particle has no production or decay vertex.");
     REGISTER_VARIABLE("vertexDistanceSignificance", vertexDistanceSignificance,
                       "Returns the distance between the production and decay vertex of a particle in units of the uncertainty on this value, i.e. the significance of the vertex separation.");
     REGISTER_VARIABLE("vertexDistanceOfDaughter(daughterN, option = '')", vertexDistanceOfDaughter,

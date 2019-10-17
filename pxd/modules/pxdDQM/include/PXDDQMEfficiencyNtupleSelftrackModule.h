@@ -22,7 +22,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 
-#include <tracking/pxdDataReductionClasses/PXDInterceptor.h>
 
 //root stuff
 #include "TVector3.h"
@@ -36,16 +35,19 @@ namespace Belle2 {
   /**
    * Creates Ntuples for PXD Efficiency analysis
    *
-   * relies on PXD intercepts from the interceptor module which needs to be run before.´
+   * This module is doing the tracking itself, thus checking for hits on in and
+   * outgoing leg of a track, which work only for cosmics. For tracks originating in IP
+   * we will end up at 50%, depending on module order.
+   * Do not use this module unless you know what to expect.
    */
-  class PXDDQMEfficiencyNtupleModule : public Module {
+  class PXDDQMEfficiencyNtupleSelftrackModule : public Module {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    PXDDQMEfficiencyNtupleModule();
+    PXDDQMEfficiencyNtupleSelftrackModule();
 
   private:
 
@@ -91,13 +93,11 @@ namespace Belle2 {
     std::string m_tracksName; ///< name of the store array of tracks
     std::string m_recoTracksName; ///< name of the store array of recotracks
     std::string m_ROIsName; ///< name of the store array of ROIs
-    std::string m_PXDInterceptListName; /**< intercept list name*/
 
     StoreArray<PXDCluster> m_pxdclusters; ///< store array of pxd clusters
     StoreArray<Track> m_tracks; ///< store array of tracks
     StoreArray<RecoTrack> m_recoTracks; ///< store array of reco tracks
     StoreArray<ROIid> m_ROIs; ///< store array of ROIs
-    StoreArray<PXDIntercept> m_intercepts; ///< store array of PXD Intercepts
 
     double m_pcut; ///< pValue-Cut for tracks
     double m_momCut; ///< Cut on fitted track momentum

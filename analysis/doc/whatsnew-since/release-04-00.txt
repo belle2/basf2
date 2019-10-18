@@ -20,3 +20,8 @@ Modules
  * In :b2:mod:`TreeFitter` max iterations set to 100, increases efficiency slightly in many cases.
  * Fix to nested RestOfEvent objects (see :issue:`BII-5649`)
  * Removed module ``CreateBsigFromFullRecoBtag``
+
+Variables
++++++++++
+
+ * Fixed ``goodBelleLambda`` and now it returns ``extraInfo(goodLambda)`` on Belle data. 

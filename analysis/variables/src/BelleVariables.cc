@@ -24,6 +24,8 @@
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
 
+#include <limits>
+
 namespace Belle2 {
   namespace Variable {
 
@@ -66,10 +68,10 @@ namespace Belle2 {
     double trackD0FromIP(const Particle* particle)
     {
       const Track* track = particle->getTrack();
-      if (!track) return 0.;
+      if (!track) return std::numeric_limits<float>::quiet_NaN();
 
       const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(particle->getPDGCode())));
-      if (!trackFit) return 0.;
+      if (!trackFit) return std::numeric_limits<float>::quiet_NaN();
 
       static DBObjPtr<BeamSpot> beamSpotDB;
 

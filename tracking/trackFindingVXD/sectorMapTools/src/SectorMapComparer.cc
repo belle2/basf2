@@ -428,7 +428,7 @@ SectorMapComparer::PlotSectorStats(bool logScale, TString pdfFileName, bool draw
     return;
   }
 
-  TH1F h_2hits("h_2hits", "number of two hit connections starting at layer; layer", 7, -0.5, 6.5);
+  TH1F h_2hits("h_2hits", "number of two hit connections starting at ith layer; layer; number connections", 7, -0.5, 6.5);
   // stats box does not give any useful information, so deactivate it
   h_2hits.SetStats(false);
   // make some copies
@@ -438,12 +438,13 @@ SectorMapComparer::PlotSectorStats(bool logScale, TString pdfFileName, bool draw
   // make copies for the three hit connections
   TH1F h_3hits(h_2hits);
   h_3hits.SetName("h_3hits");
-  h_3hits.SetTitle("number of three hit connections starting at layer; layer");
+  h_3hits.SetTitle("number of three hit connections starting at ith layer; layer; number connections");
   TH1F h_3hits_matched(h_3hits);
   h_3hits_matched.SetName("h_3hits_matched");
   h_3hits_matched.SetLineColor(kRed);
 
   for (int ilayer = 1; ilayer < 7; ilayer++) {
+
     // the bin is the same for all
     int bin = h_2hits.FindBin(ilayer);
     h_2hits.SetBinContent(bin, CountConnections(m_map_N2HitCombs, ilayer, -1, -1, -1));
@@ -468,8 +469,68 @@ SectorMapComparer::PlotSectorStats(bool logScale, TString pdfFileName, bool draw
   h_3hits.DrawCopy();
   h_3hits_matched.DrawCopy("same");
 
+
+
+  // a stupid way of counting the number of sensors contained without having to invoke the geometry
+  std::vector< std::unordered_map<std::string, int> > sensorsInLayer2Hits(6);
+  for (const auto& entry : m_map_N2HitCombs) {
+    VxdID id = FullSecID(entry.first).getVxdID();
+    sensorsInLayer2Hits[id.getLayerNumber() - 1][(std::string)id ] = 1;
+  }
+  std::vector< std::unordered_map<std::string, int> > sensorsInLayer3Hits(6);
+  for (const auto& entry : m_map_N3HitCombs) {
+    VxdID id = FullSecID(entry.first).getVxdID();
+    sensorsInLayer3Hits[id.getLayerNumber() - 1][(std::string)id] = 1;
+  }
+  // Reusing old histograms!
+  for (int i = 1; i <= 6; i++) {
+    // assumes binning is still the same for all hists!
+    int bin = 0;
+    bin = h_3hits.FindBin(i);
+
+    int nSensors2Hits = sensorsInLayer2Hits[i - 1].size();
+    int nSensors3Hits = sensorsInLayer3Hits[i - 1].size();
+
+    if (nSensors2Hits > 0) {
+      h_2hits.SetBinContent(bin, h_2hits.GetBinContent(bin) / nSensors2Hits);
+      h_2hits_matched.SetBinContent(bin, h_2hits_matched.GetBinContent(bin) / nSensors2Hits);
+    } else {
+      B2WARNING("No sensors found in layer " << i);
+    }
+
+    if (nSensors3Hits > 0) {
+      h_3hits.SetBinContent(bin, h_3hits.GetBinContent(bin) / nSensors3Hits);
+      h_3hits_matched.SetBinContent(bin, h_3hits_matched.GetBinContent(bin) / nSensors3Hits);
+    } else {
+      B2WARNING("No sensors found in layer " << i);
+    }
+    // debug
+    std::cout << "N sensors on L" << i << " = " << nSensors2Hits << " " << nSensors3Hits << std::endl;
+  }
+
+  TCanvas* can2 = new TCanvas("ConPerSensor", "Connections per sensor");
+  can2->Divide(1, 2);
+  can2->cd(1)->SetLogy((int)logScale);
+  // TODO: potential memory leak, but I dont care
+  TLegend* l2 = new TLegend(0.15, 0.7, 0.3, 0.9);
+
+  h_2hits.SetTitle("average number of 2Hit combinations per sensor starting at ith layer; layer; avg. connections/sensor");
+  hbuff = h_2hits.DrawCopy();
+  l2->AddEntry(hbuff, "all from first map", "lpf");
+  hbuff = h_2hits_matched.DrawCopy("same");
+  l2->AddEntry(hbuff, "only matched ", "lpf");
+  if (drawLegend) l2->Draw();
+
+  can2->cd(2)->SetLogy((int)logScale);
+  h_3hits.SetTitle("average number of 3Hit combinations per sensor starting at ith layer; layer; avg. connections/sensor");
+  h_3hits.DrawCopy();
+  h_3hits_matched.DrawCopy("same");
+
+
+
   if (pdfFileName != "") {
-    can->SaveAs(pdfFileName);
+    can->SaveAs(pdfFileName + "(");
+    can2->SaveAs(pdfFileName + ")");
   }
 
 }

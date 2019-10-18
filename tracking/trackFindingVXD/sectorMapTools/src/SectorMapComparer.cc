@@ -1,4 +1,5 @@
-#include "tracking/trackFindingVXD/sectorMapTools/SectorMapComparer.h"
+#include <tracking/trackFindingVXD/sectorMapTools/SectorMapComparer.h>
+#include <tracking/dataobjects/FullSecID.h>
 
 #include <framework/logging/LogConfig.h>
 
@@ -9,6 +10,7 @@
 #include <TCanvas.h>
 #include <TObjArray.h>
 #include <TObject.h>
+#include <TLegend.h>
 
 #include <vector>
 #include <iostream>
@@ -67,7 +69,6 @@ SectorMapComparer::SetLeafAddresses(TTree* t, std::unordered_map<std::string, do
 
 // returns a map of sector combinations to the position in the branch
 // WARNING: this messes up the addresses!!!!!!!
-// TODO: fix this code! Or use the SetLeafAddresses, and remove this function completely (its only 5 lines which are relevant!)
 void
 SectorMapComparer::FillSectorToTreeIndexMap(TTree* tree, std::unordered_map<std::string, long>& map)
 {
@@ -122,6 +123,10 @@ SectorMapComparer::CompareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
   std::unordered_map<std::string, uint> ids_t_second;
   SetLeafAddresses(t_second, vals_t_second, ids_t_second);
 
+
+  // identify Three hit combinations by existens of the branch centerID
+  bool isTriplet =  t_first->GetBranch("centerFullSecID") != nullptr;
+
   // some cross checks
   if (vals_t_second.size() != vals_t_first.size()) {
     B2WARNING("Number of filters stored in the two SectorMaps seem to differ! This is per se not dangerous, but some cuts may be compared to zero.");
@@ -170,11 +175,18 @@ SectorMapComparer::CompareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
   }
 
 
+
   // loop over t1, and get corresponding value for t2
   for (long i = 0; i < t_first->GetEntries(); i++) {
     t_first->GetEntry(i);
 
     std::string hash = GetHash(ids_t_first["innerFullSecID"], ids_t_first["centerFullSecID"], ids_t_first["outerFullSecID"]);
+
+
+    // count all connections
+    if (isTriplet) m_map_N3HitCombs[ ids_t_first["outerFullSecID"] ]++;
+    else  m_map_N2HitCombs[ ids_t_first["outerFullSecID"] ]++;
+
 
     // filter connections inside both sector maps, if unmatchedEntries is true only the unmatched entries will be selected
     if (indexmap_t_second.find(hash) == indexmap_t_second.end()) {
@@ -186,6 +198,9 @@ SectorMapComparer::CompareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
       if (unmatchedEntries) continue;
     }
 
+    // only count the matched ones
+    if (isTriplet) m_map_N3HitCombs_matched[ ids_t_first["outerFullSecID"] ]++;
+    else  m_map_N2HitCombs_matched[ ids_t_first["outerFullSecID"] ]++;
 
     // now fill the histograms
     // NOTE: in case unmatchedEntries==true the values in the the second tree do not make any sense, so not fill any histograms with them
@@ -194,8 +209,10 @@ SectorMapComparer::CompareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
       // TODO: find a better way to destinguis the secid leaves from the others
       if (leafName.Contains("FullSecID")) continue;
       m_histo_map_first[ leafName.Data() ].Fill(vals_t_first[leafName.Data()]);
-      if (!unmatchedEntries) m_histo_map_second[ leafName.Data() ].Fill(vals_t_second[leafName.Data()]);
-      if (!unmatchedEntries) m_histo_map_diff[ leafName.Data() ].Fill(vals_t_first[leafName.Data()] - vals_t_second[leafName.Data()]);
+      if (!unmatchedEntries) {
+        m_histo_map_second[ leafName.Data() ].Fill(vals_t_second[leafName.Data()]);
+        m_histo_map_diff[ leafName.Data() ].Fill(vals_t_first[leafName.Data()] - vals_t_second[leafName.Data()]);
+      }
       // calculate the range only for the max
       if (leafName.Contains("_max")) {
         TString minLeafName = leafName;
@@ -205,6 +222,7 @@ SectorMapComparer::CompareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
               vals_t_second[minLeafName.Data()]);
       }
     }
+
   }
 
 }
@@ -231,11 +249,11 @@ SectorMapComparer::ShowSetups(TString secmapFileName)
     return;
   }
 
-  B2INFO("Following setups found for file: " << secmapFileName);
-  B2INFO("================================ ");
+  std::cout << "Following setups found for file: " << secmapFileName << std::endl;
+  std::cout << "================================ " << std::endl;
   for (long i = 0; i < t->GetEntries(); ++i) {
-    t->GetEntry();
-    B2INFO(*setupKeyName);
+    t->GetEntry(i);
+    std::cout << (*setupKeyName) << std::endl;
   }
 
   if (setupKeyName) delete setupKeyName;
@@ -252,7 +270,6 @@ SectorMapComparer::FindTrees(TDirectory* aDir, std::vector<std::string>&  listOf
     // there should be no check needed as each key should be attached to an object
     TObject* o = aDir->Get(akey->GetName());
 
-    //std::cout << o->ClassName() << std::endl;
 
     if (o->InheritsFrom(TDirectory::Class())) FindTrees((TDirectory*)o, listOfTrees);
     if (o->InheritsFrom(TTree::Class())) {
@@ -264,8 +281,14 @@ SectorMapComparer::FindTrees(TDirectory* aDir, std::vector<std::string>&  listOf
 
 
 void
-SectorMapComparer::Plot(bool logScale, TString pdfFileName)
+SectorMapComparer::Plot(bool logScale, TString pdfFileName, bool drawLegend)
 {
+
+  if (!m_isCompared) {
+    B2WARNING("You need to run SectorMapComparer::CompareMaps before this function!");
+    return;
+  }
+
   int n = m_histo_map_first.size();
   int counter = 1;
   for (const auto& hist : m_histo_map_first) {
@@ -274,9 +297,15 @@ SectorMapComparer::Plot(bool logScale, TString pdfFileName)
     can->Divide(1, 3);
 
     can->cd(1)->SetLogy((int)logScale);
-    m_histo_map_first[ aName ].DrawCopy();
+    // TODO: pretty sure this is a memory leak, but right now I do not care
+    // draw legend only for first
+    TLegend* l = new TLegend(0.15, 0.7, 0.3, 0.9);
+    TH1* hbuff = m_histo_map_first[ aName ].DrawCopy();
+    l->AddEntry(hbuff, "first SectorMap", "lpf");
     m_histo_map_second[ aName ].SetLineColor(kRed);
-    m_histo_map_second[ aName ].DrawCopy("same");
+    hbuff = m_histo_map_second[ aName ].DrawCopy("same");
+    l->AddEntry(hbuff, "second SectorMap", "lpf");
+    if (drawLegend) l->Draw();
 
     can->cd(2)->SetLogy((int)logScale);;
     m_histo_map_diff[ aName ].DrawCopy();
@@ -355,7 +384,6 @@ SectorMapComparer::CompareMaps(TString setupName, bool unmatchedEntries)
       continue;
     }
 
-
     B2INFO("Comparing tree: " << tname_first << " with tree: " << tname_second <<  std::endl);
 
     if (!t_first || !t_second) {
@@ -363,19 +391,88 @@ SectorMapComparer::CompareMaps(TString setupName, bool unmatchedEntries)
       continue;
     }
 
-
     CompareTrees(t_first, t_second, unmatchedEntries);
-
-
   }
 
   f_first->Close();
   f_second->Close();
+
+  m_isCompared = true;
 }
 
 
+uint
+SectorMapComparer::CountConnections(const std::unordered_map<uint, uint>& map, int layer, int ladder, int sensor, int sector)
+{
+  uint result = 0;
+  for (const auto& entry : map) {
+    // convert to FullSecID
+    FullSecID fullSID(entry.first);
+    if (layer >= 0 && fullSID.getLayerNumber() != layer) continue;
+    if (ladder >= 0 && fullSID.getLadderNumber() != ladder) continue;
+    if (sensor >= 0 && fullSID.getVxdID().getSensorNumber() != sensor) continue;
+    if (sector >= 0 && fullSID.getSecID() != sector) continue;
+
+    // debug
+    result += entry.second;
+  }
+  return result;
+}
 
 
+void
+SectorMapComparer::PlotSectorStats(bool logScale, TString pdfFileName, bool drawLegend)
+{
+  if (!m_isCompared) {
+    B2WARNING("You need to run SectorMapComparer::CompareMaps before this function!");
+    return;
+  }
+
+  TH1F h_2hits("h_2hits", "number of two hit connections starting at layer; layer", 7, -0.5, 6.5);
+  // stats box does not give any useful information, so deactivate it
+  h_2hits.SetStats(false);
+  // make some copies
+  TH1F h_2hits_matched(h_2hits);
+  h_2hits_matched.SetName("h2hits_matched");
+  h_2hits_matched.SetLineColor(kRed);
+  // make copies for the three hit connections
+  TH1F h_3hits(h_2hits);
+  h_3hits.SetName("h_3hits");
+  h_3hits.SetTitle("number of three hit connections starting at layer; layer");
+  TH1F h_3hits_matched(h_3hits);
+  h_3hits_matched.SetName("h_3hits_matched");
+  h_3hits_matched.SetLineColor(kRed);
+
+  for (int ilayer = 1; ilayer < 7; ilayer++) {
+    // the bin is the same for all
+    int bin = h_2hits.FindBin(ilayer);
+    h_2hits.SetBinContent(bin, CountConnections(m_map_N2HitCombs, ilayer, -1, -1, -1));
+    h_2hits_matched.SetBinContent(bin, CountConnections(m_map_N2HitCombs_matched, ilayer, -1, -1, -1));
+    h_3hits.SetBinContent(bin, CountConnections(m_map_N3HitCombs, ilayer, -1, -1, -1));
+    h_3hits_matched.SetBinContent(bin, CountConnections(m_map_N3HitCombs_matched, ilayer, -1, -1, -1));
+  }
+
+  TCanvas* can = new TCanvas("secStats", "secStats");
+  can->Divide(1, 2);
+  can->cd(1)->SetLogy((int)logScale);
+  // TODO: potential memory leak, but I dont care
+  TLegend* l = new TLegend(0.15, 0.7, 0.3, 0.9);
+
+  TH1* hbuff = h_2hits.DrawCopy();
+  l->AddEntry(hbuff, "all from first map", "lpf");
+  hbuff = h_2hits_matched.DrawCopy("same");
+  l->AddEntry(hbuff, "only matched ", "lpf");
+  if (drawLegend) l->Draw();
+
+  can->cd(2)->SetLogy((int)logScale);
+  h_3hits.DrawCopy();
+  h_3hits_matched.DrawCopy("same");
+
+  if (pdfFileName != "") {
+    can->SaveAs(pdfFileName);
+  }
+
+}
 
 
 

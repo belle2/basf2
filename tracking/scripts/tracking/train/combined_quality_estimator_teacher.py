@@ -1042,7 +1042,6 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
             WeightFileIdentifier=self.get_input_file_names(
                 FullTrackQETeacherTask.get_weightfile_xml_identifier(FullTrackQETeacherTask)
             )[0],
-            collectEventFeatures=True,
         )
 
 

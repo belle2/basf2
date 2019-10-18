@@ -53,12 +53,12 @@ class TestMbcEff(unittest.TestCase):
         print("False candidates {0}".format(allBkg))
 
         sig_expected = 136
-        bkg_expected = 1680
+        bkg_expected = 1630
 
         self.assertTrue(
             allSig == sig_expected,
             f"Mbc cut efficency has changed! n_sig expected: {sig_expected} found: {sig_expected}.")
-        self.assertTrue(allBkg == bkg_expected, f"Mbc cut background hhas changed! n_bkg expected: {bkg_expected} found: {allBkg}.")
+        self.assertTrue(allBkg == bkg_expected, f"Mbc cut background has changed! n_bkg expected: {bkg_expected} found: {allBkg}.")
 
         print("Test passed, cleaning up.")
 

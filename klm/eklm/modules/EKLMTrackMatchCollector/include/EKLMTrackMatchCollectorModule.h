@@ -89,16 +89,6 @@ namespace Belle2 {
      */
     double getSumTrackEnergy(const StoreArray<Track>& selected_tracks) const;
 
-    /**
-     * Calculate distance to IP and make cut on this distance
-     */
-    bool d0z0Cut(const StoreArray<Track>& selected_tracks, double dist) const;
-
-    /**
-     * Making theta cut
-     */
-    bool thetaAcceptance(const StoreArray<Track>& selected_tracks) const;
-
   private:
 
     /**

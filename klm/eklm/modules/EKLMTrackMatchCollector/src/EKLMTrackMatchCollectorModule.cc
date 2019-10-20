@@ -145,33 +145,6 @@ double EKLMTrackMatchCollectorModule::getSumTrackEnergy(const StoreArray<Track>&
   return eneregy;
 }
 
-
-bool EKLMTrackMatchCollectorModule::d0z0Cut(const StoreArray<Track>& selected_tracks, double dist) const
-{
-  bool cosmic = false;
-
-  for (auto trk : selected_tracks) {
-    const TrackFitResult* fitResult = trk.getTrackFitResultWithClosestMass(Const::muon);
-    double d0 = fitResult->getD0();
-    double z0 = fitResult->getZ0();
-    if (d0 > dist || z0 > dist) cosmic = true;
-  }
-
-  return cosmic;
-}
-
-bool EKLMTrackMatchCollectorModule::thetaAcceptance(const StoreArray<Track>& selected_tracks) const
-{
-  bool disacceptance = false;
-
-  for (auto trk : selected_tracks) {
-    const TrackFitResult* fitResult = trk.getTrackFitResultWithClosestMass(Const::muon);
-    double theta = fitResult->getMomentum().Theta() * 180.0 / CLHEP::pi;
-    if (theta > 140 || theta < 20) disacceptance = true;
-  }
-  return disacceptance;
-}
-
 void EKLMTrackMatchCollectorModule::collect()
 {
   if (m_MuonListName != "") {

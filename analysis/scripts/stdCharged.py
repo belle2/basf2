@@ -34,7 +34,7 @@ def _stdChargedEffCuts(particletype, listtype):
     return effcuts[particleindex][effindex]
 
 
-def stdCharged(particletype, listtype, path=analysis_main):
+def stdCharged(particletype, listtype, path):
     """
     Function to prepare one of several standardized types of charged particle lists:
       - 'all' with no cuts on track
@@ -54,7 +54,7 @@ def stdCharged(particletype, listtype, path=analysis_main):
 
     # basic quality cut strings
     trackQuality = 'thetaInCDCAcceptance and nCDCHits>20'
-    ipCut = 'd0 < 0.5 and abs(z0) < 2'
+    ipCut = 'dr < 0.5 and abs(dz) < 2'
     goodTrack = trackQuality + ' and ' + ipCut
 
     if particletype not in _chargednames:
@@ -103,7 +103,7 @@ def stdCharged(particletype, listtype, path=analysis_main):
 ###
 
 
-def stdPi(listtype=_defaultlist, path=analysis_main):
+def stdPi(listtype=_defaultlist, path=None):
     """
     Function to prepare standard pion lists, refer to stdCharged for details
 
@@ -113,7 +113,7 @@ def stdPi(listtype=_defaultlist, path=analysis_main):
     stdCharged('pi', listtype, path)
 
 
-def stdK(listtype=_defaultlist, path=analysis_main):
+def stdK(listtype=_defaultlist, path=None):
     """
     Function to prepare standard kaon lists, refer to stdCharged for details
 
@@ -123,7 +123,7 @@ def stdK(listtype=_defaultlist, path=analysis_main):
     stdCharged('K', listtype, path)
 
 
-def stdPr(listtype=_defaultlist, path=analysis_main):
+def stdPr(listtype=_defaultlist, path=None):
     """
     Function to prepare standard proton lists, refer to stdCharged for details
 
@@ -133,7 +133,7 @@ def stdPr(listtype=_defaultlist, path=analysis_main):
     stdCharged('p', listtype, path)
 
 
-def stdE(listtype=_defaultlist, path=analysis_main):
+def stdE(listtype=_defaultlist, path=None):
     """
     Function to prepare standard electron lists, refer to stdCharged for details
 
@@ -143,7 +143,7 @@ def stdE(listtype=_defaultlist, path=analysis_main):
     stdCharged('e', listtype, path)
 
 
-def stdMu(listtype=_defaultlist, path=analysis_main):
+def stdMu(listtype=_defaultlist, path=None):
     """
     Function to prepare standard muon lists, refer to stdCharged for details
 

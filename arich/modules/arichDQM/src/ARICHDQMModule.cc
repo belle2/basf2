@@ -10,17 +10,14 @@
 
 // Own include
 #include <arich/modules/arichDQM/ARICHDQMModule.h>
-#include <arich/modules/arichDQM/hitMapMaker.h>
 
 // ARICH
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <arich/dbobjects/ARICHChannelMapping.h>
 #include <arich/dbobjects/ARICHMergerMapping.h>
-#include <arich/dbobjects/ARICHCopperMapping.h>
 #include <arich/dbobjects/ARICHGeoDetectorPlane.h>
 #include <arich/dbobjects/ARICHGeoAerogelPlane.h>
 #include <arich/dataobjects/ARICHHit.h>
-#include <arich/dataobjects/ARICHSimHit.h>
 #include <arich/dataobjects/ARICHDigit.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
 #include <arich/dataobjects/ARICHTrack.h>
@@ -31,33 +28,16 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // Dataobject classes
 #include <framework/database/DBObjPtr.h>
 
-// Raw data object class
-#include <rawdata/dataobjects/RawARICH.h>
-
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TH3F.h>
 #include <TF1.h>
-#include <TCanvas.h>
-#include <TStyle.h>
-#include <TMath.h>
-#include <THStack.h>
 #include <TVector3.h>
-#include <TFile.h>
-#include <TImage.h>
-#include <TPad.h>
 
-#include <sstream>
 #include <fstream>
 #include <math.h>
-#include <algorithm>
 
 using namespace std;
 
@@ -126,9 +106,6 @@ namespace Belle2 {
                                  0.5, 71 - 0.5);
     }
 
-    TDirectory* dirAerogel =  dirARICHDQM->mkdir("ARICHExpert");
-    dirAerogel->cd();
-
     h_chDigit = new TH1D("chDigit", "Number of raw digits in each channel;Channel serial;Hits", 420 * 144, -0.5, 420 * 144 - 0.5);
     h_chipDigit = new TH1D("chipDigit", "Number of raw digits in each chip;Chip serial;Hits", 420 * 4, -0.5, 420 * 4 - 0.5);
     h_hapdDigit = new TH1D("hapdDigit", "Number of raw digits in each HAPD;HAPD serial;Hits", 420, 0.5, 421 - 0.5);
@@ -142,8 +119,6 @@ namespace Belle2 {
 
     h_flashPerAPD = new TH1D("flashPerAPD", "Number of flashes per APD; APD serial; number of flash", 420 * 4, -0.5, 420 * 4 - 0.5);
 
-
-    dirARICHDQM->cd();
 
     //Select "LIVE" monitoring histograms
     h_chStat->SetOption("LIVE");

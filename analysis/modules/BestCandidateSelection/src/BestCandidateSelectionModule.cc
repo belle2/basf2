@@ -11,13 +11,11 @@
 #include <analysis/modules/BestCandidateSelection/BestCandidateSelectionModule.h>
 
 #include <analysis/VariableManager/Utility.h>
-
 #include <analysis/dataobjects/Particle.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/MakeROOTCompatible.h>
-
-#include <map>
 
 using namespace std;
 using namespace Belle2;
@@ -39,7 +37,7 @@ starting at 1 (best). The name of this extra-info field defaults to
 parameter.
 
 The ranking also takes antiparticles into account, so there will only be one
-B+- candidate with `rank=1`.  The remaining list is sorted from best to worst
+B+- candidate with ``rank=1``.  The remaining list is sorted from best to worst
 candidate (each charge, e.g. B+/B-, separately). The sorting is guaranteed
 to be stable between particle and anti particle list: particles with the same
 value for ``variable`` will keep their relative order. That is, a particle "A"

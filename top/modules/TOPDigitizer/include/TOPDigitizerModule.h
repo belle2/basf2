@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010, 2019 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Petric, Marko Staric                               *
@@ -24,11 +24,13 @@
 #include <top/dbobjects/TOPSampleTimes.h>
 #include <top/dbobjects/TOPCalTimebase.h>
 #include <top/dbobjects/TOPCalChannelT0.h>
+#include <top/dbobjects/TOPCalAsicShift.h>
 #include <top/dbobjects/TOPCalModuleT0.h>
 #include <top/dbobjects/TOPCalCommonT0.h>
 #include <top/dbobjects/TOPCalChannelPulseHeight.h>
 #include <top/dbobjects/TOPCalChannelThreshold.h>
 #include <top/dbobjects/TOPCalChannelNoise.h>
+#include <top/dbobjects/TOPFrontEndSetting.h>
 
 #include <top/modules/TOPDigitizer/PulseHeightGenerator.h>
 #include <string>
@@ -40,7 +42,6 @@ namespace Belle2 {
    * TOP digitizer.
    * This module takes hits form G4 simulation (TOPSimHits),
    * applies TTS, T0 jitter and does spatial and time digitization.
-   * (QE had been moved to the simulation: applied in SensitiveBar, SensitivePMT)
    * Output to TOPDigits.
    */
   class TOPDigitizerModule : public Module {
@@ -71,6 +72,31 @@ namespace Belle2 {
   private:
 
     /**
+     * Utility structure for time offset
+     */
+    struct TimeOffset {
+      double value = 0; /**< value */
+      double error = 0; /**< error squared */
+      int windowShift = 0; /**< number of shifted windows */
+      double timeShift = 0; /**< shift expressed in time */
+      /**
+       * Full constructor
+       */
+      TimeOffset(double v, double e, int n, double t):
+        value(v), error(e), windowShift(n), timeShift(t)
+      {}
+    };
+
+    /**
+     * Returns a complete time offset by adding time mis-calibration to trgOffset
+     * @param trgOffset trigger related time offset
+     * @param moduleID slot ID
+     * @param pixelID pixel ID
+     * @return time offset and its error squared
+     */
+    TimeOffset getTimeOffset(double trgOffset, int moduleID, int pixelID);
+
+    /**
      * Generates and returns pulse height
      * @param moduleID module ID (1-based)
      * @param pixelID pixel ID (1-based)
@@ -95,9 +121,6 @@ namespace Belle2 {
     bool m_useSampleTimeCalibration;   /**< if true, use time base calibration */
     bool m_simulateTTS; /**< if true, add TTS to simulated hits */
     bool m_allChannels; /**< if true, always make waveforms for all channels */
-    int m_lookBackWindows;  /**< number of "look back" windows */
-    int m_readoutWindows;   /**< number of readout windows */
-    int m_offsetWindows;    /**< number of offset windows (windows before "first one") */
 
     // datastore objects
     StoreArray<TOPSimHit> m_simHits;        /**< collection of simuated hits */
@@ -110,20 +133,19 @@ namespace Belle2 {
     // constants from conditions DB
     DBObjPtr<TOPCalTimebase> m_timebases; /**< sample times from database */
     DBObjPtr<TOPCalChannelT0> m_channelT0; /**< channel T0 calibration constants */
+    DBObjPtr<TOPCalAsicShift> m_asicShift; /**< ASIC shifts calibration constants */
     DBObjPtr<TOPCalModuleT0> m_moduleT0;   /**< module T0 calibration constants */
     DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */
     DBObjPtr<TOPCalChannelPulseHeight> m_pulseHeights; /**< pulse height param. */
     DBObjPtr<TOPCalChannelThreshold> m_thresholds; /**< channel thresholds */
     DBObjPtr<TOPCalChannelNoise> m_noises; /**< channel noise levels (r.m.s) */
+    DBObjPtr<TOPFrontEndSetting> m_feSetting;   /**< front-end settings */
 
     // default for no DB or calibration not available
     TOPSampleTimes m_sampleTimes; /**< equidistant sample times */
     TOP::PulseHeightGenerator m_pulseHeightGenerator; /**< default generator */
 
     // other
-    double m_timeMin = 0; /**< time range limit: minimal time */
-    double m_timeMax = 0; /**< time range limit: maximal time */
-    std::vector<int> m_writeDepths;  /**< write depths of production debug format */
     double m_syncTimeBase = 0; /**< SSTin period */
 
   };

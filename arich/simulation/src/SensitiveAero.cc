@@ -10,19 +10,15 @@
 
 #include <arich/simulation/SensitiveAero.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
-#include <framework/logging/Logger.h>
 
 #include <G4Step.hh>
 #include <G4Track.hh>
-#include <G4UnitsTable.hh>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
 
 #include <TVector3.h>
-#include <cmath>
 
 using namespace std;
 

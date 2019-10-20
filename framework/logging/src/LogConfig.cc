@@ -19,12 +19,9 @@ using namespace Belle2;
 LogConfig::LogConfig(LogConfig::ELogLevel logLevel, int debugLevel) :
   m_logLevel(logLevel),
   m_debugLevel(debugLevel),
-  m_abortLevel(LogConfig::c_Fatal)
-{
-  for (unsigned int& level : m_logInfo) {
-    level = 0;
-  }
-}
+  m_abortLevel(LogConfig::c_Fatal),
+  m_logInfo{0}
+{}
 
 
 void LogConfig::setLogLevel(ELogLevel logLevel)

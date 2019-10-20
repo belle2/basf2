@@ -10,10 +10,6 @@
 
 #include <analysis/utility/DecayForest.h>
 
-#include <framework/logging/Logger.h>
-
-#include <iostream>
-#include <sstream>
 #include <cassert>
 
 using namespace Belle2;
@@ -62,6 +58,10 @@ int DecayForest::decayHashFloatToInt(float decayHash, float decayHashExtended)
 
   bitconverter.f = decayHash;
   integer = static_cast<uint64_t>(bitconverter.i) << 32;
+  // cppcheck throws false positives here (doesn't understand this use of a union)
+  //
+  // cppcheck-suppress unreadVariable
+  // cppcheck-suppress redundantAssignment
   bitconverter.f = decayHashExtended;
   integer += bitconverter.i;
 

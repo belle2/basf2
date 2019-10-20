@@ -10,11 +10,10 @@
 
 // Own include
 #include <analysis/variables/TimeDependentVariables.h>
-#include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/VariableManager/Manager.h>
 
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
+#include <analysis/utility/PCmsLabTransform.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -23,17 +22,13 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 
 #include <TLorentzVector.h>
-#include <TRandom.h>
-#include <TVectorF.h>
+#include <TMatrixD.h>
 #include <TVector3.h>
 
 #include <iostream>
-#include <algorithm>
 #include <cmath>
 
 using namespace std;
@@ -188,6 +183,30 @@ namespace Belle2 {
       return vert->getFitType();
     }
 
+    double particleTagVNDF(const Particle* particle)
+    {
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert)
+        return -1111.0;
+      return vert->getTagVNDF();
+    }
+
+    double particleTagVChi2(const Particle* particle)
+    {
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert)
+        return -1111.0;
+      return vert->getTagVChi2();
+    }
+
+    double particleTagVChi2IP(const Particle* particle)
+    {
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert)
+        return -1111.0;
+      return vert->getTagVChi2IP();
+    }
+
 
     // Delta t and related
 
@@ -262,7 +281,7 @@ namespace Belle2 {
 
       if (vert) {
         PCmsLabTransform T;
-        TVector3 boost = T.getBoostVector().BoostVector();
+        TVector3 boost = T.getBoostVector();
         double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
         double c = Const::speedOfLight / 1000.; // cm ps-1
         result = vert->getDeltaT() * bg * c;
@@ -278,7 +297,7 @@ namespace Belle2 {
 
       if (vert) {
         PCmsLabTransform T;
-        TVector3 boost = T.getBoostVector().BoostVector();
+        TVector3 boost = T.getBoostVector();
         double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
         double c = Const::speedOfLight / 1000.; // cm ps-1
         result = vert->getDeltaTErr() * bg * c;
@@ -292,7 +311,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
+      TVector3 boost = T.getBoostVector();
       TVector3 boostDir = boost.Unit();
 
       TVector3 pos = part->getVertex();
@@ -305,10 +324,11 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
-      TVector3 boostDir = boost.Unit();
+      TVector3 boost = T.getBoostVector();
 
-      TVector3 orthBoostDir(boostDir.Z(), boostDir.Y(), -1 * boostDir.X());
+      TVector3 orthBoost(boost.Z(), 0, -1 * boost.X());
+      TVector3 orthBoostDir = orthBoost.Unit();
+
       TVector3 pos = part->getVertex();
       double l = pos.Dot(orthBoostDir);
 
@@ -319,7 +339,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
+      TVector3 boost = T.getBoostVector();
       TVector3 boostDir = boost.Unit();
 
       const MCParticle* mcPart = part->getRelated<MCParticle>();
@@ -332,11 +352,12 @@ namespace Belle2 {
 
     double vertexTruthOrthogonalBoostDirection(const Particle* part)
     {
-      PCmsLabTransform T;
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      TLorentzVector trueBeamEnergy = beamParamsDB->getHER() + beamParamsDB->getLER();
+      TVector3 boost = trueBeamEnergy.BoostVector();
 
-      TVector3 boost = T.getBoostVector().BoostVector();
-      TVector3 boostDir = boost.Unit();
-      TVector3 orthBoostDir(boostDir.Z(), boostDir.Y(), -1 * boostDir.X());
+      TVector3 orthBoost(boost.Z(), 0, -1 * boost.X());
+      TVector3 orthBoostDir = orthBoost.Unit();
 
       const MCParticle* mcPart = part->getRelated<MCParticle>();
       if (mcPart == nullptr) return -1111;
@@ -351,8 +372,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
-      TVector3 boostDir = boost.Unit();
+      TVector3 boost = T.getBoostVector();
 
       double cy = boost.Z() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
       double sy = boost.X() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
@@ -387,9 +407,9 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
-      TVector3 boostDir = boost.Unit();
-      TVector3 orthBoostDir(boostDir.Z(), boostDir.Y(), -1 * boostDir.X());
+      TVector3 boost = T.getBoostVector();
+      TVector3 orthBoost(boost.Z(), 0, -1 * boost.X());
+      TVector3 orthBoostDir = orthBoost.Unit();
 
       double cy = orthBoostDir.Z() / TMath::Sqrt(orthBoostDir.Z() * orthBoostDir.Z() + orthBoostDir.X() * orthBoostDir.X());
       double sy = orthBoostDir.X() / TMath::Sqrt(orthBoostDir.Z() * orthBoostDir.Z() + orthBoostDir.X() * orthBoostDir.X());
@@ -518,28 +538,35 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Time Dependent CPV Analysis Variables");
 
-    REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");
-    REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y");
-    REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z");
-    REGISTER_VARIABLE("mcTagVx", particleTruthTagVx, "MC Tag vertex X");
-    REGISTER_VARIABLE("mcTagVy", particleTruthTagVy, "MC Tag vertex Y");
-    REGISTER_VARIABLE("mcTagVz", particleTruthTagVz, "MC Tag vertex Z");
-    REGISTER_VARIABLE("TagVxErr", particleTagVxErr, "Tag vertex X Error");
-    REGISTER_VARIABLE("TagVyErr", particleTagVyErr, "Tag vertex Y Error");
-    REGISTER_VARIABLE("TagVzErr", particleTagVzErr, "Tag vertex Z Error");
+    REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X component");
+    REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y component");
+    REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z component");
+    REGISTER_VARIABLE("mcTagVx", particleTruthTagVx, "Generated Tag vertex X component");
+    REGISTER_VARIABLE("mcTagVy", particleTruthTagVy, "Generated Tag vertex Y component");
+    REGISTER_VARIABLE("mcTagVz", particleTruthTagVz, "Generated Tag vertex Z component");
+    REGISTER_VARIABLE("TagVxErr", particleTagVxErr, "Tag vertex X component uncertainty");
+    REGISTER_VARIABLE("TagVyErr", particleTagVyErr, "Tag vertex Y component uncertainty");
+    REGISTER_VARIABLE("TagVzErr", particleTagVzErr, "Tag vertex Z component uncertainty");
     REGISTER_VARIABLE("TagVpVal", particleTagVpVal, "Tag vertex p-Value");
     REGISTER_VARIABLE("TagVNTracks", particleTagVNTracks, "Number of tracks in the tag vertex");
     REGISTER_VARIABLE("TagVType", particleTagVType, "Fit type of the tag vertex");
+    REGISTER_VARIABLE("TagVNDF", particleTagVNDF, "Number of degrees of freedom in the tag vertex fit");
+    REGISTER_VARIABLE("TagVChi2", particleTagVChi2, "chi2 value of the tag vertex fit");
+    REGISTER_VARIABLE("TagVChi2IP", particleTagVChi2IP, "IP component of chi2 value of the tag vertex fit");
 
-
-    REGISTER_VARIABLE("DeltaT", particleDeltaT, "Delta T(Brec - Btag) in ps");
-    REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr, "Delta T error in ps");
+    REGISTER_VARIABLE("DeltaT", particleDeltaT,
+                      R"DOC(Proper decay time difference :math:`\Delta t` between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})` in ps.)DOC");
+    REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr,
+                      R"DOC(Proper decay time difference :math:`\Delta t` uncertainty in ps)DOC");
     REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT,
-                      "Generated Delta T(Brec - Btag) in ps");
-    REGISTER_VARIABLE("DeltaZ", particleDeltaZ, "Z(Brec) - Z(Btag)");
-    REGISTER_VARIABLE("DeltaZErr", particleDeltaZErr, "Error of the difference Z(Brec) - Z(Btag)");
-    REGISTER_VARIABLE("DeltaBoost", particleDeltaB, "Boost direction: Brec - Btag");
-    REGISTER_VARIABLE("DeltaBoostErr", particleDeltaBErr, "Error of the difference in Boost direction: Brec - Btag");
+                      R"DOC(Generated proper decay time difference :math:`\Delta t` in ps)DOC");
+    REGISTER_VARIABLE("DeltaZ", particleDeltaZ,
+                      R"DOC(Difference of decay vertex longitudinal components between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`:
+:math:`\Delta z = z(B_{rec}) - z(B_{tag})`)DOC");
+    REGISTER_VARIABLE("DeltaZErr", particleDeltaZErr,
+                      R"DOC(Uncertainty of the difference :math:`z(B_{rec}) - z(B_{tag})`)DOC");
+    REGISTER_VARIABLE("DeltaBoost", particleDeltaB, R"DOC(:math:`\Delta z` in the boost direction)DOC");
+    REGISTER_VARIABLE("DeltaBoostErr", particleDeltaBErr, R"DOC(Uncertanty of :math:`\Delta z` in the boost direction)DOC");
 
     REGISTER_VARIABLE("LBoost", vertexBoostDirection,
                       "Returns the vertex component in the boost direction");

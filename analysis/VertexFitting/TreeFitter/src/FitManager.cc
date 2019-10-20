@@ -8,32 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <TMath.h>
-#include <TVector.h>
 
 #include <analysis/dataobjects/Particle.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-
-#include <analysis/VertexFitting/TreeFitter/EigenStackConfig.h>
 
 #include <analysis/VertexFitting/TreeFitter/FitManager.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/DecayChain.h>
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 
-
-
 namespace TreeFitter {
 
   FitManager::FitManager(Belle2::Particle* particle,
+                         const ConstraintConfiguration& config,
                          double prec,
-                         bool ipConstraint,
-                         bool customOrigin,
                          bool updateDaughters,
-                         const std::vector<double>& customOriginVertex,
-                         const std::vector<double>& customOriginCovariance,
                          const bool useReferencing
                         ) :
     m_particle(particle),
@@ -45,14 +36,12 @@ namespace TreeFitter {
     m_updateDaugthers(updateDaughters),
     m_ndf(0),
     m_fitparams(nullptr),
-    m_useReferencing(useReferencing)
+    m_useReferencing(useReferencing),
+    m_config(config)
   {
     m_decaychain =  new DecayChain(particle,
-                                   false,
-                                   ipConstraint,
-                                   customOrigin,
-                                   customOriginVertex,
-                                   customOriginCovariance
+                                   config,
+                                   false
                                   );
     m_fitparams  = new FitParams(m_decaychain->dim());
   }
@@ -76,7 +65,7 @@ namespace TreeFitter {
 
   bool FitManager::fit()
   {
-    const int nitermax = 10;
+    const int nitermax = 100;
     const int maxndiverging = 3;
     double dChisqConv = m_prec;
     m_chiSquare = -1;
@@ -106,7 +95,7 @@ namespace TreeFitter {
         if (m_errCode.failure()) {
           finished = true ;
           m_status = VertexStatus::Failed;
-          setExtraInfo(m_particle, "failed", 5);
+          setExtraInfo(m_particle, "failed", 1);
         } else {
           if (m_niter > 0) {
             if ((std::abs(deltachisq) / m_chiSquare < dChisqConv)) {
@@ -129,11 +118,11 @@ namespace TreeFitter {
         }
       }
       if (m_niter == nitermax && m_status != VertexStatus::Success) {
-        setExtraInfo(m_particle, "failed", 4);
+        setExtraInfo(m_particle, "failed", 3);
         m_status = VertexStatus::NonConverged;
       }
       if (!(m_fitparams->testCovariance())) {
-        setExtraInfo(m_particle, "failed", 3);
+        setExtraInfo(m_particle, "failed", 4);
         m_status = VertexStatus::Failed;
       }
     }
@@ -141,7 +130,7 @@ namespace TreeFitter {
     if (m_status == VertexStatus::Success) {
       // mass constraints comes after kine so we have to
       // update the mothers with the values set by the mass constraint
-      if (TreeFitter::massConstraintListPDG.size() != 0) {
+      if (m_config.m_massConstraintListPDG.size() != 0) {
         m_decaychain->locate(m_particle)->forceP4Sum(*m_fitparams);
       }
       updateTree(*m_particle, true);
@@ -223,9 +212,8 @@ namespace TreeFitter {
         jacobian(col + 4, col + 3) = 1;
       }
 
-      Eigen::Matrix<double, 7, 7> cov7 =
-        Eigen::Matrix<double, 7, 7>::Zero(7, 7);
-      cov7 = jacobian * cov6.selfadjointView<Eigen::Lower>() * jacobian.transpose();
+      Eigen::Matrix<double, 7, 7> cov7
+        = jacobian * cov6.selfadjointView<Eigen::Lower>() * jacobian.transpose();
 
       for (int row = 0; row < 7; ++row) {
         for (int col = 0; col < 7; ++col) {
@@ -253,7 +241,6 @@ namespace TreeFitter {
     if (posindex < 0 && pb.mother()) {
       posindex = pb.mother()->posIndex();
     }
-
     if (m_updateDaugthers || isTreeHead) {
       if (posindex >= 0) {
         const TVector3 pos(m_fitparams->getStateVector()(posindex),
@@ -324,7 +311,8 @@ namespace TreeFitter {
 
       std::tuple<double, double> lenTuple  = getDecayLength(cand);
 
-      comb_cov(0, 0) = std::get<1>(lenTuple);
+      const double lenErr = std::get<1>(lenTuple);
+      comb_cov(0, 0) = lenErr * lenErr;
       comb_cov.block<3, 3>(1, 1) = mom_cov;
 
       const double mass = pb->pdgMass();
@@ -341,9 +329,9 @@ namespace TreeFitter {
       jac(2) = -1. * mom_vec(1) / mom3 * mBYc;
       jac(3) = -1. * mom_vec(2) / mom3 * mBYc;
 
-      const double tErr = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
+      const double tErr2 = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
       // time in nanosec
-      return std::make_tuple(t, tErr);
+      return std::make_tuple(t, std::sqrt(tErr2));
     }
     return std::make_tuple(-999, -999);
   }
@@ -359,8 +347,8 @@ namespace TreeFitter {
     if (pb->tauIndex() >= 0 && pb->mother()) {
       const int tauindex = pb->tauIndex();
       const double len = fitparams.getStateVector()(tauindex);
-      const double lenErr = fitparams.getCovariance()(tauindex, tauindex);
-      return std::make_tuple(len, lenErr);
+      const double lenErr2 = fitparams.getCovariance()(tauindex, tauindex);
+      return std::make_tuple(len, std::sqrt(lenErr2));
     }
     return std::make_tuple(-999, -999);
   }

@@ -11,14 +11,13 @@
 #include <alignment/modules/AlignmentGenerator/AlignmentGeneratorModule.h>
 
 #include <alignment/dbobjects/VXDAlignment.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <framework/database/Database.h>
-
-#include <boost/algorithm/string.hpp>
-
+#include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
+
 #include <TRandom.h>
 
+#include <boost/algorithm/string.hpp>
 
 using namespace Belle2;
 

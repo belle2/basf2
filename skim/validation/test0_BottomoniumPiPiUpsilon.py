@@ -4,8 +4,8 @@
 
 """
 <header>
-  <output>../1730840030.dst.root</output>
-  <contact>karim.trabelsi@kek.jp</contact>
+  <output>../BottomoniumPiPiUpsilon.dst.root</output>
+  <contact>jiasen@buaa.edu.cn</contact>
 </header>
 """
 

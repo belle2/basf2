@@ -46,7 +46,7 @@ REG_MODULE(SVDUnpackerDQM)
 
 std::string SVDUnpackerDQMModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
 
-SVDUnpackerDQMModule::SVDUnpackerDQMModule() : HistoModule(), m_mapping(m_xmlFileName)
+SVDUnpackerDQMModule::SVDUnpackerDQMModule() : HistoModule(), m_mapping(m_xmlFileName), FADCs(NULL)
 {
   //Set module properties
   setDescription("DQM Histogram for the SVD Unpacker");

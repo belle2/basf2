@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <pxd/unpacking/PXDRawDataStructs.h>
+#include <pxd/unpacking/PXDRawDataDefinitions.h>
 #include <framework/logging/Logger.h>
 
 #include <boost/crc.hpp>

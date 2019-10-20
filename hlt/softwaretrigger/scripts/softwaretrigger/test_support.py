@@ -74,8 +74,21 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
 
     add_packers(path, components=components)
 
+    # express reco expects to have an HLT results, so lets add a fake one
+    if location == constants.Location.expressreco:
+        class FakeHLTResult(basf2.Module):
+            def initialize(self):
+                self.results = Belle2.PyStoreObj(Belle2.SoftwareTriggerResult.Class(), "SoftwareTriggerResult")
+                self.results.registerInDataStore()
+
+            def event(self):
+                self.results.create()
+                self.results.addResult("software_trigger_cut&all&total_result", 1)
+
+        path.add_module(FakeHLTResult())
+
     # remove everything but HLT input raw objects
-    branch_names = RAWDATA_OBJECTS + ["EventMetaData", "TRGSummary"]
+    branch_names = RAWDATA_OBJECTS + ["EventMetaData", "TRGSummary", "SoftwareTriggerResult"]
     if location == constants.Location.hlt:
         branch_names.remove("RawPXDs")
         branch_names.remove("ROIs")

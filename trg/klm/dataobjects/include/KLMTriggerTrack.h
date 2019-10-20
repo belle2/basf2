@@ -41,7 +41,7 @@ namespace Belle2 {
     //! Constructor with initial values for a track
     //! @param fwd detector end (forward=true and backward=false)
     //! @param sector sector number
-    KLMTriggerTrack(bool fwd, int sector):
+    KLMTriggerTrack(int fwd, int sector):
       m_fwd(fwd),
       m_sector(sector),
       m_nHits(0),
@@ -66,7 +66,7 @@ namespace Belle2 {
 
     //! Get detector end
     //! @return detector end (forward=true and backward=false)
-    bool isForward() const { return m_fwd; }
+    int getForward() const { return m_fwd; }
 
     //! Get sector number
     //! @return sector number of the track (0..7)

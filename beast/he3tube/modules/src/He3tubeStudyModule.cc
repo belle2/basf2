@@ -13,14 +13,9 @@
 #include <beast/he3tube/dataobjects/He3tubeHit.h>
 #include <beast/he3tube/dataobjects/HE3G4TrackInfo.h>
 #include <generators/SAD/dataobjects/SADMetaHit.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 #include <cmath>
-#include <boost/foreach.hpp>
-
 
 #include <iostream>
 #include <fstream>
@@ -29,11 +24,8 @@
 
 // ROOT
 #include <TVector3.h>
-#include <TRandom.h>
 #include <TH1.h>
 #include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
 #include <TMath.h>
 
 int eventNum = 0;

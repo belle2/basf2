@@ -9,10 +9,10 @@
 
 #include <mva/interface/Weightfile.h>
 #include <mva/interface/Options.h>
-#include <framework/utilities/FileSystem.h>
 #include <framework/utilities/TestHelpers.h>
 
-#include <framework/database/LocalDatabase.h>
+#include <framework/database/Configuration.h>
+#include <framework/database/Database.h>
 #include <boost/filesystem/operations.hpp>
 
 #include <TFile.h>
@@ -134,7 +134,10 @@ namespace {
   {
 
     TestHelpers::TempDirCreator tmp_dir;
-    LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+
+    auto& conf = Conditions::Configuration::getInstance();
+    conf.overrideGlobalTags();
+    conf.prependTestingPayloadLocation("localdb/database.txt");
 
     MVA::Weightfile weightfile;
     weightfile.addElement("Test", "a");
@@ -209,7 +212,9 @@ namespace {
   {
 
     TestHelpers::TempDirCreator tmp_dir;
-    LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+    auto& conf = Conditions::Configuration::getInstance();
+    conf.overrideGlobalTags();
+    conf.prependTestingPayloadLocation("localdb/database.txt");
 
     MVA::Weightfile weightfile;
     weightfile.addElement("Test", "a");
@@ -229,7 +234,9 @@ namespace {
   {
 
     TestHelpers::TempDirCreator tmp_dir;
-    LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+    auto& conf = Conditions::Configuration::getInstance();
+    conf.overrideGlobalTags();
+    conf.prependTestingPayloadLocation("localdb/database.txt");
 
     MVA::Weightfile weightfile;
     weightfile.addElement("Test", "a");

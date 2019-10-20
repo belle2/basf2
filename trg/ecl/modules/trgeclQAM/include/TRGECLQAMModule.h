@@ -3,6 +3,8 @@
 
 
 #include "trg/ecl/dataobjects/TRGECLUnpackerStore.h"
+#include "trg/ecl/dataobjects/TRGECLUnpackerEvtStore.h"
+
 #include <mdst/dataobjects/TRGSummary.h>
 
 
@@ -15,6 +17,17 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TString.h>
+#include <vector>
+
+#include <TF1.h>
+#include <TCanvas.h>
+#include <RooWorkspace.h>
+#include <RooDataHist.h>
+#include <RooPlot.h>
+#include <RooFitResult.h>
+#include <RooAbsPdf.h>
+#include <TH1.h>
+
 
 //using namespace std;
 
@@ -27,7 +40,7 @@ namespace Belle2 {
     TRGECLQAMModule();
     //! Destrunctor
     virtual ~TRGECLQAMModule();
-    int basf2evt;
+
   public:
     //! version
     std::string version() const;
@@ -48,21 +61,6 @@ namespace Belle2 {
     int m_nRun;
     //! The # of Events
     int m_nevent;
-    /** Object of ECLTRG Physics Efficiency */
-    //! ECLTRG Total Energy Efficiency
-    double m_psnm8;
-    //! ECLTRG Cluster Efficiency
-    double m_psnm13;
-    //! ECLTRG Physics Efficiency
-    double m_psnm8_13;
-
-    //** GDL Logic Test */
-    //! Track Trigger Rate
-    double m_psnm7_15;
-    //! ECLTRG Total Energy Rate
-    double m_psnm8_15;
-    //! ECLTRG Cluster Rate
-    double m_psnm13_15;
 
     //** ECLTRG TC Hit Map
     //! FWD problem TC
@@ -80,10 +78,45 @@ namespace Belle2 {
     //! Output Root File Name
     std::string m_outputfile;
 
-    //!
+    //ECLTRG Data
+    //! Total Energy Histogram
+    TH1F* h_etot = new TH1F("h_etot", "Energy Total", 4000, 0, 4000);
+    //! Total Energy
+    int m_etot;
+    //! Total Energy mean
+    double m_etot_mean;
+    //! Total Energy error
+    double m_etot_error;
+    //! Total Energy sigma
+    double m_etot_sigma;
+    //! tcenergy check
+    std::vector<int> etot;
+
+    //! Caltime Histogram
+    TH1F* h_caltime = new TH1F("h_caltime", "Caltime", 2000, -1000, 1000);
+    //! Caltime mean
+    double m_caltime_mean;
+    //! Caltime error
+    double m_caltime_error;
+    //! Caltime sigma
+    double m_caltime_sigma;
+    //! Caltime check
+    std::vector<int> caltime;
+
+    // Cluster Energy 2D plot
+    //! Cluster Energy Histogram
+    TH1F* h_clusterE = new TH1F("h_clusterE", "ClusterE", 4000, 0, 4000);
+    //! Cluster Energy
+    int clusterE;
+    //! Cluster Energy Vector
+    std::vector<int> cluster;
+
+    //! ECL Trigger Unpacker TC output
     StoreArray<TRGECLUnpackerStore> m_TRGECLUnpackerStore;
+    //! ECL Trigger Unpacker Event output
+    StoreArray<TRGECLUnpackerEvtStore> m_TRGECLUnpackerEvtStore;
+    //! Trigger Summary
     StoreObjPtr<TRGSummary> m_TRGSummary;
-    //    StoreObjPtr<EventMetaData> EvtMeta;
 
   };
 

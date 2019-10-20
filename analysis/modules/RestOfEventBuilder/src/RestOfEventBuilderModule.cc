@@ -14,17 +14,13 @@
 #include <analysis/dataobjects/Particle.h>
 
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
-
-#include <iostream>
 
 using namespace Belle2;
 
@@ -102,7 +98,7 @@ void RestOfEventBuilderModule::createNestedROE()
       return;
     }
     // create nested RestOfEvent object:
-    RestOfEvent* nestedROE = nestedROEArray.appendNew(true);
+    RestOfEvent* nestedROE = nestedROEArray.appendNew(particle->getPDGCode(), true);
     // create relation: Particle <-> RestOfEvent
     particle->addRelationTo(nestedROE);
     // create relation: host ROE <-> nested ROE
@@ -142,7 +138,7 @@ void RestOfEventBuilderModule::createROE()
       return;
 
     // create RestOfEvent object
-    RestOfEvent* roe = roeArray.appendNew();
+    RestOfEvent* roe = roeArray.appendNew(particle->getPDGCode());
 
     // create relation: Particle <-> RestOfEvent
     particle->addRelationTo(roe);

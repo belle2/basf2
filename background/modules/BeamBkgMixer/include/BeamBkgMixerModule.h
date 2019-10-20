@@ -18,7 +18,6 @@
 #include <string>
 #include <map>
 
-#include "TFile.h"
 #include "TChain.h"
 #include "TClonesArray.h"
 
@@ -195,8 +194,9 @@ namespace Belle2 {
     void addBeamBackHits(StoreArray<HIT>& hits, TClonesArray* cloneArray,
                          double timeShift, double minTime, double maxTime)
     {
-      //Match SubDet id from BeamBackHits to whether we keep it or not
-      bool keep[] = {false, m_PXD, m_SVD, m_CDC, m_ARICH, m_TOP, m_ECL, m_EKLM, m_BKLM};
+      // Match SubDet id from BeamBackHits to whether we keep it or not
+      // KLM is a single component, but it has different hits for BKLM and EKLM.
+      bool keep[] = {false, m_PXD, m_SVD, m_CDC, m_ARICH, m_TOP, m_ECL, m_KLM, m_KLM};
       if (!cloneArray) return;
       if (!hits.isValid()) return;
       // this is basically a copy of addSimHits but we only add the
@@ -277,8 +277,7 @@ namespace Belle2 {
     bool m_TOP = false; /**< true if found in m_components */
     bool m_ARICH = false; /**< true if found in m_components */
     bool m_ECL = false; /**< true if found in m_components */
-    bool m_BKLM = false; /**< true if found in m_components */
-    bool m_EKLM = false; /**< true if found in m_components */
+    bool m_KLM = false; /**< true if found in m_components */
     bool m_BeamBackHits = false; /**<  if true add also background hits */
 
     background::BeamBGTypes m_bgTypes;  /**< defined BG types */

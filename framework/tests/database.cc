@@ -1,8 +1,6 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
-#include <framework/database/LocalDatabase.h>
-#include <framework/database/ConditionsDatabase.h>
-#include <framework/database/DatabaseChain.h>
+#include <framework/database/Configuration.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/EventDependency.h>
@@ -50,17 +48,25 @@ namespace {
       DataStore::Instance().setInitializeActive(false);
       evtPtr.construct(0, 0, 1);
 
+      auto& c = Conditions::Configuration::getInstance();
       switch (m_dbType) {
         case c_local:
-          LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+          c.setGlobalTags({});
+          c.overrideGlobalTags();
+          c.setMetadataProviders({});
+          c.setNewPayloadLocation("testPayloads/TestDatabase.txt");
+          c.appendTestingPayloadLocation("testPayloads/TestDatabase.txt");
           break;
         case c_central:
-          ConditionsDatabase::createDefaultInstance("default");
+          c.setGlobalTags({"default"});
+          c.overrideGlobalTags();
           break;
         case c_chain:
-          DatabaseChain::createInstance();
-          LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
-          ConditionsDatabase::createDefaultInstance("default");
+          c.setGlobalTags({"default"});
+          c.overrideGlobalTags();
+          c.setMetadataProviders({});
+          c.setNewPayloadLocation("testPayloads/TestDatabase.txt");
+          c.appendTestingPayloadLocation("testPayloads/TestDatabase.txt");
           break;
         case c_default:
           break;
@@ -203,7 +209,7 @@ namespace {
 
     evtPtr->setExperiment(1);
     DBStore::Instance().update();
-    EXPECT_TRUE(named);
+    ASSERT_TRUE(named);
     EXPECT_TRUE(strcmp(named->GetName(), "Experiment 1") == 0);
     evtPtr->setExperiment(4);
     EXPECT_TRUE(strcmp(named->GetName(), "Experiment 1") == 0);
@@ -561,17 +567,25 @@ namespace {
     /** Create a database with a TNamed object and an array of TObjects for experiment 1 to 5 each. */
     void SetUp() override
     {
+      auto& c = Conditions::Configuration::getInstance();
       switch (m_dbType) {
         case c_local:
-          LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+          c.setGlobalTags({});
+          c.overrideGlobalTags();
+          c.setMetadataProviders({});
+          c.setNewPayloadLocation("testPayloads/TestDatabase.txt");
+          c.appendTestingPayloadLocation("testPayloads/TestDatabase.txt");
           break;
         case c_central:
-          ConditionsDatabase::createDefaultInstance("default");
+          c.setGlobalTags({"default"});
+          c.overrideGlobalTags();
           break;
         case c_chain:
-          DatabaseChain::createInstance();
-          LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
-          ConditionsDatabase::createDefaultInstance("default");
+          c.setGlobalTags({"default"});
+          c.overrideGlobalTags();
+          c.setMetadataProviders({});
+          c.setNewPayloadLocation("testPayloads/TestDatabase.txt");
+          c.appendTestingPayloadLocation("testPayloads/TestDatabase.txt");
           break;
         case c_default:
           break;
@@ -626,7 +640,7 @@ namespace {
     DBObjPtr<TNamed> named;
     m_event.setExperiment(1);
     DBStore::Instance().update(m_event); // The DBStore takes a reference to an EventMetaData object
-    EXPECT_TRUE(named);
+    ASSERT_TRUE(named);
     EXPECT_TRUE(strcmp(named->GetName(), "Experiment 1") == 0);
     m_event.setExperiment(4);
     EXPECT_TRUE(strcmp(named->GetName(), "Experiment 1") == 0);

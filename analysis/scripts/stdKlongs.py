@@ -10,10 +10,10 @@
 #
 ########################################################
 
-from modularAnalysis import fillParticleList, cutAndCopyList, analysis_main
+from modularAnalysis import fillParticleList, cutAndCopyList
 
 
-def stdKlongs(listtype='all', path=analysis_main):
+def stdKlongs(listtype='all', path=None):
     """
     Warning:
         This function is a placeholder for Klong selections. Currently
@@ -24,8 +24,8 @@ def stdKlongs(listtype='all', path=analysis_main):
 
     Parameters:
         listtype (str): name of standard list options (currently only
-        'all' is supported/recommended)
-        param path (basf2.Path): modules are added to this path
+            'all' is supported/recommended)
+        path (basf2.Path): modules are added to this path
     """
 
     # all KLM clusters
@@ -78,11 +78,11 @@ def stdKlongs(listtype='all', path=analysis_main):
 
 
 # Used in skimming code
-def loadStdSkimKL0(path=analysis_main):
+def loadStdSkimKL0(path):
     """Load KLongs for skimming.
 
     Parameters:
-        path (belle2.Path) modules are added to this path
+        path (basf2.Path): modules are added to this path
     """
     stdKlongs('loose', path)
     cutAndCopyList(

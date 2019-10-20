@@ -50,7 +50,7 @@ namespace Belle2 {
       std::string m_InjectionBGTimingName;  /**< The name of the StoreObj InjectionBGTiming */
 
       bool m_InvertMapping; /**< Flag if we invert mapping to DHP row/col or use premapped coordinates */
-      bool m_Clusterize; /** Use clusterizer (FCE format) */
+      bool m_Clusterize; /**< Use clusterizer (FCE format) */
 
       /** Parameter dhc<->dhe list, mapping from steering file */
       std::vector< std::vector<int >> m_dhe_to_dhc;
@@ -114,12 +114,12 @@ namespace Belle2 {
       /* cppcheck-suppress unusedPrivateFunction */
       void pack_dhp_raw(int dhp_id, int dhe_id);
 
-      void start_frame(void);//! Start with a new Frame
+      void start_frame(void); ///< Start with a new Frame
       /* cppcheck-suppress unusedPrivateFunction */
-      void append_int8(unsigned char w);//! cat 8bit value to frame
-      void append_int16(unsigned short w);//! cat 16bit value to frame
-      void append_int32(unsigned int w);//! cat 32value value to frame
-      void add_frame_to_payload(void);//! Add Frame to Event payload
+      void append_int8(unsigned char w); ///< cat 8bit value to frame
+      void append_int16(unsigned short w); ///< cat 16bit value to frame
+      void append_int32(unsigned int w); ///< cat 32value value to frame
+      void add_frame_to_payload(void); ///< Add Frame to Event payload
 
       void do_the_reverse_mapping(unsigned int& row, unsigned int& col, unsigned short layer, unsigned short sensor);
 

@@ -177,6 +177,7 @@ def partial_fit(state, X, S, y, w, epoch):
 
     return True
 
+
 if __name__ == "__main__":
     import os
     import pandas
@@ -187,7 +188,6 @@ if __name__ == "__main__":
     import basf2
     import basf2_mva
     import basf2_mva_util
-
     # ##############Building Data samples ###########################
     # This is  a dataset for testing relational nets.
     # It consists of number_total_lines lines in 3 dimensional space.

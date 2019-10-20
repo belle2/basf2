@@ -18,7 +18,7 @@
 #include <framework/database/DBObjPtr.h>
 
 // DataObjects
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 
 // kfitter
 #include <analysis/KFit/MassFitKFit.h>
@@ -80,7 +80,7 @@ namespace Belle2 {
     bool m_hasCovMatrix = false;      /**< flag for mother covariance matrix (PseudoFitter)*/
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
-    DBObjPtr<BeamParameters> m_beamParams;/**< Beam parameters */
+    DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
 
     /**
      * Main steering routine
@@ -184,6 +184,11 @@ namespace Belle2 {
      * Adds IPProfile constraint to the vertex fit using kfitter.
      */
     void addIPProfileToKFitter(analysis::VertexFitKFit& kv);
+
+    /**
+     * Adds IPTube constraint to the vertex fit using kfitter.
+     */
+    void addIPTubeToKFitter(analysis::VertexFitKFit& kv);
 
     /**
      * Fills valid particle's children (with valid error matrix) in the vector of Particles that will enter the fit.

@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include <analysis/VariableManager/Manager.h>
 #include <vector>
 
 namespace Belle2 {
@@ -44,5 +43,30 @@ namespace Belle2 {
      * return unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)
      */
     double particleMdstSource(const Particle* part);
+
+    /**
+     * returns 1 if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), 0 if not
+     */
+    double particleIsUnspecified(const Particle* part);
+
+    /**
+     * return prob(chi^2,ndf) of fit
+     */
+    double particlePvalue(const Particle* part);
+
+    /**
+     * return number of daughter particles
+     */
+    double particleNDaughters(const Particle* part);
+
+    /**
+     * return flavor type
+     */
+    double particleFlavorType(const Particle* part);
+
+    /**
+     * return charge
+     */
+    double particleCharge(const Particle* part);
   }
 }

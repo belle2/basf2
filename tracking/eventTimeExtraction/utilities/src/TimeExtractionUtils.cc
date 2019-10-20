@@ -17,7 +17,7 @@
 #include <genfit/Tools.h>
 
 #include <cdc/dataobjects/CDCRecoHit.h>
-#include <framework/logging/LogMethod.h>
+#include <framework/logging/Logger.h>
 #include <TDecompChol.h>
 
 using namespace Belle2;
@@ -262,6 +262,7 @@ std::vector<int> TimeExtractionUtils::getMeasurementDimensions(const RecoTrack& 
   vDimMeas.reserve(hitPoints.size());
 
   for (const auto& hit : hitPoints) {
+    // cppcheck-suppress useStlAlgorithm
     vDimMeas.push_back(hit->getRawMeasurement(0)->getDim());
   }
 

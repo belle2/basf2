@@ -31,7 +31,7 @@ namespace Belle2 {
 
     bool TOPconfigure::m_configured(false);
     DBObjPtr<TOPCalModuleAlignment> TOPconfigure::m_alignment;
-    DBArray<TOPPmtInstallation> TOPconfigure::m_pmtInstalled;
+    OptionalDBArray<TOPPmtInstallation> TOPconfigure::m_pmtInstalled;
 
     TOPconfigure::TOPconfigure()
     {

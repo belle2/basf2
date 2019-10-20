@@ -17,15 +17,8 @@
 
 //FRAMEWORK
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationsObject.h>
 
 //ECL
 #include <ecl/dataobjects/ECLDigit.h>
@@ -193,7 +186,7 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_timefail_crateid->GetXaxis()->SetTitle("Crate ID");
   h_timefail_crateid->SetOption("LIVE");
 
-  h_amptimefail_crateid = new TH1F("amptimefail_crateid", "Shaper IDs w/ failed times and amps", 52, 1, 53);
+  h_amptimefail_crateid = new TH1F("amptimefail_crateid", "Crate IDs w/ failed times and amps", 52, 1, 53);
   h_amptimefail_crateid->GetXaxis()->SetTitle("Crate ID");
   h_amptimefail_crateid->SetOption("LIVE");
 
@@ -397,7 +390,7 @@ void ECLDQMEXTENDEDModule::initDspfromFile()
     } else if (iCrate > 44) {
       if (iShaperPosition > 8) continue;
     }
-    ECLDspData* dspdata = readEclDsp(x.path().string().c_str(), iShaperPosition - 1);
+    ECLDspData* dspdata = ECLDspUtilities::readEclDsp(x.path().string().c_str(), iShaperPosition - 1);
     callbackCalibration(dspdata, map_vec, map_coef);
     map_container_vec[iShaper] = map_vec;
     map_container_coef[iShaper] = map_coef;

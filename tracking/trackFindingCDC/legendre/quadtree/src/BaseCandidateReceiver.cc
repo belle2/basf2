@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/quadtree/BaseCandidateReceiver.h>
+#include <tracking/trackFindingCDC/processing/LowHitsAxialTrackUtil.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

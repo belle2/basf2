@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+  <input>../BottomoniumPiPiUpsilon.dst.root</input>
+  <output>../BottomoniumPiPiUpsilon.udst.root</output>
+  <contact>jiasen@buaa.edu.cn</contact>
+  <interval>nightly</interval>
+</header>
+"""
+
 __author__ = "S. Spataro && S. Jia"
 
 from basf2 import *

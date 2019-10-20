@@ -25,7 +25,7 @@ namespace Belle2 {
                                      const std::string& nodename,
                                      const std::string& begin_date,
                                      const std::string& end_date,
-                                     int max = 0);
+                                     int max, int priority);
   };
 
 }

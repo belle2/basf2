@@ -36,4 +36,5 @@ void getCurvePars(){
   CDCDedxMeanPars->Write();
   CDCDedxSigmaPars->Write();
   CDCDedxHadronCor->Write();
+  dedxpars->Close();
 }

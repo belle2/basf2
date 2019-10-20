@@ -16,9 +16,7 @@
 #include <framework/geometry/B2Vector3.h>
 #include <framework/logging/Logger.h>
 
-#include <string>
 #include <list>
-
 
 namespace Belle2 {
   /**

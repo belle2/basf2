@@ -75,7 +75,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "Magnitude (w) of trigger timing jitter (ns). The trigger timing is randuminzed uniformly in a time window of [-w/2, +w/2].",
            0.);
   //Switches to control time information handling
-  addParam("AddTimeWalk", m_addTimeWalk, "A switch for time-walk (pulse-heght dep. delay); true: on; false: off", false);
+  addParam("AddTimeWalk", m_addTimeWalk, "A switch for time-walk (pulse-heght dep. delay); true: on; false: off", true);
   addParam("AddInWirePropagationDelay",   m_addInWirePropagationDelay,
            "A switch used to control adding propagation delay in the wire into the final drift time or not; this is for signal hits.", true);
   addParam("AddInWirePropagationDelay4Bg",  m_addInWirePropagationDelay4Bg,
@@ -115,7 +115,9 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
 
   //Switch for database
   addParam("UseDB4FEE", m_useDB4FEE, "Fetch and use FEE params. from database or not", true);
-  addParam("UseDB4EDepToADC", m_useDB4EDepToADC, "Fetch and use edep-to-ADC conversion params. from database or not", true);
+  addParam("UseDB4EDepToADC", m_useDB4EDepToADC, "Uuse edep-to-ADC conversion params. from database or not", true);
+  addParam("UseDB4RunGain", m_useDB4RunGain, "Fetch and use run gain from database or not", true);
+  addParam("OverallGainFactor", m_overallGainFactor, "Overall gain factor for adjustment", 1.0);
 
   //Some FEE params.
   addParam("TDCThresholdOffset", m_tdcThresholdOffset, "Offset for TDC (digital) threshold (mV)", 3820.);
@@ -125,7 +127,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
 
   addParam("AddFudgeFactorForSigma", m_addFudgeFactorForSigma,
            "Additional fudge factor for space resol. (common to all cells)",  1.);
-  addParam("SpaceChargeEffect", m_spaceChargeEffect, "Switch for space charge effect", false);
+  addParam("SpaceChargeEffect", m_spaceChargeEffect, "Switch for space charge effect", true);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
@@ -193,6 +195,17 @@ void CDCDigitizerModule::initialize()
   }
   */
 
+  if (m_useDB4RunGain) {
+    m_runGainFromDB = new DBObjPtr<CDCDedxRunGain>;
+    if ((*m_runGainFromDB).isValid()) {
+      (*m_runGainFromDB).addCallback(this, &CDCDigitizerModule::setRunGain);
+      setRunGain();
+    } else {
+      B2FATAL("CDCDedxRunGain invalid!");
+    }
+  }
+  B2DEBUG(29, "run-gain = " << m_runGain);
+
 #if defined(CDC_DEBUG)
   cout << " " << endl;
   cout << "CDCDigitizer initialize" << endl;
@@ -210,6 +223,12 @@ void CDCDigitizerModule::initialize()
     cout << "m_mean2= " <<  m_mean2 << endl;
   */
 #endif
+
+  if (m_useDB4EDepToADC) {
+    if (m_cdcgp->getEDepToADCMainFactor(0, 0) == 0.) {
+      B2FATAL("CDCEDepToADCConversion payloads are unavailable!");
+    }
+  }
 
 }
 
@@ -507,6 +526,7 @@ void CDCDigitizerModule::event()
     */
 
     if (m_addTimeWalk) {
+      B2DEBUG(29, "timewalk= " << m_cdcgp->getTimeWalk(iterSignalMap->first, adcCount));
       iterSignalMap->second.m_driftTime += m_cdcgp->getTimeWalk(iterSignalMap->first, adcCount);
     }
 
@@ -526,7 +546,11 @@ void CDCDigitizerModule::event()
       B2DEBUG(29, "negative deltaDL= " << deltaDL);
       deltaDL = 0.;
     }
-    const unsigned short tot = std::min(std::round(5.92749 * deltaDL + 2.59706), 29.);
+    const unsigned short boardID = m_cdcgp->getBoardID(iterSignalMap->first);
+    unsigned short tot = std::min(std::round(5.92749 * deltaDL + 2.59706), static_cast<double>(m_widthOfTimeWindow[boardID]));
+    if (m_adcThresh[boardID] > 0) {
+      tot = std::min(static_cast<int>(tot), static_cast<int>(adcCount / m_adcThresh[boardID]));
+    }
 
     CDCHit* firstHit = m_cdcHits.appendNew(tdcCount, adcCount, iterSignalMap->first, 0, tot);
     //    std::cout <<"firsthit?= " << firstHit->is2ndHit() << std::endl;
@@ -828,6 +852,7 @@ unsigned short CDCDigitizerModule::getADCCount(const WireID& wid, double dEinGeV
   } else {
     if (m_useDB4EDepToADC) conv = m_cdcgp->getEDepToADCMainFactor(layer, cell);
   }
+  conv *= m_runGain;
 
   //The ADCcount is obtained by rounding-up (measured voltage)/bin in real ADC. This is true both for pedestal and signal voltages, so the pedestal-subtracted ADCcount (simulated here) is rounded.
   adcCount = static_cast<unsigned short>(std::round(conv * dEInkeV));
@@ -847,28 +872,51 @@ void CDCDigitizerModule::setFEElectronics()
   B2DEBUG(29, "L1TRGLatency= " << el1TrgLatency);
   const double c = 32. * m_tdcBinWidth;
 
-  int mode = 0;
-  for (const auto& fp : (*m_fEElectronicsFromDB)) {
-    if (fp.getBoardID() == -1) {
-      mode = 1;
-      break;
-    }
-  }
+  if (!m_fEElectronicsFromDB) B2FATAL("No FEEElectronics dbobject!");
+  const CDCFEElectronics& fp = *((*m_fEElectronicsFromDB)[0]);
+  int mode = (fp.getBoardID() == -1) ? 1 : 0;
+  int iNBoards = static_cast<int>(nBoards);
 
-  if (mode == 0) {
-    for (const auto& fp : (*m_fEElectronicsFromDB)) {
-      int bdi = fp.getBoardID();
-      if (bdi < 0 || bdi >= static_cast<int>(nBoards)) B2FATAL("CDCDigitizer:: Invalid no. of FEE boards !");
-      if (bdi == 0) continue; //bdi=0 is dummy (not used)
+  //set typical values for all channels first if mode=1
+  if (mode == 1) {
+    for (int bdi = 1; bdi < iNBoards; ++bdi) {
       m_uprEdgeOfTimeWindow[bdi] = el1TrgLatency - c * (fp.getTrgDelay() + 1);
       if (m_uprEdgeOfTimeWindow[bdi] < 0.) B2FATAL("CDCDigitizer: Upper edge of time window < 0!");
       m_lowEdgeOfTimeWindow[bdi] = m_uprEdgeOfTimeWindow[bdi] - c * (fp.getWidthOfTimeWindow() + 1);
       if (m_lowEdgeOfTimeWindow[bdi] > 0.) B2FATAL("CDCDigitizer: Lower edge of time window > 0!");
       m_adcThresh[bdi] = fp.getADCThresh();
       m_tdcThresh[bdi] = convF * (off - fp.getTDCThreshInMV());
-
-      B2DEBUG(29, bdi << " " << m_lowEdgeOfTimeWindow[bdi] << " " << m_uprEdgeOfTimeWindow[bdi] << " " << m_adcThresh[bdi] << " " <<
-              m_tdcThresh[bdi]);
+      m_widthOfTimeWindow[bdi] = fp.getWidthOfTimeWindow() + 1;
     }
   }
+
+  //ovewrite    values for specific channels if mode=1
+  //set typical values for all channels if mode=0
+  for (const auto& fpp : (*m_fEElectronicsFromDB)) {
+    int bdi = fpp.getBoardID();
+    if (mode == 0 && bdi ==  0) continue; //bdi=0 is dummy (not used)
+    if (mode == 1 && bdi == -1) continue; //skip typical case
+    if (bdi < 0 || bdi >= iNBoards) B2FATAL("CDCDigitizer:: Invalid no. of FEE board!");
+    m_uprEdgeOfTimeWindow[bdi] = el1TrgLatency - c * (fpp.getTrgDelay() + 1);
+    if (m_uprEdgeOfTimeWindow[bdi] < 0.) B2FATAL("CDCDigitizer: Upper edge of time window < 0!");
+    m_lowEdgeOfTimeWindow[bdi] = m_uprEdgeOfTimeWindow[bdi] - c * (fpp.getWidthOfTimeWindow() + 1);
+    if (m_lowEdgeOfTimeWindow[bdi] > 0.) B2FATAL("CDCDigitizer: Lower edge of time window > 0!");
+    m_adcThresh[bdi] = fpp.getADCThresh();
+    m_tdcThresh[bdi] = convF * (off - fpp.getTDCThreshInMV());
+    m_widthOfTimeWindow[bdi] = fpp.getWidthOfTimeWindow() + 1;
+  }
+
+  //debug
+  B2DEBUG(29, "mode= " << mode);
+  for (int bdi = 1; bdi < iNBoards; ++bdi) {
+    B2DEBUG(29, bdi << " " << m_lowEdgeOfTimeWindow[bdi] << " " << m_uprEdgeOfTimeWindow[bdi] << " " << m_adcThresh[bdi] << " " <<
+            m_tdcThresh[bdi]);
+  }
+}
+
+// Set Run-gain (from DB)
+void CDCDigitizerModule::setRunGain()
+{
+  m_runGain = (*m_runGainFromDB)->getRunGain();
+  m_runGain *= m_overallGainFactor;
 }

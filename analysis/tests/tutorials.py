@@ -2,23 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import os
-from ROOT import Belle2
+import sys
+import subprocess
 import unittest
 import glob
-import b2test_utils
-
-
-def test_one_tutorial(tutorial_name):
-    loc = Belle2.FileSystem.findFile('analysis/examples/tutorials/' + tutorial_name)
-    return os.system('basf2 ' + loc + ' -n 1')
+from basf2 import find_file
+from b2test_utils import clean_working_directory
 
 
 class TutorialsTest(unittest.TestCase):
-    """Test to run all tutorials"""
-
-    #: list of supported tutorials (everything in the tutorials directory)
-    supported_tutorials = [x.split("/")[-1]
-                           for x in glob.glob(Belle2.FileSystem.findFile('analysis/examples/tutorials/') + "*.py")]
+    """Test to run all tutorials. Will fail if no tutorial directory is found."""
 
     #: list of the broken tutorials (to be removed when they are individually fixed)
     broken_tutorials = ['B2A701-ContinuumSuppression_Input.py',  # BII-4246
@@ -35,14 +28,20 @@ class TutorialsTest(unittest.TestCase):
         """
         Test supported tutorials.
         """
-        for t in self.supported_tutorials:
-            with self.subTest(t):
-                if t in self.broken_tutorials:
-                    pass
-                else:
-                    self.assertEqual(test_one_tutorial(t), 0)
+        all_tutorials = sorted(glob.glob(find_file('analysis/examples/tutorials/') + "*.py"))
+        for tutorial in all_tutorials:
+            filename = os.path.basename(tutorial)
+            if filename not in self.broken_tutorials:
+                with self.subTest(msg=filename):
+                    result = subprocess.run(['basf2', '-n1', tutorial], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    if result.returncode != 0:
+                        # failure running tutorial so let's print the output
+                        # on stderr so it's not split from output of unittest
+                        # done like this since we don't want to decode/encode utf8
+                        sys.stdout.buffer.write(result.stdout)
+#                    self.assertEqual(result.returncode, 0)
 
 
 if __name__ == '__main__':
-    with b2test_utils.clean_working_directory():
+    with clean_working_directory():
         unittest.main()

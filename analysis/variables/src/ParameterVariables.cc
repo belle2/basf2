@@ -10,22 +10,17 @@
 
 #include <analysis/variables/ParameterVariables.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <framework/dataobjects/Helix.h>
 
 #include <TLorentzVector.h>
 #include <TVectorF.h>
@@ -173,51 +168,6 @@ namespace Belle2 {
       return nLevels;
     }
 
-    double genNthMotherPDG(const Particle* part, const std::vector<double>& args)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return 0.0;
-
-      unsigned int nLevels;
-      if (args.empty())
-        nLevels = 0;
-      else
-        nLevels = args[0];
-
-      const MCParticle* curMCParticle = mcparticle;
-      for (unsigned int i = 0; i <= nLevels; i++) {
-        const MCParticle* curMCMother = curMCParticle->getMother();
-        if (curMCMother == nullptr)
-          return 0.0;
-        curMCParticle = curMCMother;
-      }
-      int m_pdg = curMCParticle->getPDG();
-      return m_pdg;
-    }
-
-    double genNthMotherIndex(const Particle* part, const std::vector<double>& args)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return 0.0;
-
-      unsigned int nLevels;
-      if (args.empty())
-        nLevels = 0;
-      else
-        nLevels = args[0];
-
-      const MCParticle* curMCParticle = mcparticle;
-      for (unsigned int i = 0; i <= nLevels; i++) {
-        const MCParticle* curMCMother = curMCParticle->getMother();
-        if (curMCMother == nullptr)
-          return 0.0;
-        curMCParticle = curMCMother;
-      }
-      int m_id = curMCParticle->getArrayIndex();
-      return m_id;
-    }
 
     double daughterInvariantMass(const Particle* particle, const std::vector<double>& daughter_indexes)
     {
@@ -422,7 +372,7 @@ namespace Belle2 {
         return -999;
 
       PCmsLabTransform T;
-      TLorentzVector m = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+      TLorentzVector m = T.getBeamFourMomentum();
       TLorentzVector p = particle->get4Vector();
       TLorentzVector d1 = particle->getDaughter(daughter1)->get4Vector();
       TLorentzVector d2 = particle->getDaughter(daughter2)->get4Vector();
@@ -531,10 +481,6 @@ namespace Belle2 {
                       Second argument is optional, 1 means that the sign of the PDG code is taken into account, default is 0.
 
                       If there is no MC relations found, -1 is returned. In case of nullptr particle, -999 is returned.)DOC");
-    REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,
-                      "Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.");
-    REGISTER_VARIABLE("genMotherID(i)", genNthMotherIndex,
-                      "Check the array index of a particle n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.");
     REGISTER_VARIABLE("daughterInvariantMass(i, j, ...)", daughterInvariantMass , R"DOC(
                       Returns invariant mass of the given daughter particles. E.g.:
 

@@ -15,7 +15,8 @@ import sys
 import os
 import glob
 from ROOT import Belle2
-from basf2 import create_path, process, LogLevel, set_log_level, set_random_seed, use_central_database
+from basf2 import create_path, process, LogLevel, set_log_level, set_random_seed, conditions
+from b2test_utils import require_file
 from b2test_utils.datastoreprinter import DataStorePrinter, PrintObjectsModule
 
 from rawdata import add_unpackers
@@ -71,12 +72,10 @@ def test_raw(phase_name, postfix, global_tag):
     set_random_seed(1)
     # only override the default global tag if a specific GT was provided for this test
     if global_tag:
-        use_central_database(global_tag)
+        conditions.override_globaltags([global_tag])
+    else:
+        # otherwise use current default globaltag
+        conditions.disable_globaltag_replay()
 
-    if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
-        print("TEST SKIPPED: rawdata_compatibility because BELLE2_VALIDATION_DATA_DIR environment variable not set.",
-              file=sys.stderr)
-        sys.exit(1)
-
-    rawdata_path = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], "rawdata", phase_name)
-    unpack_and_print_files(glob.glob(rawdata_path + "/{}*.root".format(postfix)))
+    rawdata_path = require_file(os.path.join('rawdata', phase_name), "validation")
+    unpack_and_print_files(glob.glob(os.path.join(rawdata_path, f"{postfix}*.root")))

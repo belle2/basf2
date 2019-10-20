@@ -22,7 +22,6 @@ using namespace std;
 using namespace Belle2;
 
 LogMessage::LogMessage(LogConfig::ELogLevel logLevel, const std::string& message, const char* package,
-// cppcheck-suppress passedByValue ; We take a value to move it into a member so no performance penalty
                        std::string  function, std::string  file, unsigned int line, int debugLevel) :
   m_logLevel(logLevel),
   m_message(message),

@@ -24,6 +24,18 @@ ROIid::~ROIid()
 
 
 bool
+ROIid::Contains(const PXDRawHit& thePXDRawHit) const
+{
+  return (m_minUid <= thePXDRawHit.getUCellID() &&
+          m_maxUid >= thePXDRawHit.getUCellID() &&
+          m_minVid <= thePXDRawHit.getVCellID() &&
+          m_maxVid >= thePXDRawHit.getVCellID() &&
+          m_sensorID == thePXDRawHit.getSensorID()
+         );
+}
+
+
+bool
 ROIid::Contains(const PXDDigit& thePXDDigit) const
 {
   return (m_minUid <= thePXDDigit.getUCellID() &&

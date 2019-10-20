@@ -5,12 +5,13 @@
 # using 2 processes (so nothing too taxing)
 
 import os
-from basf2 import *
-from ROOT import TFile, TTree, Belle2
+import basf2
+from ROOT import TFile, Belle2
 
 
-class CheckEventNumbers(Module):
+class CheckEventNumbers(basf2.Module):
     """Class to check that we see all events we expect exactly once and nothing else"""
+
     def __init__(self, evtNumList):
         """Remember number of events to process"""
         super().__init__()
@@ -33,13 +34,13 @@ class CheckEventNumbers(Module):
         for evtNr in all_numbers:
             c = seen.count(evtNr)
             if not (evtNr in should and c == 1):
-                B2ERROR("event number %d seen %d times" % (evtNr, c))
+                basf2.B2ERROR("event number %d seen %d times" % (evtNr, c))
                 all_ok = False
         if not all_ok:
-            B2FATAL("Missing/extra events")
+            basf2.B2FATAL("Missing/extra events")
 
 
-main = create_path()
+main = basf2.Path()
 # init path
 main.add_module("EventInfoSetter", evtNumList=[5])
 particlegun = main.add_module("ParticleGun", pdgCodes=[211, -211, 321, -321],
@@ -47,8 +48,8 @@ particlegun = main.add_module("ParticleGun", pdgCodes=[211, -211, 321, -321],
 main.add_module("Gearbox")
 
 # event path
-main.add_module("Geometry", components=['MagneticField', 'BeamPipe', 'PXD'], logLevel=LogLevel.ERROR)
-simulation = main.add_module("FullSim", logLevel=LogLevel.ERROR)
+main.add_module("Geometry", components=['MagneticField', 'BeamPipe', 'PXD'], logLevel=basf2.LogLevel.ERROR)
+simulation = main.add_module("FullSim", logLevel=basf2.LogLevel.ERROR)
 
 # output path
 main.add_module("RootOutput", outputFileName='parallel_processing_test.root')
@@ -56,21 +57,21 @@ main.add_module("Progress")
 main.add_module(CheckEventNumbers(5))
 
 # test wether flags are what we expect
-if particlegun.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
-    B2FATAL("ParticleGun has pp flag?")
-if not simulation.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
-    B2FATAL("Simulation doesn't have pp flag?")
+if particlegun.has_properties(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
+    basf2.B2FATAL("ParticleGun has pp flag?")
+if not simulation.has_properties(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
+    basf2.B2FATAL("Simulation doesn't have pp flag?")
 
 # Process events in one more process than we have events to make sure at least
 # one of them doesn't get an event
-set_nprocesses(5)
-process(main)
+basf2.set_nprocesses(5)
+basf2.process(main)
 
-print(statistics)
-print(statistics(statistics.TOTAL))
-assert statistics.get(simulation).calls(statistics.EVENT) == 5
+print(basf2.statistics)
+print(basf2.statistics(basf2.statistics.TOTAL))
+assert basf2.statistics.get(simulation).calls(basf2.statistics.EVENT) == 5
 # +1 because of extra call to master module
-assert statistics.get_global().calls(statistics.EVENT) == 6
+assert basf2.statistics.get_global().calls(basf2.statistics.EVENT) == 6
 
 # check wether output file contains correct number of events
 file = TFile('parallel_processing_test.root')

@@ -49,6 +49,7 @@ namespace Belle2 {
 //  user has to call 'update()' to initialize hit information event
 //  by event.
 
+  /// a class for TRGGRL
   class TRGGRL {
 
   public:
@@ -174,7 +175,25 @@ namespace Belle2 {
     TTree* h1;
 
     /** Temporary variables to make tree in root files */
-    double x0, x1, x2, x3, x4, x5, x6, x7, x8, x9;
+    double x0;
+    /** Temporary variables to make tree in root files */
+    double x1;
+    /** Temporary variables to make tree in root files */
+    double x2;
+    /** Temporary variables to make tree in root files */
+    double x3;
+    /** Temporary variables to make tree in root files */
+    double x4;
+    /** Temporary variables to make tree in root files */
+    double x5;
+    /** Temporary variables to make tree in root files */
+    double x6;
+    /** Temporary variables to make tree in root files */
+    double x7;
+    /** Temporary variables to make tree in root files */
+    double x8;
+    /** Temporary variables to make tree in root files */
+    double x9;
     /**  Vector which stores list of TRGGRLMatch without 3D information */
     std::vector<TRGGRLMatch* > matchList;
     /**  Vector which stores list of TRGGRLMatch with 3D information */

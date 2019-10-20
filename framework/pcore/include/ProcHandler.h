@@ -21,7 +21,7 @@ namespace Belle2 {
      * Note that you probably shouldn't have multiple ProcHandlers with
      * local children running at the same time.
      */
-    ProcHandler(unsigned int nWorkerProc, bool markChildrenAsLocal = false);
+    explicit ProcHandler(unsigned int nWorkerProc, bool markChildrenAsLocal = false);
     /** Destructor */
     ~ProcHandler();
 

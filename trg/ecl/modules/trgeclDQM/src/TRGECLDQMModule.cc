@@ -13,6 +13,7 @@
 #include <trg/ecl/TrgEclMapping.h>
 #include <trg/ecl/TrgEclCluster.h>
 #include <trg/ecl/TrgEclMaster.h>
+#include <trg/ecl/TrgEclDataBase.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -74,8 +75,8 @@ void TRGECLDQMModule::defineHisto()
   h_TRGTiming      = new TH1D("h_TRGTiming",     "TRG Timing  (ns)",     100, 3010, 3210);
   h_Cal_TCTiming       = new TH1D("h_Cal_TCTiming",      "Cal TC Timing  (ns)",      100, -400, 400);
   h_Cal_TRGTiming      = new TH1D("h_Cal_TRGTiming",     "TRG Timing  (ns)",     100, -400, 400);
-  h_ECL_TriggerBit      = new TH1D("h_ECL_TriggerBit",     "ECL Trigger Bit",     26, 0, 26);
-
+  h_ECL_TriggerBit      = new TH1D("h_ECL_TriggerBit",     "ECL Trigger Bit",     29, 0, 29);
+  h_Cluster_Energy_Sum    = new TH1D("h_Cluster_Energy_Sum",   "Energy Sum of 2 Clusters (ADC)",       300, 0, 3000);
 
   oldDir->cd();
 }
@@ -173,13 +174,12 @@ void TRGECLDQMModule::event()
   int b1type = 0;
   int etot = 0;
   int vlm = 0;
+  int eclburst = 0;
   //  int s_hit_win= 0;
   std::vector<int> trgbit ;
-  trgbit.resize(41, 0);
+  trgbit.resize(44, 0);
   for (int iii = 0; iii < trgeclSumArray.getEntries(); iii++) {
     TRGECLUnpackerSumStore* aTRGECLUnpackerSumStore = trgeclSumArray[iii];
-    //    s_hit_win = aTRGECLUnpackerSumStore ->getSumNum();
-    //    if(s_hit_win != 3|| s_hit_win!=4){continue;}
 
     tsource = aTRGECLUnpackerSumStore ->getTimeType();
     phy     = aTRGECLUnpackerSumStore ->getPhysics();
@@ -192,7 +192,7 @@ void TRGECLDQMModule::event()
     vlm     = aTRGECLUnpackerSumStore ->  getLowMulti();
     mu      = aTRGECLUnpackerSumStore ->  getMumu();
     pre     = aTRGECLUnpackerSumStore ->  getPrescale();
-
+    eclburst = aTRGECLUnpackerSumStore -> getECLBST();
 
     //
     trgbit[0] = 1;
@@ -208,36 +208,38 @@ void TRGECLDQMModule::event()
     trgbit[10] = (etot >> 2) & 0x1;
     trgbit[11] = clover;
 
-    for (int j = 0; j < 12; j++) {
+    for (int j = 0; j < 14; j++) {
       trgbit[12 + j] = (vlm >> j) & 0x1;
     }
 
-    trgbit[24] = mu;
-    trgbit[25] = pre;
+    trgbit[26] = mu;
+    trgbit[27] = pre;
+    trgbit[28] = eclburst;
 
-    trgbit[26] = b1type & 0x1;
-    trgbit[27] = (b1type >> 1) & 0x1;
-    trgbit[28] = (b1type >> 2) & 0x1;
-    trgbit[29] = (b1type >> 3) & 0x1;
-    trgbit[30] = (b1type >> 4) & 0x1;
-    trgbit[31] = (b1type >> 5) & 0x1;
-    trgbit[32] = (b1type >> 6) & 0x1;
-    trgbit[33] = (b1type >> 7) & 0x1;
-    trgbit[34] = (b1type >> 8) & 0x1;
-    trgbit[35] = (b1type >> 9) & 0x1;
-    trgbit[36] = (b1type >> 10) & 0x1;
-    trgbit[37] = (b1type >> 11) & 0x1;
-    trgbit[38] = (b1type >> 12) & 0x1;
-    trgbit[39] = (b1type >> 13) & 0x1;
-    trgbit[40] = (b1type >> 14) & 0x1;
+    trgbit[29] = b1type & 0x1;
+    trgbit[30] = (b1type >> 1) & 0x1;
+    trgbit[31] = (b1type >> 2) & 0x1;
+    trgbit[32] = (b1type >> 3) & 0x1;
+    trgbit[33] = (b1type >> 4) & 0x1;
+    trgbit[34] = (b1type >> 5) & 0x1;
+    trgbit[35] = (b1type >> 6) & 0x1;
+    trgbit[36] = (b1type >> 7) & 0x1;
+    trgbit[37] = (b1type >> 8) & 0x1;
+    trgbit[38] = (b1type >> 9) & 0x1;
+    trgbit[39] = (b1type >> 10) & 0x1;
+    trgbit[40] = (b1type >> 11) & 0x1;
+    trgbit[41] = (b1type >> 12) & 0x1;
+    trgbit[42] = (b1type >> 13) & 0x1;
+    trgbit[43] = (b1type >> 14) & 0x1;
+
 
   }
 
-  const char* label[41] = {"Hit", "Timing Source(FWD)", "Timing Source(BR)", "Timing Source(BWD)", "physics Trigger", "2D Bhabha Veto", "3D Bhabha veto", "3D Bhabha Selection", "E Low", "E High", "E LOM", "Cluster Overflow", "Low multi bit 0", "Low multi bit 1", "Low multi bit 2", "Low multi bit 3", "Low multi bit 4", "Low multi bit 5", "Low multi bit 6", "Low multi bit 7", "Low multi bit 8", "Low multi bit 9", "Low multi bit 10", "Low multi bit 11", "mumu bit", "prescale bit", "2D Bhabha bit 1", "2D Bhabha bit 2"  , "2D Bhabha bit 3", "2D Bhabha bit 4", "2D Bhabha bit 5", "2D Bhabha bit 6", "2D Bhabha bit 7", "2D Bhabha bit 8", "2D Bhabha bit 9", "2D Bhabha bit 10", "2D Bhabha bit 11", "2D Bhabha bit 12", "2D Bhabha bit 13", "2D Bhabha bit 14"};
+  const char* label[44] = {"Hit", "Timing Source(FWD)", "Timing Source(BR)", "Timing Source(BWD)", "physics Trigger", "2D Bhabha Veto", "3D Bhabha veto", "3D Bhabha Selection", "E Low", "E High", "E LOM", "Cluster Overflow", "Low multi bit 0", "Low multi bit 1", "Low multi bit 2", "Low multi bit 3", "Low multi bit 4", "Low multi bit 5", "Low multi bit 6", "Low multi bit 7", "Low multi bit 8", "Low multi bit 9", "Low multi bit 10", "Low multi bit 11", "Low multi bit 12", "Low multi bit 13", "mumu bit", "prescale bit", "ECL burst bit" , "2D Bhabha bit 1", "2D Bhabha bit 2"  , "2D Bhabha bit 3", "2D Bhabha bit 4", "2D Bhabha bit 5", "2D Bhabha bit 6", "2D Bhabha bit 7", "2D Bhabha bit 8", "2D Bhabha bit 9", "2D Bhabha bit 10", "2D Bhabha bit 11", "2D Bhabha bit 12", "2D Bhabha bit 13", "2D Bhabha bit 14"};
 
 
 
-  for (int j = 0; j < 26; j++) {
+  for (int j = 0; j < 29; j++) {
     if (trgbit[j] == 0x1) {h_ECL_TriggerBit->Fill(j, 1);}
     h_ECL_TriggerBit->GetXaxis()-> SetBinLabel(j + 1, label[j]);
 
@@ -256,8 +258,86 @@ void TRGECLDQMModule::event()
 
   int c = _TCCluster.getNofCluster();
   h_Cluster->Fill(c);
+  std::vector<double> ClusterTiming;
+  std::vector<double> ClusterEnergy;
+  std::vector<int> MaxTCId;
+  ClusterTiming.clear();
+  ClusterEnergy.clear();
+  MaxTCId.clear();
 
-  //
+  for (int iii = 0; iii < trgeclCluster.getEntries(); iii++) {
+    TRGECLCluster* aTRGECLCluster = trgeclCluster[iii];
+    int maxTCId    = aTRGECLCluster ->getMaxTCId();
+    double clusterenergy  = aTRGECLCluster ->getEnergyDep();
+    double clustertiming  =  aTRGECLCluster -> getTimeAve();
+    ClusterTiming.push_back(clustertiming);
+    ClusterEnergy.push_back(clusterenergy);
+    MaxTCId.push_back(maxTCId);
+  }
+
+
+  std::vector<double> maxClusterEnergy;
+  std::vector<double> maxClusterTiming;
+  std::vector<int> maxCenterTCId;
+  maxClusterTiming.clear();
+  maxClusterEnergy.clear();
+  maxCenterTCId.clear();
+
+  maxClusterEnergy.resize(2, 0.0);
+  maxClusterTiming.resize(2, 0.0);
+  maxCenterTCId.resize(2, 0.0);
+  const int cl_size = ClusterEnergy.size();
+  for (int icl = 0; icl < cl_size; icl++) {
+    if (maxClusterEnergy[0] < ClusterEnergy[icl]) {
+      maxClusterEnergy[0] = ClusterEnergy[icl];
+      maxClusterTiming[0] = ClusterTiming[icl];
+      maxCenterTCId[0] = MaxTCId[icl];
+    } else if (maxClusterEnergy[1] < ClusterEnergy[icl]) {
+      maxClusterEnergy[1] = ClusterEnergy[icl];
+      maxClusterTiming[1] = ClusterTiming[icl];
+      maxCenterTCId[1] = MaxTCId[icl];
+
+    }
+
+  }
+  TrgEclDataBase _database;
+
+  std::vector<double> _3DBhabhaThreshold;
+  _3DBhabhaThreshold = {30, 45}; //  /10 MeV
+
+
+  bool BtoBFlag = false;
+  bool BhabhaFlag = false;
+  int lut1 = _database.Get3DBhabhaLUT(maxCenterTCId[0]);
+  int lut2 = _database.Get3DBhabhaLUT(maxCenterTCId[1]);
+  int energy1 = 15 & lut1;
+  int energy2 = 15 & lut2;
+  lut1 >>= 4;
+  lut2 >>= 4;
+  int phi1 = 511 & lut1;
+  int phi2 = 511 & lut2;
+  lut1 >>= 9;
+  lut2 >>= 9;
+  int theta1 = lut1;
+  int theta2 = lut2;
+  int dphi = abs(phi1 - phi2);
+  if (dphi > 180) {dphi = 360 - dphi;}
+  int thetaSum = theta1 + theta2;
+  if (dphi > 160 && thetaSum > 165 && thetaSum < 190) {BtoBFlag = true;}
+
+  if ((maxClusterEnergy[0] * 0.1) > _3DBhabhaThreshold[0] * energy1
+      && (maxClusterEnergy[1] * 0.1) > _3DBhabhaThreshold[0] * (energy2)
+      && ((maxClusterEnergy[0] * 0.1) > _3DBhabhaThreshold[1] * energy1
+          || (maxClusterEnergy[1] * 0.1) > _3DBhabhaThreshold[1] * (energy2))) {
+    if (BtoBFlag) {BhabhaFlag = true;}
+  }
+
+
+  if (BhabhaFlag) {
+    h_Cluster_Energy_Sum -> Fill((maxClusterEnergy[0] + maxClusterEnergy[1]) / 5.25);
+  }
+
+
   const int NofTCHit = TCId.size();
 
   double totalEnergy = 0;
@@ -302,7 +382,6 @@ void TRGECLDQMModule::event()
   h_Cal_TRGTiming -> Fill(caltrgtiming);
   h_TotalEnergy -> Fill(totalEnergy);
   h_Narrow_TotalEnergy -> Fill(totalEnergy);
-
 
   // usleep(100);
 }

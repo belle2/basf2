@@ -17,7 +17,6 @@
 
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
-#include <geometry/utilities.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -28,14 +27,12 @@
 #include <G4Torus.hh>
 #include <G4Trd.hh>
 #include <G4SubtractionSolid.hh>
-#include <G4PVReplica.hh>
 #include <G4VSolid.hh>
 
 #include <G4Polycone.hh>
 #include <G4Cons.hh>
 #include <G4Colour.hh>
 #include <G4LogicalVolume.hh>
-#include <G4VPhysicalVolume.hh>
 #include <G4PVPlacement.hh>
 #include <G4Transform3D.hh>
 #include <G4VisAttributes.hh>

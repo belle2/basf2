@@ -11,6 +11,8 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
 
 namespace Belle2 {
 
@@ -107,11 +109,17 @@ namespace Belle2 {
     //! @return matching-hit bit pattern
     unsigned int getHitLayerPattern() const { return m_HitLayerPattern; }
 
-    //! @return BKLM efficiency vector
-    std::vector<float> getExtBKLMEfficiencyVector() const { return m_ExtBKLMEfficiencyVector; }
+    //! @return total number of matching BKLM hits
+    unsigned int getTotalBarrelHits() const;
+
+    //! @return total number of matching EKLM hits
+    unsigned int getTotalEndcapHits() const;
+
+    //! @return BKLM efficiency value
+    float getExtBKLMEfficiencyValue(int index) const { return m_ExtBKLMEfficiencyValue[index]; }
 
     //! @return EKLM efficiency vector
-    //    std::vector<float> getExtEKLMEfficiencyVector() const { return m_ExtEKLMEfficiencyVector; }
+    float getExtEKLMEfficiencyValue(int index) const { return m_ExtEKLMEfficiencyValue[index]; }
 
     //! assign muon PDF value for this extrapolation
     //! @param pdfValue muon PDF value (normalized) for this extrapolation
@@ -213,12 +221,11 @@ namespace Belle2 {
     //! @param pattern bit pattern of matching-hit layers during extrapolation
     void setHitLayerPattern(unsigned int pattern) { m_HitLayerPattern = pattern; }
 
-    //! assign BKLMefficiency vector
-    void setExtBKLMEfficiencyVector(const std::vector<float>& efficiencyVector) { m_ExtBKLMEfficiencyVector = efficiencyVector; }
+    //! assign BKLMefficiency value
+    void setExtBKLMEfficiencyValue(int index, float efficiencyValue) { m_ExtBKLMEfficiencyValue[index] = efficiencyValue; }
 
-    //! assign EKLM efficiency vector
-    //    void setExtEKLMEfficiencyVector(std::vector<float>& efficiencyVector) { m_ExtEKLMEfficiencyVector = efficiencyVector; }
-
+    //! assign EKLM efficiency value
+    void setExtEKLMEfficiencyValue(int index, float efficiencyValue) { m_ExtEKLMEfficiencyValue[index] = efficiencyValue; }
 
   private:
 
@@ -309,15 +316,14 @@ namespace Belle2 {
     //! bits 15..28 = endcap layers 1..14)
     unsigned int m_HitLayerPattern;
 
-    //! Vector of BKLM layer efficiencies
-    std::vector<float> m_ExtBKLMEfficiencyVector;
+    //! Vector of BKLM layer efficiencies.
+    float m_ExtBKLMEfficiencyValue[BKLMElementNumbers::getMaximalLayerNumber()];
 
     //! Vector of EKLM layer efficiencies
-    //    std::vector<float> m_ExtEKLMEfficiencyVector;
+    float m_ExtEKLMEfficiencyValue[EKLMElementNumbers::getMaximalLayerNumber()];
 
     //! Needed to make the ROOT object storable
-    ClassDef(Muid, 6)
-    //    ClassDef(Muid, 7) With EKLM
+    ClassDef(Muid, 8)
 
   };
 }

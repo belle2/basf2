@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <vxd/dataobjects/VxdID.h>
 /// TClass is not used in this class, but the include is needed for the ClassDef
 #include <TClass.h>
 
@@ -51,6 +50,7 @@ namespace Belle2 {
     uint8_t m_chipID;/**< Chip ID as delivered by DAQ.*/
     uint16_t m_frameNr; /**< Frame number (low bits) from DHP header */
 
+    /** necessary for ROOT */
     ClassDef(PXDDAQDHPStatus, 1);
 
   }; // class PXDDAQDHPStatus

@@ -9,10 +9,7 @@
  **************************************************************************/
 
 #include <analysis/modules/TauDecayMarker/TauDecayMarkerModule.h>
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/Particle.h>
-
-#include <mdst/dataobjects/MCParticleGraph.h>
+#include <analysis/dataobjects/TauPairDecay.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -39,7 +36,7 @@ TauDecayMarkerModule::TauDecayMarkerModule() : Module(), tauPair(false), numOfTa
   // Set module properties
   setDescription("Module to identify generated tau pair decays, using MCParticle information. Each tau lepton decay channel "
                  "is numbered following the order in the default KKMC decay table. Using this module, "
-                 "the channel number will be stored in the variables `tauPlusMcMode`, and `tauMinusMcMode`. "
+                 "the channel number will be stored in the variables ``tauPlusMcMode``, and ``tauMinusMcMode``. "
                  "Further details and usage can be found at https://confluence.desy.de/display/BI/Tau+Physics+Analysis+Tools. ");
   //Parameter definition
   addParam("printDecayInfo", m_printDecayInfo, "Print information of the tau pair decay from MC.", false);
@@ -92,21 +89,17 @@ void TauDecayMarkerModule::IdentifyTauPair()
   numOfTauMinus = 0;
   idOfTauPlus = 0;
   idOfTauMinus = 0;
-  TLorentzVector P4p, P4m;
   for (int i = 0; i < MCParticles.getEntries(); i++) {
     MCParticle& p = *MCParticles[i];
 
     if (p.getStatus() == 1 && p.getPDG() == 15) {
       numOfTauMinus++;
       idOfTauMinus = p.getIndex();
-      P4m = p.get4Vector();
     }
     if (p.getStatus() == 1 && p.getPDG() == -15) {
       numOfTauPlus++;
       idOfTauPlus = p.getIndex();
-      P4p = p.get4Vector();
     }
-
   }
   if (numOfTauPlus == 1 && numOfTauMinus == 1) {
     tauPair = true;

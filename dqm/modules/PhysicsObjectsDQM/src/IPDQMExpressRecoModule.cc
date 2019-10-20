@@ -11,15 +11,10 @@
  **************************************************************************/
 
 #include <dqm/modules/PhysicsObjectsDQM/IPDQMExpressRecoModule.h>
-#include <analysis/variables/ContinuumSuppressionVariables.h>
-#include <analysis/variables/VertexVariables.h>
-#include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <TLorentzVector.h>
-#include <TStyle.h>
 #include <TDirectory.h>
-#include <iostream>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
@@ -47,9 +42,9 @@ void IPDQMExpressRecoModule::defineHisto()
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir("IPMonitoring")->cd();
 
-  m_h_x = new TH1F("Y4S_Vertex.X", "IP position - coord. X", 2000, -2, 2);
+  m_h_x = new TH1F("Y4S_Vertex.X", "IP position - coord. X", 1000, -0.5, 0.5);
   m_h_x->SetXTitle("IP_coord. X [cm]");
-  m_h_y = new TH1F("Y4S_Vertex.Y", "IP position - coord. Y", 2000, -2, 2);
+  m_h_y = new TH1F("Y4S_Vertex.Y", "IP position - coord. Y", 1000, -0.5, 0.5);
   m_h_y->SetXTitle("IP_coord. Y [cm]");
   m_h_z = new TH1F("Y4S_Vertex.Z", "IP position - coord. Z", 2000, -2, 2);
   m_h_z->SetXTitle("IP_coord. Z [cm]");
@@ -72,16 +67,16 @@ void IPDQMExpressRecoModule::defineHisto()
   m_h_temp->SetXTitle("IP_coord. Y [cm]");
   m_h_xx = new TH1F("Y4S_Prod.XX", "IP position - prod. XX", 1000, 0, 0.5);
   m_h_xx->SetXTitle("IP_prod. XX [cm^{2} ]");
-  m_h_xy = new TH1F("Y4S_Prod.XY", "IP position - prod. XY", 1000, 0, 0.5);
-  m_h_xy->SetXTitle("IP_prod. XY [cm^{2} ]");
   m_h_yy = new TH1F("Y4S_Prod.YY", "IP position - prod. YY", 1000, 0, 0.5);
   m_h_yy->SetXTitle("IP_prod. YY [cm^{2} ]");
-  m_h_yz = new TH1F("Y4S_Prod.YZ", "IP position - prod. YZ", 1000, -0.5, 0.5);
-  m_h_yz->SetXTitle("IP_prod. YZ [cm^{2} ]");
-  m_h_xz = new TH1F("Y4S_Prod.XZ", "IP position - prod. XZ", 1000, -0.5, 0.5);
-  m_h_xz->SetXTitle("IP_prod. XZ [cm^{2} ]");
-  m_h_zz = new TH1F("Y4S_Prod.ZZ", "IP position - prod. ZZ", 1000, -0.5, 0.5);
+  m_h_zz = new TH1F("Y4S_Prod.ZZ", "IP position - prod. ZZ", 2000, 0, 4);
   m_h_zz->SetXTitle("IP_prod. ZZ [cm^{2} ]");
+  m_h_xy = new TH1F("Y4S_Prod.XY", "IP position - prod. XY", 1000, -1, 1);
+  m_h_xy->SetXTitle("IP_prod. XY [cm^{2} ]");
+  m_h_yz = new TH1F("Y4S_Prod.YZ", "IP position - prod. YZ", 1000, -1, 1);
+  m_h_yz->SetXTitle("IP_prod. YZ [cm^{2} ]");
+  m_h_xz = new TH1F("Y4S_Prod.XZ", "IP position - prod. XZ", 1000, -1, 1);
+  m_h_xz->SetXTitle("IP_prod. XZ [cm^{2} ]");
   m_h_cov_x_x = new TH1F("Var.X", "X Variance", 500, 0., 0.005);
   m_h_cov_x_x->SetXTitle("Var. X [cm^{2} ]");
   m_h_cov_y_y = new TH1F("Var.Y", "Y Variance", 500, 0., 0.005);
@@ -131,6 +126,7 @@ void IPDQMExpressRecoModule::beginRun()
   m_h_E->Reset();
   m_v_y.clear();
   m_err_y.clear();
+  m_r = 0;
 }
 
 
@@ -180,7 +176,6 @@ void IPDQMExpressRecoModule::event()
       Particle* Y4S = Y4SParticles->getParticle(i);
       TVector3 IPVertex = frame.getVertex(Y4S);
       const auto& errMatrix = Y4S->getVertexErrorMatrix();
-
       m_h_x->Fill(IPVertex.X());
       m_h_y->Fill(IPVertex.Y());
       m_h_z->Fill(IPVertex.Z());
@@ -204,7 +199,7 @@ void IPDQMExpressRecoModule::event()
       m_err_y.push_back(std::sqrt(errMatrix(1, 1)));
       m_v_y.push_back(IPVertex.Y());
 
-      if (m_r == 199) {
+      if (m_r == m_size_per_unit) {
         m_h_temp->GetQuantiles(1, &m_median, &m_quantile);
         for (unsigned int u = 0; u < m_v_y.size(); u++) {
           m_h_y_risol->Fill(m_v_y.at(u) - m_median);

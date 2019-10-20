@@ -163,6 +163,7 @@ class VXDHarvester(QueueHarvester):
         #: cached copy of the detector identifier (PXD or SVD)
         self.detector = detector
 
+        #: if true the MC information is used
         self.use_mc_info = use_mc_info
 
     def is_valid_cluster(self, cluster):

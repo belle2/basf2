@@ -14,13 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
-
-#include <pxd/reconstruction/PXDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit2D.h>
-#include <cdc/dataobjects/CDCRecoHit.h>
 
 #include <root/TFile.h>
 #include <root/TTree.h>

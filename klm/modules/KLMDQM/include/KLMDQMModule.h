@@ -10,17 +10,20 @@
 
 #pragma once
 
-/* External headers. */
-#include <TH1F.h>
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMChannelArrayIndex.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMSectorArrayIndex.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 
-/* Belle2 headers. */
-#include <bklm/dataobjects/BKLMDigit.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <bklm/dataobjects/BKLMHit1d.h>
-#include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/dataobjects/ElementNumbersSingleton.h>
+/* Belle 2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+
+/* ROOT headers. */
+#include <TH1F.h>
 
 namespace Belle2 {
 
@@ -101,6 +104,15 @@ namespace Belle2 {
     /** Name of BKLMHit1d store array. */
     std::string m_inputHitsName1d;
 
+    /** KLM channel array index. */
+    const KLMChannelArrayIndex* m_ChannelArrayIndex;
+
+    /** KLM sector array index. */
+    const KLMSectorArrayIndex* m_SectorArrayIndex;
+
+    /** KLM element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
+
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_Elements;
 
@@ -116,11 +128,19 @@ namespace Belle2 {
     /** Time: EKLM scintillators. */
     TH1F* m_TimeScintillatorEKLM;
 
+    /** Number of hits per channel. */
+    TH1F** m_ChannelHits[
+      EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
+      BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
+
+    /** Number of channel hit histograms per sector for BKLM. */
+    const int m_ChannelHitHistogramsBKLM = 2;
+
+    /** Number of channel hit histograms per sector for EKLM. */
+    const int m_ChannelHitHistogramsEKLM = 3;
+
     /** Sector number. */
     TH1F* m_eklmSector;
-
-    /** Strip number within a layer. */
-    TH1F** m_eklmStripLayer;
 
     /** Axial position of muon hit. */
     TH1F* m_bklmHit2dsZ;

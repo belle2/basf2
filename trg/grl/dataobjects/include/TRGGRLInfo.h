@@ -17,9 +17,11 @@
 #include <string>
 namespace Belle2 {
 
+  /// a class to store TRGGRL TSIM info
   class TRGGRLInfo : public TObject {
   public:
 
+    /// Constructor
     TRGGRLInfo():
       m_n_2dfinder_track(-1),
       m_n_2dfitter_track(-1),
@@ -40,6 +42,7 @@ namespace Belle2 {
       m_n_high_2000_cluster414(-1),
       m_n_high_2000_cluster231516(-1),
       m_n_high_2000_cluster117(-1),
+      m_n_high_2000_endcap_cluster(-1),
       m_nbbc(-1),
       m_nbbtc(-1),
       m_n_klm_track(-1),
@@ -121,15 +124,15 @@ namespace Belle2 {
     int getBhabhaVeto() const {return m_bhabhaveto;}
     /**get eclbhabha*/
     int geteclBhabhaVeto() const {return m_eclbhabhaveto;}
-    /***/
+    /**get PhiPairHigh*/
     int getPhiPairHigh() const {return m_n_PhiPairHigh;}
-    /***/
+    /**get PhiPairLow*/
     int getPhiPairLow() const {return m_n_PhiPairLow;}
-    /***/
+    /**3D pair*/
     int get3DPair() const {return m_n_3DPair;}
-    /***/
+    /**NSameHem1Trk*/
     int getNSameHem1Trk() const {return m_n_SameHem1Trk;}
-    /***/
+    /**NOppHem1Trk*/
     int getNOppHem1Trk() const {return m_n_OppHem1Trk;}
     /**get Trk_b2b_1to3*/
     int getTrk_b2b_1to3() const {return m_Trk_b2b_1to3;}
@@ -216,15 +219,15 @@ namespace Belle2 {
     void setBhabhaVeto(int bha)  {m_bhabhaveto = bha;}
     /**set the value of sbhabha*/
     void seteclBhabhaVeto(int eclbha)  {m_eclbhabhaveto = eclbha;}
-    /***/
+    /**set PairHigh*/
     void setPairHigh(int PhiPairHigh) {m_n_PhiPairHigh = PhiPairHigh;}
-    /***/
+    /**set PairLow*/
     void setPairLow(int PhiPairLow) {m_n_PhiPairLow = PhiPairLow;}
-    /***/
+    /**set 3DPair*/
     void set3DPair(int n3DPair) {m_n_3DPair = n3DPair;}
-    /***/
+    /**set NSameHem1Trk*/
     void setNSameHem1Trk(int SameHem1Trk) {m_n_SameHem1Trk = SameHem1Trk;}
-    /***/
+    /**set NOppHem1Trk*/
     void setNOppHem1Trk(int OppHem1Trk) {m_n_OppHem1Trk = OppHem1Trk;}
     /**set the value of Trk_b2b_1to3*/
     void setTrk_b2b_1to3(int Trk_b2b_1to3) {m_Trk_b2b_1to3 = Trk_b2b_1to3;}
@@ -321,15 +324,15 @@ namespace Belle2 {
     int m_bhabhaveto;
     /**ecl Bhabha veto (only ecl information is used), eclbahbah:1, non-eclbhabha:0*/
     int m_eclbhabhaveto;
-    /***/
+    /**number of PhiPairHigh*/
     int m_n_PhiPairHigh;
-    /***/
+    /**number of PhiPairLow*/
     int m_n_PhiPairLow;
-    /***/
+    /**number of 3DPair*/
     int m_n_3DPair;
-    /***/
+    /**number of SameHem+1Trk*/
     int m_n_SameHem1Trk;
-    /***/
+    /**number of OppHem+1Trk*/
     int m_n_OppHem1Trk;
     /**Trk_b2b_1to3*/
     int m_Trk_b2b_1to3;

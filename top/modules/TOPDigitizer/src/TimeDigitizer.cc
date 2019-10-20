@@ -23,12 +23,14 @@ namespace Belle2 {
     unsigned TimeDigitizer::m_readoutWindows = 0;
     int TimeDigitizer::m_offsetWindows = 0;
     unsigned TimeDigitizer::m_window = 0;
+    bool TimeDigitizer::m_maskSamples = false;
 
     TimeDigitizer::TimeDigitizer(int moduleID, int pixelID, double timeOffset,
-                                 double calErrorsSq, double rmsNoise,
+                                 double calErrorsSq, int shift, double rmsNoise,
                                  const TOPSampleTimes& sampleTimes):
       m_moduleID(moduleID), m_pixelID(pixelID), m_timeOffset(timeOffset),
-      m_calErrorsSq(calErrorsSq), m_rmsNoise(rmsNoise), m_sampleTimes(&sampleTimes)
+      m_calErrorsSq(calErrorsSq), m_rmsNoise(rmsNoise), m_sampleTimes(&sampleTimes),
+      m_windowShift(shift)
     {
       const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
       m_channel = channelMapper.getChannel(pixelID);
@@ -254,7 +256,8 @@ namespace Belle2 {
       // generate waveform
 
       std::vector<unsigned short> windowNumbers;
-      int winnum = m_window - m_offsetWindows;
+      int offsetWindows = m_offsetWindows + m_windowShift;
+      int winnum = m_window + offsetWindows;
       if (winnum < 0) winnum += m_storageDepth;
       windowNumbers.push_back(winnum);
       for (unsigned i = 1; i < m_readoutWindows; i++) {
@@ -266,7 +269,7 @@ namespace Belle2 {
       std::vector<double> pedestals(windowNumbers.size(), averagePedestal);
       int adcRange = tdc.getADCRange();
 
-      int startSample = m_offsetWindows * TOPRawWaveform::c_WindowSize;
+      int startSample = -offsetWindows * TOPRawWaveform::c_WindowSize;
       auto wfData = generateWaveform(startSample, baselines, rmsNoises, pedestals,
                                      adcRange);
 
@@ -289,6 +292,7 @@ namespace Belle2 {
         unsigned iwin = sampleRise / TOPRawWaveform::c_WindowSize;
         if (iwin >= windowNumbers.size()) continue;
         sampleRise -= iwin * TOPRawWaveform::c_WindowSize; // should fit raw data bits
+        if (m_maskSamples and (sampleRise % 64) > 55) continue;
 
         unsigned DsamplePeak = feature.samplePeak - feature.sampleRise;
         if ((DsamplePeak & 0x0F) != DsamplePeak) continue; // does not fit raw data bits
@@ -328,7 +332,7 @@ namespace Belle2 {
         double rawTimeErr = rawDigit->getCFDLeadingTimeError(m_rmsNoise); // in [samples]
 
         // convert to [ns] using time base calibration
-        int nwin = iwin - m_offsetWindows;
+        int nwin = iwin + offsetWindows;
         rawTimeLeading += nwin * TOPRawDigit::c_WindowSize;
         rawTimeFalling += nwin * TOPRawDigit::c_WindowSize;
 

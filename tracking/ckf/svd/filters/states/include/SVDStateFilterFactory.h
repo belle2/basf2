@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/svd/entities/CKFToSVDState.h>
-
 #include <tracking/ckf/svd/filters/states/BaseSVDStateFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>

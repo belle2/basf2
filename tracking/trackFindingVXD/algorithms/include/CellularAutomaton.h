@@ -9,12 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <string>
-
-#include <framework/logging/Logger.h>
-
 #include <tracking/trackFindingVXD/algorithms/TrackerAlgorithmBase.h>
-
 
 namespace Belle2 {
   /** The CellularAutomaton class

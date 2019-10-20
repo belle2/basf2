@@ -10,33 +10,20 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-#include <map>
-#include <Geant4/G4Transform3D.hh>
-#include <root/TMatrixD.h>
+#include <framework/geometry/B2Vector3.h>
+
 #include <genfit/StateOnPlane.h>
+
+#include <root/TMatrixD.h>
 #include <root/TGeoMatrix.h>
 
-#include <framework/logging/Logger.h>
+#include <Geant4/G4Transform3D.hh>
 
-#include <alignment/GlobalParam.h>
-
-
-#include <framework/dbobjects/BeamParameters.h>
-#include <alignment/dbobjects/VXDAlignment.h>
-#include <alignment/dbobjects/CDCCalibration.h>
-#include <alignment/dbobjects/BKLMAlignment.h>
-#include "GlobalLabel.h"
-#include <eklm/dbobjects/EKLMAlignment.h>
-
-#include <cdc/dbobjects/CDCTimeZeros.h>
-#include <cdc/dbobjects/CDCTimeWalks.h>
-#include <cdc/dbobjects/CDCAlignment.h>
-#include <cdc/dbobjects/CDCXtRelations.h>
+#include <map>
+#include <set>
+#include <vector>
 
 namespace Belle2 {
-  class MillepedeAlgorithm;
   namespace alignment {
 
     /// pair of the global unique id from object with constants and element representing some rigid body in hierarchy
@@ -46,7 +33,7 @@ namespace Belle2 {
     /// A (null) constraint, vector of pairs of global label and its factor in the constraint
     typedef std::vector<std::pair<int, double>> Constraint;
     /// vector of constraints
-    typedef std::map<int, Constraint> Constraints;
+    typedef std::map<long, Constraint> Constraints;
 
     /// Class for alignment/calibration parameter hierarchy & constraints
     class GlobalDerivativesHierarchy {
@@ -126,7 +113,7 @@ namespace Belle2 {
 
       /// Template function to get globals for given db object and its element (and the rest of hierarchy)
       template<class LowestLevelDBObject>
-      GlobalDerivativeSet getGlobalDerivatives(unsigned short sensor, const genfit::StateOnPlane* sop, TVector3 bField)
+      GlobalDerivativeSet getGlobalDerivatives(unsigned short sensor, const genfit::StateOnPlane* sop, B2Vector3D bField)
       {
         if (bField.Mag() < 1.e-10)
           return std::make_pair(std::vector<int>(), TMatrixD());
@@ -139,7 +126,7 @@ namespace Belle2 {
       }
 
       /// Derivatives for Lorentz shift in sensor plane
-      TMatrixD getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, TVector3 bField);
+      TMatrixD getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, B2Vector3D bField);
 
       /// Template function to insert hierarchy relation bewteen two DB objects and their elements
       template<class ChildDBObjectType, class MotherDBObjectType>

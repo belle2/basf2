@@ -5,10 +5,10 @@
     FEI Hadronic B0 tag skim standalone for generic analysis in the
     (Semi-)Leptonic and Missing Energy Working Group
     Skim LFN code: 11180100
-    fei training: MC12 based, release-03-01-01 'FEIv4_2019_MC12_release_03_01_01'
+    fei training: MC12 based, release-04-00-00 'FEIv4_2019_MC12_release_03_01_01'
     """
 
-__authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
+__authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling", "Phil Grace"]
 
 
 import sys
@@ -17,11 +17,9 @@ import os.path
 
 from basf2 import *
 from modularAnalysis import *
-from analysisPath import analysis_main
 from beamparameters import add_beamparameters
-from skimExpertFunctions import *
-
-gb2_setuprel = 'release-03-01-01'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-04-00-00'
 skimCode = encodeSkimName('feiHadronicB0')
 fileList = get_test_file("mixedBGx1", "MC12")
 
@@ -37,12 +35,12 @@ runFEIforB0Hadronic(path)
 path.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=True)
 
 # Apply final B0 tag cuts
-B0hadronicList = B0hadronic(path)
-skimOutputUdst(skimCode, B0hadronicList, path=path)
-summaryOfLists(B0hadronicList, path=path)
+B0HadronicList = B0Hadronic(path)
+skimOutputUdst(skimCode, B0HadronicList, path=path)
+summaryOfLists(B0HadronicList, path=path)
 
 # Suppress noisy modules, and then process
-setSkimLogging()
+setSkimLogging(path)
 process(path)
 
 # print out the summary

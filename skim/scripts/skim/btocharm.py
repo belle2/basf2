@@ -144,8 +144,8 @@ def loadDkshh(path):
     Dcuts = '1.5 < M < 2.2'
 
     D0_Channels = [
-        'K_S0:all pi+:all pi-:all',
-        'K_S0:all K+:all K-:all'
+        'K_S0:merged pi+:all pi-:all',
+        'K_S0:merged K+:all K-:all'
     ]
     D0List = []
     for chID, channel in enumerate(D0_Channels):
@@ -203,7 +203,7 @@ def loadDkspi0(path):
     Dcuts = '1.5 < M < 2.2'
 
     D0_Channels = [
-        'K_S0:all pi0:skim'
+        'K_S0:merged pi0:skim'
     ]
 
     D0List = []
@@ -262,7 +262,7 @@ def loadDkspipipi0(path):
     Dcuts = '1.8 < M < 1.9'
 
     D0_Channels = [
-        'K_S0:all pi+:all pi-:all pi0:skim'
+        'K_S0:merged pi+:all pi-:all pi0:skim'
     ]
     D0List = []
     for chID, channel in enumerate(D0_Channels):

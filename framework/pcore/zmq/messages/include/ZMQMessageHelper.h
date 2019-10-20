@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/logging/LogMethod.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 #include <framework/pcore/zmq/utils/EventMetaDataSerialization.h>
@@ -18,7 +17,6 @@
 #include <zmq.hpp>
 #include <string>
 #include <memory>
-#include <vector>
 
 namespace Belle2 {
 

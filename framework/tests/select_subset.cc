@@ -5,7 +5,6 @@
 
 
 #include <gtest/gtest.h>
-#include <TObject.h>
 
 #include <string>
 #include <vector>

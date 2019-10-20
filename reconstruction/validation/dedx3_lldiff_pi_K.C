@@ -46,9 +46,9 @@ void plot(const TString &input_filename)
   for (int det = 0; det < 2; det++) {
     TString selection;
     if (det == 0) //SVD
-      selection = TString::Format("(VXDDedxTracks.m_vxdLogl[][2] - VXDDedxTracks.m_vxdLogl[][3]):VXDDedxTracks.m_pTrue");
+      selection = TString::Format("(VXDDedxLikelihoods.m_vxdLogl[][2] - VXDDedxLikelihoods.m_vxdLogl[][3]):VXDDedxTracks.m_pTrue");
     else //CDC
-      selection = TString::Format("(CDCDedxTracks.m_cdcLogl[][2] - CDCDedxTracks.m_cdcLogl[][3]):CDCDedxTracks.m_pTrue");
+      selection = TString::Format("(CDCDedxLikelihoods.m_cdcLogl[][2] - CDCDedxLikelihoods.m_cdcLogl[][3]):CDCDedxTracks.m_pTrue");
 
     for (int part = 2; part < 4; part++) {
       //now create histograms with log-likelihood difference
@@ -61,13 +61,13 @@ void plot(const TString &input_filename)
       TH1* hist = (TH1*)output_file->Get(TString::Format("%d_%d_LLdiff", det, pdg_codes[part]));
       hist->SetTitle(TString::Format("LL(pi) - LL(K) for true %s, over momentum (in %s)", pdg_names[part], (det==0)?"VXD":"CDC"));
       hist->GetListOfFunctions()->Add(new TNamed("Description", hist->GetTitle()));
-      hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
       if (pdg_codes[part] == 211) {
         hist->GetListOfFunctions()->Add(new TNamed("Check", "Should be as high as possible (esp. for low momenta), with almost no entries <0 "));
       } else {
         hist->GetListOfFunctions()->Add(new TNamed("Check", "Should be as low as possible (esp. for low momenta), with almost no entries >0 "));
       }
-      hist->GetListOfFunctions()->Add(new TNamed("Contact","jkumar@andrew.cmu.edu"));
+      hist->GetListOfFunctions()->Add(new TNamed("Contact","Jitendra Kumar: jkumar@andrew.cmu.edu"));
+      hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
       hist->Write();
 
     }

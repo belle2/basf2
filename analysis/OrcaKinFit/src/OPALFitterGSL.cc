@@ -179,9 +179,6 @@ namespace Belle2 {
       //  Vdxdt is Vetaeta * dxdt^T, thus Vdxdt[nmea][npar]
       //  both needed for calculation of the full covariance matrix of the fitted parameters
 
-      // cout statements
-      int inverr = 0;
-
       // order parameters etc
       initialize();
 
@@ -370,7 +367,7 @@ namespace Belle2 {
 // S is symmetric and positive definite
 
         gsl_linalg_LU_decomp(S, permS, &signum);
-        inverr = gsl_linalg_LU_invert(S, permS, Sinv);
+        int inverr = gsl_linalg_LU_invert(S, permS, Sinv);
 
         if (inverr != 0) {
           B2ERROR("S: gsl_linalg_LU_invert error " << inverr);
@@ -418,13 +415,17 @@ namespace Belle2 {
           // dxi = -alph*Fxi^T*lambda + 0*dxi
 
           B2DEBUG(11, "alph = " << alph);
-          if (debug > 1) debug_print(lambda, "lambda");
-          if (debug > 1) debug_print(&(Fxi.matrix), "Fxi");
+          if (debug > 1) {
+            debug_print(lambda, "lambda");
+            debug_print(&(Fxi.matrix), "Fxi");
+          }
 
           gsl_blas_dgemv(CblasTrans, -alph, &Fxi.matrix, lambda, 0, dxi);
 
-          if (debug > 1) debug_print(dxi, "dxi0");
-          if (debug > 1) debug_print(W1, "W1");
+          if (debug > 1) {
+            debug_print(dxi, "dxi0");
+            debug_print(W1, "W1");
+          }
 
           // now solve the system
           // Note added 23.12.04: W1 is symmetric and positive definite,
@@ -627,8 +628,10 @@ namespace Belle2 {
 
 // *-- Evaluate S and invert.
 
-        if (debug > 2) debug_print(&Vetaeta.matrix, "V");
-        if (debug > 2) debug_print(&Feta.matrix, "Feta");
+        if (debug > 2) {
+          debug_print(&Vetaeta.matrix, "V");
+          debug_print(&Feta.matrix, "Feta");
+        }
 
         // CblasRight means C = alpha B A + beta C with symmetric matrix A
         //FetaV[ncon][nmea] = 1*Feta[ncon][nmea]*V[nmea][nmea] + 0*FetaV
@@ -655,7 +658,7 @@ namespace Belle2 {
 
         int signum;
         gsl_linalg_LU_decomp(S, permS, &signum);
-        inverr = gsl_linalg_LU_invert(S, permS, Sinv);
+        int inverr = gsl_linalg_LU_invert(S, permS, Sinv);
 
         if (inverr != 0) {
           B2ERROR("S: gsl_linalg_LU_invert error " << inverr << " in error calculation");

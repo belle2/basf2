@@ -13,23 +13,9 @@
 
 #include <framework/core/HistoModule.h>
 
-//ARICH dataobjects
-#include <arich/dataobjects/ARICHHit.h>
-#include <arich/dataobjects/ARICHTrack.h>
-#include <arich/dataobjects/ARICHPhoton.h>
-#include <arich/dataobjects/ARICHLikelihood.h>
-
-#include <TCanvas.h>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TH3F.h>
-#include <TVector2.h>
-#include <TText.h>
-#include <TFile.h>
-
-#include <vector>
-#include <string>
-#include <map>
 
 namespace Belle2 {
 

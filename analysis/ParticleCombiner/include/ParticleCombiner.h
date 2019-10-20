@@ -247,6 +247,17 @@ namespace Belle2 {
     int m_pdgCode; /**< PDG Code of the particle which is combined */
     bool m_isSelfConjugated; /**< True if the combined particle is self-conjugated */
     unsigned int m_iParticleType; /**< The type of particle which is currently generated */
+    bool m_isUnspecified; /**< True if the particle is marked as unspecified by using "@" */
+    /** Ignore radiated photons? */
+    bool m_isIgnoreRadiatedPhotons;
+    /** Ignore intermediate particles or resonances? */
+    bool m_isIgnoreIntermediate;
+    /** Ignore missing massive final state particles? */
+    bool m_isIgnoreMassive;
+    /** Ignore missing neutrino? */
+    bool m_isIgnoreNeutrino;
+    /** Ignore missing gamma? */
+    bool m_isIgnoreGamma;
 
     unsigned int m_numberOfLists; /**< Number of lists which are combined */
     std::vector<StoreObjPtr<ParticleList>> m_plists; /**< particle lists */

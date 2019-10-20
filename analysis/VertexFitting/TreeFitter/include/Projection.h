@@ -59,6 +59,11 @@ namespace TreeFitter {
     /** get offset */
     unsigned int offset() const { return m_offset; }
 
+    /**get size */
+    int getDim() const { return m_dimProj; }
+
+    /**get size */
+    int getDimCov() const { return m_dimCov; }
   private:
 
     /** jacobian of the constraint, converts x,p,E<->system of residuals */

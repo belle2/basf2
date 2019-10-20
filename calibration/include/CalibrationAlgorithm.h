@@ -19,7 +19,7 @@
 #include <TClonesArray.h>
 #include <TDirectory.h>
 #include <TFile.h>
-#include <TChain.h>
+#include <TTree.h>
 #include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>
@@ -59,6 +59,11 @@ namespace Belle2 {
         m_result = c_Undefined;
         m_payloads.clear();
         m_iov = IntervalOfValidity();
+        m_mapCalibData.clear();
+      }
+      /// Clear calibration data
+      void clearCalibrationData()
+      {
         m_mapCalibData.clear();
       }
       /// Returns the vector of ExpRuns
@@ -272,6 +277,9 @@ namespace Belle2 {
     /// Set algorithm description (in constructor)
     void setDescription(const std::string& description) {m_description = description;}
 
+    /// Clear calibration data
+    void clearCalibrationData() {m_data.clearCalibrationData();}
+
     /// Returns the Exp,Run pair that means 'Everything'. Currently unused.
     Calibration::ExpRun getAllGranularityExpRun() const {return m_allExpRun;}
 
@@ -360,6 +368,10 @@ namespace Belle2 {
             // Get the path/directory of the Exp,Run TDirectory that holds the object(s)
             std::string objDirName = getFullObjectPath(name, expRunRequested);
             TDirectory* objDir = f->GetDirectory(objDirName.c_str());
+            if (!objDir) {
+              B2ERROR("Directory for requested object " << name << " not found: " << objDirName);
+              return nullptr;
+            }
             // Find all the objects inside, there may be more than one
             for (auto key : * (objDir->GetListOfKeys())) {
               std::string keyName = key->GetName();
@@ -418,4 +430,13 @@ namespace Belle2 {
     B2DEBUG(100, "Passing back merged data " << name);
     return objOutputPtr;
   }
+
+  /**
+   * Specialization of getObjectPtr<TTree>.
+   */
+  template<> std::shared_ptr<TTree>
+  CalibrationAlgorithm::getObjectPtr(
+    const std::string& name,
+    const std::vector<Calibration::ExpRun>& requestedRuns);
+
 } // namespace Belle2

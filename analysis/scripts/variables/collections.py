@@ -19,12 +19,10 @@ cluster = [
     'nECLClusterTrackMatches',
     'clusterZernikeMVA',
     'clusterReg',
-    'clusterTrigger',
     'weightedAverageECLTime',
     'clusterAbsZernikeMoment40',
     'clusterAbsZernikeMoment51',
     'clusterBelleQuality',
-    'clusterCRID',
     'clusterClusterID',
     'clusterConnectedRegionID',
     'clusterE1E9',
@@ -36,6 +34,8 @@ cluster = [
     'clusterErrorTheta',
     'clusterErrorTiming',
     'clusterHighestE',
+    'clusterHasFailedErrorTiming',
+    'clusterHasFailedTiming',
     'clusterHasNPhotons',
     'clusterHasNeutralHadron',
     'clusterLAT',
@@ -46,9 +46,6 @@ cluster = [
     'clusterTheta',
     'clusterTiming',
     'clusterTrackMatch',
-    'eclExtPhi',
-    'eclExtPhiId',
-    'eclExtTheta',
     'goodBelleGamma',
     'nECLOutOfTimeCrystals',
     'nECLOutOfTimeCrystalsBWDEndcap',
@@ -203,6 +200,9 @@ tag_vertex = [
     'TagVOBoost',
     'TagVOBoostErr',
     'TagVpVal',
+    'TagVNDF',
+    'TagVChi2',
+    'TagVChi2IP',
     'TagVx',
     'TagVxErr',
     'TagVy',
@@ -240,7 +240,7 @@ reco_stats = [
 inv_mass = ['M', 'ErrM', 'SigM', 'InvM']
 
 #: Extra energy variables
-extra_energy = ["ROE_eextra()"]
+extra_energy = ["roeEextra()"]
 
 #: Event level tracking variables
 event_level_tracking = [

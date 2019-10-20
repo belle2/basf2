@@ -9,10 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#include <analysis/VariableManager/Manager.h>
-
-#include <vector>
-#include <string>
 
 namespace Belle2 {
   class Particle;
@@ -83,6 +79,27 @@ namespace Belle2 {
      * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
      */
     double particleTagVNTracks(const Particle* particle);
+
+    /**
+     * returns the number of degrees of freedom in the tag vertex fit. can be non-integer due to adaptive vertex fitting.
+     *
+     * requires that TagVertex <-> Particle relation exists (returns -1111 if not)
+     */
+    double particleTagVNDF(const Particle*);
+
+    /**
+     * returns chi^2 value of the tag vertex fit result.
+     *
+     * requires that TagVertex <-> Particle relation exists (returns -1111 if not)
+     */
+    double particleTagVChi2(const Particle*);
+
+    /**
+     * returns the IP component of chi^2 value of the tag vertex fit result.
+     *
+     * requires that TagVertex <-> Particle relation exists (returns -1111 if not)
+     */
+    double particleTagVChi2IP(const Particle*);
 
 
     /**

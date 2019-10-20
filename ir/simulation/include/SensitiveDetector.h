@@ -13,7 +13,6 @@
 #define IR_SENSITIVEDETECTOR_H_
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
-#include <ir/dataobjects/IRSimHit.h>
 
 namespace Belle2 {
   namespace ir {

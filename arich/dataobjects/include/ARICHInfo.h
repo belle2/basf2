@@ -12,7 +12,6 @@
 #define ARICHINFO_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -78,7 +77,7 @@ namespace Belle2 {
     int m_n_hit = 0;            /**< number of ARICHHits of this event */
 
 
-    ClassDef(ARICHInfo, 1); /**< the class title */
+    ClassDef(ARICHInfo, 2); /**< the class title */
 
   };
 

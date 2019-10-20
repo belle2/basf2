@@ -28,10 +28,11 @@ SVD3SamplesEmulatorModule::SVD3SamplesEmulatorModule() : Module()
   setDescription("This module takes the SVDShaperDigit as input and select three consecutive samples starting from the one choosen by the user. The modules creates a new StoreArray of the class ShaperDigit whit three samples only, selected from the original ShaperDigits. The three samples are stored in the first three positions of the APVSamples store array, and the last three are set to 0.");
 
   // Parameter definitions
-  addParam("SVDShaperDigits", m_shaperDigitInput, "StoreArray with the input shaperdigits", std::string("SVDShaperDigits"));
+  addParam("SVDShaperDigits", m_shaperDigitInputName, "StoreArray with the input shaperdigits", std::string("SVDShaperDigits"));
   addParam("StartingSample", m_startingSample, "Starting sample of the three samples (between 0 and 3, the default is 0)", int(0));
   addParam("outputArrayName", m_outputArrayName, "StoreArray with the output shaperdigits with 3 samples",
            std::string("SVDShaperDigit3Samples"));
+  addParam("SVDEventInfo", m_svdEventInfoName, "SVDEventInfo name", std::string(""));
 }
 
 SVD3SamplesEmulatorModule::~SVD3SamplesEmulatorModule()
@@ -47,18 +48,22 @@ void SVD3SamplesEmulatorModule::initialize()
     return;
   }
 
-  B2DEBUG(10, "SVDShaperDigits: " << m_shaperDigitInput);
+  B2DEBUG(10, "SVDShaperDigits: " << m_shaperDigitInputName);
   B2DEBUG(10, "StartingSample: " << m_startingSample);
   B2DEBUG(10, "outputArrayName: " <<  m_outputArrayName);
 
   B2INFO("The starting sample from which start to select the three samples:  " << m_startingSample);
   B2INFO("The three samples selected are: " << m_startingSample << " " << m_startingSample + 1 << " " << m_startingSample + 2);
 
-  StoreArray<SVDShaperDigit> ShaperDigits(m_shaperDigitInput);
-  ShaperDigits.isRequired();
+  m_ShaperDigit.isRequired();
   StoreArray<SVDShaperDigit> ShaperDigit3Samples(m_outputArrayName);
   ShaperDigit3Samples.registerInDataStore();
 
+  if (!m_storeSVDEvtInfo.isOptional(m_svdEventInfoName)) m_svdEventInfoName = "SVDEventInfoSim";
+  m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
+
+  //Register the new EventInfo with ModeByte for 3 samples in the data store
+  m_storeSVDEvtInfo3samples.registerInDataStore("SVDEventInfo3samples", DataStore::c_ErrorIfAlreadyRegistered);
 }
 
 
@@ -69,20 +74,25 @@ void SVD3SamplesEmulatorModule::beginRun()
 
 void SVD3SamplesEmulatorModule::event()
 {
+  if (!m_storeSVDEvtInfo.isValid()) B2ERROR("No valid SVDEventInfo object is present!");
+
+  SVDModeByte modeByte = m_storeSVDEvtInfo->getModeByte();
   StoreArray<SVDShaperDigit> ShaperDigit3Samples(m_outputArrayName);
-  StoreArray<SVDShaperDigit> ShaperDigits(m_shaperDigitInput);
 
-  for (const SVDShaperDigit& shaper : ShaperDigits) {
+  int DAQMode = modeByte.getDAQMode();
+  if (DAQMode != 2) {
+    B2FATAL("The DAQMode is = " << DAQMode << " The number of samples of the input shaperdigits is NOT 6!");
+    return;
+  }
 
-    SVDModeByte modeByte = shaper.getModeByte();
+  m_storeSVDEvtInfo3samples.create();
+  m_storeSVDEvtInfo3samples->setTriggerType(m_storeSVDEvtInfo->getTriggerType());
+  modeByte.setDAQMode(1);
+  m_storeSVDEvtInfo3samples->setModeByte(modeByte);
 
-    int DAQMode = modeByte.getDAQMode();
-    if (DAQMode != 2) {
-      B2FATAL("The DAQMode is = " << DAQMode << " The number of samples of the input shaperdigits is NOT 6!");
-      return;
-    }
 
-    modeByte.setDAQMode(1);
+  for (const SVDShaperDigit& shaper : m_ShaperDigit) {
+
     Belle2::SVDShaperDigit::APVFloatSamples samples = shaper.getSamples();
     VxdID sensorID = shaper.getSensorID();
     bool side = shaper.isUStrip();

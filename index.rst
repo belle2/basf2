@@ -27,7 +27,6 @@ Belle 2 Software or for additional information, please
    build/tools_doc/index*
    framework/doc/index*
    */doc/index*
-   */sphinx_*
    framework/doc/atend*
 
 .. only:: format_html

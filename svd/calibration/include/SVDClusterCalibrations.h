@@ -40,8 +40,12 @@ namespace Belle2 {
       , m_time_aDBObjPtr(time_name)
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDClusterCalibrations: from now on we are using " <<
+        B2INFO("SVDClusterCuts: from now on we are using " <<
         this->m_aDBObjPtr -> get_uniqueID()); });
+
+      m_time_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+        B2INFO("SVDHitTimeSelectionFunction: from now on we are using " <<
+        this->m_time_aDBObjPtr -> get_uniqueID()); });
     }
 
     /** Return the corrected cluster position error

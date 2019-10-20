@@ -55,7 +55,6 @@ namespace Belle2 {
 
   public:
     PThread() : m_th(0) {}
-
     template<class WORKER>
     PThread(WORKER* worker, bool destroyed = true, bool detached = true)
     {
@@ -71,7 +70,10 @@ namespace Belle2 {
           m_th = 0;
         }
       }
-      if (detached) detach();
+      if (detached) {
+        detach();
+        m_th = 0;
+      }
     }
     ~PThread() {}
 

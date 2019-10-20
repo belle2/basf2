@@ -34,7 +34,10 @@ namespace Belle2 {
   public:
 
     /*! default constructor: xxx */
-    TRGTiming() {;}
+    TRGTiming() :
+      m_ID(),
+      m_timing() // 2019/07/31 by ytlai
+    {;}
 
     /*! constructor: xxx */
     TRGTiming(unsigned int ID,

@@ -10,14 +10,8 @@
 
 #pragma once
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <boost/ptr_container/ptr_vector.hpp>
 #include <string>
-#include <TTree.h>
-#include <TFile.h>
 #include <TMatrix.h>
 
 namespace Belle2 {

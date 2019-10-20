@@ -23,7 +23,7 @@ namespace Belle2 {
    *
    * conf = register_module('AnalysisConfiguration')
    * conf.param('tupleStyle', "Laconic")
-   * analysis_main.add_module(conf)
+   * mypath.add_module(conf)
    *
    */
   class AnalysisConfigurationModule : public Module {

@@ -20,7 +20,6 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 

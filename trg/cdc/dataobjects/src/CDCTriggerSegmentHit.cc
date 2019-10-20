@@ -7,9 +7,10 @@ CDCTriggerSegmentHit::CDCTriggerSegmentHit(unsigned short segmentID,
                                            unsigned short leftRight,
                                            short priorityTime,
                                            short fastestTime,
-                                           short foundTime):
+                                           short foundTime,
+                                           short quadrant):
   m_segmentID(segmentID), m_priorityPosition(priorityPosition), m_leftRight(leftRight),
-  m_priorityTime(priorityTime), m_fastestTime(fastestTime), m_foundTime(foundTime)
+  m_priorityTime(priorityTime), m_fastestTime(fastestTime), m_foundTime(foundTime), m_quadrant(quadrant)
 {
   // find super layer and local wire id
   std::array<int, 9> nWiresInSuperLayer = {
@@ -40,9 +41,10 @@ CDCTriggerSegmentHit::CDCTriggerSegmentHit(unsigned short iSL,
                                            unsigned short leftRight,
                                            short priorityTime,
                                            short fastestTime,
-                                           short foundTime):
+                                           short foundTime,
+                                           short quadrant):
   m_priorityPosition(priorityPosition), m_leftRight(leftRight),
-  m_priorityTime(priorityTime), m_fastestTime(fastestTime), m_foundTime(foundTime)
+  m_priorityTime(priorityTime), m_fastestTime(fastestTime), m_foundTime(foundTime), m_quadrant(quadrant)
 {
   // calculate continuous segment ID
   std::array<int, 9> nWiresInSuperLayer = {
@@ -71,10 +73,11 @@ CDCTriggerSegmentHit::CDCTriggerSegmentHit(const CDCHit& priorityHit,
                                            unsigned short leftRight,
                                            short priorityTime,
                                            short fastestTime,
-                                           short foundTime):
+                                           short foundTime,
+                                           short quadrant):
   m_segmentID(segmentID), m_priorityPosition(priorityPosition), m_leftRight(leftRight),
   m_priorityTime(priorityTime), m_fastestTime(fastestTime), m_foundTime(foundTime),
-  m_eWire(priorityHit.getID())
+  m_eWire(priorityHit.getID()), m_quadrant(quadrant)
 {}
 
 unsigned short

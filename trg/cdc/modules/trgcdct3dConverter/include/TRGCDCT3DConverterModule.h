@@ -160,8 +160,11 @@ namespace Belle2 {
       /** StoreObjPtr containing the event time */
       StoreObjPtr<BinnedEventT0> m_eventTime;
 
+      /** TRGCDCJSignalData for VHDL generation (jbkim's class) */
       Belle2::TRGCDCJSignalData* m_commonData;
+      /** TRGCDCJSignal for VHDL generation (jbkim's class) */
       std::map<std::string, TRGCDCJSignal> m_mSignalStorage;
+      /** TRGCDCJLUT for VHDL generation (jbkim's class) */
       std::map<std::string, TRGCDCJLUT*> m_mLutStorage;
 
     };

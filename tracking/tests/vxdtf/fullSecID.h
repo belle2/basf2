@@ -1,9 +1,6 @@
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <tracking/dataobjects/FullSecID.h>
 #include <iostream>
-// #include <TMatrixF.h>
-// #include <RKTrackRep.h>
 #include <gtest/gtest.h>
 #include <vector>
 

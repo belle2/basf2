@@ -91,7 +91,7 @@ namespace Belle2 {
                   << LogVar("pixelID", pixelID + 1));
           return status;
         case -3:
-          B2ERROR("addData: digit should already be masked-out (different masks used?)");
+          B2DEBUG(100, "addData: digit should already be masked-out (different masks used?)");
           return status;
         default:
           return status;

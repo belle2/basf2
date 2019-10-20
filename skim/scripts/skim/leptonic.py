@@ -7,7 +7,8 @@
 __authors__ = [
     "Sophie Hollit",
     "Racha Cheaib",
-    "Hannah Wakeling"
+    "Hannah Wakeling",
+    "Phil Grace"
 ]
 
 from basf2 import *
@@ -17,21 +18,42 @@ from modularAnalysis import *
 def LeptonicList(path):
     """
     Note:
-        * (Semi-)Leptonic Working Group Skim list building functions for leptonic analyses.
-        * To be used initially for B leptonic decays (B to l v) (l=electron, muon)
-        * Skim code: 11130300
+        * **Skim description**: Skim for leptonic analyses,
+          :math:`B_{\\text{sig}}^-\\to\\ell\\nu`, where :math:`\\ell=e,\\mu`.
+        * **Skim LFN code**: 11130300
+        * **Working Group**: (Semi-)Leptonic and Missing Energy
+          Working Group (WG1)
 
-    **Decay Modes**:
+    Build leptonic untagged skim lists, and supply the name of the
+    lists. Uses the standard electron and muon particle lists, so
+    these must be added to the path first.
 
-    * B- -> e-
-    * B- -> mu-
+    Example usage:
 
-    **Cuts applied**:
+    >>> from stdCharged import stdE, stdMu
+    >>> from skim.leptonic import LeptonicList
+    >>> stdE('all', path=path)
+    >>> stdMu('all', path=path)
+    >>> LeptonicList(path)
+    ['B-:L0', 'B-:L1']
 
-    * lepton momentum in CMS Frame > 2 GeV
-    * electronID > 0.5
-    * muonID > 0.5
-    * nTracks >= 3
+    Reconstructed decays
+        * :math:`B^- \\to e^-`
+        * :math:`B^- \\to \\mu^-`
+
+    Cuts applied
+        * :math:`p_{\\ell}^{*} > 2\\,\\text{GeV}` in CMS Frame
+        * :math:`\\text{electronID} > 0.5`
+        * :math:`\\text{muonID} > 0.5`
+        * :math:`n_{\\text{tracks}} \geq 3`
+
+    Parameters:
+        path (`basf2.Path`): the path to add the skim list builders.
+
+    Returns:
+        ``lepList``, a Python list containing the strings
+        :code:`'B-:L0'` and :code:`'B-:L1'`, the names of the particle
+        lists for leptonic :math:`B^-` skim candidates.
     """
     __authors__ = [
         "Phillip Urquijo"

@@ -15,8 +15,9 @@ namespace TreeFitter {
 
   Resonance::Resonance(Belle2::Particle* particle,
                        const ParticleBase* mother,
+                       const ConstraintConfiguration& config,
                        bool forceFitAll) :
-    InternalParticle(particle, mother, forceFitAll) {}
+    InternalParticle(particle, mother, config, forceFitAll) {}
 
   ErrCode Resonance::initMotherlessParticle(FitParams& fitparams)
   {

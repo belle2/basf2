@@ -44,3 +44,22 @@ variablesToHistogram(
 )
 process(taugenericskim)
 print(statistics)
+
+# add contact information to histogram
+contact = "kenji@hepl.phys.nagoya-u.ac.jp"
+
+import ROOT
+
+f = ROOT.TFile.Open('TauGeneric_Validation.root', 'update')
+
+f.Get('nGoodTracks').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+f.Get('visibleEnergyOfEventCMS').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+f.Get('E_ECLtrk').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+f.Get('maxPt').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+f.Get('invMS1').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+f.Get('invMS2').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+f.Get('Theta_miss').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+f.Get('invMS1invMS2').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+
+f.Write("", ROOT.TObject.kOverwrite)
+f.Close()

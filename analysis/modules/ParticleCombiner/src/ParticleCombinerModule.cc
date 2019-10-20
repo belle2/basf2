@@ -12,8 +12,6 @@
 #include <analysis/modules/ParticleCombiner/ParticleCombinerModule.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // dataobjects
@@ -25,9 +23,7 @@
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <framework/dbobjects/BeamParameters.h>
 
-#include <algorithm>
 #include <memory>
 
 using namespace std;
@@ -161,7 +157,7 @@ namespace Belle2 {
       //    - p(mother) = p(daughter_0) - Sum_i p(daughter_i) (where i > 0)
       if (m_recoilParticleType == 1) {
         PCmsLabTransform T;
-        TLorentzVector recoilMomentum = T.getBeamParams().getHER() + T.getBeamParams().getLER() - particle.get4Vector();
+        TLorentzVector recoilMomentum = T.getBeamFourMomentum() - particle.get4Vector();
         particle.set4Vector(recoilMomentum);
       } else if (m_recoilParticleType == 2) {
         const std::vector<Particle*> daughters = particle.getDaughters();

@@ -22,7 +22,7 @@ stdPi('all', path=kshhPath)
 stdK('all', path=kshhPath)
 stdKshorts(path=kshhPath)
 
-reconstructDecay('D0 -> K_S0:all pi+:all pi-:all', '1.84 < M < 1.89', path=kshhPath)
+reconstructDecay('D0 -> K_S0:merged pi+:all pi-:all', '1.84 < M < 1.89', path=kshhPath)
 reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=kshhPath)
 
 # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.

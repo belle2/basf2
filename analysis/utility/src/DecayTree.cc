@@ -10,11 +10,7 @@
 
 #include <analysis/utility/DecayTree.h>
 
-#include <framework/logging/Logger.h>
-
-#include <iostream>
-#include <sstream>
-#include <cassert>
+#include <stdexcept>
 
 using namespace Belle2;
 

@@ -12,10 +12,12 @@ env['LIBS'] = [
     'tracking_dataobjects',
     'framework',
     'genfit2',
-    'cdc_dataobjects',
+    'cdc', 'cdc_dataobjects',
     'pxd', 'pxd_dataobjects',
     'svd', 'svd_dataobjects',
     'vxd', 'vxd_dataobjects',
+    'ecl_dataobjects',
+    'mdst_dataobjects',
     '$ROOT_LIBS',
     ]
 

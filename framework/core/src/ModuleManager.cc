@@ -64,11 +64,7 @@ void ModuleManager::addModuleSearchPath(const string& path)
       }
     }
     //put modules into central map, if they haven't been  added yet
-    for (auto& entry : moduleNameLibMap) {
-      if (m_moduleNameLibMap.count(entry.first) == 0) {
-        m_moduleNameLibMap[entry.first] = entry.second;
-      }
-    }
+    m_moduleNameLibMap.insert(moduleNameLibMap.begin(), moduleNameLibMap.end());
   }
 }
 

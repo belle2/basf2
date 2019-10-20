@@ -33,23 +33,25 @@ namespace Belle2 {
   class TRGCDCSegmentHit;
   class TRGCDCMerger;
 
+  /// a class of TrackSegmentFinder in TRGCDC
   class TRGCDCTrackSegmentFinder
     : public TRGBoard,
       public std::vector <const TRGCDCMerger*> {
 
   public:
+    /// enum of boardType of TrackSegmentFinder
     enum boardType {
       innerType = 0,
       outerType = 1,
       unknown   = 999
     };
 
-    // Constructor.
+    /// Constructor.
     TRGCDCTrackSegmentFinder(const TRGCDC&,
                              bool makeRootFile,
                              bool logicLUTFlag);
 
-    // Constructor.
+    /// Constructor.
     TRGCDCTrackSegmentFinder(const  TRGCDC&,
                              const std::string& name,
                              boardType type,
@@ -59,47 +61,58 @@ namespace Belle2 {
                              const TRGClock& userClockOutput,
                              std::vector<TRGCDCSegment*>& tsSL);
 
-    // Destructor.
+    /// Destructor.
     ~TRGCDCTrackSegmentFinder();
 
 
-    // Member functions.
+    /// Member functions of doing TSF.
     void doit(std::vector<TRGCDCSegment* >& tss, const bool trackSegmentClockSimulation,
               std::vector<TRGCDCSegmentHit* >& segmentHits, std::vector<TRGCDCSegmentHit* >* segmentHitsSL);
+    /// terminate
     void terminate(void);
+    /// save the TS info
     void saveTSInformation(std::vector<TRGCDCSegment* >& tss);
+    /// save result of TSF
     void saveTSFResults(std::vector<TRGCDCSegmentHit* >* segmentHitsSL);
+    /// Saves NNTS information. Only when ts is hit
     void saveNNTSInformation(std::vector<TRGCDCSegment* >& tss);
 
 
-    // Members.
+    /// Members.
     const TRGCDC& _cdc;
+    /// PI
     double m_Trg_PI;
-    // 0 is Logic. 1 is LUT.
+    /// 0 is Logic. 1 is LUT.
     bool m_logicLUTFlag;
 
-    // ROOT variables.
+    /// ROOT file name string.
     std::string m_rootTSFFilename;
+    /// ROOT file
     TFile* m_fileTSF;
 
+    /// ROOT TTree for input
     TTree* m_treeInputTSF = 0;
     //// [TODO] Stores hitpattern information. [superlayer id, hitpattern, mc l/r, validation mc l/r, mc fine phi]
     //// validation mc l/r => 0: not valid, 1: priority, 2: secondary right, 3: secondary left
     // Stores hitpattern information. 9 components
     // [mc particle id, superlayer id, hitpattern, priorityLR, priorityPhi, secondPriorityRLR, secondPriorityRPhi, secondPriorityLLR, secondPriorityLPhi]
+    /// Stores hitpattern information
     TClonesArray* m_hitPatternInformation = 0;
 
+    /// ROOT TTree for output
     TTree* m_treeOutputTSF = 0;
-    // [Efficiency, Pt, # MC TS]
-    // Efficiency = -1 means that # MC TS is 0.
+    /// [Efficiency, Pt, # MC TS]
+    /// Efficiency = -1 means that # MC TS is 0.
     TClonesArray* m_particleEfficiency = 0;
-    // [SuperLayer Id, Wire Id, Priority Timing]
+    /// [SuperLayer Id, Wire Id, Priority Timing]
     TClonesArray* m_tsInformation = 0;
 
+    /// ROOT Tree for NNTSF
     TTree* m_treeNNTSF = 0;
-    // [superlayer id, lrDriftTime, timeWire0, timeWire1, ..., ...]
+    /// [superlayer id, lrDriftTime, timeWire0, timeWire1, ..., ...]
     TClonesArray* m_nnPatternInformation = 0;
 
+    /// make ROOT file or not
     bool m_makeRootFile;
 
   public:
@@ -129,12 +142,15 @@ namespace Belle2 {
 
     /// Packing output for evtTime & Low pT
     TRGSignalVector* packerOuterEvt(vector<TRGSignalVector*>, vector<int>, int);
-    ///
+    /// board type of TSF
     boardType type(void) const;
 
+    /// signal bundle of outputE
     TRGSignalBundle* outputE(void) {return _tosbE;};
+    /// signal bundle of outputT
     TRGSignalBundle* outputT(void) {return _tosbT;};
 
+    /// push back the Mergers of this TSF
     void push_back(const TRGCDCMerger*);
 
     /// firmware simulation.
@@ -191,9 +207,10 @@ namespace Belle2 {
     TRGSignalVector* packerForETF(vector<TRGSignalVector*>&,
                                   vector<int>&,
                                   const unsigned);
-
+    /// tranformatoin into integer
     double mkint(TRGState);
 
+    /// tranformatoin into bool
     vector<bool> mkbool(int, int);
 
   private:
@@ -235,7 +252,9 @@ namespace Belle2 {
 
     /// Output signal bundle.
     TRGSignalBundle* _tosbE;
+    /// Output signal bundle.
     TRGSignalBundle* _tosbT;
+    /// list of TSF
     std::vector<TCSegment*> _tsSL;
 
     /// TSF input storage

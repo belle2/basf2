@@ -14,6 +14,7 @@
 
 #include <G4VPhysicsConstructor.hh>
 #include <globals.hh>
+#include <simulation/monopoles/MonopoleConstants.h>
 
 namespace Belle2 {
 
@@ -76,8 +77,6 @@ namespace Belle2 {
       //Both monopole and anti-monopole have own process managers and have to be treated separately
 
     };
-
-    const int c_monopolePDGCode = 99666;
 
   } //end Monopoles namespace
 

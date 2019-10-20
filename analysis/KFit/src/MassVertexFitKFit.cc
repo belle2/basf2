@@ -589,6 +589,16 @@ enum KFitError::ECode MassVertexFitKFit::updateMother(Particle* mother)
   double chi2 = getCHIsq();
   int ndf = getNDF();
   double prob = TMath::Prob(chi2, ndf);
+  //
+  bool haschi2 = mother->hasExtraInfo("chiSquared");
+  if (haschi2) {
+    mother->setExtraInfo("chiSquared", chi2);
+    mother->setExtraInfo("ndf", ndf);
+  } else if (!haschi2) {
+    mother->addExtraInfo("chiSquared", chi2);
+    mother->addExtraInfo("ndf", ndf);
+  }
+
   mother->updateMomentum(
     CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
     CLHEPToROOT::getTVector3(kmm.getMotherPosition()),

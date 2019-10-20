@@ -9,11 +9,8 @@
  **************************************************************************/
 
 #include "cdc/modules/cdcCrudeT0Collector/CDCCrudeT0Collector.h"
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/WireID.h>
-#include <TH1F.h>
 #include <framework/pcore/ProcHandler.h>
-
 
 using namespace std;
 using namespace Belle2;

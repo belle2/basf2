@@ -196,7 +196,11 @@ void DisplayModule::event()
     for (std::string colName : recoTrackArrays) {
       StoreArray<RecoTrack> recoTracks(colName);
       for (const RecoTrack& recoTrack : recoTracks) {
-        m_visualizer->addTrackCandidate(colName, recoTrack);
+        if (colName != "RecoTracksMpl") {
+          m_visualizer->addTrackCandidate(colName, recoTrack);
+        } else {
+          m_visualizer->addTrackCandidateImproved(colName, recoTrack);
+        }
       }
     }
 

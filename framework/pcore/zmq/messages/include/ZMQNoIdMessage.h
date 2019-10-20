@@ -10,18 +10,9 @@
 #pragma once
 
 #include <framework/pcore/zmq/messages/ZMQModuleMessage.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/DataStoreStreamer.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/core/RandomGenerator.h>
-
 #include <framework/pcore/zmq/messages/ZMQDefinitions.h>
-#include <framework/logging/LogMethod.h>
 
 #include <zmq.hpp>
-#include <memory>
-
-
 
 namespace Belle2 {
   /// A message without an associated socket ID. Is used in most cases.
@@ -39,11 +30,13 @@ namespace Belle2 {
     /// Get the data as string
     std::string getData() const;
 
+    /// Get the data part
     zmq::message_t& getDataMessage()
     {
       return getMessagePart<c_data>();
     }
 
+    /// Get the additional data part
     zmq::message_t& getAdditionalDataMessage()
     {
       return getMessagePart<c_additionalData>();

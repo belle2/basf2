@@ -10,9 +10,7 @@
 
 #pragma once
 
-#include <TTree.h>
 #include "arich/dataobjects/ARICHPhoton.h"
-#include "arich/dataobjects/ARICHInfo.h"
 
 //#define ALIGNMENT_USING_BHABHA
 
@@ -108,6 +106,8 @@ namespace Belle2 {
       Int_t scatter;     /**< 1 if particle scattered (i.e. has daughter with same PDG) */
 
       Int_t detPhot;      /**< number of detected photons */
+      Int_t nCDC;      /**< number of track CDC hits */
+      Bool_t inAcc;     /**< track in detector acceptance, i.e. > 0 expected photons for electron ring */
       ParticlesArray numBkg;       /**< number of expected background photons */
       ParticlesArray expPhot;      /**< number of expected photons (signal + bkg) */
       ParticlesArray logL;   /**< log likelihoods */
@@ -130,7 +130,7 @@ namespace Belle2 {
         eop(0), e9e21(0), etot(0),
 #endif
         status(0), primary(0), seen(0), rhoProd(0), zProd(0), phiProd(0), rhoDec(0), zDec(0),
-        phiDec(0), scatter(0), nRec(0)
+        phiDec(0), scatter(0), nRec(0), nCDC(0), inAcc(0)
       {
 
       }
@@ -169,8 +169,10 @@ namespace Belle2 {
         phiDec = 0;
         scatter = 0;
         nRec = 0;
-
         detPhot = 0;
+        nCDC = 0;
+        inAcc = 0;
+
         numBkg.clear();
         expPhot.clear();
         logL.clear();

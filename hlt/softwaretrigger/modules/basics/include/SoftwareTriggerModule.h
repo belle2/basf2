@@ -16,7 +16,6 @@
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 
-#include <vector>
 #include <string>
 
 namespace Belle2 {

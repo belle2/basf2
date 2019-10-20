@@ -21,7 +21,6 @@
 #include <framework/logging/Logger.h>
 
 #include <vector>
-#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

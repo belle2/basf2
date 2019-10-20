@@ -16,11 +16,11 @@ from stdV0s import *
 from skim.standardlists.lightmesons import *
 
 
-def SetTauGenericSkimVariables(path=analysis_main):
+def SetTauGenericSkimVariables(path):
     """
     Set particle lists and variables for TauGeneric skim
 
-    * inout particle lists: pi+:all, gamma:all
+    * input particle lists: pi+:all, gamma:all
 
     * output particle lists: pi+:tauskim, gamma:tauskim, pi+:S1/S2, gamma:S1/S2
 
@@ -64,7 +64,7 @@ def SetTauGenericSkimVariables(path=analysis_main):
     variables.addAlias('E_ECLtrk', 'formula(totalECLEnergyOfParticlesInList(pi+:tauskim))')
 
 
-def TauList(path=analysis_main):
+def TauList(path):
     """
     Note:
         * Skim for Tau generic decays
@@ -111,7 +111,7 @@ def TauList(path=analysis_main):
     return eventParticle
 
 
-def TauLFVList(flag=1, path=analysis_main):
+def TauLFVList(flag=1, path=None):
     """
     Note:
         * Skim for Tau LFV decays
@@ -128,7 +128,7 @@ def TauLFVList(flag=1, path=analysis_main):
     """
     __author__ = "P. Urquijo, K. Inami"
 
-    tauLFVCuts = '1.58 < Mbc < 1.98 and abs(deltaE) < 1.0'
+    tauLFVCuts = '1.58 < M < 1.98 and abs(deltaE) < 1.0'
 
     tau_lgamma_Channels = ['e+:loose gamma:loose',
                            'mu+:loose gamma:loose'
@@ -148,8 +148,8 @@ def TauLFVList(flag=1, path=analysis_main):
                         'mu+:loose eta:loose',
                         'e+:loose eta\':loose',
                         'mu+:loose eta\':loose',
-                        'e+:loose K_S0:all',
-                        'mu+:loose K_S0:all'
+                        'e+:loose K_S0:merged',
+                        'mu+:loose K_S0:merged'
                         ]
 
     tau_lS0_Channels = ['e+:loose f_0:loose',
@@ -180,8 +180,8 @@ def TauLFVList(flag=1, path=analysis_main):
                         'mu+:loose K-:loose pi+:loose',
                         'e-:loose K+:loose pi+:loose',
                         'mu-:loose K+:loose pi+:loose',
-                        'e-:loose K_S0:all K_S0:all',
-                        'mu-:loose K_S0:all K_S0:all'
+                        'e-:loose K_S0:merged K_S0:merged',
+                        'mu-:loose K_S0:merged K_S0:merged'
                         ]
 
     tau_bnv_Channels = ['mu+:loose mu+:loose anti-p-:loose',
@@ -238,44 +238,48 @@ def TauLFVList(flag=1, path=analysis_main):
     return tau_lfv_lists
 
 
-def SetTauThrustSkimVariables(path=analysis_main):
+def SetTauThrustSkimVariables(path):
     """
     Set particle lists and variables for TauThrust skim
 
-    * inout particle lists: pi+:all, gamma:all
+    * input particle lists: pi+:all, gamma:all
 
-    * output particle lists: pi+:good, gamma:good, pi+:S1/S2
+    * output particle lists: pi+:thrust, gamma:thrust, pi+:thrustS1/thrustS2, pi0:thrust
 
-    * nGoodTracks: number of good tracks in an event
-    * netCharge: total net charge of good tracks
-    * nTracksS1/nTracksS2: number of good tracks in each hemisphere S1/S2 divided by thrust axis
+    * nGoodTracksThrust: number of good tracks in an event
+    * netChargeThrust: total net charge of good tracks
+    * nTracksS1Thrust/nTracksS2Thrust: number of good tracks in each hemisphere S1/S2 divided by thrust axis
 
     """
     __author__ = "Ami Rostomyan, Kenji Inami"
 
     # Track and gamma cuts
-    trackCuts = '-5.0 < dz < 5.0 and dr < 1.0 and nCDCHits > 0'
-    cutAndCopyList('pi+:good', 'pi+:all', trackCuts, path=path)
+    trackCuts = '-3.0 < dz < 7.0 and dr < 1.0'
+    cutAndCopyList('pi+:thrust', 'pi+:all', trackCuts, path=path)
+    gammaForPi0Cuts = 'E > 0.1 and -0.8660 < cosTheta < 0.9563 and clusterNHits > 1.5'
+    cutAndCopyLists('gamma:thrustForPi0', 'gamma:all', gammaForPi0Cuts, path=path)
+    reconstructDecay('pi0:thrust -> gamma:thrustForPi0 gamma:thrustForPi0', '0.115 < M < 0.152', path=path)
     gammaCuts = 'E > 0.20 and clusterNHits > 1.5 and -0.8660 < cosTheta < 0.9563'
-    cutAndCopyList('gamma:good', 'gamma:all', gammaCuts, path=path)
+    gammaCuts += ' and isDaughterOfList(pi0:thrust) == 0'
+    cutAndCopyList('gamma:thrust', 'gamma:all', gammaCuts, path=path)
 
     # Get EventShape variables
-    buildEventShape(['pi+:good', 'gamma:good'],
+    buildEventShape(['pi+:thrust', 'pi0:thrust', 'gamma:thrust'],
                     allMoments=False, foxWolfram=False, cleoCones=False,
                     sphericity=False, jets=False, path=path)
-    buildEventKinematics(['pi+:good', 'gamma:good'], path=path)
+    buildEventKinematics(['pi+:thrust', 'pi0:thrust', 'gamma:thrust'], path=path)
 
     # Split in signal and tag
-    cutAndCopyList('pi+:S1', 'pi+:good', 'cosToThrustOfEvent > 0', path=path)
-    cutAndCopyList('pi+:S2', 'pi+:good', 'cosToThrustOfEvent < 0', path=path)
+    cutAndCopyList('pi+:thrustS1', 'pi+:thrust', 'cosToThrustOfEvent > 0', path=path)
+    cutAndCopyList('pi+:thrustS2', 'pi+:thrust', 'cosToThrustOfEvent < 0', path=path)
 
-    variables.addAlias('nGoodTracks', 'nParticlesInList(pi+:good)')
-    variables.addAlias('netCharge', 'formula(countInList(pi+:good, charge == 1) - countInList(pi+:good, charge == -1))')
-    variables.addAlias('nTracksS1', 'nParticlesInList(pi+:S1)')
-    variables.addAlias('nTracksS2', 'nParticlesInList(pi+:S2)')
+    variables.addAlias('nGoodTracksThrust', 'nParticlesInList(pi+:thrust)')
+    variables.addAlias('netChargeThrust', 'formula(countInList(pi+:thrust, charge == 1) - countInList(pi+:thrust, charge == -1))')
+    variables.addAlias('nTracksS1Thrust', 'nParticlesInList(pi+:thrustS1)')
+    variables.addAlias('nTracksS2Thrust', 'nParticlesInList(pi+:thrustS2)')
 
 
-def TauThrustList(path=analysis_main):
+def TauThrustList(path):
     """
     Note:
         * Skim for Tau decays using thrust
@@ -298,17 +302,19 @@ def TauThrustList(path=analysis_main):
 
     SetTauThrustSkimVariables(path=path)
 
-    reconstructDecay('tau+:thrust -> pi+:S1', '', path=path)
+    reconstructDecay('tau+:thrust -> pi+:thrustS1', '', path=path)
     eventParticle = ['tau+:thrust']
 
     # Selection criteria
-    applyCuts('tau+:thrust', '1 < nGoodTracks < 7', path=path)  # cut1
-    applyCuts('tau+:thrust', 'netCharge == 0', path=path)  # cut2
+    applyCuts('tau+:thrust', '1 < nGoodTracksThrust < 7', path=path)  # cut1
+    applyCuts('tau+:thrust', 'netChargeThrust == 0', path=path)  # cut2
 
-    topologyCuts = '[nTracksS1 == 1 and nTracksS2 == 1]'  # 1x1
-    topologyCuts += ' or [nTracksS1 == 1 and nTracksS2 == 3] or [nTracksS1 == 3 and nTracksS2 == 1]'  # 1x3, 3x1
-    topologyCuts += ' or [nTracksS1 == 1 and nTracksS2 == 5] or [nTracksS1 == 5 and nTracksS2 == 1]'  # 1x5, 5x1
-    topologyCuts += ' or [nTracksS1 == 3 and nTracksS2 == 3]'  # 3x3
+    topologyCuts = '[nTracksS1Thrust == 1 and nTracksS2Thrust == 1]'  # 1x1
+    topologyCuts += ' or [nTracksS1Thrust == 1 and nTracksS2Thrust == 3]'\
+        ' or [nTracksS1Thrust == 3 and nTracksS2Thrust == 1]'  # 1x3, 3x1
+    topologyCuts += ' or [nTracksS1Thrust == 1 and nTracksS2Thrust == 5]'\
+        ' or [nTracksS1Thrust == 5 and nTracksS2Thrust == 1]'  # 1x5, 5x1
+    topologyCuts += ' or [nTracksS1Thrust == 3 and nTracksS2Thrust == 3]'  # 3x3
 
     applyCuts('tau+:thrust', topologyCuts, path=path)  # cut3
 
@@ -317,7 +323,7 @@ def TauThrustList(path=analysis_main):
 
     oneProngPath = create_path()
     applyCuts('tau+:thrust', 'thrust < 0.99', path=oneProngPath)  # cut6 thrust upper cut for 1x1
-    sigThrustModule = path.add_module('VariableToReturnValue', variable='nGoodTracks')
+    sigThrustModule = path.add_module('VariableToReturnValue', variable='nGoodTracksThrust')
     sigThrustModule.if_value('== 2', oneProngPath, AfterConditionPath.CONTINUE)
 
     # For skimming, the important thing is if the final particleList is empty or not.

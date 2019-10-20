@@ -34,7 +34,7 @@ stdPhotons('loose', path=tcpvskimpath)
 stdPi('all', path=tcpvskimpath)
 applyCuts('gamma:loose', '1.4 < E < 4', path=tcpvskimpath)
 
-reconstructDecay(Kres + ":all -> K_S0:all pi+:all pi-:all ", "", path=tcpvskimpath)
+reconstructDecay(Kres + ":all -> K_S0:merged pi+:all pi-:all ", "", path=tcpvskimpath)
 
 reconstructDecay("B0:signal -> " + Kres + ":all gamma:loose", "Mbc > 5.2 and deltaE < 0.5 and deltaE > -0.5", path=tcpvskimpath)
 

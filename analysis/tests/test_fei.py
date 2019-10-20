@@ -1207,7 +1207,7 @@ if __name__ == '__main__':
     basf2_mva.loadRootDictionary()
     tempdir = tempfile.mkdtemp()
     os.chdir(tempdir)
-    basf2.use_local_database(tempdir + '/localdb/dbcache.txt', tempdir + '/localdb/', False, basf2.LogLevel.WARNING)
+    basf2.conditions.testing_payloads = ['localdb/database.txt']
     # main() never returns, so install exit handler to do our cleanup
     atexit.register(shutil.rmtree, tempdir)
     unittest.main()

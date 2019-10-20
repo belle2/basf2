@@ -26,6 +26,7 @@ namespace Belle2 {
     /** whether this is an old track (appears to be a clone) */
     bool isOldTrack() const { return oldTrack; }
 
+    /** get ID of the 2D tracker (0 to 3) */
     int getITracker() const {return iTracker;}
 
   protected:

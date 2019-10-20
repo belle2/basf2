@@ -11,19 +11,9 @@
 #ifndef ALIGNABLECDCRECOHIT_H
 #define ALIGNABLECDCRECOHIT_H
 
-
 #include <cdc/dataobjects/CDCRecoHit.h>
-#include <cdc/dataobjects/CDCHit.h>
-
-#include <genfit/AbsMeasurement.h>
-#include <genfit/MeasurementOnPlane.h>
-#include <genfit/TrackCandHit.h>
-#include <genfit/HMatrixU.h>
 
 #include <genfit/ICalibrationParametersDerivatives.h>
-
-#include <memory>
-
 
 namespace Belle2 {
   /// This class is used to transfer CDC information to the track fit and Millepede.
@@ -31,7 +21,11 @@ namespace Belle2 {
 
   public:
     /// Static enabling(true) or disabling(false) addition of local derivative for track T0
-    static bool s_enableEventT0LocalDerivative;
+    static bool s_enableTrackT0LocalDerivative;
+    /// Static enabling(true) or disabling(false) addition of global derivative for wire sagging coefficient (per wire)
+    static bool s_enableWireSaggingGlobalDerivative;
+    /// Static enabling(true) or disabling(false) addition of global derivatives for wire-by-wire alignment
+    static bool s_enableWireByWireAlignmentGlobalDerivatives;
 
     /// Inherit constructors
     using CDCRecoHit::CDCRecoHit;

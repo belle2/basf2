@@ -89,6 +89,10 @@ namespace Belle2 {
     template<class ...Args> Particle& add(Args&& ... args)
     {
       auto index = m_particles.getEntries();
+      // cppcheck doesn't seem to understand the forwarding of arguments and
+      // throws an erroneous warning about reassigning appendNew
+      //
+      // cppcheck-suppress redundantAssignment
       auto particle = m_particles.appendNew(std::forward<Args>(args)...);
       m_list->addParticle(index, particle->getPDGCode(), particle->getFlavorType());
       return *particle;

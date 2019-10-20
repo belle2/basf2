@@ -30,6 +30,23 @@
       END
 
 
+      SUBROUTINE SET_CHANNEL_OFF(MDN, ICH)
+
+      IMPLICIT NONE
+      INTEGER MDN               ! module ID
+      INTEGER ICH               ! channel (i.e. pixelID-1)
+
+#include "TOP_GEO.fi"
+#include "TOP_PIK.fi"
+#include "TOP_MASK.fi"
+      
+      IF(MDN.LT.0.OR.MDN.GE.NSIZ_MOD) RETURN
+      IF(ICH.LT.0.OR.ICH.GE.NUM_CHA) RETURN
+      CH_MASK(ICH,MDN)=.FALSE.
+      
+      END
+
+
       SUBROUTINE SET_CHANNEL_EFFI(MDN, ICH, EFFI)
 
       IMPLICIT NONE

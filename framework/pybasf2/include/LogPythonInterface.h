@@ -140,6 +140,14 @@ namespace Belle2 {
      */
     void addLogJSON(bool complete);
 
+
+    /**
+     * Add a UDP server as an output connection
+     * @param hostname the hostname of the UDP server. Will throw an exception if it can not be resolved.
+     * @param port the port to connect to
+     */
+    void addLogUDP(const std::string& hostname, unsigned short port);
+
     /**
      * Add the console as output connection
      *

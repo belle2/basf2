@@ -10,27 +10,14 @@
 
 #pragma once
 
-#include <TMath.h>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <iterator>
-
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
-#include <framework/gearbox/GearDir.h>
-
 #include <mdst/dataobjects/MCParticle.h>
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/TauPairDecay.h>
-
 
 namespace Belle2 {
   /**
    * Module to identify generated tau pair decays, using MCParticle information. Each tau lepton decay channel
    * is numbered following the order in the default KKMC decay table. Using this module,
-   * the channel number will be stored in the variables `tauPlusMcMode`, and `tauMinusMcMode`.
+   * the channel number will be stored in the variables ``tauPlusMcMode``, and ``tauMinusMcMode``.
    * Further details and usage can be found at https://confluence.desy.de/display/BI/Tau+Physics+Analysis+Tools.
    *
    */

@@ -11,13 +11,10 @@
 #pragma once
 
 //root
-#include <TObject.h>
 #include <TH2Poly.h>
-#include <TGraph.h>
 #include <TVector2.h>
 
 //c, c++
-#include <string>
 #include <vector>
 #include <map>
 

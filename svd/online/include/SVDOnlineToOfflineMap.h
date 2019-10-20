@@ -302,7 +302,7 @@ namespace Belle2 {
     unsigned int nBadMappingErrors = 0;
 
     /** The suppression factor of BadMapping ERRORs messages to be shown */
-    int m_errorRate;
+    int m_errorRate{1000};
 
     /** add chipN on FADCn to the map
      */

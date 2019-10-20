@@ -15,10 +15,8 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <vector>
-#include <string>
 
 namespace Belle2 {
-  class ModuleParamList;
 
   /**
    * Helper findlet which applies its () operator to all pairs of path and state with all states in the given

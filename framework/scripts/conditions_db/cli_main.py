@@ -3,7 +3,7 @@
 
 """
 This script provides a command line interface to all the tasks related to the
-Conditions database: manage globaltags and iovs as well as upload new payloads
+:ref:`Conditions database <conditionsdb_overview>`: manage globaltags and iovs as well as upload new payloads
 or download of existing payloads.
 
 The usage of this program is similar to git: there are sub commands like for

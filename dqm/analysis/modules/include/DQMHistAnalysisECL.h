@@ -14,22 +14,15 @@
 
 #pragma once
 
-//FRAMEWORK
-#include <framework/core/Module.h>
-
 //DQM
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 //ROOT
-#include <TClass.h>
-#include <TROOT.h>
-#include <TMath.h>
 #include <TCanvas.h>
 #include <TLine.h>
 #include <TLegend.h>
 #include <THStack.h>
 #include <TWbox.h>
-#include <TFrame.h>
 #include <TH1F.h>
 
 namespace Belle2 {

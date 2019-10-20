@@ -9,8 +9,6 @@
 #include <ecl/modules/eclTrackClusterMatching/ECLTrackClusterMatchingParametrizationExpertModule.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-#include <set>
 #include <vector>
 #include <cmath>
 #include "TFile.h"

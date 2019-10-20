@@ -15,10 +15,8 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>

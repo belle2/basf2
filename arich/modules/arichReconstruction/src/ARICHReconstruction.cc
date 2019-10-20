@@ -11,25 +11,20 @@
 #include "arich/modules/arichReconstruction/ARICHReconstruction.h"
 #include "arich/dbobjects/ARICHGeometryConfig.h"
 #include "arich/modules/arichReconstruction/Utility.h"
-#include "arich/geometry/ARICHBtestGeometryPar.h"
 #include "arich/dataobjects/ARICHHit.h"
 #include "arich/dataobjects/ARICHTrack.h"
 #include "arich/dataobjects/ARICHPhoton.h"
 
 // DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
 #include <vector>
 #include <TRotation.h>
 #include <TRandom3.h>
-#include <TFile.h>
-#include <TGraph2D.h>
 
 using namespace std;
 using namespace boost;

@@ -16,13 +16,10 @@
 #include <framework/core/ModuleManager.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // Dataobject classes
@@ -34,11 +31,6 @@
 
 // print bitset
 #include <bitset>
-
-#include <sstream>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TF1.h>
 
 using namespace std;
 

@@ -11,7 +11,6 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisPXDEff.h>
 #include <TROOT.h>
-#include <TClass.h>
 #include <TLatex.h>
 #include <TGraphAsymmErrors.h>
 #include <vxd/geometry/GeoCache.h>

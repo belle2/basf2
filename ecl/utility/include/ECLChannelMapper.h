@@ -9,7 +9,6 @@
  **************************************************************************/
 #ifndef ECLCHANNELMAPPER_H
 #define ECLCHANNELMAPPER_H
-#include <framework/logging/Logger.h>
 #include <ecl/dbobjects/ECLChannelMap.h>
 namespace Belle2 {
   namespace ECL {

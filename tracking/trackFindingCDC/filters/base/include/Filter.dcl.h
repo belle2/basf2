@@ -16,13 +16,11 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <string>
-#include <cmath>
 
 namespace Belle2 {
   class ModuleParamList;
 
   namespace TrackFindingCDC {
-    class ParamList;
 
     /// Base class for filters on a generic object type.
     template<class AObject>

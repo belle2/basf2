@@ -8,17 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 #include <arich/geometry/ARICHBtestGeometryPar.h>
 
-#include <cmath>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
-#include <TGraph.h>
 
 using namespace std;
 using namespace boost;

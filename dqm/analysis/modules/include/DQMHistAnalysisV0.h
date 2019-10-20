@@ -8,15 +8,10 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
-#include <TFile.h>
 #include <TCanvas.h>
-#include <TH2.h>
 #include <TH1.h>
-#include <TImage.h>
-#include <TPad.h>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */

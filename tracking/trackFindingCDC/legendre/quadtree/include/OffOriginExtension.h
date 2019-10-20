@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/legendre/quadtree/BaseCandidateReceiver.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <vector>
 

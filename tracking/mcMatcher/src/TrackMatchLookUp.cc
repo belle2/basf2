@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 
+#include <mdst/dataobjects/Track.h>
+
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 

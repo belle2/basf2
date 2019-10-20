@@ -14,7 +14,6 @@
 // framework
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 
 // dataobjects

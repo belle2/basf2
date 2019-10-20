@@ -8,16 +8,11 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-// framework
-#include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Const.h>
-
 // SpacePointTrackCand.h
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 #include <TDatabasePDG.h>
 #include <TVectorD.h>
-#include <TMatrixD.h>
 
 // debugging
 #include <sstream> // used in print method

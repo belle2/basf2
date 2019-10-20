@@ -13,9 +13,6 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TString.h>
-#include <TPaletteAxis.h>
-#include <TBox.h>
-#include <TAxis.h>
 
 using namespace std;
 using namespace Belle2;

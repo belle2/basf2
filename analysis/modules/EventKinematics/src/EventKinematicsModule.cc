@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/ReferenceFrame.h>
 
 #include <analysis/modules/EventKinematics/EventKinematicsModule.h>
 
@@ -17,7 +16,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventKinematics.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>

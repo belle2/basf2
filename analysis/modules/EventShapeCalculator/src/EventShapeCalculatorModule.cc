@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/ReferenceFrame.h>
 
 #include <analysis/modules/EventShapeCalculator/EventShapeCalculatorModule.h>
 
@@ -17,7 +16,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventShapeContainer.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
@@ -28,6 +26,7 @@
 #include <analysis/ContinuumSuppression/HarmonicMoments.h>
 #include <analysis/ContinuumSuppression/CleoCones.h>
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
+#include <analysis/ContinuumSuppression/SphericityEigenvalues.h>
 
 #include <TVector3.h>
 #include <TLorentzVector.h>

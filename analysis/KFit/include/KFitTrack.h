@@ -10,11 +10,8 @@
 
 #pragma once
 
-#include <iostream>
-
 #include <CLHEP/Matrix/Matrix.h>
 #include <CLHEP/Matrix/SymMatrix.h>
-#include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Vector/LorentzVector.h>
 #include <CLHEP/Geometry/Point3D.h>
 

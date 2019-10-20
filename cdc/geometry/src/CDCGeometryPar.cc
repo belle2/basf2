@@ -12,7 +12,6 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
-#include <framework/core/Environment.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeoControlPar.h>
@@ -129,9 +128,8 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
     }
   }
 
-  //  B2INFO("CDCGeometryPar: isMC= " << Environment::Instance().isMC());
-  if (gcp.getEDepToADCInputType() && Environment::Instance().isMC()) {
-    m_eDepToADCConversionsFromDB = new DBObjPtr<CDCEDepToADCConversions>;
+  if (gcp.getEDepToADCInputType()) {
+    m_eDepToADCConversionsFromDB = new OptionalDBObjPtr<CDCEDepToADCConversions>;
     if ((*m_eDepToADCConversionsFromDB).isValid()) {
       (*m_eDepToADCConversionsFromDB).addCallback(this, &CDCGeometryPar::setEDepToADCConversions);
     }
@@ -457,13 +455,13 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
     }
     B2DEBUG(100, "CDCGeometryPar: Time-walk param. mode= " << m_twParamMode);
 
-    if (Environment::Instance().isMC()) {
-      if (gcp.getEDepToADCInputType()) {
-        B2DEBUG(29, "CDCGeometryPar: Read EDepToADC from DB");
+    if (gcp.getEDepToADCInputType()) {
+      B2DEBUG(29, "CDCGeometryPar: Read EDepToADC from DB");
+      if ((*m_eDepToADCConversionsFromDB).isValid()) {
         setEDepToADCConversions(); //Set edep-to-adc (from DB)
-      } else {
-        readEDepToADC(gbxParams);  //Read edep-to-adc params. (from file)
       }
+    } else {
+      readEDepToADC(gbxParams);  //Read edep-to-adc params. (from file)
     }
   }
 

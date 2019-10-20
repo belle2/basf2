@@ -54,6 +54,7 @@ namespace Belle2 {
   private:
 
     std::string m_listName;  /**< name of particle list */
+    std::string m_decayString;          /**< specifies which daughter particles will be used as reference to create Btube*/
     double m_confidenceLevel;     /**< required fit confidence level */
     double m_Bfield;              /**< magnetic field from data base */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
@@ -61,7 +62,7 @@ namespace Belle2 {
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
     StoreArray<Particle> particles; /**< the particles */
     StoreArray<Btube> tubeArray; /**< the (output) array of Btube objects */
-
+    DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
     /**
      * Main steering routine
      * @param p pointer to particle

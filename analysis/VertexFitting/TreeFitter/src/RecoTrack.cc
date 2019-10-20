@@ -8,13 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
 #include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 
-#include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/Track.h>
+
 #include <TMath.h>
 
 namespace TreeFitter {

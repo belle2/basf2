@@ -12,7 +12,6 @@
 #define ECLWAVEFORMS_H
 
 #include <TObject.h>
-#include <algorithm>
 
 namespace Belle2 {
   /*!

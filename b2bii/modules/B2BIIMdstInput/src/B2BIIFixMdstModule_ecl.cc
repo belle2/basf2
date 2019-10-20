@@ -775,8 +775,8 @@ namespace Belle2 {
 
 //
     double resol;
-    double para[4];
-    double error[4];
+    double para[4] = { };
+    double error[4] = { };
 
     double pbuf = p;
 //--

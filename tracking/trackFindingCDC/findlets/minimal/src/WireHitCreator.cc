@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>

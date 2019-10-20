@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/dataobjects/FileMetaData.h>
 

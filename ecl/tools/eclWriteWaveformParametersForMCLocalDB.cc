@@ -1,7 +1,6 @@
 #include <framework/database/DBImportObjPtr.h>
 #include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
 #include <iostream>
-#include <fstream>
 /*
 MC photon parameters are given as averaged value.
 Diode and hadron template parameters are computed using

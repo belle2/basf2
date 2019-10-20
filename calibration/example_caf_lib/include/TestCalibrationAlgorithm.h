@@ -30,11 +30,14 @@ namespace Belle2 {
     /// getter for m_willFail
     bool getForceFail() {return m_forceFail;}
 
-    /// setter for m_minentries
+    /// setter for m_minEntries
     void setMinEntries(int minEntries) {m_minEntries = minEntries;}
 
-    /// getter for m_minentries
+    /// getter for m_minEntries
     int getMinEntries() {return m_minEntries;}
+
+    /// setter for m_debugHisto
+    void setDebugHisto(bool debugHisto) {m_debugHisto = debugHisto;}
 
   protected:
 
@@ -42,8 +45,14 @@ namespace Belle2 {
     virtual EResult calibrate() override;
 
   private:
+    /// Set when c_NotEnoughData will be returned
     int m_minEntries = 100;
+    /// Force always fail for testing
     int m_forceFail = false;
+    /// Set if a debugging histogram should be created in the algorithm output directory
+    int m_debugHisto = false;
+    /// Perform debug histogram file creation
+    void createDebugHistogram();
 
   };
 } // namespace Belle2

@@ -14,12 +14,9 @@
 #include "cadef.h"
 #endif
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/dataobjects/VxdID.h>
 
-#include <TH1.h>
-#include <TH2.h>
 #include <TEfficiency.h>
 #include <TCanvas.h>
 

@@ -8,14 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TTree.h>
-
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/eklm/modules/EKLMAlignmentAlongStrips/EKLMAlignmentAlongStripsCollectorModule.h>
-#include <framework/datastore/RelationArray.h>
+
+/* Belle 2 headers. */
 #include <framework/gearbox/Unit.h>
 #include <tracking/dataobjects/ExtHit.h>
+
+/* ROOT headers. */
+#include <TTree.h>
 
 using namespace Belle2;
 

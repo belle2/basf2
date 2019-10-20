@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 #include <TCanvas.h>

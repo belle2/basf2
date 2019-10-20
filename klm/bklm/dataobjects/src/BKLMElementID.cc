@@ -8,7 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/dataobjects/BKLMElementID.h>
+
+/* C++ headers. */
 #include <sstream>
 
 using namespace std;

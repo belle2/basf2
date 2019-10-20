@@ -18,7 +18,6 @@
 
 // FRAMEWORK
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 // OTHER
 #include "TMath.h"

@@ -127,23 +127,26 @@ if __name__ == '__main__':
     for address, socket in sockets.items():
         socket.connect(address)
 
-    # When no additional things are requested, just show the table once and exit
-    if not args.watch:
-        df = get_monitor_table(sockets, show_detail=True)
-        df_to_show, worker_information = get_overview(df)
-        print(df_to_show)
-        print("")
-        print(worker_information)
-        exit()
+    try:
+        # When no additional things are requested, just show the table once and exit
+        if not args.watch:
+            df = get_monitor_table(sockets, show_detail=True)
+            df_to_show, worker_information = get_overview(df)
+            print(df_to_show)
+            print("")
+            print(worker_information)
+            exit()
 
-    # Else we go into a main loop
-    while True:
-        df = get_monitor_table(sockets, show_detail=True)
-        df_to_show, worker_information = get_overview(df)
+        # Else we go into a main loop
+        while True:
+            df = get_monitor_table(sockets, show_detail=True)
+            df_to_show, worker_information = get_overview(df)
 
-        os.system("clear")
-        print(df_to_show)
-        print("")
-        print(worker_information)
+            os.system("clear")
+            print(df_to_show)
+            print("")
+            print(worker_information)
 
-        sleep(1.0)
+            sleep(1.0)
+    except KeyboardInterrupt:
+        pass

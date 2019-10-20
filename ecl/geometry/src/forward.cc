@@ -3,24 +3,19 @@
 #include "ecl/geometry/BelleCrystal.h"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
-#include "G4NistManager.hh"
 #include <G4VisAttributes.hh>
 #include <G4Tubs.hh>
 #include <G4Box.hh>
 #include <G4AssemblyVolume.hh>
-#include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
 #include <G4UnionSolid.hh>
-#include <G4Trd.hh>
 #include <G4TwoVector.hh>
-#include <G4ExtrudedSolid.hh>
 #include <G4PVReplica.hh>
-#include "G4UserLimits.hh"
 #include "G4ReflectionFactory.hh"
+#include <G4Trap.hh>
 
 #include <iostream>
 #include "CLHEP/Matrix/Vector.h"
-#include "CLHEP/Matrix/Matrix.h"
 #include "G4Vector3D.hh"
 #include "G4Point3D.hh"
 #include "ecl/geometry/shapes.h"

@@ -11,24 +11,14 @@
 
 #include <tracking/modules/VXDOverlaps/OverlapResidualsModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
+#include <framework/gearbox/Unit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
-#include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
 #include <genfit/TrackPoint.h>
-#include <framework/gearbox/Const.h>
-#include <set>
-#include <root/TObject.h>
-#include <root/TROOT.h>
-#include <boost/foreach.hpp>
-#include <typeinfo>
-#include <cxxabi.h>
-#include <TMath.h>
 #include <TVector3.h>
 #include <TDirectory.h>
 #include <math.h>

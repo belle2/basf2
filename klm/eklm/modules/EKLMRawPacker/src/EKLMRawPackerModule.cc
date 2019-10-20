@@ -8,9 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <klm/eklm/dataobjects/EKLMDigit.h>
+/* Own header. */
 #include <klm/eklm/modules/EKLMRawPacker/EKLMRawPackerModule.h>
+
+/* KLM headers. */
+#include <klm/eklm/dataobjects/EKLMDigit.h>
 
 using namespace std;
 using namespace Belle2;

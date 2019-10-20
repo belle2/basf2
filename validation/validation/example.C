@@ -1,7 +1,7 @@
 /*
 <header>
   <input>EvtGenSimRec.root</input>
-  <contact>Kilian.Lieret@campus.lmu.de</contact>
+  <contact>Kilian.Lieret@lmu.de</contact>
 
   <description>
     This example shows how to read in a data file and produce an

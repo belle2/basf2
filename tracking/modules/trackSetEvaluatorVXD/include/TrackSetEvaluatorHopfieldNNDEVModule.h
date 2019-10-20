@@ -13,17 +13,11 @@
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapNetwork.h>
-#include <tracking/trackFindingVXD/trackSetEvaluator/OverlapResolverNodeInfo.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/Module.h>
 
 #include <string>
-#include <vector>
-
-#include <TRandom.h>
-
 
 namespace Belle2 {
 

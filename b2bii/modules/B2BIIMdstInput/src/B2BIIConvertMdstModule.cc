@@ -57,6 +57,9 @@
 #include "belle_legacy/nisKsFinder/nisKsFinder.h"
 #endif
 
+#ifdef HAVE_GOODLAMBDA
+#include "belle_legacy/findLambda/findLambda.h"
+#endif
 
 #include "belle_legacy/benergy/BeamEnergy.h"
 #include "belle_legacy/ip/IpProfile.h"
@@ -766,6 +769,11 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       Lambda0.setVertex(v0Vertex);
       newV0 = m_particles.appendNew(Lambda0);
       lambda0PList->addParticle(newV0);
+
+      // GoodLambda flag as extra info
+      Belle::FindLambda lambdaFinder;
+      lambdaFinder.candidates(belleV0, Belle::IpProfile::position(1));
+      newV0->addExtraInfo("goodLambda", lambdaFinder.goodLambda());
     } else if (belleV0.kind() == 3) { // anti-Lambda -> pi+ anti-p
       Particle antiLambda0(v0Momentum, -3122);
       antiLambda0.appendDaughter(newDaugM);
@@ -773,6 +781,11 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       antiLambda0.setVertex(v0Vertex);
       newV0 = m_particles.appendNew(antiLambda0);
       antiLambda0PList->addParticle(newV0);
+
+      // GoodLambda flag as extra info
+      Belle::FindLambda lambdaFinder;
+      lambdaFinder.candidates(belleV0, Belle::IpProfile::position(1));
+      newV0->addExtraInfo("goodLambda", lambdaFinder.goodLambda());
     } else if (belleV0.kind() == 4) { // gamma -> e+ e-
       Particle gamma(v0Momentum, 22);
       gamma.appendDaughter(newDaugP);

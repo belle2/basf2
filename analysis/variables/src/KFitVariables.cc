@@ -10,7 +10,6 @@
 
 // Own include
 #include <analysis/variables/KFitVariables.h>
-#include <analysis/VariableManager/Variable.h>
 
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>

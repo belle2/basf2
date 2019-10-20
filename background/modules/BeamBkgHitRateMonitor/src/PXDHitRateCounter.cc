@@ -163,7 +163,7 @@ namespace Belle2 {
             double currentSegmentMass = m_segmentActiveAreas[vBin + index * 6] * info.getThickness() * c_densitySi;
             double currentSegmentArea = m_segmentActiveAreas[vBin + index * 6];
             if (currentSegmentArea > 0) {
-              m_rates.segmentDoseRates[vBin + index * 6] *= (1.0 / currentComponentTime) * (1000 / currentSegmentMass);
+              m_rates.segmentDoseRates[vBin + index * 6] *= (1.0 / (currentComponentTime / Unit::s)) * (1000 / currentSegmentMass);
               m_rates.segmentSoftPhotonFluxes[vBin + index * 6] *= (1.0 / currentSegmentArea) * (1.0 / (currentComponentTime / Unit::s));
               m_rates.segmentHardPhotonFluxes[vBin + index * 6] *= (1.0 / currentSegmentArea) * (1.0 / (currentComponentTime / Unit::s));
               m_rates.segmentChargedFluxes[vBin + index * 6] *= (1.0 / currentSegmentArea) * (1.0 /

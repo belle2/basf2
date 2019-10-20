@@ -58,7 +58,7 @@ SVDUnpackerModule::SVDUnpackerModule() : Module(),
   setDescription("Produce SVDDigits from RawSVD. NOTE: only zero-suppressed mode is currently supported!");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("svdEventInfo", m_svdEventInfoName, "Name of the SVDEventInfo object", string(""));
+  addParam("SVDEventInfo", m_svdEventInfoName, "Name of the SVDEventInfo object", string(""));
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
   addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));
   addParam("GenerateOldDigits", m_generateOldDigits, "Generate SVDDigits", bool(false));

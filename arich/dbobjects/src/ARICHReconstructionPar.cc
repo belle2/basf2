@@ -10,10 +10,7 @@
 
 #include <arich/dbobjects/ARICHReconstructionPar.h>
 
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 #include <iostream>
-#include <iomanip>
 #include <vector>
 
 using namespace std;

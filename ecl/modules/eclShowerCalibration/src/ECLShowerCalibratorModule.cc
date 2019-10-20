@@ -14,9 +14,6 @@
 // THIS MODULE
 #include <ecl/modules/eclShowerCalibration/ECLShowerCalibratorModule.h>
 
-// FRAMEWORK
-#include <framework/logging/Logger.h>
-
 // ECL
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLShower.h>

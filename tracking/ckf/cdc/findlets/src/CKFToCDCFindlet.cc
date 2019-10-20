@@ -14,9 +14,6 @@
 
 #include <framework/core/ModuleParamList.h>
 
-#include <tracking/ckf/general/utilities/ClassMnemomics.h>
-#include <tracking/dataobjects/RecoTrack.h>
-
 using namespace Belle2;
 
 CKFToCDCFindlet::~CKFToCDCFindlet() = default;

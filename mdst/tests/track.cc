@@ -1,7 +1,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <gtest/gtest.h>
 

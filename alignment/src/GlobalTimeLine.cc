@@ -7,10 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
 #include <alignment/GlobalTimeLine.h>
 
-
+#include <alignment/Manager.h>
 #include <framework/core/PyObjConvUtils.h>
+#include <framework/database/EventDependency.h>
 
 namespace Belle2 {
   namespace alignment {
@@ -31,7 +33,8 @@ namespace Belle2 {
         for (long unsigned int iCol = timeid + 1; iCol < row.size(); ++iCol) {
           if (row.at(iCol) != cell && std::get<RunHeader>(timeTable).at(iCol) != cellRun) {
             timeid = iCol - 1;
-            return std::get<EventHeader>(timeTable).at(iCol - 1);
+            return std::get<EventHeader>(timeTable).at(iCol);
+            //return std::get<EventHeader>(timeTable).at(iCol - 1);
           }
         }
         timeid = row.size() - 1;
@@ -69,9 +72,9 @@ namespace Belle2 {
 
           if (std::get<TableData>(timeTable).find(uid) == std::get<TableData>(timeTable).end()) {
             auto firstEvent = std::get<EventHeader>(timeTable).at(0);
-            auto lastEvent = std::get<EventHeader>(timeTable).at(std::get<EventHeader>(timeTable).size() - 1);
+//             auto lastEvent = std::get<EventHeader>(timeTable).at(std::get<EventHeader>(timeTable).size() - 1);
 
-            auto iov = IntervalOfValidity(firstEvent.getExperiment(), firstEvent.getRun(), lastEvent.getExperiment(), lastEvent.getRun());
+            auto iov = IntervalOfValidity(firstEvent.getExperiment(), firstEvent.getRun(), -1, -1);
             auto objCopy = std::shared_ptr<GlobalParamSetAccess>(obj->clone());
             payloadsTable[uid].push_back({ iov, {{firstEvent, objCopy}} });
 
@@ -106,7 +109,13 @@ namespace Belle2 {
             // Move to next IoV block (for intra-run deps in just processed block, next block is always the next run)
             auto endEvent = gotoNextChangeRunWise(timeTable, uid, iCol);
             int endExp = endEvent.getExperiment();
-            int endRun = endEvent.getRun();
+            //int endRun = endEvent.getRun();
+            int endRun = std::max(0, endEvent.getRun() - 1);
+            // The last run will be the same as this run
+            if (endEvent.getRun() == run && endExp == exp) {
+              endRun = -1;
+              endExp = -1;
+            }
             // Store finished block
             payloadsTable[uid].push_back({IntervalOfValidity(exp, run, endExp, endRun), intraRunEntries});
 
@@ -216,16 +225,32 @@ namespace Belle2 {
 
       void GlobalParamTimeLine::loadFromDB()
       {
+        std::map<std::tuple<int, int, int>, std::vector<std::shared_ptr<GlobalParamSetAccess>>> eventPayloads{};
         for (auto& row : payloadsTable) {
           for (auto& iovBlock : row.second) {
             for (auto& payload : iovBlock.second) {
-              payload.second->loadFromDB(payload.first);
+              auto eventTuple = std::make_tuple((int)payload.first.getExperiment(), (int)payload.first.getRun(), (int)payload.first.getEvent());
+              if (eventPayloads.find(eventTuple) == eventPayloads.end()) {
+                eventPayloads[eventTuple] = std::vector<std::shared_ptr<GlobalParamSetAccess>>();
+              }
+              eventPayloads[eventTuple].push_back(payload.second);
+//               DBStore::Instance().update(payload.first);
+//               DBStore::Instance().updateEvent(payload.first.getEvent());
+//               payload.second->loadFromDBObjPtr();
             }
+          }
+        }
+        for (auto event_payloads : eventPayloads) {
+          auto event = EventMetaData(std::get<2>(event_payloads.first), std::get<1>(event_payloads.first), std::get<0>(event_payloads.first));
+          DBStore::Instance().update(event);
+          DBStore::Instance().updateEvent(event.getEvent());
+          for (auto& payload : event_payloads.second) {
+            payload->loadFromDBObjPtr();
           }
         }
       }
 
-      void GlobalParamTimeLine::updateGlobalParam(GlobalLabel label, double correction)
+      void GlobalParamTimeLine::updateGlobalParam(GlobalLabel label, double correction, bool resetParam)
       {
         auto timeid = label.getTimeId();
         auto eov = label.getEndOfValidity();
@@ -239,8 +264,15 @@ namespace Belle2 {
         }
 
         for (auto payloadIndex : payloadIndices) {
-          getPayloadByContinuousIndex(payloadsTable, label.getUniqueId(), payloadIndex).second->updateGlobalParam(correction,
-              label.getElementId(), label.getParameterId());
+          auto payload = getPayloadByContinuousIndex(payloadsTable, label.getUniqueId(), payloadIndex).second;
+          // If not found, we get an empty payload shared ptr
+          if (payload) {
+            if (resetParam) {
+              payload->setGlobalParam(correction, label.getElementId(), label.getParameterId());
+            } else {
+              payload->updateGlobalParam(correction, label.getElementId(), label.getParameterId());
+            }
+          }
         }
 
       }
@@ -256,7 +288,9 @@ namespace Belle2 {
 
             // non-intra-run
             if (iovBlock.second.size() == 1) {
-              result.push_back({iov, obj});
+              if (obj)
+                result.push_back({iov, obj});
+
               continue;
             }
 
@@ -270,7 +304,8 @@ namespace Belle2 {
               auto nextEvent = iovBlock.second.at(iObj).first.getEvent();
               auto nextObj = iovBlock.second.at(iObj).second->releaseObject();
 
-              payloads->add(nextEvent, nextObj);
+              if (nextObj)
+                payloads->add(nextEvent, nextObj);
               //payloads.add(nextEvent, nextObj);
             }
             result.push_back({iov, payloads});
@@ -353,8 +388,8 @@ namespace Belle2 {
 
             for (auto& event : std::get<1>(params_events)) {
               auto eventIndex = eventIndices[event];
-              if (eventIndex > 0)
-                label.registerTimeDependent(eventIndex);
+              //if (eventIndex > 0)
+              label.registerTimeDependent(eventIndex);
 
             }
           }

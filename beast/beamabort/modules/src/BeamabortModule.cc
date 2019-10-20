@@ -10,12 +10,10 @@
 #include <beast/beamabort/modules/BeamabortModule.h>
 #include <beast/beamabort/dataobjects/BeamabortSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <cmath>
 #include <boost/foreach.hpp>
 
 using namespace std;

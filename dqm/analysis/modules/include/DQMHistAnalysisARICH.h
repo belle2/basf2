@@ -13,27 +13,17 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-
 //DQM
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 //ARICH
 #include <arich/utility/ARICHChannelHist.h>
 
-#include <TCanvas.h>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TH3F.h>
-#include <TVector2.h>
-#include <TText.h>
-#include <TLine.h>
-#include <TFile.h>
-#include <TH2Poly.h>
-#include <chrono>
 #include <vector>
-#include <string>
-#include <map>
+
+#include <TCanvas.h>
+#include <TLine.h>
+#include <TH2Poly.h>
 
 namespace Belle2 {
 
@@ -108,6 +98,8 @@ namespace Belle2 {
     Belle2::ARICHChannelHist* m_apdHist = NULL; /**<ARICH TObject to draw hit map for each APD*/
     TH2Poly* m_apdPoly = NULL;  /**< hit map for each APD */
     TCanvas* m_c_apdHist = NULL; /**<Canvas for 2D hit map of APDs*/
+
+    std::vector<int> maskedMergers{53}; /**<The id numbers of masked merger boards to avoid unnecessary alert*/
   };
 
 } // Belle2 namespace

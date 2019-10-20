@@ -10,11 +10,7 @@
 
 // Own include
 #include <analysis/variables/Variables.h>
-#include <analysis/variables/EventVariables.h>
-#include <analysis/variables/VertexVariables.h>
-#include <analysis/variables/TrackVariables.h>
-#include <analysis/variables/ParameterVariables.h>
-#include <analysis/variables/FlightInfoVariables.h>
+#include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
@@ -27,36 +23,24 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/dataobjects/EventShapeContainer.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/utilities/Conversion.h>
 #include <framework/logging/Logger.h>
-#include <framework/core/InputController.h>
 
 #include <TLorentzVector.h>
 #include <TRandom.h>
 #include <TVectorF.h>
 #include <TVector3.h>
 
-#include <boost/lexical_cast.hpp>
-
 #include <iostream>
-#include <algorithm>
 #include <cmath>
 
 using namespace std;
@@ -1069,7 +1053,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("InvM", particleInvariantMass,
                       "invariant mass (determined from particle's daughter 4-momentum vectors)");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
-                      "invariant mass (determined from particle's daughter 4-momentum vectors)");
+                      "invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
+                      "If the particle has not 2 daughters, it returns just the mass value.");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,
                       "uncertainty of invariant mass (determined from particle's daughter 4 - momentum vectors)");

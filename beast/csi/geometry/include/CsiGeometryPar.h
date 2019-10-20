@@ -15,12 +15,6 @@
 #define CSIGEOMETRYPAR_H
 
 #include <vector>
-#include <string>
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <functional>
-#include <map>
 #include <G4String.hh>
 #include <G4Material.hh>
 

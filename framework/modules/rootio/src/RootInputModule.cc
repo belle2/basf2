@@ -13,6 +13,7 @@
 
 #include <framework/io/RootIOUtilities.h>
 #include <framework/io/RootFileInfo.h>
+#include <framework/core/FileCatalog.h>
 #include <framework/core/InputController.h>
 #include <framework/pcore/Mergeable.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -140,8 +141,6 @@ void RootInputModule::initialize()
   std::set<std::string> requiredPersistentBranches;
   // Event metadata from all files, keep it around for sanity checks and globaltag replay
   std::vector<FileMetaData> fileMetaData;
-  // do all files have a consistent number of MC events? that is all positive or all zero
-  bool validInputMCEvents{true};
   // and if so, what is the sum
   std::result_of<decltype(&FileMetaData::getMcEvents)(FileMetaData)>::type sumInputMCEvents{0};
 
@@ -149,6 +148,8 @@ void RootInputModule::initialize()
   {
     // temporarily disable some root warnings
     auto rootWarningGuard = ScopeGuard::guardValue(gErrorIgnoreLevel, kWarning + 1);
+    // do all files have a consistent number of MC events? that is all positive or all zero
+    bool validInputMCEvents{true};
     for (const string& fileName : m_inputFileNames) {
       // read metadata and create sum of MCEvents and global tags
       try {
@@ -444,11 +445,11 @@ void RootInputModule::readTree()
     }
     // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
     readPersistentEntry(treeNum);
-    realDataWorkaround(*fileMetaData);
     B2INFO("Loading new input file"
            << LogVar("filename", m_tree->GetFile()->GetName())
            << LogVar("metadata LFN", fileMetaData->getLfn()));
   }
+  realDataWorkaround(*fileMetaData);
 
   for (auto entry : m_storeEntries) {
     if (!entry->object) {
@@ -744,7 +745,7 @@ void RootInputModule::readPersistentEntry(long fileEntry)
 
 void RootInputModule::realDataWorkaround(FileMetaData& metaData)
 {
-  if ((metaData.getSite().find("bfe0") == 0) && (metaData.getDate().compare("2019-06-30") > 0) &&
+  if ((metaData.getSite().find("bfe0") == 0) && (metaData.getDate().compare("2019-06-30") < 0) &&
       (metaData.getExperimentLow() > 0) && (metaData.getExperimentHigh() < 9) && (metaData.getRunLow() > 0)) {
     metaData.declareRealData();
   }

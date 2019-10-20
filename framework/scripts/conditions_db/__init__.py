@@ -676,26 +676,31 @@ class ConditionsDB:
 
         Parameters:
           filename (str): filename of the testing payload storage file that should be uploaded
-          normalize (bool/str): if True the payload root files will be normalized to have the same checksum for the same content,
-                                if normalize is a string in addition the file name in the root file metadata will be set to it
+          normalize (bool/str): if True the payload root files will be
+            normalized to have the same checksum for the same content, if
+            normalize is a string in addition the file name in the root file
+            metadata will be set to it
           data (dict): a dictionary with the information provided by the user:
-            task: category of globaltag, either master, online, prompt, data, mc, or analysis
-            tag: the globaltage name
-            request: type of request, either Update, New, or Modification. The latter two imply task == master because
+
+            * task: category of globaltag, either master, online, prompt, data, mc, or analysis
+            * tag: the globaltage name
+            * request: type of request, either Update, New, or Modification. The latter two imply task == master because
               if new payload classes are introduced or payload classes are modified then they will first be included in
               the master globaltag. Here a synchronization of code and payload changes has to be managed.
               If new or modified payload classes should be included in other globaltags they must already be in a release.
-            pull-request: number of the pull request containing new or modified payload classes, only for request == New or Modified
-            backward-compatibility: description of what happens if the old payload is encountered by the updated code,
+            * pull-request: number of the pull request containing new or modified payload classes,
+              only for request == New or Modified
+            * backward-compatibility: description of what happens if the old payload is encountered by the updated code,
               only for request == Modified
-            forward-compatibility: description of what happens if a new payload is encountered by the existing code,
+            * forward-compatibility: description of what happens if a new payload is encountered by the existing code,
               only for request == Modified
-            release: the required release version
-            reason: the reason for the request
-            description: a detailed description for the globaltag manager
-            issue: identifier of an existing jira issue (optional)
-            user: name of the user
-            time: time stamp of the request
+            * release: the required release version
+            * reason: the reason for the request
+            * description: a detailed description for the globaltag manager
+            * issue: identifier of an existing jira issue (optional)
+            * user: name of the user
+            * time: time stamp of the request
+
           password (str): the password for access to jira
 
         Returns:

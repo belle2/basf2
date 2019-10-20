@@ -10,55 +10,45 @@
 
 #include <alignment/modules/MillepedeCollector/MillepedeCollectorModule.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/pcore/ProcHandler.h>
-#include <framework/core/FileCatalog.h>
-
 #include <alignment/dataobjects/MilleData.h>
-
-#include <genfit/Track.h>
-#include <genfit/GblFitter.h>
-
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/utility/ReferenceFrame.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/dbobjects/BeamParameters.h>
-#include <framework/database/DBObjPtr.h>
-#include <mdst/dbobjects/BeamSpot.h>
-#include <mdst/dataobjects/Track.h>
-
+#include <alignment/GblMultipleScatteringController.h>
+#include <alignment/GlobalDerivatives.h>
 #include <alignment/GlobalLabel.h>
-#include <framework/dataobjects/FileMetaData.h>
-#include <framework/particledb/EvtGenDatabasePDG.h>
-#include <framework/dataobjects/EventT0.h>
-
-#include <TMath.h>
-#include <TH1F.h>
-#include <TTree.h>
-#include <TDecompSVD.h>
-
-#include <genfit/FullMeasurement.h>
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
-#include <tracking/trackFitting/measurementCreator/adder/MeasurementAdder.h>
-
-#include <genfit/PlanarMeasurement.h>
-
+#include <alignment/GlobalParam.h>
+#include <alignment/GlobalTimeLine.h>
+#include <alignment/Manager.h>
 #include <alignment/reconstruction/AlignableCDCRecoHit.h>
 #include <alignment/reconstruction/AlignablePXDRecoHit.h>
 #include <alignment/reconstruction/AlignableSVDRecoHit.h>
 #include <alignment/reconstruction/AlignableSVDRecoHit2D.h>
 #include <alignment/reconstruction/BKLMRecoHit.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/utility/ReferenceFrame.h>
+#include <framework/core/FileCatalog.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventT0.h>
+#include <framework/dataobjects/FileMetaData.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dbobjects/BeamParameters.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
+#include <framework/pcore/ProcHandler.h>
+#include <mdst/dbobjects/BeamSpot.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/trackFitting/fitter/base/TrackFitter.h>
+#include <tracking/trackFitting/measurementCreator/adder/MeasurementAdder.h>
 
-#include <alignment/Manager.h>
-#include <alignment/Hierarchy.h>
-#include <alignment/GlobalParam.h>
-#include <alignment/GlobalDerivatives.h>
-#include <alignment/GblMultipleScatteringController.h>
-
+#include <genfit/FullMeasurement.h>
+#include <genfit/GblFitter.h>
 #include <genfit/KalmanFitterInfo.h>
-#include "../../../include/GlobalTimeLine.h"
+#include <genfit/PlanarMeasurement.h>
+#include <genfit/Track.h>
+
+#include <TMath.h>
+#include <TH1F.h>
+#include <TTree.h>
+#include <TDecompSVD.h>
 
 using namespace std;
 using namespace Belle2;
@@ -175,7 +165,7 @@ void MillepedeCollectorModule::prepare()
   emd.isRequired();
 
   StoreObjPtr<EventT0> eventT0;
-  eventT0.isRequired();
+  //eventT0.isRequired();
 
   if (m_tracks.empty() &&
       m_particles.empty() &&
@@ -260,7 +250,7 @@ void MillepedeCollectorModule::prepare()
     B2ERROR("Cannot set both, event list and timedep config.");
   }
 
-  Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
+//   Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
 
   AlignableCDCRecoHit::s_enableTrackT0LocalDerivative = m_fitTrackT0;
   AlignableCDCRecoHit::s_enableWireSaggingGlobalDerivative = m_enableWireSagging;
@@ -1000,6 +990,7 @@ void MillepedeCollectorModule::closeRun()
 
 void MillepedeCollectorModule::finish()
 {
+  Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
 
   StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
   if (!fileMetaData.isValid()) {

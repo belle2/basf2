@@ -9,44 +9,22 @@
 #define EUDAQBUFFER_H_
 
 // include standard c++
-#include <sys/time.h>
 #include <memory>
-#include <string>
-#include <set>
-#include <map>
 #include <tuple>
 #include <vector>
-#include <algorithm>
-#include <limits>
-
-// Include BASF2 Base stuff
-#include <framework/core/Module.h>
-#include <framework/core/Environment.h>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 // load some parts of the PXD
 #include <pxd/dataobjects/PXDDigit.h>
 #include <vxd/dataobjects/VxdID.h>
-//#include <rawdata/dataobjects/RawFTSW.h>
 
 // load some parts of the eudaq
 #include <eutel/eudaq/FileReader.h>
 #include <eutel/eudaq/DetectorEvent.h>
-#include <eutel/eudaq/RawDataEvent.h>
 #include <eutel/eudaq/PluginManager.h>
-#include <eutel/eudaq/Utils.h>
 #include <eutel/eudaq/TBTelEvent.h>
 
 // load the datastore objects
 #include <testbeam/vxd/dataobjects/TelDigit.h>
-#include <testbeam/vxd/dataobjects/TelEventInfo.h>
-
-#include <testbeam/vxd/geometry/SensorInfo.h>
-#include <vxd/geometry/GeoCache.h>
 
 /** EUDAQBuffer: BUffer filled with EUDAQ Events.
  */

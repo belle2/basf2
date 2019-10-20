@@ -10,11 +10,6 @@
 
 #include <analysis/dataobjects/TagVertex.h>
 
-#include <framework/datastore/StoreArray.h>
-
-#include <framework/logging/Logger.h>
-#include <iostream>
-
 using namespace Belle2;
 
 

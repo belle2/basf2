@@ -10,14 +10,13 @@
 
 #pragma once
 
-/* External headers. */
-#include <TObject.h>
-
-/* Belle2 headers. */
-#include <simulation/dataobjects/SimHitBase.h>
+/* KLM headers. */
 #include <klm/eklm/dataobjects/EKLMHitBase.h>
 #include <klm/eklm/dataobjects/EKLMHitCoord.h>
 #include <klm/eklm/dataobjects/EKLMHitMomentum.h>
+
+/* Belle 2 headers. */
+#include <simulation/dataobjects/SimHitBase.h>
 
 namespace Belle2 {
 

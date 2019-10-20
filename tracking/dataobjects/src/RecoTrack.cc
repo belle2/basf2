@@ -10,8 +10,6 @@
 #include <genfit/MplTrackRep.h>
 #include <simulation/monopoles/MonopoleConstants.h>
 
-#include <framework/dataobjects/Helix.h>
-
 using namespace Belle2;
 
 RecoTrack::RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum, const short int seedCharge,

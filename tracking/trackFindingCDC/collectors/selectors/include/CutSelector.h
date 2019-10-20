@@ -15,9 +15,10 @@
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <vector>
-#include <string>
 #include <algorithm>
+#include <cmath>
+#include <string>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

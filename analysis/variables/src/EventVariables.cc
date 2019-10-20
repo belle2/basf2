@@ -23,13 +23,11 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventKinematics.h>
-#include <analysis/dataobjects/TauPairDecay.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <framework/dataobjects/EventT0.h>
 
@@ -37,18 +35,12 @@
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
 
-// cluster utils
-#include <analysis/ClusterUtility/ClusterUtils.h>
-
 #include <analysis/utility/PCmsLabTransform.h>
 
 #include <framework/logging/Logger.h>
 
 #include <TLorentzVector.h>
 #include <TVector3.h>
-
-#include <functional>
-#include <string>
 
 namespace Belle2 {
   namespace Variable {

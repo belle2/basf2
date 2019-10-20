@@ -14,12 +14,12 @@
 
 #include <TFileMerger.h>
 #include <TFile.h>
-#include <Riostream.h>
 
 #include <sys/types.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <cerrno>
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;

@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <analysis/variables/MCTruthVariables.h>
-#include <analysis/variables/ParameterVariables.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/TauPairDecay.h>
@@ -20,7 +19,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>

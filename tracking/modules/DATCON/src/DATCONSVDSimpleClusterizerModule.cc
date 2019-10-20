@@ -10,6 +10,8 @@
 
 #include <tracking/modules/DATCON/DATCONSVDSimpleClusterizerModule.h>
 
+#include <svd/geometry/SensorInfo.h>
+
 using namespace std;
 using namespace Belle2;
 

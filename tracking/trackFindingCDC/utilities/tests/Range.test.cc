@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/utilities/GetValueType.h>
 #include <tracking/trackFindingCDC/utilities/GetIterator.h>
 #include <map>
-#include <type_traits>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

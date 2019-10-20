@@ -2643,26 +2643,26 @@ namespace Belle2 {
 
 
     /* message out */
-    if (SE_Message_Level >= 2)
+    if (SE_Message_Level >= 2) {
       B2ERROR("scale_error: info: hadronic MC: "
               << scale_error_hadronic_mc[0] << " " << scale_error_hadronic_mc[1] << " "
               << scale_error_hadronic_mc[2] << " " << scale_error_hadronic_mc[3] << " "
               << scale_error_hadronic_mc[4]);
-    if (SE_Message_Level >= 2)
+
       B2ERROR("scale_error: info: cosmic MC: "
               << scale_error_cosmic_mc[0] << " " << scale_error_cosmic_mc[1] << " "
               << scale_error_cosmic_mc[2] << " " << scale_error_cosmic_mc[3] << " "
               << scale_error_cosmic_mc[4]);
-    if (SE_Message_Level >= 2)
+
       B2ERROR("scale_error: info: cosmic data: "
               << scale_error_cosmic_data[0] << " " << scale_error_cosmic_data[1] << " "
               << scale_error_cosmic_data[2] << " " << scale_error_cosmic_data[3] << " "
               << scale_error_cosmic_data[4]);
 
-    if (SE_Message_Level >= 2)
       B2ERROR("scale_error: info: final scale: "
               << scale[0] << " " << scale[1] << " " << scale[2] << " "
               << scale[3] << " " << scale[4]);
+    }
     /* check parameter limit */
     const double scale_lo = 0.5, scale_hi = 4.0;
     bool too_lo = false, too_hi = false;

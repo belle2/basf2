@@ -16,7 +16,6 @@
 #include <beast/analysis/modules/BEASTTree_v5.h>
 #include "TFile.h"
 #include "TChain.h"
-#include "Riostream.h"
 #include "TF1.h"
 
 namespace Belle2 {

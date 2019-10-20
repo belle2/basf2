@@ -14,7 +14,6 @@ import zmq
 from argparse import ArgumentParser, FileType
 from zmq_daq.utils import get_monitor_table, normalize_addresses, write_monitoring, show_monitoring
 
-import os
 from time import sleep
 
 if __name__ == '__main__':
@@ -67,26 +66,28 @@ if __name__ == '__main__':
             socket.send_multipart([b"x", b"", b""])
             exit()
 
-    # When no additional things are requested, just show the table once and exit
-    if not args.watch and not args.dat:
-        df = get_monitor_table(sockets, show_detail=args.show_detail)
-        show_monitoring(df)
-        exit()
-
-    # Else we go into a main loop
-    if args.dat:
-        f = open(args.dat, "wb")
     try:
+        # When no additional things are requested, just show the table once and exit
+        if not args.watch and not args.dat:
+            df = get_monitor_table(sockets, show_detail=args.show_detail)
+            show_monitoring(df)
+            exit()
+
+        # Else we go into a main loop
+        if args.dat:
+            f = open(args.dat, "wb")
+
         while True:
             df = get_monitor_table(sockets, show_detail=args.show_detail)
             if args.watch:
-                os.system("clear")
-                show_monitoring(df)
+                show_monitoring(df, clear=True)
 
             if args.dat:
                 write_monitoring(df, f)
 
             sleep(0.5)
+    except KeyboardInterrupt:
+        pass
     finally:
         if args.dat:
             f.close()

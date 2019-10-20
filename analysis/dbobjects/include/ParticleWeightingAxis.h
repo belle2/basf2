@@ -12,7 +12,6 @@
 #include <map>
 #include <string>
 #include <analysis/dbobjects/ParticleWeightingBinLimits.h>
-#include <stdio.h>
 
 namespace Belle2 {
 

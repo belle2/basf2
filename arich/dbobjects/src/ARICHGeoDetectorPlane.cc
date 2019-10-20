@@ -9,10 +9,8 @@
  **************************************************************************/
 
 #include <arich/dbobjects/ARICHGeoDetectorPlane.h>
-#include <framework/gearbox/Unit.h>
 #include <math.h>
 #include <iostream>
-#include <TVector2.h>
 
 using namespace std;
 using namespace Belle2;

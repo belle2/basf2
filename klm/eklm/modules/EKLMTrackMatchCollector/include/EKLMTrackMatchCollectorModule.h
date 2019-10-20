@@ -18,8 +18,10 @@
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
+#include <analysis/dataobjects/ParticleList.h>
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
@@ -99,6 +101,15 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Collect the data for one track.
+     * @param[in] track Track.
+     */
+    void collectDataTrack(const Track* track);
+
+    /** Muon list name. If empty, use tracks. */
+    std::string m_MuonListName;
+
     /** Digits. */
     StoreArray<EKLMDigit> m_digits;
 
@@ -116,6 +127,9 @@ namespace Belle2 {
 
     /** ExtHits. */
     StoreArray<ExtHit> m_extHits;
+
+    /** Muons. */
+    StoreObjPtr<ParticleList> m_MuonList;
 
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;

@@ -1754,7 +1754,7 @@ namespace Belle2 {
 
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
 
-          double output = 0.0;
+          double output = std::numeric_limits<double>::quiet_NaN();
 
           Variable::Manager& manager = Variable::Manager::Instance();
 
@@ -1818,7 +1818,7 @@ namespace Belle2 {
 
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
 
-          double output = 0.0;
+          double output = std::numeric_limits<double>::quiet_NaN();
 
           std::vector<Particle*> targetParticles;
           std::vector<Particle*> targetParticlesCategory;
@@ -1879,7 +1879,7 @@ namespace Belle2 {
         std::string combinerMethod = arguments[0];
         auto func = [combinerMethod](const Particle * particle) -> double {
 
-          double output = -2;
+          double output = std::numeric_limits<double>::quiet_NaN();
           auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
@@ -1903,7 +1903,7 @@ namespace Belle2 {
         std::string combinerMethod = arguments[0];
         auto func = [combinerMethod](const Particle * particle) -> double {
 
-          double output = -2;
+          double output = std::numeric_limits<double>::quiet_NaN();
           auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
@@ -1927,7 +1927,7 @@ namespace Belle2 {
         std::string combinerMethod = arguments[0];
         auto func = [combinerMethod](const Particle * particle) -> double {
 
-          int output = -2;
+          int output = std::numeric_limits<double>::quiet_NaN();
           auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
@@ -1958,7 +1958,7 @@ namespace Belle2 {
         std::string categoryName = arguments[0];
         auto func = [categoryName](const Particle * particle) -> double {
 
-          double output = -2;
+          double output = std::numeric_limits<double>::quiet_NaN();
           auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
@@ -1985,7 +1985,7 @@ namespace Belle2 {
         std::string categoryName = arguments[0];
         auto func = [categoryName](const Particle * particle) -> double {
 
-          double output = -2;
+          double output = std::numeric_limits<double>::quiet_NaN();
           auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
@@ -2012,7 +2012,7 @@ namespace Belle2 {
         std::string categoryName = arguments[0];
         auto func = [categoryName](const Particle * particle) -> double {
 
-          double output = -2;
+          double output = std::numeric_limits<double>::quiet_NaN();
           auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)

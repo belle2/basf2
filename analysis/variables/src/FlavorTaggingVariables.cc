@@ -1761,6 +1761,7 @@ namespace Belle2 {
 
           if (ListOfParticles.isValid())
           {
+            output = 0;
             bool particlesHaveMCAssociated = false;
             int nTargets = 0;
             for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
@@ -1779,7 +1780,7 @@ namespace Belle2 {
               }
             }
 
-            if (!particlesHaveMCAssociated) output = -2;
+            if (!particlesHaveMCAssociated) output = std::numeric_limits<double>::quiet_NaN();
             if (nTargets > 0) output = 1;
 
             // if (nTargets > 1); B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
@@ -1826,6 +1827,7 @@ namespace Belle2 {
 
           if (ListOfParticles.isValid())
           {
+            output = 0;
             int nTargets = 0;
             for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
               Particle* iParticle = ListOfParticles->getParticle(i);
@@ -1847,7 +1849,7 @@ namespace Belle2 {
               if (isTargetOfRightCategory == 1) {
                 output = 1;
                 nTargets += 1; targetParticlesCategory.push_back(targetParticle);
-              } else if (isTargetOfRightCategory == -2 && output != 1) output = -2;
+              } else if (isTargetOfRightCategory == -2 && output != 1) output = std::numeric_limits<double>::quiet_NaN();
             }
 
             /*            if (nTargets > 1) {
@@ -1927,7 +1929,7 @@ namespace Belle2 {
         std::string combinerMethod = arguments[0];
         auto func = [combinerMethod](const Particle * particle) -> double {
 
-          int output = std::numeric_limits<double>::quiet_NaN();
+          int output = std::numeric_limits<int>::quiet_NaN();
           auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)

@@ -45,7 +45,6 @@ EKLMTrackMatchCollectorModule::EKLMTrackMatchCollectorModule() :
            "Muon list name. If empty, use tracks.", std::string("mu+:all"));
   addParam("AllowedDistance1D", m_AllowedDistance1D,
            "Max distance in strips number to 1D hit from extHit to be still matched (default 8 strips)", double(8));
-  addParam("z0_d0", m_D0Z0, "D0_z0 distance", double(5));
   setPropertyFlags(c_ParallelProcessingCertified);
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
   m_GeoDat = nullptr;

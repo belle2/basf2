@@ -137,9 +137,6 @@ namespace Belle2 {
     /** EKLMElementNumbers. */
     const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 
-    /** D0 and Z0 distance parameters */
-    double m_D0Z0;
-
     /** Output file name */
     std::string m_filename;
 

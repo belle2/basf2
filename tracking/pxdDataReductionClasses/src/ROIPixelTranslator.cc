@@ -14,8 +14,6 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-#include <list>
-
 using namespace std;
 using namespace Belle2;
 

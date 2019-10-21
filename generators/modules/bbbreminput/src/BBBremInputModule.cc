@@ -10,15 +10,11 @@
 
 #include <generators/modules/bbbreminput/BBBremInputModule.h>
 
-#include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/gearbox/Unit.h>
-
-#include <TLorentzVector.h>
 
 using namespace std;
 using namespace Belle2;

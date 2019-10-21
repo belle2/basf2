@@ -11,15 +11,10 @@
  **************************************************************************/
 
 #include <dqm/modules/PhysicsObjectsDQM/IPDQMExpressRecoModule.h>
-#include <analysis/variables/ContinuumSuppressionVariables.h>
-#include <analysis/variables/VertexVariables.h>
-#include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <TLorentzVector.h>
-#include <TStyle.h>
 #include <TDirectory.h>
-#include <iostream>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

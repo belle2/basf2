@@ -15,7 +15,6 @@
 #include <boost/math/special_functions/sinc.hpp>
 #include <boost/math/tools/precision.hpp>
 
-#include <TMath.h>
 #include <TMatrixD.h>
 
 #include <cassert>

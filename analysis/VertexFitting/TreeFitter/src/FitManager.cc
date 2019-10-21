@@ -8,21 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <TMath.h>
-#include <TVector.h>
 
 #include <analysis/dataobjects/Particle.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-
-#include <analysis/VertexFitting/TreeFitter/EigenStackConfig.h>
 
 #include <analysis/VertexFitting/TreeFitter/FitManager.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/DecayChain.h>
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
-
 
 namespace TreeFitter {
 
@@ -70,7 +65,7 @@ namespace TreeFitter {
 
   bool FitManager::fit()
   {
-    const int nitermax = 10;
+    const int nitermax = 100;
     const int maxndiverging = 3;
     double dChisqConv = m_prec;
     m_chiSquare = -1;
@@ -100,7 +95,7 @@ namespace TreeFitter {
         if (m_errCode.failure()) {
           finished = true ;
           m_status = VertexStatus::Failed;
-          setExtraInfo(m_particle, "failed", 5);
+          setExtraInfo(m_particle, "failed", 1);
         } else {
           if (m_niter > 0) {
             if ((std::abs(deltachisq) / m_chiSquare < dChisqConv)) {
@@ -123,11 +118,11 @@ namespace TreeFitter {
         }
       }
       if (m_niter == nitermax && m_status != VertexStatus::Success) {
-        setExtraInfo(m_particle, "failed", 4);
+        setExtraInfo(m_particle, "failed", 3);
         m_status = VertexStatus::NonConverged;
       }
       if (!(m_fitparams->testCovariance())) {
-        setExtraInfo(m_particle, "failed", 3);
+        setExtraInfo(m_particle, "failed", 4);
         m_status = VertexStatus::Failed;
       }
     }

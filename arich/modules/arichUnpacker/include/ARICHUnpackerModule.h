@@ -17,10 +17,7 @@
 
 #include <framework/core/Module.h>
 #include <arich/modules/arichUnpacker/ARICHRawDataHeader.h>
-#include <arich/dataobjects/ARICHInfo.h>
 #include <string>
-
-#include <TH1F.h>
 
 namespace Belle2 {
 

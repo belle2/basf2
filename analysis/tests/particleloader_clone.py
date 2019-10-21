@@ -15,7 +15,7 @@ inputFile = b2test_utils.require_file('mdst12.root', 'validation')
 b2test_utils.configure_logging_for_tests()
 basf2.conditions.disable_globaltag_replay()
 basf2.set_random_seed("1337")
-fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0 -> pi+ pi-', 'Lambda0 -> p+ pi-', 'K_L0', 'gamma']
+fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0 -> pi+ pi-', 'Lambda0 -> p+ pi-', 'K_L0', 'gamma', 'n0']
 
 ###############################################################################
 # a new ParticleLoader for each fsp

@@ -8,9 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+/* Own header. */
 #include <klm/bklm/dbobjects/BKLMGeometryPar.h>
-#include <framework/gearbox/Gearbox.h>
+
+/* Belle 2 headers. */
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
@@ -42,19 +43,19 @@ void BKLMGeometryPar::read(const GearDir& content)
   m_OffsetZ = data.getLength("OffsetZ");
   m_Phi = data.getLength("Phi");
   m_NSector = data.getNumberNodes("Sectors/Forward/Sector");
-  if (m_NSector > NSECTOR) { // array-bounds check
+  if (m_NSector > BKLMElementNumbers::getMaximalSectorNumber()) { // array-bounds check
     B2FATAL("BKLMGeometryPar::read(): sectors array size exceeded:"
             << LogVar("# of sectors", m_NSector)
-            << LogVar("array size", NSECTOR));
+            << LogVar("array size", BKLMElementNumbers::getMaximalSectorNumber()));
   }
   m_SolenoidOuterRadius = data.getLength("SolenoidOuterRadius");
   m_OuterRadius = data.getLength("OuterRadius");
   m_HalfLength = data.getLength("HalfLength");
   m_NLayer = data.getNumberNodes("Layers/Layer");
-  if (m_NLayer > NLAYER) { // array-bounds check
+  if (m_NLayer > BKLMElementNumbers::getMaximalLayerNumber()) { // array-bounds check
     B2FATAL("BKLMGeometryPar::read(): layer array size exceeded:"
             << LogVar("# of layers", m_NLayer)
-            << LogVar("array size", NLAYER));
+            << LogVar("array size", BKLMElementNumbers::getMaximalLayerNumber()));
   }
 
   m_IronNominalHeight = data.getLength("Layers/IronNominalHeight");

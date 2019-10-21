@@ -18,7 +18,6 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
-#include <svd/dataobjects/SVDEventInfo.h>
 #include <TFile.h>
 #include <TText.h>
 #include <TH1F.h>
@@ -41,6 +40,7 @@ SVDClusterEvaluationTrueInfoModule::SVDClusterEvaluationTrueInfoModule() : Modul
   setDescription("This modules generates performance plots on SVD clustering.");
 
   addParam("outputFileName", m_outputFileName, "output rootfile name", std::string("SVDClusterEvaluationTrueInfo.root"));
+  addParam("SVDEventInfo", m_svdEventInfoName, "Defines the name of the EventInfo", std::string(""));
 }
 
 
@@ -62,6 +62,9 @@ void SVDClusterEvaluationTrueInfoModule::initialize()
   SVDRecoDigits.isRequired();
   SVDClusters.isRequired();
   SVDTrueHits.isRequired();
+  if (!m_storeSVDEvtInfo.isOptional(m_svdEventInfoName)) m_svdEventInfoName = "SVDEventInfoSim";
+  m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
+
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
 
@@ -213,8 +216,8 @@ void SVDClusterEvaluationTrueInfoModule::beginRun()
 
 void SVDClusterEvaluationTrueInfoModule::event()
 {
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
-  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+
+  SVDModeByte modeByte = m_storeSVDEvtInfo->getModeByte();
 
   StoreArray<SVDShaperDigit> SVDShaperDigits;
   StoreArray<SVDRecoDigit> SVDRecoDigits;

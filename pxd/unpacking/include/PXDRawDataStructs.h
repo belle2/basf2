@@ -11,9 +11,7 @@
 #pragma once
 
 #include <pxd/dataobjects/PXDErrorFlags.h>
-#include <pxd/unpacking/PXDRawDataDefinitions.h>
 
-#include <boost/cstdint.hpp>
 #include <boost/spirit/home/support/detail/endian.hpp>
 
 

@@ -27,6 +27,7 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
                        the true event time can be used instead.
                        recommended especially for tests on single tracks.
     """
+
     if SimulationMode == 1:
         # TSF
         path.add_module('CDCTriggerTSF',
@@ -50,12 +51,13 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
         path.add_module('CDCTrigger3DFitter')
         # neurotrigger
         if shortTracks:
-            B2WARNING("shortTracks=True is deprecated and no longer supported! "
-                      "Network weights will now be loaded from the database. "
-                      "If you really want to use shorttracks, load the specific network "
-                      "weights in the Neurotrigger module!")
+            B2ERROR("shortTracks=True is deprecated and no longer supported! "
+                    "Network weights will now be loaded from the database. "
+                    "If you really want to use shorttracks, load the specific network "
+                    "weights in the Neurotrigger module!")
             exit()
         path.add_module('CDCTriggerNeuro')
+
         path.add_module('CDCTriggerTrackCombiner',
                         thetaDefinition=thetaDef, zDefinition=zDef)
     elif SimulationMode == 2:

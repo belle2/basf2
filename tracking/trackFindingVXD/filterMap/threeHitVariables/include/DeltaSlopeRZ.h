@@ -13,10 +13,6 @@
 #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariable.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/SlopeRZ.h>
 
-#include <framework/geometry/B2Vector3.h>
-
-#include <math.h>
-
 #define DELTASLOPERZ_NAME DeltaSlopeRZ
 
 namespace Belle2 {

@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include <boost/python/object.hpp>
-
 #include <boost/python/list.hpp>
 #include <boost/python/dict.hpp>
 

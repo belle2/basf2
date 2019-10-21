@@ -14,7 +14,6 @@
 #include <framework/core/Module.h>
 #include <generators/koralw/KoralW.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <generators/utilities/InitialParticleGeneration.h>

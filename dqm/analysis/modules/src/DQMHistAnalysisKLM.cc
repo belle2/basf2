@@ -8,6 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* External headers. */
+#include <TClass.h>
+#include <TROOT.h>
+
 /* Belle2 headers. */
 #include <dqm/analysis/modules/DQMHistAnalysisKLM.h>
 #include <klm/dataobjects/KLMChannelIndex.h>

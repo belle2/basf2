@@ -21,8 +21,6 @@
 
 // framework aux
 #include <framework/core/ModuleParam.templateDetails.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // SimHits
@@ -37,11 +35,11 @@
 #include <simulation/dataobjects/BeamBackHit.h>
 
 // MetaData
-#include <framework/dataobjects/EventMetaData.h>
 #include <background/dataobjects/BackgroundMetaData.h>
 #include <background/dataobjects/BackgroundInfo.h>
 
 // Root
+#include <TFile.h>
 #include <TRandom3.h>
 
 //std::find

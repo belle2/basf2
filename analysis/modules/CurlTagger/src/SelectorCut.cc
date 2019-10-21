@@ -11,7 +11,6 @@
 #include <analysis/modules/CurlTagger/SelectorCut.h>
 
 //Root includes
-#include "TLorentzVector.h"
 #include "TVector3.h"
 #include "TMath.h"
 

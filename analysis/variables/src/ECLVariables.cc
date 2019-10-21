@@ -26,13 +26,9 @@
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
 //MDST
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
-
-//ROOT
-#include <TVector3.h>
 
 #include <cmath>
 #include <stack>
@@ -1475,10 +1471,6 @@ Returns number of charged tracks matched to this cluster.
         - For charged particles, this should return at least 1 (but sometimes 2 or more).
         - For neutrals, this should always return 0.
         - Returns NaN if there is no cluster.
-)DOC");
-    REGISTER_VARIABLE("clusterCRID", eclClusterConnectedRegionId, R"DOC(
-| Returns ECL cluster's connected region ID.
-| This can be used to find potentially overlapping ECL clusters.
 )DOC");
     REGISTER_VARIABLE("clusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination, R"DOC(
 Status bit to indicate if cluster has digits with waveforms that passed energy and :math:`\chi^2`

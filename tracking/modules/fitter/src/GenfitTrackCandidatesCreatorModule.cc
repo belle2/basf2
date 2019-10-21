@@ -12,7 +12,6 @@
 #include <framework/datastore/RelationArray.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <genfit/Track.h>
 
 using namespace std;
 using namespace Belle2;

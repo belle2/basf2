@@ -204,10 +204,11 @@ namespace Belle2 {
                       const Const::ParticleType& type = Const::photon);
 
     /**
-     * Constructor of a KLong from a reconstructed KLM cluster.
+     * Constructor from a reconstructed KLM cluster.
      * @param klmCluster pointer to KLMCluster object
+     * @param pdgCode PDG code (Klong by default)
      */
-    explicit Particle(const KLMCluster* klmCluster);
+    explicit Particle(const KLMCluster* klmCluster, const int pdgCode = Const::Klong.getPDGCode());
 
     /**
      * Constructor from MC particle (mdst object MCParticle)
@@ -803,7 +804,8 @@ namespace Belle2 {
           or (pdg == Const::proton.getPDGCode())
           or (pdg == Const::deuteron.getPDGCode())) {
         return ECLCluster::EHypothesisBit::c_nPhotons;
-      } else if (pdg == Const::Klong.getPDGCode()) {
+      } else if ((pdg == Const::Klong.getPDGCode())
+                 or (pdg == Const::neutron.getPDGCode())) {
         return ECLCluster::EHypothesisBit::c_neutralHadron;
       } else {
         return ECLCluster::EHypothesisBit::c_none;

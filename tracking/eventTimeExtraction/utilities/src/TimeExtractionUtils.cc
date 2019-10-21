@@ -17,7 +17,7 @@
 #include <genfit/Tools.h>
 
 #include <cdc/dataobjects/CDCRecoHit.h>
-#include <framework/logging/LogMethod.h>
+#include <framework/logging/Logger.h>
 #include <TDecompChol.h>
 
 using namespace Belle2;

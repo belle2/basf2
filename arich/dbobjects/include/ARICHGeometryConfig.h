@@ -12,9 +12,6 @@
 
 #include <framework/gearbox/GearDir.h>
 #include "TVector2.h"
-#include <G4MaterialPropertyVector.hh>
-#include <cmath>
-#include <TObject.h>
 #include <arich/dbobjects/ARICHGeoHAPD.h>
 #include <arich/dbobjects/ARICHGeoMerger.h>
 #include <arich/dbobjects/ARICHGeoCablesEnvelope.h>

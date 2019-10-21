@@ -28,7 +28,6 @@
 
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <analysis/utility/ReferenceFrame.h>
 #include <iostream>

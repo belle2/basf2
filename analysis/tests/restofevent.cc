@@ -4,20 +4,17 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 
+#include <analysis/VariableManager/Utility.h>
+#include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/utility/ReferenceFrame.h>
+
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
-#include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/Const.h>
-#include <TMatrixFSym.h>
 #include <TLorentzVector.h>
-#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
@@ -120,6 +117,44 @@ namespace {
     EXPECT_FALSE(roe->hasParticle(myParticles[10])); // B0_K_S0_pi1
     EXPECT_FALSE(roe->hasParticle(myParticles[11])); // B0_pi0_gamma0
   }
+
+  TEST_F(ROETest, useROERecoilFrame)
+  {
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
+
+    StoreArray<Particle> myParticles;
+    StoreArray<RestOfEvent> myROEs;
+    StoreObjPtr<RestOfEvent> myROEObject;
+    DataStore::Instance().setInitializeActive(true);
+    myROEObject.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+    myParticles[14]->addRelationTo(myROEs[0]);                 // Add relation to B0
+    myROEObject.assign(myROEs[0]);
+
+    PCmsLabTransform T;
+    // Recoil vector against all ROE particles
+    TLorentzVector pRecoil = T.getBeamFourMomentum() - myROEs[0]->get4Vector();
+    Particle tmp(pRecoil, 0);
+    RestFrame frame(&tmp);
+    //std::cout << "HER: " << T.getBeamParams().getHER()[0] << " LER: " << T.getBeamParams().getLER()[0] << std::endl;
+
+    const Manager::Var* var = Manager::Instance().getVariable("useROERecoilFrame(p)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(myParticles[5]), frame.getMomentum(myParticles[5]->get4Vector()).P()); // test on D0 in ROE
+    EXPECT_FLOAT_EQ(var->function(myParticles[14]), frame.getMomentum(myParticles[14]->get4Vector()).P()); // test on B0 on signal side
+    var = Manager::Instance().getVariable("useROERecoilFrame(E)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(myParticles[5]), frame.getMomentum(myParticles[5]->get4Vector()).E()); // test on D0 in ROE
+    EXPECT_FLOAT_EQ(var->function(myParticles[14]), frame.getMomentum(myParticles[14]->get4Vector()).E()); // test on B0 on signal side
+
+    DataStore::Instance().setInitializeActive(true);
+    DataStore::Instance().getEntry(myROEObject)->object = nullptr;
+    DataStore::Instance().setInitializeActive(false);
+  }
+
   TEST_F(ROETest, getParticles)
   {
     StoreArray<Particle> myParticles;

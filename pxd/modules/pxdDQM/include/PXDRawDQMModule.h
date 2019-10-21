@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <pxd/dataobjects/PXDRawHit.h>
@@ -19,7 +18,6 @@
 #include <pxd/dataobjects/PXDDAQStatus.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <string>
-//#include <map>
 #include <TH2.h>
 
 namespace Belle2 {

@@ -9,9 +9,7 @@
  **************************************************************************/
 #include <tracking/ckf/svd/filters/results/RelationSVDResultVarSet.h>
 
-#include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <framework/core/ModuleParamList.h>
 
 using namespace std;
 using namespace Belle2;

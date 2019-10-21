@@ -11,10 +11,10 @@
 
 #pragma once
 
+/* KLM headers. */
 #include <klm/bklm/dbobjects/BKLMADCThreshold.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
+#include <klm/bklm/dbobjects/BKLMElectronicsChannel.h>
 #include <klm/bklm/dbobjects/BKLMTimeWindow.h>
-#include <framework/database/DBImportObjPtr.h>
 
 namespace Belle2 {
 

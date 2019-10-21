@@ -1,20 +1,14 @@
-#include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
 
-#include <ecl/modules/eclChargedPID/ECLChargedPIDModule.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <ecl/dbobjects/ECLChargedPidPDFs.h>
 
 #include <utility>
 #include <gtest/gtest.h>
 
-#include <TH2F.h>
 #include <TF1.h>
-#include <TMath.h>
 
 namespace Belle2 {
 

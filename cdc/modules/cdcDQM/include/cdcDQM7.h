@@ -6,11 +6,6 @@
 #define CDCDQM7MODULE_H
 
 #include <framework/core/HistoModule.h>
-// add
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-//
 
 #include <vector>
 #include "TH1F.h"

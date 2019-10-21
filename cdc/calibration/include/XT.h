@@ -108,7 +108,7 @@ public:
   void  setXTParams(double p[8])
   {
     for (int i = 0; i < 8; ++i) {m_XTParam[i] = p[i];}
-    m_tmax = p[6] + 50;
+    m_tmax = p[6] + 250;
   }
   /**
    * Set Initial parameters for fitting
@@ -119,7 +119,7 @@ public:
     m_XTParam[0] = p0;     m_XTParam[1] = p1;     m_XTParam[2] = p2;
     m_XTParam[3] = p3;     m_XTParam[4] = p4;     m_XTParam[5] = p5;
     m_XTParam[6] = p6;     m_XTParam[7] = p7;
-    m_tmax = p6 + 50;
+    m_tmax = p6 + 250;
   }
 
   /**
@@ -237,7 +237,7 @@ private:
   int m_fitflag = 0;
   double m_Prob = 0; /**< Chi2 prob of fitting*/
   double m_tmin = 20; /**< lower boundary of fit range*/
-  double m_tmax = m_XTParam[6] + 50; /**< upper boundary of fit range*/
+  double m_tmax = m_XTParam[6] + 250; /**< upper boundary of fit range*/
 };
 
 void XT::FitPol5()

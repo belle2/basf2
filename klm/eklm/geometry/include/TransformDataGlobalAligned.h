@@ -10,7 +10,7 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/eklm/geometry/TransformData.h>
 
 namespace Belle2 {

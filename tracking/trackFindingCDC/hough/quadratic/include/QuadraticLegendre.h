@@ -35,6 +35,7 @@ namespace Belle2 {
             qDivisions>;
 
     public:
+      /// typedef of the templated AHitDecisionAlgorithm; used to reach methods defined in the algorithm e.g. debugLine, centerX, centerY etc.
       using DecisionAlgorithm = AHitDecisionAlgorithm;
 
       /// Constructor using the given maximal level setting the maximal values.

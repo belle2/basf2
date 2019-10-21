@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include "tracking/modules/trackSetEvaluatorVXD/BestVXDTrackCandidatesSelectorModule.h"
-#include <framework/logging/Logger.h>
 #include <vector>
 #include <numeric>
 

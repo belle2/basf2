@@ -11,10 +11,9 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
-#include <Eigen/Sparse>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
 
 namespace Belle2 {
   /// Class implementing the algorithm used for the MC based quality estimation

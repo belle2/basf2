@@ -52,7 +52,7 @@ void PXDdigiFilterModule::initialize()
   if (m_PXDDigitsName == m_PXDDigitsInsideROIName) {
     m_selectorIN.registerSubset(PXDDigits);
   } else {
-    m_selectorIN.registerSubset(PXDDigits, m_PXDDigitsInsideROIName);
+    m_selectorIN.registerSubset(PXDDigits, m_PXDDigitsInsideROIName, DataStore::c_WriteOut);
     m_selectorIN.inheritAllRelations();
   }
 

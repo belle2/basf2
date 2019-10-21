@@ -11,8 +11,9 @@
 #ifndef ARICHSIMHIT_H
 #define ARICHSIMHIT_H
 
-#include <TVector3.h>
 #include <simulation/dataobjects/SimHitBase.h>
+
+#include <TVector2.h>
 
 namespace Belle2 {
 

@@ -10,12 +10,9 @@
 
 #pragma once
 
-#include <framework/logging/Logger.h>
 #include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
 #include <pxd/dbobjects/PXDClusterShapeIndexPar.h>
 #include <pxd/dataobjects/PXDCluster.h>
-#include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/geometry/SensorInfo.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/database/DBObjPtr.h>
 #include <set>

@@ -18,7 +18,6 @@
 
 #include <analysis/VertexFitting/TreeFitter/RecoPhoton.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
-#include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
 
 #include <framework/gearbox/Const.h>
@@ -205,7 +204,6 @@ namespace TreeFitter {
     P(1, m_i3) = 1;
     P(1, m_i1) = - p_vec[m_i3] / p_vec[m_i1];
     P(2, 3) = 1; // dE/dEc
-
 
     p.getResiduals().segment(0, 3) = residual3;
 

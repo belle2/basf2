@@ -11,7 +11,7 @@ from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 import sys
 import os
 import glob

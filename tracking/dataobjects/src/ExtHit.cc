@@ -10,8 +10,6 @@
 
 #include <tracking/dataobjects/ExtHit.h>
 
-#include <framework/logging/Logger.h>
-
 #include <TMatrixD.h>
 #include <TMatrixDSym.h>
 

@@ -33,10 +33,14 @@ def command_upload(args, db=None):
         args.add_argument("payloadsfile", metavar="PAYLOADSFILE",
                           help="Testing payload storage file containing list of iovs")
         normalize_group = args.add_mutually_exclusive_group()
-        normalize_group.add_argument('--no-normalize', dest="normalize", default=True, action="store_false",
-                                     help="Don't normalize")
+        normalize_group.add_argument('--normalize', dest="normalize", default=False, action="store_true",
+                                     help="Normalize the payload files to have reproducible checksums. "
+                                     "This option should only be used if the payload files were created "
+                                     "with an older software version (before release-04)")
         normalize_group.add_argument('--normalize-name', type=str,
-                                     help="Set the file name in the root file metadata to the given value.")
+                                     help="Set the file name in the root file metadata to the given value. "
+                                     "This implicitly enables ``--normalize`` and should only be used if "
+                                     "the payload files were created with an older software version (before release-04)")
         args.add_argument("-j", type=int, default=1, dest="nprocess",
                           help="Number of concurrent connections to use for database "
                           "connection (default: %(default)s)")
@@ -55,5 +59,5 @@ def command_upload(args, db=None):
         logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE | LogInfo.TIMESTAMP)
 
     # do the upload
-    normalize = args.normalize_name if hasattr(args, 'normalize_name') else args.normalize
+    normalize = args.normalize_name if args.normalize_name is not None else args.normalize
     return 0 if db.upload(args.payloadsfile, args.tag, normalize, args.ignore_existing, args.nprocess) else 1

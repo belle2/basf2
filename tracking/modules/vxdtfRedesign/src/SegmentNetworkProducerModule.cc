@@ -11,11 +11,9 @@
 #include <tracking/modules/vxdtfRedesign/SegmentNetworkProducerModule.h>
 #include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
+#include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/VoidObserver.h>
-#include <tracking/trackFindingVXD/filterTools/ObserverCheckMCPurity.h>
-#include <tracking/trackFindingVXD/filterTools/ObserverCheckFilters.h>
-
 
 using namespace std;
 using namespace Belle2;

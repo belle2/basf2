@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include <string>
+/* C++ headers. */
 #include <ostream>
-#include <stdexcept>
+#include <string>
 
 namespace Belle2 {
   /**

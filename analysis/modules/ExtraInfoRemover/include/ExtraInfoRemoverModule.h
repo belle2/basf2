@@ -10,11 +10,7 @@
 
 #pragma once
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <analysis/dataobjects/Particle.h>
 #include <string>
-
 
 namespace Belle2 {
 

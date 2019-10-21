@@ -11,9 +11,9 @@
 // Own include
 #include <analysis/modules/FSRCorrection/BelleBremRecoveryModule.h>
 // framework aux
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/StoreArray.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -23,14 +23,10 @@
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
-#include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/ParticleCopy.h>
 
-#include <cmath>
 #include <algorithm>
 #include <TMatrixFSym.h>
 
-#include <map>
 #include <vector>
 using namespace std;
 

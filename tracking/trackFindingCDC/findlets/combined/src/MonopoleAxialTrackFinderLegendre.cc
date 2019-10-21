@@ -10,12 +10,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/MonopoleAxialTrackFinderLegendre.h>
 
-#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

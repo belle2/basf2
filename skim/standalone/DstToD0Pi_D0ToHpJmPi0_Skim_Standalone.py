@@ -17,7 +17,7 @@ from stdPi0s import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 
 
-gb2_setuprel = 'release-03-02-02'
+gb2_setuprel = 'release-04-00-00'
 set_log_level(LogLevel.INFO)
 import sys
 import os
@@ -39,7 +39,6 @@ stdPi('all', path=c3bhpath)
 stdK('all', path=c3bhpath)
 stdE('all', path=c3bhpath)
 stdMu('all', path=c3bhpath)
-stdKshorts(path=c3bhpath)
 
 from skim.charm import DstToD0PiD0ToHpJmPi0
 DstToD0PiD0ToHpJmPi0List = DstToD0PiD0ToHpJmPi0(c3bhpath)

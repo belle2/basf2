@@ -18,13 +18,9 @@
 #include <generators/phokhara/Phokhara.h>
 #include <generators/utilities/InitialParticleGeneration.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <vector>
-#include <TFile.h>
-#include <TH1D.h>
-
 
 namespace Belle2 {
 

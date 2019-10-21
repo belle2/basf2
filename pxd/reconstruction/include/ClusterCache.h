@@ -11,9 +11,7 @@
 #ifndef PXD_CLUSTERCACHE_H
 #define PXD_CLUSTERCACHE_H
 
-#include <cstring>
 #include <deque>
-#include <pxd/reconstruction/Pixel.h>
 #include <pxd/reconstruction/ClusterCandidate.h>
 
 namespace Belle2 {

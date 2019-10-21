@@ -12,8 +12,6 @@
 #include <tracking/ckf/general/findlets/LimitedOnStateApplier.dcl.h>
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
-#include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 

@@ -93,6 +93,36 @@ namespace Belle2 {
     int m_trackerhit9rt;
     //! m_trackerhit9v leafs
     int m_trackerhit9v;
+    //! m_trackerhit10id leafs
+    int m_trackerhit10id;
+    //! m_trackerhit10rt leafs
+    int m_trackerhit10rt;
+    //! m_trackerhit10v leafs
+    int m_trackerhit10v;
+    //! m_trackerhit11id leafs
+    int m_trackerhit11id;
+    //! m_trackerhit11rt leafs
+    int m_trackerhit11rt;
+    //! m_trackerhit11v leafs
+    int m_trackerhit11v;
+    //! m_trackerhit12id leafs
+    int m_trackerhit12id;
+    //! m_trackerhit12rt leafs
+    int m_trackerhit12rt;
+    //! m_trackerhit12v leafs
+    int m_trackerhit12v;
+    //! m_trackerhit13id leafs
+    int m_trackerhit13id;
+    //! m_trackerhit13rt leafs
+    int m_trackerhit13rt;
+    //! m_trackerhit13v leafs
+    int m_trackerhit13v;
+    //! m_trackerhit14id leafs
+    int m_trackerhit14id;
+    //! m_trackerhit14rt leafs
+    int m_trackerhit14rt;
+    //! m_trackerhit14v leafs
+    int m_trackerhit14v;
 
 
     //! m_validetf leafs
@@ -622,6 +652,8 @@ namespace Belle2 {
     int m_evt;
     //! m_clk leafs
     int m_clk;
+    //! m_N2DTS leafs to indicate 10 or 15 TS version
+    int m_N2DTS;
 
     /** the class title */
     ClassDef(TRGCDCTSFUnpackerStore, 1);

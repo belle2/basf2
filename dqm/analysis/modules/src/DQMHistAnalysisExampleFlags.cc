@@ -10,13 +10,9 @@
 #include <dqm/analysis/modules/DQMHistAnalysisExampleFlags.h>
 #include <TROOT.h>
 #include <TStyle.h>
-#include <TClass.h>
 
 using namespace std;
 using namespace Belle2;
-
-
-using boost::format;
 
 //-----------------------------------------------------------------
 //                 Register the Module

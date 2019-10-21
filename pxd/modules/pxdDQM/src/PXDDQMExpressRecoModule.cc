@@ -12,6 +12,8 @@
 
 #include "pxd/modules/pxdDQM/PXDDQMExpressRecoModule.h"
 
+#include <pxd/geometry/SensorInfo.h>
+#include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoTools.h>
 #include <pxd/unpacking/PXDMappingLookup.h>
@@ -19,7 +21,6 @@
 #include <boost/format.hpp>
 
 #include "TDirectory.h"
-#include "TFile.h"
 
 using namespace std;
 using boost::format;

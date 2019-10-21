@@ -1557,10 +1557,6 @@ class MasterTask(b2luigi.WrapperTask):
     num_processes = b2luigi.get_setting("basf2_processes_per_worker", default=0)
     #: directory with MC overlay background root files
     bkgfiles_dir = b2luigi.get_setting("bkgfiles_directory")
-    #: Choose whether to run basf2_mva_evaluate tasks on weightfiles.
-    # These will fail if no LaTeX is installed, but we still have our own
-    # independent validation tasks.
-    run_mva_evaluate = b2luigi.get_setting("run_mva_evaluate", default=True)
 
     def requires(self):
         """
@@ -1583,25 +1579,32 @@ class MasterTask(b2luigi.WrapperTask):
                 "truth_track_is_matched",
                 "truth"  # truth includes clones as signal
             ]:
-                yield FullTrackQEValidationPlotsTask(
-                    cdc_training_target=cdc_training_target,
+                yield FullTrackQETeacherTask(
+                    n_events_training=self.n_events_training,
                     exclude_variables=exclude_variables,
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
+                    cdc_training_target=cdc_training_target,
                 )
 
-                yield CDCQEValidationPlotsTask(
-                    training_target=cdc_training_target,
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                )
+                if b2luigi.get_setting("run_validation_tasks", default=True):
+                    yield FullTrackQEValidationPlotsTask(
+                        cdc_training_target=cdc_training_target,
+                        exclude_variables=exclude_variables,
+                        n_events_training=self.n_events_training,
+                        n_events_testing=self.n_events_testing,
+                    )
+                    yield CDCQEValidationPlotsTask(
+                        training_target=cdc_training_target,
+                        n_events_training=self.n_events_training,
+                        n_events_testing=self.n_events_testing,
+                    )
+                    yield VXDQEValidationPlotsTask(
+                        n_events_training=self.n_events_training,
+                        n_events_testing=self.n_events_testing,
+                    )
 
-                yield VXDQEValidationPlotsTask(
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                )
-
-                if self.run_mva_evaluate:
+                if b2luigi.get_setting("run_mva_evaluate", default=True):
+                    # Evaluate trained weightfiles via basf2_mva_evaluate.py on separate testdatasets
+                    # requires a latex installation to work
                     yield FullTrackQEEvaluationTask(
                         exclude_variables=exclude_variables,
                         cdc_training_target=cdc_training_target,

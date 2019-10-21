@@ -76,7 +76,6 @@ SectorMapComparer::fillSectorToTreeIndexMap(TTree* tree, std::unordered_map<std:
   std::vector<std::string> bNames = {"innerFullSecID", "centerFullSecID", "outerFullSecID"};
   std::vector<uint> bVals = {0, 0, 0}; // lets hope there is no inner sector id 0! But need to be 0 here as later no check for existance in the map for segments, so default value is used.
 
-  // decativate all branches to gain same speed
   for (uint i = 0; i < bNames.size(); i++) {
     TLeaf* l = tree->GetLeaf(bNames[i].c_str());
     if (l) {

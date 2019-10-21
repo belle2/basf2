@@ -119,10 +119,15 @@ void ChargedPidMVAModule::event()
       int jth, ip;
       auto index   = m_weightfiles_representation->getMVAWeightIdx(sigPart, theta, p, jth, ip);
 
+      // Get the cut defining the MVA category under exam (this reflects the one used in the training).
+      const auto cutstr = m_weightfiles_representation->getCuts(m_sig_pdg)->at(index);
+      std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(cutstr);
+
       B2DEBUG(11, "\t\tclusterTheta = " << theta << " [rad]");
       B2DEBUG(11, "\t\tp = " << p << " [GeV/c]");
       B2DEBUG(11, "\t\tFSRCorrected? " << static_cast<bool>(nDaughters));
       B2DEBUG(11, "\t\tweightfile idx in payload = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
+      B2DEBUG(11, "\t\tcategory cut: " << cutstr);
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
       auto nvars  = m_variables.at(index).size();
@@ -143,15 +148,23 @@ void ChargedPidMVAModule::event()
         } else {
           var = varobj->function((!nDaughters) ? particle : daughterLep);
         }
+        // Manual imputation value of -999 for NaN (undefined) variables.
+        var = (std::isnan(var)) ? -999.0 : var;
         B2DEBUG(11, "\t\t\tvar[" << ivar << "] : " << varobj->name << " = " << var);
         m_datasets.at(index)->m_input[ivar] = var;
       }
+
       auto nspecs  = m_spectators.at(index).size();
       for (unsigned int ispec(0); ispec < nspecs; ++ispec) {
         auto specobj =  m_spectators.at(index).at(ispec);
         auto spec = specobj->function((!nDaughters) ? particle : daughterLep);
         B2DEBUG(11, "\t\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
         m_datasets.at(index)->m_spectators[ispec] = spec;
+      }
+
+      if (!cut->check((!nDaughters) ? particle : daughterLep)) {
+        B2WARNING("\t\tParticle didn't pass MVA category cut, skip MVA application...");
+        continue;
       }
 
       float score = m_experts.at(index)->apply(*m_datasets.at(index))[0];
@@ -226,5 +239,3 @@ void ChargedPidMVAModule::initializeMVA()
   }
 
 }
-
-

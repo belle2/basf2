@@ -24,7 +24,7 @@ EKLMTrackMatchAlgorithm::EKLMTrackMatchAlgorithm() : CalibrationAlgorithm("EKLMT
     0.5, EKLMElementNumbers::getMaximalPlaneGlobalNumber() + 0.5);
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
   m_StripEfficiency = new KLMStripEfficiency();
-  m_file = new TFile("TrackMAtchedResult.root", "recreate");
+  m_file = new TFile("TrackMatchedResult.root", "recreate");
   m_file->cd();
 }
 

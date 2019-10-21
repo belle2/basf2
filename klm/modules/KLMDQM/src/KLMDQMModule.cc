@@ -189,8 +189,8 @@ void KLMDQMModule::initialize()
 {
   REG_HISTOGRAM
   m_BklmDigits.isRequired(m_inputDigitsName);
-  m_BklmHit1ds.isRequired();
-  m_BklmHit2ds.isRequired();
+  m_BklmHit1ds.isOptional();
+  m_BklmHit2ds.isOptional();
   m_EklmDigits.isRequired();
 }
 

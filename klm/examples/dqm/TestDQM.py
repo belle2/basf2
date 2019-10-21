@@ -9,8 +9,6 @@
 import basf2
 from daqdqm.commondqm import add_common_dqm
 
-basf2.conditions.append_globaltag('data_reprocessing_prompt_rel4_patchb')
-
 # Set the global log level
 basf2.set_log_level(basf2.LogLevel.INFO)
 

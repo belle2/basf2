@@ -43,7 +43,7 @@ namespace Belle2 {
         if empty "" no output file will be created
       @param drawLegend: if true a legend is drawn, may hide interisting parts so one can deactivate it
     */
-    void Plot(bool logScale = true, TString pdfFileName = "", bool drawLegend = true);
+    void plot(bool logScale = true, TString pdfFileName = "", bool drawLegend = true);
 
     /** Will create canvases showing statistics
       @param logScale: if true the y-axis will be log scale
@@ -51,25 +51,25 @@ namespace Belle2 {
         if empty "" no output file will be created
       @param drawLegend: if true a legend is drawn, may hide interisting parts so one can deactivate it
     */
-    void PlotSectorStats(bool logScale = true, TString pdfFileName = "", bool drawLegend = true);
+    void plotSectorStats(bool logScale = true, TString pdfFileName = "", bool drawLegend = true);
 
     /// runs the comparison for all filters (and only the filters) in the sectormap files
-    void CompareMaps(TString setup, bool unmatchedEntries = false);
+    void compareMaps(TString setup, bool unmatchedEntries = false);
 
     /// lists all setups of sectormaps included in the two files
-    void ShowSetups()
+    void showSetups()
     {
       std::cout << std::endl;
-      ShowSetups(m_SMFileName_first);
+      showSetups(m_SMFileName_first);
       std::cout << std::endl;
-      ShowSetups(m_SMFileName_second);
+      showSetups(m_SMFileName_second);
     }
 
     /// lists all sector map setups in the specified file
-    void ShowSetups(TString sectorMapFileName);
+    void showSetups(TString sectorMapFileName);
 
     /// lists the names of the files which are used
-    void ShowFiles()
+    void showFiles()
     {
       B2INFO("Following files will be compared:");
       B2INFO("=================================");
@@ -86,27 +86,27 @@ namespace Belle2 {
       @param map: reference to map mapping from fullsecid to number of times
       @param layer, ladder, sensor, sector: layer, ladder, sensor, sector number, if -1 it will be summed over
     */
-    uint CountConnections(const std::unordered_map<uint, uint>& map,  int layer = -1, int ladder = -1, int sensor = -1,
+    uint countConnections(const std::unordered_map<uint, uint>& map,  int layer = -1, int ladder = -1, int sensor = -1,
                           int sector = -1);
 
     /** I was too lacy to implement a proper hash function, so I convert the three numbers into a string and use the string as hash for the map
       @param l1, l2, l3: just three numbers of type long
       @return: a string which combines the three numbers which can be used as hash as the hash function for std::string already exists
     */
-    std::string GetHash(long l1, long l2, long l3);
+    std::string getHash(long l1, long l2, long l3);
 
     /** helper function that returns a list of names for all trees contained in the TDirectory including sub-directories
       @param aDir: a root directory pointer (e.g. TFile *)
       @param listOfTrees: this vector will be filled with the names of the tree (NOTE: the name contains the full path (including file name))
     */
-    void FindTrees(TDirectory* aDir, std::vector<std::string>&  listOfTrees);
+    void findTrees(TDirectory* aDir, std::vector<std::string>&  listOfTrees);
 
     /** automatically sets the TLeaf addresses for a tree. Currently only TLeafI and TLeafD are supported
         @param t: the tree for setting the addresses
         @param filterVals: the targets for the TLeafD addresses, will be filled in the function
         @param secIDVals: the targets for the TLeafI addresses, will be filled in the function
     */
-    void SetLeafAddresses(TTree* t, std::unordered_map<std::string, double>& filterVals,
+    void setLeafAddresses(TTree* t, std::unordered_map<std::string, double>& filterVals,
                           std::unordered_map<std::string, uint>& SecIDVals);
 
     /**
@@ -114,17 +114,17 @@ namespace Belle2 {
       @param tree: the tree to be mapped
       @param map: the map which will be filled in the function
     */
-    void FillSectorToTreeIndexMap(TTree* tree, std::unordered_map<std::string, long>& map);
+    void fillSectorToTreeIndexMap(TTree* tree, std::unordered_map<std::string, long>& map);
 
     /** makes the comparison of two trees, and fills histograms and certain maps
     @param t_first: first tree
     @param t_second: secdon tree
     @param unmatchedEntries: if true only the unmatched entries will be filled (only for the first tree)
     */
-    void CompareTrees(TTree* t_first, TTree* t_second, bool unmatchedEntries = false);
+    void compareTrees(TTree* t_first, TTree* t_second, bool unmatchedEntries = false);
 
     /** helper that clears all the maps used*/
-    void ClearMaps()
+    void clearMaps()
     {
       m_histo_map_first.clear();
       m_histo_map_second.clear();

@@ -29,9 +29,9 @@ SectorMapComparer::SectorMapComparer(const std::string& SMFileFirst,
 
 
 std::string
-SectorMapComparer::GetHash(long l1, long l2, long l3)
+SectorMapComparer::getHash(long l1, long l2, long l3)
 {
-  std::string str = std::to_string(l1) + std::to_string(l2) + std::to_string(l3);
+  std::string str = std::to_string(l1) + "-" + std::to_string(l2) + "-" + std::to_string(l3);
   return str;
 }
 
@@ -40,7 +40,7 @@ SectorMapComparer::GetHash(long l1, long l2, long l3)
 // sets the addresses of the leafes
 // assumes each leaf name is unique! (Not sure if root takes care for that)
 void
-SectorMapComparer::SetLeafAddresses(TTree* t, std::unordered_map<std::string, double>& filterVals,
+SectorMapComparer::setLeafAddresses(TTree* t, std::unordered_map<std::string, double>& filterVals,
                                     std::unordered_map<std::string, uint>& SecIDVals)
 {
   TObjArray* leafList = t->GetListOfLeaves();
@@ -70,7 +70,7 @@ SectorMapComparer::SetLeafAddresses(TTree* t, std::unordered_map<std::string, do
 // returns a map of sector combinations to the position in the branch
 // WARNING: this messes up the addresses!!!!!!!
 void
-SectorMapComparer::FillSectorToTreeIndexMap(TTree* tree, std::unordered_map<std::string, long>& map)
+SectorMapComparer::fillSectorToTreeIndexMap(TTree* tree, std::unordered_map<std::string, long>& map)
 {
   // the branchnames which store the sectorIDs
   std::vector<std::string> bNames = {"innerFullSecID", "centerFullSecID", "outerFullSecID"};
@@ -87,7 +87,7 @@ SectorMapComparer::FillSectorToTreeIndexMap(TTree* tree, std::unordered_map<std:
   // now loop to create the map
   for (long i = 0; i < tree->GetEntries(); i++) {
     tree->GetEntry(i);
-    std::string hash = GetHash(bVals[0], bVals[1], bVals[2]);
+    std::string hash = getHash(bVals[0], bVals[1], bVals[2]);
     //std::cout << hash << " " << i << std::endl;
     map[hash] = i;
   }
@@ -101,27 +101,22 @@ SectorMapComparer::FillSectorToTreeIndexMap(TTree* tree, std::unordered_map<std:
 
 // actually compares the trees (segment and triplet filters)
 void
-SectorMapComparer::CompareTrees(TTree* t_first, TTree* t_second, bool unmatchedEntries)
+SectorMapComparer::compareTrees(TTree* t_first, TTree* t_second, bool unmatchedEntries)
 {
-
-  // clear the maps to be able to reuse them
-  // TODO: acutally this is not needed as long as all trees used here have different branch names
-  //ClearMaps();
-
 
   // index the second tree
   std::unordered_map<std::string, long> indexmap_t_second;
   // WARNING: this messes with leaf addresses of the sector ids
-  FillSectorToTreeIndexMap(t_second, indexmap_t_second);
+  fillSectorToTreeIndexMap(t_second, indexmap_t_second);
 
 
   std::unordered_map<std::string, double> vals_t_first;
   std::unordered_map<std::string, uint> ids_t_first;
-  SetLeafAddresses(t_first, vals_t_first, ids_t_first);
+  setLeafAddresses(t_first, vals_t_first, ids_t_first);
 
   std::unordered_map<std::string, double> vals_t_second;
   std::unordered_map<std::string, uint> ids_t_second;
-  SetLeafAddresses(t_second, vals_t_second, ids_t_second);
+  setLeafAddresses(t_second, vals_t_second, ids_t_second);
 
 
   // identify Three hit combinations by existens of the branch centerID
@@ -137,7 +132,6 @@ SectorMapComparer::CompareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
   for (TObject* o : *leafList) {
     TLeaf* l_first = (TLeaf*)o;
     // no histograms for the sector ids
-    // TODO: maybe histograms with number of friends for certain sectors are interesting es well
     TString leafName = l_first->GetName();
     if (leafName.Contains("FullSecID")) continue;
 
@@ -180,7 +174,7 @@ SectorMapComparer::CompareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
   for (long i = 0; i < t_first->GetEntries(); i++) {
     t_first->GetEntry(i);
 
-    std::string hash = GetHash(ids_t_first["innerFullSecID"], ids_t_first["centerFullSecID"], ids_t_first["outerFullSecID"]);
+    std::string hash = getHash(ids_t_first["innerFullSecID"], ids_t_first["centerFullSecID"], ids_t_first["outerFullSecID"]);
 
 
     // count all connections
@@ -206,7 +200,7 @@ SectorMapComparer::CompareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
     // NOTE: in case unmatchedEntries==true the values in the the second tree do not make any sense, so not fill any histograms with them
     for (TObject* o : *leafList) {
       TString leafName = o->GetName();
-      // TODO: find a better way to destinguis the secid leaves from the others
+      // TODO: find a better way to destinguish the secid leaves from the others
       if (leafName.Contains("FullSecID")) continue;
       m_histo_map_first[ leafName.Data() ].Fill(vals_t_first[leafName.Data()]);
       if (!unmatchedEntries) {
@@ -228,7 +222,7 @@ SectorMapComparer::CompareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
 }
 
 void
-SectorMapComparer::ShowSetups(TString secmapFileName)
+SectorMapComparer::showSetups(TString secmapFileName)
 {
   TFile* f = TFile::Open(secmapFileName);
   if (!f->IsOpen()) {
@@ -262,7 +256,7 @@ SectorMapComparer::ShowSetups(TString secmapFileName)
 // fills the listOfTrees with the names of all trees in this directory (including their full root-path)
 // loops recursively over all subdirectories
 void
-SectorMapComparer::FindTrees(TDirectory* aDir, std::vector<std::string>&  listOfTrees)
+SectorMapComparer::findTrees(TDirectory* aDir, std::vector<std::string>&  listOfTrees)
 {
   TList* keys = aDir->GetListOfKeys();
   for (TObject* akey : *keys) {
@@ -271,7 +265,7 @@ SectorMapComparer::FindTrees(TDirectory* aDir, std::vector<std::string>&  listOf
     TObject* o = aDir->Get(akey->GetName());
 
 
-    if (o->InheritsFrom(TDirectory::Class())) FindTrees((TDirectory*)o, listOfTrees);
+    if (o->InheritsFrom(TDirectory::Class())) findTrees((TDirectory*)o, listOfTrees);
     if (o->InheritsFrom(TTree::Class())) {
       listOfTrees.emplace_back(std::string(aDir->GetPath()) + std::string("/") + std::string(o->GetName()));
     }
@@ -281,7 +275,7 @@ SectorMapComparer::FindTrees(TDirectory* aDir, std::vector<std::string>&  listOf
 
 
 void
-SectorMapComparer::Plot(bool logScale, TString pdfFileName, bool drawLegend)
+SectorMapComparer::plot(bool logScale, TString pdfFileName, bool drawLegend)
 {
 
   if (!m_isCompared) {
@@ -333,7 +327,7 @@ SectorMapComparer::Plot(bool logScale, TString pdfFileName, bool drawLegend)
 
 
 void
-SectorMapComparer::CompareMaps(TString setupName, bool unmatchedEntries)
+SectorMapComparer::compareMaps(TString setupName, bool unmatchedEntries)
 {
   B2INFO("comparing SectorMaps in the following files");
   B2INFO("first:  " << m_SMFileName_first);
@@ -352,10 +346,10 @@ SectorMapComparer::CompareMaps(TString setupName, bool unmatchedEntries)
 
   // get the list of trees from the first file (for second file assume same trees)
   std::vector<std::string> listOfTrees;
-  FindTrees(f_first, listOfTrees);
+  findTrees(f_first, listOfTrees);
 
   // clear the maps, else old results will be mixed with this run
-  ClearMaps();
+  clearMaps();
 
   for (const std::string& tname_first : listOfTrees) {
 
@@ -391,7 +385,7 @@ SectorMapComparer::CompareMaps(TString setupName, bool unmatchedEntries)
       continue;
     }
 
-    CompareTrees(t_first, t_second, unmatchedEntries);
+    compareTrees(t_first, t_second, unmatchedEntries);
   }
 
   f_first->Close();
@@ -402,7 +396,7 @@ SectorMapComparer::CompareMaps(TString setupName, bool unmatchedEntries)
 
 
 uint
-SectorMapComparer::CountConnections(const std::unordered_map<uint, uint>& map, int layer, int ladder, int sensor, int sector)
+SectorMapComparer::countConnections(const std::unordered_map<uint, uint>& map, int layer, int ladder, int sensor, int sector)
 {
   uint result = 0;
   for (const auto& entry : map) {
@@ -413,7 +407,6 @@ SectorMapComparer::CountConnections(const std::unordered_map<uint, uint>& map, i
     if (sensor >= 0 && fullSID.getVxdID().getSensorNumber() != sensor) continue;
     if (sector >= 0 && fullSID.getSecID() != sector) continue;
 
-    // debug
     result += entry.second;
   }
   return result;
@@ -421,7 +414,7 @@ SectorMapComparer::CountConnections(const std::unordered_map<uint, uint>& map, i
 
 
 void
-SectorMapComparer::PlotSectorStats(bool logScale, TString pdfFileName, bool drawLegend)
+SectorMapComparer::plotSectorStats(bool logScale, TString pdfFileName, bool drawLegend)
 {
   if (!m_isCompared) {
     B2WARNING("You need to run SectorMapComparer::CompareMaps before this function!");
@@ -447,10 +440,10 @@ SectorMapComparer::PlotSectorStats(bool logScale, TString pdfFileName, bool draw
 
     // the bin is the same for all
     int bin = h_2hits.FindBin(ilayer);
-    h_2hits.SetBinContent(bin, CountConnections(m_map_N2HitCombs, ilayer, -1, -1, -1));
-    h_2hits_matched.SetBinContent(bin, CountConnections(m_map_N2HitCombs_matched, ilayer, -1, -1, -1));
-    h_3hits.SetBinContent(bin, CountConnections(m_map_N3HitCombs, ilayer, -1, -1, -1));
-    h_3hits_matched.SetBinContent(bin, CountConnections(m_map_N3HitCombs_matched, ilayer, -1, -1, -1));
+    h_2hits.SetBinContent(bin, countConnections(m_map_N2HitCombs, ilayer, -1, -1, -1));
+    h_2hits_matched.SetBinContent(bin, countConnections(m_map_N2HitCombs_matched, ilayer, -1, -1, -1));
+    h_3hits.SetBinContent(bin, countConnections(m_map_N3HitCombs, ilayer, -1, -1, -1));
+    h_3hits_matched.SetBinContent(bin, countConnections(m_map_N3HitCombs_matched, ilayer, -1, -1, -1));
   }
 
   TCanvas* can = new TCanvas("secStats", "secStats");
@@ -504,8 +497,6 @@ SectorMapComparer::PlotSectorStats(bool logScale, TString pdfFileName, bool draw
     } else {
       B2WARNING("No sensors found in layer " << i);
     }
-    // debug
-    std::cout << "N sensors on L" << i << " = " << nSensors2Hits << " " << nSensors3Hits << std::endl;
   }
 
   TCanvas* can2 = new TCanvas("ConPerSensor", "Connections per sensor");

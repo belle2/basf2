@@ -76,7 +76,9 @@ namespace Belle2 {
      * And the second track with high probability is in opposite section (because we choosed events with 2trks)
      * If it is so, calculate efficiency in opposite section
      */
-    std::pair<bool, bool> trackCheck(int number_of_required_hits) const;
+    void trackCheck(
+      bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()],
+      int requiredHits) const;
 
     /**
      *  Matching of digits with ext hits
@@ -99,6 +101,12 @@ namespace Belle2 {
 
     /** Muon list name. If empty, use tracks. */
     std::string m_MuonListName;
+
+    /**
+     * Whether to use standalone track selection.
+     * Always turn this off for cosmic data.
+     */
+    bool m_StandaloneTrackSelection;
 
     /** Digits. */
     StoreArray<EKLMDigit> m_digits;

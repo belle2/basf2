@@ -43,6 +43,9 @@ EKLMTrackMatchCollectorModule::EKLMTrackMatchCollectorModule() :
   setDescription("Module for EKLM strips efficiency (data collection).");
   addParam("MuonListName", m_MuonListName,
            "Muon list name. If empty, use tracks.", std::string("mu+:all"));
+  addParam("StandaloneTrackSelection", m_StandaloneTrackSelection,
+           "Whether to use standalone track selection."
+           " Always turn this off for cosmic data.", true);
   addParam("AllowedDistance1D", m_AllowedDistance1D,
            "Max distance in strips number to 1D hit from extHit to be still matched (default 8 strips)", double(8));
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -97,22 +100,21 @@ std::tuple<int, int, int, int, int, int> EKLMTrackMatchCollectorModule::checkExt
   return std::make_tuple(copyid, idSection, idLayer, idSector, idPlane, idStrip);
 }
 
-std::pair<bool, bool> EKLMTrackMatchCollectorModule::trackCheck(int number_of_required_hits) const
+void EKLMTrackMatchCollectorModule::trackCheck(
+  bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()],
+  int requiredHits) const
 {
-  // Map to calc number of hits
-  // Forward - 2, backward - 1
-  bool mark_forward = false;
-  bool mark_backward = false;
-
-  std::map<int, int> section_hits = { {1, 0}, {2, 0} };
-  for (auto hit_ : m_hit2ds) {
-    section_hits[hit_.getSection()]++;
+  int sectionHits[EKLMElementNumbers::getMaximalSectionNumber()];
+  for (int i = 0; i < EKLMElementNumbers::getMaximalSectionNumber(); ++i) {
+    trackSelected[i] = false;
+    sectionHits[i] = false;
   }
-
-  if (section_hits[1] > number_of_required_hits) mark_forward = true;
-  if (section_hits[2] > number_of_required_hits) mark_backward = true;
-
-  return std::make_pair(mark_forward, mark_backward);
+  for (const EKLMHit2d& hit : m_hit2ds)
+    sectionHits[hit.getSection() - 1]++;
+  if (sectionHits[EKLMElementNumbers::c_BackwardSection - 1] > requiredHits)
+    trackSelected[EKLMElementNumbers::c_ForwardSection - 1] = true;
+  if (sectionHits[EKLMElementNumbers::c_ForwardSection - 1] > requiredHits)
+    trackSelected[EKLMElementNumbers::c_BackwardSection - 1] = true;
 }
 
 bool EKLMTrackMatchCollectorModule::digitsMatching(const ExtHit& ext_hit, double allowed_distance) const
@@ -162,8 +164,10 @@ void EKLMTrackMatchCollectorModule::collect()
 
 void EKLMTrackMatchCollectorModule::collectDataTrack(const Track* track)
 {
-// Variables to mark possibility of using track for efficiency study
-  auto [mark_forward, mark_backward] = trackCheck(5);
+  bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()] =
+  {true, true};
+  if (m_StandaloneTrackSelection)
+    trackCheck(trackSelected, 5);
 
   TH1F* MatchedDigitsInPlane;
   MatchedDigitsInPlane = getObjectPtr<TH1F>("MatchedDigitsInPlane");
@@ -179,13 +183,7 @@ void EKLMTrackMatchCollectorModule::collectDataTrack(const Track* track)
 
     int planeNum = m_ElementNumbers->planeNumber(idSection, idLayer, idSector, idPlane);
 
-    if (idSection == 2 && mark_forward) {
-      if (digitsMatching(ext_hit, m_AllowedDistance1D)) {
-        MatchedDigitsInPlane->Fill(planeNum);
-      }
-      AllExtHitsInPlane->Fill(planeNum);
-
-    } else if (idSection == 1 && mark_backward) {
+    if (trackSelected[idSection - 1]) {
       if (digitsMatching(ext_hit, m_AllowedDistance1D)) {
         MatchedDigitsInPlane->Fill(planeNum);
       }

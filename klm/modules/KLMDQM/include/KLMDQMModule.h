@@ -11,9 +11,10 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dataobjects/BKLMHit1d.h>
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMSectorArrayIndex.h>

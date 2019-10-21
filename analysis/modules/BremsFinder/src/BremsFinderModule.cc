@@ -29,6 +29,8 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
+#include <analysis/variables/ECLVariables.h>
+
 #include <cmath>
 #include <algorithm>
 #include <TMatrixFSym.h>
@@ -276,6 +278,7 @@ namespace Belle2 {
       TMatrixFSym corLepMatrix(lepErrorMatrix);
 
       bool bremsGammaFound = false;
+      double bremsGammaEnergySum = 0.0;
       //Now, if there are any, add the brems photons as daughters as well. As before, we distinguish between the multiple and only one brems photon cases
       if (selectedGammas.size() > 0) {
         bremsGammaFound = true;
@@ -286,6 +289,7 @@ namespace Belle2 {
           std::string extraInfoName = "bremsWeightWithPhoton" + std::to_string(photonIndex);
           correctedLepton.addExtraInfo(extraInfoName, bremsPair.first);
           photonIndex++;
+          bremsGammaEnergySum += Variable::eclClusterE(bremsGamma);
 
           const TMatrixFSym& gammaErrorMatrix = bremsGamma->getMomentumVertexErrorMatrix();
           for (int irow = 0; irow <= 3; irow++) {
@@ -303,6 +307,7 @@ namespace Belle2 {
       correctedLepton.setVertex(lepton->getVertex());
       correctedLepton.setPValue(lepton->getPValue());
       correctedLepton.addExtraInfo("bremsCorrected", float(bremsGammaFound));
+      correctedLepton.addExtraInfo("bremsCorrectedPhotonEnergy", bremsGammaEnergySum);
 
       // add the mc relation
       Particle* newLepton = particles.appendNew(correctedLepton);

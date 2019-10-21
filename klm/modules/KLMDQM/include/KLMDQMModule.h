@@ -98,9 +98,6 @@ namespace Belle2 {
     /** Directory for BKLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryNameBKLM;
 
-    /** Name of BKLMDigit store array. */
-    std::string m_inputDigitsName;
-
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;
 

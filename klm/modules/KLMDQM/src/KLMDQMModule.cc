@@ -43,8 +43,6 @@ KLMDQMModule::KLMDQMModule() :
   addParam("histogramDirectoryNameBKLM", m_HistogramDirectoryNameBKLM,
            "Directory for BKLM DQM histograms in ROOT file.",
            std::string("BKLM"));
-  addParam("inputDigitsName", m_inputDigitsName,
-           "Name of BKLMDigit store array", std::string(""));
   m_ChannelArrayIndex = &(KLMChannelArrayIndex::Instance());
   m_SectorArrayIndex = &(KLMSectorArrayIndex::Instance());
   m_ElementNumbers = &(KLMElementNumbers::Instance());
@@ -75,11 +73,8 @@ void KLMDQMModule::defineHistoEKLM()
 
 void KLMDQMModule::defineHistoBKLM()
 {
-
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir(m_HistogramDirectoryNameBKLM.c_str())->cd();
-
-
   m_bklmSectorLayerPhi = new TH1F("SectorLayerPhi", "Sector and layer number occupancy for phi-readout hits",
                                   240, 0.0, 239.0);
   m_bklmSectorLayerPhi->GetXaxis()->SetTitle("sector*15 + layer (0..120 = backward, 120..240 = section)");
@@ -188,7 +183,7 @@ void KLMDQMModule::defineHisto()
 void KLMDQMModule::initialize()
 {
   REG_HISTOGRAM
-  m_BklmDigits.isRequired(m_inputDigitsName);
+  m_BklmDigits.isRequired();
   m_BklmHit1ds.isOptional();
   m_BklmHit2ds.isOptional();
   m_EklmDigits.isRequired();

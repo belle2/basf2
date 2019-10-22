@@ -53,6 +53,9 @@ BtubeCreatorModule::BtubeCreatorModule() : Module(),
   addParam("decayString", m_decayString,
            "decay string of the mother particle, the selected daughter specifies which daughter will be used as reference to create Btube",
            string(""));
+  addParam("associateTo", m_associateToListName,
+           "name of the particle you want the Btube to be asociated to as a relationship object. To associate Btube with the selected daughter, use \"SelectedDaughter\". Default is \"OtherDaughter\" ",
+           string("otherB"));
   addParam("confidenceLevel", m_confidenceLevel,
            "required confidence level of fit to keep particles in the list. Note that even with confidenceLevel == 0.0, errors during the fit might discard Particles in the list. confidenceLevel = -1 if an error occurs during the fit",
            0.);
@@ -78,6 +81,10 @@ void BtubeCreatorModule::initialize()
   int nProducts = m_decaydescriptor.getNDaughters();
   if (nProducts != 2)
     B2ERROR("BtubeCreatorModule: decay string should contain only two daughters");
+  if (!(m_associateToListName == "OtherDaughter" || m_associateToListName == "SelectedDaughter")) {
+    B2ERROR("Invalid option for associateTo parameter");
+  }
+
 }
 
 void BtubeCreatorModule::event()
@@ -241,29 +248,55 @@ void BtubeCreatorModule::event()
       tubecreatorBCopy->setMomentumVertexErrorMatrix(errNew);
 
       Btube* tubeconstraint = tubeArray.appendNew(Btube());
-      otherB->addRelationTo(tubeconstraint);
+      if (m_associateToListName == "OtherDaughter") {
+        otherB->addRelationTo(tubeconstraint);
+      }
+      if (m_associateToListName == "SelectedDaughter") {
+        tubecreatorB->addRelationTo(tubeconstraint);
+      }
+
       tubeconstraint->setTubeCenter(tubecreatorBOriginpos);
       tubeconstraint->setTubeMatrix(tubeMat);
       tubeconstraint->setTubeCenterErrorMatrix(tubeMatCenterError);
 
-      otherB->writeExtraInfo("TubePosX", tubecreatorBCopy->getVertex()[0]);
-      otherB->writeExtraInfo("TubePosY", tubecreatorBCopy->getVertex()[1]);
-      otherB->writeExtraInfo("TubePosZ", tubecreatorBCopy->getVertex()[2]);
+      if (m_associateToListName == "OtherDaughter") {
+        otherB->writeExtraInfo("TubePosX", tubecreatorBCopy->getVertex()[0]);
+        otherB->writeExtraInfo("TubePosY", tubecreatorBCopy->getVertex()[1]);
+        otherB->writeExtraInfo("TubePosZ", tubecreatorBCopy->getVertex()[2]);
 
-      otherB->writeExtraInfo("TubeCov00", pvNew(0, 0));
-      otherB->writeExtraInfo("TubeCov01", pvNew(0, 1));
-      otherB->writeExtraInfo("TubeCov02", pvNew(0, 2));
-      otherB->writeExtraInfo("TubeCov10", pvNew(1, 0));
-      otherB->writeExtraInfo("TubeCov11", pvNew(1, 1));
-      otherB->writeExtraInfo("TubeCov12", pvNew(1, 2));
-      otherB->writeExtraInfo("TubeCov20", pvNew(2, 0));
-      otherB->writeExtraInfo("TubeCov21", pvNew(2, 1));
-      otherB->writeExtraInfo("TubeCov22", pvNew(2, 2));
+        otherB->writeExtraInfo("TubeCov00", pvNew(0, 0));
+        otherB->writeExtraInfo("TubeCov01", pvNew(0, 1));
+        otherB->writeExtraInfo("TubeCov02", pvNew(0, 2));
+        otherB->writeExtraInfo("TubeCov10", pvNew(1, 0));
+        otherB->writeExtraInfo("TubeCov11", pvNew(1, 1));
+        otherB->writeExtraInfo("TubeCov12", pvNew(1, 2));
+        otherB->writeExtraInfo("TubeCov20", pvNew(2, 0));
+        otherB->writeExtraInfo("TubeCov21", pvNew(2, 1));
+        otherB->writeExtraInfo("TubeCov22", pvNew(2, 2));
 
-      otherB->writeExtraInfo("TubeDirX", v4FinalNew.Px());
-      otherB->writeExtraInfo("TubeDirY", v4FinalNew.Py());
-      otherB->writeExtraInfo("TubeDirZ", v4FinalNew.Pz());
+        otherB->writeExtraInfo("TubeDirX", v4FinalNew.Px());
+        otherB->writeExtraInfo("TubeDirY", v4FinalNew.Py());
+        otherB->writeExtraInfo("TubeDirZ", v4FinalNew.Pz());
+      }
+      if (m_associateToListName == "SelectedDaughter") {
+        tubecreatorB->writeExtraInfo("TubePosX", tubecreatorBCopy->getVertex()[0]);
+        tubecreatorB->writeExtraInfo("TubePosY", tubecreatorBCopy->getVertex()[1]);
+        tubecreatorB->writeExtraInfo("TubePosZ", tubecreatorBCopy->getVertex()[2]);
 
+        tubecreatorB->writeExtraInfo("TubeCov00", pvNew(0, 0));
+        tubecreatorB->writeExtraInfo("TubeCov01", pvNew(0, 1));
+        tubecreatorB->writeExtraInfo("TubeCov02", pvNew(0, 2));
+        tubecreatorB->writeExtraInfo("TubeCov10", pvNew(1, 0));
+        tubecreatorB->writeExtraInfo("TubeCov11", pvNew(1, 1));
+        tubecreatorB->writeExtraInfo("TubeCov12", pvNew(1, 2));
+        tubecreatorB->writeExtraInfo("TubeCov20", pvNew(2, 0));
+        tubecreatorB->writeExtraInfo("TubeCov21", pvNew(2, 1));
+        tubecreatorB->writeExtraInfo("TubeCov22", pvNew(2, 2));
+
+        tubecreatorB->writeExtraInfo("TubeDirX", v4FinalNew.Px());
+        tubecreatorB->writeExtraInfo("TubeDirY", v4FinalNew.Py());
+        tubecreatorB->writeExtraInfo("TubeDirZ", v4FinalNew.Pz());
+      }
     }
     if (!ok0) toRemove.push_back(particle->getArrayIndex());
   }

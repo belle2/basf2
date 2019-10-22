@@ -1087,7 +1087,6 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
       trackRep->getPosMomCov(firstState, lastPosition, lastMomentum, lastCov);
       lastMomentum *= -1.0; // extrapolate backwards instead of forwards
       extState.isCosmic = true;
-      extState.pdgCode = -extState.pdgCode; // flip charge for back-propagation; otherwise, it curls the wrong way in B field
       extState.tof = firstState.getTime(); // DIVOT: must be revised when IP profile (reconstructed beam spot) become available!
     }
 

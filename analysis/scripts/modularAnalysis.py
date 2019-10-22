@@ -1721,7 +1721,14 @@ def findMCDecay(
     path=None,
 ):
     """
-    The MCDecayFinder module is buggy at the moment. Not to be used.
+    Finds and creates Particle corresponding to a given decay string.
+    The decay string is required to describe correctly what you want.
+    In the case of inclusive decays, you can use :ref:`Grammar_for_custom_MCMatching`
+
+    @param list_name The output particle list name
+    @param decay     The decay string which you want
+    @param writeOut  Whether `RootOutput` module should save the created ``outputList``
+    @param path      modules are added to this path
     """
 
     decayfinder = register_module('MCDecayFinder')

@@ -17,6 +17,8 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/EvtPDLUtil.h>
 
+#include <analysis/utility/MCMatching.h>
+
 #include <string>
 #include <memory>
 
@@ -131,7 +133,14 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   }
 
   // Get daughters of MCParticle
-  const vector<MCParticle*> daughtersP = mcp->getDaughters();
+  vector<const MCParticle*> daughtersP;
+  if (d->isIgnoreIntermediate()) {
+    appendParticles(mcp, daughtersP);
+  } else {
+    const vector<MCParticle*>& tmpDaughtersP = mcp->getDaughters();
+    for (auto daug : tmpDaughtersP)
+      daughtersP.push_back(daug);
+  }
   int nDaughtersP = daughtersP.size();
   // Create index for MCParticle daughter list
   // The index of matched daughters will be then removed later from this list.
@@ -139,15 +148,9 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   daughtersPIndex.reserve(nDaughtersP);
   for (int i = 0; i < nDaughtersP; i++) daughtersPIndex.push_back(i);
 
-  // 1) if radiated photons are to be ignored, the MCParticle must
-  // have at least as many daughters as the decaydescriptor
-  // 2) if radiated photons are included the number of daughters has to be equal!
-  bool isIgnoreRadiatedPhotons = d->isIgnoreRadiatedPhotons();
-  if (isIgnoreRadiatedPhotons && nDaughtersD > nDaughtersP) {
+  // The MCParticle must have at least as many as daughters as the decaydescriptor
+  if (nDaughtersD > nDaughtersP) {
     B2DEBUG(10, "DecayDescriptor has more daughters than MCParticle!");
-    return decay;
-  } else if (!isIgnoreRadiatedPhotons && nDaughtersD != nDaughtersP) {
-    B2DEBUG(10, "DecayDescriptor must have same number of daughters as MCParticle!");
     return decay;
   }
 
@@ -164,46 +167,35 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
       daughtersPIndex.erase(itDP);
       break;
     }
-    // Could this daughter from the DecayDescriptor be matched?
     if (!isMatchDaughter) {
       return decay;
-      /*
-      // if allowed, try to skip intermediate resonance!
-      bool isIgnoreResonances = false;
-      if (!isIgnoreResonances) return decay;
-      for (vector<int>::iterator itDP1 = daughtersPIndex.begin(); itDP1 != daughtersPIndex.end(); ++itDP1) {
-          const vector<MCParticle*> daughtersP2 = daughtersP[*itDP1]->getDaughters();
-          int nDaughtersP2 = daughtersP2.size();
-          // Create index for MCParticle daughter list
-          // The index of matched daughters will be then removed later from this list.
-          vector<int> daughtersPIndex2;
-          for (int i=0; i<nDaughtersP2; i++) daughtersPIndex.push_back(i);
-          for (vector<int>::iterator itDP2 = daughtersPIndex.begin(); itDP2 != daughtersPIndex.end(); ++itDP2) {
-              DecayTree<MCParticle>* daughter = match(daughtersP2[*itDP2], d.getDaughter(iDD), isCC);
-              if (!daughter->getObj()) continue;
-              // Matching daughter found, remove it from list of unmatched particle daughters
-              decay->append(daughter);
-              isMatchDaughter = true;
-              daughtersPIndex2.erase(itDP2);
-              break;
-          }
-      */
     }
-
   }
+
   // Ok, it seems that everything from the DecayDescriptor could be matched.
   // If the decay is NOT INCLUSIVE,  no unmatched MCParticles should be left
-  bool isInclusive = (d->isIgnoreMassive() or d->isIgnoreNeutrino() or d->isIgnoreGamma());
+  bool isInclusive = (d->isIgnoreMassive() and d->isIgnoreNeutrino() and d->isIgnoreGamma() and d->isIgnoreRadiatedPhotons());
   if (!isInclusive) {
-    B2DEBUG(10, "Decay is not inclusive, check for left over MCParticles!\n");
+    B2DEBUG(10, "Check for left over MCParticles!\n");
     for (int& itDP : daughtersPIndex) {
-      // Check if additional photons are to be ignored
-      if (isIgnoreRadiatedPhotons && daughtersP[itDP]->getPDG() == 22) continue;
-      B2DEBUG(10, "There was an additional particle left which is not a photon. Found " << daughtersP[itDP]->getPDG());
+      if (daughtersP[itDP]->getPDG() == 22) {
+        // if gamma is FSR or produced by PHOTOS
+        if (MCMatching::isFSR(daughtersP[itDP]) or daughtersP[itDP]->hasStatus(MCParticle::c_IsPHOTOSPhoton)) {
+          // if the radiated photons are ignored, we can skip the particle
+          if (d->isIgnoreRadiatedPhotons()) continue;
+        }
+        // else if missing gamma is ignored, we can skip the particle
+        else if (d->isIgnoreRadiatedPhotons()) continue;
+      } else if ((daughtersP[itDP]->getPDG() == 12 or daughtersP[itDP]->getPDG() == 14 or daughtersP[itDP]->getPDG() == 16)) {
+        if (d->isIgnoreNeutrino()) continue;
+      } else if (MCMatching::isFSP(daughtersP[itDP]->getPDG()) and d->isIgnoreMassive()) {
+        if (d->isIgnoreMassive()) continue;
+      } else {
+        if (d->isIgnoreIntermediate()) continue;
+      }
+      B2DEBUG(10, "There was an additional particle left. Found " << daughtersP[itDP]->getPDG());
       return decay;
     }
-  } else {
-    B2DEBUG(19, "Inclusive decay, no need to check for additional unmatched particles!");
   }
   decay->setObj(const_cast<MCParticle*>(mcp));
   B2DEBUG(19, "Match found!");
@@ -232,4 +224,16 @@ int MCDecayFinderModule::write(DecayTree<MCParticle>* decay)
     newParticle->appendDaughter(iIndexDaughter);
   }
   return iIndex;
+}
+
+void MCDecayFinderModule::appendParticles(const MCParticle* gen, vector<const MCParticle*>& children)
+{
+  if (MCMatching::isFSP(gen->getPDG()))
+    return; //stop at the bottom of the MC decay tree (ignore secondaries)
+
+  const vector<MCParticle*>& genDaughters = gen->getDaughters();
+  for (auto daug : genDaughters) {
+    children.push_back(daug);
+    appendParticles(daug, children);
+  }
 }

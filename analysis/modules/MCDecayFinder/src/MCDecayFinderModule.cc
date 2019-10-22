@@ -148,7 +148,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   daughtersPIndex.reserve(nDaughtersP);
   for (int i = 0; i < nDaughtersP; i++) daughtersPIndex.push_back(i);
 
-  // The MCParticle must have at least as many as daughters as the decaydescriptor
+  // The MCParticle must have at least as many daughters as the decaydescriptor
   if (nDaughtersD > nDaughtersP) {
     B2DEBUG(10, "DecayDescriptor has more daughters than MCParticle!");
     return decay;

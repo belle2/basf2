@@ -185,7 +185,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
           if (d->isIgnoreRadiatedPhotons()) continue;
         }
         // else if missing gamma is ignored, we can skip the particle
-        else if (d->isIgnoreRadiatedPhotons()) continue;
+        else if (d->isIgnoreGamma()) continue;
       } else if ((daughtersP[itDP]->getPDG() == 12 or daughtersP[itDP]->getPDG() == 14 or daughtersP[itDP]->getPDG() == 16)) { // neutrino
         if (d->isIgnoreNeutrino()) continue;
       } else if (MCMatching::isFSP(daughtersP[itDP]->getPDG()) and d->isIgnoreMassive()) { // other final state particle

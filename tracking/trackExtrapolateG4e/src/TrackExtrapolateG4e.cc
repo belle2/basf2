@@ -633,7 +633,8 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   std::vector<ExtHit> eclHit1, eclHit2, eclHit3;
   if (eclClusterInfo != NULL) {
     eclClusterDistance.resize(eclClusterInfo->size(), 1.0E10); // "positive infinity"
-    ExtHit tempExtHit(extState.pdgCode, Const::EDetector::ECL, 0, EXT_FIRST, 0.0,
+    ExtHit tempExtHit(extState.pdgCode, Const::EDetector::ECL, 0, EXT_FIRST,
+                      extState.isCosmic, 0.0,
                       G4ThreeVector(), G4ThreeVector(), G4ErrorSymMatrix(6));
     eclHit1.resize(eclClusterInfo->size(), tempExtHit);
     eclHit2.resize(eclClusterInfo->size(), tempExtHit);
@@ -1307,7 +1308,8 @@ void TrackExtrapolateG4e::createExtHit(ExtHitStatus status, const ExtState& extS
   fromG4eToPhasespace(g4eState, covariance);
   StoreArray<ExtHit> extHits(*m_ExtHitsColName);
   ExtHit* extHit = extHits.appendNew(extState.pdgCode, detID, copyID, status,
-                                     extState.tof, pos, mom, covariance);
+                                     extState.isCosmic, extState.tof,
+                                     pos, mom, covariance);
   // If called standalone, there will be no associated track
   if (extState.track != NULL) { extState.track->addRelationTo(extHit); }
 

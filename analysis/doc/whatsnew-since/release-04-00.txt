@@ -22,3 +22,4 @@ Modules
  * In :b2:mod:`TreeFitter` max iterations set to 100, increases efficiency slightly in many cases.
  * Fix to nested RestOfEvent objects (see :issue:`BII-5649`)
  * Removed module ``CreateBsigFromFullRecoBtag``
+ * In BtubeCreator module, functionality to associate Btube to user's chosen B is added.  

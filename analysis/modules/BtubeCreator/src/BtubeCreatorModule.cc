@@ -56,9 +56,6 @@ BtubeCreatorModule::BtubeCreatorModule() : Module(),
   addParam("associateTo", m_associateToListName,
            "name of the particle you want the Btube to be asociated to as a relationship object. To associate Btube with the selected daughter, use \"SelectedDaughter\". Default is \"OtherDaughter\" ",
            string("OtherDaughter"));
-  addParam("confidenceLevel", m_confidenceLevel,
-           "required confidence level of fit to keep particles in the list. Note that even with confidenceLevel == 0.0, errors during the fit might discard Particles in the list. confidenceLevel = -1 if an error occurs during the fit",
-           0.);
   addParam("verbosity", m_verbose, "print statements", true);
 }
 

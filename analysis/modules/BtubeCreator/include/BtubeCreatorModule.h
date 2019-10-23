@@ -56,7 +56,6 @@ namespace Belle2 {
     std::string m_listName;  /**< name of particle list */
     std::string m_decayString;          /**< specifies which daughter particles will be used as reference to create Btube*/
     std::string m_associateToListName; /**< specifies which daughter the Btube will be associated to*/
-    double m_confidenceLevel;     /**< required fit confidence level */
     double m_Bfield;              /**< magnetic field from data base */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */

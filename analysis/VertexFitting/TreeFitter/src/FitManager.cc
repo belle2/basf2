@@ -313,9 +313,6 @@ namespace TreeFitter {
 
       const double lenErr = std::get<1>(lenTuple);
       comb_cov(0, 0) = lenErr * lenErr;
-      comb_cov(0, 1) = m_fitparams->getCovariance()(tauIndex, momindex);
-      comb_cov(0, 2) = m_fitparams->getCovariance()(tauIndex, momindex + 1);
-      comb_cov(0, 3) = m_fitparams->getCovariance()(tauIndex, momindex + 2);
       comb_cov(1, 0) = m_fitparams->getCovariance()(momindex, tauIndex);
       comb_cov(2, 0) = m_fitparams->getCovariance()(momindex + 1, tauIndex);
       comb_cov(3, 0) = m_fitparams->getCovariance()(momindex + 2, tauIndex);

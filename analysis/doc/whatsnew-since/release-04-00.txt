@@ -20,5 +20,6 @@ Modules
  * In :b2:mod:`TreeFitter` bugfix in mass constraint: chi2 correctly calculated now.
  * In :b2:mod:`TreeFitter` change of initialisation values increases performance in all fits with tracks.
  * In :b2:mod:`TreeFitter` max iterations set to 100, increases efficiency slightly in many cases.
+ * In :b2:mod:`TreeFitter` fixed a bug in life time calculation. A constant in the jacobian was missing. As a result propagated error was slightly overestimated.
  * Fix to nested RestOfEvent objects (see :issue:`BII-5649`)
  * Removed module ``CreateBsigFromFullRecoBtag``

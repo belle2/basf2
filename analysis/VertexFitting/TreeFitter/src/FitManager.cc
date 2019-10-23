@@ -303,7 +303,7 @@ namespace TreeFitter {
 
     if (pb && pb->tauIndex() >= 0 && pb->mother()) {
       const int momindex = pb->momIndex();
-
+      const int tauIndex = pb->tauIndex();
       const Eigen::Matrix<double, 1, 3> mom_vec = m_fitparams->getStateVector().segment(momindex, 3);
 
       const Eigen::Matrix<double, 3, 3> mom_cov = m_fitparams->getCovariance().block<3, 3>(momindex, momindex);
@@ -313,6 +313,13 @@ namespace TreeFitter {
 
       const double lenErr = std::get<1>(lenTuple);
       comb_cov(0, 0) = lenErr * lenErr;
+      comb_cov(0, 1) = m_fitparams->getCovariance()(tauIndex, momindex);
+      comb_cov(0, 2) = m_fitparams->getCovariance()(tauIndex, momindex + 1);
+      comb_cov(0, 3) = m_fitparams->getCovariance()(tauIndex, momindex + 2);
+      comb_cov(1, 0) = m_fitparams->getCovariance()(momindex, tauIndex);
+      comb_cov(2, 0) = m_fitparams->getCovariance()(momindex + 1, tauIndex);
+      comb_cov(3, 0) = m_fitparams->getCovariance()(momindex + 2, tauIndex);
+
       comb_cov.block<3, 3>(1, 1) = mom_cov;
 
       const double mass = pb->pdgMass();

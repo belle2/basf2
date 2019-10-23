@@ -9,6 +9,8 @@ Variables
    For example ``ROE_deltae`` is now :b2:var:`roeDeltae`.
 
  * Removed ``clusterCRID`` which duplicates :b2:var:`clusterConnectedRegionID`.
+ * Fixed ``goodBelleLambda`` and now it returns ``extraInfo(goodLambda)`` on Belle data.
+ * Fixed :b2:var:`eclClusterEoP` for particles with Bremsstrahlung correction by adding the energy of the added photon(s)
 
 Modules
 +++++++
@@ -20,8 +22,3 @@ Modules
  * In :b2:mod:`TreeFitter` max iterations set to 100, increases efficiency slightly in many cases.
  * Fix to nested RestOfEvent objects (see :issue:`BII-5649`)
  * Removed module ``CreateBsigFromFullRecoBtag``
-
-Variables
-+++++++++
-
- * Fixed ``goodBelleLambda`` and now it returns ``extraInfo(goodLambda)`` on Belle data. 

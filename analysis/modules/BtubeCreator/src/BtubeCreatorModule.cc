@@ -53,9 +53,9 @@ BtubeCreatorModule::BtubeCreatorModule() : Module(),
   addParam("decayString", m_decayString,
            "decay string of the mother particle, the selected daughter specifies which daughter will be used as reference to create Btube",
            string(""));
-  addParam("associateTo", m_associateToListName,
-           "name of the particle you want the Btube to be asociated to as a relationship object. To associate Btube with the selected daughter, use \"SelectedDaughter\". Default is \"OtherDaughter\" ",
-           string("OtherDaughter"));
+  addParam("associateBtubeToBselected", m_associateBtubeToBselected,
+           "whether to associate the Btube with the selected B",
+           false);
   addParam("verbosity", m_verbose, "print statements", true);
 }
 
@@ -78,10 +78,6 @@ void BtubeCreatorModule::initialize()
   int nProducts = m_decaydescriptor.getNDaughters();
   if (nProducts != 2)
     B2ERROR("BtubeCreatorModule: decay string should contain only two daughters");
-  if (!(m_associateToListName == "OtherDaughter" || m_associateToListName == "SelectedDaughter")) {
-    B2ERROR("Invalid option for associateTo parameter");
-  }
-
 }
 
 void BtubeCreatorModule::event()
@@ -245,22 +241,20 @@ void BtubeCreatorModule::event()
       tubecreatorBCopy->setMomentumVertexErrorMatrix(errNew);
 
       Btube* tubeconstraint = tubeArray.appendNew(Btube());
-      if (m_associateToListName == "OtherDaughter") {
-        otherB->addRelationTo(tubeconstraint);
-      }
-      if (m_associateToListName == "SelectedDaughter") {
+      if (m_associateBtubeToBselected) {
         tubecreatorB->addRelationTo(tubeconstraint);
+      } else {
+        otherB->addRelationTo(tubeconstraint);
       }
 
       tubeconstraint->setTubeCenter(tubecreatorBOriginpos);
       tubeconstraint->setTubeMatrix(tubeMat);
       tubeconstraint->setTubeCenterErrorMatrix(tubeMatCenterError);
 
-      if (m_associateToListName == "OtherDaughter") {
-        addextrainfos(otherB, tubecreatorBCopy, pvNew, v4FinalNew);
-      }
-      if (m_associateToListName == "SelectedDaughter") {
+      if (m_associateBtubeToBselected) {
         addextrainfos(tubecreatorB, tubecreatorBCopy, pvNew, v4FinalNew);
+      } else {
+        addextrainfos(otherB, tubecreatorBCopy, pvNew, v4FinalNew);
       }
     }
     if (!ok0) toRemove.push_back(particle->getArrayIndex());

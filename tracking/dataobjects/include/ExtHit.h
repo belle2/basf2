@@ -77,7 +77,7 @@ namespace Belle2 {
     void setCopyID(int copyID) { m_CopyID = copyID; }
 
     //! Set the direction of track propagation.
-    void setBackwardPropagation(int backwardPropagation) { m_BackwardPropagation = backwardPropagation; }
+    void setBackwardPropagation(bool backwardPropagation) { m_BackwardPropagation = backwardPropagation; }
 
     //! Set state of extrapolation at this hit
     void setStatus(ExtHitStatus extHitStatus) { m_Status = extHitStatus; }
@@ -126,7 +126,7 @@ namespace Belle2 {
     ExtHitStatus getStatus() const { return m_Status; }
 
     //! Get the direction of track propagation.
-    bool getBackwardPropagation() const { return m_BackwardPropagation; }
+    bool isBackwardPropagated() const { return m_BackwardPropagation; }
 
     //! Get time of flight from the point of closest approach near the origin to this hit
     //! @return time of flight from the point of closest approach near the origin to this hit (ns)

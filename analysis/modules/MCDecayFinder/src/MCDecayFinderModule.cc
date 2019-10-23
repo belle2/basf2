@@ -13,10 +13,10 @@
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/EvtPDLUtil.h>
-
 #include <analysis/utility/MCMatching.h>
 
 #include <string>
@@ -178,7 +178,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   if (!isInclusive) {
     B2DEBUG(10, "Check for left over MCParticles!\n");
     for (int& itDP : daughtersPIndex) {
-      if (daughtersP[itDP]->getPDG() == 22) {
+      if (daughtersP[itDP]->getPDG() == Const::photon.getPDGCode()) { // gamma
         // if gamma is FSR or produced by PHOTOS
         if (MCMatching::isFSR(daughtersP[itDP]) or daughtersP[itDP]->hasStatus(MCParticle::c_IsPHOTOSPhoton)) {
           // if the radiated photons are ignored, we can skip the particle
@@ -186,11 +186,11 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
         }
         // else if missing gamma is ignored, we can skip the particle
         else if (d->isIgnoreRadiatedPhotons()) continue;
-      } else if ((daughtersP[itDP]->getPDG() == 12 or daughtersP[itDP]->getPDG() == 14 or daughtersP[itDP]->getPDG() == 16)) {
+      } else if ((daughtersP[itDP]->getPDG() == 12 or daughtersP[itDP]->getPDG() == 14 or daughtersP[itDP]->getPDG() == 16)) { // neutrino
         if (d->isIgnoreNeutrino()) continue;
-      } else if (MCMatching::isFSP(daughtersP[itDP]->getPDG()) and d->isIgnoreMassive()) {
+      } else if (MCMatching::isFSP(daughtersP[itDP]->getPDG()) and d->isIgnoreMassive()) { // other final state particle
         if (d->isIgnoreMassive()) continue;
-      } else {
+      } else { // intermediate
         if (d->isIgnoreIntermediate()) continue;
       }
       B2DEBUG(10, "There was an additional particle left. Found " << daughtersP[itDP]->getPDG());

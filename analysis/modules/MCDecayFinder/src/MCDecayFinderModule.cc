@@ -19,8 +19,6 @@
 #include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/utility/MCMatching.h>
 
-#include <analysis/utility/MCMatching.h>
-
 #include <string>
 #include <memory>
 

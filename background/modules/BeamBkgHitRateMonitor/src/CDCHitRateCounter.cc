@@ -16,9 +16,16 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
 using namespace std;
 
 namespace Belle2 {
+
+  using TrackFindingCDC::StoreWrappedObjPtr;
+  using TrackFindingCDC::CDCWireHit;
+
   namespace Background {
 
     void CDCHitRateCounter::initialize(TTree* tree)
@@ -56,6 +63,21 @@ namespace Belle2 {
       // increment event counter
       rates.numEvents++;
 
+      ///// get background flag as a map ( ASIC crosstalk, etc..? )
+      std::map<const CDCHit*, bool> CDCHitToBackgroundFlag;
+      {
+        StoreWrappedObjPtr<std::vector<CDCWireHit>> storeVector("CDCWireHitVector");
+        if (not storeVector) {
+          B2FATAL("CDCWireHitVector is unaccessible in DataStore."
+                  "Need TFCDC_WireHitParameter module before.");
+        }
+        const std::vector<CDCWireHit>& cdcWireHitVector = *storeVector;
+        for (const auto& cdcWireHit : cdcWireHitVector) {
+          const CDCHit* cdcHit = cdcWireHit.getHit();
+          CDCHitToBackgroundFlag[cdcHit] = cdcWireHit->hasBackgroundFlag(); ///// cdcWireHit.getAutomatonCell().hasBackgroundFlag()
+        }
+      }
+
       ///// getter functions of CDCHit:
       /////   unsigned short CDCHit::getICLayer() /* 0-55 */
       /////   unsigned short CDCHit::getISuperLayer() /* 0-8 */
@@ -65,10 +87,11 @@ namespace Belle2 {
       for (const CDCHit& hit : m_digits) {
         const int iLayer         = hit.getICLayer();
         const int iSuperLayer    = hit.getISuperLayer();
-        const unsigned short adc = hit.getADCCount();
+        //const unsigned short adc = hit.getADCCount();
 
-        if (adc < 20)
-          continue;
+        //if (adc < 20) continue;
+        if (CDCHitToBackgroundFlag[&hit]) continue;
+
         rates.layerHitRate[iLayer] += 1;
         rates.superLayerHitRate[iSuperLayer] += 1;
         rates.averageRate += 1;

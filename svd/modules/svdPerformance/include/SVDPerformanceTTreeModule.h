@@ -58,6 +58,10 @@ namespace Belle2 {
     float m_svdTrkPosErr = 0; /**< track position error*/
     float m_svdTrkQoP = 0; /**< track q/p*/
     float m_svdTrkPrime = 0;     /**< tan of incident angle projected on u,w*/
+    float m_svdTrkPosUnbiased = 0; /**< unbiased track position */
+    float m_svdTrkPosErrUnbiased = 0; /**< unbiased track position error*/
+    float m_svdTrkQoPUnbiased = 0; /**< unbiased track q/p*/
+    float m_svdTrkPrimeUnbiased = 0;     /**< unbiased tan of incident angle projected on u,w*/
     unsigned int m_svdLayer = 0;  /**< layer */
     unsigned int m_svdLadder = 0; /**< ladder */
     unsigned int m_svdSensor = 0; /**< sensor */

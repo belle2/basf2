@@ -74,6 +74,10 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_U->Branch("svdTrkPosErr", &m_svdTrkPosErr, "svdTrkPosErr/F");
   m_t_U->Branch("svdTrkQoP", &m_svdTrkQoP, "svdTrkQoP/F");
   m_t_U->Branch("svdTrkPrime", &m_svdTrkPrime, "svdTrkPrime/F");
+  m_t_U->Branch("svdTrkPosUnbiased", &m_svdTrkPosUnbiased, "svdTrkPosUnbiased/F");
+  m_t_U->Branch("svdTrkPosErrUnbiased", &m_svdTrkPosErrUnbiased, "svdTrkPosErrUnbiased/F");
+  m_t_U->Branch("svdTrkQoPUnbiased", &m_svdTrkQoPUnbiased, "svdTrkQoPUnbiased/F");
+  m_t_U->Branch("svdTrkPrimeUnbiased", &m_svdTrkPrimeUnbiased, "svdTrkPrimeUnbiased/F");
   m_t_U->Branch("svdLayer", &m_svdLayer, "svdLayer/i");
   m_t_U->Branch("svdLadder", &m_svdLadder, "svdLadder/i");
   m_t_U->Branch("svdSensor", &m_svdSensor, "svdSensor/i");
@@ -93,6 +97,10 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_V->Branch("svdTrkPosErr", &m_svdTrkPosErr, "svdTrkPosErr/F");
   m_t_V->Branch("svdTrkQoP", &m_svdTrkQoP, "svdTrkQoP/F");
   m_t_V->Branch("svdTrkPrime", &m_svdTrkPrime, "svdTrkPrime/F");
+  m_t_V->Branch("svdTrkPosUnbiased", &m_svdTrkPosUnbiased, "svdTrkPosUnbiased/F");
+  m_t_V->Branch("svdTrkPosErrUnbiased", &m_svdTrkPosErrUnbiased, "svdTrkPosErrUnbiased/F");
+  m_t_V->Branch("svdTrkQoPUnbiased", &m_svdTrkQoPUnbiased, "svdTrkQoPUnbiased/F");
+  m_t_V->Branch("svdTrkPrimeUnbiased", &m_svdTrkPrimeUnbiased, "svdTrkPrimeUnbiased/F");
   m_t_V->Branch("svdLayer", &m_svdLayer, "svdLayer/i");
   m_t_V->Branch("svdLadder", &m_svdLadder, "svdLadder/i");
   m_t_V->Branch("svdSensor", &m_svdSensor, "svdSensor/i");
@@ -135,6 +143,9 @@ void SVDPerformanceTTreeModule::event()
       const unsigned short svd_Sensor_1 = svd_id_1.getSensorNumber();
 
       const TVectorD resUnBias_1 =  fittedResult_1->getResidual(0, false).getState();
+      genfit::MeasuredStateOnPlane state_unbiased = fittedResult_1->getFittedState(false);
+      const TVectorD& svd_predIntersect_unbiased = state_unbiased.getState();
+      const TMatrixDSym& covMatrix_unbiased = state_unbiased.getCov();
       genfit::MeasuredStateOnPlane state_1 = trk.getMeasuredStateOnPlaneFromRecoHit(infoSVD_1);
       const TVectorD& svd_predIntersect_1 = state_1.getState();
       const TMatrixDSym& covMatrix_1 = state_1.getCov();
@@ -167,6 +178,10 @@ void SVDPerformanceTTreeModule::event()
         m_svdTrkPosErr = sqrt(covMatrix_1[3][3]);
         m_svdTrkQoP = svd_predIntersect_1[0];
         m_svdTrkPrime = svd_predIntersect_1[1];
+        m_svdTrkPosUnbiased = svd_predIntersect_unbiased[3];
+        m_svdTrkPosErrUnbiased = sqrt(covMatrix_unbiased[3][3]);
+        m_svdTrkQoPUnbiased = svd_predIntersect_unbiased[0];
+        m_svdTrkPrimeUnbiased = svd_predIntersect_unbiased[1];
         m_svdLayer = svd_Layer_1;
         m_svdLadder = svd_Ladder_1;
         m_svdSensor = svd_Sensor_1;
@@ -197,6 +212,10 @@ void SVDPerformanceTTreeModule::event()
         m_svdTrkPosErr = sqrt(covMatrix_1[4][4]);
         m_svdTrkQoP = svd_predIntersect_1[0];
         m_svdTrkPrime = svd_predIntersect_1[2];
+        m_svdTrkPosUnbiased = svd_predIntersect_unbiased[4];
+        m_svdTrkPosErrUnbiased = sqrt(covMatrix_unbiased[4][4]);
+        m_svdTrkQoPUnbiased = svd_predIntersect_unbiased[0];
+        m_svdTrkPrimeUnbiased = svd_predIntersect_unbiased[2];
         m_svdLayer = svd_Layer_1;
         m_svdLadder = svd_Ladder_1;
         m_svdSensor = svd_Sensor_1;

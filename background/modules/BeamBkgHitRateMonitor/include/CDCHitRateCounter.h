@@ -25,13 +25,18 @@ namespace Belle2 {
      */
     class CDCHitRateCounter: public HitRateBase {
 
+    private:
+      static const int f_nLayer = 56;
+      static const int f_nSuperLayer = 9;
+
     public:
 
       /**
        * tree structure
        */
       struct TreeStruct {
-
+        float layerHitRate[f_nLayer] = {0}; /**< Layer average hit rate */
+        float superLayerHitRate[f_nSuperLayer] = {0}; /**< SuperLayer average hit rate */
         float averageRate = 0; /**< total detector average hit rate */
         int numEvents = 0; /**< number of events accumulated */
         bool valid = false;  /**< status: true = rates valid */
@@ -43,8 +48,12 @@ namespace Belle2 {
         {
           if (numEvents == 0) return;
           averageRate /= numEvents;
-        }
 
+          for (auto& superLayerRate : superLayerHitRate)
+            superLayerRate /= numEvents;
+          for (auto& layerRate : layerHitRate)
+            layerRate /= numEvents;
+        }
       };
 
       /**
@@ -92,6 +101,15 @@ namespace Belle2 {
       // DB payloads
 
       // other
+      int m_nActiveWireInTotal = 0;
+      int m_nActiveWireInSuperLayer[f_nSuperLayer] = {0};
+      int m_nActiveWireInLayer[f_nLayer] = {0};
+      /**
+       * set m_nActiveWireInTotal, m_nActiveWireInLayer[] and m_nActiveWireInSuperLayer[].
+       * called in initialize function.
+       */
+      void countActiveWires();
+
 
     };
 

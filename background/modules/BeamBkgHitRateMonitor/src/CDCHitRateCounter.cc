@@ -11,6 +11,11 @@
 // Own include
 #include <background/modules/BeamBkgHitRateMonitor/CDCHitRateCounter.h>
 
+// framework aux
+#include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -22,8 +27,17 @@ namespace Belle2 {
       m_digits.isOptional();
 
       // set branch address
-      tree->Branch("cdc", &m_rates, "averageRate/F:numEvents/I:valid/O");
+      //tree->Branch("cdc", &m_rates, "averageRate/F:numEvents/I:valid/O");
+      stringstream leafList;
+      leafList
+          << "layerHitRate[" << f_nLayer << "]/F:"
+          << "superLayerHitRate[" << f_nSuperLayer << "]/F:"
+          << "averageRate/F:"
+          << "numEvents/I:"
+          << "valid/O";
+      tree->Branch("cdc", &m_rates, leafList.str().c_str());
 
+      countActiveWires();
     }
 
     void CDCHitRateCounter::clear()
@@ -42,19 +56,26 @@ namespace Belle2 {
       // increment event counter
       rates.numEvents++;
 
-      // accumulate hits
-      /* either count all */
-      rates.averageRate += m_digits.getEntries();
-      /* or count selected ones only
-      for(const auto& digit: m_digits) {
-      // select digits to count (usualy only good ones)
-         rates.averageRate += 1;
+      ///// getter functions of CDCHit:
+      /////   unsigned short CDCHit::getICLayer() /* 0-55 */
+      /////   unsigned short CDCHit::getISuperLayer() /* 0-8 */
+      /////   short          CDCHit::getTDCCount()
+      /////   unsigned short CDCHit::getADCCount() /* integrated charge over the cell */
+      /////   unsigned short CDCHit::getTOT() /* time over threshold */
+      for (const CDCHit& hit : m_digits) {
+        const int iLayer         = hit.getICLayer();
+        const int iSuperLayer    = hit.getISuperLayer();
+        const unsigned short adc = hit.getADCCount();
+
+        if (adc < 20)
+          continue;
+        rates.layerHitRate[iLayer] += 1;
+        rates.superLayerHitRate[iSuperLayer] += 1;
+        rates.averageRate += 1;
       }
-      */
 
       // set flag to true to indicate the rates are valid
       rates.valid = true;
-
     }
 
     void CDCHitRateCounter::normalize(unsigned timeStamp)
@@ -64,11 +85,42 @@ namespace Belle2 {
 
       if (not m_rates.valid) return;
 
-      // normalize
+      // normalize : nhit / nEvent in a second(time stamp) => # of hit in a event
       m_rates.normalize();
 
       // optionally: convert to MHz, correct for the masked-out channels etc.
+      ///// (# of hit in a event) / nActiveWire => occupancy in an event
+      m_rates.averageRate /= m_nActiveWireInTotal;
+      for (int iSL = 0 ; iSL < f_nSuperLayer ; ++iSL)
+        m_rates.superLayerHitRate[iSL] /= m_nActiveWireInSuperLayer[iSL];
+      for (int iLayer = 0 ; iLayer < f_nLayer ; ++iLayer)
+        m_rates.layerHitRate[iLayer] /= m_nActiveWireInLayer[iLayer];
 
+    }
+
+
+    void CDCHitRateCounter::countActiveWires()
+    {
+      const int nlayer_in_SL[f_nSuperLayer] = { 8, 6, 6,
+                                                6, 6, 6,
+                                                6, 6, 6
+                                              };
+      const int nwire_in_layer[f_nSuperLayer] = { 160, 160, 192,
+                                                  224, 256, 288,
+                                                  320, 352, 384
+                                                };
+
+      m_nActiveWireInTotal = 0; ///// initialize
+      int contLayerID = 0;//// continuous layer numbering
+      for (int iSL = 0 ; iSL < f_nSuperLayer ; ++iSL) {
+        m_nActiveWireInSuperLayer[iSL] = 0; //// initialize
+        for (int i = 0 ; i < nlayer_in_SL[iSL] ; ++i) {
+          m_nActiveWireInLayer[contLayerID] = nwire_in_layer[iSL];
+          m_nActiveWireInSuperLayer[iSL]   += nwire_in_layer[iSL];
+          m_nActiveWireInTotal             += nwire_in_layer[iSL];
+          ++contLayerID;
+        }
+      }
     }
 
 

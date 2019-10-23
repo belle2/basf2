@@ -325,16 +325,16 @@ namespace TreeFitter {
       const double mass = pb->pdgMass();
       const double mBYc = mass / Belle2::Const::speedOfLight;
       const double mom = mom_vec.norm();
-      const double sqrt_mom3 = sqrt(mom * mom * mom);
+      const double mom3 = mom * mom * mom;
 
       const double len = std::get<0>(lenTuple);
       const double t = len / mom * mBYc;
 
       Eigen::Matrix<double, 1, 4> jac = Eigen::Matrix<double, 1, 4>::Zero();
       jac(0) =  1. / mom * mBYc;
-      jac(1) = -1. * len * mom_vec(0) / sqrt_mom3 * mBYc;
-      jac(2) = -1. * len * mom_vec(1) / sqrt_mom3 * mBYc;
-      jac(3) = -1. * len * mom_vec(2) / sqrt_mom3 * mBYc;
+      jac(1) = -1. * len * mom_vec(0) / mom3 * mBYc;
+      jac(2) = -1. * len * mom_vec(1) / mom3 * mBYc;
+      jac(3) = -1. * len * mom_vec(2) / mom3 * mBYc;
 
       const double tErr2 = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
       // time in nanosec

@@ -288,8 +288,7 @@ void B2BIIConvertMdstModule::event()
   // Make sure beam parameters are correct: if they are not found in the
   // database or different from the ones in the database we need to override them
   if (!m_beamSpotDB || !(m_beamSpot == *m_beamSpotDB) ||
-      !m_collisionBoostVectorDB || !(m_collisionBoostVector == *m_collisionBoostVectorDB) ||
-      !m_collisionInvMDB || !(m_collisionInvM == *m_collisionInvMDB)) {
+      !m_collisionBoostVectorDB || !m_collisionInvMDB) {
     if ((!m_beamSpotDB || !m_collisionBoostVectorDB || !m_collisionInvMDB) && !m_realData) {
       B2INFO("No database entry for this run yet, create one");
       StoreObjPtr<EventMetaData> event;
@@ -297,11 +296,10 @@ void B2BIIConvertMdstModule::event()
       Database::Instance().storeData("CollisionBoostVector", &m_collisionBoostVector, iov);
       Database::Instance().storeData("CollisionInvariantMass", &m_collisionInvM, iov);
       Database::Instance().storeData("BeamSpot", &m_beamSpot, iov);
-      B2INFO("store");
     }
     if (m_realData) {
       B2ERROR("BeamParameters from condition database are different from converted "
-              "ones, overriding database. Did you call setupB2BIIDatabase()?");
+              "ones, overriding database. Did you make sure the globaltag B2BII is used?");
     } else {
       B2INFO("BeamSpot, BoostVector, and InvariantMass from condition database are different from converted "
              "ones, overriding database");

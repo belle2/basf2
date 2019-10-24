@@ -59,6 +59,10 @@ if __name__ == '__main__':
     import basf2
     from modularAnalysis import fillParticleLists, applyChargedPidMVA, variablesToNtuple
 
+    # basf2.conditions.prepend_testing_payloads("localdb/database.txt")
+    # basf2.conditions.prepend_globaltag("MY_BEAUTIFUL_GT")
+    print(basf2.conditions.globaltags)
+
     # ------------
     # Create path.
     # ------------
@@ -89,7 +93,6 @@ if __name__ == '__main__':
 
     # Set variable aliases if needed be.
     from variables import variables
-    variables.addAlias("clusterPulseShapeDiscriminationMVA", "PulseShapeDiscriminationMVA")
     variables.addAlias("__event__", "evtNum")
     for det in ["SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"]:
         variables.addAlias(f"deltaLogL_e_pi_{det}", f"pidDeltaLogLikelihoodValueExpert(11, 211, {det})")

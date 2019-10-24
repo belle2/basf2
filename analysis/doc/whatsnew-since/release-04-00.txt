@@ -12,6 +12,9 @@ Variables
  * Fixed ``goodBelleLambda`` and now it returns ``extraInfo(goodLambda)`` on Belle data.
  * Fixed :b2:var:`eclClusterEoP` for particles with Bremsstrahlung correction by adding the energy of the added photon(s)
 
+.. note::
+        All variables will return a quietNaN instead of -999 or other out-of-the-sky numbers in case of errors
+
 Modules
 +++++++
 

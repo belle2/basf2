@@ -13,7 +13,7 @@ REG_MODULE(ChargedPidMVA)
 
 ChargedPidMVAModule::ChargedPidMVAModule() : Module()
 {
-  setDescription("This module evaluates the response of an MVA trained for charged particle identification between two hypotheses, S and B. Currently, it uses only ECL-based inputs. For a given input set of (S,B) mass hypotheses, it takes the Particle objects in the appropriate charged stable particle's ParticleLists, calculates the MVA score using the appropriate xml weight file, and adds it as ExtraInfo to the Particle objects.");
+  setDescription("This module evaluates the response of an MVA trained for charged particle identification between two hypotheses, S and B. For a given input set of (S,B) mass hypotheses, it takes the Particle objects in the appropriate charged stable particle's ParticleLists, calculates the MVA score using the appropriate xml weight file, and adds it as ExtraInfo to the Particle objects.");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -43,6 +43,7 @@ void ChargedPidMVAModule::initialize()
 
 void ChargedPidMVAModule::beginRun()
 {
+
   // Retrieve the payload from the DB.
   m_weightfiles_representation.addCallback([this]() { initializeMVA(); });
   initializeMVA();
@@ -96,80 +97,87 @@ void ChargedPidMVAModule::event()
       B2DEBUG(11, "\tParticle [" << ipart << "]");
 
       // If the particle list was created by the FSRCorrection module,
-      // the info in the mdst objects associated to the particles cannot be retrieved directly from the particle.
-      // Instead, one has to get the associated daughters, that hold relations with the mdst objects:
-      // -) the 0-th daughter, i.e. the original particle before brem correction,
-      // -) the 1-st daughter i.e. the brems photon particle (if found), needed to correct E/p.
-      auto nDaughters = particle->getNDaughters();
-      const Particle* daughterLep = (nDaughters) ? particle->getDaughter(0) : nullptr;
-      const Particle* daughterPh  = (nDaughters > 0) ? particle->getDaughter(1) : nullptr;
+      // the info in the mdst objects associated to the particles
+      // cannot be retrieved directly from the particle itself.
+      // Instead, one has to get the 0-th daughter, i.e. the original particle before brems correction.
+      // In fact, the daughter is the one that hold relations with the mdst objects.
 
-      // Check that the particle (or the 'daughterLep') has a valid relation set between track and ECL cluster.
+      const auto nDaughters = particle->getNDaughters();
+      const Particle* daughterLep = (nDaughters) ? particle->getDaughter(0) : nullptr;
+
+      // Check that the particle has a valid relation set between track and ECL cluster.
       // Otherwise, skip to next.
       const ECLCluster* eclCluster = (!nDaughters) ? particle->getECLCluster() : daughterLep->getECLCluster();
       if (!eclCluster) {
-        B2DEBUG(11, "\t --> Invalid track-cluster relation, skip...");
+        B2WARNING("\tParticle has invalid Track-ECLCluster relation, skip MVA application...");
         continue;
       }
 
-      // Retrieve the index for the correct MVA expert and dataset, given (signal hypo, clusterTheta, p)
+      // Retrieve the index for the correct MVA expert and dataset,
+      // given (signal hypo, clusterTheta, p)
       auto theta   = eclCluster->getTheta();
-      auto p       = particle->getP(); // This is the momentum from the 4-vec after any possible correction,
-      // hence it must be the one of the actual particle.
+      auto p       = particle->getP(); // This is the momentum from the particle's 4-vec after any possible correction.
       int jth, ip;
       auto index   = m_weightfiles_representation->getMVAWeightIdx(sigPart, theta, p, jth, ip);
 
       // Get the cut defining the MVA category under exam (this reflects the one used in the training).
-      const auto cutstr = m_weightfiles_representation->getCuts(m_sig_pdg)->at(index);
-      std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(cutstr);
+      const auto cuts   = m_weightfiles_representation->getCuts(m_sig_pdg);
+      const auto cutstr = (!cuts->empty()) ? cuts->at(index) : "";
 
-      B2DEBUG(11, "\t\tclusterTheta = " << theta << " [rad]");
-      B2DEBUG(11, "\t\tp = " << p << " [GeV/c]");
-      B2DEBUG(11, "\t\tFSRCorrected? " << static_cast<bool>(nDaughters));
-      B2DEBUG(11, "\t\tweightfile idx in payload = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
-      B2DEBUG(11, "\t\tcategory cut: " << cutstr);
+      B2DEBUG(11, "\tclusterTheta = " << theta << " [rad]");
+      B2DEBUG(11, "\tp = " << p << " [GeV/c]");
+      B2DEBUG(11, "\tBrems corrected? " << particle->hasExtraInfo("bremsCorrectedPhotonEnergy"));
+      B2DEBUG(11, "\tWeightfile idx in payload = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
+      if (!cutstr.empty()) {
+        B2DEBUG(11, "\tCategory cut: " << cutstr);
+      }
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
+
       auto nvars  = m_variables.at(index).size();
       for (unsigned int ivar(0); ivar < nvars; ++ivar) {
+
         auto varobj =  m_variables.at(index).at(ivar);
-        // Set the variables from the daughter particle, if found.
-        // In that case, also ensure E/p is calculated *after* the 4-vec correction,
-        // i.e. using the actual particle's momentum, and the cluster energy includes the brems photon contribution.
-        auto var(-999.0);
-        if (varobj->name == "clusterEoP") {
-          if (nDaughters) {
-            auto energyLep = eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
-            auto energyPh = (daughterPh) ? daughterPh->getECLCluster()->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) : 0.0;
-            var = (energyLep + energyPh) / p;
-          } else {
-            var = varobj->function(particle);
-          }
-        } else {
-          var = varobj->function((!nDaughters) ? particle : daughterLep);
-        }
+
+        auto var = varobj->function((!nDaughters) ? particle : daughterLep);
+
         // Manual imputation value of -999 for NaN (undefined) variables.
         var = (std::isnan(var)) ? -999.0 : var;
-        B2DEBUG(11, "\t\t\tvar[" << ivar << "] : " << varobj->name << " = " << var);
+
+        B2DEBUG(11, "\t\tvar[" << ivar << "] : " << varobj->name << " = " << var);
+
         m_datasets.at(index)->m_input[ivar] = var;
+
       }
 
       auto nspecs  = m_spectators.at(index).size();
       for (unsigned int ispec(0); ispec < nspecs; ++ispec) {
+
         auto specobj =  m_spectators.at(index).at(ispec);
+
         auto spec = specobj->function((!nDaughters) ? particle : daughterLep);
-        B2DEBUG(11, "\t\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
+
+        B2DEBUG(11, "\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
+
         m_datasets.at(index)->m_spectators[ispec] = spec;
+
       }
 
-      if (!cut->check((!nDaughters) ? particle : daughterLep)) {
-        B2WARNING("\t\tParticle didn't pass MVA category cut, skip MVA application...");
-        continue;
+      // Compute MVA score only if particle fulfils category selection.
+      if (!cutstr.empty()) {
+
+        std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(cutstr);
+
+        if (!cut->check((!nDaughters) ? particle : daughterLep)) {
+          B2WARNING("\tParticle didn't pass MVA category cut, skip MVA application...");
+          continue;
+        }
+
       }
 
       float score = m_experts.at(index)->apply(*m_datasets.at(index))[0];
 
-      B2DEBUG(11, "\t\tscore = " << score);
+      B2DEBUG(11, "\tMVA score = " << score);
 
       // Store the MVA score as a new particle object property.
       particle->writeExtraInfo(m_score_varname, score);

@@ -24,8 +24,17 @@ from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfigur
 from basf2 import B2FATAL
 
 
-def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLong=False, chargedB=True, neutralB=True,
-                         convertedFromBelle=False, specific=False, removeSLD=False):
+def get_default_channels(
+        B_extra_cut=None,
+        hadronic=True,
+        semileptonic=True,
+        KLong=False,
+        baryonic=False,
+        chargedB=True,
+        neutralB=True,
+        convertedFromBelle=False,
+        specific=False,
+        removeSLD=False):
     """
     returns list of Particle objects with all default channels for running
     FEI on Upsilon(4S). For a training with analysis-specific signal selection,
@@ -184,7 +193,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
                                                   'extraInfo(preCut_rank)', 'extraInfo(goodKs)', 'extraInfo(ksnbVLike)',
                                                   'extraInfo(ksnbNoLam)', 'extraInfo(ksnbStandard)'],
                                        target='isSignal'),
-                      PreCutConfiguration(userCut=ks0_cut,
+                      PreCutConfiguration(userCut=Lam_cut,
                                           bestCandidateVariable='abs(dM)',
                                           bestCandidateCut=20),
                       PostCutConfiguration(bestCandidateCut=10, value=0.01))
@@ -319,8 +328,6 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     LC.addChannel(['Sigma+', 'pi+', 'pi-'])
     LC.addChannel(['Sigma+', 'pi+', 'pi-', 'pi0'])
     LC.addChannel(['Sigma+', 'pi0'])
-    LC.addChannel(['anti-Sigma-', 'pi+', 'pi+'])
-    LC.addChannel(['anti-Sigma-', 'pi+', 'pi+', 'pi0'])
 
     D0 = Particle('D0',
                   MVAConfiguration(variables=intermediate_vars,
@@ -620,13 +627,14 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     BP.addChannel(['J/psi', 'K+', 'pi+', 'pi-'])
     BP.addChannel(['J/psi', 'K+', 'pi0'])
     BP.addChannel(['J/psi', 'K_S0', 'pi+'])
-    BP.addChannel(['anti-Lambda_c-', 'p+', 'pi+', 'pi0'])
-    BP.addChannel(['anti-Lambda_c-', 'p+', 'pi+', 'pi-', 'pi+'])
-    BP.addChannel(['anti-D0', 'p+', 'anti-p-', 'pi+'])
-    BP.addChannel(['anti-D*0', 'p+', 'anti-p-', 'pi+'])
-    BP.addChannel(['D+', 'p+', 'anti-p-', 'pi+', 'pi-'])
-    BP.addChannel(['D*+', 'p+', 'anti-p-', 'pi+', 'pi-'])
-    BP.addChannel(['anti-Lambda_c-', 'p+', 'pi+'])
+    if baryonic:
+        BP.addChannel(['anti-Lambda_c-', 'p+', 'pi+', 'pi0'])
+        BP.addChannel(['anti-Lambda_c-', 'p+', 'pi+', 'pi-', 'pi+'])
+        BP.addChannel(['anti-D0', 'p+', 'anti-p-', 'pi+'])
+        BP.addChannel(['anti-D*0', 'p+', 'anti-p-', 'pi+'])
+        BP.addChannel(['D+', 'p+', 'anti-p-', 'pi+', 'pi-'])
+        BP.addChannel(['D*+', 'p+', 'anti-p-', 'pi+', 'pi-'])
+        BP.addChannel(['anti-Lambda_c-', 'p+', 'pi+'])
 
     mva_BPlusSemileptonic = MVAConfiguration(
         variables=B_vars,
@@ -775,12 +783,13 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     B0.addChannel(['J/psi', 'K_S0'])
     B0.addChannel(['J/psi', 'K+', 'pi-'])
     B0.addChannel(['J/psi', 'K_S0', 'pi+', 'pi-'])
-    B0.addChannel(['anti-Lambda_c-', 'p+', 'pi+', 'pi-'])
-    B0.addChannel(['anti-D0', 'p+', 'anti-p-'])
-    B0.addChannel(['D-', 'p+', 'anti-p-', 'pi+'])
-    B0.addChannel(['D*-', 'p+', 'anti-p-', 'pi+'])
-    B0.addChannel(['anti-D0', 'p+', 'anti-p-', 'pi+', 'pi-'])
-    B0.addChannel(['anti-D*0', 'p+', 'anti-p-', 'pi+', 'pi-'])
+    if baryonic:
+        B0.addChannel(['anti-Lambda_c-', 'p+', 'pi+', 'pi-'])
+        B0.addChannel(['anti-D0', 'p+', 'anti-p-'])
+        B0.addChannel(['D-', 'p+', 'anti-p-', 'pi+'])
+        B0.addChannel(['D*-', 'p+', 'anti-p-', 'pi+'])
+        B0.addChannel(['anti-D0', 'p+', 'anti-p-', 'pi+', 'pi-'])
+        B0.addChannel(['anti-D*0', 'p+', 'anti-p-', 'pi+', 'pi-'])
 
     B0_SL = Particle('B0:semileptonic',
                      MVAConfiguration(variables=B_vars,
@@ -886,21 +895,24 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     particles = []
     particles.append(pion)
     particles.append(kaon)
-    particles.append(proton)
+    if baryonic:
+        particles.append(proton)
     particles.append(muon)
     particles.append(electron)
     particles.append(gamma)
 
     particles.append(pi0)
     particles.append(KS0)
-    particles.append(L0)
-    particles.append(Sigmap)
+    if baryonic:
+        particles.append(L0)
+        particles.append(Sigmap)
     particles.append(Jpsi)
 
     particles.append(D0)
     particles.append(DP)
     particles.append(DS)
-    particles.append(LC)
+    if baryonic:
+        particles.append(LC)
 
     particles.append(DS0)
     particles.append(DSP)
@@ -1347,7 +1359,6 @@ def get_fr_channels(convertedFromBelle=False):
     particles.append(gamma)
 
     particles.append(pi0)
-    particles.append(KS0)
     particles.append(KS0)
     particles.append(Jpsi)
 

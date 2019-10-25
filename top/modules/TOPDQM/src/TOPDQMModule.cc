@@ -387,7 +387,7 @@ namespace Belle2 {
       m_window_vs_slot->Fill(digit.getModuleID(), digit.getRawTime() / 64 + 220);
       m_window_vs_asic[i]->Fill(digit.getChannel() / 8, digit.getRawTime() / 64 + 220);
 
-      if (digit.getHitQuality() == TOPDigit::c_Good) { // good hits
+      if (digit.getHitQuality() != TOPDigit::c_Junk) { // good hits
         m_goodHits->Fill(i + 1);
         m_goodHitsXY[i]->Fill(digit.getPixelCol(), digit.getPixelRow());
         m_goodHitsAsics[i]->Fill(asic_no, asic_ch);
@@ -401,7 +401,7 @@ namespace Belle2 {
         if (digit.getTime() > 20 && digit.getTime() < 50) n_good_second[i]++;
         n_good_pixel_hits[(digit.getModuleID() - 1) * 512 + (digit.getPixelID() - 1)]++;
         n_good[i]++;
-      } else { // other hits = background hits
+      } else { // bad hits: FE not valid, pedestal jump, too short or too wide pulses
         m_badHits->Fill(i + 1);
         m_badHitsXY[i]->Fill(digit.getPixelCol(), digit.getPixelRow());
         m_badHitsAsics[i]->Fill(asic_no, asic_ch);

@@ -6,7 +6,6 @@
 #include "TFile.h"
 #include "TMath.h"
 #include "TF1.h"
-#include "TMinuit.h"
 #include "TROOT.h"
 
 using namespace std;

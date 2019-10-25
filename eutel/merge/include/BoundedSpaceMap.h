@@ -11,9 +11,7 @@
 #include <set>
 #include <map>
 #include <vector>
-#include <algorithm>
 #include <iterator>
-#include <functional>
 
 #include <eutel/merge/CircularTools.h>
 

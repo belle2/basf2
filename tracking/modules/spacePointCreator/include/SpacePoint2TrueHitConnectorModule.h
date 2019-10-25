@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -24,8 +25,6 @@
 #include <tuple>
 
 #include <unordered_map> // needed for typedef of defaultMap
-
-#include <numeric> // std::accumulate
 
 // root output
 #include <TFile.h>

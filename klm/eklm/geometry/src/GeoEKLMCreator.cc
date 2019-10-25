@@ -9,27 +9,31 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <cmath>
-#include <string>
-
-/* External headers. */
-#include <CLHEP/Units/PhysicalConstants.h>
-#include <G4Box.hh>
-#include <G4Tubs.hh>
-#include <G4Polyhedra.hh>
-#include <G4PVPlacement.hh>
-#include <G4Transform3D.hh>
-#include <G4ReflectedSolid.hh>
-
-/* Belle2 headers. */
-#include <klm/eklm/geometry/G4TriangularPrism.h>
+/* Own header. */
 #include <klm/eklm/geometry/GeoEKLMCreator.h>
+
+/* KLM headers. */
+#include <klm/eklm/geometry/G4TriangularPrism.h>
 #include <klm/eklm/simulation/EKLMSensitiveDetector.h>
-#include <framework/gearbox/Unit.h>
+
+/* Belle 2 headers. */
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
 #include <geometry/utilities.h>
+
+/* Geant4 headers. */
+#include <G4Box.hh>
+#include <G4Polyhedra.hh>
+#include <G4PVPlacement.hh>
+#include <G4Tubs.hh>
+#include <G4UnionSolid.hh>
+
+/* CLHEP headers. */
+#include <CLHEP/Units/SystemOfUnits.h>
+
+/* C++ headers. */
+#include <cmath>
+#include <string>
 
 using namespace Belle2;
 

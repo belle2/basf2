@@ -17,9 +17,6 @@
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <string>
-#include <TTree.h>
-#include <TFile.h>
-#include <time.h>
 #include <tracking/pxdDataReductionClasses/ROIinfo.h>
 
 namespace Belle2 {

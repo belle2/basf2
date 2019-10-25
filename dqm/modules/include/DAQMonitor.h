@@ -8,37 +8,9 @@
 
 #pragma once
 
-#include <stdlib.h>
-#include <string>
-#include <vector>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <sys/resource.h>
-#include <sys/uio.h>
-
 #include <framework/core/HistoModule.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-
-#include <rawdata/dataobjects/RawPXD.h>
-#include <rawdata/dataobjects/RawSVD.h>
-#include <rawdata/dataobjects/RawCDC.h>
-#include <rawdata/dataobjects/RawTOP.h>
-#include <rawdata/dataobjects/RawARICH.h>
-#include <rawdata/dataobjects/RawECL.h>
-#include <rawdata/dataobjects/RawKLM.h>
-#include <rawdata/dataobjects/RawTRG.h>
-#include <rawdata/dataobjects/RawFTSW.h>
-
-#include "TDirectory.h"
 #include "TH1F.h"
-#include "TH2F.h"
 
 namespace Belle2 {
 

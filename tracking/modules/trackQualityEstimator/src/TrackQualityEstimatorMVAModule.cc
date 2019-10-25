@@ -21,22 +21,40 @@ TrackQualityEstimatorMVAModule::TrackQualityEstimatorMVAModule() : Module()
   setDescription("The quality estimator module for a fully reconstructed track");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "Name of the recoTrack StoreArray.",
-           std::string("RecoTracks"));
-  addParam("SVDCDCRecoTracksStoreArrayName", m_svdcdcRecoTracksStoreArrayName , "Name of the SVD-CDC StoreArray.",
-           std::string("SVDCDCRecoTracks"));
-  addParam("CDCRecoTracksStoreArrayName", m_cdcRecoTracksStoreArrayName , "Name of the CDC StoreArray.",
-           std::string("CDCRecoTracks"));
-  addParam("SVDRecoTracksStoreArrayName", m_svdRecoTracksStoreArrayName , "Name of the SVD StoreArray.",
-           std::string("SVDRecoTracks"));
-  addParam("PXDRecoTracksStoreArrayName", m_pxdRecoTracksStoreArrayName , "Name of the PXD StoreArray.",
-           std::string("PXDRecoTracks"));
+  addParam("recoTracksStoreArrayName",
+           m_recoTracksStoreArrayName,
+           "Name of the recoTrack StoreArray.",
+           m_recoTracksStoreArrayName);
 
-  addParam("WeightFileIdentifier", m_WeightFileIdentifier,
-           "Identifier of weightfile in Database or local root/xml file.", std::string(""));
+  addParam("SVDCDCRecoTracksStoreArrayName",
+           m_svdcdcRecoTracksStoreArrayName,
+           "Name of the SVD-CDC StoreArray.",
+           m_svdcdcRecoTracksStoreArrayName);
 
-  addParam("collectEventFeatures", m_param_collectEventFeatures, "Whether to use eventwise features.",
-           false);
+  addParam("CDCRecoTracksStoreArrayName",
+           m_cdcRecoTracksStoreArrayName,
+           "Name of the CDC StoreArray.",
+           m_cdcRecoTracksStoreArrayName);
+
+  addParam("SVDRecoTracksStoreArrayName",
+           m_svdRecoTracksStoreArrayName,
+           "Name of the SVD StoreArray.",
+           m_svdRecoTracksStoreArrayName);
+
+  addParam("PXDRecoTracksStoreArrayName",
+           m_pxdRecoTracksStoreArrayName,
+           "Name of the PXD StoreArray.",
+           m_pxdRecoTracksStoreArrayName);
+
+  addParam("WeightFileIdentifier",
+           m_WeightFileIdentifier,
+           "Identifier of weightfile in Database or local root/xml file.",
+           m_WeightFileIdentifier);
+
+  addParam("collectEventFeatures",
+           m_param_collectEventFeatures,
+           "Whether to use eventwise features.",
+           m_param_collectEventFeatures);
 }
 
 void TrackQualityEstimatorMVAModule::initialize()
@@ -65,8 +83,8 @@ void TrackQualityEstimatorMVAModule::event()
     const RecoTrack* pxdRecoTrack = recoTrack.getRelatedTo<RecoTrack>(m_pxdRecoTracksStoreArrayName);
     const RecoTrack* svdcdcRecoTrack =
       recoTrack.getRelatedTo<RecoTrack>(m_svdcdcRecoTracksStoreArrayName);
-    RecoTrack* cdcRecoTrack;
-    RecoTrack* svdRecoTrack;
+    RecoTrack* cdcRecoTrack{nullptr};
+    RecoTrack* svdRecoTrack{nullptr};
     if (svdcdcRecoTrack) {
       cdcRecoTrack = svdcdcRecoTrack->getRelatedTo<RecoTrack>(m_cdcRecoTracksStoreArrayName);
       svdRecoTrack = svdcdcRecoTrack->getRelatedTo<RecoTrack>(m_svdRecoTracksStoreArrayName);

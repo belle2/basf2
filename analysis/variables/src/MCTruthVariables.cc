@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <analysis/variables/MCTruthVariables.h>
-#include <analysis/variables/ParameterVariables.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/TauPairDecay.h>
@@ -20,7 +19,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
@@ -37,7 +35,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits, these are usually ok
@@ -53,7 +51,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle, false);
       //remove the following bits, these are usually ok
@@ -69,7 +67,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits, these are usually ok
@@ -86,7 +84,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits, these are usually ok
@@ -207,11 +205,11 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       const MCParticle* mcmother = mcparticle->getMother();
       if (mcmother == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       double p = mcmother->getMomentum().Mag();
       return p;
@@ -237,7 +235,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits, these are usually ok
@@ -254,7 +252,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits, these are usually ok
@@ -271,7 +269,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits, these are usually ok
@@ -287,7 +285,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits, these are usually ok
@@ -306,7 +304,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       return mcparticle->getPDG();
     }
@@ -335,7 +333,7 @@ namespace Belle2 {
       if (relWithWeight.first) {
         return relWithWeight.second;
       } else {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -343,7 +341,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       return mcparticle->getDecayTime();
     }
@@ -352,7 +350,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       return mcparticle->getLifetime();
     }
@@ -361,7 +359,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       return mcparticle->getMomentum().Px();
     }
@@ -370,7 +368,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       return mcparticle->getMomentum().Py();
     }
@@ -379,7 +377,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       return mcparticle->getMomentum().Pz();
     }
@@ -388,7 +386,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       return mcparticle->getMomentum().Pt();
     }
@@ -397,7 +395,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       return mcparticle->getEnergy();
     }
@@ -406,7 +404,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       return mcparticle->getMomentum().Mag();
     }
@@ -415,7 +413,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       return mcparticle->getMomentum().Theta();
     }
@@ -424,7 +422,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       return mcparticle->getMomentum().Phi();
     }
@@ -433,7 +431,7 @@ namespace Belle2 {
     {
       StoreArray<MCParticle> mcparticles;
       if (mcparticles.getEntries() < 1)
-        return -999;
+        return std::numeric_limits<double>::quiet_NaN();
 
       TLorentzVector pInitial = mcparticles[0]->get4Vector();
       TLorentzVector pDaughters;
@@ -441,7 +439,7 @@ namespace Belle2 {
       for (auto daughter : daughters) {
         const MCParticle* mcD = daughter->getRelatedTo<MCParticle>();
         if (mcD == nullptr)
-          return -999;
+          return std::numeric_limits<double>::quiet_NaN();
 
         pDaughters += mcD->get4Vector();
       }
@@ -455,7 +453,7 @@ namespace Belle2 {
       if (mcp) {
         return mcp->getSecondaryPhysicsProcess();
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -465,7 +463,7 @@ namespace Belle2 {
       if (mcp) {
         return mcp->getStatus();
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -479,7 +477,7 @@ namespace Belle2 {
         else
           return 0;
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -493,7 +491,7 @@ namespace Belle2 {
         else
           return 0;
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -507,7 +505,7 @@ namespace Belle2 {
         else
           return 0;
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -521,7 +519,7 @@ namespace Belle2 {
         else
           return 0;
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -535,7 +533,7 @@ namespace Belle2 {
         else
           return 0;
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -549,7 +547,7 @@ namespace Belle2 {
         else
           return 0;
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -701,12 +699,12 @@ namespace Belle2 {
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp) {
         B2WARNING("No MCParticle is associated to the particle");
-        return -1;
+        return std::numeric_limits<int>::quiet_NaN();
       }
 
       int nChildren = p->getNDaughters();
       if (arguments[0] >= nChildren) {
-        return -999;
+        return std::numeric_limits<int>::quiet_NaN();
       }
 
       const Particle*   daugP   = p->getDaughter(arguments[0]);
@@ -715,7 +713,7 @@ namespace Belle2 {
         // This is a strange case.
         // The particle, p, has the related MC particle, but i-th daughter does not have the related MC Particle.
         B2WARNING("No MCParticle is associated to the i-th daughter");
-        return -1;
+        return std::numeric_limits<int>::quiet_NaN();
       }
 
       if (nChildren == 1) {
@@ -741,7 +739,7 @@ namespace Belle2 {
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp) {
         B2WARNING("No MCParticle is associated to the particle");
-        return -1;
+        return std::numeric_limits<int>::quiet_NaN();
       }
 
       return MCMatching::countMissingParticle(p, mcp, PDGcodes);

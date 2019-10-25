@@ -17,7 +17,7 @@ from stdPi0s import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
 
-gb2_setuprel = "release-03-02-00"
+gb2_setuprel = "release-04-00-00"
 
 import os
 import sys

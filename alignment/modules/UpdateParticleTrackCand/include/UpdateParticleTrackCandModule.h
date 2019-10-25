@@ -13,7 +13,6 @@
 
 #include <framework/core/Module.h>
 
-
 namespace Belle2 {
   /**
    * Updates the seed in TrackCand based on fitted state (at vertex)

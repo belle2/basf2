@@ -10,11 +10,9 @@
 
 #pragma once
 
-#include <framework/gearbox/Unit.h>
 #include <map>
 #include <string>
 #include <TObject.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <iostream>

@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <iostream>
 #include <vector>
 
 #include <CLHEP/Matrix/Matrix.h>
@@ -18,8 +17,6 @@
 #include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Vector/LorentzVector.h>
 #include <CLHEP/Geometry/Point3D.h>
-
-#include <framework/logging/Logger.h>
 
 #include <analysis/KFit/KFitConst.h>
 #include <analysis/KFit/KFitError.h>

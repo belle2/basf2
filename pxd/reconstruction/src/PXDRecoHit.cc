@@ -10,7 +10,6 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <pxd/reconstruction/PXDClusterPositionEstimator.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>

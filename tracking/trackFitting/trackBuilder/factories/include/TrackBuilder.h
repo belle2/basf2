@@ -9,18 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/gearbox/Const.h>
-
 #include <string>
 #include <TVector3.h>
 
 namespace Belle2 {
 
-  class Track;
   class RecoTrack;
-  class TrackFitResult;
-  class HitPatternVXD;
-  class HitPatternCDC;
 
   /** TrackBuilder class to create the Track/TrackFitResult mdst output from the RecoTrack.
    *

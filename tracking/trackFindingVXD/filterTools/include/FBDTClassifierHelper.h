@@ -15,7 +15,6 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#include <sstream>
 #include <array>
 
 namespace Belle2 {

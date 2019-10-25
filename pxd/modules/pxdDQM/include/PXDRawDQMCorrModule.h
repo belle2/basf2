@@ -11,17 +11,11 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <pxd/geometry/SensorInfo.h>
-#include <vxd/geometry/GeoCache.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 
 #include <pxd/dataobjects/PXDRawHit.h>
 
-#include <vector>
 #include "TH1F.h"
 #include "TH2F.h"
 

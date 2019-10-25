@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
-#include <tracking/ckf/general/utilities/Advancer.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 

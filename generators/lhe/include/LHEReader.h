@@ -18,8 +18,6 @@
 #include <string>
 #include <fstream>
 
-#include <TF1.h>
-#include <TRandom.h>
 #include <TLorentzRotation.h>
 
 namespace Belle2 {

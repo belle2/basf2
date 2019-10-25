@@ -9,9 +9,7 @@
  **************************************************************************/
 #include <tracking/ckf/general/filters/NonIPCrossingStateFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -21,8 +19,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/core/ModuleParamList.h>
-
-#include <vector>
 
 namespace Belle2 {
   template <class AllStateFilter>

@@ -10,15 +10,15 @@
 
 #pragma once
 
+/* KLM Headers. */
+#include <klm/eklm/dbobjects/EKLMTimeCalibrationData.h>
+
+/* ROOT headers. */
+#include <TObject.h>
+
 /* C++ headers. */
 #include <cstdint>
 #include <map>
-
-/* External headers. */
-#include <TObject.h>
-
-/* Belle2 Headers. */
-#include <klm/eklm/dbobjects/EKLMTimeCalibrationData.h>
 
 namespace Belle2 {
 

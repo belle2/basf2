@@ -15,9 +15,16 @@
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/ECLVariables.h>
 #include <analysis/variables/TrackVariables.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <analysis/variables/ParameterVariables.h>
 
 #include <framework/logging/Logger.h>
+
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
+
+#include <limits>
 
 namespace Belle2 {
   namespace Variable {
@@ -56,6 +63,24 @@ namespace Belle2 {
         return 0.0;
     }
 
+    // Convenience function to obtain track d0 with respect to IP
+    // Based on v0DaughterD0 function in ParameterVariables.cc
+    double trackD0FromIP(const Particle* particle)
+    {
+      const Track* track = particle->getTrack();
+      if (!track) return std::numeric_limits<float>::quiet_NaN();
+
+      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(particle->getPDGCode())));
+      if (!trackFit) return std::numeric_limits<float>::quiet_NaN();
+
+      static DBObjPtr<BeamSpot> beamSpotDB;
+
+      UncertainHelix helix = trackFit->getUncertainHelix();
+      helix.passiveMoveBy(beamSpotDB->getIPPosition());
+
+      return helix.getD0();
+    }
+
     double goodBelleLambda(const Particle* Lambda)
     {
       if (Lambda->getNDaughters() != 2) {
@@ -72,8 +97,11 @@ namespace Belle2 {
         B2WARNING("goodBelleLambda is being applied to a candidate with PDG " << Lambda->getPDGCode());
       }
 
+      if (Lambda->hasExtraInfo("goodLambda"))
+        return Lambda->getExtraInfo("goodLambda");
+
       double p = particleP(Lambda);
-      double dr = std::min(abs(trackD0(d0)), abs(trackD0(d1)));
+      double dr = std::min(abs(trackD0FromIP(d0)), abs(trackD0FromIP(d1)));
       double zdist = v0DaughterZ0Diff(Lambda);
       double dphi = acos(cosAngleBetweenMomentumAndVertexVectorInXYPlane(Lambda));
       // Flight distance of Lambda0 in xy plane
@@ -139,9 +167,13 @@ It reproduces the ``goodLambda()`` function in Belle.
 
 ``goodBelleLambda`` selection 1 (selected with: ``goodBelleLambda>0``) should be used with ``atcPIDBelle(4,2) > 0.6``,
 and ``goodBelleLambda`` selecton 2 (``goodBelleLambda>1``) can be used without a proton PID cut. 
-The former cut is looser than the latter."
+The former cut is looser than the latter.". 
 
-See `BN-684`_ Lambda selection at Belle. K F Chen et al.
+.. warning:: ``goodBelleLambda`` is not optimized or tested on Belle II data.
+
+See Also:
+  * `BN-684`_ Lambda selection at Belle. K F Chen et al.
+  * The ``FindLambda`` class can be found at ``/belle_legacy/findLambda/findLambda.h``
 
 .. _BN-684: https://belle.kek.jp/secured/belle_note/gn684/bn684.ps.gz
 

@@ -9,12 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <vector>
-#include <functional>
-#include <utility>
-#include <cmath>
-#include <cassert>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
     /**

@@ -18,9 +18,7 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
-#include <numeric>
 #include <fstream>
-
 
 namespace Belle2 {
   namespace MVA {

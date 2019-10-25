@@ -21,11 +21,11 @@ Vertex Fitting
 
 * Added IP tube constraint to KFit.
 
-* The parameter confidenceLevel of the :b2:mod:`ParticleVertexFitterModule` now always
+* The parameter confidenceLevel of the :b2:mod:`ParticleVertexFitter` now always
   rejects the particle candidates with a p-value lower than the specified one.
   Specifically, setting confidenceLevel to 0 does not reject candidates with
   p-value equal to 0 anymore. Thus, the meaning of this parameter is now
-  the same as for the :b2:mod:`TreeFitterModule`.
+  the same as for the :b2:mod:`TreeFitter`.
 
 FEI
 +++
@@ -37,12 +37,12 @@ FEI
 Variables
 +++++++++
 
-.. warning:: we overhauled the helicity variables and added new ones to replace the `NtupleHelicityTool`.
-   We renamed :b2:var:`cosHelicityAngle` to :b2:var:`cosHelicityAngleMomentum`,
-   :b2:var:`cosHelicityAnglePi0Dalitz` to :b2:var:`cosHelicityAngleMomentumPi0Dalitz`, and 
-   :b2:var:`cosHelicityAngleIfCMSIsTheMother` to :b2:var:`cosHelicityAngleBeamMomentum`.
+.. warning:: we overhauled the helicity variables and added new ones to replace the ``NtupleHelicityTool``.
+   We renamed ``cosHelicityAngle`` to :b2:var:`cosHelicityAngleMomentum`,
+   ``cosHelicityAnglePi0Dalitz`` to :b2:var:`cosHelicityAngleMomentumPi0Dalitz`, and
+   ``cosHelicityAngleIfCMSIsTheMother`` to :b2:var:`cosHelicityAngleBeamMomentum`.
    We added the variables :b2:var:`cosHelicityAngle` and :b2:var:`cosAcoplanarityAngle`
-   defining them as the PDG 2018, p. 722.  
+   defining them as the PDG 2018, p. 722.
 
 * The function to create variable aliases for particles selected from a decay
   string has been fixed and extended to allow better customization (:issue:`BII-4437`)
@@ -141,10 +141,10 @@ Variables
   ``PulseShapeDiscriminationMVA`` to :b2:var:`clusterPulseShapeDiscriminationMVA`, 
   and ``ClusterNumberOfHadronDigits`` to :b2:var`clusterNumberOfHadronDigits`.
 
-* Removed the misleading variable `McFlavorOfTagSide`. 
+* Removed the misleading variable ``McFlavorOfTagSide``.
 
 * Added a variable :b2:var:`mcFlavorOfOtherB0` which returns the tag-side flavor by checking the other Upsilon4S
-  daughter without using the ROE. This variable is part of the default `flavor_tagging` list of variables. 
+  daughter without using the ROE. This variable is part of the default ``flavor_tagging`` collection.
 
 * The name of the variable ``MCTagBFlavor`` changed to :b2:var:`internalTagVMCFlavor`. 
   It should be used only by experts for debugging.
@@ -159,7 +159,7 @@ Modules
   function `modularAnalysis.combineAllParticles`. It creates a new Particle as
   the combination of all unique Particles from the passed input ParticleLists.
 
-* The :b2:mod:`ParticleLoader` can load :doc:`RestOfEvent` as a particle
+* The :b2:mod:`ParticleLoader` can load `RestOfEvent` as a particle
   using a new function `modularAnalysis.fillParticleListFromROE`.
   This ROE particle can be combined with any other particle or written down
   using usual variables.
@@ -179,10 +179,10 @@ Modules
 
 * Removal of the unsupported ECLClusterInfoModule.
 
-* Added `modularAnalysis.fitPseudo` function and a pseudo vertex fitting module 
+* Added `vertex.fitPseudo` function and a pseudo vertex fitting module
   to add a covariance matrix when a vertex fit is not possible. E.g. for :math:`\pi^0` decays.
 
-* Added the new module :b2:mod:`SignalSideVariablesToDaughterExtraInfoModule`. It adds
+* Added the new module :b2:mod:`SignalSideVariablesToDaughterExtraInfo`. It adds
   ExtraInfo to a specified particle (typically a daughter on the signal side).
   The corresponding information is calculated in the RestOfEvent so it is
   supposed to be executed only in for_each ROE paths.
@@ -196,7 +196,7 @@ Modules
   ParticleList of composite particles (and only this one) was always added to
   the ROE.
 
-* The module :b2:mod:`VertexFitUpdateDaughtersModule` now always updates
+* The module :b2:mod:`VertexFitUpdateDaughters` now always updates
   the daughters (as advertised).
 
 
@@ -204,7 +204,7 @@ Modular Analysis
 ++++++++++++++++
 
 * A new boolean argument has been added to the function
-  `modularAnalysis.buildRestOfEvent`. It is called `belle_sources` and should be
+  `modularAnalysis.buildRestOfEvent`. It is called ``belle_sources`` and should be
   switched to True (default is False) if you are analyzing converted Belle MC or
   data. It triggers the ROE to be constructed from all tracks and from Belle's
   specific gamma:mdst list.
@@ -220,8 +220,8 @@ Standard Particle Lists
   coming from V0 objects merged with a list of particles combined using the analysis 
   :b2:mod:`ParticleCombiner` module.
 
-  `stdKshorts(prioritiseV0, path)` returns a Ks list called `K_S0:merged`
-  `stdLambdas(prioritiseV0, path)` returns a Lambda list called `Lambda0:merged`
+  `stdV0s.stdKshorts` returns a Ks list called ``K_S0:merged``
+  `stdV0s.stdLambdas` returns a Lambda list called ``Lambda0:merged``
 
   mergedKshorts() and mergedLambdas() are now deprecated, and return the standard lists.
   

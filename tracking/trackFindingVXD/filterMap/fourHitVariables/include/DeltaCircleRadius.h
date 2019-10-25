@@ -14,7 +14,6 @@
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleCenterXY.h>
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleRadius.h>
 #include <framework/geometry/B2Vector3.h>
-#include <math.h>
 
 #define DELTACIRCLERADIUS_NAME DeltaCircleRadius
 

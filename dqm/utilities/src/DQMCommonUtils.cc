@@ -9,11 +9,12 @@
  **************************************************************************/
 
 #include <dqm/utilities/DQMCommonUtils.h>
-#include <framework/datastore/RelationArray.h>
 
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBObjPtr.h>
+
+#include <TVectorT.h>
 
 using namespace std;
 using namespace Belle2;

@@ -157,6 +157,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import basf2
 import basf2_mva
 from packaging import version
+import background
 import simulation
 import tracking
 import tracking.root_utils as root_utils
@@ -360,11 +361,7 @@ class GenerateSimTask(Basf2PathTask):
             "EventInfoSetter", evtNumList=[self.n_events], runList=[0], expList=[0]
         )
         path.add_module("EvtGenInput")
-        if not os.path.isdir(self.bkgfiles_dir):
-            raise NotADirectoryError(errno.ENOTDIR, os.strerror(errno.ENOTDIR), self.bkgfiles_dir)
-        bkg_files = glob.glob(os.path.join(self.bkgfiles_dir, "*.root"))
-        if not bkg_files:
-            raise FileNotFoundError(errno.ENOENT, "No *.root background files found in", self.bkgfiles_dir)
+        bkg_files = background.get_background_files(self.bkgfiles_dir)
         simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True)
         path.add_module(
             "RootOutput",

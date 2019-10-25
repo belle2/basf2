@@ -5,6 +5,8 @@
 #include <TTree.h>
 #include <TH1F.h>
 #include <TClonesArray.h>
+#include <TRandom.h>
+
 
 #include <alignment/dataobjects/MilleData.h>
 #include <calibration/dbobjects/TestCalibObject.h>
@@ -22,6 +24,25 @@ TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithm("CaTe
     "  entry at calibrated value.                                                   \n"
     " ------------------------------------------------------------------------------\n"
   );
+}
+
+void TestCalibrationAlgorithm::createDebugHistogram()
+{
+  std::string debugFileName = (this->getPrefix()) + "debug.root";
+  B2INFO("Storing histograms in " << debugFileName);
+
+  // Save the current directory to change back later
+  TDirectory* currentDir = gDirectory;
+  TFile* debugFile = new TFile(debugFileName.c_str(), "RECREATE");
+  debugFile->cd();
+  TH1F* debugHisto = new TH1F("h1", "h1", 30, -3., 3.);
+  for (int i = 0; i < 1000; ++i) {
+    debugHisto->Fill(gRandom->Gaus());
+  }
+
+  debugHisto->Write();
+  debugFile->Close();
+  currentDir->cd();
 }
 
 CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
@@ -42,6 +63,9 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
 
   B2INFO("Mean of MyHisto was " << mean);
   B2INFO("Mean Error of MyHisto was " << meanError);
+
+  // Create debugging histo if we asked for it
+  if (m_debugHisto) createDebugHistogram();
 
   // Fail if we we're asked to. Useful for testing
   if (getForceFail()) {

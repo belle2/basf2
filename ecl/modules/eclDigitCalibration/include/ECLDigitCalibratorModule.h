@@ -35,7 +35,6 @@ namespace Belle2 {
   class EventLevelClusteringInfo;
 
   class ECLCrystalCalib;
-  class ECLPureCsIInfo;
   class ECLDigit;
   class ECLDsp;
   class ECLCalDigit;

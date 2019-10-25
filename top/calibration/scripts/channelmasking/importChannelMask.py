@@ -34,6 +34,8 @@ if numFiles is 0:
     print('No files found')
     sys.exit()
 
+if not os.path.exists('masks/imported'):
+    os.makedirs('masks/imported')
 
 for i, fileName in enumerate(fileNames):
     runFirst = int((fileName.split('_r')[1]).split('.')[0])

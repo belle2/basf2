@@ -14,7 +14,6 @@
 
 #include <analysis/dbobjects/ChargedPidMVAWeights.h>
 
-#include <utility>
 #include <gtest/gtest.h>
 
 #include <TH2F.h>

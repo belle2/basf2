@@ -14,7 +14,6 @@
 
 #include <analysis/dataobjects/Particle.h>
 
-#include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/utilities/Conversion.h>

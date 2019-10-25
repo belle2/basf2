@@ -11,8 +11,6 @@
 
 #include <EvtGenBase/EvtSemiLeptonicFF.hh>
 
-#include <framework/utilities/Utils.h>
-
 namespace Belle2 {
 
   /**

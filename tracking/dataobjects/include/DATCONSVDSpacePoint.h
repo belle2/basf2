@@ -17,14 +17,9 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-#include <svd/geometry/SensorInfo.h>
 #include <svd/dataobjects/SVDCluster.h>
 
-#include <tracking/dataobjects/DATCONSVDDigit.h>
-
 #include <vxd/dataobjects/VxdID.h>
-
-#include <genfit/PlanarMeasurement.h>
 
 #include <vector>
 #include <string>

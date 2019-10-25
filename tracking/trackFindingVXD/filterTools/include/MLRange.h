@@ -10,9 +10,7 @@
 
 #pragma once
 
-#include <tracking/trackFindingVXD/filterMap/filterFramework/TBranchLeafType.h>
 #include <TTree.h>
-#include <TBranch.h>
 #include <array>
 
 namespace Belle2 {

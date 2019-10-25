@@ -29,7 +29,7 @@ buildContinuumSuppression('B0:all', 'basic', path=path)
 
 variables.addAlias('d0_p', 'daughter(0, p)')
 variables.addAlias('d1_p', 'daughter(1, p)')
-variables.addAlias('MissM2', 'WE_MissM2(basic,0)')
+variables.addAlias('MissM2', 'weMissM2(basic,0)')
 
 histogramFilename = 'PRsemileptonicUntagged_Validation.root'
 myEmail = 'Phil Grace <philip.grace@adelaide.edu.au>'

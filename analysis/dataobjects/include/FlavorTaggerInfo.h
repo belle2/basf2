@@ -15,7 +15,6 @@
 #include <analysis/dataobjects/FlavorTaggerInfoMap.h>
 
 #include <vector>
-#include <set>
 
 namespace Belle2 {
 

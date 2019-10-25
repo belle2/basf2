@@ -17,7 +17,6 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 namespace Belle2 {
   /**
@@ -93,6 +92,7 @@ namespace Belle2 {
       bool fitting = true;
       int rejected = 0;
 
+      // cppcheck-suppress knownConditionTrueFalse
       while (m_reducedChi2 > qualityCut && fitting) {
         fitting = doLineFit(minSPs);
         if (not fitting) {return fitting;}

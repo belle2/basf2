@@ -11,12 +11,9 @@
 
 #include <string>
 #include <vector>
-#include <utility>
-#include <memory>
 #include <sstream>
 
 #include <framework/logging/Logger.h>
-
 
 namespace Belle2 {
 

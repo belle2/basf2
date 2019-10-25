@@ -14,7 +14,7 @@ from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import *
 
-gb2_setuprel = 'release-03-02-02'
+gb2_setuprel = 'release-04-00-00'
 set_log_level(LogLevel.INFO)
 
 import os

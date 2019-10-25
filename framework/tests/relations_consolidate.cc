@@ -1,7 +1,7 @@
-#include <framework/datastore/RelationIndex.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/ProfileInfo.h>
-#include <framework/datastore/RelationsObject.h>
+#include <framework/datastore/RelationArray.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <gtest/gtest.h>
 

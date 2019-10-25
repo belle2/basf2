@@ -9,27 +9,27 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/calibration/BKLMDatabaseImporter.h>
-#include <klm/bklm/dbobjects/BKLMGeometryPar.h>
-#include <klm/bklm/dbobjects/BKLMSimulationPar.h>
-#include <klm/bklm/dbobjects/BKLMDisplacement.h>
-#include <klm/bklm/dbobjects/BKLMTimeWindow.h>
-#include <alignment/dbobjects/BKLMAlignment.h>
+
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementID.h>
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/bklm/dbobjects/BKLMDisplacement.h>
+#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
+#include <klm/bklm/dbobjects/BKLMGeometryPar.h>
+#include <klm/bklm/dbobjects/BKLMSimulationPar.h>
+#include <klm/bklm/dbobjects/BKLMTimeWindow.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
-#include <rawdata/dataobjects/RawCOPPERFormat.h>
 
-#include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
-
+/* Belle 2 headers. */
+#include <alignment/dbobjects/BKLMAlignment.h>
 #include <framework/database/Database.h>
-#include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportArray.h>
 #include <framework/database/DBImportObjPtr.h>
-
-#include <TFile.h>
-#include <TTree.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/gearbox/GearDir.h>
+#include <rawdata/dataobjects/RawCOPPERFormat.h>
 
 using namespace std;
 using namespace Belle2;

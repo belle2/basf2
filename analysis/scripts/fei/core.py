@@ -56,7 +56,6 @@ import basf2
 import pybasf2
 from basf2 import *
 from modularAnalysis import *
-from vertex import vertexTree
 
 import basf2_mva
 

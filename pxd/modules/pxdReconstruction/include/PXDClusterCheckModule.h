@@ -12,13 +12,9 @@
 #define PXDClusterCheckModule_H
 
 #include <framework/core/Module.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <pxd/reconstruction/Pixel.h>
 #include <string>
 
 namespace Belle2 {
-  class RelationArray;
-  class RelationElement;
 
   namespace PXD {
 

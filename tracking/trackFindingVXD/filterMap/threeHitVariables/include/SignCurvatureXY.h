@@ -15,8 +15,6 @@
 
 #include <framework/geometry/B2Vector3.h>
 
-#include <math.h>
-
 #define SIGNCURVATUREXY_NAME SignCurvatureXY
 
 namespace Belle2 {

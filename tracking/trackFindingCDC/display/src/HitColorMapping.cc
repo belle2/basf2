@@ -12,7 +12,6 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
 #include <cdc/dataobjects/CDCHit.h>

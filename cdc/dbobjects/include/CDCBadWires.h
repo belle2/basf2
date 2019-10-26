@@ -12,7 +12,6 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
-#include <fstream>
 #include <iomanip>
 #include <TObject.h>
 #include <cdc/dataobjects/WireID.h>

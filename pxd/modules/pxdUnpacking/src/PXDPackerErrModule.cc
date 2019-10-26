@@ -16,14 +16,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
-#include <boost/foreach.hpp>
 #include <boost/crc.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/algorithm/clamp.hpp>
-
-#include <boost/spirit/home/support/detail/endian.hpp>
-
-#include <pxd/unpacking/PXDMappingLookup.h>
 
 #include <numeric>
 

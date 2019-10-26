@@ -14,14 +14,9 @@
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/KLMCluster.h>
 
-#include <analysis/ClusterUtility/ClusterUtils.h>
-
 #include <analysis/VertexFitting/TreeFitter/RecoKlong.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
-#include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
-
-#include <framework/gearbox/Const.h>
 
 namespace TreeFitter {
 

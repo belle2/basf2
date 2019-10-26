@@ -16,7 +16,6 @@
 #include <vector>
 #include <array>
 #include <string>
-#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segmentPair/BaseSegmentPairFilter.h>
-
 #include <tracking/trackFindingCDC/filters/segmentPair/BasicSegmentPairVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/SkimmedHitGapSegmentPairVarSet.h>
 

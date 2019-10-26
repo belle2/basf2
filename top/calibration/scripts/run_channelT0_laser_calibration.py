@@ -29,6 +29,7 @@ main_output_dir = 'top_calibration'
 look_back = 28  # look-back window setting (set to 0 if look-back setting available in DB)
 tts_file = '/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrizations.root'
 laser_mc_fit = '/group/belle2/group/detector/TOP/calibration/MCreferences/laserMCFit.root'
+fit_mode = 'calibration'  # can be either monitoring, MC or calibration
 #
 # ---------------------------------------------------------------------------------------
 
@@ -134,10 +135,11 @@ def channelT0_calibration():
     collector.param('storeMCTruth', False)
     collector.param('refChannel', 0)  # Do not change this unless this channel is bad
     collector.param('refSlot', 4)  # Do not change this unless this slot is bad
+    # collector.param('pulserDeltaT', 37.5)  # In some runs taken in fall 2019 the delay has been increased
 
     #    algorithm
     algorithm = TOP.TOPLocalCalFitter()
-    algorithm.setMonitoringFit(False)
+    algorithm.setFitMode(fitMode)
     algorithm.setTTSFileName(tts_file)
     algorithm.setFitConstraintsFileName(laser_mc_fit)
 

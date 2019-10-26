@@ -11,11 +11,6 @@
 
 #include <framework/logging/Logger.h>
 #include <map>
-#include <array>
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <algorithm>
 #include <TObject.h>
 
 namespace Belle2 {

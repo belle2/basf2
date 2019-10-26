@@ -13,14 +13,9 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TGraphErrors.h>
-#include <TProfile.h>
-#include <TF1.h>
-#include <TFile.h>
-#include <TChain.h>
-#include <TTree.h>
-#include <TSystem.h>
 #include <calibration/CalibrationAlgorithm.h>
-#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/dbobjects/CDCGeometry.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   namespace CDC {

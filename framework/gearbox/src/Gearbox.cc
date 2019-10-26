@@ -9,8 +9,6 @@
 #include <libxml/xmlIO.h>
 #include <cstring>
 #include <boost/algorithm/string.hpp>
-#include <regex>
-#include <list>
 
 #include <TObject.h>
 

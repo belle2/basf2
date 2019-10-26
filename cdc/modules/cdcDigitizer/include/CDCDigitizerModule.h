@@ -28,7 +28,6 @@
 
 //C++/C standard lib elements.
 #include <string>
-#include <vector>
 //#include <queue>
 #include <limits>
 

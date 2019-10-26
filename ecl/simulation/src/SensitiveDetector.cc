@@ -12,8 +12,6 @@
 #include <framework/gearbox/Unit.h>
 #include <simulation/background/BkgNeutronWeight.h>
 
-#include <framework/utilities/FileSystem.h>
-
 using namespace std;
 using namespace Belle2::ECL;
 

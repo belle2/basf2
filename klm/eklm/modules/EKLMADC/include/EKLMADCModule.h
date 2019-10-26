@@ -10,13 +10,15 @@
 
 #pragma once
 
-/* External headers. */
-#include <TFile.h>
+/* KLM headers. */
+#include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 
-/* Belle2 headers. */
-#include <klm/simulation/ScintillatorSimulator.h>
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
+
+/* ROOT headers. */
+#include <TFile.h>
 
 namespace Belle2 {
 

@@ -13,7 +13,6 @@
 #include <tracking/trackFindingVXD/sectorMapTools/MinMaxCollector.h>
 #include <framework/logging/Logger.h>
 
-#include <string>
 #include <vector>
 #include <utility> // std::pair
 #include <limits>       // std::numeric_limits

@@ -22,9 +22,6 @@
 
 namespace Belle2 {
 
-  /** forward declaration of a sector */
-  class Sector;
-
   /** forward declaration of a friendship */
   class SectorFriendship;
 

@@ -16,7 +16,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/RootMergeable.h>
 
-#include <TNtuple.h>
 #include <TFile.h>
 
 #include <string>

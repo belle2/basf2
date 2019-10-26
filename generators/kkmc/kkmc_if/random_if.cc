@@ -1,4 +1,3 @@
-#include <TROOT.h>
 #include <TRandom.h>
 #include <stdio.h>
 

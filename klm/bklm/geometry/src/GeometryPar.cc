@@ -8,21 +8,22 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/geometry/GeometryPar.h>
+
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMElementID.h>
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
+#include <klm/bklm/dbobjects/BKLMDisplacement.h>
 
-#include <simulation/background/BkgSensitiveDetector.h>
-
-#include <framework/gearbox/Gearbox.h>
+/* Belle 2 headers. */
+#include <alignment/dbobjects/BKLMAlignment.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBArray.h>
-#include <alignment/dbobjects/BKLMAlignment.h>
-#include <klm/bklm/dbobjects/BKLMDisplacement.h>
-#include <klm/bklm/dataobjects/BKLMElementID.h>
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <simulation/background/BkgSensitiveDetector.h>
 
 using namespace std;
 
@@ -97,19 +98,19 @@ namespace Belle2 {
       m_OffsetZ = content.getLength("OffsetZ");
       m_Phi = content.getLength("Phi");
       m_NSector = content.getNumberNodes("Sectors/Forward/Sector");
-      if (m_NSector > NSECTOR) { // array-bounds check
+      if (m_NSector > BKLMElementNumbers::getMaximalSectorNumber()) { // array-bounds check
         B2FATAL("BKLM GeometryPar::read(): sector array size exceeded:"
                 << LogVar("# of sectors", m_NSector)
-                << LogVar("array size", NSECTOR));
+                << LogVar("array size", BKLMElementNumbers::getMaximalSectorNumber()));
       }
       m_SolenoidOuterRadius = content.getLength("SolenoidOuterRadius");
       m_OuterRadius = content.getLength("OuterRadius");
       m_HalfLength = content.getLength("HalfLength");
       m_NLayer = content.getNumberNodes("Layers/Layer");
-      if (m_NLayer > NLAYER) { // array-bounds check
+      if (m_NLayer > BKLMElementNumbers::getMaximalLayerNumber()) { // array-bounds check
         B2FATAL("BKLM GeometryPar::read(): layer array size exceeded:"
                 << LogVar("# of layers", m_NLayer)
-                << LogVar("array size", NLAYER));
+                << LogVar("array size", BKLMElementNumbers::getMaximalLayerNumber()));
       }
 
       m_IronNominalHeight = content.getLength("Layers/IronNominalHeight");
@@ -422,7 +423,7 @@ namespace Belle2 {
       for (int section = 0; section <= BKLMElementNumbers::getMaximalSectionNumber(); ++section) {
         bool isForward = (section == BKLMElementNumbers::c_ForwardSection);
         for (int sector = 1; sector <= m_NSector; ++sector) {
-          bool hasChimney = (!isForward) && (sector == CHIMNEY_SECTOR);
+          bool hasChimney = (!isForward) && (sector == BKLMElementNumbers::c_ChimneySector);
           int nZStrips = (hasChimney ? m_NZStripsChimney : m_NZStrips);
           int nZScints = (hasChimney ? m_NZScintsChimney : m_NZScints);
           CLHEP::HepRotation rotation;
@@ -721,16 +722,6 @@ namespace Belle2 {
     const Module* GeometryPar::findModule(int section, int sector, int layer) const
     {
       int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);
-      map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
-      return (iM == m_Modules.end() ? NULL : iM->second);
-    }
-
-    const Module* GeometryPar::findModule(int layer, bool hasChimney) const
-    {
-      int moduleID = ((layer - 1) << BKLM_LAYER_BIT);
-      if (hasChimney) { // Chimney module is in backward sector 3
-        moduleID |= ((3 - 1) << BKLM_SECTOR_BIT);
-      }
       map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
       return (iM == m_Modules.end() ? NULL : iM->second);
     }

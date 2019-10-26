@@ -15,12 +15,12 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <string>
-#include <stdexcept>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
+#include <TF1.h>
 #include <TLorentzVector.h>
 
 using namespace std;

@@ -18,19 +18,9 @@
 #include <THashList.h>
 
 #include <string>
-#include <queue>
 #include <utility>
 
-#include <stdexcept>
-#include <boost/lexical_cast.hpp>
-#include <boost/tokenizer.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
-#include <boost/format.hpp>
-#include <boost/filesystem.hpp>
-
 #include <TLorentzVector.h>
-#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;

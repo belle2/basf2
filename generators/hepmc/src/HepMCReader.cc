@@ -13,6 +13,8 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+#include <HepMC/IO_GenEvent.h>
+
 #include <TLorentzVector.h>
 
 using namespace std;

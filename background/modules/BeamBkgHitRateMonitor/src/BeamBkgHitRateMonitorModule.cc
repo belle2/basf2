@@ -20,8 +20,6 @@
 #include <background/modules/BeamBkgHitRateMonitor/EKLMHitRateCounter.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <framework/io/RootIOUtilities.h>

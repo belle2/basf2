@@ -16,13 +16,6 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/analyzingTools/algorithms/AnalyzingAlgorithmBase.h>
 
-// root:
-#include <TMath.h>
-
-// stl:
-#include <string>
-
-
 namespace Belle2 {
   /** INFO
    * This file contains all the algorithms retrieving infos from Clusters.

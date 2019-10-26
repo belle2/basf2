@@ -12,8 +12,10 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 #include <framework/logging/Logger.h>
 #include <TH1F.h>
+#include <TH1D.h>
 
 namespace Belle2 {
   namespace TOP {
@@ -61,6 +63,11 @@ namespace Belle2 {
        * @param xmax upper limit of the search region
        */
       Chi2MinimumFinder1D(int nbins, double xmin, double xmax);
+
+      /**
+       * Constructor from a histogram
+       */
+      Chi2MinimumFinder1D(const std::shared_ptr<TH1D> h);
 
       /**
        * Set chi^2 values to zero

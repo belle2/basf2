@@ -8,12 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TDirectory.h>
-
-/* Belle2 headers. */
-#include <klm/dataobjects/KLMChannelIndex.h>
+/* Own header. */
 #include <klm/modules/KLMDQM/KLMDQMModule.h>
+
+/* KLM headers. */
+#include <klm/dataobjects/KLMChannelIndex.h>
+
+/* ROOT headers. */
+#include <TDirectory.h>
 
 using namespace Belle2;
 
@@ -41,8 +43,6 @@ KLMDQMModule::KLMDQMModule() :
   addParam("histogramDirectoryNameBKLM", m_HistogramDirectoryNameBKLM,
            "Directory for BKLM DQM histograms in ROOT file.",
            std::string("BKLM"));
-  addParam("inputDigitsName", m_inputDigitsName,
-           "Name of BKLMDigit store array", std::string("BKLMDigits"));
   m_ChannelArrayIndex = &(KLMChannelArrayIndex::Instance());
   m_SectorArrayIndex = &(KLMSectorArrayIndex::Instance());
   m_ElementNumbers = &(KLMElementNumbers::Instance());
@@ -73,11 +73,8 @@ void KLMDQMModule::defineHistoEKLM()
 
 void KLMDQMModule::defineHistoBKLM()
 {
-
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir(m_HistogramDirectoryNameBKLM.c_str())->cd();
-
-
   m_bklmSectorLayerPhi = new TH1F("SectorLayerPhi", "Sector and layer number occupancy for phi-readout hits",
                                   240, 0.0, 239.0);
   m_bklmSectorLayerPhi->GetXaxis()->SetTitle("sector*15 + layer (0..120 = backward, 120..240 = section)");
@@ -185,10 +182,11 @@ void KLMDQMModule::defineHisto()
 
 void KLMDQMModule::initialize()
 {
-  REG_HISTOGRAM
-  m_Digits.isRequired();
-  StoreArray<BKLMDigit> digits(m_inputDigitsName);
-  digits.isRequired();
+  REG_HISTOGRAM;
+  m_BklmDigits.isRequired();
+  m_BklmHit1ds.isOptional();
+  m_BklmHit2ds.isOptional();
+  m_EklmDigits.isRequired();
 }
 
 void KLMDQMModule::beginRun()
@@ -220,12 +218,12 @@ void KLMDQMModule::beginRun()
 
 void KLMDQMModule::event()
 {
-  int i, n;
+  int i, nEklmDigits;
   EKLMDigit* eklmDigit;
-  n = m_Digits.getEntries();
+  nEklmDigits = m_EklmDigits.getEntries();
   /* EKLM. */
-  for (i = 0; i < n; i++) {
-    eklmDigit = m_Digits[i];
+  for (i = 0; i < nEklmDigits; i++) {
+    eklmDigit = m_EklmDigits[i];
     /*
      * Reject digits that are below the threshold (such digits may appear
      * for simulated events).
@@ -254,11 +252,10 @@ void KLMDQMModule::event()
     m_TimeScintillatorEKLM->Fill(eklmDigit->getTime());
   }
   /* BKLM. */
-  StoreArray<BKLMDigit> digits(m_inputDigitsName);
-  int nent = digits.getEntries();
-  m_bklmDigitsN->Fill((double)digits.getEntries());
-  for (i = 0; i < nent; i++) {
-    BKLMDigit* digit = static_cast<BKLMDigit*>(digits[i]);
+  int nBklmDigits = m_BklmDigits.getEntries();
+  m_bklmDigitsN->Fill((double)nBklmDigits);
+  for (i = 0; i < nBklmDigits; i++) {
+    BKLMDigit* digit = static_cast<BKLMDigit*>(m_BklmDigits[i]);
     int section = digit->getSection();
     int sector = digit->getSector();
     int layer = digit->getLayer();
@@ -281,17 +278,15 @@ void KLMDQMModule::event()
     else
       m_TimeScintillatorBKLM->Fill(digit->getTime());
   }
-  StoreArray<BKLMHit2d> hits(m_inputHitsName2d);
-  int nnent = hits.getEntries();
-  for (i = 0; i < nnent; i++) {
-    BKLMHit2d* hit = static_cast<BKLMHit2d*>(hits[i]);
-    TVector3 hitPosition = hit->getGlobalPosition();
+  int nBklmHits2d = m_BklmHit2ds.getEntries();
+  for (i = 0; i < nBklmHits2d; i++) {
+    BKLMHit2d* hit2d = static_cast<BKLMHit2d*>(m_BklmHit2ds[i]);
+    TVector3 hitPosition = hit2d->getGlobalPosition();
     m_bklmHit2dsZ->Fill(hitPosition.Z());
   }
-  StoreArray<BKLMHit1d> hits1d(m_inputHitsName1d);
-  int nent1d = hits1d.getEntries();
-  for (i = 0; i < nent1d; i++) {
-    BKLMHit1d* hit1d = static_cast<BKLMHit1d*>(hits1d[i]);
+  int nBklmHits1d = m_BklmHit1ds.getEntries();
+  for (i = 0; i < nBklmHits1d; i++) {
+    BKLMHit1d* hit1d = static_cast<BKLMHit1d*>(m_BklmHit1ds[i]);
     if (hit1d->isPhiReadout()) {
       m_bklmSectorLayerPhi->Fill(hit1d->getSection() * 120 + (hit1d->getSector() - 1) * 15 + (hit1d->getLayer() - 1));
     } else {

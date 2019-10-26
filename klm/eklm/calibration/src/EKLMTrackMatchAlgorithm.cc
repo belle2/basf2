@@ -8,7 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/eklm/calibration/EKLMTrackMatchAlgorithm.h>
+
+/* KLM headers. */
 #include <klm/dataobjects/KLMChannelIndex.h>
 
 using namespace Belle2;

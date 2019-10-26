@@ -23,13 +23,11 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventKinematics.h>
-#include <analysis/dataobjects/TauPairDecay.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <framework/dataobjects/EventT0.h>
 
@@ -37,18 +35,12 @@
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
 
-// cluster utils
-#include <analysis/ClusterUtility/ClusterUtils.h>
-
 #include <analysis/utility/PCmsLabTransform.h>
 
 #include <framework/logging/Logger.h>
 
 #include <TLorentzVector.h>
 #include <TVector3.h>
-
-#include <functional>
-#include <string>
 
 namespace Belle2 {
   namespace Variable {
@@ -214,11 +206,11 @@ namespace Belle2 {
 
       if (elementI < 0 || elementI > 3) {
         B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 3]: i = " << elementI);
-        return 0;
+        return std::numeric_limits<float>::quiet_NaN();
       }
       if (elementJ < 0 || elementJ > 3) {
         B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 3]: j = " << elementJ);
-        return 0;
+        return std::numeric_limits<float>::quiet_NaN();
       }
 
       static DBObjPtr<BeamSpot> beamSpotDB;
@@ -408,12 +400,11 @@ namespace Belle2 {
     double eventTimeSeconds(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
-      double evtTime = 0.;
 
       if (!evtMetaData) {
         return std::numeric_limits<float>::quiet_NaN();
       }
-      evtTime = trunc(evtMetaData->getTime() / 1e9);
+      double evtTime = trunc(evtMetaData->getTime() / 1e9);
 
       return evtTime;
     }
@@ -421,14 +412,13 @@ namespace Belle2 {
     double eventTimeSecondsFractionRemainder(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
-      double evtTimeFrac = 0.;
 
       if (!evtMetaData) {
         return std::numeric_limits<float>::quiet_NaN();
       }
       double evtTime = trunc(evtMetaData->getTime() / 1e9);
 
-      evtTimeFrac = (evtMetaData->getTime() - evtTime * 1e9) / 1e9;
+      double evtTimeFrac = (evtMetaData->getTime() - evtTime * 1e9) / 1e9;
 
       return evtTimeFrac;
     }
@@ -436,7 +426,6 @@ namespace Belle2 {
     double eventT0(const Particle*)
     {
       StoreObjPtr<EventT0> evtT0;
-      double t0 = 0.;
 
       if (!evtT0) {
         B2WARNING("StoreObjPtr<EventT0> does not exist, are you running over cDST data?");
@@ -444,13 +433,11 @@ namespace Belle2 {
       }
 
       if (evtT0->hasEventT0()) {
-        t0 = evtT0->getEventT0();
+        return evtT0->getEventT0();
       } else {
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return t0;
     }
-
 
 
     VARIABLE_GROUP("Event");

@@ -97,6 +97,8 @@ namespace Belle2 {
       std::string m_relClusterTrueHitName;
       /** Name of the relation between SVDClusters and SVDShaperDigits */
       std::string m_relClusterShaperDigitName;
+      /** Name of the SVDEventInfo object */
+      std::string m_svdEventInfoName;
 
       //2. Strip and time fitter data
       /** Name of the time fitter (db label) */

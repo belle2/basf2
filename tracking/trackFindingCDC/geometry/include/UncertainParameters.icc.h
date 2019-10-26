@@ -15,11 +15,6 @@
 #include <tracking/trackFindingCDC/numerics/JacobianMatrixUtil.h>
 #include <tracking/trackFindingCDC/numerics/ParameterVectorUtil.h>
 
-#include <tracking/trackFindingCDC/numerics/CovarianceMatrix.h>
-#include <tracking/trackFindingCDC/numerics/PrecisionMatrix.h>
-#include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
-#include <tracking/trackFindingCDC/numerics/ParameterVector.h>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
 

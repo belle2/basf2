@@ -10,19 +10,15 @@
 
 #pragma once
 
-#include <simulation/kernel/SensitiveDetectorBase.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
-
+/* KLM headers. */
 #include <klm/bklm/dbobjects/BKLMSimulationPar.h>
+
+/* Belle 2 headers. */
+#include <framework/database/DBObjPtr.h>
+#include <simulation/kernel/SensitiveDetectorBase.h>
 
 namespace Belle2 {
 
-  class BKLMSimHit;
   class BkgSensitiveDetector;
 
   namespace bklm {

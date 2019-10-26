@@ -13,7 +13,7 @@ import stdCharged as charged
 import stdPhotons as photons
 import skimExpertFunctions as skimExp
 
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 
 darkskimpath = b2.Path()
 

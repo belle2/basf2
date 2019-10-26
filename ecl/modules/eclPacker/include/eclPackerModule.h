@@ -10,6 +10,7 @@
 #pragma once
 
 //Framework
+#include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 

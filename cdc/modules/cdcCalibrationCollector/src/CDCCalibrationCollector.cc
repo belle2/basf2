@@ -10,7 +10,6 @@
 
 #include "cdc/modules/cdcCalibrationCollector/CDCCalibrationCollector.h"
 #include <cdc/translators/RealisticTDCCountTranslator.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -19,7 +18,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackPoint.h>
-#include <genfit/KalmanFitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/MeasurementOnPlane.h>
 #include <genfit/MeasuredStateOnPlane.h>
@@ -28,6 +26,7 @@
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
+#include <TH1F.h>
 
 using namespace std;
 using namespace Belle2;

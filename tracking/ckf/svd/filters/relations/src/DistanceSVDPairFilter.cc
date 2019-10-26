@@ -10,11 +10,7 @@
 #include <tracking/ckf/svd/filters/relations/DistanceSVDPairFilter.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <vxd/geometry/GeoCache.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

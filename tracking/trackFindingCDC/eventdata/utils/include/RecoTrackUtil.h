@@ -12,7 +12,6 @@
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
-  class CDCHit;
   class RecoTrack;
 
   namespace TrackFindingCDC {

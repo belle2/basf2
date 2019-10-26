@@ -11,10 +11,6 @@
 #include <tracking/modules/spacePointCreator/SPTCvirtualIPRemoverModule.h>
 #include <framework/logging/Logger.h>
 
-// ROOT
-#include <TVector3.h>
-#include <TMath.h>
-
 using namespace std;
 using namespace Belle2;
 

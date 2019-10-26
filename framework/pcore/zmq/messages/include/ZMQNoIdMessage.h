@@ -10,18 +10,9 @@
 #pragma once
 
 #include <framework/pcore/zmq/messages/ZMQModuleMessage.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/DataStoreStreamer.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/core/RandomGenerator.h>
-
 #include <framework/pcore/zmq/messages/ZMQDefinitions.h>
-#include <framework/logging/LogMethod.h>
 
 #include <zmq.hpp>
-#include <memory>
-
-
 
 namespace Belle2 {
   /// A message without an associated socket ID. Is used in most cases.

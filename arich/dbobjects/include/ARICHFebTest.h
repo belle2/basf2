@@ -12,14 +12,12 @@
 
 #include <TObject.h>
 #include <string>
-#include <cmath>
 #include <vector>
 #include <utility>
 #include <TTimeStamp.h>
 #include <TH2F.h>
 #include <TH3F.h>
 
-#include <TROOT.h>
 #include <TClass.h>
 
 namespace Belle2 {

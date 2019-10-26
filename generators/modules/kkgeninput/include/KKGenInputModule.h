@@ -14,9 +14,7 @@
 #include <framework/core/Module.h>
 
 #include <string>
-#include <vector>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/kkmc/KKGenInterface.h>
 

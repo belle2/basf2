@@ -10,9 +10,7 @@
 
 #pragma once
 
-#include <TTree.h>
 #include "arich/dataobjects/ARICHPhoton.h"
-#include "arich/dataobjects/ARICHInfo.h"
 
 //#define ALIGNMENT_USING_BHABHA
 

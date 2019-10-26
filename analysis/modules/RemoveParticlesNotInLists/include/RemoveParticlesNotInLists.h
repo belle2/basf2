@@ -12,16 +12,10 @@
 
 #include <framework/core/Module.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
 #include <analysis/utility/ParticleSubset.h>
-#include <analysis/dataobjects/ParticleList.h>
-
 
 #include <string>
 #include <vector>
-#include <set>
 
 namespace Belle2 {
 

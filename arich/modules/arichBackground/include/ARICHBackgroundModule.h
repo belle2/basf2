@@ -18,9 +18,7 @@
 
 #include <string>
 
-#include <TRandom3.h>
 #include <TFile.h>
-#include <TH2F.h>
 #include <TTree.h>
 
 namespace Belle2 {

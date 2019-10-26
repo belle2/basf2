@@ -676,26 +676,31 @@ class ConditionsDB:
 
         Parameters:
           filename (str): filename of the testing payload storage file that should be uploaded
-          normalize (bool/str): if True the payload root files will be normalized to have the same checksum for the same content,
-                                if normalize is a string in addition the file name in the root file metadata will be set to it
+          normalize (bool/str): if True the payload root files will be
+            normalized to have the same checksum for the same content, if
+            normalize is a string in addition the file name in the root file
+            metadata will be set to it
           data (dict): a dictionary with the information provided by the user:
-            task: category of globaltag, either master, online, prompt, data, mc, or analysis
-            tag: the globaltage name
-            request: type of request, either Update, New, or Modification. The latter two imply task == master because
+
+            * task: category of globaltag, either master, online, prompt, data, mc, or analysis
+            * tag: the globaltage name
+            * request: type of request, either Update, New, or Modification. The latter two imply task == master because
               if new payload classes are introduced or payload classes are modified then they will first be included in
               the master globaltag. Here a synchronization of code and payload changes has to be managed.
               If new or modified payload classes should be included in other globaltags they must already be in a release.
-            pull-request: number of the pull request containing new or modified payload classes, only for request == New or Modified
-            backward-compatibility: description of what happens if the old payload is encountered by the updated code,
+            * pull-request: number of the pull request containing new or modified payload classes,
+              only for request == New or Modified
+            * backward-compatibility: description of what happens if the old payload is encountered by the updated code,
               only for request == Modified
-            forward-compatibility: description of what happens if a new payload is encountered by the existing code,
+            * forward-compatibility: description of what happens if a new payload is encountered by the existing code,
               only for request == Modified
-            release: the required release version
-            reason: the reason for the request
-            description: a detailed description for the globaltag manager
-            issue: identifier of an existing jira issue (optional)
-            user: name of the user
-            time: time stamp of the request
+            * release: the required release version
+            * reason: the reason for the request
+            * description: a detailed description for the globaltag manager
+            * issue: identifier of an existing jira issue (optional)
+            * user: name of the user
+            * time: time stamp of the request
+
           password (str): the password for access to jira
 
         Returns:
@@ -773,6 +778,19 @@ class ConditionsDB:
 
         # comment on an existing issue
         else:
+            # Let's make sure all assignees of new issues are added as watchers
+            # in that case, otherwise they might never find out
+            new_issue_config = jira_global_tag_v2(data['task'])
+            if isinstance(new_issue_config, dict) and "assignee" in new_issue_config:
+                user = new_issue_config['assignee'].get('name', None)
+                if user is not None:
+                    response = requests.post(f'https://agira.desy.de/rest/api/latest/issue/{issue}/watchers',
+                                             auth=(data['user'], password), json=user)
+                    if response.status_code in range(200, 210):
+                        B2INFO(f"Added {user} as watcher to {issue}")
+                    else:
+                        B2WARNING(f"Could not add {user} as watcher to {issue}: {response.status_code}")
+
             B2INFO(f"Commenting on jira issue {issue} for {data['task']} globaltag request")
             response = requests.post('https://agira.desy.de/rest/api/latest/issue/%s/comment' % issue,
                                      auth=(data['user'], password), json={'body': description})
@@ -781,6 +799,8 @@ class ConditionsDB:
             else:
                 B2ERROR('The commenting of the issue failed: ' + requests.status_codes._codes[response.status_code][0])
                 return False
+
+        return True
 
 
 def require_database_for_test(timeout=60, base_url=None):

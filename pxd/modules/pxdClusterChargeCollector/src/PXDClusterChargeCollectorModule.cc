@@ -17,7 +17,6 @@
 #include <TH1I.h>
 
 #include <boost/format.hpp>
-#include <cmath>
 
 using namespace std;
 using boost::format;

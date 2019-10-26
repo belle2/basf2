@@ -8,9 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+/* Own header. */
 #include <klm/eklm/modules/EKLMReconstructor/EKLMReconstructorModule.h>
+
+/* KLM headers. */
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+
+/* Belle 2 headers. */
 #include <framework/gearbox/Const.h>
 
 using namespace Belle2;

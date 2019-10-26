@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <analysis/variables/ContinuumSuppressionVariables.h>
-#include <analysis/variables/ParameterVariables.h>
 #include <analysis/variables/ROEVariables.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
@@ -24,14 +23,11 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/Conversion.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
 
 #include <TLorentzVector.h>
-#include <TVectorF.h>
 #include <TVector3.h>
 
 #include <cmath>
@@ -89,67 +85,47 @@ namespace Belle2 {
 
     double R2(const Particle* particle)
     {
-      double result = -1.0;
-
       const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
       if (!qq)
-        return result;
+        return std::numeric_limits<float>::quiet_NaN();
 
-      result = qq->getR2();
-
-      return result;
+      return qq->getR2();
     }
 
     double thrustBm(const Particle* particle)
     {
-      double result = -1.0;
-
       const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
       if (!qq)
-        return result;
+        return std::numeric_limits<float>::quiet_NaN();
 
-      result = qq->getThrustBm();
-
-      return result;
+      return qq->getThrustBm();
     }
 
     double thrustOm(const Particle* particle)
     {
-      double result = -1.0;
-
       const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
       if (!qq)
-        return result;
+        return std::numeric_limits<float>::quiet_NaN();
 
-      result = qq->getThrustOm();
-
-      return result;
+      return qq->getThrustOm();
     }
 
     double cosTBTO(const Particle* particle)
     {
-      double result = -1.0;
-
       const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
       if (!qq)
-        return result;
+        return std::numeric_limits<float>::quiet_NaN();
 
-      result = qq->getCosTBTO();
-
-      return result;
+      return qq->getCosTBTO();
     }
 
     double cosTBz(const Particle* particle)
     {
-      double result = -1.0;
-
       const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
       if (!qq)
-        return result;
+        return std::numeric_limits<float>::quiet_NaN();
 
-      result = qq->getCosTBz();
-
-      return result;
+      return qq->getCosTBz();
     }
 
     Manager::FunctionPtr KSFWVariables(const std::vector<std::string>& arguments)

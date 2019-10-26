@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <framework/pcore/ProcessMonitor.h>
 #include <framework/core/EventProcessor.h>
-#include <framework/logging/LogMethod.h>
 #include <framework/pcore/GlobalProcHandler.h>
 
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>

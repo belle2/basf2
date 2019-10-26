@@ -15,9 +15,9 @@
 #include <framework/logging/Logger.h>
 #include <framework/io/RootIOUtilities.h>
 
-#include <boost/filesystem/operations.hpp>
+#include <TLeaf.h>
 
-#include <iostream>
+#include <boost/filesystem/operations.hpp>
 
 namespace Belle2 {
   namespace MVA {

@@ -15,7 +15,6 @@
 #include <boost/python/object.hpp>
 #include <boost/python/list.hpp>
 
-#include <algorithm>
 #include <utility>
 #include <memory>
 

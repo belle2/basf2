@@ -9,11 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerObject.h>
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <string>
 
 namespace Belle2 {
   namespace SoftwareTrigger {

@@ -7,27 +7,25 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <gtest/gtest.h>
 
+#include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/GlobalTimeLine.h>
 #include <alignment/Manager.h>
-
+#include <cdc/dbobjects/CDCAlignment.h>
+#include <framework/database/Configuration.h>
+#include <framework/database/Database.h>
+#include <framework/database/EventDependency.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <framework/database/Database.h>
-#include <framework/database/LocalDatabase.h>
-#include <framework/database/DatabaseChain.h>
-#include <framework/database/ConditionsDatabase.h>
-#include <framework/dataobjects/EventMetaData.h>
+#include <gtest/gtest.h>
 
 #include <TFile.h>
-#include <TMath.h>
+
+#include <boost/filesystem.hpp>
 
 #include <iostream>
 #include <string>
-#include <boost/filesystem.hpp>
-
-#include <framework/database/Configuration.h>
 
 using namespace std;
 using namespace Belle2;

@@ -12,9 +12,6 @@
 
 #include <string>
 #include <vector>
-#include <utility>
-
-#include <TFile.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -25,14 +22,10 @@
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
-#include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 #include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/FullSecID.h>
-#include <tracking/dataobjects/SectorMapConfig.h>
 #include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
-#include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
-
 
 namespace Belle2 {
   /** The Segment Network Producer Module.

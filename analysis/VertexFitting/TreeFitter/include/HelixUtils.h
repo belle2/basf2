@@ -12,7 +12,6 @@
 #include <string>
 
 #include <framework/dataobjects/Helix.h>
-#include <framework/dataobjects/UncertainHelix.h>
 #include <Eigen/Core>
 namespace TreeFitter {
 

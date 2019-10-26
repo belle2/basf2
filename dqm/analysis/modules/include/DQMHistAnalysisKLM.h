@@ -11,8 +11,6 @@
 #pragma once
 
 /* External headers. */
-#include <TROOT.h>
-#include <TClass.h>
 #include <TCanvas.h>
 #include <TLatex.h>
 #include <TText.h>
@@ -23,7 +21,6 @@
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
 #include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
-#include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>

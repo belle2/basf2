@@ -16,7 +16,7 @@
 #include <TTree.h>
 #include <TError.h>
 
-#include <sys/signal.h>
+#include <csignal>
 
 #include <boost/program_options.hpp>
 

@@ -12,7 +12,6 @@
 #include <boost/format.hpp>
 #include <daq/slc/base/StringUtil.h>
 #include <TClass.h>
-#include <TDirectory.h>
 #include "TROOT.h"
 
 using namespace std;
@@ -48,7 +47,7 @@ void DQMHistAnalysisTOPModule::initialize()
   m_c_badHitsMean = new TCanvas("TOP/c_bad_hits_mean");
   m_c_badHitsRMS = new TCanvas("TOP/c_bad_hits_rms");
 
-  m_h_goodHitsMean = new TH1F("TOP/good_hits_mean", "Good hits per event vs. slot number", 16, 0.5, 16.5);
+  m_h_goodHitsMean = new TH1F("TOP/good_hits_mean", "Mean of good hits per event", 16, 0.5, 16.5);
   m_h_goodHitsRMS = new TH1F("TOP/good_hits_rms", "RMS of good hits per event", 16, 0.5, 16.5);
   m_h_badHitsMean = new TH1F("TOP/bad_hits_mean", "Mean of bad hits per event", 16, 0.5, 16.5);
   m_h_badHitsRMS = new TH1F("TOP/bad_hits_rms", "RMS of bad hits per event", 16, 0.5, 16.5);
@@ -81,7 +80,7 @@ void DQMHistAnalysisTOPModule::initialize()
   m_line2->SetLineColor(kRed);
 
   m_text1 = new TPaveText(2, 400, 8, 500, "NB");
-  m_text1->SetFillColor(kWhite);
+  m_text1->SetFillColorAlpha(kWhite, 0);
   m_text1->SetBorderSize(0);
   m_text1->AddText("Expect no entries outside of red lines");
 }

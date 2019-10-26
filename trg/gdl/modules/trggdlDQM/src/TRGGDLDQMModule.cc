@@ -865,7 +865,7 @@ TRGGDLDQMModule::isFired(std::string bitname)
   boost::algorithm::to_lower(bitname);
   int bn = m_dbftdl->getoutbitnum(bitname.c_str());
   for (unsigned clk = 0; clk < n_clocks; clk++) {
-    if (bn > 0) {
+    if (bn > -1) {
       if (isPsnm) {
         if (h_p->GetBinContent(clk + 1, bn + 1) > 0)
           return true;
@@ -877,7 +877,7 @@ TRGGDLDQMModule::isFired(std::string bitname)
   }
   bn = m_dbinput->getinbitnum(bitname.c_str());
   for (unsigned clk = 0; clk < n_clocks; clk++) {
-    if (bn > 0) {
+    if (bn > -1) {
       if (h_i->GetBinContent(clk + 1, bn + 1) > 0)
         return true;
     }

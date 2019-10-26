@@ -10,9 +10,7 @@
 
 //basf2
 #include <arich/dbobjects/ARICHGeoCooling.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <math.h>
 #include <iostream>
 #include <iomanip>
 

@@ -18,7 +18,7 @@ from stdCharged import stdPi
 from skimExpertFunctions import setSkimLogging, encodeSkimName, get_test_file
 
 # basic setup
-gb2_setuprel = 'release-03-02-03'
+gb2_setuprel = 'release-04-00-00'
 skimCode = encodeSkimName('BtoXgamma')
 
 path = Path()

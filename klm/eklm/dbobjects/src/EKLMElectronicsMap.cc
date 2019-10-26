@@ -8,9 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
+
+/* KLM headers. */
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
+
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;

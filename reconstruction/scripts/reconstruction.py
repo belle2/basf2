@@ -30,7 +30,7 @@ import mdst
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=False,
-                       nCDCHitsMax=4000, nSVDShaperDigitsMax=70000):
+                       nCDCHitsMax=6000, nSVDShaperDigitsMax=70000):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -338,6 +338,14 @@ def add_cdst_output(
         'TRGECLUnpackerEvtStores',
         'BKLMHit2ds',
         'TRGGRLUnpackerStore',
+        'CDCTriggerSegmentHits',
+        'CDCTrigger2DFinderTracks',
+        'CDCTrigger2DFinderClones',
+        'CDCTriggerNNInputSegmentHits',
+        'CDCTriggerNNInput2DFinderTracks',
+        'CDCTriggerNeuroTracks',
+        'CDCTriggerNeuroTracksInput',
+        'TRGGDLUnpackerStores',
         'TracksToBKLMHit2ds',
         'RecoHitInformations',
         'RecoHitInformationsToBKLMHit2ds',

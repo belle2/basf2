@@ -8,16 +8,10 @@
 #include <iostream>
 #include <fstream>
 #include <iterator>
-#include <unistd.h>
 #include "CLHEP/Matrix/Vector.h"
 #include "CLHEP/Matrix/Matrix.h"
 #include <G4TwoVector.hh>
 #include <G4Vector3D.hh>
-#include <G4Polycone.hh>
-#include <G4LogicalVolume.hh>
-#include "ecl/geometry/BelleLathe.h"
-#include "G4NistManager.hh"
-#include "G4PVPlacement.hh"
 #include <framework/utilities/FileSystem.h>
 
 using namespace std;

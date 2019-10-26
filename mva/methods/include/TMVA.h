@@ -16,11 +16,6 @@
 #include <mva/interface/Teacher.h>
 #include <mva/interface/Expert.h>
 
-#include <framework/utilities/MakeROOTCompatible.h>
-#include <framework/logging/LogSystem.h>
-#include <framework/utilities/Utils.h>
-#include <framework/logging/Logger.h>
-
 #include <TMVA/Factory.h>
 #include <TMVA/Tools.h>
 #include <TMVA/Reader.h>

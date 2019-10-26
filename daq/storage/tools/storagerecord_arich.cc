@@ -1,9 +1,6 @@
-#include <unistd.h>
-#include <cstdlib>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/pcore/MsgHandler.h>

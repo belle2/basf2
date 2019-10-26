@@ -21,8 +21,6 @@
 #include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
 #include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 
-#include <tracking/ckf/general/utilities/ClassMnemomics.h>
-
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <pxd/dataobjects/PXDCluster.h>

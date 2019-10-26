@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <analysis/VariableManager/Manager.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <vector>
 

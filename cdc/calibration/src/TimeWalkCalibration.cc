@@ -1,24 +1,15 @@
 #include <cdc/calibration/TimeWalkCalibration.h>
-//#include <calibration/CalibrationAlgorithm.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/WireID.h>
 
-#include <TMinuit.h>
-#include <TH1D.h>
-#include <TH2D.h>
 #include <TF1.h>
 #include <TFile.h>
 #include <TChain.h>
 #include <TDirectory.h>
 #include <TROOT.h>
-#include <TTree.h>
-#include "iostream"
-#include "string"
 #include <framework/utilities/FileSystem.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBImportObjPtr.h>
-#include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>

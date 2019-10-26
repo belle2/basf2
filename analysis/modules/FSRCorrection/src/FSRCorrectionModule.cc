@@ -12,18 +12,21 @@
 #include <analysis/modules/FSRCorrection/FSRCorrectionModule.h>
 
 // framework aux
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/StoreArray.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
+
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
-#include <analysis/utility/PCmsLabTransform.h>
+
+// variables
+#include <analysis/variables/ECLVariables.h>
 
 #include <cmath>
 #include <algorithm>
@@ -201,6 +204,7 @@ namespace Belle2 {
       correctedLepton.setPValue(lepton->getPValue());
 
       correctedLepton.addExtraInfo("fsrCorrected", float(fsrGammaFound));
+      if (fsrGammaFound) correctedLepton.addExtraInfo("bremsCorrectedPhotonEnergy", Variable::eclClusterE(fsrGamma));
 
       // add the mc relation
       Particle* newLepton = particles.appendNew(correctedLepton);

@@ -52,7 +52,7 @@ def create_stdreco_path(components):
     tmp = create_path()
     for m in path.modules():
         if m.name() == "PXDPostErrorChecker":
-            continue
+            m.param('CriticalErrorMask', 0)
         if m.name() in ["PXDUnpacker", "CDCHitBasedT0Extraction", "TFCDC_WireHitPreparer"]:
             m.set_log_level(LogLevel.ERROR)
         if m.name() == "SVDSpacePointCreator":
@@ -84,7 +84,7 @@ def create_cosmics_path(components):
     tmp = create_path()
     for m in path.modules():
         if m.name() == "PXDPostErrorChecker":
-            continue
+            m.param('CriticalErrorMask', 0)
         if m.name() in ["PXDUnpacker", "CDCHitBasedT0Extraction", "TFCDC_WireHitPreparer"]:
             m.set_log_level(LogLevel.ERROR)
         if m.name() == "SVDSpacePointCreator":
@@ -103,7 +103,7 @@ def create_collector(db_components, **argk):
     m.param('calibrateVertex', True)
     # Not yet implemeted -> alwas OFF for now
     m.param('calibrateKinematics', False)
-    m.param('minUsedCDCHitFraction', 0.85)
+    m.param('minUsedCDCHitFraction', 0.8)
     m.param('minPValue', 0.0)
     m.param('externalIterations', 0)
     m.param('tracks', [])

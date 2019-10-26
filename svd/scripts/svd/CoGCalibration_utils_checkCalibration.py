@@ -44,6 +44,8 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
 
         timeCluster = svdClustersFromTracks.getClsTime()
         snrCluster = svdClustersFromTracks.getSNR()
+        sizeCluster = svdClustersFromTracks.getSize()
+        chargeCluster = svdClustersFromTracks.getCharge()
         layerCluster = svdClustersFromTracks.getSensorID().getLayerNumber()
         layerIndex = layerCluster - 3
         sensorCluster = svdClustersFromTracks.getSensorID().getSensorNumber()
@@ -76,6 +78,12 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
             cdcHist.Fill(tZeroSync)
             snrHist = self.snrList[layerIndex][ladderIndex][sensorIndex][sideIndex]
             snrHist.Fill(snrCluster)
+            sizeHist = self.sizeList[layerIndex][ladderIndex][sensorIndex][sideIndex]
+            sizeHist.Fill(sizeCluster)
+            chargeHist = self.chargeList[layerIndex][ladderIndex][sensorIndex][sideIndex]
+            chargeHist.Fill(chargeCluster/20000.)
+            cdcHistNoSync = self.cdcNoSyncList[layerIndex][ladderIndex][sensorIndex][sideIndex]
+            cdcHistNoSync.Fill(tZero)
 
             self.NTOT = self.NTOT + 1
 
@@ -95,6 +103,9 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         self.cogList = []
         self.cdcList = []
         self.snrList = []
+        self.sizeList = []
+        self.chargeList = []
+        self.cdcNoSyncList = []
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -105,12 +116,18 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
             layerList2 = []
             layerList3 = []
             layerList4 = []
+            layerList5 = []
+            layerList6 = []
+            layerList7 = []
 
             self.resList.append(layerList0)
             self.spList.append(layerList1)
             self.cogList.append(layerList2)
             self.cdcList.append(layerList3)
             self.snrList.append(layerList4)
+            self.sizeList.append(layerList5)
+            self.chargeList.append(layerList6)
+            self.cdcNoSyncList.append(layerList7)
 
             for ladder in geoCache.getLadders(layer):
                 ladderList0 = []
@@ -118,12 +135,18 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
                 ladderList2 = []
                 ladderList3 = []
                 ladderList4 = []
+                ladderList5 = []
+                ladderList6 = []
+                ladderList7 = []
 
                 layerList0.append(ladderList0)
                 layerList1.append(ladderList1)
                 layerList2.append(ladderList2)
                 layerList3.append(ladderList3)
                 layerList4.append(ladderList4)
+                layerList5.append(ladderList5)
+                layerList6.append(ladderList6)
+                layerList7.append(ladderList7)
 
                 for sensor in geoCache.getSensors(ladder):
                     sensorList0 = []
@@ -131,12 +154,18 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
                     sensorList2 = []
                     sensorList3 = []
                     sensorList4 = []
+                    sensorList5 = []
+                    sensorList6 = []
+                    sensorList7 = []
 
                     ladderList0.append(sensorList0)
                     ladderList1.append(sensorList1)
                     ladderList2.append(sensorList2)
                     ladderList3.append(sensorList3)
                     ladderList4.append(sensorList4)
+                    ladderList5.append(sensorList5)
+                    ladderList6.append(sensorList6)
+                    ladderList7.append(sensorList7)
 
         for i in geoCache.getLayers(Belle2.VXD.SensorInfoBase.SVD):
             layerN = i.getLayerNumber()
@@ -162,6 +191,26 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
                                                               " ", 200, -100, 100))
                         self.snrList[li][ldi][si].append(TH1F("snr" + "_" + str(layerN) + "." +
                                                               str(ladderN) + "." + str(sensorN) + "." + str(s), " ", 100, 0, 100))
+                        self.sizeList[li][ldi][si].append(TH1F("size" + "_" + str(layerN) + "." +
+                                                               str(ladderN) + "." + str(sensorN) + "." + str(s), " ", 100, 0, 100))
+                        self.chargeList[li][ldi][si].append(
+                            TH1F(
+                                "charge" +
+                                "_" +
+                                str(layerN) +
+                                "." +
+                                str(ladderN) +
+                                "." +
+                                str(sensorN) +
+                                "." +
+                                str(s),
+                                " ",
+                                100,
+                                0,
+                                100))
+                        self.cdcNoSyncList[li][ldi][si].append(TH1F("cdcNoSync" + "_" + str(layerN) + "." +
+                                                                    str(ladderN) + "." + str(sensorN) + "." + str(s),
+                                                                    " ", 200, -100, 100))
 
         self.EventT0Hist = TH1F("EventT0", " ", 160, -40, 40)
         self.alphaU = TH1F("alphaU", "first order coefficient ~ U side", 100, 0, 2)
@@ -171,7 +220,7 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
 
         self.gaus = TF1("gaus", 'gaus(0)', -150, 150)
         self.pol1 = TF1("pol1", "[0] + [1]*x", -30, 30)
-
+        self.pol3 = TF1("pol3", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -50, 50)
         self.NTOT = 0
 
     def event(self):
@@ -217,6 +266,11 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         expnumber[0] = int(self.expnumber)
         evttime = np.zeros(1, dtype=float)
         evttimeerr = np.zeros(1, dtype=float)
+        evttimeNoSync = np.zeros(1, dtype=float)
+        evttimeNoSyncerr = np.zeros(1, dtype=float)
+        clsSize = np.zeros(1, dtype=float)
+        clsCharge = np.zeros(1, dtype=float)
+        clsSNR = np.zeros(1, dtype=float)
 
         tfile = TFile(self.outputFileName, 'recreate')
         tfile.cd()
@@ -235,6 +289,12 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         tree.Branch("ExpNumber", expnumber, "ExpNumber/I")
         tree.Branch("EvtT0Mean", evttime, "EvtT0Mean/D")
         tree.Branch("EvtT0MeanErr", evttimeerr, "EvtT0MeanErr/D")
+        tree.Branch("EvtT0NoSyncMean", evttimeNoSync, "EvtT0NoSyncMean/D")
+        tree.Branch("EvtT0NoSyncMeanErr", evttimeNoSyncerr, "EvtT0NoSyncMeanErr/D")
+        tree.Branch("ClsSizeMean", clsSize, "ClsSizeMean/D")
+        tree.Branch("ClsChargeMean", clsCharge, "ClsChargeMean/D")
+        tree.Branch("ClsSNRMean", clsSNR, "ClsSNRMean/D")
+
         par = [0, 1]
 
         # tfileHist.cd()
@@ -258,7 +318,6 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
                     for side in range(2):
                         sideTree[0] = side
                         print("SIDE: " + str(side))
-
                         # Resolution distribution Histograms with Gaussian Fit
                         res = self.resList[li][ldi][si][side]
                         res.GetXaxis().SetTitle("cluster time - Synchronized EventT0 (ns)")
@@ -272,17 +331,32 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
                         cdc = self.cdcList[li][ldi][si][side]
                         cdc.GetXaxis().SetTitle("Synchronized EventT0 (ns)")
                         cdc.Write()
+                        cdcNoSync = self.cdcNoSyncList[li][ldi][si][side]
+                        cdcNoSync.GetXaxis().SetTitle("Not Synchronized EventT0 (ns)")
+                        cdcNoSync.Write()
                         # SNR Distribution Histograms
                         snr = self.snrList[li][ldi][si][side]
-                        snrMean = snr.GetMean()
+                        clsSNR[0] = snr.GetMean()
                         snr.GetXaxis().SetTitle("cluster SNR")
                         snr.Write()
+                        # Size Distribution Histograms
+                        size = self.sizeList[li][ldi][si][side]
+                        clsSize[0] = size.GetMean()
+                        size.GetXaxis().SetTitle("cluster Size")
+                        size.Write()
+                        # Charge Distribution Histograms
+                        charge = self.chargeList[li][ldi][si][side]
+                        clsCharge[0] = charge.GetMean()
+                        charge.GetXaxis().SetTitle("cluster Charge")
+                        charge.Write()
                         # ScatterPlot Histograms with Linear Fit
                         sp = self.spList[li][ldi][si][side]
                         covscalebias = sp.GetCovariance()
                         pfxsp = sp.ProfileX()
-                        self.pol1.SetParameters(0, 1)
-                        pfxsp.Fit(self.pol1, "R")
+                        # self.pol1.SetParameters(0, 1)
+                        # pfxsp.Fit(self.pol1, "R")
+                        self.pol3.SetParameters(0, 1.5, 0.05, 0.005)
+                        pfxsp.Fit(self.pol3, "R")
                         sp.GetXaxis().SetTitle("cluster time (ns)")
                         sp.GetYaxis().SetTitle("synchronized EventT0 (ns)")
                         sp.Write()
@@ -309,6 +383,11 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
                             evttimeerr[0] = 2
                         else:
                             evttimeerr[0] = cdc.GetRMS()/math.sqrt(cdc.GetEntries())
+                        evttimeNoSync[0] = cdcNoSync.GetMean()
+                        if cdcNoSync.GetEntries() == 0:
+                            evttimeNoSyncerr[0] = 2
+                        else:
+                            evttimeNoSyncerr[0] = cdcNoSync.GetRMS()/math.sqrt(cdcNoSync.GetEntries())
 
                         print("AFTER FITS")
 

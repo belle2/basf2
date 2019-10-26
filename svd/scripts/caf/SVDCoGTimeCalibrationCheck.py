@@ -67,7 +67,8 @@ else:
 # use_local_database(str(localdb) + "/database.txt", str(localdb), invertLogging=True)
 
 conditions.globaltags = [
-    'data_reprocessing_prompt_rel4_patch',
+    # 'svd_NOCoGCorrections',
+    'data_reprocessing_prompt_rel4_patchb',
 ]
 conditions.testing_payloads = [
     str(localdb) + "/database.txt",

@@ -23,7 +23,7 @@ import modularAnalysis as ana
 input_branches = [
     'SVDShaperDigitsFromTracks',
     'EventT0',
-    'SVDShaperDigits'
+    'SVDShaperDigits',
 ]
 
 now = datetime.datetime.now()
@@ -132,8 +132,8 @@ if __name__ == "__main__":
         print("See: basf2 -h")
         sys.exit(1)
 
-    'data_reprocessing_prompt_rel4_patch'
-    svdCoGCAF = SVDCoGTimeCalibration(good_input_files, ['data_reprocessing_prompt_rel4_patch', 'svd_NOCoGCorrections'])
+    # 'data_reprocessing_prompt_rel4_patch'
+    svdCoGCAF = SVDCoGTimeCalibration(good_input_files, ['data_reprocessing_prompt_rel4_patchb', 'svd_NOCoGCorrections'])
 
     cal_fw = CAF()
     cal_fw.add_calibration(svdCoGCAF)

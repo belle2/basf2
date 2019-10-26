@@ -78,6 +78,9 @@ namespace Belle2 {
 
   private:
 
+    /**EventMetaData */
+    StoreObjPtr<EventMetaData> m_emdata;
+
     /** SVDCluster */
     std::string m_svdClusters;
     StoreArray<SVDCluster> m_svdCls;
@@ -93,6 +96,7 @@ namespace Belle2 {
     /** SVDHistograms */
     SVDHistograms<TH2F>* m_hEventT0vsCoG = NULL;
     SVDHistograms<TH1F>* m_hEventT0 = NULL;
+    SVDHistograms<TH1F>* m_hEventT0nosync = NULL;
 
     /** Tree */
     std::string m_tree;

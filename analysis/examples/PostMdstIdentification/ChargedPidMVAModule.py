@@ -59,8 +59,6 @@ if __name__ == '__main__':
     import basf2
     from modularAnalysis import fillParticleLists, applyChargedPidMVA, variablesToNtuple
 
-    # basf2.conditions.prepend_testing_payloads("localdb/database.txt")
-    # basf2.conditions.prepend_globaltag("MY_BEAUTIFUL_GT")
     print(basf2.conditions.globaltags)
 
     # ------------

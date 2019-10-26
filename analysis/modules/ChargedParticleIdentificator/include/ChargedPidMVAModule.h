@@ -21,9 +21,6 @@
 
 // ANALYSIS
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dbobjects/ChargedPidMVAWeights.h>
 
 namespace Belle2 {

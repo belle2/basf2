@@ -3,6 +3,9 @@
 
 //ANALYSIS
 #include <mva/interface/Interface.h>
+#include <analysis/VariableManager/Utility.h>
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 
 //MDST
 #include <mdst/dataobjects/ECLCluster.h>
@@ -96,18 +99,9 @@ void ChargedPidMVAModule::event()
 
       B2DEBUG(11, "\tParticle [" << ipart << "]");
 
-      // If the particle list was created by the FSRCorrection module,
-      // the info in the mdst objects associated to the particles
-      // cannot be retrieved directly from the particle itself.
-      // Instead, one has to get the 0-th daughter, i.e. the original particle before brems correction.
-      // In fact, the daughter is the one that hold relations with the mdst objects.
-
-      const auto nDaughters = particle->getNDaughters();
-      const Particle* daughterLep = (nDaughters) ? particle->getDaughter(0) : nullptr;
-
       // Check that the particle has a valid relation set between track and ECL cluster.
       // Otherwise, skip to next.
-      const ECLCluster* eclCluster = (!nDaughters) ? particle->getECLCluster() : daughterLep->getECLCluster();
+      const ECLCluster* eclCluster = particle->getECLCluster();
       if (!eclCluster) {
         B2WARNING("\tParticle has invalid Track-ECLCluster relation, skip MVA application...");
         continue;
@@ -116,7 +110,7 @@ void ChargedPidMVAModule::event()
       // Retrieve the index for the correct MVA expert and dataset,
       // given (signal hypo, clusterTheta, p)
       auto theta   = eclCluster->getTheta();
-      auto p       = particle->getP(); // This is the momentum from the particle's 4-vec after any possible correction.
+      auto p       = particle->getP();
       int jth, ip;
       auto index   = m_weightfiles_representation->getMVAWeightIdx(sigPart, theta, p, jth, ip);
 
@@ -139,7 +133,7 @@ void ChargedPidMVAModule::event()
 
         auto varobj =  m_variables.at(index).at(ivar);
 
-        auto var = varobj->function((!nDaughters) ? particle : daughterLep);
+        auto var = varobj->function(particle);
 
         // Manual imputation value of -999 for NaN (undefined) variables.
         var = (std::isnan(var)) ? -999.0 : var;
@@ -155,7 +149,7 @@ void ChargedPidMVAModule::event()
 
         auto specobj =  m_spectators.at(index).at(ispec);
 
-        auto spec = specobj->function((!nDaughters) ? particle : daughterLep);
+        auto spec = specobj->function(particle);
 
         B2DEBUG(11, "\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
 
@@ -168,7 +162,7 @@ void ChargedPidMVAModule::event()
 
         std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(cutstr);
 
-        if (!cut->check((!nDaughters) ? particle : daughterLep)) {
+        if (!cut->check(particle)) {
           B2WARNING("\tParticle didn't pass MVA category cut, skip MVA application...");
           continue;
         }

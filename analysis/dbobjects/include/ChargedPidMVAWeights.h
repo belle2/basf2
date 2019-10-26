@@ -68,14 +68,19 @@ namespace Belle2 {
 
 
     /**
-     * Set the (cluster theta, p) grid of bins for this particle mass hypothesis' pdgId into the payload.
+     * Set the (clusterTheta, p) grid of bins for this particle mass hypothesis' pdgId into the payload.
      * @param pdg the particle mass hypothesis' pdgId.
      * @param grid the 2D histogram w/ the bin grid.
     */
     void storeClusterThetaPGrid(const int pdg, TH2F* grid)
     {
-      if (!isValidPdg(pdg)) { B2FATAL("PDG: " << pdg << " is not that of a valid charged particle! Aborting..."); }
+
+      if (!isValidPdg(pdg)) {
+        B2FATAL("PDG: " << pdg << " is not that of a valid charged particle! Aborting...");
+      }
+
       m_grids[pdg] = grid;
+
     }
 
 
@@ -89,7 +94,9 @@ namespace Belle2 {
     void storeMVAWeights(const int pdg, const std::vector<std::string>& filepaths)
     {
 
-      if (!isValidPdg(pdg)) { B2FATAL("PDG: " << pdg << " is not that of a valid charged particle! Aborting..."); }
+      if (!isValidPdg(pdg)) {
+        B2FATAL("PDG: " << pdg << " is not that of a valid charged particle! Aborting...");
+      }
 
       for (const auto& path : filepaths) {
 
@@ -124,7 +131,9 @@ namespace Belle2 {
     void storeCuts(const int pdg, const std::vector<std::string>& cutfiles)
     {
 
-      if (!isValidPdg(pdg)) { B2FATAL("PDG: " << pdg << " is not that of a valid charged particle! Aborting..."); }
+      if (!isValidPdg(pdg)) {
+        B2FATAL("PDG: " << pdg << " is not that of a valid charged particle! Aborting...");
+      }
 
       for (const auto& cutfile : cutfiles) {
 
@@ -323,7 +332,7 @@ namespace Belle2 {
 
     /**
      * This map contains - for each charged particle mass hypothesis' pdgId - a list of (serialized) Weightfile objects to be stored in the payload.
-     * The indexing in each vector must reflect the one of the corresponding 'linearised' TH2F histogram conatined in the m_grids map.
+     * The indexing in each vector must reflect the one of the corresponding 'linearised' TH2F histogram contained in the m_grids map.
      */
     WeightfilesByParticle m_weightfiles = {
       { Const::electron.getPDGCode(), std::vector<std::string>() },
@@ -337,7 +346,7 @@ namespace Belle2 {
     /**
      * This map contains - for each charged particle mass hypothesis' pdgId - a list of cuts to be stored in the payload.
      * To each Weightfile (i.e., training region), a cut.
-     * The indexing in each vector must reflect the one of the corresponding 'linearised' TH2F histogram conatined in the m_grids map.
+     * The indexing in each vector must reflect the one of the corresponding 'linearised' TH2F histogram contained in the m_grids map.
      */
     WeightfilesByParticle m_cuts = {
       { Const::electron.getPDGCode(), std::vector<std::string>() },

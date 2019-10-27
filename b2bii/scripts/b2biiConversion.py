@@ -70,7 +70,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
                                   path=None, entrySequences=None,
                                   convertECLCrystalEnergies=False,
                                   convertExtHits=False,
-                                  matchType2E9oE25Threshold=-1.1):
+                                  matchType2E9oE25Threshold=-1.1,
+                                  HadronAOnly=False, L4Only=False):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -106,6 +107,10 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
         fix = register_module('B2BIIFixMdst')
         # fix.logging.set_log_level(LogLevel.DEBUG)
         # fix.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
+        if(HadronAOnly or L4Only):
+            fix.param("HadronB", 0)
+        if(L4Only):
+            fix.param("HadronA", 0)
         path.add_module(fix)
 
         if(applyHadronBJSkim):

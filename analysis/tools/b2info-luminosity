@@ -8,7 +8,7 @@ Based on a bash script by Mikhail Remnev mikhail.remnev@desy.de
 https://confluence.desy.de/display/BI/ECL+LM+Integrated+luminosity+in+Phase+3
 
 Usage:
-    b2info-luminosity --exp <E> --runs <Range> --what [online|offline] --plot [DATE|RUN] [--verbose]
+    b2info-luminosity --exp <E> --runs <Range> --what [online|offline] --plot [DAY|WEEK|RUN] [--verbose]
 
 <E> experiment number (mandatory) A range is allowed
 <Range> run range (mandatory)
@@ -16,7 +16,7 @@ Usage:
     all runs between xx and yy (included) and run zz. Can have multiple ranges xx-yy,zz-ww
     not allowed if exp has range as well
 --what Use Offline (default) or Online luminosity
---plot Produce plot of integrated luminosity vs day (DATE) or vs run (RUN)
+--plot Produce plot of integrated luminosity vs day (DAY) or vs week (WEEK) or vs run (RUN)
 --verbose print lumi for each run
 --dbon|offline path of database to use (for developers)
 
@@ -113,9 +113,9 @@ def argparser():
                         help="DataBase path for OffLine Lumi")
 
     plot_actions = {
-        "DATE" : "Histogram of integrated luminosity per date",
+        "DAY"  : "Histogram of integrated luminosity per day",
+        "WEEK" : "Histogram of integrated luminosity per week",
         "RUN"  : "Histogram of integrated luminosity per run",
-        "TOT"  : "Graph of total integrated luminosity vs. date",
         }
 
     parser.add_argument("--plot",
@@ -257,13 +257,17 @@ class Luminosity:
             #srs_lumi_date = self.df.groupby(self.df["date"].dt.strftime('%Y/%m/%d'))["lumi"].sum()
             srs_lumi_date = self.df.groupby(self.df["date"].dt.floor('d'))["lumi"].sum()
             label="Day"
+            freq='D'
+            width=1.0
         if period==2: # per week
             # not working yet
             srs_lumi_date = self.df.groupby(self.df["date"].dt.floor('7d'))["lumi"].sum()
             #srs_lumi_date = self.df.groupby(pd.TimeGrouper(key='date',freq='W-MON'))["lumi"].sum()
             label="Week"
-
-        srs_lumi_date = srs_lumi_date.asfreq('D', fill_value=0.0)
+            freq='7d'
+            width=3.5
+    
+        srs_lumi_date = srs_lumi_date.asfreq(freq, fill_value=0.0)
 
         x = srs_lumi_date.index.values
         y = srs_lumi_date.values
@@ -273,14 +277,17 @@ class Luminosity:
         # there must be a cleaner way to do this
         yInt = np.append(np.array([0]), np.cumsum(srs_lumi_date.values)[:-1])
         
-        ax1.bar(x, y, label=f"{label} per {label}", color="blue", width=1.0)
+        ax1.bar(x, y, label=f"{label} per {label}", color="blue", width=width)
 
         ax1.set_xlabel(r"Date")
         ax1.set_ylabel(rf"Total integrated luminosity per {label} [$\mathrm{{fb}}^{{-1}}$]", color="blue")
         ax1.tick_params(axis='y', labelcolor="blue")
 
-        ax1.xaxis.set_major_locator(ticker.AutoLocator())
-        ax1.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+        if period==1:
+            ax1.xaxis.set_major_locator(ticker.AutoLocator())
+            ax1.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+        if period==2:
+            ax1.xaxis.set_major_locator(ticker.MultipleLocator(7))
         ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
 
         # plot integrate lumi
@@ -288,8 +295,11 @@ class Luminosity:
         ax2.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]", color="red")
         ax2.tick_params(axis='y', labelcolor="red")
         ax2.plot(x, yInt, color="red", label="Total",lw=3)
-        ax2.xaxis.set_major_locator(ticker.AutoLocator())
-        ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+        if period==1:
+            ax2.xaxis.set_major_locator(ticker.AutoLocator())
+            ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+        if period==2:
+            ax2.xaxis.set_major_locator(ticker.MultipleLocator(7))
         ax2.set_ylim(bottom=0)
 
         h1, l1 = ax1.get_legend_handles_labels()
@@ -400,8 +410,9 @@ if __name__ == '__main__':
     lumi.printLumi()
 
     if args.plot:
-        if args.plot == 'DATE':
+        if args.plot == 'DAY':
             lumi.plotLumiPerPeriod(1)
-            #lumi.plotLumiPerPeriod(2)
+        if args.plot == 'WEEK':
+            lumi.plotLumiPerPeriod(2)
         if args.plot == 'RUN':
             lumi.plotLumiPerRun()

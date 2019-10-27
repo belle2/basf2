@@ -21,8 +21,8 @@
  There are 7 stages:
    (Stage -1: Write out information about the provided data sample)
    Stage 0: Final State Particles (FSP)
-   Stage 1: pi0, J/Psi
-   Stage 2: K_S0
+   Stage 1: pi0, J/Psi, Lambda0
+   Stage 2: K_S0, Sigma+
    Stage 3: D and Lambda_c mesons
    Stage 4: D* mesons
    Stage 5: B mesons

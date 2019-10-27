@@ -39,6 +39,9 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
+
 
 def parseNumRange(string):
     """
@@ -221,7 +224,7 @@ class Luminosity:
         """
 
         #cmdexp = f"SELECT {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = :exp "
-        cmdexp = f"SELECT exp, {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp IN ({', '.join(['?' for _ in self.exp])})  "
+        cmdexp = f"SELECT exp, {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp IN ({', '.join(['?' for _ in self.exp])}) AND start_time > 0 "
         if args.runs:
             cmdexp += f" AND run >= {min(self.runs)} AND run <= {max(self.runs)}"
 
@@ -251,20 +254,21 @@ class Luminosity:
         # This returns a pandas.Series object.
         srs_lumi_date = []
         if period==1: # per day
-            srs_lumi_date = self.df.groupby(self.df["date"].dt.strftime('%Y/%m/%d'))["lumi"].sum()
+            #srs_lumi_date = self.df.groupby(self.df["date"].dt.strftime('%Y/%m/%d'))["lumi"].sum()
+            srs_lumi_date = self.df.groupby(self.df["date"].dt.floor('d'))["lumi"].sum()
             label="Day"
         if period==2: # per week
             # not working yet
-            srs_lumi_date = self.df.groupby(self.df["date"].dt.strftime('%w'))["lumi"].sum()
+            srs_lumi_date = self.df.groupby(self.df["date"].dt.floor('7d'))["lumi"].sum()
             #srs_lumi_date = self.df.groupby(pd.TimeGrouper(key='date',freq='W-MON'))["lumi"].sum()
             label="Week"
 
-
-        figure, ax1 = plt.subplots()
+        srs_lumi_date = srs_lumi_date.asfreq('D', fill_value=0.0)
 
         x = srs_lumi_date.index.values
-        x[0] = x[1] # groupby insert first date as epoch 0
         y = srs_lumi_date.values
+
+        figure, ax1 = plt.subplots()
 
         # there must be a cleaner way to do this
         yInt = np.append(np.array([0]), np.cumsum(srs_lumi_date.values)[:-1])

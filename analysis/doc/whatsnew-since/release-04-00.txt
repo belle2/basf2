@@ -1,6 +1,12 @@
 Changes in the analysis package
 -------------------------------
 
+Variables
++++++++++
+
+ * Allow use of meta variables in creation of aliases by replacing non
+   alphanumeric characters with underscores in the alias name
+
 Modules
 +++++++
 

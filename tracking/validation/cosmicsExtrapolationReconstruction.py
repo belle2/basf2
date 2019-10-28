@@ -20,7 +20,7 @@ main = basf2.create_path()
 # Input.
 main.add_module('RootInput', inputFileName='../CosmicsSimNoBkg.root')
 
-# Extrapolation. Tracks are not6 merged (otherwise, many backward-extrapolated
+# Extrapolation. Tracks are not merged (otherwise, many backward-extrapolated
 # tracks are removed).
 main.add_module('Gearbox')
 main.add_module('Geometry')

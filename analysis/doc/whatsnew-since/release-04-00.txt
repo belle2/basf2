@@ -16,7 +16,7 @@ Variables
 
 * Added :b2:var:`isSignalAcceptBremsPhotons` to ignore any reconstructed brems photons.
 
-  .. note:: This is not the generator-level match (see :issue:`BII-5741`) but simply ignores photons added by the :b2:mod:`BremsFinderModule`.
+  .. note:: This is not the generator-level match (see :issue:`BII-5741`) but simply ignores photons added by the :b2:mod:`BremsFinder`.
 
 Modules
 +++++++

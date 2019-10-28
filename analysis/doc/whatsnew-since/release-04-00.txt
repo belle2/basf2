@@ -4,31 +4,38 @@ Changes in the analysis package
 Variables
 +++++++++
 
- * Renamed some `RestOfEvent` variables for consistency accross the `VariableManager`.
-   Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.
-   For example ``ROE_deltae`` is now :b2:var:`roeDeltae`.
+.. note:: All variables will return a quietNaN instead of -999 or other out-of-the-sky numbers in case of errors
 
- * Removed ``clusterCRID`` which duplicates :b2:var:`clusterConnectedRegionID`.
- * Fixed ``goodBelleLambda`` and now it returns ``extraInfo(goodLambda)`` on Belle data.
- * Fixed :b2:var:`eclClusterEoP` for particles with Bremsstrahlung correction by adding the energy of the added photon(s)
+* Renamed some `RestOfEvent` variables for consistency accross the `VariableManager`.
+  Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.
+  For example ``ROE_deltae`` is now :b2:var:`roeDeltae`.
 
-.. note::
-        All variables will return a quietNaN instead of -999 or other out-of-the-sky numbers in case of errors
+* Removed ``clusterCRID`` which duplicates :b2:var:`clusterConnectedRegionID`.
+* Fixed ``goodBelleLambda`` and now it returns ``extraInfo(goodLambda)`` on Belle data.
+* Fixed :b2:var:`clusterEoP` for particles with Bremsstrahlung correction by adding the energy of the added photon(s)
+
+* Added :b2:var:`isSignalAcceptBremsPhotons` to ignore any reconstructed brems photons.
+
+  .. note:: This is not the generator-level match (see :issue:`BII-5741`) but simply ignores photons added by the :b2:mod:`BremsFinderModule`.
 
 Modules
 +++++++
 
- * The :b2:mod:`ParticleLoader` can create neutron particle lists now. ECL
-   cluster with the hadron hypothesis as well as KLM cluster are used as source.
- * In :b2:mod:`TreeFitter` bugfix in mass constraint: chi2 correctly calculated now.
- * In :b2:mod:`TreeFitter` change of initialisation values increases performance in all fits with tracks.
- * In :b2:mod:`TreeFitter` max iterations set to 100, increases efficiency slightly in many cases.
- * In :b2:mod:`TreeFitter` fixed a bug in life time calculation. A constant in the jacobian was missing. As a result propagated error was slightly overestimated.
- * Fix to nested RestOfEvent objects (see :issue:`BII-5649`)
- * Removed module ``CreateBsigFromFullRecoBtag``
- * In BtubeCreator module, functionality to associate Btube to user's chosen B is added.
- * In `ChargedPidMVAModule` module, remove handling of particle list modified by the deprecated `FSRCorrection` module.
- * In `ChargedPidMVAModule` module, apply MVA category cuts retrieved from the DB payload.
+* The :b2:mod:`ParticleLoader` can create neutron particle lists now. ECL
+  cluster with the hadron hypothesis as well as KLM cluster are used as source.
+* In :b2:mod:`TreeFitter` bugfix in mass constraint: chi2 correctly calculated now.
+* In :b2:mod:`TreeFitter` change of initialisation values increases performance in all fits with tracks.
+* In :b2:mod:`TreeFitter` max iterations set to 100, increases efficiency slightly in many cases.
+* In :b2:mod:`TreeFitter` fixed a bug in life time calculation. A constant in the jacobian was missing. As a result propagated error was slightly overestimated.
+* Fix to nested RestOfEvent objects (see :issue:`BII-5649`)
+* Removed module ``CreateBsigFromFullRecoBtag``
+* In BtubeCreator module, functionality to associate Btube to user's chosen B is added.
+* In `ChargedPidMVA` module, remove handling of particle list modified by the deprecated `FSRCorrection` module.
+* In `ChargedPidMVA` module, apply MVA category cuts retrieved from the DB payload.
+
+* Added a :b2:mod:`BremsFinder` to unpack the bremsstrahlung relations provided by tracking.
+
+  .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
 
 Conditions DB
 +++++++++++++

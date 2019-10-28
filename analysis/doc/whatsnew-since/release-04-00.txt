@@ -26,4 +26,11 @@ Modules
  * In :b2:mod:`TreeFitter` fixed a bug in life time calculation. A constant in the jacobian was missing. As a result propagated error was slightly overestimated.
  * Fix to nested RestOfEvent objects (see :issue:`BII-5649`)
  * Removed module ``CreateBsigFromFullRecoBtag``
- * In BtubeCreator module, functionality to associate Btube to user's chosen B is added.  
+ * In BtubeCreator module, functionality to associate Btube to user's chosen B is added.
+ * In `ChargedPidMVAModule` module, remove handling of particle list modified by the deprecated `FSRCorrection` module.
+ * In `ChargedPidMVAModule` module, apply MVA category cuts retrieved from the DB payload.
+
+Conditions DB
++++++++++++++
+
+ * In `ChargedPidMVAWeights` payload class, added MVA category cut strings in basf2-compliant format.

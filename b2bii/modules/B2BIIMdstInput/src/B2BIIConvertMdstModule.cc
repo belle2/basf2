@@ -22,6 +22,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
+#include <analysis/dataobjects/EventExtraInfo.h>
 
 // Belle II dataobjects
 #include <framework/dataobjects/EventMetaData.h>
@@ -172,6 +173,8 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
            "clusters with a E9/E25 value above this threshold are classified as neutral even if tracks are matched to their connected region (matchType == 2)",
            -1.1);
 
+  addParam("convertEvtcls", m_convertEvtcls, "Flag to switch on conversion of Mdst_evtcls", true);
+
   m_realData = false;
 
   B2DEBUG(1, "B2BIIConvertMdst: Constructor done.");
@@ -211,6 +214,9 @@ void B2BIIConvertMdstModule::initializeDataStore()
 
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
+
+  StoreObjPtr<EventExtraInfo> eventExtraInfo;
+  eventExtraInfo.registerInDataStore();
 
   StoreObjPtr<ParticleList> gammaParticleList("gamma:mdst");
   gammaParticleList.registerInDataStore();
@@ -348,6 +354,10 @@ void B2BIIConvertMdstModule::event()
 
   // 12. Convert ExtHit information and set Track -> ExtHit relations
   if (m_convertExtHits) convertExtHitTable();
+
+  // 13. Convert Evtcls information
+  if (m_convertEvtcls) convertEvtclsTable();
+
 }
 
 
@@ -1237,6 +1247,29 @@ void B2BIIConvertMdstModule::convertExtHitTable()
       }
     }
   }
+}
+
+void B2BIIConvertMdstModule::convertEvtclsTable()
+{
+  StoreObjPtr<EventExtraInfo> eventExtraInfo;
+  if (not eventExtraInfo.isValid())
+    eventExtraInfo.create();
+  Belle::Evtcls_flag_Manager& EvtFlagMgr = Belle::Evtcls_flag_Manager::get_manager();
+  /*
+    for (Belle::Evtcls_flag::iterator eflagIterator = EvtFlagMgr.begin(); eflagIterator != EvtFlagMgr.end(); ++eflagIterator) {
+        Belle::Evtcls_flag mEvtC = *eflagIterator;
+        int flag5 = mEvtC.flag(5);
+        std::cout << flag5 << std::endl;
+    }
+  */
+  std::vector<Belle::Evtcls_flag>::iterator eflagIterator = EvtFlagMgr.begin();
+  std::vector<int> flag(20);
+  for (int index = 0; index < 20; ++index) {
+    flag[index] = (*eflagIterator).flag(index);
+    std::cout << "This is for Event classification flag(" << index << "): " << flag[index] << std::endl;
+  }
+  eventExtraInfo->addExtraInfo("evtcls_flag", flag[0]);
+
 }
 
 //-----------------------------------------------------------------------------

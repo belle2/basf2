@@ -21,6 +21,7 @@
 #include "belle_legacy/tables/belletdf.h"
 #include "belle_legacy/tables/mdst.h"
 #include "belle_legacy/tables/ecl.h"
+#include "belle_legacy/tables/evtcls.h"
 
 #include "belle_legacy/helix/Helix.h"
 
@@ -148,6 +149,8 @@ namespace Belle2 {
 
     bool m_convertExtHits; /**< Flag to switch on conversion of Mdst_ecl_trk into ExtHits */
 
+    bool m_convertEvtcls; /**< Flag to switch on conversion of Evtcls table */
+
     /**
      * E9/E25 threshold value
      * clusters with a value above this threshold are classified as neutral
@@ -161,6 +164,11 @@ namespace Belle2 {
     //-----------------------------------------------------------------------------
     // CONVERT TABLES
     //-----------------------------------------------------------------------------
+
+    /**
+     * Reads and converts all entries of evtcls Panther table
+     **/
+    void convertEvtclsTable();
 
     /**
      * Reads and converts all entries of Gen_hepevt Panther table to MCParticle dataobjects and adds them to StoreArray<MCParticle>.
@@ -408,6 +416,9 @@ namespace Belle2 {
 
     /** Ext hits */
     StoreArray<ExtHit> m_extHits;
+
+    /** Event classification flags */
+//    StoreObjPtr<EventExtraInfo> eventExtraInfo;
 
     /** BeamSpot for IP */
     OptionalDBObjPtr<BeamSpot> m_beamSpotDB;

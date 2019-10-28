@@ -2540,10 +2540,7 @@ def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path):
     Apply an MVA (BDT) to perform particle identification for charged stable particles using `ChargedPidMVA` module.
 
     Note:
-        Currently, the MVA is trained including only **ECL-based inputs**.
-        Hence, it is mostly suited for **electron (muon) identification**.
-        For the future, this approach could however be extended to include info from other subdetetctors,
-        as long as they are made available in the Mdst format...
+        At the moment, the MVA is trained for **lepton identification** only.
 
     The module decorates Particle objects in the input ParticleList(s) w/ variables
     containing the appropriate MVA score, which can be used to select candidates.
@@ -2555,14 +2552,6 @@ def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path):
         - e (11) vs. pi (211)
 
         - mu (13) vs. pi (211)
-
-        - pi (211) vs K (321)
-
-        - K (321) vs pi (211)
-
-        - p (2212) vs pi (211)
-
-        - d : NOT AVAILABLE
 
         The MVA is charge-agnostic, i.e. the training is not done independently for +/- charged particles.
 
@@ -2578,7 +2567,7 @@ def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path):
     """
 
     # Enforce check on input S, B hypotheses compatibility.
-    binaryOpts = [(11, 211), (13, 211), (211, 321), (321, 211), (2212, 211)]
+    binaryOpts = [(11, 211), (13, 211)]
 
     if (sigHypoPDGCode, bkgHypoPDGCode) not in binaryOpts:
         B2FATAL("No charged pid MVA was trained to separate ", sigHypoPDGCode, " vs. ", bkgHypoPDGCode,

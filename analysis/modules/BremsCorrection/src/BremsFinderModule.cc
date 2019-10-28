@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/modules/BremsFinder/BremsFinderModule.h>
+#include <analysis/modules/BremsCorrection/BremsFinderModule.h>
 
 // framework aux
 #include <framework/gearbox/Const.h>

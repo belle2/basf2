@@ -156,6 +156,8 @@ namespace Belle2 {
 
         auto func = [index, useFS1](const Particle * particle) -> double {
           const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+          if (!qq)
+            return std::numeric_limits<double>::quiet_NaN();
           std::vector<float> ksfw = qq->getKsfwFS0();
           if (useFS1)
             ksfw = qq->getKsfwFS1();
@@ -182,6 +184,8 @@ namespace Belle2 {
 
         auto func = [coneNumber, useROE](const Particle * particle) -> double {
           const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+          if (!qq)
+            return std::numeric_limits<double>::quiet_NaN();
           std::vector<float> cleoCones = qq->getCleoConesALL();
           if (useROE)
             cleoCones = qq->getCleoConesROE();
@@ -243,6 +247,8 @@ namespace Belle2 {
           StoreObjPtr<RestOfEvent> roe("RestOfEvent");
           const Particle* Bparticle = roe->getRelated<Particle>();
           const ContinuumSuppression* qq = Bparticle->getRelatedTo<ContinuumSuppression>();
+          if (!qq)
+            return std::numeric_limits<double>::quiet_NaN();
           double isinROE = isInRestOfEvent(particle);
           TVector3 newZ;
           if (modeisSignal or (modeisAuto and isinROE < 0.5))

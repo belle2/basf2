@@ -2,6 +2,7 @@ import os
 import time
 from pathlib import Path
 from unittest import main
+import basf2
 
 import zmq
 
@@ -66,7 +67,7 @@ class HistogramTestCase(HLTZMQTestCase):
                        }
 
     #: histogram_data
-    histogram_data = open(os.path.abspath("histos.raw"), "br").read()
+    histogram_data = open(basf2.find_file("daq/hbasf2/tests/histos.raw"), "br").read()
     #: event_data
     event_data = b"""{
         "_typename" : "Belle2::EventMetaData",
@@ -210,7 +211,7 @@ class HistogramStopTestCase(HLTZMQTestCase):
                        }
 
     #: histogram_data
-    histogram_data = open(os.path.abspath("histos.raw"), "br").read()
+    histogram_data = open(basf2.find_file("daq/hbasf2/tests/histos.raw"), "br").read()
     #: event_data
     event_data = b"""{
         "_typename" : "Belle2::EventMetaData",

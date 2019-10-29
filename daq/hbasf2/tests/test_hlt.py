@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from unittest import main
+import basf2
 
 import zmq
 
@@ -40,17 +41,17 @@ class HLTTestCase(HLTZMQTestCase):
                        "final_collector": ["b2hlt_finalcollector", "--input", f"tcp://*:{final_collector_input_port}",
                                            "--output", f"tcp://localhost:{final_collector_output_port}",
                                            "--monitor", f"tcp://*:{final_collector_monitoring_port}"],
-                       "worker": ["python3", os.path.abspath("passthrough.py"),
+                       "worker": ["python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
                                   "--input", f"tcp://localhost:{distributor_output_port}",
                                   "--output", f"tcp://localhost:{collector_input_port}"],
-                       "output_worker": ["python3", os.path.abspath("passthrough.py"),
+                       "output_worker": ["python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
                                          "--prefix", "output_",
                                          "--input", f"tcp://localhost:{collector_output_port}",
                                          "--output", f"tcp://localhost:{final_collector_input_port}"],
                        }
 
     #: event_data
-    event_data = open(os.path.abspath("out.raw"), "br").read()
+    event_data = open(basf2.find_file("daq/hbasf2/tests/out.raw"), "br").read()
 
     def testFullRun(self):
         """test function"""
@@ -257,17 +258,17 @@ class DyingHLTTestCase(HLTZMQTestCase):
                        "final_collector": ["b2hlt_finalcollector", "--input", f"tcp://*:{final_collector_input_port}",
                                            "--output", f"tcp://localhost:{final_collector_output_port}",
                                            "--monitor", f"tcp://*:{final_collector_monitoring_port}"],
-                       "worker": ["python3", os.path.abspath("passthrough.py"),
+                       "worker": ["python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
                                   "--input", f"tcp://localhost:{distributor_output_port}",
                                   "--output", f"tcp://localhost:{final_collector_input_port}"],
-                       "dying_worker": ["python3", os.path.abspath("passthrough.py"),
+                       "dying_worker": ["python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
                                         "--prefix", "dying_", "--exit",
                                         "--input", f"tcp://localhost:{distributor_output_port}",
                                         "--output", f"tcp://localhost:{final_collector_input_port}"],
                        }
 
     #: event_data
-    event_data = open(os.path.abspath("out.raw"), "br").read()
+    event_data = open(basf2.find_file("daq/hbasf2/tests/out.raw"), "br").read()
 
     def testFullRun(self):
         """test function"""

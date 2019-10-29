@@ -1,6 +1,7 @@
 import atexit
 import os
 from unittest import main
+import basf2
 
 import zmq
 
@@ -22,7 +23,7 @@ class DistributorTestCase(HLTZMQTestCase):
                                        "--stopWaitingTime", "1"]}
 
     #: event_data
-    event_data = open(os.path.abspath("out.raw"), "br").read()
+    event_data = open(basf2.find_file("daq/hbasf2/tests/out.raw"), "br").read()
 
     def testConnectAndDisconnect(self):
         """test function"""

@@ -14,6 +14,7 @@
 #include <framework/utilities/FileSystem.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
 
 using namespace std;
 using namespace Belle2;
@@ -35,6 +36,8 @@ EvtGenInputModule::EvtGenInputModule() : Module(),
   setPropertyFlags(c_Input);
 
   //Parameter definition
+  addParam("EvtPdlFile", m_EvtPdlFile, "Particle data file.",
+           FileSystem::findFile("decfiles/dec/evt.pdl", true));
   addParam("userDECFile", m_userDECFileName, "user DECfile name", string(""));
   addParam("DECFile", m_DECFileName, "global DECfile to be used",
            FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true));
@@ -53,6 +56,9 @@ EvtGenInputModule::EvtGenInputModule() : Module(),
 void EvtGenInputModule::initialize()
 {
   const std::string defaultDecFile = FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true);
+  if (m_EvtPdlFile.empty())
+    B2FATAL("EvtGen particle data file is not found.");
+  EvtGenDatabasePDG::Instance()->ReadEvtGenTable(m_EvtPdlFile.c_str());
   if (m_DECFileName.empty()) {
     B2ERROR("No global decay file defined, please make sure the parameter 'DECFile' is set correctly");
     return;

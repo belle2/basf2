@@ -71,6 +71,9 @@ namespace Belle2 {
      */
     void initializeGenerator();
 
+    /** Particle data file. */
+    std::string m_EvtPdlFile;
+
     /** Decay file. */
     std::string m_DecFile;
 

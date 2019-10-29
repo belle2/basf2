@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from time import sleep
 from unittest import main
+import basf2
 
 from zmq_daq.test_support import HLTZMQTestCase
 
@@ -14,12 +15,12 @@ class WorkerTestCase(HLTZMQTestCase):
     #: output_port
     output_port = HLTZMQTestCase.get_free_port()
     #: needed_programs
-    needed_programs = {"worker": ["python3", os.path.abspath("passthrough.py"),
+    needed_programs = {"worker": ["python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
                                   "--input", f"tcp://localhost:{input_port}",
                                   "--output", f"tcp://localhost:{output_port}"]}
 
     #: event_data
-    event_data = open(os.path.abspath("out.raw"), "br").read()
+    event_data = open(basf2.find_file("daq/hbasf2/tests/out.raw"), "br").read()
 
     def start(self):
         """start the needed sockets and send some hello messages"""
@@ -131,13 +132,13 @@ class DyingWorkerTestCase(HLTZMQTestCase):
     #: output_port
     output_port = HLTZMQTestCase.get_free_port()
     #: needed_programs
-    needed_programs = {"dying_worker": ["python3", os.path.abspath("passthrough.py"),
+    needed_programs = {"dying_worker": ["python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
                                         "--exit", "--prefix", "dying_",
                                         "--input", f"tcp://localhost:{input_port}",
                                         "--output", f"tcp://localhost:{output_port}"]}
 
     #: event_data
-    event_data = open(os.path.abspath("out.raw"), "br").read()
+    event_data = open(basf2.find_file("daq/hbasf2/tests/out.raw"), "br").read()
 
     def start(self):
         """start the needed sockets and send some hello messages"""

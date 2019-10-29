@@ -83,6 +83,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["nEsinglePhotonEndcap"] = 0; /**< neutral clusters with E*> 1 GeV, not barrel or low */
   calculationResult["nEsingleElectronBarrel"] = 0; /**< charged clusters with E*> 1 GeV in [45,115] */
   calculationResult["nEsingleElectronExtendedBarrel"] = 0; /**< charged clusters with E*> 1 GeV in [32,130] */
+  calculationResult["nReducedEsinglePhotonReducedBarrel"] = 0; /**< charged clusters with E*> 0.5 GeV in [44,98] */
   calculationResult["nVetoClust"] = 0; /**< clusters with E>m_Emedium and |t|/dt99 < 10 */
   calculationResult["n2GeVNeutBarrel"] = 0;
   calculationResult["n2GeVNeutEndcap"] = 0;
@@ -269,6 +270,14 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
 
       if (photon and endcapRegion) {
         calculationResult["nEsinglePhotonEndcap"] += 1;
+      }
+    }
+
+    if (selectedCluster.energyCMS > m_reducedEsinglePhoton) {
+      const bool reducedBarrelRegion = thetaLab > 44 and thetaLab < 98;
+
+      if (photon and reducedBarrelRegion) {
+        calculationResult["nReducedEsinglePhotonReducedBarrel"] += 1;
       }
     }
 

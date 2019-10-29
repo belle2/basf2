@@ -212,9 +212,7 @@ def my_basf2_mva_teacher(
            In addition to variables containing the "truth" substring, which are excluded by default.
     """
 
-    # check that weightfile ends in one of [".xml", ".root"]. Otherwise,
-    # basf2_mva teacher would upload it directly to the conditions database,
-    # which I want to prevent
+    # Check that weightfile ends in one of [".xml", ".root"]. Otherwise, a localdb would be created.
     weightfile_extension = os.path.splitext(weightfile_identifier)[1]
     if weightfile_extension not in {".xml", ".root"}:
         raise ValueError(f"Weightfile Identifier should end in .xml or .root, but ends in {weightfile_extension}")
@@ -642,13 +640,6 @@ class TrackQETeacherBaseTask(Basf2Task):
         """
         return self.weightfile_identifier_basename + ".weights.xml"
 
-    def get_weightfile_root_identifier(self):
-        """
-        Name of the root weightfile that is created by the teacher task.
-        It can be uploaded as a payload to the conditions database.
-        """
-        return self.weightfile_identifier_basename + ".weights.root"
-
     @property
     def tree_name(self):
         """
@@ -693,7 +684,6 @@ class TrackQETeacherBaseTask(Basf2Task):
         The task is considered finished iff the outputs all exist.
         """
         yield self.add_to_output(self.get_weightfile_xml_identifier())
-        yield self.add_to_output(self.get_weightfile_root_identifier())
 
     def process(self):
         """
@@ -707,15 +697,13 @@ class TrackQETeacherBaseTask(Basf2Task):
             self.data_collection_task.records_file_name
         )
 
-        for weightfile_identifier in (self.get_weightfile_xml_identifier(),
-                                      self.get_weightfile_root_identifier()):
-            my_basf2_mva_teacher(
-                records_files=records_files,
-                tree_name=self.tree_name,
-                weightfile_identifier=self.get_output_file_name(weightfile_identifier),
-                target_variable=self.training_target,
-                exclude_variables=self.exclude_variables,
-            )
+        my_basf2_mva_teacher(
+            records_files=records_files,
+            tree_name=self.tree_name,
+            weightfile_identifier=self.get_output_file_name(self.get_weightfile_xml_identifier()),
+            target_variable=self.training_target,
+            exclude_variables=self.exclude_variables,
+        )
 
 
 class VXDQETeacherTask(TrackQETeacherBaseTask):

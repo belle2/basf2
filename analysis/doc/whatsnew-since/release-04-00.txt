@@ -27,6 +27,7 @@ Modules
  * Fix to nested RestOfEvent objects (see :issue:`BII-5649`)
  * Removed module ``CreateBsigFromFullRecoBtag``
  * In BtubeCreator module, functionality to associate Btube to user's chosen B is added.
+ * Deprecated module `FSRCorrection` in favour of `BremsFinder` and `BelleBremRecovery`.
  * In `ChargedPidMVAModule` module, remove handling of particle list modified by the deprecated `FSRCorrection` module.
  * In `ChargedPidMVAModule` module, apply MVA category cuts retrieved from the DB payload.
 

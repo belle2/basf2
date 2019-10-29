@@ -3,7 +3,7 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald, Marko Staric, Phillip Urquijo          *
+* Contributors: Christian Oswald, Marko Staric, Phillip Urquijo, Yo Sato *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/

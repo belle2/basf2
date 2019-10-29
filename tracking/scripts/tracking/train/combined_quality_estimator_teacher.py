@@ -5,31 +5,35 @@
 combined_module_quality_estimator_teacher
 -----------------------------------------
 
-Purpose of this script: The track quality estimators
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Information on the MVA Track Quality Indicator / Estimator can be found
+on `Confluence
+<https://confluence.desy.de/display/BI/MVA+Track+Quality+Indicator>`_.
 
-This python script is used for the combined training and validation of the
-following track quality estimators (QE):
+Purpose of this script
+~~~~~~~~~~~~~~~~~~~~~~
 
-    - **MVA track quality estimator:** The final quality estimator for fully
-      merged and fitted tracks.  Its classifier uses features from the track
-      fitting, merger, hit pattern, ... But it also uses the outputs from
-      respective intermediate quality estimators for the VXD and the CDC track
-      finding as inputs.
+This python script is used for the combined training and validation of three
+classifiers, the actual final MVA track quality estimator and the two quality
+estimators for the intermediate standalone track finders that it depends on.
 
-    - **VXD track quality estimator:** Quality estimator for the VXDTF2 track
-      finder.
+    - Final MVA track quality estimator:
+      The final quality estimator for fully merged and fitted tracks. Its
+      classifier uses features from the track fitting, merger, hit pattern, ...
+      But it also uses the outputs from respective intermediate quality
+      estimators for the VXD and the CDC track finding as inputs. It provides
+      the final quality indicator (QI) exported to the track objects.
 
-    - **CDC track quality estimator:** Quality estimator for the CDC track
-      finding.
+    - VXDTF2 track quality estimator:
+      MVA quality estimator for the VXD standalone track finding.
 
-The reason why separate quality estimators for the subdetectors is that some
-variables are only available for the track finders in the subdetectors, e.g. are
-available in ``CDCTrack`` objects (e.g. ADC counts), but not anymore in
-``RecoTrack`` objects.  Therefore VXD and CDC quality estimators have to be
-trained before the final, full track quality estimator can be trained with their
-outputs as input.  The classifier outputs of the quality estimators are called
-**quality indicators (QI)**
+    - CDC track quality estimator:
+      MVA quality estimator for the CDC standalone track finding.
+
+Each classifier requires for its training a different training data set and they
+need to be validated on a separate testing data set. Further, the final quality
+estimator can only be trained, when the trained weights for the intermediate
+quality estimators are available. To avoid mistakes, b2luigi is used to create a
+task chain for a combined training and validation of all classifiers.
 
 b2luigi: Understanding the steering file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -72,18 +76,7 @@ Configuration
 
 Instead of command line arguments, the b2luigi script is configured via a
 ``settings.json`` file. Open it in your favorite text editor and modify it to
-fit to your requirements. It should look like this (The contents in ``<...>``
-represent placeholders):
-
-.. code-block:: json
-    {
-        "result_path": "<Root path for the b2luigi outputs>"
-        "bkgfiles_directory": "<Directory with overlay background root files>",
-        "n_events_training": <Number of events to be used for training data>,
-        "n_events_testing": <Number of events to be used for the validation/evaluation data>,
-        "workers": <Number of luigi workers, which execute tasks in parallel.>,
-        "basf2_processes_per_worker": <Number of basf2 processes per worker. 0 disables multiprocessing.>
-    }
+fit to your requirements.
 
 Usage
 ~~~~~

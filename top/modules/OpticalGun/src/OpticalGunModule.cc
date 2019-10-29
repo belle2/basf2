@@ -88,7 +88,7 @@ namespace Belle2 {
 
   OpticalGunModule::~OpticalGunModule()
   {
-    delete m_customDistribution;
+    if (m_customDistribution) delete m_customDistribution;
   }
 
   void OpticalGunModule::initialize()
@@ -110,8 +110,8 @@ namespace Belle2 {
       B2FATAL("Minimum emission angle msut me smaller than the maximum emission angle");
 
 
-    if (m_angularDistribution == string("uniform") ||
-        m_angularDistribution == string("Lambertian") ||
+    if (m_angularDistribution == string("uniform") or
+        m_angularDistribution == string("Lambertian") or
         m_angularDistribution == string("Gaussian"))
       B2INFO("Using the  pre-defined angular distribution " << m_angularDistribution);
     else {
@@ -149,7 +149,7 @@ namespace Belle2 {
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       int Nbars = geo->getNumModules();
       if (Nbars == 0) B2ERROR("TOP bars are not defined");
-      if (m_slotID < 0 || m_slotID > Nbars) {
+      if (m_slotID < 0 or m_slotID > Nbars) {
         B2ERROR("barID = " << m_slotID << " : not a valid ID");
         m_slotID = 0;
       } else {

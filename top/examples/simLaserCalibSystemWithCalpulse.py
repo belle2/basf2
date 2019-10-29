@@ -35,8 +35,8 @@ def addSource(x, angle, slotID, path):
                     theta=180 + angle,
                     phi=0.0,
                     psi=0.0,
-                    # angularDistribution='uniform'
-                    angularDistribution='(40-x)*TMath::Sin(x)'
+                    angularDistribution='uniform'
+                    # angularDistribution='(40-x)*TMath::Sin(x)'
 
                     )
 
@@ -63,17 +63,7 @@ main.add_module('TOPCalPulseGenerator',
 
 # Optical sources
 for slotId in range(1, 17):
-    for pos in [
-        0.9,
-        5.7,
-        11.3,
-        16.9,
-        22.5,
-        28.1,
-        33.7,
-        39.3,
-        44.1,
-    ]:
+    for pos in [0.9, 5.7, 11.3, 16.9, 22.5, 28.1, 33.7, 39.3, 44.1]:
         angle = 17
         x = -45. / 2. + pos
         addSource(x, angle, slotId, main)
@@ -82,12 +72,11 @@ for slotId in range(1, 17):
 main.add_module('FullSim')
 
 # TOP digitization
-main.add_module('TOPDigitizer',
-                useSampleTimeCalibration=True)
+main.add_module('TOPDigitizer')
 
 # Output
 main.add_module('RootOutput',
-                outputFileName='opticalGun.root')
+                outputFileName='opticalGunWithCalPulse.root')
 
 # Show progress of processing
 main.add_module('Progress')

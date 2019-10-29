@@ -5,8 +5,9 @@ import basf2 as b2
 import os
 
 # ---------------------------------------------------------------
-# example of using OpticalGun to simulate laser light sources
-# two sources at the left and right side of prism, outside quartz
+# example of using OpticalGun to simulate the TOP laser calibration
+# system. Nine sources are located outside of the prism, in front
+# of its slanted face, pointing to the PMTs
 #
 # Contributors: Marko Staric
 #               Stefano Lacaprara
@@ -36,9 +37,8 @@ def addSource(x, angle, slotID, path):
                     theta=180 + angle,
                     phi=0.0,
                     psi=0.0,
-                    # angularDistribution='uniform'
-                    angularDistribution='(40-x)*TMath::Sin(x)'
-
+                    angularDistribution='uniform'
+                    # angularDistribution='(40-x)*TMath::Sin(x)' # You can have whatever distribution you like
                     )
 
 # Create path
@@ -58,17 +58,7 @@ main.add_module('Geometry')
 
 # Optical sources
 for slotId in range(1, 17):
-    for pos in [
-        0.9,
-        5.7,
-        11.3,
-        16.9,
-        22.5,
-        28.1,
-        33.7,
-        39.3,
-        44.1,
-    ]:
+    for pos in [0.9, 5.7, 11.3, 16.9, 22.5, 28.1, 33.7, 39.3, 44.1]:
         angle = 17
         x = -45. / 2. + pos
         addSource(x, angle, slotId, main)

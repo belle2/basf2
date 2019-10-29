@@ -453,8 +453,13 @@ def correctFSR(
     WARNING:
       The :b2:mod:`FSRCorrection` module is now deprecated.
       Please use `modularAnalysis.correctBrems` or `modularAnalysis.correctBremsBelle` instead.
+      The latter resembles the previous principle of FSRCorrection but does no
+      longer contain the faulty first-come, first-served approach. For Belle II
+      data it is recommended to use correctBrems(), which should perform better.
     """
-    B2WARNING("The correctFSR() module is now deprecated. Please use correctBrems() or correctBremsBelle() instead.")
+
+    B2WARNING("The correctFSR() module is now deprecated. Please use correctBrems() or correctBremsBelle() instead."
+              "When analysing Belle II data, it is recommended to use correctBrems().")
 
 
 def correctBremsBelle(

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
+###############################################################################
 #
 # Stuck? Ask for help at questions.belle2.org
 #
-# This tutorial demonstrates how to use the FSRCorrection
-# module for the following decay:
+# This tutorial demonstrates how to correct for Bremsstrahlung radiation for
+# the following decay:
 #
 #   J/psi
 #    |
@@ -18,15 +18,15 @@
 # Notes:
 #
 # 1) The electrons in the corrected list have an
-#    attaced extraInfo 'fsrCorrected', indicating if
+#    attached extraInfo 'bremsCorrected', indicating if
 #    the electron was corrected (1) or not (0).
 # 2) It's recommended to use looseMCMatching.
 #
 # Contributors: Moritz Gelb (February 2017)
-#               I. Komarov (Demeber 2017)
+#               I. Komarov (December 2017)
 #               I. Komarov (September 2018)
 #
-################################################################################
+###############################################################################
 
 import basf2 as b2
 import modularAnalysis as ma
@@ -44,7 +44,7 @@ ma.inputMdst(environmentType='default',
 
 # fill particleLists
 ma.fillParticleList(decayString='e+:uncorrected',
-                    cut='electronID > 0.2 and d0 < 2 and abs(z0) < 4',
+                    cut='electronID > 0.2 and dr < 2 and abs(dz) < 4',
                     path=my_path)
 ma.fillParticleList(decayString='gamma:all',
                     cut='E < 1.0',
@@ -55,14 +55,12 @@ ma.fillParticleList(decayString='gamma:all',
 ma.looseMCTruth(list_name='e+:uncorrected', path=my_path)
 ma.looseMCTruth(list_name='gamma:all', path=my_path)
 
-# fsr correction
-ma.correctFSR(outputListName='e+:corrected',
-              inputListName='e+:uncorrected',
-              gammaListName='gamma:all',
-              angleThreshold=5.0,
-              energyThreshold=1.0,
-              writeOut=False,
-              path=my_path)
+# correction of Bremsstrahlung
+ma.correctBrems(outputList='e+:corrected',
+                inputList='e+:uncorrected',
+                gammaList='gamma:all',
+                writeOut=False,
+                path=my_path)
 ma.looseMCTruth(list_name='e+:corrected',
                 path=my_path)
 
@@ -84,7 +82,7 @@ ma.fillParticleListFromMC(decayString='J/psi:MC', cut="", path=my_path)
 # write out ntuples
 
 # Please note, a new lepton is generated, with the old electron and -if found- a gamma as daughters.
-# Information attached to the track is only available for the old lepton, accessable via the daughter
+# Information attached to the track is only available for the old lepton, accessible via the daughter
 # metavariable, e.g. <daughter(0, eid)>.
 
 var0 = ['p',
@@ -108,7 +106,7 @@ var0 = ['p',
         'pErr',
         'isSignal',
         'mcErrors',
-        'extraInfo(fsrCorrected)',
+        'extraInfo(bremsCorrected)',
         'extraInfo(looseMCMotherPDG)',
         'extraInfo(looseMCMotherIndex)',
         'extraInfo(looseMCWrongDaughterN)',
@@ -123,8 +121,8 @@ var1 = ['M',
         'mcErrors',
         'daughter(0, p)',
         'daughter(1, p)',
-        'daughter(0, extraInfo(fsrCorrected))',
-        'daughter(1, extraInfo(fsrCorrected))',
+        'daughter(0, extraInfo(bremsCorrected))',
+        'daughter(1, extraInfo(bremsCorrected))',
         'extraInfo(looseMCMotherPDG)',
         'extraInfo(looseMCMotherIndex)',
         'extraInfo(looseMCWrongDaughterN)',

@@ -28,7 +28,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("FourCFitChi2")) return part->getExtraInfo("FourCFitChi2");
       else {
         B2WARNING("The ExtraInfo 'FourCFitChi2' not found!");
-        return NAN;
+        return std::numeric_limits<float>::quiet_NaN();
       }
     }
 
@@ -37,7 +37,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("FourCFitProb")) return part->getExtraInfo("FourCFitProb");
       else {
         B2WARNING("The ExtraInfo 'FourCFitProb' not found!");
-        return NAN;
+        return std::numeric_limits<float>::quiet_NaN();
       }
     }
 

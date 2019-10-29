@@ -33,6 +33,8 @@ namespace Belle2 {
 
     /** num of leafs in data_b2l, 2k **/
     const int nLeafs = 313;
+    /** num of leafs in data_b2l, for 2D fitter **/
+    const int nLeafs_2dfitter = 141;
     /** num of leafs in data_b2l, 2.6k, 15 TS version **/
     const int nLeafs_2624 = 313 + 4 * 5 * 4;
     /** num of leafs for others **/
@@ -657,6 +659,151 @@ namespace Belle2 {
       "tsf7ts14_rt",
       "tsf7ts14_lr",
       "tsf7ts14_pr",
+      "t2d_cc",
+      "t2d_fnf",
+      "t2d0_charge",
+      "t2d0_rho_s",
+      "t2d0_phi",
+      "t2d0ts0_id",
+      "t2d0ts0_rt",
+      "t2d0ts0_lr",
+      "t2d0ts0_pr",
+      "t2d0ts2_id",
+      "t2d0ts2_rt",
+      "t2d0ts2_lr",
+      "t2d0ts2_pr",
+      "t2d0ts4_id",
+      "t2d0ts4_rt",
+      "t2d0ts4_lr",
+      "t2d0ts4_pr",
+      "t2d0ts6_id",
+      "t2d0ts6_rt",
+      "t2d0ts6_lr",
+      "t2d0ts6_pr",
+      "t2d0ts8_id",
+      "t2d0ts8_rt",
+      "t2d0ts8_lr",
+      "t2d0ts8_pr",
+      "t2d1_charge",
+      "t2d1_rho_s",
+      "t2d1_phi",
+      "t2d1ts0_id",
+      "t2d1ts0_rt",
+      "t2d1ts0_lr",
+      "t2d1ts0_pr",
+      "t2d1ts2_id",
+      "t2d1ts2_rt",
+      "t2d1ts2_lr",
+      "t2d1ts2_pr",
+      "t2d1ts4_id",
+      "t2d1ts4_rt",
+      "t2d1ts4_lr",
+      "t2d1ts4_pr",
+      "t2d1ts6_id",
+      "t2d1ts6_rt",
+      "t2d1ts6_lr",
+      "t2d1ts6_pr",
+      "t2d1ts8_id",
+      "t2d1ts8_rt",
+      "t2d1ts8_lr",
+      "t2d1ts8_pr",
+      "t2d2_charge",
+      "t2d2_rho_s",
+      "t2d2_phi",
+      "t2d2ts0_id",
+      "t2d2ts0_rt",
+      "t2d2ts0_lr",
+      "t2d2ts0_pr",
+      "t2d2ts2_id",
+      "t2d2ts2_rt",
+      "t2d2ts2_lr",
+      "t2d2ts2_pr",
+      "t2d2ts4_id",
+      "t2d2ts4_rt",
+      "t2d2ts4_lr",
+      "t2d2ts4_pr",
+      "t2d2ts6_id",
+      "t2d2ts6_rt",
+      "t2d2ts6_lr",
+      "t2d2ts6_pr",
+      "t2d2ts8_id",
+      "t2d2ts8_rt",
+      "t2d2ts8_lr",
+      "t2d2ts8_pr",
+      "t2d3_charge",
+      "t2d3_rho_s",
+      "t2d3_phi",
+      "t2d3ts0_id",
+      "t2d3ts0_rt",
+      "t2d3ts0_lr",
+      "t2d3ts0_pr",
+      "t2d3ts2_id",
+      "t2d3ts2_rt",
+      "t2d3ts2_lr",
+      "t2d3ts2_pr",
+      "t2d3ts4_id",
+      "t2d3ts4_rt",
+      "t2d3ts4_lr",
+      "t2d3ts4_pr",
+      "t2d3ts6_id",
+      "t2d3ts6_rt",
+      "t2d3ts6_lr",
+      "t2d3ts6_pr",
+      "t2d3ts8_id",
+      "t2d3ts8_rt",
+      "t2d3ts8_lr",
+      "t2d3ts8_pr",
+      "etf_thresh",
+      "etf_cc",
+      "etf_t0",
+      "etf_valid",
+      "firmid", "firmver", "evt", "clk"
+    };
+    /** leaf names for 2D fitter**/
+    const char* LeafNames_2dfitter[nLeafs_2dfitter + nLeafsExtra] = {
+      "t3d_2doldtrk",
+      "t3dtrk0_evtTime_delay",
+      "t3dtrk0_evtTimeValid_delay",
+      "t3dtrk0_charge",
+      "t3dtrk0_rho",
+      "t3dtrk0_phi0",
+      "t3dtrk0ts0_id",
+      "t3dtrk0ts0_lr",
+      "t3dtrk0ts0_rt",
+      "t3dtrk0ts1_id",
+      "t3dtrk0ts1_lr",
+      "t3dtrk0ts1_rt",
+      "t3dtrk0ts2_id",
+      "t3dtrk0ts2_lr",
+      "t3dtrk0ts2_rt",
+      "t3dtrk0ts3_id",
+      "t3dtrk0ts3_lr",
+      "t3dtrk0ts3_rt",
+      "t3dtrk1_evtTime_delay",
+      "t3dtrk1_evtTimeValid_delay",
+      "t3dtrk1_charge",
+      "t3dtrk1_rho",
+      "t3dtrk1_phi0",
+      "t3dtrk1ts0_id",
+      "t3dtrk1ts0_lr",
+      "t3dtrk1ts0_rt",
+      "t3dtrk1ts1_id",
+      "t3dtrk1ts1_lr",
+      "t3dtrk1ts1_rt",
+      "t3dtrk1ts2_id",
+      "t3dtrk1ts2_lr",
+      "t3dtrk1ts2_rt",
+      "t3dtrk1ts3_id",
+      "t3dtrk1ts3_lr",
+      "t3dtrk1ts3_rt",
+      "t2dfittertrk0_rho",
+      "t2dfittertrk0_phi0",
+      "t2dfittertrk1_rho",
+      "t2dfittertrk1_phi0",
+      "t2dfittertrk2_rho",
+      "t2dfittertrk2_phi0",
+      "t2dfittertrk3_rho",
+      "t2dfittertrk3_phi0",
       "t2d_cc",
       "t2d_fnf",
       "t2d0_charge",
@@ -1474,6 +1621,153 @@ namespace Belle2 {
       e1_firmid, e1_firmver, e1_evt, e1_clk
     };
 
+    /** enum of leafs for 2D fitter **/
+    enum EBits_2dfitter {
+      e2_t3d_2doldtrk,
+      e2_t3dtrk0_evtTime_delay,
+      e2_t3dtrk0_evtTimeValid_delay,
+      e2_t3dtrk0_charge,
+      e2_t3dtrk0_rho,
+      e2_t3dtrk0_phi0,
+      e2_t3dtrk0ts0_id,
+      e2_t3dtrk0ts0_lr,
+      e2_t3dtrk0ts0_rt,
+      e2_t3dtrk0ts1_id,
+      e2_t3dtrk0ts1_lr,
+      e2_t3dtrk0ts1_rt,
+      e2_t3dtrk0ts2_id,
+      e2_t3dtrk0ts2_lr,
+      e2_t3dtrk0ts2_rt,
+      e2_t3dtrk0ts3_id,
+      e2_t3dtrk0ts3_lr,
+      e2_t3dtrk0ts3_rt,
+      e2_t3dtrk1_evtTime_delay,
+      e2_t3dtrk1_evtTimeValid_delay,
+      e2_t3dtrk1_charge,
+      e2_t3dtrk1_rho,
+      e2_t3dtrk1_phi0,
+      e2_t3dtrk1ts0_id,
+      e2_t3dtrk1ts0_lr,
+      e2_t3dtrk1ts0_rt,
+      e2_t3dtrk1ts1_id,
+      e2_t3dtrk1ts1_lr,
+      e2_t3dtrk1ts1_rt,
+      e2_t3dtrk1ts2_id,
+      e2_t3dtrk1ts2_lr,
+      e2_t3dtrk1ts2_rt,
+      e2_t3dtrk1ts3_id,
+      e2_t3dtrk1ts3_lr,
+      e2_t3dtrk1ts3_rt,
+      e2_t2dfittertrk0_rho,
+      e2_t2dfittertrk0_phi0,
+      e2_t2dfittertrk1_rho,
+      e2_t2dfittertrk1_phi0,
+      e2_t2dfittertrk2_rho,
+      e2_t2dfittertrk2_phi0,
+      e2_t2dfittertrk3_rho,
+      e2_t2dfittertrk3_phi0,
+      e2_t2d_cc,
+      e2_t2d_fnf,
+      e2_t2d0_charge,
+      e2_t2d0_rho_s,
+      e2_t2d0_phi,
+      e2_t2d0ts0_id,
+      e2_t2d0ts0_rt,
+      e2_t2d0ts0_lr,
+      e2_t2d0ts0_pr,
+      e2_t2d0ts2_id,
+      e2_t2d0ts2_rt,
+      e2_t2d0ts2_lr,
+      e2_t2d0ts2_pr,
+      e2_t2d0ts4_id,
+      e2_t2d0ts4_rt,
+      e2_t2d0ts4_lr,
+      e2_t2d0ts4_pr,
+      e2_t2d0ts6_id,
+      e2_t2d0ts6_rt,
+      e2_t2d0ts6_lr,
+      e2_t2d0ts6_pr,
+      e2_t2d0ts8_id,
+      e2_t2d0ts8_rt,
+      e2_t2d0ts8_lr,
+      e2_t2d0ts8_pr,
+      e2_t2d1_charge,
+      e2_t2d1_rho_s,
+      e2_t2d1_phi,
+      e2_t2d1ts0_id,
+      e2_t2d1ts0_rt,
+      e2_t2d1ts0_lr,
+      e2_t2d1ts0_pr,
+      e2_t2d1ts2_id,
+      e2_t2d1ts2_rt,
+      e2_t2d1ts2_lr,
+      e2_t2d1ts2_pr,
+      e2_t2d1ts4_id,
+      e2_t2d1ts4_rt,
+      e2_t2d1ts4_lr,
+      e2_t2d1ts4_pr,
+      e2_t2d1ts6_id,
+      e2_t2d1ts6_rt,
+      e2_t2d1ts6_lr,
+      e2_t2d1ts6_pr,
+      e2_t2d1ts8_id,
+      e2_t2d1ts8_rt,
+      e2_t2d1ts8_lr,
+      e2_t2d1ts8_pr,
+      e2_t2d2_charge,
+      e2_t2d2_rho_s,
+      e2_t2d2_phi,
+      e2_t2d2ts0_id,
+      e2_t2d2ts0_rt,
+      e2_t2d2ts0_lr,
+      e2_t2d2ts0_pr,
+      e2_t2d2ts2_id,
+      e2_t2d2ts2_rt,
+      e2_t2d2ts2_lr,
+      e2_t2d2ts2_pr,
+      e2_t2d2ts4_id,
+      e2_t2d2ts4_rt,
+      e2_t2d2ts4_lr,
+      e2_t2d2ts4_pr,
+      e2_t2d2ts6_id,
+      e2_t2d2ts6_rt,
+      e2_t2d2ts6_lr,
+      e2_t2d2ts6_pr,
+      e2_t2d2ts8_id,
+      e2_t2d2ts8_rt,
+      e2_t2d2ts8_lr,
+      e2_t2d2ts8_pr,
+      e2_t2d3_charge,
+      e2_t2d3_rho_s,
+      e2_t2d3_phi,
+      e2_t2d3ts0_id,
+      e2_t2d3ts0_rt,
+      e2_t2d3ts0_lr,
+      e2_t2d3ts0_pr,
+      e2_t2d3ts2_id,
+      e2_t2d3ts2_rt,
+      e2_t2d3ts2_lr,
+      e2_t2d3ts2_pr,
+      e2_t2d3ts4_id,
+      e2_t2d3ts4_rt,
+      e2_t2d3ts4_lr,
+      e2_t2d3ts4_pr,
+      e2_t2d3ts6_id,
+      e2_t2d3ts6_rt,
+      e2_t2d3ts6_lr,
+      e2_t2d3ts6_pr,
+      e2_t2d3ts8_id,
+      e2_t2d3ts8_rt,
+      e2_t2d3ts8_lr,
+      e2_t2d3ts8_pr,
+      e2_etf_thresh,
+      e2_etf_cc,
+      e2_etf_t0,
+      e2_etf_valid,
+      e2_firmid, e2_firmver, e2_evt, e2_clk
+    };
+
+
     /** bus bit map. (a downto a-b) **/
     const int BitMap[nLeafs][2] = {
       /** the numbers in the () are still old, add 32 of them to get the correct ones **/
@@ -2189,6 +2483,154 @@ namespace Belle2 {
       9, 8, // etf_t0
       0, 0  // etf_valid
     };
+
+    /** bus bit map. for 2D fitter (a downto a-b) **/
+    const int BitMap_2dfitter[nLeafs_2dfitter][2] = {
+      /** the numbers in the () are still old, add 32 of them to get the correct ones **/
+      1746, 5, // t3d_2doldtrk (1714 downto 1709)
+      1740, 8, // t3dtrk0_evtTime_delay (1708 downto 1700)
+      1731, 0, // t3dtrk0_evtTimeValid_delay (1699 downto 1699)
+      1730, 0, // t3dtrk0_charge (1698 downto 1698)
+      1729, 10, // t3dtrk0_rho (1697 downto 1687)
+      1718, 12, // t3dtrk0_phi0 (1686 downto 1674)
+      1705, 7, // t3dtrk0ts0_id (1673 downto 1666)
+      1697, 1, // t3dtrk0ts0_lr (1665 downto 1664)
+      1695, 8, // t3dtrk0ts0_rt (1663 downto 1655)
+      1686, 7, // t3dtrk0ts1_id (1654 downto 1647)
+      1678, 1, // t3dtrk0ts1_lr (1646 downto 1645)
+      1676, 8, // t3dtrk0ts1_rt (1644 downto 1636)
+      1667, 8, // t3dtrk0ts2_id (1635 downto 1627)
+      1658, 1, // t3dtrk0ts2_lr (1626 downto 1625)
+      1656, 8, // t3dtrk0ts2_rt (1624 downto 1616)
+      1647, 8, // t3dtrk0ts3_id (1615 downto 1607)
+      1638, 1, // t3dtrk0ts3_lr (1606 downto 1605)
+      1636, 8, // t3dtrk0ts3_rt (1604 downto 1596)
+      1627, 8, // t3dtrk1_evtTime_delay (1595 downto 1587)
+      1618, 0, // t3dtrk1_evtTimeValid_delay (1586 downto 1586)
+      1617, 0, // t3dtrk1_charge (1585 downto 1585)
+      1616, 10, // t3dtrk1_rho (1584 downto 1574)
+      1605, 12, // t3dtrk1_phi0 (1573 downto 1561)
+      1592, 7, // t3dtrk1ts0_id (1560 downto 1553)
+      1584, 1, // t3dtrk1ts0_lr (1552 downto 1551)
+      1582, 8, // t3dtrk1ts0_rt (1550 downto 1542)
+      1573, 7, // t3dtrk1ts1_id (1541 downto 1534)
+      1565, 1, // t3dtrk1ts1_lr (1533 downto 1532)
+      1563, 8, // t3dtrk1ts1_rt (1531 downto 1523)
+      1554, 8, // t3dtrk1ts2_id (1522 downto 1514)
+      1545, 1, // t3dtrk1ts2_lr (1513 downto 1512)
+      1543, 8, // t3dtrk1ts2_rt (1511 downto 1503)
+      1534, 8, // t3dtrk1ts3_id (1502 downto 1494)
+      1525, 1, // t3dtrk1ts3_lr (1493 downto 1492)
+      1523, 8, // t3dtrk1ts3_rt (1491 downto 1483)
+      1514, 28, // t2dfittertrk0_rho
+      1485, 17, // t2dfittertrk0_phi0
+      1467, 28, // t2dfittertrk1_rho
+      1438, 17, // t2dfittertrk1_phi0
+      1420, 28, // t2dfittertrk2_rho
+      1391, 17, // t2dfittertrk2_phi0
+      1373, 28, // t2dfittertrk3_rho
+      1344, 17, // t2dfittertrk3_phi0
+      521, 8, // t2d_cc (489 downto 481)
+      512, 5, // t2d_fnf (480 downto 475)
+      506, 1, // t2d0_charge (474 downto 473)
+      504, 6, // t2d0_rho_s (472 downto 466)
+      497, 6, // t2d0_phi (465 downto 459)
+      490, 7, // t2d0ts0_id (458 downto 451)
+      482, 8, // t2d0ts0_rt (450 downto 442)
+      473, 1, // t2d0ts0_lr (441 downto 440)
+      471, 1, // t2d0ts0_pr (439 downto 438)
+      469, 7, // t2d0ts2_id (437 downto 430)
+      461, 8, // t2d0ts2_rt (429 downto 421)
+      452, 1, // t2d0ts2_lr (420 downto 419)
+      450, 1, // t2d0ts2_pr (418 downto 417)
+      448, 7, // t2d0ts4_id (416 downto 409)
+      440, 8, // t2d0ts4_rt (408 downto 400)
+      431, 1, // t2d0ts4_lr (399 downto 398)
+      429, 1, // t2d0ts4_pr (397 downto 396)
+      427, 7, // t2d0ts6_id (395 downto 388)
+      419, 8, // t2d0ts6_rt (387 downto 379)
+      410, 1, // t2d0ts6_lr (378 downto 377)
+      408, 1, // t2d0ts6_pr (376 downto 375)
+      406, 7, // t2d0ts8_id (374 downto 367)
+      398, 8, // t2d0ts8_rt (366 downto 358)
+      389, 1, // t2d0ts8_lr (357 downto 356)
+      387, 1, // t2d0ts8_pr (355 downto 354)
+      385, 1, // t2d1_charge (353 downto 352)
+      383, 6, // t2d1_rho_s (351 downto 345)
+      376, 6, // t2d1_phi (344 downto 338)
+      369, 7, // t2d1ts0_id (337 downto 330)
+      361, 8, // t2d1ts0_rt (329 downto 321)
+      352, 1, // t2d1ts0_lr (320 downto 319)
+      350, 1, // t2d1ts0_pr (318 downto 317)
+      348, 7, // t2d1ts2_id (316 downto 309)
+      340, 8, // t2d1ts2_rt (308 downto 300)
+      331, 1, // t2d1ts2_lr (299 downto 298)
+      329, 1, // t2d1ts2_pr (297 downto 296)
+      327, 7, // t2d1ts4_id (295 downto 288)
+      319, 8, // t2d1ts4_rt (287 downto 279)
+      310, 1, // t2d1ts4_lr (278 downto 277)
+      308, 1, // t2d1ts4_pr (276 downto 275)
+      306, 7, // t2d1ts6_id (274 downto 267)
+      298, 8, // t2d1ts6_rt (266 downto 258)
+      289, 1, // t2d1ts6_lr (257 downto 256)
+      287, 1, // t2d1ts6_pr (255 downto 254)
+      285, 7, // t2d1ts8_id (253 downto 246)
+      277, 8, // t2d1ts8_rt (245 downto 237)
+      268, 1, // t2d1ts8_lr (236 downto 235)
+      266, 1, // t2d1ts8_pr (234 downto 233)
+      264, 1, // t2d2_charge (232 downto 231)
+      262, 6, // t2d2_rho_s (230 downto 224)
+      255, 6, // t2d2_phi (223 downto 217)
+      248, 7, // t2d2ts0_id (216 downto 209)
+      240, 8, // t2d2ts0_rt (208 downto 200)
+      231, 1, // t2d2ts0_lr (199 downto 198)
+      229, 1, // t2d2ts0_pr (197 downto 196)
+      227, 7, // t2d2ts2_id (195 downto 188)
+      219, 8, // t2d2ts2_rt (187 downto 179)
+      210, 1, // t2d2ts2_lr (178 downto 177)
+      208, 1, // t2d2ts2_pr (176 downto 175)
+      206, 7, // t2d2ts4_id (174 downto 167)
+      198, 8, // t2d2ts4_rt (166 downto 158)
+      189, 1, // t2d2ts4_lr (157 downto 156)
+      187, 1, // t2d2ts4_pr (155 downto 154)
+      185, 7, // t2d2ts6_id (153 downto 146)
+      177, 8, // t2d2ts6_rt (145 downto 137)
+      168, 1, // t2d2ts6_lr (136 downto 135)
+      166, 1, // t2d2ts6_pr (134 downto 133)
+      164, 7, // t2d2ts8_id (132 downto 125)
+      156, 8, // t2d2ts8_rt (124 downto 116)
+      147, 1, // t2d2ts8_lr (115 downto 114)
+      145, 1, // t2d2ts8_pr (113 downto 112)
+      143, 1, // t2d3_charge (111 downto 110)
+      141, 6, // t2d3_rho_s (109 downto 103)
+      134, 6, // t2d3_phi (102 downto 96)
+      127, 7, // t2d3ts0_id (95 downto 88)
+      119, 8, // t2d3ts0_rt (87 downto 79)
+      110, 1, // t2d3ts0_lr (78 downto 77)
+      108, 1, // t2d3ts0_pr (76 downto 75)
+      106, 7, // t2d3ts2_id (74 downto 67)
+      98, 8, // t2d3ts2_rt (66 downto 58)
+      89, 1, // t2d3ts2_lr (57 downto 56)
+      87, 1, // t2d3ts2_pr (55 downto 54)
+      85, 7, // t2d3ts4_id (53 downto 46)
+      77, 8, // t2d3ts4_rt (45 downto 37)
+      68, 1, // t2d3ts4_lr (36 downto 35)
+      66, 1, // t2d3ts4_pr (34 downto 33)
+      64, 7, // t2d3ts6_id (32 downto 25)
+      56, 8, // t2d3ts6_rt (24 downto 16)
+      47, 1, // t2d3ts6_lr (15 downto 14)
+      45, 1, // t2d3ts6_pr (13 downto 12)
+      43, 7, // t2d3ts8_id (11 downto 4)
+      35, 8, // t2d3ts8_rt
+      26, 1, // t2d3ts8_lr
+      24, 1, // t2d3ts8_pr
+      22, 3, // etf_thresh
+      18, 8, // etf_cc
+      9, 8, // etf_t0
+      0, 0  // etf_valid
+    };
+
+
     void
     setLeafPointersArray(TRGCDCT3DUnpackerStore* store, int** bitArray)
     {
@@ -2912,6 +3354,157 @@ namespace Belle2 {
       bitArray[e1_firmid  ] = &(store->m_firmid);
       bitArray[e1_firmver ] = &(store->m_firmver);
     }
+
+    void
+    setLeafPointersArray_2dfitter(TRGCDCT3DUnpackerStore* store, int** bitArray)
+    {
+      bitArray[e2_t3d_2doldtrk    ] = &(store->m_t3d_2doldtrk);
+      bitArray[e2_t3dtrk0_evtTime_delay    ] = &(store->m_t3dtrk0_evtTime_delay);
+      bitArray[e2_t3dtrk0_evtTimeValid_delay    ] = &(store->m_t3dtrk0_evtTimeValid_delay);
+      bitArray[e2_t3dtrk0_charge    ] = &(store->m_t3dtrk0_charge);
+      bitArray[e2_t3dtrk0_rho    ] = &(store->m_t3dtrk0_rho);
+      bitArray[e2_t3dtrk0_phi0    ] = &(store->m_t3dtrk0_phi0);
+      bitArray[e2_t3dtrk0ts0_id    ] = &(store->m_t3dtrk0ts0_id);
+      bitArray[e2_t3dtrk0ts0_lr    ] = &(store->m_t3dtrk0ts0_lr);
+      bitArray[e2_t3dtrk0ts0_rt    ] = &(store->m_t3dtrk0ts0_rt);
+      bitArray[e2_t3dtrk0ts1_id    ] = &(store->m_t3dtrk0ts1_id);
+      bitArray[e2_t3dtrk0ts1_lr    ] = &(store->m_t3dtrk0ts1_lr);
+      bitArray[e2_t3dtrk0ts1_rt    ] = &(store->m_t3dtrk0ts1_rt);
+      bitArray[e2_t3dtrk0ts2_id    ] = &(store->m_t3dtrk0ts2_id);
+      bitArray[e2_t3dtrk0ts2_lr    ] = &(store->m_t3dtrk0ts2_lr);
+      bitArray[e2_t3dtrk0ts2_rt    ] = &(store->m_t3dtrk0ts2_rt);
+      bitArray[e2_t3dtrk0ts3_id    ] = &(store->m_t3dtrk0ts3_id);
+      bitArray[e2_t3dtrk0ts3_lr    ] = &(store->m_t3dtrk0ts3_lr);
+      bitArray[e2_t3dtrk0ts3_rt    ] = &(store->m_t3dtrk0ts3_rt);
+      bitArray[e2_t3dtrk1_evtTime_delay    ] = &(store->m_t3dtrk1_evtTime_delay);
+      bitArray[e2_t3dtrk1_evtTimeValid_delay    ] = &(store->m_t3dtrk1_evtTimeValid_delay);
+      bitArray[e2_t3dtrk1_charge    ] = &(store->m_t3dtrk1_charge);
+      bitArray[e2_t3dtrk1_rho    ] = &(store->m_t3dtrk1_rho);
+      bitArray[e2_t3dtrk1_phi0    ] = &(store->m_t3dtrk1_phi0);
+      bitArray[e2_t3dtrk1ts0_id    ] = &(store->m_t3dtrk1ts0_id);
+      bitArray[e2_t3dtrk1ts0_lr    ] = &(store->m_t3dtrk1ts0_lr);
+      bitArray[e2_t3dtrk1ts0_rt    ] = &(store->m_t3dtrk1ts0_rt);
+      bitArray[e2_t3dtrk1ts1_id    ] = &(store->m_t3dtrk1ts1_id);
+      bitArray[e2_t3dtrk1ts1_lr    ] = &(store->m_t3dtrk1ts1_lr);
+      bitArray[e2_t3dtrk1ts1_rt    ] = &(store->m_t3dtrk1ts1_rt);
+      bitArray[e2_t3dtrk1ts2_id    ] = &(store->m_t3dtrk1ts2_id);
+      bitArray[e2_t3dtrk1ts2_lr    ] = &(store->m_t3dtrk1ts2_lr);
+      bitArray[e2_t3dtrk1ts2_rt    ] = &(store->m_t3dtrk1ts2_rt);
+      bitArray[e2_t3dtrk1ts3_id    ] = &(store->m_t3dtrk1ts3_id);
+      bitArray[e2_t3dtrk1ts3_lr    ] = &(store->m_t3dtrk1ts3_lr);
+      bitArray[e2_t3dtrk1ts3_rt    ] = &(store->m_t3dtrk1ts3_rt);
+      bitArray[e2_t2dfittertrk0_rho    ] = &(store->m_t2dfittertrk0_rho);
+      bitArray[e2_t2dfittertrk0_phi0    ] = &(store->m_t2dfittertrk0_phi0);
+      bitArray[e2_t2dfittertrk1_rho    ] = &(store->m_t2dfittertrk1_rho);
+      bitArray[e2_t2dfittertrk1_phi0    ] = &(store->m_t2dfittertrk1_phi0);
+      bitArray[e2_t2dfittertrk2_rho    ] = &(store->m_t2dfittertrk2_rho);
+      bitArray[e2_t2dfittertrk2_phi0    ] = &(store->m_t2dfittertrk2_phi0);
+      bitArray[e2_t2dfittertrk3_rho    ] = &(store->m_t2dfittertrk3_rho);
+      bitArray[e2_t2dfittertrk3_phi0    ] = &(store->m_t2dfittertrk3_phi0);
+      bitArray[e2_t2d_cc    ] = &(store->m_t2d_cc);
+      bitArray[e2_t2d_fnf    ] = &(store->m_t2d_fnf);
+      bitArray[e2_t2d0_charge    ] = &(store->m_t2d0_charge);
+      bitArray[e2_t2d0_rho_s    ] = &(store->m_t2d0_rho_s);
+      bitArray[e2_t2d0_phi    ] = &(store->m_t2d0_phi);
+      bitArray[e2_t2d0ts0_id    ] = &(store->m_t2d0ts0_id);
+      bitArray[e2_t2d0ts0_rt    ] = &(store->m_t2d0ts0_rt);
+      bitArray[e2_t2d0ts0_lr    ] = &(store->m_t2d0ts0_lr);
+      bitArray[e2_t2d0ts0_pr    ] = &(store->m_t2d0ts0_pr);
+      bitArray[e2_t2d0ts2_id    ] = &(store->m_t2d0ts2_id);
+      bitArray[e2_t2d0ts2_rt    ] = &(store->m_t2d0ts2_rt);
+      bitArray[e2_t2d0ts2_lr    ] = &(store->m_t2d0ts2_lr);
+      bitArray[e2_t2d0ts2_pr    ] = &(store->m_t2d0ts2_pr);
+      bitArray[e2_t2d0ts4_id    ] = &(store->m_t2d0ts4_id);
+      bitArray[e2_t2d0ts4_rt    ] = &(store->m_t2d0ts4_rt);
+      bitArray[e2_t2d0ts4_lr    ] = &(store->m_t2d0ts4_lr);
+      bitArray[e2_t2d0ts4_pr    ] = &(store->m_t2d0ts4_pr);
+      bitArray[e2_t2d0ts6_id    ] = &(store->m_t2d0ts6_id);
+      bitArray[e2_t2d0ts6_rt    ] = &(store->m_t2d0ts6_rt);
+      bitArray[e2_t2d0ts6_lr    ] = &(store->m_t2d0ts6_lr);
+      bitArray[e2_t2d0ts6_pr    ] = &(store->m_t2d0ts6_pr);
+      bitArray[e2_t2d0ts8_id    ] = &(store->m_t2d0ts8_id);
+      bitArray[e2_t2d0ts8_rt    ] = &(store->m_t2d0ts8_rt);
+      bitArray[e2_t2d0ts8_lr    ] = &(store->m_t2d0ts8_lr);
+      bitArray[e2_t2d0ts8_pr    ] = &(store->m_t2d0ts8_pr);
+      bitArray[e2_t2d1_charge    ] = &(store->m_t2d1_charge);
+      bitArray[e2_t2d1_rho_s    ] = &(store->m_t2d1_rho_s);
+      bitArray[e2_t2d1_phi    ] = &(store->m_t2d1_phi);
+      bitArray[e2_t2d1ts0_id    ] = &(store->m_t2d1ts0_id);
+      bitArray[e2_t2d1ts0_rt    ] = &(store->m_t2d1ts0_rt);
+      bitArray[e2_t2d1ts0_lr    ] = &(store->m_t2d1ts0_lr);
+      bitArray[e2_t2d1ts0_pr    ] = &(store->m_t2d1ts0_pr);
+      bitArray[e2_t2d1ts2_id    ] = &(store->m_t2d1ts2_id);
+      bitArray[e2_t2d1ts2_rt    ] = &(store->m_t2d1ts2_rt);
+      bitArray[e2_t2d1ts2_lr    ] = &(store->m_t2d1ts2_lr);
+      bitArray[e2_t2d1ts2_pr    ] = &(store->m_t2d1ts2_pr);
+      bitArray[e2_t2d1ts4_id    ] = &(store->m_t2d1ts4_id);
+      bitArray[e2_t2d1ts4_rt    ] = &(store->m_t2d1ts4_rt);
+      bitArray[e2_t2d1ts4_lr    ] = &(store->m_t2d1ts4_lr);
+      bitArray[e2_t2d1ts4_pr    ] = &(store->m_t2d1ts4_pr);
+      bitArray[e2_t2d1ts6_id    ] = &(store->m_t2d1ts6_id);
+      bitArray[e2_t2d1ts6_rt    ] = &(store->m_t2d1ts6_rt);
+      bitArray[e2_t2d1ts6_lr    ] = &(store->m_t2d1ts6_lr);
+      bitArray[e2_t2d1ts6_pr    ] = &(store->m_t2d1ts6_pr);
+      bitArray[e2_t2d1ts8_id    ] = &(store->m_t2d1ts8_id);
+      bitArray[e2_t2d1ts8_rt    ] = &(store->m_t2d1ts8_rt);
+      bitArray[e2_t2d1ts8_lr    ] = &(store->m_t2d1ts8_lr);
+      bitArray[e2_t2d1ts8_pr    ] = &(store->m_t2d1ts8_pr);
+      bitArray[e2_t2d2_charge    ] = &(store->m_t2d2_charge);
+      bitArray[e2_t2d2_rho_s    ] = &(store->m_t2d2_rho_s);
+      bitArray[e2_t2d2_phi    ] = &(store->m_t2d2_phi);
+      bitArray[e2_t2d2ts0_id    ] = &(store->m_t2d2ts0_id);
+      bitArray[e2_t2d2ts0_rt    ] = &(store->m_t2d2ts0_rt);
+      bitArray[e2_t2d2ts0_lr    ] = &(store->m_t2d2ts0_lr);
+      bitArray[e2_t2d2ts0_pr    ] = &(store->m_t2d2ts0_pr);
+      bitArray[e2_t2d2ts2_id    ] = &(store->m_t2d2ts2_id);
+      bitArray[e2_t2d2ts2_rt    ] = &(store->m_t2d2ts2_rt);
+      bitArray[e2_t2d2ts2_lr    ] = &(store->m_t2d2ts2_lr);
+      bitArray[e2_t2d2ts2_pr    ] = &(store->m_t2d2ts2_pr);
+      bitArray[e2_t2d2ts4_id    ] = &(store->m_t2d2ts4_id);
+      bitArray[e2_t2d2ts4_rt    ] = &(store->m_t2d2ts4_rt);
+      bitArray[e2_t2d2ts4_lr    ] = &(store->m_t2d2ts4_lr);
+      bitArray[e2_t2d2ts4_pr    ] = &(store->m_t2d2ts4_pr);
+      bitArray[e2_t2d2ts6_id    ] = &(store->m_t2d2ts6_id);
+      bitArray[e2_t2d2ts6_rt    ] = &(store->m_t2d2ts6_rt);
+      bitArray[e2_t2d2ts6_lr    ] = &(store->m_t2d2ts6_lr);
+      bitArray[e2_t2d2ts6_pr    ] = &(store->m_t2d2ts6_pr);
+      bitArray[e2_t2d2ts8_id    ] = &(store->m_t2d2ts8_id);
+      bitArray[e2_t2d2ts8_rt    ] = &(store->m_t2d2ts8_rt);
+      bitArray[e2_t2d2ts8_lr    ] = &(store->m_t2d2ts8_lr);
+      bitArray[e2_t2d2ts8_pr    ] = &(store->m_t2d2ts8_pr);
+      bitArray[e2_t2d3_charge    ] = &(store->m_t2d3_charge);
+      bitArray[e2_t2d3_rho_s    ] = &(store->m_t2d3_rho_s);
+      bitArray[e2_t2d3_phi    ] = &(store->m_t2d3_phi);
+      bitArray[e2_t2d3ts0_id    ] = &(store->m_t2d3ts0_id);
+      bitArray[e2_t2d3ts0_rt    ] = &(store->m_t2d3ts0_rt);
+      bitArray[e2_t2d3ts0_lr    ] = &(store->m_t2d3ts0_lr);
+      bitArray[e2_t2d3ts0_pr    ] = &(store->m_t2d3ts0_pr);
+      bitArray[e2_t2d3ts2_id    ] = &(store->m_t2d3ts2_id);
+      bitArray[e2_t2d3ts2_rt    ] = &(store->m_t2d3ts2_rt);
+      bitArray[e2_t2d3ts2_lr    ] = &(store->m_t2d3ts2_lr);
+      bitArray[e2_t2d3ts2_pr    ] = &(store->m_t2d3ts2_pr);
+      bitArray[e2_t2d3ts4_id    ] = &(store->m_t2d3ts4_id);
+      bitArray[e2_t2d3ts4_rt    ] = &(store->m_t2d3ts4_rt);
+      bitArray[e2_t2d3ts4_lr    ] = &(store->m_t2d3ts4_lr);
+      bitArray[e2_t2d3ts4_pr    ] = &(store->m_t2d3ts4_pr);
+      bitArray[e2_t2d3ts6_id    ] = &(store->m_t2d3ts6_id);
+      bitArray[e2_t2d3ts6_rt    ] = &(store->m_t2d3ts6_rt);
+      bitArray[e2_t2d3ts6_lr    ] = &(store->m_t2d3ts6_lr);
+      bitArray[e2_t2d3ts6_pr    ] = &(store->m_t2d3ts6_pr);
+      bitArray[e2_t2d3ts8_id    ] = &(store->m_t2d3ts8_id);
+      bitArray[e2_t2d3ts8_rt    ] = &(store->m_t2d3ts6_rt);
+      bitArray[e2_t2d3ts8_lr    ] = &(store->m_t2d3ts6_lr);
+      bitArray[e2_t2d3ts8_pr    ] = &(store->m_t2d3ts6_pr);
+      bitArray[e2_etf_thresh    ] = &(store->m_etf_thresh);
+      bitArray[e2_etf_cc        ] = &(store->m_etf_cc);
+      bitArray[e2_etf_t0        ] = &(store->m_etf_t0);
+      bitArray[e2_etf_valid     ] = &(store->m_etf_valid);
+      bitArray[e2_evt     ] = &(store->m_evt);
+      bitArray[e2_clk     ] = &(store->m_clk);
+      bitArray[e2_firmid  ] = &(store->m_firmid);
+      bitArray[e2_firmver ] = &(store->m_firmver);
+    }
+
     /*! A module of TRGCDCT3DUnpacker */
     class TRGCDCT3DUnpackerModule : public Module {
 
@@ -2943,6 +3536,9 @@ namespace Belle2 {
 
       /** Unpacker main function.*/
       virtual void fillTreeTRGCDCT3DUnpacker(int* buf, int evt);
+
+      /** Unpacker main function.*/
+      virtual void fillTreeTRGCDCT3DUnpacker_2dfitter(int* buf, int evt);
 
       /** Unpacker main function, 2.6k, 15 TS version*/
       virtual void fillTreeTRGCDCT3DUnpacker_2624(int* buf, int evt);

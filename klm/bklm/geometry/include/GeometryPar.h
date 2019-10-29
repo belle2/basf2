@@ -347,9 +347,6 @@ namespace Belle2 {
       //! Get the pointer to the definition of a module
       const Module* findModule(int section, int sector, int layer) const;
 
-      //! Get the pointer to the definition of a module
-      const Module* findModule(int layer, bool hasChimney) const;
-
       //! Get the alignment transformation of a module
       const HepGeom::Transform3D getModuleAlignment(int section, int sector, int layer) const;
 
@@ -410,7 +407,7 @@ namespace Belle2 {
       double m_Rotation;
 
       //! Global rotation angle of a sector
-      double m_SectorRotation[2][NSECTOR];
+      double m_SectorRotation[2][BKLMElementNumbers::getMaximalSectorNumber()];
 
       //! Global offset along z of the BKLM
       double m_OffsetZ;
@@ -473,10 +470,10 @@ namespace Belle2 {
       double m_GapInnerRadius;
 
       //! Number of phi-readout RPC strips in each layer
-      int m_NPhiStrips[NLAYER];
+      int m_NPhiStrips[BKLMElementNumbers::getMaximalLayerNumber()];
 
       //! Number of phi-readout scintillators in each layer
-      int m_NPhiScints[NLAYER];
+      int m_NPhiScints[BKLMElementNumbers::getMaximalLayerNumber()];
 
       //! number of z-measuring cathode strips in a standard RPC module
       int m_NZStrips;
@@ -492,16 +489,16 @@ namespace Belle2 {
 
       //! Sign (+/-1) of scintillator-envelope's shift along y axis within its enclosing module for MPPC placement
       //! -1: shift envelope along -y to place MPPCs at +y, +1: shift envelope along +y to place MPPCs at -y
-      int m_ScintEnvelopeOffsetSign[NLAYER];
+      int m_ScintEnvelopeOffsetSign[BKLMElementNumbers::getMaximalLayerNumber()];
 
       //! Width of the phi strips on each layer
-      double m_PhiStripWidth[NLAYER];
+      double m_PhiStripWidth[BKLMElementNumbers::getMaximalLayerNumber()];
 
       //! Width of the z strips on each layer
-      double m_ZStripWidth[NLAYER];
+      double m_ZStripWidth[BKLMElementNumbers::getMaximalLayerNumber()];
 
       //! Shortening of the nominal length of the z scintillators
-      double m_ZScintDLength[NLAYER][NZSCINT];
+      double m_ZScintDLength[BKLMElementNumbers::getMaximalLayerNumber()][NZSCINT];
 
       //! length along z of the module
       double m_ModuleLength;
@@ -711,19 +708,19 @@ namespace Belle2 {
       double m_MPPCHeight;
 
       //! Flag to indicate whether layer contains RPCs (true) or scintillators (false)
-      bool m_HasRPCs[NLAYER];
+      bool m_HasRPCs[BKLMElementNumbers::getMaximalLayerNumber()];
 
       //! Reconstruction dx in local system. displacement, not alignment
-      double m_LocalReconstructionShiftX[2][NSECTOR][NLAYER];
+      double m_LocalReconstructionShiftX[2][BKLMElementNumbers::getMaximalSectorNumber()][BKLMElementNumbers::getMaximalLayerNumber()];
 
       //! Reconstruction dy in local system. displacement, not alignment
-      double m_LocalReconstructionShiftY[2][NSECTOR][NLAYER];
+      double m_LocalReconstructionShiftY[2][BKLMElementNumbers::getMaximalSectorNumber()][BKLMElementNumbers::getMaximalLayerNumber()];
 
       //! Reconstruction dz in local system. displacement, not alignment
-      double m_LocalReconstructionShiftZ[2][NSECTOR][NLAYER];
+      double m_LocalReconstructionShiftZ[2][BKLMElementNumbers::getMaximalSectorNumber()][BKLMElementNumbers::getMaximalLayerNumber()];
 
       //! Flag to indicate whether a module is flipped (true) or not (false) by 180 degrees about the z axis
-      bool m_IsFlipped[2][NSECTOR][NLAYER];
+      bool m_IsFlipped[2][BKLMElementNumbers::getMaximalSectorNumber()][BKLMElementNumbers::getMaximalLayerNumber()];
 
       //! map of <volumeIDs, pointers to defined modules>
       std::map<int, Module*> m_Modules;

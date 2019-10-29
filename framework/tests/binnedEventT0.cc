@@ -1,5 +1,4 @@
 #include <framework/dataobjects/BinnedEventT0.h>
-#include <cmath>
 #include <gtest/gtest.h>
 
 using namespace Belle2;

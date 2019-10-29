@@ -36,6 +36,12 @@ namespace Belle2 {
     {}
 
     /**
+     * Default destructor
+     */
+    ~KLMStripEfficiency()
+    {}
+
+    /**
      * Set efficiency and relative error for a single KLM strip using directly the stripId
      * @param stripId KLM strip identifier
      * @param efficiency efficiency of the strip

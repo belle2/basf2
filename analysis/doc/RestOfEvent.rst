@@ -48,7 +48,7 @@ The ROE is formed by calling :func:`modularAnalysis.buildRestOfEvent` command:
    
 This code simply adds ``RestOfEvent`` objects, which are related to each ``B0:rec`` candidate.
 Now, it is possible to calculate simple ROE-based variables using target particle candidate,
-like the ROE momentum ``ROE_P``, the ROE mass ``ROE_M`` or others. The full list of the ROE variables can be found
+like the ROE momentum ``roeP``, the ROE mass ``roeM`` or others. The full list of the ROE variables can be found
 by using command ``basf2 variables.py`` under the **Rest of Event** section.
 
 .. warning :: 
@@ -158,7 +158,7 @@ The mask tuples should contain a mask name and cuts for charged particles, for p
 In the example above a cut is not set, therefore, all hadrons will pass the mask.
 Most of ROE variables accept mask name as an argument, which allows user to compare 
 variable distributions from different ROE masks. 
-For example, the ``ROE_E(cleanMask)`` variable will be computed only using only ROE particles from a corresponding mask. 
+For example, the ``roeE(cleanMask)`` variable will be computed only using only ROE particles from a corresponding mask. 
 
 .. note::
   Hard cuts on track impact parameters :math:`d_0` and :math:`z_0` are not recommended since one can throw away tracks from long lived decaying

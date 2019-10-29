@@ -3,7 +3,6 @@
 #include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/core/Environment.h>
-#include <chrono>
 
 using namespace std;
 using namespace Belle2;

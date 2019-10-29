@@ -74,7 +74,6 @@ namespace VXDTFthreeHitFilterTest {
     VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, X, Y, Z);
 
     PXDCluster aCluster = PXDCluster(aVxdID, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
-    SpacePoint testPoint = SpacePoint(&aCluster, &sensorInfoBase);
 
     return SpacePoint(&aCluster, &sensorInfoBase);
   }
@@ -84,11 +83,9 @@ namespace VXDTFthreeHitFilterTest {
   SpacePoint provideSpacePointDummyError(double X, double Y, double Z, double eX, double eY, double eZ)
   {
     VxdID aVxdID = VxdID(1, 1, 1);
-    VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, X, Y, Z);
 
     B2Vector3D pos(X, Y, Z);
     B2Vector3D poserr(eX, eY, eZ);
-    SpacePoint testPoint = SpacePoint(pos, poserr, {0.0, 0.0}, {false, false}, aVxdID, Belle2::VXD::SensorInfoBase::PXD);
 
     return  SpacePoint(pos, poserr, {0.0, 0.0}, {false, false}, aVxdID, Belle2::VXD::SensorInfoBase::PXD);
   }
@@ -231,7 +228,6 @@ namespace VXDTFthreeHitFilterTest {
     SpacePoint outerSPunrealsigma = provideSpacePointDummyError(6., 4., 1., 2., 2., 2.);
     SpacePoint centerSPunrealsigma = provideSpacePointDummyError(3., 3., 0., 2., 2., 2.);
     SpacePoint innerSPunrealsigma = provideSpacePointDummyError(1., 1., 0., 2., 2., 2.);
-    SpacePoint outerHighSPunrealsigma = provideSpacePointDummyError(4., 6., 1., 2., 2., 2.);
 
     Filter< DeltaSlopeRZ<SpacePoint>, Range<double, double>, ResultsObserver > filterDeltaSlopeRZ(Range<double, double>(0.3,
         0.31));

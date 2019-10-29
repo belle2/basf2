@@ -1,5 +1,4 @@
 #include <framework/dataobjects/FileMetaData.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/io/RootIOUtilities.h>
 #include <framework/io/RootFileInfo.h>
 #include <framework/logging/Logger.h>
@@ -11,11 +10,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include <TSystem.h>
 #include <TFile.h>
 #include <TTree.h>
 #include <TBranchElement.h>
-#include <TClonesArray.h>
 
 #include <iostream>
 #include <iomanip>

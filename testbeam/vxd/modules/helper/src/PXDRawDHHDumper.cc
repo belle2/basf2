@@ -7,6 +7,7 @@
 //-
 
 #include <testbeam/vxd/modules/helper/PXDRawDHHDumper.h>
+#include <boost/format.hpp>
 #include <boost/spirit/home/support/detail/endian.hpp>
 
 using namespace std;

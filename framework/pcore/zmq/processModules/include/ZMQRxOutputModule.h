@@ -16,8 +16,6 @@
 #include <framework/pcore/zmq/sockets/ZMQClient.h>
 #include <framework/pcore/zmq/utils/StreamHelper.h>
 
-#include <memory>
-
 namespace Belle2 {
   /**
    * Module connecting the worker path with the output path on the output side.

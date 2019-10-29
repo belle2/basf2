@@ -244,7 +244,7 @@ def SetTauThrustSkimVariables(path):
 
     * input particle lists: pi+:all, gamma:all
 
-    * output particle lists: pi+:thrust, gamma:thrust, pi+:thrustS1/thrustS2
+    * output particle lists: pi+:thrust, gamma:thrust, pi+:thrustS1/thrustS2, pi0:thrust
 
     * nGoodTracksThrust: number of good tracks in an event
     * netChargeThrust: total net charge of good tracks
@@ -254,16 +254,20 @@ def SetTauThrustSkimVariables(path):
     __author__ = "Ami Rostomyan, Kenji Inami"
 
     # Track and gamma cuts
-    trackCuts = '-5.0 < dz < 5.0 and dr < 1.0 and nSVDHits >= 6'
+    trackCuts = '-3.0 < dz < 7.0 and dr < 1.0'
     cutAndCopyList('pi+:thrust', 'pi+:all', trackCuts, path=path)
+    gammaForPi0Cuts = 'E > 0.1 and -0.8660 < cosTheta < 0.9563 and clusterNHits > 1.5'
+    cutAndCopyLists('gamma:thrustForPi0', 'gamma:all', gammaForPi0Cuts, path=path)
+    reconstructDecay('pi0:thrust -> gamma:thrustForPi0 gamma:thrustForPi0', '0.115 < M < 0.152', path=path)
     gammaCuts = 'E > 0.20 and clusterNHits > 1.5 and -0.8660 < cosTheta < 0.9563'
+    gammaCuts += ' and isDaughterOfList(pi0:thrust) == 0'
     cutAndCopyList('gamma:thrust', 'gamma:all', gammaCuts, path=path)
 
     # Get EventShape variables
-    buildEventShape(['pi+:thrust', 'gamma:thrust'],
+    buildEventShape(['pi+:thrust', 'pi0:thrust', 'gamma:thrust'],
                     allMoments=False, foxWolfram=False, cleoCones=False,
                     sphericity=False, jets=False, path=path)
-    buildEventKinematics(['pi+:thrust', 'gamma:thrust'], path=path)
+    buildEventKinematics(['pi+:thrust', 'pi0:thrust', 'gamma:thrust'], path=path)
 
     # Split in signal and tag
     cutAndCopyList('pi+:thrustS1', 'pi+:thrust', 'cosToThrustOfEvent > 0', path=path)

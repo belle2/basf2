@@ -56,29 +56,29 @@ namespace Belle2 {
      * circleFit
      * helixFit
      */
-    std::string m_EstimationMethod;
+    std::string m_EstimationMethod = "tripletFit";
 
     /** sets the name of the expected StoreArray containing SpacePointTrackCands */
-    std::string m_SpacePointTrackCandsStoreArrayName;
+    std::string m_SpacePointTrackCandsStoreArrayName = "SPTrackCands";
 
     /** sets the name of the expected StoreArray containing MCRecoTracks. Only required for MCInfo method */
-    std::string m_MCRecoTracksStoreArrayName;
+    std::string m_MCRecoTracksStoreArrayName = "MCRecoTracks";
 
     /** Required for MCInfo method, activates its strict version */
-    bool m_MCStrictQualityEstimator;
+    bool m_MCStrictQualityEstimator = true;
 
     /** Bool to indicate if mva target requiring complete agreement in SVD Clusters between MC and PR track to yield 1
      *  should be written out as target for the mva training. */
     bool m_mva_target = false;
 
     /** name of the output rootfile */
-    std::string m_TrainingDataOutputName;
+    std::string m_TrainingDataOutputName = "QETrainingOutput.root";
 
     /** how to compile information from clusters ['Average'] **/
-    std::string m_ClusterInformation;
+    std::string m_ClusterInformation = "Average";
 
     /** whether to collect timing information */
-    bool m_UseTimingInfo;
+    bool m_UseTimingInfo = false;
 
     // -------------------------
 

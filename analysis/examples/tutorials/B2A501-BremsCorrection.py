@@ -25,6 +25,7 @@
 # Contributors: Moritz Gelb (February 2017)
 #               I. Komarov (December 2017)
 #               I. Komarov (September 2018)
+#               F. Meier (October 2019)
 #
 ###############################################################################
 

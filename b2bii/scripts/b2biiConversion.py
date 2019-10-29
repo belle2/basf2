@@ -63,7 +63,7 @@ def setupB2BIIDatabase(isMC=False):
         use_local_database("%s/dbcache.txt" % payloaddir, payloaddir, False, LogLevel.WARNING)
 
 
-def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
+def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   useBelleDBServer=None,
                                   generatorLevelReconstruction=False,
                                   generatorLevelMCMatching=False,
@@ -71,7 +71,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
                                   convertECLCrystalEnergies=False,
                                   convertExtHits=False,
                                   matchType2E9oE25Threshold=-1.1,
-                                  HadronAOnly=False, L4Only=False):
+                                  HadronA=True, HadronB=True):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -107,13 +107,19 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
         fix = register_module('B2BIIFixMdst')
         # fix.logging.set_log_level(LogLevel.DEBUG)
         # fix.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
-        if(HadronAOnly or L4Only):
-            fix.param("HadronB", 0)
-        if(L4Only):
-            fix.param("HadronA", 0)
+        # if(HadronAOnly):
+        #   fix.param("HadronB", 0)
+        # else if(L4Only):
+        #   fix.param("HadronA", 0)
+        #   fix.param("HadronB", 0)
+        fix.param('HadronA', HadronA)
+        fix.param('HadronB', HadronB)
+        if (HadronA is False and HadronB is True):
+            B2WARNING('HadronB(J) skim includes HadronA requirements.'
+                      'Are you sure you want to turn off HadronA when HadronB(J) is still applied?')
         path.add_module(fix)
 
-        if(applyHadronBJSkim):
+        if(applySkim):
             emptypath = create_path()
             # discard 'bad events' marked by fixmdst
             fix.if_value('<=0', emptypath)

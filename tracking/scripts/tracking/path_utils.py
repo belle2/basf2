@@ -502,7 +502,12 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     # Export CDCTracks to RecoTracks representation
     path.add_module("TFCDC_TrackExporter",
                     inputTracks=output_tracks,
-                    RecoTracksStoreArrayName=output_reco_tracks)
+                    RecoTracksStoreArrayName="CDCRecoTracksBeforeReattaching")
+
+    # Loop over low-ADC/TOT CDCWireHits and RecoTracks and reattach the hits to the tracks if they are close enough
+    path.add_module("ReattachCDCWireHitsToRecoTracks",
+                    inputRecoTracksStoreArray="CDCRecoTracksBeforeReattaching",
+                    outputRecoTracksStoreArray=output_reco_tracks)
 
     # Correct time seed (only necessary for the CDC tracks)
     path.add_module("IPTrackTimeEstimator",

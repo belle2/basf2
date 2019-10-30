@@ -17,6 +17,7 @@ This script tests that
 from tempfile import NamedTemporaryFile
 import basf2
 import ROOT
+from ROOT import Belle2
 import re
 import os
 import sys
@@ -34,7 +35,7 @@ pdg.add_particle("test2", 1, 5.28, 0.1, 0, 0.5)
 pdg.add_particle("foo\tbar", 10001, 0, 0, 0, 0)
 
 # default evt.pdl filename
-default_evtpdl = os.path.join(os.environ["BELLE2_EXTERNALS_DIR"], "share", "evtgen", "evt.pdl")
+default_evtpdl = Belle2.FileSystem.findFile(os.path.join("decfiles", "dec", "evt.pdl"))
 # create a temporary one and compare
 with NamedTemporaryFile() as tempfile:
     # write a evt.pdl from the EventGenDatabasePDG

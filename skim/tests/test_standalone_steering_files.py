@@ -105,4 +105,4 @@ if __name__ == '__main__':
     standaloneSkims = [name for _, name in skim_registry]
     combinedSkims = combined_skims.keys()
 
-    testScripts(standaloneSkims, combinedSkims)
+    testAllSkims(standaloneSkims, combinedSkims)

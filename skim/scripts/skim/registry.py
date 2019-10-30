@@ -87,7 +87,7 @@ combined_skims = {
         'SystematicsRadMuMu', 'SystematicsRadEE'
     ],
     'Dark': [
-        'ALP3Gamma', 'SinglePhotonDark', 'LFVZpVisible', 'LFVZpInvisible'
+        'ALP3Gamma', 'SinglePhotonDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy', 'DielectronPlusMissingEnergy'
     ],
     'EWP': [
         'BtoXll', 'BtoXll_LFV', 'BtoXgamma'

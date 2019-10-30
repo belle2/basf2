@@ -102,10 +102,10 @@ namespace Belle2 {
       double m_minError = 0.100; /**< minimal moduleT0 uncertainty [ns] to declare c_OK */
 
       // temporary store for results of a single fit
-      double m_delT0; /**< fitted delta T0 */
-      double m_error; /**< error on fitted delta T0 */
-      double m_chi2;  /**< chi2 of the fit */
-      double m_ndf;  /**< NDF of the fit */
+      double m_delT0 = 0; /**< fitted delta T0 */
+      double m_error = 0; /**< error on fitted delta T0 */
+      double m_chi2 = 0;  /**< chi2 of the fit */
+      double m_ndf = 0;  /**< NDF of the fit */
 
     };
 

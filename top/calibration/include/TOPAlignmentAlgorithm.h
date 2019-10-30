@@ -19,7 +19,7 @@ namespace Belle2 {
     /**
      * Algorithm for geometrical alignment of a TOP module with dimuons or Bhabhas.
      * This class just collects the results of iterative alignment,
-     * which is in fact run in the collector module.
+     * which is in fact run in the collector modules.
      */
     class TOPAlignmentAlgorithm : public CalibrationAlgorithm {
     public:
@@ -30,6 +30,18 @@ namespace Belle2 {
       /** Destructor */
       virtual ~TOPAlignmentAlgorithm() {}
 
+      /**
+       * Sets required precision of displacements to declare calibration as c_OK
+       * @param precision required precision
+       */
+      void setSpatialPrecision(double precision) {m_spatialPrecision = precision;}
+
+      /**
+       * Sets required precision of rotation angles to declare calibration as c_OK
+       * @param precision required precision
+       */
+      void setAngularPrecision(double precision) {m_angularPrecision = precision;}
+
     private:
 
       /**
@@ -37,14 +49,20 @@ namespace Belle2 {
        */
       virtual EResult calibrate() final;
 
+      // algorithm parameters
+      double m_spatialPrecision = 0.1; /**< precision of displacements for c_OK */
+      double m_angularPrecision = 0.001; /**< precision of rotation angles for c_OK */
+
       // input tree variables
       int m_moduleID = 0; /**< module ID */
       int m_iter = 0;  /**< iteration counter */
       int m_ntrk = 0;  /**< number of tracks used */
       int m_errorCode = 0;  /**< error code of the alignment procedure */
-      std::vector<float> m_vAlignPars;     /**< alignment parameters */
-      std::vector<float> m_vAlignParsErr;  /**< error on alignment parameters */
+      std::vector<float>* m_vAlignPars = 0;     /**< alignment parameters */
+      std::vector<float>* m_vAlignParsErr = 0;  /**< error on alignment parameters */
       bool m_valid = false;  /**< true if alignment parameters are valid */
+      TBranch* m_bAlignPars = 0; /**< branch of alignment parameters */
+      TBranch* m_bAlignParsErr = 0; /**< branch of error on alignment parameters */
 
     };
 

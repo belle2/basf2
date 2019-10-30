@@ -377,7 +377,7 @@ def correctBrems(
     gammaList,
     maximumAcceptance=3.0,
     multiplePhotons=False,
-    usePhotonOnlyOnce=False,
+    usePhotonOnlyOnce=True,
     writeOut=False,
     path=None,
 ):

@@ -37,6 +37,36 @@ namespace Belle2 {
 
   class EKLMTrackMatchCollectorModule : public CalibrationCollectorModule {
 
+  private:
+
+    /**
+     * Hit data.
+     */
+    struct HitData {
+
+      /** Section. */
+      int section;
+
+      /** Layer. */
+      int layer;
+
+      /** Sector. */
+      int sector;
+
+      /** Plane. */
+      int plane;
+
+      /** Strip. */
+      int strip;
+
+      /** Extrapolation hit. */
+      const ExtHit* hit;
+
+      /** Digit. */
+      const EKLMDigit* digit;
+
+    };
+
   public:
 
     /**
@@ -64,12 +94,6 @@ namespace Belle2 {
      */
     void closeRun() override;
 
-    /**
-     * Was ExtHit entered in EKLM sensetive volume? If it isn`t returns tuple of -1.
-     * If it is returns copyid, idSection, idLayer, idSector, idPlane, idStrip
-     */
-    std::tuple<int, int, int, int, int, int> checkExtHit(const ExtHit& ext_hit) const;
-
     /**                     SIMPLE MUID
      * Calculating number of Hit2ds in forward and backward parts
      * If there are many hits in one of the sections can be sure that this is muon track
@@ -81,9 +105,12 @@ namespace Belle2 {
       int requiredHits) const;
 
     /**
-     *  Matching of digits with ext hits
+     * Matching of digits with ext hits
+     * @param[in] hitData         Hit data.
+     * @param[in] allowedDistance Minimal distance in the units of strip number.
      */
-    bool digitsMatching(const ExtHit& ext_hit, double allowed_distance) const;
+    const EKLMDigit* findMatchingDigit(const struct HitData* hitData,
+                                       double allowedDistance) const;
 
 
     /**
@@ -107,6 +134,11 @@ namespace Belle2 {
      * Always turn this off for cosmic data.
      */
     bool m_StandaloneTrackSelection;
+
+    /**
+     * Minimal number of matching digits.
+     */
+    int m_MinimalMatchingDigits;
 
     /** Digits. */
     StoreArray<EKLMDigit> m_digits;

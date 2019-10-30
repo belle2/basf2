@@ -137,6 +137,8 @@ you, e.g.::
 import errno
 import glob
 import os
+from pathlib import Path
+import shutil
 import subprocess
 import textwrap
 from datetime import datetime
@@ -212,8 +214,7 @@ def my_basf2_mva_teacher(
            In addition to variables containing the "truth" substring, which are excluded by default.
     """
 
-    # Check that weightfile ends in one of [".xml", ".root"]. Otherwise, a localdb would be created.
-    weightfile_extension = os.path.splitext(weightfile_identifier)[1]
+    weightfile_extension = Path(weightfile_identifier).suffix
     if weightfile_extension not in {".xml", ".root"}:
         raise ValueError(f"Weightfile Identifier should end in .xml or .root, but ends in {weightfile_extension}")
 
@@ -1522,6 +1523,103 @@ class FullTrackQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
         )
 
 
+class QEWeightsLocalDBCreatorTask(Basf2Task):
+    """
+    Collect weightfile identifiers from different teacher tasks and merge them
+    into a local database for testing.
+    """
+    #: Number of events to generate for the training data set.
+    n_events_training = b2luigi.IntParameter()
+    #: List of collected variables to not use in the training of the QE MVA classifier.
+    # In addition to variables containing the "truth" substring, which are excluded by default.
+    exclude_variables = b2luigi.ListParameter(hashed=True, default=[])
+    #: Feature/variable to use as truth label for the CDC track quality estimator.
+    cdc_training_target = b2luigi.Parameter()
+
+    def requires(self):
+        """
+        Required teacher tasks
+        """
+        yield VXDQETeacherTask(
+            n_events_training=self.n_events_training,
+        )
+        yield CDCQETeacherTask(
+            n_events_training=self.n_events_training,
+            training_target=self.cdc_training_target,
+        )
+        yield FullTrackQETeacherTask(
+            n_events_training=self.n_events_training,
+            cdc_training_target=self.cdc_training_target,
+            exclude_variables=self.exclude_variables,
+        )
+
+    def output(self):
+        """
+        Local database
+        """
+        yield self.add_to_output("localdb.tar")
+
+    def process(self):
+        """
+        Create local database
+        """
+        current_path = Path.cwd()
+        localdb_archive_path = Path(self.get_output_file_name("localdb.tar")).absolute()
+        output_dir = localdb_archive_path.parent
+
+        # remove existing local databases in output directories
+        self._clean()
+
+        # "Upload" the weightfiles of all 3 teacher tasks into the same localdb
+        for task in (VXDQETeacherTask, CDCQETeacherTask, FullTrackQETeacherTask):
+            # Extract xml identifier input file name before switching working directories, as it returns relative paths
+            weightfile_xml_identifier_path = os.path.abspath(self.get_input_file_names(
+                task.get_weightfile_xml_identifier(task))[0])
+            # As localdb is created in working directory, chdir into desired output path
+            try:
+                os.chdir(output_dir)
+                # Same as basf2_mva_upload on the command line, creates localdb directory in current working dir
+                basf2_mva.upload(
+                    weightfile_xml_identifier_path,
+                    task.weightfile_identifier_basename,
+                )
+            finally:  # Switch back to working directory of b2luigi, even if upload failed
+                os.chdir(current_path)
+
+        # Pack localdb into tar archive, so that we can have on single output file instead
+        shutil.make_archive(
+            base_name=localdb_archive_path.as_posix().split('.')[0],
+            format="tar",
+            root_dir=output_dir,
+            base_dir="localdb",
+            verbose=True,
+        )
+
+    def _clean(self):
+        """
+        Remove local database and tar archives in output directory
+        """
+        localdb_archive_path = Path(self.get_output_file_name("localdb.tar"))
+        localdb_path = localdb_archive_path.parent / "localdb"
+
+        if localdb_path.exists():
+            print(f"Deleting localdb\n{localdb_path}\nwith contents\n ",
+                  "\n  ".join(f.name for f in localdb_path.iterdir()))
+            shutil.rmtree(localdb_path, ignore_errors=False)  # recursively delete localdb
+
+        if localdb_archive_path.is_file():
+            print(f"Deleting {localdb_archive_path}")
+            os.remove(localdb_archive_path)
+
+    def on_failure(self, exception):
+        """
+        Cleanup: Remove local database to prevent existing outputs when task did not finish successfully
+        """
+        self._clean()
+        # Run existing on_failure from parent class
+        super().on_failure(exception)
+
+
 class MasterTask(b2luigi.WrapperTask):
     """
     Wrapper task that needs to finish for b2luigi to finish running this steering file.
@@ -1560,7 +1658,7 @@ class MasterTask(b2luigi.WrapperTask):
                 "truth_track_is_matched",
                 "truth"  # truth includes clones as signal
             ]:
-                yield FullTrackQETeacherTask(
+                yield QEWeightsLocalDBCreatorTask(
                     n_events_training=self.n_events_training,
                     exclude_variables=exclude_variables,
                     cdc_training_target=cdc_training_target,

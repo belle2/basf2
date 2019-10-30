@@ -431,11 +431,14 @@ void TRGGDLDQMModule::event()
   }
 
   //Get skim type from SoftwareTriggerResult
+  for (int iskim = start_skim_gdldqm; iskim < end_skim_gdldqm; iskim++) {
+    if (iskim == 0) skim.push_back(iskim);
+  }
   StoreObjPtr<SoftwareTriggerResult> result_soft;
   if (result_soft.isValid()) {
     const std::map<std::string, int>& skim_map = result_soft->getResults();
     for (int iskim = start_skim_gdldqm; iskim < end_skim_gdldqm; iskim++) {
-      if (iskim == 0) skim.push_back(iskim);
+      if (iskim == 0);
       else if (skim_map.find(skim_menu[iskim]) != skim_map.end()) {
         const bool accepted = (result_soft->getResult(skim_menu[iskim]) == SoftwareTriggerCutResult::c_accept);
         if (accepted) skim.push_back(iskim);

@@ -917,6 +917,24 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
+    double getTotalECLCalDigitMCEnergy(const Particle* particle)
+    {
+      const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      double sum = 0.0;
+      auto clusterDigitRelations = mcparticle->getRelationsWith<ECLCalDigit>();
+      for (unsigned int ir = 0; ir < clusterDigitRelations.size(); ++ir) {
+        sum += clusterDigitRelations.weight(ir);
+      }
+
+      return sum;
+
+    }
+
+
+
     double getClusterNHitsThreshold(const Particle* particle, const std::vector<double>& vars)
     {
       if (vars.size() != 1) {
@@ -1058,6 +1076,10 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("eclcaldigitCellIdByEnergyRank(i)", getCellIdByEnergyRank,
                       "[calibration] Returns the cell id of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("totalECLCalDigitMCEnergy", getTotalECLCalDigitMCEnergy,
+                      "[calibration] Returns total deposited MC energy in all ECLCalDigits for the MC particle");
+
 
   }
 

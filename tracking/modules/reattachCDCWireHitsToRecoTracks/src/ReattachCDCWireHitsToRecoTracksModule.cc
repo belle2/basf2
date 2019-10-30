@@ -27,9 +27,9 @@ ReattachCDCWireHitsToRecoTracksModule::ReattachCDCWireHitsToRecoTracksModule() :
   Module()
 {
   setDescription(R"DOC(
-Module to loop over low-ADC/TOT CDCWireHits and fitted RecoTracks
+Module to loop over low-ADC/TOT CDCWireHits and RecoTracks
 and reattach the hits to the tracks if they are closer
-than a given distance. Then, the tracks are refitted.)DOC");
+than a given distance.)DOC");
   setPropertyFlags(c_ParallelProcessingCertified); // parallel processing
 
   addParam("CDCWireHitsStoreArrayName", m_CDCWireHitsStoreArrayName,
@@ -44,6 +44,10 @@ than a given distance. Then, the tracks are refitted.)DOC");
            "ADC above which (inclusive) a CDC hit can be reattached to a track", m_minimumADC);
   addParam("MinimumTOT", m_minimumTOT,
            "TOT above which (inclusive) a CDC hit can be reattached to a track", m_minimumTOT);
+  addParam("MaximumAbsD0", m_maximumAbsD0,
+           "Only tracks with an absolute value of d0 below (exclusive) this parameter (cm) are considered", m_maximumAbsD0);
+  addParam("MaximumAbsZ0", m_maximumAbsZ0,
+           "Only tracks with an absolute value of z0 below (exclusive) this parameter (cm) are considered", m_maximumAbsZ0);
 }
 
 
@@ -78,7 +82,7 @@ void ReattachCDCWireHitsToRecoTracksModule::findHits()
     const CDCTrajectorySZ& trajectorySZ(trajectory.getTrajectorySZ());
     const double d0Estimate((trajectory2D.getClosest(Vector2D(0, 0))).norm());
     const double z0Estimate(trajectorySZ.getZ0());
-    if (d0Estimate < 1 and abs(z0Estimate) < 4) {
+    if (abs(d0Estimate) < m_maximumAbsD0 and abs(z0Estimate) < m_maximumAbsZ0) {
       if (trackFitter.fit(recoTrack)) {
         m_mapToHitsOnTrack[&recoTrack] = recoTrack.getSortedCDCHitList();
       }

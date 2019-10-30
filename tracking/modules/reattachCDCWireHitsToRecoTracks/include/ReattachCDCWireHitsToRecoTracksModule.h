@@ -90,6 +90,10 @@ namespace Belle2 {
       int m_minimumADC = 1;
       /// TOT above which (inclusive) a CDC hit can be reattached to a track
       int m_minimumTOT = 1;
+      /// Only tracks with an absolute value of d0 below (exclusive) this parameter (cm) are considered
+      double m_maximumAbsD0 = 1.0;
+      /// Only tracks with an absolute value of z0 below (exclusive) this parameter (cm) are considered
+      double m_maximumAbsZ0 = 4.0;
 
       /// Input CDCWireHits
       StoreWrappedObjPtr<std::vector<CDCWireHit> > m_CDCWireHits;

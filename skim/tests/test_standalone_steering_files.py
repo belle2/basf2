@@ -39,15 +39,16 @@ def getSkimStandaloneScript(skimName, combined=False):
         return skimScript
     except FileNotFoundError:
         cprint(f'WARNING! Skim {skimName} registered in skim registry, but no standalone steering file found!', 'red')
+        return None
 
 
 def filterErrorMessages(output):
     """Filter the output of basf2 to only print WARNING, ERROR, and FATAL messages.
 
     Args:
-        output (str): Output to be filted.
+        output (str): Output to be filtered.
     Returns:
-        filtedOutput (str): Output filtered to only problematic lines.
+        filteredOutput (str): Output filtered to only problematic lines.
     """
     matchingLines = re.findall(r'.WARNING.*|.ERROR.*|.FATAL.*', output)
     return '\n'.join(matchingLines)

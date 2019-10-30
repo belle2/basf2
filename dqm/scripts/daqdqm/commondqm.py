@@ -35,6 +35,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         if components is None or 'PXD' in components:
             path.add_module('PXDDAQDQM', histogramDirectoryName='PXDDAQ')
             path.add_module('PXDDQMExpressReco', histogramDirectoryName='PXDER')
+            path.add_module('PXDROIFinder',
+                            recoTrackListName='RecoTracks',
+                            PXDInterceptListName='PXDIntercepts')
             path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
             path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ')
             path.add_module('PXDTrackClusterDQM', histogramDirectoryName='PXDER')

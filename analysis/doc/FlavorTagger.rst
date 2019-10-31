@@ -236,9 +236,9 @@ The variable has several output values. The meaning  are the following:
     not work well at all and one could think for an instant that the flavor tagger
     is under or overestimating the dilution.
 
-The flavor tagger also saves the variable ``mcFlavorOfOtherB0`` which returns the flavor of the 
-accompaning tag-side neutral :math:`B` meson if the given particle is a correctly MC matched 
-neutral :math:`B` (it returns 0 else). In other words, this variable checks the generated flavor 
+The flavor tagger also saves the variable ``mcFlavorOfOtherB`` which returns the flavor of the 
+accompaning tag-side :math:`B` meson (positive or negative) if the given particle is a correctly MC-matched 
+:math:`B` (it returns 0 else). In other words, this variable checks the generated flavor 
 of the other MC :math:`\Upsilon(4{\rm S})` daughter without considering the ROE particles.
 
 The additional informations about individual categories are saved using the aliases

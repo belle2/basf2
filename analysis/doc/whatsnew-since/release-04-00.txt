@@ -8,6 +8,8 @@ Variables
    Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.
    For example ``ROE_deltae`` is now :b2:var:`roeDeltae`.
 
+ * Fixed bug and renamed :b2:var:`mcFlavorOfOtherB0` variable to :b2:var:`mcFlavorOfOtherB`, which accepts now neutral and charged B candidates.
+
  * Removed ``clusterCRID`` which duplicates :b2:var:`clusterConnectedRegionID`.
  * Fixed ``goodBelleLambda`` and now it returns ``extraInfo(goodLambda)`` on Belle data.
  * Fixed :b2:var:`clusterEoP` for particles with Bremsstrahlung correction by adding the energy of the added photon(s)

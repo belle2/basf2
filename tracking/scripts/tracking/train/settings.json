@@ -6,5 +6,11 @@
     "workers": 1,
     "basf2_processes_per_worker": 0,
     "run_mva_evaluate": true,
-    "run_validation_tasks": true
+    "run_validation_tasks": true,
+    "localdb_iov": {
+        "exp1": 0,
+        "run1": 0,
+        "exp2": -1,
+        "run2": -1
+    }
 }

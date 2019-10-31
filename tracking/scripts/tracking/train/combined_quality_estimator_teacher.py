@@ -1569,8 +1569,8 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
 
         # remove existing local databases in output directories
         self._clean()
-
         # "Upload" the weightfiles of all 3 teacher tasks into the same localdb
+        iov_dict = b2luigi.get_setting("localdb_iov")
         for task in (VXDQETeacherTask, CDCQETeacherTask, FullTrackQETeacherTask):
             # Extract xml identifier input file name before switching working directories, as it returns relative paths
             weightfile_xml_identifier_path = os.path.abspath(self.get_input_file_names(
@@ -1582,6 +1582,10 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
                 basf2_mva.upload(
                     weightfile_xml_identifier_path,
                     task.weightfile_identifier_basename,
+                    iov_dict["exp1"],
+                    iov_dict["run1"],
+                    iov_dict["exp2"],
+                    iov_dict["run2"],
                 )
             finally:  # Switch back to working directory of b2luigi, even if upload failed
                 os.chdir(current_path)

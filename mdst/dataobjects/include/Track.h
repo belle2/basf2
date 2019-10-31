@@ -117,6 +117,15 @@ namespace Belle2 {
       return m_qualityIndicator;
     }
 
+    /** Set the quality indicator attached to this RecoTrack to a value in the range [0, 1].
+     *
+     *  0 indicates a track that is likely to be fake and 1 a tracks that is likely to be matched.
+     */
+    void setQualityIndicator(const float qualityIndicator)
+    {
+      m_qualityIndicator = qualityIndicator;
+    }
+
     /** Return a short summary of this object's contents in HTML format. */
     virtual std::string getInfoHTML() const override;
 
@@ -135,7 +144,7 @@ namespace Belle2 {
      *  Given likely data-MC discrepancies etc orders of magnitude larger than float precision,
      *  single precision is enough.
      */
-    float const m_qualityIndicator;
+    float m_qualityIndicator = NAN;
 
     ClassDefOverride(Track, 4); /**< Class that bundles various TrackFitResults. */
   };

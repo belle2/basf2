@@ -256,7 +256,8 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
     // Check if mother particle has the correct pdg code, if so we have to take care of the special case
     // tau -> rho nu, where a the matched mother is  the rho, but we have only a missing resonance and not added a wrong particle.
     auto mother = mcParticle->getMother();
-    if (mother and particle->getPDGCode() == mother->getPDG() and getNumberOfDaughtersWithoutNeutrinos(mother) == 1) {
+    if (mother and particle->getPDGCode() == mother->getPDG() and getNumberOfDaughtersWithoutNeutrinos(mother) == 1
+        and !particle->hasExtraInfo("bremsCorrected")) {
       if (abs(mother->getPDG()) != 15 and abs(mcParticle->getPDG()) != 15) {
         B2WARNING("Special treatment in MCMatching for tau is called for a non-tau particle. Check if you discovered another special case here, or if we have a bug! "
                   << mother->getPDG() << " " << particle->getPDGCode() << " " << mcParticle->getPDG());

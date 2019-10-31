@@ -535,7 +535,7 @@ namespace Belle2 {
         B2ERROR("MCFlavorOfOtherB: this variable works only for B mesons.\n"
                 "The given particle with PDG code " << particle->getPDGCode() <<
                 " is not a B-meson candidate (PDG code 511 or 521). ");
-        return 0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
 
       const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();

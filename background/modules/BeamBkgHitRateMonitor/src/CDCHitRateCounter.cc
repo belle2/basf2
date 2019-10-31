@@ -84,14 +84,17 @@ namespace Belle2 {
       /////   short          CDCHit::getTDCCount()
       /////   unsigned short CDCHit::getADCCount() /* integrated charge over the cell */
       /////   unsigned short CDCHit::getTOT() /* time over threshold */
-      for (const CDCHit& hit : m_digits) {
+      for (CDCHit& hit : m_digits) {
         const int iLayer         = hit.getICLayer();
         const int iSuperLayer    = hit.getISuperLayer();
         //const unsigned short adc = hit.getADCCount();
 
         //if (adc < 20) continue;
-        if (CDCHitToBackgroundFlag[&hit]) continue;
-
+        if (CDCHitToBackgroundFlag[&hit]) {
+          unsigned short newStatus = (hit.getStatus() | 0x100);
+          hit.setStatus(newStatus);
+          continue;
+        }
         rates.layerHitRate[iLayer] += 1;
         rates.superLayerHitRate[iSuperLayer] += 1;
         rates.averageRate += 1;

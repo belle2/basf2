@@ -501,10 +501,12 @@ add  p Particle  Upsilon(6S)                  9010553  1.0992000e+01  4.9000000e
 * N baryons
 * Data from M. Tanabashi et al. (Particle Data Group), Phys. Rev. D 98, 030001 (2018) and 2019 update.
 *---------------------------------------------------------------------------------------------------------------------------------------
-add  p Particle  p+                              2212  9.382720813e-01 0.0000000e+00 0.0000000e+00     3     1  0.0000000e+00       2212
-add  p Particle  anti-p-                        -2212  9.382720813e-01 0.0000000e+00 0.0000000e+00    -3     1  0.0000000e+00      -2212
-add  p Particle  n0                              2112  9.395654133e-01 0.0000000e+00 0.0000000e+00     0     1  2.6363749e+14       2112
-add  p Particle  anti-n0                        -2112  9.395654133e-01 0.0000000e+00 0.0000000e+00     0     1  2.6363749e+14      -2112
+* m(p+) = 9.382720813(58)e-01, m(n0) = 9.395654133(58)e-01.
+* Specifyibg more digits breaks framework tests, and, taking the error into account, it is not necessary anyway.
+add  p Particle  p+                              2212  9.3827208e-01  0.0000000e+00  0.0000000e+00     3     1  0.0000000e+00       2212
+add  p Particle  anti-p-                        -2212  9.3827208e-01  0.0000000e+00  0.0000000e+00    -3     1  0.0000000e+00      -2212
+add  p Particle  n0                              2112  9.3956541e-01  0.0000000e+00  0.0000000e+00     0     1  2.6363749e+14       2112
+add  p Particle  anti-n0                        -2112  9.3956541e-01  0.0000000e+00  0.0000000e+00     0     1  2.6363749e+14      -2112
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Delta baryons
 * Data from M. Tanabashi et al. (Particle Data Group), Phys. Rev. D 98, 030001 (2018) and 2019 update.

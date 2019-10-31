@@ -450,31 +450,16 @@ def correctFSR(
     path=None,
 ):
     """
-    Takes the particles from the given lepton list copies them to the output list and adds the
-    4-vector of the closest photon (considered as radiative) to the lepton, if the given
-    criteria for maximal angle and energy are fulfilled.
-    Please note, a new lepton is generated, with the old electron and -if found- a gamma as daughters.
-    Information attached to the track is only available for the old lepton, accessable via the daughter
-    metavariable, e.g. <daughter(0, eid)>.
-
-    @param outputListName The output lepton list containing the corrected leptons.
-    @param inputListName The initial lepton list containing the leptons to correct, should already exists.
-    @param gammaListName The gammas list containing possibly radiative gammas, should already exist..
-    @param angleThreshold The maximum angle (in degrees) between the lepton and the (radiative) gamma to be accepted.
-    @param energyThreshold The maximum energy of the (radiative) gamma to be accepted.
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    WARNING:
+      The :b2:mod:`FSRCorrection` module is now deprecated.
+      Please use `modularAnalysis.correctBrems` or `modularAnalysis.correctBremsBelle` instead.
+      The latter resembles the previous principle of FSRCorrection but does no
+      longer contain the faulty first-come, first-served approach. For Belle II
+      data it is recommended to use correctBrems(), which should perform better.
     """
 
-    fsrcorrector = register_module('FSRCorrection')
-    fsrcorrector.set_name('FSRCorrection_' + outputListName)
-    fsrcorrector.param('inputListName', inputListName)
-    fsrcorrector.param('outputListName', outputListName)
-    fsrcorrector.param('gammaListName', gammaListName)
-    fsrcorrector.param('angleThreshold', angleThreshold)
-    fsrcorrector.param('energyThreshold', energyThreshold)
-    fsrcorrector.param('writeOut', writeOut)
-    path.add_module(fsrcorrector)
+    B2WARNING("The correctFSR() module is now deprecated. Please use correctBrems() or correctBremsBelle() instead."
+              "When analysing Belle II data, it is recommended to use correctBrems().")
 
 
 def correctBremsBelle(

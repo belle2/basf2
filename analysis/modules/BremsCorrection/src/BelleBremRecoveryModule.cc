@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/modules/FSRCorrection/BelleBremRecoveryModule.h>
+#include <analysis/modules/BremsCorrection/BelleBremRecoveryModule.h>
 // framework aux
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>

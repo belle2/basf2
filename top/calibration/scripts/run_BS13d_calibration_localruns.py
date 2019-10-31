@@ -23,7 +23,7 @@ from basf2 import B2ERROR
 
 # ----- those parameters need to be adjusted before running -----------------------
 #
-globalTag = 'data_reprocessing_prompt_rel4_patch'
+globalTag = 'data_reprocessing_prompt_rel4_patchb'
 data_dir = '/ghi/fs01/belle2/bdata/group/detector/TOP/2019-*/data_sroot_global/'
 main_output_dir = 'top_calibration'
 maxFiles = 1  # maximum number of input files per run (0 or negative means all)
@@ -84,6 +84,7 @@ collector = basf2.register_module('TOPAsicShiftsBS13dCollector')
 
 # Algorithm
 algorithm = TOP.TOPAsicShiftsBS13dAlgorithm()
+algorithm.setWindowSize(0)
 
 # Define calibration
 cal = Calibration(name='TOP_BS13dCalibration', collector=collector,

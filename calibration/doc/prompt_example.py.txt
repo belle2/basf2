@@ -3,15 +3,27 @@
 """Docstring explaining what this calibration script does. Maybe a description of payloads?
 This can be a long as you want."""
 
-from prompt import CalibrationSettings
+##############################
+# OPTIONAL DEPENDENCY #
+##############################
+
+# you may choose to signal that this calibration depends on others by importing their settings and
+# adding it to the 'depends_on' list in this calibration's settings variable.
+
+from prompt.calibrations.caf_vxd import settings as caf_vxd_dependency
 
 ##############################
 # REQUIRED VARIABLE #
 ##############################
+
+from prompt import CalibrationSettings
+
 settings = CalibrationSettings(name="Example Simple",
+                               expert_username="ddossett",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["physics"])
+                               input_data_names=["physics"],
+                               depends_on=[caf_vxd_dependency])
 
 ##############################
 # REQUIRED FUNCTION #

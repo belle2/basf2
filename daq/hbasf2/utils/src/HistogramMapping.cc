@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <daq/hbasf2/utils/HistoTree.h>
+#include <daq/hbasf2/utils/HistogramMapping.h>
 
 #include <framework/pcore/MsgHandler.h>
 #include <framework/logging/Logger.h>
@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-HistogramTree::HistogramTree(std::unique_ptr<Belle2::EvtMessage> msg)
+HistogramMapping::HistogramMapping(std::unique_ptr<Belle2::EvtMessage> msg)
 {
   m_histograms.clear();
 
@@ -45,7 +45,7 @@ HistogramTree::HistogramTree(std::unique_ptr<Belle2::EvtMessage> msg)
   }
 }
 
-void HistogramTree::operator+=(const HistogramTree& rhs)
+void HistogramMapping::operator+=(const HistogramMapping& rhs)
 {
   for (auto& keyValue : rhs.m_histograms) {
     const auto& key = keyValue.first;
@@ -62,43 +62,37 @@ void HistogramTree::operator+=(const HistogramTree& rhs)
   }
 }
 
-void HistogramTree::write() const
+void HistogramMapping::write() const
 {
-  for (const auto& keyValue : m_histograms) {
-    const auto& histogram = keyValue.second;
+  for (const auto& [key, histogram] : m_histograms) {
     histogram->SetDirectory(gDirectory);
     histogram->Write();
   }
 }
 
-void HistogramTree::clear()
+void HistogramMapping::clear()
 {
   m_histograms.clear();
 }
 
-bool HistogramTree::empty() const
+bool HistogramMapping::empty() const
 {
   return m_histograms.empty();
 }
 
-void HistogramTree::printMe() const
+void HistogramMapping::printMe() const
 {
-  for (const auto& keyValue : m_histograms) {
-    const auto& key = keyValue.first;
-    const auto& histogram = keyValue.second;
-
+  for (const auto& [key, histogram] : m_histograms) {
     B2INFO(key << ": " << histogram->GetName() << " -> " << histogram->GetEntries());
   }
 }
 
-std::unique_ptr<Belle2::EvtMessage> HistogramTree::toMessage() const
+std::unique_ptr<Belle2::EvtMessage> HistogramMapping::toMessage() const
 {
   Belle2::MsgHandler msgHandler;
 
   int objectCounter = 0;
-  for (const auto& keyValue : m_histograms) {
-    const auto& key = keyValue.first;
-    const auto& histogram = keyValue.second;
+  for (const auto& [key, histogram] : m_histograms) {
     msgHandler.add(histogram.get(), key);
     objectCounter++;
   }

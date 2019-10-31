@@ -295,22 +295,39 @@ void KlongValidationModule::terminate()
   m_ROC   -> GetListOfFunctions() -> Add(new TNamed("Contact", "jkrohn@student.unimelb.edu.au"));
   m_backRej   -> GetListOfFunctions() -> Add(new TNamed("Contact", "jkrohn@student.unimelb.edu.au"));
 
-  std::vector<std::string> titles = {"K_L ID", "All Momenta generated", "Klong efficiency in Phi", "Klong efficiency in Theta", "Klong efficiency in Momentum", "Klong fake rate in Phi", "Klong fake rate in Theta", "Klong fake rate in Momentum", "KLM time", "KLM distance to next track", "KLM energy", "KLM nLayer", "Beam BKG in Phi", "Beam BKG in Theta", "Beam BKG in Momentum", "Innermost layer", "Track flag", "ECL Flag" };
+  // tuple: pointer to the plot, name of the plot, true for shifter plots
+  std::vector<std::tuple<TH1F*, std::string, bool>> histograms;
+  histograms.push_back(make_tuple(m_klidAll, "KlId distribution", true));
+  histograms.push_back(make_tuple(m_Mom_all_plot, "All Momenta generated", false));
+  histograms.push_back(make_tuple(m_effPhi, "KlId efficiency in Phi", false));
+  histograms.push_back(make_tuple(m_effTheta, "KlId efficiency in Theta", true));
+  histograms.push_back(make_tuple(m_effMom, "KlId efficiency in Momentum", true));
+  histograms.push_back(make_tuple(m_fakePhi, "KlId fake rate in Phi", false));
+  histograms.push_back(make_tuple(m_fakeTheta, "KlId fake rate in Theta", true));
+  histograms.push_back(make_tuple(m_fakeMom, "KlId fake rate in Momentum", true));
+  histograms.push_back(make_tuple(m_time, "KLMClusters time", true));
+  histograms.push_back(make_tuple(m_trackSep, "Distance of KLMCluster to closest Track", true));
+  histograms.push_back(make_tuple(m_energy, "KLMClusters energy", false));
+  histograms.push_back(make_tuple(m_nLayer, "KLMClusters nLayer", false));
+  histograms.push_back(make_tuple(m_innermostLayer, "KLMClusters innermostLayer", false));
+  histograms.push_back(make_tuple(m_bkgPhi, "Beam bkg in Phi", false));
+  histograms.push_back(make_tuple(m_bkgTheta, "Beam bkg in Theta", false));
+  histograms.push_back(make_tuple(m_bkgMom, "Beam bkg in Momentum", false));
+  histograms.push_back(make_tuple(m_trackFlag, "Track flag", false));
+  histograms.push_back(make_tuple(m_ECLFlag, "ECLCluster flag", false));
 
-  std::vector<TH1F*> histograms = {m_klidAll, m_Mom_all_plot, m_effPhi, m_effTheta,
-                                   m_effMom, m_fakePhi, m_fakeTheta, m_fakeMom,
-                                   m_time, m_trackSep, m_energy, m_nLayer, m_bkgPhi,
-                                   m_bkgTheta, m_bkgMom, m_innermostLayer, m_trackFlag, m_ECLFlag
-                                  };
-  unsigned int counter = 0;
   for (auto hist  : histograms) {
-    hist -> SetTitle(titles[counter].c_str());
-    hist -> GetListOfFunctions() -> Add(new TNamed("Description", titles[counter]));
-    hist -> GetListOfFunctions() -> Add(new TNamed("Check", "Should not change"));
-    hist -> GetListOfFunctions() -> Add(new TNamed("Contact", "jkrohn@student.unimelb.edu.au"));
-    hist -> Write();
-    ++counter;
+    std::get<0>(hist) -> SetTitle(std::get<1>(hist).c_str());
+    std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Description", std::get<1>(hist)));
+    std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Check", "Should not change"));
+    std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Contact", "jkrohn@student.unimelb.edu.au"));
+    if (std::get<2>(hist))
+      std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("MetaOptions", "shifter,pvalue-warn=0.99,pvalue-error=0.90"));
+    else
+      std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("MetaOptions", "pvalue-warn=0.99,pvalue-error=0.90"));
+    std::get<0>(hist) -> Write();
   }
+
   //this guy is a tgraph
   m_ROC       -> Write();
   m_backRej   -> Write();

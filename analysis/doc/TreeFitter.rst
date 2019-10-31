@@ -38,7 +38,7 @@ Usage:
 ######
 
 The user reconstructs the desired decay chain and then passes the head of the tree to the vertex fitter. So when you are reconstructing :math:`B->D(K \pi)\pi` the list name of the B-meson has to be passed and the fit fits everything down the stream. 
-The vertex fitter has a convenience function: `modularAnalysis.vertexTree()`.
+The vertex fitter has a convenience function: `vertex.vertexTree`.
 
 
 Parameters of the convenience function

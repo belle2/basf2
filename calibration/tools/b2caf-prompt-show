@@ -45,30 +45,12 @@ def get_argparser():
                        )
     parser.set_defaults(json=False)
 
-    parser.add_argument("--check", dest="check", action="store_true",
-                        help="A check will be made to see if there are duplicate CalibrationSettings 'name' values. "
-                             "This tool will exit early and with return code=1 if there duplicate names."
-                       )
-    parser.set_defaults(check=False)
-
     return parser
 
 
 def main():
     parser = get_argparser()
     args = parser.parse_args()
-    if args.check:
-        all_script_paths = [p.name for p in get_all_script_paths()]
-        calibration_names = [get_script_settings(script_path).name for script_path in all_script_paths]
-        if len(calibration_names) != len(set(calibration_names)):
-            B2WARNING("Duplicate calibration name(s) found in settings!!!")
-            from collections import Counter
-            c = Counter(calibration_names)
-            for name, count in c.items():
-                if count > 1:
-                    print(f"{name} was used {count} times in the prompt scripts.")
-            return 1
-
     if not args.script_name:
         all_script_paths = [p.name for p in get_all_script_paths()]
         if args.json:
@@ -82,7 +64,6 @@ def main():
         if args.json:
             print(settings.json_dumps())
         else:
-            print(f"Details for {args.script_name}")
             print(settings)
     return 0
 

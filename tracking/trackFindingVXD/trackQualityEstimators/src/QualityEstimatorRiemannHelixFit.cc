@@ -87,7 +87,6 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
 
   // Calculation of 3 different versions of a distance d for Chi Squared calculation
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> d = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1) * c + X * n;
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_trans = (d + d.cwiseProduct(X.col(2))) / sqrt(1 - n(2) * n(2));
 
   // calculation of chi2 for circle fit using Karimaeki circle fit
   Precision divisor = 1. / traceOfW;
@@ -154,13 +153,6 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
 
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> y_pos = (- n(1) * a - n(0) * root) / b;
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> y_neg = (- n(1) * a + n(0) * root) / b;
-
-  // find the correct intersection point (TODO: There might be room for simplification here, because the
-  // selection does not have to be coefficientwise!)
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> dist_pos = (x_pos - X.col(0)).cwiseProduct(x_pos - X.col(0)) + (y_pos - X.col(
-                                                           1)).cwiseProduct(y_pos - X.col(1));
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> dist_neg = (x_neg - X.col(0)).cwiseProduct(x_neg - X.col(0)) + (y_neg - X.col(
-                                                           1)).cwiseProduct(y_neg - X.col(1));
 
   // Arc length calculation
   Precision x_first = X.col(0)(0) - x0;

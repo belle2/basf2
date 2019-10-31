@@ -23,7 +23,7 @@ from basf2 import B2ERROR
 
 # ----- those parameters need to be adjusted before running -----------------------
 #
-globalTag = 'data_reprocessing_prompt_rel4_patch'
+globalTag = 'data_reprocessing_prompt_rel4_patchb'
 data_dir = '/ghi/fs01/belle2/bdata/group/detector/TOP/2019-*/data_sroot_global/'
 main_output_dir = 'top_calibration'
 look_back = 28  # look-back window setting (set to 0 if look-back setting available in DB)
@@ -94,6 +94,7 @@ def BS13d_calibration():
 
     #   algorithm
     algorithm = TOP.TOPAsicShiftsBS13dAlgorithm()
+    algorithm.setWindowSize(0)
 
     #   define calibration
     cal = Calibration(name='TOP_BS13dCalibration', collector=collector,

@@ -53,9 +53,9 @@ BtubeCreatorModule::BtubeCreatorModule() : Module(),
   addParam("decayString", m_decayString,
            "decay string of the mother particle, the selected daughter specifies which daughter will be used as reference to create Btube",
            string(""));
-  addParam("confidenceLevel", m_confidenceLevel,
-           "required confidence level of fit to keep particles in the list. Note that even with confidenceLevel == 0.0, errors during the fit might discard Particles in the list. confidenceLevel = -1 if an error occurs during the fit",
-           0.);
+  addParam("associateBtubeToBselected", m_associateBtubeToBselected,
+           "whether to associate the Btube with the selected B",
+           false);
   addParam("verbosity", m_verbose, "print statements", true);
 }
 
@@ -241,29 +241,21 @@ void BtubeCreatorModule::event()
       tubecreatorBCopy->setMomentumVertexErrorMatrix(errNew);
 
       Btube* tubeconstraint = tubeArray.appendNew(Btube());
-      otherB->addRelationTo(tubeconstraint);
+      if (m_associateBtubeToBselected) {
+        tubecreatorB->addRelationTo(tubeconstraint);
+      } else {
+        otherB->addRelationTo(tubeconstraint);
+      }
+
       tubeconstraint->setTubeCenter(tubecreatorBOriginpos);
       tubeconstraint->setTubeMatrix(tubeMat);
       tubeconstraint->setTubeCenterErrorMatrix(tubeMatCenterError);
 
-      otherB->writeExtraInfo("TubePosX", tubecreatorBCopy->getVertex()[0]);
-      otherB->writeExtraInfo("TubePosY", tubecreatorBCopy->getVertex()[1]);
-      otherB->writeExtraInfo("TubePosZ", tubecreatorBCopy->getVertex()[2]);
-
-      otherB->writeExtraInfo("TubeCov00", pvNew(0, 0));
-      otherB->writeExtraInfo("TubeCov01", pvNew(0, 1));
-      otherB->writeExtraInfo("TubeCov02", pvNew(0, 2));
-      otherB->writeExtraInfo("TubeCov10", pvNew(1, 0));
-      otherB->writeExtraInfo("TubeCov11", pvNew(1, 1));
-      otherB->writeExtraInfo("TubeCov12", pvNew(1, 2));
-      otherB->writeExtraInfo("TubeCov20", pvNew(2, 0));
-      otherB->writeExtraInfo("TubeCov21", pvNew(2, 1));
-      otherB->writeExtraInfo("TubeCov22", pvNew(2, 2));
-
-      otherB->writeExtraInfo("TubeDirX", v4FinalNew.Px());
-      otherB->writeExtraInfo("TubeDirY", v4FinalNew.Py());
-      otherB->writeExtraInfo("TubeDirZ", v4FinalNew.Pz());
-
+      if (m_associateBtubeToBselected) {
+        addextrainfos(tubecreatorB, tubecreatorBCopy, pvNew, v4FinalNew);
+      } else {
+        addextrainfos(otherB, tubecreatorBCopy, pvNew, v4FinalNew);
+      }
     }
     if (!ok0) toRemove.push_back(particle->getArrayIndex());
   }
@@ -284,4 +276,25 @@ bool BtubeCreatorModule::doVertexFit(Particle* mother)
     rsg.updateDaughters();
   } else {return false;}
   return true;
+}
+
+void BtubeCreatorModule::addextrainfos(Particle* daughter, Particle* copy, TMatrix mat, TLorentzVector TLV)
+{
+  daughter->writeExtraInfo("TubePosX", copy->getVertex()[0]);
+  daughter->writeExtraInfo("TubePosY", copy->getVertex()[1]);
+  daughter->writeExtraInfo("TubePosZ", copy->getVertex()[2]);
+
+  daughter->writeExtraInfo("TubeCov00", mat(0, 0));
+  daughter->writeExtraInfo("TubeCov01", mat(0, 1));
+  daughter->writeExtraInfo("TubeCov02", mat(0, 2));
+  daughter->writeExtraInfo("TubeCov10", mat(1, 0));
+  daughter->writeExtraInfo("TubeCov11", mat(1, 1));
+  daughter->writeExtraInfo("TubeCov12", mat(1, 2));
+  daughter->writeExtraInfo("TubeCov20", mat(2, 0));
+  daughter->writeExtraInfo("TubeCov21", mat(2, 1));
+  daughter->writeExtraInfo("TubeCov22", mat(2, 2));
+
+  daughter->writeExtraInfo("TubeDirX", TLV.Px());
+  daughter->writeExtraInfo("TubeDirY", TLV.Py());
+  daughter->writeExtraInfo("TubeDirZ", TLV.Pz());
 }

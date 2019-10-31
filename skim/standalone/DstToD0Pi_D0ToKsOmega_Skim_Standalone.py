@@ -33,7 +33,6 @@ stdK('all', path=c2bn2path)
 stdE('all', path=c2bn2path)
 stdMu('all', path=c2bn2path)
 stdKshorts(path=c2bn2path)
-mergedKshorts(path=c2bn2path)
 loadStdSkimPi0(path=c2bn2path)
 
 from skim.charm import DstToD0PiD0ToKsOmega

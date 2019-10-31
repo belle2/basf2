@@ -42,11 +42,7 @@ ma.setupEventInfo(noEvents=100, path=my_path)
 ge.add_evtgen_generator(path=my_path,
                         finalstate='signal',
                         signaldecfile=b2.find_file(
-                            'analysis/examples/tutorials/B2A101-Y4SEventGeneration.dec'))
-
-# If the simulation and reconstruction is not performed in the sam job,
-# then the Gearbox needs to be loaded with the loadGearbox() function.
-ma.loadGearbox(path=my_path)
+                            'analysis/examples/simulations/B2A101-Y4SEventGeneration.dec'))
 
 # dump generated events in DST format to the output ROOT file
 my_path.add_module('RootOutput', outputFileName='B2A101-Y4SEventGeneration-evtgen.root')

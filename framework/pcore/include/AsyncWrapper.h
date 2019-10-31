@@ -16,7 +16,6 @@ namespace Belle2 {
   class RxModule;
   class TxModule;
   class RingBuffer;
-  class ProcHandler;
 
   /** Wraps a given Module to execute it asynchronously.
    *

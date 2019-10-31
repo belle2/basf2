@@ -13,7 +13,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/core/EventProcessor.h>
 
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
 #include <cstdio>

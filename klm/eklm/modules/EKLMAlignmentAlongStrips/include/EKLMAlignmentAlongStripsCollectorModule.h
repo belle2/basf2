@@ -10,11 +10,13 @@
 
 #pragma once
 
-/* Belle2 headers. */
-#include <calibration/CalibrationCollectorModule.h>
+/* KLM headers. */
 #include <klm/eklm/calibration/EKLMAlignmentAlongStripsAlgorithm.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
+
+/* Belle 2 headers. */
+#include <calibration/CalibrationCollectorModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
 

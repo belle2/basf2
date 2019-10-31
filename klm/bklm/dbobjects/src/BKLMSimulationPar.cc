@@ -8,11 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/dbobjects/BKLMSimulationPar.h>
 
+/* Belle 2 headers. */
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
+/* C++ headers. */
 #include <cmath>
 
 using namespace std;

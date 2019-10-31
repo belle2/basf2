@@ -8,12 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TTree.h>
-
-/* Belle2 headers. */
-#include <framework/logging/Logger.h>
+/* Own header. */
 #include <klm/calibration/KLMChannelStatusCalibrationAlgorithm.h>
+
+/* Belle 2 headers. */
+#include <framework/logging/Logger.h>
+
+/* ROOT headers. */
+#include <TTree.h>
 
 using namespace Belle2;
 
@@ -25,6 +27,8 @@ KLMChannelStatusCalibrationAlgorithm::KLMChannelStatusCalibrationAlgorithm() :
 
 KLMChannelStatusCalibrationAlgorithm::~KLMChannelStatusCalibrationAlgorithm()
 {
+  if (m_ChannelStatus != nullptr)
+    delete m_ChannelStatus;
   if (m_ModuleStatus != nullptr)
     delete m_ModuleStatus;
 }
@@ -57,6 +61,9 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
     else
       m_HitNumberEKLM += hits;
   }
+  clearCalibrationData();
+  if (m_ChannelStatus != nullptr)
+    delete m_ChannelStatus;
   m_ChannelStatus = new KLMChannelStatus();
   m_ChannelStatus->setStatusAllChannels(KLMChannelStatus::c_Undetermined);
   /* If there are no hits, then mark all channels as dead. */

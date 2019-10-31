@@ -10,10 +10,12 @@
 
 #pragma once
 
-/* Belle2 headers. */
-#include <calibration/CalibrationAlgorithm.h>
+/* KLM headers. */
 #include <klm/dataobjects/KLMChannelMapValue.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
+
+/* Belle 2 headers. */
+#include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {
 

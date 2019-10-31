@@ -11,7 +11,6 @@
 
 #include <string>
 #include <vector>
-#include <regex>
 
 namespace Belle2 {
   /** Utility functions related to environment variables */

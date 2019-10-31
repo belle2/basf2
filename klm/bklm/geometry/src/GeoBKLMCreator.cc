@@ -8,23 +8,28 @@
 *  This software is provided "as is" without any warranty.               *
 *************************************************************************/
 
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+/* Own header. */
 #include <klm/bklm/geometry/GeoBKLMCreator.h>
-#include <klm/bklm/simulation/SensitiveDetector.h>
-#include "klm/bklm/dbobjects/BKLMGeometryPar.h"
 
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/bklm/dbobjects/BKLMGeometryPar.h>
+#include <klm/bklm/simulation/SensitiveDetector.h>
+
+/* Belle 2 headers. */
 #include <geometry/Materials.h>
 
-#include <G4LogicalVolume.hh>
-#include <G4PVPlacement.hh>
-#include <G4Tubs.hh>
-#include <G4Polyhedra.hh>
+/* Geant 4 headers. */
 #include <G4Box.hh>
-#include <G4SubtractionSolid.hh>
-#include <G4UnionSolid.hh>
-#include <G4Transform3D.hh>
-#include <G4VisAttributes.hh>
+#include <G4LogicalVolume.hh>
+#include <G4Polyhedra.hh>
+#include <G4PVPlacement.hh>
 #include <G4String.hh>
+#include <G4SubtractionSolid.hh>
+#include <G4Transform3D.hh>
+#include <G4Tubs.hh>
+#include <G4UnionSolid.hh>
+#include <G4VisAttributes.hh>
 
 using namespace std;
 
@@ -53,19 +58,19 @@ namespace Belle2 {
       m_InnerAirLogical[0] = m_InnerAirLogical[1] = m_InnerAirLogical[2] = m_InnerAirLogical[3] = NULL;
       m_SupportLogical[0] = m_SupportLogical[1] = NULL;
       m_BracketLogical = NULL;
-      for (int j = 0; j < NLAYER; ++j) {
+      for (int j = 0; j < BKLMElementNumbers::getMaximalLayerNumber(); ++j) {
         m_LayerIronSolid[j] = NULL;
       }
-      for (int j = 0; j < 2 * NLAYER; ++j) {
+      for (int j = 0; j < 2 * BKLMElementNumbers::getMaximalLayerNumber(); ++j) {
         m_LayerModuleLogical[j] = NULL;
         m_LayerGapSolid[j] = NULL;
       }
-      for (int j = 0; j < 12 * NLAYER; ++j) {
+      for (int j = 0; j < 12 * BKLMElementNumbers::getMaximalLayerNumber(); ++j) {
         m_LayerIronLogical[j] = NULL;
         m_LayerGapLogical[j] = NULL;
       }
       m_SectorTube = NULL;
-      for (int sector = 0; sector < NSECTOR; ++sector) {
+      for (int sector = 0; sector < BKLMElementNumbers::getMaximalSectorNumber(); ++sector) {
         m_SectorLogical[0][sector] = NULL;
         m_SectorLogical[1][sector] = NULL;
       }
@@ -185,7 +190,7 @@ namespace Belle2 {
       char name[80] = "";
       for (int s = 0; s < m_GeoPar->getNSector(); ++s) {
         int sector = (section == BKLMElementNumbers::c_ForwardSection ? s : ((12 - s) % 8)) + 1;
-        bool hasChimney = (section == BKLMElementNumbers::c_BackwardSection) && (sector == CHIMNEY_SECTOR);
+        bool hasChimney = (section == BKLMElementNumbers::c_BackwardSection) && (sector == BKLMElementNumbers::c_ChimneySector);
         bool hasInnerSupport = (sector <= m_GeoPar->getNSector() / 2 + 1);
         sprintf(name, "BKLM.%sSector%dLogical", (section == BKLMElementNumbers::c_ForwardSection ? "Forward" : "Backward"), sector);
         m_SectorLogical[section][sector - 1] =
@@ -517,14 +522,15 @@ namespace Belle2 {
         }
         const Module* module = m_GeoPar->findModule(section == BKLMElementNumbers::c_ForwardSection, sector, layer);
         bool isFlipped = module->isFlipped();
-        int newLvol = NLAYER * ((isFlipped ? 2 : 0) + (hasChimney ? 1 : 0)) + (layer - 1);
+        int newLvol = BKLMElementNumbers::getMaximalLayerNumber() * ((isFlipped ? 2 : 0) +
+                      (hasChimney ? 1 : 0)) + (layer - 1);
         int s1 = sector - 1;
         int s2 = m_GeoPar->getNSector() / 2;
         if (s1 % s2 == 0) {
         } else if (s1 > s2) {
-          newLvol += NLAYER * 4;
+          newLvol += BKLMElementNumbers::getMaximalLayerNumber() * 4;
         } else {
-          newLvol += NLAYER * 8;
+          newLvol += BKLMElementNumbers::getMaximalLayerNumber() * 8;
         }
         if (m_LayerIronLogical[newLvol] == NULL) {
           sprintf(name, "BKLM.Layer%02d%s%sIronLogical", layer, (isFlipped ? "Flipped" : ""), (hasChimney ? "Chimney" : ""));
@@ -695,7 +701,7 @@ namespace Belle2 {
       const CLHEP::Hep3Vector moduleHalfSize = m_GeoPar->getModuleHalfSize(layer, hasChimney) * CLHEP::cm;
       char name[80] = "";
       // Fill gap with air
-      int modLvol = (hasChimney ? NLAYER : 0) + (layer - 1);
+      int modLvol = (hasChimney ? BKLMElementNumbers::getMaximalLayerNumber() : 0) + (layer - 1);
       if (m_LayerModuleLogical[modLvol] == NULL) {
         // Module is aluminum (but interior will be filled)
         sprintf(name, "BKLM.Layer%02d%sModuleSolid", layer, (hasChimney ? "Chimney" : ""));

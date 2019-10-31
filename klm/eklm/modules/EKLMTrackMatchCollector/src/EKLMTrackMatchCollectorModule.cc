@@ -8,26 +8,30 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "CLHEP/Geometry/Point3D.h"
-
-// Std lib includes
-#include <map>
-#include <string>
-#include <tuple>
-
-/* ROOT headers. */
-#include <TH1F.h>
-
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/eklm/modules/EKLMTrackMatchCollector/EKLMTrackMatchCollectorModule.h>
+
+/* KLM headers. */
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
+
+/* Belle 2 headers. */
+#include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <framework/datastore/StoreArray.h>
+/* ROOT headers. */
+#include <TH1F.h>
+
+/* CLHEP headers. */
+#include <CLHEP/Geometry/Point3D.h>
+
+/* C++ headers. */
+#include <map>
+#include <string>
+#include <tuple>
 
 using namespace Belle2;
 

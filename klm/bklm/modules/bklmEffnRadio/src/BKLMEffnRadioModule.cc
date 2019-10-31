@@ -8,28 +8,31 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-
+/* Own header. */
 #include <klm/bklm/modules/bklmEffnRadio/BKLMEffnRadioModule.h>
 
-#include <framework/logging/Logger.h>
-
-#include <math.h>
-
+/* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
 #include <klm/bklm/dataobjects/BKLMHit1d.h>
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
 
-#include "TMath.h"
-#include "TCanvas.h"
-#include "TBox.h"
+/* Belle 2 headers. */
+#include <framework/logging/Logger.h>
 
-#include "TColor.h"
-#include "TStyle.h"
-#include "TLatex.h"
+/* ROOT headers. */
+#include <TBox.h>
+#include <TCanvas.h>
+#include <TColor.h>
+#include <TLatex.h>
+#include <TMath.h>
+#include <TStyle.h>
 
-#include "CLHEP/Vector/ThreeVector.h"
+/* CLHEP headers. */
+#include <CLHEP/Vector/ThreeVector.h>
+
+/* C++ headers. */
+#include <cmath>
 
 using namespace std;
 using namespace CLHEP;

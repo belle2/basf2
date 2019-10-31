@@ -10,15 +10,20 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include "TFile.h"
+
+/* ROOT headers. */
+#include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include "TTree.h"
+#include <TTree.h>
 
 namespace Belle2 {
 

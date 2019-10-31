@@ -11,7 +11,6 @@
 
 #include <framework/utilities/EnvironmentVariables.h>
 #include <framework/dataobjects/FileMetaData.h>
-#include <framework/utilities/Utils.h>
 
 #include <boost/python/list.hpp>
 #include <boost/python/tuple.hpp>

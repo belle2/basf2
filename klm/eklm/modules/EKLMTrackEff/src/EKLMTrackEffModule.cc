@@ -8,12 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <framework/datastore/StoreArray.h>
+/* Own header. */
 #include <klm/eklm/modules/EKLMTrackEff/EKLMTrackEffModule.h>
+
+/* KLM headers. */
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
+
+/* Belle 2 headers. */
+#include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
@@ -26,11 +30,11 @@
 #include <CLHEP/Units/SystemOfUnits.h>
 
 /* C++ headers. */
-#include <vector>
+#include <cmath>
 #include <map>
 #include <string>
-#include <cmath>
 #include <tuple>
+#include <vector>
 
 using namespace Belle2;
 

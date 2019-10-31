@@ -16,7 +16,7 @@ import os.path
 from basf2 import *
 from modularAnalysis import *
 from beamparameters import add_beamparameters
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file, RetentionCheck, pathWithRetentionCheck
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 gb2_setuprel = 'release-04-00-00'
 skimCode = encodeSkimName('feiSLB0')
 
@@ -38,12 +38,9 @@ BtagList = B0SL(path)
 skimOutputUdst(skimCode, BtagList, path=path)
 summaryOfLists(BtagList, path=path)
 
-# Suppress noisy modules, add the retention tracker, and then process
+# Suppress noisy modules, and then process
 setSkimLogging(path)
-path = pathWithRetentionCheck(['B0:semileptonic'], path)
 process(path)
 
-# print out the summary and the retention tracker results
+# print out the summary
 print(statistics)
-RetentionCheck.print_results()
-RetentionCheck.plot_retention('B0:semileptonic')

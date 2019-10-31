@@ -88,24 +88,33 @@ def set_FlavorTagger_pid_aliases():
     """
     This function adds the pid aliases needed by the flavor tagger.
     """
-    utils._variablemanager.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
     utils._variablemanager.addAlias('eid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, TOP), 0.5)')
     utils._variablemanager.addAlias('eid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ARICH), 0.5)')
     utils._variablemanager.addAlias('eid_ECL', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ECL), 0.5)')
 
-    utils._variablemanager.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
     utils._variablemanager.addAlias('muid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, TOP), 0.5)')
     utils._variablemanager.addAlias('muid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, ARICH), 0.5)')
     utils._variablemanager.addAlias('muid_KLM', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, KLM), 0.5)')
 
-    utils._variablemanager.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
     utils._variablemanager.addAlias('piid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, TOP), 0.5)')
     utils._variablemanager.addAlias('piid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, ARICH), 0.5)')
-    utils._variablemanager.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)')
 
     utils._variablemanager.addAlias('Kid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, TOP), 0.5)')
     utils._variablemanager.addAlias('Kid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, ARICH), 0.5)')
-    utils._variablemanager.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)')
+
+    if getBelleOrBelle2() == "Belle":
+        utils._variablemanager.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
+        utils._variablemanager.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
+        utils._variablemanager.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
+        utils._variablemanager.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)')
+        utils._variablemanager.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)')
+    else:
+        # Removed SVD PID for Belle II MC and data as it is absent in release 4.
+        utils._variablemanager.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC), 0.5)')
+        utils._variablemanager.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC), 0.5)')
+        utils._variablemanager.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC), 0.5)')
+        utils._variablemanager.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC), 0.5)')
+        utils._variablemanager.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC), 0.5)')
 
 
 # Options for Track and Event Levels
@@ -307,7 +316,6 @@ def setVariables():
         'pt',
         'cosTheta',
         eId[getBelleOrBelle2()],
-        'eid_dEdx',
         'eid_TOP',
         'eid_ARICH',
         'eid_ECL',
@@ -316,8 +324,6 @@ def setVariables():
         'BtagToWBosonVariables(cosThetaMissCMS)',
         'BtagToWBosonVariables(EW90)',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
         'chiProb',
     ]
     variables['IntermediateElectron'] = variables['Electron']
@@ -328,7 +334,6 @@ def setVariables():
         'pt',
         'cosTheta',
         muId[getBelleOrBelle2()],
-        'muid_dEdx',
         'muid_TOP',
         'muid_ARICH',
         'muid_KLM',
@@ -337,11 +342,24 @@ def setVariables():
         'BtagToWBosonVariables(cosThetaMissCMS)',
         'BtagToWBosonVariables(EW90)',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
+    ]
+    variables['IntermediateMuon'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'p',
+        'pt',
+        'cosTheta',
+        muId[getBelleOrBelle2()],
+        'muid_TOP',
+        'muid_ARICH',
+        'muid_KLM',
+        'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(pMissCMS)',
+        'BtagToWBosonVariables(cosThetaMissCMS)',
+        'BtagToWBosonVariables(EW90)',
+        'cosTPTO',
         'chiProb',
     ]
-    variables['IntermediateMuon'] = variables['Muon']
     variables['KinLepton'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
@@ -349,12 +367,10 @@ def setVariables():
         'pt',
         'cosTheta',
         muId[getBelleOrBelle2()],
-        'muid_dEdx',
         'muid_TOP',
         'muid_ARICH',
         'muid_KLM',
         eId[getBelleOrBelle2()],
-        'eid_dEdx',
         'eid_TOP',
         'eid_ARICH',
         'eid_ECL',
@@ -363,16 +379,34 @@ def setVariables():
         'BtagToWBosonVariables(cosThetaMissCMS)',
         'BtagToWBosonVariables(EW90)',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
+    ]
+    variables['IntermediateKinLepton'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'p',
+        'pt',
+        'cosTheta',
+        muId[getBelleOrBelle2()],
+        'muid_TOP',
+        'muid_ARICH',
+        'muid_KLM',
+        eId[getBelleOrBelle2()],
+        'eid_TOP',
+        'eid_ARICH',
+        'eid_ECL',
+        'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(pMissCMS)',
+        'BtagToWBosonVariables(cosThetaMissCMS)',
+        'BtagToWBosonVariables(EW90)',
+        'cosTPTO',
         'chiProb',
     ]
-    variables['IntermediateKinLepton'] = variables['KinLepton']
     variables['Kaon'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
-        'cosTheta',
+        'p',
         'pt',
+        'cosTheta',
         KId[getBelleOrBelle2()],
         'Kid_dEdx',
         'Kid_TOP',
@@ -384,11 +418,32 @@ def setVariables():
         'BtagToWBosonVariables(cosThetaMissCMS)',
         'BtagToWBosonVariables(EW90)',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
         'chiProb',
     ]
     variables['SlowPion'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'cosTheta',
+        'p',
+        'pt',
+        'pionID',
+        'piid_TOP',
+        'piid_ARICH',
+        'pi_vs_edEdxid',
+        KId[getBelleOrBelle2()],
+        'Kid_dEdx',
+        'Kid_TOP',
+        'Kid_ARICH',
+        'NumberOfKShortsInRoe',
+        'ptTracksRoe',
+        eId[getBelleOrBelle2()],
+        'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(EW90)',
+        'BtagToWBosonVariables(cosThetaMissCMS)',
+        'BtagToWBosonVariables(pMissCMS)',
+        'cosTPTO',
+    ]
+    variables['FastHadron'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
         'cosTheta',
@@ -409,13 +464,8 @@ def setVariables():
         'BtagToWBosonVariables(recoilMassSqrd)',
         'BtagToWBosonVariables(EW90)',
         'BtagToWBosonVariables(cosThetaMissCMS)',
-        'BtagToWBosonVariables(pMissCMS)',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
-        'chiProb'
     ]
-    variables['FastHadron'] = variables['SlowPion']
     variables['Lambda'] = [
         'lambdaFlavor',
         'NumberOfKShortsInRoe',
@@ -428,23 +478,15 @@ def setVariables():
         'daughter(1,useCMSFrame(p))',
         'useCMSFrame(p)',
         'p',
-        'distance',
         'chiProb',
     ]
-    if getBelleOrBelle2() != "Belle":
-        variables['Lambda'].append('daughter(1,protonID)')  # protonID always 0 in B2BII check in future
-        variables['Lambda'].append('daughter(0,pionID)')  # not very powerful in B2BII
-
     variables['MaximumPstar'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
         'p',
         'pt',
         'cosTPTO',
-        'ImpactXY',
-        'distance',
     ]
-
     variables['FSC'] = [
         'useCMSFrame(p)',
         'cosTPTO',
@@ -459,6 +501,60 @@ def setVariables():
     variables['KaonPion'] = ['extraInfo(isRightCategory(Kaon))',
                              'HighestProbInCat(pi+:inRoe, isRightCategory(SlowPion))',
                              'KaonPionVariables(cosKaonPion)', 'KaonPionVariables(HaveOpositeCharges)', KId[getBelleOrBelle2()]]
+
+    # Special treatment for some input variables:
+    if getBelleOrBelle2() == "Belle2":
+        variables['Lambda'].append('daughter(1,protonID)')  # protonID always 0 in B2BII check in future
+        variables['Lambda'].append('daughter(0,pionID)')  # not very powerful in B2BII
+    else:
+        # Below we add some input variables in case of Belle B2BII samples.
+        # They are added only for Belle samples because they lead to large data/MC discrepancies at Belle II.
+        # Add them for Belle II samples, when their distributions will have good data/MC agreement.
+        variables['Electron'].append('eid_dEdx')
+        variables['Electron'].append('ImpactXY')
+        variables['Electron'].append('distance')
+
+        variables['IntermediateElectron'].append('eid_dEdx')
+        variables['IntermediateElectron'].append('ImpactXY')
+        variables['IntermediateElectron'].append('distance')
+
+        variables['Muon'].append('muid_dEdx')
+        variables['Muon'].append('ImpactXY')
+        variables['Muon'].append('distance')
+        variables['Muon'].append('chiProb')
+
+        variables['IntermediateMuon'].append('muid_dEdx')
+        variables['IntermediateMuon'].append('ImpactXY')
+        variables['IntermediateMuon'].append('distance')
+
+        variables['KinLepton'].append('muid_dEdx')
+        variables['KinLepton'].append('eid_dEdx')
+        variables['KinLepton'].append('ImpactXY')
+        variables['KinLepton'].append('distance')
+        variables['KinLepton'].append('chiProb')
+
+        variables['IntermediateKinLepton'].append('muid_dEdx')
+        variables['IntermediateKinLepton'].append('eid_dEdx')
+        variables['IntermediateKinLepton'].append('ImpactXY')
+        variables['IntermediateKinLepton'].append('distance')
+
+        variables['Kaon'].append('ImpactXY')
+        variables['Kaon'].append('distance')
+
+        variables['SlowPion'].append('piid_dEdx')
+        variables['SlowPion'].append('ImpactXY')
+        variables['SlowPion'].append('distance')
+        variables['SlowPion'].append('chiProb')
+
+        variables['FastHadron'].append('BtagToWBosonVariables(pMissCMS)')
+        variables['FastHadron'].append('ImpactXY')
+        variables['FastHadron'].append('distance')
+        variables['FastHadron'].append('chiProb')
+
+        variables['Lambda'].append('distance')
+
+        variables['MaximumPstar'].append('ImpactXY')
+        variables['MaximumPstar'].append('distance')
 
 
 def FillParticleLists(mode='Expert', path=None):

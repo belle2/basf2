@@ -8,14 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <algorithm>
+/* Own header. */
+#include <klm/modules/KLMClustersReconstructor/KLMClustersReconstructorModule.h>
 
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
-#include <klm/modules/KLMClustersReconstructor/KLMClustersReconstructorModule.h>
 #include <klm/modules/KLMClustersReconstructor/KLMHit2d.h>
+
+/* C++ headers. */
+#include <algorithm>
 
 using namespace Belle2;
 

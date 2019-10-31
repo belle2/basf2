@@ -10,14 +10,14 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <map>
+/* KLM headers. */
+#include <klm/eklm/dbobjects/EKLMDataConcentratorLane.h>
 
-/* External headers. */
+/* ROOT headers. */
 #include <TObject.h>
 
-/* Belle2 headers. */
-#include <klm/eklm/dbobjects/EKLMDataConcentratorLane.h>
+/* C++ headers. */
+#include <map>
 
 namespace Belle2 {
 

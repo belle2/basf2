@@ -121,8 +121,6 @@ add_unpackers(main)
 for module in main.modules():
     if module.type() == 'SVDUnpacker':
         module.param('silentlyAppend', True)
-    if module.name() in ['SVDDataFormatCheck', '__ROISVDDataFormatCheck', '__ROISVDCoGTimeEstimator', 'SVDCoGTimeEstimator']:
-        module.param('SVDEventInfo', 'SVDEventInfoSim')
 
 # gather profiling information
 main.add_module('Profile', outputFileName='vmem_profile.png', rssOutputFileName='rss_profile.png').set_log_level(LogLevel.INFO)

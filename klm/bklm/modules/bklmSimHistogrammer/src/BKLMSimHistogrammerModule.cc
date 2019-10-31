@@ -8,17 +8,22 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/modules/bklmSimHistogrammer/BKLMSimHistogrammerModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMSimHit.h>
 #include <klm/bklm/dataobjects/BKLMDigit.h>
 
-#include "TMath.h"
+/* Belle 2 headers. */
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
+/* ROOT headers. */
+#include <TMath.h>
+
+/* C++ headers. */
 #include <iostream>
 
 using namespace std;

@@ -10,14 +10,16 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <map>
-
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/geometry/GeometryData.h>
+
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+
+/* C++ headers. */
+#include <map>
 
 namespace Belle2 {
 

@@ -1,5 +1,4 @@
 #include <framework/utilities/TestHelpers.h>
-#include <framework/logging/Logger.h>
 #include <framework/geometry/B2Vector3.h>
 #include <TVector3.h>
 #include <TError.h> // to shut up stupid messages

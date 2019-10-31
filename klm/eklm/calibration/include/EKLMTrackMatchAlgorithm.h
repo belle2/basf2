@@ -10,10 +10,12 @@
 
 #pragma once
 
-/* Belle2 headers. */
-#include <calibration/CalibrationAlgorithm.h>
+/* KLM headers. */
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+
+/* Belle 2 headers. */
+#include <calibration/CalibrationAlgorithm.h>
 
 /* ROOT headers. */
 #include <TH1.h>

@@ -7,16 +7,18 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/DBObjPtr.h>
+/* KLM headers. */
 #include <klm/bklm/dbobjects/BKLMADCThreshold.h>
 #include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
-
-#include <rawdata/dataobjects/RawKLM.h>
 #include <klm/bklm/dataobjects/BKLMDigit.h>
+
+/* Belle 2 headers. */
+#include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawKLM.h>
 
 namespace Belle2 {
 

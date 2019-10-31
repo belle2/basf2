@@ -77,12 +77,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     if fit_tracks:
         add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
                                         trackFitHypotheses=trackFitHypotheses,
-                                        reco_tracks=reco_tracks)
-        if add_mva_quality_indicator:
-            path.add_module(
-                "TrackQualityEstimatorMVA",
-                collectEventFeatures=True,
-            )
+                                        reco_tracks=reco_tracks,
+                                        add_mva_quality_indicator=add_mva_quality_indicator)
 
     if prune_temporary_tracks or pruneTracks:
         path.add_module("PruneRecoHits")

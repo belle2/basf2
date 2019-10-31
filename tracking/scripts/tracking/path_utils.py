@@ -86,6 +86,10 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     # implementation.
     path.add_module('TrackCreator', recoTrackColName=reco_tracks,
                     pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses)
+
+    if add_mva_quality_indicator:
+        path.add_module("TrackQualityEstimatorMVA", collectEventFeatures=True)
+
     # V0 finding
     path.add_module('V0Finder', RecoTracks=reco_tracks)
 

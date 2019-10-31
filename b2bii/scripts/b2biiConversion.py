@@ -41,6 +41,9 @@ def setupB2BIIDatabase(isMC=False):
 
     This automatically chooses the correct global tag and sets up a database suitable for B2BII conversion.
 
+    Warning:
+        This function is not up to date and should not be called
+
     Args:
         isMC (bool): should be True for MC data and False for real data
     """

@@ -27,7 +27,7 @@ namespace Belle2 {
      * @param variableSet set of variable to be filled
      * @param useTimingInfo whether to use the timing info in clusters
      */
-    HitInfoExtractor(std::vector<Named<float*>>& variableSet) :
+    explicit HitInfoExtractor(std::vector<Named<float*>>& variableSet) :
       VariableExtractor()
     {
       addVariable("N_TrackPoints_without_KalmanFitterInfo", variableSet);
@@ -120,7 +120,7 @@ namespace Belle2 {
 
   protected:
     /// initialize statistics subsets of variables from clusters that get combined for SPTC
-    void initializeStats(std::string identifier, std::vector<Named<float*>>& variables)
+    void initializeStats(const std::string& identifier, std::vector<Named<float*>>& variables)
     {
       addVariable(identifier + "_max", variables);
       addVariable(identifier + "_min", variables);
@@ -134,7 +134,7 @@ namespace Belle2 {
 
     /// calculated statistics and saves them in variable set
     void setStats
-    (std::string identifier, std::vector<float>& values)
+    (const std::string& identifier, std::vector<float>& values)
     {
       int size = values.size();
       if (values.size() == 0) {
@@ -167,7 +167,9 @@ namespace Belle2 {
       m_variables.at(identifier + "_std") = stddev;
       m_variables.at(identifier + "_min") = values.front();
       m_variables.at(identifier + "_max") = values.back();
-      float median = size % 2 ? values[size / 2] : 0.5 * (values[size / 2] + values[size / 2 - 1]);
+      // only in the case size==0 there would be a negative container index, but that case is handled above. So the suppress for cppcheck:
+      // cppcheck-suppress negativeContainerIndex
+      float median = (size % 2) ? values[size / 2] : 0.5 * (values[size / 2] + values[size / 2 - 1]);
       m_variables.at(identifier + "_median") = median;
     }
 

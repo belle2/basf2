@@ -146,8 +146,7 @@ namespace Belle2 {
             f->GetParameters(parms);
             for (int iPar = 0; iPar < 3; iPar++)
               // ROOT reads these on otree->Fill() but cppcheck doesn't know that
-              // cppcheck-suppress unreadVariable
-              parmErrs[iPar] = f->GetParError(iPar);
+              parmErrs[iPar] = f->GetParError(iPar); // cppcheck-suppress unreadVariable
             otree->Fill();
             channel++;
           }
@@ -184,8 +183,7 @@ namespace Belle2 {
             f->GetParameters(parms);
             for (int iPar = 0; iPar < 8; iPar++)
               // ROOT reads these on otree->Fill() but cppcheck doesn't know that
-              // cppcheck-suppress unreadVariable
-              parmErrs[iPar] = f->GetParError(iPar);
+              parmErrs[iPar] = f->GetParError(iPar); // cppcheck-suppress unreadVariable
             otree->Fill();
             channel++;
           }
@@ -213,8 +211,7 @@ namespace Belle2 {
             f->GetParameters(parms);
             for (int iPar = 0; iPar < 5; iPar++)
               // ROOT reads these on otree->Fill() but cppcheck doesn't know that
-              // cppcheck-suppress unreadVariable
-              parmErrs[iPar] = f->GetParError(iPar);
+              parmErrs[iPar] = f->GetParError(iPar); // cppcheck-suppress unreadVariable
             otree->Fill();
             channel++;
           }

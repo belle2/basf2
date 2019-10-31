@@ -68,14 +68,19 @@ namespace Belle2 {
 
 
     /**
-     * Set the (cluster theta, p) grid of bins for this particle mass hypothesis' pdgId into the payload.
+     * Set the (clusterTheta, p) grid of bins for this particle mass hypothesis' pdgId into the payload.
      * @param pdg the particle mass hypothesis' pdgId.
      * @param grid the 2D histogram w/ the bin grid.
     */
     void storeClusterThetaPGrid(const int pdg, TH2F* grid)
     {
-      if (!isValidPdg(pdg)) { B2FATAL("PDG: " << pdg << " is not that of a valid charged particle! Aborting..."); }
+
+      if (!isValidPdg(pdg)) {
+        B2FATAL("PDG: " << pdg << " is not that of a valid charged particle! Aborting...");
+      }
+
       m_grids[pdg] = grid;
+
     }
 
 
@@ -89,7 +94,9 @@ namespace Belle2 {
     void storeMVAWeights(const int pdg, const std::vector<std::string>& filepaths)
     {
 
-      if (!isValidPdg(pdg)) { B2FATAL("PDG: " << pdg << " is not that of a valid charged particle! Aborting..."); }
+      if (!isValidPdg(pdg)) {
+        B2FATAL("PDG: " << pdg << " is not that of a valid charged particle! Aborting...");
+      }
 
       for (const auto& path : filepaths) {
 
@@ -114,6 +121,39 @@ namespace Belle2 {
     }
 
     /**
+     * Store the list of cuts defining categories for this particle mass hypothesis' pdgId into the payload.
+     * NB: the caller MUST ensure that the order in the list of file paths corresponds to the
+     * one of the linearised TH2F grid object, set in the payload via storeClusterThetaPGrid()
+     * @param pdg the particle mass hypothesis' pdgId.
+     * @param cutfiles a list of text files w/ cut strings defining a category for several (clusterTheta,p) bins.
+     *        The format of the cut must be compliant with the `GeneralCut` syntax.
+     */
+    void storeCuts(const int pdg, const std::vector<std::string>& cutfiles)
+    {
+
+      if (!isValidPdg(pdg)) {
+        B2FATAL("PDG: " << pdg << " is not that of a valid charged particle! Aborting...");
+      }
+
+      for (const auto& cutfile : cutfiles) {
+
+        std::ifstream ifs(cutfile);
+        std::string cut((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
+
+        // Strip trailing newline.
+        cut.erase(std::remove(cut.begin(), cut.end(), '\n'), cut.end());
+
+        // Conditional expression separator must use square brackets in basf2.
+        std::replace(cut.begin(), cut.end(), '(', '[');
+        std::replace(cut.begin(), cut.end(), ')', ']');
+
+        m_cuts[pdg].push_back(cut);
+      }
+
+    }
+
+
+    /**
      * Get the list of (serialized) MVA weightfiles stored in the payload for a given pdgId.
      * @param pdg the particle mass hypothesis' pdgId.
      */
@@ -122,10 +162,21 @@ namespace Belle2 {
       return &(m_weightfiles.at(pdg));
     }
 
+
+    /**
+     * Get the list of cut strings stored in the payload for a given pdgId.
+     * @param pdg the particle mass hypothesis' pdgId.
+     */
+    const std::vector<std::string>* getCuts(const int pdg) const
+    {
+      return &(m_cuts.at(pdg));
+    }
+
+
     /**
      * Get the index of the weightfile of interest in the list of weightfiles, for a given particle mass hypothesis, clusterTheta, and p.
      * The index is obtained by linearising the 2D histogram representing the (clusterTheta, p) bins grid.
-     * The same index can be used to look up the correct MVA Expert and Dataset in the application module,
+     * The same index can be used to look up the correct MVAExpert, Dataset and Cut in the application module,
      * hence we believe it's more useful to return the index rather than a pointer to the weightfile itself.
      * The function also retrieves the (clusterTheta, p) bin coordinates.
      * @param part the particle mass hypothesis.
@@ -204,8 +255,12 @@ namespace Belle2 {
 
         auto serialized_weightfile = weights.at(idx);
 
-        std::string filename = "db_payload_chargedpidmva__weightfile_pdg_" + std::to_string(pdgId) + "_" + std::to_string(idx) + ".xml";
+        std::string filename = "db_payload_chargedpidmva__weightfile_pdg_" + std::to_string(pdgId) + "_glob_bin_" + std::to_string(
+                                 idx + 1) + ".xml";
 
+        auto cutstr = getCuts(pdg)->at(idx);
+
+        B2INFO("\tCut: " << cutstr);
         B2INFO("\tWriting weight file: " << filename);
 
         std::ofstream weightfile;
@@ -277,7 +332,7 @@ namespace Belle2 {
 
     /**
      * This map contains - for each charged particle mass hypothesis' pdgId - a list of (serialized) Weightfile objects to be stored in the payload.
-     * The indexing in each vector must reflect the one of the corresponding 'linearised' TH2F histogram conatined in the m_grids map.
+     * The indexing in each vector must reflect the one of the corresponding 'linearised' TH2F histogram contained in the m_grids map.
      */
     WeightfilesByParticle m_weightfiles = {
       { Const::electron.getPDGCode(), std::vector<std::string>() },
@@ -288,11 +343,26 @@ namespace Belle2 {
       { Const::deuteron.getPDGCode(), std::vector<std::string>() }
     };
 
-    ClassDef(ChargedPidMVAWeights, 3);
+    /**
+     * This map contains - for each charged particle mass hypothesis' pdgId - a list of cuts to be stored in the payload.
+     * To each Weightfile (i.e., training region), a cut.
+     * The indexing in each vector must reflect the one of the corresponding 'linearised' TH2F histogram contained in the m_grids map.
+     */
+    WeightfilesByParticle m_cuts = {
+      { Const::electron.getPDGCode(), std::vector<std::string>() },
+      { Const::muon.getPDGCode(), std::vector<std::string>() },
+      { Const::pion.getPDGCode(), std::vector<std::string>() },
+      { Const::kaon.getPDGCode(), std::vector<std::string>() },
+      { Const::proton.getPDGCode(), std::vector<std::string>() },
+      { Const::deuteron.getPDGCode(), std::vector<std::string>() }
+    };
+
+
+    ClassDef(ChargedPidMVAWeights, 4);
+    /**< 4. add cuts map. */
     /**< 3. add overloaded getMVAWeightIdx. */
     /**< 2: add energy/angular units. */
     /**< 1: first class implementation. */
   };
 
 }
-

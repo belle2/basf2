@@ -15,12 +15,10 @@
 #        |  +-> e+ (gamma)
 #        +-> e- (gamma)
 #
-# Notes:
+# Note:
 #
-# 1) The electrons in the corrected list have an
-#    attached extraInfo 'bremsCorrected', indicating if
-#    the electron was corrected (1) or not (0).
-# 2) It's recommended to use looseMCMatching.
+# The electrons in the corrected list have an attached extraInfo
+# 'bremsCorrected', indicating if the electron was corrected (1) or not (0).
 #
 # Contributors: Moritz Gelb (February 2017)
 #               I. Komarov (December 2017)
@@ -49,20 +47,19 @@ ma.fillParticleList(decayString='e+:uncorrected',
                     path=my_path)
 ma.fillParticleList(decayString='gamma:all',
                     cut='E < 1.0',
-                    writeOut=False,
                     path=my_path)
 
-# loose mc matching (recommended)
-ma.looseMCTruth(list_name='e+:uncorrected', path=my_path)
-ma.looseMCTruth(list_name='gamma:all', path=my_path)
+# MC matching
+ma.matchMCTruth(list_name='e+:uncorrected', path=my_path)
+ma.matchMCTruth(list_name='gamma:all', path=my_path)
 
 # correction of Bremsstrahlung
+# A new lepton is generated, with the old electron and, if found, a gamma as daughters.
 ma.correctBrems(outputList='e+:corrected',
                 inputList='e+:uncorrected',
                 gammaList='gamma:all',
-                writeOut=False,
                 path=my_path)
-ma.looseMCTruth(list_name='e+:corrected',
+ma.matchMCTruth(list_name='e+:corrected',
                 path=my_path)
 
 # uncorrected
@@ -73,18 +70,14 @@ ma.reconstructDecay(decayString='J/psi:corrected -> e+:corrected e-:corrected',
                     cut='',
                     path=my_path)
 
-# loose MC matching
-ma.looseMCTruth(list_name='J/psi:uncorrected', path=my_path)
-ma.looseMCTruth(list_name='J/psi:corrected', path=my_path)
+# MC matching
+ma.matchMCTruth(list_name='J/psi:uncorrected', path=my_path)
+ma.matchMCTruth(list_name='J/psi:corrected', path=my_path)
 
 # get all MC particles
 ma.fillParticleListFromMC(decayString='J/psi:MC', cut="", path=my_path)
 
 # write out ntuples
-
-# Please note, a new lepton is generated, with the old electron and -if found- a gamma as daughters.
-# Information attached to the track is only available for the old lepton, accessible via the daughter
-# metavariable, e.g. <daughter(0, eid)>.
 
 var0 = ['p',
         'px',
@@ -93,7 +86,7 @@ var0 = ['p',
         'x',
         'y',
         'z',
-        'daughter(0, electronID)',
+        'electronID',
         'PDG',
         'mcPDG',
         'E',
@@ -107,12 +100,7 @@ var0 = ['p',
         'pErr',
         'isSignal',
         'mcErrors',
-        'extraInfo(bremsCorrected)',
-        'extraInfo(looseMCMotherPDG)',
-        'extraInfo(looseMCMotherIndex)',
-        'extraInfo(looseMCWrongDaughterN)',
-        'extraInfo(looseMCWrongDaughterPDG)',
-        'extraInfo(looseMCWrongDaughterBiB)',
+        'extraInfo(bremsCorrected)'
         ]
 var1 = ['M',
         'p',
@@ -123,12 +111,7 @@ var1 = ['M',
         'daughter(0, p)',
         'daughter(1, p)',
         'daughter(0, extraInfo(bremsCorrected))',
-        'daughter(1, extraInfo(bremsCorrected))',
-        'extraInfo(looseMCMotherPDG)',
-        'extraInfo(looseMCMotherIndex)',
-        'extraInfo(looseMCWrongDaughterN)',
-        'extraInfo(looseMCWrongDaughterPDG)',
-        'extraInfo(looseMCWrongDaughterBiB)',
+        'daughter(1, extraInfo(bremsCorrected))'
         ]
 
 ma.variablesToNtuple(decayString='e+:uncorrected',

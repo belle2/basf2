@@ -134,7 +134,7 @@ namespace Belle2 {
                  std::numeric_limits<double>::quiet_NaN()
                 ), TMatrixTSym<double>(3)
       );
-      Database::Instance().storeData("BeamSpot", &beamParams, iov);
+      Database::Instance().storeData("BeamSpot", &beamSpot, iov);
       B2INFO("No IpProfile, created BeamEnergy Payload");
       return;
     }

@@ -369,10 +369,9 @@ namespace Belle2 {
       float BcpFlavor = 0;
 
       if (roe != nullptr) {
-        const Particle* Bcp = roe->getRelated<Particle>();
-        const MCParticle* BcpMC = roe->getRelated<Particle>()->getRelatedTo<MCParticle>();
+        const MCParticle* BcpMC = particle->getRelatedTo<MCParticle>();
 
-        if (Variable::isSignal(Bcp) > 0 && BcpMC != nullptr) {
+        if (Variable::isSignal(particle) > 0 && BcpMC != nullptr) {
           const MCParticle* Y4S = BcpMC->getMother();
           if (Y4S != nullptr) {
             for (auto& iTrack : roe->getTracks()) {

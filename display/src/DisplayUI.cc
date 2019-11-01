@@ -41,7 +41,6 @@
 #include <TGMsgBox.h>
 #include <TGFileDialog.h>
 #include <TGInputDialog.h>
-#include <TGTab.h>
 #include <TGTextEntry.h>
 #include <TGLViewer.h>
 #include <TGLWidget.h>

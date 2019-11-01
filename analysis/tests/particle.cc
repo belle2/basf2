@@ -595,7 +595,8 @@ namespace {
       EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
       EXPECT_FLOAT_EQ(2., p.getEnergy());
       EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
-      double m = TDatabasePDG::Instance()->GetParticle(130)->Mass();
+      int pdg = Const::Klong.getPDGCode();
+      double m = TDatabasePDG::Instance()->GetParticle(pdg)->Mass();
       EXPECT_FLOAT_EQ(m, p.getMass());
     }
 
@@ -610,7 +611,8 @@ namespace {
       EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
       EXPECT_FLOAT_EQ(2., p.getEnergy());
       EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
-      double m = TDatabasePDG::Instance()->GetParticle(2112)->Mass();
+      int pdg = Const::neutron.getPDGCode();
+      double m = TDatabasePDG::Instance()->GetParticle(pdg)->Mass();
       EXPECT_FLOAT_EQ(m, p.getMass());
     }
   }
@@ -628,8 +630,9 @@ namespace {
       cluster->setMomentumMag(1.0);
 
       Particle p(cluster);
-      EXPECT_EQ(130, p.getPDGCode());
-      double m = TDatabasePDG::Instance()->GetParticle(130)->Mass();
+      int pdg = Const::Klong.getPDGCode();
+      EXPECT_EQ(pdg, p.getPDGCode());
+      double m = TDatabasePDG::Instance()->GetParticle(pdg)->Mass();
       EXPECT_FLOAT_EQ(sqrt(1. + m * m), p.getEnergy());
       EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
       EXPECT_FLOAT_EQ(m, p.getMass());
@@ -644,8 +647,9 @@ namespace {
       cluster->setMomentumMag(1.0);
 
       Particle p(cluster, Const::neutron.getPDGCode());
-      EXPECT_EQ(2112, p.getPDGCode());
-      double m = TDatabasePDG::Instance()->GetParticle(2112)->Mass();
+      int pdg = Const::neutron.getPDGCode();
+      EXPECT_EQ(pdg, p.getPDGCode());
+      double m = TDatabasePDG::Instance()->GetParticle(pdg)->Mass();
       EXPECT_FLOAT_EQ(sqrt(1. + m * m), p.getEnergy());
       EXPECT_EQ(Particle::c_Flavored, p.getFlavorType());
       EXPECT_FLOAT_EQ(m, p.getMass());

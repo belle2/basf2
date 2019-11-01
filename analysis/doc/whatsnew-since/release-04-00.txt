@@ -53,6 +53,7 @@ Modules
 * In BtubeCreator module, functionality to associate Btube to user's chosen B is added.
 * In `ChargedPidMVA` module, remove handling of particle list modified by the deprecated `FSRCorrection` module.
 * In `ChargedPidMVA` module, apply MVA category cuts retrieved from the DB payload.
+ * Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`. One can find and create a `ParticleList`_ for all `MCParticle`_ decays matching a given :ref:`DecayString`.
 
 * Added a :b2:mod:`BremsFinder` to unpack the bremsstrahlung relations provided by tracking.
 
@@ -62,3 +63,4 @@ Conditions DB
 +++++++++++++
 
  * In ``ChargedPidMVAWeights`` payload class, added MVA category cut strings in basf2-compliant format.
+ * Fixed ``goodBelleLambda`` and now it returns ``extraInfo(goodLambda)`` on Belle data. 

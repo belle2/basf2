@@ -41,5 +41,7 @@ namespace Belle2 {
     DecayTree<MCParticle>* match(const MCParticle* mcp, const DecayDescriptor* d, bool isCC);
     /** Create Particle from matched MCParticle and write to Particle list. */
     int write(DecayTree<MCParticle>* decay);
+    /** Recursively gather all MC daughters of gen **/
+    void appendParticles(const MCParticle* gen, std::vector<const MCParticle*>& children);
   };
 }

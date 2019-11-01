@@ -112,7 +112,7 @@ def get_default_channels(
                                             bestCandidateMode='highest',
                                             bestCandidateVariable='electronID' if not convertedFromBelle else 'eIDBelle',
                                             bestCandidateCut=10),
-                        PostCutConfiguration(bestCandidateCut=10, value=0.01))
+                        PostCutConfiguration(bestCandidateCut=5, value=0.01))
     electron.addChannel(['e+:FSP'])
 
     muon = Particle('mu+',
@@ -122,7 +122,7 @@ def get_default_channels(
                                         bestCandidateMode='highest',
                                         bestCandidateVariable='muonID' if not convertedFromBelle else 'muIDBelle',
                                         bestCandidateCut=10),
-                    PostCutConfiguration(bestCandidateCut=10, value=0.01))
+                    PostCutConfiguration(bestCandidateCut=5, value=0.01))
     muon.addChannel(['mu+:FSP'])
 
     if convertedFromBelle:
@@ -278,7 +278,7 @@ def get_default_channels(
                    PostCutConfiguration(bestCandidateCut=10, value=0.01))
     KL0.addChannel(['K_L0:FSP'])
 
-    Sigmap = Particle('Sigma+',
+    SigmaP = Particle('Sigma+',
                       MVAConfiguration(variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
                                                   'useCMSFrame(E)', 'daughterAngle(0,1)',
                                                   'daughter({},extraInfo(SignalProbability))',
@@ -289,7 +289,7 @@ def get_default_channels(
                                           bestCandidateVariable='abs(dM)',
                                           bestCandidateCut=20),
                       PostCutConfiguration(bestCandidateCut=10, value=0.01))
-    Sigmap.addChannel(['p+', 'pi0'])
+    SigmaP.addChannel(['p+', 'pi0'])
     # variables for D mesons and J/Psi
     intermediate_vars = ['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
                          'chiProb', 'daughter({}, chiProb)', 'extraInfo(preCut_rank)', 'abs(dM)',
@@ -905,7 +905,7 @@ def get_default_channels(
     particles.append(KS0)
     if baryonic:
         particles.append(L0)
-        particles.append(Sigmap)
+        particles.append(SigmaP)
     particles.append(Jpsi)
 
     particles.append(D0)

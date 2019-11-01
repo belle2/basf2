@@ -63,7 +63,7 @@ def decayDescriptor(decay_string):
         ('e-', r'$e^-$'),
         ('J/psi', r'$J/\psi$'),
         ('anti-Lambda_c-', r'$\Lambda^{-}_{c}$'),
-        ('anti-Sigma+', r'$\oveline{\Sigma}^{+}$'),
+        ('anti-Sigma+', r'$\overline{\Sigma}^{+}$'),
         ('anti-Lambda0', r'$\overline{\Lambda}^{0}$'),
         ('anti-D0*', r'$\overline{D^{0*}}$'),
         ('anti-D*0', r'$\overline{D^{0*}}$'),

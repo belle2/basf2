@@ -13,9 +13,10 @@ will be a lot of messages starting with `ERR    : ` from the belle library if
 the data cannot be found. These can be safely ignored:
 
 * If Benergy is missing the run will be skipped and added to the
-  ``missing_benergy.txt`` in the output directory
+  ``missing_benergy.txt`` in the output directory.
 * If IPProfile is missing the BeamSpot/BeamParameters will be created with NaN
-for the IP position.
+  for the IP position, and the run will be added to the
+  ``missing_ip.txt`` in the output directory.
 
 This script requires access to the BELLE postgres database so it should be run on
 KEKCC or proper port forwarding needs to be setup and BELLE_POSTGRESS_SERVER
@@ -79,7 +80,7 @@ def run_conversion(rundata):
     Parameters:
         rundata (list(tuple(int,int)): List of exp, run values
     """
-    global missing
+    global missing_benergy, missing_ip
     experiments = [e[0] for e in rundata]
     runs = [e[1] for e in rundata]
     events = [1]*len(runs)
@@ -89,7 +90,7 @@ def run_conversion(rundata):
     # and create and run the conversion path
     main = b2.Path()
     main.add_module("EventInfoSetter", expList=experiments, runList=runs, evtNumList=events)
-    main.add_module("B2BIIConvertBeamParams", mcFlag=1, missing=missing, logLevel=b2.LogLevel.INFO)
+    main.add_module("B2BIIConvertBeamParams", mcFlag=1, missingBenergy=missing_benergy, missingIp=missing_ip, logLevel=b2.LogLevel.INFO)
     b2.process(main)
 
 
@@ -110,7 +111,8 @@ if __name__ == "__main__":
     os.makedirs(args.output, exist_ok=True)
     # and remember where to put information
     db_file = os.path.join(args.output, "database.txt")
-    missing = os.path.join(args.output, "missing_benergy.txt")
+    missing_benergy = os.path.join(args.output, "missing_benergy.txt")
+    missing_ip = os.path.join(args.output, "missing_ip.txt")
     # specfiy where to store new payloads
     b2.conditions.expert_settings(save_payloads=db_file)
     # disable database access, we only create, don't use
@@ -131,7 +133,7 @@ if __name__ == "__main__":
     # and subtract all excluded runs from that
     subtract = [
         (db_file, f"existing in database file {db_file}", (2, 3)),
-        (missing, f"runs we know don't have benergy data from {missing}", (0, 1)),
+        (missing_benergy, f"runs we know don't have benergy data from {missing_benergy}", (0, 1)),
     ]
 
     if args.exclude is not None:

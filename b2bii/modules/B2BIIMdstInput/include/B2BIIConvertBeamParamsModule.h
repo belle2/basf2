@@ -36,8 +36,10 @@ namespace Belle2 {
   private:
     /** mcFlag to use when getting belle database content */
     int m_mcFlag{1};
-    /** Where to store information about runs without ipprofile information */
-    std::string m_missing{"missing.txt"};
+    /** Where to store information about runs without beam energy information */
+    std::string m_missingBenergy{"missing_benergy.txt"};
+    /** Where to store information about runs without IP profile information */
+    std::string m_missingIp{"missing_ip.txt"};
     /** Event metadata */
     StoreObjPtr<EventMetaData> m_event;
   };

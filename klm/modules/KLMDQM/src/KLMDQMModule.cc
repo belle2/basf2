@@ -26,10 +26,10 @@ KLMDQMModule::KLMDQMModule() :
   m_TimeRPC(nullptr),
   m_TimeScintillatorBKLM(nullptr),
   m_TimeScintillatorEKLM(nullptr),
-  m_eklmSector(nullptr),
+  m_PlaneBKLMPhi(nullptr),
+  m_PlaneBKLMZ(nullptr),
+  m_PlaneEKLM(nullptr),
   m_bklmHit2dsZ(nullptr),
-  m_bklmSectorLayerPhi(nullptr),
-  m_bklmSectorLayerZ(nullptr),
   m_bklmDigitsN(nullptr)
 {
   setDescription("KLM data quality monitor.");
@@ -60,40 +60,6 @@ KLMDQMModule::~KLMDQMModule()
   }
 }
 
-void KLMDQMModule::defineHistoEKLM()
-{
-  TDirectory* oldDirectory, *newDirectory;
-  oldDirectory = gDirectory;
-  newDirectory = oldDirectory->mkdir(m_HistogramDirectoryNameEKLM.c_str());
-  newDirectory->cd();
-  m_eklmSector = new TH1F("sector", "Sector number", 104, 0.5, 104.5);
-  m_eklmSector->SetOption("LIVE");
-  oldDirectory->cd();
-}
-
-void KLMDQMModule::defineHistoBKLM()
-{
-  TDirectory* oldDir = gDirectory;
-  oldDir->mkdir(m_HistogramDirectoryNameBKLM.c_str())->cd();
-  m_bklmSectorLayerPhi = new TH1F("SectorLayerPhi", "Sector and layer number occupancy for phi-readout hits",
-                                  240, 0.0, 239.0);
-  m_bklmSectorLayerPhi->GetXaxis()->SetTitle("sector*15 + layer (0..120 = backward, 120..240 = section)");
-  m_bklmSectorLayerPhi->SetOption("LIVE");
-  m_bklmSectorLayerZ = new TH1F("SectorLayerZ", "Sector and layer number occupancy for Z-readout hits",
-                                240, 0.0, 239.0);
-  m_bklmSectorLayerZ->GetXaxis()->SetTitle("sector*15 + layer (0..120 = backward, 120..240 = section)");
-  m_bklmSectorLayerZ->SetOption("LIVE");
-  m_bklmHit2dsZ = new TH1F("zBKLMHit2ds", "Axial position of muon hit",
-                           97, -172.22, 266.22);
-  m_bklmHit2dsZ->GetXaxis()->SetTitle("Axial position of muon hit");
-  m_bklmHit2dsZ->SetOption("LIVE");
-  m_bklmDigitsN = new TH1F("bklmDigitsN", "Number of BKLM Digits",
-                           250.0, 0.0, 250.0);
-  m_bklmDigitsN->GetXaxis()->SetTitle("Number of BKLM Digits");
-  m_bklmDigitsN->SetOption("LIVE");
-  oldDir->cd();
-}
-
 void KLMDQMModule::defineHisto()
 {
   TDirectory* oldDirectory, *newDirectory;
@@ -114,6 +80,20 @@ void KLMDQMModule::defineHisto()
              100, -5000, -4000);
   m_TimeScintillatorEKLM->GetXaxis()->SetTitle("Time, ns");
   m_TimeScintillatorEKLM->SetOption("LIVE");
+  /* Number of hits per plane. */
+  m_PlaneBKLMPhi = new TH1F("plane_bklm_phi",
+                            "BKLM plane occupancy (phi readout)",
+                            240, 0.5, 240.5);
+  m_PlaneBKLMPhi->GetXaxis()->SetTitle("Layer number");
+  m_PlaneBKLMPhi->SetOption("LIVE");
+  m_PlaneBKLMZ = new TH1F("plane_bklm_z",
+                          "BKLM plane occupancy (Z readout)",
+                          240, 0.5, 240.5);
+  m_PlaneBKLMZ->GetXaxis()->SetTitle("Layer number");
+  m_PlaneBKLMZ->SetOption("LIVE");
+  m_PlaneEKLM = new TH1F("plane_eklm", "EKLM plane occupancy", 208, 0.5, 208.5);
+  m_PlaneEKLM->GetXaxis()->SetTitle("Plane number");
+  m_PlaneEKLM->SetOption("LIVE");
   /* Number of hits per channel. */
   int nChannelHistograms =
     BKLMElementNumbers::getMaximalSectorGlobalNumber() *
@@ -173,11 +153,16 @@ void KLMDQMModule::defineHisto()
     }
   }
   delete[] firstChannelNumbers;
-  oldDirectory->cd();
-  /* EKLM histograms. */
-  defineHistoEKLM();
   /* BKLM histograms. */
-  defineHistoBKLM();
+  m_bklmHit2dsZ = new TH1F("zBKLMHit2ds", "Axial position of muon hit",
+                           97, -172.22, 266.22);
+  m_bklmHit2dsZ->GetXaxis()->SetTitle("Axial position of muon hit");
+  m_bklmHit2dsZ->SetOption("LIVE");
+  m_bklmDigitsN = new TH1F("bklmDigitsN", "Number of BKLM Digits",
+                           250.0, 0.0, 250.0);
+  m_bklmDigitsN->GetXaxis()->SetTitle("Number of BKLM Digits");
+  m_bklmDigitsN->SetOption("LIVE");
+  oldDirectory->cd();
 }
 
 void KLMDQMModule::initialize()
@@ -208,11 +193,11 @@ void KLMDQMModule::beginRun()
       m_ChannelHits[sectorIndex][j]->Reset();
   }
   /* EKLM. */
-  m_eklmSector->Reset();
+  m_PlaneEKLM->Reset();
   /* BKLM. */
   m_bklmHit2dsZ->Reset();
-  m_bklmSectorLayerPhi->Reset();
-  m_bklmSectorLayerZ->Reset();
+  m_PlaneBKLMPhi->Reset();
+  m_PlaneBKLMZ->Reset();
   m_bklmDigitsN->Reset();
 }
 
@@ -247,8 +232,8 @@ void KLMDQMModule::event()
         continue;
       m_ChannelHits[klmSectorIndex][j]->Fill(channelIndex);
     }
-    int sectorGlobal = m_Elements->sectorNumber(section, layer, sector);
-    m_eklmSector->Fill(sectorGlobal);
+    int planeGlobal = m_Elements->planeNumber(section, layer, sector, plane);
+    m_PlaneEKLM->Fill(planeGlobal);
     m_TimeScintillatorEKLM->Fill(eklmDigit->getTime());
   }
   /* BKLM. */
@@ -287,11 +272,15 @@ void KLMDQMModule::event()
   int nBklmHits1d = m_BklmHit1ds.getEntries();
   for (i = 0; i < nBklmHits1d; i++) {
     BKLMHit1d* hit1d = static_cast<BKLMHit1d*>(m_BklmHit1ds[i]);
-    if (hit1d->isPhiReadout()) {
-      m_bklmSectorLayerPhi->Fill(hit1d->getSection() * 120 + (hit1d->getSector() - 1) * 15 + (hit1d->getLayer() - 1));
-    } else {
-      m_bklmSectorLayerZ->Fill(hit1d->getSection() * 120 + (hit1d->getSector() - 1) * 15 + (hit1d->getLayer() - 1));
-    }
+    int section = hit1d->getSection();
+    int sector = hit1d->getSector();
+    int layer = hit1d->getLayer();
+    int layerGlobal = BKLMElementNumbers::layerGlobalNumber(
+                        section, sector, layer);
+    if (hit1d->isPhiReadout())
+      m_PlaneBKLMPhi->Fill(layerGlobal);
+    else
+      m_PlaneBKLMZ->Fill(layerGlobal);
   }
 }
 

@@ -24,6 +24,19 @@ namespace Belle2 {
   public:
 
     /**
+     * Constants for section numbers.
+     */
+    enum Section {
+
+      /** Backward. */
+      c_BackwardSection = 1,
+
+      /** Forward. */
+      c_ForwardSection = 2,
+
+    };
+
+    /**
      * Constructor.
      */
     EKLMElementNumbers();

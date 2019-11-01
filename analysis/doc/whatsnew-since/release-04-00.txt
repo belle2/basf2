@@ -21,7 +21,6 @@ Modules
  * Fix to nested RestOfEvent objects (see :issue:`BII-5649`)
  * Removed module ``CreateBsigFromFullRecoBtag``
  * Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`. One can find and create a `ParticleList`_ for all `MCParticle`_ decays matching a given :ref:`DecayString`.
- * Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`. One can find and create a :ref:`ParticleList` for all :ref:`MCParticle` decays matching a given :ref:`DecayString`.
 
 Variables
 +++++++++

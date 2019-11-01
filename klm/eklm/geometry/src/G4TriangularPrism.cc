@@ -8,16 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
+#include <klm/eklm/geometry/G4TriangularPrism.h>
+
+/* CLHEP headers. */
+#include <CLHEP/Units/SystemOfUnits.h>
+
 /* C++ headers. */
 #include <cmath>
 #include <new>
-
-/* External headers. */
-#include <CLHEP/Units/SystemOfUnits.h>
-
-/* Belle2 headers. */
-#include <klm/eklm/geometry/G4TriangularPrism.h>
-
 
 using namespace Belle2;
 

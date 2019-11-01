@@ -10,26 +10,28 @@
 
 #pragma once
 
-/* C++ headers. */
-#include<map>
+/* KLM headers. */
+#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+#include <klm/eklm/geometry/GeometryData.h>
 
-/* ROOT headers. */
-#include "TH1.h"
-#include "TH2F.h"
-#include "TFile.h"
-
-/* Belle2 headers. */
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/eklm/geometry/GeometryData.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TH1.h>
+#include <TH2F.h>
+
+/* C++ headers. */
+#include <map>
 
 namespace Belle2 {
 

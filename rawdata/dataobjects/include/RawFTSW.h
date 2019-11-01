@@ -206,7 +206,7 @@ namespace Belle2 {
       FTSW_FORMAT_MASK = 0x000000FF,
 
       FORMAT_ID_VER_0TO2 = 0x54544420,
-      FORMAT_ID_VER_0TO3 = 0x54544421,
+      FORMAT_ID_VER_0TO3 = 0x54544431,
 
       POS_HEADER_SIZE = 1, //! The same number of this information must appear in RawFTSWFormat*.h. Information should be placed in one place but I need to put this number in RawFTSW.h because it is used to distinguish different version numbers.
       // header size is used to distinguish different version number for ver. 0, 1, and 2

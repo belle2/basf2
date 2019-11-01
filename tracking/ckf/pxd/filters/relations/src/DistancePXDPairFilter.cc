@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/pxd/filters/relations/DistancePXDPairFilter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 

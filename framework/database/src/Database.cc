@@ -23,8 +23,6 @@
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/utilities/EnvironmentVariables.h>
 #include <framework/database/LocalDatabase.h>
 #include <framework/database/ConditionsDatabase.h>
 #include <framework/database/DatabaseChain.h>
@@ -37,10 +35,7 @@
 #include <framework/database/CentralMetadataProvider.h>
 #include <framework/database/Configuration.h>
 
-#include <TFile.h>
-
 #include <cstdlib>
-#include <iomanip>
 
 namespace Belle2 {
 
@@ -54,11 +49,13 @@ namespace Belle2 {
 
   void Database::reset(bool keepConfig)
   {
+    auto& conf = Conditions::Configuration::getInstance();
+    conf.setInitialized(false);
     DBStore::Instance().reset(true);
     Instance().m_metadataProvider.reset();
     Instance().m_payloadCreation.reset();
     if (not keepConfig)
-      Conditions::Configuration::getInstance().reset();
+      conf.reset();
   }
 
   ScopeGuard Database::createScopedUpdateSession()
@@ -198,6 +195,7 @@ namespace Belle2 {
   void Database::initialize()
   {
     auto conf = Conditions::Configuration::getInstance();
+    conf.setInitialized(true);
     m_globalTags = conf.getFinalListOfTags();
     m_usableTagStates = conf.getUsableTagStates();
     m_metadataConfigurations = conf.getMetadataProviders();

@@ -10,8 +10,11 @@
 
 #pragma once
 
-#include <TObject.h>
+/* Belle 2 headers. */
 #include <framework/gearbox/GearDir.h>
+
+/* ROOT headers. */
+#include <TObject.h>
 
 namespace Belle2 {
 

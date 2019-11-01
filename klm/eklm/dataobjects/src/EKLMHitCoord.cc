@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/eklm/dataobjects/EKLMHitCoord.h>
 
 using namespace Belle2;

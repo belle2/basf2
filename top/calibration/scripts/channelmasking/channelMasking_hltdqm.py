@@ -101,11 +101,11 @@ def makeChannelMasks(file, outFileName):
     return masked
 
 
-experiment = 8
+experiment = 10
 experimentstring = "{:04d}".format(experiment)
 outdir = 'masks'
-if not os.path.exists('outdir'):
-    os.makedirs('outdir')
+if not os.path.exists(outdir):
+    os.makedirs(outdir)
 fileNames = sorted(glob.glob('/group/belle2/phase3/dqm/dqmsrv1/e'+experimentstring+'/dqmhisto/hltdqm*.root'))
 
 logging.basicConfig(level=logging.INFO, filename="channelmasking.log")

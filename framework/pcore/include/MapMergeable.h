@@ -11,8 +11,6 @@
 
 #include <framework/pcore/Mergeable.h>
 
-#include <map>
-
 namespace Belle2 {
   /** Wrap an STL map to make it mergeable.
    *

@@ -8,25 +8,32 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/simulation/SensitiveDetector.h>
-#include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/bklm/geometry/Module.h>
+
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dataobjects/BKLMSimHit.h>
 #include <klm/bklm/dataobjects/BKLMSimHitPosition.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/bklm/geometry/Module.h>
 
+/* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include "CLHEP/Vector/ThreeVector.h"
-#include "CLHEP/Units/SystemOfUnits.h"
+/* Geant4 headers. */
+#include <G4Step.hh>
+#include <G4VProcess.hh>
 
-#include "TRandom3.h"
+/* CLHEP headers. */
+#include <CLHEP/Units/SystemOfUnits.h>
+#include <CLHEP/Vector/ThreeVector.h>
 
-#include "G4Step.hh"
-#include "G4VProcess.hh"
+/* ROOT headers. */
+#include <TRandom3.h>
 
 #define DEPTH_SECTION 2
 #define DEPTH_SECTOR 3
@@ -115,8 +122,7 @@ namespace Belle2 {
         int sector = hist->GetCopyNumber(depth - DEPTH_SECTOR);
         int section = hist->GetCopyNumber(depth - DEPTH_SECTION);
         int moduleID =
-          int(BKLMElementNumbers::moduleNumber(section, sector, layer))
-          | BKLM_MC_MASK;
+          int(BKLMElementNumbers::moduleNumber(section, sector, layer));
         double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
         if (time > m_HitTimeMax)
           return false;
@@ -129,21 +135,27 @@ namespace Belle2 {
         }
         int trackID = track->GetTrackID();
         if (m->hasRPCs()) {
-          moduleID |= BKLM_INRPC_MASK;
           int phiStripLower = -1;
           int phiStripUpper = -1;
           int zStripLower = -1;
           int zStripUpper = -1;
           convertHitToRPCStrips(localPosition, m, phiStripLower, phiStripUpper, zStripLower, zStripUpper);
           if (zStripLower > 0) {
-            int moduleIDZ = moduleID | ((zStripLower - 1) << BKLM_STRIP_BIT) | ((zStripUpper - 1) << BKLM_MAXSTRIP_BIT);
+            int moduleIDZ = moduleID;
+            BKLMElementNumbers::setPlaneInModule(
+              moduleIDZ, BKLMElementNumbers::c_ZPlane);
+            BKLMElementNumbers::setStripInModule(moduleIDZ, zStripLower);
+            BKLMStatus::setMaximalStrip(moduleIDZ, zStripUpper);
             BKLMSimHit* simHit = simHits.appendNew(moduleIDZ, propagationTimes.z(), time, eDep);
             particleToSimHits.add(trackID, simHits.getEntries() - 1);
             BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
             simHitPosition->addRelationTo(simHit);
           }
           if (phiStripLower > 0) {
-            moduleID |= ((phiStripLower - 1) << BKLM_STRIP_BIT) | ((phiStripUpper - 1) << BKLM_MAXSTRIP_BIT) | BKLM_PLANE_MASK;
+            BKLMElementNumbers::setPlaneInModule(
+              moduleID, BKLMElementNumbers::c_PhiPlane);
+            BKLMElementNumbers::setStripInModule(moduleID, phiStripLower);
+            BKLMStatus::setMaximalStrip(moduleID, phiStripUpper);
             BKLMSimHit* simHit = simHits.appendNew(moduleID, propagationTimes.y(), time, eDep);
             particleToSimHits.add(trackID, simHits.getEntries() - 1);
             BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
@@ -151,11 +163,17 @@ namespace Belle2 {
           }
         } else {
           int scint = hist->GetCopyNumber(depth - DEPTH_SCINT);
-          moduleID |= ((scint - 1) << BKLM_STRIP_BIT) | ((scint - 1) << BKLM_MAXSTRIP_BIT);
-          double propTime = propagationTimes.z();
+          BKLMElementNumbers::setStripInModule(moduleID, scint);
+          BKLMStatus::setMaximalStrip(moduleID, scint);
+          double propTime;
           if (plane == BKLM_INNER) {
-            moduleID |= BKLM_PLANE_MASK;
+            BKLMElementNumbers::setPlaneInModule(
+              moduleID, BKLMElementNumbers::c_PhiPlane);
             propTime = propagationTimes.y();
+          } else {
+            BKLMElementNumbers::setPlaneInModule(
+              moduleID, BKLMElementNumbers::c_ZPlane);
+            propTime = propagationTimes.z();
           }
           BKLMSimHit* simHit = simHits.appendNew(moduleID, propTime, time, eDep);
           particleToSimHits.add(trackID, simHits.getEntries() - 1);

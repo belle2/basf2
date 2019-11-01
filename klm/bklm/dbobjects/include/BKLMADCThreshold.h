@@ -10,6 +10,7 @@
 
 #pragma once
 
+/* ROOT headers. */
 #include <TObject.h>
 
 namespace Belle2 {

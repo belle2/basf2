@@ -10,12 +10,12 @@
 
 #pragma once
 
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
-#include <simulation/dataobjects/SimHitBase.h>
 
-//#define BKLM_INNER 1
-//#define BKLM_OUTER 2
+/* Belle 2 headers. */
+#include <simulation/dataobjects/SimHitBase.h>
 
 namespace Belle2 {
 
@@ -46,39 +46,67 @@ namespace Belle2 {
 
     //! Determine whether this hit is in an RPC or scintillator
     //! @return whether this hit is in an RPC (true) or scintillator (false)
-    bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
+    bool inRPC() const
+    {
+      return getLayer() >= BKLMElementNumbers::c_FirstRPCLayer;
+    }
 
     //! Get section number
     //! @return section number (1=forward or 0=backward) of this hit
-    int getSection() const { return ((m_ModuleID & BKLM_END_MASK) >> BKLM_END_BIT); }
+    int getSection() const
+    {
+      return BKLMElementNumbers::getSectionByModule(m_ModuleID);
+    }
 
     //! Get sector number
     //! @return sector number of this hit
-    int getSector() const { return (((m_ModuleID & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1); }
+    int getSector() const
+    {
+      return BKLMElementNumbers::getSectorByModule(m_ModuleID);
+    }
 
     //! Get layer number
     //! @return layer number of this hit
-    int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
+    int getLayer() const
+    {
+      return BKLMElementNumbers::getLayerByModule(m_ModuleID);
+    }
 
     //! Get plane number.
     //! @return Plane number (0=z, 1=phi).
-    bool getPlane() const { return BKLMElementNumbers::getPlaneByModule(m_ModuleID);}
+    bool getPlane() const
+    {
+      return BKLMElementNumbers::getPlaneByModule(m_ModuleID);
+    }
 
     //! Get readout coordinate
     //! @return readout coordinate (TRUE=phi, FALSE=z) of this hit
-    bool isPhiReadout() const { return ((m_ModuleID & BKLM_PLANE_MASK) != 0); }
+    bool isPhiReadout() const
+    {
+      return BKLMElementNumbers::getPlaneByModule(m_ModuleID) ==
+             BKLMElementNumbers::c_PhiPlane;
+    }
 
     //! Get strip number of this hit
     //! @return readout strip number of this hit (assuming one strip per hit)
-    int getStrip() const { return BKLMElementNumbers::getStripByModule(m_ModuleID); }
+    int getStrip() const
+    {
+      return BKLMElementNumbers::getStripByModule(m_ModuleID);
+    }
 
     //! Get lowest readout strip number of a contiguous set
     //! @return lowest readout strip number of this hit (assuming a contiguous set of RPC strips)
-    int getStripMin() const { return BKLMElementNumbers::getStripByModule(m_ModuleID); }
+    int getStripMin() const
+    {
+      return BKLMElementNumbers::getStripByModule(m_ModuleID);
+    }
 
     //! Get highest readout strip number of a contiguous set
     //! @return highest readout strip number of this hit (assuming a contiguous set of RPC strips)
-    int getStripMax() const { return (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1); }
+    int getStripMax() const
+    {
+      return BKLMStatus::getMaximalStrip(m_ModuleID);
+    }
 
     //! Get detector-module identifier
     //! @return detector-module identifier

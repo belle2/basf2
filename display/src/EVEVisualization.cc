@@ -22,6 +22,7 @@
 #include <display/VisualRepMap.h>
 #include <display/EveGeometry.h>
 #include <display/EveVisBField.h>
+#include <display/ObjectInfo.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <klm/bklm/dataobjects/BKLMSimHitPosition.h>
@@ -31,6 +32,7 @@
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <arich/dbobjects/ARICHGeometryConfig.h>
+#include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <top/geometry/TOPGeometryPar.h>
 
@@ -64,7 +66,6 @@
 #include <TEveTrackPropagator.h>
 #include <TGeoEltu.h>
 #include <TGeoMatrix.h>
-#include <TGeoNode.h>
 #include <TGeoManager.h>
 #include <TGeoSphere.h>
 #include <TGeoTube.h>

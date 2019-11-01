@@ -140,7 +140,7 @@ namespace Belle2 {
         if (count[i] >= 0 && count[i] < 9) {
           res += std_logic_literal[(int) count[i]];
         } else {
-          B2WARNING("invalid signal detected: " << static_cast<int>(count[i]));
+          B2DEBUG(20, "invalid signal detected: " << static_cast<int>(count[i]));
           res += "?";
         }
       }
@@ -156,7 +156,7 @@ namespace Belle2 {
         if (bit >= 0 && bit < 9) {
           res += std_logic_literal[(int) bit];
         } else {
-          B2WARNING("invalid signal detected: " << static_cast<int>(bit));
+          B2DEBUG(20, "invalid signal detected: " << static_cast<int>(bit));
           res += "0";
         }
       }
@@ -170,8 +170,8 @@ namespace Belle2 {
       oldState.copyfmt(std::cout);
       if (std::any_of(signal.begin(), signal.end(), [](char i)
       {return i != zero_val && i != one_val;})) {
-        B2WARNING("Some bit in the signal vector is neither 0 nor 1. \n" <<
-                  "Displaying binary values instead.");
+        B2DEBUG(20, "Some bit in the signal vector is neither 0 nor 1. \n" <<
+                "Displaying binary values instead.");
         std::cout << slv_to_bin_string(signal) << std::endl;
       } else {
         std::string binString = slv_to_bin_string(signal, true);
@@ -525,7 +525,7 @@ namespace Belle2 {
               noMoreHit = true;
               continue;
             } else if (noMoreHit) {
-              B2WARNING("Discontinuous TS hit detected!");
+              B2DEBUG(20, "Discontinuous TS hit detected!");
             }
             unsigned iTS = TSIDInSL(ts[0], 2 * iAx, iTracker);
             // Make TS hit object

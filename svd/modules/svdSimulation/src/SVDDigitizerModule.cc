@@ -76,7 +76,7 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   addParam("TrueHits", m_storeTrueHitsName, "TrueHit collection name",
            string(""));
   addParam("ShaperDigits", m_storeShaperDigitsName, "ShaperDigits collection name", string(""));
-  addParam("SVDEventInfo", m_svdEventInfoName, "SVDEventInfo name", string(""));
+  addParam("SVDEventInfo", m_svdEventInfoName, "SVDEventInfo name", string("SVDEventInfoSim"));
 
   // 2. Physics
   addParam("SegmentLength", m_segmentLength,

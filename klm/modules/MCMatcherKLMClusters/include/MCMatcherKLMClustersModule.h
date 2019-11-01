@@ -10,7 +10,7 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/KLMCluster.h>

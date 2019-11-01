@@ -14,6 +14,7 @@
 #include <tracking/eventTimeExtraction/utilities/TimeExtractionUtils.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
   template <class AFindlet>

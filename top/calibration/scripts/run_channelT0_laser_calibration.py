@@ -23,12 +23,13 @@ from basf2 import B2ERROR
 
 # ----- those parameters need to be adjusted before running -----------------------
 #
-globalTag = 'data_reprocessing_prompt_rel4_patch'
+globalTag = 'data_reprocessing_prompt_rel4_patchb'
 data_dir = '/ghi/fs01/belle2/bdata/group/detector/TOP/2019-*/data_sroot_global/'
 main_output_dir = 'top_calibration'
 look_back = 28  # look-back window setting (set to 0 if look-back setting available in DB)
 tts_file = '/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrizations.root'
 laser_mc_fit = '/group/belle2/group/detector/TOP/calibration/MCreferences/laserMCFit.root'
+fit_mode = 'calibration'  # can be either monitoring, MC or calibration
 #
 # ---------------------------------------------------------------------------------------
 
@@ -93,6 +94,7 @@ def BS13d_calibration():
 
     #   algorithm
     algorithm = TOP.TOPAsicShiftsBS13dAlgorithm()
+    algorithm.setWindowSize(0)
 
     #   define calibration
     cal = Calibration(name='TOP_BS13dCalibration', collector=collector,
@@ -134,10 +136,11 @@ def channelT0_calibration():
     collector.param('storeMCTruth', False)
     collector.param('refChannel', 0)  # Do not change this unless this channel is bad
     collector.param('refSlot', 4)  # Do not change this unless this slot is bad
+    # collector.param('pulserDeltaT', 37.5)  # In some runs taken in fall 2019 the delay has been increased
 
     #    algorithm
     algorithm = TOP.TOPLocalCalFitter()
-    algorithm.setMonitoringFit(False)
+    algorithm.setFitMode(fitMode)
     algorithm.setTTSFileName(tts_file)
     algorithm.setFitConstraintsFileName(laser_mc_fit)
 

@@ -17,7 +17,6 @@ namespace TreeFitter {
     int sizeState
   ) :
     m_constrDim(sizeRes),
-    m_stateDim(sizeState),
     m_chisq(1e10),
     m_res(sizeRes),
     m_G(sizeRes, sizeState),

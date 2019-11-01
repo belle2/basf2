@@ -10,13 +10,18 @@
 
 #pragma once
 
-#include <list>
-#include "CLHEP/Matrix/Vector.h"
-#include "CLHEP/Matrix/Matrix.h"
-#include "CLHEP/Matrix/SymMatrix.h"
-#include "CLHEP/Matrix/DiagMatrix.h"
+/* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
-#include "klm/bklm/dataobjects/BKLMHit2d.h"
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+
+/* CLHEP headers. */
+#include <CLHEP/Matrix/DiagMatrix.h>
+#include <CLHEP/Matrix/Matrix.h>
+#include <CLHEP/Matrix/SymMatrix.h>
+#include <CLHEP/Matrix/Vector.h>
+
+/* C++ headers. */
+#include <list>
 
 namespace Belle2 {
 

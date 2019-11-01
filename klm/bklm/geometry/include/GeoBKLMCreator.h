@@ -10,13 +10,16 @@
 
 #pragma once
 
-#include <geometry/CreatorBase.h>
-#include <klm/bklm/geometry/GeometryPar.h>
+/* KLM headers. */
 #include <klm/bklm/dbobjects/BKLMGeometryPar.h>
-#include <framework/logging/Logger.h>
-#include <framework/database/DBObjPtr.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+
+/* Belle 2 headers. */
 #include <framework/database/DBImportObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
+#include <framework/logging/Logger.h>
+#include <geometry/CreatorBase.h>
 
 class G4VSolid;
 class G4Box;
@@ -188,25 +191,25 @@ namespace Belle2 {
       G4LogicalVolume* m_BracketLogical;
 
       //! Pointers to solids for iron in each layer [layer-1]
-      G4Polyhedra* m_LayerIronSolid[NLAYER];
+      G4Polyhedra* m_LayerIronSolid[BKLMElementNumbers::getMaximalLayerNumber()];
 
       //! Pointers to logical volumes for iron in each layer [side/bottom/top | isFlipped | hasChimney | layer-1]
-      G4LogicalVolume* m_LayerIronLogical[12 * NLAYER];
+      G4LogicalVolume* m_LayerIronLogical[12 * BKLMElementNumbers::getMaximalLayerNumber()];
 
       //! Pointers to solids for air gap in each layer [hasChimney | layer-1]
-      G4Box* m_LayerGapSolid[2 * NLAYER];
+      G4Box* m_LayerGapSolid[2 * BKLMElementNumbers::getMaximalLayerNumber()];
 
       //! Pointers to logical volumes for air gap in each layer [side/bottom/top | isFlipped | hasChimney | layer-1]
-      G4LogicalVolume* m_LayerGapLogical[12 * NLAYER];
+      G4LogicalVolume* m_LayerGapLogical[12 * BKLMElementNumbers::getMaximalLayerNumber()];
 
       //! Pointers to logical volumes for detector modules in each layer's air gap [hasChimney | layer-1]
-      G4LogicalVolume* m_LayerModuleLogical[2 * NLAYER];
+      G4LogicalVolume* m_LayerModuleLogical[2 * BKLMElementNumbers::getMaximalLayerNumber()];
 
       //! Pointer to solid for sector's enclosing tube
       G4Tubs* m_SectorTube;
 
       //! Pointers to logical volumes for each sector [fb-1][sector-1]
-      G4LogicalVolume* m_SectorLogical[2][NSECTOR];
+      G4LogicalVolume* m_SectorLogical[2][BKLMElementNumbers::getMaximalSectorNumber()];
 
       //! Pointer to logical volume for MPPC housing
       G4LogicalVolume* m_MPPCHousingLogical;

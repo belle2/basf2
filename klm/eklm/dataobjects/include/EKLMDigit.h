@@ -10,11 +10,13 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/eklm/dataobjects/EKLMHitBase.h>
 #include <klm/eklm/dataobjects/EKLMHitMCTime.h>
 #include <klm/eklm/dataobjects/EKLMSimHit.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+
+/* Belle 2 headers. */
 #include <framework/dataobjects/DigitBase.h>
 
 namespace Belle2 {

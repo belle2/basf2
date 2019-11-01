@@ -134,8 +134,8 @@ The (external) `RAVE <https://github.com/rave-package>`_ vertex fitter is not ma
 Its use in analysis is therefore deprecated.
 We do not expect to *remove* it, but *do not recommend* its use for any real physics analyses other than benchmarking or legacy studies.
 
-Instead we recommend you use either KFitter (`vertex.vertexKFit`, and similar functions) for fast/simple fits, or `TreeFitter` (`vertex.vertexTree`) for more complex fits and fitting the full decay chain.
-Please check the `TreeFitter` pages for details about the constraints available.
+Instead we recommend you use either KFitter (`vertex.vertexKFit`, and similar functions) for fast/simple fits, or TreeFitter (`vertex.vertexTree`) for more complex fits and fitting the full decay chain.
+Please check the :ref:`TreeFitter` pages for details about the constraints available.
 If you are unable to use TreeFitter because of missing functionality, please `submit a feature request <https://agira.desy.de/projects/BII>`_!
 
 .. warning:: The default fitter for `vertex.fitVertex` has been changed to KFitter.
@@ -166,7 +166,7 @@ Once DecayStringGrammar is used with `reconstructDecay`, users can use `isSignal
 If one doesn't use any new DecayStringGrammar, all MCTruthVariables work same as before.
 
 The grammar is useful to analyze inclusive processes with both fully-inclusive-method and sum-of-exclusive-method.
-There are also new helper functions `genNMissingDaughter(PDG)` and `genNStepsToDaughter(i)` to obtain the detailed MC information.
+There are also new helper functions `genNMissingDaughter` and `genNStepsToDaughter` to obtain the detailed MC information.
 
 You can find examples of usage in :ref:`Marker_of_unspecified_particle`, :ref:`Grammar_for_custom_MCMatching`.
 

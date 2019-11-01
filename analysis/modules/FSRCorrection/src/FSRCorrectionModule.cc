@@ -21,8 +21,12 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
+
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
+
+// variables
+#include <analysis/variables/ECLVariables.h>
 
 #include <cmath>
 #include <algorithm>
@@ -63,6 +67,11 @@ namespace Belle2 {
 
   void FSRCorrectionModule::initialize()
   {
+    // module is deprecated
+    B2WARNING("The module FSRCorrection is deprecated.\n"
+              "Please switch to one of the new (and better) modules BremsFinder or BelleBremRecovery.\n"
+              "Soon, this module will be removed.");
+
     // check the validity of output ParticleList name
     bool valid = m_decaydescriptor.init(m_outputListName);
     if (!valid)
@@ -200,6 +209,7 @@ namespace Belle2 {
       correctedLepton.setPValue(lepton->getPValue());
 
       correctedLepton.addExtraInfo("fsrCorrected", float(fsrGammaFound));
+      if (fsrGammaFound) correctedLepton.addExtraInfo("bremsCorrectedPhotonEnergy", Variable::eclClusterE(fsrGamma));
 
       // add the mc relation
       Particle* newLepton = particles.appendNew(correctedLepton);

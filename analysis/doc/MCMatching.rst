@@ -10,7 +10,7 @@ First, you must run it
 MCMatching relates ``Particle`` and ``MCParticle`` objects. 
 
 .. important:: 
-        Most MC matching variables will have non-trivial values only if the :b2:mod:`MCMatching` module is actually executed.
+        Most MC matching variables will have non-trivial values only if the :b2:mod:`MCMatcherParticles` module is actually executed.
         It can be executed by adding the module to your path, there is a `modularAnalysis.matchMCTruth` convenience function to do this.
 
 
@@ -49,33 +49,35 @@ The error flags
 
 The error flag :b2:var:`mcErrors` is a bit set where each bit flag describes
  a different kind of discrepancy between reconstruction and ``MCParticle``. 
- The individual flags are described by the `MCMatching::MCErrorFlags` enum. 
+ The individual flags are described by the ``MCMatching::MCErrorFlags`` enum.
  A value of mcErrors equal to 0 indicates perfect reconstruction (signal). 
  Usually candidates with only FSR photons missing are also considered as signal, 
- so you might want to ignore the corresponding `c_MissFSR` flag. 
- The same is true for `c_MissingResonance`, which is set for any missing composite particle (e.g. :math:`K_1`, but also :math:`D^{*0}`).
+ so you might want to ignore the corresponding ``c_MissFSR`` flag.
+ The same is true for ``c_MissingResonance``, which is set for any missing composite particle (e.g. :math:`K_1`, but also :math:`D^{*0}`).
 
 
 =============================  ================================================================================================
 Flag                           Explanation  
 =============================  ================================================================================================  
- c_Correct       = 0           This Particle and all its daughters are perfectly reconstructed. 
- c_MissFSR       = 1           A Final State Radiation (FSR) photon is not reconstructed (based on MCParticle: :c_IsFSRPhoton). 
- c_MissingResonance = 2        The associated MCParticle decay contained additional non-final-state particles (e.g. a rho)
-                               that weren't reconstructed. This is probably O.K. in most cases. 
- c_DecayInFlight = 4           A Particle was reconstructed from the secondary decay product of the actual particle. 
-                               This means that a wrong hypothesis was used to reconstruct it, which e.g. for tracks might mean
-                               a pion hypothesis was used for a secondary electron. 
- c_MissNeutrino  = 8           A neutrino is missing (not reconstructed). 
- c_MissGamma     = 16          A photon (not FSR) is missing (not reconstructed). 
- c_MissMassiveParticle = 32    A generated massive FSP is missing (not reconstructed). 
- c_MissKlong     = 64          A Klong is missing (not reconstructed).  
- c_MisID = 128                 One of the charged final state particles is mis-identified (wrong signed PDG code).
- c_AddedWrongParticle = 256    A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters)
-                               belongs to another Particle. 
- c_InternalError = 512         There was an error in MC matching. Not a valid match. Might indicate fake/background 
-                               track or cluster. 
- c_MissPHOTOS    = 1024        A photon created by PHOTOS was not reconstructed (based on MCParticle: :c_IsPHOTOSPhoton). 
+ c_Correct       = 0             This Particle and all its daughters are perfectly reconstructed. 
+ c_MissFSR       = 1             A Final State Radiation (FSR) photon is not reconstructed (based on MCParticle: :c_IsFSRPhoton). 
+ c_MissingResonance = 2          The associated MCParticle decay contained additional non-final-state particles (e.g. a rho)
+                                 that weren't reconstructed. This is probably O.K. in most cases. 
+ c_DecayInFlight = 4             A Particle was reconstructed from the secondary decay product of the actual particle. 
+                                 This means that a wrong hypothesis was used to reconstruct it, which e.g. for tracks might mean
+                                 a pion hypothesis was used for a secondary electron. 
+ c_MissNeutrino  = 8             A neutrino is missing (not reconstructed). 
+ c_MissGamma     = 16            A photon (not FSR) is missing (not reconstructed). 
+ c_MissMassiveParticle = 32      A generated massive FSP is missing (not reconstructed). 
+ c_MissKlong     = 64            A Klong is missing (not reconstructed).  
+ c_MisID = 128                   One of the charged final state particles is mis-identified (wrong signed PDG code).
+ c_AddedWrongParticle = 256      A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters)
+                                 belongs to another Particle. 
+ c_InternalError = 512           There was an error in MC matching. Not a valid match. Might indicate fake/background 
+                                 track or cluster. 
+ c_MissPHOTOS    = 1024          A photon created by PHOTOS was not reconstructed (based on MCParticle: :c_IsPHOTOSPhoton). 
+ c_AddedRecoBremsPhoton = 2048   A photon added with the bremsstrahlung recovery tools (correctBrems or correctBremsBelle) has 
+                                 no MC particle assigned, or it doesn't belong to the decay chain of the corrected lepton mother
 =============================  ================================================================================================
 
 
@@ -144,16 +146,14 @@ Steering file snippet
   
   # Modules to generate events, etc.
   ...
-  
-  mcfinder = register_module('MCDecayFinder')
+
+  import modularAnalysis as ma
   # Search for B+ decaying to anti-D0 + anything, where the anti-D0 decays to K+ pi-.
   # Ignore additional photons emitted in the anti-D0 decay. Charge conjugated decays
-  # are matched, too. If there is a match found, save to ParticleList 'testB'
-  mcfinder.param('strDecayString', 'B+ -> [anti-D0 => K+ pi-] ...')
-  mcfinder.param('strListName', 'testB')
-  main.add_module(mcfinder)
+  # are matched, too. If there is a match found, save to ParticleList 'B+:testB'
+  ma.findMCDecay('B+:testB', 'B+ =direct=> [anti-D0 =direct=> K+ pi-] ... ?gamma ?nu', path=main)  
   
-  # Modules which can use the matched decays saved as Particle in the ParticleList 'testB'
+  # Modules which can use the matched decays saved as Particle in the ParticleList 'B+:testB'
   ...
  
 
@@ -190,7 +190,7 @@ This will produce a file with all of the decay strings in it, along with the dec
 (hashes the decay string of the mother and daughter particles).  
 The mapping of hashes to full MC decay strings is stored in a ROOT file determined by the fileName parameter.
 
-Then the :b2:mod:`decayHash` and :b2:mod:`decayHashExtended` are available in the `VariableManager`.
+Then the variables ``extraInfo(decayHash)`` and ``extraInfo(decayHashExtended)`` are available in the `VariableManager`.
 
 ------------------
 Tau decay MC modes

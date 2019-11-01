@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/svd/filters/relations/SectorMapBasedSVDPairFilter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 

@@ -4,23 +4,26 @@
 *                name                              id      mass/GeV       width/GeV max_Dm/GeV 3*charge 2*spin  lifetime*c/mm   PythiaId
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Quarks
+* Data from M. Tanabashi et al. (Particle Data Group), Phys. Rev. D 98, 030001 (2018) and 2019 update.
 *---------------------------------------------------------------------------------------------------------------------------------------
-add  p Particle  d                                  1  9.9000000e-03  0.0000000e+00  0.0000000e+00    -1     1  0.0000000e+00          1
-add  p Particle  anti-d                            -1  9.9000000e-03  0.0000000e+00  0.0000000e+00     1     1  0.0000000e+00         -1
-add  p Particle  u                                  2  5.6000000e-03  0.0000000e+00  0.0000000e+00     2     1  0.0000000e+00          2
-add  p Particle  anti-u                            -2  5.6000000e-03  0.0000000e+00  0.0000000e+00    -2     1  0.0000000e+00         -2
-add  p Particle  s                                  3  1.9900000e-01  0.0000000e+00  0.0000000e+00    -1     1  0.0000000e+00          3
-add  p Particle  anti-s                            -3  1.9900000e-01  0.0000000e+00  0.0000000e+00     1     1  0.0000000e+00         -3
-add  p Particle  c                                  4  1.3500000e+00  0.0000000e+00  0.0000000e+00     2     1  0.0000000e+00          4
-add  p Particle  anti-c                            -4  1.3500000e+00  0.0000000e+00  0.0000000e+00    -2     1  0.0000000e+00         -4
-add  p Particle  b                                  5  5.0000000e+00  0.0000000e+00  0.0000000e+00    -1     1  0.0000000e+00          5
-add  p Particle  anti-b                            -5  5.0000000e+00  0.0000000e+00  0.0000000e+00     1     1  0.0000000e+00         -5
-add  p Particle  t                                  6  1.7500000e+02  1.3981600e+00  1.3981560e+01     2     1  0.0000000e+00          6
-add  p Particle  anti-t                            -6  1.7500000e+02  1.3981600e+00  1.3981560e+01    -2     1  0.0000000e+00         -6
-add  p Particle  b'                                 7  4.0000000e+02  0.0000000e+00  0.0000000e+00    -1     1  0.0000000e+00          7
-add  p Particle  anti-b'                           -7  4.0000000e+02  0.0000000e+00  0.0000000e+00     1     1  0.0000000e+00         -7
-add  p Particle  t'                                 8  5.0000000e+02  0.0000000e+00  0.0000000e+00     2     1  0.0000000e+00          8
-add  p Particle  anti-t'                           -8  5.0000000e+02  0.0000000e+00  0.0000000e+00    -2     1  0.0000000e+00         -8
+add  p Particle  d                                  1        4.67e-3              0              0    -1     1              0          1
+add  p Particle  anti-d                            -1        4.67e-3              0              0     1     1              0         -1
+add  p Particle  u                                  2        2.16e-3              0              0     2     1              0          2
+add  p Particle  anti-u                            -2        2.16e-3              0              0    -2     1              0         -2
+add  p Particle  s                                  3          93e-3              0              0    -1     1              0          3
+add  p Particle  anti-s                            -3          93e-3              0              0     1     1              0         -3
+add  p Particle  c                                  4           1.27              0              0     2     1              0          4
+add  p Particle  anti-c                            -4           1.27              0              0    -2     1              0         -4
+add  p Particle  b                                  5           4.18              0              0    -1     1              0          5
+add  p Particle  anti-b                            -5           4.18              0              0     1     1              0         -5
+add  p Particle  t                                  6          172.9           1.42           14.2     2     1              0          6
+add  p Particle  anti-t                            -6          172.9           1.42           14.2    -2     1              0         -6
+* The b' mass lower limit is m > 1.53 TeV (95% C. L.) from single production in p anti-p collisions. The mass is set to 2 TeV.
+add  p Particle  b'                                 7            2e3              0              0    -1     1              0          7
+add  p Particle  anti-b'                           -7            2e3              0              0     1     1              0         -7
+* The t' mass lower limit is m > 1.16 TeV (95% C. L.). The mass is set to 3 TeV.
+add  p Particle  t'                                 8            3e3              0              0     2     1              0          8
+add  p Particle  anti-t'                           -8            3e3              0              0    -2     1              0         -8
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Leptons
 *---------------------------------------------------------------------------------------------------------------------------------------

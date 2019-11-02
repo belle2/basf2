@@ -77,20 +77,20 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     data objects and loads them to the StoreArray.
 
     Args:
-    :param str inputBelleMDSTFile: Name of the file(s) to be loaded
-    :param bool applySkim: apply skim conditions in B2BIIFixMdst.
-    :param str useBelleDBServer: None to use the recommended BelleDB server.
-    :param bool generatorLevelReconstruction: Enables to bypass corrections applied in B2BIIFixMdst.
-    :param bool generatorLevelMCMatching: Enables to switch MCTruth matching to generator-level particles.
-    :param basf2.Path path: Path to add modules in.
-    :param list(str) entrySequences: The number sequences (e.g. 23:42,101) defining
+        inputBelleMDSTFile (str): Name of the file(s) to be loaded.
+        applySkim (bool): Apply skim conditions in B2BIIFixMdst.
+        useBelleDBServer (str): None to use the recommended BelleDB server.
+        generatorLevelReconstruction (bool): Enables to bypass corrections applied in B2BIIFixMdst.
+        generatorLevelMCMatching (bool): Enables to switch MCTruth matching to generator-level particles.
+        path (basf2.Path): Path to add modules in.
+        entrySequences (list(str)): The number sequences (e.g. 23:42,101) defining
             the entries which are processed for each inputFileName.
-    :param bool convertECLCrystalEnergies: Enables to convert Datecl_mc_ehits into ECLHits
-    :param bool convertExtHits: Enables to convert Mdst_ecl_trk into ExtHits.
-    :param float matchType2E9oE25Threshold: Clusters with a E9/E25 value above this threshold are classified as neutral
-                 even if tracks are matched to their connected region (matchType == 2 in basf).
-    :param bool HadronA: Enables to switch on HadronA skim in B2BIIFixMdst module.
-    :param bool HadronB: Enables to switch on HadronB skim in B2BIIFixMdst module.
+        convertECLCrystalEnergies (bool): Enables to convert Datecl_mc_ehits into ECLHits
+        convertExtHits (bool): Enables to convert Mdst_ecl_trk into ExtHits.
+        matchType2E9oE25Threshold (float): Clusters with a E9/E25 value above this threshold are classified as neutral
+            even if tracks are matched to their connected region (matchType == 2 in basf).
+        HadronA (bool): Enables to switch on HadronA skim in B2BIIFixMdst module.
+        HadronB (bool): Enables to switch on HadronB skim in B2BIIFixMdst module.
     """
 
     if useBelleDBServer is None:

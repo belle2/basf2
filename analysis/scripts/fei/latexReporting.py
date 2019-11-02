@@ -44,7 +44,7 @@ if __name__ == '__main__':
     o = b2latex.LatexFile()
 
     o += b2latex.TitlePage(title='Full Event Interpretation Report',
-                           authors=['Thomas Keck', 'Christian Pulvermacher'],
+                           authors=['Thomas Keck', 'Christian Pulvermacher', 'William Sutcliffe'],
                            abstract=r"""
                            This report contains key performance indicators and control plots of the Full Event Interpretation.
                            The pre-, and post-cuts as well as trained multivariate selection methods are described.

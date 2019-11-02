@@ -55,3 +55,8 @@ Conditions DB
 +++++++++++++
 
  * In ``ChargedPidMVAWeights`` payload class, added MVA category cut strings in basf2-compliant format.
+
+Full Event Interpretation
++++++++++++++++++++++++++
+
+* Addition of hadronic FEI channels involving baryons. This includes the addition to default channels the following particles: p, Lambda_c+, Sigma+ and Lambda0. Baryonic modes must be switched on when calling particles = fei.get_default_channels(baryonic = True) using a flag (baryonic = True).

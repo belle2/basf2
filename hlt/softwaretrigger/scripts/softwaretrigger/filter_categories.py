@@ -8,6 +8,7 @@ ECL_PHYSICS = [
 # ECL Potentially Prescaled channels
 ECL_PRESCALED = [
     "filter 1 electron Estargt1 GeV clust in 45115 and no other clust Estargt0.3 GeV",
+    "filter 1 electron Estargt1 GeV clust in 32130 and no other clust Estargt0.3 GeV",
     "filter 1 Estargt1 GeV cluster no other cluster Estargt0.3 GeV",
     "filter 1 photon Estargt1 GeV clust not low not 45115 no other clust Estargt0.3 GeV",
     "filter gg2clst",
@@ -38,7 +39,9 @@ CDC_PRESCALED = [
 # Targeted Physics channels
 PHYSICS = [
     "filter 1 photon Estargt1 GeV clust in 45115 and no other clust Estargt0.3 GeV",
-    "filter ggBarrelLoose"
+    "filter 1 photon Estargt1 GeV clust in 32130 and no other clust Estargt0.3 GeV",
+    "filter 1 photon Estargt0.5 GeV clust in 4498 and no other clust Estargt0.3 GeV",
+    "filter ggBarrelLoose",
 ]
 
 # QED channels

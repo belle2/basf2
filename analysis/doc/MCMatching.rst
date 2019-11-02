@@ -146,16 +146,14 @@ Steering file snippet
   
   # Modules to generate events, etc.
   ...
-  
-  mcfinder = register_module('MCDecayFinder')
+
+  import modularAnalysis as ma
   # Search for B+ decaying to anti-D0 + anything, where the anti-D0 decays to K+ pi-.
   # Ignore additional photons emitted in the anti-D0 decay. Charge conjugated decays
-  # are matched, too. If there is a match found, save to ParticleList 'testB'
-  mcfinder.param('strDecayString', 'B+ -> [anti-D0 => K+ pi-] ...')
-  mcfinder.param('strListName', 'testB')
-  main.add_module(mcfinder)
+  # are matched, too. If there is a match found, save to ParticleList 'B+:testB'
+  ma.findMCDecay('B+:testB', 'B+ =direct=> [anti-D0 =direct=> K+ pi-] ... ?gamma ?nu', path=main)  
   
-  # Modules which can use the matched decays saved as Particle in the ParticleList 'testB'
+  # Modules which can use the matched decays saved as Particle in the ParticleList 'B+:testB'
   ...
  
 

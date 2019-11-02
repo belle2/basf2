@@ -8,6 +8,8 @@ Variables
    Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.
    For example ``ROE_deltae`` is now :b2:var:`roeDeltae`.
 
+ * Fixed bug and renamed ``mcFlavorOfOtherB0`` variable to :b2:var:`mcFlavorOfOtherB`, which accepts now neutral and charged B candidates.
+
  * Removed ``clusterCRID`` which duplicates :b2:var:`clusterConnectedRegionID`.
  * Fixed ``goodBelleLambda`` and now it returns ``extraInfo(goodLambda)`` on Belle data.
  * Fixed calculation of :b2:var:`cosHelicityAngleMomentum` for decays with bremscorrected electrons
@@ -19,9 +21,18 @@ Variables
 
   .. note:: This is not the generator-level match (see :issue:`BII-5741`) but simply ignores photons added by the :b2:mod:`BremsFinder`.
 
+ * Allow use of meta variables in creation of aliases by replacing non
+   alphanumeric characters with underscores in the alias name
+
 Modules
 +++++++
 
+ * When merging ParticleLists using the :b2:mod:`ParticleListManipulator`
+   (`modularAnalysis.copyLists`) duplicates (not multiple candidates) are removed
+   on a first-come, first-served basis, i.e. the order of the input particles
+   matters. Now, the new parameter ``variable`` can be provided to determine
+   which duplicate should be preferred. The logic is the same as for the
+   :b2:mod:`BestCandidateSelection` module.
  * The :b2:mod:`ParticleLoader` can create neutron particle lists now. ECL
    cluster with the hadron hypothesis as well as KLM cluster are used as source.
  * In :b2:mod:`TreeFitter` bugfix in mass constraint: chi2 correctly calculated now.
@@ -34,6 +45,7 @@ Modules
  * Deprecated module `FSRCorrection` in favour of `BremsFinder` and `BelleBremRecovery`.
  * In `ChargedPidMVA` module, remove handling of particle list modified by the deprecated `FSRCorrection` module.
  * In `ChargedPidMVA` module, apply MVA category cuts retrieved from the DB payload.
+ * Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`. One can find and create a ``ParticleList`` for all ``MCParticle`` decays matching a given :ref:`DecayString`.
 
  * Added a :b2:mod:`BremsFinder` to unpack the bremsstrahlung relations provided by tracking.
 

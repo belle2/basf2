@@ -1743,7 +1743,7 @@ def findMCDecay(
     path=None,
 ):
     """
-    Finds and creates a `ParticleList`_ for all `MCParticle`_ decays matching a given :ref:`DecayString`.
+    Finds and creates a ``ParticleList`` for all ``MCParticle`` decays matching a given :ref:`DecayString`.
     The decay string is required to describe correctly what you want.
     In the case of inclusive decays, you can use :ref:`Grammar_for_custom_MCMatching`
 

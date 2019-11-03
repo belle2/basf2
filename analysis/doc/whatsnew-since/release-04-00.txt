@@ -8,10 +8,11 @@ Variables
    Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.
    For example ``ROE_deltae`` is now :b2:var:`roeDeltae`.
 
- * Fixed bug and renamed :b2:var:``mcFlavorOfOtherB0`` variable to :b2:var:`mcFlavorOfOtherB`, which accepts now neutral and charged B candidates.
+ * Fixed bug and renamed ``mcFlavorOfOtherB0`` variable to :b2:var:`mcFlavorOfOtherB`, which accepts now neutral and charged B candidates.
 
  * Removed ``clusterCRID`` which duplicates :b2:var:`clusterConnectedRegionID`.
  * Fixed ``goodBelleLambda`` and now it returns ``extraInfo(goodLambda)`` on Belle data.
+ * Fixed calculation of :b2:var:`cosHelicityAngleMomentum` for decays with bremscorrected electrons
  * Fixed :b2:var:`clusterEoP` for particles with Bremsstrahlung correction by adding the energy of the added photon(s)
 
   .. note:: All variables will return a quietNaN instead of -999 or other out-of-the-sky numbers in case of errors
@@ -54,7 +55,8 @@ Conditions DB
 +++++++++++++
 
  * In ``ChargedPidMVAWeights`` payload class, added MVA category cut strings in basf2-compliant format.
+
 Full Event Interpretation
-+++++++++++++
++++++++++++++++++++++++++
 
 * Addition of hadronic FEI channels involving baryons. This includes the addition to default channels the following particles: p, Lambda_c+, Sigma+ and Lambda0. Baryonic modes must be switched on when calling particles = fei.get_default_channels(baryonic = True) using a flag (baryonic = True).

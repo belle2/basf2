@@ -57,7 +57,7 @@ The error flag :b2:var:`mcErrors` is a bit set where each bit flag describes
 
 
 ==============================  ================================================================================================
-Flag                            Explanation  
+Flag                            Explanation
 ==============================  ================================================================================================
  c_Correct       = 0             This Particle and all its daughters are perfectly reconstructed. 
  c_MissFSR       = 1             A Final State Radiation (FSR) photon is not reconstructed (based on MCParticle: :c_IsFSRPhoton). 

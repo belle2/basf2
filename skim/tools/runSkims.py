@@ -1,4 +1,8 @@
+from pathlib import Path
 import subprocess
+from tempfile import TemporaryNamedFile
+
+from basf2 import find_file
 from skimExpertFunctions import get_test_file
 
 all_skims = [
@@ -16,7 +20,7 @@ all_skims = [
     'SystematicsLambda', 'Systematics', 'SystematicsTracking', 'Resonance',
     'TauThrust', 'TauLFV', 'TCPV', 'TauGeneric',
     'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0', 'feiSLBplus'
-      ]
+]
 
 
 MCTypes = ['mixedBGx1', 'chargedBGx1', 'ccbarBGx1', 'ssbarBGx1',
@@ -29,11 +33,15 @@ MCCampaign = 'MC12'
 for skim in all_skims:
     for MCType in MCTypes:
         input_file = get_test_file(MCType, MCCampaign)
-        script = f'../standalone/{skim}_Skim_Standalone.py'
-        log_file = f'{skim}_{MCCampaign}_{MCType}.out'
-        err_file = f'{skim}_{MCCampaign}_{MCType}.err'
-        output_file = f'{skim}_{MCCampaign}_{MCType}.udst.root'
+        script = find_file(f'skim/standalone/{skim}_Skim_Standalone.py')
+
+        Path('log').mkdir(parents=True, exist_ok=True)
+        log_file = f'log/{skim}_{MCCampaign}_{MCType}.out'
+        err_file = f'log/{skim}_{MCCampaign}_{MCType}.err'
+        output_file = TemporaryNamedFile().name
 
         print(f'Running {script} on {input_file} (MC type {MCCampaign}_{MCType}) to {output_file}')
         subprocess.run(['bsub', '-q', 'l', '-oo', log_file, '-e', err_file, 'basf2', script,
+                        '--job-information', f'JobInformation_{skim}_{MCCampaign}_{MCType}.json',
+                        '-n', '10000',
                         '-o', output_file, '-i', input_file])

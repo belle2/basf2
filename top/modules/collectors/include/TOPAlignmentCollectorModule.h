@@ -53,6 +53,10 @@ namespace Belle2 {
      */
     virtual void collect() final;
 
+    /** Enumerator for sizes */
+    enum {c_numSets = 2,  /**< number of statistically independent subsamples */
+         };
+
     // steering parameters
     double m_minBkgPerBar; /**< minimal assumed background photons per module */
     double m_scaleN0; /**< scale factor for figure-of-merit N0 */
@@ -74,8 +78,8 @@ namespace Belle2 {
 
     // alignment procedure
     TOP::TrackSelector m_selector; /**< track selection utility */
-    TOP::TOPalign m_align;     /**< alignment object */
-    int m_countFails = 0;      /**< counter for failed iterations */
+    std::vector<TOP::TOPalign> m_align;  /**< alignment objects */
+    std::vector<int> m_countFails;      /**< counters for failed iterations */
 
     // collections
     StoreArray<TOPDigit> m_digits; /**< collection of digits */
@@ -84,6 +88,7 @@ namespace Belle2 {
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
 
     // tree variables
+    std::vector<std::string> m_treeNames; /**< tree names */
     int m_iter = 0;  /**< iteration counter */
     int m_ntrk = 0;  /**< number of tracks used */
     int m_errorCode = 0;  /**< error code of the alignment procedure */

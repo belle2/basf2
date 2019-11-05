@@ -20,6 +20,8 @@
 
 // root
 #include <TTree.h>
+#include <TH2F.h>
+#include <TRandom.h>
 
 using namespace std;
 
@@ -70,7 +72,8 @@ namespace Belle2 {
              "[number of emission points along track, number of Cerenkov angles]. "
              "No grid used if list is empty.", m_gridSize);
     std::string names;
-    for (const auto& parName : m_align.getParameterNames()) names += parName + ", ";
+    auto align = TOPalign();
+    for (const auto& parName : align.getParameterNames()) names += parName + ", ";
     names.pop_back();
     names.pop_back();
     addParam("parInit", m_parInit,
@@ -110,47 +113,63 @@ namespace Belle2 {
       B2ERROR("Invalid sample type '" << m_sample << "'");
     }
 
-    // set alignment object
+    // set alignment objects
 
-    m_align.setModuleID(m_targetMid);
-    m_align.setSteps(m_stepPosition, m_stepAngle, m_stepTime, m_stepRefind);
-    if (m_gridSize.size() == 2) {
-      m_align.setGrid(m_gridSize[0], m_gridSize[1]);
-      B2INFO("TOPAligner: grid for time-of-propagation averaging is set");
-    }
-    m_align.setParameters(m_parInit);
-    for (const auto& parName : m_parFixed) {
-      m_align.fixParameter(parName);
+    for (int set = 0; set < c_numSets; set++) {
+      auto align = TOPalign();
+      align.setModuleID(m_targetMid);
+      align.setSteps(m_stepPosition, m_stepAngle, m_stepTime, m_stepRefind);
+      if (m_gridSize.size() == 2) {
+        align.setGrid(m_gridSize[0], m_gridSize[1]);
+        B2INFO("TOPAligner: grid for time-of-propagation averaging is set");
+      }
+      align.setParameters(m_parInit);
+      for (const auto& parName : m_parFixed) {
+        align.fixParameter(parName);
+      }
+      m_align.push_back(align);
+      m_countFails.push_back(0);
     }
 
     // configure detector in reconstruction code
 
     TOPconfigure config;
 
-    // create and register ntuple
+    // create and register output histograms and ntuples
 
-    auto alignTree = new TTree("alignTree", "TOP alignment results");
-    alignTree->Branch("ModuleId", &m_targetMid);
-    alignTree->Branch("iter", &m_iter);
-    alignTree->Branch("ntrk", &m_ntrk);
-    alignTree->Branch("errorCode", &m_errorCode);
-    alignTree->Branch("iterPars", &m_vAlignPars);
-    alignTree->Branch("iterParsErr", &m_vAlignParsErr);
-    alignTree->Branch("valid", &m_valid);
-    alignTree->Branch("x", &m_x);
-    alignTree->Branch("y", &m_y);
-    alignTree->Branch("z", &m_z);
-    alignTree->Branch("p", &m_p);
-    alignTree->Branch("theta", &m_theta);
-    alignTree->Branch("phi", &m_phi);
-    alignTree->Branch("r_poca", &m_pocaR);
-    alignTree->Branch("z_poca", &m_pocaZ);
-    alignTree->Branch("x_poca", &m_pocaX);
-    alignTree->Branch("y_poca", &m_pocaY);
-    alignTree->Branch("Ecms", &m_cmsE);
-    alignTree->Branch("charge", &m_charge);
-    alignTree->Branch("PDG", &m_PDG);
-    registerObject<TTree>("alignTree", alignTree);
+    int numModules = geo->getNumModules();
+    auto h = new TH2F("tracks_per_slot", "tracks per slot and sample",
+                      numModules, 0.5, numModules + 0.5, c_numSets, 0, c_numSets);
+    h->SetXTitle("slot number");
+    h->SetYTitle("sample number");
+    registerObject<TH2F>("tracks_per_slot", h);
+
+    for (int set = 0; set < c_numSets; set++) {
+      std::string name = "alignTree" + to_string(set);
+      m_treeNames.push_back(name);
+      auto alignTree = new TTree(name.c_str(), "TOP alignment results");
+      alignTree->Branch("ModuleId", &m_targetMid);
+      alignTree->Branch("iter", &m_iter);
+      alignTree->Branch("ntrk", &m_ntrk);
+      alignTree->Branch("errorCode", &m_errorCode);
+      alignTree->Branch("iterPars", &m_vAlignPars);
+      alignTree->Branch("iterParsErr", &m_vAlignParsErr);
+      alignTree->Branch("valid", &m_valid);
+      alignTree->Branch("x", &m_x);
+      alignTree->Branch("y", &m_y);
+      alignTree->Branch("z", &m_z);
+      alignTree->Branch("p", &m_p);
+      alignTree->Branch("theta", &m_theta);
+      alignTree->Branch("phi", &m_phi);
+      alignTree->Branch("r_poca", &m_pocaR);
+      alignTree->Branch("z_poca", &m_pocaZ);
+      alignTree->Branch("x_poca", &m_pocaX);
+      alignTree->Branch("y_poca", &m_pocaY);
+      alignTree->Branch("Ecms", &m_cmsE);
+      alignTree->Branch("charge", &m_charge);
+      alignTree->Branch("PDG", &m_PDG);
+      registerObject<TTree>(name, alignTree);
+    }
 
   }
 
@@ -188,28 +207,36 @@ namespace Belle2 {
       // track selection
       if (not m_selector.isSelected(trk)) continue;
 
+      // generate sub-sample number
+      int sub = gRandom->Integer(c_numSets);
+      auto& align = m_align[sub];
+      auto& countFails = m_countFails[sub];
+      const auto& name = m_treeNames[sub];
+      auto h1 = getObjectPtr<TH2F>("tracks_per_slot");
+      h1->Fill(trk.getModuleID(), sub);
+
       // do an iteration
-      int err = m_align.iterate(trk, m_selector.getChargedStable());
+      int err = align.iterate(trk, m_selector.getChargedStable());
       m_iter++;
 
       // check number of consecutive failures, and in case reset
       if (err == 0) {
-        m_countFails = 0;
-      } else if (m_countFails <= m_maxFails) {
-        m_countFails++;
+        countFails = 0;
+      } else if (countFails <= m_maxFails) {
+        countFails++;
       } else {
         B2INFO("Reached maximum allowed number of failed iterations. "
                "Resetting TOPalign object");
-        m_align.reset();
-        m_countFails = 0;
+        align.reset();
+        countFails = 0;
       }
 
       // get new parameter values and estimated errors
-      m_vAlignPars = m_align.getParameters();
-      m_vAlignParsErr = m_align.getErrors();
-      m_ntrk = m_align.getNumUsedTracks();
+      m_vAlignPars = align.getParameters();
+      m_vAlignParsErr = align.getErrors();
+      m_ntrk = align.getNumUsedTracks();
       m_errorCode = err;
-      m_valid = m_align.isValid();
+      m_valid = align.isValid();
 
       // set other ntuple variables
       const auto& localPosition = m_selector.getLocalPosition();
@@ -230,10 +257,10 @@ namespace Belle2 {
       m_PDG = trk.getPDGcode();
 
       // fill output tree
-      auto alignTree = getObjectPtr<TTree>("alignTree");
+      auto alignTree = getObjectPtr<TTree>(name);
       alignTree->Fill();
 
-    } // track loop
+    } // tracks
 
   }
 

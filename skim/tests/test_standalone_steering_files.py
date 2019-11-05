@@ -11,9 +11,8 @@ __email__ = 'philip.grace@adelaide.edu.au'
 import re
 import subprocess
 import sys
-from termcolor import colored, cprint
-from tempfile import NamedTemporaryFile
 
+from b2test_utils import clean_working_directory, require_file
 from basf2 import find_file
 from skim.registry import skim_registry, combined_skims
 
@@ -38,7 +37,7 @@ def getSkimStandaloneScript(skimName, combined=False):
         skimScript = find_file(f'skim/{scriptDirectory}/{skimName}_Skim_Standalone.py')
         return skimScript
     except FileNotFoundError:
-        cprint(f'WARNING! Skim {skimName} registered in skim registry, but no standalone steering file found!', 'red')
+        print(f'WARNING! Skim {skimName} registered in skim registry, but no standalone steering file found!', file=sys.stderr)
         return None
 
 
@@ -63,20 +62,22 @@ def testSteeringFile(skimScript):
     Returns:
         steeringFileWorks (bool): True if basf2 exited normally, and False otherwise.
     """
-    tempFile = NamedTemporaryFile(suffix='.udst.root')
-    process = subprocess.run(['basf2', skimScript, '-n', '10', '-o', tempFile.name],
-                             universal_newlines=True,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    testFile = require_file('mdst12.root', 'validation')
+
+    with clean_working_directory():
+        process = subprocess.run(['basf2', skimScript, '-n', '1', '-i', testFile],
+                                 universal_newlines=True,
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     steeringFileWorks = (process.returncode == 0)
 
     if steeringFileWorks:
-        cprint(f'Script {skimScript} ran successfully.', 'green')
+        print(f'Script {skimScript} ran successfully.')
     else:
-        cprint(f'ERROR! Script {skimScript} failed! See output below.', 'red')
+        print(f'ERROR! Script {skimScript} failed! See output below.', file=sys.stderr)
 
         filteredStdout = filterErrorMessages(process.stdout)
-        print(process.stderr, filteredStdout)
+        print(process.stderr, filteredStdout, file=sys.stderr)
 
     return steeringFileWorks
 
@@ -97,8 +98,8 @@ def testAllSkims(standaloneSkims, combinedSkims):
     failedScripts = [script for script in allScripts if not testSteeringFile(script)]
 
     if failedScripts:
-        cprint('The following standalone steering files failed:', 'red', attrs=['bold'])
-        cprint('\n'.join(failedScripts), 'red', attrs=['bold'])
+        print('The following standalone steering files failed:', file=sys.stderr)
+        print('\n'.join(failedScripts), file=sys.stderr)
 
         sys.exit(1)
 

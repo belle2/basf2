@@ -9,11 +9,12 @@ __author__ = "Phil Grace, Racha Cheaib"
 __email__ = "philip.grace@adelaide.edu.au, rachac@mail.ubc.ca"
 
 
+from functools import lru_cache
 import json
 from os.path import getsize
-# import pandas as pd
 import re
 
+# from skimExpertFunctions import get_eventN, get_total_infiles
 
 skims = [
     'LeptonicUntagged',
@@ -25,7 +26,7 @@ dataLabels = ['MC12_mixedBGx1', 'MC12_chargedBGx1', 'MC12_ccbarBGx1', 'MC12_ssba
               'MC12_uubarBGx0', 'MC12_ddbarBGx0', 'MC12_taupairBGx0']
 
 
-def divide(numerator, denominator):
+def dictDivide(numerator, denominator):
     """Divide two dicts elementwise, or divide all elements of a dict by a float or int.
 
     Args:
@@ -39,6 +40,22 @@ def divide(numerator, denominator):
         dividedDict = {label: n / denominator for label, n in numerator.items()}
 
     return dividedDict
+
+
+def dictTimes(dict1, multiplier):
+    """Multiply two dicts elementwise, or multiply all elements of a dict by a float or int.
+
+    Args:
+        dict1 (dict):
+        multiplier (dict, float, int):
+    """
+    try:
+        assert dict1.keys() == multiplier.keys()
+        multipliedDict = {label: v1 * v2 for (label, v1), (_, v2) in zip(dict1.items(), multiplier.items())}
+    except AttributeError or TypeError:
+        multipliedDict = {label: v * multiplier for label, n in dict1.items()}
+
+    return multipliedDict
 
 
 class SkimStats:
@@ -94,50 +111,73 @@ class SkimStats:
         return statsJson
 
     def statsDict(self):
+        nInputEvents = self.makeDict(self.nInputEvents)
+        nSkimmedEvents = self.makeDict(self.nSkimmedEvents)
+        udstSize = self.makeDict(self.udstSize)
+        logSize = self.makeDict(self.logSize)
+        cpuTime = self.makeDict(self.cpuTime)
+        memoryAverage = self.makeDict(self.memoryAverage)
+        memoryMaximum = self.makeDict(self.memoryMaximum)
+
+        nEventsPerFile = self.makeDict(self.nEventsPerFile)
+        nTotalFiles = self.makeDict(self.nEventsPerFile)
+        nTotalEvents = dictMult(self.__nEventsPerFile, self.__nTotalFiles)
+
         skimStats = {
-            'RetentionRate': divide(self.nSkimmedEvents(), self.nInputEvents()),
-            'nInputEvents': self.nInputEvents(),
-            'nSkimmedEvents': self.nSkimmedEvents(),
-            'cpuTime': self.cpuTime(),
-            'cpuTimePerEvent': divide(self.cpuTime(), self.nInputEvents()),
-            'udstSize': divide(self.udstSize(), 1024),
-            'udstSizePerEvent': divide(self.udstSize(), self.nInputEvents()),
-            'logSize': divide(self.logSize(), 1024),
-            'logSizePerEvent': divide(self.logSize(), self.nInputEvents()),
-            'memoryAverage': self.memoryAverage(),
-            'memoryMaximum': self.memoryMaximum(),
+            'RetentionRate': dictDivide(nSkimmedEvents, nInputEvents),
+            'nInputEvents': nInputEvents,
+            'nSkimmedEvents': nSkimmedEvents,
+            'cpuTime': cpuTime,
+            'cpuTimePerEvent': dictDivide(cpuTime, nInputEvents),
+            'udstSize': dictDivide(udstSize, 1024),
+            'udstSizePerEvent': dictDivide(udstSize, nInputEvents),
+            'logSize': dictDivide(logSize, 1024),
+            'logSizePerEvent': dictDivide(logSize, nInputEvents),
+            'memoryAverage': memoryAverage,
+            'memoryMaximum': memoryMaximum,
             # TODO: Calculate these:
-            'udstSizePerEntireSample': None,
+            'udstSizePerEntireSample': dictMult(dictDivide(udstSize, nInputEvents), nTotalEvents),
             'logSizePerEntireSample': None,
         }
 
         return skimStats
 
-    def nInputEvents(self):
-        return {l: self.__json[l]['basf2_status']['total_events'] for l in self.__labels}
+    def makeDict(self, func):
+        return {l: func(l) for l in self.__labels}
 
-    def nSkimmedEvents(self):
-        return {l: self.__json[l]['output_files'][0]['stats']['events'] for l in self.__labels}
+    def nInputEvents(self, dataLabel):
+        json = self.__json[dataLabel]
+        return json['basf2_status']['total_events']
 
-    def udstSize(self):
+    def nSkimmedEvents(self, dataLabel):
+        json = self.__json[dataLabel]
+        return json['output_files'][0]['stats']['events']
+
+    def udstSize(self, dataLabel):
         """Return the size of the output uDST file in KB, read from Job Information JSON file."""
-        return {l: self.__json[l]['output_files'][0]['stats']['filesize_kib'] for l in self.__labels}
+        json = self.__json[dataLabel]
+        return json['output_files'][0]['stats']['filesize_kib']
 
-    def logSize(self):
+    def logSize(self, dataLabel):
         """Return the size of the log file in KB, directly measured from output file."""
-        return {l: getsize(self.__logFileNames[l]) / 1024 for l in self.__labels}
+        logFileName = self.__logFileNames[dataLabel]
+        return getsize(logFileName) / 1024
 
-    def cpuTime(self):
-        return {l: self.getStatFromLog('CPU time', l) for l in self.__labels}
+    def cpuTime(self, dataLabel):
+        return self.getStatFromLog('CPU time', dataLabel)
 
-    def memoryAverage(self):
-        return {l: self.getStatFromLog('Average Memory', l) for l in self.__labels}
+    def memoryAverage(self, dataLabel):
+        return self.getStatFromLog('Average Memory', dataLabel)
 
-    def memoryMaximum(self):
-        return {l: self.getStatFromLog('Max Memory', l) for l in self.__labels}
+    def memoryMaximum(self, dataLabel):
+        return self.getStatFromLog('Max Memory', dataLabel)
 
-    def nTotalEvents(self):
-        return {l: get_total_infiles(l, self.__skimName) for l in self.__labels}
+    def nEventsPerFile(self, dataLabel):
+        parentFile = get_test_file(dataLabel)
+        return get_eventN(parentFile)
+
+    def nTotalFiles(self, dataLabel):
+        return get_total_infiles(dataLabel, self.__skimName)
 
     # Helper functions
     def getStatFromLog(self, statistic, dataLabel):
@@ -152,6 +192,7 @@ class SkimStats:
 
 
 if __name__ == '__main__':
+
     allSkimStats = {skim: SkimStats(skim, dataLabels).statsDict() for skim in skims}
     print(allSkimStats)
 

@@ -487,3 +487,21 @@ namespace Belle2 {
     return objOutputPtr;
   }
 }
+
+bool CalibrationAlgorithm::loadInputJson(const std::string& jsonString)
+{
+  try {
+    auto jsonInput = nlohmann::json::parse(jsonString);
+    // Input string has an object (dict) as the top level object?
+    if (jsonInput.is_object()) {
+      m_jsonExecutionInput = jsonInput;
+      return true;
+    } else {
+      B2ERROR("JSON input string isn't an object type i.e. not a '{}' at the top level.");
+      return false;
+    }
+  } catch (nlohmann::json::parse_error) {
+    B2ERROR("Parsing of JSON input string failed");
+    return false;
+  }
+}

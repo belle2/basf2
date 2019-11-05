@@ -14,8 +14,10 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <any>
 #include <utility>
 #include <list>
+#include <nlohmann/json.hpp>
 #include <TClonesArray.h>
 #include <TDirectory.h>
 #include <TFile.h>
@@ -59,7 +61,7 @@ namespace Belle2 {
         m_result = c_Undefined;
         m_payloads.clear();
         m_iov = IntervalOfValidity();
-        m_mapCalibData.clear();
+        clearCalibrationData();
       }
       /// Clear calibration data
       void clearCalibrationData()
@@ -211,6 +213,13 @@ namespace Belle2 {
     /// Get the description of the algoithm (set by developers in constructor)
     const std::string& getDescription() const {return m_description;}
 
+    /// Load the m_inputJson variable from a string (useful from Python interface). The rturn bool indicates success or failure
+    //  of JSON object creation. Failure probably means that your JSON string was badly formatted.
+    bool loadInputJson(const std::string& jsonString);
+
+    /// Dump the JSON string of the output JSON object.
+    const std::string dumpOutputJson() const {return m_jsonExecutionOutput.dump();}
+
   protected:
     // Developers implement this function ------------
 
@@ -283,6 +292,39 @@ namespace Belle2 {
     /// Returns the Exp,Run pair that means 'Everything'. Currently unused.
     Calibration::ExpRun getAllGranularityExpRun() const {return m_allExpRun;}
 
+    /// Clears the m_inputJson member variable.
+    void resetInputJson() {m_jsonExecutionInput.clear();}
+
+    /// Clears the m_outputJson member variable.
+    void resetOutputJson() {m_jsonExecutionOutput.clear();}
+
+    /// Set a key:value pair for the outputJson object, expected to used interally during calibrate()
+    template<class T>
+    void setOutputJsonValue(const std::string& key, const T& value) {m_jsonExecutionOutput[key] = value;}
+
+    /// Get a value using a key from the JSON output object, not sure why you would want to do this.
+    //  No attempt to catch exceptions is made here.
+    template<class T>
+    const T getOutputJsonValue(const std::string& key) const
+    {
+      return m_jsonExecutionOutput.at(key);
+    }
+
+    /// Get an input JSON value using a key. The normal exceptions are raised when the key doesn't exist.
+    //  No attempt to catch them is made here.
+    template<class T>
+    const T getInputJsonValue(const std::string& key) const
+    {
+      return m_jsonExecutionInput.at(key);
+    }
+
+    /// Get the entire top level JSON object. We explicitly say this must be of object type so that we might pick
+    //  up on weird errors where someone snuck an array into the member variable.
+    const nlohmann::json& getInputJsonObject() const {return m_jsonExecutionInput;}
+
+    /// Test for a key in the input JSON object
+    bool inputJsonKeyExists(const std::string& key) const {return m_jsonExecutionInput.count(key);}
+
   private:
 
     static const Calibration::ExpRun m_allExpRun;
@@ -310,6 +352,21 @@ namespace Belle2 {
 
     /// The name of the TDirectory the collector objects are contained within
     std::string m_prefix{""};
+
+    /// Optional input JSON  object used to make decisions about how to execute the algorithm code.
+    //  We initialise to "{}" rather than allowing a JSON array/value as the top level type. This forces the user
+    //  to use "key":value for storing data in this object. You should test for empty(), is_null() will always
+    //  return false due to the empty top level object.
+    //  Functionally similar to simple member variables for configuration of the algorithm.
+    //  However these input values are easier to use from Python code without needing to know the details of the algorithm.
+    //  These values are intended to be used for a single execution, not reused
+    nlohmann::json m_jsonExecutionInput = nlohmann::json::object();
+
+    /// Optional output JSON object that can be set during the execution by the underlying algorithm code.
+    //  As for input we initialise to an empty "{}" JSON object. Testing for empty() returns true, but is_null() does not.
+    //  Nothing is done with these by default, however a calling process may decide to capture these values and use them
+    //  as input to a following execution.
+    nlohmann::json m_jsonExecutionOutput = nlohmann::json::object();
 
   };  // End of CalibrationAlgorithm definition
 

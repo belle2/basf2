@@ -9,12 +9,12 @@ __author__ = "Phil Grace, Racha Cheaib"
 __email__ = "philip.grace@adelaide.edu.au, rachac@mail.ubc.ca"
 
 
-from functools import lru_cache
 import json
 from os.path import getsize
 import re
 
-# from skimExpertFunctions import get_eventN, get_total_infiles
+from skimExpertFunctions import get_test_file, get_eventN, get_total_infiles
+
 
 skims = [
     'LeptonicUntagged',
@@ -53,7 +53,7 @@ def dictTimes(dict1, multiplier):
         assert dict1.keys() == multiplier.keys()
         multipliedDict = {label: v1 * v2 for (label, v1), (_, v2) in zip(dict1.items(), multiplier.items())}
     except AttributeError or TypeError:
-        multipliedDict = {label: v * multiplier for label, n in dict1.items()}
+        multipliedDict = {label: v * multiplier for label, v in dict1.items()}
 
     return multipliedDict
 
@@ -101,7 +101,6 @@ class SkimStats:
         """Read in the job information JSON files produced when passing `--job-information` flag to
         basf2.
         """
-        # TODO: make this in the log/ directory
         statsJson = {}
 
         for label in self.__labels:
@@ -119,9 +118,12 @@ class SkimStats:
         memoryAverage = self.makeDict(self.memoryAverage)
         memoryMaximum = self.makeDict(self.memoryMaximum)
 
+        udstSizePerEvent = dictDivide(udstSize, nInputEvents)
+        logSizePerEvent = dictDivide(logSize, nInputEvents)
+
         nEventsPerFile = self.makeDict(self.nEventsPerFile)
         nTotalFiles = self.makeDict(self.nEventsPerFile)
-        nTotalEvents = dictMult(self.__nEventsPerFile, self.__nTotalFiles)
+        nTotalEvents = dictTimes(nEventsPerFile, nTotalFiles)
 
         skimStats = {
             'RetentionRate': dictDivide(nSkimmedEvents, nInputEvents),
@@ -135,9 +137,8 @@ class SkimStats:
             'logSizePerEvent': dictDivide(logSize, nInputEvents),
             'memoryAverage': memoryAverage,
             'memoryMaximum': memoryMaximum,
-            # TODO: Calculate these:
-            'udstSizePerEntireSample': dictMult(dictDivide(udstSize, nInputEvents), nTotalEvents),
-            'logSizePerEntireSample': None,
+            'udstSizePerEntireSample': dictTimes(udstSizePerEvent, nTotalEvents),
+            'logSizePerEntireSample': dictTimes(logSizePerEvent, nTotalEvents),
         }
 
         return skimStats
@@ -187,7 +188,6 @@ class SkimStats:
         floatRegexp = '\s*:\s+(\d+(\.(\d+)?)?)'
         statFromLog = re.findall(f'{statistic}{floatRegexp}', logFileContents)[0][0]
 
-        # TODO Error handling for when it can't find a match.
         return float(statFromLog)
 
 

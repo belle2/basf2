@@ -25,7 +25,7 @@ import glob
 skimCode = encodeSkimName('DstToD0Pi_D0ToHpJmPi0')
 
 c3bhpath = Path()
-fileList = get_test_file("ddbarBGx0", "MC12")
+fileList = get_test_file("ddbarBGx0_MC12")
 inputMdstList('default', fileList, path=c3bhpath)
 
 

@@ -18,7 +18,7 @@ from skim.fei import runFEIforB0SL, B0SL
 path = b2.create_path()
 
 # Input a test mdst file.
-ma.inputMdstList('default', get_test_file("mixedBGx1", "MC12"), path=path)
+ma.inputMdstList('default', get_test_file("mixedBGx1_MC12"), path=path)
 
 # Run pre-selection cuts and FEI.
 runFEIforB0SL(path)

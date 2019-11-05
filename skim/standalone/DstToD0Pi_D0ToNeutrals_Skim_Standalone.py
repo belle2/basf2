@@ -24,7 +24,7 @@ skimCode = encodeSkimName('DstToD0Pi_D0ToNeutrals')
 
 c2bnpath = Path()
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("mixedBGx1_MC12")
 inputMdstList('default', fileList, path=c2bnpath)
 
 

@@ -54,15 +54,15 @@ def decodeSkimName(skimCode):
     return lookup_dict[skimCode]
 
 
-def get_test_file(sample, skimCampaign):
+def get_test_file(sampleName):
     """
     Returns the KEKcc location of files used specifically for skim testing
 
-    Arguments:
-        sample: Type of MC sample: charged mixed ccbar uubar ddbar ssbar taupair or other of-resonance samples.
-        skimCampaign: MC9, MC10, MC11, etc..
+    Args:
+        sampleName (str): Name of the sample. MC samples are named *e.g.* "chargedBGx1_MC12", "ccbarBGx0_MC9"
+    Returns:
+        sampleFileName (str): The path to the test file on KEKCC.
     """
-    sampleName = skimCampaign + '_' + sample
     lookup_dict = {s: f for s, f in skimTestFilesInfo.kekcc_locations}
     if sampleName not in lookup_dict:
         B2ERROR("Testing file for this sample and skim campaign is not available.")

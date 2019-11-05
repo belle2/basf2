@@ -103,7 +103,7 @@ for bkg in bkgs.split():
         pos = bkg.find('_')
         skimCampaign = bkg[0:pos]
         sampleType = bkg[pos + 1:]
-        fileList = get_test_file(sampleType, skimCampaign)
+        fileList = get_test_file(f'{sampleType}_{skimCampaign}')
         nFullEvents = get_eventN(fileList)
         nSkimmedEvents = 0  # get_eventN(outputFileName + '.udst.root')
         # These counters are included to determine the number  of lines with retention and candidate multiplicity information.

@@ -13,7 +13,7 @@ MCCampaign = 'MC12'
 
 for skim in all_skims:
     for MCType in MCTypes:
-        input_file = get_test_file(MCType, MCCampaign)
+        input_file = get_test_file(f'{MCType}_{MCCampaign}')
         script = f"../combined/{skim}_Skim_Standalone.py"
         log_file = f"{skim}_{MCCampaign}_{MCType}.out"
         err_file = f"{skim}_{MCCampaign}_{MCType}.err"

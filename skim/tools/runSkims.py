@@ -32,7 +32,7 @@ MCCampaign = 'MC12'
 
 for skim in all_skims:
     for MCType in MCTypes:
-        input_file = get_test_file(MCType, MCCampaign)
+        input_file = get_test_file(f'{MCType}_{MCCampaign}')
         script = find_file(f'skim/standalone/{skim}_Skim_Standalone.py')
 
         Path('log').mkdir(parents=True, exist_ok=True)

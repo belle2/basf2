@@ -158,7 +158,7 @@ void EventT0DQMModule::event()
   }
 
   // Set the TOP event t0 value if it exists
-  if (m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
+  if (m_eventT0->hasTemporaryEventT0(Const::EDetector::TOP)) {
     vector<EventT0::EventT0Component> evt_t0_list_TOP = m_eventT0->getTemporaryEventT0s(Const::EDetector::TOP) ;
 
     // set the TOP event t0 value for filling into the histogram

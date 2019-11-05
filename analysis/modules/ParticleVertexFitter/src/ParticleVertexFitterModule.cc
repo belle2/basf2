@@ -200,9 +200,6 @@ namespace Belle2 {
     bool ok = false;
     // fits with KFitter
     if (m_vertexFitter == "kfitter") {
-      // TODO: add this functionality
-      // if (m_decayString != "")
-      //   B2FATAL("ParticleVertexFitter: kfitter does not support yet selection of daughters via decay string!");
 
       // vertex fit
       if (m_fitType == "vertex") {
@@ -279,6 +276,7 @@ namespace Belle2 {
                                                     std::vector<const Particle*>& pi0Children)
   {
     if (m_decayString.empty()) {
+      // if decayString is empty, just use all primary daughters
       for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
         const Particle* child = mother->getDaughter(ichild);
         fitChildren.push_back(child);
@@ -287,9 +285,9 @@ namespace Belle2 {
       fitChildren = m_decaydescriptor.getSelectionParticles(mother);
     }
 
-    // for (auto& child : fitChildren) {
     for (auto itr = fitChildren.begin(); itr != fitChildren.end(); itr++) {
       const Particle* child = *itr;
+
       if (child->getPValue() < 0) {
         B2WARNING("Daughter with PDG code " << child->getPDGCode() << " does not have a valid error matrix.");
         return false; // error matrix not valid

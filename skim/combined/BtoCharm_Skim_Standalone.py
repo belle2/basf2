@@ -21,7 +21,7 @@ gb2_setuprel = 'release-04-00-00'
 
 btocharmpath = Path()
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("mixedBGx1_MC12")
 inputMdstList('default', fileList, path=btocharmpath)
 
 

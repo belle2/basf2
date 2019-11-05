@@ -26,7 +26,7 @@ from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_te
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("mixedBGx1_MC12")
 
 syspath = Path()
 inputMdstList('default', fileList, path=syspath)

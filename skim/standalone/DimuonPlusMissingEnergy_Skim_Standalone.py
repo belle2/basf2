@@ -18,7 +18,7 @@ gb2_setuprel = 'release-04-00-00'
 
 dimuon_path = b2.Path()
 
-fileList = skimExp.get_test_file("mixedBGx1", "MC12")
+fileList = skimExp.get_test_file("mixedBGx1_MC12")
 ma.inputMdstList('default', fileList, path=dimuon_path)
 
 charged.stdMu('all', path=dimuon_path)

@@ -24,7 +24,7 @@ import glob
 skimCode = encodeSkimName('SLUntagged')
 
 SLpath = Path()
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("mixedBGx1_MC12")
 inputMdstList('default', fileList, path=SLpath)
 
 stdPi('loose', path=SLpath)

@@ -61,8 +61,8 @@ KLMStripEfficiencyCollectorModule::~KLMStripEfficiencyCollectorModule()
 
 void KLMStripEfficiencyCollectorModule::prepare()
 {
-
-  m_digits.isRequired();
+  m_EklmDigits.isRequired();
+  m_BklmDigits.isRequired();
   m_hit2ds.isRequired();
   m_recoTracks.isRequired();
   m_tracks.isRequired();
@@ -111,30 +111,6 @@ void KLMStripEfficiencyCollectorModule::trackCheck(
     trackSelected[EKLMElementNumbers::c_BackwardSection - 1] = true;
 }
 
-const EKLMDigit* KLMStripEfficiencyCollectorModule::findMatchingDigit(
-  const struct HitData* hitData, double allowedDistance) const
-{
-  for (const EKLMDigit& digit : m_digits) {
-    if (digit.getSection() == hitData->section &&
-        digit.getLayer() == hitData->layer &&
-        digit.getSector() == hitData->sector &&
-        digit.getPlane() == hitData->plane &&
-        (fabs(digit.getStrip() - hitData->strip) < allowedDistance))
-      return &digit;
-  }
-  return nullptr;
-}
-
-double KLMStripEfficiencyCollectorModule::getSumTrackEnergy(const StoreArray<Track>& selected_tracks) const
-{
-  double eneregy = 0;
-  for (auto trk : selected_tracks) {
-    const TrackFitResult* fitResult = trk.getTrackFitResultWithClosestMass(Const::muon);
-    eneregy += fitResult->getEnergy();
-  }
-  return eneregy;
-}
-
 void KLMStripEfficiencyCollectorModule::collect()
 {
   if (m_MuonListName != "") {
@@ -166,6 +142,33 @@ void KLMStripEfficiencyCollectorModule::addHit(
   }
 }
 
+void KLMStripEfficiencyCollectorModule::findMatchingDigit(
+  struct HitData* hitData)
+{
+  for (const EKLMDigit& digit : m_EklmDigits) {
+    if (!(digit.getSection() == hitData->section &&
+          digit.getLayer() == hitData->layer &&
+          digit.getSector() == hitData->sector &&
+          digit.getPlane() == hitData->plane))
+      continue;
+    if (fabs(digit.getStrip() - hitData->strip) < m_AllowedDistance1D) {
+      hitData->eklmDigit = &digit;
+      return;
+    }
+  }
+  for (const BKLMDigit& digit : m_BklmDigits) {
+    if (!(digit.getSection() == hitData->section &&
+          digit.getLayer() == hitData->layer &&
+          digit.getSector() == hitData->sector &&
+          digit.getPlane() == hitData->plane))
+      continue;
+    if (fabs(digit.getStrip() - hitData->strip) < m_AllowedDistance1D) {
+      hitData->bklmDigit = &digit;
+      return;
+    }
+  }
+}
+
 void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
 {
   bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()] =
@@ -192,7 +195,8 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
       continue;
     uint16_t planeGlobal = 0;
     hitData.hit = &hit;
-    hitData.digit = nullptr;
+    hitData.eklmDigit = nullptr;
+    hitData.bklmDigit = nullptr;
     if (hit.getDetectorID() == Const::EDetector::EKLM) {
       int stripGlobal = hit.getCopyID();
       hitData.subdetector = KLMElementNumbers::c_EKLM;
@@ -200,7 +204,8 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
         stripGlobal, &hitData.section, &hitData.layer, &hitData.sector,
         &hitData.plane, &hitData.strip);
       planeGlobal = m_ElementNumbers->planeNumberEKLM(
-                      hitData.section, hitData.sector, hitData.layer, hitData.plane);
+                      hitData.section, hitData.sector, hitData.layer,
+                      hitData.plane);
       addHit(selectedHits, planeGlobal, &hitData);
     } else if (hit.getDetectorID() == Const::EDetector::BKLM) {
       int moduleNumber = hit.getCopyID();
@@ -216,7 +221,8 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
           moduleNumber, &hitData.section, &hitData.sector, &hitData.layer,
           &hitData.plane, &hitData.strip);
         planeGlobal = m_ElementNumbers->planeNumberBKLM(
-                        hitData.section, hitData.sector, hitData.layer, hitData.plane);
+                        hitData.section, hitData.sector, hitData.layer,
+                        hitData.plane);
         addHit(selectedHits, planeGlobal, &hitData);
       } else {
         /* For RPCs, the sensitive volume corresponds to both readout planes. */
@@ -229,9 +235,11 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
                                      hitData.layer);
         localPosition = module->globalToLocal(extHitPositionCLHEP);
         hitData.plane = BKLMElementNumbers::c_ZPlane;
+        hitData.strip = module->getZStrip(localPosition);
         hitData.localPosition = localPosition.z();
         addHit(selectedHits, planeGlobal, &hitData);
         hitData.plane = BKLMElementNumbers::c_PhiPlane;
+        hitData.strip = module->getPhiStrip(localPosition);
         hitData.localPosition = localPosition.y();
         addHit(selectedHits, planeGlobal, &hitData);
       }
@@ -241,8 +249,8 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
   /* Find matching digits. */
   int nDigits = 0;
   for (it = selectedHits.begin(); it != selectedHits.end(); ++it) {
-    it->second.digit = findMatchingDigit(&(it->second), m_AllowedDistance1D);
-    if (it->second.digit != nullptr)
+    findMatchingDigit(&(it->second));
+    if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr)
       nDigits++;
   }
   /* Write efficiency histograms */
@@ -250,12 +258,12 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
     if (!trackSelected[it->second.section - 1])
       continue;
     int matchingDigits = nDigits;
-    if (it->second.digit != nullptr)
+    if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr)
       matchingDigits--;
     if (matchingDigits < m_MinimalMatchingDigits)
       continue;
     AllExtHitsInPlane->Fill(it->first);
-    if (it->second.digit != nullptr)
+    if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr)
       MatchedDigitsInPlane->Fill(it->first);
   }
 }

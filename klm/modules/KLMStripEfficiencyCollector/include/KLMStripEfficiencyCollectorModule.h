@@ -11,6 +11,7 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
@@ -69,8 +70,11 @@ namespace Belle2 {
       /** Extrapolation hit. */
       const ExtHit* hit;
 
-      /** Digit. */
-      const EKLMDigit* digit;
+      /** EKLM digit. */
+      const EKLMDigit* eklmDigit;
+
+      /** BKLM digit. */
+      const BKLMDigit* bklmDigit;
 
     };
 
@@ -116,14 +120,6 @@ namespace Belle2 {
       bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()],
       int requiredHits) const;
 
-    /**
-     * Matching of digits with ext hits
-     * @param[in] hitData         Hit data.
-     * @param[in] allowedDistance Minimal distance in the units of strip number.
-     */
-    const EKLMDigit* findMatchingDigit(const struct HitData* hitData,
-                                       double allowedDistance) const;
-
 
     /**
      * Find sum energy of tracks in event
@@ -140,6 +136,12 @@ namespace Belle2 {
      */
     void addHit(std::map<uint16_t, struct HitData>& hitMap,
                 uint16_t planeGlobal, struct HitData* hitData);
+
+    /**
+     * Find matching digit.
+     * @param[in] hitData Hit data.
+     */
+    void findMatchingDigit(struct HitData* hitData);
 
     /**
      * Collect the data for one track.
@@ -161,8 +163,11 @@ namespace Belle2 {
      */
     int m_MinimalMatchingDigits;
 
-    /** Digits. */
-    StoreArray<EKLMDigit> m_digits;
+    /** EKLM digits. */
+    StoreArray<EKLMDigit> m_EklmDigits;
+
+    /** BKLM digits. */
+    StoreArray<BKLMDigit> m_BklmDigits;
 
     /** Hit2ds. */
     StoreArray<EKLMHit2d> m_hit2ds;

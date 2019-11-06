@@ -43,9 +43,6 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   setDescription("Module for EKLM strips efficiency (data collection).");
   addParam("MuonListName", m_MuonListName,
            "Muon list name. If empty, use tracks.", std::string("mu+:all"));
-  addParam("StandaloneTrackSelection", m_StandaloneTrackSelection,
-           "Whether to use standalone track selection."
-           " Always turn this off for cosmic data.", true);
   addParam("MinimalMatchingDigits", m_MinimalMatchingDigits,
            "Minimal number of matching digits.", 0);
   addParam("AllowedDistance1D", m_AllowedDistance1D,
@@ -63,12 +60,10 @@ void KLMStripEfficiencyCollectorModule::prepare()
 {
   m_EklmDigits.isRequired();
   m_BklmDigits.isRequired();
-  m_hit2ds.isRequired();
   m_recoTracks.isRequired();
   m_tracks.isRequired();
   m_trackFitResults.isRequired();
   m_extHits.isRequired();
-  m_recoTracks.registerRelationTo(m_hit2ds);
   if (m_MuonListName != "")
     m_MuonList.isRequired(m_MuonListName);
 
@@ -92,23 +87,6 @@ void KLMStripEfficiencyCollectorModule::startRun()
 
 void KLMStripEfficiencyCollectorModule::closeRun()
 {
-}
-
-void KLMStripEfficiencyCollectorModule::trackCheck(
-  bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()],
-  int requiredHits) const
-{
-  int sectionHits[EKLMElementNumbers::getMaximalSectionNumber()];
-  for (int i = 0; i < EKLMElementNumbers::getMaximalSectionNumber(); ++i) {
-    trackSelected[i] = false;
-    sectionHits[i] = false;
-  }
-  for (const EKLMHit2d& hit : m_hit2ds)
-    sectionHits[hit.getSection() - 1]++;
-  if (sectionHits[EKLMElementNumbers::c_BackwardSection - 1] > requiredHits)
-    trackSelected[EKLMElementNumbers::c_ForwardSection - 1] = true;
-  if (sectionHits[EKLMElementNumbers::c_ForwardSection - 1] > requiredHits)
-    trackSelected[EKLMElementNumbers::c_BackwardSection - 1] = true;
 }
 
 void KLMStripEfficiencyCollectorModule::collect()
@@ -171,11 +149,6 @@ void KLMStripEfficiencyCollectorModule::findMatchingDigit(
 
 void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
 {
-  bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()] =
-  {true, true};
-  if (m_StandaloneTrackSelection)
-    trackCheck(trackSelected, 5);
-
   TH1F* MatchedDigitsInPlane;
   MatchedDigitsInPlane = getObjectPtr<TH1F>("MatchedDigitsInPlane");
   TH1F* AllExtHitsInPlane;
@@ -255,8 +228,6 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
   }
   /* Write efficiency histograms */
   for (it = selectedHits.begin(); it != selectedHits.end(); ++it) {
-    if (!trackSelected[it->second.section - 1])
-      continue;
     int matchingDigits = nDigits;
     if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr)
       matchingDigits--;

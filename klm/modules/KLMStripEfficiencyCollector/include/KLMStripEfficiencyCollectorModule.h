@@ -15,7 +15,6 @@
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
@@ -110,22 +109,6 @@ namespace Belle2 {
      */
     void closeRun() override;
 
-    /**                     SIMPLE MUID
-     * Calculating number of Hit2ds in forward and backward parts
-     * If there are many hits in one of the sections can be sure that this is muon track
-     * And the second track with high probability is in opposite section (because we choosed events with 2trks)
-     * If it is so, calculate efficiency in opposite section
-     */
-    void trackCheck(
-      bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()],
-      int requiredHits) const;
-
-
-    /**
-     * Find sum energy of tracks in event
-     */
-    double getSumTrackEnergy(const StoreArray<Track>& selected_tracks) const;
-
   private:
 
     /**
@@ -153,12 +136,6 @@ namespace Belle2 {
     std::string m_MuonListName;
 
     /**
-     * Whether to use standalone track selection.
-     * Always turn this off for cosmic data.
-     */
-    bool m_StandaloneTrackSelection;
-
-    /**
      * Minimal number of matching digits.
      */
     int m_MinimalMatchingDigits;
@@ -168,9 +145,6 @@ namespace Belle2 {
 
     /** BKLM digits. */
     StoreArray<BKLMDigit> m_BklmDigits;
-
-    /** Hit2ds. */
-    StoreArray<EKLMHit2d> m_hit2ds;
 
     /** Tracks. */
     StoreArray<Track> m_tracks;

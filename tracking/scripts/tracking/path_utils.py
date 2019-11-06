@@ -504,6 +504,11 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                     inputTracks=output_tracks,
                     RecoTracksStoreArrayName="CDCRecoTracksBeforeReattaching")
 
+    # The ReattachCDCWireHitsToRecoTracks module (below) requires the SetupGenfitExtrapolation module
+    if 'SetupGenfitExtrapolation' not in path:
+        # Prepare Genfit extrapolation
+        path.add_module('SetupGenfitExtrapolation')
+
     # Loop over low-ADC/TOT CDCWireHits and RecoTracks and reattach the hits to the tracks if they are close enough
     path.add_module("ReattachCDCWireHitsToRecoTracks",
                     inputRecoTracksStoreArrayName="CDCRecoTracksBeforeReattaching",

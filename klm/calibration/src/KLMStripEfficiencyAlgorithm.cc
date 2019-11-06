@@ -18,11 +18,11 @@ using namespace Belle2;
 
 KLMStripEfficiencyAlgorithm::KLMStripEfficiencyAlgorithm() : CalibrationAlgorithm("KLMStripEfficiencyCollector")
 {
-  m_planesEff = new TH1F(
-    "plane_efficiency", "",
-    EKLMElementNumbers::getMaximalPlaneGlobalNumber(),
-    0.5, EKLMElementNumbers::getMaximalPlaneGlobalNumber() + 0.5);
-  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
+  m_PlaneArrayIndex = &(KLMPlaneArrayIndex::Instance());
+  int nPlanes = m_PlaneArrayIndex->getNPlanes();
+  m_planesEff = new TH1F("plane_efficiency", "KLM plane efficiency",
+                         nPlanes, 0.5, double(nPlanes) + 0.5);
   m_StripEfficiency = new KLMStripEfficiency();
   m_file = new TFile("TrackMatchedResult.root", "recreate");
   m_file->cd();
@@ -34,37 +34,47 @@ KLMStripEfficiencyAlgorithm::~KLMStripEfficiencyAlgorithm()
 
 CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
 {
-  std::shared_ptr<TH1F> MatchedDigitsInPlane;
-  MatchedDigitsInPlane = getObjectPtr<TH1F>("MatchedDigitsInPlane");
-  std::shared_ptr<TH1F> AllExtHitsInPlane;
-  AllExtHitsInPlane = getObjectPtr<TH1F>("AllExtHitsInPlane");
+  std::shared_ptr<TH1F> matchedDigitsInPlane;
+  matchedDigitsInPlane = getObjectPtr<TH1F>("matchedDigitsInPlane");
+  std::shared_ptr<TH1F> allExtHitsInPlane;
+  allExtHitsInPlane = getObjectPtr<TH1F>("allExtHitsInPlane");
 
-  MatchedDigitsInPlane.get()->Sumw2();
-  AllExtHitsInPlane.get()->Sumw2();
-  MatchedDigitsInPlane.get()->Write();
-  AllExtHitsInPlane.get()->Write();
+  matchedDigitsInPlane.get()->Sumw2();
+  allExtHitsInPlane.get()->Sumw2();
+  matchedDigitsInPlane.get()->Write();
+  allExtHitsInPlane.get()->Write();
 
-  m_planesEff->Divide(MatchedDigitsInPlane.get(), AllExtHitsInPlane.get(), 1, 1, "B");
+  m_planesEff->Divide(matchedDigitsInPlane.get(), allExtHitsInPlane.get(), 1, 1, "B");
   m_planesEff->Write();
 
   KLMChannelIndex klmChannels;
-  for (KLMChannelIndex klmChannel = klmChannels.beginEKLM(); klmChannel != klmChannels.endEKLM(); ++klmChannel) {
-    int idSection = klmChannel.getSection(); // Section
-    int idSector = klmChannel.getSector(); // Sector
-    int idLayer = klmChannel.getLayer(); // Layer
-    int idPlane = klmChannel.getPlane(); // Plane
-    int idStrip = klmChannel.getStrip(); // Strip
-    int planeNum = m_ElementNumbers->planeNumber(idSection, idLayer, idSector, idPlane);
-
-    // Bin number is equal to plane planeNumber
-    float efficiency = m_planesEff->GetBinContent(planeNum);
-    float efficiencyError = m_planesEff->GetBinError(planeNum);
-
-    // Fill the efficiency for this strip.
-    m_StripEfficiency->setEndcapEfficiency(idSection, idSector, idLayer, idPlane, idStrip, efficiency, efficiencyError);
+  for (KLMChannelIndex& klmChannel : klmChannels) {
+    int subdetector = klmChannel.getSubdetector();
+    int section = klmChannel.getSection();
+    int sector = klmChannel.getSector();
+    int layer = klmChannel.getLayer();
+    int plane = klmChannel.getPlane();
+    int strip = klmChannel.getStrip();
+    uint16_t planeKLM = 0;
+    if (subdetector == KLMElementNumbers::c_BKLM) {
+      planeKLM = m_ElementNumbers->planeNumberBKLM(
+                   section, sector, layer, plane);
+    } else {
+      planeKLM = m_ElementNumbers->planeNumberEKLM(
+                   section, sector, layer, plane);
+    }
+    uint16_t planeIndex = m_PlaneArrayIndex->getIndex(planeKLM);
+    float efficiency = m_planesEff->GetBinContent(planeIndex);
+    float efficiencyError = m_planesEff->GetBinError(planeIndex);
+    /* Fill the efficiency for this strip. */
+    if (subdetector == KLMElementNumbers::c_BKLM) {
+      m_StripEfficiency->setBarrelEfficiency(
+        section, sector, layer, plane, strip, efficiency, efficiencyError);
+    } else {
+      m_StripEfficiency->setEndcapEfficiency(
+        section, sector, layer, plane, strip, efficiency, efficiencyError);
+    }
   }
-
-  // Where can I get IoV?
   saveCalibration(m_StripEfficiency, "KLMStripEfficiency");
   return CalibrationAlgorithm::c_OK;
 }

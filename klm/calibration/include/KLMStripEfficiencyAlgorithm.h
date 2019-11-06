@@ -11,8 +11,9 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMPlaneArrayIndex.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 
 /* Belle 2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
@@ -62,8 +63,11 @@ namespace Belle2 {
     /** Output root file */
     TFile* m_file;
 
-    /** EKLM element numbers */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
+    /** Element numbers */
+    const KLMElementNumbers* m_ElementNumbers;
+
+    /** Plane array index. */
+    const KLMPlaneArrayIndex* m_PlaneArrayIndex;
 
     /** Efficiency data object */
     KLMStripEfficiency* m_StripEfficiency;

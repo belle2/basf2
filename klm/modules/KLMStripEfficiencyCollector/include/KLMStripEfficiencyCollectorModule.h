@@ -174,9 +174,6 @@ namespace Belle2 {
     /** Plane array index. */
     const KLMPlaneArrayIndex* m_PlaneArrayIndex;
 
-    /** Output file name */
-    std::string m_filename;
-
     /** Max distance in strips number to 1D hit from extHit to be still matched */
     double m_AllowedDistance1D;
 

@@ -9,6 +9,7 @@ __author__ = "Phil Grace, Racha Cheaib"
 __email__ = "philip.grace@adelaide.edu.au, rachac@mail.ubc.ca"
 
 
+from functools import lru_cache
 import json
 from os.path import getsize
 import re
@@ -20,182 +21,206 @@ skims = [
     'LeptonicUntagged',
 ]
 
-dataLabels = ['MC12_mixedBGx1', 'MC12_chargedBGx1', 'MC12_ccbarBGx1', 'MC12_ssbarBGx1',
-              'MC12_uubarBGx1', 'MC12_ddbarBGx1', 'MC12_taupairBGx1',
-              'MC12_mixedBGx0', 'MC12_chargedBGx0', 'MC12_ccbarBGx0', 'MC12_ssbarBGx0',
-              'MC12_uubarBGx0', 'MC12_ddbarBGx0', 'MC12_taupairBGx0']
+beamBackgroundWeights = {
+    'BGx1': 0.8,
+    'BGx0': 0.2
+}
+
+mcSampleCrossSections = {
+    'mixed': 0.555,
+    'charged': 0.555,
+    'ccbar': 1.3,
+    'uubar': 1.61,
+    'ddbar': 0.40,
+    'ssbar': 0.38,
+    'taupair': 0.91
+}
+
+mcCampaign = 'MC12'
+
+mcSamples = [f'{mcCampaign}_{mcSample}{beamBackground}'
+             for beamBackground in beamBackgroundWeights.keys()
+             for mcSample in mcSampleCrossSections.keys()]
+
+dataSamples = []
+
+sampleLabels = mcSamples + dataSamples
 
 
-def dictDivide(numerator, denominator):
-    """Divide two dicts elementwise, or divide all elements of a dict by a float or int.
+def getStatFromLog(statistic, logFileContents):
+    """Search for a given statistic in the "Resource usage summary" section of the log file."""
+    floatRegexp = '\s*:\s+(\d+(\.(\d+)?)?)'
+    statFromLog = re.findall(f'{statistic}{floatRegexp}', logFileContents)[0][0]
 
-    Args:
-        numerator (dict):
-        denominator (dict, float, int):
-    """
-    try:
-        assert numerator.keys() == denominator.keys()
-        dividedDict = {label: n / d for (label, n), (_, d) in zip(numerator.items(), denominator.items())}
-    except AttributeError or TypeError:
-        dividedDict = {label: n / denominator for label, n in numerator.items()}
-
-    return dividedDict
+    return float(statFromLog)
 
 
-def dictTimes(dict1, multiplier):
-    """Multiply two dicts elementwise, or multiply all elements of a dict by a float or int.
-
-    Args:
-        dict1 (dict):
-        multiplier (dict, float, int):
-    """
-    try:
-        assert dict1.keys() == multiplier.keys()
-        multipliedDict = {label: v1 * v2 for (label, v1), (_, v2) in zip(dict1.items(), multiplier.items())}
-    except AttributeError or TypeError:
-        multipliedDict = {label: v * multiplier for label, v in dict1.items()}
-
-    return multipliedDict
+def nInputEvents(json):
+    return json['basf2_status']['total_events']
 
 
-class SkimStats:
-    """Class for managing the skim stats of a single skim."""
-    # TODO: put this in with getSkimStats().
-    columnLabels = {
-        'RetentionRate': 'Retention rate',
-        'nInputEvents': 'Number of input events of test',
-        'nSkimmedEvents': 'Number of skimmed events',
-        'timePerEvent': 'CPU time per event',
-        'cpuTime': 'CPU time of test',
-        'udstSizePerEvent': 'uDST size per event (kB)',
-        'udstSize': 'uDST size of test (MB)',
-        'logSizePerEvent': 'Log size per event (kB)',
-        'logSize': 'Log size of test (MB)',
-        'memoryAverage': 'Average memory usage (MB)',
-        'memoryMaximum': 'Maximum memory usage (MB)',
-        'udstSizePerEntireSample': 'Estimated uDST size for entire sample (GB)',
-        'logSizePerEntireSample': 'Estimated log size for entire sample (GB)'
+def nSkimmedEvents(json):
+    return json['output_files'][0]['stats']['events']
+
+
+def udstSize(json):
+    """Return the size of the output uDST file in KB, read from Job Information JSON file."""
+    return json['output_files'][0]['stats']['filesize_kib']
+
+
+def logSize(log):
+    """Return the size of the log file in KB."""
+    return len(log) / 1024
+
+
+def cpuTime(log):
+    return getStatFromLog('CPU time', log)
+
+
+def memoryAverage(log):
+    return getStatFromLog('Average Memory', log)
+
+
+def memoryMaximum(log):
+    return getStatFromLog('Max Memory', log)
+
+
+# TODO: copy previous method of calculating this.
+def candidateMultiplicity(log):
+    return
+
+
+@lru_cache()
+def nEventsPerFile(sampleLabel):
+    parentFile = get_test_file(sampleLabel)
+    return get_eventN(parentFile)
+
+
+def nTotalFiles(sampleLabel):
+    return get_total_infiles(sampleLabel)
+
+
+def nTotalEvents(sampleLabel):
+    return nEventsPerFile(sampleLabel)*nTotalFiles(sampleLabel)
+
+
+def mcWeightedAverage(statsPerSample):
+    totalCrossSection = sum(mcSampleCrossSections.values())
+
+    weightedAverage = 0
+    for mcSample, crossSection in mcSampleCrossSections.items():
+        for beamBackground, beamBackgroundWeight in beamBackgroundWeights.items():
+            sampleLabel = f'{mcCampaign}_{mcSample}{beamBackground}'
+            weightedAverage += statsPerSample[sampleLabel]*beamBackgroundWeight*crossSection/totalCrossSection
+
+    return weightedAverage
+
+statistics = {
+    'RetentionRate': {
+        'LongName': 'Retention rate (%)',
+        'printf': '.2f',
+        'Calculate': lambda json, log, skim, sample: 100 * nSkimmedEvents(json) / nInputEvents(json),
+        'Combine': lambda statDict: mcWeightedAverage(statDict)
+    },
+    'nInputEvents': {
+        'LongName': 'Number of input events of test',
+        'printf': 'd',
+        'Calculate': lambda json, log, skim, sample: nInputEvents(json),
+        'Combine': lambda _: None
+    },
+    'nSkimmedEvents': {
+        'LongName': 'Number of skimmed events',
+        'printf': 'd',
+        'Calculate': lambda json, log, skim, sample: nSkimmedEvents(json),
+        'Combine': lambda _: None
+    },
+    'cpuTime': {
+        'LongName': 'CPU time of test on KEKCC (s)',
+        'printf': '.1f',
+        'Calculate': lambda json, log, skim, sample: cpuTime(log),
+        'Combine': lambda _: None
+    },
+    'cpuTimePerEvent': {
+        'LongName': 'CPU time per event on KEKCC (ms)',
+        'printf': '.1f',
+        'Calculate': lambda json, log, skim, sample: cpuTime(log) / nInputEvents(json) * 1000,
+        'Combine': lambda statDict: mcWeightedAverage(statDict)
+    },
+    'udstSize': {
+        'LongName': 'uDST size of test (MB)',
+        'printf': '.2f',
+        'Calculate': lambda json, log, skim, sample: udstSize(json) / 1024,
+        'Combine': lambda _: None
+    },
+    'udstSizePerEvent': {
+        'LongName': 'uDST size per event (kB)',
+        'printf': '.2f',
+        'Calculate': lambda json, log, skim, sample: udstSize(json) / nInputEvents(json) * 1024,
+        'Combine': lambda statDict: mcWeightedAverage(statDict)
+    },
+    'logSize': {
+        'LongName': 'Log size of test (kB)',
+        'printf': '.1f',
+        'Calculate': lambda json, log, skim, sample: logSize(log),
+        'Combine': lambda _: None
+    },
+    'logSizePerEvent': {
+        'LongName': 'Log size per event (B)',
+        'printf': '.2f',
+        'Calculate': lambda json, log, skim, sample: logSize(log) / nInputEvents(json) * 1024,
+        'Combine': lambda statDict: mcWeightedAverage(statDict)
+    },
+    'memoryAverage': {
+        'LongName': 'Average memory usage (MB)',
+        'printf': '.1f',
+        'Calculate': lambda json, log, skim, sample: memoryAverage(log),
+        'Combine': lambda statDict: mcWeightedAverage(statDict)
+    },
+    'memoryMaximum': {
+        'LongName': 'Maximum memory usage (MB)',
+        'printf': '.1f',
+        'Calculate': lambda json, log, skim, sample: memoryMaximum(log),
+        'Combine': lambda statDict: max(statDict.values())
+    },
+    'udstSizePerEntireSample': {
+        'LongName': 'Estimated uDST size for entire sample (GB)',
+        'printf': '.2f',
+        'Calculate': lambda json, log, skim, sample: udstSize(json) * nTotalEvents(sample) / nInputEvents(json) / 1024,
+        'Combine': lambda statDict: sum(statDict.values())
+    },
+    'logSizePerEntireSample': {
+        'LongName': 'Estimated log size for entire sample (GB)}',
+        'printf': '.2f',
+        'Calculate': lambda json, log, skim, sample: logSize(log) * nTotalEvents(sample) / nInputEvents(json) / 1024,
+        'Combine': lambda statDict: sum(statDict.values())
     }
-
-    def __init__(self, skimName, dataLabels):
-        self.__skimName = skimName
-        self.__labels = dataLabels
-
-        self.__jsonFileNames = {l: f'log/JobInformation_{self.__skimName}_{l}.json' for l in self.__labels}
-        self.__logFileNames = {l: f'log/{self.__skimName}_{l}.out' for l in self.__labels}
-
-        self.__json = self.loadJson()
-        self.__logs = self.loadLogs()
-
-    def loadLogs(self):
-        """"""
-        logFileContents = {}
-
-        for label in self.__labels:
-            with open(self.__logFileNames[label], 'r') as logFile:
-                logFileContents[label] = logFile.read()
-
-        return logFileContents
-
-    def loadJson(self):
-        """Read in the job information JSON files produced when passing `--job-information` flag to
-        basf2.
-        """
-        statsJson = {}
-
-        for label in self.__labels:
-            with open(self.__jsonFileNames[label]) as jsonFile:
-                statsJson[label] = json.load(jsonFile)
-
-        return statsJson
-
-    def statsDict(self):
-        nInputEvents = self.makeDict(self.nInputEvents)
-        nSkimmedEvents = self.makeDict(self.nSkimmedEvents)
-        udstSize = self.makeDict(self.udstSize)
-        logSize = self.makeDict(self.logSize)
-        cpuTime = self.makeDict(self.cpuTime)
-        memoryAverage = self.makeDict(self.memoryAverage)
-        memoryMaximum = self.makeDict(self.memoryMaximum)
-
-        udstSizePerEvent = dictDivide(udstSize, nInputEvents)
-        logSizePerEvent = dictDivide(logSize, nInputEvents)
-
-        nEventsPerFile = self.makeDict(self.nEventsPerFile)
-        nTotalFiles = self.makeDict(self.nEventsPerFile)
-        nTotalEvents = dictTimes(nEventsPerFile, nTotalFiles)
-
-        skimStats = {
-            'RetentionRate': dictDivide(nSkimmedEvents, nInputEvents),
-            'nInputEvents': nInputEvents,
-            'nSkimmedEvents': nSkimmedEvents,
-            'cpuTime': cpuTime,
-            'cpuTimePerEvent': dictDivide(cpuTime, nInputEvents),
-            'udstSize': dictDivide(udstSize, 1024),
-            'udstSizePerEvent': dictDivide(udstSize, nInputEvents),
-            'logSize': dictDivide(logSize, 1024),
-            'logSizePerEvent': dictDivide(logSize, nInputEvents),
-            'memoryAverage': memoryAverage,
-            'memoryMaximum': memoryMaximum,
-            'udstSizePerEntireSample': dictTimes(udstSizePerEvent, nTotalEvents),
-            'logSizePerEntireSample': dictTimes(logSizePerEvent, nTotalEvents),
-        }
-
-        return skimStats
-
-    def makeDict(self, func):
-        return {l: func(l) for l in self.__labels}
-
-    def nInputEvents(self, dataLabel):
-        json = self.__json[dataLabel]
-        return json['basf2_status']['total_events']
-
-    def nSkimmedEvents(self, dataLabel):
-        json = self.__json[dataLabel]
-        return json['output_files'][0]['stats']['events']
-
-    def udstSize(self, dataLabel):
-        """Return the size of the output uDST file in KB, read from Job Information JSON file."""
-        json = self.__json[dataLabel]
-        return json['output_files'][0]['stats']['filesize_kib']
-
-    def logSize(self, dataLabel):
-        """Return the size of the log file in KB, directly measured from output file."""
-        logFileName = self.__logFileNames[dataLabel]
-        return getsize(logFileName) / 1024
-
-    def cpuTime(self, dataLabel):
-        return self.getStatFromLog('CPU time', dataLabel)
-
-    def memoryAverage(self, dataLabel):
-        return self.getStatFromLog('Average Memory', dataLabel)
-
-    def memoryMaximum(self, dataLabel):
-        return self.getStatFromLog('Max Memory', dataLabel)
-
-    def nEventsPerFile(self, dataLabel):
-        parentFile = get_test_file(dataLabel)
-        return get_eventN(parentFile)
-
-    def nTotalFiles(self, dataLabel):
-        return get_total_infiles(dataLabel, self.__skimName)
-
-    # Helper functions
-    def getStatFromLog(self, statistic, dataLabel):
-        """Search for a given statistic in the "Resource usage summary" section of the log file."""
-        logFileContents = self.__logs[dataLabel]
-
-        floatRegexp = '\s*:\s+(\d+(\.(\d+)?)?)'
-        statFromLog = re.findall(f'{statistic}{floatRegexp}', logFileContents)[0][0]
-
-        return float(statFromLog)
+}
 
 
 if __name__ == '__main__':
+    # TODO: put into function getSkimStats(skims) which returns a dict
+    skimStats = {skim: {stat: {} for stat in statistics.keys()} for skim in skims}
 
-    allSkimStats = {skim: SkimStats(skim, dataLabels).statsDict() for skim in skims}
-    print(allSkimStats)
+    for skim in skims:
+        for sampleLabel in sampleLabels:
+            logFileName = f'log/{skim}_{sampleLabel}.out'
+            with open(logFileName) as logFile:
+                logContents = logFile.read()
+
+            jsonFileName = f'log/JobInformation_{skim}_{sampleLabel}.json'
+            with open(jsonFileName) as jsonFile:
+                jsonContents = json.load(jsonFile)
+
+            for statName, statInfo in statistics.items():
+                statFunction = statInfo['Calculate']
+
+                skimStats[skim][statName][sampleLabel] = statFunction(jsonContents, logContents, skim, sampleLabel)
+
+    for skim in skims:
+        for statName, statInfo in statistics.items():
+            combiningFunction = statInfo['Combine']
+            skimStats[skim][statName]['Combined MC'] = combiningFunction(skimStats[skim][statName])
 
     outputJsonName = 'skimStats.json'
     with open(outputJsonName, 'w') as outputJson:
-        json.dump(allSkimStats, outputJson, indent=4)
+        json.dump(skimStats, outputJson, indent=4)

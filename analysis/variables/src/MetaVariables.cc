@@ -47,7 +47,7 @@ namespace Belle2 {
     // Explores the decay tree of a particle and return the (grand^n)daughter indentified by a coordinate string.
     // The coordinate string consists in a whitespace-separated the list of daughter indexes, starting from the root particle:
     // 0 1 3  identifies the fourth daugther (3) of the second daugther (1) of the first daugther (0) of the mother particle.
-    const Particle* getParticleFromCoordinateString(const Particle* particle, const std::string coordinate)
+    const Particle* getParticleFromCoordinateString(const Particle* particle, const std::string& coordinate)
     {
 
       // Split the coordinate string in a vector of strings.

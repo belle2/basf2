@@ -20,6 +20,7 @@
 
 // root
 #include <TTree.h>
+#include <TH1F.h>
 #include <TH2F.h>
 #include <TRandom.h>
 
@@ -138,11 +139,38 @@ namespace Belle2 {
     // create and register output histograms and ntuples
 
     int numModules = geo->getNumModules();
-    auto h = new TH2F("tracks_per_slot", "tracks per slot and sample",
-                      numModules, 0.5, numModules + 0.5, c_numSets, 0, c_numSets);
-    h->SetXTitle("slot number");
-    h->SetYTitle("sample number");
-    registerObject<TH2F>("tracks_per_slot", h);
+    auto h1 = new TH2F("tracks_per_slot", "tracks per slot and sample",
+                       numModules, 0.5, numModules + 0.5, c_numSets, 0, c_numSets);
+    h1->SetXTitle("slot number");
+    h1->SetYTitle("sample number");
+    registerObject<TH2F>("tracks_per_slot", h1);
+
+    auto h2 = new TH1F("local_z", "distribution of tracks along bar", 100, -150.0, 150.0);
+    h2->SetXTitle("local z [cm]");
+    registerObject<TH1F>("local_z", h2);
+
+    auto h3 = new TH2F("cth_vs_p", "track momentum", 100, 0.0, 7.0, 100, -1.0, 1.0);
+    h3->SetXTitle("p [GeV/c]");
+    h3->SetYTitle("cos #theta");
+    registerObject<TH2F>("cth_vs_p", h3);
+
+    auto h4 = new TH2F("poca_xy", "distribution of track POCA in x-y",
+                       100, -m_dr, m_dr, 100, -m_dr, m_dr);
+    h4->SetXTitle("x [cm]");
+    h4->SetYTitle("y [cm]");
+    registerObject<TH2F>("poca_xy", h4);
+
+    auto h5 = new TH1F("poca_z", "distribution of track POCA in z", 100, -m_dz, m_dz);
+    h5->SetXTitle("z [cm]");
+    registerObject<TH1F>("poca_z", h5);
+
+    auto h6 = new TH1F("Ecms", "c.m.s. energy of track", 100, 5.1, 5.4);
+    h6->SetXTitle("E_{cms} [GeV]");
+    registerObject<TH1F>("Ecms", h6);
+
+    auto h7 = new TH1F("charge", "charge of track", 3, -1.5, 1.5);
+    h7->SetXTitle("charge");
+    registerObject<TH1F>("charge", h7);
 
     for (int set = 0; set < c_numSets; set++) {
       std::string name = "alignTree" + to_string(set);
@@ -259,6 +287,20 @@ namespace Belle2 {
       // fill output tree
       auto alignTree = getObjectPtr<TTree>(name);
       alignTree->Fill();
+
+      // fill control histograms
+      auto h2 = getObjectPtr<TH1F>("local_z");
+      h2->Fill(m_z);
+      auto h3 = getObjectPtr<TH2F>("cth_vs_p");
+      h3->Fill(m_p, cos(m_theta));
+      auto h4 = getObjectPtr<TH2F>("poca_xy");
+      h4->Fill(m_pocaX, m_pocaY);
+      auto h5 = getObjectPtr<TH1F>("poca_z");
+      h5->Fill(m_pocaZ);
+      auto h6 = getObjectPtr<TH1F>("Ecms");
+      h6->Fill(m_cmsE);
+      auto h7 = getObjectPtr<TH1F>("charge");
+      h7->Fill(m_charge);
 
     } // tracks
 

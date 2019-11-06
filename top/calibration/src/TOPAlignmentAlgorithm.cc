@@ -109,7 +109,21 @@ namespace Belle2 {
       string outputFileName = "alignment-e" + expNo + "-r" + runNo + ".root";
       auto* file = TFile::Open(outputFileName.c_str(), "recreate");
 
+      // write control histograms
+
       h1->Write();
+      auto h2 = getObjectPtr<TH1F>("local_z");
+      if (h2) h2->Write();
+      auto h3 = getObjectPtr<TH2F>("cth_vs_p");
+      if (h3) h3->Write();
+      auto h4 = getObjectPtr<TH2F>("poca_xy");
+      if (h4) h4->Write();
+      auto h5 = getObjectPtr<TH1F>("poca_z");
+      if (h5) h5->Write();
+      auto h6 = getObjectPtr<TH1F>("Ecms");
+      if (h6) h6->Write();
+      auto h7 = getObjectPtr<TH1F>("charge");
+      if (h7) h7->Write();
 
       // book output histograms
 
@@ -133,19 +147,19 @@ namespace Belle2 {
       auto h_x = new TH1F("delta_x", "Displacement in x",
                           numModules, 0.5, numModules + 0.5);
       h_x->SetXTitle("slot number");
-      h_x->SetYTitle("#Delta x [cm]");
+      h_x->SetYTitle("#Deltax [cm]");
       h_params.push_back(h_x);
 
       auto h_y = new TH1F("delta_y", "Displacement in y",
                           numModules, 0.5, numModules + 0.5);
       h_y->SetXTitle("slot number");
-      h_y->SetYTitle("#Delta y [cm]");
+      h_y->SetYTitle("#Deltay [cm]");
       h_params.push_back(h_y);
 
       auto h_z = new TH1F("delta_z", "Displacement in z",
                           numModules, 0.5, numModules + 0.5);
       h_z->SetXTitle("slot number");
-      h_z->SetYTitle("#Delta z [cm]");
+      h_z->SetYTitle("#Deltaz [cm]");
       h_params.push_back(h_z);
 
       auto h_alpha = new TH1F("alpha", "Rotation angle around x",
@@ -169,13 +183,13 @@ namespace Belle2 {
       auto h_t0 = new TH1F("t0", "Module T0",
                            numModules, 0.5, numModules + 0.5);
       h_t0->SetXTitle("slot number");
-      h_t0->SetYTitle("t_0 [ns]");
+      h_t0->SetYTitle("t_{0} [ns]");
       h_params.push_back(h_t0);
 
       auto h_refind = new TH1F("dn_n", "Refractive index scale factor",
                                numModules, 0.5, numModules + 0.5);
       h_refind->SetXTitle("slot number");
-      h_refind->SetYTitle("#Delta n/n");
+      h_refind->SetYTitle("#Deltan/n");
       h_params.push_back(h_refind);
 
       // create DB object

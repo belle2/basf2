@@ -46,7 +46,8 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   addParam("MinimalMatchingDigits", m_MinimalMatchingDigits,
            "Minimal number of matching digits.", 0);
   addParam("AllowedDistance1D", m_AllowedDistance1D,
-           "Max distance in strips number to 1D hit from extHit to be still matched (default 8 strips)", double(8));
+           "Maximal distance in the units of strip number from ExtHit to "
+           "matching (B|E)KLMDigit.", double(8));
   setPropertyFlags(c_ParallelProcessingCertified);
   m_ElementNumbers = &(KLMElementNumbers::Instance());
   m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
@@ -66,18 +67,16 @@ void KLMStripEfficiencyCollectorModule::prepare()
   m_extHits.isRequired();
   if (m_MuonListName != "")
     m_MuonList.isRequired(m_MuonListName);
-
-  TH1F* MatchedDigitsInPlane =
-    new TH1F("Matched Digits in planeNumber", "",
-             EKLMElementNumbers::getMaximalPlaneGlobalNumber(),
-             0.5, EKLMElementNumbers::getMaximalPlaneGlobalNumber() + 0.5);
-  TH1F* AllExtHitsInPlane = new TH1F(
-    "All ExtHits in planeNumber", "",
+  TH1F* matchedDigitsInPlane = new TH1F(
+    "matchedDigitsInPlane", "Number of matching (B|E)KLMDigits",
     EKLMElementNumbers::getMaximalPlaneGlobalNumber(),
     0.5, EKLMElementNumbers::getMaximalPlaneGlobalNumber() + 0.5);
-
-  registerObject<TH1F>("MatchedDigitsInPlane", MatchedDigitsInPlane);
-  registerObject<TH1F>("AllExtHitsInPlane", AllExtHitsInPlane);
+  TH1F* allExtHitsInPlane = new TH1F(
+    "allExtHitsInPlane", "Number of ExtHits",
+    EKLMElementNumbers::getMaximalPlaneGlobalNumber(),
+    0.5, EKLMElementNumbers::getMaximalPlaneGlobalNumber() + 0.5);
+  registerObject<TH1F>("matchedDigitsInPlane", matchedDigitsInPlane);
+  registerObject<TH1F>("allExtHitsInPlane", allExtHitsInPlane);
 }
 
 void KLMStripEfficiencyCollectorModule::startRun()
@@ -149,11 +148,8 @@ void KLMStripEfficiencyCollectorModule::findMatchingDigit(
 
 void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
 {
-  TH1F* MatchedDigitsInPlane;
-  MatchedDigitsInPlane = getObjectPtr<TH1F>("MatchedDigitsInPlane");
-  TH1F* AllExtHitsInPlane;
-  AllExtHitsInPlane = getObjectPtr<TH1F>("AllExtHitsInPlane");
-
+  TH1F* matchedDigitsInPlane = getObjectPtr<TH1F>("matchedDigitsInPlane");
+  TH1F* allExtHitsInPlane = getObjectPtr<TH1F>("allExtHitsInPlane");
   RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
   std::map<uint16_t, struct HitData> selectedHits;
   std::map<uint16_t, struct HitData>::iterator it;
@@ -233,8 +229,8 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
       matchingDigits--;
     if (matchingDigits < m_MinimalMatchingDigits)
       continue;
-    AllExtHitsInPlane->Fill(it->first);
+    allExtHitsInPlane->Fill(it->first);
     if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr)
-      MatchedDigitsInPlane->Fill(it->first);
+      matchedDigitsInPlane->Fill(it->first);
   }
 }

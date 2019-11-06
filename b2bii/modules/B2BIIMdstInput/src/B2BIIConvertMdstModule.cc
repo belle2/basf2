@@ -215,8 +215,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
 
-  StoreObjPtr<EventExtraInfo> eventExtraInfo;
-  eventExtraInfo.registerInDataStore();
+  if (m_convertEvtcls) m_evtCls.registerInDataStore();
 
   StoreObjPtr<ParticleList> gammaParticleList("gamma:mdst");
   gammaParticleList.registerInDataStore();
@@ -1251,25 +1250,35 @@ void B2BIIConvertMdstModule::convertExtHitTable()
 
 void B2BIIConvertMdstModule::convertEvtclsTable()
 {
-  StoreObjPtr<EventExtraInfo> eventExtraInfo;
-  if (not eventExtraInfo.isValid())
-    eventExtraInfo.create();
+  // Create StoreObj if it is not valid
+  if (not m_evtCls.isValid()) {
+    m_evtCls.create();
+  }
+  // Pull Evtcls_flag(2) from manager
   Belle::Evtcls_flag_Manager& EvtFlagMgr = Belle::Evtcls_flag_Manager::get_manager();
-  /*
-    for (Belle::Evtcls_flag::iterator eflagIterator = EvtFlagMgr.begin(); eflagIterator != EvtFlagMgr.end(); ++eflagIterator) {
-        Belle::Evtcls_flag mEvtC = *eflagIterator;
-        int flag5 = mEvtC.flag(5);
-        std::cout << flag5 << std::endl;
-    }
-  */
+  Belle::Evtcls_flag2_Manager& EvtFlag2Mgr = Belle::Evtcls_flag2_Manager::get_manager();
+
+  std::string name = "flag";
+  // Only one entry in each event
   std::vector<Belle::Evtcls_flag>::iterator eflagIterator = EvtFlagMgr.begin();
+  std::vector<Belle::Evtcls_flag2>::iterator eflag2Iterator = EvtFlag2Mgr.begin();
+
   std::vector<int> flag(20);
   for (int index = 0; index < 20; ++index) {
-    flag[index] = (*eflagIterator).flag(index);
-    std::cout << "This is for Event classification flag(" << index << "): " << flag[index] << std::endl;
+    // flag(9-17): not used
+    if (index > 8 && index < 18) continue;
+    // 0-9 corresponding to evtcls_flag.flag(0-9)
+    if (index < 10) {
+      flag[index] = (*eflagIterator).flag(index);
+      B2DEBUG(99, "evtcls_flag(" << index << ") = " << flag[index]);
+    } else {
+      // 10-19 corresponding to evtcls_flag2.flag(0-9)
+      flag[index] = (*eflag2Iterator).flag(index - 10);
+      B2DEBUG(99, "evtcls_flag(" << index << ") = " << flag[index]);
+    }
+    std::string iVar = name + std::to_string(index);
+    m_evtCls->addExtraInfo(iVar, flag[index]);
   }
-  eventExtraInfo->addExtraInfo("evtcls_flag", flag[0]);
-
 }
 
 //-----------------------------------------------------------------------------

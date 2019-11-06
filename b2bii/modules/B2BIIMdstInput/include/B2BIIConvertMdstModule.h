@@ -35,6 +35,7 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <analysis/dataobjects/EventExtraInfo.h>
 
 // Replace BeamParameters
 #include <mdst/dbobjects/BeamSpot.h>
@@ -418,7 +419,7 @@ namespace Belle2 {
     StoreArray<ExtHit> m_extHits;
 
     /** Event classification flags */
-//    StoreObjPtr<EventExtraInfo> eventExtraInfo;
+    StoreObjPtr<EventExtraInfo> m_evtCls;
 
     /** BeamSpot for IP */
     OptionalDBObjPtr<BeamSpot> m_beamSpotDB;

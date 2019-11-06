@@ -215,7 +215,7 @@ namespace Belle2 {
         }
         if (vsize < 6) {
           B2ERROR("slot " << moduleID <<
-                  "too few alignment parameters found in ntuple");
+                  ": too few alignment parameters found in ntuple");
           continue;
         }
         alignment->setX(moduleID, data.alignPars[0], data.alignErrs[0]);

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
+###############################################################################
 #
 # Stuck? Ask for help at questions.belle2.org
 #
-# This tutorial demonstrates how to use the FSRCorrection
-# module for the following decay:
+# This tutorial demonstrates how to correct for Bremsstrahlung radiation for
+# the following decay:
 #
 #   J/psi
 #    |
@@ -15,18 +15,17 @@
 #        |  +-> e+ (gamma)
 #        +-> e- (gamma)
 #
-# Notes:
+# Note:
 #
-# 1) The electrons in the corrected list have an
-#    attaced extraInfo 'fsrCorrected', indicating if
-#    the electron was corrected (1) or not (0).
-# 2) It's recommended to use looseMCMatching.
+# The electrons in the corrected list have an attached extraInfo
+# 'bremsCorrected', indicating if the electron was corrected (1) or not (0).
 #
 # Contributors: Moritz Gelb (February 2017)
-#               I. Komarov (Demeber 2017)
+#               I. Komarov (December 2017)
 #               I. Komarov (September 2018)
+#               F. Meier (October 2019)
 #
-################################################################################
+###############################################################################
 
 import basf2 as b2
 import modularAnalysis as ma
@@ -44,26 +43,23 @@ ma.inputMdst(environmentType='default',
 
 # fill particleLists
 ma.fillParticleList(decayString='e+:uncorrected',
-                    cut='electronID > 0.2 and d0 < 2 and abs(z0) < 4',
+                    cut='electronID > 0.2 and dr < 2 and abs(dz) < 4',
                     path=my_path)
 ma.fillParticleList(decayString='gamma:all',
                     cut='E < 1.0',
-                    writeOut=False,
                     path=my_path)
 
-# loose mc matching (recommended)
-ma.looseMCTruth(list_name='e+:uncorrected', path=my_path)
-ma.looseMCTruth(list_name='gamma:all', path=my_path)
+# MC matching
+ma.matchMCTruth(list_name='e+:uncorrected', path=my_path)
+ma.matchMCTruth(list_name='gamma:all', path=my_path)
 
-# fsr correction
-ma.correctFSR(outputListName='e+:corrected',
-              inputListName='e+:uncorrected',
-              gammaListName='gamma:all',
-              angleThreshold=5.0,
-              energyThreshold=1.0,
-              writeOut=False,
-              path=my_path)
-ma.looseMCTruth(list_name='e+:corrected',
+# correction of Bremsstrahlung
+# A new lepton is generated, with the old electron and, if found, a gamma as daughters.
+ma.correctBrems(outputList='e+:corrected',
+                inputList='e+:uncorrected',
+                gammaList='gamma:all',
+                path=my_path)
+ma.matchMCTruth(list_name='e+:corrected',
                 path=my_path)
 
 # uncorrected
@@ -74,18 +70,14 @@ ma.reconstructDecay(decayString='J/psi:corrected -> e+:corrected e-:corrected',
                     cut='',
                     path=my_path)
 
-# loose MC matching
-ma.looseMCTruth(list_name='J/psi:uncorrected', path=my_path)
-ma.looseMCTruth(list_name='J/psi:corrected', path=my_path)
+# MC matching
+ma.matchMCTruth(list_name='J/psi:uncorrected', path=my_path)
+ma.matchMCTruth(list_name='J/psi:corrected', path=my_path)
 
 # get all MC particles
 ma.fillParticleListFromMC(decayString='J/psi:MC', cut="", path=my_path)
 
 # write out ntuples
-
-# Please note, a new lepton is generated, with the old electron and -if found- a gamma as daughters.
-# Information attached to the track is only available for the old lepton, accessable via the daughter
-# metavariable, e.g. <daughter(0, eid)>.
 
 var0 = ['p',
         'px',
@@ -94,7 +86,7 @@ var0 = ['p',
         'x',
         'y',
         'z',
-        'daughter(0, electronID)',
+        'electronID',
         'PDG',
         'mcPDG',
         'E',
@@ -108,12 +100,7 @@ var0 = ['p',
         'pErr',
         'isSignal',
         'mcErrors',
-        'extraInfo(fsrCorrected)',
-        'extraInfo(looseMCMotherPDG)',
-        'extraInfo(looseMCMotherIndex)',
-        'extraInfo(looseMCWrongDaughterN)',
-        'extraInfo(looseMCWrongDaughterPDG)',
-        'extraInfo(looseMCWrongDaughterBiB)',
+        'extraInfo(bremsCorrected)'
         ]
 var1 = ['M',
         'p',
@@ -123,13 +110,8 @@ var1 = ['M',
         'mcErrors',
         'daughter(0, p)',
         'daughter(1, p)',
-        'daughter(0, extraInfo(fsrCorrected))',
-        'daughter(1, extraInfo(fsrCorrected))',
-        'extraInfo(looseMCMotherPDG)',
-        'extraInfo(looseMCMotherIndex)',
-        'extraInfo(looseMCWrongDaughterN)',
-        'extraInfo(looseMCWrongDaughterPDG)',
-        'extraInfo(looseMCWrongDaughterBiB)',
+        'daughter(0, extraInfo(bremsCorrected))',
+        'daughter(1, extraInfo(bremsCorrected))'
         ]
 
 ma.variablesToNtuple(decayString='e+:uncorrected',

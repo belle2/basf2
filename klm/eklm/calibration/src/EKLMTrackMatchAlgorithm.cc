@@ -19,12 +19,12 @@ using namespace Belle2;
 EKLMTrackMatchAlgorithm::EKLMTrackMatchAlgorithm() : CalibrationAlgorithm("EKLMTrackMatchCollector")
 {
   m_planesEff = new TH1F(
-    "plane_effiiency", "",
+    "plane_efficiency", "",
     EKLMElementNumbers::getMaximalPlaneGlobalNumber(),
     0.5, EKLMElementNumbers::getMaximalPlaneGlobalNumber() + 0.5);
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
   m_StripEfficiency = new KLMStripEfficiency();
-  m_file = new TFile("TrackMAtchedResult.root", "recreate");
+  m_file = new TFile("TrackMatchedResult.root", "recreate");
   m_file->cd();
 }
 

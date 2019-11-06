@@ -369,10 +369,9 @@ namespace Belle2 {
       float BcpFlavor = 0;
 
       if (roe != nullptr) {
-        const Particle* Bcp = roe->getRelated<Particle>();
-        const MCParticle* BcpMC = roe->getRelated<Particle>()->getRelatedTo<MCParticle>();
+        const MCParticle* BcpMC = particle->getRelatedTo<MCParticle>();
 
-        if (Variable::isSignal(Bcp) > 0) {
+        if (Variable::isSignal(particle) > 0 && BcpMC != nullptr) {
           const MCParticle* Y4S = BcpMC->getMother();
           if (Y4S != nullptr) {
             for (auto& iTrack : roe->getTracks()) {
@@ -528,20 +527,25 @@ namespace Belle2 {
       } else return -2;//gRandom->Uniform(0, 1);
     }
 
-    double mcFlavorOfOtherB0(const Particle* particle)
+    double mcFlavorOfOtherB(const Particle* particle)
     {
 
-      if (std::abs(particle->getPDGCode()) != 511) {
-        B2ERROR("MCFlavorOfOtherB0: the given particle is not a neutral B meson. This variable works only for B0 or B0bar particles. ");
-        return 0;
+      if (std::abs(particle->getPDGCode()) != 511 && std::abs(particle->getPDGCode()) != 521) {
+        B2ERROR("MCFlavorOfOtherB: this variable works only for B mesons.\n"
+                "The given particle with PDG code " << particle->getPDGCode() <<
+                " is not a B-meson candidate (PDG code 511 or 521). ");
+        return std::numeric_limits<double>::quiet_NaN();
       }
 
-      if (Variable::isSignal(particle) < 1.0) return 0;
-
       const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
+
+      if (mcParticle == nullptr) return std::numeric_limits<double>::quiet_NaN();
+
       const MCParticle* mcMother = mcParticle->getMother();
 
-      if (mcMother == nullptr) return 0;
+      if (mcMother == nullptr) return std::numeric_limits<double>::quiet_NaN();
+
+      if (Variable::isSignal(particle) < 1.0) return 0;
 
       for (auto& upsilon4SDaughter : mcMother -> getDaughters()) {
         if (upsilon4SDaughter != mcParticle) {
@@ -1754,13 +1758,14 @@ namespace Belle2 {
 
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
 
-          double output = 0.0;
+          double output = std::numeric_limits<double>::quiet_NaN();
 
           Variable::Manager& manager = Variable::Manager::Instance();
 
 
           if (ListOfParticles.isValid())
           {
+            output = 0;
             bool particlesHaveMCAssociated = false;
             int nTargets = 0;
             for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
@@ -1779,7 +1784,7 @@ namespace Belle2 {
               }
             }
 
-            if (!particlesHaveMCAssociated) output = -2;
+            if (!particlesHaveMCAssociated) output = std::numeric_limits<double>::quiet_NaN();
             if (nTargets > 0) output = 1;
 
             // if (nTargets > 1); B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
@@ -1818,7 +1823,7 @@ namespace Belle2 {
 
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
 
-          double output = 0.0;
+          double output = std::numeric_limits<double>::quiet_NaN();
 
           std::vector<Particle*> targetParticles;
           std::vector<Particle*> targetParticlesCategory;
@@ -1826,6 +1831,7 @@ namespace Belle2 {
 
           if (ListOfParticles.isValid())
           {
+            output = 0;
             int nTargets = 0;
             for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
               Particle* iParticle = ListOfParticles->getParticle(i);
@@ -1847,7 +1853,7 @@ namespace Belle2 {
               if (isTargetOfRightCategory == 1) {
                 output = 1;
                 nTargets += 1; targetParticlesCategory.push_back(targetParticle);
-              } else if (isTargetOfRightCategory == -2 && output != 1) output = -2;
+              } else if (isTargetOfRightCategory == -2 && output != 1) output = std::numeric_limits<double>::quiet_NaN();
             }
 
             /*            if (nTargets > 1) {
@@ -1879,7 +1885,7 @@ namespace Belle2 {
         std::string combinerMethod = arguments[0];
         auto func = [combinerMethod](const Particle * particle) -> double {
 
-          double output = -2;
+          double output = std::numeric_limits<double>::quiet_NaN();
           auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
@@ -1903,7 +1909,7 @@ namespace Belle2 {
         std::string combinerMethod = arguments[0];
         auto func = [combinerMethod](const Particle * particle) -> double {
 
-          double output = -2;
+          double output = std::numeric_limits<double>::quiet_NaN();
           auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
@@ -1927,7 +1933,7 @@ namespace Belle2 {
         std::string combinerMethod = arguments[0];
         auto func = [combinerMethod](const Particle * particle) -> double {
 
-          int output = -2;
+          int output = std::numeric_limits<int>::quiet_NaN();
           auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
@@ -1958,7 +1964,7 @@ namespace Belle2 {
         std::string categoryName = arguments[0];
         auto func = [categoryName](const Particle * particle) -> double {
 
-          double output = -2;
+          double output = std::numeric_limits<double>::quiet_NaN();
           auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
@@ -1985,7 +1991,7 @@ namespace Belle2 {
         std::string categoryName = arguments[0];
         auto func = [categoryName](const Particle * particle) -> double {
 
-          double output = -2;
+          double output = std::numeric_limits<double>::quiet_NaN();
           auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
@@ -2012,7 +2018,7 @@ namespace Belle2 {
         std::string categoryName = arguments[0];
         auto func = [categoryName](const Particle * particle) -> double {
 
-          double output = -2;
+          double output = std::numeric_limits<double>::quiet_NaN();
           auto* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
 
           if (flavorTaggerInfo != nullptr)
@@ -2071,8 +2077,8 @@ namespace Belle2 {
                       " 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a B0bar (B0).");
     REGISTER_VARIABLE("isRestOfEventMajorityB0Flavor", isRestOfEventMajorityB0Flavor,
                       "0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a B0bar (B0).");
-    REGISTER_VARIABLE("mcFlavorOfOtherB0", mcFlavorOfOtherB0,
-                      "Returns the MC flavor (+-1) of the accompaning tag-side neutral B meson if the given particle is a correctly MC matched neutral B. It returns 0 else. \n"
+    REGISTER_VARIABLE("mcFlavorOfOtherB", mcFlavorOfOtherB,
+                      "Returns the MC flavor (+-1) of the accompaning tag-side B meson if the given particle is a correctly MC-matched B candidate. It returns 0 else. \n"
                       "In other words, this variable checks the generated flavor of the other MC Upsilon(4S) daughter.");
 
     VARIABLE_GROUP("Flavor Tagger MetaFunctions")

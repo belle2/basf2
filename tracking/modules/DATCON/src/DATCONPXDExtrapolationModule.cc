@@ -96,7 +96,6 @@ DATCONPXDExtrapolationModule::event()
 
           double x = std::numeric_limits<double>::max();
           double y = std::numeric_limits<double>::max();
-          double z = std::numeric_limits<double>::max();
 
           if (layer == 1) {
             sensorPhi = M_PI / 4. * (ladder - 1);
@@ -131,6 +130,7 @@ DATCONPXDExtrapolationModule::event()
             y = sensorPerpRadius * tan(angleDiff);
           }
 
+          double z;
           if (trackTheta < (M_PI / 2.0)) {
             z = sqrt(x * x + y * y) / tan(trackTheta);
           } else if (trackTheta > (M_PI / 2.0)) {

@@ -143,7 +143,7 @@ Variables
 
 * Removed the misleading variable ``McFlavorOfTagSide``.
 
-* Added a variable :b2:var:`mcFlavorOfOtherB0` which returns the tag-side flavor by checking the other Upsilon4S
+* Added a variable :b2:var:`mcFlavorOfOtherB` which returns the tag-side flavor by checking the other Upsilon4S
   daughter without using the ROE. This variable is part of the default ``flavor_tagging`` collection.
 
 * The name of the variable ``MCTagBFlavor`` changed to :b2:var:`internalTagVMCFlavor`. 

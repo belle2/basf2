@@ -753,7 +753,10 @@ namespace Belle2 {
 
     double eclClusterEoP(const Particle* part)
     {
-      const double E = eclClusterE(part);
+      double E = eclClusterE(part);
+      if (part->hasExtraInfo("bremsCorrectedPhotonEnergy")) {
+        E += part->getExtraInfo("bremsCorrectedPhotonEnergy");
+      }
       const double p =  part->getMomentumMagnitude();
       if (0 == p) { return std::numeric_limits<float>::quiet_NaN();}
       return E / p;

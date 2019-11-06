@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/modules/FSRCorrection/BelleBremRecoveryModule.h>
+#include <analysis/modules/BremsCorrection/BelleBremRecoveryModule.h>
 // framework aux
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
@@ -23,6 +23,9 @@
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
+
+// variables
+#include <analysis/variables/ECLVariables.h>
 
 #include <algorithm>
 #include <TMatrixFSym.h>
@@ -130,6 +133,7 @@ namespace Belle2 {
       TLorentzVector lepton4Vector = lepton->get4Vector();
       TLorentzVector new4Vec = lepton->get4Vector();
       std::vector<Particle*> selectedGammas;
+      double bremsGammaEnergySum = 0.0;
       // look for all possible (radiative) gamma
       for (unsigned j = 0; j < nGam; j++) {
         Particle* gamma = m_gammaList->getParticle(j);
@@ -153,6 +157,7 @@ namespace Belle2 {
       //Preparing 4-momentum vector of charged particle by adding bremphoton momenta
       for (auto const& fsrgamma : selectedGammas) {
         new4Vec += fsrgamma->get4Vector();
+        bremsGammaEnergySum += Variable::eclClusterE(fsrgamma);
         if (!m_isMultiPho) break;
       }
       Particle correctedLepton(new4Vec, lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,
@@ -174,6 +179,8 @@ namespace Belle2 {
       correctedLepton.setMomentumVertexErrorMatrix(corLepMatrix);
       correctedLepton.setVertex(lepton->getVertex());
       correctedLepton.setPValue(lepton->getPValue());
+      correctedLepton.addExtraInfo("bremsCorrected", float(selectedGammas.size() > 0));
+      correctedLepton.addExtraInfo("bremsCorrectedPhotonEnergy", bremsGammaEnergySum);
       // add the mc relation
       Particle* newLepton = particles.appendNew(correctedLepton);
       const MCParticle* mcLepton = lepton->getRelated<MCParticle>();

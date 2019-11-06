@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/KLMDigitEventInfo.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
@@ -43,6 +43,9 @@ namespace Belle2 {
      * Hit data.
      */
     struct HitData {
+
+      /** Subdetector. */
+      int subdetector;
 
       /** Section. */
       int section;
@@ -121,6 +124,15 @@ namespace Belle2 {
   private:
 
     /**
+     * Add hit to map.
+     * @param[in] hitMap  Hit map.
+     * @param[in] plane   Plane number.
+     * @param[in] hitData Hit data.
+     */
+    void addHit(std::map<uint16_t, struct HitData>& hitMap,
+                uint16_t planeGlobal, struct HitData* hitData);
+
+    /**
      * Collect the data for one track.
      * @param[in] track Track.
      */
@@ -161,11 +173,11 @@ namespace Belle2 {
     /** Muons. */
     StoreObjPtr<ParticleList> m_MuonList;
 
-    /** Geometry data. */
-    const EKLM::GeometryData* m_GeoDat;
+    /** Element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
 
-    /** EKLMElementNumbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
+    /** EKLM element numbers. */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;
 
     /** Output file name */
     std::string m_filename;

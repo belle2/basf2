@@ -117,6 +117,26 @@ namespace Belle2 {
       int* layer, int* plane, int* strip) const;
 
     /**
+     * Get plane number for BKLM.
+     * @param[in] section Forward (1) or backward (0) BKLM.
+     * @param[in] sector  Sector (1-based).
+     * @param[in] layer   Layer (1-based).
+     * @param[in] plane   Plane (0-based).
+     */
+    uint16_t planeNumberBKLM(int section, int sector, int layer,
+                             int plane) const;
+
+    /**
+     * Get channel number for EKLM.
+     * @param[in] section Section number.
+     * @param[in] sector  Sector number.
+     * @param[in] layer   Layer number.
+     * @param[in] plane   Plane number.
+     */
+    uint16_t planeNumberEKLM(int section, int sector, int layer,
+                             int plane) const;
+
+    /**
      * Get module number.
      * @param[in] subdetector Subdetector.
      * @param[in] section     Section.

@@ -51,8 +51,8 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   addParam("AllowedDistance1D", m_AllowedDistance1D,
            "Max distance in strips number to 1D hit from extHit to be still matched (default 8 strips)", double(8));
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
-  m_GeoDat = nullptr;
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
+  m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 KLMStripEfficiencyCollectorModule::~KLMStripEfficiencyCollectorModule()
@@ -71,7 +71,6 @@ void KLMStripEfficiencyCollectorModule::prepare()
   m_recoTracks.registerRelationTo(m_hit2ds);
   if (m_MuonListName != "")
     m_MuonList.isRequired(m_MuonListName);
-  m_GeoDat = &(EKLM::GeometryData::Instance());
 
   TH1F* MatchedDigitsInPlane =
     new TH1F("Matched Digits in planeNumber", "",
@@ -142,6 +141,22 @@ void KLMStripEfficiencyCollectorModule::collect()
   }
 }
 
+void KLMStripEfficiencyCollectorModule::addHit(
+  std::map<uint16_t, struct HitData>& hitMap,
+  uint16_t planeGlobal, struct HitData* hitData)
+{
+  std::map<uint16_t, struct HitData>::iterator it;
+  it = hitMap.find(planeGlobal);
+  /*
+   * There may be more than one such hit e.g. if track crosses the edge
+   * of the strips or WLS fiber groove. Select only one hit per plane.
+   */
+  if (it == hitMap.end()) {
+    hitMap.insert(std::pair<uint16_t, struct HitData>(
+                    planeGlobal, *hitData));
+  }
+}
+
 void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
 {
   bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()] =
@@ -155,8 +170,8 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
   AllExtHitsInPlane = getObjectPtr<TH1F>("AllExtHitsInPlane");
 
   RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
-  std::map<int, struct HitData> selectedHits;
-  std::map<int, struct HitData>::iterator it;
+  std::map<uint16_t, struct HitData> selectedHits;
+  std::map<uint16_t, struct HitData>::iterator it;
   struct HitData hitData;
   for (const ExtHit& hit : extHits) {
     if (hit.getDetectorID() != Const::EDetector::EKLM)
@@ -164,21 +179,43 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
     /* Choose hits that enter the sensitive volume. */
     if (hit.getStatus() != EXT_ENTER)
       continue;
-    /*
-     * There may be more than one such hit e.g. if track crosses the edge
-     * of the strips or WLS fiber groove. Select only one hit per plane.
-     */
-    int stripGlobal = hit.getCopyID();
-    m_ElementNumbers->stripNumberToElementNumbers(
-      stripGlobal, &hitData.section, &hitData.layer, &hitData.sector,
-      &hitData.plane, &hitData.strip);
+    uint16_t planeGlobal = 0;
     hitData.hit = &hit;
     hitData.digit = nullptr;
-    int planeGlobal = m_ElementNumbers->planeNumber(
-                        hitData.section, hitData.layer, hitData.sector, hitData.plane);
-    it = selectedHits.find(planeGlobal);
-    if (it == selectedHits.end())
-      selectedHits.insert(std::pair<int, struct HitData>(planeGlobal, hitData));
+    if (hit.getDetectorID() == Const::EDetector::EKLM) {
+      int stripGlobal = hit.getCopyID();
+      hitData.subdetector = KLMElementNumbers::c_EKLM;
+      m_ElementNumbersEKLM->stripNumberToElementNumbers(
+        stripGlobal, &hitData.section, &hitData.layer, &hitData.sector,
+        &hitData.plane, &hitData.strip);
+      planeGlobal = m_ElementNumbers->planeNumberEKLM(
+                      hitData.section, hitData.sector, hitData.layer, hitData.plane);
+      addHit(selectedHits, planeGlobal, &hitData);
+    } else if (hit.getDetectorID() == Const::EDetector::BKLM) {
+      int module = hit.getCopyID();
+      hitData.subdetector = KLMElementNumbers::c_BKLM;
+      BKLMElementNumbers::moduleNumberToElementNumbers(
+        module, &hitData.section, &hitData.sector, &hitData.layer);
+      if (hitData.layer < BKLMElementNumbers::c_FirstRPCLayer) {
+        /*
+         * For scintillators, the plane and strip numbers are recorded
+         * in the copy number.
+         */
+        BKLMElementNumbers::channelNumberToElementNumbers(
+          module, &hitData.section, &hitData.sector, &hitData.layer,
+          &hitData.plane, &hitData.strip);
+        planeGlobal = m_ElementNumbers->planeNumberBKLM(
+                        hitData.section, hitData.sector, hitData.layer, hitData.plane);
+        addHit(selectedHits, planeGlobal, &hitData);
+      } else {
+        /* For RPCs, the sensitive volume corresponds to both readout planes. */
+        hitData.plane = BKLMElementNumbers::c_ZPlane;
+        addHit(selectedHits, planeGlobal, &hitData);
+        hitData.plane = BKLMElementNumbers::c_PhiPlane;
+        addHit(selectedHits, planeGlobal, &hitData);
+      }
+    } else
+      continue;
   }
   /* Find matching digits. */
   int nDigits = 0;

@@ -139,12 +139,6 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
   Precision chi2 = traceOfW * (1. + pocaD / rho) * (1. + curvature * pocaD) *
                    (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2);
 
-  // Line Fit for extension to Helix Fit
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> a = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1) * c + n(2) * X.col(2);
-  Precision b = n(0) * n(0) + n(1) * n(1);
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> underRoot = b * X.col(2) - a.cwiseProduct(a);
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> root = underRoot.cwiseSqrt();
-
   // Arc length calculation
   Precision x_first = X.col(0)(0) - x0;
   Precision y_first = X.col(1)(0) - y0;

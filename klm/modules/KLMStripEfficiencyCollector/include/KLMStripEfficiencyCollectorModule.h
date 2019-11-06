@@ -14,6 +14,7 @@
 #include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMPlaneArrayIndex.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/eklm/geometry/GeometryData.h>
@@ -168,7 +169,10 @@ namespace Belle2 {
     const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;
 
     /** BKLM geometry. */
-    bklm::GeometryPar* m_GeometryBKLM;
+    const bklm::GeometryPar* m_GeometryBKLM;
+
+    /** Plane array index. */
+    const KLMPlaneArrayIndex* m_PlaneArrayIndex;
 
     /** Output file name */
     std::string m_filename;

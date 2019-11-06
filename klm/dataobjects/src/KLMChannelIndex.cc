@@ -131,6 +131,17 @@ uint16_t KLMChannelIndex::getKLMChannelNumber() const
   }
 }
 
+uint16_t KLMChannelIndex::getKLMPlaneNumber() const
+{
+  if (m_Subdetector == KLMElementNumbers::c_BKLM) {
+    return m_ElementNumbers->planeNumberBKLM(
+             m_Section, m_Sector, m_Layer, m_Plane);
+  } else {
+    return m_ElementNumbers->planeNumberEKLM(
+             m_Section, m_Sector, m_Layer, m_Plane);
+  }
+}
+
 uint16_t KLMChannelIndex::getKLMModuleNumber() const
 {
   if (m_Subdetector == KLMElementNumbers::c_BKLM)

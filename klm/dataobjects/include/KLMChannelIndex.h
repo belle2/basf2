@@ -140,6 +140,11 @@ namespace Belle2 {
     uint16_t getKLMChannelNumber() const;
 
     /**
+     * Get KLM plane number.
+     */
+    uint16_t getKLMPlaneNumber() const;
+
+    /**
      * Get KLM module number.
      */
     uint16_t getKLMModuleNumber() const;

@@ -51,6 +51,7 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   setPropertyFlags(c_ParallelProcessingCertified);
   m_ElementNumbers = &(KLMElementNumbers::Instance());
   m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
+  m_PlaneArrayIndex = &(KLMPlaneArrayIndex::Instance());
 }
 
 KLMStripEfficiencyCollectorModule::~KLMStripEfficiencyCollectorModule()
@@ -67,14 +68,12 @@ void KLMStripEfficiencyCollectorModule::prepare()
   m_extHits.isRequired();
   if (m_MuonListName != "")
     m_MuonList.isRequired(m_MuonListName);
+  int nPlanes = m_PlaneArrayIndex->getNPlanes();
   TH1F* matchedDigitsInPlane = new TH1F(
     "matchedDigitsInPlane", "Number of matching (B|E)KLMDigits",
-    EKLMElementNumbers::getMaximalPlaneGlobalNumber(),
-    0.5, EKLMElementNumbers::getMaximalPlaneGlobalNumber() + 0.5);
+    nPlanes, 0.5, nPlanes + 0.5);
   TH1F* allExtHitsInPlane = new TH1F(
-    "allExtHitsInPlane", "Number of ExtHits",
-    EKLMElementNumbers::getMaximalPlaneGlobalNumber(),
-    0.5, EKLMElementNumbers::getMaximalPlaneGlobalNumber() + 0.5);
+    "allExtHitsInPlane", "Number of ExtHits", nPlanes, 0.5, nPlanes + 0.5);
   registerObject<TH1F>("matchedDigitsInPlane", matchedDigitsInPlane);
   registerObject<TH1F>("allExtHitsInPlane", allExtHitsInPlane);
 }
@@ -229,8 +228,8 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
       matchingDigits--;
     if (matchingDigits < m_MinimalMatchingDigits)
       continue;
-    allExtHitsInPlane->Fill(it->first);
+    allExtHitsInPlane->Fill(m_PlaneArrayIndex->getIndex(it->first));
     if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr)
-      matchedDigitsInPlane->Fill(it->first);
+      matchedDigitsInPlane->Fill(m_PlaneArrayIndex->getIndex(it->first));
   }
 }

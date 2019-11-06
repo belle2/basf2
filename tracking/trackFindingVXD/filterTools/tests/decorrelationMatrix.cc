@@ -82,9 +82,9 @@ namespace VXDTFFilterTest {
 
       TestMatrix tmpMatrix;
       // cpp check does not like commas
-      // cppcheck-suppress constStatement
       tmpMatrix << 3.132492133948475, 0.974827954209597, -0.761264020048923,
                 0.974827954209597, 1.486186070946439, -0.840189849104485,
+                // cppcheck-suppress constStatement
                 -0.761264020048923, -0.840189849104485, 0.739017883637750;
 
       // MATLAB calculates the empirical covariance matrix with a prefactor (n-1)^-1, but we do with a prefactor of n^-1 so this has

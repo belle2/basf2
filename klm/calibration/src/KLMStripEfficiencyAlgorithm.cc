@@ -9,14 +9,14 @@
  **************************************************************************/
 
 /* Own header. */
-#include <klm/eklm/calibration/EKLMTrackMatchAlgorithm.h>
+#include <klm/calibration/KLMStripEfficiencyAlgorithm.h>
 
 /* KLM headers. */
 #include <klm/dataobjects/KLMChannelIndex.h>
 
 using namespace Belle2;
 
-EKLMTrackMatchAlgorithm::EKLMTrackMatchAlgorithm() : CalibrationAlgorithm("EKLMTrackMatchCollector")
+KLMStripEfficiencyAlgorithm::KLMStripEfficiencyAlgorithm() : CalibrationAlgorithm("KLMStripEfficiencyCollector")
 {
   m_planesEff = new TH1F(
     "plane_efficiency", "",
@@ -28,11 +28,11 @@ EKLMTrackMatchAlgorithm::EKLMTrackMatchAlgorithm() : CalibrationAlgorithm("EKLMT
   m_file->cd();
 }
 
-EKLMTrackMatchAlgorithm::~EKLMTrackMatchAlgorithm()
+KLMStripEfficiencyAlgorithm::~KLMStripEfficiencyAlgorithm()
 {
 }
 
-CalibrationAlgorithm::EResult EKLMTrackMatchAlgorithm::calibrate()
+CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
 {
   std::shared_ptr<TH1F> MatchedDigitsInPlane;
   MatchedDigitsInPlane = getObjectPtr<TH1F>("MatchedDigitsInPlane");

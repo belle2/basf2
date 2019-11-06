@@ -25,29 +25,29 @@ namespace Belle2 {
   /**
    * KLM channel status calibration algorithm.
    */
-  class EKLMTrackMatchAlgorithm : public CalibrationAlgorithm {
+  class KLMStripEfficiencyAlgorithm : public CalibrationAlgorithm {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMTrackMatchAlgorithm();
+    KLMStripEfficiencyAlgorithm();
 
     /**
      * Copy constructor (disabled).
      */
-    EKLMTrackMatchAlgorithm(const EKLMTrackMatchAlgorithm&) = delete;
+    KLMStripEfficiencyAlgorithm(const KLMStripEfficiencyAlgorithm&) = delete;
 
     /**
      * Operator = (disabled).
      */
-    EKLMTrackMatchAlgorithm& operator=(const EKLMTrackMatchAlgorithm&) = delete;
+    KLMStripEfficiencyAlgorithm& operator=(const KLMStripEfficiencyAlgorithm&) = delete;
 
     /**
      * Destructor.
      */
-    ~EKLMTrackMatchAlgorithm();
+    ~KLMStripEfficiencyAlgorithm();
 
     /**
      * Calibration.

@@ -30,12 +30,12 @@
 namespace Belle2 {
 
   /**
-   * Module EKLMTrackMatchCollectorModule.
+   * Module KLMStripEfficiencyCollectorModule.
    * @details
    * Module for collecting data for track matching efficiency.
    */
 
-  class EKLMTrackMatchCollectorModule : public CalibrationCollectorModule {
+  class KLMStripEfficiencyCollectorModule : public CalibrationCollectorModule {
 
   private:
 
@@ -72,12 +72,12 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMTrackMatchCollectorModule();
+    KLMStripEfficiencyCollectorModule();
 
     /**
      * Destructor.
      */
-    virtual ~EKLMTrackMatchCollectorModule();
+    virtual ~KLMStripEfficiencyCollectorModule();
 
     /**
      * Initializer.

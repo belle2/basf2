@@ -9,7 +9,7 @@
  **************************************************************************/
 
 /* Own header. */
-#include <klm/eklm/modules/EKLMTrackMatchCollector/EKLMTrackMatchCollectorModule.h>
+#include <klm/modules/KLMStripEfficiencyCollector/KLMStripEfficiencyCollectorModule.h>
 
 /* KLM headers. */
 #include <klm/eklm/dataobjects/EKLMDigit.h>
@@ -35,9 +35,9 @@
 
 using namespace Belle2;
 
-REG_MODULE(EKLMTrackMatchCollector)
+REG_MODULE(KLMStripEfficiencyCollector)
 
-EKLMTrackMatchCollectorModule::EKLMTrackMatchCollectorModule() :
+KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   CalibrationCollectorModule()
 {
   setDescription("Module for EKLM strips efficiency (data collection).");
@@ -55,11 +55,11 @@ EKLMTrackMatchCollectorModule::EKLMTrackMatchCollectorModule() :
   m_GeoDat = nullptr;
 }
 
-EKLMTrackMatchCollectorModule::~EKLMTrackMatchCollectorModule()
+KLMStripEfficiencyCollectorModule::~KLMStripEfficiencyCollectorModule()
 {
 }
 
-void EKLMTrackMatchCollectorModule::prepare()
+void KLMStripEfficiencyCollectorModule::prepare()
 {
 
   m_digits.isRequired();
@@ -86,7 +86,7 @@ void EKLMTrackMatchCollectorModule::prepare()
   registerObject<TH1F>("AllExtHitsInPlane", AllExtHitsInPlane);
 }
 
-void EKLMTrackMatchCollectorModule::trackCheck(
+void KLMStripEfficiencyCollectorModule::trackCheck(
   bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()],
   int requiredHits) const
 {
@@ -103,7 +103,7 @@ void EKLMTrackMatchCollectorModule::trackCheck(
     trackSelected[EKLMElementNumbers::c_BackwardSection - 1] = true;
 }
 
-const EKLMDigit* EKLMTrackMatchCollectorModule::findMatchingDigit(
+const EKLMDigit* KLMStripEfficiencyCollectorModule::findMatchingDigit(
   const struct HitData* hitData, double allowedDistance) const
 {
   for (const EKLMDigit& digit : m_digits) {
@@ -117,7 +117,7 @@ const EKLMDigit* EKLMTrackMatchCollectorModule::findMatchingDigit(
   return nullptr;
 }
 
-double EKLMTrackMatchCollectorModule::getSumTrackEnergy(const StoreArray<Track>& selected_tracks) const
+double KLMStripEfficiencyCollectorModule::getSumTrackEnergy(const StoreArray<Track>& selected_tracks) const
 {
   double eneregy = 0;
   for (auto trk : selected_tracks) {
@@ -127,7 +127,7 @@ double EKLMTrackMatchCollectorModule::getSumTrackEnergy(const StoreArray<Track>&
   return eneregy;
 }
 
-void EKLMTrackMatchCollectorModule::collect()
+void KLMStripEfficiencyCollectorModule::collect()
 {
   if (m_MuonListName != "") {
     unsigned int nMuons = m_MuonList->getListSize();
@@ -142,7 +142,7 @@ void EKLMTrackMatchCollectorModule::collect()
   }
 }
 
-void EKLMTrackMatchCollectorModule::collectDataTrack(const Track* track)
+void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
 {
   bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()] =
   {true, true};
@@ -202,6 +202,6 @@ void EKLMTrackMatchCollectorModule::collectDataTrack(const Track* track)
   }
 }
 
-void EKLMTrackMatchCollectorModule::closeRun()
+void KLMStripEfficiencyCollectorModule::closeRun()
 {
 }

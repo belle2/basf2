@@ -43,6 +43,52 @@
 namespace Belle2 {
   namespace Variable {
 
+
+    // Explores the decay tree of a particle and return the (grand^n)daughter indentified by a coordinate string.
+    // The coordinate string consists in a whitespace-separated the list of daughter indexes, starting from the root particle:
+    // 0 1 3  identifies the fourth daugther (3) of the second daugther (1) of the first daugther (0) of the mother particle.
+    const Particle* getParticleFromCoordinateString(const Particle* particle, const std::string coordinate)
+    {
+
+      // Split the coordinate string in a vector of strings.
+      // Shamelessly copied from stackoverflow...
+      std::istringstream buffer(coordinate);
+      std::vector<std::string> coordinates((std::istream_iterator<std::string>(buffer)), std::istream_iterator<std::string>());
+
+      // To explore the tree of unknown depth, we need to a place to store
+      // Bothe the root and the daugther particle for each iteration
+      const Particle* dauPart = new Particle(); // This will be eventually returned
+      const Particle* currentPart = particle; // This is the root particle of the next iteration
+
+      // Loop over the coordinates until you get to the particle you want
+      for (auto& indexString : coordinates) {
+        // indexString is a string. First try to convert it into an int
+        int dauIndex = 0;
+        try {
+          // The daughter indext must be an int
+          dauIndex = Belle2::convertString<int>(indexString);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("Found the string " << indexString <<
+                    "instead of a daugther index. You probably mispelled the arguments of the meta-variable daughterCombination");
+          return nullptr;
+        }
+
+        // Check that the daughter index is smaller than the number of daughters of the current root particle
+        if (dauIndex >= int(currentPart->getNDaughters())) {
+          B2WARNING("Daughter index " << dauIndex << " out of range");
+          return nullptr;
+        } else {
+          dauPart = currentPart->getDaughter(dauIndex); // Pick the particle indicated by the coordinate
+          currentPart = dauPart; // The daughter you found becomes the root particle for the next iteration
+        }
+      }
+      return dauPart;
+    }
+
+
+
+
+
     Manager::FunctionPtr useRestFrame(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -2162,6 +2208,77 @@ endloop:
       return func;
     }
 
+
+    Manager::FunctionPtr daughterCombination(const std::vector<std::string>& arguments)
+    {
+      // Expect 2 or more arguments.
+      if (arguments.size() >= 2) {
+        // First argument is the variable name
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+
+        // Core function
+        auto func = [var, arguments](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return std::numeric_limits<float>::quiet_NaN();
+          const auto& frame = ReferenceFrame::GetCurrent();
+
+          // Sum of the 4-momenta of all the selected daugthers
+          TLorentzVector pSum(0, 0, 0, 0);
+
+          // Loop over the arguments. Each one of them is a coordinate,
+          // pointing to a particle in the decay tree.
+          for (unsigned int iCoord = 1; iCoord < arguments.size(); iCoord++)
+          {
+            auto coordinate = arguments[iCoord];
+            const Particle* dauPart = getParticleFromCoordinateString(particle, coordinate);
+            pSum +=  frame.getMomentum(dauPart);
+          }
+
+          // Make a dummy particle out of the sum of the 4-momenta of the selected daugthers
+          Particle* sumOfDaugthers = new Particle(pSum, 100); // 100 is one of the special numbers
+
+          // Calculate the variable on the dummy particle
+          return var->function(sumOfDaugthers);
+        };
+        return func;
+      } else
+        B2FATAL("Wrong number of arguments for meta function daughter");
+    }
+
+
+
+    Manager::FunctionPtr daughterAngleBetweenGeneric(const std::vector<std::string>& arguments)
+    {
+      // Expect 2 arguments.
+      if (arguments.size() != 2)
+        B2FATAL("Wrong number of arguments for meta function daughter");
+
+      auto func = [arguments](const Particle * particle) -> double {
+        if (particle == nullptr)
+          return std::numeric_limits<float>::quiet_NaN();
+
+        const auto& frame = ReferenceFrame::GetCurrent();
+
+        std::vector<TLorentzVector> pDaus;
+
+        for (auto& coordinate : arguments)
+        {
+          const Particle* dauPart = getParticleFromCoordinateString(particle, coordinate);
+          pDaus.push_back(frame.getMomentum(dauPart));
+        }
+
+        double cosTheta = pDaus[0].Vect().Dot(pDaus[1].Vect()) / (pDaus[0].Vect().Mag() * pDaus[1].Vect().Mag());
+        return cosTheta;
+      };
+      return func;
+    }
+
+
+
+
+
+
+
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
                       "[Eventbased] Returns the number of clean Clusters in the event\n"
@@ -2251,7 +2368,7 @@ Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to c
                       "E.g. mcMother(PDG) will return the PDG code of the MC mother of the matched MC"
                       "particle of the reconstructed particle the function is applied to.\n"
                       "The meta variable can also be nested: mcMother(mcMother(PDG)).");
-    REGISTER_VARIABLE("genParticle(index, variable)", genParticle, R"DOC(
+    REGISTER_VARIABLE("genParticle(index, variable)", genParticle,  R"DOC(
 [Eventbased] Returns the ``variable`` for the ith generator particle.
 The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 
 and ``variable``, the name of the function or variable for that generator particle.
@@ -2447,5 +2564,11 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns the angle between this particle and the most back-to-back particle (closest opening angle to 180) in the list provided.");
     REGISTER_VARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
                       "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.");
+    REGISTER_VARIABLE("daughterCombination(variable, daugtherCoordinate_1, daugtherCoordinate_2 ... dagutherCoordinate_n)", daughterCombination,
+                      "Returns `variable` calculated on a dummy particle made combining arbirary set of (grand)daugthers. Dagthers from different generations of the decay tree can be combined, identifying them with a coordinate-like notaton. A coordinate string consists in a whitespace-separated the list of daughter indexes, starting from the root particle: 0 1 3  identifies the fourth daugther (3) of the second daugther (1) of the first daugther (0) of the mother particle. For examples: daughterCombination(M, 0, 3, 4) will return the invariant mass of the system made of the first, fourth and fifth daugther ora particle. daughterCombination(M, 0 0, 3 0) will return the invariant mass of the system made of the first daugther of the first daughter, and the first daughter of the fourth daughter");
+    REGISTER_VARIABLE("daughterAngleBetweenGeneric(daugtherIndex_1, daugtherIndex_2 ... dagutherIndex_n)", daughterAngleBetweenGeneric,"Returns the angle in between any pair of particles belonging to the same decay tree. The particles are identified via coordinates. A coordinate string consists in a whitespace-separated the list of daughter indexes, starting from the root particle: 0 1 3  identifies the fourth daugther (3) of the second daugther (1) of the first daugther (0) of the mother particle. ");
+
+
+
   }
 }

@@ -402,5 +402,21 @@ namespace Belle2 {
     * Returns function which returns the median value of the given variable of the particles in the given particle list.
     */
     Manager::FunctionPtr medianValueInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns a function whith returns the value of a variable obtained combining an arbirary subset of particles in the decay tree, passed as
+    * coordinates. daughterCombination(M, 0, 3, 4) will return the invariant mass of the system mad of the first, fourth and
+    * fifth daugther of a particle.
+    */
+    Manager::FunctionPtr daughterCombination(const std::vector<std::string>& arguments);
+
+
+    /**
+    * Returns a function whith returns the cosTheta between any particle pair in the decay tree, passed as
+    * coordinates.
+    */
+    Manager::FunctionPtr daughterAngleBetweenGeneric(const std::vector<std::string>& arguments);
+
+
   }
 }

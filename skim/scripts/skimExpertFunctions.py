@@ -69,17 +69,18 @@ def get_test_file(sampleName):
     return lookup_dict[sampleName]
 
 
-def get_total_infiles(sample, skimCampaign):
+def get_total_infiles(sampleName):
     """
     Returns the total number of input Mdst files for a given sample. This is useful for resource estimate.
-    Arguments:
-        sample: Type of MC sample: charged mixed ccbar uubar ddbar ssbar taupair or other of-resonance samples.
-        skimCampaign: MC9, MC10, MC11, etc..
+
+    Args:
+        sampleName (str): Name of the sample. MC samples are named *e.g.* "chargedBGx1_MC12", "ccbarBGx0_MC9"
+    Returns:
+        nInFiles (int): Total number of input files for sample.
     """
-    sampleName = skimCampaign + '_' + sample
     lookup_dict = {s: f for s, f in skimTestFilesInfo.total_input_files}
     if sampleName not in lookup_dict:
-        return 1000
+        return None
     return lookup_dict[sampleName]
 
 

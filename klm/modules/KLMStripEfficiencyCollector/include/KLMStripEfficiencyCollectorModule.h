@@ -11,6 +11,7 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
@@ -62,6 +63,9 @@ namespace Belle2 {
       /** Strip. */
       int strip;
 
+      /** Local coordinate. */
+      double localPosition;
+
       /** Extrapolation hit. */
       const ExtHit* hit;
 
@@ -91,6 +95,11 @@ namespace Belle2 {
      * This method is called for each event.
      */
     void collect() override;
+
+    /**
+     * This method is called at the beginning of the run.
+     */
+    void startRun() override;
 
     /**
      * This method is called at the end of run.
@@ -178,6 +187,9 @@ namespace Belle2 {
 
     /** EKLM element numbers. */
     const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;
+
+    /** BKLM geometry. */
+    bklm::GeometryPar* m_GeometryBKLM;
 
     /** Output file name */
     std::string m_filename;

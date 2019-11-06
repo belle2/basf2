@@ -85,6 +85,15 @@ void KLMStripEfficiencyCollectorModule::prepare()
   registerObject<TH1F>("AllExtHitsInPlane", AllExtHitsInPlane);
 }
 
+void KLMStripEfficiencyCollectorModule::startRun()
+{
+  m_GeometryBKLM = bklm::GeometryPar::instance();
+}
+
+void KLMStripEfficiencyCollectorModule::closeRun()
+{
+}
+
 void KLMStripEfficiencyCollectorModule::trackCheck(
   bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()],
   int requiredHits) const
@@ -173,6 +182,8 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
   std::map<uint16_t, struct HitData> selectedHits;
   std::map<uint16_t, struct HitData>::iterator it;
   struct HitData hitData;
+  TVector3 extHitPosition;
+  CLHEP::Hep3Vector extHitPositionCLHEP, localPosition;
   for (const ExtHit& hit : extHits) {
     if (hit.getDetectorID() != Const::EDetector::EKLM)
       continue;
@@ -192,26 +203,36 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
                       hitData.section, hitData.sector, hitData.layer, hitData.plane);
       addHit(selectedHits, planeGlobal, &hitData);
     } else if (hit.getDetectorID() == Const::EDetector::BKLM) {
-      int module = hit.getCopyID();
+      int moduleNumber = hit.getCopyID();
       hitData.subdetector = KLMElementNumbers::c_BKLM;
       BKLMElementNumbers::moduleNumberToElementNumbers(
-        module, &hitData.section, &hitData.sector, &hitData.layer);
+        moduleNumber, &hitData.section, &hitData.sector, &hitData.layer);
       if (hitData.layer < BKLMElementNumbers::c_FirstRPCLayer) {
         /*
          * For scintillators, the plane and strip numbers are recorded
          * in the copy number.
          */
         BKLMElementNumbers::channelNumberToElementNumbers(
-          module, &hitData.section, &hitData.sector, &hitData.layer,
+          moduleNumber, &hitData.section, &hitData.sector, &hitData.layer,
           &hitData.plane, &hitData.strip);
         planeGlobal = m_ElementNumbers->planeNumberBKLM(
                         hitData.section, hitData.sector, hitData.layer, hitData.plane);
         addHit(selectedHits, planeGlobal, &hitData);
       } else {
         /* For RPCs, the sensitive volume corresponds to both readout planes. */
+        extHitPosition = hit.getPosition();
+        extHitPositionCLHEP.setX(extHitPosition.X() / CLHEP::cm);
+        extHitPositionCLHEP.setY(extHitPosition.Y() / CLHEP::cm);
+        extHitPositionCLHEP.setZ(extHitPosition.Z() / CLHEP::cm);
+        const bklm::Module* module =
+          m_GeometryBKLM->findModule(hitData.section, hitData.sector,
+                                     hitData.layer);
+        localPosition = module->globalToLocal(extHitPositionCLHEP);
         hitData.plane = BKLMElementNumbers::c_ZPlane;
+        hitData.localPosition = localPosition.z();
         addHit(selectedHits, planeGlobal, &hitData);
         hitData.plane = BKLMElementNumbers::c_PhiPlane;
+        hitData.localPosition = localPosition.y();
         addHit(selectedHits, planeGlobal, &hitData);
       }
     } else
@@ -237,8 +258,4 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
     if (it->second.digit != nullptr)
       MatchedDigitsInPlane->Fill(it->first);
   }
-}
-
-void KLMStripEfficiencyCollectorModule::closeRun()
-{
 }

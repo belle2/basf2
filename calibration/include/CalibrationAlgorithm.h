@@ -220,11 +220,39 @@ namespace Belle2 {
     /// Dump the JSON string of the output JSON object.
     const std::string dumpOutputJson() const {return m_jsonExecutionOutput.dump();}
 
+    /// Used to discover the ExpRun boundaries that you want the Python CAF to execute on. This is optional and only used in some
+    //  areas of the CAF. Basically you search for features in the data that you want to find and make sure that the CAF knows
+    //  there is a boundary where payloads should probably start/end. The output boundaries should be the starting ExpRun
+    //  of the new boundary.
+    const std::vector<Calibration::ExpRun> findPayloadBoundaries(std::vector<Calibration::ExpRun> runs, int iteration = 0);
+
+    /// If you need to make some changes to your algorithm class before 'findPayloadBoundaries' is run, make them in this function
+    //  We omit the names of arguments here so that we don't generate lots of compiler warnings in algorithms that don't
+    //  implement this function.
+    virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) {};
+
+    /// Put your algorithm back into a state ready for normal execution if you need to.
+    //  This runs right after 'findPayloadBoundaries' and is supposed to  correct any changes you made in 'boundaryFindingSetup'
+    //  or 'isBoundaryRequired'.
+    virtual void boundaryFindingTearDown() {};
+
   protected:
     // Developers implement this function ------------
 
     /// Run algo on data - pure virtual: needs to be implemented
     virtual EResult calibrate() = 0;
+
+    /// Given the current collector data, make a decision about whether or not this run should be the start of a payload boundary
+    //  Implementing this is optional because most people will never call findPayloadBoundaries in their CAF job.
+    //  It returns false by default so that the boundaries vector is empty if you forgot to implement this.
+    //
+    //  We omit the names of arguments here so that we don't generate lots of compiler warnings in algorithms that don't
+    //  implement this function.
+    virtual bool isBoundaryRequired(const Calibration::ExpRun& /*currentRun*/)
+    {
+      B2ERROR("You didn't implement a isBoundaryRequired() member function in your CalibrationAlgorithm but you are calling it!");
+      return false;
+    }
 
     // Helpers ---------------- Data retrieval -------
 

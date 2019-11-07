@@ -39,10 +39,18 @@ namespace Belle2 {
     /// setter for m_debugHisto
     void setDebugHisto(bool debugHisto) {m_debugHisto = debugHisto;}
 
+    /// Start boundary finding mode, we simply set the previous mean to be a silly amount.
+    //  Notice that we comment out the argument names because we want to avoid compiler warnings about not using them.
+    virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/)
+    override {m_previousMean = -1000000.;};
+
   protected:
 
     /// Run algo on data
     virtual EResult calibrate() override;
+
+    /// Decide if a run should be a payload boundary. Only used in certain Python Algorithm Starategies.
+    virtual bool isBoundaryRequired(const Calibration::ExpRun& currentRun) override;
 
   private:
     /// Set when c_NotEnoughData will be returned
@@ -53,6 +61,9 @@ namespace Belle2 {
     int m_debugHisto = false;
     /// Perform debug histogram file creation
     void createDebugHistogram();
-
+    /// During isBoundaryRequired this is used to define the previous run's mean
+    float m_previousMean = -1000000.;
+    /// Configurable parameter for deciding when to choose a new payload boundary (if used)
+    float m_allowedMeanShift = 0.5;
   };
 } // namespace Belle2

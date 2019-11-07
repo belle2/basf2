@@ -13,6 +13,7 @@
 #include <calibration/dbobjects/TestCalibMean.h>
 
 using namespace Belle2;
+using namespace Calibration;
 
 TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithm("CaTest")
 {
@@ -125,5 +126,28 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
     return c_Iterate;
   } else {
     return c_OK;
+  }
+}
+
+bool TestCalibrationAlgorithm::isBoundaryRequired(const ExpRun& currentRun)
+{
+  auto hist = getObjectPtr<TH1F>("MyHisto");
+  float mean = hist->GetMean();
+  // First run?
+  if (m_previousMean < -10000) {
+    B2INFO("This is the first run encountered, let's say it is a boundary.");
+    B2INFO("Initial mean was " << mean);
+    m_previousMean = mean;
+    return true;
+  }
+  // Shifted since last time?
+  else if ((mean - m_previousMean) > m_allowedMeanShift) {
+    B2INFO("Histogram mean has shifted from " << m_previousMean
+           << " to " << mean << ". We are requesting a new payload boundary for ("
+           << currentRun.first << "," << currentRun.second << ")");
+    m_previousMean = mean;
+    return true;
+  } else {
+    return false;
   }
 }

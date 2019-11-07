@@ -123,7 +123,7 @@ def argparser():
                         action="store",
                         choices=list(plot_actions.keys()),
                         default=None,
-                        help="")
+                        help="Produce plot of integrated luminosity for each run, day, or week")
 
     return parser
 
@@ -220,7 +220,7 @@ class Luminosity:
 
     def getDataFrameFromDBOnline(self):
         """
-        create a panda dataframe from DB
+        create a panda dataframe from online DB
         """
 
         #cmdexp = f"SELECT {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = :exp "
@@ -254,15 +254,12 @@ class Luminosity:
         # This returns a pandas.Series object.
         srs_lumi_date = []
         if period==1: # per day
-            #srs_lumi_date = self.df.groupby(self.df["date"].dt.strftime('%Y/%m/%d'))["lumi"].sum()
             srs_lumi_date = self.df.groupby(self.df["date"].dt.floor('d'))["lumi"].sum()
             label="Day"
             freq='D'
             width=1.0
         if period==2: # per week
-            # not working yet
             srs_lumi_date = self.df.groupby(self.df["date"].dt.floor('7d'))["lumi"].sum()
-            #srs_lumi_date = self.df.groupby(pd.TimeGrouper(key='date',freq='W-MON'))["lumi"].sum()
             label="Week"
             freq='7d'
             width=3.5

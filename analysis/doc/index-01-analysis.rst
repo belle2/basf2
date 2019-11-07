@@ -105,7 +105,7 @@ Advanced Topics
 
 .. toctree:: ContinuumSuppression
 
-.. toctree:: TreeFitter
+.. .. toctree:: TreeFitter
 
 .. .. toctree:: VertexFitter
 
@@ -136,5 +136,5 @@ A measurement of time-dependent CP violation in B0 decays to a different final s
 
 
 
-.. b2-modules::
+.. .. b2-modules::
    :package: analysis

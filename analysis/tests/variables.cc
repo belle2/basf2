@@ -3051,6 +3051,25 @@ namespace {
     var = Manager::Instance().getVariable("daughterCombination(p, 1, 0, 4)");
     double p_test = (daughterMomenta[0] + daughterMomenta[1] + daughterMomenta[4]).Vect().Mag();
     EXPECT_FLOAT_EQ(var->function(p), p_test);
+
+
+    // errors and bad stuff
+    EXPECT_B2FATAL(Manager::Instance().getVariable("daughterCombination(aVeryNonExistingVariableSillyName, 1, 0, 4)"));
+
+    var = Manager::Instance().getVariable("daughterCombination(M, 1, 0, 100)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+
+    var = Manager::Instance().getVariable("daughterCombination(M, 1, -1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+
+    var = Manager::Instance().getVariable("daughterCombination(M, 1, 0 1 0 0 1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
   }
 
 
@@ -3173,6 +3192,19 @@ namespace {
     M_test = (daughterMomenta_1[0].Vect().Dot(daughterMomenta_2[0].Vect())) / (daughterMomenta_1[0].Vect().Mag() *
              daughterMomenta_2[0].Vect().Mag());
     EXPECT_FLOAT_EQ(var->function(p), M_test);
+
+
+
+    var = Manager::Instance().getVariable("daughterAngleBetweenGeneric( 1, -1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+
+    var = Manager::Instance().getVariable("daughterAngleBetweenGeneric(1, 0 1 0 0 1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+
 
   }
 

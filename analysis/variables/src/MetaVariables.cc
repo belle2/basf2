@@ -49,15 +49,23 @@ namespace Belle2 {
     // 0 1 3  identifies the fourth daugther (3) of the second daugther (1) of the first daugther (0) of the mother particle.
     const Particle* getParticleFromGeneralizedIndexString(const Particle* particle, const std::string& generalizedIndex)
     {
+      if (not particle) {
+        B2WARNING("Trying to access non-existing particle");
+        return nullptr;
+      }
 
       // Split the generalizedIndex string in a vector of strings.
       // Shamelessly copied from stackoverflow...
       std::istringstream buffer(generalizedIndex);
       std::vector<std::string> generalizedIndexes((std::istream_iterator<std::string>(buffer)), std::istream_iterator<std::string>());
 
+      if (generalizedIndexes.size() < 1) {
+        B2WARNING("Found empty generalized index.");
+        return nullptr;
+      }
       // To explore the tree of unknown depth, we need to a place to store
       // Bothe the root and the daugther particle for each iteration
-      const Particle* dauPart = new Particle(); // This will be eventually returned
+      const Particle* dauPart = nullptr; // This will be eventually returned
       const Particle* currentPart = particle; // This is the root particle of the next iteration
 
       // Loop over the generalizedIndexes until you get to the particle you want
@@ -74,12 +82,17 @@ namespace Belle2 {
         }
 
         // Check that the daughter index is smaller than the number of daughters of the current root particle
-        if (dauIndex >= int(currentPart->getNDaughters())) {
+        if (dauIndex >= int(currentPart->getNDaughters()) or dauIndex < 0) {
           B2WARNING("Daughter index " << dauIndex << " out of range");
           return nullptr;
         } else {
           dauPart = currentPart->getDaughter(dauIndex); // Pick the particle indicated by the generalizedIndex
-          currentPart = dauPart; // The daughter you found becomes the root particle for the next iteration
+          if (dauPart)
+            currentPart = dauPart; // The daughter you found becomes the root particle for the next iteration
+          else {
+            B2WARNING("Trying to access non-existing particle. Index = " << indexString);
+            return nullptr;
+          }
         }
       }
       return dauPart;
@@ -2219,7 +2232,10 @@ endloop:
         // Core function
         auto func = [var, arguments](const Particle * particle) -> double {
           if (particle == nullptr)
+          {
+            B2WARNING("Trying to access a daughter that does not exist");
             return std::numeric_limits<float>::quiet_NaN();
+          }
           const auto& frame = ReferenceFrame::GetCurrent();
 
           // Sum of the 4-momenta of all the selected daugthers
@@ -2231,7 +2247,12 @@ endloop:
           {
             auto generalizedIndex = arguments[iCoord];
             const Particle* dauPart = getParticleFromGeneralizedIndexString(particle, generalizedIndex);
-            pSum +=  frame.getMomentum(dauPart);
+            if (dauPart)
+              pSum +=  frame.getMomentum(dauPart);
+            else {
+              B2WARNING("Trying to access a daughter that does not exist. Index = " << generalizedIndex);
+              return std::numeric_limits<float>::quiet_NaN();
+            }
           }
 
           // Make a dummy particle out of the sum of the 4-momenta of the selected daugthers
@@ -2264,7 +2285,12 @@ endloop:
         for (auto& generalizedIndex : arguments)
         {
           const Particle* dauPart = getParticleFromGeneralizedIndexString(particle, generalizedIndex);
-          pDaus.push_back(frame.getMomentum(dauPart));
+          if (dauPart)
+            pDaus.push_back(frame.getMomentum(dauPart));
+          else {
+            B2WARNING("Trying to access a daughter that does not exist. Index = " << generalizedIndex);
+            return std::numeric_limits<float>::quiet_NaN();
+          }
         }
 
         double cosTheta = pDaus[0].Vect().Dot(pDaus[1].Vect()) / (pDaus[0].Vect().Mag() * pDaus[1].Vect().Mag());

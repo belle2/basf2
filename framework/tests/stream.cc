@@ -1,5 +1,4 @@
 #include <framework/utilities/Stream.h>
-#include <framework/logging/Logger.h>
 #include <framework/dataobjects/RelationContainer.h>
 #include <framework/dataobjects/RelationElement.h>
 #include <framework/datastore/DataStore.h>

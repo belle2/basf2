@@ -29,7 +29,7 @@ REG_MODULE(EventInfoPrinter)
 EventInfoPrinterModule::EventInfoPrinterModule() : Module()
 {
   //Set module properties
-  setDescription("Prints the current event meta data information (exp, run, event numbers).");
+  setDescription("Prints the current event meta data information (exp, run, event numbers). LogLevel need to be set to INFO, at least for this module.");
 
   addParam("printTime", m_printTime, "Print time in addition to exp/run/evt numbers.", false);
 }

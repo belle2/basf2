@@ -26,10 +26,15 @@ namespace Belle2 {
   public:
     /** struct to hold a line of information of b2link format */
     struct B2FormatLine {
+      /** start bit number in B2Link */
       int start;
+      /** end bit number in B2Link */
       int end;
+      /** offset of information in B2Link */
       int offset;
+      /** name of information in B2link */
       std::string name;
+      /** description of information in B2link */
       std::string description;
     };
     /** constructor */
@@ -136,23 +141,23 @@ namespace Belle2 {
     std::string getNNTFirmwareComment()      const  {return m_NNTFirmwareComment;}
 
   private:
-    // B2Format
+    /** B2Format */
     std::vector<B2FormatLine> m_B2Format = {};
 
-    // Used neurotrigger filename
+    /** Used neurotrigger filename */
     std::string m_NNName;
 
-    // weights of expert networks
+    /** weights of expert networks */
     std::vector<CDCTriggerMLP> m_MLPs;
 
-    // short field for notes
+    /** short field for notes */
     std::string m_NNNotes;
 
     /** switch wether the ETF is used or the first priority time of the
      * TSF is  used during preprocessing**/
     bool m_useETF = false;
 
-    // short field for notes
+    /** short field for notes */
     std::string m_PPNotes;
 
     /** Firmware Version ID **/

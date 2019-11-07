@@ -9,34 +9,20 @@
  **************************************************************************/
 
 #include <tracking/modules/trackingPerformanceEvaluation/EffPlotsModule.h>
-#include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
-#include <framework/datastore/RelationsObject.h>
 
 #include <framework/geometry/BFieldManager.h>
 
-#include <vxd/geometry/GeoCache.h>
-
-#include <genfit/Track.h>
-#include <genfit/TrackCand.h>
-
+#include <tracking/dataobjects/MCParticleInfo.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/V0ValidationVertex.h>
 
-#include <root/TTree.h>
-#include <root/TAxis.h>
 #include <root/TObject.h>
 
 #include <boost/foreach.hpp>
 #include <vector>
-#include <utility>
-
-#include <typeinfo>
-#include <cxxabi.h>
 
 using namespace Belle2;
 

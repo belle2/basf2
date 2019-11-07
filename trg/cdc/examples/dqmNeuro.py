@@ -79,7 +79,10 @@ def add_neuro_simulation(path):
 
 
 class FilterTrgPresent(Module):
+    """Filter the event with more than one CDCTriggerNNInputSegmentHits"""
+
     def event(self):
+        """event function of the FilterTrgPresent class"""
         self.return_value(bool(Belle2.PyStoreArray('CDCTriggerNNInputSegmentHits').getEntries() > 0))
 
 

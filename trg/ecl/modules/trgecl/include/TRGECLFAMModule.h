@@ -101,16 +101,12 @@ namespace Belle2 {
     /** Threshold */
     std::vector<int> Threshold;
 
-    /**< output for TRGECLDigi0 */
-    StoreArray<TRGECLDigi0> m_TRGECLDigi0;
-    /**< output for TRGECLWaveform */
-    StoreArray<TRGECLWaveform> m_TRGECLWaveform;
-    /**< output for TRGECLHit */
-    StoreArray<TRGECLHit> m_TRGECLHit;
-    /**< output for TRGECLFAMAna */
-    StoreArray<TRGECLFAMAna> m_TRGECLFAMAna;
-    /** FAM Parameters */
-    DBArray<TRGECLFAMPara> m_FAMPara;
+    StoreArray<TRGECLDigi0> m_TRGECLDigi0; /**< output for TRGECLDigi0 */
+    StoreArray<TRGECLWaveform> m_TRGECLWaveform; /**< output for TRGECLWaveform */
+    StoreArray<TRGECLHit> m_TRGECLHit; /**< output for TRGECLHit */
+    StoreArray<TRGECLFAMAna> m_TRGECLFAMAna; /**< output for TRGECLFAMAna */
+    DBArray<TRGECLFAMPara> m_FAMPara; /**< FAM Parameters */
+
   };
 
 } // namespace Belle2

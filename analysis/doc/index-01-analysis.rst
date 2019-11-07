@@ -62,7 +62,7 @@ While ``basf2`` operates on `ParticleList`_ s, it is also important to calculate
 
 In ``basf2`` analysis, variables are handled by the `VariableManager`.
 There are many variables available for use in analysis.
-Probably the most obvious, and useful are: :b2:var:`p`, :b2:var:`E`, :b2:var:`mbc`, and :b2:var:`deltaE`.
+Probably the most obvious, and useful are: :b2:var:`p`, :b2:var:`E`, :b2:var:`Mbc`, and :b2:var:`deltaE`.
 
 You can search the variables in an alphabetical :ref:`b2-varindex`, or browse :ref:`variablesByGroup`.
 

@@ -14,13 +14,11 @@
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <vector>
 #include <string>
 #include <set>
-#include <map>
 
 class TLorentzVector;
 
@@ -98,10 +96,6 @@ namespace Belle2 {
       void addParticles(std::vector<const Particle*>& particles)
       {
         if (isValid()) {
-          B2INFO("Mask " + m_name + " is default and valid, cannot write to it!");
-          return;
-        }
-        if (isValid()) {
           B2INFO("Mask " + m_name + " originating from "  + m_origin + " is  valid, cannot write to it!");
           return;
         } else {
@@ -154,20 +148,6 @@ namespace Belle2 {
         m_isValid = false;
       }
       /**
-       *  Sets ChargedStable fractions
-       */
-      void setChargedStableFractions(std::vector<double>& chargedStableFractions)
-      {
-        m_chargedStableFractions = chargedStableFractions;
-      }
-      /**
-       *  Gets ChargedStable fractions
-       */
-      std::vector<double> getChargedStableFractions() const
-      {
-        return m_chargedStableFractions;
-      }
-      /**
        *  Print mask and selected particles associated to the mask
        */
       void print()
@@ -180,12 +160,6 @@ namespace Belle2 {
         for (const int index : m_maskedParticleIndices) {
           printout += std::to_string(index) +  ", ";
         }
-        if (m_chargedStableFractions.size() > 0) {
-          printout += "\n ChargedStable fractions: ";
-          for (unsigned int i = 0; i < m_chargedStableFractions.size(); i++) {
-            printout += std::to_string(m_chargedStableFractions[i]) + ", ";
-          }
-        }
         B2INFO(printout);
       }
     private:
@@ -194,7 +168,6 @@ namespace Belle2 {
       bool m_isValid;                           /**< Check if mask has elements or correctly initialized*/
       std::set<int> m_maskedParticleIndices;    /**< StoreArray indices for masked ROE particles */
       std::set<int> m_maskedV0Indices;          /**< StoreArray indices for masked V0 ROE particles */
-      std::vector<double> m_chargedStableFractions;          /**<  ChargedStable fractions, never used */
     };
     /**
      * Default constructor.
@@ -277,23 +250,9 @@ namespace Belle2 {
      */
     bool checkCompatibilityOfMaskAndV0(const std::string& name, const Particle* particleV0);
     /**
-     * Get charged stable fractions with a specific mask name
-     *
-     * @param name of mask
-     * @return fractions
-     */
-    std::vector<double> getChargedStableFractions(const std::string& maskName) const;
-    /**
      * Returns true if the ROE is nested
      */
     bool getIsNested() const {return m_isNested;}
-    /**
-     * Update or add a priori ChargedStable fractions for a specific mask name in the ROE object.
-     *
-     * @param name of mask
-     * @param a priori fractions
-     */
-    void updateChargedStableFractions(const std::string& maskName, std::vector<double>& fractions);
     // getters
     /**
      * Get all Particles from ROE mask.

@@ -11,13 +11,10 @@
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-#include <framework/dataobjects/DigitBase.h>
 
 #include <cstdint>
 #include <sstream>
-#include <string>
 #include <algorithm>
-#include <functional>
 #include <limits>
 
 namespace Belle2 {

@@ -219,7 +219,7 @@ class Package(JsonBase):
         self.scriptfiles = scriptfiles
         #: true if this package is displayed on the default validation website
         self.visible = True
-        #: contains the number how many scripts failed to execute without error
+        #: contains the number how many scripts failed to execute with error
         self.fail_count = fail_count
 
 
@@ -309,9 +309,20 @@ class ComparisonPlotFile(PlotFile):
         self.comparison_error = len([
             plt for plt in self.plots if plt.comparison_result == "error"
         ])
-        #: the number of comparisons which resulted a warning
+        #: the number of failed comparisons of shifter plots in this file
+        self.comparison_error_shifter = len([
+            plt for plt in self.plots
+            if (not plt.is_expert) and plt.comparison_result == "error"
+        ])
+        #: the number of comparisons which resulted in a warning
         self.comparison_warning = len([
             plt for plt in self.plots if plt.comparison_result == "warning"
+        ])
+        #: the number of comparisons of shifter plots in this file which
+        #: resulted in a warning
+        self.comparison_warning_shifter = len([
+            plt for plt in self.plots
+            if (not plt.is_expert) and plt.comparison_result == "warning"
         ])
 
         #: Number of shifter ntuples
@@ -468,14 +479,22 @@ class ComparisonPackage(Package):
 
         super().__init__(name, plotfiles=plotfiles, scriptfiles=scriptfiles)
 
-        # compute from the plotfiles ... and flatten list
         #: the number of failed comparisons in this package
         self.comparison_error = sum([
             pf.comparison_error for pf in plotfiles
         ])
-        #: the number of comparisons which resulted a warning
+        #: the number of failed comparisons of shifter plots in this package
+        self.comparison_error_shifter = sum([
+            pf.comparison_error_shifter for pf in plotfiles
+        ])
+        #: the number of comparisons which resulted in a warning
         self.comparison_warning = sum([
             pf.comparison_warning for pf in plotfiles
+        ])
+        #: the number of comparisons of shifter plots which resulted in a
+        #: warning
+        self.comparison_warning_shifter = sum([
+            pf.comparison_warning_shifter for pf in plotfiles
         ])
 
 

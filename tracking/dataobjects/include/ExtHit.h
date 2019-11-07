@@ -37,11 +37,12 @@ namespace Belle2 {
     //! @param detector Detector containing this hit
     //! @param element Detector element containing this hit
     //! @param status State of extrapolation at this hit
+    //! @param backwardPropagation Direction of the track propagation.
     //! @param t Time of flight from start of event to this hit (ns)
     //! @param r Global position of this hit (cm)
     //! @param p Momentum of extrapolated track at this hit (GeV/c)
     //! @param e Covariance matrix of extrapolation at this hit (GeV/c and cm)
-    ExtHit(int pdgCode, Const::EDetector detector, int element, ExtHitStatus status, double t,
+    ExtHit(int pdgCode, Const::EDetector detector, int element, ExtHitStatus status, bool backwardPropagation, double t,
            const TVector3& r, const TVector3& p, const TMatrixDSym& e);
 
     //! Constructor with initial values
@@ -49,11 +50,12 @@ namespace Belle2 {
     //! @param detector Detector containing this hit
     //! @param element Detector element containing this hit
     //! @param status State of extrapolation at this hit
+    //! @param backwardPropagation Direction of the track propagation.
     //! @param t Time of flight from IP to this hit (ns)
     //! @param r Global position of this hit (cm)
     //! @param p Momentum of extrapolated track at this hit (GeV/c)
     //! @param e Covariance matrix of extrapolation at this hit (GeV/c and cm)
-    ExtHit(int pdgCode, Const::EDetector detector, int element, ExtHitStatus status, double t,
+    ExtHit(int pdgCode, Const::EDetector detector, int element, ExtHitStatus status, bool backwardPropagation, double t,
            const G4ThreeVector& r, const G4ThreeVector& p, const G4ErrorSymMatrix& e);
 
     //! Copy constructor
@@ -73,6 +75,9 @@ namespace Belle2 {
 
     //! Set detector-element ID of sensitive element within detector
     void setCopyID(int copyID) { m_CopyID = copyID; }
+
+    //! Set the direction of track propagation.
+    void setBackwardPropagation(bool backwardPropagation) { m_BackwardPropagation = backwardPropagation; }
 
     //! Set state of extrapolation at this hit
     void setStatus(ExtHitStatus extHitStatus) { m_Status = extHitStatus; }
@@ -119,6 +124,9 @@ namespace Belle2 {
     //! Get state of extrapolation at this hit
     //! @return state of extrapolation at this hit
     ExtHitStatus getStatus() const { return m_Status; }
+
+    //! Get the direction of track propagation.
+    bool isBackwardPropagated() const { return m_BackwardPropagation; }
 
     //! Get time of flight from the point of closest approach near the origin to this hit
     //! @return time of flight from the point of closest approach near the origin to this hit (ns)
@@ -172,6 +180,9 @@ namespace Belle2 {
     //! extrapolation state
     ExtHitStatus m_Status;
 
+    //! Direction of track propagation.
+    bool m_BackwardPropagation;
+
     //! time of flight (ns)
     float m_TOF;
 
@@ -185,7 +196,7 @@ namespace Belle2 {
     float m_Covariance[21];
 
     //! Needed to make the ROOT object storable
-    ClassDef(ExtHit, 7)
+    ClassDef(ExtHit, 8);
 
   };
 }

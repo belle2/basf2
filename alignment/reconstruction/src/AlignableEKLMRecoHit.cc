@@ -8,10 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+#include <alignment/reconstruction/AlignableEKLMRecoHit.h>
+
 #include <alignment/GlobalDerivatives.h>
 #include <alignment/GlobalLabel.h>
-#include <alignment/reconstruction/AlignableEKLMRecoHit.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
@@ -36,7 +36,7 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   CLHEP::Hep3Vector origin;
   CLHEP::Hep3Vector u(1, 0, 0);
   CLHEP::Hep3Vector v(0, 1, 0);
-  TVector3 origin2, u2, v2;
+  B2Vector3D origin2, u2, v2;
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   const EKLM::TransformDataGlobalAligned* transformData =
     &(EKLM::TransformDataGlobalAligned::Instance());

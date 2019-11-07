@@ -11,14 +11,6 @@
 #pragma once
 
 #include "TH1F.h"
-#include "TVectorT.h"
-#include <vxd/geometry/GeoCache.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <vector>
-#include <set>
-#include <memory>
-#include <algorithm>
-#include <numeric>
 
 namespace Belle2 {
 

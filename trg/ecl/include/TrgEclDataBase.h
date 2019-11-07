@@ -19,7 +19,7 @@
 
 
 namespace Belle2 {
-  //  class TrgEclDataBase;
+  ///  class TrgEclDataBase;
   class TrgEclDataBase {
 
   public:

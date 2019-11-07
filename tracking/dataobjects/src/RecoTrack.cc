@@ -10,8 +10,6 @@
 #include <genfit/MplTrackRep.h>
 #include <simulation/monopoles/MonopoleConstants.h>
 
-#include <framework/dataobjects/Helix.h>
-
 using namespace Belle2;
 
 RecoTrack::RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum, const short int seedCharge,
@@ -538,6 +536,7 @@ std::vector<RecoHitInformation*> RecoTrack::getRecoHitInformations(bool getSorte
 
   hitList.reserve(recoHitInformations.size());
   for (auto& recoHit : recoHitInformations) {
+    // cppcheck-suppress useStlAlgorithm
     hitList.push_back(&recoHit);
   }
 

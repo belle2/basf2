@@ -8,8 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/eklm/geometry/Polygon2D.h>
+
+/* Belle 2 headers. */
 #include <framework/core/RandomNumbers.h>
 
 using namespace Belle2;

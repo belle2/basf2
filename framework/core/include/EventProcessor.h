@@ -19,8 +19,6 @@
 
 #include <stdexcept>
 
-class TRandom;
-
 namespace Belle2 {
 
   /**

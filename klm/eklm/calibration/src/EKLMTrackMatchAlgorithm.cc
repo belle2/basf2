@@ -8,9 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#include <TH1.h>
+/* Own header. */
 #include <klm/eklm/calibration/EKLMTrackMatchAlgorithm.h>
+
+/* KLM headers. */
 #include <klm/dataobjects/KLMChannelIndex.h>
 
 using namespace Belle2;
@@ -18,11 +19,12 @@ using namespace Belle2;
 EKLMTrackMatchAlgorithm::EKLMTrackMatchAlgorithm() : CalibrationAlgorithm("EKLMTrackMatchCollector")
 {
   m_planesEff = new TH1F(
-    "plane_effiiency", "",
+    "plane_efficiency", "",
     EKLMElementNumbers::getMaximalPlaneGlobalNumber(),
     0.5, EKLMElementNumbers::getMaximalPlaneGlobalNumber() + 0.5);
+  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
   m_StripEfficiency = new KLMStripEfficiency();
-  m_file = new TFile("TrackMAtchedResult.root", "recreate");
+  m_file = new TFile("TrackMatchedResult.root", "recreate");
   m_file->cd();
 }
 
@@ -32,12 +34,10 @@ EKLMTrackMatchAlgorithm::~EKLMTrackMatchAlgorithm()
 
 CalibrationAlgorithm::EResult EKLMTrackMatchAlgorithm::calibrate()
 {
-
   std::shared_ptr<TH1F> MatchedDigitsInPlane;
   MatchedDigitsInPlane = getObjectPtr<TH1F>("MatchedDigitsInPlane");
   std::shared_ptr<TH1F> AllExtHitsInPlane;
   AllExtHitsInPlane = getObjectPtr<TH1F>("AllExtHitsInPlane");
-
 
   MatchedDigitsInPlane.get()->Sumw2();
   AllExtHitsInPlane.get()->Sumw2();
@@ -49,7 +49,6 @@ CalibrationAlgorithm::EResult EKLMTrackMatchAlgorithm::calibrate()
 
   KLMChannelIndex klmChannels;
   for (KLMChannelIndex klmChannel = klmChannels.beginEKLM(); klmChannel != klmChannels.endEKLM(); ++klmChannel) {
-
     int idSection = klmChannel.getSection(); // Section
     int idSector = klmChannel.getSector(); // Sector
     int idLayer = klmChannel.getLayer(); // Layer

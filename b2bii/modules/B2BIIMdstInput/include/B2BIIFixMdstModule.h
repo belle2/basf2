@@ -288,13 +288,13 @@ namespace Belle2 {
     double fRange[2][4][15][kRange];      // range pdf
     double fRchisq[2][4][kRchisq + 1]; // reduced chi-squared pdf
     double fRchisqN[2][4][15];    // non-overflow normalization
-    double fRchisqD1[2][4][kRchisq + 1]; // first derivatives of above
-    double fRchisqD2[2][4][kRchisq + 1]; // second derivatives of above
-    double fRchisqD3[2][4][kRchisq + 1]; // third derivatives of above
+    double fRchisqD1[2][4][kRchisq + 1] = {0.0}; // first derivatives of above
+    double fRchisqD2[2][4][kRchisq + 1] = {0.0}; // second derivatives of above
+    double fRchisqD3[2][4][kRchisq + 1] = {0.0}; // third derivatives of above
     double fEEcl[kPTrk][kEEcl + 1];       // ECL energy pdf
-    double fEEclD1[kPTrk][kEEcl + 1];     // first derivatives of above
-    double fEEclD2[kPTrk][kEEcl + 1];     // second derivatives of above
-    double fEEclD3[kPTrk][kEEcl + 1];     // third derivatives of above
+    double fEEclD1[kPTrk][kEEcl + 1] = {0.0};     // first derivatives of above
+    double fEEclD2[kPTrk][kEEcl + 1] = {0.0};     // second derivatives of above
+    double fEEclD3[kPTrk][kEEcl + 1] = {0.0};     // third derivatives of above
 
     // private member functions
 

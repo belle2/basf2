@@ -32,7 +32,7 @@ namespace Belle2 {
   public:
 
     /// Constructor with links.
-    TRGCDCCircle(const std::vector<TRGCDCLink*>& links);
+    explicit TRGCDCCircle(const std::vector<TRGCDCLink*>& links);
 
     /// Constructor with a circle center, assuming the origin is on a circle.
     TRGCDCCircle(double r,

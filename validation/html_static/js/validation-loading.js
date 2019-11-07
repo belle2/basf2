@@ -487,6 +487,13 @@ function updateComparisonData(_comparisonData) {
     }
 }
 
+function packagePaneExpertToggle() {
+    template2ractive["package"].set(
+        "show_expert_plots",
+        $("#check_show_expert_plots")[0].checked
+    )
+}
+
 /**
  * Gets information about the comparisons and plots (generated when
  * we generate the plots), merges it with the information about the revisions
@@ -527,9 +534,12 @@ function setupRactiveFromRevision(revList) {
                         $("content").text("No package could be loaded");
                     }
                 }
+
                 ractive.on({
                     // todo: why does pycharm complain about this being unused? It's used in package.html
                     load_validation_plots: function (evt) {
+                        packagePaneExpertToggle();
+
                         // This gets called if the user clicks on a package in the
                         // package-selection side menu.
 

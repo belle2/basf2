@@ -9,9 +9,7 @@
  **************************************************************************/
 
 #include "tracking/modules/trackSetEvaluatorVXD/VXDTrackCandidatesQualityIndicatorCutterModule.h"
-#include <framework/logging/Logger.h>
 #include <vector>
-#include <numeric>
 
 using namespace Belle2;
 

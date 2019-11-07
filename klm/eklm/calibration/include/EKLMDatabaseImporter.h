@@ -10,9 +10,11 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
 #include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
+
+/* Belle 2 headers. */
 #include <framework/database/DBImportObjPtr.h>
 
 namespace Belle2 {
@@ -38,11 +40,6 @@ namespace Belle2 {
      * Set interval of validity.
      */
     void setIOV(int experimentLow, int runLow, int experimentHigh, int runHigh);
-
-    /**
-     * Import digitization parameters.
-     */
-    void importDigitizationParameters();
 
     /**
      * Import reconstruction parameters.

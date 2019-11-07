@@ -9,17 +9,14 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/core/FileCatalog.h>
 #include <framework/dataobjects/FileMetaData.h>
 
 #include <TFile.h>
 #include <TTree.h>
-#include <TError.h>
-
-#include <sys/signal.h>
 
 #include <boost/program_options.hpp>
 
+#include <csignal>
 #include <string>
 #include <iostream>
 
@@ -39,7 +36,7 @@ int main(int argc, char* argv[])
   std::string filename;
   po::options_description description("Options");
   description.add_options()
-  ("filename", po::value<std::string>(&filename), "belle 1 mdst file");
+  ("filename", po::value<std::string>(&filename), "belle 2 mdst file");
   po::variables_map vm;
   po::positional_options_description p;
   p.add("filename", -1);
@@ -77,10 +74,9 @@ int main(int argc, char* argv[])
     B2ERROR("No meta data found in " << filename);
     return 1;
   }
-  metaDataPtr = 0;
+
   branch->SetAddress(&metaDataPtr);
   tree->GetEntry(0);
-
   std::cout << metaDataPtr->getNEvents() << std::endl;
 
   return 0;

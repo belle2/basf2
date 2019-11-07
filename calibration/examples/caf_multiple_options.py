@@ -39,6 +39,8 @@ def main(argv):
         """
         Just to show that the function is correctly applied
         """
+        from basf2 import set_log_level, LogLevel
+        set_log_level(LogLevel.DEBUG)
         B2INFO("Running Test Algorithm Setup For Iteration {0}".format(iteration))
         B2INFO("Can access the {0} class from Calibration().pre_algorithms.".format(algorithm.__cppname__))
 
@@ -57,6 +59,7 @@ def main(argv):
         # different names. TestCalibrationAlgorithm outputs to the database using the prefix name so we change it
         # slightly for each calibration. Not something you'd usually have to do.
         alg_test.setPrefix('Test{}'.format(i))  # Must be the same as colllector prefix
+        alg_test.setDebugHisto(True)
 
         cal_test = Calibration(name='TestCalibration{}'.format(i),
                                collector=col_test,

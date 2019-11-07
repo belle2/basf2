@@ -28,7 +28,7 @@ appendROEMask('B+:all', 'basic',
 buildContinuumSuppression('B+:all', 'basic', path=path)
 
 variables.addAlias('d1_p', 'daughter(1,p)')
-variables.addAlias('MissM2', 'WE_MissM2(basic,0)')
+variables.addAlias('MissM2', 'weMissM2(basic,0)')
 
 histogramFilename = 'SLUntagged_Validation.root'
 myEmail = 'Phil Grace <philip.grace@adelaide.edu.au>'

@@ -161,8 +161,8 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         pos_cut = pos_cut + ' and ' + additional_roe_filter
         neg_cut = neg_cut + ' and ' + additional_roe_filter
 
-    cutAndCopyList(particle_lists[0], roe_particle_list, pos_cut, writeOut=True, path=roe_path)
-    cutAndCopyList(particle_lists[1], roe_particle_list, neg_cut, writeOut=True, path=roe_path)
+    cutAndCopyList(dft_particle_lists[0], roe_particle_list, pos_cut, writeOut=True, path=roe_path)
+    cutAndCopyList(dft_particle_lists[1], roe_particle_list, neg_cut, writeOut=True, path=roe_path)
 
     # sort pattern for tagging specific variables
     rank_variable = 'p'

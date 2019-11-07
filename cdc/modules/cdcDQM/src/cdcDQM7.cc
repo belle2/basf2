@@ -6,26 +6,14 @@
 /* update shifter's plots */
 
 #include "cdc/modules/cdcDQM/cdcDQM7.h"
-// add
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
+
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-//
 #include <framework/core/HistoModule.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
 
-#include "TH1F.h"
-#include "TH1D.h"
-#include "TH2D.h"
-#include <stdio.h>
-
 #include <TDirectory.h>
-#include <TStyle.h>
-
-#include <TProfile.h>//
 
 using namespace std;
 using namespace Belle2;

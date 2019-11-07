@@ -97,6 +97,7 @@ namespace Belle2 {
     {
       return m_eWire;
     }
+    /** get the quadrant*/
     short getQuadrant() const
     {
       return m_quadrant;
@@ -122,6 +123,7 @@ namespace Belle2 {
      *  Details are explained in the separate WireID object. */
     unsigned short m_eWire;
 
+    /** quadrant */
     short m_quadrant;
 
     //! Needed to make the ROOT object storable

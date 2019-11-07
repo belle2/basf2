@@ -6,27 +6,20 @@
 // Date : 19 - May - 2017
 //-
 #include <hlt/softwaretrigger/modules/dqm/CosmicRayHLTDQMModule.h>
-#include <mdst/dataobjects/SoftwareTriggerResult.h>
-#include <hlt/softwaretrigger/dataobjects/SoftwareTriggerVariables.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
 
 #include <TDirectory.h>
 
-#include <map>
 #include <string>
-#include <iostream>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;

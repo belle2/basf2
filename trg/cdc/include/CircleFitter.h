@@ -31,7 +31,7 @@ namespace Belle2 {
 
   public:
     /// Constructor.
-    TRGCDCCircleFitter(const std::string& name);
+    explicit TRGCDCCircleFitter(const std::string& name);
 
     /// Destructor
     virtual ~TRGCDCCircleFitter();

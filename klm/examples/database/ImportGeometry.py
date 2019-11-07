@@ -5,30 +5,28 @@
 # Note that GeoConfiguration created by this script should not be used except
 # for testing, because it contains the KLM only.
 
-import os
-import random
-from basf2 import *
+import basf2
 
-set_log_level(LogLevel.INFO)
+basf2.set_log_level(basf2.LogLevel.INFO)
 
-eventinfosetter = register_module('EventInfoSetter')
+# Create main path
+main = basf2.create_path()
+
+# Event-info setter
+eventinfosetter = basf2.register_module('EventInfoSetter')
+main.add_module(eventinfosetter)
 
 # Gearbox
-gearbox = register_module('Gearbox')
+gearbox = basf2.register_module('Gearbox')
+main.add_module(gearbox)
 
 # Geometry
-geometry = register_module('Geometry')
+geometry = basf2.register_module('Geometry')
 geometry.param('components', ['KLM'])
 geometry.param('useDB', False)
 geometry.param('createPayloads', True)
 geometry.param('payloadIov', [0, 0, -1, -1])
-
-# Create main path
-main = create_path()
-
-# Add modules to main path
-main.add_module(eventinfosetter)
-main.add_module(gearbox)
 main.add_module(geometry)
 
-process(main)
+# Process the path
+basf2.process(main)

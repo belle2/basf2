@@ -1,0 +1,13 @@
+Import('env')
+
+env['PYTHON_MODULE'] = True
+env['SUBLIB'] = True
+
+env['LIBS'] = [
+    'framework',
+    'daq_dataobjects', 'daq', 'hlt_softwaretrigger_dataobjects',
+    'boost_python', 'boost_filesystem', 'boost_program_options',
+    '$PYTHON_LIBS'
+]
+
+Return('env')

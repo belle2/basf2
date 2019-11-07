@@ -10,10 +10,7 @@
 
 #pragma once
 
-#include <TObject.h>
-#include <string>
 #include <TH2Poly.h>
-#include <TGraph.h>
 #include <TLine.h>
 #include <TText.h>
 

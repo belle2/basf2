@@ -14,7 +14,6 @@
 
 #include <analysis/dataobjects/Particle.h>
 
-#include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/utilities/Conversion.h>
@@ -40,7 +39,10 @@ namespace Belle2 {
 
         for (auto& idaughter : daughters) {
           if (idaughter -> getNDaughters() == 2) {
-            if (std::abs(idaughter -> getDaughters()[0]-> getPDGCode()) == 11) isOneConversion = true;
+            if (std::abs(idaughter -> getDaughters()[0]-> getPDGCode()) == 11
+                && std::abs(idaughter -> getDaughters()[1]-> getPDGCode()) == 11) {
+              isOneConversion = true;
+            }
           }
         }
 
@@ -352,18 +354,18 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("cosHelicityAnglePrimary", cosHelicityAnglePrimary,
                       R"DOC(
-                      Cosine of the helicity angle (see `Particle::getCosHelicity`) assuming the center of mass system as mother rest frame.
+                      Cosine of the helicity angle (see``Particle::getCosHelicity``) assuming the center of mass system as mother rest frame.
                       See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");
 
     REGISTER_VARIABLE("cosHelicityAngleDaughter", cosHelicityAngleDaughter,
                       R"DOC(
-                      Cosine of the helicity angle of the i-th daughter (see `Particle::getCosHelicityDaughter`).
+                      Cosine of the helicity angle of the i-th daughter (see ``Particle::getCosHelicityDaughter``).
                       The second argument is the index of the grand daughter that defines the angle, default is 0.
                       See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");
 
     REGISTER_VARIABLE("acoplanarityAngle", acoplanarityAngle,
                       R"DOC(
-                      Acoplanarity angle (see `Particle::getAcoplanarity`) assuming a two body decay of the particle and its daughters.
+                      Acoplanarity angle (see ``Particle::getAcoplanarity``) assuming a two body decay of the particle and its daughters.
                       See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the acoplanarity angle.)DOC");
 
   }

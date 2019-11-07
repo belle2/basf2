@@ -8,39 +8,31 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-
+/* Own header. */
 #include <klm/bklm/modules/bklmEffnRadio/BKLMEffnRadioModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-
-#include <math.h>
-
+/* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
-#include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/dataobjects/BKLMHit1d.h>
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/bklm/dataobjects/BKLMStatus.h>
 
-#include "CLHEP/Matrix/Matrix.h"
+/* Belle 2 headers. */
+#include <framework/logging/Logger.h>
 
-#include "TMath.h"
-#include "TCanvas.h"
-#include "TBox.h"
+/* ROOT headers. */
+#include <TBox.h>
+#include <TCanvas.h>
+#include <TColor.h>
+#include <TLatex.h>
+#include <TMath.h>
+#include <TStyle.h>
 
-#include "TColor.h"
-#include "TStyle.h"
-#include "TLatex.h"
+/* CLHEP headers. */
+#include <CLHEP/Vector/ThreeVector.h>
 
-#include "CLHEP/Vector/ThreeVector.h"
-#include "CLHEP/Units/PhysicalConstants.h"
-#include "CLHEP/Units/SystemOfUnits.h"
-
+/* C++ headers. */
+#include <cmath>
 
 using namespace std;
 using namespace CLHEP;

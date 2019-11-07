@@ -13,12 +13,12 @@
 #define PXD_IGNORED_PIXELS_MAP_H_
 
 #include <vxd/dataobjects/VxdID.h>
-#include <boost/property_tree/ptree.hpp>
+
+#include <functional>
 #include <map>
 #include <unordered_map>
 #include <set>
 #include <unordered_set>
-
 
 namespace Belle2 {
   /** This class provides a check for ignored (=cold, hot or otherwise deffective)

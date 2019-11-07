@@ -90,7 +90,6 @@ namespace Belle2 {
       px_gen = value;
       py_gen = value;
       pz_gen = value;
-      pt = value;
       pt_gen = value;
       ptot_gen = value;
       cosTheta_gen = value;

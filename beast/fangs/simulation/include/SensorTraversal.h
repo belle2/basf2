@@ -12,7 +12,6 @@
 #define SENSORTRAVERSAL_H
 
 #include <G4ThreeVector.hh>
-#include <vector>
 
 namespace Belle2 {
   namespace fangs {

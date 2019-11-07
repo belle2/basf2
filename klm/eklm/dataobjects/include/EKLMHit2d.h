@@ -10,12 +10,10 @@
 
 #pragma once
 
-/* External headers. */
-#include <TObject.h>
-
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <framework/datastore/DataStore.h>
+
+/* Belle 2 headers. */
 #include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {

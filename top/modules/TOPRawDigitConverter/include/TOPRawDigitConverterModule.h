@@ -84,6 +84,7 @@ namespace Belle2 {
     std::string m_inputRawDigitsName;  /**< name of TOPRawDigit store array */
     std::string m_outputDigitsName;    /**< name of TOPDigit store array */
     bool m_useSampleTimeCalibration;   /**< if true, use sample time calibration */
+    bool m_useAsicShiftCalibration;    /**< if true, use asic shifts calibration */
     bool m_useChannelT0Calibration;    /**< if true, use channel T0 calibration */
     bool m_useModuleT0Calibration;     /**< if true, use module T0 calibration */
     bool m_useCommonT0Calibration;     /**< if true, use common T0 calibration */

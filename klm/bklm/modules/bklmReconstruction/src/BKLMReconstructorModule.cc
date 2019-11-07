@@ -8,19 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/modules/bklmReconstruction/BKLMReconstructorModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMStatus.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/bklm/geometry/Module.h>
+
+/* Belle 2 headers. */
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-#include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/bklm/geometry/Module.h>
-#include <klm/bklm/dataobjects/BKLMStatus.h>
-
-#include "CLHEP/Vector/ThreeVector.h"
-#include "CLHEP/Matrix/Matrix.h"
+/* CLHEP headers. */
+#include <CLHEP/Vector/ThreeVector.h>
 
 using namespace std;
 using namespace Belle2;
@@ -80,9 +81,9 @@ void BKLMReconstructorModule::initialize()
 
 void BKLMReconstructorModule::beginRun()
 {
-  StoreObjPtr<EventMetaData> evtMetaData;
-
   if (m_loadTimingFromDB) {
+    if (!m_timing.isValid())
+      B2FATAL("BKLM time window data are not available.");
     m_DtMax = m_timing->getCoincidenceWindow();
     m_PromptTime = m_timing->getPromptTime();
     m_PromptWindow = m_timing->getPromptWindow();
@@ -98,7 +99,9 @@ void BKLMReconstructorModule::event()
   for (int d = 0; d < digits.getEntries(); ++d) {
     BKLMDigit* bklmDigit = digits[d];
     if (bklmDigit->inRPC() || bklmDigit->isAboveThreshold()) {
-      volIDToDigits.insert(std::pair<int, int>(bklmDigit->getModuleID() & BKLM_MODULESTRIPID_MASK, d));
+      int module = bklmDigit->getModuleID();
+      uint16_t channel = BKLMElementNumbers::getChannelByModule(module);
+      volIDToDigits.insert(std::pair<int, int>(channel, d));
     }
   }
   if (volIDToDigits.empty()) return;
@@ -127,11 +130,13 @@ void BKLMReconstructorModule::event()
   hit2ds.clear();
 
   for (int i = 0; i < hit1ds.getEntries(); ++i) {
-    int moduleID = hit1ds[i]->getModuleID() & BKLM_MODULEID_MASK;
+    int moduleID = hit1ds[i]->getModuleID();
     const bklm::Module* m = m_GeoPar->findModule(hit1ds[i]->getSection(), hit1ds[i]->getSector(), hit1ds[i]->getLayer());
     bool isPhiReadout = hit1ds[i]->isPhiReadout();
     for (int j = i + 1; j < hit1ds.getEntries(); ++j) {
-      if (moduleID != (hit1ds[j]->getModuleID() & BKLM_MODULEID_MASK)) continue;
+      if (!BKLMElementNumbers::hitsFromSameModule(
+            moduleID, hit1ds[j]->getModuleID()))
+        continue;
       if (isPhiReadout == hit1ds[j]->isPhiReadout()) continue;
       int phiIndex = isPhiReadout ? i : j;
       int zIndex   = isPhiReadout ? j : i;

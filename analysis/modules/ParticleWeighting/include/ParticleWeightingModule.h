@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <analysis/dbobjects/ParticleWeightingKeyMap.h>
 #include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>

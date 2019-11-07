@@ -58,9 +58,11 @@ Here is a simple example:
     applyEventCuts('R2EventLevel < 0.3')
 
 This builds the list of all pions but only processes events where the event-level R2 passes the cut. 
-See :download:`B2A307 </analysis/examples/tutorials/B2A307-BasicEventWiseNtupleSelection.py>` for a full example.
+.. FIXME B2A307 is broken, when it's fixed, please uncomment this line (BII-5330)
+.. See :download:`B2A307 </analysis/examples/tutorials/B2A307-BasicEventWiseNtupleSelection.py>` for a full example.
 
 .. autofunction:: modularAnalysis.applyEventCuts
+   :noindex:
 
 Event based variables
 ~~~~~~~~~~~~~~~~~~~~~

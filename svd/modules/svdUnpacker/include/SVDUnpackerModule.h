@@ -205,7 +205,7 @@ namespace Belle2 {
       /** The parameter that indicates what fraction of B2ERRORs messages
        * should be suppressed to not overload HLT while data taking
        */
-      int m_errorRate;
+      int m_errorRate{1000};
 
       /** this 4-bits value should be 1111 if no headers/trailers are missing */
       unsigned short seenHeadersAndTrailers: 4;

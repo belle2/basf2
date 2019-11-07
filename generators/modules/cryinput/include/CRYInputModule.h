@@ -13,16 +13,10 @@
 #define CRYINPUTMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/logging/Logger.h>
 
 #include <generators/cry/CRY.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
-
-#include <vector>
-#include <TFile.h>
-#include <TH1D.h>
 
 namespace Belle2 {
 

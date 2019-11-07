@@ -10,26 +10,27 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <string>
-
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/dataobjects/BKLMDigitOutOfRange.h>
 #include <klm/bklm/dbobjects/BKLMADCThreshold.h>
 #include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
+#include <klm/dataobjects/KLMDigitEventInfo.h>
+#include <klm/dataobjects/KLMDigitRaw.h>
+#include <klm/dbobjects/KLMTimeConversion.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/eklm/dbobjects/EKLMChannels.h>
 #include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
-#include <framework/database/DBArray.h>
-#include <framework/database/DBObjPtr.h>
+
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <klm/dataobjects/KLMDigitEventInfo.h>
-#include <klm/dataobjects/KLMDigitRaw.h>
-#include <klm/dbobjects/KLMTimeConversion.h>
 #include <rawdata/dataobjects/RawKLM.h>
+
+/* C++ headers. */
+#include <string>
 
 namespace Belle2 {
 
@@ -166,7 +167,7 @@ namespace Belle2 {
     DBObjPtr<EKLMElectronicsMap> m_eklmElectronicsMap;
 
     /** Channels. */
-    DBObjPtr<EKLMChannels> m_Channels;
+    DBObjPtr<EKLMChannels> m_eklmChannels;
 
     /** EKLM digits. */
     StoreArray<EKLMDigit> m_eklmDigits;
@@ -177,7 +178,7 @@ namespace Belle2 {
     DBObjPtr<BKLMElectronicsMap> m_bklmElectronicsMap;
 
     /** ADC offset and threshold read from database. */
-    DBObjPtr<BKLMADCThreshold> m_ADCParams;
+    DBObjPtr<BKLMADCThreshold> m_bklmADCParams;
 
     /** BKLM digits. */
     StoreArray<BKLMDigit> m_bklmDigits;

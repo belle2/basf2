@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerObject.h>
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
@@ -60,5 +60,7 @@ namespace Belle2::SoftwareTrigger {
     double m_Ehigh = 2;
     /// which CMS energy defines nEsingleClust
     double m_EsinglePhoton = 1;
+    /// which CMS energy defines nReducedEsingle clusters
+    double m_reducedEsinglePhoton = 0.5;
   };
 }

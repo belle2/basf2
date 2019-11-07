@@ -13,16 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <beast/pindiode/dataobjects/PindiodeHit.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <string>
-#include <vector>
-
-//ROOT
-#include <TRandom3.h>
-#include <TF1.h>
-#include <TVector3.h>
-
 
 namespace Belle2 {
   namespace pindiode {

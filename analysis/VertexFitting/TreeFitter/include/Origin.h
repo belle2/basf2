@@ -10,12 +10,10 @@
  **************************************************************************/
 #pragma once
 
-#include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
 #include <framework/database/DBObjPtr.h>
-#include <analysis/ClusterUtility/ClusterUtils.h>
 
 namespace TreeFitter {
 

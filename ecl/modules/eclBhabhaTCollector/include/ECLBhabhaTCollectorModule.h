@@ -11,9 +11,6 @@
 #ifndef ECLBHABHATCOLLECTORMODULE_H
 #define ECLBHABHATCOLLECTORMODULE_H
 
-#include <framework/core/Module.h>
-#include <ecl/utility/ECLChannelMapper.h>
-
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>

@@ -8,12 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <framework/core/RandomNumbers.h>
+/* Own header. */
 #include <klm/modules/KLMDigitizer/KLMDigitizerModule.h>
+
+/* KLM headers. */
 #include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/simulation/ScintillatorSimulator.h>
+
+/* Belle 2 headers. */
+#include <framework/core/RandomNumbers.h>
 
 using namespace Belle2;
 

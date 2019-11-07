@@ -963,11 +963,10 @@ namespace Belle2 {
       }
     }
 
-    int nVert = 0;
     bool okFT = false;
     if (m_fitType == "vertex") {
       okFT = true;
-      nVert = rf.fit();
+      int nVert = rf.fit();
       rf.updateMother();
       if (m_decayString.empty() && m_updateDaughters == true) rf.updateDaughters();
       if (nVert != 1) return false;
@@ -977,14 +976,14 @@ namespace Belle2 {
       okFT = true;
       rf.setMassConstFit(true);
       rf.setVertFit(false);
-      nVert = rf.fit();
+      int nVert = rf.fit();
       rf.updateMother();
       if (nVert != 1) return false;
     };
     if (m_fitType == "massvertex") {
       okFT = true;
       rf.setMassConstFit(true);
-      nVert = rf.fit();
+      int nVert = rf.fit();
       rf.updateMother();
       if (m_decayString.empty() && m_updateDaughters == true) rf.updateDaughters();
       if (nVert != 1) return false;

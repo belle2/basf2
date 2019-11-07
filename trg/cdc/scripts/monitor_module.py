@@ -52,26 +52,16 @@ class Monitor(Module):
         """
         Initilization
         """
+        #: Event info
         self.event_info = Belle2.PyStoreObj('EventMetaData')
-        """
-        Event info
-        """
+        #: CDCTRG TS hit
         self.tshits = Belle2.PyStoreArray('CDCTriggerSegmentHits')
-        """
-        CDCTRG TS hit
-        """
+        #: TSIM TS hit
         self.simhits = Belle2.PyStoreArray('TSimSegmentHits')
-        """
-        TSIM TS hit
-        """
+        #: get run ID
         self.first_run = self.event_info.getRun()
-        """
-        get run ID
-        """
+        #: Number of events
         self.nevents = 0
-        """
-        Number of events
-        """
 
     def event(self):
         """

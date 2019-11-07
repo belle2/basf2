@@ -45,7 +45,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/predicate.hpp> //for iequals()
 
-#include <unistd.h>
 #include <csignal>
 #include <cstdlib>
 #include <iostream>

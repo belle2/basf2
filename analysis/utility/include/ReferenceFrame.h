@@ -165,8 +165,8 @@ namespace Belle2 {
   private:
     TLorentzVector m_momentum;         /**< momentum of RF in the lab frame */
     TVector3 m_displacement;           /**< displacement of RF origin in th lab frame */
-    TLorentzRotation m_lab2restframe;  /**< Lorentz transformation connecting lab and rest frame */
     TVector3 m_boost;                  /**< boost of RF relative to the lab frame */
+    TLorentzRotation m_lab2restframe;  /**< Lorentz transformation connecting lab and rest frame */
   };
 
   /**

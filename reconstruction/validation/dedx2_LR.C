@@ -71,7 +71,8 @@ void plot(const TString &input_filename)
     } else {
       hist->GetListOfFunctions()->Add(new TNamed("Check", "Peak at 1"));
     }
-    hist->GetListOfFunctions()->Add(new TNamed("Contact","jkumar@andrew.cmu.edu"));
+    hist->GetListOfFunctions()->Add(new TNamed("Contact","Jitendra Kumar: jkumar@andrew.cmu.edu"));
+    hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
     hist->Write();
 
   }

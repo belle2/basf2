@@ -8,16 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TTree.h>
-#include <TH1F.h>
-#include <TF1.h>
-#include <TCanvas.h>
-
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/eklm/calibration/EKLMTimeCalibrationAlgorithm.h>
+
+/* KLM headers. */
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/eklm/dbobjects/EKLMTimeCalibration.h>
+
+/* ROOT headers. */
+#include <TCanvas.h>
+#include <TF1.h>
+#include <TH1F.h>
+#include <TTree.h>
 
 using namespace Belle2;
 

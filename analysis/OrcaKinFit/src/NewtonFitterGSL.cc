@@ -204,8 +204,8 @@ namespace Belle2 {
 
         chi2old = chi2new;
 
-        if (nit == 0 || nit < nitdebug) B2DEBUG(11, "===================\nStarting iteration " << nit);
         if (nit == 0 || nit < nitdebug) {
+          B2DEBUG(11, "===================\nStarting iteration " << nit);
           std::string printout = "\n Fit objects:\n";
           for (auto fo : fitobjects) {
             assert(fo);

@@ -14,7 +14,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
@@ -30,8 +29,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <boost/lexical_cast.hpp>
@@ -94,30 +91,6 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr useROERecoilFrame(const std::vector<std::string>& arguments)
-    {
-      if (arguments.size() == 1) {
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double {
-          const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-          if (!roe)
-          {
-            B2ERROR("Relation between particle and ROE doesn't exist!");
-            return -999.;
-          }
-          PCmsLabTransform T;
-          TLorentzVector pRecoil = T.getBeamFourMomentum() - roe->get4Vector();
-          Particle tmp(pRecoil, 0);
-          UseReferenceFrame<RestFrame> frame(&tmp);
-          double result = var->function(particle);
-          return result;
-        };
-        return func;
-      } else {
-        B2WARNING("Wrong number of arguments for meta function useROERecoilFrame");
-        return nullptr;
-      }
-    }
 
     Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments)
     {
@@ -126,14 +99,14 @@ namespace Belle2 {
         auto func = [extraInfoName](const Particle * particle) -> double {
           if (particle == nullptr)
           {
-            StoreObjPtr<EventExtraInfo> eventExtraInfo;
-            return eventExtraInfo->getExtraInfo(extraInfoName);
+            B2WARNING("Returns NaN because the particle is nullptr! If you want EventExtraInfo variables, please use eventExtraInfo() instead");
+            return std::numeric_limits<float>::quiet_NaN();
           }
-          try {
-            return particle->getExtraInfo(extraInfoName);
-          } catch (const std::runtime_error& error)
+          if (particle->hasExtraInfo(extraInfoName))
           {
-            return -999.;
+            return particle->getExtraInfo(extraInfoName);
+          } else {
+            return std::numeric_limits<float>::quiet_NaN();
           }
         };
         return func;
@@ -149,7 +122,12 @@ namespace Belle2 {
         auto extraInfoName = arguments[0];
         auto func = [extraInfoName](const Particle*) -> double {
           StoreObjPtr<EventExtraInfo> eventExtraInfo;
-          return eventExtraInfo->getExtraInfo(extraInfoName);
+          if (eventExtraInfo->hasExtraInfo(extraInfoName))
+          {
+            return eventExtraInfo->getExtraInfo(extraInfoName);
+          } else {
+            return std::numeric_limits<float>::quiet_NaN();
+          }
         };
         return func;
       } else {
@@ -301,7 +279,7 @@ namespace Belle2 {
         auto func = [cut](const Particle * particle) -> double {
 
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           if (cut->check(particle))
             return 1;
           else
@@ -347,7 +325,7 @@ namespace Belle2 {
 
           if (std::abs(particle -> getPDGCode()) == std::abs(pdgCode))
             return var -> function(particle);
-          else return -999;
+          else return std::numeric_limits<float>::quiet_NaN();
         };
         return func;
       } else {
@@ -617,7 +595,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -649,11 +626,8 @@ endloop:
         // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
-          // cppcheck-suppress unreadVariable
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-          // cppcheck-suppress unreadVariable
           agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
           bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&) {
@@ -689,7 +663,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -731,11 +704,8 @@ endloop:
         // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
-          // cppcheck-suppress unreadVariable
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-          // cppcheck-suppress unreadVariable
           agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
           bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&) {
@@ -781,7 +751,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -826,11 +795,8 @@ endloop:
         // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
-          // cppcheck-suppress unreadVariable
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-          // cppcheck-suppress unreadVariable
           agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
           bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&) {
@@ -879,7 +845,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -922,7 +887,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -968,7 +932,6 @@ endloop:
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
-          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -1071,7 +1034,7 @@ endloop:
           } else if (daughterIndices.size() == 3)
           {
             if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters())
-                || daughterIndices[2] >= int(particle->getNDaughters())) return -999;
+                || daughterIndices[2] >= int(particle->getNDaughters())) return std::numeric_limits<float>::quiet_NaN();
             else {
               const auto& frame = ReferenceFrame::GetCurrent();
               TVector3 pi = frame.getMomentum(particle->getDaughter(daughterIndices[0])).Vect();
@@ -1162,7 +1125,7 @@ endloop:
         }
         auto func = [daughterIndices](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           else {
             const auto& frame = ReferenceFrame::GetCurrent();
             TLorentzVector pSum;
@@ -1170,7 +1133,7 @@ endloop:
             for (auto& index : daughterIndices)
             {
               if (index >= int(particle->getNDaughters())) {
-                return -999;
+                return std::numeric_limits<float>::quiet_NaN();
               } else pSum += frame.getMomentum(particle->getDaughter(index));
             }
 
@@ -1245,6 +1208,33 @@ endloop:
         B2FATAL("Wrong number of arguments for meta function isInfinity");
       }
     }
+
+    Manager::FunctionPtr conditionalVariableSelector(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 3) {
+
+        std::string cutString = arguments[0];
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
+
+        // cppcheck-suppress unreadVariable ; cppcheck has problems with lambda capture
+        const Variable::Manager::Var* variableIfTrue = Manager::Instance().getVariable(arguments[1]);
+        const Variable::Manager::Var* variableIfFalse = Manager::Instance().getVariable(arguments[2]);
+
+        auto func = [cut, variableIfTrue, variableIfFalse](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return std::numeric_limits<float>::quiet_NaN();
+          if (cut->check(particle))
+            return variableIfTrue->function(particle);
+          else
+            return variableIfFalse->function(particle);
+        };
+        return func;
+
+      } else {
+        B2FATAL("Wrong number of arguments for meta function conditionalVariableSelector");
+      }
+    }
+
 
     Manager::FunctionPtr pValueCombination(const std::vector<std::string>& arguments)
     {
@@ -1377,9 +1367,9 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [var, daughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           if (daughterNumber >= int(particle->getNDaughters()))
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           else
             return var->function(particle->getDaughter(daughterNumber));
         };
@@ -1402,16 +1392,16 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [var, daughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           if (particle->getMCParticle()) // has MC match or is MCParticle
           {
             if (daughterNumber >= int(particle->getMCParticle()->getNDaughters())) {
-              return -999;
+              return std::numeric_limits<float>::quiet_NaN();
             }
             Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
             return var->function(&tempParticle);
           } else {
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           }
         };
         return func;
@@ -1426,16 +1416,16 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           if (particle->getMCParticle()) // has MC match or is MCParticle
           {
             if (particle->getMCParticle()->getMother() == nullptr) {
-              return -999;
+              return std::numeric_limits<float>::quiet_NaN();
             }
             Particle tempParticle = Particle(particle->getMCParticle()->getMother());
             return var->function(&tempParticle);
           } else {
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           }
         };
         return func;
@@ -1460,7 +1450,7 @@ endloop:
           StoreArray<MCParticle> mcParticles("MCParticles");
           if (particleNumber >= mcParticles.getEntries())
           {
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           }
 
           MCParticle* mcParticle = mcParticles[particleNumber];
@@ -1482,13 +1472,13 @@ endloop:
           StoreArray<MCParticle> mcParticles("MCParticles");
           if (mcParticles.getEntries() == 0)
           {
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           }
 
           MCParticle* mcUpsilon4S = mcParticles[0];
           if (mcUpsilon4S->getPDG() != 300553)
           {
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           }
 
           Particle upsilon4S = Particle(mcUpsilon4S);
@@ -1590,11 +1580,16 @@ endloop:
         }
 
         auto flavourType = (Belle2::EvtPDLUtil::hasAntiParticle(pdgCode)) ? Particle::c_Flavored : Particle::c_Unflavored;
+        // cppcheck has problems understanding lambda function syntax and throws
+        // a warning here about cut being unread. but it is read in the if
+        // statements so suppress the false positive
+        //
+        // cppcheck-suppress unreadVariable
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
         auto func = [roeListName, cut, pdgCode, flavourType](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           StoreObjPtr<ParticleList> roeList(roeListName);
           TLorentzVector vec = particle->get4Vector();
           for (unsigned int i = 0; i < roeList->getListSize(); i++)
@@ -1624,7 +1619,7 @@ endloop:
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
         auto func = [cut](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           unsigned int n = 0;
           for (auto& daughter : particle->getDaughters())
           {
@@ -1673,7 +1668,7 @@ endloop:
           const MCParticle* mcp = particle->getMCParticle();
           if (!mcp)   // Has no MC match and is no MCParticle
           {
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           }
           Particle tmpPart(mcp);
           return var->function(&tmpPart);
@@ -2205,20 +2200,17 @@ Returns the value of ``variable`` in the *lab* frame.
 Specifying the lab frame is useful in some corner-cases. For example:
 ``useRestFrame(daughter(0, formula(E - useLabFrame(E))))`` which is the difference of the first daughter's energy in the rest frame of the mother (current particle) with the same daughter's lab-frame energy.
 )DOC");
-    REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
-                      "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
-                      "E.g. useROERecoilFrame(E) returns the energy of a particle in the ROE recoil frame.");
     REGISTER_VARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
                       "Useful if you want to write out if a particle would have passed a cut or not.\n"
-                      "Returns -999 if particle is a nullptr.");
+                      "Returns NaN if particle is a nullptr.");
     REGISTER_VARIABLE("passesEventCut(cut)", passesEventCut,
                       "[Eventbased] Returns 1 if event passes the cut otherwise 0.\n"
                       "Useful if you want to select events passing a cut without looping into particles, such as for skimming.\n");
     REGISTER_VARIABLE("countDaughters(cut)", countDaughters,
                       "Returns number of direct daughters which satisfy the cut.\n"
                       "Used by the skimming package (for what exactly?)\n"
-                      "Returns -999 if particle is a nullptr.");
+                      "Returns NaN if particle is a nullptr.");
     REGISTER_VARIABLE("varFor(pdgCode, variable)", varFor,
                       "Returns the value of the variable for the given particle if its abs(pdgCode) agrees with the given one.\n"
                       "E.g. varFor(11, p) returns the momentum if the particle is an electron or a positron.");
@@ -2244,17 +2236,17 @@ Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to c
                       "Returns value of variable for the i-th daughter. E.g.\n"
                       "  - daughter(0, p) returns the total momentum of the first daughter.\n"
                       "  - daughter(0, daughter(1, p) returns the total momentum of the second daughter of the first daughter.\n\n"
-                      "Returns -999 if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
+                      "Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
     REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter,
                       "Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.\n"
-                      "Returns -999 if the particle is nullptr, if the particle is not matched to an MC particle,"
+                      "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
                       "or if the i-th MC daughter does not exist.\n"
                       "E.g. mcDaughter(0, PDG) will return the PDG code of the first MC daughter of the matched MC"
                       "particle of the reconstructed particle the function is applied to./n"
                       "The meta variable can also be nested: mcDaughter(0, mcDaughter(1, PDG)).");
     REGISTER_VARIABLE("mcMother(variable)", mcMother,
                       "Returns the value of the requested variable for the Monte Carlo mother of the particle.\n"
-                      "Returns -999 if the particle is nullptr, if the particle is not matched to an MC particle,"
+                      "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
                       "or if the MC mother does not exist.\n"
                       "E.g. mcMother(PDG) will return the PDG code of the MC mother of the matched MC"
                       "particle of the reconstructed particle the function is applied to.\n"
@@ -2358,11 +2350,12 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_VARIABLE("extraInfo(name)", extraInfo,
                       "Returns extra info stored under the given name.\n"
                       "The extraInfo has to be set first by a module like MVAExpert. If nothing is set under this name, -999 is returned.\n"
+                      "If particle is a nullptr, -999 is returned. Please use eventExtraInfo(name) if you want EventExtraInfo variable.\n"
                       "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the MVAExpert.");
     REGISTER_VARIABLE("eventExtraInfo(name)", eventExtraInfo,
                       "[Eventbased] Returns extra info stored under the given name in the event extra info.\n"
                       "The extraInfo has to be set first by another module like MVAExpert in event mode.\n"
-                      "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the MVAExpert for an event.");
+                      "If nothing is set under this name, -999 is returned.");
     REGISTER_VARIABLE("eventCached(variable)", eventCached,
                       "[Eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
                       "The result of second call to this variable in the same event will be provided from the cache.");
@@ -2396,6 +2389,9 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
                       "Useful for debugging.");
+    REGISTER_VARIABLE("conditionalVariableSelector(cut, variableIfTrue, variableIfFalse)", conditionalVariableSelector,
+                      "Returns one of the two supplied variables, depending on whether the particle passes the supplied cut.\n"
+                      "The first variable is returned if the particle passes the cut, and the second variable is returned otherwise.");
     REGISTER_VARIABLE("pValueCombination(p1, p2, ...)", pValueCombination,
                       "Returns the combined p-value of the provided p-values according to the formula given in `Nucl. Instr. and Meth. A 411 (1998) 449 <https://doi.org/10.1016/S0168-9002(98)00293-9>`_ .\n"
                       "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.");
@@ -2408,7 +2404,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns variable output for the matched MCParticle by constructing a temporary Particle from it.\n"
                       "This may not work too well if your variable requires accessing daughters of the particle.\n"
                       "E.g. matchedMC(p) returns the total momentum of the related MCParticle.\n"
-                      "Returns -999 if no matched MCParticle exists.");
+                      "Returns NaN if no matched MCParticle exists.");
     REGISTER_VARIABLE("countInList(particleList, cut='')", countInList,
                       "Returns number of particle which pass given in cut in the specified particle list.\n"
                       "Useful for creating statistics about the number of particles in a list.\n"

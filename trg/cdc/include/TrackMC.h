@@ -98,7 +98,7 @@ namespace Belle2 {
     std::vector<TRGCDCWireHitMC*> _hits;
 
   private:// static members
-    // vector of pointers to TRGCDCTrackMC
+    /// vector of pointers to TRGCDCTrackMC
     static std::vector<const TRGCDCTrackMC*> _list;
 
     friend class TRGCDC;

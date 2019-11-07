@@ -31,11 +31,12 @@
 namespace Belle2 {
 //
 //
-  /*! ETM class */
+  /** ETM class */
   class TrgEclMaster;
 //
 //
 //
+  /** ETM class */
   class TrgEclMaster {
 
   public:

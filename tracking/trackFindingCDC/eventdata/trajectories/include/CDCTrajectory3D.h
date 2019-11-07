@@ -16,7 +16,6 @@
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/CovarianceMatrix.h>
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 
 #include <TMath.h>
@@ -56,6 +55,11 @@ namespace Belle2 {
         : m_localOrigin(0.0, 0.0, 0.0)
         , m_localHelix(helix)
         , m_flightTime(0.0)
+      {
+      }
+
+      /// conversion constructor to make that one stupid test work
+      explicit CDCTrajectory3D(const Helix& helix) : CDCTrajectory3D(UncertainHelix(helix))
       {
       }
 

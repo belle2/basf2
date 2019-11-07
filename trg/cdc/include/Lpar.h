@@ -91,7 +91,7 @@ namespace Belle2 {
     class Cpar {
     public:
       /// constructor  of Cpar class
-      Cpar(const TRGCDCLpar&);
+      explicit Cpar(const TRGCDCLpar&);
       /// returns parameter of Cpar class
       double xi() const { return 1 + 2 * m_cu * m_da; }
       /// returns parameter of Cpar class
@@ -176,7 +176,7 @@ namespace Belle2 {
     /// data members
     double m_kappa;
 
-
+    /// belle alpha
     static const double BELLE_ALPHA;
 
     // static data members

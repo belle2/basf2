@@ -113,6 +113,7 @@ class EffModule(Module):
             trglog = self.trglog_phase3
             prescale = self.prescale_phase3
 
+        #: Total number of events
         if self.Ntot_event == 0:
             return
         sp = ' '

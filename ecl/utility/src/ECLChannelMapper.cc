@@ -4,11 +4,8 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/utilities/FileSystem.h>
 //
-#include <iostream>
 #include <fstream>
 #include <string>
-#include <cstdio>
-#include <cstdlib>
 
 using namespace Belle2;
 using namespace std;

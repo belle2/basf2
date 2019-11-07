@@ -1,6 +1,5 @@
 #include <ecl/digitization/EclConfigurationPure.h>
 #include <ecl/digitization/ECLSampledShaper.h>
-#include <TH1F.h>
 #include <algorithm>
 #include <iostream>
 #include <cassert>

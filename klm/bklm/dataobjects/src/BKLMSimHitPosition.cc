@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/dataobjects/BKLMSimHitPosition.h>
 
 using namespace Belle2;

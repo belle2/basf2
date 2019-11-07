@@ -9,12 +9,8 @@
  **************************************************************************/
 
 #include <tracking/modules/trackingPerformanceEvaluation/TrackingPerformanceEvaluationModule.h>
-#include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
 #include <framework/geometry/BFieldManager.h>
@@ -40,14 +36,9 @@
 
 #include <genfit/KalmanFitterInfo.h>
 
-#include <root/TTree.h>
-#include <root/TAxis.h>
 #include <root/TObject.h>
 
 #include <boost/foreach.hpp>
-
-#include <typeinfo>
-#include <cxxabi.h>
 
 using namespace Belle2;
 
@@ -820,8 +811,6 @@ void  TrackingPerformanceEvaluationModule::fillTrackErrParams2DHistograms(const 
   double p = momentum.Mag();
   double mass = fitResult->getParticleType().getMass();
   double beta = p / sqrt(p * p + mass * mass);
-  // the following line gives a false positive for cpp-check
-  // cppcheck-suppress unreadVariable
   double sinTheta = TMath::Sin(momentum.Theta());
 
   m_h2_d0errphi0err_xy->Fill(d0_err / phi_err * px / pt,

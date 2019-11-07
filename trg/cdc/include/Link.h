@@ -358,22 +358,32 @@ namespace Belle2 {
     HepGeom::Point3D<double> _onWire;
     /// position
     HepGeom::Point3D<double> _position;
+    /// dPhi
     double _dPhi;
     /// left right
     unsigned _leftRight;
+    /// drift distance
     float _drift[2];
+    /// drift distance error
     float _dDrift[2];
 
+    /// z status of stereo
     int _zStatus;
+    /// not useds?
     int _zPair;
+    /// pull
     double _pull;
+    /// neighbor TRGCDCLink
     TRGCDCLink* _neighbor[7];
+    /// TRGCDCLink
     TRGCDCLink* _link;
 
     /// ...tmp...
     HepGeom::Point3D<double> _conf;
 
+    /// arcZ
     HepGeom::Point3D<double> _arcZ[4];
+    ///  2D fitted or not
     unsigned _fit2D;
     //
     // for quick dicision

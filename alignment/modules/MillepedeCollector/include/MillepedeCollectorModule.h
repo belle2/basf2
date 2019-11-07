@@ -11,14 +11,15 @@
 #ifndef MILLEPEDECOLLECTORMODULE_H
 #define MILLEPEDECOLLECTORMODULE_H
 
-#include <calibration/CalibrationCollectorModule.h>
-#include <genfit/Track.h>
-#include <genfit/StateOnPlane.h>
-#include <genfit/MeasuredStateOnPlane.h>
 #include <analysis/dataobjects/Particle.h>
-#include <genfit/GblTrajectory.h>
+#include <calibration/CalibrationCollectorModule.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/geometry/B2Vector3.h>
 #include <tracking/dataobjects/RecoTrack.h>
+
+#include <genfit/GblTrajectory.h>
+#include <genfit/Track.h>
+#include <genfit/MeasuredStateOnPlane.h>
 
 namespace Belle2 {
   /**
@@ -98,9 +99,9 @@ namespace Belle2 {
 
     /** Get the primary vertex position estimation and its size
      *  from BeamSpot
-     @return tuple<TVector3, TMatrixDSym> tuple with position and size as covariance matrix
+     @return tuple<B2Vector3D, TMatrixDSym> tuple with position and size as covariance matrix
      */
-    std::tuple<TVector3, TMatrixDSym> getPrimaryVertexAndCov() const;
+    std::tuple<B2Vector3D, TMatrixDSym> getPrimaryVertexAndCov() const;
 
 
   private:

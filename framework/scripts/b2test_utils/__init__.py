@@ -17,7 +17,6 @@ from collections import OrderedDict
 import multiprocessing
 import basf2
 import subprocess
-import unittest
 import re
 from . import logfilter
 
@@ -49,7 +48,7 @@ def require_file(filename, data_type="", py_case=None):
 
     Parameters:
         filename (str): relative filename to look for, either in a central place or in the current working directory
-        data_type (str): case insensitive data type to fine.  Either empty string or one of `""examples"`` or ``"validation"``.
+        data_type (str): case insensitive data type to find.  Either empty string or one of ``"examples"`` or ``"validation"``.
         py_case (unittest.TestCase): if this is to be skipped within python's native unittest then pass the TestCase instance
 
     Returns:
@@ -99,10 +98,12 @@ def configure_logging_for_tests(user_replacements=None):
     1. Simplify log message to be just ``[LEVEL] message``
     2. Disable error summary, just additional noise
     3. Intercept all log messages and replace
+
         * the current working directory in log messaged with ``${cwd}``
         * the current default globaltags with ``${default_globaltag}``
         * the contents of the following environment varibles with their name
           (or the listed replacement string):
+
             - :envvar:`BELLE2_TOOLS`
             - :envvar:`BELLE2_RELEASE_DIR` with ``BELLE2_SOFTWARE_DIR``
             - :envvar:`BELLE2_LOCAL_DIR` with ``BELLE2_SOFTWARE_DIR``
@@ -116,6 +117,8 @@ def configure_logging_for_tests(user_replacements=None):
 
     Warning:
         This function should be called **after** switching directory to replace the correct directory name
+
+    .. versionadded:: release-04-00-00
     """
     basf2.logging.reset()
     basf2.logging.enable_summary(False)
@@ -226,7 +229,7 @@ def safe_process(*args, **kwargs):
     return run_in_subprocess(target=basf2.process, *args, **kwargs)
 
 
-def check_error_free(tool, toolname, package, filter=lambda x: False):
+def check_error_free(tool, toolname, package, filter=lambda x: False, toolopts=None):
     """Calls the `tool` with argument `package` and check that the output is
     error-free. Optionally `filter` the output in case of error messages that
     can be ignored.
@@ -246,8 +249,9 @@ def check_error_free(tool, toolname, package, filter=lambda x: False):
         tool(str): executable to call
         toolname(str): human readable name of the tool
         package(str): package to run over. Also the first argument to the tool
-        filter(lambda): function which gets called for each line of output and
+        filter: function which gets called for each line of output and
            if it returns True the line will be ignored.
+        toolopts(list(str)): extra options to pass to the tool.
     """
 
     if "BELLE2_RELEASE_DIR" in os.environ:
@@ -257,7 +261,9 @@ def check_error_free(tool, toolname, package, filter=lambda x: False):
 
     with local_software_directory():
         try:
-            output = subprocess.check_output([tool, package], encoding="utf8")
+            output = subprocess.check_output(
+                [tool] + toolopts + [package] if toolopts else [tool, package],
+                encoding="utf8")
         except subprocess.CalledProcessError as error:
             print(error)
             output = error.output

@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
 #include <root/TMatrixD.h>
+
+#include <vector>
 
 namespace Belle2 {
   namespace alignment {

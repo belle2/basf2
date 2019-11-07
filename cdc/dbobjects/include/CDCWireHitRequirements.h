@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #pragma once
-#include <iostream>
+
 #include <TObject.h>
 #include <framework/logging/Logger.h>
 #include <boost/property_tree/ptree.hpp>

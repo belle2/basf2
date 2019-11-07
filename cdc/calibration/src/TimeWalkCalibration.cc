@@ -1,24 +1,15 @@
 #include <cdc/calibration/TimeWalkCalibration.h>
-//#include <calibration/CalibrationAlgorithm.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/WireID.h>
 
-#include <TMinuit.h>
-#include <TH1D.h>
-#include <TH2D.h>
 #include <TF1.h>
 #include <TFile.h>
 #include <TChain.h>
 #include <TDirectory.h>
 #include <TROOT.h>
-#include <TTree.h>
-#include "iostream"
-#include "string"
 #include <framework/utilities/FileSystem.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBImportObjPtr.h>
-#include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>
@@ -57,6 +48,16 @@ void TimeWalkCalibration::CreateHisto()
   tree->SetBranchAddress("ndf", &ndf);
   tree->SetBranchAddress("Pval", &Pval);
   tree->SetBranchAddress("adc", &adc);
+
+  /* Disable unused branch */
+  std::vector<TString> list_vars = {"lay", "IWire", "x_u", "t", "t_fit",  "weight", "Pval", "ndf", "adc"};
+  tree->SetBranchStatus("*", 0);
+
+  for (TString brname : list_vars) {
+    tree->SetBranchStatus(brname, 1);
+  }
+
+
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   double halfCSize[56];
   for (int i = 0; i < 56; ++i) {
@@ -89,7 +90,7 @@ bool TimeWalkCalibration::calibrate()
   gROOT->SetBatch(1);
   readTW();
   CreateHisto();
-  TF1* fold;
+  TF1* fold = nullptr;
   if (m_twParamMode_old == 0)
     fold = new TF1("fold", "[0]/sqrt(x)", 0, 500);
   else if (m_twParamMode_old == 1)

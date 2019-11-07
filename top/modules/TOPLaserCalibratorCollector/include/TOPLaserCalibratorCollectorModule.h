@@ -53,7 +53,7 @@ namespace Belle2 {
 
     // Parameters.
     bool m_useReferencePulse = true; /**< Use the electronic pulser as reference.  */
-    int m_refChannel = 0; /**< Reference channel. It must contain electronic pulses. 0-511. */
+    unsigned m_refChannel = 0; /**< Reference channel. It must contain electronic pulses. 0-511. */
     int m_refSlot = 0; /**< Reference slot (1-16). Set it to 0 or negative to switch to slot-by-slot reference */
     float m_pulserDeltaT = 22.; /**< Approximate time difference between the two calpulses, in ns */
     float m_pulserDeltaTTolerance = 2.; /**< Window around the nominal deltaT used to select a double pulse, in ns */
@@ -66,12 +66,13 @@ namespace Belle2 {
     short m_channel = 0;  /**< Channel number (0-511) */
     short m_window = 0;  /**< Window  number (0-???) */
     short m_sample = 0;  /**< Sample number (0-???) */
-    short m_slot = 0;  /**< Slot number (1-16)*/
-    float m_hitTime = 0.;  /**< Hit time with respect to the reference pulse (ns)*/
-    float m_dVdt = 0.;  /**< Approximate dV/dt (ADC/ns)*/
-    float m_amplitude = 0; /**< Hit pulse amplitude (ADC)*/
-    float m_width = 0; /**< Hit pulse width (ns)*/
-    float m_refTime = 0; /**< Time of the reference pulse (ns)*/
-    int m_event = 0; /**< Consecutive event number. Useful to select all the hits of a given event*/
+    short m_slot = 0;  /**< Slot number (1-16) */
+    float m_hitTime = 0.;  /**< Hit time with respect to the reference pulse (ns) */
+    float m_dVdt = 0.;  /**< Approximate dV/dt (ADC/ns) */
+    float m_amplitude = 0; /**< Hit pulse amplitude (ADC) */
+    float m_width = 0; /**< Hit pulse width (ns) */
+    float m_refTime = 0; /**< Time of the reference pulse (ns) */
+    int m_event = 0; /**< Consecutive event count. Useful to select all the hits of a given event */
+    bool m_refTimeValid = false; /**< true when the time of the reference pulse is valid */
   };
 }

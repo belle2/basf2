@@ -11,22 +11,10 @@
 #ifndef HITHIT_H
 #define HITHIT_H
 
-
 #include <framework/core/Module.h>
 #include <TTree.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <vxd/geometry/GeoCache.h>
-#include <svd/geometry/SensorInfo.h>
-#include <vxd/geometry/SensorInfoBase.h>
 #include <tracking/dataobjects/hitXP.h>
 #include <TFile.h>
-
-
 
 namespace Belle2 {
 

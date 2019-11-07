@@ -11,18 +11,10 @@
 #pragma once
 
 #include <calibration/DBObjCalibrationConstMapBase.h>
-
-#include <fstream>
-#include <map>
-#include <TObject.h>
-
 #include <cdc/dataobjects/WireID.h>
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
 
 namespace Belle2 {
 
-  class FileSystem;
   /// CDC misalignment constants
   // N.B. The original was CDCCalibration.h by Tadeas; copied here and removed
   // calibration-related part. This is tentative for code development; to be

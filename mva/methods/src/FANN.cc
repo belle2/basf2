@@ -11,7 +11,6 @@
 #include <mva/methods/FANN.h>
 
 #include <framework/logging/Logger.h>
-#include <TFormula.h>
 
 #ifdef HAS_OPENMP
 #include <parallel_fann.hpp>

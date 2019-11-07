@@ -140,7 +140,7 @@ namespace Belle2 {
         if (count[i] >= 0 && count[i] < 9) {
           res += std_logic_literal[(int) count[i]];
         } else {
-          B2WARNING("invalid signal detected: " << static_cast<int>(count[i]));
+          B2DEBUG(20, "invalid signal detected: " << static_cast<int>(count[i]));
           res += "?";
         }
       }
@@ -156,7 +156,7 @@ namespace Belle2 {
         if (bit >= 0 && bit < 9) {
           res += std_logic_literal[(int) bit];
         } else {
-          B2WARNING("invalid signal detected: " << static_cast<int>(bit));
+          B2DEBUG(20, "invalid signal detected: " << static_cast<int>(bit));
           res += "0";
         }
       }
@@ -170,8 +170,8 @@ namespace Belle2 {
       oldState.copyfmt(std::cout);
       if (std::any_of(signal.begin(), signal.end(), [](char i)
       {return i != zero_val && i != one_val;})) {
-        B2WARNING("Some bit in the signal vector is neither 0 nor 1. \n" <<
-                  "Displaying binary values instead.");
+        B2DEBUG(20, "Some bit in the signal vector is neither 0 nor 1. \n" <<
+                "Displaying binary values instead.");
         std::cout << slv_to_bin_string(signal) << std::endl;
       } else {
         std::string binString = slv_to_bin_string(signal, true);
@@ -218,6 +218,7 @@ namespace Belle2 {
 
     using tsOut = std::array<unsigned, 4>;
     using tsOutArray = std::array<tsOut, 5>;
+    /// TRG 2DFinder Track
     struct TRG2DFinderTrack {
       /// omega of a 2D track
       double omega;
@@ -226,6 +227,7 @@ namespace Belle2 {
       /// all TS of a 2D track
       tsOutArray ts;
     };
+    /// TRG Neuro track
     struct TRGNeuroTrack {
       /// z0 of a NN track
       double z;
@@ -409,10 +411,11 @@ namespace Belle2 {
       //    break;
       //  }
       //}
-      if (!hit) {
-        hit = tsHits->appendNew(iSL, iTS, ts[3], ts[2], ts[1], 0, foundTime, iTracker);
-        B2DEBUG(15, "make hit at SL " << iSL << " ID " << iTS << " clock " << foundTime << " iTracker " << iTracker);
-      }
+// !hit is always true.
+//      if (!hit) {
+      hit = tsHits->appendNew(iSL, iTS, ts[3], ts[2], ts[1], 0, foundTime, iTracker);
+      B2DEBUG(15, "make hit at SL " << iSL << " ID " << iTS << " clock " << foundTime << " iTracker " << iTracker);
+//      }
       return hit;
     }
 
@@ -522,7 +525,7 @@ namespace Belle2 {
               noMoreHit = true;
               continue;
             } else if (noMoreHit) {
-              B2WARNING("Discontinuous TS hit detected!");
+              B2DEBUG(20, "Discontinuous TS hit detected!");
             }
             unsigned iTS = TSIDInSL(ts[0], 2 * iAx, iTracker);
             // Make TS hit object

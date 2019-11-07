@@ -6,10 +6,8 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/HTML.h>
 #include <framework/utilities/ColorPalette.h>
 
 #include <utility>

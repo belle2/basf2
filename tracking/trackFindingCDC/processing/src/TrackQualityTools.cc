@@ -4,10 +4,10 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/utilities/ReversedRange.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <framework/dataobjects/Helix.h>
+#include <TVector2.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

@@ -10,55 +10,45 @@
 
 #include <alignment/modules/MillepedeCollector/MillepedeCollectorModule.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/pcore/ProcHandler.h>
-#include <framework/core/FileCatalog.h>
-
 #include <alignment/dataobjects/MilleData.h>
-
-#include <genfit/Track.h>
-#include <genfit/GblFitter.h>
-
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/utility/ReferenceFrame.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/dbobjects/BeamParameters.h>
-#include <framework/database/DBObjPtr.h>
-#include <mdst/dbobjects/BeamSpot.h>
-#include <mdst/dataobjects/Track.h>
-
+#include <alignment/GblMultipleScatteringController.h>
+#include <alignment/GlobalDerivatives.h>
 #include <alignment/GlobalLabel.h>
-#include <framework/dataobjects/FileMetaData.h>
-#include <framework/particledb/EvtGenDatabasePDG.h>
-#include <framework/dataobjects/EventT0.h>
-
-#include <TMath.h>
-#include <TH1F.h>
-#include <TTree.h>
-#include <TDecompSVD.h>
-
-#include <genfit/FullMeasurement.h>
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
-#include <tracking/trackFitting/measurementCreator/adder/MeasurementAdder.h>
-
-#include <genfit/PlanarMeasurement.h>
-
+#include <alignment/GlobalParam.h>
+#include <alignment/GlobalTimeLine.h>
+#include <alignment/Manager.h>
 #include <alignment/reconstruction/AlignableCDCRecoHit.h>
 #include <alignment/reconstruction/AlignablePXDRecoHit.h>
 #include <alignment/reconstruction/AlignableSVDRecoHit.h>
 #include <alignment/reconstruction/AlignableSVDRecoHit2D.h>
 #include <alignment/reconstruction/BKLMRecoHit.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/utility/ReferenceFrame.h>
+#include <framework/core/FileCatalog.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventT0.h>
+#include <framework/dataobjects/FileMetaData.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dbobjects/BeamParameters.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
+#include <framework/pcore/ProcHandler.h>
+#include <mdst/dbobjects/BeamSpot.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/trackFitting/fitter/base/TrackFitter.h>
+#include <tracking/trackFitting/measurementCreator/adder/MeasurementAdder.h>
 
-#include <alignment/Manager.h>
-#include <alignment/Hierarchy.h>
-#include <alignment/GlobalParam.h>
-#include <alignment/GlobalDerivatives.h>
-#include <alignment/GblMultipleScatteringController.h>
-
+#include <genfit/FullMeasurement.h>
+#include <genfit/GblFitter.h>
 #include <genfit/KalmanFitterInfo.h>
-#include "../../../include/GlobalTimeLine.h"
+#include <genfit/PlanarMeasurement.h>
+#include <genfit/Track.h>
+
+#include <TMath.h>
+#include <TH1F.h>
+#include <TTree.h>
+#include <TDecompSVD.h>
 
 using namespace std;
 using namespace Belle2;
@@ -175,7 +165,7 @@ void MillepedeCollectorModule::prepare()
   emd.isRequired();
 
   StoreObjPtr<EventT0> eventT0;
-  eventT0.isRequired();
+  //eventT0.isRequired();
 
   if (m_tracks.empty() &&
       m_particles.empty() &&
@@ -260,7 +250,7 @@ void MillepedeCollectorModule::prepare()
     B2ERROR("Cannot set both, event list and timedep config.");
   }
 
-  Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
+//   Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
 
   AlignableCDCRecoHit::s_enableTrackT0LocalDerivative = m_fitTrackT0;
   AlignableCDCRecoHit::s_enableWireSaggingGlobalDerivative = m_enableWireSagging;
@@ -417,7 +407,7 @@ void MillepedeCollectorModule::collect()
 
         TMatrixDSym vertexCov(get<TMatrixDSym>(beam));
         TMatrixDSym vertexPrec(get<TMatrixDSym>(beam).Invert());
-        TVector3 vertexResidual = - (mother->getVertex() - get<TVector3>(beam));
+        B2Vector3D vertexResidual = - (mother->getVertex() - get<B2Vector3D>(beam));
 
         TVectorD extMeasurements(3);
         extMeasurements[0] = vertexResidual[0];
@@ -686,7 +676,7 @@ void MillepedeCollectorModule::collect()
       daughters.push_back({gbl->collectGblPoints(track12[1], track12[1]->getCardinalRep()), dfdextPlusMinus.second});
 
       TMatrixDSym vertexPrec(get<TMatrixDSym>(getPrimaryVertexAndCov()).Invert());
-      TVector3 vertexResidual = - (mother->getVertex() - get<TVector3>(getPrimaryVertexAndCov()));
+      B2Vector3D vertexResidual = - (mother->getVertex() - get<B2Vector3D>(getPrimaryVertexAndCov()));
 
       TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / motherWidth / motherWidth;
       TVectorD massResidual(1); massResidual = - (mother->getMass() - motherMass);
@@ -807,9 +797,9 @@ void MillepedeCollectorModule::collect()
       auto extPrec = extCov; extPrec.Invert();
 
       TVectorD extMeasurements(7);
-      extMeasurements[0] = - (mother->getVertex() - get<TVector3>(getPrimaryVertexAndCov()))[0];
-      extMeasurements[1] = - (mother->getVertex() - get<TVector3>(getPrimaryVertexAndCov()))[1];
-      extMeasurements[2] = - (mother->getVertex() - get<TVector3>(getPrimaryVertexAndCov()))[2];
+      extMeasurements[0] = - (mother->getVertex() - get<B2Vector3D>(getPrimaryVertexAndCov()))[0];
+      extMeasurements[1] = - (mother->getVertex() - get<B2Vector3D>(getPrimaryVertexAndCov()))[1];
+      extMeasurements[2] = - (mother->getVertex() - get<B2Vector3D>(getPrimaryVertexAndCov()))[2];
       extMeasurements[3] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[0];
       extMeasurements[4] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[1];
       extMeasurements[5] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[2];
@@ -1000,6 +990,7 @@ void MillepedeCollectorModule::closeRun()
 
 void MillepedeCollectorModule::finish()
 {
+  Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
 
   StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
   if (!fileMetaData.isValid()) {
@@ -1176,13 +1167,13 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
   gfTrack.setCardinalRep(gfTrack.getIdForRep(trackRep));
 
   if (particle) {
-    TVector3 vertexPos = particle->getVertex();
-    TVector3 vertexMom = particle->getMomentum();
+    B2Vector3D vertexPos = particle->getVertex();
+    B2Vector3D vertexMom = particle->getMomentum();
     gfTrack.setStateSeed(vertexPos, vertexMom);
 
     genfit::StateOnPlane vertexSOP(gfTrack.getCardinalRep());
-    TVector3 vertexRPhiDir(vertexPos[0], vertexPos[1], 0);
-    TVector3 vertexZDir(0, 0, vertexPos[2]);
+    B2Vector3D vertexRPhiDir(vertexPos[0], vertexPos[1], 0);
+    B2Vector3D vertexZDir(0, 0, vertexPos[2]);
     genfit::SharedPlanePtr vertexPlane(new genfit::DetPlane(vertexPos, vertexRPhiDir, vertexZDir));
     vertexSOP.setPlane(vertexPlane);
     vertexSOP.setPosMom(vertexPos, vertexMom);
@@ -1356,9 +1347,9 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getTwoBodyToLocalTransfo
 
 
     TMatrixD R = mother2lab;
-    TVector3 P(sign * c1 * sin(theta) * cos(phi),
-               sign * c1 * sin(theta) * sin(phi),
-               p / 2. + sign * c2 * cos(theta));
+    B2Vector3D P(sign * c1 * sin(theta) * cos(phi),
+                 sign * c1 * sin(theta) * sin(phi),
+                 p / 2. + sign * c2 * cos(theta));
 
     TMatrixD dRdpx(3, 3);
     dRdpx(0, 0) = - pz * (pow(px, 4.) - pow(py, 4.) - py * py * pz * pz) / pt3 / p3;
@@ -1399,22 +1390,22 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getTwoBodyToLocalTransfo
     dRdpz(2, 1) = 0.;
     dRdpz(2, 2) = (px * px + py * py) / p3;
 
-    TVector3 dpdpx = dRdpx * P;
-    TVector3 dpdpy = dRdpy * P;
-    TVector3 dpdpz = dRdpz * P;
+    B2Vector3D dpdpx = dRdpx * P;
+    B2Vector3D dpdpy = dRdpy * P;
+    B2Vector3D dpdpz = dRdpz * P;
 
-    TVector3 dpdtheta = R * TVector3(sign * c1 * cos(theta) * cos(phi),
-                                     sign * c1 * cos(theta) * sin(phi),
-                                     p / 2. + sign * c2 * (- sin(phi)));
+    B2Vector3D dpdtheta = R * B2Vector3D(sign * c1 * cos(theta) * cos(phi),
+                                         sign * c1 * cos(theta) * sin(phi),
+                                         p / 2. + sign * c2 * (- sin(phi)));
 
 
-    TVector3 dpdphi = R * TVector3(sign * c1 * sin(theta) * (- sin(phi)),
-                                   sign * c1 * sin(theta) * cos(phi),
-                                   0.);
+    B2Vector3D dpdphi = R * B2Vector3D(sign * c1 * sin(theta) * (- sin(phi)),
+                                       sign * c1 * sin(theta) * cos(phi),
+                                       0.);
 
-    TVector3 dpdM = R * TVector3(0.,
-                                 0.,
-                                 0.5 * sign * M / (2. * c2) * cos(phi));
+    B2Vector3D dpdM = R * B2Vector3D(0.,
+                                     0.,
+                                     0.5 * sign * M / (2. * c2) * cos(phi));
 
     TMatrixD dpdz(3, 6);
     dpdz(0, 0) = dpdpx(0); dpdz(0, 1) = dpdpy(0); dpdz(0, 2) = dpdpz(0); dpdz(0, 3) = dpdtheta(0); dpdz(0, 4) = dpdphi(0);
@@ -1442,10 +1433,10 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getTwoBodyToLocalTransfo
 TMatrixD MillepedeCollectorModule::getGlobalToLocalTransform(const genfit::MeasuredStateOnPlane& msop)
 {
   auto state = msop;
-  const TVector3& U(state.getPlane()->getU());
-  const TVector3& V(state.getPlane()->getV());
-  const TVector3& O(state.getPlane()->getO());
-  const TVector3& W(state.getPlane()->getNormal());
+  const B2Vector3D& U(state.getPlane()->getU());
+  const B2Vector3D& V(state.getPlane()->getV());
+  const B2Vector3D& O(state.getPlane()->getO());
+  const B2Vector3D& W(state.getPlane()->getNormal());
 
   const double* state5 = state.getState().GetMatrixArray();
 
@@ -1515,9 +1506,9 @@ TMatrixD MillepedeCollectorModule::getLocalToGlobalTransform(const genfit::Measu
 {
   auto state = msop;
   // get vectors and aux variables
-  const TVector3& U(state.getPlane()->getU());
-  const TVector3& V(state.getPlane()->getV());
-  const TVector3& W(state.getPlane()->getNormal());
+  const B2Vector3D& U(state.getPlane()->getU());
+  const B2Vector3D& V(state.getPlane()->getV());
+  const B2Vector3D& W(state.getPlane()->getNormal());
 
   const TVectorD& state5(state.getState());
   double spu = 1.;
@@ -1573,7 +1564,7 @@ TMatrixD MillepedeCollectorModule::getLocalToGlobalTransform(const genfit::Measu
 
 }
 
-tuple<TVector3, TMatrixDSym> MillepedeCollectorModule::getPrimaryVertexAndCov() const
+tuple<B2Vector3D, TMatrixDSym> MillepedeCollectorModule::getPrimaryVertexAndCov() const
 {
   DBObjPtr<BeamSpot> beam;
   return {beam->getIPPosition(), beam->getSizeCovMatrix()};

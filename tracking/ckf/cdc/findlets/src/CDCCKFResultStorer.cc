@@ -11,7 +11,6 @@
 #include <tracking/ckf/cdc/findlets/CDCCKFResultStorer.h>
 
 #include <tracking/ckf/general/utilities/SearchDirection.h>
-#include <tracking/ckf/general/utilities/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/dataobjects/RecoTrack.h>
 

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/dataobjects/hitXP.h>
 #include <tracking/dataobjects/hitXPDerivate.h>
+#include <tracking/dataobjects/MCParticleInfo.h>
 
 using namespace Belle2;
 

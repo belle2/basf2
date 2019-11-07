@@ -9,9 +9,6 @@
  **************************************************************************/
 
 #include "tracking/vxdCaTracking/TwoHitFilters.h"
-#include <boost/math/special_functions/fpclassify.hpp>
-
-
 
 using namespace std;
 using namespace Belle2;
@@ -19,7 +16,9 @@ using namespace Belle2;
 
 double TwoHitFilters::filterNan(double value) const
 {
+  // cppcheck-suppress compareBoolExpressionWithInt
   if (std::isnan(value) == true) { return 0; }
+  // cppcheck-suppress compareBoolExpressionWithInt
   if (std::isinf(value) == true) { return 0; }
   return value;
 }

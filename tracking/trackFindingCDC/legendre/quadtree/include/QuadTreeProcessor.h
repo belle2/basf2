@@ -21,7 +21,6 @@
 #include <vector>
 #include <deque>
 #include <utility>
-#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

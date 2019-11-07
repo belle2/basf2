@@ -10,32 +10,28 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+#include <klm/eklm/geometry/GeometryData.h>
 
-/* C++ headers. */
-#include<map>
-
-/* ROOT headers. */
-#include "TH1.h"
-#include "TH2F.h"
-#include "TFile.h"
-#include "TGraph.h"
-#include "TGraphErrors.h"
-
-/* Belle2 headers. */
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
-#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
-#include <klm/dataobjects/KLMDigitEventInfo.h>
-#include <klm/eklm/geometry/GeometryData.h>
-#include <klm/eklm/geometry/TransformData.h>
-#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TH1.h>
+#include <TH2F.h>
+
+/* C++ headers. */
+#include <map>
 
 namespace Belle2 {
 
@@ -63,7 +59,6 @@ namespace Belle2 {
      * Initializer.
      */
     void initialize() override;
-
 
     /**
      * This method is called for each event.
@@ -174,8 +169,8 @@ namespace Belle2 {
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 
-    /** EKLMElementNumbers. */
-    const EKLMElementNumbers* m_ElementNumbers;
+    /** EKLM Element Numbers. */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 
     /** Hist for z distribution of Hit2ds */
     TH1F* m_Hit2dZDistrib;

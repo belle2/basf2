@@ -3,22 +3,20 @@
 
 # EKLM ADC study.
 
-import os
-import random
-from basf2 import *
+import basf2
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.WARNING)
+basf2.set_log_level(basf2.LogLevel.WARNING)
 
 # EventInfoSetter - generate event meta data
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = basf2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1])
 
 # XML reader
-xmldata = register_module('Gearbox')
+xmldata = basf2.register_module('Gearbox')
 
 # EKLM ADC
-eklmadc = register_module('EKLMADC')
+eklmadc = basf2.register_module('EKLMADC')
 eklmadc.param('Mode', 'Shape')
 eklmadc.param('OutputFile', 'FPGA.root')
 # For generation of the histograms for strips.
@@ -26,7 +24,7 @@ eklmadc.param('OutputFile', 'FPGA.root')
 # eklmadc.param('OutputFile', 'EKLMADC.root')
 
 # Create main path
-main = create_path()
+main = basf2.create_path()
 
 # Add modules to main path
 main.add_module(eventinfosetter)
@@ -34,4 +32,4 @@ main.add_module(xmldata)
 main.add_module(eklmadc)
 
 # Run
-process(main)
+basf2.process(main)

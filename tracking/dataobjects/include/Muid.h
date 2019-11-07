@@ -109,6 +109,12 @@ namespace Belle2 {
     //! @return matching-hit bit pattern
     unsigned int getHitLayerPattern() const { return m_HitLayerPattern; }
 
+    //! @return total number of matching BKLM hits
+    unsigned int getTotalBarrelHits() const;
+
+    //! @return total number of matching EKLM hits
+    unsigned int getTotalEndcapHits() const;
+
     //! @return BKLM efficiency value
     float getExtBKLMEfficiencyValue(int index) const { return m_ExtBKLMEfficiencyValue[index]; }
 
@@ -218,9 +224,8 @@ namespace Belle2 {
     //! assign BKLMefficiency value
     void setExtBKLMEfficiencyValue(int index, float efficiencyValue) { m_ExtBKLMEfficiencyValue[index] = efficiencyValue; }
 
-    //! assign EKLM efficiency value TODO
+    //! assign EKLM efficiency value
     void setExtEKLMEfficiencyValue(int index, float efficiencyValue) { m_ExtEKLMEfficiencyValue[index] = efficiencyValue; }
-
 
   private:
 

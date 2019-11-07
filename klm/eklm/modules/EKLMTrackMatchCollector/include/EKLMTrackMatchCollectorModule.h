@@ -10,34 +10,22 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/dataobjects/KLMDigitEventInfo.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+#include <klm/eklm/geometry/GeometryData.h>
 
-/* C++ headers. */
-#include<map>
-
-/* ROOT headers. */
-#include "TH1.h"
-#include "TH2F.h"
-#include "TFile.h"
-#include "TGraph.h"
-#include "TGraphErrors.h"
-
-/* Belle2 headers. */
-#include <framework/core/Module.h>
+/* Belle 2 headers. */
+#include <analysis/dataobjects/ParticleList.h>
+#include <calibration/CalibrationCollectorModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
-#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
-#include <klm/dataobjects/KLMDigitEventInfo.h>
-#include <klm/eklm/geometry/GeometryData.h>
-#include <klm/eklm/geometry/TransformData.h>
-#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
-#include <calibration/CalibrationCollectorModule.h>
-
 
 namespace Belle2 {
 
@@ -48,6 +36,36 @@ namespace Belle2 {
    */
 
   class EKLMTrackMatchCollectorModule : public CalibrationCollectorModule {
+
+  private:
+
+    /**
+     * Hit data.
+     */
+    struct HitData {
+
+      /** Section. */
+      int section;
+
+      /** Layer. */
+      int layer;
+
+      /** Sector. */
+      int sector;
+
+      /** Plane. */
+      int plane;
+
+      /** Strip. */
+      int strip;
+
+      /** Extrapolation hit. */
+      const ExtHit* hit;
+
+      /** Digit. */
+      const EKLMDigit* digit;
+
+    };
 
   public:
 
@@ -76,24 +94,23 @@ namespace Belle2 {
      */
     void closeRun() override;
 
-    /**
-     * Was ExtHit entered in EKLM sensetive volume? If it isn`t returns tuple of -1.
-     * If it is returns copyid, idSection, idLayer, idSector, idPlane, idStrip
-     */
-    std::tuple<int, int, int, int, int, int> checkExtHit(const ExtHit& ext_hit) const;
-
     /**                     SIMPLE MUID
      * Calculating number of Hit2ds in forward and backward parts
      * If there are many hits in one of the sections can be sure that this is muon track
      * And the second track with high probability is in opposite section (because we choosed events with 2trks)
      * If it is so, calculate efficiency in opposite section
      */
-    std::pair<bool, bool> trackCheck(int number_of_required_hits) const;
+    void trackCheck(
+      bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()],
+      int requiredHits) const;
 
     /**
-     *  Matching of digits with ext hits
+     * Matching of digits with ext hits
+     * @param[in] hitData         Hit data.
+     * @param[in] allowedDistance Minimal distance in the units of strip number.
      */
-    bool digitsMatching(const ExtHit& ext_hit, double allowed_distance) const;
+    const EKLMDigit* findMatchingDigit(const struct HitData* hitData,
+                                       double allowedDistance) const;
 
 
     /**
@@ -101,17 +118,27 @@ namespace Belle2 {
      */
     double getSumTrackEnergy(const StoreArray<Track>& selected_tracks) const;
 
-    /**
-     * Calculate distance to IP and make cut on this distance
-     */
-    bool d0z0Cut(const StoreArray<Track>& selected_tracks, double dist) const;
-
-    /**
-     * Making theta cut
-     */
-    bool thetaAcceptance(const StoreArray<Track>& selected_tracks) const;
-
   private:
+
+    /**
+     * Collect the data for one track.
+     * @param[in] track Track.
+     */
+    void collectDataTrack(const Track* track);
+
+    /** Muon list name. If empty, use tracks. */
+    std::string m_MuonListName;
+
+    /**
+     * Whether to use standalone track selection.
+     * Always turn this off for cosmic data.
+     */
+    bool m_StandaloneTrackSelection;
+
+    /**
+     * Minimal number of matching digits.
+     */
+    int m_MinimalMatchingDigits;
 
     /** Digits. */
     StoreArray<EKLMDigit> m_digits;
@@ -131,14 +158,14 @@ namespace Belle2 {
     /** ExtHits. */
     StoreArray<ExtHit> m_extHits;
 
+    /** Muons. */
+    StoreObjPtr<ParticleList> m_MuonList;
+
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 
     /** EKLMElementNumbers. */
-    const EKLMElementNumbers* m_ElementNumbers;
-
-    /** D0 and Z0 distance parameters */
-    double m_D0Z0;
+    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 
     /** Output file name */
     std::string m_filename;

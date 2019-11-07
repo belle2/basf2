@@ -10,11 +10,11 @@
 
 #pragma once
 
+/* Belle 2 headers. */
+#include <framework/datastore/RelationsObject.h>
+
 /* C++ headers. */
 #include <cstdint>
-
-/* Belle2 headers. */
-#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 

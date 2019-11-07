@@ -128,6 +128,8 @@ class LocalMetadataProvider:
 
         #: Cache name->id mappings from the database
         self._cache = {}
+        #: sqlite Database connection
+        self._database = None
 
         # connect to the database file ...
         if mode == "read":

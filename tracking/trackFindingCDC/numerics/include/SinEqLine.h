@@ -15,9 +15,7 @@
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 #include <tracking/trackFindingCDC/numerics/EIncDec.h>
-#include <tracking/trackFindingCDC/numerics/ESign.h>
 
-#include <utility>
 #include <cmath>
 
 namespace Belle2 {

@@ -12,8 +12,6 @@
 
 #include <genfit/GblTrackSegmentController.h>
 
-class GblFitter;
-
 namespace Belle2 {
 
   /**
@@ -44,6 +42,7 @@ namespace Belle2 {
      * @return void
      */
     virtual void controlTrackSegment(TVector3, TVector3, double scatTheta, genfit::GblFitter* fitter);
+//     virtual void controlTrackSegment(B2Vector3D, B2Vector3D, double scatTheta, genfit::GblFitter* fitter);
 
   };
 

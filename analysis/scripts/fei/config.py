@@ -54,7 +54,7 @@ MVAConfiguration.target.__doc__ = "Target variable from the VariableManager."
 MVAConfiguration.sPlotVariable.__doc__ = "Discriminating variable used by sPlot to do data-driven training."
 
 
-PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, vertexCut, bestCandidateVariable, '
+PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, vertexCut, bestCandidateVariable,'
                                              'bestCandidateCut, bestCandidateMode')
 PreCutConfiguration.__new__.__defaults__ = ('', -2, None, 0, 'lowest')
 PreCutConfiguration.__doc__ = "PreCut configuration class. These cuts is employed before training the mva classifier."
@@ -74,7 +74,7 @@ PostCutConfiguration.bestCandidateCut.__doc__ = "Number of best-candidates to ke
 DecayChannel = collections.namedtuple('DecayChannel', 'name, label, decayString, daughters, mvaConfig, preCutConfig, decayModeID')
 DecayChannel.__new__.__defaults__ = (None, None, None, None, None, None, None)
 DecayChannel.__doc__ = "Decay channel of a Particle."
-DecayChannel.name.__doc__ = "str:Name of the channel e.g. D0:generic_0"
+DecayChannel.name.__doc__ = "str:Name of the channel e.g. :code:`D0:generic_0`"
 DecayChannel.label.__doc__ = "Label used to identify the decay channel e.g. for weightfiles independent of decayModeID"
 DecayChannel.decayString.__doc__ = "DecayDescriptor of the channel e.g. D0 ==> K+ pi-"
 DecayChannel.daughters.__doc__ = "List of daughter particles of the decay channel e.g. [K+, pi-]"

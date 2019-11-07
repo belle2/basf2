@@ -30,7 +30,8 @@ KLMDQMModule::KLMDQMModule() :
   m_PlaneBKLMZ(nullptr),
   m_PlaneEKLM(nullptr),
   m_bklmHit2dsZ(nullptr),
-  m_bklmDigitsN(nullptr)
+  m_BklmDigitsNumber(nullptr),
+  m_KlmDigitsNumber(nullptr)
 {
   setDescription("KLM data quality monitor.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -153,15 +154,20 @@ void KLMDQMModule::defineHisto()
     }
   }
   delete[] firstChannelNumbers;
-  /* BKLM histograms. */
+  /* Number of digits. */
+  m_BklmDigitsNumber = new TH1F("bklm_digits", "Number of BKLM Digits",
+                                250.0, 0.0, 250.0);
+  m_BklmDigitsNumber->GetXaxis()->SetTitle("Number of BKLM Digits");
+  m_BklmDigitsNumber->SetOption("LIVE");
+  m_KlmDigitsNumber = new TH1F("klm_digits", "Number of KLM Digits",
+                               250.0, 0.0, 250.0);
+  m_KlmDigitsNumber->GetXaxis()->SetTitle("Number of BKLM Digits");
+  m_KlmDigitsNumber->SetOption("LIVE");
+  /* BKLM 2d hits. */
   m_bklmHit2dsZ = new TH1F("zBKLMHit2ds", "Axial position of muon hit",
                            97, -172.22, 266.22);
   m_bklmHit2dsZ->GetXaxis()->SetTitle("Axial position of muon hit");
   m_bklmHit2dsZ->SetOption("LIVE");
-  m_bklmDigitsN = new TH1F("bklmDigitsN", "Number of BKLM Digits",
-                           250.0, 0.0, 250.0);
-  m_bklmDigitsN->GetXaxis()->SetTitle("Number of BKLM Digits");
-  m_bklmDigitsN->SetOption("LIVE");
   oldDirectory->cd();
 }
 
@@ -176,10 +182,15 @@ void KLMDQMModule::initialize()
 
 void KLMDQMModule::beginRun()
 {
-  /* Common histograms. */
+  /* Time. */
   m_TimeRPC->Reset();
   m_TimeScintillatorBKLM->Reset();
   m_TimeScintillatorEKLM->Reset();
+  /* Plane hits. */
+  m_PlaneEKLM->Reset();
+  m_PlaneBKLMPhi->Reset();
+  m_PlaneBKLMZ->Reset();
+  /* Channel hits. */
   KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
   for (KLMChannelIndex& klmSector : klmSectors) {
     int nHistograms;
@@ -192,13 +203,11 @@ void KLMDQMModule::beginRun()
     for (int j = 0; j < nHistograms; j++)
       m_ChannelHits[sectorIndex][j]->Reset();
   }
-  /* EKLM. */
-  m_PlaneEKLM->Reset();
-  /* BKLM. */
+  /* Digits. */
+  m_KlmDigitsNumber->Reset();
+  m_BklmDigitsNumber->Reset();
+  /* BKLM 2d hits. */
   m_bklmHit2dsZ->Reset();
-  m_PlaneBKLMPhi->Reset();
-  m_PlaneBKLMZ->Reset();
-  m_bklmDigitsN->Reset();
 }
 
 void KLMDQMModule::event()
@@ -238,7 +247,8 @@ void KLMDQMModule::event()
   }
   /* BKLM. */
   int nBklmDigits = m_BklmDigits.getEntries();
-  m_bklmDigitsN->Fill((double)nBklmDigits);
+  m_BklmDigitsNumber->Fill((double)nBklmDigits);
+  m_KlmDigitsNumber->Fill((double)nBklmDigits + nEklmDigits);
   for (i = 0; i < nBklmDigits; i++) {
     BKLMDigit* digit = static_cast<BKLMDigit*>(m_BklmDigits[i]);
     int section = digit->getSection();

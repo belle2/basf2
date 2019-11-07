@@ -145,7 +145,10 @@ namespace Belle2 {
     TH1F* m_bklmHit2dsZ;
 
     /** Number of BKLM Digits. */
-    TH1F* m_bklmDigitsN;
+    TH1F* m_BklmDigitsNumber;
+
+    /** Number of KLM Digits. */
+    TH1F* m_KlmDigitsNumber;
 
   };
 

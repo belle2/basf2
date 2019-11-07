@@ -12,6 +12,7 @@
 #include <top/calibration/TOPCommonT0BFAlgorithm.h>
 #include <top/dbobjects/TOPCalCommonT0.h>
 #include <math.h>
+#include <TROOT.h>
 #include <TF1.h>
 #include <TFile.h>
 #include <TTree.h>
@@ -32,6 +33,7 @@ namespace Belle2 {
 
     CalibrationAlgorithm::EResult TOPCommonT0BFAlgorithm::calibrate()
     {
+      gROOT->SetBatch();
 
       // get histogram to fit and check if statistics is sufficient
 

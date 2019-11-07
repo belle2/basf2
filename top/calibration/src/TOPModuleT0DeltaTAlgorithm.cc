@@ -12,6 +12,7 @@
 #include <top/calibration/TOPModuleT0DeltaTAlgorithm.h>
 #include <top/dbobjects/TOPCalModuleT0.h>
 #include <math.h>
+#include <TROOT.h>
 #include <TFile.h>
 #include <TF1.h>
 #include <TH2F.h>
@@ -34,6 +35,7 @@ namespace Belle2 {
 
     CalibrationAlgorithm::EResult TOPModuleT0DeltaTAlgorithm::calibrate()
     {
+      gROOT->SetBatch();
 
       // get basic histogram
 

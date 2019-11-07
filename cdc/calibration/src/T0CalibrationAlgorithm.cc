@@ -189,7 +189,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   //  const double dt0Mean = hm_All->GetMean();
   for (int ilay = 0; ilay < 56; ++ilay) {
     for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
-      dt[ilay][iwire] -= dEventT0;
+      dt[ilay][iwire] += dEventT0;
     }
   }
 

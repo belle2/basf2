@@ -67,6 +67,11 @@ namespace Belle2 {
 
   void FSRCorrectionModule::initialize()
   {
+    // module is deprecated
+    B2WARNING("The module FSRCorrection is deprecated.\n"
+              "Please switch to one of the new (and better) modules BremsFinder or BelleBremRecovery.\n"
+              "Soon, this module will be removed.");
+
     // check the validity of output ParticleList name
     bool valid = m_decaydescriptor.init(m_outputListName);
     if (!valid)

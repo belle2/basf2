@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/modules/FSRCorrection/BelleBremRecoveryModule.h>
+#include <analysis/modules/BremsCorrection/BelleBremRecoveryModule.h>
 // framework aux
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
@@ -179,6 +179,7 @@ namespace Belle2 {
       correctedLepton.setMomentumVertexErrorMatrix(corLepMatrix);
       correctedLepton.setVertex(lepton->getVertex());
       correctedLepton.setPValue(lepton->getPValue());
+      correctedLepton.addExtraInfo("bremsCorrected", float(selectedGammas.size() > 0));
       correctedLepton.addExtraInfo("bremsCorrectedPhotonEnergy", bremsGammaEnergySum);
       // add the mc relation
       Particle* newLepton = particles.appendNew(correctedLepton);

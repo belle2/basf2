@@ -317,7 +317,7 @@ class Luminosity:
             filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
         print(f"Creating {filename}.pdf|png files")
         for fileformat in ['pdf','png']:
-            plt.savefig(f"{filename}.{fileformat}", bbox_inches="tight")
+            plt.savefig(f"{filename}.{fileformat}", bbox_inches="tight", dpi=150)
 
     def plotLumiPerRun(self):
         """

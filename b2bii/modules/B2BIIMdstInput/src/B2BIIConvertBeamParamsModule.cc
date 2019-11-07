@@ -129,7 +129,6 @@ namespace Belle2 {
         std::ofstream file(m_missingIp.c_str(), std::ios::app);
         file << m_event->getExperiment() << "," << m_event->getRun() << std::endl;
       }
-      return;
       beamParams.setVertex(TVector3(
                              std::numeric_limits<double>::quiet_NaN(),
                              std::numeric_limits<double>::quiet_NaN(),

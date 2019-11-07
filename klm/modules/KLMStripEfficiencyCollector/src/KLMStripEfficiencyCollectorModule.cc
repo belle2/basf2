@@ -122,26 +122,29 @@ void KLMStripEfficiencyCollectorModule::addHit(
 void KLMStripEfficiencyCollectorModule::findMatchingDigit(
   struct HitData* hitData)
 {
-  for (const EKLMDigit& digit : m_EklmDigits) {
-    if (!(digit.getSection() == hitData->section &&
-          digit.getLayer() == hitData->layer &&
-          digit.getSector() == hitData->sector &&
-          digit.getPlane() == hitData->plane))
-      continue;
-    if (fabs(digit.getStrip() - hitData->strip) < m_AllowedDistance1D) {
-      hitData->eklmDigit = &digit;
-      return;
+  if (hitData->subdetector == KLMElementNumbers::c_EKLM) {
+    for (const EKLMDigit& digit : m_EklmDigits) {
+      if (!(digit.getSection() == hitData->section &&
+            digit.getLayer() == hitData->layer &&
+            digit.getSector() == hitData->sector &&
+            digit.getPlane() == hitData->plane))
+        continue;
+      if (fabs(digit.getStrip() - hitData->strip) < m_AllowedDistance1D) {
+        hitData->eklmDigit = &digit;
+        return;
+      }
     }
-  }
-  for (const BKLMDigit& digit : m_BklmDigits) {
-    if (!(digit.getSection() == hitData->section &&
-          digit.getLayer() == hitData->layer &&
-          digit.getSector() == hitData->sector &&
-          digit.getPlane() == hitData->plane))
-      continue;
-    if (fabs(digit.getStrip() - hitData->strip) < m_AllowedDistance1D) {
-      hitData->bklmDigit = &digit;
-      return;
+  } else {
+    for (const BKLMDigit& digit : m_BklmDigits) {
+      if (!(digit.getSection() == hitData->section &&
+            digit.getLayer() == hitData->layer &&
+            digit.getSector() == hitData->sector &&
+            digit.getPlane() == hitData->plane))
+        continue;
+      if (fabs(digit.getStrip() - hitData->strip) < m_AllowedDistance1D) {
+        hitData->bklmDigit = &digit;
+        return;
+      }
     }
   }
 }
@@ -194,9 +197,9 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
       } else {
         /* For RPCs, the sensitive volume corresponds to both readout planes. */
         extHitPosition = hit.getPosition();
-        extHitPositionCLHEP.setX(extHitPosition.X() / CLHEP::cm);
-        extHitPositionCLHEP.setY(extHitPosition.Y() / CLHEP::cm);
-        extHitPositionCLHEP.setZ(extHitPosition.Z() / CLHEP::cm);
+        extHitPositionCLHEP.setX(extHitPosition.X());
+        extHitPositionCLHEP.setY(extHitPosition.Y());
+        extHitPositionCLHEP.setZ(extHitPosition.Z());
         const bklm::Module* module =
           m_GeometryBKLM->findModule(hitData.section, hitData.sector,
                                      hitData.layer);

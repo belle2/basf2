@@ -157,8 +157,6 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
   TVector3 extHitPosition;
   CLHEP::Hep3Vector extHitPositionCLHEP, localPosition;
   for (const ExtHit& hit : extHits) {
-    if (hit.getDetectorID() != Const::EDetector::EKLM)
-      continue;
     /* Choose hits that enter the sensitive volume. */
     if (hit.getStatus() != EXT_ENTER)
       continue;
@@ -206,10 +204,16 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
         hitData.plane = BKLMElementNumbers::c_ZPlane;
         hitData.strip = module->getZStrip(localPosition);
         hitData.localPosition = localPosition.z();
+        planeGlobal = m_ElementNumbers->planeNumberBKLM(
+                        hitData.section, hitData.sector, hitData.layer,
+                        hitData.plane);
         addHit(selectedHits, planeGlobal, &hitData);
         hitData.plane = BKLMElementNumbers::c_PhiPlane;
         hitData.strip = module->getPhiStrip(localPosition);
         hitData.localPosition = localPosition.y();
+        planeGlobal = m_ElementNumbers->planeNumberBKLM(
+                        hitData.section, hitData.sector, hitData.layer,
+                        hitData.plane);
         addHit(selectedHits, planeGlobal, &hitData);
       }
     } else

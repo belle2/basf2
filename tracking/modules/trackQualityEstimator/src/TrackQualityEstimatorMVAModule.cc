@@ -47,39 +47,39 @@ TrackQualityEstimatorMVAModule::TrackQualityEstimatorMVAModule() : Module()
            m_pxdRecoTracksStoreArrayName);
 
   addParam("exportToTracks",
-           m_param_exportToTracks,
+           m_exportToTracks,
            "Whether QI property should also be set in fitted mdst Tracks in addition to RecoTracks."
            " If enabled, this increases the mdst size.",
-           m_param_exportToTracks);
+           m_exportToTracks);
 
   addParam("TracksStoreArrayName",
-           m_TracksStoreArrayName,
+           m_tracksStoreArrayName,
            "Name of the fitted mdst Tracks StoreArray.",
-           m_TracksStoreArrayName);
+           m_tracksStoreArrayName);
 
   addParam("WeightFileIdentifier",
-           m_WeightFileIdentifier,
+           m_weightFileIdentifier,
            "Identifier of weightfile in Database or local root/xml file.",
-           m_WeightFileIdentifier);
+           m_weightFileIdentifier);
 
   addParam("collectEventFeatures",
-           m_param_collectEventFeatures,
+           m_collectEventFeatures,
            "Whether to use eventwise features.",
-           m_param_collectEventFeatures);
+           m_collectEventFeatures);
 }
 
 void TrackQualityEstimatorMVAModule::initialize()
 {
   m_recoTracks.isRequired(m_recoTracksStoreArrayName);
 
-  if (m_param_collectEventFeatures) {
+  if (m_collectEventFeatures) {
     m_eventInfoExtractor = std::make_unique<EventInfoExtractor>(m_variableSet);
   }
   m_recoTrackExtractor = std::make_unique<RecoTrackExtractor>(m_variableSet);
   m_subRecoTrackExtractor = std::make_unique<SubRecoTrackExtractor>(m_variableSet);
   m_hitInfoExtractor = std::make_unique<HitInfoExtractor>(m_variableSet);
 
-  m_mvaExpert = std::make_unique<MVAExpert>(m_WeightFileIdentifier, m_variableSet);
+  m_mvaExpert = std::make_unique<MVAExpert>(m_weightFileIdentifier, m_variableSet);
   m_mvaExpert->initialize();
 }
 
@@ -101,7 +101,7 @@ void TrackQualityEstimatorMVAModule::event()
       svdRecoTrack = svdcdcRecoTrack->getRelatedTo<RecoTrack>(m_svdRecoTracksStoreArrayName);
     }
 
-    if (m_param_collectEventFeatures) {
+    if (m_collectEventFeatures) {
       m_eventInfoExtractor->extractVariables(m_recoTracks, recoTrack);
     }
     m_recoTrackExtractor->extractVariables(recoTrack);
@@ -111,8 +111,8 @@ void TrackQualityEstimatorMVAModule::event()
     const float qualityIndicator = m_mvaExpert->predict();
     // set quality indicator property in RecoTracks and mdst Tracks from track fit
     recoTrack.setQualityIndicator(qualityIndicator);
-    if (m_param_exportToTracks) {
-      Track* const mdstTrack = recoTrack.getRelatedFrom<Track>(m_TracksStoreArrayName);
+    if (m_exportToTracks) {
+      Track* const mdstTrack = recoTrack.getRelatedFrom<Track>(m_tracksStoreArrayName);
       if (mdstTrack) {
         mdstTrack->setQualityIndicator(qualityIndicator);
       }

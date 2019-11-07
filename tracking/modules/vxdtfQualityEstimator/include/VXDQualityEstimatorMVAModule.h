@@ -62,7 +62,7 @@ namespace Belle2 {
     std::string m_SpacePointTrackCandsStoreArrayName = "SPTrackCands";
 
     /** identifier of weightfile in Database or local root/xml file */
-    std::string m_WeightFileIdentifier = "vxdtf2_mva_qe_weightFile_noTiming";
+    std::string m_weightFileIdentifier = "vxdtf2_mva_qe_weightFile_noTiming";
 
     /** whether to use timing information available in the weight file */
     bool m_UseTimingInfo = false;

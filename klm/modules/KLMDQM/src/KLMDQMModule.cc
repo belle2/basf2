@@ -161,7 +161,7 @@ void KLMDQMModule::defineHisto()
   m_BklmDigitsNumber->SetOption("LIVE");
   m_KlmDigitsNumber = new TH1F("klm_digits", "Number of KLM Digits",
                                250.0, 0.0, 250.0);
-  m_KlmDigitsNumber->GetXaxis()->SetTitle("Number of BKLM Digits");
+  m_KlmDigitsNumber->GetXaxis()->SetTitle("Number of KLM Digits");
   m_KlmDigitsNumber->SetOption("LIVE");
   /* BKLM 2d hits. */
   m_bklmHit2dsZ = new TH1F("zBKLMHit2ds", "Axial position of muon hit",

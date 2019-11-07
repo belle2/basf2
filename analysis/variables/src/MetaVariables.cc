@@ -44,24 +44,24 @@ namespace Belle2 {
   namespace Variable {
 
 
-    // Explores the decay tree of a particle and return the (grand^n)daughter indentified by a coordinate string.
-    // The coordinate string consists in a whitespace-separated the list of daughter indexes, starting from the root particle:
+    // Explores the decay tree of a particle and return the (grand^n)daughter indentified by a generalized index string.
+    // The generalized index string consists in a whitespace-separated the list of daughter indexes, starting from the root particle:
     // 0 1 3  identifies the fourth daugther (3) of the second daugther (1) of the first daugther (0) of the mother particle.
-    const Particle* getParticleFromCoordinateString(const Particle* particle, const std::string& coordinate)
+    const Particle* getParticleFromGeneralizedIndexString(const Particle* particle, const std::string& generalizedIndex)
     {
 
-      // Split the coordinate string in a vector of strings.
+      // Split the generalizedIndex string in a vector of strings.
       // Shamelessly copied from stackoverflow...
-      std::istringstream buffer(coordinate);
-      std::vector<std::string> coordinates((std::istream_iterator<std::string>(buffer)), std::istream_iterator<std::string>());
+      std::istringstream buffer(generalizedIndex);
+      std::vector<std::string> generalizedIndexes((std::istream_iterator<std::string>(buffer)), std::istream_iterator<std::string>());
 
       // To explore the tree of unknown depth, we need to a place to store
       // Bothe the root and the daugther particle for each iteration
       const Particle* dauPart = new Particle(); // This will be eventually returned
       const Particle* currentPart = particle; // This is the root particle of the next iteration
 
-      // Loop over the coordinates until you get to the particle you want
-      for (auto& indexString : coordinates) {
+      // Loop over the generalizedIndexes until you get to the particle you want
+      for (auto& indexString : generalizedIndexes) {
         // indexString is a string. First try to convert it into an int
         int dauIndex = 0;
         try {
@@ -78,7 +78,7 @@ namespace Belle2 {
           B2WARNING("Daughter index " << dauIndex << " out of range");
           return nullptr;
         } else {
-          dauPart = currentPart->getDaughter(dauIndex); // Pick the particle indicated by the coordinate
+          dauPart = currentPart->getDaughter(dauIndex); // Pick the particle indicated by the generalizedIndex
           currentPart = dauPart; // The daughter you found becomes the root particle for the next iteration
         }
       }
@@ -2225,12 +2225,12 @@ endloop:
           // Sum of the 4-momenta of all the selected daugthers
           TLorentzVector pSum(0, 0, 0, 0);
 
-          // Loop over the arguments. Each one of them is a coordinate,
+          // Loop over the arguments. Each one of them is a generalizedIndex,
           // pointing to a particle in the decay tree.
           for (unsigned int iCoord = 1; iCoord < arguments.size(); iCoord++)
           {
-            auto coordinate = arguments[iCoord];
-            const Particle* dauPart = getParticleFromCoordinateString(particle, coordinate);
+            auto generalizedIndex = arguments[iCoord];
+            const Particle* dauPart = getParticleFromGeneralizedIndexString(particle, generalizedIndex);
             pSum +=  frame.getMomentum(dauPart);
           }
 
@@ -2261,9 +2261,9 @@ endloop:
 
         std::vector<TLorentzVector> pDaus;
 
-        for (auto& coordinate : arguments)
+        for (auto& generalizedIndex : arguments)
         {
-          const Particle* dauPart = getParticleFromCoordinateString(particle, coordinate);
+          const Particle* dauPart = getParticleFromGeneralizedIndexString(particle, generalizedIndex);
           pDaus.push_back(frame.getMomentum(dauPart));
         }
 
@@ -2564,9 +2564,25 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns the angle between this particle and the most back-to-back particle (closest opening angle to 180) in the list provided.");
     REGISTER_VARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
                       "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.");
-    REGISTER_VARIABLE("daughterCombination(variable, daugtherCoordinate_1, daugtherCoordinate_2 ... dagutherCoordinate_n)", daughterCombination,
-                      "Returns `variable` calculated on a dummy particle made combining arbirary set of (grand)daugthers. Dagthers from different generations of the decay tree can be combined, identifying them with a coordinate-like notaton. A coordinate string consists in a whitespace-separated the list of daughter indexes, starting from the root particle: 0 1 3  identifies the fourth daugther (3) of the second daugther (1) of the first daugther (0) of the mother particle. For examples: daughterCombination(M, 0, 3, 4) will return the invariant mass of the system made of the first, fourth and fifth daugther ora particle. daughterCombination(M, 0 0, 3 0) will return the invariant mass of the system made of the first daugther of the first daughter, and the first daughter of the fourth daughter");
-    REGISTER_VARIABLE("daughterAngleBetweenGeneric(daugtherIndex_1, daugtherIndex_2 ... dagutherIndex_n)", daughterAngleBetweenGeneric,"Returns the angle in between any pair of particles belonging to the same decay tree. The particles are identified via coordinates. A coordinate string consists in a whitespace-separated the list of daughter indexes, starting from the root particle: 0 1 3  identifies the fourth daugther (3) of the second daugther (1) of the first daugther (0) of the mother particle. ");
+    REGISTER_VARIABLE("daughterCombination(variable, daughterIndex_1, daughterIndex_2 ... daughterIndex_n)", daughterCombination,R"DOC(
+Returns ``variable`` calculated on an arbirary set of (grand)daugthers. 
+Daughters from different generations of the decay tree can be combined using generalized daughter indexes, which are simply whitespace-separated 
+the list of daughter indexes, starting from the root particle: for example, ``0 1 3``  identifies the fourth 
+daugther (3) of the second daugther (1) of the first daugther (0) of the mother particle.
+.. tip::
+``daughterCombination(M, 0, 3, 4)`` will return the invariant mass of the system made of the first, fourth and fifth daugther of particle. 
+``daughterCombination(M, 0 0, 3 0)`` will return the invariant mass of the system made of the first daugther of the first daughter and the first daughter of the fourth daughter.
+)DOC");
+
+    REGISTER_VARIABLE("daughterAngleBetweenGeneric(daugtherIndex_1, daugtherIndex_2)", daughterAngleBetweenGeneric,R"DOC(
+Returns the cosine angle in between any pair of particles belonging to the same decay tree. 
+The particles are identified via generalized daughter indexes, which are simply whitespace-separated the list of daughter indexes 
+starting from the root particle: for example, `0 1 3`  identifies the fourth daugther (3) of the second daugther (1) of the first daugther (0) of the mother particle.
+.. tip::
+``daughterAngleBetweenGeneric(0, 3)`` will return the cosine of the angle between the first and fourth daughter. 
+``daughterCombination(M, 0 0, 3 0)`` will return the cosine of the angle between the first daugther of the first daughter, and the first daughter of the fourth daughter
+)DOC");
+
 
 
 

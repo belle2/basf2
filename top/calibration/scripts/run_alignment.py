@@ -82,7 +82,7 @@ if not os.path.isdir(main_output_dir):
     print('New folder created: ' + main_output_dir)
 
 # Suppress messages during processing
-basf2.set_log_level(basf2.LogLevel.WARNING)
+# basf2.set_log_level(basf2.LogLevel.WARNING)
 
 
 def module_alignment():
@@ -112,6 +112,8 @@ def module_alignment():
         # Define collection
         collection = Collection(collector=collector, input_files=inputFiles,
                                 pre_collector_path=main, max_files_per_collector_job=-1)
+        collection.use_central_database(globalTag)
+        collection.backend_args = {"queue": "l"}
         # Add collection to calibration
         cal.add_collection(name='slot_' + '{:0=2d}'.format(slot), collection=collection)
 

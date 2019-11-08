@@ -369,7 +369,7 @@ def create_configuration(db_components,
     return c
 
 
-def create_calibration(cfg, name='MillepedeCalibration', tags=None, files=None, timedep=None):
+def create_calibration(cfg, name='MillepedeCalibration', tags=None, files=None, timedep=None, init_event=None):
     algo = Belle2.MillepedeAlgorithm(cfg.algo)
 
     for cmd_name, cmd in cfg.commands.items():
@@ -384,7 +384,7 @@ def create_calibration(cfg, name='MillepedeCalibration', tags=None, files=None, 
     def gen_constraints(algorithm, iteration):
         from alignment.constraints import generate_constraints
         if len(consts):
-            generate_constraints(consts, timedep, tags)
+            generate_constraints(consts, timedep, tags, init_event)
 
     algo.steering().command('Parameters')
 

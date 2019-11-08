@@ -21,12 +21,12 @@
 #include <mdst/dbobjects/BeamSpot.h>
 
 // kfitter
-#include <analysis/KFit/MassFitKFit.h>
-#include <analysis/KFit/FourCFitKFit.h>
-#include <analysis/KFit/MassPointingVertexFitKFit.h>
-#include <analysis/KFit/MassVertexFitKFit.h>
-#include <analysis/KFit/VertexFitKFit.h>
-#include <analysis/KFit/MakeMotherKFit.h>
+#include <analysis/VertexFitting/KFit/MassFitKFit.h>
+#include <analysis/VertexFitting/KFit/FourCFitKFit.h>
+#include <analysis/VertexFitting/KFit/MassPointingVertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/MassVertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 
 // rave
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>

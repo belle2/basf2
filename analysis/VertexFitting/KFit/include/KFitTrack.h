@@ -17,7 +17,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <analysis/KFit/KFitConst.h>
+#include <analysis/VertexFitting/KFit/KFitConst.h>
 
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;

@@ -14,8 +14,8 @@
 
 #include <TMatrixFSym.h>
 
-#include <analysis/KFit/MakeMotherKFit.h>
-#include <analysis/KFit/VertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
 
 

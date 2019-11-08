@@ -9,7 +9,7 @@
  **************************************************************************/
 
 
-#include <analysis/KFit/MakeMotherKFit.h>
+#include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 
 
 using namespace std;

@@ -18,9 +18,9 @@
 #include <CLHEP/Geometry/Point3D.h>
 
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/KFit/KFitConst.h>
-#include <analysis/KFit/KFitError.h>
-#include <analysis/KFit/KFitTrack.h>
+#include <analysis/VertexFitting/KFit/KFitConst.h>
+#include <analysis/VertexFitting/KFit/KFitError.h>
+#include <analysis/VertexFitting/KFit/KFitTrack.h>
 
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;

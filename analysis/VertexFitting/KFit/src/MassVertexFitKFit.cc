@@ -10,8 +10,8 @@
 
 #include <TMatrixFSym.h>
 
-#include <analysis/KFit/MakeMotherKFit.h>
-#include <analysis/KFit/MassVertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
+#include <analysis/VertexFitting/KFit/MassVertexFitKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
 
 

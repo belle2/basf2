@@ -10,6 +10,16 @@ Variables
 
  * Removed ``clusterCRID`` which duplicates :b2:var:`clusterConnectedRegionID`.
 
+ * Modified :b2:var:`daughterAngleInBetween` to accept generalized variable indeces instead of simple indeces. A 
+   generalized index is a column-separated string of daughter indexes belonging to different generations, 
+   starting from the root particle. For example, ``0:2:1`` indicates the second daughter (0) of the third daughter
+   (2) of the first daughter (0) of the particle. Of course, conventional indexes are still working as expected:
+   ``1`` still indicates the second daughter of the particle.
+
+ * Added :b2:var:`daughterCombination`, that returns a variable calculated on the sum
+   of an arbitrary number of daughters. Generalized indeces are supported. This variable is mostly intended
+   to calculate the invariant mass or the recoil mass of any set of particles belonging to a decay tree.
+
 Modules
 +++++++
 

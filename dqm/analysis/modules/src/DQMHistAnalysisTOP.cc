@@ -82,7 +82,7 @@ void DQMHistAnalysisTOPModule::initialize()
   m_text1 = new TPaveText(2, 400, 8, 500, "NB");
   m_text1->SetFillColorAlpha(kWhite, 0);
   m_text1->SetBorderSize(0);
-  m_text1->AddText("Less than 1% is expected:");
+  m_text1->AddText("Less than 1%% is expected:");
   m_text1->AddText("Ratio of entries outside of red lines");
 }
 

@@ -161,7 +161,7 @@ void DQMHistAnalysisTOPModule::event()
     }
   }
 
-  TH2* hraw = findHist("TOP/window_vs_slot");
+  TH2F* hraw = (TH2F*)findHist("TOP/window_vs_slot");
   double exRatio(0.0);
   double totalraw = hraw->GetEntries();
   double totalbadraw(0.0);

@@ -73,8 +73,8 @@ void DQMHistAnalysisTOPModule::initialize()
   m_h_badHitsMean->SetMinimum(0);
   m_h_badHitsRMS->SetMinimum(0);
 
-  m_line1 = new TLine(0.5, 220, 16.5, 220);
-  m_line2 = new TLine(0.5, 250, 16.5, 250);
+  m_line1 = new TLine(0.5, 215, 16.5, 215);
+  m_line2 = new TLine(0.5, 235, 16.5, 235);
   m_line1->SetLineWidth(2);
   m_line2->SetLineWidth(2);
   m_line1->SetLineColor(kRed);
@@ -169,7 +169,7 @@ void DQMHistAnalysisTOPModule::event()
   for (int i = 1; i <= 16; i++) {
     for (int j = 1; j <= 512; j++) {
       double nhraw = hraw->GetBinContent(i, j);
-      if (j < 220 || j > 235) totalbadraw += nhraw ;
+      if (j < 215 || j > 235) totalbadraw += nhraw ;
     }
   }
   if (totalraw > 0) exRatio = totalbadraw * 1.0 / totalraw;

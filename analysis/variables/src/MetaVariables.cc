@@ -3,7 +3,8 @@
  * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck, Anze Zupanc, Sam Cunliffe                   *
+ * Contributors: Thomas Keck, Anze Zupanc, Sam Cunliffe,                  *
+ *               Umberto Tamponi                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -1011,39 +1012,31 @@ endloop:
     Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2 || arguments.size() == 3) {
-        std::vector<int> daughterIndices;
-        try {
-          for (auto& argument : arguments) daughterIndices.push_back(Belle2::convertString<int>(argument));
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The arguments of daughterAngleInBetween meta function must be integers!");
-          return nullptr;
-        }
-        auto func = [daughterIndices](const Particle * particle) -> double {
+
+        auto func = [arguments](const Particle * particle) -> double {
           if (particle == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
-          if (daughterIndices.size() == 2)
-          {
-            if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters()))
-              return std::numeric_limits<double>::quiet_NaN();
-            else {
-              const auto& frame = ReferenceFrame::GetCurrent();
-              TVector3 pi = frame.getMomentum(particle->getDaughter(daughterIndices[0])).Vect();
-              TVector3 pj = frame.getMomentum(particle->getDaughter(daughterIndices[1])).Vect();
-              return pi.Angle(pj);
-            }
-          } else if (daughterIndices.size() == 3)
-          {
-            if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters())
-                || daughterIndices[2] >= int(particle->getNDaughters())) return -999;
-            else {
-              const auto& frame = ReferenceFrame::GetCurrent();
-              TVector3 pi = frame.getMomentum(particle->getDaughter(daughterIndices[0])).Vect();
-              TVector3 pj = frame.getMomentum(particle->getDaughter(daughterIndices[1])).Vect();
-              TVector3 pk = frame.getMomentum(particle->getDaughter(daughterIndices[2])).Vect();
-              return pk.Angle(pi + pj);
-            }
-          } else return std::numeric_limits<double>::quiet_NaN();
 
+          std::vector<TLorentzVector> pDaus;
+          const auto& frame = ReferenceFrame::GetCurrent();
+
+          // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
+          for (auto& generalizedIndex : arguments)
+          {
+            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+            if (dauPart)
+              pDaus.push_back(frame.getMomentum(dauPart));
+            else {
+              B2WARNING("Trying to access a daughter that does not exist. Index = " << generalizedIndex);
+              return std::numeric_limits<double>::quiet_NaN();
+            }
+          }
+
+          // Calculates the angle between the selected particles
+          if (pDaus.size() == 2)
+            return pDaus[0].Vect().Angle(pDaus[1].Vect());
+          else
+            return pDaus[2].Vect().Angle(pDaus[0].Vect() + pDaus[1].Vect());
         };
         return func;
       } else {
@@ -2170,11 +2163,11 @@ endloop:
         // First argument is the variable name
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
 
-        // Core function
+        // Core function: calculates a variable combining an arbitrary number of particles
         auto func = [var, arguments](const Particle * particle) -> double {
           if (particle == nullptr)
           {
-            B2WARNING("Trying to access a daughter that does not exist");
+            B2WARNING("Trying to access a daughter that does not exist. Skipping");
             return std::numeric_limits<float>::quiet_NaN();
           }
           const auto& frame = ReferenceFrame::GetCurrent();
@@ -2196,53 +2189,16 @@ endloop:
             }
           }
 
-          // Make a dummy particle out of the sum of the 4-momenta of the selected daugthers
-          Particle* sumOfDaugthers = new Particle(pSum, 100); // 100 is one of the special numbers
+          // Make a dummy particle out of the sum of the 4-momenta of the selected daughters
+          Particle* sumOfDaughters = new Particle(pSum, 100); // 100 is one of the special numbers
 
           // Calculate the variable on the dummy particle
-          return var->function(sumOfDaugthers);
+          return var->function(sumOfDaughters);
         };
         return func;
       } else
-        B2FATAL("Wrong number of arguments for meta function daughter");
+        B2FATAL("Wrong number of arguments for meta function daughterCombination");
     }
-
-
-
-    Manager::FunctionPtr daughterCosAngleBetweenGeneric(const std::vector<std::string>& arguments)
-    {
-      // Expect 2 arguments.
-      if (arguments.size() != 2)
-        B2FATAL("Wrong number of arguments for meta function daughter");
-
-      auto func = [arguments](const Particle * particle) -> double {
-        if (particle == nullptr)
-          return std::numeric_limits<float>::quiet_NaN();
-
-        const auto& frame = ReferenceFrame::GetCurrent();
-
-        std::vector<TLorentzVector> pDaus;
-
-        for (auto& generalizedIndex : arguments)
-        {
-          const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
-          if (dauPart)
-            pDaus.push_back(frame.getMomentum(dauPart));
-          else {
-            B2WARNING("Trying to access a daughter that does not exist. Index = " << generalizedIndex);
-            return std::numeric_limits<float>::quiet_NaN();
-          }
-        }
-
-        double cosTheta = pDaus[0].Vect().Dot(pDaus[1].Vect()) / (pDaus[0].Vect().Mag() * pDaus[1].Vect().Mag());
-        return cosTheta;
-      };
-      return func;
-    }
-
-
-
-
 
 
 
@@ -2341,7 +2297,7 @@ The arguments of the function must be the ``index`` of the particle in the MCPar
 and ``variable``, the name of the function or variable for that generator particle.
 If ``index`` goes beyond the length of the MCParticles array, -999 will be returned.
 
-E.g. ``genParticle(0, p)`` returns the total momentum of the first MCParticle, which is "
+E.g. ``genParticle(0, p)`` returns the total momentum of the first MCParticle, which is 
 the Upsilon(4S) in a generic decay.
 ``genParticle(0, mcDaughter(1, p)`` returns the total momentum of the second daughter of
 the first MC Particle, which is the momentum of the second B meson in a generic decay.
@@ -2416,11 +2372,17 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_VARIABLE("daughterMotherNormDiffOf(i, variable)", daughterMotherNormDiffOf,
                       "Returns the normalized difference of a variable between the given daughter and the mother particle itself.\n"
                       "E.g. daughterMotherNormDiffOf(1, p) returns the normalized momentum difference between the given particle and its second daughter in the lab frame.");
-    REGISTER_VARIABLE("daughterAngleInBetween(i, j)", daughterAngleInBetween,
-                      "If two indices given: Variable returns the angle between the momenta of the two given daughters.\n"
-                      "If three indices given: Variable returns the angle between the momentum of the third particle and a vector "
-                      "which is the sum of the first two daughter momenta.\n"
-                      "E.g. useLabFrame(daughterAngleInBetween(0, 1)) returns the angle between first and second daughter in the Lab frame.");
+    REGISTER_VARIABLE("daughterAngleInBetween(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", daughterAngleInBetween, R"DOC(
+Returns the angle in between any pair of particles belonging to the same decay tree. 
+The particles are identified via generalized daughter indexes, which are simply column-separated lists of daughter indexes, ordered starting from the root particle. For example, ``0:1:3``  identifies the fourth daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle. ``1`` simply identifies the second daughter of the root particle. 
+
+Both two and three generalized indexes can be given to ``daughterAngleInBetween``. If two indices are given, the variable returns the angle between the momenta of the two given particles. If three indices are given,  the variable returns the angle between the momentum of the third particle and a vector which is the sum of the first two daughter momenta.
+
+.. tip::
+``daughterAngleInBetween(0, 3)`` will return the angle between the first and fourth daughter.
+``daughterAngleInBetween(0, 1, 3)`` will return the angle between the fourth daughter and the sum of the first and second daughter. 
+``daughterAngleInBetween(M, 0:0, 3:0)`` will return the angle between the first daughter of the first daughter, and the first daughter of the fourth daughter
+)DOC");
     REGISTER_VARIABLE("daughterClusterAngleInBetween(i, j)", daughterClusterAngleInBetween,
                       "Returns function which returns the angle between clusters associated to the two daughters."
                       "If two indices given: returns the angle between the momenta of the clusters associated to the two given daughters."
@@ -2532,24 +2494,14 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_VARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
                       "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.");
     REGISTER_VARIABLE("daughterCombination(variable, daughterIndex_1, daughterIndex_2 ... daughterIndex_n)", daughterCombination,R"DOC(
-Returns ``variable`` calculated on an arbirary set of (grand)daugthers. 
+Returns ``variable`` calculated on an arbirary set of (grand)daughters. 
 Daughters from different generations of the decay tree can be combined using generalized daughter indexes, which are simply column-separated 
 the list of daughter indexes, starting from the root particle: for example, ``0:1:3``  identifies the fourth 
-daugther (3) of the second daugther (1) of the first daugther (0) of the mother particle.
+daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle.
 
 .. tip::
-``daughterCombination(M, 0, 3, 4)`` will return the invariant mass of the system made of the first, fourth and fifth daugther of particle. 
-``daughterCombination(M, 0:0, 3:0)`` will return the invariant mass of the system made of the first daugther of the first daughter and the first daughter of the fourth daughter.
-)DOC");
-
-    REGISTER_VARIABLE("daughterCosAngleBetweenGeneric(daugtherIndex_1, daugtherIndex_2)", daughterCosAngleBetweenGeneric,R"DOC(
-Returns the cosine angle in between any pair of particles belonging to the same decay tree. 
-The particles are identified via generalized daughter indexes, which are simply column-separated the list of daughter indexes 
-starting from the root particle: for example, `0:1:3`  identifies the fourth daugther (3) of the second daugther (1) of the first daugther (0) of the mother particle.
-
-.. tip::
-``daughterCosAngleBetweenGeneric(0, 3)`` will return the cosine of the angle between the first and fourth daughter. 
-``daughterCombination(M, 0:0, 3:0)`` will return the cosine of the angle between the first daugther of the first daughter, and the first daughter of the fourth daughter
+``daughterCombination(M, 0, 3, 4)`` will return the invariant mass of the system made of the first, fourth and fifth daughter of particle. 
+``daughterCombination(M, 0:0, 3:0)`` will return the invariant mass of the system made of the first daughter of the first daughter and the first daughter of the fourth daughter.
 )DOC");
 
 

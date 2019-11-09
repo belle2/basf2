@@ -594,7 +594,7 @@ namespace Belle2 {
 
     /** Apply a function to all daughters of this particle
      *
-     * @param function function object to run on each daugther. If this
+     * @param function function object to run on each daughter. If this
      *    function returns true the processing will be stopped immeddiately.
      * @param recursive if true go through all daughters of daughters as well
      * @param includeSelf if true also apply the function to this particle
@@ -813,10 +813,10 @@ namespace Belle2 {
     }
 
     /**
-    * Explores the decay tree of the  and return the (grand^n)daughter indentified by a generalized index string.
-    * The generalized index string consists in a column-separated list of daughter indexes, starting from the root particle:
-    * 0:1:3 identifies the fourth daugther (3) of the second daugther (1) of the first daugther (0) of the mother particle.
-    * @param generalizedIndex the generalize index of the particle to be returned
+    * Explores the decay tree of the particle and returns the (grand^n)daughter identified by a generalized index.
+    * The generalized index consists in a column-separated list of daughter indexes, starting from the root particle:
+    * 0:1:3 identifies the fourth daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle.
+    * @param generalizedIndex the generalized index of the particle to be returned
     * @return a particle in the decay tree of the root particle.
     */
     const Particle* getParticleFromGeneralizedIndexString(const std::string& generalizedIndex) const;

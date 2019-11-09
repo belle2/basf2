@@ -759,8 +759,8 @@ const Particle* Particle::getParticleFromGeneralizedIndexString(const std::strin
     return nullptr;
   }
 
-  // To explore the tree of unknown depth, we need to a place to store
-  // Bothe the root and the daugther particle for each iteration
+  // To explore a decay tree of unknown depth, we need a place to store
+  // both the root particle and the daughter particle at each iteration
   const Particle* dauPart =
     nullptr; // This will be eventually returned
   const Particle* currentPart = this; // This is the root particle of the next iteration
@@ -772,8 +772,7 @@ const Particle* Particle::getParticleFromGeneralizedIndexString(const std::strin
     try {
       dauIndex = Belle2::convertString<int>(indexString);
     } catch (boost::bad_lexical_cast&) {
-      B2WARNING("Found the string " << indexString <<
-                "instead of a daugther index. You probably mispelled the arguments of the meta-variable daughterCombination");
+      B2WARNING("Found the string " << indexString << "instead of a daughter index.");
       return nullptr;
     }
 

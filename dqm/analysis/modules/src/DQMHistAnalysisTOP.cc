@@ -82,7 +82,7 @@ void DQMHistAnalysisTOPModule::initialize()
   m_text1 = new TPaveText(2, 400, 8, 500, "NB");
   m_text1->SetFillColorAlpha(kWhite, 0);
   m_text1->SetBorderSize(0);
-  m_text1->AddText("Expect no entries outside of red lines");
+  //m_text1->AddText("Expect no entries outside of red lines");
 }
 
 

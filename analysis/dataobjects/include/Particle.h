@@ -812,6 +812,16 @@ namespace Belle2 {
       }
     }
 
+    /**
+    * Explores the decay tree of the  and return the (grand^n)daughter indentified by a generalized index string.
+    * The generalized index string consists in a column-separated list of daughter indexes, starting from the root particle:
+    * 0:1:3 identifies the fourth daugther (3) of the second daugther (1) of the first daugther (0) of the mother particle.
+    * @param generalizedIndex the generalize index of the particle to be returned
+    * @return a particle in the decay tree of the root particle.
+    */
+    const Particle* getParticleFromGeneralizedIndexString(const std::string& generalizedIndex) const;
+
+
   private:
 
     // persistent data members

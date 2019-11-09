@@ -3035,7 +3035,7 @@ namespace {
       daughterMomenta.push_back(mom);
       momentum = momentum + mom;
     }
-    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Flavored, daughterIndices);
 
     // Test the invariant mass of several combinations
     const Manager::Var* var = Manager::Instance().getVariable("daughterCombination(M, 0,1,2)");
@@ -3066,7 +3066,7 @@ namespace {
     EXPECT_TRUE(std::isnan(var->function(p)));
 
 
-    var = Manager::Instance().getVariable("daughterCombination(M, 1, 0 1 0 0 1)");
+    var = Manager::Instance().getVariable("daughterCombination(M, 1, 0:1:0:0:1)");
     EXPECT_B2WARNING(var->function(p));
     EXPECT_TRUE(std::isnan(var->function(p)));
 
@@ -3092,7 +3092,7 @@ namespace {
       momentum_1 = momentum_1 + mom;
     }
 
-    const Particle* compositeDau_1 = particles.appendNew(momentum_1, 411, Particle::c_Unflavored, daughterIndices_1);
+    const Particle* compositeDau_1 = particles.appendNew(momentum_1, 411, Particle::c_Flavored, daughterIndices_1);
 
 
     // make a 1 -> 2 particle
@@ -3110,7 +3110,7 @@ namespace {
       momentum_2 = momentum_2 + mom;
     }
 
-    const Particle* compositeDau_2 = particles.appendNew(momentum_2, 411, Particle::c_Unflavored, daughterIndices_2);
+    const Particle* compositeDau_2 = particles.appendNew(momentum_2, 411, Particle::c_Flavored, daughterIndices_2);
 
 
     // make the composite particle
@@ -3124,12 +3124,12 @@ namespace {
     EXPECT_FLOAT_EQ(var->function(p), M_test);
 
     // this should be the mass of the first daughter
-    var = Manager::Instance().getVariable("daughterCombination(M, 0 0, 0 1, 0 2)");
+    var = Manager::Instance().getVariable("daughterCombination(M, 0:0, 0:1, 0:2)");
     M_test = (momentum_1).Mag();
     EXPECT_FLOAT_EQ(var->function(p), M_test);
 
     // this should be a generic combinations
-    var = Manager::Instance().getVariable("daughterCombination(M, 0 0, 0 1, 1 0)");
+    var = Manager::Instance().getVariable("daughterCombination(M, 0:0, 0:1, 1:0)");
     M_test = (daughterMomenta_1[0] + daughterMomenta_1[1] + daughterMomenta_2[0]).Mag();
     EXPECT_FLOAT_EQ(var->function(p), M_test);
 
@@ -3156,7 +3156,7 @@ namespace {
       momentum_1 = momentum_1 + mom;
     }
 
-    const Particle* compositeDau_1 = particles.appendNew(momentum_1, 411, Particle::c_Unflavored, daughterIndices_1);
+    const Particle* compositeDau_1 = particles.appendNew(momentum_1, 411, Particle::c_Flavored, daughterIndices_1);
 
 
     // make a 1 -> 2 particle
@@ -3174,7 +3174,7 @@ namespace {
       momentum_2 = momentum_2 + mom;
     }
 
-    const Particle* compositeDau_2 = particles.appendNew(momentum_2, 411, Particle::c_Unflavored, daughterIndices_2);
+    const Particle* compositeDau_2 = particles.appendNew(momentum_2, 411, Particle::c_Flavored, daughterIndices_2);
 
 
     // make the composite particle
@@ -3183,24 +3183,24 @@ namespace {
 
 
     // Test the invariant mass of several combinations
-    const Manager::Var* var = Manager::Instance().getVariable("daughterAngleBetweenGeneric(0, 1)");
+    const Manager::Var* var = Manager::Instance().getVariable("daughterCosAngleBetweenGeneric(0, 1)");
     double M_test = (momentum_1.Vect().Dot(momentum_2.Vect())) / (momentum_1.Vect().Mag() * momentum_2.Vect().Mag());
     EXPECT_FLOAT_EQ(var->function(p), M_test);
 
     // this should be a generic combinations
-    var = Manager::Instance().getVariable("daughterAngleBetweenGeneric(0 0, 1 0)");
+    var = Manager::Instance().getVariable("daughterCosAngleBetweenGeneric(0:0, 1:0)");
     M_test = (daughterMomenta_1[0].Vect().Dot(daughterMomenta_2[0].Vect())) / (daughterMomenta_1[0].Vect().Mag() *
              daughterMomenta_2[0].Vect().Mag());
     EXPECT_FLOAT_EQ(var->function(p), M_test);
 
 
 
-    var = Manager::Instance().getVariable("daughterAngleBetweenGeneric( 1, -1)");
+    var = Manager::Instance().getVariable("daughterCosAngleBetweenGeneric( 1, -1)");
     EXPECT_B2WARNING(var->function(p));
     EXPECT_TRUE(std::isnan(var->function(p)));
 
 
-    var = Manager::Instance().getVariable("daughterAngleBetweenGeneric(1, 0 1 0 0 1)");
+    var = Manager::Instance().getVariable("daughterCosAngleBetweenGeneric(1, 0:1:0:0:1)");
     EXPECT_B2WARNING(var->function(p));
     EXPECT_TRUE(std::isnan(var->function(p)));
 

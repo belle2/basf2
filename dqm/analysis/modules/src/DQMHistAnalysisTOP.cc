@@ -172,7 +172,7 @@ void DQMHistAnalysisTOPModule::event()
     }
   }
   if (totalraw > 0) exRatio = totalbadraw * 1.0 / totalraw;
-  TString Par1V = Form("%.1f%", exRatio * 100.0);
+  TString Par1V = Form("%.1f %%", exRatio * 100.0);
   m_text1->AddText(Par1V);
 
   //addHist("", m_h_goodHitsMean->GetName(), m_h_goodHitsMean);

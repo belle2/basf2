@@ -82,7 +82,8 @@ void DQMHistAnalysisTOPModule::initialize()
   m_text1 = new TPaveText(2, 400, 8, 500, "NB");
   m_text1->SetFillColorAlpha(kWhite, 0);
   m_text1->SetBorderSize(0);
-  //m_text1->AddText("Expect no entries outside of red lines");
+  m_text1->AddText("Less than 1% is expected:");
+  m_text1->AddText("Ratio of entries outside of red lines");
 }
 
 
@@ -159,6 +160,20 @@ void DQMHistAnalysisTOPModule::event()
       m_h_badHitsRMS->SetBinContent(i, 0);
     }
   }
+
+  TH2* hraw = findHist("TOP/window_vs_slot");
+  double exRatio(0.0);
+  double totalraw = hraw->GetEntries();
+  double totalbadraw(0.0);
+  for (int i = 1; i <= 16; i++) {
+    for (int j = 1; j <= 512; j++) {
+      double nhraw = hraw->GetBinContent(i, j);
+      if (j < 220 || j > 235) totalbadraw += nhraw ;
+    }
+  }
+  if (totalraw > 0) exRatio = totalbadraw * 1.0 / totalraw;
+  TString Par1V = Form("%.1f%", exRatio * 100.0);
+  m_text1->AddText(Par1V);
 
   //addHist("", m_h_goodHitsMean->GetName(), m_h_goodHitsMean);
 

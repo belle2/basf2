@@ -7,32 +7,42 @@
 # dqm/analysis/examples/DQMAnalysisKLM.py
 
 import basf2
-from daqdqm.commondqm import add_common_dqm
 import sys
+from daqdqm.commondqm import add_common_dqm
+
+raw_data = False
+if len(sys.argv) >= 2:
+    if sys.argv[1] == 'raw':
+        raw_data = True
 
 # Set the global log level
 basf2.set_log_level(basf2.LogLevel.INFO)
 
-# Input
-input = basf2.register_module('RootInput')
-input.param('inputFileName', sys.argv[1])
+# Create path
+main = basf2.Path()
 
-# Histogram creation
-histo = basf2.register_module('HistoManager')
-histo.param('histoFileName', 'KLMDQM.root')
+# Input
+main.add_module('RootInput')
+
+# Progress
+main.add_module('Progress')
 
 # Gearbox
-gearbox = basf2.register_module('Gearbox')
+main.add_module('Gearbox')
 
 # Geometry
-geometry = basf2.register_module('Geometry')
+main.add_module('Geometry')
 
-# Create paths
-main = basf2.create_path()
-main.add_module(input)
-main.add_module(histo)
-main.add_module(gearbox)
-main.add_module(geometry)
+# Histogram manager
+main.add_module('HistoManager',
+                histoFileName='KLMDQM.root')
+
+# Unpacker and reconstruction.
+if raw_data:
+    main.add_module('KLMUnpacker')
+    main.add_module('BKLMReconstructor')
+
+# DQM
 add_common_dqm(main, components=['KLM'])
 
 # Process events

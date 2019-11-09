@@ -100,14 +100,14 @@ namespace Belle2 {
         auto func = [extraInfoName](const Particle * particle) -> double {
           if (particle == nullptr)
           {
-            B2WARNING("Returns -999 because the particle is nullptr! If you want EventExtraInfo variables, please use eventExtraInfo() instead");
-            return -999.;
+            B2WARNING("Returns NaN because the particle is nullptr! If you want EventExtraInfo variables, please use eventExtraInfo() instead");
+            return std::numeric_limits<float>::quiet_NaN();
           }
           if (particle->hasExtraInfo(extraInfoName))
           {
             return particle->getExtraInfo(extraInfoName);
           } else {
-            return -999.;
+            return std::numeric_limits<float>::quiet_NaN();
           }
         };
         return func;
@@ -127,7 +127,7 @@ namespace Belle2 {
           {
             return eventExtraInfo->getExtraInfo(extraInfoName);
           } else {
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           }
         };
         return func;
@@ -280,7 +280,7 @@ namespace Belle2 {
         auto func = [cut](const Particle * particle) -> double {
 
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           if (cut->check(particle))
             return 1;
           else
@@ -326,7 +326,7 @@ namespace Belle2 {
 
           if (std::abs(particle -> getPDGCode()) == std::abs(pdgCode))
             return var -> function(particle);
-          else return -999;
+          else return std::numeric_limits<float>::quiet_NaN();
         };
         return func;
       } else {
@@ -1118,7 +1118,7 @@ endloop:
         }
         auto func = [daughterIndices](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           else {
             const auto& frame = ReferenceFrame::GetCurrent();
             TLorentzVector pSum;
@@ -1126,7 +1126,7 @@ endloop:
             for (auto& index : daughterIndices)
             {
               if (index >= int(particle->getNDaughters())) {
-                return -999;
+                return std::numeric_limits<float>::quiet_NaN();
               } else pSum += frame.getMomentum(particle->getDaughter(index));
             }
 
@@ -1360,9 +1360,9 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [var, daughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           if (daughterNumber >= int(particle->getNDaughters()))
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           else
             return var->function(particle->getDaughter(daughterNumber));
         };
@@ -1385,16 +1385,16 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [var, daughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           if (particle->getMCParticle()) // has MC match or is MCParticle
           {
             if (daughterNumber >= int(particle->getMCParticle()->getNDaughters())) {
-              return -999;
+              return std::numeric_limits<float>::quiet_NaN();
             }
             Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
             return var->function(&tempParticle);
           } else {
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           }
         };
         return func;
@@ -1409,16 +1409,16 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           if (particle->getMCParticle()) // has MC match or is MCParticle
           {
             if (particle->getMCParticle()->getMother() == nullptr) {
-              return -999;
+              return std::numeric_limits<float>::quiet_NaN();
             }
             Particle tempParticle = Particle(particle->getMCParticle()->getMother());
             return var->function(&tempParticle);
           } else {
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           }
         };
         return func;
@@ -1443,7 +1443,7 @@ endloop:
           StoreArray<MCParticle> mcParticles("MCParticles");
           if (particleNumber >= mcParticles.getEntries())
           {
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           }
 
           MCParticle* mcParticle = mcParticles[particleNumber];
@@ -1465,13 +1465,13 @@ endloop:
           StoreArray<MCParticle> mcParticles("MCParticles");
           if (mcParticles.getEntries() == 0)
           {
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           }
 
           MCParticle* mcUpsilon4S = mcParticles[0];
           if (mcUpsilon4S->getPDG() != 300553)
           {
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           }
 
           Particle upsilon4S = Particle(mcUpsilon4S);
@@ -1582,7 +1582,7 @@ endloop:
 
         auto func = [roeListName, cut, pdgCode, flavourType](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           StoreObjPtr<ParticleList> roeList(roeListName);
           TLorentzVector vec = particle->get4Vector();
           for (unsigned int i = 0; i < roeList->getListSize(); i++)
@@ -1612,7 +1612,7 @@ endloop:
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
         auto func = [cut](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           unsigned int n = 0;
           for (auto& daughter : particle->getDaughters())
           {
@@ -1661,7 +1661,7 @@ endloop:
           const MCParticle* mcp = particle->getMCParticle();
           if (!mcp)   // Has no MC match and is no MCParticle
           {
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           }
           Particle tmpPart(mcp);
           return var->function(&tmpPart);
@@ -2243,14 +2243,14 @@ Specifying the lab frame is useful in some corner-cases. For example:
     REGISTER_VARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
                       "Useful if you want to write out if a particle would have passed a cut or not.\n"
-                      "Returns -999 if particle is a nullptr.");
+                      "Returns NaN if particle is a nullptr.");
     REGISTER_VARIABLE("passesEventCut(cut)", passesEventCut,
                       "[Eventbased] Returns 1 if event passes the cut otherwise 0.\n"
                       "Useful if you want to select events passing a cut without looping into particles, such as for skimming.\n");
     REGISTER_VARIABLE("countDaughters(cut)", countDaughters,
                       "Returns number of direct daughters which satisfy the cut.\n"
                       "Used by the skimming package (for what exactly?)\n"
-                      "Returns -999 if particle is a nullptr.");
+                      "Returns NaN if particle is a nullptr.");
     REGISTER_VARIABLE("varFor(pdgCode, variable)", varFor,
                       "Returns the value of the variable for the given particle if its abs(pdgCode) agrees with the given one.\n"
                       "E.g. varFor(11, p) returns the momentum if the particle is an electron or a positron.");
@@ -2276,17 +2276,17 @@ Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to c
                       "Returns value of variable for the i-th daughter. E.g.\n"
                       "  - daughter(0, p) returns the total momentum of the first daughter.\n"
                       "  - daughter(0, daughter(1, p) returns the total momentum of the second daughter of the first daughter.\n\n"
-                      "Returns -999 if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
+                      "Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
     REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter,
                       "Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.\n"
-                      "Returns -999 if the particle is nullptr, if the particle is not matched to an MC particle,"
+                      "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
                       "or if the i-th MC daughter does not exist.\n"
                       "E.g. mcDaughter(0, PDG) will return the PDG code of the first MC daughter of the matched MC"
                       "particle of the reconstructed particle the function is applied to./n"
                       "The meta variable can also be nested: mcDaughter(0, mcDaughter(1, PDG)).");
     REGISTER_VARIABLE("mcMother(variable)", mcMother,
                       "Returns the value of the requested variable for the Monte Carlo mother of the particle.\n"
-                      "Returns -999 if the particle is nullptr, if the particle is not matched to an MC particle,"
+                      "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
                       "or if the MC mother does not exist.\n"
                       "E.g. mcMother(PDG) will return the PDG code of the MC mother of the matched MC"
                       "particle of the reconstructed particle the function is applied to.\n"
@@ -2450,7 +2450,7 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
                       "Returns variable output for the matched MCParticle by constructing a temporary Particle from it.\n"
                       "This may not work too well if your variable requires accessing daughters of the particle.\n"
                       "E.g. matchedMC(p) returns the total momentum of the related MCParticle.\n"
-                      "Returns -999 if no matched MCParticle exists.");
+                      "Returns NaN if no matched MCParticle exists.");
     REGISTER_VARIABLE("countInList(particleList, cut='')", countInList,
                       "Returns number of particle which pass given in cut in the specified particle list.\n"
                       "Useful for creating statistics about the number of particles in a list.\n"

@@ -105,15 +105,16 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 path.add_module(IfMCParticlesPresentModule(mc_track_matcher_module))
 
             # this ensures that the parameters are set in both cases (if the modules have been added or are already in the path)
+            # only check for containment to also cope with the "IfMCParticlesPresentModule" cases correctly
             for module in path.modules():
-                if (module.name() == 'MCRecoTracksMatcher'):
+                if 'MCRecoTracksMatcher' in module.name():
                     module.param({
                           'mcRecoTracksStoreArrayName': 'MCRecoTracks',
                           'MinimalPurity': 0.66,
                           'prRecoTracksStoreArrayName': "RecoTracks",
                           **matching_coverage
                         })
-                if (module.name() == 'TrackFinderMCTruthRecoTracks'):
+                if 'TrackFinderMCTruthRecoTracks' in module.name():
                     module.param({
                           'RecoTracksStoreArrayName': 'MCRecoTracks',
                           **tracking_coverage

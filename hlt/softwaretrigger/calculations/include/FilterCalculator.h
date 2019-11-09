@@ -60,5 +60,7 @@ namespace Belle2::SoftwareTrigger {
     double m_Ehigh = 2;
     /// which CMS energy defines nEsingleClust
     double m_EsinglePhoton = 1;
+    /// which CMS energy defines nReducedEsingle clusters
+    double m_reducedEsinglePhoton = 0.5;
   };
 }

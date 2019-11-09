@@ -10,7 +10,7 @@
 #pragma once
 
 #include <daq/hbasf2/connections/ZMQHistogramConnection.h>
-#include <daq/hbasf2/utils/HistoTree.h>
+#include <daq/hbasf2/utils/HistogramMapping.h>
 
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
 
@@ -69,7 +69,7 @@ namespace Belle2 {
     unsigned int m_maximalUncompressedBufferSize;
 
     /// The stored histograms for each sender identity
-    std::map<std::string, HistogramTree> m_storedMessages;
+    std::map<std::string, HistogramMapping> m_storedMessages;
     /// The buffer used during decompression
     std::vector<char> m_uncompressedBuffer;
 

@@ -43,10 +43,6 @@ namespace Belle2 {
         B2ERROR("TOPAsicShiftsBS13dAlgorithm: histogram 'time_reference' is empty");
         return c_NotEnoughData;
       }
-      m_timeReference.clear();
-      for (int i = 0; i < timeReference->GetNbinsX(); i++) {
-        m_timeReference.push_back(timeReference->GetBinContent(i + 1));
-      }
 
       std::vector<std::shared_ptr<TH1F> > timeCarriers;
       for (unsigned i = 0; i < 4; i++) {
@@ -58,6 +54,13 @@ namespace Belle2 {
         }
         timeCarriers.push_back(h);
       }
+
+      // set time reference distribution
+      m_timeReference.clear();
+      for (int i = 0; i < timeReference->GetNbinsX(); i++) {
+        m_timeReference.push_back(timeReference->GetBinContent(i + 1));
+      }
+      setWindow();
 
       // construct file name, open output root file and book output histograms
 
@@ -182,10 +185,33 @@ namespace Belle2 {
     }
 
 
-    double TOPAsicShiftsBS13dAlgorithm::fun(int x)
+    void TOPAsicShiftsBS13dAlgorithm::setWindow()
     {
       int nx = m_timeReference.size();
-      if (x < 0 or x >= nx) return m_minVal;
+      m_i0 = 0;
+      m_i1 = nx - 1;
+      if (m_winSize > nx or m_winSize < 1) return;
+
+      double s = 0;
+      for (int i = 0; i < m_winSize; i++) s += m_timeReference[i];
+
+      double s_max = s;
+      int i0 = 0;
+      for (int i = 0; i < nx - m_winSize; i++) {
+        s += m_timeReference[i + m_winSize] - m_timeReference[i];
+        if (s > s_max) {
+          s_max = s;
+          i0 = i + 1;
+        }
+      }
+      m_i0 = i0;
+      m_i1 = i0 + m_winSize - 1;
+    }
+
+
+    double TOPAsicShiftsBS13dAlgorithm::fun(int x)
+    {
+      x = std::min(std::max(x, m_i0), m_i1);
       return std::max(m_timeReference[x], m_minVal);
     }
 

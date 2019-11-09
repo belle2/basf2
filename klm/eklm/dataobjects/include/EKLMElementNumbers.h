@@ -24,6 +24,19 @@ namespace Belle2 {
   public:
 
     /**
+     * Constants for section numbers.
+     */
+    enum Section {
+
+      /** Backward. */
+      c_BackwardSection = 1,
+
+      /** Forward. */
+      c_ForwardSection = 2,
+
+    };
+
+    /**
      * Constructor.
      */
     EKLMElementNumbers();
@@ -221,10 +234,34 @@ namespace Belle2 {
       int* strip) const;
 
     /**
-     * Strip local number (in a plane).
-     * @param[in] strip Global strip number.
+     * Get section number by global strip number.
+     * @param[in] stripGlobal Global strip number.
      */
-    int stripLocalNumber(int strip) const;
+    int getSectionByGlobalStrip(int stripGlobal);
+
+    /**
+     * Get layer number by global strip number.
+     * @param[in] stripGlobal Global strip number.
+     */
+    int getLayerByGlobalStrip(int stripGlobal);
+
+    /**
+     * Get sector number by global strip number.
+     * @param[in] stripGlobal Global strip number.
+     */
+    int getSectorByGlobalStrip(int stripGlobal);
+
+    /**
+     * Get plane number by global strip number.
+     * @param[in] stripGlobal Global strip number.
+     */
+    int getPlaneByGlobalStrip(int stripGlobal);
+
+    /**
+     * Get strip number by global strip number.
+     * @param[in] stripGlobal Global strip number.
+     */
+    int getStripByGlobalStrip(int stripGlobal);
 
     /**
      * Get software strip number by firmware strip number.

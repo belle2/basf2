@@ -77,7 +77,7 @@ int BKLMElementNumbers::layerGlobalNumber(int section, int sector, int layer)
   checkSection(section);
   checkSector(sector);
   checkLayer(layer);
-  int layerGlobal = layer - 1;
+  int layerGlobal = layer;
   layerGlobal += (sector - 1) * m_MaximalLayerNumber;
   layerGlobal += section * m_MaximalSectorNumber * m_MaximalLayerNumber;
   return layerGlobal;
@@ -91,7 +91,8 @@ int BKLMElementNumbers::getNStrips(
   checkLayer(layer);
   checkPlane(plane);
   int strips = 0;
-  if (section == BKLMElementNumbers::c_BackwardSection && sector == BKLMElementNumbers::c_ChimneySector &&
+  if (section == BKLMElementNumbers::c_BackwardSection &&
+      sector == BKLMElementNumbers::c_ChimneySector &&
       plane == BKLMElementNumbers::c_ZPlane) {
     /* Chimney sector. */
     if (layer < 3)

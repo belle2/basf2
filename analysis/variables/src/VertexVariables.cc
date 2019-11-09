@@ -291,7 +291,7 @@ namespace Belle2 {
                                                          beamSpotDB->getCovVertex());
       auto denominator = vertex * (vertexErr * vertex);
       if (denominator <= 0) {
-        return -999;
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return vertex.Mag2() / std::sqrt(denominator);
     }
@@ -303,7 +303,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("prodVertX")) {
         return part->getExtraInfo("prodVertX");
       }
-      return -999;
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     double particleProductionY(const Particle* part)
@@ -311,7 +311,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("prodVertY")) {
         return part->getExtraInfo("prodVertY");
       }
-      return -999;
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     double particleProductionZ(const Particle* part)
@@ -319,7 +319,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("prodVertZ")) {
         return part->getExtraInfo("prodVertZ");
       }
-      return -999;
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     // Production vertex covariance matrix
@@ -344,7 +344,7 @@ namespace Belle2 {
           {
             return part->getExtraInfo(prodVertS);
           }
-          return -999;
+          return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
       }
@@ -357,7 +357,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("prodVertSxx")) {
         return std::sqrt(part->getExtraInfo("prodVertSxx"));
       }
-      return -999;
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     double particleProductionYErr(const Particle* part)
@@ -365,7 +365,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("prodVertSyy")) {
         return std::sqrt(part->getExtraInfo("prodVertSyy"));
       }
-      return -999;
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     double particleProductionZErr(const Particle* part)
@@ -373,7 +373,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("prodVertSzz")) {
         return std::sqrt(part->getExtraInfo("prodVertSzz"));
       }
-      return -999;
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     VARIABLE_GROUP("Vertex Information");

@@ -4,11 +4,25 @@ Changes in the analysis package
 Variables
 +++++++++
 
- * Renamed some `RestOfEvent` variables for consistency accross the `VariableManager`.
+ * Renamed some `RestOfEvent` variables for consistency across the `VariableManager`.
    Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.
    For example ``ROE_deltae`` is now :b2:var:`roeDeltae`.
 
+ * Fixed bug and renamed ``mcFlavorOfOtherB0`` variable to :b2:var:`mcFlavorOfOtherB`, which accepts now neutral and charged B candidates.
+
  * Removed ``clusterCRID`` which duplicates :b2:var:`clusterConnectedRegionID`.
+ * Fixed ``goodBelleLambda`` and now it returns ``extraInfo(goodLambda)`` on Belle data.
+ * Fixed calculation of :b2:var:`cosHelicityAngleMomentum` for decays with bremscorrected electrons
+ * Fixed :b2:var:`clusterEoP` for particles with Bremsstrahlung correction by adding the energy of the added photon(s)
+
+  .. note:: All variables will return a quietNaN instead of -999 or other out-of-the-sky numbers in case of errors
+
+ * Added :b2:var:`isSignalAcceptBremsPhotons` to ignore any reconstructed brems photons.
+
+  .. note:: This is not the generator-level match (see :issue:`BII-5741`) but simply ignores photons added by the :b2:mod:`BremsFinder`.
+
+ * Allow use of meta variables in creation of aliases by replacing non
+   alphanumeric characters with underscores in the alias name
 
  * Modified :b2:var:`daughterAngleInBetween` to accept generalized variable indeces instead of simple indeces. A 
    generalized index is a column-separated string of daughter indexes belonging to different generations, 
@@ -23,15 +37,37 @@ Variables
 Modules
 +++++++
 
+ * When merging ParticleLists using the :b2:mod:`ParticleListManipulator`
+   (`modularAnalysis.copyLists`) duplicates (not multiple candidates) are removed
+   on a first-come, first-served basis, i.e. the order of the input particles
+   matters. Now, the new parameter ``variable`` can be provided to determine
+   which duplicate should be preferred. The logic is the same as for the
+   :b2:mod:`BestCandidateSelection` module.
  * The :b2:mod:`ParticleLoader` can create neutron particle lists now. ECL
    cluster with the hadron hypothesis as well as KLM cluster are used as source.
  * In :b2:mod:`TreeFitter` bugfix in mass constraint: chi2 correctly calculated now.
  * In :b2:mod:`TreeFitter` change of initialisation values increases performance in all fits with tracks.
  * In :b2:mod:`TreeFitter` max iterations set to 100, increases efficiency slightly in many cases.
+ * In :b2:mod:`TreeFitter` fixed a bug in life time calculation. A constant in the jacobian was missing. As a result propagated error was slightly overestimated.
  * Fix to nested RestOfEvent objects (see :issue:`BII-5649`)
  * Removed module ``CreateBsigFromFullRecoBtag``
+ * In BtubeCreator module, functionality to associate Btube to user's chosen B is added.
+ * Deprecated module `FSRCorrection` in favour of `BremsFinder` and `BelleBremRecovery`.
+ * In `ChargedPidMVA` module, remove handling of particle list modified by the deprecated `FSRCorrection` module.
+ * In `ChargedPidMVA` module, apply MVA category cuts retrieved from the DB payload.
+ * Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`. One can find and create a ``ParticleList`` for all ``MCParticle`` decays matching a given :ref:`DecayString`.
 
-Variables
-+++++++++
+ * Added a :b2:mod:`BremsFinder` to unpack the bremsstrahlung relations provided by tracking.
+
+  .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
+
+Conditions DB
++++++++++++++
+
+ * In ``ChargedPidMVAWeights`` payload class, added MVA category cut strings in basf2-compliant format.
+
+Full Event Interpretation
++++++++++++++++++++++++++
 
  * Fixed ``goodBelleLambda`` and now it returns ``extraInfo(goodLambda)`` on Belle data. 
+* Addition of hadronic FEI channels involving baryons. This includes the addition to default channels the following particles: p, Lambda_c+, Sigma+ and Lambda0. Baryonic modes must be switched on when calling particles = fei.get_default_channels(baryonic = True) using a flag (baryonic = True).

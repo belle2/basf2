@@ -108,6 +108,7 @@ namespace Belle2 {
        * set m_nActiveWireInTotal, m_nActiveWireInLayer[] and m_nActiveWireInSuperLayer[].
        * called in initialize function.
        */
+      void countActiveWires_countAll();
       void countActiveWires();
 
 

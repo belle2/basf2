@@ -19,6 +19,9 @@
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/dataobjects/WireID.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -78,13 +81,20 @@ namespace Belle2 {
         }
       }
 
+      CDC::CDCGeometryPar& geometryPar = CDC::CDCGeometryPar::Instance();
+
       ///// getter functions of CDCHit:
+      /////   unsigned short getID() /* encoded wire ID*/
       /////   unsigned short CDCHit::getICLayer() /* 0-55 */
       /////   unsigned short CDCHit::getISuperLayer() /* 0-8 */
       /////   short          CDCHit::getTDCCount()
       /////   unsigned short CDCHit::getADCCount() /* integrated charge over the cell */
       /////   unsigned short CDCHit::getTOT() /* time over threshold */
       for (CDCHit& hit : m_digits) {
+        const WireID wireID(hit.getID());
+        if (geometryPar.isBadWire(wireID))
+          continue;
+
         const int iLayer         = hit.getICLayer();
         const int iSuperLayer    = hit.getISuperLayer();
         //const unsigned short adc = hit.getADCCount();
@@ -116,16 +126,30 @@ namespace Belle2 {
 
       // optionally: convert to MHz, correct for the masked-out channels etc.
       ///// (# of hit in a event) / nActiveWire => occupancy in an event
-      m_rates.averageRate /= m_nActiveWireInTotal;
+      ///// Total occupancy
+      if (m_nActiveWireInTotal == 0) {
+        m_rates.averageRate = 0;
+      } else {
+        m_rates.averageRate /= m_nActiveWireInTotal;
+      }
+      ///// SuperLayer occupancy
       for (int iSL = 0 ; iSL < f_nSuperLayer ; ++iSL)
-        m_rates.superLayerHitRate[iSL] /= m_nActiveWireInSuperLayer[iSL];
+        if (m_nActiveWireInSuperLayer[iSL] == 0) {
+          m_rates.superLayerHitRate[iSL] = 0;
+        } else {
+          m_rates.superLayerHitRate[iSL] /= m_nActiveWireInSuperLayer[iSL];
+        }
+      ///// Layer occupancy
       for (int iLayer = 0 ; iLayer < f_nLayer ; ++iLayer)
-        m_rates.layerHitRate[iLayer] /= m_nActiveWireInLayer[iLayer];
-
+        if (m_nActiveWireInLayer[iLayer] == 0) {
+          m_rates.layerHitRate[iLayer] = 0;
+        } else {
+          m_rates.layerHitRate[iLayer] /= m_nActiveWireInLayer[iLayer];
+        }
     }
 
 
-    void CDCHitRateCounter::countActiveWires()
+    void CDCHitRateCounter::countActiveWires_countAll()
     {
       const int nlayer_in_SL[f_nSuperLayer] = { 8, 6, 6,
                                                 6, 6, 6,
@@ -147,6 +171,56 @@ namespace Belle2 {
           ++contLayerID;
         }
       }
+    }
+
+
+
+    void CDCHitRateCounter::countActiveWires()
+    {
+      const int nlayer_in_SL[f_nSuperLayer] = { 8, 6, 6,
+                                                6, 6, 6,
+                                                6, 6, 6
+                                              };
+      const int nwire_in_layer[f_nSuperLayer] = { 160, 160, 192,
+                                                  224, 256, 288,
+                                                  320, 352, 384
+                                                };
+
+      CDC::CDCGeometryPar& geometryPar = CDC::CDCGeometryPar::Instance();
+
+      m_nActiveWireInTotal = 0; ///// initialize
+      int contLayerID = 0;//// continuous layer numbering
+
+      for (int iSL = 0 ; iSL < f_nSuperLayer ; ++iSL) {
+        m_nActiveWireInSuperLayer[iSL] = 0; //// initialize
+        for (int iL = 0 ; iL < nlayer_in_SL[iSL] ; ++iL) { //// iL: layerID in SL
+          m_nActiveWireInLayer[contLayerID] = 0;//// initialize
+          for (int i = 0 ; i < nwire_in_layer[iSL] ; ++i) {
+            WireID wireID(iSL, iL, i);
+            if (not geometryPar.isBadWire(wireID))
+              ++m_nActiveWireInLayer[contLayerID];
+          }/// end i loop
+          m_nActiveWireInSuperLayer[iSL] += m_nActiveWireInLayer[contLayerID];
+          ++contLayerID;
+        }/// end iL loop
+        m_nActiveWireInTotal += m_nActiveWireInSuperLayer[iSL];
+      }/// end iSL loop
+
+
+      //B2INFO("CDC, # of Active wires / # of total wires");
+      std::cout << "CDC, # of Active wires / # of total wires" << std::endl;
+      int contLayerID_2 = 0;
+      for (int iSL = 0 ; iSL < f_nSuperLayer ; ++iSL) {
+        for (int iL = 0 ; iL < nlayer_in_SL[iSL] ; ++iL) {
+          //B2INFO("Layer "<< contLayerID_2 << ": "
+          std::cout << "Layer " << contLayerID_2 << ": "
+                    << m_nActiveWireInLayer[contLayerID_2] << " / "
+                    //<< nwire_in_layer[iSL] );
+                    << nwire_in_layer[iSL] << std::endl;
+          ++contLayerID_2;
+        }
+      }
+
     }
 
 

@@ -80,7 +80,7 @@ void DQMHistAnalysisTOPModule::initialize()
   m_line1->SetLineColor(kRed);
   m_line2->SetLineColor(kRed);
 
-  m_text1 = new TPaveText(2, 400, 10, 500, "NB");
+  m_text1 = new TPaveText(1, 435, 10, 500, "NB");
   m_text1->SetFillColorAlpha(kWhite, 0);
   m_text1->SetBorderSize(0);
 }

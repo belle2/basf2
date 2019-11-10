@@ -172,10 +172,10 @@ void DQMHistAnalysisTOPModule::event()
   }
   if (totalraw > 0) exRatio = totalbadraw * 1.0 / totalraw;
 
-  m_text1->clear();
+  m_text1->Clear();
   m_text1->AddText(Form("Ratio of entries outside of red lines: %.1f %%", exRatio * 100.0));
   if (exRatio > 0.01) {
-    TText* tbad = m_text1->AddText(">1% bad, report to TOP experts.");
+    TText* tbad = m_text1->AddText(">1% bad, report to TOP experts!");
     tbad->SetTextColor(kRed);
   } else {
     TText* tgood = m_text1->AddText("<0.1% good, 0.1-1% recoverable.");

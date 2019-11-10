@@ -175,11 +175,9 @@ void DQMHistAnalysisTOPModule::event()
   m_text1->Clear();
   m_text1->AddText(Form("Ratio of entries outside of red lines: %.1f %%", exRatio * 100.0));
   if (exRatio > 0.01) {
-    TText* tbad = m_text1->AddText(">1% bad, report to TOP experts!");
-    tbad->SetTextColor(kRed);
+    m_text1->AddText(">1% bad, report to TOP experts!");
   } else {
-    TText* tgood = m_text1->AddText("<0.1% good, 0.1-1% recoverable.");
-    tgood->SetTextColor(kBlack);
+    m_text1->AddText("<0.1% good, 0.1-1% recoverable.");
   }
 
   //addHist("", m_h_goodHitsMean->GetName(), m_h_goodHitsMean);
@@ -196,6 +194,7 @@ void DQMHistAnalysisTOPModule::event()
   TCanvas* c2 = find_canvas("TOP/c_window_vs_slot");
   if (c2 != NULL) {
     c2->cd();
+    if (exRatio > 0.01) c2->Pad()->SetFillColor(kRed);
     m_line1->Draw();
     m_line2->Draw();
     m_text1->Draw();

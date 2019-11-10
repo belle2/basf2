@@ -193,6 +193,9 @@ void DQMHistAnalysisTOPModule::event()
   TCanvas* c2 = find_canvas("TOP/c_window_vs_slot");
   if (c2 != NULL) {
     c2->cd();
+    if (exRatio > 0.01) {
+      c2->Pad()->SetFillColor(kYellow);
+    }
     m_line1->Draw();
     m_line2->Draw();
     m_text1->Draw();

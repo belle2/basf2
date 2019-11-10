@@ -80,11 +80,9 @@ void DQMHistAnalysisTOPModule::initialize()
   m_line1->SetLineColor(kRed);
   m_line2->SetLineColor(kRed);
 
-  m_text1 = new TPaveText(2, 400, 8, 500, "NB");
+  m_text1 = new TPaveText(2, 400, 10, 500, "NB");
   m_text1->SetFillColorAlpha(kWhite, 0);
   m_text1->SetBorderSize(0);
-  m_text1->AddText("Less than 1%% is expected:");
-  m_text1->AddText("Ratio of entries outside of red lines");
 }
 
 
@@ -173,8 +171,13 @@ void DQMHistAnalysisTOPModule::event()
     }
   }
   if (totalraw > 0) exRatio = totalbadraw * 1.0 / totalraw;
-  TString Par1V = Form("%.1f %%", exRatio * 100.0);
-  m_text1->AddText(Par1V);
+  m_text1->AddText("Ratio of entries outside of red lines: &.1f %%", exRatio * 100.0);
+  if (exRatio > 0.01) {
+    TText* tbad = m_text1->AddText(">1% not expected. Please report it.");
+    tbad->SetTextColor(kRed);
+  } else {
+    TText* tgood = m_text1->AddText("<1% as normal case. Not needed to report.");
+  }
 
   //addHist("", m_h_goodHitsMean->GetName(), m_h_goodHitsMean);
 

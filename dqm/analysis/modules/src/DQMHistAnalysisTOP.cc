@@ -195,6 +195,7 @@ void DQMHistAnalysisTOPModule::event()
   if (c2 != NULL) {
     c2->cd();
     if (exRatio > 0.01) c2->Pad()->SetFillColor(kRed);
+    else c2->Pad()->SetFillColor(kWhite);
     m_line1->Draw();
     m_line2->Draw();
     m_text1->Draw();

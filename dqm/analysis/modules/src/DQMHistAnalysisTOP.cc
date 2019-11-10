@@ -171,7 +171,7 @@ void DQMHistAnalysisTOPModule::event()
     }
   }
   if (totalraw > 0) exRatio = totalbadraw * 1.0 / totalraw;
-  m_text1->AddText("Ratio of entries outside of red lines: %.1f %%", exRatio * 100.0);
+  m_text1->AddText(Form("Ratio of entries outside of red lines: %.1f %%", exRatio * 100.0));
   if (exRatio > 0.01) {
     TText* tbad = m_text1->AddText(">1% not expected. Please report it.");
     tbad->SetTextColor(kRed);

@@ -24,11 +24,7 @@ input_branches = [
     'RawFTSWs',
     'RawPXDs',
     'RawSVDs',
-    'RawCDCs',
-    'RawTOPs',
-    'RawARICHs',
-    'RawECLs',
-    'RawKLMs']
+    'RawCDCs']
 
 
 def BeamSpotCalibration(files, tags):
@@ -42,16 +38,17 @@ def BeamSpotCalibration(files, tags):
 
     # Not needed for di-muon skim cdst or mdst, but needed to re-run reconstruction
     # with possibly changed global tags
-    raw.add_unpackers(path)
-    reco.add_reconstruction(path)
+    raw.add_unpackers(path, components=["PXD", "SVD", "CDC"])
+    reco.add_tracking_reconstruction(path)
 
-    mySelection = 'p>1.0'
-    mySelection += ' and abs(dz)<2.0 and dr<0.5'
-    ana.fillParticleList('mu+:DQM', mySelection, path=path)
-    ana.reconstructDecay('Upsilon(4S):IPDQM -> mu+:DQM mu-:DQM', '9.5<M<11.5', path=path)
-    vx.vertexKFit('Upsilon(4S):IPDQM', conf_level=0, path=path, silence_warning=True)
+    muSelection = 'p>1.0'
+    muSelection += ' and abs(dz)<2.0 and dr<0.5'
+    muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
+    ana.fillParticleList('mu+:BS', muSelection, path=path)
+    ana.reconstructDecay('Upsilon(4S):BS -> mu+:BS mu-:BS', '9.5<M<11.5', path=path)
+    vx.vertexKFit('Upsilon(4S):BS', conf_level=0, path=path)
 
-    collector = register_module('BeamSpotCollector', Y4SPListName='Upsilon(4S):IPDQM')
+    collector = register_module('BeamSpotCollector', Y4SPListName='Upsilon(4S):BS')
     algorithm = BeamSpotAlgorithm()
 
     calibration = Calibration('BeamSpot',
@@ -79,7 +76,7 @@ if __name__ == "__main__":
         print("See: basf2 -h")
         sys.exit(1)
 
-    beamspot = BeamSpotCalibration(input_files, ['data_reprocessing_proc9'])
+    beamspot = BeamSpotCalibration(input_files, ['data_reprocessing_prompt_rel4_patchb', 'data_reprocessing_proc10'])
     # beamspot.max_iterations = 0
 
     cal_fw = CAF()

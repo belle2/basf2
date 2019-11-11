@@ -166,7 +166,7 @@ void BeamSpotCollectorModule::collect()
 
   if (Y4SParticles.isValid() && abs(Y4SParticles->getPDGCode()) == 300553) {
 
-    if (Y4SParticles.getListSize() > 1)
+    if (Y4SParticles->getListSize() > 1)
       return;
 
     for (unsigned int i = 0; i < Y4SParticles->getListSize(); i++) {

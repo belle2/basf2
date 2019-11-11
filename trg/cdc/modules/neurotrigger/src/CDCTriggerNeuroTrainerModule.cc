@@ -137,7 +137,7 @@ CDCTriggerNeuroTrainerModule::CDCTriggerNeuroTrainerModule() : Module()
            "Maximal drift time (for scaling, unit: trigger timing bins).", m_parameters.tMax);
   addParam("et_option", m_parameters.et_option,
            "option on how to obtain the event time. Possibilities are: "
-           "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', 'etf_or_zero'.",
+           "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', 'etf_or_zero', 'etf_or_fastest2d', 'fastest2d'.",
            m_parameters.et_option);
   addParam("T0fromHits", m_parameters.T0fromHits,
            "Deprecated, kept for backward compatibility. If true, the event time is "

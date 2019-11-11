@@ -4,21 +4,8 @@
 """
 Script to get the integrated luminosity of a set of runs
 
-Based on a bash script by Mikhail Remnev mikhail.remnev@desy.de
-https://confluence.desy.de/display/BI/ECL+LM+Integrated+luminosity+in+Phase+3
-
 Usage:
     b2info-luminosity --exp <E> --runs <Range> --what [online|offline] --plot [DAY|WEEK|RUN] [--verbose]
-
-<E> experiment number (mandatory) A range is allowed
-<Range> run range (mandatory)
-    syntax is: xx-yy,zz
-    all runs between xx and yy (included) and run zz. Can have multiple ranges xx-yy,zz-ww
-    not allowed if exp has range as well
---what Use Offline (default) or Online luminosity
---plot Produce plot of integrated luminosity vs day (DAY) or vs week (WEEK) or vs run (RUN)
---verbose print lumi for each run
---dbon|offline path of database to use (for developers)
 
 """
 
@@ -69,7 +56,7 @@ def argparser():
     Parse options as command-line arguments.
     """
 
-    description = "Script to get the online integrated luminosity for a range or runs."
+    description = "Script to get the integrated luminosity."
 
     parser = argparse.ArgumentParser(description=description, usage=__doc__, add_help=True)
 
@@ -78,14 +65,14 @@ def argparser():
                         action="store",
                         type=parseNumList,
                         required=True,
-                        help="Experiment numbers")
+                        help="Experiment numbers (required). Range allowed: eg 3,7-10")
     parser.add_argument("--runs",
                         dest="runs",
                         action="store",
                         type=parseNumList,
                         required=False,
                         default=None,
-                        help="Process only the selected run range. Syntax is xx-yy,zz")
+                        help="Process only the selected run range. Syntax is xx-yy,zz. Multiple ranges allowed xx-yy,zz,aa-bb")
     parser.add_argument("--what",
                         dest="what",
                         action="store",
@@ -93,22 +80,22 @@ def argparser():
                         required=False,
                         default='offline',
                         choices=["offline","online"],
-                        help="Offline (default) or online luminosity")
+                        help="Which luminosity: offline (default) or online")
     parser.add_argument("--verbose",
                         dest="verb",
                         action="store_true",
                         default=False,
-                        help="Print each run luminosity")
+                        help="Print luminosity for each run")
     parser.add_argument("--dbonline",
                         dest="dbonlie",
                         action="store",
                         default="/gpfs/group/belle2/group/detector/ECL/ecl_lom.db",
-                        help="EC: DataBase path")
+                        help="ECL DataBase path (for developers)")
     parser.add_argument("--dboffline",
                         dest="dbofflie",
                         action="store",
                         default="/group/belle2/dataprod/Luminosity/OffLineLuminosity.db",
-                        help="DataBase path for OffLine Lumi")
+                        help="DataBase path for OffLine Lumi (for developers)")
 
     plot_actions = {
         "DAY"  : "Histogram of daily integrated luminosity",
@@ -323,7 +310,7 @@ class Luminosity:
         # create a reduced dataframe with only runs selected
         # these are the runs to be selected
         if (self.runs):
-            dfRuns=self.df[self.df['run'].isin(self.runs)]
+            dfRuns=self.df[self.df['run'].isin(self.runs)].copy()
             dfRuns['intLumi'] = dfRuns['lumi'].cumsum()
         else:
             dfRuns=self.df

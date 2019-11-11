@@ -172,10 +172,7 @@ namespace Belle2 {
     Manager::FunctionPtr CleoConesCS(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1 || arguments.size() == 2) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
 
-        // cppcheck-suppress variableScope
         int coneNumber = 0;
         try {
           coneNumber = Belle2::convertString<int>(arguments[0]);

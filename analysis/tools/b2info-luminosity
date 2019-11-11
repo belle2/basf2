@@ -121,6 +121,7 @@ def argparser():
     parser.add_argument("--plot",
                         dest="plot",
                         action="store",
+                        nargs='+',
                         choices=list(plot_actions.keys()),
                         default=None,
                         help="Produce plot of integrated luminosity for each run, day, or week")
@@ -407,9 +408,9 @@ if __name__ == '__main__':
     lumi.printLumi()
 
     if args.plot:
-        if args.plot == 'DAY':
+        if 'DAY' in args.plot:
             lumi.plotLumiPerPeriod(1)
-        if args.plot == 'WEEK':
+        if 'WEEK' in args.plot:
             lumi.plotLumiPerPeriod(2)
-        if args.plot == 'RUN':
+        if 'RUN' in args.plot:
             lumi.plotLumiPerRun()

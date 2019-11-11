@@ -295,13 +295,13 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
       else if (mcDaughter == mcParticle) {
         daughterStatus |= getMCErrors(daughter) & (~c_MisID);
       }
-      //If it has, check if the MC particle is (n*grand)-daughter of the particle mother. If it isn't, we'll add the error flag and stop the propagation of c_MisID
+      //If it has, check if the MC particle is (n*grand)-daughter of the particle mother. If it isn't, we'll add the error flag
       else if (std::find(genParts.begin(), genParts.end(), mcDaughter) == genParts.end()) {
-        daughterStatus |= getMCErrors(daughter) & (~c_MisID);
+        daughterStatus |= getMCErrors(daughter);
         daughterStatus |= c_AddedRecoBremsPhoton;
-        //If it is, just perform the normal matching without error flags of any type and stop the propagation of c_MisID
+        //If it is, just perform the normal matching without error flags of any type
       } else {
-        daughterStatus |= getMCErrors(daughter) & (~c_MisID);
+        daughterStatus |= getMCErrors(daughter);
       }
     } else daughterStatus |= getMCErrors(daughter);
   }

@@ -199,7 +199,7 @@ namespace Belle2 {
      * If two indices given: returns the angle between the momenta of the two given daughters.
      * If three indices given: Variable returns the angle between the momentum of the third particle and a vector
      * which is the sum of the first two daughter momenta.
-     * The arguments in the argument vector must be generalized daughter indeces.
+     * The arguments in the argument vector must be generalized daughter indices.
      */
     Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments);
 
@@ -406,7 +406,7 @@ namespace Belle2 {
 
     /**
     * Returns a function which returns the value of a variable obtained combining an arbitrary subset of particles in the decay tree, passed as
-    * generalized indeces. daughterCombination(M, 0, 3, 4) will return the invariant mass of the system made of the first, fourth and
+    * generalized indices. daughterCombination(M, 0, 3, 4) will return the invariant mass of the system made of the first, fourth and
     * fifth daugther of a particle.
     */
     Manager::FunctionPtr daughterCombination(const std::vector<std::string>& arguments);

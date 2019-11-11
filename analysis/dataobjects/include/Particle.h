@@ -814,7 +814,7 @@ namespace Belle2 {
 
     /**
     * Explores the decay tree of the particle and returns the (grand^n)daughter identified by a generalized index.
-    * The generalized index consists in a column-separated list of daughter indexes, starting from the root particle:
+    * The generalized index consists of a colon-separated list of daughter indexes, starting from the root particle:
     * 0:1:3 identifies the fourth daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle.
     * @param generalizedIndex the generalized index of the particle to be returned
     * @return a particle in the decay tree of the root particle.

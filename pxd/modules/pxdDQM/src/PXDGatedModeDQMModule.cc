@@ -41,8 +41,9 @@ void PXDGatedModeDQMModule::defineHisto()
   oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
   oldDir->cd(m_histogramDirectoryName.c_str());//changing to the right directory
 
-  hBunchHER = new TH1F("hBunchHER", "Bunch HER", 4096, 0, 4095);
-  hBunchLER = new TH1F("hBunchLER", "Bunch LER", 4096, 0, 4095);
+  hBunchInjHER = new TH1F("hBunchInjHER", "Last Inj Bunch HER", 4096, 0, 4095);
+  hBunchInjLER = new TH1F("hBunchInjLER", "Last Inj Bunch LER", 4096, 0, 4095);
+  hBunchTrg = new TH1F("hBunchTrg", "Triggered Bunch", 4096, 0, 4095);
 
 
   std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
@@ -64,6 +65,15 @@ void PXDGatedModeDQMModule::defineHisto()
           Form("PXDGatedModeMapCutLER %d ", rgate) + buff + ";U;V", 25, 0, 250, 192, 0, 768);
       hGatedModeMapCutHER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapCutHER_%d_", rgate) + bufful,
           Form("PXDGatedModeMapCutHER %d ", rgate) + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+
+      hGatedModeMapADCLER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapADCLER_%d_", rgate) + bufful,
+          Form("PXDGatedModeMapADCLER %d ", rgate) + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+      hGatedModeMapADCHER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapADCHER_%d_", rgate) + bufful,
+          Form("PXDGatedModeMapADCHER %d ", rgate) + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+      hGatedModeMapCutADCLER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapCutADCLER_%d_", rgate) + bufful,
+          Form("PXDGatedModeMapCutADCLER %d ", rgate) + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+      hGatedModeMapCutADCHER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapCutADCHER_%d_", rgate) + bufful,
+          Form("PXDGatedModeMapCutADCHER %d ", rgate) + buff + ";U;V", 25, 0, 250, 192, 0, 768);
     }
     hGatedModeProjLER[avxdid] = new TH2F("PXDGatedModeProjLER_" + bufful,
                                          "PXDGatedModeProjLER " + buff + ";Gate;V", 96, 0, 96, 192, 0, 768);
@@ -78,6 +88,20 @@ void PXDGatedModeDQMModule::defineHisto()
                                            "PXDGatedModeMapAddLER " + buff + ";U;V", 25, 0, 250, 192, 0, 768);
     hGatedModeMapAddHER[avxdid] = new TH2F("PXDGatedModeMapAddHER_" + bufful,
                                            "PXDGatedModeMapAddHER " + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+
+    hGatedModeProjADCLER[avxdid] = new TH2F("PXDGatedModeProjADCLER_" + bufful,
+                                            "PXDGatedModeProjADCLER " + buff + ";Gate;V", 96, 0, 96, 192, 0, 768);
+    hGatedModeProjADCHER[avxdid] = new TH2F("PXDGatedModeProjADCHER_" + bufful,
+                                            "PXDGatedModeProjADCHER " + buff + ";Gate;V", 96, 0, 96, 192, 0, 768);
+
+    hGatedModeMapSubADCLER[avxdid] = new TH2F("PXDGatedModeMapSubADCLER_" + bufful,
+                                              "PXDGatedModeMapSubADCLER " + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+    hGatedModeMapSubADCHER[avxdid] = new TH2F("PXDGatedModeMapSubADCHER_" + bufful,
+                                              "PXDGatedModeMapSubADCHER " + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+    hGatedModeMapAddADCLER[avxdid] = new TH2F("PXDGatedModeMapAddADCLER_" + bufful,
+                                              "PXDGatedModeMapAddADCLER " + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+    hGatedModeMapAddADCHER[avxdid] = new TH2F("PXDGatedModeMapAddADCHER_" + bufful,
+                                              "PXDGatedModeMapAddADCHER " + buff + ";U;V", 25, 0, 250, 192, 0, 768);
 
   }
   // cd back to root directory
@@ -117,8 +141,9 @@ void PXDGatedModeDQMModule::event()
       if (bunch_inj < 0) bunch_inj += 1280;
       int rgate = bunch_inj / (1280. / 96.); // 0-96 ?
       if (diff2 > 100 && diff2 < 10000) { // 10ms  ... variable wie lange gegated wird
-        if (isher) hBunchHER->Fill(it.GetBunchNumber(0) & 0x7FF);
-        else hBunchLER->Fill(it.GetBunchNumber(0) & 0x7FF);
+        hBunchTrg->Fill(it.GetBunchNumber(0) & 0x7FF);
+        if (isher) hBunchInjHER->Fill(bunch_inj);
+        else hBunchInjLER->Fill(bunch_inj);
         for (auto& p : m_storeRawHits) {
           auto charge = p.getCharge();
           if (charge > 20) {
@@ -143,6 +168,22 @@ void PXDGatedModeDQMModule::event()
               if (h4) {
                 h4->Fill(p.getUCellID(), v2);
               }
+              auto h5 = hGatedModeMapADCHER[std::make_pair(p.getSensorID(), rgate)];
+              if (h5) {
+                h5->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
+              }
+              auto h6 = hGatedModeProjADCHER[p.getSensorID()];
+              if (h6) {
+                h6->Fill(rgate, p.getVCellID(), p.getCharge());
+              }
+              auto h7 = hGatedModeMapSubADCHER[p.getSensorID()];
+              if (h7) {
+                h7->Fill(p.getUCellID(), v, p.getCharge());
+              }
+              auto h8 = hGatedModeMapAddADCHER[p.getSensorID()];
+              if (h8) {
+                h8->Fill(p.getUCellID(), v2, p.getCharge());
+              }
             } else {
               auto h = hGatedModeMapLER[std::make_pair(p.getSensorID(), rgate)];
               if (h) {
@@ -160,6 +201,22 @@ void PXDGatedModeDQMModule::event()
               if (h4) {
                 h4->Fill(p.getUCellID(), v2);
               }
+              auto h5 = hGatedModeMapADCLER[std::make_pair(p.getSensorID(), rgate)];
+              if (h5) {
+                h5->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
+              }
+              auto h6 = hGatedModeProjADCLER[p.getSensorID()];
+              if (h6) {
+                h6->Fill(rgate, p.getVCellID(), p.getCharge());
+              }
+              auto h7 = hGatedModeMapSubADCLER[p.getSensorID()];
+              if (h7) {
+                h7->Fill(p.getUCellID(), v, p.getCharge());
+              }
+              auto h8 = hGatedModeMapAddADCLER[p.getSensorID()];
+              if (h8) {
+                h8->Fill(p.getUCellID(), v2, p.getCharge());
+              }
             }
           }
           if (charge > 30) {
@@ -169,10 +226,18 @@ void PXDGatedModeDQMModule::event()
               if (h) {
                 h->Fill(p.getUCellID(), p.getVCellID());
               }
+              auto h2 = hGatedModeMapCutADCHER[std::make_pair(p.getSensorID(), rgate)];
+              if (h2) {
+                h2->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
+              }
             } else {
               auto h = hGatedModeMapCutLER[std::make_pair(p.getSensorID(), rgate)];
               if (h) {
                 h->Fill(p.getUCellID(), p.getVCellID());
+              }
+              auto h2 = hGatedModeMapCutADCLER[std::make_pair(p.getSensorID(), rgate)];
+              if (h2) {
+                h2->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
               }
             }
           }
@@ -185,10 +250,18 @@ void PXDGatedModeDQMModule::event()
             if (h) {
               h->Fill(p.getUCellID(), p.getVCellID());
             }
+            auto h2 = hGatedModeMapADCHER[std::make_pair(p.getSensorID(), rgate)];
+            if (h2) {
+              h2->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
+            }
           } else {
             auto h = hGatedModeMapLER[std::make_pair(p.getSensorID(), rgate)];
             if (h) {
               h->Fill(p.getUCellID(), p.getVCellID());
+            }
+            auto h2 = hGatedModeMapADCLER[std::make_pair(p.getSensorID(), rgate)];
+            if (h2) {
+              h2->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
             }
           }
         }

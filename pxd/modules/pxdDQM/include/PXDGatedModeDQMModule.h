@@ -51,7 +51,12 @@ namespace Belle2 {
       VXD::GeoCache& m_vxdGeometry;
 
 
-      TH1F* hBunchLER, *hBunchHER;
+      /** Histo for last LER injected bunches */
+      TH1F* hBunchInjLER;
+      /** Histo for last HER injected bunches */
+      TH1F* hBunchInjHER;
+      /** Histo for triggered bunches */
+      TH1F* hBunchTrg;
 
       std::map<std::pair<VxdID, int>, TH2F*> hGatedModeMapLER; /**< Histogram Occupancy after LER injection */
       std::map<std::pair<VxdID, int>, TH2F*> hGatedModeMapHER; /**< Histogram Occupancy after HER injection */
@@ -67,6 +72,21 @@ namespace Belle2 {
 
       std::map<VxdID, TH2F*> hGatedModeProjLER; /**< Histogram Occupancy after LER injection */
       std::map<VxdID, TH2F*> hGatedModeProjHER; /**< Histogram Occupancy after HER injection */
+
+      std::map<std::pair<VxdID, int>, TH2F*> hGatedModeMapADCLER; /**< Histogram Occupancy after LER injection */
+      std::map<std::pair<VxdID, int>, TH2F*> hGatedModeMapADCHER; /**< Histogram Occupancy after HER injection */
+
+      std::map<std::pair<VxdID, int>, TH2F*> hGatedModeMapCutADCLER; /**< Histogram Occupancy after LER injection */
+      std::map<std::pair<VxdID, int>, TH2F*> hGatedModeMapCutADCHER; /**< Histogram Occupancy after HER injection */
+
+      std::map<VxdID, TH2F*> hGatedModeMapSubADCLER; /**< Histogram Occupancy after LER injection */
+      std::map<VxdID, TH2F*> hGatedModeMapSubADCHER; /**< Histogram Occupancy after HER injection */
+
+      std::map<VxdID, TH2F*> hGatedModeMapAddADCLER; /**< Histogram Occupancy after LER injection */
+      std::map<VxdID, TH2F*> hGatedModeMapAddADCHER; /**< Histogram Occupancy after HER injection */
+
+      std::map<VxdID, TH2F*> hGatedModeProjADCLER; /**< Histogram Occupancy after LER injection */
+      std::map<VxdID, TH2F*> hGatedModeProjADCHER; /**< Histogram Occupancy after HER injection */
 
       void initialize() override final; /**< initialize function */
 

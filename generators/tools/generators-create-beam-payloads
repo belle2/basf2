@@ -13,10 +13,15 @@ in addition choose a predefined preset (one of %s) and scale the beam energies
 to achieve a selected cms energy.
 """
 
-from basf2 import *
+import basf2
 import os
-from beamparameters import beamparameter_presets, add_beamparameters
+from beamparameters import beamparameter_presets, calculate_beamparameters
 import argparse
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+import ROOT
+from ROOT import Belle2
+import numpy as np
 
 
 def __parse_floatlist(string):
@@ -53,6 +58,12 @@ def __parse_iov(string):
         raise argparse.ArgumentTypeError("first run cannot be larger than final run")
     return iov
 
+def __vec(values):
+    vec = ROOT.std.vector("double")()
+    for v in values:
+        vec.push_back(v)
+    return vec
+
 
 if __name__ == "__main__":
     #: command line parser
@@ -62,13 +73,6 @@ if __name__ == "__main__":
         "for true and [0, false, off, no] for false. list(float) should be a "
         "comma separated list of values"
     )
-    parser.add_argument("dbfile", nargs="?", metavar="DATABASEFILE",
-                        default="localdb/database.txt",
-                        help="Database file containing local list of iovs "
-                        "(default: %(default)s)")
-    parser.add_argument("dbdir", nargs="?", metavar="DATABASEDIR",
-                        help="Directory for the payloads. Defaults to the "
-                        "directory of the database file")
     parser.add_argument("--preset", default="Y4S", metavar="PRESET",
                         choices=sorted(beamparameter_presets.keys()),
                         help="Name of the preset to use (default: %(default)s)")
@@ -86,12 +90,17 @@ if __name__ == "__main__":
                         "Example: --iov=0,0,1,12 will create a payload valid "
                         "from experiment 0, run 0 up to and including experiment "
                         "1, run 12.")
+    parser.add_argument("--tries", type=int, default=0,
+                        help="If a non-negative number indicates the amount of "
+                        "generated collisions to estimate errors")
 
     #: temporary BeamParameters module to get list of parameters
-    bp = register_module("BeamParameters")
+    bp = basf2.register_module("BeamParameters")
+    values = {}
     for param in bp.available_params():
         if param.name in ["payloadIov", "createPayload"]:
             continue
+        values[param.name] = param.default
         #: argument type conversion to parse them correctly
         argument_type = {"float": float, "int": int, "bool": __parse_bool,
                          "list(float)": __parse_floatlist}[param.type]
@@ -102,28 +111,82 @@ if __name__ == "__main__":
     #: command line arguments
     arguments = parser.parse_args()
 
-    # make sure directory is set
-    if arguments.dbdir is None:
-        arguments.dbdir = os.path.dirname(arguments.dbfile)
-
-    # set database to local with the correct arguments
-    reset_database()
-    use_local_database(arguments.dbfile, arguments.dbdir, False)
-    #: processing path
-    main = create_path()
-    # add processing of one event
-    main.add_module("EventInfoSetter")
-    # add the beamparameters module and tell it to create an iov
-    bpmodule = add_beamparameters(main, arguments.preset, arguments.cms,
-                                  createPayload=True, payloadIov=arguments.iov)
+    #: calculate beam parameter values from arguments
+    values.update(calculate_beamparameters(arguments.preset, arguments.cms))
 
     # now loop over all the arguments and pass the ones starting with param_
     # directly to the Beamparameters if they are set
     for arg, value in arguments.__dict__.items():
         if arg.startswith("param_") and value is not None:
-            bpmodule.param(arg[6:], value)
+           values[arg[6:]] = value
 
-    # make the framework shut up
-    set_log_level(LogLevel.ERROR)
-    # and process the one event
-    process(main)
+    #: Beamparameter object we want
+    beamparams = Belle2.BeamParameters()
+    beamparams.setHER(values['energyHER'], values['angleHER'], __vec(values['covHER']))
+    beamparams.setLER(values['energyLER'], values['angleLER'], __vec(values['covLER']))
+    beamparams.setVertex(ROOT.TVector3(*values['vertex']), __vec(values['covVertex']))
+    flags = 0
+    if values['generateCMS']:
+        flags |= Belle2.BeamParameters.c_generateCMS
+    if values['smearDirection']:
+        flags |= Belle2.BeamParameters.c_smearBeamDirection
+    if values['smearEnergy']:
+        flags |= Belle2.BeamParameters.c_smearBeamEnergy
+    if values['smearVertex']:
+        flags |= Belle2.BeamParameters.c_smearVertex
+    beamparams.setGenerationFlags(flags)
+
+    # do we want to estimate uncertainties from smearing?
+    if arguments.tries >  0:
+        # then we need the intial particle generator
+        ROOT.gInterpreter.Declare("#include <generators/utilities/InitialParticleGeneration.h>")
+        Belle2.DBStore.Instance().addConstantOverride("BeamParameters", beamparams)
+        gen = Belle2.InitialParticleGeneration(Belle2.BeamParameters.c_smearALL)
+        gen.initialize()
+        # and do some trials
+        e_cms = []
+        boosts = []
+        for i in range(arguments.tries):
+            evt = gen.generate()
+            e_cms.append(evt.getMass())
+            cms = evt.getLER() + evt.getHER()
+            boosts.append(list(cms.BoostVector()))
+
+        e_cms = np.array(e_cms)
+        energy_mean = e_cms.mean()
+        energy_spread = e_cms.std()
+        energy_error = energy_spread/len(e_cms)**.5
+
+        boosts = np.array(boosts)
+        boost_mean = boosts.mean(axis=0)
+        cov = np.cov(boosts.T)
+        boost_cov = ROOT.TMatrixDSym(3)
+        for i in range(3):
+            for j in range(3):
+                boost_cov[i][j] = cov[i][j]
+    else:
+        # otherwise just take zero for the errors
+        cms = beamparams.getLER() + beamparams.getHER()
+        energy_mean = cms.M()
+        energy_spread = 0
+        energy_error = 0
+        boost_mean = list(cms.BoostVector())
+        boost_cov = ROOT.TMatrixDSym(3)
+
+    #: beamspot object
+    beamspot = Belle2.BeamSpot()
+    beamspot.setIP(beamparams.getVertex(), beamparams.getCovVertex())
+
+    #: invariant mass object
+    invmass = Belle2.CollisionInvariantMass()
+    invmass.setMass(energy_mean, energy_error, energy_spread)
+    #: boost object
+    boost = Belle2.CollisionBoostVector()
+    boost.setBoost(ROOT.TVector3(*boost_mean), boost_cov)
+
+    # save them all ...
+    database = Belle2.Database.Instance()
+    iov = Belle2.IntervalOfValidity(*arguments.iov)
+    for obj in beamparams, beamspot, invmass, boost:
+        name = obj.ClassName()[8:]
+        database.storeData(name, obj, iov)

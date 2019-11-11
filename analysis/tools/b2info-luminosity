@@ -113,8 +113,8 @@ def argparser():
                         help="DataBase path for OffLine Lumi")
 
     plot_actions = {
-        "DAY"  : "Histogram of integrated luminosity per day",
-        "WEEK" : "Histogram of integrated luminosity per week",
+        "DAY"  : "Histogram of daily integrated luminosity",
+        "WEEK" : "Histogram of weekly integrated luminosity",
         "RUN"  : "Histogram of integrated luminosity per run",
         }
 
@@ -253,14 +253,14 @@ class Luminosity:
         # Group runs by date, and store the int lumi per date as the max cumulative lumi.
         # This returns a pandas.Series object.
         srs_lumi_date = []
-        if period==1: # per day
+        if period==1: # daily
             srs_lumi_date = self.df.groupby(self.df["date"].dt.floor('d'))["lumi"].sum()
-            label="Day"
+            label="Daily"
             freq='D'
             width=1.0
-        if period==2: # per week
+        if period==2: # weekly
             srs_lumi_date = self.df.groupby(self.df["date"].dt.floor('7d'))["lumi"].sum()
-            label="Week"
+            label="Weekly"
             freq='7d'
             width=3.5
     
@@ -274,10 +274,10 @@ class Luminosity:
         # there must be a cleaner way to do this
         yInt = np.append(np.array([0]), np.cumsum(srs_lumi_date.values)[:-1])
         
-        ax1.bar(x, y, label=f"{label} per {label}", color="blue", width=width)
+        ax1.bar(x, y, label=f"{label}", color="blue", width=width)
 
         ax1.set_xlabel(r"Date")
-        ax1.set_ylabel(rf"Total integrated luminosity per {label} [$\mathrm{{fb}}^{{-1}}$]", color="blue")
+        ax1.set_ylabel(rf"Total integrated {label} luminosity [$\mathrm{{fb}}^{{-1}}$]", color="blue")
         ax1.tick_params(axis='y', labelcolor="blue")
 
         if period==1:
@@ -309,7 +309,7 @@ class Luminosity:
         plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
         plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
-        filename=f"Lumi{self.what.title()}Per{label}_Exp{self.expstr}"
+        filename=f"Lumi{self.what.title()}_{label}_Exp{self.expstr}"
         if self.runs:
             filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
         print(f"Creating {filename}.pdf|png files")
@@ -333,7 +333,7 @@ class Luminosity:
 
         ax1.bar(dfRuns['run'], dfRuns['lumi'], label=f"Run by run", color="blue", width=1.0)
         ax1.set_xlabel(r"Run")
-        ax1.set_ylabel(rf"Total integrated luminosity per Run [$\mathrm{{fb}}^{{-1}}$]", color="blue")
+        ax1.set_ylabel(rf"Total integrated luminosity by run [$\mathrm{{fb}}^{{-1}}$]", color="blue")
         ax1.tick_params(axis='y', labelcolor="blue")
         ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
         ax1.set_xlim(left=dfRuns['run'].min())

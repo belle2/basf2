@@ -12,16 +12,18 @@ __email__ = "philip.grace@adelaide.edu.au, rachac@mail.ubc.ca"
 import argparse
 from functools import lru_cache
 import json
-from os.path import getsize
 import pandas as pd
+from pathlib import Path
 import re
 from textwrap import wrap
 
 from tabulate import tabulate
 
-
+from basf2 import find_file
 from skimExpertFunctions import get_test_file, get_eventN, get_total_infiles
 
+
+statsDirectory = find_file('skim/tools/stats')
 
 skims = [
     'LeptonicUntagged',
@@ -119,6 +121,27 @@ def nTotalEvents(sampleLabel):
     return nEventsPerFile(sampleLabel)*nTotalFiles(sampleLabel)
 
 
+def getSkimStatsDict(skims, sampleLabels, statistics):
+    allSkimStats = {skim: {stat: {} for stat in statistics.keys()} for skim in skims}
+
+    for skim in skims:
+        for sampleLabel in sampleLabels:
+            logFileName = Path(statsDirectory, 'log', f'{skim}_{sampleLabel}.out')
+            with open(logFileName) as logFile:
+                logContents = logFile.read()
+
+            jsonFileName = Path(statsDirectory, 'log', f'JobInformation_{skim}_{sampleLabel}.json')
+            with open(jsonFileName) as jsonFile:
+                jsonContents = json.load(jsonFile)
+
+            for statName, statInfo in statistics.items():
+                statFunction = statInfo['Calculate']
+
+                allSkimStats[skim][statName][sampleLabel] = statFunction(jsonContents, logContents, sampleLabel)
+
+    return allSkimStats
+
+
 def mcWeightedAverage(statsPerSample):
     totalCrossSection = sum(mcSampleCrossSections.values())
 
@@ -129,6 +152,18 @@ def mcWeightedAverage(statsPerSample):
             weightedAverage += statsPerSample[sampleLabel]*beamBackgroundWeight*crossSection/totalCrossSection
 
     return weightedAverage
+
+
+def addCombinedMC(allSkimStats, statistics):
+    for skimStats in allSkimStats.values():
+        for statName, statInfo in statistics.items():
+            try:
+                combiningFunction = statInfo['Combine']
+                skimStats[statName]['Combined MC'] = combiningFunction(skimStats[statName])
+            except TypeError:
+                skimStats[statName]['Combined MC'] = None
+
+    return allSkimStats
 
 statistics = {
     'RetentionRate': {
@@ -210,7 +245,7 @@ statistics = {
         'Combine': lambda statDict: sum(statDict.values())
     },
     'logSizePerEntireSample': {
-        'LongName': 'Estimated log size for entire sample (GB)}',
+        'LongName': 'Estimated log size for entire sample (GB)',
         'floatfmt': '.2f',
         'Calculate': lambda json, log, sample: logSize(log) * nTotalEvents(sample) / nInputEvents(json) / 1024 / 1024,
         'Combine': lambda statDict: sum(statDict.values())
@@ -219,7 +254,8 @@ statistics = {
 
 
 def toJson(allSkimStats):
-    with open('skimStats.json', 'w') as outputJson:
+    outputJsonName = Path(statsDirectory, 'skimStats.json')
+    with open(outputJsonName, 'w') as outputJson:
         json.dump(allSkimStats, outputJson, indent=4)
 
 
@@ -260,7 +296,9 @@ def toConfluence(allSkimStats):
         confluenceStrings += [table]
 
     confluenceString = '\n'.join(confluenceStrings)
-    with open('skimStats_confluence.txt', 'w') as confluenceFile:
+
+    confluenceFileName = Path(statsDirectory, 'skimStats_confluence.txt')
+    with open(confluenceFileName, 'w') as confluenceFile:
         confluenceFile.write(confluenceString)
 
 if __name__ == '__main__':
@@ -273,33 +311,11 @@ if __name__ == '__main__':
                         help='Provide this flag if running the combined skims.')
     args = parser.parse_args()
 
-    # TODO: put into function getSkimStats(skims) which returns a dict
-    allSkimStats = {skim: {stat: {} for stat in statistics.keys()} for skim in skims}
-
-    for skim in skims:
-        for sampleLabel in sampleLabels:
-            logFileName = f'log/{skim}_{sampleLabel}.out'
-            with open(logFileName) as logFile:
-                logContents = logFile.read()
-
-            jsonFileName = f'log/JobInformation_{skim}_{sampleLabel}.json'
-            with open(jsonFileName) as jsonFile:
-                jsonContents = json.load(jsonFile)
-
-            for statName, statInfo in statistics.items():
-                statFunction = statInfo['Calculate']
-
-                allSkimStats[skim][statName][sampleLabel] = statFunction(jsonContents, logContents, sampleLabel)
+    allSkimStats = getSkimStatsDict(skims, sampleLabels, statistics)
 
     toJson(allSkimStats)
 
-    for skim in skims:
-        for statName, statInfo in statistics.items():
-            try:
-                combiningFunction = statInfo['Combine']
-                allSkimStats[skim][statName]['Combined MC'] = combiningFunction(allSkimStats[skim][statName])
-            except TypeError:
-                allSkimStats[skim][statName]['Combined MC'] = None
+    allSkimStats = addCombinedMC(allSkimStats, statistics)
 
     if args.screen:
         toScreen(allSkimStats)

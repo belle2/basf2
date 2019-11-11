@@ -20,7 +20,7 @@ from textwrap import wrap
 from tabulate import tabulate
 
 
-# from skimExpertFunctions import get_test_file, get_eventN, get_total_infiles
+from skimExpertFunctions import get_test_file, get_eventN, get_total_infiles
 
 
 skims = [
@@ -57,7 +57,7 @@ sampleLabels = mcSamples + dataSamples
 
 def getStatFromLog(statistic, logFileContents):
     """Search for a given statistic in the "Resource usage summary" section of the log file."""
-    floatRegexp = '\s*:\s+(\d+(\.(\d+)?)?)'
+    floatRegexp = r'\s*:\s+(\d+(\.(\d+)?)?)'
     statFromLog = re.findall(f'{statistic}{floatRegexp}', logFileContents)[0][0]
 
     return float(statFromLog)
@@ -77,12 +77,24 @@ def udstSize(json):
 
 
 def logSize(log):
-    """Return the size of the log file in KB."""
+    """Return the size of the log file in kB."""
     return len(log) / 1024
 
 
 def cpuTime(log):
     return getStatFromLog('CPU time', log)
+
+
+def averageCandidateMultiplicity(log):
+    floatRegexp = r'\d+\.\d+'
+
+    multiplicityBlock = re.findall('(Average Candidate Multiplicity(.*\n)+?.*INFO)', log)[0][0]
+    multiplicityLines = [line for line in multiplicityBlock.split('\n') if re.findall(floatRegexp, line)]
+    multiplicities = [float(re.findall(floatRegexp, line)[1]) for line in multiplicityLines]
+
+    averageMultiplicity = sum(multiplicities)/len(multiplicities)
+
+    return averageMultiplicity
 
 
 def memoryAverage(log):
@@ -93,23 +105,18 @@ def memoryMaximum(log):
     return getStatFromLog('Max Memory', log)
 
 
-# TODO: copy previous method of calculating this.
-def candidateMultiplicity(log):
-    return
+@lru_cache()
+def nEventsPerFile(sampleLabel):
+    parentFile = get_test_file(sampleLabel)
+    return get_eventN(parentFile)
 
 
-# @lru_cache()
-# def nEventsPerFile(sampleLabel):
-#     parentFile = get_test_file(sampleLabel)
-#     return get_eventN(parentFile)
+def nTotalFiles(sampleLabel):
+    return get_total_infiles(sampleLabel)
 
 
-# def nTotalFiles(sampleLabel):
-#     return get_total_infiles(sampleLabel)
-
-
-# def nTotalEvents(sampleLabel):
-#     return nEventsPerFile(sampleLabel)*nTotalFiles(sampleLabel)
+def nTotalEvents(sampleLabel):
+    return nEventsPerFile(sampleLabel)*nTotalFiles(sampleLabel)
 
 
 def mcWeightedAverage(statsPerSample):
@@ -127,81 +134,87 @@ statistics = {
     'RetentionRate': {
         'LongName': 'Retention rate (%)',
         'floatfmt': '.2f',
-        'Calculate': lambda json, log, skim, sample: 100 * nSkimmedEvents(json) / nInputEvents(json),
+        'Calculate': lambda json, *_: 100 * nSkimmedEvents(json) / nInputEvents(json),
         'Combine': lambda statDict: mcWeightedAverage(statDict)
     },
     'nInputEvents': {
         'LongName': 'Number of input events of test',
         'floatfmt': '.0f',
-        'Calculate': lambda json, log, skim, sample: nInputEvents(json),
+        'Calculate': lambda json, *_: nInputEvents(json),
         'Combine': None
     },
     'nSkimmedEvents': {
         'LongName': 'Number of skimmed events',
         'floatfmt': '.0f',
-        'Calculate': lambda json, log, skim, sample: nSkimmedEvents(json),
+        'Calculate': lambda json, *_: nSkimmedEvents(json),
         'Combine': None
     },
     'cpuTime': {
         'LongName': 'CPU time of test on KEKCC (s)',
         'floatfmt': '.1f',
-        'Calculate': lambda json, log, skim, sample: cpuTime(log),
+        'Calculate': lambda _, log, __: cpuTime(log),
         'Combine': None
     },
     'cpuTimePerEvent': {
         'LongName': 'CPU time per event on KEKCC (s)',
         'floatfmt': '.3f',
-        'Calculate': lambda json, log, skim, sample: cpuTime(log) / nInputEvents(json),
+        'Calculate': lambda json, log, *_: cpuTime(log) / nInputEvents(json),
         'Combine': lambda statDict: mcWeightedAverage(statDict)
     },
     'udstSize': {
         'LongName': 'uDST size of test (MB)',
         'floatfmt': '.2f',
-        'Calculate': lambda json, log, skim, sample: udstSize(json) / 1024,
+        'Calculate': lambda json, *_: udstSize(json) / 1024,
         'Combine': None
     },
     'udstSizePerEvent': {
         'LongName': 'uDST size per event (kB)',
         'floatfmt': '.3f',
-        'Calculate': lambda json, log, skim, sample: udstSize(json) / nInputEvents(json),
+        'Calculate': lambda json, *_: udstSize(json) / nInputEvents(json),
         'Combine': lambda statDict: mcWeightedAverage(statDict)
     },
     'logSize': {
         'LongName': 'Log size of test (kB)',
         'floatfmt': '.1f',
-        'Calculate': lambda json, log, skim, sample: logSize(log),
+        'Calculate': lambda _, log, __: logSize(log),
         'Combine': None
     },
     'logSizePerEvent': {
         'LongName': 'Log size per event (B)',
         'floatfmt': '.2f',
-        'Calculate': lambda json, log, skim, sample: logSize(log) / nInputEvents(json) * 1024,
+        'Calculate': lambda json, log, __: logSize(log) / nInputEvents(json) * 1024,
+        'Combine': lambda statDict: mcWeightedAverage(statDict)
+    },
+    'averageCandidateMultiplicity': {
+        'LongName': 'Average candidate multiplicity of passed events',
+        'floatfmt': '.2f',
+        'Calculate': lambda _, log, __: averageCandidateMultiplicity(log),
         'Combine': lambda statDict: mcWeightedAverage(statDict)
     },
     'memoryAverage': {
         'LongName': 'Average memory usage (MB)',
         'floatfmt': '.0f',
-        'Calculate': lambda json, log, skim, sample: memoryAverage(log),
+        'Calculate': lambda _, log, __: memoryAverage(log),
         'Combine': lambda statDict: mcWeightedAverage(statDict)
     },
     'memoryMaximum': {
         'LongName': 'Maximum memory usage (MB)',
         'floatfmt': '.0f',
-        'Calculate': lambda json, log, skim, sample: memoryMaximum(log),
+        'Calculate': lambda _, log, __: memoryMaximum(log),
         'Combine': lambda statDict: max(statDict.values())
     },
-    # 'udstSizePerEntireSample': {
-    #     'LongName': 'Estimated uDST size for entire sample (GB)',
-    #     'floatfmt': '.2f',
-    #     'Calculate': lambda json, log, skim, sample: udstSize(json) * nTotalEvents(sample) / nInputEvents(json) / 1024,
-    #     'Combine': lambda statDict: sum(statDict.values())
-    # },
-    # 'logSizePerEntireSample': {
-    #     'LongName': 'Estimated log size for entire sample (GB)}',
-    #     'floatfmt': '.2f',
-    #     'Calculate': lambda json, log, skim, sample: logSize(log) * nTotalEvents(sample) / nInputEvents(json) / 1024,
-    #     'Combine': lambda statDict: sum(statDict.values())
-    # }
+    'udstSizePerEntireSample': {
+        'LongName': 'Estimated uDST size for entire sample (GB)',
+        'floatfmt': '.2f',
+        'Calculate': lambda json, _, sample: udstSize(json) * nTotalEvents(sample) / nInputEvents(json) / 1024 / 1024,
+        'Combine': lambda statDict: sum(statDict.values())
+    },
+    'logSizePerEntireSample': {
+        'LongName': 'Estimated log size for entire sample (GB)}',
+        'floatfmt': '.2f',
+        'Calculate': lambda json, log, sample: logSize(log) * nTotalEvents(sample) / nInputEvents(json) / 1024 / 1024,
+        'Combine': lambda statDict: sum(statDict.values())
+    }
 }
 
 
@@ -276,7 +289,7 @@ if __name__ == '__main__':
             for statName, statInfo in statistics.items():
                 statFunction = statInfo['Calculate']
 
-                allSkimStats[skim][statName][sampleLabel] = statFunction(jsonContents, logContents, skim, sampleLabel)
+                allSkimStats[skim][statName][sampleLabel] = statFunction(jsonContents, logContents, sampleLabel)
 
     toJson(allSkimStats)
 

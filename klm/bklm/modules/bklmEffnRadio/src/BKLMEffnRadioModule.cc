@@ -527,7 +527,7 @@ void BKLMEffnRadioModule::getEffs()
         int sector1 = hits2D[h]->getSector();
         int section1 = hits2D[h]->getSection();
         int sector2 = hits2D[h2]->getSector();
-        int section2 = hits2D[h]->getSection();
+        int section2 = hits2D[h2]->getSection();
 
         //let's stay in the same module...(that is what we use for the simple tracking as well...)
         if (sector1 != sector2  || section1 != section2)

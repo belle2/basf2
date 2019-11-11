@@ -39,8 +39,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 
-from pandas.plotting import register_matplotlib_converters
-register_matplotlib_converters()
 
 
 def parseNumRange(string):
@@ -401,13 +399,18 @@ class Luminosity:
 
 if __name__ == '__main__':
 
+    from pandas.plotting import register_matplotlib_converters
+    register_matplotlib_converters()
+
     args = argparser().parse_args()
     
     lumi=Luminosity(args)
 
     lumi.printLumi()
 
+
     if args.plot:
+
         if 'DAY' in args.plot:
             lumi.plotLumiPerPeriod(1)
         if 'WEEK' in args.plot:

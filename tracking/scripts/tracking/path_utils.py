@@ -276,7 +276,7 @@ def add_svd_track_finding(
         temporary_svd_cdc_reco_tracks="SVDPlusCDCStandaloneRecoTracks",
         use_svd_to_cdc_ckf=True,
         prune_temporary_tracks=True,
-        add_mva_quality_indicator=True,
+        add_mva_quality_indicator=False,
         **kwargs,
 ):
     """
@@ -420,7 +420,7 @@ def add_svd_track_finding(
 
 
 def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
-                          use_second_hits=False, add_mva_quality_indicator=True):
+                          use_second_hits=False, add_mva_quality_indicator=False):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -717,7 +717,7 @@ def add_vxd_track_finding_vxdtf2(
     custom_setup_name=None,
     min_SPTC_quality=0.,
     filter_overlapping=True,
-    add_mva_quality_indicator=True,
+    add_mva_quality_indicator=False,
 ):
     """
     Convenience function for adding all vxd track finder Version 2 modules

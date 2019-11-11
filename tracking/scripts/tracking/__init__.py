@@ -10,7 +10,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
-                                add_mva_quality_indicator=True):
+                                add_mva_quality_indicator=False):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -172,7 +172,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       prune_temporary_tracks=True, use_second_cdc_hits=False,
                       use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True,
                       use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
-                      add_subtrack_mva_quality_indicators=True):
+                      add_subtrack_mva_quality_indicators=False):
     """
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to

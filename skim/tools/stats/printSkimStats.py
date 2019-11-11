@@ -54,7 +54,7 @@ dataSamples = []
 # TODO: acquire data samples and put in registry
 # dataSamples = ['proc9_exp3', 'proc9_exp7', 'proc9_exp8', 'bucket7_exp8']
 
-sampleLabels = mcSamples + dataSamples
+samples = mcSamples + dataSamples
 
 
 def getStatFromLog(statistic, logFileContents):
@@ -108,36 +108,36 @@ def memoryMaximum(log):
 
 
 @lru_cache()
-def nEventsPerFile(sampleLabel):
-    parentFile = get_test_file(sampleLabel)
+def nEventsPerFile(sample):
+    parentFile = get_test_file(sample)
     return get_eventN(parentFile)
 
 
-def nTotalFiles(sampleLabel):
-    return get_total_infiles(sampleLabel)
+def nTotalFiles(sample):
+    return get_total_infiles(sample)
 
 
-def nTotalEvents(sampleLabel):
-    return nEventsPerFile(sampleLabel)*nTotalFiles(sampleLabel)
+def nTotalEvents(sample):
+    return nEventsPerFile(sample)*nTotalFiles(sample)
 
 
-def getSkimStatsDict(skims, sampleLabels, statistics):
+def getSkimStatsDict(skims, samples, statistics):
     allSkimStats = {skim: {stat: {} for stat in statistics.keys()} for skim in skims}
 
     for skim in skims:
-        for sampleLabel in sampleLabels:
-            logFileName = Path(statsDirectory, 'log', f'{skim}_{sampleLabel}.out')
+        for sample in samples:
+            logFileName = Path(statsDirectory, 'log', f'{skim}_{sample}.out')
             with open(logFileName) as logFile:
                 logContents = logFile.read()
 
-            jsonFileName = Path(statsDirectory, 'log', f'JobInformation_{skim}_{sampleLabel}.json')
+            jsonFileName = Path(statsDirectory, 'log', f'JobInformation_{skim}_{sample}.json')
             with open(jsonFileName) as jsonFile:
                 jsonContents = json.load(jsonFile)
 
             for statName, statInfo in statistics.items():
                 statFunction = statInfo['Calculate']
 
-                allSkimStats[skim][statName][sampleLabel] = statFunction(jsonContents, logContents, sampleLabel)
+                allSkimStats[skim][statName][sample] = statFunction(jsonContents, logContents, sample)
 
     return allSkimStats
 
@@ -148,13 +148,13 @@ def mcWeightedAverage(statsPerSample):
     weightedAverage = 0
     for mcSample, crossSection in mcSampleCrossSections.items():
         for beamBackground, beamBackgroundWeight in beamBackgroundWeights.items():
-            sampleLabel = f'{mcCampaign}_{mcSample}{beamBackground}'
-            weightedAverage += statsPerSample[sampleLabel]*beamBackgroundWeight*crossSection/totalCrossSection
+            sample = f'{mcCampaign}_{mcSample}{beamBackground}'
+            weightedAverage += statsPerSample[sample]*beamBackgroundWeight*crossSection/totalCrossSection
 
     return weightedAverage
 
 
-def addCombinedMC(allSkimStats, statistics):
+def addWeightedMC(allSkimStats, statistics):
     for skimStats in allSkimStats.values():
         for statName, statInfo in statistics.items():
             try:
@@ -303,19 +303,19 @@ def toConfluence(allSkimStats):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--screen', action='store_true', default=False,
+    parser.add_argument('--screen', action='store_true',
                         help='Provide this flag to print stats to screen.')
-    parser.add_argument('--confluence', action='store_true', default=False,
+    parser.add_argument('--confluence', action='store_true',
                         help='Provide this flag to produce text file output for copying to Confluence.')
-    parser.add_argument('--combined', action='store_true', default=False,
+    parser.add_argument('--combined', action='store_true',
                         help='Provide this flag if running the combined skims.')
     args = parser.parse_args()
 
-    allSkimStats = getSkimStatsDict(skims, sampleLabels, statistics)
+    allSkimStats = getSkimStatsDict(skims, samples, statistics)
 
     toJson(allSkimStats)
 
-    allSkimStats = addCombinedMC(allSkimStats, statistics)
+    allSkimStats = addWeightedMC(allSkimStats, statistics)
 
     if args.screen:
         toScreen(allSkimStats)

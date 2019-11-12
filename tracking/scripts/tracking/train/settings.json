@@ -10,7 +10,7 @@
     "localdb_iov": {
         "exp1": 0,
         "run1": 0,
-        "exp2": -1,
+        "exp2": 0,
         "run2": -1
     }
 }

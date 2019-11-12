@@ -370,6 +370,7 @@ namespace Belle2 {
     m_bunchOffset->Reset();
     m_time->Reset();
     m_goodTDC->Reset();
+    m_badTDC->Reset();
     m_goodHitsPerEvent->Reset();
     m_goodHitsPerEventAll->Reset();
     m_badHitsPerEvent->Reset();
@@ -382,9 +383,7 @@ namespace Belle2 {
       m_goodHitsAsics[i]->Reset();
       m_badHitsAsics[i]->Reset();
       m_goodTdc[i]->Reset();
-      m_goodTDC->Reset();
       m_badTdc[i]->Reset();
-      m_badTDC->Reset();
       m_goodTiming[i]->Reset();
       m_goodChannelHits[i]->Reset();
       m_badChannelHits[i]->Reset();

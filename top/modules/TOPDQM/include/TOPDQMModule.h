@@ -109,13 +109,17 @@ namespace Belle2 {
     std::vector<TH2F*> m_badHitsXY; /**< Histograms (2D) for bad hits in x-y*/
     std::vector<TH2F*> m_goodHitsAsics; /**< Histograms (2D) for good hits for asics*/
     std::vector<TH2F*> m_badHitsAsics; /**< Histograms (2D) for bad hits for asics*/
-    std::vector<TH1F*> m_goodTdc; /**< Histograms for TDC distribution of good hits*/
-    std::vector<TH1F*> m_badTdc; /**< Histograms for TDC distribution of bad hits*/
+    std::vector<TH1F*> m_goodTdc; /**< Histograms for TDC distribution of good hits for each slot*/
+    std::vector<TH1F*> m_badTdc; /**< Histograms for TDC distribution of bad hits for each slot*/
+    std::vector<TH1F*> m_goodTDC; /**< Histograms for TDC distribution of good hits*/
+    std::vector<TH1F*> m_badTDC; /**< Histograms for TDC distribution of bad hits*/
     std::vector<TH1F*> m_goodTiming; /**< Histograms for timing distribution of good hits*/
     std::vector<TH1F*> m_goodChannelHits; /**< Histograms for good channel hits*/
     std::vector<TH1F*> m_badChannelHits; /**< Histograms for bad channel hits*/
-    std::vector<TH1F*> m_goodHitsPerEvent; /**< Histograms for good hits per event*/
-    std::vector<TH1F*> m_badHitsPerEvent; /**< Histograms for bad hits per event*/
+    std::vector<TH1F*> m_goodHitsPerEvent; /**< Histograms for good hits per event for each slot*/
+    std::vector<TH1F*> m_badHitsPerEvent; /**< Histograms for bad hits per event for each slot*/
+    std::vector<TH1F*> m_goodHitsPerEventAll; /**< Histograms for good hits per event*/
+    std::vector<TH1F*> m_badHitsPerEventAll; /**< Histograms for bad hits per event*/
     std::vector<TProfile2D*> m_goodHitsXYTrack; /**< Histograms (2D) for good hits in x-y per module with track*/
     std::vector<TProfile2D*> m_goodHitsXYTrackBkg; /**< Histograms (2D) for good hits in x-y per module with bkg track*/
 

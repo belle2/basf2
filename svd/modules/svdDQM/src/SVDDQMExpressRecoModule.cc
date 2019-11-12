@@ -12,6 +12,8 @@
 
 #include "svd/modules/svdDQM/SVDDQMExpressRecoModule.h"
 
+#include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
+
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -31,6 +33,7 @@
 using namespace std;
 using boost::format;
 using namespace Belle2;
+using namespace SoftwareTrigger;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -659,7 +662,12 @@ void SVDDQMExpressRecoModule::beginRun()
 void SVDDQMExpressRecoModule::event()
 {
 
-  //increase the numbe rof processed events
+  //check HLT decision and increase number of events only if the event has been accepted
+
+  if (m_resultStoreObjectPointer.isValid()) {
+    const bool eventAccepted = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
+    if (!eventAccepted) return;
+  }
   m_nEvents->Fill(0);
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();

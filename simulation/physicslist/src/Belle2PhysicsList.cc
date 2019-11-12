@@ -11,6 +11,8 @@
 #include <simulation/physicslist/Belle2PhysicsList.h>
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
+#include "G4RegionStore.hh"
+#include "G4ProductionCuts.hh"
 
 // EM and decay physics
 #include "G4EmStandardPhysics.hh"
@@ -45,6 +47,9 @@ Belle2PhysicsList::Belle2PhysicsList(const G4String& physicsListName)
   : G4VModularPhysicsList(), m_globalCutValue(0.07)
 {
   G4cout << " Using " << physicsListName << " physics list " << G4endl;
+
+  m_pxdCutValue = m_globalCutValue;
+  m_svdCutValue = m_globalCutValue;
 
   // Decay
   RegisterPhysics(new G4DecayPhysics());
@@ -94,6 +99,21 @@ void Belle2PhysicsList::SetCuts()
   SetCutValue(m_globalCutValue * cm, "e-");
   SetCutValue(m_globalCutValue * cm, "e+");
   SetCutValue(m_globalCutValue * cm, "gamma");
+
+  G4RegionStore* theRegionStore = G4RegionStore::GetInstance();
+  G4ProductionCuts* regionCuts = 0;
+
+  // VXD region cut
+  regionCuts = new G4ProductionCuts;
+  regionCuts->SetProductionCut(m_pxdCutValue * cm);
+  G4cout << " PXD cut set to " << m_pxdCutValue << G4endl;
+  theRegionStore->GetRegion("PXDEnvelope")->SetProductionCuts(regionCuts);
+
+  // SVD region cut
+  regionCuts = new G4ProductionCuts;
+  regionCuts->SetProductionCut(m_svdCutValue * cm);
+  G4cout << " SVD cut set to " << m_svdCutValue << G4endl;
+  theRegionStore->GetRegion("SVDEnvelope")->SetProductionCuts(regionCuts);
 }
 
 
@@ -106,6 +126,18 @@ void Belle2PhysicsList::SetVerbosity(G4int verb)
 void Belle2PhysicsList::SetProductionCutValue(G4double value)
 {
   m_globalCutValue = value;
+}
+
+
+void Belle2PhysicsList::SetPXDProductionCutValue(G4double value)
+{
+  m_pxdCutValue = value;
+}
+
+
+void Belle2PhysicsList::SetSVDProductionCutValue(G4double value)
+{
+  m_svdCutValue = value;
 }
 
 

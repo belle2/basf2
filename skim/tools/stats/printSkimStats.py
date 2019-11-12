@@ -134,7 +134,10 @@ def getSkimStatsDict(skims, samples, statistics):
             for statName, statInfo in statistics.items():
                 statFunction = statInfo['Calculate']
 
-                allSkimStats[skim][statName][sample] = statFunction(jsonContents, logContents, sample)
+                try:
+                    allSkimStats[skim][statName][sample] = statFunction(jsonContents, logContents, sample)
+                except TypeError:
+                    allSkimStats[skim][statName][sample] = None
 
     return allSkimStats
 

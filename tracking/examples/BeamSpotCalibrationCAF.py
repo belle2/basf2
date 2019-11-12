@@ -18,6 +18,7 @@ import reconstruction as reco
 import modularAnalysis as ana
 import vertex as vx
 
+# Not needed for di-muon skim cdst or mdst, but needed to re-run reconstruction
 input_branches = [
     'EventMetaData',
     'RawTRGs',
@@ -33,13 +34,16 @@ def BeamSpotCalibration(files, tags):
     path = create_path()
 
     path.add_module('Progress')
+
+    path.add_module('RootInput')
+    # Not needed for di-muon skim cdst or mdst, but needed to re-run reconstruction
     # Remove all non-raw data to run the full reco again
-    path.add_module('RootInput', branchNames=input_branches)
+    #    path.add_module('RootInput', branchNames=input_branches)
 
     # Not needed for di-muon skim cdst or mdst, but needed to re-run reconstruction
     # with possibly changed global tags
-    raw.add_unpackers(path, components=["PXD", "SVD", "CDC"])
-    reco.add_tracking_reconstruction(path)
+    #    raw.add_unpackers(path, components=["PXD", "SVD", "CDC"])
+    #    reco.add_tracking_reconstruction(path)
 
     muSelection = 'p>1.0'
     muSelection += ' and abs(dz)<2.0 and dr<0.5'

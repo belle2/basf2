@@ -7,9 +7,9 @@ from pathlib import Path
 import subprocess
 from tempfile import TemporaryNamedFile
 
+from basf2 import find_file
 from skimExpertFunctions import get_test_file
 
-statsDirectory = find_file('skim/tools/stats')
 
 all_skims = [
     'ALP3Gamma', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon',

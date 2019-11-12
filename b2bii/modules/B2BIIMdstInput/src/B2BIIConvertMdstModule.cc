@@ -64,6 +64,8 @@
 
 #include "belle_legacy/benergy/BeamEnergy.h"
 #include "belle_legacy/ip/IpProfile.h"
+#include "belle_legacy/tables/evtcls.h"
+
 
 #include <cmath>
 #include <cfloat>
@@ -1258,7 +1260,7 @@ void B2BIIConvertMdstModule::convertEvtclsTable()
   Belle::Evtcls_flag_Manager& EvtFlagMgr = Belle::Evtcls_flag_Manager::get_manager();
   Belle::Evtcls_flag2_Manager& EvtFlag2Mgr = Belle::Evtcls_flag2_Manager::get_manager();
 
-  std::string name = "flag";
+  std::string name = "evtcls_flag";
   // Only one entry in each event
   std::vector<Belle::Evtcls_flag>::iterator eflagIterator = EvtFlagMgr.begin();
   std::vector<Belle::Evtcls_flag2>::iterator eflag2Iterator = EvtFlag2Mgr.begin();

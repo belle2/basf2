@@ -193,21 +193,9 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
                                                               str(ladderN) + "." + str(sensorN) + "." + str(s), " ", 100, 0, 100))
                         self.sizeList[li][ldi][si].append(TH1F("size" + "_" + str(layerN) + "." +
                                                                str(ladderN) + "." + str(sensorN) + "." + str(s), " ", 100, 0, 100))
-                        self.chargeList[li][ldi][si].append(
-                            TH1F(
-                                "charge" +
-                                "_" +
-                                str(layerN) +
-                                "." +
-                                str(ladderN) +
-                                "." +
-                                str(sensorN) +
-                                "." +
-                                str(s),
-                                " ",
-                                100,
-                                0,
-                                100))
+                        self.chargeList[li][ldi][si].append(TH1F("charge" + "_" + str(layerN) + "." +
+                                                                 str(ladderN) + "." + str(sensorN) + "." + str(s),
+                                                                 " ", 100, 0, 100))
                         self.cdcNoSyncList[li][ldi][si].append(TH1F("cdcNoSync" + "_" + str(layerN) + "." +
                                                                     str(ladderN) + "." + str(sensorN) + "." + str(s),
                                                                     " ", 200, -100, 100))
@@ -248,8 +236,6 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
 
     def terminate(self):
 
-        # tfileHist = TFile(self.outputHistFileName, 'recreate')
-        # tfile = TFile("../caf/cogVsRunNumber.txt", "recreate")
         layerNumberTree = np.zeros(1, dtype=int)
         ladderNumberTree = np.zeros(1, dtype=int)
         sensorNumberTree = np.zeros(1, dtype=int)
@@ -317,7 +303,6 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
                     si = sensorNumber - 1
                     for side in range(2):
                         sideTree[0] = side
-                        print("SIDE: " + str(side))
                         # Resolution distribution Histograms with Gaussian Fit
                         res = self.resList[li][ldi][si][side]
                         res.GetXaxis().SetTitle("cluster time - Synchronized EventT0 (ns)")
@@ -389,22 +374,11 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
                         else:
                             evttimeNoSyncerr[0] = cdcNoSync.GetRMS()/math.sqrt(cdcNoSync.GetEntries())
 
-                        print("AFTER FITS")
-
                         if fitResult == -1:
                             mean[0] = -100.0
                             meanerr[0] = -100.0
                             width[0] = -100.0
                             widtherr[0] = -100.0
-
-                        # print(" ")
-                        # print(" WHAT I NEED ")
-                        # print(str(self.runnumber) + " " + str(layerNumber) + " " + str(ladderNumber)
-                        #               + " " + str(sensorNumber) + " " + str(side) + " " + str(mean) + " " + str(meanerr)
-                        #               + " " + str(width) + " " + str(widtherr) +  " " + str(cogmean) + "\n")
-                        # print(" ")
-                        # print(str(type(mean[0])))
-                        # print(" ")
 
                         tree.Fill()
 

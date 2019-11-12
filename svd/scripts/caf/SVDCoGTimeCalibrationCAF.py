@@ -27,7 +27,7 @@ input_branches = [
 ]
 
 now = datetime.datetime.now()
-uniqueID = "SVDCoGTimeCalibrations_MC_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_lat=+47.16"
+uniqueID = "SVDCoGTimeCalibrations_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_lat=+47.16"
 
 
 def remove_module(path, name):
@@ -38,7 +38,7 @@ def remove_module(path, name):
             new_path.add_module(m)
     return new_path
 
-
+'''
 def pre_alg(algorithm, iteration):
 
     B2INFO("Running pre_algorithm function")
@@ -48,6 +48,7 @@ def pre_alg(algorithm, iteration):
     geom = register_module('Geometry')
     gear.initialize()
     geom.initialize()
+'''
 
 
 def SVDCoGTimeCalibration(files, tags):
@@ -78,12 +79,15 @@ def SVDCoGTimeCalibration(files, tags):
 
     path = remove_module(path, 'SVDMissingAPVsClusterCreator')
 
+    output_iov = IoV(8, 0, 8, -1)
+
     # collector setup
     collector = register_module('SVDCoGTimeCalibrationCollector')
     collector.param("SVDClustersFromTracksName", "SVDClustersFromTracks")
     collector.param("SVDRecoDigitsFromTracksName", "SVDRecoDigitsFromTracks")
     collector.param("granularity", "run")
 
+    # algorithm setup
     algorithm = SVDCoGTimeCalibrationAlgorithm(uniqueID)
 
     # calibration setup
@@ -98,9 +102,12 @@ def SVDCoGTimeCalibration(files, tags):
                               backend_args=None
                               )
 
-    calibration.pre_algorithms = pre_alg
+    # calibration.pre_algorithms = pre_alg
     calibration.strategies = strategies.SequentialRunByRun
     # calibration.strategies = strategies.SingleIOV
+
+    for algorithm in cal_test.algorithms:
+        algorithm.params = {"apply_iov": output_iov}
 
     return calibration
 
@@ -138,7 +145,7 @@ if __name__ == "__main__":
     cal_fw = CAF()
     cal_fw.add_calibration(svdCoGCAF)
     cal_fw.backend = backends.LSF()
-
+    caf_fw.output_dir = 'cal_test'
     # Try to guess if we are at KEKCC and change the backend to Local if not
 #    if multiprocessing.cpu_count() < 10:
 #        cal_fw.backend = backends.Local(8)

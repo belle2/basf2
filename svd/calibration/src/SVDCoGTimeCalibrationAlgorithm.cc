@@ -86,18 +86,16 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           auto hEventT0nosync = getObjectPtr<TH1F>(Form("eventT0nosync__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
           cout << " " << endl;
           cout << typeid(hEventT0vsCoG).name() << " " << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << endl;
-          if (layer_num == 3 && hEventT0vsCoG->GetEntries() < 40000) { //bhabha: data 40000, sim 2000, hadron: data 100000, sim 2000
+          if (layer_num == 3 && hEventT0vsCoG->GetEntries() < 100000) {
             cout << " " << endl;
             cout << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << endl;
             cout << "Not enough data, adding one run to the collector" << endl;
             return c_NotEnoughData;
           }
           cout << " " << endl;
-          // hEventT0vsCoG->SetMinimum(200);
           for (int i = 0; i < hEventT0vsCoG->GetNbinsX(); i++) {
             for (int j = 0; j < hEventT0vsCoG->GetNbinsY(); j++) {
               if (hEventT0vsCoG->GetBinContent(i, j) < int(hEventT0vsCoG->GetEntries() * 0.001)) {
-                // cout << " " <<" " <<  hEventT0vsCoG->GetEntries() << " " << int(hEventT0vsCoG->GetEntries()*0.01) << endl;
                 hEventT0vsCoG->SetBinContent(i, j, 0);
               }
             }
@@ -107,17 +105,13 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           pfx->SetName(name.c_str());
           pfx->SetErrorOption("S");
           pfx->Fit("pol3", "RQ");
-          // pfx->Fit("pol5", "Q0");
           double par[4];
-          // double par[6];
           pol3->GetParameters(par);
-          // pol5->GetParameters(par);
           double meanT0 = hEventT0->GetMean();
           double meanT0NoSync = hEventT0nosync->GetMean();
           timeCal->set_current(1);
           // timeCal->set_current(2);
           timeCal->set_pol3parameters(par[0], par[1], par[2], par[3]);
-          // timeCal->set_pol5parameters(par[0] - meanT0, par[1], par[2], par[3], par[4], par[5]); // par[0] - meanT0
           if (view == 1) {
             par0U->Fill(par[0]);
             par1U->Fill(par[1]);
@@ -150,6 +144,14 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   par3V->Write();
   f->Close();
   saveCalibration(payload, "SVDCoGTimeCalibrations");
+  delete par0U;
+  delete par1U;
+  delete par2U;
+  delete par3U;
+  delete par0V;
+  delete par1V;
+  delete par2V;
+  delete par3V;
 
   // probably not needed - would trigger re-doing the collection
   // if ( ... too large corrections ... ) return c_Iterate;

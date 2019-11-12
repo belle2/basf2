@@ -62,5 +62,9 @@ namespace Belle2::SoftwareTrigger {
     double m_EsinglePhoton = 1;
     /// which CMS energy defines nReducedEsingle clusters
     double m_reducedEsinglePhoton = 0.5;
+    /// which LAB pt defines a cosmic
+    double m_cosmicMinPt = 0.5 * Unit::GeV;
+    /// which LAB cluster energy vetoes a cosmic candidate
+    double m_cosmicMaxClusterEnergy = 1.0 * Unit::GeV;
   };
 }

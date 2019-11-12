@@ -22,7 +22,7 @@ namespace Belle2 {
     ARICHChannelMaskMaker();
 
     /// Destructor
-    virtual ~ARICHChannelMaskMaker {}
+    //    virtual ~ARICHChannelMaskMaker {}
 
     /// setter for m_willFail
     void setForceFail(bool forceFail) {m_forceFail = forceFail;}

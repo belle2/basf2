@@ -156,22 +156,56 @@ namespace Belle2 {
     m_time->SetOption("LIVE");
     m_time->SetMinimum(0);
 
-    m_hitsPerEvent = new TProfile("hitsPerEvent", "Good hits per event vs. slot number",
-                                  16, 0.5, 16.5, 0, 1000);
-    m_hitsPerEvent->SetXTitle("slot number");
-    m_hitsPerEvent->SetYTitle("hits per event");
-    m_hitsPerEvent->SetOption("LIVE");
-    m_hitsPerEvent->SetStats(kFALSE);
-    m_hitsPerEvent->SetMinimum(0);
+    m_goodHitsPerEventAll = new TH1F("good_hits_per_event", "Number of good hits per event", 250, 0, 250);
+    m_badHitsPerEventAll = new TH1F("bad_hits_per_event", "Number of bad hits per event", 250, 0, 250);
+    m_goodHitsPerEventAll->SetOption("LIVE");
+    m_badHitsPerEventAll->SetOption("LIVE");
+    m_goodHitsPerEventAll->SetMinimum(0);
+    m_badHitsPerEventAll->SetMinimum(0);
+    m_goodHitsPerEventAll->GetXaxis()->SetTitle("hits / event");
+    m_goodHitsPerEventAll->GetYaxis()->SetTitle("Events");
+    m_badHitsPerEventAll->GetXaxis()->SetTitle("hits / event");
+    m_badHitsPerEventAll->GetYaxis()->SetTitle("Events");
+
+    m_goodTDC = new TH1F("goodTDC", "Raw time distribution of good hits",
+                         2000, 0, 2000);
+    m_goodTDC->SetXTitle("raw time [samples]");
+    m_goodTDC->SetYTitle("hits / sample");
+    m_goodTDC->SetOption("LIVE");
+    m_goodTDC->SetMinimum(0);
+
+    m_badTDC = new TH1F("badTDC", "Raw time distribution of bad hits",
+                        2000, 0, 2000);
+    m_badTDC->SetXTitle("raw time [samples]");
+    m_badTDC->SetYTitle("hits / sample");
+    m_badTDC->SetOption("LIVE");
+    m_badTDC->SetMinimum(0);
+
+    m_goodHitsPerEvent = new TProfile("goodHitsPerEvent", "Good hits per event vs. slot number",
+                                      m_goodHitsPerEvent = new TProfile("goodHitsPerEvent", "Good hits per event vs. slot number",
+                                          16, 0.5, 16.5, 0, 1000);
+                                      m_goodHitsPerEvent->SetXTitle("slot number");
+                                      m_goodHitsPerEvent->SetYTitle("hits per event");
+                                      m_goodHitsPerEvent->SetOption("LIVE");
+                                      m_goodHitsPerEvent->SetStats(kFALSE);
+                                      m_goodHitsPerEvent->SetMinimum(0);
+
+                                      m_badHitsPerEvent = new TProfile("badHitsPerEvent", "Bad hits per event vs. slot number",
+                                          16, 0.5, 16.5, 0, 1000);
+                                      m_badHitsPerEvent->SetXTitle("slot number");
+                                      m_badHitsPerEvent->SetYTitle("hits per event");
+                                      m_badHitsPerEvent->SetOption("LIVE");
+                                      m_badHitsPerEvent->SetStats(kFALSE);
+                                      m_badHitsPerEvent->SetMinimum(0);
 
     for (int i = 0; i < m_numModules; i++) {
-      int module = i + 1;
-      string name, title;
-      TH1F* h1 = 0;
-      TH2F* h2 = 0;
-      TProfile2D* h3 = 0;
+    int module = i + 1;
+    string name, title;
+    TH1F* h1 = 0;
+    TH2F* h2 = 0;
+    TProfile2D* h3 = 0;
 
-      name = str(format("window_vs_asic_%1%") % (module));
+    name = str(format("window_vs_asic_%1%") % (module));
       title = str(format("Distribution of hits: raw timing for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 512, 0, 512);
       h2->SetOption("LIVE");
@@ -336,7 +370,11 @@ namespace Belle2 {
     m_window_vs_slot->Reset();
     m_bunchOffset->Reset();
     m_time->Reset();
-    m_hitsPerEvent->Reset();
+    m_goodTDC->Reset();
+    m_goodHitsPerEvent->Reset();
+    m_goodHitsPerEventAll->Reset();
+    m_badHitsPerEvent->Reset();
+    m_badHitsPerEventAll->Reset();
 
     for (int i = 0; i < m_numModules; i++) {
       m_window_vs_asic[i]->Reset();
@@ -345,7 +383,9 @@ namespace Belle2 {
       m_goodHitsAsics[i]->Reset();
       m_badHitsAsics[i]->Reset();
       m_goodTdc[i]->Reset();
+      m_goodTDC->Reset();
       m_badTdc[i]->Reset();
+      m_badTDC->Reset();
       m_goodTiming[i]->Reset();
       m_goodChannelHits[i]->Reset();
       m_badChannelHits[i]->Reset();
@@ -392,6 +432,7 @@ namespace Belle2 {
         m_goodHitsXY[i]->Fill(digit.getPixelCol(), digit.getPixelRow());
         m_goodHitsAsics[i]->Fill(asic_no, asic_ch);
         m_goodTdc[i]->Fill(digit.getRawTime());
+        m_goodTDC->Fill(digit.getRawTime());
         if (recBunchValid) {
           m_goodTiming[i]->Fill(digit.getTime());
           m_time->Fill(digit.getTime());
@@ -406,15 +447,19 @@ namespace Belle2 {
         m_badHitsXY[i]->Fill(digit.getPixelCol(), digit.getPixelRow());
         m_badHitsAsics[i]->Fill(asic_no, asic_ch);
         m_badTdc[i]->Fill(digit.getRawTime());
+        m_badTDC->Fill(digit.getRawTime());
         m_badChannelHits[i]->Fill(digit.getChannel());
         n_bad[i]++;
       }
     }
 
     for (int i = 0; i < 16; i++) {
-      m_hitsPerEvent->Fill(i + 1, n_good[i]);
+      m_goodHitsPerEvent->Fill(i + 1, n_good[i]);
+      m_badHitsPerEvent->Fill(i + 1, n_bad[i]);
       m_goodHitsPerEvent[i]->Fill(n_good[i]);
+      m_goodHitsPerEventAll->Fill(n_good[i]);
       m_badHitsPerEvent[i]->Fill(n_bad[i]);
+      m_badHitsPerEventAll->Fill(n_bad[i]);
 
       bool slot_has_track = (n_good_first[i] + n_good_second[i]) > m_cutNphot;
       for (int j = 0; j < 512; j++) {

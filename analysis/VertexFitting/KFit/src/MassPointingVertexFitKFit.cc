@@ -6,8 +6,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/KFit/MakeMotherKFit.h>
-#include <analysis/KFit/MassPointingVertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
+#include <analysis/VertexFitting/KFit/MassPointingVertexFitKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
 
 using namespace std;

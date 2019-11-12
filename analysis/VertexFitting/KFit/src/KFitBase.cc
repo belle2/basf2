@@ -11,7 +11,7 @@
 #include <TMatrixFSym.h>
 
 #include <analysis/utility/ROOTToCLHEP.h>
-#include <analysis/KFit/KFitBase.h>
+#include <analysis/VertexFitting/KFit/KFitBase.h>
 
 using namespace std;
 using namespace Belle2;

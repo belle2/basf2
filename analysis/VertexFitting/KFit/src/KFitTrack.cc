@@ -11,7 +11,7 @@
 
 #include <cstdio>
 
-#include <analysis/KFit/KFitTrack.h>
+#include <analysis/VertexFitting/KFit/KFitTrack.h>
 
 using namespace CLHEP;
 using namespace std;

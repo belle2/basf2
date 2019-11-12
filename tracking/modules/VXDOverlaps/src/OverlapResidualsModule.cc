@@ -12,7 +12,9 @@
 #include <tracking/modules/VXDOverlaps/OverlapResidualsModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/core/Environment.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -314,38 +316,68 @@ void OverlapResidualsModule::defineHisto()
     t_PXD->Branch("extSensor_PXD", &extSensor_PXD, "extSensor_PXD/i");
     //Tree for SVD u overlapping clusters
     t_SVD_U = new TTree("t_SVD_U", "Tree for SVD u-overlaps");
-    t_SVD_U->Branch("deltaRes_SVD_U", &deltaRes_SVD_U, "deltaResU_SVD_U/F");
-    t_SVD_U->Branch("intRes_SVD_U", &intRes_SVD_U, "intRes_SVD_U/F");
-    t_SVD_U->Branch("int_SVD_U", &int_SVD_U, "int_SVD_U/F");
-    t_SVD_U->Branch("intPhi_SVD_U", &intPhi_SVD_U, "intPhi_SVD_U/F");
-    t_SVD_U->Branch("intZ_SVD_U", &intZ_SVD_U, "intZ_SVD_U/F");
-    t_SVD_U->Branch("intLayer_SVD_U", &intLayer_SVD_U, "intLayer_SVD_U/i");
-    t_SVD_U->Branch("intLadder_SVD_U", &intLadder_SVD_U, "intLadder_SVD_U/i");
-    t_SVD_U->Branch("intSensor_SVD_U", &intSensor_SVD_U, "intSensor_SVD_U/i");
-    t_SVD_U->Branch("extRes_SVD_U", &extRes_SVD_U, "extRes_SVD_U/F");
-    t_SVD_U->Branch("ext_SVD_U", &ext_SVD_U, "ext_SVD_U/F");
-    t_SVD_U->Branch("extPhi_SVD_U", &extPhi_SVD_U, "extPhi_SVD_U/F");
-    t_SVD_U->Branch("extZ_SVD_U", &extZ_SVD_U, "extZ_SVD_U/F");
-    t_SVD_U->Branch("extLayer_SVD_U", &extLayer_SVD_U, "extLayer_SVD_U/i");
-    t_SVD_U->Branch("extLadder_SVD_U", &extLadder_SVD_U, "extLadder_SVD_U/i");
-    t_SVD_U->Branch("extSensor_SVD_U", &extSensor_SVD_U, "extSensor_SVD_U/i");
+    t_SVD_U->Branch("deltaRes", &deltaRes_SVD_U, "deltaResU/F");
+    t_SVD_U->Branch("intRes", &intRes_SVD_U, "intRes/F");
+    t_SVD_U->Branch("intClPos", &intClPos_SVD_U, "intClPos/F");
+    t_SVD_U->Branch("intClPosErr", &intClPosErr_SVD_U, "intClPosErr/F");
+    t_SVD_U->Branch("intTruePos", &intTruePos_SVD_U, "intTruePos/F");
+    t_SVD_U->Branch("intClPhi", &intClPhi_SVD_U, "intClPhi/F");
+    t_SVD_U->Branch("intClZ", &intClZ_SVD_U, "intClZ/F");
+    t_SVD_U->Branch("intTrkPos", &intTrkPos_SVD_U, "intTrkPos/F");
+    t_SVD_U->Branch("intTrkPosErr", &intTrkPosErr_SVD_U, "intTrkPosErr/F");
+    t_SVD_U->Branch("intTrkQoP", &intTrkQoP_SVD_U, "intTrkQoP/F");
+    t_SVD_U->Branch("intTrkPrime", &intTrkPrime_SVD_U, "intTrkPrime/F");
+    t_SVD_U->Branch("intLayer", &intLayer_SVD_U, "intLayer/i");
+    t_SVD_U->Branch("intLadder", &intLadder_SVD_U, "intLadder/i");
+    t_SVD_U->Branch("intSensor", &intSensor_SVD_U, "intSensor/i");
+    t_SVD_U->Branch("intSize", &intSize_SVD_U, "intSize/i");
+    t_SVD_U->Branch("deltaRes", &deltaRes_SVD_U, "deltaResU/F");
+    t_SVD_U->Branch("extRes", &extRes_SVD_U, "extRes/F");
+    t_SVD_U->Branch("extClPos", &extClPos_SVD_U, "extClPos/F");
+    t_SVD_U->Branch("extClPosErr", &extClPosErr_SVD_U, "extClPosErr/F");
+    t_SVD_U->Branch("extTruePos", &extTruePos_SVD_U, "extTruePos/F");
+    t_SVD_U->Branch("extClPhi", &extClPhi_SVD_U, "extClPhi/F");
+    t_SVD_U->Branch("extClZ", &extClZ_SVD_U, "extClZ/F");
+    t_SVD_U->Branch("extTrkPos", &extTrkPos_SVD_U, "extTrkPos/F");
+    t_SVD_U->Branch("extTrkPosErr", &extTrkPosErr_SVD_U, "extTrkPosErr/F");
+    t_SVD_U->Branch("extTrkQoP", &extTrkQoP_SVD_U, "extTrkQoP/F");
+    t_SVD_U->Branch("extTrkPrime", &extTrkPrime_SVD_U, "extTrkPrime/F");
+    t_SVD_U->Branch("extLayer", &extLayer_SVD_U, "extLayer/i");
+    t_SVD_U->Branch("extLadder", &extLadder_SVD_U, "extLadder/i");
+    t_SVD_U->Branch("extSensor", &extSensor_SVD_U, "extSensor/i");
+    t_SVD_U->Branch("extSize", &extSize_SVD_U, "extSize/i");
     //Tree for SVD v overlapping clusters
     t_SVD_V = new TTree("t_SVD_V", "Tree for SVD v-overlaps");
-    t_SVD_V->Branch("deltaRes_SVD_V", &deltaRes_SVD_V, "deltaResU_SVD_V/F");
-    t_SVD_V->Branch("intRes_SVD_V", &intRes_SVD_V, "intRes_SVD_V/F");
-    t_SVD_V->Branch("int_SVD_V", &int_SVD_V, "int_SVD_V/F");
-    t_SVD_V->Branch("intPhi_SVD_V", &intPhi_SVD_V, "intPhi_SVD_V/F");
-    t_SVD_V->Branch("intZ_SVD_V", &intZ_SVD_V, "intZ_SVD_V/F");
-    t_SVD_V->Branch("intLayer_SVD_V", &intLayer_SVD_V, "intLayer_SVD_V/i");
-    t_SVD_V->Branch("intLadder_SVD_V", &intLadder_SVD_V, "intLadder_SVD_V/i");
-    t_SVD_V->Branch("intSensor_SVD_V", &intSensor_SVD_V, "intSensor_SVD_V/i");
-    t_SVD_V->Branch("extRes_SVD_V", &extRes_SVD_V, "extRes_SVD_V/F");
-    t_SVD_V->Branch("ext_SVD_V", &ext_SVD_V, "ext_SVD_V/F");
-    t_SVD_V->Branch("extPhi_SVD_V", &extPhi_SVD_V, "extPhi_SVD_V/F");
-    t_SVD_V->Branch("extZ_SVD_V", &extZ_SVD_V, "extZ_SVD_V/F");
-    t_SVD_V->Branch("extLayer_SVD_V", &extLayer_SVD_V, "extLayer_SVD_V/i");
-    t_SVD_V->Branch("extLadder_SVD_V", &extLadder_SVD_V, "extLadder_SVD_V/i");
-    t_SVD_V->Branch("extSensor_SVD_V", &extSensor_SVD_V, "extSensor_SVD_V/i");
+    t_SVD_V->Branch("deltaRes", &deltaRes_SVD_V, "deltaResV/F");
+    t_SVD_V->Branch("intRes", &intRes_SVD_V, "intRes/F");
+    t_SVD_V->Branch("intClPos", &intClPos_SVD_V, "intClPos/F");
+    t_SVD_V->Branch("intClPosErr", &intClPosErr_SVD_V, "intClPosErr/F");
+    t_SVD_V->Branch("intTruePos", &intTruePos_SVD_V, "intTruePos/F");
+    t_SVD_V->Branch("intClPhi", &intClPhi_SVD_V, "intClPhi/F");
+    t_SVD_V->Branch("intClZ", &intClZ_SVD_V, "intClZ/F");
+    t_SVD_V->Branch("intTrkPos", &intTrkPos_SVD_V, "intTrkPos/F");
+    t_SVD_V->Branch("intTrkPosErr", &intTrkPosErr_SVD_V, "intTrkPosErr/F");
+    t_SVD_V->Branch("intTrkQoP", &intTrkQoP_SVD_V, "intTrkQoP/F");
+    t_SVD_V->Branch("intTrkPrime", &intTrkPrime_SVD_V, "intTrkPrime/F");
+    t_SVD_V->Branch("intLayer", &intLayer_SVD_V, "intLayer/i");
+    t_SVD_V->Branch("intLadder", &intLadder_SVD_V, "intLadder/i");
+    t_SVD_V->Branch("intSensor", &intSensor_SVD_V, "intSensor/i");
+    t_SVD_V->Branch("intSize", &intSize_SVD_V, "intSize/i");
+    t_SVD_V->Branch("deltaRes", &deltaRes_SVD_V, "deltaResV/F");
+    t_SVD_V->Branch("extRes", &extRes_SVD_V, "extRes/F");
+    t_SVD_V->Branch("extClPos", &extClPos_SVD_V, "extClPos/F");
+    t_SVD_V->Branch("extClPosErr", &extClPosErr_SVD_V, "extClPosErr/F");
+    t_SVD_V->Branch("extTruePos", &extTruePos_SVD_V, "extTruePos/F");
+    t_SVD_V->Branch("extClPhi", &extClPhi_SVD_V, "extClPhi/F");
+    t_SVD_V->Branch("extClZ", &extClZ_SVD_V, "extClZ/F");
+    t_SVD_V->Branch("extTrkPos", &extTrkPos_SVD_V, "extTrkPos/F");
+    t_SVD_V->Branch("extTrkPosErr", &extTrkPosErr_SVD_V, "extTrkPosErr/F");
+    t_SVD_V->Branch("extTrkQoP", &extTrkQoP_SVD_V, "extTrkQoP/F");
+    t_SVD_V->Branch("extTrkPrime", &extTrkPrime_SVD_V, "extTrkPrime/F");
+    t_SVD_V->Branch("extLayer", &extLayer_SVD_V, "extLayer/i");
+    t_SVD_V->Branch("extLadder", &extLadder_SVD_V, "extLadder/i");
+    t_SVD_V->Branch("extSensor", &extSensor_SVD_V, "extSensor/i");
+    t_SVD_V->Branch("extSize", &extSize_SVD_V, "extSize/i");
   }
   //Go back to the default output directory
   oldDir->cd();
@@ -353,6 +385,8 @@ void OverlapResidualsModule::defineHisto()
 
 void OverlapResidualsModule::event()
 {
+  bool isMC = Environment::Instance().isMC();
+
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
   for (const auto& trk : recoTracks) {
@@ -361,7 +395,7 @@ void OverlapResidualsModule::event()
     }
     const vector<PXDCluster* > pxdClusters = trk.getPXDHitList();
     const vector<SVDCluster* > svdClusters = trk.getSVDHitList();
-    B2INFO("FITTED TRACK:   NUMBER OF PXD HITS = " << pxdClusters.size() << "    NUMBER OF SVD HITS = " << svdClusters.size());
+    B2DEBUG(40, "FITTED TRACK:   NUMBER OF PXD HITS = " << pxdClusters.size() << "    NUMBER OF SVD HITS = " << svdClusters.size());
     //LOOKING FOR 2 CONSECUTIVE PXD HITS IN OVERLAPPING MODULES OF A SAME LAYER
     for (unsigned int i = 0; i < pxdClusters.size(); i++) {
       const PXDCluster* pxd_1 = pxdClusters[i];
@@ -395,7 +429,7 @@ void OverlapResidualsModule::event()
         const unsigned short pxd_Sensor_2 = pxd_id_2.getSensorNumber();
         if (pxd_Layer_1 == pxd_Layer_2 && ((pxd_Ladder_2 - pxd_Ladder_1) == -1.0 || (pxd_Ladder_2 - pxd_Ladder_1) == 7.0
                                            || (pxd_Ladder_2 - pxd_Ladder_1) == 11.0)) {
-          B2INFO(" ============= 2 hits in a PXD overlap ============= ");
+          B2DEBUG(40, " ============= 2 hits in a PXD overlap ============= ");
           const TVectorD resUnBias_PXD_1 = fittedResult_1->getResidual(0, false).getState();
           const TVectorD resUnBias_PXD_2 = fittedResult_2->getResidual(0, false).getState();
           const float res_U_1 = resUnBias_PXD_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
@@ -414,7 +448,7 @@ void OverlapResidualsModule::event()
           double pxdPhi_2 = atan2(pxdGlobal_2(1), pxdGlobal_2(0));
           double pxdZ_1 = pxdGlobal_1(2);
           double pxdZ_2 = pxdGlobal_2(2);
-          B2INFO("PXD: difference of residuals " << over_U_PXD << "   " << over_V_PXD);
+          B2DEBUG(40, "PXD: difference of residuals " << over_U_PXD << "   " << over_V_PXD);
           //Fill PXD tree for overlaps if required by the user
           if (m_ExpertLevel) {
             deltaResU_PXD = over_U_PXD;
@@ -480,6 +514,10 @@ void OverlapResidualsModule::event()
     //LOOKING FOR 2 CONSECUTIVE SVD HITS IN OVERLAPPING MODULES OF A SAME LAYER
     for (unsigned int i = 0; i < svdClusters.size(); i++) {
       const SVDCluster* svd_1 = svdClusters[i];
+
+      //get true hits, used only if isMC
+      RelationVector<SVDTrueHit> trueHit_1 = DataStore::getRelationsWithObj<SVDTrueHit>(svd_1);
+
       const RecoHitInformation* infoSVD_1 = trk.getRecoHitInformation(svd_1);
       if (!infoSVD_1) {
         continue;
@@ -495,6 +533,10 @@ void OverlapResidualsModule::event()
       const unsigned short svd_Sensor_1 = svd_id_1.getSensorNumber();
       for (unsigned int l = i + 1; l < svdClusters.size(); l++) {
         const SVDCluster* svd_2 = svdClusters[l];
+
+        //get true hits, used only if isMC
+        RelationVector<SVDTrueHit> trueHit_2 = DataStore::getRelationsWithObj<SVDTrueHit>(svd_2);
+
         const RecoHitInformation* infoSVD_2 = trk.getRecoHitInformation(svd_2);
         if (!infoSVD_2) {
           continue;
@@ -510,11 +552,15 @@ void OverlapResidualsModule::event()
         const unsigned short svd_Sensor_2 = svd_id_2.getSensorNumber();
         if (svd_Layer_1 == svd_Layer_2 && ((svd_Ladder_2 - svd_Ladder_1) == 1.0 || (svd_Ladder_2 - svd_Ladder_1) == -6.0
                                            || (svd_Ladder_2 - svd_Ladder_1) == -9.0 || (svd_Ladder_2 - svd_Ladder_1) == -11.0 || (svd_Ladder_2 - svd_Ladder_1) == -15.0)) {
-          B2INFO(" ============= 2 hits in a SVD overlap ============= ");
+          B2DEBUG(40, " ============= 2 hits in a SVD overlap ============= ");
           const TVectorD resUnBias_SVD_1 =  fittedResult_1->getResidual(0, false).getState();
           const TVectorD resUnBias_SVD_2 =  fittedResult_2->getResidual(0, false).getState();
-          const TVectorD& svd_predIntersect_1 = trk.getMeasuredStateOnPlaneFromRecoHit(infoSVD_1).getState();
-          const TVectorD& svd_predIntersect_2 = trk.getMeasuredStateOnPlaneFromRecoHit(infoSVD_2).getState();
+          genfit::MeasuredStateOnPlane state_1 = trk.getMeasuredStateOnPlaneFromRecoHit(infoSVD_1);
+          const TVectorD& svd_predIntersect_1 = state_1.getState();
+          const TMatrixDSym& covMatrix_1 = state_1.getCov();
+          genfit::MeasuredStateOnPlane state_2 = trk.getMeasuredStateOnPlaneFromRecoHit(infoSVD_2);
+          const TVectorD& svd_predIntersect_2 = state_2.getState();
+          const TMatrixDSym& covMatrix_2 = state_2.getCov();
           //Restricting to consecutive SVD u-clusters
           if (svd_1->isUCluster() == true && svd_2->isUCluster() == true) {
             const int strips_1 = svd_1->getSize();
@@ -534,24 +580,44 @@ void OverlapResidualsModule::event()
             double svdPhi_2 = atan2(svdGlobal_2(1), svdGlobal_2(0));
             double svdZ_1 = svdGlobal_1(2);
             double svdZ_2 = svdGlobal_2(2);
-            B2INFO("SVD: difference of u-residuals =========> " << over_U_SVD);
+            B2DEBUG(40, "SVD: difference of u-residuals =========> " << over_U_SVD);
             //Fill SVD tree for u-overlaps if required by the user
             if (m_ExpertLevel) {
               deltaRes_SVD_U = over_U_SVD;
               intRes_SVD_U = res_U_1;
-              int_SVD_U = svd_1->getPosition();
-              intPhi_SVD_U = svdPhi_1;
-              intZ_SVD_U = svdZ_1;
+              intClPos_SVD_U = svd_1->getPosition();
+              intClPosErr_SVD_U = svd_1->getPositionSigma();
+              if (isMC && trueHit_1.size() > 0)
+                intTruePos_SVD_U = trueHit_1[0]->getU();
+              else
+                intTruePos_SVD_U = -99;
+              intClPhi_SVD_U = svdPhi_1;
+              intClZ_SVD_U = svdZ_1;
+              intTrkPos_SVD_U = svd_predIntersect_1[3];
+              intTrkPosErr_SVD_U = sqrt(covMatrix_1[3][3]);
+              intTrkQoP_SVD_U = svd_predIntersect_1[0];
+              intTrkPrime_SVD_U = svd_predIntersect_1[1];
               intLayer_SVD_U = svd_Layer_1;
               intLadder_SVD_U = svd_Ladder_1;
               intSensor_SVD_U = svd_Sensor_1;
+              intSize_SVD_U = strips_1;
               extRes_SVD_U = res_U_2;
-              ext_SVD_U = svd_2->getPosition();
-              extPhi_SVD_U = svdPhi_2;
-              extZ_SVD_U = svdZ_2;
+              extClPos_SVD_U = svd_2->getPosition();
+              extClPosErr_SVD_U = svd_2->getPositionSigma();
+              if (isMC && trueHit_2.size() > 0)
+                extTruePos_SVD_U = trueHit_2[0]->getU();
+              else
+                extTruePos_SVD_U = -99;
+              extClPhi_SVD_U = svdPhi_2;
+              extClZ_SVD_U = svdZ_2;
+              extTrkPos_SVD_U = svd_predIntersect_2[3];
+              extTrkPosErr_SVD_U = sqrt(covMatrix_2[3][3]);
+              extTrkQoP_SVD_U = svd_predIntersect_2[0];
+              extTrkPrime_SVD_U = svd_predIntersect_2[1];
               extLayer_SVD_U = svd_Layer_2;
               extLadder_SVD_U = svd_Ladder_2;
               extSensor_SVD_U = svd_Sensor_2;
+              extSize_SVD_U = strips_2;
               t_SVD_U->Fill();
             }
             //Fill histograms of residuals differences with SVD u clusters
@@ -607,7 +673,7 @@ void OverlapResidualsModule::event()
             const double res_V_1 = resUnBias_SVD_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
             const double res_V_2 = resUnBias_SVD_2.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
             const float over_V_SVD = res_V_2 - res_V_1;
-            const TVector3 svdLocal_1(svd_predIntersect_2[3], svd_1->getPosition(), 0.);
+            const TVector3 svdLocal_1(svd_predIntersect_1[3], svd_1->getPosition(), 0.);
             const TVector3 svdLocal_2(svd_predIntersect_2[3], svd_2->getPosition(), 0.);
             const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
             const VXD::SensorInfoBase& svdSensor_2 = geo.get(svd_id_2);
@@ -617,24 +683,44 @@ void OverlapResidualsModule::event()
             double svdPhi_2 = atan2(svdGlobal_2(1), svdGlobal_2(0));
             double svdZ_1 = svdGlobal_1(2);
             double svdZ_2 = svdGlobal_2(2);
-            B2INFO("SVD: difference of v-residuals =========> " << over_V_SVD);
+            B2DEBUG(40, "SVD: difference of v-residuals =========> " << over_V_SVD);
             //Fill SVD tree for v-overlaps if required by the user
             if (m_ExpertLevel) {
               deltaRes_SVD_V = over_V_SVD;
               intRes_SVD_V = res_V_1;
-              int_SVD_V = svd_1->getPosition();
-              intPhi_SVD_V = svdPhi_1;
-              intZ_SVD_V = svdZ_1;
+              intClPos_SVD_V = svd_1->getPosition();
+              intClPosErr_SVD_V = svd_1->getPositionSigma();
+              if (isMC && trueHit_1.size() > 0)
+                intTruePos_SVD_V = trueHit_1[0]->getV();
+              else
+                intTruePos_SVD_V = -99;
+              intClPhi_SVD_V = svdPhi_1;
+              intClZ_SVD_V = svdZ_1;
+              intTrkPos_SVD_V = svd_predIntersect_1[4];
+              intTrkPosErr_SVD_V = sqrt(covMatrix_1[4][4]);
+              intTrkQoP_SVD_V = svd_predIntersect_1[0];
+              intTrkPrime_SVD_V = svd_predIntersect_1[2];
               intLayer_SVD_V = svd_Layer_1;
               intLadder_SVD_V = svd_Ladder_1;
               intSensor_SVD_V = svd_Sensor_1;
+              intSize_SVD_V = strips_1;
               extRes_SVD_V = res_V_2;
-              ext_SVD_V = svd_2->getPosition();
-              extPhi_SVD_V = svdPhi_2;
-              extZ_SVD_V = svdZ_2;
+              extClPos_SVD_V = svd_2->getPosition();
+              extClPosErr_SVD_V = svd_2->getPositionSigma();
+              if (isMC && trueHit_2.size() > 0)
+                extTruePos_SVD_V = trueHit_2[0]->getV();
+              else
+                extTruePos_SVD_V = -99;
+              extClPhi_SVD_V = svdPhi_2;
+              extClZ_SVD_V = svdZ_2;
+              extTrkPos_SVD_V = svd_predIntersect_2[4];
+              extTrkPosErr_SVD_V = sqrt(covMatrix_2[4][4]);
+              extTrkQoP_SVD_V = svd_predIntersect_2[0];
+              extTrkPrime_SVD_V = svd_predIntersect_2[2];
               extLayer_SVD_V = svd_Layer_2;
               extLadder_SVD_V = svd_Ladder_2;
               extSensor_SVD_V = svd_Sensor_2;
+              extSize_SVD_V = strips_2;
               t_SVD_V->Fill();
             }
             //Fill histograms of residuals differences with SVD v clusters

@@ -73,15 +73,19 @@ namespace Belle2 {
         // get last iteration for each module
 
         std::map<int, int> lastIterations;
+        std::map<int, int> lastIterationEntries;
         for (int i = 0; i < alignTree->GetEntries(); i++) {
           alignTree->GetEntry(i);
-          lastIterations[m_moduleID] = i;
+          if (m_iter > lastIterations[m_moduleID]) {
+            lastIterations[m_moduleID] = m_iter;
+            lastIterationEntries[m_moduleID] = i;
+          }
         }
 
         // store last iteration in a multimap
 
-        for (const auto& lastIteration : lastIterations) {
-          alignTree->GetEntry(lastIteration.second);
+        for (const auto& lastIterationEntry : lastIterationEntries) {
+          alignTree->GetEntry(lastIterationEntry.second);
           if (m_vAlignPars->size() != m_vAlignParsErr->size()) {
             B2ERROR("slot " << m_moduleID << ", set=" << set <<
                     ": sizes of vectors of alignment parameters and errors differ. "
@@ -215,7 +219,7 @@ namespace Belle2 {
         }
         if (vsize < 6) {
           B2ERROR("slot " << moduleID <<
-                  ": too few alignment parameters found in ntuple");
+                  ": too few alignment parameters found in ntuple, npar = " << vsize);
           continue;
         }
         alignment->setX(moduleID, data.alignPars[0], data.alignErrs[0]);

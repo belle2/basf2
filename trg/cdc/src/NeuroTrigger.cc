@@ -595,7 +595,11 @@ NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track)
     if (iSL % 2 == 0) continue;
     // get priority time
     int t = (m_hasT0) ? m_segmentHits[ihit]->priorityTime() - m_T0 : 0;
-    if (t < 0 || t > expert.getTMax()) continue;
+    if (t < 0) {
+      t = 0;
+    } else if (t > expert.getTMax()) {
+      continue;
+    }
     double relId = getRelId(*m_segmentHits[ihit]);
     if (expert.isRelevant(relId, iSL)) {
       if (nHits[iSL] < expert.getMaxHitsPerSL()) {
@@ -694,7 +698,11 @@ NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
     }
     // get priority time and apply time window cut
     int t = (m_hasT0) ? m_segmentHits[ihit]->priorityTime() - m_T0 : 0;
-    if (t < 0 || t > expert.getTMax()) continue;
+    if (t < 0) {
+      t = 0;
+    } else if (t > expert.getTMax()) {
+      continue;
+    }
     double relId = getRelId(*m_segmentHits[ihit]);
     if (expert.isRelevant(relId, iSL)) {
       // get reference hit (worst of existing hits)

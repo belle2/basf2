@@ -77,6 +77,10 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     # track fitting
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks).set_name(
         "Combined_DAFRecoFitter")
+    # Add MVA classifier that uses information not included in the calculation of the fit p-value
+    # to add a track quality indicator for classification of fake vs. MC-matched tracks
+    if add_mva_quality_indicator:
+        path.add_module("TrackQualityEstimatorMVA", collectEventFeatures=True)
     # create Belle2 Tracks from the genfit Tracks
     # The following particle hypothesis will be fitted: Pion, Kaon and Proton
     # Muon fit is working but gives very similar as the Pion due to the closeness of masses
@@ -86,9 +90,6 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     # implementation.
     path.add_module('TrackCreator', recoTrackColName=reco_tracks,
                     pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses)
-
-    if add_mva_quality_indicator:
-        path.add_module("TrackQualityEstimatorMVA", collectEventFeatures=True)
 
     # V0 finding
     path.add_module('V0Finder', RecoTracks=reco_tracks)

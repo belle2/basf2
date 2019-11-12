@@ -408,7 +408,7 @@ def create_calibration(cfg, name='MillepedeCalibration', tags=None, files=None, 
                               algorithms=algo,
                               input_files=None,
                               pre_collector_path=None,
-                              database_chain=[CentralDatabase(tag) for tag in tags],
+                              database_chain=[CentralDatabase(tag) for tag in tags] if tags is not None else None,
                               output_patterns=None,
                               max_files_per_collector_job=1,
                               backend_args=None
@@ -430,7 +430,7 @@ def create_calibration(cfg, name='MillepedeCalibration', tags=None, files=None, 
                                 input_files=filelist,
                                 pre_collector_path=col.path,
                                 max_files_per_collector_job=1,
-                                database_chain=[CentralDatabase(tag) for tag in tags])
+                                database_chain=[CentralDatabase(tag) for tag in tags] if tags is not None else None)
 
         calibration.add_collection(colname, collection)
 

@@ -35,7 +35,7 @@ def get_calibrations(input_data, **kwargs):
     input_files_physics = list(reduced_file_to_iov_physics.keys())
     basf2.B2INFO(f"Total number of physics files actually used as input = {len(input_files_physics)}")
 
-    reduced_file_to_iov_Bcosmics = filter_by_max_files_per_run(file_to_iov_Bcosmics, 20)
+    reduced_file_to_iov_Bcosmics = filter_by_max_files_per_run(file_to_iov_Bcosmics, 2)
     input_files_Bcosmics = list(reduced_file_to_iov_Bcosmics.keys())
     basf2.B2INFO(f"Total number of Bcosmics files actually used as input = {len(input_files_Bcosmics)}")
 
@@ -49,24 +49,29 @@ def get_calibrations(input_data, **kwargs):
     import ROOT
     from ROOT import Belle2
     import millepede_calibration as mp2
+    import alignment
 
     cfg = mp2.create_configuration(
-      db_components=['VXDAlignment', 'CDCAlignment']
-      constraints=[
-          alignment.constraints.VXDHierarchyConstraints(type=3, pxd=True, svd=True),
-          alignment.constraints.CDCLayerConstraints(z_offset=True)
-      ],
-      fixed=alignment.parameters.vxd_sensors(rigid=False, surface2=False, surface3=False, surface4=True),
-      commands=[
-          'method diagonalization 3 0.1',
-          'scaleerrors 1. 1.',
-          'entries 100'],
-      reco_components=['PXD', 'SVD', 'CDC'],
-      params=dict(minPValue=0., externalIterations=0),
-      min_entries=10000)
+        db_components=['VXDAlignment', 'CDCAlignment'],
+        constraints=[
+            alignment.constraints.VXDHierarchyConstraints(type=3, pxd=True, svd=True),
+            alignment.constraints.CDCLayerConstraints(z_offset=True)
+        ],
+        fixed=alignment.parameters.vxd_sensors(rigid=False, surface2=False, surface3=False, surface4=True),
+        commands=[
+            'method diagonalization 3 0.1',
+            'scaleerrors 1. 1.',
+            'entries 100'],
+        reco_components=['PXD', 'SVD', 'CDC'],
+        params=dict(minPValue=0., externalIterations=0),
+        min_entries=10000)
 
-    with cfg.reprocess_cosmics():
-        cfg.collect_tracks('RecoTracks')
+    with cfg.reprocess_cosmics(collection_name='Bcosmics'):
+        path = basf2.create_path()
+        ana.fillParticleList('mu+:bad', 'z0 > 57. and abs(d0) < 26.5', path=path)
+        path.add_module('SkimFilter', particleLists=['mu+:bad']).if_true(create_path())
+
+        cfg.collect_tracks('RecoTracks', path=path)
 
     with cfg.reprocess_physics():
         cfg.collect_tracks('RecoTracks')
@@ -74,17 +79,18 @@ def get_calibrations(input_data, **kwargs):
     cal = mp2.create_calibration(
         cfg,
         name='VXDCDCAlignment_stage0',
-        tags=[],
+        tags=None,
         files=dict(
             physics=input_files_physics,
-            dimuon_skim=input_files_dimuon_skim,
-            cosmics=input_files_Bcosmics,
-            B0cosmics=input_files_cosmics),
+            Bcosmics=input_files_Bcosmics),
         timedep=[],
         init_event=(
             0,
             0,
-            10))  # init_event used to setup geometry at particular (event, run, exp) - only needed for constraint generation
+            1003))  # init_event used to setup geometry at particular (event, run, exp) - only needed for constraint generation
+
+    basf2.set_module_parameters(cal.collections['physics'].pre_collector_path, 'RootInput', entrySequences=['0:4000'])
+    basf2.set_module_parameters(cal.collections['Bcosmics'].pre_collector_path, 'RootInput', entrySequences=['0:8000'])
 
     # Most values like database chain and backend args are overwritten by b2caf-prompt-run. But some can be set.
     cal.max_iterations = 3

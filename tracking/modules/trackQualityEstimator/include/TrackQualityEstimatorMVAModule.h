@@ -64,9 +64,6 @@ namespace Belle2 {
     /// Parameter to enable event-wise features
     bool m_collectEventFeatures = false;
 
-    /** Parameter to toggle whether QI should be set in mdst tracks (costs storage) */
-    bool m_exportToTracks = true;
-
     /// Store Array of the recoTracks
     StoreArray<RecoTrack> m_recoTracks;
 

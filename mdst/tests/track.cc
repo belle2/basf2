@@ -101,9 +101,6 @@ namespace Belle2 {
     EXPECT_EQ(trackQITest.getQualityIndicator(), 0.);
     Track trackQITest1(0.5);
     EXPECT_EQ(trackQITest1.getQualityIndicator(), 0.5);
-    Track trackQITest2;
-    trackQITest2.setQualityIndicator(0.5);
-    EXPECT_EQ(trackQITest2.getQualityIndicator(), 0.5);
   }
 
   /** Test simple Setters and Getters.

@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <tracking/modules/trackQualityEstimator/TrackQualityEstimatorMVAModule.h>
-#include <mdst/dataobjects/Track.h>
+
 using namespace Belle2;
 
 
@@ -45,12 +45,6 @@ TrackQualityEstimatorMVAModule::TrackQualityEstimatorMVAModule() : Module()
            m_pxdRecoTracksStoreArrayName,
            "Name of the PXD StoreArray.",
            m_pxdRecoTracksStoreArrayName);
-
-  addParam("exportToTracks",
-           m_exportToTracks,
-           "Whether QI property should also be set in fitted mdst Tracks in addition to RecoTracks."
-           " If enabled, this increases the mdst size.",
-           m_exportToTracks);
 
   addParam("TracksStoreArrayName",
            m_tracksStoreArrayName,
@@ -111,11 +105,5 @@ void TrackQualityEstimatorMVAModule::event()
     const float qualityIndicator = m_mvaExpert->predict();
     // set quality indicator property in RecoTracks and mdst Tracks from track fit
     recoTrack.setQualityIndicator(qualityIndicator);
-    if (m_exportToTracks) {
-      Track* const mdstTrack = recoTrack.getRelatedFrom<Track>(m_tracksStoreArrayName);
-      if (mdstTrack) {
-        mdstTrack->setQualityIndicator(qualityIndicator);
-      }
-    }
   }
 }

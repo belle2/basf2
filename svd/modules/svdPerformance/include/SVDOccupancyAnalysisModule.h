@@ -19,6 +19,8 @@
 #include <svd/dataobjects/SVDHistograms.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+
 #include <svd/calibration/SVDNoiseCalibrations.h>
 
 
@@ -69,6 +71,9 @@ namespace Belle2 {
     bool m_FADCmode = true; /**if true, ZS done with same algorithm as on FADC*/
 
   private:
+
+    /// Store Object for reading the trigger decision.
+    StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
 
     int m_nEvents = 0; /**< number of events*/
     StoreArray<SVDShaperDigit> m_svdShapers; /**<SVDShaperDigit StoreArray*/

@@ -181,21 +181,21 @@ namespace Belle2 {
     m_badTDC->SetOption("LIVE");
     m_badTDC->SetMinimum(0);
 
-    m_goodHitsPerEvent = new TProfile("goodHitsPerEvent", "Good hits per event vs. slot number",
-                                      16, 0.5, 16.5, 0, 1000);
-    m_goodHitsPerEvent->SetXTitle("slot number");
-    m_goodHitsPerEvent->SetYTitle("hits per event");
-    m_goodHitsPerEvent->SetOption("LIVE");
-    m_goodHitsPerEvent->SetStats(kFALSE);
-    m_goodHitsPerEvent->SetMinimum(0);
+    m_goodHitsPerEventProf = new TProfile("goodHitsPerEvent", "Good hits per event vs. slot number",
+                                          16, 0.5, 16.5, 0, 1000);
+    m_goodHitsPerEventProf->SetXTitle("slot number");
+    m_goodHitsPerEventProf->SetYTitle("hits per event");
+    m_goodHitsPerEventProf->SetOption("LIVE");
+    m_goodHitsPerEventProf->SetStats(kFALSE);
+    m_goodHitsPerEventProf->SetMinimum(0);
 
-    m_badHitsPerEvent = new TProfile("badHitsPerEvent", "Bad hits per event vs. slot number",
-                                     16, 0.5, 16.5, 0, 1000);
-    m_badHitsPerEvent->SetXTitle("slot number");
-    m_badHitsPerEvent->SetYTitle("hits per event");
-    m_badHitsPerEvent->SetOption("LIVE");
-    m_badHitsPerEvent->SetStats(kFALSE);
-    m_badHitsPerEvent->SetMinimum(0);
+    m_badHitsPerEventProf = new TProfile("badHitsPerEvent", "Bad hits per event vs. slot number",
+                                         16, 0.5, 16.5, 0, 1000);
+    m_badHitsPerEventProf->SetXTitle("slot number");
+    m_badHitsPerEventProf->SetYTitle("hits per event");
+    m_badHitsPerEventProf->SetOption("LIVE");
+    m_badHitsPerEventProf->SetStats(kFALSE);
+    m_badHitsPerEventProf->SetMinimum(0);
 
     for (int i = 0; i < m_numModules; i++) {
       int module = i + 1;
@@ -371,9 +371,9 @@ namespace Belle2 {
     m_time->Reset();
     m_goodTDC->Reset();
     m_badTDC->Reset();
-    m_goodHitsPerEvent->Reset();
+    m_goodHitsPerEventProf->Reset();
     m_goodHitsPerEventAll->Reset();
-    m_badHitsPerEvent->Reset();
+    m_badHitsPerEventProf->Reset();
     m_badHitsPerEventAll->Reset();
 
     for (int i = 0; i < m_numModules; i++) {
@@ -452,8 +452,8 @@ namespace Belle2 {
     }
 
     for (int i = 0; i < 16; i++) {
-      m_goodHitsPerEvent->Fill(i + 1, n_good[i]);
-      m_badHitsPerEvent->Fill(i + 1, n_bad[i]);
+      m_goodHitsPerEventProf->Fill(i + 1, n_good[i]);
+      m_badHitsPerEventProf->Fill(i + 1, n_bad[i]);
       m_goodHitsPerEvent[i]->Fill(n_good[i]);
       m_goodHitsPerEventAll->Fill(n_good[i]);
       m_badHitsPerEvent[i]->Fill(n_bad[i]);

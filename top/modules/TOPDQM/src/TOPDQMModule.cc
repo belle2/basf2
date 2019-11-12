@@ -182,30 +182,29 @@ namespace Belle2 {
     m_badTDC->SetMinimum(0);
 
     m_goodHitsPerEvent = new TProfile("goodHitsPerEvent", "Good hits per event vs. slot number",
-                                      m_goodHitsPerEvent = new TProfile("goodHitsPerEvent", "Good hits per event vs. slot number",
-                                          16, 0.5, 16.5, 0, 1000);
-                                      m_goodHitsPerEvent->SetXTitle("slot number");
-                                      m_goodHitsPerEvent->SetYTitle("hits per event");
-                                      m_goodHitsPerEvent->SetOption("LIVE");
-                                      m_goodHitsPerEvent->SetStats(kFALSE);
-                                      m_goodHitsPerEvent->SetMinimum(0);
+                                      16, 0.5, 16.5, 0, 1000);
+    m_goodHitsPerEvent->SetXTitle("slot number");
+    m_goodHitsPerEvent->SetYTitle("hits per event");
+    m_goodHitsPerEvent->SetOption("LIVE");
+    m_goodHitsPerEvent->SetStats(kFALSE);
+    m_goodHitsPerEvent->SetMinimum(0);
 
-                                      m_badHitsPerEvent = new TProfile("badHitsPerEvent", "Bad hits per event vs. slot number",
-                                          16, 0.5, 16.5, 0, 1000);
-                                      m_badHitsPerEvent->SetXTitle("slot number");
-                                      m_badHitsPerEvent->SetYTitle("hits per event");
-                                      m_badHitsPerEvent->SetOption("LIVE");
-                                      m_badHitsPerEvent->SetStats(kFALSE);
-                                      m_badHitsPerEvent->SetMinimum(0);
+    m_badHitsPerEvent = new TProfile("badHitsPerEvent", "Bad hits per event vs. slot number",
+                                     16, 0.5, 16.5, 0, 1000);
+    m_badHitsPerEvent->SetXTitle("slot number");
+    m_badHitsPerEvent->SetYTitle("hits per event");
+    m_badHitsPerEvent->SetOption("LIVE");
+    m_badHitsPerEvent->SetStats(kFALSE);
+    m_badHitsPerEvent->SetMinimum(0);
 
     for (int i = 0; i < m_numModules; i++) {
-    int module = i + 1;
-    string name, title;
-    TH1F* h1 = 0;
-    TH2F* h2 = 0;
-    TProfile2D* h3 = 0;
+      int module = i + 1;
+      string name, title;
+      TH1F* h1 = 0;
+      TH2F* h2 = 0;
+      TProfile2D* h3 = 0;
 
-    name = str(format("window_vs_asic_%1%") % (module));
+      name = str(format("window_vs_asic_%1%") % (module));
       title = str(format("Distribution of hits: raw timing for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 512, 0, 512);
       h2->SetOption("LIVE");

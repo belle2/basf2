@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kodys                                              *
+ * Contributors: Peter Kodys, Giulia Casarosa, Giuliana Rizzo             *
  *                                                                        *
  * Prepared for Belle II geometry                                         *
  *                                                                        *
@@ -13,7 +13,6 @@
 #include "svd/modules/svdDQM/SVDDQMExpressRecoModule.h"
 
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
-
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>

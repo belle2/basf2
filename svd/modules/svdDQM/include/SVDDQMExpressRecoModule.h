@@ -14,7 +14,6 @@
 
 #include <framework/core/HistoModule.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
-#include <mdst/dataobjects/TRGSummary.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/geometry/SensorInfo.h>

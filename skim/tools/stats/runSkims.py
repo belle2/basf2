@@ -1,8 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+"""
+
 from pathlib import Path
 import subprocess
 from tempfile import TemporaryNamedFile
 
-from basf2 import find_file
 from skimExpertFunctions import get_test_file
 
 statsDirectory = find_file('skim/tools/stats')
@@ -37,10 +41,10 @@ for skim in all_skims:
         input_file = get_test_file(f'{MCType}_{MCCampaign}')
         script = find_file(f'skim/standalone/{skim}_Skim_Standalone.py')
 
-        Path(statsDirectory, 'log').mkdir(parents=True, exist_ok=True)
-        log_file = Path(statsDirectory, 'log', f'{skim}_{MCCampaign}_{MCType}.out')
-        err_file = Path(statsDirectory, 'log', f'{skim}_{MCCampaign}_{MCType}.err')
-        json_file = Path(statsDirectory, 'log', f'JobInformation_{skim}_{MCCampaign}_{MCType}.json')
+        Path('log').mkdir(parents=True, exist_ok=True)
+        log_file = Path('log', f'{skim}_{MCCampaign}_{MCType}.out')
+        err_file = Path('log', f'{skim}_{MCCampaign}_{MCType}.err')
+        json_file = Path('log', f'JobInformation_{skim}_{MCCampaign}_{MCType}.json')
         output_file = TemporaryNamedFile().name
 
         print(f'Running {script} on {input_file} (MC type {MCCampaign}_{MCType}) to {output_file}')

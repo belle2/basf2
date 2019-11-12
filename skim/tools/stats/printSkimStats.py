@@ -19,11 +19,8 @@ from textwrap import wrap
 
 from tabulate import tabulate
 
-from basf2 import find_file
 from skimExpertFunctions import get_test_file, get_eventN, get_total_infiles
 
-
-statsDirectory = find_file('skim/tools/stats')
 
 skims = [
     'LeptonicUntagged',
@@ -126,11 +123,11 @@ def getSkimStatsDict(skims, samples, statistics):
 
     for skim in skims:
         for sample in samples:
-            logFileName = Path(statsDirectory, 'log', f'{skim}_{sample}.out')
+            logFileName = Path('log', f'{skim}_{sample}.out')
             with open(logFileName) as logFile:
                 logContents = logFile.read()
 
-            jsonFileName = Path(statsDirectory, 'log', f'JobInformation_{skim}_{sample}.json')
+            jsonFileName = Path('log', f'JobInformation_{skim}_{sample}.json')
             with open(jsonFileName) as jsonFile:
                 jsonContents = json.load(jsonFile)
 
@@ -169,84 +166,98 @@ statistics = {
     'RetentionRate': {
         'LongName': 'Retention rate (%)',
         'floatfmt': '.2f',
+        'PrintToScreen': True,
         'Calculate': lambda json, *_: 100 * nSkimmedEvents(json) / nInputEvents(json),
         'Combine': lambda statDict: mcWeightedAverage(statDict)
     },
     'nInputEvents': {
         'LongName': 'Number of input events of test',
         'floatfmt': '.0f',
+        'PrintToScreen': False,
         'Calculate': lambda json, *_: nInputEvents(json),
         'Combine': None
     },
     'nSkimmedEvents': {
         'LongName': 'Number of skimmed events',
         'floatfmt': '.0f',
+        'PrintToScreen': False,
         'Calculate': lambda json, *_: nSkimmedEvents(json),
         'Combine': None
     },
     'cpuTime': {
         'LongName': 'CPU time of test on KEKCC (s)',
         'floatfmt': '.1f',
+        'PrintToScreen': False,
         'Calculate': lambda _, log, __: cpuTime(log),
         'Combine': None
     },
     'cpuTimePerEvent': {
         'LongName': 'CPU time per event on KEKCC (s)',
         'floatfmt': '.3f',
+        'PrintToScreen': True,
         'Calculate': lambda json, log, *_: cpuTime(log) / nInputEvents(json),
         'Combine': lambda statDict: mcWeightedAverage(statDict)
     },
     'udstSize': {
         'LongName': 'uDST size of test (MB)',
         'floatfmt': '.2f',
+        'PrintToScreen': False,
         'Calculate': lambda json, *_: udstSize(json) / 1024,
         'Combine': None
     },
     'udstSizePerEvent': {
         'LongName': 'uDST size per event (kB)',
         'floatfmt': '.3f',
+        'PrintToScreen': True,
         'Calculate': lambda json, *_: udstSize(json) / nInputEvents(json),
         'Combine': lambda statDict: mcWeightedAverage(statDict)
     },
     'logSize': {
         'LongName': 'Log size of test (kB)',
         'floatfmt': '.1f',
+        'PrintToScreen': False,
         'Calculate': lambda _, log, __: logSize(log),
         'Combine': None
     },
     'logSizePerEvent': {
         'LongName': 'Log size per event (B)',
         'floatfmt': '.2f',
+        'PrintToScreen': True,
         'Calculate': lambda json, log, __: logSize(log) / nInputEvents(json) * 1024,
         'Combine': lambda statDict: mcWeightedAverage(statDict)
     },
     'averageCandidateMultiplicity': {
         'LongName': 'Average candidate multiplicity of passed events',
         'floatfmt': '.2f',
+        'PrintToScreen': True,
         'Calculate': lambda _, log, __: averageCandidateMultiplicity(log),
         'Combine': lambda statDict: mcWeightedAverage(statDict)
     },
     'memoryAverage': {
         'LongName': 'Average memory usage (MB)',
         'floatfmt': '.0f',
+        'PrintToScreen': True,
         'Calculate': lambda _, log, __: memoryAverage(log),
         'Combine': lambda statDict: mcWeightedAverage(statDict)
     },
     'memoryMaximum': {
         'LongName': 'Maximum memory usage (MB)',
         'floatfmt': '.0f',
+        'PrintToScreen': True,
         'Calculate': lambda _, log, __: memoryMaximum(log),
         'Combine': lambda statDict: max(statDict.values())
     },
     'udstSizePerEntireSample': {
         'LongName': 'Estimated uDST size for entire sample (GB)',
         'floatfmt': '.2f',
+        'PrintToScreen': False,
         'Calculate': lambda json, _, sample: udstSize(json) * nTotalEvents(sample) / nInputEvents(json) / 1024 / 1024,
         'Combine': lambda statDict: sum(statDict.values())
     },
     'logSizePerEntireSample': {
         'LongName': 'Estimated log size for entire sample (GB)',
         'floatfmt': '.2f',
+        'PrintToScreen': False,
         'Calculate': lambda json, log, sample: logSize(log) * nTotalEvents(sample) / nInputEvents(json) / 1024 / 1024,
         'Combine': lambda statDict: sum(statDict.values())
     }
@@ -254,7 +265,7 @@ statistics = {
 
 
 def toJson(allSkimStats):
-    outputJsonName = Path(statsDirectory, 'skimStats.json')
+    outputJsonName = 'skimStats.json'
     with open(outputJsonName, 'w') as outputJson:
         json.dump(allSkimStats, outputJson, indent=4)
 
@@ -264,7 +275,7 @@ def toScreen(allSkimStats):
         print(f'Performance statistics for {skimName} skim:')
 
         # Only print some stats to screen
-        printingStats = [stat for (stat, statInfo) in statistics.items() if statInfo['Combine']]
+        printingStats = [stat for (stat, statInfo) in statistics.items() if statInfo['PrintToScreen']]
         df = pd.DataFrame(skimStats, columns=printingStats)
 
         headers = ['\n'.join(wrap(statistics[stat]['LongName'], 12)) for stat in printingStats]
@@ -297,7 +308,7 @@ def toConfluence(allSkimStats):
 
     confluenceString = '\n'.join(confluenceStrings)
 
-    confluenceFileName = Path(statsDirectory, 'skimStats_confluence.txt')
+    confluenceFileName = 'skimStats_confluence.txt'
     with open(confluenceFileName, 'w') as confluenceFile:
         confluenceFile.write(confluenceString)
 

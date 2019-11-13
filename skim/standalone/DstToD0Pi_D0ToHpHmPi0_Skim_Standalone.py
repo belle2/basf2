@@ -25,7 +25,7 @@ skimCode = encodeSkimName('DstToD0Pi_D0ToHpHmPi0')
 
 c3bh1path = Path()
 
-fileList = get_test_file("mixedBGx1_MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 inputMdstList('default', fileList, path=c3bh1path)
 
 loadStdSkimPhoton(path=c3bh1path)

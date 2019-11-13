@@ -17,7 +17,7 @@ gb2_setuprel = 'release-04-00-00'
 
 darkskimpath = b2.Path()
 
-fileList = skimExp.get_test_file("mixedBGx1_MC12")
+fileList = skimExp.get_test_file("MC12_mixedBGx1")
 ma.inputMdstList('default', fileList, path=darkskimpath)
 
 charged.stdMu('all', path=darkskimpath)

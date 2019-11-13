@@ -27,7 +27,7 @@ skimCode = "DstToD0Pi_D0ToRare"
 
 crpath = Path()
 
-fileList = get_test_file("mixedBGx1_MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 inputMdstList('default', fileList, path=crpath)
 
 

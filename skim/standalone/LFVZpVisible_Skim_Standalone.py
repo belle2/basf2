@@ -21,7 +21,7 @@ import os
 import glob
 
 lfvzppath = Path()
-fileList = get_test_file("mixedBGx1_MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 inputMdstList('default', fileList, path=lfvzppath)
 
 stdPi('loose', path=lfvzppath)

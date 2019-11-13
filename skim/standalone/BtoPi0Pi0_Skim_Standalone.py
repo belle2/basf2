@@ -25,7 +25,7 @@ import glob
 skimCode = encodeSkimName('BtoPi0Pi0')
 
 path = Path()
-fileList = get_test_file("mixedBGx1_MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 inputMdstList('default', fileList, path=path)
 
 # load particle lists

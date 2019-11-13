@@ -21,7 +21,7 @@ skimCode = encodeSkimName('Systematics')
 argvs = sys.argv
 argc = len(argvs)
 
-fileList = get_test_file("mixedBGx1_MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 
 inputMdstList('default', fileList, path=skimpath)
 

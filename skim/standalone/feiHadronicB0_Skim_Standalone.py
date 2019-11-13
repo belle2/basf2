@@ -21,7 +21,7 @@ from beamparameters import add_beamparameters
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 gb2_setuprel = 'release-04-00-00'
 skimCode = encodeSkimName('feiHadronicB0')
-fileList = get_test_file("mixedBGx1_MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 
 path = create_path()
 

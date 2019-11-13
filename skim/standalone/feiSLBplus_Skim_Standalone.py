@@ -18,7 +18,7 @@ from modularAnalysis import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 gb2_setuprel = 'release-04-00-00'
 skimCode = encodeSkimName('feiSLBplus')
-fileList = get_test_file("mixedBGx1_MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 
 path = create_path()
 

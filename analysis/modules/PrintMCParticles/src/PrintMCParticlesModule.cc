@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/modules/PrintMCParticlesModule.h>
+#include <analysis/modules/PrintMCParticles/PrintMCParticlesModule.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 

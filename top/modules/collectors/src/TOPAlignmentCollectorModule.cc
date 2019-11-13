@@ -189,7 +189,7 @@ namespace Belle2 {
 
       hname = "timeHits" + slotName;
       title = "Photon time distribution " + slotTitle;
-      auto h8 = new TH2F(hname.c_str(), title.c_str(), 512, 0, 512, 200, 0, 20);
+      auto h8 = new TH2F(hname.c_str(), title.c_str(), 512, 0, 512, 200, 0, 50);
       h8->SetXTitle("channel number");
       h8->SetYTitle("time [ns]");
       registerObject<TH2F>(hname, h8);

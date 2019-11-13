@@ -254,8 +254,13 @@ namespace Belle2 {
 
       // check the results and return if alignment precision is not satisfied
 
-      if (not alignment->areAllCalibrated() or
-          not alignment->areAllPrecise(m_spatialPrecision, m_angularPrecision)) {
+      if (not alignment->areAllCalibrated()) {
+        B2INFO("Alignment not successful for all slots");
+        delete alignment;
+        return c_NotEnoughData;
+      }
+      if (not alignment->areAllPrecise(m_spatialPrecision, m_angularPrecision)) {
+        B2INFO("Alignment successful but precision worse than required");
         delete alignment;
         return c_NotEnoughData;
       }

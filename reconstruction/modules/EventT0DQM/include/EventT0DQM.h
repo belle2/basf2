@@ -19,6 +19,8 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <mdst/dataobjects/TRGSummary.h>
 
 #include "TH1F.h"
 #include "TString.h"
@@ -31,9 +33,7 @@ using std::string;
 namespace Belle2 {
 
   /**
-   * This module to design collect CDC dEdx monitoring for DQM and only minimal information are
-   * stored. All higher level calculation like fit etc is done using DQM analysis module.
-   * Output of this module used as an input to DQM analysis.
+   * This module to design collect the event t0 values base on different detectors and physics processes.
    */
 
   class EventT0DQMModule : public HistoModule {
@@ -69,15 +69,36 @@ namespace Belle2 {
 
   private:
 
+
+    StoreObjPtr<TRGSummary>    obj_trg_summary;   /**< Trigger Summary data object */
+    // L1 timing source from getTimeType() in TRGSummary
+    // See ETimingTYpe in mdst/dataobjects/include/TRGSummary.h (but information is obsolete...)
+    // (2019/11/11) release-04-00-02, return values from getTimType() are
+    // 0=ecltrg, 3=cdctrg, 5=delayed Bhabha, 7=random trigger from gdl, (toptrg is undefined yet)
+    int m_L1_timing_src;
+
     StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
     StoreObjPtr<EventT0> m_eventT0 ;  /**< Store array for event t0 */
 
-    TH1F* h_eventT0_ECL_bhabha{nullptr}; /**< event t0 histogram for ECL and bha bha events */
-    TH1F* h_eventT0_CDC_bhabha{nullptr}; /**< event t0 histogram for CDC and bha bha events */
-    TH1F* h_eventT0_TOP_bhabha{nullptr}; /**< event t0 histogram for TOP and bha bha events */
-    TH1F* h_eventT0_ECL_hadron{nullptr}; /**< event t0 histogram for ECL and hadronic events */
-    TH1F* h_eventT0_CDC_hadron{nullptr}; /**< event t0 histogram for CDC and hadronic events */
-    TH1F* h_eventT0_TOP_hadron{nullptr}; /**< event t0 histogram for TOP and hadronic events */
+    TH1F* h_eventT0_ECL_bhabha_L1_ECLTRG{nullptr}; /**< event t0 histogram for ECL and bha bha events wrt the ECL trigger time*/
+    TH1F* h_eventT0_CDC_bhabha_L1_ECLTRG{nullptr}; /**< event t0 histogram for CDC and bha bha events wrt the ECL trigger time*/
+    TH1F* h_eventT0_TOP_bhabha_L1_ECLTRG{nullptr}; /**< event t0 histogram for TOP and bha bha events wrt the ECL trigger time*/
+    TH1F* h_eventT0_ECL_hadron_L1_ECLTRG{nullptr}; /**< event t0 histogram for ECL and hadronic events wrt the ECL trigger time */
+    TH1F* h_eventT0_CDC_hadron_L1_ECLTRG{nullptr}; /**< event t0 histogram for CDC and hadronic events wrt the ECL trigger time */
+    TH1F* h_eventT0_TOP_hadron_L1_ECLTRG{nullptr}; /**< event t0 histogram for TOP and hadronic events wrt the ECL trigger time */
+    TH1F* h_eventT0_ECL_mumu_L1_ECLTRG{nullptr};   /**< event t0 histogram for ECL and mu mu events wrt the ECL trigger time*/
+    TH1F* h_eventT0_CDC_mumu_L1_ECLTRG{nullptr};   /**< event t0 histogram for CDC and mu mu events wrt the ECL trigger time*/
+    TH1F* h_eventT0_TOP_mumu_L1_ECLTRG{nullptr};   /**< event t0 histogram for TOP and mu mu events wrt the ECL trigger time*/
+
+    TH1F* h_eventT0_ECL_bhabha_L1_CDCTRG{nullptr}; /**< event t0 histogram for ECL and bha bha events wrt the CDC trigger time*/
+    TH1F* h_eventT0_CDC_bhabha_L1_CDCTRG{nullptr}; /**< event t0 histogram for CDC and bha bha events wrt the CDC trigger time*/
+    TH1F* h_eventT0_TOP_bhabha_L1_CDCTRG{nullptr}; /**< event t0 histogram for TOP and bha bha events wrt the CDC trigger time*/
+    TH1F* h_eventT0_ECL_hadron_L1_CDCTRG{nullptr}; /**< event t0 histogram for ECL and hadronic events wrt the CDC trigger time */
+    TH1F* h_eventT0_CDC_hadron_L1_CDCTRG{nullptr}; /**< event t0 histogram for CDC and hadronic events wrt the CDC trigger time */
+    TH1F* h_eventT0_TOP_hadron_L1_CDCTRG{nullptr}; /**< event t0 histogram for TOP and hadronic events wrt the CDC trigger time */
+    TH1F* h_eventT0_ECL_mumu_L1_CDCTRG{nullptr};   /**< event t0 histogram for ECL and mu mu events wrt the CDC trigger time*/
+    TH1F* h_eventT0_CDC_mumu_L1_CDCTRG{nullptr};   /**< event t0 histogram for CDC and mu mu events wrt the CDC trigger time*/
+    TH1F* h_eventT0_TOP_mumu_L1_CDCTRG{nullptr};   /**< event t0 histogram for TOP and mu mu events wrt the CDC trigger time*/
 
   };
 

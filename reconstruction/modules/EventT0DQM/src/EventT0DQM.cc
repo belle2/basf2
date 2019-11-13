@@ -19,7 +19,7 @@ REG_MODULE(EventT0DQM)
 EventT0DQMModule::EventT0DQMModule(): HistoModule()
 {
   setPropertyFlags(c_ParallelProcessingCertified); // parallel processing
-  setDescription("Make data quality monitoring plots for event t0 for bhabha and hadron samples.");
+  setDescription("Make data quality monitoring plots for event t0 for bhabha, mu mu, and hadron samples seeded by different trigger times.");
 }
 
 //---------------------------------
@@ -36,18 +36,63 @@ void EventT0DQMModule::defineHisto()
   int nBins = 160 ;
   double minT0 = -40 ;
   double maxT0 =  40 ;
-  h_eventT0_ECL_bhabha = new TH1F("h_eventT0_ECL_bhabha", "ECL event t0 - bhabhas;event t0 [ns];events / 0.5 ns", nBins, minT0,
-                                  maxT0);
-  h_eventT0_CDC_bhabha = new TH1F("h_eventT0_CDC_bhabha", "CDC event t0 - bhabhas;event t0 [ns];events / 0.5 ns", nBins, minT0,
-                                  maxT0);
-  h_eventT0_TOP_bhabha = new TH1F("h_eventT0_TOP_bhabha", "TOP event t0 - bhabhas;event t0 [ns];events / 0.5 ns", nBins, minT0,
-                                  maxT0);
-  h_eventT0_ECL_hadron = new TH1F("h_eventT0_ECL_hadron", "ECL event t0 - hadrons;event t0 [ns];events / 0.5 ns", nBins, minT0,
-                                  maxT0);
-  h_eventT0_CDC_hadron = new TH1F("h_eventT0_CDC_hadron", "CDC event t0 - hadrons;event t0 [ns];events / 0.5 ns", nBins, minT0,
-                                  maxT0);
-  h_eventT0_TOP_hadron = new TH1F("h_eventT0_TOP_hadron", "TOP event t0 - hadrons;event t0 [ns];events / 0.5 ns", nBins, minT0,
-                                  maxT0);
+
+  h_eventT0_ECL_bhabha_L1_ECLTRG = new TH1F("h_eventT0_ECL_bhabha_L1_ECLTRG",
+                                            "ECL event t0 - bhabhas - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_CDC_bhabha_L1_ECLTRG = new TH1F("h_eventT0_CDC_bhabha_L1_ECLTRG",
+                                            "CDC event t0 - bhabhas - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_TOP_bhabha_L1_ECLTRG = new TH1F("h_eventT0_TOP_bhabha_L1_ECLTRG",
+                                            "TOP event t0 - bhabhas - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_ECL_hadron_L1_ECLTRG = new TH1F("h_eventT0_ECL_hadron_L1_ECLTRG",
+                                            "ECL event t0 - hadrons - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_CDC_hadron_L1_ECLTRG = new TH1F("h_eventT0_CDC_hadron_L1_ECLTRG",
+                                            "CDC event t0 - hadrons - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_TOP_hadron_L1_ECLTRG = new TH1F("h_eventT0_TOP_hadron_L1_ECLTRG",
+                                            "TOP event t0 - hadrons - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_ECL_mumu_L1_ECLTRG   = new TH1F("h_eventT0_ECL_mumu_L1_ECLTRG",
+                                            "ECL event t0 - mu mu - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_CDC_mumu_L1_ECLTRG   = new TH1F("h_eventT0_CDC_mumu_L1_ECLTRG",
+                                            "CDC event t0 - mu mu - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_TOP_mumu_L1_ECLTRG   = new TH1F("h_eventT0_TOP_mumu_L1_ECLTRG",
+                                            "TOP event t0 - mu mu - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+
+
+  h_eventT0_ECL_bhabha_L1_CDCTRG = new TH1F("h_eventT0_ECL_bhabha_L1_CDCTRG",
+                                            "ECL event t0 - bhabhas - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_CDC_bhabha_L1_CDCTRG = new TH1F("h_eventT0_CDC_bhabha_L1_CDCTRG",
+                                            "CDC event t0 - bhabhas - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_TOP_bhabha_L1_CDCTRG = new TH1F("h_eventT0_TOP_bhabha_L1_CDCTRG",
+                                            "TOP event t0 - bhabhas - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_ECL_hadron_L1_CDCTRG = new TH1F("h_eventT0_ECL_hadron_L1_CDCTRG",
+                                            "ECL event t0 - hadrons - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_CDC_hadron_L1_CDCTRG = new TH1F("h_eventT0_CDC_hadron_L1_CDCTRG",
+                                            "CDC event t0 - hadrons - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_TOP_hadron_L1_CDCTRG = new TH1F("h_eventT0_TOP_hadron_L1_CDCTRG",
+                                            "TOP event t0 - hadrons - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_ECL_mumu_L1_CDCTRG   = new TH1F("h_eventT0_ECL_mumu_L1_CDCTRG",
+                                            "ECL event t0 - mu mu - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_CDC_mumu_L1_CDCTRG   = new TH1F("h_eventT0_CDC_mumu_L1_CDCTRG",
+                                            "CDC event t0 - mu mu - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
+  h_eventT0_TOP_mumu_L1_CDCTRG   = new TH1F("h_eventT0_TOP_mumu_L1_CDCTRG",
+                                            "TOP event t0 - mu mu - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                            nBins, minT0, maxT0);
 
   oldDir->cd();
 
@@ -63,7 +108,7 @@ void EventT0DQMModule::initialize()
     return;
   }
 
-  m_TrgResult.isOptional();
+  m_TrgResult.isRequired();
   m_eventT0.isRequired();
   REG_HISTOGRAM
 
@@ -79,12 +124,25 @@ void EventT0DQMModule::beginRun()
     return;
   }
 
-  h_eventT0_ECL_bhabha->Reset();
-  h_eventT0_CDC_bhabha->Reset();
-  h_eventT0_TOP_bhabha->Reset();
-  h_eventT0_ECL_hadron->Reset();
-  h_eventT0_CDC_hadron->Reset();
-  h_eventT0_TOP_hadron->Reset();
+  h_eventT0_ECL_bhabha_L1_ECLTRG->Reset();
+  h_eventT0_CDC_bhabha_L1_ECLTRG->Reset();
+  h_eventT0_TOP_bhabha_L1_ECLTRG->Reset();
+  h_eventT0_ECL_hadron_L1_ECLTRG->Reset();
+  h_eventT0_CDC_hadron_L1_ECLTRG->Reset();
+  h_eventT0_TOP_hadron_L1_ECLTRG->Reset();
+  h_eventT0_ECL_mumu_L1_ECLTRG->Reset();
+  h_eventT0_CDC_mumu_L1_ECLTRG->Reset();
+  h_eventT0_TOP_mumu_L1_ECLTRG->Reset();
+
+  h_eventT0_ECL_bhabha_L1_CDCTRG->Reset();
+  h_eventT0_CDC_bhabha_L1_CDCTRG->Reset();
+  h_eventT0_TOP_bhabha_L1_CDCTRG->Reset();
+  h_eventT0_ECL_hadron_L1_CDCTRG->Reset();
+  h_eventT0_CDC_hadron_L1_CDCTRG->Reset();
+  h_eventT0_TOP_hadron_L1_CDCTRG->Reset();
+  h_eventT0_ECL_mumu_L1_CDCTRG->Reset();
+  h_eventT0_CDC_mumu_L1_CDCTRG->Reset();
+  h_eventT0_TOP_mumu_L1_CDCTRG->Reset();
 
 }
 
@@ -92,16 +150,35 @@ void EventT0DQMModule::beginRun()
 //---------------------------------
 void EventT0DQMModule::event()
 {
+  if (!obj_trg_summary.isValid()) {
+    B2WARNING("TRGSummary object not available but required to indicate which detector provided the L1 trigger time");
+    return;
+  } else {
+    m_L1_timing_src = obj_trg_summary->getTimType();
+  }
+
+  bool Is_ECL_L1TriggerSource = false ;
+  bool Is_CDC_L1TriggerSource = false ;
+  if (m_L1_timing_src == 0) {            // for L1 timing source is "ecl trigger"
+    Is_ECL_L1TriggerSource = true ;
+  } else if (m_L1_timing_src == 3) {     // for L1 timing source is "cdc trigger"
+    Is_CDC_L1TriggerSource = true ;
+  }
+  // else if(m_L1_timing_src==5){  // for L1 timing source is "delayed Bhabha" }
+  B2DEBUG(20, "Is_ECL_L1TriggerSource = " << Is_ECL_L1TriggerSource) ;
+  B2DEBUG(20, "Is_CDC_L1TriggerSource= " << Is_CDC_L1TriggerSource) ;
+
 
   if (!m_TrgResult.isValid()) {
-    B2WARNING("SoftwareTriggerResult object not available but require to select bhabha/hadron events for this module");
+    B2WARNING("SoftwareTriggerResult object not available but require to select bhabha/mumu/hadron events for this module");
     return;
   }
 
   const std::map<std::string, int>& fresults = m_TrgResult->getResults();
   if ((fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end())   ||
+      (fresults.find("software_trigger_cut&skim&accept_mumu_2trk") == fresults.end())   ||
       (fresults.find("software_trigger_cut&skim&accept_hadron") == fresults.end())) {
-    B2WARNING("EventT0DQMModule: Can't find required bhabha or hadron trigger identifier");
+    B2WARNING("EventT0DQMModule: Can't find required bhabha or mumu or hadron trigger identifier");
     return;
   }
 
@@ -118,11 +195,25 @@ void EventT0DQMModule::event()
     return ;
   }
 
-  // determine if the event was part of the hadron skim or bhabha skim
+  // determine if the event was part of the hadron skim or bhabha skim or mumu skim
   const bool IsEvtAcceptedBhabha = (m_TrgResult->getResult("software_trigger_cut&skim&accept_bhabha") ==
                                     SoftwareTriggerCutResult::c_accept);
   const bool IsEvtAcceptedHadron = (m_TrgResult->getResult("software_trigger_cut&skim&accept_hadron") ==
                                     SoftwareTriggerCutResult::c_accept);
+  const bool IsEvtAcceptedMumu = (m_TrgResult->getResult("software_trigger_cut&skim&accept_mumu_2trk") ==
+                                  SoftwareTriggerCutResult::c_accept);
+
+
+  B2DEBUG(20, "bhabha trigger result = " << static_cast<std::underlying_type<SoftwareTriggerCutResult>::type>
+          (m_TrgResult->getResult("software_trigger_cut&skim&accept_bhabha"))) ;
+  B2DEBUG(20, "hadron trigger result = " << static_cast<std::underlying_type<SoftwareTriggerCutResult>::type>
+          (m_TrgResult->getResult("software_trigger_cut&skim&accept_hadron"))) ;
+  B2DEBUG(20, "mu mu trigger result = "  << static_cast<std::underlying_type<SoftwareTriggerCutResult>::type>
+          (m_TrgResult->getResult("software_trigger_cut&skim&accept_mumu_2trk"))) ;
+  B2DEBUG(20, "bhabha trigger comparison bool = " << IsEvtAcceptedBhabha) ;
+  B2DEBUG(20, "hadron trigger comparison bool = " << IsEvtAcceptedHadron) ;
+  B2DEBUG(20, "mumu trigger comparison bool = "   << IsEvtAcceptedMumu) ;
+
 
   // default values of the event t0 given that there may not be a value for every event depending on the detector measuring it.
   double event_t0_ECL = -1000 ;
@@ -168,20 +259,49 @@ void EventT0DQMModule::event()
 
 
 
-  // Fill the histograms with the event t0 values
-  if (IsEvtAcceptedBhabha) {   // fill the bha bha skim event t0s
-    h_eventT0_ECL_bhabha->Fill(event_t0_ECL);
-    h_eventT0_CDC_bhabha->Fill(event_t0_CDC);
-    h_eventT0_TOP_bhabha->Fill(event_t0_TOP);
+
+  // Fill the plots that used the ECL trigger as the L1 timing source
+  if (Is_ECL_L1TriggerSource) {
+    // Fill the histograms with the event t0 values
+    if (IsEvtAcceptedBhabha) {   // fill the bha bha skim event t0s
+      h_eventT0_ECL_bhabha_L1_ECLTRG->Fill(event_t0_ECL);
+      h_eventT0_CDC_bhabha_L1_ECLTRG->Fill(event_t0_CDC);
+      h_eventT0_TOP_bhabha_L1_ECLTRG->Fill(event_t0_TOP);
+    }
+
+    if (IsEvtAcceptedHadron) {    // fill the hadron skim event t0s
+      h_eventT0_ECL_hadron_L1_ECLTRG->Fill(event_t0_ECL);
+      h_eventT0_CDC_hadron_L1_ECLTRG->Fill(event_t0_CDC);
+      h_eventT0_TOP_hadron_L1_ECLTRG->Fill(event_t0_TOP);
+    }
+
+    if (IsEvtAcceptedMumu) {    // fill the mumu skim event t0s
+      h_eventT0_ECL_mumu_L1_ECLTRG->Fill(event_t0_ECL);
+      h_eventT0_CDC_mumu_L1_ECLTRG->Fill(event_t0_CDC);
+      h_eventT0_TOP_mumu_L1_ECLTRG->Fill(event_t0_TOP);
+    }
   }
+  // Fill the plots that used the CDC trigger as the L1 timing source
+  else if (Is_CDC_L1TriggerSource) {
+    // Fill the histograms with the event t0 values
+    if (IsEvtAcceptedBhabha) {   // fill the bha bha skim event t0s
+      h_eventT0_ECL_bhabha_L1_CDCTRG->Fill(event_t0_ECL);
+      h_eventT0_CDC_bhabha_L1_CDCTRG->Fill(event_t0_CDC);
+      h_eventT0_TOP_bhabha_L1_CDCTRG->Fill(event_t0_TOP);
+    }
 
-  if (IsEvtAcceptedHadron) {    // fill the hadron skim event t0s
-    h_eventT0_ECL_hadron->Fill(event_t0_ECL);
-    h_eventT0_CDC_hadron->Fill(event_t0_CDC);
-    h_eventT0_TOP_hadron->Fill(event_t0_TOP);
+    if (IsEvtAcceptedHadron) {    // fill the hadron skim event t0s
+      h_eventT0_ECL_hadron_L1_CDCTRG->Fill(event_t0_ECL);
+      h_eventT0_CDC_hadron_L1_CDCTRG->Fill(event_t0_CDC);
+      h_eventT0_TOP_hadron_L1_CDCTRG->Fill(event_t0_TOP);
+    }
+
+    if (IsEvtAcceptedMumu) {    // fill the mumu skim event t0s
+      h_eventT0_ECL_mumu_L1_CDCTRG->Fill(event_t0_ECL);
+      h_eventT0_CDC_mumu_L1_CDCTRG->Fill(event_t0_CDC);
+      h_eventT0_TOP_mumu_L1_CDCTRG->Fill(event_t0_TOP);
+    }
   }
-
-
 }
 
 

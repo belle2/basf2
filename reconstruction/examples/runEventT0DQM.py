@@ -30,7 +30,14 @@ main.add_module("RootInput", inputFileName=input_file)
 main.add_module("HistoManager", histoFileName="EventT0DQM.root")
 
 # run the DQM module
-main.add_module("EventT0DQM")
+eventT0DQMmodule = main.add_module("EventT0DQM")
+eventT0DQMmodule.set_log_level(LogLevel.INFO)  # LogLevel.DEBUG / LogLevel.INFO
+eventT0DQMmodule.set_debug_level(21)
+
+# == Show progress
+main.add_module('Progress')
 
 # Process events
 process(main)
+
+print(statistics)

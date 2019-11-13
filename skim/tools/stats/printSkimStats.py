@@ -15,6 +15,7 @@ import json
 import pandas as pd
 from pathlib import Path
 import re
+import sys
 from textwrap import wrap
 
 from tabulate import tabulate
@@ -149,10 +150,10 @@ def testLogContents(logContents, jsonContents, skim, sample):
                  jsonContents['basf2_status']['success'],
                  jsonContents['basf2_status']['errors'] == 0,
                  jsonContents['basf2_status']['fatals'] == 0,
-                 all(check for check in jsonContents['output_files']['checks_passed'].values())
+                 all(check for check in jsonContents['output_files'][0]['checks_passed'].values())
                  ]
 
-    if not all(*logTests, *jsonTests):
+    if not all(logTests) and all(jsonTests):
         raise SkimNotRunError(f'Error found in log files of {skim} skim on {sample} sample.\n' +
                               'Please check the .out, .err, and .json files in log/ directory.')
 
@@ -177,8 +178,8 @@ def getSkimStatsDict(skims, samples, statistics):
         except SkimNotRunError as e:
             del allSkimStats[skim]
 
-            print(f'Error! Could not get stats for {skim}. Details:')
-            print(e)
+            print(f'Error! Could not get stats for {skim}. Details:', file=sys.stderr)
+            print(e, file=sys.stderr)
 
     return allSkimStats
 

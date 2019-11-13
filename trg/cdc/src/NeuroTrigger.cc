@@ -576,7 +576,11 @@ NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track)
     if (iSL % 2 == 1) continue;
     // get priority time
     int t = (m_hasT0) ? axialHits[ihit]->priorityTime() - m_T0 : 0;
-    if (t < 0 || t > expert.getTMax()) continue;
+    if (t < 0) {
+      t = 0;
+    } else if (t > expert.getTMax()) {
+      t = expert.getTMax();
+    }
     double relId = getRelId(*axialHits[ihit]);
     if (expert.isRelevant(relId, iSL)) {
       if (nHits[iSL] < expert.getMaxHitsPerSL()) {
@@ -598,7 +602,7 @@ NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track)
     if (t < 0) {
       t = 0;
     } else if (t > expert.getTMax()) {
-      continue;
+      t = expert.getTMax();
     }
     double relId = getRelId(*m_segmentHits[ihit]);
     if (expert.isRelevant(relId, iSL)) {
@@ -648,7 +652,11 @@ NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
     }
     // get priority time and apply time window cut
     int t = (m_hasT0) ? axialHits[ihit]->priorityTime() - m_T0 : 0;
-    if (t < 0 || t > expert.getTMax()) continue;
+    if (t < 0) {
+      t = 0;
+    } else if (t > expert.getTMax()) {
+      t = expert.getTMax();
+    }
     double relId = getRelId(*axialHits[ihit]);
     if (expert.isRelevant(relId, iSL)) {
       // get reference hit (worst of existing hits)
@@ -701,7 +709,7 @@ NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
     if (t < 0) {
       t = 0;
     } else if (t > expert.getTMax()) {
-      continue;
+      t = expert.getTMax();
     }
     double relId = getRelId(*m_segmentHits[ihit]);
     if (expert.isRelevant(relId, iSL)) {
@@ -763,11 +771,11 @@ NeuroTrigger::getInputVector(unsigned isector, const vector<unsigned>& hitIds)
     unsigned short iSL = m_segmentHits[ihit]->getISuperLayer();
     unsigned short iRef = iSL + 9 * nHits[iSL];
     ++nHits[iSL];
-    int t = 0;
-    if (m_hasT0) {
-      t = ((m_segmentHits[ihit]->priorityTime() - m_T0) > 0) ? m_segmentHits[ihit]->priorityTime() - m_T0 : 0;
-    } else {
+    int t = (m_hasT0) ? m_segmentHits[ihit]->priorityTime() - m_T0 : 0;
+    if (t < 0) {
       t = 0;
+    } else if (t > expert.getTMax()) {
+      t = expert.getTMax();
     }
     int LR = m_segmentHits[ihit]->getLeftRight();
     double relId = getRelId(*m_segmentHits[ihit]);

@@ -602,12 +602,11 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
                            Belle2::ECLCluster::EHypothesisBit::c_nPhotons) : 0);
       };
 
-      const double maxClusterENeg = std::accumulate(negTrack->track->getRelationsTo<ECLCluster>().begin(),
-                                                    negTrack->track->getRelationsTo<ECLCluster>().end(),
-                                                    0.0, accumulatePhotonEnergy);
-      const double maxClusterEPos = std::accumulate(posTrack->track->getRelationsTo<ECLCluster>().begin(),
-                                                    posTrack->track->getRelationsTo<ECLCluster>().end(),
-                                                    0.0, accumulatePhotonEnergy);
+      const auto& clustersOfNegTrack = negTrack->track->getRelationsTo<ECLCluster>();
+      const auto& clustersOfPosTrack = posTrack->track->getRelationsTo<ECLCluster>();
+
+      const double maxClusterENeg = std::accumulate(clustersOfNegTrack.begin(), clustersOfNegTrack.end(), 0.0, accumulatePhotonEnergy);
+      const double maxClusterEPos = std::accumulate(clustersOfPosTrack.begin(), clustersOfPosTrack.end(), 0.0, accumulatePhotonEnergy);
 
       const TLorentzVector& momentumLabNeg(negTrack->p4Lab);
       const TLorentzVector& momentumLabPos(posTrack->p4Lab);

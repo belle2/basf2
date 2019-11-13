@@ -598,8 +598,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       const double maxPospT = posTrack->pT;
 
       auto accumulatePhotonEnergy = [](double result, const auto & cluster) {
-        return result + cluster.hasHypothesis(Belle2::ECLCluster::EHypothesisBit::c_nPhotons) ? cluster.getEnergy(
-                 Belle2::ECLCluster::EHypothesisBit::c_nPhotons) : 0;
+        return result + (cluster.hasHypothesis(Belle2::ECLCluster::EHypothesisBit::c_nPhotons) ? cluster.getEnergy(
+                           Belle2::ECLCluster::EHypothesisBit::c_nPhotons) : 0);
       };
 
       const double maxClusterENeg = std::accumulate(negTrack->track->getRelationsTo<ECLCluster>().begin(),

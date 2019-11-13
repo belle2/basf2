@@ -79,8 +79,11 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["nEhighLowAng"] = 0; /**< number of clusters with E*>m_Ehigh, low angles */
   calculationResult["nEsingleClust"] = 0; /**< clusters with E*> m_EsinglePhoton (1 GeV) */
   calculationResult["nEsinglePhotonBarrel"] = 0; /**< neutral clusters with E*> 1 GeV in [45,115] */
+  calculationResult["nEsinglePhotonExtendedBarrel"] = 0; /**< neutral clusters with E*> 1 GeV in [32,130] */
   calculationResult["nEsinglePhotonEndcap"] = 0; /**< neutral clusters with E*> 1 GeV, not barrel or low */
   calculationResult["nEsingleElectronBarrel"] = 0; /**< charged clusters with E*> 1 GeV in [45,115] */
+  calculationResult["nEsingleElectronExtendedBarrel"] = 0; /**< charged clusters with E*> 1 GeV in [32,130] */
+  calculationResult["nReducedEsinglePhotonReducedBarrel"] = 0; /**< charged clusters with E*> 0.5 GeV in [44,98] */
   calculationResult["nVetoClust"] = 0; /**< clusters with E>m_Emedium and |t|/dt99 < 10 */
   calculationResult["n2GeVNeutBarrel"] = 0;
   calculationResult["n2GeVNeutEndcap"] = 0;
@@ -246,18 +249,35 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       calculationResult["nEsingleClust"] += 1;
 
       const bool barrelRegion = thetaLab > 45 and thetaLab < 115;
+      const bool extendedBarrelRegion = thetaLab > 30 and thetaLab < 130;
       const bool endcapRegion = (thetaLab > 22 and thetaLab < 45) or (thetaLab > 115 and thetaLab < 145);
 
       if (photon and barrelRegion) {
         calculationResult["nEsinglePhotonBarrel"] += 1;
       }
 
+      if (photon and extendedBarrelRegion) {
+        calculationResult["nEsinglePhotonExtendedBarrel"] += 1;
+      }
+
       if (electron and barrelRegion) {
         calculationResult["nEsingleElectronBarrel"] += 1;
       }
 
+      if (electron and extendedBarrelRegion) {
+        calculationResult["nEsingleElectronExtendedBarrel"] += 1;
+      }
+
       if (photon and endcapRegion) {
         calculationResult["nEsinglePhotonEndcap"] += 1;
+      }
+    }
+
+    if (selectedCluster.energyCMS > m_reducedEsinglePhoton) {
+      const bool reducedBarrelRegion = thetaLab > 44 and thetaLab < 98;
+
+      if (photon and reducedBarrelRegion) {
+        calculationResult["nReducedEsinglePhotonReducedBarrel"] += 1;
       }
     }
 

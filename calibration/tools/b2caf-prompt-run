@@ -130,6 +130,11 @@ Required format of JSON file:
                 collection.use_central_database(global_tag)
             collection.backend_args = caf_config["backend_args"]
             collection.max_files_per_collector_job = args.files_per_job
+        # Although we set the collection database chain already. The algorithm needs the overall Calibration database chain
+        # to be set. Otherwise it doesn't know which Collection's databse chain to use.
+        cal.reset_database(apply_to_default_collection=False)
+        for global_tag in caf_config["database_chain"]:
+            cal.use_central_database(global_tag)
         # Heartbeat should be chosen by us, not the calibration setup function
         cal.heartbeat = default_collection_heartbeat
         # Backend should be chosen by us, not the calibration setup function

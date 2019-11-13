@@ -29,7 +29,7 @@ def setAnalysisConfigParams(configParametersAndValues, path):
     - 'mcMatchingVersion': Specifies what version of mc matching algorithm is going to be used:
 
           - 'MC5' - analysis of BelleII MC5
-          - 'Belle' - analaysis of Belle MC
+          - 'Belle' - analysis of Belle MC
           - 'BelleII' (default) - all other cases
 
     @param configParametersAndValues dictionary of parameters and their values of the form {param1: value, param2: value, ...)
@@ -271,7 +271,7 @@ def outputIndex(filename, path, includeArrays=[], keepParents=False, mc=True):
     @param str filename the name of the output index file
     @param str path modules are added to this path
     @param list(str) includeArrays: datastore arrays/objects to write to the output
-        file in addition to particl lists and related information
+        file in addition to particle lists and related information
     @param bool keepParents whether the parents of the input event will be saved as the parents of the same event
         in the output index file. Useful if you are only adding more information to another index file
     @param bool mc whether the input data is MC or not
@@ -377,7 +377,7 @@ def correctBrems(
     gammaList,
     maximumAcceptance=3.0,
     multiplePhotons=False,
-    usePhotonOnlyOnce=False,
+    usePhotonOnlyOnce=True,
     writeOut=False,
     path=None,
 ):
@@ -450,31 +450,16 @@ def correctFSR(
     path=None,
 ):
     """
-    Takes the particles from the given lepton list copies them to the output list and adds the
-    4-vector of the closest photon (considered as radiative) to the lepton, if the given
-    criteria for maximal angle and energy are fulfilled.
-    Please note, a new lepton is generated, with the old electron and -if found- a gamma as daughters.
-    Information attached to the track is only available for the old lepton, accessable via the daughter
-    metavariable, e.g. <daughter(0, eid)>.
-
-    @param outputListName The output lepton list containing the corrected leptons.
-    @param inputListName The initial lepton list containing the leptons to correct, should already exists.
-    @param gammaListName The gammas list containing possibly radiative gammas, should already exist..
-    @param angleThreshold The maximum angle (in degrees) between the lepton and the (radiative) gamma to be accepted.
-    @param energyThreshold The maximum energy of the (radiative) gamma to be accepted.
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    WARNING:
+      The :b2:mod:`FSRCorrection` module is now deprecated.
+      Please use `modularAnalysis.correctBrems` or `modularAnalysis.correctBremsBelle` instead.
+      The latter resembles the previous principle of FSRCorrection but does no
+      longer contain the faulty first-come, first-served approach. For Belle II
+      data it is recommended to use correctBrems(), which should perform better.
     """
 
-    fsrcorrector = register_module('FSRCorrection')
-    fsrcorrector.set_name('FSRCorrection_' + outputListName)
-    fsrcorrector.param('inputListName', inputListName)
-    fsrcorrector.param('outputListName', outputListName)
-    fsrcorrector.param('gammaListName', gammaListName)
-    fsrcorrector.param('angleThreshold', angleThreshold)
-    fsrcorrector.param('energyThreshold', energyThreshold)
-    fsrcorrector.param('writeOut', writeOut)
-    path.add_module(fsrcorrector)
+    B2WARNING("The correctFSR() module is now deprecated. Please use correctBrems() or correctBremsBelle() instead."
+              "When analysing Belle II data, it is recommended to use correctBrems().")
 
 
 def correctBremsBelle(
@@ -524,9 +509,14 @@ def copyLists(
     path=None,
 ):
     """
+
     Copy all Particle indices from all input ParticleLists to the single output ParticleList.
-    Note that the Particles themselves are not copied.The original and copied
-    ParticleLists will point to the same Particles.
+    Note that the Particles themselves are not copied.
+    The original and copied ParticleLists will point to the same Particles.
+    Duplicates are removed based on the first-come, first-served principle.
+    Therefore, the order of the input ParticleLists matters.
+    If you want to select the best duplicate based on another criterion, have
+    a look at the function `mergeListsWithBestDuplicate`.
 
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
@@ -646,6 +636,38 @@ def cutAndCopyList(
         path (basf2.Path): modules are added to this path
     """
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
+
+
+def mergeListsWithBestDuplicate(
+    outputListName,
+    inputListNames,
+    variable,
+    preferLowest=True,
+    writeOut=False,
+    path=None,
+):
+    """
+    Merge input ParticleLists into one output ParticleList. Only the best
+    among duplicates is kept. The lowest or highest value (configurable via
+    preferLowest) of the provided variable determines which duplicate is the
+    best.
+
+    @param ouputListName name of merged ParticleList
+    @param inputListName vector of original ParticleLists to be merged
+    @param variable      variable to determine best duplicate
+    @param preferLowest  whether lowest or highest value of variable should be preferred
+    @param writeOut      whether RootOutput module should save the created ParticleList
+    @param path          modules are added to this path
+    """
+
+    pmanipulate = register_module('ParticleListManipulator')
+    pmanipulate.set_name('PListMerger_' + outputListName)
+    pmanipulate.param('outputListName', outputListName)
+    pmanipulate.param('inputListNames', inputListNames)
+    pmanipulate.param('variable', variable)
+    pmanipulate.param('preferLowest', preferLowest)
+    pmanipulate.param('writeOut', writeOut)
+    path.add_module(pmanipulate)
 
 
 def fillSignalSideParticleList(outputListName, decayString, path):
@@ -1671,7 +1693,7 @@ def signalSideParticleFilter(
     to the particle from the input ParticleList. Additional selection criteria can be applied.
     If ROE is not related to any of the Particles from ParticleList or the Particle doesn't
     meet the selection criteria the execution of deadEndPath is started. This path, as the name
-    sugest should be empty and its purpose is to end the execution of for_each roe path for
+    suggests should be empty and its purpose is to end the execution of for_each roe path for
     the current ROE object.
 
     @param particleList  The input ParticleList
@@ -1698,7 +1720,7 @@ def signalSideParticleListsFilter(
     to the particle from the input ParticleList. Additional selection criteria can be applied.
     If ROE is not related to any of the Particles from ParticleList or the Particle doesn't
     meet the selection criteria the execution of deadEndPath is started. This path, as the name
-    sugest should be empty and its purpose is to end the execution of for_each roe path for
+    suggests should be empty and its purpose is to end the execution of for_each roe path for
     the current ROE object.
 
     @param particleLists  The input ParticleLists
@@ -1721,7 +1743,14 @@ def findMCDecay(
     path=None,
 ):
     """
-    The MCDecayFinder module is buggy at the moment. Not to be used.
+    Finds and creates a ``ParticleList`` for all ``MCParticle`` decays matching a given :ref:`DecayString`.
+    The decay string is required to describe correctly what you want.
+    In the case of inclusive decays, you can use :ref:`Grammar_for_custom_MCMatching`
+
+    @param list_name The output particle list name
+    @param decay     The decay string which you want
+    @param writeOut  Whether `RootOutput` module should save the created ``outputList``
+    @param path      modules are added to this path
     """
 
     decayfinder = register_module('MCDecayFinder')
@@ -1766,7 +1795,7 @@ def looseMCTruth(list_name, path):
     Performs loose MC matching for all particles in the specified
     ParticleList.
     The difference between loose and normal mc matching algorithm is that
-    the loose agorithm will find the common mother of the majority of daughter
+    the loose algorithm will find the common mother of the majority of daughter
     particles while the normal algorithm finds the common mother of all daughters.
     The results of loose mc matching algorithm are stored to the following extraInfo
     items:
@@ -1775,7 +1804,7 @@ def looseMCTruth(list_name, path):
       - looseMCMotherIndex: 1-based StoreArray<MCParticle> index of most common mother
       - looseMCWrongDaughterN: number of daughters that don't originate from the most
                                common mother
-      - looseMCWrongDaughterPDG: PDG code of the daughter that doesn't orginate from
+      - looseMCWrongDaughterPDG: PDG code of the daughter that doesn't originate from
                                  the most common mother
                                  (only if looseMCWrongDaughterN = 1)
       - looseMCWrongDaughterBiB: 1 if the wrong daughter is Beam Induced Background
@@ -1958,7 +1987,7 @@ def keepInROEMasks(
 ):
     """
     This function is used to apply particle list specific cuts on one or more ROE masks (track or eclCluster).
-    With this funciton one can KEEP the tracks/eclclusters used in particles from provided particle list.
+    With this function one can KEEP the tracks/eclclusters used in particles from provided particle list.
     This function should be executed only in the for_each roe path for the current ROE object.
 
     To avoid unnecessary computation, the input particle list should only contain particles from ROE
@@ -2000,7 +2029,7 @@ def discardFromROEMasks(
 ):
     """
     This function is used to apply particle list specific cuts on one or more ROE masks (track or eclCluster).
-    With this funciton one can DISCARD the tracks/eclclusters used in particles from provided particle list.
+    With this function one can DISCARD the tracks/eclclusters used in particles from provided particle list.
     This function should be executed only in the for_each roe path for the current ROE object.
 
     To avoid unnecessary computation, the input particle list should only contain particles from ROE

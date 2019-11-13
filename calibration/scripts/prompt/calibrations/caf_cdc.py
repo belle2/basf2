@@ -18,6 +18,7 @@ settings = CalibrationSettings(name="CDC Tracking",
 ################################################
 
 def get_calibrations(input_data, **kwargs):
+    import basf2
     # Gets the input files and IoV objects associated with the files.
     file_to_iov_mumu = input_data["hlt_mumu"]
     file_to_iov_hadron = input_data["hlt_hadron"]
@@ -36,7 +37,7 @@ def get_calibrations(input_data, **kwargs):
     basf2.B2INFO(f"Total number of hlt_mumu files actually used as input = {len(input_files_mumu)}")
 
     reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, max_files_per_run)
-    input_files_hadron = list(reduced_file_to_iov_cosmics.keys())
+    input_files_hadron = list(reduced_file_to_iov_hadron.keys())
     basf2.B2INFO(f"Total number of hlt_hadron files actually used as input = {len(input_files_hadron)}")
 
     input_file_dict = {"hlt_mumu": input_files_mumu, "hlt_hadron": input_files_hadron}
@@ -155,7 +156,8 @@ class CDCCalibration(Calibration):
                  algorithms,
                  input_file_dict,
                  max_iterations=5,
-                 dependencies=None):
+                 dependencies=None,
+                 queue='l'):
         for algo in algorithms:
             algo.setHistFileName(name)
 

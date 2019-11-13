@@ -54,6 +54,7 @@ TH2D* bmap_2; // board(copper-finess) status map 2D
 // add 20190205
 TH1D* h_occ; // occupancy
 TH1D* h_occ_L[56]; // occupancy layer dependent
+TH1D* h_hit_cell; // occupancy
 
 void cdcDQM7Module::defineHisto()
 {
@@ -121,6 +122,9 @@ void cdcDQM7Module::defineHisto()
   h_occ = new TH1D("occ", "occ. total", 100, 0, 1.);
   h_occ->SetFillColor(95);
 
+  // 20191108
+  h_hit_cell = new TH1D("h_hit_cell", "Hit of each cell", 14336, 0, 14335);
+  h_hit_cell->SetFillColor(20);
   //
   bmap_2 = new TH2D("bmap_2", "", 75, 0, 75, 4, 0, 4);
 
@@ -162,6 +166,7 @@ void cdcDQM7Module::beginRun()
   h_board_out_tdc->Reset();
   bmap_2->Reset();
   h_occ->Reset();
+  h_hit_cell->Reset();
 
 }
 
@@ -178,6 +183,8 @@ void cdcDQM7Module::event()
   // for layer dependent occupancy
   int whits_L[56] = {}; // wire hits
   double occ_L[56] = {}; // occupancy
+
+  int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
 
   for (int i = 0; i < nent; i++) {
     CDCHit* cdchit = static_cast<CDCHit*>(cdcHits[i]);
@@ -215,12 +222,25 @@ void cdcDQM7Module::event()
       }// fastest
 
     }// adc
+
+    // add by J.H. Yin
+    int cid(0);
+    if (adcsum > 25) {
+      if (sL == 0) {
+        cid = iL * ndiv[sL] + wid;
+      } else {
+        for (int isl = 0; isl < sL; isl ++) {
+          cid += sL * 6 * ndiv[isl];
+        }
+        cid += 2 * ndiv[0] + iL * ndiv[sL + 1] + wid;
+      }
+      h_hit_cell -> Fill(cid);
+    }
   }// cdchit
 
   h_fast_tdc->Fill(ftdc);
 
   // each layer
-  int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
   for (int b = 0; b < 56; b++) {
     int n_wire = 0;
     if (b < 8) {

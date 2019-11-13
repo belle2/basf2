@@ -51,6 +51,7 @@ namespace Belle2 {
     TH1D* h_occ = nullptr;/**<occupancy*/
     TH1D* h_occ_L[56] = {nullptr}; /**<occupancy-layer-dep.*/
 
+    TH1D* h_hit_cell = nullptr;/**<hits-of-cell*/
 
   };
 }

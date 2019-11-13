@@ -267,7 +267,7 @@ void KLMDigitizerModule::event()
       if (hit->getStripMin() <= 0)
         continue;
       if (m_EfficiencyMode == c_Plane) {
-        float efficiency = m_StripEfficiency->getEndcapEfficiency(
+        float efficiency = m_StripEfficiency->getBarrelEfficiency(
                              hit->getSection(), hit->getSector(),
                              hit->getLayer(), hit->getPlane(),
                              hit->getStripMin());

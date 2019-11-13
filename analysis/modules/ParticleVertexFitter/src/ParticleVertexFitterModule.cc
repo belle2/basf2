@@ -285,7 +285,8 @@ namespace Belle2 {
       fitChildren = m_decaydescriptor.getSelectionParticles(mother);
     }
 
-    for (auto itr = fitChildren.begin(); itr != fitChildren.end(); itr++) {
+    auto itr = fitChildren.begin();
+    while (itr != fitChildren.end()) {
       const Particle* child = *itr;
 
       if (child->getPValue() < 0) {
@@ -304,7 +305,9 @@ namespace Belle2 {
       if (isPi0) {
         // move children from fitChildren to pi0Children
         pi0Children.push_back(child);
-        fitChildren.erase(itr);
+        itr = fitChildren.erase(itr);
+      } else {
+        itr++;
       }
     }
 

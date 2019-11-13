@@ -27,7 +27,7 @@ input_branches = [
 ]
 
 now = datetime.datetime.now()
-uniqueID = "SVDCoGTimeCalibrations_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_lat=+47.16"
+# uniqueID = "SVDCoGTimeCalibrations_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_lat=+47.16"
 
 
 def remove_module(path, name):
@@ -51,7 +51,7 @@ def pre_alg(algorithm, iteration):
 '''
 
 
-def SVDCoGTimeCalibration(files, tags):
+def SVDCoGTimeCalibration(files, tags, uniqueID):
 
     # Set-up re-processing path
     path = create_path()
@@ -123,7 +123,8 @@ if __name__ == "__main__":
     print(" ")
 
     good_input_files = []
-
+    runs = []
+    expNum = int()
     for i in input_files:
         file_list = glob.glob(i)
         for f in file_list:
@@ -132,6 +133,17 @@ if __name__ == "__main__":
             if tree.GetEntries() != 0:
                 good_input_files.append(f)
                 print(str(f))
+                inputStringSplit = f.split("/")
+                s_run = str(inputStringSplit[10])
+                s_exp = str(inputStringSplit[8])
+                print(str(s_run) + " " + str(s_exp))
+                runNum = runs.append(int(s_run[1:6]))
+                expNum = int(s_exp[1:5])
+
+    runs.sort()
+
+    firstRun = runs[0]
+    lastRun = runs[-1]
 
     if not len(good_input_files):
         print("You have to specify some input file(s)\n"
@@ -139,8 +151,14 @@ if __name__ == "__main__":
         print("See: basf2 -h")
         sys.exit(1)
 
+    uniqueID = "SVDCoGTimeCalibrations_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_Exp" + \
+        str(expNum) + "_runsFrom" + str(firstRun) + "to" + str(lastRun)
+    print("UniqueID")
+    print("")
+    print(str(uniqueID))
+    print("")
     # 'data_reprocessing_prompt_rel4_patch'
-    svdCoGCAF = SVDCoGTimeCalibration(good_input_files, ['data_reprocessing_prompt_rel4_patchb', 'svd_NOCoGCorrections'])
+    svdCoGCAF = SVDCoGTimeCalibration(good_input_files, ['data_reprocessing_prompt_rel4_patchb', 'svd_NOCoGCorrections'], uniqueID)
 
     cal_fw = CAF()
     cal_fw.add_calibration(svdCoGCAF)

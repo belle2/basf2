@@ -59,8 +59,8 @@ namespace Belle2 {
              "sample type: one of dimuon or bhabha", std::string("dimuon"));
     addParam("deltaEcms", m_deltaEcms,
              "c.m.s energy window (half size) if sample is dimuon or bhabha", 0.1);
-    addParam("dr", m_dr, "cut on POCA in r", 2.0);
-    addParam("dz", m_dz, "cut on POCA in abs(z)", 4.0);
+    addParam("dr", m_dr, "cut on POCA in r", 1.0);
+    addParam("dz", m_dz, "cut on POCA in abs(z)", 2.0);
     addParam("minZ", m_minZ, "minimal local z of extrapolated hit", -130.0);
     addParam("maxZ", m_maxZ, "maximal local z of extrapolated hit", 130.0);
     addParam("stepPosition", m_stepPosition, "step size for translations", 1.0);
@@ -139,38 +139,67 @@ namespace Belle2 {
     // create and register output histograms and ntuples
 
     int numModules = geo->getNumModules();
-    auto h1 = new TH2F("tracks_per_slot", "tracks per slot and sample",
+    auto h1 = new TH2F("tracks_per_slot", "Number of tracks per slot and sample",
                        numModules, 0.5, numModules + 0.5, c_numSets, 0, c_numSets);
     h1->SetXTitle("slot number");
     h1->SetYTitle("sample number");
     registerObject<TH2F>("tracks_per_slot", h1);
 
-    auto h2 = new TH1F("local_z", "distribution of tracks along bar", 100, -150.0, 150.0);
-    h2->SetXTitle("local z [cm]");
-    registerObject<TH1F>("local_z", h2);
+    for (int slot = 1; slot <= numModules; slot++) {
+      std::string slotName = "_s" + to_string(slot);
+      std::string slotTitle = "(slot " + to_string(slot) + ")";
 
-    auto h3 = new TH2F("cth_vs_p", "track momentum", 100, 0.0, 7.0, 100, -1.0, 1.0);
-    h3->SetXTitle("p [GeV/c]");
-    h3->SetYTitle("cos #theta");
-    registerObject<TH2F>("cth_vs_p", h3);
+      std::string hname = "local_z" + slotName;
+      std::string title = "Distribution of tracks along bar " + slotTitle;
+      auto h2 = new TH1F(hname.c_str(), title.c_str(), 100, -150.0, 150.0);
+      h2->SetXTitle("local z [cm]");
+      registerObject<TH1F>(hname, h2);
 
-    auto h4 = new TH2F("poca_xy", "distribution of track POCA in x-y",
-                       100, -m_dr, m_dr, 100, -m_dr, m_dr);
-    h4->SetXTitle("x [cm]");
-    h4->SetYTitle("y [cm]");
-    registerObject<TH2F>("poca_xy", h4);
+      hname = "cth_vs_p" + slotName;
+      title = "Track momentum " + slotTitle;
+      auto h3 = new TH2F(hname.c_str(), title.c_str(), 100, 0.0, 7.0, 100, -1.0, 1.0);
+      h3->SetXTitle("p [GeV/c]");
+      h3->SetYTitle("cos #theta");
+      registerObject<TH2F>(hname, h3);
 
-    auto h5 = new TH1F("poca_z", "distribution of track POCA in z", 100, -m_dz, m_dz);
-    h5->SetXTitle("z [cm]");
-    registerObject<TH1F>("poca_z", h5);
+      hname = "poca_xy" + slotName;
+      title = "Track POCA in x-y " + slotTitle;
+      auto h4 = new TH2F(hname.c_str(), title.c_str(), 100, -m_dr, m_dr, 100, -m_dr, m_dr);
+      h4->SetXTitle("x [cm]");
+      h4->SetYTitle("y [cm]");
+      registerObject<TH2F>(hname, h4);
 
-    auto h6 = new TH1F("Ecms", "c.m.s. energy of track", 100, 5.1, 5.4);
-    h6->SetXTitle("E_{cms} [GeV]");
-    registerObject<TH1F>("Ecms", h6);
+      hname = "poca_z" + slotName;
+      title = "Track POCA in z " + slotTitle;
+      auto h5 = new TH1F(hname.c_str(), title.c_str(), 100, -m_dz, m_dz);
+      h5->SetXTitle("z [cm]");
+      registerObject<TH1F>(hname, h5);
 
-    auto h7 = new TH1F("charge", "charge of track", 3, -1.5, 1.5);
-    h7->SetXTitle("charge");
-    registerObject<TH1F>("charge", h7);
+      hname = "Ecms" + slotName;
+      title = "Track c.m.s. energy " + slotTitle;
+      auto h6 = new TH1F(hname.c_str(), title.c_str(), 100, 5.1, 5.4);
+      h6->SetXTitle("E_{cms} [GeV]");
+      registerObject<TH1F>(hname, h6);
+
+      hname = "charge" + slotName;
+      title = "Charge of track " + slotTitle;
+      auto h7 = new TH1F(hname.c_str(), title.c_str(), 3, -1.5, 1.5);
+      h7->SetXTitle("charge");
+      registerObject<TH1F>(hname, h7);
+
+      hname = "timeHits" + slotName;
+      title = "Photon time distribution " + slotTitle;
+      auto h8 = new TH2F(hname.c_str(), title.c_str(), 512, 0, 512, 200, 0, 20);
+      h8->SetXTitle("channel number");
+      h8->SetYTitle("time [ns]");
+      registerObject<TH2F>(hname, h8);
+
+      hname = "numPhot" + slotName;
+      title = "Number of photons " + slotTitle;
+      auto h9 = new TH1F(hname.c_str(), title.c_str(), 100, 0, 100);
+      h9->SetXTitle("photons per track");
+      registerObject<TH1F>(hname, h9);
+    }
 
     for (int set = 0; set < c_numSets; set++) {
       std::string name = "alignTree" + to_string(set);
@@ -183,6 +212,7 @@ namespace Belle2 {
       alignTree->Branch("iterPars", &m_vAlignPars);
       alignTree->Branch("iterParsErr", &m_vAlignParsErr);
       alignTree->Branch("valid", &m_valid);
+      alignTree->Branch("numPhot", &m_numPhot);
       alignTree->Branch("x", &m_x);
       alignTree->Branch("y", &m_y);
       alignTree->Branch("z", &m_z);
@@ -254,7 +284,7 @@ namespace Belle2 {
         countFails++;
       } else {
         B2INFO("Reached maximum allowed number of failed iterations. "
-               "Resetting TOPalign object");
+               "Resetting TOPalign object of set = " << sub << " at iter = " << m_iter);
         align.reset();
         countFails = 0;
       }
@@ -265,6 +295,7 @@ namespace Belle2 {
       m_ntrk = align.getNumUsedTracks();
       m_errorCode = err;
       m_valid = align.isValid();
+      m_numPhot = align.getNumOfPhotons();
 
       // set other ntuple variables
       const auto& localPosition = m_selector.getLocalPosition();
@@ -289,18 +320,27 @@ namespace Belle2 {
       alignTree->Fill();
 
       // fill control histograms
-      auto h2 = getObjectPtr<TH1F>("local_z");
+      std::string slotName = "_s" + to_string(m_targetMid);
+      auto h2 = getObjectPtr<TH1F>("local_z" + slotName);
       h2->Fill(m_z);
-      auto h3 = getObjectPtr<TH2F>("cth_vs_p");
+      auto h3 = getObjectPtr<TH2F>("cth_vs_p" + slotName);
       h3->Fill(m_p, cos(m_theta));
-      auto h4 = getObjectPtr<TH2F>("poca_xy");
+      auto h4 = getObjectPtr<TH2F>("poca_xy" + slotName);
       h4->Fill(m_pocaX, m_pocaY);
-      auto h5 = getObjectPtr<TH1F>("poca_z");
+      auto h5 = getObjectPtr<TH1F>("poca_z" + slotName);
       h5->Fill(m_pocaZ);
-      auto h6 = getObjectPtr<TH1F>("Ecms");
+      auto h6 = getObjectPtr<TH1F>("Ecms" + slotName);
       h6->Fill(m_cmsE);
-      auto h7 = getObjectPtr<TH1F>("charge");
+      auto h7 = getObjectPtr<TH1F>("charge" + slotName);
       h7->Fill(m_charge);
+      auto h8 = getObjectPtr<TH2F>("timeHits" + slotName);
+      for (const auto& digit : m_digits) {
+        if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+        if (digit.getModuleID() != m_targetMid) continue;
+        h8->Fill(digit.getChannel(), digit.getTime());
+      }
+      auto h9 = getObjectPtr<TH1F>("numPhot" + slotName);
+      h9->Fill(m_numPhot);
 
     } // tracks
 

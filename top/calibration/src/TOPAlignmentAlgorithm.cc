@@ -116,18 +116,30 @@ namespace Belle2 {
       // write control histograms
 
       h1->Write();
-      auto h2 = getObjectPtr<TH1F>("local_z");
-      if (h2) h2->Write();
-      auto h3 = getObjectPtr<TH2F>("cth_vs_p");
-      if (h3) h3->Write();
-      auto h4 = getObjectPtr<TH2F>("poca_xy");
-      if (h4) h4->Write();
-      auto h5 = getObjectPtr<TH1F>("poca_z");
-      if (h5) h5->Write();
-      auto h6 = getObjectPtr<TH1F>("Ecms");
-      if (h6) h6->Write();
-      auto h7 = getObjectPtr<TH1F>("charge");
-      if (h7) h7->Write();
+      TDirectory* oldDir = gDirectory;
+      for (unsigned slot = 1; slot <= numModules; slot++) {
+        std::string slotName = "_s" + to_string(slot);
+        auto h2 = getObjectPtr<TH1F>("local_z" + slotName);
+        auto h3 = getObjectPtr<TH2F>("cth_vs_p" + slotName);
+        auto h4 = getObjectPtr<TH2F>("poca_xy" + slotName);
+        auto h5 = getObjectPtr<TH1F>("poca_z" + slotName);
+        auto h6 = getObjectPtr<TH1F>("Ecms" + slotName);
+        auto h7 = getObjectPtr<TH1F>("charge" + slotName);
+        auto h8 = getObjectPtr<TH2F>("timeHits" + slotName);
+        auto h9 = getObjectPtr<TH1F>("numPhot" + slotName);
+
+        std::string name = "slot_" + to_string(slot);
+        oldDir->mkdir(name.c_str())->cd();
+        if (h2) h2->Write();
+        if (h3) h3->Write();
+        if (h4) h4->Write();
+        if (h5) h5->Write();
+        if (h6) h6->Write();
+        if (h7) h7->Write();
+        if (h8) h8->Write();
+        if (h9) h9->Write();
+        oldDir->cd();
+      }
 
       // book output histograms
 

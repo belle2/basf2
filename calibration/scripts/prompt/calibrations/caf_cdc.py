@@ -22,11 +22,13 @@ def get_calibrations(input_data, **kwargs):
     # Gets the input files and IoV objects associated with the files.
     file_to_iov_mumu = input_data["hlt_mumu"]
     file_to_iov_hadron = input_data["hlt_hadron"]
+    print(file_to_iov_mumu)
+    print(file_to_iov_hadron)
 
     # We might have requested an enormous amount of data across a requested range.
     # There's a LOT more files than runs!
     # Lets set some limits because this calibration doesn't need that much to run.
-    max_files_per_run = 2
+    max_files_per_run = 100
 
     # We filter out any more than 2 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering
@@ -53,15 +55,34 @@ def get_calibrations(input_data, **kwargs):
     cal0 = CDCCalibration(name='tz0',
                           algorithms=[tz_algo()],
                           input_file_dict=input_file_dict,
+                          max_iterations=4,
+                          )
+
+    # tw
+    cal1 = CDCCalibration(name='tw0',
+                          algorithms=[tw_algo()],
+                          input_file_dict=input_file_dict,
                           max_iterations=1,
+                          dependencies=[cal0]
+                          )
+
+    cal2 = CDCCalibration(name='tz1',
+                          algorithms=[tz_algo()],
+                          input_file_dict=input_file_dict,
+                          max_iterations=4,
+                          dependencies=[cal1]
                           )
 
     # Force the output payload IoV to be correct.
     # It may be different if you are using another strategy like SequentialRunByRun
     for algorithm in cal0.algorithms:
         algorithm.params = {"apply_iov": output_iov}
+    for algorithm in cal1.algorithms:
+        algorithm.params = {"apply_iov": output_iov}
+    for algorithm in cal2.algorithms:
+        algorithm.params = {"apply_iov": output_iov}
 
-    return [cal0, ]
+    return [cal0, cal1, cal2]
 
 
 #################################################
@@ -134,13 +155,64 @@ def tz_algo():
     """
     from ROOT import Belle2
     algo = Belle2.CDC.T0CalibrationAlgorithm()
-    # algo.storeHisto(True)
-    algo.storeHisto(False)
+    algo.storeHisto(True)
+    # algo.storeHisto(False)
     # algo.setDebug(True)
     algo.setMaxMeanDt(0.5)
     algo.setMaxRMSDt(0.1)
     algo.setMinimumNDF(20)
     return algo
+
+
+def tw_algo():
+    """
+    Create a time walk calibration algorithm.
+    Returns:
+        algo : TW algorithm
+    """
+    from ROOT import Belle2
+    algo = Belle2.CDC.TimeWalkCalibrationAlgorithm()
+    algo.setStoreHisto(True)
+    # algo.setStoreHisto(False)
+    # algo.setMode(0)
+    algo.setMode(1)
+    return algo
+
+
+def xt_algo():
+    """
+    Create a XT calibration algorithm.
+    Parameters:
+        prefix : prefixed name for algorithm,
+                 which should be consistent with one of collector..
+    Returns:
+        algo : XT algorithm
+    """
+    from ROOT import Belle2
+    algo = Belle2.CDC.XTCalibrationAlgorithm()
+    algo.setStoreHisto(True)
+    # algo.setStoreHisto(False)
+    algo.setLRSeparate(True)
+    algo.setThreshold(0.55)
+    return algo
+
+
+def sr_algo():
+    """
+    Create a Spacial resolution calibration algorithm.
+    Parameters:
+        prefix : prefixed name for algorithm,
+                 which should be consistent with one of collector..
+    Returns:
+        algo : Spacial algorithm
+    """
+    from ROOT import Belle2
+    algo = Belle2.CDC.SpaceResolutionCalibrationAlgorithm()
+    algo.setStoreHisto(True)
+    # algo.setStoreHisto(False)
+    algo.setThreshold(0.4)
+    return algo
+
 
 from caf.framework import Calibration
 
@@ -167,7 +239,7 @@ class CDCCalibration(Calibration):
 
         from caf.framework import Collection
 
-        max_events = 10
+        max_events = 10000
         for skim_type, file_list in input_file_dict.items():
             collection = Collection(collector=collector(),
                                     input_files=file_list,

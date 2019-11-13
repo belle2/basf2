@@ -10,6 +10,7 @@ __email__ = "philip.grace@adelaide.edu.au, rachac@mail.ubc.ca"
 
 
 import argparse
+from collections import OrderedDict
 from functools import lru_cache
 import json
 import pandas as pd
@@ -26,12 +27,12 @@ skims = [
     'LeptonicUntagged',
 ]
 
-beamBackgroundWeights = {
+beamBackgroundWeights = OrderedDict({
     'BGx1': 0.8,
     'BGx0': 0.2
-}
+})
 
-mcSampleCrossSections = {
+mcSampleCrossSections = OrderedDict({
     'mixed': 0.555,
     'charged': 0.555,
     'ccbar': 1.3,
@@ -39,19 +40,24 @@ mcSampleCrossSections = {
     'ddbar': 0.40,
     'ssbar': 0.38,
     'taupair': 0.91
-}
+})
 
 mcCampaign = 'MC12'
 
-mcSamples = [f'{mcCampaign}_{mcSample}{beamBackground}'
-             for beamBackground in beamBackgroundWeights.keys()
-             for mcSample in mcSampleCrossSections.keys()]
+mcSamples = OrderedDict({
+    f'{mcCampaign}_{mcSample}{beamBackground}': f'{mcCampaign}: {mcSample} {beamBackground}'
+    for beamBackground in beamBackgroundWeights.keys()
+    for mcSample in mcSampleCrossSections.keys()
+})
 
-dataSamples = []
-# TODO: acquire data samples and put in registry
-# dataSamples = ['proc9_exp3', 'proc9_exp7', 'proc9_exp8', 'bucket7_exp8']
+dataSamples = OrderedDict({
+    'proc9_exp3': 'Data: proc9 Experiment 3',
+    'proc9_exp7': 'Data: proc9 Experiment 7',
+    'proc9_exp8': 'Data: proc9 Experiment 8',
+    'bucket7_exp8': 'Data: bucket7 Experiment 8'
+})
 
-samples = mcSamples + dataSamples
+samples = list(mcSamples.keys()) + list(dataSamples.keys())
 
 
 def getStatFromLog(statistic, logFileContents):
@@ -281,6 +287,9 @@ def toScreen(allSkimStats):
         printingStats = [stat for (stat, statInfo) in statistics.items() if statInfo['PrintToScreen']]
         df = pd.DataFrame(skimStats, columns=printingStats)
 
+        df = df.reindex([*dataSamples.keys(), 'Combined MC', *mcSamples.keys()])
+        df = df.rename(index={**dataSamples, **mcSamples})
+
         headers = ['\n'.join(wrap(statistics[stat]['LongName'], 12)) for stat in printingStats]
         floatfmt = [''] + [statistics[stat]['floatfmt'] for stat in printingStats]
 
@@ -297,6 +306,10 @@ def toConfluence(allSkimStats):
     for skimName, skimStats in allSkimStats.items():
         confluenceStrings += [f'h1. Performance statistics for {skimName} skim']
         df = pd.DataFrame(skimStats)
+
+        # Set up row ordering and naming
+        df = df.reindex([*dataSamples.keys(), 'Combined MC', *mcSamples.keys()])
+        df = df.rename(index={**dataSamples, **mcSamples})
 
         headers = [statistics[stat]['LongName'] for stat in statistics]
         floatfmt = [''] + [statistics[stat]['floatfmt'] for stat in statistics]

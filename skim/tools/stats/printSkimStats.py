@@ -10,7 +10,6 @@ __email__ = "philip.grace@adelaide.edu.au, rachac@mail.ubc.ca"
 
 
 import argparse
-from collections import OrderedDict
 from functools import lru_cache
 import json
 import pandas as pd
@@ -27,12 +26,12 @@ skims = [
     'LeptonicUntagged',
 ]
 
-beamBackgroundWeights = OrderedDict({
+beamBackgroundWeights = {
     'BGx1': 0.8,
     'BGx0': 0.2
-})
+}
 
-mcSampleCrossSections = OrderedDict({
+mcSampleCrossSections = {
     'mixed': 0.555,
     'charged': 0.555,
     'ccbar': 1.3,
@@ -40,22 +39,22 @@ mcSampleCrossSections = OrderedDict({
     'ddbar': 0.40,
     'ssbar': 0.38,
     'taupair': 0.91
-})
+}
 
 mcCampaign = 'MC12'
 
-mcSamples = OrderedDict({
+mcSamples = {
     f'{mcCampaign}_{mcSample}{beamBackground}': f'{mcCampaign}: {mcSample} {beamBackground}'
     for beamBackground in beamBackgroundWeights.keys()
     for mcSample in mcSampleCrossSections.keys()
-})
+}
 
-dataSamples = OrderedDict({
+dataSamples = {
     'proc9_exp3': 'Data: proc9 Experiment 3',
     'proc9_exp7': 'Data: proc9 Experiment 7',
     'proc9_exp8': 'Data: proc9 Experiment 8',
     'bucket7_exp8': 'Data: bucket7 Experiment 8'
-})
+}
 
 samples = list(mcSamples.keys()) + list(dataSamples.keys())
 
@@ -277,6 +276,7 @@ def toJson(allSkimStats):
     outputJsonName = 'skimStats.json'
     with open(outputJsonName, 'w') as outputJson:
         json.dump(allSkimStats, outputJson, indent=4)
+    print(f'Wrote stats to JSON file {outputJsonName}.')
 
 
 def toScreen(allSkimStats):
@@ -318,7 +318,7 @@ def toConfluence(allSkimStats):
 
         # Make the first column (the sample label) bold on Confluence
         table = re.sub(r'^\| ', '|| ', table, flags=re.MULTILINE)
-        table = table.replace(' nan ', ' -- ')
+        table = table.replace(' nan ', ' --  ')
 
         confluenceStrings += [table]
 
@@ -327,6 +327,7 @@ def toConfluence(allSkimStats):
     confluenceFileName = 'skimStats_confluence.txt'
     with open(confluenceFileName, 'w') as confluenceFile:
         confluenceFile.write(confluenceString)
+    print(f'Wrote table to {confluenceFileName}. The contents of this file can be copied directly to Confluence.')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

@@ -536,6 +536,8 @@ def command_iov(args, db):
 
     .. versionchanged:: release-03-00-00
        modified output structure and added ``--human-readable``
+    .. versionchanged:: after release-04-00-00
+       added parameter ``--checksums``
     """
 
     iovfilter = ItemFilter(args)
@@ -674,6 +676,10 @@ def command_dump(args, db):
     Depending on whether you want to display a payload by its id in the
     database, its name and revision in the database or from a local file
     provide **one** of the arguments ``-i``, ``-r``, ``-f`` or ``-g``
+
+    .. versionchanged:: after release-04-00-00
+       added argument ``-r`` to directly dump a payload valid for a given run
+       in a given globaltag
     """
     if db is None:
         group = args.add_mutually_exclusive_group(required=True)

@@ -24,7 +24,8 @@ using namespace Belle2;
 REG_MODULE(KLMDigitizer)
 
 KLMDigitizerModule::KLMDigitizerModule() : Module(),
-  m_ChannelSpecificSimulation(false)
+  m_ChannelSpecificSimulation(false),
+  m_EfficiencyMode(c_Plane)
 {
   setDescription("KLM digitization module");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -34,6 +35,9 @@ KLMDigitizerModule::KLMDigitizerModule() : Module(),
   addParam("DigitizationInitialTime", m_DigitizationInitialTime,
            "Initial digitization time (ns).", double(-40.));
   addParam("SaveFPGAFit", m_SaveFPGAFit, "Save FPGA fit data", false);
+  addParam("Efficiency", m_Efficiency,
+           "Efficiency determination mode (\"Strip\" or \"Plane\")",
+           std::string("Plane"));
   addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
            false);
@@ -67,6 +71,12 @@ void KLMDigitizerModule::initialize()
   } else {
     B2FATAL("Unknown simulation mode: " << m_SimulationMode);
   }
+  if (m_Efficiency == "Strip")
+    m_EfficiencyMode = c_Strip;
+  else if (m_Efficiency == "Plane")
+    m_EfficiencyMode = c_Plane;
+  else
+    B2FATAL("Unknown efficiency mode: " << m_EfficiencyMode);
 }
 
 void KLMDigitizerModule::checkChannelParameters()
@@ -146,9 +156,12 @@ void KLMDigitizerModule::digitizeBKLM()
                          simHit->getSection(), simHit->getSector(),
                          simHit->getLayer(), simHit->getPlane(),
                          simHit->getStrip());
-    if (!efficiencyCorrection(efficiency))
-      continue;
-    if (simHit->inRPC()) {
+    bool rpc = simHit->inRPC();
+    if (!rpc || (rpc && m_EfficiencyMode == c_Strip)) {
+      if (!efficiencyCorrection(efficiency))
+        continue;
+    }
+    if (rpc) {
       int strip = BKLMElementNumbers::getStripByModule(
                     m_ElementNumbers->localChannelNumberBKLM(it->first));
       BKLMDigit* bklmDigit = m_bklmDigits.appendNew(simHit, strip);
@@ -251,15 +264,23 @@ void KLMDigitizerModule::event()
   for (i = 0; i < m_bklmSimHits.getEntries(); i++) {
     BKLMSimHit* hit = m_bklmSimHits[i];
     if (hit->inRPC()) {
-      if (hit->getStripMin() > 0) {
-        for (int s = hit->getStripMin(); s <= hit->getStripMax(); ++s) {
-          channel = m_ElementNumbers->channelNumberBKLM(
-                      hit->getSection(), hit->getSector(), hit->getLayer(),
-                      hit->getPlane(), s);
-          if (checkActive(channel)) {
-            m_bklmSimHitChannelMap.insert(
-              std::pair<int, BKLMSimHit*>(channel, hit));
-          }
+      if (hit->getStripMin() <= 0)
+        continue;
+      if (m_EfficiencyMode == c_Plane) {
+        float efficiency = m_StripEfficiency->getEndcapEfficiency(
+                             hit->getSection(), hit->getSector(),
+                             hit->getLayer(), hit->getPlane(),
+                             hit->getStripMin());
+        if (!efficiencyCorrection(efficiency))
+          continue;
+      }
+      for (int s = hit->getStripMin(); s <= hit->getStripMax(); ++s) {
+        channel = m_ElementNumbers->channelNumberBKLM(
+                    hit->getSection(), hit->getSector(), hit->getLayer(),
+                    hit->getPlane(), s);
+        if (checkActive(channel)) {
+          m_bklmSimHitChannelMap.insert(
+            std::pair<int, BKLMSimHit*>(channel, hit));
         }
       }
     } else {

@@ -76,6 +76,19 @@ namespace Belle2 {
   private:
 
     /**
+     * Efficiency determination mode.
+     */
+    enum EfficiencyMode {
+
+      /** Strip. */
+      c_Strip,
+
+      /** Plane. */
+      c_Plane,
+
+    };
+
+    /**
      * Check channel parameters for channel-specific simulation.
      */
     void checkChannelParameters();
@@ -135,6 +148,12 @@ namespace Belle2 {
 
     /** Save FPGA fit data (KLMScintillatorFirmwareFitResult). */
     bool m_SaveFPGAFit;
+
+    /** Efficiency determination mode ("Strip" or "Plane"). */
+    std::string m_Efficiency;
+
+    /** Efficiency determination mode (converted from the string parameter). */
+    EfficiencyMode m_EfficiencyMode;
 
     /** Use debug mode in EKLM::ScintillatorSimulator or not. */
     bool m_Debug;

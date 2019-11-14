@@ -84,6 +84,16 @@ def get_total_infiles(sampleName):
     return lookup_dict[sampleName]
 
 
+def get_events_per_file(sample):
+    """
+    Returns the total number of input Mdst files for a given sample.
+    """
+    try:
+        return skimTestFilesInfo.nEventsPerFile[sample]
+    except KeyError:
+        return None
+
+
 def add_skim(label, lists, path):
     """
     create uDST skim for given lists, saving into $label.udst.root

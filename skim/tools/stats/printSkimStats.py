@@ -20,7 +20,7 @@ from textwrap import wrap
 
 from tabulate import tabulate
 
-from skimExpertFunctions import get_test_file, get_eventN, get_total_infiles
+from skimExpertFunctions import get_test_file, get_eventN, get_total_infiles, get_events_per_file
 
 
 skims = [
@@ -262,6 +262,14 @@ statistics = {
         'PrintToScreen': True,
         'PrintToConfluence': True,
         'Calculate': lambda json, *_: udstSize(json) / nInputEvents(json),
+        'Combine': lambda statDict: mcWeightedAverage(statDict)
+    },
+    'udstSizePerFile': {
+        'LongName': 'Estimated average uDST size per file (MB)',
+        'floatfmt': '.2f',
+        'PrintToScreen': False,
+        'PrintToConfluence': False,
+        'Calculate': lambda json, _, sample: udstSize(json) / nInputEvents(json) * get_events_per_file(sample) / 1024,
         'Combine': lambda statDict: mcWeightedAverage(statDict)
     },
     'logSize': {

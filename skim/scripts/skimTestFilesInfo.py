@@ -50,6 +50,29 @@ total_input_files = [
 
 ]
 
+# Average number of events in test files
+nEventsPerFile = {
+    'proc9_exp3': 3456,
+    'proc9_exp7': 3691,
+    'proc9_exp8': 7846,
+    'bucket7_exp8': 11242,
+
+    'MC12_mixedBGx1': 200000,
+    'MC12_chargedBGx1': 200000,
+    'MC12_uubarBGx1': 200000,
+    'MC12_ddbarBGx1': 200000,
+    'MC12_ssbarBGx1': 200000,
+    'MC12_ccbarBGx1': 200000,
+    'MC12_taupairBGx1': 200000,
+    'MC12_mixedBGx0': 200000,
+    'MC12_chargedBGx0': 200000,
+    'MC12_uubarBGx0': 200000,
+    'MC12_ddbarBGx0': 200000,
+    'MC12_ssbarBGx0': 200000,
+    'MC12_ccbarBGx0': 200000,
+    'MC12_taupairBGx0': 200000,
+}
+
 #: location of test files on kekcc
 kekcc_locations = [
     ('proc9_exp3', '/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/e0003/4S/r05241/skim/hlt_hadron/' +

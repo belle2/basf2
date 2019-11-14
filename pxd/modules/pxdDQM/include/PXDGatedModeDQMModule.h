@@ -15,7 +15,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <pxd/dataobjects/PXDRawHit.h>
-#include <TH1.h>
 #include <TH2.h>
 #include <string>
 #include <map>

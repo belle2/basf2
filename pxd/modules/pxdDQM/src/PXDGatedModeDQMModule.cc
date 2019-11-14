@@ -118,6 +118,11 @@ void PXDGatedModeDQMModule::initialize()
 
 void PXDGatedModeDQMModule::beginRun()
 {
+  // reset all histograms
+  hBunchInjHER->Reset();
+  hBunchInjLER->Reset();
+  hBunchTrg->Reset();
+
   for (auto& it : hGatedModeMapLER) if (it.second) it.second->Reset();
   for (auto& it : hGatedModeMapHER) if (it.second) it.second->Reset();
   for (auto& it : hGatedModeMapCutLER) if (it.second) it.second->Reset();
@@ -139,7 +144,6 @@ void PXDGatedModeDQMModule::beginRun()
   for (auto& it : hGatedModeMapSubADCHER) if (it.second) it.second->Reset();
   for (auto& it : hGatedModeMapAddADCLER) if (it.second) it.second->Reset();
   for (auto& it : hGatedModeMapAddADCHER) if (it.second) it.second->Reset();
-
 }
 
 void PXDGatedModeDQMModule::event()

@@ -90,6 +90,7 @@ void ReattachCDCWireHitsToRecoTracksModule::findHits()
   }
 
   // Loop over the CDC hits and find the closest track (if any) whose distance to the hit is smaller than the threshold.
+  // Only the hits with the BadADCOrTOTFlag are considered (these are hits rejected by the TFCDC_WireHitPreparer module).
   for (CDCWireHit& wireHit : *m_CDCWireHits) {
     if ((wireHit.getAutomatonCell().hasBadADCOrTOTFlag()) and
         (wireHit.getHit()->getADCCount() >= m_minimumADC) and

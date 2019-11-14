@@ -73,6 +73,29 @@ def get_calibrations(input_data, **kwargs):
                           dependencies=[cal1]
                           )
 
+    # xt
+    cal3 = CDCCalibration(name='xt0',
+                          algorithms=[xt_algo()],
+                          input_file_dict=input_file_dict,
+                          max_iterations=1,
+                          dependencies=[cal2]
+                          )
+
+    # space resolution and time zero
+    cal4 = CDCCalibration(name='sr0',
+                          algorithms=[sr_algo()],
+                          input_file_dict=input_file_dict,
+                          max_iterations=1,
+                          dependencies=[cal3]
+                          )
+
+    cal5 = CDCCalibration(name='tz2',
+                          algorithms=[tz_algo()],
+                          input_file_dict=input_file_dict,
+                          max_iterations=4,
+                          dependencies=[cal4]
+                          )
+
     # Force the output payload IoV to be correct.
     # It may be different if you are using another strategy like SequentialRunByRun
     for algorithm in cal0.algorithms:
@@ -81,8 +104,14 @@ def get_calibrations(input_data, **kwargs):
         algorithm.params = {"apply_iov": output_iov}
     for algorithm in cal2.algorithms:
         algorithm.params = {"apply_iov": output_iov}
+    for algorithm in cal3.algorithms:
+        algorithm.params = {"apply_iov": output_iov}
+    for algorithm in cal4.algorithms:
+        algorithm.params = {"apply_iov": output_iov}
+    for algorithm in cal5.algorithms:
+        algorithm.params = {"apply_iov": output_iov}
 
-    return [cal0, cal1, cal2]
+    return [cal0, cal1, cal2, cal3, cal4, cal5]
 
 
 #################################################
@@ -118,8 +147,6 @@ def pre_collector(max_events=None):
     from reconstruction import add_reconstruction
     add_reconstruction(reco_path,
                        add_trigger_calculation=False,
-                       # components=components,
-                       # components=['CDC'],
                        trackFitHypotheses=[211, 13],
                        pruneTracks=False)
 
@@ -156,8 +183,6 @@ def tz_algo():
     from ROOT import Belle2
     algo = Belle2.CDC.T0CalibrationAlgorithm()
     algo.storeHisto(True)
-    # algo.storeHisto(False)
-    # algo.setDebug(True)
     algo.setMaxMeanDt(0.5)
     algo.setMaxRMSDt(0.1)
     algo.setMinimumNDF(20)
@@ -173,8 +198,6 @@ def tw_algo():
     from ROOT import Belle2
     algo = Belle2.CDC.TimeWalkCalibrationAlgorithm()
     algo.setStoreHisto(True)
-    # algo.setStoreHisto(False)
-    # algo.setMode(0)
     algo.setMode(1)
     return algo
 
@@ -191,7 +214,6 @@ def xt_algo():
     from ROOT import Belle2
     algo = Belle2.CDC.XTCalibrationAlgorithm()
     algo.setStoreHisto(True)
-    # algo.setStoreHisto(False)
     algo.setLRSeparate(True)
     algo.setThreshold(0.55)
     return algo
@@ -209,7 +231,6 @@ def sr_algo():
     from ROOT import Belle2
     algo = Belle2.CDC.SpaceResolutionCalibrationAlgorithm()
     algo.setStoreHisto(True)
-    # algo.setStoreHisto(False)
     algo.setThreshold(0.4)
     return algo
 
@@ -229,7 +250,8 @@ class CDCCalibration(Calibration):
                  input_file_dict,
                  max_iterations=5,
                  dependencies=None,
-                 queue='l'):
+                 queue='l',
+                 max_events=10000):
         for algo in algorithms:
             algo.setHistFileName(name)
 
@@ -239,7 +261,6 @@ class CDCCalibration(Calibration):
 
         from caf.framework import Collection
 
-        max_events = 10000
         for skim_type, file_list in input_file_dict.items():
             collection = Collection(collector=collector(),
                                     input_files=file_list,

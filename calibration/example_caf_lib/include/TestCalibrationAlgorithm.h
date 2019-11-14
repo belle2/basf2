@@ -39,6 +39,10 @@ namespace Belle2 {
     /// setter for m_debugHisto
     void setDebugHisto(bool debugHisto) {m_debugHisto = debugHisto;}
 
+    void setAllowedMeanShift(float value) {m_allowedMeanShift = value;}
+
+    float getAllowedMeanShift() {return m_allowedMeanShift;}
+
     /// Start boundary finding mode, we simply set the previous mean to be a silly amount.
     //  Notice that we comment out the argument names because we want to avoid compiler warnings about not using them.
     virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/)

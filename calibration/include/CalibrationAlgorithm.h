@@ -226,16 +226,6 @@ namespace Belle2 {
     //  of the new boundary.
     const std::vector<Calibration::ExpRun> findPayloadBoundaries(std::vector<Calibration::ExpRun> runs, int iteration = 0);
 
-    /// If you need to make some changes to your algorithm class before 'findPayloadBoundaries' is run, make them in this function
-    //  We omit the names of arguments here so that we don't generate lots of compiler warnings in algorithms that don't
-    //  implement this function.
-    virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) {};
-
-    /// Put your algorithm back into a state ready for normal execution if you need to.
-    //  This runs right after 'findPayloadBoundaries' and is supposed to  correct any changes you made in 'boundaryFindingSetup'
-    //  or 'isBoundaryRequired'.
-    virtual void boundaryFindingTearDown() {};
-
   protected:
     // Developers implement this function ------------
 
@@ -253,6 +243,16 @@ namespace Belle2 {
       B2ERROR("You didn't implement a isBoundaryRequired() member function in your CalibrationAlgorithm but you are calling it!");
       return false;
     }
+
+    /// If you need to make some changes to your algorithm class before 'findPayloadBoundaries' is run, make them in this function
+    //  We omit the names of arguments here so that we don't generate lots of compiler warnings in algorithms that don't
+    //  implement this function.
+    virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) {};
+
+    /// Put your algorithm back into a state ready for normal execution if you need to.
+    //  This runs right after 'findPayloadBoundaries' and is supposed to  correct any changes you made in 'boundaryFindingSetup'
+    //  or 'isBoundaryRequired'.
+    virtual void boundaryFindingTearDown() {};
 
     // Helpers ---------------- Data retrieval -------
 

@@ -530,6 +530,8 @@ const std::vector<ExpRun> CalibrationAlgorithm::findPayloadBoundaries(std::vecto
     return boundaries;
   }
   m_data.setIteration(iteration);
+  // User defined setup function
+  boundaryFindingSetup(runs, iteration);
   std::vector<ExpRun> runList;
   // Loop over run list and call derived class "isBoundaryRequired" member function
   for (auto currentRun : runs) {
@@ -545,5 +547,6 @@ const std::vector<ExpRun> CalibrationAlgorithm::findPayloadBoundaries(std::vecto
     m_data.clearCalibrationData();
   }
   m_data.reset();
+  boundaryFindingTearDown();
   return boundaries;
 }

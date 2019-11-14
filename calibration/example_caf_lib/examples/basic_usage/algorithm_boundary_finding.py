@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from ROOT import Belle2
+from caf.utils import runs_from_vector, find_run_lists_from_boundaries
 
 algo = Belle2.TestCalibrationAlgorithm()
 
@@ -9,8 +10,13 @@ algo = Belle2.TestCalibrationAlgorithm()
 inputFileNames = ["CollectorOutput.root"]
 algo.setInputFileNames(inputFileNames)
 all_runs = algo.getRunListFromAllData()
-boundaries = algo.findPayloadBoundaries(all_runs)
+boundaries = runs_from_vector(algo.findPayloadBoundaries(all_runs))
 
 print("Boundaries were:")
 for exprun in boundaries:
-    print(f"({exprun.first},{exprun.second})")
+    print(exprun)
+
+print("Run lists associated to boundary IoVs")
+
+for iov, runs in find_run_lists_from_boundaries(boundaries, runs_from_vector(all_runs)).items():
+    print(iov, runs)

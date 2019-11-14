@@ -158,11 +158,14 @@ namespace Belle2 {
     /** Use debug mode in EKLM::ScintillatorSimulator or not. */
     bool m_Debug;
 
-    /** Simulation hit map for BKLM. */
-    std::multimap<uint16_t, BKLMSimHit*> m_bklmSimHitChannelMap;
+    /** Simulation hit map for BKLM (by channel). */
+    std::multimap<uint16_t, const BKLMSimHit*> m_bklmSimHitChannelMap;
+
+    /** Simulation hit map for BKLM (by plane). */
+    std::multimap<uint16_t, const BKLMSimHit*> m_bklmSimHitPlaneMap;
 
     /** Simulation hit map for EKLM. */
-    std::multimap<uint16_t, EKLMSimHit*> m_eklmSimHitChannelMap;
+    std::multimap<uint16_t, const EKLMSimHit*> m_eklmSimHitChannelMap;
 
     /** FPGA fitter. */
     KLM::ScintillatorFirmware* m_Fitter;

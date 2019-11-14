@@ -46,15 +46,135 @@ namespace Belle2 {
 
     /** Print out the content of the PDf map. Useful for debugging.
      */
-    void printMap(const int pdg) const
+    enum class InputVar : unsigned int {
+      /** Null var */
+      c_NONE = 0,
+      /** E1/E9 */
+      c_E1E9 = 1,
+      /** E9/E21 */
+      c_E9E21 = 2,
+      /** Second moment */
+      c_S2 = 3,
+      /** Energy of maxE shower */
+      c_E = 4,
+      /** E/p */
+      c_EoP = 5,
+      /** Zernike moment 40 */
+      c_Z40 = 6,
+      /** Zernike moment 51 */
+      c_Z51 = 7,
+      /** Zernike MVA */
+      c_ZMVA = 8,
+      /** PSD MVA */
+      c_PSDMVA = 9,
+      /** DeltaL (track depth) */
+      c_DeltaL = 10,
+      /** Lateral shower shape */
+      c_LAT = 11
+    };
+
+    /**
+     * Class to hold parameters needed to perform pre-processing of input variables (e.g., gaussianisation, decorrelation) to build a multi-dimensional likelihood model.
+     * All matrices are stored in a linearised form, as vectors.
+     */
+    class VarTransfoSettings {
+    public:
+
+      VarTransfoSettings() {}; /** Constructor */
+      ~VarTransfoSettings() {}; /** Destructor */
+
+      bool doTransfo = false; /** To be toggled on if the class instance will be effectively configured
+          (e.g., it won't be done if classifier is univariate in a given category). */
+      int nVars; /** Number of variables. */
+      std::string classPath; /** Path of the class used to get the variables transfo. Useful for debugging. */
+      std::vector<int> nDivisions; /** Number of steps in which each variable range is sub-divided. */
+      int nDivisionsMax; /** Maximal number of steps, across all variables */
+      std::vector<double> cumulDist; /** Cumulative density function at each step. */
+      std::vector<double> x; /** Variable value at each step. */
+      std::vector<double> covMatrix; /** Variables covariance matrix. */
+
+      unsigned int ip; /** p bin index */
+      unsigned int jth; /** theta bin index */
+      unsigned int gbin; /** Global bin corresponding to (jth,ip) */
+    };
+
+    typedef std::unordered_map<int, TH2F> BinsHistoByParticle; /**< Typedef */
+    typedef std::unordered_map<InputVar, TF1*> PdfsByVariable; /**< Typedef */
+    typedef std::unordered_map<int, PdfsByVariable > PdfsMapByBinIdxs; /**< Typedef */
+    typedef std::unordered_map<int, PdfsMapByBinIdxs > PdfsMapByParticle; /**< Typedef */
+    typedef std::unordered_map<int, std::vector<InputVar> > VariablesMapByBinIdxs; /**< Typedef */
+    typedef std::unordered_map<int, VariablesMapByBinIdxs > VariablesMapByParticle; /**< Typedef */
+    typedef std::unordered_map<int, VarTransfoSettings> VTSMapByBinIdxs; /**< Typedef */
+    typedef std::unordered_map<int, VTSMapByBinIdxs > VTSMapByParticle; /**< Typedef */
+
+    /**
+     * Set the names of the input variables for which PDFs are stored for a given category (hypo, p, theta).
+     @param pdg the particle hypothesis' signed pdgId.
+     @param i the index along the 2D grid Y axis (rows) --> p.
+     @param j the index along the 2D grid X axis (cols) --> theta.
+     @param vars the list of variables. The variable ID is not a string, but an enum code integer as defined in InputVar.
+     */
+    void setVars(const int pdg, const unsigned int i, const unsigned int j,
+                 const std::vector<InputVar>& vars)
     {
-      for (const auto& pair1 : m_pdfsmap) {
-        if (pdg != pair1.first) continue;
-        std::cout << "Printing PDF map for pdgId: " << pair1.first << std::endl;
-        unsigned int cntr(1);
-        for (const auto& pair2 : pair1.second) {
-          std::cout << "\tkey counter: [" << cntr << "], key: " << pair2.first << ", value: " << pair2.second.GetName() << std::endl;
-          cntr++;
+      auto ji = getBinsHist(pdg)->GetBin(j, i);
+
+      m_variablesmap_bybinidxs[ji] = vars;
+
+      m_variablesmap[pdg] = m_variablesmap_bybinidxs;
+
+    }
+
+    /**
+     * Getter for list of input variables (enums) for which PDFs are stored for a given category (hypo, p, theta).
+     @param pdg the particle hypothesis' signed pdgId.
+     @param p the reconstructed momentum of the particle's track.
+     @param theta the reconstructed polar angle of the particle's cluster.
+     */
+    const std::vector<InputVar>* getVars(const int pdg, const double& p, const double& theta) const
+    {
+
+      auto gbin = findBin(getBinsHist(pdg), theta, p);
+
+      return &(m_variablesmap.at(pdg).at(gbin));
+
+    }
+
+    /**
+     * Print out the content of the internal 'matrioska' maps. Useful for debugging.
+     */
+    void printPdfMap(const int pdg = 0, const double& p = -1.0, const double& theta = -999.0,
+                     const InputVar varid = InputVar::c_NONE) const
+    {
+
+      std::cout << "Printing PDF info: " << std::endl;
+      if (pdg) std::cout << "-) pdgId = " << pdg << std::endl;
+      if (p != -1.0) std::cout << "-) p = " << p << " [GeV/c]" << std::endl;
+      if (theta != -999.0) std::cout << "-) theta = " << theta << " [rad]" << std::endl;
+      if (varid != InputVar::c_NONE) std::cout << "-) varid = " << static_cast<unsigned int>(varid) << std::endl;
+
+      int x, y, z;
+      for (const auto& pair0 : m_pdfsmap) {
+
+        if (pdg && pdg != pair0.first) continue;
+
+        for (const auto& pair1 : pair0.second) {
+
+          auto ji(-1);
+          if (p != -1.0 && theta != -999.0) {
+            const TH2F* h = getBinsHist(pdg);
+            ji = findBin(h, theta, p);
+            h->GetBinXYZ(ji, x, y, z);
+          }
+          if (ji > 0 && ji != pair1.first) continue;
+
+          std::cout << "\tglobal_bin_idx: " << pair1.first << " (" << x << "," << y << ")" << std::endl;
+
+          for (const auto& pair2 : pair1.second) {
+            if (varid != InputVar::c_NONE && varid != pair2.first) continue;
+            std::cout << "\t\tvarid: " << static_cast<unsigned int>(varid) << ", TF1: " << pair2.second->GetName() << std::endl;
+          }
+
         }
       }
     };
@@ -67,10 +187,11 @@ namespace Belle2 {
      */
     void setAngularUnit(const double& unit) { m_ang_unit.SetVal(unit); }
 
-    /** Set the 2D grid w/ the binning of the PDF:
-    @param hypo the particle hypothesis' signed pdgId.
-    @param binhist the 2D histogram w/ the bin grid.
-     */
+    /**
+     * Set the 2D (theta, p) grid that defines the categories for which PDFs are defined.
+     @param hypo the particle hypothesis' signed pdgId.
+     @param binhist the 2D histogram w/ the bin grid.
+    */
     void setBinsHist(const int pdg, TH2F binhist)
     {
       m_binshisto.emplace(pdg, binhist);
@@ -84,13 +205,15 @@ namespace Belle2 {
       return &m_binshisto.at(pdg);
     }
 
-    /** Set the internal PDF map:
-    @param pdg the particle hypothesis' signed pdgId.
-    @param i the index along the 2D grid Y axis (rows) --> p.
-    @param j the index along the 2D grid X axis (cols) --> theta.
-    @param pdf the pdf object.
-     */
-    void setPDFsInternalMap(const int pdg, const unsigned int i, const unsigned int j, TF1 pdf)
+    /**
+     * Fills the internal maps of this class' instance for a given category (hypo, p, theta).
+     @param pdg the particle hypothesis' signed pdgId.
+     @param i the index along the 2D grid Y axis (rows) --> p.
+     @param j the index along the 2D grid X axis (cols) --> theta.
+     @param varid the observable's enum identifier.
+     @param pdf the pdf object.
+    */
+    void add(const int pdg, const unsigned int i, const unsigned int j, const InputVar varid, TF1* pdf)
     {
       auto ij = getBinsHist(pdg)->GetBin(j, i);
       m_pdfsbybinidxs.emplace(ij, pdf);
@@ -106,13 +229,14 @@ namespace Belle2 {
       m_pdfsbybinidxs.clear(); // Don't forget to clear the internal map for the next call!
     };
 
-
-    /** Return the PDF for the given particle hypothesis, for this reconstructed (p,theta):
-    @param pdg the particle hypothesis' signed pdgId.
-    @param p the reconstructed momentum of the particle's track.
-    @param theta the reconstructed polar angle of the particle's track.
-     */
-    const TF1* getPdf(const int pdg, const double& p, const double& theta) const
+    /**
+     * Return the PDF of this observable for this candidate's reconstructed (p, theta), under the given particle hypothesis.
+     @param pdg the particle hypothesis' signed pdgId.
+     @param p the reconstructed momentum of the candidate's track.
+     @param theta the reconstructed polar angle of the candidate's cluster.
+     @param varid the observable's enum identifier.
+    */
+    const TF1* getPdf(const int pdg, const double& p, const double& theta, const InputVar varid) const
     {
 
       const TH2F* binshist = getBinsHist(pdg);
@@ -155,20 +279,125 @@ namespace Belle2 {
       return  binx + nx * biny;
     }
 
+    /**
+     * Setup the variable transformations a given category (hypo, p, theta) needed to build a multi-dimensional likelihood.
+     @param pdg the particle hypothesis' signed pdgId.
+     @param i the index along the 2D grid Y axis (rows) --> p.
+     @param j the index along the 2D grid X axis (cols) --> theta.
+     @param nvars the number of input variables used to build the model.
+     @param classPath (for debugging) full path to the file containing the TMVA standalone class used to get the variables transformation parameters.
+     @param cumulDist the value of the variable's cumulative density function at each step.
+     @param x the value of the variable at each step.
+     @param nDivisions the number of divisions (steps) of the variable's range.
+     @param covMatrix the variables' inverse square-root covariance matrix.
+    */
+    void storeVarsTransfoSettings(const int pdg, const unsigned int i, const unsigned int j,
+                                  const int nVars,
+                                  const std::string& classPath = "",
+                                  const std::vector<int>& nDivisions = std::vector<int>(),
+                                  const std::vector<double>& cumulDist = std::vector<double>(),
+                                  const std::vector<double>& x = std::vector<double>(),
+                                  const std::vector<double>& covMatrix = std::vector<double>())
+    {
+
+      VarTransfoSettings vts;
+
+      vts.doTransfo = (nVars > 1); /** No transformation will be attempted if univariate! */
+      vts.nVars = nVars;
+      vts.classPath = classPath;
+      vts.nDivisionsMax = (!nDivisions.empty()) ? *(std::max_element(std::begin(nDivisions), std::end(nDivisions))) : 0;
+      vts.nDivisions = nDivisions;
+      vts.cumulDist = cumulDist;
+      vts.x = x;
+      vts.covMatrix = covMatrix;
+
+      auto ji = getBinsHist(pdg)->GetBin(j, i);
+      vts.gbin = ji;
+      vts.ip   = i;
+      vts.jth  = j;
+
+      m_vtsmap_bybinidxs[ji] = vts;
+
+      m_vtsmap[pdg] = m_vtsmap_bybinidxs;
+
+    }
+
+    /**
+     * Getter for variable transformation settings.
+     @param pdg the particle hypothesis' signed pdgId.
+     @param p the reconstructed momentum of the candidate's track.
+     @param theta the reconstructed polar angle of the candidate's cluster.
+     */
+    const VarTransfoSettings* getVTS(const int pdg, const double& p, const double& theta) const
+    {
+
+      auto gbin = findBin(getBinsHist(pdg), theta, p);
+
+      return &(m_vtsmap.at(pdg).at(gbin));
+
+    }
+
+  private:
+
     TParameter<double> m_energy_unit; /**< The energy unit used for the binning. */
     TParameter<double> m_ang_unit;    /**< The angular unit used for the binning. */
 
-    /** This map contains the 2D grid histograms describing the PDF binning for each particle hypothesis.
-    The key corresponds to the particle hypothesis' signed pdgId.
-    The mapped value is the 2D bin grid as a histogram.
+    /**
+     * Internal map.
+     * The key corresponds to the particle hypothesis' signed pdgId.
+     * The mapped value is a VariablesMapByBinIdxs map, described below.
+     */
+    VariablesMapByParticle m_variablesmap;
+
+    /**
+     * Internal map.
+     * The key corresponds to the global bin index in the 2D (theta,p) grid.
+     * The mapped value is a list of variables used for the MVA training
+     * for a given particle in a given 2D bin.
+     * NB: the order of the variables in the mapped vector matches the one used in the training by construction!
     */
+    VariablesMapByBinIdxs m_variablesmap_bybinidxs;
+
+    /**
+     * To be toggled on if input variables have been transformed
+     * (i.e., if storeVarsTransfoSettings() was called when creating the payload).
+     */
+    bool m_do_varstransform = false;
+
+    /**
+     * This map contains the 2D (theta,p) grid histograms describing - for each particle hypothesis - the categories for which PDFs are defined.
+     * The key corresponds to the particle hypothesis' signed pdgId.
+     * The mapped value is the 2D (theta,p) bin grid as a histogram.
+     */
     BinsHistoByParticle m_binshisto;
 
-    /** This is an "internal" map.
-    The key corresponds to the global bin index in the 2D grid.
-    The mapped value is a TF1 representing the normalised PDF for that particle in that bin.
-    */
-    PdfsByBinIdxs m_pdfsbybinidxs; // to be cleared after each pdg hypo is being checked.
+    /**
+     * Internal map.
+     * The key corresponds to the particle hypothesis' signed pdgId.
+     * The mapped value is a PdfsMapByBinIdxs map, described below.
+     */
+    PdfsMapByParticle m_pdfsmap;
+
+    /**
+     * Internal map.
+     * The key corresponds to the global bin index in the 2D (theta,p) grid.
+     * The mapped value is a PdfsByVariable map, described below.
+     */
+    PdfsMapByBinIdxs m_pdfsmap_bybinidxs;
+
+    /**
+     * Internal map.
+     * The key corresponds to an observable of interest (E/p, E, shower shape...).
+     * The mapped value is a TF1 representing the normalised PDF for that variable, for a given particle in a given 2D bin.
+     */
+    PdfsByVariable m_pdfs_byvariable;
+
+    /**
+     * Internal map.
+     * The key corresponds to the particle hypothesis' signed pdgId.
+     * The mapped value is a VTSMapByBinIdxs map, described below.
+     */
+    VTSMapByParticle m_vtsmap;
 
     /** This map contains the actual PDFs, for each particle hypothesis and 2D bin indexes.
     The key corresponds to the particle hypothesis' signed pdgId.

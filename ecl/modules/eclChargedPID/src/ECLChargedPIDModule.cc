@@ -100,11 +100,52 @@ void ECLChargedPIDModule::event()
 
       auto signedhypo = hypo.getPDGCode() * charge;
 
-      // For tracks w/ well defined charge (+/-1), get the pdf value.
-      // For now, skip deuteron...
-      if (std::abs(charge) && hypo.getPDGCode() != 1000010020) {
-        const TF1* currentpdf = m_pdfs->getPdf(signedhypo, p, theta);
-        pdfval = currentpdf->Eval(eop);
+      B2DEBUG(20, "\n\thypo[" << hypo_idx << "] = " << hypo.getPDGCode()
+              << ", signedhypo[" << hypo_idx << "] = " << signedhypo);
+
+      // For the moment, do not split by charge
+      signedhypo = fabs(signedhypo);
+
+      // For tracks w/:
+      // -) A matched shower
+      // -) Shower is in the tracker acceptance (reg != 0)
+      // -) Well defined charge (+/-1),
+      // get the pdf value.
+      if (mostEnergeticShower && showerReg && std::abs(charge)) {
+
+        // Get the transformed input variables.
+        // If no transformation parameters are stored in the payload, this will be just a copy of the input variable list.
+        auto variables_transfo = transfoGaussDecorr(signedhypo, p, showerTheta);
+
+        // Get the PDF templates for the various observables, and multiply the PDF values for this candidate.
+        // This assumes observables aren't independent, or at least linear correlations have been removed by suitably transforming the inputs....
+        double prod(1.0);
+        double ipdfval;
+        for (unsigned int idx(0); idx < variables_transfo.size(); idx++) {
+
+          auto var   = variables_transfo.at(idx);
+          auto varid = m_pdfs->getVars(signedhypo, p, showerTheta)->at(idx);
+
+          const TF1* pdf = m_pdfs->getPdf(signedhypo, p, showerTheta, varid);
+          if (pdf) {
+
+            ipdfval = getPdfVal(var, pdf);
+
+            B2DEBUG(30, "\t\tL(" << hypo.getPDGCode() << ") = " << prod
+                    << " * pdf(varid: " << static_cast<unsigned int>(varid) << ") = "
+                    << prod << " * " << ipdfval
+                    << " = " << prod * ipdfval);
+
+            prod *= ipdfval;
+          }
+        }
+
+        if (prod != 1.0) {
+          pdfval = prod;
+        }
+
+        B2DEBUG(20, "\tL(" << hypo.getPDGCode() << ") = " << pdfval);
+
       }
 
       B2DEBUG(20, "hypo = " << hypo.getPDGCode() << ", signedhypo = " << signedhypo << ", pdf(E/P=" << eop << ") = " << pdfval);
@@ -126,6 +167,123 @@ void ECLChargedPIDModule::event()
     track.addRelationTo(eclPidLikelihood);
 
   } // end loop on tracks
+}
+
+double ECLChargedPIDModule::getPdfVal(const double& x, const TF1* pdf)
+{
+
+  double y, xmin, xmax;
+  pdf->GetRange(xmin, xmax);
+
+  if (x <= xmin) { y = pdf->Eval(xmin + 1e-9); }
+  else if (x >= xmax) { y = pdf->Eval(xmax - 1e-9); }
+  else                { y = pdf->Eval(x); }
+
+  return (y) ? y : 1e-9; // Do not return exactly 0, otherwise deltaLogL might be biased...
+}
+
+std::vector<double> ECLChargedPIDModule::transfoGaussDecorr(const int pdg, const double& p, const double& theta)
+{
+
+  // Retrieve the list of enum ids for the input variables from the payload.
+  auto varids = m_pdfs->getVars(pdg, p, theta);
+
+  // Fill the vector w/ the values taken from the module map.
+  std::vector<double> vtransfo_gauss;
+  for (const auto& varid : *varids) {
+    vtransfo_gauss.push_back(m_variables.at(varid));
+  }
+
+  unsigned int nvars = varids->size();
+
+  // Get the variable transformation settings for this (hypo, p, theta).
+  auto vts = m_pdfs->getVTS(pdg, p, theta);
+
+  // Transform the input variables only if necessary.
+  if (!vts->doTransfo) {
+    return vtransfo_gauss; // Just a copy of the original vars at this stage!
+  }
+
+  B2DEBUG(30, "");
+  B2DEBUG(30, "\tclass path: " << vts->classPath);
+  B2DEBUG(30, "\tgbin = " << vts->gbin << ", (theta,p) = (" << vts->jth << "," << vts->ip << ")");
+  B2DEBUG(30, "\tnvars: " << nvars);
+
+  for (unsigned int ivar(0); ivar < nvars; ivar++) {
+    unsigned int ndivs = vts->nDivisions[ivar];
+    B2DEBUG(30, "\tvarid: " << static_cast<unsigned int>(varids->at(ivar)) << " = " << vtransfo_gauss.at(
+              ivar) << ", nsteps = " << ndivs);
+    for (unsigned int jdiv(0); jdiv < ndivs; jdiv++) {
+      auto ij = linIndex(ivar, jdiv, vts->nDivisionsMax);
+      B2DEBUG(30, "\t\tx[" << ivar << "][" << jdiv << "] = x[" << ij << "] = " << vts->x[ij]);
+      B2DEBUG(30, "\t\tcumulDist[" << ivar << "][" << jdiv << "] = cumulDist[" << ij << "] = " << vts->cumulDist[ij]);
+    }
+  }
+
+  double cumulant;
+  for (unsigned int ivar(0); ivar < nvars; ivar++) {
+
+    int ndivs = vts->nDivisions[ivar];
+
+    int jdiv = 0;
+    auto ij = linIndex(ivar, jdiv, vts->nDivisionsMax);
+    while (vtransfo_gauss.at(ivar) > vts->x[ij]) {
+      jdiv++;
+      ij = linIndex(ivar, jdiv, vts->nDivisionsMax);
+    }
+
+    if (jdiv < 0) { jdiv = 0; }
+    if (jdiv >= ndivs) { jdiv = ndivs - 1; }
+    int jnextdiv = jdiv;
+    if ((vtransfo_gauss.at(ivar) > vts->x[ij] && jdiv != ndivs - 1) || jdiv == 0) {
+      jnextdiv++;
+    } else {
+      jnextdiv--;
+    }
+    auto ijnext = linIndex(ivar, jnextdiv, vts->nDivisionsMax);
+
+    double dx = vts->x[ij] - vts->x[ijnext];
+    double dy = vts->cumulDist[ij] - vts->cumulDist[ijnext];
+    cumulant  = vts->cumulDist[ij] + (vtransfo_gauss.at(ivar) - vts->x[ijnext]) * dy / dx;
+
+    cumulant = std::min(cumulant, 1.0 - 10e-10);
+    cumulant = std::max(cumulant, 10e-10);
+
+    double maxErfInvArgRange = 0.99999999;
+    double arg = 2.0 * cumulant - 1.0;
+
+    arg = std::min(maxErfInvArgRange, arg);
+    arg = std::max(-maxErfInvArgRange, arg);
+
+    vtransfo_gauss.at(ivar) = c_sqrt2 * TMath::ErfInverse(arg);
+
+  }
+
+  B2DEBUG(30, "\tSHOWER properties (Gaussian-transformed):");
+  for (unsigned int idx(0); idx < nvars; idx++) {
+    B2DEBUG(30, "\tvarid: " << static_cast<unsigned int>(varids->at(idx)) << " = " << vtransfo_gauss.at(idx));
+  }
+  B2DEBUG(30,  "\t-------------------------------");
+
+  std::vector<double> vtransfo_decorr;
+  vtransfo_decorr.reserve(nvars);
+
+  for (unsigned int i(0); i < nvars; i++) {
+    double vartransfo(0);
+    for (unsigned int j(0); j < nvars; j++) {
+      auto ij = linIndex(i, j, nvars);
+      vartransfo += vtransfo_gauss[j] * vts->covMatrix[ij];
+    }
+    vtransfo_decorr.push_back(vartransfo);
+  }
+
+  B2DEBUG(30, "\tSHOWER properties (Decorrelation-transformed):");
+  for (unsigned int idx(0); idx < nvars; idx++) {
+    B2DEBUG(30, "\tvarid: " << static_cast<unsigned int>(varids->at(idx)) << " = " << vtransfo_decorr.at(idx));
+  }
+  B2DEBUG(30,  "\t-------------------------------");
+
+  return vtransfo_decorr;
 
 }
 

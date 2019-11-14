@@ -12,12 +12,11 @@
 
 #include <framework/core/HistoModule.h>
 #include <vxd/geometry/GeoCache.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <TH1.h>
-#include <TH2F.h>
+#include <TH2.h>
 #include <string>
 #include <map>
 
@@ -27,7 +26,7 @@ namespace Belle2 {
     /** The PXD for GatedMode DQM module.
      *
      * PXD Occupancy etc for GatedMode Histogramming with
-     * info taken from TTD packet
+     * injection info taken from TTD packet
      *
      */
     class PXDGatedModeDQMModule : public HistoModule {
@@ -39,7 +38,8 @@ namespace Belle2 {
 
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
-      std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */
+      std::string m_PXDRawHitsName; /**< The name of the StoreArray of PXDRawHits to be generated */
+      bool m_perGate; /**< make one plot per possible gate */
 
       /** Input array for DAQ Status. */
       StoreArray<RawFTSW> m_rawTTD;

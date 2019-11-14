@@ -33,6 +33,7 @@ PXDGatedModeDQMModule::PXDGatedModeDQMModule() : HistoModule() , m_vxdGeometry(V
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("PXDINJ"));
   addParam("PXDRawHitsName", m_PXDRawHitsName, "Name of PXD raw hits", std::string(""));
+  addParam("perGate", m_perGate, "Make plots per GM Start Gate", true);
 }
 
 void PXDGatedModeDQMModule::defineHisto()
@@ -56,7 +57,7 @@ void PXDGatedModeDQMModule::defineHisto()
     TString bufful = buff;
     bufful.ReplaceAll(".", "_");
 
-    for (int rgate = 0; rgate <= 96; rgate++) { // 96 is no gating
+    for (int rgate = m_perGate ? 0 : 96; rgate <= 96; rgate++) { // 96 is no gating
       hGatedModeMapLER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapLER_%d_", rgate) + bufful,
                                                                  Form("PXDGatedModeMapLER %d ", rgate) + buff + ";U;V", 25, 0, 250, 192, 0, 768);
       hGatedModeMapHER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapHER_%d_", rgate) + bufful,
@@ -119,6 +120,26 @@ void PXDGatedModeDQMModule::beginRun()
 {
   for (auto& it : hGatedModeMapLER) if (it.second) it.second->Reset();
   for (auto& it : hGatedModeMapHER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeMapCutLER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeMapCutHER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeMapADCLER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeMapADCHER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeMapCutADCLER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeMapCutADCHER) if (it.second) it.second->Reset();
+
+  for (auto& it : hGatedModeProjLER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeProjHER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeMapSubLER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeMapSubHER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeMapAddLER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeMapAddHER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeProjADCLER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeProjADCHER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeMapSubADCLER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeMapSubADCHER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeMapAddADCLER) if (it.second) it.second->Reset();
+  for (auto& it : hGatedModeMapAddADCHER) if (it.second) it.second->Reset();
+
 }
 
 void PXDGatedModeDQMModule::event()

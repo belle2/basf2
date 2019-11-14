@@ -39,6 +39,8 @@
 #include <stdexcept>
 #include <queue>
 
+#include <boost/algorithm/string.hpp>
+
 using namespace Belle2;
 
 Particle::Particle() :
@@ -748,11 +750,8 @@ const MCParticle* Particle::getMCParticle() const
 const Particle* Particle::getParticleFromGeneralizedIndexString(const std::string& generalizedIndex) const
 {
   // Split the generalizedIndex string in a vector of strings.
-  // Shamelessly copied from stackoverflow...
-  std::string generalizedIndexWhiteSpace = generalizedIndex;
-  std::replace(generalizedIndexWhiteSpace.begin(), generalizedIndexWhiteSpace.end(), ':', ' ');
-  std::istringstream buffer(generalizedIndexWhiteSpace);
-  std::vector<std::string> generalizedIndexes((std::istream_iterator<std::string>(buffer)), std::istream_iterator<std::string>());
+  std::vector<std::string> generalizedIndexes;
+  boost::split(generalizedIndexes, generalizedIndex, boost::is_any_of(":"));
 
   if (generalizedIndexes.empty()) {
     B2WARNING("Generalized index of daughter particle is empty. Skipping.");

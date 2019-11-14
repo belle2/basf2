@@ -42,9 +42,9 @@ void PXDGatedModeDQMModule::defineHisto()
   oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
   oldDir->cd(m_histogramDirectoryName.c_str());//changing to the right directory
 
-  hBunchInjHER = new TH1F("hBunchInjHER", "Last Inj Bunch HER", 4096, 0, 4095);
-  hBunchInjLER = new TH1F("hBunchInjLER", "Last Inj Bunch LER", 4096, 0, 4095);
-  hBunchTrg = new TH1F("hBunchTrg", "Triggered Bunch", 4096, 0, 4095);
+  hBunchInjHER = new TH1F("hBunchInjHER", "Last Inj Bunch HER;Counts;BunchNr/4", 1280, 0, 1280);
+  hBunchInjLER = new TH1F("hBunchInjLER", "Last Inj Bunch LER;Counts;BunchNr/4", 1280, 0, 1280);
+  hBunchTrg = new TH1F("hBunchTrg", "Triggered Bunch;Counts;BunchNr/4", 1280, 0, 1280);
 
 
   std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
@@ -82,13 +82,13 @@ void PXDGatedModeDQMModule::defineHisto()
                                          "PXDGatedModeProjHER " + buff + ";Gate;V", 96, 0, 96, 192, 0, 768);
 
     hGatedModeMapSubLER[avxdid] = new TH2F("PXDGatedModeMapSubLER_" + bufful,
-                                           "PXDGatedModeMapSubLER " + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+                                           "PXDGatedModeMapSubLER " + buff + ";U;V-G", 25, 0, 250, 192, 0, 768);
     hGatedModeMapSubHER[avxdid] = new TH2F("PXDGatedModeMapSubHER_" + bufful,
-                                           "PXDGatedModeMapSubHER " + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+                                           "PXDGatedModeMapSubHER " + buff + ";U;V-G", 25, 0, 250, 192, 0, 768);
     hGatedModeMapAddLER[avxdid] = new TH2F("PXDGatedModeMapAddLER_" + bufful,
-                                           "PXDGatedModeMapAddLER " + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+                                           "PXDGatedModeMapAddLER " + buff + ";U;V+G", 25, 0, 250, 192, 0, 768);
     hGatedModeMapAddHER[avxdid] = new TH2F("PXDGatedModeMapAddHER_" + bufful,
-                                           "PXDGatedModeMapAddHER " + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+                                           "PXDGatedModeMapAddHER " + buff + ";U;V+G", 25, 0, 250, 192, 0, 768);
 
     hGatedModeProjADCLER[avxdid] = new TH2F("PXDGatedModeProjADCLER_" + bufful,
                                             "PXDGatedModeProjADCLER " + buff + ";Gate;V", 96, 0, 96, 192, 0, 768);
@@ -96,13 +96,13 @@ void PXDGatedModeDQMModule::defineHisto()
                                             "PXDGatedModeProjADCHER " + buff + ";Gate;V", 96, 0, 96, 192, 0, 768);
 
     hGatedModeMapSubADCLER[avxdid] = new TH2F("PXDGatedModeMapSubADCLER_" + bufful,
-                                              "PXDGatedModeMapSubADCLER " + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+                                              "PXDGatedModeMapSubADCLER " + buff + ";U;V-G", 25, 0, 250, 192, 0, 768);
     hGatedModeMapSubADCHER[avxdid] = new TH2F("PXDGatedModeMapSubADCHER_" + bufful,
-                                              "PXDGatedModeMapSubADCHER " + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+                                              "PXDGatedModeMapSubADCHER " + buff + ";U;V-G", 25, 0, 250, 192, 0, 768);
     hGatedModeMapAddADCLER[avxdid] = new TH2F("PXDGatedModeMapAddADCLER_" + bufful,
-                                              "PXDGatedModeMapAddADCLER " + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+                                              "PXDGatedModeMapAddADCLER " + buff + ";U;V+G", 25, 0, 250, 192, 0, 768);
     hGatedModeMapAddADCHER[avxdid] = new TH2F("PXDGatedModeMapAddADCHER_" + bufful,
-                                              "PXDGatedModeMapAddADCHER " + buff + ";U;V", 25, 0, 250, 192, 0, 768);
+                                              "PXDGatedModeMapAddADCHER " + buff + ";U;V+G", 25, 0, 250, 192, 0, 768);
 
   }
   // cd back to root directory

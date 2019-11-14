@@ -2379,9 +2379,9 @@ The particles are identified via generalized daughter indexes, which are simply 
 Both two and three generalized indexes can be given to ``daughterAngleInBetween``. If two indices are given, the variable returns the angle between the momenta of the two given particles. If three indices are given,  the variable returns the angle between the momentum of the third particle and a vector which is the sum of the first two daughter momenta.
 
 .. tip::
-``daughterAngleInBetween(0, 3)`` will return the angle between the first and fourth daughter.
-``daughterAngleInBetween(0, 1, 3)`` will return the angle between the fourth daughter and the sum of the first and second daughter. 
-``daughterAngleInBetween(0:0, 3:0)`` will return the angle between the first daughter of the first daughter, and the first daughter of the fourth daughter
+    ``daughterAngleInBetween(0, 3)`` will return the angle between the first and fourth daughter.
+    ``daughterAngleInBetween(0, 1, 3)`` will return the angle between the fourth daughter and the sum of the first and second daughter. 
+    ``daughterAngleInBetween(0:0, 3:0)`` will return the angle between the first daughter of the first daughter, and the first daughter of the fourth daughter
 
 )DOC");
     REGISTER_VARIABLE("daughterClusterAngleInBetween(i, j)", daughterClusterAngleInBetween,
@@ -2495,14 +2495,18 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
     REGISTER_VARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
                       "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.");
     REGISTER_VARIABLE("daughterCombination(variable, daughterIndex_1, daughterIndex_2 ... daughterIndex_n)", daughterCombination,R"DOC(
-Returns ``variable`` calculated on an arbirary set of (grand)daughters. 
+Returns a ``variable`` function only of the 4-momentum calculated on an arbirary set of (grand)daughters. 
+
+.. warning::
+    ``variable`` must be only function of the daughters' 4-momenta.
+
 Daughters from different generations of the decay tree can be combined using generalized daughter indexes, which are simply colon-separated 
 the list of daughter indexes, starting from the root particle: for example, ``0:1:3``  identifies the fourth 
 daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle.
 
 .. tip::
-``daughterCombination(M, 0, 3, 4)`` will return the invariant mass of the system made of the first, fourth and fifth daughter of particle. 
-``daughterCombination(M, 0:0, 3:0)`` will return the invariant mass of the system made of the first daughter of the first daughter and the first daughter of the fourth daughter.
+    ``daughterCombination(M, 0, 3, 4)`` will return the invariant mass of the system made of the first, fourth and fifth daughter of particle. 
+    ``daughterCombination(M, 0:0, 3:0)`` will return the invariant mass of the system made of the first daughter of the first daughter and the first daughter of the fourth daughter.
 
 )DOC");
 

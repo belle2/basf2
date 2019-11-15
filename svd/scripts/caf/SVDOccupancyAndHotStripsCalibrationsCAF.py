@@ -149,7 +149,7 @@ if __name__ == "__main__":
     print("")
     print(str(uniqueID_hotStrips))
     print("")
-'''
+
     cal_fw = CAF()
     cal_fw.add_calibration(svdOccupAndHotStripsCAF)
 
@@ -160,4 +160,3 @@ if __name__ == "__main__":
         cal_fw.backend = backends.Local(8)
 
     cal_fw.run()
-'''

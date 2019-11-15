@@ -98,8 +98,8 @@ namespace Belle2 {
     TProfile* m_recoPull_Phic = 0;  /**< pulls vs phiCer */
     TH1F* m_goodHitsPerEventAll = 0; /**< Histograms for good hits per event (all slots)*/
     TH1F* m_badHitsPerEventAll = 0; /**< Histograms for bad hits per event (all slots)*/
-    TH1F* m_goodTDC = 0; /**< Histograms for TDC distribution of good hits (all slots)*/
-    TH1F* m_badTDC = 0; /**< Histograms for TDC distribution of bad hits (all slots)*/
+    TH1F* m_goodTDCAll = 0; /**< Histograms for TDC distribution of good hits (all slots)*/
+    TH1F* m_badTDCAll = 0; /**< Histograms for TDC distribution of bad hits (all slots)*/
 
     TH1F* m_goodHits = nullptr; /**< Histogram for number of accumulated good hits */
     TH1F* m_badHits = nullptr; /**< Histogram for number of accumulated bad hits */

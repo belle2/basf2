@@ -167,19 +167,19 @@ namespace Belle2 {
     m_badHitsPerEventAll->GetXaxis()->SetTitle("hits / event");
     m_badHitsPerEventAll->GetYaxis()->SetTitle("Events");
 
-    m_goodTDC = new TH1F("goodTDC", "Raw time distribution of good hits",
-                         2000, 0, 2000);
-    m_goodTDC->SetXTitle("raw time [samples]");
-    m_goodTDC->SetYTitle("hits / sample");
-    m_goodTDC->SetOption("LIVE");
-    m_goodTDC->SetMinimum(0);
+    m_goodTDCAll = new TH1F("goodTDCAll", "Raw time distribution of good hits",
+                            2000, 0, 2000);
+    m_goodTDCAll->SetXTitle("raw time [samples]");
+    m_goodTDCAll->SetYTitle("hits / sample");
+    m_goodTDCAll->SetOption("LIVE");
+    m_goodTDCAll->SetMinimum(0);
 
-    m_badTDC = new TH1F("badTDC", "Raw time distribution of bad hits",
-                        2000, 0, 2000);
-    m_badTDC->SetXTitle("raw time [samples]");
-    m_badTDC->SetYTitle("hits / sample");
-    m_badTDC->SetOption("LIVE");
-    m_badTDC->SetMinimum(0);
+    m_badTDCAll = new TH1F("badTDCAll", "Raw time distribution of bad hits",
+                           2000, 0, 2000);
+    m_badTDCAll->SetXTitle("raw time [samples]");
+    m_badTDCAll->SetYTitle("hits / sample");
+    m_badTDCAll->SetOption("LIVE");
+    m_badTDCAll->SetMinimum(0);
 
     m_goodHitsPerEventProf = new TProfile("goodHitsPerEventProf", "Good hits per event vs. slot number",
                                           16, 0.5, 16.5, 0, 1000);
@@ -369,8 +369,8 @@ namespace Belle2 {
     m_window_vs_slot->Reset();
     m_bunchOffset->Reset();
     m_time->Reset();
-    m_goodTDC->Reset();
-    m_badTDC->Reset();
+    m_goodTDCAll->Reset();
+    m_badTDCAll->Reset();
     m_goodHitsPerEventProf->Reset();
     m_goodHitsPerEventAll->Reset();
     m_badHitsPerEventProf->Reset();
@@ -430,7 +430,7 @@ namespace Belle2 {
         m_goodHitsXY[i]->Fill(digit.getPixelCol(), digit.getPixelRow());
         m_goodHitsAsics[i]->Fill(asic_no, asic_ch);
         m_goodTdc[i]->Fill(digit.getRawTime());
-        m_goodTDC->Fill(digit.getRawTime());
+        m_goodTDCAll->Fill(digit.getRawTime());
         if (recBunchValid) {
           m_goodTiming[i]->Fill(digit.getTime());
           m_time->Fill(digit.getTime());
@@ -445,7 +445,7 @@ namespace Belle2 {
         m_badHitsXY[i]->Fill(digit.getPixelCol(), digit.getPixelRow());
         m_badHitsAsics[i]->Fill(asic_no, asic_ch);
         m_badTdc[i]->Fill(digit.getRawTime());
-        m_badTDC->Fill(digit.getRawTime());
+        m_badTDCAll->Fill(digit.getRawTime());
         m_badChannelHits[i]->Fill(digit.getChannel());
         n_bad[i]++;
       }

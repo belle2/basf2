@@ -51,9 +51,6 @@ matchMCTruth('D0', path=main)
 
 vertexKFit('D0', 0.0, 'D0 -> ^K- ^pi+ pi0', path=main)
 
-# Rave is depricated. You can use KFit with selecting daughters.
-# vertexRave('D0', 0.0, 'D0 -> ^K- ^pi+ pi0', path=main)
-
 ntupler = register_module('VariablesToNtuple')
 ntupler.param('fileName', testFile.name)
 ntupler.param('variables', ['M', 'isSignal', 'distance', 'dr', 'dz', 'significanceOfDistance', 'pValue'])

@@ -11,12 +11,13 @@ from b2test_utils import clean_working_directory
 
 
 class TutorialsTest(unittest.TestCase):
-    """Test to run all tutorials. Will fail if no tutorial directory is found."""
+    """Test to run all mva examples."""
 
     #: list of the broken tutorials (to be removed when they are individually fixed)
-    broken_tutorials = ['B2A702-ContinuumSuppression_MVATrain.py',  # BII-4246
-                        'B2A703-ContinuumSuppression_MVAExpert.py',  # BII-4246
-                        'B2A503-ReadDecayHash.py',  # BII-4254
+    broken_tutorials = ['B2A711-DeepContinuumSuppression_Input.py',  # BII-4279
+                        'B2A713-DeepContinuumSuppression_MVAExpert.py',  # BII-4279
+                        'B2A712-DeepContinuumSuppression_MVATrain.py',  # BII-4279
+                        'B2A714-DeepContinuumSuppression_MVAModel.py'  # BII-4279
                         ]
 
     @unittest.skipIf(not os.getenv('BELLE2_EXAMPLES_DATA_DIR'),
@@ -27,7 +28,7 @@ class TutorialsTest(unittest.TestCase):
         """
         Test supported tutorials.
         """
-        all_tutorials = sorted(glob.glob(find_file('analysis/examples/tutorials/') + "*.py"))
+        all_tutorials = sorted(glob.glob(find_file('analysis/examples/mva/') + "*.py"))
         for tutorial in all_tutorials:
             filename = os.path.basename(tutorial)
             if filename not in self.broken_tutorials:

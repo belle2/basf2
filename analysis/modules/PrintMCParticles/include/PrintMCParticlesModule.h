@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PRINTMCPARTICLESMODULE_H
-#define PRINTMCPARTICLESMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -59,5 +58,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif // PRINTMCPARTICLESMODULE_H

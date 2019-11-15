@@ -62,6 +62,7 @@ QED = [
     "filter radiative Bhabha",
     "filter selectmumu",
     "filter single muon",
+    "filter cosmic",
 ]
 
 # L1 Passthrough channels

@@ -27,7 +27,7 @@ from basf2 import B2ERROR
 # ----- those parameters need to be adjusted before running -----------------------------
 #
 globalTag = 'data_reprocessing_prompt_rel4_patchb'
-data_dir = '/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009'
+data_dir = '/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/'
 dimuon_skim_dir = 'offskim/offskim_mumutop/cdst/sub00'
 bhabha_skim_dir = 'skim/hlt_bhabha/cdst/sub00'
 main_output_dir = 'top_calibration'

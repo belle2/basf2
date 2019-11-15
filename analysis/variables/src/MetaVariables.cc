@@ -2495,10 +2495,10 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
     REGISTER_VARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
                       "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.");
     REGISTER_VARIABLE("daughterCombination(variable, daughterIndex_1, daughterIndex_2 ... daughterIndex_n)", daughterCombination,R"DOC(
-Returns a ``variable`` function only of the 4-momentum calculated on an arbirary set of (grand)daughters. 
+Returns a ``variable`` function only of the 4-momentum calculated on an arbitrary set of (grand)daughters. 
 
 .. warning::
-    ``variable`` must be only function of the daughters' 4-momenta.
+    ``variable`` can only be a function of the daughters' 4-momenta.
 
 Daughters from different generations of the decay tree can be combined using generalized daughter indexes, which are simply colon-separated 
 the list of daughter indexes, starting from the root particle: for example, ``0:1:3``  identifies the fourth 

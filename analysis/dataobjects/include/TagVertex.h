@@ -13,7 +13,13 @@
 #include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>
-#include <TMatrixFSym.h>
+#include <TMatrixDSym.h>
+#include <string>
+
+// DataObjects
+// #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <analysis/dataobjects/DistanceTools.h>
 
 namespace Belle2 {
 
@@ -41,6 +47,7 @@ namespace Belle2 {
       m_MCtagV(0) = 0; m_MCtagV(1) = 0; m_MCtagV(2) = 0;
       m_mcPDG = 0;
       resetTagVertexErrorMatrix();
+      resetConstraintCov();
       m_FitType = 0;
       m_NTracks = -1;
       m_tagVl = 0;
@@ -52,6 +59,8 @@ namespace Belle2 {
       m_tagVNDF = 0;
       m_tagVChi2 = 0;
       m_tagVChi2IP = 0;
+      m_constraintType = "";
+      m_constraintCenter(0) = 0; m_constraintCenter(1) = 0, m_constraintCenter(2) = 0;
     }
 
     // get methods
@@ -64,7 +73,7 @@ namespace Belle2 {
     /**
      * Returns BTag Vertex (3x3) error matrix
      */
-    TMatrixFSym getTagVertexErrMatrix();
+    TMatrixDSym getTagVertexErrMatrix();
 
     /**
      * Returns BTag Vertex P value
@@ -105,6 +114,11 @@ namespace Belle2 {
      * Returns number of tracks used in the fit
      */
     int getNTracks() ;
+
+    /**
+     * Returns number of tracks used in the fit (not counting the ones removed because they come from Kshorts)
+     */
+    int getNFitTracks() ;
 
     /**
      * Returns the tagV component in the boost direction
@@ -151,7 +165,54 @@ namespace Belle2 {
      */
     float getTagVChi2IP() ;
 
+    /**
+     * Returns one of the 3 components of the momentum of tag track indexed by trackindex
+     */
+    double getVtxFitTrackPComponent(unsigned int trackIndex, unsigned int component);
 
+    double getVtxFitTrackZ0(unsigned int trackIndex);
+    double getVtxFitTrackD0(unsigned int trackIndex);
+
+    /**
+     *  Returns the distance between the constraint and the tag track indexed by trackindex
+     */
+
+    double getTrackDistanceToConstraint(unsigned int trackIndex);
+
+    /**
+     *  Returns the uncertainty on the distance between the constraint and the tag track indexed by trackindex
+     */
+
+    double getTrackDistanceToConstraintErr(unsigned int trackIndex);
+
+    /**
+     *  Returns the distance between the constraint and the tag vtx
+     */
+
+    double getTagVDistanceToConstraint();
+
+    /**
+     *  Returns the distance between the tag vtx and the track indexed by trackIndex
+     */
+
+    double getTrackDistanceToTagV(unsigned int trackIndex);
+
+    /**
+     *  Returns the ertimated error on the distance between the tag vtx and the track indexed by trackIndex
+     */
+
+    double getTrackDistanceToTagVErr(unsigned int trackIndex);
+
+    /**
+     *  Returns the uncertainty on the distance between the constraint and the tag vtx
+     */
+
+    double getTagVDistanceToConstraintErr();
+
+    /**
+     * Returns the weight assigned by Rave to the track indexed by trackIndex
+     */
+    double getRaveWeight(unsigned int trackIndex);
 
     // set methods
 
@@ -163,7 +224,7 @@ namespace Belle2 {
     /**
      *  Set BTag Vertex (3x3) error matrix
      */
-    void setTagVertexErrMatrix(const TMatrixFSym& TagVertexErrMatrix);
+    void setTagVertexErrMatrix(const TMatrixDSym& TagVertexErrMatrix);
 
     /**
      * Set BTag Vertex P value
@@ -250,11 +311,38 @@ namespace Belle2 {
      */
     void setTagVChi2IP(float TagVChi2IP) ;
 
+    /**
+     * Set a vector of pointers to the tracks used in the tag vtx fit
+     */
+    void setVertexFitTracks(std::vector<const TrackFitResult*> const& vtxFitTracks);
+
+    /**
+     * Set the weights used by Rave in the tag vtx fit
+     */
+    void setRaveWeights(std::vector<double> const& raveWeights);
+
+    /**
+     * Set the centre of the constraint for the tag fit
+     */
+
+    void setConstraintCenter(TVector3 const& constraintCenter);
+
+    /**
+     * Set the covariance matrix of the constraint for the tag fit
+     */
+
+    void setConstraintCov(TMatrixDSym const& constraintCov);
+
+    /**
+     * Set the type of the constraint for the tag fit
+     */
+
+    void setConstraintType(std::string constraintType);
 
 
   private:
     TVector3 m_tagVertex;               /**< Btag vertex */
-    TMatrixFSym m_tagVertexErrMatrix;   /**< Btag vertex (3x3) error matrix */
+    TMatrixDSym m_tagVertexErrMatrix;   /**< Btag vertex (3x3) error matrix */
     float m_tagVertexPval;              /**< Btag vertex P value */
     float m_deltaT;                     /**< Delta t */
     float m_deltaTErr;                  /**< Delta t error */
@@ -272,12 +360,22 @@ namespace Belle2 {
     float m_tagVNDF;                    /**< Number of degrees of freedom in the tag vertex fit */
     float m_tagVChi2;                   /**< chi^2 value of the tag vertex fit result */
     float m_tagVChi2IP;                 /**< IP component of chi^2 value of the tag vertex fit result */
+    std::vector<const TrackFitResult*> m_vtxFitTracks; /**< pointers to the tracks used by rave to fit the vertex */
+    int m_NFitTracks;                   /**< Number of tracks used by Rave to fit the vertex */
+    std::vector<double> m_raveWeights;  /**< weights of each track in the Rave tag vtx fit */
+    std::string m_constraintType;       /**< Type of the constraint used for the tag vertex fit (noConstraint, IP, Boost, Tube) */
+    TVector3 m_constraintCenter;        /**< centre of the constraint */
+    TMatrixDSym m_constraintCov;        /**< covariance matrix associated to the constraint, ie size of the constraint */
+    DistanceTools
+    m_distanceTools;      /**< this class contains a collection of function useful to get distances between tracks and vtx's */
+
 
     /**
      * Resets 3x3 tag vertex error matrix
      * All elements are set to 0.0
      */
     void resetTagVertexErrorMatrix();
+    void resetConstraintCov();
 
     ClassDef(TagVertex, 3) /**<
            3. Add NDF, Chi2, Chi2IP

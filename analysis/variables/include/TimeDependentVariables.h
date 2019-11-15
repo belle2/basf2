@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include<vector>
+
 namespace Belle2 {
   class Particle;
 
@@ -253,6 +255,96 @@ namespace Belle2 {
      *
      */
     double particleInternalTagVMCFlavor(const Particle*);
+
+
+    /**
+     * Return the X component of the momentum of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackMomentumX(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Return the Y component of the momentum of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackMomentumY(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Return the Z component of the momentum of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackMomentumZ(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Return one of the three components of the momentum of the tag track indexed by trackIndex
+     *
+     */
+    double getTrackMomentumComponent(const Particle* part, unsigned int trackIndex, unsigned int component);
+
+    /**
+     * Returns the d0 parameter of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackD0(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Returns the z0 parameter of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackZ0(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the number of tracks used by rave to fit the vertex (not counting the ones coming from Kshorts
+     *
+     */
+    double particleTagVNFitTracks(const Particle* particle);
+
+    /**
+     * returns the weight assigned by Rave to the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackRaveWeight(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the distance between the centre of the constraint and the tag track indexed by track index
+     *
+     */
+    double tagTrackDistanceToConstraint(const Particle* part, const std::vector<double>& trackIndex);
+
+
+    /**
+     * returns the estimated uncertainty on the distance between the centre of the constraint and
+     * the tag track indexed by track index
+     *
+     */
+    double tagTrackDistanceToConstraintErr(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the distance between the centre of the constraint and the tag vtx
+     *
+     */
+    double tagVDistanceToConstraint(const Particle* part);
+
+    /**
+     * returns the estimated uncertainty on the distance between the centre of the constraint and
+     * the tag vtx
+     *
+     */
+    double tagVDistanceToConstraintErr(const Particle* part);
+
+
+    /**
+     * returns the measured distance between the tag vtx and the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the estimated uncertainty on the distance between the tag vtx and
+     * the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackDistanceToTagVErr(const Particle* part, const std::vector<double>& trackIndex);
 
   }
 }

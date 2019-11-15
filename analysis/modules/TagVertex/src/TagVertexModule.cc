@@ -10,6 +10,8 @@
 
 #include <analysis/modules/TagVertex/TagVertexModule.h>
 
+//to help printing out stuff
+#include<sstream>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -30,6 +32,7 @@
 // utilities
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/variables/TrackVariables.h>
+#include <analysis/utility/ParticleCopy.h>
 
 // msdt dataobject
 #include <mdst/dataobjects/MCParticle.h>
@@ -40,9 +43,12 @@
 
 #include <TVector.h>
 
+
 using namespace std;
 
 namespace Belle2 {
+
+
 
 
   //-----------------------------------------------------------------
@@ -56,7 +62,8 @@ namespace Belle2 {
 
   TagVertexModule::TagVertexModule() : Module(),
     m_Bfield(0), m_fitPval(0), m_mcPDG(0), m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_shiftZ(0), m_FitType(0), m_tagVl(0),
-    m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0), m_tagVNDF(0), m_tagVChi2(0), m_tagVChi2IP(0)
+    m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0), m_tagVNDF(0), m_tagVChi2(0), m_tagVChi2IP(0),
+    m_verbose(true)
   {
     // Set module properties
     setDescription("Tag side Vertex Fitter for modular analysis");
@@ -68,8 +75,12 @@ namespace Belle2 {
              0.001);
     addParam("MCAssociation", m_useMCassociation,
              "'': no MC association. breco: use standard Breco MC association. internal: use internal MC association", string("breco"));
-    addParam("useFitAlgorithm", m_useFitAlgorithm,
-             "Choose the fit algorithm: boost, breco, standard, standard_pxd, singleTrack, singleTrack_pxd, noConstraint", string("standard"));
+    addParam("constraintType", m_constraintType,
+             "Choose the type of the constraint: noConstraint, IP (tag tracks constrained to be within the beam spot), tube (long tube along the BTag line of flight, only for fully reconstruced B rec), boost (long tube along the Upsilon(4S) boost direction), (breco)",
+             string("IP"));
+    addParam("trackFindingType", m_trackFindingType,
+             "Choose how to reconstruct the tracks on the tag side: standard, standard_PXD, singleTrack, singleTrack_PXD",
+             string("standard_PXD"));
     addParam("maskName", m_roeMaskName,
              "Choose ROE mask to get particles from ", string(""));
     addParam("askMCInformation", m_MCInfo,
@@ -82,8 +93,6 @@ namespace Belle2 {
 
   void TagVertexModule::initialize()
   {
-
-
     // magnetic field
     m_Bfield = BFieldManager::getField(m_BeamSpotCenter).Z() / Unit::T;
     // RAVE setup
@@ -122,7 +131,9 @@ namespace Belle2 {
     analysis::RaveSetup::initialize(1, m_Bfield);
 
     std::vector<unsigned int> toRemove;
+
     for (unsigned i = 0; i < plist->getListSize(); i++) {
+
       Particle* particle =  plist->getParticle(i);
       if (m_useMCassociation == "breco" || m_useMCassociation == "internal") BtagMCVertex(particle);
       bool ok = doVertexFit(particle);
@@ -158,22 +169,33 @@ namespace Belle2 {
           ver->setTagVNDF(m_tagVNDF);
           ver->setTagVChi2(m_tagVChi2);
           ver->setTagVChi2IP(m_tagVChi2IP);
+          ver->setVertexFitTracks(m_raveTracks);
+          ver->setRaveWeights(m_raveWeights);
+          ver->setConstraintType(m_constraintType);
+          ver->setConstraintCenter(m_constraintCenter);
+          ver->setConstraintCov(m_constraintCov);
         } else {
           ver->setTagVertex(m_tagV);
           ver->setTagVertexPval(-1.);
-          ver->setDeltaT(-1111.);
-          ver->setDeltaTErr(-1111.);
+          ver->setDeltaT(m_deltaT);
+          ver->setDeltaTErr(m_deltaTErr);
+          ver->setMCTagVertex(m_MCtagV);
           ver->setMCTagBFlavor(0.);
-          ver->setMCDeltaT(-1111.);
-          ver->setTagVl(-1111.);
-          ver->setTruthTagVl(-1111.);
-          ver->setTagVlErr(-1111.);
-          ver->setTagVol(-1111.);
-          ver->setTruthTagVol(-1111.);
-          ver->setTagVolErr(-1111.);
+          ver->setMCDeltaT(m_MCdeltaT);
+          ver->setFitType(m_FitType);
+          ver->setNTracks(m_tagTracks.size());
+          ver->setTagVl(m_tagVl);
+          ver->setTruthTagVl(m_truthTagVl);
+          ver->setTagVlErr(m_tagVlErr);
+          ver->setTagVol(m_tagVol);
+          ver->setTruthTagVol(m_truthTagVol);
+          ver->setTagVolErr(m_tagVolErr);
           ver->setTagVNDF(-1111.);
           ver->setTagVChi2(-1111.);
           ver->setTagVChi2IP(-1111.);
+          ver->setConstraintType(m_constraintType);
+          ver->setConstraintCenter(m_constraintCenter);
+          ver->setConstraintCov(m_constraintCov);
         }
       }
 
@@ -187,44 +209,61 @@ namespace Belle2 {
 
   bool TagVertexModule::doVertexFit(Particle* Breco)
   {
+    if ((m_trackFindingType == "singleTrack" || m_trackFindingType == "singleTrack_PXD") && m_constraintType == "noConstraint") {
+      B2ERROR("TagVertex: not possible to use singleTrack with no constraint");
+      return false;
+    }
 
     m_fitPval = 1;
     bool ok = false;
-    if (!(Breco->getRelatedTo<RestOfEvent>())) return false;
+
+    if (!(Breco->getRelatedTo<RestOfEvent>())) {
+      m_FitType = -1;
+      return false;
+    }
 
     if (m_Bfield == 0) {
       B2ERROR("TagVertex: No magnetic field");
       return false;
     }
 
-    // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
+    // recover beam spot info
+
+    m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
+    m_BeamSpotCov.ResizeTo(3, 3);
+    m_BeamSpotCov = m_beamSpotDB->getCovVertex();
+
+    //make the beam spot bigger for the standard constraint
+
     PCmsLabTransform T;
     TVector3 boost = T.getBoostVector();
-    TVector3 boostDir = boost.Unit();
-    float boostAngle = TMath::ATan(float(boostDir[0]) / boostDir[2]); // boost angle with respect from Z
     double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
-
-    m_shiftZ = 4.184436e+02 * bg *  0.0001;   // shift of 120 um (Belle2) in the boost direction
-
-    if (m_useFitAlgorithm == "singleTrack" || m_useFitAlgorithm == "singleTrack_PXD") {
-      m_BeamSpotCenter = m_beamSpotDB->getIPPosition() +
-                         TVector3(m_shiftZ * TMath::Sin(boostAngle), 0., m_shiftZ * TMath::Cos(boostAngle)); // boost in the XZ plane
-    } else {
-      m_BeamSpotCenter = m_beamSpotDB->getIPPosition(); // Standard algorithm needs no shift
-    }
 
     double cut = 8.717575e-02 * bg;
 
+    m_shiftZ = 4.184436e+02 * bg *  0.0001;
+
     // Each fit algorithm has its own constraint. Therefore, depending on the user's choice, the constraint will change.
-    if (m_useFitAlgorithm == "breco") ok = findConstraint(Breco, cut * 2000.);
-    if (m_useFitAlgorithm == "singleTrack" || m_useFitAlgorithm == "singleTrack_PXD") {
-      ok = findConstraintBoost(cut - m_shiftZ); // The constraint size is specially squeezzed when using the Single Track Algorithm
+
+
+    if (m_trackFindingType != "singleTrack" && m_trackFindingType != "singleTrack_PXD"
+        && m_constraintType == "IP") ok = findConstraintBoost(cut);
+    //tube length here set to 20 * 2 * c tau beta gamma ~= 0.5 cm, should be enough to not bias the decay
+    //time but should still help getting rid of some pions from kshorts
+    if (m_constraintType == "tube") ok = findConstraintBTube(Breco, 20 * cut);
+    if (m_constraintType == "boost") ok = findConstraintBoost(cut * 200000.);
+    if (m_constraintType == "noConstraint") ok = true;
+    if (m_constraintType == "breco") ok = findConstraint(Breco, cut * 2000.);
+    if ((m_trackFindingType == "singleTrack" || m_trackFindingType == "singleTrack_PXD") && m_constraintType == "IP") {
+      // The constraint size is specially squeezzed when using the Single Track Algorithm
+      // and shifted along the boost direction
+      ok = findConstraintBoost(cut - m_shiftZ, m_shiftZ);
+
       if (ok && m_MCInfo) FlavorTaggerInfoMCMatch(
           Breco); // When using the STA, the user can ask for MC information from the tracks performing the fit
     }
-    if (m_useFitAlgorithm == "standard" || m_useFitAlgorithm == "standard_PXD") ok = findConstraintBoost(cut);
-    if (m_useFitAlgorithm == "boost") ok = findConstraintBoost(cut * 200000.);
-    if (m_useFitAlgorithm == "noConstraint") ok = true;
+
+
     if (!ok) {
       B2ERROR("TagVertex: No correct fit constraint");
       return false;
@@ -234,29 +273,35 @@ namespace Belle2 {
        high efficiency, the next algorithm less restictive is used. I.e, if standard_PXD does not work, the program tries with standard.
     */
     m_FitType = 0;
-    if (m_useFitAlgorithm == "singleTrack_PXD") {
+    if (m_trackFindingType == "singleTrack_PXD") {
       ok = getTagTracks_singleTrackAlgorithm(Breco, 1);
       if (ok) {
         ok = makeGeneralFit();
         m_FitType = 1;
       }
     }
-    if ((ok == false || m_fitPval < 0.001) || m_useFitAlgorithm == "singleTrack") {
+    if ((ok == false || m_fitPval < 0.001) || m_trackFindingType == "singleTrack") {
       ok = getTagTracks_singleTrackAlgorithm(Breco, 0);
       if (ok) {
         ok = makeGeneralFit();
         m_FitType = 2;
       }
     }
-    if ((ok == false || m_fitPval < 0.001) || m_useFitAlgorithm == "standard_PXD") {
+
+    //if the IP constraint is used and the 1 track fit fails, must re-compute the constraint
+    if ((ok == false || m_fitPval < 0.001) && m_constraintType == "IP" && (m_trackFindingType == "singleTrack"
+        || m_trackFindingType == "singleTrack_PXD")) {
+      ok = findConstraintBoost(cut);
+    }
+
+    if ((ok == false || m_fitPval < 0.001) || m_trackFindingType == "standard_PXD") {
       ok = getTagTracks_standardAlgorithm(Breco, 1);
       if (ok) {
         ok = makeGeneralFit();
         m_FitType = 3;
       }
     }
-    if ((ok == false || m_fitPval < 0.001) || m_useFitAlgorithm == "standard" || m_useFitAlgorithm == "breco"
-        || m_useFitAlgorithm == "boost" || m_useFitAlgorithm == "noConstraint") {
+    if ((ok == false || m_fitPval < 0.001) || m_trackFindingType == "standard") {
       ok = getTagTracks_standardAlgorithm(Breco, m_reqPXDHits);
       if (ok) {
         ok = makeGeneralFit();
@@ -264,7 +309,7 @@ namespace Belle2 {
       }
     }
 
-    if ((ok == false || m_fitPval <= 0.) && m_useFitAlgorithm != "noConstraint") {
+    if ((ok == false || m_fitPval <= 0.) && m_constraintType != "noConstraint") {
       ok = findConstraintBoost(cut * 200000.);
       if (ok) ok = getTagTracks_standardAlgorithm(Breco, m_reqPXDHits);
       if (ok) {
@@ -395,18 +440,140 @@ namespace Belle2 {
     TMatrix TubePart(3, 3);  TubePart.Mult(r2t, TubeZ);
     TMatrix Tube(3, 3); Tube.Mult(TubePart, r2);
 
-    m_tube.ResizeTo(3, 3);
+    m_constraintCov.ResizeTo(3, 3);
 
-    m_tube(0, 0) = Tube(0, 0);  m_tube(0, 1) = Tube(0, 1);  m_tube(0, 2) = Tube(0, 2);
-    m_tube(1, 0) = Tube(1, 0);  m_tube(1, 1) = Tube(1, 1);  m_tube(1, 2) = Tube(1, 2);
-    m_tube(2, 0) = Tube(2, 0);  m_tube(2, 1) = Tube(2, 1);  m_tube(2, 2) = Tube(2, 2);
+    m_constraintCov(0, 0) = Tube(0, 0);  m_constraintCov(0, 1) = Tube(0, 1);  m_constraintCov(0, 2) = Tube(0, 2);
+    m_constraintCov(1, 0) = Tube(1, 0);  m_constraintCov(1, 1) = Tube(1, 1);  m_constraintCov(1, 2) = Tube(1, 2);
+    m_constraintCov(2, 0) = Tube(2, 0);  m_constraintCov(2, 1) = Tube(2, 1);  m_constraintCov(2, 2) = Tube(2, 2);
+
+    m_constraintCenter = m_BeamSpotCenter; // Standard algorithm needs no shift
+
+    return true;
+
+  }
+
+  bool TagVertexModule::findConstraintBTube(Particle* Breco, double cut)
+  {
+    //Use Breco as the creator of the B tube.
+
+    bool ok0(true);
+
+    if ((Breco->getVertexErrorMatrix()(2, 2)) == 0.0) {
+      //B2FATAL("In TagVertexModule::findConstraintBTube: Please perform a vertex fit of the selected B before calling this module");
+      B2WARNING("In TagVertexModule::findConstraintBTube: cannot get a proper vertex for BReco. BTube constraint replaced by Boost.");
+      ok0 = findConstraintBoost(cut);
+      return ok0;
+    }
+
+    //make a copy of tubecreatorB so as not to modify the original object
+
+    //Particle* tubecreatorBCopy = ParticleCopy::copyParticle(Breco); //causes problems when deleting pcle
+
+    Particle* tubecreatorBCopy = new Particle(Breco->get4Vector(), Breco->getPDGCode());
+    tubecreatorBCopy->updateMomentum(Breco->get4Vector(), Breco->getVertex(), Breco->getMomentumVertexErrorMatrix(),
+                                     Breco->getPValue());
+
+    //vertex fit will give the intersection between the beam spot and the trajectory of the B
+    //(base of the BTube, or primary vtx cov matrix)
+
+    ok0 = doVertexFitForBTube(tubecreatorBCopy);
+
+    if (!ok0) return false;
+
+    //get direction of B tag = opposite direction of B rec in CMF
+
+    TLorentzVector v4Final = tubecreatorBCopy->get4Vector();
+    PCmsLabTransform T;
+    TLorentzVector vec = T.rotateLabToCms() * v4Final;
+    TLorentzVector vecNew(-1 * vec.Px(), -1 * vec.Py(), -1 * vec.Pz(), vec.E());
+    TLorentzVector v4FinalNew = T.rotateCmsToLab() * vecNew;
+
+
+    //To creat the B tube, strategy is: take the primary vtx cov matrix, and add to it a cov
+    //matrix corresponding to an very big error in the direction of the B tag
+
+    TMatrixFSym pv = tubecreatorBCopy->getVertexErrorMatrix();
+
+
+    //print some stuff if wanted
+
+    if (m_verbose) {
+      B2DEBUG(10, "Brec decay vertex before fit: " << printVector(Breco->getVertex()));
+      B2DEBUG(10, "Brec decay vertex after fit: " << printVector(tubecreatorBCopy->getVertex()));
+      B2DEBUG(10, "Brec direction before fit: " << printVector((1. / Breco->getP()) * Breco->getMomentum()));
+      B2DEBUG(10, "Brec direction after fit: " << printVector((1. / tubecreatorBCopy->getP()) * tubecreatorBCopy->getMomentum()));
+      B2DEBUG(10, "IP position: " << printVector(m_BeamSpotCenter));
+      B2DEBUG(10, "Brec primary vertex: " << printVector(tubecreatorBCopy->getVertex()));
+      B2DEBUG(10, "IP covariance: " << printMatrix(m_BeamSpotCov));
+      B2DEBUG(10, "Brec PV covariance: " << printMatrix(pv));
+      B2DEBUG(10, "BTag direction: " << printVector((1. / v4FinalNew.P())*v4FinalNew.Vect()));
+      B2DEBUG(10, "BTag direction in CMF: " << printVector((1. / vecNew.P())*vecNew.Vect()));
+      B2DEBUG(10, "Brec direction in CMF: " << printVector((1. / vec.P())*vec.Vect()));
+      //B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex()[0] << "," << std::fixed <<
+      //    std::setprecision(
+      //      20) << tubecreatorBCopy->getVertex()[1] << "," << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex()[2] << "}");
+    }
+
+
+    // make rotation matrix from z axis to BTag line of flight
+
+    double theta = v4FinalNew.Theta();
+    double phi = v4FinalNew.Phi();
+
+    double st = TMath::Sin(theta);
+    double ct = TMath::Cos(theta);
+    double sp = TMath::Sin(phi);
+    double cp = TMath::Cos(phi);
+
+    TMatrix r2z(3, 3);  r2z(2, 2) = 1;
+    r2z(0, 0) = cp; r2z(0, 1) = -1 * sp;
+    r2z(1, 0) = sp; r2z(1, 1) = cp;
+
+    TMatrix r2y(3, 3);  r2y(1, 1) = 1;
+    r2y(0, 0) = ct; r2y(0, 2) = st;
+    r2y(2, 0) = -1 * st; r2y(2, 2) = ct;
+
+    TMatrix r2(3, 3);  r2.Mult(r2z, r2y);
+    TMatrix r2t(3, 3); r2t.Transpose(r2);
+
+
+    //make a long error matrix along BTag direction
+
+    TMatrix longerror(3, 3); longerror(2, 2) = cut * cut;
+    TMatrix longerror_temp(3, 3); longerror_temp.Mult(r2, longerror);
+    TMatrix longerrorRotated(3, 3); longerrorRotated.Mult(longerror_temp, r2t);
+
+    //pvNew will correspond to the covariance matrix of the B tube
+
+    TMatrix pvNew(3, 3);
+    pvNew += pv;
+    pvNew += longerrorRotated;
+
+    //set the constraint
+
+    m_constraintCenter = tubecreatorBCopy->getVertex();
+
+    m_constraintCov.ResizeTo(3, 3);
+
+    for (int i(0); i < 3; ++i) {
+      for (int j(0); j < 3; ++j) {
+        m_constraintCov(i, j) = pvNew(i, j);
+      }
+    }
+
+    if (m_verbose) {
+      B2DEBUG(10, "IPTube covariance: " << printMatrix(m_constraintCov));
+    }
+
+    //analysis::RaveSetup::getInstance()->reset();
+    delete tubecreatorBCopy;
 
     return true;
 
   }
 
 
-  bool TagVertexModule::findConstraintBoost(double cut)
+  bool TagVertexModule::findConstraintBoost(double cut, double shiftAlongBoost)
   {
 
     PCmsLabTransform T;
@@ -416,7 +583,11 @@ namespace Belle2 {
 
     TMatrixDSym beamSpotCov(3);
     beamSpotCov = m_beamSpotDB->getCovVertex();
+    //std::cout<<"beamSpotCov before cut:"<<std::endl;
+    //beamSpotCov.Print();
     beamSpotCov(2, 2) = cut * cut;
+    //std::cout<<"beamSpotCov after cut:"<<std::endl;
+    //beamSpotCov.Print();
     double thetab = boostDir.Theta();
     double phib = boostDir.Phi();
 
@@ -440,12 +611,29 @@ namespace Belle2 {
     TMatrix TubePart(3, 3);  TubePart.Mult(rt, beamSpotCov);
     TMatrix Tube(3, 3); Tube.Mult(TubePart, r);
 
+    //std::cout<<"beamSpotCov after rotation:"<<std::endl;
+    //Tube.Print();
 
-    m_tube.ResizeTo(3, 3);
+    m_constraintCov.ResizeTo(3, 3);
 
-    m_tube(0, 0) = Tube(0, 0);  m_tube(0, 1) = Tube(0, 1);  m_tube(0, 2) = Tube(0, 2);
-    m_tube(1, 0) = Tube(1, 0);  m_tube(1, 1) = Tube(1, 1);  m_tube(1, 2) = Tube(1, 2);
-    m_tube(2, 0) = Tube(2, 0);  m_tube(2, 1) = Tube(2, 1);  m_tube(2, 2) = Tube(2, 2);
+    m_constraintCov(0, 0) = Tube(0, 0); m_constraintCov(0, 1) = Tube(0, 1);  m_constraintCov(0, 2) = Tube(0, 2);
+    m_constraintCov(1, 0) = Tube(1, 0); m_constraintCov(1, 1) = Tube(1, 1);  m_constraintCov(1, 2) = Tube(1, 2);
+    m_constraintCov(2, 0) = Tube(2, 0); m_constraintCov(2, 1) = Tube(2, 1);  m_constraintCov(2, 2) = Tube(2, 2);
+
+
+    m_constraintCenter = m_BeamSpotCenter; // Standard algorithm needs no shift
+
+    // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
+
+    if (shiftAlongBoost > -1000) {
+      float boostAngle = TMath::ATan(float(boostDir[0]) / boostDir[2]); // boost angle with respect from Z
+
+      //double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
+      //m_shiftZ = 4.184436e+02 * bg *  0.0001;   // shift of 120 um (Belle2) in the boost direction
+
+      m_constraintCenter = m_BeamSpotCenter +
+                           TVector3(shiftAlongBoost * TMath::Sin(boostAngle), 0., shiftAlongBoost * TMath::Cos(boostAngle)); // boost in the XZ plane
+    }
 
     return true;
 
@@ -507,6 +695,8 @@ namespace Belle2 {
       }
     }
 
+    //std::cout<<"U: "<<mcPDG<<" "<<nReco<<" ("<<MCTagVert[0]<<"< "<<MCTagVert[1]<<", "<<MCTagVert[2]<<") "<<Breco->getPDGCode()<<std::endl;
+
     m_MCtagV = MCTagVert;
     m_mcPDG = mcPDG;
   }
@@ -548,13 +738,13 @@ namespace Belle2 {
    The MAIN interest is to know for a given track whether it comes directly from the B0 or from one of their immediately decaying daughters.
    Finally, the function saves this information in a codified form inside the FlavorTaggerInfo dataObject.
    */
-  void TagVertexModule::FlavorTaggerInfoMCMatch(Particle* Breco)
+  std::vector< std::pair<const MCParticle*, int> > TagVertexModule::FlavorTaggerInfoMCMatch(Particle* Breco)
   {
 
     const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
     auto* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
 
-    if (!flavorTagInfo) return;
+    if (!flavorTagInfo) return std::vector< std::pair<const MCParticle*, int> >(0);
 
 
     std::vector<int> FTGoodTracks;
@@ -675,33 +865,48 @@ namespace Belle2 {
     std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
     int ROEGoodTracks = 0;
     int ROETotalTracks = ROETracks.size();
+
+    std::pair<MCParticle*, int> emptyPair;
+    emptyPair.first = 0;
+    emptyPair.second = 2;
+    std::vector< std::pair<const MCParticle*, int> > roeTracksAndMatch(ROETotalTracks, emptyPair);
+
     for (int i = 0; i < ROETotalTracks; i++) {
       auto* roeTrackMCParticle = ROETracks[i]->getRelatedTo<MCParticle>();
+      roeTracksAndMatch.at(i).first = roeTrackMCParticle;
       MCParticle* roeTrackMCParticleMother = roeTrackMCParticle->getMother();
       bool exitROEWhile;
       do {
         int PDG = TMath::Abs(roeTrackMCParticleMother->getPDG());
         std::string motherPDGString = std::to_string(PDG);
         if (PDG == 211 || PDG == 130 || PDG == 310 || PDG == 311 ||
-            PDG == 321 || PDG == 411 || PDG == 421 || PDG == 431) break;
-        if (motherPDGString.size() == 4 || motherPDGString.size() < 3) break;
+            PDG == 321 || PDG == 411 || PDG == 421
+            || PDG == 431) break; //this checks if the mother of the pcl is a secondary (pi, K, D, KS, ...)
+        if (motherPDGString.size() == 4 || motherPDGString.size() < 3) break; //checks if the mother is a baryon
         if (roeTrackMCParticleMother->getPDG() == -m_mcPDG) break;
         if (roeTrackMCParticleMother->getPDG() == m_mcPDG) {
           ROEGoodTracks++;
+          roeTracksAndMatch.at(i).second = 1;
           break;
         }
+        /* If none of the previous work, the mother may be an immediately decaying meson, daugther of the B_tag. Thus, this checks which kind of
+          meson is it, and whether the grandmother is a B0. The given code depends on the PDG code of the meson */
         MCParticle* roeTrackMCParticleGrandMother = roeTrackMCParticleMother->getMother();
         if (motherPDGString[motherPDGString.size() - 3] == '1' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
           ROEGoodTracks++;
+          roeTracksAndMatch.at(i).second = 1;
           exitROEWhile = true;
         } else if (motherPDGString[motherPDGString.size() - 3] == '2' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
           ROEGoodTracks++;
+          roeTracksAndMatch.at(i).second = 1;
           exitROEWhile = true;
         } else if (motherPDGString[motherPDGString.size() - 3] == '3' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
           ROEGoodTracks++;
+          roeTracksAndMatch.at(i).second = 1;
           exitROEWhile = true;
         } else if (motherPDGString[motherPDGString.size() - 3] == '4' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
           ROEGoodTracks++;
+          roeTracksAndMatch.at(i).second = 1;
           exitROEWhile = true;
 
         } else {
@@ -733,6 +938,8 @@ namespace Belle2 {
     } else {
       flavorTagInfo->setGoodTracksPurityROE(float(ROEGoodTracks) / ROETotalTracks);
     }
+
+    return roeTracksAndMatch;
 
   }
 
@@ -915,9 +1122,12 @@ namespace Belle2 {
 
   bool TagVertexModule::makeGeneralFit()
   {
+    //prepare container of pointer to tracks
+    vector<const TrackFitResult*> trackFitResVec;
+
     // apply constraint
     analysis::RaveSetup::getInstance()->unsetBeamSpot();
-    if (m_useFitAlgorithm != "noConstraint") analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_tube);
+    if (m_constraintType != "noConstraint") analysis::RaveSetup::getInstance()->setBeamSpot(m_constraintCenter, m_constraintCov);
     analysis::RaveVertexFitter rFit;
 
     // Mpi &&  MKs
@@ -955,7 +1165,10 @@ namespace Belle2 {
 
       }
       try {
-        if (!isKsDau) rFit.addTrack(trak1Res); // Temporal fix: some mom go to Inf
+        if (!isKsDau) {
+          trackFitResVec.push_back(trak1Res);
+          rFit.addTrack(trak1Res); // Temporal fix: some mom go to Inf
+        }
       } catch (const rave::CheckedFloatException&) {
         B2ERROR("Exception caught in TagVertexModule::makeGeneralFit(): Invalid inputs (nan/inf)?");
       }
@@ -969,8 +1182,8 @@ namespace Belle2 {
       return false;
     }
 
-    if (m_useFitAlgorithm != "noConstraint") {
-      TMatrixDSym tubeInv = m_tube;
+    if (m_constraintType != "noConstraint") {
+      TMatrixDSym tubeInv = m_constraintCov;
       tubeInv.Invert();
       TVector3 dTagV = rFit.getPos(0) - m_BeamSpotCenter;
       TVectorD dV(0, 2,
@@ -988,6 +1201,14 @@ namespace Belle2 {
     m_tagVChi2 = rFit.getChi2(0);
 
     m_fitPval = rFit.getPValue();
+
+    //save the track info for later use
+
+    m_raveTracks = trackFitResVec;
+    m_raveWeights.clear();
+
+    for (unsigned int i(0); i < m_raveTracks.size(); ++i)
+      m_raveWeights.push_back(rFit.getWeight(i));
 
     return true;
 
@@ -1083,5 +1304,80 @@ namespace Belle2 {
   }
 
 
+  bool TagVertexModule::doVertexFitForBTube(Particle* mother)
+  {
+    //TMatrixDSym beamSpotCov(3);
+    //beamSpotCov = m_beamSpotDB->getCovVertex();
+
+    analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_BeamSpotCov);
+
+    analysis::RaveVertexFitter rsg;
+    rsg.addTrack(mother);
+    int nvert = rsg.fit("avf");
+
+    if (nvert == 1) {
+      rsg.updateDaughters();
+    } else {return false;}
+    return true;
+  }
+
+  std::string TagVertexModule::printVector(TVector3 const& vec)
+  {
+    std::ostringstream oss;
+    int w(14);
+    oss << "(" << std::setw(w) << vec[0] << ", " << std::setw(w) << vec[1] << ", " << std::setw(w) << vec[2] << ")" << std::endl;
+    return oss.str();
+  }
+
+  std::string TagVertexModule::printMatrix(TMatrix const& mat)
+  {
+    std::ostringstream oss;
+    int w(14);
+    for (int i(0); i < mat.GetNrows(); ++i) {
+      for (int j(0); j < mat.GetNcols(); ++j) {
+        oss << std::setw(w) << mat(i, j) << " ";
+      }
+      oss << endl;
+    }
+    return oss.str();
+  }
+
+  std::string TagVertexModule::printMatrix(TMatrixFSym const& mat)
+  {
+    std::ostringstream oss;
+    int w(14);
+    for (int i(0); i < mat.GetNrows(); ++i) {
+      for (int j(0); j < mat.GetNcols(); ++j) {
+        oss << std::setw(w) << mat(i, j) << " ";
+      }
+      oss << endl;
+    }
+    return oss.str();
+  }
+
+  void TagVertexModule::doRaveTracksMatching(std::vector< std::pair<const MCParticle*, int> > const& roeTracksAndMatch)
+  {
+    m_raveTracksMatchStatus = vector<int>(m_raveTracks.size(), 0);
+    m_raveTracksMCParticles = vector<const MCParticle*>(m_raveTracks.size(), 0);
+
+    const TrackFitResult* raveTrack;
+    MCParticle* raveMC;
+    std::pair<const MCParticle*, int> roeTrack;
+    bool keepLooping(true);
+    for (unsigned int i(0); i < m_raveTracks.size(); ++i) {
+      raveTrack = m_raveTracks.at(i);
+      raveMC = raveTrack->getRelatedTo<MCParticle>();
+
+      keepLooping = true;
+      for (unsigned int j(0); j < roeTracksAndMatch.size() && keepLooping; ++j) {
+        roeTrack = roeTracksAndMatch.at(j);
+        if (raveMC == roeTrack.first) {
+          m_raveTracksMCParticles.at(i) = roeTrack.first;
+          m_raveTracksMatchStatus.at(i) = roeTrack.second;
+          keepLooping = false;
+        }
+      }
+    }
+  }
 
 } // end Belle2 namespace

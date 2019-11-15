@@ -122,8 +122,8 @@ namespace Belle2 {
     m_recoPull_Phic->GetYaxis()->SetTitle("pulls");
 
     // Histograms from TOPDataQualtiyOnline
-    m_goodHits = new TH1F("good_hits", "Number of good hits per bar", m_numModules, 0.5, m_numModules + 0.5);
-    m_badHits = new TH1F("bad_hits", "Number of bad hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+    m_goodHits = new TH1F("goodHits", "Number of good hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+    m_badHits = new TH1F("badHits", "Number of bad hits per bar", m_numModules, 0.5, m_numModules + 0.5);
     m_goodHits->SetOption("LIVE");
     m_badHits->SetOption("LIVE");
     m_goodHits->SetMinimum(0);
@@ -156,8 +156,8 @@ namespace Belle2 {
     m_time->SetOption("LIVE");
     m_time->SetMinimum(0);
 
-    m_goodHitsPerEventAll = new TH1F("good_hits_per_event", "Number of good hits per event", 250, 0, 250);
-    m_badHitsPerEventAll = new TH1F("bad_hits_per_event", "Number of bad hits per event", 250, 0, 250);
+    m_goodHitsPerEventAll = new TH1F("goodHitsPerEventAll", "Number of good hits per event", 250, 0, 250);
+    m_badHitsPerEventAll = new TH1F("badHitsPerEventAll", "Number of bad hits per event", 250, 0, 250);
     m_goodHitsPerEventAll->SetOption("LIVE");
     m_badHitsPerEventAll->SetOption("LIVE");
     m_goodHitsPerEventAll->SetMinimum(0);
@@ -181,7 +181,7 @@ namespace Belle2 {
     m_badTDC->SetOption("LIVE");
     m_badTDC->SetMinimum(0);
 
-    m_goodHitsPerEventProf = new TProfile("goodHitsPerEvent", "Good hits per event vs. slot number",
+    m_goodHitsPerEventProf = new TProfile("goodHitsPerEventProf", "Good hits per event vs. slot number",
                                           16, 0.5, 16.5, 0, 1000);
     m_goodHitsPerEventProf->SetXTitle("slot number");
     m_goodHitsPerEventProf->SetYTitle("hits per event");
@@ -189,7 +189,7 @@ namespace Belle2 {
     m_goodHitsPerEventProf->SetStats(kFALSE);
     m_goodHitsPerEventProf->SetMinimum(0);
 
-    m_badHitsPerEventProf = new TProfile("badHitsPerEvent", "Bad hits per event vs. slot number",
+    m_badHitsPerEventProf = new TProfile("badHitsPerEventProf", "Bad hits per event vs. slot number",
                                          16, 0.5, 16.5, 0, 1000);
     m_badHitsPerEventProf->SetXTitle("slot number");
     m_badHitsPerEventProf->SetYTitle("hits per event");

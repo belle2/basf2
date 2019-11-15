@@ -107,7 +107,7 @@ namespace Belle2 {
     TH1F* m_bunchOffset = 0; /**< reconstructed bunch: current offset */
     TH1F* m_time = 0; /**< time distribution of good hits */
     TProfile* m_goodHitsPerEventProf = 0; /**< a profile histogram of good hits per event */
-    TProfile* m_badHitsPerEventProf = 0; /**< a profile histogram of good hits per event */
+    TProfile* m_badHitsPerEventProf = 0; /**< a profile histogram of bad hits per event */
 
     std::vector<TH2F*> m_window_vs_asic; /**< Histograms window w.r.t reference vs. ASIC */
     std::vector<TH2F*> m_goodHitsXY; /**< Histograms (2D) for good hits in x-y*/

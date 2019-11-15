@@ -24,8 +24,9 @@ from basf2 import B2ERROR
 
 # ----- those parameters need to be adjusted before running -----------------------------
 #
-globalTag = 'data_reprocessing_prompt_rel4_patch'
-data_dir = '/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009'
+globalTags = ['data_reprocessing_prompt_rel4_patchb']  # highest priority first
+localDBs = []  # highest priority first, local DB's have higher priority than global tags
+data_dir = '/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/'
 bhabha_skim_dir = 'skim/hlt_bhabha/cdst/sub00'
 dimuon_skim_dir = 'offskim/offskim_mumutop/cdst/sub00'
 main_output_dir = 'top_calibration'
@@ -79,7 +80,7 @@ if not os.path.isdir(main_output_dir):
     print('New folder created: ' + main_output_dir)
 
 # Suppress messages during processing
-basf2.set_log_level(basf2.LogLevel.WARNING)
+# basf2.set_log_level(basf2.LogLevel.WARNING)
 
 
 def moduleT0_calibration_DeltaT():
@@ -104,7 +105,10 @@ def moduleT0_calibration_DeltaT():
     # Define calibration
     cal = Calibration(name='TOP_moduleT0_rough', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
-    cal.use_central_database(globalTag)
+    for globalTag in reversed(globalTags):
+        cal.use_central_database(globalTag)
+    for localDB in reversed(localDBs):
+        cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.max_files_per_collector_job = 1
     cal.strategies = SingleIOV
@@ -135,7 +139,10 @@ def moduleT0_calibration_LL():
     # Define calibration
     cal = Calibration(name='TOP_moduleT0_final', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
-    cal.use_central_database(globalTag)
+    for globalTag in reversed(globalTags):
+        cal.use_central_database(globalTag)
+    for localDB in reversed(localDBs):
+        cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.max_files_per_collector_job = 1
     cal.strategies = SingleIOV

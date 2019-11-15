@@ -11,6 +11,7 @@
 #include <analysis/dataobjects/TagVertex.h>
 
 using namespace Belle2;
+using namespace std;
 
 
 TVector3 TagVertex::getTagVertex()
@@ -18,7 +19,7 @@ TVector3 TagVertex::getTagVertex()
   return m_tagVertex;
 }
 
-TMatrixFSym TagVertex::getTagVertexErrMatrix()
+TMatrixDSym TagVertex::getTagVertexErrMatrix()
 {
   return m_tagVertexErrMatrix;
 }
@@ -61,6 +62,11 @@ int TagVertex::getFitType()
 int TagVertex::getNTracks()
 {
   return m_NTracks;
+}
+
+int TagVertex::getNFitTracks()
+{
+  return m_NFitTracks;
 }
 
 float TagVertex::getTagVl()
@@ -108,14 +114,117 @@ float TagVertex::getTagVChi2IP()
   return m_tagVChi2IP;
 }
 
+double TagVertex::getVtxFitTrackPComponent(unsigned int trackIndex, unsigned int component)
+{
+  if (m_vtxFitTracks.size() <= trackIndex || component > 2)
+    return -1111.;
+  return m_vtxFitTracks.at(trackIndex) -> getMomentum()[component];
+}
 
+double TagVertex::getVtxFitTrackZ0(unsigned int trackIndex)
+{
+  if (m_vtxFitTracks.size() <= trackIndex)
+    return -1111.;
+  return m_vtxFitTracks.at(trackIndex) -> getZ0();
+}
+
+double TagVertex::getVtxFitTrackD0(unsigned int trackIndex)
+{
+  if (m_vtxFitTracks.size() <= trackIndex)
+    return -1111.;
+  return m_vtxFitTracks.at(trackIndex) -> getD0();
+}
+
+double TagVertex::getRaveWeight(unsigned int trackIndex)
+{
+  if (m_raveWeights.size() <= trackIndex)
+    return -1111.;
+  return m_raveWeights.at(trackIndex);
+}
+
+
+double TagVertex::getTrackDistanceToConstraint(unsigned int trackIndex)
+{
+  if (m_constraintType == "noConstraint" || m_vtxFitTracks.size() <= trackIndex)
+    return -1111.;
+
+  return m_distanceTools.trackToVtxDist(m_vtxFitTracks.at(trackIndex) -> getPosition(),
+                                        m_vtxFitTracks.at(trackIndex) -> getMomentum(),
+                                        m_constraintCenter);
+}
+
+double TagVertex::getTrackDistanceToConstraintErr(unsigned int trackIndex)
+{
+  if (m_constraintType == "noConstraint" || m_vtxFitTracks.size() <= trackIndex)
+    return -1111.;
+
+  TMatrixDSym trackPosCovMat(m_vtxFitTracks.at(trackIndex)->getCovariance6().GetSub(0, 2, 0, 2));
+
+  return m_distanceTools.trackToVtxDistErr(m_vtxFitTracks.at(trackIndex) -> getPosition(),
+                                           m_vtxFitTracks.at(trackIndex) -> getMomentum(),
+                                           m_constraintCenter,
+                                           trackPosCovMat,
+                                           m_constraintCov);
+}
+
+double TagVertex::getTagVDistanceToConstraint()
+{
+  if (m_constraintType == "noConstraint") return -1111;
+
+  return m_distanceTools.vtxToVtxDist(m_constraintCenter, m_tagVertex);
+}
+
+double TagVertex::getTagVDistanceToConstraintErr()
+{
+  if (m_constraintType == "noConstraint") return -1111;
+
+  //To compute the uncertainty, the tag vtx uncertainty is NOT taken into account
+  //The error computed is the the one used  in the chi2.
+  //To change that, emptyMat has to be replaced by m_TagVertexErrMatrix
+  TMatrixDSym emptyMat(3);
+
+  return m_distanceTools.vtxToVtxDistErr(m_constraintCenter,
+                                         m_tagVertex,
+                                         m_constraintCov,
+                                         emptyMat);
+}
+
+
+double TagVertex::getTrackDistanceToTagV(unsigned int trackIndex)
+{
+  if (m_vtxFitTracks.size() <= trackIndex)
+    return -1111.;
+
+  return m_distanceTools.trackToVtxDist(m_vtxFitTracks.at(trackIndex) -> getPosition(),
+                                        m_vtxFitTracks.at(trackIndex) -> getMomentum(),
+                                        m_tagVertex);
+}
+
+double TagVertex::getTrackDistanceToTagVErr(unsigned int trackIndex)
+{
+  if (m_vtxFitTracks.size() <= trackIndex)
+    return -1111.;
+
+  TMatrixDSym trackPosCovMat(m_vtxFitTracks.at(trackIndex)->getCovariance6().GetSub(0, 2, 0, 2));
+
+  //To compute the uncertainty, the tag vtx uncertainty is NOT taken into account
+  //The error computed is then the one in the chi2.
+  //To change that, emptyMat has to be replaced by m_TagVertexErrMatrix
+  TMatrixDSym emptyMat(3);
+
+  return m_distanceTools.trackToVtxDistErr(m_vtxFitTracks.at(trackIndex) -> getPosition(),
+                                           m_vtxFitTracks.at(trackIndex) -> getMomentum(),
+                                           m_tagVertex,
+                                           trackPosCovMat,
+                                           emptyMat);
+}
 
 void TagVertex::setTagVertex(const TVector3& tagVertex)
 {
   m_tagVertex = tagVertex;
 }
 
-void TagVertex::setTagVertexErrMatrix(const TMatrixFSym& TagVertexErrMatrix)
+void TagVertex::setTagVertexErrMatrix(const TMatrixDSym& TagVertexErrMatrix)
 {
   m_tagVertexErrMatrix = TagVertexErrMatrix;
 }
@@ -205,11 +314,43 @@ void TagVertex::setTagVChi2IP(float TagVChi2IP)
   m_tagVChi2IP = TagVChi2IP;
 }
 
+void TagVertex::setVertexFitTracks(std::vector<const TrackFitResult*> const& vtxFitTracks)
+{
+  m_vtxFitTracks = vtxFitTracks;
+  m_NFitTracks = vtxFitTracks.size();
+}
 
+void TagVertex::setRaveWeights(std::vector<double> const& raveWeights)
+{
+  m_raveWeights = raveWeights;
+}
+
+void TagVertex::setConstraintCenter(TVector3 const& constraintCenter)
+{
+  m_constraintCenter = constraintCenter;
+}
+
+void TagVertex::setConstraintCov(TMatrixDSym const& constraintCov)
+{
+  m_constraintCov.ResizeTo(constraintCov);
+  m_constraintCov = constraintCov;
+}
+
+void TagVertex::setConstraintType(std::string constraintType)
+{
+  m_constraintType = constraintType;
+}
 
 void  TagVertex::resetTagVertexErrorMatrix()
 {
-  TMatrixFSym temp(3);
+  TMatrixDSym temp(3);
   m_tagVertexErrMatrix.ResizeTo(temp);
   m_tagVertexErrMatrix = temp;
+}
+
+void  TagVertex::resetConstraintCov()
+{
+  TMatrixDSym temp(3);
+  m_constraintCov.ResizeTo(temp);
+  m_constraintCov = temp;
 }

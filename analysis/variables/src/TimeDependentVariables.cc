@@ -175,6 +175,14 @@ namespace Belle2 {
       return vert->getNTracks();
     }
 
+    double particleTagVNFitTracks(const Particle* particle)
+    {
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert)
+        return -1111.0;
+      return vert->getNFitTracks();
+    }
+
     double particleTagVType(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
@@ -533,7 +541,185 @@ namespace Belle2 {
       return result;
     }
 
+    double getTrackMomentumComponent(const Particle* part, unsigned int trackIndex, unsigned int component)
+    {
+      double result(-1111.0);
 
+      if (component > 2)
+        return result;
+
+      auto* vert = part->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = vert->getVtxFitTrackPComponent(trackIndex, component);
+
+      return result;
+    }
+
+
+    double tagTrackMomentumX(const Particle* part, const std::vector<double>& trackIndex)
+    {
+      double result(-1111.0);
+      if (trackIndex.size() != 1) return result;
+      unsigned int trackIndexInt(trackIndex.at(0));
+
+      auto* vert = part->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = vert->getVtxFitTrackPComponent(trackIndexInt, 0);
+
+      return result;
+    }
+
+    double tagTrackMomentumY(const Particle* part, const std::vector<double>& trackIndex)
+    {
+      double result(-1111.0);
+      if (trackIndex.size() != 1) return result;
+      unsigned int trackIndexInt(trackIndex.at(0));
+
+      auto* vert = part->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = vert->getVtxFitTrackPComponent(trackIndexInt, 1);
+
+      return result;
+    }
+
+    double tagTrackMomentumZ(const Particle* part, const std::vector<double>& trackIndex)
+    {
+      double result(-1111.0);
+      if (trackIndex.size() != 1) return result;
+      unsigned int trackIndexInt(trackIndex.at(0));
+
+      auto* vert = part->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = vert->getVtxFitTrackPComponent(trackIndexInt, 2);
+
+      return result;
+    }
+
+    double tagTrackZ0(const Particle* part, const std::vector<double>& trackIndex)
+    {
+      double result(-1111.0);
+      if (trackIndex.size() != 1) return result;
+      unsigned int trackIndexInt(trackIndex.at(0));
+
+      auto* vert = part->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = vert->getVtxFitTrackZ0(trackIndexInt);
+
+      return result;
+    }
+
+    double tagTrackD0(const Particle* part, const std::vector<double>& trackIndex)
+    {
+      double result(-1111.0);
+      if (trackIndex.size() != 1) return result;
+      unsigned int trackIndexInt(trackIndex.at(0));
+
+      auto* vert = part->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = vert->getVtxFitTrackD0(trackIndexInt);
+
+      return result;
+    }
+
+    double tagTrackRaveWeight(const Particle* part, const std::vector<double>& trackIndex)
+    {
+      double result(-1111.0);
+      if (trackIndex.size() != 1) return result;
+      unsigned int trackIndexInt(trackIndex.at(0));
+
+      auto* vert = part->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = vert->getRaveWeight(trackIndexInt);
+
+      return result;
+    }
+
+    double tagTrackDistanceToConstraint(const Particle* part, const std::vector<double>& trackIndex)
+    {
+      double result(-1111.0);
+      if (trackIndex.size() != 1) return result;
+      unsigned int trackIndexInt(trackIndex.at(0));
+
+      auto* vert = part->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = vert->getTrackDistanceToConstraint(trackIndexInt);
+
+      return result;
+    }
+
+    double tagTrackDistanceToConstraintErr(const Particle* part, const std::vector<double>& trackIndex)
+    {
+      double result(-1111.0);
+      if (trackIndex.size() != 1) return result;
+      unsigned int trackIndexInt(trackIndex.at(0));
+
+      auto* vert = part->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = vert->getTrackDistanceToConstraintErr(trackIndexInt);
+
+      return result;
+    }
+
+    double tagVDistanceToConstraint(const Particle* part)
+    {
+      double result(-1111.0);
+
+      auto* vert = part->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = vert->getTagVDistanceToConstraint();
+
+      return result;
+    }
+
+    double tagVDistanceToConstraintErr(const Particle* part)
+    {
+      double result(-1111.0);
+
+      auto* vert = part->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = vert->getTagVDistanceToConstraintErr();
+
+      return result;
+    }
+
+    double tagTrackDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex)
+    {
+      double result(-1111.0);
+      if (trackIndex.size() != 1) return result;
+      unsigned int trackIndexInt(trackIndex.at(0));
+
+      auto* vert = part->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = vert->getTrackDistanceToTagV(trackIndexInt);
+
+      return result;
+    }
+
+    double tagTrackDistanceToTagVErr(const Particle* part, const std::vector<double>& trackIndex)
+    {
+      double result(-1111.0);
+      if (trackIndex.size() != 1) return result;
+      unsigned int trackIndexInt(trackIndex.at(0));
+
+      auto* vert = part->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = vert->getTrackDistanceToTagVErr(trackIndexInt);
+
+      return result;
+    }
 
 
     VARIABLE_GROUP("Time Dependent CPV Analysis Variables");
@@ -597,6 +783,45 @@ namespace Belle2 {
     REGISTER_VARIABLE("internalTagVMCFlavor", particleInternalTagVMCFlavor,
                       "[Expert] [Debugging] This variable is only for internal checks of the TagV module by developers. \n"
                       "It returns the internal mc flavor information of the tag-side B provided by the TagV module.");
+
+
+    //REGISTER_VARIABLE("tagTrack0MomentumX", tagTrack0MomentumX, "Just a test function for now, don't use");
+
+    REGISTER_VARIABLE("TagTrackMomentumX(i) ", tagTrackMomentumX,
+                      "return the X component of the momentum of the ith track used in the tag vtx fit.");
+    REGISTER_VARIABLE("TagTrackMomentumY(i) ", tagTrackMomentumY,
+                      "return the Y component of the momentum of the ith track used in the tag vtx fit.");
+    REGISTER_VARIABLE("TagTrackMomentumZ(i) ", tagTrackMomentumZ,
+                      "return the Z component of the momentum of the ith track used in the tag vtx fit.");
+
+    REGISTER_VARIABLE("TagTrackZ0(i)", tagTrackZ0, "return the z0 parameter of the ith track used in the tag vtx fit");
+    REGISTER_VARIABLE("TagTrackD0(i)", tagTrackD0, "return the d0 parameter of the ith track used in the tag vtx fit");
+
+
+    REGISTER_VARIABLE("TagTrackRaveWeight(i)", tagTrackRaveWeight, "returns the weight assigned by Rave to track i");
+
+    REGISTER_VARIABLE("TagVNFitTracks", particleTagVNFitTracks,
+                      "returns the number of tracks used by rave to fit the vertex (not counting the ones coming from Kshorts");
+
+    REGISTER_VARIABLE("TagTrackDistanceToConstraint(i)", tagTrackDistanceToConstraint,
+                      "returns the measured distance between the ith tag track and the centre of the constraint.");
+
+    REGISTER_VARIABLE("TagTrackDistanceToConstraintErr(i)", tagTrackDistanceToConstraintErr,
+                      "returns the estimated error on the distance between the ith tag track and the centre of the constraint.");
+
+
+    REGISTER_VARIABLE("TagVDistanceToConstraint", tagVDistanceToConstraint,
+                      "returns the measured distance between the tag vtx and the centre of the constraint.");
+
+    REGISTER_VARIABLE("TagVDistanceToConstraintErr", tagVDistanceToConstraintErr,
+                      "returns the estimated error on the distance between the tag vtx and the centre of the constraint.");
+
+    REGISTER_VARIABLE("TagTrackDistanceToTagV(i)", tagTrackDistanceToTagV,
+                      "returns the measured distance between the ith tag track and the tag vtx.");
+
+    REGISTER_VARIABLE("TagTrackDistanceToTagVErr(i)", tagTrackDistanceToTagVErr,
+                      "returns the estimated error on the distance between the ith tag track and the tag vtx. Warning: only the uncertainties on the track position parameters are taken into account.");
+
   }
 }
 

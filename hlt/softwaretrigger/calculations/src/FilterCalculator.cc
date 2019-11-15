@@ -44,6 +44,8 @@ struct SelectedECLCluster {
   const ECLCluster* cluster = nullptr;
   /// the energy in CMS system
   double energyCMS = NAN;
+  /// the energy in Lab system
+  double energyLab = NAN;
   /// the 4 momentum in CMS system
   TLorentzVector p4CMS;
   /// the 4 momentum in lab system
@@ -85,6 +87,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["nEsingleElectronExtendedBarrel"] = 0; /**< charged clusters with E*> 1 GeV in [32,130] */
   calculationResult["nReducedEsinglePhotonReducedBarrel"] = 0; /**< charged clusters with E*> 0.5 GeV in [44,98] */
   calculationResult["nVetoClust"] = 0; /**< clusters with E>m_Emedium and |t|/dt99 < 10 */
+  calculationResult["singleTagLowMass"] = 0;
+  calculationResult["singleTagHighMass"] = 0;
   calculationResult["n2GeVNeutBarrel"] = 0;
   calculationResult["n2GeVNeutEndcap"] = 0;
   calculationResult["n2GeVChrg"] = 0;
@@ -242,6 +246,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     selectedCluster.p4CMS = boostrotate.rotateLabToCms() * selectedCluster.p4Lab; // was clustp4COM
     selectedCluster.cluster = &cluster;
     selectedCluster.clusterTime = time / dt99; // was clustT
+    selectedCluster.energyLab = selectedCluster.p4Lab.E();
     selectedCluster.energyCMS = selectedCluster.p4CMS.E(); // was first of ECOMPair
     selectedCluster.isTrack = cluster.isTrack(); // was tempCharge
 
@@ -582,6 +587,48 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
         thetaFlatten > flatBoundaries[iflat] and thetaFlatten < flatBoundaries[iflat + 1];
       if (calculationResult[eeFlatName]) {
         calculationResult["selectee"] = 1;
+      }
+    }
+  }
+
+  // Single tag pi0 / eta dedicated lines
+  if (calculationResult["nTrkLoose"] == 1 and calculationResult["maximumPCMS"] > 0.8 and selectedClusters.size() >= 2) {
+
+    decltype(selectedClusters) selectedSingleTagClusters(selectedClusters.size());
+    auto lastItem = std::copy_if(selectedClusters.begin(), selectedClusters.end(), selectedSingleTagClusters.begin(),
+    [](auto & cluster) {
+      const bool isNeutralCluster = not cluster.isTrack;
+      const bool hasEnoughEnergy = cluster.energyLab > 0.1;
+      const double clusterThetaLab = cluster.p4Lab.Theta() * TMath::RadToDeg();
+      const bool isInAcceptance = 17 < clusterThetaLab and clusterThetaLab < 150.;
+      return isNeutralCluster and hasEnoughEnergy and isInAcceptance;
+    });
+    selectedSingleTagClusters.resize(std::distance(selectedSingleTagClusters.begin(), lastItem));
+
+    if (selectedSingleTagClusters.size() >= 2) {  // One track and at least two clusters are found
+
+      const auto& track = maximumPtTracks.at(-1) ? *maximumPtTracks.at(-1) : *maximumPtTracks.at(1);
+      // in real signal, the pi0 decay daughters are always the two most-energetic neutral clusters.
+      const auto& firstCluster = selectedSingleTagClusters[0];
+      const auto& secondCluster = selectedSingleTagClusters[1];
+
+      const TLorentzVector trackP4CMS = track.p4CMS;
+      const TLorentzVector pi0P4CMS = firstCluster.p4CMS + secondCluster.p4CMS;
+
+      const bool passPi0ECMS = pi0P4CMS.E() > 1. and pi0P4CMS.E() < 0.525 * p4ofCOM.M();
+      const double thetaSumCMS = (pi0P4CMS.Theta() + trackP4CMS.Theta()) * TMath::RadToDeg();
+      const bool passThetaSum = thetaSumCMS < 170. or thetaSumCMS > 190.;
+
+      double dphiCMS = std::abs(trackP4CMS.Phi() - pi0P4CMS.Phi()) * TMath::RadToDeg();
+      if (dphiCMS > 180) {
+        dphiCMS = 360 - dphiCMS;
+      }
+      const bool passdPhi = dphiCMS > 160.;
+
+      if (passPi0ECMS and passThetaSum and passdPhi and pi0P4CMS.M() < 0.7) {
+        calculationResult["singleTagLowMass"] = 1;
+      } else if (passPi0ECMS and passThetaSum and passdPhi and pi0P4CMS.M() > 0.7) {
+        calculationResult["singleTagHighMass"] = 1;
       }
     }
   }

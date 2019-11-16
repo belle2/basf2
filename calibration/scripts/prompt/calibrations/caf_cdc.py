@@ -250,7 +250,6 @@ class CDCCalibration(Calibration):
                  input_file_dict,
                  max_iterations=5,
                  dependencies=None,
-                 queue='l',
                  max_events=10000):
         for algo in algorithms:
             algo.setHistFileName(name)

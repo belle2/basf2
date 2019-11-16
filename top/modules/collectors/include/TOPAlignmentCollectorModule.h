@@ -95,6 +95,7 @@ namespace Belle2 {
     std::vector<float> m_vAlignPars;     /**< alignment parameters */
     std::vector<float> m_vAlignParsErr;  /**< error on alignment parameters */
     bool m_valid = false;  /**< true if alignment parameters are valid */
+    int m_numPhot = 0; /**< number of photons used for log likelihood in this iteration */
     float m_x = 0; /**< track: extrapolated hit coordinate in local (module) frame */
     float m_y = 0; /**< track: extrapolated hit coordinate in local (module) frame */
     float m_z = 0; /**< track: extrapolated hit coordinate in local (module) frame */

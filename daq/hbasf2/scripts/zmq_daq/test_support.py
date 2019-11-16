@@ -33,6 +33,9 @@ class HLTZMQTestCase(TestCase):
         socket = HLTZMQTestCase.ctx.socket(zmq.ROUTER)
         port = socket.bind_to_random_port("tcp://*")
         socket.close()
+
+        # Make sure all ports are cleared etc.
+        sleep(1)
         return port
 
     def setUp(self):
@@ -66,6 +69,9 @@ class HLTZMQTestCase(TestCase):
         shutil.rmtree(self.test_dir)
 
         atexit._clear()
+
+        # Make sure all ports are cleared etc.
+        sleep(1)
 
     def _is_running(self, name):
         """

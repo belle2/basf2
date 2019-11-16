@@ -43,7 +43,7 @@ namespace Belle2 {
       auto h1 = getObjectPtr<TH1F>("tracks_per_set");
       if (not h1) {
         B2ERROR("TOPCommonT0LLAlgorithm: histogram 'tracks_per_set' not found");
-        return c_Failure;
+        return c_NotEnoughData;
       }
       unsigned numSets = h1->GetNbinsX();
 
@@ -58,7 +58,7 @@ namespace Belle2 {
         B2ERROR("TOPCommonT0LLAlgorithm: got number of chi2 scans not as expected"
                 << LogVar("expected", numSets)
                 << LogVar("found", finders.size()));
-        return c_Failure;
+        return c_NotEnoughData;
       }
 
       // bunch separation in time
@@ -66,7 +66,7 @@ namespace Belle2 {
       auto h4 = getObjectPtr<TH1F>("offset");
       if (not h4) {
         B2ERROR("TOPCommonT0LLAlgorithm: histogram 'offset' not found");
-        return c_Failure;
+        return c_NotEnoughData;
       }
       double bunchTimeSep = h4->GetXaxis()->GetXmax() - h4->GetXaxis()->GetXmin();
 

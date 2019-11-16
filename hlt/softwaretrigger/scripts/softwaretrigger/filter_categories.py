@@ -42,6 +42,8 @@ PHYSICS = [
     "filter 1 photon Estargt1 GeV clust in 32130 and no other clust Estargt0.3 GeV",
     "filter 1 photon Estargt0.5 GeV clust in 4498 and no other clust Estargt0.3 GeV",
     "filter ggBarrelLoose",
+    "filter singleTagLowMass",
+    "filter singleTagHighMass",
 ]
 
 # QED channels
@@ -62,6 +64,7 @@ QED = [
     "filter radiative Bhabha",
     "filter selectmumu",
     "filter single muon",
+    "filter cosmic",
 ]
 
 # L1 Passthrough channels

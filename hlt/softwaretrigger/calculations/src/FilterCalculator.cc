@@ -44,6 +44,8 @@ struct SelectedECLCluster {
   const ECLCluster* cluster = nullptr;
   /// the energy in CMS system
   double energyCMS = NAN;
+  /// the energy in Lab system
+  double energyLab = NAN;
   /// the 4 momentum in CMS system
   TLorentzVector p4CMS;
   /// the 4 momentum in lab system
@@ -85,6 +87,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["nEsingleElectronExtendedBarrel"] = 0; /**< charged clusters with E*> 1 GeV in [32,130] */
   calculationResult["nReducedEsinglePhotonReducedBarrel"] = 0; /**< charged clusters with E*> 0.5 GeV in [44,98] */
   calculationResult["nVetoClust"] = 0; /**< clusters with E>m_Emedium and |t|/dt99 < 10 */
+  calculationResult["singleTagLowMass"] = 0;
+  calculationResult["singleTagHighMass"] = 0;
   calculationResult["n2GeVNeutBarrel"] = 0;
   calculationResult["n2GeVNeutEndcap"] = 0;
   calculationResult["n2GeVChrg"] = 0;
@@ -114,6 +118,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["muonPairV"] = 0;
   calculationResult["selectmumu"] = 0;
   calculationResult["singleMuon"] = 0;
+  calculationResult["cosmic"] = 0;
   calculationResult["eeFlat0"] = 0;
   calculationResult["eeFlat1"] = 0;
   calculationResult["eeFlat2"] = 0;
@@ -148,6 +153,11 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     { -1, {}}, {1,  {}}
   };
 
+  // Pointer to the two tracks with maximum pt without a cut applied on z0 (used for cosmic trigger)
+  std::map<short, std::optional<MaximumPtTrack>> maximumPtTracksWithoutZCut = {
+    { -1, {}}, {1, {}}
+  };
+
   // --- Track variables -- //
   for (const Track& track : m_tracks) {
     const TrackFitResult* trackFitResult = track.getTrackFitResultWithClosestMass(Const::pion);
@@ -167,29 +177,45 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       calculationResult["nTrkTight"] += 1;
     }
 
+    // From here on use only tracks with defined charge
+    const short charge = trackFitResult->getChargeSign();
+    if (charge == 0) {
+      continue;
+    }
+
+    const TLorentzVector& momentumLab = trackFitResult->get4Momentum();
+    const TLorentzVector momentumCMS = boostrotate.rotateLabToCms() * momentumLab;
+    double pCMS = momentumCMS.Rho();
+
+    // Find the maximum pt negative [0] and positive [1] tracks without z0 cut
+    const double pT = trackFitResult->getTransverseMomentum();
+    const auto& currentMaximum = maximumPtTracksWithoutZCut.at(charge);
+    if (not currentMaximum or pT > currentMaximum->pT) {
+      MaximumPtTrack newMaximum;
+      newMaximum.pT = pT;
+      newMaximum.track = &track;
+      newMaximum.pCMS = pCMS;
+      newMaximum.pLab = momentumLab.Rho();
+      newMaximum.p4CMS = momentumCMS;
+      newMaximum.p4Lab = momentumLab;
+      maximumPtTracksWithoutZCut[charge] = newMaximum;
+    }
+
     // Loose tracks
     if (std::abs(z0) < m_looseTrkZ0) {
       calculationResult["nTrkLoose"] += 1;
-
-      const short charge = trackFitResult->getChargeSign();
-      if (charge == 0) {
-        continue;
-      }
       calculationResult["netChargeLoose"] += charge;
 
-      const TLorentzVector& momentumLab = trackFitResult->get4Momentum();
-      const TLorentzVector momentumCMS = boostrotate.rotateLabToCms() * momentumLab;
-      double pCMS = momentumCMS.Rho();
       if (std::isnan(calculationResult["maximumPCMS"]) or pCMS > calculationResult["maximumPCMS"]) {
         calculationResult["maximumPCMS"] = pCMS;
       }
 
       // Find the maximum pt negative [0] and positive [1] tracks
-      const double pT = trackFitResult->getTransverseMomentum();
-      const auto& currentMaximum = maximumPtTracks.at(charge);
-      if (not currentMaximum or pT > currentMaximum->pT) {
+      const double pTLoose = trackFitResult->getTransverseMomentum();
+      const auto& currentMaximumLoose = maximumPtTracks.at(charge);
+      if (not currentMaximumLoose or pTLoose > currentMaximumLoose->pT) {
         MaximumPtTrack newMaximum;
-        newMaximum.pT = pT;
+        newMaximum.pT = pTLoose;
         newMaximum.track = &track;
         newMaximum.pCMS = pCMS;
         newMaximum.pLab = momentumLab.Rho();
@@ -220,6 +246,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     selectedCluster.p4CMS = boostrotate.rotateLabToCms() * selectedCluster.p4Lab; // was clustp4COM
     selectedCluster.cluster = &cluster;
     selectedCluster.clusterTime = time / dt99; // was clustT
+    selectedCluster.energyLab = selectedCluster.p4Lab.E();
     selectedCluster.energyCMS = selectedCluster.p4CMS.E(); // was first of ECOMPair
     selectedCluster.isTrack = cluster.isTrack(); // was tempCharge
 
@@ -563,4 +590,91 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       }
     }
   }
+
+  // Single tag pi0 / eta dedicated lines
+  if (calculationResult["nTrkLoose"] == 1 and calculationResult["maximumPCMS"] > 0.8 and selectedClusters.size() >= 2) {
+
+    decltype(selectedClusters) selectedSingleTagClusters(selectedClusters.size());
+    auto lastItem = std::copy_if(selectedClusters.begin(), selectedClusters.end(), selectedSingleTagClusters.begin(),
+    [](auto & cluster) {
+      const bool isNeutralCluster = not cluster.isTrack;
+      const bool hasEnoughEnergy = cluster.energyLab > 0.1;
+      const double clusterThetaLab = cluster.p4Lab.Theta() * TMath::RadToDeg();
+      const bool isInAcceptance = 17 < clusterThetaLab and clusterThetaLab < 150.;
+      return isNeutralCluster and hasEnoughEnergy and isInAcceptance;
+    });
+    selectedSingleTagClusters.resize(std::distance(selectedSingleTagClusters.begin(), lastItem));
+
+    if (selectedSingleTagClusters.size() >= 2) {  // One track and at least two clusters are found
+
+      const auto& track = maximumPtTracks.at(-1) ? *maximumPtTracks.at(-1) : *maximumPtTracks.at(1);
+      // in real signal, the pi0 decay daughters are always the two most-energetic neutral clusters.
+      const auto& firstCluster = selectedSingleTagClusters[0];
+      const auto& secondCluster = selectedSingleTagClusters[1];
+
+      const TLorentzVector trackP4CMS = track.p4CMS;
+      const TLorentzVector pi0P4CMS = firstCluster.p4CMS + secondCluster.p4CMS;
+
+      const bool passPi0ECMS = pi0P4CMS.E() > 1. and pi0P4CMS.E() < 0.525 * p4ofCOM.M();
+      const double thetaSumCMS = (pi0P4CMS.Theta() + trackP4CMS.Theta()) * TMath::RadToDeg();
+      const bool passThetaSum = thetaSumCMS < 170. or thetaSumCMS > 190.;
+
+      double dphiCMS = std::abs(trackP4CMS.Phi() - pi0P4CMS.Phi()) * TMath::RadToDeg();
+      if (dphiCMS > 180) {
+        dphiCMS = 360 - dphiCMS;
+      }
+      const bool passdPhi = dphiCMS > 160.;
+
+      if (passPi0ECMS and passThetaSum and passdPhi and pi0P4CMS.M() < 0.7) {
+        calculationResult["singleTagLowMass"] = 1;
+      } else if (passPi0ECMS and passThetaSum and passdPhi and pi0P4CMS.M() > 0.7) {
+        calculationResult["singleTagHighMass"] = 1;
+      }
+    }
+  }
+
+  // Cosmic selection
+  if (calculationResult["nTrkLoose"] <= 2) {
+
+    const auto negTrack = maximumPtTracksWithoutZCut.at(-1);
+    const auto posTrack = maximumPtTracksWithoutZCut.at(1);
+
+    if (negTrack and posTrack) {
+
+      const double maxNegpT = negTrack->pT;
+      const double maxPospT = posTrack->pT;
+
+      auto accumulatePhotonEnergy = [](double result, const auto & cluster) {
+        return result + (cluster.hasHypothesis(Belle2::ECLCluster::EHypothesisBit::c_nPhotons) ? cluster.getEnergy(
+                           Belle2::ECLCluster::EHypothesisBit::c_nPhotons) : 0);
+      };
+
+      const auto& clustersOfNegTrack = negTrack->track->getRelationsTo<ECLCluster>();
+      const auto& clustersOfPosTrack = posTrack->track->getRelationsTo<ECLCluster>();
+
+      const double maxClusterENeg = std::accumulate(clustersOfNegTrack.begin(), clustersOfNegTrack.end(), 0.0, accumulatePhotonEnergy);
+      const double maxClusterEPos = std::accumulate(clustersOfPosTrack.begin(), clustersOfPosTrack.end(), 0.0, accumulatePhotonEnergy);
+
+      const TLorentzVector& momentumLabNeg(negTrack->p4Lab);
+      const TLorentzVector& momentumLabPos(posTrack->p4Lab);
+
+      // Select cosmic using these tracks
+      if (maxNegpT > m_cosmicMinPt and maxPospT > m_cosmicMinPt and maxClusterENeg < m_cosmicMaxClusterEnergy
+          and maxClusterEPos < m_cosmicMaxClusterEnergy) {
+        double dphiLab = std::abs(momentumLabNeg.Phi() - momentumLabPos.Phi()) * TMath::RadToDeg();
+        if (dphiLab > 180) {
+          dphiLab = 360 - dphiLab;
+        }
+
+        const double thetaSumLab = (momentumLabNeg.Theta() + momentumLabPos.Theta()) * TMath::RadToDeg();
+
+        constexpr double phiBackToBackTolerance = 2.;
+        constexpr double thetaBackToBackTolerance = 2.;
+        if ((180 - dphiLab) < phiBackToBackTolerance and std::abs(180 - thetaSumLab) < thetaBackToBackTolerance) {
+          calculationResult["cosmic"] = 1;
+        }
+      }
+    }
+  }
+
 }

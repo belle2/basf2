@@ -3,7 +3,8 @@
  * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck, Anze Zupanc, Sam Cunliffe                   *
+ * Contributors: Thomas Keck, Anze Zupanc, Sam Cunliffe,                  *
+ *               Umberto Tamponi                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -198,7 +199,7 @@ namespace Belle2 {
      * If two indices given: returns the angle between the momenta of the two given daughters.
      * If three indices given: Variable returns the angle between the momentum of the third particle and a vector
      * which is the sum of the first two daughter momenta.
-     * The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.
+     * The arguments in the argument vector must be generalized daughter indices.
      */
     Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments);
 
@@ -402,5 +403,15 @@ namespace Belle2 {
     * Returns function which returns the median value of the given variable of the particles in the given particle list.
     */
     Manager::FunctionPtr medianValueInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns a function which returns the value of a variable obtained combining an arbitrary subset of particles in the decay tree, passed as
+    * generalized indices. daughterCombination(M, 0, 3, 4) will return the invariant mass of the system made of the first, fourth and
+    * fifth daugther of a particle.
+    */
+    Manager::FunctionPtr daughterCombination(const std::vector<std::string>& arguments);
+
+
+
   }
 }

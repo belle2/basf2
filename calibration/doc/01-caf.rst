@@ -65,6 +65,16 @@ before running, and assigns some default options to calibrations if they weren't
     :members:
 
 
+The Algorithm Class
+===================
+
+.. warning::  You probably don't need to interact with this class unless you are attempting to set the
+              `caf.framework.Algorithm.params` dictionary.
+
+.. autoclass:: caf.framework.Algorithm
+    :members:
+
+
 Restarting The CAF From Failure
 ===============================
 
@@ -216,22 +226,57 @@ Writing Your Own Calibration Class
 Strategy Objects
 ----------------
 
-.. autoclass:: caf.framework.Algorithm
-    :members:
-
 .. automodule:: caf.strategies
 
 .. autoclass:: caf.strategies.AlgorithmStrategy
     :members:
     :special-members:
 
+SingleIoV
+*********
+
 .. autoclass:: caf.strategies.SingleIOV
     :members:
     :show-inheritance:
 
+SequentialRunByRun
+******************
+
+.. _seqrunbyrun:
+
+.. figure:: sequentialrunbyrun.png
+    :width: 40em
+    :align: center
+
+    Approximate execution logic of the :py:class:`SequentialRunByRun <caf.strategies.SequentialRunByRun>` strategy
+
 .. autoclass:: caf.strategies.SequentialRunByRun
     :members:
     :show-inheritance:
+
+SimpleRunByRun
+******************
+
+.. autoclass:: caf.strategies.SimpleRunByRun
+    :members:
+    :show-inheritance:
+
+
+SequentialBoundaries
+********************
+
+.. _seqboundaries:
+
+.. figure:: sequentialboundaries.png
+    :width: 40em
+    :align: center
+
+    Approximate execution logic of the :py:class:`SequentialBoundaries <caf.strategies.SequentialBoundaries>` strategy
+
+.. autoclass:: caf.strategies.SequentialBoundaries
+    :members:
+    :show-inheritance:
+
 
 State Machine Framework
 -----------------------

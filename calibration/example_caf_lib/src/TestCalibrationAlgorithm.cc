@@ -134,10 +134,11 @@ bool TestCalibrationAlgorithm::isBoundaryRequired(const ExpRun& currentRun)
   auto hist = getObjectPtr<TH1F>("MyHisto");
   float mean = hist->GetMean();
   // First run?
-  if (m_previousMean < -10000) {
+  if (!m_previousMeanExists) {
     B2INFO("This is the first run encountered, let's say it is a boundary.");
     B2INFO("Initial mean was " << mean);
     m_previousMean = mean;
+    m_previousMeanExists = true;
     return true;
   }
   // Shifted since last time?

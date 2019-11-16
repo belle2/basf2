@@ -39,14 +39,11 @@ namespace Belle2 {
     /// setter for m_debugHisto
     void setDebugHisto(bool debugHisto) {m_debugHisto = debugHisto;}
 
+    /// Setter for m_allowedMeanShift
     void setAllowedMeanShift(float value) {m_allowedMeanShift = value;}
 
+    /// Getter for m_allowedMeanShift
     float getAllowedMeanShift() {return m_allowedMeanShift;}
-
-    /// Start boundary finding mode, we simply set the previous mean to be a silly amount.
-    //  Notice that we comment out the argument names because we want to avoid compiler warnings about not using them.
-    virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/)
-    override {m_previousMean = -1000000.;};
 
   protected:
 
@@ -56,17 +53,35 @@ namespace Belle2 {
     /// Decide if a run should be a payload boundary. Only used in certain Python Algorithm Starategies.
     virtual bool isBoundaryRequired(const Calibration::ExpRun& currentRun) override;
 
+    /// Start boundary finding mode, we simply set the previous mean to be a silly amount.
+    //  Notice that we comment out the argument names because we want to avoid compiler warnings about not using them.
+    virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) override
+    {
+      m_previousMean = -1000000.;
+      m_previousMeanExists = false;
+    };
+
   private:
+
     /// Set when c_NotEnoughData will be returned
     int m_minEntries = 100;
+
     /// Force always fail for testing
     int m_forceFail = false;
+
     /// Set if a debugging histogram should be created in the algorithm output directory
     int m_debugHisto = false;
+
     /// Perform debug histogram file creation
     void createDebugHistogram();
+
     /// During isBoundaryRequired this is used to define the previous run's mean
     float m_previousMean = -1000000.;
+
+    /// During isBoundaryRequired we set this to True when the first boundary is defined.
+    //  It is a flag so we know we can now compare with a previous mean value.
+    bool m_previousMeanExists = false;
+
     /// Configurable parameter for deciding when to choose a new payload boundary (if used)
     float m_allowedMeanShift = 0.5;
   };

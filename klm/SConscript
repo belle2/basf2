@@ -10,6 +10,7 @@ env['LIBS'] = ['klm_dataobjects', 'klm_dbobjects',
                'geometry',
                'mdst_dataobjects',
                'simulation',
+	       'tracking_dbobjects',
                '$ROOT_LIBS']
 
 Return('env')

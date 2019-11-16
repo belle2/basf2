@@ -10,7 +10,6 @@
 
 #include <tracking/trackExtrapolateG4e/TrackExtrapolateG4e.h>
 #include <tracking/dbobjects/MuidParameters.h>
-#include <tracking/trackExtrapolateG4e/MuidPar.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/GearDir.h>
@@ -26,6 +25,7 @@
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
+#include <klm/muid/MuidBuilder.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
@@ -380,18 +380,18 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
       delete m_PositronPar;
     }
     m_ExpNo = expNo;
-    m_MuonPlusPar = new MuidPar(expNo, "MuonPlus");
-    m_MuonMinusPar = new MuidPar(expNo, "MuonMinus");
-    m_PionPlusPar = new MuidPar(expNo, "PionPlus");
-    m_PionMinusPar = new MuidPar(expNo, "PionMinus");
-    m_KaonPlusPar = new MuidPar(expNo, "KaonPlus");
-    m_KaonMinusPar = new MuidPar(expNo, "KaonMinus");
-    m_ProtonPar = new MuidPar(expNo, "Proton");
-    m_AntiprotonPar = new MuidPar(expNo, "Antiproton");
-    m_DeuteronPar = new MuidPar(expNo, "Deuteron");
-    m_AntideuteronPar = new MuidPar(expNo, "Antideuteron");
-    m_ElectronPar = new MuidPar(expNo, "Electron");
-    m_PositronPar = new MuidPar(expNo, "Positron");
+    m_MuonPlusPar = new MuidBuilder(expNo, "MuonPlus");
+    m_MuonMinusPar = new MuidBuilder(expNo, "MuonMinus");
+    m_PionPlusPar = new MuidBuilder(expNo, "PionPlus");
+    m_PionMinusPar = new MuidBuilder(expNo, "PionMinus");
+    m_KaonPlusPar = new MuidBuilder(expNo, "KaonPlus");
+    m_KaonMinusPar = new MuidBuilder(expNo, "KaonMinus");
+    m_ProtonPar = new MuidBuilder(expNo, "Proton");
+    m_AntiprotonPar = new MuidBuilder(expNo, "Antiproton");
+    m_DeuteronPar = new MuidBuilder(expNo, "Deuteron");
+    m_AntideuteronPar = new MuidBuilder(expNo, "Antideuteron");
+    m_ElectronPar = new MuidBuilder(expNo, "Electron");
+    m_PositronPar = new MuidBuilder(expNo, "Positron");
 
     // Check availability of KLM channel status for muid
     m_eklmTransformData = &(EKLM::TransformDataGlobalAligned::Instance());

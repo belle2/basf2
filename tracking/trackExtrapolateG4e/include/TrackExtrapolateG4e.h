@@ -37,7 +37,7 @@ namespace Belle2 {
 
   class Track;
   class KLMMuidLikelihood;
-  class MuidPar;
+  class MuidBuilder;
   class KLMCluster;
   class ECLCluster;
   namespace Simulation {
@@ -496,40 +496,40 @@ namespace Belle2 {
     const EKLM::TransformDataGlobalAligned* m_eklmTransformData;
 
     //! probability density function for positive-muon hypothesis
-    MuidPar* m_MuonPlusPar;
+    MuidBuilder* m_MuonPlusPar;
 
     //! probability density function for negative-muon hypothesis
-    MuidPar* m_MuonMinusPar;
+    MuidBuilder* m_MuonMinusPar;
 
     //! probability density function for positive-pion hypothesis
-    MuidPar* m_PionPlusPar;
+    MuidBuilder* m_PionPlusPar;
 
     //! probability density function for negative-pion hypothesis
-    MuidPar* m_PionMinusPar;
+    MuidBuilder* m_PionMinusPar;
 
     //! probability density function for positive-kaon hypothesis
-    MuidPar* m_KaonPlusPar;
+    MuidBuilder* m_KaonPlusPar;
 
     //! probability density function for negative-kaon hypothesis
-    MuidPar* m_KaonMinusPar;
+    MuidBuilder* m_KaonMinusPar;
 
     //! probability density function for proton hypothesis
-    MuidPar* m_ProtonPar;
+    MuidBuilder* m_ProtonPar;
 
     //! probability density function for antiproton hypothesis
-    MuidPar* m_AntiprotonPar;
+    MuidBuilder* m_AntiprotonPar;
 
     //! probability density function for deuteron hypothesis
-    MuidPar* m_DeuteronPar;
+    MuidBuilder* m_DeuteronPar;
 
     //! probability density function for antideuteron hypothesis
-    MuidPar* m_AntideuteronPar;
+    MuidBuilder* m_AntideuteronPar;
 
     //! probability density function for electron hypothesis
-    MuidPar* m_ElectronPar;
+    MuidBuilder* m_ElectronPar;
 
     //! probability density function for positron hypothesis
-    MuidPar* m_PositronPar;
+    MuidBuilder* m_PositronPar;
 
   };
 

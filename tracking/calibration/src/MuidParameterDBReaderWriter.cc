@@ -10,7 +10,7 @@
 
 #include <tracking/calibration/MuidParameterDBReaderWriter.h>
 #include <tracking/dbobjects/MuidParameters.h>
-#include <tracking/trackExtrapolateG4e/MuidPar.h>
+#include <klm/muid/MuidBuilder.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/IntervalOfValidity.h>
@@ -38,28 +38,28 @@ void MuidParameterDBReaderWriter::writeMuidParameters()
       GearDir outcomeContent(content);
       outcomeContent.append((format("/LayerProfile/Outcome[@outcome=\"%1%\"]/") % (outcome)).str());
       for (int lastLayer = 0; lastLayer <= MUID_MaxBarrelLayer; ++lastLayer) {
-        if ((outcome == MuidPar::EMuidOutcome::c_StopInBarrel)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_StopInBarrel)
             && (lastLayer > MUID_MaxBarrelLayer - 1)) break; // barrel stop: never in layer 14
-        if ((outcome == MuidPar::EMuidOutcome::c_StopInForwardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_StopInForwardEndcap)
             && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // forward endcap stop: never in layer 13
-        if ((outcome == MuidPar::EMuidOutcome::c_ExitBarrel) && (lastLayer > MUID_MaxBarrelLayer)) break; // barrel exit: no layers 15+
-        if ((outcome == MuidPar::EMuidOutcome::c_ExitForwardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_ExitBarrel) && (lastLayer > MUID_MaxBarrelLayer)) break; // barrel exit: no layers 15+
+        if ((outcome == MuidBuilder::EMuidOutcome::c_ExitForwardEndcap)
             && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // forward endcap exit: no layers 14+
-        if ((outcome == MuidPar::EMuidOutcome::c_StopInBackwardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_StopInBackwardEndcap)
             && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // backward endcap stop: never in layer 11
-        if ((outcome == MuidPar::EMuidOutcome::c_ExitBackWardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_ExitBackWardEndcap)
             && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // backward endcap exit: no layers 12+
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelStopInForwardMin)
-            && (outcome <=  MuidPar::EMuidOutcome::c_CrossBarrelStopInForwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInForwardMin)
+            && (outcome <=  MuidBuilder::EMuidOutcome::c_CrossBarrelStopInForwardMax)
             && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // like outcome == 2
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelStopInBackwardMin)
-            && (outcome <=  MuidPar::EMuidOutcome::c_CrossBarrelStopInBackwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInBackwardMin)
+            && (outcome <=  MuidBuilder::EMuidOutcome::c_CrossBarrelStopInBackwardMax)
             && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // like outcome == 5
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelExitForwardMin)
-            && (outcome <=  MuidPar::EMuidOutcome::c_CrossBarrelExitForwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelExitForwardMin)
+            && (outcome <=  MuidBuilder::EMuidOutcome::c_CrossBarrelExitForwardMax)
             && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // like outcome == 4
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelExitBackwardMin)
-            && (outcome <=  MuidPar::EMuidOutcome::c_CrossBarrelExitBackwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelExitBackwardMin)
+            && (outcome <=  MuidBuilder::EMuidOutcome::c_CrossBarrelExitBackwardMax)
             && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // like outcome == 6
         std::vector<double> layerPDF = outcomeContent.getArray((format("LastLayer[@layer=\"%1%\"]") % (lastLayer)).str());
         muidPar->setLayerProfile(hypothesis, outcome, lastLayer, layerPDF);
@@ -104,28 +104,28 @@ void MuidParameterDBReaderWriter::readMuidParameters()
       B2INFO(" outcome " << outcome);
       for (int lastLayer = 0; lastLayer <= MUID_MaxBarrelLayer; ++lastLayer) {
         B2INFO(" lastLayer " << lastLayer);
-        if ((outcome == MuidPar::EMuidOutcome::c_StopInBarrel)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_StopInBarrel)
             && (lastLayer > MUID_MaxBarrelLayer - 1)) break; // barrel stop: never in layer 14
-        if ((outcome == MuidPar::EMuidOutcome::c_StopInForwardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_StopInForwardEndcap)
             && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // forward endcap stop: never in layer 13
-        if ((outcome == MuidPar::EMuidOutcome::c_ExitBarrel) && (lastLayer > MUID_MaxBarrelLayer)) break; // barrel exit: no layers 15+
-        if ((outcome == MuidPar::EMuidOutcome::c_ExitForwardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_ExitBarrel) && (lastLayer > MUID_MaxBarrelLayer)) break; // barrel exit: no layers 15+
+        if ((outcome == MuidBuilder::EMuidOutcome::c_ExitForwardEndcap)
             && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // forward endcap exit: no layers 14+
-        if ((outcome == MuidPar::EMuidOutcome::c_StopInBackwardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_StopInBackwardEndcap)
             && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // backward endcap stop: never in layer 11
-        if ((outcome == MuidPar::EMuidOutcome::c_ExitBackWardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_ExitBackWardEndcap)
             && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // backward endcap exit: no layers 12+
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelStopInForwardMin)
-            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelStopInForwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInForwardMin)
+            && (outcome <= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInForwardMax)
             && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // like outcome == 2
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelStopInBackwardMin)
-            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelStopInBackwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInBackwardMin)
+            && (outcome <= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInBackwardMax)
             && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // like outcome == 5
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelExitForwardMin)
-            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelExitForwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelExitForwardMin)
+            && (outcome <= MuidBuilder::EMuidOutcome::c_CrossBarrelExitForwardMax)
             && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // like outcome == 4
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelExitBackwardMin)
-            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelExitBackwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelExitBackwardMin)
+            && (outcome <= MuidBuilder::EMuidOutcome::c_CrossBarrelExitBackwardMax)
             && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // like outcome == 6
         std::vector<double> layerPDF = m_muidParameters->getProfile(hypothesis, outcome, lastLayer);
         B2INFO(" layerPDF:  ");

@@ -8,18 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackExtrapolateG4e/MuidPar.h>
+/* Own header. */
+#include <klm/muid/MuidBuilder.h>
+
+/* KLM headers. */
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 
-#include <fstream>
-#include <cmath>
-
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
+
+/* C++ headers. */
+#include <cmath>
+#include <fstream>
 
 using namespace std;
 namespace Belle2 {
 
-  MuidPar::MuidPar() : m_ReducedChiSquaredDx(0.0)
+  MuidBuilder::MuidBuilder() : m_ReducedChiSquaredDx(0.0)
   {
     for (int outcome = 1; outcome <= MUID_MaxOutcome; ++outcome) {
       for (int lastLayer = 0; lastLayer <= MUID_MaxBarrelLayer; ++lastLayer) {
@@ -44,49 +49,49 @@ namespace Belle2 {
     }
   }
 
-  MuidPar::MuidPar(int expNo, const char hypothesisName[]) : m_ReducedChiSquaredDx(0.0)
+  MuidBuilder::MuidBuilder(int expNo, const char hypothesisName[]) : m_ReducedChiSquaredDx(0.0)
   {
     //fill PDFs by reading database
     fillPDFs(hypothesisName);
     if (m_ReducedChiSquaredDx == 0.0) { B2FATAL("Failed to read " << hypothesisName << " PDFs for experiment " << expNo); }
   }
 
-  MuidPar::~MuidPar()
+  MuidBuilder::~MuidBuilder()
   {
   }
 
 
-  void MuidPar::fillPDFs(const char hypothesisName[])
+  void MuidBuilder::fillPDFs(const char hypothesisName[])
   {
     vector<string> const hypotheses = {"Positron", "Electron" , "Deuteron", "Antideuteron", "Proton", "Antiproton", "PionPlus", "PionMinus", "KaonPlus", "KaonMinus", "MuonPlus", "MuonMinus" };
     int hypothesis = -1;
     for (unsigned int ii = 0; ii < hypotheses.size(); ii++) { if (hypothesisName == hypotheses[ii]) {hypothesis = ii; break;}}
-    if (hypothesis == -1) B2FATAL("MuidPar::fillPDFs(): hypothesisName " << hypothesisName << "is not expected. ");
+    if (hypothesis == -1) B2FATAL("MuidBuilder::fillPDFs(): hypothesisName " << hypothesisName << "is not expected. ");
 
     for (int outcome = 1; outcome <= MUID_MaxOutcome; ++outcome) {
       for (int lastLayer = 0; lastLayer <= MUID_MaxBarrelLayer; ++lastLayer) {
-        if ((outcome == MuidPar::EMuidOutcome::c_StopInBarrel)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_StopInBarrel)
             && (lastLayer > MUID_MaxBarrelLayer - 1)) break; // barrel stop: never in layer 14
-        if ((outcome == MuidPar::EMuidOutcome::c_StopInForwardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_StopInForwardEndcap)
             && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // forward endcap stop: never in layer 13
-        if ((outcome == MuidPar::EMuidOutcome::c_ExitBarrel) && (lastLayer > MUID_MaxBarrelLayer)) break; // barrel exit: no layers 15+
-        if ((outcome == MuidPar::EMuidOutcome::c_ExitForwardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_ExitBarrel) && (lastLayer > MUID_MaxBarrelLayer)) break; // barrel exit: no layers 15+
+        if ((outcome == MuidBuilder::EMuidOutcome::c_ExitForwardEndcap)
             && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // forward endcap exit: no layers 14+
-        if ((outcome == MuidPar::EMuidOutcome::c_StopInBackwardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_StopInBackwardEndcap)
             && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // backward endcap stop: never in layer 11
-        if ((outcome == MuidPar::EMuidOutcome::c_ExitBackWardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_ExitBackWardEndcap)
             && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // backward endcap exit: no layers 12+
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelStopInForwardMin)
-            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelStopInForwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInForwardMin)
+            && (outcome <= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInForwardMax)
             && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // like outcome == 2
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelStopInBackwardMin)
-            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelStopInBackwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInBackwardMin)
+            && (outcome <= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInBackwardMax)
             && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // like outcome == 5
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelExitForwardMin)
-            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelExitForwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelExitForwardMin)
+            && (outcome <= MuidBuilder::EMuidOutcome::c_CrossBarrelExitForwardMax)
             && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // like outcome == 4
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelExitBackwardMin)
-            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelExitBackwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelExitBackwardMin)
+            && (outcome <= MuidBuilder::EMuidOutcome::c_CrossBarrelExitBackwardMax)
             && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // like outcome == 6
         std::vector<double> layerPDF = m_muidParameters->getProfile(hypothesis, outcome, lastLayer);
         for (unsigned int layer = 0; layer < layerPDF.size(); ++layer) {
@@ -125,7 +130,7 @@ namespace Belle2 {
 
   }
 
-  void MuidPar::spline(int n, double dx, double Y[], double B[], double C[], double D[])
+  void MuidBuilder::spline(int n, double dx, double Y[], double B[], double C[], double D[])
   {
 
     // Generate the spline interpolation coefficients B, C, D to smooth out a
@@ -163,13 +168,13 @@ namespace Belle2 {
   }
 
 
-  double MuidPar::getPDF(const KLMMuidLikelihood* muid, bool isForward) const
+  double MuidBuilder::getPDF(const KLMMuidLikelihood* muid, bool isForward) const
   {
     return getPDFLayer(muid, isForward) * getPDFRchisq(muid);
   }
 
 
-  double MuidPar::getPDFLayer(const KLMMuidLikelihood* muid, bool isForward) const
+  double MuidBuilder::getPDFLayer(const KLMMuidLikelihood* muid, bool isForward) const
   {
 
     int outcome = muid->getOutcome();
@@ -239,7 +244,7 @@ namespace Belle2 {
   }
 
 
-  double MuidPar::getPDFRchisq(const KLMMuidLikelihood* muid) const
+  double MuidBuilder::getPDFRchisq(const KLMMuidLikelihood* muid) const
   {
 
     // Evaluate the transverse-coordinate PDF for this particleID hypothesis.

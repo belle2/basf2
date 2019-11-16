@@ -8,8 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MUIDPAR_H
-#define MUIDPAR_H
+#pragma once
+
+/* Belle 2 headers */
+#include <framework/database/DBObjPtr.h>
+#include <tracking/dbobjects/MuidParameters.h>
 
 //! Outermost barrel layer number (zero-based counting)
 #define MUID_MaxBarrelLayer 14
@@ -47,15 +50,12 @@
 //! Maximum reduced-chi-squared tabulated value for transverse scattering
 #define MUID_ReducedChiSquaredLimit 10.0
 
-#include <framework/database/DBObjPtr.h>
-#include <tracking/dbobjects/MuidParameters.h>
-
 namespace Belle2 {
 
   class KLMMuidLikelihood;
 
   //! Provides muid parameters (from Database)
-  class MuidPar {
+  class MuidBuilder {
 
   public:
 
@@ -81,10 +81,10 @@ namespace Belle2 {
     };
 
     //! Constructor with arguments (experiment #, particleID hypothesis)
-    MuidPar(int, const char*);
+    MuidBuilder(int, const char*);
 
     //! Destructor
-    ~MuidPar();
+    ~MuidBuilder();
 
     //! Get the PDF for a particular hypothesis
     double getPDF(const KLMMuidLikelihood*, bool isForward) const;
@@ -92,13 +92,13 @@ namespace Belle2 {
   private:
 
     //! Hidden constructor
-    MuidPar();
+    MuidBuilder();
 
     //! Hidden copy constructor
-    MuidPar(MuidPar&);
+    MuidBuilder(MuidBuilder&);
 
     //! Hidden copy assignment
-    MuidPar& operator=(const MuidPar&);
+    MuidBuilder& operator=(const MuidBuilder&);
 
     //! Get probability density functions for this particleID hypothesis from Dababase
     void fillPDFs(const char*);
@@ -145,5 +145,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif // MUIDPAR_H

@@ -4,16 +4,16 @@
 ########################################################
 #
 #  This steering file shows how to correctly "load"
-#  the Muid variables and use them in a steering file
-#  for calibration studies.
+#  the KLMMuidLikelihood variables and use them in a
+#  steering file for calibration studies.
 #
 #  In the first part of the script we generate a sample
 #  of muons and we simulate and reconstuct them.
 #  In the second part we run a (very) simple analysis
 #  and save some variables to ntuple.
 #
-#  Note that the Muid variables are intended to be used
-#  by experts for calibration studies!
+#  Note that the KLMMuidLikelihood variables are intended
+#  to be used by experts for calibration studies!
 #
 #  Contact: Giacomo De Pietro (2018)
 #           giacomo.depietro@roma3.infn.it
@@ -26,10 +26,10 @@ import simulation as sim
 import reconstruction as rec
 import modularAnalysis as ma
 
-# Load the tracking libraries
-# Fundamental for using the Muid variables!
+# Load the klm libraries
+# Fundamental for using the KLMMuidLikelihood variables!
 from ROOT import gSystem
-gSystem.Load('libtracking.so')
+gSystem.Load('libklm.so')
 
 # Create the main path
 main = b2.create_path()

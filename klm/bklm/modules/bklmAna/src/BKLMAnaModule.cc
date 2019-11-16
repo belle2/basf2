@@ -16,7 +16,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <tracking/dataobjects/Muid.h>
+#include <klm/dataobjects/KLMMuidLikelihood.h>
 
 /* CLHEP headers. */
 #include <CLHEP/Units/SystemOfUnits.h>
@@ -199,7 +199,7 @@ void BKLMAnaModule::event()
     if (trkphi < 0) trkphi =  trkphi + 360.0;
     RelationVector<BKLMHit2d> relatedHit2D = track->getRelationsTo<BKLMHit2d>();
     RelationVector<ExtHit> relatedExtHit = track->getRelationsTo<ExtHit>();
-    RelationVector<Muid> Muids = track->getRelationsTo<Muid>();
+    RelationVector<KLMMuidLikelihood> Muids = track->getRelationsTo<KLMMuidLikelihood>();
     for (unsigned int t = 0; t < relatedExtHit.size(); t++) {
       ExtHit* exthit =  relatedExtHit[t];
       if (exthit->getDetectorID() != Const::EDetector::BKLM) continue;
@@ -210,7 +210,7 @@ void BKLMAnaModule::event()
       //do we need to require Muid ?
       bool crossed = false; // should be only once ?
       for (unsigned int mu = 0; mu < Muids.size(); mu++) {
-        Muid* muid =  Muids[mu];
+        KLMMuidLikelihood* muid =  Muids[mu];
         int extPattern = muid->getExtLayerPattern();
         if ((extPattern & (1 << (layer - 1))) != 0)  crossed = true;
         if (crossed) break;

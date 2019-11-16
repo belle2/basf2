@@ -21,8 +21,8 @@
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <tracking/dataobjects/Muid.h>
-#include <tracking/dataobjects/MuidHit.h>
+#include <klm/dataobjects/KLMMuidLikelihood.h>
+#include <klm/dataobjects/KLMMuidHit.h>
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
 #include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
@@ -222,8 +222,8 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   StoreArray<Track> tracks(*m_TracksColName);
   StoreArray<RecoTrack> recoTracks(*m_RecoTracksColName);
   StoreArray<ExtHit> extHits(*m_ExtHitsColName);
-  StoreArray<Muid> muids(*m_MuidsColName);
-  StoreArray<MuidHit> muidHits(*m_MuidHitsColName);
+  StoreArray<KLMMuidLikelihood> muids(*m_MuidsColName);
+  StoreArray<KLMMuidHit> muidHits(*m_MuidHitsColName);
   StoreArray<BKLMHit2d> bklmHits(*m_BKLMHitsColName);
   StoreArray<EKLMHit2d> eklmHits(*m_EKLMHitsColName);
   StoreArray<KLMCluster> klmClusters(*m_KLMClustersColName);
@@ -645,8 +645,8 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   if (klmClusterInfo != NULL) {
     klmHit.resize(klmClusterInfo->size()); // initialize each to huge distance
   }
-  StoreArray<Muid> muids(*m_MuidsColName);
-  Muid* muid = muids.appendNew(extState.pdgCode); // rest of this object will be filled later
+  StoreArray<KLMMuidLikelihood> muids(*m_MuidsColName);
+  KLMMuidLikelihood* muid = muids.appendNew(extState.pdgCode); // rest of this object will be filled later
   if (extState.track != NULL) { extState.track->addRelationTo(muid); }
   G4ErrorMode propagationMode = (extState.isCosmic ? G4ErrorMode_PropBackwards : G4ErrorMode_PropForwards);
   m_ExtMgr->InitTrackPropagation(propagationMode);
@@ -1317,7 +1317,7 @@ void TrackExtrapolateG4e::createExtHit(ExtHitStatus status, const ExtState& extS
 // Write another volume-entry point on track.
 // The track state will be modified here by the Kalman fitter.
 
-bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState& g4eState, Muid* muid,
+bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState& g4eState, KLMMuidLikelihood* muid,
                                         std::vector<std::map<const Track*, double> >* bklmHitUsed)
 {
 
@@ -1490,14 +1490,14 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
   // Create a new MuidHit and RelationEntry between it and the track.
   // Adjust geant4e's position, momentum and covariance based on matching hit and tell caller to update the geant4e state.
   if (intersection.chi2 >= 0.0) {
-    StoreArray<MuidHit> muidHits(*m_MuidHitsColName);
+    StoreArray<KLMMuidHit> muidHits(*m_MuidHitsColName);
     TVector3 tpos(intersection.position.x(), intersection.position.y(), intersection.position.z());
     TVector3 tposAtHitPlane(intersection.positionAtHitPlane.x(),
                             intersection.positionAtHitPlane.y(),
                             intersection.positionAtHitPlane.z());
-    MuidHit* muidHit = muidHits.appendNew(extState.pdgCode, intersection.inBarrel, intersection.isForward, intersection.sector,
-                                          intersection.layer, tpos,
-                                          tposAtHitPlane, extState.tof, intersection.time, intersection.chi2);
+    KLMMuidHit* muidHit = muidHits.appendNew(extState.pdgCode, intersection.inBarrel, intersection.isForward, intersection.sector,
+                                             intersection.layer, tpos,
+                                             tposAtHitPlane, extState.tof, intersection.time, intersection.chi2);
     if (extState.track != NULL) { extState.track->addRelationTo(muidHit); }
     G4Point3D newPos(intersection.position.x() * CLHEP::cm,
                      intersection.position.y() * CLHEP::cm,
@@ -1886,7 +1886,7 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
 
 }
 
-void TrackExtrapolateG4e::finishTrack(const ExtState& extState, Muid* muid, bool isForward)
+void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihood* muid, bool isForward)
 {
 
   // Done with this track: compute likelihoods and fill the muid object

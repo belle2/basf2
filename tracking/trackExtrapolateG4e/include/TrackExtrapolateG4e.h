@@ -36,7 +36,7 @@ class G4StepPoint;
 namespace Belle2 {
 
   class Track;
-  class Muid;
+  class KLMMuidLikelihood;
   class MuidPar;
   class KLMCluster;
   class ECLCluster;
@@ -297,7 +297,7 @@ namespace Belle2 {
                       const std::pair<ECLCluster*, G4ThreeVector>&, double, double);
 
     //! Create another MUID extrapolation hit for a track candidate
-    bool createMuidHit(ExtState&, G4ErrorFreeTrajState&, Muid*, std::vector<std::map<const Track*, double> >*);
+    bool createMuidHit(ExtState&, G4ErrorFreeTrajState&, KLMMuidLikelihood*, std::vector<std::map<const Track*, double> >*);
 
     //! Find the intersection point of the track with the crossed BKLM plane
     bool findBarrelIntersection(ExtState&, const G4ThreeVector&, Intersection&);
@@ -315,7 +315,7 @@ namespace Belle2 {
     void adjustIntersection(Intersection&, const double*, const G4ThreeVector&, const G4ThreeVector&);
 
     //! Complete muon identification after end of track extrapolation
-    void finishTrack(const ExtState&, Muid*, bool);
+    void finishTrack(const ExtState&, KLMMuidLikelihood*, bool);
 
     //! Stores pointer to the singleton class
     static TrackExtrapolateG4e* m_Singleton;

@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackExtrapolateG4e/MuidPar.h>
-#include <tracking/dataobjects/Muid.h>
+#include <klm/dataobjects/KLMMuidLikelihood.h>
 
 #include <fstream>
 #include <cmath>
@@ -163,13 +163,13 @@ namespace Belle2 {
   }
 
 
-  double MuidPar::getPDF(const Muid* muid, bool isForward) const
+  double MuidPar::getPDF(const KLMMuidLikelihood* muid, bool isForward) const
   {
     return getPDFLayer(muid, isForward) * getPDFRchisq(muid);
   }
 
 
-  double MuidPar::getPDFLayer(const Muid* muid, bool isForward) const
+  double MuidPar::getPDFLayer(const KLMMuidLikelihood* muid, bool isForward) const
   {
 
     int outcome = muid->getOutcome();
@@ -239,7 +239,7 @@ namespace Belle2 {
   }
 
 
-  double MuidPar::getPDFRchisq(const Muid* muid) const
+  double MuidPar::getPDFRchisq(const KLMMuidLikelihood* muid) const
   {
 
     // Evaluate the transverse-coordinate PDF for this particleID hypothesis.

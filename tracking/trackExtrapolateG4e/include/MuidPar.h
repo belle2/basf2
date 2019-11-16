@@ -52,7 +52,7 @@
 
 namespace Belle2 {
 
-  class Muid;
+  class KLMMuidLikelihood;
 
   //! Provides muid parameters (from Database)
   class MuidPar {
@@ -87,7 +87,7 @@ namespace Belle2 {
     ~MuidPar();
 
     //! Get the PDF for a particular hypothesis
-    double getPDF(const Muid*, bool isForward) const;
+    double getPDF(const KLMMuidLikelihood*, bool isForward) const;
 
   private:
 
@@ -107,10 +107,10 @@ namespace Belle2 {
     void spline(int, double, double*, double*, double*, double*);
 
     //! Get the per-layer PDF for a particular hypothesis
-    double getPDFLayer(const Muid*, bool) const;
+    double getPDFLayer(const KLMMuidLikelihood*, bool) const;
 
     //! Get the transverse-coordinate PDF for a particular hypothesis
-    double getPDFRchisq(const Muid*) const;
+    double getPDFRchisq(const KLMMuidLikelihood*) const;
 
     //! Per-layer (longitudinal) probability density function
     double m_LayerPDF[MUID_MaxOutcome + 1][MUID_MaxBarrelLayer + 1][MUID_MaxBarrelLayer + MUID_MaxForwardEndcapLayer + 2];

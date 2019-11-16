@@ -11,125 +11,125 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/Muid.h>
+#include <klm/dataobjects/KLMMuidLikelihood.h>
 
 using namespace std;
 
 namespace Belle2 {
   namespace Variable {
 
-    //! @returns a pointer to the related Muid dataobject
-    Muid* getMuid(const Particle* particle)
+    //! @returns a pointer to the related KLMMuidLikelihood dataobject
+    KLMMuidLikelihood* getMuid(const Particle* particle)
     {
       const Track* track = particle->getTrack();
       if (!track)
         return nullptr;
-      return track->getRelatedTo<Muid>();
+      return track->getRelatedTo<KLMMuidLikelihood>();
     }
 
-    //! @returns the muon probability stored in the Muid dataobject
+    //! @returns the muon probability stored in the KLMMuidLikelihood dataobject
     double muidMuonProbability(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getMuonPDFValue();
     }
 
-    //! @returns the pion probability stored in the Muid dataobject
+    //! @returns the pion probability stored in the KLMMuidLikelihood dataobject
     double muidPionProbability(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getPionPDFValue();
     }
 
-    //! @returns the kaon probability stored in the Muid dataobject
+    //! @returns the kaon probability stored in the KLMMuidLikelihood dataobject
     double muidKaonProbability(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getKaonPDFValue();
     }
 
-    //! @returns the electron probability stored in the Muid dataobject
+    //! @returns the electron probability stored in the KLMMuidLikelihood dataobject
     double muidElectronProbability(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getElectronPDFValue();
     }
 
-    //! @returns the proton probability stored in the Muid dataobject
+    //! @returns the proton probability stored in the KLMMuidLikelihood dataobject
     double muidProtonProbability(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getProtonPDFValue();
     }
 
-    //! @returns the deuteron probability stored in the Muid dataobject
+    //! @returns the deuteron probability stored in the KLMMuidLikelihood dataobject
     double muidDeuteronProbability(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getDeuteronPDFValue();
     }
 
-    //! @returns the muon log-likelihood stored in the Muid dataobject
+    //! @returns the muon log-likelihood stored in the KLMMuidLikelihood dataobject
     double muidMuonLogLikelihood(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getLogL_mu();
     }
 
-    //! @returns the pion log-likelihood stored in the Muid dataobject
+    //! @returns the pion log-likelihood stored in the KLMMuidLikelihood dataobject
     double muidPionLogLikelihood(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getLogL_pi();
     }
 
-    //! @returns the kaon log-likelihood stored in the Muid dataobject
+    //! @returns the kaon log-likelihood stored in the KLMMuidLikelihood dataobject
     double muidKaonLogLikelihood(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getLogL_K();
     }
 
-    //! @returns the electron log-likelihood stored in the Muid dataobject
+    //! @returns the electron log-likelihood stored in the KLMMuidLikelihood dataobject
     double muidElectronLogLikelihood(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getLogL_e();
     }
 
-    //! @returns the proton log-likelihood stored in the Muid dataobject
+    //! @returns the proton log-likelihood stored in the KLMMuidLikelihood dataobject
     double muidProtonLogLikelihood(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getLogL_p();
     }
 
-    //! @returns the deuteron log-likelihood stored in the Muid dataobject
+    //! @returns the deuteron log-likelihood stored in the KLMMuidLikelihood dataobject
     double muidDeuteronLogLikelihood(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getLogL_d();
@@ -138,7 +138,7 @@ namespace Belle2 {
     //! @return outcome of the extrapolation: 0=missed KLM, 1=barrel stop, 2=endcap stop, 3=barrel exit, 4=endcap exit
     double muidOutcomeExtTrack(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getOutcome();
@@ -147,7 +147,7 @@ namespace Belle2 {
     //! @returns chi-squared for this extrapolation
     double muidChiSquared(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getChiSquared();
@@ -156,7 +156,7 @@ namespace Belle2 {
     //! @returns number of degrees of freedom in chi-squared calculation
     double muidDegreesOfFreedom(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getDegreesOfFreedom();
@@ -165,7 +165,7 @@ namespace Belle2 {
     //! @return outermost EKLM layer crossed by track during extrapolation
     double muidEndcapExtLayer(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getEndcapExtLayer();
@@ -174,7 +174,7 @@ namespace Belle2 {
     //! @return outermost BKLM layer crossed by track during extrapolation
     double muidBarrelExtLayer(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getBarrelExtLayer();
@@ -183,7 +183,7 @@ namespace Belle2 {
     //! @return outermost BKLM or EKLM layer crossed by track during extrapolation
     double muidExtLayer(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getExtLayer();
@@ -192,7 +192,7 @@ namespace Belle2 {
     //! @return outermost EKLM layer with a matching hit
     double muidEndcapHitLayer(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getEndcapHitLayer();
@@ -201,7 +201,7 @@ namespace Belle2 {
     //! @return outermost BKLM layer with a matching hit
     double muidBarrelHitLayer(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getBarrelHitLayer();
@@ -210,7 +210,7 @@ namespace Belle2 {
     //! @return outermost BKLM or EKLM layer with a matching hit
     double muidHitLayer(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getHitLayer();
@@ -219,7 +219,7 @@ namespace Belle2 {
     //! @return layer-crossing bit pattern during extrapolation
     double muidExtLayerPattern(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getExtLayerPattern();
@@ -228,7 +228,7 @@ namespace Belle2 {
     //! @return matching-hit bit pattern
     double muidHitLayerPattern(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getHitLayerPattern();
@@ -237,7 +237,7 @@ namespace Belle2 {
     //! @return total number of matching BKLM hits
     double muidTotalBarrelHits(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getTotalBarrelHits();
@@ -246,7 +246,7 @@ namespace Belle2 {
     //! @return total number of matching EKLM hits
     double muidTotalEndcapHits(const Particle* particle)
     {
-      Muid* muid = getMuid(particle);
+      KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getTotalEndcapHits();
@@ -258,31 +258,31 @@ namespace Belle2 {
       return muidTotalBarrelHits(particle) + muidTotalEndcapHits(particle);
     }
 
-    VARIABLE_GROUP("Muid calibration");
+    VARIABLE_GROUP("KLMMuidLikelihood calibration");
     REGISTER_VARIABLE("muidMuonProbability", muidMuonProbability,
-                      "[Calibration] Returns the muon probability stored in the Muid dataobject");
+                      "[Calibration] Returns the muon probability stored in the KLMMuidLikelihood dataobject");
     REGISTER_VARIABLE("muidPionProbability", muidPionProbability,
-                      "[Calibration] Returns the pion probability stored in the Muid dataobject");
+                      "[Calibration] Returns the pion probability stored in the KLMMuidLikelihood dataobject");
     REGISTER_VARIABLE("muidKaonProbability", muidKaonProbability,
-                      "[Calibration] Returns the kaon probability stored in the Muid dataobject");
+                      "[Calibration] Returns the kaon probability stored in the KLMMuidLikelihood dataobject");
     REGISTER_VARIABLE("muidElectronProbability", muidElectronProbability,
-                      "[Calibration] Returns the electron probability stored in the Muid dataobject");
+                      "[Calibration] Returns the electron probability stored in the KLMMuidLikelihood dataobject");
     REGISTER_VARIABLE("muidProtonProbability", muidProtonProbability,
-                      "[Calibration] Returns the proton probability stored in the Muid dataobject");
+                      "[Calibration] Returns the proton probability stored in the KLMMuidLikelihood dataobject");
     REGISTER_VARIABLE("muidDeuteronProbability", muidDeuteronProbability,
-                      "[Calibration] Returns the deuteron probability stored in the Muid dataobject");
+                      "[Calibration] Returns the deuteron probability stored in the KLMMuidLikelihood dataobject");
     REGISTER_VARIABLE("muidMuonLogLikelihood", muidMuonLogLikelihood,
-                      "[Calibration] Returns the muon log-likelihood stored in the Muid dataobject");
+                      "[Calibration] Returns the muon log-likelihood stored in the KLMMuidLikelihood dataobject");
     REGISTER_VARIABLE("muidPionLogLikelihood", muidPionLogLikelihood,
-                      "[Calibration] Returns the pion log-likelihood stored in the Muid dataobject");
+                      "[Calibration] Returns the pion log-likelihood stored in the KLMMuidLikelihood dataobject");
     REGISTER_VARIABLE("muidKaonLogLikelihood", muidKaonLogLikelihood,
-                      "[Calibration] Returns the kaon log-likelihood stored in the Muid dataobject");
+                      "[Calibration] Returns the kaon log-likelihood stored in the KLMMuidLikelihood dataobject");
     REGISTER_VARIABLE("muidElectronLogLikelihood", muidElectronLogLikelihood,
-                      "[Calibration] Returns the electron log-likelihood stored in the Muid dataobject");
+                      "[Calibration] Returns the electron log-likelihood stored in the KLMMuidLikelihood dataobject");
     REGISTER_VARIABLE("muidProtonLogLikelihood", muidProtonLogLikelihood,
-                      "[Calibration] Returns the proton log-likelihood stored in the Muid dataobject");
+                      "[Calibration] Returns the proton log-likelihood stored in the KLMMuidLikelihood dataobject");
     REGISTER_VARIABLE("muidDeuteronLogLikelihood", muidDeuteronLogLikelihood,
-                      "[Calibration] Returns the deuteron log-likelihood stored in the Muid dataobject");
+                      "[Calibration] Returns the deuteron log-likelihood stored in the KLMMuidLikelihood dataobject");
     REGISTER_VARIABLE("muidOutcomeExtTrack", muidOutcomeExtTrack,
                       "[Calibration] Returns outcome of muon extrapolation: 0=missed KLM, 1=BKLM stop, 2=EKLM stop, 3=BKLM exit, 4=EKLM exit");
     REGISTER_VARIABLE("muidChiSquared", muidChiSquared,

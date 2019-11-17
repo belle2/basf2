@@ -43,6 +43,9 @@ namespace Belle2 {
           << "layerHitRate[" << f_nLayer << "]/F:"
           << "superLayerHitRate[" << f_nSuperLayer << "]/F:"
           << "averageRate/F:"
+          << "nActiveWireInLayer[" << f_nLayer << "]/I:"
+          << "nActiveWireInSuperLayer[" << f_nSuperLayer << "]/I:"
+          << "nActiveWireInTotal/I:"
           << "numEvents/I:"
           << "valid/O";
       tree->Branch("cdc", &m_rates, leafList.str().c_str());
@@ -146,6 +149,11 @@ namespace Belle2 {
         } else {
           m_rates.layerHitRate[iLayer] /= m_nActiveWireInLayer[iLayer];
         }
+      for (int i = 0 ; i < f_nLayer ; ++i)
+        m_rates.nActiveWireInLayer[i] = m_nActiveWireInLayer[i];
+      for (int i = 0 ; i < f_nSuperLayer ; ++i)
+        m_rates.nActiveWireInSuperLayer[i] = m_nActiveWireInSuperLayer[i];
+      m_rates.nActiveWireInTotal = m_nActiveWireInTotal;
     }
 
 

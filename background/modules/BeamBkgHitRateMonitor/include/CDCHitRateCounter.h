@@ -38,8 +38,11 @@ namespace Belle2 {
         float layerHitRate[f_nLayer] = {0}; /**< Layer average hit rate */
         float superLayerHitRate[f_nSuperLayer] = {0}; /**< SuperLayer average hit rate */
         float averageRate = 0; /**< total detector average hit rate */
-        int numEvents = 0; /**< number of events accumulated */
-        bool valid = false;  /**< status: true = rates valid */
+        int   nActiveWireInLayer[f_nLayer] = {0}; /**<  number of wires used in this analysis in each layer */
+        int   nActiveWireInSuperLayer[f_nSuperLayer] = {0}; /**<  number of wires used in this analysis in each super layer*/
+        int   nActiveWireInTotal = 0; /**<  number of wires used in this analysis in the whole CDC*/
+        int   numEvents = 0; /**< number of events accumulated */
+        bool  valid = false;  /**< status: true = rates valid */
 
         /**
          * normalize accumulated hits to single event

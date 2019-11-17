@@ -17,9 +17,9 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
+#include <klm/dbobjects/MuidParameters.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <tracking/dbobjects/MuidParameters.h>
 
 #include <G4TouchableHandle.hh>
 #include <G4ErrorTrajErr.hh>

@@ -7,9 +7,9 @@
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
+
 #pragma once
 
-#include <TObject.h>
 namespace Belle2 {
 
   /**
@@ -37,11 +37,6 @@ namespace Belle2 {
      * Read MuidParameters from the database.
      */
     void readMuidParameters();
-
-  private:
-
-    /** ClassDef */
-    ClassDef(MuidParameterDBReaderWriter, 0);
 
   };
 

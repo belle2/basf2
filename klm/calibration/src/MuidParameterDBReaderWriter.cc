@@ -8,22 +8,27 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/calibration/MuidParameterDBReaderWriter.h>
-#include <tracking/dbobjects/MuidParameters.h>
-#include <klm/muid/MuidBuilder.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/DBImportObjPtr.h>
+/* Own header. */
+#include <klm/calibration/MuidParameterDBReaderWriter.h>
 
+/* KLM headers. */
+#include <klm/dbobjects/MuidParameters.h>
+#include <klm/muid/MuidBuilder.h>
+
+/* Belle 2 headers. */
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/logging/Logger.h>
+
+/* C++ headers. */
+#include <fstream>
 #include <string>
 #include <vector>
-#include <fstream>
 
 using namespace std;
 using namespace Belle2;
-using namespace boost;
 
 void MuidParameterDBReaderWriter::writeMuidParameters()
 {
@@ -36,7 +41,7 @@ void MuidParameterDBReaderWriter::writeMuidParameters()
     content.append(hypotheses[hypothesis]);
     for (int outcome = 1; outcome <= MUID_MaxOutcome; ++outcome) {
       GearDir outcomeContent(content);
-      outcomeContent.append((format("/LayerProfile/Outcome[@outcome=\"%1%\"]/") % (outcome)).str());
+      outcomeContent.append((boost::format("/LayerProfile/Outcome[@outcome=\"%1%\"]/") % (outcome)).str());
       for (int lastLayer = 0; lastLayer <= MUID_MaxBarrelLayer; ++lastLayer) {
         if ((outcome == MuidBuilder::EMuidOutcome::c_StopInBarrel)
             && (lastLayer > MUID_MaxBarrelLayer - 1)) break; // barrel stop: never in layer 14
@@ -61,7 +66,7 @@ void MuidParameterDBReaderWriter::writeMuidParameters()
         if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelExitBackwardMin)
             && (outcome <=  MuidBuilder::EMuidOutcome::c_CrossBarrelExitBackwardMax)
             && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // like outcome == 6
-        std::vector<double> layerPDF = outcomeContent.getArray((format("LastLayer[@layer=\"%1%\"]") % (lastLayer)).str());
+        std::vector<double> layerPDF = outcomeContent.getArray((boost::format("LastLayer[@layer=\"%1%\"]") % (lastLayer)).str());
         muidPar->setLayerProfile(hypothesis, outcome, lastLayer, layerPDF);
       }
     }
@@ -72,13 +77,13 @@ void MuidParameterDBReaderWriter::writeMuidParameters()
       if (detector == 1) detectorContent.append("/TransversePDF/BarrelOnly");
       if (detector == 2) detectorContent.append("/TransversePDF/EndcapOnly");
       for (int halfNdof = 1; halfNdof <= MUID_MaxHalfNdof; ++halfNdof) {
-        double reducedChiSquaredThreshold = detectorContent.getDouble((format("DegreesOfFreedom[@ndof=\"%1%\"]/Tail/Threshold") %
+        double reducedChiSquaredThreshold = detectorContent.getDouble((boost::format("DegreesOfFreedom[@ndof=\"%1%\"]/Tail/Threshold") %
                                             (2 * halfNdof)).str());
-        double reducedChiSquaredScaleY = detectorContent.getDouble((format("DegreesOfFreedom[@ndof=\"%1%\"]/Tail/ScaleY") %
+        double reducedChiSquaredScaleY = detectorContent.getDouble((boost::format("DegreesOfFreedom[@ndof=\"%1%\"]/Tail/ScaleY") %
                                                                     (2 * halfNdof)).str());
-        double reducedChiSquaredScaleX = detectorContent.getDouble((format("DegreesOfFreedom[@ndof=\"%1%\"]/Tail/ScaleX") %
+        double reducedChiSquaredScaleX = detectorContent.getDouble((boost::format("DegreesOfFreedom[@ndof=\"%1%\"]/Tail/ScaleX") %
                                                                     (2 * halfNdof)).str());
-        std::vector<double> reducedChiSquaredPDF = detectorContent.getArray((format("DegreesOfFreedom[@ndof=\"%1%\"]/Histogram") %
+        std::vector<double> reducedChiSquaredPDF = detectorContent.getArray((boost::format("DegreesOfFreedom[@ndof=\"%1%\"]/Histogram") %
                                                    (2 * halfNdof)).str());
         muidPar->setPDF(hypothesis, detector, halfNdof * 2, reducedChiSquaredPDF);
         muidPar->setThreshold(hypothesis, detector, halfNdof * 2, reducedChiSquaredThreshold);

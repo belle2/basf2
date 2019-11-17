@@ -10,9 +10,11 @@
 
 #pragma once
 
-/* Belle 2 headers */
+/* KLM headers. */
+#include <klm/dbobjects/MuidParameters.h>
+
+/* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
-#include <tracking/dbobjects/MuidParameters.h>
 
 //! Outermost barrel layer number (zero-based counting)
 #define MUID_MaxBarrelLayer 14

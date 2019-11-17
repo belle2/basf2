@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <tracking/trackExtrapolateG4e/TrackExtrapolateG4e.h>
-#include <tracking/dbobjects/MuidParameters.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/GearDir.h>

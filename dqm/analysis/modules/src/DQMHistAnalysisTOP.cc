@@ -185,11 +185,11 @@ void DQMHistAnalysisTOPModule::event()
 
   //addHist("", m_h_goodHitsMean->GetName(), m_h_goodHitsMean);
 
-  TCanvas* c1 = find_canvas("TOP/c_goodHitsPerEventProf");
+  TCanvas* c1 = find_canvas("TOP/c_hitsPerEvent");
   //TH1* h1=find_histo_in_canvas("TOP/hitsPerEvent");
-  //if (c1 != NULL) {
-  //  c1->SetName("TOP/c_hitsPerEvent_top");
-  //}
+  if (c1 != NULL) {
+    c1->SetName("TOP/c_hitsPerEvent_top");
+  }
   //if (h1!=NULL) {
   //  h1->SetName("TOP/hitsPerEvent_top");
   //}

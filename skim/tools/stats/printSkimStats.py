@@ -392,10 +392,6 @@ def toConfluence(allSkimStats):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--confluence', action='store_true',
-                        help='Provide this flag to produce text file output for copying to Confluence.')
-    parser.add_argument('--json', action='store_true',
-                        help='Provide this flag to print the skim stats to a JSON file.')
     parser.add_argument('--combined', action='store_true',
                         help='Provide this flag if running the combined skims.')
     args = parser.parse_args()
@@ -404,8 +400,5 @@ if __name__ == '__main__':
     allSkimStats = addWeightedMC(allSkimStats, statistics)
 
     toScreen(allSkimStats)
-
-    if args.json:
-        toJson(allSkimStats)
-    if args.confluence:
-        toConfluence(allSkimStats)
+    toJson(allSkimStats)
+    toConfluence(allSkimStats)

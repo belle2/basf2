@@ -210,8 +210,8 @@ void DQMHistAnalysisPXDEffModule::event()
 
       // get the errors and check for limits for each bin seperately ...
       /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
-      error_flag |= false; // (moduleAverageErr > 0.0 && moduleAverage < (0.50 + moduleAverageErr));
-      warn_flag |= false; // (moduleAverageErr > 0.0 && moduleAverage < (0.60 + moduleAverageErr));
+      error_flag |= (moduleAverageErr > 0.0 && moduleAverage < (0.85 + moduleAverageErr));
+      warn_flag |= (moduleAverageErr > 0.0 && moduleAverage < (0.90 + moduleAverageErr));
     }
   }
 

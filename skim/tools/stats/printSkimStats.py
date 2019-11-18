@@ -45,9 +45,20 @@ mcSampleCrossSections = {
 mcCampaign = 'MC12'
 
 mcSamples = {
-    f'{mcCampaign}_{mcSample}{beamBackground}': f'{mcCampaign}: {mcSample} {beamBackground}'
-    for beamBackground in beamBackgroundWeights.keys()
-    for mcSample in mcSampleCrossSections.keys()
+    'MC12_mixedBGx1': 'MC12: mixed BGx1',
+    'MC12_chargedBGx1': 'MC12: charged BGx1',
+    'MC12_ccbarBGx1': 'MC12: ccbar BGx1',
+    'MC12_uubarBGx1': 'MC12: uubar BGx1',
+    'MC12_ddbarBGx1': 'MC12: ddbar BGx1',
+    'MC12_ssbarBGx1': 'MC12: ssbar BGx1',
+    'MC12_taupairBGx1': 'MC12: taupair BGx1',
+    'MC12_mixedBGx0': 'MC12: mixed BGx0',
+    'MC12_chargedBGx0': 'MC12: charged BGx0',
+    'MC12_ccbarBGx0': 'MC12: ccbar BGx0',
+    'MC12_uubarBGx0': 'MC12: uubar BGx0',
+    'MC12_ddbarBGx0': 'MC12: ddbar BGx0',
+    'MC12_ssbarBGx0': 'MC12: ssbar BGx0',
+    'MC12_taupairBGx0': 'MC12: taupair BGx0'
 }
 
 dataSamples = {

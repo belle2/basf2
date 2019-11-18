@@ -37,7 +37,7 @@ void MuidParameterDBReaderWriter::writeMuidParameters()
 
   vector<string> const hypotheses = {"Positron", "Electron" , "Deuteron", "Antideuteron", "Proton", "Antiproton", "PionPlus", "PionMinus", "KaonPlus", "KaonMinus", "MuonPlus", "MuonMinus" };
   for (unsigned int hypothesis = 0; hypothesis < hypotheses.size(); hypothesis++) {
-    GearDir content("/Detector/Tracking/MuidParameters//Experiment[@exp=\"0\"]/");
+    GearDir content("/Detector/Muid/MuidParameters//Experiment[@exp=\"0\"]/");
     content.append(hypotheses[hypothesis]);
     for (int outcome = 1; outcome <= MUID_MaxOutcome; ++outcome) {
       GearDir outcomeContent(content);

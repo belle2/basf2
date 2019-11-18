@@ -218,6 +218,66 @@ def addWeightedMC(allSkimStats, statistics):
 
     return allSkimStats
 
+
+def toJson(allSkimStats):
+    outputJsonName = 'skimStats.json'
+    with open(outputJsonName, 'w') as outputJson:
+        json.dump(allSkimStats, outputJson, indent=4)
+    print(f'Wrote stats to JSON file {outputJsonName}.')
+
+
+def toScreen(allSkimStats):
+    for skimName, skimStats in allSkimStats.items():
+        print(f'Performance statistics for {skimName} skim:')
+
+        # Only print some stats to screen
+        selectedStats = [stat for (stat, statInfo) in statistics.items() if statInfo['PrintToScreen']]
+        df = pd.DataFrame(skimStats, columns=selectedStats)
+
+        df = df.reindex([*dataSamples.keys(), 'Combined MC', *mcSamples.keys()])
+        df = df.rename(index={**dataSamples, **mcSamples})
+
+        headers = ['\n'.join(wrap(statistics[stat]['LongName'], 12)) for stat in selectedStats]
+        floatFormat = [''] + [statistics[stat]['FloatFormat'] for stat in selectedStats]
+
+        table = tabulate(df[selectedStats],
+                         headers=headers, tablefmt="fancy_grid",
+                         numalign='right', stralign='left',
+                         floatfmt=floatFormat)
+        table = table.replace(' nan ', ' -   ')
+        print(table)
+
+
+def toConfluence(allSkimStats):
+    confluenceStrings = []
+    for skimName, skimStats in allSkimStats.items():
+        confluenceStrings += [f'h1. Performance statistics for {skimName} skim']
+
+        selectedStats = [stat for (stat, statInfo) in statistics.items() if statInfo['PrintToConfluence']]
+        df = pd.DataFrame(skimStats, columns=selectedStats)
+
+        # Set up row ordering and naming
+        df = df.reindex([*dataSamples.keys(), 'Combined MC', *mcSamples.keys()])
+        df = df.rename(index={**dataSamples, **mcSamples})
+
+        headers = [statistics[stat]['LongName'] for stat in statistics]
+        floatFormat = [''] + [statistics[stat]['FloatFormat'] for stat in statistics]
+
+        table = tabulate(df, headers=headers, tablefmt="jira", floatfmt=floatFormat)
+
+        # Make the first column (the sample label) bold on Confluence
+        table = re.sub(r'^\| ', '|| ', table, flags=re.MULTILINE)
+        table = table.replace(' nan ', ' --  ')
+
+        confluenceStrings += [table]
+
+    confluenceString = '\n'.join(confluenceStrings)
+
+    confluenceFileName = 'skimStats_confluence.txt'
+    with open(confluenceFileName, 'w') as confluenceFile:
+        confluenceFile.write(confluenceString)
+    print(f'Wrote tables to {confluenceFileName}. The contents of this file can be copied directly to Confluence.')
+
 statistics = {
     'RetentionRate': {
         'LongName': 'Retention rate (%)',
@@ -340,66 +400,6 @@ statistics = {
         'Combine': lambda statDict: sum(statDict.values())
     }
 }
-
-
-def toJson(allSkimStats):
-    outputJsonName = 'skimStats.json'
-    with open(outputJsonName, 'w') as outputJson:
-        json.dump(allSkimStats, outputJson, indent=4)
-    print(f'Wrote stats to JSON file {outputJsonName}.')
-
-
-def toScreen(allSkimStats):
-    for skimName, skimStats in allSkimStats.items():
-        print(f'Performance statistics for {skimName} skim:')
-
-        # Only print some stats to screen
-        selectedStats = [stat for (stat, statInfo) in statistics.items() if statInfo['PrintToScreen']]
-        df = pd.DataFrame(skimStats, columns=selectedStats)
-
-        df = df.reindex([*dataSamples.keys(), 'Combined MC', *mcSamples.keys()])
-        df = df.rename(index={**dataSamples, **mcSamples})
-
-        headers = ['\n'.join(wrap(statistics[stat]['LongName'], 12)) for stat in selectedStats]
-        floatFormat = [''] + [statistics[stat]['FloatFormat'] for stat in selectedStats]
-
-        table = tabulate(df[selectedStats],
-                         headers=headers, tablefmt="fancy_grid",
-                         numalign='right', stralign='left',
-                         floatfmt=floatFormat)
-        table = table.replace(' nan ', ' -   ')
-        print(table)
-
-
-def toConfluence(allSkimStats):
-    confluenceStrings = []
-    for skimName, skimStats in allSkimStats.items():
-        confluenceStrings += [f'h1. Performance statistics for {skimName} skim']
-
-        selectedStats = [stat for (stat, statInfo) in statistics.items() if statInfo['PrintToConfluence']]
-        df = pd.DataFrame(skimStats, columns=selectedStats)
-
-        # Set up row ordering and naming
-        df = df.reindex([*dataSamples.keys(), 'Combined MC', *mcSamples.keys()])
-        df = df.rename(index={**dataSamples, **mcSamples})
-
-        headers = [statistics[stat]['LongName'] for stat in statistics]
-        floatFormat = [''] + [statistics[stat]['FloatFormat'] for stat in statistics]
-
-        table = tabulate(df, headers=headers, tablefmt="jira", floatfmt=floatFormat)
-
-        # Make the first column (the sample label) bold on Confluence
-        table = re.sub(r'^\| ', '|| ', table, flags=re.MULTILINE)
-        table = table.replace(' nan ', ' --  ')
-
-        confluenceStrings += [table]
-
-    confluenceString = '\n'.join(confluenceStrings)
-
-    confluenceFileName = 'skimStats_confluence.txt'
-    with open(confluenceFileName, 'w') as confluenceFile:
-        confluenceFile.write(confluenceString)
-    print(f'Wrote tables to {confluenceFileName}. The contents of this file can be copied directly to Confluence.')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

@@ -162,12 +162,15 @@ void DQMHistAnalysisTOPModule::event()
 
   TH2F* hraw = (TH2F*)findHist("TOP/window_vs_slot");
   double exRatio(0.0);
-  double totalraw = hraw->GetEntries();
+  double totalraw(0.0);
   double totalbadraw(0.0);
-  for (int i = 1; i <= 16; i++) {
-    for (int j = 1; j <= 512; j++) {
-      double nhraw = hraw->GetBinContent(i, j);
-      if (j < 215 || j > 235) totalbadraw += nhraw ;
+  if (hraw != NULL) {
+    totalraw = hraw->GetEntries();
+    for (int i = 1; i <= 16; i++) {
+      for (int j = 1; j <= 512; j++) {
+        double nhraw = hraw->GetBinContent(i, j);
+        if (j < 215 || j > 235) totalbadraw += nhraw ;
+      }
     }
   }
   if (totalraw > 0) exRatio = totalbadraw * 1.0 / totalraw;

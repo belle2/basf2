@@ -233,6 +233,10 @@ void DQMHistInjectionModule::event()
     m_hInjectionLERTOP->Divide(Hits, Triggers, 100, 8192);
   }
 
+  m_cInjectionLERTOP->Clear();
+  m_cInjectionLERTOP->cd(0);
+  m_hInjectionLERTOP->Draw("hist");
+
   locationHits = "TOPOccInjHER";
   if (m_histogramDirectoryName != "") {
     locationHits = m_histogramDirectoryName + "/" + locationHits;

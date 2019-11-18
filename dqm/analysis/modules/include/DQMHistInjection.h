@@ -69,6 +69,10 @@ namespace Belle2 {
     TH1F* m_hInjectionLERECL = nullptr;
     //! Final Canvas
     TCanvas* m_cInjectionLERECL = nullptr;
+    //! TOP Hits
+    TH1F* m_hInjectionLERTOP = nullptr;
+    //! Final Canvas
+    TCanvas* m_cInjectionLERTOP = nullptr;
     //! PXD Hits
     TH1F* m_hInjectionHERPXD = nullptr;
     //! Final Canvas
@@ -81,6 +85,10 @@ namespace Belle2 {
     TH1F* m_hInjectionHERECL = nullptr;
     //! Final Canvas
     TCanvas* m_cInjectionHERECL = nullptr;
+    //! TOP Hits
+    TH1F* m_hInjectionHERTOP = nullptr;
+    //! Final Canvas
+    TCanvas* m_cInjectionHERTOP = nullptr;
 
 #ifdef _BELLE2_EPICS
     //! EPICS PVs

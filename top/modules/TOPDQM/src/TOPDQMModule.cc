@@ -197,6 +197,11 @@ namespace Belle2 {
     m_badHitsPerEventProf->SetStats(kFALSE);
     m_badHitsPerEventProf->SetMinimum(0);
 
+    hTOPOccAfterInjLER  = new TH1F("TOPOccInjLER", "TOPOccInjLER/Time;Time in #mus;Nhits/Time (#mus bins)", 4000, 0, 20000);
+    hTOPOccAfterInjHER  = new TH1F("TOPOccInjHER", "TOPOccInjHER/Time;Time in #mus;Nhits/Time (#mus bins)", 4000, 0, 20000);
+    hTOPEOccAfterInjLER  = new TH1F("TOPEOccInjLER", "TOPEOccInjLER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
+    hTOPEOccAfterInjHER  = new TH1F("TOPEOccInjHER", "TOPEOccInjHER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
+
     for (int i = 0; i < m_numModules; i++) {
       int module = i + 1;
       string name, title;
@@ -348,6 +353,8 @@ namespace Belle2 {
     REG_HISTOGRAM;
 
     // register dataobjects
+    m_rawFTSW.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
+    m_rawDigits.isRequired();
     m_digits.isRequired();
     m_recBunch.isOptional();
     m_tracks.isOptional();
@@ -375,6 +382,10 @@ namespace Belle2 {
     m_goodHitsPerEventAll->Reset();
     m_badHitsPerEventProf->Reset();
     m_badHitsPerEventAll->Reset();
+    hTOPOccAfterInjLER->Reset();
+    hTOPOccAfterInjHER->Reset();
+    hTOPEOccAfterInjLER->Reset();
+    hTOPEOccAfterInjHER->Reset();
 
     for (int i = 0; i < m_numModules; i++) {
       m_window_vs_asic[i]->Reset();
@@ -493,6 +504,24 @@ namespace Belle2 {
           m_recoTime->Fill(pull.getTime());
           m_recoTimeBg->Fill(pull.getTime(), pull.getWeight());
           m_recoTimeMinT0->Fill(pull.getTimeDiff());
+        }
+      }
+    }
+
+    for (auto& it : m_rawFTSW) {
+      B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
+              (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
+              it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
+      auto difference = it.GetTimeSinceLastInjection(0);
+      if (difference != 0x7FFFFFFF) {
+        unsigned int nentries = m_rawDigits.getEntries();
+        float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
+        if (it.GetIsHER(0)) {
+          hTOPOccAfterInjHER->Fill(diff2, nentries);
+          hTOPEOccAfterInjHER->Fill(diff2);
+        } else {
+          hTOPOccAfterInjLER->Fill(diff2, nentries);
+          hTOPEOccAfterInjLER->Fill(diff2);
         }
       }
     }

@@ -221,7 +221,7 @@ def addWeightedMC(allSkimStats, statistics):
 statistics = {
     'RetentionRate': {
         'LongName': 'Retention rate (%)',
-        'floatfmt': '.2f',
+        'FloatFormat': '.2f',
         'PrintToScreen': True,
         'PrintToConfluence': True,
         'Calculate': lambda json, *_: 100 * nSkimmedEvents(json) / nInputEvents(json),
@@ -229,7 +229,7 @@ statistics = {
     },
     'nInputEvents': {
         'LongName': 'Number of input events of test',
-        'floatfmt': '.0f',
+        'FloatFormat': '.0f',
         'PrintToScreen': False,
         'PrintToConfluence': True,
         'Calculate': lambda json, *_: nInputEvents(json),
@@ -237,7 +237,7 @@ statistics = {
     },
     'nSkimmedEvents': {
         'LongName': 'Number of skimmed events',
-        'floatfmt': '.0f',
+        'FloatFormat': '.0f',
         'PrintToScreen': False,
         'PrintToConfluence': True,
         'Calculate': lambda json, *_: nSkimmedEvents(json),
@@ -245,7 +245,7 @@ statistics = {
     },
     'cpuTime': {
         'LongName': 'CPU time of test on KEKCC (s)',
-        'floatfmt': '.1f',
+        'FloatFormat': '.1f',
         'PrintToScreen': False,
         'PrintToConfluence': True,
         'Calculate': lambda _, log, __: cpuTime(log),
@@ -253,7 +253,7 @@ statistics = {
     },
     'cpuTimePerEvent': {
         'LongName': 'CPU time per event on KEKCC (s)',
-        'floatfmt': '.3f',
+        'FloatFormat': '.3f',
         'PrintToScreen': True,
         'PrintToConfluence': True,
         'Calculate': lambda json, log, *_: cpuTime(log) / nInputEvents(json),
@@ -261,7 +261,7 @@ statistics = {
     },
     'udstSize': {
         'LongName': 'uDST size of test (MB)',
-        'floatfmt': '.2f',
+        'FloatFormat': '.2f',
         'PrintToScreen': False,
         'PrintToConfluence': True,
         'Calculate': lambda json, *_: udstSize(json) / 1024,
@@ -269,7 +269,7 @@ statistics = {
     },
     'udstSizePerEvent': {
         'LongName': 'uDST size per event (kB)',
-        'floatfmt': '.3f',
+        'FloatFormat': '.3f',
         'PrintToScreen': True,
         'PrintToConfluence': True,
         'Calculate': lambda json, *_: udstSize(json) / nInputEvents(json),
@@ -277,7 +277,7 @@ statistics = {
     },
     'udstSizePerFile': {
         'LongName': 'Estimated average uDST size per file (MB)',
-        'floatfmt': '.2f',
+        'FloatFormat': '.2f',
         'PrintToScreen': False,
         'PrintToConfluence': False,
         'Calculate': lambda json, _, sample: udstSize(json) / nInputEvents(json) * get_events_per_file(sample) / 1024,
@@ -285,7 +285,7 @@ statistics = {
     },
     'logSize': {
         'LongName': 'Log size of test (kB)',
-        'floatfmt': '.1f',
+        'FloatFormat': '.1f',
         'PrintToScreen': False,
         'PrintToConfluence': True,
         'Calculate': lambda _, log, __: logSize(log),
@@ -293,7 +293,7 @@ statistics = {
     },
     'logSizePerEvent': {
         'LongName': 'Log size per event (B)',
-        'floatfmt': '.2f',
+        'FloatFormat': '.2f',
         'PrintToScreen': True,
         'PrintToConfluence': True,
         'Calculate': lambda json, log, __: logSize(log) / nInputEvents(json) * 1024,
@@ -301,7 +301,7 @@ statistics = {
     },
     'averageCandidateMultiplicity': {
         'LongName': 'Average candidate multiplicity of passed events',
-        'floatfmt': '.2f',
+        'FloatFormat': '.2f',
         'PrintToScreen': True,
         'PrintToConfluence': True,
         'Calculate': lambda _, log, __: averageCandidateMultiplicity(log),
@@ -309,7 +309,7 @@ statistics = {
     },
     'memoryAverage': {
         'LongName': 'Average memory usage (MB)',
-        'floatfmt': '.0f',
+        'FloatFormat': '.0f',
         'PrintToScreen': True,
         'PrintToConfluence': True,
         'Calculate': lambda _, log, __: memoryAverage(log),
@@ -317,7 +317,7 @@ statistics = {
     },
     'memoryMaximum': {
         'LongName': 'Maximum memory usage (MB)',
-        'floatfmt': '.0f',
+        'FloatFormat': '.0f',
         'PrintToScreen': True,
         'PrintToConfluence': True,
         'Calculate': lambda _, log, __: memoryMaximum(log),
@@ -325,7 +325,7 @@ statistics = {
     },
     'udstSizePerEntireSample': {
         'LongName': 'Estimated uDST size for entire sample (GB)',
-        'floatfmt': '.2f',
+        'FloatFormat': '.2f',
         'PrintToScreen': False,
         'PrintToConfluence': True,
         'Calculate': lambda json, _, sample: udstSize(json) * nTotalEvents(sample) / nInputEvents(json) / 1024 / 1024,
@@ -333,7 +333,7 @@ statistics = {
     },
     'logSizePerEntireSample': {
         'LongName': 'Estimated log size for entire sample (GB)',
-        'floatfmt': '.2f',
+        'FloatFormat': '.2f',
         'PrintToScreen': False,
         'PrintToConfluence': True,
         'Calculate': lambda json, log, sample: logSize(log) * nTotalEvents(sample) / nInputEvents(json) / 1024 / 1024,
@@ -361,12 +361,12 @@ def toScreen(allSkimStats):
         df = df.rename(index={**dataSamples, **mcSamples})
 
         headers = ['\n'.join(wrap(statistics[stat]['LongName'], 12)) for stat in selectedStats]
-        floatfmt = [''] + [statistics[stat]['floatfmt'] for stat in selectedStats]
+        floatFormat = [''] + [statistics[stat]['FloatFormat'] for stat in selectedStats]
 
         table = tabulate(df[selectedStats],
                          headers=headers, tablefmt="fancy_grid",
                          numalign='right', stralign='left',
-                         floatfmt=floatfmt)
+                         floatfmt=floatFormat)
         table = table.replace(' nan ', ' -   ')
         print(table)
 
@@ -384,9 +384,9 @@ def toConfluence(allSkimStats):
         df = df.rename(index={**dataSamples, **mcSamples})
 
         headers = [statistics[stat]['LongName'] for stat in statistics]
-        floatfmt = [''] + [statistics[stat]['floatfmt'] for stat in statistics]
+        floatFormat = [''] + [statistics[stat]['FloatFormat'] for stat in statistics]
 
-        table = tabulate(df, headers=headers, tablefmt="jira", floatfmt=floatfmt)
+        table = tabulate(df, headers=headers, tablefmt="jira", floatfmt=floatFormat)
 
         # Make the first column (the sample label) bold on Confluence
         table = re.sub(r'^\| ', '|| ', table, flags=re.MULTILINE)

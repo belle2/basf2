@@ -34,6 +34,8 @@ def getCommandLineOptions():
                               default is to create a temporary directory.""")
     parser.add_argument('-n', '--fillnan', dest='fillnan', action='store_true',
                         help='Fill nan and inf values with actual numbers')
+    parser.add_argument('-c', '--compile', dest='compile', action='store_false',
+                        help='Compile latex to pdf (does not work on KEKCC)')
     args = parser.parse_args()
     return args
 
@@ -319,10 +321,14 @@ if __name__ == '__main__':
                 graphics.add('correlation_plot_{}_{}.pdf'.format(hash(spectator), hash(identifier)), width=1.0)
                 o += graphics.finish()
 
-        o.save('latex.tex', compile=False)
-        os.chdir(old_cwd)
-
-        if args.working_directory == '':
-            shutil.copy(tempdir + '/latex.tex', args.outputfile)
+        if args.compile:
+            filetype = 'pdf'
         else:
-            shutil.copy(args.working_directory + '/latex.tex', args.outputfile)
+            filetype = 'tex'
+
+        o.save(f'latex.{filetype}', compile=args.compile)
+        os.chdir(old_cwd)
+        if args.working_directory == '':
+            shutil.copy(os.path.join(tempdir, f'latex.{filetype}'), args.outputfile)
+        else:
+            shutil.copy(os.path.join(args.working_directory, f'latex.{filetype}'), args.outputfile)

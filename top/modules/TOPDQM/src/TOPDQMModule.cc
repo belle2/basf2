@@ -354,7 +354,6 @@ namespace Belle2 {
 
     // register dataobjects
     m_rawFTSW.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
-    m_rawDigits.isRequired();
     m_digits.isRequired();
     m_recBunch.isOptional();
     m_tracks.isOptional();
@@ -514,7 +513,7 @@ namespace Belle2 {
               it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
       auto difference = it.GetTimeSinceLastInjection(0);
       if (difference != 0x7FFFFFFF) {
-        unsigned int nentries = m_rawDigits.getEntries();
+        unsigned int nentries = m_digits.getEntries();
         float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
         if (it.GetIsHER(0)) {
           m_TOPOccAfterInjHER->Fill(diff2, nentries);

@@ -21,7 +21,6 @@
 // dataobject classes
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <top/dataobjects/TOPRecBunch.h>
@@ -135,7 +134,6 @@ namespace Belle2 {
 
     // dataobjects
     StoreArray<RawFTSW> m_rawFTSW; /**< Input array for DAQ Status. */
-    StoreArray<TOPRawDigit> m_rawDigits; /**< collection of raw digits */
     StoreArray<TOPDigit> m_digits; /**< collection of digits */
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
     StoreArray<Track> m_tracks;    /**< collection of tracks */

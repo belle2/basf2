@@ -87,7 +87,7 @@ void createSVDreference(){
   // eff > effEmpty  -> green bin
 
   float effEmpty = 0;
-  float effWarning = 0.95;
+  float effWarning = 0.94;
   float effError = 0.9;
 
   //bin 1: efficiency level EMPTY

@@ -205,7 +205,7 @@ void ReattachCDCWireHitsToRecoTracksModule::addHits()
             if ((previousArcLength[&hitToAdd] > 0) and (currentArcLength[&hitToAdd] < 0)) { // Hit needs to be added here.
 
               const RecoHitInformation::RightLeftInformation rl = rightLeftInformationTranslator(hitToAddInfo.rlInfo);
-              newRecoTrack->addCDCHit(hitToAdd.getHit(), sortingParameter, rl);
+              newRecoTrack->addCDCHit(hitToAdd.getHit(), sortingParameter, rl, RecoHitInformation::c_ReattachCDCWireHitsToRecoTracks);
               hitToAdd.getAutomatonCell().setTakenFlag(true);
               ++sortingParameter;
 
@@ -213,7 +213,8 @@ void ReattachCDCWireHitsToRecoTracksModule::addHits()
           }
         }
         const RecoHitInformation::RightLeftInformation rl = recoTrack.getRecoHitInformation(hitOnTrack)->getRightLeftInformation();
-        newRecoTrack->addCDCHit(hitOnTrack, sortingParameter, rl);
+        const RecoHitInformation::OriginTrackFinder foundBy = recoTrack.getRecoHitInformation(hitOnTrack)->getFoundByTrackFinder();
+        newRecoTrack->addCDCHit(hitOnTrack, sortingParameter, rl, foundBy);
         //TODO: In the (rare) case where more than one hit are added between the same 2 hits on track, one should order them w.r.t. the arcLength.
         ++sortingParameter;
       }

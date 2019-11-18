@@ -17,7 +17,7 @@ import argparse
 import re
 import sqlite3
 import time
-import datetime
+from datetime import datetime
 import os
 import basf2 as b2
 
@@ -270,7 +270,8 @@ class Luminosity:
             ax1.xaxis.set_major_locator(ticker.AutoLocator())
             ax1.xaxis.set_minor_locator(ticker.MultipleLocator(1))
         if period==2:
-            ax1.xaxis.set_major_locator(ticker.MultipleLocator(7))
+            ax1.xaxis.set_major_locator(ticker.AutoLocator())
+            ax1.xaxis.set_minor_locator(ticker.AutoLocator())
         ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
 
         # plot integrate lumi
@@ -282,18 +283,25 @@ class Luminosity:
             ax2.xaxis.set_major_locator(ticker.AutoLocator())
             ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
         if period==2:
-            ax2.xaxis.set_major_locator(ticker.MultipleLocator(7))
+            ax2.xaxis.set_major_locator(ticker.AutoLocator())
+            ax2.xaxis.set_minor_locator(ticker.MultipleLocator(7))
         ax2.set_ylim(bottom=0)
 
         h1, l1 = ax1.get_legend_handles_labels()
         h2, l2 = ax2.get_legend_handles_labels()
-        ax2.legend(h1+h2, l1+l2,loc="best",title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
+
+        # addtext=rf"Total $\int\mathcal{{L}}dt = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$"
+        # h1.append(mpatches.Patch(color='none', label=addtext))
+
+        ax2.legend(h1+h2, l1+l2, loc="upper left",title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
 
         # Text box. Use axis coords.
         plt.text(0., 1.03, rf"Belle II {self.what.title()} luminosity", transform=ax1.transAxes, fontsize=12)
         plt.text(.5, 1.03, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, fontsize=12)
-        plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
-        plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
+
+        props = dict(boxstyle='square', facecolor='white', alpha=0.8, edgecolor='None')
+        plt.text(.02, 0.7, rf"Total $\int\mathcal{{L}}dt\  = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=12, bbox=props)
+        plt.text(1, -0.25, f"Plot on {datetime.now().strftime('%Y/%m/%d %H:%M %Z')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
         filename=f"Lumi{self.what.title()}_{label}_Exp{self.expstr}"
         if self.runs:
@@ -340,8 +348,10 @@ class Luminosity:
         # Text box. Use axis coords.
         plt.text(0., 1.03, rf"Belle II {self.what.title()} luminosity", transform=ax1.transAxes, fontsize=12)
         plt.text(.5, 1.03, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, fontsize=12)
-        plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {dfRuns['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
-        plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
+
+        props = dict(boxstyle='square', facecolor='white', alpha=0.8, edgecolor='None')
+        plt.text(.02, 0.7, rf"Total $\int\mathcal{{L}}dt\  = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=12, bbox=props)
+        plt.text(1, -0.25, f"Plot on {datetime.now().strftime('%Y/%m/%d %H:%M %Z')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
         filename=f"Lumi{self.what.title()}PerRun_Exp{self.expstr}"
         if self.runs:

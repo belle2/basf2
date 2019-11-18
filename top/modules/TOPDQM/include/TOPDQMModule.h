@@ -99,8 +99,8 @@ namespace Belle2 {
     TProfile* m_recoPull_Phic = 0;  /**< pulls vs phiCer */
     TH1F* m_goodHitsPerEventAll = 0; /**< Histograms for good hits per event (all slots)*/
     TH1F* m_badHitsPerEventAll = 0; /**< Histograms for bad hits per event (all slots)*/
-    TH1F* m_goodTDC = 0; /**< Histograms for TDC distribution of good hits (all slots)*/
-    TH1F* m_badTDC = 0; /**< Histograms for TDC distribution of bad hits (all slots)*/
+    TH1F* m_goodTDCAll = 0; /**< Histograms for TDC distribution of good hits (all slots)*/
+    TH1F* m_badTDCAll = 0; /**< Histograms for TDC distribution of bad hits (all slots)*/
 
     TH1F* m_goodHits = nullptr; /**< Histogram for number of accumulated good hits */
     TH1F* m_badHits = nullptr; /**< Histogram for number of accumulated bad hits */
@@ -108,7 +108,7 @@ namespace Belle2 {
     TH1F* m_bunchOffset = 0; /**< reconstructed bunch: current offset */
     TH1F* m_time = 0; /**< time distribution of good hits */
     TProfile* m_goodHitsPerEventProf = 0; /**< a profile histogram of good hits per event */
-    TProfile* m_badHitsPerEventProf = 0; /**< a profile histogram of good hits per event */
+    TProfile* m_badHitsPerEventProf = 0; /**< a profile histogram of bad hits per event */
     TH1F* m_TOPOccAfterInjLER = 0; /**< Histogram Ndigits after LER injection */
     TH1F* m_TOPOccAfterInjHER = 0; /**< Histogram Ndigits after HER injection */
     TH1F* m_TOPEOccAfterInjLER = 0; /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */

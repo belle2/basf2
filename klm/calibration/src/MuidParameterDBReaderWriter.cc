@@ -32,6 +32,9 @@ using namespace Belle2;
 
 void MuidParameterDBReaderWriter::writeMuidParameters()
 {
+  B2WARNING("The method MuidParameterDBReaderWriter::writeMuidParameters() is temporary unavailable, sorry! :(");
+  return;
+
   DBImportObjPtr<MuidParameters> muidPar;
   muidPar.construct();
 

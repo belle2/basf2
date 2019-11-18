@@ -46,12 +46,12 @@ void DQMHistInjectionModule::initialize()
   m_cInjectionLERPXD = new TCanvas("PXDINJ/c_InjectionLERPXD");
   m_cInjectionLERPXDOcc = new TCanvas("PXDINJ/c_InjectionLERPXDOcc");
   m_cInjectionLERECL = new TCanvas("ECLINJ/c_InjectionLERECL");
-  m_cInjectionLERTOP = new TCanvas("TOPINJ/c_InjectionLERTOP");
+  m_cInjectionLERTOP = new TCanvas("TOP/c_InjectionLERTOP");
 
   m_cInjectionHERPXD = new TCanvas("PXDINJ/c_InjectionHERPXD");
   m_cInjectionHERPXDOcc = new TCanvas("PXDINJ/c_InjectionHERPXDOcc");
   m_cInjectionHERECL = new TCanvas("ECLINJ/c_InjectionHERECL");
-  m_cInjectionHERTOP = new TCanvas("TOPINJ/c_InjectionHERTOP");
+  m_cInjectionHERTOP = new TCanvas("TOP/c_InjectionHERTOP");
 
   m_hInjectionLERPXD = new TH1F("HitInjectionLERPXD", "PXD Hits after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
   m_hInjectionLERPXDOcc = new TH1F("HitInjectionPXDLEROcc", "PXD Occ after LER Injection;Time in #mus;Mean Occ in % per module", 4000,
@@ -216,7 +216,7 @@ void DQMHistInjectionModule::event()
   m_cInjectionHERECL->cd(0);
   m_hInjectionHERECL->Draw("hist");
 
-  m_histogramDirectoryName = "TOPINJ";
+  m_histogramDirectoryName = "TOP";
 
   locationHits = "TOPOccInjLER";
   if (m_histogramDirectoryName != "") {

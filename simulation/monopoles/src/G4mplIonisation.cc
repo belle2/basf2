@@ -13,14 +13,16 @@
 #include <simulation/monopoles/G4mplIonisation.h>
 #include <simulation/monopoles/G4mplIonisationWithDeltaModel.h>
 
-#include <G4PhysicalConstants.hh>
-#include <G4SystemOfUnits.hh>
+
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
 #include <G4Electron.hh>
 #include <G4EmParameters.hh>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
+using namespace CLHEP;
 
 G4mplIonisation::G4mplIonisation(G4double mCharge, const G4String& name)
   : G4VEnergyLossProcess(name),
@@ -44,6 +46,17 @@ G4bool G4mplIonisation::IsApplicable(const G4ParticleDefinition&)
   return true;
 }
 
+G4double G4mplIonisation::MinPrimaryEnergy(const G4ParticleDefinition* mpl,
+                                           const G4Material*,
+                                           G4double cut)
+{
+  G4double x = 0.5 * cut / electron_mass_c2;
+  G4double mass  = mpl->GetPDGMass();
+  G4double ratio = electron_mass_c2 / mass;
+  G4double gam   = x * ratio + std::sqrt((1. + x) * (1. + x * ratio * ratio));
+  return mass * (gam - 1.0);
+}
+
 void G4mplIonisation::InitialiseEnergyLossProcess(const G4ParticleDefinition* p,
                                                   const G4ParticleDefinition*)
 {
@@ -52,8 +65,10 @@ void G4mplIonisation::InitialiseEnergyLossProcess(const G4ParticleDefinition* p,
   SetBaseParticle(0);
 
   // monopole model is responsible both for energy loss and fluctuations
+
   G4mplIonisationWithDeltaModel* ion =
     new G4mplIonisationWithDeltaModel(magneticCharge, "PAI");
+
   ion->SetParticle(p);
 
   // define size of dedx and range tables
@@ -67,6 +82,7 @@ void G4mplIonisation::InitialiseEnergyLossProcess(const G4ParticleDefinition* p,
   SetMaxKinEnergy(emax);
   SetDEDXBinning(bin);
 
+  SetEmModel(ion);
   AddEmModel(1, ion, ion);
 
   isInitialised = true;

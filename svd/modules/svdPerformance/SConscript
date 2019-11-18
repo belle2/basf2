@@ -9,5 +9,6 @@ env['LIBS'] = [
     'svd',	
     'svd_dataobjects',
     'vxd_dataobjects',
+    'hlt',
     ]
 Return('env')

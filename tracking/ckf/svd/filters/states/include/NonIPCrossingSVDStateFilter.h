@@ -14,5 +14,6 @@
 
 namespace Belle2 {
   extern template class NonIPCrossingStateFilter<AllSVDStateFilter>;
+  /// Alias for filter to check direction of a new CKF SVD state
   using NonIPCrossingSVDStateFilter = NonIPCrossingStateFilter<AllSVDStateFilter>;
 }

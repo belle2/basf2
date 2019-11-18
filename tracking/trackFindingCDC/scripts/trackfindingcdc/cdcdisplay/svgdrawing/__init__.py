@@ -31,8 +31,9 @@ class CDCSVGPlotter:
         default_width = 1120
         default_height = 1120
 
-        # Switch to indicating if an animated SVG should be generated
+        #: Switch to indicating if an animated SVG should be generated
         self.animate = animate
+        #: Display the image using the event-data plotter
         self.eventdata_plotter = Belle2.TrackFindingCDC.EventDataPlotter(self.animate)
 
         self.eventdata_plotter.setBoundingBox(default_bound)
@@ -48,6 +49,9 @@ class CDCSVGPlotter:
         return cloned_plotter
 
     def styling_to_attribute_map(self, **styling):
+        """
+        Transfer the styling information to the attribute map
+        """
         attribute_map = Belle2.TrackFindingCDC.PrimitivePlotter.AttributeMap()
 
         for key, value in list(styling.items()):
@@ -56,17 +60,29 @@ class CDCSVGPlotter:
         return attribute_map
 
     def draw_superlayer_boundaries(self, **styling):
+        """
+        Draw the CDC superlayer boundaries
+        """
         attribute_map = self.styling_to_attribute_map(**styling)
         self.eventdata_plotter.drawSuperLayerBoundaries(attribute_map)
 
     def draw_interaction_point(self):
+        """
+        Draw the interaction point
+        """
         self.eventdata_plotter.drawInteractionPoint()
 
     def draw_outer_cdc_wall(self, **styling):
+        """
+        Draw the CDC outer wall
+        """
         attribute_map = self.styling_to_attribute_map(**styling)
         self.eventdata_plotter.drawOuterCDCWall(attribute_map)
 
     def draw_inner_cdc_wall(self, **styling):
+        """
+        Draw the CDC inner wall
+        """
         attribute_map = self.styling_to_attribute_map(**styling)
         self.eventdata_plotter.drawInnerCDCWall(attribute_map)
 
@@ -86,6 +102,9 @@ class CDCSVGPlotter:
         return result
 
     def draw_iterable(self, iterable, **styling):
+        """
+        Draw one or more items with the specified styling
+        """
         draw = self.draw
         unpack_attributes = self.unpack_attributes
         for (i_obj, obj) in enumerate(iterable):
@@ -93,6 +112,9 @@ class CDCSVGPlotter:
             draw(obj, **obj_styling)
 
     def draw_storevector(self, storeobj_name, **styling):
+        """
+        Draw information in a vector from the DataStore with the specified styling
+        """
         print('Drawing vector from DataStore:', storeobj_name, end=' ')
         print()
         pystoreobj = Belle2.PyStoreObj(storeobj_name)
@@ -118,6 +140,9 @@ class CDCSVGPlotter:
             Belle2.PyStoreObj.printList()
 
     def draw_storearray(self, storearray_name, **styling):
+        """
+        Draw information from a StoreArray with the specified styling
+        """
         print('Drawing StoreArray:', storearray_name, end=' ')
         print()
         storearray = Belle2.PyStoreArray(storearray_name)
@@ -138,6 +163,9 @@ class CDCSVGPlotter:
             Belle2.PyStoreObj.printList()
 
     def draw(self, obj, **styling):
+        """
+        Draw an object with the specified styling
+        """
         attribute_map = self.styling_to_attribute_map(**styling)
         self.eventdata_plotter.draw(obj, attribute_map)
 

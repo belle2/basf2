@@ -24,6 +24,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         expert_level <= default_expert_level: all figures and plots from this module except tree entries
         expert_level > default_expert_level: everything including tree entries
     """
+    #: the threshold value for the expert level
     default_expert_level = 10
 
     def __init__(
@@ -34,6 +35,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             reco_tracks_name='RecoTracks',
             mc_reco_tracks_name='MCRecoTracks',
             expert_level=None):
+        """Constructor"""
 
         output_file_name = output_file_name or name + 'TrackingValidation.root'
         super().__init__(foreach=reco_tracks_name,
@@ -149,6 +151,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         return crops
 
     def peel_pr_to_mc_match_info(self, reco_track):
+        """Extracts track-match information from the MCMatcherTracksModule results"""
         track_match_look_up = self.track_match_look_up
         is_matched = track_match_look_up.isMatchedPRRecoTrack(reco_track)
         is_clone = track_match_look_up.isClonePRRecoTrack(reco_track)
@@ -176,9 +179,10 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
     # Refiners to be executed on terminate #
     # #################################### #
 
-    # Save a tree of all collected variables in a sub folder
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree(folder_name="pr_tree", name="pr_tree", above_expert_level=default_expert_level)
 
+    #: Save RecoTrack clone-rate information
     save_clone_rate = refiners.save_fom(
         name="{module.id}_overview_figures_of_merit",
         # Same as in the mc side module to combine the overview figures of merit into the same TNTuple
@@ -190,6 +194,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         filter_on="is_clone_or_match",
     )
 
+    #: Save RecoTrack fake-rate information
     save_fake_rate = refiners.save_fom(
         name="{module.id}_overview_figures_of_merit",
         # Same as in the mc side module to combine the overview figures of merit into the same TNTuple
@@ -201,8 +206,8 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         aggregation=np.mean,
     )
 
-    # Make profiles of the finding efficiencies versus various fit parameters
-    # Rename the quatities to names that display nicely by root latex translation
+    #: Make profile of the fake rate versus seed phi0
+    #: Rename the quantities to names that display nicely by root latex translation
     save_fake_rate_by_seed_phi0_profile = refiners.save_profiles(
         select={
             'is_fake': 'fake rate',
@@ -213,6 +218,8 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
     )
 
+    #: Make profile of the fake rate versus seed tan(lambda)
+    #: Rename the quantities to names that display nicely by root latex translation
     save_fake_rate_by_seed_tan_lambda_profile = refiners.save_profiles(
         select={
             'is_fake': 'fake rate',
@@ -225,6 +232,8 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         upper_bound=3.27,
     )
 
+    #: Make profile of the fake rate versus seed transverse momentum
+    #: Rename the quantities to names that display nicely by root latex translation
     save_fake_rate_by_seed_pt_profile = refiners.save_profiles(
         select={
             'is_fake': 'fake rate',
@@ -237,7 +246,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         upper_bound=1.7,
     )
 
-    # Hit counts in each sub detector by the true pt value
+    #: Hit counts in each sub detector by the true pt value
     save_hit_counts_by_pt_profile = refiners.save_profiles(
         filter_on="is_matched",
         select={
@@ -265,7 +274,7 @@ Generally some peaking behvaiour towards zero is too be expected if the errors a
         check="The distribution should be flat."
     )
 
-    # Pulls of seed parameters
+    #: Pull of seed omega
     save_seed_omega_pull_analysis = refiners.save_pull_analysis(
         filter_on="is_matched",
         part_name="seed_omega",
@@ -275,6 +284,7 @@ Generally some peaking behvaiour towards zero is too be expected if the errors a
         unit="1/cm",
     )
 
+    #: Pull of seed tan(lambda)
     save_seed_tan_lambda_pull_analysis = refiners.save_pull_analysis(
         filter_on="is_matched",
         part_name="seed_tan_lambda",
@@ -283,7 +293,7 @@ Generally some peaking behvaiour towards zero is too be expected if the errors a
         truth_name="tan_lambda_truth",
     )
 
-    # Pull of fitted parameters
+    #: Pull of fitted omega
     save_fitted_omega_pull_analysis = refiners.save_pull_analysis(
         filter_on="is_matched",
         part_name="omega",
@@ -292,6 +302,7 @@ Generally some peaking behvaiour towards zero is too be expected if the errors a
         unit="1/cm",
     )
 
+    #: Pull of fitted tan(lambda)
     save_fitted_tan_lambda_pull_analysis = refiners.save_pull_analysis(
         filter_on="is_matched",
         part_name="tan_lambda",
@@ -299,6 +310,7 @@ Generally some peaking behvaiour towards zero is too be expected if the errors a
         folder_name="pull_fitted_tan_lambda",
     )
 
+    #: Pull of fitted transverse momentum
     save_fitted_pt_pull_analysis = refiners.save_pull_analysis(
         filter_on="is_matched",
         part_name="pt",
@@ -306,6 +318,7 @@ Generally some peaking behvaiour towards zero is too be expected if the errors a
         folder_name="pull_fitted_p_t",
     )
 
+    #: Pull of fitted x coordinate grouped by true transverse momentum
     save_fitted_x_pull_analysis = refiners.save_pull_analysis(
         filter_on="is_matched",
         part_name="x",
@@ -314,6 +327,7 @@ Generally some peaking behvaiour towards zero is too be expected if the errors a
         groupby=[None, ("pt_truth", [0.070, 0.250, 0.600])],
     )
 
+    #: Pull of fitted y coordinate grouped by true transverse momentum
     save_fitted_y_pull_analysis = refiners.save_pull_analysis(
         filter_on="is_matched",
         part_name="y",
@@ -322,6 +336,7 @@ Generally some peaking behvaiour towards zero is too be expected if the errors a
         groupby=[None, ("pt_truth", [0.070, 0.250, 0.600])],
     )
 
+    #: Pull of fitted z coordinate grouped by true transverse momentum
     save_fitted_z_pull_analysis = refiners.save_pull_analysis(
         filter_on="is_matched",
         part_name="z",
@@ -330,7 +345,7 @@ Generally some peaking behvaiour towards zero is too be expected if the errors a
         groupby=[None, ("pt_truth", [0.070, 0.250, 0.600])],
     )
 
-    # Resolutions as a function of true p_t
+    #: Resolutions as a function of true p_t
     save_resolutions_by_pt_profile = refiners.save_profiles(
         filter_on="is_matched",
         select={

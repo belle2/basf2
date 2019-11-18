@@ -38,14 +38,14 @@ data for all available objects/detectors.
 
 Other option could be
 
->>> dbobjects = ['BeamParameters', 'CDCAlignment', 'CDCLayerAlignment']
+>>> dbobjects = ['BeamSpot', 'CDCAlignment', 'CDCLayerAlignment']
 
 the available objects are:
 
-BeamParameters, VXDAlignment, CDCAlignment, CDCLayerAlignment,
+BeamSpot, VXDAlignment, CDCAlignment, CDCLayerAlignment,
 CDCTimeWalks, CDCTimeZeros, BKLMALignment, EKLMALignment
 """
-dbobjects = ['VXDAlignment', 'BeamParameters']
+dbobjects = ['VXDAlignment', 'BeamSpot']
 
 # All data sources from samples as possible input
 main.add_module('MillepedeCollector',

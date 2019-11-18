@@ -17,6 +17,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <svd/geometry/SensorInfo.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
@@ -47,6 +48,7 @@ namespace Belle2 {
     /** Constructor defining the parameters */
     SVDCoGTimeEstimatorModule();
 
+    /** default destructor*/
     virtual ~SVDCoGTimeEstimatorModule();
 
     /** Initialize the SVDCoGTimeEstimator.*/
@@ -68,11 +70,13 @@ namespace Belle2 {
   private:
 
     /** store arrays*/
-    StoreArray<SVDShaperDigit> m_storeShaper;
-    StoreArray<SVDRecoDigit> m_storeReco;
+    StoreArray<SVDShaperDigit> m_storeShaper; /**<SVDShaperDigits Store Array*/
+    StoreArray<SVDRecoDigit> m_storeReco; /**<SVDRecoDigits store array*/
 
-    StoreArray<SVDTrueHit> m_storeTrueHits;
-    StoreArray<MCParticle> m_storeMCParticles;
+    StoreArray<SVDTrueHit> m_storeTrueHits; /**<SVDTrueHits store array*/
+    StoreArray<MCParticle> m_storeMCParticles; /**<MCParticles Store array*/
+
+    StoreObjPtr<SVDEventInfo> m_storeSVDEvtInfo; /**<storage for SVDEventInfo object */
 
     /** The peak time estimation */
     float m_weightedMeanTime;
@@ -126,6 +130,8 @@ namespace Belle2 {
     /** Lookup table for SVDShaperDigit->SVDTrueHit relation */
     RelationLookup m_trueRelation;
 
+    /** Name of the SVDEventInfo object */
+    std::string m_svdEventInfoName;
     /** Name of the collection to use for the MCParticles */
     std::string m_storeMCParticlesName;
     /** Name of the collection to use for the SVDTrueHits */
@@ -169,11 +175,11 @@ namespace Belle2 {
     int fromModeToNumberOfSample(int modality);
 
     //calibration objects
-    SVDPulseShapeCalibrations m_PulseShapeCal;
-    SVDNoiseCalibrations m_NoiseCal;
-    SVDCoGTimeCalibrations m_TimeCal;
+    SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShaper calibrations db object*/
+    SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
+    SVDCoGTimeCalibrations m_TimeCal; /**< SVD CoG Time calibrations db object*/
 
-    //number of samples
+    /** number of samples*/
     int m_NumberOfAPVSamples = 6;
 
   };

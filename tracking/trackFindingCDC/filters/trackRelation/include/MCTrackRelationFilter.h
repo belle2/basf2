@@ -28,7 +28,7 @@ namespace Belle2 {
        *  Constructor also setting the switch ,
        *  if the reversed version of a track relation (in comparision to MC truth) shall be accepted.
        */
-      MCTrackRelationFilter(bool allowReverse = false);
+      explicit MCTrackRelationFilter(bool allowReverse = false);
 
     public:
       /// Checks if a track relation is a good combination.

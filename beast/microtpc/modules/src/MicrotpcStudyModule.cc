@@ -12,23 +12,15 @@
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
 #include <beast/microtpc/dataobjects/TPCG4TrackInfo.h>
 #include <beast/microtpc/dataobjects/MicrotpcHit.h>
-#include <beast/microtpc/dataobjects/MicrotpcDataHit.h>
 #include <beast/microtpc/dataobjects/MicrotpcRecoTrack.h>
 #include <generators/SAD/dataobjects/SADMetaHit.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <cmath>
 #include <boost/foreach.hpp>
 
-
-#include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
 
 // ROOT
@@ -37,7 +29,6 @@
 #include <TH1.h>
 #include <TH2.h>
 #include <TH3.h>
-#include <TFile.h>
 #include <TMath.h>
 
 int eventNum = 0;
@@ -275,7 +266,7 @@ void MicrotpcStudyModule::event()
   int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
   for (const auto& sadMetaHit : sadMetaHits) {
     rate = sadMetaHit.getrate();
-    double ss = sadMetaHit.getss();
+    double ss = sadMetaHit.getss() / 100.;
     if (ss < 0) ss += 3000.;
     int section = (int)(ss / 250.);
     if (section >= 0 && section < 12) ring_section = section_ordering[section];
@@ -493,8 +484,10 @@ void MicrotpcStudyModule::event()
       for (auto fract : m_maxEnFrac) { // loop over all recoils in beast/microtpc/data/MICROTPC-recoilProb.xml
         double recoil = gRandom->Uniform(fract) * kin * 1e3; // calculate recoil energy
         double weight = m_intProb[irecoil]->Eval(kin * 1e3) * trlen; // weight - interaction probability * track lenght
+        if (weight < 0) weight = 0;
         h_mctpc_recoil[irecoil]->Fill(ring_section, detNb, recoil); // fill recoil energy
         h_mctpc_recoilW[irecoil]->Fill(ring_section, detNb, recoil, weight); // fill weighted recoil energy
+        //  std::cout << ring_section << " " << detNb << " " << recoil << " " << weight << std::endl;
         irecoil++;
       }
     }

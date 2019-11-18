@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="KLM" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<Description>Belle II KLM geometry</Description>
+	<Version>0</Version>
+	<Creator library="klm">KLMCreator</Creator>
+	<Content>
+		<xi:include href="BKLM.xml"/>
+		<xi:include href="EKLM.xml"/>
+	</Content>
+</DetectorComponent>

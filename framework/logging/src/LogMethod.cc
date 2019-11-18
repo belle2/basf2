@@ -13,13 +13,13 @@
 #include <framework/logging/LogMessage.h>
 #include <framework/logging/LogSystem.h>
 
+#include <utility>
 
 using namespace std;
 using namespace Belle2;
 
-
-LogMethod::LogMethod(const char* package, const string& function, const string& file, unsigned int line): m_package(package),
-  m_function(function), m_file(file), m_line(line)
+LogMethod::LogMethod(const char* package, string  function, string  file, unsigned int line): m_package(package),
+  m_function(std::move(function)), m_file(std::move(file)), m_line(line)
 {
   //Send message for entering the method
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Info)) {
@@ -27,7 +27,6 @@ LogMethod::LogMethod(const char* package, const string& function, const string& 
     LogSystem::Instance().sendMessage(LogMessage(LogConfig::c_Info, messageText, m_package, m_function, m_file, m_line));
   }
 }
-
 
 LogMethod::~LogMethod()
 {

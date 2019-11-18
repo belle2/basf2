@@ -9,10 +9,10 @@
 
 #include <mva/interface/Weightfile.h>
 #include <mva/interface/Options.h>
-#include <framework/utilities/FileSystem.h>
 #include <framework/utilities/TestHelpers.h>
 
-#include <framework/database/LocalDatabase.h>
+#include <framework/database/Configuration.h>
+#include <framework/database/Database.h>
 #include <boost/filesystem/operations.hpp>
 
 #include <TFile.h>
@@ -29,9 +29,9 @@ namespace {
 
   public:
     TestOptions(const std::string& _x, const std::string& _y) : x(_x), y(_y) { }
-    virtual void load(const boost::property_tree::ptree& pt) override { y = pt.get<std::string>(x); }
-    virtual void save(boost::property_tree::ptree& pt) const override { pt.put(x, y); }
-    virtual po::options_description getDescription() override
+    void load(const boost::property_tree::ptree& pt) override { y = pt.get<std::string>(x); }
+    void save(boost::property_tree::ptree& pt) const override { pt.put(x, y); }
+    po::options_description getDescription() override
     {
       po::options_description description("General options");
       description.add_options()
@@ -134,7 +134,10 @@ namespace {
   {
 
     TestHelpers::TempDirCreator tmp_dir;
-    LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+
+    auto& conf = Conditions::Configuration::getInstance();
+    conf.overrideGlobalTags();
+    conf.prependTestingPayloadLocation("localdb/database.txt");
 
     MVA::Weightfile weightfile;
     weightfile.addElement("Test", "a");
@@ -209,7 +212,9 @@ namespace {
   {
 
     TestHelpers::TempDirCreator tmp_dir;
-    LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+    auto& conf = Conditions::Configuration::getInstance();
+    conf.overrideGlobalTags();
+    conf.prependTestingPayloadLocation("localdb/database.txt");
 
     MVA::Weightfile weightfile;
     weightfile.addElement("Test", "a");
@@ -229,7 +234,9 @@ namespace {
   {
 
     TestHelpers::TempDirCreator tmp_dir;
-    LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+    auto& conf = Conditions::Configuration::getInstance();
+    conf.overrideGlobalTags();
+    conf.prependTestingPayloadLocation("localdb/database.txt");
 
     MVA::Weightfile weightfile;
     weightfile.addElement("Test", "a");

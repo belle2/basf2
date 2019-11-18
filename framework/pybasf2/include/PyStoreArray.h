@@ -97,7 +97,7 @@ namespace Belle2 {
      *  @param storeFlags  ORed combination of DataStore::EStoreFlags. (default: c_WriteOut)
      *  @return            True if the registration succeeded.
      */
-    bool registerInDataStore(std::string name = "",
+    bool registerInDataStore(const std::string& name = "",
                              DataStore::EStoreFlags storeFlags = DataStore::EStoreFlags::c_WriteOut);
 
     /** Ensure this array has been registered previously.

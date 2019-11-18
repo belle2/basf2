@@ -7,7 +7,6 @@
 
 from basf2 import *
 from modularAnalysis import *
-
 variables = ['p', 'pt', 'pz', 'phi',
              'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)', 'daughter(0, phi)',
              'daughter(1, p)', 'daughter(1, pz)', 'daughter(1, pt)', 'daughter(1, phi)',
@@ -35,9 +34,9 @@ def reconstruction_path(inputfiles):
                         ' and minC2HDist > 35')],
                       path=path)
     reconstructDecay('pi0 -> gamma gamma', '0.1 < M < 1.6', path=path)
-    massVertexKFit('pi0', 0.1, path=path, silence_warning=True)
+    massVertexKFit('pi0', 0.1, path=path)
     reconstructDecay('D0 -> K- pi+ pi0', '1.8 < M < 1.9', path=path)
-    vertexKFit('D0', 0.1, path=path, silence_warning=True)
+    vertexKFit('D0', 0.1, path=path)
     applyCuts('D0', '1.7 < M < 1.9', path=path)
     matchMCTruth('D0', path=path)
     return path

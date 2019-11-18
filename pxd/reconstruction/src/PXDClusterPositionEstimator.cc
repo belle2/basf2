@@ -217,11 +217,10 @@ const std::string Belle2::PXD::PXDClusterPositionEstimator::getMirroredShortName
 const std::string Belle2::PXD::PXDClusterPositionEstimator::getFullName(const std::set<Belle2::PXD::Pixel>& pixels, int uStart,
     int vStart) const
 {
-  std::string name = "F";
-  for (const Belle2::PXD::Pixel& px : pixels) {
-    name += "D" + std::to_string(px.getV() - vStart) + '.' + std::to_string(px.getU() - uStart);
-  }
-  return name;
+  return std::accumulate(pixels.begin(), pixels.end(), std::string("F"),
+  [uStart, vStart](auto name, auto px) {
+    return name + "D" + std::to_string(px.getV() - vStart) + "." + std::to_string(px.getU() - uStart);
+  });
 }
 
 int Belle2::PXD::PXDClusterPositionEstimator::getClusterkind(const Belle2::PXDCluster& cluster) const
@@ -238,10 +237,10 @@ int Belle2::PXD::PXDClusterPositionEstimator::getClusterkind(const Belle2::PXDCl
     pixelkinds.insert(pixelkind);
 
     // Cluster at v sensor edge
-    if (digit.getVCellID() <= 0 or digit.getVCellID() >= 767)
+    if (digit.getVCellID() == 0 or digit.getVCellID() >= 767)
       vEdge = true;
     // Cluster at u sensor edge
-    if (digit.getUCellID() <= 0 or digit.getUCellID() >= 249)
+    if (digit.getUCellID() == 0 or digit.getUCellID() >= 249)
       uEdge = true;
   }
 
@@ -270,10 +269,10 @@ int Belle2::PXD::PXDClusterPositionEstimator::getClusterkind(const std::vector<B
     pixelkinds.insert(pixelkind);
 
     // Cluster at v sensor edge
-    if (pix.getV() <= 0 or pix.getV() >= 767)
+    if (pix.getV() == 0 or pix.getV() >= 767)
       vEdge = true;
     // Cluster at u sensor edge
-    if (pix.getU() <= 0 or pix.getU() >= 249)
+    if (pix.getU() == 0 or pix.getU() >= 249)
       uEdge = true;
   }
 

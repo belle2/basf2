@@ -36,7 +36,7 @@ namespace Belle2 {
      * @param description The description of the parameter.
      * @param force If true the parameter has to be set in the steering file by the user.
      */
-    ModuleParamBase(const std::string& typeInfo, const std::string& description, bool force);
+    ModuleParamBase(std::string  typeInfo, std::string  description, bool force);
 
     /**
      * Destructor.

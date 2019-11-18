@@ -184,7 +184,7 @@ namespace Belle2 {
     /** The electronic noise for V strips in bw barrel (non-Origami) sensors. */
     double m_electronicNoiseSbwV;
 
-    ClassDef(SVDSensorInfoPar, 7);
+    ClassDef(SVDSensorInfoPar, 7); /**< needed by root*/
   };
 } // end of namespace Belle2
 

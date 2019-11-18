@@ -99,6 +99,7 @@ class V0Harvester(HarvestingModule):
                 "FOUND": False
             }
 
+    #: Refiners to be executed at the end of the harvesting / termination of the module
     #: Store the output of the module in a root file.
     save_tree = SaveTreeRefiner()
 

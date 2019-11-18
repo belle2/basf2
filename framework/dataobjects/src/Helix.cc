@@ -15,10 +15,9 @@
 #include <boost/math/special_functions/sinc.hpp>
 #include <boost/math/tools/precision.hpp>
 
-#include <TMath.h>
 #include <TMatrixD.h>
 
-#include <assert.h>
+#include <cassert>
 
 using namespace Belle2;
 using namespace HelixParameterIndex;
@@ -444,7 +443,7 @@ double Helix::calcASinXDividedByX(const double& x)
 
   BOOST_MATH_STD_USING;
 
-  double const taylor_n_bound = boost::math::tools::forth_root_epsilon<double>();
+  auto const taylor_n_bound = boost::math::tools::forth_root_epsilon<double>();
 
   if (abs(x) >= taylor_n_bound) {
     if (fabs(x) == 1) {
@@ -459,13 +458,13 @@ double Helix::calcASinXDividedByX(const double& x)
     // approximation by taylor series in x at 0 up to order 0
     double result = 1.0;
 
-    double const taylor_0_bound = boost::math::tools::epsilon<double>();
+    auto const taylor_0_bound = boost::math::tools::epsilon<double>();
     if (abs(x) >= taylor_0_bound) {
       double x2 = x * x;
       // approximation by taylor series in x at 0 up to order 2
       result += x2 / 6.0;
 
-      double const taylor_2_bound = boost::math::tools::root_epsilon<double>();
+      auto const taylor_2_bound = boost::math::tools::root_epsilon<double>();
       if (abs(x) >= taylor_2_bound) {
         // approximation by taylor series in x at 0 up to order 4
         result += x2 * x2 * (3.0 / 40.0);
@@ -483,7 +482,7 @@ double Helix::calcATanXDividedByX(const double& x)
 
   BOOST_MATH_STD_USING;
 
-  double const taylor_n_bound = boost::math::tools::forth_root_epsilon<double>();
+  auto const taylor_n_bound = boost::math::tools::forth_root_epsilon<double>();
 
   if (abs(x) >= taylor_n_bound) {
     return atan(x) / x;
@@ -492,13 +491,13 @@ double Helix::calcATanXDividedByX(const double& x)
     // approximation by taylor series in x at 0 up to order 0
     double result = 1.0;
 
-    double const taylor_0_bound = boost::math::tools::epsilon<double>();
+    auto const taylor_0_bound = boost::math::tools::epsilon<double>();
     if (abs(x) >= taylor_0_bound) {
       double x2 = x * x;
       // approximation by taylor series in x at 0 up to order 2
       result -= x2 / 3.0;
 
-      double const taylor_2_bound = boost::math::tools::root_epsilon<double>();
+      auto const taylor_2_bound = boost::math::tools::root_epsilon<double>();
       if (abs(x) >= taylor_2_bound) {
         // approximation by taylor series in x at 0 up to order 4
         result += x2 * x2 * (1.0 / 5.0);
@@ -515,7 +514,7 @@ double Helix::calcDerivativeOfATanXDividedByX(const double& x)
 
   BOOST_MATH_STD_USING;
 
-  double const taylor_n_bound = boost::math::tools::forth_root_epsilon<double>();
+  auto const taylor_n_bound = boost::math::tools::forth_root_epsilon<double>();
 
   const double x2 = x * x;
   if (abs(x) >= taylor_n_bound) {
@@ -526,12 +525,12 @@ double Helix::calcDerivativeOfATanXDividedByX(const double& x)
     // approximation by taylor series in x at 0 up to order 0
     double result = 1.0;
 
-    double const taylor_0_bound = boost::math::tools::epsilon<double>();
+    auto const taylor_0_bound = boost::math::tools::epsilon<double>();
     if (abs(x) >= taylor_0_bound) {
       // approximation by taylor series in x at 0 up to order 2
       result -= 2.0 * x / 3.0;
 
-      double const taylor_2_bound = boost::math::tools::root_epsilon<double>();
+      auto const taylor_2_bound = boost::math::tools::root_epsilon<double>();
       if (abs(x) >= taylor_2_bound) {
         // approximation by taylor series in x at 0 up to order 4
         result += x2 * x * (4.0 / 5.0);

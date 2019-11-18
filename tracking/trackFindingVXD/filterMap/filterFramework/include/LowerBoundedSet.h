@@ -16,8 +16,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <typeinfo>
-
 namespace Belle2 {
 
   /** Represents a lower bounded set of arithmetic types.
@@ -28,7 +26,7 @@ namespace Belle2 {
 
   template< typename InfType >
   class LowerBoundedSet {
-    InfType m_inf;
+    InfType m_inf; /**< infinity value */
   public:
 
     /** Constructor */

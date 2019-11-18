@@ -103,7 +103,7 @@ namespace Belle2 {
      */
     auto getIndexWeight = [this](double value, int coordinate) -> std::tuple<unsigned int, double> {
       double weight = value * m_invgridPitch[coordinate];
-      unsigned int index = static_cast<unsigned int>(weight);
+      auto index = static_cast<unsigned int>(weight);
       index = std::min(index, static_cast<unsigned int>(m_mapSize[coordinate] - 2));
       weight -= index;
       return std::make_tuple(index, weight);

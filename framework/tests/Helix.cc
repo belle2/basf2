@@ -1,11 +1,8 @@
 #include <framework/dataobjects/Helix.h>
-#include <framework/logging/Logger.h>
 
 #include <TVector3.h>
 #include <TRandom3.h>
-#include <TMath.h>
 
-#include <boost/math/special_functions/sign.hpp>
 #include <framework/utilities/TestHelpers.h>
 
 #include <gtest/gtest.h>
@@ -24,24 +21,24 @@ std::ostream& operator<<(::std::ostream& output, const TVector3& tVector3)
          << tVector3.Z() << ")";
 }
 
-namespace Belle2 {
-  /** Predicate checking that all five components of the Helix are close by a maximal error of absError.*/
-  namespace TestHelpers {
+namespace Belle2::TestHelpers {
 
-    /** Overload method for ASSERT_ALL_NEAR / EXPECT_ALL_NEAR. */
-    template<>
-    bool allNear<Belle2::Helix>(const Belle2::Helix& expected,
-                                const Belle2::Helix& actual,
-                                double tolerance)
-    {
-      bool d0Near = fabs(expected.getD0() - actual.getD0()) < tolerance;
-      bool phi0Near = angleNear(expected.getPhi0(), actual.getPhi0(), tolerance);
-      bool omegaNear = fabs(expected.getOmega() - actual.getOmega()) < tolerance;
-      bool z0Near = fabs(expected.getZ0() - actual.getZ0()) < tolerance;
-      bool tanLambdaNear = fabs(expected.getTanLambda() - actual.getTanLambda()) < tolerance;
+  /** Predicate checking that all five components of the Helix are close by a
+   * maximal error of absError. Extends the EXPECT_ALL_NEAR/ASSERT_ALL_NEAR
+   * macro in the framework testhelpers to work for the helix class
+   */
+  template<>
+  bool allNear<Belle2::Helix>(const Belle2::Helix& expected,
+                              const Belle2::Helix& actual,
+                              double tolerance)
+  {
+    bool d0Near = fabs(expected.getD0() - actual.getD0()) < tolerance;
+    bool phi0Near = angleNear(expected.getPhi0(), actual.getPhi0(), tolerance);
+    bool omegaNear = fabs(expected.getOmega() - actual.getOmega()) < tolerance;
+    bool z0Near = fabs(expected.getZ0() - actual.getZ0()) < tolerance;
+    bool tanLambdaNear = fabs(expected.getTanLambda() - actual.getTanLambda()) < tolerance;
 
-      return d0Near and phi0Near and omegaNear and z0Near and tanLambdaNear;
-    }
+    return d0Near and phi0Near and omegaNear and z0Near and tanLambdaNear;
   }
 }
 
@@ -71,9 +68,6 @@ namespace {
 
     return result;
   }
-}
-
-namespace {
 
   /** Set up a few arrays and objects in the datastore */
   class HelixTest : public ::testing::Test {

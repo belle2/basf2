@@ -115,10 +115,10 @@ namespace Belle2 {
 
     VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/
     bool m_isU; /**< True if U, false if V. */
-    BinEdgesArray m_bins; /** Bins used by the time fitter. */
+    BinEdgesArray m_bins; /**< Bins used by the time fitter. */
     SVDModeByte::baseType m_mode; /**< Mode byte, trigger FADCTime + DAQ mode */
 
-    ClassDef(SVDRecoTimeBase, 1)
+    ClassDef(SVDRecoTimeBase, 1) /**< needed by root*/
 
   }; // class SVDRecoTimeBase
 

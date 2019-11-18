@@ -13,6 +13,7 @@
 #include <string.h>
 #include <stdlib.h>
 //#include <TObject.h>
+#include <rawdata/switch_basf2_standalone.h>
 
 //#include <framework/datastore/DataStore.h>
 
@@ -226,8 +227,7 @@ namespace Belle2 {
   inline void RawHeader_v1::CheckSetBuffer()
   {
     if (m_buffer == NULL) {
-      perror("m_buffer is NULL. Exiting...");
-      exit(1);
+      B2FATAL("m_buffer is NULL. Exiting...");
     }
   }
 
@@ -235,15 +235,9 @@ namespace Belle2 {
   {
 
     if (m_buffer == NULL) {
-      printf("[DEBUG] m_buffer is NULL(%p). Data is corrupted or header info has not yet filled. Exiting...",
-             m_buffer);
-      exit(1);
-      /*     } else if (m_buffer[ POS_TERM_HEADER ] != MAGIC_WORD_TERM_HEADER) { */
-      /*       printf("[DEBUG]  magic word is invalid(0x%x). Data is corrupted or header info has not yet filled. Exiting...", */
-      /*              m_buffer[ POS_TERM_HEADER ] */
-      /*             ); */
-      /*       exit(1); */
-
+      B2FATAL("m_buffer is NULL. Data is corrupted or header info has not yet filled. Exiting...");
+//  } else if (m_buffer[ POS_TERM_HEADER ] != MAGIC_WORD_TERM_HEADER) { */
+//    B2FATAL("[DEBUG]  magic word is invalid(0x" << hex() << m_buffer[ POS_TERM_HEADER ] << "). Data is corrupted or header info has not yet filled. Exiting...");
     }
 
 

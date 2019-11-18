@@ -11,7 +11,6 @@
 #ifndef ARICHDATABASEIMPORTER_H
 #define ARICHDATABASEIMPORTER_H
 
-#include <TObject.h>
 #include <TGraph.h>
 #include <TH1.h>
 #include <TH2F.h>
@@ -169,6 +168,21 @@ namespace Belle2 {
      * for simple option, draw TGraph2D with "pcolz" option and set view to "top"
      */
     void dumpQEMap(bool simple = false);
+
+    /**
+     * Dumps detector map of HAPD modules to HV cable channels
+     */
+    void dumpHvMappings();
+
+    /**
+     * Prints electronics mappings for all modules (merger ID + SN, merger port, copper, finnese)
+     */
+    void printFEMappings();
+
+    /**
+     * Dumps module - merger mapping into root file
+     */
+    void dumpMergerMapping(bool sn = true);
 
     /**
      * Dumps module numbering scheme into root file (module position on the detector plane -> module number)

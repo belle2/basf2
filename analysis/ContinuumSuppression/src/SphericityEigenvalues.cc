@@ -13,11 +13,8 @@
 #include <framework/logging/Logger.h>
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
-#include <Eigen/Eigenvalues>
 
 #include <string>
-#include <sstream>
-#include <iostream>
 
 using namespace Belle2;
 
@@ -45,7 +42,7 @@ void SphericityEigenvalues::calculateEigenvalues()
     return;
   }
 
-  for (auto p : m_momenta) {
+  for (const auto& p : m_momenta) {
     elements[0] += p.X() * p.X(); // diag
     elements[1] += p.X() * p.Y();
     elements[2] += p.X() * p.Z();

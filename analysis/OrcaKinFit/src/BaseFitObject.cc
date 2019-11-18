@@ -29,10 +29,10 @@ using std::isfinite;
 #include <gsl/gsl_linalg.h>
 
 namespace Belle2 {
-
   namespace OrcaKinFit {
 
-    BaseFitObject::BaseFitObject(): name(0), par{}, mpar{}, measured{}, fixed{},  globalParNum{}, cov{}, covinv{},  covinvvalid(false),
+    BaseFitObject::BaseFitObject(): name(nullptr), par{}, mpar{}, measured{}, fixed{},  globalParNum{}, cov{}, covinv{},  covinvvalid(
+        false),
       cachevalid(false)
     {
       setName("???");
@@ -48,7 +48,7 @@ namespace Belle2 {
     }
 
     BaseFitObject::BaseFitObject(const BaseFitObject& rhs)
-      : name(0), par{}, mpar{}, measured{}, fixed{},  globalParNum{}, cov{}, covinv{}, covinvvalid(false), cachevalid(false)
+      : name(nullptr), par{}, mpar{}, measured{}, fixed{},  globalParNum{}, cov{}, covinv{}, covinvvalid(false), cachevalid(false)
     {
       BaseFitObject::assign(rhs);
     }
@@ -64,7 +64,7 @@ namespace Belle2 {
     BaseFitObject& BaseFitObject::assign(const BaseFitObject& source)
     {
       if (&source != this) {
-        name = 0;
+        name = nullptr;
         setName(source.name);
         for (int i = 0; i < BaseDefs::MAXPAR; ++i) {
           par[i]          = source.par[i];
@@ -93,7 +93,7 @@ namespace Belle2 {
 
     void  BaseFitObject::setName(const char* name_)
     {
-      if (name_ == 0) return;
+      if (name_ == nullptr) return;
       size_t l = strlen(name_);
       if (name) delete[] name;
       name = new char[l + 1];
@@ -409,8 +409,7 @@ namespace Belle2 {
 
     double BaseFitObject::getChi2() const
     {
-      if (!covinvvalid) calculateCovInv();
-      if (!covinvvalid) return -1;
+      if (not covinvvalid and not calculateCovInv()) return -1;
       double chi2 = 0;
       static double resid[BaseDefs::MAXPAR];
       static bool chi2contr[BaseDefs::MAXPAR];
@@ -433,8 +432,9 @@ namespace Belle2 {
     {
       assert(ilocal >= 0 && ilocal < getNPar());
       if (isParamFixed(ilocal) || !isParamMeasured(ilocal)) return 0;
-      if (!covinvvalid) calculateCovInv();
-      if (!covinvvalid) return 0;
+
+      if (not covinvvalid and not calculateCovInv()) return 0;
+
       double result = 0;
       for (int jlocal = 0; jlocal < getNPar(); jlocal++)
         if (!isParamFixed(jlocal) && isParamMeasured(jlocal))
@@ -449,8 +449,7 @@ namespace Belle2 {
       if (isParamFixed(ilocal) || !isParamMeasured(ilocal) ||
           isParamFixed(jlocal) || !isParamMeasured(jlocal))
         return 0;
-      if (!covinvvalid) calculateCovInv();
-      if (!covinvvalid) return 0;
+      if (not covinvvalid and not calculateCovInv()) return 0;
       return 2 * covinv[ilocal][jlocal]; // JL: ok in absence of soft constraints
     }
 
@@ -480,8 +479,7 @@ namespace Belle2 {
     {
       // This adds the dChi2/dpar piece
       assert(getNPar() <= BaseDefs::MAXPAR);
-      if (!covinvvalid) calculateCovInv();
-      if (!covinvvalid) return 1;
+      if (not covinvvalid and not calculateCovInv()) return 0;
       for (int ilocal = 0; ilocal < getNPar(); ++ilocal) {
         if (!isParamFixed(ilocal) && isParamMeasured(ilocal)) {
           int iglobal = getGlobalParNum(ilocal);

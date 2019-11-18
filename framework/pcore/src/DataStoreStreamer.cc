@@ -21,7 +21,7 @@
 #include <TList.h>
 
 #include <unistd.h>
-#include <stdio.h>                      // for NULL, printf
+#include <cstdio>                      // for NULL, printf
 
 #include <algorithm>
 #include <queue>
@@ -31,7 +31,7 @@ using namespace std;
 using namespace Belle2;
 
 // Thread related
-static DataStoreStreamer* s_streamer = NULL;
+static DataStoreStreamer* s_streamer = nullptr;
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t mutex_thread[DataStoreStreamer::c_maxThreads];
@@ -49,10 +49,10 @@ static int my_decstat[DataStoreStreamer::c_maxThreads];
 
 void* RunDecodeEvtMessage(void* targ)
 {
-  int* id = (int*)targ;
+  auto* id = (int*)targ;
   //  DataStoreStreamer::Instance().decodeEvtMessage(*id);
   s_streamer->decodeEvtMessage(*id);
-  return NULL;
+  return nullptr;
 }
 
 DataStoreStreamer::DataStoreStreamer(int complevel, bool handleMergeable, int maxthread):
@@ -85,7 +85,7 @@ DataStoreStreamer::DataStoreStreamer(int complevel, bool handleMergeable, int ma
     }
     for (int i = 0; i < m_maxthread; i++) {
       //      args.evtbuf = m_evtbuf[i];
-      pthread_create(&m_pt[i], NULL, RunDecodeEvtMessage, (void*)&m_id[i]);
+      pthread_create(&m_pt[i], nullptr, RunDecodeEvtMessage, (void*)&m_id[i]);
     }
     pthread_attr_destroy(&thread_attr);
   }
@@ -114,7 +114,7 @@ void DataStoreStreamer::clearMergeable(TObject* object)
 }
 void DataStoreStreamer::mergeIntoExisting(TObject* existing, const TObject* received)
 {
-  Mergeable* existingObject = static_cast<Mergeable*>(existing);
+  auto* existingObject = static_cast<Mergeable*>(existing);
   existingObject->merge(static_cast<const Mergeable*>(received));
 }
 void DataStoreStreamer::removeSideEffects()
@@ -141,54 +141,52 @@ EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, boo
   int nobjs = 0;
   DataStore::EDurability durability = DataStore::c_Event;
   while (true) {
-    DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(durability);
-    for (DataStore::StoreEntryIter it = map.begin(); it != map.end(); ++it) {
-      DataStore::StoreEntry* entry = &it->second;
-
+    auto& map = DataStore::Instance().getStoreEntryMap(durability);
+    for (auto &[name, entry] : map) {
       //skip transient objects/arrays?
-      if (!streamTransientObjects and entry->dontWriteOut)
+      if (!streamTransientObjects and entry.dontWriteOut)
         continue;
 
       //skip objects not in the list
       if (!m_streamobjnames.empty()) {
-        vector<string>::iterator pos = std::find(m_streamobjnames.begin(), m_streamobjnames.end(), it->first);
+        auto pos = std::find(m_streamobjnames.begin(), m_streamobjnames.end(), name);
         if (pos == m_streamobjnames.end())  continue;
       }
 
       //verify that bits are unused
-      if (entry->object->TestBit(c_IsTransient)) {
-        B2FATAL("DataStoreStreamer::c_IsTransient bit is set for " << it->first << "!");
+      if (entry.object->TestBit(c_IsTransient)) {
+        B2FATAL("DataStoreStreamer::c_IsTransient bit is set for " << name << "!");
       }
-      if (entry->object->TestBit(c_IsNull)) {
-        B2FATAL("DataStoreStreamer::c_IsNull bit is set for " << it->first << "!");
+      if (entry.object->TestBit(c_IsNull)) {
+        B2FATAL("DataStoreStreamer::c_IsNull bit is set for " << name << "!");
       }
-      if (entry->object->TestBit(c_PersistentDurability)) {
-        B2FATAL("DataStoreStreamer::c_PersistentDurability bit is set for " << it->first << "!");
+      if (entry.object->TestBit(c_PersistentDurability)) {
+        B2FATAL("DataStoreStreamer::c_PersistentDurability bit is set for " << name << "!");
       }
       //verify TObject bits are serialised
-      if (entry->object->IsA()->CanIgnoreTObjectStreamer()) {
-        B2FATAL("TObject streamers disabled for " << it->first << "!");
+      if (entry.object->IsA()->CanIgnoreTObjectStreamer()) {
+        B2FATAL("TObject streamers disabled for " << name << "!");
       }
-      //store some information in TObject bits to ensure consistent state even if entry->ptr is NULL
-      entry->object->SetBit(c_IsTransient, entry->dontWriteOut);
-      entry->object->SetBit(c_IsNull, (entry->ptr == NULL));
-      entry->object->SetBit(c_PersistentDurability, (durability == DataStore::c_Persistent));
-      m_msghandler->add(entry->object, it->first);
-      B2DEBUG(100, "adding item " << it->first);
+      //store some information in TObject bits to ensure consistent state even if entry.ptr is NULL
+      entry.object->SetBit(c_IsTransient, entry.dontWriteOut);
+      entry.object->SetBit(c_IsNull, (entry.ptr == nullptr));
+      entry.object->SetBit(c_PersistentDurability, (durability == DataStore::c_Persistent));
+      m_msghandler->add(entry.object, name);
+      B2DEBUG(100, "adding item " << name);
 
-      if (entry->isArray)
+      if (entry.isArray)
         narrays++;
       else
         nobjs++;
 
       //reset bits (are checked to be false when streaming the object)
-      entry->object->SetBit(c_IsTransient, false);
-      entry->object->SetBit(c_IsNull, false);
-      entry->object->SetBit(c_PersistentDurability, false);
+      entry.object->SetBit(c_IsTransient, false);
+      entry.object->SetBit(c_IsNull, false);
+      entry.object->SetBit(c_PersistentDurability, false);
 
-      bool merge = m_handleMergeable and entry->ptr != NULL and isMergeable(entry->object);
+      bool merge = m_handleMergeable and entry.ptr != nullptr and isMergeable(entry.object);
       if (merge)
-        clearMergeable(entry->object);
+        clearMergeable(entry.object);
     }
 
     if (addPersistentDurability and durability == DataStore::c_Event)
@@ -234,8 +232,8 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
     // Restore objects in DataStore
     for (int i = 0; i < nobjs + narrays; i++) {
       TObject* obj = objlist.at(i);
-      bool array = (dynamic_cast<TClonesArray*>(obj) != 0);
-      if (obj != NULL) {
+      bool array = (dynamic_cast<TClonesArray*>(obj) != nullptr);
+      if (obj != nullptr) {
 
         // Read and Build StreamerInfo
         if (msg->type() == MSG_STREAMERINFO) {
@@ -253,10 +251,11 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
           DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, flags);
         }
         DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(namelist.at(i), durability, cl, array));
+        B2ASSERT("Can not find a data store entry with the name " << namelist.at(i) << ". Did you maybe forget to register it?", entry);
         //only restore object if it is valid for current event
         bool ptrIsNULL = obj->TestBit(c_IsNull);
         if (!ptrIsNULL) {
-          bool merge = m_handleMergeable and !array and entry->ptr != NULL and isMergeable(obj);
+          bool merge = m_handleMergeable and !array and entry->ptr != nullptr and isMergeable(obj);
           if (merge) {
             B2DEBUG(100, "Will now merge " << namelist.at(i));
 
@@ -297,7 +296,7 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
 int DataStoreStreamer::queueEvtMessage(char* evtbuf)
 {
   // EOF case
-  if (evtbuf == NULL) {
+  if (evtbuf == nullptr) {
     printf("queueEvtMessage : NULL evtbuf detected. \n");
     for (int i = 0; i < m_maxthread; i++) {
       while (my_evtbuf[i].size() >= c_maxQueueDepth) usleep(10);
@@ -353,14 +352,14 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
     pthread_mutex_unlock(&mutex_thread[id]);
 
     // In case of EOF
-    if (evtbuf == NULL) {
+    if (evtbuf == nullptr) {
       printf("decodeEvtMessage: NULL evtbuf detected, nq = %d\n", nqueue);
       my_nobjs.push(-1);
-      return NULL;
+      return nullptr;
     }
 
     // Construct EvtMessage
-    EvtMessage* msg = new EvtMessage(evtbuf);
+    auto* msg = new EvtMessage(evtbuf);
 
     // Decode EvtMessage into Objects
     vector<TObject*> objlist;
@@ -389,7 +388,7 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
 
   }
 
-  return NULL;
+  return nullptr;
 }
 
 int DataStoreStreamer::restoreDataStoreAsync()
@@ -416,8 +415,8 @@ int DataStoreStreamer::restoreDataStoreAsync()
   //TODO refactor, just copied & pasted right now
   for (int i = 0; i < nobjs + narrays; i++) {
     //    printf ( "restoring object %d = %s\n", i, namelist.at(i).c_str() );
-    bool array = (dynamic_cast<TClonesArray*>(objlist.at(i)) != 0);
-    if (objlist.at(i) != NULL) {
+    bool array = (dynamic_cast<TClonesArray*>(objlist.at(i)) != nullptr);
+    if (objlist.at(i) != nullptr) {
       TObject* obj = objlist.at(i);
       bool isPersistent = obj->TestBit(c_PersistentDurability);
       DataStore::EDurability durability = isPersistent ? (DataStore::c_Persistent) : (DataStore::c_Event);
@@ -494,8 +493,8 @@ int DataStoreStreamer::restoreStreamerInfos(const TList* list)
     info = (TStreamerInfo*)lnk->GetObject();
 
     int ovlap = 0;
-    for (auto itr = class_name.begin(); itr != class_name.end(); ++itr) {
-      if (strcmp((*itr).c_str(), info->GetName()) == 0) {
+    for (auto& itr : class_name) {
+      if (strcmp(itr.c_str(), info->GetName()) == 0) {
         ovlap = 1;
         B2DEBUG(100, "Regular Class Loop : The class " << info->GetName() << " has already appeared. Skipping...");
         break;
@@ -527,8 +526,8 @@ int DataStoreStreamer::restoreStreamerInfos(const TList* list)
     info = (TStreamerInfo*)lnk->GetObject();
 
     int ovlap = 0;
-    for (auto itr = class_name.begin(); itr != class_name.end(); ++itr) {
-      if (strcmp((*itr).c_str(), info->GetName()) == 0) {
+    for (auto& itr : class_name) {
+      if (strcmp(itr.c_str(), info->GetName()) == 0) {
         ovlap = 1;
         B2DEBUG(100, "STL Class Loop : The class " << info->GetName() << " has already appeared. Skipping...");
         break;

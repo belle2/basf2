@@ -1,25 +1,28 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013-2019 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Thomas Keck, Christian Pulvermacher                      *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
+#include <framework/utilities/GeneralCut.h>
 
 #include <boost/algorithm/string.hpp>
 
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-#include <exception>
 #include <string>
 #include <regex>
 
 using namespace Belle2;
 
-Variable::Manager::~Manager()
-{
-}
+Variable::Manager::~Manager() = default;
 Variable::Manager& Variable::Manager::Instance()
 {
   static Variable::Manager v;
@@ -83,14 +86,14 @@ bool Variable::Manager::addAlias(const std::string& alias, const std::string& va
 void Variable::Manager::printAliases()
 {
   long unsigned int longest_alias_size = 0;
-  for (auto a : m_alias) {
+  for (const auto& a : m_alias) {
     if (a.first.length() > longest_alias_size) {
       longest_alias_size = a.first.length();
     }
   }
   B2INFO("=====================================");
   B2INFO("The following aliases are registered:");
-  for (auto a : m_alias) {
+  for (const auto& a : m_alias) {
     B2INFO(std::string(a.first, 0, longest_alias_size) << std::string(longest_alias_size - a.first.length(),
            ' ') << " --> " << a.second);
   }
@@ -214,7 +217,8 @@ bool Variable::Manager::createVariable(const std::string& name)
 }
 
 
-void Variable::Manager::registerVariable(const std::string& name, Variable::Manager::FunctionPtr f, const std::string& description)
+void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::FunctionPtr& f,
+                                         const std::string& description)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -233,7 +237,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
   }
 }
 
-void Variable::Manager::registerVariable(const std::string& name, Variable::Manager::ParameterFunctionPtr f,
+void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::ParameterFunctionPtr& f,
                                          const std::string& description)
 {
   if (!f) {
@@ -253,7 +257,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
   }
 }
 
-void Variable::Manager::registerVariable(const std::string& name, Variable::Manager::MetaFunctionPtr f,
+void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::MetaFunctionPtr& f,
                                          const std::string& description)
 {
   if (!f) {
@@ -280,6 +284,13 @@ std::vector<std::string> Variable::Manager::getNames() const
   for (const VarBase* var : m_variablesInRegistrationOrder) {
     names.push_back(var->name);
   }
+  return names;
+}
+
+std::vector<std::string> Variable::Manager::getAliasNames() const
+{
+  std::vector<std::string> names;
+  for (auto al : m_alias) names.push_back(al.first);
   return names;
 }
 

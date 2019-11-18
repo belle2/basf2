@@ -182,6 +182,18 @@ namespace Belle2 {
         return m_hasMatchingSegment;
       }
 
+      /// Get the multivariate quality indicator in [0, 1] attached the CDCTrack.
+      float getQualityIndicator() const
+      {
+        return m_qualityIndicator;
+      }
+
+      /// Set the multivariate quality indicator in [0, 1] attached the CDCTrack.
+      void setQualityIndicator(float qualityIndicator)
+      {
+        m_qualityIndicator = qualityIndicator;
+      }
+
     private:
       /// Memory for the automaton cell.
       mutable AutomatonCell m_automatonCell;
@@ -194,6 +206,10 @@ namespace Belle2 {
 
       /// Flag which indicates that the track had a matching segment (can be used for filter decisions)
       bool m_hasMatchingSegment = false;
+
+      /// Multivariate classifier output in [0, 1] correlated with probability that track is good
+      /// match. Used to reject fakes and clones. Implemented here to be forwarded to RecoTrack.
+      float m_qualityIndicator = NAN;
     };
   }
 }

@@ -16,6 +16,7 @@ namespace Belle2 {
   /// Base filter for CKF SVD states
   class DistanceSVDPairFilter : public BaseSVDPairFilter {
   public:
+    /// Return the weight based on azimuthal-angle separation
     TrackFindingCDC::Weight operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation) override;
   };
 }

@@ -11,7 +11,6 @@
 #pragma once
 
 #include <vector>
-#include <utility>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -19,9 +18,7 @@
 
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/trackFindingVXD/tcTools/SpacePointTrackCandCreator.h>
 #include <tracking/trackFindingVXD/algorithms/StandaloneCosmicsCollector.h>
-
 
 namespace Belle2 {
   /**

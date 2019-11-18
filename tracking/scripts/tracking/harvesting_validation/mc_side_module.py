@@ -23,6 +23,7 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         expert_level <= default_expert_level//2: only basic figures
         default_expert_level//2 < expert_level < default_expert_level: basic figures and basic tree entries
     """
+    #: the threshold value for the expert level
     default_expert_level = 10
 
     def __init__(
@@ -33,6 +34,7 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
             reco_tracks_name='RecoTracks',
             mc_reco_tracks_name='MCRecoTracks',
             expert_level=None):
+        """Constructor"""
 
         output_file_name = output_file_name or name + 'TrackingValidation.root'
 
@@ -65,6 +67,7 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
             self.fake_det_hit_ids = set()
 
     def initialize(self):
+        """Initialization signal at the start of the event processing"""
         super().initialize()
         self.track_match_look_up = Belle2.TrackMatchLookUp(self.mc_reco_tracks_name, self.reco_tracks_name)
 
@@ -104,6 +107,7 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
             self.fake_det_hit_ids = fake_det_hit_ids
 
     def pick(self, mc_reco_track):
+        """Pick every MCRecoTrack"""
         return True
 
     def peel(self, mc_reco_track):
@@ -161,6 +165,7 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         return crops
 
     def peel_mc_to_pr_match_info(self, mc_reco_track):
+        """Extracts track-match information from the MCMatcherTracksModule results"""
         track_match_look_up = self.track_match_look_up
         return dict(
             is_matched=track_match_look_up.isMatchedMCRecoTrack(mc_reco_track),
@@ -170,6 +175,7 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         )
 
     def peel_hit_efficiencies_in_all_pr_tracks(self, mc_reco_track):
+        """Extracts hit efficiencies"""
         mc_det_hit_ids = utilities.get_det_hit_ids(mc_reco_track)
 
         hit_efficiency_in_all_found = utilities.calc_hit_efficiency(self.found_det_hit_ids,
@@ -186,7 +192,7 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         hit_efficiency_crops = dict(
             hit_efficiency_in_all_found=hit_efficiency_in_all_found,
             unfound_hit_efficiency=unfound_hit_efficiency,
-            hit_efficiency_in_all_mached=hit_efficiency_in_all_matched,
+            hit_efficiency_in_all_matched=hit_efficiency_in_all_matched,
             hit_efficiency_in_all_fake=hit_efficiency_in_all_fake,
         )
         return hit_efficiency_crops
@@ -194,12 +200,14 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
     # Refiners to be executed on terminate #
     # #################################### #
 
-    # Save a tree of all collected variables in a sub folder
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree(name="mc_tree", folder_name="mc_tree", above_expert_level=default_expert_level)
+
+    #: Save a basic tree
     save_tree_basic = refiners.save_tree(name="mc_tree", folder_name="mc_tree",
                                          above_expert_level=default_expert_level // 2, below_expert_level=default_expert_level)
 
-    # Generate the average finding efficiencies and hit efficiencies
+    #: Generate the average finding efficiencies and hit efficiencies
     save_overview_figures_of_merit = refiners.save_fom(
         name="{module.id}_overview_figures_of_merit",
         title="Overview figures in {module.title}",
@@ -216,7 +224,7 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
     # Default refiners that can be disabled with a lower expert_level
     # #################################### #
 
-    # Save a histogram of the hit efficiency
+    #: Save a histogram of the hit efficiency
     save_hit_efficiency_histogram = refiners.save_histograms(
         above_expert_level=default_expert_level - 1,
         select={"hit_efficiency": "hit efficiency"},
@@ -224,8 +232,7 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         description="Not a serious plot yet.",
     )
 
-    # Make profiles of the finding efficiencies versus various fit parameters
-    # Rename the quatities to names that display nicely by root latex translation
+    #: Rename the efficiency-profile quantities so that they display nicely in ROOT TLatex
     renaming_select_for_finding_efficiency_profiles = {
         'is_matched': 'finding efficiency',
         'd0_truth': 'd_{0}',
@@ -234,6 +241,7 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         'phi0_truth': '#phi',
     }
 
+    #: Make profile of finding efficiency
     save_finding_efficiency_profiles = refiners.save_profiles(
         above_expert_level=default_expert_level - 1,
         select=renaming_select_for_finding_efficiency_profiles,
@@ -244,6 +252,7 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         allow_discrete=True,
     )
 
+    #: Make profile of finding efficiency versus tan(lambda)
     save_finding_efficiency_by_tan_lamba_profiles = refiners.save_profiles(
         above_expert_level=default_expert_level - 1,
         select={
@@ -258,6 +267,7 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         upper_bound=3.27,
     )
 
+    #: Make profiles of finding efficiency versus tan(lambda) grouped by transverse momentum
     save_finding_efficiency_by_tan_lamba_in_pt_groups_profiles = refiners.save_profiles(
         above_expert_level=default_expert_level - 1,
         select={
@@ -274,7 +284,7 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
     )
 
     # Make profiles of the hit efficiencies versus various fit parameters
-    # Rename the quatities to names that display nicely by root latex translation
+    #: Rename the hit-profile quantities so that they display nicely in ROOT TLatex
     renaming_select_for_hit_efficiency_profiles = {
         'hit_efficiency': 'hit efficiency',
         'd0_truth': 'd_{0}',
@@ -283,6 +293,7 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         'phi0_truth': '#phi',
     }
 
+    #: Make profile of hit efficiency
     save_hit_efficiency_profiles = refiners.save_profiles(
         above_expert_level=default_expert_level - 1,
         select=renaming_select_for_hit_efficiency_profiles,
@@ -293,6 +304,7 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         allow_discrete=True,
     )
 
+    #: Make profile of finding efficiency versus tan(lambda)
     save_hit_efficiency_by_tan_lambda_profiles = refiners.save_profiles(
         above_expert_level=default_expert_level - 1,
         select={

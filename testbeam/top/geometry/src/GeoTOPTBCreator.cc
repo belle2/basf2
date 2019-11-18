@@ -31,7 +31,6 @@
 #include <G4Tubs.hh>
 #include <G4Polyhedra.hh>
 #include <G4Polycone.hh>
-#include <G4SubtractionSolid.hh>
 #include <G4UserLimits.hh>
 #include <G4Material.hh>
 

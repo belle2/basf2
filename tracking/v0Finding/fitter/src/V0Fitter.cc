@@ -4,7 +4,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <tracking/v0Finding/dataobjects/VertexVector.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/GFRaveVertexFactory.h>
@@ -12,7 +11,6 @@
 #include <genfit/Track.h>
 #include <genfit/FieldManager.h>
 #include "genfit/MaterialEffects.h"
-#include <genfit/Exception.h>
 
 #include <framework/utilities/IOIntercept.h>
 

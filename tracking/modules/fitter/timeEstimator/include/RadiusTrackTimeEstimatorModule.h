@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/modules/fitter/timeEstimator/BaseTrackTimeEstimatorModule.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 

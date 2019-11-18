@@ -11,11 +11,9 @@
 #include <framework/core/ProcessStatistics.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/pcore/ProcHelper.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/utilities/Utils.h>
-#include <framework/utilities/HTML.h>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <regex>
@@ -151,7 +149,7 @@ void ProcessStatistics::appendUnmergedModules(const ProcessStatistics* otherObje
 
 void ProcessStatistics::merge(const Mergeable* other)
 {
-  const ProcessStatistics* otherObject = static_cast<const ProcessStatistics*>(other);
+  const auto* otherObject = static_cast<const ProcessStatistics*>(other);
 
   if (m_stats == otherObject->m_stats) {
     //fast version for merging between processes
@@ -195,7 +193,7 @@ void ProcessStatistics::setCounters(double& time, double& memory,
 
 TObject* ProcessStatistics::Clone(const char*) const
 {
-  ProcessStatistics* p = new ProcessStatistics(*this);
+  auto* p = new ProcessStatistics(*this);
   return p;
 }
 

@@ -8,11 +8,10 @@ from contextlib import redirect_stdout
 with redirect_stdout(open(os.devnull, 'w')):
     print('abc')
 
-from basf2 import *
-from ROOT import Belle2
+import basf2
 
 
-rootfile = Belle2.FileSystem.findFile('/framework/tests/root_input.root')
+rootfile = basf2.find_file('/framework/tests/root_input.root')
 assert 0 == os.system('b2file-check ' + rootfile)
 
 assert 0 != os.system('b2file-check /THIS_DOESNT_EXIST')

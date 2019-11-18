@@ -36,6 +36,9 @@ namespace Belle2 {
     public:
       /// Default constructor - for cppcheck
       CDCMCTrackStore() = default;
+      /// Singleton: Delete copy constructor and assignment operator
+      CDCMCTrackStore(CDCMCTrackStore&) = delete;
+      CDCMCTrackStore& operator=(const CDCMCTrackStore&) = delete;
 
     public:
       /// Clear all Monte Carlo hits

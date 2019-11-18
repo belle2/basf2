@@ -59,8 +59,8 @@ stdK('loose', path=my_path)
 # keep only candidates with 1.8 < M(Kpi) < 1.9 GeV
 reconstructDecay('D0:kpi -> K-:loose pi+:loose', '1.8 < M < 1.9', path=my_path)
 
-# perform D0 vertex fit
-# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
+# Perform D0 vertex fit.
+# Reject the candidates with failed fit.
 vertexKFit('D0:kpi', 0.0, path=my_path)
 
 # reconstruct D*+ -> D0 pi+ decay

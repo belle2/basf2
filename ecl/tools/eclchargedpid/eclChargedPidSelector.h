@@ -23,9 +23,6 @@
 #include <stdio.h>
 #include <TCut.h>
 
-// Header file for the classes stored in the TTree if any.
-#include <vector>
-
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
 /** eclChargedPidSelector

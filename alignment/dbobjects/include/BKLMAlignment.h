@@ -39,7 +39,7 @@ namespace Belle2 {
     /// Get global unique id
     static unsigned short getGlobalUniqueID() {return 30;}
     /// Get global parameter
-    double getGlobalParam(unsigned short element, unsigned short param) {return get(element, param);}
+    double getGlobalParam(unsigned short element, unsigned short param) const {return get(element, param);}
     /// Set global parameter
     void setGlobalParam(double value, unsigned short element, unsigned short param) {set(element, param, value);}
     /// TODO: list stored global parameters

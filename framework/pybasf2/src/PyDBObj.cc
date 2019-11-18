@@ -9,10 +9,8 @@
  **************************************************************************/
 
 #include <framework/pybasf2/PyDBObj.h>
-#include <framework/database/DBStore.h>
 #include <framework/datastore/DataStore.h>
 
-#include <TClonesArray.h>
 #include <TClass.h>
 
 using namespace Belle2;

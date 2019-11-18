@@ -58,8 +58,10 @@ namespace Belle2 {
     bool extract(const CKFToSVDResult* result) final;
 
   private:
+    /// Pointer to the object containing event number etc
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
+    /// MC information used in the SVD CKF
     MCUtil m_mcUtil;
   };
 }

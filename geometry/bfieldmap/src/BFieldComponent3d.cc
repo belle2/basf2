@@ -78,7 +78,7 @@ void BFieldComponent3d::initialize()
         char* next;
         Br   = strtod(tmp + 33, &next);
         Bphi = strtod(next, &next);
-        Bz   = strtod(next, NULL);
+        Bz   = strtod(next, nullptr);
         m_bmap.emplace_back(-Br, -Bphi, -Bz);
       }
     }
@@ -188,7 +188,7 @@ B2Vector3D BFieldComponent3d::calculate(const B2Vector3D& point) const
   auto getPhiIndexWeight = [this](double y, double x, double & wphi) -> unsigned int {
     double phi = fast_atan2_minimax<4>(y, x);
     wphi = phi * m_igridPitch[1];
-    unsigned int iphi = static_cast<unsigned int>(wphi);
+    auto iphi = static_cast<unsigned int>(wphi);
     iphi = min(iphi, static_cast<unsigned int>(m_mapSize[1] - 2));
     wphi -= iphi;
     return iphi;
@@ -226,7 +226,7 @@ B2Vector3D BFieldComponent3d::calculate(const B2Vector3D& point) const
 
     // Calculate the lower index of the point in the R grid
     double wr = (r - m_mapRegionR[0]) * m_igridPitch[0];
-    unsigned int ir = static_cast<unsigned int>(wr);
+    auto ir = static_cast<unsigned int>(wr);
     ir = min(ir, static_cast<unsigned int>(m_mapSize[0] - 2));
     wr -= ir;
 

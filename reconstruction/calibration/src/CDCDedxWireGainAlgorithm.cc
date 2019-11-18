@@ -166,22 +166,21 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     htempPerWire->Reset();
   }
 
-  Int_t iSuperLayer = 0, nWireiLayer = 0, fromWire = 0, toWire = 0, countwire = 0;
+  Int_t toWire = 0, countwire = 0;
   double LayerMeanSum[56];
   std::vector<double> AvgLayerSum;
 
   for (Int_t iLayer = 0; iLayer < 56; iLayer++) {
-    iSuperLayer = (iLayer - 2) / 6;
+    Int_t iSuperLayer = (iLayer - 2) / 6;
     if (iSuperLayer <= 0)iSuperLayer = 1; //hack for wire#
-    nWireiLayer = 160 + (iSuperLayer - 1) * 32;
+    Int_t nWireiLayer = 160 + (iSuperLayer - 1) * 32;
 
-    fromWire = countwire; // or towire+countwire
+    Int_t fromWire = countwire; // or towire+countwire
     toWire = toWire + nWireiLayer;
 
     LayerMeanSum[iLayer] = 0.0;
     int counter = 0;
 
-    //std::cout << "Layer = " << iLayer << "), fromWire = " << fromWire << ") to wire = (" << toWire - 1 << ", total wire = "<< toWire-fromWire << std::endl;
     for (Int_t jwire = fromWire; jwire < toWire; jwire++) {
       countwire++;
       bool IsSkip = false;
@@ -201,12 +200,10 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 
     if ((LayerMeanSum[iLayer] / counter) >= 0.)AvgLayerSum.push_back(LayerMeanSum[iLayer] / counter);
     else AvgLayerSum.push_back(1.0);
-    //std::cout << "Layer = " << iLayer << ", Total wire mean = " << LayerMeanSum[iLayer] << ", S[iLayer] = " << AvgLayerSum.at(iLayer) << std::endl;
   }
 
   double ScaleFactorAvg = TMath::Mean(AvgLayerSum.begin() + 8, AvgLayerSum.end()); //frp, 8 to 56 only
   if (ScaleFactorAvg <= 0)ScaleFactorAvg = 1.0;
-  //std::cout << "ScaleFactorAvg = " << ScaleFactorAvg << std::endl;
 
   //voting all wires with scale factor calculated from outer layer
   for (Int_t jwire = 0; jwire < 14336; jwire++) iWireTruncMean[jwire] /= ScaleFactorAvg;

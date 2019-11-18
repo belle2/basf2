@@ -24,7 +24,8 @@ for i in range(procid, procid + nnodes):
     nodeid = '%2.2d' % i
     if badlist.find(nodeid) == -1:
         nodename = nodebase + nodeid
-	haddcmd += ' ../evp_'+ nodename + '/histofile.root'
+#	haddcmd += ' ../evp_'+ nodename + '/histofile.root'
+	haddcmd += ' ../evp_'+ nodename + '/' + outfile
 
 print haddcmd
 

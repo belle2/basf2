@@ -46,12 +46,12 @@ namespace Belle2 {
     OPALFitterGSL::OPALFitterGSL()
       : npar(0), nmea(0), nunm(0), ncon(0), ierr(0), nit(0),
         fitprob(0), chi2(0),
-        f(0), r(0), Fetaxi(0), S(0), Sinv(0), SinvFxi(0), SinvFeta(0),
-        W1(0), G(0), H(0), HU(0), IGV(0), V(0), VLU(0), Vinv(0), Vnew(0),
-        Minv(0), dxdt(0), Vdxdt(0),
-        dxi(0), Fxidxi(0), lambda(0), FetaTlambda(0),
-        etaxi(0), etasv(0), y(0), y_eta(0), Vinvy_eta(0), FetaV(0),
-        permS(0), permU(0), permV(0), debug(0)
+        f(nullptr), r(nullptr), Fetaxi(nullptr), S(nullptr), Sinv(nullptr), SinvFxi(nullptr), SinvFeta(nullptr),
+        W1(nullptr), G(nullptr), H(nullptr), HU(nullptr), IGV(nullptr), V(nullptr), VLU(nullptr), Vinv(nullptr), Vnew(nullptr),
+        Minv(nullptr), dxdt(nullptr), Vdxdt(nullptr),
+        dxi(nullptr), Fxidxi(nullptr), lambda(nullptr), FetaTlambda(nullptr),
+        etaxi(nullptr), etasv(nullptr), y(nullptr), y_eta(nullptr), Vinvy_eta(nullptr), FetaV(nullptr),
+        permS(nullptr), permU(nullptr), permV(nullptr), debug(0)
     {}
 
 // destructor
@@ -90,38 +90,38 @@ namespace Belle2 {
       if (permU) gsl_permutation_free(permU);
       if (permV) gsl_permutation_free(permV);
 
-      f = 0;
-      r = 0;
-      Fetaxi = 0;
-      S = 0;
-      Sinv = 0;
-      SinvFxi = 0;
-      SinvFeta = 0;
-      W1 = 0;
-      G = 0;
-      H = 0;
-      HU = 0;
-      IGV = 0;
-      V = 0;
-      VLU = 0;
-      Vinv = 0;
-      Vnew = 0;
-      Minv = 0;
-      dxdt = 0;
-      Vdxdt = 0;
-      dxi = 0;
-      Fxidxi = 0;
-      lambda = 0;
-      FetaTlambda = 0;
-      etaxi = 0;
-      etasv = 0;
-      y = 0;
-      y_eta = 0;
-      Vinvy_eta = 0;
-      FetaV = 0;
-      permS = 0;
-      permU = 0;
-      permV = 0;
+      f = nullptr;
+      r = nullptr;
+      Fetaxi = nullptr;
+      S = nullptr;
+      Sinv = nullptr;
+      SinvFxi = nullptr;
+      SinvFeta = nullptr;
+      W1 = nullptr;
+      G = nullptr;
+      H = nullptr;
+      HU = nullptr;
+      IGV = nullptr;
+      V = nullptr;
+      VLU = nullptr;
+      Vinv = nullptr;
+      Vnew = nullptr;
+      Minv = nullptr;
+      dxdt = nullptr;
+      Vdxdt = nullptr;
+      dxi = nullptr;
+      Fxidxi = nullptr;
+      lambda = nullptr;
+      FetaTlambda = nullptr;
+      etaxi = nullptr;
+      etasv = nullptr;
+      y = nullptr;
+      y_eta = nullptr;
+      Vinvy_eta = nullptr;
+      FetaV = nullptr;
+      permS = nullptr;
+      permU = nullptr;
+      permV = nullptr;
     }
 
 // do it (~ transcription of WWFGO as of ww113)
@@ -178,9 +178,6 @@ namespace Belle2 {
       //
       //  Vdxdt is Vetaeta * dxdt^T, thus Vdxdt[nmea][npar]
       //  both needed for calculation of the full covariance matrix of the fitted parameters
-
-      // cout statements
-      int inverr = 0;
 
       // order parameters etc
       initialize();
@@ -307,8 +304,8 @@ namespace Belle2 {
         // Get covariance matrix
         gsl_matrix_set_zero(V);
 
-        for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
-          fitobjects[ifitobj]->addToGlobCov(V->block->data, V->tda);
+        for (auto& fitobject : fitobjects) {
+          fitobject->addToGlobCov(V->block->data, V->tda);
         }
         if (debug > 1)  debug_print(V, "V");
 
@@ -370,7 +367,7 @@ namespace Belle2 {
 // S is symmetric and positive definite
 
         gsl_linalg_LU_decomp(S, permS, &signum);
-        inverr = gsl_linalg_LU_invert(S, permS, Sinv);
+        int inverr = gsl_linalg_LU_invert(S, permS, Sinv);
 
         if (inverr != 0) {
           B2ERROR("S: gsl_linalg_LU_invert error " << inverr);
@@ -418,13 +415,17 @@ namespace Belle2 {
           // dxi = -alph*Fxi^T*lambda + 0*dxi
 
           B2DEBUG(11, "alph = " << alph);
-          if (debug > 1) debug_print(lambda, "lambda");
-          if (debug > 1) debug_print(&(Fxi.matrix), "Fxi");
+          if (debug > 1) {
+            debug_print(lambda, "lambda");
+            debug_print(&(Fxi.matrix), "Fxi");
+          }
 
           gsl_blas_dgemv(CblasTrans, -alph, &Fxi.matrix, lambda, 0, dxi);
 
-          if (debug > 1) debug_print(dxi, "dxi0");
-          if (debug > 1) debug_print(W1, "W1");
+          if (debug > 1) {
+            debug_print(dxi, "dxi0");
+            debug_print(W1, "W1");
+          }
 
           // now solve the system
           // Note added 23.12.04: W1 is symmetric and positive definite,
@@ -627,8 +628,10 @@ namespace Belle2 {
 
 // *-- Evaluate S and invert.
 
-        if (debug > 2) debug_print(&Vetaeta.matrix, "V");
-        if (debug > 2) debug_print(&Feta.matrix, "Feta");
+        if (debug > 2) {
+          debug_print(&Vetaeta.matrix, "V");
+          debug_print(&Feta.matrix, "Feta");
+        }
 
         // CblasRight means C = alpha B A + beta C with symmetric matrix A
         //FetaV[ncon][nmea] = 1*Feta[ncon][nmea]*V[nmea][nmea] + 0*FetaV
@@ -655,7 +658,7 @@ namespace Belle2 {
 
         int signum;
         gsl_linalg_LU_decomp(S, permS, &signum);
-        inverr = gsl_linalg_LU_invert(S, permS, Sinv);
+        int inverr = gsl_linalg_LU_invert(S, permS, Sinv);
 
         if (inverr != 0) {
           B2ERROR("S: gsl_linalg_LU_invert error " << inverr << " in error calculation");
@@ -838,13 +841,13 @@ namespace Belle2 {
 // *-- now we finally have Vnew, fill into fitobjects
 
         // update errors in fitobjects
-        for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
-          for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
-            int iglobal = fitobjects[ifitobj]->getGlobalParNum(ilocal);
-            for (int jlocal = ilocal; jlocal < fitobjects[ifitobj]->getNPar(); ++jlocal) {
-              int jglobal = fitobjects[ifitobj]->getGlobalParNum(jlocal);
+        for (auto& fitobject : fitobjects) {
+          for (int ilocal = 0; ilocal < fitobject->getNPar(); ++ilocal) {
+            int iglobal = fitobject->getGlobalParNum(ilocal);
+            for (int jlocal = ilocal; jlocal < fitobject->getNPar(); ++jlocal) {
+              int jglobal = fitobject->getGlobalParNum(jlocal);
               if (iglobal >= 0 && jglobal >= 0)
-                fitobjects[ifitobj]->setCov(ilocal, jlocal, gsl_matrix_get(Vnew, iglobal, jglobal));
+                fitobject->setCov(ilocal, jlocal, gsl_matrix_get(Vnew, iglobal, jglobal));
             }
           }
         }
@@ -852,7 +855,7 @@ namespace Belle2 {
         // Finally, copy covariance matrix
         if (cov && covDim != nmea + nunm) {
           delete[] cov;
-          cov = 0;
+          cov = nullptr;
         }
         covDim = nmea + nunm;
         if (!cov) cov = new double[covDim * covDim];
@@ -879,13 +882,13 @@ namespace Belle2 {
       // tell fitobjects the global ordering of their parameters:
       int iglobal = 0;
       // measured parameters first!
-      for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
-        for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
-          if (fitobjects[ifitobj]->isParamMeasured(ilocal) &&
-              !fitobjects[ifitobj]->isParamFixed(ilocal)) {
-            fitobjects[ifitobj]->setGlobalParNum(ilocal, iglobal);
-            B2DEBUG(10, "Object " << fitobjects[ifitobj]->getName()
-                    << " Parameter " << fitobjects[ifitobj]->getParamName(ilocal)
+      for (auto& fitobject : fitobjects) {
+        for (int ilocal = 0; ilocal < fitobject->getNPar(); ++ilocal) {
+          if (fitobject->isParamMeasured(ilocal) &&
+              !fitobject->isParamFixed(ilocal)) {
+            fitobject->setGlobalParNum(ilocal, iglobal);
+            B2DEBUG(10, "Object " << fitobject->getName()
+                    << " Parameter " << fitobject->getParamName(ilocal)
                     << " is measured, global number " << iglobal);
             ++iglobal;
           }
@@ -893,13 +896,13 @@ namespace Belle2 {
       }
       nmea = iglobal;
       // now  unmeasured parameters!
-      for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
-        for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
-          if (!fitobjects[ifitobj]->isParamMeasured(ilocal) &&
-              !fitobjects[ifitobj]->isParamFixed(ilocal)) {
-            fitobjects[ifitobj]->setGlobalParNum(ilocal, iglobal);
-            B2DEBUG(10, "Object " << fitobjects[ifitobj]->getName()
-                    << " Parameter " << fitobjects[ifitobj]->getParamName(ilocal)
+      for (auto& fitobject : fitobjects) {
+        for (int ilocal = 0; ilocal < fitobject->getNPar(); ++ilocal) {
+          if (!fitobject->isParamMeasured(ilocal) &&
+              !fitobject->isParamFixed(ilocal)) {
+            fitobject->setGlobalParNum(ilocal, iglobal);
+            B2DEBUG(10, "Object " << fitobject->getName()
+                    << " Parameter " << fitobject->getParamName(ilocal)
                     << " is unmeasured, global number " << iglobal);
             ++iglobal;
           }
@@ -992,9 +995,9 @@ namespace Belle2 {
       // changed etaxi -> eetaxi to avoid clash with class member DJeans
       //bool debug = false;
       bool result = true;
-      for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
-        for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
-          fitobjects[ifitobj]->updateParams(eetaxi, npar);
+      for (auto& fitobject : fitobjects) {
+        for (int ilocal = 0; ilocal < fitobject->getNPar(); ++ilocal) {
+          fitobject->updateParams(eetaxi, npar);
 //       }
         }
       }
@@ -1013,7 +1016,7 @@ namespace Belle2 {
         if (p->size != size) {
           gsl_permutation_free(p);
           if (size > 0) p = gsl_permutation_alloc(size);
-          else p = 0;
+          else p = nullptr;
         }
       } else if (size > 0) p = gsl_permutation_alloc(size);
     }
@@ -1025,7 +1028,7 @@ namespace Belle2 {
         if (v->size != size) {
           gsl_vector_free(v);
           if (size > 0) v = gsl_vector_alloc(size);
-          else v = 0;
+          else v = nullptr;
         }
       } else if (size > 0) v = gsl_vector_alloc(size);
     }
@@ -1036,7 +1039,7 @@ namespace Belle2 {
         if (m->size1 != size1 || m->size2 != size2) {
           gsl_matrix_free(m);
           if (size1 * size2 > 0) m = gsl_matrix_alloc(size1, size2);
-          else m = 0;
+          else m = nullptr;
         }
       } else if (size1 * size2 > 0) m = gsl_matrix_alloc(size1, size2);
     }

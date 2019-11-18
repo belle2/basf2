@@ -1,5 +1,4 @@
 #include <framework/dataobjects/FileMetaData.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/io/RootIOUtilities.h>
 #include <framework/io/RootFileInfo.h>
 #include <framework/logging/Logger.h>
@@ -11,11 +10,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include <TSystem.h>
 #include <TFile.h>
 #include <TTree.h>
 #include <TBranchElement.h>
-#include <TClonesArray.h>
 
 #include <iostream>
 #include <iomanip>
@@ -28,7 +25,7 @@ namespace fs = boost::filesystem;
 
 /** Simple typedef to conveniently define a exp,run,evt structure with a
  * working comparison operator */
-typedef std::tuple<int, int, unsigned int> EventInfo;
+using EventInfo = std::tuple<int, int, unsigned int>;
 
 int main(int argc, char* argv[])
 {
@@ -135,7 +132,7 @@ The following restrictions apply:
       // File looks good so far, now fix the persistent stuff, i.e. merge all
       // objects in persistent tree
       for(TObject* brObj: *fileInfo.getPersistentTree().GetListOfBranches()){
-        TBranchElement* br = dynamic_cast<TBranchElement*>(brObj);
+        auto* br = dynamic_cast<TBranchElement*>(brObj);
         // FileMetaData is handled separately
         if(br && br->GetTargetClass() == FileMetaData::Class() && std::string(br->GetName()) == "FileMetaData")
           continue;
@@ -200,10 +197,10 @@ The following restrictions apply:
         }
         if(fileMetaData.getDataDescription() != outputMetaData->getDataDescription()){
           KeyValuePrinter cur(true);
-          for (auto descrPair : outputMetaData->getDataDescription())
+          for (const auto& descrPair : outputMetaData->getDataDescription())
             cur.put(descrPair.first, descrPair.second);
           KeyValuePrinter prev(true);
-          for (auto descrPair : fileMetaData.getDataDescription())
+          for (const auto& descrPair : fileMetaData.getDataDescription())
             prev.put(descrPair.first, descrPair.second);
 
           B2ERROR("dataDescription in " << std::quoted(input) << " differs from previous files:\n" << cur.string() << " vs.\n" << prev.string());
@@ -293,7 +290,7 @@ The following restrictions apply:
   for (const auto& input : inputfilenames) {
     B2INFO("processing events from " << std::quoted(input));
     TFile tfile(input.c_str());
-    TTree* tree = dynamic_cast<TTree*>(tfile.Get("tree"));
+    auto* tree = dynamic_cast<TTree*>(tfile.Get("tree"));
     if(!outputEventTree){
       output.cd();
       outputEventTree = tree->CloneTree(0);
@@ -338,7 +335,7 @@ The following restrictions apply:
   outputMetaDataTree.Write();
 
   // now clean up the mess ...
-  for(auto val: persistentMergeables){
+  for(const auto& val: persistentMergeables){
     delete val.second.first;
   }
   persistentMergeables.clear();

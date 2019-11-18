@@ -95,8 +95,12 @@ run = int(int(run) + 1)
 
 # TO DO, enable calibration of calib or mapping, depending on the user input
 
+# importer class for local calibrations
+
 
 class dbImporterModule(Module):
+
+    # do everything in the begin run method
     def beginRun(self):
         # call the importer class
         dbImporter = SVDDatabaseImporter(experiment, run, experiment, -1)

@@ -59,7 +59,6 @@
 #include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>
 #include <genfit/TGeoMaterialInterface.h>
-#include <genfit/MeasurementFactory.h>
 
 #include <cstdlib>
 #include <iomanip>

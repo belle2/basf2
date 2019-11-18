@@ -20,7 +20,7 @@ namespace Belle2 {
 
   public:
 
-
+    /** typedef of the output calibration function*/
     typedef bool (SVDHitTimeSelectionFunction::*selFunction)(double, double, double, double) const;
 
     /** returns whether the hit came on time or not */
@@ -82,27 +82,28 @@ namespace Belle2 {
     /** function parameters & implementations*/
 
     /** FIRST VERSION, ID = 0: isOnTime if t > m_tMin */
-    double m_tMin; /**< minimum cluster time*/
     bool firstVersion(double svdTime, double /* svdTimeError */, double /* t0 */, double /* t0Error */) const
     {
       return svdTime > m_tMin;
     };
+    double m_tMin; /**< minimum cluster time*/
 
     /** SECOND VERSION, ID = 1: isOnTime if |t - t0|< deltaT */
-    double m_deltaT; /**< minimum time distance wrt t0 */
     bool secondVersion(double svdTime, double /* svdTimeError */, double t0, double /* t0Error */) const
     {
       return fabs(svdTime - t0) < m_deltaT;
     };
+    double m_deltaT; /**< minimum time distance wrt t0 */
 
 
     /** THIRD VERSION, ID = 2: isOnTime if |t - t0|< nSigma*sigma */
-    double m_nSigma; /**< number of Sigma */
     bool thirdVersion(double svdTime, double svdTimeError, double t0, double t0Error) const
     {
       float err2 = svdTimeError * svdTimeError + t0Error * t0Error;
       return (svdTime - t0) * (svdTime - t0) < m_nSigma * m_nSigma * err2;
     };
+    double m_nSigma; /**< number of Sigma */
+
 
     /** current function ID */
     int m_current;
@@ -110,7 +111,7 @@ namespace Belle2 {
     static std::vector < selFunction > m_implementations; //! Do not stream this, please throw it in the WC
 
 
-    ClassDef(SVDHitTimeSelectionFunction, 2)
+    ClassDef(SVDHitTimeSelectionFunction, 2) /**< needed by root*/
   };
 
 }

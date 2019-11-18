@@ -23,7 +23,7 @@ namespace Belle2 {
   public:
     /** Default constructor*/
     SVDSummaryPlots():
-      SVDSummaryPlots("", "") {};
+      SVDSummaryPlots("", "") {}; /**< this is the default constructor */
 
     /** Use @param template to initialize both the histograms*/
     SVDSummaryPlots(TString name, TString title)
@@ -41,9 +41,11 @@ namespace Belle2 {
     }
 
 
+    /** clean everything in the destructor */
     ~SVDSummaryPlots() { clean(); };
-    // This enumeration assure the same semantic of the
-    // isU methods defined by Peter Kv.
+
+    /** This enumeration assure the same semantic of the
+    isU methods defined by Peter Kv.*/
     enum E_side { VIndex = 0 , UIndex = 1 };
 
     /** get a reference to the histogram for @param vxdID side @param view
@@ -63,6 +65,7 @@ namespace Belle2 {
       return returnValue;
     }
 
+    /** get the value contained in the corresponding bin, given VxdID and view*/
     float getValue(const VxdID& vxdID, int view)
     {
       int layer = vxdID.getLayerNumber();
@@ -73,6 +76,7 @@ namespace Belle2 {
       return getHistogram(view)->GetBinContent(bin);
     }
 
+    /** get the value contained in the corresponding bin, given layer, ladder, sensor and view*/
     float getValue(int layer, int ladder, int sensor, int view)
     {
       int bin = m_histos[view]->FindBin(ladder, findBinY(layer, sensor));
@@ -108,6 +112,7 @@ namespace Belle2 {
       getHistogram(view)->Fill(ladder, findBinY(layer, sensor), value);
     }
 
+    /** replaces layer ladder sensor view and apv with the current numbers*/
     void customizeString(std::string& base, bool isU)
     {
       std::string view = isU ? "U" : "V" ;
@@ -128,6 +133,7 @@ namespace Belle2 {
 
   private:
 
+    /** find the Y bin given the layer and sensor number */
     Int_t findBinY(Int_t layer, Int_t sensor)
     {
 
@@ -143,10 +149,11 @@ namespace Belle2 {
         return -1;
     }
 
-    TH2F* m_histos[2];
+    TH2F* m_histos[2]; /**< vector containing the U and V histograms*/
 
-    TH2F* m_defaultHistogram;
+    TH2F* m_defaultHistogram; /**< default histograms*/
 
+    /** customize the histogram with the sensor, view*/
     void customize(TH2F& histogram, int view)
     {
 
@@ -187,7 +194,7 @@ namespace Belle2 {
     }
 
 
-    ClassDef(SVDSummaryPlots , 1);
+    ClassDef(SVDSummaryPlots , 1); /**< needed by root */
   };
 
 

@@ -11,8 +11,6 @@
 
 #include <framework/logging/LogConnectionFilter.h>
 
-#include <sstream>
-
 using namespace Belle2;
 using namespace std;
 

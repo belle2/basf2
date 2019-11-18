@@ -73,7 +73,7 @@ namespace Belle2 {
     }
 
 // destructor
-    JetFitObject::~JetFitObject() {}
+    JetFitObject::~JetFitObject() = default;
 
     JetFitObject::JetFitObject(const JetFitObject& rhs)
       : ParticleFitObject(rhs), ctheta(0), stheta(0), cphi(0), sphi(0),
@@ -98,7 +98,7 @@ namespace Belle2 {
 
     JetFitObject& JetFitObject::assign(const BaseFitObject& source)
     {
-      if (const JetFitObject* psource = dynamic_cast<const JetFitObject*>(&source)) {
+      if (const auto* psource = dynamic_cast<const JetFitObject*>(&source)) {
         if (psource != this) {
           ParticleFitObject::assign(source);
           // only mutable data members, need not to be copied, if cache is invalid

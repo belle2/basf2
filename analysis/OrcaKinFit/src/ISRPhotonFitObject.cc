@@ -36,7 +36,6 @@ using namespace marlin;
 #endif
 
 namespace Belle2 {
-
   namespace OrcaKinFit {
 
     static const double pi_ = M_PI, // 3.14159265358979323846264338328,
@@ -88,7 +87,7 @@ namespace Belle2 {
     }
 
 // destructor
-    ISRPhotonFitObject::~ISRPhotonFitObject() {}
+    ISRPhotonFitObject::~ISRPhotonFitObject() = default;
 
 
     ISRPhotonFitObject::ISRPhotonFitObject(const ISRPhotonFitObject& rhs)
@@ -116,7 +115,7 @@ namespace Belle2 {
 
     ISRPhotonFitObject& ISRPhotonFitObject::assign(const BaseFitObject& source)
     {
-      if (const ISRPhotonFitObject* psource = dynamic_cast<const ISRPhotonFitObject*>(&source)) {
+      if (const auto* psource = dynamic_cast<const ISRPhotonFitObject*>(&source)) {
         if (psource != this) {
           ParticleFitObject::assign(source);
           // only mutable data members, need not to be copied, if cache is invalid

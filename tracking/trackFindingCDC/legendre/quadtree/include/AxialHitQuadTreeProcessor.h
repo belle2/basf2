@@ -97,8 +97,9 @@ namespace Belle2 {
       bool checkExtremum(QuadTree* node, const CDCWireHit* wireHit) const;
 
     public: // debug stuff
-      /// Draw QuadTree nodes
+      /// Draw QuadTree node
       void drawHits(std::vector<const CDCWireHit*> hits, unsigned int color = 46) const;
+      /// Draw QuadTree node
       void drawNode(QuadTree* node) const;
 
     private:

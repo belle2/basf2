@@ -75,7 +75,7 @@ TObject* Stream::deserializeEncodedRawData(const std::string& base64Data)
   if (msg.What() != kMESS_OBJECT or msg.GetClass() == nullptr) {
     return nullptr;
   }
-  TObject* obj = static_cast<TObject*>(msg.ReadObjectAny(msg.GetClass()));
+  auto* obj = static_cast<TObject*>(msg.ReadObjectAny(msg.GetClass()));
 
   return obj;
 }

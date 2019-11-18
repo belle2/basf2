@@ -66,6 +66,8 @@ void TrackCreatorSegmentPairAutomaton::apply(
       // Return false to continue looking
       return false;
     };
+    // return value is not needed here
+    // cppcheck-suppress ignoredReturnValue
     std::adjacent_find(segmentPairPath.begin(), segmentPairPath.end(), saverStereoApogeePositions);
 
     // Compute the average recohits with the preliminary fits

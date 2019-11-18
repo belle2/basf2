@@ -31,7 +31,7 @@ namespace Belle2 {
        *  Constructor also setting the switch if the reversed version of a facet
        *  (in comparision to MC truth) shall be accepted.
        */
-      MCFacetRelationFilter(bool allowReverse = false);
+      explicit MCFacetRelationFilter(bool allowReverse = false);
 
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;

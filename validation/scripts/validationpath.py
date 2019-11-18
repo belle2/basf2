@@ -58,7 +58,7 @@ def get_tag_comparison_folder(tags):
     if not isinstance(tags, list):
         raise Exception("Provided input must be a list of tags")
 
-    return '_'.join(sorted(tags))
+    return '_'.join(tags)
 
 
 def get_html_plots_tag_comparison_folder(output_base_dir, tags):

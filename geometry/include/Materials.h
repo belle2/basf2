@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2019 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter                                            *
@@ -8,12 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MATERIALS_H
-#define MATERIALS_H
+#pragma once
+#include <framework/core/MRUCache.h>
 
+#include <optional>
+#include <set>
 #include <string>
 #include <vector>
-#include <framework/core/MRUCache.h>
 
 class G4Material;
 class G4Element;
@@ -128,6 +129,21 @@ namespace Belle2 {
       /** Clear all existing materials */
       void clear();
 
+      /** Set the density scale to the given value */
+      void setDensityScale(double scale)
+      {
+        if (scale == 1.0) return resetDensityScale();
+        m_densityScale = scale;
+      }
+      /** Disable density scaling */
+      void resetDensityScale()
+      {
+        m_densityScale.reset();
+      }
+      /** get the set of material names which will **not** be scaled in any way */
+      std::set<std::string> getDensityScaleIgnoredMaterials() const { return m_ignoreScaling; }
+      /** set the set of material names which will **not** be scaled in any way */
+      void setDensityScaleIgnoredMaterials(const std::set<std::string>& ignored) { m_ignoreScaling = ignored; }
     protected:
       /** Singleton: hide constructor */
       Materials(): m_materialCache(CacheSize) {};
@@ -135,6 +151,8 @@ namespace Belle2 {
       Materials(const Materials&) = delete;
       /** Singleton: hide assignment operator */
       void operator=(const Materials&) = delete;
+      /** find an existing material by name */
+      G4Material* findMaterial(const std::string& name);
 
       /** Cache for already searched Materials */
       mutable MRUCache<std::string, G4Material*> m_materialCache;
@@ -153,9 +171,11 @@ namespace Belle2 {
 
       /** Initialize Nist Builder instances */
       void initBuilders();
+
+      /** If set we scale all densities by a given factor */
+      std::optional<double> m_densityScale;
+      /** Names of materials we don't want to scale */
+      std::set<std::string> m_ignoreScaling{"G4_AIR", "Air", "Vacuum"};
     };
-
   } //geometry namespace
-
 } //Belle2 namespace
-#endif

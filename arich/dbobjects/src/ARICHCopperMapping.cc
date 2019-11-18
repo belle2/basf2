@@ -10,12 +10,10 @@
 
 #include <arich/dbobjects/ARICHCopperMapping.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 #include <arich/dbobjects/ARICHMergerMapping.h>
 
 #include <iostream>
-#include <iomanip>
 #include <vector>
 #include <algorithm>
 

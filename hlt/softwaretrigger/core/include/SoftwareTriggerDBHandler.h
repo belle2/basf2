@@ -10,8 +10,8 @@
 #pragma once
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerCut.h>
-#include <hlt/softwaretrigger/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
-#include <hlt/softwaretrigger/dbobjects/SoftwareTriggerMenu.h>
+#include <mdst/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
+#include <mdst/dbobjects/SoftwareTriggerMenu.h>
 #include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
@@ -39,6 +39,13 @@ namespace Belle2 {
       static const std::string s_dbPackageIdentifier;
       /// Common suffix to identify all total results in the stored results.
       static const std::string s_totalResultIdentifier;
+
+      /**
+       * Helper factory function to generate a unique cut pointer
+       * from its representation in the database.
+       * Was part of the DBRepresentation before, but is now a standalone function.
+       */
+      static std::unique_ptr<SoftwareTriggerCut> createCutFromDB(const DBRepresentationOfSoftwareTriggerCut& dbCut);
 
       /**
        * Helper function to compile the full identifier from the base and the specific cut name.

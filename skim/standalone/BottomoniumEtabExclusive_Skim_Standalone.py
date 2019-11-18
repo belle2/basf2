@@ -10,8 +10,8 @@
 from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-00'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-04-00-00'
 import sys
 import os
 import glob
@@ -20,14 +20,8 @@ import glob
 BottomoniumEtabskimpath = Path()
 
 skimCode = encodeSkimName('BottomoniumEtabExclusive')
-fileList = \
-    [
-        '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-        'mdst_000001_prod00002288_task00000001.root'
-    ]
-
-
-inputMdstList('MC9', fileList, path=BottomoniumEtabskimpath)
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=BottomoniumEtabskimpath)
 
 
 stdPhotons('loose', path=BottomoniumEtabskimpath)

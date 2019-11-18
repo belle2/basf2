@@ -11,15 +11,18 @@
 #include <hlt/softwaretrigger/calculations/utilities.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
+#include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <numeric>
-#include <iostream>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
 SkimSampleCalculator::SkimSampleCalculator() :
-  m_monopoleRecoTracks("RecoTracksMpl"),
   m_pionParticles("pi+:skim"), m_gammaParticles("gamma:skim")
 {
 
@@ -27,7 +30,6 @@ SkimSampleCalculator::SkimSampleCalculator() :
 
 void SkimSampleCalculator::requireStoreArrays()
 {
-  m_monopoleRecoTracks.isRequired();
   m_pionParticles.isRequired();
   m_gammaParticles.isRequired();
 };
@@ -332,6 +334,105 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   if (gg_tag) ggSel = 1;
   calculationResult["GG"] = ggSel;
 
-  // Monopole searches
-  calculationResult["nMplTracks"] = m_monopoleRecoTracks.getEntries();
+  // Bhabha skim with ECL information only (bhabhaecl)
+  double BhabhaECL = 0.;
+  ClusterUtils Cls;
+  for (int i = 0; i < eclClusters.getEntries() - 1; i++) {
+    if (!eclClusters[i]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+      continue;
+
+    TLorentzVector V4g1 = PCmsLabTransform::labToCms(Cls.Get4MomentumFromCluster(eclClusters[i],
+                                                     ECLCluster::EHypothesisBit::c_nPhotons));
+    double Eg1ob = V4g1.E() / (2 * BeamEnergyCMS());
+    for (int j = i + 1; j < eclClusters.getEntries(); j++) {
+      if (!eclClusters[j]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+        continue;
+      TLorentzVector V4g2 = PCmsLabTransform::labToCms(Cls.Get4MomentumFromCluster(eclClusters[j],
+                                                       ECLCluster::EHypothesisBit::c_nPhotons));
+      double Eg2ob = V4g2.E() / (2 * BeamEnergyCMS());
+      const TVector3 V3g1 = V4g1.Vect();
+      const TVector3 V3g2 = V4g2.Vect();
+      double Thetag1 = V4g1.Theta() * TMath::RadToDeg();
+      double Thetag2 = V4g2.Theta() * TMath::RadToDeg();
+      double deltphi = fabs(V3g1.DeltaPhi(V3g2) * TMath::RadToDeg());
+      double Tsum = Thetag1 + Thetag2;
+      if ((deltphi > 165. && deltphi < 178.5) && (Eg1ob > 0.4 && Eg2ob > 0.4 && (Eg1ob > 0.45 || Eg2ob > 0.45)) && (Tsum > 178.
+          && Tsum < 182.)) BhabhaECL = 1;
+    }
+  }
+  calculationResult["BhabhaECL"] = BhabhaECL;
+
+  // Radiative Bhabha skim (radee) for CDC dE/dx calib studies
+  double radee = 0.;
+  const double lowdEdxEdge = 0.8, highdEdxEdge = 1.2;
+  const double lowEoPEdge = 0.8, highEoPEdge = 1.2;
+
+  if (m_pionParticles->getListSize() == 2) {
+
+    //------------First track variables----------------
+    for (unsigned int i = 0; i < m_pionParticles->getListSize() - 1; i++) {
+
+      Particle* part1 = m_pionParticles->getParticle(i);
+      if (!part1) continue;
+
+      const auto chargep1 = part1->getCharge();
+      if (abs(chargep1) != 1) continue;
+
+      const ECLCluster* eclTrack1 = part1->getECLCluster();
+      if (!eclTrack1) continue;
+      if (!eclTrack1->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
+
+      const double& momentum1 = part1->getMomentumMagnitude();
+      const double& energyOverMomentum1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / momentum1;
+      if (energyOverMomentum1 <= lowEoPEdge || energyOverMomentum1 >= highEoPEdge) continue;
+
+      const Track* track1 = part1->getTrack();
+      if (!track1) continue;
+
+      const TrackFitResult* trackFit1 = track1->getTrackFitResultWithClosestMass(Const::pion);
+      if (!trackFit1) continue;
+      if (trackFit1->getHitPatternCDC().getNHits() <= 0) continue;
+
+      const CDCDedxTrack* dedxTrack1 = track1->getRelatedTo<CDCDedxTrack>();
+      if (!dedxTrack1) continue;
+
+      //------------Second track variables----------------
+      for (unsigned int j = i + 1; j < m_pionParticles->getListSize(); j++) {
+
+        Particle* part2 = m_pionParticles->getParticle(j);
+        if (!part2) continue;
+
+        const auto chargep2 = part2->getCharge();
+        if (abs(chargep2) != 1 || (chargep1 + chargep2 != 0)) continue;
+
+        const ECLCluster* eclTrack2 = part2->getECLCluster();
+        if (!eclTrack2) continue;
+        if (!eclTrack2->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
+
+        const double& momentum2 = part2->getMomentumMagnitude();
+        const double& energyOverMomentum2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / momentum2;
+        if (energyOverMomentum2 <= lowEoPEdge || energyOverMomentum2 >= highEoPEdge) continue;
+
+        const Track* track2 = part2->getTrack();
+        if (!track2) continue;
+
+        const TrackFitResult* trackFit2 = track2->getTrackFitResultWithClosestMass(Const::pion);
+        if (!trackFit2) continue;
+        if (trackFit2->getHitPatternCDC().getNHits() <= 0) continue;
+
+        CDCDedxTrack* dedxTrack2 = track2->getRelatedTo<CDCDedxTrack>();
+        if (!dedxTrack2) continue;
+
+        double p1_dedxnosat = dedxTrack1->getDedxNoSat();
+        double p2_dedxnosat = dedxTrack2->getDedxNoSat();
+
+        if ((p1_dedxnosat > lowdEdxEdge && p1_dedxnosat < highdEdxEdge)  || (p2_dedxnosat > lowdEdxEdge
+            && p2_dedxnosat < highdEdxEdge))radee = 1;
+
+      }
+    }
+  }
+
+  calculationResult["Radee"] = radee;
+
 }

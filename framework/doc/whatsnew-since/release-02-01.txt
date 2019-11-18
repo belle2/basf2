@@ -29,9 +29,9 @@ might notice are
 * Display and colouring of log messages in Jupyter_ has been significantly
   improved and should now be much faster.
 
-* There's a new implementation for `pager.Pager` which can also show output
-  from C++ programs and will display the output incrementally instead of
-  waiting for all output before showing everything.
+* There's a new implementation for `pager.Pager <terminal_utils.Pager>` which
+  can also show output from C++ programs and will display the output
+  incrementally instead of waiting for all output before showing everything.
 
 Command Line Tools
 ++++++++++++++++++

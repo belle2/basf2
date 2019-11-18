@@ -81,8 +81,8 @@ void IntervalOfValidity::makeValid()
 
 bool IntervalOfValidity::contains(const EventMetaData& event) const
 {
-  int experiment = (int) event.getExperiment();
-  int run = (int) event.getRun();
+  auto experiment = (int) event.getExperiment();
+  auto run = (int) event.getRun();
 
   // check for empty interval
   if (empty()) return false;

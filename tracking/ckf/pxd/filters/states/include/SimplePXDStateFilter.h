@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/ckf/pxd/filters/states/BasePXDStateFilter.h>
-#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 #include <tracking/ckf/pxd/utilities/PXDKalmanStepper.h>
 
 namespace Belle2 {
@@ -20,12 +19,16 @@ namespace Belle2 {
     /// Set the cached B field
     void beginRun() final;
 
+    /// default constructor to silence the cppcheck warnings
+    SimplePXDStateFilter() = default;
+
     TrackFindingCDC::Weight operator()(const BasePXDStateFilter::Object& pair) final;
 
   private:
     /// Cache for the B field at the IP
     double m_cachedBField;
 
+    /// Kalman stepper (CKF) for PXD
     PXDKalmanStepper m_kalmanStepper;
 
     /// Shortcut for a 2x3 array.

@@ -10,14 +10,14 @@
 
 #include <analysis/modules/BestCandidateSelection/BestCandidateSelectionModule.h>
 
-#include <analysis/VariableManager/Utility.h>
+#include <analysis/utility/ValueIndexPairSorting.h>
 
+#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/MakeROOTCompatible.h>
-
-#include <map>
 
 using namespace std;
 using namespace Belle2;
@@ -39,7 +39,7 @@ starting at 1 (best). The name of this extra-info field defaults to
 parameter.
 
 The ranking also takes antiparticles into account, so there will only be one
-B+- candidate with `rank=1`.  The remaining list is sorted from best to worst
+B+- candidate with ``rank=1``.  The remaining list is sorted from best to worst
 candidate (each charge, e.g. B+/B-, separately). The sorting is guaranteed
 to be stable between particle and anti particle list: particles with the same
 value for ``variable`` will keep their relative order. That is, a particle "A"
@@ -70,9 +70,7 @@ output list. If ``allowMultiRank=True`` that means that there can be more than
 
 }
 
-BestCandidateSelectionModule::~BestCandidateSelectionModule()
-{
-}
+BestCandidateSelectionModule::~BestCandidateSelectionModule() = default;
 
 void BestCandidateSelectionModule::initialize()
 {
@@ -104,19 +102,8 @@ void BestCandidateSelectionModule::event()
     return;
   }
 
-  // define the criteria for "best"
-  typedef std::pair<double, unsigned int> ValueIndexPair;
-  auto betterThan = [this](const ValueIndexPair & a, const ValueIndexPair & b) -> bool {
-    // always sort NaN to the high ranks: it's never a good thing to have nan in front
-    if (std::isnan(a.first)) return false;
-    if (std::isnan(b.first)) return true;
-    if (m_selectLowest)
-      return a.first < b.first;
-    else
-      return a.first > b.first;
-  };
-
   // create list of particle index and the corresponding value of variable
+  typedef std::pair<double, unsigned int> ValueIndexPair;
   std::vector<ValueIndexPair> valueToIndex;
   const unsigned int numParticles = m_inputList->getListSize();
   valueToIndex.reserve(numParticles);
@@ -127,7 +114,11 @@ void BestCandidateSelectionModule::event()
 
   // use stable sort to make sure we keep the relative order of elements with
   // same value as it was before
-  std::stable_sort(valueToIndex.begin(), valueToIndex.end(), betterThan);
+  if (m_selectLowest) {
+    std::stable_sort(valueToIndex.begin(), valueToIndex.end(), ValueIndexPairSorting::lowerPair<ValueIndexPair>);
+  } else {
+    std::stable_sort(valueToIndex.begin(), valueToIndex.end(), ValueIndexPairSorting::higherPair<ValueIndexPair>);
+  }
 
   // assign ranks and (optionally) remove everything but best candidates
   m_inputList->clear();

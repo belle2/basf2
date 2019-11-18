@@ -63,6 +63,9 @@ namespace Belle2 {
     int m_nnodes;
     char m_nodename[256];
 
+    int m_expno;
+    int m_runno;
+
   };
 
 }

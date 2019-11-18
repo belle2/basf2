@@ -21,7 +21,6 @@
 #include <TParameter.h>
 #include <TH2F.h>
 #include <TF1.h>
-#include <TMath.h>
 
 namespace Belle2 {
 

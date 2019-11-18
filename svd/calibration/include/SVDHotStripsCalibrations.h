@@ -30,8 +30,9 @@ namespace Belle2 {
    */
   class SVDHotStripsCalibrations {
   public:
-    static std::string name;
-    typedef SVDCalibrationsBase< SVDCalibrationsBitmap > t_payload;
+    static std::string name; /**< name of the SVDHotStripsCalibrations payload */
+    typedef SVDCalibrationsBase< SVDCalibrationsBitmap >
+    t_payload; /**< typedef of the SVDHotStripsCalibrations payload for all SVD strips*/
 
     /** Constructor, no input argument is required */
     SVDHotStripsCalibrations(): m_aDBObjPtr(name)
@@ -68,7 +69,7 @@ namespace Belle2 {
     bool isValid() { return m_aDBObjPtr.isValid(); }
 
   private:
-    DBObjPtr< t_payload > m_aDBObjPtr;
+    DBObjPtr< t_payload > m_aDBObjPtr; /**< SVDHotStripsCalibrations payload */
 
 
   };

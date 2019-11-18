@@ -83,6 +83,11 @@ SoftwareTriggerCutResult FinalTriggerDecisionCalculator::getModuleResult(const S
       continue;
     }
 
+    if (cutName == SoftwareTriggerDBHandler::makeTotalResultName(baseIdentifier)) {
+      B2WARNING("The store object already includes a result for this module. Will overwrite it.");
+      continue;
+    }
+
     const SoftwareTriggerCutResult cutResult = static_cast<SoftwareTriggerCutResult>(resultWithName.second);
 
     if (cutResult == SoftwareTriggerCutResult::c_accept) {

@@ -12,37 +12,19 @@
 #include <arich/utility/ARICHAerogelHist.h>
 
 //c, c++
-#include <stdio.h>
-//#include <assert.h>
-#include <stdlib.h>
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <iomanip>
-#include <time.h>
-#include <math.h>
 #include <vector>
 
 //root
 #include <TVector2.h>
-#include <TPolyLine.h>
-#include <TLine.h>
 #include <TCanvas.h>
-#include <TGraph.h>
-#include <TText.h>
 #include <TMath.h>
-#include <TH2F.h>
-#include <TLegend.h>
-#include <TCrown.h>
-#include <TArc.h>
-#include <TROOT.h>
-#include <TRandom3.h>
-#include <TStyle.h>
 #include <TPad.h>
 #include <TString.h>
 #include <TFile.h>
 #include <TAxis.h>
-#include <TVector2.h>
 
 using namespace std;
 using namespace Belle2;

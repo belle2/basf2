@@ -34,9 +34,9 @@ namespace Belle2 {
     static void prependModulesIfNotPresent(ModulePtrList* modules, const ModulePtrList& prependModules);
 
     /// Prepend given modules to the path
-    static void appendModule(PathPtr& path, ModulePtr module);
+    static void appendModule(PathPtr& path, const ModulePtr& module);
 
     /// Append given modules to the path
-    static void prependModule(PathPtr& path, ModulePtr module);
+    static void prependModule(PathPtr& path, const ModulePtr& module);
   };
 } // namespace Belle2

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# @cond
+# @cond SUPPRESS_DOXYGEN
 
 # Thoms Keck 2017
 
@@ -243,6 +243,7 @@ class MonitoringNTuple(object):
     """
     Reads the ntuple named variables from a ROOT file
     """
+
     def __init__(self, filename):
         """
         Reads ntuple from the given file
@@ -265,6 +266,7 @@ class MonitoringModuleStatistics(object):
     Reads the module statistics for a single particle from the outputted root file
     and puts them into a more accesable format
     """
+
     def __init__(self, particle):
         """
         Reads the module statistics from the file named Monitor_ModuleStatistics.root
@@ -541,6 +543,7 @@ class MonitoringParticle(object):
     Monitoring object containing all the monitoring information
     about a single particle
     """
+
     def __init__(self, particle):
         """
         Read the monitoring information of the given particle
@@ -643,3 +646,5 @@ class MonitoringParticle(object):
         nSig = hist.values['extraInfo(uniqueSignal)'][signal_bins].sum()
         nBg = hist.values['extraInfo(uniqueSignal)'][bckgrd_bins].sum()
         return Statistic(nTrueSig, nSig, nBg)
+
+# @endcond

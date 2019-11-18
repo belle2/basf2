@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# @cond
+# @cond SUPPRESS_DOXYGEN
 
 # Thomas Keck 2017
 
@@ -21,9 +21,9 @@
  There are 7 stages:
    (Stage -1: Write out information about the provided data sample)
    Stage 0: Final State Particles (FSP)
-   Stage 1: pi0, J/Psi
-   Stage 2: K_S0
-   Stage 3: D mesons
+   Stage 1: pi0, J/Psi, Lambda0
+   Stage 2: K_S0, Sigma+
+   Stage 3: D and Lambda_c mesons
    Stage 4: D* mesons
    Stage 5: B mesons
    Stage 6: Finish
@@ -180,6 +180,7 @@ class FSPLoader(object):
             fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
                                ('mu+:FSP', ''), ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
             for outputList, inputList in [('gamma:FSP', 'gamma:mdst'), ('K_S0:V0', 'K_S0:mdst'),
+                                          ('Lambda0:V0', 'Lambda0:mdst'),
                                           ('pi0:FSP', 'pi0:mdst'), ('gamma:V0', 'gamma:v0mdst')]:
                 copyParticles(outputList, inputList, writeOut=True, path=path)
         else:
@@ -187,7 +188,7 @@ class FSPLoader(object):
                                ('mu+:FSP', ''), ('gamma:FSP', ''),
                                ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
             fillParticleList('K_S0:V0 -> pi+ pi-', '', writeOut=True, path=path)
-            fillParticleList('Lambda0:FSP -> p+ pi-', '', writeOut=True, path=path)
+            fillParticleList('Lambda0:V0 -> p+ pi-', '', writeOut=True, path=path)
             fillConvertedPhotonsList('gamma:V0 -> e+ e-', '', writeOut=True, path=path)
 
         if self.config.monitor:
@@ -704,9 +705,9 @@ def get_stages_from_particles(particles: typing.Sequence[config.Particle]):
     """
     stages = [
         [p for p in particles if p.name in ['e+', 'K+', 'pi+', 'mu+', 'gamma', 'p+', 'K_L0']],
-        [p for p in particles if p.name in ['pi0', 'J/psi',  'phi']],
-        [p for p in particles if p.name in ['K_S0']],
-        [p for p in particles if p.name in ['D+', 'D0', 'D_s+']],
+        [p for p in particles if p.name in ['pi0', 'J/psi', 'Lambda0', 'phi']],
+        [p for p in particles if p.name in ['K_S0', 'Sigma+']],
+        [p for p in particles if p.name in ['D+', 'D0', 'D_s+', 'Lambda_c+']],
         [p for p in particles if p.name in ['D*+', 'D*0', 'D_s*+']],
         [p for p in particles if p.name in ['B0', 'B+', 'B_s0']],
         []
@@ -905,3 +906,5 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
 
     # Finally we return the path, the stage and the used lists to the user.
     return FeiState(path, stage + 1, plists=used_lists)
+
+# @endcond

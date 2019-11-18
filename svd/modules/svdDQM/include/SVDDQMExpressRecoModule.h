@@ -13,6 +13,8 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
@@ -47,6 +49,9 @@ namespace Belle2 {
     void defineHisto() override final;
 
   private:
+
+    /// Store Object for reading the trigger decision.
+    StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
 
     /** list of cumulative histograms */
     TList* m_cumHistos = nullptr;

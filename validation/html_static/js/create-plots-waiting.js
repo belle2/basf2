@@ -46,7 +46,7 @@ function installPlottingProgress(revList, joinedRevisions, progressKey, waitTime
                         // is the plotting complete and the overlay can be hidden again ?
                         // load the newly generated plots
                         console.log("Plot creation for revisions " + revString + " complete");
-                        setupRactiveFromRevision(revData, revList);
+                        setupRactiveFromRevision(revList);
                         $("#outer").hide();
                     } else {
                         // detailed progress message

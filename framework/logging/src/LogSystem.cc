@@ -17,7 +17,7 @@
 #include <framework/datastore/DataStore.h>
 
 #include <TROOT.h>
-#include <signal.h>
+#include <csignal>
 
 #include <cstdio>
 #include <iostream>
@@ -63,7 +63,7 @@ bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, const
 bool LogSystem::sendMessage(LogMessage&& message)
 {
   LogConfig::ELogLevel logLevel = message.getLogLevel();
-  map<string, LogConfig>::const_iterator packageLogConfig = m_packageLogConfigs.find(message.getPackage());
+  auto packageLogConfig = m_packageLogConfigs.find(message.getPackage());
   if ((packageLogConfig != m_packageLogConfigs.end()) && packageLogConfig->second.getLogInfo(logLevel)) {
     message.setLogInfo(packageLogConfig->second.getLogInfo(logLevel));
   } else if (m_moduleLogConfig && m_moduleLogConfig->getLogInfo(logLevel)) {
@@ -112,8 +112,8 @@ bool LogSystem::sendMessage(LogMessage&& message)
 
 void LogSystem::resetMessageCounter()
 {
-  for (int i = 0; i < LogConfig::c_Default; ++i) {
-    m_messageCounter[i] = 0;
+  for (int& i : m_messageCounter) {
+    i = 0;
   }
   m_errorLog.clear();
 }
@@ -153,8 +153,9 @@ const LogConfig& LogSystem::getCurrentLogConfig(const char* package) const
 
 LogSystem::LogSystem() :
   m_logConfig(LogConfig::c_Info),
-  m_moduleLogConfig(0),
-  m_printErrorSummary(false)
+  m_moduleLogConfig(nullptr),
+  m_printErrorSummary(false),
+  m_messageCounter{0}
 {
   resetLogging();
 }

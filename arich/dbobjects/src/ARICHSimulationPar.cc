@@ -11,9 +11,7 @@
 #include <arich/dbobjects/ARICHSimulationPar.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 #include <iostream>
-#include <iomanip>
 
 using namespace std;
 using namespace Belle2;

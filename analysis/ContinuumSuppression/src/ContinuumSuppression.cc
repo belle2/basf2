@@ -74,7 +74,7 @@ namespace Belle2 {
     for (const Belle2::Particle* sigFS0 : signalDaughters) {
       TLorentzVector p_cms = T.rotateLabToCms() * sigFS0->get4Vector();
 
-      p3_cms_q_sigA.push_back({p_cms.Vect(), sigFS0->getCharge()});
+      p3_cms_q_sigA.emplace_back(p_cms.Vect(), sigFS0->getCharge());
 
       p_cms_missA -= p_cms;
       et[0] += p_cms.Perp();
@@ -89,7 +89,7 @@ namespace Belle2 {
       p3_cms_all.push_back(p_cms.Vect());
       p3_cms_sigB.push_back(p_cms.Vect());
 
-      p3_cms_q_sigB.push_back({p_cms.Vect(), sigFS1->getCharge()});
+      p3_cms_q_sigB.emplace_back(p_cms.Vect(), sigFS1->getCharge());
 
       p_cms_missB -= p_cms;
       et[1] += p_cms.Perp();
@@ -124,7 +124,7 @@ namespace Belle2 {
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
 
-          p3_cms_q_roe.push_back({p_cms.Vect(), charged_particle.getCharge()});
+          p3_cms_q_roe.emplace_back(p_cms.Vect(), charged_particle.getCharge());
 
           p_cms_missA -= p_cms;
           p_cms_missB -= p_cms;
@@ -139,15 +139,15 @@ namespace Belle2 {
 
       for (const ECLCluster* cluster : roeECLClusters) {
 
-        if (cluster->isNeutral()) {
+        if (cluster->isNeutral() and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
           // Create particle from ECLCluster with gamma hypothesis
-          Particle gamma_particle(cluster);
+          Particle gamma_particle(cluster, Const::photon);
 
           TLorentzVector p_cms = T.rotateLabToCms() * gamma_particle.get4Vector();
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
 
-          p3_cms_q_roe.push_back({p_cms.Vect(), gamma_particle.getCharge()});
+          p3_cms_q_roe.emplace_back(p_cms.Vect(), gamma_particle.getCharge());
 
           p_cms_missA -= p_cms;
           p_cms_missB -= p_cms;

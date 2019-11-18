@@ -88,7 +88,7 @@ namespace Belle2 {
     /// set track ID.
     void setTrackID(int trackID);
 
-    // get track ID.
+    /// get track ID.
     int getTrackID();
 
     /// returns object type.

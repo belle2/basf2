@@ -16,7 +16,6 @@
 #include <mva/interface/Expert.h>
 
 #include <map>
-#include <vector>
 #include <string>
 #include <memory>
 
@@ -32,7 +31,7 @@ namespace Belle2 {
        * Creates a new Interface to a third-party library
        * @param name of the third-party MVA library
        */
-      explicit AbstractInterface(std::string name);
+      explicit AbstractInterface(const std::string& name);
 
       /**
        * Virtual destructor

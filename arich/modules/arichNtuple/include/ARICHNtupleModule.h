@@ -28,7 +28,6 @@
 
 // ROOT
 #include <string>
-#include <TROOT.h>
 #include <TFile.h>
 #include <TTree.h>
 #include <arich/modules/arichNtuple/ARICHNtupleStruct.h>

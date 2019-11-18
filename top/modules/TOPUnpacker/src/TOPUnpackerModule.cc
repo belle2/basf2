@@ -128,6 +128,8 @@ namespace Belle2 {
         int bufferSize = raw.GetDetectorNwords(0, finesse);
         if (bufferSize < 1) continue;
 
+        int err = 0;
+
         int dataFormat = m_dataFormat;
         if (dataFormat == 0) { // auto detect data format
           DataArray array(buffer, bufferSize, m_swapBytes);
@@ -151,13 +153,13 @@ namespace Belle2 {
                 dataFormat = 0x0301; //assume it's interim format
                 m_swapBytes = true;
               } else {
-                B2ERROR("TOPUnpacker: Could not establish data format.");
+                B2WARNING("TOPUnpacker: Could not establish data format.");
+                err = bufferSize;
               }
             }
           }
         }
 
-        int err = 0;
         switch (dataFormat) {
           case static_cast<int>(TOP::RawDataType::c_Type0Ver16):
             unpackType0Ver16(buffer, bufferSize);
@@ -182,11 +184,18 @@ namespace Belle2 {
             B2ERROR("TOPUnpacker: unknown data format."
                     << LogVar("Type", (dataFormat >> 8))
                     << LogVar("Version", (dataFormat & 0xFF)));
+            err = bufferSize;
+
         }
 
-        if (err != 0)
-          B2ERROR("TOPUnpacker: extra or missing words in data buffer."
-                  << LogVar("Difference", err));
+        if (err != 0) {
+          stringstream copperName;
+          //nodeid format is described on page7 of: https://confluence.desy.de/display/BI/DAQ+WebHome?preview=%2F34029242%2F37487394%2FSetupPocketDAQ_4p1_RawCOPPERDataFormat.pdf
+          copperName << "cpr" << ((raw.GetNodeID(0) >> 24) * 1000 + (raw.GetNodeID(0) & 0x3FF)) << char('a' + finesse);
+          B2ERROR("TOPUnpacker: error in unpacking data from frontend " << copperName.str()
+                  << LogVar("words unused", err)
+                  << LogVar("copper", copperName.str()));
+        }
 
       } // finesse loop
     } // m_rawData loop
@@ -788,6 +797,19 @@ namespace Belle2 {
     unsigned int evtMagicHeader = (word >> 12) & 0xF;
     unsigned int evtScrodID = word & 0xFFF;
 
+    // determine slot number (moduleID) and boardstack
+    int moduleID = 0;
+    int boardstack = 0;
+    const auto* feemap = m_topgp->getFrontEndMapper().getMap(evtScrodID);
+    if (feemap) {
+      moduleID = feemap->getModuleID();
+      boardstack = feemap->getBoardstackNumber();
+    } else {
+      B2WARNING("TOPUnpacker: no front-end map available."
+                << LogVar("SCROD ID", evtScrodID));
+    }
+
+
     B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
             << "\tevtType = " << evtType
@@ -796,8 +818,8 @@ namespace Belle2 {
             << ", evtScrodID = " << evtScrodID);
 
     if (evtMagicHeader != 0xA) {
-      B2ERROR("TOPUnpacker: event header magic word mismatch. should be 0xA."
-              << LogVar("Magic word", evtMagicHeader));
+      B2WARNING("TOPUnpacker: event header magic word mismatch. should be 0xA."
+                << LogVar("Magic word", evtMagicHeader));
       return array.getRemainingWords();
     }
 
@@ -952,8 +974,8 @@ namespace Belle2 {
                 << ", hitIsOnHeap = " << hitIsOnHeap
                 << ", hitHeapWindow = " << hitHeapWindow);
       } else { //could not match the data format
-        B2ERROR("TOPUnpacker: could not match data type inside unpackProdDebug()"
-                << LogVar("evtType", evtType) << LogVar("evtVersion", evtVersion));
+        B2WARNING("TOPUnpacker: could not match data type inside unpackProdDebug()"
+                  << LogVar("evtType", evtType) << LogVar("evtVersion", evtVersion));
         return array.getRemainingWords();
       }
 
@@ -963,8 +985,8 @@ namespace Belle2 {
       }
 
       if (hitMagicHeader != 0xB) {
-        B2ERROR("TOPUnpacker: hit header magic word mismatch. should be 0xB."
-                << LogVar("Magic word", hitMagicHeader));
+        B2WARNING("TOPUnpacker: hit header magic word mismatch. should be 0xB."
+                  << LogVar("Magic word", hitMagicHeader));
         return array.getRemainingWords();
       }
 
@@ -998,7 +1020,7 @@ namespace Belle2 {
               << ", checksum " << (array.validateChecksum() ? "OK" : "NOT OK"));
 
       if (!array.validateChecksum()) {
-        B2ERROR("TOPUnpacker: hit checksum invalid.");
+        B2WARNING("TOPUnpacker: hit checksum invalid.");
         return array.getRemainingWords();
       }
 
@@ -1078,24 +1100,12 @@ namespace Belle2 {
     }
 
     if (evtMagicFooter != 0x5) {
-      B2ERROR("TOPUnpacker: event footer magic word mismatch. should be 0x5."
-              << LogVar("Magic word", evtMagicFooter));
+      B2WARNING("TOPUnpacker: event footer magic word mismatch. should be 0x5."
+                << LogVar("Magic word", evtMagicFooter));
       return array.getRemainingWords();
     }
 
     B2DEBUG(200, "the rest:");
-
-    // determine slot number (moduleID) and boardstack
-    int moduleID = 0;
-    int boardstack = 0;
-    const auto* feemap = m_topgp->getFrontEndMapper().getMap(evtScrodID);
-    if (feemap) {
-      moduleID = feemap->getModuleID();
-      boardstack = feemap->getBoardstackNumber();
-    } else {
-      B2ERROR("TOPUnpacker: no front-end map available."
-              << LogVar("SCROD ID", evtScrodID));
-    }
 
     unsigned int numParsedWaveforms = 0;
     while (array.peekWord() != 0x6c617374 //next word is not wf footer word
@@ -1122,9 +1132,9 @@ namespace Belle2 {
               << ", wfChannel " << wfChannel);
 
       if (wfNSamples != 32 && wfNSamples != 16) {
-        B2ERROR("TOPUnpacker: suspicious value for wfNSamples."
-                << LogVar("Value", wfNSamples));
-        //return array.getRemainingWords();
+        B2WARNING("TOPUnpacker: suspicious value for wfNSamples."
+                  << LogVar("wfNSamples", wfNSamples));
+        return array.getRemainingWords();
       }
 
       word = array.getWord(); // waveform word 1, 0x0(1)/startSamp(6)/logAddress(9)/carrierEventNumber(7)/readAddr(9)
@@ -1176,9 +1186,9 @@ namespace Belle2 {
         if (digit->getScrodChannel() == channel % 128) {
           digit->addRelationTo(waveform);
         } else {
-          B2ERROR("TOPUnpacker: hit and its waveform have different channel number."
-                  << LogVar("channel (hit)", digit->getScrodChannel())
-                  << LogVar("channel (waveform)", channel % 128));
+          B2WARNING("TOPUnpacker: hit and its waveform have different channel number."
+                    << LogVar("channel (hit)", digit->getScrodChannel())
+                    << LogVar("channel (waveform)", channel % 128));
         }
       }
       numParsedWaveforms += 1;
@@ -1186,9 +1196,9 @@ namespace Belle2 {
     } // end of waveform segments loop
 
     if (numExpectedWaveforms != numParsedWaveforms) {
-      B2ERROR("TOPUnpacker: number of expected and parsed waveforms does not match."
-              << LogVar("expected", numExpectedWaveforms)
-              << LogVar("parsed", numParsedWaveforms));
+      B2WARNING("TOPUnpacker: number of expected and parsed waveforms does not match."
+                << LogVar("expected", numExpectedWaveforms)
+                << LogVar("parsed", numParsedWaveforms));
     }
 
     return array.getRemainingWords();

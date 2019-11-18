@@ -24,8 +24,8 @@ namespace Belle2 {
 
   class RFFlowStat {
   public:
-    RFFlowStat(char* shmname, int id, RingBuffer* rbuf);    // Constructor for fillter
-    RFFlowStat(char* shmname);    // Constructor for retriever
+    RFFlowStat(const char* shmname, int id, RingBuffer* rbuf);    // Constructor for fillter
+    RFFlowStat(const char* shmname);    // Constructor for retriever
     ~RFFlowStat();
 
     // functions for filler

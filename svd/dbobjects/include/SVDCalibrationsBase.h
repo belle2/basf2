@@ -21,32 +21,33 @@ namespace Belle2 {
   template < class T  >
   class SVDCalibrationsBase: public TObject {
 
-    // T::payloadContainerType can be a vector whose length is the
-    // number of strips per side or a list of defect on a given side
-    // This vector will have length 2.
-    // Index 0 for the V side, index 1 for the U side
-    // Please, please, pleaseeeee use SVDCalibrationBase<...>::UIndex
-    // and SVDCalibrationBase<...>::VIndex instead of  1 and 0 for better
-    // code readibility
+    /** T::payloadContainerType can be a vector whose length is the
+     * number of strips per side or a list of defect on a given side
+     * This vector will have length 2.
+     * Index 0 for the V side, index 1 for the U side
+     * Please, please, pleaseeeee use SVDCalibrationBase<...>::UIndex
+     * and SVDCalibrationBase<...>::VIndex instead of  1 and 0 for better
+     * code readibility
+     */
     typedef std::vector< typename T::payloadContainerType > SVDSensor;
 
-    // An SVDLAdder is a vector of SVDSensors
+    /**An SVDLadder is a vector of SVDSensors */
     typedef std::vector< SVDSensor > SVDLadder;
 
-    // An SVDLayer is a vector of SVDLAdders
+    /** An SVDLayer is a vector of SVDLadders */
     typedef std::vector< SVDLadder > SVDLayer;
 
-    // The SVD is a vector of SVDLayers
+    /** The SVD is a vector of SVDLayers */
     typedef std::vector< SVDLayer > SVD;
 
-
+    /** an SVD calibration*/
     SVD calibrations;
 
 
   public:
 
-    // This enumeration assure the same semantic of the
-    // isU methods defined by Peter Kv.
+    /** This enumeration assure the same semantic of the
+    isU methods defined by Peter Kv.*/
     enum E_side { Vindex = 0 , Uindex = 1 };
 
     /** The default constructor initialize all the vectors
@@ -167,11 +168,12 @@ namespace Belle2 {
       // tertium non datur
     }
 
-    typedef T t_perSideContainer;
+    typedef T t_perSideContainer; /**< typedef of the container of each side*/
   private:
-    TString m_uniqueID; //The unique identifier is a private member of SVDCalibrationsBase, whose value is assigned in the constructor.
 
-    ClassDef(SVDCalibrationsBase, 2)
+    TString m_uniqueID; /**<The unique identifier is a private member of SVDCalibrationsBase, whose value is assigned in the constructor.*/
+
+    ClassDef(SVDCalibrationsBase, 2) /**< needed by root*/
   };
 
 }

@@ -11,7 +11,6 @@
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-#include <vxd/geometry/GeoCache.h>
 
 #include <genfit/DetPlane.h>
 #include <genfit/SharedPlanePtr.h>
@@ -38,9 +37,12 @@ namespace Belle2 {
     /**return the sensor ID*/
     VxdID getVxdID() {return m_vxdID;};
 
+    /** determine if the sensor is in range */
     bool isSensorInRange(const TVector3& trackPosition, int layer);
 
+    /** assign the shared-plane pointer */
     void setSharedPlanePtr(genfit::SharedPlanePtr spp) {m_sharedPlanePtr = spp;};
+    /** return the shared-plane pointer */
     genfit::SharedPlanePtr getSharedPlanePtr() {return m_sharedPlanePtr;};
 
   private:

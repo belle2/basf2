@@ -37,14 +37,7 @@ HistoManagerModule::HistoManagerModule() : Module(), m_initmain(false), m_tupleM
 
 }
 
-HistoManagerModule::~HistoManagerModule()
-{
-  //  if (m_initmain) {
-  //  if (ProcHandler::EvtProcID() == -1) {   // should be called from main proc.
-  //    cout << "HistoManager:: destructor called from pid=" << ProcHandler::EvtProcID() << endl;
-  //    if (Environment::Instance().getNumberProcesses() > 0 && ProcHandler::EvtProcID() == -1) {
-  //  }
-}
+HistoManagerModule::~HistoManagerModule() = default;
 
 void HistoManagerModule::initialize()
 {
@@ -92,6 +85,3 @@ void HistoManagerModule::terminate()
     RbTupleManager::Instance().terminate();
   }
 }
-
-
-

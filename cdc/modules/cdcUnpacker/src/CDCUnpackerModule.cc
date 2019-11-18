@@ -17,23 +17,13 @@
 #include <cdc/dbobjects/CDCChannelMap.h>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 // framework - Database
-#include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBImportArray.h>
 
-
-#include <sstream>
 #include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <cstring>
 
 using namespace std;
 using namespace Belle2;
@@ -314,6 +304,11 @@ void CDCUnpackerModule::event()
                 secondHit->setOtherHitIndices(firstHit);
                 secondHit->set2ndHitFlag();
               }
+              if (m_enableStoreCDCRawHit == true) {
+                for (int iSample = 0; iSample < nSamples; ++iSample) {
+                  cdcHits[cdcHits.getEntries() - 1]->addRelationTo(cdcRawHitWFs[cdcRawHitWFs.getEntries() - 1 + iSample - (nSamples - 1) ]);
+                }
+              }
             }
 
 
@@ -409,10 +404,12 @@ void CDCUnpackerModule::event()
                 if (board == m_boardIDTrig && ch == m_channelTrig) {
                   tdcCountTrig = tdc1;
                 } else {
-                  CDCHit* firstHit = cdcHits.appendNew(tdc1, fadcSum, wireId);
+                  CDCHit* firstHit = cdcHits.appendNew(tdc1, fadcSum, wireId,
+                                                       0, tot);
                   if (length == 5) {
                     if (m_enable2ndHit == true) {
-                      CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId);
+                      CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId,
+                                                            0, tot);
                       secondHit->setOtherHitIndices(firstHit);
                       secondHit->set2ndHitFlag();
                     }

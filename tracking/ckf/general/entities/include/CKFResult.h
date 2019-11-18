@@ -16,8 +16,6 @@
 
 #include <vector>
 
-#include <framework/logging/Logger.h>
-
 namespace Belle2 {
   /**
    * Object for temporary storage of a CKF tree search result.

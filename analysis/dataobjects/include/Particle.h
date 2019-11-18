@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2012-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Marko Staric                                *
+ * Contributors: Anze Zupanc, Marko Staric, Christian Pulvermacher,       *
+ *               Sam Cunliffe, Torben Ferber                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -97,6 +98,20 @@ namespace Belle2 {
     enum {c_Px, c_Py, c_Pz, c_E, c_X, c_Y, c_Z};
 
     /**
+     * Flags that describe the particle property,
+     * which are used in the MC matching.
+     */
+    enum PropertyFlags {
+      c_Ordinary = 0, /** Ordinary particles */
+      c_IsUnspecified = 1, /**< Is the particle unspecified by marking @ ? */
+      c_isIgnoreRadiatedPhotons = 2, /**< Is the particle MC matched with the ignore radiated photon flag set?*/
+      c_isIgnoreIntermediate = 4, /**< Is the particle MC matched with the ignore intermediate resonances flag set?*/
+      c_isIgnoreMassive = 8, /**< Is the particle MC matched with the ignore missing massive particle flag set?*/
+      c_isIgnoreNeutrino = 16, /**< Is the particle MC matched with the ignore missing neutrino flag set?*/
+      c_isIgnoreGamma = 32, /**< Is the particle MC matched with the ignore missing gamma flag set?*/
+    };
+
+    /**
      * Default constructor.
      * All private members are set to 0. Particle type is set to c_Undefined.
      */
@@ -141,6 +156,23 @@ namespace Belle2 {
              TClonesArray* arrayPointer = nullptr);
 
     /**
+     * Constructor for composite particles.
+     * All other private members are set to their default values (0).
+     * @param momentum Lorentz vector
+     * @param pdgCode PDG code
+     * @param flavorType decay flavor type
+     * @param daughterIndices indices of daughters in StoreArray<Particle>
+     * @param particle property
+     * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
+     */
+    Particle(const TLorentzVector& momentum,
+             const int pdgCode,
+             EFlavorType flavorType,
+             const std::vector<int>& daughterIndices,
+             int properties,
+             TClonesArray* arrayPointer = nullptr);
+
+    /**
      * Constructor from a reconstructed track (mdst object Track);
      * @param track pointer to Track object
      * @param chargedStable Type of charged particle
@@ -166,14 +198,17 @@ namespace Belle2 {
     /**
      * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.
      * @param eclCluster pointer to ECLCluster object
+     * @param type the kind of ParticleType we want (photon by default)
      */
-    explicit Particle(const ECLCluster* eclCluster);
+    explicit Particle(const ECLCluster* eclCluster,
+                      const Const::ParticleType& type = Const::photon);
 
     /**
-     * Constructor of a KLong from a reconstructed KLM cluster that is not matched to any charged track.
+     * Constructor from a reconstructed KLM cluster.
      * @param klmCluster pointer to KLMCluster object
+     * @param pdgCode PDG code (Klong by default)
      */
-    explicit Particle(const KLMCluster* klmCluster);
+    explicit Particle(const KLMCluster* klmCluster, const int pdgCode = Const::Klong.getPDGCode());
 
     /**
      * Constructor from MC particle (mdst object MCParticle)
@@ -229,6 +264,14 @@ namespace Belle2 {
     }
 
     /**
+     * sets m_properties
+     */
+    void setProperty(const int properties)
+    {
+      m_properties = properties;
+    }
+
+    /**
      * Sets Lorentz vector, position, 7x7 error matrix and p-value
      * @param p4 Lorentz vector
      * @param vertex point (position or vertex)
@@ -256,16 +299,18 @@ namespace Belle2 {
      * Appends index of daughter to daughters index array
      * @param daughter pointer to the daughter particle
      */
-    void appendDaughter(const Particle* daughter);
+    void appendDaughter(const Particle* daughter, const bool updateType = true);
 
     /**
      * Appends index of daughter to daughters index array
      * @param particleIndex index of daughter in StoreArray<Particle>
      */
-    void appendDaughter(int particleIndex)
+    void appendDaughter(int particleIndex, const bool updateType = true)
     {
-      m_particleType = c_Composite;
-
+      if (updateType) {
+        // is it a composite particle or fsr corrected?
+        m_particleType = c_Composite;
+      }
       m_daughterIndices.push_back(particleIndex);
     }
 
@@ -317,6 +362,17 @@ namespace Belle2 {
     unsigned getMdstArrayIndex(void) const
     {
       return m_mdstIndex;
+    }
+
+    /**
+     * Returns particle property as a bit pattern
+     * The values are defined in the PropertyFlags enum and described in detail there.
+     *
+     * @return Combination of Properties describing the particle property
+     */
+    int getProperty() const
+    {
+      return m_properties;
     }
 
     /**
@@ -479,6 +535,33 @@ namespace Belle2 {
     TMatrixFSym getVertexErrorMatrix() const;
 
     /**
+     * Returns cosine of the helicity angle
+     * The helicity angle is defined in the rest frame of the particle as the angle between the negative momentum of the mother and
+     * - the momentum of the first daughter for two body decays
+     * - the momentum of the photon for pi0 Dalitz decays
+     * - the direction perpendicular to the daughter momenta for three body decays
+     * @param mother mother particle, if not given the center of mass system is taken as mother frame
+     * @return cosine of the helicity angle
+     */
+    float getCosHelicity(const Particle* mother = nullptr) const;
+
+    /**
+     * Returns cosine of the helicity angle of the given daughter defined by given grand daughter
+     * @param iDaughter 0-based index of daughter particle
+     * @param iGrandDaughter 0-based index of grand daughter particle
+     * @return cosine of the helicity angle
+     */
+    float getCosHelicityDaughter(unsigned iDaughter, unsigned iGrandDaughter = 0) const;
+
+    /**
+     * Returns acoplanarity angle defined as the angle between the decay planes of the grand daughters in the particle's rest frame
+     * This assumes that the particle and its daughters have two daughters each
+     * @return acoplanarity angle
+     */
+    float getAcoplanarity() const;
+
+
+    /**
      * Returns unique identifier of final state particle (needed in particle combiner)
      * @return unique identifier of final state particle
      */
@@ -511,14 +594,14 @@ namespace Belle2 {
 
     /** Apply a function to all daughters of this particle
      *
-     * @param function function object to run on each daugther. If this
+     * @param function function object to run on each daughter. If this
      *    function returns true the processing will be stopped immeddiately.
      * @param recursive if true go through all daughters of daughters as well
      * @param includeSelf if true also apply the function to this particle
      * @return true if the function returned true for any of the particles it
      *    was applied to
      */
-    bool forEachDaughter(std::function<bool(const Particle*)> function,
+    bool forEachDaughter(const std::function<bool(const Particle*)>& function,
                          bool recursive = true, bool includeSelf = true) const;
 
     /**
@@ -604,7 +687,7 @@ namespace Belle2 {
 
     /**
      * Returns the pointer to the KLMCluster object that was used to create this Particle (ParticleType == c_KLMCluster).
-     * Returns the pointer to the largest KLMCluster object associated to this Particle if ParticleType == c_Track.
+     * Returns the pointer to the KLMCluster object associated to this Particle if ParticleType == c_Track.
      * NULL pointer is returned, if the Particle has no relation to the KLMCluster.
      * @return const pointer to the KLMCluster
      */
@@ -721,12 +804,23 @@ namespace Belle2 {
           or (pdg == Const::proton.getPDGCode())
           or (pdg == Const::deuteron.getPDGCode())) {
         return ECLCluster::EHypothesisBit::c_nPhotons;
-      } else if (pdg == Const::Klong.getPDGCode()) {
+      } else if ((pdg == Const::Klong.getPDGCode())
+                 or (pdg == Const::neutron.getPDGCode())) {
         return ECLCluster::EHypothesisBit::c_neutralHadron;
       } else {
         return ECLCluster::EHypothesisBit::c_none;
       }
     }
+
+    /**
+    * Explores the decay tree of the particle and returns the (grand^n)daughter identified by a generalized index.
+    * The generalized index consists of a colon-separated list of daughter indexes, starting from the root particle:
+    * 0:1:3 identifies the fourth daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle.
+    * @param generalizedIndex the generalized index of the particle to be returned
+    * @return a particle in the decay tree of the root particle.
+    */
+    const Particle* getParticleFromGeneralizedIndexString(const std::string& generalizedIndex) const;
+
 
   private:
 
@@ -740,12 +834,13 @@ namespace Belle2 {
     float m_x;      /**< position component x */
     float m_y;      /**< position component y */
     float m_z;      /**< position component z */
-    float m_errMatrix[c_SizeMatrix]; /**< error matrix (1D representation) */
+    float m_errMatrix[c_SizeMatrix] = {}; /**< error matrix (1D representation) */
     float m_pValue;   /**< chi^2 probability of the fit. Default is nan */
     std::vector<int> m_daughterIndices;  /**< daughter particle indices */
     EFlavorType m_flavorType;  /**< flavor type. */
     EParticleType m_particleType;  /**< particle type */
     unsigned m_mdstIndex;  /**< 0-based index of MDST store array object */
+    int m_properties; /**< particle property */
 
     /**
      * Identifier that can be used to identify whether the particle is unqiue
@@ -813,15 +908,15 @@ namespace Belle2 {
      */
     void setFlavorType();
 
-
     /**
      * set mdst array index
      */
     void setMdstArrayIndex(const int arrayIndex);
 
-    ClassDef(Particle, 9); /**< Class to store reconstructed particles. */
+    ClassDef(Particle, 10); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
+    // v10: added m_properties
 
     friend class ParticleSubset;
   };

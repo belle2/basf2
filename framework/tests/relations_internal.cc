@@ -14,7 +14,7 @@ namespace {
   class RelationsInternal : public ::testing::Test {
   protected:
     /** fill StoreArrays with entries from 0..9 */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       evtData.registerInDataStore();
@@ -30,7 +30,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -144,7 +144,7 @@ namespace {
     array.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
-    RelationContainer* rel = new RelationContainer(); //default constructed object, as written to file
+    auto* rel = new RelationContainer(); //default constructed object, as written to file
     ASSERT_TRUE(DataStore::Instance().createObject(rel, false, array));
 
     EXPECT_FALSE(array.isValid());
@@ -190,11 +190,11 @@ namespace {
     EXPECT_TRUE(to_obj == relIndex.getFirstElementFrom(first_from_obj)->to);
 
     //check search for non-existing relations
-    EXPECT_TRUE(relIndex.getFirstElementTo(0) == NULL);
-    EXPECT_TRUE(relIndex.getFirstElementFrom(0) == NULL);
-    EXPECT_TRUE(relIndex.getFirstElementFrom(0) == NULL);
-    EXPECT_TRUE(relIndex.getFirstElementFrom((evtData)[4]) == NULL);
-    EXPECT_TRUE(relIndex.getFirstElementTo((profileData)[3]) == NULL);
+    EXPECT_TRUE(relIndex.getFirstElementTo(nullptr) == nullptr);
+    EXPECT_TRUE(relIndex.getFirstElementFrom(nullptr) == nullptr);
+    EXPECT_TRUE(relIndex.getFirstElementFrom(nullptr) == nullptr);
+    EXPECT_TRUE(relIndex.getFirstElementFrom((evtData)[4]) == nullptr);
+    EXPECT_TRUE(relIndex.getFirstElementTo((profileData)[3]) == nullptr);
 
     //check size of found element lists
     {
@@ -238,7 +238,7 @@ namespace {
 
     RelationArray relation(evtData, profileData);
     relation.add(0, 10, 1.0);
-    typedef RelationIndex<EventMetaData, ProfileInfo> rel_t;
+    using rel_t =  RelationIndex<EventMetaData, ProfileInfo>;
     EXPECT_B2FATAL(rel_t relIndex);
     relation.clear();
     relation.add(10, 0, 1.0);
@@ -275,7 +275,7 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     relation.create();
-    typedef RelationIndex<EventMetaData, ProfileInfo> rel_t;
+    using rel_t =  RelationIndex<EventMetaData, ProfileInfo>;
     EXPECT_B2FATAL(rel_t(evtData, profileData, "test"));
     EXPECT_B2FATAL(rel_t("test"));
 

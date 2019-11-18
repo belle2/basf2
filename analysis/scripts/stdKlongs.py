@@ -10,11 +10,10 @@
 #
 ########################################################
 
-from basf2 import *
-from modularAnalysis import *
+from modularAnalysis import fillParticleList, cutAndCopyList
 
 
-def stdKlongs(listtype='all', path=analysis_main):
+def stdKlongs(listtype='all', path=None):
     """
     Warning:
         This function is a placeholder for Klong selections. Currently
@@ -23,13 +22,15 @@ def stdKlongs(listtype='all', path=analysis_main):
     Prepares the 'K_L0:all' list with not cuts (all KLM clusters with no track
     are loaded).
 
-    @param listtype name of standard list
-    @param path     modules are added to this path
+    Parameters:
+        listtype (str): name of standard list options (currently only
+            'all' is supported/recommended)
+        path (basf2.Path): modules are added to this path
     """
 
     # all KLM clusters
     if listtype == 'all':
-        fillParticleList('K_L0:all', '', True, path)
+        fillParticleList('K_L0:all', 'isFromKLM > 0', True, path)
     else:
         B2WARNING("Only the 'all' list is currently recommended.")
         B2WARNING("Ignoring the requested type: %s and instead loading the 'all' list" % listtype)
@@ -77,7 +78,12 @@ def stdKlongs(listtype='all', path=analysis_main):
 
 
 # Used in skimming code
-def loadStdSkimKL0(path=analysis_main):
+def loadStdSkimKL0(path):
+    """Load KLongs for skimming.
+
+    Parameters:
+        path (basf2.Path): modules are added to this path
+    """
     stdKlongs('loose', path)
     cutAndCopyList(
         'K_L0:skim',
@@ -85,6 +91,3 @@ def loadStdSkimKL0(path=analysis_main):
         '',
         True,
         path)
-
-# Only used for Belle via b2bii
-# ?

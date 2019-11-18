@@ -76,12 +76,16 @@ namespace Belle2 {
        */
       MayBePtr<Float_t> find(const std::string& varName) override
       {
+        // it is hard to do this with string::compare as cppcheck recommends
+        // cppcheck-suppress stlIfStrFind
         if (0 == varName.find(m_firstPrefix)) {
           std::string varNameWithoutPrefix = varName.substr(m_firstPrefix.size());
           MayBePtr<Float_t> found = m_firstVarSet.find(varNameWithoutPrefix);
           if (found) return found;
         }
 
+        // it is hard to do this with string::compare as cppcheck recommends
+        // cppcheck-suppress stlIfStrFind
         if (0 == varName.find(m_secondPrefix)) {
           std::string varNameWithoutPrefix = varName.substr(m_secondPrefix.size());
           MayBePtr<Float_t> found = m_secondVarSet.find(varNameWithoutPrefix);

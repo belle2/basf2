@@ -43,6 +43,7 @@ namespace Belle2 {
     AFindlet m_findlet;
   };
 
+  /// Alias for the event time extraction module
   template <class AFindlet>
   using EventTimeExtractorModule = TrackFindingCDC::FindletModule <
                                    TrackFindingCDC::FindletStoreArrayInput<BaseEventTimeExtractorModuleFindlet<AFindlet> >>;

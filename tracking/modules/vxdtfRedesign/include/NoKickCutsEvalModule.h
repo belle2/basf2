@@ -12,15 +12,11 @@
 #define NOKICKCUTSEVAL_H
 
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <tracking/dataobjects/hitXP.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
 #include <TFile.h>
 #include <math.h>
-
 
 namespace Belle2 {
 

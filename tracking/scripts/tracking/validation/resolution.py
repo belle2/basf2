@@ -18,14 +18,22 @@ formatter = TolerateMissingKeyFormatter()
 
 
 class ResolutionAnalysis(object):
+    """Perform resolution analysis"""
+
+    #: default Z-score (for outlier detection)
     default_outlier_z_score = 5.0
+    #: default minimum number of entries
     default_min_required_entries = 50
+    #: default plot name
     default_plot_name = "{plot_name_prefix}_{subplot_name}{plot_name_postfix}"
+    #: default plot title
     default_plot_title = "{subplot_title} of {quantity_name}{plot_title_postfix}"
+    #: default list of plots to create
     default_which_plots = [
         "resolution",
     ]
 
+    #: by default, create expert plots
     default_is_expert = True
 
     def __init__(
@@ -45,33 +53,48 @@ class ResolutionAnalysis(object):
         plot_title_postfix='',  # depricated use plot_title instead
         referenceFileName=None,  # if set binnings of histograms will be read from corresponding histogram in this file
     ):
-        """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
+        """Performs a comparison of an estimated quantity to their truths by generating standardized validation plots."""
 
+        #: cached name of the quantity in the truth-classification analysis
         self.quantity_name = quantity_name
+        #: cached measurement unit for this truth-classification analysis
         self.unit = unit or get_unit(quantity_name)
+        #: cached value of the histogram bin spacing
         self.bin_spacing = bin_spacing
+        #: cached value of the bin name
         self.bin_name = bin_name
+        #: cached value of the bin measurement unit
         self.bin_unit = bin_unit
 
         if outlier_z_score is None:
+            #: cached value of the Z-score (for outlier detection)
             self.outlier_z_score = self.default_outlier_z_score
         else:
             self.outlier_z_score = outlier_z_score
 
+        #: cached value of the minimum number of entries
         self.min_required_entries = min_required_entries
         if self.min_required_entries is None:
             self.min_required_entries = self.default_min_required_entries
 
+        #: cached value of the base name of the plot
         self.plot_name = plot_name
+        #: cached value of the plot title
         self.plot_title = plot_title
 
+        #: cached value of the prefix prepended to the plot name
         self.plot_name_prefix = plot_name_prefix or root_save_name(quantity_name)
+        #: cached value of the suffix appended to the plot name
         self.plot_name_postfix = plot_name_postfix
+        #: cached value of the suffix appended to the plot title
         self.plot_title_postfix = plot_title_postfix
 
+        #: cached value of the contact person
         self._contact = contact
+        #: cached value of the dictionary of plots to be created
         self.plots = collections.OrderedDict()
 
+        #: cached value of the reference filename
         self.referenceFileName = referenceFileName
 
     def analyse(
@@ -206,20 +229,22 @@ class ResolutionAnalysis(object):
 
             self.plots[resolution_graph_name] = resolution_graph
 
-        # Forward the contract to all plots by reassigning the contact.
+        #: Forward the contact to all plots by reassigning the contact.
         self.contact = self.contact
 
     @property
     def contact(self):
+        """Get the contact person's name"""
         return self._contact
 
     @contact.setter
     def contact(self, contact):
+        """Set the contact person's name"""
         self._contact = contact
         for validation_plot in list(self.plots.values()):
             validation_plot.contact = contact
 
     def write(self, tDirectory=None):
-        # Write all validation plot to the given Root directory
+        """Write all validation plot to the given Root directory"""
         for validation_plot in list(self.plots.values()):
             validation_plot.write(tDirectory)

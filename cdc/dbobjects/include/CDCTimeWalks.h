@@ -14,7 +14,6 @@
 #include <fstream>
 #include <iomanip>
 #include <TObject.h>
-#include <cdc/dataobjects/WireID.h>
 
 namespace Belle2 {
 

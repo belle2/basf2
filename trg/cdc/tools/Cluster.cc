@@ -1,3 +1,10 @@
+#ifdef __clang__
+// This file takes forever when compiled with clang (~25min just for this one
+// file) so let's selectively disable optimization. As this is a simple enough
+// tool this should not make any problems
+#pragma clang optimize off
+#endif
+
 #include <iostream>
 #include <fstream>
 #include <cmath>

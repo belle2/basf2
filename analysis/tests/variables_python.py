@@ -20,6 +20,11 @@ assert 'extraInfo(SignalProbability)' == var.name
 
 assert (v.evaluate('constant(123)', None) - 123) < 0.001
 
+v.addAlias('anotherAlias', 'daughter(1, p)')
+
+for vn in v.getAliasNames():
+    assert (vn == 'sigProb' or vn == 'anotherAlias')
+
 # used in FEI
 import ROOT
 assert 'extraInfo__boSignalProbability__bc' == ROOT.Belle2.makeROOTCompatible('extraInfo(SignalProbability)')

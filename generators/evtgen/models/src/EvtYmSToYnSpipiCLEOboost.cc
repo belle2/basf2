@@ -40,13 +40,11 @@
 //------------------------------------------------------------------------
 
 
-#include "EvtGenBase/EvtPatches.hh"
 #include <stdlib.h>
 #include "EvtGenBase/EvtParticle.hh"
 #include "EvtGenBase/EvtGenKine.hh"
 #include "EvtGenBase/EvtPDL.hh"
 #include "EvtGenBase/EvtVector4C.hh"
-#include "EvtGenBase/EvtTensor4C.hh"
 #include "EvtGenBase/EvtReport.hh"
 #include "EvtGenBase/EvtRandom.hh"
 #include <generators/evtgen/EvtGenModelRegister.h>

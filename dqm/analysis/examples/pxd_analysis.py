@@ -45,9 +45,15 @@ pxd_charge = register_module('DQMHistAnalysisPXDCharge')
 pxd_charge.param('histogramDirectoryName', 'PXDER')
 main.add_module(pxd_charge)
 
+pxd_trackcharge = register_module('DQMHistAnalysisPXDTrackCharge')
+pxd_trackcharge.param('histogramDirectoryName', 'PXDER')
+main.add_module(pxd_trackcharge)
+
+pxd_inj = register_module('DQMHistInjection')
+main.add_module(pxd_inj)
+
 pxd_commode = register_module('DQMHistAnalysisPXDCM')
 pxd_commode.param('histogramDirectoryName', 'PXDDAQ')
-
 main.add_module(pxd_commode)
 
 pxd_effi = register_module('DQMHistAnalysisPXDEff')

@@ -27,8 +27,9 @@ namespace Belle2 {
    */
   class SVDPedestalCalibrations {
   public:
-    static std::string name;
-    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_payload;
+    static std::string name; /**< name of the SVDPedestalCalibrations payload*/
+    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > >
+    t_payload; /**< typedef of the SVDPedestalCalibrations payload of all SVD strips*/
 
     /** Constructor, no input argument is required */
     SVDPedestalCalibrations(): m_aDBObjPtr(name)
@@ -71,7 +72,7 @@ namespace Belle2 {
     bool isValid() { return m_aDBObjPtr.isValid(); }
 
   private:
-    DBObjPtr< t_payload > m_aDBObjPtr;
+    DBObjPtr< t_payload > m_aDBObjPtr; /**< SVDPedestalCalibrations payload*/
 
 
   };

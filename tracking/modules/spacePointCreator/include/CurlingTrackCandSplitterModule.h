@@ -17,11 +17,8 @@
 
 #include <framework/geometry/B2Vector3.h> // gradually moving to B2Vector3 instead of TVector3
 
-#include <TVector3.h>
 #include <TFile.h>
 #include <TTree.h>
-
-#include <array>
 
 namespace Belle2 {
   /**

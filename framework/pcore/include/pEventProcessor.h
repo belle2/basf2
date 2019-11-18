@@ -40,7 +40,7 @@ namespace Belle2 {
         \param maxEvent The maximum number of events that will be processed.
             If the number is smaller or equal 0, all events will be processed.
     */
-    void process(PathPtr spath, long maxEvent);
+    void process(const PathPtr& spath, long maxEvent);
 
     /** signal handler for Ctrl+C (async-safe)
      *
@@ -67,10 +67,10 @@ namespace Belle2 {
     void preparePaths();
 
     /** Create RingBuffer with name from given environment variable, add Tx and Rx modules to a and b. */
-    RingBuffer* connectViaRingBuffer(const char* name, PathPtr a, PathPtr& b);
+    RingBuffer* connectViaRingBuffer(const char* name, const PathPtr& a, PathPtr& b);
 
     /** Dump module names in the ModulePtrList */
-    void dump_modules(const std::string&, const ModulePtrList);
+    void dump_modules(const std::string&, const ModulePtrList&);
 
     /** TFiles are stored in a global list and cleaned up by root
      * since this will happen in all forked processes, these will be corrupted if we don't clean the list!

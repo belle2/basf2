@@ -29,6 +29,10 @@ calib = register_module('ECLDigitCalibrator')
 
 histo = register_module('HistoManager')
 
+trigger_skim_module = register_module("TriggerSkim")
+trigger_skim_module.param('triggerLines', ["software_trigger_cut&all&total_result"])
+trigger_skim_module.if_value("==0", Path(), AfterConditionPath.END)
+
 ecldqm = register_module('ECLDQM')
 ecldqm.param("histogramDirectoryName", "ECL")
 ecldqm.param("EnergyUpperThr", 1.5)
@@ -42,6 +46,7 @@ main.add_module(input)
 main.add_module(unpacker)
 main.add_module(calib)
 main.add_module(histo)
+main.add_module(trigger_skim_module)
 main.add_module(ecldqm)
 
 # Process all events

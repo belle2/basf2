@@ -44,9 +44,9 @@ namespace Belle2 {
     void startRun() override final;
 
   private:
-    /**< Required input PXDCluster  */
+    /** Required input PXDCluster  */
     StoreArray<PXDCluster> m_pxdCluster;
-    /**< Required input EventMetaData */
+    /** Required input EventMetaData */
     StoreObjPtr<EventMetaData> m_evtMetaData;
 
     /** Name of the collection to use for PXDClusters */
@@ -74,9 +74,9 @@ namespace Belle2 {
     /** GainMap to be stored in dbtree */
     PXDGainMapPar m_gainMap;
 
-    /**< Pointer to ChargeMap calibration in DB */
+    /** Pointer to ChargeMap calibration in DB */
     DBObjPtr<PXDClusterChargeMapPar> m_DBChargeMapPar;
-    /**< Pointer to GainMap calibration in DB */
+    /** Pointer to GainMap calibration in DB */
     DBObjPtr<PXDGainMapPar> m_DBGainMapPar;
   };
 }

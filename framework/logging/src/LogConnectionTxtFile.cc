@@ -19,9 +19,7 @@ LogConnectionTxtFile::LogConnectionTxtFile(const string& filename, bool append):
   if (!m_fileStream.is_open()) throw std::runtime_error("Cannot open output file '" + filename + "': " + strerror(errno));
 }
 
-LogConnectionTxtFile::~LogConnectionTxtFile()
-{
-}
+LogConnectionTxtFile::~LogConnectionTxtFile() = default;
 
 bool LogConnectionTxtFile::isConnected()
 {

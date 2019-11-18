@@ -55,12 +55,8 @@ int RawCOPPERFormat::GetOffsetFINESSE(int n, int finesse_num)
   char err_buf[500];
   sprintf(err_buf, "[FATAL] Specifined FINESSE number( = %d ) is invalid. Exiting...\n%s %s %d\n", finesse_num,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  printf("%s", err_buf);
-  string err_str = err_buf; throw (err_str);
-  //   sleep(12345678);
-  //   exit(-1);
-  //   return 0;
-
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 }
 
 
@@ -88,11 +84,8 @@ int* RawCOPPERFormat::GetFINESSEBuffer(int n, int finesse_num)
   char err_buf[500];
   sprintf(err_buf, "[FATAL] Specifined FINESSE number( = %d ) is invalid. Exiting...\n%s %s %d\n", finesse_num,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  printf("%s", err_buf);
-  string err_str = err_buf; throw (err_str);
-//   sleep(12345678);
-//   exit(-1);
-//   return 0;
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 }
 
 
@@ -120,11 +113,8 @@ int* RawCOPPERFormat::GetDetectorBuffer(int n, int finesse_num)
   char err_buf[500];
   sprintf(err_buf, "[FATAL] Specifined FINESSE number( = %d ) is invalid. Exiting...\n%s %s %d\n", finesse_num,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  printf("%s", err_buf);
-  string err_str = err_buf; throw (err_str);
-//   sleep(12345678);
-//   exit(-1);
-//   return 0;
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 }
 
 
@@ -150,7 +140,8 @@ unsigned int RawCOPPERFormat::GetB2LHeaderWord(int n, int finesse_buffer_pos)
     char err_buf[500];
     sprintf(err_buf, "[FATAL] ERROR_EVENT : No HSLB data in COPPER data. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    string err_str = err_buf; throw (err_str);
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
   }
 
   if (err_flag == 1) {
@@ -160,7 +151,7 @@ unsigned int RawCOPPERFormat::GetB2LHeaderWord(int n, int finesse_buffer_pos)
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[DEBUG] %s\n", err_buf);
 #ifndef NO_DATA_CHECK
-    string err_str = err_buf; throw (err_str);
+    B2FATAL(err_buf);
 #endif
   }
   return ret_word;
@@ -175,8 +166,7 @@ int RawCOPPERFormat::GetPacketCRCError(int n)
           "[FATAL] This function is not supported in the version of  RawCOPPER format that you're using. n=%d : %s %s %d: Exiting...\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("%s\n", err_buf); fflush(stdout);
-  string err_str = err_buf;
-  throw (err_str);
+  B2FATAL(err_buf);
   return -1;
 }
 
@@ -188,8 +178,7 @@ int RawCOPPERFormat::GetEventCRCError(int n)
           "[FATAL] This function is not supported in the version of  RawCOPPER format that you're using. n=%d : %s %s %d: Exiting...\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("%s\n", err_buf); fflush(stdout);
-  string err_str = err_buf;
-  throw (err_str);
+  B2FATAL(err_buf);
   return -1;
 }
 
@@ -200,8 +189,7 @@ int RawCOPPERFormat::GetEventCRC16Value(int n, int finesse_num)
           "[FATAL] This function is not supported in the version of  RawCOPPER format that you're using. n=%d fin=%d : %s %s %d: Exiting...\n",
           n, finesse_num, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("%s\n", err_buf); fflush(stdout);
-  string err_str = err_buf;
-  throw (err_str);
+  B2FATAL(err_buf);
   return -1;
 }
 

@@ -47,25 +47,29 @@ TH2F* create2DHisto(const char* name, const char* title,
 }
 
 // ======================================================================
-void addDetails(TH1F* h, const char* descr, const char* check, const char* contact_str)
-{
-      h->GetListOfFunctions()->Add(new TNamed("Description", descr));
-      h->GetListOfFunctions()->Add(new TNamed("Check", check));
-      h->GetListOfFunctions()->Add(new TNamed("Contact", contact_str));
-
-}
-
-void add2Details(TH2F* h, const char* descr, const char* check, const char* contact_str)
+void addDetails(TH1F* h, const char* descr, const char* check, const char* contact_str, bool isShifter)
 {
   h->GetListOfFunctions()->Add(new TNamed("Description", descr));
   h->GetListOfFunctions()->Add(new TNamed("Check", check));
   h->GetListOfFunctions()->Add(new TNamed("Contact", contact_str));
+  if (isShifter)
+    h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
+  
+}
 
+void add2Details(TH2F* h, const char* descr, const char* check, const char* contact_str, bool isShifter)
+{
+  h->GetListOfFunctions()->Add(new TNamed("Description", descr));
+  h->GetListOfFunctions()->Add(new TNamed("Check", check));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", contact_str));
+  if (isShifter)
+    h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
+  
 }
 
 // ======================================================================
 void plotThis(const char *Type[], const char *Side[], const char* name, const char * title, int nbins, double xmin, double xmax, const char* x_label,        TTree* tree, const char* expr,  
-	      const char* descr, const char* check, const char* contact_str, int size = -1)
+	      const char* descr, const char* check, const char* contact_str, bool isShifter=false, int size = -1)
 {
    for (int layer=3; layer<=6; layer++) // loop on layers  
      {
@@ -89,7 +93,7 @@ void plotThis(const char *Type[], const char *Side[], const char* name, const ch
 		cond = (Form("layer==%d&&strip_dir==%d&&sensor_type==%d&&cluster_size>2", layer, i, m)); 
 	      tree->Draw(Form("%s>>%s", expr, hName), cond);
 	      
-	      addDetails(h, descr, check, contact_str);
+	      addDetails(h, descr, check, contact_str, isShifter);
 	      h->SetTitle(Form("%s, Layer %d",title, layer));
 	      h->Write(hName);
 	      //delete h;
@@ -105,7 +109,7 @@ void plotThis(const char *Type[], const char *Side[], const char* name, const ch
 
 //=================================================================================
 
-void plotMean(const char *Type[], const char *Side[], const char* name, const char * title, int nbins, double xmin, double xmax, const char* x_label,        TTree* tree,const char* descr, const char* check, const char* contact_str)
+void plotMean(const char *Type[], const char *Side[], const char* name, const char * title, int nbins, double xmin, double xmax, const char* x_label,        TTree* tree,const char* descr, const char* check, const char* contact_str, bool isShifter=false)
 {
   float lay[]={0,33.624,85.053,136.481,187.910,239.338,290.767,342.195,0, 8.00,44.00,80.00,116.0,152.0,188.0,224.0,260.0,296.00,332.00,0,22,52,82,112.0,142.0,172.0,202.0,232.0,262.0,292,322,352,0, 18.5,41.0,63.5,86.0,108.5,131.0,153.5,176.0,198.5,221.0,243.5,266.00,288.5,311.0,333.5,356};
 
@@ -176,7 +180,7 @@ void plotMean(const char *Type[], const char *Side[], const char* name, const ch
 		  delete h;
 		}
 
-	      addDetails(h1, descr, check, contact_str);
+	      addDetails(h1, descr, check, contact_str, isShifter);
 	      h1->Write();
 	      
 	    }} 
@@ -190,7 +194,7 @@ void plotMean(const char *Type[], const char *Side[], const char* name, const ch
 
 void plotThis2d(const char *Type[], const char *Side[], const char* name, const char * title, int nbins, double xmin, double xmax, const char* x_label,int ybins, double ymin, double ymax, const char* y_label,
                 TTree* tree, const char* expr,  const char* expy,
-                const char* descr, const char* check, const char* contact_str)
+                const char* descr, const char* check, const char* contact_str, bool isShifter=false)
 {
    for (int layer=3; layer<=6; layer++) // loop on layers  
       {
@@ -208,7 +212,7 @@ void plotThis2d(const char *Type[], const char *Side[], const char* name, const 
           const char* cond = (Form("layer==%d&&strip_dir==%d&&sensor_type==%d", layer, i, m)); 
 
 	  tree->Draw(Form("%s:%s>>%s",expy,expr,hName),cond);
-          add2Details(h1, descr, check, contact_str);
+          add2Details(h1, descr, check, contact_str, isShifter);
 	  h1->Write(hName);
 
           delete h1;
@@ -219,7 +223,7 @@ void plotThis2d(const char *Type[], const char *Side[], const char* name, const 
 // ======================================================================
 void plotThisNoSideLoop(const char *Type[], const char* name, const char * title, int nbins, double xmin, double xmax, const char* x_label,
                 TTree* tree, const char* expr,  
-                const char* descr, const char* check, const char* contact_str)
+                const char* descr, const char* check, const char* contact_str, bool isShifter=false)
 {
    for (int layer=3; layer<=6; layer++) // loop on layers  
       {
@@ -239,7 +243,7 @@ void plotThisNoSideLoop(const char *Type[], const char* name, const char * title
           const char* cond = (Form("layer==%d&&sensor_type==%d", layer, m)); 
           tree->Draw(Form("%s>>%s", expr, hName), cond);
 	  
-          addDetails(h, descr, check, contact_str);
+          addDetails(h, descr, check, contact_str, isShifter);
 	  h->SetTitle(Form("%s, Layer %d",title, layer));	  
           h->Write(hName);
 	  
@@ -287,12 +291,12 @@ void SVDValidation()
   // SpacePoint TimeU
   plotThisNoSideLoop(Type,  "spTimeU", "SpacePoint Time U", 200, -100, 100, "SP time u (ns)",
            treeSpacePoint, "time_u", "time of the U cluster",
-           "between 20 and 40 ns", contact_str);
+		     "between 20 and 40 ns", contact_str, true);
 
   // SpacePoint TimeV
   plotThisNoSideLoop(Type,  "spTimeV", "SpacePoint Time V", 200, -100, 100, "SP time v (ns)",
            treeSpacePoint, "time_v", "time of the V cluster",
-           "between 20 and 40 ns", contact_str);
+		     "between 20 and 40 ns", contact_str, true);
 
   // Cls size
   plotThis(Type, Side, "cSize", "Cluster size", 9, 0.5, 9.5, "Cls size",
@@ -308,43 +312,43 @@ void SVDValidation()
   const char* name = "Residual";
   plotThis(Type, Side, "cResidual", name, 100, -0.010, 0.010, Form("%s (cm)",name),
            tree, "cluster_residual", "Residual (clusterPos - truehitPos) distributions",
-           "Should be peak around zero", contact_str);
+           "Should be peak around zero", contact_str, true);
 
   name = "Residual for cluster size = 1";
   plotThis(Type, Side, "cResidualSize1", name, 100, -0.010, 0.010, Form("%s (cm)",name),
            tree, "cluster_residual", "Residual (clusterPos - truehitPos) distributions for clusters size = 1",
-           "Should be peak around zero", contact_str, 1);
+           "Should be peak around zero", contact_str, false, 1);
   
   name = "ResidualSize2";
   plotThis(Type, Side, "cResidualSize2", name, 100, -0.010, 0.010, Form("%s (cm)",name),
            tree, "cluster_residual", "Residual (clusterPos - truehitPos) distributions for clusters size = 2",
-           "Should be peak around zero", contact_str, 2);
+           "Should be peak around zero", contact_str, false, 2);
 
   name = "ResidualSize3";
   plotThis(Type, Side, "cResidualSize3", name, 100, -0.010, 0.010, Form("%s (cm)",name),
            tree, "cluster_residual", "Residual (clusterPos - truehitPos) distributions for clusters size > 2",
-           "Should be peak around zero", contact_str, 3);
+           "Should be peak around zero", contact_str, false, 3);
   
   // Pull
   name = "Pull";
   plotThis(Type, Side, "cPull", name, 100, -5, 5, name,
            tree, "cluster_pull", "Pull (clusterPos - truehitPos)/clusterPosSignma distributions",
-           "Should be centered at 0 with RMS less than 2.0", contact_str);
+           "Should be centered at 0 with RMS less than 2.0", contact_str, true);
 
   name = "PullSize1";
   plotThis(Type, Side, "cPullSize1", name, 100, -5, 5, name,
            tree, "cluster_pull", "Pull (clusterPos - truehitPos)/clusterPosSignma distributions for cluster size = 1",
-           "Should be centered at 0 with RMS equal to 1", contact_str, 1);
+           "Should be centered at 0 with RMS equal to 1", contact_str, false, 1);
   
   name = "PullSize2";
   plotThis(Type, Side, "cPullSize2", name, 100, -5, 5, name,
            tree, "cluster_pull", "Pull (clusterPos - truehitPos)/clusterPosSignma distributions for cluster size = 2",
-           "Should be centered at 0 with RMS equal to 1", contact_str, 2);
+           "Should be centered at 0 with RMS equal to 1", contact_str, false, 2);
   
   name = "PullSize3";
   plotThis(Type, Side, "cPullSize3", name, 100, -5, 5, name,
            tree, "cluster_pull", "Pull (clusterPos - truehitPos)/clusterPosSignma distributions for cluster size > 2",
-           "Should be centered at 0 with RMS equal to 1", contact_str, 3);
+           "Should be centered at 0 with RMS equal to 1", contact_str, false, 3);
   
   // Cluster charge     
   name = "Cluster Charge";
@@ -356,7 +360,7 @@ void SVDValidation()
   name = "Cluster SN ratio";
   plotThis(Type, Side, "cClusterSN", name, 121, -0.5, 120.5, Form("%s",name),
          tree, "cluster_snr", Form("%s distributions", name),
-         "Should peak at around 20", contact_str);
+	   "Should peak at around 20", contact_str, true);
 
   // Strip charge   
   name = "Strip Charge";

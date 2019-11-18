@@ -58,7 +58,7 @@ namespace Belle2 {
     /**
     * Add axis
     */
-    void addAxis(std::string name);
+    void addAxis(const std::string& name);
 
     /**
      * Adding predefined ID to the table.

@@ -7,13 +7,9 @@
 
 #include "G4VPVParameterisation.hh"
 
-#include "Randomize.hh"
-
 #include "G4VGraphicsScene.hh"
 
-#include "G4GenericPolycone.hh"
-
-#include <map>
+#include "CLHEP/Random/RandFlat.h"
 
 using namespace std;
 using namespace Belle2;

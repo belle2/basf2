@@ -129,8 +129,8 @@ class Cluster(ClusterBase):
                 requirement_vmem=self.requirement_vmem,
                 queuename=self.queuename
             )
-            print('Creating job template for wrapper script {}'.format(
-                shell_script_name)
+            print(
+                f'Creating job template for wrapper script {shell_script_name}'
             )
             jt = session.createJobTemplate()
             jt.remoteCommand = shell_script_name
@@ -139,8 +139,8 @@ class Cluster(ClusterBase):
 
             if not dry:
                 jobid = session.runJob(jt)
-                self.logger.debug("Script {} started with job id {}".format(
-                    job.name, jobid)
+                self.logger.debug(
+                    f"Script {job.name} started with job id {jobid}"
                 )
                 job.cluster_drmaa_jobid = jobid
 

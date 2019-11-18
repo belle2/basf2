@@ -14,36 +14,34 @@ from stdCharged import stdPi, stdK
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.charm import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging
-gb2_setuprel = 'release-03-00-00'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-04-00-00'
 
-kspi0path = Path()
+path = Path()
 
 skimCode = encodeSkimName('BtoDh_Kspi0')
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+
+fileList = get_test_file("mixedBGx1", "MC12")
 
 
-inputMdstList('MC9', fileList, path=kspi0path)
+inputMdstList('default', fileList, path=path)
 
 
-stdPi('all', path=kspi0path)
-stdK('all', path=kspi0path)
-loadStdSkimPi0(path=kspi0path)
-stdKshorts(path=kspi0path)
+stdPi('all', path=path)
+stdK('all', path=path)
+loadStdSkimPi0(path=path)
+stdKshorts(path=path)
 
 # B- to D(->Kspi0)h- Skim
 from skim.btocharm import loadDkspi0, BsigToDhToKspi0List
-loadDkspi0(path=kspi0path)
-BtoDhList = BsigToDhToKspi0List(path=kspi0path)
-skimOutputUdst(skimCode, BtoDhList, path=kspi0path)
-summaryOfLists(BtoDhList, path=kspi0path)
+loadDkspi0(path=path)
+BtoDhList = BsigToDhToKspi0List(path=path)
+skimOutputUdst(skimCode, BtoDhList, path=path)
+summaryOfLists(BtoDhList, path=path)
 
 
-setSkimLogging()
-process(kspi0path)
+setSkimLogging(path)
+process(path)
 
 # print out the summary
 print(statistics)

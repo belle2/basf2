@@ -11,12 +11,12 @@ from svd import *
 import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import SVDStripCalAmp
-from ROOT.Belle2 import SVDTriggerBinDependentConstants
+import datetime
 
 import os
 
-timeShift = 0
-timeShiftTBDep = 0
+now = datetime.datetime.now()
+
 peakTime = 75
 pulseWidth = 130
 
@@ -51,21 +51,13 @@ class defaultPulseShapeImporter(basf2.Module):
         iov = Belle2.IntervalOfValidity.always()
 
         # gain, peakTime,
-        calAmp_payload = Belle2.SVDPulseShapeCalibrations.t_calAmp_payload()
         tmp_calAmp = SVDStripCalAmp()
-        tmp_calAmp.gain = -1  # set after the loop on sensors
+        tmp_calAmp.gain = 275  # set after the loop on sensors
         tmp_calAmp.peakTime = peakTime
         tmp_calAmp.pulseWidth = pulseWidth
-        # time shift correction (old correction: set to 0)
-        time_payload = Belle2.SVDPulseShapeCalibrations.t_time_payload()
-
-        # trigger-bin dependent time shift correction (old correction: set to 0)
-        bin_payload = Belle2.SVDPulseShapeCalibrations.t_bin_payload()
-        tmp_bin = SVDTriggerBinDependentConstants()
-        tmp_bin.bin0 = timeShiftTBDep
-        tmp_bin.bin1 = timeShiftTBDep
-        tmp_bin.bin2 = timeShiftTBDep
-        tmp_bin.bin3 = timeShiftTBDep
+        calAmp_payload = Belle2.SVDPulseShapeCalibrations.t_calAmp_payload(
+            tmp_calAmp, "PulseShapeCalibrations_default_" + str(now.isoformat()) +
+            "_INFO:_peakTime=75_pulseWidth=130_gain=fromPhase3calibrations")
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -104,20 +96,19 @@ class defaultPulseShapeImporter(basf2.Module):
                                         gain = gain_origami_U
 
                         tmp_calAmp.gain = 1 / gain
-                        print(str(Nstrips))
+
+                        # print(str(Nstrips))
                         for strip in range(0, Nstrips):
-                            print("setting Gain for strip " + str(strip) + " to " + str(tmp_calAmp.gain))
+                            # print("setting Gain for strip " + str(strip) + " to " + str(tmp_calAmp.gain))
 
-                            time_payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), strip, timeShift)
                             calAmp_payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), strip, tmp_calAmp)
-                            bin_payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), strip, tmp_bin)
 
-        Belle2.Database.Instance().storeData(Belle2.SVDPulseShapeCalibrations.time_name, time_payload, iov)
         Belle2.Database.Instance().storeData(Belle2.SVDPulseShapeCalibrations.calAmp_name, calAmp_payload, iov)
-        Belle2.Database.Instance().storeData(Belle2.SVDPulseShapeCalibrations.bin_name, bin_payload, iov)
 
 
-use_local_database("localDB/database.txt", "localDB")
+use_database_chain()
+use_central_database("svd_onlySVDinGeoConfiguration")
+use_local_database("localDB_defaultPulseShapeCalibrations/database.txt", "localDB_defaultPulseShapeCalibrations")
 
 main = create_path()
 
@@ -126,7 +117,7 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
-main.add_module("Gearbox")  # , fileName="/geometry/Beast2_phase2.xml")
+main.add_module("Gearbox")
 main.add_module("Geometry", components=['SVD'])
 
 main.add_module(defaultPulseShapeImporter())

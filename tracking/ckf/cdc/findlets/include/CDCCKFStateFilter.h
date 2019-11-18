@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
@@ -63,10 +62,15 @@ namespace Belle2 {
 
       TrackFindingCDC::Weight weight;
 
+      B2DEBUG(100, "On layer: " << (lastState.isSeed() ? -1 : lastState.getWireHit()->getWire().getICLayer()));
+
       for (CDCCKFState& nextState : nextStates) {
+        B2DEBUG(100, "Checking layer: " << nextState.getWireHit()->getWire().getICLayer());
+
         weight = m_preFilter({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
+          B2DEBUG(100, "Fails PreFilter");
           continue;
         }
 
@@ -76,6 +80,7 @@ namespace Belle2 {
         weight = m_basicFilter({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
+          B2DEBUG(100, "Fails BasicFilter");
           continue;
         }
 
@@ -83,6 +88,7 @@ namespace Belle2 {
         weight = m_extrapolationFilter({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
+          B2DEBUG(100, "Fails ExtrapolationFilter");
           continue;
         }
 
@@ -93,6 +99,7 @@ namespace Belle2 {
         weight = m_finalSelection({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
+          B2DEBUG(100, "Fails FinalFilter");
           continue;
         }
       }

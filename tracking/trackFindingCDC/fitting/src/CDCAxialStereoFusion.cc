@@ -12,8 +12,6 @@
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
@@ -22,10 +20,6 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
-
-#include <cdc/translators/RealisticTDCCountTranslator.h>
-
-#include <iterator>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -38,6 +32,7 @@ namespace {
     CDCTrajectory2D trajectory2D = trajectory3D.getTrajectory2D();
     CDCTrajectorySZ trajectorySZ = trajectory3D.getTrajectorySZ();
 
+    result.reserve(segment2D.size());
     for (const CDCRecoHit2D& recoHit2D : segment2D) {
       result.push_back(CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D, trajectorySZ));
     }
@@ -121,24 +116,13 @@ CDCTrajectory3D CDCAxialStereoFusion::fusePreliminary(const CDCSegment2D& fromSe
   CDCSegment3D stereoSegment3D = CDCSegment3D::reconstruct(stereoSegment2D, axialTrajectory2D);
 
   CDCTrajectorySZ trajectorySZ;
-  const bool mcTruthReference = false;
-  if (mcTruthReference) {
-    const CDCMCSegment2DLookUp& theMCSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
-    CDCTrajectory3D axialMCTrajectory3D = theMCSegmentLookUp.getTrajectory3D(&axialSegment2D);
-    Vector3D localOrigin3D =  axialMCTrajectory3D.getLocalOrigin();
-    localOrigin3D.setXY(axialTrajectory2D.getLocalOrigin());
-    axialMCTrajectory3D.setLocalOrigin(localOrigin3D);
-    trajectorySZ = axialMCTrajectory3D.getTrajectorySZ();
-    stereoSegment3D = CDCSegment3D::reconstruct(stereoSegment2D, axialMCTrajectory3D.getTrajectory2D());
 
-  } else {
-    CDCSZFitter szFitter = CDCSZFitter::getFitter();
-    trajectorySZ = szFitter.fit(stereoSegment3D);
-    if (not trajectorySZ.isFitted()) {
-      CDCTrajectory3D result;
-      result.setChi2(NAN);
-      return result;
-    }
+  CDCSZFitter szFitter = CDCSZFitter::getFitter();
+  trajectorySZ = szFitter.fit(stereoSegment3D);
+  if (not trajectorySZ.isFitted()) {
+    CDCTrajectory3D result;
+    result.setChi2(NAN);
+    return result;
   }
 
   CDCTrajectory3D preliminaryTrajectory3D(axialTrajectory2D, trajectorySZ);

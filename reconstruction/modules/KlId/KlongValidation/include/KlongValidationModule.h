@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef KlongValidationModule_H
-#define KlongValidationModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -21,7 +20,6 @@
 #include <string>
 #include <TH1F.h>
 #include <TGraph.h>
-
 
 namespace Belle2 {
 
@@ -70,7 +68,7 @@ namespace Belle2 {
     /** cluster reconstructed as K0L?   */
     bool   m_reconstructedAsKl{false};
     /** of > 0 use Klid else use trackflag as reconstruction criterion  */
-    float m_KlIDCut{ -1};
+    float m_KlIdCut{ -1};
 
     /** is beam bkg */
     bool m_isBeamBKG{false};
@@ -88,11 +86,11 @@ namespace Belle2 {
     /**  fake momentum plot   */
     TH1F* m_fakeMom{nullptr};
     /** efficiency in x-y plane   */
-    TH1F* m_effPhi_Pass{nullptr};
+    TH1F* m_Phi_Pass{nullptr};
     /** efficiency in angle to z   */
-    TH1F* m_effTheta_Pass{nullptr};
+    TH1F* m_Theta_Pass{nullptr};
     /** momentum efficiency   */
-    TH1F* m_effMom_Pass{nullptr};
+    TH1F* m_Mom_Pass{nullptr};
 
     /** efficiency in x-y plane   */
     TH1F* m_Phi_all{nullptr};
@@ -149,13 +147,13 @@ namespace Belle2 {
     const std::vector<double> m_xbins =
     {0, 0.001, 0.01, 0.1, 0.15, 0.175, 0.2, 0.3, 0.4, 0.5, 1};
 
-    /** output path   */
-    std::string m_outPath = "nightlyKlongValidation.root";
+    /** output file name */
+    std::string m_outputName = "K_long_full_validation_sample.root";
 
     /** root tree etc. */
-    TFile* m_f = nullptr;  //
+    TFile* m_f = nullptr;
 
   }; // end class
+
 } // end namespace Belle2
 
-#endif

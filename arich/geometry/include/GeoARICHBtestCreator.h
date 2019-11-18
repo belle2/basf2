@@ -14,8 +14,6 @@
 
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
-
 
 class  G4LogicalVolume;
 class G4Material;

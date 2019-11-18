@@ -20,7 +20,6 @@
 #include <CLHEP/Random/Random.h>
 
 #include <G4LogicalVolumeStore.hh>
-#include <G4RegionStore.hh>
 #include <G4PhysicalVolumeStore.hh>
 #include <G4SolidStore.hh>
 #include <G4RegionStore.hh>

@@ -11,11 +11,9 @@
 //Merge multiple constraints that we want to project simultaneously.
 //Kept for development, currently incompatible with referencing.
 
-#include <framework/logging/Logger.h>
-//
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
-#include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/MergedConstraint.h>
+#include <analysis/VertexFitting/TreeFitter/Projection.h>
 
 namespace TreeFitter {
 

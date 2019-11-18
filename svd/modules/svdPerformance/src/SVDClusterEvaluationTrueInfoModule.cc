@@ -40,6 +40,7 @@ SVDClusterEvaluationTrueInfoModule::SVDClusterEvaluationTrueInfoModule() : Modul
   setDescription("This modules generates performance plots on SVD clustering.");
 
   addParam("outputFileName", m_outputFileName, "output rootfile name", std::string("SVDClusterEvaluationTrueInfo.root"));
+  addParam("SVDEventInfo", m_svdEventInfoName, "Defines the name of the EventInfo", std::string(""));
 }
 
 
@@ -61,6 +62,9 @@ void SVDClusterEvaluationTrueInfoModule::initialize()
   SVDRecoDigits.isRequired();
   SVDClusters.isRequired();
   SVDTrueHits.isRequired();
+  if (!m_storeSVDEvtInfo.isOptional(m_svdEventInfoName)) m_svdEventInfoName = "SVDEventInfoSim";
+  m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
+
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
 
@@ -213,6 +217,8 @@ void SVDClusterEvaluationTrueInfoModule::beginRun()
 void SVDClusterEvaluationTrueInfoModule::event()
 {
 
+  SVDModeByte modeByte = m_storeSVDEvtInfo->getModeByte();
+
   StoreArray<SVDShaperDigit> SVDShaperDigits;
   StoreArray<SVDRecoDigit> SVDRecoDigits;
   StoreArray<SVDCluster> SVDClusters;
@@ -307,8 +313,6 @@ void SVDClusterEvaluationTrueInfoModule::event()
 
       //get trigger bin
       int triggerBin = 0;
-      RelationVector<SVDRecoDigit> relatVectorClusToRD = DataStore::getRelationsWithObj<SVDRecoDigit>(&clus);
-      SVDModeByte modeByte = relatVectorClusToRD[0]->getModeByte();
       triggerBin = (int)modeByte.getTriggerBin();
 
       if (triggerBin == 0)

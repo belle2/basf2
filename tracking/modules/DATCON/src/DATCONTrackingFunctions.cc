@@ -10,6 +10,8 @@
 
 #include <tracking/modules/DATCON/DATCONTrackingModule.h>
 
+#include <tracking/gfbfield/GFGeant4Field.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -192,6 +194,7 @@ DATCONTrackingModule::trackCandMerger()
             uTrackCandCopy.erase(it_in);
             break;
           }
+          // cppcheck-suppress redundantAssignment
           cancelflag = true;
         }
 
@@ -234,6 +237,7 @@ DATCONTrackingModule::trackCandMerger()
             vTrackCandCopy.erase(it_in);
             break;
           }
+          // cppcheck-suppress redundantAssignment
           cancelflag = true;
         }
 
@@ -265,7 +269,6 @@ DATCONTrackingModule::trackMerger()
   std::vector<DATCONTrack> TracksCopy;
   std::vector<DATCONTrack> TracksMerged;
 
-  int count = 1;
   int trackID = 1;
 
   if (storeDATCONTracks.isValid()) {
@@ -289,7 +292,7 @@ DATCONTrackingModule::trackMerger()
     double ThetaAverage  = trackTheta;
     double ZzeroAverage  = TrackZzero;
 
-    count = 1;
+    int count = 1;
 
     bool cancelflag = false;
     while (true) {
@@ -313,6 +316,7 @@ DATCONTrackingModule::trackMerger()
           TracksCopy.erase(it_in);
           break;
         }
+        // cppcheck-suppress redundantAssignment
         cancelflag = true;
       }
 

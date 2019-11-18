@@ -72,6 +72,7 @@ class CombinedTrackingValidationModule(metamodules.PathModule):
         for module in self.modules:
             module.output_file_name = output_tfile
 
+        #: the output TFile
         self.output_tfile = output_tfile
 
     def terminate(self):

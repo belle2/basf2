@@ -131,6 +131,7 @@ namespace Belle2 {
                                        Const::TOP,
                                        barHit->getModuleID(),
                                        EXT_ENTER,
+                                       false,
                                        tof,
                                        barHit->getPosition(),
                                        barHit->getMomentum(),

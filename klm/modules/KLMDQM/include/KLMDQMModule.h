@@ -3,24 +3,30 @@
  * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin                                          *
+ * Contributors: Kirill Chilikin, Vipin Gaur, Leo Piilonen                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 
-/* External headers. */
-#include <TH1F.h>
-#include <TH2F.h>
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/bklm/dataobjects/BKLMHit1d.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/dataobjects/KLMChannelArrayIndex.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMSectorArrayIndex.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 
-/* Belle2 headers. */
-#include <bklm/dataobjects/BKLMDigit.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/dataobjects/ElementNumbersSingleton.h>
+/* Belle 2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+
+/* ROOT headers. */
+#include <TH1F.h>
 
 namespace Belle2 {
 
@@ -73,16 +79,6 @@ namespace Belle2 {
 
   private:
 
-    /**
-     * Define EKLM histograms.
-     */
-    void defineHistoEKLM();
-
-    /**
-     * Define BKLM histograms.
-     */
-    void defineHistoBKLM();
-
     /** Directory for KLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryName;
 
@@ -92,17 +88,29 @@ namespace Belle2 {
     /** Directory for BKLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryNameBKLM;
 
-    /** name of BKLMDigit store array. */
-    std::string m_outputDigitsName;
+    /** KLM channel array index. */
+    const KLMChannelArrayIndex* m_ChannelArrayIndex;
 
-    /** Name of BKLMHit store array. */
-    std::string m_outputHitsName;
+    /** KLM sector array index. */
+    const KLMSectorArrayIndex* m_SectorArrayIndex;
+
+    /** KLM element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
 
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_Elements;
 
-    /** Digits. */
-    StoreArray<EKLMDigit> m_Digits;
+    /** BKLM digits. */
+    StoreArray<BKLMDigit> m_BklmDigits;
+
+    /** BKLM 1d hits. */
+    StoreArray<BKLMHit1d> m_BklmHit1ds;
+
+    /** BKLM 2d hits. */
+    StoreArray<BKLMHit2d> m_BklmHit2ds;
+
+    /** EKLM digits. */
+    StoreArray<EKLMDigit> m_EklmDigits;
 
     /** Time: BKLM RPCs. */
     TH1F* m_TimeRPC;
@@ -113,62 +121,34 @@ namespace Belle2 {
     /** Time: EKLM scintillators. */
     TH1F* m_TimeScintillatorEKLM;
 
-    /** Sector number. */
-    TH1F* m_Sector;
+    /** Plane occupancy: BKLM, phi readout. */
+    TH1F* m_PlaneBKLMPhi;
 
-    /** Strip number within a layer. */
-    TH1F** m_StripLayer;
+    /** Plane occupancy: BKLM, z readout. */
+    TH1F* m_PlaneBKLMZ;
 
-    /** Histogram: number of hits per layer. */
-    TH1F* h_layerHits;
+    /** Plane occupancy: EKLM. */
+    TH1F* m_PlaneEKLM;
 
-    /** Histogram: Lowest 16 bits of the B2TT CTIME signal. */
-    TH1F* h_ctime;
+    /** Number of hits per channel. */
+    TH1F** m_ChannelHits[
+      EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
+      BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
 
-    /** Histogram: MC simulation event hit time. */
-    TH1F* h_simtime;
+    /** Number of channel hit histograms per sector for BKLM. */
+    const int m_ChannelHitHistogramsBKLM = 2;
 
-    /** Histogram: MC simulation pulse height. */
-    TH1F* h_simEDep;
+    /** Number of channel hit histograms per sector for EKLM. */
+    const int m_ChannelHitHistogramsEKLM = 3;
 
-    /** Histogram: Reconstructed pulse height. */
-    TH1F* h_eDep;
+    /** Axial position of muon hit. */
+    TH1F* m_bklmHit2dsZ;
 
-    /** Histogram: Simulated number of MPPC pixels. */
-    TH1F* h_simNPixel;
+    /** Number of BKLM Digits. */
+    TH1F* m_BklmDigitsNumber;
 
-    /** Histogram: Reconstructed number MPPC pixels. */
-    TH1F* h_nPixel;
-
-    /** Histogram: Detector-module identifier. */
-    TH1F* h_moduleID;
-
-    /** Histogram: z-measuring strip numbers of the 2D hit. */
-    TH1F* h_zStrips;
-
-    /** Histogram: Phi strip number of muon hit. */
-    TH1F* h_phiStrip;
-
-    /** Histogram: Sector number of muon hit. */
-    TH1F* h_sector;
-
-    /** Histogram: Layer number of muon hit. */
-    TH1F* h_layer;
-
-    /** Histogram: Distance from z axis in transverse plane of muon hit. */
-    TH1F* h_rBKLMHit2ds;
-
-    /** Histogram: Axial position of muon hit. */
-    TH1F* h_zBKLMHit2ds;
-
-    /** Histogram: Position projected into transverse plane of muon hit. */
-    TH2F* h_yvsxBKLMHit2ds;
-
-    /** Histogram: Position projected into x-z plane of muon hit. */
-    TH2F* h_xvszBKLMHit2ds;
-
-    /** Histogram: Position projected into y-z plane of muon hit. */
-    TH2F* h_yvszBKLMHit2ds;
+    /** Number of KLM Digits. */
+    TH1F* m_KlmDigitsNumber;
 
   };
 

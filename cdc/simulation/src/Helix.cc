@@ -80,7 +80,6 @@
 
 #include <math.h>
 #include <float.h>
-#include <exception>
 
 #include <cdc/simulation/Helix.h>
 #include "CLHEP/Matrix/Matrix.h"

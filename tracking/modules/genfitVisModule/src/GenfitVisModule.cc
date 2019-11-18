@@ -13,9 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <geometry/GeometryManager.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
 #include <genfit/Track.h>
-#include <genfit/GFRaveVertex.h>
 #include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>
 

@@ -16,8 +16,6 @@
 
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
-
 #include <tracking/trackFindingVXD/algorithms/CellularAutomaton.h>
 #include <tracking/trackFindingVXD/algorithms/PathCollectorRecursive.h>
 #include <tracking/trackFindingVXD/algorithms/NodeFamilyDefiner.h>
@@ -28,7 +26,6 @@
 
 #include <tracking/trackFindingVXD/tcTools/SpacePointTrackCandCreator.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
-#include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <tracking/trackFindingVXD/algorithms/CAValidator.h>
 #include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerPathCollector.h>

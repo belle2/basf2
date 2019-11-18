@@ -46,16 +46,16 @@ namespace Belle2 {
      *  @param pxdCluster   Pointer to PXDCluster (typically owned by the DataStore).
      *  @param aSensorInfo  Only for testing purposes.
      */
-    SpacePoint(const PXDCluster* pxdCluster,
-               const VXD::SensorInfoBase* aSensorInfo = nullptr);
+    explicit SpacePoint(const PXDCluster* pxdCluster,
+                        const VXD::SensorInfoBase* aSensorInfo = nullptr);
 
     /** Constructor SpacePoint from ONE or TWO SVDClusters.
      *
      *  @param clusters            container carrying pointers to SVDCluster (1 or 2 (u+v), must not be nullptr).
      *  @param aSensorInfo         SensorInfoBase for testing purposes, usually derived from first cluster.
      */
-    SpacePoint(std::vector<SVDCluster const*>& clusters,
-               VXD::SensorInfoBase const* aSensorInfo = nullptr);
+    explicit SpacePoint(std::vector<SVDCluster const*>& clusters,
+                        VXD::SensorInfoBase const* aSensorInfo = nullptr);
 
     /** Default constructor for the ROOT IO. */
     SpacePoint() :

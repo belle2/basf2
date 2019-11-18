@@ -28,6 +28,9 @@
 
 using namespace Belle2;
 
+//#define ONLINE 0
+#define ONLINE 1
+
 //prescale setting
 void setprescale()
 {
@@ -188,20 +191,36 @@ void setprescale()
 
   DBImportObjPtr<TRGGDLDBPrescales> prescales;
   prescales.construct();
-  for (int i = 0; i < N_PSNM_ARRAY; i++) {
-    IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
-    //initialize
-    for (int j = 0; j < N_BITS_RESERVED; j++) {
-      prescales->setprescales(j, 0);
+  if (ONLINE == 0) {
+    for (int i = 0; i < N_PSNM_ARRAY; i++) {
+      IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
+      //initialize
+      for (int j = 0; j < N_BITS_RESERVED; j++) {
+        prescales->setprescales(j, 0);
+      }
+      //set
+      for (int j = 0; j < nbit[i]; j++) {
+        prescales->setprescales(j, psnmValues[i][j]);
+      }
+      prescales->setnoutbit(nbit[i]);
+      prescales.import(iov);
     }
-    //set
-    for (int j = 0; j < nbit[i]; j++) {
-      prescales->setprescales(j, psnmValues[i][j]);
+  } else if (ONLINE == 1) {
+    //for (int i = N_PSNM_ARRAY-1; i < N_PSNM_ARRAY; i++) {
+    for (int i = 0; i < 1; i++) {
+      IntervalOfValidity iov(5, 0, -1, -1);
+      //initialize
+      for (int j = 0; j < N_BITS_RESERVED; j++) {
+        prescales->setprescales(j, 0);
+      }
+      //set
+      for (int j = 0; j < nbit[i]; j++) {
+        prescales->setprescales(j, psnmValues[i][j]);
+      }
+      prescales->setnoutbit(nbit[i]);
+      prescales.import(iov);
     }
-    prescales->setnoutbit(nbit[i]);
-    prescales.import(iov);
   }
-
 
 
 }
@@ -212,7 +231,7 @@ void setftdlbits()
 {
 
   const int N_BITS_RESERVED = 320;
-  const int N_OUTPUT_ARRAY = 6;
+  const int N_OUTPUT_ARRAY = 7;
 
   const int run[N_OUTPUT_ARRAY][4] = { //itnitial exp, initial run, end exp, end run
     0,    0, -1,  -1,
@@ -220,137 +239,90 @@ void setftdlbits()
     3, 292,  3, 1314,
     3, 1315, 3, 1511,
     3, 1512, 3, 5313,
-    3, 5314, 10,   0
+    3, 5314, 6,   -1,
+    7, 0,    -1,  -1
   };
 
   const int nbit[N_OUTPUT_ARRAY]      = {62, 62, 63, 67, 75, 88,
+                                         134
                                         };
-  const int nbit_temp[N_OUTPUT_ARRAY] = {62, 62, 63, 67, 75, 88 + 4,
-                                        };
+
 
   const char*
-  outputBitNames[N_BITS_RESERVED] = {
-    "zzz", "zzzo", "fff", "fffo", "zz", "zzo", "ff", "ffo", "hie", "lowe",
-    "lume", "c2", "c3", "c4", "c5", "bha", "bha_trk", "bha_brl", "bha_ecp", "g_high",
-    "g_c1", "gg", "mu_pair", "mu_b2b", "revo", "rand", "bg", "ecltiming", "nim0", "nima03",
-    "nimo03", "period", "eclnima03", "eclnimo03", "pls", "poi", "klmhit", "f", "fe", "ffe",
-    "fc", "ffc", "cdctiming", "cdcbb", "nim1c", "c1n0", "c1n1", "c1n2", "c1n3", "c1n4",
-    "c2n1", "c2n2", "c2n3", "c2n4", "cdcecl1", "cdcecl2", "cdcecl3", "cdcecl4", "cdcklm1", "cdcklm2",
-    "cdcklm3", "cdcklm4", "ffb", "uuu", "uuuo", "uub", "uuo", "c1hie", "c1lume", "n1hie",
-    "n1lume", "c3hie", "c3lume", "n3hie", "n3lume", "eed", "fed", "fp", "bha3d", "shem",
-    "ohem", "lml0", "lml1", "lml2", "lml3", "lml4", "lml5", "lml6", "lml7", "lml8",
-    "lml9", "lml10"
-  };
-
-  const int
-  outputMap[N_OUTPUT_ARRAY][N_BITS_RESERVED] = {
-
-    // -1
+  outputBitNames[N_OUTPUT_ARRAY][N_BITS_RESERVED] = {
+    //0
     {
-      0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-      10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-      20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-      30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-      40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-      50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-      60, 61
+      "zzz", "zzzo", "fff", "fffo", "zz", "zzo", "ff", "ffo", "hie", "lowe", "lume", "c2", "c3", "c4", "c5", "bha", "bha_trk", "bha_brl", "bha_ecp", "g_high", "g_c1", "gg", "mu_pair", "mu_b2b", "revo", "rand", "bg", "ecltiming", "nim0", "nima03", "nimo03", "period", "eclnima03", "eclnimo03", "pls", "poi", "klmhit", "f", "fe", "ffe", "fc", "ffc", "cdctiming", "cdcbb", "nim1c", "c1n0", "c1n1", "c1n2", "c1n3", "c1n4", "c2n1", "c2n2", "c2n3", "c2n4", "cdcecl1", "cdcecl2", "cdcecl3", "cdcecl4", "cdcklm1", "cdcklm2", "cdcklm3", "cdcklm4"
     },
-
-
-    // 0
-    // 62 bit. gdl0065c
-    // 10 <= run <= 261
+    //1
     {
-      0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-      10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-      20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-      30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-      40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-      50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-      60, 61
+      "zzz", "zzzo", "fff", "fffo", "zz", "zzo", "ff", "ffo", "hie", "lowe", "lume", "c2", "c3", "c4", "c5", "bha", "bha_trk", "bha_brl", "bha_ecp", "g_high", "g_c1", "gg", "mu_pair", "mu_b2b", "revo", "rand", "bg", "ecltiming", "nim0", "nima03", "nimo03", "period", "eclnima03", "eclnimo03", "pls", "poi", "klmhit", "f", "fe", "ffe", "fc", "ffc", "cdctiming", "cdcbb", "nim1c", "c1n0", "c1n1", "c1n2", "c1n3", "c1n4", "c2n1", "c2n2", "c2n3", "c2n4", "cdcecl1", "cdcecl2", "cdcecl3", "cdcecl4", "cdcklm1", "cdcklm2", "cdcklm3", "cdcklm4"
     },
-
-    // 1
-    // 63 bit. gdl0065e, 65h, 65j, 65k
-    // 292 <= run <= 480
+    //2
     {
-      0, 1, 2, 3, 4, 5, 62, 7, 8, 9,
-      10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-      20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-      30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-      40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-      50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-      60, 61, 6
+      "zzz", "zzzo", "fff", "fffo", "zz", "zzo", "ffb", "ffo", "hie", "lowe", "lume", "c2", "c3", "c4", "c5", "bha", "bha_trk", "bha_brl", "bha_ecp", "g_high", "g_c1", "gg", "mu_pair", "mu_b2b", "revo", "rand", "bg", "ecltiming", "nim0", "nima03", "nimo03", "period", "eclnima03", "eclnimo03", "pls", "poi", "klmhit", "f", "fe", "ffe", "fc", "ffc", "cdctiming", "cdcbb", "nim1c", "c1n0", "c1n1", "c1n2", "c1n3", "c1n4", "c2n1", "c2n2", "c2n3", "c2n4", "cdcecl1", "cdcecl2", "cdcecl3", "cdcecl4", "cdcklm1", "cdcklm2", "cdcklm3", "cdcklm4", "ff"
     },
-
-    // 2
-    // 67 bit. gdl0066a
-    // 292 <= run <= 480
+    //3
     {
-      0, 1, 2, 3, 4, 5, 62, 7, 8, 9,
-      10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-      20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-      30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-      40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-      50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-      60, 61, 6, 63, 64, 65, 66
+      "zzz", "zzzo", "fff", "fffo", "zz", "zzo", "ffb", "ffo", "hie", "lowe", "lume", "c2", "c3", "c4", "c5", "bha", "bha_trk", "bha_brl", "bha_ecp", "g_high", "g_c1", "gg", "mu_pair", "mu_b2b", "revo", "rand", "bg", "ecltiming", "nim0", "nima03", "nimo03", "period", "eclnima03", "eclnimo03", "pls", "poi", "klmhit", "f", "fe", "ffe", "fc", "ffc", "cdctiming", "cdcbb", "nim1c", "c1n0", "c1n1", "c1n2", "c1n3", "c1n4", "c2n1", "c2n2", "c2n3", "c2n4", "cdcecl1", "cdcecl2", "cdcecl3", "cdcecl4", "cdcklm1", "cdcklm2", "cdcklm3", "cdcklm4", "ff", "uuu", "uuuo", "uub", "uuo"
     },
-
-    // 3
-    // 75 bit. gdl0066b(71bit), 66c,e,f,h,k, 67g.
-    // 1512 <= run < 5314
+    //4
     {
-      0,  1,  2,  3,  4,  5,  62, 7,  8,  9,
-      10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-      20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-      30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-      40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-      50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-      60, 61, 6,  63, 64, 65, 66, 67, 68, 69,
-      70,  71,  72,  73,  74
+      "zzz", "zzzo", "fff", "fffo", "zz", "zzo", "ffb", "ffo", "hie", "lowe", "lume", "c2", "c3", "c4", "c5", "bha", "bha_trk", "bha_brl", "bha_ecp", "g_high", "g_c1", "gg", "mu_pair", "mu_b2b", "revo", "rand", "bg", "ecltiming", "nim0", "nima03", "nimo03", "period", "eclnima03", "eclnimo03", "pls", "poi", "klmhit", "f", "fe", "ffe", "fc", "ffc", "cdctiming", "cdcbb", "nim1c", "c1n0", "c1n1", "c1n2", "c1n3", "c1n4", "c2n1", "c2n2", "c2n3", "c2n4", "cdcecl1", "cdcecl2", "cdcecl3", "cdcecl4", "cdcklm1", "cdcklm2", "cdcklm3", "cdcklm4", "ff", "uuu", "uuuo", "uub", "uuo", "c1hie", "c1lume", "n1hie", "n1lume", "c3hie", "c3lume", "n3hie", "n3lume"
     },
-
-    // 4
-    // 88 bit. gdl0068a, 68b
-    // 5314 <= run
+    //5
     {
-      0,  1,  2,  3,  4,  5,  62,  7,  8,  9,
-      10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-      20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-      30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-      40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-      50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-      60, 61, 6,  -1, -1, -1, -1, 67, 68, 69,
-      70, 71, 72, 73, 74, 63, 64, 65, 66, 75,
-      76, 77, 78, 79, 80, 81, 82, 83, 84, 85,
-      86,  87
+      "zzz", "zzzo", "fff", "fffo", "zz", "zzo", "ffb", "ffo", "hie", "lowe", "lume", "c2", "c3", "c4", "c5", "bha", "bha_trk", "bha_brl", "bha_ecp", "g_high", "g_c1", "gg", "mu_pair", "mu_b2b", "revo", "rand", "bg", "ecltiming", "nim0", "nima03", "nimo03", "period", "eclnima03", "eclnimo03", "pls", "poi", "klmhit", "f", "fe", "ffe", "fc", "ffc", "cdctiming", "cdcbb", "nim1c", "c1n0", "c1n1", "c1n2", "c1n3", "c1n4", "c2n1", "c2n2", "c2n3", "c2n4", "cdcecl1", "cdcecl2", "cdcecl3", "cdcecl4", "cdcklm1", "cdcklm2", "cdcklm3", "cdcklm4", "ff", "eed", "fed", "fp", "bha3d", "c1hie", "c1lume", "n1hie", "n1lume", "c3hie", "c3lume", "n3hie", "n3lume", "shem", "ohem", "lml0", "lml1", "lml2", "lml3", "lml4", "lml5", "lml6", "lml7", "lml8", "lml9", "lml10"
+    },
+    //6
+    {
+      "fff", "ffs", "fss", "sss", "ffz", "fzz", "zzz", "ffy", "fyy", "yyy", "ff", "fs", "ss", "fz", "zz", "fy", "yy", "ffo", "fso", "sso", "fzo", "fyo", "ffb", "fsb", "ssb", "fzb", "fyb", "hie", "lowe", "lume", "c2", "c3", "c4", "c5", "bha3d", "bha", "bha_trk", "bha_brl", "bha_ecp", "bhapur", "eclmumu", "bhauni", "ecloflo", "g_high", "g_c1", "gg", "eed", "fed", "fp", "sp", "zp", "yp", "d_5", "shem", "ohem", "toptiming", "ecltiming", "cdctiming", "cdcbb", "mu_pair", "mu_b2b", "klmhit", "revolution", "random", "bg", "pls", "poi", "f", "s", "z", "y", "nim0", "nima03", "nimo03", "eclnima03", "eclnimo03", "n1gev0", "n1gev1", "n1gev2", "n1gev3", "n1gev4", "n2gev1", "n2gev2", "n2gev3", "n2gev4", "c2gev1", "c2gev2", "c2gev3", "c2gev4", "cdcecl1", "cdcecl2", "cdcecl3", "cdcecl4", "cdcklm1", "cdcklm2", "cdcklm3", "cdcklm4", "cdctop1", "cdctop2", "cdctop3", "cdctop4", "c1hie", "c1lume", "n1hie", "n1lume", "c3hie", "c3lume", "n3hie", "n3lume", "lml0", "lml1", "lml2", "lml3", "lml4", "lml5", "lml6", "lml7", "lml8", "lml9", "lml10", "lml11", "zzzv", "yyyv", "fffv", "zzv", "yyv", "ffov", "hiev", "lumev", "c4v", "bhav", "bhapurv", "mu_pairv", "bha3dv"
     }
-
   };
+
 
 
   DBImportObjPtr<TRGGDLDBFTDLBits> ftdlbits;
   ftdlbits.construct();
-  for (int i = 0; i < N_OUTPUT_ARRAY; i++) {
-    IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
-    //initialize
-    for (int j = 0; j < N_BITS_RESERVED; j++) {
-      ftdlbits->setoutbitname(j, "");
+  if (ONLINE == 0) {
+    for (int i = 0; i < N_OUTPUT_ARRAY; i++) {
+      IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
+      //initialize
+      for (int j = 0; j < N_BITS_RESERVED; j++) {
+        ftdlbits->setoutbitname(j, "");
+      }
+      //set
+      for (int j = 0; j < nbit[i]; j++) {
+        //std::cout << i << " " << j << " " << outputBitNames[i][j] << std::endl;
+        ftdlbits->setoutbitname(j, outputBitNames[i][j]);
+      }
+      ftdlbits->setnoutbit(nbit[i]);
+      ftdlbits.import(iov);
     }
-    //set
-    for (int j = 0; j < nbit_temp[i]; j++) {
-      if ((outputMap[i][j] >= 0) && (outputMap[i][j] < nbit[i]))ftdlbits->setoutbitname(outputMap[i][j], outputBitNames[j]);
+  } else if (ONLINE == 1) {
+    for (int i = N_OUTPUT_ARRAY - 1; i < N_OUTPUT_ARRAY; i++) {
+      IntervalOfValidity iov(0, 0, -1, -1);
+      //initialize
+      for (int j = 0; j < N_BITS_RESERVED; j++) {
+        ftdlbits->setoutbitname(j, "");
+      }
+      //set
+      for (int j = 0; j < nbit[i]; j++) {
+        //std::cout << i << " " << j << " " << outputBitNames[i][j] << std::endl;
+        ftdlbits->setoutbitname(j, outputBitNames[i][j]);
+      }
+      ftdlbits->setnoutbit(nbit[i]);
+      ftdlbits.import(iov);
     }
-    ftdlbits->setnoutbit(nbit[i]);
-    ftdlbits.import(iov);
   }
+
 }
 
 void setinputbits()
 {
 
   const int N_BITS_RESERVED = 320;
-  const int N_INPUT_ARRAY = 6;
+  const int N_INPUT_ARRAY = 7;
 
   const int run[N_INPUT_ARRAY][4] = { //itnitial exp, initial run, end exp, end run
     0, 0,    -1,  -1,
@@ -358,142 +330,81 @@ void setinputbits()
     3, 1315, 3, 1865,
     3, 1866, 3, 5313,
     3, 5314, 3, 5593,
-    3, 5594, 10,   0
+    3, 5594,  6,  -1,
+    7, 0,    -1,  -1
   };
 
 
-  const int nbit[N_INPUT_ARRAY]      = { 80, 80, 87,  89, 109,  111,
-                                       };
-  const int nbit_temp[N_INPUT_ARRAY] = { 80, 80, 87 + 2, 89, 109 + 3, 111 + 3,
-                                       };
+  const int nbit[N_INPUT_ARRAY]      = {
+    80, 80, 87,  89, 109,  111,
+    130
+  };
 
   const char*
-  inputBitNames[N_BITS_RESERVED] = {
-    "t3_0", "t3_1", "t3_2", "t2_0", "t2_1", "t2_2", "cdc_open90", "cdc_active", "cdc_b2b3", "cdc_b2b5",
-    "cdc_b2b7", "cdc_b2b9", "ehigh", "elow", "elum", "ecl_bha", "bha_0", "bha_1", "bha_2", "bha_3",
-    "bha_4", "bha_5", "bha_6", "bha_7", "bha_8", "bha_9", "bha_10", "bha_11", "bha_12", "bha_13",
-    "c_0", "c_1", "c_2", "c_3", "ebg_0", "ebg_1", "ebg_2", "ecl_active", "ecl_tim_fwd", "ecl_tim_brl",
-    "ecl_tim_bwd", "ecl_phys", "top_0", "top_1", "top_2", "top_bb", "top_active", "klm_hit", "klm_0", "klm_1",
-    "klm_2", "klm_3", "klmb2b_0", "klmb2b_1", "klmb2b_2", "revo", "her_kick", "ler_kick", "bha_delay", "pseud_rand",
-    "plsin", "poiin", "periodin", "veto", "n1_0", "n1_1", "n1_2", "n2_0", "n2_1", "n2_2",
-    "cdcecl_0", "cdcecl_1", "cdcecl_2", "cdcklm_0", "cdcklm_1", "cdcklm_2", "nim0", "nim1", "nim2", "nim3",
-    "t3_3", "t2_3", "n1_3", "n2_3", "cdcecl_3", "cdcklm_3", "u2_0", "u2_1", "u2_2", "ecl_oflo",
-    "ecl_3dbha", "lml_0", "lml_1", "lml_2", "lml_3", "lml_4", "lml_5", "lml_6", "lml_7", "lml_8", // 100
-    "lml_9", "lml_10", "samhem", "opohem", "d_b2b3", "d_b2b5", "d_b2b7", "d_b2b9", "p_b2b3", "p_b2b5",
-    "p_b2b7", "p_b2b9", "track", "trkflt"
-  };
-
-  const int
-  inputMap[N_INPUT_ARRAY][N_BITS_RESERVED] = {
-    //-1
-    {
-      0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-      10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-      20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-      30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-      40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-      50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-      60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
-      70, 71, 72, 73, 74, 75, 76, 77, 78, 79
-    },
-
+  inputBitNames[N_INPUT_ARRAY][N_BITS_RESERVED] = {
     //0
     {
-      0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-      10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-      20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-      30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-      40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-      50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-      60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
-      70, 71, 72, 73, 74, 75, 76, 77, 78, 79
+      "t3_0", "t3_1", "t3_2", "t2_0", "t2_1", "t2_2", "cdc_open90", "cdc_active", "cdc_b2b3", "cdc_b2b5", "cdc_b2b7", "cdc_b2b9", "ehigh", "elow", "elum", "ecl_bha", "bha_0", "bha_1", "bha_2", "bha_3", "bha_4", "bha_5", "bha_6", "bha_7", "bha_8", "bha_9", "bha_10", "bha_11", "bha_12", "bha_13", "c_0", "c_1", "c_2", "c_3", "ebg_0", "ebg_1", "ebg_2", "ecl_active", "ecl_tim_fwd", "ecl_tim_brl", "ecl_tim_bwd", "ecl_phys", "top_0", "top_1", "top_2", "top_bb", "top_active", "klm_hit", "klm_0", "klm_1", "klm_2", "klm_3", "klmb2b_0", "klmb2b_1", "klmb2b_2", "revo", "her_kick", "ler_kick", "bha_delay", "pseud_rand", "plsin", "poiin", "periodin", "veto", "n1_0", "n1_1", "n1_2", "n2_0", "n2_1", "n2_2", "cdcecl_0", "cdcecl_1", "cdcecl_2", "cdcklm_0", "cdcklm_1", "cdcklm_2", "nim0", "nim1", "nim2", "nim3"
     },
-
-    // "1"
-    // 87 bits. gdl0065k-gdl0066e.
-    // e3r1315 <= run < e3r1866
+    //1
     {
-      0, 1, 2, 4, 5, 6, 8, 9, 10, 11,
-      12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-      22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-      32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
-      42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
-      52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-      62, 63, 64, 65, 66, 67, 68, 69, 70, 71,
-      72, 73, 74, 76, 77, 78, 80, 81, 82, 83,
-      3, 7, -1, -1, 75, 79, 84, 85, 86
+      "t3_0", "t3_1", "t3_2", "t2_0", "t2_1", "t2_2", "cdc_open90", "cdc_active", "cdc_b2b3", "cdc_b2b5", "cdc_b2b7", "cdc_b2b9", "ehigh", "elow", "elum", "ecl_bha", "bha_0", "bha_1", "bha_2", "bha_3", "bha_4", "bha_5", "bha_6", "bha_7", "bha_8", "bha_9", "bha_10", "bha_11", "bha_12", "bha_13", "c_0", "c_1", "c_2", "c_3", "ebg_0", "ebg_1", "ebg_2", "ecl_active", "ecl_tim_fwd", "ecl_tim_brl", "ecl_tim_bwd", "ecl_phys", "top_0", "top_1", "top_2", "top_bb", "top_active", "klm_hit", "klm_0", "klm_1", "klm_2", "klm_3", "klmb2b_0", "klmb2b_1", "klmb2b_2", "revo", "her_kick", "ler_kick", "bha_delay", "pseud_rand", "plsin", "poiin", "periodin", "veto", "n1_0", "n1_1", "n1_2", "n2_0", "n2_1", "n2_2", "cdcecl_0", "cdcecl_1", "cdcecl_2", "cdcklm_0", "cdcklm_1", "cdcklm_2", "nim0", "nim1", "nim2", "nim3"
     },
-
-    // "2"
-    // 89 bits. gdl0066f-gdl0067g.
-    // e3r1866 <= run < 5314
+    //2
     {
-      0, 1, 2, 4, 5, 6, 8, 9, 10, 11,
-      12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-      22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-      32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
-      42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
-      52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-      62, 63, 64, 65, 66, 67, 68, 70, 71, 72,
-      74, 75, 76, 78, 79, 80, 82, 83, 84, 85,
-      3, 7, 69, 73, 77, 81, 86, 87, 88
+      "t3_0", "t3_1", "t3_2", "t3_3", "t2_0", "t2_1", "t2_2", "t2_3", "cdc_open90", "cdc_active", "cdc_b2b3", "cdc_b2b5", "cdc_b2b7", "cdc_b2b9", "ehigh", "elow", "elum", "ecl_bha", "bha_0", "bha_1", "bha_2", "bha_3", "bha_4", "bha_5", "bha_6", "bha_7", "bha_8", "bha_9", "bha_10", "bha_11", "bha_12", "bha_13", "c_0", "c_1", "c_2", "c_3", "ebg_0", "ebg_1", "ebg_2", "ecl_active", "ecl_tim_fwd", "ecl_tim_brl", "ecl_tim_bwd", "ecl_phys", "top_0", "top_1", "top_2", "top_bb", "top_active", "klm_hit", "klm_0", "klm_1", "klm_2", "klm_3", "klmb2b_0", "klmb2b_1", "klmb2b_2", "revo", "her_kick", "ler_kick", "bha_delay", "pseud_rand", "plsin", "poiin", "periodin", "veto", "n1_0", "n1_1", "n1_2", "n2_0", "n2_1", "n2_2", "cdcecl_0", "cdcecl_1", "cdcecl_2", "cdcecl_3", "cdcklm_0", "cdcklm_1", "cdcklm_2", "cdcklm_3", "nim0", "nim1", "nim2", "nim3", "u2_0", "u2_1", "u2_2"
     },
-
-    // "3"
-    // 109 bits. gdl0068a.
-    // e3r5314 <= run < 5594
+    //3
     {
-      0, 1, 2, 4, 5, 6, 8, 9, 10, 11,
-      12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-      22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-      32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
-      42, 43, 57, 58, 59, 60, 61, 62, 63, 64,
-      65, 66, 67, 68, 69, 70, 71, 72, 73, 74,
-      75, 76, 77, 78, 81, 82, 83, 85, 86, 87,
-      89, 90, 91, 93, 94, 95, 105, 106, 107, 108,
-      3, 7, 84, 88, 92, 96, -1, -1, -1, 44,
-      45, 46, 47, 48, 49, 50, 51, 52, 53, 54,
-      55, 56, 79, 80, 97, 98, 99, 100, 101, 102,
-      103, 104
+      "t3_0", "t3_1", "t3_2", "t3_3", "t2_0", "t2_1", "t2_2", "t2_3", "cdc_open90", "cdc_active", "cdc_b2b3", "cdc_b2b5", "cdc_b2b7", "cdc_b2b9", "ehigh", "elow", "elum", "ecl_bha", "bha_0", "bha_1", "bha_2", "bha_3", "bha_4", "bha_5", "bha_6", "bha_7", "bha_8", "bha_9", "bha_10", "bha_11", "bha_12", "bha_13", "c_0", "c_1", "c_2", "c_3", "ebg_0", "ebg_1", "ebg_2", "ecl_active", "ecl_tim_fwd", "ecl_tim_brl", "ecl_tim_bwd", "ecl_phys", "top_0", "top_1", "top_2", "top_bb", "top_active", "klm_hit", "klm_0", "klm_1", "klm_2", "klm_3", "klmb2b_0", "klmb2b_1", "klmb2b_2", "revo", "her_kick", "ler_kick", "bha_delay", "pseud_rand", "plsin", "poiin", "periodin", "veto", "n1_0", "n1_1", "n1_2", "n1_3", "n2_0", "n2_1", "n2_2", "n2_3", "cdcecl_0", "cdcecl_1", "cdcecl_2", "cdcecl_3", "cdcklm_0", "cdcklm_1", "cdcklm_2", "cdcklm_3", "nim0", "nim1", "nim2", "nim3", "u2_0", "u2_1", "u2_2"
     },
-
-    // "4"
-    // 111 bits. track, trkflt added. gdl0068b
-    // e3r5594 <= run
+    //4
     {
-      0, 1, 2, 4, 5, 6, 8, 9, 10, 11,
-      12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-      22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-      32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
-      42, 43, 57, 58, 59, 60, 61, 62, 63, 64,
-      65, 66, 67, 68, 69, 70, 71, 72, 73, 74,
-      75, 76, 77, 78, 81, 82, 83, 85, 86, 87,
-      89, 90, 91, 93, 94, 95, 107, 108, 109, 110,
-      3, 7, 84, 88, 92, 96, -1, -1, -1, 44,
-      45, 46, 47, 48, 49, 50, 51, 52, 53, 54,
-      55, 56, 79, 80, 97, 98, 99, 100, 101, 102,
-      103, 104, 105, 106
+      "t3_0", "t3_1", "t3_2", "t3_3", "t2_0", "t2_1", "t2_2", "t2_3", "cdc_open90", "cdc_active", "cdc_b2b3", "cdc_b2b5", "cdc_b2b7", "cdc_b2b9", "ehigh", "elow", "elum", "ecl_bha", "bha_0", "bha_1", "bha_2", "bha_3", "bha_4", "bha_5", "bha_6", "bha_7", "bha_8", "bha_9", "bha_10", "bha_11", "bha_12", "bha_13", "c_0", "c_1", "c_2", "c_3", "ebg_0", "ebg_1", "ebg_2", "ecl_active", "ecl_tim_fwd", "ecl_tim_brl", "ecl_tim_bwd", "ecl_phys", "ecl_oflo", "ecl_3dbha", "lml_0", "lml_1", "lml_2", "lml_3", "lml_4", "lml_5", "lml_6", "lml_7", "lml_8", "lml_9", "lml_10", "top_0", "top_1", "top_2", "top_bb", "top_active", "klm_hit", "klm_0", "klm_1", "klm_2", "klm_3", "klmb2b_0", "klmb2b_1", "klmb2b_2", "revo", "her_kick", "ler_kick", "bha_delay", "pseud_rand", "plsin", "poiin", "periodin", "veto", "samhem", "opohem", "n1_0", "n1_1", "n1_2", "n1_3", "n2_0", "n2_1", "n2_2", "n2_3", "cdcecl_0", "cdcecl_1", "cdcecl_2", "cdcecl_3", "cdcklm_0", "cdcklm_1", "cdcklm_2", "cdcklm_3", "d_b2b3", "d_b2b5", "d_b2b7", "d_b2b9", "p_b2b3", "p_b2b5", "p_b2b7", "p_b2b9", "nim0", "nim1", "nim2", "nim3"
     },
-
-
-
+    //5
+    {
+      "t3_0", "t3_1", "t3_2", "t3_3", "t2_0", "t2_1", "t2_2", "t2_3", "cdc_open90", "cdc_active", "cdc_b2b3", "cdc_b2b5", "cdc_b2b7", "cdc_b2b9", "ehigh", "elow", "elum", "ecl_bha", "bha_0", "bha_1", "bha_2", "bha_3", "bha_4", "bha_5", "bha_6", "bha_7", "bha_8", "bha_9", "bha_10", "bha_11", "bha_12", "bha_13", "c_0", "c_1", "c_2", "c_3", "ebg_0", "ebg_1", "ebg_2", "ecl_active", "ecl_tim_fwd", "ecl_tim_brl", "ecl_tim_bwd", "ecl_phys", "ecl_oflo", "ecl_3dbha", "lml_0", "lml_1", "lml_2", "lml_3", "lml_4", "lml_5", "lml_6", "lml_7", "lml_8", "lml_9", "lml_10", "top_0", "top_1", "top_2", "top_bb", "top_active", "klm_hit", "klm_0", "klm_1", "klm_2", "klm_3", "klmb2b_0", "klmb2b_1", "klmb2b_2", "revo", "her_kick", "ler_kick", "bha_delay", "pseud_rand", "plsin", "poiin", "periodin", "veto", "samhem", "opohem", "n1_0", "n1_1", "n1_2", "n1_3", "n2_0", "n2_1", "n2_2", "n2_3", "cdcecl_0", "cdcecl_1", "cdcecl_2", "cdcecl_3", "cdcklm_0", "cdcklm_1", "cdcklm_2", "cdcklm_3", "d_b2b3", "d_b2b5", "d_b2b7", "d_b2b9", "p_b2b3", "p_b2b5", "p_b2b7", "p_b2b9", "track", "trkflt", "nim0", "nim1", "nim2", "nim3"
+    },
+    //6
+    {
+      "t3_0", "t3_1", "t3_2", "t3_3", "ty_0", "ty_1", "ty_2", "ty_3", "t2_0", "t2_1", "t2_2", "t2_3", "ts_0", "ts_1", "ts_2", "ts_3", "cdc_open90", "cdc_active", "cdc_b2b3", "cdc_b2b5", "cdc_b2b7", "cdc_b2b9", "ehigh", "elow", "elum", "ecl_bha", "bha_type_0", "bha_type_1", "bha_type_2", "bha_type_3", "bha_type_4", "bha_type_5", "bha_type_6", "bha_type_7", "bha_type_8", "bha_type_9", "bha_type_10", "bha_type_11", "bha_type_12", "bha_type_13", "clst_0", "clst_1", "clst_2", "clst_3", "ecl_bg_0", "ecl_bg_1", "ecl_bg_2", "ecl_active", "ecl_timing_fwd", "ecl_timing_brl", "ecl_timing_bwd", "ecl_phys", "ecl_oflo", "ecl_3dbha", "ecl_lml_0", "ecl_lml_1", "ecl_lml_2", "ecl_lml_3", "ecl_lml_4", "ecl_lml_5", "ecl_lml_6", "ecl_lml_7", "ecl_lml_8", "ecl_lml_9", "ecl_lml_10", "ecl_lml_11", "ecl_bhauni", "ecl_mumu", "ecl_bhapur", "top_0", "top_1", "top_2", "top_bb", "top_active", "klm_hit", "klm_0", "klm_1", "klm_2", "klm_3", "klmb2b_0", "klmb2b_1", "klmb2b_2", "revo", "her_kick", "ler_kick", "bha_delay", "pseud_rand", "plsin", "poissonin", "veto", "samhem", "opohem", "n1gev_0", "n1gev_1", "n1gev_2", "n1gev_3", "n2gev_0", "n2gev_1", "n2gev_2", "n2gev_3", "c2gev_0", "c2gev_1", "c2gev_2", "c2gev_3", "cdcecl_0", "cdcecl_1", "cdcecl_2", "cdcecl_3", "cdcklm_0", "cdcklm_1", "cdcklm_2", "cdcklm_3", "cdctop_0", "cdctop_1", "cdctop_2", "cdctop_3", "d3", "d5", "d7", "d9", "p3", "p5", "p7", "p9", "track", "trkflt", "nimin0", "nimin1", "nimin2", "nimin3"
+    }
   };
 
 
   DBImportObjPtr<TRGGDLDBInputBits> inputbits;
   inputbits.construct();
-  for (int i = 0; i < N_INPUT_ARRAY; i++) {
-    IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
-    //initialize
-    for (int j = 0; j < N_BITS_RESERVED; j++) {
-      inputbits->setinbitname(j, "");
+  if (ONLINE == 0) {
+    for (int i = 0; i < N_INPUT_ARRAY; i++) {
+      IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
+      //initialize
+      for (int j = 0; j < N_BITS_RESERVED; j++) {
+        inputbits->setinbitname(j, "");
+      }
+      //set
+      for (int j = 0; j < nbit[i]; j++) {
+        //std::cout << j << " " << inputBitNames[i][j] << std::endl;
+        inputbits->setinbitname(j, inputBitNames[i][j]);
+      }
+      inputbits->setninbit(nbit[i]);
+      inputbits.import(iov);
     }
-    //set
-    for (int j = 0; j < nbit_temp[i]; j++) {
-      if ((inputMap[i][j] >= 0) && (inputMap[i][j] < nbit[i]))inputbits->setinbitname(inputMap[i][j], inputBitNames[j]);
+  } else if (ONLINE == 1) {
+    for (int i = N_INPUT_ARRAY - 1; i < N_INPUT_ARRAY; i++) {
+      IntervalOfValidity iov(0, 0, -1, -1);
+      //initialize
+      for (int j = 0; j < N_BITS_RESERVED; j++) {
+        inputbits->setinbitname(j, "");
+      }
+      //set
+      for (int j = 0; j < nbit[i]; j++) {
+        //std::cout << j << " " << inputBitNames[i][j] << std::endl;
+        inputbits->setinbitname(j, inputBitNames[i][j]);
+      }
+      inputbits->setninbit(nbit[i]);
+      inputbits.import(iov);
     }
-    inputbits->setninbit(nbit[i]);
-    inputbits.import(iov);
   }
 
 }
@@ -502,7 +413,7 @@ void setunpacker()
 {
 
   const int N_LEAF = 320;
-  const int N_UNPACKER_ARRAY = 10;
+  const int N_UNPACKER_ARRAY = 12;
 
   const int run[N_UNPACKER_ARRAY][4] = { //itnitial exp, initial run, end exp, end run
     0,    0, -1,  -1,
@@ -514,34 +425,41 @@ void setunpacker()
     3, 4791, 3, 5313,
     3, 5314, 4, 6379,
     4, 6380, 4, 7433,
-    4, 7434, 10,   0
+    4, 7434, 5,    0,
+    5,    1, 6,   -1,
+    7,    0, -1,   -1
   };
 
   /** num of leafs in data_b2l **/
   const int nLeafs[N_UNPACKER_ARRAY] = {
     37, 37, 27, 26, 26,
-    26, 31, 32, 31, 32
+    26, 31, 32, 31, 32,
+    31, 31
   };
   /** num of leafs for others **/
   const int nLeafsExtra[N_UNPACKER_ARRAY] = {
     8,   8,  9, 11, 11,
-    11, 11, 11, 11, 11
+    11, 11, 11, 11, 11,
+    11, 11
   };
   /** num of clk time window **/
   const int nClks[N_UNPACKER_ARRAY] = {
     48, 48, 48, 48, 48,
-    32, 32, 32, 32, 32
+    32, 32, 32, 32, 32,
+    32, 32
   };
   /** num of bits **/
   const int nBits[N_UNPACKER_ARRAY] = {
     640, 640, 640, 640, 640,
-    640, 640, 640, 640, 640
+    640, 640, 640, 640, 640,
+    640, 640
   };
 
   /** num of inputleafmap raw **/
   const int nrows[N_UNPACKER_ARRAY] = {
     45, 45, 51, 52, 52,
-    52, 57, 61, 61, 61
+    52, 57, 61, 61, 61,
+    61, 61
   };
 
 
@@ -717,6 +635,40 @@ void setunpacker()
       22, 36, 3, 4, 5,
       6, 7, 16, 23, 27,
       28
+    },
+
+    {
+      //9
+      -1, -1,  1,  2, -1,
+      37, -1, -1,  9, -1,
+      12, 13, 14,  8, -1,
+      -1, -1, 15, 10,  0,
+      36, 25, 19, 20, -1,
+      -1, -1, 21, 26, 11,
+      27, 28, 29, 30, -1,
+      -1, -1, 31, 32, 33,
+      34, 38, 39, 40, 41,
+      -1, -1, -1, 22, 23,
+      -1, 35,  3,  4,  5,
+      6,   7, 18, 24, 16,
+      17
+    },
+
+    {
+      //10
+      -1, -1,  1,  2, -1,
+      37, -1, -1,  9, -1,
+      12, 13, 14,  8, -1,
+      -1, -1, 15, 10,  0,
+      36, 25, 19, 20, -1,
+      -1, -1, 21, 26, 11,
+      27, 28, 29, 30, -1,
+      -1, -1, 31, 32, 33,
+      34, 38, 39, 40, 41,
+      -1, -1, -1, 22, 23,
+      -1, 35,  3,  4,  5,
+      6,   7, 18, 24, 16,
+      17
     }
 
   };
@@ -1070,6 +1022,80 @@ void setunpacker()
       95, 31, // itd2
       63, 31, // itd1
       31, 31, // itd0
+    },
+
+    {
+      //9
+      623, 11, // rvc
+      611, 2,  // timtype
+      608, 2,  // etyp
+      603, 2,  // tttmdl
+      600, 1,  // tdsrcp
+      599, 1,  // tdtopp
+      598, 1,  // tdeclp
+      597, 1,  // tdcdcp
+      583, 14, // rvcout
+
+      557, 10, // toprvc
+      546, 10, // eclrvc
+      535, 10, // cdcrvc
+      524, 13, // toptiming
+      509, 13, // ecltiming
+      494, 13, // cdctiming
+      479, 10, // nim0rvc
+      468, 15, // itd4
+      452, 31, // itd3
+      415, 31, // psn3
+      383, 31, // psn2
+      351, 31, // psn1
+      319, 31, // psn0
+
+      287, 31, // topslot1
+      255, 31, // topslot0
+      223, 31, // ftd3
+      191, 31, // ftd2
+      159, 31, // ftd1
+      127, 31, // ftd0
+      95, 31, // itd2
+      63, 31, // itd1
+      31, 31, // itd0
+    },
+
+    {
+      //10
+      623, 11, // rvc
+      611, 2,  // timtype
+      608, 2,  // etyp
+      603, 2,  // tttmdl
+      600, 1,  // tdsrcp
+      599, 1,  // tdtopp
+      598, 1,  // tdeclp
+      597, 1,  // tdcdcp
+      583, 14, // rvcout
+
+      557, 10, // toprvc
+      546, 10, // eclrvc
+      535, 10, // cdcrvc
+      524, 13, // toptiming
+      509, 13, // ecltiming
+      494, 13, // cdctiming
+      479, 10, // nim0rvc
+      468, 15, // itd4
+      452, 31, // itd3
+      415, 31, // psn3
+      383, 31, // psn2
+      351, 31, // psn1
+      319, 31, // psn0
+
+      287, 31, // topslot1
+      255, 31, // topslot0
+      223, 31, // ftd3
+      191, 31, // ftd2
+      159, 31, // ftd1
+      127, 31, // ftd0
+      95, 31, // itd2
+      63, 31, // itd1
+      31, 31, // itd0
     }
 
 
@@ -1077,19 +1103,23 @@ void setunpacker()
 
   int m_nword_header[N_UNPACKER_ARRAY] {
     3, 3, 4, 6, 6,
-    6, 6, 6, 6, 6
+    6, 6, 6, 6, 6,
+    6, 6
   };
   int m_conf[N_UNPACKER_ARRAY] {
     0, 0, 1, 2, 3,
-    4, 5, 6, 7, 6
+    4, 5, 6, 7, 6,
+    7, 7
   };
   int m_nword_input[N_UNPACKER_ARRAY] {
     3, 3, 3, 3, 3,
-    3, 3, 5, 5, 5
+    3, 3, 5, 5, 5,
+    5, 5
   };
   int m_nword_output[N_UNPACKER_ARRAY] {
     3, 3, 3, 3, 3,
-    3, 3, 3, 3, 3
+    3, 3, 3, 3, 3,
+    3, 4
   };
 
   const int BitMap_extra[N_UNPACKER_ARRAY][N_LEAF][3] = {
@@ -1234,6 +1264,36 @@ void setunpacker()
       5, 12,  9, //b2ldly
       5, 21, 11, //maxrvc
       -1, -1, -1  //conf
+    },
+
+    {
+      //9
+      -1, -1, -1, //evt
+      -1, -1, -1, //clk
+      0, -1, -1, //firmid
+      1, -1, -1, //firmver
+      3, 11, 11, //drvc
+      2,  0, 11, //finalrvc
+      3,  0, 11, //gdll1rvc
+      5,  0, 12, //coml1rvc
+      5, 12,  9, //b2ldly
+      5, 21, 11, //maxrvc
+      -1, -1, -1  //conf
+    },
+
+    {
+      //10
+      -1, -1, -1, //evt
+      -1, -1, -1, //clk
+      0, -1, -1, //firmid
+      1, -1, -1, //firmver
+      3, 11, 11, //drvc
+      2,  0, 11, //finalrvc
+      3,  0, 11, //gdll1rvc
+      5,  0, 12, //coml1rvc
+      5, 12,  9, //b2ldly
+      5, 21, 11, //maxrvc
+      -1, -1, -1  //conf
     }
 
   };
@@ -1241,43 +1301,80 @@ void setunpacker()
 
   DBImportObjPtr<TRGGDLDBUnpacker> unpacker;
   unpacker.construct();
-  for (int i = 0; i < N_UNPACKER_ARRAY; i++) {
-    IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
+  if (ONLINE == 0) {
+    for (int i = 0; i < N_UNPACKER_ARRAY; i++) {
+      IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
 
-    unpacker->setnLeafs(nLeafs[i]);
-    unpacker->setnLeafsExtra(nLeafsExtra[i]);
-    unpacker->setnClks(nClks[i]);
-    unpacker->setnBits(nBits[i]);
-    unpacker->set_nword_header(m_nword_header[i]);
-    unpacker->set_nword_input(m_nword_input[i]);
-    unpacker->set_nword_output(m_nword_output[i]);
-    unpacker->setconf(m_conf[i]);
+      unpacker->setnLeafs(nLeafs[i]);
+      unpacker->setnLeafsExtra(nLeafsExtra[i]);
+      unpacker->setnClks(nClks[i]);
+      unpacker->setnBits(nBits[i]);
+      unpacker->set_nword_header(m_nword_header[i]);
+      unpacker->set_nword_input(m_nword_input[i]);
+      unpacker->set_nword_output(m_nword_output[i]);
+      unpacker->setconf(m_conf[i]);
 
-    //initialize
-    for (int j = 0; j < N_LEAF; j++) {
-      unpacker->setLeafName(j, "");
-      unpacker->setLeafMap(j, -1);
-    }
-    //set
-    for (int j = 0; j < nrows[i]; j++) {
-      if ((inputleafMap[i][j] >= 0) && (inputleafMap[i][j] < nLeafs[i] + nLeafsExtra[i])) {
-        unpacker->setLeafName(j, LeafNames[j]);
-        unpacker->setLeafMap(j, inputleafMap[i][j]);
+      //initialize
+      for (int j = 0; j < N_LEAF; j++) {
+        unpacker->setLeafName(j, "");
+        unpacker->setLeafMap(j, -1);
       }
-    }
+      //set
+      for (int j = 0; j < nrows[i]; j++) {
+        if ((inputleafMap[i][j] >= 0) && (inputleafMap[i][j] < nLeafs[i] + nLeafsExtra[i])) {
+          unpacker->setLeafName(j, LeafNames[j]);
+          unpacker->setLeafMap(j, inputleafMap[i][j]);
+        }
+      }
 
-    for (int j = 0; j < N_LEAF; j++) {
-      unpacker->setBitMap(j, 0, BitMap[i][j][0]);
-      unpacker->setBitMap(j, 1, BitMap[i][j][1]);
+      for (int j = 0; j < N_LEAF; j++) {
+        unpacker->setBitMap(j, 0, BitMap[i][j][0]);
+        unpacker->setBitMap(j, 1, BitMap[i][j][1]);
+      }
+      for (int j = 0; j < N_LEAF; j++) {
+        unpacker->setBitMap_extra(j, 0, BitMap_extra[i][j][0]);
+        unpacker->setBitMap_extra(j, 1, BitMap_extra[i][j][1]);
+        unpacker->setBitMap_extra(j, 2, BitMap_extra[i][j][2]);
+      }
+      unpacker.import(iov);
     }
-    for (int j = 0; j < N_LEAF; j++) {
-      unpacker->setBitMap_extra(j, 0, BitMap_extra[i][j][0]);
-      unpacker->setBitMap_extra(j, 1, BitMap_extra[i][j][1]);
-      unpacker->setBitMap_extra(j, 2, BitMap_extra[i][j][2]);
+  } else if (ONLINE == 1) {
+    for (int i = N_UNPACKER_ARRAY - 1; i < N_UNPACKER_ARRAY; i++) {
+      IntervalOfValidity iov(0, 0, -1, -1);
+
+      unpacker->setnLeafs(nLeafs[i]);
+      unpacker->setnLeafsExtra(nLeafsExtra[i]);
+      unpacker->setnClks(nClks[i]);
+      unpacker->setnBits(nBits[i]);
+      unpacker->set_nword_header(m_nword_header[i]);
+      unpacker->set_nword_input(m_nword_input[i]);
+      unpacker->set_nword_output(m_nword_output[i]);
+      unpacker->setconf(m_conf[i]);
+
+      //initialize
+      for (int j = 0; j < N_LEAF; j++) {
+        unpacker->setLeafName(j, "");
+        unpacker->setLeafMap(j, -1);
+      }
+      //set
+      for (int j = 0; j < nrows[i]; j++) {
+        if ((inputleafMap[i][j] >= 0) && (inputleafMap[i][j] < nLeafs[i] + nLeafsExtra[i])) {
+          unpacker->setLeafName(j, LeafNames[j]);
+          unpacker->setLeafMap(j, inputleafMap[i][j]);
+        }
+      }
+
+      for (int j = 0; j < N_LEAF; j++) {
+        unpacker->setBitMap(j, 0, BitMap[i][j][0]);
+        unpacker->setBitMap(j, 1, BitMap[i][j][1]);
+      }
+      for (int j = 0; j < N_LEAF; j++) {
+        unpacker->setBitMap_extra(j, 0, BitMap_extra[i][j][0]);
+        unpacker->setBitMap_extra(j, 1, BitMap_extra[i][j][1]);
+        unpacker->setBitMap_extra(j, 2, BitMap_extra[i][j][2]);
+      }
+      unpacker.import(iov);
     }
-
-
-    unpacker.import(iov);
   }
 
 }
@@ -1365,23 +1462,45 @@ void setdelay()
   DBImportObjPtr<TRGGDLDBDelay> delay;
   delay.construct();
   char logname[2000];
-  for (int i = 0; i < N_DELAY_ARRAY; i++) {
-    IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
-    for (int j = 0; j < 320; j++) {
-      delay->setdelay(j, 0);
+  if (ONLINE == 0) {
+    for (int i = 0; i < N_DELAY_ARRAY; i++) {
+      IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
+      for (int j = 0; j < 320; j++) {
+        delay->setdelay(j, 0);
+      }
+      sprintf(logname, "trg/gdl/dbobjects/log/itd_%04d.dat", data_num[i]);
+      std::ifstream ifs(logname);
+      if (!ifs) {
+        std::cout << "No logfile to read delay values" << " " << logname << std::endl;
+      }
+      int k = 0;
+      int delay_temp = 0;
+      while (ifs >> k >> delay_temp) {
+        delay->setdelay(k, delay_temp);
+      }
+      delay.import(iov);
+      ifs.close();
     }
-    sprintf(logname, "trg/gdl/dbobjects/log/itd_%04d.dat", data_num[i]);
-    std::ifstream ifs(logname);
-    if (!ifs) {
-      std::cout << "No logfile to read delay values" << " " << logname << std::endl;
+  } else if (ONLINE == 1) {
+    //for (int i = N_DELAY_ARRAY-1; i < N_DELAY_ARRAY; i++) {
+    for (int i = 0; i < 1; i++) {
+      IntervalOfValidity iov(5, 0, -1, -1);
+      for (int j = 0; j < 320; j++) {
+        delay->setdelay(j, 0);
+      }
+      sprintf(logname, "trg/gdl/dbobjects/log/itd_%04d.dat", data_num[i]);
+      std::ifstream ifs(logname);
+      if (!ifs) {
+        std::cout << "No logfile to read delay values" << " " << logname << std::endl;
+      }
+      int k = 0;
+      int delay_temp = 0;
+      while (ifs >> k >> delay_temp) {
+        delay->setdelay(k, delay_temp);
+      }
+      delay.import(iov);
+      ifs.close();
     }
-    int k = 0;
-    int delay_temp = 0;
-    while (ifs >> k >> delay_temp) {
-      delay->setdelay(k, delay_temp);
-    }
-    delay.import(iov);
-    ifs.close();
   }
 
 }
@@ -1415,22 +1534,30 @@ void setbadrun()
 
   DBImportObjPtr<TRGGDLDBBadrun> badrun;
   badrun.construct();
-  for (int i = 0; i < N_BADRUN_ARRAY; i++) {
-    IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
-    badrun->setflag(flag[i]);
-    badrun.import(iov);
+  if (ONLINE == 0) {
+    for (int i = 0; i < N_BADRUN_ARRAY; i++) {
+      IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
+      badrun->setflag(flag[i]);
+      badrun.import(iov);
+    }
+  } else if (ONLINE == 1) {
+    for (int i = N_BADRUN_ARRAY - 1; i < N_BADRUN_ARRAY; i++) {
+      IntervalOfValidity iov(5, 0, -1, -1);
+      badrun->setflag(flag[i]);
+      badrun.import(iov);
+    }
   }
 }
 
 int main()
 {
 
-  setprescale();
+  //setprescale();
   setftdlbits();
   setinputbits();
   setunpacker();
-  setdelay();
-  setbadrun();
+  //setdelay();
+  //setbadrun();
 
 }
 

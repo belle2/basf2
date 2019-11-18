@@ -11,6 +11,9 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
+#include <framework/core/ModuleParamList.templateDetails.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
 #include <TMultiGraph.h>
 #include <TGraph.h>
 #include <TCanvas.h>
@@ -23,6 +26,14 @@ using namespace TrackFindingCDC;
 std::string TrackInspector::getDescription()
 {
   return "Findlet for printing out CDCtracks";
+}
+
+void TrackInspector::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(prefixed(prefix, "debugDraw"),
+                                m_param_debugDraw,
+                                "Draw found hit positions of the track",
+                                m_param_debugDraw);
 }
 
 void TrackInspector::apply(std::vector<CDCTrack>& tracks)

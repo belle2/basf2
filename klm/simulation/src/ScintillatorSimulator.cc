@@ -8,22 +8,26 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <string>
-
-/* External headers. */
-#include <TH1D.h>
-#include <TFile.h>
-
-/* Belle2 headers. */
-#include <bklm/geometry/GeometryPar.h>
-#include <eklm/geometry/GeometryData.h>
+/* Own header. */
 #include <klm/simulation/ScintillatorSimulator.h>
+
+/* KLM headers. */
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/eklm/geometry/GeometryData.h>
+
+/* Belle 2 headers. */
 #include <framework/core/RandomNumbers.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TH1D.h>
+
+/* C++ headers. */
+#include <string>
 
 using namespace Belle2;
 
@@ -36,14 +40,11 @@ void KLM::ScintillatorSimulator::reallocPhotoElectronBuffers(int size)
    * Here there is a memory leak in case of realloc() failure, but it does not
    * matter because a fatal error is issued in this case.
    */
-  /* cppcheck-suppress memleakOnRealloc */
   m_Photoelectrons =
     (struct Photoelectron*)realloc(m_Photoelectrons,
                                    size * sizeof(struct Photoelectron));
-  /* cppcheck-suppress memleakOnRealloc */
   m_PhotoelectronIndex = (int*)realloc(m_PhotoelectronIndex,
                                        size * sizeof(int));
-  /* cppcheck-suppress memleakOnRealloc */
   m_PhotoelectronIndex2 = (int*)realloc(m_PhotoelectronIndex2,
                                         size * sizeof(int));
   if (size != 0) {
@@ -149,20 +150,20 @@ void KLM::ScintillatorSimulator::prepareSimulation()
 }
 
 void KLM::ScintillatorSimulator::simulate(
-  std::multimap<int, BKLMSimHit*>::iterator& firstHit,
-  std::multimap<int, BKLMSimHit*>::iterator& end)
+  std::multimap<uint16_t, BKLMSimHit*>::iterator& firstHit,
+  std::multimap<uint16_t, BKLMSimHit*>::iterator& end)
 {
   m_stripName = "strip_" + std::to_string(firstHit->first);
   prepareSimulation();
   bklm::GeometryPar* geoPar = bklm::GeometryPar::instance();
   const BKLMSimHit* hit = firstHit->second;
   const bklm::Module* module =
-    geoPar->findModule(hit->isForward(), hit->getSector(), hit->getLayer());
+    geoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
   double stripLength =
     2.0 * (hit->isPhiReadout() ?
            module->getPhiScintHalfLength(hit->getStrip()) :
            module->getZScintHalfLength(hit->getStrip()));
-  for (std::multimap<int, BKLMSimHit*>::iterator it = firstHit;
+  for (std::multimap<uint16_t, BKLMSimHit*>::iterator it = firstHit;
        it != end; ++it) {
     hit = it->second;
     m_Energy = m_Energy + hit->getEDep();
@@ -187,15 +188,15 @@ void KLM::ScintillatorSimulator::simulate(
 }
 
 void KLM::ScintillatorSimulator::simulate(
-  std::multimap<int, EKLMSimHit*>::iterator& firstHit,
-  std::multimap<int, EKLMSimHit*>::iterator& end)
+  std::multimap<uint16_t, EKLMSimHit*>::iterator& firstHit,
+  std::multimap<uint16_t, EKLMSimHit*>::iterator& end)
 {
   m_stripName = "strip_" + std::to_string(firstHit->first);
   prepareSimulation();
   const EKLMSimHit* hit = firstHit->second;
   double stripLength = EKLM::GeometryData::Instance().getStripLength(
                          hit->getStrip()) / CLHEP::mm * Unit::mm;
-  for (std::multimap<int, EKLMSimHit*>::iterator it = firstHit;
+  for (std::multimap<uint16_t, EKLMSimHit*>::iterator it = firstHit;
        it != end; ++it) {
     hit = it->second;
     m_Energy = m_Energy + hit->getEDep();

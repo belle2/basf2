@@ -25,8 +25,6 @@
 
 
 #include <TVector3.h>
-#include <cmath>
-#include <boost/format.hpp>
 
 namespace Belle2 {
   /** Internal ARICH track reconstruction

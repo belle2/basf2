@@ -91,7 +91,12 @@ DQMHistAnalysisInputPVSrvModule::DQMHistAnalysisInputPVSrvModule()
 }
 
 
-DQMHistAnalysisInputPVSrvModule::~DQMHistAnalysisInputPVSrvModule() { }
+DQMHistAnalysisInputPVSrvModule::~DQMHistAnalysisInputPVSrvModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
 
 void DQMHistAnalysisInputPVSrvModule::initialize()
 {
@@ -99,7 +104,7 @@ void DQMHistAnalysisInputPVSrvModule::initialize()
   //if (m_server) m_serv = new THttpServer("http:8082");
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   SEVCHK(ca_add_exception_event(exceptionCallback, NULL), "ca_add_exception_event");
   for (auto& it : m_histlist) {
     if (it.size() != 4 && it.size() != 5) {
@@ -281,9 +286,6 @@ void DQMHistAnalysisInputPVSrvModule::endRun()
 void DQMHistAnalysisInputPVSrvModule::terminate()
 {
   B2DEBUG(20, "DQMHistAnalysisInputPVSrv: terminate called");
-#ifdef _BELLE2_EPICS
-  ca_context_destroy();
-#endif
 }
 
 

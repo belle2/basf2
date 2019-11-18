@@ -12,6 +12,8 @@
 #include <functional>
 #include <ios>
 #include <TSystem.h>
+#include <TROOT.h>
+#include <string>
 
 namespace Belle2 {
   /** Simple ScopeGuard to execute a function at the end of the object lifetime.
@@ -321,6 +323,41 @@ namespace Belle2 {
       const std::string old{gSystem->GetWorkingDirectory()};
       gSystem->ChangeDirectory(newDirectory.c_str());
       return ScopeGuard([old]() {gSystem->ChangeDirectory(old.c_str());});
+    }
+
+    /** Create a ScopeGuard to turn ROOT into batch mode and restore the initial
+     * batch mode status after the guard object is destroyed.
+     *
+     * Restoring the initial status is important if your code e..g should run
+     * with and without the display module.
+     *
+     *
+       \code
+       {
+         // the default is to turn on batch mode. You can also pass "false" to turn off
+         // the batch mode for the scope of this guard.
+         auto guard = ScopeGuard::guardBatchMode();
+         // now batch mode is turned on
+       }
+       // now back to what it was before.
+       \endcode
+     *
+     * @warning Do not just call this function and discard the return value.
+     *    You have to assign the return value to an object in the current scope
+     *    to the scope guard to work as intended.
+     *
+     */
+    [[nodiscard]] static ScopeGuard guardBatchMode(bool batchMode = true)
+    {
+      auto getBatchMode = []() {
+        return gROOT->IsBatch();
+      };
+
+      auto setBatchMode = [](bool batchMode_) {
+        gROOT->SetBatch(batchMode_);
+      };
+
+      return guardGetterSetter(getBatchMode, setBatchMode, batchMode);
     }
   };
 }

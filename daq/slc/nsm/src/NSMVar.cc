@@ -1,4 +1,4 @@
-#include "daq/slc/nsm/NSMMessage.h"
+#include "daq/slc/nsm/NSMVar.h"
 
 #include <string.h>
 #include <unistd.h>
@@ -22,7 +22,7 @@ NSMVar::NSMVar(const std::string& name, const std::vector<int>& value)
   m_len = value.size();
   m_value = v;
   m_id = 0;
-  m_rev = 0;
+  m_date = Date().get();
 }
 
 NSMVar::NSMVar(const std::string& name, const std::vector<float>& value)
@@ -36,7 +36,7 @@ NSMVar::NSMVar(const std::string& name, const std::vector<float>& value)
   m_len = value.size();
   m_value = v;
   m_id = 0;
-  m_rev = 0;
+  m_date = Date().get();
 }
 
 const NSMVar& NSMVar::operator=(const std::vector<int>& val)
@@ -48,6 +48,7 @@ const NSMVar& NSMVar::operator=(const std::vector<int>& val)
   m_value = v;
   m_type = INT;
   m_len = val.size();
+  m_date = Date().get();
   return *this;
 }
 
@@ -60,6 +61,7 @@ const NSMVar& NSMVar::operator=(const std::vector<float>& val)
   m_value = v;
   m_type = FLOAT;
   m_len = val.size();
+  m_date = Date().get();
   return *this;
 }
 
@@ -93,7 +95,7 @@ const char* NSMVar::getTypeLabel() const
 
 void NSMVar::copy(const std::string& name,
                   Type type, int len, const void* value,
-                  int id, int rev)
+                  int id, int date)
 {
   if (m_value) free(m_value);
   m_value = NULL;
@@ -101,13 +103,12 @@ void NSMVar::copy(const std::string& name,
   m_type = type;
   m_len = len;
   m_id = id;
-  m_rev = rev;
+  m_date = (date > 0) ? date : Date().get();
   int s = size();
   if (s > 0) {
     m_value = malloc(s);
     memcpy(m_value, value, s);
   } else {
-    m_name = "";
     m_type = NONE;
     m_len = 0;
     m_value = NULL;
@@ -126,7 +127,7 @@ void NSMVar::readObject(Reader& reader)
   m_type = (Type)reader.readInt();
   m_len = reader.readInt();
   m_id = reader.readInt();
-  m_rev = reader.readInt();
+  m_date = reader.readInt();
   int len = (m_len > 0) ? m_len : 1;
   int s = size();
   if (s > 0) {
@@ -164,7 +165,7 @@ void NSMVar::writeObject(Writer& writer) const
   writer.writeInt((int)m_type);
   writer.writeInt(m_len);
   writer.writeInt(m_id);
-  writer.writeInt(m_rev);
+  writer.writeInt(m_date);
   int len = (m_len > 0) ? m_len : 1;
   switch (m_type) {
     case INT: {

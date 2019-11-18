@@ -34,7 +34,6 @@
 #include <TGraph.h>
 #include <TGraphPainter.h>
 #include <THistPainter.h>
-#include <TStyle.h>
 #include <TColor.h>
 #include <TMultiGraph.h>
 #include <TLegend.h>

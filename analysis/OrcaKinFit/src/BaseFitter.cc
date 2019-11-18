@@ -22,16 +22,15 @@
 #include <cassert>
 
 namespace Belle2 {
-
   namespace OrcaKinFit {
 
     BaseFitter::BaseFitter()
       : fitobjects(FitObjectContainer()),
         constraints(ConstraintContainer()),
         softconstraints(SoftConstraintContainer()),
-        covDim(0), cov(0), covValid(false)
+        covDim(0), cov(nullptr), covValid(false)
 #ifndef FIT_TRACEOFF
-      , tracer(0),
+      , tracer(nullptr),
         traceValues(std::map<std::string, double> ())
 #endif
     {}
@@ -39,7 +38,7 @@ namespace Belle2 {
     BaseFitter::~BaseFitter()
     {
       delete[] cov;
-      cov = 0;
+      cov = nullptr;
     }
 
     void BaseFitter::addFitObject(BaseFitObject* fitobject_)
@@ -58,9 +57,9 @@ namespace Belle2 {
     {
       covValid = false;
 
-      if (BaseHardConstraint* hc = dynamic_cast<BaseHardConstraint*>(constraint_))
+      if (auto* hc = dynamic_cast<BaseHardConstraint*>(constraint_))
         constraints.push_back(hc);
-      else if (BaseSoftConstraint* sc = dynamic_cast<BaseSoftConstraint*>(constraint_))
+      else if (auto* sc = dynamic_cast<BaseSoftConstraint*>(constraint_))
         softconstraints.push_back(sc);
       else {
         // illegal constraint
@@ -71,9 +70,9 @@ namespace Belle2 {
     void BaseFitter::addConstraint(BaseConstraint& constraint_)
     {
       covValid = false;
-      if (BaseHardConstraint* hc = dynamic_cast<BaseHardConstraint*>(&constraint_))
+      if (auto* hc = dynamic_cast<BaseHardConstraint*>(&constraint_))
         constraints.push_back(hc);
-      else if (BaseSoftConstraint* sc = dynamic_cast<BaseSoftConstraint*>(&constraint_))
+      else if (auto* sc = dynamic_cast<BaseSoftConstraint*>(&constraint_))
         softconstraints.push_back(sc);
     }
 
@@ -149,7 +148,7 @@ namespace Belle2 {
         return cov;
       }
       idim = 0;
-      return 0;
+      return nullptr;
     }
 
     double* BaseFitter::getGlobalCovarianceMatrix(int& idim)
@@ -159,7 +158,7 @@ namespace Belle2 {
         return cov;
       }
       idim = 0;
-      return 0;
+      return nullptr;
     }
 
   }// end OrcaKinFit namespace

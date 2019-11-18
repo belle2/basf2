@@ -3,7 +3,6 @@
 
 from basf2 import register_module
 import inspect
-from analysisPath import analysis_main
 
 
 def fitKinematic4C(
@@ -12,7 +11,7 @@ def fitKinematic4C(
     constraint='HardBeam',
     daughtersUpdate=True,
     addUnmeasuredPhoton=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     Perform 4C momentum constraint kinematic fit for particles in the given ParticleList.
@@ -43,7 +42,7 @@ def UnmeasuredfitKinematic1C(
     constraint='HardBeam',
     daughtersUpdate=True,
     addUnmeasuredPhoton=True,
-    path=analysis_main,
+    path=None,
 ):
     """
     Perform 1C momentum constraint kinematic fit with one unmeasured photon for particles in the given ParticleList.
@@ -75,7 +74,7 @@ def fitKinematic3C(
         daughtersUpdate=True,
         addUnmeasuredPhoton=False,
         add3CPhoton=True,
-        path=analysis_main,
+        path=None,
 ):
     """
     Perform 3C momentum constraint kinematic fit with one photon with unmeasured energy for particles
@@ -110,7 +109,7 @@ def MassfitKinematic1CRecoil(
     constraint='RecoilMass',
     daughtersUpdate=True,
     addUnmeasuredPhoton=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     Perform recoil mass kinematic fit for particles in the given ParticleList.
@@ -144,7 +143,7 @@ def MassfitKinematic1C(
     constraint='Mass',
     daughtersUpdate=True,
     addUnmeasuredPhoton=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     Perform recoil mass kinematic fit for particles in the given ParticleList.
@@ -173,6 +172,4 @@ def MassfitKinematic1C(
 
 if __name__ == '__main__':
     from basf2.utils import pretty_print_module
-    pretty_print_module(__name__, "kinfit", {
-        repr(analysis_main): "analysis_main",
-    })
+    pretty_print_module(__name__, "kinfit")

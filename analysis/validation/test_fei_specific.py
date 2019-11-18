@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>Thomas Keck; thomas.keck2@kit.edu</contact>
+  <contact>william.sutcliffe@kit.edu</contact>
 </header>
 """
 

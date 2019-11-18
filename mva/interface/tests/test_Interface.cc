@@ -8,10 +8,7 @@
  **************************************************************************/
 
 #include <mva/interface/Interface.h>
-#include <framework/utilities/FileSystem.h>
 #include <framework/utilities/TestHelpers.h>
-
-#include <framework/database/LocalDatabase.h>
 
 #include <gtest/gtest.h>
 
@@ -22,28 +19,28 @@ namespace {
   class TestOptions : public MVA::SpecificOptions {
 
   public:
-    virtual void load(const boost::property_tree::ptree&) override { }
-    virtual void save(boost::property_tree::ptree&) const override { }
-    virtual po::options_description getDescription() override
+    void load(const boost::property_tree::ptree&) override { }
+    void save(boost::property_tree::ptree&) const override { }
+    po::options_description getDescription() override
     {
       po::options_description description("General options");
       description.add_options()
       ("help", "print this message");
       return description;
     }
-    virtual std::string getMethod() const override { return "Test"; }
+    [[nodiscard]] std::string getMethod() const override { return "Test"; }
   };
 
   class TestTeacher : public MVA::Teacher {
   public:
     TestTeacher(const MVA::GeneralOptions& g, const TestOptions&) : MVA::Teacher(g) { }
-    virtual MVA::Weightfile train(MVA::Dataset&) const { return MVA::Weightfile(); }
+    MVA::Weightfile train(MVA::Dataset&) const override { return MVA::Weightfile(); }
   };
 
   class TestExpert : public MVA::Expert {
   public:
-    virtual void load(MVA::Weightfile&) { }
-    virtual std::vector<float> apply(MVA::Dataset&) const { return std::vector<float>(); };
+    void load(MVA::Weightfile&) override { }
+    std::vector<float> apply(MVA::Dataset&) const override { return std::vector<float>(); };
   };
 
   TEST(InterfaceTest, InterfaceCreation)

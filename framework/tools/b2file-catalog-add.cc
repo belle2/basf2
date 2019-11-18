@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/dataobjects/FileMetaData.h>
 
@@ -64,7 +63,7 @@ int main(int argc, char* argv[])
     B2ERROR("Couldn't open file " << fileName);
     return 1;
   }
-  TTree* tree = (TTree*) file->Get("persistent");
+  auto* tree = (TTree*) file->Get("persistent");
   if (!tree) {
     B2ERROR("No tree persistent found in " << fileName);
     return 1;
@@ -74,7 +73,7 @@ int main(int argc, char* argv[])
     B2ERROR("No meta data found in " << fileName);
     return 1;
   }
-  FileMetaData* metaData = 0;
+  FileMetaData* metaData = nullptr;
   branch->SetAddress(&metaData);
   tree->GetEntry(0);
 

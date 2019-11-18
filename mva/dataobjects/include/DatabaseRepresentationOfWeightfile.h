@@ -13,7 +13,6 @@
 #define INCLUDE_GUARD_BELLE2_MVA_DATABASE_WEIGHTFILE_HEADER
 
 #include <TObject.h>
-#include <TGenericClassInfo.h>
 
 #include <string>
 
@@ -31,9 +30,14 @@ namespace Belle2 {
      */
     DatabaseRepresentationOfWeightfile() { }
 
+    /**
+     * Constructor from weight file name.
+     */
+    explicit DatabaseRepresentationOfWeightfile(const std::string& data) : m_data(data) { }
+
     std::string m_data; /**< Serialized weightfile */
 
-    ClassDef(DatabaseRepresentationOfWeightfile, 1); /**< Class to store weightfile in datastore */
+    ClassDef(DatabaseRepresentationOfWeightfile, 2); /**< Class to store weightfile in datastore */
   };
 
 }

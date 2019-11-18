@@ -9,18 +9,20 @@
  **************************************************************************/
 
 #include <alignment/reconstruction/AlignablePXDRecoHit.h>
-#include <alignment/Manager.h>
-#include <alignment/Hierarchy.h>
+
 #include <alignment/dbobjects/VXDAlignment.h>
-
 #include <alignment/GlobalDerivatives.h>
-
+#include <alignment/Hierarchy.h>
+#include <alignment/Manager.h>
+#include <framework/geometry/BFieldManager.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace alignment;
+
+bool AlignablePXDRecoHit::s_enableLorentzGlobalDerivatives = false;
 
 std::pair<std::vector<int>, TMatrixD> AlignablePXDRecoHit::globalDerivatives(const genfit::StateOnPlane* sop)
 {
@@ -29,9 +31,11 @@ std::pair<std::vector<int>, TMatrixD> AlignablePXDRecoHit::globalDerivatives(con
 
   auto globals = GlobalDerivatives(alignment);
 
-  // TODO: Move Lorentz outside
-  //auto globalsLorentz = GlobalCalibrationManager::getInstance().getLorentzShiftHierarchy().getGlobalDerivatives<VXDAlignment>(getPlaneId(),
-  //               sop);
+  if (s_enableLorentzGlobalDerivatives) {
+    auto lorentz = GlobalCalibrationManager::getInstance().getLorentzShiftHierarchy().getGlobalDerivatives<VXDAlignment>(getPlaneId(),
+                   sop, BFieldManager::getInstance().getField(sop->getPos()));
+    globals.add(lorentz);
+  }
 
   const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(getSensorID()));
 

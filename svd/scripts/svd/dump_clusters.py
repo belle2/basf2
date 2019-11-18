@@ -32,15 +32,17 @@ class dump_clusters(Module):
         """ Write legend for file columns """
 
         self.file.write(
-                'EventNo Layer Ladder Sensor Side Position Bg Time_event' +
-                'Time_cluster Charge_cluster Size_cluster Chi2_cluster\n'
-                )
+            'EventNo Layer Ladder Sensor Side Position Bg Time_event' +
+            'Time_cluster Charge_cluster Size_cluster Chi2_cluster\n'
+        )
 
     def event(self):
         """Save information on all clusters together with event time data. """
 
         eventData = Belle2.PyStoreObj('EventMetaData')
         eventNo = eventData.getEvent()
+        svd_evt_info = Belle2.PyStoreObj('SVDEventInfo')
+        mode_byte = svd_evt_info.getModeByte()
         clusters = Belle2.PyStoreArray(self.collection)
 
         for cluster in clusters:
@@ -50,7 +52,7 @@ class dump_clusters(Module):
             triggerTime = 0.0
             if reco_digit:
                 # Trigger bin from SVDModeByte
-                triggerBin = ord(reco_digit.getModeByte().getTriggerBin())
+                triggerBin = ord(mode_byte.getTriggerBin())
                 triggerTime = 0.25 * 31.44 * (-4 + triggerBin + 0.5)
 
             sensorID = cluster.getRawSensorID()

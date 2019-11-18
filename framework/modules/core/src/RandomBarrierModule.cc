@@ -29,9 +29,7 @@ RandomBarrierModule::RandomBarrierModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-RandomBarrierModule::~RandomBarrierModule()
-{
-}
+RandomBarrierModule::~RandomBarrierModule() = default;
 
 void RandomBarrierModule::initialize()
 {

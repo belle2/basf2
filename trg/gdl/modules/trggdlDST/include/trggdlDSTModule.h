@@ -40,17 +40,17 @@ namespace Belle2 {
 
     //condition database for unpacer
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
-    int LeafBitMap[320];
-    char LeafNames[320][100];
-    int _e_timtype  ;
-    int _e_gdll1rvc ;
-    int _e_coml1rvc ;
-    int _e_toprvc   ;
-    int _e_eclrvc   ;
-    int _e_cdcrvc   ;
-    int _e_toptiming;
-    int _e_ecltiming;
-    int _e_cdctiming;
+    int LeafBitMap[320] = {0};
+    char LeafNames[320][100] = {{""}};
+    int _e_timtype = 0 ;
+    int _e_gdll1rvc = 0 ;
+    int _e_coml1rvc = 0 ;
+    int _e_toprvc = 0  ;
+    int _e_eclrvc = 0  ;
+    int _e_cdcrvc = 0  ;
+    int _e_toptiming = 0;
+    int _e_ecltiming = 0;
+    int _e_cdctiming = 0;
 
   };
 

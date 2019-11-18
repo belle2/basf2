@@ -29,6 +29,7 @@ namespace Belle2 {
     static bool g_stderr;
     static bool g_opened;
     static std::string g_filepath;
+    static std::string g_linkpath;
     static std::ofstream g_stream;
     static unsigned int g_filesize;
     static Mutex g_mutex;

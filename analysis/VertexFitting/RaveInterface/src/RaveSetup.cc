@@ -47,8 +47,8 @@ void RaveSetup::initialize(int verbosity, double magneticField)
   getRawInstance()->m_initialized = true;
 }
 
-RaveSetup::RaveSetup(): m_useBeamSpot(false), m_raveVertexFactory(NULL)/*, m_GFRaveVertexFactory(NULL)*/,
-  m_raveKinematicTreeFactory(NULL), m_initialized(false)
+RaveSetup::RaveSetup(): m_useBeamSpot(false), m_raveVertexFactory(nullptr)/*, m_GFRaveVertexFactory(NULL)*/,
+  m_raveKinematicTreeFactory(nullptr), m_initialized(false)
 {
 }
 
@@ -71,7 +71,7 @@ void RaveSetup::reset()
 }
 
 
-void RaveSetup::setBeamSpot(TVector3 beamSpot, TMatrixDSym beamSpotCov)
+void RaveSetup::setBeamSpot(const TVector3& beamSpot, const TMatrixDSym& beamSpotCov)
 {
   m_beamSpot = beamSpot;
   m_beamSpotCov.ResizeTo(beamSpotCov);
@@ -88,7 +88,7 @@ void RaveSetup::unsetBeamSpot()
 
 void RaveSetup::Print()
 {
-  if (getRawInstance() not_eq NULL) {
+  if (getRawInstance() not_eq nullptr) {
     if (getRawInstance()->m_useBeamSpot == false) {
       B2INFO("use beam spot is false");
     } else {

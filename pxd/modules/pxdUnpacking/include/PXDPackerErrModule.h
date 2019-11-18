@@ -48,8 +48,8 @@ namespace Belle2 {
       std::string m_RawPXDsName;  /**< The name of the StoreArray of generated RawPXDs */
 
       bool m_InvertMapping; /**< Flag if we invert mapping to DHP row/col or use premapped coordinates */
-      bool m_Clusterize; /** Use clusterizer (FCE format) */
-      bool m_Check; /** false=Pack Raw Data, true=Check unpacked result */
+      bool m_Clusterize; /**< Use clusterizer (FCE format) */
+      bool m_Check; /**< false=Pack Raw Data, true=Check unpacked result */
       std::string m_PXDDAQEvtStatsName;  /**< The name of the StoreObjPtr of PXDDAQStatus to be read */
 
       /** Parameter dhc<->dhe list, mapping from steering file */
@@ -115,11 +115,11 @@ namespace Belle2 {
       /* cppcheck-suppress unusedPrivateFunction */
       void pack_dhp_raw(int dhp_id, int dhe_id);
 
-      void start_frame(void);//! Start with a new Frame
-      void append_int8(unsigned char w);//! cat 8bit value to frame
-      void append_int16(unsigned short w);//! cat 16bit value to frame
-      void append_int32(unsigned int w);//! cat 32value value to frame
-      void add_frame_to_payload(void);//! Add Frame to Event payload
+      void start_frame(void); ///< Start with a new Frame
+      void append_int8(unsigned char w); ///< cat 8bit value to frame
+      void append_int16(unsigned short w); ///< cat 16bit value to frame
+      void append_int32(unsigned int w); ///< cat 32value value to frame
+      void add_frame_to_payload(void); ///< Add Frame to Event payload
 
       void do_the_reverse_mapping(unsigned int& row, unsigned int& col, unsigned short layer, unsigned short sensor);
 
@@ -137,6 +137,7 @@ namespace Belle2 {
 
       bool CheckErrorMaskInEvent(unsigned int eventnr, PXDError::PXDErrorFlags mask);
 
+      /// The pxd error flags
       static std::vector <PXDErrorFlags> m_errors;
 
     };//end class declaration

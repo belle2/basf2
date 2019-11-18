@@ -11,38 +11,34 @@ from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdK
-from skimExpertFunctions import encodeSkimName, setSkimLogging
-
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-00-00'
+gb2_setuprel = 'release-04-00-00'
 
-hhpath = Path()
+path = Path()
 
 skimCode = encodeSkimName('BtoDh_hh')
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+fileList = get_test_file("mixedBGx1", "MC12")
 
 
-inputMdstList('MC9', fileList, path=hhpath)
+inputMdstList('default', fileList, path=path)
 
 
 # create and fill pion and kaon ParticleLists
-stdPi('all', path=hhpath)
-stdK('all', path=hhpath)
+stdPi('all', path=path)
+stdK('all', path=path)
 
 # B+ to D(->h+h-)h+ Skim
 from skim.btocharm import loadD0bar, BsigToDhTohhList
-loadD0bar(path=hhpath)
-BtoDhList = BsigToDhTohhList(path=hhpath)
-skimOutputUdst(skimCode, BtoDhList, path=hhpath)
-summaryOfLists(BtoDhList, path=hhpath)
+loadD0bar(path=path)
+BtoDhList = BsigToDhTohhList(path=path)
+skimOutputUdst(skimCode, BtoDhList, path=path)
+summaryOfLists(BtoDhList, path=path)
 
 
-setSkimLogging()
-process(hhpath)
+setSkimLogging(path)
+process(path)
 
 # print out the summary
 print(statistics)

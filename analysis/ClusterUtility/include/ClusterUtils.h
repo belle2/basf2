@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2017-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
@@ -10,8 +10,8 @@
 
 #pragma once
 
-// BEAMPARAMETERS AND DATABASE
-#include <framework/dbobjects/BeamParameters.h>
+// BEAMSPOT AND DATABASE
+#include <mdst/dbobjects/BeamSpot.h>
 #include <framework/database/DBObjPtr.h>
 
 // MDST
@@ -42,13 +42,14 @@ namespace Belle2 {
      * Returns four momentum vector
      * @return const four momentum vector
      */
-    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
+    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo, double mass = 0.);
 
     /**
      * Returns four momentum vector
      * @return const four momentum vector
      */
-    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex, ECLCluster::EHypothesisBit hypo);
+    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex, ECLCluster::EHypothesisBit hypo,
+                                                 double mass = 0.);
 
     /**
      * Returns 4x4 covariance matrix (px, py, pz, E)
@@ -90,7 +91,7 @@ namespace Belle2 {
 
   private:
 
-    DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter. */
+    DBObjPtr<BeamSpot> m_beamSpotDB; /**< Beam spot database object */
   };
 
 } // Belle2 namespace

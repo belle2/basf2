@@ -37,10 +37,10 @@ CreatorBase* CreatorManager::getCreator(const string& name, const string& librar
   }
 
   CreatorManager& instance = getInstance();
-  map<string, CreatorFactory*>::const_iterator it = instance.m_creatorFactories.find(name);
+  auto it = instance.m_creatorFactories.find(name);
   if (it == instance.m_creatorFactories.end()) {
     B2ERROR("Could not find a geometry creator named " << name);
-    return 0;
+    return nullptr;
   }
   return it->second();
 }

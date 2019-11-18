@@ -12,5 +12,6 @@
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
 namespace Belle2 {
+  /// Alias for the collection of CDC CKF-algorithm states
   using CDCCKFResult = CDCCKFPath;
 }

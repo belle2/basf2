@@ -11,13 +11,10 @@
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-#include <framework/dataobjects/DigitBase.h>
 
 #include <cstdint>
 #include <sstream>
-#include <string>
 #include <algorithm>
-#include <functional>
 #include <limits>
 
 namespace Belle2 {
@@ -82,6 +79,8 @@ namespace Belle2 {
     }
 
     /** Default constructor for the ROOT IO. */
+    // cppcheck does not recognize initialization through other constructor
+    // cppcheck-suppress uninitMemberVar
     DATCONSVDDigit() : DATCONSVDDigit(
         0, true, 0, APVRawSamples( {{0, 0, 0, 0, 0, 0}})
     )

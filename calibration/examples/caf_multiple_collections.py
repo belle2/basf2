@@ -88,10 +88,10 @@ def main(argv):
                               input_files=input_files_1,
                               pre_collector_path=rec_path_1,
                               max_files_per_collector_job=1
-                              # database_chain = [LocalDatabase('path/to/database.txt'), CentralDatabase('global_tag')],
-                              # output_patterns = ["CollectorOutput.root"],  Does your collector output something else
+                              # database_chain=[LocalDatabase('path/to/database.txt'), CentralDatabase('global_tag')],
+                              # output_patterns=["CollectorOutput.root"],  Does your collector output something else
                               #                                              you want passed to the algorithm?
-                              # backend_args = {'queue', 's'}  Only necessary for LSF/PBS backends
+                              # backend_args={'queue': 's'}  Only necessary for LSF/PBS backends
                               )
     # If you have some local databases or want to override the default global tag for this Collection you can do that
     # with these functions

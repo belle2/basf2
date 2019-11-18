@@ -16,7 +16,10 @@ Belle2.RecoTrack.getRightLeftInformation("Belle2::CDCHit")
 import basf2
 from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
+#: string formatter that handles missing keys gracefully
 formatter = TolerateMissingKeyFormatter()
+
+#: create a formatted-key dictionary from specified peeler
 
 
 def format_crop_keys(peel_func):
@@ -34,6 +37,8 @@ def format_crop_keys(peel_func):
             return crops
 
     return peel_func_formatted_keys
+
+#: create a dictionary from MCParticle information
 
 
 @format_crop_keys
@@ -113,6 +118,8 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
             is_primary=False,
         )
 
+#: create a dictionary from RecoTrack's hit content
+
 
 @format_crop_keys
 def peel_reco_track_hit_content(reco_track, key="{part_name}"):
@@ -191,6 +198,8 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
             last_fit_layer=last_fit_layer
         )
 
+#: create a dictionary from RecoTrack's seed
+
 
 @format_crop_keys
 def peel_reco_track_seed(reco_track, key="{part_name}"):
@@ -201,6 +210,8 @@ def peel_reco_track_seed(reco_track, key="{part_name}"):
     else:
         return peel_track_fit_result(None, key="seed_{part_name}")
 
+#: create a dictionary from EventMetaData
+
 
 @format_crop_keys
 def peel_event_info(event_meta_data, key="{part_name}"):
@@ -209,6 +220,8 @@ def peel_event_info(event_meta_data, key="{part_name}"):
         run_number=event_meta_data.getRun(),
         experiment_number=event_meta_data.getExperiment(),
     )
+
+#: create a dictionary from a StoreArray
 
 
 @format_crop_keys
@@ -222,11 +235,15 @@ def peel_store_array_info(item, key="{part_name}"):
             store_array_number=float("nan")
         )
 
+#: create a dictionary from the size of a StoreArray
+
 
 @format_crop_keys
 def peel_store_array_size(array_name, key="{part_name}"):
     array = Belle2.PyStoreArray(array_name)
     return {str(array_name) + "_size": array.getEntries() if array else 0}
+
+#: create a dictionary from the event-level Track info
 
 
 @format_crop_keys
@@ -239,6 +256,8 @@ def peel_event_level_tracking_info(event_level_tracking_info, key="{part_name}")
     return dict(has_vxdtf2_failure_flag=event_level_tracking_info.hasVXDTF2AbortionFlag(),
                 has_unspecified_trackfinding_failure=event_level_tracking_info.hasUnspecifiedTrackFindingFailure(),
                 )
+
+#: create a dictionary from RecoTrack's and its related SPTrackCand's quality indicators
 
 
 @format_crop_keys
@@ -264,6 +283,8 @@ def peel_quality_indicators(reco_track, key="{part_name}"):
     )
 
     return crops
+
+#: create a dictionary from RecoTrack fit status
 
 
 @format_crop_keys
@@ -301,6 +322,8 @@ def peel_fit_status(reco_track, key="{part_name}"):
                             crops[f"ndf_{particle_name}"] = reco_track.getTrackFitStatus(rep).getNdf()
 
     return crops
+
+#: create a dictionary from the TrackFit information
 
 
 @format_crop_keys
@@ -393,6 +416,8 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
 
     return fit_crops
 
+#: create a dictionary from RecoTrack's hit information
+
 
 def get_reco_hit_information(reco_track, hit):
     """Helper function for getting the correct reco hit info"""
@@ -401,7 +426,7 @@ def get_reco_hit_information(reco_track, hit):
             return info
 
 
-# Custom peel function to get the sub detector hit efficiencies
+#: Custom peel function to get the sub detector hit efficiencies
 @format_crop_keys
 def peel_subdetector_hit_efficiency(mc_reco_track, reco_track, key="{part_name}"):
     def get_efficiency(detector_string):
@@ -437,7 +462,7 @@ def peel_subdetector_hit_efficiency(mc_reco_track, reco_track, key="{part_name}"
     return dict(**get_efficiency("CDC"), **get_efficiency("SVD"), **get_efficiency("PXD"))
 
 
-# Custom peel function to get the sub detector hit purity
+#: Custom peel function to get the sub detector hit purity
 @format_crop_keys
 def peel_subdetector_hit_purity(reco_track, mc_reco_track, key="{part_name}"):
     def get_efficiency(detector_string):
@@ -464,7 +489,7 @@ def peel_subdetector_hit_purity(reco_track, mc_reco_track, key="{part_name}"):
     return dict(**get_efficiency("CDC"), **get_efficiency("SVD"), **get_efficiency("PXD"))
 
 
-# Get hit level information information
+#: Get hit level information information
 @format_crop_keys
 def peel_hit_information(hit_info, reco_track, key="{part_name}"):
     nan = np.float("nan")
@@ -509,7 +534,7 @@ def peel_hit_information(hit_info, reco_track, key="{part_name}"):
     return crops
 
 
-# Peeler for module statistics
+#: Peeler for module statistics
 @format_crop_keys
 def peel_module_statistics(modules=[], key="{part_name}"):
     module_stats = dict()
@@ -522,6 +547,8 @@ def peel_module_statistics(modules=[], key="{part_name}"):
 
     return module_stats
 
+#: create a dictionary for MCParticle information
+
 
 def get_helix_from_mc_particle(mc_particle):
     position = mc_particle.getVertex()
@@ -531,6 +558,8 @@ def get_helix_from_mc_particle(mc_particle):
 
     seed_helix = Belle2.Helix(position, momentum, charge_sign, b_field)
     return seed_helix
+
+#: create a dictionary for RecoTrack's seed values
 
 
 def get_seed_track_fit_result(reco_track):
@@ -558,6 +587,8 @@ def get_seed_track_fit_result(reco_track):
     )
 
     return track_fit_result
+
+#: create a dictionary for RecoTrack CDCHit's right-left information
 
 
 def is_correct_rl_information(cdc_hit, reco_track, hit_lookup):

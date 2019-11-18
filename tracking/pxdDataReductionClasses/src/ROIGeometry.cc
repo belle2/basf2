@@ -11,9 +11,6 @@
 
 #include "tracking/pxdDataReductionClasses/ROIGeometry.h"
 #include <framework/logging/Logger.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <genfit/RKTrackRep.h>
-#include <genfit/Track.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <tracking/pxdDataReductionClasses/ROIDetPlane.h>

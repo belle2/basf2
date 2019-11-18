@@ -39,18 +39,30 @@ import collections
 from skimExpertFunctions import get_eventN, get_total_infiles, get_test_file, encodeSkimName
 import subprocess
 import json
+import csv
 
 
-skims = ' ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon TauGeneric SystematicsRadMuMu SystematicsRadEE'
-skims += ' LFVZpInvisible LFVZpVisible SinglePhotonDark SystematicsTracking'
-skims += '  SystematicsLambda  Systematics ISRpipicc BtoDh_Kspipipi0 BtoPi0Pi0  CharmSemileptonic   '
-skims += 'feiSLB0WithOneLep  feiHadronicB0 feiHadronicBplus  BtoPi0Pi0 '
-skims += '  BtoDh_Kspi0  BtoDh_hh TauGeneric  PRsemileptonicUntagged SLUntagged LeptonicUntagged TCPV  '
-skims += 'CharmRare BtoXll BtoXgamma  TauLFV CharmRare Charm2BodyNeutrals2'
-skims += ' Charm3BodyHadronic2  Charm3BodyHadronic1 Charm3BodyHadronic3   Charm2BodyNeutrals Charm2BodyNeutralsD0'
+skims = [
+    'ALP3Gamma', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon',
+    'BtoDh_Kspipipi0', 'BtoDh_Kspi0', 'BtoDh_hh', 'BtoDh_Kshh',
+    'BtoPi0Pi0', 'BtoXgamma', 'BtoXll', 'BtoXgamma', 'BtoXll_LFV',
+    'DielectronPlusMissingEnergy', 'DimuonPlusMissingEnergy', 'ElectronMuonPlusMissingEnergy'
+    'DstToD0Pi_D0ToHpJm', 'XToD0_D0ToHpJm', 'DstToD0Pi_D0ToKsOmega'
+    'DstToD0Pi_D0ToNeutrals', 'XToD0_D0ToNeutrals', 'DstToD0Pi_D0ToHpJmPi0', 'DstToD0Pi_D0ToHpHmKs',
+    'DstToD0Pi_D0ToHpHmPi0', 'DstToD0Pi_D0ToHpJmEta', 'DstToD0Pi_D0ToRare', 'DstToD0Pi_D0ToSemileptonic',
+    'XToDp_DpToKsHp', 'CharmlessHad2Body', 'CharmlessHad3Body', 'ISRpipicc',
+    'LFVZpVisible', 'LeptonicUntagged', 'PRsemileptonicUntagged',
+    'SLUntagged', 'SinglePhotonDark',
+    'SystematicsEELL', 'SystematicsRadMuMu', 'SystematicsRadEE',
+    'SystematicsLambda', 'Systematics', 'SystematicsTracking', 'Resonance',
+    'TauThrust',  'TauLFV', 'TCPV', 'TauGeneric',
+    'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0', 'feiSLBplus'
+]
 
-bkgs = 'MC9_mixedBGx1  MC9_chargedBGx1 MC9_ccbarBGx1 MC9_ssbarBGx1 MC9_uubarBGx0  MC9_ddbarBGx1  MC9_taupairBGx1'
-bkgs += ' MC9_mixedBGx0 MC9_chargedBGx0 MC9_ccbarBGx0 MC9_ssbarBGx0 MC9_uubarBGx0 MC9_ddbarBGx0 MC9_taupairBGx0'
+bkgs = ['MC12_mixedBGx1', 'MC12_chargedBGx1', 'MC12_ccbarBGx1', 'MC12_ssbarBGx1',
+        'MC12_uubarBGx1', 'MC12_ddbarBGx1', 'MC12_taupairBGx1',
+        'MC12_mixedBGx0', 'MC12_chargedBGx0', 'MC12_ccbarBGx0', 'MC12_ssbarBGx0',
+        'MC12_uubarBGx0', 'MC12_ddbarBGx0', 'MC12_taupairBGx0']
 
 jsonMergeFactorInput = open('JsonMergeFactorInput.txt', 'w')
 jsonEvtSizeInput = open('JsonEvtSizeInput.txt', 'w')
@@ -61,17 +73,25 @@ nFullEvents = 200000
 avgUdstSizePerEventPerSample = 0
 avgRetentionPerSample = 0
 avgProcessingTimePerEventPerSample = 0
-for skim in skims.split():
+for skim in skims:
+    csvFile = open(skim + '_stats.csv', 'w')
+    csvWriter = csv.writer(csvFile)
+    csvWriter.writerow(['MC type', 'Input Events', 'Skimmed Events', 'Retention',
+                        'Time/Evt (HEPSEC)', 'Total Time (s)', 'uDST Size/Evt (KB)',
+                        'uDST Size(MB)', 'ACMPE', 'Log Size/evt(KB)', 'Log Size(MB)',
+                        'Max Memory (GB)', 'Avg Memory (GB)', 'FullSkimSize (GB)',
+                        'Full Skim Log Size (GB)'])
+
     jsonTimeInput.write('t_' + skim + '=[')
     jsonEvtSizeInput.write('s_' + skim + '=[')
     jsonMergeFactorInput.write('m_' + skim + '=[')
     print('|Skim:' + skim + '_Skim_Standalone Statistics|')
-    title = '|Bkg        |  InputEvents  |  Skimmed Events  |   Retention   | Time/Evt(HEPSEC)| Total Time (s) |uDSTSize/Evt(KB)|'
+    title = '| MC type   |  InputEvents  |  Skimmed Events  |   Retention   | Time/Evt(HEPSEC)| Total Time (s) |uDSTSize/Evt(KB)|'
     title += ' uDSTSize(MB)|  ACMPE   |Log Size/evt(KB)|Log Size(MB)|'
     title += ' MaxMemory (GB)  | AvgMemory (GB) | FullSkimSize(GB)|'
     title += ' FullSkimLogSize(GB)|'
     print(title)
-    for bkg in bkgs.split():
+    for bkg in bkgs:
         inputFileName = skim + '_' + bkg + '.out'
         outputFileName = skim + '_' + bkg
         outputUdstName = skim + '_' + bkg
@@ -227,6 +247,13 @@ for skim in skims.split():
               '   |    ' +
               str(fullLogSkimSizeGB)[:5] +
               "\n")
+
+        csvWriter.writerow([bkg, str(nFullEvents), str(nSkimmedEvents), str(retention),
+                            str(timePerEvent)[:5], str(totalTime)[:5], str(udstSizePerEvent)[:5],
+                            str(fullFileSizeMB)[:5], str(acm)[:5], str(logFileSizePerEvent)[:5],
+                            str(fullLogFileMB)[:5], str(maxMemory)[:5], str(avgMemory)[:5],
+                            str(fullSkimSizeGB)[:5], str(fullLogSkimSizeGB)[:5]])
+
         outTimePerEvent = timePerEvent
         if (timePerEvent >= 0.5):
             outTimePerEvent = timePerEvent + 1
@@ -290,6 +317,8 @@ for skim in skims.split():
             jsonTimeInput.write(']')
             jsonEvtSizeInput.write(']')
             jsonMergeFactorInput.write(']')
+    csvFile.close()
+    print(f'Wrote skim stats to {skim}_stats.csv')
     jsonTimeInput.write('\n')
     jsonEvtSizeInput.write('\n')
     jsonMergeFactorInput.write('\n')

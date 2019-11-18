@@ -61,7 +61,7 @@ namespace Belle2 {
     * Define reweight info for particles out of range. This info is stored in bin -1.
     * @param entryValue is a line from LookUp table
     */
-    void defineOutOfRangeWeight(WeightInfo entryValue);
+    void defineOutOfRangeWeight(const WeightInfo& entryValue);
 
     /**
     * Get axes names

@@ -3,7 +3,6 @@
 #include <memory>
 #include <vector>
 #include <numeric>
-#include <algorithm>
 
 #include <TTree.h>
 #include <TRandom.h>

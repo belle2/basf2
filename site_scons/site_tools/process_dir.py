@@ -29,14 +29,9 @@ def define_aliases(
         env.Alias(extension, target)
 
 
-def get_files(path_name, release_dir):
-    if release_dir:
-        save_dir = os.getcwd()
-        os.chdir(release_dir)
+def get_files(path_name):
     result = Glob(path_name)
     files = [f for f in result if not os.path.isdir(str(f))]
-    if release_dir:
-        os.chdir(save_dir)
     return files
 
 
@@ -53,18 +48,10 @@ def get_python_files_recursive(topdir_path):
     return python_file_nodes
 
 
-def real_path(path_name, release_dir):
-    if release_dir:
-        return os.path.join(release_dir, path_name)
-    else:
-        return path_name
-
-
 def process_dir(
     parent_env,
     dir_name,
-    is_module_dir,
-    release_dir,
+    is_module_dir
 ):
 
     # remove leading ./
@@ -78,10 +65,9 @@ def process_dir(
         lib_name = dir_name.replace(os.sep, '_')
 
     # get list of header and linkdef files
-    header_files = get_files(os.path.join(dir_name, '*.h'), release_dir)
+    header_files = get_files(os.path.join(dir_name, '*.h'))
     if dir_name != '.':
-        header_files += get_files(os.path.join(dir_name, 'include', '*.h'),
-                                  release_dir)
+        header_files += get_files(os.path.join(dir_name, 'include', '*.h'))
     linkdef_files = []
     for header_file in header_files:
         if str(header_file).lower().endswith('linkdef.h'):
@@ -89,21 +75,20 @@ def process_dir(
             header_files.remove(header_file)
 
     # get list of source files
-    src_nodes = get_files(os.path.join(dir_name, '*.cc'), release_dir) \
-        + get_files(os.path.join(dir_name, 'src', '*.cc'), release_dir) \
-        + get_files(os.path.join(dir_name, '*.c'), release_dir) \
-        + get_files(os.path.join(dir_name, 'src', '*.c'), release_dir) \
-        + get_files(os.path.join(dir_name, '*.f'), release_dir) \
-        + get_files(os.path.join(dir_name, 'src', '*.f'), release_dir) \
-        + get_files(os.path.join(dir_name, '*.F'), release_dir) \
-        + get_files(os.path.join(dir_name, 'src', '*.F'), release_dir)
+    src_nodes = get_files(os.path.join(dir_name, '*.cc')) \
+        + get_files(os.path.join(dir_name, 'src', '*.cc')) \
+        + get_files(os.path.join(dir_name, '*.c')) \
+        + get_files(os.path.join(dir_name, 'src', '*.c')) \
+        + get_files(os.path.join(dir_name, '*.f')) \
+        + get_files(os.path.join(dir_name, 'src', '*.f')) \
+        + get_files(os.path.join(dir_name, '*.F')) \
+        + get_files(os.path.join(dir_name, 'src', '*.F'))
     src_files = [os.path.join(parent_env['BUILDDIR'], str(node)) for node in
                  src_nodes]
 
     # get list of test files
     test_files = [os.path.join(parent_env['BUILDDIR'], str(node)) for node in
-                  get_files(os.path.join(dir_name, 'tests', '*.cc'),
-                            release_dir)]
+                  get_files(os.path.join(dir_name, 'tests', '*.cc'))]
 
     # get list of script files
     script_files = get_python_files_recursive(os.path.join(dir_name, 'scripts'
@@ -112,18 +97,14 @@ def process_dir(
     # get list of executable script files
     executable_files = []
     executable_mode = stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
-    for tools_file in get_files(os.path.join(dir_name, 'tools', '*'),
-                                release_dir):
+    for tools_file in get_files(os.path.join(dir_name, 'tools', '*')):
         executable_file = str(tools_file)
-        if not os.path.exists(executable_file):
-            executable_file = os.path.join(os.environ['BELLE2_RELEASE_DIR'],
-                                           executable_file)
         if os.stat(executable_file).st_mode & executable_mode \
                 == executable_mode:
             executable_files.append(tools_file)
 
     # get list of data files
-    data_files = get_files(os.path.join(dir_name, 'data', '*'), release_dir)
+    data_files = get_files(os.path.join(dir_name, 'data', '*'))
 
     # create environment for directory
     env = parent_env.Clone()
@@ -154,8 +135,7 @@ def process_dir(
         env.Append(LIBS=['dataobjects'])
 
     # include SConscript file if it exists
-    sconscript_name = real_path(os.path.join(dir_name, 'SConscript'),
-                                release_dir)
+    sconscript_name = os.path.join(dir_name, 'SConscript')
     if os.path.isfile(sconscript_name):
         result = SConscript(sconscript_name, exports='env')
 
@@ -202,11 +182,10 @@ def process_dir(
     local_test_files = env['TEST_FILES']
 
     # loop over subdirs
-    entries = os.listdir(real_path(dir_name, release_dir))
+    entries = os.listdir(dir_name)
     for entry in entries:
         if entry.find('.') == -1 \
-            and not os.path.isfile(real_path(os.path.join(dir_name, entry),
-                                             release_dir)) and entry not in [
+            and not os.path.isfile(os.path.join(dir_name, entry)) and entry not in [
             'include',
             'src',
             'tools',
@@ -227,7 +206,7 @@ def process_dir(
                 'site_scons',
             ]:
                 continue
-            process_dir(env, os.path.join(dir_name, entry), is_module_dir and dir_name != '.', release_dir)
+            process_dir(env, os.path.join(dir_name, entry), is_module_dir and dir_name != '.')
 
     # determine whether we are in a special directory
     is_package_dir = dir_name == env['PACKAGE']
@@ -317,16 +296,13 @@ def process_dir(
         parent_env.AppendUnique(DATAOBJECT_LIBS=env['DATAOBJECT_LIBS'])
 
     # process modules directory last so that it is known whether the main library exists
-    if os.path.isdir(real_path(os.path.join(dir_name, 'modules'),
-                               release_dir)):
-        process_dir(env, os.path.join(dir_name, 'modules'), True, release_dir)
+    if os.path.isdir(os.path.join(dir_name, 'modules')):
+        process_dir(env, os.path.join(dir_name, 'modules'), True)
 
     # setup environment for building executables, include SConscript if it exists
     save_env = env.Clone()
-    env['TOOLS_FILES'] = get_files(os.path.join(dir_name, 'tools', '*.cc'),
-                                   release_dir)
-    sconscript_name = real_path(os.path.join(dir_name, 'tools', 'SConscript'),
-                                release_dir)
+    env['TOOLS_FILES'] = get_files(os.path.join(dir_name, 'tools', '*.cc'))
+    sconscript_name = os.path.join(dir_name, 'tools', 'SConscript')
     if os.path.isfile(sconscript_name):
         result = SConscript(sconscript_name, exports='env')
         if isinstance(result, Environment):
@@ -358,14 +334,13 @@ def process_dir(
     # build shared objects from the tests/*.cc files in this directory
     if len(local_test_files) > 0:
         local_test_env = env.Clone()
-        sconscript_name = real_path(os.path.join(dir_name, 'tests',
-                                                 'SConscript'), release_dir)
+        sconscript_name = os.path.join(dir_name, 'tests', 'SConscript')
         if os.path.isfile(sconscript_name):
             result = SConscript(sconscript_name, exports='env')
             if isinstance(result, Environment):
                 local_test_env = result
         local_test_env.PrependUnique(LIBS=['test_main'])
-        local_test_env.AppendUnique(LIBS=['framework', '$ROOT_LIBS', 'gtest', 'pthread'])
+        local_test_env.AppendUnique(LIBS=['mdst_dbobjects', 'framework', '$ROOT_LIBS', 'gtest', 'pthread'])
         env['TEST_FILES'] = [test_file for test_file in env['TEST_FILES']
                              if test_file not in local_test_files]
         env.Prepend(TEST_FILES=local_test_env.SharedObject(local_test_files))

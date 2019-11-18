@@ -10,26 +10,12 @@
 
 #include <analysis/modules/SelectDaughters/SelectDaughtersModule.h>
 
-// framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-#include <framework/dbobjects/BeamParameters.h>
-
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-// utilities
-#include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/ParticleCopy.h>
-
 // Magnetic field
 #include <framework/geometry/BFieldManager.h>
-
-#include <TMath.h>
-
-
 
 using namespace std;
 
@@ -82,12 +68,12 @@ void SelectDaughtersModule::event()
     std::vector<Particle*> daughters = particle->getDaughters();
     std::vector<const Particle*> selParticles = m_decaydescriptor.getSelectionParticles(particle);
 
-    for (unsigned idau = 0; idau < daughters.size(); idau++) {
+    for (auto& daughter : daughters) {
       bool isSel = false;
-      for (unsigned isel = 0; isel < selParticles.size(); isel++) {
-        if (daughters[idau] == selParticles[isel]) isSel = true;
+      for (auto& selParticle : selParticles) {
+        if (daughter == selParticle) isSel = true;
       }
-      if (!isSel) particle->removeDaughter(daughters[idau]);
+      if (!isSel) particle->removeDaughter(daughter);
     }
   }
 }

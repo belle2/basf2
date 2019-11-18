@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
-
 #include <tracking/ckf/pxd/filters/states/BasePXDStateFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
@@ -25,7 +23,7 @@ namespace Belle2 {
 
   public:
     /// Constructor forwarding the default filter name
-    PXDStateFilterFactory(const std::string& defaultFilterName = "all");
+    explicit PXDStateFilterFactory(const std::string& defaultFilterName = "all");
 
     /// Default destructor
     ~PXDStateFilterFactory();

@@ -12,37 +12,34 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdK
 from stdV0s import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-00-00'
+gb2_setuprel = 'release-04-00-00'
 
-mypath = Path()
+path = Path()
 
 skimCode = encodeSkimName('BtoDh_Kshh')
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
 
-inputMdstList('MC9', fileList, path=mypath)
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=path)
 
 
-stdPi('all', path=mypath)
-stdK('all', path=mypath)
-stdKshorts(path=mypath)
+stdPi('all', path=path)
+stdK('all', path=path)
+stdKshorts(path=path)
 
 # B- to D(->Kshh)h- Skim
 from skim.btocharm import loadDkshh, BsigToDhToKshhList
-loadDkshh(path=mypath)
-BtoDhList = BsigToDhToKshhList(path=mypath)
-skimOutputUdst(skimCode, BtoDhList, path=mypath)
-summaryOfLists(BtoDhList, path=mypath)
+loadDkshh(path=path)
+BtoDhList = BsigToDhToKshhList(path=path)
+skimOutputUdst(skimCode, BtoDhList, path=path)
+summaryOfLists(BtoDhList, path=path)
 
 
-setSkimLogging()
-process(mypath)
+setSkimLogging(path)
+process(path)
 
 # print out the summary
 print(statistics)

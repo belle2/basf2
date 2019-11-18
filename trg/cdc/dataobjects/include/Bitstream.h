@@ -4,8 +4,10 @@
 
 #define MERGER_WIDTH 256
 #define NUM_MERGER 146
-#define TSF_TO_2D_HALF_WIDTH 219
-#define TSF_TO_2D_WIDTH 429
+//#define TSF_TO_2D_HALF_WIDTH 219  //210+9
+//#define TSF_TO_2D_WIDTH 429     //210*2+9
+#define TSF_TO_2D_HALF_WIDTH 324  //315+9
+#define TSF_TO_2D_WIDTH 639       //315*2+9
 #define NUM_2D 4
 #define NUM_TSF 5
 #define T2D_TO_3D_WIDTH 747
@@ -41,15 +43,15 @@ namespace Belle2 {
   template <typename SignalBus>
   class Bitstream : public TObject {
     friend class CDCTriggerUnpackerModule;
-    friend class Merger;
-    friend class Tracker2D;
-    friend class Neuro;
+    friend struct Merger;
+    friend struct Tracker2D;
+    friend struct Neuro;
   public:
     /** default constructor */
     Bitstream() {};
 
     /** constructor from Signal Bus */
-    Bitstream(SignalBus bus)
+    explicit Bitstream(SignalBus bus) : m_signal(bus)
     {
       m_signal = bus;
     };
@@ -57,13 +59,14 @@ namespace Belle2 {
     /** destructor, empty because we don't allocate memory explicitly. */
     ~Bitstream() { };
 
-    // accessors
+    //! accessors
     const SignalBus& signal()
     {
       return m_signal;
     }
 
   protected:
+    //! SignalBus of the Bitstream
     SignalBus m_signal;
 
     //! Needed to make the ROOT object storable

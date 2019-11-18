@@ -10,13 +10,11 @@
 
 #include <tracking/modules/pxdDataReduction/ROIPayloadAssemblerModule.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <stdlib.h>
 #include <set>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
-// #include <tracking/dataobjects/ROIrawID.h>
 
 using namespace std;
 using namespace Belle2;

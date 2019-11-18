@@ -13,5 +13,6 @@
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
+  /// Alias for filter to weight the SVD clusters
   using ChooseableSVDResultFilter = TrackFindingCDC::ChooseableFilter<SVDResultFilterFactory>;
 }

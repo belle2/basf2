@@ -14,7 +14,6 @@
 #include <arich/dbobjects/ARICHGeoBase.h>
 #include <string>
 #include <TVector3.h>
-#include <TVector2.h>
 #include <TRotation.h>
 
 

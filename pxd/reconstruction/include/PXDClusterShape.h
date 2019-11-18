@@ -11,12 +11,7 @@
 #ifndef PXDCLUSTERSHAPE_H
 #define PXDCLUSTERSHAPE_H
 
-#include <cstring>
-#include <deque>
-#include <pxd/reconstruction/Pixel.h>
 #include <pxd/reconstruction/ClusterCandidate.h>
-#include <vxd/geometry/GeoCache.h>
-#include <pxd/reconstruction/ClusterProjection.h>
 
 namespace Belle2 {
   namespace PXD {

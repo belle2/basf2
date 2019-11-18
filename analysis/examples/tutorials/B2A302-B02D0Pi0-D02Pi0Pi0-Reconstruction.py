@@ -27,6 +27,8 @@ import variables.collections as vc
 import variables.utils as vu
 from stdPi0s import stdPi0s
 
+b2.conditions.disable_globaltag_replay()
+
 # create path
 my_path = b2.create_path()
 
@@ -76,7 +78,6 @@ pi0_vars = vc.mc_truth + \
     vu.create_aliases_for_selected(
         list_of_variables=vc.cluster + vc.kinematics,
         decay_string='pi0 -> ^gamma ^gamma')
-
 
 # Saving variables to ntuple
 output_file = 'B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.root'

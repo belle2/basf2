@@ -49,13 +49,24 @@ class Monitor(Module):
     """
 
     def initialize(self):
+        """
+        Initilization
+        """
+        #: Event info
         self.event_info = Belle2.PyStoreObj('EventMetaData')
+        #: CDCTRG TS hit
         self.tshits = Belle2.PyStoreArray('CDCTriggerSegmentHits')
+        #: TSIM TS hit
         self.simhits = Belle2.PyStoreArray('TSimSegmentHits')
+        #: get run ID
         self.first_run = self.event_info.getRun()
+        #: Number of events
         self.nevents = 0
 
     def event(self):
+        """
+        event function
+        """
         self.nevents += 1
         used.fill(0)
         in_tsim.fill(0)
@@ -91,6 +102,9 @@ class Monitor(Module):
                 hftime.Fill(hit.foundTime())
 
     def terminate(self):
+        """
+        termination
+        """
         if self.nevents == 0:
             B2WARNING("The monitor module is never called.\n" +
                       "There seems to be no CDC Trigger data at all!")

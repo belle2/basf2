@@ -13,7 +13,6 @@
 #include "framework/logging/Logger.h"
 #include "framework/datastore/StoreObjPtr.h"
 #include "framework/dataobjects/EventMetaData.h"
-#include "framework/dataobjects/FileMetaData.h"
 #include <sstream>
 #include <iomanip>
 #include <algorithm>

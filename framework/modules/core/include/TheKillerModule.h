@@ -25,6 +25,7 @@ namespace Belle2 {
    * * uncaught exception
    * * signal
    * * segfault
+   * * bus error
    *
    * This error can occur in a selected event to test behavior during processing
    */
@@ -33,12 +34,13 @@ namespace Belle2 {
     /** All the defined methods to kill us ... */
     enum class EMethod {
       c_abort,      /**< call std::abort */
+      c_buserror,   /**< produce bus error */
       c_terminate,  /**< call std::terminate */
       c_quick_exit, /**< call std::quick_exit */
       c_exit,       /**< call std::exit */
       c_exception,  /**< raise std::runtime_error */
       c_signal,     /**< raise signal(N) */
-      c_segfault    /**< produce segfault */
+      c_segfault,   /**< produce segfault */
     };
 
     /**

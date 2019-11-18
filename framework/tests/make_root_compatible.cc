@@ -1,5 +1,4 @@
 #include <framework/utilities/TestHelpers.h>
-#include <framework/logging/Logger.h>
 #include <framework/utilities/MakeROOTCompatible.h>
 
 #include <gtest/gtest.h>
@@ -30,7 +29,7 @@ namespace {
     EXPECT_EQ("c__cl__bo__cm__pl8951aBZWVZUEOH_Rhtnsq__bcb__sp__bo__bc__cma", makeROOTCompatible("c:(,+8951aBZWVZUEOH_Rhtnsq)b (),a"));
     EXPECT_EQ("foo__bobar__cm__mi0__pt123__cm__sp94__bc", makeROOTCompatible("foo(bar,-0.123, 94)"));
 
-    for (auto pair : getSubstitutionMap()) {
+    for (const auto& pair : getSubstitutionMap()) {
       EXPECT_EQ(pair.second, makeROOTCompatible(pair.first));
     }
 
@@ -60,7 +59,7 @@ namespace {
               "c:(,+8951aBZWVZUEOH_Rhtnsq)b (),a");
     EXPECT_EQ(invertMakeROOTCompatible("foo__bobar__cm__mi0__pt123__cm__sp94__bc"), "foo(bar,-0.123, 94)");
 
-    for (auto pair : getSubstitutionMap()) {
+    for (const auto& pair : getSubstitutionMap()) {
       EXPECT_EQ(pair.first, invertMakeROOTCompatible(pair.second));
     }
   }

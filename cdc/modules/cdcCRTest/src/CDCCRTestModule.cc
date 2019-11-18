@@ -12,7 +12,6 @@
 #include <TTree.h>
 #include <framework/gearbox/Const.h>
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -21,22 +20,18 @@
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackPoint.h>
-#include <genfit/KalmanFitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/MeasurementOnPlane.h>
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/StateOnPlane.h>
-#include <set>
-#include <boost/format.hpp>
 #include <boost/foreach.hpp>
 
 #include <cdc/translators/RealisticCDCGeometryTranslator.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include "TDirectory.h"
-#include "TMath.h"
 #include <Math/ProbFuncMathCore.h>
-#include "iostream"
 
 using namespace std;
 using namespace Belle2;
@@ -58,11 +53,11 @@ CDCCRTestModule::CDCCRTestModule() : HistoModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "Track fit results histograms will be put into this directory", std::string("trackfit"));
   addParam("NameOfTree", m_treeName, "name of tree in output file", string("tree"));
-  addParam("fillExpertHistograms", m_fillExpertHistos, "Fill additional histograms", false);
-  addParam("noBFit", m_noBFit, "If true -> #Params ==4, #params ==5 for calculate P-Val", true);
+  addParam("fillExpertHistograms", m_fillExpertHistos, "Fill additional histograms", true);
+  addParam("noBFit", m_noBFit, "If true -> #Params ==4, #params ==5 for calculate P-Val", false);
   addParam("plotResidual", m_plotResidual, "plot biased residual, normalized res and xtplot for all layer", false);
   addParam("calExpectedDriftTime", m_calExpectedDriftTime, "if true module will calculate expected drift time, it take a time",
-           false);
+           true);
   addParam("hitEfficiency", m_hitEfficiency, "calculate hit efficiency(Not work now) true:yes false:No", false);
   addParam("TriggerPos", m_TriggerPos, "Trigger position use for cut and reconstruct Trigger image", std::vector<double> { -0.6, -13.25, 17.3});
   addParam("NormTriggerPlaneDirection", m_TriggerPlaneDirection, "Normal trigger plane direction and reconstruct Trigger image",
@@ -74,10 +69,10 @@ CDCCRTestModule::CDCCRTestModule() : HistoModule()
            false);
   addParam("EstimateResultForUnFittedLayer", m_EstimateResultForUnFittedLayer,
            "Calculate residual for Layer that is set unUseInFit", true);
-  addParam("SmallerOutput", m_SmallerOutput, "If true, trigghit position, residual cov,absRes, will not be stored", true);
+  addParam("SmallerOutput", m_SmallerOutput, "If true, trigghit position, residual cov,absRes, will not be stored", false);
   addParam("StoreTrackParams", m_StoreTrackParams, "Store Track Parameter or not, it will be multicount for each hit", true);
-  addParam("StoreHitDistribution", m_MakeHitDist, "Make hit distribution or not", false);
-  addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", false);
+  addParam("StoreHitDistribution", m_MakeHitDist, "Make hit distribution or not", true);
+  addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", true);
   addParam("MinimumPt", m_MinimumPt, "Tracks with tranverse momentum small than this will not recored", 0.);
 }
 

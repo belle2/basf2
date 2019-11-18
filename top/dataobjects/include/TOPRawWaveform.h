@@ -67,7 +67,7 @@ namespace Belle2 {
                    unsigned channel,
                    unsigned scrodID,
                    unsigned window,
-                   unsigned startSample,
+                   int startSample,
                    const std::vector<short>& data):
       m_moduleID(moduleID), m_pixelID(pixelID), m_channel(channel), m_scrodID(scrodID),
       m_window(window), m_startSample(startSample), m_data(data),
@@ -96,6 +96,18 @@ namespace Belle2 {
     {
       m_windows = windows;
     }
+
+    /**
+     * Sets number of global clock tics since last revo9 flag
+     * @param revo9counter
+     */
+    void setRevo9Counter(unsigned short revo9Counter) {m_revo9Counter = revo9Counter;}
+
+    /**
+     * Sets number of offset windows (windows before "first one") - MC only
+     * @param offsetWindows number of windows before "first one"
+     */
+    void setOffsetWindows(int offsetWindows) {m_offsetWindows = offsetWindows;}
 
     /**
      * Returns module ID
@@ -131,7 +143,7 @@ namespace Belle2 {
      * Returns sample number of the first waveform sample
      * @return sample number
      */
-    unsigned getStartSample() const { return m_startSample;}
+    int getStartSample() const { return m_startSample;}
 
     /**
      * Tells whether pedestal already subtracted or not
@@ -158,6 +170,18 @@ namespace Belle2 {
      * @return window numbers
      */
     const std::vector<unsigned short>& getStorageWindows() const { return m_windows; }
+
+    /**
+     * Returns 127 MHz clock ticks since last revo9 marker
+     * @return revo9counter
+     */
+    unsigned short getRevo9Counter() const {return m_revo9Counter;}
+
+    /**
+     * Returns number of windows before the "first one" which defines the time origin
+     * @return number of windows before the "first one"
+     */
+    int getOffsetWindows() const {return m_offsetWindows;}
 
     /**
      * Returns ASIC channel number
@@ -248,12 +272,21 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Returns integral of a peak
+     * @param sampleRise w.r.t array boundaries
+     * @param samplePeak w.r.t array boundaries
+     * @param sampleFall w.r.t array boundaries
+     * @return integral
+     */
+    int Integral(int sampleRise, int samplePeak, int sampleFall) const;
+
     int m_moduleID = 0;                 /**< module ID */
     int m_pixelID = 0;                  /**< software channel ID */
     unsigned m_channel = 0;             /**< hardware channel number */
     unsigned short m_scrodID = 0;       /**< SCROD ID */
     unsigned short m_window = 0;   /**< hardware logic window number (storage window) */
-    unsigned short m_startSample = 0;   /**< sample number of the first waveform sample */
+    int m_startSample = 0;   /**< sample number of the first waveform sample */
     std::vector<short> m_data;      /**< waveform ADC values */
     bool m_pedestalSubtracted = false; /**< true, if pedestals already subtracted */
 
@@ -261,10 +294,13 @@ namespace Belle2 {
     unsigned short m_lastWriteAddr = 0; /**< current (reference) window number */
     std::vector<unsigned short> m_windows; /**< storage windows of waveform segments */
 
+    unsigned short m_revo9Counter = 0; /**< number of clock ticks since last revo9 flag */
+    int m_offsetWindows = 0; /**< number of offset windows (windows before "first one") */
+
     /** cache for feature extraction data */
     mutable std::vector<FeatureExtraction> m_features; //!
 
-    ClassDef(TOPRawWaveform, 8); /**< ClassDef */
+    ClassDef(TOPRawWaveform, 9); /**< ClassDef */
 
   };
 

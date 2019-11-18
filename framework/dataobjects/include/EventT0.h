@@ -10,13 +10,11 @@
 #pragma once
 
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 #include <TObject.h>
 
 #include <boost/optional.hpp>
 
 #include <vector>
-#include <utility>
 #include <cmath>
 
 namespace Belle2 {
@@ -56,7 +54,7 @@ namespace Belle2 {
       /// Storage for the internal quality estimation for a single algorithm. Only comparable for all temporaries with the same algorithm and detector.
       double quality = NAN;
 
-      ClassDef(EventT0Component, 3) /**< Storage element for the EventT0Component */
+      ClassDefNV(EventT0Component, 3) /**< Storage element for the EventT0Component */
     };
 
     /// Check if a final event t0 is set

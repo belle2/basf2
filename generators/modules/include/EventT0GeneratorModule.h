@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <string>
 #include <cmath>
 
 #include <framework/datastore/StoreArray.h>

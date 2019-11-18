@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <mva/interface/Dataset.h>
-#include <framework/utilities/FileSystem.h>
 #include <framework/utilities/TestHelpers.h>
 
 #include <boost/filesystem/operations.hpp>
@@ -33,23 +32,23 @@ namespace {
       m_weight = -3.0;
     }
 
-    virtual unsigned int getNumberOfFeatures() const override { return 5; }
-    virtual unsigned int getNumberOfSpectators() const override { return 2; }
-    virtual unsigned int getNumberOfEvents() const override { return 20; }
-    virtual void loadEvent(unsigned int iEvent) override
+    [[nodiscard]] unsigned int getNumberOfFeatures() const override { return 5; }
+    [[nodiscard]] unsigned int getNumberOfSpectators() const override { return 2; }
+    [[nodiscard]] unsigned int getNumberOfEvents() const override { return 20; }
+    void loadEvent(unsigned int iEvent) override
     {
-      float f = static_cast<float>(iEvent);
+      auto f = static_cast<float>(iEvent);
       m_input = {f + 1, f + 2, f + 3, f + 4, f + 5};
       m_spectators = {f + 6, f + 7};
     };
-    virtual float getSignalFraction() override { return 0.1; };
-    virtual std::vector<float> getFeature(unsigned int iFeature) override
+    float getSignalFraction() override { return 0.1; };
+    std::vector<float> getFeature(unsigned int iFeature) override
     {
       std::vector<float> a(20, 0.0);
       std::iota(a.begin(), a.end(), iFeature + 1);
       return a;
     }
-    virtual std::vector<float> getSpectator(unsigned int iSpectator) override
+    std::vector<float> getSpectator(unsigned int iSpectator) override
     {
       std::vector<float> a(20, 0.0);
       std::iota(a.begin(), a.end(), iSpectator + 6);

@@ -98,6 +98,11 @@ namespace Belle2 {
     // Configure TOP detector for reconstruction
     TOPconfigure config;
 
+    // bunch separation in time
+
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+    m_bunchTimeSep = geo->getNominalTDC().getSyncTimeBase() / 24;
+
     // Parse PDF option
     if (m_pdfOption == "rough") {
       m_PDFOption = TOPreco::c_Rough;
@@ -206,6 +211,12 @@ namespace Belle2 {
                      digit.getTimeError());
     }
 
+    // running offset must not be subtracted in TOPDigits: issue an error if it is
+
+    if (isRunningOffsetSubtracted()) {
+      B2ERROR("Running offset subtracted in TOPDigits: common T0 will not be correct");
+    }
+
     // loop over reconstructed tracks, make a selection and accumulate log likelihoods
 
     for (const auto& track : m_tracks) {
@@ -272,7 +283,7 @@ namespace Belle2 {
   void TOPCommonT0CalibratorModule::terminate()
   {
 
-    // determine scaling factor for errors from two statistically independent results
+    // determine scaling factor for errors from statistically independent results
 
     TH1F h_pulls("pulls", "Pulls of statistically independent results",
                  200, -15.0, 15.0);
@@ -296,18 +307,29 @@ namespace Belle2 {
 
     // merge statistically independent finders and store results into histograms
 
-    TH1F h_commonT0("commonT0", "Common T0", 1, 0, 1);
-    h_commonT0.SetYTitle("common T0 [ns]");
-
     auto finder = m_finders[0];
     for (int i = 1; i < c_numSets; i++) {
       finder.add(m_finders[i]);
     }
+
+    TH1F h_relCommonT0("relCommonT0", "relative common T0", 1, 0, 1);
+    h_relCommonT0.SetYTitle("common T0 residual [ns]");
+    TH1F h_commonT0("commonT0", "Common T0", 1, 0, 1);
+    h_commonT0.SetYTitle("common T0 [ns]");
+
     const auto& minimum = finder.getMinimum();
+    auto h = finder.getHistogram("chi2", "chi2");
+    h.Write();
     if (minimum.valid) {
-      h_commonT0.SetBinContent(1, minimum.position);
+      h_relCommonT0.SetBinContent(1, minimum.position);
+      h_relCommonT0.SetBinError(1, minimum.error * scaleError);
+      double T0 = minimum.position;
+      if (m_commonT0->isCalibrated()) T0 += m_commonT0->getT0();
+      T0 -= round(T0 / m_bunchTimeSep) * m_bunchTimeSep; // wrap around
+      h_commonT0.SetBinContent(1, T0);
       h_commonT0.SetBinError(1, minimum.error * scaleError);
     }
+    h_relCommonT0.Write();
     h_commonT0.Write();
 
     // write other histograms and ntuple; close the file
@@ -319,6 +341,15 @@ namespace Belle2 {
 
     B2RESULT("Results available in " << m_outFileName);
   }
+
+  bool TOPCommonT0CalibratorModule::isRunningOffsetSubtracted()
+  {
+    for (const auto& digit : m_digits) {
+      if (digit.hasStatus(TOPDigit::c_BunchOffsetSubtracted)) return true;
+    }
+    return false;
+  }
+
 
 } // end Belle2 namespace
 

@@ -11,11 +11,13 @@
 #include <analysis/dbobjects/ParticleWeightingKeyMap.h>
 #include <framework/logging/Logger.h>
 
+#include <utility>
+
 using namespace Belle2;
 
-void ParticleWeightingKeyMap::addAxis(std::string name)
+void ParticleWeightingKeyMap::addAxis(const std::string& name)
 {
-  ParticleWeightingAxis* axis = new ParticleWeightingAxis();;
+  auto* axis = new ParticleWeightingAxis();;
   axis->setName(name);
   // Note: map is sorted by keys (C++ standards)
   m_axes.insert(std::make_pair(name, axis));
@@ -31,7 +33,7 @@ int ParticleWeightingKeyMap::addKey(NDBin bin, int key_ID)
   }
 
   if (m_axes.size() == 0) {
-    for (auto i_1dbin : bin) {
+    for (const auto& i_1dbin : bin) {
       this->addAxis(i_1dbin.first);
     }
   }
@@ -59,14 +61,14 @@ int ParticleWeightingKeyMap::addKey(NDBin bin, int key_ID)
     }
   }
 
-  m_bins.push_back(std::make_pair(bin_id_collection, key_ID));
+  m_bins.emplace_back(bin_id_collection, key_ID);
   return key_ID;
 }
 
 
 double ParticleWeightingKeyMap::addKey(NDBin bin)
 {
-  return this->addKey(bin, m_bins.size());
+  return this->addKey(std::move(bin), m_bins.size());
 }
 
 
@@ -98,7 +100,7 @@ double ParticleWeightingKeyMap::getKey(std::map<std::string, double> values) con
 std::vector<std::string> ParticleWeightingKeyMap::getNames() const
 {
   std::vector<std::string> names;
-  for (auto i_axis : m_axes) {
+  for (const auto& i_axis : m_axes) {
     names.push_back(i_axis.first);
   }
   return names;
@@ -113,7 +115,7 @@ void ParticleWeightingKeyMap::printKeyMap() const
     i_axis.second->printAxis();
   }
   B2INFO("Bin map \n <" + axes_names + "> : <gobal ID>");
-  for (auto i_bin : m_bins) {
+  for (const auto& i_bin : m_bins) {
     std::string binIDs = "";
     for (auto i_binid : i_bin.first) {
       binIDs += std::to_string(i_binid) + "; ";

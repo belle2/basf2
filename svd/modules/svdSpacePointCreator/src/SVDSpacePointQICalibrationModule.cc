@@ -36,7 +36,7 @@ SVDSpacePointQICalibrationModule::SVDSpacePointQICalibrationModule() :
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,
            "allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module", string(""));
-  addParam("binSize", m_binSize, "Number of bins in charge distribtuion.",
+  addParam("binSize", m_binSize, "Number of bins in charge distribution.",
            int(50));
 
   addParam("maxClusterSize", m_maxClusterSize, "Max number of strips the PDF are separated into.",

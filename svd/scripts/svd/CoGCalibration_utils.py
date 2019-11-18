@@ -49,7 +49,7 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         self.notApplyCDCLatencyCorrection = mode
         print("Not Correct for CDC latency: " + str(mode) + " " + str(self.notApplyCDCLatencyCorrection))
 
-    def fillLists(self, svdRecoDigits_rel_Clusters, svdClusters_rel_RecoTracks_cl):
+    def fillLists(self, mode_byte_object, svdClusters_rel_RecoTracks_cl):
 
         timeCluster = svdClusters_rel_RecoTracks_cl.getClsTime()
         snrCluster = svdClusters_rel_RecoTracks_cl.getSNR()
@@ -68,7 +68,7 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         hasTimezero = self.cdcEventT0.hasEventT0()
         # print("Time: " + str(hasTimezero))
         if hasTimezero:
-            TBClusters = svdRecoDigits_rel_Clusters.getModeByte().getTriggerBin()
+            TBClusters = mode_byte_object.getTriggerBin()
             TBIndex = ord(TBClusters)
             tZero = self.cdcEventT0.getEventT0()
             # tZero_err = self.cdcEventT0.getEventT0Uncertainty()
@@ -265,6 +265,8 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         self.NTOT = 0
 
     def event(self):
+        svd_evt_info = Belle2.PyStoreObj('SVDEventInfo')
+        mode_byte = svd_evt_info.getModeByte()
         timeClusterU = 0
         timeClusterV = 0
         sideIndex = 0
@@ -278,7 +280,7 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
 
         for svdCluster in svdCluster_list:
             svdRecoDigit = svdCluster.getRelatedTo(svd_recoDigits)
-            self.fillLists(svdRecoDigit, svdCluster)
+            self.fillLists(mode_byte, svdCluster)
 
     def terminate(self):
 

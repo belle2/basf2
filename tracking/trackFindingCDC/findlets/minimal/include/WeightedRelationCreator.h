@@ -23,8 +23,6 @@
 #include <framework/core/ModuleParamList.h>
 #include <framework/logging/Logger.h>
 
-#include <memory>
-
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -97,6 +95,7 @@ namespace Belle2 {
               ++nCurrentRepetitions;
               return nCurrentRepetitions > nMaxRepetitions;
             } else {
+              // cppcheck-suppress unreadVariable
               nCurrentRepetitions = 1;
               return false;
             }

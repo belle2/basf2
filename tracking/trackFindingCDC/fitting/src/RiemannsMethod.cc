@@ -60,6 +60,7 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D,
 
     Eigen::Matrix<double, 1, 2> pointMean;
     //RowVector2d pointMean;
+    // cppcheck-suppress constStatement
     pointMean << 0.0, 0.0;
     if (!(isOriginConstrained())) {
       // subtract the offset from the origin
@@ -83,7 +84,7 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D,
 
     // set the generalized circle parameters
     // last set to zero constrains to a line
-    trajectory2D.setGlobalCircle(PerigeeCircle::fromN(offset, normalToLine(0), normalToLine(1), 0));
+    trajectory2D.setGlobalCircle(UncertainPerigeeCircle(PerigeeCircle::fromN(offset, normalToLine(0), normalToLine(1), 0)));
 
   } else {
 
@@ -96,6 +97,7 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D,
 
 
     Eigen::Matrix<double, 1, 3> pointMean;
+    // cppcheck-suppress constStatement
     pointMean << 0.0, 0.0, 0.0;
     if (!(isOriginConstrained())) {
       // subtract the offset from the origin
@@ -118,7 +120,8 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D,
 
     double offset = -pointMean * normalToPlane;
 
-    trajectory2D.setGlobalCircle(PerigeeCircle::fromN(offset, normalToPlane(0), normalToPlane(1), normalToPlane(2)));
+    trajectory2D.setGlobalCircle(UncertainPerigeeCircle(PerigeeCircle::fromN(offset, normalToPlane(0), normalToPlane(1),
+                                                        normalToPlane(2))));
     //fit.setParameters();
 
   }
@@ -172,7 +175,7 @@ void RiemannsMethod::updateWithDriftLength(CDCTrajectory2D& trajectory2D, CDCObs
     Eigen::Matrix<double, 2, 1> parameters =
       projectedPoints.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(distances);
 
-    trajectory2D.setGlobalCircle(PerigeeCircle::fromN(0.0, parameters(0), parameters(1), 0.0));
+    trajectory2D.setGlobalCircle(UncertainPerigeeCircle(PerigeeCircle::fromN(0.0, parameters(0), parameters(1), 0.0)));
   }
 
   else if ((! isLineConstrained()) && (isOriginConstrained())) {
@@ -188,7 +191,7 @@ void RiemannsMethod::updateWithDriftLength(CDCTrajectory2D& trajectory2D, CDCObs
     Eigen::Matrix<double, 3, 1> parameters =
       projectedPoints.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(distances);
 
-    trajectory2D.setGlobalCircle(PerigeeCircle::fromN(0.0, parameters(0), parameters(1), parameters(2)));
+    trajectory2D.setGlobalCircle(UncertainPerigeeCircle(PerigeeCircle::fromN(0.0, parameters(0), parameters(1), parameters(2))));
   }
 
   else if ((isLineConstrained()) && (! isOriginConstrained())) {
@@ -204,7 +207,7 @@ void RiemannsMethod::updateWithDriftLength(CDCTrajectory2D& trajectory2D, CDCObs
     Eigen::Matrix<double, 3, 1> parameters =
       projectedPoints.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(distances);
 
-    trajectory2D.setGlobalCircle(PerigeeCircle::fromN(parameters(0), parameters(1), parameters(2), 0.0));
+    trajectory2D.setGlobalCircle(UncertainPerigeeCircle(PerigeeCircle::fromN(parameters(0), parameters(1), parameters(2), 0.0)));
     //fit.setParameters(parameters(0),parameters(1),parameters(2),0.0);
 
   }
@@ -224,7 +227,8 @@ void RiemannsMethod::updateWithDriftLength(CDCTrajectory2D& trajectory2D, CDCObs
     Eigen::Matrix<double, 4, 1> parameters =
       projectedPoints.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(distances);
 
-    trajectory2D.setGlobalCircle(PerigeeCircle::fromN(parameters(0), parameters(1), parameters(2), parameters(3)));
+    trajectory2D.setGlobalCircle(UncertainPerigeeCircle(PerigeeCircle::fromN(parameters(0), parameters(1), parameters(2),
+                                                        parameters(3))));
 
   }
 }

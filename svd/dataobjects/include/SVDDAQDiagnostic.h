@@ -47,13 +47,20 @@ namespace Belle2 {
       APVMatchBits = 1,
       /** Number of bits available to represent an upset APV code */
       UpsetAPVBits = 1,
-      /** Number of bits available to represent bad mapping, bad header and bad trailer code */
+      /** Number of bits available to represent bad mapping */
       BadMappingBits = 1,
+      /** Number of Bits available to represent bad header */
       BadHeaderBits = 1,
+      /** Number of Bits available to represent bad trailer code */
       BadTrailerBits = 1,
+      /** Number of Bits available to represent missed header */
+      MissedHeaderBits = 1,
+      /** Number of Bits available to represent missed trailer */
+      MissedTrailerBits = 1,
+
 
       /** Total bit size of the SVDDAQDiagnostic */
-      Bits = TriggerTypeBits + TriggerNumberBits + PipelineAddressBits + CMC1Bits + CMC2Bits + APVErrorBits + FTBErrorBits + FTBFlagsBits + EMUPipelineAddressBits + APVErrorORBits + FADCMatchBits + APVMatchBits + UpsetAPVBits + BadMappingBits + BadHeaderBits + BadTrailerBits
+      Bits = TriggerTypeBits + TriggerNumberBits + PipelineAddressBits + CMC1Bits + CMC2Bits + APVErrorBits + FTBErrorBits + FTBFlagsBits + EMUPipelineAddressBits + APVErrorORBits + FADCMatchBits + APVMatchBits + UpsetAPVBits + BadMappingBits + BadHeaderBits + BadTrailerBits + MissedHeaderBits + MissedTrailerBits
     };
 
 
@@ -67,7 +74,8 @@ namespace Belle2 {
      * @param ftbError Errors field as in the FTB header
      */
     SVDDAQDiagnostic(uint8_t triggerNumber, uint8_t triggerType, uint8_t pipelineAddress, uint8_t cmc1, uint8_t cmc2, uint8_t apvError,
-                     uint8_t ftbError, bool fadcMatch, bool apvMatch, bool badHeader, uint8_t fadcNo = uint8_t(0), uint8_t apvNo = uint8_t(0))
+                     uint8_t ftbError, bool fadcMatch, bool apvMatch, bool badHeader, bool missedHeader, bool missedTrailer, uint8_t fadcNo = uint8_t(0),
+                     uint8_t apvNo = uint8_t(0))
 
     {
       m_triggerNumber = triggerNumber;
@@ -80,6 +88,8 @@ namespace Belle2 {
       m_fadcMatch = fadcMatch;
       m_apvMatch = apvMatch;
       m_badHeader = badHeader;
+      m_missedHeader = missedHeader;
+      m_missedTrailer = missedTrailer;
 
       m_ftbFlags = 0;
       m_emuPipelineAddress = 0;
@@ -92,7 +102,7 @@ namespace Belle2 {
     }
 
     /** Default constructor */
-    SVDDAQDiagnostic(): SVDDAQDiagnostic(0, 0, 0, 0, 0, 0, 0, false, 0, 0) {}
+    SVDDAQDiagnostic(): SVDDAQDiagnostic(0, 0, 0, 0, 0, 0, 0, 0, 0, false, 0, 0) {}
 
     /** Get the trigger number */
     uint16_t getTriggerNumber() const { return static_cast<uint16_t>(m_triggerNumber); }
@@ -120,10 +130,16 @@ namespace Belle2 {
     bool getFADCMatch() const {return m_fadcMatch; }
     /** Get the UpsetAPV code */
     bool getUpsetAPV() const {return m_upsetApv; }
-    /** Get the BadMapping, BadHeader and BadTrailer code */
+    /** Get the Bad Mapping code */
     bool getBadMapping() const {return m_badMapping; }
+    /** Get the Bad Trailer code */
     bool getBadTrailer() const {return m_badTrailer; }
+    /** Get the Bad Header code */
     bool getBadHeader() const {return m_badHeader; }
+    /** Get the missed Header */
+    bool getMissedHeader() const {return m_missedHeader; }
+    /** Get the missed Trailer */
+    bool getMissedTrailer() const {return m_missedTrailer; }
 
     /** Get FADC number */
     unsigned short getFADCNumber() const { return m_fadcNo; }
@@ -133,20 +149,33 @@ namespace Belle2 {
 
 
     /** functions for setting values unpacked from FADC trailer
-     * - FTB Flags Field
-     * - emulated pipeline Address
-     * - APV errors OR
-     * - APV match code
-     * - Upset APVs
-     * - Bad Mapping
-     * - Bad FADC Trailer */
+     * - FTB Flags Field */
     void setFTBFlags(uint16_t ftbFlags) { m_ftbFlags = ftbFlags; }
+    /** functions for setting values unpacked from FADC trailer
+     * - emulated pipeline Address */
     void setEmuPipelineAddress(uint8_t emuPipelineAddress) { m_emuPipelineAddress = emuPipelineAddress; }
+    /** functions for setting values unpacked from FADC trailer
+     * - APV errors OR*/
     void setApvErrorOR(uint8_t apvErrorOR) { m_apvErrorOR = apvErrorOR; }
+    /** functions for setting values of
+     * - APV match code*/
     void setAPVMatch(bool APVMatch) { m_apvMatch = APVMatch; }
+    /** functions for setting values for
+     * - Upset APVs*/
     void setUpsetAPV(bool UpsetAPV) { m_upsetApv = UpsetAPV; }
+    /** functions for setting values for
+     * - Bad Mapping*/
     void setBadMapping(bool BadMapping) { m_badMapping = BadMapping; }
+    /** functions for setting values for
+     * - Bad FADC Trailer */
     void setBadTrailer(bool BadTrailer) { m_badTrailer = BadTrailer; }
+    /** functions for setting values for
+     * - Missed Trailer */
+    void setMissedTrailer(bool MissedTrailer) { m_missedTrailer = MissedTrailer; }
+    /** functions for setting values for
+     * - Missed Header */
+    void setMissedHeader(bool MissedHeader) { m_missedHeader = MissedHeader; }
+
 
   private:
     /** Trigger number */
@@ -181,12 +210,17 @@ namespace Belle2 {
     bool m_badHeader;
     /**Bad fadc Trailer */
     bool m_badTrailer;
+    /**missed Header */
+    bool m_missedHeader;
+    /**missed Trailer */
+    bool m_missedTrailer;
+
     /**FADC # */
     uint8_t m_fadcNo;
     /**APV # */
     uint8_t m_apvNo;
 
-    ClassDef(SVDDAQDiagnostic, 4)
+    ClassDef(SVDDAQDiagnostic, 5)
 
   }; // class SVDDAQDiagnostic
 } // namespace Belle2

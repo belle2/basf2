@@ -37,6 +37,7 @@ namespace Belle2 {
         }
       }
 
+      /** return the decay time*/
       double getTau() const { return m_tau; }
 
     private:
@@ -180,6 +181,7 @@ namespace Belle2 {
 
     private:
 
+      /**minimizer precision*/
       static int s_minimizer_precision;
 
       /** Perform fit on the data */

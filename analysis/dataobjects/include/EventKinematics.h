@@ -13,8 +13,6 @@
 #include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>
-#include <vector>
-#include <set>
 
 namespace Belle2 {
 
@@ -43,14 +41,14 @@ namespace Belle2 {
      *
      * @param TVector3 missing momentum
      */
-    void addMissingMomentum(TVector3 missingMomentum);
+    void addMissingMomentum(const TVector3& missingMomentum);
 
     /**
      * Add the missing momentum vector in CMS.
      *
      * @param TVector3 missing momentum
      */
-    void addMissingMomentumCMS(TVector3 missingMomentumCMS);
+    void addMissingMomentumCMS(const TVector3& missingMomentumCMS);
 
     /**
      * Add missing energy in CMS.

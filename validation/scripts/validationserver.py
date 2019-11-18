@@ -249,8 +249,8 @@ class ValidationRoot(object):
         def sort_key(label: str):
             if "-" not in label:
                 logging.warning(
-                    "Misformatted label encountered: '{}' "
-                    "(doesn't seem to include date?)".format(label)
+                    f"Misformatted label encountered: '{label}' "
+                    f"(doesn't seem to include date?)"
                 )
                 return label
             category, datetag = label.split("-", maxsplit=1)
@@ -267,12 +267,11 @@ class ValidationRoot(object):
             try:
                 index = order.index(category)
             except ValueError:
-                logging.warning(
-                    "Misformatted label encountered: '{}' "
-                    "(doesn't seem to belong to any known "
-                    "category?)".format(label)
-                )
                 index = 9
+                logging.warning(
+                    f"Misformatted label encountered: '{label}' (doesn't seem "
+                    f"to belong to any known category?)"
+                )
             return "{}-{}".format(index, datetag)
 
         combined_list.sort(
@@ -337,7 +336,7 @@ class ValidationRoot(object):
         if not os.path.isfile(full_path):
             raise cherrypy.HTTPError(
                 404,
-                "Json Comparison file {} does not exist".format(full_path)
+                f"Json Comparison file {full_path} does not exist"
             )
 
         return deliver_json(full_path)
@@ -430,7 +429,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     cwd_folder = os.getcwd()
 
     # Only execute the program if a basf2 release is set up!
-    if os.environ.get('BELLE2_RELEASE', None) is None:
+    if os.environ.get('BELLE2_RELEASE_DIR', None) is None and os.environ.get('BELLE2_LOCAL_DIR', None) is None:
         sys.exit('Error: No basf2 release set up!')
 
     cherry_config = dict()
@@ -465,8 +464,8 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     results_folder = validationpath.get_results_folder(cwd_folder)
     comparison_folder = validationpath.get_html_plots_folder(cwd_folder)
 
-    logging.info("Serving static content from {}".format(static_folder))
-    logging.info("Serving result content and plots from {}".format(cwd_folder))
+    logging.info(f"Serving static content from {static_folder}")
+    logging.info(f"Serving result content and plots from {cwd_folder}")
 
     # check if the results folder exists and has at least one folder
     if not os.path.isdir(results_folder):
@@ -478,8 +477,9 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
         for f in os.listdir(results_folder)
     ])
     if results_count == 0:
-        sys.exit("Result folder {} contains no folders, run validate_basf2 "
-                 "first to create validation output".format(results_folder))
+        sys.exit(
+            f"Result folder {results_folder} contains no folders, run "
+            f"validate_basf2 first to create validation output")
 
     # Go to the html directory
     if not os.path.exists('html'):
@@ -542,7 +542,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     if production_env:
         cherrypy.config.update({'environment': 'production'})
 
-    logging.info("Server: Starting HTTP server on {0}:{1}".format(ip, port))
+    logging.info(f"Server: Starting HTTP server on {ip}:{port}")
 
     if open_site:
         webbrowser.open("http://" + ip + ":" + str(port))

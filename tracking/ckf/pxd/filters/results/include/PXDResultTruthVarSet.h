@@ -57,8 +57,10 @@ namespace Belle2 {
     bool extract(const CKFToPXDResult* result) final;
 
   private:
+    /// Pointer to the object containing event number etc
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
+    /// MC information used in the PXD CKF
     MCUtil m_mcUtil;
   };
 }

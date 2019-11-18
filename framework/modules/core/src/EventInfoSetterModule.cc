@@ -15,7 +15,6 @@
 
 #include <chrono>
 #include <set>
-#include <algorithm>
 
 using namespace std;
 using namespace Belle2;
@@ -56,12 +55,7 @@ EventInfoSetterModule::EventInfoSetterModule() : Module()
            "is useful for debugging to start with a specific event.", m_skipToEvent);
 }
 
-
-EventInfoSetterModule::~EventInfoSetterModule()
-{
-
-}
-
+EventInfoSetterModule::~EventInfoSetterModule() = default;
 
 void EventInfoSetterModule::initialize()
 {

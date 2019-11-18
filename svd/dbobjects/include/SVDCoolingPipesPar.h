@@ -61,17 +61,17 @@ namespace Belle2 {
     void setDeltaL(double deltaL)  { m_deltaL = deltaL; }
 
   private:
-    std::string m_material;
-    double m_outerDiameter;
-    double m_wallThickness;
+    std::string m_material; /**< material*/
+    double m_outerDiameter; /**< outer diameter*/
+    double m_wallThickness; /**< wall thickness*/
 
-    int m_nPipes;
-    double m_startPhi;
-    double m_deltaPhi;
-    double m_radius;
-    double m_zstart;
-    double m_zend;
-    double m_deltaL;
+    int m_nPipes; /**<n pipes*/
+    double m_startPhi; /**< start phi angle*/
+    double m_deltaPhi; /**< delta phi angle*/
+    double m_radius; /**<radius*/
+    double m_zstart; /**< start z*/
+    double m_zend; /**< end z*/
+    double m_deltaL; /**< delta L*/
 
 
     ClassDef(SVDCoolingPipesPar, 5);  /**< ClassDef, must be the last term before the closing {}*/

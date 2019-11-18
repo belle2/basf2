@@ -92,7 +92,7 @@ namespace Belle2 {
      *
      * \note wrapped object must already be in 'file' before filled, or not part of any file at all. This function will throw an error and might crash if this is not the case.
      */
-    void write(TFile* file)
+    void write(TDirectory* file)
     {
       if (m_wrapped->GetDirectory() != nullptr and m_wrapped->GetDirectory() != file) {
         B2ERROR("RootMergeable: wrapped object belongs to other file, Write() might crash. Make sure your histogram/ntuple already belongs to the file you want to save it to before filling (e.g. in initialize())");

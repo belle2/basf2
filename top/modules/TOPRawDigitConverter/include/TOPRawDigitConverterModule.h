@@ -15,16 +15,20 @@
 #include <vector>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <top/dataobjects/TOPRawDigit.h>
+#include <top/dataobjects/TOPProductionEventDebug.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPAsicMask.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPCalTimebase.h>
 #include <top/dbobjects/TOPCalChannelT0.h>
+#include <top/dbobjects/TOPCalAsicShift.h>
 #include <top/dbobjects/TOPCalModuleT0.h>
 #include <top/dbobjects/TOPCalCommonT0.h>
 #include <top/dbobjects/TOPCalChannelNoise.h>
-
+#include <top/dbobjects/TOPFrontEndSetting.h>
 
 namespace Belle2 {
 
@@ -80,6 +84,7 @@ namespace Belle2 {
     std::string m_inputRawDigitsName;  /**< name of TOPRawDigit store array */
     std::string m_outputDigitsName;    /**< name of TOPDigit store array */
     bool m_useSampleTimeCalibration;   /**< if true, use sample time calibration */
+    bool m_useAsicShiftCalibration;    /**< if true, use asic shifts calibration */
     bool m_useChannelT0Calibration;    /**< if true, use channel T0 calibration */
     bool m_useModuleT0Calibration;     /**< if true, use module T0 calibration */
     bool m_useCommonT0Calibration;     /**< if true, use common T0 calibration */
@@ -96,9 +101,13 @@ namespace Belle2 {
     int m_calpulseHeightMin;    /**< minimal height of calibration pulse */
     int m_calpulseHeightMax;    /**< maximal height of calibration pulse */
 
+    // front-end settings (lookback, storage depths etc)
+    DBObjPtr<TOPFrontEndSetting> m_feSetting;   /**< front-end settings */
+
     // time calibration
     DBObjPtr<TOPCalTimebase> m_timebase;   /**< sample time calibration constants */
     DBObjPtr<TOPCalChannelT0> m_channelT0; /**< channel T0 calibration constants */
+    DBObjPtr<TOPCalAsicShift> m_asicShift; /**< ASIC shifts calibration constants */
     DBObjPtr<TOPCalModuleT0> m_moduleT0;   /**< module T0 calibration constants */
     DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */
     TOPSampleTimes m_sampleTimes; /**< equidistant in case no calibration required */
@@ -108,10 +117,11 @@ namespace Belle2 {
 
     // collections
     StoreArray<TOPRawDigit> m_rawDigits; /**< collection of raw digits */
+    StoreArray<TOPProductionEventDebug> m_eventDebugs; /**< collection of debug data */
     StoreArray<TOPDigit> m_digits;       /**< collection of digits */
+    StoreObjPtr<TOPAsicMask> m_asicMask; /**< masked asics in firmware */
 
     // other
-    std::vector<int> m_writeDepths;  /**< write depths of production debug format */
     double m_syncTimeBase = 0; /**< SSTin period */
 
   };

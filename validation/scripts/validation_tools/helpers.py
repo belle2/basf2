@@ -45,7 +45,7 @@ def get_basf2_repo(non_dirty_check=False):
     return repo
 
 
-def checkout_git_revision(revision, use_stash=False, repo=None):
+def checkout_git_revision(revision, repo=None, use_stash=False):
     """
     Checkout the given revision in the basf2 repository.
     ATTENTION: this does not check for dirty files etc.

@@ -13,19 +13,15 @@ from basf2 import process, statistics, Path
 from modularAnalysis import inputMdstList, skimOutputUdst, summaryOfLists
 from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
-from skimExpertFunctions import setSkimLogging, encodeSkimName
-
-gb2_setuprel = 'release-03-00-00'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-04-00-00'
 
 # create a path
 darkskimpath = Path()
 
 # test input file
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
-inputMdstList('MC9', fileList, path=darkskimpath)
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=darkskimpath)
 stdPhotons('all', path=darkskimpath)
 stdE('all', path=darkskimpath)
 stdMu('all', path=darkskimpath)

@@ -10,8 +10,6 @@
 
 #include <pxd/modules/pxdReconstruction/PXDRawHitSorterModule.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 
 #include <vxd/geometry/GeoCache.h>

@@ -8,11 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
 #include <analysis/dataobjects/TauPairDecay.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
-#include <iostream>
 
 using namespace Belle2;
 
@@ -24,4 +20,14 @@ void TauPairDecay::addTauPlusIdMode(int pmode)
 void TauPairDecay::addTauMinusIdMode(int mmode)
 {
   m_mmode = mmode;
+}
+
+void TauPairDecay::addTauPlusMcProng(int pprong)
+{
+  m_pprong = pprong;
+}
+
+void TauPairDecay::addTauMinusMcProng(int mprong)
+{
+  m_mprong = mprong;
 }

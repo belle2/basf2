@@ -12,9 +12,6 @@
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
 
 #include <tracking/trackFindingCDC/numerics/CovarianceMatrixUtil.h>
-#include <tracking/trackFindingCDC/numerics/CovarianceMatrix.h>
-#include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
-#include <tracking/trackFindingCDC/numerics/ParameterVector.h>
 
 #include <tracking/trackFindingCDC/numerics/Median.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>

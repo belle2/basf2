@@ -111,13 +111,13 @@ namespace Belle2 {
        * @param vdp Pointer to the storage of sampled delta electrons
        * @param materialCutsCouple This argument of base function is ignored
        * @param dp Secnodary particle pointer
-       * @param minKinEnergy Minimal energy of secondary electrons
+       * @param tmin Minimal energy of secondary electrons
        * @param maxEnergy Maximum energy of secondary electrons
        */
       virtual void SampleSecondaries(std::vector<G4DynamicParticle*>* vdp,
                                      const G4MaterialCutsCouple* materialCutsCouple,
                                      const G4DynamicParticle* dp,
-                                     G4double minKinEnergy,
+                                     G4double tmin,
                                      G4double maxEnergy) override;
 
 
@@ -150,6 +150,12 @@ namespace Belle2 {
                                   const G4DynamicParticle*,
                                   G4double tmax,
                                   G4double length) override;
+
+      /**
+       * Threshold for zero value
+       */
+      virtual G4double MinEnergyCut(const G4ParticleDefinition*,
+                                    const G4MaterialCutsCouple* couple) override;
 
       void SetParticle(const G4ParticleDefinition* p); /**< Read definition of the monopole*/
 
@@ -202,16 +208,17 @@ namespace Belle2 {
       G4ParticleChangeForLoss*    fParticleChange; /**< Pointer to ionising particle*/
 
       G4double mass; /**< Mass of the monopole */
-      G4double magCharge; /**< Monopole magnetic charge*/
+      G4double magCharge; /**< Monopole magnetic charge in e+ units*/
       //FIXME following is lazy programming
       G4double twoln10; /**< log(100.0)*/
       G4double betalow; /**< Beta threshold for low asymptotic*/
       G4double betalim; /**< Beta threshold for high energy (only Ahlen formula)*/
       G4double beta2lim; /**< Square of betalim*/
       G4double bg2lim; /**< (beta*gamma)^2 for betalim*/
-      G4double chargeSquare; /**< Square of magnetic charge*/
+      G4double chargeSquare; /**< Square of magnetic charge in units of Dirac charge*/
       G4double dedxlim; /**< dedx limit in asymptotic formula, not used*/
-      G4double pi_hbarc2_over_mc2; /**< Mass with constants combination*/
+      G4double pi_hbarc2_over_mc2; /**< Convenient constants combination with mass*/
+      G4double nmpl; /**< Magn. charge in units of Dirac charge g_D, nmpl=1 -> g = g_D*/
 
       static std::vector<G4double>* dedx0; /**<Base dedx for each couple in current material*/
     };

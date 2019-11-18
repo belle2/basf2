@@ -28,8 +28,6 @@
 #include "TH1F.h"
 #include "TH2F.h"
 
-#include <framework/core/HistoModule.h>
-
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -59,14 +57,6 @@
 #include <pxd/online/PXDIgnoredPixelsMap.h>
 #include <svd/online/SVDIgnoredStripsMap.h>
 
-#include <testbeam/vxd/dataobjects/TelDigit.h>
-
-#include <framework/core/HistoModule.h>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 namespace Belle2 {

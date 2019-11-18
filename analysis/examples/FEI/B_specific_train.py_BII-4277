@@ -55,7 +55,7 @@ clean_roe_mask = (
     'dr < 2 and abs(dz) < 4',
     'clusterE9E25 > 0.9 and clusterTiming < 50 and E > 0.09 and trackMatchType==0')
 appendROEMasks('B+:sig', [clean_roe_mask], path=path)
-applyCuts('B+:sig', 'ROE_deltae(CleanROE) < 2.0 and ROE_mbc(CleanROE) > 4.8', path=path)
+applyCuts('B+:sig', 'roeDeltae(CleanROE) < 2.0 and roeMbc(CleanROE) > 4.8', path=path)
 
 skimfilter = register_module('SkimFilter')
 skimfilter.param('particleLists', ['B+:sig'])

@@ -11,9 +11,8 @@
 #include "cdc/modules/cdcRecoTrackFilter/CDCRecoTrackFilterModule.h"
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <boost/foreach.hpp>
-#include "TMath.h"
-#include "iostream"
 
 using namespace std;
 using namespace Belle2;

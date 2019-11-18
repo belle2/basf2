@@ -1,9 +1,7 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/utilities/TestHelpers.h>
-#include <framework/logging/Logger.h>
 
 #include <gtest/gtest.h>
 

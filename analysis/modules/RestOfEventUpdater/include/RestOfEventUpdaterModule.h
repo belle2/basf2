@@ -21,7 +21,6 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <tuple>
 
 namespace Belle2 {
 
@@ -58,8 +57,6 @@ namespace Belle2 {
     std::shared_ptr<Variable::Cut> m_cut; /**< Cut object which performs the cuts */
     bool m_discard; /**< Update the ROE mask by passing or discarding particles in the provided particle list. Default is to pass. */
 
-    std::vector<double>
-    m_fractions; /**< A priori fractions used for newly added masks. Fractions of existing masks will not be changed (default: pion always) */
 
     // Methods:
     /**
@@ -73,14 +70,14 @@ namespace Belle2 {
      * @param Reference to particle collection
      * @param ParticleType of the collection
      */
-    void updateMasksWithParticles(StoreObjPtr<RestOfEvent> roe, std::vector<const Particle*>& particlesToUpdate,
+    void updateMasksWithParticles(const StoreObjPtr<RestOfEvent>& roe, std::vector<const Particle*>& particlesToUpdate,
                                   Particle::EParticleType listType);
     /**
      * Update ROE masks with provided composite particle collection
      * @param Pointer to RestOfEvent object for update
      * @param Reference to composite particle collection
      */
-    void updateMasksWithV0(StoreObjPtr<RestOfEvent> roe, std::vector<const Particle*>& particlesToUpdate);
+    void updateMasksWithV0(const StoreObjPtr<RestOfEvent>& roe, std::vector<const Particle*>& particlesToUpdate);
   };
 }
 

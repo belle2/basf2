@@ -28,7 +28,7 @@ namespace Belle2 {
     virtual ~ZMQEventProcessor();
 
     /// Processes the full module chain using parallel processing, starting with the first module in the given path.
-    void process(PathPtr spath, long maxEvent);
+    void process(const PathPtr& spath, long maxEvent);
 
     /// clean up IPC resources (should only be called in one process).
     void cleanup();

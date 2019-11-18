@@ -93,12 +93,10 @@ namespace Belle2 {
              "if true, do fine search with two-dimensional PDF", true);
     addParam("correctDigits", m_correctDigits,
              "if true, subtract bunch time in TOPDigits", true);
-    addParam("addOffset", m_addOffset,
-             "if true, add running average offset to bunch time. "
-             "To be used when common T0 calibration is not available (HLT, express reco)",
-             false);
-    addParam("bias", m_bias,
-             "bias in bunch time determination [ns], to be subtracted", 0.0);
+    addParam("subtractRunningOffset", m_subtractRunningOffset,
+             "if true and correctDigits = True, subtract running offset in TOPDigits "
+             "when running in HLT mode. It must be set to false when running calibration.",
+             true);
     addParam("bunchesPerSSTclk", m_bunchesPerSSTclk,
              "number of bunches per SST clock period", 24);
     addParam("usePIDLikelihoods", m_usePIDLikelihoods,
@@ -140,6 +138,7 @@ namespace Belle2 {
     m_recBunch.registerInDataStore();
     m_timeZeros.registerInDataStore();
     m_timeZeros.registerRelationTo(extHits);
+    m_eventT0.registerInDataStore(); // usually it is already registered in tracking
 
     // Configure TOP detector for reconstruction
 
@@ -164,6 +163,49 @@ namespace Belle2 {
     for (const auto& prior : m_priors) s += prior.second;
     for (auto& prior : m_priors) prior.second /= s;
 
+    if (not m_commonT0.isValid()) {
+      B2ERROR("Common T0 calibration payload requested but not available");
+      return;
+    }
+
+    // auto detection of HLT/express reco mode via status of common T0 payload:
+    //   c_Default           -> HLT/express reco mode
+    //   c_Calibrated        -> data processing mode
+    //   c_Unusable          -> HLT/express reco mode
+    //   c_roughlyCalibrated -> HLT/express reco mode
+    if (m_commonT0->isCalibrated()) {
+      m_HLTmode = false;
+      m_runningOffset = 0; // since digits are already commonT0 calibrated
+      m_runningError = m_commonT0->getT0Error();
+    } else if (m_commonT0->isRoughlyCalibrated()) {
+      m_HLTmode = true;
+      m_runningOffset = m_commonT0->getT0(); // since digits are not commonT0 calibrated
+      m_runningError = m_commonT0->getT0Error();
+    } else {
+      m_HLTmode = true;
+      m_runningOffset = 0;
+      m_runningError = m_bunchTimeSep / sqrt(12.0);
+    }
+
+    if (m_HLTmode) {
+      B2INFO("TOPBunchFinder: running in HLT/express reco mode");
+    } else {
+      B2INFO("TOPBunchFinder: running in data processing mode");
+    }
+
+  }
+
+
+  void TOPBunchFinderModule::beginRun()
+  {
+    StoreObjPtr<EventMetaData> evtMetaData;
+
+    if (not m_commonT0.isValid()) {
+      B2FATAL("Common T0 calibration payload requested but not available for run "
+              << evtMetaData->getRun()
+              << " of experiment " << evtMetaData->getExperiment());
+    }
+
   }
 
 
@@ -180,6 +222,8 @@ namespace Belle2 {
       m_recBunch->clearReconstructed();
     }
     m_timeZeros.clear();
+
+    if (!m_eventT0.isValid()) m_eventT0.create();
 
     // set MC truth if available
 
@@ -366,27 +410,12 @@ namespace Belle2 {
       T0 = t0Fine;
     }
 
-    // subtract bias
-
-    T0.position -= m_bias;
-
-    // are digits common T0 calibrated (or offset subtracted in case of MC)?
-
-    bool commonT0calibrated = false;
-    for (const auto& digit : m_topDigits) {
-      if (digit.getHitQuality() != TOPDigit::c_Good) continue;
-      if (digit.isCommonT0Calibrated() or digit.hasStatus(TOPDigit::c_OffsetSubtracted)) {
-        commonT0calibrated = true;
-        break;
-      }
-    }
-
     // bunch time and current offset
 
     int bunchNo = lround(T0.position / m_bunchTimeSep); // round to nearest integer
     double offset = T0.position - m_bunchTimeSep * bunchNo;
-    if (!commonT0calibrated) { // auto set offset range
-      double deltaOffset = offset - m_offset;
+    if (not m_commonT0->isCalibrated()) { // auto set offset range
+      double deltaOffset = offset - m_runningOffset;
       if (fabs(deltaOffset + m_bunchTimeSep) < fabs(deltaOffset)) {
         offset += m_bunchTimeSep;
         bunchNo--;
@@ -397,27 +426,23 @@ namespace Belle2 {
     }
     double error = T0.error;
 
-    if (m_eventCount == 0) {
-      m_offset = offset;
-      m_error = error;
-    }
-    m_eventCount++;
+    // averaging with first order filter (with adoptable time constant)
 
-    // averaging with first order filter
-
-    double a = exp(-1.0 / m_tau);
-    m_offset = a * m_offset + (1 - a) * offset;
-    double err1 = a * m_error;
+    double tau = 10 + m_success / 2;  // empirically with toy MC
+    if (tau > m_tau) tau = m_tau;
+    double a = exp(-1.0 / tau);
+    m_runningOffset = a * m_runningOffset + (1 - a) * offset;
+    double err1 = a * m_runningError;
     double err2 = (1 - a) * error;
-    m_error = sqrt(err1 * err1 + err2 * err2);
+    m_runningError = sqrt(err1 * err1 + err2 * err2);
 
     // store the results
 
     double bunchTime = bunchNo * m_bunchTimeSep;
-    if (m_addOffset) bunchTime += m_offset;
-
-    m_recBunch->setReconstructed(bunchNo, bunchTime, offset, error, m_offset, m_error,
-                                 m_fineSearch);
+    m_recBunch->setReconstructed(bunchNo, bunchTime, offset, error,
+                                 m_runningOffset, m_runningError, m_fineSearch);
+    m_eventT0->addTemporaryEventT0(EventT0::EventT0Component(bunchTime, error,
+                                                             Const::TOP, "bunchFinder"));
     m_success++;
 
     // store T0 of single tracks relative to bunchTime
@@ -459,14 +484,14 @@ namespace Belle2 {
       for (auto& digit : m_topDigits) {
         digit.subtractT0(bunchTime);
         digit.addStatus(TOPDigit::c_EventT0Subtracted);
-        if (m_addOffset) {
+        if (m_HLTmode and m_subtractRunningOffset) {
+          digit.subtractT0(m_runningOffset);
           double err = digit.getTimeError();
-          digit.setTimeError(sqrt(err * err + m_error * m_error));
+          digit.setTimeError(sqrt(err * err + m_runningError * m_runningError));
           digit.addStatus(TOPDigit::c_BunchOffsetSubtracted);
         }
       }
     }
-
 
   }
 

@@ -11,8 +11,6 @@
 
 #include <tracking/svdROIFinder/SVDROIGeometry.h>
 #include <framework/logging/Logger.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <genfit/Track.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 

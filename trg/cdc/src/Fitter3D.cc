@@ -47,7 +47,6 @@
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/LUT.h"
-#include "trg/cdc/SegmentHit.h"
 #include "trg/trg/Constants.h"
 #include "trg/cdc/Helix.h"
 #include "trg/cdc/Fitter3DUtility.h"
@@ -68,7 +67,8 @@ namespace Belle2 {
                                  const TRGCDC& TRGCDC,
                                  const std::map<std::string, bool>& flags)
     : m_name(name), m_cdc(TRGCDC),
-      m_mBool(flags), m_rootFitter3DFileName(rootFitter3DFile)
+      m_mBool(flags), m_rootFitter3DFileName(rootFitter3DFile),
+      m_treeTrackFitter3D(), m_treeConstantsFitter3D() // 2019/07/31 by ytlai
   {
     m_fileFitter3D = 0;
     m_commonData = 0;

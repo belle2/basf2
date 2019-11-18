@@ -103,9 +103,9 @@ void CaTestModule::closeRun()
 void CaTestModule::collect()
 {
   describeProcess("CaTest::collect()");
-  m_evt = m_emd->getEvent();
-  m_run = m_emd->getRun();
-  m_exp = m_emd->getExperiment();
+  m_evt = m_emdata->getEvent();
+  m_run = m_emdata->getRun();
+  m_exp = m_emdata->getExperiment();
 
   std::string objectName = "MyTree";
   auto tree = getObjectPtr<TTree>(objectName);
@@ -140,7 +140,7 @@ void CaTestModule::finish()
   describeProcess("CaTest::finish()");
 }
 
-void CaTestModule::describeProcess(string functionName)
+void CaTestModule::describeProcess(const string& functionName)
 {
   B2DEBUG(100, "Running " + functionName + " function from a Process of type " + ProcHandler::getProcessName()
           + "\nParallel Processing Used = " + to_string(ProcHandler::parallelProcessingUsed())

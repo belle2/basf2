@@ -25,6 +25,12 @@ Vector3D::Vector3D(const TVector3& tVector3)
 {
 }
 
+Vector3D::Vector3D(const B2Vector3D& b2Vector3)
+  : m_xy(b2Vector3.X(), b2Vector3.Y())
+  , m_z(b2Vector3.Z())
+{
+}
+
 Vector3D& Vector3D::operator=(const TVector3& tVector3)
 {
   m_xy.setX(tVector3.X());
@@ -33,9 +39,22 @@ Vector3D& Vector3D::operator=(const TVector3& tVector3)
   return *this;
 }
 
+Vector3D& Vector3D::operator=(const B2Vector3D& b2Vector3)
+{
+  m_xy.setX(b2Vector3.X());
+  m_xy.setY(b2Vector3.Y());
+  m_z = b2Vector3.Z();
+  return *this;
+}
+
 Vector3D::operator const TVector3() const
 {
   return TVector3(x(), y(), z());
+}
+
+Vector3D::operator const B2Vector3D() const
+{
+  return B2Vector3D(x(), y(), z());
 }
 
 std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const Vector3D& vector3D)

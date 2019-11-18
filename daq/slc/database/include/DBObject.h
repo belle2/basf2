@@ -3,6 +3,7 @@
 
 #include <daq/slc/base/AbstractDBObject.h>
 #include <daq/slc/base/StringUtil.h>
+#include <daq/slc/base/Date.h>
 
 #include <ostream>
 #include <stdexcept>
@@ -59,6 +60,9 @@ namespace Belle2 {
     void printHTML(bool isfull = true) const;
     const std::string printSQL(const std::string& table, int id) const;
     void search(NameValueList& map, const std::string& name = "", bool isfull = true) const;
+    int getDate() const { return m_date; }
+    void setDate(const Date& date) { m_date = date.get(); }
+    void setDate(int date) { m_date = date; }
 
   public:
     virtual const void* getValue(const std::string& name) const;
@@ -77,6 +81,7 @@ namespace Belle2 {
     FieldTextList m_text_m;
     FieldObjectList m_obj_v_m;
     std::string m_empty;
+    int m_date;
 
   protected:
     virtual void reset();

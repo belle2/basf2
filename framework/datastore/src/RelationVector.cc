@@ -9,7 +9,7 @@ void RelationVectorBase::apply(int index,
   const TObject* obj = m_relations.at(index).object;
   float objweight = m_relations.at(index).weight;
 
-  for (auto name : m_relationNames) {
+  for (const auto& name : m_relationNames) {
     RelationArray rel(name, DataStore::c_Event);
 
     //fill fromIndex, toIndex the rght way around

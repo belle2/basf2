@@ -24,7 +24,6 @@
 // FRAMEWORK
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
-#include <framework/datastore/RelationArray.h>
 
 // MDST
 #include <mdst/dataobjects/MCParticle.h>

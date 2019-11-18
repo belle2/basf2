@@ -105,8 +105,7 @@ int PreRawCOPPERFormat_v1::GetFINESSENwords(int n, int finesse_num)
             "[ERROR] COPPER's magic word is invalid. Exiting... Maybe it is due to data corruption or different version of the data format.\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;
-    throw (err_str);
+    B2FATAL(err_buf);
   }
   int pos_nwords;
   switch (finesse_num) {
@@ -127,9 +126,7 @@ int PreRawCOPPERFormat_v1::GetFINESSENwords(int n, int finesse_num)
       sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n %s %s %d\n",
               finesse_num, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf); fflush(stdout);
-      string err_str = err_buf;
-      throw (err_str);
-
+      B2FATAL(err_buf);
   }
   return m_buffer[ pos_nwords ];
 
@@ -162,9 +159,7 @@ unsigned int PreRawCOPPERFormat_v1::GetB2LFEE32bitEventNumber(int n)
     sprintf(err_buf, "No HSLB data in COPPER data. Exiting...\n%s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf; throw (err_str);
-    //     sleep(12345678);
-    //     exit(-1);
+    B2FATAL(err_buf);
   }
 
   if (err_flag == 1) {
@@ -173,12 +168,9 @@ unsigned int PreRawCOPPERFormat_v1::GetB2LFEE32bitEventNumber(int n)
     sprintf(err_buf, "CORRUPTED DATA: Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n%s %s %d\n",
             eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[DEBUG] [ERROR] %s\n", err_buf);
+    printf("[DEBUG] [ERROR] %s\n", err_buf); fflush(stdout);
 #ifndef NO_DATA_CHECK
-    string err_str = err_buf; throw (err_str);
-    //     sleep(12345678);
-    //     exit(-1);
-
+    B2FATAL(err_buf);
 #endif //NO_DATA_CHECK
   }
   return eve_num;
@@ -189,11 +181,7 @@ unsigned int PreRawCOPPERFormat_v1::GetB2LFEE32bitEventNumber(int n)
   sprintf(err_buf, "You need comment out READ_OLD_B2LFEE_FORMAT_FILE if you are handling a new data format\n%s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("%s", err_buf); fflush(stdout);
-  string err_str = err_buf; throw (err_str);
-
-  //   sleep(12345678);
-  //   exit(1);
-  //   return 0;
+  B2FATAL(err_buf);
 
 #endif // READ_OLD_B2LFEE_FORMAT_FILE
 
@@ -212,8 +200,8 @@ void PreRawCOPPERFormat_v1::CheckData(int n,
           n, prev_evenum, *cur_evenum_rawcprhdr, prev_copper_ctr, *cur_copper_ctr,
           prev_exprunsubrun_no, *cur_exprunsubrun_no,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf;
-  throw (err_str);
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 
 //   char err_buf[500];
 //   int err_flag = 0;
@@ -420,10 +408,7 @@ void PreRawCOPPERFormat_v1::CheckUtimeCtimeTRGType(int n)
     sprintf(err_buf, "CORRUPTED DATA: mismatch over FINESSEs. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf; throw (err_str);
-
-    //     sleep(1234567);
-    //     exit(1);
+    B2FATAL(err_buf);
   }
   return;
 }
@@ -438,8 +423,8 @@ unsigned int PreRawCOPPERFormat_v1::FillTopBlockRawHeader(unsigned int m_node_id
           "This function for format ver.1 is not supported. (node %.8x preveve %u prevrun %u currun %u ) Exiting...\n %s %s %d\n",
           m_node_id, prev_eve32, prev_exprunsubrun_no, *cur_exprunsubrun_no,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf;
-  throw (err_str);
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 
   return 0xffffffff;
 
@@ -713,9 +698,8 @@ void PreRawCOPPERFormat_v1::CheckB2LFEEHeaderVersion(int n)
         char err_buf[500];
         sprintf(err_buf, "FTSW and b2tt firmwares are old. Exiting...\n %s %s %d\n",
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
-        string err_str = err_buf; throw (err_str);
-        //         sleep(12345678);
-        //         exit(-1);
+        printf("%s", err_buf); fflush(stdout);
+        B2FATAL(err_buf);
 #endif
       } else {
         // this word for 32bit unixtime
@@ -730,9 +714,7 @@ void PreRawCOPPERFormat_v1::CheckB2LFEEHeaderVersion(int n)
       sprintf(err_buf, "PreRawCOPPERFormat_v1 contains no FINESSE data. Exiting...\n %s %s %d\n",
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf); fflush(stdout);
-      string err_str = err_buf; throw (err_str);
-      //       sleep(12345678);
-      //      exit(-1);
+      B2FATAL(err_buf);
 #endif
     }
   }
@@ -910,7 +892,7 @@ int PreRawCOPPERFormat_v1::CopyReducedBuffer(int n, int* buf_to)
                 finesse_nwords, SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER,
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         printf("%s", err_buf); fflush(stdout);
-        string err_str = err_buf;     throw (err_str);
+        B2FATAL(err_buf);
       }
 
       copy_nwords =
@@ -942,13 +924,12 @@ int PreRawCOPPERFormat_v1::CopyReducedBuffer(int n, int* buf_to)
   copy_nwords = tmp_trailer.GetTrlNwords();
   copyData(buf_to, &pos_nwords_to, buf_from, copy_nwords, nwords_buf_to);
 
-
-
   // length check
   if (pos_nwords_to != nwords_buf_to) {
-    printf("Buffer overflow. Exiting... %d %d\n", pos_nwords_to, nwords_buf_to);
-    fflush(stdout);
-    exit(1);
+    char err_buf[500];
+    sprintf(err_buf, "Buffer overflow. Exiting... %d %d\n", pos_nwords_to, nwords_buf_to);
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
   }
 
   //
@@ -970,10 +951,11 @@ int PreRawCOPPERFormat_v1::CopyReducedBuffer(int n, int* buf_to)
   //
   m_reduced_rawcpr.SetBuffer(buf_to, nwords_buf_to, 0, GetNumEvents(), GetNumNodes());
   if (m_reduced_rawcpr.GetNumEvents() * m_reduced_rawcpr.GetNumNodes() <= 0) {
-    printf("Invalid data block numbers.(# of events %d, # of nodes %d) Exiting...\n",
-           m_reduced_rawcpr.GetNumEvents(), m_reduced_rawcpr.GetNumNodes());
-    fflush(stdout);
-    exit(1);
+    char err_buf[500];
+    sprintf(err_buf, "Invalid data block numbers.(# of events %d, # of nodes %d) Exiting...\n",
+            m_reduced_rawcpr.GetNumEvents(), m_reduced_rawcpr.GetNumNodes());
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
   }
 
   //
@@ -989,9 +971,10 @@ int PreRawCOPPERFormat_v1::CopyReducedBuffer(int n, int* buf_to)
       }
     }
     if (nonzero_finesse_buf == 0) {
-      printf("No non-zero FINESSE buffer. Exiting...\n");
-      fflush(stdout);
-      exit(1);
+      char err_buf[500];
+      sprintf(err_buf, "No non-zero FINESSE buffer. Exiting...\n");
+      printf("%s", err_buf); fflush(stdout);
+      B2FATAL(err_buf);
     }
   }
 
@@ -1027,12 +1010,13 @@ int PreRawCOPPERFormat_v1::CheckB2LHSLBMagicWords(int* finesse_buf, int finesse_
     return 1;
   } else {
     PrintData(m_buffer, m_nwords);
-    printf("Invalid B2LHSLB magic words 0x%x 0x%x. Exiting... :%s %s %d\n",
-           finesse_buf[ POS_MAGIC_B2LHSLB ],
-           finesse_buf[ finesse_nwords - SIZE_B2LHSLB_TRAILER + POS_CHKSUM_B2LHSLB ],
-           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    fflush(stdout);
-    exit(-1);
+    char err_buf[500];
+    sprintf(err_buf, "Invalid B2LHSLB magic words 0x%x 0x%x. Exiting... :%s %s %d\n",
+            finesse_buf[ POS_MAGIC_B2LHSLB ],
+            finesse_buf[ finesse_nwords - SIZE_B2LHSLB_TRAILER + POS_CHKSUM_B2LHSLB ],
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
     return -1;
   }
 }
@@ -1075,8 +1059,7 @@ int PreRawCOPPERFormat_v1::CheckCRC16(int n, int finesse_num)
             (unsigned short)(*buf & 0xFFFF), temp_crc16,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;     throw (err_str);
-
+    B2FATAL(err_buf);
   }
   return 1;
 

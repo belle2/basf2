@@ -10,24 +10,17 @@
 
 // Own include
 #include <analysis/variables/PIDVariables.h>
-#include <analysis/VariableManager/Variable.h>
 
 #include <analysis/VariableManager/Manager.h>
-
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 #include <boost/algorithm/string.hpp>
 
 #include <iostream>
-#include <algorithm>
 #include <cmath>
 
 using namespace std;
@@ -115,7 +108,7 @@ namespace Belle2 {
       std::vector<std::string> detectors(arguments.begin() + 1, arguments.end());
 
       Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
-      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCode));
+      auto hypType = Const::ChargedStable(abs(pdgCode));
 
       auto func = [hypType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
@@ -154,8 +147,8 @@ namespace Belle2 {
 
       std::vector<std::string> detectors(arguments.begin() + 2, arguments.end());
       Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
-      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCodeHyp));
-      Const::ChargedStable testType = Const::ChargedStable(abs(pdgCodeTest));
+      auto hypType = Const::ChargedStable(abs(pdgCodeHyp));
+      auto testType = Const::ChargedStable(abs(pdgCodeTest));
 
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
@@ -193,8 +186,8 @@ namespace Belle2 {
       std::vector<std::string> detectors(arguments.begin() + 2, arguments.end());
 
       Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
-      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCodeHyp));
-      Const::ChargedStable testType = Const::ChargedStable(abs(pdgCodeTest));
+      auto hypType = Const::ChargedStable(abs(pdgCodeHyp));
+      auto testType = Const::ChargedStable(abs(pdgCodeTest));
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid) return std::numeric_limits<float>::quiet_NaN();
@@ -224,12 +217,12 @@ namespace Belle2 {
 
       std::vector<std::string> detectors(arguments.begin() + 1, arguments.end());
       Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
-      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCodeHyp));
+      auto hypType = Const::ChargedStable(abs(pdgCodeHyp));
 
       // Placeholder for the priors
       const unsigned int n = Const::ChargedStable::c_SetSize;
       double frac[n];
-      for (unsigned int i = 0; i < n; ++i) frac[i] = 1.0; // flat priors
+      for (double& i : frac) i = 1.0;  // flat priors
 
       auto func = [hypType, frac, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
@@ -293,7 +286,22 @@ namespace Belle2 {
       return Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(part);
     }
 
+    Manager::FunctionPtr pidPairChargedBDTScore(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 2) {
+        B2ERROR("Need exactly two arguments for pidPairChargedBDTScore: pdgCodeHyp, pdgCodeTest");
+        return nullptr;
+      }
 
+      auto pdgCodeHyp(arguments.at(0));
+      auto pdgCodeTest(arguments.at(1));
+
+      auto func = [pdgCodeHyp, pdgCodeTest](const Particle * part) -> double {
+        auto name = "pidPairChargedBDTScore_" + pdgCodeHyp + "_VS_" + pdgCodeTest;
+        return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : std::numeric_limits<float>::quiet_NaN();
+      };
+      return func;
+    }
 
     //*************
     // B2BII
@@ -427,6 +435,8 @@ namespace Belle2 {
                       "proton identification probability defined as :math:`\\mathcal{L}_p/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
     REGISTER_VARIABLE("deuteronID", deuteronID,
                       "deuteron identification probability defined as :math:`\\mathcal{L}_d/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
+    REGISTER_VARIABLE("pidPairChargedBDTScore(pdgCodeHyp, pdgCodeTest)", pidPairChargedBDTScore,
+                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis. Currently uses only ECL inputs.");
 
     // Metafunctions for experts to access the basic PID quantities
     VARIABLE_GROUP("PID_expert");

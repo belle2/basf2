@@ -3,20 +3,12 @@
 
 #undef debug_log
 // include standard c++
-#include <sys/time.h>
-#include <memory>
 #include <string>
-#include <set>
 #include <map>
 #include <tuple>
 
 // Include BASF2 Base stuff
 #include <framework/core/Module.h>
-#include <framework/core/Environment.h>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 // load some parts of the PXD
 #include <pxd/dataobjects/PXDDigit.h>
@@ -24,12 +16,10 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <vxd/dataobjects/VxdID.h>
-#include <rawdata/dataobjects/RawFTSW.h>
 
 // load some parts of the eudaq
 #include <eutel/eudaq/FileReader.h>
 #include <eutel/merge/CircularTools.h>
-#include <eutel/merge/BoundedSpaceMap.h>
 #include <eutel/merge/EUDAQBuffer.h>
 
 #ifdef debug_log

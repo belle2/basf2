@@ -11,7 +11,6 @@
 #include <tracking/ckf/general/entities/CKFState.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <genfit/SharedPlanePtr.h>
-#include <memory>
 
 namespace genfit {
   class MeasuredStateOnPlane;
@@ -26,10 +25,10 @@ namespace Belle2 {
   class CKFToPXDState : public CKFState<RecoTrack, SpacePoint> {
   public:
     /// When constructed by a hit, set the reco hit
-    CKFToPXDState(const SpacePoint* hit);
+    explicit CKFToPXDState(const SpacePoint* hit);
 
     /// Constructor setting the state to the position of the first CDC track seed hit
-    CKFToPXDState(const RecoTrack* seed, bool reversed = false);
+    explicit CKFToPXDState(const RecoTrack* seed, bool reversed = false);
 
     /// Extract the real layer this state sits on
     unsigned int getGeometricalLayer() const;

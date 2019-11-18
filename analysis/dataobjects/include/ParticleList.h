@@ -190,7 +190,7 @@ namespace Belle2 {
      * @param name name of the Particle store array
      * @param forAntiParticle if true the name is set also for the anti-particle list
      */
-    void setParticleCollectionName(std::string name, bool forAntiParticle = true);
+    void setParticleCollectionName(const std::string& name, bool forAntiParticle = true);
 
     /**
      * Adds a new particle to the list (safe method)

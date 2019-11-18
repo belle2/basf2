@@ -14,8 +14,6 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 
-#include <cassert>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

@@ -3,56 +3,55 @@
 
 """
 <header>
-  <output>K_long_full validation_sample.root</output>
+  <output>K_long_full_validation_sample.root</output>
   <description>Generates particle gun Klong Events for Kl efficiency validation.\t
    Output is not very meaningful but sufficient to check for regression.</description>
-  <contact>jo-frederik.krohn@desy.de</contact>
+  <contact>benjamin.oberhof@lnf.infn.it</contact>
   <interval>nightly</interval>
 </header>
 """
 
-from basf2 import *
-from simulation import *
-from reconstruction import *
-from ROOT import Belle2
+import basf2 as b2
+import simulation as sim
+import reconstruction as rec
+
+import os
 import glob
-from generators import add_evtgen_generator
-set_random_seed('#fa1afe1')
 
+bg = None
+if 'BELLE2_BACKGROUND_DIR' in os.environ:
+    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+else:
+    b2.B2FATAL('The variable BELLE2_BACKGROUND_DIR is not set!')
 
-main = create_path()
+b2.set_random_seed('L1V0RN0')
 
+main = b2.create_path()
 
-noEvents = 1000
+main.add_module('EventInfoSetter',
+                expList=0,
+                runList=0,
+                evtNumList=1000)
 
-bkg = glob.glob('/sw/belle2/bkg/*.root')
-# bkg = '~/bkg/*.root'
+main.add_module('ParticleGun',
+                nTracks=5,
+                momentumGeneration='uniform',
+                momentumParams=[0.05, 5.0],
+                pdgCodes=[130, 321, 311, 2212, 2112, 211, 13, 11])
 
-main.add_module("EventInfoSetter", expList=0, runList=0, evtNumList=noEvents)
+sim.add_simulation(path=main,
+                   bkgfiles=bg)
 
-generator = register_module('ParticleGun')
-generator.param('momentumParams', [0.05, 5.0])
-generator.param('pdgCodes', [130, 321, 311, 2212, 2112, 211, 13, 11])
-main.add_module(generator)
+rec.add_reconstruction(path=main)
 
-# add_evtgen_generator(main, finalstate='mixed')
+# Run a module to generate histograms for PID performances
+main.add_module('KlongValidation',
+                outputName='K_long_full_validation_sample.root',
+                KlIdCut=0.1)
 
-# bkginput = register_module('BGOverlayInput')
-# bkginput.param('inputFileNames', bkg)
-# main.add_module(bkginput)
+# add_mdst_output(main, True, 'Klong_validation_check.root')
 
-add_simulation(main, bkgfiles=bkg)
-# add_simulation(main)
+main.add_module('Progress')
 
-add_reconstruction(main)
-
-# run a module to generate histograms to test pid performance
-validation = register_module('KlongValidation')
-validation.param('outPath', 'K_long_full validation_sample.root'.format(noEvents))
-validation.param("KlId_cut", 0.1)
-main.add_module(validation)
-
-main.add_module(register_module('ProgressBar'))
-
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

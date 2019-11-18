@@ -17,7 +17,6 @@
 #include <geometry/bfieldmap/BFieldComponentBeamline.h>
 #include <geometry/bfieldmap/BFieldComponentKlm1.h>
 #include <geometry/bfieldmap/BFieldComponent3d.h>
-#include <geometry/bfieldmap/BFieldFrameworkInterface.h>
 #include <geometry/dbobjects/MagneticFieldComponent3D.h>
 #include <geometry/CreatorFactory.h>
 #include <framework/database/DBImportObjPtr.h>
@@ -32,8 +31,6 @@
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/bind.hpp>
-#include <boost/foreach.hpp>
-#include <TFile.h>
 
 using namespace std;
 using namespace boost;
@@ -61,10 +58,7 @@ GeoMagneticField::GeoMagneticField() : CreatorBase()
 }
 
 
-GeoMagneticField::~GeoMagneticField()
-{
-
-}
+GeoMagneticField::~GeoMagneticField()  = default;
 
 MagneticField GeoMagneticField::createConfiguration(const GearDir& content)
 {
@@ -131,12 +125,12 @@ void GeoMagneticField::add3dBField(const GearDir& component, MagneticField& fiel
         char* next;
         Br   = strtod(tmp + 33, &next);
         Bphi = strtod(next, &next);
-        Bz   = strtod(next, NULL);
+        Bz   = strtod(next, nullptr);
         bmap.emplace_back(-Br * Unit::T, -Bphi * Unit::T, -Bz * Unit::T);
       }
     }
   }
-  MagneticFieldComponent3D* field = new MagneticFieldComponent3D(
+  auto* field = new MagneticFieldComponent3D(
     minR, maxR, minZ, maxZ,
     mapSizeR, mapSizePhi, mapSizeZ,
     std::move(bmap)
@@ -188,7 +182,7 @@ void GeoMagneticField::readConstantBField(const GearDir& component)
   double ZminValue = component.getLength("MinZ"); // stored in cm
   double ZmaxValue = component.getLength("MaxZ"); // stored in cm
 
-  BFieldComponentConstant& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentConstant>();
+  auto& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentConstant>();
   bComp.setMagneticFieldValues(xValue, yValue, zValue, RmaxValue, ZminValue, ZmaxValue);
 }
 
@@ -214,7 +208,7 @@ void GeoMagneticField::readRadialBField(const GearDir& component)
   double gapHeight     = component.getLength("GapHeight");
   double ironThickness = component.getLength("IronPlateThickness");
 
-  BFieldComponentRadial& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentRadial>();
+  auto& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentRadial>();
   bComp.setMapFilename(mapFilename);
   bComp.setMapSize(mapSizeR, mapSizeZ);
   bComp.setMapRegionZ(mapRegionMinZ, mapRegionMaxZ, mapOffset);
@@ -237,7 +231,7 @@ void GeoMagneticField::readQuadBField(const GearDir& component)
   int apertSizeHER      = component.getInt("ApertSizeHER");
   int apertSizeLER      = component.getInt("ApertSizeLER");
 
-  BFieldComponentQuad& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentQuad>();
+  auto& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentQuad>();
   bComp.setMapFilename(mapFilenameHER, mapFilenameLER, mapFilenameHERleak);
   bComp.setApertFilename(apertFilenameHER, apertFilenameLER);
   bComp.setMapSize(mapSizeHER, mapSizeLER, mapSizeHERleak);
@@ -259,7 +253,7 @@ void GeoMagneticField::readBeamlineBField(const GearDir& component)
 
   double beamAngle = component.getLength("BeamAngle");
 
-  BFieldComponentBeamline& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentBeamline>();
+  auto& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentBeamline>();
   bComp.setMapFilename(mapFilenameHER, mapFilenameLER);
   bComp.setInterpolateFilename(interFilenameHER, interFilenameLER);
   bComp.setMapRegionZ(mapRegionMinZ, mapRegionMaxZ);
@@ -287,7 +281,7 @@ void GeoMagneticField::readKlm1BField(const GearDir& component)
   double dLayer                = component.getLength("DLayer");
 
 
-  BFieldComponentKlm1& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentKlm1>();
+  auto& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentKlm1>();
   bComp.setMapFilename(mapFilename);
   bComp.setNLayers(nBarrelLayers, nEndcapLayers);
   bComp.setBarrelRegion(barrelRMin, barrelZMax, mapOffset);
@@ -328,7 +322,7 @@ void GeoMagneticField::read3dBField(const GearDir& component)
   bool doInterpolation    = bool(component.getInt("enableInterpolation"));
   string enableCoordinate = component.getString("EnableCoordinate");
 
-  BFieldComponent3d& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponent3d>();
+  auto& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponent3d>();
   bComp.setMapFilename(mapFilename);
   bComp.setMapSize(mapSizeR, mapSizePhi, mapSizeZ);
   bComp.setMapRegionZ(mapRegionMinZ, mapRegionMaxZ, mapOffset);

@@ -33,6 +33,7 @@ using namespace std;
 
 namespace Belle2 {
 
+  /// register the basf2 module TRGCDC
   REG_MODULE(TRGCDC);
 
   string

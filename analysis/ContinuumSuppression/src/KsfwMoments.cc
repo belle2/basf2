@@ -49,8 +49,8 @@ namespace Belle2 {
                            std::vector<std::pair<TVector3, int>> p3_cms_q_sigA,
                            std::vector<std::pair<TVector3, int>> p3_cms_q_sigB,
                            std::vector<std::pair<TVector3, int>> p3_cms_q_roe,
-                           TLorentzVector p_cms_missA,
-                           TLorentzVector p_cms_missB,
+                           const TLorentzVector& p_cms_missA,
+                           const TLorentzVector& p_cms_missB,
                            double et[2]
                           )
   {
@@ -121,8 +121,8 @@ namespace Belle2 {
 
     // Add missing to the lists
     std::vector<std::pair<TVector3, int>> p3_cms_q_roeA(p3_cms_q_roe), p3_cms_q_roeB(p3_cms_q_roe);
-    p3_cms_q_roeA.push_back({p_cms_missA.Vect(), 0});
-    p3_cms_q_roeB.push_back({p_cms_missB.Vect(), 0});
+    p3_cms_q_roeA.emplace_back(p_cms_missA.Vect(), 0);
+    p3_cms_q_roeB.emplace_back(p_cms_missB.Vect(), 0);
 
     // Calculate Hoo components
     for (int k = 0; k < 5; k++) {

@@ -9,14 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <mdst/dataobjects/SoftwareTriggerResult.h>
-
 namespace Belle2 {
   namespace SoftwareTrigger {
     /// Helper function to do a prescaling using a random integer number and the prescaling factor from the object.
     bool makePreScale(const unsigned int& preScaleFactor);
-
-    /// Helper function to do a prescaling using a random integer number and the list of prescaling factors from the object.
-    bool makePreScale(const std::vector<unsigned int>& preScaleFactors);
   }
 }

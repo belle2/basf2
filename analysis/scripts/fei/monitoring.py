@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# @cond
+# @cond SUPPRESS_DOXYGEN
 
 # Thoms Keck 2017
 
@@ -643,3 +643,5 @@ class MonitoringParticle(object):
         nSig = hist.values['extraInfo(uniqueSignal)'][signal_bins].sum()
         nBg = hist.values['extraInfo(uniqueSignal)'][bckgrd_bins].sum()
         return Statistic(nTrueSig, nSig, nBg)
+
+# @endcond

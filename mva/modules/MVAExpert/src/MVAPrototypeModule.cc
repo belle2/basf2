@@ -13,6 +13,7 @@
 #include <mva/interface/Interface.h>
 
 #include <boost/algorithm/string/predicate.hpp>
+#include <memory>
 
 namespace Belle2 {
 
@@ -44,8 +45,7 @@ namespace Belle2 {
     // If the identifier does not end on .root or .xml, we are dealing with a database identifier
     // so we need to create a DBObjPtr, which will fetch the weightfile from the database
     if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
-      m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
-                                    DBObjPtr<DatabaseRepresentationOfWeightfile>(m_identifier));
+      m_weightfile_representation = std::make_unique<DBObjPtr<DatabaseRepresentationOfWeightfile>>(m_identifier);
     }
 
     // The supported methods have to be initialized once (calling it more than once is save)
@@ -96,7 +96,7 @@ namespace Belle2 {
     // If you want to apply the expert to more than one sample, you can also use
     // MVA::MultiDataset or any other Dataset defined by the mva package interface.
     std::vector<float> dummy(general_options.m_variables.size(), 0);
-    m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, dummy, 0));
+    m_dataset = std::make_unique<MVA::SingleDataset>(general_options, dummy, 0);
 
   }
 

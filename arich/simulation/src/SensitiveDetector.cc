@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <arich/simulation/SensitiveDetector.h>
-#include <framework/logging/Logger.h>
 #include <arich/dataobjects/ARICHSimHit.h>
 
 // geant4
@@ -21,10 +20,8 @@
 #include <G4Track.hh>
 #include <G4Step.hh>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <TVector2.h>
 #include <TRandom3.h>
 

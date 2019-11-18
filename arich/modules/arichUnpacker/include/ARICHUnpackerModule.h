@@ -17,10 +17,7 @@
 
 #include <framework/core/Module.h>
 #include <arich/modules/arichUnpacker/ARICHRawDataHeader.h>
-#include <arich/dataobjects/ARICHInfo.h>
 #include <string>
-
-#include <TH1F.h>
 
 namespace Belle2 {
 
@@ -98,6 +95,7 @@ namespace Belle2 {
 
   protected:
     unsigned int calbyte(const int* buf); /**< calculate number of bytes in raw Unpacker */
+    unsigned int cal2byte(const int* buf); /**< calculate number of lines (2 bytes) in raw Unpacker */
     unsigned int calword(const int* buf); /**< calculate number of words in raw Unpacker */
     unsigned int m_ibyte = 0; /**< bye index of raw unpacker */
   };
@@ -111,6 +109,14 @@ namespace Belle2 {
     unsigned int val = 0xff & (buf[m_ibyte / 4] >> shift);
     m_ibyte++;
     return val;
+  }
+
+  /**
+   * calculate number of lines (2 bytes) in raw Unpacker
+   */
+  inline unsigned int ARICHUnpackerModule::cal2byte(const int* buf)
+  {
+    return (calbyte(buf) << 8) | calbyte(buf);
   }
 
   /**

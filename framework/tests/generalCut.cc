@@ -33,9 +33,9 @@ namespace {
   class MockVariableManager {
   public:
     /// Use MockObjectType as Objects.
-    typedef MockObjectType Object;
+    using Object = MockObjectType;
     /// Use MockvariableType as Variables.
-    typedef MockVariableType Var;
+    using Var = MockVariableType;
 
     /// Singleton.
     static MockVariableManager& Instance()
@@ -59,7 +59,7 @@ namespace {
   };
 
   /// Type of a mocked general cut.
-  typedef GeneralCut<MockVariableManager> MockGeneralCut;
+  using MockGeneralCut = GeneralCut<MockVariableManager>;
 
   /// Test for the general cut: Try to compile some cuts and check their result using a mocked variable manager.
   TEST(GeneralCutTest, cutCheck)

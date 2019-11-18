@@ -39,15 +39,15 @@ namespace Belle2 {
   private:
     StoreArray<RawSVD> m_rawSVD; /**< Array for RawSVD */
 
-    unsigned long  m_event;
+    unsigned long  m_event; /**<event number*/
 
-    int m_nFtbHeader;
-    int m_nFtbTrailer;
+    int m_nFtbHeader; /**<FTB header*/
+    int m_nFtbTrailer; /**<FTB trailer*/
 
     std::string    m_outputFileName; /**< Name of output file. */
     std::ofstream* m_outputFile;     /**< output file. */
 
-    std::string    m_svdRawName;
+    std::string    m_svdRawName; /**raw name*/
 
   };
 } // Namaspace Belle2

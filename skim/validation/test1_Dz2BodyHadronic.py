@@ -28,25 +28,25 @@ fileList = [
 ]
 
 # create path
-myAna_Main = create_path()
+path = create_path()
 
-inputMdstList('MC9', fileList, path=myAna_Main)
+inputMdstList('MC9', fileList, path=path)
 
-stdPi('loose', path=myAna_Main)
-stdK('loose', path=myAna_Main)
-stdPi('all', path=myAna_Main)
-stdK('all', path=myAna_Main)
-stdE('all', path=myAna_Main)
+stdPi('loose', path=path)
+stdK('loose', path=path)
+stdPi('all', path=path)
+stdK('all', path=path)
+stdE('all', path=path)
 
 
 from skim.charm import DstToD0PiD0ToHpJm
-DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm(myAna_Main)
+DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm(path)
 
-skimOutputUdst('WG6_DstToD0ToKpi', DstToD0PiD0ToHpJmList, path=myAna_Main)
-summaryOfLists(DstList, path=myAna_Main)
+skimOutputUdst('../WG6_DstToD0ToKpi.udst.root', DstToD0PiD0ToHpJmList, path=path)
+summaryOfLists(DstToD0PiD0ToHpJmList, path=path)
 
 
-setSkimLogging()
-process(myAna_Main)
+setSkimLogging(path)
+process(path)
 
 print(statistics)

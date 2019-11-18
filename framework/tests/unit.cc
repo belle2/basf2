@@ -1,6 +1,5 @@
 #include <framework/gearbox/Unit.h>
 
-#include <framework/logging/Logger.h>
 #include <framework/utilities/TestHelpers.h>
 
 #include <gtest/gtest.h>

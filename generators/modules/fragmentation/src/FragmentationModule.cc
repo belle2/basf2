@@ -14,28 +14,16 @@
 
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/particledb/EvtGenDatabasePDG.h>
 #include <framework/utilities/FileSystem.h>
 
-#include <boost/format.hpp>
-#include <stdio.h>
-
-#include <TDatabasePDG.h>
 #include <TRandom3.h>
 
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/IOIntercept.h>
 
 #include <string>
-#include <queue>
-
-#include <EvtGenExternal/EvtExternalGenList.hh>
-#include <EvtGenBase/EvtAbsRadCorr.hh>
-#include <EvtGenBase/EvtDecayBase.hh>
 
 using namespace std;
 using namespace Belle2;
@@ -60,8 +48,9 @@ FragmentationModule::FragmentationModule() : Module()
   addParam("ListPYTHIAEvent", m_listEvent, "List event record of PYTHIA after hadronization", 0);
   addParam("UseEvtGen", m_useEvtGen, "Use EvtGen for specific decays", 1);
   addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)",
-           FileSystem::findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC", true));
+           FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true));
   addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string(""));
+  addParam("CoherentMixing", m_coherentMixing, "Decay the B0-B0bar coherently (should always be true)", true);
   addParam("useEvtGenParticleData", m_useEvtGenParticleData, "Use evt.pdl particle data in PYTHIA as well", 0);
 
   //initialize member variables
@@ -141,7 +130,7 @@ void FragmentationModule::initialize()
 
   if (m_useEvtGen) {
     B2INFO("Using PYTHIA EvtGen Interface");
-    const std::string defaultDecFile = FileSystem::findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC", true);
+    const std::string defaultDecFile = FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true);
     if (m_DecFile.empty()) {
       B2ERROR("No global decay file defined, please make sure the parameter 'DecFile' is set correctly");
       return;
@@ -151,7 +140,7 @@ void FragmentationModule::initialize()
     } else if (defaultDecFile != m_DecFile) {
       B2INFO("Using non-standard DECAY file \"" << m_DecFile << "\"");
     }
-    evtgen = new EvtGenDecays(pythia, EvtGenInterface::createEvtGen(m_DecFile));
+    evtgen = new EvtGenDecays(pythia, EvtGenInterface::createEvtGen(m_DecFile, m_coherentMixing));
     evtgen->readDecayFile(m_UserDecFile);
 
     // Update pythia particle tables from evtgen

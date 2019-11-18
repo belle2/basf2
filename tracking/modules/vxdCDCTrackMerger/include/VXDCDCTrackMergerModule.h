@@ -11,12 +11,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include "genfit/TrackCand.h"
-#include "genfit/Track.h"
-#include "genfit/RKTrackRep.h"
 
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <tracking/dataobjects/RecoTrack.h>

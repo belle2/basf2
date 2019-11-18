@@ -23,7 +23,6 @@
 #include "G4ThreeVector.hh"
 #include "G4RotationMatrix.hh"
 #include "G4Transform3D.hh"
-#include "G4AffineTransform.hh"
 #include "G4VPVParameterisation.hh"
 #include <G4Tubs.hh>
 #include <G4Polyhedron.hh>
@@ -212,7 +211,7 @@ void FBXWriterModule::assignName(std::vector<std::string>* names, unsigned int i
       if (name.length() == (*names)[j].length()) {
         (*names)[j].append("_1");
       }
-      int n = std::stoi((*names)[j].substr(name.length() + 1), NULL);
+      int n = std::stoi((*names)[j].substr(name.length() + 1), nullptr);
       name.append("_");
       name.append(std::to_string(n + 1));
       break;
@@ -228,7 +227,7 @@ void FBXWriterModule::writeGeometryNode(G4VSolid* solid, const std::string& soli
       (solid->GetEntityType() == "G4SubtractionSolid") ||
       (solid->GetEntityType() == "G4BooleanSolid")) {
     HepPolyhedron* polyhedron = getBooleanSolidPolyhedron(solid);
-    G4Polyhedron* g4polyhedron = new G4Polyhedron(*polyhedron);
+    auto* g4polyhedron = new G4Polyhedron(*polyhedron);
     writePolyhedron(solid, g4polyhedron, solidName, solidID);
     delete polyhedron;
     delete g4polyhedron;
@@ -268,10 +267,10 @@ void FBXWriterModule::writeMaterialNode(int lvIndex, const std::string& matName)
   } else {
     visible = false;
   }
-  if (logVol->GetSensitiveDetector() != NULL) visible = "";
+  if (logVol->GetSensitiveDetector() != nullptr) visible = "";
   (*m_Visible)[lvIndex] = visible;
   m_File << "\t; Color for LogVol " << logVol->GetName() << std::endl <<
-         "\tMaterial: " << matID << ", \"Material::" << matName << "\", \"\" {" << std::endl <<
+         "\tMaterial: " << matID << ", \"Material::" << matName << R"(", "" {)" << std::endl <<
          "\t\tVersion: 102" << std::endl <<
          "\t\tProperties70:  {" << std::endl <<
          "\t\t\tP: \"ShadingModel\", \"KString\", \"\", \"\", \"phong\"" << std::endl <<
@@ -286,7 +285,7 @@ void FBXWriterModule::writeMaterialNode(int lvIndex, const std::string& matName)
 void FBXWriterModule::writeLVModelNode(G4LogicalVolume* logVol, const std::string& lvName, unsigned long long lvID)
 {
   m_File << "\t; LogVol " << logVol->GetName() << " with solid " << logVol->GetSolid()->GetName() << std::endl <<
-         "\tModel: " << lvID << ", \"Model::lv_" << lvName << "\", \"Null\" {" << std::endl <<
+         "\tModel: " << lvID << ", \"Model::lv_" << lvName << R"(", "Null" {)" << std::endl <<
          "\t\tVersion: 232" << std::endl <<
          "\t\tProperties70:  {" << std::endl <<
          "\t\t}" << std::endl <<
@@ -618,7 +617,7 @@ void FBXWriterModule::addConnections(G4VPhysicalVolume* physVol, int replica)
 
 void FBXWriterModule::writePreamble(int modelCount, int materialCount, int geometryCount)
 {
-  std::time_t t = std::time(NULL);
+  std::time_t t = std::time(nullptr);
   struct tm* now = std::localtime(&t);
   m_File << "; FBX 7.3.0 project file" << std::endl <<
          "; Copyright (C) 1997-2010 Autodesk Inc. and/or its licensors." << std::endl <<
@@ -851,7 +850,7 @@ void FBXWriterModule::writePolyhedron(G4VSolid* solid, G4Polyhedron* polyhedron,
   if (polyhedron) {
     polyhedron->SetNumberOfRotationSteps(120);
     m_File << "\t; Solid " << solid->GetName() << " of type " << solid->GetEntityType() << std::endl <<
-           "\tGeometry: " << solidID << ", \"Geometry::" << name << "\", \"Mesh\" {" << std::endl <<
+           "\tGeometry: " << solidID << ", \"Geometry::" << name << R"(", "Mesh" {)" << std::endl <<
            "\t\tVertices: *" << polyhedron->GetNoVertices() * 3 << " {" << std::endl << "\t\t\ta: ";
     std::streampos startOfLine = m_File.tellp();
     for (int j = 1; j <= polyhedron->GetNoVertices(); ++j) {
@@ -952,7 +951,7 @@ void FBXWriterModule::writePVModelNode(G4VPhysicalVolume* physVol, const std::st
     m_File << " (replicated: copy " << physVol->GetCopyNo() << ")";
   }
   m_File << ", placing LogVol " << physVol->GetLogicalVolume()->GetName() << std::endl <<
-         "\tModel: " << pvID << ", \"Model::" << pvName << "\", \"Null\" {" << std::endl <<
+         "\tModel: " << pvID << ", \"Model::" << pvName << R"(", "Null" {)" << std::endl <<
          "\t\tVersion: 232" << std::endl <<
          "\t\tProperties70:  {" << std::endl <<
          "\t\t\tP: \"Lcl Translation\", \"Lcl Translation\", \"\", \"A\"," <<
@@ -1010,7 +1009,7 @@ HepPolyhedron* FBXWriterModule::getBooleanSolidPolyhedron(G4VSolid* solid)
 {
   G4VSolid* solidA = solid->GetConstituentSolid(0);
   G4VSolid* solidB = solid->GetConstituentSolid(1);
-  HepPolyhedron* polyhedronA = NULL;
+  HepPolyhedron* polyhedronA = nullptr;
   if ((solidA->GetEntityType() == "G4IntersectionSolid") ||
       (solidA->GetEntityType() == "G4UnionSolid") ||
       (solidA->GetEntityType() == "G4SubtractionSolid") ||
@@ -1019,7 +1018,7 @@ HepPolyhedron* FBXWriterModule::getBooleanSolidPolyhedron(G4VSolid* solid)
   } else {
     polyhedronA = new HepPolyhedron(*(solidA->GetPolyhedron()));
   }
-  HepPolyhedron* polyhedronB = NULL;
+  HepPolyhedron* polyhedronB = nullptr;
   G4VSolid* solidB2 = solidB;
   if (solidB->GetEntityType() == "G4DisplacedSolid") {
     solidB2 = ((G4DisplacedSolid*)solidB)->GetConstituentMovedSolid();
@@ -1037,7 +1036,7 @@ HepPolyhedron* FBXWriterModule::getBooleanSolidPolyhedron(G4VSolid* solid)
   } else {
     polyhedronB = new HepPolyhedron(*(solidB->GetPolyhedron()));
   }
-  HepPolyhedron* result = new HepPolyhedron();
+  auto* result = new HepPolyhedron();
   if (solid->GetEntityType() == "G4UnionSolid") {
     *result = polyhedronA->add(*polyhedronB);
   } else if (solid->GetEntityType() == "G4SubtractionSolid") {

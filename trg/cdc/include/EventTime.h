@@ -31,49 +31,77 @@ namespace Belle2 {
   class TRGCDCSegmentHit;
   class TRGCDCLink;
 
+  /// A class of TRGCDC Event Time
   class TRGCDCEventTime {
   public:
 
+    /// constructor of TRGCDCEventTime class
     TRGCDCEventTime(const TRGCDC&, bool makeRootFile);
-
+    /// destructor of TRGCDCEventTime class
     virtual ~TRGCDCEventTime();
 
   public :
 
+    /// initialize the class
     void initialize(void);
+    /// terminate function
     void terminate(void);
+    /// Calculate T0 based on ver
     void doit(int ver, bool print);
+    /// hit count of TS
     void hitcount(void);
+    /// making hostogram
     void hist(void);
+    /// old version of calculation function
     void oldVer(void);
+    /// Print info in firmware level
     void printFirm(void);
+    /// Calculate T0
     int getT0(void)const;
 
 
   private :
+    /// TRGCDC class
     const TRGCDC& _cdc;
 
+    /// TFile pointer
     TFile* m_fileEvtTime;
+    /// TTree pointer of the TFile
     TTree* m_evtOutputTs;
+    /// TTree pointer of the TFile
     TTree* m_evtOut;
+    /// TH1 pointer of the TFile
     TH1* h;
 
+    /// The fastest time of TS
     int m_fastestT;
+    /// calculated T0
     int m_histT;
+    /// TS counter for each SL and clock
     int cnt[9][64];
+    /// Fastest time array each SL and clock
     int ft[9][64][10];
+    /// T0 is found or not
     bool m_foundT0;
+    /// Found time of TS
     int m_foundT;
+    /// Drift time of TS
     int m_whdiff;
+    /// minus ET bin
     int m_minusET;
+    /// no ET bin is looped
     int m_noET;
 //    int m_allET;
 //    int m_yesET;
+    /// Threshold value
     int threshold;
 
+    /// event number
     int m_eventN;
 
+    /// make Root file or not
     bool m_makeRootFile;
+    /// Version
     int m_ver;
 
   };

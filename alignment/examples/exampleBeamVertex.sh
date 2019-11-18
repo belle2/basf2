@@ -36,6 +36,6 @@ basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/caf_vxdbeam.py -i sampleMuMu.root -
 
 
 # 3) command line tool (separate collection+calibration)
-millepede_calibration VXDHalfShells collect   --components VXDAlignment BeamParameters --tracks --reco --ana -- -i sampleMuMu.root -i sampleBMuons.root -l ERROR
+millepede_calibration VXDHalfShells collect   --components VXDAlignment BeamSpot --tracks --reco --ana -- -i sampleMuMu.root -i sampleBMuons.root -l ERROR
 # Output file name name of previous line is used by default in the following (RootOutput.root, but produced by HistoManager)
-millepede_calibration VXDHalfShells calibrate --components VXDAlignment BeamParameters
+millepede_calibration VXDHalfShells calibrate --components VXDAlignment BeamSpot

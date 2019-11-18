@@ -12,6 +12,7 @@
 
 #include <framework/utilities/RootFileCreationManager.h>
 #include <framework/logging/Logger.h>
+#include <framework/core/MetadataService.h>
 #include <iomanip>
 
 namespace {
@@ -22,6 +23,7 @@ namespace {
     if (file->IsOpen()) {
       file->Close();
     }
+    Belle2::MetadataService::Instance().addRootNtupleFile(file->GetName());
     delete file;
   }
 }

@@ -113,6 +113,8 @@ void SuperClusterCreator::apply(std::vector<CDCWireHit>& inputWireHits,
         }
         return false;
       };
+      // the return value is not needed
+      // cppcheck-suppress ignoredReturnValue
       std::adjacent_find(wireHitChains.begin(), wireHitChains.end(), connectWireHitChains);
 
       if (not frontWrapChain.empty()) {

@@ -13,11 +13,9 @@
 #include "cadef.h"
 #endif
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/dataobjects/VxdID.h>
 
-#include <TF1.h>
 #include <TH2F.h>
 #include <TCanvas.h>
 
@@ -31,6 +29,8 @@ namespace Belle2 {
 
     //! Constructor
     DQMHistAnalysisPXDReductionModule();
+    //! Destructor
+    ~DQMHistAnalysisPXDReductionModule();
   private:
 
     //! Module functions to be called from main process

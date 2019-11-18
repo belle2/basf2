@@ -407,7 +407,7 @@ namespace Belle2 {
     private:
       static bool m_configured; /**< set to true when done */
       static DBObjPtr<TOPCalModuleAlignment> m_alignment; /**< alignment constants */
-      static DBArray<TOPPmtInstallation> m_pmtInstalled; /**< PMT installation data */
+      static OptionalDBArray<TOPPmtInstallation> m_pmtInstalled; /**< PMT installation data */
       double m_R1 = 0;   /**< inner radius */
       double m_R2 = 0;   /**< outer radius */
       double m_Z1 = 0;   /**< backward z */

@@ -2,10 +2,6 @@
 # -*- coding: utf-8 -*-
 from variables import utils
 
-#: Placehoder for FT variables collection
-#: (not complete, see :issue:`BII-3853`)
-flavor_tagging = ["qrOutput(FBDT)"]
-
 #: Replacement for DeltaEMbc
 deltae_mbc = ["Mbc", "deltaE"]
 
@@ -14,21 +10,19 @@ kinematics = ['px', 'py', 'pz', 'pt', 'p', 'E']
 
 #: Cluster-related variables
 cluster = [
-    'PulseShapeDiscriminationMVA',
-    'ClusterHasPulseShapeDiscrimination',
-    'ClusterNumberOfHadronDigits',
+    'clusterPulseShapeDiscriminationMVA',
+    'clusterHasPulseShapeDiscrimination',
+    'clusterNumberOfHadronDigits',
     'clusterDeltaLTemp',
     'maxWeightedDistanceFromAverageECLTime',
     'minC2TDist',
     'nECLClusterTrackMatches',
     'clusterZernikeMVA',
     'clusterReg',
-    'clusterTrigger',
     'weightedAverageECLTime',
     'clusterAbsZernikeMoment40',
     'clusterAbsZernikeMoment51',
     'clusterBelleQuality',
-    'clusterCRID',
     'clusterClusterID',
     'clusterConnectedRegionID',
     'clusterE1E9',
@@ -40,6 +34,8 @@ cluster = [
     'clusterErrorTheta',
     'clusterErrorTiming',
     'clusterHighestE',
+    'clusterHasFailedErrorTiming',
+    'clusterHasFailedTiming',
     'clusterHasNPhotons',
     'clusterHasNeutralHadron',
     'clusterLAT',
@@ -50,9 +46,6 @@ cluster = [
     'clusterTheta',
     'clusterTiming',
     'clusterTrackMatch',
-    'eclExtPhi',
-    'eclExtPhiId',
-    'eclExtTheta',
     'goodBelleGamma',
     'nECLOutOfTimeCrystals',
     'nECLOutOfTimeCrystalsBWDEndcap',
@@ -81,7 +74,6 @@ klm_cluster = [
     'klmClusterIsBackwardEKLM',
     'klmClusterTheta',
     'klmClusterPhi',
-    'maximumKLMAngleCMS',
     'nKLMClusterTrackMatches',
     'nMatchedKLMClusters',
 ]
@@ -113,9 +105,9 @@ mc_variables = [
     'genMotherPDG',
     'genParticleID',
     'isCloneTrack',
-    'mcDX',
-    'mcDY',
-    'mcDZ',
+    'mcX',
+    'mcY',
+    'mcZ',
     'mcDecayTime',
     'mcE',
     'mcErrors',
@@ -180,7 +172,7 @@ vertex = [
     'prodVertexXErr',
     'prodVertexYErr',
     'prodVertexZErr',
-    'pValue',
+    'chiProb',
 ]
 
 #: Replacement for MCVertex tuple tool
@@ -195,13 +187,22 @@ mc_vertex = [
     'mcProdVertexZ'
 ]
 
-#: Tag-side related variables
+#: CPV and Tag-side related variables
 tag_vertex = [
+    'DeltaT',
+    'DeltaTErr',
+    'DeltaZ',
+    'DeltaZErr',
+    'DeltaBoost',
+    'DeltaBoostErr',
     'TagVLBoost',
     'TagVLBoostErr',
     'TagVOBoost',
     'TagVOBoostErr',
     'TagVpVal',
+    'TagVNDF',
+    'TagVChi2',
+    'TagVChi2IP',
     'TagVx',
     'TagVxErr',
     'TagVy',
@@ -213,7 +214,6 @@ tag_vertex = [
 #: Tag-side  related MC true variables
 mc_tag_vertex = [
     'MCDeltaT',
-    'MCTagBFlavor',
     'TagVmcLBoost',
     'TagVmcOBoost',
     'mcLBoost',
@@ -240,7 +240,7 @@ reco_stats = [
 inv_mass = ['M', 'ErrM', 'SigM', 'InvM']
 
 #: Extra energy variables
-extra_energy = ["ROE_eextra()"]
+extra_energy = ["roeEextra()"]
 
 #: Event level tracking variables
 event_level_tracking = [

@@ -13,8 +13,6 @@
 #include <framework/datastore/RelationsObject.h>
 #include <analysis/dataobjects/Particle.h>
 
-#include <vector>
-#include <set>
 #include <map>
 #include <string>
 
@@ -72,14 +70,14 @@ namespace Belle2 {
     * @param category string name of the given category
     * @param track pointer to track object
     */
-    void setTargetTrackLevel(std::string category, const Belle2::Track* track);
+    void setTargetTrackLevel(const std::string& category, const Belle2::Track* track);
 
     /**
     * Map filler: Set the category name and the corresponding highest target track probability.
     * @param category string name of the given category
     * @param probability highest target track probability
     */
-    void setProbTrackLevel(std::string category, float probability);
+    void setProbTrackLevel(const std::string& category, float probability);
 
     /**
     * Map filler: Set the category name and the pointer of the track with the highest category probability
@@ -87,7 +85,7 @@ namespace Belle2 {
     * @param category string name of the given category
     * @param track pointer to track object
     */
-    void setTargetEventLevel(std::string category, const Belle2::Track* track);
+    void setTargetEventLevel(const std::string& category, const Belle2::Track* track);
 
     /**
     * Map filler: Set the category name and the highest category probability for the corresponding
@@ -95,7 +93,7 @@ namespace Belle2 {
     * @param category string name of the given category
     * @param probability highest category probability
     */
-    void setProbEventLevel(std::string category, float probability);
+    void setProbEventLevel(const std::string& category, float probability);
 
     /**
     * Map filler: Set the category name and the corresponding qr Output, i.e. the Combiner input value.
@@ -103,21 +101,21 @@ namespace Belle2 {
     * @param category string name of the given category
     * @param qr output of the given category
     */
-    void setQpCategory(std::string category, float qr);
+    void setQpCategory(const std::string& category, float qr);
 
     /**
     * Map filler: Set the category name and the corresponding MC target truth value.
     * @param category string name of the given category
     * @param isTrue output of the given category
     */
-    void setHasTrueTarget(std::string category, float isTrue);
+    void setHasTrueTarget(const std::string& category, float isTrue);
 
     /**
     * Map filler: Set the category name and the corresponding truth MC value.
     * @param category string name of the given category
     * @param isTrue output of the given category
     */
-    void setIsTrueCategory(std::string category, float isTrue);
+    void setIsTrueCategory(const std::string& category, float isTrue);
 
     /**
     * Saves qr Output of the Combiner. Output of the FlavorTagger after the complete process.

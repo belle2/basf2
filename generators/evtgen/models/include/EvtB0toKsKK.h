@@ -12,6 +12,8 @@
 #include "EvtGenBase/EvtDecayAmp.hh"
 #include "EvtGenBase/EvtParticle.hh"
 
+#include <fstream>
+
 namespace Belle2 {
 //! Register Decay model EvtB0toKsKK
   class EvtB0toKsKK : public  EvtDecayAmp {

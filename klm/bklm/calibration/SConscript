@@ -1,0 +1,7 @@
+Import('env')
+
+env['LIBS'] = ['$ROOT_LIBS', 'framework', 'klm_bklm_dbobjects', 'klm_bklm_dataobjects',
+               'alignment_dbobjects', 'calibration', 'klm_dataobjects']
+env['SUBLIB'] = True
+
+Return('env')

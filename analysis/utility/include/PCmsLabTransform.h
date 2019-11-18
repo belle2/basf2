@@ -1,16 +1,17 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Francesco Tenchini                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/CollisionBoostVector.h>
+#include <mdst/dbobjects/CollisionInvariantMass.h>
 #include <framework/database/DBObjPtr.h>
 
 #include <TLorentzRotation.h>
@@ -31,29 +32,11 @@ namespace Belle2 {
     PCmsLabTransform();
 
     /**
-     * Returns Lorentz transformation from CMS to Lab
-     * @return const reference to Lorentz rotation matrix
+     * Returns boost vector (beta=p/E)
      */
-    const TLorentzRotation& rotateCmsToLab() const
+    TVector3 getBoostVector() const
     {
-      return getBeamParams().getCMSToLab();
-    }
-
-    /**
-     * Returns Lorentz transformation from Lab to CMS
-     * @return const reference to Lorentz rotation matrix
-     */
-    const TLorentzRotation& rotateLabToCms() const
-    {
-      return getBeamParams().getLabToCMS();
-    }
-
-    /**
-     * Returns boost vector
-     */
-    TLorentzVector getBoostVector() const
-    {
-      return getBeamParams().getHER() + getBeamParams().getLER();
+      return m_boostVectorDB->getBoost();
     }
 
     /**
@@ -61,7 +44,34 @@ namespace Belle2 {
      */
     double getCMSEnergy() const
     {
-      return getBeamParams().getMass();
+      return m_invariantMassDB->getMass();
+    }
+
+    /**
+     * Returns LAB four-momentum of e+e-
+     */
+    TLorentzVector getBeamFourMomentum() const
+    {
+      return rotateCmsToLab() * TLorentzVector(0, 0, 0, getCMSEnergy());
+    }
+
+    /**
+     * Returns Lorentz transformation from Lab to CMS
+     * @return const reference to Lorentz rotation matrix
+     */
+    const TLorentzRotation rotateLabToCms() const
+    {
+      TLorentzRotation rotation(-1.*getBoostVector());
+      return rotation;
+    }
+
+    /**
+     * Returns Lorentz transformation from CMS to Lab
+     * @return const reference to Lorentz rotation matrix
+     */
+    const TLorentzRotation rotateCmsToLab() const
+    {
+      return rotateLabToCms().Inverse();
     }
 
     /**
@@ -78,11 +88,9 @@ namespace Belle2 {
      */
     static TLorentzVector cmsToLab(const TLorentzVector& vec);
 
-    /** Get currently valid beam parameters from database, or from gearbox if not available. */
-    const BeamParameters& getBeamParams() const;
-
   private:
-    const DBObjPtr<BeamParameters> m_beamParams; /**< actually performs calculations. */
+    const DBObjPtr<CollisionInvariantMass> m_invariantMassDB; /**< db object for invariant mass. */
+    const DBObjPtr<CollisionBoostVector> m_boostVectorDB; /**< db object for boost vector. */
   };
 
 } // Belle2 namespace

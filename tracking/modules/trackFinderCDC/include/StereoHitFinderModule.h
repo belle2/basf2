@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/combined/StereoHitFinder.h>
 #include <tracking/trackFindingCDC/findlets/combined/MonopoleStereoHitFinder.h>
+#include <tracking/trackFindingCDC/findlets/combined/MonopoleStereoHitFinderQuadratic.h>
 
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
@@ -41,19 +42,33 @@ namespace Belle2 {
       using Super = FindletModule<StereoHitFinder>;
 
     public:
-      /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree. */
+      /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a 2D hough quad tree. */
       TFCDC_StereoHitFinderModule();
     };
 
     /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree.
+     * WARNING This findlet is kept here just in case hyperbolic one misbehaves and eats up too much RAM
+     * If it doesn't, this one should be removed around release-05 or earlier
      *
      * Same as above StereoHitFinder, but the s-z hypothesis is z(s) = (0) + (p + 4q)*x - q/25*s^2, where
      *  p (in units of 100cm) is z coordinate of track at s=100cm, i.e. outer layers of CDC
      *  q (in units of 100cm) is divergence of from a straight line at s=50cm, i.e. middle layers of CDC
      *
      * Non-zero q's indicate magnetic charge of the track
+     *  */
+    class TFCDC_MonopoleStereoHitFinderQuadraticModule : public FindletModule<MonopoleStereoHitFinderQuadratic> {
+
+      /// The base class
+      using Super = FindletModule<MonopoleStereoHitFinderQuadratic>;
+
+    public:
+      /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree. */
+      TFCDC_MonopoleStereoHitFinderQuadraticModule();
+    };
+
+    /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a 3D hough tree looking for hyperbolic cosines.
      *
-     * TODO 3-dim hough tree to include z0 into consideration
+     * Description of the actual algorithm is in tracking/trackFindingCDC/hough/algorithms/include/HitInHyperBox.h
      *  */
     class TFCDC_MonopoleStereoHitFinderModule : public FindletModule<MonopoleStereoHitFinder> {
 

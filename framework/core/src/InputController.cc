@@ -11,7 +11,7 @@ long InputController::s_nextExperiment = -1;
 long InputController::s_nextRun = -1;
 long InputController::s_nextEvent = -1;
 long InputController::s_currentEntry = 0;
-const TChain* InputController::s_chain = NULL;
+const TChain* InputController::s_chain = nullptr;
 
 void InputController::resetForChildProcess()
 {

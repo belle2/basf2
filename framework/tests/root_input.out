@@ -1,6 +1,7 @@
 [INFO] Steering file: framework/tests/root_input.py
 [INFO] The random number seed is set to "something important"
 [INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -69,6 +70,7 @@
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Given sequence contains entry numbers which are out of range. I won't add any further events to the EventList for the current file.  { module: RootInput }
+[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -106,6 +108,7 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -117,6 +120,7 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -127,6 +131,7 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -136,6 +141,7 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -144,21 +150,26 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [ERROR] Couldn't find entry (5, 1, 0) in file! Loading entry 0 instead.  { module: RootInput }
 [FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Given sequence contains entry numbers which are out of range. I won't add any further events to the EventList for the current file.  { module: RootInput }
+[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
  ... message repeated 1 times
 [INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
  ... message repeated 1 times
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] File 'chaintest_empty.root' seems to be empty, skipping  { module: RootInput }
+[WARNING] File appears to be empty, skipping
+	filename = chaintest_empty.root  { module: RootInput }
 [FATAL] No file could be opened, aborting  { module: RootInput }
  ... message repeated 1 times
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] File 'chaintest_empty.root' seems to be empty, skipping  { module: RootInput }
+[WARNING] File appears to be empty, skipping
+	filename = chaintest_empty.root  { module: RootInput }
 [INFO] Added file chaintest_1.root
-[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
+[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -179,10 +190,11 @@
 [INFO] ========================================================================
  ... message repeated 1 times
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] File 'chaintest_empty.root' seems to be empty, skipping  { module: RootInput }
+[WARNING] File appears to be empty, skipping
+	filename = chaintest_empty.root  { module: RootInput }
 [INFO] Added file chaintest_1.root
 [INFO] Added file chaintest_2.root
-[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
+[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -221,12 +233,13 @@
 [INFO] ========================================================================
  ... message repeated 1 times
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] File 'chaintest_empty.root' seems to be empty, skipping  { module: RootInput }
+[WARNING] File appears to be empty, skipping
+	filename = chaintest_empty.root  { module: RootInput }
 [INFO] Added file chaintest_1.root
 [INFO] Added file chaintest_2.root
 [INFO] Added file chaintest_1.root
 [WARNING] The input file 'chaintest_1.root' was specified more than once  { module: RootInput }
-[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
+[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------

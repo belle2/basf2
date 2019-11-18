@@ -18,15 +18,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <pxd/geometry/SensorInfo.h>
-
-#include <root/TVector2.h>
-#include <root/TVector3.h>
-
-#include <vxd/dataobjects/VxdID.h>
-#include <vxd/geometry/GeoCache.h>
-
-
 namespace Belle2 {
 
   /** The DATCONROICalculationModule calculates ROI from the

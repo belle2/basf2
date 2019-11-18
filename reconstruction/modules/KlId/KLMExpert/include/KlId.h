@@ -217,16 +217,17 @@ namespace KlId {
       unsigned int indexOfClosestCluster = 0;
       for (Belle2::ECLCluster& eclcluster : eclClusters) {
 
-        if (!eclcluster.hasHypothesis(eclhypothesis)) continue;
+        if (eclcluster.hasHypothesis(eclhypothesis)) {
 
-        const TVector3& eclclusterPos = eclcluster.getClusterPosition();
-        double angularDist = eclclusterPos.Angle(klmClusterPosition);
-        if (angularDist < closestECLAngleDist) {
-          closestECLAngleDist = angularDist;
-          // the problem here is one can not just use a refenrence to klmCluster because the next cluster will be written in the same address
-          // so that after the loop the reference would always point to the last cluster in the list...
-          // if you know a more elegant solution than using the index pls tell me (Jo)
-          indexOfClosestCluster = index;
+          const TVector3& eclclusterPos = eclcluster.getClusterPosition();
+          double angularDist = eclclusterPos.Angle(klmClusterPosition);
+          if (angularDist < closestECLAngleDist) {
+            closestECLAngleDist = angularDist;
+            // the problem here is one can not just use a refenrence to klmCluster because the next cluster will be written in the same address
+            // so that after the loop the reference would always point to the last cluster in the list...
+            // if you know a more elegant solution than using the index pls tell me (Jo)
+            indexOfClosestCluster = index;
+          }
         }
         ++index;
       }

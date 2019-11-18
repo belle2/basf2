@@ -9,11 +9,9 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 #include <arich/dbobjects/ARICHMergerMapping.h>
 #include <iostream>
-#include<iomanip>
 
 using namespace std;
 using namespace Belle2;

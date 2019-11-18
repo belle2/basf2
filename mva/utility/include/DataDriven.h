@@ -109,7 +109,7 @@ namespace Belle2 {
        * @param mc_dataset containing mc
        * @param sideband_variable defining the sideband regions
        */
-      SidebandDataset(const GeneralOptions& general_options, Dataset& dataset, Dataset& mc_dataset, std::string sideband_variable);
+      SidebandDataset(const GeneralOptions& general_options, Dataset& dataset, Dataset& mc_dataset, const std::string& sideband_variable);
 
       /**
        * Returns the number of features in this dataset

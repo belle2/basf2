@@ -19,6 +19,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include "trg/grl/TRGGRL.h"
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/TRGGDLDBInputBits.h>
 //#include "trg/cdc/dataobjects/CDCTriggerTrack.h"
 
 namespace Belle2 {
@@ -84,15 +86,19 @@ namespace Belle2 {
 
     /** Name of the StoreArray holding the matched 2D tracks */
     std::string m_2DmatchCollectionName;
+    /**the matched 2d track list by phi matching*/
+    std::string m_phimatch_tracklist;
     /** Name of the StoreArray holding the matched 3D tracks */
     std::string m_3DmatchCollectionName;
+    /**the matched 2d track list by KLM matching*/
+    std::string m_klmmatch_tracklist;
     /** Name of the StoreArray holding the tracks made by the 2D finder */
     std::string m_2DfinderCollectionName;
     /** Name of the StoreArray holding the tracks made by the 2D fitter */
     std::string m_2DfitterCollectionName;
     /** Name of the StoreArray holding the tracks made by the 3D fitter. */
     std::string m_3DfitterCollectionName;
-    /** Name of the StoreArray holding projects information from grk */
+    /** Name of the StoreArray holding projects information from grl */
     std::string m_TrgGrlInformationName;
 
     /** Name of the StoreArray holding the tracks made by NN*/
@@ -109,6 +115,8 @@ namespace Belle2 {
     std::vector<double> m_energythreshold;
     /**ecl cluster time window to suppress beam induced background*/
     double m_eclClusterTimeWindow;
+    /**Data base of GDL input bits**/
+    DBObjPtr<TRGGDLDBInputBits> m_InputBitsDB;
 
     /**convert the unit of angle from rad to degree*/
     //double m_RtD;

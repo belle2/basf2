@@ -47,7 +47,7 @@ void DataFlowVisualization::visualizePath(const std::string& filename, const Pat
   //for steering file data flow graph, we may get multiple definitions of each node
   //graphviz merges these into the last one, so we'll go through module list in reverse (all boxes should be coloured as outputs)
   const bool steeringFileFlow = true;
-  for (ModulePtr mod : path.buildModulePathList())
+  for (const ModulePtr& mod : path.buildModulePathList())
     generateModulePlot(file, *mod, steeringFileFlow);
 
   plotPath(file, path);
@@ -85,7 +85,7 @@ void DataFlowVisualization::plotPath(std::ofstream& file, const Path& path, cons
   file << "    \"" << graphname  << "_inv\" [shape=point,style=invis];\n";
   std::string lastModule("");
   //connect modules in right order...
-  for (ModulePtr mod : path.getModules()) {
+  for (const ModulePtr& mod : path.getModules()) {
     const std::string& module = DependencyMap::getModuleID(*mod);
     file << "    \"" << module << "\";\n";
     if (!lastModule.empty()) {
@@ -122,7 +122,7 @@ void DataFlowVisualization::generateModulePlot(std::ofstream& file, const Module
       const std::string fillcolor = m_fillcolor[i];
       const std::string arrowcolor = m_arrowcolor[i];
 
-      for (std::string dsentry : entries) {
+      for (const std::string& dsentry : entries) {
         if (!steeringFileFlow)
           file << "  \"" << dsentry << "\" [shape=box,style=filled,fillcolor=" << fillcolor << "];\n";
         if (i == DependencyMap::c_Output) {
@@ -190,8 +190,8 @@ void DataFlowVisualization::executeModuleAndCreateIOPlot(const std::string& modu
 
 bool DataFlowVisualization::checkArrayUnknown(const std::string& name, const DependencyMap::ModuleInfo& info)
 {
-  for (int i = 0; i < DependencyMap::c_NEntryTypes; i++) {
-    if (info.entries[i].count(name) != 0)
+  for (const auto& entry : info.entries) {
+    if (entry.count(name) != 0)
       return false; //found
   }
 

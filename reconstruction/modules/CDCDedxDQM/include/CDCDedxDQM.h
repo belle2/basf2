@@ -11,6 +11,7 @@
 #pragma once
 
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
@@ -68,12 +69,14 @@ namespace Belle2 {
 
   private:
 
+    StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array for CDCDedxTrack */
 
     Int_t fCurrentEventNum; /**< variable to get run number */
+    std::string m_triggerIdentifier = ""; /**< variable to get specific trigger event */
 
     Bool_t isHadronfile; /**< Parameter-1 to switch binning */
-    TString fCollType; /**< Parameter-2 to switch binning */
+    TString fCollType = ""; /**< Parameter-2 to switch binning */
 
     TH1D* temp1D{nullptr}; /**< Dedx histogram per run */
     TH2D* temp2D{nullptr}; /**< Dedx vs P histogram per run */

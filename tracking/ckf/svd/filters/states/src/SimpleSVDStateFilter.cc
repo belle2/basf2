@@ -64,8 +64,8 @@ Weight SimpleSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)
 
   const Vector3D hitPosition = static_cast<Vector3D>(spacePoint->getPosition());
 
-  const double sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
-  if (sameHemisphere != 1) {
+  const bool sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
+  if (not sameHemisphere) {
     return NAN;
   }
 

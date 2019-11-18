@@ -11,6 +11,8 @@
 
 #include <ecl/modules/eclChargedPID/ECLChargedPIDModule.h>
 
+#include <ecl/dataobjects/ECLShower.h>
+
 using namespace Belle2;
 
 REG_MODULE(ECLChargedPID)

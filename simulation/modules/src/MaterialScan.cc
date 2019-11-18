@@ -12,7 +12,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/utilities/Utils.h>
-#include <boost/format.hpp>
 #include <algorithm>
 
 #include <TFile.h>

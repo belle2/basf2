@@ -4,7 +4,7 @@
 """
 <header>
     <input>../CharmlessHad3BodyCharged.dst.root</input>
-    <output>CharmlessHad3BodyCharged.udst.root</output>
+    <output>../CharmlessHad3BodyCharged.udst.root</output>
     <contact>khsmith@student.unimelb.edu.au</contact>
     <interval>nightly</interval>
 </header>
@@ -26,7 +26,7 @@ charmless3chargedpath = Path()
 
 fileList = ['../CharmlessHad3BodyCharged.dst.root']
 
-inputMdstList('MC9', fileList, path=charmless3chargedpath)
+inputMdstList('default', fileList, path=charmless3chargedpath)
 
 # Load particle lists
 stdPhotons('loose', path=charmless3chargedpath)
@@ -38,14 +38,14 @@ stdPi0s('all', path=charmless3chargedpath)
 loadStdSkimPi0(path=charmless3chargedpath)
 loadStdLightMesons(path=charmless3chargedpath)
 
-# Hadronic B0 skim
+# Hadronic Bm skim
 from skim.btocharmless import *
-Had3BodyList = CharmlessHad3BodyB0List(path=charmless3chargedpath) + CharmlessHad3BodyBmList(path=charmless3chargedpath)
-skimOutputUdst('CharmlessHad3BodyCharged.udst.root', Had3BodyList, path=charmless3chargedpath)
+Had3BodyList = CharmlessHad3BodyBmList(path=charmless3chargedpath)
+skimOutputUdst('../CharmlessHad3BodyCharged.udst.root', Had3BodyList, path=charmless3chargedpath)
 summaryOfLists(Had3BodyList, path=charmless3chargedpath)
 
 # Suppress noisy modules, and then process
-setSkimLogging(skim_path=charmless3chargedpath)
+setSkimLogging(path=charmless3chargedpath)
 process(charmless3chargedpath)
 
 # print out the summary

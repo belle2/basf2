@@ -3,51 +3,29 @@
 
 """
 <header>
+  <input>PartGunChargedStableGenSim.root</input>
   <output>EvtGenSimRec_dedx.root</output>
   <description>Generates dE/dx debug data (DedxTracks) for testing</description>
-  <contact>jvbennett@cmu.edu</contact>
+  <contact>jkumar@andrew.cmu.edu</contact>
 </header>
 """
 
-from basf2 import *
-from simulation import *
-from reconstruction import *
-from ROOT import Belle2
+import basf2
+from reconstruction import add_reconstruction
 
-set_random_seed(56423)
+main = basf2.create_path()
 
+# Read input.
+inputFileName = "../PartGunChargedStableGenSim.root"
+main.add_module("RootInput", inputFileName=inputFileName)
 
-main = create_path()
+# Load parameters.
+main.add_module("Gearbox")
+# Create geometry.
+main.add_module("Geometry")
 
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1000])
-main.add_module(eventinfosetter)
-
-particles = Belle2.Const.chargedStableSet
-pdgs = []
-for i in range(particles.size()):
-    pdgs.append(particles.at(i).getPDGCode())
-
-pdgs += [-p for p in pdgs]
-print(pdgs)
-
-generator = register_module('ParticleGun')
-generator.param('momentumParams', [0.05, 4.5])
-generator.param('nTracks', 8.0)
-generator.param('pdgCodes', pdgs)
-main.add_module(generator)
-
-# only up to CDC
-components = [
-    'MagneticFieldConstant4LimitedRCDC',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-]
-add_simulation(main, components)
-
-add_reconstruction(main, components)
+# Reconstruct events.
+add_reconstruction(main)
 
 # enable debug output for the module added by add_reconstruction()
 for m in main.modules():
@@ -58,13 +36,13 @@ for m in main.modules():
         # m.param('usePXD', True)
 
 
-output = register_module('RootOutput')
+output = basf2.register_module('RootOutput')
 output.param('outputFileName', '../EvtGenSimRec_dedx.root')
 # let's keep this small
 output.param('branchNames', ['CDCDedxLikelihoods', 'CDCDedxTracks', 'VXDDedxLikelihoods', 'VXDDedxTracks', 'EventMetaData'])
 main.add_module(output)
 
-main.add_module(register_module('ProgressBar'))
+main.add_module("ProgressBar")
 
-process(main)
-print(statistics)
+basf2.process(main)
+print(basf2.statistics)

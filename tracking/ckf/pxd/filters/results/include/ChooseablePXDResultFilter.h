@@ -14,7 +14,10 @@
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
+  /// Filter to weight the CKF PXD results
   extern template class TrackFindingCDC::Chooseable<BasePXDResultFilter>;
+  /// Filter to weight the PXD clusters
   extern template class TrackFindingCDC::ChooseableFilter<PXDResultFilterFactory>;
+  /// Alias for filter to weight the PXD clusters
   using ChooseablePXDResultFilter = TrackFindingCDC::ChooseableFilter<PXDResultFilterFactory>;
 }

@@ -24,7 +24,9 @@ class PDF:
         :param pdf: The filename of the PDF file.
         :param size: The size to use.
         """
+        #: cached copy of the pdf filename
         self.pdf = pdf
+        #: cached copy of the size
         self.size = size
 
     def _repr_html_(self):
@@ -120,21 +122,33 @@ class MVATeacherAndAnalyser:
     """
 
     def __init__(self, run_class, use_jupyter=True):
+        """Constructor"""
+
+        #: cached copy of the run class
         self.run_class = run_class
+        #: cached flag to use jupyter notebook
         self.use_jupyter = use_jupyter
 
+        #: cached name of the output file
         self.recording_file_name = self.run_class.recording_module + ".root"
 
+        #: cached path without extension of the output file
         self.file_name_path, ext = os.path.splitext(self.recording_file_name)
 
+        #: cached path with extension of the training-output file
         self.training_file_name = self.file_name_path + "Training" + ext
+        #: cached path with extension of the testing-output file
         self.test_file_name = self.file_name_path + "Testing" + ext
 
+        #: cached identifier
         self.identifier_name = "FastBDT.weights.xml"
+        #: cached name of the output PDF file
         self.evaluation_file_name = self.identifier_name + ".pdf"
 
+        #: cached path with extension of the testing-export file
         self.expert_file_name = self.file_name_path + "TestingExport" + ext
 
+        #: cached path of the weight input data
         self.weight_data_location = Belle2.FileSystem.findFile(os.path.join("tracking/data",
                                                                             self.run_class.weight_data_location))
 

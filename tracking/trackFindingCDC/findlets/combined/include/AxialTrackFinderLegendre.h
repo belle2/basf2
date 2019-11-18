@@ -55,6 +55,7 @@ namespace Belle2 {
       void apply(const std::vector<CDCWireHit>& wireHits, std::vector<CDCTrack>& tracks);
 
     private: // findlets
+      /// Class of Pass keys
       using EPass = AxialTrackCreatorHitLegendre::EPass;
 
       /// Findlet for the non-curler legendre pass

@@ -41,7 +41,7 @@ namespace Belle2 {
       Constant() = default;
 
       /// Constructor from the constant value
-      Constant(const T& t)
+      explicit Constant(const T& t)
         : m_t(t)
       {
       }
@@ -261,7 +261,7 @@ namespace Belle2 {
     template<class ADefault, class AFunctor, class T>
     ADefault getIfApplicable(AFunctor&& function, T&& obj, ADefault value)
     {
-      Alternation<AFunctor, Constant<ADefault> > getIfApplicableImpl{std::forward<AFunctor>(function), value};
+      Alternation<AFunctor, Constant<ADefault> > getIfApplicableImpl{std::forward<AFunctor>(function), Constant(value) };
       return getIfApplicableImpl(std::forward<T>(obj));
     }
 

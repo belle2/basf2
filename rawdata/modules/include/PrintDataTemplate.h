@@ -81,6 +81,9 @@ namespace Belle2 {
     //! print the contents of a RawFTSW event
     virtual void printFTSWEvent(RawDataBlock* raw_array, int i);
 
+    //! check the contents of a RawFTSW event ver.2
+    virtual void checkFTSWver2(RawFTSW* raw_array, int i);
+
     //! print a buffer
     virtual void printBuffer(int* buf, int nwords);
 

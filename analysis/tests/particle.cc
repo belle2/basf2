@@ -3,9 +3,9 @@
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/Logger.h>
 #include <framework/utilities/TestHelpers.h>
 
 #include <analysis/utility/ParticleCopy.h>
@@ -21,7 +21,7 @@ namespace {
   class ParticleTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap> particleExtraInfo;
@@ -29,18 +29,20 @@ namespace {
       StoreArray<MCParticle> mcparticles;
       StoreArray<RestOfEvent> roes;
       StoreArray<ECLCluster> eclClusters;
+      StoreArray<KLMCluster> klmClusters;
       particleExtraInfo.registerInDataStore();
       particles.registerInDataStore();
       mcparticles.registerInDataStore();
       eclClusters.registerInDataStore();
       roes.registerInDataStore();
+      klmClusters.registerInDataStore();
       particles.registerRelationTo(mcparticles);
       particles.registerRelationTo(roes);
       DataStore::Instance().setInitializeActive(false);
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -563,28 +565,84 @@ namespace {
 
   }
 
-  /** test cluster based functionality: hypotheses and such (relatively simple
-   * for now but will become more complex with BII-3099 */
+  /** test cluster based functionality: hypotheses and such */
   TEST_F(ParticleTest, ECLClusterBased)
   {
     StoreArray<ECLCluster> eclclusters;
-    ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
-    cluster->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
-    cluster->setEnergy(1337);
-    cluster->setEnergyRaw(42);
+    {
+      ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
+      cluster->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      cluster->setEnergy(1.);
+      cluster->setEnergyRaw(2.);
 
-    Particle p(cluster);
-    EXPECT_FLOAT_EQ(1337, p.getECLClusterEnergy());
-    EXPECT_FLOAT_EQ(1337, p.getEnergy());
-    EXPECT_EQ(ECLCluster::EHypothesisBit::c_nPhotons, p.getECLClusterEHypothesisBit());
+      Particle p(cluster);
+      EXPECT_FLOAT_EQ(1., p.getECLClusterEnergy());
+      EXPECT_FLOAT_EQ(1., p.getEnergy());
+      EXPECT_EQ(ECLCluster::EHypothesisBit::c_nPhotons, p.getECLClusterEHypothesisBit());
+      EXPECT_FLOAT_EQ(0, p.getMass());
+    }
 
-    // when 3099 is introduced
-    /*
-    cluster->addHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
-    Particle p2(cluster);
-    EXPECT_EQUAL(130, p2.getPDGCode());
-    EXPECT_EQUAL(42, p2.getECLClusterEnergy());
-    EXPECT_EQUAL(42, p2.getEnergy());
-    */
+    {
+      ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
+      cluster->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+      cluster->setEnergy(1.);
+      cluster->setEnergyRaw(2.);
+
+      Particle p(cluster, Const::Klong);
+      EXPECT_EQ(130, p.getPDGCode());
+      EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
+      EXPECT_FLOAT_EQ(2., p.getEnergy());
+      EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
+      EXPECT_FLOAT_EQ(0.497614, p.getMass());
+    }
+
+    {
+      ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
+      cluster->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+      cluster->setEnergy(1.);
+      cluster->setEnergyRaw(2.);
+
+      Particle p(cluster, Const::neutron);
+      EXPECT_EQ(2112, p.getPDGCode());
+      EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
+      EXPECT_FLOAT_EQ(2., p.getEnergy());
+      EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
+      EXPECT_FLOAT_EQ(0.93956536, p.getMass());
+    }
+  }
+
+  /** test particle creation from KLMCluster */
+  TEST_F(ParticleTest, KLMClusterBased)
+  {
+    StoreArray<KLMCluster> klmClusters;
+    {
+      KLMCluster* cluster = klmClusters.appendNew(KLMCluster());
+      cluster->setTime(1.1);
+      cluster->setClusterPosition(1.1, 1.1, 1.0);
+      cluster->setLayers(1);
+      cluster->setInnermostLayer(1);
+      cluster->setMomentumMag(1.0);
+
+      Particle p(cluster);
+      EXPECT_EQ(130, p.getPDGCode());
+      EXPECT_FLOAT_EQ(sqrt(1. + 0.497614 * 0.497614), p.getEnergy());
+      EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
+      EXPECT_FLOAT_EQ(0.497614, p.getMass());
+    }
+
+    {
+      KLMCluster* cluster = klmClusters.appendNew(KLMCluster());
+      cluster->setTime(1.1);
+      cluster->setClusterPosition(1.1, 1.1, 1.0);
+      cluster->setLayers(1);
+      cluster->setInnermostLayer(1);
+      cluster->setMomentumMag(1.0);
+
+      Particle p(cluster, Const::neutron.getPDGCode());
+      EXPECT_EQ(2112, p.getPDGCode());
+      EXPECT_FLOAT_EQ(sqrt(1. + 0.93956536 * 0.93956536), p.getEnergy());
+      EXPECT_EQ(Particle::c_Flavored, p.getFlavorType());
+      EXPECT_FLOAT_EQ(0.93956536, p.getMass());
+    }
   }
 }  // namespace

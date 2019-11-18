@@ -11,10 +11,8 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <tracking/dataobjects/ROIid.h>
@@ -22,13 +20,10 @@
 #include <pxd/dataobjects/PXDDigit.h>
 
 #include <unordered_map>
-#include <map>
-#include <vector>
 #include <utility>
 #include <functional>
 #include <TH1.h>
 #include <TH1F.h>
-#include <TH2F.h>
 
 namespace Belle2 {
 
@@ -43,9 +38,9 @@ namespace Belle2 {
     ROIDQMModule();
 
   private:
-    StoreArray<PXDDigit> m_pxdDigits;
-    StoreArray<ROIid> m_roiIDs;
-    StoreArray<PXDIntercept> m_pxdIntercept;
+    StoreArray<PXDDigit> m_pxdDigits; /**< the PXDDigits dataobjects collection */
+    StoreArray<ROIid> m_roiIDs; /**< the ROIids dataobjects collection */
+    StoreArray<PXDIntercept> m_pxdIntercept; /**< the PXDIntercepts dataobjects collection */
 
     std::string m_PXDDigitsName; /**< digit list name*/
 

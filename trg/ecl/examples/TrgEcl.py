@@ -28,6 +28,7 @@ if argc == 3:
 set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 # set_log_level(LogLevel.DEBUG)
+# use_local_database('./trg_ecl/database.txt')
 
 gearbox = register_module('Gearbox')
 

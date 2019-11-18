@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'klm_eklm_dataobjects', '$ROOT_LIBS']
+env['SUBLIB'] = True
+
+Return('env')

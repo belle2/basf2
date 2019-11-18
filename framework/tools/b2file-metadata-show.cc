@@ -16,7 +16,7 @@
 #include <TTree.h>
 #include <TError.h>
 
-#include <sys/signal.h>
+#include <csignal>
 
 #include <boost/program_options.hpp>
 
@@ -51,9 +51,16 @@ int main(int argc, char* argv[])
   posOptDesc.add("file", -1);
 
   prog::variables_map varMap;
-  prog::store(prog::command_line_parser(argc, argv).
-              options(options).positional(posOptDesc).run(), varMap);
-  prog::notify(varMap);
+  try {
+    prog::store(prog::command_line_parser(argc, argv).
+                options(options).positional(posOptDesc).run(), varMap);
+    prog::notify(varMap);
+  } catch (std::exception& e) {
+    cout << "Problem parsing command line: " << e.what() << endl;
+    cout << "Usage: " << argv[0] << " [OPTIONS] [FILE]\n";
+    cout << options << endl;
+    return 1;
+  }
 
   //Check for help option
   if (varMap.count("help") or argc == 1) {
@@ -74,7 +81,7 @@ int main(int argc, char* argv[])
       B2ERROR("Couldn't open file " << fileName);
       return 1;
     }
-    TTree* tree = (TTree*) file->Get("persistent");
+    auto* tree = (TTree*) file->Get("persistent");
     if (!tree) {
       B2ERROR("No tree persistent found in " << fileName);
       return 1;
@@ -84,7 +91,7 @@ int main(int argc, char* argv[])
       B2ERROR("No meta data found in " << fileName);
       return 1;
     }
-    metaDataPtr = 0;
+    metaDataPtr = nullptr;
     branch->SetAddress(&metaDataPtr);
     tree->GetEntry(0);
 

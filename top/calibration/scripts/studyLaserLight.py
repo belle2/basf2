@@ -219,11 +219,13 @@ if datatype != 'root':
     if dbaddress == 'none':
         print("Not using Calibrations")
         converter.param('useSampleTimeCalibration', False)
+        converter.param('useAsicShiftCalibration', False)
         converter.param('useChannelT0Calibration', False)
         converter.param('useModuleT0Calibration', False)
     else:
         print("Using Calibrations")
         converter.param('useSampleTimeCalibration', True)
+        converter.param('useAsicShiftCalibration', True)
         converter.param('useChannelT0Calibration', True)
         converter.param('useModuleT0Calibration', True)
     converter.param('useCommonT0Calibration', False)

@@ -26,6 +26,8 @@ namespace Belle2 {
     std::string m_strName;
     /** Is particle selected? */
     bool m_isSelected;
+    /** Is particle unspecified by marking @ ? */
+    bool m_isUnspecified;
     /** Label of this particle to distinguish e.g. different decay channels or selection criteria. */
     std::string m_strLabel;
     /** PDG code of the decaying particle. */
@@ -73,6 +75,11 @@ namespace Belle2 {
     int getPDGCode() const
     {
       return m_iPDGCode;
+    }
+    /** Is the particle unspecified? */
+    int isUnspecified() const
+    {
+      return m_isUnspecified;
     }
   };
 }

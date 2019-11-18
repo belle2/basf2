@@ -16,15 +16,11 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 // dataobjects
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-
 
 #include <iostream>
 
@@ -89,8 +85,7 @@ namespace Belle2 {
       B2INFO(" - " << "No. of ECLClusters in ROE: " << nAllECLClusters);
       B2INFO(" - " << "No. of KLMClusters in ROE: " << nAllKLMClusters);
 
-      for (std::vector<std::string>::iterator it = m_maskNames.begin() ; it != m_maskNames.end(); ++it) {
-        std::string maskName = *it;
+      for (const auto& maskName : m_maskNames) {
         unsigned int nTracks = roe->getNTracks(maskName);
         unsigned int nECLClusters = roe->getNECLClusters(maskName);
 

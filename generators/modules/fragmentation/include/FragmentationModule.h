@@ -19,7 +19,6 @@
 #include <generators/modules/fragmentation/EvtGenDecays.h>
 
 #include <string>
-#include <vector>
 
 namespace Belle2 {
 
@@ -71,6 +70,7 @@ namespace Belle2 {
     std::string m_DecFile;  /**< EvtGen decay file */
     std::string m_UserDecFile;  /**< User EvtGen decay file */
     int m_useEvtGenParticleData; /**< Override PYTHIA parameters */
+    bool m_coherentMixing;  /**< decay the B0-B0bar coherently. */
 
     MCParticleGraph mcParticleGraph; /**< An instance of the MCParticle graph. */
 

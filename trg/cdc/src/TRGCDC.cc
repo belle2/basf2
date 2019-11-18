@@ -56,7 +56,6 @@
 #include "trg/cdc/Fitter3D.h"
 #include "trg/cdc/Fitter3DUtility.h"
 #include "trg/cdc/Link.h"
-#include "trg/cdc/Relation.h"
 #include "trg/cdc/EventTime.h"
 #include <framework/gearbox/Const.h>
 
@@ -1079,6 +1078,9 @@ namespace Belle2 {
         TCWire& w = *(TCWire*) wire(layerId, wireId);
 
         //...TDC count...
+        B2INFO("t0:" << m_cdcp->getT0(WireID(h.getID())) <<
+               "binwidth:" << m_cdcp->getTdcBinWidth() <<
+               "tdc count:" << h.getTDCCount());
         const int tdcCount = floor(m_cdcp->getT0(WireID(h.getID())) / m_cdcp->getTdcBinWidth()
                                    - h.getTDCCount() + 0.5);
 

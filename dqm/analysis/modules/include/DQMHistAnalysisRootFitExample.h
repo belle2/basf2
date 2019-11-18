@@ -14,11 +14,8 @@
 #include "cadef.h"
 #endif
 
-#include <framework/core/Module.h>
-
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
-#include <TF1.h>
 #include <TCanvas.h>
 #include <RooWorkspace.h>
 #include <RooDataHist.h>
@@ -34,8 +31,10 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    //! Constructor
     DQMHistAnalysisRooFitExampleModule();
+    //! Destructor
+    ~DQMHistAnalysisRooFitExampleModule();
   private:
 
     //! Module functions to be called from main process

@@ -54,16 +54,16 @@ bool DAQLogDB::createLog(DBInterface& db, const std::string& tablename,
     db.execute("select id,category from log_node where name = '" + log.getNodeName() + "';");
     DBRecordList record(db.loadRecords());
     int id = 1;
-    int cid = 1;
+    //int cid = 1;
     if (record.size() > 0) {
       id = record[0].getInt("id");
-      cid = record[0].getInt("category");
+      //cid = record[0].getInt("category");
     } else {
       db.execute("insert into log_node (name, category) values ('" + log.getNodeName() +
                  "', " + StringUtil::form("%d", log.getCategory()) + ") returning id,category;");
       DBRecordList record(db.loadRecords());
       id = record[0].getInt("id");
-      cid = record[0].getInt("category");
+      //cid = record[0].getInt("category");
     }
     db.execute("insert into %s (node, priority, date, message) values "
                "(%d, %d, to_timestamp(%d), '%s');",
@@ -85,38 +85,31 @@ DAQLogMessageList DAQLogDB::getLogs(DBInterface& db, const std::string& tablenam
     if (!db.isConnected()) db.connect();
     if (nodename.size() > 0) {
       if (max > 0) {
-        db.execute("select node, extract(epoch from date) date, priority, message"
-                   " from %s where node = '%s' order by id desc limit %d;",
+        db.execute("select n.name, extract(epoch from l.date) date, l.priority, l.message"
+                   " from %s as l, log_node as n, log_priority as p where l.node=n.id and p.id=l.priority and n.name = '%s' order by l.id desc limit %d;",
                    tablename_date.c_str(), nodename.c_str(), max);
       } else {
-        db.execute("select node, extract(epoch from date) date, priority, message"
-                   " from %s where node = '%s' order by id desc;",
+        db.execute("select n.name, extract(epoch from l.date) date, l.priority, l.message"
+                   " from %s as l, log_node as n, log_priority as p where l.node=n.id and p.id=l.priority and n.name = '%s' order by l.id desc;",
                    tablename_date.c_str(), nodename.c_str());
       }
     } else {
       if (max > 0) {
-        db.execute("select node, extract(epoch from date) date, priority, message"
-                   " from %s order by id desc limit %d;", tablename_date.c_str(), max);
+        db.execute("select n.name, extract(epoch from l.date) date, l.priority, l.message"
+                   " from %s as l, log_node as n, log_priority as p where l.node=n.id and p.id=l.priority order by l.id desc limit %d;",
+                   tablename_date.c_str(), max);
       } else {
-        db.execute("select node, extract(epoch from date) date, priority, message"
-                   " from %s order by id desc;", tablename_date.c_str());
+        db.execute("select n.name, extract(epoch from l.date) date, l.priority, l.message"
+                   " from %s as l, log_node as n, log_priority as p where l.node=n.id and p.id=l.priority order by l.id desc;",
+                   tablename_date.c_str());
       }
     }
     DBRecordList record_v(db.loadRecords());
-    std::map<int, std::string> nodemap;
-    {
-      db.execute("select name,id from log_node;");
-      DBRecordList record_v(db.loadRecords());
-      for (size_t i = 0; i < record_v.size(); i++) {
-        DBRecord& record(record_v[i]);
-        nodemap.insert(std::pair<int, std::string>(record.getInt("id"), record.get("name")));
-      }
-    }
     for (size_t i = 0; i < record_v.size(); i++) {
       DBRecord& record(record_v[i]);
-      logs.push_back(DAQLogMessage(nodemap[record.getInt("node")],
+      logs.push_back(DAQLogMessage(record.get("n.name"),
                                    (LogFile::Priority)(record.getInt("priority")),
-                                   record.get("message"), Date(record.getInt("date"))));
+                                   record.get("l.message"), Date(record.getInt("date"))));
     }
   } catch (const DBHandlerException& e) {
     LogFile::error(e.what());
@@ -126,51 +119,34 @@ DAQLogMessageList DAQLogDB::getLogs(DBInterface& db, const std::string& tablenam
 
 DAQLogMessageList DAQLogDB::getLogs(DBInterface& db, const std::string& tablename,
                                     const std::string& nodename, const std::string& begin_date,
-                                    const std::string& end_date, int max)
+                                    const std::string& end_date, int max, int priority)
 {
   std::string tablename_date = tablename + "_" + Date().toString("%Y");
   DAQLogMessageList logs;
   try {
     if (!db.isConnected()) db.connect();
     std::stringstream ss;
-    ss << "select node, extract(epoch from date) date, priority, message "
-       << "from " << tablename_date << " ";
-    bool hasand = false;
+    ss << "select n.name, extract(epoch from l.date) date, l.priority, l.message"
+       << " from " << tablename_date << " as l, log_node as n where l.node=n.id ";
     if (nodename.size() > 0) {
-      hasand = true;
-      ss << "where node = '" << nodename << "' ";
+      ss << "and n.name = '" << nodename << "' ";
     }
     if (begin_date.size() > 0) {
-      if (hasand) ss << "and ";
-      else {
-        ss << "where ";
-        hasand = true;
-      }
-      ss << "date >= '" << begin_date << "' ";
+      ss << "and l.date >= (timestamp '" << begin_date << "') ";
     }
     if (end_date.size() > 0) {
-      if (hasand) ss << "and ";
-      else {
-        ss << "where ";
-      }
-      ss << "date <= '" << end_date << "' ";
+      ss << "and l.date <= (timestamp '" << end_date << "') ";
     }
-    ss << "order by id desc ";
+    if (priority > 0) {
+      ss << "and l.priority >= " << priority << " ";
+    }
+    ss << "order by l.id desc ";
     if (max > 0) ss << "limit " << max;
     db.execute(ss.str().c_str());
     DBRecordList record_v(db.loadRecords());
-    std::map<int, std::string> nodemap;
-    {
-      db.execute("select name,id from log_node;");
-      DBRecordList record_v(db.loadRecords());
-      for (size_t i = 0; i < record_v.size(); i++) {
-        DBRecord& record(record_v[i]);
-        nodemap.insert(std::pair<int, std::string>(record.getInt("id"), record.get("name")));
-      }
-    }
     for (size_t i = 0; i < record_v.size(); i++) {
       DBRecord& record(record_v[i]);
-      logs.push_back(DAQLogMessage(nodemap[record.getInt("node")],
+      logs.push_back(DAQLogMessage(record.get("name"),
                                    (LogFile::Priority)(record.getInt("priority")),
                                    record.get("message"), Date(record.getInt("date"))));
     }

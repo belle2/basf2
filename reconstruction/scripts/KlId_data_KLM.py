@@ -1,8 +1,9 @@
-#!/bin/zsh
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Jo-Frederik.krohn@desy.de
-from modularAnalysis import *
+# Jo-Frederik.krohn@desy.de, benjamin.oberhof@lnf.infn.it
 
+import basf2
+from modularAnalysis import *
 
 from simulation import add_simulation
 # from reconstruction import add_mdst_output
@@ -10,27 +11,23 @@ from reconstruction import add_reconstruction
 from beamparameters import add_beamparameters
 from generators import add_evtgen_generator
 # from L1trigger import add_tsim
-
-
-from basf2 import *  # or just import Module if you don't want the basf2 logging functions
 from ROOT import Belle2
 # import pandas as pd
 import sys
 import time
 import glob
 
-
-base_path = "/home/belle2/jkrohn/"
+base_path = "."
 
 # convert input params
 try:
     outPath = str(sys.argv[1])
 except BaseException:
-    outPath = base_path + '/root_files/test/KLID_MDST_TEST.root'
+    outPath = 'root_files/test/KLID_MDST_TEST.root'
 try:
     noEvents = int(sys.argv[2])
 except BaseException:
-    noEvents = 10
+    noEvents = 100
 try:
     bkgScale = float(sys.argv[3])
 except BaseException:
@@ -52,18 +49,21 @@ except BaseException:
 if '.root' not in outPath:
     outPath = outPath + str(noEvents) + '.root'
 
+# dec_path_string = base_path + '/dec_files/generic_Btag.dec'
+mypath = basf2.Path()
 
-dec_path_string = base_path + '/dec_files/generic_Btag.dec'
+# '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007427/s00/e1003/4S/r00000/mixed/mdst/sub00/mdst_000*.root'
+# my_path.add_module('RootInput', inputFileNames=inputFilename)
 
-path = analysis_main
+dec_file = None
+final_state = 'mixed'
+setupEventInfo(noEvents, mypath)
+# , signaldecfile=Belle2.FileSystem.findFile('analysis/examples/tutorials/B2A101-Y4SEventGeneration.dec'))
+add_evtgen_generator(mypath, finalstate=final_state, signaldecfile=dec_file)
 
-setupEventInfo(noEvents, path)
-add_evtgen_generator(path, 'signal', Belle2.FileSystem.findFile(dec_path_string))
+add_simulation(mypath, bkgfiles=glob.glob('/sw/belle2/bkg/*.root'))
 
-add_simulation(path, bkgfiles=glob.glob('/sw/belle2/bkg/*.root'))
-
-add_reconstruction(path)
-
+add_reconstruction(mypath)
 
 # for m in path.modules():
 #  if m.name() == "KLMExpert":
@@ -80,8 +80,7 @@ data_writer = register_module('DataWriter')
 data_writer.param("outPath", outPath)
 data_writer.param("useKLM", useKLM)
 data_writer.param("useECL", useECL)
-path.add_module(data_writer)
+mypath.add_module(data_writer)
 
-
-process(path)
+basf2.process(mypath)
 print(statistics)

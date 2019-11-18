@@ -17,7 +17,6 @@
 #include <TH1I.h>
 
 #include <boost/format.hpp>
-#include <cmath>
 
 using namespace std;
 using boost::format;
@@ -33,6 +32,7 @@ REG_MODULE(PXDClusterChargeCollector)
 //-----------------------------------------------------------------
 
 PXDClusterChargeCollectorModule::PXDClusterChargeCollectorModule() : CalibrationCollectorModule()
+  , m_signal(0), m_run(0), m_exp(0)
 {
   // Set module properties
   setDescription("Calibration collector module for cluster charge related calibrations.");

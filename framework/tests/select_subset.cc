@@ -5,11 +5,10 @@
 
 
 #include <gtest/gtest.h>
-#include <TObject.h>
 
 #include <string>
 #include <vector>
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <map>
 #include <unordered_map>
@@ -25,8 +24,8 @@ namespace {
 
   public:
 
-    typedef UInt_t KeyElementType;
-    typedef RelationsObject StoredElement;
+    using KeyElementType = UInt_t;
+    using StoredElement = RelationsObject;
 
 
     static bool SelectionCriterium(const KeyElementType a)
@@ -46,7 +45,7 @@ namespace {
     // The following map type is ment as a container of all the relations
     // from m_fromElement to al other elements in all the store arrays.
     // It maps the "To" KeyElement to the weight of Relation.
-    typedef map< KeyElementType , double > FromTargetElementsToWeight;
+    using FromTargetElementsToWeight =  map< KeyElementType , double >;
 
 
     class Relations {
@@ -59,7 +58,7 @@ namespace {
 
       // the following map is ment to map the name of StoreArray to the
       // map linking the target "to" element to the weight of the relation.
-      typedef unordered_map< string, FromTargetElementsToWeight > FromStringToArrows;
+      using FromStringToArrows = unordered_map< string, FromTargetElementsToWeight >;
 
     private:
       KeyElementType m_fromElement;
@@ -74,7 +73,7 @@ namespace {
       }
 
       const FromStringToArrows&
-      getConstSetOfAllRelations(void) const
+      getConstSetOfAllRelations() const
       {
         return m_allRelations;
       }
@@ -87,23 +86,23 @@ namespace {
 
 
       FromStringToArrows::iterator
-      getSetOfToRelations(string toSetName)
+      getSetOfToRelations(const string& toSetName)
       {
         return m_allRelations.find(toSetName) ;
       }
 
       FromStringToArrows::const_iterator
-      getSetOfToRelations(string toSetName) const
+      getSetOfToRelations(const string& toSetName) const
       {
         return m_allRelations.find(toSetName) ;
       }
 
 
       void
-      print(void)
+      print()
       {
         cout << "From KeyElement " << m_fromElement << "to:" << endl;
-        for (auto toSet : m_allRelations) {
+        for (const auto& toSet : m_allRelations) {
           for (auto pair : toSet.second)
             cout << "Set name: "
                  << toSet.first << "  "
@@ -170,14 +169,14 @@ namespace {
       string m_name;                                    // My name
       map< KeyElementType, Relations > m_set;           // What I am
       StoreArray< StoredElement > m_storeArray;         // How I am stored
-      RelationArray* to;    // How my relation to the original set is stored
-      RelationArray* from;  // How my relation from the original set is stored
-      RelationArray* self;  // How the relation with myself is stored (yes, I am
+      RelationArray* to{nullptr};    // How my relation to the original set is stored
+      RelationArray* from{nullptr};  // How my relation from the original set is stored
+      RelationArray* self{nullptr};  // How the relation with myself is stored (yes, I am
       // the original set)
     public:
 
 
-      void print(void)
+      void print()
       {
         cout << "The NamedSet: "  << m_name << " contains:" << endl ;
         for (auto set : m_set) {
@@ -189,10 +188,7 @@ namespace {
 
       // constructor
       explicit NamedSet(const string& name = "") :
-        m_name(name), m_storeArray(name),
-        to(NULL), from(NULL), self(NULL)
-      {
-      }
+        m_name(name), m_storeArray(name)  {}
 
       // order relation
       bool operator()(const NamedSet& a, const NamedSet& b) const
@@ -201,18 +197,18 @@ namespace {
       }
 
       // accessors
-      const string getName(void) const
+      [[nodiscard]] const string getName() const
       {
         return m_name;
       }
 
-      StoreArray< StoredElement >& storedArray(void)
+      StoreArray< StoredElement >& storedArray()
       {
         return m_storeArray;
       }
 
 
-      void initializeDatastore(void)
+      void initializeDatastore()
       {
         // this method take care of the initialization of the
         // StoreArray
@@ -225,7 +221,7 @@ namespace {
         DataStore::Instance().setInitializeActive(false);
       }
 
-      void initializeDatastore(string SetName)
+      void initializeDatastore(const string& SetName)
       {
         // this method take care of the initialization of the
         // store array and of the RelationArrays from and to
@@ -247,11 +243,11 @@ namespace {
       {
         // this method consolidate the StoreArray and the RelationArrays
         // to and from the set
-        if (self != NULL)
+        if (self != nullptr)
           self->consolidate();
-        if (from != NULL)
+        if (from != nullptr)
           from->consolidate();
-        if (to != NULL)
+        if (to != nullptr)
           to->consolidate();
       }
 
@@ -272,8 +268,8 @@ namespace {
         fromElement->second.appendNewRelationTo(toName, toKey, weight);
       }
 
-      bool isPresentRelationFromTo(const KeyElementType& fromKey, const string& otherSetName ,
-                                   const KeyElementType& toKey) const
+      [[nodiscard]] bool isPresentRelationFromTo(const KeyElementType& fromKey, const string& otherSetName ,
+                                                 const KeyElementType& toKey) const
       {
         auto fromElement = m_set.find(fromKey);
         if (fromElement != m_set.end()) {
@@ -283,10 +279,10 @@ namespace {
           if (i ++ < 999 || (i % 100) == 0) {
             cout << "Error: from: " << getName() << " id " <<  fromKey  <<
                  " -> " << otherSetName << " id " << toKey << endl;
-            for (auto element : m_set)
+            for (const auto& element : m_set)
               cout << element.first << "\t";
             cout << endl;
-            for (auto element : m_storeArray)
+            for (const auto& element : m_storeArray)
               cout << element.GetUniqueID() << "\t";
             cout << endl;
           } else if (i == 1000) {
@@ -296,18 +292,18 @@ namespace {
         }
       }
 
-      const FromTargetElementsToWeight& getAllRelations(const KeyElementType& fromKey, const string& toOtherSetName) const
+      [[nodiscard]] const FromTargetElementsToWeight& getAllRelations(const KeyElementType& fromKey, const string& toOtherSetName) const
       {
         auto fromElement = m_set.find(fromKey);
         return fromElement->second.getAllRelations(toOtherSetName);
       }
 
-      typedef map< KeyElementType , FromTargetElementsToWeight > StlRelationArray;
+      using StlRelationArray = map< KeyElementType , FromTargetElementsToWeight >;
 
-      StlRelationArray getRestrictedDomainRelationTo(const string& toOtherSetName)const
+      [[nodiscard]] StlRelationArray getRestrictedDomainRelationTo(const string& toOtherSetName)const
       {
         StlRelationArray theInducedRelation;
-        for (auto element : m_set) {
+        for (const auto& element : m_set) {
           if (SelectionCriterium(element.first) &&
               element.second.getAllRelations(toOtherSetName).size() != 0)
             theInducedRelation.insert(pair< KeyElementType, FromTargetElementsToWeight>
@@ -316,10 +312,10 @@ namespace {
         return theInducedRelation;
       }
 
-      StlRelationArray getRestrictedCodomainRelationTo(const string& setName)const
+      [[nodiscard]] StlRelationArray getRestrictedCodomainRelationTo(const string& setName)const
       {
         StlRelationArray theInducedRelation;
-        for (auto element : m_set) {
+        for (const auto& element : m_set) {
           if (element.second.getConstSetOfToRelations(setName) ==
               element.second.getConstSetOfAllRelations().end())
             continue;
@@ -337,10 +333,10 @@ namespace {
         return theInducedRelation;
       }
 
-      StlRelationArray getRestrictedSelfRelation(void) const
+      [[nodiscard]] StlRelationArray getRestrictedSelfRelation() const
       {
         StlRelationArray theInducedRelation;
-        for (auto element : m_set) {
+        for (const auto& element : m_set) {
           if (! SelectionCriterium(element.first) ||
               element.second.getAllRelations(m_name).size() == 0)
             continue;
@@ -383,50 +379,50 @@ namespace {
       {
         m_setName = m_set.getName();
         m_subsetName = m_subset.getName();
-        for (auto aSetName : m_otherSetsNames)
+        for (const auto& aSetName : m_otherSetsNames)
           m_otherSets.insert(pair<string, NamedSet> (aSetName, NamedSet(aSetName)));
       };
 
       //accessors
       const string&
-      getSetName(void) const
+      getSetName() const
       {
         return m_setName    ;
       };
 
       StoreArray< StoredElement >&
-      getSet(void)
+      getSet()
       {
         return m_set.storedArray();
       };
 
       NamedSet&
-      getNamedSet(void)
+      getNamedSet()
       {
         return m_set;
       };
 
 
       const string&
-      getSubsetName(void) const
+      getSubsetName() const
       {
         return m_subsetName ;
       };
 
       StoreArray< StoredElement >&
-      getSubset(void)
+      getSubset()
       {
         return m_subset.storedArray();
       };
 
       int
-      getNSets(void) const
+      getNSets() const
       {
         return m_otherSets.size() ;
       }
 
       const vector< string >&
-      getOtherSetsNames(void) const
+      getOtherSetsNames() const
       {
         return m_otherSetsNames ;
       }
@@ -455,13 +451,13 @@ namespace {
       }
 
       unordered_map< string, NamedSet >&
-      getOtherSets(void)
+      getOtherSets()
       {
         return m_otherSets;
       }
 
       void
-      initializeDatastore(void)
+      initializeDatastore()
       {
         // initialitation phase
 
@@ -473,7 +469,7 @@ namespace {
       }
 
       void
-      populateDatastore(void)
+      populateDatastore()
       {
         unsigned int nElements = 1368;
         for (unsigned int i = 0; i < nElements ; i++)
@@ -481,24 +477,24 @@ namespace {
 
         int n(0);
 
-        for (auto iterator = m_otherSets.begin() ; iterator != m_otherSets.end(); iterator++) {
+        for (auto& set : m_otherSets) {
           unsigned int nOtherElements = nElements - n * 100;
 
           for (unsigned int i = 0; i < nOtherElements ; i++)
-            appendNewElement(iterator->second);
+            appendNewElement(set.second);
 
         }
 
         int j(2);
-        for (auto iterator = m_otherSets.begin() ; iterator != m_otherSets.end(); iterator++) {
+        for (auto& set : m_otherSets) {
 
 
           unsigned int nArrows = nElements * j;
           j++;
 
           for (unsigned int arrow = 0; arrow < nArrows ; arrow ++) {
-            appendNewRelationToOther(*iterator);
-            appendNewRelationFromOther(*iterator);
+            appendNewRelationToOther(set);
+            appendNewRelationFromOther(set);
           }
 
         }
@@ -515,7 +511,7 @@ namespace {
 
 
       double
-      getWeight(void)
+      getWeight()
       {
         static double counter(0.0);
         return counter += 1.;
@@ -615,7 +611,7 @@ namespace {
       }
 
       void
-      appendNewSelfRelation(void)
+      appendNewSelfRelation()
       {
         unsigned int from_index = flat_random(getSet().getEntries());
         KeyElementType from_key = getSet()[from_index]->GetUniqueID();
@@ -645,12 +641,12 @@ namespace {
 
     CollectionOfSets m_TestBench;
 
-    virtual void SetUp()
+    void SetUp() override
     {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -801,7 +797,7 @@ namespace {
 
 
     bool
-    testSelfRelation(void)
+    testSelfRelation()
     {
 
       StoreArray< StoredElement > subset(m_TestBench.getSubsetName());
@@ -911,7 +907,7 @@ namespace {
 
     // First of all let us check that all the elements in the subset
     // do satisfy the SelectionCriterium and that
-    for (auto element : subset) {
+    for (const auto& element : subset) {
       if (! SelectionCriteriumOnElement(& element))
         allSubsetElementsAreGood = false;
 
@@ -924,7 +920,7 @@ namespace {
     // Then we check that the size of the subset equals the number
     // of elements in the set satisfiing the SelectionCriterium
     int NSelected(0);
-    for (auto element : set)
+    for (const auto& element : set)
       NSelected += SelectionCriteriumOnElement(&element) ? 1 : 0;
 
     EXPECT_TRUE(NSelected == subset.getEntries());

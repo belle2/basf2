@@ -3,10 +3,9 @@ from softwaretrigger import constants
 import modularAnalysis
 
 from rawdata import add_unpackers
-from tracking import add_cdc_monopole_track_finding
 
 
-def add_online_dqm(path, run_type, dqm_environment, components):
+def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode):
     """
     Add DQM plots for a specific run type and dqm environment
     """
@@ -16,15 +15,18 @@ def add_online_dqm(path, run_type, dqm_environment, components):
     from daqdqm.cosmicdqm import add_cosmic_dqm
 
     if run_type == constants.RunTypes.beam:
-        add_collision_dqm(path, components=components, dqm_environment=dqm_environment)
+        add_collision_dqm(path, components=components, dqm_environment=dqm_environment, dqm_mode=dqm_mode)
     elif run_type == constants.RunTypes.cosmic:
-        add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment)
+        add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment, dqm_mode=dqm_mode)
     else:
         basf2.B2FATAL("Run type {} not supported.".format(run_type))
-    path.add_module('DelayDQM', title=dqm_environment, histogramDirectoryName='DAQ')
+
+    if dqm_mode in ["dont_care", "all_events"]:
+        path.add_module('DelayDQM', title=dqm_environment, histogramDirectoryName='DAQ')
 
 
-def add_hlt_dqm(path, run_type, components=constants.DEFAULT_HLT_COMPONENTS, standalone=False):
+def add_hlt_dqm(path, run_type, components=constants.DEFAULT_HLT_COMPONENTS,
+                dqm_mode=constants.DQMModes.dont_care, standalone=False):
     """
     Add all the DQM modules for HLT to the path
     """
@@ -32,7 +34,12 @@ def add_hlt_dqm(path, run_type, components=constants.DEFAULT_HLT_COMPONENTS, sta
         add_geometry_if_not_present(path)
         add_unpackers(path, components=components)
 
-    add_online_dqm(path, run_type=run_type, dqm_environment=constants.Location.hlt.name, components=components)
+    add_online_dqm(
+        path,
+        run_type=run_type,
+        dqm_environment=constants.Location.hlt.name,
+        components=components,
+        dqm_mode=dqm_mode.name)
 
 
 def add_expressreco_dqm(path, run_type, components=constants.DEFAULT_EXPRESSRECO_COMPONENTS, standalone=False):
@@ -43,7 +50,8 @@ def add_expressreco_dqm(path, run_type, components=constants.DEFAULT_EXPRESSRECO
         add_geometry_if_not_present(path)
         add_unpackers(path, components=components)
 
-    add_online_dqm(path, run_type=run_type, dqm_environment=constants.Location.expressreco.name, components=components)
+    add_online_dqm(path, run_type=run_type, dqm_environment=constants.Location.expressreco.name, components=components,
+                   dqm_mode=constants.DQMModes.dont_care.name)
 
 
 def add_geometry_if_not_present(path):
@@ -123,9 +131,6 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     # ECL cluster and track particle lists
     modularAnalysis.fillParticleList("pi+:skim", 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', path=path)
-
-    # monopoles
-    add_cdc_monopole_track_finding(path)
 
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)

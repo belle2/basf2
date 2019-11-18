@@ -14,12 +14,10 @@
 #include "cadef.h"
 #endif
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/dataobjects/VxdID.h>
 
-#include <TH1.h>
-#include <TH2.h>
+#include <TEfficiency.h>
 #include <TCanvas.h>
 
 namespace Belle2 {
@@ -32,6 +30,8 @@ namespace Belle2 {
 
     //! Constructor
     DQMHistAnalysisPXDEffModule();
+    //! Destructor
+    ~DQMHistAnalysisPXDEffModule();
   private:
 
     //! Module functions to be called from main process
@@ -58,12 +58,12 @@ namespace Belle2 {
     std::vector<VxdID> m_PXDModules;
 
     //! Individual efficiency for each module, 2d histogram
-    std::map<VxdID, TH2D*> m_hEffModules;
+    std::map<VxdID, TEfficiency*> m_hEffModules;
     //! Individual efficiency for each module, canvas
     std::map<VxdID, TCanvas*> m_cEffModules;
 
     //! One bin for each module in the geometry
-    TH1D* m_hEffAll = nullptr;
+    TEfficiency* m_hEffAll = nullptr;
     //! Final Canvas
     TCanvas* m_cEffAll = nullptr;
 

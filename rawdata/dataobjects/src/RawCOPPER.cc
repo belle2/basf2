@@ -35,8 +35,10 @@ void RawCOPPER::SetVersion()
 {
 
   if (m_buffer == NULL) {
-    perror("m_buffer is NULL. Exiting...");
-    exit(1);
+    char err_buf[500];
+    sprintf(err_buf, "m_buffer is NULL. Exiting...");
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
   }
 
   if (m_access != NULL) {
@@ -70,9 +72,8 @@ void RawCOPPER::SetVersion()
       sprintf(err_buf, "[FATAL] ERROR_EVENT : Invalid version of a data format(0x%.8x = 0x7f7f**..). Exiting...\n %s %s %d\n",
               m_buffer[ POS_FORMAT_VERSION ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf); fflush(stdout);
-      string err_str = err_buf; throw (err_str);
+      B2FATAL(err_buf); // to reduce multiple error messages
     }
-    exit(1);
   }
 
   m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
@@ -108,8 +109,7 @@ void RawCOPPER::SetVersion(string class_name)
     sprintf(err_buf, "Invalid name of a data format class (%s). Exiting...\n %s %s %d\n",
             class_name.c_str(), __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;
-    throw (err_str);
+    B2FATAL(err_buf);
   }
 
 //   if( class_name == "RawCOPPERFormat_v0" ){
@@ -129,14 +129,15 @@ void RawCOPPER::SetVersion(string class_name)
 
 }
 
-
-
 void RawCOPPER::SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes)
 {
   if (bufin == NULL) {
-    printf("[DEBUG] bufin is NULL. Exting...\n");
-    exit(1);
+    char err_buf[500];
+    sprintf(err_buf, "[DEBUG] bufin is NULL. Exting...\n");
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
   }
+
   if (!m_use_prealloc_buf && m_buffer != NULL) delete[] m_buffer;
 
   if (delete_flag == 0) {

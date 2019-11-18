@@ -55,8 +55,6 @@
 
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
-#include <framework/database/DBStore.h>
-#include <framework/database/LocalDatabase.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBImportObjPtr.h>
@@ -66,7 +64,6 @@
 #include <TH3.h>
 #include <TGraph.h>
 #include <TGraph2D.h>
-#include <TCanvas.h>
 #include <TFile.h>
 #include <TKey.h>
 #include <TString.h>
@@ -79,7 +76,6 @@
 #include <TTree.h>
 #include <tuple>
 #include <iomanip>
-#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -774,6 +770,19 @@ void ARICHDatabaseImporter::printHvMappings()
   crateMap->print();
 }
 
+void ARICHDatabaseImporter::dumpHvMappings()
+{
+  DBObjPtr<ARICHHvCablesMapping> hvMap;
+
+  ARICHChannelHist* hist = new ARICHChannelHist("hvMapping", "module - HV cable mapping", 1);
+  for (int hapdID = 1; hapdID < 421; hapdID++) {
+    int val = hvMap->getCableID(hapdID) * 100 + hvMap->getInnerID(hapdID);
+    hist->setBinContent(hapdID, val);
+  }
+  hist->SetOption("TEXT");
+  hist->SaveAs("HVMapping.root");
+}
+
 void ARICHDatabaseImporter::printNominalBiasVoltages()
 {
   DBObjPtr<ARICHBiasVoltages> biasVolt;
@@ -927,6 +936,57 @@ void ARICHDatabaseImporter::printChannelMask(bool makeHist)
     }
     hist->SaveAs("channelMask.root");
   }
+}
+
+void ARICHDatabaseImporter::dumpMergerMapping(bool sn)
+{
+  DBObjPtr<ARICHMergerMapping> mgrMap;
+  ARICHChannelHist* hist = new ARICHChannelHist("mergerNum", "module - merger mapping", 1);
+  for (int hapdID = 1; hapdID < 421; hapdID++) {
+    int val = mgrMap->getMergerID(hapdID);
+    if (sn) val = mgrMap->getMergerSN(val);
+    hist->setBinContent(hapdID, val);
+  }
+  hist->SetOption("TEXT");
+  hist->SaveAs("MergerMapping.root");
+
+}
+
+void ARICHDatabaseImporter::printFEMappings()
+{
+
+  DBObjPtr<ARICHMergerMapping> mgrMap;
+  DBObjPtr<ARICHCopperMapping> cprMap;
+  DBObjPtr<ARICHGeometryConfig> geoConfig;
+
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
+
+  cout << "{ \"hapdmap\": [" << endl;
+  for (unsigned hapdID = 1; hapdID < 421; hapdID++) {
+    std::string hapdsn;
+    for (const GearDir& module : content.getNodes("Module")) {
+      hapdsn = module.getString("@hapdID");
+      unsigned sector = module.getInt("Sector");
+      unsigned ring = module.getInt("Ring");
+      unsigned azimuth = module.getInt("Azimuth");
+      unsigned moduleID = geoConfig->getDetectorPlane().getSlotIDFromSRF(sector, ring, azimuth);
+      if (moduleID == hapdID) break;
+    }
+
+    int val = mgrMap->getMergerID(hapdID);
+    cout << "{\n" << "\"ID\": \"" << hapdID << "\"," << endl;
+    cout << "\"sn\": \"" << hapdsn << "\"," << endl;
+    cout << "\"mrg\": \"" << val << "\"," << endl;
+    cout << "\"mrgSN\": \"" << mgrMap->getMergerSN(val) << "\"," << endl;
+    cout << "\"feb\": \"" << mgrMap->getFEBSlot(hapdID) - 1 << "\"," << endl;
+    cout << "\"cpr\": \"" << cprMap->getCopperID(val) << "\"," << endl;
+    cout << "\"hslb\": \"" << cprMap->getFinesse(val) << "\"" << endl;
+    if (hapdID < 420) cout << "}," << endl;
+    else  cout << "}" << endl;
+  }
+  cout << "]}" << endl;
+
+
 }
 
 void ARICHDatabaseImporter::dumpModuleNumbering()

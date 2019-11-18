@@ -533,7 +533,7 @@ namespace Belle2 {
     static const ChargedStable proton;    /**< proton particle */
     static const ChargedStable deuteron;  /**< deuteron particle */
 
-    static const Cluster clusterphoton;   /**< electron cluster */
+    static const Cluster clusterphoton;   /**< photon cluster */
     static const Cluster clusterKlong;    /**< K^0_L cluster */
     static const Cluster clusterelectron; /**< electron cluster  */
     static const Cluster clusterpion;     /**< charged hadron cluster */

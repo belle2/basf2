@@ -71,25 +71,26 @@ int RunNumberTable::getRunNumber(const std::string& node, int expno)
   if (expno <= 0) return -1;
   int runno = 1;
   try {
-    if (node.size() == 0) {
-      if (expno == 0) {
-        m_db.execute("select max(runno)+1 as runno from runnumber_new "
-                     "limit 1;");
-      } else {
-        m_db.execute("select max(runno)+1 as runno from runnumber_new "
-                     "where expno = %d limit 1;", expno);
-      }
-
+    //if (node.size() == 0) {
+    if (expno == 0) {
+      m_db.execute("select max(runno)+1 as runno from runnumber_new "
+                   "limit 1;");
     } else {
-      if (expno == 0) {
-        m_db.execute("select max(runno)+1 as runno from runnumber_new "
-                     "where node = '%s' limit 1;", node.c_str());
-      } else {
-        m_db.execute("select max(runno)+1 as runno from runnumber_new "
-                     "where node = '%s' and expno = %d limit 1;",
-                     node.c_str(), expno);
-      }
+      m_db.execute("select max(runno)+1 as runno from runnumber_new "
+                   "where expno = %d limit 1;", expno);
     }
+    /*
+    } else {
+    if (expno == 0) {
+    m_db.execute("select max(runno)+1 as runno from runnumber_new "
+    "where node = '%s' limit 1;", node.c_str());
+    } else {
+    m_db.execute("select max(runno)+1 as runno from runnumber_new "
+    "where node = '%s' and expno = %d limit 1;",
+    node.c_str(), expno);
+    }
+    }
+    */
     DBRecordList record_v(m_db.loadRecords());
     if (record_v.size() > 0) {
       runno = record_v[0].getInt("runno");
@@ -133,32 +134,32 @@ RunNumberList RunNumberTable::get(const std::string& node, int expno, int runno_
     if (node.size() == 0) {
       if (expno == 0) {
         if (runno_max > 0) {
-          m_db.execute("%s where runno >= %d and runno <= %d", cmd, runno_min, runno_max);
+          m_db.execute("%s where runno >= %d and runno <= %d order by id", cmd, runno_min, runno_max);
         } else {
-          m_db.execute("%s where runno >= %d", cmd, runno_min);
+          m_db.execute("%s where runno >= %d order by id", cmd, runno_min);
         }
       } else {
         if (runno_max > 0) {
-          m_db.execute("%s where expno = %d and runno >= %d and runno <= %d",
+          m_db.execute("%s where expno = %d and runno >= %d and runno <= %d order by id",
                        cmd, expno, runno_min, runno_max);
         } else {
-          m_db.execute("%s where expno = %d and runno >= %d", cmd, expno, runno_min);
+          m_db.execute("%s where expno = %d and runno >= %d order by id", cmd, expno, runno_min);
         }
       }
     } else {
       if (expno == 0) {
         if (runno_max > 0) {
-          m_db.execute("%s where node = '%s' and runno >= %d and runno <= %d",
+          m_db.execute("%s where node = '%s' and runno >= %d and runno <= %d order by id",
                        cmd, node.c_str(), runno_min, runno_max);
         } else {
-          m_db.execute("%s where node = '%s' and runno >= %d", cmd, node.c_str(), runno_min);
+          m_db.execute("%s where node = '%s' and runno >= %d order by id", cmd, node.c_str(), runno_min);
         }
       } else {
         if (runno_max > 0) {
-          m_db.execute("%s where node = '%s' and expno = %d and runno >= %d and runno <= %d",
+          m_db.execute("%s where node = '%s' and expno = %d and runno >= %d and runno <= %d order by id",
                        cmd, node.c_str(), expno, runno_min, runno_max);
         } else {
-          m_db.execute("%s where node = '%s' and expno = %d and runno >= %d",
+          m_db.execute("%s where node = '%s' and expno = %d and runno >= %d order by id",
                        cmd, node.c_str(), expno, runno_min);
         }
       }

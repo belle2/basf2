@@ -97,12 +97,12 @@ void SVDShaperDigitsFromTracksModule::event()
 {
   StoreArray<SVDShaperDigit> ShaperDigits(m_svdshaper);
 
-  m_selectedShaperDigits.select([this](const SVDShaperDigit * theSVDShaperDigit) {
+  m_selectedShaperDigits.select([](const SVDShaperDigit * theSVDShaperDigit) {
     return isRelatedToTrack(theSVDShaperDigit);
   });
 
 
-  m_notSelectedShaperDigits.select([this](const SVDShaperDigit * theSVDShaperDigit) {
+  m_notSelectedShaperDigits.select([](const SVDShaperDigit * theSVDShaperDigit) {
     return !isRelatedToTrack(theSVDShaperDigit);
   });
 }

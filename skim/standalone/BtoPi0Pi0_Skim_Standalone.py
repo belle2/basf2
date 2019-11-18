@@ -14,23 +14,19 @@ from ROOT import Belle2
 from modularAnalysis import *
 from stdPi0s import *
 
-from skimExpertFunctions import *
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
 
-gb2_setuprel = "release-03-00-00"
+gb2_setuprel = "release-04-00-00"
 
 import os
 import sys
 import glob
 skimCode = encodeSkimName('BtoPi0Pi0')
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
 path = Path()
-
-inputMdstList('MC9', fileList, path=path)
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=path)
 
 # load particle lists
 loadStdSkimPi0(path=path)
@@ -43,7 +39,7 @@ skimOutputUdst(skimCode, Pi0Pi0List, path=path)
 summaryOfLists(Pi0Pi0List, path=path)
 
 
-setSkimLogging()
+setSkimLogging(path)
 process(path)
 
 # print out the summary

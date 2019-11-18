@@ -33,6 +33,9 @@ DqmMemFile::DqmMemFile(string name, string mode, int size)
   // Open TMemFile if write mode selected
   if (m_mode == 1) {
     m_memfile = new TMemFile(name.c_str(), m_buf, size * sizeof(int), "RECREATE");
+    m_shm->lock();
+    m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
+    m_shm->unlock();
     printf("DqmMemFile : TMemFile is opened in WRITE mode.\n");
   } else
     printf("DqmMemFile : TMemFile is opend in READ mode.\n");

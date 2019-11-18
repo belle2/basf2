@@ -7,5 +7,6 @@
 
 #pragma link C++ namespace Belle2::Stream-;
 #pragma link C++ class Belle2::FileSystem-;
+#pragma link C++ class Belle2::RootFileCreationManager-;
 
 #endif

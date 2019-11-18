@@ -10,12 +10,10 @@
 #include <beast/microtpc/modules/MicrotpcModule.h>
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <cmath>
 #include <boost/foreach.hpp>
 
 using namespace std;

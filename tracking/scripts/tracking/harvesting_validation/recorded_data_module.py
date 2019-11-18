@@ -35,19 +35,31 @@ class EventInfoHarvester(harvesting.HarvestingModule):
                                                  output_file_name=output_file_name,
                                                  )
 
+        #: cached value of the PXDClusters StoreArray
         self.pxd_clusters_name = pxd_clusters_name
+        #: cached value of the PXDSpacePoints StoreArray
         self.pxd_spacepoints_name = pxd_spacepoints_name
+        #: cached value of the SVDClusters StoreArray
         self.svd_clusters_name = svd_clusters_name
+        #: cached value of the SVDSpacePoints StoreArray
         self.svd_spacepoints_name = svd_spacepoints_name
+        #: cached value of the CDCHits StoreArray
         self.cdc_hits_name = cdc_hits_name
 
+        #: cached value of the RecoTracks StoreArray
         self.reco_tracks_name = reco_tracks_name
+        #: cached value of the CDCRecoTracks StoreArray
         self.cdc_reco_tracks_name = cdc_reco_tracks_name
+        #: cached value of the SVDCDCRecoTracks StoreArray
         self.svd_cdc_reco_tracks_name = svd_cdc_reco_tracks_name
+        #: cached value of the SVDRecoTracks StoreArray
         self.svd_reco_tracks_name = svd_reco_tracks_name
+        #: cached value of the PXDRecoTracks StoreArray
         self.pxd_reco_tracks_name = pxd_reco_tracks_name
 
     def peel(self, event_meta_data):
+        """Extract and store counts of *RecoTracks' and hits, clusters, spacepoints"""
+
         event_crops = peelers.peel_event_info(event_meta_data)
 
         event_level_tracking_info = Belle2.PyStoreObj("EventLevelTrackingInfo")
@@ -79,6 +91,7 @@ class EventInfoHarvester(harvesting.HarvestingModule):
                     **module_stats,
                     )
 
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.SaveTreeRefiner()
 
 
@@ -94,15 +107,20 @@ class TrackInfoHarvester(harvesting.HarvestingModule):
                  sp_track_cands_name="SPTrackCands"
                  ):
         """Expecting a name for the output file and the name of the RecoTracks StoreArray
-           to operate on. The latter dafaults to 'RecoTracks'"""
+           to operate on. The latter defaults to 'RecoTracks'"""
         super(TrackInfoHarvester, self).__init__(foreach=reco_tracks_name,
                                                  output_file_name=output_file_name)
 
+        #: cached value of the SVDCDCRecoTracks StoreArray
         self.svd_cdc_reco_tracks_name = svd_cdc_reco_tracks_name
+        #: cached value of the SVDRecoTracks StoreArray
         self.svd_reco_tracks_name = svd_reco_tracks_name
+        #: cached value of the SPTrackCands StoreArray
         self.sp_track_cands_name = sp_track_cands_name
 
     def peel(self, reco_track):
+        """Extract and store information about each RecoTrack"""
+
         event_meta_data = Belle2.PyStoreObj("EventMetaData")
         event_crops = peelers.peel_event_info(event_meta_data)
 
@@ -140,6 +158,7 @@ class TrackInfoHarvester(harvesting.HarvestingModule):
                     **event_crops,
                     )
 
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.SaveTreeRefiner()
 
 
@@ -155,6 +174,8 @@ class HitInfoHarvester(harvesting.HarvestingModule):
                                                output_file_name=output_file_name)
 
     def peel(self, reco_track):
+        """Extract and store information about each RecoTrack's hits"""
+
         # Event Info
         event_meta_data = Belle2.PyStoreObj("EventMetaData")
         event_crops = peelers.peel_event_info(event_meta_data)
@@ -193,4 +214,5 @@ class HitInfoHarvester(harvesting.HarvestingModule):
                     except BaseException:
                         pass
 
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.SaveTreeRefiner()

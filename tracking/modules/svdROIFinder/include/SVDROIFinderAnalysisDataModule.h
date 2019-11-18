@@ -12,17 +12,14 @@
 
 #include <framework/core/Module.h>
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <string>
-#include <TTree.h>
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TGraphErrors.h>
 
 namespace Belle2 {
 
@@ -126,20 +123,20 @@ namespace Belle2 {
     TH1F* m_h1GlobalTime; /**< distribution of global time for PDXDigits contained in a ROI*/
 
     //ROI stuff
-    TH2F* m_h2ROIuMinMax;
-    TH2F* m_h2ROIvMinMax;
-    TH2F* m_h2ROIcenters;
-    TH2F* m_h2GoodROIcenters;
-    TH2F* m_h2FullROIcenters;
+    TH2F* m_h2ROIuMinMax; /**< u-coordinate Min vs Max */
+    TH2F* m_h2ROIvMinMax;  /**< v-coordinate Min vs Max */
+    TH2F* m_h2ROIcenters; /**< ROI centers */
+    TH2F* m_h2GoodROIcenters; /**< ROI centers containing a SVDShaperDigit */
+    TH2F* m_h2FullROIcenters; /**< ROI centers with all SVDShaperDigits inside ROI */
     TH1F* m_h1totROIs; /**< distribution of number of all ROIs*/
-    TH1F* m_h1goodROIs; /**< distribution of number of ROIs containin a SVDShaperDigit, DATA*/
-    TH1F* m_h1okROIs; /**< distribution of number of ROIs containin a SVDShaperDigit*/
-    TH1F* m_h1effROIs; /**< distribution of number of ROIs containin a SVDShaperDigit, DATA*/
+    TH1F* m_h1goodROIs; /**< distribution of number of ROIs containing a SVDShaperDigit, DATA*/
+    TH1F* m_h1okROIs; /**< distribution of number of ROIs containing a SVDShaperDigit*/
+    TH1F* m_h1effROIs; /**< distribution of number of ROIs containing a SVDShaperDigit, DATA*/
 
-    unsigned int n_rois;
-    unsigned int m_nGoodROIs;
-    unsigned int m_nOkROIs;
-    unsigned int n_intercepts;
+    unsigned int n_rois; /**< number of ROIs */
+    unsigned int m_nGoodROIs; /**< number of ROIs containing a SVDShaperDigit, DATA */
+    unsigned int m_nOkROIs; /**< number of ROIs containing a SVDShaperDigit */
+    unsigned int n_intercepts; /**< number of SVDIntercepts */
     unsigned int n_tracks; /**< number of tracks */
 
   };

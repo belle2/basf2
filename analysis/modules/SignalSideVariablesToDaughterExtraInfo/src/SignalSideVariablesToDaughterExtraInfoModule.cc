@@ -10,6 +10,7 @@
 
 #include <analysis/modules/SignalSideVariablesToDaughterExtraInfo/SignalSideVariablesToDaughterExtraInfoModule.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
@@ -74,7 +75,7 @@ void SignalSideVariablesToDaughterExtraInfoModule::event()
 
   StoreObjPtr<RestOfEvent> roe("RestOfEvent");
   if (roe.isValid()) {
-    Particle* signalSide = roe->getRelated<Particle>();
+    auto* signalSide = roe->getRelated<Particle>();
     Particle* daughter = plist->getParticle(0);
 
     const unsigned int nVars = m_functions.size();

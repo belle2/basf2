@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Constructor forwarding the default filter name
-      SegmentFilterFactory(const std::string& defaultFilterName = "all");
+      explicit SegmentFilterFactory(const std::string& defaultFilterName = "all");
 
       /// Getter for a short identifier for the factory
       std::string getIdentifier() const override;

@@ -66,14 +66,21 @@ namespace Belle2 {
   private:
 
     /**
-     * Pack in format Production draft
+     * Pack in format: c_Draft (tentative production format)
+     * this format was never implemented in firmware!
      */
     void packProductionDraft();
 
     /**
-     * Pack in format Feature-extracted data
+     * Pack in format: c_Type0Ver16 (Feature-extracted data)
+     * this format was never implemented in firmware!
      */
     void packType0Ver16();
+
+    /**
+     * Pack in format: Production Debugging Data Format 01
+     */
+    void packProductionDebug();
 
     /**
      * sum both 16-bit words of 32-bit integer

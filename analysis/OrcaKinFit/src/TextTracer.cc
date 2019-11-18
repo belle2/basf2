@@ -26,7 +26,6 @@
 #include <cmath>
 
 namespace Belle2 {
-
   namespace OrcaKinFit {
 
     TextTracer::TextTracer(std::ostream& os_)
@@ -34,8 +33,7 @@ namespace Belle2 {
         istep(0), isubstep(0), chi2fo(0), chi2sc(0), sumhc(0), sumhcscal(0)
     {}
 
-    TextTracer::~TextTracer()
-    {}
+    TextTracer::~TextTracer() = default;
 
 
     void TextTracer::initialize(BaseFitter& fitter)
@@ -101,8 +99,7 @@ namespace Belle2 {
       FitObjectContainer* fitobjects = fitter.getFitObjects();
       if (!fitobjects) return;
       os << "Fit objects:\n";
-      for (FitObjectIterator i = fitobjects->begin(); i != fitobjects->end(); ++i) {
-        BaseFitObject* fo = *i;
+      for (auto fo : *fitobjects) {
         assert(fo);
         os << fo->getName() << ": " << *fo << ", chi2=" << fo->getChi2() << std::endl;
         chi2fo += fo->getChi2();
@@ -116,7 +113,7 @@ namespace Belle2 {
       ConstraintContainer* constraints = fitter.getConstraints();
       if (constraints && constraints->size() > 0) {
         os << "Hard Constraints:\n";
-        for (ConstraintIterator i = constraints->begin(); i != constraints->end(); ++i) {
+        for (auto i = constraints->begin(); i != constraints->end(); ++i) {
           BaseConstraint* c = *i;
           assert(c);
           os << i - constraints->begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError() << std::endl;
@@ -127,9 +124,9 @@ namespace Belle2 {
       SoftConstraintContainer* softConstraints = fitter.getSoftConstraints();
       if (softConstraints && softConstraints->size() > 0) {
         os << "Soft Constraints:\n";
-        for (SoftConstraintIterator i = softConstraints->begin(); i != softConstraints->end(); ++i) {
+        for (auto i = softConstraints->begin(); i != softConstraints->end(); ++i) {
           BaseConstraint* c = *i;
-          BaseSoftConstraint* sc = dynamic_cast<BaseSoftConstraint*>(c);
+          auto* sc = dynamic_cast<BaseSoftConstraint*>(c);
           assert(c);
           assert(sc);
           os << i - softConstraints->begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError()
@@ -141,10 +138,9 @@ namespace Belle2 {
 
     void TextTracer::printTraceValues(BaseFitter& fitter)
     {
-      for (std::map<std::string, double>::iterator i =  fitter.traceValues.begin();
-           i != fitter.traceValues.end(); ++i) {
-        std::string name = i->first;
-        double value = i->second;
+      for (auto& traceValue : fitter.traceValues) {
+        std::string name = traceValue.first;
+        double value = traceValue.second;
         os << "Value of " << name << ": " << value << std::endl;;
       }
     }
@@ -154,7 +150,7 @@ namespace Belle2 {
          << " = " << chi2fo + chi2sc << " = " << chi2fo << "(fo) + " << chi2sc << "(sc)"
          << std::endl;
       os << "Hard constraints: " << sumhc << ", scaled: " << sumhcscal << std::endl;
-      std::map<std::string, double>::iterator i = fitter.traceValues.find("mu");
+      auto i = fitter.traceValues.find("mu");
       if (i != fitter.traceValues.end()) {
         double mu = i->second;
         os << "Contribution to merit function: " << sumhc* mu << ", scaled: " << sumhcscal* mu << std::endl;
@@ -164,4 +160,3 @@ namespace Belle2 {
     }
   }// end OrcaKinFit namespace
 } // end Belle2 namespace
-

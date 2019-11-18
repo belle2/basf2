@@ -97,7 +97,7 @@ namespace Belle2 {
         for (auto& character : layer) {
           if (character == 'N') character = 'x';
         }
-        TFormula* iLayerSize = new TFormula("iLayerSize", layer.c_str());
+        auto* iLayerSize = new TFormula("iLayerSize", layer.c_str());
         hiddenLayers.push_back(iLayerSize->Eval(nf));
       }
       return hiddenLayers;

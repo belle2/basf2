@@ -30,9 +30,7 @@ InteractiveModule::InteractiveModule() : Module()
   setDescription("Start an interactive (I)python shell in each call of event().  Also imports the ROOT.Belle2 namespace for convenience, allowing you to use Belle2.PyStoreArray etc. directly.");
 }
 
-InteractiveModule::~InteractiveModule()
-{
-}
+InteractiveModule::~InteractiveModule() = default;
 
 void InteractiveModule::event()
 {

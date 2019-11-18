@@ -44,12 +44,12 @@ namespace Belle2 {
      * of doubles suitable for computing.
      */
     typedef uint8_t APVRawSampleType;
-    typedef std::array<APVRawSampleType, c_nAPVSamples> APVRawSamples;
+    typedef std::array<APVRawSampleType, c_nAPVSamples> APVRawSamples; /**<array of APVRawSamplesType objects */
 
     /** Types for array of samples for processing.
      */
     typedef float APVFloatSampleType;
-    typedef std::array<APVFloatSampleType, c_nAPVSamples> APVFloatSamples;
+    typedef std::array<APVFloatSampleType, c_nAPVSamples> APVFloatSamples; /**<array of APVFloatSampleType objects*/
 
     /** Constructor using c-array of samples.
      * @param sensorID Sensor VXD ID.

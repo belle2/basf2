@@ -12,12 +12,14 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <cstdlib>
+#include <daq/slc/system/LockGuard.h>
 
 using namespace Belle2;
 
 bool LogFile::g_stderr = true;
 bool LogFile::g_opened = false;
 std::string LogFile::g_filepath;
+std::string LogFile::g_linkpath;
 std::ofstream LogFile::g_stream;
 unsigned int LogFile::g_filesize = 0;
 Mutex LogFile::g_mutex;
@@ -53,8 +55,9 @@ void LogFile::open(const std::string& filename, Priority threshold)
     system(("mkdir -p " + path + "/" + filename).c_str());
     g_filename = filename;
     g_date = Date();
-    g_filepath = path + "/" + filename + "/latest.log";
-    //+ date.toString("%Y.%m.%d.log");
+    g_filepath = path + StringUtil::form("/%s/%s.log", filename.c_str(), g_date.toString("%Y.%m.%d"));
+    g_linkpath = path + StringUtil::form("/%s/latest.log", filename.c_str());
+    //"/latest.log";
     g_threshold = threshold;
     g_opened = true;
     open();
@@ -74,6 +77,9 @@ void LogFile::open()
   }
   debug("/* ---------- log file opened ---------- */");
   debug("log file : %s (%d) ", g_filepath.c_str(), g_filesize);
+  std::string cmd = "ln -sf " + g_filepath + " " + g_linkpath;
+  system(cmd.c_str());
+  debug("sym link : %s", g_linkpath.c_str());
 }
 
 void LogFile::close()
@@ -142,22 +148,14 @@ void LogFile::put(Priority priority, const std::string& msg, ...)
 
 int LogFile::put_impl(const std::string& msg, Priority priority, va_list ap)
 {
-  g_mutex.lock();
+  LockGuard lockGuard(g_mutex);
   if (g_threshold > priority) {
-    g_mutex.unlock();
     return 0;
   }
   Date date;
-  if (g_date.getDay() != date.getDay() ||
-      g_filesize >= 1024 * 1024 * 2) {
+  if (g_date.getDay() != date.getDay()) {
     g_stream.close();
-    ConfigFile config("slowcontrol");
-    rename(g_filepath.c_str(),
-           (config.get("log.dir") + "/" + g_filename + "/" +
-            g_date.toString("%Y.%m.%d.%H.%M.%s.log")).c_str());
-    g_mutex.unlock();
     open();
-    g_mutex.lock();
   }
   std::stringstream ss;
   ss << "[" << date.toString();
@@ -181,6 +179,5 @@ int LogFile::put_impl(const std::string& msg, Priority priority, va_list ap)
     g_stream.flush();
     g_filesize += str.size();
   }
-  g_mutex.unlock();
   return (int) str.size();
 }

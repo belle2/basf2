@@ -22,7 +22,7 @@ namespace Belle2 {
 
   protected:
     /// add a variable to the variable set
-    void addVariable(std::string identifier, std::vector<Named<float*>>& variables)
+    void addVariable(const std::string& identifier, std::vector<Named<float*>>& variables)
     {
       //todo: verify if it is faster to check explicitly or not
       auto value = m_variables.emplace(identifier, NAN).first;

@@ -22,6 +22,9 @@
 #include <top/dataobjects/TOPRecBunch.h>
 #include <top/dataobjects/TOPTimeZero.h>
 #include <framework/dataobjects/MCInitialParticles.h>
+#include <framework/dataobjects/EventT0.h>
+#include <framework/database/DBObjPtr.h>
+#include <top/dbobjects/TOPCalCommonT0.h>
 
 namespace Belle2 {
 
@@ -43,6 +46,11 @@ namespace Belle2 {
      * This method is called at the beginning of data processing.
      */
     virtual void initialize() override;
+
+    /**
+     * Called when entering a new run.
+     */
+    virtual void beginRun() override;
 
     /**
      * Event processor.
@@ -83,17 +91,16 @@ namespace Belle2 {
     double m_tau; /**< first order filter time constant [events] */
     bool m_fineSearch; /**< use fine search */
     bool m_correctDigits; /**< subtract bunch time in TOPDigits */
-    bool m_addOffset; /**< add running average offset to bunch time */
-    double m_bias; /**< bias to be subtracted */
+    bool m_subtractRunningOffset; /**< subtract running offset when running in HLT mode */
     int m_bunchesPerSSTclk; /**< number of bunches per SST clock */
     bool m_usePIDLikelihoods; /**< if true, use PIDLikelihoods (only on cdst files) */
 
     // internal variables shared between events
-    double m_bunchTimeSep; /**< time between two filled bunches */
+    double m_bunchTimeSep = 0; /**< time between two bunches */
     std::map<int, double> m_priors; /**< map of PDG codes to prior probabilities */
-    double m_offset = 0; /**< running average offset to the reconstructed bunch */
-    double m_error = 0; /**< error on running average offset */
-    unsigned m_eventCount = 0; /**< event counter */
+    double m_runningOffset = 0; /**< running average of bunch offset */
+    double m_runningError = 0; /**< error on running average */
+    bool m_HLTmode = false; /**< use running average to correct digits */
     unsigned m_processed = 0; /**< processed events */
     unsigned m_success = 0; /**< events with reconstructed bunch */
     int m_nodEdxCount = 0; /**< counter of tracks with no dEdx, reset at each event */
@@ -105,6 +112,10 @@ namespace Belle2 {
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
     StoreObjPtr<MCInitialParticles> m_initialParticles; /**< simulated beam particles */
     StoreArray<TOPTimeZero> m_timeZeros; /**< collection of T0 of individual tracks */
+    StoreObjPtr<EventT0> m_eventT0; /**< event T0 */
+
+    // database
+    DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */
 
   };
 

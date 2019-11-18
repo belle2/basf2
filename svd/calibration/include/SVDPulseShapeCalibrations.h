@@ -33,8 +33,9 @@ namespace Belle2 {
    */
   class SVDPulseShapeCalibrations {
   public:
-    static std::string calAmp_name;
-    typedef SVDCalibrationsBase< SVDCalibrationsVector< SVDStripCalAmp > > t_calAmp_payload;
+    static std::string calAmp_name; /**<name of the SVDStripCalAmp payload */
+    typedef SVDCalibrationsBase< SVDCalibrationsVector< SVDStripCalAmp > >
+    t_calAmp_payload; /**< typedef of the SVDStripCalAmp payload of all SVD strips*/
 
     /** Constructor, no input argument is required */
     SVDPulseShapeCalibrations()
@@ -189,7 +190,7 @@ namespace Belle2 {
     }
 
   private:
-    DBObjPtr< t_calAmp_payload > m_calAmp_aDBObjPtr;
+    DBObjPtr< t_calAmp_payload > m_calAmp_aDBObjPtr; /**<SVDStripCalAmp payload */
 
   };
 }

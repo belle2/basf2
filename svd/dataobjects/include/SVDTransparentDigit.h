@@ -53,7 +53,8 @@ namespace Belle2 {
                         const short** fine_cmc2 = NULL,
                         const short** fine_corradc = NULL)
       : m_sensorID(sensorID), m_isU(isU),
-        m_fadcID(fadcID), m_apvID(apvID), m_nSample(nSample) {
+        m_fadcID(fadcID), m_apvID(apvID), m_nSample(nSample)
+    {
       if (adc != NULL) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
@@ -162,11 +163,17 @@ namespace Belle2 {
     /** Get ADC value.
      * @return charge collected in the strip.
      */
-    const short*  getADC(short channel) const {
+    const short*  getADC(short channel) const
+    {
       if (channel < 0 || 128 <= channel) return NULL;
       else return m_ADC[channel];
     }
-    short getADC(short channel, short index) const {
+
+    /** Get ADC value.
+     * @return charge collected in the strip.
+     */
+    short getADC(short channel, short index) const
+    {
       //if(index<0||SVDPar::maxSample<=index) return -1;
       if (index < 0 || 6 <= index) return -9999;
       if (channel < 0 || 128 <= channel) return -9999;
@@ -177,7 +184,12 @@ namespace Belle2 {
      * @return 1st commom-mode correction value
      */
     const short* getCMC1() const { return m_cmc1; }
-    short  getCMC1(short index) const {
+
+    /** Get 1st commom-mode correction value.
+     * @return 1st commom-mode correction value
+     */
+    short  getCMC1(short index) const
+    {
       if (index < 0 || 6 <= index) return -9999;
       return m_cmc1[index];
     }
@@ -186,7 +198,11 @@ namespace Belle2 {
      * @return 2nd commom-mode correction value
      */
     const short* getCMC2() const { return m_cmc2; }
-    short  getCMC2(short index) const {
+    /** Get 2nd commom-mode correction value.
+     * @return 2nd commom-mode correction value
+     */
+    short  getCMC2(short index) const
+    {
       if (index < 0 || 6 <= index) return -9999;
       return m_cmc2[index];
     }
@@ -195,7 +211,11 @@ namespace Belle2 {
      * @return total commom-mode correction value
      */
     const short* getCMC() const { return m_cmc; }
-    short  getCMC(short index) const {
+    /** Get total commom-mode correction value.
+     * @return total commom-mode correction value
+     */
+    short  getCMC(short index) const
+    {
       if (index < 0 || 6 <= index) return -9999;
       return m_cmc[index] ;
     }
@@ -203,11 +223,16 @@ namespace Belle2 {
     /** Get 1st fine commom-mode correction value.
      * @return 1st fine commom-mode correction value
      */
-    const short*  getFineCMC1(short channel) const {
+    const short*  getFineCMC1(short channel) const
+    {
       if (channel < 0 || 128 <= channel) return NULL;
       return m_fine_cmc1[channel];
     }
-    short getFineCMC1(short channel, short index) const {
+    /** Get 1st fine commom-mode correction value.
+     * @return 1st fine commom-mode correction value
+     */
+    short getFineCMC1(short channel, short index) const
+    {
       //if(index<0||SVDPar::maxSample<=index) return -1;
       if (index < 0 || 6 <= index) return -9999;
       if (channel < 0 || 128 <= channel) return -9999;
@@ -216,11 +241,16 @@ namespace Belle2 {
     /** Get 2nd fine commom-mode correction value.
      * @return 2nd fine commom-mode correction value
      */
-    const short*  getFineCMC2(short channel) const {
+    const short*  getFineCMC2(short channel) const
+    {
       if (channel < 0 || 128 <= channel) return NULL;
       return m_fine_cmc2[channel];
     }
-    short getFineCMC2(short channel, short index) const {
+    /** Get 2nd fine commom-mode correction value.
+     * @return 2nd fine commom-mode correction value
+     */
+    short getFineCMC2(short channel, short index) const
+    {
       //if(index<0||SVDPar::maxSample<=index) return -1;
       if (index < 0 || 6 <= index) return -9999;
       if (channel < 0 || 128 <= channel) return -9999;
@@ -229,11 +259,16 @@ namespace Belle2 {
     /** Get total fine commom-mode correction value.
      * @return total fine commom-mode correction value
      */
-    const short*  getFineCMC(short channel) const {
+    const short*  getFineCMC(short channel) const
+    {
       if (channel < 0 || 128 <= channel) return NULL;
       return m_fine_cmc[channel];
     }
-    short getFineCMC(short channel, short index) const {
+    /** Get total fine commom-mode correction value.
+     * @return total fine commom-mode correction value
+     */
+    short getFineCMC(short channel, short index) const
+    {
       //if(index<0||SVDPar::maxSample<=index) return -1;
       if (index < 0 || 6 <= index) return -9999;
       if (channel < 0 || 128 <= channel) return -9999;
@@ -243,11 +278,16 @@ namespace Belle2 {
     /** Get corrected ADC value with pedestal and common-mode.
      * @return ADC value corrected with pedestal and common-mode
      */
-    const short*  getCorrADC(short channel) const {
+    const short*  getCorrADC(short channel) const
+    {
       if (channel < 0 || 128 <= channel) return NULL;
       return m_corrADC[channel];
     }
-    short getCorrADC(short channel, short index) const {
+    /** Get corrected ADC value with pedestal and common-mode.
+     * @return ADC value corrected with pedestal and common-mode
+     */
+    short getCorrADC(short channel, short index) const
+    {
       //if(index<0||SVDPar::maxSample<=index) return -1;
       if (index < 0 || 6 <= index) return -9999;
       if (channel < 0 || 128 <= channel) return -9999;
@@ -257,11 +297,16 @@ namespace Belle2 {
     /** Get precisely corrected ADC value with pedestal and fine common-mode.
      * @return ADC value precisely corrected with pedestal and fine common-mode
      */
-    const short*  getFineCorrADC(short channel) const {
+    const short*  getFineCorrADC(short channel) const
+    {
       if (channel < 0 || 128 <= channel) return NULL;
       return m_fine_corrADC[channel];
     }
-    short getFineCorrADC(short channel, short index) const {
+    /** Get precisely corrected ADC value with pedestal and fine common-mode.
+     * @return ADC value precisely corrected with pedestal and fine common-mode
+     */
+    short getFineCorrADC(short channel, short index) const
+    {
       //if(index<0||SVDPar::maxSample<=index) return -1;
       if (index < 0 || 6 <= index) return -9999;
       if (channel < 0 || 128 <= channel) return -9999;
@@ -291,7 +336,8 @@ namespace Belle2 {
 
     /** Set ADC values.
      */
-    void setADC(short** adc) {
+    void setADC(short** adc)
+    {
       if (adc != NULL) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
@@ -301,7 +347,10 @@ namespace Belle2 {
         }
       }
     }
-    void setADC(short* adc, short channel) {
+    /** Set ADC values.
+     */
+    void setADC(short* adc, short channel)
+    {
       if (adc != NULL) {
         //for(int index=0;index<SVDPar::maxSample;index++) {
         for (int index = 0; index < 6; index++) {
@@ -309,47 +358,64 @@ namespace Belle2 {
         }
       }
     }
-    void setADC(short adc, short channel, short index) {
+    /** Set ADC values.
+     */
+    void setADC(short adc, short channel, short index)
+    {
       if (0 <= index && index < 6 && 0 <= channel && channel < 128)
         m_ADC[channel][index] = adc;
     }
 
     /** Set 1st commom-mode correction value.
      */
-    void setCMC1(short* cmc1) {
+    void setCMC1(short* cmc1)
+    {
       for (int index = 0; index < 6; index++) {
         m_cmc1[index] = cmc1[index];
       }
     }
-    void setCMC1(short cmc1, int index) {
+
+    /** Set 1st commom-mode correction value.
+     */
+    void setCMC1(short cmc1, int index)
+    {
       if (0 <= index && index < 6) m_cmc1[index] = cmc1;
     }
 
     /** Set 2nd commom-mode correction value.
      */
-    void setCMC2(short* cmc2) {
+    void setCMC2(short* cmc2)
+    {
       for (int index = 0; index < 6; index++) {
         m_cmc2[index] = cmc2[index];
       }
     }
-    void setCMC2(short cmc2, int index) {
+    /** Set 2nd commom-mode correction value.
+     */
+    void setCMC2(short cmc2, int index)
+    {
       if (0 <= index && index < 6) m_cmc2[index] = cmc2;
     }
 
     /** Set Total commom-mode correction value.
      */
-    void setCMC(short* cmc) {
+    void setCMC(short* cmc)
+    {
       for (int index = 0; index < 6; index++) {
         m_cmc[index] = cmc[index];
       }
     }
-    void setCMC(short cmc, int index) {
+    /** Set Total commom-mode correction value.
+     */
+    void setCMC(short cmc, int index)
+    {
       if (0 <= index && index < 6) m_cmc[index] = cmc;
     }
 
     /** Set channel-dependent 1st CMC values.
      */
-    void setFineCMC1(short** fine_cmc1) {
+    void setFineCMC1(short** fine_cmc1)
+    {
       if (fine_cmc1 != NULL) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
@@ -359,7 +425,10 @@ namespace Belle2 {
         }
       }
     }
-    void setFineCMC1(short* fine_cmc1, short channel) {
+    /** Set channel-dependent 1st CMC values.
+     */
+    void setFineCMC1(short* fine_cmc1, short channel)
+    {
       if (fine_cmc1 != NULL) {
         //for(int index=0;index<SVDPar::maxSample;index++) {
         for (int index = 0; index < 6; index++) {
@@ -367,12 +436,18 @@ namespace Belle2 {
         }
       }
     }
-    void setFineCMC1(short fine_cmc1, short channel, short index) {
+    /** Set channel-dependent 1st CMC values.
+     */
+    void setFineCMC1(short fine_cmc1, short channel, short index)
+    {
       if (0 <= index && index < 6 && 0 <= channel && channel < 128)
         m_fine_cmc1[channel][index] = fine_cmc1;
     }
 
-    void setFineCMC2(short** fine_cmc2) {
+    /** Set channel-dependent 2nd CMC values.
+     */
+    void setFineCMC2(short** fine_cmc2)
+    {
       if (fine_cmc2 != NULL) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
@@ -382,7 +457,10 @@ namespace Belle2 {
         }
       }
     }
-    void setFineCMC2(short* fine_cmc2, short channel) {
+    /** Set channel-dependent 2nd CMC values.
+     */
+    void setFineCMC2(short* fine_cmc2, short channel)
+    {
       if (fine_cmc2 != NULL) {
         //for(int index=0;index<SVDPar::maxSample;index++) {
         for (int index = 0; index < 6; index++) {
@@ -390,12 +468,18 @@ namespace Belle2 {
         }
       }
     }
-    void setFineCMC2(short fine_cmc2, short channel, short index) {
+    /** Set channel-dependent 2nd CMC values.
+     */
+    void setFineCMC2(short fine_cmc2, short channel, short index)
+    {
       if (0 <= index && index < 6 && 0 <= channel && channel < 128)
         m_fine_cmc2[channel][index] = fine_cmc2;
     }
 
-    void setFineCMC(short** fine_cmc) {
+    /** Set CMC values.
+     */
+    void setFineCMC(short** fine_cmc)
+    {
       if (fine_cmc != NULL) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
@@ -405,7 +489,10 @@ namespace Belle2 {
         }
       }
     }
-    void setFineCMC(short* fine_cmc, short channel) {
+    /** Set channel-dependent CMC values.
+     */
+    void setFineCMC(short* fine_cmc, short channel)
+    {
       if (fine_cmc != NULL) {
         //for(int index=0;index<SVDPar::maxSample;index++) {
         for (int index = 0; index < 6; index++) {
@@ -413,14 +500,18 @@ namespace Belle2 {
         }
       }
     }
-    void setFineCMC(short fine_cmc, short channel, short index) {
+    /** Set channel-dependent CMC values.
+     */
+    void setFineCMC(short fine_cmc, short channel, short index)
+    {
       if (0 <= index && index < 6 && 0 <= channel && channel < 128)
         m_fine_cmc[channel][index] = fine_cmc;
     }
 
     /** Set corrected ADC values.
      */
-    void setCorrADC(short** corradc) {
+    void setCorrADC(short** corradc)
+    {
       if (corradc != NULL) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
@@ -430,7 +521,10 @@ namespace Belle2 {
         }
       }
     }
-    void setCorrADC(short* corradc, short channel) {
+    /** Set corrected ADC values.
+     */
+    void setCorrADC(short* corradc, short channel)
+    {
       if (corradc != NULL) {
         //for(int index=0;index<SVDPar::maxSample;index++) {
         for (int index = 0; index < 6; index++) {
@@ -438,14 +532,18 @@ namespace Belle2 {
         }
       }
     }
-    void setCorrADC(short corradc, short channel, short index) {
+    /** Set corrected ADC values.
+     */
+    void setCorrADC(short corradc, short channel, short index)
+    {
       if (0 <= index && index < 6 && 0 <= channel && channel < 128)
         m_corrADC[channel][index] = corradc;
     }
 
     /** Set precisely corrected ADC values.
      */
-    void setFineCorrADC(short** corradc) {
+    void setFineCorrADC(short** corradc)
+    {
       if (corradc != NULL) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
@@ -455,7 +553,10 @@ namespace Belle2 {
         }
       }
     }
-    void setFineCorrADC(short* corradc, short channel) {
+    /** Set precisely corrected ADC values.
+     */
+    void setFineCorrADC(short* corradc, short channel)
+    {
       if (corradc != NULL) {
         //for(int index=0;index<SVDPar::maxSample;index++) {
         for (int index = 0; index < 6; index++) {
@@ -463,14 +564,18 @@ namespace Belle2 {
         }
       }
     }
-    void setFineCorrADC(short corradc, short channel, short index) {
+    /** Set precisely corrected ADC values.
+     */
+    void setFineCorrADC(short corradc, short channel, short index)
+    {
       if (0 <= index && index < 6 && 0 <= channel && channel < 128)
         m_fine_corrADC[channel][index] = corradc;
     }
 
     /** Display main parameters in this object
      */
-    std::string print() {
+    std::string print()
+    {
       VxdID thisSensorID = static_cast<VxdID>(m_sensorID);
       VxdID::baseType id      = thisSensorID.getID();
       VxdID::baseType layer   = thisSensorID.getLayerNumber();

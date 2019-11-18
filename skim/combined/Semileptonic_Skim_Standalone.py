@@ -4,7 +4,6 @@
 #######################################################
 #
 # Semileptonic skims
-# P. Urquijo, 6/Jan/2015
 #
 ######################################################
 
@@ -14,22 +13,16 @@ from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.charm import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-01'
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-04-00-00'
 set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
-
-
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
-
+fileList = get_test_file("mixedBGx1", "MC12")
 SLskimpath = Path()
 
-inputMdstList('MC9', fileList, path=SLskimpath)
+inputMdstList('default', fileList, path=SLskimpath)
 stdPi0s('loose', path=SLskimpath)
 stdPhotons('loose', path=SLskimpath)
 stdPi('loose', path=SLskimpath)

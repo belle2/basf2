@@ -47,7 +47,7 @@ namespace Belle2 {
     explicit ROIrawID(baseType id = 0)
     {
       m_rawID.id = id;
-    }; /**< constructor setting the id */
+    } /**< constructor setting the id */
 
     ROIrawID(baseType SystemFlag, baseType DHHID, baseType MinV, baseType MinU, baseType MaxV, baseType MaxU)
     {

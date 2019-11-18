@@ -58,7 +58,7 @@ namespace {
   /// Prescaled recording filter for VXD - CDC relations.
   class SloppyRecordingPXDStateFilter : public RecordingPXDStateFilter {
   public:
-    SloppyRecordingPXDStateFilter(const std::string& defaultRootFileName) : RecordingPXDStateFilter(defaultRootFileName)
+    explicit SloppyRecordingPXDStateFilter(const std::string& defaultRootFileName) : RecordingPXDStateFilter(defaultRootFileName)
     {
       setSkimFilter(std::make_unique<SloppyMCPXDStateFilter>());
     }

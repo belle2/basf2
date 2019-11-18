@@ -20,8 +20,8 @@ using namespace Belle2;
 void FoxWolfram::calculateBasicMoments()
 {
   // clear the momenta, in case someone calls this function twice
-  for (short i = 0; i < 9; i++)
-    m_moment[i] = 0.;
+  for (double& i : m_moment)
+    i = 0.;
 
   const auto begin = m_momenta.begin();
   const auto end = m_momenta.end();
@@ -64,8 +64,8 @@ void FoxWolfram::calculateBasicMoments()
 void FoxWolfram::calculateAllMoments()
 {
   // clear the momenta, in case someone calls this function twice
-  for (short i = 0; i < 9; i++)
-    m_moment[i] = 0.;
+  for (double& i : m_moment)
+    i = 0.;
 
   const auto begin = m_momenta.begin();
   const auto end = m_momenta.end();

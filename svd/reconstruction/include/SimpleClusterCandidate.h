@@ -23,11 +23,11 @@ namespace Belle2 {
      * of eachstrip of the cluster
      */
     struct stripInCluster {
-      int recoDigitIndex;
-      float charge;
-      float noise;
-      int cellID;
-      float time;
+      int recoDigitIndex; /**< index of the reco digit*/
+      float charge; /**< strip charge*/
+      float noise; /**<strip noise*/
+      int cellID; /**<strip cellID*/
+      float time; /**<strip time*/
     };
 
     /**
@@ -113,6 +113,7 @@ namespace Belle2 {
        */
       int size() const { return m_strips.size(); }
 
+      /** returns the vector of the strips in the cluster*/
       const std::vector<stripInCluster> getStripsInCluster() const { return m_strips; };
 
     protected:

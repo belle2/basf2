@@ -33,6 +33,8 @@ import variables.utils as vu
 from stdV0s import stdKshorts
 from stdV0s import stdLambdas
 
+b2.conditions.disable_globaltag_replay()
+
 # create path
 my_path = b2.create_path()
 

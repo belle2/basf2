@@ -1,4 +1,4 @@
-TCanvas/*
+/*
  * Plots histograms from ARICHRateCal module
  * run as: "root -l histogram_file.root plot_thscan.C"
  * By: Tomoyuki Konno

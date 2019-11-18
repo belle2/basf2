@@ -24,6 +24,7 @@ AssignParameterVisitor::AssignParameterVisitor(ModuleParamList* moduleParamList,
 {
 }
 
+/// Assign the value to a keyword in the dictionary
 template <class T>
 void AssignParameterVisitor::operator()(const T& t) const
 {

@@ -16,6 +16,7 @@
 
 namespace Belle2 {
 
+  /** A bremsstrahlung hit that correlates an ECLCluster with a RecoTrack */
   class BremHit : public RelationsObject {
   public:
     /**
@@ -71,6 +72,7 @@ namespace Belle2 {
       return m_clusterDistance;
     }
 
+    /** Return the effective acceptance factor to find the BremHit. */
     double getEffAcceptanceFactor() const
     {
       return m_acceptanceFactor;
@@ -92,6 +94,7 @@ namespace Belle2 {
     /** The acceptance factor which is needed to find the BremHit. */
     double m_acceptanceFactor;
 
+    /** Making this class a ROOT class.*/
     ClassDef(BremHit, 1);
   };
 }

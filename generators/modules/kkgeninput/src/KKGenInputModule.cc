@@ -17,18 +17,12 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/gearbox/GearDir.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/IOIntercept.h>
 
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <boost/filesystem.hpp>
 
-#include <TRandom.h>
 #include <stdio.h>
 
 using namespace std;

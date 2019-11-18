@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <analysis/variables/OrcaKinFitVariables.h>
-#include <analysis/VariableManager/Variable.h>
 
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
@@ -28,7 +27,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitChi2")) return part->getExtraInfo("OrcaKinFitChi2");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitChi2' not found!");
-        return NAN;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -37,7 +36,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitProb")) return part->getExtraInfo("OrcaKinFitProb");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitProb' not found!");
-        return NAN;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -46,7 +45,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitErrorCode")) return part->getExtraInfo("OrcaKinFitErrorCode");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitErrorCode' not found!");
-        return NAN;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -58,7 +57,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredTheta")) return part->getExtraInfo("OrcaKinFitUnmeasuredTheta");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitUnmeasuredTheta' not found!");
-        return NAN;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -67,7 +66,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredPhi")) return part->getExtraInfo("OrcaKinFitUnmeasuredPhi");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitUnmeasuredPhi' not found!");
-        return NAN;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -76,7 +75,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredE")) return part->getExtraInfo("OrcaKinFitUnmeasuredE");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitUnmeasuredE' not found!");
-        return NAN;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -85,7 +84,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredErrorTheta")) return part->getExtraInfo("OrcaKinFitUnmeasuredErrorTheta");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitUnmeasuredErrorTheta' not found!");
-        return NAN;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -94,7 +93,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredErrorPhi")) return part->getExtraInfo("OrcaKinFitUnmeasuredErrorPhi");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitUnmeasuredErrorPhi' not found!");
-        return NAN;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -103,7 +102,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredErrorE")) return part->getExtraInfo("OrcaKinFitUnmeasuredErrorE");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitUnmeasuredErrorE' not found!");
-        return NAN;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 

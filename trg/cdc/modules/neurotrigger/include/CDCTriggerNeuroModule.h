@@ -3,8 +3,9 @@
 
 #include <framework/core/Module.h>
 #include <trg/cdc/NeuroTrigger.h>
-
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
+#include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
@@ -65,13 +66,24 @@ namespace Belle2 {
      *  - MLP values: nodes, weights, activation function LUT input (LUT output = nodes)
      */
     std::vector<unsigned> m_precision;
+    /** way to obtain the event time, possible values are:
+     *   "etf_only"                 :   only ETF info is used, otherwise an error
+     *                                  is thrown.
+     *   "fastestpriority"          :   event time is estimated by fastest priority
+     *                                  time in selected track segments. if something
+     *                                  fails, it is set to 0.
+     *   "zero"                     :   the event time is set to 0.
+     *   "etf_or_fastestpriority"   :   the event time is obtained by the ETF, if
+     *                                  not possible, the flag
+     *                                  "fastestppriority" is used.
+     *   "etf_or_zero"              :   the event time is obtained by the ETF, if
+     *                                  not possible, it es set to 0
+     */
+    std::string m_et_option;
     /** Switch for writing out the input vector for each track (off by default). */
     bool m_writeMLPinput;
-    /** Switch for always using the shortest priority time of the TS as t0. */
-    bool m_alwaysTrackT0;
     /** Switch to mimic an apparent bug in the hardware preprocessing. */
     bool m_hardwareCompatibilityMode;
-
     /** list of input 2D tracks */
     StoreArray<CDCTriggerTrack> m_tracks2D;
     /** list of output NN tracks */
@@ -80,6 +92,8 @@ namespace Belle2 {
     StoreArray<CDCTriggerSegmentHit> m_segmentHits;
     /** list of input vectors for each NN track */
     StoreArray<CDCTriggerMLPInput> m_mlpInput;
+    /** get NNT payload from database. */
+    DBObjPtr<CDCTriggerNeuroConfig> m_cdctriggerneuroconfig;
   };
 }
 #endif

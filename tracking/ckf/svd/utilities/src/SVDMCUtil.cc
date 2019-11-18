@@ -16,7 +16,6 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
-#include <functional>
 
 using namespace Belle2;
 

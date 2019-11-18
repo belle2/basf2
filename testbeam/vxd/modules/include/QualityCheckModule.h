@@ -47,12 +47,7 @@
 #include <eutel/eudaq/Exception.h>
 
 #include <testbeam/vxd/dataobjects/TelEventInfo.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawFTSW.h>
-
-
-
-#include <framework/core/HistoModule.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>

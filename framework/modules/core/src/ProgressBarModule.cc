@@ -71,7 +71,7 @@ void ProgressBarModule::event()
     double elapsedSec = clockSec - m_startTime;
     double ratio = double(m_evtNr) / m_nTotal;
     double time_per_event = elapsedSec / m_evtNr;
-    int remainingSeconds = (int)std::round((m_nTotal - m_evtNr) * time_per_event);
+    auto remainingSeconds = (int)std::round((m_nTotal - m_evtNr) * time_per_event);
 
     if (remainingSeconds >= 0) {
       const int bar_length = 50; //characters for bar

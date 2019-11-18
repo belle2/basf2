@@ -30,10 +30,10 @@ namespace Belle2 {
    */
   namespace SVDRunType {
     constexpr uint8_t
-    raw = 0,
-    transparent = 1,
-    zero_suppressed = 2,
-    zero_suppressed_timefit = 3;
+    raw = 0, /**< 00. raw data*/
+    transparent = 1, /**< 01. transparent data*/
+    zero_suppressed = 2, /**< 10. zero suppressed*/
+    zero_suppressed_timefit = 3; /**< 11. zero suppressed + hit time finding*/
   }
 
   /** Event Type, 3 bits, separated into 1+2 bits:
@@ -43,8 +43,8 @@ namespace Belle2 {
    */
   namespace SVDEventType {
     constexpr uint8_t
-    global_run = 0,
-    local_run = 1;
+    global_run = 0, /**< global run */
+    local_run = 1; /**< local run - should never happen */
   }
 
   /** 2+3 bit:
@@ -54,9 +54,9 @@ namespace Belle2 {
    */
   namespace SVDDAQModeType {
     constexpr uint8_t
-    daq_1sample = 0,
-    daq_3samples = 1,
-    daq_6samples = 2;
+    daq_1sample = 0, /**< one sample per strip */
+    daq_3samples = 1, /**< three samples per strip */
+    daq_6samples = 2; /**< six samples per strip */
   }
 
   /**

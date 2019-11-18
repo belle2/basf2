@@ -1,0 +1,13 @@
+Import('env')
+
+env['TOOLS_LIBS']['b2hlt_file2rb'] = ['framework', 'hlt', 'daq', 'boost_program_options']
+env['TOOLS_LIBS']['b2hlt_file2socket'] = ['framework', 'hlt', 'daq', 'boost_program_options']
+env['TOOLS_LIBS']['b2hlt_rb2file'] = ['framework', 'hlt', 'daq', 'boost_program_options']
+env['TOOLS_LIBS']['b2hlt_rb2rb'] = ['framework', 'hlt', 'daq', 'boost_program_options']
+env['TOOLS_LIBS']['b2hlt_rb2socket'] = ['framework', 'hlt', 'daq', 'boost_program_options']
+env['TOOLS_LIBS']['b2hlt_socket2rb'] = ['framework', 'hlt', 'daq', 'boost_program_options']
+
+env['TOOLS_LIBS']['b2hlt_file2z'] = ['zmq', 'framework']
+env['TOOLS_LIBS']['b2hlt_z2measurement'] = ['zmq', 'framework']
+
+Return('env')

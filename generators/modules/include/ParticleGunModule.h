@@ -13,12 +13,10 @@
 
 #include <framework/core/Module.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/particlegun/ParticleGun.h>
 
 #include <string>
-#include <vector>
 
 namespace Belle2 {
 

@@ -19,7 +19,7 @@ void DependencyMap::ModuleInfo::addEntry(const std::string& name, EEntryType typ
     entries[type].insert(name);
 }
 
-bool DependencyMap::isUsedAs(std::string branchName, EEntryType type) const
+bool DependencyMap::isUsedAs(const std::string& branchName, EEntryType type) const
 {
   return any_of(m_moduleInfo.begin(), m_moduleInfo.end(),
   [branchName, type](const pair<string, ModuleInfo>& info) {

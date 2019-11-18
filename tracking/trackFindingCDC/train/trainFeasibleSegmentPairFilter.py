@@ -11,10 +11,15 @@ from trackfindingcdc.run.training import TrainingRunMixin
 
 class FeasibleSegmentPairFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsRun):
     """Run to record segment pairs encountered at the SegmentPairCreator and retrain its mva method"""
+
+    #: number of events to generate
     n_events = 10000
+    #: use the generic event generator
     generator_module = "generic"
+    #: overlay background hits from the events in these files
     bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
+    #: degree of MC truth-matching
     truth = "truth_positive"
 
     @property
@@ -37,6 +42,7 @@ class FeasibleSegmentPairFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEvent
         # Also fix the segment orientation to outwards to make training additionally aggressive
         path.add_module("TFCDC_SegmentFinderFacetAutomaton")
 
+        #: Process each event according to the user's desired task (train, eval, explore)
         if self.task == "train":
             varSets = [
                 "feasible",

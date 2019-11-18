@@ -10,14 +10,13 @@
 #include <framework/core/ModuleParamBase.h>
 
 #include <string>
+#include <utility>
 
 using namespace Belle2 ;
 
-ModuleParamBase::ModuleParamBase(const std::string& typeInfo,
-                                 const std::string& description,
-                                 bool force)
-  : m_typeInfo(typeInfo)
-  , m_description(description)
+ModuleParamBase::ModuleParamBase(std::string  typeInfo, std::string  description, bool force)
+  : m_typeInfo(std::move(typeInfo))
+  , m_description(std::move(description))
   , m_forceInSteering(force)
   , m_setInSteering(false)
 {

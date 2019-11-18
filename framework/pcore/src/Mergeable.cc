@@ -8,7 +8,7 @@ Long64_t Mergeable::Merge(TCollection* hlist)
 {
   Long64_t nMerged = 0;
   if (hlist) {
-    const Mergeable* xh = 0;
+    const Mergeable* xh = nullptr;
     TIter nxh(hlist);
     while ((xh = dynamic_cast<Mergeable*>(nxh()))) {
       // Add xh to me

@@ -26,7 +26,7 @@ void DBImportBase::addIntraRunDependency(unsigned long long int tag,
   if (dependency == m_dependency) {
     m_objects.push_back(m_object);
     m_tags.push_back(tag);
-    m_object = 0;
+    m_object = nullptr;
   } else {
     B2FATAL("DBImportBase::addIntraRunDependency: " <<
             "intra run dependency cannot be of mixed types");
@@ -61,7 +61,7 @@ void DBImportBase::clear()
 {
   if (m_object) {
     delete m_object;
-    m_object = 0;
+    m_object = nullptr;
   }
 
   m_dependency = c_None;

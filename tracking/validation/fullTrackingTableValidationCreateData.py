@@ -85,6 +85,7 @@ class VxdCdcPartFinderHarvester(HarvestingModule):
 
         return return_dict
 
+    #: Refiners to be executed at the end of the harvesting / termination of the module
     #: Store as a table in a ROOT file
     save_tree = refiners.SaveTreeRefiner()
 

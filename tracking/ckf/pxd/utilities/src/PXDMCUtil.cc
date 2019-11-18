@@ -15,7 +15,6 @@
 #include <pxd/dataobjects/PXDCluster.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <functional>
 
 using namespace Belle2;
 

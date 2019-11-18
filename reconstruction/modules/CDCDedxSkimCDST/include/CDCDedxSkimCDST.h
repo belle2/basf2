@@ -77,7 +77,7 @@ namespace Belle2 {
     virtual void terminate() override;
 
   private:
-
+    bool isRecList;/**< set particle list type FS or reco particle list */
     std::vector<std::string> m_strParticleList; /**< Vector of ParticleLists to write out */
     StoreArray<CDCDedxTrack> m_dedxTracks; /**< Intput array of CDCDedxTracks */
     SelectSubset<CDCDedxTrack> m_selector; /**< Used to get a subset of the input array */

@@ -26,7 +26,7 @@ namespace Belle2 {
 
     public:
       /// Constructor setting to default reversal symmetry.
-      MCSegmentPairRelationFilter(bool allowReverse = true);
+      explicit MCSegmentPairRelationFilter(bool allowReverse = true);
 
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;

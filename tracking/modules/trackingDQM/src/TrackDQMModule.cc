@@ -14,21 +14,14 @@
 
 #include <genfit/MeasurementOnPlane.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
-#include <pxd/reconstruction/PXDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit.h>
 #include <svd/geometry/SensorInfo.h>
 #include <pxd/geometry/SensorInfo.h>
 
 #include <vxd/geometry/GeoTools.h>
 
-//#include <framework/database/DBObjPtr.h>
-
-#include <algorithm>
 #include <TDirectory.h>
 #include <TVectorD.h>
 
@@ -99,9 +92,10 @@ void TrackDQMModule::defineHisto()
 
   // Create a separate histogram directories and cd into it.
   TDirectory* oldDir = gDirectory;
-  TDirectory* DirTracks = oldDir->mkdir("TracksDQM");
-  TDirectory* DirTracksAlignment = oldDir->mkdir("TracksDQMAlignment");
-  DirTracks->cd();
+
+  gDirectory->mkdir("TracksDQM"); // dont use return value, it might be zero ptr if dir is existing already
+  gDirectory->cd("TracksDQM");
+
   // Momentum Phi
   string name = str(format("MomPhi"));
   string title = str(format("Momentum Phi of fit"));
@@ -351,7 +345,10 @@ void TrackDQMModule::defineHisto()
     m_TRClusterCorrelationsTheta[index]->GetZaxis()->SetTitle("counts");
   }
 
-  DirTracksAlignment->cd();
+  oldDir->cd();
+  oldDir->mkdir("TracksDQMAlignment");// dont use returned ptr, it might be zero
+  oldDir->cd("TracksDQMAlignment");
+
   for (int i = 0; i < nVXDSensors; i++) {
     VxdID id = gTools->getSensorIDFromIndex(i);
     int iLayer = id.getLayerNumber();
@@ -384,7 +381,6 @@ void TrackDQMModule::defineHisto()
   }
 
   oldDir->cd();
-
 }
 
 void TrackDQMModule::beginRun()

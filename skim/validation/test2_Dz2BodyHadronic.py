@@ -21,7 +21,7 @@ from variables import variables
 myAna_Main = create_path()
 
 # load input ROOT file
-inputMdst('default', './WG6_DstToD0ToKpi.udst.root', path=myAna_Main)
+inputMdst('default', '../WG6_DstToD0ToKpi.udst.root', path=myAna_Main)
 
 # --------------------------------------------------
 # write out useful information to a ROOT file
@@ -32,6 +32,8 @@ variables.addAlias('ps_D0', 'daughter(0,useCMSFrame(p))')
 variables.addAlias('ps_spi', 'daughter(1,useCMSFrame(p))')
 
 DstTree = ['Q', 'M_D0', 'ps_Dst', 'ps_D0', 'ps_spi']
+
+copyLists('D*+:sig', ['D*+:HpJm0', 'D*+:HpJm1', 'D*+:HpJm2'], writeOut=True, path=myAna_Main)
 
 variablesToNtuple(filename='WG6_DstToD0ToKpi.ntup.root',
                   decayString='D*+:sig', treename='hrec',

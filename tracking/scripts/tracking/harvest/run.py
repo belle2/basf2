@@ -6,12 +6,17 @@ from tracking.run.mixins import BrowseTFileOnTerminateRunMixin, PostProcessingRu
 
 
 class HarvestingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
+    """Harvester to select crops, postprocess, and inspect"""
+
+    #: Disable the writing of an output ROOT file
     output_file_name = None
 
     def harvesting_module(self, path=None):
+        """This virtual method must be overridden by the inheriting class"""
         raise RuntimeError("Override the harvesting_module method")
 
     def create_argument_parser(self, **kwds):
+        """Parse the arguments and append them to the harvester's list"""
         argument_parser = super().create_argument_parser(**kwds)
         harvesting_argument_group = argument_parser.add_argument_group("Harvest arguments")
 
@@ -26,16 +31,17 @@ class HarvestingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin)
         return argument_parser
 
     def pickle_crops(self, harvesting_module, crops, **kwds):
-        "Save the raw crops as a pickle file"
+        """Save the raw crops as a pickle file"""
         with open(self.output_file_name + ".pickle", "wb") as pickle_file:
             pickle.dump(crops, pickle_file)
 
     def unpickle_crops(self):
-        "Load the raw crops from a pickle file"
+        """Load the raw crops from a pickle file"""
         with open(self.output_file_name + ".pickle", "rb") as pickle_file:
             return pickle.load(pickle_file)
 
     def postprocess(self):
+        """Post-process the crops"""
         if self.postprocess_only:
             harvesting_module = self.harvesting_module()
             if self.output_file_name:
@@ -50,6 +56,7 @@ class HarvestingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin)
         super().postprocess()
 
     def adjust_path(self, path):
+        """Add the harvester to the basf2 path"""
         super().adjust_path(path)
         harvesting_module = self.harvesting_module()
         if self.output_file_name:
@@ -60,4 +67,5 @@ class HarvestingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin)
 
 
 class HarvestingRun(HarvestingRunMixin, StandardEventGenerationRun):
+    """Harvester to generate MC events followed by crop selection, postprocessing, inspection"""
     pass

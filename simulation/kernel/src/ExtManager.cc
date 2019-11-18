@@ -19,7 +19,6 @@
 #include <string>
 
 #include <G4UImanager.hh>
-#include <G4ErrorPropagator.hh>
 #include <G4ErrorRunManagerHelper.hh>
 #include <G4RunManager.hh>
 #include <G4EventManager.hh>

@@ -21,8 +21,6 @@ DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
   int angleSectors        = 1;
   int minimumClusterSize  = 1;
   int maximumClusterSize  = 1000;
-  int actualPositionX     = 0;
-  int actualPositionY     = 0;
   double unitX = 0., unitY = 0.;
   double angleRange = 0., vertRange = 0.;
   double left = 0., right = 0., up = 0., down = 0.;
@@ -78,8 +76,8 @@ DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
     idList = it->getIdList();
     mergedList = idList;
     CandidateCoordinates = it->getCoord();
-    actualPositionX = (int)CandidateCoordinates.X();
-    actualPositionY = (int)CandidateCoordinates.Y();
+    int actualPositionX = (int)CandidateCoordinates.X();
+    int actualPositionY = (int)CandidateCoordinates.Y();
     if (ArrayOfActiveHoughSpaceSectors[actualPositionY][actualPositionX] == -1) {
       m_clusterInitialPosition.Set((double)actualPositionX, (double)actualPositionY);
       m_clusterCenterOfGravity.Set((double)actualPositionX, (double)actualPositionY);

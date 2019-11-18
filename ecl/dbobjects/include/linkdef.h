@@ -24,4 +24,6 @@
 #pragma link C++ class Belle2::ECLHadronComponentEmissionFunction;
 #pragma link C++ class Belle2::ECLDspData;
 #pragma link C++ class Belle2::ECLChannelMap+;
+#pragma link C++ class Belle2::ECLCrystalLocalRunCalib;
+#pragma link C++ class Belle2::ECLLocalRunCalibRef;
 #endif

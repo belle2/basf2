@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # An example/test of using the formula() metavariable
-# note: it's the pion momentuim + the number of tracks in the event which is total nonsense
+# note: it's the pion momentum + the number of tracks in the event which is total nonsense
 #
 # James Kahn and Sam Cunliffe
 #

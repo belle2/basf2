@@ -18,7 +18,11 @@ namespace Belle2 {
   TRGCDCWireHitMC::TRGCDCWireHitMC(const TRGCDCWire* w,
                                    const TRGCDCWireHit* wh)
     : _wire(w),
-      _hit(wh)
+      _hit(wh),
+      _distance(), // 2019/07/31 by ytlai
+      _energy(),
+      _hep(),
+      _leftRight()
   {
   }
 

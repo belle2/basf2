@@ -50,11 +50,11 @@ namespace Belle2 {
     std::vector<std::tuple<std::string, int, float, float, std::string, int, float, float>> m_variables_2d;
     /** Name of ROOT file for output. */
     std::string m_fileName;
-    /** Name of the TTree. */
-    std::string m_treeName;
+    /** Name of the Directory. */
+    std::string m_directory;
 
     /** ROOT file for output. */
-    TFile* m_file;
+    std::shared_ptr<TFile> m_file{nullptr};
     /** The ROOT TH1Ds for output. */
     std::vector<std::unique_ptr<StoreObjPtr<RootMergeable<TH1D>>>> m_hists;
     /** The ROOT TH2Ds for output. */

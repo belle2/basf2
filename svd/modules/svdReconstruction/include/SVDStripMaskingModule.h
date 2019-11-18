@@ -44,7 +44,7 @@ namespace Belle2 {
 
   private:
 
-    SVDHotStripsCalibrations m_HotStripsCalib;
+    SVDHotStripsCalibrations m_HotStripsCalib; /**<SVDHotStrips calibration db object*/
 
     /** store arrays*/
     StoreArray<SVDShaperDigit> m_storeShaper;
@@ -56,8 +56,8 @@ namespace Belle2 {
 
     /** Name of the collections to use for the SVDShaperDigits */
     std::string m_storeShaperDigitsName;
-    std::string m_SVDShaperDigitsMasked;
-    std::string m_SVDShaperDigitsUnmasked;
+    std::string m_SVDShaperDigitsMasked; /**< masked SVDShaperDigits name*/
+    std::string m_SVDShaperDigitsUnmasked; /**< unmasked (good) SVDShaperDigits name*/
 
   };
 }

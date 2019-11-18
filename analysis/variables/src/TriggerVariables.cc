@@ -20,16 +20,47 @@
 #include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
 #include <mdst/dbobjects/TRGGDLDBPrescales.h>
 
+// HLT dbobjects
+#include <mdst/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
+
 // framework
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 
-#include <cmath>
-#include <bitset> // bitwise stuff for L1
-
 namespace Belle2 {
+  namespace {
+    /**
+     * This function is the basis for returning in the variables for software trigger result.
+     * It is hidden in a anonymous namespace.
+     */
+    double extractSoftwareTriggerResultImplementation(bool nonPrescaled, const std::string& triggerIdentifier, const Particle*)
+    {
+      // get trigger result object
+      StoreObjPtr<SoftwareTriggerResult> swtr;
+      if (!swtr) return std::numeric_limits<float>::quiet_NaN();
+
+      // check that the trigger ID provided by the user exists in the SWTR
+      SoftwareTriggerCutResult swtcr;
+      try {
+        if (nonPrescaled) {
+          swtcr = swtr->getNonPrescaledResult(triggerIdentifier);
+        } else {
+          swtcr = swtr->getResult(triggerIdentifier);
+        }
+      } catch (const std::out_of_range&) {
+        // then the trigger identifier is wrong
+        std::string err = "The trigger identifier \"" + triggerIdentifier;
+        err += "\" was not found. Maybe you misspelled it?\n";
+        err += "Here are all possible trigger identifiers: \n";
+        auto res = swtr->getResults();
+        for (auto& re : res) err += re.first + "\n";
+        B2FATAL(err);
+      }
+      return double(swtcr); // see mdst/dataobjects/include/SoftwareTriggerResult.h
+    };
+  }
+
   namespace Variable {
 
     double L1Trigger(const Particle*)
@@ -224,30 +255,25 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments for the function softwareTriggerResult");
       std::string triggerIdentifier = args[0];
 
-      // need to output a function for the VariableManager
-      auto outputfunction = [triggerIdentifier](const Particle*) -> double {
+      using namespace std::placeholders;
+      return std::bind(extractSoftwareTriggerResultImplementation, false, triggerIdentifier, _1);
+    }
 
-        // get trigger result object
-        StoreObjPtr<SoftwareTriggerResult> swtr;
-        if (!swtr) return std::numeric_limits<float>::quiet_NaN();
+    Manager::FunctionPtr softwareTriggerResultNonPrescaled(const std::vector<std::string>& args)
+    {
+      /* The analyst has to know the name of the trigger she wants
+       * (after having looked this up from the trigger db payload)
+       *
+       * This workflow will probably improve later: but for now parse the args
+       * to check we have one name, then check the name does not throw an
+       * exception when we ask for it from the SWTR (std::map)
+       */
+      if (args.size() != 1)
+        B2FATAL("Wrong number of arguments for the function softwareTriggerResultNonPrescaled");
+      std::string triggerIdentifier = args[0];
 
-        // check that the trigger ID provided by the user exists in the SWTR
-        SoftwareTriggerCutResult swtcr;
-        try {
-          swtcr = swtr->getResult(triggerIdentifier);
-        } catch (const std::out_of_range&)
-        {
-          // then the trigger indentifier is wrong
-          std::string err = "The trigger identifier \"" + triggerIdentifier;
-          err += "\" was not found. Maybe you misspelled it?\n";
-          err += "Here are all possible trigger identifiers: \n";
-          auto res = swtr->getResults();
-          for (auto it = res.begin(); it != res.end(); it++) err += it->first + "\n";
-          B2FATAL(err);
-        }
-        return double(swtcr); // see mdst/dataobjects/include/SoftwareTriggerResult.h
-      };
-      return outputfunction;
+      using namespace std::placeholders;
+      return std::bind(extractSoftwareTriggerResultImplementation, true, triggerIdentifier, _1);
     }
 
     double passesAnyHighLevelTrigger(const Particle* p)
@@ -259,6 +285,32 @@ namespace Belle2 {
       double swtcr = softwareTriggerResult(hardcodedname)(p);
       if (swtcr > 0.5) return 1.0; // 1
       else             return 0.0; // 0 or -1
+    }
+
+    Manager::FunctionPtr softwareTriggerPrescaling(const std::vector<std::string>& args)
+    {
+      /* The analyst has to know the name of the trigger she wants
+       * (after having looked this up from the trigger db payload)
+       *
+       * This workflow will probably improve later: but for now parse the args
+       * to check we have one name, then check the name does not throw an
+       * exception when we ask for it from the SWTR (std::map)
+       */
+      if (args.size() != 1)
+        B2FATAL("Wrong number of arguments for the function softwareTriggerPrescaling");
+      std::string triggerIdentifier = args[0];
+
+      auto outputFunction = [triggerIdentifier](const Particle*) -> double {
+        DBObjPtr<DBRepresentationOfSoftwareTriggerCut> downloadedCut(triggerIdentifier);
+        if (not downloadedCut)
+        {
+          B2FATAL("There is no trigger with the given name " << triggerIdentifier << "!");
+        }
+
+        return double(downloadedCut->getPreScaleFactor());
+      };
+
+      return outputFunction;
     }
 
     //-------------------------------------------------------------------------
@@ -290,8 +342,19 @@ namespace Belle2 {
                       "defined as reject (-1), accept (1), or noResult (0). Note "
                       "that the meanings of these change depending if using trigger "
                       "or the skim stage, hence expert.");
+    REGISTER_VARIABLE("SoftwareTriggerResultNonPrescaled(triggerIdentifier)", softwareTriggerResultNonPrescaled,
+                      "[Eventbased] [Expert] returns the SoftwareTriggerCutResult, "
+                      "if this trigger would not be prescaled."
+                      "Please note, this is not the final HLT decision! "
+                      "It is defined as reject (-1), accept (1), or noResult (0). Note "
+                      "that the meanings of these change depending if using trigger "
+                      "or the skim stage, hence expert.");
     REGISTER_VARIABLE("HighLevelTrigger", passesAnyHighLevelTrigger,
                       "[Eventbased] 1.0 if event passes the HLT trigger, 0.0 if not");
+    REGISTER_VARIABLE("SoftwareTriggerPrescaling(triggerIdentifier)", softwareTriggerPrescaling,
+                      "[Eventbased] return the prescaling for the specific software trigger identifier. "
+                      "Please note, this prescaling is taken from the currently setup database. It only corresponds "
+                      "to the correct HLT prescale if you are using the online database!");
     //-------------------------------------------------------------------------
   }
 }

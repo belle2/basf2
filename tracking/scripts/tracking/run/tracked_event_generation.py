@@ -16,7 +16,9 @@ def get_logger():
 
 
 class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
-    #: Descriptio fof the run setup to be displayed on command line
+    """ Apply tracking to presimulated events or events generated on the fly """
+
+    #: Description of the run setup to be displayed on command line
     description = "Apply tracking to presimulated events or events generated on the fly."
 
     #: Name of the finder module to be used - can be everything that is accepted by tracking.run.utilities.extend_path
@@ -34,10 +36,11 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         'WhichParticles': [],
     }
 
-    #: Add the track fitting to the execution
+    #: By default, do not add the track fitting to the execution
     fit_tracks = False
 
     def create_argument_parser(self, **kwds):
+        """Convert command-line arguments to basf2 argument list"""
         argument_parser = super().create_argument_parser(**kwds)
 
         tracking_argument_group = argument_parser.add_argument_group("Tracking setup arguments")
@@ -61,8 +64,8 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         return argument_parser
 
     def create_path(self):
-        # Sets up a path that plays back pregenerated events or generates events
-        # based on the properties in the base class.
+        """Sets up a path that plays back pregenerated events or generates events
+           based on the properties in the base class."""
         path = super().create_path()
 
         # setting up fitting is only necessary when testing
@@ -82,36 +85,40 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
             # determine which sub-detector hits will be used
             tracking_coverage = dict(self.tracking_coverage)
 
+            matching_coverage = {key: value for key, value in tracking_coverage.items()
+                                 if key in ('UsePXDHits', 'UseSVDHits', 'UseCDCHits', 'MinimalEfficiency', 'MinimalPurity')}
+            # Removing minimal efficiency and purity as they are only parameters of the matching
+            if "MinimalEfficiency" in tracking_coverage:
+                tracking_coverage.pop("MinimalEfficiency")
+            if "MinimalPurity" in tracking_coverage:
+                tracking_coverage.pop("MinimalPurity")
+
             # Include the mc tracks if the monte carlo data is presentx
             if 'MCRecoTracksMatcher' not in path:
-                matching_coverage = {key: value for key, value in tracking_coverage.items()
-                                     if key in ('UsePXDHits', 'UseSVDHits', 'UseCDCHits', 'MinimalEfficiency', 'MinimalPurity')}
-
-                # Removing minimal efficiency and purity as they are only parameters of the matching
-                if "MinimalEfficiency" in tracking_coverage:
-                    tracking_coverage.pop("MinimalEfficiency")
-                if "MinimalPurity" in tracking_coverage:
-                    tracking_coverage.pop("MinimalPurity")
-
                 # Reference Monte Carlo tracks
                 track_finder_mc_truth_module = basf2.register_module('TrackFinderMCTruthRecoTracks')
-                track_finder_mc_truth_module.param({
-                    'RecoTracksStoreArrayName': 'MCRecoTracks',
-                    **tracking_coverage
-                })
 
                 # Track matcher
                 mc_track_matcher_module = basf2.register_module('MCRecoTracksMatcher')
 
-                mc_track_matcher_module.param({
-                    'mcRecoTracksStoreArrayName': 'MCRecoTracks',
-                    'MinimalPurity': 0.66,
-                    'prRecoTracksStoreArrayName': "RecoTracks",
-                    **matching_coverage
-                })
-
                 path.add_module(IfMCParticlesPresentModule(track_finder_mc_truth_module))
                 path.add_module(IfMCParticlesPresentModule(mc_track_matcher_module))
+
+            # this ensures that the parameters are set in both cases (if the modules have been added or are already in the path)
+            # only check for containment to also cope with the "IfMCParticlesPresentModule" cases correctly
+            for module in path.modules():
+                if 'MCRecoTracksMatcher' in module.name():
+                    module.param({
+                          'mcRecoTracksStoreArrayName': 'MCRecoTracks',
+                          'MinimalPurity': 0.66,
+                          'prRecoTracksStoreArrayName': "RecoTracks",
+                          **matching_coverage
+                        })
+                if 'TrackFinderMCTruthRecoTracks' in module.name():
+                    module.param({
+                          'RecoTracksStoreArrayName': 'MCRecoTracks',
+                          **tracking_coverage
+                        })
 
         if self.fit_tracks:
             # Fit tracks
@@ -125,6 +132,8 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
 
 def add_standard_finder(path):
+    """adds the standard track finding to the path"""
+
     import tracking
     components = None
     for module in path.modules():
@@ -175,6 +184,7 @@ def add_cosmics_reconstruction(path):
         components = None
     reconstruction.add_cosmics_reconstruction(path, components=components)
 
+
 finder_modules_by_short_name = {
     'MC': 'TrackFinderMCTruthRecoTracks',
     'Reconstruction': add_standard_reconstruction,
@@ -221,7 +231,10 @@ finder_modules_by_short_name = {
 
 
 class StandardReconstructionEventsRun(ReadOrGenerateTrackedEventsRun):
+    """Generate, simulate and reconstruct events"""
+    #: Use EvtGen for the event generator
     generator_module = 'EvtGenInput'
 
     def finder_module(self, path):
+        """Add track reconstruction to the basf2 path"""
         tracking.add_tracking_reconstruction(path, components=self.components)

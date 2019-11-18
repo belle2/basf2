@@ -105,8 +105,8 @@ CDCTriggerMCMatcherModule::event()
   for (int imc = 0; imc < m_mcParticles.getEntries(); ++imc) {
     MCParticle* mcParticle = m_mcParticles[imc];
 
-    // minimum requirement: charged and seen in CDC
-    if (!mcParticle->hasSeenInDetector(Const::CDC) || mcParticle->getCharge() == 0)
+    // minimum requirement: seen in CDC, unless monopoles
+    if (!mcParticle->hasSeenInDetector(Const::CDC) || (mcParticle->getCharge() == 0 && abs(mcParticle->getPDG()) != 99666))
       continue;
 
     // reject secondaries

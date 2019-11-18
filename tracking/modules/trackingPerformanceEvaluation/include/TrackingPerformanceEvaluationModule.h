@@ -13,8 +13,6 @@
 #include <framework/core/Module.h>
 #include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
 
-#include <TTree.h>
-#include <TFile.h>
 #include <TList.h>
 #include <TH1F.h>
 #include <TH2F.h>
@@ -25,13 +23,8 @@
 
 // forward declarations
 namespace Belle2 {
-  class MCParticle;
   class Track;
   class TrackFitResult;
-
-  template< class T >
-  class StoreArray;
-
 
   /** This module takes the MCParticles, the Tracks, the RecoTrack,
    *  and the MCRecoTracks input and produce a root file containing various histograms
@@ -153,7 +146,7 @@ namespace Belle2 {
     TH2F* m_h2_d0errVSpt = nullptr; /**< error */
     TH2F* m_h2_d0errMSVSpt = nullptr; /**< error */
 
-    TH2F* m_h2_chargeVSchargeMC = nullptr; //**< charge comparison */
+    TH2F* m_h2_chargeVSchargeMC = nullptr; /**< charge comparison */
 
     //histograms used for efficiency plots
     TH1F* m_h1_HitsRecoTrackPerMCRecoTrack = nullptr;  /**< hits */
@@ -178,11 +171,11 @@ namespace Belle2 {
     TH3F* m_h3_TracksPerMCRecoTrack_minus = nullptr;  /**< efficiency*/
 
     //histograms used for purity plots
-    TH3F* m_h3_MCParticlesPerTrack = nullptr;  /**< purityy*/
+    TH3F* m_h3_MCParticlesPerTrack = nullptr;  /**< purity*/
     TH3F* m_h3_Tracks = nullptr; /**< purity*/
 
   };
 } // end of namespace
 
 
-#endif /* TRACKINGPERFORMANCEEVALUAITONMODULE_H_ */
+#endif /* TRACKINGPERFORMANCEEVALUATIONMODULE_H_ */

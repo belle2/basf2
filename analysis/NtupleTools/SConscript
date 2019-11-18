@@ -1,6 +1,0 @@
-Import('env')
-env['SUBLIB'] = True
-env['LIBS'] = ['framework', 'analysis', 'analysis_utility', 'analysis_dataobjects', 'analysis_DecayDescriptor', 'mdst_dataobjects']
-
-Return('env')
-

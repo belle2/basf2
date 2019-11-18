@@ -28,7 +28,9 @@ namespace Belle2 {
    */
   template <class AllStateFilter>
   class NonIPCrossingStateFilter : public AllStateFilter {
+    /// The object to filter
     using Object = typename AllStateFilter::Object;
+    /// The parent class
     using Super = AllStateFilter;
   public:
     /// Main function testing the object for the direction

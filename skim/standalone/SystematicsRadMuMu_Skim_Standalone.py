@@ -13,19 +13,16 @@
 from basf2 import process, statistics, Path, set_log_level, LogLevel
 from modularAnalysis import inputMdstList, skimOutputUdst, summaryOfLists
 from stdCharged import stdMu
-from skimExpertFunctions import encodeSkimName, setSkimLogging
-
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-00-00'
+gb2_setuprel = 'release-04-00-00'
 
 # create a path to build skim lists
 skimpath = Path()
 
 # input test data
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002314/e0000/4S/r00000/mumu_ecldigits/sub00/' +
-    'mdst_000001_prod00002314_task00000001.root']
-inputMdstList('MC9', fileList, path=skimpath)
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=skimpath)
 stdMu('all', path=skimpath)
 
 # setup the skim get the skim code

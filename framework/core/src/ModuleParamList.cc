@@ -15,7 +15,6 @@
 #include <boost/python/object.hpp>
 #include <boost/python/list.hpp>
 
-#include <algorithm>
 #include <utility>
 #include <memory>
 
@@ -45,9 +44,7 @@ void ModuleParamList::throwTypeError(const std::string& name,
   throw (ModuleParameterTypeError() << name << expectedTypeInfo << typeInfo);
 }
 
-ModuleParamList::ModuleParamList()
-{
-}
+ModuleParamList::ModuleParamList() = default;
 
 
 ModuleParamList::~ModuleParamList()
@@ -59,7 +56,7 @@ ModuleParamList::~ModuleParamList()
 std::vector<std::string> ModuleParamList::getUnsetForcedParams() const
 {
   std::vector<std::string> missingParam;
-  for (const std::pair<std::string, ModuleParamPtr>& mapEntry : m_paramMap) {
+  for (const auto& mapEntry : m_paramMap) {
     if (mapEntry.second->isForcedInSteering() && !mapEntry.second->isSetInSteering())
       missingParam.push_back(mapEntry.first);
   }

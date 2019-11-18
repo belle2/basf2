@@ -148,8 +148,8 @@ void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject
     const std::string& cutIdentifier = cutWithName.first;
     const auto& cut = cutWithName.second;
     B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << ")");
-    const SoftwareTriggerCutResult& cutResult = cut->checkPreScaled(prefilledObject);
-    m_resultStoreObjectPointer->addResult(cutIdentifier, cutResult);
+    const auto& [prescaledCutResult, nonPrescaledCutResult] = cut->check(prefilledObject);
+    m_resultStoreObjectPointer->addResult(cutIdentifier, prescaledCutResult, nonPrescaledCutResult);
   }
 
   // Also add the module result ( = the result of all cuts with this basename) for later reference.

@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # --------------------------------------------------------------------------------
-# Example of using Database importer for importing Module T0 constants to local database
-# Name and location of local DB can also be changed
+# Import dummy payloads
 # --------------------------------------------------------------------------------
 
 from basf2 import *
@@ -15,9 +14,8 @@ import glob
 import subprocess
 from fnmatch import fnmatch
 
-# define a local database (will be created automatically, if doesn't exist)
-use_local_database("localDB/localDB.txt", "localDB", False)
 
+# Create path
 main = create_path()
 
 # Event info setter - execute single event
@@ -29,15 +27,16 @@ main.add_module(eventinfosetter)
 gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 
-geometry = register_module('Geometry')
-geometry.param('useDB', False)
-geometry.param('components', ['TOP'])
-main.add_module(geometry)
+# Initialize TOP geometry parameters from gearbox
+main.add_module('TOPGeometryParInitializer', useDB=False)
 
 # process single event
 process(main)
 
-# and then run the importer (note: input file is not there - must change the path!)
+# define a local database (will be created automatically, if doesn't exist)
+use_local_database("localDB/localDB.txt")
+
+# and then run the importer
 dbImporter = TOPDatabaseImporter()
 
 # import constants
@@ -52,3 +51,4 @@ dbImporter.importDummyCalChannelThresholdEff()
 dbImporter.importDummyCalChannelThreshold()
 dbImporter.importDummyCalCommonT0()
 dbImporter.importDummyCalIntegratedCharge()
+dbImporter.importDummyCalAsicShift()

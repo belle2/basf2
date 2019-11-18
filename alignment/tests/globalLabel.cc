@@ -1,24 +1,15 @@
+
+#include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/GlobalLabel.h>
 #include <alignment/PedeResult.h>
-
-#include <vxd/dataobjects/VxdID.h>
 #include <cdc/dataobjects/WireID.h>
+#include <cdc/dbobjects/CDCAlignment.h>
+#include <vxd/dataobjects/VxdID.h>
+
 #include <gtest/gtest.h>
+
 #include <iostream>
 #include <string>
-
-#include <framework/database/Database.h>
-
-#include <TFile.h>
-#include <TTree.h>
-#include <TH1F.h>
-
-#include <TClonesArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <alignment/dbobjects/VXDAlignment.h>
-#include <cdc/dbobjects/CDCAlignment.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -148,7 +139,8 @@ namespace Belle2 {
     EXPECT_EQ(100873609, (unsigned int)vxdlabel2);
 
     // Assignment
-    GlobalLabel other = GlobalLabel::construct<CDCAlignment>(cdcWire, 20);
+    GlobalLabel other = GlobalLabel::construct<CDCAlignment>(cdcWire, 2);
+    EXPECT_EQ(270620402, other.label());
     other = vxdlabel1;
     EXPECT_EQ(100873609, other.label());
   }

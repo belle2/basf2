@@ -41,9 +41,9 @@ namespace Belle2 {
       virtual void event() override;
 
     private:
-      /**< Required input for PXDRawHit */
+      /** Required input for PXDRawHit */
       StoreArray<PXDRawHit> m_storeRawHits;
-      /**< Required input for PXD Daq Status */
+      /** Required input for PXD Daq Status */
       StoreObjPtr<PXDDAQStatus> m_storeDaqStatus;
       /** Output array for PXDDigits. */
       StoreArray<PXDDigit> m_storeDigits;

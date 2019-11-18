@@ -138,9 +138,9 @@ void ECLClusterPropertiesModule::computeDepth(const ECLShower& shower, double& l
   TVector3 w0 = showerCenter - trkpos;
   double costh = avgDir.Unit() * trkdir;
   double sin2th = 1 - costh * costh;
-  lShower = costh * (w0 * trkdir) - w0 * avgDir;
+  lShower = costh * (w0 * trkdir) - w0 * avgDir.Unit();
   lShower /= sin2th;
 
-  lTrk = w0 * trkdir - costh * (w0 * avgDir);
+  lTrk = w0 * trkdir - costh * (w0 * avgDir.Unit());
   lTrk /= sin2th;
 }

@@ -17,6 +17,10 @@
 #pragma link C++ class Belle2::TRGCDCTSFUnpackerStore+;
 #pragma link C++ class Belle2::TRGCDCETFUnpackerStore+;
 
+#pragma link C++ class Belle2::Bitstream<array<array<array<char, 429>, 4>, 5> >+;
+#pragma link C++ class Belle2::Bitstream<array<array<array<char, TSF_TO_2D_WIDTH>, NUM_2D>, NUM_TSF> >+;
+#pragma link C++ class Belle2::Bitstream<array<array<bitset<TSF_TO_2D_WIDTH>, NUM_2D>,NUM_TSF> >+;
+
 #pragma link C++ class Belle2::TRGCDCT3DUnpackerStore+;
 #pragma link C++ class Belle2::Bitstream<array<bitset<MERGER_WIDTH>, NUM_MERGER> >+;
 #pragma link C++ class Belle2::Bitstream<array<array<array<char, TSF_TO_2D_WIDTH>, NUM_2D>, NUM_TSF> >+;

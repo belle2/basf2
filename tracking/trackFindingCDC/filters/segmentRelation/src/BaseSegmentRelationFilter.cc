@@ -59,6 +59,7 @@ Weight BaseSegmentRelationFilter::operator()(const Relation<const CDCSegment2D>&
   std::vector<const CDCWireHit*> fromWireHits;
   fromWireHits.reserve(from->size());
   for (const CDCRecoHit2D& recoHit2D : *from) {
+    // cppcheck-suppress useStlAlgorithm
     fromWireHits.push_back(&recoHit2D.getWireHit());
   }
   std::sort(fromWireHits.begin(), fromWireHits.end());
@@ -69,7 +70,7 @@ Weight BaseSegmentRelationFilter::operator()(const Relation<const CDCSegment2D>&
     }
   }
 
-  if (1.0 * nOverlap / from->size() > 0.8 or 1.0 * nOverlap / from->size() > 0.8) {
+  if (1.0 * nOverlap / from->size() > 0.8) {
     return NAN;
   }
 

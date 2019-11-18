@@ -19,13 +19,13 @@ class VariablesToHDF5(basf2.Module):
     instead of a root file. It is slower as it is implemented in pure python and
     should currently be considered a proof of concept.
     """
-    def __init__(self, filename, listname, variables):
+    def __init__(self, listname, variables, filename):
         """Constructor to initialize the internal state
 
         Arguments:
-            filename(str): name of the hdf5 file to be created
             listname(str): name of the particle list
             variables(list(str)): list of variables to save for each particle
+            filename(str): name of the hdf5 file to be created
         """
         super().__init__()
         #: Output filename
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     p.add_module("EventInfoSetter", evtNumList=100)
     p.add_module("EvtGenInput")
     modularAnalysis.fillParticleListsFromMC([("pi-:gen", "")], path=p)
-    a = VariablesToHDF5("test.hdf5", "pi-:gen", ["M", "E", "px", "py", "pz"])
+    a = VariablesToHDF5("pi-:gen", ["M", "E", "px", "py", "pz"], "test.hdf5")
     p.add_module(a)
     # Process the events
     basf2.process(p)

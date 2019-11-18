@@ -10,22 +10,12 @@
 
 #include <analysis/modules/RestOfEventUpdater/RestOfEventUpdaterModule.h>
 
-
-#include <analysis/variables/Variables.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/MCParticle.h>
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h> //
-#include <framework/dataobjects/EventMetaData.h> //
 
 #include <framework/logging/Logger.h>
 
 #include <iostream>
-#include <utility>
 
 using namespace std;
 
@@ -49,15 +39,12 @@ namespace Belle2 {
     // Add parameters
     std::vector<std::string> emptyMaskVector;
     std::string emptyCutString;
-    std::vector<double> defaultFractionsVector = {0, 0, 1, 0, 0, 0};
 
     addParam("particleList", m_inputListName, "Name of the ParticleList which contains information that will be used for updating");
     addParam("updateMasks", m_maskNamesForUpdating, "List of all mask names which will be updated", emptyMaskVector);
     addParam("cutString", m_selection, "Cut string which will be used for updating masks", emptyCutString);
     addParam("discard", m_discard,
              "Update the ROE mask by passing or discarding particles in the provided particle list, default is to pass", false);
-    addParam("fractions", m_fractions, "A-priori fractions used to update (default: pion always, empty vector: no change)",
-             defaultFractionsVector);
   }
 
   void RestOfEventUpdaterModule::initialize()
@@ -99,7 +86,8 @@ namespace Belle2 {
       updateMasksWithV0(roe, particlesToUpdate);
     }
   }
-  void RestOfEventUpdaterModule::updateMasksWithV0(StoreObjPtr<RestOfEvent> roe, std::vector<const Particle*>& particlesToUpdate)
+  void RestOfEventUpdaterModule::updateMasksWithV0(const StoreObjPtr<RestOfEvent>& roe,
+                                                   std::vector<const Particle*>& particlesToUpdate)
   {
     if (particlesToUpdate.size() == 0) {
       B2DEBUG(10, "No particles in list provided, nothing to do");
@@ -118,7 +106,7 @@ namespace Belle2 {
     }
 
   }
-  void RestOfEventUpdaterModule::updateMasksWithParticles(StoreObjPtr<RestOfEvent> roe,
+  void RestOfEventUpdaterModule::updateMasksWithParticles(const StoreObjPtr<RestOfEvent>& roe,
                                                           std::vector<const Particle*>& particlesToUpdate, Particle::EParticleType listType)
   {
     for (auto& maskToUpdate : m_maskNamesForUpdating) {

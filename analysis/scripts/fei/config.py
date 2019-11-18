@@ -220,8 +220,8 @@ class Particle(object):
         # At the moment all channels must have the same target variable. Why?
         if mvaConfig is not None and mvaConfig.target != self.mvaConfig.target:
             basf2.B2FATAL(
-                'Particle %s has common target %s, while channel %s has %s. Each particle must have exactly one target!' %
-                (self.identifier, self.mvaConfig.target, ' '.join(daughters), mvaConfig.target))
+                f'Particle {self.identifier} has common target {self.mvaConfig.target}, while channel '
+                f'{" ".join(daughters)} has {mvaConfig.target}. Each particle must have exactly one target!')
         # Replace generic-variables with ordinary variables.
         # All instances of {} are replaced with all combinations of daughter indices
         mvaVars = []

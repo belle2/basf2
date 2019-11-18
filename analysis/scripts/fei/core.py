@@ -635,13 +635,13 @@ class Teacher(object):
                         continue
                     variable_str = "' '".join(channel.mvaConfig.variables)
 
-                    command = f"{self.config.externTeacher} " \
-                        f"--method '{channel.mvaConfig.method}' " \
-                        f"--target_variable '{channel.mvaConfig.target}'"\
-                        f"--treename variables --datafile '{channel.label}.root' "\
-                        f"--signal_class 1 --variables '{variable_str}' " \
-                        f"--identifier '{channel.label}.xml' " \
-                        f"{channel.mvaConfig.config} > '{channel.label}'.log 2>&1"
+                    command = (f"{self.config.externTeacher}"
+                               f" --method '{channel.mvaConfig.method}'"
+                               f" --target_variable '{channel.mvaConfig.target}'"
+                               f" --treename variables --datafile '{channel.label}.root'"
+                               f" --signal_class 1 --variables '{variable_str}'"
+                               f" --identifier '{channel.label}.xml'"
+                               f" {channel.mvaConfig.config} > '{channel.label}'.log 2>&1")
                     B2INFO(f"Used following command to invoke teacher: \n {command}")
                     job_list.append((channel.label, command))
 

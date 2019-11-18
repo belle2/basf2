@@ -21,9 +21,7 @@ from ROOT import Belle2
 Belle2.Variable.Manager.Instance()
 
 import pdg
-
 import numpy as np
-
 import os
 import math
 import functools
@@ -123,9 +121,9 @@ class Statistic(object):
 
     def __str__(self):
         """ Returns a string representation of a Statistic object. """
-        o = "nTrueSig {}    nSig {}    nBg {}\n".format(self.nTrueSig, self.nSig, self.nBg)
-        o += "Efficiency {:.3f} ({:.3f})\n".format(self.efficiency, self.efficiencyError)
-        o += "Purity {:.3f} ({:.3f})\n".format(self.purity, self.purityError)
+        o = f"nTrueSig {self.nTrueSig}    nSig {self.nSig}    nBg {self.nBg}\n"
+        o += f"Efficiency {self.efficiency:.3f} ({self.efficiencyError:.3f})\n"
+        o += f"Purity {self.purity:.3f} ({self.purityError:.3f})\n"
         return o
 
     def __add__(self, a):
@@ -331,9 +329,9 @@ def MonitorCosBDLPlot(particle, filename):
         p.add(df, 'cosThetaBDl', common & (df['signal'] == 1), label="Signal")
         p.add(df, 'cosThetaBDl', common & (df['signal'] == 0), label="Background")
         p.finish()
-        p.axis.set_title("Cosine of Theta between B and Dl system for signal probability >= {:.2f}".format(cut))
+        p.axis.set_title(f"Cosine of Theta between B and Dl system for signal probability >= {cut:.2f}")
         p.axis.set_xlabel("CosThetaBDl")
-        p.save('{}_{}.png'.format(filename, i))
+        p.save(f'{filename}_{i}.png')
 
 
 def MonitorMbcPlot(particle, filename):
@@ -350,9 +348,9 @@ def MonitorMbcPlot(particle, filename):
         p.add(df, 'Mbc', common & (df['signal'] == 1), label="Signal")
         p.add(df, 'Mbc', common & (df['signal'] == 0), label="Background")
         p.finish()
-        p.axis.set_title("Beam constrained mass for signal probability >= {:.2f}".format(cut))
+        p.axis.set_title(f"Beam constrained mass for signal probability >= {cut:.2f}")
         p.axis.set_xlabel("Mbc")
-        p.save('{}_{}.png'.format(filename, i))
+        p.save(f'{filename}_{i}.png')
 
 
 def MonitorROCPlot(particle, filename):
@@ -393,7 +391,7 @@ def MonitoringMCCount(particle):
     """
     root_file = ROOT.TFile('mcParticlesCount.root')
 
-    key = 'NumberOfMCParticlesInEvent({})'.format(abs(pdg.from_name(particle.name)))
+    key = f'NumberOfMCParticlesInEvent({abs(pdg.from_name(particle.name))})'
     Belle2.Variable.Manager
     key = Belle2.makeROOTCompatible(key)
     hist = root_file.Get(key)
@@ -585,30 +583,30 @@ class MonitoringParticle(object):
         self.ignored_channels = {}
 
         for channel in self.particle.channels:
-            hist = MonitoringHist('Monitor_PreReconstruction_BeforeRanking_{}.root'.format(channel.label))
+            hist = MonitoringHist(f'Monitor_PreReconstruction_BeforeRanking_{channel.label}.root')
             self.before_ranking[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist('Monitor_PreReconstruction_AfterRanking_{}.root'.format(channel.label))
+            hist = MonitoringHist(f'Monitor_PreReconstruction_AfterRanking_{channel.label}.root')
             self.after_ranking[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist('Monitor_MatchParticleList_AfterVertex_{}.root'.format(channel.label))
+            hist = MonitoringHist(f'Monitor_MatchParticleList_AfterVertex_{channel.label}.root')
             self.after_vertex[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist('Monitor_PostReconstruction_AfterMVA_{}.root'.format(channel.label))
+            hist = MonitoringHist(f'Monitor_PostReconstruction_AfterMVA_{channel.label}.root')
             self.after_classifier[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
             if hist.valid and hist.sum(channel.mvaConfig.target) > 0:
                 self.reconstructed_number_of_channels += 1
                 self.ignored_channels[channel.label] = False
             else:
                 self.ignored_channels[channel.label] = True
-            hist = MonitoringHist('Monitor_TrainingData_{}.root'.format(channel.label))
+            hist = MonitoringHist(f'Monitor_TrainingData_{channel.label}.root')
             self.training_data[channel.label] = hist
 
         plist = removeJPsiSlash(particle.identifier)
-        hist = MonitoringHist('Monitor_PostReconstruction_BeforePostCut_{}.root'.format(plist))
+        hist = MonitoringHist(f'Monitor_PostReconstruction_BeforePostCut_{plist}.root')
         #: Monitoring histogram in PostReconstruction before the postcut
         self.before_postcut = self.calculateStatistic(hist, self.particle.mvaConfig.target)
-        hist = MonitoringHist('Monitor_PostReconstruction_BeforeRanking_{}.root'.format(plist))
+        hist = MonitoringHist(f'Monitor_PostReconstruction_BeforeRanking_{plist}.root')
         #: Monitoring histogram in PostReconstruction before the ranking postcut
         self.before_ranking_postcut = self.calculateStatistic(hist, self.particle.mvaConfig.target)
-        hist = MonitoringHist('Monitor_PostReconstruction_AfterRanking_{}.root'.format(plist))
+        hist = MonitoringHist(f'Monitor_PostReconstruction_AfterRanking_{plist}.root')
         #: Monitoring histogram in PostReconstruction after the ranking postcut
         self.after_ranking_postcut = self.calculateStatistic(hist, self.particle.mvaConfig.target)
         #: Statistic object before unique tagging of signals
@@ -616,7 +614,7 @@ class MonitoringParticle(object):
         #: Statistic object after unique tagging of signals
         self.after_tag = self.calculateUniqueStatistic(hist)
         #: Reference to the final ntuple
-        self.final_ntuple = MonitoringNTuple('Monitor_Final_{}.root'.format(plist))
+        self.final_ntuple = MonitoringNTuple(f'Monitor_Final_{plist}.root')
 
     def calculateStatistic(self, hist, target):
         """

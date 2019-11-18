@@ -119,7 +119,7 @@ class TrainingDataInformation(object):
         path = basf2.create_path()
         module = register_module('VariablesToHistogram')
         module.set_name("VariablesToHistogram_MCCount")
-        module.param('variables', [('NumberOfMCParticlesInEvent({i})'.format(i=pdg), 100, -0.5, 99.5) for pdg in pdgs])
+        module.param('variables', [(f'NumberOfMCParticlesInEvent({pdg})', 100, -0.5, 99.5) for pdg in pdgs])
         module.param('fileName', self.filename)
         path.add_module(module)
         return path
@@ -195,7 +195,7 @@ class FSPLoader(object):
             names = ['e+', 'K+', 'pi+', 'mu+', 'gamma', 'K_S0', 'p+', 'K_L0', 'Lambda0', 'pi0']
             filename = 'Monitor_FSPLoader.root'
             pdgs = set([abs(pdg.from_name(name)) for name in names])
-            variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdg), 100, -0.5, 99.5) for pdg in pdgs]
+            variables = [(f'NumberOfMCParticlesInEvent({pdg})', 100, -0.5, 99.5) for pdg in pdgs]
             variablesToHistogram('', variables=variables, filename=filename, path=path)
         return path
 
@@ -240,7 +240,7 @@ class TrainingData(object):
                 nSignal /= 10000
 
             for channel in particle.channels:
-                filename = '{}.root'.format(channel.label)
+                filename = f'{channel.label}.root'
 
                 nBackground = self.mc_counts[0]['sum'] * channel.preCutConfig.bestCandidateCut
                 inverseSamplingRates = {}
@@ -257,7 +257,7 @@ class TrainingData(object):
                     hist_variables = ['mcErrors', 'mcParticleStatus'] + channel.mvaConfig.variables + spectators
                     hist_variables_2d = [(x, channel.mvaConfig.target)
                                          for x in channel.mvaConfig.variables + spectators if x is not channel.mvaConfig.target]
-                    hist_filename = 'Monitor_TrainingData_{}.root'.format(channel.label)
+                    hist_filename = f'Monitor_TrainingData_{channel.label}.root'
                     variablesToHistogram(channel.name,
                                          variables=config.variables2binnings(hist_variables),
                                          variables_2d=config.variables2binnings_2d(hist_variables_2d),
@@ -308,7 +308,7 @@ class PreReconstruction(object):
 
                 if len(channel.daughters) == 1:
                     cutAndCopyList(channel.name, channel.daughters[0], channel.preCutConfig.userCut, writeOut=True, path=path)
-                    variablesToExtraInfo(channel.name, {'constant({})'.format(channel.decayModeID): 'decayModeID'}, path=path)
+                    variablesToExtraInfo(channel.name, {f'constant({channel.decayModeID})': 'decayModeID'}, path=path)
                 else:
                     reconstructDecay(channel.decayString, channel.preCutConfig.userCut, channel.decayModeID,
                                      writeOut=True, path=path)
@@ -319,7 +319,7 @@ class PreReconstruction(object):
                     hist_variables_2d = [(bc_variable, channel.mvaConfig.target),
                                          (bc_variable, 'mcErrors'),
                                          (bc_variable, 'mcParticleStatus')]
-                    filename = 'Monitor_PreReconstruction_BeforeRanking_{}.root'.format(channel.label)
+                    filename = f'Monitor_PreReconstruction_BeforeRanking_{channel.label}.root'
                     variablesToHistogram(channel.name,
                                          variables=config.variables2binnings(hist_variables),
                                          variables_2d=config.variables2binnings_2d(hist_variables_2d),
@@ -341,7 +341,7 @@ class PreReconstruction(object):
                     raise RuntimeError("Unknown bestCandidateMode " + repr(channel.preCutConfig.bestCandidateMode))
 
                 if self.config.monitor:
-                    filename = 'Monitor_PreReconstruction_AfterRanking_{}.root'.format(channel.label)
+                    filename = f'Monitor_PreReconstruction_AfterRanking_{channel.label}.root'
                     hist_variables += ['extraInfo(preCut_rank)']
                     hist_variables_2d += [('extraInfo(preCut_rank)', channel.mvaConfig.target),
                                           ('extraInfo(preCut_rank)', 'mcErrors'),
@@ -356,7 +356,7 @@ class PreReconstruction(object):
                     matchMCTruth(channel.name, path=path)
 
                 if re.findall(r"[\w']+", channel.decayString).count('pi0') > 1:
-                    B2INFO("Ignoring vertex fit because multiple pi0 are not supported yet {c}.".format(c=channel.name))
+                    B2INFO(f"Ignoring vertex fit because multiple pi0 are not supported yet {channel.name}.")
                 elif len(channel.daughters) > 1:
                     pvfit = register_module('ParticleVertexFitter')
                     pvfit.set_name('ParticleVertexFitter_' + channel.name)
@@ -372,7 +372,7 @@ class PreReconstruction(object):
                     hist_variables_2d = [('chiProb', channel.mvaConfig.target),
                                          ('chiProb', 'mcErrors'),
                                          ('chiProb', 'mcParticleStatus')]
-                    filename = 'Monitor_PreReconstruction_AfterVertex_{}.root'.format(channel.label)
+                    filename = f'Monitor_PreReconstruction_AfterVertex_{channel.label}.root'
                     variablesToHistogram(channel.name,
                                          variables=config.variables2binnings(hist_variables),
                                          variables_2d=config.variables2binnings_2d(hist_variables_2d),
@@ -455,7 +455,7 @@ class PostReconstruction(object):
                                          ('extraInfo(decayModeID)', 'mcErrors'),
                                          ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                          ('extraInfo(decayModeID)', 'mcParticleStatus')]
-                    filename = 'Monitor_PostReconstruction_AfterMVA_{}.root'.format(channel.label)
+                    filename = f'Monitor_PostReconstruction_AfterMVA_{channel.label}.root'
                     variablesToHistogram(channel.name,
                                          variables=config.variables2binnings(hist_variables),
                                          variables_2d=config.variables2binnings_2d(hist_variables_2d),
@@ -473,7 +473,7 @@ class PostReconstruction(object):
                 hist_variables_2d = [('extraInfo(decayModeID)', particle.mvaConfig.target),
                                      ('extraInfo(decayModeID)', 'mcErrors'),
                                      ('extraInfo(decayModeID)', 'mcParticleStatus')]
-                filename = 'Monitor_PostReconstruction_BeforePostCut_{}.root'.format(particle.identifier)
+                filename = f'Monitor_PostReconstruction_BeforePostCut_{particle.identifier}.root'
                 variablesToHistogram(particle.identifier,
                                      variables=config.variables2binnings(hist_variables),
                                      variables_2d=config.variables2binnings_2d(hist_variables_2d),
@@ -482,7 +482,7 @@ class PostReconstruction(object):
             applyCuts(particle.identifier, cutstring, path=path)
 
             if self.config.monitor:
-                filename = 'Monitor_PostReconstruction_BeforeRanking_{}.root'.format(particle.identifier)
+                filename = f'Monitor_PostReconstruction_BeforeRanking_{particle.identifier}.root'
                 variablesToHistogram(particle.identifier,
                                      variables=config.variables2binnings(hist_variables),
                                      variables_2d=config.variables2binnings_2d(hist_variables_2d),
@@ -497,7 +497,7 @@ class PostReconstruction(object):
                                       (particle.mvaConfig.target, 'extraInfo(postCut_rank)'),
                                       ('mcErrors', 'extraInfo(postCut_rank)'),
                                       ('mcParticleStatus', 'extraInfo(postCut_rank)')]
-                filename = 'Monitor_PostReconstruction_AfterRanking_{}.root'.format(particle.identifier)
+                filename = f'Monitor_PostReconstruction_AfterRanking_{particle.identifier}.root'
                 variablesToHistogram(particle.identifier,
                                      variables=config.variables2binnings(hist_variables),
                                      variables_2d=config.variables2binnings_2d(hist_variables_2d),
@@ -510,7 +510,7 @@ class PostReconstruction(object):
                     variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
                                  'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
 
-                filename = 'Monitor_Final_{}.root'.format(particle.identifier)
+                filename = f'Monitor_Final_{particle.identifier}.root'
                 variablesToNtuple(particle.identifier, variables, treename='variables',
                                   filename=config.removeJPsiSlash(filename), path=path)
 
@@ -550,7 +550,7 @@ class Teacher(object):
         Create a fake weightfile using the trivial method, it will always return 0.0
         @param channel for which we create a fake weightfile
         """
-        content = """
+        content = f"""
             <?xml version="1.0" encoding="utf-8"?>
             <method>Trivial</method>
             <weightfile>{channel}.xml</weightfile>
@@ -567,7 +567,7 @@ class Teacher(object):
             <Trivial_version>1</Trivial_version>
             <Trivial_output>0</Trivial_output>
             <signal_fraction>0.066082567</signal_fraction>
-            """.format(channel=channel)
+            """
         with open(channel + ".xml", "w") as f:
             f.write(content)
 
@@ -590,10 +590,6 @@ class Teacher(object):
         """
         disk = channel + '.xml'
         dbase = self.config.prefix + '_' + channel
-        # Up to now, we uploaded the weightfile twice, once in a subprocess and once in python
-        # This makes sometimes a differences because the database cache directory can be different!
-        # Hence we upload our weightfile multiple times, to make sure that it is always found.
-        # subprocess.call("basf2_mva_upload --identifier '{disk}' --db_identifier '{db}'".format(disk=disk, db=dbase), shell=True)
         basf2_mva.upload(disk, dbase)
         return (disk, dbase)
 
@@ -604,21 +600,21 @@ class Teacher(object):
         job_list = []
         for particle in self.particles:
             for channel in particle.channels:
-                filename = '{}.root'.format(channel.label)
+                filename = f'{channel.label}.root'
                 # weightfile = self.config.prefix + '_' + channel.label
                 weightfile = channel.label + '.xml'
                 if not basf2_mva.available(weightfile) and os.path.isfile(filename):
                     f = ROOT.TFile(filename)
                     if not f:
-                        B2WARNING("Training of MVC failed. Couldn't find ROOT file. "
-                                  "Ignoring channel {}.".format(channel.label))
+                        B2WARNING(f"Training of MVC failed. Couldn't find ROOT file. "
+                                  "Ignoring channel {channel.label}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
                     l = [m for m in f.GetListOfKeys()]
                     if not l:
-                        B2WARNING("Training of MVC failed. ROOT file does not contain a tree. "
-                                  "Ignoring channel {}.".format(channel.label))
+                        B2WARNING(f"Training of MVC failed. ROOT file does not contain a tree. "
+                                  "Ignoring channel {channel.label}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
@@ -626,30 +622,27 @@ class Teacher(object):
                     nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1.0')
                     nBg = tree.GetEntries(channel.mvaConfig.target + ' != 1.0')
                     if nSig < Teacher.MinimumNumberOfMVASamples:
-                        B2WARNING("Training of MVC failed."
-                                  "Tree contains too few signal events {}. Ignoring channel.".format(nSig))
+                        B2WARNING(f"Training of MVC failed."
+                                  "Tree contains too few signal events {nSig}. Ignoring channel.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
                     if nBg < Teacher.MinimumNumberOfMVASamples:
-                        B2WARNING("Training of MVC failed."
-                                  "Tree contains too few bckgrd events {}. Ignoring channel.".format(nBg))
+                        B2WARNING(f"Training of MVC failed."
+                                  "Tree contains too few bckgrd events {nBg}. Ignoring channel.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
+                    variable_str = "' '".join(channel.mvaConfig.variables)
 
-                    command = (
-                        "{externTeacher} --method '{method}' --target_variable '{target}' "
-                        "--treename variables --datafile '{prefix}.root' "
-                        "--signal_class 1 --variables '{variables}' --identifier '{prefix}.xml' {config} "
-                        "> '{prefix}'.log 2>&1".format(
-                            externTeacher=self.config.externTeacher,
-                            method=channel.mvaConfig.method,
-                            config=channel.mvaConfig.config,
-                            target=channel.mvaConfig.target,
-                            variables="' '".join(channel.mvaConfig.variables),
-                            prefix=channel.label))
-                    B2INFO("Used following command to invoke teacher\n" + command)
+                    command = f"{self.config.externTeacher} " \
+                        f"--method '{channel.mvaConfig.method}' " \
+                        f"--target_variable '{channel.mvaConfig.target}'"\
+                        f"--treename variables --datafile '{channel.label}.root' "\
+                        f"--signal_class 1 --variables '{variable_str}' " \
+                        f"--identifier '{channel.label}.xml' " \
+                        f"{channel.mvaConfig.config} > '{channel.label}'.log 2>&1"
+                    B2INFO(f"Used following command to invoke teacher: \n {command}")
                     job_list.append((channel.label, command))
 
         p = multiprocessing.Pool(None, maxtasksperchild=1)
@@ -712,7 +705,7 @@ def get_stages_from_particles(particles: typing.Sequence[config.Particle]):
 
     for p in particles:
         if p.name not in [p.name for stage in stages for p in stage]:
-            raise RuntimeError("Unknown particle {}: Not implemented in FEI".format(p.name))
+            raise RuntimeError(f"Unknown particle {p.name}: Not implemented in FEI")
 
     return stages
 
@@ -743,8 +736,8 @@ def save_summary(particles: typing.Sequence[config.Particle], configuration: con
                                             configuration.training)
     # Backup existing Summary.pickle files
     for i in [8, 7, 6, 5, 4, 3, 2, 1, 0]:
-        if os.path.isfile('Summary.pickle.backup_{}'.format(i)):
-            shutil.copyfile('Summary.pickle.backup_{}'.format(i), 'Summary.pickle.backup_{}'.format(i + 1))
+        if os.path.isfile(f'Summary.pickle.backup_{i}'):
+            shutil.copyfile(f'Summary.pickle.backup_{i}', f'Summary.pickle.backup_{i + 1}')
     if os.path.isfile('Summary.pickle'):
         shutil.copyfile('Summary.pickle', 'Summary.pickle.backup_0')
     pickle.dump((particles, configuration), open('Summary.pickle', 'wb'))
@@ -871,12 +864,12 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     for stage, stage_particles in enumerate(stages):
         pre_reconstruction = PreReconstruction(stage_particles, configuration)
         if cache <= stage:
-            print("Stage {}: PreReconstruct particles: ".format(stage), [p.name for p in stage_particles])
+            print(f"Stage {stage}: PreReconstruct particles: ", [p.name for p in stage_particles])
             path.add_path(pre_reconstruction.reconstruct())
 
         post_reconstruction = PostReconstruction(stage_particles, configuration)
         if configuration.training and not post_reconstruction.available():
-            print("Stage {}: Create training data for particles: ".format(stage), [p.name for p in stage_particles])
+            print(f"Stage {stage}: Create training data for particles: ", [p.name for p in stage_particles])
             mc_counts = training_data_information.get_mc_counts()
             training_data = TrainingData(stage_particles, configuration, mc_counts)
             path.add_path(training_data.reconstruct())

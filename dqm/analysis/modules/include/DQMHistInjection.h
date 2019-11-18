@@ -69,7 +69,7 @@ namespace Belle2 {
     TH1F* m_hInjectionLERECL = nullptr;
     //! Final Canvas
     TCanvas* m_cInjectionLERECL = nullptr;
-    //! TOP Hits
+    //! TOP Occ
     TH1F* m_hInjectionLERTOP = nullptr;
     //! Final Canvas
     TCanvas* m_cInjectionLERTOP = nullptr;
@@ -85,7 +85,7 @@ namespace Belle2 {
     TH1F* m_hInjectionHERECL = nullptr;
     //! Final Canvas
     TCanvas* m_cInjectionHERECL = nullptr;
-    //! TOP Hits
+    //! TOP Occ
     TH1F* m_hInjectionHERTOP = nullptr;
     //! Final Canvas
     TCanvas* m_cInjectionHERTOP = nullptr;

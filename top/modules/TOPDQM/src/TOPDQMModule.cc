@@ -197,10 +197,10 @@ namespace Belle2 {
     m_badHitsPerEventProf->SetStats(kFALSE);
     m_badHitsPerEventProf->SetMinimum(0);
 
-    hTOPOccAfterInjLER  = new TH1F("TOPOccInjLER", "TOPOccInjLER/Time;Time in #mus;Nhits/Time (#mus bins)", 4000, 0, 20000);
-    hTOPOccAfterInjHER  = new TH1F("TOPOccInjHER", "TOPOccInjHER/Time;Time in #mus;Nhits/Time (#mus bins)", 4000, 0, 20000);
-    hTOPEOccAfterInjLER  = new TH1F("TOPEOccInjLER", "TOPEOccInjLER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
-    hTOPEOccAfterInjHER  = new TH1F("TOPEOccInjHER", "TOPEOccInjHER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
+    m_TOPOccAfterInjLER  = new TH1F("TOPOccInjLER", "TOPOccInjLER/Time;Time in #mus;Nhits/Time (#mus bins)", 4000, 0, 20000);
+    m_TOPOccAfterInjHER  = new TH1F("TOPOccInjHER", "TOPOccInjHER/Time;Time in #mus;Nhits/Time (#mus bins)", 4000, 0, 20000);
+    m_TOPEOccAfterInjLER  = new TH1F("TOPEOccInjLER", "TOPEOccInjLER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
+    m_TOPEOccAfterInjHER  = new TH1F("TOPEOccInjHER", "TOPEOccInjHER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
 
     for (int i = 0; i < m_numModules; i++) {
       int module = i + 1;
@@ -382,10 +382,10 @@ namespace Belle2 {
     m_goodHitsPerEventAll->Reset();
     m_badHitsPerEventProf->Reset();
     m_badHitsPerEventAll->Reset();
-    hTOPOccAfterInjLER->Reset();
-    hTOPOccAfterInjHER->Reset();
-    hTOPEOccAfterInjLER->Reset();
-    hTOPEOccAfterInjHER->Reset();
+    m_TOPOccAfterInjLER->Reset();
+    m_TOPOccAfterInjHER->Reset();
+    m_TOPEOccAfterInjLER->Reset();
+    m_TOPEOccAfterInjHER->Reset();
 
     for (int i = 0; i < m_numModules; i++) {
       m_window_vs_asic[i]->Reset();
@@ -517,11 +517,11 @@ namespace Belle2 {
         unsigned int nentries = m_rawDigits.getEntries();
         float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
         if (it.GetIsHER(0)) {
-          hTOPOccAfterInjHER->Fill(diff2, nentries);
-          hTOPEOccAfterInjHER->Fill(diff2);
+          m_TOPOccAfterInjHER->Fill(diff2, nentries);
+          m_TOPEOccAfterInjHER->Fill(diff2);
         } else {
-          hTOPOccAfterInjLER->Fill(diff2, nentries);
-          hTOPEOccAfterInjLER->Fill(diff2);
+          m_TOPOccAfterInjLER->Fill(diff2, nentries);
+          m_TOPEOccAfterInjLER->Fill(diff2);
         }
       }
     }

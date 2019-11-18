@@ -110,10 +110,10 @@ namespace Belle2 {
     TH1F* m_time = 0; /**< time distribution of good hits */
     TProfile* m_goodHitsPerEventProf = 0; /**< a profile histogram of good hits per event */
     TProfile* m_badHitsPerEventProf = 0; /**< a profile histogram of good hits per event */
-    TH1F* hTOPOccAfterInjLER = 0; /**< Histogram Ndigits after LER injection */
-    TH1F* hTOPOccAfterInjHER = 0; /**< Histogram Ndigits after HER injection */
-    TH1F* hTOPEOccAfterInjLER = 0; /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
-    TH1F* hTOPEOccAfterInjHER = 0; /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
+    TH1F* m_TOPOccAfterInjLER = 0; /**< Histogram Ndigits after LER injection */
+    TH1F* m_TOPOccAfterInjHER = 0; /**< Histogram Ndigits after HER injection */
+    TH1F* m_TOPEOccAfterInjLER = 0; /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
+    TH1F* m_TOPEOccAfterInjHER = 0; /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
 
     std::vector<TH2F*> m_window_vs_asic; /**< Histograms window w.r.t reference vs. ASIC */
     std::vector<TH2F*> m_goodHitsXY; /**< Histograms (2D) for good hits in x-y*/

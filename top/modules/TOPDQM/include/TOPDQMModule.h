@@ -22,6 +22,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 #include <top/dataobjects/TOPRecBunch.h>
 #include <mdst/dataobjects/Track.h>
 
@@ -108,6 +109,10 @@ namespace Belle2 {
     TH1F* m_time = 0; /**< time distribution of good hits */
     TProfile* m_goodHitsPerEventProf = 0; /**< a profile histogram of good hits per event */
     TProfile* m_badHitsPerEventProf = 0; /**< a profile histogram of bad hits per event */
+    TH1F* m_TOPOccAfterInjLER = 0; /**< Histogram Ndigits after LER injection */
+    TH1F* m_TOPOccAfterInjHER = 0; /**< Histogram Ndigits after HER injection */
+    TH1F* m_TOPEOccAfterInjLER = 0; /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
+    TH1F* m_TOPEOccAfterInjHER = 0; /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
 
     std::vector<TH2F*> m_window_vs_asic; /**< Histograms window w.r.t reference vs. ASIC */
     std::vector<TH2F*> m_goodHitsXY; /**< Histograms (2D) for good hits in x-y*/
@@ -128,6 +133,7 @@ namespace Belle2 {
     int m_numModules = 0; /**< number of TOP modules */
 
     // dataobjects
+    StoreArray<RawFTSW> m_rawFTSW; /**< Input array for DAQ Status. */
     StoreArray<TOPDigit> m_digits; /**< collection of digits */
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
     StoreArray<Track> m_tracks;    /**< collection of tracks */

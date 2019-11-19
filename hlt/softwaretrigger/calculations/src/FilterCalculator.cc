@@ -74,9 +74,10 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["nEmedium"] = 0; /**< number of clusters with E*>m_Emedium (higher threshold) */
   calculationResult["nElow"] = 0; /**< number of clusters with E*>m_Elow (lower threshold) */
   calculationResult["nEhigh"] = 0; /**< number of clusters with E*>m_Ehigh (2 GeV) */
-  calculationResult["nE180Lab"] = 0; /**< number of clusters with Elab > m_EminLab */
-  calculationResult["nE300Lab"] = 0; /**< number of clusters with Elab > m_EminLab4Cluster */
-  calculationResult["nE500Lab"] = 0; /**< number of clusters with Elab > m_EminLab3Cluster */
+  calculationResult["nE180Lab"] = 0; /**< number of clusters with Elab > m_EminLab outside of high background endcap region */
+  calculationResult["nE300Lab"] = 0; /**< number of clusters with Elab > m_EminLab4Cluster outside of high background endcap region */
+  calculationResult["nE500Lab"] = 0; /**< number of clusters with Elab > m_EminLab3Cluster outside of high background endcap region */
+  calculationResult["nE2000CMS"] = 0; /**< number of clusters with Ecms > m_Ehigh outside of high background endcap region */
   calculationResult["netChargeLoose"] = 0; /**< net charge of loose tracks */
   calculationResult["maximumPCMS"] = NAN; /**< maximum p* of loose tracks (GeV/c) */
   calculationResult["eexx"] = 0;
@@ -288,6 +289,10 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
 
     if (selectedCluster.energyLab > m_EminLab3Cluster and notInHighBackgroundEndcapRegion) {
       calculationResult["nE500Lab"] += 1;
+    }
+
+    if (selectedCluster.energyCMS > m_Ehigh and notInHighBackgroundEndcapRegion) {
+      calculationResult["nE2000CMS"] += 1;
     }
 
     if (selectedCluster.energyCMS > m_EsinglePhoton) {

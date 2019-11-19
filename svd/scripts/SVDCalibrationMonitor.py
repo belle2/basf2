@@ -42,7 +42,7 @@ ExpList = args.exp
 
 conditions.override_globaltags()
 conditions.globaltags = [
-    "data_reprocessing_proc10",
+    "svd_basic", "svd_loadedOnFADC",
     "data_reprocessing_prompt_rel4_patchb",
     "giulia_CDCEDepToADCConversions_rel4_patch"]
 

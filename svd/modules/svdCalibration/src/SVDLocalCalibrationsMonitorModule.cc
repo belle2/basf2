@@ -100,19 +100,19 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   ///OCCUPANCY
   TH1F hOccupancy("occupancy_L@layerL@ladderS@sensor@view",
                   "occupancy in hits/evt in @layer.@ladder.@sensor @view/@side",
-                  1500, 0.0000005, 0.0006);
+                  1500, 0.0, 0.006);
   hOccupancy.GetXaxis()->SetTitle("strip occupancy ()");
   m_hOccupancy = new SVDHistograms<TH1F>(hOccupancy);
 
   TH2F h2Occupancy_512("occupancy2D_512_L@layerL@ladderS@sensor@view",
                        "occupancy in HITS/EVT in @layer.@ladder.@sensor @view/@side VS cellID",
-                       128 * 4, -0.5, 128 * 4 - 0.5, 1500, 0.0000005, 0.0006);
+                       128 * 4, -0.5, 128 * 4 - 0.5, 1500, 0.0, 0.006);
   h2Occupancy_512.GetYaxis()->SetTitle("strip occupancy (HITS/EVT)");
   h2Occupancy_512.GetXaxis()->SetTitle("cellID");
 
   TH2F h2Occupancy_768("occupancy2D_768_L@layerL@ladderS@sensor@view",
                        "occupancy in HITS/EVT in @layer.@ladder.@sensor @view/@side VS cellID",
-                       128 * 6, -0.5, 128 * 6 - 0.5, 1500, 0.0000005, 0.0006);
+                       128 * 6, -0.5, 128 * 6 - 0.5, 1500, 0.0, 0.006);
   h2Occupancy_768.GetYaxis()->SetTitle("strip occupancy (HITS/EVT)");
   h2Occupancy_768.GetXaxis()->SetTitle("cellID");
 

@@ -133,7 +133,8 @@ if __name__ == "__main__":
 
     svdOccupAndHotStripsCAF = SVDOccupancyAndHotStripsCalibrations(input_files,
                                                                    ['data_reprocessing_prompt_rel4_patchb',
-                                                                    'data_reprocessing_proc10'])
+                                                                    'svd_loadedOnFADC', 'svd_basic'])
+
     uniqueID_occup = "SVDOccupancyCalibrations_" + \
         str(now.isoformat()) + "_INFO:_ZS5_Exp" + str(expNum) + "_runsFrom" + \
         str(firstRun) + "to" + str(lastRun)

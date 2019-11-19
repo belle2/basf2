@@ -106,7 +106,7 @@ class HLTZMQTestCase(TestCase):
         bind or connect it to localhost and the given port.
         """
         socket = HLTZMQTestCase.ctx.socket(socket_type)
-        socket.rcvtimeo = 5000
+        socket.rcvtimeo = 10000
         socket.linger = 0
         if identity:
             socket.setsockopt_string(zmq.IDENTITY, identity)

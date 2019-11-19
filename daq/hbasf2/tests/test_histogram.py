@@ -36,36 +36,6 @@ def check_histogram_output(file_name, expected_factor):
 
 class HistogramTestCase(HLTZMQTestCase):
     """Test case"""
-    #: first_input_port
-    first_input_port = HLTZMQTestCase.get_free_port()
-    #: first_monitoring_port
-    first_monitoring_port = HLTZMQTestCase.get_free_port()
-
-    #: second_input_port
-    second_input_port = HLTZMQTestCase.get_free_port()
-    #: second_monitoring_port
-    second_monitoring_port = HLTZMQTestCase.get_free_port()
-
-    #: final_collector_input_port
-    final_collector_input_port = HLTZMQTestCase.get_free_port()
-    #: final_collector_monitoring_port
-    final_collector_monitoring_port = HLTZMQTestCase.get_free_port()
-
-    #: needed_programs
-    needed_programs = {"first": ["b2hlt_proxyhistoserver", "--input", f"tcp://*:{first_input_port}",
-                                 "--output", f"tcp://localhost:{final_collector_input_port}",
-                                 "--timeout", "1",
-                                 "--monitor", f"tcp://*:{first_monitoring_port}"],
-                       "second": ["b2hlt_proxyhistoserver", "--input", f"tcp://*:{second_input_port}",
-                                  "--output", f"tcp://localhost:{final_collector_input_port}",
-                                  "--timeout", "1",
-                                  "--monitor", f"tcp://*:{second_monitoring_port}"],
-                       "final_collector": ["b2hlt_finalhistoserver", "--input", f"tcp://*:{final_collector_input_port}",
-                                           "--rootFileName", "outputFile.root",
-                                           "--timeout", "1",
-                                           "--monitor", f"tcp://*:{final_collector_monitoring_port}"],
-                       }
-
     #: histogram_data
     histogram_data = open(basf2.find_file("daq/hbasf2/tests/histos.raw"), "br").read()
     #: event_data
@@ -83,6 +53,47 @@ class HistogramTestCase(HLTZMQTestCase):
         "m_generatedWeight" : 1,
         "m_errorFlag" : 0
         }"""
+
+    def setUp(self):
+        """Setup port numbers and necessary programs"""
+        #: first_input_port
+        self.first_input_port = HLTZMQTestCase.get_free_port()
+        #: first_monitoring_port
+        self.first_monitoring_port = HLTZMQTestCase.get_free_port()
+
+        #: second_input_port
+        self.second_input_port = HLTZMQTestCase.get_free_port()
+        #: second_monitoring_port
+        self.second_monitoring_port = HLTZMQTestCase.get_free_port()
+
+        #: final_collector_input_port
+        self.final_collector_input_port = HLTZMQTestCase.get_free_port()
+        #: final_collector_monitoring_port
+        self.final_collector_monitoring_port = HLTZMQTestCase.get_free_port()
+        #: needed_programs
+        self.needed_programs = {
+            "first": [
+                "b2hlt_proxyhistoserver", "--input", f"tcp://*:{self.first_input_port}",
+                "--output", f"tcp://localhost:{self.final_collector_input_port}",
+                "--timeout", "1",
+                "--monitor", f"tcp://*:{self.first_monitoring_port}"
+            ],
+            "second": [
+                "b2hlt_proxyhistoserver",
+                "--input", f"tcp://*:{self.second_input_port}",
+                "--output", f"tcp://localhost:{self.final_collector_input_port}",
+                "--timeout", "1",
+                "--monitor", f"tcp://*:{self.second_monitoring_port}"
+            ],
+            "final_collector": [
+                "b2hlt_finalhistoserver",
+                "--input", f"tcp://*:{self.final_collector_input_port}",
+                "--rootFileName", "outputFile.root",
+                "--timeout", "1",
+                "--monitor", f"tcp://*:{self.final_collector_monitoring_port}"
+            ],
+        }
+        super().setUp()
 
     def testEventPropagation(self):
         """test function"""

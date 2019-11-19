@@ -9,26 +9,31 @@ from zmq_daq.test_support import HLTZMQTestCase
 
 
 class WorkerTestCase(HLTZMQTestCase):
-    """Test case"""
-    #: input_port
-    input_port = HLTZMQTestCase.get_free_port()
-    #: output_port
-    output_port = HLTZMQTestCase.get_free_port()
-    #: needed_programs
-    needed_programs = {"worker": ["python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
-                                  "--input", f"tcp://localhost:{input_port}",
-                                  "--output", f"tcp://localhost:{output_port}"]}
-
+    """Test case baseclass to spawn a worker"""
     #: event_data
     event_data = open(basf2.find_file("daq/hbasf2/tests/out.raw"), "br").read()
 
+    #: extra arguments to pass to the worker script
+    extra_arguments = []
+
+    def setUp(self):
+        """Setup necessary sockets and programs"""
+        #: input_socket
+        self.input_socket, input_port = self.create_router_socket(None)
+        #: output_socket
+        self.output_socket, output_port = self.create_router_socket(None)
+        # and set the list of necessary programs to use these sockets
+        self.needed_programs = {
+            "worker": [
+                "python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
+                "--input", f"tcp://localhost:{input_port}",
+                "--output", f"tcp://localhost:{output_port}",
+            ] + self.extra_arguments
+        }
+        super().setUp()
+
     def start(self):
         """start the needed sockets and send some hello messages"""
-        #: input_socket
-        self.input_socket = self.create_router_socket(self.input_port)
-        #: output_socket
-        self.output_socket = self.create_router_socket(self.output_port)
-
         # There should be a hello message
         #: output_identity
         self.output_identity = self.assertIsMsgType(self.output_socket, "h", router=True)[0].decode()
@@ -44,6 +49,9 @@ class WorkerTestCase(HLTZMQTestCase):
         #: some data
         self.second_run_event_data = [self.event_data, self.event_data]
 
+
+class NormalWorkerTestCase(WorkerTestCase):
+    """Tests for normal worker behavior"""
     def testInitialization(self):
         """test function"""
         self.start()
@@ -125,36 +133,11 @@ class WorkerTestCase(HLTZMQTestCase):
         self.assertIsDown("worker", timeout=200)
 
 
-class DyingWorkerTestCase(HLTZMQTestCase):
-    """Test case"""
-    #: input_port
-    input_port = HLTZMQTestCase.get_free_port()
-    #: output_port
-    output_port = HLTZMQTestCase.get_free_port()
-    #: needed_programs
-    needed_programs = {"dying_worker": ["python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
-                                        "--exit", "--prefix", "dying_",
-                                        "--input", f"tcp://localhost:{input_port}",
-                                        "--output", f"tcp://localhost:{output_port}"]}
+class DyingWorkerTestCase(WorkerTestCase):
+    """Test case for dying workers"""
 
-    #: event_data
-    event_data = open(basf2.find_file("daq/hbasf2/tests/out.raw"), "br").read()
-
-    def start(self):
-        """start the needed sockets and send some hello messages"""
-        #: input_socket
-        self.input_socket = self.create_router_socket(self.input_port)
-        #: output_socket
-        self.output_socket = self.create_router_socket(self.output_port)
-
-        # There should be a hello message
-        #: output_identity
-        self.output_identity = self.assertIsMsgType(self.output_socket, "h", router=True)[0].decode()
-        self.send(self.output_socket, "c", identity=self.output_identity)
-
-        # There are probably many more ready messages, but we are only interested in at least one here
-        #: input_identity
-        self.input_identity = self.assertIsMsgType(self.input_socket, "r", router=True, final=False)[0].decode()
+    #: set the extra arguments we need ...
+    extra_arguments = ["--exit", "--prefix", "dying_"]
 
     def testUnregistration(self):
         """test function"""
@@ -178,7 +161,7 @@ class DyingWorkerTestCase(HLTZMQTestCase):
         self.assertEqual(msg[2].decode(), self.output_identity)
         self.send(self.output_socket, "c", identity=msg[0].decode())
 
-        self.assertIsDown("dying_worker", timeout=10)
+        self.assertIsDown("worker", timeout=10)
 
 
 if __name__ == '__main__':

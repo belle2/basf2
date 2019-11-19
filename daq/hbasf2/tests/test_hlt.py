@@ -10,48 +10,65 @@ from zmq_daq.test_support import HLTZMQTestCase
 
 class HLTTestCase(HLTZMQTestCase):
     """Test case"""
-    #: distributor_input_port
-    distributor_input_port = HLTZMQTestCase.get_free_port()
-    #: distributor_output_port
-    distributor_output_port = HLTZMQTestCase.get_free_port()
-    #: distributor_monitoring_port
-    distributor_monitoring_port = HLTZMQTestCase.get_free_port()
-
-    #: collector_input_port
-    collector_input_port = HLTZMQTestCase.get_free_port()
-    #: collector_output_port
-    collector_output_port = HLTZMQTestCase.get_free_port()
-    #: collector_monitoring_port
-    collector_monitoring_port = HLTZMQTestCase.get_free_port()
-
-    #: final_collector_input_port
-    final_collector_input_port = HLTZMQTestCase.get_free_port()
-    #: final_collector_output_port
-    final_collector_output_port = HLTZMQTestCase.get_free_port()
-    #: final_collector_monitoring_port
-    final_collector_monitoring_port = HLTZMQTestCase.get_free_port()
-
-    #: needed_programs
-    needed_programs = {"distributor": ["b2hlt_distributor", "--input", f"tcp://localhost:{distributor_input_port}",
-                                       "--output", f"tcp://*:{distributor_output_port}",
-                                       "--monitor", f"tcp://*:{distributor_monitoring_port}"],
-                       "collector": ["b2hlt_collector", "--input", f"tcp://*:{collector_input_port}",
-                                     "--output", f"tcp://*:{collector_output_port}",
-                                     "--monitor", f"tcp://*:{collector_monitoring_port}"],
-                       "final_collector": ["b2hlt_finalcollector", "--input", f"tcp://*:{final_collector_input_port}",
-                                           "--output", f"tcp://localhost:{final_collector_output_port}",
-                                           "--monitor", f"tcp://*:{final_collector_monitoring_port}"],
-                       "worker": ["python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
-                                  "--input", f"tcp://localhost:{distributor_output_port}",
-                                  "--output", f"tcp://localhost:{collector_input_port}"],
-                       "output_worker": ["python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
-                                         "--prefix", "output_",
-                                         "--input", f"tcp://localhost:{collector_output_port}",
-                                         "--output", f"tcp://localhost:{final_collector_input_port}"],
-                       }
-
     #: event_data
     event_data = open(basf2.find_file("daq/hbasf2/tests/out.raw"), "br").read()
+
+    def setUp(self):
+        """Setup port numbers and necessary programs"""
+        #: distributor_input_port
+        self.distributor_input_port = HLTZMQTestCase.get_free_port()
+        #: distributor_output_port
+        self.distributor_output_port = HLTZMQTestCase.get_free_port()
+        #: distributor_monitoring_port
+        self.distributor_monitoring_port = HLTZMQTestCase.get_free_port()
+
+        #: collector_input_port
+        self.collector_input_port = HLTZMQTestCase.get_free_port()
+        #: collector_output_port
+        self.collector_output_port = HLTZMQTestCase.get_free_port()
+        #: collector_monitoring_port
+        self.collector_monitoring_port = HLTZMQTestCase.get_free_port()
+
+        #: final_collector_input_port
+        self.final_collector_input_port = HLTZMQTestCase.get_free_port()
+        #: final_collector_output_port
+        self.final_collector_output_port = HLTZMQTestCase.get_free_port()
+        #: final_collector_monitoring_port
+        self.final_collector_monitoring_port = HLTZMQTestCase.get_free_port()
+
+        #: needed_programs
+        self.needed_programs = {
+            "distributor": [
+                "b2hlt_distributor",
+                "--input", f"tcp://localhost:{self.distributor_input_port}",
+                "--output", f"tcp://*:{self.distributor_output_port}",
+                "--monitor", f"tcp://*:{self.distributor_monitoring_port}"
+            ],
+            "collector": [
+                "b2hlt_collector",
+                "--input", f"tcp://*:{self.collector_input_port}",
+                "--output", f"tcp://*:{self.collector_output_port}",
+                "--monitor", f"tcp://*:{self.collector_monitoring_port}"
+            ],
+            "final_collector": [
+                "b2hlt_finalcollector",
+                "--input", f"tcp://*:{self.final_collector_input_port}",
+                "--output", f"tcp://localhost:{self.final_collector_output_port}",
+                "--monitor", f"tcp://*:{self.final_collector_monitoring_port}"
+            ],
+            "worker": [
+                "python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
+                "--input", f"tcp://localhost:{self.distributor_output_port}",
+                "--output", f"tcp://localhost:{self.collector_input_port}"
+            ],
+            "output_worker": [
+                "python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
+                "--prefix", "output_",
+                "--input", f"tcp://localhost:{self.collector_output_port}",
+                "--output", f"tcp://localhost:{self.final_collector_input_port}"
+            ],
+        }
+        super().setUp()
 
     def testFullRun(self):
         """test function"""
@@ -237,38 +254,51 @@ class HLTTestCase(HLTZMQTestCase):
 
 class DyingHLTTestCase(HLTZMQTestCase):
     """Test case"""
-    #: distributor_input_port
-    distributor_input_port = HLTZMQTestCase.get_free_port()
-    #: distributor_output_port
-    distributor_output_port = HLTZMQTestCase.get_free_port()
-    #: distributor_monitoring_port
-    distributor_monitoring_port = HLTZMQTestCase.get_free_port()
-
-    #: final_collector_input_port
-    final_collector_input_port = HLTZMQTestCase.get_free_port()
-    #: final_collector_output_port
-    final_collector_output_port = HLTZMQTestCase.get_free_port()
-    #: final_collector_monitoring_port
-    final_collector_monitoring_port = HLTZMQTestCase.get_free_port()
-
-    #: needed_programs
-    needed_programs = {"distributor": ["b2hlt_distributor", "--input", f"tcp://localhost:{distributor_input_port}",
-                                       "--output", f"tcp://*:{distributor_output_port}",
-                                       "--monitor", f"tcp://*:{distributor_monitoring_port}"],
-                       "final_collector": ["b2hlt_finalcollector", "--input", f"tcp://*:{final_collector_input_port}",
-                                           "--output", f"tcp://localhost:{final_collector_output_port}",
-                                           "--monitor", f"tcp://*:{final_collector_monitoring_port}"],
-                       "worker": ["python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
-                                  "--input", f"tcp://localhost:{distributor_output_port}",
-                                  "--output", f"tcp://localhost:{final_collector_input_port}"],
-                       "dying_worker": ["python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
-                                        "--prefix", "dying_", "--exit",
-                                        "--input", f"tcp://localhost:{distributor_output_port}",
-                                        "--output", f"tcp://localhost:{final_collector_input_port}"],
-                       }
-
     #: event_data
     event_data = open(basf2.find_file("daq/hbasf2/tests/out.raw"), "br").read()
+
+    def setUp(self):
+        """Setup port numbers and necessary programs"""
+        #: distributor_input_port
+        self.distributor_input_port = HLTZMQTestCase.get_free_port()
+        #: distributor_output_port
+        self.distributor_output_port = HLTZMQTestCase.get_free_port()
+        #: distributor_monitoring_port
+        self.distributor_monitoring_port = HLTZMQTestCase.get_free_port()
+
+        #: final_collector_input_port
+        self.final_collector_input_port = HLTZMQTestCase.get_free_port()
+        #: final_collector_output_port
+        self.final_collector_output_port = HLTZMQTestCase.get_free_port()
+        #: final_collector_monitoring_port
+        self.final_collector_monitoring_port = HLTZMQTestCase.get_free_port()
+
+        #: needed_programs
+        self.needed_programs = {
+            "distributor": [
+                "b2hlt_distributor",
+                "--input", f"tcp://localhost:{self.distributor_input_port}",
+                "--output", f"tcp://*:{self.distributor_output_port}",
+                "--monitor", f"tcp://*:{self.distributor_monitoring_port}"
+            ],
+            "final_collector": [
+                "b2hlt_finalcollector", "--input", f"tcp://*:{self.final_collector_input_port}",
+                "--output", f"tcp://localhost:{self.final_collector_output_port}",
+                "--monitor", f"tcp://*:{self.final_collector_monitoring_port}"
+            ],
+            "worker": [
+                "python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
+                "--input", f"tcp://localhost:{self.distributor_output_port}",
+                "--output", f"tcp://localhost:{self.final_collector_input_port}"
+            ],
+            "dying_worker": [
+                "python3", basf2.find_file("daq/hbasf2/tests/passthrough.no_run_py"),
+                "--prefix", "dying_", "--exit",
+                "--input", f"tcp://localhost:{self.distributor_output_port}",
+                "--output", f"tcp://localhost:{self.final_collector_input_port}"
+            ],
+        }
+        super().setUp()
 
     def testFullRun(self):
         """test function"""

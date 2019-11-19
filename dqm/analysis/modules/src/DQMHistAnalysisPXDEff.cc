@@ -210,8 +210,10 @@ void DQMHistAnalysisPXDEffModule::event()
 
       // get the errors and check for limits for each bin seperately ...
       /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
-      error_flag |= (ihit > 10 && m_hEffAll->GetEfficiencyErrorUp(j) < 0.85); // error if upper error value is below limit
-      warn_flag |= (ihit > 10 && m_hEffAll->GetEfficiencyErrorUp(j) < 0.90); // (and not only the actual eff value)
+      error_flag |= (ihit > 10)
+                    && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.85); // error if upper error value is below limit
+      warn_flag |= (ihit > 10)
+                   && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.90); // (and not only the actual eff value)
     }
   }
 

@@ -34,7 +34,7 @@ def getCommandLineOptions():
                               default is to create a temporary directory.""")
     parser.add_argument('-n', '--fillnan', dest='fillnan', action='store_true',
                         help='Fill nan and inf values with actual numbers')
-    parser.add_argument('-c', '--compile', dest='compile', action='store_false',
+    parser.add_argument('-c', '--compile', dest='compile', action='store_true',
                         help='Compile latex to pdf (does not work on KEKCC)')
     args = parser.parse_args()
     return args

@@ -265,18 +265,6 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       calculationResult["nEhigh"] += 1;
     }
 
-    if (selectedCluster.energyLab > m_EminLab) {
-      calculationResult["nE180Lab"] += 1;
-    }
-
-    if (selectedCluster.energyLab > m_EminLab4Cluster) {
-      calculationResult["nE300Lab"] += 1;
-    }
-
-    if (selectedCluster.energyLab > m_EminLab3Cluster) {
-      calculationResult["nE500Lab"] += 1;
-    }
-
     if (selectedCluster.energyCMS > m_E0min and std::abs(selectedCluster.clusterTime) < 10) {
       calculationResult["nVetoClust"] += 1;
     }
@@ -286,6 +274,21 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     const double zmva = cluster.getZernikeMVA();
     const bool photon = zmva > 0.5 and not selectedCluster.isTrack;
     const bool electron = zmva > 0.5 and selectedCluster.isTrack;
+
+
+    // improved 3 cluster (4 cluster) trigger
+    const bool notInHighBackgroundEndcapRegion = 18.5 < thetaLab and thetaLab < 139.3;
+    if (selectedCluster.energyLab > m_EminLab and notInHighBackgroundEndcapRegion) {
+      calculationResult["nE180Lab"] += 1;
+    }
+
+    if (selectedCluster.energyLab > m_EminLab4Cluster and notInHighBackgroundEndcapRegion) {
+      calculationResult["nE300Lab"] += 1;
+    }
+
+    if (selectedCluster.energyLab > m_EminLab3Cluster and notInHighBackgroundEndcapRegion) {
+      calculationResult["nE500Lab"] += 1;
+    }
 
     if (selectedCluster.energyCMS > m_EsinglePhoton) {
       calculationResult["nEsingleClust"] += 1;

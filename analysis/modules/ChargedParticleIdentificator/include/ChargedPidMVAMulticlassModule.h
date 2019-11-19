@@ -20,6 +20,7 @@
 #include <mva/interface/Dataset.h>
 
 // ANALYSIS
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dbobjects/ChargedPidMVAWeights.h>
 
@@ -27,14 +28,13 @@ namespace Belle2 {
 
   /**
    *
-   * This module evaluates the response of an MVA trained for binary charged particle identification between two hypotheses, S and B.
+   * This module evaluates the response of a multi-class MVA trained for global charged particle identification.
    *
-   * For a given input set of (S,B) mass hypotheses, it takes the Particle objects in the appropriate charged stable particle's ParticleLists,
-   * calculates the MVA score using the appropriate xml weight file,
-   * and adds it as ExtraInfo to the Particle objects.
+   * It takes the Particle objects in the input charged stable particles' ParticleLists,
+   * calculates the MVA per-class score using the appropriate xml weight file, and adds it as ExtraInfo to the Particle objects.
    *
    */
-  class ChargedPidMVAModule : public Module {
+  class ChargedPidMVAMulticlassModule : public Module {
 
     typedef std::vector<std::unique_ptr<MVA::Expert> > ExpertsList; /**< Typedef */
     typedef std::vector<std::unique_ptr<MVA::SingleDataset> > DatasetsList; /**< Typedef */
@@ -45,12 +45,12 @@ namespace Belle2 {
     /**
      * Constructor, for setting module description and parameters.
      */
-    ChargedPidMVAModule();
+    ChargedPidMVAMulticlassModule();
 
     /**
      * Destructor, use this to clean up anything you created in the constructor.
      */
-    virtual ~ChargedPidMVAModule();
+    virtual ~ChargedPidMVAMulticlassModule();
 
     /**
      * Use this to initialize resources or memory your module needs.
@@ -79,24 +79,30 @@ namespace Belle2 {
     /**
      * 1. Check if a payload is found in the database.
      * 2. Check the MVA weights for consistency every time they change in the database.
-     * 3. Load MVA weight files for the given signal hypothesis, and set MVA::Expert and MVA::SingleDataset objects for each file found.
+     * 3. Load MVA weight files, and set MVA::Expert and MVA::SingleDataset objects for each file found.
     */
     void initializeMVA();
+
+    /**
+     * Split the particle list name in "particleName", "particleLabel",
+     * and return the particle name w/o the charge +/- label.
+     * This corresponds to the name as given in the evt.pdl
+    */
+    const std::string getParticleName(const ParticleList* pList) const
+    {
+
+      auto fullName = pList->getParticleListName();
+      auto delimiter(":");
+      auto signedName = fullName.substr(0, fullName.find(delimiter));
+      signedName.pop_back();
+
+      return signedName;
+    }
 
   private:
 
     /**
-     * The input signal mass hypothesis' pdgId.
-     */
-    int m_sig_pdg;
-
-    /**
-     * The input background mass hypothesis' pdgId.
-     */
-    int m_bkg_pdg;
-
-    /**
-     * The input list of names of ParticleList objects to which MVA weights will be applied.
+     * The input list of ParticleList names.
      */
     std::vector<std::string> m_particle_lists;
 
@@ -104,11 +110,6 @@ namespace Belle2 {
      * The name of the database payload object with the MVA weights.
      */
     std::string m_payload_name;
-
-    /**
-     * The lookup name of the MVA score variable, given the input S, B mass hypotheses for the algorithm.
-     */
-    std::string m_score_varname;
 
     /**
      * The event information. Used for debugging purposes.
@@ -124,27 +125,33 @@ namespace Belle2 {
 
     /**
      * List of MVA::Expert objects.
-     * One Expert to be stored for each xml file found in the database for the given signal mass hypothesis.
+     * One Expert to be stored for each xml file found in the database, i.e. for each training category.
+     *
      */
     ExpertsList m_experts;
 
     /**
      * List of MVA::SingleDataset objects.
-     * One DS to be stored for each xml file found in the database for the given signal mass hypothesis.
+     * One DS to be stored for each xml file found in the database, i.e. for each training category.
      */
     DatasetsList m_datasets;
 
     /**
      * List of lists of feature variables.
-     * One list of lists to be stored for each xml file found in the database for the given signal mass hypothesis.
+     * One list of lists to be stored for each xml file found in the database, i.e. for each training category.
      */
     VariablesLists m_variables;
 
     /**
      * List of lists of spectator variables.
-     * One list of lists to be stored for each xml file found in the database for the given signal mass hypothesis.
+     * One list of lists to be stored for each xml file found in the database, i.e. for each training category.
      */
     VariablesLists m_spectators;
+
+    /**
+     * List of MVA class names.
+     */
+    std::vector<std::string> m_classes;
 
   };
 }

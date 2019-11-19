@@ -1,11 +1,11 @@
 //THIS MODULE
-#include <analysis/modules/ChargedParticleIdentificator/ChargedPidMVAModule.h>
+#include <analysis/modules/ChargedParticleIdentificator/ChargedPidMVAMulticlassModule.h>
 
 //ANALYSIS
 #include <mva/interface/Interface.h>
+#include <mva/methods/TMVA.h>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 
 //MDST
 #include <mdst/dataobjects/ECLCluster.h>
@@ -13,22 +13,14 @@
 
 using namespace Belle2;
 
-REG_MODULE(ChargedPidMVA)
+REG_MODULE(ChargedPidMVAMulticlass)
 
-ChargedPidMVAModule::ChargedPidMVAModule() : Module()
+ChargedPidMVAMulticlassModule::ChargedPidMVAMulticlassModule() : Module()
 {
-  setDescription("This module evaluates the response of an MVA trained for binary charged particle identification between two hypotheses, S and B. For a given input set of (S,B) mass hypotheses, it takes the Particle objects in the appropriate charged stable particle's ParticleLists, calculates the MVA score using the appropriate xml weight file, and adds it as ExtraInfo to the Particle objects.");
+  setDescription("This module evaluates the response of a multi-class MVA trained for global charged particle identification.. It takes the Particle objects in the input charged stable particles' ParticleLists, calculates the MVA per-class score using the appropriate xml weight file, and adds it as ExtraInfo to the Particle objects.");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("sigHypoPDGCode",
-           m_sig_pdg,
-           "The input signal mass hypothesis' pdgId.",
-           int(0));
-  addParam("bkgHypoPDGCode",
-           m_bkg_pdg,
-           "The input background mass hypothesis' pdgId.",
-           int(0));
   addParam("particleLists",
            m_particle_lists,
            "The input list of ParticleList names.",
@@ -40,10 +32,10 @@ ChargedPidMVAModule::ChargedPidMVAModule() : Module()
 }
 
 
-ChargedPidMVAModule::~ChargedPidMVAModule() = default;
+ChargedPidMVAMulticlassModule::~ChargedPidMVAMulticlassModule() = default;
 
 
-void ChargedPidMVAModule::initialize()
+void ChargedPidMVAMulticlassModule::initialize()
 {
 
   m_event_metadata.isRequired();
@@ -53,28 +45,17 @@ void ChargedPidMVAModule::initialize()
 }
 
 
-void ChargedPidMVAModule::beginRun()
+void ChargedPidMVAMulticlassModule::beginRun()
 {
 
   // Retrieve the payload from the DB.
   (*m_weightfiles_representation.get()).addCallback([this]() { initializeMVA(); });
   initializeMVA();
 
-  if (!(*m_weightfiles_representation.get())->isValidPdg(m_sig_pdg)) {
-    B2FATAL("PDG: " << m_sig_pdg <<
-            " of the signal mass hypothesis is not that of a valid particle in Const::chargedStableSet! Aborting...");
-  }
-  if (!(*m_weightfiles_representation.get())->isValidPdg(m_bkg_pdg)) {
-    B2FATAL("PDG: " << m_bkg_pdg <<
-            " of the background mass hypothesis is not that of a valid particle in Const::chargedStableSet! Aborting...");
-  }
-
-  m_score_varname = "pidPairChargedBDTScore_" + std::to_string(m_sig_pdg) + "_VS_" + std::to_string(m_bkg_pdg);
-
 }
 
 
-void ChargedPidMVAModule::event()
+void ChargedPidMVAMulticlassModule::event()
 {
 
   B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent());
@@ -91,11 +72,6 @@ void ChargedPidMVAModule::event()
     if (!(*m_weightfiles_representation.get())->isValidPdg(pdg)) {
       B2FATAL("PDG: " << pList->getPDGCode() << " of ParticleList: " << pList->getParticleListName() <<
               " is not that of a valid particle in Const::chargedStableSet! Aborting...");
-    }
-
-    // Skip if this ParticleList does not match any of the input (S, B) hypotheses.
-    if (pdg != m_sig_pdg && pdg != m_bkg_pdg) {
-      continue;
     }
 
     B2DEBUG(11, "ParticleList: " << pList->getParticleListName() << " - N = " << pList->getListSize() << " particles.");
@@ -115,14 +91,14 @@ void ChargedPidMVAModule::event()
       }
 
       // Retrieve the index for the correct MVA expert and dataset,
-      // given (signal hypo, clusterTheta, p)
+      // given (clusterTheta, p)
       auto theta   = eclCluster->getTheta();
       auto p       = particle->getP();
       int jth, ip;
       auto index   = (*m_weightfiles_representation.get())->getMVAWeightIdx(theta, p, jth, ip);
 
       // Get the cut defining the MVA category under exam (this reflects the one used in the training).
-      const auto cuts   = (*m_weightfiles_representation.get())->getCuts(m_sig_pdg);
+      const auto cuts   = (*m_weightfiles_representation.get())->getCutsMulticlass();
       const auto cutstr = (!cuts->empty()) ? cuts->at(index) : "";
 
       // Get track charge sign.
@@ -138,7 +114,7 @@ void ChargedPidMVAModule::event()
       B2DEBUG(11, "\t\tBrems corrected = " << particle->hasExtraInfo("bremsCorrectedPhotonEnergy"));
       B2DEBUG(11, "\t\tWeightfile idx  = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
       if (!cutstr.empty()) {
-        B2DEBUG(11, "\tCategory cut: " << cutstr);
+        B2DEBUG(11, "\t\tCategory cut    = " << cutstr);
       }
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
@@ -188,12 +164,24 @@ void ChargedPidMVAModule::event()
 
       }
 
-      float score = m_experts.at(index)->apply(*m_datasets.at(index))[0];
+      // Compute MVA score for each available class.
 
-      B2DEBUG(11, "\tMVA score = " << score);
+      B2DEBUG(11, "\tMVA response:");
 
-      // Store the MVA score as a new particle object property.
-      particle->writeExtraInfo(m_score_varname, score);
+      std::string score_varname("");
+      for (unsigned int classID(0); classID < m_classes.size(); ++classID) {
+
+        const std::string className(m_classes.at(classID));
+
+        float score = m_experts.at(index)->apply(*m_datasets.at(index), classID)[0];
+        score_varname = "pidChargedBDTScore_" + className;
+
+        B2DEBUG(11, "\t\tclass[" << classID << "] = " << className << " - score = " << score);
+
+        // Store the MVA score as a new particle object property.
+        particle->writeExtraInfo(score_varname, score);
+
+      }
 
     }
 
@@ -201,18 +189,18 @@ void ChargedPidMVAModule::event()
 }
 
 
-void ChargedPidMVAModule::initializeMVA()
+void ChargedPidMVAMulticlassModule::initializeMVA()
 {
 
-  B2INFO("Load supported MVA interfaces for charged particle identification...");
+  B2INFO("Load supported MVA interfaces for mult-class charged particle identification...");
 
   // The supported methods have to be initialized once (calling it more than once is safe).
   MVA::AbstractInterface::initSupportedInterfaces();
   auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
 
-  B2INFO("\tLoading weightfiles from the payload class for SIGNAL particle hypothesis: " << m_sig_pdg);
+  B2INFO("\tLoading weightfiles from the payload class.");
 
-  auto serialized_weightfiles = (*m_weightfiles_representation.get())->getMVAWeights(m_sig_pdg);
+  auto serialized_weightfiles = (*m_weightfiles_representation.get())->getMVAWeightsMulticlass();
   auto nfiles = serialized_weightfiles->size();
 
   B2INFO("\tConstruct the MVA experts and datasets from N = " << nfiles << " weightfiles...");
@@ -257,6 +245,19 @@ void ChargedPidMVAModule::initializeMVA()
 
     B2DEBUG(12, "\t\tdataset[" << idx << "] created successfully!");
 
-  }
+    // Register class names only once.
+    if (idx == 0) {
+      MVA::TMVAOptionsMulticlass specific_options; // QUESTION: could this be made generic?
+      weightfile.getOptions(specific_options);
 
+      if (specific_options.m_classes.empty()) {
+        B2FATAL("MVA::SpecificOptions of weightfile[" << idx <<
+                "] has no registered MVA classes! This shouldn't happen in multi-class mode. Aborting...");
+      }
+
+      for (const auto& cls : specific_options.m_classes) {
+        m_classes.push_back(cls);
+      }
+    }
+  }
 }

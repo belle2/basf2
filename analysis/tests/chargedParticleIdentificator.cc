@@ -82,7 +82,7 @@ namespace Belle2 {
                                       m_pbins.size() - 1,
                                       m_pbins.data());
 
-      m_dbrep.storeClusterThetaPGrid(m_testHypo.getPDGCode(), m_grid.get());
+      m_dbrep.setWeightCategories(m_grid.get());
 
       m_dbrep.setAngularUnit(Unit::rad);
       m_dbrep.setEnergyUnit(Unit::GeV);
@@ -134,7 +134,7 @@ namespace Belle2 {
     auto p = m_grid->GetYaxis()->GetBinCenter(biny);
 
     int jth, ip;
-    auto ij = m_dbrep.getMVAWeightIdx(m_testHypo, theta, p, jth, ip);
+    auto ji = m_dbrep.getMVAWeightIdx(theta, p, jth, ip);
 
     EXPECT_EQ(jth, binx);
     EXPECT_EQ(ip, biny);
@@ -145,12 +145,12 @@ namespace Belle2 {
     std::replace(thisfname.begin(), thisfname.end(), '.', '_');
     thisfname += ".xml";
 
-    EXPECT_EQ(thisfname, m_dummyfiles.at(ij));
+    EXPECT_EQ(thisfname, m_dummyfiles.at(ji));
 
     auto matchitr = std::find(m_dummyfiles.begin(), m_dummyfiles.end(), thisfname);
     auto thisidx = std::distance(m_dummyfiles.begin(), matchitr);
 
-    EXPECT_EQ(thisidx, ij);
+    EXPECT_EQ(thisidx, ji);
 
   }
 

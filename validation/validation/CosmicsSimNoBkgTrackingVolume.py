@@ -8,6 +8,7 @@
   <cacheable/>
   <description>
     This steering file produces 10000 cosmic ray events without background, for the early_phase3 geometry.
+    The particles are created on a cylinder of radius 125cm (right outside the tracking volume).
   </description>
 </header>
 """

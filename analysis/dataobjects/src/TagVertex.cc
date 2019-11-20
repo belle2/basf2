@@ -219,6 +219,17 @@ double TagVertex::getTrackDistanceToTagVErr(unsigned int trackIndex)
                                            emptyMat);
 }
 
+double TagVertex::getTrueTagDistanceToTagV(unsigned int trackIndex)
+{
+  if (m_vtxFitMCParticles.size() <= trackIndex) return -1111.;
+  if (!m_vtxFitMCParticles.at(trackIndex)) return -1111.;
+  if (m_MCtagV(0)  == -111 && m_MCtagV(1) == -111 && m_MCtagV(2) == -111) return -1111.;
+  if (m_MCtagV(0)  == 0 && m_MCtagV(1) == 0 && m_MCtagV(2) == 0) return -1111.;
+
+  return m_distanceTools.vtxToVtxDist(m_vtxFitMCParticles.at(trackIndex)->getProductionVertex(),
+                                      m_MCtagV);
+}
+
 void TagVertex::setTagVertex(const TVector3& tagVertex)
 {
   m_tagVertex = tagVertex;
@@ -318,6 +329,11 @@ void TagVertex::setVertexFitTracks(std::vector<const TrackFitResult*> const& vtx
 {
   m_vtxFitTracks = vtxFitTracks;
   m_NFitTracks = vtxFitTracks.size();
+}
+
+void TagVertex::setVertexFitMCParticles(std::vector<const MCParticle*> const& vtxFitMCParticles)
+{
+  m_vtxFitMCParticles = vtxFitMCParticles;
 }
 
 void TagVertex::setRaveWeights(std::vector<double> const& raveWeights)

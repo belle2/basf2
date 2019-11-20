@@ -20,6 +20,7 @@
 // #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <analysis/dataobjects/DistanceTools.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 namespace Belle2 {
 
@@ -204,6 +205,12 @@ namespace Belle2 {
     double getTrackDistanceToTagVErr(unsigned int trackIndex);
 
     /**
+     *  Returns the distance between the MC tag vtx and the MC p'cle corresponding to the track indexed by trackIndex
+     */
+
+    double getTrueTagDistanceToTagV(unsigned int trackIndex);
+
+    /**
      *  Returns the uncertainty on the distance between the constraint and the tag vtx
      */
 
@@ -317,6 +324,11 @@ namespace Belle2 {
     void setVertexFitTracks(std::vector<const TrackFitResult*> const& vtxFitTracks);
 
     /**
+     * Set a vector of pointers to the MC p'cles corresponding to the tracks in the tag vtx fit
+     */
+    void setVertexFitMCParticles(std::vector<const MCParticle*> const& vtxFitMCParticles);
+
+    /**
      * Set the weights used by Rave in the tag vtx fit
      */
     void setRaveWeights(std::vector<double> const& raveWeights);
@@ -361,6 +373,7 @@ namespace Belle2 {
     float m_tagVChi2;                   /**< chi^2 value of the tag vertex fit result */
     float m_tagVChi2IP;                 /**< IP component of chi^2 value of the tag vertex fit result */
     std::vector<const TrackFitResult*> m_vtxFitTracks; /**< pointers to the tracks used by rave to fit the vertex */
+    std::vector<const MCParticle*> m_vtxFitMCParticles; /**< pointers to the MC p'cles corresponding to the tracks in the tag vtx fit */
     int m_NFitTracks;                   /**< Number of tracks used by Rave to fit the vertex */
     std::vector<double> m_raveWeights;  /**< weights of each track in the Rave tag vtx fit */
     std::string m_constraintType;       /**< Type of the constraint used for the tag vertex fit (noConstraint, IP, Boost, Tube) */

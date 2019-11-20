@@ -1143,6 +1143,45 @@ namespace {
     EXPECT_FLOAT_EQ(var->function(&p), 3.185117);
   }
 
+  TEST_F(MetaVariableTest, useSigBestFrame)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<Particle> particles;
+    particles.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+    PCmsLabTransform T;
+    TLorentzVector vec0 = {0.0, 0.0, 0.0, T.getCMSEnergy()};
+    TLorentzVector vec1 = {0.0, +0.332174566, 0.0, T.getCMSEnergy() / 2.};
+    TLorentzVector vec2 = {0.0, -0.332174566, 0.0, T.getCMSEnergy() / 2.};
+    Particle* p0 = particles.appendNew(Particle(T.rotateCmsToLab() * vec0, 300553));
+    Particle* p1 = particles.appendNew(Particle(T.rotateCmsToLab() * vec1, 511, Particle::c_Unflavored, Particle::c_Undefined, 1));
+    Particle* p2 = particles.appendNew(Particle(T.rotateCmsToLab() * vec2, -511, Particle::c_Unflavored, Particle::c_Undefined, 2));
+
+    p0->appendDaughter(p1->getArrayIndex());
+    p0->appendDaughter(p2->getArrayIndex());
+
+    const Manager::Var* var = Manager::Instance().getVariable("useSigBRestFrame(daughter(1, p))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+
+    var = Manager::Instance().getVariable("useSigBRestFrame(daughter(1, px))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+
+    var = Manager::Instance().getVariable("useSigBRestFrame(daughter(1, py))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+
+    var = Manager::Instance().getVariable("useSigBRestFrame(daughter(1, pz))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+
+    var = Manager::Instance().getVariable("useSigBRestFrame(daughter(1, E))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_NEAR(var->function(p0), p1->getMass(), 1e-6);
+  }
+
+
   TEST_F(MetaVariableTest, extraInfo)
   {
     Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);

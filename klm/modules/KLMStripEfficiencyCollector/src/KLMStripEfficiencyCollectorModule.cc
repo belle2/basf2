@@ -11,27 +11,11 @@
 /* Own header. */
 #include <klm/modules/KLMStripEfficiencyCollector/KLMStripEfficiencyCollectorModule.h>
 
-/* KLM headers. */
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
-
-/* Belle 2 headers. */
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <tracking/dataobjects/ExtHit.h>
-#include <tracking/dataobjects/RecoTrack.h>
-
 /* ROOT headers. */
 #include <TH1F.h>
 
 /* CLHEP headers. */
-#include <CLHEP/Geometry/Point3D.h>
-
-/* C++ headers. */
-#include <map>
-#include <string>
-#include <tuple>
+#include <CLHEP/Vector/ThreeVector.h>
 
 using namespace Belle2;
 

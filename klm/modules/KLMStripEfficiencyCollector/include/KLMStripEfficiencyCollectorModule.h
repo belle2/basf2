@@ -29,6 +29,10 @@
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+/* C++ headers. */
+#include <map>
+#include <string>
+
 namespace Belle2 {
 
   /**

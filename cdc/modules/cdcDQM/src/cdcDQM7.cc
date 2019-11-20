@@ -266,7 +266,7 @@ void cdcDQM7Module::event()
         cid = iL * ndiv[sL] + wid;
       } else {
         for (int isl = 0; isl < sL; isl ++) {
-          cid += isL * 6 * ndiv[isl];
+          cid += isl * 6 * ndiv[isl];
         }
         cid += 2 * ndiv[0] + iL * ndiv[sL + 1] + wid;
       }

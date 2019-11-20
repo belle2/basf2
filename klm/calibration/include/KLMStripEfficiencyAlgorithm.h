@@ -18,9 +18,6 @@
 /* Belle 2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 
-/* ROOT headers. */
-#include <TH1.h>
-
 namespace Belle2 {
 
   /**
@@ -55,13 +52,18 @@ namespace Belle2 {
      */
     CalibrationAlgorithm::EResult calibrate() override;
 
+    /**
+     * Set output file name.
+     */
+    void setOutputFileName(const char* outputFileName)
+    {
+      m_OutputFileName = outputFileName;
+    }
+
   private:
 
-    /** Hist of planes eff (data for calibration) */
-    TH1F* m_planesEff;
-
     /** Output root file */
-    TFile* m_file;
+    std::string m_OutputFileName = "TrackMatchedResult.root";
 
     /** Element numbers */
     const KLMElementNumbers* m_ElementNumbers;

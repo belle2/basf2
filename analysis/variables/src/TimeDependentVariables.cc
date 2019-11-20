@@ -721,6 +721,20 @@ namespace Belle2 {
       return result;
     }
 
+    double tagTrackTrueDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex)
+    {
+      double result(-1111.0);
+      if (trackIndex.size() != 1) return result;
+      unsigned int trackIndexInt(trackIndex.at(0));
+
+      auto* vert = part->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = vert->getTrueTagDistanceToTagV(trackIndexInt);
+
+      return result;
+    }
+
 
     VARIABLE_GROUP("Time Dependent CPV Analysis Variables");
 
@@ -821,6 +835,9 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("TagTrackDistanceToTagVErr(i)", tagTrackDistanceToTagVErr,
                       "returns the estimated error on the distance between the ith tag track and the tag vtx. Warning: only the uncertainties on the track position parameters are taken into account.");
+
+    REGISTER_VARIABLE("TagTrackTrueDistanceToTagV(i)", tagTrackTrueDistanceToTagV,
+                      "return the true distance between the true B Tag decay vertex and the p'cle corresponding to the ith tag vtx track.")
 
   }
 }

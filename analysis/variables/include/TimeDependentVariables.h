@@ -346,6 +346,13 @@ namespace Belle2 {
      */
     double tagTrackDistanceToTagVErr(const Particle* part, const std::vector<double>& trackIndex);
 
+    /**
+     * returns the true distance between the true B Tag decay vertex and the p'cle
+     * corresponding to the tag vtx track indexed by trackIndex.
+     *
+     */
+
+    double tagTrackTrueDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex);
   }
 }
 

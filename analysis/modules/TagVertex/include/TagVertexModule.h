@@ -92,8 +92,8 @@ namespace Belle2 {
     std::vector<double> m_raveWeights; /**< Store the weights used by Rave in the vtx fit so that they can be accessed later */
     std::vector<const MCParticle*>
     m_raveTracksMCParticles; /**< Store the MC particles corresponding to each track used by Rave in the vtx fit */
-    std::vector<int> m_raveTracksMatchStatus; /**< stor the MC match status related to each track used by rave:
-                                               * 0: no match, 1: match to good track (direct from tag B) 2: match to bad track */
+    //std::vector<int> m_raveTracksMatchStatus; /**< stor the MC match status related to each track used by rave:
+    //                                           * 0: no match, 1: match to good track (direct from tag B) 2: match to bad track */
     double m_fitPval;             /**< P value of the tag side fit result */
     TVector3 m_tagV;              /**< tag side fit result */
     TMatrixDSym m_tagVErrMatrix;  /**< Error matrix of the tag side fit result */
@@ -145,8 +145,8 @@ namespace Belle2 {
     bool compBrecoBgen(Particle* Breco, MCParticle* Bgen);
 
     /** asks for the MC information of the tracks performing the vertex fit *
-     *  returns a list of pointers to the MC particles that is used to get the true
-     *  distance between each tag trag and the true tag V
+     *  returns a list of pointers to the MC particles and their kinds, ie
+     *  1 for good pcle coming direclty from the tag B and 2 otherwise
      */
     std::vector< std::pair<const MCParticle*, int> > FlavorTaggerInfoMCMatch(Particle* Breco);
 
@@ -178,12 +178,6 @@ namespace Belle2 {
      * DT = Dl / gamma beta c  ,  l = boost direction
      */
     void deltaT(Particle* Breco);
-
-    /**
-     * if the MC matching is run, this will fill the MC info related to the tag tracks
-     * (based on the ROE track MC match that must be done before)
-     */
-    void doRaveTracksMatching(std::vector< std::pair<const MCParticle*, int> > const& roeTracksAndMatch);
 
     //just to help printing things out
     std::string printVector(TVector3 const& vec);

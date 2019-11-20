@@ -170,6 +170,7 @@ namespace Belle2 {
           ver->setTagVChi2(m_tagVChi2);
           ver->setTagVChi2IP(m_tagVChi2IP);
           ver->setVertexFitTracks(m_raveTracks);
+          ver->setVertexFitMCParticles(m_raveTracksMCParticles);
           ver->setRaveWeights(m_raveWeights);
           ver->setConstraintType(m_constraintType);
           ver->setConstraintCenter(m_constraintCenter);
@@ -193,6 +194,9 @@ namespace Belle2 {
           ver->setTagVNDF(-1111.);
           ver->setTagVChi2(-1111.);
           ver->setTagVChi2IP(-1111.);
+          ver->setVertexFitTracks(m_raveTracks);
+          ver->setVertexFitMCParticles(m_raveTracksMCParticles);
+          ver->setRaveWeights(m_raveWeights);
           ver->setConstraintType(m_constraintType);
           ver->setConstraintCenter(m_constraintCenter);
           ver->setConstraintCov(m_constraintCov);
@@ -206,6 +210,17 @@ namespace Belle2 {
     analysis::RaveSetup::getInstance()->reset();
 
   }
+
+  //this struct and sort function are used to sort the tagV track
+
+  struct TrackAndWeight {
+    double weight;
+    const TrackFitResult* track;
+    const MCParticle* mcParticle;
+  };
+
+  bool compare(TrackAndWeight& a, TrackAndWeight& b) { return a.weight > b.weight; }
+
 
   bool TagVertexModule::doVertexFit(Particle* Breco)
   {
@@ -264,6 +279,8 @@ namespace Belle2 {
     }
 
 
+
+
     if (!ok) {
       B2ERROR("TagVertex: No correct fit constraint");
       return false;
@@ -317,6 +334,8 @@ namespace Belle2 {
         m_FitType = 5;
       }
     }
+
+    //if(m_MCInfo) doRaveTracksMatching(roeTracksAndMatch);
 
     return ok;
 
@@ -746,7 +765,6 @@ namespace Belle2 {
 
     if (!flavorTagInfo) return std::vector< std::pair<const MCParticle*, int> >(0);
 
-
     std::vector<int> FTGoodTracks;
     std::vector<int> FTTotalTracks;
 
@@ -798,6 +816,7 @@ namespace Belle2 {
           exitFTWhile = true; // Exit the while with true
           break;
         }
+
 
         /* If none of the previous work, the mother may be an immediately decaying meson, daugther of the B_tag. Thus, this checks which kind of
           meson is it, and whether the grandmother is a B0. The given code depends on the PDG code of the meson */
@@ -874,54 +893,56 @@ namespace Belle2 {
     for (int i = 0; i < ROETotalTracks; i++) {
       auto* roeTrackMCParticle = ROETracks[i]->getRelatedTo<MCParticle>();
       roeTracksAndMatch.at(i).first = roeTrackMCParticle;
-      MCParticle* roeTrackMCParticleMother = roeTrackMCParticle->getMother();
-      bool exitROEWhile;
-      do {
-        int PDG = TMath::Abs(roeTrackMCParticleMother->getPDG());
-        std::string motherPDGString = std::to_string(PDG);
-        if (PDG == 211 || PDG == 130 || PDG == 310 || PDG == 311 ||
-            PDG == 321 || PDG == 411 || PDG == 421
-            || PDG == 431) break; //this checks if the mother of the pcl is a secondary (pi, K, D, KS, ...)
-        if (motherPDGString.size() == 4 || motherPDGString.size() < 3) break; //checks if the mother is a baryon
-        if (roeTrackMCParticleMother->getPDG() == -m_mcPDG) break;
-        if (roeTrackMCParticleMother->getPDG() == m_mcPDG) {
-          ROEGoodTracks++;
-          roeTracksAndMatch.at(i).second = 1;
-          break;
-        }
-        /* If none of the previous work, the mother may be an immediately decaying meson, daugther of the B_tag. Thus, this checks which kind of
-          meson is it, and whether the grandmother is a B0. The given code depends on the PDG code of the meson */
-        MCParticle* roeTrackMCParticleGrandMother = roeTrackMCParticleMother->getMother();
-        if (motherPDGString[motherPDGString.size() - 3] == '1' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
-          ROEGoodTracks++;
-          roeTracksAndMatch.at(i).second = 1;
-          exitROEWhile = true;
-        } else if (motherPDGString[motherPDGString.size() - 3] == '2' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
-          ROEGoodTracks++;
-          roeTracksAndMatch.at(i).second = 1;
-          exitROEWhile = true;
-        } else if (motherPDGString[motherPDGString.size() - 3] == '3' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
-          ROEGoodTracks++;
-          roeTracksAndMatch.at(i).second = 1;
-          exitROEWhile = true;
-        } else if (motherPDGString[motherPDGString.size() - 3] == '4' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
-          ROEGoodTracks++;
-          roeTracksAndMatch.at(i).second = 1;
-          exitROEWhile = true;
+      if (roeTrackMCParticle) {
+        MCParticle* roeTrackMCParticleMother = roeTrackMCParticle->getMother();
+        bool exitROEWhile;
+        do {
+          int PDG = TMath::Abs(roeTrackMCParticleMother->getPDG());
+          std::string motherPDGString = std::to_string(PDG);
+          if (PDG == 211 || PDG == 130 || PDG == 310 || PDG == 311 ||
+              PDG == 321 || PDG == 411 || PDG == 421
+              || PDG == 431) break; //this checks if the mother of the pcl is a secondary (pi, K, D, KS, ...)
+          if (motherPDGString.size() == 4 || motherPDGString.size() < 3) break; //checks if the mother is a baryon
+          if (roeTrackMCParticleMother->getPDG() == -m_mcPDG) break;
+          if (roeTrackMCParticleMother->getPDG() == m_mcPDG) {
+            ROEGoodTracks++;
+            roeTracksAndMatch.at(i).second = 1;
+            break;
+          }
+          /* If none of the previous work, the mother may be an immediately decaying meson, daugther of the B_tag. Thus, this checks which kind of
+             meson is it, and whether the grandmother is a B0. The given code depends on the PDG code of the meson */
+          MCParticle* roeTrackMCParticleGrandMother = roeTrackMCParticleMother->getMother();
+          if (motherPDGString[motherPDGString.size() - 3] == '1' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
+            ROEGoodTracks++;
+            roeTracksAndMatch.at(i).second = 1;
+            exitROEWhile = true;
+          } else if (motherPDGString[motherPDGString.size() - 3] == '2' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
+            ROEGoodTracks++;
+            roeTracksAndMatch.at(i).second = 1;
+            exitROEWhile = true;
+          } else if (motherPDGString[motherPDGString.size() - 3] == '3' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
+            ROEGoodTracks++;
+            roeTracksAndMatch.at(i).second = 1;
+            exitROEWhile = true;
+          } else if (motherPDGString[motherPDGString.size() - 3] == '4' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
+            ROEGoodTracks++;
+            roeTracksAndMatch.at(i).second = 1;
+            exitROEWhile = true;
 
-        } else {
-          roeTrackMCParticle = roeTrackMCParticleMother;
-          roeTrackMCParticleMother = roeTrackMCParticleGrandMother;
-          exitROEWhile = false;
-        }
-      } while (exitROEWhile == false);
+          } else {
+            roeTrackMCParticle = roeTrackMCParticleMother;
+            roeTrackMCParticleMother = roeTrackMCParticleGrandMother;
+            exitROEWhile = false;
+          }
+        } while (exitROEWhile == false);
+      }
     }
 
 
     // SET IN THE FT DATAOBJECT THE GOOD/BAD TRACKS INFORMATION FROM FT AND ROE
     /* Finally the MC information is stored in the FlavorTaggerInfo DataObject for future uses. More concretely the number
-     of tracks coming directly from the B_tag and immediately decaying daughters (good tracks), and tracks coming from any
-     other intermediate particle (bad track) */
+       of tracks coming directly from the B_tag and immediately decaying daughters (good tracks), and tracks coming from any
+       other intermediate particle (bad track) */
     flavorTagInfo->setGoodTracksROE(ROEGoodTracks);
     flavorTagInfo->setBadTracksROE(ROETotalTracks - ROEGoodTracks);
     flavorTagInfo->setGoodTracksFT(FTGoodTracks.size());
@@ -944,18 +965,21 @@ namespace Belle2 {
   }
 
 
-// SINGLE TRACK FIT ALGORITHM
+  // SINGLE TRACK FIT ALGORITHM
   /* The algorithm basically selects only one track to perform the vertex fit. The first idea was to select all tracks
-   coming from the B_tag directly together with the tracks coming from its immediately decaying daughters. It did not work though,
-   and therefore it was opted to select only one track.
-   Nevertheless there is still some basic cuts applied to all tracks before performing the "one track selection", as there is
-   still room for improvement, trying to take more than one track if possible. That is not implemented now.
-   */
+     coming from the B_tag directly together with the tracks coming from its immediately decaying daughters. It did not work though,
+     and therefore it was opted to select only one track.
+     Nevertheless there is still some basic cuts applied to all tracks before performing the "one track selection", as there is
+     still room for improvement, trying to take more than one track if possible. That is not implemented now.
+     */
   bool TagVertexModule::getTagTracks_singleTrackAlgorithm(Particle* Breco, int reqPXDHits)
   {
+    cout << "SALUT1" << endl;
     const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
     std::vector<const Track*> fitTracks; // Vector of track that will be returned after the selection. Now it must contain only 1
 
+
+    cout << "SALUT2" << endl;
     auto* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
     if (!flavorTagInfo) return false;
     std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
@@ -966,6 +990,8 @@ namespace Belle2 {
     std::vector<Belle2::Track*> originalTracks = flavorTagInfo->getTracks();
     std::vector<Particle*> listParticle = flavorTagInfo->getParticle();
     std::vector<std::string> categories = flavorTagInfo->getCategories();
+
+    cout << "SALUT3" << endl;
 
     if (ROETracks.size() == 0) return false;
 
@@ -979,6 +1005,8 @@ namespace Belle2 {
         flavorTagInfo->setIsFromB(0);
       }
     }
+
+    cout << "SALUT4" << endl;
 
     // Obtain the impact parameters of the tracks, D0 and Z0. Need the result of the track Fit.
     Const::ChargedStable constArray[8] = {Const::electron, Const::muon, Const::muon, Const::kaon,
@@ -1001,6 +1029,8 @@ namespace Belle2 {
     std::vector<float> listZ0 = flavorTagInfo->getZ0();
     std::vector<float> listD0 = flavorTagInfo->getD0();
 
+    cout << "SALUT5" << endl;
+
 
     // Save in a vector the hits left by each track in the Pixel Vertex Detector. This will be useful when requesting PXD hits.
     std::vector<int> listNPXDHits(listParticle.size());
@@ -1008,27 +1038,34 @@ namespace Belle2 {
       listNPXDHits[i] = int(Variable::trackNPXDHits(listParticle[i]));
     }
 
+    cout << "SALUT6 " << listTracks.size() << " " << originalTracks.size() << " " << listMomentum.size() << endl;
+    return false;
+
     // Here the program keeps track of the tracks that are repeated inside the FlavorTaggerInfo
     int nonRepeated = 1;
     for (unsigned i = 0; i < listTracks.size(); i++) {
       bool repeatedTrack = false;
       for (int j = i - 1; j >= 0; j--) {
-        if (originalTracks[i] == originalTracks[j]) {
+        if (originalTracks.at(i) == originalTracks.at(j)) {
           repeatedTrack = true;
-          listTracks[i] = listTracks[j]; // If repeated, assign the same number for both tracks
+          listTracks.at(i) = listTracks.at(j); // If repeated, assign the same number for both tracks
           break;
         }
       }
       if (repeatedTrack == true) continue;
-      listTracks[i] = nonRepeated; // Assign different numbers for different tracks
+      listTracks.at(i) = nonRepeated; // Assign different numbers for different tracks
       nonRepeated++;
     }
+
+    cout << "SALUT6a" << endl;
 
 
     // Basic cut. Impact parameter needs to be small.
     for (unsigned i = 0; i < listTracks.size(); i++) {
-      if ((listZ0[i] > 0.1 || listD0[i] > 0.1) && listTracks[i] != 0) eliminateTrack(listTracks, i);
+      if ((listZ0.at(i) > 0.1 || listD0.at(i) > 0.1) && listTracks.at(i) != 0) eliminateTrack(listTracks, i);
     }
+
+    cout << "SALUT7" << endl;
 
     B2DEBUG(10, "Required PXD hits " << reqPXDHits);
     for (unsigned i = 0; i < listTracks.size(); i++) {
@@ -1037,6 +1074,8 @@ namespace Belle2 {
         eliminateTrack(listTracks, i);
       }
     }
+
+    cout << "SALUT8" << endl;
 
     // Residual cut from the previous algorithm. Used to give good results discarding secondary tracks. Could be more useful for future non-single track algorithms.
     for (unsigned i = 0; i < listTracks.size(); i++) {
@@ -1051,18 +1090,22 @@ namespace Belle2 {
       }
     }
 
+    cout << "SALUT9" << endl;
+
     // SINGLE TRACK SELECTION
     /* Here the code selects only one track to perform the Single Track Fit. Up to now 3 conditions has been implemented for the chosen track to be taken as primary:
-     - Maximum momentum
-     - High Target Probability
-     - High Category Probability
-     The last two parameters can be tunned to make the criteria more or less restrictive. The values written here are the standard ones.
-     The conditions have been taken only for the Muon and Electron categories. At this moment (Aug 2015) the other categories still are not very easily filtered. A deep MC study confirms it.
-     */
+       - Maximum momentum
+       - High Target Probability
+       - High Category Probability
+       The last two parameters can be tunned to make the criteria more or less restrictive. The values written here are the standard ones.
+       The conditions have been taken only for the Muon and Electron categories. At this moment (Aug 2015) the other categories still are not very easily filtered. A deep MC study confirms it.
+       */
 
     float maxP = listMomentum[7];
     float minTargetProb = 0.2;
     float minCategoryProb = 0.2;
+
+    cout << "SALUTa" << endl;
 
     if (listMomentum[1] == maxP && listTargetP[1] > minTargetProb && listCategoryP[1] > minCategoryProb && listTracks[1] != 0) {
       fitTracks.push_back(originalTracks[1]);
@@ -1073,6 +1116,8 @@ namespace Belle2 {
     } else { // When no single track is available, return false and try with other algorithm.
       return false;
     }
+
+    cout << "SALUTb" << endl;
 
     return true;
 
@@ -1102,6 +1147,7 @@ namespace Belle2 {
     std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
     if (ROETracks.size() == 0) return false;
     std::vector<const Track*> fitTracks;
+    std::vector<const MCParticle*> fitTracksMC;
     for (auto& ROETrack : ROETracks) {
       // TODO: this will always return something (so not nullptr) contrary to the previous method
       // used here. This line can be removed as soon as the multi hypothesis fitting method
@@ -1113,17 +1159,22 @@ namespace Belle2 {
 
       if (roeTrackPattern.getNPXDHits() >= reqPXDHits) {
         fitTracks.push_back(ROETrack);
+
       }
     }
     if (fitTracks.size() == 0) return false;
     m_tagTracks = fitTracks;
+
     return true;
   }
 
   bool TagVertexModule::makeGeneralFit()
   {
+
     //prepare container of pointer to tracks
-    vector<const TrackFitResult*> trackFitResVec;
+    TrackAndWeight trackAndWeight;
+    trackAndWeight.mcParticle = 0;
+    vector<TrackAndWeight> trackAndWeights;
 
     // apply constraint
     analysis::RaveSetup::getInstance()->unsetBeamSpot();
@@ -1166,21 +1217,50 @@ namespace Belle2 {
       }
       try {
         if (!isKsDau) {
-          trackFitResVec.push_back(trak1Res);
+          trackAndWeight.track = trak1Res;
           rFit.addTrack(trak1Res); // Temporal fix: some mom go to Inf
+
+          if (m_useMCassociation == "breco" || m_useMCassociation == "internal")
+            trackAndWeight.mcParticle = trak1->getRelatedTo<MCParticle>();
+
+          trackAndWeights.push_back(trackAndWeight);
         }
       } catch (const rave::CheckedFloatException&) {
         B2ERROR("Exception caught in TagVertexModule::makeGeneralFit(): Invalid inputs (nan/inf)?");
       }
     }
 
+    int isGoodFit(-1);
     try {
-      int isGoodFit = rFit.fit("avf");
-      if (isGoodFit < 1) return false;
+      isGoodFit = rFit.fit("avf");
+
     } catch (const rave::CheckedFloatException&) {
       B2ERROR("Exception caught in TagVertexModule::makeGeneralFit(): Invalid inputs (nan/inf)?");
       return false;
     }
+
+    //save the track info for later use
+    //Tracks are sorted from highest rave weight to lowest
+
+    unsigned int n(trackAndWeights.size());
+    for (unsigned int i(0); i < n; ++i)
+      trackAndWeights.at(i).weight = rFit.getWeight(i);
+
+    sort(trackAndWeights.begin(), trackAndWeights.end(), compare);
+
+    m_raveTracks.resize(n);
+    m_raveWeights.resize(n);
+    m_raveTracksMCParticles.resize(n);
+
+    for (unsigned int i(0); i < n; ++i) {
+      m_raveTracks.at(i) = trackAndWeights.at(i).track;
+      m_raveTracksMCParticles.at(i) = trackAndWeights.at(i).mcParticle;
+      m_raveWeights.at(i) = trackAndWeights.at(i).weight;
+    }
+
+    //if the fit is good, save the infos related to the vertex
+
+    if (isGoodFit < 1) return false;
 
     if (m_constraintType != "noConstraint") {
       TMatrixDSym tubeInv = m_constraintCov;
@@ -1202,16 +1282,7 @@ namespace Belle2 {
 
     m_fitPval = rFit.getPValue();
 
-    //save the track info for later use
-
-    m_raveTracks = trackFitResVec;
-    m_raveWeights.clear();
-
-    for (unsigned int i(0); i < m_raveTracks.size(); ++i)
-      m_raveWeights.push_back(rFit.getWeight(i));
-
     return true;
-
   }
 
 
@@ -1303,7 +1374,6 @@ namespace Belle2 {
 
   }
 
-
   bool TagVertexModule::doVertexFitForBTube(Particle* mother)
   {
     //TMatrixDSym beamSpotCov(3);
@@ -1355,29 +1425,6 @@ namespace Belle2 {
     return oss.str();
   }
 
-  void TagVertexModule::doRaveTracksMatching(std::vector< std::pair<const MCParticle*, int> > const& roeTracksAndMatch)
-  {
-    m_raveTracksMatchStatus = vector<int>(m_raveTracks.size(), 0);
-    m_raveTracksMCParticles = vector<const MCParticle*>(m_raveTracks.size(), 0);
 
-    const TrackFitResult* raveTrack;
-    MCParticle* raveMC;
-    std::pair<const MCParticle*, int> roeTrack;
-    bool keepLooping(true);
-    for (unsigned int i(0); i < m_raveTracks.size(); ++i) {
-      raveTrack = m_raveTracks.at(i);
-      raveMC = raveTrack->getRelatedTo<MCParticle>();
-
-      keepLooping = true;
-      for (unsigned int j(0); j < roeTracksAndMatch.size() && keepLooping; ++j) {
-        roeTrack = roeTracksAndMatch.at(j);
-        if (raveMC == roeTrack.first) {
-          m_raveTracksMCParticles.at(i) = roeTrack.first;
-          m_raveTracksMatchStatus.at(i) = roeTrack.second;
-          keepLooping = false;
-        }
-      }
-    }
-  }
 
 } // end Belle2 namespace

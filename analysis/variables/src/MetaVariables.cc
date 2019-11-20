@@ -109,6 +109,7 @@ namespace Belle2 {
           TLorentzVector pSigB = T.getBeamFourMomentum() - particle->getDaughter(daughterIndexTagB)->get4Vector();
           // set PDG code for temporary sig B particle to opposite flavor of tag B to get the correct mass;
           Particle tmp(pSigB, -particle->getDaughter(daughterIndexTagB)->getPDGCode());
+
           UseReferenceFrame<RestFrame> frame(&tmp);
           double result = var->function(particle);
           return result;

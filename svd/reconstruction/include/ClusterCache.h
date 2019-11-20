@@ -77,6 +77,8 @@ namespace Belle2 {
       ClusterCache(unsigned int maxSamples = MAX_SAMPLES);
       /** No copy construction. */
       ClusterCache(const ClusterCache& other) = delete;
+      /** Do not copy this class, or properly implement copy and assignment*/
+      ClusterCache& operator = (const ClusterCache&) = delete;
       /** Delete the cache and free the memory */
       ~ClusterCache();
       /** Clear the cache structure */

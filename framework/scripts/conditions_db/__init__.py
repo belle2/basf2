@@ -701,7 +701,7 @@ class ConditionsDB:
             * user: name of the user
             * time: time stamp of the request
 
-          password (str): the password for access to jira
+          password: the password for access to jira or the access token and secret for oauth access
 
         Returns:
           True if the upload and jira issue creation/upload was successful
@@ -768,8 +768,15 @@ class ConditionsDB:
                 issue["issuetype"] = {"name": "Task"}
 
             B2INFO(f"Creating jira issue for {data['task']} globaltag request")
-            response = requests.post('https://agira.desy.de/rest/api/latest/issue', auth=(data['user'], password),
-                                     json={'fields': issue})
+            if isinstance(password, str):
+                response = requests.post('https://agira.desy.de/rest/api/latest/issue', auth=(data['user'], password),
+                                         json={'fields': issue})
+            else:
+                fields = {'issue': json.dumps(issue)}
+                if password:
+                    fields['token'] = password[0]
+                    fields['secret'] = password[1]
+                response = requests.post('https://b2-master.belle2.org/cgi-bin/jira_issue.py', data=fields)
             if response.status_code in range(200, 210):
                 B2INFO(f"Issue successfully created: https://agira.desy.de/browse/{response.json()['key']}")
             else:
@@ -784,8 +791,15 @@ class ConditionsDB:
             if isinstance(new_issue_config, dict) and "assignee" in new_issue_config:
                 user = new_issue_config['assignee'].get('name', None)
                 if user is not None:
-                    response = requests.post(f'https://agira.desy.de/rest/api/latest/issue/{issue}/watchers',
-                                             auth=(data['user'], password), json=user)
+                    if isinstance(password, str):
+                        response = requests.post(f'https://agira.desy.de/rest/api/latest/issue/{issue}/watchers',
+                                                 auth=(data['user'], password), json=user)
+                    else:
+                        fields = {'id': issue, 'user': user}
+                        if password:
+                            fields['token'] = password[0]
+                            fields['secret'] = password[1]
+                        response = requests.post('https://b2-master.belle2.org/cgi-bin/jira_issue.py', data=fields)
                     if response.status_code in range(200, 210):
                         B2INFO(f"Added {user} as watcher to {issue}")
                     else:

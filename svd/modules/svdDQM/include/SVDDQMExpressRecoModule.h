@@ -35,6 +35,12 @@ namespace Belle2 {
     /* Destructor */
     virtual ~SVDDQMExpressRecoModule();
 
+    /** this class dynamically allocates memory. If needed copy constructor needs to be implemented properly. For now just deleted.*/
+    SVDDQMExpressRecoModule(const SVDDQMExpressRecoModule&) = delete;
+
+    /** this class dynamically allocates memory. If needed assignment operator needs to be implemented properly. For now just deleted.*/
+    SVDDQMExpressRecoModule& operator= (const SVDDQMExpressRecoModule&) = delete;
+
     /** Module function initialize */
     void initialize() override final;
     /** Module function beginRun */
@@ -47,6 +53,7 @@ namespace Belle2 {
      * to be placed in this function.
     */
     void defineHisto() override final;
+
 
   private:
 

@@ -24,6 +24,11 @@ namespace Belle2 {
       clear();
     }
 
+    /** Do not copy this class, or properly implement copy and assignment*/
+    ClusterCache& operator(const ClusterCache&) = delete;
+    /** Do not copy this class, or properly implement copy and assignment*/
+    ClusterCache(const ClusterCache&) = delete;
+
     ClusterCache::~ClusterCache()
     {
       delete[] m_clsTop;

@@ -499,7 +499,7 @@ namespace Belle2 {
       }
     }
 
-    void GeoSVDCreator::readHalfShellSupport(GearDir support, SVDGeometryPar& svdGeometryPar)
+    void GeoSVDCreator::readHalfShellSupport(const GearDir& support, SVDGeometryPar& svdGeometryPar)
     {
       if (!support) return;
 
@@ -526,7 +526,7 @@ namespace Belle2 {
       return;
     }
 
-    void GeoSVDCreator::readLayerSupport(int layer, GearDir support, SVDGeometryPar& svdGeometryPar)
+    void GeoSVDCreator::readLayerSupport(int layer, const GearDir& support, SVDGeometryPar& svdGeometryPar)
     {
       if (!support) return;
 
@@ -571,7 +571,7 @@ namespace Belle2 {
       return;
     }
 
-    void GeoSVDCreator::readLadderSupport(int layer, GearDir support, SVDGeometryPar& svdGeometryPar)
+    void GeoSVDCreator::readLadderSupport(int layer, const GearDir& support, SVDGeometryPar& svdGeometryPar)
     {
       if (!support) return;
 

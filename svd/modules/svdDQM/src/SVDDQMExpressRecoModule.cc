@@ -66,12 +66,14 @@ SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("SVDExpReco"));
 
+  // TODO: "cum" maybe misinterpreted, one may consider to rename it?!
   m_cumHistos = new TList();
 }
 
 
 SVDDQMExpressRecoModule::~SVDDQMExpressRecoModule()
 {
+  if (m_cumHistos) delete m_cumHistos;
 }
 
 //------------------------------------------------------------------

@@ -9,6 +9,7 @@
 
 #include <trg/cdc/dataobjects/Bitstream.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTriggerHWTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerFinderClone.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
@@ -586,14 +587,15 @@ namespace Belle2 {
      *  @return CDCTriggerTrack*  pointer to 2D track RelationsObject
      *
      */
-    CDCTriggerTrack* decodeNNInput(short iclock,
-                                   unsigned iTracker,
-                                   NNInputBitStream* bitsIn,
-                                   StoreArray<CDCTriggerTrack>* store2DTracks,
-                                   StoreArray<CDCTriggerSegmentHit>* tsHits)
+    CDCTriggerHWTrack* decodeNNInput(short iclock,
+                                     unsigned iTracker,
+                                     NNInputBitStream* bitsIn,
+                                     StoreArray<CDCTriggerHWTrack>* store2DTracks,
+                                     StoreArray<CDCTriggerSegmentHit>* tsHits)
     {
-      CDCTriggerTrack* track2D = nullptr;
-      constexpr unsigned lenTrack = 119;  // omega (7 bit) + phi (7 bit) + 5 * TS (21 bit)
+      CDCTriggerHWTrack* track2D = nullptr;
+      constexpr unsigned lenTrack = 135; //119;
+      // omega (7 bit) + phi (7 bit) + 5 * TS (21 bit) + old track found(6bit) + valid stereo bit (1bit) + drift threshold (9bit)
       const auto slvIn = bitsIn->signal()[iTracker];
       std::string strIn = slv_to_bin_string(slvIn);
       // decode stereo hits
@@ -609,11 +611,63 @@ namespace Belle2 {
       }
       std::string strTrack = strIn.substr(nStereoTSF * 10 * lenTS, lenTrack);
       if (!std::all_of(strTrack.begin(), strTrack.end(), [](char i) {return i == '0';})) {
+        std::string infobits = strTrack.substr(5 * lenTS + 14, 16);
         strTrack = "00" + strTrack.substr(5 * lenTS, 14) + strTrack.substr(0,
                    5 * lenTS); // add 2 dummy bits for the charge (not stored in NN)
         TRG2DFinderTrack trk2D = decode2DTrack(strTrack, iTracker);
         B2DEBUG(15, "NNIn phi0:" << trk2D.phi0 << ", omega:" << trk2D.omega
                 << ", at clock " << iclock << ", tracker " << iTracker);
+        B2DEBUG(300, "Content of new infobits: " << infobits);
+        std::vector<bool> foundoldtrack;
+        std::vector<bool> driftthreshold;
+        bool valstereobit;
+        unsigned i = 0;
+        for (i = 0; i < 6; i++) {
+          if (infobits.substr(i, 1) == "1") {
+            foundoldtrack.push_back(true);
+          } else if (infobits.substr(i, 1) == "0") {
+            foundoldtrack.push_back(false);
+          } else {
+            B2WARNING("Invalid input in NNBitstream appending 'false'!");
+            foundoldtrack.push_back(false);
+          }
+        }
+        for (i = 6; i < 15; i++) {
+          if (infobits.substr(i, 1) == "1") {
+            driftthreshold.push_back(true);
+          } else if (infobits.substr(i, 1) == "0") {
+            driftthreshold.push_back(false);
+          } else {
+            B2WARNING("Invalid input in NNBitstream appending 'false'!");
+            driftthreshold.push_back(false);
+          }
+        }
+        i = 15;
+        if (infobits.substr(i, 1) == "1") {
+          valstereobit = true;
+        } else if (infobits.substr(i, 1) == "0") {
+          valstereobit = false;
+        } else {
+          B2WARNING("Invalid input in NNBitstream appending 'false'!");
+          valstereobit = false;
+        }
+        B2DEBUG(15, "bits for foundoldtrack:    "   << foundoldtrack[0]
+                << foundoldtrack[1]
+                << foundoldtrack[2]
+                << foundoldtrack[3]
+                << foundoldtrack[4]
+                << foundoldtrack[5]);
+        B2DEBUG(15, "bits for driftthreshold:   "   << driftthreshold[0]
+                << driftthreshold[1]
+                << driftthreshold[2]
+                << driftthreshold[3]
+                << driftthreshold[4]
+                << driftthreshold[5]
+                << driftthreshold[6]
+                << driftthreshold[7]
+                << driftthreshold[8]);
+        B2DEBUG(15, "bits for valstereobit:     "   << valstereobit);
+
         // check if 2D track is already in list, otherwise add it
         //for (int itrack = 0; itrack < store2DTracks->getEntries(); ++itrack) {
         //  if ((*store2DTracks)[itrack]->getPhi0() == trk2D->phi0 &&
@@ -624,7 +678,7 @@ namespace Belle2 {
         //  }
         //}
         B2DEBUG(15, "make new 2D track with phi " << trk2D.phi0 << " omega " << trk2D.omega << " clock " << iclock);
-        track2D = store2DTracks->appendNew(trk2D.phi0, trk2D.omega, 0., iclock, iTracker);
+        track2D = store2DTracks->appendNew(trk2D.phi0, trk2D.omega, 0., foundoldtrack, driftthreshold, valstereobit, iclock, iTracker);
         // add axial hits and create relations
         for (unsigned iAx = 0; iAx < nAxialTSF; ++iAx) {
           const auto& ts = trk2D.ts[iAx];
@@ -666,7 +720,7 @@ namespace Belle2 {
                         StoreArray<CDCTriggerTrack>* storeNNTracks,
                         StoreArray<CDCTriggerSegmentHit>* tsHits,
                         StoreArray<CDCTriggerMLPInput>* storeNNInputs,
-                        CDCTriggerTrack* track2D,
+                        CDCTriggerHWTrack* track2D,
                         const CDCTriggerMLP& mlp)
     {
       const auto slvOut = bitsOut->signal()[iTracker];
@@ -728,7 +782,7 @@ namespace Belle2 {
     void decodeNNIO(
       StoreArray<CDCTriggerUnpacker::NNInputBitStream>* bitsToNN,
       StoreArray<CDCTriggerUnpacker::NNOutputBitStream>* bitsFromNN,
-      StoreArray<CDCTriggerTrack>* store2DTracks,
+      StoreArray<CDCTriggerHWTrack>* store2DTracks,
       StoreArray<CDCTriggerTrack>* storeNNTracks,
       StoreArray<CDCTriggerSegmentHit>* tsHits,
       StoreArray<CDCTriggerMLPInput>* storeNNInputs,
@@ -743,15 +797,15 @@ namespace Belle2 {
           const auto slvOutEnable = bitsOutEnable->signal()[iTracker];
           std::string stringOutEnable = slv_to_bin_string(slvOutEnable);
           if (stringOutEnable.c_str()[0] == '1') {
-            CDCTriggerTrack* track2D = decodeNNInput(iclock, iTracker, bitsIn, store2DTracks, tsHits);
-            if (track2D) {
+            CDCTriggerHWTrack* nntrack2D = decodeNNInput(iclock, iTracker, bitsIn, store2DTracks, tsHits);
+            if (nntrack2D) {
               int foundTime = iclock + delayNNOutput[iTracker];
               if (foundTime  < bitsFromNN->getEntries()) {
                 NNOutputBitStream* bitsOut = (*bitsFromNN)[foundTime];
                 NNOutputBitStream* bitsSelectTS = (*bitsFromNN)[iclock + delayNNSelect[iTracker]];
                 decodeNNOutput(iclock, iTracker, bitsOut, bitsSelectTS,
                                storeNNTracks, tsHits, storeNNInputs,
-                               track2D, mlp);
+                               nntrack2D, mlp);
               }
             }
           }

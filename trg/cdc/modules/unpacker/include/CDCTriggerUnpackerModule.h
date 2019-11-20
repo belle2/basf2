@@ -19,6 +19,7 @@
 #include <trg/cdc/dataobjects/Bitstream.h>
 #include <trg/cdc/Unpacker.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTriggerHWTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerFinderClone.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
@@ -305,7 +306,7 @@ namespace Belle2 {
     StoreArray<CDCTriggerMLPInput> m_NeuroInputs;
 
     /** decoded 2D finder tracks from the neural network input */
-    StoreArray<CDCTriggerTrack> m_NNInput2DFinderTracks;
+    StoreArray<CDCTriggerHWTrack> m_NNInput2DFinderTracks;
 
     /** decoded track segment hits from the neural network input */
     StoreArray<CDCTriggerSegmentHit> m_NNInputTSHits;

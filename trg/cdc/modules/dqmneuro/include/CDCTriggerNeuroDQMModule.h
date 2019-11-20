@@ -14,6 +14,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTriggerHWTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
 #include <tracking/dataobjects/RecoTrack.h>
@@ -128,11 +129,11 @@ namespace Belle2 {
     /** StoreArray for 2D finder tracks from unpacker */
     StoreArray<CDCTriggerTrack> m_unpacked2DTracks;
     /** StoreArray for neuro tracks from unpacker */
-    StoreArray<CDCTriggerTrack> m_unpackedNeuroTracks;
+    StoreArray<CDCTriggerHWTrack> m_unpackedNeuroTracks;
     /** StoreArray for neuro input vector from unpacker */
     StoreArray<CDCTriggerMLPInput> m_unpackedNeuroInputVector;
     /** StoreArray for neuro input 2dfinder tracks */
-    StoreArray<CDCTriggerTrack> m_unpackedNeuroInput2DTracks;
+    StoreArray<CDCTriggerHWTrack> m_unpackedNeuroInput2DTracks;
     /** StoreArray for neuro input Track segments */
     StoreArray<CDCTriggerSegmentHit> m_unpackedNeuroInputSegments;
     /** StoreArray for neuro tracks from TSIM */

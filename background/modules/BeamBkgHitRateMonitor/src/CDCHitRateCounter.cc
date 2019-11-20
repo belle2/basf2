@@ -50,7 +50,11 @@ namespace Belle2 {
           << "valid/O";
       tree->Branch("cdc", &m_rates, leafList.str().c_str());
 
-      countActiveWires();
+      if (m_enableBadWireTreatment) {
+        countActiveWires();
+      } else {
+        countActiveWires_countAll();
+      }
     }
 
     void CDCHitRateCounter::clear()
@@ -71,7 +75,7 @@ namespace Belle2 {
 
       ///// get background flag as a map ( ASIC crosstalk, etc..? )
       std::map<const CDCHit*, bool> CDCHitToBackgroundFlag;
-      {
+      if (m_enableBackgroundHitFilter) {
         StoreWrappedObjPtr<std::vector<CDCWireHit>> storeVector("CDCWireHitVector");
         if (not storeVector) {
           B2FATAL("CDCWireHitVector is unaccessible in DataStore."
@@ -95,19 +99,24 @@ namespace Belle2 {
       /////   unsigned short CDCHit::getTOT() /* time over threshold */
       for (CDCHit& hit : m_digits) {
         const WireID wireID(hit.getID());
-        if (geometryPar.isBadWire(wireID))
+        if (m_enableBadWireTreatment && geometryPar.isBadWire(wireID))
           continue;
 
         const int iLayer         = hit.getICLayer();
         const int iSuperLayer    = hit.getISuperLayer();
-        //const unsigned short adc = hit.getADCCount();
+        const unsigned short adc = hit.getADCCount();
 
-        //if (adc < 20) continue;
-        if (CDCHitToBackgroundFlag[&hit]) {
-          unsigned short newStatus = (hit.getStatus() | 0x100);
-          hit.setStatus(newStatus);
-          continue;
+        if (m_enableBackgroundHitFilter) {
+          if (CDCHitToBackgroundFlag[&hit]) {
+            unsigned short newStatus = (hit.getStatus() | 0x100);
+            hit.setStatus(newStatus);
+            continue;
+          }
+        } else {
+          if (adc < 20)
+            continue;
         }
+
         rates.layerHitRate[iLayer] += 1;
         rates.superLayerHitRate[iSuperLayer] += 1;
         rates.averageRate += 1;

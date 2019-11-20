@@ -61,8 +61,12 @@ namespace Belle2 {
 
       /**
        * Constructor
+       * @param enableBadWireTreatment flag to enable the bad wire treatment
+       * @param enableBackgroundHitFilter flag to enable the CDC background hit (crosstakl, noise) filter
        */
-      CDCHitRateCounter()
+      CDCHitRateCounter(const bool enableBadWireTreatment, const bool enableBackgroundHitFilter):
+        m_enableBadWireTreatment(enableBadWireTreatment),
+        m_enableBackgroundHitFilter(enableBackgroundHitFilter)
       {}
 
       /**
@@ -104,6 +108,8 @@ namespace Belle2 {
       // DB payloads
 
       // other
+      const bool m_enableBadWireTreatment; /** flag to enable the bad wire treatment. default: true*/
+      const bool m_enableBackgroundHitFilter; /** flag to enable the CDC background hit (crosstakl, noise) filter. default: true*/
       int m_nActiveWireInTotal = 0;
       int m_nActiveWireInSuperLayer[f_nSuperLayer] = {0};
       int m_nActiveWireInLayer[f_nLayer] = {0};

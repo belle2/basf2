@@ -83,7 +83,10 @@ namespace Belle2 {
              "Additional dictionary of "
              "name->value pairs to be added to the file metadata to describe the data",
              m_additionalDataDescription);
-
+    addParam("cdcEnableBadWireTreatment", m_cdcEnableBadWireTreatment,
+             "CDC: flag to enable the bad wire treatment", true);
+    addParam("cdcEnableBackgroundHitFilter", m_cdcEnableBackgroundHitFilter,
+             "CDC: flag to enable the CDC background hit (crosstakl, noise) filter", true);
   }
 
   BeamBkgHitRateMonitorModule::~BeamBkgHitRateMonitorModule()
@@ -109,7 +112,7 @@ namespace Belle2 {
     m_monitors.push_back(pxd);
     auto* svd = new Background::SVDHitRateCounter(m_svdShaperDigitsName, m_svdThrCharge);
     m_monitors.push_back(svd);
-    auto* cdc = new Background::CDCHitRateCounter();
+    auto* cdc = new Background::CDCHitRateCounter(m_cdcEnableBadWireTreatment, m_cdcEnableBackgroundHitFilter);
     m_monitors.push_back(cdc);
     auto* top = new Background::TOPHitRateCounter(m_topTimeOffset, m_topTimeWindow);
     m_monitors.push_back(top);

@@ -1143,7 +1143,7 @@ namespace {
     EXPECT_FLOAT_EQ(var->function(&p), 3.185117);
   }
 
-  TEST_F(MetaVariableTest, useSigBestFrame)
+  TEST_F(MetaVariableTest, useTagSideRecoilRestFrame)
   {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<Particle> particles;
@@ -1160,23 +1160,23 @@ namespace {
     p0->appendDaughter(p1->getArrayIndex());
     p0->appendDaughter(p2->getArrayIndex());
 
-    const Manager::Var* var = Manager::Instance().getVariable("useSigBRestFrame(daughter(1, p))");
+    const Manager::Var* var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, p), 0)");
     ASSERT_NE(var, nullptr);
     EXPECT_NEAR(var->function(p0), 0., 1e-6);
 
-    var = Manager::Instance().getVariable("useSigBRestFrame(daughter(1, px))");
+    var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, px), 0)");
     ASSERT_NE(var, nullptr);
     EXPECT_NEAR(var->function(p0), 0., 1e-6);
 
-    var = Manager::Instance().getVariable("useSigBRestFrame(daughter(1, py))");
+    var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, py), 0)");
     ASSERT_NE(var, nullptr);
     EXPECT_NEAR(var->function(p0), 0., 1e-6);
 
-    var = Manager::Instance().getVariable("useSigBRestFrame(daughter(1, pz))");
+    var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, pz), 0)");
     ASSERT_NE(var, nullptr);
     EXPECT_NEAR(var->function(p0), 0., 1e-6);
 
-    var = Manager::Instance().getVariable("useSigBRestFrame(daughter(1, E))");
+    var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, E), 0)");
     ASSERT_NE(var, nullptr);
     EXPECT_NEAR(var->function(p0), p1->getMass(), 1e-6);
   }

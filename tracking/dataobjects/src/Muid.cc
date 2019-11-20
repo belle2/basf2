@@ -109,3 +109,17 @@ unsigned int Muid::getTotalEndcapHits() const
   }
   return hits;
 }
+
+bool Muid::isExtrapolatedBarrelLayerCrossed(unsigned int layer) const
+{
+  if (layer >= BKLMElementNumbers::getMaximalLayerNumber())
+    return false;
+  return m_ExtLayerPattern & (1 << layer);
+};
+
+bool Muid::isExtrapolatedEndcapLayerCrossed(unsigned int layer) const
+{
+  if (layer >= EKLMElementNumbers::getMaximalLayerNumber())
+    return false;
+  return m_ExtLayerPattern & (1 << (BKLMElementNumbers::getMaximalLayerNumber() + layer));
+};

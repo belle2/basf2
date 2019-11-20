@@ -187,7 +187,6 @@ void KLMTimeCalibrationCollectorModule::collect()
     RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
     RelationVector<BKLMHit2d> bklmHit2ds = track->getRelationsTo<BKLMHit2d>();
     RelationVector<EKLMHit2d> eklmHit2ds = track->getRelationsTo<EKLMHit2d>();
-    RelationVector<Muid> Muids = track->getRelationsTo<Muid>();
 
     getObjectPtr<TH1I>("m_HnHit2d_bklm")->Fill(int(bklmHit2ds.size()));
     getObjectPtr<TH1I>("m_HnHit2d_eklm")->Fill(int(eklmHit2ds.size()));
@@ -210,15 +209,13 @@ void KLMTimeCalibrationCollectorModule::collect()
       int tSub, tFor, tSec, tLay;
       m_elementNum->moduleNumberToElementNumbers(copyId, &tSub, &tFor, &tSec, &tLay);
       bool crossed = false; // should be only once ?
-      for (unsigned int mu = 0; mu < Muids.size(); mu++) {
-        Muid* muid =  Muids[mu];
-        int extPattern = muid->getExtLayerPattern();
-        if ((extPattern & (1 << (tLay - 1))) != 0)  crossed = true;
-        if (crossed) break;
-      }
-      if (!crossed) continue;
-
-      m_mapExtHits.insert(std::pair<int, ExtHit*>(copyId, extHit));
+      Muid* muid = track->getRelatedTo<Muid>();
+      if (tSub == KLMElementNumbers::c_BKLM)
+        crossed = muid->isExtrapolatedBarrelLayerCrossed(tLay - 1);
+      else
+        crossed = muid->isExtrapolatedEndcapLayerCrossed(tLay);
+      if (crossed)
+        m_mapExtHits.insert(std::pair<int, ExtHit*>(copyId, extHit));
     }
 
     B2DEBUG(20, "In KLM coverage: " << LogVar("exthits", m_mapExtHits.size())

@@ -115,6 +115,12 @@ namespace Belle2 {
     //! @return total number of matching EKLM hits
     unsigned int getTotalEndcapHits() const;
 
+    //! @return true if the given BKLM layer is crossed during extrapolation
+    bool isExtrapolatedBarrelLayerCrossed(unsigned int layer) const;
+
+    //! @return true if the given EKLM layer is crossed during extrapolation
+    bool isExtrapolatedEndcapLayerCrossed(unsigned int layer) const;
+
     //! @return BKLM efficiency value
     float getExtBKLMEfficiencyValue(int index) const { return m_ExtBKLMEfficiencyValue[index]; }
 

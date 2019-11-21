@@ -85,7 +85,7 @@ namespace Belle2 {
 
     /**
      * Get channel number.
-     * @param[in] section Forward (1) or backward (0) BKLM.
+     * @param[in] section Section (0-based).
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
      * @param[in] plane   Plane (0-based).
@@ -96,20 +96,40 @@ namespace Belle2 {
 
     /**
      * Get element numbers by channel number.
-     * @param[in] channel  Channel.
-     * @param[out] forward Forward (1) or backward (0) BKLM.
+     * @param[in]  channel Channel.
+     * @param[out] section Section (0-based).
      * @param[out] sector  Sector (1-based).
      * @param[out] layer   Layer (1-based).
      * @param[out] plane   Plane (0-based).
      * @param[out] strip   Strip (1-based).
      */
     static void channelNumberToElementNumbers(
-      uint16_t channel, int* forward, int* sector, int* layer, int* plane,
+      uint16_t channel, int* section, int* sector, int* layer, int* plane,
       int* strip);
 
     /**
+     * Get plane number.
+     * @param[in] section Section (0-based).
+     * @param[in] sector  Sector (1-based).
+     * @param[in] layer   Layer (1-based).
+     * @param[in] plane   Plane (0-based).
+     */
+    static uint16_t planeNumber(int section, int sector, int layer, int plane);
+
+    /**
+     * Get element numbers by plane number.
+     * @param[in]  channel Channel.
+     * @param[out] section Section (0-based).
+     * @param[out] sector  Sector (1-based).
+     * @param[out] layer   Layer (1-based).
+     * @param[out] plane   Plane (0-based).
+     */
+    static void planeNumberToElementNumbers(
+      uint16_t planeGlobal, int* section, int* sector, int* layer, int* plane);
+
+    /**
      * Get module number.
-     * @param[in] section Forward (1) or backward (0) BKLM.
+     * @param[in] section Section (0-based).
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
      */
@@ -118,23 +138,23 @@ namespace Belle2 {
     /**
      * Get element numbers by module number.
      * @param[in]  module  Module.
-     * @param[out] forward Forward (1) or backward (0) BKLM.
+     * @param[out] section Section (0-based).
      * @param[out] sector  Sector (1-based).
      * @param[out] layer   Layer (1-based).
      */
     static void moduleNumberToElementNumbers(
-      uint16_t module, int* forward, int* sector, int* layer);
+      uint16_t module, int* section, int* sector, int* layer);
 
     /**
      * Get sector number.
-     * @param[in] section Forward (1) or backward (0) BKLM.
+     * @param[in] section Section (0-based).
      * @param[in] sector  Sector (1-based).
      */
     static uint16_t sectorNumber(int section, int sector);
 
     /**
      * Get layer global number.
-     * @param[in] section Forward (1) or backward (0) BKLM.
+     * @param[in] section Section (0-based).
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
      */
@@ -142,7 +162,7 @@ namespace Belle2 {
 
     /**
      * Get number of strips.
-     * @param[in] section Forward (1) or backward (0) BKLM.
+     * @param[in] section Section (0-based).
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
      * @param[in] plane   Plane (0-based).
@@ -151,7 +171,7 @@ namespace Belle2 {
 
     /**
      * Check if section number is correct.
-     * @param[in] section    Forward (1) or backward (0) BKLM.
+     * @param[in] section    Section (0-based).
      * @param[in] fatalError Issue fatal error (default) or not.
      */
     static bool checkSection(int section, bool fatalError = true);
@@ -179,7 +199,7 @@ namespace Belle2 {
 
     /**
      * Check channel number.
-     * @param[in] section Forward (1) or backward (0) BKLM.
+     * @param[in] section Section (0-based).
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
      * @param[in] plane   Plane (0-based).
@@ -246,7 +266,7 @@ namespace Belle2 {
     /**
      * Get element numbers by layer global number (0-based).
      * @param[in]  layerGlobal  Layer global number.
-     * @param[out] section      Forward (1) or backward (0) BKLM.
+     * @param[out] section      Section (0-based).
      * @param[out] sector       Sector (1-based).
      * @param[out] layer        Layer (1-based).
      */

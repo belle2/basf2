@@ -433,17 +433,17 @@ namespace Belle2 {
     h_theta->Fit(f1, "R");
 
     //Normalise bins in histogram bitsPerMerger
-    for (int mergerID = 1; mergerID == 72; ++mergerID) {
+    for (int mergerID = 1; mergerID < 73; ++mergerID) {
       double NHapd = 0;
-      for (int febSlot = 1; febSlot == 6; ++febSlot) {
+      for (int febSlot = 1; febSlot < 7; ++febSlot) {
         if (arichMergerMap->getModuleID(mergerID, febSlot) > 0) NHapd++;
       }
 
       double bin_value[4];
-      for (int i = 0; i < 4; ++i) {
+      for (int i = 1; i < 5; ++i) {
         // loop over bits
-        bin_value[i] = h_bitsPerMerger->GetBinContent(i, mergerID);
-        h_bitsPerMerger->SetBinContent(i, mergerID, bin_value[i] / NHapd);
+        bin_value[i - 1] = h_bitsPerMerger->GetBinContent(i, mergerID);
+        h_bitsPerMerger->SetBinContent(i, mergerID, bin_value[i - 1] / NHapd);
       }
     }
 

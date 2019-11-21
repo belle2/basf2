@@ -268,7 +268,7 @@ void cdcDQM7Module::event()
         for (int isl = 0; isl < sL; isl ++) {
           cid += isl * 6 * ndiv[isl];
         }
-        cid += 2 * ndiv[0] + iL * ndiv[sL + 1] + wid;
+        cid += 2 * ndiv[0] + iL * ndiv[sL] + wid;
       }
       h_hit_cell -> Fill(cid);
     }

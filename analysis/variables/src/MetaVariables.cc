@@ -92,6 +92,43 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr useTagSideRecoilRestFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+
+        int daughterIndexTagB = 0;
+        try {
+          daughterIndexTagB = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("Second argument of useTagSideRecoilRestFrame meta function must be integer!");
+          return nullptr;
+        }
+
+        auto func = [var, daughterIndexTagB](const Particle * particle) -> double {
+          if (particle->getPDGCode() != 300553)
+          {
+            B2ERROR("Variable should only be used on a Upsilon(4S) Particle List!");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+
+          PCmsLabTransform T;
+          TLorentzVector pSigB = T.getBeamFourMomentum() - particle->getDaughter(daughterIndexTagB)->get4Vector();
+          Particle tmp(pSigB, -particle->getDaughter(daughterIndexTagB)->getPDGCode());
+
+          UseReferenceFrame<RestFrame> frame(&tmp);
+          double result = var->function(particle);
+          return result;
+        };
+
+        return func;
+      } else {
+        B2WARNING("Wrong number of arguments for meta function useTagSideRecoilRestFrame");
+        return nullptr;
+      }
+    }
+
+
 
     Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments)
     {
@@ -2240,6 +2277,10 @@ Returns the value of ``variable`` in the *lab* frame.
 Specifying the lab frame is useful in some corner-cases. For example:
 ``useRestFrame(daughter(0, formula(E - useLabFrame(E))))`` which is the difference of the first daughter's energy in the rest frame of the mother (current particle) with the same daughter's lab-frame energy.
 )DOC");
+    REGISTER_VARIABLE("useTagSideRecoilRestFrame(variable, daughterIndexTagB)", useTagSideRecoilRestFrame,
+                      "Returns the value of the variable in the rest frame of the recoiling particle to the tag side B meson.\n"
+                      "The variable should only be applied to an Upsilon(4S) list.\n"
+                      "E.g. ``useTagSideRecoilRestFrame(daughter(1, daughter(1, p)), 0)`` applied on a Upsilon(4S) list (``Upsilon(4S)->B+:tag B-:sig``) returns the momentum of the second daughter of the signal B meson in the signal B meson rest frame.");
     REGISTER_VARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
                       "Useful if you want to write out if a particle would have passed a cut or not.\n"

@@ -96,18 +96,24 @@ namespace Belle2 {
     {
       if (arguments.size() == 2) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        int daughterIndexTagB = std::stoi(arguments[1]);
+
+        int daughterIndexTagB = 0;
+        try {
+          daughterIndexTagB = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("Second argument of useTagSideRecoilRestFrame meta function must be integer!");
+          return nullptr;
+        }
 
         auto func = [var, daughterIndexTagB](const Particle * particle) -> double {
           if (particle->getPDGCode() != 300553)
           {
             B2ERROR("Variable should only be used on a Upsilon(4S) Particle List!");
             return std::numeric_limits<float>::quiet_NaN();
-          };
+          }
 
           PCmsLabTransform T;
           TLorentzVector pSigB = T.getBeamFourMomentum() - particle->getDaughter(daughterIndexTagB)->get4Vector();
-          // set PDG code for temporary sig B particle to opposite flavor of tag B to get the correct mass;
           Particle tmp(pSigB, -particle->getDaughter(daughterIndexTagB)->getPDGCode());
 
           UseReferenceFrame<RestFrame> frame(&tmp);

@@ -31,6 +31,10 @@ namespace Belle2 {
     /// Destructor
     virtual ~SVDCoGTimeCalibrationAlgorithm() {}
 
+    void setMinEntries(int minEntries) {m_minEntries = minEntries;}
+
+    int getMinEntries() {return m_minEntries;}
+
   protected:
 
     /// Run algo on data
@@ -40,7 +44,7 @@ namespace Belle2 {
 
     std::string m_id;
     int m_ent = 0;
-
+    float m_minEntries = 10000;
   };
 } // namespace Belle2
 

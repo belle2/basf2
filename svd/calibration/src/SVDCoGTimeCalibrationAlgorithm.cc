@@ -86,7 +86,7 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           auto hEventT0nosync = getObjectPtr<TH1F>(Form("eventT0nosync__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
           cout << " " << endl;
           cout << typeid(hEventT0vsCoG).name() << " " << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << endl;
-          if (layer_num == 3 && hEventT0vsCoG->GetEntries() < 100000) {
+          if (layer_num == 3 && hEventT0vsCoG->GetEntries() < m_minEntries) {
             cout << " " << endl;
             cout << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << endl;
             cout << "Not enough data, adding one run to the collector" << endl;

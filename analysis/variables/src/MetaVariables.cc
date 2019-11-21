@@ -2280,7 +2280,7 @@ Specifying the lab frame is useful in some corner-cases. For example:
     REGISTER_VARIABLE("useTagSideRecoilRestFrame(variable, daughterIndexTagB)", useTagSideRecoilRestFrame,
                       "Returns the value of the variable in the rest frame of the recoiling particle to the tag side B meson.\n"
                       "The variable should only be applied to an Upsilon(4S) list.\n"
-                      "E.g. ``useTagSideRecoilRestFrame(daughter(1, daugther(1, p)), 0)`` applied on a Upsilon(4S) list (``Upsilon(4S)->B+:tag B-:sig``) returns the momentum of the second daughter of the signal B meson in the signal B meson rest frame.");
+                      "E.g. ``useTagSideRecoilRestFrame(daughter(1, daughter(1, p)), 0)`` applied on a Upsilon(4S) list (``Upsilon(4S)->B+:tag B-:sig``) returns the momentum of the second daughter of the signal B meson in the signal B meson rest frame.");
     REGISTER_VARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
                       "Useful if you want to write out if a particle would have passed a cut or not.\n"

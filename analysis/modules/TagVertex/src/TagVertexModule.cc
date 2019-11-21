@@ -289,6 +289,7 @@ namespace Belle2 {
     /* Depending on the user's choice, one of the possible algorithms is chosen for the fit. In case the algorithm does not converge, in order to assure
        high efficiency, the next algorithm less restictive is used. I.e, if standard_PXD does not work, the program tries with standard.
     */
+
     m_FitType = 0;
     if (m_trackFindingType == "singleTrack_PXD") {
       ok = getTagTracks_singleTrackAlgorithm(Breco, 1);
@@ -974,12 +975,9 @@ namespace Belle2 {
      */
   bool TagVertexModule::getTagTracks_singleTrackAlgorithm(Particle* Breco, int reqPXDHits)
   {
-    cout << "SALUT1" << endl;
     const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
     std::vector<const Track*> fitTracks; // Vector of track that will be returned after the selection. Now it must contain only 1
 
-
-    cout << "SALUT2" << endl;
     auto* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
     if (!flavorTagInfo) return false;
     std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
@@ -990,8 +988,6 @@ namespace Belle2 {
     std::vector<Belle2::Track*> originalTracks = flavorTagInfo->getTracks();
     std::vector<Particle*> listParticle = flavorTagInfo->getParticle();
     std::vector<std::string> categories = flavorTagInfo->getCategories();
-
-    cout << "SALUT3" << endl;
 
     if (ROETracks.size() == 0) return false;
 
@@ -1005,8 +1001,6 @@ namespace Belle2 {
         flavorTagInfo->setIsFromB(0);
       }
     }
-
-    cout << "SALUT4" << endl;
 
     // Obtain the impact parameters of the tracks, D0 and Z0. Need the result of the track Fit.
     Const::ChargedStable constArray[8] = {Const::electron, Const::muon, Const::muon, Const::kaon,
@@ -1029,16 +1023,12 @@ namespace Belle2 {
     std::vector<float> listZ0 = flavorTagInfo->getZ0();
     std::vector<float> listD0 = flavorTagInfo->getD0();
 
-    cout << "SALUT5" << endl;
-
-
     // Save in a vector the hits left by each track in the Pixel Vertex Detector. This will be useful when requesting PXD hits.
     std::vector<int> listNPXDHits(listParticle.size());
     for (unsigned i = 0; i < listParticle.size(); i++) {
       listNPXDHits[i] = int(Variable::trackNPXDHits(listParticle[i]));
     }
 
-    cout << "SALUT6 " << listTracks.size() << " " << originalTracks.size() << " " << listMomentum.size() << endl;
     return false;
 
     // Here the program keeps track of the tracks that are repeated inside the FlavorTaggerInfo
@@ -1057,15 +1047,10 @@ namespace Belle2 {
       nonRepeated++;
     }
 
-    cout << "SALUT6a" << endl;
-
-
     // Basic cut. Impact parameter needs to be small.
     for (unsigned i = 0; i < listTracks.size(); i++) {
       if ((listZ0.at(i) > 0.1 || listD0.at(i) > 0.1) && listTracks.at(i) != 0) eliminateTrack(listTracks, i);
     }
-
-    cout << "SALUT7" << endl;
 
     B2DEBUG(10, "Required PXD hits " << reqPXDHits);
     for (unsigned i = 0; i < listTracks.size(); i++) {
@@ -1074,8 +1059,6 @@ namespace Belle2 {
         eliminateTrack(listTracks, i);
       }
     }
-
-    cout << "SALUT8" << endl;
 
     // Residual cut from the previous algorithm. Used to give good results discarding secondary tracks. Could be more useful for future non-single track algorithms.
     for (unsigned i = 0; i < listTracks.size(); i++) {
@@ -1090,8 +1073,6 @@ namespace Belle2 {
       }
     }
 
-    cout << "SALUT9" << endl;
-
     // SINGLE TRACK SELECTION
     /* Here the code selects only one track to perform the Single Track Fit. Up to now 3 conditions has been implemented for the chosen track to be taken as primary:
        - Maximum momentum
@@ -1105,8 +1086,6 @@ namespace Belle2 {
     float minTargetProb = 0.2;
     float minCategoryProb = 0.2;
 
-    cout << "SALUTa" << endl;
-
     if (listMomentum[1] == maxP && listTargetP[1] > minTargetProb && listCategoryP[1] > minCategoryProb && listTracks[1] != 0) {
       fitTracks.push_back(originalTracks[1]);
       m_tagTracks = fitTracks;
@@ -1116,8 +1095,6 @@ namespace Belle2 {
     } else { // When no single track is available, return false and try with other algorithm.
       return false;
     }
-
-    cout << "SALUTb" << endl;
 
     return true;
 
@@ -1174,6 +1151,7 @@ namespace Belle2 {
     //prepare container of pointer to tracks
     TrackAndWeight trackAndWeight;
     trackAndWeight.mcParticle = 0;
+    trackAndWeight.weight = -1111.;
     vector<TrackAndWeight> trackAndWeights;
 
     // apply constraint
@@ -1243,8 +1221,9 @@ namespace Belle2 {
     //Tracks are sorted from highest rave weight to lowest
 
     unsigned int n(trackAndWeights.size());
-    for (unsigned int i(0); i < n; ++i)
+    for (unsigned int i(0); i < n && isGoodFit >= 1; ++i)
       trackAndWeights.at(i).weight = rFit.getWeight(i);
+
 
     sort(trackAndWeights.begin(), trackAndWeights.end(), compare);
 

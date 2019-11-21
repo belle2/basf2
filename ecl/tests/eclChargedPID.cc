@@ -84,9 +84,7 @@ namespace Belle2 {
 
     std::vector<int> pdgIds = {11, -11, 13, -13, 211, -211, 321, -321, 2212, -2212};
 
-    for (const auto& pdgId : pdgIds) {
-      eclPdfs.setBinsHist(pdgId, histgrid);
-    }
+    eclPdfs.setPdfCategories(&histgrid);
 
     // Create a set of fictitious (normalised) PDFs of E/p=x, for various signed particle hypotheses.
     TF1 pdf_el("pdf_el", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.2);
@@ -121,13 +119,10 @@ namespace Belle2 {
     float likelihoods_plus[Const::ChargedStable::c_SetSize];
     float likelihoods_minus[Const::ChargedStable::c_SetSize];
 
-    // Choose an arbitrary set of (P,theta), and of E/P.
+    // Choose an arbitrary set of (clusterTheta, p), and of E/p.
     double theta = 1.047; // (X) --> theta [rad] = 60 [deg] --> [44,117] deg
     double p     = 0.85;  // (Y) --> P [GeV] = 850 [MeV] --> [750,1000] MeV
     double eop   = 0.87;
-
-    std::cout << "Theta = " << theta << " [rad]" << std::endl;
-    std::cout << "P = " << p << " [GeV]" << std::endl;
 
     // Fill the DB PDF map.
     for (const auto& pdf : pdfs) {

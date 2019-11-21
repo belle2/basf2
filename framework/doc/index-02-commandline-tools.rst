@@ -19,3 +19,4 @@ files created by the Belle2 Software.
     :glob:
 
     tools/*
+    ../../analysis/doc/analysis-tools.rst

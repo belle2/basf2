@@ -20,6 +20,7 @@ from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
 from ROOT import Belle2
 from ROOT.Belle2 import TOP
 from basf2 import B2ERROR
+from top_calibration import BS13d_calibration_local
 
 # ----- those parameters need to be adjusted before running -----------------------
 #
@@ -64,51 +65,12 @@ if not os.path.isfile(laser_mc_fit):
     B2ERROR(f"File {laser_mc_fit} not found")
     sys.exit()
 
-# Output folder
+# Output folder name
 run_range = 'r' + '{:0=5d}'.format(run_first) + '-' + '{:0=5d}'.format(run_last)
 output_dir = f"{main_output_dir}/channelT0-local-{expNo}-{run_range}"
 
-# Temporary fix for BII-5431
-if not os.path.isdir(main_output_dir):
-    os.makedirs(main_output_dir)
-    print('New folder created: ' + main_output_dir)
-
 # Suppress messages during processing
 # basf2.set_log_level(basf2.LogLevel.WARNING)
-
-
-def BS13d_calibration():
-    ''' calibration of carrier shifts of BS13d with laser data '''
-
-    #   create path
-    main = basf2.create_path()
-
-    #   add basic modules
-    main.add_module('SeqRootInput')
-    main.add_module('TOPGeometryParInitializer')
-    main.add_module('TOPUnpacker')
-    main.add_module('TOPRawDigitConverter', lookBackWindows=look_back,
-                    useAsicShiftCalibration=False, useChannelT0Calibration=False)
-
-    #   collector module
-    collector = basf2.register_module('TOPAsicShiftsBS13dCollector')
-
-    #   algorithm
-    algorithm = TOP.TOPAsicShiftsBS13dAlgorithm()
-    algorithm.setWindowSize(0)
-
-    #   define calibration
-    cal = Calibration(name='TOP_BS13dCalibration', collector=collector,
-                      algorithms=algorithm, input_files=inputFiles)
-    for globalTag in reversed(globalTags):
-        cal.use_central_database(globalTag)
-    for localDB in reversed(localDBs):
-        cal.use_local_database(localDB)
-    cal.pre_collector_path = main
-    cal.max_files_per_collector_job = 1
-    cal.backend_args = {"queue": "l"}
-    cal.strategies = SequentialRunByRun  # in case of power-cycle between the runs
-    return cal
 
 
 def channelT0_calibration():
@@ -144,7 +106,7 @@ def channelT0_calibration():
 
     #    algorithm
     algorithm = TOP.TOPLocalCalFitter()
-    algorithm.setFitMode(fitMode)
+    algorithm.setFitMode(fit_mode)
     algorithm.setTTSFileName(tts_file)
     algorithm.setFitConstraintsFileName(laser_mc_fit)
 
@@ -157,16 +119,19 @@ def channelT0_calibration():
         cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.max_files_per_collector_job = 1
-    cal.backend_args = {"queue": "l"}
     cal.strategies = SingleIOV  # merge all runs together to gain statistics
     return cal
 
 
+# Define calibrations
+cal1 = BS13d_calibration_local(inputFiles, look_back, globalTags, localDBs)
+cal2 = channelT0_calibration()
+cal1.backend_args = {"queue": "l"}
+cal2.backend_args = {"queue": "l"}
+cal2.depends_on(cal1)
+
 # Add calibrations to CAF
 cal_fw = CAF()
-cal1 = BS13d_calibration()
-cal2 = channelT0_calibration()
-cal2.depends_on(cal1)
 cal_fw.add_calibration(cal1)
 cal_fw.add_calibration(cal2)
 cal_fw.output_dir = output_dir

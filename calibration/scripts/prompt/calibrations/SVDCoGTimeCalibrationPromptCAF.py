@@ -30,8 +30,8 @@ input_branches = [
 now = datetime.datetime.now()
 uniqueID = "SVDCoGTimeCalibrations_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_lat=+47.16"
 
-settings = CalibrationSettings(name="SVDCoGTimeCalibrationPromptTest",
-                               expert_username="ddossett",
+settings = CalibrationSettings(name="SVDCoGTimeCalibrationPrompt",
+                               expert_username="gdujani",
                                description=__doc__,
                                input_data_formats=["cdst"],
                                input_data_names=["hlt_hadron"],

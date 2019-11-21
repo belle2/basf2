@@ -182,4 +182,7 @@ void ParticleStatsModule::terminate()
   stream << "Total Number of Particles created in the DataStore: " << m_nParticles;
   stream << "\n=======================================================\n";
   B2INFO(stream.str());
+
+  delete m_PassMatrix;
+  delete m_MultiplicityMatrix;
 }

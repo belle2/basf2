@@ -38,8 +38,8 @@ class ConstraintsGenerator(Module):
         print("Done: ", self.generator.filename)
 
 
-def save_config(constraint_sets, timedep_config=None, global_tags=None):
-    a = {'constraint_sets': constraint_sets, 'timedep_config': timedep_config, 'global_tags': global_tags}
+def save_config(constraint_sets, timedep_config=None, global_tags=None, init_event=None):
+    a = {'constraint_sets': constraint_sets, 'timedep_config': timedep_config, 'global_tags': global_tags, 'init_event': init_event}
 
     file_Name = "constraint_config.pickled"
     # open the file for writing
@@ -58,10 +58,10 @@ def read_config(filename='constraint_config.pickled'):
     with open(filename, 'rb') as fileObject:
         # load the object from the file into var b
         b = pickle.load(fileObject)
-    return (b['constraint_sets'], b['timedep_config'], b['global_tags'])
+    return (b['constraint_sets'], b['timedep_config'], b['global_tags'], b['init_event'])
 
 
-def gen_constraints(constraint_sets, timedep_config=None, global_tags=None):
+def gen_constraints(constraint_sets, timedep_config=None, global_tags=None, init_event=None):
     if timedep_config is None:
         timedep_config = []
 
@@ -73,7 +73,9 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None):
         events += [event for event in events_]
 
     if not len(timedep_config):
-        events = [(0, 0, 0)]
+        if init_event is None:
+            init_event = (0, 0, 0)
+        events = [init_event]
 
     events = [(exp, run, ev) for (ev, run, exp) in events]
     events = sorted(list(set(events)))
@@ -133,8 +135,8 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None):
 
 
 def gen_constraints_from_config(filename='constraint_config.pickled'):
-    constraint_sets, timedep_config, global_tags = read_config(filename)
-    gen_constraints(constraint_sets, timedep_config, global_tags)
+    constraint_sets, timedep_config, global_tags, init_event = read_config(filename)
+    gen_constraints(constraint_sets, timedep_config, global_tags, init_event)
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:

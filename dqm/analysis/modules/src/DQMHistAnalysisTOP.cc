@@ -12,6 +12,7 @@
 #include <boost/format.hpp>
 #include <daq/slc/base/StringUtil.h>
 #include <TClass.h>
+#include <TH2.h>
 #include "TROOT.h"
 
 using namespace std;
@@ -72,17 +73,16 @@ void DQMHistAnalysisTOPModule::initialize()
   m_h_badHitsMean->SetMinimum(0);
   m_h_badHitsRMS->SetMinimum(0);
 
-  m_line1 = new TLine(0.5, 220, 16.5, 220);
-  m_line2 = new TLine(0.5, 250, 16.5, 250);
+  m_line1 = new TLine(0.5, 215, 16.5, 215);
+  m_line2 = new TLine(0.5, 235, 16.5, 235);
   m_line1->SetLineWidth(2);
   m_line2->SetLineWidth(2);
   m_line1->SetLineColor(kRed);
   m_line2->SetLineColor(kRed);
 
-  m_text1 = new TPaveText(2, 400, 8, 500, "NB");
+  m_text1 = new TPaveText(1, 435, 10, 500, "NB");
   m_text1->SetFillColorAlpha(kWhite, 0);
   m_text1->SetBorderSize(0);
-  m_text1->AddText("Expect no entries outside of red lines");
 }
 
 
@@ -160,6 +160,29 @@ void DQMHistAnalysisTOPModule::event()
     }
   }
 
+  TH2F* hraw = (TH2F*)findHist("TOP/window_vs_slot");
+  double exRatio(0.0);
+  double totalraw(0.0);
+  double totalbadraw(0.0);
+  if (hraw != NULL) {
+    totalraw = hraw->GetEntries();
+    for (int i = 1; i <= 16; i++) {
+      for (int j = 1; j <= 512; j++) {
+        double nhraw = hraw->GetBinContent(i, j);
+        if (j < 215 || j > 235) totalbadraw += nhraw ;
+      }
+    }
+  }
+  if (totalraw > 0) exRatio = totalbadraw * 1.0 / totalraw;
+
+  m_text1->Clear();
+  m_text1->AddText(Form("Ratio of entries outside of red lines: %.2f %%", exRatio * 100.0));
+  if (exRatio > 0.01) {
+    m_text1->AddText(">1% bad, report to TOP experts!");
+  } else {
+    m_text1->AddText("<0.1% good, 0.1-1% recoverable.");
+  }
+
   //addHist("", m_h_goodHitsMean->GetName(), m_h_goodHitsMean);
 
   TCanvas* c1 = find_canvas("TOP/c_hitsPerEvent");
@@ -174,6 +197,8 @@ void DQMHistAnalysisTOPModule::event()
   TCanvas* c2 = find_canvas("TOP/c_window_vs_slot");
   if (c2 != NULL) {
     c2->cd();
+    if (exRatio > 0.01) c2->Pad()->SetFillColor(kRed);
+    else c2->Pad()->SetFillColor(kWhite);
     m_line1->Draw();
     m_line2->Draw();
     m_text1->Draw();

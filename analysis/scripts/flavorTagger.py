@@ -47,7 +47,7 @@ def setInteractionWithDatabase(downloadFromDatabaseIfNotFound=False, uploadToDat
 
 
 # Default list of aliases that should be used to save the flavor tagging information using VariablesToNtuple
-flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined', 'qrMC', 'mcFlavorOfOtherB0',
+flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined', 'qrMC', 'mcFlavorOfOtherB',
                   'qpElectron', 'hasTrueTargetElectron', 'isRightCategoryElectron',
                   'qpIntermediateElectron', 'hasTrueTargetIntermediateElectron', 'isRightCategoryIntermediateElectron',
                   'qpMuon', 'hasTrueTargetMuon', 'isRightCategoryMuon',

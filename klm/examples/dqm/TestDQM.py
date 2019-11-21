@@ -7,7 +7,13 @@
 # dqm/analysis/examples/DQMAnalysisKLM.py
 
 import basf2
+import sys
 from daqdqm.commondqm import add_common_dqm
+
+raw_data = False
+if len(sys.argv) >= 2:
+    if sys.argv[1] == 'raw':
+        raw_data = True
 
 # Set the global log level
 basf2.set_log_level(basf2.LogLevel.INFO)
@@ -31,11 +37,10 @@ main.add_module('Geometry')
 main.add_module('HistoManager',
                 histoFileName='KLMDQM.root')
 
-# Unpacker
-main.add_module('KLMUnpacker')
-
-# BKLM reconstructor
-main.add_module('BKLMReconstructor')
+# Unpacker and reconstruction.
+if raw_data:
+    main.add_module('KLMUnpacker')
+    main.add_module('BKLMReconstructor')
 
 # DQM
 add_common_dqm(main, components=['KLM'])

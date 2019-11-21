@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber                                            *
@@ -19,6 +19,7 @@
 // dataobjects
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
@@ -51,7 +52,8 @@ namespace Belle2 {
       theta = 21,
       phiId = 22,
       thetaId = 23,
-      cellId = 24
+      cellId = 24,
+      mcenergy = 25
     };
 
     // enum with available center types
@@ -280,6 +282,14 @@ namespace Belle2 {
             return eclCalDigits[storearraypos]->getTwoComponentDiodeEnergy();
           } else if (varid == varType::twoComponentFitType) {
             return int(eclCalDigits[storearraypos]->getTwoComponentFitType());
+          } else if (varid == varType::mcenergy) {
+            // loop over all related MCParticles
+            auto digitMCRelations = eclCalDigits[storearraypos]->getRelationsTo<MCParticle>();
+            double edep = 0.0;
+            for (unsigned int i = 0; i < digitMCRelations.size(); ++i) {
+              edep += digitMCRelations.weight(i);
+            }
+            return edep;
           }
         } else {
           return std::numeric_limits<double>::quiet_NaN();
@@ -423,6 +433,18 @@ namespace Belle2 {
       std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::energy, ECLCalDigitVariable::centerType::maxCell};
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
+
+    //! @returns the MC deposited energy
+    double getMCEnergy(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::mcenergy, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
 
     //! @returns the eclcaldigit energy from ext
     double getExtECLCalDigitEnergy(const Particle* particle, const std::vector<double>& vars)
@@ -925,6 +947,24 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
+    double getTotalECLCalDigitMCEnergy(const Particle* particle)
+    {
+      const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      double sum = 0.0;
+      auto clusterDigitRelations = mcparticle->getRelationsWith<ECLCalDigit>();
+      for (unsigned int ir = 0; ir < clusterDigitRelations.size(); ++ir) {
+        sum += clusterDigitRelations.weight(ir);
+      }
+
+      return sum;
+
+    }
+
+
+
     double getClusterNHitsThreshold(const Particle* particle, const std::vector<double>& vars)
     {
       if (vars.size() != 1) {
@@ -985,6 +1025,8 @@ namespace Belle2 {
                       "[calibration] Returns the center cell crystal phi");
     REGISTER_VARIABLE("eclcaldigitCenterCellIndex(i)", getCenterCellIndex,
                       "[calibration] Returns the center cell index (within its 5x5 (j=5) or 7x7 (j=7) neighbours)");
+    REGISTER_VARIABLE("eclcaldigitMCEnergy(i, j)", getMCEnergy,
+                      "[calibration] Returns the true deposited energy of all particles of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)");
     REGISTER_VARIABLE("clusterNHitsThreshold(i)", getClusterNHitsThreshold,
                       "[calibration] Returns sum of crystal weights sum(w_i) with w_i<=1  associated to this cluster above threshold (in GeV)");
 
@@ -1066,6 +1108,10 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("eclcaldigitCellIdByEnergyRank(i)", getCellIdByEnergyRank,
                       "[calibration] Returns the cell id of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("totalECLCalDigitMCEnergy", getTotalECLCalDigitMCEnergy,
+                      "[calibration] Returns total deposited MC energy in all ECLCalDigits for the MC particle");
+
 
   }
 

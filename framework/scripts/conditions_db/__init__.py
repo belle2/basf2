@@ -773,7 +773,7 @@ class ConditionsDB:
                                          json={'fields': issue})
             else:
                 fields = {'issue': json.dumps(issue)}
-                if password:
+                if len(password) == 2:
                     fields['token'] = password[0]
                     fields['secret'] = password[1]
                 response = requests.post('https://b2-master.belle2.org/cgi-bin/jira_issue.py', data=fields)
@@ -796,7 +796,7 @@ class ConditionsDB:
                                                  auth=(data['user'], password), json=user)
                     else:
                         fields = {'id': issue, 'user': user}
-                        if password:
+                        if len(password) == 2:
                             fields['token'] = password[0]
                             fields['secret'] = password[1]
                         response = requests.post('https://b2-master.belle2.org/cgi-bin/jira_issue.py', data=fields)

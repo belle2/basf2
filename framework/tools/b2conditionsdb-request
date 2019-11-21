@@ -74,8 +74,9 @@ def get_argument_parser():
     parser.add_argument('--password', type=str,
                         help='Password to authenticate the request')
     parser.add_argument('--oauth', default=False, action='store_true',
-                        help='Authenticate via oauth.'
-                        'In this case the password argument can be used to give the access token and secret separated by a space.')
+                        help='Authenticate via oauth. '
+                        'In this case the password argument can be used to give the access token and secret separated by a space. '
+                        'No authentication is required for automated requests from the online system.')
     parser.add_argument('--confirm', default=False, action='store_true',
                         help='Confirm that the given information is correct and that the payloads should be uploaded')
     parser.add_argument('payloads', help='Name of the testing payload storage file')

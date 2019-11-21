@@ -85,9 +85,6 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
   Precision rho2 = (1 - n(2) * (n(2) + 4 * c)) / (4 * n(2) * n(2));
   Precision rho = sqrt(rho2);
 
-  // Calculation of 3 different versions of a distance d for Chi Squared calculation
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> d = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1) * c + X * n;
-
   // calculation of chi2 for circle fit using Karimaeki circle fit
   Precision divisor = 1. / traceOfW;
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> unitvec = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1);
@@ -141,18 +138,6 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
 
   Precision chi2 = traceOfW * (1. + pocaD / rho) * (1. + curvature * pocaD) *
                    (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2);
-
-  // Line Fit for extension to Helix Fit
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> a = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1) * c + n(2) * X.col(2);
-  Precision b = n(0) * n(0) + n(1) * n(1);
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> underRoot = b * X.col(2) - a.cwiseProduct(a);
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> root = underRoot.cwiseSqrt();
-
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> x_pos = (- n(0) * a + n(1) * root) / b;
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> x_neg = (- n(0) * a - n(1) * root) / b;
-
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> y_pos = (- n(1) * a - n(0) * root) / b;
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> y_neg = (- n(1) * a + n(0) * root) / b;
 
   // Arc length calculation
   Precision x_first = X.col(0)(0) - x0;

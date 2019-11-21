@@ -728,8 +728,18 @@ C      PHIND_LAMBDA=1.44+8.20/(LAM-126.) ! T. Ijima (6-jul-2004)
       RIND_SF=SCALEF
 
       END
-      
 
+
+      REAL FUNCTION GET_REFIND_SF()
+      
+      IMPLICIT NONE
+      REAL RIND_SF
+      COMMON /TOP_RIND/ RIND_SF
+
+      GET_REFIND_SF=RIND_SF
+      END
+      
+      
       REAL FUNCTION GROUP_INDEX(E)
 
       IMPLICIT NONE

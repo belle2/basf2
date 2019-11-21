@@ -11,14 +11,13 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <analysis/dbobjects/ParticleWeightingKeyMap.h>
 #include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
 #include <string>
 
 namespace Belle2 {
 
   /**
-    * Currently, std::pair can not be retreived from python list
+    * Currently, std::pair can not be retrieved from python list
     * We will get ParticleWeightingLookUpTable entries with tuples and
     * transform tuples to pairs here.
     */
@@ -45,7 +44,7 @@ namespace Belle2 {
     int m_runHigh; /**< Highest valid run # */
 
     /**
-     * Currently, std::pair can not be retreived from python list
+     * Currently, std::pair can not be retrieved from python list
      * We will get ParticleWeightingLookUpTable entries with tuples and transform tuples to pairs here.
      */
     NDBin NDBinTupleToNDBin(const NDBinTuple& bin_tuple);
@@ -63,6 +62,11 @@ namespace Belle2 {
      */
     virtual void initialize() override;
 
+    /** Clean up anything created in initialize(). */
+    virtual void terminate() override;
+
+  private:
+    ParticleWeightingBinLimits* lims{nullptr}; /**< object holding bin limits */
   };
 
 } // Belle2 namespace

@@ -1,8 +1,21 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2011 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Giulia Casarosa                                           *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <svd/modules/svdPerformance/SVDOccupancyAnalysisModule.h>
+#include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
+
 #include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
+using namespace SoftwareTrigger;
 
 REG_MODULE(SVDOccupancyAnalysis)
 
@@ -87,6 +100,11 @@ void SVDOccupancyAnalysisModule::beginRun()
 void SVDOccupancyAnalysisModule::event()
 {
 
+  if (m_resultStoreObjectPointer.isValid()) {
+    const bool eventAccepted = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
+    if (!eventAccepted) return;
+  }
+
   m_nEvents++;
   int nEvent = m_eventMetaData->getEvent();
 
@@ -146,32 +164,6 @@ void SVDOccupancyAnalysisModule::endRun()
 
     TDirectory* oldDir = gDirectory;
 
-    /*
-    for (int i = 0; i < m_nLayers; i++) {
-      TString layerName = "shaperL";
-      layerName += i + 3;
-      TDirectory* dir_layer = oldDir->mkdir(layerName.Data());
-      dir_layer->cd();
-      TIter nextH_shaper(m_histoList_shaper[i]);
-      while ((obj = (TH1F*)nextH_shaper())) {
-        int nStrips = 768;
-        TString name = obj->GetName();
-        if (name.Contains("occupancy"))
-          obj->Scale(1. / m_nEvents);
-        else if (name.Contains("occVSevt"))
-          obj->Scale(1. / m_group);
-        else {
-          if ((! name.Contains("L3")) &&
-              (name.Contains("1V") || name.Contains("2V") || name.Contains("3V") || name.Contains("4V") || name.Contains("5V")))
-            nStrips = 512;
-
-          obj->Scale(1. / m_nEvents / nStrips);
-        }
-        obj->Write();
-      }
-
-    }
-    */
 
     VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 

@@ -38,10 +38,16 @@ namespace Belle2 {
       // get histogram to fit and check if statistics is sufficient
 
       auto h = getHistogram();
-      if (not h) return c_Failure;
+      if (not h) {
+        B2ERROR("TOPCommonT0BFAlgorithm: no histogram to fit");
+        return c_NotEnoughData;
+      }
 
       int numEntries = h->GetSumOfWeights();
-      if (numEntries < m_minEntries) return c_NotEnoughData;
+      if (numEntries < m_minEntries) {
+        B2ERROR("TOPCommonT0BFAlgorithm: too few entries to fit the histogram");
+        return c_NotEnoughData;
+      }
 
       m_bunchTimeSep = h->GetXaxis()->GetXmax() - h->GetXaxis()->GetXmin();
 

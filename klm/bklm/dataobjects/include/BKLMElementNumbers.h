@@ -256,7 +256,7 @@ namespace Belle2 {
     }
 
     /**
-     * Get maximal layer global number (0-based).
+     * Get maximal layer global number.
      */
     static constexpr int getMaximalLayerGlobalNumber()
     {

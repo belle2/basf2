@@ -118,14 +118,14 @@ namespace Belle2 {
     VARIABLE_GROUP("For fully-inclusive particles");
 
     REGISTER_VARIABLE("nDaughterPhotons",   nDaughterPhotons,
-                      "Returns number of final state daugher photons.");
+                      "Returns the number of final state daughter photons.");
     REGISTER_VARIABLE("nDaughterNeutralHadrons",   nDaughterNeutralHadrons,
-                      "Returns number of KL_0 or neutrons among the final state daughers.");
+                      "Returns the number of KL_0 or neutrons among the final state daughters.");
     REGISTER_VARIABLE("nDaughterCharged(pdg)",   nDaughterCharged,
-                      "Returns number of charged daughers with PDG code or number of all charged daughters if no argument has been provided.");
+                      "Returns the number of charged daughers with PDG code or number of all charged daughters if no argument has been provided.");
     REGISTER_VARIABLE("nCompositeDaughters",   nCompositeDaughters,
-                      "Returns number of final state composite daughers.");
+                      "Returns the number of final state composite daughters.");
     REGISTER_VARIABLE("daughterAverageOf(variable)", daughterAverageOf,
-                      "Returns average of a variable over all daughters.")
+                      "Returns the mean value of a variable over all daughters.")
   }
 }

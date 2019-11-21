@@ -10,6 +10,7 @@
 
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
+#include <optional>
 
 namespace Belle2 {
   /**
@@ -57,8 +58,7 @@ namespace Belle2 {
     //  Notice that we comment out the argument names because we want to avoid compiler warnings about not using them.
     virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) override
     {
-      m_previousMean = -1000000.;
-      m_previousMeanExists = false;
+      m_previousMean.reset();
     };
 
   private:
@@ -76,11 +76,7 @@ namespace Belle2 {
     void createDebugHistogram();
 
     /// During isBoundaryRequired this is used to define the previous run's mean
-    float m_previousMean = -1000000.;
-
-    /// During isBoundaryRequired we set this to True when the first boundary is defined.
-    //  It is a flag so we know we can now compare with a previous mean value.
-    bool m_previousMeanExists = false;
+    std::optional<float> m_previousMean;
 
     /// Configurable parameter for deciding when to choose a new payload boundary (if used)
     float m_allowedMeanShift = 0.5;

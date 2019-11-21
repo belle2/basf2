@@ -28,7 +28,7 @@ input_branches = [
 ]
 
 now = datetime.datetime.now()
-uniqueID = "SVDCoGTimeCalibrations_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_lat=+47.16"
+# uniqueID = "SVDCoGTimeCalibrations_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_lat=+47.16"
 
 settings = CalibrationSettings(name="SVDCoGTimeCalibrationPrompt",
                                expert_username="gdujani",
@@ -85,6 +85,49 @@ def get_calibrations(input_data, **kwargs):
     input_files_physics = list(reduced_file_to_iov_physics.keys())
     basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_physics)}")
 
+    '''
+    print(" ")
+    print("INPUT FILES")
+    print(" ")
+    print(input_files_physics)
+    print(" ")
+    '''
+
+    good_input_files = []
+    runs = []
+    expNum = int()
+    for i in input_files_physics:
+        file_list = glob.glob(i)
+        for f in file_list:
+            tf = TFile.Open(f)
+            tree = tf.Get("tree")
+            if tree.GetEntries() != 0:
+                good_input_files.append(f)
+                print("Good run (entries !=0): " + str(f))
+                inputStringSplit = f.split("/")
+                s_run = str(inputStringSplit[10])
+                s_exp = str(inputStringSplit[8])
+                print(str(s_run) + " " + str(s_exp))
+                runNum = runs.append(int(s_run[1:6]))
+                expNum = int(s_exp[1:5])
+
+    runs.sort()
+
+    firstRun = runs[0]
+    lastRun = runs[-1]
+
+    if not len(good_input_files):
+        print("No good input files found! Check that the input files have entries != 0!")
+        sys.exit(1)
+
+    uniqueID = "SVDCoGTimeCalibrations_Prompt_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_Exp" + \
+        str(expNum) + "_runsFrom" + str(firstRun) + "to" + str(lastRun)
+    print("")
+    print("UniqueID")
+    print("")
+    print(str(uniqueID))
+    print("")
+
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
@@ -96,6 +139,7 @@ def get_calibrations(input_data, **kwargs):
 
     # algorithm setup
     algorithm = SVDCoGTimeCalibrationAlgorithm(uniqueID)
+    algorithm.setMinEntries(10000)
 
     # calibration setup
     calibration = Calibration('SVDCoGTime',

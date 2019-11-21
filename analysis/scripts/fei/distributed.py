@@ -7,7 +7,7 @@
  This script can be used to train the FEI on a cluster like available at KEKCC
  All you need is a basf2 steering file (see analysis/examples/FEI/ ) and some MC O(100) million
  The script will automatically create some directories
-  - collection containing weightfiles, monitoring files and other stuff
+  - collection containing weight files, monitoring files and other stuff
   - jobs containing temporary files during the training (can be deleted afterwards)
 
  The distributed script automatically spawns jobs on the cluster (or local machine),
@@ -24,10 +24,10 @@
 
  If your training fails for some reason (e.g. a job fails on the cluster),
  the FEI will stop, you can fix the problem and resume the training using the -x option.
- This requires some expert knowledge, because you have to know howto fix the occured problem
+ This requires some expert knowledge, because you have to know how to fix the occurred problem
  and at which step you have to resume the training.
 
- After the training the weightfiles will be stored in the localdb in the collection directory
+ After the training the weight files will be stored in the localdb in the collection directory
  You have to upload these local database to the Belle 2 Condition Database if you want to use the FEI everywhere.
  Alternatively you can just copy the localdb to somewhere and use it directly.
 

@@ -13,7 +13,7 @@
   - It can be used for hadronic and semileptonic tagging.
   - The algorithm has to be trained on MC, and can afterwards be applied on data.
   - The training requires O(100) million MC events
-  - The weightfiles are stored in the Belle 2 Condition database
+  - The weight files are stored in the Belle 2 Condition database
 
  Read this file if you want to understand the technical details of the FEI.
 
@@ -37,7 +37,7 @@
 
  The FEI will reconstruct these 7 stages during the training phase,
  since the stages depend on one another, you have to run basf2 multiple (7) times on the same data
- to train all the necssary multivariate classifiers.
+ to train all the necessary multivariate classifiers.
 """
 
 # FEI defines own command line options, therefore we disable
@@ -519,7 +519,8 @@ class PostReconstruction(object):
 
 class Teacher(object):
     """
-    Performs all necessary trainings for all training data files which are available but where there is no weightfile avaiable yet.
+    Performs all necessary trainings for all training data files which are
+    available but where there is no weight file available yet.
     This class is usually used by the do_trainings function below, to perform the necessary trainings after each stage.
     The trainings are run in parallel using multi-threading of python.
     Each training is done by a subprocess call, the training command (passed by config.externTeacher) can be either
@@ -547,8 +548,8 @@ class Teacher(object):
     @staticmethod
     def create_fake_weightfile(channel: str):
         """
-        Create a fake weightfile using the trivial method, it will always return 0.0
-        @param channel for which we create a fake weightfile
+        Create a fake weight file using the trivial method, it will always return 0.0
+        @param channel for which we create a fake weight file
         """
         content = f"""
             <?xml version="1.0" encoding="utf-8"?>
@@ -574,8 +575,8 @@ class Teacher(object):
     @staticmethod
     def check_if_weightfile_is_fake(filename: str):
         """
-        Checks if the provided filename is a fake-weightfile or not
-        @param filename the filename of the weightfile
+        Checks if the provided filename is a fake-weight file or not
+        @param filename the filename of the weight file
         """
         try:
             return '<method>Trivial</method>' in open(filename, 'r').readlines()[2]
@@ -585,8 +586,8 @@ class Teacher(object):
 
     def upload(self, channel: str):
         """
-        Upload the weightfile into the condition database
-        @param channel whose weightfile is uploaded
+        Upload the weight file into the condition database
+        @param channel whose weight file is uploaded
         """
         disk = channel + '.xml'
         dbase = self.config.prefix + '_' + channel
@@ -663,7 +664,7 @@ class Teacher(object):
 def convert_legacy_training(particles: typing.Sequence[config.Particle], configuration: config.FeiConfiguration):
     """
     Convert an old FEI training into the new format.
-    The old format used hashes for the weightfiles, the hashes can be converted to the new naming scheme
+    The old format used hashes for the weight files, the hashes can be converted to the new naming scheme
     using the Summary.pickle file outputted by the FEIv3. This file must be passes by the parameter configuration.legacy.
     @param particles list of config.Particle objects
     @param config config.FeiConfiguration object
@@ -717,7 +718,7 @@ def do_trainings(particles: typing.Sequence[config.Particle], configuration: con
     or (more likely) is called by the distributed.py script after  merging the outputs of all jobs,
     @param particles list of config.Particle objects
     @param config config.FeiConfiguration object
-    @return list of tuple with weightfile on disk and identifier in database for all trained classifiers
+    @return list of tuple with weight file on disk and identifier in database for all trained classifiers
     """
     teacher = Teacher(particles, configuration)
     return teacher.do_all_trainings()
@@ -810,7 +811,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     stages = get_stages_from_particles(particles)
 
     # If the user provided a Summary.pickle file of a FEIv3 training we
-    # convert the old weightfiles (with hashes), to the new naming scheme.
+    # convert the old weight files (with hashes), to the new naming scheme.
     # Afterwards the algorithm runs as usual
     if configuration.legacy is not None:
         convert_legacy_training(particles, configuration)
@@ -850,13 +851,13 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     #   - Apply the mva method
     #   - Apply cuts on the mva output and best candidate selection
     #
-    # If the weightfiles for the PostReconstruction are not available for the current stage and we are in training mode,
+    # If the weight files for the PostReconstruction are not available for the current stage and we are in training mode,
     # we have to create the training data. The training itself is done by the do_trainings function which is called
     # either by the user after each step, or by the distributed.py script
     #
-    # If the weightfiles for the PostReconstruction are not available for the current stage and we are not in training mode,
+    # If the weight files for the PostReconstruction are not available for the current stage and we are not in training mode,
     # we keep going, as soon as the user will call process on the produced path he will get an error message that the
-    # weightfiles are missing.
+    # weight files are missing.
     #
     # Finally we keep track of the ParticleLists we use, so the user can run the RemoveParticles module to reduce the size of the
     # intermediate output of RootOutput.

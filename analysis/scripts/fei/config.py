@@ -30,7 +30,7 @@ import basf2
 FeiConfiguration = collections.namedtuple('FeiConfiguration', 'prefix, cache, b2bii, monitor, legacy, externTeacher, training')
 FeiConfiguration.__new__.__defaults__ = ('FEI_TEST', None, False, True, None, 'basf2_mva_teacher', False)
 FeiConfiguration.__doc__ = "Fei Global Configuration class"
-FeiConfiguration.prefix.__doc__ = "The database prefix used for all weightfiles"
+FeiConfiguration.prefix.__doc__ = "The database prefix used for all weight files"
 FeiConfiguration.cache.__doc__ = "The stage which is passed as input, it is assumed that all previous stages"\
                                  "do not have to be reconstructed again. Can be either a number or"\
                                  " a filename containing a pickled number or"\
@@ -77,7 +77,7 @@ DecayChannel = collections.namedtuple('DecayChannel', 'name, label, decayString,
 DecayChannel.__new__.__defaults__ = (None, None, None, None, None, None, None)
 DecayChannel.__doc__ = "Decay channel of a Particle."
 DecayChannel.name.__doc__ = "str:Name of the channel e.g. :code:`D0:generic_0`"
-DecayChannel.label.__doc__ = "Label used to identify the decay channel e.g. for weightfiles independent of decayModeID"
+DecayChannel.label.__doc__ = "Label used to identify the decay channel e.g. for weight files independent of decayModeID"
 DecayChannel.decayString.__doc__ = "DecayDescriptor of the channel e.g. D0 ==> K+ pi-"
 DecayChannel.daughters.__doc__ = "List of daughter particles of the decay channel e.g. [K+, pi-]"
 DecayChannel.mvaConfig.__doc__ = "MVAConfiguration object which is used for this channel."
@@ -153,12 +153,12 @@ class Particle(object):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
             @param identifier is the pdg name of the particle as a string
-                   with an optional additional user label seperated by ':'
+                   with an optional additional user label separated by ':'
             @param mvaConfig multivariate analysis configuration
             @param preCutConfig intermediate pre cut configuration
             @param postCutConfig post cut configuration
         """
-        #: pdg name of the particle with an optional additional user label seperated by :
+        #: pdg name of the particle with an optional additional user label separated by :
         self.identifier = identifier + ':generic' if len(identifier.split(':')) < 2 else identifier
         v = self.identifier.split(':')
         #: The name of the particle as correct pdg name e.g. K+, pi-, D*0.

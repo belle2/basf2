@@ -3,7 +3,7 @@
 
 # @cond SUPPRESS_DOXYGEN
 
-# Thoms Keck 2017
+# Thomas Keck 2017
 
 """
  Contains classes to read in the monitoring output
@@ -51,7 +51,7 @@ def load_config():
 
 class Statistic(object):
     """
-    This class provides thhe efficiency, purity and other quantities for a
+    This class provides the efficiency, purity and other quantities for a
     given number of true signal candidates, signal candidates and background candidates
     """
 
@@ -143,7 +143,7 @@ class Statistic(object):
 class MonitoringHist(object):
     """
     Reads all TH1F and TH2F from a ROOT file
-    and puts them into a more accesable format.
+    and puts them into a more accessible format.
     """
 
     def __init__(self, filename):
@@ -261,7 +261,7 @@ class MonitoringNTuple(object):
 class MonitoringModuleStatistics(object):
     """
     Reads the module statistics for a single particle from the outputted root file
-    and puts them into a more accesable format
+    and puts them into a more accessible format
     """
     def __init__(self, particle):
         """

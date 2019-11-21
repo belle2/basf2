@@ -15,12 +15,23 @@ if [ ! -d ${logfiles}  ]; then
 fi
 
 
+changeIFSlocal() {
+  IFS="/"
+}
+
+changeIFSglobal() {
+  IFS=""
+}
+
 i=0
 for file in ${inputList}/*.txt;
-do
-  # local IFS="/"
-  # read -ra ADDR <<< "${file}"
-  run_number=$(echo ${file} | sed 's/[^0-9]*//g')
+do  
+  changeIFSlocal
+  # IFS="/"
+  read -ra ADDR <<< "${file}"
+  run_number=$(echo ${ADDR[1]} | sed 's/[^0-9]*//g')
+  changeIFSglobal
+
   echo "RUN: ${run_number} EXP: ${exp_number} FILE: ${file}" 
   
   bsub -q s -oo ${logfiles}/log_cog_${run_number}.txt basf2 SVDCoGTimeCalibrationCheck.py ${localDBFolder} ${file} ${run_number} ${exp_number}

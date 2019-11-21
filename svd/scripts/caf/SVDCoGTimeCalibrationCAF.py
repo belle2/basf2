@@ -27,7 +27,6 @@ input_branches = [
 ]
 
 now = datetime.datetime.now()
-# uniqueID = "SVDCoGTimeCalibrations_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_lat=+47.16"
 
 
 def remove_module(path, name):
@@ -89,6 +88,7 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
 
     # algorithm setup
     algorithm = SVDCoGTimeCalibrationAlgorithm(uniqueID)
+    algorithm.setMinEntries(10000)
 
     # calibration setup
     calibration = Calibration('SVDCoGTime',

@@ -362,8 +362,22 @@ class ConditionsDB:
 
     def get_all_iovs(self, globalTag, exp=None, run=None, message=None):
         """
-        Return list of all payloads in gt where each element is a named
-        tuple with (name, revision, payloadId, iovId, iov)
+        Return list of all payloads in the given globaltag where each element is
+        a `PayloadInformation` instance
+
+        Parameters:
+            gobalTag (str): name of the globaltag
+            exp (int): if given limit the list of payloads to the ones valid for
+                the given exp,run combination
+            run (int): if given limit the list of payloads to the ones valid for
+                the given exp,run combination
+            message (str): additional message to show when downloading the
+                payload information. Will be directly appended to
+                "Obtaining lists of iovs for globaltag {globalTag}"
+
+        Warning:
+            Both, exp and run, need to be given at the same time. Just supplying
+            an experiment or a run number will not work
         """
         globalTag = encode_name(globalTag)
         if message is None:

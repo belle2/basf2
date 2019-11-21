@@ -424,6 +424,74 @@ def command_tag_invalidate(args, db):
     return change_state(db, args.tag, "INVALID")
 
 
+def remove_repeated_values(table, columns, keep=None):
+    """Strip repeated values from a table of values
+
+    This function takes a table (a list of lists with all the same length) and
+    removes values in certain columns if they are identical in consecutive rows.
+
+    It does this in a dependent way only if the previous columns are identical
+    will it continue stripping further columns. For example, given the table ::
+
+        table = [
+            ["A", "a"],
+            ["B", "a"],
+            ["B", "a"],
+            ["B", "b"],
+        ]
+
+    If we want to remove duplicates in all columns in order it would look like this:
+
+        >>> remove_repated_values(table, [0,1])
+        [
+            ["A", "a"],
+            ["B", "a"],
+            [ "",  ""],
+            [ "", "b"],
+        ]
+
+    But we can give selected columns to strip one after the other
+
+        >>> remove_repeated_values(table, [1,0])
+        [
+            ["A", "a"],
+            ["B",  ""],
+            [ "",  ""],
+            ["B", "b"],
+        ]
+
+    In addition, we might want to only strip some columns if previous columns
+    were identical but keep the values of the previous column. For this one can
+    supply ``keep``:
+
+        >>> remove_repated_values(table, [0,1,2], keep=[0])
+        [
+            ["A", "a"],
+            ["B", "a"],
+            ["B",  ""],
+            ["B", "b"],
+        ]
+
+    Parameters:
+        table (list(list(str))): 2d table of values
+        columns (list(int)): indices of columns to consider in order
+        keep (set(int)): indices of columns to not strip
+    """
+    last_values = [None] * len(columns)
+    for row in table[1:]:
+        current_values = [row[i] for i in columns]
+        for i, curr, last in zip(columns, current_values, last_values):
+            if curr != last:
+                break
+
+            if keep and i in keep:
+                continue
+
+            row[i] = ""
+
+        last_values = current_values
+
+
 def command_diff(args, db):
     """Compare two globaltags
 
@@ -440,6 +508,8 @@ def command_diff(args, db):
 
     .. versionchanged:: release-03-00-00
        modified output structure and added ``--human-readable``
+    .. versionchanged:: after release-04-00-00
+       added parameter ``--checksums`` and ``--show-ids``
     """
     iovfilter = ItemFilter(args)
     if db is None:
@@ -450,6 +520,10 @@ def command_diff(args, db):
         args.add_argument("--human-readable", default=False, action="store_true",
                           help="If given the iovs will be written in a more human friendly format. "
                           "Also repeated payload names will be omitted to create a more readable listing.")
+        args.add_argument("--checksums", default=False, action="store_true",
+                          help="If given don't show the revision number but the md5 checksum")
+        args.add_argument("--show-ids", default=False, action="store_true",
+                          help="If given also show the payload and iov ids for each iov")
 
         args.add_argument("tagA", metavar="TAGNAME1", help="base for comparison")
         args.add_argument("tagB", metavar="TAGNAME2", help="tagname to compare")
@@ -471,20 +545,32 @@ def command_diff(args, db):
 
         B2INFO("Comparing contents ...")
         diff = difflib.SequenceMatcher(a=listA, b=listB)
+        table = [["", "Name", "Rev" if not args.checksums else "Checksum"]]
+        columns = [1, "+", -8 if not args.checksums else -32]
+
         if args.human_readable:
-            table = [["", "Name", "Rev.", "Iov"]]
-            columns = [1, "+", -8, -36]
+            table[0] += ["Iov"]
+            columns += [-36]
         else:
-            table = [["", "Name", "Rev.", "First Exp", "First Run", "Final Exp", "Final Run"]]
-            columns = [1, "+", -8, 6, 6, 6, 6]
+            table[0] = ["First Exp", "First Run", "Final Exp", "Final Run"]
+            columns += [6, 6, 6, 6]
+
+        if args.show_ids:
+            table[0] += ["IovId", "PayloadId"]
+            columns += [7, 9]
 
         def add_payloads(opcode, payloads):
             """Add a list of payloads to the table, filling the first column with opcode"""
             for p in payloads:
+                row = [opcode, p.name, p.revision if not args.checksums else p.checksum]
                 if args.human_readable:
-                    table.append([opcode, p.name, p.revision, p.readable_iov()])
+                    row += [p.readable_iov()]
                 else:
-                    table.append([opcode, p.name, p.revision] + list(p.iov))
+                    row += list(p.iov)
+
+                if args.show_ids:
+                    row += [p.iov_id, p.payload_id]
+                table.append(row)
 
         for tag, i1, i2, j1, j2 in diff.get_opcodes():
             if tag == "equal":
@@ -497,18 +583,10 @@ def command_diff(args, db):
                 add_payloads("+", listB[j1:j2])
 
         if args.human_readable:
-            # strip repeated names, revision, payloadid, to make it more readable
-            last_code = None
-            last_name = None
-            last_rev = None
-            for i in range(len(table)):
-                cur_code, cur_name, cur_rev = table[i][:3]
-                if last_code == cur_code:
-                    if cur_name == last_name:
-                        table[i][1] = ""
-                        if cur_rev == last_rev:
-                            table[i][2] = ""
-                last_code, last_name, last_rev = cur_code, cur_name, cur_rev
+            # strip repeated names, revision, payloadid, to make it more readable.
+            # this is dependent on the fact that the opcode is still the same but we
+            # don't want to strip the opcode ...
+            remove_repeated_values(table, [0, 1, 2] + ([-1] if args.show_ids else []), keep=[0])
 
         def color_row(row, widths, line):
             if not LogPythonInterface.terminal_supports_colors():
@@ -537,7 +615,7 @@ def command_iov(args, db):
     .. versionchanged:: release-03-00-00
        modified output structure and added ``--human-readable``
     .. versionchanged:: after release-04-00-00
-       added parameter ``--checksums``
+       added parameter ``--checksums`` and ``--show-ids``
     """
 
     iovfilter = ItemFilter(args)
@@ -554,6 +632,8 @@ def command_iov(args, db):
                           "Also repeated payload names will be omitted to create a more readable listing.")
         args.add_argument("--checksums", default=False, action="store_true",
                           help="If given don't show the revision number but the md5 checksum")
+        args.add_argument("--show-ids", default=False, action="store_true",
+                          help="If given also show the payload and iov ids for each iov")
         iovfilter.add_arguments("payloads")
         return
 
@@ -616,27 +696,27 @@ def command_iov(args, db):
                     payloads.append(PayloadInformation.from_json(payload, iov))
 
         if not args.detail:
+            def add_ids(table, columns, payloads):
+                """Add the numerical ids to the table"""
+                if args.show_ids:
+                    table[0] += ["IovId", "PayloadId"]
+                    columns += [7, 9]
+                    for row, p in zip(table[1:], payloads):
+                        row += [p.iov_id, p.payload_id]
             payloads.sort()
             if args.human_readable:
                 table = [["Name", "Rev" if not args.checksums else "Checksum", "IoV"]]
-                table += [[p.name, p.revision if not args.checksums else p.checksum, p.readable_iov()] for p in payloads]
                 columns = ["+", -8 if not args.checksums else -32, -32]
+                table += [[p.name, p.revision if not args.checksums else p.checksum, p.readable_iov()] for p in payloads]
+                add_ids(table, columns, payloads)
                 # strip repeated names, revision, payloadid, to make it more readable
-                last_name = None
-                last_rev = None
-                for i in range(len(table)):
-                    cur_name, cur_rev = table[i][:2]
-                    if cur_name == last_name:
-                        table[i][0] = ""
-                        if cur_rev == last_rev:
-                            table[i][1] = ""
-                            table[i][-1] = ""
-                    last_name, last_rev = cur_name, cur_rev
+                remove_repeated_values(table, columns=[0, 1] + ([-1] if args.show_ids else []))
 
             else:
                 table = [["Name", "Rev" if not args.checksums else "Checksum", "First Exp", "First Run", "Final Exp", "Final Run"]]
                 table += [[p.name, p.revision if not args.checksums else p.checksum] + list(p.iov) for p in payloads]
                 columns = ["+", -8 if not args.checksums else -32, 6, 6, 6, 6]
+                add_ids(table, columns, payloads)
 
             pretty_print_table(table, columns)
 

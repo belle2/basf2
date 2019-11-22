@@ -6,6 +6,7 @@ exp_number=${1}
 inputList=${2}
 localDBFolder=${3}
 logfiles=${4}
+OUTPUTCHECKFILES="tree"
 
 if [ ! -d ${logfiles}  ]; then
     echo "WARNING!"
@@ -14,6 +15,12 @@ if [ ! -d ${logfiles}  ]; then
     mkdir ${logfiles}
 fi
 
+if [ ! -d ${OUTPUTCHECKFILES}  ]; then
+    echo "WARNING!"
+    echo "the output folder ${OUTPUTCHECKFILES} does not exist. Create it before launching simulation."
+    echo "mkdir ${OUTPUTCHECKFILES}"
+    mkdir ${OUTPUTCHECKFILES}
+fi
 
 changeIFSlocal() {
   IFS="/"

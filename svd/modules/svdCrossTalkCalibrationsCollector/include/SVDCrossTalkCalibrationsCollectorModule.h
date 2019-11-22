@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
+
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
@@ -24,6 +26,7 @@
 #include <string>
 #include <TH2.h>
 #include <TFile.h>
+#include <TTree.h>
 #include <map>
 
 
@@ -53,15 +56,15 @@ namespace Belle2 {
     /** */
     void finish() override;
 
+
+  private:
+
     TTree* m_histogramTree;
     TH1F* m_hist;
     int m_layer = 4;
     int m_ladder = 16;
     int m_sensor = 5;
     int m_side = 2;
-
-  private:
-
 
 
     void calculateAverage(const VxdID& sensorID, double& mean, int side); /**Function to calculate sensor average occupancy */

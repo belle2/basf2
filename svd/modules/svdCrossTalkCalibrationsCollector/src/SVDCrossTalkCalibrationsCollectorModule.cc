@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <svd/modules/svdCrossTalkCalibrationsCollector/SVDCrossTalkCalibrationsCollectorModule.h>
-
+#include <iostream>
 using namespace std;
 using namespace Belle2;
 
@@ -84,6 +84,7 @@ void SVDCrossTalkCalibrationsCollectorModule::startRun()
       }
     }
   }
+
 }
 
 void SVDCrossTalkCalibrationsCollectorModule::collect()
@@ -101,7 +102,6 @@ void SVDCrossTalkCalibrationsCollectorModule::collect()
   vector<int> strips_vSide;
 
   //loop over RecoDigits
-
   for (auto& svdRecoDigit : m_svdRecoDigits) {
     //Remove L3 and +fw sensors, not affected by cross-talk
     if (svdRecoDigit.getSensorID().getLayerNumber() == 3 or svdRecoDigit.getSensorID().getSensorNumber() == 1) {
@@ -118,7 +118,6 @@ void SVDCrossTalkCalibrationsCollectorModule::collect()
     std::string sensorStripNum = sensorName + "." + std::to_string(stripID);
     double stripOccupancy = m_OccupancyCal.getOccupancy(svdRecoDigit.getSensorID(), side, stripID);
     //Clustering only works assuming digits are ordered.//
-
     if (side == 1 && stripOccupancy > (m_uSideOccupancyFactor * sensorAverage)) {
 
       int adjacentStrip = 0;
@@ -173,7 +172,7 @@ void SVDCrossTalkCalibrationsCollectorModule::collect()
         occupancyPDFName(svdRecoDigit.getSensorID(), svdRecoDigit.isUStrip(), sensorName);
         auto xTalkStrip = m_sensorHistograms.at(sensorName);
         //Only fill bin once
-        if (xTalkStrip->GetBinContent(svdRecoDigit.getCellID()) < 1.) xTalkStrip->Fill(svdRecoDigit.getCellID(), true);
+        if (xTalkStrip->GetBinContent(svdRecoDigit.getCellID()) < 1.) xTalkStrip->Fill(svdRecoDigit.getCellID(), true); //Change this later
       }
       if (std::find(clusterStrips_vSide.begin(), clusterStrips_vSide.end(), stripID) != clusterStrips_vSide.end()) {
         std::string sensorName;
@@ -212,6 +211,7 @@ void SVDCrossTalkCalibrationsCollectorModule::closeRun()
           m_side = side;
 
           getObjectPtr<TTree>("HTreeCrossTalkCalib")->Fill();
+//    cout<<m_hist->GetEntries()<< " "<<m_layer<<" "<<m_ladder<<" "<<m_ladder<<endl;
 //            sensorOnMap->Write();
 
         }

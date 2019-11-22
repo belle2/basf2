@@ -26,27 +26,49 @@ VXDQETrainingDataCollectorModule::VXDQETrainingDataCollectorModule() : Module()
   setDescription("Module to collect training data for the VXDQualityEstimatorMVA and store it in a root file.");
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
-  addParam("EstimationMethod", m_EstimationMethod,
-           "Identifier which estimation method to use. Valid identifiers are: [circleFit, tripletFit, helixFit]", std::string(""));
-  addParam("SpacePointTrackCandsStoreArrayName", m_SpacePointTrackCandsStoreArrayName,
-           "Name of StoreArray containing the SpacePointTrackCandidates to be estimated.", std::string(""));
+  addParam("EstimationMethod",
+           m_EstimationMethod,
+           "Identifier which estimation method to use. Valid identifiers are: [circleFit, "
+           "tripletFit, helixFit]",
+           m_EstimationMethod);
 
-  addParam("MCRecoTracksStoreArrayName", m_MCRecoTracksStoreArrayName,
-           "Name of StoreArray containing MCRecoTracks. Only required for MCInfo method", std::string("MCRecoTracks"));
+  addParam("SpacePointTrackCandsStoreArrayName",
+           m_SpacePointTrackCandsStoreArrayName,
+           "Name of StoreArray containing the SpacePointTrackCandidates to be estimated.",
+           m_SpacePointTrackCandsStoreArrayName);
 
-  addParam("MCStrictQualityEstimator", m_MCStrictQualityEstimator,
-           "Only required for MCInfo method. If false combining several MCTracks is allowed.", bool(true));
+  addParam("MCRecoTracksStoreArrayName",
+           m_MCRecoTracksStoreArrayName,
+           "Name of StoreArray containing MCRecoTracks. Only required for MCInfo method",
+           m_MCRecoTracksStoreArrayName);
 
-  addParam("mva_target", m_mva_target,
-           "Whether to write out MVA target which requires complete agreement between SVD CLusters of pattern "
-           "recognition track and MC track to yield 1, else 0, and thus provides maximal hit purity and hit efficiency.",
+  addParam("MCStrictQualityEstimator",
+           m_MCStrictQualityEstimator,
+           "Only required for MCInfo method. If false combining several MCTracks is allowed.",
+           m_MCStrictQualityEstimator);
+
+  addParam("mva_target",
+           m_mva_target,
+           "Whether to write out MVA target which requires complete agreement between SVD CLusters "
+           "of pattern "
+           "recognition track and MC track to yield 1, else 0, and thus provides maximal hit "
+           "purity and hit efficiency.",
            m_mva_target);
 
-  addParam("TrainingDataOutputName", m_TrainingDataOutputName, "Name of the output rootfile.", std::string("QETrainingOutput.root"));
+  addParam("TrainingDataOutputName",
+           m_TrainingDataOutputName,
+           "Name of the output rootfile.",
+           m_TrainingDataOutputName);
 
-  addParam("ClusterInformation", m_ClusterInformation, "How to compile information from clusters ['Average']", std::string(""));
+  addParam("ClusterInformation",
+           m_ClusterInformation,
+           "How to compile information from clusters ['Average']",
+           m_ClusterInformation);
 
-  addParam("UseTimingInfo", m_UseTimingInfo, "Whether to collect timing information", bool(false));
+  addParam("UseTimingInfo",
+           m_UseTimingInfo,
+           "Whether to collect timing information",
+           m_UseTimingInfo);
 }
 
 void VXDQETrainingDataCollectorModule::initialize()

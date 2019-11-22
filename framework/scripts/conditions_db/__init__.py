@@ -778,6 +778,19 @@ class ConditionsDB:
 
         # comment on an existing issue
         else:
+            # Let's make sure all assignees of new issues are added as watchers
+            # in that case, otherwise they might never find out
+            new_issue_config = jira_global_tag_v2(data['task'])
+            if isinstance(new_issue_config, dict) and "assignee" in new_issue_config:
+                user = new_issue_config['assignee'].get('name', None)
+                if user is not None:
+                    response = requests.post(f'https://agira.desy.de/rest/api/latest/issue/{issue}/watchers',
+                                             auth=(data['user'], password), json=user)
+                    if response.status_code in range(200, 210):
+                        B2INFO(f"Added {user} as watcher to {issue}")
+                    else:
+                        B2WARNING(f"Could not add {user} as watcher to {issue}: {response.status_code}")
+
             B2INFO(f"Commenting on jira issue {issue} for {data['task']} globaltag request")
             response = requests.post('https://agira.desy.de/rest/api/latest/issue/%s/comment' % issue,
                                      auth=(data['user'], password), json={'body': description})
@@ -786,6 +799,8 @@ class ConditionsDB:
             else:
                 B2ERROR('The commenting of the issue failed: ' + requests.status_codes._codes[response.status_code][0])
                 return False
+
+        return True
 
 
 def require_database_for_test(timeout=60, base_url=None):

@@ -119,7 +119,7 @@ namespace Belle2::Conditions {
       overrideGlobalTags();
     }
     std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", "http://belle2db.sdcc.bnl.gov/b2s/rest/");
-    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", serverList + " /cvms/belle.cern.ch/conditions/database.sqlite");
+    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", serverList + " /cvmfs/belle.cern.ch/conditions/database.sqlite");
     fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", "/cvmfs/belle.cern.ch/conditions");
   }
 
@@ -192,7 +192,7 @@ namespace Belle2::Conditions {
         youngest = metadata.getDate();
       }
     }
-    if (youngest->compare("2019-10-01") < 0) {
+    if (youngest->compare("2019-12-31") < 0) {
       B2DEBUG(30, "Enabling legacy IP information globaltag in tag replay");
       m_inputGlobaltags->emplace_back("Legacy_IP_Information");
     }
@@ -461,8 +461,8 @@ Warning:
     .def("prepend_testing_payloads", &Configuration::prependTestingPayloadLocation, py::args("filename"), R"DOC(prepend_testing_payloads(filename)
 
 Insert a text file containing local test payloads in the beginning of the list
-of `testing_payloads`. This will mean they will have lower priority than payloads in
-previously defined text files but still higher priority than globaltags.
+of `testing_payloads`. This will mean they will have higher priority than payloads in
+previously defined text files as well as higher priority than globaltags.
 
 Parameters:
     filename (str): file containing a local definition of payloads and their

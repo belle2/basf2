@@ -1,0 +1,59 @@
+version: '3.4'
+
+# Basic hlt definition
+x-hlt-node: &hlt_node
+  build:
+    context: ../base_image
+  image: hbasf2_local_test:18.04
+  expose: [8000]
+  cap_add:
+    - SYS_PTRACE
+  volumes:
+    - ./:/work
+    - ${BELLE2_LOCAL_DIR}:/mnt/basf2/software:ro
+    - ${BELLE2_EXTERNALS_TOPDIR}:/mnt/basf2/externals:ro
+    - ${BELLE2_TOOLS}:/mnt/basf2/tools:ro
+    - ${BELLE2_DAQ_SLC}:/mnt/daq_slc/:ro
+
+services:
+  erin:
+    <<: *hlt_node
+    hostname: erin
+    container_name: erin
+    networks:
+      vpcbr:
+        ipv4_address: 10.6.0.2
+  display:
+    <<: *hlt_node
+    hostname: display
+    container_name: display
+    networks:
+      vpcbr:
+        ipv4_address: 10.6.0.3
+  erwk01:
+    <<: *hlt_node
+    hostname: erwk01
+    container_name: erwk01
+    networks:
+      vpcbr:
+        ipv4_address: 10.6.0.4
+  erwk02:
+    <<: *hlt_node
+    hostname: erwk02
+    container_name: erwk02
+    networks:
+      vpcbr:
+        ipv4_address: 10.6.0.5
+  erctl:
+    <<: *hlt_node
+    hostname: erctl
+    container_name: erctl
+    networks:
+      vpcbr:
+        ipv4_address: 10.6.0.6
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.6.0.0/16

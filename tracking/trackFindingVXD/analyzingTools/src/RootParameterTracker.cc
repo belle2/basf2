@@ -133,8 +133,6 @@ void RootParameterTracker::collectData4VecDoubleAlgorithms(std::string tcTypeNam
         {
           out += (" " + to_string(val));
         }
-        // the following line causes a false positive
-        // cppcheck-suppress unreadVariable
         return (out += "\n");
       };
       B2DEBUG(20, "RootParameterTracker::collectData4VecDoubleAlgorithms(), tc with type " << tcTypeName <<

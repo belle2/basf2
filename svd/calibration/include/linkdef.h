@@ -20,6 +20,8 @@
 #pragma link C++ class Belle2::SVDCoGTimeCalibrationAlgorithm+;
 #pragma link C++ class Belle2::SVDCrossTalkStripsCalibrations;
 #pragma link C++ class Belle2::SVDOccupancyCalibrations;
+#pragma link C++ class Belle2::SVDOccupancyCalibrationsAlgorithm;
+#pragma link C++ class Belle2::SVDHotStripsCalibrationsAlgorithm;
 
 
 #pragma link C++ class Belle2::SVDCrossTalkCalibrationsAlgorithm;

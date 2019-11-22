@@ -25,7 +25,7 @@ charmless2chargedpath = Path()
 
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [10000])
+eventinfosetter.param('evtNumList', [5000])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [0])
 charmless2chargedpath.add_module(eventinfosetter)
@@ -33,7 +33,7 @@ charmless2chargedpath.add_module(eventinfosetter)
 # .dec file for B -> K*+ rho0
 evtgeninput = register_module('EvtGenInput')
 
-evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/decfiles/dec/1210032007.dec'))
+evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/decfiles/dec/1210050105.dec'))
 charmless2chargedpath.add_module(evtgeninput)
 
 # detector simulation

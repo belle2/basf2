@@ -215,7 +215,7 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
       m_PDGIDCut->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
       m_noKickTree->Fill();
     }
-    return good;
+    return false;
   }
 
   if (track.getMomentumSeed().Mag() > m_pmax) {

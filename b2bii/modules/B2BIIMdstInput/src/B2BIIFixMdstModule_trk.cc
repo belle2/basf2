@@ -169,7 +169,7 @@
 #include "belle_legacy/ip/IpProfile.h"
 
 // kfitter
-#include <analysis/KFit/VertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
 
 namespace Belle2 {
 

@@ -316,7 +316,7 @@ namespace Belle2 {
       if (!pList.isValid())
         B2FATAL("ParticleList " << m_sourceParticleListName << " could not be found or is not valid!");
       for (unsigned int i = 0; i < pList->getListSize(); i++) {
-        RestOfEvent* roe = pList->getParticle(i)->getRelatedTo<RestOfEvent>();
+        RestOfEvent* roe = pList->getParticle(i)->getRelatedTo<RestOfEvent>("ALL");
         if (!roe) {
           B2ERROR("ParticleList " << m_sourceParticleListName << " has no associated ROEs!");
         } else {

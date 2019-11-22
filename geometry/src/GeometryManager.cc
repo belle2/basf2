@@ -268,6 +268,7 @@ namespace Belle2 {
 
       auto getDensityScale = [this](const std::string & name) {
         std::optional<double> scale;
+        // cppcheck-suppress stlIfFind ; cppcheck doesn't like if with initializer ...
         if (auto it = m_densityScaling.find(name); it != m_densityScaling.end()) {
           scale = it->second;
         }
@@ -356,6 +357,7 @@ namespace Belle2 {
       }
       g4Factory.Import(m_topVolume);
       RootGM::Factory rtFactory;
+      rtFactory.SetIgnore(1);
       if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME())) {
         rtFactory.SetDebug(1);
       }

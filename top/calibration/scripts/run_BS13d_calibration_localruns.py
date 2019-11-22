@@ -23,7 +23,8 @@ from basf2 import B2ERROR
 
 # ----- those parameters need to be adjusted before running -----------------------
 #
-globalTag = 'data_reprocessing_prompt_rel4_patch'
+globalTags = ['data_reprocessing_prompt_rel4_patchb']  # highest priority first
+localDBs = []  # highest priority first, local DB's have higher priority than global tags
 data_dir = '/ghi/fs01/belle2/bdata/group/detector/TOP/2019-*/data_sroot_global/'
 main_output_dir = 'top_calibration'
 maxFiles = 1  # maximum number of input files per run (0 or negative means all)
@@ -67,7 +68,7 @@ if not os.path.isdir(main_output_dir):
     print('New folder created: ' + main_output_dir)
 
 # Suppress messages during processing
-basf2.set_log_level(basf2.LogLevel.WARNING)
+# basf2.set_log_level(basf2.LogLevel.WARNING)
 
 # Create path
 main = basf2.create_path()
@@ -84,11 +85,15 @@ collector = basf2.register_module('TOPAsicShiftsBS13dCollector')
 
 # Algorithm
 algorithm = TOP.TOPAsicShiftsBS13dAlgorithm()
+algorithm.setWindowSize(0)
 
 # Define calibration
 cal = Calibration(name='TOP_BS13dCalibration', collector=collector,
                   algorithms=algorithm, input_files=inputFiles)
-cal.use_central_database(globalTag)
+for globalTag in reversed(globalTags):
+    cal.use_central_database(globalTag)
+for localDB in reversed(localDBs):
+    cal.use_local_database(localDB)
 cal.pre_collector_path = main
 cal.max_files_per_collector_job = 1
 cal.backend_args = {"queue": "l"}

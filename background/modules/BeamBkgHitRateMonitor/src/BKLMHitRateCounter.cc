@@ -56,7 +56,7 @@ void BKLMHitRateCounter::accumulate(unsigned timeStamp)
     if (!digit.inRPC() && !digit.isAboveThreshold())
       continue;
 
-    int layerGlobal = BKLMElementNumbers::layerGlobalNumber(digit.getSection(), digit.getSector(), digit.getLayer());
+    int layerGlobal = BKLMElementNumbers::layerGlobalNumber(digit.getSection(), digit.getSector(), digit.getLayer()) - 1;
     if (layerGlobal >= 0 and layerGlobal < m_maxGlobalLayer) {
       rates.layerRates[layerGlobal]++;
     } else {

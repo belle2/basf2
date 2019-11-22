@@ -23,7 +23,6 @@ cluster = [
     'clusterAbsZernikeMoment40',
     'clusterAbsZernikeMoment51',
     'clusterBelleQuality',
-    'clusterCRID',
     'clusterClusterID',
     'clusterConnectedRegionID',
     'clusterE1E9',
@@ -241,7 +240,7 @@ reco_stats = [
 inv_mass = ['M', 'ErrM', 'SigM', 'InvM']
 
 #: Extra energy variables
-extra_energy = ["ROE_eextra()"]
+extra_energy = ["roeEextra()"]
 
 #: Event level tracking variables
 event_level_tracking = [

@@ -633,7 +633,8 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   std::vector<ExtHit> eclHit1, eclHit2, eclHit3;
   if (eclClusterInfo != NULL) {
     eclClusterDistance.resize(eclClusterInfo->size(), 1.0E10); // "positive infinity"
-    ExtHit tempExtHit(extState.pdgCode, Const::EDetector::ECL, 0, EXT_FIRST, 0.0,
+    ExtHit tempExtHit(extState.pdgCode, Const::EDetector::ECL, 0, EXT_FIRST,
+                      extState.isCosmic, 0.0,
                       G4ThreeVector(), G4ThreeVector(), G4ErrorSymMatrix(6));
     eclHit1.resize(eclClusterInfo->size(), tempExtHit);
     eclHit2.resize(eclClusterInfo->size(), tempExtHit);
@@ -1087,7 +1088,6 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
       trackRep->getPosMomCov(firstState, lastPosition, lastMomentum, lastCov);
       lastMomentum *= -1.0; // extrapolate backwards instead of forwards
       extState.isCosmic = true;
-      extState.pdgCode = -extState.pdgCode; // flip charge for back-propagation; otherwise, it curls the wrong way in B field
       extState.tof = firstState.getTime(); // DIVOT: must be revised when IP profile (reconstructed beam spot) become available!
     }
 
@@ -1307,7 +1307,8 @@ void TrackExtrapolateG4e::createExtHit(ExtHitStatus status, const ExtState& extS
   fromG4eToPhasespace(g4eState, covariance);
   StoreArray<ExtHit> extHits(*m_ExtHitsColName);
   ExtHit* extHit = extHits.appendNew(extState.pdgCode, detID, copyID, status,
-                                     extState.tof, pos, mom, covariance);
+                                     extState.isCosmic, extState.tof,
+                                     pos, mom, covariance);
   // If called standalone, there will be no associated track
   if (extState.track != NULL) { extState.track->addRelationTo(extHit); }
 

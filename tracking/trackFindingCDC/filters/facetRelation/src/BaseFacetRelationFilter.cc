@@ -33,10 +33,6 @@ std::vector<const CDCFacet*> BaseFacetRelationFilter::getPossibleTos(
   const CDCFacet* from,
   const std::vector<const CDCFacet*>& facets) const
 {
-  // Expensive assert has been deactivated - but true nonetheless
-  assert(true or (std::is_sorted(facets.begin(), facets.end(), LessOf<Deref>()) &&
-                  "Expected facets to be sorted"));
-
   const CDCRLWireHitPair& rearRLWireHitPair = from->getRearRLWireHitPair();
 
   ConstVectorRange<const CDCFacet*> neighbors{

@@ -41,9 +41,15 @@ EKLMTrackMatchCollectorModule::EKLMTrackMatchCollectorModule() :
   CalibrationCollectorModule()
 {
   setDescription("Module for EKLM strips efficiency (data collection).");
+  addParam("MuonListName", m_MuonListName,
+           "Muon list name. If empty, use tracks.", std::string("mu+:all"));
+  addParam("StandaloneTrackSelection", m_StandaloneTrackSelection,
+           "Whether to use standalone track selection."
+           " Always turn this off for cosmic data.", true);
+  addParam("MinimalMatchingDigits", m_MinimalMatchingDigits,
+           "Minimal number of matching digits.", 0);
   addParam("AllowedDistance1D", m_AllowedDistance1D,
            "Max distance in strips number to 1D hit from extHit to be still matched (default 8 strips)", double(8));
-  addParam("z0_d0", m_D0Z0, "D0_z0 distance", double(5));
   setPropertyFlags(c_ParallelProcessingCertified);
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
   m_GeoDat = nullptr;
@@ -63,6 +69,8 @@ void EKLMTrackMatchCollectorModule::prepare()
   m_trackFitResults.isRequired();
   m_extHits.isRequired();
   m_recoTracks.registerRelationTo(m_hit2ds);
+  if (m_MuonListName != "")
+    m_MuonList.isRequired(m_MuonListName);
   m_GeoDat = &(EKLM::GeometryData::Instance());
 
   TH1F* MatchedDigitsInPlane =
@@ -78,58 +86,35 @@ void EKLMTrackMatchCollectorModule::prepare()
   registerObject<TH1F>("AllExtHitsInPlane", AllExtHitsInPlane);
 }
 
-std::tuple<int, int, int, int, int, int> EKLMTrackMatchCollectorModule::checkExtHit(const ExtHit& ext_hit) const
+void EKLMTrackMatchCollectorModule::trackCheck(
+  bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()],
+  int requiredHits) const
 {
-  // If ExtHit NOT in EKLM continue
-  if (ext_hit.getDetectorID() != Const::EDetector::EKLM) return std::make_tuple(-1, -1, -1, -1, -1, -1);
-  // Choose extHits that just enter in sensetive volume
-  if (ext_hit.getStatus() != EXT_ENTER) return std::make_tuple(-1, -1, -1, -1, -1, -1);
-  // Get subdetector component ID
-  int copyid = ext_hit.getCopyID();
-  if (copyid < 1 || copyid > 15600) return std::make_tuple(-1, -1, -1, -1, -1, -1);
-
-  int idSection = -1, idLayer = -1, idSector = -1, idPlane = -1, idStrip = -1;
-  // Get all info about part of detector
-  m_GeoDat->stripNumberToElementNumbers(copyid, &idSection, &idLayer, &idSector, &idPlane, &idStrip);
-  return std::make_tuple(copyid, idSection, idLayer, idSector, idPlane, idStrip);
+  int sectionHits[EKLMElementNumbers::getMaximalSectionNumber()];
+  for (int i = 0; i < EKLMElementNumbers::getMaximalSectionNumber(); ++i) {
+    trackSelected[i] = false;
+    sectionHits[i] = false;
+  }
+  for (const EKLMHit2d& hit : m_hit2ds)
+    sectionHits[hit.getSection() - 1]++;
+  if (sectionHits[EKLMElementNumbers::c_BackwardSection - 1] > requiredHits)
+    trackSelected[EKLMElementNumbers::c_ForwardSection - 1] = true;
+  if (sectionHits[EKLMElementNumbers::c_ForwardSection - 1] > requiredHits)
+    trackSelected[EKLMElementNumbers::c_BackwardSection - 1] = true;
 }
 
-std::pair<bool, bool> EKLMTrackMatchCollectorModule::trackCheck(int number_of_required_hits) const
+const EKLMDigit* EKLMTrackMatchCollectorModule::findMatchingDigit(
+  const struct HitData* hitData, double allowedDistance) const
 {
-  // Map to calc number of hits
-  // Forward - 2, backward - 1
-  bool mark_forward = false;
-  bool mark_backward = false;
-
-  std::map<int, int> section_hits = { {1, 0}, {2, 0} };
-  for (auto hit_ : m_hit2ds) {
-    section_hits[hit_.getSection()]++;
+  for (const EKLMDigit& digit : m_digits) {
+    if (digit.getSection() == hitData->section &&
+        digit.getLayer() == hitData->layer &&
+        digit.getSector() == hitData->sector &&
+        digit.getPlane() == hitData->plane &&
+        (fabs(digit.getStrip() - hitData->strip) < allowedDistance))
+      return &digit;
   }
-
-  if (section_hits[1] > number_of_required_hits) mark_forward = true;
-  if (section_hits[2] > number_of_required_hits) mark_backward = true;
-
-  return std::make_pair(mark_forward, mark_backward);
-}
-
-bool EKLMTrackMatchCollectorModule::digitsMatching(const ExtHit& ext_hit, double allowed_distance) const
-{
-  int copyid = ext_hit.getCopyID();
-  int idSection = -1, idLayer = -1, idSector = -1, idPlane = -1, idStrip = -1;
-  m_GeoDat->stripNumberToElementNumbers(copyid, &idSection, &idLayer, &idSector, &idPlane, &idStrip);
-  TVector3 ext_hit_pos = ext_hit.getPosition();
-
-  for (auto hit_1d : m_digits) {
-    TVector3 hit1d_pos = hit_1d.getPosition();
-    TVector3 distance = hit1d_pos - ext_hit_pos;
-
-    if (hit_1d.getLayer() == idLayer && hit_1d.getSection() == idSection
-        && hit_1d.getSector() == idSector && hit_1d.getPlane() == idPlane
-        && (idStrip > hit_1d.getStrip() - allowed_distance && idStrip < hit_1d.getStrip() + allowed_distance))
-    { return true; }
-  }
-
-  return false;
+  return nullptr;
 }
 
 double EKLMTrackMatchCollectorModule::getSumTrackEnergy(const StoreArray<Track>& selected_tracks) const
@@ -142,84 +127,79 @@ double EKLMTrackMatchCollectorModule::getSumTrackEnergy(const StoreArray<Track>&
   return eneregy;
 }
 
-
-bool EKLMTrackMatchCollectorModule::d0z0Cut(const StoreArray<Track>& selected_tracks, double dist) const
-{
-  bool cosmic = false;
-
-  for (auto trk : selected_tracks) {
-    const TrackFitResult* fitResult = trk.getTrackFitResultWithClosestMass(Const::muon);
-    double d0 = fitResult->getD0();
-    double z0 = fitResult->getZ0();
-    if (d0 > dist || z0 > dist) cosmic = true;
-  }
-
-  return cosmic;
-}
-
-bool EKLMTrackMatchCollectorModule::thetaAcceptance(const StoreArray<Track>& selected_tracks) const
-{
-  bool disacceptance = false;
-
-  for (auto trk : selected_tracks) {
-    const TrackFitResult* fitResult = trk.getTrackFitResultWithClosestMass(Const::muon);
-    double theta = fitResult->getMomentum().Theta() * 180.0 / CLHEP::pi;
-    if (theta > 140 || theta < 20) disacceptance = true;
-  }
-  return disacceptance;
-}
-
-
 void EKLMTrackMatchCollectorModule::collect()
 {
-// Variables to mark possibility of using track for efficiency study
-  auto [mark_forward, mark_backward] = trackCheck(5);
-
-  for (const Track& track : m_tracks) {
-
-    // Making different cuts
-    const RecoTrack* recoTrack = track.getRelated<RecoTrack>();
-
-    if (recoTrack && m_tracks.getEntries() == 2) {
-      const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::muon);
-      if (fitResult->getMomentum().Mag() > 11. || fitResult->getMomentum().Mag() < 1.) continue;
-      // if (m_EnergyCut) {
-      //   if (getSumTrackEnergy(m_tracks) > 10) continue;
-      // }
-
-      if (d0z0Cut(m_tracks, m_D0Z0)) continue;
-      // if (thetaAcceptance(m_tracks)) continue;
-
-      TH1F* MatchedDigitsInPlane;
-      MatchedDigitsInPlane = getObjectPtr<TH1F>("MatchedDigitsInPlane");
-      TH1F* AllExtHitsInPlane;
-      AllExtHitsInPlane = getObjectPtr<TH1F>("AllExtHitsInPlane");
-
-      for (const auto& ext_hit : track.getRelationsTo<ExtHit>()) {
-
-        auto [copyid, idSection, idLayer, idSector, idPlane, idStrip] = checkExtHit(ext_hit);
-        if (copyid == -1) continue;
-
-        TVector3 ext_hit_pos = ext_hit.getPosition();
-
-        int planeNum = m_ElementNumbers->planeNumber(idSection, idLayer, idSector, idPlane);
-
-        if (idSection == 2 && mark_forward) {
-          if (digitsMatching(ext_hit, m_AllowedDistance1D)) {
-            MatchedDigitsInPlane->Fill(planeNum);
-          }
-          AllExtHitsInPlane->Fill(planeNum);
-
-        } else if (idSection == 1 && mark_backward) {
-          if (digitsMatching(ext_hit, m_AllowedDistance1D)) {
-            MatchedDigitsInPlane->Fill(planeNum);
-          }
-          AllExtHitsInPlane->Fill(planeNum);
-        }
-      }
+  if (m_MuonListName != "") {
+    unsigned int nMuons = m_MuonList->getListSize();
+    for (unsigned int i = 0; i < nMuons; ++i) {
+      const Particle* particle = m_MuonList->getParticle(i);
+      const Track* track = particle->getTrack();
+      collectDataTrack(track);
     }
+  } else {
+    for (const Track& track : m_tracks)
+      collectDataTrack(&track);
   }
+}
 
+void EKLMTrackMatchCollectorModule::collectDataTrack(const Track* track)
+{
+  bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()] =
+  {true, true};
+  if (m_StandaloneTrackSelection)
+    trackCheck(trackSelected, 5);
+
+  TH1F* MatchedDigitsInPlane;
+  MatchedDigitsInPlane = getObjectPtr<TH1F>("MatchedDigitsInPlane");
+  TH1F* AllExtHitsInPlane;
+  AllExtHitsInPlane = getObjectPtr<TH1F>("AllExtHitsInPlane");
+
+  RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
+  std::map<int, struct HitData> selectedHits;
+  std::map<int, struct HitData>::iterator it;
+  struct HitData hitData;
+  for (const ExtHit& hit : extHits) {
+    if (hit.getDetectorID() != Const::EDetector::EKLM)
+      continue;
+    /* Choose hits that enter the sensitive volume. */
+    if (hit.getStatus() != EXT_ENTER)
+      continue;
+    /*
+     * There may be more than one such hit e.g. if track crosses the edge
+     * of the strips or WLS fiber groove. Select only one hit per plane.
+     */
+    int stripGlobal = hit.getCopyID();
+    m_ElementNumbers->stripNumberToElementNumbers(
+      stripGlobal, &hitData.section, &hitData.layer, &hitData.sector,
+      &hitData.plane, &hitData.strip);
+    hitData.hit = &hit;
+    hitData.digit = nullptr;
+    int planeGlobal = m_ElementNumbers->planeNumber(
+                        hitData.section, hitData.layer, hitData.sector, hitData.plane);
+    it = selectedHits.find(planeGlobal);
+    if (it == selectedHits.end())
+      selectedHits.insert(std::pair<int, struct HitData>(planeGlobal, hitData));
+  }
+  /* Find matching digits. */
+  int nDigits = 0;
+  for (it = selectedHits.begin(); it != selectedHits.end(); ++it) {
+    it->second.digit = findMatchingDigit(&(it->second), m_AllowedDistance1D);
+    if (it->second.digit != nullptr)
+      nDigits++;
+  }
+  /* Write efficiency histograms */
+  for (it = selectedHits.begin(); it != selectedHits.end(); ++it) {
+    if (!trackSelected[it->second.section - 1])
+      continue;
+    int matchingDigits = nDigits;
+    if (it->second.digit != nullptr)
+      matchingDigits--;
+    if (matchingDigits < m_MinimalMatchingDigits)
+      continue;
+    AllExtHitsInPlane->Fill(it->first);
+    if (it->second.digit != nullptr)
+      MatchedDigitsInPlane->Fill(it->first);
+  }
 }
 
 void EKLMTrackMatchCollectorModule::closeRun()

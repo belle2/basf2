@@ -23,6 +23,7 @@ skim_registry = [
     ('14120300', 'BtoDh_Kspi0'),
     ('14140200', 'BtoDh_Kshh'),
     ('14120400', 'BtoDh_Kspipipi0'),
+    ('14140500', 'BtoDh_Kspi0pi0'),
     ('11180100', 'feiHadronicB0'),
     ('11180200', 'feiHadronicBplus'),
     ('11180300', 'feiSLB0'),
@@ -67,3 +68,46 @@ skim_registry = [
     ('18570600', 'TauGeneric'),
     ('18570700', 'TauThrust'),
 ]
+
+combined_skims = {
+    'BtoCharm': [
+        'BtoDh_Kshh', 'BtoDh_hh', 'BtoDh_Kspi0', 'BtoDh_Kspipipi0'
+    ],
+    'BtoCharmless': [
+        'CharmlessHad2Body', 'CharmlessHad3Body'
+    ],
+    'CharmHigh': [
+
+    ],
+    'CharmLow': [
+
+    ],
+    'CombinedSystematics': [
+        'Systematics', 'SystematicsLambda', 'SystematicsTracking', 'Resonance',
+        'SystematicsRadMuMu', 'SystematicsRadEE'
+    ],
+    'Dark': [
+        'ALP3Gamma', 'SinglePhotonDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy', 'DielectronPlusMissingEnergy'
+    ],
+    'EWP': [
+        'BtoXll', 'BtoXll_LFV', 'BtoXgamma'
+    ],
+    'feiCombined': [
+        'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0', 'feiSLBplus'
+    ],
+    'feiHadronicCombined': [
+        'feiHadronicB0', 'feiHadronicBplus'
+    ],
+    'feiSLCombined': [
+        'feiSLB0', 'feiSLBplus'
+    ],
+    'MiscCombined': [
+        'TCPV', 'TauLFV', 'TauThrust', 'TauGeneric'
+    ],
+    'Quarkonium': [
+        'ISRpipicc', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon'
+    ],
+    'Semileptonic': [
+        'PRsemileptonicUntagged', 'LeptonicUntagged', 'SLUntagged'
+    ]
+}

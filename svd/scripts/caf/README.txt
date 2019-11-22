@@ -13,4 +13,4 @@ How to run the SVD CoG calibration using CAF:
 
 3) run source SVDCoGTimeCalibrationCheck.sh <exp_number> <txt_folder produced in 2)> <localDB produced in 1)> <log files output folder>
    
-   -It runs the check of the calibration in the localDB specified for all run contained in the folder created in 2)
+   -It runs the check of the calibration (in the localDB specified as third argument) for all runs contained in the folder created in 2)

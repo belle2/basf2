@@ -26,7 +26,7 @@ data_dir = '/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/'
 skim_dir = 'skim/hlt_bhabha/cdst/sub00'
 main_output_dir = 'top_calibration'
 maxFiles = 10  # maximum number of input files per run (0 or negative means all)
-time_offset = -66.8  # set to 0 for release-4 processed data or newer
+time_offset = -66.8  # must be set to 0 for release-4 processed data or newer
 #
 # ---------------------------------------------------------------------------------------
 

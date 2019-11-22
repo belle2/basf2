@@ -335,7 +335,7 @@ def pulseHeight_calibration_rawdata(inputFiles, globalTags=[], localDBs=[]):
     '''
     Returns calibration object for calibration of pulse-height distributions and
     threshold efficiencies with raw data
-    :param inputFiles: A list of input files in cdst data format
+    :param inputFiles: A list of input files in raw data format
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
     '''
@@ -375,7 +375,7 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
     Returns calibration object for alignment of TOP modules.
     :param inputFiles: A list of input files in cdst data format
     :param sample: data sample ('dimuon' or 'bhabha')
-    :fixedParameters: a list of parameters to be fixed (to get names: basf2 -m TOPAlignmentCollector)
+    :fixedParameters: a list of parameters to be fixed (parameter names: basf2 -m TOPAlignmentCollector)
     :recalibrate: on True recalibrate time and reconstruct bunch again
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first

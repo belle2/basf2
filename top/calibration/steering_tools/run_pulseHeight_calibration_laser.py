@@ -25,8 +25,8 @@ localDBs = []  # highest priority first, local DB's have higher priority than gl
 data_dir = '/ghi/fs01/belle2/bdata/group/detector/TOP/2019-*/data_sroot_global/'
 main_output_dir = 'top_calibration'
 look_back = 28  # look-back window setting (set to 0 if look-back setting available in DB)
-t_min = -50.0  # [ns] time window low of laser signal
-t_max = 0.0    # [ns] time window high of laser signal
+t_min = -50.0  # lower edge of time window to select laser signal [ns]
+t_max = 0.0    # upper edge of time window to select laser signal [ns]
 #
 # ---------------------------------------------------------------------------------------
 

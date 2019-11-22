@@ -80,7 +80,7 @@ namespace Belle2 {
     double nCompositeDaughters(const Particle* particle)
     {
       int result = 0;
-      auto fspDaughters = particle->getFinalStateDaughters();
+      auto fspDaughters = particle->getDaughters();
       for (auto* daughter : fspDaughters) {
         if (daughter->getParticleType() == Particle::EParticleType::c_Composite) {
           result++;

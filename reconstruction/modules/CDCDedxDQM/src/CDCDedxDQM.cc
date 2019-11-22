@@ -20,8 +20,6 @@ CDCDedxDQMModule::CDCDedxDQMModule(): HistoModule()
 {
   setPropertyFlags(c_ParallelProcessingCertified); // parallel processing
   setDescription("Make data quality monitoring plots for dE/dx: means and resolutions for bhabha skim, dedx band plots for bhabha/hadron skim.");
-  addParam("TriggerIdentifier", m_triggerIdentifier,
-           "Trigger identifier string used to select bhabha events in this module", std::string("software_trigger_cut&skim&accept_bhabha"));
 }
 
 //---------------------------------
@@ -92,8 +90,8 @@ void CDCDedxDQMModule::event()
 
   const std::map<std::string, int>& fresults = m_TrgResult->getResults();
   if (fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end()
-      or fresults.find("software_trigger_cut&skim&accept_hadron") == fresults.end()) {
-    B2WARNING("CDCDedxDQMModule: Can't find required trigger identifiers: going back " << m_triggerIdentifier);
+      and fresults.find("software_trigger_cut&skim&accept_hadron") == fresults.end()) {
+    B2WARNING("CDCDedxDQMModule: Can't find required trigger identifiers: going back ");
     return;
   }
 
@@ -102,7 +100,7 @@ void CDCDedxDQMModule::event()
   const bool IsHadronEvtAccepted = (m_TrgResult->getResult("software_trigger_cut&skim&accept_hadron") ==
                                     SoftwareTriggerCutResult::c_accept);
   if (!IsBhabhaEvtAccepted and !IsHadronEvtAccepted) {
-    B2WARNING("CDCDedxDQMModule: not an bhabha or hadron event: going back" << m_triggerIdentifier);
+    B2WARNING("CDCDedxDQMModule: not an bhabha or hadron event: going back");
     return;
   }
   // fill histograms for bhabha-events only

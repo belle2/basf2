@@ -73,7 +73,6 @@ namespace Belle2 {
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array for CDCDedxTrack */
 
     Int_t fCurrentEventNum; /**< variable to get run number */
-    std::string m_triggerIdentifier = ""; /**< variable to get specific trigger event */
 
     TH1D* temp1D{nullptr}; /**< Dedx histogram per run */
     TH2D* temp2D{nullptr}; /**< Dedx vs P histogram per run */

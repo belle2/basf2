@@ -280,13 +280,6 @@ namespace Belle2 {
   {
     for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
       const Particle* child = mother->getDaughter(ichild);
-      if (mother->getProperty() == Particle::PropertyFlags::c_IsUnspecified) {
-        if (child->getPValue() > 0) {
-          B2DEBUG(10, "Adding daughter of unspecified particle");
-          fitChildren.push_back(ichild);
-        }
-        continue;
-      }
 
       if (child->getPValue() < 0) {
         B2WARNING("Daughter with PDG code " << child->getPDGCode() << " does not have a valid error matrix.");

@@ -56,28 +56,11 @@ void SVDCoGTimeCalibrationCollectorModule::prepare()
                       100, -100, 100);
   hEventT0NoSync.GetXaxis()->SetTitle("event_t0 (ns)");
   m_hEventT0nosync = new SVDHistograms<TH1F>(hEventT0NoSync);
-  // m_hEventT0 = new TH1F("hEventT0", "EventT0Sync", 200, -100, 100);
 
-  // m_histogramTree = new TTree("tree", "tree");
   m_svdCls.isRequired(m_svdClusters);
   m_eventT0.isRequired(m_eventTime);
   m_svdRD.isRequired(m_svdRecoDigits);
-  /*
-  // m_histogramTree->Branch("hist", "TH2F", &m_hist, 32000, 0);
-  m_histogramTree->Branch("evt", &m_evt, "evt/I");
-  m_histogramTree->Branch("run", &m_run, "run/I");
-  m_histogramTree->Branch("exp", &m_exp, "exp/I");
-  m_histogramTree->Branch("layer", &m_layer, "layer/I");
-  m_histogramTree->Branch("ladder", &m_ladder, "ladder/I");
-  m_histogramTree->Branch("sensor", &m_sensor, "sensor/I");
-  m_histogramTree->Branch("view", &m_side, "view/I");
-  m_histogramTree->Branch("evtTime", &m_evtT0, "evtTime/D");
-  m_histogramTree->Branch("evtTimeSync", &m_evtT0Sync, "evtTimeSync/D");
-  m_histogramTree->Branch("rawCog", &m_rawCoG, "rawCoG/D");
-  // m_histogramTree->Branch("hist_evttime", "TH1F", &m_hist_evttime, 32000, 0);
-  registerObject<TTree>("HTreeCoGTimeCalib", m_histogramTree);
-  // registerObject<TH1F>("hEventT0", m_hEventT0);
-  */
+
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
   for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
@@ -95,9 +78,6 @@ void SVDCoGTimeCalibrationCollectorModule::prepare()
 
 void SVDCoGTimeCalibrationCollectorModule::startRun()
 {
-  //describeProcess("SVDCoGTimeCalibrationCollectorModule::startRun()");
-
-  //getObjectPtr<TTree>("HTreeCoGTimeCalib")->Reset();
 
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
@@ -116,43 +96,19 @@ void SVDCoGTimeCalibrationCollectorModule::startRun()
       }
     }
   }
-  // m_hEventT0->Reset();
 }
 
 
 void SVDCoGTimeCalibrationCollectorModule::closeRun()
 {
-  //describeProcess("SVDCoGTimeCalibrationCollectorModule::closeRun()");
-  /*
-   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
-
-   //getObjectPtr<TH2F>("hEventT0")->Fill(1,1);
-
-   for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
-     for (auto ladder : geoCache.getLadders(layer)) {
-       for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
-         for (int view = SVDHistograms<TH2F>::VIndex ; view < SVDHistograms<TH2F>::UIndex + 1; view++) {
-           m_hist = m_hEventT0vsCoG->getHistogram(sensor, view);
-           m_hist_evttime = m_hEventT0->getHistogram(sensor, view);
-           m_layer = layer.getLayerNumber();
-           m_ladder = ladder.getLadderNumber();
-           m_sensor = sensor.getSensorNumber();
-           m_side = view;
-           // getObjectPtr<TTree>("HTreeCoGTimeCalib")->Fill();
-         }
-       }
-     }
-   }*/
 }
 
 void SVDCoGTimeCalibrationCollectorModule::finish()
 {
-  //describeProcess("SVDCoGTimeCalibrationCollectorModule::finish()");
 }
 
 void SVDCoGTimeCalibrationCollectorModule::collect()
 {
-  // describeProcess("SVDCoGTimeCalibrationCollectorModule::collect()");
   if (!m_svdCls.isValid()) {
     B2WARNING("!!!! File is not Valid: isValid() = " << m_svdCls.isValid());
     return;
@@ -170,10 +126,6 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
       getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(theVxdID, side)->GetName())->Fill(clTime, eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(theVxdID, side)->GetName())->Fill(eventT0);
-      // getObjectPtr<TTree>("HTreeCoGTimeCalib")->Fill();
-      // m_hEventT0vsCoG->fill(theVxdID, side, clTime, eventT0Sync);
-      // m_hEventT0->fill(theVxdID, side, eventT0Sync);
-      // getObjectPtr<TH1F>("hEventT0")->Fill(eventT0Sync);
     }
   };
 }

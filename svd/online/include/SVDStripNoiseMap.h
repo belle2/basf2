@@ -31,13 +31,13 @@ namespace Belle2 {
     SVDStripNoiseMap(SVDOnlineToOfflineMap* onl2offl_map_ptr = NULL);
     /** Constructor including map initialization */
     SVDStripNoiseMap(SVDOnlineToOfflineMap* onl2offl_map_ptr,
-                     const std::string noisefilename);
+                     const std::string& noisefilename);
 
     /** Destructor */
     ~SVDStripNoiseMap() {};
 
     /** Initialize maps with input noisefile */
-    int initializeMap(const std::string noisefilename = "");
+    int initializeMap(const std::string& noisefilename = "");
 
     /* Get pedestal, noise, and threshold values.
      * @param id VxdID of the required sensor, with segment number 0 for v, 1 for u

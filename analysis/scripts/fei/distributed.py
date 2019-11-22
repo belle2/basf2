@@ -54,7 +54,12 @@ import stat
 import shutil
 import pickle
 import json
-import b2biiConversion
+try:
+    import b2biiConversion
+    b2biifound = True
+except ModuleNotFoundError:
+    print("B2BII not found, can't use process_urls for training.")
+    b2biifound = False
 import fei
 
 
@@ -111,7 +116,7 @@ def setup(args):
 
     for x in args.data:
         for y in x:
-            if y.startswith("http://") or y.startswith("https://"):
+            if (y.startswith("http://") or y.startswith("https://")) and b2biifound:
                 data_files += b2biiConversion.parse_process_url(y)
             else:
                 data_files += glob.glob(y)

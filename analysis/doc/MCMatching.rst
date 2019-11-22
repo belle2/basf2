@@ -56,9 +56,9 @@ The error flag :b2:var:`mcErrors` is a bit set where each bit flag describes
  The same is true for ``c_MissingResonance``, which is set for any missing composite particle (e.g. :math:`K_1`, but also :math:`D^{*0}`).
 
 
-=============================  ================================================================================================
-Flag                           Explanation  
-=============================  ================================================================================================  
+==============================  ================================================================================================
+Flag                            Explanation
+==============================  ================================================================================================
  c_Correct       = 0             This Particle and all its daughters are perfectly reconstructed. 
  c_MissFSR       = 1             A Final State Radiation (FSR) photon is not reconstructed (based on MCParticle: :c_IsFSRPhoton). 
  c_MissingResonance = 2          The associated MCParticle decay contained additional non-final-state particles (e.g. a rho)
@@ -78,7 +78,7 @@ Flag                           Explanation
  c_MissPHOTOS    = 1024          A photon created by PHOTOS was not reconstructed (based on MCParticle: :c_IsPHOTOSPhoton). 
  c_AddedRecoBremsPhoton = 2048   A photon added with the bremsstrahlung recovery tools (correctBrems or correctBremsBelle) has 
                                  no MC particle assigned, or it doesn't belong to the decay chain of the corrected lepton mother
-=============================  ================================================================================================
+==============================  ================================================================================================
 
 
 ~~~~~~~~~~~~~~
@@ -146,16 +146,14 @@ Steering file snippet
   
   # Modules to generate events, etc.
   ...
-  
-  mcfinder = register_module('MCDecayFinder')
+
+  import modularAnalysis as ma
   # Search for B+ decaying to anti-D0 + anything, where the anti-D0 decays to K+ pi-.
   # Ignore additional photons emitted in the anti-D0 decay. Charge conjugated decays
-  # are matched, too. If there is a match found, save to ParticleList 'testB'
-  mcfinder.param('strDecayString', 'B+ -> [anti-D0 => K+ pi-] ...')
-  mcfinder.param('strListName', 'testB')
-  main.add_module(mcfinder)
+  # are matched, too. If there is a match found, save to ParticleList 'B+:testB'
+  ma.findMCDecay('B+:testB', 'B+ =direct=> [anti-D0 =direct=> K+ pi-] ... ?gamma ?nu', path=main)  
   
-  # Modules which can use the matched decays saved as Particle in the ParticleList 'testB'
+  # Modules which can use the matched decays saved as Particle in the ParticleList 'B+:testB'
   ...
  
 

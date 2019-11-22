@@ -37,7 +37,7 @@ namespace Belle2 {
       auto timeReference = getObjectPtr<TH1F>("time_reference");
       if (not timeReference) {
         B2ERROR("TOPAsicShiftsBS13dAlgorithm: histogram 'time_reference' not found");
-        return c_Failure;
+        return c_NotEnoughData;
       }
       if (timeReference->GetSumOfWeights() == 0) {
         B2ERROR("TOPAsicShiftsBS13dAlgorithm: histogram 'time_reference' is empty");
@@ -50,7 +50,7 @@ namespace Belle2 {
         auto h = getObjectPtr<TH1F>(name);
         if (not h) {
           B2ERROR("TOPAsicShiftsBS13dAlgorithm: histogram '" << name << "' not found");
-          return c_Failure;
+          return c_NotEnoughData;
         }
         timeCarriers.push_back(h);
       }

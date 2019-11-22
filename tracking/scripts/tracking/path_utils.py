@@ -421,7 +421,8 @@ def add_svd_track_finding(
 
 
 def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
-                          use_second_hits=False, add_mva_quality_indicator=False):
+                          use_second_hits=False, add_mva_quality_indicator=False,
+                          reattach_hits=False):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -434,6 +435,9 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     :param use_second_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_mva_quality_indicator: Add the TFCDC_TrackQualityEstimator module to set the CDC quality
            indicator property of the CDC ``output_reco_tracks``
+    :param cdc_quality_estimator_weightfile: Weightfile identifier for the TFCDC_TrackQualityEstimator
+    :param reattach_hits: if true, use the ReattachCDCWireHitsToRecoTracks module at the end of the CDC track finding
+                          to readd hits with bad ADC or TOT rejected by the TFCDC_WireHitPreparer module.
     """
     # Init the geometry for cdc tracking and the hits and cut low ADC hits
     path.add_module("TFCDC_WireHitPreparer",
@@ -506,7 +510,18 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     # Export CDCTracks to RecoTracks representation
     path.add_module("TFCDC_TrackExporter",
                     inputTracks=output_tracks,
-                    RecoTracksStoreArrayName=output_reco_tracks)
+                    RecoTracksStoreArrayName="CDCRecoTracksBeforeReattaching" if reattach_hits else output_reco_tracks)
+
+    if reattach_hits:
+        # The ReattachCDCWireHitsToRecoTracks module (below) requires the SetupGenfitExtrapolation module
+        if 'SetupGenfitExtrapolation' not in path:
+            # Prepare Genfit extrapolation
+            path.add_module('SetupGenfitExtrapolation')
+
+        # Loop over low-ADC/TOT CDCWireHits and RecoTracks and reattach the hits to the tracks if they are close enough
+        path.add_module("ReattachCDCWireHitsToRecoTracks",
+                        inputRecoTracksStoreArrayName="CDCRecoTracksBeforeReattaching",
+                        outputRecoTracksStoreArrayName=output_reco_tracks)
 
     # Correct time seed (only necessary for the CDC tracks)
     path.add_module("IPTrackTimeEstimator",

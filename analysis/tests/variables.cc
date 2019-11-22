@@ -1143,6 +1143,45 @@ namespace {
     EXPECT_FLOAT_EQ(var->function(&p), 3.185117);
   }
 
+  TEST_F(MetaVariableTest, useTagSideRecoilRestFrame)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<Particle> particles;
+    particles.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+    PCmsLabTransform T;
+    TLorentzVector vec0 = {0.0, 0.0, 0.0, T.getCMSEnergy()};
+    TLorentzVector vec1 = {0.0, +0.332174566, 0.0, T.getCMSEnergy() / 2.};
+    TLorentzVector vec2 = {0.0, -0.332174566, 0.0, T.getCMSEnergy() / 2.};
+    Particle* p0 = particles.appendNew(Particle(T.rotateCmsToLab() * vec0, 300553));
+    Particle* p1 = particles.appendNew(Particle(T.rotateCmsToLab() * vec1, 511, Particle::c_Unflavored, Particle::c_Undefined, 1));
+    Particle* p2 = particles.appendNew(Particle(T.rotateCmsToLab() * vec2, -511, Particle::c_Unflavored, Particle::c_Undefined, 2));
+
+    p0->appendDaughter(p1->getArrayIndex());
+    p0->appendDaughter(p2->getArrayIndex());
+
+    const Manager::Var* var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, p), 0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+
+    var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, px), 0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+
+    var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, py), 0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+
+    var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, pz), 0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+
+    var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, E), 0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_NEAR(var->function(p0), p1->getMass(), 1e-6);
+  }
+
+
   TEST_F(MetaVariableTest, extraInfo)
   {
     Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
@@ -3013,6 +3052,196 @@ namespace {
     // non-existing variable
     EXPECT_B2FATAL(Manager::Instance().getVariable("pValueCombination(chiProb, NONEXISTANTVARIABLE)"));
   }
+
+
+  TEST_F(MetaVariableTest, daughterCombinationOneGeneration)
+  {
+    const int nDaughters = 5;
+    TLorentzVector momentum(0, 0, 0, 0);
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    std::vector<TLorentzVector> daughterMomenta;
+
+    for (int i = 0; i < nDaughters; i++) {
+      TLorentzVector mom(1, i * 0.5, 1, i * 1.0 + 2.0);
+      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+      daughterMomenta.push_back(mom);
+      momentum = momentum + mom;
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Flavored, daughterIndices);
+
+    // Test the invariant mass of several combinations
+    const Manager::Var* var = Manager::Instance().getVariable("daughterCombination(M, 0,1,2)");
+    double M_test = (daughterMomenta[0] + daughterMomenta[1] + daughterMomenta[2]).Mag();
+    EXPECT_FLOAT_EQ(var->function(p), M_test);
+
+    var = Manager::Instance().getVariable("daughterCombination(M, 0,4)");
+    M_test = (daughterMomenta[0] + daughterMomenta[4]).Mag();
+    EXPECT_FLOAT_EQ(var->function(p), M_test);
+
+
+    // Try with a non-lorentz invariant quantity
+    var = Manager::Instance().getVariable("daughterCombination(p, 1, 0, 4)");
+    double p_test = (daughterMomenta[0] + daughterMomenta[1] + daughterMomenta[4]).Vect().Mag();
+    EXPECT_FLOAT_EQ(var->function(p), p_test);
+
+
+    // errors and bad stuff
+    EXPECT_B2FATAL(Manager::Instance().getVariable("daughterCombination(aVeryNonExistingVariableSillyName, 1, 0, 4)"));
+
+    var = Manager::Instance().getVariable("daughterCombination(M, 1, 0, 100)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+
+    var = Manager::Instance().getVariable("daughterCombination(M, 1, -1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+
+    var = Manager::Instance().getVariable("daughterCombination(M, 1, 0:1:0:0:1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+  }
+
+
+  TEST_F(MetaVariableTest, daughterCombinationTwoGenerations)
+  {
+    StoreArray<Particle> particles;
+
+    // make a 1 -> 3 particle
+
+    TLorentzVector momentum_1(0, 0, 0, 0);
+    std::vector<TLorentzVector> daughterMomenta_1;
+    std::vector<int> daughterIndices_1;
+
+    for (int i = 0; i < 3; i++) {
+      TLorentzVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
+      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices_1.push_back(newDaughters->getArrayIndex());
+      daughterMomenta_1.push_back(mom);
+      momentum_1 = momentum_1 + mom;
+    }
+
+    const Particle* compositeDau_1 = particles.appendNew(momentum_1, 411, Particle::c_Flavored, daughterIndices_1);
+
+
+    // make a 1 -> 2 particle
+
+    TLorentzVector momentum_2(0, 0, 0, 0);
+    std::vector<TLorentzVector> daughterMomenta_2;
+    std::vector<int> daughterIndices_2;
+
+    for (int i = 0; i < 2; i++) {
+      TLorentzVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
+      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices_2.push_back(newDaughters->getArrayIndex());
+      daughterMomenta_2.push_back(mom);
+      momentum_2 = momentum_2 + mom;
+    }
+
+    const Particle* compositeDau_2 = particles.appendNew(momentum_2, 411, Particle::c_Flavored, daughterIndices_2);
+
+
+    // make the composite particle
+    std::vector<int> daughterIndices = {compositeDau_1->getArrayIndex(), compositeDau_2->getArrayIndex()};
+    const Particle* p = particles.appendNew(momentum_2 + momentum_1, 111, Particle::c_Unflavored, daughterIndices);
+
+
+    // Test the invariant mass of several combinations
+    const Manager::Var* var = Manager::Instance().getVariable("daughterCombination(M, 0,1)");
+    double M_test = (momentum_1 + momentum_2).Mag();
+    EXPECT_FLOAT_EQ(var->function(p), M_test);
+
+    // this should be the mass of the first daughter
+    var = Manager::Instance().getVariable("daughterCombination(M, 0:0, 0:1, 0:2)");
+    M_test = (momentum_1).Mag();
+    EXPECT_FLOAT_EQ(var->function(p), M_test);
+
+    // this should be a generic combinations
+    var = Manager::Instance().getVariable("daughterCombination(M, 0:0, 0:1, 1:0)");
+    M_test = (daughterMomenta_1[0] + daughterMomenta_1[1] + daughterMomenta_2[0]).Mag();
+    EXPECT_FLOAT_EQ(var->function(p), M_test);
+
+  }
+
+
+
+  TEST_F(MetaVariableTest, daughterAngleInBetween)
+  {
+    StoreArray<Particle> particles;
+
+    // make a 1 -> 3 particle
+
+    TLorentzVector momentum_1(0, 0, 0, 0);
+    std::vector<TLorentzVector> daughterMomenta_1;
+    std::vector<int> daughterIndices_1;
+
+    for (int i = 0; i < 3; i++) {
+      TLorentzVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
+      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices_1.push_back(newDaughters->getArrayIndex());
+      daughterMomenta_1.push_back(mom);
+      momentum_1 = momentum_1 + mom;
+    }
+
+    const Particle* compositeDau_1 = particles.appendNew(momentum_1, 411, Particle::c_Flavored, daughterIndices_1);
+
+
+    // make a 1 -> 2 particle
+
+    TLorentzVector momentum_2(0, 0, 0, 0);
+    std::vector<TLorentzVector> daughterMomenta_2;
+    std::vector<int> daughterIndices_2;
+
+    for (int i = 0; i < 2; i++) {
+      TLorentzVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
+      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices_2.push_back(newDaughters->getArrayIndex());
+      daughterMomenta_2.push_back(mom);
+      momentum_2 = momentum_2 + mom;
+    }
+
+    const Particle* compositeDau_2 = particles.appendNew(momentum_2, 411, Particle::c_Flavored, daughterIndices_2);
+
+
+    // make the composite particle
+    std::vector<int> daughterIndices = {compositeDau_1->getArrayIndex(), compositeDau_2->getArrayIndex()};
+    const Particle* p = particles.appendNew(momentum_2 + momentum_1, 111, Particle::c_Unflavored, daughterIndices);
+
+
+    // Test the invariant mass of several combinations
+    const Manager::Var* var = Manager::Instance().getVariable("daughterAngleInBetween(0, 1)");
+    double v_test = momentum_1.Vect().Angle(momentum_2.Vect());
+    EXPECT_FLOAT_EQ(var->function(p), v_test);
+
+    // this should be a generic combinations
+    var = Manager::Instance().getVariable("daughterAngleInBetween(0:0, 1:0)");
+    v_test = daughterMomenta_1[0].Vect().Angle(daughterMomenta_2[0].Vect());
+    EXPECT_FLOAT_EQ(var->function(p), v_test);
+
+    var = Manager::Instance().getVariable("daughterAngleInBetween( 1, -1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+    var = Manager::Instance().getVariable("daughterAngleInBetween(1, 0:1:0:0:1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+  }
+
+
+
+
+
+
 
   class PIDVariableTest : public ::testing::Test {
   protected:

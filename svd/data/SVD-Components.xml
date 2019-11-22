@@ -75,8 +75,8 @@
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
                         <ADUEquivalentU unit="e">270</ADUEquivalentU>
                         <ADUEquivalentV unit="e">259</ADUEquivalentV>
-                        <ElectronicNoiseU unit="e">820</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">716</ElectronicNoiseV>
+                        <ElectronicNoiseU unit="e">540</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">467</ElectronicNoiseV>
 		</Active>
 	</SensorBase>
 
@@ -110,12 +110,12 @@
                         <!-- All except backward sensors are on Origami -->
                         <ADUEquivalentU unit="e">297</ADUEquivalentU>
                         <ADUEquivalentV unit="e">231</ADUEquivalentV>
-                        <ElectronicNoiseU unit="e">984</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">527</ElectronicNoiseV>
+                        <ElectronicNoiseU unit="e">708</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">306</ElectronicNoiseV>
                         <ADUEquivalentSbwU unit="e">274</ADUEquivalentSbwU>
                         <ADUEquivalentSbwV unit="e">260</ADUEquivalentSbwV>
-                        <ElectronicNoiseSbwU unit="e">853</ElectronicNoiseSbwU>
-                        <ElectronicNoiseSbwV unit="e">716</ElectronicNoiseSbwV>
+                        <ElectronicNoiseSbwU unit="e">567</ElectronicNoiseSbwU>
+                        <ElectronicNoiseSbwV unit="e">471</ElectronicNoiseSbwV>
 		</Active>
 	</SensorBase>
 
@@ -148,8 +148,8 @@
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
                         <ADUEquivalentU unit="e">320</ADUEquivalentU>
                         <ADUEquivalentV unit="e">323</ADUEquivalentV>
-                        <ElectronicNoiseU unit="e">1054</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">798</ElectronicNoiseV>
+                        <ElectronicNoiseU unit="e">793</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">585</ElectronicNoiseV>
 		</Active>
 		<!-- For now, layer 3 only has a flex on top -->
 		<Component name="KaptonLayer3">

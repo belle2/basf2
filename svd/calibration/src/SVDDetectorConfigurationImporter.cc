@@ -138,6 +138,7 @@ void SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(con
   read_xml(xmlFileName, pt);
 
   //auxilairy variables to store the XML file values
+  // TODO: calInjectedCharge is not used! Check if it can be removed.
   std::string calInjectedCharge = "";
   std::string calibTimeUnits = "";
   std::string calibDate = "";
@@ -149,7 +150,6 @@ void SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(con
     if (apvChild.first == "cal_peaks") {
       calInjectedCharge = apvChild.second.get<std::string>("<xmlattr>.units") ;
       std::cout << " injected charge from XML  = " << calInjectedCharge << ", but actually set to 22500, hardcoded" << endl;
-
     }
 
     if (apvChild.first == "cal_peak_time") {

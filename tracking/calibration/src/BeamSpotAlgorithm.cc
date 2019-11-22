@@ -23,7 +23,7 @@ BeamSpotAlgorithm::BeamSpotAlgorithm() : CalibrationAlgorithm("BeamSpotCollector
 
 CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
 {
-  int minVertices = 10;
+  int minVertices = 300;
   int nSigmacut = 6;
 
   auto hVertexX = getObjectPtr<TH1F>("Y4S_Vertex.X");

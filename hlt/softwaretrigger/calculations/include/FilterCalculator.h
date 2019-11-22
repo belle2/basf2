@@ -58,6 +58,12 @@ namespace Belle2::SoftwareTrigger {
     double m_E0min = 0.3;
     /// which CMS energy defines nEhigh
     double m_Ehigh = 2;
+    /// which lab energy defines nE180Lab
+    double m_EminLab = 0.18;
+    /// which lab energy defines nE300Lab
+    double m_EminLab4Cluster = 0.3;
+    /// which lab energy defines nE500Lab
+    double m_EminLab3Cluster = 0.5;
     /// which CMS energy defines nEsingleClust
     double m_EsinglePhoton = 1;
     /// which CMS energy defines nReducedEsingle clusters

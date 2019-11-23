@@ -34,6 +34,12 @@ PXDGatedModeDQMModule::PXDGatedModeDQMModule() : HistoModule() , m_vxdGeometry(V
            std::string("PXDINJ"));
   addParam("PXDRawHitsName", m_PXDRawHitsName, "Name of PXD raw hits", std::string(""));
   addParam("perGate", m_perGate, "Make plots per GM Start Gate", true);
+  addParam("minTimeCutLER", m_minTimeCutLER, "minimum time cut in us after LER kick", 20);
+  addParam("maxTimeCutLER", m_maxTimeCutLER, "maximum time cut in us after LER kick", 20);
+  addParam("minTimeCutHER", m_minTimeCutHER, "minimum time cut in us after HER kick", 4980);
+  addParam("maxTimeCutHER", m_maxTimeCutHER, "maximum time cut in us after HER kick", 4980);
+  addParam("outsideTimeCut", m_outsideTimeCut, "outside GM time cut in us after kick", 20000);
+  addParam("perGate", m_perGate, "Make plots per GM Start Gate", true);
 }
 
 void PXDGatedModeDQMModule::defineHisto()
@@ -165,7 +171,9 @@ void PXDGatedModeDQMModule::event()
       int bunch_inj = (bunch_trg - time_inj) % 1280;
       if (bunch_inj < 0) bunch_inj += 1280;
       int rgate = bunch_inj / (1280. / 96.); // 0-96 ?
-      if (diff2 > 100 && diff2 < 10000) { // 10ms  ... variable wie lange gegated wird
+      if ((isher && diff2 > m_minTimeCutHER && diff2 < m_maxTimeCutHER) ||
+          (!isher && diff2 > m_minTimeCutLER && diff2 < m_maxTimeCutLER)
+         ) { // be sure that we fill only in gating region
         hBunchTrg->Fill(it.GetBunchNumber(0) & 0x7FF);
         if (isher) hBunchInjHER->Fill(bunch_inj);
         else hBunchInjLER->Fill(bunch_inj);
@@ -267,7 +275,7 @@ void PXDGatedModeDQMModule::event()
             }
           }
         }
-      } else if (diff2 > 20000) {
+      } else if (diff2 > m_outsideTimeCut) {
         rgate = 96;
         for (auto& p : m_storeRawHits) {
           if (isher) {

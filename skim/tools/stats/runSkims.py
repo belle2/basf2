@@ -5,6 +5,7 @@
 
 import argparse
 from pathlib import Path
+import re
 import subprocess
 import sys
 from tempfile import NamedTemporaryFile
@@ -38,19 +39,20 @@ def getSkimsToRun():
     parser = argparse.ArgumentParser(description='A script to run a set of skims, and ' +
                                      'save the output in a format to be read by printSkimStats.py. ' +
                                      'One or more standalone or combined skim names must be provided.',
-                                     epilog='Example: ./runSkims.py -s LeptonicUntagged -c BtoCharm')
+                                     epilog='example: ./runSkims.py -s LeptonicUntagged -c BtoCharm')
     parser.add_argument('-s', '--standalone', nargs='+', default=[],
-                        choices=['all']+allStandaloneSkims, metavar='',
+                        choices=['all']+allStandaloneSkims, metavar='SKIM',
                         help='List of standalone skims to run. Valid options are: ' + ', '.join(allStandaloneSkims) +
                         ', or all to run all standalone skims.')
     parser.add_argument('-c', '--combined', nargs='+', default=[],
-                        choices=['all']+allCombinedSkims, metavar='',
+                        choices=['all']+allCombinedSkims, metavar='SKIM',
                         help='List of combined skims to run. Valid options are: ' + ', '.join(allCombinedSkims) +
                         ', or all to run all combined skims.')
     args = parser.parse_args()
 
     if not (args.standalone or args.combined):
-        argparse.ArgumentError('One or more standalone or combined skim names must be provided.')
+        parser.print_help()
+        sys.exit(1)
 
     if args.standalone == ['all']:
         standaloneSkims = allStandaloneSkims
@@ -78,6 +80,8 @@ if __name__ == '__main__':
             print(f'Error! Could not find script for {skim} skim.', file=sys.stderr)
             continue
 
+        jobIDs = []
+
         for sample in samples:
             sampleFile = get_test_file(sample)
 
@@ -87,7 +91,11 @@ if __name__ == '__main__':
             jsonFile = Path('log', f'JobInformation_{skim}_{sample}.json')
             outputFile = NamedTemporaryFile().name
 
-            print(f'Running {script} on {sampleFile} (sample label: {sample}) to {outputFile}')
-            subprocess.run(['bsub', '-q', 'l', '-oo', logFile, '-e', errFile, 'basf2', script,
-                            '--job-information', jsonFile, '-n', '10000',
-                            '-o', outputFile, '-i', sampleFile])
+            process = subprocess.run(['bsub', '-q', 'l', '-oo', logFile, '-e', errFile,
+                                      'basf2', script, '--job-information', jsonFile, '-n', '10000',
+                                      '-o', outputFile, '-i', sampleFile],
+                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+            jobIDs.append(re.findall('\d+', stdout)[0])
+
+        print(f'Running {script} for {skim} skim. Job IDs: ' + ', '.join(jobIDs))

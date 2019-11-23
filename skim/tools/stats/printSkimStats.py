@@ -176,13 +176,13 @@ def getSkimsToRun():
     parser = argparse.ArgumentParser(description='A script to print tables of statistics for skims ' +
                                      'which have been run by runSkims.py. One or more standalone or combined ' +
                                      'skim names must be provided.',
-                                     epilog='Example: ./printSkimStats.py -s LeptonicUntagged -c BtoCharm')
+                                     epilog='example: ./printSkimStats.py -s LeptonicUntagged -c BtoCharm')
     parser.add_argument('-s', '--standalone', nargs='+', default=[],
-                        choices=['all']+allStandaloneSkims, metavar='',
+                        choices=['all']+allStandaloneSkims, metavar='SKIM',
                         help='List of standalone skims to run. Valid options are: ' + ', '.join(allStandaloneSkims) +
                         ', or all to run all standalone skims.')
     parser.add_argument('-c', '--combined', nargs='+', default=[],
-                        choices=['all']+allCombinedSkims, metavar='',
+                        choices=['all']+allCombinedSkims, metavar='SKIM',
                         help='List of combined skims to run. Valid options are: ' + ', '.join(allCombinedSkims) +
                         ', or all to run all combined skims.')
     args = parser.parse_args()

@@ -134,7 +134,7 @@ void cdcDQM7Module::defineHisto()
   h_occ->SetFillColor(95);
 
   // 20191108
-  h_hit_cell = new TH1D("h_hit_cell", "Hit of each cell", 20000, 0, 20000);
+  h_hit_cell = new TH1D("h_hit_cell", "Hit of each cell", 14336, 0, 14335);
   h_hit_cell->SetFillColor(20);
   //
   bmap_2 = new TH2D("bmap_2", "", 75, 0, 75, 4, 0, 4);

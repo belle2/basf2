@@ -3,31 +3,23 @@
 """
 """
 
+import argparse
 from pathlib import Path
 import subprocess
+import sys
 from tempfile import NamedTemporaryFile
 
+from ROOT import PyConfig
+
+# Importing ROOT in skimExpertFunctions has the side-effect of hijacking argument parsing
+PyConfig.IgnoreCommandLineOptions = True
 from basf2 import find_file
+from skim.registry import skim_registry, combined_skims
 from skimExpertFunctions import get_test_file
 
 
-all_skims = [
-    'ALP3Gamma', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon',
-    'BtoDh_Kspipipi0', 'BtoDh_Kspi0', 'BtoDh_hh', 'BtoDh_Kshh',
-    'BtoPi0Pi0', 'BtoXll', 'BtoXgamma', 'BtoXll_LFV',
-    'DielectronPlusMissingEnergy', 'DimuonPlusMissingEnergy', 'ElectronMuonPlusMissingEnergy'
-    'DstToD0Pi_D0ToHpJm', 'XToD0_D0ToHpJm', 'DstToD0Pi_D0ToKsOmega'
-    'DstToD0Pi_D0ToNeutrals', 'XToD0_D0ToNeutrals', 'DstToD0Pi_D0ToHpJmPi0', 'DstToD0Pi_D0ToHpHmKs',
-    'DstToD0Pi_D0ToHpHmPi0', 'DstToD0Pi_D0ToHpJmEta', 'DstToD0Pi_D0ToRare', 'DstToD0Pi_D0ToSemileptonic',
-    'XToDp_DpToKsHp', 'CharmlessHad2Body', 'CharmlessHad3Body', 'ISRpipicc',
-    'LFVZpVisible', 'LeptonicUntagged', 'PRsemileptonicUntagged',
-    'SLUntagged', 'SinglePhotonDark',
-    'SystematicsEELL', 'SystematicsRadMuMu', 'SystematicsRadEE',
-    'SystematicsLambda', 'Systematics', 'SystematicsTracking', 'Resonance',
-    'TauThrust', 'TauLFV', 'TCPV', 'TauGeneric',
-    'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0', 'feiSLBplus'
-]
-
+allStandaloneSkims = [skim for _, skim in skim_registry]
+allCombinedSkims = list(combined_skims.keys())
 
 mcCampaign = 'MC12'
 beamBackgrounds = ['BGx1', 'BGx0']
@@ -41,19 +33,61 @@ dataSamples = ['proc9_exp3', 'proc9_exp7', 'proc9_exp8', 'bucket7_exp8']
 
 samples = mcSamples + dataSamples
 
-for skim in all_skims:
-    for sample in samples:
-        input_file = get_test_file(sample)
-        script = find_file(f'skim/standalone/{skim}_Skim_Standalone.py')
 
-        Path('log').mkdir(parents=True, exist_ok=True)
-        log_file = Path('log', f'{skim}_{sample}.out')
-        err_file = Path('log', f'{skim}_{sample}.err')
-        json_file = Path('log', f'JobInformation_{skim}_{sample}.json')
-        output_file = NamedTemporaryFile().name
+def getSkimsToRun():
+    parser = argparse.ArgumentParser(description='A script to run a set of skims, and ' +
+                                     'save the output in a format to be read by printSkimStats.py. ' +
+                                     'One or more standalone or combined skim names must be provided.',
+                                     epilog='Example: ./runSkims.py -s LeptonicUntagged -c BtoCharm')
+    parser.add_argument('-s', '--standalone', nargs='+', default=[],
+                        choices=['all']+allStandaloneSkims, metavar='',
+                        help='List of standalone skims to run. Valid options are: ' + ', '.join(allStandaloneSkims) +
+                        ', or all to run all standalone skims.')
+    parser.add_argument('-c', '--combined', nargs='+', default=[],
+                        choices=['all']+allCombinedSkims, metavar='',
+                        help='List of combined skims to run. Valid options are: ' + ', '.join(allCombinedSkims) +
+                        ', or all to run all combined skims.')
+    args = parser.parse_args()
 
-        print(f'Running {script} on {input_file} (sample label: {sample}) to {output_file}')
-        subprocess.run(['bsub', '-q', 'l', '-oo', log_file, '-e', err_file, 'basf2', script,
-                        '--job-information', json_file,
-                        '-n', '10000',
-                        '-o', output_file, '-i', input_file])
+    if not (args.standalone or args.combined):
+        argparse.ArgumentError('One or more standalone or combined skim names must be provided.')
+
+    if args.standalone == ['all']:
+        standaloneSkims = allStandaloneSkims
+    else:
+        standaloneSkims = args.standalone
+
+    if args.combined == ['all']:
+        combinedSkims = allCombinedSkims
+    else:
+        combinedSkims = args.combined
+
+    return standaloneSkims, combinedSkims
+
+if __name__ == '__main__':
+    standaloneSkims, combinedSkims = getSkimsToRun()
+
+    standaloneScripts = [find_file(f'skim/standalone/{skim}_Skim_Standalone.py', silent=True) for skim in standaloneSkims]
+    combinedScripts = [find_file(f'skim/combined/{skim}_Skim_Standalone.py', silent=True) for skim in combinedSkims]
+
+    skims = standaloneSkims + combinedSkims
+    scripts = standaloneScripts + combinedScripts
+
+    for skim, script in zip(skims, scripts):
+        if not script:
+            print(f'Error! Could not find script for {skim} skim.', file=sys.stderr)
+            continue
+
+        for sample in samples:
+            sampleFile = get_test_file(sample)
+
+            Path('log').mkdir(parents=True, exist_ok=True)
+            logFile = Path('log', f'{skim}_{sample}.out')
+            errFile = Path('log', f'{skim}_{sample}.err')
+            jsonFile = Path('log', f'JobInformation_{skim}_{sample}.json')
+            outputFile = NamedTemporaryFile().name
+
+            print(f'Running {script} on {sampleFile} (sample label: {sample}) to {outputFile}')
+            subprocess.run(['bsub', '-q', 'l', '-oo', logFile, '-e', errFile, 'basf2', script,
+                            '--job-information', jsonFile, '-n', '10000',
+                            '-o', outputFile, '-i', sampleFile])

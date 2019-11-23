@@ -18,14 +18,17 @@ import re
 import sys
 from textwrap import wrap
 
+from ROOT import PyConfig
 from tabulate import tabulate
 
+# Importing ROOT in skimExpertFunctions has the side-effect of hijacking argument parsing
+PyConfig.IgnoreCommandLineOptions = True
+from skim.registry import skim_registry, combined_skims
 from skimExpertFunctions import get_test_file, get_eventN, get_total_infiles, get_events_per_file
 
 
-skims = [
-    'LeptonicUntagged',
-]
+allStandaloneSkims = [skim for _, skim in skim_registry]
+allCombinedSkims = list(combined_skims.keys())
 
 beamBackgroundWeights = {
     'BGx1': 0.8,
@@ -45,20 +48,20 @@ mcSampleCrossSections = {
 mcCampaign = 'MC12'
 
 mcSamples = {
-    'MC12_mixedBGx1': 'MC12: mixed BGx1',
-    'MC12_chargedBGx1': 'MC12: charged BGx1',
-    'MC12_ccbarBGx1': 'MC12: ccbar BGx1',
-    'MC12_uubarBGx1': 'MC12: uubar BGx1',
-    'MC12_ddbarBGx1': 'MC12: ddbar BGx1',
-    'MC12_ssbarBGx1': 'MC12: ssbar BGx1',
-    'MC12_taupairBGx1': 'MC12: taupair BGx1',
-    'MC12_mixedBGx0': 'MC12: mixed BGx0',
-    'MC12_chargedBGx0': 'MC12: charged BGx0',
-    'MC12_ccbarBGx0': 'MC12: ccbar BGx0',
-    'MC12_uubarBGx0': 'MC12: uubar BGx0',
-    'MC12_ddbarBGx0': 'MC12: ddbar BGx0',
-    'MC12_ssbarBGx0': 'MC12: ssbar BGx0',
-    'MC12_taupairBGx0': 'MC12: taupair BGx0'
+    f'{mcCampaign}_mixedBGx1': f'{mcCampaign}: mixed BGx1',
+    f'{mcCampaign}_chargedBGx1': f'{mcCampaign}: charged BGx1',
+    f'{mcCampaign}_ccbarBGx1': f'{mcCampaign}: ccbar BGx1',
+    f'{mcCampaign}_uubarBGx1': f'{mcCampaign}: uubar BGx1',
+    f'{mcCampaign}_ddbarBGx1': f'{mcCampaign}: ddbar BGx1',
+    f'{mcCampaign}_ssbarBGx1': f'{mcCampaign}: ssbar BGx1',
+    f'{mcCampaign}_taupairBGx1': f'{mcCampaign}: taupair BGx1',
+    f'{mcCampaign}_mixedBGx0': f'{mcCampaign}: mixed BGx0',
+    f'{mcCampaign}_chargedBGx0': f'{mcCampaign}: charged BGx0',
+    f'{mcCampaign}_ccbarBGx0': f'{mcCampaign}: ccbar BGx0',
+    f'{mcCampaign}_uubarBGx0': f'{mcCampaign}: uubar BGx0',
+    f'{mcCampaign}_ddbarBGx0': f'{mcCampaign}: ddbar BGx0',
+    f'{mcCampaign}_ssbarBGx0': f'{mcCampaign}: ssbar BGx0',
+    f'{mcCampaign}_taupairBGx0': f'{mcCampaign}: taupair BGx0'
 }
 
 dataSamples = {
@@ -149,8 +152,8 @@ def getLogContents(skim, sample):
         with open(jsonFileName) as jsonFile:
             jsonContents = json.load(jsonFile)
     except FileNotFoundError:
-        raise SkimNotRunError(f'Failed to find output files for {skim} skim on {sample} sample.\n' +
-                              'Perhaps you forgot to run the skim with runSkims.py?')
+        raise SkimNotRunError(f'    Failed to find output files for {skim} skim on {sample} sample.\n' +
+                              '    Perhaps you forgot to run the skim with runSkims.py?')
 
     return logContents, jsonContents
 
@@ -165,8 +168,40 @@ def testLogContents(logContents, jsonContents, skim, sample):
                  ]
 
     if not all(logTests) and all(jsonTests):
-        raise SkimNotRunError(f'Error found in log files of {skim} skim on {sample} sample.\n' +
-                              'Please check the .out, .err, and .json files in log/ directory.')
+        raise SkimNotRunError(f'    Error found in log files of {skim} skim on {sample} sample.\n' +
+                              '    Please check the .out, .err, and .json files in log/ directory.')
+
+
+def getSkimsToRun():
+    parser = argparse.ArgumentParser(description='A script to print tables of statistics for skims ' +
+                                     'which have been run by runSkims.py. One or more standalone or combined ' +
+                                     'skim names must be provided.',
+                                     epilog='Example: ./printSkimStats.py -s LeptonicUntagged -c BtoCharm')
+    parser.add_argument('-s', '--standalone', nargs='+', default=[],
+                        choices=['all']+allStandaloneSkims, metavar='',
+                        help='List of standalone skims to run. Valid options are: ' + ', '.join(allStandaloneSkims) +
+                        ', or all to run all standalone skims.')
+    parser.add_argument('-c', '--combined', nargs='+', default=[],
+                        choices=['all']+allCombinedSkims, metavar='',
+                        help='List of combined skims to run. Valid options are: ' + ', '.join(allCombinedSkims) +
+                        ', or all to run all combined skims.')
+    args = parser.parse_args()
+
+    if not (args.standalone or args.combined):
+        parser.print_help()
+        sys.exit(1)
+
+    if args.standalone == ['all']:
+        standaloneSkims = allStandaloneSkims
+    else:
+        standaloneSkims = args.standalone
+
+    if args.combined == ['all']:
+        combinedSkims = allCombinedSkims
+    else:
+        combinedSkims = args.combined
+
+    return standaloneSkims + combinedSkims
 
 
 def getSkimStatsDict(skims, samples, statistics):
@@ -190,7 +225,7 @@ def getSkimStatsDict(skims, samples, statistics):
             del allSkimStats[skim]
 
             print(f'Error! Could not get stats for {skim}. Details:', file=sys.stderr)
-            print(e, file=sys.stderr)
+            print(e, '\n', file=sys.stderr)
 
     return allSkimStats
 
@@ -402,12 +437,10 @@ statistics = {
 }
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--combined', action='store_true',
-                        help='Provide this flag if running the combined skims.')
-    args = parser.parse_args()
+    skims = getSkimsToRun()
 
     allSkimStats = getSkimStatsDict(skims, samples, statistics)
+
     allSkimStats = addWeightedMC(allSkimStats, statistics)
 
     toScreen(allSkimStats)

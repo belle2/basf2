@@ -39,6 +39,8 @@ PXDGatedModeDQMModule::PXDGatedModeDQMModule() : HistoModule() , m_vxdGeometry(V
   addParam("minTimeCutHER", m_minTimeCutHER, "minimum time cut in us after HER kick", 4980);
   addParam("maxTimeCutHER", m_maxTimeCutHER, "maximum time cut in us after HER kick", 4980);
   addParam("outsideTimeCut", m_outsideTimeCut, "outside GM time cut in us after kick", 20000);
+  addParam("chargeCut", m_chargeCut, "minimum pixel ADU charge cut", 5);
+  addParam("chargeCutHigh", m_chargeCutHigh, "minimum pixel ADU charge cut for second set of histograms", 20);
   addParam("perGate", m_perGate, "Make plots per GM Start Gate", true);
 }
 
@@ -171,15 +173,15 @@ void PXDGatedModeDQMModule::event()
       int bunch_inj = (bunch_trg - time_inj) % 1280;
       if (bunch_inj < 0) bunch_inj += 1280;
       int rgate = bunch_inj / (1280. / 96.); // 0-96 ?
-      if ((isher && diff2 > m_minTimeCutHER && diff2 < m_maxTimeCutHER) ||
-          (!isher && diff2 > m_minTimeCutLER && diff2 < m_maxTimeCutLER)
+      if ((isher && diff2 >= m_minTimeCutHER && diff2 <= m_maxTimeCutHER) ||
+          (!isher && diff2 >= m_minTimeCutLER && diff2 <= m_maxTimeCutLER)
          ) { // be sure that we fill only in gating region
         hBunchTrg->Fill(it.GetBunchNumber(0) & 0x7FF);
         if (isher) hBunchInjHER->Fill(bunch_inj);
         else hBunchInjLER->Fill(bunch_inj);
         for (auto& p : m_storeRawHits) {
           auto charge = p.getCharge();
-          if (charge > 20) {
+          if (charge > m_chargeCut) {
             int v = int(p.getVCellID()) - rgate * 4;
             if (v < 0) v += 768;
             int v2 = int(p.getVCellID()) + rgate * 4;
@@ -252,7 +254,7 @@ void PXDGatedModeDQMModule::event()
               }
             }
           }
-          if (charge > 30) {
+          if (m_chargeCutHigh > 30) {
 
             if (isher) {
               auto h = hGatedModeMapCutHER[std::make_pair(p.getSensorID(), rgate)];

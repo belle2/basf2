@@ -39,11 +39,13 @@ namespace Belle2 {
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
       std::string m_PXDRawHitsName; /**< The name of the StoreArray of PXDRawHits to be generated */
       bool m_perGate; /**< make one plot per possible gate */
-      int m_minTimeCutLER; /**< "minimum time cut in us after LER kick */
-      int m_maxTimeCutLER; /**< "maximum time cut in us after LER kick */
-      int m_minTimeCutHER; /**< "minimum time cut in us after HER kick */
-      int m_maxTimeCutHER; /**< "maximum time cut in us after HER kick */
-      int m_outsideTimeCut; /**< "outside GM time cut in us after kick */
+      int m_minTimeCutLER; /**< minimum time cut in us after LER kick */
+      int m_maxTimeCutLER; /**< maximum time cut in us after LER kick */
+      int m_minTimeCutHER; /**< minimum time cut in us after HER kick */
+      int m_maxTimeCutHER; /**< maximum time cut in us after HER kick */
+      int m_outsideTimeCut; /**< outside GM time cut in us after kick */
+      int m_chargeCut; /**< minimum charge cut in ADU */
+      int m_chargeCutHigh; /**< minimum charge cut for second set of histograms in ADU */
 
       /** Input array for DAQ Status. */
       StoreArray<RawFTSW> m_rawTTD;

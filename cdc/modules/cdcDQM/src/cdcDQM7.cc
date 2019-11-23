@@ -134,7 +134,7 @@ void cdcDQM7Module::defineHisto()
   h_occ->SetFillColor(95);
 
   // 20191108
-  h_hit_cell = new TH1D("h_hit_cell", "Hit of each cell", 14336, 0, 14335);
+  h_hit_cell = new TH1D("h_hit_cell", "Hit of each cell", 20000, 0, 20000);
   h_hit_cell->SetFillColor(20);
   //
   bmap_2 = new TH2D("bmap_2", "", 75, 0, 75, 4, 0, 4);
@@ -260,13 +260,13 @@ void cdcDQM7Module::event()
     }// adc
 
     // add by J.H. Yin
-    int cid(0);
     if (adcsum > 25) {
+      int cid(0);
       if (sL == 0) {
         cid = iL * ndiv[sL] + wid;
       } else {
         for (int isl = 0; isl < sL; isl ++) {
-          cid += isl * 6 * ndiv[isl];
+          cid += 6 * ndiv[isl];
         }
         cid += 2 * ndiv[0] + iL * ndiv[sL] + wid;
       }

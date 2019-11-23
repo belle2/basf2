@@ -57,10 +57,10 @@ namespace Belle2 {
 
     TH1D* h_hit_cell = nullptr;/**<hits-of-cell*/
 
-    TH1D* h_EoccAfterInjLER = nullptr; /*<nhits after LER injection>*/
-    TH1D* h_EoccAfterInjHER = nullptr; /*<nhits after HER injection>*/
-    TH1D* h_occAfterInjLER = nullptr; /*<occupancy after LER injection>*/
-    TH1D* h_occAfterInjHER = nullptr; /*<occupancy after HER injection>*/
+    TH1D* h_EoccAfterInjLER = nullptr; /**<nhits after LER injection>*/
+    TH1D* h_EoccAfterInjHER = nullptr; /**<nhits after HER injection>*/
+    TH1D* h_occAfterInjLER = nullptr; /**<occupancy after LER injection>*/
+    TH1D* h_occAfterInjHER = nullptr; /**<occupancy after HER injection>*/
 
     StoreArray<RawFTSW> m_rawFTSW; /**< Input array for DAQ Status. */
 

@@ -34,6 +34,8 @@ dataSamples = ['proc9_exp3', 'proc9_exp7', 'proc9_exp8', 'bucket7_exp8']
 
 samples = mcSamples + dataSamples
 
+nTestEvents = 10000
+
 
 def getSkimsToRun():
     parser = argparse.ArgumentParser(description='A script to run a set of skims, and ' +
@@ -93,7 +95,7 @@ if __name__ == '__main__':
             outputFile = NamedTemporaryFile().name
 
             process = subprocess.run(['bsub', '-q', 'l', '-oo', logFile, '-e', errFile,
-                                      'basf2', script, '--job-information', jsonFile, '-n', '10000',
+                                      'basf2', script, '--job-information', jsonFile, '-n', str(nTestEvents),
                                       '-o', outputFile, '-i', sampleFile],
                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -103,4 +105,4 @@ if __name__ == '__main__':
         if any(returnCodes):
             print(f'An error occurred while submitting jobs for {skim} skim with script {script}.')
         else:
-            print(f'Running {script} for {skim} skim. Job IDs: ' + ', '.join(jobIDs))
+            print(f'Running {script} on {nTestEvents} events for each test sample. Job IDs:\n  ' + '\n  '.join(jobIDs))

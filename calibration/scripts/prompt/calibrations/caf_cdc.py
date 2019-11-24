@@ -35,7 +35,7 @@ def get_calibrations(input_data, **kwargs):
     # Currently we don't have a good way of filtering this on the automated side, so we can check here.
     min_events_per_file = 100
 
-    # We filter out any more than 2 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
+    # We filter out any more than 100 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering
     from prompt.utils import filter_by_max_files_per_run
 

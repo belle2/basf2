@@ -81,6 +81,7 @@ if __name__ == '__main__':
             continue
 
         jobIDs = []
+        returnCodes = []
 
         for sample in samples:
             sampleFile = get_test_file(sample)
@@ -96,6 +97,10 @@ if __name__ == '__main__':
                                       '-o', outputFile, '-i', sampleFile],
                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-            jobIDs.append(re.findall('\d+', stdout)[0])
+            jobIDs.append(re.findall('\d+', process.stdout)[0])
+            returnCodes.append(process.returncode)
 
-        print(f'Running {script} for {skim} skim. Job IDs: ' + ', '.join(jobIDs))
+        if any(returnCodes):
+            print(f'An error occurred while submitting jobs for {skim} skim with script {script}.')
+        else:
+            print(f'Running {script} for {skim} skim. Job IDs: ' + ', '.join(jobIDs))

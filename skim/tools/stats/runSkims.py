@@ -97,7 +97,7 @@ if __name__ == '__main__':
                                       '-o', outputFile, '-i', sampleFile],
                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-            jobIDs.append(re.findall('\d+', process.stdout)[0])
+            jobIDs.append(re.findall('\d+', str(process.stdout))[0])
             returnCodes.append(process.returncode)
 
         if any(returnCodes):

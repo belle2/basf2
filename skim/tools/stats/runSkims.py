@@ -8,12 +8,12 @@ from pathlib import Path
 import re
 import subprocess
 import sys
-from tempfile import NamedTemporaryFile
 
 from ROOT import PyConfig
 
 # Importing ROOT in skimExpertFunctions has the side-effect of hijacking argument parsing
 PyConfig.IgnoreCommandLineOptions = True
+from b2test_utils import clean_working_directory
 from basf2 import find_file
 from skim.registry import skim_registry, combined_skims
 from skimExpertFunctions import get_test_file
@@ -77,6 +77,9 @@ if __name__ == '__main__':
     skims = standaloneSkims + combinedSkims
     scripts = standaloneScripts + combinedScripts
 
+    logDirectory = Path('log').resolve()
+    logDirectory.mkdir(parents=True, exist_ok=True)
+
     for skim, script in zip(skims, scripts):
         if not script:
             print(f'Error! Could not find script for {skim} skim.', file=sys.stderr)
@@ -88,16 +91,15 @@ if __name__ == '__main__':
         for sample in samples:
             sampleFile = get_test_file(sample)
 
-            Path('log').mkdir(parents=True, exist_ok=True)
-            logFile = Path('log', f'{skim}_{sample}.out')
-            errFile = Path('log', f'{skim}_{sample}.err')
-            jsonFile = Path('log', f'JobInformation_{skim}_{sample}.json')
-            outputFile = NamedTemporaryFile().name
+            logFile = Path(logDirectory, f'{skim}_{sample}.out')
+            errFile = Path(logDirectory, f'{skim}_{sample}.err')
+            jsonFile = Path(logDirectory, f'JobInformation_{skim}_{sample}.json')
 
-            process = subprocess.run(['bsub', '-q', 'l', '-oo', logFile, '-e', errFile,
-                                      'basf2', script, '--job-information', jsonFile, '-n', str(nTestEvents),
-                                      '-o', outputFile, '-i', sampleFile],
-                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            with clean_working_directory():
+                process = subprocess.run(['bsub', '-q', 'l', '-oo', logFile, '-e', errFile,
+                                          'basf2', script, '--job-information', jsonFile,
+                                          '-n', str(nTestEvents), '-i', sampleFile],
+                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             jobIDs.append(re.findall('\d+', str(process.stdout))[0])
             returnCodes.append(process.returncode)

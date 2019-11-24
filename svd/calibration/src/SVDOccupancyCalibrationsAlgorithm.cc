@@ -19,7 +19,7 @@
 using namespace std;
 using namespace Belle2;
 
-SVDOccupancyCalibrationsAlgorithm::SVDOccupancyCalibrationsAlgorithm(std::string str) :
+SVDOccupancyCalibrationsAlgorithm::SVDOccupancyCalibrationsAlgorithm(const std::string& str) :
   CalibrationAlgorithm("SVDOccupancyCalibrationsCollector")
 {
   setDescription("Calibration algorithm for SVDOccupancyCalibrations payloads");

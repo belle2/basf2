@@ -37,6 +37,8 @@ namespace Belle2 {
 
     /** Module function initialize */
     void initialize() override final;
+    /** Module function terminate */
+    void terminate() override final;
     /** Module function beginRun */
     void beginRun() override final;
     /** Module function event */
@@ -54,7 +56,7 @@ namespace Belle2 {
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
 
     /** list of cumulative histograms */
-    TList* m_cumHistos = nullptr;
+    TList* m_histoList = nullptr;
 
     /** experiment number*/
     int m_expNumber = 0;

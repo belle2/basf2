@@ -89,7 +89,6 @@ void SVDCrossTalkFinderModule::event()
   vector<std::string> clusterStrips_uSide ;
   vector<std::string> clusterStrips_vSide ;
   vector<std::string> clusterChips_uSide ;
-  vector<std::string> clusterChips_vSide ;
   vector<int> strips_uSide;
   vector<int> strips_vSide;
 

@@ -158,7 +158,7 @@ void KLMDigitizerModule::digitizeBKLM()
                          simHit->getLayer(), simHit->getPlane(),
                          simHit->getStrip());
     bool rpc = simHit->inRPC();
-    if (!rpc || (rpc && m_EfficiencyMode == c_Strip)) {
+    if (!rpc || (m_EfficiencyMode == c_Strip)) {
       if (!efficiencyCorrection(efficiency))
         continue;
     }

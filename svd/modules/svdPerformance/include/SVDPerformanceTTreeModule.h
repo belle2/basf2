@@ -29,11 +29,11 @@ namespace Belle2 {
     /** Constructor */
     SVDPerformanceTTreeModule();
     /** Register input and output data */
-    void initialize();
+    void initialize() override;
     /** Write the TTrees to the file*/
-    void terminate();
+    void terminate() override;
     /** Compute the variables and fill the tree*/
-    void event();
+    void event() override;
 
   private:
 

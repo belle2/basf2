@@ -31,14 +31,14 @@ now = datetime.datetime.now()
 # uniqueID = "SVDCoGTimeCalibrations_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_lat=+47.16"
 
 settings = CalibrationSettings(name="SVDCoGTimeCalibrationPrompt",
-                               expert_username="gdujani",
+                               expert_username="gdujany",
                                description=__doc__,
                                input_data_formats=["cdst"],
                                input_data_names=["hlt_hadron"],
                                depends_on=[])
 
 ##################################################################
-# Remove Module form the Path
+# Remove Module from the Path
 
 
 def remove_module(path, name):

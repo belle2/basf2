@@ -67,8 +67,8 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
                    section, sector, layer, plane);
     }
     uint16_t planeIndex = m_PlaneArrayIndex->getIndex(planeKLM);
-    float efficiency = efficiencyHistogram->GetBinContent(planeIndex);
-    float efficiencyError = efficiencyHistogram->GetBinError(planeIndex);
+    float efficiency = efficiencyHistogram->GetBinContent(planeIndex + 1);
+    float efficiencyError = efficiencyHistogram->GetBinError(planeIndex + 1);
     /* Fill the efficiency for this strip. */
     if (subdetector == KLMElementNumbers::c_BKLM) {
       m_StripEfficiency->setBarrelEfficiency(

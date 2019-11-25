@@ -62,4 +62,5 @@
 #pragma link C++ class Belle2::ARICHGeoGlobalDisplacement+;
 #pragma link C++ class Belle2::ARICHGeoMirrorDisplacement+;
 #pragma link C++ class Belle2::ARICHMirrorAlignment+;
+#pragma link C++ class Belle2::ARICHAeroTilesAlignment+;
 #endif

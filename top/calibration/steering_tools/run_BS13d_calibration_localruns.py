@@ -3,25 +3,22 @@
 
 # ---------------------------------------------------------------------------------------
 # CAF calibration script: BS13d carrier shifts
-# data type: local runs (laser or singe-pulse or double-pulse)
+# data type: local runs (laser, singe-pulse or double-pulse)
 #
 # usage: basf2 run_BS13d_calibration_localruns.py expNo runFirst runLast
 #
 # author: M. Staric
 # ---------------------------------------------------------------------------------------
 
-import basf2
 import sys
 import os
 import glob
 from caf import backends
-from caf.framework import Calibration, CAF
-from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
-from ROOT import Belle2
-from ROOT.Belle2 import TOP
+from caf.framework import CAF
 from basf2 import B2ERROR
+from top_calibration import BS13d_calibration_local
 
-# ----- those parameters need to be adjusted before running -----------------------
+# ----- those parameters need to be adjusted before running -----------------------------
 #
 globalTags = ['data_reprocessing_prompt_rel4_patchb']  # highest priority first
 localDBs = []  # highest priority first, local DB's have higher priority than global tags
@@ -53,51 +50,19 @@ for run in range(run_first, run_last + 1):
             inputFiles.append(files[i])
     else:
         inputFiles += files
+
 if len(inputFiles) == 0:
     B2ERROR('No sroot files found in ' + data_dir + ' for exp=' + str(experiment) +
             ' runFirst=' + str(run_first) + ' runLast=' + str(run_last))
     sys.exit()
 
-# Output folder
+# Output folder name
 run_range = 'r' + '{:0=5d}'.format(run_first) + '-' + '{:0=5d}'.format(run_last)
 output_dir = f"{main_output_dir}/BS13d-local-{expNo}-{run_range}"
 
-# Temporary fix for BII-5431
-if not os.path.isdir(main_output_dir):
-    os.makedirs(main_output_dir)
-    print('New folder created: ' + main_output_dir)
-
-# Suppress messages during processing
-# basf2.set_log_level(basf2.LogLevel.WARNING)
-
-# Create path
-main = basf2.create_path()
-
-# Basic modules: Input, converters, geometry, unpacker
-main.add_module('SeqRootInput')
-main.add_module('TOPGeometryParInitializer')
-main.add_module('TOPUnpacker')
-main.add_module('TOPRawDigitConverter', lookBackWindows=look_back,
-                useAsicShiftCalibration=False, useChannelT0Calibration=False)
-
-# Collector module
-collector = basf2.register_module('TOPAsicShiftsBS13dCollector')
-
-# Algorithm
-algorithm = TOP.TOPAsicShiftsBS13dAlgorithm()
-algorithm.setWindowSize(0)
-
 # Define calibration
-cal = Calibration(name='TOP_BS13dCalibration', collector=collector,
-                  algorithms=algorithm, input_files=inputFiles)
-for globalTag in reversed(globalTags):
-    cal.use_central_database(globalTag)
-for localDB in reversed(localDBs):
-    cal.use_local_database(localDB)
-cal.pre_collector_path = main
-cal.max_files_per_collector_job = 1
-cal.backend_args = {"queue": "l"}
-cal.strategies = SequentialRunByRun
+cal = BS13d_calibration_local(inputFiles, look_back, globalTags, localDBs)
+cal.backend_args = {"queue": "s"}
 
 # Add calibration to CAF
 cal_fw = CAF()

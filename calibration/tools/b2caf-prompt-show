@@ -25,7 +25,7 @@ def get_all_script_paths():
 
 def get_script_settings(name):
     import importlib
-    cal_module = importlib.import_module(prompt_script_package + name.rstrip(".py"))
+    cal_module = importlib.import_module(prompt_script_package + Path(name).stem)
     return cal_module.settings
 
 

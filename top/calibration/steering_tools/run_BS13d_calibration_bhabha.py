@@ -10,16 +10,13 @@
 # author: M. Staric
 # ---------------------------------------------------------------------------------------
 
-import basf2
 import sys
 import os
 import glob
 from caf import backends
-from caf.framework import Calibration, CAF
-from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
-from ROOT import Belle2
-from ROOT.Belle2 import TOP
+from caf.framework import CAF
 from basf2 import B2ERROR
+from top_calibration import BS13d_calibration_cdst
 
 # ----- those parameters need to be adjusted before running -----------------------------
 #
@@ -29,7 +26,7 @@ data_dir = '/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/'
 skim_dir = 'skim/hlt_bhabha/cdst/sub00'
 main_output_dir = 'top_calibration'
 maxFiles = 10  # maximum number of input files per run (0 or negative means all)
-time_offset = -66.8  # for release-3 processed cdst or older, set to 0 for release-4 cdst
+time_offset = -66.8  # must be set to 0 for release-4 processed data or newer
 #
 # ---------------------------------------------------------------------------------------
 
@@ -61,45 +58,13 @@ if len(inputFiles) == 0:
             ' (skim_dir=' + skim_dir + ')')
     sys.exit()
 
-# Output folder
+# Output folder name
 run_range = 'r' + '{:0=5d}'.format(run_first) + '-' + '{:0=5d}'.format(run_last)
 output_dir = f"{main_output_dir}/BS13d-bhabha-{expNo}-{run_range}"
 
-# Temporary fix for BII-5431
-if not os.path.isdir(main_output_dir):
-    os.makedirs(main_output_dir)
-    print('New folder created: ' + main_output_dir)
-
-# Suppress messages during processing
-# basf2.set_log_level(basf2.LogLevel.WARNING)
-
-# Create path
-main = basf2.create_path()
-
-# Basic modules: Input, converters, geometry, unpacker
-main.add_module('RootInput')
-main.add_module('TOPGeometryParInitializer')
-main.add_module('TOPTimeRecalibrator',
-                useAsicShiftCalibration=False, useChannelT0Calibration=False)
-
-# Collector module
-collector = basf2.register_module('TOPAsicShiftsBS13dCollector',
-                                  timeOffset=time_offset, requireRecBunch=True)
-
-# Algorithm
-algorithm = TOP.TOPAsicShiftsBS13dAlgorithm()
-
 # Define calibration
-cal = Calibration(name='TOP_BS13dCalibration', collector=collector,
-                  algorithms=algorithm, input_files=inputFiles)
-for globalTag in reversed(globalTags):
-    cal.use_central_database(globalTag)
-for localDB in reversed(localDBs):
-    cal.use_local_database(localDB)
-cal.pre_collector_path = main
-cal.max_files_per_collector_job = 1
-cal.backend_args = {"queue": "l"}
-cal.strategies = SequentialRunByRun
+cal = BS13d_calibration_cdst(inputFiles, time_offset, globalTags, localDBs)
+cal.backend_args = {"queue": "s"}
 
 # Add calibration to CAF
 cal_fw = CAF()

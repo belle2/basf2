@@ -136,12 +136,12 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   hprf_scint_z_effC = new TProfile("hprf_scint_z_effC",
                                    "Time over propagation length for scintillators (Z_Readout); propagation distance[cm]; propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
                                    350, 0.0, 350.0);
-  hprf_scint_phi_effC_end = new TProfile("hprf_scint_phi_effC_end",
-                                         "Time over propagation length for scintillators (Phi_Readout, Endcap); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
-                                         350, 0.0, 350.0);
-  hprf_scint_z_effC_end = new TProfile("hprf_scint_z_effC_end",
-                                       "Time over propagation length for scintillators (Z_Readout, Endcap); propagation distance[cm]; propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
-                                       350, 0.0, 350.0);
+  hprf_scint_plane1_effC_end = new TProfile("hprf_scint_plane1_effC_end",
+                                            "Time over propagation length for scintillators (plane1, Endcap); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
+                                            350, 0.0, 350.0);
+  hprf_scint_plane2_effC_end = new TProfile("hprf_scint_plane2_effC_end",
+                                            "Time over propagation length for scintillators (plane2, Endcap); propagation distance[cm]; propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
+                                            350, 0.0, 350.0);
 
   h_time_rpc_tc = new TH1D("h_time_rpc_tc", "time distribtution for RPC", nBin, lowEdge_rpc, upEdge_rpc);
   h_time_scint_tc = new TH1D("h_time_scint_tc", "time distribtution for Scintillator", nBin_scint, lowEdge_scint, upEdge_scint);
@@ -552,9 +552,9 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
         }
       } else {
         if (iPla) {
-          hprf_scint_phi_effC_end->Fill(distHit, timeHit);
+          hprf_scint_plane1_effC_end->Fill(distHit, timeHit);
         } else {
-          hprf_scint_z_effC_end->Fill(distHit, timeHit);
+          hprf_scint_plane2_effC_end->Fill(distHit, timeHit);
         }
       }
     }
@@ -584,17 +584,17 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   double effC_scint_z = 1.0 / slope_scint_z;
   double e_effC_scint_z = e_slope_scint_z / (slope_scint_z * slope_scint_z);
 
-  hprf_scint_phi_effC_end->Fit("fcn_pol1");
-  double slope_scint_phi_end = fcn_pol1->GetParameter(1);
-  double e_slope_scint_phi_end = fcn_pol1->GetParError(1);
-  double effC_scint_phi_end = 1.0 / slope_scint_phi_end;
-  double e_effC_scint_phi_end = e_slope_scint_phi_end / (slope_scint_phi_end * slope_scint_phi_end);
+  hprf_scint_plane1_effC_end->Fit("fcn_pol1");
+  double slope_scint_plane1_end = fcn_pol1->GetParameter(1);
+  double e_slope_scint_plane1_end = fcn_pol1->GetParError(1);
+  double effC_scint_plane1_end = 1.0 / slope_scint_plane1_end;
+  double e_effC_scint_plane1_end = e_slope_scint_plane1_end / (slope_scint_plane1_end * slope_scint_plane1_end);
 
-  hprf_scint_z_effC_end->Fit("fcn_pol1");
-  double slope_scint_z_end = fcn_pol1->GetParameter(1);
-  double e_slope_scint_z_end = fcn_pol1->GetParError(1);
-  double effC_scint_z_end = 1.0 / slope_scint_z_end;
-  double e_effC_scint_z_end = e_slope_scint_z_end / (slope_scint_z_end * slope_scint_z_end);
+  hprf_scint_plane2_effC_end->Fit("fcn_pol1");
+  double slope_scint_plane2_end = fcn_pol1->GetParameter(1);
+  double e_slope_scint_plane2_end = fcn_pol1->GetParError(1);
+  double effC_scint_plane2_end = 1.0 / slope_scint_plane2_end;
+  double e_effC_scint_plane2_end = e_slope_scint_plane2_end / (slope_scint_plane2_end * slope_scint_plane2_end);
 
   TString logStr_phi, logStr_z;
   logStr_phi = Form("%.4f +/- %.4f cm/ns", effC_rpc_phi, e_effC_rpc_phi);
@@ -607,16 +607,16 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   B2INFO("Estimation of Effected Speed Light of Scintillators: "
          << LogVar("Fitted Value (phi readout) ", logStr_phi.Data())
          << LogVar("Fitted Value (z readout) ", logStr_z.Data()));
-  logStr_phi = Form("%.4f +/- %.4f cm/ns", effC_scint_phi_end, e_effC_scint_phi_end);
-  logStr_z = Form("%.4f +/- %.4f cm/ns", effC_scint_z_end, e_effC_scint_z_end);
+  logStr_phi = Form("%.4f +/- %.4f cm/ns", effC_scint_plane1_end, e_effC_scint_plane1_end);
+  logStr_z = Form("%.4f +/- %.4f cm/ns", effC_scint_plane2_end, e_effC_scint_plane2_end);
   B2INFO("Estimation of Effected Speed Light of Scintillators (EKLM): "
-         << LogVar("Fitted Value (phi readout) ", logStr_phi.Data())
-         << LogVar("Fitted Value (z readout) ", logStr_z.Data()));
+         << LogVar("Fitted Value (plane1 readout) ", logStr_phi.Data())
+         << LogVar("Fitted Value (plane2 readout) ", logStr_z.Data()));
 
   // Default Effected Light Speed in current Database
   effSpeed = 0.5671 * Const::speedOfLight;
 
-  effSpeed = (fabs(effC_scint_phi) + fabs(effC_scint_z) + fabs(effC_scint_phi_end) + fabs(effC_scint_z_end)) / 4.0;
+  effSpeed = (fabs(effC_scint_phi) + fabs(effC_scint_z) + fabs(effC_scint_plane1_end) + fabs(effC_scint_plane2_end)) / 4.0;
 
   effSpeed_RPC = (fabs(effC_rpc_phi) + fabs(effC_rpc_z)) / 2.0;
   effSpeed_RPC = 0.50 * Const::speedOfLight;
@@ -875,8 +875,8 @@ void KLMTimeCalibrationAlgorithm::saveHist()
   hprf_rpc_z_effC->SetDirectory(dir_effC);
   hprf_scint_phi_effC->SetDirectory(dir_effC);
   hprf_scint_z_effC->SetDirectory(dir_effC);
-  hprf_scint_phi_effC_end->SetDirectory(dir_effC);
-  hprf_scint_z_effC_end->SetDirectory(dir_effC);
+  hprf_scint_plane1_effC_end->SetDirectory(dir_effC);
+  hprf_scint_plane2_effC_end->SetDirectory(dir_effC);
 
   m_outFile->cd();
   TDirectory* dir_time = m_outFile->mkdir("time");

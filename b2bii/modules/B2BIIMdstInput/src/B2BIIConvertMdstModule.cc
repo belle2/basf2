@@ -22,7 +22,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
 
 // Belle II dataobjects
 #include <framework/dataobjects/EventMetaData.h>
@@ -356,7 +355,7 @@ void B2BIIConvertMdstModule::event()
   // 12. Convert ExtHit information and set Track -> ExtHit relations
   if (m_convertExtHits) convertExtHitTable();
 
-  // 13. Convert Evtcls information
+  // 13. Convert Evtcls panther table information
   if (m_convertEvtcls) convertEvtclsTable();
 
 }
@@ -1260,27 +1259,39 @@ void B2BIIConvertMdstModule::convertEvtclsTable()
   Belle::Evtcls_flag_Manager& EvtFlagMgr = Belle::Evtcls_flag_Manager::get_manager();
   Belle::Evtcls_flag2_Manager& EvtFlag2Mgr = Belle::Evtcls_flag2_Manager::get_manager();
 
+  // Pull Evtcls_hadronic_flag from manager
+  Belle::Evtcls_hadronic_flag_Manager& EvtHadFlagMgr = Belle::Evtcls_hadronic_flag_Manager::get_manager();
+
   std::string name = "evtcls_flag";
+  std::string name_had = "evtcls_hadronic_flag";
   // Only one entry in each event
   std::vector<Belle::Evtcls_flag>::iterator eflagIterator = EvtFlagMgr.begin();
   std::vector<Belle::Evtcls_flag2>::iterator eflag2Iterator = EvtFlag2Mgr.begin();
+  std::vector<Belle::Evtcls_hadronic_flag>::iterator ehadflagIterator = EvtHadFlagMgr.begin();
 
+  // Converting evtcls_flag(2)
   std::vector<int> flag(20);
   for (int index = 0; index < 20; ++index) {
-    // flag(9-17): not used
-    if (index > 8 && index < 18) continue;
+    // flag(14, 16): not filled
+    if (index == 14 || index == 16) continue;
+    std::string iVar = name + std::to_string(index);
     // 0-9 corresponding to evtcls_flag.flag(0-9)
     if (index < 10) {
-      flag[index] = (*eflagIterator).flag(index);
-      B2DEBUG(99, "evtcls_flag(" << index << ") = " << flag[index]);
+      m_evtCls->addExtraInfo(iVar, (*eflagIterator).flag(index));
     } else {
       // 10-19 corresponding to evtcls_flag2.flag(0-9)
-      flag[index] = (*eflag2Iterator).flag(index - 10);
-      B2DEBUG(99, "evtcls_flag(" << index << ") = " << flag[index]);
+      m_evtCls->addExtraInfo(iVar, (*eflag2Iterator).flag(index - 10));
     }
-    std::string iVar = name + std::to_string(index);
-    m_evtCls->addExtraInfo(iVar, flag[index]);
+    B2DEBUG(99, "evtcls_flag(" << index << ") = " << m_evtCls->getExtraInfo(iVar));
   }
+
+  // Converting evtcls_hadronic_flag
+  for (int index = 0; index < 6; ++index) {
+    std::string iVar = name_had + std::to_string(index);
+    m_evtCls->addExtraInfo(iVar, (*ehadflagIterator).hadronic_flag(index));
+    B2DEBUG(99, "evtcls_hadronic_flag(" << index << ") = " << m_evtCls->getExtraInfo(iVar));
+  }
+
 }
 
 //-----------------------------------------------------------------------------

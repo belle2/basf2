@@ -14,7 +14,7 @@ from ROOT import Belle2
 from ROOT.Belle2 import TOP
 
 
-def BS13d_calibration_local(inputFiles, look_back=28, globalTags=[], localDBs=[]):
+def BS13d_calibration_local(inputFiles, look_back=28, globalTags=None, localDBs=None):
     '''
     Returns calibration object for carrier shift calibration of BS13d with local runs
     (laser, single-pulse or double-pulse).
@@ -44,10 +44,12 @@ def BS13d_calibration_local(inputFiles, look_back=28, globalTags=[], localDBs=[]
     #   define calibration
     cal = Calibration(name='TOP_BS13dCalibration', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
-    for globalTag in reversed(globalTags):
-        cal.use_central_database(globalTag)
-    for localDB in reversed(localDBs):
-        cal.use_local_database(localDB)
+    if globalTags:
+        for globalTag in reversed(globalTags):
+            cal.use_central_database(globalTag)
+    if localDBs:
+        for localDB in reversed(localDBs):
+            cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.max_files_per_collector_job = 1
     cal.strategies = SequentialRunByRun
@@ -55,7 +57,7 @@ def BS13d_calibration_local(inputFiles, look_back=28, globalTags=[], localDBs=[]
     return cal
 
 
-def BS13d_calibration_rawdata(inputFiles, globalTags=[], localDBs=[]):
+def BS13d_calibration_rawdata(inputFiles, globalTags=None, localDBs=None):
     '''
     Returns calibration object for carrier shift calibration of BS13d with raw data.
     :param inputFiles: A list of input files in raw data format
@@ -82,10 +84,12 @@ def BS13d_calibration_rawdata(inputFiles, globalTags=[], localDBs=[]):
     #   define calibration
     cal = Calibration(name='TOP_BS13dCalibration', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
-    for globalTag in reversed(globalTags):
-        cal.use_central_database(globalTag)
-    for localDB in reversed(localDBs):
-        cal.use_local_database(localDB)
+    if globalTags:
+        for globalTag in reversed(globalTags):
+            cal.use_central_database(globalTag)
+    if localDBs:
+        for localDB in reversed(localDBs):
+            cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.max_files_per_collector_job = 1
     cal.strategies = SequentialRunByRun
@@ -93,7 +97,7 @@ def BS13d_calibration_rawdata(inputFiles, globalTags=[], localDBs=[]):
     return cal
 
 
-def BS13d_calibration_cdst(inputFiles, time_offset=0, globalTags=[], localDBs=[]):
+def BS13d_calibration_cdst(inputFiles, time_offset=0, globalTags=None, localDBs=None):
     '''
     Returns calibration object for carrier shift calibration of BS13d with processed data.
     :param inputFiles: A list of input files in cdst data format
@@ -121,10 +125,12 @@ def BS13d_calibration_cdst(inputFiles, time_offset=0, globalTags=[], localDBs=[]
     #   define calibration
     cal = Calibration(name='TOP_BS13dCalibration', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
-    for globalTag in reversed(globalTags):
-        cal.use_central_database(globalTag)
-    for localDB in reversed(localDBs):
-        cal.use_local_database(localDB)
+    if globalTags:
+        for globalTag in reversed(globalTags):
+            cal.use_central_database(globalTag)
+    if localDBs:
+        for localDB in reversed(localDBs):
+            cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.max_files_per_collector_job = 1
     cal.strategies = SequentialRunByRun
@@ -132,7 +138,7 @@ def BS13d_calibration_cdst(inputFiles, time_offset=0, globalTags=[], localDBs=[]
     return cal
 
 
-def moduleT0_calibration_DeltaT(inputFiles, globalTags=[], localDBs=[]):
+def moduleT0_calibration_DeltaT(inputFiles, globalTags=None, localDBs=None):
     '''
     Returns calibration object for rough module T0 calibration with method DeltaT
     :param inputFiles: A list of input files in cdst data format
@@ -159,10 +165,12 @@ def moduleT0_calibration_DeltaT(inputFiles, globalTags=[], localDBs=[]):
     #   define calibration
     cal = Calibration(name='TOP_moduleT0_rough', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
-    for globalTag in reversed(globalTags):
-        cal.use_central_database(globalTag)
-    for localDB in reversed(localDBs):
-        cal.use_local_database(localDB)
+    if globalTags:
+        for globalTag in reversed(globalTags):
+            cal.use_central_database(globalTag)
+    if localDBs:
+        for localDB in reversed(localDBs):
+            cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.max_files_per_collector_job = 1
     cal.strategies = SingleIOV
@@ -170,7 +178,7 @@ def moduleT0_calibration_DeltaT(inputFiles, globalTags=[], localDBs=[]):
     return cal
 
 
-def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=[], localDBs=[]):
+def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localDBs=None):
     '''
     Returns calibration object for final module T0 calibration with method LL
     :param inputFiles: A list of input files in cdst data format
@@ -199,10 +207,12 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=[], localDBs
     #   define calibration
     cal = Calibration(name='TOP_moduleT0_final', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
-    for globalTag in reversed(globalTags):
-        cal.use_central_database(globalTag)
-    for localDB in reversed(localDBs):
-        cal.use_local_database(localDB)
+    if globalTags:
+        for globalTag in reversed(globalTags):
+            cal.use_central_database(globalTag)
+    if localDBs:
+        for localDB in reversed(localDBs):
+            cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.max_files_per_collector_job = 1
     cal.strategies = SingleIOV
@@ -210,7 +220,7 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=[], localDBs
     return cal
 
 
-def commonT0_calibration_BF(inputFiles, globalTags=[], localDBs=[]):
+def commonT0_calibration_BF(inputFiles, globalTags=None, localDBs=None):
     '''
     Returns calibration object for common T0 calibration with method BF
     :param inputFiles: A list of input files in cdst data format
@@ -237,10 +247,12 @@ def commonT0_calibration_BF(inputFiles, globalTags=[], localDBs=[]):
     #   define calibration
     cal = Calibration(name='TOP_commonT0Calibration', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
-    for globalTag in reversed(globalTags):
-        cal.use_central_database(globalTag)
-    for localDB in reversed(localDBs):
-        cal.use_local_database(localDB)
+    if globalTags:
+        for globalTag in reversed(globalTags):
+            cal.use_central_database(globalTag)
+    if localDBs:
+        for localDB in reversed(localDBs):
+            cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.max_files_per_collector_job = 1
     cal.strategies = SequentialRunByRun
@@ -248,7 +260,7 @@ def commonT0_calibration_BF(inputFiles, globalTags=[], localDBs=[]):
     return cal
 
 
-def commonT0_calibration_LL(inputFiles, sample='dimuon', globalTags=[], localDBs=[]):
+def commonT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localDBs=None):
     '''
     Returns calibration object for common T0 calibration with method LL
     :param inputFiles: A list of input files in cdst data format
@@ -277,10 +289,12 @@ def commonT0_calibration_LL(inputFiles, sample='dimuon', globalTags=[], localDBs
     #   define calibration
     cal = Calibration(name='TOP_commonT0Calibration', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
-    for globalTag in reversed(globalTags):
-        cal.use_central_database(globalTag)
-    for localDB in reversed(localDBs):
-        cal.use_local_database(localDB)
+    if globalTags:
+        for globalTag in reversed(globalTags):
+            cal.use_central_database(globalTag)
+    if localDBs:
+        for localDB in reversed(localDBs):
+            cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.max_files_per_collector_job = 1
     cal.strategies = SequentialRunByRun
@@ -289,7 +303,7 @@ def commonT0_calibration_LL(inputFiles, sample='dimuon', globalTags=[], localDBs
 
 
 def pulseHeight_calibration_laser(inputFiles, t_min=-50.0, t_max=0.0, look_back=28,
-                                  globalTags=[], localDBs=[]):
+                                  globalTags=None, localDBs=None):
     '''
     Returns calibration object for calibration of pulse-height distributions and
     threshold efficiencies with local laser runs.
@@ -320,10 +334,12 @@ def pulseHeight_calibration_laser(inputFiles, t_min=-50.0, t_max=0.0, look_back=
     #   define calibration
     cal = Calibration(name='TOP_pulseHeightCalibration', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
-    for globalTag in reversed(globalTags):
-        cal.use_central_database(globalTag)
-    for localDB in reversed(localDBs):
-        cal.use_local_database(localDB)
+    if globalTags:
+        for globalTag in reversed(globalTags):
+            cal.use_central_database(globalTag)
+    if localDBs:
+        for localDB in reversed(localDBs):
+            cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.max_files_per_collector_job = 1
     cal.strategies = SingleIOV
@@ -331,7 +347,7 @@ def pulseHeight_calibration_laser(inputFiles, t_min=-50.0, t_max=0.0, look_back=
     return cal
 
 
-def pulseHeight_calibration_rawdata(inputFiles, globalTags=[], localDBs=[]):
+def pulseHeight_calibration_rawdata(inputFiles, globalTags=None, localDBs=None):
     '''
     Returns calibration object for calibration of pulse-height distributions and
     threshold efficiencies with raw data
@@ -358,10 +374,12 @@ def pulseHeight_calibration_rawdata(inputFiles, globalTags=[], localDBs=[]):
     #   define calibration
     cal = Calibration(name='TOP_pulseHeightCalibration', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
-    for globalTag in reversed(globalTags):
-        cal.use_central_database(globalTag)
-    for localDB in reversed(localDBs):
-        cal.use_local_database(localDB)
+    if globalTags:
+        for globalTag in reversed(globalTags):
+            cal.use_central_database(globalTag)
+    if localDBs:
+        for localDB in reversed(localDBs):
+            cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.max_files_per_collector_job = 1
     cal.strategies = SingleIOV
@@ -370,7 +388,7 @@ def pulseHeight_calibration_rawdata(inputFiles, globalTags=[], localDBs=[]):
 
 
 def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
-                     recalibrate=True, globalTags=[], localDBs=[]):
+                     recalibrate=True, globalTags=None, localDBs=None):
     '''
     Returns calibration object for alignment of TOP modules.
     :param inputFiles: A list of input files in cdst data format
@@ -383,10 +401,12 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
 
     #   define calibration
     cal = Calibration(name='TOP_alignment')
-    for globalTag in reversed(globalTags):
-        cal.use_central_database(globalTag)
-    for localDB in reversed(localDBs):
-        cal.use_local_database(localDB)
+    if globalTags:
+        for globalTag in reversed(globalTags):
+            cal.use_central_database(globalTag)
+    if localDBs:
+        for localDB in reversed(localDBs):
+            cal.use_local_database(localDB)
     cal.strategies = SingleIOV
 
     #   add collections
@@ -414,11 +434,12 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
         #   define collection
         collection = Collection(collector=collector, input_files=inputFiles,
                                 pre_collector_path=main, max_files_per_collector_job=-1)
-        for globalTag in reversed(globalTags):
-            collection.use_central_database(globalTag)
-        for localDB in reversed(localDBs):
-            collection.use_local_database(localDB)
-        collection.backend_args = {"queue": "l"}
+        if globalTags:
+            for globalTag in reversed(globalTags):
+                collection.use_central_database(globalTag)
+        if localDBs:
+            for localDB in reversed(localDBs):
+                collection.use_local_database(localDB)
 
         #   add collection to calibration
         cal.add_collection(name='slot_' + '{:0=2d}'.format(slot), collection=collection)

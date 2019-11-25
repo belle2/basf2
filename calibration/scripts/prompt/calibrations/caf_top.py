@@ -9,6 +9,8 @@ Author: Marko Staric
 
 from prompt import CalibrationSettings
 from caf.framework import Calibration
+from caf.utils import IoV
+from caf.strategies import SingleIOV
 from top_calibration import BS13d_calibration_cdst
 from top_calibration import moduleT0_calibration_DeltaT, moduleT0_calibration_LL
 from top_calibration import commonT0_calibration_BF, commonT0_calibration_LL
@@ -34,11 +36,21 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov = input_data["hlt_bhabha"]
     sample = 'bhabha'
     inputFiles = list(file_to_iov.keys())
+    requested_iov = kwargs.get("requested_iov", None)
+    output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
     cal = [BS13d_calibration_cdst(inputFiles),
            moduleT0_calibration_DeltaT(inputFiles),
            moduleT0_calibration_LL(inputFiles, sample),
            commonT0_calibration_BF(inputFiles)]
+
+    for c in cal:
+        if c.strategies == SingleIOV:
+            for alg in c.algorithms:
+                alg.params = {"apply_iov": output_iov}
+        else:
+            for alg in c.algorithms:
+                alg.params = {"iov_coverage": output_iov}
 
     cal[1].save_payloads = False
 

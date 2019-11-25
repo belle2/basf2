@@ -671,7 +671,6 @@ def add_dedx_modules(path, components=None):
     # only run this if the SVD is enabled - PXD is disabled by default
     if components is None or 'SVD' in components:
         VXDdEdxPID = register_module('VXDDedxPID')
-        VXDdEdxPID.param("useIndividualHits", False)
         path.add_module(VXDdEdxPID)
 
 

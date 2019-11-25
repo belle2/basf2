@@ -41,7 +41,6 @@ PXDGatedModeDQMModule::PXDGatedModeDQMModule() : HistoModule() , m_vxdGeometry(V
   addParam("outsideTimeCut", m_outsideTimeCut, "outside GM time cut in us after kick", 20000);
   addParam("chargeCut", m_chargeCut, "minimum pixel ADU charge cut", 5);
   addParam("chargeCutHigh", m_chargeCutHigh, "minimum pixel ADU charge cut for second set of histograms", 20);
-  addParam("perGate", m_perGate, "Make plots per GM Start Gate", true);
 }
 
 void PXDGatedModeDQMModule::defineHisto()

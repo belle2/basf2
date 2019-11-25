@@ -41,8 +41,6 @@ MCDecayFinderModule::MCDecayFinderModule() : Module(), m_isSelfConjugatedParticl
 
 void MCDecayFinderModule::initialize()
 {
-  B2WARNING("MCDecayFinder is not yet configured to deal with matches that require intermediate resonances to be ignored.");
-
   m_decaydescriptor.init(m_strDecay);
 
   m_antiListName = ParticleListName::antiParticleListName(m_listName);

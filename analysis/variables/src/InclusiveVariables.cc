@@ -55,7 +55,7 @@ namespace Belle2 {
         try {
           pdgCode = Belle2::convertString<int>(arguments[0]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The first argument of  meta function must be a positive integer!");
+          B2WARNING("The meta variable nDaughterCharged accepts zero or one arguments!");
           return nullptr;
         }
       }
@@ -107,7 +107,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function daughterAverageOf");
+        B2FATAL("The meta variable daughterAverageOf requires only one argument!");
       }
     }
 
@@ -120,9 +120,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("nDaughterPhotons",   nDaughterPhotons,
                       "Returns the number of final state daughter photons.");
     REGISTER_VARIABLE("nDaughterNeutralHadrons",   nDaughterNeutralHadrons,
-                      "Returns the number of KL_0 or neutrons among the final state daughters.");
+                      "Returns the number of K_L0 or neutrons among the final state daughters.");
     REGISTER_VARIABLE("nDaughterCharged(pdg)",   nDaughterCharged,
-                      "Returns the number of charged daughers with PDG code or number of all charged daughters if no argument has been provided.");
+                      "Returns the number of charged daughters with the provided PDG code or the number "
+                      "of all charged daughters if no argument has been provided.");
     REGISTER_VARIABLE("nCompositeDaughters",   nCompositeDaughters,
                       "Returns the number of final state composite daughters.");
     REGISTER_VARIABLE("daughterAverageOf(variable)", daughterAverageOf,

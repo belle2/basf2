@@ -34,6 +34,9 @@ Variables
    of an arbitrary number of daughters. Generalized indeces are supported. This variable is mostly intended
    to calculate the invariant mass or the recoil mass of any set of particles belonging to a decay tree.
 
+ * Added new varaibles for fully-inclusive analysis: :b2:var:`nDaughterPhotons`, :b2:var:`nDaughterCharged` etc., which allow to count 
+   specific daughters easily, and :b2:var:`daughterAverageOf`, which is similar to the :b2:var:`daughterSumOf`, but output a mean value of a variable.
+
 Modules
 +++++++
 

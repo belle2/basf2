@@ -260,13 +260,13 @@ void cdcDQM7Module::event()
     }// adc
 
     // add by J.H. Yin
-    int cid(0);
     if (adcsum > 25) {
+      int cid(0);
       if (sL == 0) {
         cid = iL * ndiv[sL] + wid;
       } else {
         for (int isl = 0; isl < sL; isl ++) {
-          cid += isl * 6 * ndiv[isl];
+          cid += 6 * ndiv[isl];
         }
         cid += 2 * ndiv[0] + iL * ndiv[sL] + wid;
       }

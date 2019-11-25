@@ -104,7 +104,7 @@ namespace {
   {
     StoreArray<Particle> myParticles;
     auto* var = Manager::Instance().getVariable("daughterAverageOf(PDG)");
-    EXPECT_FLOAT_EQ(var->function(myParticles[8]), 110.75);
+    EXPECT_FLOAT_EQ(var->function(myParticles[8]), 105.25);
   }
 
 }

@@ -7,6 +7,8 @@
 </header>
 """
 
+import fei
+from fei.default_channels import get_unittest_channels
 import os
 import sys
 
@@ -23,16 +25,15 @@ from modularAnalysis import *
 from ROOT import Belle2
 import basf2_mva
 import pdg
+from basf2 import conditions
 
 basf2_mva.loadRootDictionary()
 
 tempdir = tempfile.mkdtemp()
 os.chdir(tempdir)
 
-use_local_database(tempdir + '/localdb/dbcache.txt', tempdir + '/localdb/', False, LogLevel.WARNING)
+conditions.append_testing_payloads('localdb/database.txt')
 
-from fei.default_channels import get_unittest_channels
-import fei
 
 fei.core.Teacher.MaximumNumberOfMVASamples = int(1e7)
 fei.core.Teacher.MinimumNumberOfMVASamples = int(10)
@@ -42,11 +43,10 @@ particles = fei.get_unittest_channels()
 if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
     sys.exit(0)
 
-# inputFile = '/storage/jbod/tkeck/MC6/evtgen-charged/sub00/mdst_000020_prod00000189_task00000020.root'
-inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst6_BBx0_charged.root')
-
 sig_path = create_path()
-inputMdstList('MC6', [inputFile], sig_path)
+inputMdst(environmentType='default',
+          filename=find_file('mdst12.root', 'validation', False),
+          path=sig_path)
 fillParticleList('mu+:sig', 'muonID > 0.5 and dr < 1 and abs(dz) < 2', writeOut=True, path=sig_path)
 reconstructDecay('tau+:sig -> mu+:sig', '', 1, writeOut=True, path=sig_path)
 matchMCTruth('tau+:sig', path=sig_path)
@@ -69,7 +69,7 @@ path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 0
 print(path)
-process(path)
+process(path, max_event=10000)
 assert len(glob.glob('mcParticlesCount.root')) == 1
 
 configuration = fei.config.FeiConfiguration(prefix='FEI_VALIDATION', training=True, cache=0)
@@ -86,7 +86,7 @@ path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 1, feistate.stage
 print(path)
-process(path)
+process(path, max_event=10000)
 assert len(glob.glob('gamma*')) == 2
 assert len(glob.glob('mu+*')) == 1
 assert len(glob.glob('pi+*')) == 1
@@ -112,7 +112,7 @@ path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 2
 print(path)
-process(path)
+process(path, max_event=10000)
 assert len(glob.glob('pi0*')) == 1
 
 fei.do_trainings(particles, configuration)
@@ -131,7 +131,7 @@ path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 4
 print(path)
-process(path)
+process(path, max_event=10000)
 assert len(glob.glob('D*')) == 5
 
 # One training will fail D -> pi pi due to low statistic
@@ -167,7 +167,7 @@ path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 7
 print(path)
-process(path)
+process(path, max_event=10000)
 assert len(glob.glob('Monitor_FSPLoader.root')) == 1
 assert len(glob.glob('Monitor_TrainingData_*')) == 11
 assert len(glob.glob('Monitor_PreReconstruction_BeforeRanking_*')) == 11

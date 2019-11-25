@@ -21,7 +21,7 @@
 
 import sys
 from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
-from basf2 import B2FATAL
+from basf2 import B2FATAL, B2INFO
 
 
 def get_default_channels(
@@ -39,7 +39,7 @@ def get_default_channels(
     returns list of Particle objects with all default channels for running
     FEI on Upsilon(4S). For a training with analysis-specific signal selection,
     adding a cut on nRemainingTracksInRestOfEvent is recommended.
-    @param B_extra_cut Additional user cut on rekombination of tag-B-mesons
+    @param B_extra_cut Additional user cut on recombination of tag-B-mesons
     @param hadronic whether to include hadronic B decays (default is True)
     @param semileptonic whether to include semileptonic B decays (default is True)
     @param KLong whether to include K_long decays into the training (default is False)
@@ -300,7 +300,7 @@ def get_default_channels(
                          'daughterInvariantMass({},{},{},{},{})', 'dQ', 'Q', 'dM', 'daughter({},extraInfo(decayModeID))']
 
     # TODO if specific:
-    # We can not do this in the generic case (because this would heavily influence our performance on the unkown signal events
+    # We can not do this in the generic case (because this would heavily influence our performance on the unknown signal events
     # but in the specific case this could work well
     #    intermediate_vars = ['nRemainingTracksInEvent']
     LC = Particle('Lambda_c+',
@@ -636,10 +636,6 @@ def get_default_channels(
         BP.addChannel(['D*+', 'p+', 'anti-p-', 'pi+', 'pi-'])
         BP.addChannel(['anti-Lambda_c-', 'p+', 'pi+'])
 
-    mva_BPlusSemileptonic = MVAConfiguration(
-        variables=B_vars,
-        target='isSignalAcceptMissingNeutrino')
-
     semileptonic_user_cut = ''
     if B_extra_cut is not None:
         semileptonic_user_cut += B_extra_cut
@@ -947,7 +943,6 @@ def get_default_channels(
             particles.append(B0_SL)
         if chargedB:
             particles.append(BP_SL)
-
     return particles
 
 

@@ -44,11 +44,12 @@ Charm physics skims
 .. automodule:: skim.charm
     :members:
 
-Charmonium skims
-~~~~~~~~~~~~~~~~
+.. Commented out, because this module no longer exists
+   Charmonium skims
+   ~~~~~~~~~~~~~~~~
 
-.. automodule:: skim.charmonium
-    :members:
+   .. automodule:: skim.charmonium
+       :members:
 
 Dark sector skims
 ~~~~~~~~~~~~~~~~~
@@ -92,7 +93,7 @@ Semileptonic skims
 Time-dependent CP-violation (TDCPV) analysis skims
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: skim.tdcpv
+.. automodule:: skim.tcpv
     :members:
 
 Tau-pair skims
@@ -118,5 +119,35 @@ Some functions and tools are for the use of skim liaisons and developers.
     :members:
     :undoc-members:
 
+Skim performance statistics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+The following two command-line tools can be used to test the performance of a skim. They are
+available in `skim/tools/stats`.
+
+They both `skim.registry`
+
+
+``runSkimsForStats.py``: Run skim scripts and save output
+.........................................................
+
+.. argparse::
+   :filename: skim/tools/stats/runSkimsForStats.py
+   :func: getArgumentParser
+   :prog: runSkimsForStats.py
+   :nodefault:
+   :noepilog:
+   :nogroupsections:
+
+
+``printStatsSkims.py``: Print tables of performance statistics
+..............................................................
+
+.. argparse::
+   :filename: skim/tools/stats/printSkimStats.py
+   :func: getArgumentParser
+   :prog: printSkimStats.py
+   :nodefault:
+   :noepilog:
+   :nogroupsections:
 

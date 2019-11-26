@@ -37,45 +37,62 @@ samples = mcSamples + dataSamples
 nTestEvents = 10000
 
 
-def getSkimsToRun():
-    parser = argparse.ArgumentParser(description='A script to run a set of skims, and ' +
+def getArgumentParser():
+    """
+
+    Returns:
+        parser (argparse.ArgumentParser):
+    """
+    allStandaloneSkims = [skim for _, skim in skim_registry]
+    allCombinedSkims = list(combined_skims.keys())
+
+    parser = argparse.ArgumentParser(description='A script to run a given set of skims, and ' +
                                      'save the output in a format to be read by printSkimStats.py. ' +
                                      'One or more standalone or combined skim names must be provided.',
-                                     epilog='example: ./runSkims.py -s LeptonicUntagged -c BtoCharm')
+                                     epilog='example: ./printSkimStats.py -s LeptonicUntagged -c BtoCharm')
     parser.add_argument('-s', '--standalone', nargs='+', default=[],
                         choices=['all']+allStandaloneSkims, metavar='SKIM',
-                        help='List of standalone skims to run. Valid options are: ' + ', '.join(allStandaloneSkims) +
-                        ', or all to run all standalone skims.')
+                        help='List of standalone skims to run. Valid options are: ' +
+                        ', '.join([f'``{s}``' for s in allStandaloneSkims]) +
+                        ', or ``all`` to run all standalone skims.')
     parser.add_argument('-c', '--combined', nargs='+', default=[],
                         choices=['all']+allCombinedSkims, metavar='SKIM',
-                        help='List of combined skims to run. Valid options are: ' + ', '.join(allCombinedSkims) +
-                        ', or all to run all combined skims.')
-    args = parser.parse_args()
+                        help='List of combined skims to run. Valid options are: ' +
+                        ', '.join([f'``{s}``' for s in allCombinedSkims]) +
+                        ', or ``all`` to run all combined skims.')
 
-    if not (args.standalone or args.combined):
+    return parser
+
+
+def getSkimsAndScriptsToRun(parser, standaloneList, combinedList):
+    """
+    """
+    if not (standaloneList or combinedList):
         parser.print_help()
         sys.exit(1)
 
-    if args.standalone == ['all']:
+    if standaloneList == ['all']:
         standaloneSkims = allStandaloneSkims
     else:
-        standaloneSkims = args.standalone
+        standaloneSkims = standaloneList
 
-    if args.combined == ['all']:
+    if combinedList == ['all']:
         combinedSkims = allCombinedSkims
     else:
-        combinedSkims = args.combined
-
-    return standaloneSkims, combinedSkims
-
-if __name__ == '__main__':
-    standaloneSkims, combinedSkims = getSkimsToRun()
+        combinedSkims = combinedList
 
     standaloneScripts = [find_file(f'skim/standalone/{skim}_Skim_Standalone.py', silent=True) for skim in standaloneSkims]
     combinedScripts = [find_file(f'skim/combined/{skim}_Skim_Standalone.py', silent=True) for skim in combinedSkims]
 
     skims = standaloneSkims + combinedSkims
     scripts = standaloneScripts + combinedScripts
+
+    return skims, scripts
+
+if __name__ == '__main__':
+    parser = getArgumentParser()
+    args = parser.parse_args()
+    skims, scripts = getSkimsAndScriptsToRun(parser, args.standalone, args.combined)
 
     logDirectory = Path('log').resolve()
     logDirectory.mkdir(parents=True, exist_ok=True)
@@ -94,7 +111,7 @@ if __name__ == '__main__':
             logFile = Path(logDirectory, f'{skim}_{sample}.out')
             errFile = Path(logDirectory, f'{skim}_{sample}.err')
             jsonFile = Path(logDirectory, f'JobInformation_{skim}_{sample}.json')
-
+            print(f'{skim}, {sample}')
             with clean_working_directory():
                 process = subprocess.run(['bsub', '-q', 'l', '-oo', logFile, '-e', errFile,
                                           '-J', f'{skim} {sample}'

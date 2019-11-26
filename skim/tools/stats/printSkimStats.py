@@ -75,9 +75,36 @@ samples = list(mcSamples.keys()) + list(dataSamples.keys())
 
 class SkimNotRunError(Exception):
     """An exception to be raised whenever an error occurs that is likely due to
-    a skim not being run properly by ``runSkims.py``.
+    a skim not being run properly by ``runSkimsForStats.py``.
     """
     pass
+
+
+def getArgumentParser():
+    """
+
+    Returns:
+        parser (argparse.ArgumentParser):
+    """
+    allStandaloneSkims = [skim for _, skim in skim_registry]
+    allCombinedSkims = list(combined_skims.keys())
+
+    parser = argparse.ArgumentParser(description='A script to print tables of statistics for skims ' +
+                                     'which have been run by runSkimsForStats.py. One or more standalone or combined ' +
+                                     'skim names must be provided.',
+                                     epilog='example: ./printSkimStats.py -s LeptonicUntagged -c BtoCharm')
+    parser.add_argument('-s', '--standalone', nargs='+', default=[],
+                        choices=['all']+allStandaloneSkims, metavar='SKIM',
+                        help='List of standalone skims to run. Valid options are: ' +
+                        ', '.join([f'``{s}``' for s in allStandaloneSkims]) +
+                        ', or ``all`` to run all standalone skims.')
+    parser.add_argument('-c', '--combined', nargs='+', default=[],
+                        choices=['all']+allCombinedSkims, metavar='SKIM',
+                        help='List of combined skims to run. Valid options are: ' +
+                        ', '.join([f'``{s}``' for s in allCombinedSkims]) +
+                        ', or ``all`` to run all combined skims.')
+
+    return parser
 
 
 def getStatFromLog(statisticName, logFileContents):
@@ -272,7 +299,7 @@ def getJobOutput(skim, sample):
             jsonFileContents = json.load(jsonFile)
     except FileNotFoundError:
         raise SkimNotRunError(f'    Failed to open output files for {skim} skim on {sample} sample.\n' +
-                              '    Perhaps you forgot to run the skim with runSkims.py?')
+                              '    Perhaps you forgot to run the skim with runSkimsForStats.py?')
 
     return logFileContents, jsonFileContents
 
@@ -306,42 +333,25 @@ def testLogContents(logFileContents, jsonFileContents, skim, sample):
                               '    Please check the .out, .err, and .json files in log/ directory.')
 
 
-def getSkimsToRun():
+def getSkimsToRun(parser, standaloneList, combinedList):
     """
 
     Returns:
         skimsToRun (list):
     """
-    allStandaloneSkims = [skim for _, skim in skim_registry]
-    allCombinedSkims = list(combined_skims.keys())
-
-    parser = argparse.ArgumentParser(description='A script to print tables of statistics for skims ' +
-                                     'which have been run by runSkims.py. One or more standalone or combined ' +
-                                     'skim names must be provided.',
-                                     epilog='example: ./printSkimStats.py -s LeptonicUntagged -c BtoCharm')
-    parser.add_argument('-s', '--standalone', nargs='+', default=[],
-                        choices=['all']+allStandaloneSkims, metavar='SKIM',
-                        help='List of standalone skims to run. Valid options are: ' + ', '.join(allStandaloneSkims) +
-                        ', or all to run all standalone skims.')
-    parser.add_argument('-c', '--combined', nargs='+', default=[],
-                        choices=['all']+allCombinedSkims, metavar='SKIM',
-                        help='List of combined skims to run. Valid options are: ' + ', '.join(allCombinedSkims) +
-                        ', or all to run all combined skims.')
-    args = parser.parse_args()
-
-    if not (args.standalone or args.combined):
+    if not (standaloneList or combinedList):
         parser.print_help()
         sys.exit(1)
 
-    if args.standalone == ['all']:
+    if standaloneList == ['all']:
         standaloneSkims = allStandaloneSkims
     else:
-        standaloneSkims = args.standalone
+        standaloneSkims = standaloneList
 
-    if args.combined == ['all']:
+    if combinedList == ['all']:
         combinedSkims = allCombinedSkims
     else:
-        combinedSkims = args.combined
+        combinedSkims = combinedList
 
     return standaloneSkims + combinedSkims
 
@@ -655,7 +665,10 @@ def getStatSpecifier():
     return statSpecifier
 
 if __name__ == '__main__':
-    skims = getSkimsToRun()
+    parser = getArgumentParser()
+    args = parser.parse_args()
+
+    skims = getSkimsToRun(parser, args.standalone, args.combined)
 
     statSpecifier = getStatSpecifier()
     allSkimStats = getSkimStatsDict(skims, samples, statSpecifier)

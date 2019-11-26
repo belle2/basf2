@@ -35,8 +35,8 @@ PXDGatedModeDQMModule::PXDGatedModeDQMModule() : HistoModule() , m_vxdGeometry(V
   addParam("PXDRawHitsName", m_PXDRawHitsName, "Name of PXD raw hits", std::string(""));
   addParam("perGate", m_perGate, "Make plots per GM Start Gate", true);
   addParam("minTimeCutLER", m_minTimeCutLER, "minimum time cut in us after LER kick", 20);
-  addParam("maxTimeCutLER", m_maxTimeCutLER, "maximum time cut in us after LER kick", 20);
-  addParam("minTimeCutHER", m_minTimeCutHER, "minimum time cut in us after HER kick", 4980);
+  addParam("maxTimeCutLER", m_maxTimeCutLER, "maximum time cut in us after LER kick", 4980);
+  addParam("minTimeCutHER", m_minTimeCutHER, "minimum time cut in us after HER kick", 20);
   addParam("maxTimeCutHER", m_maxTimeCutHER, "maximum time cut in us after HER kick", 4980);
   addParam("outsideTimeCut", m_outsideTimeCut, "outside GM time cut in us after kick", 20000);
   addParam("chargeCut", m_chargeCut, "minimum pixel ADU charge cut", 5);

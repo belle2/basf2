@@ -9,9 +9,11 @@
 #
 # Usage: basf2 runEventT0DQM.py
 #
-# Input: cdst_hadronEvents.root
-# Output: EventT0DQM.root
+# Default input: cdst_hadronEvents.root
+# Output:        EventT0DQM.root
 #
+# Optional input usage:
+#    basf2 runEventT0DQM.py -i "<path/to/file.root>"
 #
 # Example steering file - 2011 Belle II Collaboration
 #############################################################

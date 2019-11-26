@@ -9,12 +9,12 @@ Author: qingyuan.liu@desy.de
 from basf2 import register_module, create_path
 from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm
 from caf.framework import Calibration
-from caf.strategies import SequentialRunByRun
+from caf.strategies import SequentialRunByRun, SimpleRunByRun
 
 run_types = ['beam', 'physcs', 'cosmic', 'all']
 
 
-def hot_pixel_mask_calibration(input_files, run_type=None, global_tags=None, local_dbs=None):
+def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration", run_type=None, global_tags=None, local_dbs=None):
     """
     Parameters:
       input_files (list): A list of input files to be assigned to calibration.input_files
@@ -70,14 +70,13 @@ def hot_pixel_mask_calibration(input_files, run_type=None, global_tags=None, loc
     algorithm.maskRows = True               # Set True to allow masking of hot rows
     algorithm.rowMultiplier = 7             # Occupancy threshold is median occupancy x multiplier
     algorithm.setPrefix("PXDRawHotPixelMaskCollector")
-
     if run_type == 'cosmic':
         algorithm.forceContinueMasking = True
 
     # Create the calibration instance
 
     cal = Calibration(
-        name="PXDHotPixelMaskCalibrationAlgorithm",
+        name=cal_name,
         collector=collector,
         algorithms=[algorithm],
         input_files=input_files)
@@ -88,5 +87,10 @@ def hot_pixel_mask_calibration(input_files, run_type=None, global_tags=None, loc
     cal.pre_collector_path = main
     cal.max_files_per_collector_job = 1
     cal.strategies = SequentialRunByRun
+
+    # Run type dependent configurations
+
+    if run_type == 'cosmic':
+        cal.strategies = SimpleRunByRun
 
     return cal

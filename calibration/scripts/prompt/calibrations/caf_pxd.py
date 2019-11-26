@@ -53,19 +53,17 @@ def get_calibrations(input_data, **kwargs):
         reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run)
         input_files_physics = list(reduced_file_to_iov_physics.keys())
         basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_physics)}")
-        cal_list.append(hot_pixel_mask_calibration(input_files_physics))
+        cal = hot_pixel_mask_calibration(cal_name="1_PXDHotPixelMaskCalibration_BeamorPhysics", input_files=input_files_physics)
+        cal.algorithms[0].params = {"iov_coverage": output_iov}
+        cal_list.append(cal)
     if len(file_to_iov_cosmics) > 0:
         reduced_file_to_iov_cosmics = filter_by_max_files_per_run(file_to_iov_cosmics, max_files_per_run)
         input_files_cosmics = list(reduced_file_to_iov_cosmics.keys())
         basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_cosmics)}")
-        # cal_list.append(hot_pixel_mask_calibration(input_files_cosmics, run_type='cosmic'))
-        cal = hot_pixel_mask_calibration(input_files_cosmics, run_type='cosmic')
-        cal.name += 'Cosmic'
-        cal_list.append(cal)
-
-    # Leave the last iov open
-    for cal in cal_list:
-        for algorithm in cal.algorithms:
-            algorithm.params = {"iov_coverage": output_iov}
+        cal_list.append(
+            hot_pixel_mask_calibration(
+                cal_name="2_PXDHotPixelMaskCalibration_Cosmic",
+                input_files=input_files_cosmics,
+                run_type='cosmic'))
 
     return cal_list

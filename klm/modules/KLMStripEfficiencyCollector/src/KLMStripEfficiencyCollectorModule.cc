@@ -55,10 +55,10 @@ void KLMStripEfficiencyCollectorModule::prepare()
   int nPlanes = m_PlaneArrayIndex->getNPlanes();
   TH1F* matchedDigitsInPlane = new TH1F(
     "matchedDigitsInPlane", "Number of matching (B|E)KLMDigits",
-    nPlanes, 0.5, double(nPlanes) + 0.5);
+    nPlanes, -0.5, double(nPlanes) - 0.5);
   TH1F* allExtHitsInPlane = new TH1F(
     "allExtHitsInPlane", "Number of ExtHits",
-    nPlanes, 0.5, double(nPlanes) + 0.5);
+    nPlanes, -0.5, double(nPlanes) - 0.5);
   registerObject<TH1F>("matchedDigitsInPlane", matchedDigitsInPlane);
   registerObject<TH1F>("allExtHitsInPlane", allExtHitsInPlane);
 }

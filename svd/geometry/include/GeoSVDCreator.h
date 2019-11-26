@@ -113,21 +113,21 @@ namespace Belle2 {
        * thagt does not depend on layer or sensor alignment
        * @param support Reference to the database containing the parameters
        */
-      void readHalfShellSupport(GearDir support, SVDGeometryPar& svdGeometryPar);
+      void readHalfShellSupport(const GearDir& support, SVDGeometryPar& svdGeometryPar);
 
       /**
        * Create support structure for a SVD Layer
        * @param layer Layer ID to create the support for
        * @param support Reference to the database containing the parameters
        */
-      void readLayerSupport(int layer, GearDir support, SVDGeometryPar& svdGeometryPar);
+      void readLayerSupport(int layer, const GearDir& support, SVDGeometryPar& svdGeometryPar);
 
       /**
        * Create support structure for a SVD Ladder
        * @param layer Layer ID to create the support for
        * @param support Reference to the database containing the parameters
        */
-      void readLadderSupport(int layer, GearDir support, SVDGeometryPar& svdGeometryPar);
+      void readLadderSupport(int layer, const GearDir& support, SVDGeometryPar& svdGeometryPar);
 
     private:
 

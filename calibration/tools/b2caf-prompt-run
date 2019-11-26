@@ -96,7 +96,7 @@ Required format of JSON file:
         caf_config = json.load(caf_config_file)
 
     import importlib
-    module_name = prompt_script_package + caf_config["caf_script"].rstrip(".py")
+    module_name = prompt_script_package + Path(caf_config["caf_script"]).stem
     try:
         cal_module = importlib.import_module(module_name)
     except ModuleNotFoundError:

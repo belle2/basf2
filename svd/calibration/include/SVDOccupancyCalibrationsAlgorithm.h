@@ -20,7 +20,7 @@ namespace Belle2 {
   public:
 
     /// Constructor set the prefix to SVDOccupancyCalibrationsCollector
-    SVDOccupancyCalibrationsAlgorithm(std::string str);
+    SVDOccupancyCalibrationsAlgorithm(const std::string& str);
 
     /// Destructor
     virtual ~SVDOccupancyCalibrationsAlgorithm() {}
@@ -32,7 +32,7 @@ namespace Belle2 {
 
   private:
 
-    std::string m_id;
+    std::string m_id; ///< identifier
 
   };
 } // namespace Belle2

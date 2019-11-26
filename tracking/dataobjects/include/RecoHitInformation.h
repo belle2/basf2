@@ -84,6 +84,9 @@ namespace Belle2 {
       // CDC hit finders using a CKF (seeded from SVD or ECL)
       c_SVDtoCDCCKF,
       c_ECLtoCDCCKF,
+      // CDC hit finder implemented in the ReattachCDCWireHitsToRecoTracks module:
+      // looks for CDC hits that are close to RecTracks, but that were rejected by the ADC/TOT based filter.
+      c_ReattachCDCWireHitsToRecoTracks,
       // Belle I's track finder
       c_Trasan,
       c_other

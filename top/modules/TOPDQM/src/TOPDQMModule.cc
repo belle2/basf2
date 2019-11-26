@@ -156,8 +156,9 @@ namespace Belle2 {
     m_time->SetOption("LIVE");
     m_time->SetMinimum(0);
 
-    m_goodHitsPerEventAll = new TH1F("goodHitsPerEventAll", "Number of good hits per event", 250, 0, 250);
-    m_badHitsPerEventAll = new TH1F("badHitsPerEventAll", "Number of bad hits per event", 250, 0, 250);
+    int MaxEvents(1000);
+    m_goodHitsPerEventAll = new TH1F("goodHitsPerEventAll", "Number of good hits per event", MaxEvents, 0, MaxEvents);
+    m_badHitsPerEventAll = new TH1F("badHitsPerEventAll", "Number of bad hits per event", MaxEvents, 0, MaxEvents);
     m_goodHitsPerEventAll->SetOption("LIVE");
     m_badHitsPerEventAll->SetOption("LIVE");
     m_goodHitsPerEventAll->SetMinimum(0);
@@ -167,22 +168,24 @@ namespace Belle2 {
     m_badHitsPerEventAll->GetXaxis()->SetTitle("hits / event");
     m_badHitsPerEventAll->GetYaxis()->SetTitle("Events");
 
+    int MaxRawTime(800);
+    int BinNumRT(400);
     m_goodTDCAll = new TH1F("goodTDCAll", "Raw time distribution of good hits",
-                            2000, 0, 2000);
+                            BinNumRT, 0, MaxRawTime);
     m_goodTDCAll->SetXTitle("raw time [samples]");
     m_goodTDCAll->SetYTitle("hits / sample");
     m_goodTDCAll->SetOption("LIVE");
     m_goodTDCAll->SetMinimum(0);
 
     m_badTDCAll = new TH1F("badTDCAll", "Raw time distribution of bad hits",
-                           2000, 0, 2000);
+                           BinNumRT, 0, MaxRawTime);
     m_badTDCAll->SetXTitle("raw time [samples]");
     m_badTDCAll->SetYTitle("hits / sample");
     m_badTDCAll->SetOption("LIVE");
     m_badTDCAll->SetMinimum(0);
 
     m_goodHitsPerEventProf = new TProfile("goodHitsPerEventProf", "Good hits per event vs. slot number",
-                                          16, 0.5, 16.5, 0, 1000);
+                                          16, 0.5, 16.5, 0, MaxEvents);
     m_goodHitsPerEventProf->SetXTitle("slot number");
     m_goodHitsPerEventProf->SetYTitle("hits per event");
     m_goodHitsPerEventProf->SetOption("LIVE");
@@ -190,7 +193,7 @@ namespace Belle2 {
     m_goodHitsPerEventProf->SetMinimum(0);
 
     m_badHitsPerEventProf = new TProfile("badHitsPerEventProf", "Bad hits per event vs. slot number",
-                                         16, 0.5, 16.5, 0, 1000);
+                                         16, 0.5, 16.5, 0, MaxEvents);
     m_badHitsPerEventProf->SetXTitle("slot number");
     m_badHitsPerEventProf->SetYTitle("hits per event");
     m_badHitsPerEventProf->SetOption("LIVE");
@@ -261,8 +264,7 @@ namespace Belle2 {
 
       name = str(format("good_TDC_%1%") % (module));
       title = str(format("Raw time distribution of good hits for slot #%1%") % (module));
-      int numTDCbins = 2000;
-      h1 = new TH1F(name.c_str(), title.c_str(), numTDCbins, 0, numTDCbins);
+      h1 = new TH1F(name.c_str(), title.c_str(), BinNumRT, 0, MaxRawTime);
       h1->SetOption("LIVE");
       h1->GetXaxis()->SetTitle("raw time [samples]");
       h1->GetYaxis()->SetTitle("hits per sample");
@@ -271,7 +273,7 @@ namespace Belle2 {
 
       name = str(format("bad_TDC_%1%") % (module));
       title = str(format("Raw time distribution of bad hits for slot #%1%") % (module));
-      h1 = new TH1F(name.c_str(), title.c_str(), numTDCbins, 0, numTDCbins);
+      h1 = new TH1F(name.c_str(), title.c_str(), BinNumRT, 0, MaxRawTime);
       h1->SetOption("LIVE");
       h1->GetXaxis()->SetTitle("raw time [samples]");
       h1->GetYaxis()->SetTitle("hits per sample");
@@ -308,7 +310,7 @@ namespace Belle2 {
 
       name = str(format("good_hits_per_event%1%") % (module));
       title = str(format("Number of good hits per event for slot #%1%") % (module));
-      h1 = new TH1F(name.c_str(), title.c_str(), 250, 0, 250);
+      h1 = new TH1F(name.c_str(), title.c_str(), MaxEvents, 0, MaxEvents);
       h1->SetOption("LIVE");
       h1->GetXaxis()->SetTitle("hits / event");
       h1->SetMinimum(0);
@@ -316,7 +318,7 @@ namespace Belle2 {
 
       name = str(format("bad_hits_per_event%1%") % (module));
       title = str(format("Number of bad hits per event for slot #%1%") % (module));
-      h1 = new TH1F(name.c_str(), title.c_str(), 250, 0, 250);
+      h1 = new TH1F(name.c_str(), title.c_str(), MaxEvents, 0, MaxEvents);
       h1->SetOption("LIVE");
       h1->GetXaxis()->SetTitle("hits / event");
       h1->SetMinimum(0);

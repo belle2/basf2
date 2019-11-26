@@ -12,16 +12,13 @@
 # author: M. Staric
 # ---------------------------------------------------------------------------------------
 
-import basf2
 import sys
 import os
 import glob
 from caf import backends
-from caf.framework import Calibration, CAF
-from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
-from ROOT import Belle2
-from ROOT.Belle2 import TOP
+from caf.framework import CAF
 from basf2 import B2ERROR
+from top_calibration import commonT0_calibration_BF, commonT0_calibration_LL
 
 # ----- those parameters need to be adjusted before running -----------------------------
 #
@@ -77,98 +74,22 @@ if len(inputFiles) == 0:
             ' (skim_dir=' + skim_dir + ')')
     sys.exit()
 
-# Output folder
+# Output folder name
 run_range = 'r' + '{:0=5d}'.format(run_first) + '-' + '{:0=5d}'.format(run_last)
 output_dir = f"{main_output_dir}/commonT0-{sample}-{method}-{expNo}-{run_range}"
 
-# Temporary fix for BII-5431
-if not os.path.isdir(main_output_dir):
-    os.makedirs(main_output_dir)
-    print('New folder created: ' + main_output_dir)
-
-# Suppress messages during processing
-# basf2.set_log_level(basf2.LogLevel.WARNING)
-
-
-def commonT0_calibration_BF():
-    ''' common T0 calibration with method BF '''
-
-    # Create path
-    main = basf2.create_path()
-
-    # Basic modules
-    main.add_module('RootInput')
-    main.add_module('TOPGeometryParInitializer')
-    main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
-    main.add_module('TOPChannelMasker')
-    main.add_module('TOPBunchFinder', usePIDLikelihoods=True, subtractRunningOffset=False)
-
-    # Collector module
-    collector = basf2.register_module('TOPCommonT0BFCollector')
-
-    # Algorithm
-    algorithm = TOP.TOPCommonT0BFAlgorithm()
-
-    # Define calibration
-    cal = Calibration(name='TOP_commonT0Calibration', collector=collector,
-                      algorithms=algorithm, input_files=inputFiles)
-    for globalTag in reversed(globalTags):
-        cal.use_central_database(globalTag)
-    for localDB in reversed(localDBs):
-        cal.use_local_database(localDB)
-    cal.pre_collector_path = main
-    cal.max_files_per_collector_job = 1
-    cal.strategies = SequentialRunByRun
-
-    return cal
-
-
-def commonT0_calibration_LL():
-    ''' common T0 calibration with method LL '''
-
-    # Create path
-    main = basf2.create_path()
-
-    # Basic modules
-    main.add_module('RootInput')
-    main.add_module('TOPGeometryParInitializer')
-    main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
-    main.add_module('TOPChannelMasker')
-    main.add_module('TOPBunchFinder', usePIDLikelihoods=True, subtractRunningOffset=False)
-
-    # Collector module
-    collector = basf2.register_module('TOPCommonT0LLCollector')
-    collector.param('sample', sample)
-
-    # Algorithm
-    algorithm = TOP.TOPCommonT0LLAlgorithm()
-
-    # Define calibration
-    cal = Calibration(name='TOP_commonT0Calibration', collector=collector,
-                      algorithms=algorithm, input_files=inputFiles)
-    for globalTag in reversed(globalTags):
-        cal.use_central_database(globalTag)
-    for localDB in reversed(localDBs):
-        cal.use_local_database(localDB)
-    cal.pre_collector_path = main
-    cal.max_files_per_collector_job = 1
-    cal.strategies = SequentialRunByRun
-
-    return cal
-
-
-# Add calibration to CAF
-cal_fw = CAF()
-
+# Define calibration
 if method == 'BF':
-    cal = commonT0_calibration_BF()
+    cal = commonT0_calibration_BF(inputFiles, globalTags, localDBs)
 elif method == 'LL':
-    cal = commonT0_calibration_LL()
+    cal = commonT0_calibration_LL(inputFiles, sample, globalTags, localDBs)
 else:
     B2ERROR('Invalid method name: ' + method)
     sys.exit()
+cal.backend_args = {"queue": "s"}
 
-cal.backend_args = {"queue": "l"}
+# Add calibration to CAF
+cal_fw = CAF()
 cal_fw.add_calibration(cal)
 cal_fw.output_dir = output_dir
 cal_fw.backend = backends.LSF()

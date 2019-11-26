@@ -56,19 +56,6 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   TH1F* par1V = new TH1F("par1V", " ", 100, -10, 10);
   TH1F* par2V = new TH1F("par2V", " ", 150, -0.5, 1);
   TH1F* par3V = new TH1F("par3V", " ", 100, -0.02, 0.01);
-  /*
-  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
-
-  cout << "STARTING GEOMETRY CICLE" << endl;
-
-  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
-    layer_num =  layer.getLayerNumber();
-    cout << layer_num << endl;
-    for (auto ladder : geoCache.getLadders(layer)) {
-      ladder_num = ladder.getLadderNumber();
-      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
-        sensor_num = sensor.getSensorNumber();
-        for (int view = SVDHistograms<TH2F>::VIndex ; view < SVDHistograms<TH2F>::UIndex + 1; view++) {*/
 
   TFile* f = new TFile("algorithm_output.root", "RECREATE");
   for (int layer = 0; layer < 4; layer++) {

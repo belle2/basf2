@@ -27,13 +27,12 @@ SVDCoGTimeCalibrationCollectorModule::SVDCoGTimeCalibrationCollectorModule() : C
 {
   //Set module properties
 
-  setDescription(" ");
+  setDescription("Collector used for the calibration of the SVD timing estimator (CoG)");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("SVDClustersFromTracksName", m_svdClusters, "Name of the SVDClusters list", std::string("SVDClustersFromTracks"));
   addParam("SVDRecoDigitsFromTracksName", m_svdRecoDigits, "Name of the SVDRecoDigits list", std::string("SVDRecoDigitsFromTracks"));
   addParam("EventT0Name", m_eventTime, "Name of the EventT0 list", std::string("EventT0"));
-  addParam("HistogramTree", m_tree, "Name of the tree in which the histograms are saved", std::string("tree"));
 }
 
 void SVDCoGTimeCalibrationCollectorModule::prepare()
@@ -98,14 +97,6 @@ void SVDCoGTimeCalibrationCollectorModule::startRun()
   }
 }
 
-
-void SVDCoGTimeCalibrationCollectorModule::closeRun()
-{
-}
-
-void SVDCoGTimeCalibrationCollectorModule::finish()
-{
-}
 
 void SVDCoGTimeCalibrationCollectorModule::collect()
 {

@@ -31,8 +31,10 @@ namespace Belle2 {
     /// Destructor
     virtual ~SVDCoGTimeCalibrationAlgorithm() {}
 
+    /// Set the minimum entries required in the histograms
     void setMinEntries(int minEntries) {m_minEntries = minEntries;}
 
+    /// Get the minimum entries required in the histograms
     int getMinEntries() {return m_minEntries;}
 
   protected:
@@ -42,9 +44,8 @@ namespace Belle2 {
 
   private:
 
-    std::string m_id;
-    int m_ent = 0;
-    float m_minEntries = 10000;
+    std::string m_id; /*< Parameter given to set the UniqueID of the payload*/
+    float m_minEntries = 10000; /*< Set the minimun number of entries required in the histograms of layer 3*/
   };
 } // namespace Belle2
 

@@ -33,9 +33,9 @@ void EventT0DQMModule::defineHisto()
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir("EventT0DQMdir")->cd();
 
-  int nBins = 160 ;
-  double minT0 = -40 ;
-  double maxT0 =  40 ;
+  int nBins = 400 ;
+  double minT0 = -100 ;
+  double maxT0 =  100 ;
 
   h_eventT0_ECL_bhabha_L1_ECLTRG = new TH1F("h_eventT0_ECL_bhabha_L1_ECLTRG",
                                             "ECL event t0 - bhabhas - ECLTRG time;event t0 [ns];events / 0.5 ns",
@@ -64,6 +64,9 @@ void EventT0DQMModule::defineHisto()
   h_eventT0_TOP_mumu_L1_ECLTRG   = new TH1F("h_eventT0_TOP_mumu_L1_ECLTRG",
                                             "TOP event t0 - mu mu - ECLTRG time;event t0 [ns];events / 0.5 ns",
                                             nBins, minT0, maxT0);
+
+
+
 
 
   h_eventT0_ECL_bhabha_L1_CDCTRG = new TH1F("h_eventT0_ECL_bhabha_L1_CDCTRG",
@@ -302,6 +305,10 @@ void EventT0DQMModule::event()
       h_eventT0_TOP_mumu_L1_CDCTRG->Fill(event_t0_TOP);
     }
   }
+
+  B2DEBUG(20, "event_t0_ECL = " << event_t0_ECL << " ns") ;
+  B2DEBUG(20, "event_t0_CDC = " << event_t0_CDC << " ns") ;
+  B2DEBUG(20, "event_t0_TOP = " << event_t0_TOP << " ns") ;
 }
 
 

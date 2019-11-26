@@ -136,7 +136,6 @@ They both `skim.registry`
    :func: getArgumentParser
    :prog: runSkimsForStats.py
    :nodefault:
-   :noepilog:
    :nogroupsections:
 
 
@@ -148,6 +147,5 @@ They both `skim.registry`
    :func: getArgumentParser
    :prog: printSkimStats.py
    :nodefault:
-   :noepilog:
    :nogroupsections:
 

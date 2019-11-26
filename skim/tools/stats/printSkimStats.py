@@ -73,7 +73,7 @@ dataSamples = {
 samples = list(mcSamples.keys()) + list(dataSamples.keys())
 
 
-class SkimNotRunError(Exception):
+class SkimNotRunException(Exception):
     """An exception to be raised whenever an error occurs that is likely due to
     a skim not being run properly by ``runSkimsForStats.py``.
     """
@@ -91,8 +91,7 @@ def getArgumentParser():
 
     parser = argparse.ArgumentParser(description='A script to print tables of statistics for skims ' +
                                      'which have been run by runSkimsForStats.py. One or more standalone or combined ' +
-                                     'skim names must be provided.',
-                                     epilog='example: ./printSkimStats.py -s LeptonicUntagged -c BtoCharm')
+                                     'skim names must be provided.')
     parser.add_argument('-s', '--standalone', nargs='+', default=[],
                         choices=['all']+allStandaloneSkims, metavar='SKIM',
                         help='List of standalone skims to run. Valid options are: ' +
@@ -287,7 +286,7 @@ def getJobOutput(skim, sample):
             of a skim script.
 
     Raises:
-        SkimNotRunError: Raised if any of the log or JSON files cannot be opened.
+        SkimNotRunException: Raised if any of the log or JSON files cannot be opened.
     """
     try:
         logFileName = Path('log', f'{skim}_{sample}.out')
@@ -298,8 +297,8 @@ def getJobOutput(skim, sample):
         with open(jsonFileName) as jsonFile:
             jsonFileContents = json.load(jsonFile)
     except FileNotFoundError:
-        raise SkimNotRunError(f'    Failed to open output files for {skim} skim on {sample} sample.\n' +
-                              '    Perhaps you forgot to run the skim with runSkimsForStats.py?')
+        raise SkimNotRunException(f'    Failed to open output files for {skim} skim on {sample} sample.\n' +
+                                  '    Perhaps you forgot to run the skim with runSkimsForStats.py?')
 
     return logFileContents, jsonFileContents
 
@@ -316,7 +315,7 @@ def testLogContents(logFileContents, jsonFileContents, skim, sample):
         sample (str): The label of the sample being tested.
 
     Raises:
-        SkimNotRunError: Raised if the log file indicates the job did not finish
+        SkimNotRunException: Raised if the log file indicates the job did not finish
             successfully, or the JSON file indicates the output files were not
             written correctly.
     """
@@ -329,8 +328,8 @@ def testLogContents(logFileContents, jsonFileContents, skim, sample):
                  ]
 
     if not all(logTests) and all(jsonTests):
-        raise SkimNotRunError(f'    Error found in log files of {skim} skim on {sample} sample.\n' +
-                              '    Please check the .out, .err, and .json files in log/ directory.')
+        raise SkimNotRunException(f'    Error found in log files of {skim} skim on {sample} sample.\n' +
+                                  '    Please check the .out, .err, and .json files in log/ directory.')
 
 
 def getSkimsToRun(parser, standaloneList, combinedList):
@@ -358,7 +357,7 @@ def getSkimsToRun(parser, standaloneList, combinedList):
 
 def getSkimStatsDict(skims, samples, statSpecifier):
     """
-    If ``SkimNotRunError`` is raised, this is caught and the dict entries for
+    If ``SkimNotRunException`` is raised, this is caught and the dict entries for
     the skim are removed. An error messsage is printed, and execution continues.
 
     Args:
@@ -387,7 +386,7 @@ def getSkimStatsDict(skims, samples, statSpecifier):
                         allSkimStats[skim][statName][sample] = statFunction(jsonFileContents, logFileContents, sample)
                     except TypeError:
                         allSkimStats[skim][statName][sample] = None
-        except SkimNotRunError as e:
+        except SkimNotRunException as e:
             del allSkimStats[skim]
 
             print(f'Error! Could not get stats for {skim}. Details:', file=sys.stderr)

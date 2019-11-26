@@ -89,6 +89,10 @@ namespace Belle2 {
     m_numModules = geo->getNumModules();
     double bunchTimeSep = geo->getNominalTDC().getSyncTimeBase() / 24;
 
+    m_BoolEvtMonitor = new TH1F("BoolEvtMonitor", "Event desynchronization monitoring",
+                                2, -0.5, 1.5);
+    m_BoolEvtMonitor->GetXaxis()->SetTitle("good/bad event entries");
+
     m_recoTime = new TH1F("recoTime", "reco: time distribution",
                           500, 0, 50);
     m_recoTime->GetXaxis()->SetTitle("time [ns]");
@@ -364,6 +368,8 @@ namespace Belle2 {
 
   void TOPDQMModule::beginRun()
   {
+    m_BoolEvtMonitor->Reset();
+
     m_recoTimeDiff->Reset();
     m_recoTimeDiff_Phic->Reset();
     m_recoPull->Reset();
@@ -423,6 +429,14 @@ namespace Belle2 {
     std::vector<int> n_good_first(16, 0);
     std::vector<int> n_good_second(16, 0);
     std::vector<int> n_good_pixel_hits(16 * 512, 0);
+
+    int Ndigits = m_digits.getEntries();
+    if (Ndigits > 0) {
+      for (const auto& digit : m_digits) {
+        int x = digit.getFirstWindow() != m_digits[0]->getFirstWindow() ? 1 : 0 ;
+        m_BoolEvtMonitor->Fill(x);
+      }
+    }
 
     for (const auto& digit : m_digits) {
       int i = digit.getModuleID() - 1;

@@ -224,6 +224,8 @@ void DQMHistAnalysisTOPModule::event()
   TCanvas* c3 = find_canvas("TOP/c_BoolEvtMonitor");
   if (c3 != NULL) {
     c3->cd();
+    if (badRatio > 0.0001) c3->Pad()->SetFillColor(kRed);
+    else c3->Pad()->SetFillColor(kWhite);
     m_text2->Draw();
   }
 

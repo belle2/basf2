@@ -84,7 +84,7 @@ void DQMHistAnalysisTOPModule::initialize()
   m_text1->SetFillColorAlpha(kWhite, 0);
   m_text1->SetBorderSize(0);
 
-  m_text2 = new TPaveText(0.5, 0.70, 0.85, 0.9, "NB");
+  m_text2 = new TPaveText(0.2, 0.70, 0.50, 0.9, "NB");
   m_text2->SetFillColorAlpha(kWhite, 0);
   m_text2->SetBorderSize(0);
 }
@@ -219,7 +219,7 @@ void DQMHistAnalysisTOPModule::event()
   if (totalEvts > 0) badRatio = totalBadEvts * 1.0 / totalEvts;
 
   m_text2->Clear();
-  m_text2->AddText(Form("Ratio of bad events: %.2f %%", badRatio * 100.0));
+  m_text2->AddText(Form("fraction of deviating hits: %.4f %%", badRatio * 100.0));
 
   TCanvas* c3 = find_canvas("TOP/c_BoolEvtMonitor");
   if (c3 != NULL) {

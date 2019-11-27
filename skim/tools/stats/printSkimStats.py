@@ -419,7 +419,7 @@ def getSkimStatsDict(skims, samples, statSpecifier):
     return allSkimStats
 
 
-def mcWeightedAverage(statsPerSample):
+def mcWeightedAverage(statsPerSample, mcCampaign):
     """
 
     Args:
@@ -529,7 +529,7 @@ def printToScreen(allSkimStats, statSpecifier, mcOnly, dataOnly):
         print(table)
 
 
-def printToConfluence(allSkimStats, statSpecifier):
+def printToConfluence(allSkimStats, statSpecifier, samples):
     """
 
     Args:
@@ -544,10 +544,15 @@ def printToConfluence(allSkimStats, statSpecifier):
 
     confluenceStrings = ['h1. How each statistic is calculated']
     for stat in selectedStats:
-        confluenceStrings.append(' - ' + statSpecifier[stat]['LongName'] + ': ' + statSpecifier[stat]['CalculationDescription'])
+        confluenceStrings.append(f' - {statSpecifier[stat]["LongName"]}: {statSpecifier[stat]["CalculationDescription"]}')
 
+    confluenceStrings += ['', 'h1. List of test files for each sample']
+    for sample in samples:
+        confluenceStrings += [' - ' + f'{sample}: {{{{{get_test_file(sample)}}}}}']
+
+    confluenceStrings += ['', 'h1. Performance statistics per skim']
     for skimName, skimStats in allSkimStats.items():
-        confluenceStrings += ['', f'h1. Performance statistics for {skimName} skim']
+        confluenceStrings += ['', f'h2. Performance statistics for {skimName} skim']
 
         df = pd.DataFrame(skimStats, columns=selectedStats)
 
@@ -767,4 +772,4 @@ if __name__ == '__main__':
 
     printToScreen(allSkimStats, statSpecifier, args.mconly, args.dataonly)
     printToJson(allSkimStats, statSpecifier)
-    printToConfluence(allSkimStats, statSpecifier)
+    printToConfluence(allSkimStats, statSpecifier, samples)

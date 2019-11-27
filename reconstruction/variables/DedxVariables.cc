@@ -23,7 +23,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
-
+#include <reconstruction/dataobjects/VXDDedxTrack.h>
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
@@ -51,6 +51,20 @@ namespace Belle2 {
 
     return dedxTrack;
   }
+  VXDDedxTrack const* getSVDDedxFromParticle(Particle const* particle)
+  {
+    const Track* track = particle->getTrack();
+    if (!track) {
+      return nullptr;
+    }
+
+    const VXDDedxTrack* dedxTrack = track->getRelatedTo<VXDDedxTrack>();
+    if (!dedxTrack) {
+      return nullptr;
+    }
+    return dedxTrack;
+  }
+
 
   namespace Variable {
 
@@ -145,6 +159,54 @@ namespace Belle2 {
       }
     }
 
+    double SVD_p(const Particle* part)
+    {
+      const VXDDedxTrack* dedxTrack = getSVDDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getMomentum();
+      }
+    }
+    double SVD_pTrue(const Particle* part)
+    {
+      const VXDDedxTrack* dedxTrack = getSVDDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getTrueMomentum();
+      }
+    }
+
+    double SVD_dedx(const Particle* part)
+    {
+      const VXDDedxTrack* dedxTrack = getSVDDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getDedx(Const::EDetector::SVD);
+      }
+    }
+
+    double SVD_CosTheta(const Particle* part)
+    {
+      const VXDDedxTrack* dedxTrack = getSVDDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getCosTheta();
+      }
+    }
+    double SVD_nHits(const Particle* part)
+    {
+      const VXDDedxTrack* dedxTrack = getSVDDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->size();
+      }
+    }
+
 
     VARIABLE_GROUP("Dedx");
     REGISTER_VARIABLE("dedx", dedx, "dE/dx truncated mean");
@@ -156,5 +218,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("CDCdEdx_chiK", CDCdEdx_chiK, "Chi value of kaons from CDC dEdx");
     REGISTER_VARIABLE("CDCdEdx_chiP", CDCdEdx_chiP, "Chi value of protons from CDC dEdx");
     REGISTER_VARIABLE("CDCdEdx_chiD", CDCdEdx_chiD, "Chi value of duetrons from CDC dEdx");
+    REGISTER_VARIABLE("SVD_p", SVD_p, "momentum valid in the SVD");
+    REGISTER_VARIABLE("SVD_pTrue", SVD_pTrue, "true MC momentum valid in the SVD");
+    REGISTER_VARIABLE("SVD_dedx", SVD_dedx, "SVD dE/dx truncated mean");
+    REGISTER_VARIABLE("SVD_CosTheta", SVD_CosTheta, "cos(theta) of the track valid in the SVD");
+    REGISTER_VARIABLE("SVD_nHits", SVD_nHits, "number of hits of the track valid in the SVD");
+
   }
 }

@@ -36,7 +36,7 @@ def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration
         local_dbs = []
     if run_type is None:
         run_type = 'all'
-    if type(run_type) is not str or run_type.lower() not in run_types:
+    if not isinstance(run_type, str) or run_type.lower() not in run_types:
         raise ValueError("run_type not found in run_types : {}".format(run_type))
 
     # Create BASF2 path
@@ -90,7 +90,7 @@ def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration
 
     # Run type dependent configurations
 
-    if run_type == 'cosmic':
-        cal.strategies = SimpleRunByRun
+    # if run_type == 'cosmic':
+    # cal.strategies = SimpleRunByRun
 
     return cal

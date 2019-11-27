@@ -54,7 +54,7 @@ Enddecay
 CDecay D*- 
 
 Decay D0sig
-1.0000      K_S0  pi+   pi-       PHOTOS    PHSP;
+1.0000     KS0sig   pi+   pi-       PHOTOS    PHSP;
 Enddecay
 CDecay anti-D0sig 
 

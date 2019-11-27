@@ -6,6 +6,7 @@
 # Copyright(C) 2018 Belle II Collaboration
 #
 # Author: The Belle II Collaboration
+# Contributors: Ewan Hill
 # Contributors: Mikhail Remnev
 #
 # This software is provided "as is" without any warranty.
@@ -44,9 +45,16 @@ env = Belle2.Environment.Instance()
 # NOTE: It is going to be sorted (alphabetic and length sorting, files with
 #       shortest names are first)
 INPUT_LIST = []
-# = Adding data for exp3 run 529 as an example.
 # = Processed data
-INPUT_LIST += glob.glob("/hsm/belle2/bdata/Data/release-01-02-09/DB00000410/prod00000004/e0003/4S/r00529/all/dst/sub00/*.root")
+INPUT_LIST += glob.glob("oneTestFile/*.root")
+# INPUT_LIST += glob.glob("threeTestFiles/*.root")
+# INPUT_LIST += glob.glob("specificIndividualRuns/run_784/*.root")
+# INPUT_LIST += glob.glob("specificIndividualRuns/run_2727/*.root")
+# INPUT_LIST += glob.glob("testingProd7/cdst.*.root")
+# INPUT_LIST +=
+# glob.glob("testFiles/*.root")
+# # EWAN multiple files
+
 # = Raw data
 # INPUT_LIST += glob.glob("/ghi/fs01/belle2/bdata/Data/Raw/e0003/r00529/sub00/*.root")
 
@@ -72,23 +80,14 @@ if len(output_arg) > 0:
 # == Collector parameters
 ###################################################################
 
-# Low energy cut (GeV)
-MIN_EN = 0.04
-# High energy cut (GeV)
-MAX_EN = 10.0
-# High energy cut for max total energy in event (GeV)
-MAX_TOTAL_EN = 15.0
+
 # Events with abs(time_ECL-time_CDC) > TIME_ABS_MAX are excluded
 TIME_ABS_MAX = 250
-# Events with ECLDigits.getEntries() > NENTRIES_MAX are excluded
-# (currently unused -- set to arbitrarily high value)
-NENTRIES_MAX = 9999
 
 # If true, output file will contain TTree "tree" with detailed
 # event information.
+# SAVE_TREE = True
 SAVE_TREE = False
-# If true, fill histogram with weight min(energy**2, 1 GeV)
-WEIGHTED_HIST = True
 
 # First ECL CellId to calibrate
 MIN_CRYSTAL = 1
@@ -129,26 +128,76 @@ if add_unpackers:
 else:
     main.add_module('Geometry', useDB=True, components=components)
 
+
 # == Generate time calibration matrix from ECLDigit
-main.add_module('ECLBhabhaTCollector', minEn=MIN_EN,
-                maxEn=MAX_EN, maxTotalEn=MAX_TOTAL_EN, timeAbsMax=TIME_ABS_MAX,
-                minCrystal=MIN_CRYSTAL, maxCrystal=MAX_CRYSTAL,
-                nentriesMax=NENTRIES_MAX, saveTree=SAVE_TREE,
-                weightedHist=WEIGHTED_HIST)
+ECLBhabhaTCollectorInfo = main.add_module('ECLBhabhaTCollector', timeAbsMax=TIME_ABS_MAX,
+                                          minCrystal=MIN_CRYSTAL, maxCrystal=MAX_CRYSTAL,
+                                          saveTree=SAVE_TREE)
+
+# ECLBhabhaTCollectorInfo.set_log_level(LogLevel.DEBUG)
+ECLBhabhaTCollectorInfo.set_log_level(LogLevel.INFO)
+ECLBhabhaTCollectorInfo.set_debug_level(36)
+
 
 # == Show progress
 main.add_module('Progress')
 
+# set_log_level(LogLevel.DEBUG)
 set_log_level(LogLevel.INFO)
+set_debug_level(100)
 
 # == Configure database
 reset_database()
 use_database_chain()
-use_central_database("development")
+# Required for reading the offline calibration development
+# version of the database, which contains updates to the
+# ECLCrystalElectronicsTime
+# use_central_database("Calibration_Offline_Development")
+# use_central_database("data_reprocessing_prompt_bucket6_alignment")
+# use_central_database("staging_data_reprocessing")   # this did not work !
+
+
+# These two below work together(?) for exp7 but failed for exp3
+# use_central_database("data_reprocessing_prompt_bucket6")
+# use_central_database("data_reprocessing_proc9_cdst_production")
+
+
+# 3 GT required for proc9 as stated by Umberto on the jira ticket
+# use_central_database("data_reprocessing_proc8")  #Fallback for exp  0 -> 3
+# use_central_database("data_reprocessing_prompt_bucket6")  #Fallback for exp  5 -> 8
+# use_central_database("data_reprocessing_proc9_cdst_production")  #New calibrations
+# use_central_database("ECL_time_calibrations_proc9")  #validation
+# use_central_database("data_reprocessing_proc9")  #New calibrations
+
+# use_central_database("data_reprocessing_prompt_bucket7_calcdstprod")  # required for calibrating bucket 7
+
+
+# use_central_database("data_reprocessing_prompt_bucket7")  # bucket 7 GT used to make valiation cdst files for bucket 7
+
+
+# 2 GT required for making proc 10
+use_central_database("data_reprocessing_proc10")
+use_central_database("data_reprocessing_prompt_rel4_patchb")
+
+
+# use_central_database("data_reprocessing_prod6")   # Use this to keep a stable tag: from Chris
+#   Also see https://confluence.desy.de/x/6ThYBQ
+# CHECK database with:
+#      b2conditionsdb iov Calibration_Offline_Development  -f '^ECLCrateTimeOffset' -r
+# and
+#      b2conditionsdb iov Calibration_Offline_Development  -f '^ECLCrystalTimeOffset' -r
+
+
+# CAREFUL ABOUT USING LOCAL DATABASE OF PREVIOUS CRYSTAL TIME CORRECTIONS WHEN CALCULATING
+#    CRATE TIME CORRECTIONS VS CENTRAL DB VALUES.  CRYSTAL TIME CORRECTIONS SHOULD
+#    USE THE LOCAL DB CRATE TIME CORRECTIONS.
 use_local_database("localdb/database.txt")
 
+
 # == Process events
-# set_nprocesses(8) # Run in multiple threads.
-process(main)
+# process(main, max_event=350000)  # reasonable stats for one crate
+# process(main, max_event=600000) # reasonable stats for crystal calibs for proc10
+process(main, max_event=3000)
+# process(main)
 
 print(statistics)

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-
+A script to print tables of statistics for skims which have been run by
+``submitTestSkims.py``.
 """
 
 
@@ -24,10 +25,23 @@ from tabulate import tabulate
 # Importing ROOT in skimExpertFunctions has the side-effect of hijacking argument parsing
 PyConfig.IgnoreCommandLineOptions = True
 from skim.registry import skim_registry, combined_skims
-from skimExpertFunctions import get_test_file, get_eventN, get_total_infiles, get_events_per_file
+from skimExpertFunctions import get_test_file, get_total_infiles, get_events_per_file
 
 
 def getAllSamples(mcCampaign):
+    """Get dicts of all MC and data samples to potentially test on.
+
+    Args:
+        mcCampaign (str): A label like ``MC12`` for the MC campaign to test on.
+
+    Returns:
+        mcSampleLabels (dict): A dict in which the keys are internal MC sample
+            labels (as used by `skimExpertFunctions.get_test_file`), and the
+            values are more readable labels to be used in printed tables.
+        dataSampleLabels (dict): A dict in which the keys are internal data
+            sample labels (as used by `skimExpertFunctions.get_test_file`), and
+            the values are more readable labels to be used in printed tables.
+    """
     mcSampleLabels = {
         f'{mcCampaign}_mixedBGx1': f'{mcCampaign}: mixed BGx1',
         f'{mcCampaign}_chargedBGx1': f'{mcCampaign}: charged BGx1',
@@ -56,35 +70,36 @@ def getAllSamples(mcCampaign):
 
 
 class SkimNotRunException(Exception):
-    """An exception to be raised whenever an error occurs that is likely due to
-    a skim not being run properly by ``submitTestSkims.py``.
+    """A more specific exception to be raised whenever an error occurs that is
+    likely due to a skim not being run properly by ``submitTestSkims.py``.
     """
     pass
 
 
 class CustomHelpFormatter(argparse.HelpFormatter):
-    """Custom formatter for argparse, to print the valid choices for an argument
-    in the help string.
+    """Custom formatter for argparse which prints the valid choices for an
+    argument in the help string.
     """
     def _get_help_string(self, action):
         if action.choices:
-            return action.help + ' Valid options are: ' + ', '.join(action.choices)
+            return action.help + ' Valid options are: ' + ', '.join(action.choices) + '.'
         else:
             return action.help
 
 
 def getArgumentParser():
-    """
+    """Construct the argument parser.
 
     Returns:
-        parser (argparse.ArgumentParser):
+        parser (argparse.ArgumentParser): An argument parser which obtains its
+            list of valid skim names from `skim.registry`.
     """
     allStandaloneSkims = [skim for _, skim in skim_registry]
     allCombinedSkims = list(combined_skims.keys())
 
-    parser = argparse.ArgumentParser(description='A script to print tables of statistics for skims ' +
-                                     'which have been run by ``submitTestSkims.py``. One or more standalone or combined ' +
-                                     'skim names must be provided.',
+    parser = argparse.ArgumentParser(description='Reads the output files of test skim jobs from ' +
+                                     '``submitTestSkims.py`` and prints tables of performance statistics.' +
+                                     'One or more standalone or combined skim names must be provided.',
                                      formatter_class=CustomHelpFormatter)
     parser.add_argument('-s', '--standalone', nargs='+', default=[],
                         choices=['all']+allStandaloneSkims, metavar='SKIM',
@@ -114,7 +129,7 @@ def getStatFromLog(statisticName, logFileContents):
             of a skim script.
 
     Returns:
-        statFromLog (float):
+        statFromLog (float): The value of the statistic matched in the log file.
     """
     floatRegexp = r'\s*:\s+(\d+(\.(\d+)?)?)'
     statFromLog = re.findall(f'{statisticName}{floatRegexp}', logFileContents)[0][0]
@@ -123,7 +138,8 @@ def getStatFromLog(statisticName, logFileContents):
 
 
 def nInputEvents(jsonFileContents):
-    """
+    """Read the number of input MDST events from the JSON output file from
+    ``--job-information``.
 
     Args:
         jsonFileContents (dict): A dict read from the JobInformation JSON output
@@ -136,7 +152,9 @@ def nInputEvents(jsonFileContents):
 
 
 def nSkimmedEvents(jsonFileContents):
-    """
+    """Read the number of output uDST events from the JSON output file from
+    ``--job-information``. If more than one output file is present, average over
+    the output files.
 
     Args:
         jsonFileContents (dict): A dict read from the JobInformation JSON output
@@ -152,7 +170,9 @@ def nSkimmedEvents(jsonFileContents):
 
 
 def udstSize(jsonFileContents):
-    """Return the size of the output uDST file in KB, read from Job Information JSON file.
+    """Read the size of the of output uDST file from the JSON output file from
+    ``--job-information``. If more than one output file is present, average over
+    the output files.
 
     Args:
         jsonFileContents (dict): A dict read from the JobInformation JSON output
@@ -168,40 +188,46 @@ def udstSize(jsonFileContents):
 
 
 def logSize(logFileContents):
-    """Return the size of the log file in kB.
+    """Calculate the size of the log file directly from the length of a string
+    containing the log.
 
     Args:
         logFileContents (str): A string containing the contents of the log file
             of a skim script.
 
     Returns:
-        logSize (float):
+        logSize (float): The size of the log file in kB.
     """
     return len(logFileContents) / 1024
 
 
 def cpuTime(logFileContents):
-    """
+    """Read the CPU time of the test from the "Resource usage summary" section
+    of the log file.
 
     Args:
         logFileContents (str): A string containing the contents of the log file
             of a skim script.
 
     Returns:
-        cpuTime (float):
+        cpuTime (float): The CPU time of the test job in seconds.
     """
     return getStatFromLog('CPU time', logFileContents)
 
 
 def averageCandidateMultiplicity(logFileContents):
-    """
+    """Read the average multiplicity of passed events by parsing the "Average
+    Candidate Multiplicity" blocks of the log file. If there is more than output
+    one particle list, then the multiplicity is averaged over the particle
+    lists.
 
     Args:
         logFileContents (str): A string containing the contents of the log file
             of a skim script.
 
     Returns:
-        averageCandidateMultiplicity (float):
+        averageCandidateMultiplicity (float): The candidate multiplicity of
+            passed events, averaged over the particle lists.
     """
     # Find all the blocks with the header "Average Candidate Multiplicity", and
     # join them into a single string.
@@ -220,78 +246,59 @@ def averageCandidateMultiplicity(logFileContents):
 
 
 def memoryAverage(logFileContents):
-    """
+    """Read the average memory usage of the test from the "Resource usage
+    summary" section of the log file.
 
     Args:
         logFileContents (str): A string containing the contents of the log file
             of a skim script.
 
     Returns:
-       memoryAverage (float):
+       memoryAverage (float): Average memory usage of the test in MB.
     """
     return getStatFromLog('Average Memory', logFileContents)
 
 
 def memoryMaximum(logFileContents):
-    """
+    """Read the maximum memory usage of the test from the "Resource usage
+    summary" section of the log file.
 
     Args:
         logFileContents (str): A string containing the contents of the log file
             of a skim script.
 
     Returns:
-        memoryMaximum (float):
+        memoryMaximum (float): Maximum memory usage of the test in MB.
     """
     return getStatFromLog('Max Memory', logFileContents)
 
 
 @lru_cache()
-def nEventsPerFile(sample):
-    """
-
-    Args:
-        sample (str): The label of the sample being tested.
-
-    Returns:
-        nEventsPerFile (int):
-    """
-    parentFile = get_test_file(sample)
-    return get_eventN(parentFile)
-
-
-def nTotalFiles(sample):
-    """
-
-    Args:
-        sample (str): The label of the sample being tested.
-
-    Returns:
-        nTotalFiles (int):
-    """
-    return get_total_infiles(sample)
-
-
 def nTotalEvents(sample):
-    """
+    """Get an estimate for the total number of events in the dataset of a given
+    sample type. This is used for the purposes of estimating the total storage
+    space required.
 
     Args:
         sample (str): The label of the sample being tested.
 
     Returns:
-        nTotalEvents (int):
+        nTotalEvents (int): The total number of events in the sample dataset.
     """
-    return nEventsPerFile(sample)*nTotalFiles(sample)
+    return get_events_per_file(sample)*get_total_infiles(sample)
 
 
 def getJobOutput(skim, sample):
-    """
+    """Read in the log file of a test job as a string, and the JSON output from
+    ``--job-information`` as a dict.
 
     Args:
         skim (str): The name of the skim being tested.
         sample (str): The label of the sample being tested.
 
     Returns:
-        logFileContents (str): The contents of the log file.
+        logFileContents (str): A string containing the contents of the log file
+            of a skim script.
         jsonFileContents (dict): A dict read from the JobInformation JSON output
             of a skim script.
 
@@ -314,7 +321,7 @@ def getJobOutput(skim, sample):
 
 
 def testLogContents(logFileContents, jsonFileContents, skim, sample):
-    """
+    """Check that the output files indicate that the skims ran successfully.
 
     Args:
         logFileContents (str):  A string containing the contents of the log file
@@ -346,11 +353,30 @@ def testLogContents(logFileContents, jsonFileContents, skim, sample):
 
 
 def getSkimsToRun(parser, standaloneList, combinedList):
-    """
+    """Get a list of of skims to be tested, dependent on the skim names present in
+    ``standaloneSkimList`` and ``combinedSkimList``.
+
+    If ``standaloneSkimList`` is a list of skim names, then those are included
+    in the list of skims to run. If ``standaloneSkimList`` is ``['all']``, then
+    all available standalone skims are run. ``combinedSkimList`` is handled
+    likewise.
+
+    Args:
+        parser (argparse.ArgumentParser): A parser with a help message to be
+            printed if no skim names are provided.
+        standaloneSkimList (list): A list of skim names, like that obtained from
+            the ``--standalone`` argument of the ``getArgumentParser`` argument
+            parser.
+        combinedSkimList (list): A list of skim names, like that obtained from
+            the ``--combined`` argument of the ``getArgumentParser`` argument
+            parser.
 
     Returns:
-        skimsToRun (list):
+        skims (list): A list of skim names to be tested.
     """
+    allStandaloneSkims = [skim for _, skim in skim_registry]
+    allCombinedSkims = list(combined_skims.keys())
+
     if not (standaloneList or combinedList):
         parser.print_help()
         sys.exit(1)
@@ -369,7 +395,21 @@ def getSkimsToRun(parser, standaloneList, combinedList):
 
 
 def getSamplesToRun(mcSamples, dataSamples, mcOnly=False, dataOnly=False):
-    """
+    """Get a list of samples to be tested, filtered by whether the ``mcOnly``
+    or ``dataOnly`` flags are provided.
+
+    Args:
+        mcSamples (list): A list of internal labels (as used by
+            `skimExpertFunctions.get_test_file`) for MC samples to potentially
+            test on.
+        dataSamples (list): A list of internal labels (as used by
+            `skimExpertFunctions.get_test_file`) for data samples to potentially
+            test on.
+        mcOnly (bool): Test only on MC samples.
+        dataOnly (bool): Test only on data samples.
+
+    Returns:
+        samples (list): A list of internal labels for samples to be tested on.
     """
     if mcOnly:
         return mcSamples
@@ -380,19 +420,23 @@ def getSamplesToRun(mcSamples, dataSamples, mcOnly=False, dataOnly=False):
 
 
 def getSkimStatsDict(skims, samples, statSpecifier):
-    """
+    """Fill a nested dict with skim performance statistics, using the skim and
+    sample names provided. The dict ``statSpecifier`` determines how each
+    statistic is to be calculated.
+
     If ``SkimNotRunException`` is raised, this is caught and the dict entries for
-    the skim are removed. An error messsage is printed, and execution continues.
+    the skim are removed. A warning message is printed, and execution continues.
 
     Args:
         skims (list): List of skims to run.
         samples (list): List of sample labels to test on.
         statSpecifier (dict): A nested dict specifying how each statistic should
-            be calculated and printed, as returned by `getStatSpecifier`.
+            be calculated and printed, as returned by ``getStatSpecifier``.
 
     Returns:
-        skimStatsDict (dict): A nested dict indexed as ``skim name::statistic
-            label::sample label``.
+        skimStatsDict (dict): A nested dict containing all requested skim
+            statistics. The indexing of this dict is
+            ``SKIM_NAME::STATISTIC_LABEL::SAMPLE_LABEL``.
     """
     allSkimStats = {skim: {stat: {} for stat in statSpecifier.keys()} for skim in skims}
 
@@ -420,13 +464,17 @@ def getSkimStatsDict(skims, samples, statSpecifier):
 
 
 def mcWeightedAverage(statsPerSample, mcCampaign):
-    """
+    """Give an average value of a statistic for MC, weighted by the
+    cross-sections of each process, and the fractions of the MC sample generated
+    with beam background x0 or x1.
 
     Args:
-        statsPerSample (dict):
+        statsPerSample (dict): A dict of values for a single skim and single
+            statistic, indexed by sample label.
+        mcCampaign (str): A label like ``MC12`` for the MC campaign to test on.
 
     Returns:
-        mcWeightedAverage (float):
+        mcWeightedAverage (float): A weighted average for the statistic.
     """
 
     # The fraction of each background level produced in the MC sample
@@ -458,14 +506,19 @@ def mcWeightedAverage(statsPerSample, mcCampaign):
 
 
 def addWeightedMC(allSkimStats, statSpecifier, mcCampaign):
-    """
+    """Add an entry to ``allSkimStats`` for statistic estimates of a combined MC
+    sample. The combining functions are taken from ``statSpecifier``, and may be
+    ``max``, ``sum``, or ``mcWeightedAverage``, as is appropriate for each
+    statistic.
 
     Args:
-        allSkimStats (dict):
-        statSpecifier (dict):
+        allSkimStats (dict): A nested dict of statistics, as returned by ``getSkimStatsDict``.
+        statSpecifier (dict): A nested dict specifying how each statistic should
+            be calculated and printed, as returned by ``getStatSpecifier``.
 
     Returns:
-        allSkimStatsWithWeightedMC (dict):
+        allSkimStatsWithWeightedMC (dict): A modified version of skim statistics
+            dict, with an extra entry for combined MC samples.
     """
     for skimStats in allSkimStats.values():
         for statName, statInfo in statSpecifier.items():
@@ -479,10 +532,13 @@ def addWeightedMC(allSkimStats, statSpecifier, mcCampaign):
 
 
 def printToJson(allSkimStats, statSpecifier):
-    """
+    """Write the nested dict of skim performance statistics to a JSON file. Also
+    prints a message after writing the file.
 
     Args:
-        allSkimStats (dict):
+        allSkimStats (dict): A nested dict of statistics, as returned by ``getSkimStatsDict``.
+        statSpecifier (dict): A nested dict specifying how each statistic should
+            be calculated and printed, as returned by ``getStatSpecifier``.
     """
     outputJsonName = 'skimStats.json'
     with open(outputJsonName, 'w') as outputJson:
@@ -490,11 +546,21 @@ def printToJson(allSkimStats, statSpecifier):
     print(f'\nWrote stats to JSON file {outputJsonName}.')
 
 
-def printToScreen(allSkimStats, statSpecifier, mcOnly, dataOnly):
-    """
+def printToScreen(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels, mcOnly, dataOnly):
+    """Format the skim performance statistics in an ASCII table, and print to the terminal for each skim.
 
     Args:
-        allSkimStats (dict):
+        allSkimStats (dict): A nested dict of statistics, as returned by ``getSkimStatsDict``.
+        statSpecifier (dict): A nested dict specifying how each statistic should
+            be calculated and printed, as returned by ``getStatSpecifier``.
+        mcSampleLabels (dict): A dict in which the keys are internal MC sample
+            labels (as used by `skimExpertFunctions.get_test_file`), and the
+            values are more readable labels to be used in printed tables.
+        dataSampleLabels (dict): A dict in which the keys are internal data
+            sample labels (as used by `skimExpertFunctions.get_test_file`), and
+            the values are more readable labels to be used in printed tables.
+        mcOnly (bool): Print only MC samples statistics.
+        dataOnly (bool): Print only data samples statistics.
     """
     selectedStats = [stat for (stat, statInfo) in statSpecifier.items() if statInfo['PrintToScreen']]
 
@@ -529,11 +595,23 @@ def printToScreen(allSkimStats, statSpecifier, mcOnly, dataOnly):
         print(table)
 
 
-def printToConfluence(allSkimStats, statSpecifier, samples):
-    """
+def printToConfluence(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels, samples):
+    """Format the skim performance statistics in Confluence wiki markdown, and
+    write to a file. The top of the output file includes an information on how
+    each statistic is calculated, and lists the test files for each sample. Also
+    prints a message about how to copy this table to a Confluence page.
 
     Args:
-        allSkimStats (dict):
+        allSkimStats (dict): A nested dict of statistics, as returned by ``getSkimStatsDict``.
+        statSpecifier (dict): A nested dict specifying how each statistic should
+            be calculated and printed, as returned by ``getStatSpecifier``.
+        mcSampleLabels (dict): A dict in which the keys are internal MC sample
+            labels (as used by `skimExpertFunctions.get_test_file`), and the
+            values are more readable labels to be used in printed tables.
+        dataSampleLabels (dict): A dict in which the keys are internal data
+            sample labels (as used by `skimExpertFunctions.get_test_file`), and
+            the values are more readable labels to be used in printed tables.
+        samples (list): A list of samples to print statistics for.
     """
     confluenceFileName = 'skimStats_confluence.txt'
 
@@ -613,8 +691,8 @@ def getStatSpecifier():
       by sample name, and the MC campaign number.
 
     Returns:
-        statSpecifier (dict): A nested dict specifying how each
-        statistic should be handled.
+        statSpecifier (dict): A nested dict specifying how each statistic should
+            be handled.
     """
     statSpecifier = {
         'RetentionRate': {
@@ -770,6 +848,6 @@ if __name__ == '__main__':
     if not args.dataonly:
         allSkimStats = addWeightedMC(allSkimStats, statSpecifier, args.mccampaign)
 
-    printToScreen(allSkimStats, statSpecifier, args.mconly, args.dataonly)
+    printToScreen(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels, args.mconly, args.dataonly)
     printToJson(allSkimStats, statSpecifier)
-    printToConfluence(allSkimStats, statSpecifier, samples)
+    printToConfluence(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels, samples)

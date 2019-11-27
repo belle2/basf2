@@ -131,16 +131,12 @@ Run ``submitTestSkims.py``, which will submit small skim jobs on test files of M
 .. code-block:: sh
 
     ./submitTestSkims.py -s LeptonicUntagged SLUntagged
-    ./submitTestSkims.py -c BtoCharm
-    ./submitTestSkims.py -s BtoXgamma -c feiHadronicCombined
 
 Once all of the submitted jobs have completed successfully, then run ``printSkimStats.py``.
 
 .. code-block:: sh
 
-    ./printSkimStats.py -s LeptonicUntagged
-    ./printSkimStats.py -c BtoCharm
-    ./printSkimStats.py -s BtoXgamma -c feiHadronicCombined
+    ./printSkimStats.py -s LeptonicUntagged SLUntagged
 
 This will read the output files of the test jobs, and produce tables of statistics in the following three formats:
 

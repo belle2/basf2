@@ -86,7 +86,12 @@ def get_total_infiles(sampleName):
 
 def get_events_per_file(sample):
     """
-    Returns the total number of input Mdst files for a given sample.
+    Returns an estimate for the average number of events in an input Mdst file of the given sample type.
+
+    Args:
+        sample (str): Name of the sample. MC samples are named *e.g.* "chargedBGx1_MC12", "ccbarBGx0_MC9"
+    Returns:
+        nEventsPerFile (int): The average number of events in file of the given sample type.
     """
     try:
         return skimTestFilesInfo.nEventsPerFile[sample]

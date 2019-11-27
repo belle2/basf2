@@ -3,6 +3,21 @@
 """
 A script to print tables of statistics for skims which have been run by
 ``submitTestSkims.py``.
+
+This tool works by constructing a nested dictionary of values indexed by skim
+name, then by performance statistic, and then by sample name. The main function
+of interest here is ``fillSkimStatsDict``, which loops over skims, statistics
+and samples to construct this object. There are a number of functions such as
+``udstSize`` and ``memoryAverage`` in this script which calculate individual
+statistics for a particular skim and sample.
+
+The dict returned by ``getStatSpecifier`` determins which statistics are
+calculated, and how they are calculated. It also contains entries which
+determine whether a statistic is printed to the screen or included in the
+Confluence tables.
+
+The functions ``printToJson``, ``printToScreen``, and ``printToConfluence``
+handle all the output of the statistics tables.
 """
 
 
@@ -26,47 +41,6 @@ from tabulate import tabulate
 PyConfig.IgnoreCommandLineOptions = True
 from skim.registry import skim_registry, combined_skims
 from skimExpertFunctions import get_test_file, get_total_infiles, get_events_per_file
-
-
-def getAllSamples(mcCampaign):
-    """Get dicts of all MC and data samples to potentially test on.
-
-    Args:
-        mcCampaign (str): A label like ``MC12`` for the MC campaign to test on.
-
-    Returns:
-        mcSampleLabels (dict): A dict in which the keys are internal MC sample
-            labels (as used by `skimExpertFunctions.get_test_file`), and the
-            values are more readable labels to be used in printed tables.
-        dataSampleLabels (dict): A dict in which the keys are internal data
-            sample labels (as used by `skimExpertFunctions.get_test_file`), and
-            the values are more readable labels to be used in printed tables.
-    """
-    mcSampleLabels = {
-        f'{mcCampaign}_mixedBGx1': f'{mcCampaign}: mixed BGx1',
-        f'{mcCampaign}_chargedBGx1': f'{mcCampaign}: charged BGx1',
-        f'{mcCampaign}_ccbarBGx1': f'{mcCampaign}: ccbar BGx1',
-        f'{mcCampaign}_uubarBGx1': f'{mcCampaign}: uubar BGx1',
-        f'{mcCampaign}_ddbarBGx1': f'{mcCampaign}: ddbar BGx1',
-        f'{mcCampaign}_ssbarBGx1': f'{mcCampaign}: ssbar BGx1',
-        f'{mcCampaign}_taupairBGx1': f'{mcCampaign}: taupair BGx1',
-        f'{mcCampaign}_mixedBGx0': f'{mcCampaign}: mixed BGx0',
-        f'{mcCampaign}_chargedBGx0': f'{mcCampaign}: charged BGx0',
-        f'{mcCampaign}_ccbarBGx0': f'{mcCampaign}: ccbar BGx0',
-        f'{mcCampaign}_uubarBGx0': f'{mcCampaign}: uubar BGx0',
-        f'{mcCampaign}_ddbarBGx0': f'{mcCampaign}: ddbar BGx0',
-        f'{mcCampaign}_ssbarBGx0': f'{mcCampaign}: ssbar BGx0',
-        f'{mcCampaign}_taupairBGx0': f'{mcCampaign}: taupair BGx0'
-    }
-
-    dataSampleLabels = {
-        'proc9_exp3': 'Data: proc9 exp. 3',
-        'proc9_exp7': 'Data: proc9 exp. 7',
-        'proc9_exp8': 'Data: proc9 exp. 8',
-        'bucket7_exp8': 'Data: bucket7 exp. 8'
-    }
-
-    return mcSampleLabels, dataSampleLabels
 
 
 class SkimNotRunException(Exception):
@@ -118,6 +92,38 @@ def getArgumentParser():
                              help='Test on only data samples.')
 
     return parser
+
+
+def getJobOutput(skim, sample):
+    """Read in the log file of a test job as a string, and the JSON output from
+    ``--job-information`` as a dict.
+
+    Args:
+        skim (str): The name of the skim being tested.
+        sample (str): The label of the sample being tested.
+
+    Returns:
+        logFileContents (str): A string containing the contents of the log file
+            of a skim script.
+        jsonFileContents (dict): A dict read from the JobInformation JSON output
+            of a skim script.
+
+    Raises:
+        SkimNotRunException: Raised if any of the log or JSON files cannot be opened.
+    """
+    try:
+        logFileName = Path('log', f'{skim}_{sample}.out')
+        with open(logFileName) as logFile:
+            logFileContents = logFile.read()
+
+        jsonFileName = Path('log', f'JobInformation_{skim}_{sample}.json')
+        with open(jsonFileName) as jsonFile:
+            jsonFileContents = json.load(jsonFile)
+    except FileNotFoundError:
+        raise SkimNotRunException(f'    Failed to open output files for {skim} skim on {sample} sample.\n' +
+                                  '    Perhaps you forgot to run the skim with runSkimsForStats.py?')
+
+    return logFileContents, jsonFileContents
 
 
 def getStatFromLog(statisticName, logFileContents):
@@ -288,38 +294,6 @@ def nTotalEvents(sample):
     return get_events_per_file(sample)*get_total_infiles(sample)
 
 
-def getJobOutput(skim, sample):
-    """Read in the log file of a test job as a string, and the JSON output from
-    ``--job-information`` as a dict.
-
-    Args:
-        skim (str): The name of the skim being tested.
-        sample (str): The label of the sample being tested.
-
-    Returns:
-        logFileContents (str): A string containing the contents of the log file
-            of a skim script.
-        jsonFileContents (dict): A dict read from the JobInformation JSON output
-            of a skim script.
-
-    Raises:
-        SkimNotRunException: Raised if any of the log or JSON files cannot be opened.
-    """
-    try:
-        logFileName = Path('log', f'{skim}_{sample}.out')
-        with open(logFileName) as logFile:
-            logFileContents = logFile.read()
-
-        jsonFileName = Path('log', f'JobInformation_{skim}_{sample}.json')
-        with open(jsonFileName) as jsonFile:
-            jsonFileContents = json.load(jsonFile)
-    except FileNotFoundError:
-        raise SkimNotRunException(f'    Failed to open output files for {skim} skim on {sample} sample.\n' +
-                                  '    Perhaps you forgot to run the skim with runSkimsForStats.py?')
-
-    return logFileContents, jsonFileContents
-
-
 def testLogContents(logFileContents, jsonFileContents, skim, sample):
     """Check that the output files indicate that the skims ran successfully.
 
@@ -394,6 +368,47 @@ def getSkimsToRun(parser, standaloneList, combinedList):
     return standaloneSkims + combinedSkims
 
 
+def getAllSamples(mcCampaign):
+    """Get dicts of all MC and data samples to potentially test on.
+
+    Args:
+        mcCampaign (str): A label like ``MC12`` for the MC campaign to test on.
+
+    Returns:
+        mcSampleLabels (dict): A dict in which the keys are internal MC sample
+            labels (as used by `skimExpertFunctions.get_test_file`), and the
+            values are more readable labels to be used in printed tables.
+        dataSampleLabels (dict): A dict in which the keys are internal data
+            sample labels (as used by `skimExpertFunctions.get_test_file`), and
+            the values are more readable labels to be used in printed tables.
+    """
+    mcSampleLabels = {
+        f'{mcCampaign}_mixedBGx1': f'{mcCampaign}: mixed BGx1',
+        f'{mcCampaign}_chargedBGx1': f'{mcCampaign}: charged BGx1',
+        f'{mcCampaign}_ccbarBGx1': f'{mcCampaign}: ccbar BGx1',
+        f'{mcCampaign}_uubarBGx1': f'{mcCampaign}: uubar BGx1',
+        f'{mcCampaign}_ddbarBGx1': f'{mcCampaign}: ddbar BGx1',
+        f'{mcCampaign}_ssbarBGx1': f'{mcCampaign}: ssbar BGx1',
+        f'{mcCampaign}_taupairBGx1': f'{mcCampaign}: taupair BGx1',
+        f'{mcCampaign}_mixedBGx0': f'{mcCampaign}: mixed BGx0',
+        f'{mcCampaign}_chargedBGx0': f'{mcCampaign}: charged BGx0',
+        f'{mcCampaign}_ccbarBGx0': f'{mcCampaign}: ccbar BGx0',
+        f'{mcCampaign}_uubarBGx0': f'{mcCampaign}: uubar BGx0',
+        f'{mcCampaign}_ddbarBGx0': f'{mcCampaign}: ddbar BGx0',
+        f'{mcCampaign}_ssbarBGx0': f'{mcCampaign}: ssbar BGx0',
+        f'{mcCampaign}_taupairBGx0': f'{mcCampaign}: taupair BGx0'
+    }
+
+    dataSampleLabels = {
+        'proc9_exp3': 'Data: proc9 exp. 3',
+        'proc9_exp7': 'Data: proc9 exp. 7',
+        'proc9_exp8': 'Data: proc9 exp. 8',
+        'bucket7_exp8': 'Data: bucket7 exp. 8'
+    }
+
+    return mcSampleLabels, dataSampleLabels
+
+
 def getSamplesToRun(mcSamples, dataSamples, mcOnly=False, dataOnly=False):
     """Get a list of samples to be tested, filtered by whether the ``mcOnly``
     or ``dataOnly`` flags are provided.
@@ -419,7 +434,186 @@ def getSamplesToRun(mcSamples, dataSamples, mcOnly=False, dataOnly=False):
         return mcSamples + dataSamples
 
 
-def getSkimStatsDict(skims, samples, statSpecifier):
+def getStatSpecifier():
+    """Returns a nested dict containing the specifications for how each
+    statistic should be calculated and printed. The keys of the dict are used
+    internally by this script for constructing the tables of stats. The entries
+    of the dicts are as follows:
+
+    * ``'LongName'`` (`str`): The label to use in the Confluence table. Should
+      include units of the statistic.
+
+    * ``'FloatFormat'`` (`str`): A printf string for how the number should be
+      printed.
+
+    * ``'PrintToScreen'`` (`bool`): Determines whether the statistic is included
+      in the table in terminal output.
+
+    * ``'PrintToConfluence'`` (`bool`): Determines whether the statistic is
+      included in the Confluence table.
+
+    * ``'Calculate'`` (`function`): An anonymous function for how to calculate
+      the statistic. The arguments of this function must be a dict constructed
+      from the JobInformation JSON output, a string containing the log file
+      contents, and the name of the sample being used. Not all of these
+      arguments must be used by the function, but they must all be supplied.
+
+    * ``'CalculationDescription'`` (`str`): A sentence description of how the
+      statistic is calculated.
+
+    * ``'CombineMC'`` (`function`): An anonymous function for how this
+      statistics should be combined across samples to obtain an estimate for a
+      cross-section weighted MC sample. Can be `None` if there is no sensible
+      way to combine this statistic for different MC samples. Should take as
+      arguments a dict of stats for a single skim and single statistic, indexed
+      by sample name, and the MC campaign number.
+
+    Returns:
+        statSpecifier (dict): A nested dict specifying how each statistic should
+            be handled.
+    """
+    statSpecifier = {
+        'RetentionRate': {
+            'LongName': 'Retention rate (%)',
+            'FloatFormat': '.2f',
+            'PrintToScreen': True,
+            'PrintToConfluence': True,
+            'Calculate': lambda json, *_: 100 * nSkimmedEvents(json) / nInputEvents(json),
+            'CalculationDescription': 'Number of skimmed events divided by number of input events.',
+            'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
+        },
+        'nInputEvents': {
+            'LongName': 'Number of input events of test',
+            'FloatFormat': '.0f',
+            'PrintToScreen': False,
+            'PrintToConfluence': True,
+            'Calculate': lambda json, *_: nInputEvents(json),
+            'CalculationDescription': 'Number of events in the input MDST file.',
+            'CombineMC': None
+        },
+        'nSkimmedEvents': {
+            'LongName': 'Number of skimmed events',
+            'FloatFormat': '.0f',
+            'PrintToScreen': False,
+            'PrintToConfluence': True,
+            'Calculate': lambda json, *_: nSkimmedEvents(json),
+            'CalculationDescription': 'Number of events in the output uDST file.',
+            'CombineMC': None
+        },
+        'cpuTime': {
+            'LongName': 'CPU time of test on KEKCC (s)',
+            'FloatFormat': '.1f',
+            'PrintToScreen': False,
+            'PrintToConfluence': True,
+            'Calculate': lambda _, log, __: cpuTime(log),
+            'CalculationDescription': 'CPU time of test job as printed in the output logs.',
+            'CombineMC': None
+        },
+        'cpuTimePerEvent': {
+            'LongName': 'CPU time per event on KEKCC (s)',
+            'FloatFormat': '.3f',
+            'PrintToScreen': True,
+            'PrintToConfluence': True,
+            'Calculate': lambda json, log, *_: cpuTime(log) / nInputEvents(json),
+            'CalculationDescription': 'CPU time of test job divided by number of input events.',
+            'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
+        },
+        'udstSize': {
+            'LongName': 'uDST size of test (MB)',
+            'FloatFormat': '.2f',
+            'PrintToScreen': False,
+            'PrintToConfluence': True,
+            'Calculate': lambda json, *_: udstSize(json) / 1024,
+            'CalculationDescription': 'File size of output uDST.',
+            'CombineMC': None
+        },
+        'udstSizePerEvent': {
+            'LongName': 'uDST size per event (kB)',
+            'FloatFormat': '.3f',
+            'PrintToScreen': True,
+            'PrintToConfluence': True,
+            'Calculate': lambda json, *_: udstSize(json) / nInputEvents(json),
+            'CalculationDescription': 'File size of output uDST divided by number of input events.',
+            'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
+        },
+        'udstSizePerFile': {
+            'LongName': 'Estimated average uDST size per file (MB)',
+            'FloatFormat': '.2f',
+            'PrintToScreen': False,
+            'PrintToConfluence': False,
+            'Calculate': lambda json, _, sample: udstSize(json) / nInputEvents(json) * get_events_per_file(sample) / 1024,
+            'CalculationDescription': 'uDST size per event multiplied by average number of events per file for this sample.',
+            'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
+        },
+        'logSize': {
+            'LongName': 'Log size of test (kB)',
+            'FloatFormat': '.1f',
+            'PrintToScreen': False,
+            'PrintToConfluence': True,
+            'Calculate': lambda _, log, __: logSize(log),
+            'CalculationDescription': 'File size of the output logs.',
+            'CombineMC': None
+        },
+        'logSizePerEvent': {
+            'LongName': 'Log size per event (B)',
+            'FloatFormat': '.2f',
+            'PrintToScreen': True,
+            'PrintToConfluence': True,
+            'Calculate': lambda json, log, __: logSize(log) / nInputEvents(json) * 1024,
+            'CalculationDescription': 'File size of the output logs divided by the number of input events.',
+            'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
+        },
+        'averageCandidateMultiplicity': {
+            'LongName': 'Average candidate multiplicity of passed events',
+            'FloatFormat': '.2f',
+            'PrintToScreen': True,
+            'PrintToConfluence': True,
+            'Calculate': lambda _, log, __: averageCandidateMultiplicity(log),
+            'CalculationDescription': 'Candidate multiplicity as listed in output logs, averaged over the particle lists.',
+            'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
+        },
+        'memoryAverage': {
+            'LongName': 'Average memory usage (MB)',
+            'FloatFormat': '.0f',
+            'PrintToScreen': True,
+            'PrintToConfluence': True,
+            'Calculate': lambda _, log, __: memoryAverage(log),
+            'CalculationDescription': 'Average memory usage, as listed in output logs.',
+            'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
+        },
+        'memoryMaximum': {
+            'LongName': 'Maximum memory usage (MB)',
+            'FloatFormat': '.0f',
+            'PrintToScreen': True,
+            'PrintToConfluence': True,
+            'Calculate': lambda _, log, __: memoryMaximum(log),
+            'CalculationDescription': 'Maximum memory usage, as listed in output logs.',
+            'CombineMC': lambda statDict, _: max(statDict.values())
+        },
+        'udstSizePerEntireSample': {
+            'LongName': 'Estimated uDST size for entire sample (GB)',
+            'FloatFormat': '.2f',
+            'PrintToScreen': False,
+            'PrintToConfluence': True,
+            'Calculate': lambda json, _, sample: udstSize(json) * nTotalEvents(sample) / nInputEvents(json) / 1024 / 1024,
+            'CalculationDescription': 'Output uDST size per event multiplied by total number of events in the full sample.',
+            'CombineMC': lambda statDict, _: sum(statDict.values())
+        },
+        'logSizePerEntireSample': {
+            'LongName': 'Estimated log size for entire sample (GB)',
+            'FloatFormat': '.2f',
+            'PrintToScreen': False,
+            'PrintToConfluence': True,
+            'Calculate': lambda json, log, sample: logSize(log) * nTotalEvents(sample) / nInputEvents(json) / 1024 / 1024,
+            'CalculationDescription': 'Output log file size per event multiplied by total number of events in the full sample.',
+            'CombineMC': lambda statDict, _: sum(statDict.values())
+        }
+    }
+
+    return statSpecifier
+
+
+def fillSkimStatsDict(skims, samples, statSpecifier):
     """Fill a nested dict with skim performance statistics, using the skim and
     sample names provided. The dict ``statSpecifier`` determines how each
     statistic is to be calculated.
@@ -656,184 +850,6 @@ def printToConfluence(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLab
           '(accessible via ctrl-shift-D or cmd-shift-D).')
 
 
-def getStatSpecifier():
-    """Returns a nested dict containing the specifications for how each
-    statistic should be calculated and printed. The keys of the dict are used
-    internally by this script for constructing the tables of stats. The entries
-    of the dicts are as follows:
-
-    * ``'LongName'`` (`str`): The label to use in the Confluence table. Should
-      include units of the statistic.
-
-    * ``'FloatFormat'`` (`str`): A printf string for how the number should be
-      printed.
-
-    * ``'PrintToScreen'`` (`bool`): Determines whether the statistic is included
-      in the table in terminal output.
-
-    * ``'PrintToConfluence'`` (`bool`): Determines whether the statistic is
-      included in the Confluence table.
-
-    * ``'Calculate'`` (`function`): An anonymous function for how to calculate
-      the statistic. The arguments of this function must be a dict constructed
-      from the JobInformation JSON output, a string containing the log file
-      contents, and the name of the sample being used. Not all of these
-      arguments must be used by the function, but they must all be supplied.
-
-    * ``'CalculationDescription'`` (`str`): A sentence description of how the
-      statistic is calculated.
-
-    * ``'CombineMC'`` (`function`): An anonymous function for how this
-      statistics should be combined across samples to obtain an estimate for a
-      cross-section weighted MC sample. Can be `None` if there is no sensible
-      way to combine this statistic for different MC samples. Should take as
-      arguments a dict of stats for a single skim and single statistic, indexed
-      by sample name, and the MC campaign number.
-
-    Returns:
-        statSpecifier (dict): A nested dict specifying how each statistic should
-            be handled.
-    """
-    statSpecifier = {
-        'RetentionRate': {
-            'LongName': 'Retention rate (%)',
-            'FloatFormat': '.2f',
-            'PrintToScreen': True,
-            'PrintToConfluence': True,
-            'Calculate': lambda json, *_: 100 * nSkimmedEvents(json) / nInputEvents(json),
-            'CalculationDescription': 'Number of skimmed events divided by number of input events.',
-            'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
-        },
-        'nInputEvents': {
-            'LongName': 'Number of input events of test',
-            'FloatFormat': '.0f',
-            'PrintToScreen': False,
-            'PrintToConfluence': True,
-            'Calculate': lambda json, *_: nInputEvents(json),
-            'CalculationDescription': 'Number of events in the input MDST file.',
-            'CombineMC': None
-        },
-        'nSkimmedEvents': {
-            'LongName': 'Number of skimmed events',
-            'FloatFormat': '.0f',
-            'PrintToScreen': False,
-            'PrintToConfluence': True,
-            'Calculate': lambda json, *_: nSkimmedEvents(json),
-            'CalculationDescription': 'Number of events in the output uDST file.',
-            'CombineMC': None
-        },
-        'cpuTime': {
-            'LongName': 'CPU time of test on KEKCC (s)',
-            'FloatFormat': '.1f',
-            'PrintToScreen': False,
-            'PrintToConfluence': True,
-            'Calculate': lambda _, log, __: cpuTime(log),
-            'CalculationDescription': 'CPU time of test job as printed in the output logs.',
-            'CombineMC': None
-        },
-        'cpuTimePerEvent': {
-            'LongName': 'CPU time per event on KEKCC (s)',
-            'FloatFormat': '.3f',
-            'PrintToScreen': True,
-            'PrintToConfluence': True,
-            'Calculate': lambda json, log, *_: cpuTime(log) / nInputEvents(json),
-            'CalculationDescription': 'CPU time of test job divided by number of input events.',
-            'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
-        },
-        'udstSize': {
-            'LongName': 'uDST size of test (MB)',
-            'FloatFormat': '.2f',
-            'PrintToScreen': False,
-            'PrintToConfluence': True,
-            'Calculate': lambda json, *_: udstSize(json) / 1024,
-            'CalculationDescription': 'File size of output uDST.',
-            'CombineMC': None
-        },
-        'udstSizePerEvent': {
-            'LongName': 'uDST size per event (kB)',
-            'FloatFormat': '.3f',
-            'PrintToScreen': True,
-            'PrintToConfluence': True,
-            'Calculate': lambda json, *_: udstSize(json) / nInputEvents(json),
-            'CalculationDescription': 'File size of output uDST divided by number of input events.',
-            'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
-        },
-        'udstSizePerFile': {
-            'LongName': 'Estimated average uDST size per file (MB)',
-            'FloatFormat': '.2f',
-            'PrintToScreen': False,
-            'PrintToConfluence': False,
-            'Calculate': lambda json, _, sample: udstSize(json) / nInputEvents(json) * get_events_per_file(sample) / 1024,
-            'CalculationDescription': 'uDST size per event multiplied by average number of events per file for this sample.',
-            'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
-        },
-        'logSize': {
-            'LongName': 'Log size of test (kB)',
-            'FloatFormat': '.1f',
-            'PrintToScreen': False,
-            'PrintToConfluence': True,
-            'Calculate': lambda _, log, __: logSize(log),
-            'CalculationDescription': 'File size of the output logs.',
-            'CombineMC': None
-        },
-        'logSizePerEvent': {
-            'LongName': 'Log size per event (B)',
-            'FloatFormat': '.2f',
-            'PrintToScreen': True,
-            'PrintToConfluence': True,
-            'Calculate': lambda json, log, __: logSize(log) / nInputEvents(json) * 1024,
-            'CalculationDescription': 'File size of the output logs divided by the number of input events.',
-            'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
-        },
-        'averageCandidateMultiplicity': {
-            'LongName': 'Average candidate multiplicity of passed events',
-            'FloatFormat': '.2f',
-            'PrintToScreen': True,
-            'PrintToConfluence': True,
-            'Calculate': lambda _, log, __: averageCandidateMultiplicity(log),
-            'CalculationDescription': 'Candidate multiplicity as listed in output logs, averaged over the particle lists.',
-            'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
-        },
-        'memoryAverage': {
-            'LongName': 'Average memory usage (MB)',
-            'FloatFormat': '.0f',
-            'PrintToScreen': True,
-            'PrintToConfluence': True,
-            'Calculate': lambda _, log, __: memoryAverage(log),
-            'CalculationDescription': 'Average memory usage, as listed in output logs.',
-            'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
-        },
-        'memoryMaximum': {
-            'LongName': 'Maximum memory usage (MB)',
-            'FloatFormat': '.0f',
-            'PrintToScreen': True,
-            'PrintToConfluence': True,
-            'Calculate': lambda _, log, __: memoryMaximum(log),
-            'CalculationDescription': 'Maximum memory usage, as listed in output logs.',
-            'CombineMC': lambda statDict, _: max(statDict.values())
-        },
-        'udstSizePerEntireSample': {
-            'LongName': 'Estimated uDST size for entire sample (GB)',
-            'FloatFormat': '.2f',
-            'PrintToScreen': False,
-            'PrintToConfluence': True,
-            'Calculate': lambda json, _, sample: udstSize(json) * nTotalEvents(sample) / nInputEvents(json) / 1024 / 1024,
-            'CalculationDescription': 'Output uDST size per event multiplied by total number of events in the full sample.',
-            'CombineMC': lambda statDict, _: sum(statDict.values())
-        },
-        'logSizePerEntireSample': {
-            'LongName': 'Estimated log size for entire sample (GB)',
-            'FloatFormat': '.2f',
-            'PrintToScreen': False,
-            'PrintToConfluence': True,
-            'Calculate': lambda json, log, sample: logSize(log) * nTotalEvents(sample) / nInputEvents(json) / 1024 / 1024,
-            'CalculationDescription': 'Output log file size per event multiplied by total number of events in the full sample.',
-            'CombineMC': lambda statDict, _: sum(statDict.values())
-        }
-    }
-
-    return statSpecifier
-
 if __name__ == '__main__':
     parser = getArgumentParser()
     args = parser.parse_args()
@@ -843,7 +859,7 @@ if __name__ == '__main__':
     samples = getSamplesToRun(list(mcSampleLabels.keys()), list(dataSampleLabels.keys()), args.mconly, args.dataonly)
 
     statSpecifier = getStatSpecifier()
-    allSkimStats = getSkimStatsDict(skims, samples, statSpecifier)
+    allSkimStats = fillSkimStatsDict(skims, samples, statSpecifier)
 
     if not args.dataonly:
         allSkimStats = addWeightedMC(allSkimStats, statSpecifier, args.mccampaign)

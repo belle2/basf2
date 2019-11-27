@@ -23,9 +23,6 @@ namespace Belle2 {
     /// Add the module parameters and the description.
     ROIfindingConditionFromDBModule();
 
-    /// No initialization required.
-    void initialize() override;
-
     /// Set the m_roiEnabled according to the new run
     void beginRun() override;
 

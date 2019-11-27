@@ -20,8 +20,6 @@ ROIfindingConditionFromDBModule::ROIfindingConditionFromDBModule() : Module(), m
   setPropertyFlags(Module::EModulePropFlags::c_ParallelProcessingCertified);
 }
 
-void ROIfindingConditionFromDBModule::initialize() {}
-
 void ROIfindingConditionFromDBModule::beginRun()
 {
   m_roiEnabled = true;

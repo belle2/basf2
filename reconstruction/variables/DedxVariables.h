@@ -18,12 +18,12 @@ namespace Belle2 {
     /**
      * returns dE/dx truncated mean
      */
-    double dedx(const Particle* part);
+    double CDCdedx(const Particle* part);
 
     /**
      * returns dE/dx truncated mean without the hadron saturation correction
      */
-    double dedxnosat(const Particle* part);
+    double CDCdedxnosat(const Particle* part);
 
     /**
      * returns the momentum valid in the CDC
@@ -70,7 +70,7 @@ namespace Belle2 {
     /**
      * returns the dEdx truncated mean valid in the SVD
      */
-    double SVD_dedx(const Particle* part);
+    double SVDdedx(const Particle* part);
     /**
      * returns the number of hits valid in the SVD
      */

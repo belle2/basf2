@@ -68,7 +68,7 @@ namespace Belle2 {
 
   namespace Variable {
 
-    double dedx(const Particle* part)
+    double CDCdedx(const Particle* part)
     {
       const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
       if (!dedxTrack) {
@@ -78,7 +78,7 @@ namespace Belle2 {
       }
     }
 
-    double dedxnosat(const Particle* part)
+    double CDCdedxnosat(const Particle* part)
     {
       const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
       if (!dedxTrack) {
@@ -159,6 +159,7 @@ namespace Belle2 {
       }
     }
 
+//Variables for SVD dedx
     double SVD_p(const Particle* part)
     {
       const VXDDedxTrack* dedxTrack = getSVDDedxFromParticle(part);
@@ -168,6 +169,7 @@ namespace Belle2 {
         return dedxTrack->getMomentum();
       }
     }
+
     double SVD_pTrue(const Particle* part)
     {
       const VXDDedxTrack* dedxTrack = getSVDDedxFromParticle(part);
@@ -178,7 +180,7 @@ namespace Belle2 {
       }
     }
 
-    double SVD_dedx(const Particle* part)
+    double SVDdedx(const Particle* part)
     {
       const VXDDedxTrack* dedxTrack = getSVDDedxFromParticle(part);
       if (!dedxTrack) {
@@ -208,9 +210,12 @@ namespace Belle2 {
     }
 
 
+
+
     VARIABLE_GROUP("Dedx");
-    REGISTER_VARIABLE("dedx", dedx, "dE/dx truncated mean");
-    REGISTER_VARIABLE("dedxnosat", dedxnosat, "dE/dx truncated mean without saturation correction");
+    //CDC variables
+    REGISTER_VARIABLE("CDCdEdx", CDCdedx, "dE/dx truncated mean from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdxnosat", CDCdedxnosat, "dE/dx truncated mean without saturation correction from CDC dedx");
     REGISTER_VARIABLE("pCDC", pCDC, "Momentum valid in the CDC");
     REGISTER_VARIABLE("CDCdEdx_chiE", CDCdEdx_chiE, "Chi value of electrons from CDC dEdx");
     REGISTER_VARIABLE("CDCdEdx_chiMu", CDCdEdx_chiMu, "Chi value of muons from CDC dEdx");
@@ -218,9 +223,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("CDCdEdx_chiK", CDCdEdx_chiK, "Chi value of kaons from CDC dEdx");
     REGISTER_VARIABLE("CDCdEdx_chiP", CDCdEdx_chiP, "Chi value of protons from CDC dEdx");
     REGISTER_VARIABLE("CDCdEdx_chiD", CDCdEdx_chiD, "Chi value of duetrons from CDC dEdx");
-    REGISTER_VARIABLE("SVD_p", SVD_p, "momentum valid in the SVD");
+    //SVD variables
+    REGISTER_VARIABLE("SVDdEdx", SVDdedx, "SVD dE/dx truncated mean");
+    REGISTER_VARIABLE("pSVD", SVD_p, "momentum valid in the SVD");
     REGISTER_VARIABLE("SVD_pTrue", SVD_pTrue, "true MC momentum valid in the SVD");
-    REGISTER_VARIABLE("SVD_dedx", SVD_dedx, "SVD dE/dx truncated mean");
     REGISTER_VARIABLE("SVD_CosTheta", SVD_CosTheta, "cos(theta) of the track valid in the SVD");
     REGISTER_VARIABLE("SVD_nHits", SVD_nHits, "number of hits of the track valid in the SVD");
 

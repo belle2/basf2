@@ -124,7 +124,7 @@ Skim performance statistics
 
 Two command-line tools are provided to test the performance of a skim. They are available in ``skim/tools/stats/``.
 
-To test a skim, first check that the skim is listed in `skim.registry`, and that its name in the registry matches the name of the standalone steering file in ``skim/standalone/`` or ``skim/combined/``. This is necessary for ``submitTestSkims.py`` and ``printSkimStats.py`` to locate the skim steering files.
+To test a skim, first check that the skim is listed in `skim.registry` in the currently setup basf2 environment, and that its name in the registry matches the name of the standalone steering file in ``skim/standalone/`` or ``skim/combined/``. This is how ``submitTestSkims.py`` and ``printSkimStats.py`` get their lists of valid options and find the steering files to run.
 
 Run ``submitTestSkims.py``, which will submit small skim jobs on test files of MC and data using ``bsub``. For example,
 
@@ -157,7 +157,7 @@ This will read the output files of the test jobs, and produce tables of statisti
    :filename: skim/tools/stats/submitTestSkims.py
    :func: getArgumentParser
    :prog: ./submitTestSkims.py
-   :nodefault:
+   :nodefaultconst:
    :nogroupsections:
 
    .. note::
@@ -172,7 +172,7 @@ This will read the output files of the test jobs, and produce tables of statisti
    :filename: skim/tools/stats/printSkimStats.py
    :func: getArgumentParser
    :prog: ./printSkimStats.py
-   :nodefault:
+   :nodefaultconst:
    :nogroupsections:
 
    .. note::

@@ -19,30 +19,30 @@ from skim.registry import skim_registry, combined_skims
 from skimExpertFunctions import get_test_file
 
 
-mcCampaign = 'MC12'
-
-mcSamples = [
-    f'{mcCampaign}_mixedBGx1',
-    f'{mcCampaign}_chargedBGx1',
-    f'{mcCampaign}_ccbarBGx1',
-    f'{mcCampaign}_uubarBGx1',
-    f'{mcCampaign}_ddbarBGx1',
-    f'{mcCampaign}_ssbarBGx1',
-    f'{mcCampaign}_taupairBGx1',
-    f'{mcCampaign}_mixedBGx0',
-    f'{mcCampaign}_chargedBGx0',
-    f'{mcCampaign}_ccbarBGx0',
-    f'{mcCampaign}_uubarBGx0',
-    f'{mcCampaign}_ddbarBGx0',
-    f'{mcCampaign}_ssbarBGx0',
-    f'{mcCampaign}_taupairBGx0',
-]
-
-dataSamples = ['proc9_exp3', 'proc9_exp7', 'proc9_exp8', 'bucket7_exp8']
-
-samples = mcSamples + dataSamples
-
 nTestEvents = 10000
+
+
+def getAllSamples(mcCampaign):
+    mcSamples = [
+        f'{mcCampaign}_mixedBGx1',
+        f'{mcCampaign}_chargedBGx1',
+        f'{mcCampaign}_ccbarBGx1',
+        f'{mcCampaign}_uubarBGx1',
+        f'{mcCampaign}_ddbarBGx1',
+        f'{mcCampaign}_ssbarBGx1',
+        f'{mcCampaign}_taupairBGx1',
+        f'{mcCampaign}_mixedBGx0',
+        f'{mcCampaign}_chargedBGx0',
+        f'{mcCampaign}_ccbarBGx0',
+        f'{mcCampaign}_uubarBGx0',
+        f'{mcCampaign}_ddbarBGx0',
+        f'{mcCampaign}_ssbarBGx0',
+        f'{mcCampaign}_taupairBGx0',
+    ]
+
+    dataSamples = ['proc9_exp3', 'proc9_exp7', 'proc9_exp8', 'bucket7_exp8']
+
+    return mcSamples, dataSamples
 
 
 class CustomHelpFormatter(argparse.HelpFormatter):
@@ -75,6 +75,15 @@ def getArgumentParser():
     parser.add_argument('-c', '--combined', nargs='+', default=[],
                         choices=['all']+allCombinedSkims, metavar='SKIM',
                         help='List of combined skims to run.')
+    parser.add_argument('--mccampaign', default='MC12',
+                        choices=['MC9', 'MC10', 'MC11', 'MC12'],
+                        help='The MC campaign to test on.')
+
+    sampleGroup = parser.add_mutually_exclusive_group()
+    sampleGroup.add_argument('--mconly', action='store_true',
+                             help='Test on only MC samples.')
+    sampleGroup.add_argument('--dataonly', action='store_true',
+                             help='Test on only data samples.')
 
     return parser
 
@@ -107,11 +116,20 @@ def getSkimsAndScriptsToRun(parser, standaloneList, combinedList):
 
     return skims, scripts
 
-if __name__ == '__main__':
-    parser = getArgumentParser()
-    args = parser.parse_args()
-    skims, scripts = getSkimsAndScriptsToRun(parser, args.standalone, args.combined)
 
+def getSamplesToRun(mcSamples, dataSamples, mcOnly=False, dataOnly=False):
+    """
+    """
+    if mcOnly:
+        return mcSamples
+    elif dataOnly:
+        return dataSamples
+    else:
+        return mcSamples + dataSamples
+
+
+def submitJobs(skims, scripts, samples):
+    """"""
     logDirectory = Path('log').resolve()
     logDirectory.mkdir(parents=True, exist_ok=True)
 
@@ -129,7 +147,7 @@ if __name__ == '__main__':
             logFile = Path(logDirectory, f'{skim}_{sample}.out')
             errFile = Path(logDirectory, f'{skim}_{sample}.err')
             jsonFile = Path(logDirectory, f'JobInformation_{skim}_{sample}.json')
-            print(f'{skim}, {sample}')
+
             with clean_working_directory():
                 process = subprocess.run(['bsub', '-q', 'l', '-oo', logFile, '-e', errFile,
                                           '-J', f'{skim} {sample}'
@@ -143,4 +161,15 @@ if __name__ == '__main__':
         if any(returnCodes):
             print(f'An error occurred while submitting jobs for {skim} skim with script {script}.')
         else:
-            print(f'Running {script} on {nTestEvents} events for each test sample. Job IDs:\n  ' + '\n  '.join(jobIDs))
+            print(f'Running {script} on {nTestEvents} events from test samples of {", ".join(samples)}. Job IDs:\n  ' +
+                  '\n  '.join(jobIDs))
+
+if __name__ == '__main__':
+    parser = getArgumentParser()
+    args = parser.parse_args()
+
+    mcSamples, dataSamples = getAllSamples(args.mccampaign)
+    skims, scripts = getSkimsAndScriptsToRun(parser, args.standalone, args.combined)
+    samples = getSamplesToRun(mcSamples, dataSamples, args.mconly, args.dataonly)
+
+    submitJobs(skims, scripts, samples)

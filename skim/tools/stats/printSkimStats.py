@@ -135,9 +135,12 @@ def nSkimmedEvents(jsonFileContents):
             of a skim script.
 
     Returns:
-        nSkimmedEvents (int):
+        nSkimmedEvents (int): The average number of events in the output uDST files.
     """
-    return jsonFileContents['output_files'][0]['stats']['events']
+    outputFileInfoList = jsonFileContents['output_files']
+    eventNumberList = [outputFileInfo['stats']['events'] for outputFileInfo in outputFileInfoList]
+
+    return sum(eventNumberList)/len(eventNumberList)
 
 
 def udstSize(jsonFileContents):
@@ -148,9 +151,12 @@ def udstSize(jsonFileContents):
             of a skim script.
 
     Returns:
-        udstSize (float):
+        udstSize (float): The average file size of the output uDST files.
     """
-    return jsonFileContents['output_files'][0]['stats']['filesize_kib']
+    outputFileInfoList = jsonFileContents['output_files']
+    udstSizeList = [outputFileInfo['stats']['filesize_kib'] for outputFileInfo in outputFileInfoList]
+
+    return sum(udstSizeList)/len(udstSizeList)
 
 
 def logSize(logFileContents):
@@ -189,15 +195,20 @@ def averageCandidateMultiplicity(logFileContents):
     Returns:
         averageCandidateMultiplicity (float):
     """
-    floatRegexp = r'\d+\.\d+'
+    # Find all the blocks with the header "Average Candidate Multiplicity", and
+    # join them into a single string.
+    multiplicityBlocks = re.findall('(Average Candidate Multiplicity(.*\n)+?.*INFO)', logFileContents)
+    joinedBlocks = '\n'.join([block[0] for block in multiplicityBlocks])
 
-    multiplicityBlock = re.findall('(Average Candidate Multiplicity(.*\n)+?.*INFO)', logFileContents)[0][0]
-    multiplicityLines = [line for line in multiplicityBlock.split('\n') if re.findall(floatRegexp, line)]
+    # Get the second numbers in each line, which are the average candidate
+    # multiplicities of passed events for each particle list.
+    floatRegexp = r'\d+\.\d+'
+    multiplicityLines = [line for line in joinedBlocks.split('\n') if re.findall(floatRegexp, line)]
     multiplicities = [float(re.findall(floatRegexp, line)[1]) for line in multiplicityLines]
 
-    averageMultiplicity = sum(multiplicities)/len(multiplicities)
+    averageCandidateMultiplicity = sum(multiplicities)/len(multiplicities)
 
-    return averageMultiplicity
+    return averageCandidateMultiplicity
 
 
 def memoryAverage(logFileContents):
@@ -311,11 +322,14 @@ def testLogContents(logFileContents, jsonFileContents, skim, sample):
             written correctly.
     """
     logTests = ['Successfully completed' in logFileContents]
+
+    outputFileInfoList = jsonFileContents['output_files']
+
     jsonTests = [jsonFileContents['basf2_status']['finished'],
                  jsonFileContents['basf2_status']['success'],
                  jsonFileContents['basf2_status']['errors'] == 0,
                  jsonFileContents['basf2_status']['fatals'] == 0,
-                 all(check for check in jsonFileContents['output_files'][0]['checks_passed'].values())
+                 all(check for outputFileInfo in outputFileInfoList for check in outputFileInfo['checks_passed'].values())
                  ]
 
     if not all(logTests) and all(jsonTests):

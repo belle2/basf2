@@ -6,8 +6,8 @@
 # Copyright(C) 2018 Belle II Collaboration
 #
 # Author: The Belle II Collaboration
-# Contributors: Ewan Hill
-# Contributors: Mikhail Remnev
+# Contributors: Ewan Hill       (ehill@mail.ubc.ca)
+#               Mikhail Remnev
 #
 # This software is provided "as is" without any warranty.
 # -----------------------------------------------------------
@@ -47,16 +47,6 @@ env = Belle2.Environment.Instance()
 INPUT_LIST = []
 # = Processed data
 INPUT_LIST += glob.glob("oneTestFile/*.root")
-# INPUT_LIST += glob.glob("threeTestFiles/*.root")
-# INPUT_LIST += glob.glob("specificIndividualRuns/run_784/*.root")
-# INPUT_LIST += glob.glob("specificIndividualRuns/run_2727/*.root")
-# INPUT_LIST += glob.glob("testingProd7/cdst.*.root")
-# INPUT_LIST +=
-# glob.glob("testFiles/*.root")
-# # EWAN multiple files
-
-# = Raw data
-# INPUT_LIST += glob.glob("/ghi/fs01/belle2/bdata/Data/Raw/e0003/r00529/sub00/*.root")
 
 # == Output file
 OUTPUT = "eclBhabhaTCollector.root"
@@ -86,7 +76,6 @@ TIME_ABS_MAX = 250
 
 # If true, output file will contain TTree "tree" with detailed
 # event information.
-# SAVE_TREE = True
 SAVE_TREE = False
 
 # First ECL CellId to calibrate
@@ -134,8 +123,7 @@ ECLBhabhaTCollectorInfo = main.add_module('ECLBhabhaTCollector', timeAbsMax=TIME
                                           minCrystal=MIN_CRYSTAL, maxCrystal=MAX_CRYSTAL,
                                           saveTree=SAVE_TREE)
 
-# ECLBhabhaTCollectorInfo.set_log_level(LogLevel.DEBUG)
-ECLBhabhaTCollectorInfo.set_log_level(LogLevel.INFO)
+ECLBhabhaTCollectorInfo.set_log_level(LogLevel.INFO)  # OR: LogLevel.DEBUG
 ECLBhabhaTCollectorInfo.set_debug_level(36)
 
 
@@ -149,48 +137,15 @@ set_debug_level(100)
 # == Configure database
 reset_database()
 use_database_chain()
-# Required for reading the offline calibration development
-# version of the database, which contains updates to the
-# ECLCrystalElectronicsTime
-# use_central_database("Calibration_Offline_Development")
-# use_central_database("data_reprocessing_prompt_bucket6_alignment")
-# use_central_database("staging_data_reprocessing")   # this did not work !
 
-
-# These two below work together(?) for exp7 but failed for exp3
-# use_central_database("data_reprocessing_prompt_bucket6")
-# use_central_database("data_reprocessing_proc9_cdst_production")
-
-
-# 3 GT required for proc9 as stated by Umberto on the jira ticket
-# use_central_database("data_reprocessing_proc8")  #Fallback for exp  0 -> 3
-# use_central_database("data_reprocessing_prompt_bucket6")  #Fallback for exp  5 -> 8
-# use_central_database("data_reprocessing_proc9_cdst_production")  #New calibrations
-# use_central_database("ECL_time_calibrations_proc9")  #validation
-# use_central_database("data_reprocessing_proc9")  #New calibrations
-
-# use_central_database("data_reprocessing_prompt_bucket7_calcdstprod")  # required for calibrating bucket 7
-
-
-# use_central_database("data_reprocessing_prompt_bucket7")  # bucket 7 GT used to make valiation cdst files for bucket 7
-
+# Read in any required central databases
+# use_central_database("online")
 
 # 2 GT required for making proc 10
 use_central_database("data_reprocessing_proc10")
 use_central_database("data_reprocessing_prompt_rel4_patchb")
 
-
-# use_central_database("data_reprocessing_prod6")   # Use this to keep a stable tag: from Chris
-#   Also see https://confluence.desy.de/x/6ThYBQ
-# CHECK database with:
-#      b2conditionsdb iov Calibration_Offline_Development  -f '^ECLCrateTimeOffset' -r
-# and
-#      b2conditionsdb iov Calibration_Offline_Development  -f '^ECLCrystalTimeOffset' -r
-
-
-# CAREFUL ABOUT USING LOCAL DATABASE OF PREVIOUS CRYSTAL TIME CORRECTIONS WHEN CALCULATING
-#    CRATE TIME CORRECTIONS VS CENTRAL DB VALUES.  CRYSTAL TIME CORRECTIONS SHOULD
-#    USE THE LOCAL DB CRATE TIME CORRECTIONS.
+# Read in any required local databases.  This may be required when doing crystal/crate iterations
 use_local_database("localdb/database.txt")
 
 

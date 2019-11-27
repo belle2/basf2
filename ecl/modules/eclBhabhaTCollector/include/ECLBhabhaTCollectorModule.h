@@ -33,8 +33,9 @@ namespace Belle2 {
 
 
   /**
-   * This module generates 'TimevsCrys' histogram to later
-   * (in eclBhabhaTAlgorithm) find time offset from bhabha events.
+   * This module generates time vs crystal 2D histograms to later
+   * (in eclBhabhaTAlgorithm) find time crystal/crate offsets
+   * from bhabha events.
    */
   class ECLBhabhaTCollectorModule : public CalibrationCollectorModule {
 
@@ -61,22 +62,13 @@ namespace Belle2 {
 
     /** If true, save TTree with more detailed event info */
     bool m_saveTree ;
-    /**
-     * If true, time difference histogram is filled with weight
-     * min(energy*energy, 1 GeV)
-     */
-    bool m_weightedHist ;
 
     /****** Parameters END ******/
-
-    // delete for dupilication
-    //StoreArray<ECLDigit> ecl_digits ; /**< StoreArray for input ECL events */
-    //StoreArray<ECLCalDigit> ecl_cal_digits ; /**< StoreArray for calibrated input ECL events */
 
 
     StoreArray<Track> tracks ; /**< StoreArray for tracks */
     /**
-     * StoreObjPtr for T0. The event t0 class has an overall event t0 so use that as presumably some code has been run to determine what the best t0 is to use.
+     * StoreObjPtr for T0. The event t0 class has an overall event t0
      */
     StoreObjPtr<EventT0> m_event_t0 ;
 
@@ -97,10 +89,6 @@ namespace Belle2 {
     DBObjPtr<ECLCrystalCalib> m_CrateTime ; /**< database object */
     std::vector<float> CrateTime ; /**< vector obtained from DB object */
     std::vector<float> CrateTimeUnc ; /**< uncertainty vector obtained from DB object */
-
-    // saved to ntuple
-    //double m_track_chi2[30] ; /**< chi2 of good tracks */
-    //double m_track_ndf[30] ;  /**< ndf of good tracks */
 
     /**
      * Output tree with detailed event data.
@@ -123,17 +111,21 @@ namespace Belle2 {
     double m_tree_theta ;     /**< theta position for debug TTree output */
     int m_tree_amp ;     /**< Fitting amplitude from ECL for debug TTree output */
     double m_tree_en ;     /**< Energy of crystal with maximum energy within ECL cluster, GeV for debug TTree output */
-    double m_tree_E1Etot
-    ;     /**< Energy of crystal with maximum energy within ECL cluster divided by total cluster energy, unitless for debug TTree output */
-    double m_tree_E1E2
-    ;     /**< Energy of crystal with maximum energy within ECL cluster divided by second most energetic crystal in the cluster, unitless for debug TTree output */
-    double m_tree_E1p
-    ;     /**< Energy of crystal with maximum energy within ECL cluster divided by total cluster energy divided by the track momentum, unitless for debug TTree output */
+    double m_tree_E1Etot ;     /**< Energy of crystal with maximum energy within
+                                    ECL cluster divided by total cluster energy,
+                                    unitless for debug TTree output */
+    double m_tree_E1E2 ;     /**< Energy of crystal with maximum energy within ECL
+                                  cluster divided by second most energetic crystal
+                                  in the cluster, unitless for debug TTree output */
+    double m_tree_E1p ;     /**< Energy of crystal with maximum energy within ECL
+                                 cluster divided by total cluster energy divided by
+                                 the track momentum, unitless for debug TTree output */
     int m_tree_quality ; /**< ECL fit quality for debug TTree output */
     double m_tree_timeF ; /**< ECL fitting time for debug TTree output */
     double m_tree_time ; /**< Time for Ts distribution for debug TTree output */
-    double m_tree_timetsPreviousTimeCalibs
-    ; /**< Time for Ts distribution after application of previous time calibrations for debug TTree output */
+    double m_tree_timetsPreviousTimeCalibs ; /**< Time for Ts distribution after
+                                                  application of previous time calibrations
+                                                  for debug TTree output */
     double m_tree_t0 ;   /**< EventT0 (not from ECL) for debug TTree output */
     double m_tree_t0_unc ;   /**< EventT0 uncertainty for debug TTree output */
     double m_tree_t0_ECL_closestCDC ;   /**< EventT0 (from ECL) closest to CDC for debug TTree output */
@@ -142,10 +134,11 @@ namespace Belle2 {
     double m_tree_z0 ;    /** Track z0 for debug TTree output */
     double m_tree_p ;    /** Track momentum for debug TTree output */
     double m_tree_nCDChits ;    /** Number of CDC hits along the track for debug TTree output */
-    double m_tree_clustCrysE_DIV_maxEcrys
-    ;    /** ratio of crystal energy to energy of the crystal that has the maximum energy, only for the crystals that meet all the selection criteria for debug TTree output */
-    double m_tree_clustCrysE
-    ;    /** crystal energy, only for the crystals that meet all the selection criteria for debug TTree output */
+    double m_tree_clustCrysE_DIV_maxEcrys ;    /** ratio of crystal energy to energy of the crystal that
+                                                   has the maximum energy, only for the crystals that
+                                                   meet all the selection criteria for debug TTree output */
+    double m_tree_clustCrysE ;    /** crystal energy, only for the crystals that meet all the selection
+                                      criteria for debug TTree output */
     double m_tree_maxCrysE ;    /** energy of maximum energy crystal, for debug TTree output */
 
 
@@ -153,17 +146,17 @@ namespace Belle2 {
     double m_tree_enNeg ;     /**< Energy of cluster associated to negatively charged track, GeV for debug TTree output */
     double m_tree_tclustPos ;     /**< Cluster time of cluster associated to positively charged track, ns for debug TTree output */
     double m_tree_tclustNeg ;     /**< Cluster time of cluster associated to negatively charged track, ns for debug TTree output */
-    double m_tree_maxEcrystPosClust
-    ;     /**< Time of the highest energy crystal in the cluster associated to positively charged track, ns for debug TTree output */
-    double m_tree_maxEcrystNegClust
-    ;     /**< Time of the highest energy crystal in the cluster associated to negatively charged track, ns for debug TTree output */
+    double m_tree_maxEcrystPosClust ;     /**< Time of the highest energy crystal in the cluster
+                                               associated to positively charged track, ns for debug TTree output */
+    double m_tree_maxEcrystNegClust;     /**< Time of the highest energy crystal in the cluster associated
+                                              to negatively charged track, ns for debug TTree output */
 
     double m_tree_tclust ;     /**< Cluster time of a cluster, ns for debug TTree output */
 
     double m_tree_ECLCalDigitTime ;   /**< Time of an ECLCalDigit within a cluster, ns for debug TTree output */
     double m_tree_ECLCalDigitE ;   /**< Energy of an ECLCalDigit within a cluster, GeV for debug TTree output */
-    double m_tree_ECLDigitAmplitude
-    ;   /**< Amplitude (used to calculate energy) of an ECLDigit within a cluster, for debug TTree output */
+    double m_tree_ECLDigitAmplitude;   /**< Amplitude (used to calculate energy) of an ECLDigit within
+                                            a cluster, for debug TTree output */
 
 
     int m_charge ;
@@ -205,10 +198,6 @@ namespace Belle2 {
     double m_looseTrkD0 ;
     double m_tightTrkD0 ;
 
-    //double m_eNegBeamE ;
-    //double m_ePosBeamE ;
-    //double E_COM ;
-    //double m_COM ;
     double m_pCOM ;
     int m_numLooseTracks ;
     int m_numTightTracks ;
@@ -221,7 +210,6 @@ namespace Belle2 {
 
     int m_crystalCrate ;
     int m_runNum ;
-    //int m_experimentNum ;
 
     bool storeCalib = true ;
 
@@ -236,8 +224,6 @@ namespace Belle2 {
     double m_energyDependenceTimeOffsetFitParam_p4 = 3.1482 ;           /**< p4 in "energy dependence equation" */
     double m_energyDependenceTimeOffsetFitParam_p5 = 7.4747 ;           /**< p5 in "energy dependence equation" */
     double m_energyDependenceTimeOffsetFitParam_p6 = 1279.3 ;           /**< p6 in "energy dependence equation" */
-
-
 
 
   } ;

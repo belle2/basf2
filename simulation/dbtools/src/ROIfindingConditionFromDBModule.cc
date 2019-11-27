@@ -16,22 +16,19 @@ REG_MODULE(ROIfindingConditionFromDB)
 
 ROIfindingConditionFromDBModule::ROIfindingConditionFromDBModule() : Module(), m_roiParameters()
 {
-  setDescription(" Module which sets its return value based on the payload whether ROI-finding was enabled for the given run/exp interval or not.");
+  setDescription("Module which sets its return value based on the payload whether ROI-finding was enabled for the given run/exp interval or not.");
   setPropertyFlags(Module::EModulePropFlags::c_ParallelProcessingCertified);
-}
-
-void ROIfindingConditionFromDBModule::beginRun()
-{
-  m_roiEnabled = true;
-  if (m_roiParameters) {
-    m_roiEnabled = m_roiParameters->getROIfinding();
-  } else {
-    B2ERROR("No configuration for the current run found");
-  }
 }
 
 void ROIfindingConditionFromDBModule::event()
 {
+  if (m_roiParameters.hasChanged()) {
+    if (m_roiParameters) {
+      m_roiEnabled = m_roiParameters->getROIfinding();
+    } else {
+      B2ERROR("No configuration for the current run found");
+    }
+  }
   setReturnValue(m_roiEnabled);
 }
 

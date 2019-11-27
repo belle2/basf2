@@ -50,6 +50,7 @@ Belle2PhysicsList::Belle2PhysicsList(const G4String& physicsListName)
 
   m_pxdCutValue = m_globalCutValue;
   m_svdCutValue = m_globalCutValue;
+  m_cdcCutValue = m_globalCutValue;
 
   // Decay
   RegisterPhysics(new G4DecayPhysics());
@@ -114,6 +115,12 @@ void Belle2PhysicsList::SetCuts()
   regionCuts->SetProductionCut(m_svdCutValue * cm);
   G4cout << " SVD cut set to " << m_svdCutValue << G4endl;
   theRegionStore->GetRegion("SVDEnvelope")->SetProductionCuts(regionCuts);
+
+  // CDC region cut
+  regionCuts = new G4ProductionCuts;
+  regionCuts->SetProductionCut(m_cdcCutValue * cm);
+  G4cout << " CDC cut set to " << m_cdcCutValue << G4endl;
+  theRegionStore->GetRegion("CDCEnvelope")->SetProductionCuts(regionCuts);
 }
 
 
@@ -138,6 +145,12 @@ void Belle2PhysicsList::SetPXDProductionCutValue(G4double value)
 void Belle2PhysicsList::SetSVDProductionCutValue(G4double value)
 {
   m_svdCutValue = value;
+}
+
+
+void Belle2PhysicsList::SetCDCProductionCutValue(G4double value)
+{
+  m_cdcCutValue = value;
 }
 
 

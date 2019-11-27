@@ -164,8 +164,8 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
       isMatchDaughter = true;
       itDP = daughtersP.erase(itDP);
 
+      // if the matched daughter has daughters, they are also removed from the list
       if (d->isIgnoreIntermediate() and d->getDaughter(iDD)->getNDaughters() != 0) {
-        B2WARNING("DecayDescriptor Try to Erase !!!");
         vector<const MCParticle*> grandDaughtersP;
         if (d->getDaughter(iDD)->isIgnoreIntermediate()) {
           appendParticles(daugP, grandDaughtersP);
@@ -178,14 +178,12 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
         for (auto grandDaugP : grandDaughtersP) {
           auto jtDP = itDP;
           while (jtDP != daughtersP.end()) {
-            // for (auto jtDP = itDP; jtDP != daughtersPIndex.end(); ++jtDP) {
             const MCParticle* daugP_j = *jtDP;
-            if (grandDaugP == daugP_j) {
-              B2WARNING("DecayDescriptor Erased jtDP!!!");
+            // if a grand-daughter matched a daughter, remove it.
+            if (grandDaugP == daugP_j)
               jtDP = daughtersP.erase(jtDP);
-            } else {
+            else
               ++jtDP;
-            }
           }
         }
       }

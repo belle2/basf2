@@ -20,6 +20,7 @@
 #include <analysis/variables/ParameterVariables.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
@@ -61,7 +62,7 @@ namespace Belle2 {
         B2WARNING("goodBelleKshort is only defined for a particle with charged daughters");
         return 0.0;
       }
-      if (abs(KS->getPDGCode()) != 310)
+      if (abs(KS->getPDGCode()) != Const::Kshort.getPDGCode())
         B2WARNING("goodBelleKshort is being applied to a candidate with PDG " << KS->getPDGCode());
 
       // If goodKs exists, return the value
@@ -100,7 +101,7 @@ namespace Belle2 {
         B2WARNING("goodBelleLambda is only defined for a particle with charged daughters");
         return 0.;
       }
-      if (abs(Lambda->getPDGCode()) != 3122) {
+      if (abs(Lambda->getPDGCode()) != Const::Lambda.getPDGCode()) {
         B2WARNING("goodBelleLambda is being applied to a candidate with PDG " << Lambda->getPDGCode());
       }
 

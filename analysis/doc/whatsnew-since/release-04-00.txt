@@ -39,6 +39,8 @@ Variables
    only. The variable gives access to the signal B rest frame in semi-leptonic decays, where the four momentum
    of the signal B can not be entirely reconstructed due to the presence of neutrinos in the decay.
 
+ * Fixed ``goodBelleKshort``, now it turns ``extraInfo(goodKs)`` if the variable exists.
+
 Modules
 +++++++
 

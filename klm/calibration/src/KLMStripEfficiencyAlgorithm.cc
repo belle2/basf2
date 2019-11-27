@@ -39,7 +39,7 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
   int nPlanes = m_PlaneArrayIndex->getNPlanes();
   TH1F* efficiencyHistogram =
     new TH1F("plane_efficiency", "KLM plane efficiency",
-             nPlanes, 0.5, double(nPlanes) + 0.5);
+             nPlanes, -0.5, double(nPlanes) - 0.5);
   std::shared_ptr<TH1F> matchedDigitsInPlane;
   matchedDigitsInPlane = getObjectPtr<TH1F>("matchedDigitsInPlane");
   std::shared_ptr<TH1F> allExtHitsInPlane;

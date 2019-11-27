@@ -37,6 +37,17 @@ samples = mcSamples + dataSamples
 nTestEvents = 10000
 
 
+class CustomHelpFormatter(argparse.HelpFormatter):
+    """Custom formatter for argparse, to print the valid choices for an argument
+    in the help string.
+    """
+    def _get_help_string(self, action):
+        if action.choices:
+            return action.help + ' Valid options are: ' + ', '.join(action.choices)
+        else:
+            return action.help
+
+
 def getArgumentParser():
     """
 
@@ -47,19 +58,15 @@ def getArgumentParser():
     allCombinedSkims = list(combined_skims.keys())
 
     parser = argparse.ArgumentParser(description='A script to run a given set of skims, and ' +
-                                     'save the output in a format to be read by printSkimStats.py. ' +
+                                     'save the output in a format to be read by ``printSkimStats.py``. ' +
                                      'One or more standalone or combined skim names must be provided.',
-                                     epilog='example: ./printSkimStats.py -s LeptonicUntagged -c BtoCharm')
+                                     formatter_class=CustomHelpFormatter)
     parser.add_argument('-s', '--standalone', nargs='+', default=[],
                         choices=['all']+allStandaloneSkims, metavar='SKIM',
-                        help='List of standalone skims to run. Valid options are: ' +
-                        ', '.join([f'``{s}``' for s in allStandaloneSkims]) +
-                        ', or ``all`` to run all standalone skims.')
+                        help='List of standalone skims to run.')
     parser.add_argument('-c', '--combined', nargs='+', default=[],
                         choices=['all']+allCombinedSkims, metavar='SKIM',
-                        help='List of combined skims to run. Valid options are: ' +
-                        ', '.join([f'``{s}``' for s in allCombinedSkims]) +
-                        ', or ``all`` to run all combined skims.')
+                        help='List of combined skims to run.')
 
     return parser
 

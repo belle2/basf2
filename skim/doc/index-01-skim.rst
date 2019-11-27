@@ -122,30 +122,59 @@ Some functions and tools are for the use of skim liaisons and developers.
 Skim performance statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The following two command-line tools can be used to test the performance of a skim. They are
-available in `skim/tools/stats`.
+Two command-line tools are provided to test the performance of a skim. They are available in ``skim/tools/stats/``.
 
-They both `skim.registry`
+To test a skim, first check that the skim is listed in `skim.registry`, and that its name in the registry matches the name of the standalone steering file in ``skim/standalone/`` or ``skim/combined/``. This is necessary for ``submitTestSkims.py`` and ``printSkimStats.py`` to locate the skim steering files.
 
+Run ``submitTestSkims.py``, which will submit small skim jobs on test files of MC and data using ``bsub``. For example,
 
-``runSkimsForStats.py``: Run skim scripts and save output
+.. code-block:: sh
+
+    ./submitTestSkims.py -s LeptonicUntagged SLUntagged
+    ./submitTestSkims.py -c BtoCharm
+    ./submitTestSkims.py -s BtoXgamma -c feiHadronicCombined
+
+Once all of the submitted jobs have completed successfully, then run ``printSkimStats.py``.
+
+.. code-block:: sh
+
+    ./printSkimStats.py -s LeptonicUntagged
+    ./printSkimStats.py -c BtoCharm
+    ./printSkimStats.py -s BtoXgamma -c feiHadronicCombined
+
+This will read the output files of the test jobs, and produce tables of statistics in the following three formats:
+
+* A subset of the statistics printed to the screen per-skim. This output is for display only.
+
+* A text file ``skimStats_confluence.txt`` is written, in which the statistics are formatted as Confluence wiki markup tables. These tables can be copied directly onto a Confluence page by editing the page, selecting ``Insert more content`` from the toolbar, selecting ``Markup`` from the drop-down menu, and then pasting the content of the text file into the markup editor which appears. Confluence will then format the tables and headings. The markup editor can also be accessed via ``ctrl-shift-D`` (``cmd-shift-D``).
+
+* All statistics produced are printed to a JSON file ``skimStats.json``, indexed by skim, statistic, and sample label. This file is to be used by grid production tools.
+
+``submitTestSkims.py``: Run skim scripts on test samples
 .........................................................
 
 .. argparse::
-   :filename: skim/tools/stats/runSkimsForStats.py
+   :filename: skim/tools/stats/submitTestSkims.py
    :func: getArgumentParser
-   :prog: runSkimsForStats.py
+   :prog: ./submitTestSkims.py
    :nodefault:
    :nogroupsections:
 
+   .. note::
+      Please run these skim tests on KEKCC, so that the estimates for CPU time are directly
+      comparable to one another.
 
-``printStatsSkims.py``: Print tables of performance statistics
+
+``printSkimStats.py``: Print tables of performance statistics
 ..............................................................
 
 .. argparse::
    :filename: skim/tools/stats/printSkimStats.py
    :func: getArgumentParser
-   :prog: printSkimStats.py
+   :prog: ./printSkimStats.py
    :nodefault:
    :nogroupsections:
 
+   .. note::
+      This tool uses the third-party package `tabulate <https://pypi.org/project/tabulate>`_, which
+      can be installed via ``pip``.

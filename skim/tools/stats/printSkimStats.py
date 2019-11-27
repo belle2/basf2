@@ -28,22 +28,6 @@ from skimExpertFunctions import get_test_file, get_eventN, get_total_infiles, ge
 
 
 # TODO: put these into a function for documentation purposes
-beamBackgroundWeights = {
-    'BGx1': 0.8,
-    'BGx0': 0.2
-}
-
-mcSampleCrossSections = {
-    'mixed': 0.555,
-    'charged': 0.555,
-    'ccbar': 1.3,
-    'uubar': 1.61,
-    'ddbar': 0.40,
-    'ssbar': 0.38,
-    'taupair': 0.91
-}
-
-# TODO: put these into a function for documentation purposes
 mcCampaign = 'MC12'
 
 mcSamples = {
@@ -75,9 +59,20 @@ samples = list(mcSamples.keys()) + list(dataSamples.keys())
 
 class SkimNotRunException(Exception):
     """An exception to be raised whenever an error occurs that is likely due to
-    a skim not being run properly by ``runSkimsForStats.py``.
+    a skim not being run properly by ``submitTestSkims.py``.
     """
     pass
+
+
+class CustomHelpFormatter(argparse.HelpFormatter):
+    """Custom formatter for argparse, to print the valid choices for an argument
+    in the help string.
+    """
+    def _get_help_string(self, action):
+        if action.choices:
+            return action.help + ' Valid options are: ' + ', '.join(action.choices)
+        else:
+            return action.help
 
 
 def getArgumentParser():
@@ -90,18 +85,15 @@ def getArgumentParser():
     allCombinedSkims = list(combined_skims.keys())
 
     parser = argparse.ArgumentParser(description='A script to print tables of statistics for skims ' +
-                                     'which have been run by runSkimsForStats.py. One or more standalone or combined ' +
-                                     'skim names must be provided.')
+                                     'which have been run by ``submitTestSkims.py``. One or more standalone or combined ' +
+                                     'skim names must be provided.',
+                                     formatter_class=CustomHelpFormatter)
     parser.add_argument('-s', '--standalone', nargs='+', default=[],
                         choices=['all']+allStandaloneSkims, metavar='SKIM',
-                        help='List of standalone skims to run. Valid options are: ' +
-                        ', '.join([f'``{s}``' for s in allStandaloneSkims]) +
-                        ', or ``all`` to run all standalone skims.')
+                        help='List of standalone skims to run.')
     parser.add_argument('-c', '--combined', nargs='+', default=[],
                         choices=['all']+allCombinedSkims, metavar='SKIM',
-                        help='List of combined skims to run. Valid options are: ' +
-                        ', '.join([f'``{s}``' for s in allCombinedSkims]) +
-                        ', or ``all`` to run all combined skims.')
+                        help='List of combined skims to run.')
 
     return parser
 
@@ -404,12 +396,30 @@ def mcWeightedAverage(statsPerSample):
     Returns:
         mcWeightedAverage (float):
     """
-    totalCrossSection = sum(mcSampleCrossSections.values())
+
+    # The fraction of each background level produced in the MC sample
+    beamBackgroundFraction = {
+        'BGx1': 0.8,
+        'BGx0': 0.2
+    }
+
+    # The cross section of each process in e+e- collisions (fb^-1)
+    processCrossSections = {
+        'mixed': 0.555,
+        'charged': 0.555,
+        'ccbar': 1.3,
+        'uubar': 1.61,
+        'ddbar': 0.40,
+        'ssbar': 0.38,
+        'taupair': 0.91
+    }
+
+    totalCrossSection = sum(processCrossSections.values())
 
     weightedAverage = 0
-    for mcSample, crossSection in mcSampleCrossSections.items():
+    for process, crossSection in processCrossSections.items():
         for beamBackground, beamBackgroundWeight in beamBackgroundWeights.items():
-            sample = f'{mcCampaign}_{mcSample}{beamBackground}'
+            sample = f'{mcCampaign}_{process}{beamBackground}'
             weightedAverage += statsPerSample[sample]*beamBackgroundWeight*crossSection/totalCrossSection
 
     return weightedAverage
@@ -436,7 +446,7 @@ def addWeightedMC(allSkimStats, statSpecifier):
     return allSkimStats
 
 
-def printToJson(allSkimStats):
+def printToJson(allSkimStats, statSpecifier):
     """
 
     Args:
@@ -445,27 +455,28 @@ def printToJson(allSkimStats):
     outputJsonName = 'skimStats.json'
     with open(outputJsonName, 'w') as outputJson:
         json.dump(allSkimStats, outputJson, indent=4)
-    print(f'Wrote stats to JSON file {outputJsonName}.')
+    print(f'\nWrote stats to JSON file {outputJsonName}.')
 
 
-def printToScreen(allSkimStats):
+def printToScreen(allSkimStats, statSpecifier):
     """
 
     Args:
         allSkimStats (dict):
     """
+    selectedStats = [stat for (stat, statInfo) in statSpecifier.items() if statInfo['PrintToScreen']]
+
+    headers = ['\n'.join(wrap(statSpecifier[stat]['LongName'], 12)) for stat in selectedStats]
+    floatFormat = [''] + [statSpecifier[stat]['FloatFormat'] for stat in selectedStats]
+
     for skimName, skimStats in allSkimStats.items():
-        print(f'Performance statistics for {skimName} skim:')
+        print(f'\nPerformance statistics for {skimName} skim:')
 
         # Only print some stats to screen
-        selectedStats = [stat for (stat, statInfo) in statSpecifier.items() if statInfo['PrintToScreen']]
         df = pd.DataFrame(skimStats, columns=selectedStats)
 
         df = df.reindex([*dataSamples.keys(), 'Combined MC', *mcSamples.keys()])
         df = df.rename(index={**dataSamples, **mcSamples})
-
-        headers = ['\n'.join(wrap(statSpecifier[stat]['LongName'], 12)) for stat in selectedStats]
-        floatFormat = [''] + [statSpecifier[stat]['FloatFormat'] for stat in selectedStats]
 
         table = tabulate(df[selectedStats],
                          headers=headers, tablefmt="fancy_grid",
@@ -475,25 +486,31 @@ def printToScreen(allSkimStats):
         print(table)
 
 
-def printToConfluence(allSkimStats):
+def printToConfluence(allSkimStats, statSpecifier):
     """
 
     Args:
         allSkimStats (dict):
     """
-    confluenceStrings = []
+    confluenceFileName = 'skimStats_confluence.txt'
+
+    selectedStats = [stat for (stat, statInfo) in statSpecifier.items() if statInfo['PrintToConfluence']]
+
+    headers = [statSpecifier[stat]['LongName'] for stat in selectedStats]
+    floatFormat = [''] + [statSpecifier[stat]['FloatFormat'] for stat in selectedStats]
+
+    confluenceStrings = ['h1. How each statistic is calculated']
+    for stat in selectedStats:
+        confluenceStrings.append(statSpecifier[stat]['LongName'] + ': ' + statSpecifier[stat]['CalculationDescription'])
+
     for skimName, skimStats in allSkimStats.items():
         confluenceStrings += [f'h1. Performance statistics for {skimName} skim']
 
-        selectedStats = [stat for (stat, statInfo) in statSpecifier.items() if statInfo['PrintToConfluence']]
         df = pd.DataFrame(skimStats, columns=selectedStats)
 
         # Set up row ordering and naming
         df = df.reindex([*dataSamples.keys(), 'Combined MC', *mcSamples.keys()])
         df = df.rename(index={**dataSamples, **mcSamples})
-
-        headers = [statSpecifier[stat]['LongName'] for stat in selectedStats]
-        floatFormat = [''] + [statSpecifier[stat]['FloatFormat'] for stat in selectedStats]
 
         table = tabulate(df, headers=headers, tablefmt="jira", floatfmt=floatFormat)
 
@@ -505,10 +522,12 @@ def printToConfluence(allSkimStats):
 
     confluenceString = '\n'.join(confluenceStrings)
 
-    confluenceFileName = 'skimStats_confluence.txt'
     with open(confluenceFileName, 'w') as confluenceFile:
         confluenceFile.write(confluenceString)
-    print(f'Wrote tables to {confluenceFileName}. The contents of this file can be copied directly to Confluence.')
+
+    print(f'\nWrote tables to {confluenceFileName}. The contents of this file can ' +
+          'be copied directly to Confluence as Wiki markup in the markup editor ' +
+          '(accessible via ctrl-shift-D or cmd-shift-D).')
 
 
 def getStatSpecifier():
@@ -519,16 +538,24 @@ def getStatSpecifier():
 
     * ``'LongName'`` (`str`): The label to use in the Confluence table. Should
       include units of the statistic.
+
     * ``'FloatFormat'`` (`str`): A printf string for how the number should be printed.
+
     * ``'PrintToScreen'`` (`bool`): Determines whether the statistic is included
       in the table in terminal output.
+
     * ``'PrintToConfluence'`` (`bool`): Determines whether the statistic is
       included in the Confluence table.
+
     * ``'Calculate'`` (`function`): An anonymous function for how to calculate
       the statistic. The arguments of this function must be a dict constructed
       from the JobInformation JSON output, a string containing the log file
       contents, and the name of the sample being used. Not all of these
       arguments must be used by the function, but they must all be supplied.
+
+    * ``'CalculationDescription'`` (`str`): A sentence description of how the
+      statistic is calculated.
+
     * ``'CombineMC'`` (`function`): An anonymous function for how this
       statistics should be combined across samples to obtain an estimate for a
       cross-section weighted MC sample. Can be `None` if there is no sensible way
@@ -545,6 +572,7 @@ def getStatSpecifier():
             'PrintToScreen': True,
             'PrintToConfluence': True,
             'Calculate': lambda json, *_: 100 * nSkimmedEvents(json) / nInputEvents(json),
+            'CalculationDescription': 'Number of skimmed events divided by number of input events.',
             'CombineMC': lambda statDict: mcWeightedAverage(statDict)
         },
         'nInputEvents': {
@@ -553,6 +581,7 @@ def getStatSpecifier():
             'PrintToScreen': False,
             'PrintToConfluence': True,
             'Calculate': lambda json, *_: nInputEvents(json),
+            'CalculationDescription': 'Number of events in the input MDST file.',
             'CombineMC': None
         },
         'nSkimmedEvents': {
@@ -561,6 +590,7 @@ def getStatSpecifier():
             'PrintToScreen': False,
             'PrintToConfluence': True,
             'Calculate': lambda json, *_: nSkimmedEvents(json),
+            'CalculationDescription': 'Number of events in the output uDST file.',
             'CombineMC': None
         },
         'cpuTime': {
@@ -569,6 +599,7 @@ def getStatSpecifier():
             'PrintToScreen': False,
             'PrintToConfluence': True,
             'Calculate': lambda _, log, __: cpuTime(log),
+            'CalculationDescription': 'CPU time of test job as printed in the output logs.',
             'CombineMC': None
         },
         'cpuTimePerEvent': {
@@ -577,6 +608,7 @@ def getStatSpecifier():
             'PrintToScreen': True,
             'PrintToConfluence': True,
             'Calculate': lambda json, log, *_: cpuTime(log) / nInputEvents(json),
+            'CalculationDescription': 'CPU time of test job divided by number of input events.',
             'CombineMC': lambda statDict: mcWeightedAverage(statDict)
         },
         'udstSize': {
@@ -585,6 +617,7 @@ def getStatSpecifier():
             'PrintToScreen': False,
             'PrintToConfluence': True,
             'Calculate': lambda json, *_: udstSize(json) / 1024,
+            'CalculationDescription': 'File size of output uDST.',
             'CombineMC': None
         },
         'udstSizePerEvent': {
@@ -593,6 +626,7 @@ def getStatSpecifier():
             'PrintToScreen': True,
             'PrintToConfluence': True,
             'Calculate': lambda json, *_: udstSize(json) / nInputEvents(json),
+            'CalculationDescription': 'File size of output uDST divided by number of input events.',
             'CombineMC': lambda statDict: mcWeightedAverage(statDict)
         },
         'udstSizePerFile': {
@@ -601,6 +635,7 @@ def getStatSpecifier():
             'PrintToScreen': False,
             'PrintToConfluence': False,
             'Calculate': lambda json, _, sample: udstSize(json) / nInputEvents(json) * get_events_per_file(sample) / 1024,
+            'CalculationDescription': 'uDST size per event multiplied by average number of events per file for this sample.',
             'CombineMC': lambda statDict: mcWeightedAverage(statDict)
         },
         'logSize': {
@@ -609,6 +644,7 @@ def getStatSpecifier():
             'PrintToScreen': False,
             'PrintToConfluence': True,
             'Calculate': lambda _, log, __: logSize(log),
+            'CalculationDescription': 'File size of the output logs.',
             'CombineMC': None
         },
         'logSizePerEvent': {
@@ -617,6 +653,7 @@ def getStatSpecifier():
             'PrintToScreen': True,
             'PrintToConfluence': True,
             'Calculate': lambda json, log, __: logSize(log) / nInputEvents(json) * 1024,
+            'CalculationDescription': 'File size of the output logs divided by the number of input events.',
             'CombineMC': lambda statDict: mcWeightedAverage(statDict)
         },
         'averageCandidateMultiplicity': {
@@ -625,6 +662,7 @@ def getStatSpecifier():
             'PrintToScreen': True,
             'PrintToConfluence': True,
             'Calculate': lambda _, log, __: averageCandidateMultiplicity(log),
+            'CalculationDescription': 'Candidate multiplicity as listed in output logs, averaged over the particle lists.',
             'CombineMC': lambda statDict: mcWeightedAverage(statDict)
         },
         'memoryAverage': {
@@ -633,6 +671,7 @@ def getStatSpecifier():
             'PrintToScreen': True,
             'PrintToConfluence': True,
             'Calculate': lambda _, log, __: memoryAverage(log),
+            'CalculationDescription': 'Average memory usage, as listed in output logs.',
             'CombineMC': lambda statDict: mcWeightedAverage(statDict)
         },
         'memoryMaximum': {
@@ -641,6 +680,7 @@ def getStatSpecifier():
             'PrintToScreen': True,
             'PrintToConfluence': True,
             'Calculate': lambda _, log, __: memoryMaximum(log),
+            'CalculationDescription': 'Maximum memory usage, as listed in output logs.',
             'CombineMC': lambda statDict: max(statDict.values())
         },
         'udstSizePerEntireSample': {
@@ -649,6 +689,7 @@ def getStatSpecifier():
             'PrintToScreen': False,
             'PrintToConfluence': True,
             'Calculate': lambda json, _, sample: udstSize(json) * nTotalEvents(sample) / nInputEvents(json) / 1024 / 1024,
+            'CalculationDescription': 'Output uDST size per event multiplied by total number of events in the full sample.',
             'CombineMC': lambda statDict: sum(statDict.values())
         },
         'logSizePerEntireSample': {
@@ -657,6 +698,7 @@ def getStatSpecifier():
             'PrintToScreen': False,
             'PrintToConfluence': True,
             'Calculate': lambda json, log, sample: logSize(log) * nTotalEvents(sample) / nInputEvents(json) / 1024 / 1024,
+            'CalculationDescription': 'Output log file size per event multiplied by total number of events in the full sample.',
             'CombineMC': lambda statDict: sum(statDict.values())
         }
     }
@@ -673,6 +715,6 @@ if __name__ == '__main__':
     allSkimStats = getSkimStatsDict(skims, samples, statSpecifier)
     allSkimStats = addWeightedMC(allSkimStats, statSpecifier)
 
-    printToScreen(allSkimStats)
-    printToJson(allSkimStats)
-    printToConfluence(allSkimStats)
+    printToScreen(allSkimStats, statSpecifier)
+    printToJson(allSkimStats, statSpecifier)
+    printToConfluence(allSkimStats, statSpecifier)

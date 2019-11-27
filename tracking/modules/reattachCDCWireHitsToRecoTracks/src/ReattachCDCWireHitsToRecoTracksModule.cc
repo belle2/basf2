@@ -138,7 +138,6 @@ void ReattachCDCWireHitsToRecoTracksModule::findHits()
                     << "ID of the background hit: " << wireHit.getHit()->getID() << std::endl
                     << "ADC of the background hit: " << wireHit.getHit()->getADCCount() << std::endl
                     << "TOT of the background hit: " << wireHit.getHit()->getTOT() << std::endl
-                    << "rlInfo: " << results.rlInfo << " (right: 1, left: -1, unknown: 0)" << std::endl
                     << "Distance from track to hit: " << results.distanceToTrack << std::endl);
           }
         }
@@ -197,7 +196,6 @@ void ReattachCDCWireHitsToRecoTracksModule::addHits()
                     << "ID of the background hit: " << hitToAdd.getHit()->getID() << std::endl
                     << "ADC of the background hit: " << hitToAdd.getHit()->getADCCount() << std::endl
                     << "TOT of the background hit: " << hitToAdd.getHit()->getTOT() << std::endl
-                    << "rlInfo: " << results.rlInfo << " (right: 1, left: -1, unknown: 0)" << std::endl
                     << "Distance from track to hit: " << results.distanceToTrack << std::endl
                     << "Previous arc lenght of the hit: " << previousArcLength[&hitToAdd] << std::endl
                     << "Current arc lenght of the hit: " << currentArcLength[&hitToAdd] << std::endl);

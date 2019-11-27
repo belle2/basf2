@@ -8,31 +8,30 @@
 # usage: basf2 run_alignment.py expNo runFirst runLast [sample]
 #        sample = dimuon/bhabha (D = dimuon)
 #
-# Note: input data must be already well calibrated (including moduleT0 and commonT0)
+# Note: input data or databases must be well calibrated (including moduleT0 and commonT0)
 #
 # author: M. Staric
 # ---------------------------------------------------------------------------------------
 
-import basf2
 import sys
 import os
 import glob
 from caf import backends
-from caf.framework import Calibration, CAF, Collection
-from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
-from ROOT import Belle2
-from ROOT.Belle2 import TOP
+from caf.framework import CAF
 from basf2 import B2ERROR
+from top_calibration import module_alignment
 
 # ----- those parameters need to be adjusted before running -----------------------------
 #
-globalTag = 'data_reprocessing_prompt_rel4_patchb'
+globalTags = ['data_reprocessing_prompt_rel4_patchb']  # highest priority first
+localDBs = []  # highest priority first, local DB's have higher priority than global tags
 data_dir = '/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/'
 dimuon_skim_dir = 'offskim/offskim_mumutop/cdst/sub00'
 bhabha_skim_dir = 'skim/hlt_bhabha/cdst/sub00'
 main_output_dir = 'top_calibration'
 default_sample = 'dimuon'
 fixedParameters = ['dn/n']  # to list all names: basf2 -m TOPAlignmentCollector
+recalibrate = False  # if input data already well calibrated, otherwise switch to True
 #
 # ---------------------------------------------------------------------------------------
 
@@ -76,56 +75,9 @@ if len(inputFiles) == 0:
 run_range = 'r' + '{:0=5d}'.format(run_first) + '-' + '{:0=5d}'.format(run_last)
 output_dir = f"{main_output_dir}/alignment-{sample}-{expNo}-{run_range}"
 
-# Temporary fix for BII-5431
-if not os.path.isdir(main_output_dir):
-    os.makedirs(main_output_dir)
-    print('New folder created: ' + main_output_dir)
-
-# Suppress messages during processing
-# basf2.set_log_level(basf2.LogLevel.WARNING)
-
-
-def module_alignment():
-    ''' alignment of TOP modules '''
-
-    # Define calibration
-    cal = Calibration(name='TOP_alignment')
-    cal.use_central_database(globalTag)
-    cal.strategies = SingleIOV
-
-    # Add collections
-    for slot in range(1, 17):
-        # Create path
-        main = basf2.create_path()
-
-        # Basic modules: Input, converters, geometry, unpacker
-        main.add_module('RootInput')
-        main.add_module('TOPGeometryParInitializer')
-        main.add_module('TOPChannelMasker')
-
-        # Collector module
-        collector = basf2.register_module('TOPAlignmentCollector')
-        collector.param('sample', sample)
-        collector.param('parFixed', fixedParameters)
-        collector.param('targetModule', slot)
-
-        # Define collection
-        collection = Collection(collector=collector, input_files=inputFiles,
-                                pre_collector_path=main, max_files_per_collector_job=-1)
-        collection.use_central_database(globalTag)
-        collection.backend_args = {"queue": "l"}
-        # Add collection to calibration
-        cal.add_collection(name='slot_' + '{:0=2d}'.format(slot), collection=collection)
-
-    # Algorithm
-    algorithm = TOP.TOPAlignmentAlgorithm()
-    cal.algorithms = algorithm
-
-    return cal
-
-
-# Define calibrations
-cal = module_alignment()
+# Define calibration
+cal = module_alignment(inputFiles, sample, fixedParameters, recalibrate,
+                       globalTags, localDBs)
 cal.backend_args = {"queue": "l"}
 
 # Add calibrations to CAF

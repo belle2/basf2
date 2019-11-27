@@ -29,6 +29,25 @@
 namespace Belle2 {
   namespace Variable {
 
+    // Convenience function to obtain track d0 with respect to IP
+    // Based on v0DaughterD0 function in ParameterVariables.cc
+    double trackD0FromIP(const Particle* particle)
+    {
+      const Track* track = particle->getTrack();
+      if (!track) return std::numeric_limits<float>::quiet_NaN();
+
+      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(particle->getPDGCode())));
+      if (!trackFit) return std::numeric_limits<float>::quiet_NaN();
+
+      static DBObjPtr<BeamSpot> beamSpotDB;
+
+      UncertainHelix helix = trackFit->getUncertainHelix();
+      helix.passiveMoveBy(beamSpotDB->getIPPosition());
+
+      return helix.getD0();
+    }
+
+
     double goodBelleKshort(const Particle* KS)
     {
       // check input
@@ -68,23 +87,6 @@ namespace Belle2 {
         return 0.0;
     }
 
-    // Convenience function to obtain track d0 with respect to IP
-    // Based on v0DaughterD0 function in ParameterVariables.cc
-    double trackD0FromIP(const Particle* particle)
-    {
-      const Track* track = particle->getTrack();
-      if (!track) return std::numeric_limits<float>::quiet_NaN();
-
-      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(particle->getPDGCode())));
-      if (!trackFit) return std::numeric_limits<float>::quiet_NaN();
-
-      static DBObjPtr<BeamSpot> beamSpotDB;
-
-      UncertainHelix helix = trackFit->getUncertainHelix();
-      helix.passiveMoveBy(beamSpotDB->getIPPosition());
-
-      return helix.getD0();
-    }
 
     double goodBelleLambda(const Particle* Lambda)
     {

@@ -24,10 +24,6 @@ namespace Belle2 {
     /** Returns true if the cluster with given attributes passes the Belle 'good gamma' criteria. */
     bool isGoodBelleGamma(int region, double energy);
 
-    // Convenience function to obtain track d0 with respect to IP
-    // Based on v0DaughterD0 function in ParameterVariables.cc
-    double trackD0FromIP(const Particle* particle);
-
     /**
      * Return 1 if ECLCluster passes the following selection criteria:
      * Forward  : E > 100 MeV

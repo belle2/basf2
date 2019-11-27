@@ -19,16 +19,24 @@ from skim.registry import skim_registry, combined_skims
 from skimExpertFunctions import get_test_file
 
 
-allStandaloneSkims = [skim for _, skim in skim_registry]
-allCombinedSkims = list(combined_skims.keys())
-
 mcCampaign = 'MC12'
-beamBackgrounds = ['BGx1', 'BGx0']
-mcSampleTypes = ['mixed', 'charged', 'ccbar', 'uubar', 'ddbar', 'ssbar', 'taupair']
 
-mcSamples = [f'{mcCampaign}_{mcSample}{beamBackground}'
-             for beamBackground in beamBackgrounds
-             for mcSample in mcSampleTypes]
+mcSamples = [
+    f'{mcCampaign}_mixedBGx1',
+    f'{mcCampaign}_chargedBGx1',
+    f'{mcCampaign}_ccbarBGx1',
+    f'{mcCampaign}_uubarBGx1',
+    f'{mcCampaign}_ddbarBGx1',
+    f'{mcCampaign}_ssbarBGx1',
+    f'{mcCampaign}_taupairBGx1',
+    f'{mcCampaign}_mixedBGx0',
+    f'{mcCampaign}_chargedBGx0',
+    f'{mcCampaign}_ccbarBGx0',
+    f'{mcCampaign}_uubarBGx0',
+    f'{mcCampaign}_ddbarBGx0',
+    f'{mcCampaign}_ssbarBGx0',
+    f'{mcCampaign}_taupairBGx0',
+]
 
 dataSamples = ['proc9_exp3', 'proc9_exp7', 'proc9_exp8', 'bucket7_exp8']
 
@@ -74,6 +82,9 @@ def getArgumentParser():
 def getSkimsAndScriptsToRun(parser, standaloneList, combinedList):
     """
     """
+    allStandaloneSkims = [skim for _, skim in skim_registry]
+    allCombinedSkims = list(combined_skims.keys())
+
     if not (standaloneList or combinedList):
         parser.print_help()
         sys.exit(1)

@@ -27,7 +27,6 @@ from skim.registry import skim_registry, combined_skims
 from skimExpertFunctions import get_test_file, get_eventN, get_total_infiles, get_events_per_file
 
 
-# TODO: put these into a function for documentation purposes
 mcCampaign = 'MC12'
 
 mcSamples = {
@@ -398,12 +397,12 @@ def mcWeightedAverage(statsPerSample):
     """
 
     # The fraction of each background level produced in the MC sample
-    beamBackgroundFraction = {
+    beamBackgroundFractions = {
         'BGx1': 0.8,
         'BGx0': 0.2
     }
 
-    # The cross section of each process in e+e- collisions (fb^-1)
+    # The cross section (nb) of each process in e+e- collisions
     processCrossSections = {
         'mixed': 0.555,
         'charged': 0.555,
@@ -418,9 +417,9 @@ def mcWeightedAverage(statsPerSample):
 
     weightedAverage = 0
     for process, crossSection in processCrossSections.items():
-        for beamBackground, beamBackgroundWeight in beamBackgroundWeights.items():
+        for beamBackground, beamBackgroundFraction in beamBackgroundFractions.items():
             sample = f'{mcCampaign}_{process}{beamBackground}'
-            weightedAverage += statsPerSample[sample]*beamBackgroundWeight*crossSection/totalCrossSection
+            weightedAverage += statsPerSample[sample]*beamBackgroundFraction*crossSection/totalCrossSection
 
     return weightedAverage
 
@@ -501,10 +500,10 @@ def printToConfluence(allSkimStats, statSpecifier):
 
     confluenceStrings = ['h1. How each statistic is calculated']
     for stat in selectedStats:
-        confluenceStrings.append(statSpecifier[stat]['LongName'] + ': ' + statSpecifier[stat]['CalculationDescription'])
+        confluenceStrings.append(' - ' + statSpecifier[stat]['LongName'] + ': ' + statSpecifier[stat]['CalculationDescription'])
 
     for skimName, skimStats in allSkimStats.items():
-        confluenceStrings += [f'h1. Performance statistics for {skimName} skim']
+        confluenceStrings += ['', f'h1. Performance statistics for {skimName} skim']
 
         df = pd.DataFrame(skimStats, columns=selectedStats)
 

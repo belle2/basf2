@@ -1,0 +1,5 @@
+Import('env')
+
+env['TOOLS_LIBS']['writeROIparametersToDB'] = ['stdc++', 'simulation', 'framework', '$ROOT_LIBS']
+
+Return('env')

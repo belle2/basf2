@@ -18,6 +18,7 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/utility/MCMatching.h>
+#include <analysis/utility/AnalysisConfiguration.h>
 
 #include <string>
 #include <memory>
@@ -139,14 +140,9 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
     for (auto daug : tmpDaughtersP)
       daughtersP.push_back(daug);
   }
-  int nDaughtersP = daughtersP.size();
-  // Create index for MCParticle daughter list
-  // The index of matched daughters will be then removed later from this list.
-  vector<int> daughtersPIndex;
-  daughtersPIndex.reserve(nDaughtersP);
-  for (int i = 0; i < nDaughtersP; i++) daughtersPIndex.push_back(i);
 
   // The MCParticle must have at least as many daughters as the decaydescriptor
+  int nDaughtersP = daughtersP.size();
   if (nDaughtersD > nDaughtersP) {
     B2DEBUG(10, "DecayDescriptor has more daughters than MCParticle!");
     return decay;
@@ -156,13 +152,45 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   for (int iDD = 0; iDD < nDaughtersD; iDD++) {
     // check if there is an unmatched particle daughter matching this decay descriptor daughter
     bool isMatchDaughter = false;
-    for (auto itDP = daughtersPIndex.begin(); itDP != daughtersPIndex.end(); ++itDP) {
-      DecayTree<MCParticle>* daughter = match(daughtersP[*itDP], d->getDaughter(iDD), isCC);
-      if (!daughter->getObj()) continue;
+    auto itDP = daughtersP.begin();
+    while (itDP != daughtersP.end()) {
+      const MCParticle* daugP = *itDP;
+      DecayTree<MCParticle>* daughter = match(daugP, d->getDaughter(iDD), isCC);
+      if (!daughter->getObj()) {
+        ++itDP;
+        continue;
+      }
       // Matching daughter found, remove it from list of unmatched particle daughters
       decay->append(daughter);
       isMatchDaughter = true;
-      daughtersPIndex.erase(itDP);
+      itDP = daughtersP.erase(itDP);
+
+      if (d->isIgnoreIntermediate() and d->getDaughter(iDD)->getNDaughters() != 0) {
+        B2WARNING("DecayDescriptor Try to Erase !!!");
+        vector<const MCParticle*> grandDaughtersP;
+        if (d->getDaughter(iDD)->isIgnoreIntermediate()) {
+          appendParticles(daugP, grandDaughtersP);
+        } else {
+          const vector<MCParticle*>& tmpGrandDaughtersP = daugP->getDaughters();
+          for (auto grandDaugP : tmpGrandDaughtersP)
+            grandDaughtersP.push_back(grandDaugP);
+        }
+
+        for (auto grandDaugP : grandDaughtersP) {
+          auto jtDP = itDP;
+          while (jtDP != daughtersP.end()) {
+            // for (auto jtDP = itDP; jtDP != daughtersPIndex.end(); ++jtDP) {
+            const MCParticle* daugP_j = *jtDP;
+            if (grandDaugP == daugP_j) {
+              B2WARNING("DecayDescriptor Erased jtDP!!!");
+              jtDP = daughtersP.erase(jtDP);
+            } else {
+              ++jtDP;
+            }
+          }
+        }
+      }
+
       break;
     }
     if (!isMatchDaughter) {
@@ -175,23 +203,23 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   bool isInclusive = (d->isIgnoreMassive() and d->isIgnoreNeutrino() and d->isIgnoreGamma() and d->isIgnoreRadiatedPhotons());
   if (!isInclusive) {
     B2DEBUG(10, "Check for left over MCParticles!\n");
-    for (int& itDP : daughtersPIndex) {
-      if (daughtersP[itDP]->getPDG() == Const::photon.getPDGCode()) { // gamma
+    for (auto daugP : daughtersP) {
+      if (daugP->getPDG() == Const::photon.getPDGCode()) { // gamma
         // if gamma is FSR or produced by PHOTOS
-        if (MCMatching::isFSR(daughtersP[itDP]) or daughtersP[itDP]->hasStatus(MCParticle::c_IsPHOTOSPhoton)) {
+        if (MCMatching::isFSR(daugP) or daugP->hasStatus(MCParticle::c_IsPHOTOSPhoton)) {
           // if the radiated photons are ignored, we can skip the particle
           if (d->isIgnoreRadiatedPhotons()) continue;
         }
         // else if missing gamma is ignored, we can skip the particle
         else if (d->isIgnoreGamma()) continue;
-      } else if ((daughtersP[itDP]->getPDG() == 12 or daughtersP[itDP]->getPDG() == 14 or daughtersP[itDP]->getPDG() == 16)) { // neutrino
+      } else if ((daugP->getPDG() == 12 or daugP->getPDG() == 14 or daugP->getPDG() == 16)) { // neutrino
         if (d->isIgnoreNeutrino()) continue;
-      } else if (MCMatching::isFSP(daughtersP[itDP]->getPDG()) and d->isIgnoreMassive()) { // other final state particle
+      } else if (MCMatching::isFSP(daugP->getPDG()) and d->isIgnoreMassive()) { // other final state particle
         if (d->isIgnoreMassive()) continue;
       } else { // intermediate
         if (d->isIgnoreIntermediate()) continue;
       }
-      B2DEBUG(10, "There was an additional particle left. Found " << daughtersP[itDP]->getPDG());
+      B2DEBUG(10, "There was an additional particle left. Found " << daugP->getPDG());
       return decay;
     }
   }

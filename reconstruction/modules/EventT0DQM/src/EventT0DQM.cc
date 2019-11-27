@@ -37,65 +37,65 @@ void EventT0DQMModule::defineHisto()
   double minT0 = -100 ;
   double maxT0 =  100 ;
 
-  h_eventT0_ECL_bhabha_L1_ECLTRG = new TH1F("h_eventT0_ECL_bhabha_L1_ECLTRG",
-                                            "ECL event t0 - bhabhas - ECLTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_CDC_bhabha_L1_ECLTRG = new TH1F("h_eventT0_CDC_bhabha_L1_ECLTRG",
-                                            "CDC event t0 - bhabhas - ECLTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_TOP_bhabha_L1_ECLTRG = new TH1F("h_eventT0_TOP_bhabha_L1_ECLTRG",
-                                            "TOP event t0 - bhabhas - ECLTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_ECL_hadron_L1_ECLTRG = new TH1F("h_eventT0_ECL_hadron_L1_ECLTRG",
-                                            "ECL event t0 - hadrons - ECLTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_CDC_hadron_L1_ECLTRG = new TH1F("h_eventT0_CDC_hadron_L1_ECLTRG",
-                                            "CDC event t0 - hadrons - ECLTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_TOP_hadron_L1_ECLTRG = new TH1F("h_eventT0_TOP_hadron_L1_ECLTRG",
-                                            "TOP event t0 - hadrons - ECLTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_ECL_mumu_L1_ECLTRG   = new TH1F("h_eventT0_ECL_mumu_L1_ECLTRG",
-                                            "ECL event t0 - mu mu - ECLTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_CDC_mumu_L1_ECLTRG   = new TH1F("h_eventT0_CDC_mumu_L1_ECLTRG",
-                                            "CDC event t0 - mu mu - ECLTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_TOP_mumu_L1_ECLTRG   = new TH1F("h_eventT0_TOP_mumu_L1_ECLTRG",
-                                            "TOP event t0 - mu mu - ECLTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
+  m_histEventT0_ECL_bhabha_L1_ECLTRG = new TH1F("m_histEventT0_ECL_bhabha_L1_ECLTRG",
+                                                "ECL event t0 - bhabhas - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_CDC_bhabha_L1_ECLTRG = new TH1F("m_histEventT0_CDC_bhabha_L1_ECLTRG",
+                                                "CDC event t0 - bhabhas - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_TOP_bhabha_L1_ECLTRG = new TH1F("m_histEventT0_TOP_bhabha_L1_ECLTRG",
+                                                "TOP event t0 - bhabhas - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_ECL_hadron_L1_ECLTRG = new TH1F("m_histEventT0_ECL_hadron_L1_ECLTRG",
+                                                "ECL event t0 - hadrons - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_CDC_hadron_L1_ECLTRG = new TH1F("m_histEventT0_CDC_hadron_L1_ECLTRG",
+                                                "CDC event t0 - hadrons - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_TOP_hadron_L1_ECLTRG = new TH1F("m_histEventT0_TOP_hadron_L1_ECLTRG",
+                                                "TOP event t0 - hadrons - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_ECL_mumu_L1_ECLTRG   = new TH1F("m_histEventT0_ECL_mumu_L1_ECLTRG",
+                                                "ECL event t0 - mu mu - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_CDC_mumu_L1_ECLTRG   = new TH1F("m_histEventT0_CDC_mumu_L1_ECLTRG",
+                                                "CDC event t0 - mu mu - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_TOP_mumu_L1_ECLTRG   = new TH1F("m_histEventT0_TOP_mumu_L1_ECLTRG",
+                                                "TOP event t0 - mu mu - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
 
 
 
 
 
-  h_eventT0_ECL_bhabha_L1_CDCTRG = new TH1F("h_eventT0_ECL_bhabha_L1_CDCTRG",
-                                            "ECL event t0 - bhabhas - CDCTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_CDC_bhabha_L1_CDCTRG = new TH1F("h_eventT0_CDC_bhabha_L1_CDCTRG",
-                                            "CDC event t0 - bhabhas - CDCTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_TOP_bhabha_L1_CDCTRG = new TH1F("h_eventT0_TOP_bhabha_L1_CDCTRG",
-                                            "TOP event t0 - bhabhas - CDCTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_ECL_hadron_L1_CDCTRG = new TH1F("h_eventT0_ECL_hadron_L1_CDCTRG",
-                                            "ECL event t0 - hadrons - CDCTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_CDC_hadron_L1_CDCTRG = new TH1F("h_eventT0_CDC_hadron_L1_CDCTRG",
-                                            "CDC event t0 - hadrons - CDCTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_TOP_hadron_L1_CDCTRG = new TH1F("h_eventT0_TOP_hadron_L1_CDCTRG",
-                                            "TOP event t0 - hadrons - CDCTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_ECL_mumu_L1_CDCTRG   = new TH1F("h_eventT0_ECL_mumu_L1_CDCTRG",
-                                            "ECL event t0 - mu mu - CDCTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_CDC_mumu_L1_CDCTRG   = new TH1F("h_eventT0_CDC_mumu_L1_CDCTRG",
-                                            "CDC event t0 - mu mu - CDCTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
-  h_eventT0_TOP_mumu_L1_CDCTRG   = new TH1F("h_eventT0_TOP_mumu_L1_CDCTRG",
-                                            "TOP event t0 - mu mu - CDCTRG time;event t0 [ns];events / 0.5 ns",
-                                            nBins, minT0, maxT0);
+  m_histEventT0_ECL_bhabha_L1_CDCTRG = new TH1F("m_histEventT0_ECL_bhabha_L1_CDCTRG",
+                                                "ECL event t0 - bhabhas - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_CDC_bhabha_L1_CDCTRG = new TH1F("m_histEventT0_CDC_bhabha_L1_CDCTRG",
+                                                "CDC event t0 - bhabhas - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_TOP_bhabha_L1_CDCTRG = new TH1F("m_histEventT0_TOP_bhabha_L1_CDCTRG",
+                                                "TOP event t0 - bhabhas - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_ECL_hadron_L1_CDCTRG = new TH1F("m_histEventT0_ECL_hadron_L1_CDCTRG",
+                                                "ECL event t0 - hadrons - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_CDC_hadron_L1_CDCTRG = new TH1F("m_histEventT0_CDC_hadron_L1_CDCTRG",
+                                                "CDC event t0 - hadrons - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_TOP_hadron_L1_CDCTRG = new TH1F("m_histEventT0_TOP_hadron_L1_CDCTRG",
+                                                "TOP event t0 - hadrons - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_ECL_mumu_L1_CDCTRG   = new TH1F("m_histEventT0_ECL_mumu_L1_CDCTRG",
+                                                "ECL event t0 - mu mu - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_CDC_mumu_L1_CDCTRG   = new TH1F("m_histEventT0_CDC_mumu_L1_CDCTRG",
+                                                "CDC event t0 - mu mu - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_TOP_mumu_L1_CDCTRG   = new TH1F("m_histEventT0_TOP_mumu_L1_CDCTRG",
+                                                "TOP event t0 - mu mu - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
 
   oldDir->cd();
 
@@ -127,25 +127,25 @@ void EventT0DQMModule::beginRun()
     return;
   }
 
-  h_eventT0_ECL_bhabha_L1_ECLTRG->Reset();
-  h_eventT0_CDC_bhabha_L1_ECLTRG->Reset();
-  h_eventT0_TOP_bhabha_L1_ECLTRG->Reset();
-  h_eventT0_ECL_hadron_L1_ECLTRG->Reset();
-  h_eventT0_CDC_hadron_L1_ECLTRG->Reset();
-  h_eventT0_TOP_hadron_L1_ECLTRG->Reset();
-  h_eventT0_ECL_mumu_L1_ECLTRG->Reset();
-  h_eventT0_CDC_mumu_L1_ECLTRG->Reset();
-  h_eventT0_TOP_mumu_L1_ECLTRG->Reset();
+  m_histEventT0_ECL_bhabha_L1_ECLTRG->Reset();
+  m_histEventT0_CDC_bhabha_L1_ECLTRG->Reset();
+  m_histEventT0_TOP_bhabha_L1_ECLTRG->Reset();
+  m_histEventT0_ECL_hadron_L1_ECLTRG->Reset();
+  m_histEventT0_CDC_hadron_L1_ECLTRG->Reset();
+  m_histEventT0_TOP_hadron_L1_ECLTRG->Reset();
+  m_histEventT0_ECL_mumu_L1_ECLTRG->Reset();
+  m_histEventT0_CDC_mumu_L1_ECLTRG->Reset();
+  m_histEventT0_TOP_mumu_L1_ECLTRG->Reset();
 
-  h_eventT0_ECL_bhabha_L1_CDCTRG->Reset();
-  h_eventT0_CDC_bhabha_L1_CDCTRG->Reset();
-  h_eventT0_TOP_bhabha_L1_CDCTRG->Reset();
-  h_eventT0_ECL_hadron_L1_CDCTRG->Reset();
-  h_eventT0_CDC_hadron_L1_CDCTRG->Reset();
-  h_eventT0_TOP_hadron_L1_CDCTRG->Reset();
-  h_eventT0_ECL_mumu_L1_CDCTRG->Reset();
-  h_eventT0_CDC_mumu_L1_CDCTRG->Reset();
-  h_eventT0_TOP_mumu_L1_CDCTRG->Reset();
+  m_histEventT0_ECL_bhabha_L1_CDCTRG->Reset();
+  m_histEventT0_CDC_bhabha_L1_CDCTRG->Reset();
+  m_histEventT0_TOP_bhabha_L1_CDCTRG->Reset();
+  m_histEventT0_ECL_hadron_L1_CDCTRG->Reset();
+  m_histEventT0_CDC_hadron_L1_CDCTRG->Reset();
+  m_histEventT0_TOP_hadron_L1_CDCTRG->Reset();
+  m_histEventT0_ECL_mumu_L1_CDCTRG->Reset();
+  m_histEventT0_CDC_mumu_L1_CDCTRG->Reset();
+  m_histEventT0_TOP_mumu_L1_CDCTRG->Reset();
 
 }
 
@@ -153,21 +153,21 @@ void EventT0DQMModule::beginRun()
 //---------------------------------
 void EventT0DQMModule::event()
 {
-  if (!obj_trg_summary.isValid()) {
+  if (!m_objTrgSummary.isValid()) {
     B2WARNING("TRGSummary object not available but required to indicate which detector provided the L1 trigger time");
     return;
   } else {
-    m_L1_timing_src = obj_trg_summary->getTimType();
+    m_L1TimingSrc = m_objTrgSummary->getTimType();
   }
 
   bool Is_ECL_L1TriggerSource = false ;
   bool Is_CDC_L1TriggerSource = false ;
-  if (m_L1_timing_src == 0) {            // for L1 timing source is "ecl trigger"
+  if (m_L1TimingSrc == 0) {            // for L1 timing source is "ecl trigger"
     Is_ECL_L1TriggerSource = true ;
-  } else if (m_L1_timing_src == 3) {     // for L1 timing source is "cdc trigger"
+  } else if (m_L1TimingSrc == 3) {     // for L1 timing source is "cdc trigger"
     Is_CDC_L1TriggerSource = true ;
   }
-  // else if(m_L1_timing_src==5){  // for L1 timing source is "delayed Bhabha" }
+  // else if(m_L1TimingSrc==5){  // for L1 timing source is "delayed Bhabha" }
   B2DEBUG(20, "Is_ECL_L1TriggerSource = " << Is_ECL_L1TriggerSource) ;
   B2DEBUG(20, "Is_CDC_L1TriggerSource= " << Is_CDC_L1TriggerSource) ;
 
@@ -219,45 +219,45 @@ void EventT0DQMModule::event()
 
 
   // default values of the event t0 given that there may not be a value for every event depending on the detector measuring it.
-  double event_t0_ECL = -1000 ;
-  double event_t0_CDC = -1000 ;
-  double event_t0_TOP = -1000 ;
+  double eventT0_ECL = -1000 ;
+  double eventT0_CDC = -1000 ;
+  double eventT0_TOP = -1000 ;
 
   // Set the CDC event t0 value if it exists
   if (m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
-    vector<EventT0::EventT0Component> evt_t0_list_CDC = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC) ;
+    auto evtT0List_CDC = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC) ;
 
     // set the CDC event t0 value for filling into the histogram
     //    The most accurate CDC event t0 value is the last one in the list.
-    event_t0_CDC = evt_t0_list_CDC.back().eventT0 ;
+    eventT0_CDC = evtT0List_CDC.back().eventT0 ;
   }
 
   // Set the ECL event t0 value if it exists
   if (m_eventT0->hasTemporaryEventT0(Const::EDetector::ECL)) {
     // Get the list of ECL event t0 values.  There are several event t0 values, not just one.
-    vector<EventT0::EventT0Component> evt_t0_list_ECL = m_eventT0->getTemporaryEventT0s(Const::EDetector::ECL) ;
+    auto evtT0List_ECL = m_eventT0->getTemporaryEventT0s(Const::EDetector::ECL) ;
 
     // Select the event t0 value from the ECL as the one with the smallest chi squared value (defined as ".quality")
-    double smallest_ECL_t0_minChi2 = evt_t0_list_ECL[0].quality ;
+    double smallest_ECL_t0_minChi2 = evtT0List_ECL[0].quality ;
     int smallest_ECL_t0_minChi2_idx = 0 ;
-    for (int ECLi = 0; ECLi < evt_t0_list_ECL.size(); ECLi++) {
-      if (evt_t0_list_ECL[ECLi].quality < smallest_ECL_t0_minChi2) {
-        smallest_ECL_t0_minChi2 = evt_t0_list_ECL[ECLi].quality ;
+    for (long unsigned int ECLi = 0; ECLi < evtT0List_ECL.size(); ECLi++) {
+      if (evtT0List_ECL[ECLi].quality < smallest_ECL_t0_minChi2) {
+        smallest_ECL_t0_minChi2 = evtT0List_ECL[ECLi].quality ;
         smallest_ECL_t0_minChi2_idx = ECLi ;
       }
     }
     // set the ECL event t0 value for filling into the histogram
     //    It is the value found to have the small chi square
-    event_t0_ECL = evt_t0_list_ECL[smallest_ECL_t0_minChi2_idx].eventT0 ;
+    eventT0_ECL = evtT0List_ECL[smallest_ECL_t0_minChi2_idx].eventT0 ;
   }
 
   // Set the TOP event t0 value if it exists
   if (m_eventT0->hasTemporaryEventT0(Const::EDetector::TOP)) {
-    vector<EventT0::EventT0Component> evt_t0_list_TOP = m_eventT0->getTemporaryEventT0s(Const::EDetector::TOP) ;
+    auto evtT0List_TOP = m_eventT0->getTemporaryEventT0s(Const::EDetector::TOP) ;
 
     // set the TOP event t0 value for filling into the histogram
     //    There should only be at most one value in the list per event
-    event_t0_TOP = evt_t0_list_TOP.back().eventT0 ;
+    eventT0_TOP = evtT0List_TOP.back().eventT0 ;
   }
 
 
@@ -267,48 +267,48 @@ void EventT0DQMModule::event()
   if (Is_ECL_L1TriggerSource) {
     // Fill the histograms with the event t0 values
     if (IsEvtAcceptedBhabha) {   // fill the bha bha skim event t0s
-      h_eventT0_ECL_bhabha_L1_ECLTRG->Fill(event_t0_ECL);
-      h_eventT0_CDC_bhabha_L1_ECLTRG->Fill(event_t0_CDC);
-      h_eventT0_TOP_bhabha_L1_ECLTRG->Fill(event_t0_TOP);
+      m_histEventT0_ECL_bhabha_L1_ECLTRG->Fill(eventT0_ECL);
+      m_histEventT0_CDC_bhabha_L1_ECLTRG->Fill(eventT0_CDC);
+      m_histEventT0_TOP_bhabha_L1_ECLTRG->Fill(eventT0_TOP);
     }
 
     if (IsEvtAcceptedHadron) {    // fill the hadron skim event t0s
-      h_eventT0_ECL_hadron_L1_ECLTRG->Fill(event_t0_ECL);
-      h_eventT0_CDC_hadron_L1_ECLTRG->Fill(event_t0_CDC);
-      h_eventT0_TOP_hadron_L1_ECLTRG->Fill(event_t0_TOP);
+      m_histEventT0_ECL_hadron_L1_ECLTRG->Fill(eventT0_ECL);
+      m_histEventT0_CDC_hadron_L1_ECLTRG->Fill(eventT0_CDC);
+      m_histEventT0_TOP_hadron_L1_ECLTRG->Fill(eventT0_TOP);
     }
 
     if (IsEvtAcceptedMumu) {    // fill the mumu skim event t0s
-      h_eventT0_ECL_mumu_L1_ECLTRG->Fill(event_t0_ECL);
-      h_eventT0_CDC_mumu_L1_ECLTRG->Fill(event_t0_CDC);
-      h_eventT0_TOP_mumu_L1_ECLTRG->Fill(event_t0_TOP);
+      m_histEventT0_ECL_mumu_L1_ECLTRG->Fill(eventT0_ECL);
+      m_histEventT0_CDC_mumu_L1_ECLTRG->Fill(eventT0_CDC);
+      m_histEventT0_TOP_mumu_L1_ECLTRG->Fill(eventT0_TOP);
     }
   }
   // Fill the plots that used the CDC trigger as the L1 timing source
   else if (Is_CDC_L1TriggerSource) {
     // Fill the histograms with the event t0 values
     if (IsEvtAcceptedBhabha) {   // fill the bha bha skim event t0s
-      h_eventT0_ECL_bhabha_L1_CDCTRG->Fill(event_t0_ECL);
-      h_eventT0_CDC_bhabha_L1_CDCTRG->Fill(event_t0_CDC);
-      h_eventT0_TOP_bhabha_L1_CDCTRG->Fill(event_t0_TOP);
+      m_histEventT0_ECL_bhabha_L1_CDCTRG->Fill(eventT0_ECL);
+      m_histEventT0_CDC_bhabha_L1_CDCTRG->Fill(eventT0_CDC);
+      m_histEventT0_TOP_bhabha_L1_CDCTRG->Fill(eventT0_TOP);
     }
 
     if (IsEvtAcceptedHadron) {    // fill the hadron skim event t0s
-      h_eventT0_ECL_hadron_L1_CDCTRG->Fill(event_t0_ECL);
-      h_eventT0_CDC_hadron_L1_CDCTRG->Fill(event_t0_CDC);
-      h_eventT0_TOP_hadron_L1_CDCTRG->Fill(event_t0_TOP);
+      m_histEventT0_ECL_hadron_L1_CDCTRG->Fill(eventT0_ECL);
+      m_histEventT0_CDC_hadron_L1_CDCTRG->Fill(eventT0_CDC);
+      m_histEventT0_TOP_hadron_L1_CDCTRG->Fill(eventT0_TOP);
     }
 
     if (IsEvtAcceptedMumu) {    // fill the mumu skim event t0s
-      h_eventT0_ECL_mumu_L1_CDCTRG->Fill(event_t0_ECL);
-      h_eventT0_CDC_mumu_L1_CDCTRG->Fill(event_t0_CDC);
-      h_eventT0_TOP_mumu_L1_CDCTRG->Fill(event_t0_TOP);
+      m_histEventT0_ECL_mumu_L1_CDCTRG->Fill(eventT0_ECL);
+      m_histEventT0_CDC_mumu_L1_CDCTRG->Fill(eventT0_CDC);
+      m_histEventT0_TOP_mumu_L1_CDCTRG->Fill(eventT0_TOP);
     }
   }
 
-  B2DEBUG(20, "event_t0_ECL = " << event_t0_ECL << " ns") ;
-  B2DEBUG(20, "event_t0_CDC = " << event_t0_CDC << " ns") ;
-  B2DEBUG(20, "event_t0_TOP = " << event_t0_TOP << " ns") ;
+  B2DEBUG(20, "eventT0_ECL = " << eventT0_ECL << " ns") ;
+  B2DEBUG(20, "eventT0_CDC = " << eventT0_CDC << " ns") ;
+  B2DEBUG(20, "eventT0_TOP = " << eventT0_TOP << " ns") ;
 }
 
 

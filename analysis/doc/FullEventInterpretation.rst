@@ -4,6 +4,8 @@ Full event interpretation
 Sphinx documentation
 ####################
 
+.. seealso:: The FEI is formally described in the publication `Comp.Sci.HEP.2019.3.6 <https://link.springer.com/article/10.1007/s41781-019-0021-8>`_
+
 .. automodule:: fei
    :members:
    :undoc-members:
@@ -221,7 +223,7 @@ This script can be used to train the FEI on a cluster like available at KEKCC.  
 
 The script will automatically create some directories collection containing weightfiles, monitoring files and other stuff jobs containing temporary files during the training (can be deleted afterwards)
 
-The distributed script automatically spawns jobs on the cluster (or local machine), and runs the steering file on the provided MC. Since a FEI training requires multiple runs over the same MC, it does so multiple times. The output of a run is passed as input to the next run (so your script has to use RootInput and RootOutput). In between it calls the do_trainings function of the FEI, to train the mutlivariate classifiers of the FEI at each stage.  At the end it produces summary outputs using printReporting.py and latexReporting.py (this will only work of you use the monitoring mode). And a summary file for each mva training using basf2_mva_evaluate.  If your training fails for some reason (e.g. a job fails on the cluster), the FEI will stop, you can fix the problem and resume the training using the `-x` option. This requires some expert knowledge, because you have to know howto fix the occured problem and at which step you have to resume the training. After the training the weightfiles will be stored in the localdb in the collection directory. You have to upload these local database to the Belle 2 Condition Database if you want to use the FEI everywhere. Alternatively you can just copy the localdb to somehwere and use it directly.
+The distributed script automatically spawns jobs on the cluster (or local machine), and runs the steering file on the provided MC. Since a FEI training requires multiple runs over the same MC, it does so multiple times. The output of a run is passed as input to the next run (so your script has to use RootInput and RootOutput). In between it calls the do_trainings function of the FEI, to train the mutlivariate classifiers of the FEI at each stage.  At the end it produces summary outputs using printReporting.py and latexReporting.py (this will only work of you use the monitoring mode). And a summary file for each mva training using basf2_mva_evaluate.  If your training fails for some reason (e.g. a job fails on the cluster), the FEI will stop, you can fix the problem and resume the training using the `-x` option. This requires some expert knowledge, because you have to know howto fix the occured problem and at which step you have to resume the training. After the training the weightfiles will be stored in the localdb in the collection directory. You have to upload these local database to the Belle 2 Condition Database if you want to use the FEI everywhere. Alternatively you can just copy the localdb to somehwere and use it directly, however, this is recommended only for testing as it is not reproducible.
 
 You have to adjust the following parameters:
 
@@ -291,38 +293,36 @@ Each candidate has three extra infos which are interesting:
 You can use a different decay channel configuration during the application. In particular you can omit decay-channels (e.g. the semileptonic if your are only interested in the hadronic tag).
 However, it is not possible to add new channels without training them first (obviously).
 
-You can find up to date examples in ``analysis/examples/FEI``. You will need to use the relevant database in which the FEI training waits are located. For Belle II this is the analysis global tag, meanwhile, when running on Belle converted data or MC it will be in the B2BII and B2BII_MC database tags. You can use the following basf2 command to get a recommended db: ``b2conditionsdb-recommend`` 
-
+You can find up to date examples in ``analysis/examples/FEI``. 
 If you encounter problems which require debugging in the FEI algorithm, the best starting point is to enable the monitoring, by choosing ``monitor=True`` in the FEIConfiguration. This will create a lot of root files containing histograms of interesting variables throughout the process (e.g. MC truth before and after all the cuts). You can also create a pdf using the root files produced by the monitoring and the "Summary.pickle" file produced by the original training by executing:
 
 ``basf2 fei/latexReporting.py > summary.tex``
 
-Pre-Trained FEI
-###############
+FEI and the condition datasbase
+###############################
 
+The FEI is frequently retrained and updated to give the best performance with the latest reconstruction, etc. You will need to use the relevant database in which the FEI training weights are located. 
+FEI training weights are distributed by the `basf2.conditions` database under an `analysis global tag <link to something helpful explaining this>`.
+In order to find the latest, recommended FEI training, you can use the `b2conditionsdb-recommend` tool.
 
-From time to time I retrain the generic FEI using the current MC campaign and basf2 software. Currently you can find these trainings on KEKCC in my home-directory: /home/belle2/tkeck/feiv4
+``b2conditionsdb-recommend input_file.mdst.root``
 
-There are different trainings available here. Be sure to read the README file in the corresponding directories, it will contain information about the skim-cuts which were used for the training, and the data which was used.
+This tool will tell you all tags you should use. For the FEI we are only concerned with the analysis tag.
+Analysis tags are named `analysis_tools_XXXX`.
+You will need to prepend this tag to your global tags list.
+This is done inside the FEI steering script.
 
-One important remark:
-Be careful if you schedule many jobs on the cluster, make sure that the jobs can share the database-cache e.g.
-``use_central_database('production', LogLevel.WARNING, '/home/belle2/$your_username/database_cache_directory')``
-Otherwise all the jobs will download the weightfiles separately.
+.. code-block:: python3
 
-#.    this is slow
-#.    this is effectively a ddos against the database 
+        import basf2
+        import fei
 
-Current performance
+        basf2.conditions.prepend_globaltag("findme")
+        fei.configure("foo", bar)
+        
+Note that when running on Belle converted data or MC you will need to use the `B2BII` and `B2BII_MC` database tags, respectively. 
 
-The training was done with 100M MC9 :math:`B\bar{B}` events with beam-background
-
-The tag-side efficiencies are (on the events which survive the skim-cut)
-
-* 0.2 % for hadronic neutral :math:`B`
-* 0.4 % for hadronic charged :math:`B`
-* 1.3 % for semileptonic neutral :math:`B`
-* 1.1 % for semileptonic charged :math:`B`
+If you have trouble finding the correct analysis tag, please ask a question at `B2Questions <https://questions.belle2.org>` and/or send a mail to XXX@belle2org,
 
 Troubleshooting
 ###############

@@ -210,7 +210,7 @@ def submitJobs(skims, scripts, samples, nTestEvents):
 
             with clean_working_directory():
                 process = subprocess.run(['bsub', '-q', 'l', '-oo', logFile, '-e', errFile,
-                                          '-J', f'{skim} {sample}'
+                                          '-J', f'{skim} {sample}',
                                           'basf2', script, '--job-information', jsonFile,
                                           '-n', str(nTestEvents), '-i', sampleFile],
                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)

@@ -34,9 +34,14 @@ GeneratedVertexDisplacerModule::GeneratedVertexDisplacerModule() : Module()
     R"DOC(""Takes a list of PDG values and lifetime paramters to displaces the vertex of MCParticles with matching PDG value corresponding to the given lifetime parameter. Can be used betwenerator and the detector simulation.)DOC");
 
   // Parameter definitions
-  addParam("lifetimeOption", m_lifetimeOption, "Set the lifetime option, either 0=fixed, 1=flat or 2=exponential", string("fixed"));
-  addParam("lifetime", m_lifetime, "Set the numerical value of the lifetime c*tau in units of cm ", std::vector<float> {0});
-  addParam("pdgVal", m_pdgVals, "PDG values of MCParticles that should be displaced", std::vector<int> { -999});
+  addParam("lifetimeOption", m_lifetimeOption,
+           "Set the lifetime option, either 'fixed', 'flat' or 'exponential'. Option is set globally.", string("fixed"));
+  addParam("lifetime", m_lifetime,
+           "Set the numerical value of the lifetime c*tau in units of [cm]. Example: (lifetime_1, lifetime_2, ... ,lifetime_N). Lifetime_X is set for PDG_X.",
+           std::vector<float> {0});
+  addParam("pdgVal", m_pdgVals,
+           "PDG values of MCParticles that should be displaced. Subsequent daughters of these will be displaced accordingly. Example: (PDG_1, PDG_2, ... , PDG_N). PDG_X corresponds to lifetime_X.",
+           std::vector<int> { -999});
 }
 
 
@@ -46,26 +51,24 @@ void GeneratedVertexDisplacerModule::initialize()
   B2DEBUG(0, "Initialize GeneratedVertexDisplacerModule");
   m_mcparticles.isRequired(m_particleList);
 
-  if (m_mcparticles.getEntries() < 1) {
-    B2WARNING("MC particle container empty.");
-    return;
-  }
-
   if (m_pdgVals.size() != m_lifetime.size()) {
-    B2WARNING("List of PDG values and lifetime parameters have different sizes. Specify a lifetime for each PDG value.");
-    return;
+    B2FATAL("List of PDG values and lifetime parameters have different sizes. Specify a lifetime for each PDG value.");
   }
 
   if ((m_lifetimeOption.compare("fixed") != 0) && (m_lifetimeOption.compare("flat") != 0)
       && (m_lifetimeOption.compare("exponential") != 0)) {
-    B2WARNING("Lifetime option must be 0 (fixed), 1 (flat) or 2 (exponential).");
-    return;
+    B2FATAL("Lifetime option must be 0 (fixed), 1 (flat) or 2 (exponential).");
   }
 }
 
 
 void GeneratedVertexDisplacerModule::event()
 {
+
+  if (m_mcparticles.getEntries() < 1) {
+    B2WARNING("MC particle container empty. Calling next event.");
+    return;
+  }
 
   for (int mcp_index = 0; mcp_index < m_mcparticles.getEntries(); mcp_index++) {
 
@@ -80,21 +83,21 @@ void GeneratedVertexDisplacerModule::event()
       if (m_pdgVals.at(param_index) == mcp_pdg) {
         //skip if particle already displaced -- could happen if it is (subsequent) daughter of a previously displaced mother
         if (std::find(displaced_particles.begin(), displaced_particles.end(), mcp.getIndex()) != displaced_particles.end()) return;
-        B2DEBUG(0, "Displacing Vertex of particle with pdg_id: " << mcp_pdg << " with lifetime: " << m_lifetime.at(param_index));
+        B2DEBUG(0, "Displacing Vertex of particle with pdg_id: " << mcp_pdg << " with lifetime: " << m_lifetime.at(
+                  param_index) << " and option: " << m_lifetimeOption);
         displace(mcp, m_lifetime.at(param_index));
         B2DEBUG(0, "new vertex (x,y,z) at:" << "(" << mcp.getDecayVertex().X() << "," << mcp.getDecayVertex().Y() << "," <<
-                mcp.getDecayVertex().Z() << ")");
+                mcp.getDecayVertex().Z() << ")" << " with decaylength=" << std::sqrt(std::pow(mcp.getDecayVertex().X(),
+                    2) + std::pow(mcp.getDecayVertex().Y(), 2) + std::pow(mcp.getDecayVertex().Z(), 2))) ;
       }
     }
   }
-
   displaced_particles.clear();
 }
 
 
 void GeneratedVertexDisplacerModule::displace(MCParticle& particle, float lifetime)
 {
-
   // misusing TLV class to pass X,Y,Z and time of the vertex
   TLorentzVector* displaceVertex = new TLorentzVector();
   getDisplacement(particle, lifetime, *displaceVertex);
@@ -107,6 +110,7 @@ void GeneratedVertexDisplacerModule::displace(MCParticle& particle, float lifeti
 
   particle.setDecayVertex(mother_decVtx);
   particle.setDecayTime(displaceVertex->T());
+  particle.setValidVertex(true);
 
   displaced_particles.push_back(particle.getIndex());
 
@@ -114,13 +118,11 @@ void GeneratedVertexDisplacerModule::displace(MCParticle& particle, float lifeti
   if (particle.getNDaughters()) {
     displaceDaughter(particle, particle.getDaughters());
   }
-
 }
 
 
 void GeneratedVertexDisplacerModule::displaceDaughter(MCParticle& particle, std::vector<MCParticle*> daughters)
 {
-
   for (unsigned int daughter_index = 0; daughter_index < daughters.size(); daughter_index++) {
 
     MCParticle* daughter_mcp = daughters.at(daughter_index);
@@ -136,6 +138,8 @@ void GeneratedVertexDisplacerModule::displaceDaughter(MCParticle& particle, std:
     MCParticle& mcp = *m_mcparticles[daughter_mcpIndex];
     mcp.setProductionVertex(particle.getDecayVertex());
     mcp.setProductionTime(particle.getDecayTime());
+    mcp.setValidVertex(true);
+
     displaced_particles.push_back(daughter_mcpIndex);
 
     // Displace subsequent daughters
@@ -148,25 +152,19 @@ void GeneratedVertexDisplacerModule::displaceDaughter(MCParticle& particle, std:
 
 void GeneratedVertexDisplacerModule::getDisplacement(MCParticle& particle, float lifetime, TLorentzVector& displacement)
 {
-
   TLorentzVector fourVector_mcp = particle.get4Vector();
   float lifetime_mcp = 0;
 
-  // parameter lifetime == c*tau in units of cm
-  // --> decay length in cm = c*tau*beta*gamma, right?
-
   if (m_lifetimeOption.compare("fixed") == 0)
     lifetime_mcp = lifetime;
-
   else if (m_lifetimeOption.compare("flat") == 0) {
     TF1 flat_lifetime("flat", "1", 0, 1000000);
     // ad-hoc cut at 5*lifetime
     flat_lifetime.SetRange(0, 5 * lifetime);
     lifetime_mcp = flat_lifetime.GetRandom();
-  } else {
-    TF1 exp_lifetime("exp(x)", "exp(-x/(fourVector_mcp.Gamma()*lifetime))", 0, 1000000);
-    // cut the very small lifetimes:
-    // exp_lifetime.SetRange(0.1*lifetime, 1000000)
+  } else  {
+    TF1 exp_lifetime("exp(x)", "exp(-x/[0])", 0, 1000000);
+    exp_lifetime.SetParameter(0, fourVector_mcp.Gamma()*lifetime);
     lifetime_mcp = exp_lifetime.GetRandom();
   }
 
@@ -178,7 +176,6 @@ void GeneratedVertexDisplacerModule::getDisplacement(MCParticle& particle, float
   displacement.SetY(decayLength * fourVector_mcp.Y() / pMag);
   displacement.SetZ(decayLength * fourVector_mcp.Z() / pMag);
   displacement.SetT(lifetime_mcp);
-
 }
 
 

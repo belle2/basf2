@@ -70,40 +70,40 @@ namespace Belle2 {
     /**
      * StoreObjPtr for T0. The event t0 class has an overall event t0
      */
-    StoreObjPtr<EventT0> m_event_t0 ;
+    StoreObjPtr<EventT0> m_eventT0 ;
 
     /** Time offset from electronics calibration from database */
-    DBObjPtr<ECLCrystalCalib> m_ElectronicsTime ; /**< database object */
-    std::vector<float> ElectronicsTime ; /**< vector obtained from DB object */
+    DBObjPtr<ECLCrystalCalib> m_ElectronicsTimeDB ; /**< database object */
+    std::vector<float> m_ElectronicsTime ; /**< vector obtained from DB object */
 
     /** Time offset from flight time b/w IP and crystal from database */
-    DBObjPtr<ECLCrystalCalib> m_FlightTime ; /**< database object */
-    std::vector<float> FlightTime ; /**< vector obtained from DB object */
+    DBObjPtr<ECLCrystalCalib> m_FlightTimeDB ; /**< database object */
+    std::vector<float> m_FlightTime ; /**< vector obtained from DB object */
 
     /** Time offset from previous crystal time calibration (this calibration) from database */
-    DBObjPtr<ECLCrystalCalib> m_PreviousCrystalTime ; /**< database object */
-    std::vector<float> PreviousCrystalTime ; /**< vector obtained from DB object */
-    std::vector<float> PreviousCrystalTimeUnc ; /**< vector obtained from DB object */
+    DBObjPtr<ECLCrystalCalib> m_PreviousCrystalTimeDB ; /**< database object */
+    std::vector<float> m_PreviousCrystalTime ; /**< vector obtained from DB object */
+    std::vector<float> m_PreviousCrystalTimeUnc ; /**< vector obtained from DB object */
 
     /** Time offset from crate time calibration (also this calibration) from database */
-    DBObjPtr<ECLCrystalCalib> m_CrateTime ; /**< database object */
-    std::vector<float> CrateTime ; /**< vector obtained from DB object */
-    std::vector<float> CrateTimeUnc ; /**< uncertainty vector obtained from DB object */
+    DBObjPtr<ECLCrystalCalib> m_CrateTimeDB ; /**< database object */
+    std::vector<float> m_CrateTime ; /**< vector obtained from DB object */
+    std::vector<float> m_CrateTimeUnc ; /**< uncertainty vector obtained from DB object */
 
     /**
      * Output tree with detailed event data.
      */
-    TTree* m_dbg_tree_electrons ;
-    TTree* m_dbg_tree_tracks ;
-    TTree* m_dbg_tree_crystals ;
-    TTree* m_dbg_tree_event ;
-    TTree* m_dbg_tree_allCuts ;
-    TTree* m_dbg_tree_evt_allCuts ;
-    TTree* m_dbg_tree_crys_allCuts ;
+    TTree* m_dbgTree_electrons ;
+    TTree* m_dbgTree_tracks ;
+    TTree* m_dbgTree_crystals ;
+    TTree* m_dbgTree_event ;
+    TTree* m_dbgTree_allCuts ;
+    TTree* m_dbgTree_evt_allCuts ;
+    TTree* m_dbgTree_crys_allCuts ;
 
     /*** tree branches ***/
     /*** See inDefineHisto method for branches description ***/
-    int m_tree_evt_num ;    /**< Event number for debug TTree output*/
+    int m_tree_evtNum ;    /**< Event number for debug TTree output*/
     int m_tree_exp ;     /**< Experiment number for debug TTree output */
     int m_tree_run ;     /**< Run number for debug TTree output */
     int m_tree_cid ;     /**< ECL Cell ID (1..8736) for debug TTree output */
@@ -128,7 +128,7 @@ namespace Belle2 {
                                                   for debug TTree output */
     double m_tree_t0 ;   /**< EventT0 (not from ECL) for debug TTree output */
     double m_tree_t0_unc ;   /**< EventT0 uncertainty for debug TTree output */
-    double m_tree_t0_ECL_closestCDC ;   /**< EventT0 (from ECL) closest to CDC for debug TTree output */
+    double m_tree_t0_ECLclosestCDC ;   /**< EventT0 (from ECL) closest to CDC for debug TTree output */
     double m_tree_t0_ECL_minChi2 ;   /**< EventT0 (from ECL) min chi2 for debug TTree output */
     double m_tree_d0 ;    /** Track d0 for debug TTree output */
     double m_tree_z0 ;    /** Track z0 for debug TTree output */
@@ -144,14 +144,14 @@ namespace Belle2 {
 
     double m_tree_enPlus ;     /**< Energy of cluster associated to positively charged track, GeV for debug TTree output */
     double m_tree_enNeg ;     /**< Energy of cluster associated to negatively charged track, GeV for debug TTree output */
-    double m_tree_tclustPos ;     /**< Cluster time of cluster associated to positively charged track, ns for debug TTree output */
-    double m_tree_tclustNeg ;     /**< Cluster time of cluster associated to negatively charged track, ns for debug TTree output */
+    double m_tree_tClustPos ;     /**< Cluster time of cluster associated to positively charged track, ns for debug TTree output */
+    double m_tree_tClustNeg ;     /**< Cluster time of cluster associated to negatively charged track, ns for debug TTree output */
     double m_tree_maxEcrystPosClust ;     /**< Time of the highest energy crystal in the cluster
                                                associated to positively charged track, ns for debug TTree output */
     double m_tree_maxEcrystNegClust;     /**< Time of the highest energy crystal in the cluster associated
                                               to negatively charged track, ns for debug TTree output */
 
-    double m_tree_tclust ;     /**< Cluster time of a cluster, ns for debug TTree output */
+    double m_tree_tClust ;     /**< Cluster time of a cluster, ns for debug TTree output */
 
     double m_tree_ECLCalDigitTime ;   /**< Time of an ECLCalDigit within a cluster, ns for debug TTree output */
     double m_tree_ECLCalDigitE ;   /**< Energy of an ECLCalDigit within a cluster, GeV for debug TTree output */
@@ -171,9 +171,9 @@ namespace Belle2 {
     StoreArray<ECLCalDigit> m_eclCalDigitArray ; /**< Required input array of ECLCalDigits */
     StoreArray<ECLCluster> m_eclClusterArray ; /**< Required input array of ECLClusters */
 
-    std::vector<float> EperCrys ; /**< ECL digit energy for each crystal */
-    std::vector<int> eclCalDigitID ; /**< ECL cal digit id sorter */
-    std::vector<int> eclDigitID ; /**< ECL digit id sorter */
+    std::vector<float> m_EperCrys ; /**< ECL digit energy for each crystal */
+    std::vector<int> m_eclCalDigitID ; /**< ECL cal digit id sorter */
+    std::vector<int> m_eclDigitID ; /**< ECL digit id sorter */
 
 
 
@@ -185,13 +185,6 @@ namespace Belle2 {
     int m_minCrystal ; /**< First CellId to handle */
     int m_maxCrystal ; /**< Last CellId to handle */
 
-    /* If 161 <= cell ID <= 8762 then the crystal is within the CDC acceptance.
-       If cell ID < 161 or cell ID > 8762 then the crystal is partly outside the CDC acceptance.
-       Depending on if the crystal cell is inside or outside the CDC acceptance, we need a different method of estimating
-       the time calibration */
-    int crystalIDmin_insideCDCacceptance = 161 ;
-    int crystalIDmax_insideCDCacceptance = 8672 ;
-
     /* d0 and z0 values of the loose and tight tracks*/
     double m_looseTrkZ0 ;
     double m_tightTrkZ0 ;
@@ -201,7 +194,7 @@ namespace Belle2 {
     int m_crystalCrate ;    /**< Crate id for the crystal */
     int m_runNum ;   /**< run number */
 
-    bool storeCalib = true ;   /**< Boolean for whether or not to store the previous
+    bool m_storeCalib = true ;   /**< Boolean for whether or not to store the previous
                                     calibration calibration constants*/
 
     // For the energy dependence correction to the time

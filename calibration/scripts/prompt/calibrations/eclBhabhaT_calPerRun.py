@@ -60,7 +60,7 @@ def get_calibrations(input_data, **kwargs):
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
     # Lets set some limits because this calibration doesn't need that much to run.
-    max_files_per_run = 2
+    max_files_per_run = 26
 
     # We filter out any more than 2 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering

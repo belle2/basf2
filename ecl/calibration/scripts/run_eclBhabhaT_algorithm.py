@@ -53,16 +53,8 @@ if(narg >= 3):
     print("basePath = ", basePath)
 
 
-# algo.cellIDLo = 1
-# algo.cellIDLo = 500
-algo.cellIDLo = 602
+algo.cellIDLo = 3
 algo.cellIDHi = 2
-# algo.cellIDHi = 200
-# algo.cellIDHi = 501
-# algo.cellIDHi = 602
-# algo.cellIDHi = 610
-# algo.cellIDHi = 8736
-# algo.cellIDHi = 1350
 algo.debugOutput = True
 algo.meanCleanRebinFactor = 3   # Rebin factor
 # 0 means no cut.  # 1 means keep only bins from max rebinned bin.  # Note that with low stats, 0.2 is still too large.
@@ -72,8 +64,7 @@ algo.meanCleanCutMinFactor = 0.3
 algo.debugFilenameBase = "eclBhabhaTAlgorithm"
 
 set_debug_level(35)
-# set_log_level(LogLevel.DEBUG)
-set_log_level(LogLevel.INFO)
+set_log_level(LogLevel.INFO)   # or LogLevel.DEBUG
 
 
 exprun_vector = algo.getRunListFromAllData()

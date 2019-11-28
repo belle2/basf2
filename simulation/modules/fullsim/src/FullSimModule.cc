@@ -136,11 +136,11 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
            "[mm] The maximum miss-distance between the trajectory curve and its linear cord(s) approximation", 0.25);
 
   vector<string> defaultCommandsAtPreInit;
-  addParam("UICommands", m_uiCommandsAtPreInit,
+  addParam("UICommandsAtPreInit", m_uiCommandsAtPreInit,
            "A list of Geant4 UI commands that should be applied at PreInit state, before the simulation starts.",
            defaultCommandsAtPreInit);
   vector<string> defaultCommandsAtIdle;
-  addParam("UICommands", m_uiCommandsAtIdle,
+  addParam("UICommandsAtIdle", m_uiCommandsAtIdle,
            "A list of Geant4 UI commands that should be applied at Idle state, before the simulation starts.",
            defaultCommandsAtIdle);
 

@@ -440,7 +440,7 @@ void ECLBhabhaTCollectorModule::collect()
     evt_t0_unc = evt_t0_list.back().eventT0Uncertainty ;   // uncertainty on event t0
 
 
-    // Get the ECL event t0 for comparison
+    // Get the ECL event t0 for comparison - validations
     if (m_eventT0->hasTemporaryEventT0(Const::EDetector::ECL)) {
       vector<EventT0::EventT0Component> evt_t0_list_ECL = m_eventT0->getTemporaryEventT0s(Const::EDetector::ECL) ;
 
@@ -684,7 +684,6 @@ void ECLBhabhaTCollectorModule::collect()
       trkp4COM[icharge] = boostrotate.rotateLabToCms() * trkp4Lab[icharge] ;
       trkpLab[icharge] = trkp4Lab[icharge].Rho() ;
       trkpCOM[icharge] = trkp4COM[icharge].Rho() ;
-      //trkThetaLab[icharge] = trkp4Lab[icharge].Theta() ;
 
 
       /* For each cluster associated to the current track, sum up the energies to get the total
@@ -737,11 +736,12 @@ void ECLBhabhaTCollectorModule::collect()
 
 
 
-
+            /* "eclp->GetCrystalPos(...)" works when using Ewan's normal steering files but crashes
+                when the code is launched by the airflow.  */
             phi_ECLCaldigits_bothClusters.push_back(-1000) ;
             theta_ECLCaldigits_bothClusters.push_back(-1000) ;
             /*
-                        TVector3 crystal3Vec = eclp->GetCrystalPos(calDigit->getCellId() - 1) ;   // was this a bug???  Is it cid or cid-1?
+                        TVector3 crystal3Vec = eclp->GetCrystalPos(calDigit->getCellId() - 1) ;
                         phi_ECLCaldigits_bothClusters.push_back(crystal3Vec.Phi()) ;
                         theta_ECLCaldigits_bothClusters.push_back(crystal3Vec.Theta()) ;
                         B2DEBUG(30,  "calDigit(ir" << ir << "), calDigit->getCellId() =  " << calDigit->getCellId() << ", theta = " << crystal3Vec.Theta()
@@ -984,11 +984,6 @@ void ECLBhabhaTCollectorModule::collect()
     B2DEBUG(20, "Number of trackless ECL clusters != 0") ;
   }
 
-  // Remove events where there are any extra ECL clusters.
-  if (numTrackless != 0) {
-    //return ;
-  }
-
   // There are exactly three energy clusters
   cutIndexPassed++ ;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed) ;
@@ -1043,6 +1038,8 @@ void ECLBhabhaTCollectorModule::collect()
       numCrystalsPassingCuts++ ;
 
 
+      /* Store information about one random specific crystal and one random specific crate for
+         studies of how they vary over time.*/
       if (crystalIDs[iCharge] == 1338) {
         getObjectPtr<TH2F>("TimevsRunPrevCrateCalibPrevCrystCalibCID1338")->Fill(m_runNum + 0.001,
             times_noPreviousCalibrations[iCharge] - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge] , 1) ;
@@ -1160,6 +1157,13 @@ void ECLBhabhaTCollectorModule::collect()
 
 
 
+/*  Time walk function : time shift as a function of crystal amplitude.
+    This function is copy-pasted from ecl/modules/eclDigitCalibration/src/ECLDigitCalibratorModule.cc
+    Ideally this code would just execute the function from ECLDigitCalibratorModule; however,
+    it is non-trivial to make an instance of ECLDigitCalibratorModule so that a
+    copy of the function is available.  In the future, the function should be moved to a
+    different location to make it more easily accessible to outside modules.
+*/
 double ECLBhabhaTCollectorModule::energyDependentTimeOffsetElectronic(const double amp)
 {
   double ticks_offset = m_energyDependenceTimeOffsetFitParam_p1 + pow((m_energyDependenceTimeOffsetFitParam_p3 /

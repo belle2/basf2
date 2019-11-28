@@ -34,6 +34,7 @@
 #include <G4Tubs.hh>
 #include <G4Polycone.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4Region.hh>
 
 using namespace std;
 using namespace boost;
@@ -374,6 +375,11 @@ namespace Belle2 {
         setVisibility(*envelope, false);
         physEnvelope = new G4PVPlacement(getAlignment(parameters.getAlignment(m_prefix)), envelope, m_prefix + ".Envelope",
                                          &topVolume, false, 1);
+
+        // Set up region for production cuts
+        G4Region* aRegion = new G4Region("PXDEnvelope");
+        envelope->SetRegion(aRegion);
+        aRegion->AddRootLogicalVolume(envelope);
       }
 
       //Read the definition of all sensor types

@@ -32,7 +32,7 @@ namespace Belle2 {
       SVDHistograms(H(), H(), H() , H()) {}; /**< the class is built with a default histogram for L3 and L456, U and V sides*/
 
     /** Use @param template to initialize all the histograms*/
-    SVDHistograms(const H& templateHisto):
+    explicit SVDHistograms(const H& templateHisto):
       SVDHistograms(templateHisto, templateHisto,
                     templateHisto, templateHisto)
     {};

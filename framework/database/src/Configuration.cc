@@ -192,7 +192,7 @@ namespace Belle2::Conditions {
         youngest = metadata.getDate();
       }
     }
-    if (youngest->compare("2019-10-01") < 0) {
+    if (youngest->compare("2019-12-31") < 0) {
       B2DEBUG(30, "Enabling legacy IP information globaltag in tag replay");
       m_inputGlobaltags->emplace_back("Legacy_IP_Information");
     }

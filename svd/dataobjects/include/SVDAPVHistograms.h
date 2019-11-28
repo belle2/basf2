@@ -32,7 +32,7 @@ namespace Belle2 {
       SVDAPVHistograms(H()) {};
 
     /** Use @param template to initialize all the histograms*/
-    SVDAPVHistograms(const H& templateAPV);
+    explicit SVDAPVHistograms(const H& templateAPV);
 
     /** clean everything in the destructor */
     ~SVDAPVHistograms() { clean(); };

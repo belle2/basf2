@@ -17,8 +17,8 @@
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPedestalCalibrations.h>
-//#include <svd/calibration/SVDOccupancyCalibrations.h>
-//#include <svd/calibration/SVDHotStripsCalibrations.h>
+#include <svd/calibration/SVDOccupancyCalibrations.h>
+#include <svd/calibration/SVDHotStripsCalibrations.h>
 
 #include <svd/dataobjects/SVDHistograms.h>
 
@@ -63,6 +63,7 @@ namespace Belle2 {
     TBranch* b_sensor = nullptr; /**< sensor number*/
     TBranch* b_side = nullptr; /**< sensor side */
     TBranch* b_strip = nullptr; /**< strip number*/
+    TBranch* b_occupancy = nullptr; /**< strip occupancy*/
     TBranch* b_mask = nullptr; /**< strip mask 0/1*/
     TBranch* b_maskAVE = nullptr; /**< average sensor mask*/
     TBranch* b_pedestal = nullptr; /**< strip pedestal*/
@@ -75,6 +76,8 @@ namespace Belle2 {
     TBranch* b_noiseEl = nullptr; /**< strip noise (e-)*/
     TBranch* b_noiseAVE = nullptr; /**< sensor noise average (ADC)*/
     TBranch* b_noiseRMS = nullptr; /**< sensor noise rms (ADC)*/
+    TBranch* b_occupancyAVE = nullptr; /**< sensor occupancy average (ADC)*/
+    TBranch* b_occupancyRMS = nullptr; /**< sensor occupancy rms (ADC)*/
     TBranch* b_calPeakADC = nullptr; /**< strip calPeakADC*/
     TBranch* b_calPeakADCAVE = nullptr; /**< sensor calPeakADC average*/
     TBranch* b_calPeakADCRMS = nullptr; /**< sensor calPeakADC arm*/
@@ -94,8 +97,11 @@ namespace Belle2 {
     int m_strip = -1; /**< strip number*/
     float m_mask = -1; /**< strip mask 0/1*/
     float m_maskAVE = -1; /**< sensor mask average*/
+    float m_occupancy = -1; /**< strip occupancy (ADC) */
     float m_noise = -1; /**< strip noise (ADC) */
     float m_noiseEl = -1; /**< strip noise (e-)*/
+    float m_occupancyAVE = -1; /**< sensor occupancy average*/
+    float m_occupancyRMS = -1; /**< sensor occupancy rms*/
     float m_noiseAVE = -1; /**< sensor noise average (ADC)*/
     float m_noiseRMS = -1; /**< sensor noise rms (ADC)*/
     float m_pedestal = -1; /**< strip pedestal*/
@@ -122,8 +128,8 @@ namespace Belle2 {
     SVDNoiseCalibrations m_NoiseCal; /**< noise payload*/
     SVDPulseShapeCalibrations m_PulseShapeCal; /**< pulse shape payload*/
     SVDPedestalCalibrations m_PedestalCal; /**< pedestal payload*/
-    //    SVDOccupancyCalibrations m_OccCal; /**< occupancy payload*/
-    //    SVDHotStripsCalibrations m_HotStripsCal; /**< hot strips calibration*/
+    SVDOccupancyCalibrations m_OccupancyCal; /**< occupancy payload*/
+    SVDHotStripsCalibrations m_HotStripsCal; /**< hot strips calibration*/
 
     /** MASKS */
     SVDHistograms<TH1F>* m_hMask = nullptr; /**< masked strips histo */
@@ -155,6 +161,10 @@ namespace Belle2 {
     //PULSEWIDTH
     SVDHistograms<TH1F>* m_hPulseWidth = nullptr; /**< calPeakTime (ns) histo */
     SVDHistograms<TH2F>* m_h2PulseWidth = nullptr; /**< calPeakTime (ns) VS strip 2D histo */
+
+    //OCCUPANCY
+    SVDHistograms<TH1F>* m_hOccupancy = nullptr; /**< occupancy (hits/evt) histo */
+    SVDHistograms<TH2F>* m_h2Occupancy = nullptr; /**< occupancy (hits/evt) VS strip 2D histo */
 
   };
 }

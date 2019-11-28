@@ -46,6 +46,28 @@ void BKLMElementNumbers::channelNumberToElementNumbers(
   *strip = ((channel & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1;
 }
 
+uint16_t BKLMElementNumbers::planeNumber(
+  int section, int sector, int layer, int plane)
+{
+  checkSection(section);
+  checkSector(sector);
+  checkLayer(layer);
+  checkPlane(plane);
+  return (section << BKLM_END_BIT)
+         | ((sector - 1) << BKLM_SECTOR_BIT)
+         | ((layer - 1) << BKLM_LAYER_BIT)
+         | ((plane) << BKLM_PLANE_BIT);
+}
+
+void BKLMElementNumbers::planeNumberToElementNumbers(
+  uint16_t planeGlobal, int* section, int* sector, int* layer, int* plane)
+{
+  *section = ((planeGlobal & BKLM_END_MASK) >> BKLM_END_BIT);
+  *sector = ((planeGlobal & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1;
+  *layer = ((planeGlobal & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1;
+  *plane = ((planeGlobal & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT);
+}
+
 uint16_t BKLMElementNumbers::moduleNumber(int section, int sector, int layer, bool fatalError)
 {
   checkSection(section);

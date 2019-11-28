@@ -57,8 +57,6 @@ namespace Belle2 {
                          TLorentzVector& displacement); /**< Helper function to calculate the numerical value of the vertex displacement (x,y,z,t) */
     std::string m_particleList; /**< The name of the MCParticle collection. */
     StoreArray<MCParticle> m_mcparticles; /**< store array for the MCParticles */
-    std::list<int>
-    displaced_particles; /**< storing m_mcparticles indices of particles that were displaced already to avoid double-displacing. */
 
   private:
     // Parameters

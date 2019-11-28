@@ -81,8 +81,6 @@ void GeneratedVertexDisplacerModule::event()
 
     for (unsigned int param_index = 0; param_index < m_pdgVals.size(); param_index++) {
       if (m_pdgVals.at(param_index) == mcp_pdg) {
-        //skip if particle already displaced -- could happen if it is (subsequent) daughter of a previously displaced mother
-        if (std::find(displaced_particles.begin(), displaced_particles.end(), mcp.getIndex()) != displaced_particles.end()) return;
         B2DEBUG(0, "Displacing Vertex of particle with pdg_id: " << mcp_pdg << " with lifetime: " << m_lifetime.at(
                   param_index) << " and option: " << m_lifetimeOption);
         displace(mcp, m_lifetime.at(param_index));
@@ -92,27 +90,25 @@ void GeneratedVertexDisplacerModule::event()
       }
     }
   }
-  displaced_particles.clear();
 }
 
 
 void GeneratedVertexDisplacerModule::displace(MCParticle& particle, float lifetime)
 {
   // misusing TLV class to pass X,Y,Z and time of the vertex
-  TLorentzVector* displaceVertex = new TLorentzVector();
-  getDisplacement(particle, lifetime, *displaceVertex);
+  TLorentzVector* displacementVector = new TLorentzVector();
+  getDisplacement(particle, lifetime, *displacementVector);
 
-  TVector3 mother_decVtx = particle.getDecayVertex();
+  TVector3 decayVertex = particle.getDecayVertex();
 
-  mother_decVtx.SetX(mother_decVtx.X() + displaceVertex->X());
-  mother_decVtx.SetY(mother_decVtx.Y() + displaceVertex->Y());
-  mother_decVtx.SetZ(mother_decVtx.Z() + displaceVertex->Z());
+  decayVertex.SetX(decayVertex.X() + displacementVector->X());
+  decayVertex.SetY(decayVertex.Y() + displacementVector->Y());
+  decayVertex.SetZ(decayVertex.Z() + displacementVector->Z());
 
-  particle.setDecayVertex(mother_decVtx);
-  particle.setDecayTime(displaceVertex->T());
+  particle.setDecayVertex(decayVertex);
+  particle.setDecayTime(particle.getProductionTime() + displacementVector->T());
   particle.setValidVertex(true);
 
-  displaced_particles.push_back(particle.getIndex());
 
   // displace first daughters
   if (particle.getNDaughters()) {
@@ -127,20 +123,15 @@ void GeneratedVertexDisplacerModule::displaceDaughter(MCParticle& particle, std:
 
     MCParticle* daughter_mcp = daughters.at(daughter_index);
     int daughter_mcpIndex = daughter_mcp->getIndex();
-    TVector3 daughter_prodVtx = daughter_mcp->getProductionVertex();
     TVector3 mother_decVtx = particle.getDecayVertex();
-
-    daughter_prodVtx.SetX(daughter_prodVtx.X() + mother_decVtx.X());
-    daughter_prodVtx.SetY(daughter_prodVtx.Y() + mother_decVtx.Y());
-    daughter_prodVtx.SetZ(daughter_prodVtx.Z() + mother_decVtx.Z());
 
     // getDaughters returns a copied list, need to change parameters of the original particle in the MCParticle StoreArray.
     MCParticle& mcp = *m_mcparticles[daughter_mcpIndex];
-    mcp.setProductionVertex(particle.getDecayVertex());
-    mcp.setProductionTime(particle.getDecayTime());
+    mcp.setProductionVertex(mother_decVtx);
+    mcp.setDecayVertex(mother_decVtx);
+    mcp.setProductionTime(mcp.getProductionTime() + particle.getDecayTime());
+    mcp.setDecayTime(mcp.getProductionTime());
     mcp.setValidVertex(true);
-
-    displaced_particles.push_back(daughter_mcpIndex);
 
     // Displace subsequent daughters
     if (daughter_mcp->getNDaughters()) {
@@ -153,29 +144,28 @@ void GeneratedVertexDisplacerModule::displaceDaughter(MCParticle& particle, std:
 void GeneratedVertexDisplacerModule::getDisplacement(MCParticle& particle, float lifetime, TLorentzVector& displacement)
 {
   TLorentzVector fourVector_mcp = particle.get4Vector();
-  float lifetime_mcp = 0;
+  float decayTime_mcp = 0;
 
   if (m_lifetimeOption.compare("fixed") == 0)
-    lifetime_mcp = lifetime;
+    decayTime_mcp = lifetime;
   else if (m_lifetimeOption.compare("flat") == 0) {
-    TF1 flat_lifetime("flat", "1", 0, 1000000);
-    // ad-hoc cut at 5*lifetime
+    TF1 flat_lifetime("flat", "1", 0, 1000000); // ToDo: --> std::rand() (time optimization)
+    // ad-hoc cut at 5*lifetime, could be set as external parameters if needed
     flat_lifetime.SetRange(0, 5 * lifetime);
-    lifetime_mcp = flat_lifetime.GetRandom();
+    decayTime_mcp = flat_lifetime.GetRandom();
   } else  {
-    TF1 exp_lifetime("exp(x)", "exp(-x/[0])", 0, 1000000);
-    exp_lifetime.SetParameter(0, fourVector_mcp.Gamma()*lifetime);
-    lifetime_mcp = exp_lifetime.GetRandom();
+    TF1 exp_lifetime("exp(x)", "exp(-x/[0])", 0, 1000000); // ToDo: --> TRandom3 or gRandom (time optimization)
+    exp_lifetime.SetParameter(0, lifetime);
+    decayTime_mcp = fourVector_mcp.Gamma() * fourVector_mcp.Beta() * exp_lifetime.GetRandom();
   }
 
   // calculate the magnitude of the displacement from the lifetime
-  float decayLength = fourVector_mcp.Beta() * lifetime_mcp;
   float pMag = fourVector_mcp.P();
 
-  displacement.SetX(decayLength * fourVector_mcp.X() / pMag);
-  displacement.SetY(decayLength * fourVector_mcp.Y() / pMag);
-  displacement.SetZ(decayLength * fourVector_mcp.Z() / pMag);
-  displacement.SetT(lifetime_mcp);
+  displacement.SetX(decayTime_mcp * fourVector_mcp.X() / pMag);
+  displacement.SetY(decayTime_mcp * fourVector_mcp.Y() / pMag);
+  displacement.SetZ(decayTime_mcp * fourVector_mcp.Z() / pMag);
+  displacement.SetT(decayTime_mcp);
 }
 
 

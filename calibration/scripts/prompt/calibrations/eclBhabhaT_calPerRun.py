@@ -17,7 +17,7 @@ settings = CalibrationSettings(name="ECL crate time calibrations",
                                expert_username="ehill",
                                description=__doc__,
                                input_data_formats=["cdst"],
-                               input_data_names=["hlt_bhabha_skim_set_Ewan_test"],
+                               input_data_names=["physics"],
                                depends_on=[])
 
 ##############################
@@ -55,7 +55,7 @@ def get_calibrations(input_data, **kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    file_to_iov_physics = input_data["hlt_bhabha_skim_set_Ewan_test"]
+    file_to_iov_physics = input_data["physics"]
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
@@ -76,7 +76,7 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.utils import IoV
     # The actual value our output IoV payload should have. Notice that we've set it open ended.
-    output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
+#    output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
     ###################################################
     # Algorithm setup
@@ -85,7 +85,17 @@ def get_calibrations(input_data, **kwargs):
     from ROOT import Belle2
     from ROOT.Belle2 import TestCalibrationAlgorithm
 
-    alg_test = Belle2.ECL.eclBhabhaTAlgorithm()
+    eclTAlg = Belle2.ECL.eclBhabhaTAlgorithm()
+
+    # Define the CAF algorithm arguments
+    eclTAlg.cellIDLo = 3
+    eclTAlg.cellIDHi = 2
+    eclTAlg.debugOutput = True
+    eclTAlg.meanCleanRebinFactor = 3
+    eclTAlg.meanCleanCutMinFactor = 0.3
+    # eclTAlg.crateIDLo = 10
+    # eclTAlg.crateIDHi = 9
+    eclTAlg.debugFilenameBase = "eclBhabhaTAlgorithm"
 
     ###################################################
     # Calibration setup
@@ -94,13 +104,26 @@ def get_calibrations(input_data, **kwargs):
 
     cal_test = Calibration("ECLcrateTimeCalibration_physics",
                            collector="ECLBhabhaTCollector",
-                           algorithms=[alg_test],
+                           algorithms=[eclTAlg],
                            input_files=input_files_physics
                            )
-    # Do this for the default AlgorithmStrategy to force the output payload IoV
-    # It may be different if you are using another strategy like SequentialRunByRun
-    for algorithm in cal_test.algorithms:
-        algorithm.params = {"apply_iov": output_iov}
+
+    # Here we set the AlgorithmStrategy for our algorithm
+    from caf.strategies import SimpleRunByRun
+
+    # The SimpleRunByRun strategy executes your algorithm over runs
+    # individually to give you payloads for each one (if successful)
+    # It will not do any merging of runs which didn't contain enough data.
+    # So failure is expected if your algorithm requires a large amount of data compared to run length.
+    # You should only use granularity='run' for the collector when using this strategy.
+
+    cal_test.strategies = SimpleRunByRun
+
+
+#    # Do this for the default AlgorithmStrategy to force the output payload IoV
+#    # It may be different if you are using another strategy like SequentialRunByRun
+#    for algorithm in cal_test.algorithms:
+#        algorithm.params = {"apply_iov": output_iov}
 
     # Most other options like database chain and backend args will be overwritten by b2caf-prompt-run.
     # So we don't bother setting them.

@@ -159,9 +159,10 @@ namespace Belle2 {
                                             a cluster, for debug TTree output */
 
 
-    int m_charge ;
-    double m_E_DIV_p ;
-    double m_massInvTracks ;
+    int m_charge ;        /**< particle charge, for debug TTree output */
+    double m_E_DIV_p ;    /**< Energy divided by momentum, for debug TTree output */
+    double m_massInvTracks ;    /**< invariant mass of the two tracks, for debug TTree output */
+
 
     /*** tree branches END ***/
 
@@ -191,27 +192,17 @@ namespace Belle2 {
     int crystalIDmin_insideCDCacceptance = 161 ;
     int crystalIDmax_insideCDCacceptance = 8672 ;
 
-
-
+    /* d0 and z0 values of the loose and tight tracks*/
     double m_looseTrkZ0 ;
     double m_tightTrkZ0 ;
     double m_looseTrkD0 ;
     double m_tightTrkD0 ;
 
-    double m_pCOM ;
-    int m_numLooseTracks ;
-    int m_numTightTracks ;
-    int m_numClusterTrackElecNeg ;
-    int m_numClusterTrackElecPos ;
-    double m_sumE_COM_negElec ;
-    double m_sumE_COM_posElec ;
-    double m_E_COM_crystal_maxE_negElec ;
-    double m_E_COM_crystal_maxE_posElec ;
+    int m_crystalCrate ;    /**< Crate id for the crystal */
+    int m_runNum ;   /**< run number */
 
-    int m_crystalCrate ;
-    int m_runNum ;
-
-    bool storeCalib = true ;
+    bool storeCalib = true ;   /**< Boolean for whether or not to store the previous
+                                    calibration calibration constants*/
 
     // For the energy dependence correction to the time
     // t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")

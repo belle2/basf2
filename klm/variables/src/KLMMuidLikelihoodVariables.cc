@@ -8,10 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/Particle.h>
-#include <mdst/dataobjects/Track.h>
+/* KLM headers. */
 #include <klm/dataobjects/KLMMuidLikelihood.h>
+
+/* Belle 2 headers. */
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/VariableManager/Manager.h>
+#include <mdst/dataobjects/Track.h>
 
 using namespace std;
 

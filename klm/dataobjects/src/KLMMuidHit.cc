@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/dataobjects/KLMMuidHit.h>
 
 using namespace std;

@@ -9,9 +9,15 @@
 **************************************************************************/
 #pragma once
 
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
-#include <map>
+
+/* ROOT headers. */
 #include <TObject.h>
+
+/* C++ headers. */
+#include <map>
+
 
 namespace Belle2 {
 

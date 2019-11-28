@@ -8,8 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/dataobjects/KLMMuidLikelihood.h>
+
+/* Belle2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <framework/utilities/TestHelpers.h>
 

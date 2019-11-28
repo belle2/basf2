@@ -90,7 +90,9 @@ def decayDescriptor(decay_string):
         ('D_s*-', r'$D^{-*}_s$'),
         ('B+', r'$B^+$'),
         ('B-', r'$B^-$'),
-        ('B0', r'$B^0$'), ]
+        ('B0', r'$B^0$'),
+        ('B_s0', r'$B^0_s$'),
+        ('K*0', r'$K^{0*}$')]
     tex_string = decay_string
     for (key, value) in substitutes:
         tex_string = tex_string.replace(key, value)

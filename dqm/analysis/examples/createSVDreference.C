@@ -69,8 +69,42 @@ void createSVDreference(){
   //bin 3: onlineOccupancy level ERROR
   ref_onlineOcc->SetBinContent(3,onlineOccError);
 
+
+
+  TH1F* ref_eff = new TH1F("refEfficiency","Efficiency Levels Reference",3,0,3);
+
+  xLabels[0]="effEmpty";
+  xLabels[1]="effWarning";
+  xLabels[2]="effError";
+
+  for(int i = 0; i<3; i++)
+    ref_eff->GetXaxis()->SetBinLabel(i+1,xLabels[i]);
+
+  //infos:
+  // eff < effEmpty -> black bin
+  // effEmpty <= eff < effError  -> red bin
+  // effError <= eff < effWarning  -> orange bin
+  // eff > effEmpty  -> green bin
+
+  float effEmpty = 0;
+  float effWarning = 0.94;
+  float effError = 0.9;
+
+  //bin 1: efficiency level EMPTY
+  ref_eff->SetBinContent(1,effEmpty);
+
+  //bin 2: efficiency level WARNING
+  ref_eff->SetBinContent(2,effWarning);
+
+  //bin 3: efficiency level ERROR
+  ref_eff->SetBinContent(3,effError);
+
+
+  //write histogrmas to file
   ref_occ->Write();
   ref_onlineOcc->Write();
+  ref_eff->Write();
+
 
   f->Close();
 

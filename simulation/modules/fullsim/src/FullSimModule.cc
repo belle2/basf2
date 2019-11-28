@@ -103,6 +103,9 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("ProductionCut", m_productionCut,
            "[cm] Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.",
            0.07);
+  addParam("PXDProductionCut", m_pxdProductionCut, "[cm] Secondary production threshold in PXD envelope.", 0.07);
+  addParam("SVDProductionCut", m_svdProductionCut, "[cm] Secondary production threshold in SVD envelope.", 0.07);
+  addParam("CDCProductionCut", m_cdcProductionCut, "[cm] Secondary production threshold in CDC envelope.", 0.07);
   addParam("MaxNumberSteps", m_maxNumberSteps,
            "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
   addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 0.5);
@@ -200,6 +203,9 @@ void FullSimModule::initialize()
     physicsList->UseOpticalPhysics(m_optics);
     physicsList->UseHighPrecisionNeutrons(m_HPneutrons);
     physicsList->SetProductionCutValue(m_productionCut);
+    physicsList->SetPXDProductionCutValue(m_pxdProductionCut);
+    physicsList->SetSVDProductionCutValue(m_svdProductionCut);
+    physicsList->SetCDCProductionCutValue(m_cdcProductionCut);
     runManager.SetUserInitialization(physicsList);
 
   } else {

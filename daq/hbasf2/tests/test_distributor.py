@@ -10,20 +10,26 @@ from zmq_daq.test_support import HLTZMQTestCase
 
 class DistributorTestCase(HLTZMQTestCase):
     """Test case"""
-    #: input_port
-    input_port = HLTZMQTestCase.get_free_port()
-    #: output_port
-    output_port = HLTZMQTestCase.get_free_port()
-    #: monitoring_port
-    monitoring_port = HLTZMQTestCase.get_free_port()
-    #: needed_programs
-    needed_programs = {"distributor": ["b2hlt_distributor", "--input", f"tcp://localhost:{input_port}",
-                                       "--output", f"tcp://*:{output_port}",
-                                       "--monitor", f"tcp://*:{monitoring_port}",
-                                       "--stopWaitingTime", "1"]}
-
     #: event_data
     event_data = open(basf2.find_file("daq/hbasf2/tests/out.raw"), "br").read()
+
+    def setUp(self):
+        """Setup port numbers and necessary programs"""
+        #: input_port
+        self.input_port = HLTZMQTestCase.get_free_port()
+        #: output_port
+        self.output_port = HLTZMQTestCase.get_free_port()
+        #: monitoring_port
+        self.monitoring_port = HLTZMQTestCase.get_free_port()
+        #: needed_programs
+        self.needed_programs = {
+            "distributor": [
+                "b2hlt_distributor",
+                "--input", f"tcp://localhost:{self.input_port}",
+                "--output", f"tcp://*:{self.output_port}",
+                "--monitor", f"tcp://*:{self.monitoring_port}",
+                "--stopWaitingTime", "1"]}
+        super().setUp()
 
     def testConnectAndDisconnect(self):
         """test function"""

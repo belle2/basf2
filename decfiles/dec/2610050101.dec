@@ -1,5 +1,5 @@
-# EventType: 2610050100
-# Descriptor: [ccbar Dstarp2D0Pip D02KS0PipPim]
+# EventType: 2610050101
+# Descriptor: [ccbar Dstarm2D0Pim D0bar2KS0PipPim]
 # NickName: 
 # Cuts: None
 # Documentation: 
@@ -48,12 +48,11 @@ Enddecay
 
 Alias KS0sig K_S0 
 
-Decay D*+
-1.0 D0sig pi+  PHOTOS  VSS;
+Decay D*-
+1.0 anti-D0sig pi-  PHOTOS  VSS;
 Enddecay
 
-
-Decay D0sig
+Decay anti-D0sig
 1.0000     KS0sig   pi+   pi-       PHOTOS    PHSP;
 Enddecay
 

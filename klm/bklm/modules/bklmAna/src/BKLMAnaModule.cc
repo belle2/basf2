@@ -199,7 +199,6 @@ void BKLMAnaModule::event()
     if (trkphi < 0) trkphi =  trkphi + 360.0;
     RelationVector<BKLMHit2d> relatedHit2D = track->getRelationsTo<BKLMHit2d>();
     RelationVector<ExtHit> relatedExtHit = track->getRelationsTo<ExtHit>();
-    RelationVector<KLMMuidLikelihood> Muids = track->getRelationsTo<KLMMuidLikelihood>();
     for (unsigned int t = 0; t < relatedExtHit.size(); t++) {
       ExtHit* exthit =  relatedExtHit[t];
       if (exthit->getDetectorID() != Const::EDetector::BKLM) continue;
@@ -207,14 +206,11 @@ void BKLMAnaModule::event()
       int section = BKLMElementNumbers::getSectionByModule(module);
       int sector = BKLMElementNumbers::getSectorByModule(module);
       int layer = BKLMElementNumbers::getLayerByModule(module);
-      //do we need to require Muid ?
       bool crossed = false; // should be only once ?
-      for (unsigned int mu = 0; mu < Muids.size(); mu++) {
-        KLMMuidLikelihood* muid =  Muids[mu];
-        int extPattern = muid->getExtLayerPattern();
-        if ((extPattern & (1 << (layer - 1))) != 0)  crossed = true;
-        if (crossed) break;
-      }
+      KLMMuidLikelihood* muid = track->getRelatedTo<KLMMuidLikelihood>();
+      if (!muid) continue;
+      int extPattern = muid->getExtLayerPattern();
+      if ((extPattern & (1 << (layer - 1))) != 0)  crossed = true;
       if (!crossed) continue;
 
       TVector3 extMom = exthit->getMomentum();

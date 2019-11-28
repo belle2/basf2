@@ -208,7 +208,7 @@ If you want to use the FEI in your analysis these are the steps you have to do (
 #.    Copy an example steering file from ``analysis/examples/FEI/`` to your directory and modify it (especially choose a different prefix(!))
 #.    Use ``python3 analysis/scripts/fei/distributed.py`` to perform the training
 #.    Take a look at the summary.pdf which is created at the end of the training
-#.    Upload the weightfiles to the condition database: ``conditionsdb upload production localdb/database.txt``
+#.    Upload the weightfiles to the condition database: ``b2conditionsdb-request localdb/database.txt``
 #.    Load the path in your analyis-steering file by choosing the option ``training=False`` in the ``FEIConfiguration``
 #.    Use the ParticleLists created by the FEI ``B+:generic``, ``B+:semileptonic``, ``B0:generic``, ``B0:semileptonic`` and the signal-probabilities stored in the extra Info ``(extraInfo(SignalProbability))`` in your analysis.
 

@@ -73,8 +73,8 @@ def getArgumentParser():
         parser (argparse.ArgumentParser): An argument parser which obtains its
             list of valid skim names from `skim.registry`.
     """
-    allStandaloneSkims = [skim for _, skim in skim_registry]
-    allCombinedSkims = list(combined_skims.keys())
+    allStandaloneSkims = [skim for _, skim in sorted(skim_registry)]
+    allCombinedSkims = sorted(combined_skims.keys())
 
     parser = argparse.ArgumentParser(description='Submits test jobs for a given set of skims, and ' +
                                      'saves the output in a format to be read by ``printSkimStats.py``. ' +

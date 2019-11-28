@@ -144,8 +144,13 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
   TVector3 extHitPosition;
   CLHEP::Hep3Vector extHitPositionCLHEP, localPosition;
   for (const ExtHit& hit : extHits) {
-    /* Choose hits that enter the sensitive volume. */
-    if (hit.getStatus() != EXT_ENTER)
+    /*
+     * Choose hits that exit the sensitive volume.
+     * It is not possible to use entry hits because of a bug in Geant4:
+     * the step does not always have a correct status (fGeomBoundary),
+     * and, consequently, ExtHits are not created.
+     */
+    if (hit.getStatus() != EXT_EXIT)
       continue;
     uint16_t planeGlobal = 0;
     hitData.hit = &hit;

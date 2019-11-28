@@ -5,7 +5,8 @@
  * Calculate time offsets from bhabha events.                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Mikhail Remnev                                           *
+ * Contributors: Ewan Hill        (ehill@mail.ubc.ca)                     *
+ *               Mikhail Remnev                                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,7 +20,7 @@
 class TH2F;
 
 
-using namespace std ;
+using namespace std;
 
 namespace Belle2 {
   namespace ECL {
@@ -47,20 +48,20 @@ namespace Belle2 {
       int crateIDLo; /**< Fit crates with crateID0 in the inclusive range [crateIDLo,crateIDHi] */
       int crateIDHi; /**< Fit crystals with crateID0 in the inclusive range [crateIDLo,crateIDHi] */
 
-      double meanCleanRebinFactor ;  /**< Rebinning factor for mean calculation */
-      double meanCleanCutMinFactor
-      ;  /**< After rebinning, create a mask for bins that have values less than meanCleanCutMinFactor times the maximum bin value.  Expand mask and apply to non-rebinned histogram. */
+      double meanCleanRebinFactor;  /**< Rebinning factor for mean calculation */
+
+      double meanCleanCutMinFactor;  /**< After rebinning, create a mask for bins that have values
+                                           less than meanCleanCutMinFactor times the maximum bin value.
+                                           Expand mask and apply to non-rebinned histogram. */
 
       bool debugOutput; /**< Save every histogram and fitted function to debugFilename */
       /** Name of file with debug output, eclBhabhaTAlgorithm.root by default */
-      string debugFilenameBase ;
+      string debugFilenameBase;
 
-      string collectorName ;
+      string collectorName;  /**< Name of the collector */
 
-
-      //string runIndex ;
-
-      ECLChannelMapper* crystalMapper;
+      ECLChannelMapper* crystalMapper;  /**< Tool for mapping ecl crystal to other ecl objects
+                                             eg, crates, shapers, etc.*/
 
     protected:
 

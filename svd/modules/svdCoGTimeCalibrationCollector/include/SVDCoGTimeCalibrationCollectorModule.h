@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                 *
  ***************************************************************************/
 
-#ifndef SVDCOGTIMECALIBRATIONCOLLECTOR_H
-#define SVDCOGTIMECALIBRATIONCOLLECTOR_H
+#pragma once
 
 #include <calibration/CalibrationCollectorModule.h>
 
@@ -94,4 +93,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-#endif

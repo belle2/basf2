@@ -6,7 +6,6 @@
 import fei
 import basf2 as b2
 import modularAnalysis as ma
-from basf2 import conditions
 
 import b2biiConversion
 import ROOT
@@ -15,7 +14,7 @@ from ROOT import Belle2
 
 # Add the necessary database
 # You can use the command b2conditionsdb-recommend
-conditions.globaltags = ['B2BII_MC']
+b2.conditions.globaltags = ['B2BII_MC']
 
 # Create path
 path = b2.create_path()

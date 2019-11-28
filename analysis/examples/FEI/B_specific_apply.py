@@ -15,7 +15,6 @@ import os
 import fei
 import basf2 as b2
 import modularAnalysis as ma
-from basf2 import conditions as cd
 
 # Create path
 path = b2.create_path()
@@ -78,10 +77,10 @@ path.add_module(skimfilter)
 fei_tag = 'FEIv4_2019_MC12_release_03_01_01'
 
 # Add the necessary database
-# conditions.globaltags = ['name of database containing the specific training']
+# b2.conditions.globaltags = ['name of database containing the specific training']
 
 # Here we use a generic FEI training to demonstrate applying the FEI in an ROE of the signal
-cd.globaltags = ['GT_gen_ana_004.40_AAT-parameters']
+b2.conditions.globaltags = ['GT_gen_ana_004.40_AAT-parameters']
 
 belle_particles = fei.get_default_channels(KLong=False,
                                            chargedB=True,

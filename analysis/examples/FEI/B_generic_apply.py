@@ -6,7 +6,6 @@
 import fei
 import basf2 as b2
 import modularAnalysis as ma
-from basf2 import conditions as cd
 
 # Create path
 path = b2.create_path()
@@ -18,8 +17,8 @@ ma.inputMdst(environmentType='default',
 
 # Add the necessary database
 # You can use the command b2conditionsdb-recommend
-# conditions.globaltags = ['name of analysis global tag']
-cd.globaltags = ['GT_gen_ana_004.40_AAT-parameters']
+# b2.conditions.globaltags = ['name of analysis global tag']
+b2.conditions.globaltags = ['GT_gen_ana_004.40_AAT-parameters']
 
 # Get FEI default channels.
 # Utilise the arguments to toggle on and off certain channels

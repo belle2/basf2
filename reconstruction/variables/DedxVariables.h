@@ -18,12 +18,12 @@ namespace Belle2 {
     /**
      * returns dE/dx truncated mean
      */
-    double dedx(const Particle* part);
+    double CDCdedx(const Particle* part);
 
     /**
      * returns dE/dx truncated mean without the hadron saturation correction
      */
-    double dedxnosat(const Particle* part);
+    double CDCdedxnosat(const Particle* part);
 
     /**
      * returns the momentum valid in the CDC
@@ -59,6 +59,27 @@ namespace Belle2 {
      * returns the chi value for duetrons from CDC dEdx
      */
     double CDCdEdx_chiD(const Particle* part);
+    /**
+     * returns the momentum valid in the SVD
+     */
+    double SVD_p(const Particle* part);
+    /**
+     * returns the MC true momentum valid in the SVD
+     */
+    double SVD_pTrue(const Particle* part);
+    /**
+     * returns the dEdx truncated mean valid in the SVD
+     */
+    double SVDdedx(const Particle* part);
+    /**
+     * returns the number of hits valid in the SVD
+     */
+    double SVD_nHits(const Particle* part);
+    /**
+     *returns cos(theta) of the track valid in the SVD
+     */
+    double SVD_CosTheta(const Particle* part);
+
 
   }
 } // Belle2 namespace

@@ -102,6 +102,8 @@ namespace Belle2 {
 
     /** Return the momentum valid at the IP */
     double getMomentum() const { return m_p; }
+    /** Return the MC truemomentum valid at the IP */
+    double getTrueMomentum() const { return m_pTrue; }
     /** Return the number of hits for this track */
     double size() const { return m_nHits; }
     /** Return the number of hits used to determine the truncated mean */

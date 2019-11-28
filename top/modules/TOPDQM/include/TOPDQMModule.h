@@ -90,6 +90,8 @@ namespace Belle2 {
     int m_cutNphot;   /**< Number of photon cut */
 
     // histograms
+    TH1F* m_BoolEvtMonitor = 0;           /**< Event desynchronization monitoring */
+
     TH1F* m_recoTime = 0;           /**< time distribution */
     TH1F* m_recoTimeBg = 0;         /**< time distribution background */
     TH1F* m_recoTimeMinT0 = 0;      /**< time distribution in respect to the first peak */

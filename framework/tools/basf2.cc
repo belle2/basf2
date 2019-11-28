@@ -104,6 +104,9 @@ int main(int argc, char* argv[])
     B2FATAL("Cannot remove SIGPIPE signal handler");
   }
 
+  //Initialize metadata service
+  MetadataService::Instance();
+
   //Check for Belle2 environment variables (during environment initialisation)
   Environment::Instance();
 

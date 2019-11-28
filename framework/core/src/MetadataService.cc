@@ -21,9 +21,12 @@
 using namespace Belle2;
 
 
+static double basf2StartTime = 0;
+
 MetadataService::MetadataService()
 {
   m_json["basf2_apiversion"] = 1;
+  basf2StartTime = Utils::getClock();
 }
 
 MetadataService& MetadataService::Instance()
@@ -72,8 +75,6 @@ void MetadataService::addRootNtupleFile(const std::string& fileName)
 
   writeJson();
 }
-
-static auto basf2StartTime = Utils::getClock();
 
 void MetadataService::addBasf2Status(const std::string& message)
 {

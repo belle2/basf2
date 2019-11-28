@@ -321,7 +321,7 @@ def testLogContents(logFileContents, jsonFileContents, skim, sample):
                  all(check for outputFileInfo in outputFileInfoList for check in outputFileInfo['checks_passed'].values())
                  ]
 
-    if not all(logTests) and all(jsonTests):
+    if not (all(logTests) and all(jsonTests)):
         raise SkimNotRunException(f'    Error found in log files of {skim} skim on {sample} sample.\n' +
                                   '    Please check the .out, .err, and .json files in log/ directory.')
 

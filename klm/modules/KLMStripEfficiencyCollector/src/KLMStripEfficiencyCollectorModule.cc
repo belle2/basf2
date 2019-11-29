@@ -29,6 +29,11 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
            "Muon list name. If empty, use tracks.", std::string("mu+:all"));
   addParam("MinimalMatchingDigits", m_MinimalMatchingDigits,
            "Minimal number of matching digits.", 0);
+  addParam("MinimalMatchingDigitsOuterLayers",
+           m_MinimalMatchingDigitsOuterLayers,
+           "Minimal number of matching digits in outer layers.", 0);
+  addParam("MinimalMomentumNoOuterLayers", m_MinimalMomentumNoOuterLayers,
+           "Minimal momentum in case there are no hits in outer layers.", 0.0);
   addParam("RemoveUnusedMuons", m_RemoveUnusedMuons,
            "Whether to remove unused muons.", false);
   addParam("AllowedDistance1D", m_AllowedDistance1D,
@@ -52,8 +57,7 @@ void KLMStripEfficiencyCollectorModule::prepare()
   m_tracks.isRequired();
   m_trackFitResults.isRequired();
   m_extHits.isRequired();
-  if (m_MuonListName != "")
-    m_MuonList.isRequired(m_MuonListName);
+  m_MuonList.isRequired(m_MuonListName);
   int nPlanes = m_PlaneArrayIndex->getNPlanes();
   TH1F* matchedDigitsInPlane = new TH1F(
     "matchedDigitsInPlane", "Number of matching (B|E)KLMDigits",
@@ -76,22 +80,16 @@ void KLMStripEfficiencyCollectorModule::closeRun()
 
 void KLMStripEfficiencyCollectorModule::collect()
 {
-  if (m_MuonListName != "") {
-    std::vector<unsigned int> toRemove;
-    unsigned int nMuons = m_MuonList->getListSize();
-    for (unsigned int i = 0; i < nMuons; ++i) {
-      const Particle* particle = m_MuonList->getParticle(i);
-      const Track* track = particle->getTrack();
-      bool trackUsed = collectDataTrack(track);
-      if (m_RemoveUnusedMuons && !trackUsed)
-        toRemove.push_back(particle->getArrayIndex());
-    }
-    if (m_RemoveUnusedMuons)
-      m_MuonList->removeParticles(toRemove);
-  } else {
-    for (const Track& track : m_tracks)
-      collectDataTrack(&track);
+  std::vector<unsigned int> toRemove;
+  unsigned int nMuons = m_MuonList->getListSize();
+  for (unsigned int i = 0; i < nMuons; ++i) {
+    const Particle* muon = m_MuonList->getParticle(i);
+    bool trackUsed = collectDataTrack(muon);
+    if (m_RemoveUnusedMuons && !trackUsed)
+      toRemove.push_back(muon->getArrayIndex());
   }
+  if (m_RemoveUnusedMuons)
+    m_MuonList->removeParticles(toRemove);
 }
 
 void KLMStripEfficiencyCollectorModule::addHit(
@@ -140,8 +138,9 @@ void KLMStripEfficiencyCollectorModule::findMatchingDigit(
   }
 }
 
-bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
+bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
 {
+  const Track* track = muon->getTrack();
   TH1F* matchedDigitsInPlane = getObjectPtr<TH1F>("matchedDigitsInPlane");
   TH1F* allExtHitsInPlane = getObjectPtr<TH1F>("allExtHitsInPlane");
   RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
@@ -264,20 +263,42 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
   }
   /* Find matching digits. */
   int nDigits = 0;
+  std::map<int, int> mapLayerDigits;
+  std::map<int, int>::iterator it2;
   for (it = selectedHits.begin(); it != selectedHits.end(); ++it) {
     findMatchingDigit(&(it->second));
-    if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr)
+    if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr) {
       nDigits++;
+      int layer = m_ElementNumbers->getExtrapolationLayer(
+                    it->second.subdetector, it->second.layer);
+      it2 = mapLayerDigits.find(layer);
+      if (it2 != mapLayerDigits.end())
+        it2->second++;
+      else
+        mapLayerDigits.insert(std::pair<int, int>(layer, 1));
+    }
   }
   if (nDigits < m_MinimalMatchingDigits)
     return false;
   /* Write efficiency histograms */
   for (it = selectedHits.begin(); it != selectedHits.end(); ++it) {
-    int matchingDigits = nDigits;
-    if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr)
-      matchingDigits--;
+    /* Check the number of matching digits in other layers. */
+    int matchingDigits = 0;
+    int matchingDigitsOuterLayers = 0;
+    int layer = m_ElementNumbers->getExtrapolationLayer(
+                  it->second.subdetector, it->second.layer);
+    for (it2 = mapLayerDigits.begin(); it2 != mapLayerDigits.end(); ++it2) {
+      if (layer != it2->first)
+        matchingDigits += it2->second;
+      if (layer < it2->first)
+        matchingDigitsOuterLayers += it2->second;
+    }
     if (matchingDigits < m_MinimalMatchingDigits)
       continue;
+    if (matchingDigitsOuterLayers < m_MinimalMatchingDigitsOuterLayers &&
+        muon->getMomentum().Mag() < m_MinimalMomentumNoOuterLayers)
+      continue;
+    /* Check the number of mathcing digitsafter this one. */
     allExtHitsInPlane->Fill(m_PlaneArrayIndex->getIndex(it->first));
     if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr)
       matchedDigitsInPlane->Fill(m_PlaneArrayIndex->getIndex(it->first));

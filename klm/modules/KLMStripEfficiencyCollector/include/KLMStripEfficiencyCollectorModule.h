@@ -134,17 +134,23 @@ namespace Belle2 {
     void findMatchingDigit(struct HitData* hitData);
 
     /**
-     * Collect the data for one track.
-     * @param[in] track Track.
-     * @return True if track satisfies the selection criteria.
+     * Collect the data for one muon.
+     * @param[in] muon Muon.
+     * @return True if the muon satisfies the selection criteria.
      */
-    bool collectDataTrack(const Track* track);
+    bool collectDataTrack(const Particle* muon);
 
     /** Muon list name. If empty, use tracks. */
     std::string m_MuonListName;
 
     /** Minimal number of matching digits. */
     int m_MinimalMatchingDigits;
+
+    /** Minimal number of matching digits in outer layers. */
+    int m_MinimalMatchingDigitsOuterLayers;
+
+    /** Minimal momentum in case there are no hits in outer layers. */
+    double m_MinimalMomentumNoOuterLayers;
 
     /** Whether to remove unused muons. */
     bool m_RemoveUnusedMuons;

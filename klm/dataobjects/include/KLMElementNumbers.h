@@ -194,6 +194,14 @@ namespace Belle2 {
      */
     uint16_t sectorNumberEKLM(int section, int sector) const;
 
+    /**
+     * Get extrapolation layer number
+     * (BKLM - from 1 to 15, EKLM - from 16 to 29).
+     * @param[in] subdetector Subdetector.
+     * @param[in] layer       Layer.
+     */
+    int getExtrapolationLayer(int subdetector, int layer) const;
+
   private:
 
     /**

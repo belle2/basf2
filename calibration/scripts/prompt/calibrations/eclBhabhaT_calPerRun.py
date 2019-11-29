@@ -70,14 +70,6 @@ def get_calibrations(input_data, **kwargs):
     input_files_physics = list(reduced_file_to_iov_physics.keys())
     basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_physics)}")
 
-    # Get the overall IoV we our process should cover. Includes the end values that we may want to ignore since our output
-    # IoV should be open ended. We could also use this as part of the input data selection in some way.
-    requested_iov = kwargs.get("requested_iov", None)
-
-    from caf.utils import IoV
-    # The actual value our output IoV payload should have. Notice that we've set it open ended.
-#    output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
-
     ###################################################
     # Algorithm setup
 
@@ -118,12 +110,6 @@ def get_calibrations(input_data, **kwargs):
     # You should only use granularity='run' for the collector when using this strategy.
 
     cal_test.strategies = SimpleRunByRun
-
-
-#    # Do this for the default AlgorithmStrategy to force the output payload IoV
-#    # It may be different if you are using another strategy like SequentialRunByRun
-#    for algorithm in cal_test.algorithms:
-#        algorithm.params = {"apply_iov": output_iov}
 
     # Most other options like database chain and backend args will be overwritten by b2caf-prompt-run.
     # So we don't bother setting them.

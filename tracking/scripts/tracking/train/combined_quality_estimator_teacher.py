@@ -134,8 +134,7 @@ you, e.g.::
     find <result_path> -name "*.root" # find all ROOT files
 """
 
-import errno
-import glob
+import itertools
 import os
 from pathlib import Path
 import shutil
@@ -341,6 +340,8 @@ class GenerateSimTask(Basf2PathTask):
 
     #: Number of events to generate.
     n_events = b2luigi.IntParameter()
+    #: Experiment number of the conditions database, e.g. defines simulation geometry
+    experiment_number = b2luigi.IntParameter()
     #: Random basf2 seed.
     random_seed = b2luigi.Parameter()
     #: Directory with overlay background root files
@@ -362,7 +363,7 @@ class GenerateSimTask(Basf2PathTask):
         basf2.set_random_seed(self.random_seed)
         path = basf2.create_path()
         path.add_module(
-            "EventInfoSetter", evtNumList=[self.n_events], runList=[0], expList=[0]
+            "EventInfoSetter", evtNumList=[self.n_events], runList=[0], expList=[self.experiment_number]
         )
         path.add_module("EvtGenInput")
         bkg_files = background.get_background_files(self.bkgfiles_dir)
@@ -384,6 +385,8 @@ class VXDQEDataCollectionTask(Basf2PathTask):
     """
     #: Number of events to generate.
     n_events = b2luigi.IntParameter()
+    #: Experiment number of the conditions database, e.g. defines simulation geometry
+    experiment_number = b2luigi.IntParameter()
     #: Random basf2 seed used by the GenerateSimTask.
     random_seed = b2luigi.Parameter()
     #: Filename of the recorded/collected data for the VXDTF2 QE MVA training.
@@ -398,6 +401,7 @@ class VXDQEDataCollectionTask(Basf2PathTask):
             num_processes=self.num_processes,
             random_seed=self.random_seed,
             n_events=self.n_events,
+            experiment_number=self.experiment_number,
         )
 
     def output(self):
@@ -452,6 +456,8 @@ class CDCQEDataCollectionTask(Basf2PathTask):
     """
     #: Number of events to generate.
     n_events = b2luigi.IntParameter()
+    #: Experiment number of the conditions database, e.g. defines simulation geometry
+    experiment_number = b2luigi.IntParameter()
     #: Random basf2 seed used by the GenerateSimTask.
     random_seed = b2luigi.Parameter()
     #: Filename of the recorded/collected data for the CDC QE MVA training.
@@ -466,6 +472,7 @@ class CDCQEDataCollectionTask(Basf2PathTask):
             num_processes=self.num_processes,
             random_seed=self.random_seed,
             n_events=self.n_events,
+            experiment_number=self.experiment_number,
         )
 
     def output(self):
@@ -515,6 +522,8 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
 
     #: Number of events to generate.
     n_events = b2luigi.IntParameter()
+    #: Experiment number of the conditions database, e.g. defines simulation geometry
+    experiment_number = b2luigi.IntParameter()
     #: Random basf2 seed used by the GenerateSimTask.
     random_seed = b2luigi.Parameter()
     #: Filename of the recorded/collected data for the final QE MVA training.
@@ -531,12 +540,17 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
             num_processes=MasterTask.num_processes,
             random_seed=self.random_seed,
             n_events=self.n_events,
+            experiment_number=self.experiment_number,
         )
         yield CDCQETeacherTask(
             n_events_training=MasterTask.n_events_training,
+            experiment_number=self.experiment_number,
             training_target=self.cdc_training_target,
         )
-        yield VXDQETeacherTask(n_events_training=MasterTask.n_events_training)
+        yield VXDQETeacherTask(
+            n_events_training=MasterTask.n_events_training,
+            experiment_number=self.experiment_number,
+        )
 
     def output(self):
         """
@@ -615,6 +629,8 @@ class TrackQETeacherBaseTask(Basf2Task):
     """
     #: Number of events to generate for the training data set.
     n_events_training = b2luigi.IntParameter()
+    #: Experiment number of the conditions database, e.g. defines simulation geometry
+    experiment_number = b2luigi.IntParameter()
     #: Feature/variable to use as truth label in the quality estimator MVA classifier.
     training_target = b2luigi.Parameter(default="truth")
     #: List of collected variables to not use in the training of the QE MVA classifier.
@@ -673,6 +689,7 @@ class TrackQETeacherBaseTask(Basf2Task):
         yield self.data_collection_task(
             num_processes=MasterTask.num_processes,
             n_events=self.n_events_training,
+            experiment_number=self.experiment_number,
             random_seed=self.random_seed,
         )
 
@@ -762,6 +779,7 @@ class FullTrackQETeacherTask(TrackQETeacherBaseTask):
             cdc_training_target=self.cdc_training_target,
             num_processes=MasterTask.num_processes,
             n_events=self.n_events_training,
+            experiment_number=self.experiment_number,
             random_seed=self.random_seed,
         )
 
@@ -776,6 +794,8 @@ class HarvestingValidationBaseTask(Basf2PathTask):
     n_events_testing = b2luigi.IntParameter()
     #: Number of events to generate for the training data set.
     n_events_training = b2luigi.IntParameter()
+    #: Experiment number of the conditions database, e.g. defines simulation geometry
+    experiment_number = b2luigi.IntParameter()
     #: Name of the "harvested" ROOT output file with variables that can be used for validation.
     validation_output_file_name = "harvesting_validation.root"
     #: Name of the output of the RootOutput module with reconstructed events.
@@ -802,11 +822,15 @@ class HarvestingValidationBaseTask(Basf2PathTask):
         """
         Generate list of luigi Tasks that this Task depends on.
         """
-        yield self.teacher_task(n_events_training=self.n_events_training)
+        yield self.teacher_task(
+            n_events_training=self.n_events_training,
+            experiment_number=self.experiment_number,
+        )
         yield GenerateSimTask(
             bkgfiles_dir=MasterTask.bkgfiles_dir,
             num_processes=MasterTask.num_processes,
             n_events=self.n_events_testing,
+            experiment_number=self.experiment_number,
             random_seed="testdata_0",
         )
 
@@ -909,12 +933,14 @@ class CDCQEHarvestingValidationTask(HarvestingValidationBaseTask):
         """
         yield self.teacher_task(
             n_events_training=self.n_events_training,
+            experiment_number=self.experiment_number,
             training_target=self.training_target,
         )
         yield GenerateSimTask(
             bkgfiles_dir=MasterTask.bkgfiles_dir,
             num_processes=MasterTask.num_processes,
             n_events=self.n_events_testing,
+            experiment_number=self.experiment_number,
             random_seed="testdata_0",
         )
 
@@ -969,16 +995,22 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
         """
         yield CDCQETeacherTask(
             n_events_training=self.n_events_training,
+            experiment_number=self.experiment_number,
             training_target=self.cdc_training_target,
         )
-        yield VXDQETeacherTask(n_events_training=self.n_events_training)
+        yield VXDQETeacherTask(
+            n_events_training=self.n_events_training,
+            experiment_number=self.experiment_number,
+        )
         yield self.teacher_task(
             n_events_training=self.n_events_training,
+            experiment_number=self.experiment_number,
             exclude_variables=self.exclude_variables,
             cdc_training_target=self.cdc_training_target,
         )
         yield GenerateSimTask(
             bkgfiles_dir=MasterTask.bkgfiles_dir,
+            experiment_number=self.experiment_number,
             num_processes=MasterTask.num_processes,
             n_events=self.n_events_testing,
             random_seed="testdata_0",
@@ -1042,6 +1074,8 @@ class TrackQEEvaluationBaseTask(Task):
     n_events_testing = b2luigi.IntParameter()
     #: Number of events to generate for the training data set.
     n_events_training = b2luigi.IntParameter()
+    #: Experiment number of the conditions database, e.g. defines simulation geometry
+    experiment_number = b2luigi.IntParameter()
     #: Feature/variable to use as truth label in the quality estimator MVA classifier.
     training_target = b2luigi.Parameter(default="truth")
 
@@ -1070,11 +1104,13 @@ class TrackQEEvaluationBaseTask(Task):
         """
         yield self.teacher_task(
             n_events_training=self.n_events_training,
+            experiment_number=self.experiment_number,
             training_target=self.training_target,
         )
         yield self.data_collection_task(
             num_processes=MasterTask.num_processes,
             n_events=self.n_events_testing,
+            experiment_number=self.experiment_number,
             random_seed="testdata_0",
         )
 
@@ -1448,6 +1484,8 @@ class VXDQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
     n_events_testing = b2luigi.IntParameter()
     #: Number of events to generate for the training data set.
     n_events_training = b2luigi.IntParameter()
+    #: Experiment number of the conditions database, e.g. defines simulation geometry
+    experiment_number = b2luigi.IntParameter()
 
     @property
     def harvesting_validation_task_instance(self):
@@ -1458,6 +1496,7 @@ class VXDQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
         return VXDQEHarvestingValidationTask(
             n_events_testing=self.n_events_testing,
             n_events_training=self.n_events_training,
+            experiment_number=self.experiment_number,
             num_processes=MasterTask.num_processes,
         )
 
@@ -1472,6 +1511,8 @@ class CDCQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
     n_events_testing = b2luigi.IntParameter()
     #: Number of events to generate for the training data set.
     n_events_training = b2luigi.IntParameter()
+    #: Experiment number of the conditions database, e.g. defines simulation geometry
+    experiment_number = b2luigi.IntParameter()
     #: Feature/variable to use as truth label in the quality estimator MVA classifier.
     training_target = b2luigi.Parameter()
 
@@ -1484,6 +1525,7 @@ class CDCQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
         return CDCQEHarvestingValidationTask(
             n_events_testing=self.n_events_testing,
             n_events_training=self.n_events_training,
+            experiment_number=self.experiment_number,
             training_target=self.training_target,
             num_processes=MasterTask.num_processes,
         )
@@ -1499,6 +1541,8 @@ class FullTrackQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
     n_events_testing = b2luigi.IntParameter()
     #: Number of events to generate for the training data set.
     n_events_training = b2luigi.IntParameter()
+    #: Experiment number of the conditions database, e.g. defines simulation geometry
+    experiment_number = b2luigi.IntParameter()
     #: Feature/variable to use as truth label for the CDC track quality estimator.
     cdc_training_target = b2luigi.Parameter()
     #: List of collected variables to not use in the training of the QE MVA classifier.
@@ -1514,6 +1558,7 @@ class FullTrackQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
         return FullTrackQEHarvestingValidationTask(
             n_events_testing=self.n_events_testing,
             n_events_training=self.n_events_training,
+            experiment_number=self.experiment_number,
             cdc_training_target=self.cdc_training_target,
             exclude_variables=self.exclude_variables,
             num_processes=MasterTask.num_processes,
@@ -1527,6 +1572,8 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
     """
     #: Number of events to generate for the training data set.
     n_events_training = b2luigi.IntParameter()
+    #: Experiment number of the conditions database, e.g. defines simulation geometry
+    experiment_number = b2luigi.IntParameter()
     #: List of collected variables to not use in the training of the QE MVA classifier.
     # In addition to variables containing the "truth" substring, which are excluded by default.
     exclude_variables = b2luigi.ListParameter(hashed=True, default=[])
@@ -1539,13 +1586,16 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
         """
         yield VXDQETeacherTask(
             n_events_training=self.n_events_training,
+            experiment_number=self.experiment_number,
         )
         yield CDCQETeacherTask(
             n_events_training=self.n_events_training,
+            experiment_number=self.experiment_number,
             training_target=self.cdc_training_target,
         )
         yield FullTrackQETeacherTask(
             n_events_training=self.n_events_training,
+            experiment_number=self.experiment_number,
             cdc_training_target=self.cdc_training_target,
             exclude_variables=self.exclude_variables,
         )
@@ -1653,53 +1703,67 @@ class MasterTask(b2luigi.WrapperTask):
             "N_diff_PXD_SVD_RecoTracks",
             "N_diff_SVD_CDC_RecoTracks",
         ]
+        exclude_variables_combinations = [ntrack_variables]
 
-        for exclude_variables in [ntrack_variables]:
-            for cdc_training_target in [
-                "truth_track_is_matched",
-                "truth"  # truth includes clones as signal
-            ]:
-                yield QEWeightsLocalDBCreatorTask(
-                    n_events_training=self.n_events_training,
-                    exclude_variables=exclude_variables,
+        cdc_trainings_targets = [
+            "truth",  # treats clones as signal
+            "truth_track_is_matched"  # treats clones as backround, only best matched CDC tracks are true
+        ]
+
+        experiment_numbers = b2luigi.get_setting("experiment_numbers")
+
+        # iterate over all possible combinations of parameters from the above defined parameter lists
+        for experiment_number, exclude_variables, cdc_training_target in itertools.product(
+                experiment_numbers, exclude_variables, cdc_training_targets
+        ):
+            yield QEWeightsLocalDBCreatorTask(
+                n_events_training=self.n_events_training,
+                experiment_number=experiment_number,
+                exclude_variables=exclude_variables,
+                cdc_training_target=cdc_training_target,
+            )
+
+            if b2luigi.get_setting("run_validation_tasks", default=True):
+                yield FullTrackQEValidationPlotsTask(
                     cdc_training_target=cdc_training_target,
+                    exclude_variables=exclude_variables,
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                    experiment_number=experiment_number,
+                )
+                yield CDCQEValidationPlotsTask(
+                    training_target=cdc_training_target,
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                    experiment_number=experiment_number,
+                )
+                yield VXDQEValidationPlotsTask(
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                    experiment_number=experiment_number,
                 )
 
-                if b2luigi.get_setting("run_validation_tasks", default=True):
-                    yield FullTrackQEValidationPlotsTask(
-                        cdc_training_target=cdc_training_target,
-                        exclude_variables=exclude_variables,
-                        n_events_training=self.n_events_training,
-                        n_events_testing=self.n_events_testing,
-                    )
-                    yield CDCQEValidationPlotsTask(
-                        training_target=cdc_training_target,
-                        n_events_training=self.n_events_training,
-                        n_events_testing=self.n_events_testing,
-                    )
-                    yield VXDQEValidationPlotsTask(
-                        n_events_training=self.n_events_training,
-                        n_events_testing=self.n_events_testing,
-                    )
-
-                if b2luigi.get_setting("run_mva_evaluate", default=True):
-                    # Evaluate trained weightfiles via basf2_mva_evaluate.py on separate testdatasets
-                    # requires a latex installation to work
-                    yield FullTrackQEEvaluationTask(
-                        exclude_variables=exclude_variables,
-                        cdc_training_target=cdc_training_target,
-                        n_events_training=self.n_events_training,
-                        n_events_testing=self.n_events_testing,
-                    )
-                    yield CDCTrackQEEvaluationTask(
-                        training_target=cdc_training_target,
-                        n_events_training=self.n_events_training,
-                        n_events_testing=self.n_events_testing,
-                    )
-                    yield VXDTrackQEEvaluationTask(
-                        n_events_training=self.n_events_training,
-                        n_events_testing=self.n_events_testing,
-                    )
+            if b2luigi.get_setting("run_mva_evaluate", default=True):
+                # Evaluate trained weightfiles via basf2_mva_evaluate.py on separate testdatasets
+                # requires a latex installation to work
+                yield FullTrackQEEvaluationTask(
+                    exclude_variables=exclude_variables,
+                    cdc_training_target=cdc_training_target,
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                    experiment_number=experiment_number,
+                )
+                yield CDCTrackQEEvaluationTask(
+                    training_target=cdc_training_target,
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                    experiment_number=experiment_number,
+                )
+                yield VXDTrackQEEvaluationTask(
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                    experiment_number=experiment_number,
+                )
 
 
 if __name__ == "__main__":

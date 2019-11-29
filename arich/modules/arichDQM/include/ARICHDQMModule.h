@@ -87,7 +87,8 @@ namespace Belle2 {
     TH1* h_chipHit = NULL;/**<The number of hits in each ASIC chip*/
     TH1* h_hapdHit = NULL;/**<The number of hits in each HAPD*/
     TH1* h_mergerHit = NULL;/**<The number of hits in each Merger Boards*/
-    TH2* h_bitsPerMerger = NULL;/*<The number of hits in each bit in each Merger Board>*/
+    TH2* h_bitsPerMergerNorm =
+      NULL;/*<The number of hits in each bit in each Merger Board normalised to number of HAPDs and sum(bit1, bit2)>*/
     TH2* h_bitsPerHapdMerger = NULL;/*<The number of hits in each bit in each HAPD sorted by Merger Board>*/
     TH1* h_secHapdHit[6] = {};/**<The number of hits in each HAPDs of each sector*/
     TH2* h_hapdHitPerEvent = NULL; /**< number of hits in each HAPD per event */

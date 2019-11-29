@@ -84,9 +84,10 @@ namespace Belle2 {
                                  144, -0.5, 143.5);
     h_trackPerEvent = new TH1D("trackPerEvent", "Number of tracks in ARICH per event; # of tracks;Events", 6, -0.5, 5.5);
 
-    h_mergerHit = new TH1D("mergerHit", "Number of hits in each merger board;MB serial;Hits", 72, 0.5, 72 + 0.5);
-    h_bitsPerMerger = new TH2D("bitsPerMerger", "Number of hits in each bit in each Merger;Bit;MB serial;Hits", 5, -1 - 0.5,
-                               4 - 0.5, 72, 0.5, 72 + 0.5); // copy of h_bits
+    h_mergerHit = new TH1D("mergerHit", "Number of hits in each merger board;MB ID;Hits", 72, 0.5, 72 + 0.5);
+    h_bitsPerMergerNorm = new TH2D("bitsPerMergerNorm", "Normalised number of hits in each bit in each Merger;Bit;MB ID;Hits", 5,
+                                   -1 - 0.5,
+                                   4 - 0.5, 72, 0.5, 72 + 0.5); // copy of h_bits, normalised to number of connected Hapds and to sum(bit1, bit2)
     h_bitsPerHapdMerger = new TH2D("bitsPerHapdMerger",
                                    "Number of hits in each bit in each Hapd sorted by mergers;Bit;HAPD unsorted;Hits", 5, -1 - 0.5,
                                    4 - 0.5, 432, 1, 432);
@@ -140,7 +141,7 @@ namespace Belle2 {
     h_chipDigit->SetOption("LIVE");
     h_hapdDigit->SetOption("LIVE");
     h_mergerHit->SetOption("LIVE");
-    h_bitsPerMerger->SetOption("LIVE");
+    h_bitsPerMergerNorm->SetOption("LIVE");
     h_bitsPerHapdMerger->SetOption("LIVE");
 
     h_aerogelHit->SetOption("LIVE");
@@ -168,7 +169,7 @@ namespace Belle2 {
     h_chipHit->SetMinimum(0);
     h_hapdHit->SetMinimum(0);
     h_mergerHit->SetMinimum(0);
-    h_bitsPerMerger->SetMinimum(0);
+    h_bitsPerMergerNorm->SetMinimum(0);
     h_bitsPerHapdMerger->SetMinimum(0);
     h_aerogelHit->SetMinimum(0);
     h_bits->SetMinimum(0);
@@ -221,7 +222,7 @@ namespace Belle2 {
     h_chipHit->Reset();
     h_hapdHit->Reset();
     h_mergerHit->Reset();
-    h_bitsPerMerger->Reset();
+    h_bitsPerMergerNorm->Reset();
     h_bitsPerHapdMerger->Reset();
 
     h_aerogelHit->Reset();
@@ -280,12 +281,12 @@ namespace Belle2 {
         if ((bits & (1 << i)) && !(bits & ~(1 << i))) {
           h_bits->Fill(i);
           h_bitsPerHapd->Fill(i, moduleID);
-          h_bitsPerMerger->Fill(i, mergerID);
+          h_bitsPerMergerNorm->Fill(i, mergerID);
           h_bitsPerHapdMerger->Fill(i, binID);
         } else if (!bits) {
           h_bits->Fill(8);
           h_bitsPerHapd->Fill(8, moduleID);
-          h_bitsPerMerger->Fill(8, mergerID);
+          h_bitsPerMergerNorm->Fill(8, mergerID);
           h_bitsPerHapdMerger->Fill(8, binID);
         }
       }
@@ -420,7 +421,7 @@ namespace Belle2 {
 
   void ARICHDQMModule::endRun()
   {
-    StoreArray<ARICHDigit> arichDigits;
+
     DBObjPtr<ARICHMergerMapping> arichMergerMap;
     if (h_theta->GetEntries() < 200) return;
     TF1* f1 = new TF1("arichFitFunc", "gaus(0)+pol1(3)", 0.25, 0.4);
@@ -432,18 +433,23 @@ namespace Belle2 {
     f1->SetParName(4, "p1");
     h_theta->Fit(f1, "R");
 
-    //Normalise bins in histogram bitsPerMerger
+    //Normalise bins in histogram bitsPerMergerNorm
     for (int mergerID = 1; mergerID < 73; ++mergerID) {
       double NHapd = 0;
       for (int febSlot = 1; febSlot < 7; ++febSlot) {
         if (arichMergerMap->getModuleID(mergerID, febSlot) > 0) NHapd++;
       }
 
-      double bin_value[4];
-      for (int i = 1; i < 5; ++i) {
-        // loop over bits
-        bin_value[i - 1] = h_bitsPerMerger->GetBinContent(i, mergerID);
-        h_bitsPerMerger->SetBinContent(i, mergerID, bin_value[i - 1] / NHapd);
+      double bin_value[5];
+      for (int i = 1; i <= 5; ++i) {
+        // loop over bits and save values
+        bin_value[i - 1] = h_bitsPerMergerNorm->GetBinContent(i, mergerID);
+      }
+
+      for (int i = 1; i <= 5; ++i) {
+        // loop over bits again and set bin content
+        h_bitsPerMergerNorm->SetBinContent(i, mergerID,
+                                           bin_value[i - 1] / (bin_value[3] + bin_value[2]) / NHapd); // normalise with sum of bit1 and bit2, and number of connected HAPDs
       }
     }
 

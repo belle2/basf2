@@ -114,9 +114,9 @@ namespace Belle2 {
     double m_photonFraction;               /**< The fraction of Cerenkov photons which will be kept and propagated. */
     bool m_useNativeGeant4;                /**< If set to true, uses the Geant4 navigator and native detector construction class. */
     std::vector<std::string> m_uiCommandsAtPreInit; /**< A list of Geant4 UI commands that should be applied at PreInit state,
-                                                         before the simulation starts. */
+                                                         before the Geant4 initialization and before the simulation starts. */
     std::vector<std::string> m_uiCommandsAtIdle;    /**< A list of Geant4 UI commands that should be applied at Idle state,
-                                                         before the simulation starts. */
+                                                         after the Geant4 initialization and before the simulation starts. */
     bool m_EnableVisualization;            /**< If set to true the Geant4 visualization support is enabled. */
 
     bool m_storeOpticalPhotons;            /**< controls storing of optical photons in MCParticles */

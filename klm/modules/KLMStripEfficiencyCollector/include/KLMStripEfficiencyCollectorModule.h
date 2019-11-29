@@ -134,16 +134,18 @@ namespace Belle2 {
     /**
      * Collect the data for one track.
      * @param[in] track Track.
+     * @return True if track satisfies the selection criteria.
      */
-    void collectDataTrack(const Track* track);
+    bool collectDataTrack(const Track* track);
 
     /** Muon list name. If empty, use tracks. */
     std::string m_MuonListName;
 
-    /**
-     * Minimal number of matching digits.
-     */
+    /** Minimal number of matching digits. */
     int m_MinimalMatchingDigits;
+
+    /** Whether to remove unused muons. */
+    bool m_RemoveUnusedMuons;
 
     /** EKLM digits. */
     StoreArray<EKLMDigit> m_EklmDigits;

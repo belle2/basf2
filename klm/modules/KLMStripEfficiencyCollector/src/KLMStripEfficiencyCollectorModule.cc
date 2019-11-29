@@ -29,6 +29,8 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
            "Muon list name. If empty, use tracks.", std::string("mu+:all"));
   addParam("MinimalMatchingDigits", m_MinimalMatchingDigits,
            "Minimal number of matching digits.", 0);
+  addParam("RemoveUnusedMuons", m_RemoveUnusedMuons,
+           "Whether to remove unused muons.", false);
   addParam("AllowedDistance1D", m_AllowedDistance1D,
            "Maximal distance in the units of strip number from ExtHit to "
            "matching (B|E)KLMDigit.", double(8));
@@ -75,12 +77,17 @@ void KLMStripEfficiencyCollectorModule::closeRun()
 void KLMStripEfficiencyCollectorModule::collect()
 {
   if (m_MuonListName != "") {
+    std::vector<unsigned int> toRemove;
     unsigned int nMuons = m_MuonList->getListSize();
     for (unsigned int i = 0; i < nMuons; ++i) {
       const Particle* particle = m_MuonList->getParticle(i);
       const Track* track = particle->getTrack();
-      collectDataTrack(track);
+      bool trackUsed = collectDataTrack(track);
+      if (m_RemoveUnusedMuons && !trackUsed)
+        toRemove.push_back(particle->getArrayIndex());
     }
+    if (m_RemoveUnusedMuons)
+      m_MuonList->removeParticles(toRemove);
   } else {
     for (const Track& track : m_tracks)
       collectDataTrack(&track);
@@ -133,7 +140,7 @@ void KLMStripEfficiencyCollectorModule::findMatchingDigit(
   }
 }
 
-void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
+bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
 {
   TH1F* matchedDigitsInPlane = getObjectPtr<TH1F>("matchedDigitsInPlane");
   TH1F* allExtHitsInPlane = getObjectPtr<TH1F>("allExtHitsInPlane");
@@ -218,6 +225,8 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
     if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr)
       nDigits++;
   }
+  if (nDigits < m_MinimalMatchingDigits)
+    return false;
   /* Write efficiency histograms */
   for (it = selectedHits.begin(); it != selectedHits.end(); ++it) {
     int matchingDigits = nDigits;
@@ -229,4 +238,5 @@ void KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
     if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr)
       matchedDigitsInPlane->Fill(m_PlaneArrayIndex->getIndex(it->first));
   }
+  return true;
 }

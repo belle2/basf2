@@ -1,19 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# KLM alignment: simulation.
+
 import sys
-from basf2 import *
+import basf2
 from simulation import add_simulation
-from reconstruction import add_reconstruction
-import glob
 
-main = create_path()
+# Use local database.
+basf2.conditions.append_testing_payloads('localdb/database.txt')
 
+# Create path.
+main = basf2.create_path()
+
+# Input.
 main.add_module('RootInput', inputFileName=sys.argv[1])
+
+# Simulation.
 add_simulation(main)
+
+# Output.
 main.add_module('RootOutput', outputFileName=sys.argv[2])
+
+# Progress.
 main.add_module('Progress')
-process(main)
+
+# Processing.
+basf2.process(main)
 
 # Print call statistics
-print(statistics)
+print(basf2.statistics)

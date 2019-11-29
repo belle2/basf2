@@ -38,11 +38,6 @@ namespace Belle2 {
         return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
-      //status &= (~MCMatching::c_DecayInFlight);
 
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }

@@ -44,13 +44,6 @@ Charm physics skims
 .. automodule:: skim.charm
     :members:
 
-.. Commented out, because this module no longer exists
-   Charmonium skims
-   ~~~~~~~~~~~~~~~~
-
-   .. automodule:: skim.charmonium
-       :members:
-
 Dark sector skims
 ~~~~~~~~~~~~~~~~~
 

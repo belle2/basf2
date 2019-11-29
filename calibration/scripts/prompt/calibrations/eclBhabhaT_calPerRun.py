@@ -62,7 +62,8 @@ def get_calibrations(input_data, **kwargs):
     # Lets set some limits because this calibration doesn't need that much to run.
     max_files_per_run = 26
 
-    # We filter out any more than 2 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
+    # We filter addition files if there are more than [max_files_per_run] files per run.
+    # The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering
     from prompt.utils import filter_by_max_files_per_run
 
@@ -80,11 +81,13 @@ def get_calibrations(input_data, **kwargs):
     eclTAlg = Belle2.ECL.eclBhabhaTAlgorithm()
 
     # Define the CAF algorithm arguments
+    # Comment out the below two lines when doing the crystal calibrations
     eclTAlg.cellIDLo = 3
     eclTAlg.cellIDHi = 2
     eclTAlg.debugOutput = True
     eclTAlg.meanCleanRebinFactor = 3
     eclTAlg.meanCleanCutMinFactor = 0.3
+    # Comment out the below two lines when doing the crate calibrations
     # eclTAlg.crateIDLo = 10
     # eclTAlg.crateIDHi = 9
     eclTAlg.debugFilenameBase = "eclBhabhaTAlgorithm"

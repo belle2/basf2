@@ -151,8 +151,8 @@ use_local_database("localdb/database.txt")
 
 # == Process events
 # process(main, max_event=350000)  # reasonable stats for one crate
-# process(main, max_event=600000) # reasonable stats for crystal calibs for proc10
-process(main, max_event=3000)
-# process(main)
+# process(main, max_event=600000)  # reasonable stats for crystal calibs for proc10
+# process(main, max_event=3000)    # reasonable stats and speed for a quick test
+process(main)                      # process all events
 
 print(statistics)

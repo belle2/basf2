@@ -17,10 +17,6 @@
 #include <ecl/utility/ECLChannelMapper.h>
 #include <string>
 
-class TH2F;
-
-
-using namespace std;
 
 namespace Belle2 {
   namespace ECL {
@@ -31,12 +27,6 @@ namespace Belle2 {
 
       /**..Constructor */
       eclBhabhaTAlgorithm();
-
-      /**..Constructor */
-      eclBhabhaTAlgorithm(string colName);
-
-      /**..Constructor */
-      eclBhabhaTAlgorithm(bool is_eeGamma);
 
       /**..Destructor */
       virtual ~eclBhabhaTAlgorithm() {}
@@ -56,9 +46,9 @@ namespace Belle2 {
 
       bool debugOutput; /**< Save every histogram and fitted function to debugFilename */
       /** Name of file with debug output, eclBhabhaTAlgorithm.root by default */
-      string debugFilenameBase;
+      std::string debugFilenameBase;
 
-      string collectorName;  /**< Name of the collector */
+      std::string collectorName;  /**< Name of the collector */
 
       ECLChannelMapper* crystalMapper;  /**< Tool for mapping ecl crystal to other ecl objects
                                              eg, crates, shapers, etc.*/

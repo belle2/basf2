@@ -3,13 +3,9 @@
 #include <ecl/digitization/EclConfiguration.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-//#include <ecl/calibration/eclBhabhaTTools.cc>
-
 #include "TH2F.h"
 #include "TFile.h"
-#include "TMath.h"
 #include "TF1.h"
-#include "TMinuit.h"
 #include "TROOT.h"
 
 using namespace std;
@@ -33,58 +29,6 @@ eclBhabhaTAlgorithm::eclBhabhaTAlgorithm():
 {
   setDescription("Calculate time offsets from bhabha events by fitting gaussian function to the (t - T0) difference.");
 }
-
-
-
-eclBhabhaTAlgorithm::eclBhabhaTAlgorithm(string colName):
-  // Parameters
-  CalibrationAlgorithm(colName.c_str()),
-  cellIDLo(1),
-  cellIDHi(8736),
-  meanCleanRebinFactor(1),
-  meanCleanCutMinFactor(0),
-  crateIDLo(1),
-  crateIDHi(52),
-  debugOutput(true),
-  debugFilenameBase("eclBhabhaTAlgorithm"),   // base of filename (without ".root")
-  collectorName("ECLBhabhaTCollector"),
-  // Private members
-  m_runCount(0)
-{
-  setDescription("Calculate time offsets from bhabha events by fitting gaussian function to the (t - T0) difference.");
-  B2INFO("Setting user passed prefix");
-  B2INFO("New prefix: getPrefix() = " << getPrefix());
-}
-
-
-
-
-eclBhabhaTAlgorithm::eclBhabhaTAlgorithm(bool is_eeGamma):
-  // Parameters
-  CalibrationAlgorithm("ECLBhabhaTCollector"),
-  cellIDLo(1),
-  cellIDHi(8736),
-  meanCleanRebinFactor(1),
-  meanCleanCutMinFactor(0),
-  crateIDLo(1),
-  crateIDHi(52),
-  debugOutput(true),
-  debugFilenameBase("eclBhabhaTAlgorithm"),   // base of filename (without ".root")
-  collectorName("ECLBhabhaTCollector"),
-  // Private members
-  m_runCount(0)
-{
-  setDescription("Calculate time offsets from bhabha events by fitting gaussian function to the (t - T0) difference.");
-
-  B2INFO("Default perfix: getPrefix() = " << getPrefix());
-  if (is_eeGamma) {
-    B2INFO("Setting ee gamma prefix");
-    setPrefix("ECLBhabhaGammaTCollector");
-    B2INFO("New prefix: getPrefix() = " << getPrefix());
-  }
-}
-
-
 
 
 
@@ -721,6 +665,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   tree_crystal->Write();
   tree_crate->Write();
 
+  histfile->Close() ;
 
   return c_OK;
 }

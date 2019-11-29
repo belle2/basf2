@@ -25,10 +25,10 @@ from glob import glob
 env = Belle2.Environment.Instance()
 
 # Setting just with steering file
-combineRuns = True   # For whether to run over each run invidually or to combine them together in a single plot
-# combineRuns = False ;   # For whether to run over each run invidually or
-# to combine them together in a single plot    ---- for crates run
-# sequentially - small amouonts log size too big
+
+# For whether to execute the algorithm over each run invidually or to combine them together in a single plot
+#   often it is easier just to only pass a single file to the algorithm code instead of to use this feature
+combineRuns = True
 
 
 # Set up and execute calibration
@@ -69,13 +69,13 @@ set_log_level(LogLevel.INFO)   # or LogLevel.DEBUG
 
 exprun_vector = algo.getRunListFromAllData()
 
+baseName = "eclBhabhaTAlgorithm"
+basePathAndName = basePath + baseName
+algo.debugFilenameBase = basePathAndName
 
 if (combineRuns):
     print("Combining all runs' histograms for a single calibration")
-    baseName = "eclBhabhaTAlgorithm"
-    basePathAndName = basePath + baseName
     print("path = ", basePathAndName)
-    algo.debugFilenameBase = basePathAndName
     alg_result = algo.execute()
     print("Calibration completion status", alg_result)
     if (alg_result == 0):
@@ -86,16 +86,11 @@ else:
     for exprun in exprun_vector:
         iov_to_execute = ROOT.vector("std::pair<int,int>")()
         iov_to_execute.push_back(exprun)
-        baseName = "eclBhabhaTAlgorithm"
-        basePathAndName = basePath + baseName
         print("path = ", basePathAndName)
-        algo.debugFilenameBase = basePathAndName
         alg_result = algo.execute(iov_to_execute, 0)
         print("Calibration success-result was", alg_result, "   (0=ok, 2=needs more data)")
         if (alg_result == 0):
             algo.commit()
-        # if ( alg_result == 2 ):  # Not enough data
-        #   runsWithoutEnoughData.append(exprun)
 
 
 print("Summary of possible calibration completion status values:")

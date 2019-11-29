@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 A script to print tables of statistics for skims which have been run by
-``submitTestSkims.py``.
+``b2skim-stats-submit``.
 
 This tool works by constructing a nested dictionary of values indexed by skim
 name, then by performance statistic, and then by sample name. The main function
@@ -45,7 +45,7 @@ from skimExpertFunctions import get_test_file, get_total_infiles, get_events_per
 
 class SkimNotRunException(Exception):
     """A more specific exception to be raised whenever an error occurs that is
-    likely due to a skim not being run properly by ``submitTestSkims.py``.
+    likely due to a skim not being run properly by ``b2skim-stats-submit``.
     """
     pass
 
@@ -72,7 +72,7 @@ def getArgumentParser():
     allCombinedSkims = sorted(combined_skims.keys())
 
     parser = argparse.ArgumentParser(description='Reads the output files of test skim jobs from ' +
-                                     '``submitTestSkims.py`` and prints tables of performance statistics.' +
+                                     '``b2skim-stats-submit`` and prints tables of performance statistics.' +
                                      'One or more standalone or combined skim names must be provided.',
                                      formatter_class=CustomHelpFormatter)
     parser.add_argument('-s', '--standalone', nargs='+', default=[],
@@ -121,7 +121,7 @@ def getJobOutput(skim, sample):
             jsonFileContents = json.load(jsonFile)
     except FileNotFoundError:
         raise SkimNotRunException(f'    Failed to open output files for {skim} skim on {sample} sample.\n' +
-                                  '    Perhaps you forgot to run the skim with runSkimsForStats.py?')
+                                  '    Perhaps you forgot to run the skim with ``b2skim-stats-submit``?')
 
     return logFileContents, jsonFileContents
 
@@ -807,7 +807,7 @@ def printToConfluence(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLab
             the values are more readable labels to be used in printed tables.
         samples (list): A list of samples to print statistics for.
     """
-    confluenceFileName = 'skimStats_confluence.txt'
+    confluenceFileName = 'confluenceTables.txt'
 
     selectedStats = [stat for (stat, statInfo) in statSpecifier.items() if statInfo['PrintToConfluence']]
 

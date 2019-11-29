@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 A script to submit small skim test jobs, and save the output in a form to be
-read by ``printSkimStats.py``.
+read by ``b2skim-stats-print``.
 """
 
 import argparse
@@ -77,7 +77,7 @@ def getArgumentParser():
     allCombinedSkims = sorted(combined_skims.keys())
 
     parser = argparse.ArgumentParser(description='Submits test jobs for a given set of skims, and ' +
-                                     'saves the output in a format to be read by ``printSkimStats.py``. ' +
+                                     'saves the output in a format to be read by ``b2skim-stats-print``. ' +
                                      'One or more standalone or combined skim names must be provided.',
                                      formatter_class=CustomHelpFormatter)
     parser.add_argument('-s', '--standalone', nargs='+', default=[],

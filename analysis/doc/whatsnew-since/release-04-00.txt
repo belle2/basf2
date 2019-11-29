@@ -41,6 +41,8 @@ Variables
  * Added new variables for fully-inclusive analysis: :b2:var:`nDaughterPhotons`, :b2:var:`nDaughterCharged` etc., which allow to count 
    specific daughters easily, and :b2:var:`daughterAverageOf`, which is similar to the :b2:var:`daughterSumOf`, but outputs the mean value of a variable.
 
+ * Fixed :b2:var:`goodBelleKshort`, now it returns ``extraInfo(goodKs)`` if the variable exists.
+
 Modules
 +++++++
 

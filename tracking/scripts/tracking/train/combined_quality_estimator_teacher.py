@@ -1216,12 +1216,14 @@ class FullTrackQEEvaluationTask(TrackQEEvaluationBaseTask):
         yield self.teacher_task(
             exclude_variables=self.exclude_variables,
             n_events_training=self.n_events_training,
+            experiment_number=self.experiment_number,
             training_target=self.training_target,
             cdc_training_target=self.cdc_training_target,
         )
         yield self.data_collection_task(
             num_processes=MasterTask.num_processes,
             n_events=self.n_events_testing,
+            experiment_number=self.experiment_number,
             random_seed="testdata_0",
             cdc_training_target=self.cdc_training_target,
         )
@@ -1577,7 +1579,7 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
     #: List of collected variables to not use in the training of the QE MVA classifier.
     # In addition to variables containing the "truth" substring, which are excluded by default.
     exclude_variables = b2luigi.ListParameter(hashed=True, default=[])
-    #: Feature/variable to use as truth label for the CDC track quality estimator.
+    #: Feature/vaiable to use as truth label for the CDC track quality estimator.
     cdc_training_target = b2luigi.Parameter()
 
     def requires(self):
@@ -1705,7 +1707,7 @@ class MasterTask(b2luigi.WrapperTask):
         ]
         exclude_variables_combinations = [ntrack_variables]
 
-        cdc_trainings_targets = [
+        cdc_training_targets = [
             "truth",  # treats clones as signal
             "truth_track_is_matched"  # treats clones as backround, only best matched CDC tracks are true
         ]
@@ -1714,7 +1716,7 @@ class MasterTask(b2luigi.WrapperTask):
 
         # iterate over all possible combinations of parameters from the above defined parameter lists
         for experiment_number, exclude_variables, cdc_training_target in itertools.product(
-                experiment_numbers, exclude_variables, cdc_training_targets
+                experiment_numbers, exclude_variables_combinations, cdc_training_targets
         ):
             yield QEWeightsLocalDBCreatorTask(
                 n_events_training=self.n_events_training,

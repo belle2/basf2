@@ -3,7 +3,7 @@
 
 # -----------------------------------------------------------
 # BASF2 (Belle Analysis Framework 2)
-# Copyright(C) 2018 Belle II Collaboration
+# Copyright(C) 2019 Belle II Collaboration
 #
 # Author: The Belle II Collaboration
 # Contributors: Mikhail Remnev
@@ -64,7 +64,7 @@ algo.meanCleanCutMinFactor = 0.3
 algo.debugFilenameBase = "eclBhabhaTAlgorithm"
 
 set_debug_level(35)
-set_log_level(LogLevel.INFO)   # or LogLevel.DEBUG
+set_log_level(LogLevel.INFO)   # LogLevel.INFO or LogLevel.DEBUG
 
 
 exprun_vector = algo.getRunListFromAllData()

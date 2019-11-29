@@ -170,11 +170,10 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   double time_fit_min = hist_tmax;   // Set min value to largest possible value so that it gets reset
   double time_fit_max = hist_tmin;   // Set max value to smallest possible value so that it gets reset
 
-  cout << "hist_tmin = " << hist_tmin << "\n";
-  cout << "hist_tmax = " << hist_tmax << "\n";
+  B2INFO("hist_tmin = " << hist_tmin);
+  B2INFO("hist_tmax = " << hist_tmax);
 
 
-  //const double TICKS_TO_NS = 0.4931; // ns/clock
   const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::m_rf) *
                              1e3;  // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz. Same for all crystals.  Proper accurate value
 
@@ -191,8 +190,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     t_offsets.push_back(TsDatabase->GetBinContent(i - 1) / numTimesFilled);
     t_offsets_prev.push_back(TsDatabase->GetBinContent(i) / numTimesFilled);
 
-    cout << " TsDatabase->GetBinContent(i) = " << TsDatabase->GetBinContent(i) << "\n";
-    cout << "t_offsets_prev = " << t_offsets_prev[i - 1] << "\n";
+    B2INFO(" TsDatabase->GetBinContent(i) = " << TsDatabase->GetBinContent(i));
+    B2INFO("t_offsets_prev = " << t_offsets_prev[i - 1]);
 
 
     t_offsets_unc.push_back(TsDatabaseUnc->GetBinContent(i - 1) / numTimesFilled);
@@ -284,14 +283,13 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     B2INFO("Fitting crystal between " << time_fit_min << " and " << time_fit_max);
 
     // gaus(0) is a substitute for [0]*exp(-0.5*((x-[1])/[2])**2)
-    //TF1* gaus = new TF1("func", "gaus(0)", hist_tmin, hist_tmax);
     TF1* gaus = new TF1("func", "gaus(0)", time_fit_min, time_fit_max);
     gaus->SetParNames("numCrystalHitsNormalization", "mean", "sigma");
     /*
        gaus->ReleaseParameter(0);  // number of crystals
        gaus->ReleaseParameter(1);  // mean
        gaus->ReleaseParameter(2);  // standard deviation
-       */
+    */
 
     double hist_max = h_time->GetMaximum();
 
@@ -304,13 +302,11 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     gaus->SetParameter(0, hist_max / 2.);
     gaus->SetParameter(1, mean);
     gaus->SetParameter(2, sigma);
-    //gaus->SetParLimits(2, sig_min, sig_max);
     // L -- Use log likelihood method
     // I -- Use integral of function in bin instead of value at bin center
     // R -- Use the range specified in the function range     // DON'T USE ANYMORE !
     // B -- Fix one or more parameters with predefined function   /// DON'T USE ANYMORE !
     // Q -- Quiet mode
-    //h_time->Fit(gaus, "LIRBQ", "", mean - stddev, mean + stddev);
 
     h_timeMasked->Fit(gaus, "LQR");  // L for likelihood, R for x-range, Q for fit quiet mode
 
@@ -345,11 +341,11 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
       B2INFO("time_fit_min = " << time_fit_min);
       B2INFO("time_fit_max = " << time_fit_max);
 
-      if (fabs(meanDiff) > 10)       B2INFO("fit mean diff too large\n");
-      if (fabs(meanUncDiff) > 10)    B2INFO("fit mean unc diff too large\n");
-      if (fabs(sigmaDiff) > 10)      B2INFO("fit mean sigma diff too large\n");
-      if (fit_mean_unc > 3)          B2INFO("fit mean unc too large\n");
-      if (fit_sigma < 0.1)           B2INFO("fit sigma too small\n");
+      if (fabs(meanDiff) > 10)       B2INFO("fit mean diff too large");
+      if (fabs(meanUncDiff) > 10)    B2INFO("fit mean unc diff too large");
+      if (fabs(sigmaDiff) > 10)      B2INFO("fit mean sigma diff too large");
+      if (fit_mean_unc > 3)          B2INFO("fit mean unc too large");
+      if (fit_sigma < 0.1)           B2INFO("fit sigma too small");
 
     } else {
       good_fit = true;
@@ -373,8 +369,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
       database_mean_unc = default_mean_unc;
     }
 
-    if (numEntries < minNumEntries)   B2INFO("Number of entries less than minimum\n");
-    if (numEntries == 0)   B2INFO("Number of entries == 0\n");
+    if (numEntries < minNumEntries)   B2INFO("Number of entries less than minimum");
+    if (numEntries == 0)   B2INFO("Number of entries == 0");
 
 
     tree_cid  = crys_id;
@@ -392,6 +388,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
     tsPrev = t_offsets_prev[crys_id - 1] * TICKS_TO_NS;
 
+    delete gaus;
     tree_crystal->Fill();
   }
 
@@ -412,7 +409,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   B2DEBUG(30, "Found min/max of X axis of TimevsCrateNoCrateCalibPrevCrystCalib");
 
   // Vector of time offsets to be saved in the database.
-  //t_offsets_crate.clear();
 
   auto TcrateDatabase = getObjectPtr<TH1F>("TcrateDatabase");
 
@@ -581,6 +577,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     histfile->WriteTObject(h_time_crate, (std::string("h_time_psi_crate") + std::to_string(crate_id)).c_str());
     histfile->WriteTObject(h_time_crate_masked, (std::string("h_time_psi_crate_masked") + std::to_string(crate_id)).c_str());
     histfile->WriteTObject(h_time_crate_rebin, (std::string("h_time_psi_crate_rebinned") + std::to_string(crate_id)).c_str());
+
+    delete gaus;
   }
 
   B2DEBUG(30, "crate histograms made");
@@ -603,13 +601,11 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     int crate_id_from_crystal = crystalMapper->getCrateID(crys_id);
     if (tcrate_new_was_set[crate_id_from_crystal - 1]) {
       t_offsets_crate[crys_id - 1] = tcrate_mean_new[crate_id_from_crystal - 1] / TICKS_TO_NS;
-
-      // USE SIGMA OR MEAN UNCERTAINTY ?!?!?!?!??!?
       t_offsets_crate_unc[crys_id - 1] = tcrate_mean_unc_new[crate_id_from_crystal - 1] / TICKS_TO_NS;
 
     } else {
       t_offsets_crate[crys_id - 1] = tcrate_mean_prev[crate_id_from_crystal - 1];
-      cout << "used old crate mean but zeroed uncertainty since not saved in root file\n";
+      B2INFO("used old crate mean but zeroed uncertainty since not saved in root file");
     }
 
   }
@@ -665,8 +661,14 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   tree_crystal->Write();
   tree_crate->Write();
 
-  histfile->Close() ;
+  histfile->Close();
 
+  delete crystalMapper;
+
+  tree_crystal = 0;
+  tree_crate = 0;
+
+  B2INFO("Finished talgorithm");
   return c_OK;
 }
 

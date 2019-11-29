@@ -130,10 +130,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   TFile* histfile = 0;
   TTree* tree_crystal = 0;
-  TTree* tree_crystal_final = 0;
   TTree* tree_crate = 0;
   int tree_cid;
-  double chi2;
 
   // Vector of time offsets to be saved in the database.
   vector<float> t_offsets;
@@ -417,7 +415,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
     // Set the tree_crystal values - ignore fit values  !!!!!!!!!!!!!!!!
     sigma = default_sigma;
-    chi2 = -1;
 
 
     int numEntries = h_time->GetEntries();
@@ -484,7 +481,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   double mean_crate = 0;
   double sigma_crate = -1;
   double mean_crate_unc = 0;
-  int crateCalibSaved = 0;
 
   vector<float> tcrate_mean_new(52, 0.0);
   vector<float> tcrate_mean_unc_new(52, 0.0);
@@ -619,7 +615,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     int numEntries = h_time_crate->GetEntries();
     B2INFO("Number entries = " << numEntries);
     if ((numEntries >= minNumEntries)  &&  good_fit) {
-      crateCalibSaved = 1;
 
       database_mean_crate = fit_mean_crate;
       database_mean_crate_unc = fit_mean_crate_unc;
@@ -704,8 +699,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   tree_crate->Branch("tcrate_sigma", &tree_tcrate_sigma)->SetTitle("Sigma of time tcrate distribution, ns");
   tree_crate->SetAutoSave(10);
 
-
-  bool firstRunInList = true;
 
   for (auto expRun : getRunList()) {
     // Key command to make sure your DBObjPtrs are correct

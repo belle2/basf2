@@ -140,6 +140,8 @@ void KLMStripEfficiencyCollectorModule::findMatchingDigit(
 
 bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
 {
+  const int nExtrapolationLayers =
+    KLMElementNumbers::getMaximalExtrapolationLayer();
   const Track* track = muon->getTrack();
   TH1F* matchedDigitsInPlane = getObjectPtr<TH1F>("matchedDigitsInPlane");
   TH1F* allExtHitsInPlane = getObjectPtr<TH1F>("allExtHitsInPlane");
@@ -148,9 +150,13 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
   std::map<uint16_t, struct HitData>::iterator it;
   uint16_t channel;
   enum KLMChannelStatus::ChannelStatus status;
-  struct HitData hitData;
+  struct HitData hitData, hitDataPrevious;
   TVector3 extHitPosition;
   CLHEP::Hep3Vector extHitPositionCLHEP, localPosition;
+  int layer;
+  int extHitLayer[nExtrapolationLayers] = {0};
+  int digitLayer[nExtrapolationLayers] = {0};
+  hitDataPrevious.subdetector = -1;
   for (const ExtHit& hit : extHits) {
     /*
      * Choose hits that exit the sensitive volume.
@@ -177,6 +183,9 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
       if (status == KLMChannelStatus::c_Unknown)
         B2FATAL("Incomplete KLM channel status data.");
       if (status == KLMChannelStatus::c_Normal) {
+        layer = m_ElementNumbers->getExtrapolationLayer(
+                  hitData.subdetector, hitData.layer);
+        extHitLayer[layer - 1]++;
         planeGlobal = m_ElementNumbers->planeNumberEKLM(
                         hitData.section, hitData.sector, hitData.layer,
                         hitData.plane);
@@ -202,6 +211,9 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
         if (status == KLMChannelStatus::c_Unknown)
           B2FATAL("Incomplete KLM channel status data.");
         if (status == KLMChannelStatus::c_Normal) {
+          layer = m_ElementNumbers->getExtrapolationLayer(
+                    hitData.subdetector, hitData.layer);
+          extHitLayer[layer - 1]++;
           planeGlobal = m_ElementNumbers->planeNumberBKLM(
                           hitData.section, hitData.sector, hitData.layer,
                           hitData.plane);
@@ -219,6 +231,18 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
         localPosition = module->globalToLocal(extHitPositionCLHEP);
         hitData.plane = BKLMElementNumbers::c_ZPlane;
         hitData.strip = module->getZStrip(localPosition);
+        /*
+         * FIXME
+         * There are 2 hits per module in RPCs, but the plane information is
+         * not available in ExtHit. For now, 2 entries are created (one for
+         * each plane) for the first hit, and the second one is removed.
+         */
+        if (hitData.subdetector == hitDataPrevious.subdetector &&
+            hitData.section == hitDataPrevious.section &&
+            hitData.sector == hitDataPrevious.sector &&
+            hitData.layer == hitDataPrevious.layer)
+          continue;
+        std::memcpy(&hitDataPrevious, &hitData, sizeof(struct HitData));
         /* The returned strip may be out of the valid range. */
         if (BKLMElementNumbers::checkChannelNumber(
               hitData.section, hitData.sector, hitData.layer, hitData.plane,
@@ -230,6 +254,9 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
           if (status == KLMChannelStatus::c_Unknown)
             B2FATAL("Incomplete KLM channel status data.");
           if (status == KLMChannelStatus::c_Normal) {
+            layer = m_ElementNumbers->getExtrapolationLayer(
+                      hitData.subdetector, hitData.layer);
+            extHitLayer[layer - 1]++;
             hitData.localPosition = localPosition.z();
             planeGlobal = m_ElementNumbers->planeNumberBKLM(
                             hitData.section, hitData.sector, hitData.layer,
@@ -250,6 +277,9 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
           if (status == KLMChannelStatus::c_Unknown)
             B2FATAL("Incomplete KLM channel status data.");
           if (status == KLMChannelStatus::c_Normal) {
+            layer = m_ElementNumbers->getExtrapolationLayer(
+                      hitData.subdetector, hitData.layer);
+            extHitLayer[layer - 1]++;
             hitData.localPosition = localPosition.y();
             planeGlobal = m_ElementNumbers->planeNumberBKLM(
                             hitData.section, hitData.sector, hitData.layer,
@@ -263,19 +293,14 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
   }
   /* Find matching digits. */
   int nDigits = 0;
-  std::map<int, int> mapLayerDigits;
   std::map<int, int>::iterator it2;
   for (it = selectedHits.begin(); it != selectedHits.end(); ++it) {
     findMatchingDigit(&(it->second));
     if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr) {
       nDigits++;
-      int layer = m_ElementNumbers->getExtrapolationLayer(
-                    it->second.subdetector, it->second.layer);
-      it2 = mapLayerDigits.find(layer);
-      if (it2 != mapLayerDigits.end())
-        it2->second++;
-      else
-        mapLayerDigits.insert(std::pair<int, int>(layer, 1));
+      layer = m_ElementNumbers->getExtrapolationLayer(
+                it->second.subdetector, it->second.layer);
+      digitLayer[layer - 1]++;
     }
   }
   if (nDigits < m_MinimalMatchingDigits)
@@ -285,18 +310,23 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
     /* Check the number of matching digits in other layers. */
     int matchingDigits = 0;
     int matchingDigitsOuterLayers = 0;
-    int layer = m_ElementNumbers->getExtrapolationLayer(
-                  it->second.subdetector, it->second.layer);
-    for (it2 = mapLayerDigits.begin(); it2 != mapLayerDigits.end(); ++it2) {
-      if (layer != it2->first)
-        matchingDigits += it2->second;
-      if (layer < it2->first)
-        matchingDigitsOuterLayers += it2->second;
+    int extHitsOuterLayers = 0;
+    layer = m_ElementNumbers->getExtrapolationLayer(
+              it->second.subdetector, it->second.layer) - 1;
+    for (int i = 0; i < nExtrapolationLayers; ++i) {
+      if (i != layer)
+        matchingDigits += digitLayer[i];
+      if (i > layer) {
+        matchingDigitsOuterLayers += digitLayer[i];
+        extHitsOuterLayers += extHitLayer[i];
+      }
     }
     if (matchingDigits < m_MinimalMatchingDigits)
       continue;
     if (matchingDigitsOuterLayers < m_MinimalMatchingDigitsOuterLayers &&
-        muon->getMomentum().Mag() < m_MinimalMomentumNoOuterLayers)
+        extHitsOuterLayers >= m_MinimalMatchingDigitsOuterLayers)
+      continue;
+    if (muon->getMomentum().Mag() < m_MinimalMomentumNoOuterLayers)
       continue;
     /* Check the number of mathcing digitsafter this one. */
     allExtHitsInPlane->Fill(m_PlaneArrayIndex->getIndex(it->first));

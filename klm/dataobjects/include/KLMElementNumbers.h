@@ -11,6 +11,7 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 
 namespace Belle2 {
@@ -201,6 +202,15 @@ namespace Belle2 {
      * @param[in] layer       Layer.
      */
     int getExtrapolationLayer(int subdetector, int layer) const;
+
+    /**
+     * Get maximal extrapolation layer.
+     */
+    static constexpr int getMaximalExtrapolationLayer()
+    {
+      return EKLMElementNumbers::getMaximalLayerNumber() +
+             BKLMElementNumbers::getMaximalLayerNumber();
+    }
 
   private:
 

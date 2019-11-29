@@ -546,6 +546,108 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr isChildOfList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() > 0) {
+        auto listNames = arguments;
+        auto func = [listNames](const Particle * particle) -> double {
+          double output = 0;
+
+          for (auto& iListName : listNames)
+          {
+
+            // Creating recursive lambda
+            auto list_comparison  = [](auto && self, const Particle * m, const Particle * p)-> int {
+              int result = 0;
+              for (unsigned i = 0; i < m->getNDaughters(); ++i)
+              {
+
+                const Particle* daughter = m->getDaughter(i);
+                if (p == daughter) {
+                  return 1;
+                }
+                if (daughter->getNDaughters() > 0) {
+                  result = self(self, daughter, p);
+                  if (result == 1) {
+                    return 1;
+                  }
+                }
+              }
+              return result;
+            };
+
+
+            StoreObjPtr<ParticleList> listOfParticles(iListName);
+
+            if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << iListName << " given to isChildOfList");
+
+            for (unsigned i = 0; i < listOfParticles->getListSize(); ++i) {
+              Particle* iParticle = listOfParticles->getParticle(i);
+              output = list_comparison(list_comparison, iParticle, particle); goto endloop;
+            }
+
+          }
+endloop:
+          return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function isChildOfList");
+      }
+    }
+
+    Manager::FunctionPtr isMCChildOfList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() > 0) {
+        auto listNames = arguments;
+        auto func = [listNames](const Particle * particle) -> double {
+          double output = 0;
+          if (particle->getMCParticle() == nullptr)
+          {
+            return 0;
+          }
+
+          for (auto& iListName : listNames)
+          {
+            // Creating recursive lambda
+            auto list_comparison  = [](auto && self, const Particle * m, const Particle * p)-> int {
+              int result = 0;
+              for (unsigned i = 0; i < m->getNDaughters(); ++i)
+              {
+                const Particle* daughter = m->getDaughter(i);
+                if (p->getMCParticle() == daughter->getMCParticle()) {
+                  return 1;
+                }
+                if (daughter->getNDaughters() > 0) {
+                  result = self(self, daughter, p);
+                  if (result == 1) {
+                    return 1;
+                  }
+                }
+              }
+              return result;
+            };
+
+
+            StoreObjPtr<ParticleList> listOfParticles(iListName);
+
+            if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << iListName << " given to isMCChildOfList");
+
+            for (unsigned i = 0; i < listOfParticles->getListSize(); ++i) {
+              Particle* iParticle = listOfParticles->getParticle(i);
+              output = list_comparison(list_comparison, iParticle, particle); goto endloop;
+            }
+
+          }
+endloop:
+          return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function isMCChildOfList");
+      }
+    }
+
     Manager::FunctionPtr daughterProductOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -2305,6 +2407,12 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       "Returns 1.0 if the particle is in the list provided, 0.0 if not. Note that this only checks the particle given. For daughters of composite particles, please see isDaughterOfList().");
     REGISTER_VARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
                       "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.");
+    REGISTER_VARIABLE("isChildOfList(particleListNames)", isChildOfList,
+                      "Returns 1 if the given particle appears in decay chain of the particles in the given particle Lists.");
+    REGISTER_VARIABLE("isMCChildOfList(particleListNames)", isMCChildOfList,
+                      R"DOC(Returns function which returns 1 if the given particle is linked to the same MC particle as any of reconstructed daughter of the decay lists.\n"
+                      "It have only sense for lists created with ``fillParticleListFromMC`` function with ``addDaughters=True`` argument.)DOC");
+
     REGISTER_VARIABLE("sourceObjectIsInList(particleListName)", sourceObjectIsInList, R"DOC(
 Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to create a particle in ``particleListName``, 0.0 if not. 
 

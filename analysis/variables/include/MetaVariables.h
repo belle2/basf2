@@ -70,6 +70,17 @@ namespace Belle2 {
     Manager::FunctionPtr isGrandDaughterOfList(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns 1 if the given particle appears to be a in the decay chain of given lists.
+     */
+    Manager::FunctionPtr isChildOfList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns 1 if the given particle is linked to the same MC particle as any of reconstructed daughter of the decay lists.
+     * It have only sense for lists created with fillParticleListFromMC function with addDaughters=True argument.
+     */
+    Manager::FunctionPtr isMCChildOfList(const std::vector<std::string>& arguments);
+
+    /**
      * Returns a function which returns the the variable for the closest
      * particle in the provided particle list
      */

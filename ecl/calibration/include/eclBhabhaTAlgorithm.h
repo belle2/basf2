@@ -36,7 +36,7 @@ namespace Belle2 {
       eclBhabhaTAlgorithm(string colName);
 
       /**..Constructor */
-      eclBhabhaTAlgorithm(bool is_ee_gamma);
+      eclBhabhaTAlgorithm(bool is_eeGamma);
 
       /**..Destructor */
       virtual ~eclBhabhaTAlgorithm() {}
@@ -70,7 +70,7 @@ namespace Belle2 {
 
     private:
       /** Number of processed runs */
-      unsigned int m_run_count;
+      unsigned int m_runCount;
     };
   }  // namespace ECL
 } // namespace Belle2

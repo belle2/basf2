@@ -29,7 +29,7 @@ eclBhabhaTAlgorithm::eclBhabhaTAlgorithm():
   debugFilenameBase("eclBhabhaTAlgorithm"),   // base of filename (without ".root")
   collectorName("ECLBhabhaTCollector"),
   // Private members
-  m_run_count(0)
+  m_runCount(0)
 {
   setDescription("Calculate time offsets from bhabha events by fitting gaussian function to the (t - T0) difference.");
 }
@@ -49,7 +49,7 @@ eclBhabhaTAlgorithm::eclBhabhaTAlgorithm(string colName):
   debugFilenameBase("eclBhabhaTAlgorithm"),   // base of filename (without ".root")
   collectorName("ECLBhabhaTCollector"),
   // Private members
-  m_run_count(0)
+  m_runCount(0)
 {
   setDescription("Calculate time offsets from bhabha events by fitting gaussian function to the (t - T0) difference.");
   B2INFO("Setting user passed prefix");
@@ -59,7 +59,7 @@ eclBhabhaTAlgorithm::eclBhabhaTAlgorithm(string colName):
 
 
 
-eclBhabhaTAlgorithm::eclBhabhaTAlgorithm(bool is_ee_gamma):
+eclBhabhaTAlgorithm::eclBhabhaTAlgorithm(bool is_eeGamma):
   // Parameters
   CalibrationAlgorithm("ECLBhabhaTCollector"),
   cellIDLo(1),
@@ -72,12 +72,12 @@ eclBhabhaTAlgorithm::eclBhabhaTAlgorithm(bool is_ee_gamma):
   debugFilenameBase("eclBhabhaTAlgorithm"),   // base of filename (without ".root")
   collectorName("ECLBhabhaTCollector"),
   // Private members
-  m_run_count(0)
+  m_runCount(0)
 {
   setDescription("Calculate time offsets from bhabha events by fitting gaussian function to the (t - T0) difference.");
 
   B2INFO("Default perfix: getPrefix() = " << getPrefix());
-  if (is_ee_gamma) {
+  if (is_eeGamma) {
     B2INFO("Setting ee gamma prefix");
     setPrefix("ECLBhabhaGammaTCollector");
     B2INFO("New prefix: getPrefix() = " << getPrefix());

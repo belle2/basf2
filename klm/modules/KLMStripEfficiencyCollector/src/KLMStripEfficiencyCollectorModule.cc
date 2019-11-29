@@ -147,6 +147,8 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
   RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
   std::map<uint16_t, struct HitData> selectedHits;
   std::map<uint16_t, struct HitData>::iterator it;
+  uint16_t channel;
+  enum KLMChannelStatus::ChannelStatus status;
   struct HitData hitData;
   TVector3 extHitPosition;
   CLHEP::Hep3Vector extHitPositionCLHEP, localPosition;
@@ -169,10 +171,18 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
       m_ElementNumbersEKLM->stripNumberToElementNumbers(
         stripGlobal, &hitData.section, &hitData.layer, &hitData.sector,
         &hitData.plane, &hitData.strip);
-      planeGlobal = m_ElementNumbers->planeNumberEKLM(
-                      hitData.section, hitData.sector, hitData.layer,
-                      hitData.plane);
-      addHit(selectedHits, planeGlobal, &hitData);
+      channel = m_ElementNumbers->channelNumberEKLM(
+                  hitData.section, hitData.sector, hitData.layer,
+                  hitData.plane, hitData.strip);
+      status = m_ChannelStatus->getChannelStatus(channel);
+      if (status == KLMChannelStatus::c_Unknown)
+        B2FATAL("Incomplete KLM channel status data.");
+      if (status == KLMChannelStatus::c_Normal) {
+        planeGlobal = m_ElementNumbers->planeNumberEKLM(
+                        hitData.section, hitData.sector, hitData.layer,
+                        hitData.plane);
+        addHit(selectedHits, planeGlobal, &hitData);
+      }
     } else if (hit.getDetectorID() == Const::EDetector::BKLM) {
       int moduleNumber = hit.getCopyID();
       hitData.subdetector = KLMElementNumbers::c_BKLM;
@@ -186,10 +196,18 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
         BKLMElementNumbers::channelNumberToElementNumbers(
           moduleNumber, &hitData.section, &hitData.sector, &hitData.layer,
           &hitData.plane, &hitData.strip);
-        planeGlobal = m_ElementNumbers->planeNumberBKLM(
-                        hitData.section, hitData.sector, hitData.layer,
-                        hitData.plane);
-        addHit(selectedHits, planeGlobal, &hitData);
+        channel = m_ElementNumbers->channelNumberBKLM(
+                    hitData.section, hitData.sector, hitData.layer,
+                    hitData.plane, hitData.strip);
+        status = m_ChannelStatus->getChannelStatus(channel);
+        if (status == KLMChannelStatus::c_Unknown)
+          B2FATAL("Incomplete KLM channel status data.");
+        if (status == KLMChannelStatus::c_Normal) {
+          planeGlobal = m_ElementNumbers->planeNumberBKLM(
+                          hitData.section, hitData.sector, hitData.layer,
+                          hitData.plane);
+          addHit(selectedHits, planeGlobal, &hitData);
+        }
       } else {
         /* For RPCs, the sensitive volume corresponds to both readout planes. */
         extHitPosition = hit.getPosition();
@@ -202,18 +220,44 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Track* track)
         localPosition = module->globalToLocal(extHitPositionCLHEP);
         hitData.plane = BKLMElementNumbers::c_ZPlane;
         hitData.strip = module->getZStrip(localPosition);
-        hitData.localPosition = localPosition.z();
-        planeGlobal = m_ElementNumbers->planeNumberBKLM(
-                        hitData.section, hitData.sector, hitData.layer,
-                        hitData.plane);
-        addHit(selectedHits, planeGlobal, &hitData);
+        /* The returned strip may be out of the valid range. */
+        if (BKLMElementNumbers::checkChannelNumber(
+              hitData.section, hitData.sector, hitData.layer, hitData.plane,
+              hitData.strip, false)) {
+          channel = m_ElementNumbers->channelNumberBKLM(
+                      hitData.section, hitData.sector, hitData.layer,
+                      hitData.plane, hitData.strip);
+          status = m_ChannelStatus->getChannelStatus(channel);
+          if (status == KLMChannelStatus::c_Unknown)
+            B2FATAL("Incomplete KLM channel status data.");
+          if (status == KLMChannelStatus::c_Normal) {
+            hitData.localPosition = localPosition.z();
+            planeGlobal = m_ElementNumbers->planeNumberBKLM(
+                            hitData.section, hitData.sector, hitData.layer,
+                            hitData.plane);
+            addHit(selectedHits, planeGlobal, &hitData);
+          }
+        }
         hitData.plane = BKLMElementNumbers::c_PhiPlane;
         hitData.strip = module->getPhiStrip(localPosition);
-        hitData.localPosition = localPosition.y();
-        planeGlobal = m_ElementNumbers->planeNumberBKLM(
-                        hitData.section, hitData.sector, hitData.layer,
-                        hitData.plane);
-        addHit(selectedHits, planeGlobal, &hitData);
+        /* The returned strip may be out of the valid range. */
+        if (BKLMElementNumbers::checkChannelNumber(
+              hitData.section, hitData.sector, hitData.layer, hitData.plane,
+              hitData.strip, false)) {
+          channel = m_ElementNumbers->channelNumberBKLM(
+                      hitData.section, hitData.sector, hitData.layer,
+                      hitData.plane, hitData.strip);
+          status = m_ChannelStatus->getChannelStatus(channel);
+          if (status == KLMChannelStatus::c_Unknown)
+            B2FATAL("Incomplete KLM channel status data.");
+          if (status == KLMChannelStatus::c_Normal) {
+            hitData.localPosition = localPosition.y();
+            planeGlobal = m_ElementNumbers->planeNumberBKLM(
+                            hitData.section, hitData.sector, hitData.layer,
+                            hitData.plane);
+            addHit(selectedHits, planeGlobal, &hitData);
+          }
+        }
       }
     } else
       continue;

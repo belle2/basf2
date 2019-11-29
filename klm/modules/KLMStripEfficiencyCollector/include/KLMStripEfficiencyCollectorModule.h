@@ -15,6 +15,7 @@
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMPlaneArrayIndex.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/eklm/geometry/GeometryData.h>
@@ -22,6 +23,7 @@
 /* Belle 2 headers. */
 #include <analysis/dataobjects/ParticleList.h>
 #include <calibration/CalibrationCollectorModule.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
@@ -146,6 +148,9 @@ namespace Belle2 {
 
     /** Whether to remove unused muons. */
     bool m_RemoveUnusedMuons;
+
+    /** Channel status. */
+    DBObjPtr<KLMChannelStatus> m_ChannelStatus;
 
     /** EKLM digits. */
     StoreArray<EKLMDigit> m_EklmDigits;

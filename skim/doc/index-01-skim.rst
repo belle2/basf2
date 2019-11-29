@@ -112,40 +112,48 @@ Some functions and tools are for the use of skim liaisons and developers.
     :members:
     :undoc-members:
 
-Skim performance statistics
+Testing skim performance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Two command-line tools are provided to test the performance of a skim. They are available in ``skim/tools/stats/``.
+Two command-line tools are provided to test the performance of a skim, which are available in the ``PATH`` after setting up the ``basf2`` environment.
 
-To test a skim, first check that the skim is listed in `skim.registry` in the currently setup basf2 environment, and that its name in the registry matches the name of the standalone steering file in ``skim/standalone/`` or ``skim/combined/``. This is how ``submitTestSkims.py`` and ``printSkimStats.py`` get their lists of valid options and find the steering files to run. For instance, the entry ``('11180100', 'feiHadronicB0')`` in `skim.registry.skim_registry` is used to locate ``skim/standalone/feiHadronicB0_Skim_Standalone.py``.
-
-Run ``submitTestSkims.py``, which will submit small skim jobs on test files of MC and data using ``bsub``. For example,
+First run ``b2skim-stats-submit``, which will submit small skim jobs on test files of MC and data using ``bsub``. For example,
 
 .. code-block:: sh
 
-    ./submitTestSkims.py -s LeptonicUntagged SLUntagged
+    b2skim-stats-submit -s LeptonicUntagged SLUntagged
 
-Once all of the submitted jobs have completed successfully, then run ``printSkimStats.py``.
+Once all of the submitted jobs have completed successfully, then run ``b2skim-stats-print``.
 
 .. code-block:: sh
 
-    ./printSkimStats.py -s LeptonicUntagged SLUntagged
+    b2skim-stats-print -s LeptonicUntagged SLUntagged
 
 This will read the output files of the test jobs, and produce tables of statistics in the following three formats:
 
 * A subset of the statistics printed to the screen per-skim. This output is for display only.
 
-* A text file ``skimStats_confluence.txt`` is written, in which the statistics are formatted as Confluence wiki markup tables. These tables can be copied directly onto a Confluence page by editing the page, selecting ``Insert more content`` from the toolbar, selecting ``Markup`` from the drop-down menu, and then pasting the content of the text file into the markup editor which appears. Confluence will then format the tables and headings. The markup editor can also be accessed via ``ctrl-shift-D`` (``cmd-shift-D``).
+* A text file ``confluenceTables.txt`` is written, in which the statistics are formatted as Confluence wiki markup tables. These tables can be copied directly onto a Confluence page by editing the page, selecting ``Insert more content`` from the toolbar, selecting ``Markup`` from the drop-down menu, and then pasting the content of the text file into the markup editor which appears. Confluence will then format the tables and headings. The markup editor can also be accessed via ``ctrl-shift-D`` (``cmd-shift-D``).
 
 * All statistics produced are printed to a JSON file ``skimStats.json``, indexed by skim, statistic, and sample label. This file is to be used by grid production tools.
 
-``submitTestSkims.py``: Run skim scripts on test samples
+.. tip::
+   To test your own newly-developed skim, you must do the following two things in your current setup of ``basf2``:
+
+   1. Add your skim to `skim.registry.skim_registry`. This should be an entry of the form ``(SkimCode, SkimName)``.
+
+   2. Put your skim steering file in ``skim/standalone/``, with a name of the form ``{SkimName}_Skim_Standalone.py``. This skim name must match what you wrote in the registry.
+
+   If these two things are done, then the stats tools will be able to find and run your skim.
+
+
+``b2skim-stats-submit``: Run skim scripts on test samples
 .........................................................
 
 .. argparse::
-   :filename: skim/tools/stats/submitTestSkims.py
+   :filename: skim/tools/b2skim-stats-submit
    :func: getArgumentParser
-   :prog: ./submitTestSkims.py
+   :prog: b2skim-stats-submit
    :nodefaultconst:
    :nogroupsections:
 
@@ -154,13 +162,13 @@ This will read the output files of the test jobs, and produce tables of statisti
       comparable to one another.
 
 
-``printSkimStats.py``: Print tables of performance statistics
+``b2skim-stats-print``: Print tables of performance statistics
 ..............................................................
 
 .. argparse::
-   :filename: skim/tools/stats/printSkimStats.py
+   :filename: skim/tools/b2skim-stats-print
    :func: getArgumentParser
-   :prog: ./printSkimStats.py
+   :prog: b2skim-stats-print
    :nodefaultconst:
    :nogroupsections:
 

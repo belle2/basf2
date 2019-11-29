@@ -11,7 +11,7 @@ and samples to construct this object. There are a number of functions such as
 ``udstSize`` and ``memoryAverage`` in this script which calculate individual
 statistics for a particular skim and sample.
 
-The dict returned by ``getStatSpecifier`` determins which statistics are
+The dict returned by ``getStatSpecifier`` determines which statistics are
 calculated, and how they are calculated. It also contains entries which
 determine whether a statistic is printed to the screen or included in the
 Confluence tables.

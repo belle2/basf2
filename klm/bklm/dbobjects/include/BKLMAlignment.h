@@ -23,21 +23,21 @@
 namespace Belle2 {
 
   /**
-   * Class to store EKLM alignment data in the database.
+   * Class to store BKLM alignment data in the database.
    */
-  class EKLMAlignment : public TObject {
+  class BKLMAlignment : public TObject {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMAlignment();
+    BKLMAlignment();
 
     /**
      * Destructor.
      */
-    ~EKLMAlignment();
+    ~BKLMAlignment();
 
     /**
      * Set module alignment data.
@@ -60,7 +60,7 @@ namespace Belle2 {
      */
     static unsigned short getGlobalUniqueID()
     {
-      return 40;
+      return 30;
     }
 
     /**
@@ -79,7 +79,6 @@ namespace Belle2 {
      */
     void setGlobalParam(double value, unsigned short element,
                         unsigned short param);
-
     /**
      * Get a list of stored global parameters.
      */
@@ -91,7 +90,7 @@ namespace Belle2 {
     std::map<uint16_t, KLMAlignmentData> m_ModuleAlignment;
 
     /** Class version. */
-    ClassDef(Belle2::EKLMAlignment, 3);
+    ClassDef(Belle2::BKLMAlignment, 3);
 
   };
 

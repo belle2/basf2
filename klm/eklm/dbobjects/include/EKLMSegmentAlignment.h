@@ -10,7 +10,7 @@
 
 #pragma once
 
-/* KLM headers. */
+/* Belle 2 headers. */
 #include <klm/dbobjects/KLMAlignmentData.h>
 
 /* ROOT headers. */
@@ -25,32 +25,32 @@ namespace Belle2 {
   /**
    * Class to store EKLM alignment data in the database.
    */
-  class EKLMAlignment : public TObject {
+  class EKLMSegmentAlignment : public TObject {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMAlignment();
+    EKLMSegmentAlignment();
 
     /**
      * Destructor.
      */
-    ~EKLMAlignment();
+    ~EKLMSegmentAlignment();
 
     /**
-     * Set module alignment data.
-     * @param[in] module Module number.
-     * @param[in] dat    Alignment data.
+     * Set segment alignment data.
+     * @param[in] segment Segment number.
+     * @param[in] dat     Alignment data.
      */
-    void setModuleAlignment(uint16_t module, KLMAlignmentData* dat);
+    void setSegmentAlignment(uint16_t segment, KLMAlignmentData* dat);
 
     /**
-     * Get module alignment data.
-     * @param[in] module Module number.
+     * Get segment alignment data.
+     * @param[in] segment Segment number.
      */
-    const KLMAlignmentData* getModuleAlignment(uint16_t module) const;
+    const KLMAlignmentData* getSegmentAlignment(uint16_t segment) const;
 
     /* Interface to global Millepede calibration. */
 
@@ -60,12 +60,12 @@ namespace Belle2 {
      */
     static unsigned short getGlobalUniqueID()
     {
-      return 40;
+      return 41;
     }
 
     /**
      * Get global parameter.
-     * @param[in] element Element number (KLM module number).
+     * @param[in] element Element number (EKLM segment number).
      * @param[in] param   Parameter number.
      * @return Global parameter value.
      */
@@ -74,7 +74,7 @@ namespace Belle2 {
     /**
      * Set global parameter.
      * @param[in] value   Parameter value.
-     * @param[in] element Element number (KLM module number).
+     * @param[in] element Element number (EKLM segment number).
      * @param[in] param   Parameter number.
      */
     void setGlobalParam(double value, unsigned short element,
@@ -87,11 +87,11 @@ namespace Belle2 {
 
   private:
 
-    /** Module alignment. */
-    std::map<uint16_t, KLMAlignmentData> m_ModuleAlignment;
+    /** Segment alignment. */
+    std::map<uint16_t, KLMAlignmentData> m_SegmentAlignment;
 
     /** Class version. */
-    ClassDef(Belle2::EKLMAlignment, 3);
+    ClassDef(Belle2::EKLMSegmentAlignment, 1);
 
   };
 

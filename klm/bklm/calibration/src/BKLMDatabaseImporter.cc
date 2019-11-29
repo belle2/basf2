@@ -13,9 +13,8 @@
 #include <klm/bklm/calibration/BKLMDatabaseImporter.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementID.h>
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dbobjects/BKLMDisplacement.h>
+#include <klm/bklm/dbobjects/BKLMAlignment.h>
 #include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
 #include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <klm/bklm/dbobjects/BKLMSimulationPar.h>
@@ -23,7 +22,6 @@
 #include <klm/dataobjects/KLMChannelIndex.h>
 
 /* Belle 2 headers. */
-#include <alignment/dbobjects/BKLMAlignment.h>
 #include <framework/database/Database.h>
 #include <framework/database/DBImportArray.h>
 #include <framework/database/DBImportObjPtr.h>
@@ -189,44 +187,6 @@ void BKLMDatabaseImporter::importSimulationPar()
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
   Database::Instance().storeData("BKLMSimulationPar", &bklmSimulationPar, iov);
-}
-
-void BKLMDatabaseImporter::importAlignment()
-{
-  DBImportObjPtr<BKLMAlignment> al;
-  al.construct();
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 8; j++) {
-      for (int k = 0; k < 15; k++) {
-        BKLMElementID bklmid(i, j, k);
-        al->set(bklmid, 1, 0.);
-        al->set(bklmid, 2, 0.);
-        al->set(bklmid, 3, 0.);
-        al->set(bklmid, 4, 0.);
-        al->set(bklmid, 5, 0.);
-        al->set(bklmid, 6, 0.);
-      }
-    }
-  }
-  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
-                         m_ExperimentHigh, m_RunHigh);
-  al.import(iov);
-}
-
-void BKLMDatabaseImporter::importDisplacement()
-{
-  DBImportArray<BKLMDisplacement> m_displacement;
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 8; j++) {
-      for (int k = 0; k < 15; k++) {
-        BKLMElementID bklmid(i, j, k);
-        m_displacement.appendNew(bklmid, 0, 0, 0, 0, 0, 0);
-      }
-    }
-  }
-  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
-                         m_ExperimentHigh, m_RunHigh);
-  m_displacement.import(iov);
 }
 
 void BKLMDatabaseImporter::importADCThreshold(BKLMADCThreshold* inputThreshold)

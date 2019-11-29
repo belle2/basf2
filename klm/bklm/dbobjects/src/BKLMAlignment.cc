@@ -9,22 +9,22 @@
  **************************************************************************/
 
 /* Own header. */
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
+#include <klm/bklm/dbobjects/BKLMAlignment.h>
 
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
-EKLMAlignment::EKLMAlignment()
+BKLMAlignment::BKLMAlignment()
 {
 }
 
-EKLMAlignment::~EKLMAlignment()
+BKLMAlignment::~BKLMAlignment()
 {
 }
 
-void EKLMAlignment::setModuleAlignment(uint16_t module,
+void BKLMAlignment::setModuleAlignment(uint16_t module,
                                        KLMAlignmentData* dat)
 {
   std::map<uint16_t, KLMAlignmentData>::iterator it;
@@ -37,7 +37,7 @@ void EKLMAlignment::setModuleAlignment(uint16_t module,
   }
 }
 
-const KLMAlignmentData* EKLMAlignment::getModuleAlignment(
+const KLMAlignmentData* BKLMAlignment::getModuleAlignment(
   uint16_t module) const
 {
   std::map<uint16_t, KLMAlignmentData>::const_iterator it;
@@ -47,7 +47,7 @@ const KLMAlignmentData* EKLMAlignment::getModuleAlignment(
   return &(it->second);
 }
 
-double EKLMAlignment::getGlobalParam(unsigned short element,
+double BKLMAlignment::getGlobalParam(unsigned short element,
                                      unsigned short param) const
 {
   const KLMAlignmentData* alignmentData = getModuleAlignment(element);
@@ -57,7 +57,7 @@ double EKLMAlignment::getGlobalParam(unsigned short element,
            static_cast<enum KLMAlignmentData::ParameterNumbers>(param));
 }
 
-void EKLMAlignment::setGlobalParam(double value, unsigned short element,
+void BKLMAlignment::setGlobalParam(double value, unsigned short element,
                                    unsigned short param)
 {
   KLMAlignmentData* alignmentData =
@@ -70,7 +70,7 @@ void EKLMAlignment::setGlobalParam(double value, unsigned short element,
 
 /* TODO: this function is not implemented. */
 std::vector< std::pair<unsigned short, unsigned short> >
-EKLMAlignment::listGlobalParams()
+BKLMAlignment::listGlobalParams()
 {
   return {};
 }

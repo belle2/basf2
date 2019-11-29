@@ -21,29 +21,55 @@
 #include <TMatrixD.h>
 
 namespace Belle2 {
+
   /**
-   * BKLMRecoHit
+   * Alignable BKLM hit.
    */
-  class BKLMRecoHit: public genfit::PlanarMeasurement, public genfit::ICalibrationParametersDerivatives {
+  class AlignableBKLMRecoHit: public genfit::PlanarMeasurement,
+    public genfit::ICalibrationParametersDerivatives {
+
   public:
 
-    /** Default constructor for ROOT IO. */
-    BKLMRecoHit() {};
+    /**
+     * Constructor.
+     */
+    AlignableBKLMRecoHit()
+    {
+    }
 
-    /** Construct BKLMRecoHit from a BKLMHit2d */
-    explicit BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit* trackCandHit = NULL);
+    /**
+     * Constructor.
+     */
+    explicit AlignableBKLMRecoHit(const BKLMHit2d* hit,
+                                  const genfit::TrackCandHit* trackCandHit);
 
-    /** Destructor. */
-    virtual ~BKLMRecoHit() {}
+    /**
+     * Destructor.
+     */
+    virtual ~AlignableBKLMRecoHit()
+    {
+    }
 
-    /** Creating a deep copy of this hit. */
+    /**
+     * Creating a deep copy of this hit.
+     */
     genfit::AbsMeasurement* clone() const override;
 
-    /** Methods that actually interface to Genfit.  */
-    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const override;
+    /**
+     * Measurement construction.
+     */
+    virtual std::vector<genfit::MeasurementOnPlane*>
+    constructMeasurementsOnPlane(
+      const genfit::StateOnPlane& state) const override;
 
-    /** Get the genfit projection H matrix (to U,V)  */
-    virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const override { return new genfit::HMatrixUV(); };
+    /**
+     * Get the genfit projection H matrix (to U,V).
+     */
+    virtual const genfit::AbsHMatrix* constructHMatrix(
+      const genfit::AbsTrackRep*) const override
+    {
+      return new genfit::HMatrixUV();
+    };
 
     /** @brief Labels and derivatives of residuals (local measurement coordinates) w.r.t. alignment/calibration parameters
     * Matrix "G" of derivatives valid for given prediction of track state:
@@ -81,34 +107,24 @@ namespace Belle2 {
 
     enum { HIT_DIMENSIONS = 2 /**< sensitive Dimensions of the Hit */ };
 
-    unsigned short m_moduleID; /**< Unique module identifier.*/
+    /** KLM module number. */
+    uint16_t m_KLMModule;
 
-    /** Section number. */
-    int m_Section;
-
-    /** Sector number. */
-    int m_Sector;
-
-    /** Layer number. */
+    /** Hit layer. */
     int m_Layer;
 
-    /** module used to get geometry information */
-    const bklm::Module* module; //! not streamed
+    /** Module used to get geometry information. */
+    const bklm::Module* m_Module; //! not streamed
 
-    /** global coordiante of the hit */
+    /** global coordiante of the hit. */
     CLHEP::Hep3Vector global; //! not streamed
 
     /** half height of scintillator module*/
     const double halfheight_sci = 0.5;
 
-    //!the number of fired phi-measuring strips
-    //int m_numPhiStrips;
-    //!the number of fired z-measuring strips
-    //int m_numZStrips;
-
-    /** Needed to make object storable. */
-    ClassDefOverride(BKLMRecoHit, 3);
+    /** Class version. */
+    ClassDefOverride(AlignableBKLMRecoHit, 1);
 
   };
 
-} // namespace Belle2
+}

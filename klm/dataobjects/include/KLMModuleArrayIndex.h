@@ -8,28 +8,40 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Own header. */
-#include <klm/dataobjects/KLMChannelArrayIndex.h>
+#pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/KLMChannelIndex.h>
+#include <klm/dataobjects/KLMElementArrayIndex.h>
 
-/* Belle 2 headers. */
-#include <framework/logging/Logger.h>
+/* C++ headers. */
+#include <map>
 
-using namespace Belle2;
+namespace Belle2 {
 
-KLMChannelArrayIndex::KLMChannelArrayIndex() :
-  KLMElementArrayIndex(KLMChannelIndex::c_IndexLevelStrip)
-{
-}
+  /**
+   * KLM module array index.
+   */
+  class KLMModuleArrayIndex : public KLMElementArrayIndex {
 
-KLMChannelArrayIndex::~KLMChannelArrayIndex()
-{
-}
+  public:
 
-const KLMChannelArrayIndex& KLMChannelArrayIndex::Instance()
-{
-  static KLMChannelArrayIndex klmChannelArrayIndex;
-  return klmChannelArrayIndex;
+    /**
+     * Instantiation.
+     */
+    static const KLMModuleArrayIndex& Instance();
+
+  private:
+
+    /**
+     * Constructor.
+     */
+    KLMModuleArrayIndex();
+
+    /**
+     * Destructor.
+     */
+    ~KLMModuleArrayIndex();
+
+  };
+
 }

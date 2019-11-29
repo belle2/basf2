@@ -9,5 +9,6 @@
 #pragma link C++ class Belle2::ECL::eclCosmicEAlgorithm-;
 #pragma link C++ class Belle2::ECL::eclGammaGammaEAlgorithm-;
 #pragma link C++ class Belle2::ECL::eclBhabhaTAlgorithm-;
+#pragma link C++ class Belle2::ECL::eclee5x5Algorithm-;
 
 #endif

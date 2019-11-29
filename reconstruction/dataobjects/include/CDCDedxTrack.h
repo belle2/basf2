@@ -67,7 +67,7 @@ namespace Belle2 {
     void addHit(int lwire, int wire, int layer, double doca, double docaRS, double enta, double entaRS, int adcCount, double dE,
                 double path, double dedx,
                 double cellHeight, double cellHalfWidth, int driftT, double driftD, double driftDRes, double wiregain, double twodcor,
-                double onedcor)
+                double onedcor, bool hasReaddedFlag)
     {
 
       m_hLWire.push_back(lwire);
@@ -89,6 +89,7 @@ namespace Belle2 {
       m_hWireGain.push_back(wiregain);
       m_hTwodCor.push_back(twodcor);
       m_hOnedCor.push_back(onedcor);
+      m_hHasReaddedFlag.push_back(hasReaddedFlag);
     }
 
     /** Return the track ID */
@@ -210,6 +211,9 @@ namespace Belle2 {
     /** Return the 1D correction for this hit */
     double getOneDCorrection(int i) const { return m_hOnedCor[i]; }
 
+    /** Return whether the hit was readded to the track */
+    bool getReaddedFlag(int i) const { return m_hHasReaddedFlag[i]; }
+
     /** Return the PID (chi) value */
     double getChi(int i) const { return m_cdcChi[i]; }
     /** Return the PID (logL) value */
@@ -278,6 +282,7 @@ namespace Belle2 {
     std::vector<int> m_hDriftT;       /**< drift time for each hit */
     std::vector<double> m_hDriftD;    /**< drift distance for each hit */
     std::vector<double> m_hDriftDRes; /**< drift distance resolution for each hit */
+    std::vector<bool> m_hHasReaddedFlag; /**< flags for each hit if it was readded */
 
     std::vector<double> m_hCellHeight;    /**< height of the CDC cell */
     std::vector<double> m_hCellHalfWidth; /**< half-width of the CDC cell */

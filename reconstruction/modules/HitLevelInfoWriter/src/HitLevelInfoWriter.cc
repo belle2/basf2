@@ -297,6 +297,7 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
       h_enta[ihit] = dedxTrack->getEnta(ihit);
       h_entaRS[ihit] = dedxTrack->getEntaRS(ihit);
       h_driftT[ihit] = dedxTrack->getDriftT(ihit);
+      h_hasReaddedFlag[ihit] = dedxTrack->getReaddedFlag(ihit);
 
       // Get the calibration constants
       h_wireGain[ihit] = m_DBWireGains->getWireGain(h_wire[ihit]);
@@ -334,6 +335,7 @@ HitLevelInfoWriterModule::clearEntries()
       h_wireGain[ihit] = 0;
       h_twodCor[ihit] = 0;
       h_onedCor[ihit] = 0;
+      h_hasReaddedFlag[ihit] = false;
     }
   }
 }
@@ -421,6 +423,7 @@ HitLevelInfoWriterModule::bookOutput(std::string filename)
     m_tree[i]->Branch("hWireGain", h_wireGain, "hWireGain[hNHits]/D");
     m_tree[i]->Branch("hTwodcor", h_twodCor, "hTwodcor[hNHits]/D");
     m_tree[i]->Branch("hOnedcor", h_onedCor, "hOnedcor[hNHits]/D");
+    m_tree[i]->Branch("hHasReaddedFlag", h_hasReaddedFlag, "hHasReaddedFlag[hNHits]/O");
   }
 
 }

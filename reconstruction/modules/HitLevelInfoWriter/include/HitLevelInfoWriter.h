@@ -178,6 +178,8 @@ namespace Belle2 {
     double h_twodCor[kMaxHits] = {};  /**< calibration 2D correction */
     double h_onedCor[kMaxHits] = {};  /**< calibration 1D cleanup correction */
 
+    bool h_hasReaddedFlag[kMaxHits] = {}; /**< was the hit readded */
+
     // parameters: calibration constants
     DBObjPtr<CDCDedxScaleFactor> m_DBScaleFactor; /**< Scale factor to make electrons ~1 */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains;      /**< Wire gain DB object */

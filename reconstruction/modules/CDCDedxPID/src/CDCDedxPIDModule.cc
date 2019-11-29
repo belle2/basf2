@@ -21,6 +21,7 @@
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
+#include <tracking/dataobjects/RecoHitInformation.h>
 
 #include <genfit/AbsTrackRep.h>
 #include <genfit/Exception.h>
@@ -304,6 +305,13 @@ void CDCDedxPIDModule::event()
       int layer = cdcHit->getILayer(); // layer within superlayer
       int superlayer = cdcHit->getISuperLayer();
 
+      // check if the hit was
+      bool hasReaddedFlag = false;
+      const RecoHitInformation* hitInfo = recoTrack->getRecoHitInformation(cdcHit);
+      if (hitInfo->getFoundByTrackFinder() == RecoHitInformation::c_ReattachCDCWireHitsToRecoTracks) {
+        hasReaddedFlag = true;
+      }
+
       // continuous layer number
       int currentLayer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer);
       int nextLayer = currentLayer;
@@ -467,7 +475,8 @@ void CDCDedxPIDModule::event()
             if (m_enableDebugOutput)
               dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS, adcCount, hitCharge, celldx, cellDedx, cellHeight,
                                 cellHalfWidth, driftT,
-                                driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor);
+                                driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor,
+                                hasReaddedFlag);
             nhitscombined++;
           }
         }

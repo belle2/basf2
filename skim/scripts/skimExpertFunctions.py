@@ -60,23 +60,13 @@ def get_test_file(sampleName):
 
     Args:
         sampleName (str): Name of the sample. MC samples are named *e.g.* "chargedBGx1_MC12", "ccbarBGx0_MC9"
-
     Returns:
         sampleFileName (str): The path to the test file on KEKCC.
-
-    Raises:
-        AssertionError: If file cannot be found, which likely indicates that it is
-        being called on a non-KEKCC machine).
     """
     lookup_dict = {s: f for s, f in skimTestFilesInfo.kekcc_locations}
     if sampleName not in lookup_dict:
         B2ERROR("Testing file for this sample and skim campaign is not available.")
-
-    testFile = lookup_dict[sampleName]
-
-    assert os.path.exists(testFile), f'Could not locate test file. This function only works on KEKCC.'
-
-    return testFile
+    return lookup_dict[sampleName]
 
 
 def get_total_infiles(sampleName):

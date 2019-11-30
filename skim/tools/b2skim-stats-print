@@ -72,7 +72,7 @@ def getArgumentParser():
     allCombinedSkims = sorted(combined_skims.keys())
 
     parser = argparse.ArgumentParser(description='Reads the output files of test skim jobs from ' +
-                                     '``b2skim-stats-submit`` and prints tables of performance statistics.' +
+                                     '``b2skim-stats-submit`` and prints tables of performance statistics. ' +
                                      'One or more standalone or combined skim names must be provided.',
                                      formatter_class=CustomHelpFormatter)
     parser.add_argument('-s', '--standalone', nargs='+', default=[],
@@ -84,6 +84,9 @@ def getArgumentParser():
     parser.add_argument('--mccampaign', default='MC12',
                         choices=['MC9', 'MC10', 'MC11', 'MC12'],
                         help='The MC campaign to test on.')
+    parser.add_argument('-v', '--verbose', action='store_true', dest='VERBOSE',
+                        help='Print out extra warning messages when the script cannot ' +
+                        'calculate a value, but moves on anyway.')
 
     sampleGroup = parser.add_mutually_exclusive_group()
     sampleGroup.add_argument('--mconly', action='store_true',
@@ -613,7 +616,7 @@ def getStatSpecifier():
     return statSpecifier
 
 
-def fillSkimStatsDict(skims, samples, statSpecifier):
+def fillSkimStatsDict(skims, samples, statSpecifier, verbose=False):
     """Fill a nested dict with skim performance statistics, using the skim and
     sample names provided. The dict ``statSpecifier`` determines how each
     statistic is to be calculated.
@@ -626,6 +629,8 @@ def fillSkimStatsDict(skims, samples, statSpecifier):
         samples (list): List of sample labels to test on.
         statSpecifier (dict): A nested dict specifying how each statistic should
             be calculated and printed, as returned by ``getStatSpecifier``.
+        verbose (bool): Print extra messages when a statistic can't be calculated, but the script
+            moves on anyway.
 
     Returns:
         skimStatsDict (dict): A nested dict containing all requested skim
@@ -648,6 +653,8 @@ def fillSkimStatsDict(skims, samples, statSpecifier):
                         allSkimStats[skim][statName][sample] = statFunction(jsonFileContents, logFileContents, sample)
                     except TypeError:
                         allSkimStats[skim][statName][sample] = None
+                        if verbose:
+                            print(f'Warning! Could not calculate {statName} for {skim} skim on {sample} sample.')
         except SkimNotRunException as e:
             del allSkimStats[skim]
 
@@ -666,6 +673,8 @@ def mcWeightedAverage(statsPerSample, mcCampaign):
         statsPerSample (dict): A dict of values for a single skim and single
             statistic, indexed by sample label.
         mcCampaign (str): A label like ``MC12`` for the MC campaign to test on.
+        verbose (bool): Print extra messages when a statistic can't be calculated, but the script
+            moves on anyway.
 
     Returns:
         mcWeightedAverage (float): A weighted average for the statistic.
@@ -699,7 +708,7 @@ def mcWeightedAverage(statsPerSample, mcCampaign):
     return weightedAverage
 
 
-def addWeightedMC(allSkimStats, statSpecifier, mcCampaign):
+def addWeightedMC(allSkimStats, statSpecifier, mcCampaign, verbose=False):
     """Add an entry to ``allSkimStats`` for statistic estimates of a combined MC
     sample. The combining functions are taken from ``statSpecifier``, and may be
     ``max``, ``sum``, or ``mcWeightedAverage``, as is appropriate for each
@@ -714,13 +723,20 @@ def addWeightedMC(allSkimStats, statSpecifier, mcCampaign):
         allSkimStatsWithWeightedMC (dict): A modified version of skim statistics
             dict, with an extra entry for combined MC samples.
     """
-    for skimStats in allSkimStats.values():
-        for statName, statInfo in statSpecifier.items():
+    for skim, skimStats in allSkimStats.items():
+        for stat, statInfo in statSpecifier.items():
             try:
                 combiningFunction = statInfo['CombineMC']
-                skimStats[statName]['Combined MC'] = combiningFunction(skimStats[statName], mcCampaign)
+                if combiningFunction:
+                    skimStats[stat]['Combined MC'] = combiningFunction(skimStats[stat], mcCampaign)
+                elif verbose:
+                    skimStats[stat]['Combined MC'] = None
+                    print(f'Warning! No method provided in `statsSpecifier` for combining MC estimate of {stat}. ' +
+                          'This may be because there is no sensible way to combine this value.')
             except TypeError:
-                skimStats[statName]['Combined MC'] = None
+                skimStats[stat]['Combined MC'] = None
+                if verbose:
+                    print(f'Warning! Could not calculate combined MC estimate for {stat} for {skim} skim.')
 
     return allSkimStats
 
@@ -859,10 +875,10 @@ if __name__ == '__main__':
     samples = getSamplesToRun(list(mcSampleLabels.keys()), list(dataSampleLabels.keys()), args.mconly, args.dataonly)
 
     statSpecifier = getStatSpecifier()
-    allSkimStats = fillSkimStatsDict(skims, samples, statSpecifier)
+    allSkimStats = fillSkimStatsDict(skims, samples, statSpecifier, args.VERBOSE)
 
     if not args.dataonly:
-        allSkimStats = addWeightedMC(allSkimStats, statSpecifier, args.mccampaign)
+        allSkimStats = addWeightedMC(allSkimStats, statSpecifier, args.mccampaign, args.VERBOSE)
 
     printToScreen(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels, args.mconly, args.dataonly)
     printToJson(allSkimStats, statSpecifier)

@@ -325,19 +325,24 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
       continue;
     /*
      * Check the number of matching digits in outer layersi relatively to
-     * this hit. It should be possible to have the required number of digits,
-     * thus, the number of ExtHits needs to be sufficient. Due to the ExtHit
-     * number condition, this does not reject the outer layers of the detector.
+     * this hit.
      */
-    if (matchingDigitsOuterLayers < m_MinimalMatchingDigitsOuterLayers &&
-        extHitsOuterLayers >= m_MinimalMatchingDigitsOuterLayers)
-      continue;
-    /*
-     * Check the momentum. The muons with sufficiently large momentum have
-     * a very small probability to get absorbed in the detector.
-     */
-    if (muon->getMomentum().Mag() < m_MinimalMomentumNoOuterLayers)
-      continue;
+    if (matchingDigitsOuterLayers < m_MinimalMatchingDigitsOuterLayers) {
+      /**
+       * It should be possible to have the required number of digits, thus,
+       * the number of ExtHits needs to be sufficient. This requirement
+       * does not reject the outer layers of the detector.
+       */
+      if (extHitsOuterLayers >= m_MinimalMatchingDigitsOuterLayers)
+        continue;
+      /*
+       * If the number of ExtHits is insufficient, then check the momentum.
+       * The muons with sufficiently large momentum have a very small
+       * probability to get absorbed in the detector.
+       */
+      if (muon->getMomentum().Mag() < m_MinimalMomentumNoOuterLayers)
+        continue;
+    }
     allExtHitsInPlane->Fill(m_PlaneArrayIndex->getIndex(it->first));
     if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr)
       matchedDigitsInPlane->Fill(m_PlaneArrayIndex->getIndex(it->first));

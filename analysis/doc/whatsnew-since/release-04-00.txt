@@ -41,6 +41,8 @@ Variables
  * Added new variables for fully-inclusive analysis: :b2:var:`nDaughterPhotons`, :b2:var:`nDaughterCharged` etc., which allow to count 
    specific daughters easily, and :b2:var:`daughterAverageOf`, which is similar to the :b2:var:`daughterSumOf`, but outputs the mean value of a variable.
 
+ * Fixed :b2:var:`goodBelleKshort`, now it returns ``extraInfo(goodKs)`` if the variable exists.
+
 Modules
 +++++++
 
@@ -67,6 +69,8 @@ Modules
  * Added a :b2:mod:`BremsFinder` to unpack the bremsstrahlung relations provided by tracking.
 
   .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
+
+ * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector `^` to select daughters.
 
 Conditions DB
 +++++++++++++

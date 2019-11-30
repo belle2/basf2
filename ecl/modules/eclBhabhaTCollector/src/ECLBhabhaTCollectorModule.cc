@@ -961,16 +961,6 @@ void ECLBhabhaTCollectorModule::collect()
     }
   }
 
-  int numGoodEMclusters_minCut = 2;
-  if (nGoodClusts != numGoodEMclusters_minCut) {
-    //return;
-  }
-  // There are exactly two energy clusters
-  cutIndexPassed++;
-  getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: Exactly 2 photon clusters with energy > " <<  clusterE_minCut << "GeV : index = " << cutIndexPassed);
-
-
   int numTrackless = 0;
   for (int clustId = 0; clustId < 2; clustId++) {
     B2DEBUG(30, "m_eclClusterArray[goodPhotonClusterIdxs[clustId]]->isTrack() = " <<

@@ -103,10 +103,9 @@ def getArgumentParser():
 
     return parser
 
-
-def getJobOutput(skim, sample):
-    """Read in the log file of a test job as a string, and the JSON output from
-    ``--job-information`` as a dict.
+@lru_cache()
+def getLogFile(skim, sample):
+    """Read in the log file of a test job as a string.
 
     Args:
         skim (str): The name of the skim being tested.
@@ -114,9 +113,7 @@ def getJobOutput(skim, sample):
 
     Returns:
         logFileContents (str): A string containing the contents of the log file
-            of a skim script.
-        jsonFileContents (dict): A dict read from the JobInformation JSON output
-            of a skim script.
+            from the skim test job.
 
     Raises:
         SkimNotRunException: Raised if any of the log or JSON files cannot be opened.
@@ -130,10 +127,44 @@ def getJobOutput(skim, sample):
         with open(jsonFileName) as jsonFile:
             jsonFileContents = json.load(jsonFile)
     except FileNotFoundError:
-        raise SkimNotRunException(f'    Failed to open output files for {skim} skim on {sample} sample.\n' +
+        raise SkimNotRunException(f'    Failed to open output log file for {skim} skim on {sample} sample.\n' +
                                   '    Perhaps you forgot to run the skim with ``b2skim-stats-submit``?')
 
-    return logFileContents, jsonFileContents
+    if not testLogFile(logFileContents):
+        raise SkimNotRunException(f'    The log file {logFileName} does not indicate that the test job finished successfully.')
+
+    return logFileContents
+
+
+@lru_cache()
+def getJsonFile(skim, sample):
+    """Read in the JSON output from ``--job-information`` of a test job as a dict. 
+
+    Args:
+        skim (str): The name of the skim being tested.
+        sample (str): The label of the sample being tested.
+
+    Returns:
+        jsonFileContents (dict): A dict read from the ``--jobinformation`` JSON
+            output of teh skim test job.
+
+    Raises:
+        SkimNotRunException: Raised if any of the JSON files cannot be opened,
+            or the JSON file does not pass `testJsonFile`.
+    """
+    try:
+        jsonFileName = Path('log', f'JobInformation_{skim}_{sample}.json')
+        with open(jsonFileName) as jsonFile:
+            jsonFileContents = json.load(jsonFile)
+    except FileNotFoundError:
+        raise SkimNotRunException(f'    Failed to open output JSON file for {skim} skim on {sample} sample.\n' +
+                                  '    Perhaps you forgot to run the skim with ``b2skim-stats-submit``?')
+
+    if not testJsonFile(jsonFileContents):
+        raise SkimNotRunException(f'    The file {jsonFileName} indicates something ' +
+                                  'went wrong with the skim job, or while saving the uDST file(s).')
+
+    return jsonFileContents
 
 
 def getStatFromLog(statisticName, logFileContents):
@@ -153,98 +184,111 @@ def getStatFromLog(statisticName, logFileContents):
     return float(statFromLog)
 
 
-def nInputEvents(jsonFileContents):
+def nInputEvents(skim, sample):
     """Read the number of input MDST events from the JSON output file from
     ``--job-information``.
 
     Args:
-        jsonFileContents (dict): A dict read from the JobInformation JSON output
-            of a skim script.
+        skim (str): The name of the skim being tested.
+        sample (str): The label of the sample being tested.
 
     Returns:
-        nInputEvents (int):
+        nInputEvents (int): Total number of events that the test skim job was
+            run on.
     """
+    jsonFileContents = getJsonFile(skim, sample)
+
     return jsonFileContents['basf2_status']['total_events']
 
 
-def nSkimmedEvents(jsonFileContents):
+def nSkimmedEvents(skim, sample):
     """Read the number of output uDST events from the JSON output file from
     ``--job-information``. If more than one output file is present, average over
     the output files.
 
     Args:
-        jsonFileContents (dict): A dict read from the JobInformation JSON output
-            of a skim script.
+        skim (str): The name of the skim being tested.
+        sample (str): The label of the sample being tested.
 
     Returns:
         nSkimmedEvents (int): The average number of events in the output uDST files.
     """
+    jsonFileContents = getJsonFile(skim, sample)
+
     outputFileInfoList = jsonFileContents['output_files']
     eventNumberList = [outputFileInfo['stats']['events'] for outputFileInfo in outputFileInfoList]
 
     return sum(eventNumberList)/len(eventNumberList)
 
 
-def udstSize(jsonFileContents):
+def udstSize(skim, sample):
     """Read the size of the of output uDST file from the JSON output file from
     ``--job-information``. If more than one output file is present, average over
     the output files.
 
     Args:
-        jsonFileContents (dict): A dict read from the JobInformation JSON output
-            of a skim script.
+        skim (str): The name of the skim being tested.
+        sample (str): The label of the sample being tested.
 
     Returns:
         udstSize (float): The average file size of the output uDST files.
     """
+    jsonFileContents = getJsonFile(skim, sample)
+
     outputFileInfoList = jsonFileContents['output_files']
     udstSizeList = [outputFileInfo['stats']['filesize_kib'] for outputFileInfo in outputFileInfoList]
 
     return sum(udstSizeList)/len(udstSizeList)
 
 
-def logSize(logFileContents):
+def logSize(skim, sample):
     """Calculate the size of the log file directly from the length of a string
     containing the log.
 
     Args:
-        logFileContents (str): A string containing the contents of the log file
-            of a skim script.
+        skim (str): The name of the skim being tested.
+        sample (str): The label of the sample being tested.
 
     Returns:
         logSize (float): The size of the log file in kB.
     """
+    logFileContents = getLogFile(skim, sample)
+
     return len(logFileContents) / 1024
 
 
-def cpuTime(logFileContents):
+def cpuTime(skim, sample):
     """Read the CPU time of the test from the "Resource usage summary" section
     of the log file.
 
     Args:
-        logFileContents (str): A string containing the contents of the log file
-            of a skim script.
+        skim (str): The name of the skim being tested.
+        sample (str): The label of the sample being tested.
 
     Returns:
         cpuTime (float): The CPU time of the test job in seconds.
     """
+    logFileContents = getLogFile(skim, sample)
+
     return getStatFromLog('CPU time', logFileContents)
 
 
-def averageCandidateMultiplicity(logFileContents):
+def averageCandidateMultiplicity(skim, sample):
     """Read the average multiplicity of passed events by parsing the "Average
     Candidate Multiplicity" blocks of the log file. If there is more than output
     one particle list, then the multiplicity is averaged over the particle
     lists.
 
     Args:
-        logFileContents (str): A string containing the contents of the log file
-            of a skim script.
+        skim (str): The name of the skim being tested.
+        sample (str): The label of the sample being tested.
 
     Returns:
         averageCandidateMultiplicity (float): The candidate multiplicity of
             passed events, averaged over the particle lists.
     """
+    logFileContents = getLogFile(skim, sample)
+
     # Find all the blocks with the header "Average Candidate Multiplicity", and
     # join them into a single string.
     multiplicityBlocks = re.findall('(Average Candidate Multiplicity(.*\n)+?.*INFO)', logFileContents)
@@ -256,36 +300,40 @@ def averageCandidateMultiplicity(logFileContents):
     multiplicityLines = [line for line in joinedBlocks.split('\n') if re.findall(floatRegexp, line)]
     multiplicities = [float(re.findall(floatRegexp, line)[1]) for line in multiplicityLines]
 
-    averageCandidateMultiplicity = sum(multiplicities)/len(multiplicities)
+    averageCandidateMultiplicity = sum(multiplicities) / len(multiplicities)
 
     return averageCandidateMultiplicity
 
 
-def memoryAverage(logFileContents):
+def memoryAverage(skim, sample):
     """Read the average memory usage of the test from the "Resource usage
     summary" section of the log file.
 
     Args:
-        logFileContents (str): A string containing the contents of the log file
-            of a skim script.
+        skim (str): The name of the skim being tested.
+        sample (str): The label of the sample being tested.
 
     Returns:
        memoryAverage (float): Average memory usage of the test in MB.
     """
+    logFileContents = getLogFile(skim, sample)
+
     return getStatFromLog('Average Memory', logFileContents)
 
 
-def memoryMaximum(logFileContents):
+def memoryMaximum(skim, sample):
     """Read the maximum memory usage of the test from the "Resource usage
     summary" section of the log file.
 
     Args:
-        logFileContents (str): A string containing the contents of the log file
-            of a skim script.
+        skim (str): The name of the skim being tested.
+        sample (str): The label of the sample being tested.
 
     Returns:
         memoryMaximum (float): Maximum memory usage of the test in MB.
     """
+    logFileContents = getLogFile(skim, sample)
+
     return getStatFromLog('Max Memory', logFileContents)
 
 
@@ -304,24 +352,19 @@ def nTotalEvents(sample):
     return get_events_per_file(sample)*get_total_infiles(sample)
 
 
-def testLogContents(logFileContents, jsonFileContents, skim, sample):
-    """Check that the output files indicate that the skims ran successfully.
+def testJsonFile(jsonFileContents):
+    """Check that a JSON file indicates the test skim job ran successfully and
+    the files were written successfully.
 
     Args:
-        logFileContents (str):  A string containing the contents of the log file
-            of a skim script.
         jsonFileContents (dict): A dict read from the JobInformation JSON output
             of a skim script.
-        skim (str): The name of the skim being tested.
-        sample (str): The label of the sample being tested.
 
     Raises:
         SkimNotRunException: Raised if the log file indicates the job did not finish
             successfully, or the JSON file indicates the output files were not
             written correctly.
     """
-    logTests = ['Successfully completed' in logFileContents]
-
     outputFileInfoList = jsonFileContents['output_files']
 
     jsonTests = [jsonFileContents['basf2_status']['finished'],
@@ -331,9 +374,29 @@ def testLogContents(logFileContents, jsonFileContents, skim, sample):
                  all(check for outputFileInfo in outputFileInfoList for check in outputFileInfo['checks_passed'].values())
                  ]
 
-    if not (all(logTests) and all(jsonTests)):
-        raise SkimNotRunException(f'    Error found in log files of {skim} skim on {sample} sample.\n' +
-                                  '    Please check the .out, .err, and .json files in log/ directory.')
+    if all(jsonTests):
+        return True
+    else:
+        return False
+
+
+def testLogFile(logFileContents):
+    """Check that a log file indicates that the test skim jobs ran successfully.
+
+    Args:
+        logFileContents (str): A string containing the contents of the log file
+            of a skim script.
+
+    Returns:
+        logFilesPass (bool): `True` if the log files indicate the skims ran
+            successfully.
+    """
+    logTests = ['Successfully completed' in logFileContents]
+
+    if all(logTests):
+        return True
+    else:
+        return False
 
 
 def getSkimsToRun(parser, standaloneList, combinedList):
@@ -462,11 +525,9 @@ def getStatSpecifier():
     * ``'PrintToConfluence'`` (`bool`): Determines whether the statistic is
       included in the Confluence table.
 
-    * ``'Calculate'`` (`function`): An anonymous function for how to calculate
-      the statistic. The arguments of this function must be a dict constructed
-      from the JobInformation JSON output, a string containing the log file
-      contents, and the name of the sample being used. Not all of these
-      arguments must be used by the function, but they must all be supplied.
+    * ``'Calculate'`` (`function`): An anonymous function which calculates a
+      statistic for one skim and one sample. The arguments of this function must
+      the names of the skim and sample being tested.
 
     * ``'CalculationDescription'`` (`str`): A sentence description of how the
       statistic is calculated.
@@ -488,7 +549,7 @@ def getStatSpecifier():
             'FloatFormat': '.2f',
             'PrintToScreen': True,
             'PrintToConfluence': True,
-            'Calculate': lambda json, *_: 100 * nSkimmedEvents(json) / nInputEvents(json),
+            'Calculate': lambda skim, sample: 100 * nSkimmedEvents(skim, sample) / nInputEvents(skim, sample),
             'CalculationDescription': 'Number of skimmed events divided by number of input events.',
             'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
         },
@@ -497,7 +558,7 @@ def getStatSpecifier():
             'FloatFormat': '.0f',
             'PrintToScreen': False,
             'PrintToConfluence': True,
-            'Calculate': lambda json, *_: nInputEvents(json),
+            'Calculate': lambda skim, sample: nInputEvents(skim, sample),
             'CalculationDescription': 'Number of events in the input MDST file.',
             'CombineMC': None
         },
@@ -506,7 +567,7 @@ def getStatSpecifier():
             'FloatFormat': '.0f',
             'PrintToScreen': False,
             'PrintToConfluence': True,
-            'Calculate': lambda json, *_: nSkimmedEvents(json),
+            'Calculate': lambda skim, sample: nSkimmedEvents(skim, sample),
             'CalculationDescription': 'Number of events in the output uDST file.',
             'CombineMC': None
         },
@@ -515,7 +576,7 @@ def getStatSpecifier():
             'FloatFormat': '.1f',
             'PrintToScreen': False,
             'PrintToConfluence': True,
-            'Calculate': lambda _, log, __: cpuTime(log),
+            'Calculate': lambda skim, sample: cpuTime(skim, sample),
             'CalculationDescription': 'CPU time of test job as printed in the output logs.',
             'CombineMC': None
         },
@@ -524,7 +585,7 @@ def getStatSpecifier():
             'FloatFormat': '.3f',
             'PrintToScreen': True,
             'PrintToConfluence': True,
-            'Calculate': lambda json, log, *_: cpuTime(log) / nInputEvents(json),
+            'Calculate': lambda skim, sample: cpuTime(skim, sample) / nInputEvents(skim, sample),
             'CalculationDescription': 'CPU time of test job divided by number of input events.',
             'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
         },
@@ -533,7 +594,7 @@ def getStatSpecifier():
             'FloatFormat': '.2f',
             'PrintToScreen': False,
             'PrintToConfluence': True,
-            'Calculate': lambda json, *_: udstSize(json) / 1024,
+            'Calculate': lambda skim, sample: udstSize(skim, sample) / 1024,
             'CalculationDescription': 'File size of output uDST.',
             'CombineMC': None
         },
@@ -542,7 +603,7 @@ def getStatSpecifier():
             'FloatFormat': '.3f',
             'PrintToScreen': True,
             'PrintToConfluence': True,
-            'Calculate': lambda json, *_: udstSize(json) / nInputEvents(json),
+            'Calculate': lambda skim, sample: udstSize(skim, sample) / nInputEvents(skim, sample),
             'CalculationDescription': 'File size of output uDST divided by number of input events.',
             'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
         },
@@ -551,7 +612,7 @@ def getStatSpecifier():
             'FloatFormat': '.2f',
             'PrintToScreen': False,
             'PrintToConfluence': False,
-            'Calculate': lambda json, _, sample: udstSize(json) / nInputEvents(json) * get_events_per_file(sample) / 1024,
+            'Calculate': lambda skim, sample: udstSize(skim, sample) / nInputEvents(skim, sample) * get_events_per_file(sample) / 1024,
             'CalculationDescription': 'uDST size per event multiplied by average number of events per file for this sample.',
             'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
         },
@@ -560,7 +621,7 @@ def getStatSpecifier():
             'FloatFormat': '.1f',
             'PrintToScreen': False,
             'PrintToConfluence': True,
-            'Calculate': lambda _, log, __: logSize(log),
+            'Calculate': lambda skim, sample: logSize(skim, sample),
             'CalculationDescription': 'File size of the output logs.',
             'CombineMC': None
         },
@@ -569,7 +630,7 @@ def getStatSpecifier():
             'FloatFormat': '.2f',
             'PrintToScreen': True,
             'PrintToConfluence': True,
-            'Calculate': lambda json, log, __: logSize(log) / nInputEvents(json) * 1024,
+            'Calculate': lambda skim, sample: logSize(skim, sample) / nInputEvents(skim, sample) * 1024,
             'CalculationDescription': 'File size of the output logs divided by the number of input events.',
             'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
         },
@@ -578,7 +639,7 @@ def getStatSpecifier():
             'FloatFormat': '.2f',
             'PrintToScreen': True,
             'PrintToConfluence': True,
-            'Calculate': lambda _, log, __: averageCandidateMultiplicity(log),
+            'Calculate': lambda skim, sample: averageCandidateMultiplicity(skim, sample),
             'CalculationDescription': 'Candidate multiplicity as listed in output logs, averaged over the particle lists.',
             'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
         },
@@ -587,7 +648,7 @@ def getStatSpecifier():
             'FloatFormat': '.0f',
             'PrintToScreen': True,
             'PrintToConfluence': True,
-            'Calculate': lambda _, log, __: memoryAverage(log),
+            'Calculate': lambda skim, sample: memoryAverage(skim, sample),
             'CalculationDescription': 'Average memory usage, as listed in output logs.',
             'CombineMC': lambda statDict, mcCampaign: mcWeightedAverage(statDict, mcCampaign)
         },
@@ -596,7 +657,7 @@ def getStatSpecifier():
             'FloatFormat': '.0f',
             'PrintToScreen': True,
             'PrintToConfluence': True,
-            'Calculate': lambda _, log, __: memoryMaximum(log),
+            'Calculate': lambda skim, sample: memoryMaximum(skim, sample),
             'CalculationDescription': 'Maximum memory usage, as listed in output logs.',
             'CombineMC': lambda statDict, _: max(statDict.values())
         },
@@ -605,7 +666,7 @@ def getStatSpecifier():
             'FloatFormat': '.2f',
             'PrintToScreen': False,
             'PrintToConfluence': True,
-            'Calculate': lambda json, _, sample: udstSize(json) * nTotalEvents(sample) / nInputEvents(json) / 1024 / 1024,
+            'Calculate': lambda skim, sample: udstSize(skim, sample) * nTotalEvents(sample) / nInputEvents(skim, sample) / 1024**2,
             'CalculationDescription': 'Output uDST size per event multiplied by total number of events in the full sample.',
             'CombineMC': lambda statDict, _: sum(statDict.values())
         },
@@ -614,7 +675,7 @@ def getStatSpecifier():
             'FloatFormat': '.2f',
             'PrintToScreen': False,
             'PrintToConfluence': True,
-            'Calculate': lambda json, log, sample: logSize(log) * nTotalEvents(sample) / nInputEvents(json) / 1024 / 1024,
+            'Calculate': lambda skim, sample: logSize(skim, sample) * nTotalEvents(sample) / nInputEvents(skim, sample) / 1024**2,
             'CalculationDescription': 'Output log file size per event multiplied by total number of events in the full sample.',
             'CombineMC': lambda statDict, _: sum(statDict.values())
         }
@@ -649,24 +710,19 @@ def fillSkimStatsDict(skims, samples, statSpecifier, verbose=False):
     for skim in skims:
         try:
             for sample in samples:
-                logFileContents, jsonFileContents = getJobOutput(skim, sample)
-
-                testLogContents(logFileContents, jsonFileContents, skim, sample)
-
-                for statName, statInfo in statSpecifier.items():
-                    statFunction = statInfo['Calculate']
+                for statName, statSpec in statSpecifier.items():
+                    statFunction = statSpec['Calculate']
 
                     try:
-                        allSkimStats[skim][statName][sample] = statFunction(jsonFileContents, logFileContents, sample)
+                        allSkimStats[skim][statName][sample] = statFunction(skim, sample)
                     except TypeError:
                         allSkimStats[skim][statName][sample] = None
                         if verbose:
                             B2WARNING(f'Could not calculate {statName} for {skim} skim on {sample} sample.')
+
         except SkimNotRunException as e:
             del allSkimStats[skim]
-
-            print(f'Error! Could not get stats for {skim}. Details:', file=sys.stderr)
-            print(e, '\n', file=sys.stderr)
+            B2ERROR(f'Could not get stats for {skim}. Reason:\n{e}\n')
 
     return allSkimStats
 
@@ -731,9 +787,9 @@ def addWeightedMC(allSkimStats, statSpecifier, mcCampaign, verbose=False):
             dict, with an extra entry for combined MC samples.
     """
     for skim, skimStats in allSkimStats.items():
-        for stat, statInfo in statSpecifier.items():
+        for stat, statSpec in statSpecifier.items():
             try:
-                combiningFunction = statInfo['CombineMC']
+                combiningFunction = statSpec['CombineMC']
                 if combiningFunction:
                     skimStats[stat]['Combined MC'] = combiningFunction(skimStats[stat], mcCampaign)
                 elif verbose:
@@ -779,7 +835,7 @@ def printToScreen(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels,
         mcOnly (bool): Print only MC samples statistics.
         dataOnly (bool): Print only data samples statistics.
     """
-    selectedStats = [stat for (stat, statInfo) in statSpecifier.items() if statInfo['PrintToScreen']]
+    selectedStats = [stat for (stat, statSpec) in statSpecifier.items() if statSpec['PrintToScreen']]
 
     headers = ['\n'.join(wrap(statSpecifier[stat]['LongName'], 12)) for stat in selectedStats]
     floatFormat = [''] + [statSpecifier[stat]['FloatFormat'] for stat in selectedStats]
@@ -832,7 +888,7 @@ def printToConfluence(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLab
     """
     confluenceFileName = 'confluenceTables.txt'
 
-    selectedStats = [stat for (stat, statInfo) in statSpecifier.items() if statInfo['PrintToConfluence']]
+    selectedStats = [stat for (stat, statSpec) in statSpecifier.items() if statSpec['PrintToConfluence']]
 
     headers = [statSpecifier[stat]['LongName'] for stat in selectedStats]
     floatFormat = [''] + [statSpecifier[stat]['FloatFormat'] for stat in selectedStats]

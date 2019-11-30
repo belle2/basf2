@@ -50,15 +50,6 @@ void KLMPackerModule::beginRun()
 
 void KLMPackerModule::event()
 {
-  /* The node_id is set later. */
-  RawCOPPERPackerInfo packerInfo;
-  packerInfo.exp_num = m_EventMetaData->getExperiment();
-  packerInfo.run_subrun_num = (m_EventMetaData->getRun() << 8) +
-                              (m_EventMetaData->getSubrun() & 0xFF);
-  packerInfo.tt_ctime = 0;
-  packerInfo.tt_utime = 0;
-  packerInfo.b2l_ctime = 0;
-
   /* Indices: copper, data concentrator.
    * Coppers from 0 to 3 are BKLM;
    * coppers from 4 to 7 are EKLM.
@@ -129,6 +120,14 @@ void KLMPackerModule::event()
   }
 
   /* Create RawKLM objects. */
+  RawCOPPERPackerInfo packerInfo;
+  packerInfo.exp_num = m_EventMetaData->getExperiment();
+  packerInfo.run_subrun_num = (m_EventMetaData->getRun() << 8) +
+                              (m_EventMetaData->getSubrun() & 0xFF);
+  packerInfo.eve_num = m_EventMetaData->getEvent();
+  packerInfo.tt_ctime = 0;
+  packerInfo.tt_utime = 0;
+  packerInfo.b2l_ctime = 0;
   int* detectorBuf[4];
   int nWords[4];
   for (int i = 0; i < 8; i++) {

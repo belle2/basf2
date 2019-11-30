@@ -35,13 +35,20 @@ import sys
 from textwrap import wrap
 
 from ROOT import PyConfig
-from tabulate import tabulate
 
 # Importing ROOT in skimExpertFunctions has the side-effect of hijacking argument parsing
 PyConfig.IgnoreCommandLineOptions = True
+from basf2 import B2WARNING, B2ERROR
 from skim.registry import skim_registry, combined_skims
 from skimExpertFunctions import get_test_file, get_total_infiles, get_events_per_file
 
+try:
+    from tabulate import tabulate
+except ModuleNotFoundError:
+    B2ERROR('This tool relies on the third-party package `tabulate`, ' +
+          'which is not currently installed. Please install it with:\n' +
+          '    pip3 install tabulate --user')
+    sys.exit(1)
 
 class SkimNotRunException(Exception):
     """A more specific exception to be raised whenever an error occurs that is
@@ -356,7 +363,7 @@ def getSkimsToRun(parser, standaloneList, combinedList):
 
     if not (standaloneList or combinedList):
         parser.print_help()
-        sys.exit(1)
+        sys.exit(0)
 
     if standaloneList == ['all']:
         standaloneSkims = allStandaloneSkims
@@ -654,7 +661,7 @@ def fillSkimStatsDict(skims, samples, statSpecifier, verbose=False):
                     except TypeError:
                         allSkimStats[skim][statName][sample] = None
                         if verbose:
-                            print(f'Warning! Could not calculate {statName} for {skim} skim on {sample} sample.')
+                            B2WARNING(f'Could not calculate {statName} for {skim} skim on {sample} sample.')
         except SkimNotRunException as e:
             del allSkimStats[skim]
 
@@ -731,12 +738,12 @@ def addWeightedMC(allSkimStats, statSpecifier, mcCampaign, verbose=False):
                     skimStats[stat]['Combined MC'] = combiningFunction(skimStats[stat], mcCampaign)
                 elif verbose:
                     skimStats[stat]['Combined MC'] = None
-                    print(f'Warning! No method provided in `statsSpecifier` for combining MC estimate of {stat}. ' +
+                    B2WARNING(f'No method provided in `statsSpecifier` for combining MC estimate of {stat}. ' +
                           'This may be because there is no sensible way to combine this value.')
             except TypeError:
                 skimStats[stat]['Combined MC'] = None
                 if verbose:
-                    print(f'Warning! Could not calculate combined MC estimate for {stat} for {skim} skim.')
+                    B2WARNING(f'Could not calculate combined MC estimate for {stat} for {skim} skim.')
 
     return allSkimStats
 

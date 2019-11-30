@@ -131,6 +131,22 @@ def get_calibrations(input_data, **kwargs):
     ext_path.add_module("Ext", pdgCodes=[13])
     cal_ecl_mu_mu.pre_collector_path = ext_path
 
+    # Include a merging Calibration that doesn't require input data but instead creates the final
+    # payload from the previous calibration payloads.
+
+    # We use a dummy collector that barely outputs any data and we set the input files to a single file so
+    # we spawn only one very fast job.
+    # It doesn't matter which input file we choose as the output is never used.
+
+    merging_alg = Belle2.ECL.eclMergingCrystalEAlgorithm()
+    cal_ecl_merge = Calibration(name="ecl_merge", collector="DummyCollector", algorithms=[merging_alg],
+                                input_files=input_files_mu_mu[:1])
+
+    # The important part is that we depend on all 3 previous calibrations
+    cal_ecl_merge.depends_on(cal_ecl_ee5x5)
+    cal_ecl_merge.depends_on(cal_ecl_gamma_gamma)
+    cal_ecl_merge.depends_on(cal_ecl_mu_mu)
+
     # --------------------------------------------------------------
     # ..Force the output iovs to be open
     requested_iov = kwargs.get("requested_iov", None)
@@ -141,7 +157,9 @@ def get_calibrations(input_data, **kwargs):
         algorithm.params = {"apply_iov": output_iov}
     for algorithm in cal_ecl_mu_mu.algorithms:
         algorithm.params = {"apply_iov": output_iov}
+    for algorithm in cal_ecl_merge.algorithms:
+        algorithm.params = {"apply_iov": output_iov}
 
     # --------------------------------------------------------------
     # ..Return the calibrations
-    return [cal_ecl_ee5x5, cal_ecl_gamma_gamma, cal_ecl_mu_mu]
+    return [cal_ecl_ee5x5, cal_ecl_gamma_gamma, cal_ecl_mu_mu, cal_ecl_merge]

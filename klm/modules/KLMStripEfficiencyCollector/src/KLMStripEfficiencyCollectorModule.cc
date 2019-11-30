@@ -25,8 +25,8 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   CalibrationCollectorModule()
 {
   setDescription("Module for EKLM strips efficiency (data collection).");
-  addParam("MuonListName", m_MuonListName,
-           "Muon list name. If empty, use tracks.", std::string("mu+:all"));
+  addParam("MuonListName", m_MuonListName, "Muon list name.",
+           std::string("mu+:all"));
   addParam("MinimalMatchingDigits", m_MinimalMatchingDigits,
            "Minimal number of matching digits.", 0);
   addParam("MinimalMatchingDigitsOuterLayers",
@@ -307,7 +307,6 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
     return false;
   /* Write efficiency histograms */
   for (it = selectedHits.begin(); it != selectedHits.end(); ++it) {
-    /* Check the number of matching digits in other layers. */
     int matchingDigits = 0;
     int matchingDigitsOuterLayers = 0;
     int extHitsOuterLayers = 0;
@@ -321,14 +320,24 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
         extHitsOuterLayers += extHitLayer[i];
       }
     }
+    /* Check the number of matching digits in other layers. */
     if (matchingDigits < m_MinimalMatchingDigits)
       continue;
+    /*
+     * Check the number of matching digits in outer layersi relatively to
+     * this hit. It should be possible to have the required number of digits,
+     * thus, the number of ExtHits needs to be sufficient. Due to the ExtHit
+     * number condition, this does not reject the outer layers of the detector.
+     */
     if (matchingDigitsOuterLayers < m_MinimalMatchingDigitsOuterLayers &&
         extHitsOuterLayers >= m_MinimalMatchingDigitsOuterLayers)
       continue;
+    /*
+     * Check the momentum. The muons with sufficiently large momentum have
+     * a very small probability to get absorbed in the detector.
+     */
     if (muon->getMomentum().Mag() < m_MinimalMomentumNoOuterLayers)
       continue;
-    /* Check the number of mathcing digitsafter this one. */
     allExtHitsInPlane->Fill(m_PlaneArrayIndex->getIndex(it->first));
     if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr)
       matchedDigitsInPlane->Fill(m_PlaneArrayIndex->getIndex(it->first));

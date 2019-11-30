@@ -11,15 +11,19 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/KLMDigitEventInfo.h>
+#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMPlaneArrayIndex.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
 #include <analysis/dataobjects/ParticleList.h>
 #include <calibration/CalibrationCollectorModule.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
@@ -27,15 +31,19 @@
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+/* C++ headers. */
+#include <map>
+#include <string>
+
 namespace Belle2 {
 
   /**
-   * Module EKLMTrackMatchCollectorModule.
+   * Module KLMStripEfficiencyCollectorModule.
    * @details
    * Module for collecting data for track matching efficiency.
    */
 
-  class EKLMTrackMatchCollectorModule : public CalibrationCollectorModule {
+  class KLMStripEfficiencyCollectorModule : public CalibrationCollectorModule {
 
   private:
 
@@ -43,6 +51,9 @@ namespace Belle2 {
      * Hit data.
      */
     struct HitData {
+
+      /** Subdetector. */
+      int subdetector;
 
       /** Section. */
       int section;
@@ -59,11 +70,17 @@ namespace Belle2 {
       /** Strip. */
       int strip;
 
+      /** Local coordinate. */
+      double localPosition;
+
       /** Extrapolation hit. */
       const ExtHit* hit;
 
-      /** Digit. */
-      const EKLMDigit* digit;
+      /** EKLM digit. */
+      const EKLMDigit* eklmDigit;
+
+      /** BKLM digit. */
+      const BKLMDigit* bklmDigit;
 
     };
 
@@ -72,12 +89,12 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMTrackMatchCollectorModule();
+    KLMStripEfficiencyCollectorModule();
 
     /**
      * Destructor.
      */
-    virtual ~EKLMTrackMatchCollectorModule();
+    virtual ~KLMStripEfficiencyCollectorModule();
 
     /**
      * Initializer.
@@ -90,61 +107,62 @@ namespace Belle2 {
     void collect() override;
 
     /**
+     * This method is called at the beginning of the run.
+     */
+    void startRun() override;
+
+    /**
      * This method is called at the end of run.
      */
     void closeRun() override;
 
-    /**                     SIMPLE MUID
-     * Calculating number of Hit2ds in forward and backward parts
-     * If there are many hits in one of the sections can be sure that this is muon track
-     * And the second track with high probability is in opposite section (because we choosed events with 2trks)
-     * If it is so, calculate efficiency in opposite section
-     */
-    void trackCheck(
-      bool trackSelected[EKLMElementNumbers::getMaximalSectionNumber()],
-      int requiredHits) const;
-
-    /**
-     * Matching of digits with ext hits
-     * @param[in] hitData         Hit data.
-     * @param[in] allowedDistance Minimal distance in the units of strip number.
-     */
-    const EKLMDigit* findMatchingDigit(const struct HitData* hitData,
-                                       double allowedDistance) const;
-
-
-    /**
-     * Find sum energy of tracks in event
-     */
-    double getSumTrackEnergy(const StoreArray<Track>& selected_tracks) const;
-
   private:
 
     /**
-     * Collect the data for one track.
-     * @param[in] track Track.
+     * Add hit to map.
+     * @param[in] hitMap  Hit map.
+     * @param[in] plane   Plane number.
+     * @param[in] hitData Hit data.
      */
-    void collectDataTrack(const Track* track);
+    void addHit(std::map<uint16_t, struct HitData>& hitMap,
+                uint16_t planeGlobal, struct HitData* hitData);
+
+    /**
+     * Find matching digit.
+     * @param[in] hitData Hit data.
+     */
+    void findMatchingDigit(struct HitData* hitData);
+
+    /**
+     * Collect the data for one muon.
+     * @param[in] muon Muon.
+     * @return True if the muon satisfies the selection criteria.
+     */
+    bool collectDataTrack(const Particle* muon);
 
     /** Muon list name. If empty, use tracks. */
     std::string m_MuonListName;
 
-    /**
-     * Whether to use standalone track selection.
-     * Always turn this off for cosmic data.
-     */
-    bool m_StandaloneTrackSelection;
-
-    /**
-     * Minimal number of matching digits.
-     */
+    /** Minimal number of matching digits. */
     int m_MinimalMatchingDigits;
 
-    /** Digits. */
-    StoreArray<EKLMDigit> m_digits;
+    /** Minimal number of matching digits in outer layers. */
+    int m_MinimalMatchingDigitsOuterLayers;
 
-    /** Hit2ds. */
-    StoreArray<EKLMHit2d> m_hit2ds;
+    /** Minimal momentum in case there are no hits in outer layers. */
+    double m_MinimalMomentumNoOuterLayers;
+
+    /** Whether to remove unused muons. */
+    bool m_RemoveUnusedMuons;
+
+    /** Channel status. */
+    DBObjPtr<KLMChannelStatus> m_ChannelStatus;
+
+    /** EKLM digits. */
+    StoreArray<EKLMDigit> m_EklmDigits;
+
+    /** BKLM digits. */
+    StoreArray<BKLMDigit> m_BklmDigits;
 
     /** Tracks. */
     StoreArray<Track> m_tracks;
@@ -161,14 +179,17 @@ namespace Belle2 {
     /** Muons. */
     StoreObjPtr<ParticleList> m_MuonList;
 
-    /** Geometry data. */
-    const EKLM::GeometryData* m_GeoDat;
+    /** Element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
 
-    /** EKLMElementNumbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
+    /** EKLM element numbers. */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;
 
-    /** Output file name */
-    std::string m_filename;
+    /** BKLM geometry. */
+    const bklm::GeometryPar* m_GeometryBKLM;
+
+    /** Plane array index. */
+    const KLMPlaneArrayIndex* m_PlaneArrayIndex;
 
     /** Max distance in strips number to 1D hit from extHit to be still matched */
     double m_AllowedDistance1D;

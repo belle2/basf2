@@ -115,7 +115,7 @@ Some functions and tools are for the use of skim liaisons and developers.
 Testing skim performance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Two command-line tools are provided to test the performance of a skim, which are available in the ``PATH`` after setting up the ``basf2`` environment.
+When skims are developed, it is important to test the performance of the skim on a data and on a range of background MC samples. Two command-line tools are provided in the skim package to aid in this: ``b2skim-stats-submit`` and ``b2skim-stats-print``. They are available in the ``PATH`` after setting up the ``basf2`` environment after calling `b2setup`. The former submits a series of test jobs for a skim on data and MC samples, and the latter uses the output files of the jobs to calculate performance statistics for each sample including retention rate, CPU time, and uDST size per event. ``b2skim-stats-print`` also provides estimates for combined MC samples, where the statistics are weighted by the cross-section of each background process.
 
 First run ``b2skim-stats-submit``, which will submit small skim jobs on test files of MC and data using ``bsub``. For example,
 
@@ -138,13 +138,15 @@ This will read the output files of the test jobs, and produce tables of statisti
 * All statistics produced are printed to a JSON file ``skimStats.json``, indexed by skim, statistic, and sample label. This file is to be used by grid production tools.
 
 .. tip::
-   To test your own newly-developed skim, you must do the following two things in your current setup of ``basf2``:
+   To test your own newly-developed skim, you must do the following things in your current setup of ``basf2``:
 
    1. Add your skim to `skim.registry.skim_registry`. This should be an entry of the form ``(SkimCode, SkimName)``.
 
    2. Put your skim steering file in ``skim/standalone/``, with a name of the form ``{SkimName}_Skim_Standalone.py``. This skim name must match what you wrote in the registry.
 
-   If these two things are done, then the stats tools will be able to find and run your skim.
+   3. If your skim relies on any particle list modules which you have added or modified, make sure these are included in ``skim/scripts/skim/``.
+
+   If these three things are done, then the stats tools will be able to find and run your skim.
 
 
 ``b2skim-stats-submit``: Run skim scripts on test samples

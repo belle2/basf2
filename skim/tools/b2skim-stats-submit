@@ -228,6 +228,10 @@ def submitJobs(skims, scripts, samples, nTestEvents):
             print(f'Running {script} on {nTestEvents} events from test samples of {", ".join(samples)}. Job IDs:\n  ' +
                   '\n  '.join(jobIDs))
 
+    print(f'Log files will be written to {str(logDirectory)}. ' +
+          'Once these jobs have finished, please run `b2skim-stats-print` ' +
+          'from the directory {str(logDirectory.parent)}.')
+
 if __name__ == '__main__':
     parser = getArgumentParser()
     args = parser.parse_args()

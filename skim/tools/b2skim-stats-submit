@@ -130,7 +130,7 @@ def getSkimsAndScriptsToRun(parser, standaloneSkimList, combinedSkimList):
     # Check that at least one skim name was supplied
     if not (standaloneSkimList or combinedSkimList):
         parser.print_help()
-        sys.exit(1)
+        sys.exit(0)
 
     if standaloneSkimList == ['all']:
         standaloneSkims = allStandaloneSkims
@@ -203,6 +203,10 @@ def submitJobs(skims, scripts, samples, nTestEvents):
 
         for sample in samples:
             sampleFile = get_test_file(sample)
+
+            if not Path(sampleFile).exists():
+                print(f'Error! Could not find test file {sampleFile}. `b2skim-stats-submit` is meant to be run on KEKCC.')
+                sys.exit(1)
 
             logFile = Path(logDirectory, f'{skim}_{sample}.out')
             errFile = Path(logDirectory, f'{skim}_{sample}.err')

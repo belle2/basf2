@@ -11,59 +11,65 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMPlaneArrayIndex.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 
 /* Belle 2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
-
-/* ROOT headers. */
-#include <TH1.h>
 
 namespace Belle2 {
 
   /**
    * KLM channel status calibration algorithm.
    */
-  class EKLMTrackMatchAlgorithm : public CalibrationAlgorithm {
+  class KLMStripEfficiencyAlgorithm : public CalibrationAlgorithm {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMTrackMatchAlgorithm();
+    KLMStripEfficiencyAlgorithm();
 
     /**
      * Copy constructor (disabled).
      */
-    EKLMTrackMatchAlgorithm(const EKLMTrackMatchAlgorithm&) = delete;
+    KLMStripEfficiencyAlgorithm(const KLMStripEfficiencyAlgorithm&) = delete;
 
     /**
      * Operator = (disabled).
      */
-    EKLMTrackMatchAlgorithm& operator=(const EKLMTrackMatchAlgorithm&) = delete;
+    KLMStripEfficiencyAlgorithm& operator=(const KLMStripEfficiencyAlgorithm&) = delete;
 
     /**
      * Destructor.
      */
-    ~EKLMTrackMatchAlgorithm();
+    ~KLMStripEfficiencyAlgorithm();
 
     /**
      * Calibration.
      */
     CalibrationAlgorithm::EResult calibrate() override;
 
+    /**
+     * Set output file name.
+     */
+    void setOutputFileName(const char* outputFileName)
+    {
+      m_OutputFileName = outputFileName;
+    }
+
   private:
 
-    /** Hist of planes eff (data for calibration) */
-    TH1F* m_planesEff;
-
     /** Output root file */
-    TFile* m_file;
+    std::string m_OutputFileName = "TrackMatchedResult.root";
 
-    /** EKLM element numbers */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
+    /** Element numbers */
+    const KLMElementNumbers* m_ElementNumbers;
+
+    /** Plane array index. */
+    const KLMPlaneArrayIndex* m_PlaneArrayIndex;
 
     /** Efficiency data object */
     KLMStripEfficiency* m_StripEfficiency;

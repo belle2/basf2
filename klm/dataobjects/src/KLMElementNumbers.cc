@@ -211,3 +211,11 @@ uint16_t KLMElementNumbers::sectorNumberEKLM(int section, int sector) const
   sect = m_ElementNumbersEKLM->sectorNumberKLMOrder(section, sector);
   return sect;
 }
+
+int KLMElementNumbers::getExtrapolationLayer(int subdetector, int layer) const
+{
+  if (subdetector == c_BKLM)
+    return layer;
+  else
+    return BKLMElementNumbers::getMaximalLayerNumber() + layer;
+}

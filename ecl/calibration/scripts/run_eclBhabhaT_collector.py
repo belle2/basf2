@@ -114,8 +114,8 @@ if add_unpackers:
     reconstruction.add_ext_module(main, components)
     reconstruction.add_ecl_modules(main, components)
     reconstruction.add_ecl_track_matcher_module(main, components)
-else:
-    main.add_module('Geometry', useDB=True, components=components)
+# else:
+#     main.add_module('Geometry', useDB=True, components=components)
 
 
 # == Generate time calibration matrix from ECLDigit

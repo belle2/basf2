@@ -17,7 +17,7 @@ settings = CalibrationSettings(name="ECL crate time calibrations",
                                expert_username="ehill",
                                description=__doc__,
                                input_data_formats=["cdst"],
-                               input_data_names=["physics"],
+                               input_data_names=["hlt_bhabha"],
                                depends_on=[])
 
 ##############################
@@ -55,7 +55,7 @@ def get_calibrations(input_data, **kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    file_to_iov_physics = input_data["physics"]
+    file_to_iov_physics = input_data["hlt_bhabha"]
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
@@ -81,15 +81,13 @@ def get_calibrations(input_data, **kwargs):
     eclTAlg = Belle2.ECL.eclBhabhaTAlgorithm()
 
     # Define the CAF algorithm arguments
-    # Comment out the below two lines when doing the crystal calibrations
+    # Set the cellIDLo to be larger than cellIDHi so that no crystal
+    #    calibrations will be performed.
     eclTAlg.cellIDLo = 3
     eclTAlg.cellIDHi = 2
     eclTAlg.debugOutput = True
     eclTAlg.meanCleanRebinFactor = 3
     eclTAlg.meanCleanCutMinFactor = 0.3
-    # Comment out the below two lines when doing the crate calibrations
-    # eclTAlg.crateIDLo = 10
-    # eclTAlg.crateIDHi = 9
     eclTAlg.debugFilenameBase = "eclBhabhaTAlgorithm"
 
     ###################################################

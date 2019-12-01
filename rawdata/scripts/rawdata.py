@@ -86,6 +86,7 @@ def add_unpackers(path, components=None):
     # CDC
     if components is None or 'CDC' in components:
         cdcunpacker = register_module('CDCUnpacker')
+        cdcunpacker.param('enableStoreCDCRawHit', True)
         cdcunpacker.param('enablePrintOut', False)
         path.add_module(cdcunpacker)
 

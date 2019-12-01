@@ -73,15 +73,19 @@ namespace Belle2 {
         // get last iteration for each module
 
         std::map<int, int> lastIterations;
+        std::map<int, int> lastIterationEntries;
         for (int i = 0; i < alignTree->GetEntries(); i++) {
           alignTree->GetEntry(i);
-          lastIterations[m_moduleID] = i;
+          if (m_iter > lastIterations[m_moduleID]) {
+            lastIterations[m_moduleID] = m_iter;
+            lastIterationEntries[m_moduleID] = i;
+          }
         }
 
         // store last iteration in a multimap
 
-        for (const auto& lastIteration : lastIterations) {
-          alignTree->GetEntry(lastIteration.second);
+        for (const auto& lastIterationEntry : lastIterationEntries) {
+          alignTree->GetEntry(lastIterationEntry.second);
           if (m_vAlignPars->size() != m_vAlignParsErr->size()) {
             B2ERROR("slot " << m_moduleID << ", set=" << set <<
                     ": sizes of vectors of alignment parameters and errors differ. "
@@ -112,18 +116,30 @@ namespace Belle2 {
       // write control histograms
 
       h1->Write();
-      auto h2 = getObjectPtr<TH1F>("local_z");
-      if (h2) h2->Write();
-      auto h3 = getObjectPtr<TH2F>("cth_vs_p");
-      if (h3) h3->Write();
-      auto h4 = getObjectPtr<TH2F>("poca_xy");
-      if (h4) h4->Write();
-      auto h5 = getObjectPtr<TH1F>("poca_z");
-      if (h5) h5->Write();
-      auto h6 = getObjectPtr<TH1F>("Ecms");
-      if (h6) h6->Write();
-      auto h7 = getObjectPtr<TH1F>("charge");
-      if (h7) h7->Write();
+      TDirectory* oldDir = gDirectory;
+      for (unsigned slot = 1; slot <= numModules; slot++) {
+        std::string slotName = "_s" + to_string(slot);
+        auto h2 = getObjectPtr<TH1F>("local_z" + slotName);
+        auto h3 = getObjectPtr<TH2F>("cth_vs_p" + slotName);
+        auto h4 = getObjectPtr<TH2F>("poca_xy" + slotName);
+        auto h5 = getObjectPtr<TH1F>("poca_z" + slotName);
+        auto h6 = getObjectPtr<TH1F>("Ecms" + slotName);
+        auto h7 = getObjectPtr<TH1F>("charge" + slotName);
+        auto h8 = getObjectPtr<TH2F>("timeHits" + slotName);
+        auto h9 = getObjectPtr<TH1F>("numPhot" + slotName);
+
+        std::string name = "slot_" + to_string(slot);
+        oldDir->mkdir(name.c_str())->cd();
+        if (h2) h2->Write();
+        if (h3) h3->Write();
+        if (h4) h4->Write();
+        if (h5) h5->Write();
+        if (h6) h6->Write();
+        if (h7) h7->Write();
+        if (h8) h8->Write();
+        if (h9) h9->Write();
+        oldDir->cd();
+      }
 
       // book output histograms
 
@@ -215,7 +231,7 @@ namespace Belle2 {
         }
         if (vsize < 6) {
           B2ERROR("slot " << moduleID <<
-                  ": too few alignment parameters found in ntuple");
+                  ": too few alignment parameters found in ntuple, npar = " << vsize);
           continue;
         }
         alignment->setX(moduleID, data.alignPars[0], data.alignErrs[0]);
@@ -238,8 +254,13 @@ namespace Belle2 {
 
       // check the results and return if alignment precision is not satisfied
 
-      if (not alignment->areAllCalibrated() or
-          not alignment->areAllPrecise(m_spatialPrecision, m_angularPrecision)) {
+      if (not alignment->areAllCalibrated()) {
+        B2INFO("Alignment not successful for all slots");
+        delete alignment;
+        return c_NotEnoughData;
+      }
+      if (not alignment->areAllPrecise(m_spatialPrecision, m_angularPrecision)) {
+        B2INFO("Alignment successful but precision worse than required");
         delete alignment;
         return c_NotEnoughData;
       }

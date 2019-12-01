@@ -22,7 +22,7 @@ class TestTreeFits(unittest.TestCase):
 
         # we want to use the latest grated globaltag, not the old one from the
         # file
-        conditions.disable_globaltag_replay()
+        basf2.conditions.disable_globaltag_replay()
 
         main = basf2.create_path()
 

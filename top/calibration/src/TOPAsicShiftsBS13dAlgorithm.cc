@@ -31,28 +31,25 @@ namespace Belle2 {
 
     CalibrationAlgorithm::EResult TOPAsicShiftsBS13dAlgorithm::calibrate()
     {
-
       // get collected histograms
 
       auto timeReference = getObjectPtr<TH1F>("time_reference");
       if (not timeReference) {
         B2ERROR("TOPAsicShiftsBS13dAlgorithm: histogram 'time_reference' not found");
-        return c_Failure;
+        return c_NotEnoughData;
       }
       if (timeReference->GetSumOfWeights() == 0) {
         B2ERROR("TOPAsicShiftsBS13dAlgorithm: histogram 'time_reference' is empty");
         return c_NotEnoughData;
       }
 
-      std::vector<std::shared_ptr<TH1F> > timeCarriers;
-      for (unsigned i = 0; i < 4; i++) {
-        string name = "time_carr_" + to_string(i);
+      std::vector<std::shared_ptr<TH1F> > timeCarriers(4, nullptr);
+      std::vector<int> entries(4, 0);
+      for (unsigned cb = 0; cb < 4; cb++) {
+        string name = "time_carr_" + to_string(cb);
         auto h = getObjectPtr<TH1F>(name);
-        if (not h) {
-          B2ERROR("TOPAsicShiftsBS13dAlgorithm: histogram '" << name << "' not found");
-          return c_Failure;
-        }
-        timeCarriers.push_back(h);
+        timeCarriers[cb] = h;
+        if (h) entries[cb] = h->GetSumOfWeights();
       }
 
       // set time reference distribution
@@ -104,6 +101,7 @@ namespace Belle2 {
       for (unsigned cb = 0; cb < 4; cb++) {
         auto& h_chi = chi2Carriers[cb];
         auto& h_time = timeCarriers[cb];
+        if (not h_time) continue;
         for (int shift = m_shiftBegin; shift < m_shiftEnd; shift++) {
           double chi2 = -2.0 * logL(h_time, shift);
           h_chi->SetBinContent(shift - m_shiftBegin + 1, chi2);
@@ -158,14 +156,28 @@ namespace Belle2 {
         }
       }
       timeReference->Write();
-      for (auto& h : timeCarriers) h->Write();
+      for (auto& h : timeCarriers) {
+        if (h) h->Write();
+      }
       file->Write();
       file->Close();
+
+      // check if CB entries have changed if this run is merged with previous one
+
+      if (not m_lastEntries.empty()) { // run is merged
+        for (unsigned cb = 0; cb < 4; cb++) {
+          if (entries[cb] == m_lastEntries[cb] and significances[cb] < m_minSignificance)
+            significances[cb] = 0; // not possible to calibrate this CB
+        }
+      }
 
       // check result significances and return if too low
 
       for (auto significance : significances) {
-        if (significance < m_minSignificance) return c_NotEnoughData;
+        if (significance > 0 and significance < m_minSignificance) {
+          m_lastEntries = entries; // save entries
+          return c_NotEnoughData;
+        }
       }
 
       // otherwise create and import payload to DB
@@ -174,12 +186,14 @@ namespace Belle2 {
       int moduleID = 13;
       unsigned bs = 3;
       for (unsigned cb = 0; cb < 4; cb++) {
+        if (significances[cb] == 0) continue; // no or insufficient data from this BS
         for (unsigned a = 0; a < 4; a++) {
           unsigned asic = a + cb * 4 + bs * 16;
           asicShift->setT0(moduleID, asic, shifts[cb]);
         }
       }
       saveCalibration(asicShift);
+      m_lastEntries.clear();
 
       return c_OK;
     }
@@ -231,6 +245,8 @@ namespace Belle2 {
 
     double TOPAsicShiftsBS13dAlgorithm::logL(std::shared_ptr<TH1F> h, int shift)
     {
+      if (not h) return 0;
+
       double logl = 0;
       auto pdf = getPDF(shift);
       for (unsigned i = 0; i < pdf.size(); i++) {

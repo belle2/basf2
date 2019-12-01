@@ -11,9 +11,6 @@
 /* Own header. */
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
 
-/* KLM headers. */
-#include <klm/eklm/dataobjects/EKLMElementID.h>
-
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
@@ -27,46 +24,25 @@ EKLMAlignment::~EKLMAlignment()
 {
 }
 
-void EKLMAlignment::setSectorAlignment(uint16_t segment,
-                                       EKLMAlignmentData* dat)
+void EKLMAlignment::setModuleAlignment(uint16_t module,
+                                       KLMAlignmentData* dat)
 {
-  std::map<uint16_t, EKLMAlignmentData>::iterator it;
-  it = m_SectorAlignment.find(segment);
-  if (it == m_SectorAlignment.end()) {
-    m_SectorAlignment.insert(
-      std::pair<uint16_t, EKLMAlignmentData>(segment, *dat));
-  } else
+  std::map<uint16_t, KLMAlignmentData>::iterator it;
+  it = m_ModuleAlignment.find(module);
+  if (it == m_ModuleAlignment.end()) {
+    m_ModuleAlignment.insert(
+      std::pair<uint16_t, KLMAlignmentData>(module, *dat));
+  } else {
     it->second = *dat;
+  }
 }
 
-const EKLMAlignmentData* EKLMAlignment::getSectorAlignment(
-  uint16_t segment) const
+const KLMAlignmentData* EKLMAlignment::getModuleAlignment(
+  uint16_t module) const
 {
-  std::map<uint16_t, EKLMAlignmentData>::const_iterator it;
-  it = m_SectorAlignment.find(segment);
-  if (it == m_SectorAlignment.end())
-    return nullptr;
-  return &(it->second);
-}
-
-void EKLMAlignment::setSegmentAlignment(uint16_t segment,
-                                        EKLMAlignmentData* dat)
-{
-  std::map<uint16_t, EKLMAlignmentData>::iterator it;
-  it = m_SegmentAlignment.find(segment);
-  if (it == m_SegmentAlignment.end()) {
-    m_SegmentAlignment.insert(
-      std::pair<uint16_t, EKLMAlignmentData>(segment, *dat));
-  } else
-    it->second = *dat;
-}
-
-const EKLMAlignmentData* EKLMAlignment::getSegmentAlignment(
-  uint16_t segment) const
-{
-  std::map<uint16_t, EKLMAlignmentData>::const_iterator it;
-  it = m_SegmentAlignment.find(segment);
-  if (it == m_SegmentAlignment.end())
+  std::map<uint16_t, KLMAlignmentData>::const_iterator it;
+  it = m_ModuleAlignment.find(module);
+  if (it == m_ModuleAlignment.end())
     return nullptr;
   return &(it->second);
 }
@@ -74,51 +50,27 @@ const EKLMAlignmentData* EKLMAlignment::getSegmentAlignment(
 double EKLMAlignment::getGlobalParam(unsigned short element,
                                      unsigned short param) const
 {
-  const EKLMAlignmentData* alignmentData;
-  EKLMElementID id(element);
-  alignmentData = getSectorAlignment(id.getSectorNumber());
+  const KLMAlignmentData* alignmentData = getModuleAlignment(element);
   if (alignmentData == nullptr)
     return 0;
-  switch (param) {
-    case 1:
-      return alignmentData->getDx();
-    case 2:
-      return alignmentData->getDy();
-    case 6:
-      return alignmentData->getDalpha();
-  }
-  B2FATAL("Attempt to get EKLM alignment parameter with incorrect number " <<
-          param);
-  return 0;
+  return alignmentData->getParameter(
+           static_cast<enum KLMAlignmentData::ParameterNumbers>(param));
 }
 
 void EKLMAlignment::setGlobalParam(double value, unsigned short element,
                                    unsigned short param)
 {
-  EKLMAlignmentData* alignmentData;
-  EKLMElementID id(element);
-  alignmentData = const_cast<EKLMAlignmentData*>(
-                    getSectorAlignment(id.getSectorNumber()));
+  KLMAlignmentData* alignmentData =
+    const_cast<KLMAlignmentData*>(getModuleAlignment(element));
   if (alignmentData == nullptr)
     return;
-  switch (param) {
-    case 1:
-      alignmentData->setDx(value);
-      return;
-    case 2:
-      alignmentData->setDy(value);
-      return;
-    case 6:
-      alignmentData->setDalpha(value);
-      return;
-  }
-  B2FATAL("Attempt to set EKLM alignment parameter with incorrect number " <<
-          param);
+  alignmentData->setParameter(
+    static_cast<enum KLMAlignmentData::ParameterNumbers>(param), value);
 }
 
 /* TODO: this function is not implemented. */
-std::vector<std::pair<unsigned short, unsigned short>>
-                                                    EKLMAlignment::listGlobalParams()
+std::vector< std::pair<unsigned short, unsigned short> >
+EKLMAlignment::listGlobalParams()
 {
   return {};
 }

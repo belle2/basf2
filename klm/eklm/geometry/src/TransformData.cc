@@ -13,6 +13,7 @@
 
 /* KLM headers. */
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
+#include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
 #include <klm/eklm/geometry/AlignmentChecker.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
@@ -29,7 +30,6 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
   int iSection, iLayer, iSector, iPlane, iSegment, iStrip, sector, segment;
   int nSections, nLayers, nSectors, nPlanes, nStrips, nSegments, nStripsSegment;
   int nDetectorLayers;
-  std::string payload;
   AlignmentChecker alignmentChecker(true);
   m_GeoDat = &(GeometryData::Instance());
   nSections = m_GeoDat->getNSections();
@@ -106,15 +106,20 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
   }
   /* Read alignment data from the database and modify transformations. */
   if (displacementType != c_None) {
-    if (displacementType == c_Displacement)
+    std::string payload, segmentPayload;
+    if (displacementType == c_Displacement) {
       payload = "EKLMDisplacement";
-    else
+      segmentPayload = "EKLMSegmentDisplacement";
+    } else {
       payload = "EKLMAlignment";
+      segmentPayload = "EKLMSegmentAlignment";
+    }
     DBObjPtr<EKLMAlignment> alignment(payload);
+    DBObjPtr<EKLMSegmentAlignment> segmentAlignment(segmentPayload);
     if (!alignment.isValid())
       B2FATAL("No EKLM displacement (alignment) data.");
     if (displacementType == c_Displacement) {
-      if (!alignmentChecker.checkAlignment(&(*alignment)))
+      if (!alignmentChecker.checkAlignment(&(*alignment), &(*segmentAlignment)))
         B2FATAL("EKLM displacement data are incorrect, overlaps exist.");
     }
     for (iSection = 1; iSection <= nSections; iSection++) {
@@ -122,8 +127,8 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
       for (iLayer = 1; iLayer <= nDetectorLayers; iLayer++) {
         for (iSector = 1; iSector <= nSectors; iSector++) {
           sector = m_GeoDat->sectorNumber(iSection, iLayer, iSector);
-          const EKLMAlignmentData* sectorAlignment =
-            alignment->getSectorAlignment(sector);
+          const KLMAlignmentData* sectorAlignment =
+            alignment->getModuleAlignment(sector);
           if (sectorAlignment == nullptr)
             B2FATAL("Incomplete EKLM displacement (alignment) data.");
           for (iPlane = 1; iPlane <= nPlanes; iPlane++) {
@@ -131,43 +136,44 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
             if (iPlane == 1) {
               m_PlaneDisplacement[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1] =
                 HepGeom::Translate3D(
-                  sectorAlignment->getDy() * CLHEP::cm / Unit::cm,
-                  sectorAlignment->getDx() * CLHEP::cm / Unit::cm, 0) *
-                HepGeom::RotateZ3D(-sectorAlignment->getDalpha() *
+                  sectorAlignment->getDeltaV() * CLHEP::cm / Unit::cm,
+                  sectorAlignment->getDeltaU() * CLHEP::cm / Unit::cm, 0) *
+                HepGeom::RotateZ3D(-sectorAlignment->getDeltaGamma() *
                                    CLHEP::rad / Unit::rad);
             } else {
               m_PlaneDisplacement[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1] =
                 HepGeom::Translate3D(
-                  sectorAlignment->getDx() * CLHEP::cm / Unit::cm,
-                  sectorAlignment->getDy() * CLHEP::cm / Unit::cm, 0) *
-                HepGeom::RotateZ3D(sectorAlignment->getDalpha() *
+                  sectorAlignment->getDeltaU() * CLHEP::cm / Unit::cm,
+                  sectorAlignment->getDeltaV() * CLHEP::cm / Unit::cm, 0) *
+                HepGeom::RotateZ3D(sectorAlignment->getDeltaGamma() *
                                    CLHEP::rad / Unit::rad);
             }
             for (iSegment = 1; iSegment <= nSegments; iSegment++) {
               segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector,
                                                 iPlane, iSegment);
-              const EKLMAlignmentData* segmentAlignment =
-                alignment->getSegmentAlignment(segment);
-              if (segmentAlignment == nullptr)
+              const KLMAlignmentData* segmentAlignmentData =
+                segmentAlignment->getSegmentAlignment(segment);
+              if (segmentAlignmentData == nullptr)
                 B2FATAL("Incomplete EKLM displacement (alignment) data.");
               m_Segment[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1]
               [iSegment - 1] =
                 HepGeom::Translate3D(
-                  segmentAlignment->getDx() * CLHEP::cm / Unit::cm,
-                  segmentAlignment->getDy() * CLHEP::cm / Unit::cm, 0) *
+                  segmentAlignmentData->getDeltaU() * CLHEP::cm / Unit::cm,
+                  segmentAlignmentData->getDeltaV() * CLHEP::cm / Unit::cm, 0) *
                 m_Segment[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1]
                 [iSegment - 1] *
-                HepGeom::RotateZ3D(segmentAlignment->getDalpha() *
+                HepGeom::RotateZ3D(segmentAlignmentData->getDeltaGamma() *
                                    CLHEP::rad / Unit::rad);
               for (iStrip = 1; iStrip <= nStripsSegment; iStrip++) {
                 m_Strip[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1]
                 [nStripsSegment * (iSegment - 1) + iStrip - 1] =
                   HepGeom::Translate3D(
-                    segmentAlignment->getDx() * CLHEP::cm / Unit::cm,
-                    segmentAlignment->getDy() * CLHEP::cm / Unit::cm, 0) *
+                    segmentAlignmentData->getDeltaU() * CLHEP::cm / Unit::cm,
+                    segmentAlignmentData->getDeltaV() * CLHEP::cm / Unit::cm,
+                    0) *
                   m_Strip[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1]
                   [nStripsSegment * (iSegment - 1) + iStrip - 1] *
-                  HepGeom::RotateZ3D(segmentAlignment->getDalpha() *
+                  HepGeom::RotateZ3D(segmentAlignmentData->getDeltaGamma() *
                                      CLHEP::rad / Unit::rad);
               }
             }

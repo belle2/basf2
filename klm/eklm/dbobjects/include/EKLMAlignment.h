@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/eklm/dbobjects/EKLMAlignmentData.h>
+#include <klm/dbobjects/KLMAlignmentData.h>
 
 /* ROOT headers. */
 #include <TObject.h>
@@ -40,30 +40,17 @@ namespace Belle2 {
     ~EKLMAlignment();
 
     /**
-     * Set sector alignment data.
-     * @param[in] sector Sector number.
+     * Set module alignment data.
+     * @param[in] module Module number.
      * @param[in] dat    Alignment data.
      */
-    void setSectorAlignment(uint16_t sector, EKLMAlignmentData* dat);
+    void setModuleAlignment(uint16_t module, KLMAlignmentData* dat);
 
     /**
-     * Get sector alignment data.
-     * @param[in] sector Sector number.
+     * Get module alignment data.
+     * @param[in] module Module number.
      */
-    const EKLMAlignmentData* getSectorAlignment(uint16_t sector) const;
-
-    /**
-     * Set segment alignment data.
-     * @param[in] segment Segment number.
-     * @param[in] dat     Alignment data.
-     */
-    void setSegmentAlignment(uint16_t segment, EKLMAlignmentData* dat);
-
-    /**
-     * Get segment alignment data.
-     * @param[in] segment Segment number.
-     */
-    const EKLMAlignmentData* getSegmentAlignment(uint16_t segment) const;
+    const KLMAlignmentData* getModuleAlignment(uint16_t module) const;
 
     /* Interface to global Millepede calibration. */
 
@@ -71,19 +58,28 @@ namespace Belle2 {
      * Get global unique identifier.
      * @return Global unique identifier.
      */
-    static unsigned short getGlobalUniqueID() { return 40; }
+    static unsigned short getGlobalUniqueID()
+    {
+      return 40;
+    }
 
     /**
      * Get global parameter.
+     * @param[in] element Element number (KLM module number).
+     * @param[in] param   Parameter number.
      * @return Global parameter value.
      */
     double getGlobalParam(unsigned short element, unsigned short param) const;
 
     /**
      * Set global parameter.
+     * @param[in] value   Parameter value.
+     * @param[in] element Element number (KLM module number).
+     * @param[in] param   Parameter number.
      */
     void setGlobalParam(double value, unsigned short element,
                         unsigned short param);
+
     /**
      * Get a list of stored global parameters.
      */
@@ -91,14 +87,11 @@ namespace Belle2 {
 
   private:
 
-    /** Sector alignment. */
-    std::map<uint16_t, EKLMAlignmentData> m_SectorAlignment;
-
-    /** Segment alignment. */
-    std::map<uint16_t, EKLMAlignmentData> m_SegmentAlignment;
+    /** Module alignment. */
+    std::map<uint16_t, KLMAlignmentData> m_ModuleAlignment;
 
     /** Class version. */
-    ClassDef(Belle2::EKLMAlignment, 2);
+    ClassDef(Belle2::EKLMAlignment, 3);
 
   };
 

@@ -12,7 +12,6 @@
 
 /* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dbobjects/BKLMADCThreshold.h>
 #include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
@@ -89,11 +88,8 @@ namespace Belle2 {
      * @param[out] bword3 Third word.
      * @param[out] bword4 Fourth word.
      */
-    void formatData(int flag, int lane,
-                    int plane, int strip, int charge,
-                    uint16_t ctime, uint16_t tdc,
-                    uint16_t& bword1, uint16_t& bword2, uint16_t& bword3,
-                    uint16_t& bword4);
+    void formatData(int flag, int lane, int plane, int strip, int charge, uint16_t ctime, uint16_t tdc,
+                    uint16_t& bword1, uint16_t& bword2, uint16_t& bword3, uint16_t& bword4);
 
     /* Common objects. */
 

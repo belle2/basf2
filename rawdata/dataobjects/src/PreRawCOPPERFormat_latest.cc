@@ -532,6 +532,10 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   if (copper_buf[ POS_CH_A_DATA_LENGTH ] != 0) {
     ff55_higher_bits = (unsigned int)(m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
                        0xFFFF0000;
+
+    if (cur_ftsw_eve32 % 1009 == 0) {
+      m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] = 0xff550001;
+    }
     ff55_lower_bits = m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF;
 
     if (ff55_higher_bits != 0xff550000) {
@@ -561,6 +565,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
       } else {
         if (((unsigned int)m_node_id & DETECTOR_MASK) == ARICH_ID) {
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x1 << 28);
           sprintf(err_buf,
                   "[WARNING] ARICH(cpr=%.8x) B2link packet CRC error slot A eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
                   m_node_id,
@@ -572,6 +577,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
           fflush(stdout);
         } else {
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x1 << 28);
           sprintf(err_buf, "[FATAL] (cpr=%.8x) B2link packet CRC error slot A eve %8u foooter %.8x : %s %s %d\n",
                   m_node_id,
                   cur_ftsw_eve32,
@@ -589,6 +595,10 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   if (copper_buf[ POS_CH_B_DATA_LENGTH ] != 0) {
     ff55_higher_bits = (unsigned int)(m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
                        0xFFFF0000;
+    if (cur_ftsw_eve32 % 1009 == 1) {
+      m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] = 0xff550001;
+    }
+
     ff55_lower_bits = (m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
 
     if (ff55_higher_bits != 0xff550000) {
@@ -618,6 +628,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
       } else {
         if (((unsigned int)m_node_id & DETECTOR_MASK) == ARICH_ID) {
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x2 << 28);
           sprintf(err_buf,
                   "[WARNING] ARICH(cpr=%.8x) B2link packet CRC error slot B eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
                   m_node_id,
@@ -629,6 +640,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
           fflush(stdout);
         } else {
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x2 << 28);
           sprintf(err_buf, "[FATAL] (cpr=%.8x) B2link packet CRC error slot B eve %8u foooter %.8x : %s %s %d\n",
                   m_node_id,
                   cur_ftsw_eve32,
@@ -646,6 +658,10 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   if (copper_buf[ POS_CH_C_DATA_LENGTH ] != 0) {
     ff55_higher_bits = (unsigned int)(m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
                        0xFFFF0000;
+    if (cur_ftsw_eve32 % 1009 == 2) {
+      m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] = 0xff550001;
+    }
+
     ff55_lower_bits = (m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
 
     if (ff55_higher_bits != 0xff550000) {
@@ -675,6 +691,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
       } else {
         if (((unsigned int)m_node_id & DETECTOR_MASK) == ARICH_ID) {
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x4 << 28);
           sprintf(err_buf,
                   "[WARNING] ARICH(cpr=%.8x) B2link packet CRC error slot C eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
                   m_node_id,
@@ -686,6 +703,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
           fflush(stdout);
         } else {
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x4 << 28);
           sprintf(err_buf, "[FATAL] (cpr=%.8x) B2link packet CRC error slot C eve %8u foooter %.8x : %s %s %d\n",
                   m_node_id,
                   cur_ftsw_eve32,
@@ -704,6 +722,10 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   if (copper_buf[ POS_CH_D_DATA_LENGTH ] != 0) {
     ff55_higher_bits = (unsigned int)(m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
                        0xFFFF0000;
+    if (cur_ftsw_eve32 % 1009 == 3) {
+      m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] = 0xff550001;
+    }
+
     ff55_lower_bits = (m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
 
     if (ff55_higher_bits != 0xff550000) {
@@ -733,6 +755,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
       } else {
         if (((unsigned int)m_node_id & DETECTOR_MASK) == ARICH_ID) {
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x8 << 28);
           sprintf(err_buf,
                   "[WARNING] ARICH(cpr=%.8x) B2link packet CRC error slot D eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
                   m_node_id,
@@ -744,6 +767,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
           fflush(stdout);
         } else {
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x8 << 28);
           sprintf(err_buf, "[FATAL] (cpr=%.8x) B2link packet CRC error slot D eve %8u foooter %.8x : %s %s %d\n",
                   m_node_id,
                   cur_ftsw_eve32,

@@ -50,7 +50,7 @@ if __name__ == "__main__":
             continue
 
         # add up all non-zero dataframes
-        if not sum_out.empty:
+        if sum_out.empty:
             sum_out = swtr
         else:
             sum_out = sum_out.add(swtr)

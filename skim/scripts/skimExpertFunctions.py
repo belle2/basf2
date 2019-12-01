@@ -59,7 +59,7 @@ def get_test_file(sampleName):
     Returns the KEKcc location of files used specifically for skim testing
 
     Args:
-        sampleName (str): Name of the sample. MC samples are named *e.g.* "chargedBGx1_MC12", "ccbarBGx0_MC9"
+        sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
     Returns:
         sampleFileName (str): The path to the test file on KEKCC.
     """
@@ -74,7 +74,7 @@ def get_total_infiles(sampleName):
     Returns the total number of input Mdst files for a given sample. This is useful for resource estimate.
 
     Args:
-        sampleName (str): Name of the sample. MC samples are named *e.g.* "chargedBGx1_MC12", "ccbarBGx0_MC9"
+        sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
     Returns:
         nInFiles (int): Total number of input files for sample.
     """
@@ -89,7 +89,7 @@ def get_events_per_file(sample):
     Returns an estimate for the average number of events in an input Mdst file of the given sample type.
 
     Args:
-        sample (str): Name of the sample. MC samples are named *e.g.* "chargedBGx1_MC12", "ccbarBGx0_MC9"
+        sample (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
     Returns:
         nEventsPerFile (int): The average number of events in file of the given sample type.
     """

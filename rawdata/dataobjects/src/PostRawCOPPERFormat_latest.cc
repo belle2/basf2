@@ -265,16 +265,30 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       // Do not stop data
       //
       char err_buf[500];
-      sprintf(err_buf,
-              "[FATAL] POST B2link event CRC16 error with B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x : slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
-              *buf , temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
-              65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
-              __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      printf("%s", err_buf); fflush(stdout);
-      PrintData(GetFINESSEBuffer(n, finesse_num), GetFINESSENwords(n, finesse_num));
+      if ((GetNodeID(n) & DETECTOR_MASK) == ARICH_ID) {
+        sprintf(err_buf,
+                "[WARNING] ARICH(cpr=%.8x) POST B2link event CRC16 error with B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+                GetNodeID(n),
+                *buf , temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
+                65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
+                __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        printf("%s", err_buf); fflush(stdout);
+        PrintData(GetFINESSEBuffer(n, finesse_num), GetFINESSENwords(n, finesse_num));
+      } else {
+        sprintf(err_buf,
+                "[FATAL] POST B2link event CRC16 error with B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x : slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+                *buf , temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
+                65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
+                __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        printf("%s", err_buf); fflush(stdout);
+        PrintData(GetFINESSEBuffer(n, finesse_num), GetFINESSENwords(n, finesse_num));
 #ifndef NO_ERROR_STOP
-      B2FATAL(err_buf);
+        B2FATAL(err_buf);
 #endif
+      }
+
+
+
     } else {
       //
       // Stop taking data

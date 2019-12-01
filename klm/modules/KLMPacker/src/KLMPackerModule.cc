@@ -57,28 +57,27 @@ void KLMPackerModule::event()
   std::vector<uint32_t> dataWords[8][4];
 
   /* Pack BKLM digits. */
-  for (int i = 0; i < m_BklmDigits.getEntries(); i++) {
-    BKLMDigit* bklmDigit = m_BklmDigits[i];
+  for (const BKLMDigit& bklmDigit : m_BklmDigits) {
     uint32_t buf[2] = {0};
     uint16_t bword1 = 0;
     uint16_t bword2 = 0;
     uint16_t bword3 = 0;
     uint16_t bword4 = 0;
-    int channel = BKLMElementNumbers::channelNumber(bklmDigit->getSection(), bklmDigit->getSector(), bklmDigit->getLayer(),
-                                                    bklmDigit->isPhiReadout(), bklmDigit->getStrip());
+    int channel = BKLMElementNumbers::channelNumber(bklmDigit.getSection(), bklmDigit.getSector(), bklmDigit.getLayer(),
+                                                    bklmDigit.isPhiReadout(), bklmDigit.getStrip());
     const BKLMElectronicsChannel* electronicsChannel =
       m_BklmElectronicsMap->getElectronicsChannel(channel);
     if (electronicsChannel == nullptr)
       B2FATAL("Incomplete BKLM electronics map.");
-    int flag = 2;
-    if (!bklmDigit->inRPC())
-      flag = 4;
+    int flag = 2; // RPC
+    if (!bklmDigit.inRPC())
+      flag = 4; // Scintillator
     int lane = electronicsChannel->getLane();
     int plane = electronicsChannel->getAxis();
     int strip = electronicsChannel->getChannel();
     formatData(flag, lane, plane,
-               strip, bklmDigit->getCharge(),
-               bklmDigit->getCTime(), bklmDigit->getTime(),
+               strip, bklmDigit.getCharge(),
+               bklmDigit.getCTime(), bklmDigit.getTime(),
                bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
@@ -91,23 +90,22 @@ void KLMPackerModule::event()
   }
 
   /* Pack EKLM digits. */
-  for (int i = 0; i < m_EklmDigits.getEntries(); i++) {
-    EKLMDigit* eklmDigit = m_EklmDigits[i];
+  for (const EKLMDigit& eklmDigit : m_EklmDigits) {
     uint32_t buf[2] = {0};
     uint16_t bword1 = 0;
     uint16_t bword2 = 0;
     uint16_t bword3 = 0;
     uint16_t bword4 = 0;
-    int sectorGlobal = m_EklmElementNumbers->sectorNumber(eklmDigit->getSection(), eklmDigit->getLayer(), eklmDigit->getSector());
+    int sectorGlobal = m_EklmElementNumbers->sectorNumber(eklmDigit.getSection(), eklmDigit.getLayer(), eklmDigit.getSector());
     const EKLMDataConcentratorLane* dataConcentratorLane = m_EklmElectronicsMap->getLaneBySector(sectorGlobal);
     if (dataConcentratorLane == nullptr)
       B2FATAL("Incomplete EKLM electronics map.");
-    int flag = 4;
+    int flag = 4; // Scintillator
     int lane = dataConcentratorLane->getLane();
-    int stripFirmware = m_EklmElementNumbers->getStripFirmwareBySoftware(eklmDigit->getStrip());
-    formatData(flag, lane, eklmDigit->getPlane() - 1,
-               stripFirmware, eklmDigit->getCharge(),
-               eklmDigit->getCTime(), eklmDigit->getTDC(),
+    int stripFirmware = m_EklmElementNumbers->getStripFirmwareBySoftware(eklmDigit.getStrip());
+    formatData(flag, lane, eklmDigit.getPlane() - 1,
+               stripFirmware, eklmDigit.getCharge(),
+               eklmDigit.getCTime(), eklmDigit.getTDC(),
                bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));

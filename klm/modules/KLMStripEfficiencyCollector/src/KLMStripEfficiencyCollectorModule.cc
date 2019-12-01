@@ -22,7 +22,8 @@ using namespace Belle2;
 REG_MODULE(KLMStripEfficiencyCollector)
 
 KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
-  CalibrationCollectorModule()
+  CalibrationCollectorModule(),
+  m_GeometryBKLM(nullptr)
 {
   setDescription("Module for EKLM strips efficiency (data collection).");
   addParam("MuonListName", m_MuonListName, "Muon list name.",
@@ -67,11 +68,11 @@ void KLMStripEfficiencyCollectorModule::prepare()
     nPlanes, -0.5, double(nPlanes) - 0.5);
   registerObject<TH1F>("matchedDigitsInPlane", matchedDigitsInPlane);
   registerObject<TH1F>("allExtHitsInPlane", allExtHitsInPlane);
+  m_GeometryBKLM = bklm::GeometryPar::instance();
 }
 
 void KLMStripEfficiencyCollectorModule::startRun()
 {
-  m_GeometryBKLM = bklm::GeometryPar::instance();
 }
 
 void KLMStripEfficiencyCollectorModule::closeRun()

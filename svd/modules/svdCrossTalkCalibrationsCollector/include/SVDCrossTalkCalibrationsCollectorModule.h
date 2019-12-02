@@ -16,7 +16,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <svd/dataobjects/SVDRecoDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoCache.h>
@@ -42,18 +42,18 @@ namespace Belle2 {
     /** Init the module.*/
     void prepare() override final;
 
-    /** */
+    /**New run */
     void startRun() override final;
 
-    /** */
+    /**Event processing */
     void collect() override final;
 
 
-    /** */
+    /**End of run */
     void closeRun() override final;
 
 
-    /** */
+    /**Termination */
     void finish() override;
 
 
@@ -69,11 +69,11 @@ namespace Belle2 {
 
     void calculateAverage(const VxdID& sensorID, double& mean, int side); /**Function to calculate sensor average occupancy */
 
-    /** SVDRecoDigit collection name. */
-    std::string m_svdRecoDigitsName;
+    /** SVDShaperDigit collection name. */
+    std::string m_svdShaperDigitsName;
 
-    /** The storeArray for svdRecoDigits */
-    StoreArray<SVDRecoDigit> m_svdRecoDigits;
+    /** The storeArray for svdShaperDigits */
+    StoreArray<SVDShaperDigit> m_svdShaperDigits;
 
     int m_uSideOccupancyFactor; /**Parameter to define high occupancy strips (some multiple above sensor average occupancy) */
 
@@ -81,11 +81,8 @@ namespace Belle2 {
 
     int m_nAPVFactor; /**Parameter to set number of sensors with possible cross-talk clusters required for event flagging.*/
 
-    std::string m_treeName; /** Filename of root file containing cross-talk strip calibration payload */
-
-//    TFile* m_histogramFile; /**Pointer to root TFile containing histograms for calibration payload */
-
     std::map<std::string, TH1F* > m_sensorHistograms; /**< map to store cross-talk strip histograms */
+
     SVDOccupancyCalibrations m_OccupancyCal; /**<SVDOccupancy calibrations db object */
 
 

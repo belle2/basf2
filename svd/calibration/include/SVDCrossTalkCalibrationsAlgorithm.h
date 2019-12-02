@@ -21,7 +21,7 @@ namespace Belle2 {
   public:
 
     /** Constructor  */
-    SVDCrossTalkCalibrationsAlgorithm(std::string str);
+    SVDCrossTalkCalibrationsAlgorithm(const std::string str);
 
     /** Destructor */
     virtual ~SVDCrossTalkCalibrationsAlgorithm() {}
@@ -33,7 +33,6 @@ namespace Belle2 {
   private:
 
     std::string m_id;
-
 
   };
 

@@ -14,7 +14,7 @@
 using namespace std;
 using namespace Belle2;
 
-SVDCrossTalkCalibrationsAlgorithm::SVDCrossTalkCalibrationsAlgorithm(std::string str) :
+SVDCrossTalkCalibrationsAlgorithm::SVDCrossTalkCalibrationsAlgorithm(const std::string str) :
   CalibrationAlgorithm("SVDCrossTalkCalibrationsCollector")
 {
   setDescription("Calibration algorithm for SVDCrossTalkCalibrations payload");

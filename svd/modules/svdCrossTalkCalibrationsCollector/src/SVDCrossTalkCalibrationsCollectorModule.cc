@@ -22,10 +22,8 @@ SVDCrossTalkCalibrationsCollectorModule::SVDCrossTalkCalibrationsCollectorModule
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("SVDRecoDigits", m_svdRecoDigitsName,
-           "SVDRecoDigit collection name", string(""));
-
-  addParam("HistogramTree", m_treeName, "Name of the tree in which the histograms are saved", std::string("tree"));
+  addParam("SVDShaperDigits", m_svdShaperDigitsName,
+           "SVDShaperDigit collection name", string(""));
 
   addParam("uSideOccupancyFactor", m_uSideOccupancyFactor,
            "Multiple of the average occupancy for high occupancy strip classification", 2);
@@ -41,10 +39,8 @@ SVDCrossTalkCalibrationsCollectorModule::SVDCrossTalkCalibrationsCollectorModule
 void SVDCrossTalkCalibrationsCollectorModule::prepare()
 {
 
-  m_svdRecoDigits.isRequired(m_svdRecoDigitsName);
+  m_svdShaperDigits.isRequired(m_svdShaperDigitsName);
 
-//  TH1F hCrossTalkStrips768("CrossTalkStrips768_L@LayerL@ladderS@sensor@side","",0,768);
-//  TH1F hCrossTalkStrips512("CrossTalkStrips768_L@LayerL@ladderS@sensor@side","",0,512);
 
   m_histogramTree = new TTree("tree", "tree");
   m_histogramTree->Branch("hist", "TH1F", &m_hist, 32000, 0);
@@ -69,7 +65,7 @@ void SVDCrossTalkCalibrationsCollectorModule::startRun()
     for (auto& ladders : geo.getLadders(layers)) {
       for (auto& sensors : geo.getSensors(ladders)) {
         for (int side = 0; side <= 1; side++) {
-          occupancyPDFName(sensors, side, sensorName); //How am i going to go about naming?
+          occupancyPDFName(sensors, side, sensorName);
           if (m_sensorHistograms.count(sensorName) == 0) {
             if (layers.getLayerNumber() == 3 or side == 1) {
               sensorHist  = new TH1F(sensorName.c_str(), "", 768, 0, 768);
@@ -101,22 +97,22 @@ void SVDCrossTalkCalibrationsCollectorModule::collect()
   vector<int> strips_uSide;
   vector<int> strips_vSide;
 
-  //loop over RecoDigits
-  for (auto& svdRecoDigit : m_svdRecoDigits) {
+  //loop over ShaperDigits
+  for (auto& svdShaperDigit : m_svdShaperDigits) {
     //Remove L3 and +fw sensors, not affected by cross-talk
-    if (svdRecoDigit.getSensorID().getLayerNumber() == 3 or svdRecoDigit.getSensorID().getSensorNumber() == 1) {
+    if (svdShaperDigit.getSensorID().getLayerNumber() == 3 or svdShaperDigit.getSensorID().getSensorNumber() == 1) {
       continue;
     }
 
-    int side = svdRecoDigit.isUStrip();
+    int side = svdShaperDigit.isUStrip();
     std::string sensorName;
-    occupancyPDFName(svdRecoDigit.getSensorID(), side, sensorName);
+    occupancyPDFName(svdShaperDigit.getSensorID(), side, sensorName);
 
     double sensorAverage = 0.;
-    calculateAverage(svdRecoDigit.getSensorID(), sensorAverage, side);
-    int stripID = svdRecoDigit.getCellID();
+    calculateAverage(svdShaperDigit.getSensorID(), sensorAverage, side);
+    int stripID = svdShaperDigit.getCellID();
     std::string sensorStripNum = sensorName + "." + std::to_string(stripID);
-    double stripOccupancy = m_OccupancyCal.getOccupancy(svdRecoDigit.getSensorID(), side, stripID);
+    double stripOccupancy = m_OccupancyCal.getOccupancy(svdShaperDigit.getSensorID(), side, stripID);
     //Clustering only works assuming digits are ordered.//
     if (side == 1 && stripOccupancy > (m_uSideOccupancyFactor * sensorAverage)) {
 
@@ -152,7 +148,7 @@ void SVDCrossTalkCalibrationsCollectorModule::collect()
       highOccChips_vSide.push_back(sensorName);
     }
 
-  } //RecoDigit loop
+  } //ShaperDigit loop
 
   std::sort(clusterChips_uSide.begin(), clusterChips_uSide.end());
   clusterChips_uSide.erase(unique(clusterChips_uSide.begin(), clusterChips_uSide.end()), clusterChips_uSide.end());
@@ -161,29 +157,25 @@ void SVDCrossTalkCalibrationsCollectorModule::collect()
 
 //   Crosstalk events flagged using u-side
   if (numberOfClusterChips > m_nAPVFactor) {
-//    m_svdEventInfo->setCrossTalk(true);
-    for (auto& svdRecoDigit : m_svdRecoDigits) {
-      std::string sensorID = svdRecoDigit.getSensorID();
-      std::string digitID = sensorID + "." + std::to_string(svdRecoDigit.isUStrip());
-      std::string stripID = digitID + "." + std::to_string(svdRecoDigit.getCellID());
-//      if (m_createCalibrationPayload) {
+    for (auto& svdShaperDigit : m_svdShaperDigits) {
+      std::string sensorID = svdShaperDigit.getSensorID();
+      std::string digitID = sensorID + "." + std::to_string(svdShaperDigit.isUStrip());
+      std::string stripID = digitID + "." + std::to_string(svdShaperDigit.getCellID());
       if (std::find(clusterStrips_uSide.begin(), clusterStrips_uSide.end(), stripID) != clusterStrips_uSide.end()) {
         std::string sensorName;
-        occupancyPDFName(svdRecoDigit.getSensorID(), svdRecoDigit.isUStrip(), sensorName);
+        occupancyPDFName(svdShaperDigit.getSensorID(), svdShaperDigit.isUStrip(), sensorName);
         auto xTalkStrip = m_sensorHistograms.at(sensorName);
-        //Only fill bin once
-        if (xTalkStrip->GetBinContent(svdRecoDigit.getCellID()) < 1.) xTalkStrip->Fill(svdRecoDigit.getCellID(), true); //Change this later
+        xTalkStrip->Fill(svdShaperDigit.getCellID(), true);
       }
       if (std::find(clusterStrips_vSide.begin(), clusterStrips_vSide.end(), stripID) != clusterStrips_vSide.end()) {
         std::string sensorName;
-        occupancyPDFName(svdRecoDigit.getSensorID(), svdRecoDigit.isUStrip(), sensorName);
+        occupancyPDFName(svdShaperDigit.getSensorID(), svdShaperDigit.isUStrip(), sensorName);
         auto xTalkStrip = m_sensorHistograms.at(sensorName);
-        if (xTalkStrip->GetBinContent(svdRecoDigit.getCellID()) < 1.) xTalkStrip->Fill(svdRecoDigit.getCellID(), true);
+        xTalkStrip->Fill(svdShaperDigit.getCellID(), true);
       }
 
-//      }
 
-    }//reco digit loop
+    }//shaper digit loop
   }
 
 } //Collector loop
@@ -211,9 +203,8 @@ void SVDCrossTalkCalibrationsCollectorModule::closeRun()
           m_side = side;
 
           getObjectPtr<TTree>("HTreeCrossTalkCalib")->Fill();
-//    cout<<m_hist->GetEntries()<< " "<<m_layer<<" "<<m_ladder<<" "<<m_ladder<<endl;
-//            sensorOnMap->Write();
 
+          sensorOnMap->Delete();
         }
       }
     }

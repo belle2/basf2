@@ -13,18 +13,18 @@ import sys
 import glob
 import os.path
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from beamparameters import add_beamparameters
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
-skimCode = encodeSkimName('feiSLB0')
+skimCode = expert.encodeSkimName('feiSLB0')
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("mixedBGx1", "MC12")
 
 path = create_path()
 
-inputMdstList('default', fileList, path=path)
+ma.inputMdstList('default', fileList, path=path)
 
 from skim.fei import *
 # run pre-selection cuts and FEI
@@ -35,12 +35,12 @@ path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatchin
 
 # Apply final  B0 tag cuts
 BtagList = B0SL(path)
-skimOutputUdst(skimCode, BtagList, path=path)
-summaryOfLists(BtagList, path=path)
+expert.skimOutputUdst(skimCode, BtagList, path=path)
+ma.summaryOfLists(BtagList, path=path)
 
 # Suppress noisy modules, and then process
-setSkimLogging(path)
-process(path)
+expert.setSkimLogging(path)
+b2.process(path)
 
 # print out the summary
 print(statistics)

@@ -29,7 +29,7 @@ from skim import dark
 dielectron_list = dark.DielectronPlusMissingEnergyList(path=dielectron_path)
 
 skimExp.skimOutputUdst(skimCode, dielectron_list, path=dielectron_path)
-skimExp.summaryOfLists(dielectron_list, path=dielectron_path)
+ma.summaryOfLists(dielectron_list, path=dielectron_path)
 
 skimExp.setSkimLogging(path=dielectron_path)
 b2.process(dielectron_path)

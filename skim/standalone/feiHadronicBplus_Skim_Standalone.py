@@ -10,21 +10,21 @@
 __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling", "Phil Grace"]
 
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from beamparameters import add_beamparameters
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
 
 import sys
 import os
 import glob
-skimCode = encodeSkimName('feiHadronicBplus')
-fileList = get_test_file("mixedBGx1", "MC12")
+skimCode = expert.encodeSkimName('feiHadronicBplus')
+fileList = expert.get_test_file("mixedBGx1", "MC12")
 
 path = create_path()
 
-inputMdstList('default', fileList, path=path)
+ma.inputMdstList('default', fileList, path=path)
 
 from skim.fei import *
 # run pre-selection cuts and FEI
@@ -35,12 +35,12 @@ path.add_module('MCMatcherParticles', listName='B+:generic', looseMCMatching=Tru
 
 # Apply final B+ tag cuts
 BplusHadronicList = BplusHadronic(path)
-skimOutputUdst(skimCode, BplusHadronicList, path=path)
-summaryOfLists(BplusHadronicList, path=path)
+expert.skimOutputUdst(skimCode, BplusHadronicList, path=path)
+ma.summaryOfLists(BplusHadronicList, path=path)
 
 # Suppress noisy modules, and then process
-setSkimLogging(path)
-process(path)
+expert.setSkimLogging(path)
+b2.process(path)
 
 # print out the summary
 print(statistics)

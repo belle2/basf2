@@ -11,8 +11,8 @@
 __author__ = " Reem Rasheed"
 
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from beamparameters import add_beamparameters
 from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPhotons import *
@@ -20,22 +20,22 @@ from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import loadStdDiLeptons
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
-set_log_level(LogLevel.INFO)
+b2.set_log_level(LogLevel.INFO)
 
 
 import sys
 import os
 import glob
-skimCode = encodeSkimName('TCPV')
+skimCode = expert.encodeSkimName('TCPV')
 
 # create a path
-path = Path()
+path = b2.Path()
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("mixedBGx1", "MC12")
 
-inputMdstList('default', fileList, path=path)
+ma.inputMdstList('default', fileList, path=path)
 
 loadStdSkimPi0(path=path)
 loadStdSkimPhoton(path=path)
@@ -49,16 +49,16 @@ stdPhotons('loose', path=path)
 stdKshorts(path=path)
 loadStdDiLeptons(True, path=path)
 loadStdLightMesons(path=path)
-cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=path)
+ma.cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=path)
 
 # TCPV Skim
 from skim.tcpv import TCPVList
 tcpvList = TCPVList(path=path)
-skimOutputUdst(skimCode, tcpvList, path=path)
-summaryOfLists(tcpvList, path=path)
+expert.skimOutputUdst(skimCode, tcpvList, path=path)
+ma.summaryOfLists(tcpvList, path=path)
 
-setSkimLogging(path)
-process(path)
+expert.setSkimLogging(path)
+b2.process(path)
 
 # print out the summary
 print(statistics)

@@ -29,7 +29,7 @@ from skim import dark
 dimuon_list = dark.DimuonPlusMissingEnergyList(path=dimuon_path)
 
 skimExp.skimOutputUdst(skimCode, dimuon_list, path=dimuon_path)
-skimExp.summaryOfLists(dimuon_list, path=dimuon_path)
+ma.summaryOfLists(dimuon_list, path=dimuon_path)
 
 skimExp.setSkimLogging(path=dimuon_path)
 b2.process(dimuon_path)

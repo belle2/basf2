@@ -9,34 +9,34 @@
 #
 #######################################################
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from stdCharged import stdE, stdMu
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import skimExpertFunctions as expert
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'
 
-skimCode = encodeSkimName('SystematicsEELL')
+skimCode = expert.encodeSkimName('SystematicsEELL')
 import sys
 import os
 import glob
 
-skimpath = Path()
+skimpath = b2.Path()
 
 
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=skimpath)
+fileList = expert.get_test_file("mixedBGx1", "MC12")
+ma.inputMdstList('default', fileList, path=skimpath)
 
 stdE('all', path=skimpath)
 stdMu('all', path=skimpath)
 
 from skim.systematics import *
 SysList = EELLList(skimpath)
-skimOutputUdst(skimCode, SysList, path=skimpath)
-summaryOfLists(SysList, path=skimpath)
+expert.skimOutputUdst(skimCode, SysList, path=skimpath)
+ma.summaryOfLists(SysList, path=skimpath)
 
-setSkimLogging(path=skimpath)
-process(skimpath)
+expert.setSkimLogging(path=skimpath)
+b2.process(skimpath)
 
 print(statistics)

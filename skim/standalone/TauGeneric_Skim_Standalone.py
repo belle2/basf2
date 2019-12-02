@@ -7,21 +7,21 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from stdCharged import *
 from stdPhotons import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-set_log_level(LogLevel.INFO)
+import skimExpertFunctions as expert
+b2.set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'
 
-skimCode = encodeSkimName('TauGeneric')
+skimCode = expert.encodeSkimName('TauGeneric')
 
-taugenericskim = Path()
+taugenericskim = b2.Path()
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("mixedBGx1", "MC12")
 
-inputMdstList('default', fileList, path=taugenericskim)
+ma.inputMdstList('default', fileList, path=taugenericskim)
 
 stdPi('all', path=taugenericskim)
 stdPhotons('all', path=taugenericskim)
@@ -30,11 +30,11 @@ stdPhotons('all', path=taugenericskim)
 from skim.taupair import *
 tauList = TauList(path=taugenericskim)
 
-skimOutputUdst(skimCode, tauList, path=taugenericskim)
-summaryOfLists(tauList, path=taugenericskim)
+expert.skimOutputUdst(skimCode, tauList, path=taugenericskim)
+ma.summaryOfLists(tauList, path=taugenericskim)
 
-setSkimLogging(path=taugenericskim)
-process(taugenericskim)
+expert.setSkimLogging(path=taugenericskim)
+b2.process(taugenericskim)
 
 # print out the summary
 print(statistics)

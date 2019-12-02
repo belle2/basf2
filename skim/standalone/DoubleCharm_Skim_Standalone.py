@@ -8,25 +8,25 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from stdCharged import stdPi, stdK
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.charm import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-set_log_level(LogLevel.INFO)
+import skimExpertFunctions as expert
+b2.set_log_level(LogLevel.INFO)
 
 
 gb2_setuprel = 'release-04-00-00'
 import os
 import sys
 import glob
-skimCode = encodeSkimName('DoubleCharm')
-fileList = get_test_file("mixedBGx1", "MC12")
+skimCode = expert.encodeSkimName('DoubleCharm')
+fileList = expert.get_test_file("mixedBGx1", "MC12")
 
-path = Path()
-inputMdstList('default', fileList, path=path)
+path = b2.Path()
+ma.inputMdstList('default', fileList, path=path)
 stdPi('all', path=path)
 stdPi('loose', path=path)
 stdK('loose', path=path)
@@ -43,10 +43,10 @@ loadStdDstarPlus(path=path)
 # Double Charm Skim
 from skim.btocharm import *
 DCList = DoubleCharmList(path=path)
-skimOutputUdst(skimCode, DCList, path=path)
-summaryOfLists(DCList, path=path)
-setSkimLogging(path=path)
-process(path=path)
+expert.skimOutputUdst(skimCode, DCList, path=path)
+ma.summaryOfLists(DCList, path=path)
+expert.setSkimLogging(path=path)
+b2.process(path=path)
 
 # print out the summary
 print(statistics)

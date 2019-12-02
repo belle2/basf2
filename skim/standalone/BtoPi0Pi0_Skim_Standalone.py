@@ -9,24 +9,24 @@
 #
 #######################################################
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
-from modularAnalysis import *
+import modularAnalysis as ma
 from stdPi0s import *
 
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-set_log_level(LogLevel.INFO)
+import skimExpertFunctions as expert
+b2.set_log_level(LogLevel.INFO)
 
 gb2_setuprel = "release-04-00-00"
 
 import os
 import sys
 import glob
-skimCode = encodeSkimName('BtoPi0Pi0')
+skimCode = expert.encodeSkimName('BtoPi0Pi0')
 
-path = Path()
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=path)
+path = b2.Path()
+fileList = expert.get_test_file("mixedBGx1", "MC12")
+ma.inputMdstList('default', fileList, path=path)
 
 # load particle lists
 loadStdSkimPi0(path=path)
@@ -34,13 +34,13 @@ loadStdSkimPi0(path=path)
 # Had Skim
 from skim.btocharmless import BtoPi0Pi0List
 Pi0Pi0List = BtoPi0Pi0List(path=path)
-skimOutputUdst(skimCode, Pi0Pi0List, path=path)
+expert.skimOutputUdst(skimCode, Pi0Pi0List, path=path)
 
-summaryOfLists(Pi0Pi0List, path=path)
+ma.summaryOfLists(Pi0Pi0List, path=path)
 
 
-setSkimLogging(path)
-process(path)
+expert.setSkimLogging(path)
+b2.process(path)
 
 # print out the summary
 print(statistics)

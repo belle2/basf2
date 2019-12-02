@@ -30,7 +30,7 @@ from skim import dark
 emu_list = dark.ElectronMuonPlusMissingEnergyList(path=emu_path)
 
 skimExp.skimOutputUdst(skimCode, emu_list, path=emu_path)
-skimExp.summaryOfLists(emu_list, path=emu_path)
+ma.summaryOfLists(emu_list, path=emu_path)
 
 skimExp.setSkimLogging(path=emu_path)
 b2.process(emu_path)

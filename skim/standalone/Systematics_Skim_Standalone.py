@@ -6,24 +6,24 @@
 # Modified by Y. Kato, Mar/2018
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPhotons import *
 
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
-set_log_level(LogLevel.INFO)
+b2.set_log_level(LogLevel.INFO)
 
-skimpath = Path()
+skimpath = b2.Path()
 
-skimCode = encodeSkimName('Systematics')
+skimCode = expert.encodeSkimName('Systematics')
 argvs = sys.argv
 argc = len(argvs)
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("mixedBGx1", "MC12")
 
-inputMdstList('default', fileList, path=skimpath)
+ma.inputMdstList('default', fileList, path=skimpath)
 
 stdE('loose', path=skimpath)
 stdMu('loose', path=skimpath)
@@ -34,10 +34,10 @@ stdMu('all', path=skimpath)
 
 from skim.systematics import SystematicsList
 SysList = SystematicsList(skimpath)
-skimOutputUdst(skimCode, SysList, path=skimpath)
-summaryOfLists(SysList, path=skimpath)
+expert.skimOutputUdst(skimCode, SysList, path=skimpath)
+ma.summaryOfLists(SysList, path=skimpath)
 
-setSkimLogging(path=skimpath)
-process(skimpath)
+expert.setSkimLogging(path=skimpath)
+b2.process(skimpath)
 
 print(statistics)

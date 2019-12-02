@@ -21,7 +21,8 @@ CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() :
   m_badWireFPath(""),
   m_badWireFName(""),
   isRmBadwires(false),
-  isMakePlots(true)
+  isMakePlots(true),
+  isMergePayload(true)
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx wire gains");
@@ -216,13 +217,10 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   std::vector<double> dedxTruncmean;
   for (unsigned int kwire = 0; kwire < 14336; ++kwire) {
     dedxTruncmean.push_back(iWireTruncMean[kwire]);
-    std::cout << kwire <<  " WireGain for this = " << iWireTruncMean[kwire] << std::endl;
+    // std::cout << kwire <<  " WireGain for this = " << iWireTruncMean[kwire] << std::endl;
   }
 
-  B2INFO("dE/dx Calibration done for " << dedxTruncmean.size() << " CDC wires");
-  CDCDedxWireGain* gains = new CDCDedxWireGain(dedxTruncmean);
-  saveCalibration(gains, "CDCDedxWireGain");
-
+  generateNewPayloads(dedxTruncmean);
 
   delete htempPerWire;
   if (isMakePlots) {
@@ -232,4 +230,27 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   }
 
   return c_OK;
+}
+
+
+void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTruncmean)
+{
+
+  if (isMergePayload) {
+    const auto expRun = getRunList()[0];
+    updateDBObjPtrs(1, expRun.second, expRun.first);
+    // bool refchange = m_DBWireGains.hasChanged();
+
+    B2INFO("Saving new rung for (Exp, Run) : (" << expRun.first << "," << expRun.second << ")");
+    for (unsigned int iwire = 0; iwire < 14336; iwire++) {
+      B2INFO("Gain for Wire # " << iwire << ", Previous = " << m_DBWireGains->getWireGain(iwire) << ", Relative = " << dedxTruncmean.at(
+               iwire) << ", Merged = " << m_DBWireGains->getWireGain(iwire)*dedxTruncmean.at(iwire));
+      dedxTruncmean.at(iwire) *= (double)m_DBWireGains->getWireGain(iwire);
+    }
+  }
+
+  B2INFO("dE/dx Calibration done for " << dedxTruncmean.size() << " CDC wires");
+  CDCDedxWireGain* gains = new CDCDedxWireGain(dedxTruncmean);
+  saveCalibration(gains, "CDCDedxWireGain");
+  //saveCalibration(gains, IntervalOfValidity(expRun.first, expRun.second, expRun.first, expRun.second));
 }

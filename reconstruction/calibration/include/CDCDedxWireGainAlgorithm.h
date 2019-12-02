@@ -75,6 +75,16 @@ namespace Belle2 {
     }
 
     /**
+    * function to decide merge vs relative gains
+    */
+    void setMergePayload(bool value = true) {isMergePayload = value;}
+
+    /**
+    * function to finally store new payload after full calibration
+    */
+    void generateNewPayloads(std::vector<double> dedxTruncmean);
+
+    /**
     * funtion to set flag active for plotting
     */
     void setMonitoringPlots(bool value = false) {isMakePlots = value;}
@@ -100,8 +110,9 @@ namespace Belle2 {
     std::string m_badWireFName; /**< name of bad wire file */
     bool isRmBadwires; /**< if bad wire consideration */
     bool isMakePlots; /**< produce plots for status */
+    bool isMergePayload; /**< merge payload at the of calibration */
 
     std::vector<int> listofbadwires; /**< vector of bad ru list */
-
+    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
   };
 } // namespace Belle2

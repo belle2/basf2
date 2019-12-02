@@ -42,4 +42,4 @@ ma.summaryOfLists(ResonanceList, path=syspath)
 expert.setSkimLogging(path=syspath)
 b2.process(syspath)
 
-print(statistics)
+print(b2.statistics)

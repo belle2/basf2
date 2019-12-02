@@ -41,4 +41,4 @@ ma.summaryOfLists(DstToD0Pi_D0ToRareList, path=crpath)
 expert.setSkimLogging(path=crpath)
 b2.process(crpath)
 
-print(statistics)
+print(b2.statistics)

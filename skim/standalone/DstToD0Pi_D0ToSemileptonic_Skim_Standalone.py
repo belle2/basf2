@@ -42,4 +42,4 @@ expert.setSkimLogging(path=cslpath)
 b2.process(cslpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

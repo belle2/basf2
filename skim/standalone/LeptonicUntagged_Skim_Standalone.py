@@ -56,4 +56,4 @@ expert.setSkimLogging(path=leppath)
 b2.process(leppath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

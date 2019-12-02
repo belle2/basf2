@@ -35,4 +35,4 @@ ma.summaryOfLists(BeamList, path=darkskimpath)
 b2.process(darkskimpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

@@ -69,4 +69,4 @@ expert.add_skim("XToDp_DpToKsHp", DpToKsHpList, path=charmpath)
 expert.setSkimLogging(path=charmpath)
 b2.process(charmpath)
 
-print(statistics)
+print(b2.statistics)

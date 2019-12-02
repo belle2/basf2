@@ -41,4 +41,4 @@ ma.summaryOfLists(SysList, path=skimpath)
 expert.setSkimLogging(path=skimpath)
 b2.process(skimpath)
 
-print(statistics)
+print(b2.statistics)

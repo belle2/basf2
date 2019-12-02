@@ -79,4 +79,4 @@ expert.add_skim("DstToD0Pi_D0ToSemileptonic", CSLList, path=charmpath)
 expert.setSkimLogging(path=charmpath)
 b2.process(charmpath)
 
-print(statistics)
+print(b2.statistics)

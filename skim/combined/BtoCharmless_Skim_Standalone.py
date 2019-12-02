@@ -46,4 +46,4 @@ expert.setSkimLogging(path=btocharmlesspath)
 b2.process(btocharmlesspath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

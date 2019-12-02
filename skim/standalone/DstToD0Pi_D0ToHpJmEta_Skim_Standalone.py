@@ -45,4 +45,4 @@ ma.summaryOfLists(DstToD0PiD0ToHpJmEtaList, path=c3bh3path)
 expert.setSkimLogging(path=c3bh3path)
 b2.process(c3bh3path)
 
-print(statistics)
+print(b2.statistics)

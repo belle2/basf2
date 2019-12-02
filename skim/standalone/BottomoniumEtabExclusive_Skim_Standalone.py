@@ -33,4 +33,4 @@ expert.setSkimLogging(path=BottomoniumEtabskimpath)
 b2.process(BottomoniumEtabskimpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

@@ -37,4 +37,4 @@ expert.setSkimLogging(path=taugenericskim)
 b2.process(taugenericskim)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

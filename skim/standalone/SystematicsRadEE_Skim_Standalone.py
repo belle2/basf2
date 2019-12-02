@@ -35,4 +35,4 @@ expert.setSkimLogging(path=skimpath)
 
 # process the path (run the skim)
 b2.process(skimpath)
-print(statistics)
+print(b2.statistics)

@@ -47,4 +47,4 @@ expert.setSkimLogging(path=taulfvskim)
 b2.process(taulfvskim)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

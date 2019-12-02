@@ -42,4 +42,4 @@ ma.summaryOfLists(PRList, path=PRSLpath)
 expert.setSkimLogging(path=PRSLpath)
 b2.process(path=PRSLpath)
 # print out the summary
-print(statistics)
+print(b2.statistics)

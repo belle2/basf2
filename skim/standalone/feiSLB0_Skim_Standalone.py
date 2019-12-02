@@ -39,4 +39,4 @@ expert.setSkimLogging(path)
 b2.process(path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

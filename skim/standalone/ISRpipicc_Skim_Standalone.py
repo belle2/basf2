@@ -52,4 +52,4 @@ expert.setSkimLogging(path=ISRskimpath)
 b2.process(ISRskimpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

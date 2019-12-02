@@ -39,4 +39,4 @@ ma.summaryOfLists(SysList, path=lfvzppath)
 expert.setSkimLogging(path=lfvzppath)
 b2.process(lfvzppath)
 
-print(statistics)
+print(b2.statistics)

@@ -51,4 +51,4 @@ expert.setSkimLogging(path=skimpath)
 b2.process(skimpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

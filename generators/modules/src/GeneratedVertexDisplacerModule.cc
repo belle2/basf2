@@ -42,6 +42,10 @@ GeneratedVertexDisplacerModule::GeneratedVertexDisplacerModule() : Module()
   addParam("pdgVal", m_pdgVals,
            "PDG values of MCParticles that should be displaced. Subsequent daughters of these will be displaced accordingly. Example: (PDG_1, PDG_2, ... , PDG_N). PDG_X corresponds to lifetime_X.",
            std::vector<int> { -999});
+  addParam("maxDecayTime", m_maxDecayTime,
+           "Set the maximal allowed decay time in c*tau [cm] for the options 'flat' and 'exponential'. Set globally, default value at 300cm.",
+           static_cast<float>(300));
+
 }
 
 
@@ -59,6 +63,8 @@ void GeneratedVertexDisplacerModule::initialize()
       && (m_lifetimeOption.compare("exponential") != 0)) {
     B2FATAL("Lifetime option must be 0 (fixed), 1 (flat) or 2 (exponential).");
   }
+
+  rnd.initialize();
 }
 
 
@@ -77,6 +83,7 @@ void GeneratedVertexDisplacerModule::event()
     if (!(mcp.hasStatus(MCParticle::c_PrimaryParticle)) || (mcp.hasStatus(MCParticle::c_Initial))) return;
     // what about virtual? will the S-particle have the virtual-flag?
     if (mcp.hasStatus(MCParticle::c_IsVirtual)) return;
+
     int mcp_pdg = mcp.getPDG();
 
     for (unsigned int param_index = 0; param_index < m_pdgVals.size(); param_index++) {
@@ -112,30 +119,29 @@ void GeneratedVertexDisplacerModule::displace(MCParticle& particle, float lifeti
 
   // displace first daughters
   if (particle.getNDaughters()) {
-    displaceDaughter(particle, particle.getDaughters());
+    displaceDaughter(*displacementVector, particle.getDaughters());
   }
 }
 
 
-void GeneratedVertexDisplacerModule::displaceDaughter(MCParticle& particle, std::vector<MCParticle*> daughters)
+void GeneratedVertexDisplacerModule::displaceDaughter(TLorentzVector& motherDisplacementVector, std::vector<MCParticle*> daughters)
 {
   for (unsigned int daughter_index = 0; daughter_index < daughters.size(); daughter_index++) {
 
     MCParticle* daughter_mcp = daughters.at(daughter_index);
-    int daughter_mcpIndex = daughter_mcp->getIndex();
-    TVector3 mother_decVtx = particle.getDecayVertex();
+    int daughter_mcpArrayIndex = daughter_mcp->getArrayIndex();
 
     // getDaughters returns a copied list, need to change parameters of the original particle in the MCParticle StoreArray.
-    MCParticle& mcp = *m_mcparticles[daughter_mcpIndex];
-    mcp.setProductionVertex(mother_decVtx);
-    mcp.setDecayVertex(mother_decVtx);
-    mcp.setProductionTime(mcp.getProductionTime() + particle.getDecayTime());
-    mcp.setDecayTime(mcp.getProductionTime());
+    MCParticle& mcp = *m_mcparticles[daughter_mcpArrayIndex];
+    mcp.setProductionVertex(mcp.getProductionVertex() + motherDisplacementVector.Vect());
+    mcp.setProductionTime(mcp.getProductionTime() + motherDisplacementVector.T());
+    mcp.setDecayVertex(mcp.getDecayVertex() + motherDisplacementVector.Vect());
+    mcp.setDecayTime(mcp.getDecayTime() + motherDisplacementVector.T());
     mcp.setValidVertex(true);
 
     // Displace subsequent daughters
     if (daughter_mcp->getNDaughters()) {
-      displaceDaughter(particle, daughter_mcp->getDaughters());
+      displaceDaughter(motherDisplacementVector, daughter_mcp->getDaughters());
     }
   }
 }
@@ -149,14 +155,14 @@ void GeneratedVertexDisplacerModule::getDisplacement(MCParticle& particle, float
   if (m_lifetimeOption.compare("fixed") == 0)
     decayTime_mcp = lifetime;
   else if (m_lifetimeOption.compare("flat") == 0) {
-    TF1 flat_lifetime("flat", "1", 0, 1000000); // ToDo: --> std::rand() (time optimization)
-    // ad-hoc cut at 5*lifetime, could be set as external parameters if needed
-    flat_lifetime.SetRange(0, 5 * lifetime);
-    decayTime_mcp = flat_lifetime.GetRandom();
+    decayTime_mcp = rnd.random01() * m_maxDecayTime;
   } else  {
-    TF1 exp_lifetime("exp(x)", "exp(-x/[0])", 0, 1000000); // ToDo: --> TRandom3 or gRandom (time optimization)
-    exp_lifetime.SetParameter(0, lifetime);
-    decayTime_mcp = fourVector_mcp.Gamma() * fourVector_mcp.Beta() * exp_lifetime.GetRandom();
+    decayTime_mcp = -1 * std::log(rnd.random01()) * lifetime * fourVector_mcp.Gamma() * fourVector_mcp.Beta();
+
+    if (!particle.getMass()) {
+      B2WARNING("Displacing a particle with zero mass. Forcing Gamma=1 for the decay time.");
+      decayTime_mcp = -1 * std::log(rnd.random01()) * lifetime * fourVector_mcp.Beta();
+    }
   }
 
   // calculate the magnitude of the displacement from the lifetime

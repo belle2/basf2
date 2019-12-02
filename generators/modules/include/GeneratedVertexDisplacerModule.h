@@ -12,6 +12,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/core/RandomGenerator.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <TVector3.h>
 #include <TLorentzVector.h>
@@ -50,20 +51,21 @@ namespace Belle2 {
     // called for a particle, displaces its vertex and of its subsequent daughters
     void displace(MCParticle& particle, float
                   lifetime); /**< Helper function to displace the mother particles (corresponding to given pdf values). */
-    void displaceDaughter(MCParticle& particle,
+    void displaceDaughter(TLorentzVector& motherDisplacementVector,
                           std::vector<MCParticle*>
                           daughters); /**< Helper function to loop over subsequent daughters and displaces their vertices corresponding to their mother decay vertex. */
     void getDisplacement(MCParticle& particle, float lifetime,
                          TLorentzVector& displacement); /**< Helper function to calculate the numerical value of the vertex displacement (x,y,z,t) */
     std::string m_particleList; /**< The name of the MCParticle collection. */
     StoreArray<MCParticle> m_mcparticles; /**< store array for the MCParticles */
+    RandomGenerator rnd; /**< Used to generate random numbers for flat and exponential decay time options. */
 
   private:
     // Parameters
     std::string m_lifetimeOption;  /**< Set the lifetime option, either fixed, flat exponential */
     std::vector<float> m_lifetime;  /**< Set the numerical value of the lifetime c*tau [cm]  */
     std::vector<int> m_pdgVals;  /**< Set the particles whose vertices should be displaced  */
-
+    float m_maxDecayTime; /**< Set the maximal decayTime for the options 'flat' and 'exponential'. */
   };
 
 }

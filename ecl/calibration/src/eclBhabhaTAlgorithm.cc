@@ -23,9 +23,9 @@ eclBhabhaTAlgorithm::eclBhabhaTAlgorithm():
   crateIDHi(52),
   debugOutput(true),
   debugFilenameBase("eclBhabhaTAlgorithm"),   // base of filename (without ".root")
-  collectorName("ECLBhabhaTCollector"),
+  collectorName("ECLBhabhaTCollector")
   // Private members
-  m_runCount(0)
+  //m_runCount(0)
 {
   setDescription("Calculate time offsets from bhabha events by fitting gaussian function to the (t - T0) difference.");
 }
@@ -271,7 +271,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
     // Calculate mean from masked histogram
     double default_meanMasked = h_timeMasked->GetMean();
-    double default_meanMasked_unc = h_timeMasked->GetMeanError();
+    //double default_meanMasked_unc = h_timeMasked->GetMeanError();
     B2INFO("default_meanMasked = " << default_meanMasked);
 
 
@@ -313,7 +313,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     double fit_mean     = gaus->GetParameter(1);
     double fit_mean_unc = gaus->GetParError(1);
     double fit_sigma    = gaus->GetParameter(2);
-    double fit_chi2     = gaus->GetChisquare();
 
     double meanDiff =  fit_mean - default_mean;
     double meanUncDiff = fit_mean_unc - default_mean_unc;
@@ -420,7 +419,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   double mean_crate = 0;
   double sigma_crate = -1;
-  double mean_crate_unc = 0;
 
   vector<float> tcrate_mean_new(52, 0.0);
   vector<float> tcrate_mean_unc_new(52, 0.0);
@@ -521,7 +519,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     double fit_mean_crate     = gaus->GetParameter(1);
     double fit_mean_crate_unc = gaus->GetParError(1);
     double fit_sigma_crate    = gaus->GetParameter(2);
-    double fit_chi2_crate     = gaus->GetChisquare();
 
     double meanDiff =  fit_mean_crate - default_mean_crate;
     double meanUncDiff = fit_mean_crate_unc - default_mean_crate_unc;

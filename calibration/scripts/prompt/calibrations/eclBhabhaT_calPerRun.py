@@ -55,7 +55,8 @@ def get_calibrations(input_data, **kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    file_to_iov_physics = input_data["hlt_bhabha"]
+    # file_to_iov_physics = input_data["hlt_bhabha"]
+    file_to_iov_physics = input_data["matchingFiles"]
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
@@ -72,11 +73,32 @@ def get_calibrations(input_data, **kwargs):
     basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_physics)}")
 
     ###################################################
-    # Algorithm setup
-
+    import basf2
+    from basf2 import register_module, create_path
     import ROOT
     from ROOT import Belle2
     from ROOT.Belle2 import TestCalibrationAlgorithm
+    from caf.framework import Collection
+
+    ###################################################
+    # Collector setup
+    root_input = register_module('RootInput')
+    rec_path_bhabha = create_path()
+    rec_path_bhabha.add_module(root_input)
+
+    col_bhabha = register_module('ECLBhabhaTCollector')
+    col_bhabha.param('timeAbsMax', 250)
+    col_bhabha.param('minCrystal', 1)
+    col_bhabha.param('maxCrystal', 8736)
+    col_bhabha.param('saveTree', False)
+
+    eclTCol = Collection(collector=col_bhabha,
+                         input_files=input_files_physics,
+                         pre_collector_path=rec_path_bhabha,
+                         )
+
+    ###################################################
+    # Algorithm setup
 
     eclTAlg = Belle2.ECL.eclBhabhaTAlgorithm()
 
@@ -95,11 +117,9 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.framework import Calibration
 
-    cal_test = Calibration("ECLcrateTimeCalibration_physics",
-                           collector="ECLBhabhaTCollector",
-                           algorithms=[eclTAlg],
-                           input_files=input_files_physics
-                           )
+    cal_test = Calibration("ECLcrateTimeCalibration_physics")
+    cal_test.add_collection(name="bhabha", collection=eclTCol)
+    cal_test.algorithms = [eclTAlg]
 
     # Here we set the AlgorithmStrategy for our algorithm
     from caf.strategies import SimpleRunByRun

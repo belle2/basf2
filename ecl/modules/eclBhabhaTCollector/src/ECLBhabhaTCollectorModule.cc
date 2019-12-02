@@ -10,7 +10,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
 #include <ecl/modules/eclBhabhaTCollector/ECLBhabhaTCollectorModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
@@ -23,11 +22,9 @@
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <ecl/digitization/EclConfiguration.h>
-
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
 #include <boost/optional.hpp>
-
 #include <ecl/geometry/ECLGeometryPar.h>
 
 #include <TH2F.h>
@@ -341,7 +338,7 @@ void ECLBhabhaTCollectorModule::collect()
   crystalMapper->initFromDB();
 
   // Set up a tool for determining the theta/phi of a crystal
-  ECLGeometryPar* eclp = ECLGeometryPar::Instance();
+  // ECLGeometryPar* eclp = ECLGeometryPar::Instance();
 
 
   //== Get expected energies and calibration constants from DB. Need to call
@@ -447,7 +444,7 @@ void ECLBhabhaTCollectorModule::collect()
 
       double smallest_CDC_ECL_t0_diff = fabs(evt_t0_list_ECL[0].eventT0 - evt_t0);
       int smallest_CDC_ECL_t0_diff_idx = 0;
-      for (int ECLi = 0; ECLi < evt_t0_list_ECL.size(); ECLi++) {
+      for (long unsigned int ECLi = 0; ECLi < evt_t0_list_ECL.size(); ECLi++) {
         double tempt_ECL_t0 = evt_t0_list_ECL[ECLi].eventT0;
         if (fabs(tempt_ECL_t0 - evt_t0) < smallest_CDC_ECL_t0_diff) {
           smallest_CDC_ECL_t0_diff = fabs(tempt_ECL_t0 - evt_t0);
@@ -466,7 +463,7 @@ void ECLBhabhaTCollectorModule::collect()
       B2DEBUG(30, "evt_t0_list_ECL[0].quality = " << evt_t0_list_ECL[0].quality
               << ", with ECL event t0 = " << evt_t0_list_ECL[0].eventT0);
 
-      for (int ECLi = 0; ECLi < evt_t0_list_ECL.size(); ECLi++) {
+      for (long unsigned int ECLi = 0; ECLi < evt_t0_list_ECL.size(); ECLi++) {
         B2DEBUG(30, "evt_t0_list_ECL[" << ECLi << "].quality = " << evt_t0_list_ECL[ECLi].quality
                 << ", with ECL event t0 = " <<
                 evt_t0_list_ECL[ECLi].eventT0);
@@ -716,25 +713,29 @@ void ECLBhabhaTCollectorModule::collect()
             int eclDigitIndex = m_eclDigitID[tempCrysID];
             ECLDigit*    ecl_dig = m_eclDigitArray[eclDigitIndex];
 
-
+            // for the max E crystal
             if (tempE > crysEMax[icharge]) {
+              // Set 2nd highest E crystal to the info from the highest E crystal
+              crysE2Max[icharge] = crysEMax[icharge];
+              crysID2Max[icharge] = crysIDMax[icharge];
+              // Set the highest E crystal to the current crystal
               crysEMax[icharge] = tempE;
               crysIDMax[icharge] = tempCrysID;
             }
+            // for the 2nd highest E crystal
+            if (tempE > crysE2Max[icharge] && tempCrysID != crysIDMax[icharge]) {
+              crysE2Max[icharge] = tempE;
+              crysID2Max[icharge] = tempCrysID;
+            }
+
 
             B2DEBUG(30,  "calDigit(ir" << ir << ") time = " << calDigit->getTime() << "ns , with E = " << tempE << " GeV");
             time_ECLCaldigits_bothClusters.push_back(calDigit->getTime());
             cid_ECLCaldigits_bothClusters.push_back(tempCrysID);
 
 
-
-
-
-
-
-
-
-
+            // Code to determine the phi and theta of the crystal.  But this is not working properly with the current
+            //    airflow script so it is being temporarily removed
             /* "eclp->GetCrystalPos(...)" works when using Ewan's normal steering files but crashes
                 when the code is launched by the airflow.  */
             phi_ECLCaldigits_bothClusters.push_back(-1000);
@@ -747,37 +748,24 @@ void ECLBhabhaTCollectorModule::collect()
                                 << ", phi = " << crystal3Vec.Phi());
             */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             E_ECLCaldigits_bothClusters.push_back(tempE);
             amp_ECLDigits_bothClusters.push_back(ecl_dig->getAmp());
             chargeID_ECLCaldigits_bothClusters.push_back(icharge);
 
           }
 
-          // Find the crystal that has the second largest energy
-          for (unsigned int ir = 0; ir < eclClusterRelations.size(); ir++) {
-            const auto calDigit = eclClusterRelations.object(ir);
-            int tempCrysID = calDigit->getCellId() - 1;
-            double tempE = m_EperCrys[tempCrysID];
-            if (tempE > crysE2Max[icharge] && tempCrysID != crysIDMax[icharge]) {
-              crysE2Max[icharge] = tempE;
-              crysID2Max[icharge] = tempCrysID;
-            }
-          }
+          /*
+                    // Find the crystal that has the second largest energy
+                    for (unsigned int ir = 0; ir < eclClusterRelations.size(); ir++) {
+                      const auto calDigit = eclClusterRelations.object(ir);
+                      int tempCrysID = calDigit->getCellId() - 1;
+                      double tempE = m_EperCrys[tempCrysID];
+                      if (tempE > crysE2Max[icharge] && tempCrysID != crysIDMax[icharge]) {
+                        crysE2Max[icharge] = tempE;
+                        crysID2Max[icharge] = tempCrysID;
+                      }
+                    }
+          */
         }
       }
       trkEClustCOM[icharge] = trkEClustLab[icharge] * trkpCOM[icharge] / trkpLab[icharge];
@@ -1114,7 +1102,7 @@ void ECLBhabhaTCollectorModule::collect()
 
 
 
-  for (int digit_i = 0; digit_i < time_ECLCaldigits_bothClusters.size(); digit_i++) {
+  for (long unsigned int digit_i = 0; digit_i < time_ECLCaldigits_bothClusters.size(); digit_i++) {
     StoreObjPtr<EventMetaData> evtMetaData;
     m_runNum        = evtMetaData->getRun();
     m_tree_evtNum  = evtMetaData->getEvent();

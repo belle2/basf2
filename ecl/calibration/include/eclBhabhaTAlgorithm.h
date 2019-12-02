@@ -33,21 +33,17 @@ namespace Belle2 {
 
       /*** Parameters ***/
 
-      int cellIDLo; /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
-      int cellIDHi; /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
-      int crateIDLo; /**< Fit crates with crateID0 in the inclusive range [crateIDLo,crateIDHi] */
-      int crateIDHi; /**< Fit crystals with crateID0 in the inclusive range [crateIDLo,crateIDHi] */
-
+      int cellIDLo;     /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
+      int cellIDHi;     /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
       double meanCleanRebinFactor;  /**< Rebinning factor for mean calculation */
-
       double meanCleanCutMinFactor;  /**< After rebinning, create a mask for bins that have values
-                                           less than meanCleanCutMinFactor times the maximum bin value.
-                                           Expand mask and apply to non-rebinned histogram. */
-
+                                          less than meanCleanCutMinFactor times the maximum bin value.
+                                          Expand mask and apply to non-rebinned histogram. */
+      int crateIDLo;    /**< Fit crates with crateID0 in the inclusive range [crateIDLo,crateIDHi] */
+      int crateIDHi;    /**< Fit crates with crateID0 in the inclusive range [crateIDLo,crateIDHi] */
       bool debugOutput; /**< Save every histogram and fitted function to debugFilename */
       /** Name of file with debug output, eclBhabhaTAlgorithm.root by default */
       std::string debugFilenameBase;
-
       std::string collectorName;  /**< Name of the collector */
 
       ECLChannelMapper* crystalMapper;  /**< Tool for mapping ecl crystal to other ecl objects
@@ -58,9 +54,9 @@ namespace Belle2 {
       /**..Run algorithm on events */
       virtual EResult calibrate();
 
-    private:
-      /** Number of processed runs */
-      unsigned int m_runCount;
+//    private:
+//      /** Number of processed runs */
+//      unsigned int m_runCount;
     };
   }  // namespace ECL
 } // namespace Belle2

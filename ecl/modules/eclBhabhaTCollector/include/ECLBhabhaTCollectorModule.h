@@ -104,8 +104,6 @@ namespace Belle2 {
     /*** tree branches ***/
     /*** See inDefineHisto method for branches description ***/
     int m_tree_evtNum;    /**< Event number for debug TTree output*/
-    int m_tree_exp;     /**< Experiment number for debug TTree output */
-    int m_tree_run;     /**< Run number for debug TTree output */
     int m_tree_cid;     /**< ECL Cell ID (1..8736) for debug TTree output */
     double m_tree_phi;     /**< phi position for debug TTree output */
     double m_tree_theta;     /**< theta position for debug TTree output */
@@ -139,7 +137,6 @@ namespace Belle2 {
                                                    meet all the selection criteria for debug TTree output */
     double m_tree_clustCrysE;    /** crystal energy, only for the crystals that meet all the selection
                                       criteria for debug TTree output */
-    double m_tree_maxCrysE;    /** energy of maximum energy crystal, for debug TTree output */
 
 
     double m_tree_enPlus;     /**< Energy of cluster associated to positively charged track, GeV for debug TTree output */
@@ -179,7 +176,6 @@ namespace Belle2 {
 
 
     /****** Parameters for cuts ******/
-    double m_maxTotalEn; /**< High energy cut for total energy in event (GeV) */
     short m_timeAbsMax; /**< Events with abs(time) > m_timeAbsMax are excluded, mostly for histogram x-range purposes*/
 
     int m_minCrystal; /**< First CellId to handle */

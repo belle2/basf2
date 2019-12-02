@@ -60,6 +60,8 @@ namespace Belle2 {
 
     double isExtendedSignal(const Particle* part)
     {
+      B2WARNING("isExtendedSignal is deprecated and will be removed. Please use isSignalAcceptWrongFSPs which is exact same variable");
+
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
         return std::numeric_limits<double>::quiet_NaN();

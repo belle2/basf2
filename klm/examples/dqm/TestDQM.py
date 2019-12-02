@@ -33,14 +33,14 @@ sroot = False
 if input_files[0].endswith('.sroot'):
     sroot = True
     # If .sroot files are used, we must disable the GT replay
-    basf2.conditions.override_globaltags(['klm_alignment_testing', 'online'])
+    basf2.conditions.override_globaltags(['online'])
     basf2.B2INFO('No GT is set in FileMetaData; GT automatically set to "online"')
 elif input_files[0].endswith('.root'):
     # Disable the GT replay also if no GT is set in FileMetaData
     metadata = basf2.get_file_metadata(input_files[0])
     if metadata.getDatabaseGlobalTag() == '':
         raw_data = True
-        basf2.conditions.override_globaltags(['klm_alignment_testing', 'online'])
+        basf2.conditions.override_globaltags(['online'])
         basf2.B2INFO('No GT is set in FileMetaData; GT automatically set to "online"')
 else:
     sys.exit('Please provide a valid list of .sroot or .root input files.')

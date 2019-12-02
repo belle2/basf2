@@ -9,8 +9,7 @@
 #######################################################
 
 import basf2 as b2
-from modularAnalysis import inputMdstList, \
-    skimOutputUdst, summaryOfLists
+import modularAnalysis as ma
 from stdCharged import stdE
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'

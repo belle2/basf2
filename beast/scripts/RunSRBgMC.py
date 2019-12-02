@@ -92,7 +92,7 @@ geometry.set_log_level(LogLevel.INFO)
 # simulation.param('PhysicsList', "QGSP_BERT_HP")
 simulation.param('PhysicsList', "QGSP_BERT_EMV")  # faster than QGSP_BERT_HP
 # simulation.param('PhysicsList', "FTFP_BERT_EMV")
-simulation.param('UICommands', ["/process/inactivate nKiller"])
+simulation.param('UICommandsAtIdle', ["/process/inactivate nKiller"])
 simulation.param("StoreAllSecondaries", True)
 simulation.param("SecondariesEnergyCut", 0.000001)  # in MeV   we need this for CDC EB neutron flux simulation
 

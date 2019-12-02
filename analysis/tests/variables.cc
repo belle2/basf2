@@ -3171,6 +3171,79 @@ namespace {
   }
 
 
+  TEST_F(MetaVariableTest, useAlternativeDaughterHypothesis)
+  {
+    const int nDaughters = 5;
+    StoreArray<Particle> particles;
+
+    // Build a first Particle
+    TLorentzVector momentum(0, 0, 0, 0);
+    std::vector<int> daughterIndices;
+    for (int i = 0; i < nDaughters; i++) {
+      double px =  i * 0.1;
+      double py =  i * 0.3;
+      double pz =  -i * 0.1 - 0.2;
+
+      TLorentzVector mom(px, py, pz, 1);
+      Particle d(mom, 211); // all pions as default
+      d.updateMass(211);
+      mom.SetXYZM(px, py, pz, d.getMass());
+
+      Particle* daughters = particles.appendNew(d);
+      daughterIndices.push_back(daughters->getArrayIndex());
+      momentum = momentum + mom;
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Flavored, daughterIndices);
+
+
+    // Build a second Particle with same momenta, but different mass hyp.
+    TLorentzVector momentumAlt(0, 0, 0, 0);
+    std::vector<int> daughterIndicesAlt;
+    for (int i = 0; i < nDaughters; i++) {
+      double px =  i * 0.1;
+      double py =  i * 0.3;
+      double pz =  -i * 0.1 - 0.2;
+
+      TLorentzVector mom(px, py, pz, 1);
+      int pdgCode = 211;
+      if (i == 0)
+        pdgCode = 2212; // a proton
+      if (i == 1)
+        pdgCode = -321; // a K-
+
+      Particle d(mom, pdgCode); // all pions as default
+      d.updateMass(pdgCode);
+      mom.SetXYZM(px, py, pz, d.getMass());
+
+      Particle* daughters = particles.appendNew(d);
+      daughterIndicesAlt.push_back(daughters->getArrayIndex());
+      momentumAlt = momentumAlt + mom;
+    }
+    const Particle* pAlt = particles.appendNew(momentumAlt, 411, Particle::c_Flavored, daughterIndicesAlt);
+
+
+    // Test the invariant mass under the alternative hypothesis
+    const Manager::Var* var = Manager::Instance().getVariable("useAlternativeDaughterHypothesis(M, 0:p+,1:K-)");
+    const Manager::Var* varAlt = Manager::Instance().getVariable("M");
+    EXPECT_FLOAT_EQ(var->function(p), varAlt->function(pAlt));
+
+    // check it's really charge-instensitive...
+    std::cout << "charge test" << std::endl;
+    var = Manager::Instance().getVariable("useAlternativeDaughterHypothesis(M, 0:p+,1:K+)");
+    varAlt = Manager::Instance().getVariable("M");
+    EXPECT_FLOAT_EQ(var->function(p), varAlt->function(pAlt));
+
+    // check the variable is not changing the 3-momentum
+    std::cout << "momentum test" << std::endl;
+    var = Manager::Instance().getVariable("useAlternativeDaughterHypothesis(p, 0:p+,1:K-)");
+    varAlt = Manager::Instance().getVariable("p");
+    EXPECT_FLOAT_EQ(var->function(p), varAlt->function(pAlt));
+    EXPECT_FLOAT_EQ(var->function(p), varAlt->function(p));
+    EXPECT_FLOAT_EQ(var->function(pAlt), varAlt->function(pAlt));
+  }
+
+
+
 
   TEST_F(MetaVariableTest, daughterAngleInBetween)
   {

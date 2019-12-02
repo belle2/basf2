@@ -16,7 +16,6 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLTrig.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
@@ -338,7 +337,7 @@ void ECLBhabhaTCollectorModule::collect()
   crystalMapper->initFromDB();
 
   // Set up a tool for determining the theta/phi of a crystal
-  // ECLGeometryPar* eclp = ECLGeometryPar::Instance();
+  ECLGeometryPar* eclp = ECLGeometryPar::Instance();
 
 
   //== Get expected energies and calibration constants from DB. Need to call
@@ -654,7 +653,6 @@ void ECLBhabhaTCollectorModule::collect()
 
   // Index of the cluster and the crystal that has the highest energy crystal for the two tracks
   int crysIDMax[2] = { -1, -1 };
-  int crysID2Max[2] = { -1, -1 };
   double crysEMax[2] = { -1, -1 };
   double crysE2Max[2] = { -1, -1 };
   int numClustersPerTrack[2] = { 0, 0 };
@@ -717,7 +715,6 @@ void ECLBhabhaTCollectorModule::collect()
             if (tempE > crysEMax[icharge]) {
               // Set 2nd highest E crystal to the info from the highest E crystal
               crysE2Max[icharge] = crysEMax[icharge];
-              crysID2Max[icharge] = crysIDMax[icharge];
               // Set the highest E crystal to the current crystal
               crysEMax[icharge] = tempE;
               crysIDMax[icharge] = tempCrysID;
@@ -725,7 +722,6 @@ void ECLBhabhaTCollectorModule::collect()
             // for the 2nd highest E crystal
             if (tempE > crysE2Max[icharge] && tempCrysID != crysIDMax[icharge]) {
               crysE2Max[icharge] = tempE;
-              crysID2Max[icharge] = tempCrysID;
             }
 
 
@@ -734,19 +730,12 @@ void ECLBhabhaTCollectorModule::collect()
             cid_ECLCaldigits_bothClusters.push_back(tempCrysID);
 
 
-            // Code to determine the phi and theta of the crystal.  But this is not working properly with the current
-            //    airflow script so it is being temporarily removed
-            /* "eclp->GetCrystalPos(...)" works when using Ewan's normal steering files but crashes
-                when the code is launched by the airflow.  */
-            phi_ECLCaldigits_bothClusters.push_back(-1000);
-            theta_ECLCaldigits_bothClusters.push_back(-1000);
-            /*
-                        TVector3 crystal3Vec = eclp->GetCrystalPos(calDigit->getCellId() - 1);
-                        phi_ECLCaldigits_bothClusters.push_back(crystal3Vec.Phi());
-                        theta_ECLCaldigits_bothClusters.push_back(crystal3Vec.Theta());
-                        B2DEBUG(30,  "calDigit(ir" << ir << "), calDigit->getCellId() =  " << calDigit->getCellId() << ", theta = " << crystal3Vec.Theta()
-                                << ", phi = " << crystal3Vec.Phi());
-            */
+            // Code to determine the phi and theta of the crystal.
+            TVector3 crystal3Vec = eclp->GetCrystalPos(calDigit->getCellId() - 1);
+            phi_ECLCaldigits_bothClusters.push_back(crystal3Vec.Phi());
+            theta_ECLCaldigits_bothClusters.push_back(crystal3Vec.Theta());
+            B2DEBUG(30,  "calDigit(ir" << ir << "), calDigit->getCellId() =  " << calDigit->getCellId() << ", theta = " << crystal3Vec.Theta()
+                    << ", phi = " << crystal3Vec.Phi());
 
             E_ECLCaldigits_bothClusters.push_back(tempE);
             amp_ECLDigits_bothClusters.push_back(ecl_dig->getAmp());
@@ -848,13 +837,7 @@ void ECLBhabhaTCollectorModule::collect()
 
 
     // For second most energetic energy crystal
-    int crystal_idx2 = crysID2Max[iCharge];
-    int eclCalDigit2Index = m_eclCalDigitID[crystal_idx2];
-    ECLCalDigit* ecl_cal2 = m_eclCalDigitArray[eclCalDigit2Index];
-    auto en2 = ecl_cal2->getEnergy();
-    crystalEnergies2[iCharge] = en2;
-
-
+    crystalEnergies2[iCharge] = crysE2Max[iCharge];
 
 
 //  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Tree saving
@@ -865,7 +848,7 @@ void ECLBhabhaTCollectorModule::collect()
     m_tree_amp      = ecl_dig->getAmp();
     m_tree_en       = en;
     m_tree_E1Etot   = en / trkEClustLab[iCharge];
-    m_tree_E1E2     = en / en2;
+    m_tree_E1E2     = en / crystalEnergies2[iCharge];
     m_tree_E1p      = en / trkpLab[iCharge];
     m_tree_timetsPreviousTimeCalibs = time - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge];
     m_tree_timeF    = ecl_dig->getTimeFit() * TICKS_TO_NS;

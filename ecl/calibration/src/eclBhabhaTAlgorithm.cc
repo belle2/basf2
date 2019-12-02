@@ -2,6 +2,7 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <ecl/utility/ECLChannelMapper.h>
 
 #include "TH2F.h"
 #include "TFile.h"
@@ -64,17 +65,16 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   /**-----------------------------------------------------------------------------------------------*/
 
-
-  crystalMapper = new  ECL::ECLChannelMapper();
-  string pathString = getenv("BELLE2_LOCAL_DIR");
-  pathString += "/ecl/data/ecl_channels_map.txt";
-  crystalMapper->initFromFile(pathString.c_str());
-
+  // Make tool for mapping ecl crystal to other ecl objects
+  //    e.g. crates, shapers, etc.
+  unique_ptr<ECLChannelMapper> crystalMapper(new ECL::ECLChannelMapper());
+  crystalMapper->initFromDB();
 
 
   TFile* histfile = 0;
-  TTree* tree_crystal = 0;
-  TTree* tree_crate = 0;
+  unique_ptr<TTree> tree_crystal(new TTree("tree_crystal", "Debug data from bhabha time calibration algorithm for crystals"));
+
+  unique_ptr<TTree>   tree_crate(new TTree("tree_crate",   "Debug data from bhabha time calibration algorithm for crates"));
   int tree_cid;
 
   // Vector of time offsets to be saved in the database.
@@ -152,7 +152,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
 
   if (debugOutput) {
-    tree_crystal = new TTree("tree_crystal", "Debug data from bhabha time calibration algorithm for crystals");
     tree_crystal->Branch("cid", &tree_cid)->SetTitle("Cell ID, 1..8736");
     tree_crystal->Branch("ts", &mean)->SetTitle("Time offset mean, ts, ns");
     tree_crystal->Branch("tsUnc", &mean_unc)->SetTitle("Error of time ts mean, ns.");
@@ -303,9 +302,9 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     gaus->SetParameter(1, mean);
     gaus->SetParameter(2, sigma);
     // L -- Use log likelihood method
-    // I -- Use integral of function in bin instead of value at bin center
-    // R -- Use the range specified in the function range     // DON'T USE ANYMORE !
-    // B -- Fix one or more parameters with predefined function   /// DON'T USE ANYMORE !
+    // I -- Use integral of function in bin instead of value at bin center  // not using
+    // R -- Use the range specified in the function range
+    // B -- Fix one or more parameters with predefined function   // not using
     // Q -- Quiet mode
 
     h_timeMasked->Fit(gaus, "LQR");  // L for likelihood, R for x-range, Q for fit quiet mode
@@ -393,11 +392,17 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   ECLCrystalCalib* BhabhaTCalib = new ECLCrystalCalib();
   BhabhaTCalib->setCalibVector(t_offsets, t_offsets_unc);
-  saveCalibration(BhabhaTCalib, "ECLCrystalTimeOffset");
 
 
-  B2DEBUG(30, "end of crystal start of crate corrections ..... for now");
+  // Save the information to the payload if there is at least one crystal
+  //    begin calibrated.
+  if (cellIDLo <= cellIDHi) {
+    saveCalibration(BhabhaTCalib, "ECLCrystalTimeOffset");
+    B2DEBUG(30, "crystal payload made");
+  }
 
+
+  B2DEBUG(30, "end of crystal start of crate corrections .....");
 
 
   /* CRATE CORRECTIONS */
@@ -592,7 +597,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   }
 
 
-
   for (int crys_id = 1; crys_id <= 8736; crys_id++) {
 
     int crate_id_from_crystal = crystalMapper->getCrateID(crys_id);
@@ -611,13 +615,12 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   BhabhaTCrateCalib->setCalibVector(t_offsets_crate, t_offsets_crate_unc);
 
 
-
-  // While trying to run a lot of runs, use this other funny name so that I can run all the talgs in parallel and then rename the payloads later.
-  // For proper running suquentially, use the first version
-  saveCalibration(BhabhaTCrateCalib, "ECLCrateTimeOffset");   // sequential
-
-  B2DEBUG(30, "crate payload made");
-
+  // Save the information to the payload if there is at least one crate
+  //    begin calibrated.
+  if (crateIDLo <= crateIDHi) {
+    saveCalibration(BhabhaTCrateCalib, "ECLCrateTimeOffset");
+    B2DEBUG(30, "crate payload made");
+  }
 
 
   int tree_crateid;
@@ -627,7 +630,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   double tree_tcrate_sigma;
   double tree_tcrate_meanPrev;
 
-  tree_crate = new TTree("tree_crate", "Debug data from bhabha time calibration algorithm for crates");
   tree_crate->Branch("runNum", &tree_runNum)->SetTitle("Run number, 0..infinity and beyond!");
   tree_crate->Branch("crateid", &tree_crateid)->SetTitle("Crate id, 1..52");
   tree_crate->Branch("tcrate", &tree_tcrate_mean)->SetTitle("Crate time offset mean, tcrate, ns");
@@ -655,12 +657,12 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     }
   }
 
+  B2DEBUG(30, "end of crate corrections .....");
+
   tree_crystal->Write();
   tree_crate->Write();
 
   histfile->Close();
-
-  delete crystalMapper;
 
   tree_crystal = 0;
   tree_crate = 0;

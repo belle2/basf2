@@ -85,6 +85,8 @@ def get_calibrations(input_data, **kwargs):
     root_input = register_module('RootInput')
     rec_path_bhabha = create_path()
     rec_path_bhabha.add_module(root_input)
+    rec_path_bhabha.add_module('Gearbox')
+    rec_path_bhabha.add_module('Geometry', useDB=True)
 
     col_bhabha = register_module('ECLBhabhaTCollector')
     col_bhabha.param('timeAbsMax', 250)

@@ -14,7 +14,6 @@
 #pragma once
 #include <ecl/calibration/eclBhabhaTAlgorithm.h>
 #include <calibration/CalibrationAlgorithm.h>
-#include <ecl/utility/ECLChannelMapper.h>
 #include <string>
 
 
@@ -45,9 +44,6 @@ namespace Belle2 {
       /** Name of file with debug output, eclBhabhaTAlgorithm.root by default */
       std::string debugFilenameBase;
       std::string collectorName;  /**< Name of the collector */
-
-      ECLChannelMapper* crystalMapper;  /**< Tool for mapping ecl crystal to other ecl objects
-                                             eg, crates, shapers, etc.*/
 
     protected:
 

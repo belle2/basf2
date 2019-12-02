@@ -18,7 +18,7 @@ skimCode = expert.encodeSkimName('feiSLB0')
 
 fileList = expert.get_test_file("mixedBGx1", "MC12")
 
-path = create_path()
+path = b2.create_path()
 
 ma.inputMdstList('default', fileList, path=path)
 

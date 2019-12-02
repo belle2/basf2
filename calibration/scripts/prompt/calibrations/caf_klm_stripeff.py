@@ -114,7 +114,8 @@ def get_calibrations(input_data, **kwargs):
 
     if input_files_physics:
         coll_physics = get_collector("raw_physics")
-        rec_path_physics = get_physics_pre_collector_path(entry_sequence="0:10")
+        rec_path_physics = get_physics_pre_collector_path(entry_sequence="0:1000")
+#        rec_path_physics = get_physics_pre_collector_path()
 
         collection_physics = Collection(collector=coll_physics,
                                         input_files=input_files_physics,
@@ -124,7 +125,8 @@ def get_calibrations(input_data, **kwargs):
 
     if input_files_cosmic:
         coll_cosmic = get_collector("raw_cosmic")
-        rec_path_cosmic = get_cosmic_pre_collector_path(entry_sequence="0:10")
+        rec_path_cosmic = get_cosmic_pre_collector_path(entry_sequence="0:1000")
+#        rec_path_cosmic = get_cosmic_pre_collector_path()
 
         collection_cosmic = Collection(collector=coll_cosmic,
                                        input_files=input_files_cosmic,

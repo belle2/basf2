@@ -8,9 +8,10 @@ from rawdata import add_unpackers
 from reconstruction import add_cosmics_reconstruction, add_reconstruction
 import modularAnalysis as ma
 
-from caf.strategies import AlgorithmStrategy
 from caf.utils import IoV, AlgResult
 from caf.utils import runs_overlapping_iov, runs_from_vector
+from caf.strategies import AlgorithmStrategy
+from caf.state_machines import AlgorithmMachine
 
 
 class KLMStripEfficiency(AlgorithmStrategy):
@@ -39,7 +40,7 @@ class KLMStripEfficiency(AlgorithmStrategy):
             raise StrategyError("This AlgorithmStrategy was not set up correctly!")
         self.queue = queue
 
-        B2INFO("Setting up {} strategy for {}".format(self.__class__.__name__, self.algorithm.name))
+        basf2.B2INFO(f"Setting up {self.__class__.__name__} strategy for {self.algorithm.name}")
         # Now add all the necessary parameters for a strategy to run
         machine_params = {}
         machine_params["database_chain"] = self.database_chain
@@ -50,10 +51,12 @@ class KLMStripEfficiency(AlgorithmStrategy):
         machine_params["ignored_runs"] = self.ignored_runs
         self.machine.setup_from_dict(machine_params)
         # Start moving through machine states
-        B2INFO("Starting AlgorithmMachine of {}".format(self.algorithm.name))
+        basf2.B2INFO(f"Starting AlgorithmMachine of {self.algorithm.name}")
+        # This sets up the logging and database chain, plus it assigns all input files from collector jobs.
+        # Note that we simply assign all input files, and use the execute(runs) to define which data to use.
         self.machine.setup_algorithm(iteration=iteration)
         # After this point, the logging is in the stdout of the algorithm
-        B2INFO("Beginning execution of {} using strategy {}".format(self.algorithm.name, self.__class__.__name__))
+        basf2.B2INFO(f"Beginning execution of {self.algorithm.name} using strategy {self.__class__.__name__}")
 
         all_runs_collected = set(runs_from_vector(self.algorithm.algorithm.getRunListFromAllData()))
         # If we were given a specific IoV to calibrate we just execute all runs in that IoV at once
@@ -64,29 +67,53 @@ class KLMStripEfficiency(AlgorithmStrategy):
 
         # Remove the ignored runs from our run list to execute
         if self.ignored_runs:
-            B2INFO("Removing the ignored_runs from the runs to execute for {}".format(self.algorithm.name))
+            basf2.B2INFO(f"Removing the ignored_runs from the runs to execute for {self.algorithm.name}")
             runs_to_execute.difference_update(set(self.ignored_runs))
         # Sets aren't ordered so lets go back to lists and sort
         runs_to_execute = sorted(runs_to_execute)
+
         apply_iov = None
         if "apply_iov" in self.algorithm.params:
             apply_iov = self.algorithm.params["apply_iov"]
-        self.machine.execute_runs(runs=runs_to_execute, iteration=iteration, apply_iov=apply_iov)
-        B2INFO("Finished execution with result code {}".format(self.machine.result.result))
 
-        # Send out the result to the runner
+        # apply_iov forces the execute_runs() function to use this IoV as the value for saveCalibration()
+        self.machine.execute_runs(runs=runs_to_execute, iteration=iteration, apply_iov=apply_iov)
+        basf2.B2INFO(f"Finished execution with result code {self.machine.result.result}")
+
+        # At this point you can test the result code and decide if you want to actually commit payloads using
+        #
+        # self.machine.result
+        #
+        # If you want to save the payloads for later and commit them use:
+        #
+        # payloads = self.machine.algorithm.algorithm.getPayloadValues()
+        #
+        # and then to commit them to localdb later:
+        #
+        # self.machine.algorithm.algorithm.commit(payloads)
+        #
+        # To execute again, just complete or fail: and do setup again. This will NOT re-run the loggin setup etc.
+        #
+        # self.machine.complete()
+        # self.machine.setup_algorithm()
+        # self.machine.execute_runs(runs=runs_to_execute, iteration=iteration, apply_iov=apply_iov)
+
+        # Whenever you have a final result that can't be changed e.g. a success you committed, or a failure you can't
+        # force past or merge runs to avoid. You should send that result out.
         self.send_result(self.machine.result)
 
-        # Make sure the algorithm state and commit is done
+        # Check the result and commit
         if (self.machine.result.result == AlgResult.ok.value) or (self.machine.result.result == AlgResult.iterate.value):
             # Valid exit codes mean we can complete properly
             self.machine.complete()
-            # Commit all the payloads and send out the results
+            # Commit all the current payloads (didn't bother saving them for later)
             self.machine.algorithm.algorithm.commit()
+            # Tell the controlling process that we are done and whether the overall algorithm process managed to succeed
             self.send_final_state(self.COMPLETED)
         else:
             # Either there wasn't enough data or the algorithm failed
             self.machine.fail()
+            # Tell the controlling process that we are done and whether the overall algorithm process managed to succeed
             self.send_final_state(self.FAILED)
 
 

@@ -138,6 +138,14 @@ namespace Belle2 {
     }
 
     /**
+     * Get total number of ExtHits.
+     */
+    int getExtHits() const
+    {
+      return m_ExtHits;
+    }
+
+    /**
      * Get number of ExtHits per plane.
      */
     int* getExtHitsPlane() const
@@ -182,6 +190,9 @@ namespace Belle2 {
 
     /** Efiiciency. */
     float* m_Efficiency;
+
+    /** Number of ExtHits. */
+    int m_ExtHits;
 
     /** Number of ExtHits per plane. */
     int* m_ExtHitsPlane;

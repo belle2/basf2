@@ -49,6 +49,7 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
   m_MatchedDigits = matchedDigitsInPlane->Integral();
   std::shared_ptr<TH1F> allExtHitsInPlane;
   allExtHitsInPlane = getObjectPtr<TH1F>("allExtHitsInPlane");
+  m_ExtHits = allExtHitsInPlane->Integral();
   matchedDigitsInPlane.get()->Sumw2();
   allExtHitsInPlane.get()->Sumw2();
   efficiencyHistogram->Divide(matchedDigitsInPlane.get(), allExtHitsInPlane.get(), 1, 1, "B");

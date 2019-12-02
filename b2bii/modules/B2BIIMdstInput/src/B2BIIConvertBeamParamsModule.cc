@@ -183,8 +183,8 @@ namespace Belle2 {
       beamspotList.emplace_back(beamSpot);
 
       if (!beamparams) {
-        beamparams = std::make_unique<EventDependency>(&beamparamsList.back());
-        beamspots = std::make_unique<EventDependency>(&beamspotList.back());
+        beamparams = std::make_unique<EventDependency>(&beamparamsList.back(), false);
+        beamspots = std::make_unique<EventDependency>(&beamspotList.back(), false);
       } else {
         beamparams->add(evtNr, &beamparamsList.back());
         beamspots->add(evtNr, &beamspotList.back());

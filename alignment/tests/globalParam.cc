@@ -1,6 +1,5 @@
 
 #include <alignment/dbobjects/VXDAlignment.h>
-#include <alignment/dbobjects/BKLMAlignment.h>
 #include <alignment/GlobalParam.h>
 #include <alignment/Manager.h>
 #include <cdc/dbobjects/CDCTimeZeros.h>
@@ -8,6 +7,7 @@
 #include <cdc/dbobjects/CDCAlignment.h>
 #include <cdc/dbobjects/CDCXtRelations.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <klm/bklm/dbobjects/BKLMAlignment.h>
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
 
 #include <gtest/gtest.h>

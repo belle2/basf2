@@ -134,7 +134,7 @@ void CDCCalibrationCollectorModule::collect()
   const int nTr = recoTracks.getEntries();
   const int nHits = cdcHits.getEntries();
   const int nWires = 14336;
-  float oc = static_cast<float>(nHits / nWires);
+  float oc = static_cast<float>(nHits) / static_cast<float>(nWires);
   int nCTracks  = 0;
 
   getObjectPtr<TH1F>("hOccupancy")->Fill(oc);

@@ -87,6 +87,18 @@ namespace Belle2 {
     void useEKLMSegments(bool useSegments = true);
 
     /**
+     * Set KLM module.
+     * @param[in] module Module.
+     */
+    void setKLMModule(uint16_t module);
+
+    /**
+     * Set EKLM segment.
+     * @param[in] segment Segment.
+     */
+    void setEKLMSegment(int segment);
+
+    /**
      * Get subdetector.
      */
     int getSubdetector() const
@@ -138,6 +150,11 @@ namespace Belle2 {
      * Get KLM channel number.
      */
     uint16_t getKLMChannelNumber() const;
+
+    /**
+     * Get KLM plane number.
+     */
+    uint16_t getKLMPlaneNumber() const;
 
     /**
      * Get KLM module number.

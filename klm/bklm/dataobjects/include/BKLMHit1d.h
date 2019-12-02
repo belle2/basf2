@@ -75,7 +75,7 @@ namespace Belle2 {
 
     //! Get plane number.
     //! @return Plane number (0=z, 1=phi).
-    bool getPlane() const
+    int getPlane() const
     {
       return BKLMElementNumbers::getPlaneByModule(m_ModuleID);
     }

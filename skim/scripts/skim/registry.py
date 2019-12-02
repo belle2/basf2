@@ -103,12 +103,15 @@ combined_skims = {
         'feiSLB0', 'feiSLBplus'
     ],
     'MiscCombined': [
-        'TCPV', 'TauLFV', 'TauThrust', 'TauGeneric'
+        'TCPV'
     ],
     'Quarkonium': [
         'ISRpipicc', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon'
     ],
     'Semileptonic': [
         'PRsemileptonicUntagged', 'LeptonicUntagged', 'SLUntagged'
+    ],
+    'TauCombined': [
+        'TauLFV', 'TauThrust', 'TauGeneric'
     ]
 }

@@ -10,11 +10,11 @@
 #
 #######################################################
 
-from basf2 import process, statistics, Path, set_log_level, LogLevel
+import basf2 as b2
 from modularAnalysis import inputMdstList, skimOutputUdst, summaryOfLists
 from stdCharged import stdMu
 import skimExpertFunctions as expert
-b2.set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'
 
 # create a path to build skim lists

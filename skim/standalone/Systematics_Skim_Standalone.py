@@ -12,7 +12,7 @@ from stdCharged import stdE, stdK, stdMu, stdPi
 
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
-b2.set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 skimpath = b2.Path()
 

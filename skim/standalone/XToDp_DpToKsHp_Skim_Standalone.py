@@ -14,7 +14,7 @@ from stdCharged import stdK, stdPi
 from stdV0s import mergedKshorts
 import skimExpertFunctions as expert
 
-b2.set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 gb2_setuprel = 'release-04-00-00'
 

@@ -15,7 +15,7 @@ from stdCharged import stdE, stdK, stdMu, stdPi
 from stdV0s import stdKshorts
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
-b2.set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 skimCode = expert.encodeSkimName('DstToD0Pi_D0ToHpJmEta')
 
 c3bh3path = b2.Path()

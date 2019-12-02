@@ -8,7 +8,7 @@
 #
 #######################################################
 
-from basf2 import process, statistics, Path
+import basf2 as b2
 from modularAnalysis import inputMdstList, \
     skimOutputUdst, summaryOfLists
 from stdCharged import stdE

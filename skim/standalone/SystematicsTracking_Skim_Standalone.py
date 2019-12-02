@@ -13,7 +13,7 @@ import modularAnalysis as ma
 from stdCharged import stdK, stdPi
 from stdPi0s import stdPi0s
 import skimExpertFunctions as expert
-b2.set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'
 
 import sys

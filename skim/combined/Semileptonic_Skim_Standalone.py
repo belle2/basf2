@@ -16,7 +16,7 @@ from stdV0s import stdKshorts
 from skim.standardlists.charm import loadStdD0, loadStdDplus, loadStdDStar0, loadStdDstarPlus
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
-b2.set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 fileList = expert.get_test_file("mixedBGx1", "MC12")
 SLskimpath = b2.Path()
 

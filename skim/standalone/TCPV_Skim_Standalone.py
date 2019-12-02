@@ -22,7 +22,7 @@ from skim.standardlists.lightmesons import loadStdLightMesons
 from skim.standardlists.dileptons import loadStdDiLeptons
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
-b2.set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 
 skimCode = expert.encodeSkimName('TCPV')

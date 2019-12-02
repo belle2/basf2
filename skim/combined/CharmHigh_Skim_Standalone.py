@@ -19,7 +19,7 @@ import skimExpertFunctions as expert
 
 
 gb2_setuprel = 'release-03-02-02'
-b2.set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 charmpath = b2.Path()
 fileList = [

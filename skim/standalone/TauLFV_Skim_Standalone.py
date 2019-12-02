@@ -15,7 +15,7 @@ from skim.standardlists.lightmesons import loadStdLightMesons
 from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
 import skimExpertFunctions as expert
-b2.set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'
 
 skimCode = expert.encodeSkimName('TauLFV')

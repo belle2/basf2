@@ -12,6 +12,12 @@
 
 #include <calibration/CalibrationAlgorithm.h>
 
+#include <svd/dataobjects/SVDHistograms.h>
+#include <framework/core/Module.h>
+#include <vxd/dataobjects/VxdID.h>
+#include <vxd/geometry/GeoCache.h>
+#include <svd/geometry/SensorInfo.h>
+
 namespace Belle2 {
   /**
    * Class implementing SVDCoGTimeCalibration calibration algorithm
@@ -25,6 +31,12 @@ namespace Belle2 {
     /// Destructor
     virtual ~SVDCoGTimeCalibrationAlgorithm() {}
 
+    /// Set the minimum entries required in the histograms
+    void setMinEntries(int minEntries) {m_minEntries = minEntries;}
+
+    /// Get the minimum entries required in the histograms
+    int getMinEntries() {return m_minEntries;}
+
   protected:
 
     /// Run algo on data
@@ -32,8 +44,8 @@ namespace Belle2 {
 
   private:
 
-    std::string m_id;
-
+    std::string m_id; /*< Parameter given to set the UniqueID of the payload*/
+    float m_minEntries = 10000; /*< Set the minimun number of entries required in the histograms of layer 3*/
   };
 } // namespace Belle2
 

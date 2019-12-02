@@ -9,7 +9,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <svd/modules/svdCoGTimeCalibrationCollector/SVDCoGTimeCalibrationCollectorModule.h>
-
 #include <TH2F.h>
 
 using namespace std;
@@ -28,42 +27,57 @@ SVDCoGTimeCalibrationCollectorModule::SVDCoGTimeCalibrationCollectorModule() : C
 {
   //Set module properties
 
-  setDescription(" ");
+  setDescription("Collector used for the calibration of the SVD timing estimator (CoG)");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("SVDClustersFromTracksName", m_svdClusters, "Name of the SVDClusters list", std::string("SVDClustersFromTracks"));
   addParam("SVDRecoDigitsFromTracksName", m_svdRecoDigits, "Name of the SVDRecoDigits list", std::string("SVDRecoDigitsFromTracks"));
   addParam("EventT0Name", m_eventTime, "Name of the EventT0 list", std::string("EventT0"));
-  addParam("HistogramTree", m_tree, "Name of the tree in which the histograms are saved", std::string("tree"));
 }
 
 void SVDCoGTimeCalibrationCollectorModule::prepare()
 {
   TH2F hEventT0vsCoG("eventT0vsCoG__L@layerL@ladderS@sensor@view",
                      "EventT0Sync vs rawCoG in @layer.@ladder.@sensor @view/@side",
-                     300, -150, 150, 300, -150, 150);
+                     100, -100, 100, 100, -100, 100);
   hEventT0vsCoG.GetYaxis()->SetTitle("EventT0Sync (ns)");
   hEventT0vsCoG.GetXaxis()->SetTitle("raw_cog (ns)");
   m_hEventT0vsCoG = new SVDHistograms<TH2F>(hEventT0vsCoG);
 
-  m_hEventT0 = new TH1F("hEventT0", "EventT0Sync", 200, -100, 100);
+  TH1F hEventT0("eventT0__L@layerL@ladderS@sensor@view",
+                "EventT0Sync in @layer.@ladder.@sensor @view/@side",
+                100, -100, 100);
+  hEventT0.GetXaxis()->SetTitle("event_t0 (ns)");
+  m_hEventT0 = new SVDHistograms<TH1F>(hEventT0);
 
-  m_histogramTree = new TTree("tree", "tree");
+  TH1F hEventT0NoSync("eventT0nosync__L@layerL@ladderS@sensor@view",
+                      "EventT0NoSync in @layer.@ladder.@sensor @view/@side",
+                      100, -100, 100);
+  hEventT0NoSync.GetXaxis()->SetTitle("event_t0 (ns)");
+  m_hEventT0nosync = new SVDHistograms<TH1F>(hEventT0NoSync);
+
   m_svdCls.isRequired(m_svdClusters);
   m_eventT0.isRequired(m_eventTime);
   m_svdRD.isRequired(m_svdRecoDigits);
 
-  m_histogramTree->Branch("hist", "TH2F", &m_hist, 32000, 0);
-  m_histogramTree->Branch("layer", &m_layer, "layer/I");
-  m_histogramTree->Branch("ladder", &m_ladder, "ladder/I");
-  m_histogramTree->Branch("sensor", &m_sensor, "sensor/I");
-  m_histogramTree->Branch("view", &m_side, "view/I");
-  registerObject<TTree>("HTreeCoGTimeCalib", m_histogramTree);
-  registerObject<TH1F>("hEventT0", m_hEventT0);
+  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
+
+  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
+    for (auto ladder : geoCache.getLadders(layer)) {
+      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
+        for (int view = SVDHistograms<TH2F>::VIndex ; view < SVDHistograms<TH2F>::UIndex + 1; view++) {
+          registerObject<TH2F>(m_hEventT0vsCoG->getHistogram(sensor, view)->GetName(), m_hEventT0vsCoG->getHistogram(sensor, view));
+          registerObject<TH1F>(m_hEventT0->getHistogram(sensor, view)->GetName(), m_hEventT0->getHistogram(sensor, view));
+          registerObject<TH1F>(m_hEventT0nosync->getHistogram(sensor, view)->GetName(), m_hEventT0nosync->getHistogram(sensor, view));
+        }
+      }
+    }
+  }
 }
 
 void SVDCoGTimeCalibrationCollectorModule::startRun()
 {
+
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
   for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
@@ -74,43 +88,22 @@ void SVDCoGTimeCalibrationCollectorModule::startRun()
           // std::string v = std::to_string(view);
           // std::string name = string("eventT0vsCog_")+s+string("_")+v;
           // registerObject<TH2F>(name.c_str(),m_hEventT0vsCoG->getHistogram(sensor, view));
-          (m_hEventT0vsCoG->getHistogram(sensor, view))->Reset();
-        }
-      }
-    }
-  }
-  m_hEventT0->Reset();
-}
-
-
-void SVDCoGTimeCalibrationCollectorModule::closeRun()
-{
-  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
-
-  //getObjectPtr<TH2F>("hEventT0")->Fill(1,1);
-
-  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
-    for (auto ladder : geoCache.getLadders(layer)) {
-      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
-        for (int view = SVDHistograms<TH2F>::VIndex ; view < SVDHistograms<TH2F>::UIndex + 1; view++) {
-          m_hist = m_hEventT0vsCoG->getHistogram(sensor, view);
-          m_layer = layer.getLayerNumber();
-          m_ladder = ladder.getLadderNumber();
-          m_sensor = sensor.getSensorNumber();
-          m_side = view;
-          getObjectPtr<TTree>("HTreeCoGTimeCalib")->Fill();
+          getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(sensor, view)->GetName())->Reset();
+          getObjectPtr<TH1F>(m_hEventT0->getHistogram(sensor, view)->GetName())->Reset();
+          getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(sensor, view)->GetName())->Reset();
         }
       }
     }
   }
 }
 
-void SVDCoGTimeCalibrationCollectorModule::finish()
-{
-}
 
 void SVDCoGTimeCalibrationCollectorModule::collect()
 {
+  if (!m_svdCls.isValid()) {
+    B2WARNING("!!!! File is not Valid: isValid() = " << m_svdCls.isValid());
+    return;
+  }
   for (int cl = 0 ; cl < m_svdCls.getEntries(); cl++) {
     SVDCluster* cluster = m_svdCls[cl];
     RelationVector<SVDRecoDigit> reco_rel_cluster = cluster->getRelationsTo<SVDRecoDigit>(m_svdRecoDigits);
@@ -121,8 +114,9 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
       float eventT0 = m_eventT0->getEventT0();
       float TB = (reco_rel_cluster[0]->getModeByte()).getTriggerBin();
       float eventT0Sync = eventT0 - 7.8625 * (3 - TB);
-      m_hEventT0vsCoG->fill(theVxdID, side, clTime, eventT0Sync);
-      getObjectPtr<TH1F>("hEventT0")->Fill(eventT0Sync);
+      getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(theVxdID, side)->GetName())->Fill(clTime, eventT0Sync);
+      getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);
+      getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(theVxdID, side)->GetName())->Fill(eventT0);
     }
   };
 }

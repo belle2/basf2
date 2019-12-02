@@ -42,35 +42,13 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   auto timeCal = new Belle2::SVDCoGCalibrationFunction();
   auto payload = new Belle2::SVDCoGTimeCalibrations::t_payload(*timeCal, m_id);
 
-  TF1* pol3 = new TF1("pol3", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -50, 50);
+  TF1* pol3 = new TF1("pol3", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -50, 80);
   pol3->SetParameters(-40, 0.5, 0.05, 0.0005);
   TF1* pol5 = new TF1("pol5", "[0] + [1]*x + [2]*x*x + [3]*x*x*x + [4]*x*x*x*x + [5]*x*x*x*x*x", -100, 100);
   pol5->SetParameters(-50, 1.5, 0.01, 0.0001, 0.00001, 0.000001);
 
-  TH1F* par0U = new TH1F("par0U", " ", 100, -50, 0);
-  TH1F* par1U = new TH1F("par1U", " ", 100, -2, 2);
-  TH1F* par2U = new TH1F("par2U", " ", 100, -0.5, 0.5);
-  TH1F* par3U = new TH1F("par3U", " ", 100, -0.01, 0.01);
-
-  TH1F* par0V = new TH1F("par0V", " ", 100, -50, 50);
-  TH1F* par1V = new TH1F("par1V", " ", 100, -10, 10);
-  TH1F* par2V = new TH1F("par2V", " ", 150, -0.5, 1);
-  TH1F* par3V = new TH1F("par3V", " ", 100, -0.02, 0.01);
-  /*
-  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
-
-  cout << "STARTING GEOMETRY CICLE" << endl;
-
-  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
-    layer_num =  layer.getLayerNumber();
-    cout << layer_num << endl;
-    for (auto ladder : geoCache.getLadders(layer)) {
-      ladder_num = ladder.getLadderNumber();
-      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
-        sensor_num = sensor.getSensorNumber();
-        for (int view = SVDHistograms<TH2F>::VIndex ; view < SVDHistograms<TH2F>::UIndex + 1; view++) {*/
-
   TFile* f = new TFile("algorithm_output.root", "RECREATE");
+
   for (int layer = 0; layer < 4; layer++) {
     layer_num = layer + 3;
     for (int ladder = 0; ladder < (int)ladderOfLayer[layer]; ladder++) {
@@ -112,17 +90,6 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           timeCal->set_current(1);
           // timeCal->set_current(2);
           timeCal->set_pol3parameters(par[0], par[1], par[2], par[3]);
-          if (view == 1) {
-            par0U->Fill(par[0]);
-            par1U->Fill(par[1]);
-            par2U->Fill(par[2]);
-            par3U->Fill(par[3]);
-          } else {
-            par0V->Fill(par[0]);
-            par1V->Fill(par[1]);
-            par2V->Fill(par[2]);
-            par3V->Fill(par[3]);
-          }
           payload->set(layer_num, ladder_num, sensor_num, bool(view), 1, *timeCal);
           f->cd();
           hEventT0->Write();
@@ -134,24 +101,8 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
       }
     }
   }
-  // par0U->Write();
-  // par1U->Write();
-  // par2U->Write();
-  // par3U->Write();
-  // par0V->Write();
-  // par1V->Write();
-  // par2V->Write();
-  // par3V->Write();
   f->Close();
   saveCalibration(payload, "SVDCoGTimeCalibrations");
-  // delete par0U;
-  // delete par1U;
-  // delete par2U;
-  // delete par3U;
-  // delete par0V;
-  // delete par1V;
-  // delete par2V;
-  // delete par3V;
 
   // probably not needed - would trigger re-doing the collection
   // if ( ... too large corrections ... ) return c_Iterate;
@@ -163,28 +114,18 @@ bool SVDCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRu
 {
   auto eventT0Hist = getObjectPtr<TH1F>("hEventT0FromCDST");
   float meanEventT0 = eventT0Hist->GetMean();
-  // if (!m_previousEventT0Exists) {
   if (!m_previousEventT0) {
     B2INFO("Setting start payload boundary to be the first run ("
            << currentRun.first << "," << currentRun.second << ")");
-    // m_previousEventT0 = meanEventT0;
-    // m_previousEventT0Exists = true;
     m_previousEventT0.emplace(meanEventT0);
     return true;
-  } // else if ((meanEventT0 - m_previousEventT0) > m_allowedT0Shift) {
-  // B2INFO("Event T0 mean has shifted. We are requesting a new payload boundary for ("
-  //       << currentRun.first << "," << currentRun.second << ")");
-  // m_previousEventT0 = meanEventT0;
-  else if (abs(meanEventT0 - m_previousEventT0.value()) > m_allowedT0Shift) {
+  } else if (abs(meanEventT0 - m_previousEventT0.value()) > m_allowedT0Shift) {
     B2INFO("Histogram mean has shifted from " << m_previousEventT0.value()
            << " to " << meanEventT0 << ". We are requesting a new payload boundary for ("
            << currentRun.first << "," << currentRun.second << ")");
     m_previousEventT0.emplace(meanEventT0);
     return true;
   } else {
-    // We don't update the previous event T0 here deliberately. If we updated it we could slowly shift away from the
-    // last T0 that was used to initiate a boundary. We want to compare against that T0, not the last run to prevent
-    // a cumulative (slow) shifting preventing boundaries being found.
     return false;
   }
 }

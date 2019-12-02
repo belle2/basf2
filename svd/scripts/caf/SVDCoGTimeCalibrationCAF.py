@@ -80,8 +80,6 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
 
     path = remove_module(path, 'SVDMissingAPVsClusterCreator')
 
-    # output_iov = IoV(8, 0, 8, -1)
-
     # collector setup
     collector = register_module('SVDCoGTimeCalibrationCollector')
     collector.param("SVDClustersFromTracksName", "SVDClustersFromTracks")
@@ -105,14 +103,7 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
                               backend_args=None
                               )
 
-    # calibration.pre_algorithms = pre_alg
     calibration.strategies = strategies.SequentialBoundaries
-    # calibration.strategies = strategies.SingleIOV
-
-    # calibration.algorithms[0].params["iov_coverage"] = IoV(0, 0, -1, -1)
-
-    # for algorithm in calibration.algorithms:
-    #     algorithm.params = {"apply_iov": output_iov}
 
     return calibration
 
@@ -162,17 +153,9 @@ if __name__ == "__main__":
     print("")
     print(str(uniqueID))
     print("")
-    # 'data_reprocessing_prompt_rel4_patch'
     svdCoGCAF = SVDCoGTimeCalibration(good_input_files, ['data_reprocessing_prompt_rel4_patchb', 'svd_NOCoGCorrections'], uniqueID)
 
     cal_fw = CAF()
     cal_fw.add_calibration(svdCoGCAF)
     cal_fw.backend = backends.LSF()
-    # caf_fw.output_dir = 'calibration'
-    # Try to guess if we are at KEKCC and change the backend to Local if not
-#    if multiprocessing.cpu_count() < 10:
-#        cal_fw.backend = backends.Local(8)
-
-    # iov_to_calibrate = IoV(exp_low=8, run_low=0, exp_high=8, run_high=-1)
-    # cal_fw.run(iov=iov_to_calibrate)
     cal_fw.run()

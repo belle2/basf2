@@ -64,7 +64,7 @@ namespace Belle2 {
     std::string m_id; /*< Parameter given to set the UniqueID of the payload*/
     std::optional<float> m_previousEventT0; /*< EventT0 of the previous run*/
     float m_allowedT0Shift = 2.; /*< Allowed EventT0 shift*/
-    float m_minEntries = 15000; /*< Set the minimun number of entries required in the histograms of layer 3*/
+    float m_minEntries = 10000; /*< Set the minimun number of entries required in the histograms of layer 3*/
   };
 } // namespace Belle2
 

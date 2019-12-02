@@ -57,6 +57,29 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
     m_ExtHitsPlane[i] = allExtHitsInPlane->GetBinContent(i + 1);
   }
   bool notEnoughData = false;
+  KLMChannelIndex klmPlanes(KLMChannelIndex::c_IndexLevelPlane);
+  for (KLMChannelIndex& klmPlane : klmPlanes) {
+    uint16_t plane = klmPlane.getKLMPlaneNumber();
+    uint16_t planeIndex = m_PlaneArrayIndex->getIndex(plane);
+    int extHits = allExtHitsInPlane->GetBinContent(planeIndex + 1);
+    float efficiencyError = efficiencyHistogram->GetBinError(planeIndex + 1);
+    if (efficiencyError > m_AchievedPrecision)
+      m_AchievedPrecision = efficiencyError;
+    /*
+     * No hits is not considered as "not enough data", because this can
+     * happen in case KLM is excluded.
+     */
+    switch (m_CalibrationStage) {
+      case c_MeasurablePlaneCheck:
+        if (extHits != 0 && extHits < m_MinimalExtHits)
+          notEnoughData = true;
+        break;
+      case c_EfficiencyMeasurement:
+        if (efficiencyError > m_RequestedPrecision)
+          notEnoughData = true;
+        break;
+    }
+  }
   KLMChannelIndex klmChannels;
   for (KLMChannelIndex& klmChannel : klmChannels) {
     int subdetector = klmChannel.getSubdetector();
@@ -76,13 +99,6 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
     uint16_t planeIndex = m_PlaneArrayIndex->getIndex(planeKLM);
     float efficiency = efficiencyHistogram->GetBinContent(planeIndex + 1);
     float efficiencyError = efficiencyHistogram->GetBinError(planeIndex + 1);
-    int extHits = allExtHitsInPlane->GetBinContent(planeIndex + 1);
-    /*
-     * No hits is not considered as "not enough data", because this can
-     * happen in case KLM is excluded.
-     */
-    if (extHits != 0 && extHits < m_MinimalExtHits)
-      notEnoughData = true;
     /* Fill the efficiency for this strip. */
     if (subdetector == KLMElementNumbers::c_BKLM) {
       m_StripEfficiency->setBarrelEfficiency(

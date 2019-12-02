@@ -115,7 +115,9 @@ namespace Belle2 {
             continue;
           }
         } else {
-          if (adc < 20)
+          if (iSuperLayer == 0 && adc < 15)
+            continue;
+          if (iSuperLayer != 0 && adc < 18)
             continue;
         }
 

@@ -753,19 +753,6 @@ void ECLBhabhaTCollectorModule::collect()
             chargeID_ECLCaldigits_bothClusters.push_back(icharge);
 
           }
-
-          /*
-                    // Find the crystal that has the second largest energy
-                    for (unsigned int ir = 0; ir < eclClusterRelations.size(); ir++) {
-                      const auto calDigit = eclClusterRelations.object(ir);
-                      int tempCrysID = calDigit->getCellId() - 1;
-                      double tempE = m_EperCrys[tempCrysID];
-                      if (tempE > crysE2Max[icharge] && tempCrysID != crysIDMax[icharge]) {
-                        crysE2Max[icharge] = tempE;
-                        crysID2Max[icharge] = tempCrysID;
-                      }
-                    }
-          */
         }
       }
       trkEClustCOM[icharge] = trkEClustLab[icharge] * trkpCOM[icharge] / trkpLab[icharge];

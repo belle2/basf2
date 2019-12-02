@@ -10,7 +10,6 @@ __author__ = "Sam Cunliffe"
 
 
 import basf2 as b2
-from modularAnalysis import inputMdstList, skimOutputUdst, summaryOfLists
 from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
 import skimExpertFunctions as expert

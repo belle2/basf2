@@ -19,9 +19,6 @@ import modularAnalysis as ma
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
-from skim.standardlists.charm import loadStdD0, loadStdDplus, loadStdDStar0, loadStdDstarPlus
-from skim.standardlists.lightmesons import loadStdLightMesons
-from skim.standardlists.dileptons import loadStdDiLeptons
 import skimExpertFunctions as expert
 b2.set_log_level(b2.LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'

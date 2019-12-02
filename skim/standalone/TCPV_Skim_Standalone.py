@@ -13,7 +13,6 @@ __author__ = " Reem Rasheed"
 
 import basf2 as b2
 import modularAnalysis as ma
-from beamparameters import add_beamparameters
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons, loadStdSkimPhoton
 from stdPi0s import stdPi0s

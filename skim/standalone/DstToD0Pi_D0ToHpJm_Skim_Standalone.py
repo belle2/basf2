@@ -11,15 +11,11 @@
 from ROOT import Belle2
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdE, stdK, stdMu, stdPi
 import skimExpertFunctions as expert
 
 gb2_setuprel = 'release-04-00-00'
 b2.set_log_level(LogLevel.INFO)
 
-import os
-import sys
-import glob
 skimCode = expert.encodeSkimName('DstToD0Pi_D0ToHpJm')
 
 c2bhpath = b2.Path()

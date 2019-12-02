@@ -18,7 +18,6 @@ import basf2 as b2
 import modularAnalysis as ma
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPi0s import stdPi0s
-from stdV0s import mergedKshorts, stdKshorts
 from skim.standardlists.charm import loadStdD0, loadStdDplus, loadStdDStar0, loadStdDstarPlus
 from skim.standardlists.lightmesons import loadStdLightMesons
 from skim.standardlists.dileptons import loadStdDiLeptons

@@ -17,7 +17,7 @@ from beamparameters import add_beamparameters
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons, loadStdSkimPhoton
 from stdPi0s import stdPi0s
-from stdV0s import mergedKshorts, stdKshorts
+from stdV0s import stdKshorts
 from skim.standardlists.lightmesons import loadStdLightMesons
 from skim.standardlists.dileptons import loadStdDiLeptons
 import skimExpertFunctions as expert
@@ -25,9 +25,6 @@ gb2_setuprel = 'release-04-00-00'
 b2.set_log_level(LogLevel.INFO)
 
 
-import sys
-import os
-import glob
 skimCode = expert.encodeSkimName('TCPV')
 
 # create a path

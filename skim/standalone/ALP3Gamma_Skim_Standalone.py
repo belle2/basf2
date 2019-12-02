@@ -10,7 +10,6 @@ __author__ = "Michael De Nuccio"
 
 import basf2 as b2
 import modularAnalysis as ma  # Standard Analysis Tools
-from stdPhotons import stdPhotons, loadStdSkimPhoton
 import skimExpertFunctions as expert
 skimCode = expert.encodeSkimName('ALP3Gamma')
 gb2_setuprel = 'release-04-00-00'

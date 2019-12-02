@@ -10,8 +10,8 @@
 from ROOT import Belle2
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdE, stdK, stdMu, stdPi
-from stdV0s import mergedKshorts, stdKshorts
+from stdCharged import stdK, stdPi
+from stdV0s import stdKshorts
 import skimExpertFunctions as expert
 
 b2.set_log_level(LogLevel.INFO)

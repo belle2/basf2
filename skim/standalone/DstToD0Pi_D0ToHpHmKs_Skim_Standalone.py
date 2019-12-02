@@ -18,9 +18,6 @@ import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
 b2.set_log_level(LogLevel.INFO)
 
-import os
-import sys
-import glob
 skimCode = expert.encodeSkimName('DstToD0Pi_D0ToHpHmKs')
 
 c3bh2path = b2.Path()

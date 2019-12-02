@@ -16,9 +16,6 @@ import skimExpertFunctions as expert
 b2.set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'
 skimCode = expert.encodeSkimName('LFVZpVisible')
-import sys
-import os
-import glob
 
 lfvzppath = b2.Path()
 fileList = expert.get_test_file("mixedBGx1", "MC12")

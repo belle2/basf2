@@ -9,9 +9,8 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdE, stdK, stdMu, stdPi
+from stdCharged import stdK, stdMu, stdPi
 from stdPi0s import stdPi0s
-from stdPhotons import stdPhotons, loadStdSkimPhoton
 import skimExpertFunctions as expert
 
 b2.set_log_level(LogLevel.INFO)

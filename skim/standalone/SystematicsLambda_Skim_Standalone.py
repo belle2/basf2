@@ -10,7 +10,6 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdPhotons import stdPhotons, loadStdSkimPhoton
 import skimExpertFunctions as expert
 b2.set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'

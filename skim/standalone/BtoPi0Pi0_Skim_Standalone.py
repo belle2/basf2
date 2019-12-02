@@ -12,16 +12,12 @@
 import basf2 as b2
 from ROOT import Belle2
 import modularAnalysis as ma
-from stdPi0s import stdPi0s
 
 import skimExpertFunctions as expert
 b2.set_log_level(LogLevel.INFO)
 
 gb2_setuprel = "release-04-00-00"
 
-import os
-import sys
-import glob
 skimCode = expert.encodeSkimName('BtoPi0Pi0')
 
 path = b2.Path()

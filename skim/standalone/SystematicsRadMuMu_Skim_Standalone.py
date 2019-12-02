@@ -12,7 +12,7 @@
 
 from basf2 import process, statistics, Path, set_log_level, LogLevel
 from modularAnalysis import inputMdstList, skimOutputUdst, summaryOfLists
-from stdCharged import stdE, stdK, stdMu, stdPi
+from stdCharged import stdMu
 import skimExpertFunctions as expert
 b2.set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'

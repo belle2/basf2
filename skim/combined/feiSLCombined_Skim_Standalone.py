@@ -9,9 +9,6 @@
 
 __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling", "Phil Grace"]
 
-import sys
-import glob
-import os.path
 
 import basf2 as b2
 import modularAnalysis as ma

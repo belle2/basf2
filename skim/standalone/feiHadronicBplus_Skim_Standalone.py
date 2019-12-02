@@ -16,9 +16,6 @@ from beamparameters import add_beamparameters
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
 
-import sys
-import os
-import glob
 skimCode = expert.encodeSkimName('feiHadronicBplus')
 fileList = expert.get_test_file("mixedBGx1", "MC12")
 

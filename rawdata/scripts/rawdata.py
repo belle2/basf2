@@ -54,10 +54,8 @@ def add_packers(path, components=None):
 
     # KLM
     if components is None or 'KLM' in components:
-        bklmpacker = register_module('BKLMRawPacker')
-        path.add_module(bklmpacker)
-        eklmpacker = register_module('EKLMRawPacker')
-        path.add_module(eklmpacker)
+        klmpacker = register_module('KLMPacker')
+        path.add_module(klmpacker)
 
 
 def add_unpackers(path, components=None):

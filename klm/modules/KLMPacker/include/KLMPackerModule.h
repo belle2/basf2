@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Petr Katrenko                                            *
+ * Contributors: Petr Katrenko, Anselm Vossen, Giacomo De Pietro          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,6 +11,8 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
@@ -18,7 +20,9 @@
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <rawdata/dataobjects/RawKLM.h>
 
 /* C++ headers. */
@@ -27,21 +31,21 @@
 namespace Belle2 {
 
   /**
-   * EKLM raw data packer.
+   * KLM raw packer.
    */
-  class EKLMRawPackerModule : public Module {
+  class KLMPackerModule : public Module {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMRawPackerModule();
+    KLMPackerModule();
 
     /**
      * Destructor.
      */
-    virtual ~EKLMRawPackerModule();
+    virtual ~KLMPackerModule();
 
     /**
      * Initializer.
@@ -72,37 +76,47 @@ namespace Belle2 {
 
     /**
      * Creation of raw data.
+     * @param[in]  flag   Flag for RPCs or scintillators.
      * @param[in]  lane   Data concentrator lane.
      * @param[in]  plane  Plane number.
      * @param[in]  strip  Strip number.
      * @param[in]  charge Charge.
-     * @param[in]  ctime  CTine.
+     * @param[in]  ctime  CTime.
      * @param[in]  tdc    TDC.
      * @param[out] bword1 First word.
      * @param[out] bword2 Second word.
      * @param[out] bword3 Third word.
      * @param[out] bword4 Fourth word.
      */
-    void formatData(const EKLMDataConcentratorLane* lane,
-                    int plane, int strip, int charge,
-                    uint16_t ctime, uint16_t tdc,
-                    uint16_t& bword1, uint16_t& bword2, uint16_t& bword3,
-                    uint16_t& bword4);
+    void formatData(int flag, int lane, int plane, int strip, int charge, uint16_t ctime, uint16_t tdc,
+                    uint16_t& bword1, uint16_t& bword2, uint16_t& bword3, uint16_t& bword4);
 
-    /** Element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
-
-    /** Electronics map. */
-    DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
-
-    /** Number of events. */
-    int m_NEvents;
+    /* Common objects. */
 
     /** Raw data. */
     StoreArray<RawKLM> m_RawKLMs;
 
-    /** Digits. */
-    StoreArray<EKLMDigit> m_Digits;
+    /** Event meta data. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
+
+    /* BKLM objects. */
+
+    /** BKLM electronics map. */
+    DBObjPtr<BKLMElectronicsMap> m_BklmElectronicsMap;
+
+    /* BKLM digits. */
+    StoreArray<BKLMDigit> m_BklmDigits;
+
+    /* EKLM objects. */
+
+    /** EKLM element numbers. */
+    const EKLM::ElementNumbersSingleton* m_EklmElementNumbers;
+
+    /** EKLM electronics map. */
+    DBObjPtr<EKLMElectronicsMap> m_EklmElectronicsMap;
+
+    /** EKLM digits. */
+    StoreArray<EKLMDigit> m_EklmDigits;
 
   };
 

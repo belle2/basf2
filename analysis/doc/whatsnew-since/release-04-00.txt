@@ -43,7 +43,7 @@ Variables
 
  * Fixed :b2:var:`goodBelleKshort`, now it returns ``extraInfo(goodKs)`` if the variable exists.
  * Fixed :b2:var:`isSignal`, which always accepted c_MissingResonance and c_MissFSR/c_MissPHOTOS even one used `=direct=>`, `=norad=>`, or `=exact=>`.
-   Now it correctly respects the decay string grammar. The other isSignal* variables, such as `isSignalAccpetMissing`, are also fixed.
+   Now it correctly respects the decay string grammar. The other isSignal* variables, such as `isSignalAcceptMissing`, are also fixed.
 
 Modules
 +++++++

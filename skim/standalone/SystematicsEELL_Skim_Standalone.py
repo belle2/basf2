@@ -11,7 +11,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdE, stdMu
+from stdCharged import stdE, stdK, stdMu, stdPi
 import skimExpertFunctions as expert
 
 b2.set_log_level(LogLevel.INFO)

@@ -11,8 +11,8 @@ __author__ = "Sam Cunliffe"
 
 from basf2 import process, statistics, Path
 from modularAnalysis import inputMdstList, skimOutputUdst, summaryOfLists
-from stdCharged import stdE, stdMu
-from stdPhotons import stdPhotons
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPhotons import stdPhotons, loadStdSkimPhoton
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
 

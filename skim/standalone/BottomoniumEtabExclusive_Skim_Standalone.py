@@ -9,7 +9,7 @@
 ######################################################
 import basf2 as b2
 import modularAnalysis as ma
-from stdPhotons import *
+from stdPhotons import stdPhotons, loadStdSkimPhoton
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
 import sys

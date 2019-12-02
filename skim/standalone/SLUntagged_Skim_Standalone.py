@@ -10,10 +10,10 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.charm import *
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPi0s import stdPi0s
+from stdV0s import mergedKshorts, stdKshorts
+from skim.standardlists.charm import loadStdD0, loadStdDplus, loadStdDStar0, loadStdDstarPlus
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
 b2.set_log_level(LogLevel.INFO)

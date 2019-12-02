@@ -11,9 +11,9 @@
 from ROOT import Belle2
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdV0s import *
-from stdPi0s import *
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdV0s import mergedKshorts, stdKshorts
+from stdPi0s import stdPi0s
 import skimExpertFunctions as expert
 
 gb2_setuprel = 'release-04-00-00'

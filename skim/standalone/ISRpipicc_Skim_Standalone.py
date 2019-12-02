@@ -11,8 +11,8 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdPhotons import *
-from stdCharged import stdPi, stdK, stdE, stdMu
+from stdPhotons import stdPhotons, loadStdSkimPhoton
+from stdCharged import stdE, stdK, stdMu, stdPi
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
 b2.set_log_level(LogLevel.INFO)

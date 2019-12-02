@@ -11,7 +11,7 @@
 from basf2 import process, statistics, Path
 from modularAnalysis import inputMdstList, \
     skimOutputUdst, summaryOfLists
-from stdCharged import stdE
+from stdCharged import stdE, stdK, stdMu, stdPi
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
 

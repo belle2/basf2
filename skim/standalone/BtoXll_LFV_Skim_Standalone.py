@@ -13,8 +13,8 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdPhotons import *
-from stdCharged import stdE, stdMu, stdPi
+from stdPhotons import stdPhotons, loadStdSkimPhoton
+from stdCharged import stdE, stdK, stdMu, stdPi
 import skimExpertFunctions as expert
 
 # basic setup

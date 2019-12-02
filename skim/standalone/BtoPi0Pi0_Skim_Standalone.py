@@ -12,7 +12,7 @@
 import basf2 as b2
 from ROOT import Belle2
 import modularAnalysis as ma
-from stdPi0s import *
+from stdPi0s import stdPi0s
 
 import skimExpertFunctions as expert
 b2.set_log_level(LogLevel.INFO)

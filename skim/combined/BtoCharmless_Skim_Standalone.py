@@ -10,12 +10,10 @@
 import basf2 as b2
 import modularAnalysis as ma
 from skim.standardlists.lightmesons import loadStdLightMesons
-from stdCharged import stdPi
-from stdCharged import stdK
-from stdPi0s import loadStdSkimPi0
+from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPi0s import stdPi0s
-from stdV0s import stdKshorts
-from stdPhotons import stdPhotons
+from stdV0s import mergedKshorts, stdKshorts
+from stdPhotons import stdPhotons, loadStdSkimPhoton
 import skimExpertFunctions as expert
 
 gb2_setuprel = "release-04-00-00"

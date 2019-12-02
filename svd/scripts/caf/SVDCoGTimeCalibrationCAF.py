@@ -19,6 +19,7 @@ from caf.utils import ExpRun, IoV
 
 import reconstruction as reco
 import modularAnalysis as ana
+from caf.strategies import SequentialBoundaries
 
 input_branches = [
     'SVDShaperDigitsFromTracks',
@@ -27,6 +28,7 @@ input_branches = [
 ]
 
 now = datetime.datetime.now()
+# uniqueID = "SVDCoGTimeCalibrations_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_lat=+47.16"
 
 
 def remove_module(path, name):
@@ -88,7 +90,8 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
 
     # algorithm setup
     algorithm = SVDCoGTimeCalibrationAlgorithm(uniqueID)
-    algorithm.setMinEntries(10000)
+    algorithm.setMinEntries(100)
+    algorithm.setAllowedT0Shift(2.)
 
     # calibration setup
     calibration = Calibration('SVDCoGTime',
@@ -103,8 +106,10 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
                               )
 
     # calibration.pre_algorithms = pre_alg
-    calibration.strategies = strategies.SequentialRunByRun
+    calibration.strategies = strategies.SequentialBoundaries
     # calibration.strategies = strategies.SingleIOV
+
+    # calibration.algorithms[0].params["iov_coverage"] = IoV(0, 0, -1, -1)
 
     # for algorithm in calibration.algorithms:
     #     algorithm.params = {"apply_iov": output_iov}

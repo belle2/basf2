@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "run this scipt: source CalibrationCheck_Input_Files_List_tool.sh <name of the folder that will cointain the txt output files>"
-
 OUTPUTLIST=${1}
 
 echo "###############################################"

@@ -17,6 +17,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
+#include <optional>
 
 namespace Belle2 {
   /**
@@ -26,10 +27,16 @@ namespace Belle2 {
   public:
 
     /// Constructor set the prefix to SVDCoGTimeCalibrationCollector
-    explicit SVDCoGTimeCalibrationAlgorithm(const std::string& str);
+    SVDCoGTimeCalibrationAlgorithm(std::string str);
 
     /// Destructor
     virtual ~SVDCoGTimeCalibrationAlgorithm() {}
+
+    /// Setter for m_allowedT0Shift
+    void setAllowedT0Shift(float value) {m_allowedT0Shift = value;}
+
+    /// Getter for m_allowedT0Shift
+    float getAllowedT0Shift() {return m_allowedT0Shift;}
 
     /// Set the minimum entries required in the histograms
     void setMinEntries(int minEntries) {m_minEntries = minEntries;}
@@ -42,10 +49,22 @@ namespace Belle2 {
     /// Run algo on data
     virtual EResult calibrate() override;
 
+    /// If the event T0 changes significantly return true. This is run inside the findPayloadBoundaries member function
+    //  in the base class.
+    virtual bool isBoundaryRequired(const Calibration::ExpRun& currentRun) override;
+
+    virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) override
+    {
+      m_previousEventT0.reset();
+    }
+
+
   private:
 
     std::string m_id; /*< Parameter given to set the UniqueID of the payload*/
-    float m_minEntries = 10000; /*< Set the minimun number of entries required in the histograms of layer 3*/
+    std::optional<float> m_previousEventT0; /*< EventT0 of the previous run*/
+    float m_allowedT0Shift = 2.; /*< Allowed EventT0 shift*/
+    float m_minEntries = 15000; /*< Set the minimun number of entries required in the histograms of layer 3*/
   };
 } // namespace Belle2
 

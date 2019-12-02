@@ -27,7 +27,7 @@ SVDCoGTimeCalibrationCollectorModule::SVDCoGTimeCalibrationCollectorModule() : C
 {
   //Set module properties
 
-  setDescription("Collector used for the calibration of the SVD timing estimator (CoG)");
+  setDescription(" ");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("SVDClustersFromTracksName", m_svdClusters, "Name of the SVDClusters list", std::string("SVDClustersFromTracks"));
@@ -55,6 +55,11 @@ void SVDCoGTimeCalibrationCollectorModule::prepare()
                       100, -100, 100);
   hEventT0NoSync.GetXaxis()->SetTitle("event_t0 (ns)");
   m_hEventT0nosync = new SVDHistograms<TH1F>(hEventT0NoSync);
+
+  m_hEventT0FromCDST = new TH1F("hEventT0FromCDST", "EventT0FromCDST", 200, -100, 100);
+  registerObject<TH1F>("hEventT0FromCDST", m_hEventT0FromCDST);
+  m_hEventT0FromCDSTSync = new TH1F("hEventT0FromCDSTSync", "EventT0FromCDSTSync", 200, -100, 100);
+  registerObject<TH1F>("hEventT0FromCDSTSync", m_hEventT0FromCDSTSync);
 
   m_svdCls.isRequired(m_svdClusters);
   m_eventT0.isRequired(m_eventTime);
@@ -95,8 +100,9 @@ void SVDCoGTimeCalibrationCollectorModule::startRun()
       }
     }
   }
+  m_hEventT0FromCDST->Reset();
+  m_hEventT0FromCDSTSync->Reset();
 }
-
 
 void SVDCoGTimeCalibrationCollectorModule::collect()
 {
@@ -117,6 +123,8 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
       getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(theVxdID, side)->GetName())->Fill(clTime, eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(theVxdID, side)->GetName())->Fill(eventT0);
+      getObjectPtr<TH1F>("hEventT0FromCDST")->Fill(eventT0);
+      getObjectPtr<TH1F>("hEventT0FromCDSTSync")->Fill(eventT0Sync);
     }
   };
 }

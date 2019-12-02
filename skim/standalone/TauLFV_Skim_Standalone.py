@@ -9,7 +9,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdE, stdK, stdMu, stdPi
+from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from skim.standardlists.lightmesons import loadStdLightMesons
 from stdPi0s import stdPi0s

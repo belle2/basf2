@@ -42,9 +42,8 @@
 
 namespace Belle2 {
   /**
-   * This collects the position
-   * and the dimension of the beamspot using mu+mu- events for
-   * calibration of the SVDCoGTimeCalibration using CAF
+   * Collector module used to create the histograms needed for the
+   * SVD CoG-Time calibration
    */
   class SVDCoGTimeCalibrationCollectorModule : public CalibrationCollectorModule {
 

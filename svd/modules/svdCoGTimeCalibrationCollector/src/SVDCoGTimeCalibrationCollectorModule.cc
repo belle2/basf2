@@ -27,7 +27,7 @@ SVDCoGTimeCalibrationCollectorModule::SVDCoGTimeCalibrationCollectorModule() : C
 {
   //Set module properties
 
-  setDescription(" ");
+  setDescription("Collector module used to create the histograms needed for the SVD CoG-Time calibration");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("SVDClustersFromTracksName", m_svdClusters, "Name of the SVDClusters list", std::string("SVDClustersFromTracks"));

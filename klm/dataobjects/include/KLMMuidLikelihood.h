@@ -10,26 +10,29 @@
 
 #pragma once
 
-#include <framework/datastore/RelationsObject.h>
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
+
+/* Belle 2 headers. */
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
   //! Store the muon-identification information for an extrapolated track
-  class Muid : public RelationsObject {
+  class KLMMuidLikelihood : public RelationsObject {
 
   public:
 
     //! Empty constructor for ROOT IO (needed to make the class storable)
-    Muid();
+    KLMMuidLikelihood();
 
     //! Constructor with initial value
     //! @param pdgCode PDG code of the hypothesis used for this extrapolation
-    explicit Muid(int pdgCode);
+    explicit KLMMuidLikelihood(int pdgCode);
 
     //! Destructor
-    virtual ~Muid() {}
+    virtual ~KLMMuidLikelihood() {}
 
     //! @return PDG code of the hypothesis used for this extrapolation
     int getPDGCode() const { return m_PDGCode; }
@@ -323,7 +326,7 @@ namespace Belle2 {
     float m_ExtEKLMEfficiencyValue[EKLMElementNumbers::getMaximalLayerNumber()];
 
     //! Needed to make the ROOT object storable
-    ClassDef(Muid, 8)
+    ClassDef(KLMMuidLikelihood, 1)
 
   };
 }

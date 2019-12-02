@@ -8,8 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* KLM headers. */
+#include <klm/dataobjects/KLMMuidLikelihood.h>
+
 /* Belle2 headers. */
-#include <tracking/dataobjects/Muid.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/utilities/TestHelpers.h>
 
@@ -21,15 +23,15 @@ using namespace std;
 
 namespace Belle2 {
 
-  /** Test class for the Muid object. */
-  class MuidTest : public ::testing::Test {
+  /** Test class for the KLMMuidLikelihood object. */
+  class KLMMuidLikelihoodTest : public ::testing::Test {
 
   protected:
-    /** Register Muid in the DataStore. */
+    /** Register KLMMuidLikelihood in the DataStore. */
     void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreArray<Muid> muids;
+      StoreArray<KLMMuidLikelihood> muids;
       muids.registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
     }
@@ -41,13 +43,13 @@ namespace Belle2 {
     }
 
     /** Pointer to a Muid object. */
-    Muid* m_muid = nullptr;
+    KLMMuidLikelihood* m_muid = nullptr;
   };
 
   /** Test some setters and getters. */
-  TEST_F(MuidTest, Muid)
+  TEST_F(KLMMuidLikelihoodTest, KLMMuidLikelihood)
   {
-    StoreArray<Muid> muids;
+    StoreArray<KLMMuidLikelihood> muids;
 
     // Test the non-default constructor
     int pdg = 13;

@@ -8,60 +8,68 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/calibration/MuidParameterDBReaderWriter.h>
-#include <tracking/dbobjects/MuidParameters.h>
-#include <tracking/trackExtrapolateG4e/MuidPar.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/DBImportObjPtr.h>
+/* Own header. */
+#include <klm/calibration/MuidParameterDBReaderWriter.h>
 
+/* KLM headers. */
+#include <klm/dbobjects/MuidParameters.h>
+#include <klm/muid/MuidBuilder.h>
+
+/* Belle 2 headers. */
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/logging/Logger.h>
+
+/* C++ headers. */
+#include <fstream>
 #include <string>
 #include <vector>
-#include <fstream>
 
 using namespace std;
 using namespace Belle2;
-using namespace boost;
 
 void MuidParameterDBReaderWriter::writeMuidParameters()
 {
+  B2WARNING("The method MuidParameterDBReaderWriter::writeMuidParameters() is temporary unavailable, sorry! :(");
+  return;
+
   DBImportObjPtr<MuidParameters> muidPar;
   muidPar.construct();
 
   vector<string> const hypotheses = {"Positron", "Electron" , "Deuteron", "Antideuteron", "Proton", "Antiproton", "PionPlus", "PionMinus", "KaonPlus", "KaonMinus", "MuonPlus", "MuonMinus" };
   for (unsigned int hypothesis = 0; hypothesis < hypotheses.size(); hypothesis++) {
-    GearDir content("/Detector/Tracking/MuidParameters//Experiment[@exp=\"0\"]/");
+    GearDir content("/Detector/Muid/MuidParameters//Experiment[@exp=\"0\"]/");
     content.append(hypotheses[hypothesis]);
     for (int outcome = 1; outcome <= MUID_MaxOutcome; ++outcome) {
       GearDir outcomeContent(content);
-      outcomeContent.append((format("/LayerProfile/Outcome[@outcome=\"%1%\"]/") % (outcome)).str());
+      outcomeContent.append((boost::format("/LayerProfile/Outcome[@outcome=\"%1%\"]/") % (outcome)).str());
       for (int lastLayer = 0; lastLayer <= MUID_MaxBarrelLayer; ++lastLayer) {
-        if ((outcome == MuidPar::EMuidOutcome::c_StopInBarrel)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_StopInBarrel)
             && (lastLayer > MUID_MaxBarrelLayer - 1)) break; // barrel stop: never in layer 14
-        if ((outcome == MuidPar::EMuidOutcome::c_StopInForwardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_StopInForwardEndcap)
             && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // forward endcap stop: never in layer 13
-        if ((outcome == MuidPar::EMuidOutcome::c_ExitBarrel) && (lastLayer > MUID_MaxBarrelLayer)) break; // barrel exit: no layers 15+
-        if ((outcome == MuidPar::EMuidOutcome::c_ExitForwardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_ExitBarrel) && (lastLayer > MUID_MaxBarrelLayer)) break; // barrel exit: no layers 15+
+        if ((outcome == MuidBuilder::EMuidOutcome::c_ExitForwardEndcap)
             && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // forward endcap exit: no layers 14+
-        if ((outcome == MuidPar::EMuidOutcome::c_StopInBackwardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_StopInBackwardEndcap)
             && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // backward endcap stop: never in layer 11
-        if ((outcome == MuidPar::EMuidOutcome::c_ExitBackWardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_ExitBackWardEndcap)
             && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // backward endcap exit: no layers 12+
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelStopInForwardMin)
-            && (outcome <=  MuidPar::EMuidOutcome::c_CrossBarrelStopInForwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInForwardMin)
+            && (outcome <=  MuidBuilder::EMuidOutcome::c_CrossBarrelStopInForwardMax)
             && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // like outcome == 2
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelStopInBackwardMin)
-            && (outcome <=  MuidPar::EMuidOutcome::c_CrossBarrelStopInBackwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInBackwardMin)
+            && (outcome <=  MuidBuilder::EMuidOutcome::c_CrossBarrelStopInBackwardMax)
             && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // like outcome == 5
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelExitForwardMin)
-            && (outcome <=  MuidPar::EMuidOutcome::c_CrossBarrelExitForwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelExitForwardMin)
+            && (outcome <=  MuidBuilder::EMuidOutcome::c_CrossBarrelExitForwardMax)
             && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // like outcome == 4
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelExitBackwardMin)
-            && (outcome <=  MuidPar::EMuidOutcome::c_CrossBarrelExitBackwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelExitBackwardMin)
+            && (outcome <=  MuidBuilder::EMuidOutcome::c_CrossBarrelExitBackwardMax)
             && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // like outcome == 6
-        std::vector<double> layerPDF = outcomeContent.getArray((format("LastLayer[@layer=\"%1%\"]") % (lastLayer)).str());
+        std::vector<double> layerPDF = outcomeContent.getArray((boost::format("LastLayer[@layer=\"%1%\"]") % (lastLayer)).str());
         muidPar->setLayerProfile(hypothesis, outcome, lastLayer, layerPDF);
       }
     }
@@ -72,13 +80,13 @@ void MuidParameterDBReaderWriter::writeMuidParameters()
       if (detector == 1) detectorContent.append("/TransversePDF/BarrelOnly");
       if (detector == 2) detectorContent.append("/TransversePDF/EndcapOnly");
       for (int halfNdof = 1; halfNdof <= MUID_MaxHalfNdof; ++halfNdof) {
-        double reducedChiSquaredThreshold = detectorContent.getDouble((format("DegreesOfFreedom[@ndof=\"%1%\"]/Tail/Threshold") %
+        double reducedChiSquaredThreshold = detectorContent.getDouble((boost::format("DegreesOfFreedom[@ndof=\"%1%\"]/Tail/Threshold") %
                                             (2 * halfNdof)).str());
-        double reducedChiSquaredScaleY = detectorContent.getDouble((format("DegreesOfFreedom[@ndof=\"%1%\"]/Tail/ScaleY") %
+        double reducedChiSquaredScaleY = detectorContent.getDouble((boost::format("DegreesOfFreedom[@ndof=\"%1%\"]/Tail/ScaleY") %
                                                                     (2 * halfNdof)).str());
-        double reducedChiSquaredScaleX = detectorContent.getDouble((format("DegreesOfFreedom[@ndof=\"%1%\"]/Tail/ScaleX") %
+        double reducedChiSquaredScaleX = detectorContent.getDouble((boost::format("DegreesOfFreedom[@ndof=\"%1%\"]/Tail/ScaleX") %
                                                                     (2 * halfNdof)).str());
-        std::vector<double> reducedChiSquaredPDF = detectorContent.getArray((format("DegreesOfFreedom[@ndof=\"%1%\"]/Histogram") %
+        std::vector<double> reducedChiSquaredPDF = detectorContent.getArray((boost::format("DegreesOfFreedom[@ndof=\"%1%\"]/Histogram") %
                                                    (2 * halfNdof)).str());
         muidPar->setPDF(hypothesis, detector, halfNdof * 2, reducedChiSquaredPDF);
         muidPar->setThreshold(hypothesis, detector, halfNdof * 2, reducedChiSquaredThreshold);
@@ -104,28 +112,28 @@ void MuidParameterDBReaderWriter::readMuidParameters()
       B2INFO(" outcome " << outcome);
       for (int lastLayer = 0; lastLayer <= MUID_MaxBarrelLayer; ++lastLayer) {
         B2INFO(" lastLayer " << lastLayer);
-        if ((outcome == MuidPar::EMuidOutcome::c_StopInBarrel)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_StopInBarrel)
             && (lastLayer > MUID_MaxBarrelLayer - 1)) break; // barrel stop: never in layer 14
-        if ((outcome == MuidPar::EMuidOutcome::c_StopInForwardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_StopInForwardEndcap)
             && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // forward endcap stop: never in layer 13
-        if ((outcome == MuidPar::EMuidOutcome::c_ExitBarrel) && (lastLayer > MUID_MaxBarrelLayer)) break; // barrel exit: no layers 15+
-        if ((outcome == MuidPar::EMuidOutcome::c_ExitForwardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_ExitBarrel) && (lastLayer > MUID_MaxBarrelLayer)) break; // barrel exit: no layers 15+
+        if ((outcome == MuidBuilder::EMuidOutcome::c_ExitForwardEndcap)
             && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // forward endcap exit: no layers 14+
-        if ((outcome == MuidPar::EMuidOutcome::c_StopInBackwardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_StopInBackwardEndcap)
             && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // backward endcap stop: never in layer 11
-        if ((outcome == MuidPar::EMuidOutcome::c_ExitBackWardEndcap)
+        if ((outcome == MuidBuilder::EMuidOutcome::c_ExitBackWardEndcap)
             && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // backward endcap exit: no layers 12+
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelStopInForwardMin)
-            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelStopInForwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInForwardMin)
+            && (outcome <= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInForwardMax)
             && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // like outcome == 2
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelStopInBackwardMin)
-            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelStopInBackwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInBackwardMin)
+            && (outcome <= MuidBuilder::EMuidOutcome::c_CrossBarrelStopInBackwardMax)
             && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // like outcome == 5
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelExitForwardMin)
-            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelExitForwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelExitForwardMin)
+            && (outcome <= MuidBuilder::EMuidOutcome::c_CrossBarrelExitForwardMax)
             && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // like outcome == 4
-        if ((outcome >= MuidPar::EMuidOutcome::c_CrossBarrelExitBackwardMin)
-            && (outcome <= MuidPar::EMuidOutcome::c_CrossBarrelExitBackwardMax)
+        if ((outcome >= MuidBuilder::EMuidOutcome::c_CrossBarrelExitBackwardMin)
+            && (outcome <= MuidBuilder::EMuidOutcome::c_CrossBarrelExitBackwardMax)
             && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // like outcome == 6
         std::vector<double> layerPDF = m_muidParameters->getProfile(hypothesis, outcome, lastLayer);
         B2INFO(" layerPDF:  ");

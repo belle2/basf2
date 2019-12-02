@@ -8,8 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MUIDPAR_H
-#define MUIDPAR_H
+#pragma once
+
+/* KLM headers. */
+#include <klm/dbobjects/MuidParameters.h>
+
+/* Belle 2 headers. */
+#include <framework/database/DBObjPtr.h>
 
 //! Outermost barrel layer number (zero-based counting)
 #define MUID_MaxBarrelLayer 14
@@ -47,15 +52,12 @@
 //! Maximum reduced-chi-squared tabulated value for transverse scattering
 #define MUID_ReducedChiSquaredLimit 10.0
 
-#include <framework/database/DBObjPtr.h>
-#include <tracking/dbobjects/MuidParameters.h>
-
 namespace Belle2 {
 
-  class Muid;
+  class KLMMuidLikelihood;
 
   //! Provides muid parameters (from Database)
-  class MuidPar {
+  class MuidBuilder {
 
   public:
 
@@ -81,24 +83,24 @@ namespace Belle2 {
     };
 
     //! Constructor with arguments (experiment #, particleID hypothesis)
-    MuidPar(int, const char*);
+    MuidBuilder(int, const char*);
 
     //! Destructor
-    ~MuidPar();
+    ~MuidBuilder();
 
     //! Get the PDF for a particular hypothesis
-    double getPDF(const Muid*, bool isForward) const;
+    double getPDF(const KLMMuidLikelihood*, bool isForward) const;
 
   private:
 
     //! Hidden constructor
-    MuidPar();
+    MuidBuilder();
 
     //! Hidden copy constructor
-    MuidPar(MuidPar&);
+    MuidBuilder(MuidBuilder&);
 
     //! Hidden copy assignment
-    MuidPar& operator=(const MuidPar&);
+    MuidBuilder& operator=(const MuidBuilder&);
 
     //! Get probability density functions for this particleID hypothesis from Dababase
     void fillPDFs(const char*);
@@ -107,10 +109,10 @@ namespace Belle2 {
     void spline(int, double, double*, double*, double*, double*);
 
     //! Get the per-layer PDF for a particular hypothesis
-    double getPDFLayer(const Muid*, bool) const;
+    double getPDFLayer(const KLMMuidLikelihood*, bool) const;
 
     //! Get the transverse-coordinate PDF for a particular hypothesis
-    double getPDFRchisq(const Muid*) const;
+    double getPDFRchisq(const KLMMuidLikelihood*) const;
 
     //! Per-layer (longitudinal) probability density function
     double m_LayerPDF[MUID_MaxOutcome + 1][MUID_MaxBarrelLayer + 1][MUID_MaxBarrelLayer + MUID_MaxForwardEndcapLayer + 2];
@@ -145,5 +147,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif // MUIDPAR_H

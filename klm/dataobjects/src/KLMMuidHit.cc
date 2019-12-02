@@ -8,12 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/dataobjects/MuidHit.h>
+/* Own header. */
+#include <klm/dataobjects/KLMMuidHit.h>
 
 using namespace std;
 using namespace Belle2;
 
-MuidHit::MuidHit() :
+KLMMuidHit::KLMMuidHit() :
   m_PdgCode(0),
   m_ExtPosition(0.0, 0.0, 0.0),
   m_ExtTime(0.0),
@@ -27,8 +28,8 @@ MuidHit::MuidHit() :
   m_HitPosition = m_ExtPosition;
 }
 
-MuidHit::MuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer, const TVector3& extPosition,
-                 const TVector3& hitPosition, double extTime, double hitTime, double chiSquared) :
+KLMMuidHit::KLMMuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer, const TVector3& extPosition,
+                       const TVector3& hitPosition, double extTime, double hitTime, double chiSquared) :
   m_ExtPosition(extPosition),
   m_HitPosition(hitPosition)
 {

@@ -8,32 +8,25 @@
 # readMuidParameters read dbobject MuidParameters from database
 ###############################################################
 
-from basf2 import *
+import basf2
 import ROOT
 from ROOT.Belle2 import MuidParameterDBReaderWriter
-import os
-import sys
-import glob
-import subprocess
 
-set_log_level(LogLevel.INFO)
-# use local database
-reset_database()
-use_local_database("localdb/database.txt", "localdb")
+basf2.set_log_level(basf2.LogLevel.INFO)
 
-eventinfo = register_module('EventInfoSetter')
-eventinfo.param({'evtNumList': [1], 'runList': [1]})
-# read muid parameters from xml file needs Gearbox
-paramloader = register_module('Gearbox')
-main = create_path()
+eventinfo = basf2.register_module('EventInfoSetter')
+eventinfo.param({'evtNumList': [0], 'runList': [0]})
+paramloader = basf2.register_module('Gearbox')
+
+main = basf2.create_path()
 main.add_module(eventinfo)
 main.add_module(paramloader)
-process(main)
+basf2.process(main)
 
 # run the MuidParameters writer, create dbobject payload in ./localdb
-# dbWriter = MuidParameterDBReaderWriter()
-# dbWriter.writeMuidParameters()
+dbWriter = MuidParameterDBReaderWriter()
+dbWriter.writeMuidParameters()
 
 # run the MuidParameters reader
-dbReader = MuidParameterDBReaderWriter()
-dbReader.readMuidParameters()
+# dbReader = MuidParameterDBReaderWriter()
+# dbReader.readMuidParameters()

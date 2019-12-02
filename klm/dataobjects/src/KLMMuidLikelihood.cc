@@ -8,12 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/dataobjects/Muid.h>
+/* Own header. */
+#include <klm/dataobjects/KLMMuidLikelihood.h>
 
 using namespace std;
 using namespace Belle2;
 
-Muid::Muid() :
+KLMMuidLikelihood::KLMMuidLikelihood() :
   m_PDGCode(0),
   m_MuonPDFValue(0.0),
   m_PionPDFValue(0.0),
@@ -49,7 +50,7 @@ Muid::Muid() :
   }
 }
 
-Muid::Muid(int pdgCode) :
+KLMMuidLikelihood::KLMMuidLikelihood(int pdgCode) :
   m_PDGCode(pdgCode),
   m_MuonPDFValue(0.0),
   m_PionPDFValue(0.0),
@@ -85,7 +86,7 @@ Muid::Muid(int pdgCode) :
   }
 }
 
-unsigned int Muid::getTotalBarrelHits() const
+unsigned int KLMMuidLikelihood::getTotalBarrelHits() const
 {
   unsigned int hits = 0;
   unsigned int pattern = m_HitLayerPattern;
@@ -97,7 +98,7 @@ unsigned int Muid::getTotalBarrelHits() const
   return hits;
 }
 
-unsigned int Muid::getTotalEndcapHits() const
+unsigned int KLMMuidLikelihood::getTotalEndcapHits() const
 {
   unsigned int hits = 0;
   unsigned int pattern = m_HitLayerPattern;

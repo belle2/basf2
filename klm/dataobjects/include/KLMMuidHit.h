@@ -10,18 +10,21 @@
 
 #pragma once
 
+/* Belle 2 headers. */
 #include <framework/datastore/RelationsObject.h>
+
+/* C++ headers. */
 #include <TVector3.h>
 
 namespace Belle2 {
 
   //! Store one muon-identification hit in the KLM as a ROOT object.
-  class MuidHit : public RelationsObject {
+  class KLMMuidHit : public RelationsObject {
 
   public:
 
     //! Empty constructor for ROOT IO (needed to make the class storable)
-    MuidHit();
+    KLMMuidHit();
 
     //! Constructor with initial values
     //! @param pdgCode PDG particleID hypothesis used in this extrapolation
@@ -34,11 +37,11 @@ namespace Belle2 {
     //! @param extTime extrapolation time of this hit (ns)
     //! @param hitTime Measured time of this hit (ns)
     //! @param chiSq Chi-squared contribution of this hit
-    MuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer, const TVector3& extPos, const TVector3& hitPos,
-            double extTime, double hitTime, double chiSq);
+    KLMMuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer, const TVector3& extPos, const TVector3& hitPos,
+               double extTime, double hitTime, double chiSq);
 
     //! Destructor
-    virtual ~MuidHit() {}
+    virtual ~KLMMuidHit() {}
 
     //! @return PDG particleID hypothesis used in this extrapolation
     int getPdgCode() const { return m_PdgCode; }
@@ -103,7 +106,7 @@ namespace Belle2 {
     double m_ChiSquared;
 
     //! Needed to make the ROOT object storable
-    ClassDef(MuidHit, 1)
+    ClassDef(KLMMuidHit, 1)
 
   };
 }

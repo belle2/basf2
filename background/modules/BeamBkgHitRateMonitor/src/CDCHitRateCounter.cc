@@ -108,8 +108,10 @@ namespace Belle2 {
 
         if (m_enableBackgroundHitFilter) {
           if (CDCHitToBackgroundFlag[&hit]) {
-            unsigned short newStatus = (hit.getStatus() | 0x100);
-            hit.setStatus(newStatus);
+            if (m_enableMarkBackgroundHit) {
+              unsigned short newStatus = (hit.getStatus() | 0x100);
+              hit.setStatus(newStatus);
+            }
             continue;
           }
         } else {

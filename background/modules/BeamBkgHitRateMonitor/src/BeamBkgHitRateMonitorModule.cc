@@ -87,6 +87,9 @@ namespace Belle2 {
              "CDC: flag to enable the bad wire treatment", true);
     addParam("cdcEnableBackgroundHitFilter", m_cdcEnableBackgroundHitFilter,
              "CDC: flag to enable the CDC background hit (crosstakl, noise) filter", true);
+    addParam("cdcEnableMarkBackgroundHit", m_cdcEnableMarkBackgroundHit,
+             "CDC: flag to enable to mark background flag on CDCHit (set 0x100 bit for CDCHit::m_status).", false);
+
   }
 
   BeamBkgHitRateMonitorModule::~BeamBkgHitRateMonitorModule()
@@ -112,7 +115,8 @@ namespace Belle2 {
     m_monitors.push_back(pxd);
     auto* svd = new Background::SVDHitRateCounter(m_svdShaperDigitsName, m_svdThrCharge);
     m_monitors.push_back(svd);
-    auto* cdc = new Background::CDCHitRateCounter(m_cdcEnableBadWireTreatment, m_cdcEnableBackgroundHitFilter);
+    auto* cdc = new Background::CDCHitRateCounter(m_cdcEnableBadWireTreatment, m_cdcEnableBackgroundHitFilter,
+                                                  m_cdcEnableMarkBackgroundHit);
     m_monitors.push_back(cdc);
     auto* top = new Background::TOPHitRateCounter(m_topTimeOffset, m_topTimeWindow);
     m_monitors.push_back(top);

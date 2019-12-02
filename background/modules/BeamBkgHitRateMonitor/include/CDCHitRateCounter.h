@@ -64,9 +64,12 @@ namespace Belle2 {
        * @param enableBadWireTreatment flag to enable the bad wire treatment
        * @param enableBackgroundHitFilter flag to enable the CDC background hit (crosstakl, noise) filter
        */
-      CDCHitRateCounter(const bool enableBadWireTreatment, const bool enableBackgroundHitFilter):
+      CDCHitRateCounter(const bool enableBadWireTreatment,
+                        const bool enableBackgroundHitFilter,
+                        const bool enableMarkBackgroundHit):
         m_enableBadWireTreatment(enableBadWireTreatment),
-        m_enableBackgroundHitFilter(enableBackgroundHitFilter)
+        m_enableBackgroundHitFilter(enableBackgroundHitFilter),
+        m_enableMarkBackgroundHit(enableMarkBackgroundHit)
       {}
 
       /**
@@ -108,8 +111,11 @@ namespace Belle2 {
       // DB payloads
 
       // other
-      const bool m_enableBadWireTreatment; /** flag to enable the bad wire treatment. default: true*/
-      const bool m_enableBackgroundHitFilter; /** flag to enable the CDC background hit (crosstakl, noise) filter. default: true*/
+      const bool m_enableBadWireTreatment; /**< flag to enable the bad wire treatment. default: true */
+      const bool m_enableBackgroundHitFilter; /**< flag to enable the CDC background hit (crosstakl, noise) filter. default: true */
+      const bool
+      m_enableMarkBackgroundHit;/**< flag to enable to mark background flag on CDCHit (set 0x100 bit for CDCHit::m_status). default: false */
+
       int m_nActiveWireInTotal = 0;
       int m_nActiveWireInSuperLayer[f_nSuperLayer] = {0};
       int m_nActiveWireInLayer[f_nLayer] = {0};

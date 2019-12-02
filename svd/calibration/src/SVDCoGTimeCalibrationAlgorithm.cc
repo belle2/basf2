@@ -22,7 +22,7 @@
 using namespace std;
 using namespace Belle2;
 
-SVDCoGTimeCalibrationAlgorithm::SVDCoGTimeCalibrationAlgorithm(std::string str) :
+SVDCoGTimeCalibrationAlgorithm::SVDCoGTimeCalibrationAlgorithm(const std::string& str) :
   CalibrationAlgorithm("SVDCoGTimeCalibrationCollector")
 {
   setDescription("SVDCoGTimeCalibration calibration algorithm");

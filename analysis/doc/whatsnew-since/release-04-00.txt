@@ -42,6 +42,8 @@ Variables
    specific daughters easily, and :b2:var:`daughterAverageOf`, which is similar to the :b2:var:`daughterSumOf`, but outputs the mean value of a variable.
 
  * Fixed :b2:var:`goodBelleKshort`, now it returns ``extraInfo(goodKs)`` if the variable exists.
+ * Fixed :b2:var:`isSignal`, which always accepted ``c_MissingResonance`` and ``c_MissFSR``/``c_MissPHOTOS`` even one used ``=direct=>``, ``=norad=>``, or ``=exact=>``.
+   Now it correctly respects the decay string grammar. The other isSignal* variables, such as :b2:var:`isSignalAcceptMissing`, are also fixed.
 
 Modules
 +++++++

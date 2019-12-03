@@ -24,6 +24,8 @@ skim_registry = [
     ('14140200', 'BtoDh_Kshh'),
     ('14120400', 'BtoDh_Kspipipi0'),
     ('14140500', 'BtoDh_Kspi0pi0'),
+    ('14140101', 'BtoDh_Kpi'),
+    ('14140102', 'BtoDh_Kpipipi'),
     ('11180100', 'feiHadronicB0'),
     ('11180200', 'feiHadronicBplus'),
     ('11180300', 'feiSLB0'),
@@ -102,15 +104,12 @@ combined_skims = {
         'feiSLB0', 'feiSLBplus'
     ],
     'MiscCombined': [
-        'TCPV'
+        'TCPV', 'TauLFV', 'TauThrust', 'TauGeneric'
     ],
     'Quarkonium': [
         'ISRpipicc', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon'
     ],
     'Semileptonic': [
         'PRsemileptonicUntagged', 'LeptonicUntagged', 'SLUntagged'
-    ],
-    'TauCombined': [
-        'TauLFV', 'TauThrust', 'TauGeneric'
     ]
 }

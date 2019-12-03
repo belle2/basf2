@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import ROOT
-import math
 
 """
 Functionality to extract quantities from various ROOT objects (TH1).

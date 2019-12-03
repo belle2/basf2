@@ -11,8 +11,7 @@
 </header>
 """
 
-from basf2 import set_random_seed, create_path, process, statistics, \
-    set_nprocesses
+from basf2 import set_random_seed, create_path, process, statistics
 from simulation import add_simulation
 from L1trigger import add_tsim
 from reconstruction import add_reconstruction

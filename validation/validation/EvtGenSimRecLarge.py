@@ -23,6 +23,7 @@ from L1trigger import add_tsim
 from reconstruction import add_reconstruction
 from beamparameters import add_beamparameters
 from background import get_background_files
+import validation
 
 set_random_seed(12345)
 
@@ -62,15 +63,14 @@ process(main)
 # Print call statistics
 print(statistics)
 
-from validation import *
-statistics_plots(
+validation.statistics_plots(
     'EvtGenSimRecLarge_statistics.root',
     contact='Software team b2soft@mail.desy.de',
     job_desc='a standard simulation and reconstruction job with generic '
              'EvtGen events',
     prefix='EvtGenSimRecLarge'
 )
-event_timing_plot(
+validation.event_timing_plot(
     '../EvtGenSimRecLarge.root',
     'EvtGenSimRecLarge_statistics.root',
     contact='Software team b2soft@mail.desy.de',

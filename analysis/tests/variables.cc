@@ -3185,8 +3185,10 @@ namespace {
       double pz =  -i * 0.1 - 0.2;
 
       TLorentzVector mom(px, py, pz, 1);
-      Particle d(mom, 211); // all pions as default
-      d.updateMass(211);
+      // all pions
+      int pdgCode = Const::pion.getPDGCode();
+      Particle d(mom, pdgCode);
+      d.updateMass(pdgCode);
       mom.SetXYZM(px, py, pz, d.getMass());
 
       Particle* daughters = particles.appendNew(d);
@@ -3205,13 +3207,13 @@ namespace {
       double pz =  -i * 0.1 - 0.2;
 
       TLorentzVector mom(px, py, pz, 1);
-      int pdgCode = 211;
+      // all pions but the first two
+      int pdgCode = Const::pion.getPDGCode();
       if (i == 0)
-        pdgCode = 2212; // a proton
+        pdgCode = Const::proton.getPDGCode(); // a proton
       if (i == 1)
-        pdgCode = -321; // a K-
-
-      Particle d(mom, pdgCode); // all pions as default
+        pdgCode = Const::kaon.getPDGCode(); // a K
+      Particle d(mom, pdgCode);
       d.updateMass(pdgCode);
       mom.SetXYZM(px, py, pz, d.getMass());
 
@@ -3223,14 +3225,14 @@ namespace {
 
 
     // Test the invariant mass under the alternative hypothesis
-    const Manager::Var* var = Manager::Instance().getVariable("useAlternativeDaughterHypothesis(M, 0:p+,1:K-)");
+    std::cout << "mass test" << std::endl;
+    const Manager::Var* var = Manager::Instance().getVariable("useAlternativeDaughterHypothesis(M, 0:p+,1:K+)");
     const Manager::Var* varAlt = Manager::Instance().getVariable("M");
     EXPECT_FLOAT_EQ(var->function(p), varAlt->function(pAlt));
 
-    // check it's really charge-instensitive...
+    // check it's really charge-insensitive...
     std::cout << "charge test" << std::endl;
-    var = Manager::Instance().getVariable("useAlternativeDaughterHypothesis(M, 0:p+,1:K+)");
-    varAlt = Manager::Instance().getVariable("M");
+    var = Manager::Instance().getVariable("useAlternativeDaughterHypothesis(M, 0:p+,1:K-)");
     EXPECT_FLOAT_EQ(var->function(p), varAlt->function(pAlt));
 
     // check the variable is not changing the 3-momentum

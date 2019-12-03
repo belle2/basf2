@@ -106,6 +106,7 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("PXDProductionCut", m_pxdProductionCut, "[cm] Secondary production threshold in PXD envelope.", 0.07);
   addParam("SVDProductionCut", m_svdProductionCut, "[cm] Secondary production threshold in SVD envelope.", 0.07);
   addParam("CDCProductionCut", m_cdcProductionCut, "[cm] Secondary production threshold in CDC envelope.", 0.07);
+  addParam("ARICHTOPProductionCut", m_arichtopProductionCut, "[cm] Secondary production threshold in ARICH and TOP envelopes.", 0.07);
   addParam("MaxNumberSteps", m_maxNumberSteps,
            "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
   addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 0.5);
@@ -206,6 +207,7 @@ void FullSimModule::initialize()
     physicsList->SetPXDProductionCutValue(m_pxdProductionCut);
     physicsList->SetSVDProductionCutValue(m_svdProductionCut);
     physicsList->SetCDCProductionCutValue(m_cdcProductionCut);
+    physicsList->SetARICHTOPProductionCutValue(m_arichtopProductionCut);
     runManager.SetUserInitialization(physicsList);
 
   } else {

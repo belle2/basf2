@@ -39,7 +39,7 @@ loadStdDstar0(path=path)
 loadStdDstarPlus(path=path)
 
 # Double Charm Skim
-from skim.btocharm import *
+from skim.btocharm import DoubleCharmList
 DCList = DoubleCharmList(path=path)
 expert.skimOutputUdst(skimCode, DCList, path=path)
 ma.summaryOfLists(DCList, path=path)

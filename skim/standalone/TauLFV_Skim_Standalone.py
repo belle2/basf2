@@ -37,7 +37,7 @@ stdKshorts(path=taulfvskim)
 loadStdLightMesons(path=taulfvskim)
 
 # Tau Skim
-from skim.taupair import *
+from skim.taupair import TauLFVList
 tauList = TauLFVList(1, path=taulfvskim)
 
 expert.skimOutputUdst(skimCode, tauList, path=taulfvskim)

@@ -60,7 +60,7 @@ from skim.taupair import TauList
 expert.add_skim('TauGeneric', TauList(path=skimpath), path=skimpath)
 
 # Tau Thrust
-from skim.taupair import *
+from skim.taupair import TauLFVList, TauList, TauThrustList
 expert.add_skim('TauThrust', TauThrustList(path=skimpath), path=skimpath)
 
 expert.setSkimLogging(path=skimpath)

@@ -27,7 +27,7 @@ stdPi('all', path=tauthrustskim)
 stdPhotons('all', path=tauthrustskim)
 
 # Tau Skim
-from skim.taupair import *
+from skim.taupair import TauThrustList
 tauList = TauThrustList(path=tauthrustskim)
 
 expert.skimOutputUdst(skimCode, tauList, path=tauthrustskim)

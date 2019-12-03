@@ -22,7 +22,7 @@ path = b2.create_path()
 
 ma.inputMdstList('default', fileList, path=path)
 
-from skim.fei import *
+from skim.fei import BplusHadronic, runFEIforBplusHadronic
 # run pre-selection cuts and FEI
 runFEIforBplusHadronic(path)
 

@@ -33,7 +33,7 @@ stdPi0s('looseFit', path=syspath)
 
 skimCode = expert.encodeSkimName('Resonance')
 
-from skim.systematics import *
+from skim.systematics import ResonanceList
 ResonanceList = ResonanceList(path=syspath)
 
 expert.skimOutputUdst(skimCode, ResonanceList, path=syspath)

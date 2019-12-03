@@ -20,7 +20,7 @@ skimpath = b2.Path()
 fileList = expert.get_test_file("mixedBGx1", "MC12")
 ma.inputMdstList('default', fileList, path=skimpath)
 
-from skim.systematics import *
+from skim.systematics import SystematicsLambdaList
 SysList = SystematicsLambdaList(path=skimpath)
 
 skimCode = expert.encodeSkimName('SystematicsLambda')

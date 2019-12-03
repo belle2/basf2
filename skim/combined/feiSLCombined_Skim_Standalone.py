@@ -19,7 +19,7 @@ fileList = expert.get_test_file("mixedBGx1", "MC12")
 path = b2.create_path()
 ma.inputMdstList('default', fileList, path=path)
 
-from skim.fei import *
+from skim.fei import B0SL, BplusSL, runFEIforSLCombined
 # run pre-selection  cuts and FEI
 runFEIforSLCombined(path)
 

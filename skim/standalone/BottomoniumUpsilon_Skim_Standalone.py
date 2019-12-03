@@ -31,7 +31,7 @@ stdMu('loose', path=BottomoniumUpsilonskimpath)
 stdPhotons('loose', path=BottomoniumUpsilonskimpath)
 
 # Bottomonium Skim
-from skim.quarkonium import *
+from skim.quarkonium import UpsilonList
 YList = UpsilonList(path=BottomoniumUpsilonskimpath)
 expert.skimOutputUdst(skimCode, YList, path=BottomoniumUpsilonskimpath)
 ma.summaryOfLists(YList, path=BottomoniumUpsilonskimpath)

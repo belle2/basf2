@@ -20,6 +20,8 @@ from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
 import skimExpertFunctions as expert
+from skim.systematics import ResonanceList, SystematicsLambdaList, SystematicsList, SystematicsRadEEList, \
+    SystematicsRadMuMuList, SystematicsTrackingList
 b2.set_log_level(b2.LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'
 
@@ -41,27 +43,21 @@ stdPhotons('loose', path=syspath)
 
 
 # Systematics skim
-from skim.systematics import *
 expert.add_skim('Systematics', SystematicsList(path=syspath), path=syspath)
 
 # Systematics Lambda Skim
-from skim.systematics import *
 expert.add_skim('SystematicsLambda', SystematicsLambdaList(path=syspath), path=syspath)
 
 # Systematics Tracking
-from skim.systematics import *
 expert.add_skim('SystematicsTracking', SystematicsTrackingList(path=syspath), path=syspath)
 
 # Resonan ce
-from skim.systematics import *
 expert.add_skim('Resonance', ResonanceList(path=syspath), path=syspath)
 
 # Systematics Rad mu mu
-from skim.systematics import *
 expert.add_skim('SystematicsRadMuMu', SystematicsRadMuMuList(path=syspath), path=syspath)
 
 # Systematics Rad mu mu
-from skim.systematics import *
 expert.add_skim('SystematicsRadEE', SystematicsRadEEList(path=syspath), path=syspath)
 
 b2.process(path=syspath)

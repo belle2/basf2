@@ -23,7 +23,7 @@ ma.inputMdstList('default', fileList, path=BottomoniumEtabskimpath)
 
 stdPhotons('loose', path=BottomoniumEtabskimpath)
 # Bottomonium Skim
-from skim.quarkonium import *
+from skim.quarkonium import EtabList
 EtabList = EtabList(path=BottomoniumEtabskimpath)
 expert.skimOutputUdst(skimCode, EtabList, path=BottomoniumEtabskimpath)
 ma.summaryOfLists(EtabList, path=BottomoniumEtabskimpath)

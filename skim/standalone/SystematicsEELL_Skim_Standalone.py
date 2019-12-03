@@ -28,7 +28,7 @@ ma.inputMdstList('default', fileList, path=skimpath)
 stdE('all', path=skimpath)
 stdMu('all', path=skimpath)
 
-from skim.systematics import *
+from skim.systematics import EELLList
 SysList = EELLList(skimpath)
 expert.skimOutputUdst(skimCode, SysList, path=skimpath)
 ma.summaryOfLists(SysList, path=skimpath)

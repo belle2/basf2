@@ -11,7 +11,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from variables import variables
+from variables import variables as vm
 from validation_tools.metadata import create_validation_histograms
 
 path = b2.Path()
@@ -27,8 +27,8 @@ ma.appendROEMask('B+:all', 'basic',
                  path=path)
 ma.buildContinuumSuppression('B+:all', 'basic', path=path)
 
-variables.addAlias('d1_p', 'daughter(1,p)')
-variables.addAlias('MissM2', 'weMissM2(basic,0)')
+vm.addAlias('d1_p', 'daughter(1,p)')
+vm.addAlias('MissM2', 'weMissM2(basic,0)')
 
 histogramFilename = 'SLUntagged_Validation.root'
 myEmail = 'Phil Grace <philip.grace@adelaide.edu.au>'

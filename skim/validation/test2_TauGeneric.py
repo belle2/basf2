@@ -3,7 +3,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from variables import variables
+from variables import variables as vm
 from stdCharged import stdPi
 from stdPhotons import stdPhotons
 from skim.taupair import SetTauGenericSkimVariables
@@ -26,7 +26,7 @@ stdPhotons('all', path=taugenericskim)
 # set variables
 SetTauGenericSkimVariables(path=taugenericskim)
 
-variables.addAlias('Theta_miss', 'formula(missingMomentumOfEvent_theta*180/3.14159)')
+vm.addAlias('Theta_miss', 'formula(missingMomentumOfEvent_theta*180/3.14159)')
 
 # the variables that are printed out are:
 ma.variablesToHistogram(

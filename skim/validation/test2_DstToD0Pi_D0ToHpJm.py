@@ -12,7 +12,7 @@
 import basf2 as b2
 import modularAnalysis as ma
 from stdCharged import stdK, stdPi
-from variables import variables
+from variables import variables as vm
 from validation_tools.metadata import create_validation_histograms
 
 
@@ -29,14 +29,14 @@ stdK('all', path=c2bhdpath)
 ma.reconstructDecay('D0:HpJm0_test -> pi+:loose K-:loose', '1.80 < M < 1.93 and useCMSFrame(p)>2.2', path=c2bhdpath)
 ma.reconstructDecay('D*+:HpJm0_test -> D0:HpJm0_test pi+:all', '0 < Q < 0.018', path=c2bhdpath)
 
-variables.addAlias('M_D0', 'daughter(0,InvM)')
-variables.addAlias('Pcms_D0', 'daughter(0,useCMSFrame(p))')
-variables.addAlias('d0_spi', 'daughter(1,d0)')
-variables.addAlias('z0_spi', 'daughter(1,z0)')
-variables.addAlias('dr_spi', 'daughter(1,dr)')
-variables.addAlias('dz_spi', 'daughter(1,dz)')
-variables.addAlias('Pcms_spi', 'daughter(1,useCMSFrame(p))')
-variables.addAlias('Pcms_Dst', 'useCMSFrame(p)')
+vm.addAlias('M_D0', 'daughter(0,InvM)')
+vm.addAlias('Pcms_D0', 'daughter(0,useCMSFrame(p))')
+vm.addAlias('d0_spi', 'daughter(1,d0)')
+vm.addAlias('z0_spi', 'daughter(1,z0)')
+vm.addAlias('dr_spi', 'daughter(1,dr)')
+vm.addAlias('dz_spi', 'daughter(1,dz)')
+vm.addAlias('Pcms_spi', 'daughter(1,useCMSFrame(p))')
+vm.addAlias('Pcms_Dst', 'useCMSFrame(p)')
 
 
 histogramFilename = 'DstToD0Pi_D0ToHpJm_Validation.root'

@@ -9,7 +9,7 @@ __authors__ = [
 
 import basf2 as b2
 import modularAnalysis as ma
-from variables import variables
+from variables import variables as vm
 
 
 def SetTauGenericSkimVariables(path):
@@ -49,15 +49,15 @@ def SetTauGenericSkimVariables(path):
     ma.cutAndCopyList('gamma:S1', 'gamma:tauskim', 'cosToThrustOfEvent > 0', path=path)
     ma.cutAndCopyList('gamma:S2', 'gamma:tauskim', 'cosToThrustOfEvent < 0', path=path)
 
-    variables.addAlias('nGoodTracks', 'nParticlesInList(pi+:tauskim)')
-    variables.addAlias('netCharge', 'formula(countInList(pi+:tauskim, charge == 1) - countInList(pi+:tauskim, charge == -1))')
-    variables.addAlias('nTracksS1', 'nParticlesInList(pi+:S1)')
-    variables.addAlias('nTracksS2', 'nParticlesInList(pi+:S2)')
-    variables.addAlias('invMS1', 'invMassInLists(pi+:S1, gamma:S1)')
-    variables.addAlias('invMS2', 'invMassInLists(pi+:S2, gamma:S2)')
-    # variables.addAlias('Evis', 'visibleEnergyOfEventCMS')
-    variables.addAlias('maxPt', 'maxPtInList(pi+:tauskim)')
-    variables.addAlias('E_ECLtrk', 'formula(totalECLEnergyOfParticlesInList(pi+:tauskim))')
+    vm.addAlias('nGoodTracks', 'nParticlesInList(pi+:tauskim)')
+    vm.addAlias('netCharge', 'formula(countInList(pi+:tauskim, charge == 1) - countInList(pi+:tauskim, charge == -1))')
+    vm.addAlias('nTracksS1', 'nParticlesInList(pi+:S1)')
+    vm.addAlias('nTracksS2', 'nParticlesInList(pi+:S2)')
+    vm.addAlias('invMS1', 'invMassInLists(pi+:S1, gamma:S1)')
+    vm.addAlias('invMS2', 'invMassInLists(pi+:S2, gamma:S2)')
+    # vm.addAlias('Evis', 'visibleEnergyOfEventCMS')
+    vm.addAlias('maxPt', 'maxPtInList(pi+:tauskim)')
+    vm.addAlias('E_ECLtrk', 'formula(totalECLEnergyOfParticlesInList(pi+:tauskim))')
 
 
 def TauList(path):
@@ -269,10 +269,10 @@ def SetTauThrustSkimVariables(path):
     ma.cutAndCopyList('pi+:thrustS1', 'pi+:thrust', 'cosToThrustOfEvent > 0', path=path)
     ma.cutAndCopyList('pi+:thrustS2', 'pi+:thrust', 'cosToThrustOfEvent < 0', path=path)
 
-    variables.addAlias('nGoodTracksThrust', 'nParticlesInList(pi+:thrust)')
-    variables.addAlias('netChargeThrust', 'formula(countInList(pi+:thrust, charge == 1) - countInList(pi+:thrust, charge == -1))')
-    variables.addAlias('nTracksS1Thrust', 'nParticlesInList(pi+:thrustS1)')
-    variables.addAlias('nTracksS2Thrust', 'nParticlesInList(pi+:thrustS2)')
+    vm.addAlias('nGoodTracksThrust', 'nParticlesInList(pi+:thrust)')
+    vm.addAlias('netChargeThrust', 'formula(countInList(pi+:thrust, charge == 1) - countInList(pi+:thrust, charge == -1))')
+    vm.addAlias('nTracksS1Thrust', 'nParticlesInList(pi+:thrustS1)')
+    vm.addAlias('nTracksS2Thrust', 'nParticlesInList(pi+:thrustS2)')
 
 
 def TauThrustList(path):

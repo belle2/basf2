@@ -11,7 +11,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from variables import variables
+from variables import variables as vm
 from validation_tools.metadata import create_validation_histograms
 
 path = b2.Path()
@@ -27,10 +27,10 @@ ma.appendROEMask('B-:all', 'basic',
                  path=path)
 ma.buildContinuumSuppression('B-:all', 'basic', path=path)
 
-variables.addAlias('d0_p', 'daughter(0,p)')
-variables.addAlias('d0_electronID', 'daughter(0,electronID)')
-variables.addAlias('d0_muonID', 'daughter(0,muonID)')
-variables.addAlias('MissP', 'weMissP(basic,0)')
+vm.addAlias('d0_p', 'daughter(0,p)')
+vm.addAlias('d0_electronID', 'daughter(0,electronID)')
+vm.addAlias('d0_muonID', 'daughter(0,muonID)')
+vm.addAlias('MissP', 'weMissP(basic,0)')
 
 histogramFilename = 'LeptonicUntagged_Validation.root'
 myEmail = 'Phil Grace <philip.grace@adelaide.edu.au>'

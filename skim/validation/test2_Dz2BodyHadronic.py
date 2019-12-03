@@ -12,7 +12,7 @@
 import basf2 as b2
 import modularAnalysis as ma
 
-from variables import variables
+from variables import variables as vm
 
 # create path
 myAna_Main = b2.create_path()
@@ -23,10 +23,10 @@ ma.inputMdst('default', '../WG6_DstToD0ToKpi.udst.root', path=myAna_Main)
 # --------------------------------------------------
 # write out useful information to a ROOT file
 # --------------------------------------------------
-variables.addAlias('ps_Dst', 'useCMSFrame(p)')
-variables.addAlias('M_D0', 'daughter(0,InvM)')
-variables.addAlias('ps_D0', 'daughter(0,useCMSFrame(p))')
-variables.addAlias('ps_spi', 'daughter(1,useCMSFrame(p))')
+vm.addAlias('ps_Dst', 'useCMSFrame(p)')
+vm.addAlias('M_D0', 'daughter(0,InvM)')
+vm.addAlias('ps_D0', 'daughter(0,useCMSFrame(p))')
+vm.addAlias('ps_spi', 'daughter(1,useCMSFrame(p))')
 
 DstTree = ['Q', 'M_D0', 'ps_Dst', 'ps_D0', 'ps_spi']
 

@@ -15,14 +15,14 @@ import basf2 as b2
 import fei
 import modularAnalysis as ma
 
-from variables import variables
-variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
-variables.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
-variables.addAlias('dmID', 'extraInfo(decayModeID)')
-variables.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
-variables.addAlias('cosThetaBY', 'cosThetaBetweenParticleAndNominalB')
-variables.addAlias('d1_p_CMSframe', 'useCMSFrame(daughter(1,p))')
-variables.addAlias('d2_p_CMSframe', 'useCMSFrame(daughter(2,p))')
+from variables import variables as vm
+vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
+vm.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
+vm.addAlias('dmID', 'extraInfo(decayModeID)')
+vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
+vm.addAlias('cosThetaBY', 'cosThetaBetweenParticleAndNominalB')
+vm.addAlias('d1_p_CMSframe', 'useCMSFrame(daughter(1,p))')
+vm.addAlias('d2_p_CMSframe', 'useCMSFrame(daughter(2,p))')
 
 
 def B0Hadronic(path):
@@ -424,7 +424,7 @@ def B0SL(path):
         :code:`'B0:semileptonic'`, the name of the particle list for
         SL :math:`B^0` skim candidates.
     """
-    variables.addAlias('p_lepton_CMSframe', 'conditionalVariableSelector(dmID<4, d1_p_CMSframe, d2_p_CMSframe)')
+    vm.addAlias('p_lepton_CMSframe', 'conditionalVariableSelector(dmID<4, d1_p_CMSframe, d2_p_CMSframe)')
 
     # Apply cuts
     ma.applyCuts('B0:semileptonic', 'dmID<8', path=path)
@@ -502,7 +502,7 @@ def BplusSL(path):
         :code:`'B+:semileptonic'`, the name of the particle list for
         SL :math:`B^+` skim candidates.
     """
-    variables.addAlias('p_lepton_CMSframe', 'conditionalVariableSelector(dmID<4, d1_p_CMSframe, d2_p_CMSframe)')
+    vm.addAlias('p_lepton_CMSframe', 'conditionalVariableSelector(dmID<4, d1_p_CMSframe, d2_p_CMSframe)')
 
     # Apply cuts
     ma.applyCuts('B+:semileptonic', 'dmID<8', path=path)

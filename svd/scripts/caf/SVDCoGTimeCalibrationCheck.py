@@ -68,7 +68,7 @@ else:
 
 conditions.globaltags = [
     # 'svd_NOCoGCorrections',
-    'data_reprocessing_prompt_rel4_patchb',
+    'data_reprocessing_prompt_rel4_patchb'
 ]
 conditions.testing_payloads = [
     str(localdb) + "/database.txt",

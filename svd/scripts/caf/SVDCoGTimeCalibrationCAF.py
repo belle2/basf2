@@ -19,6 +19,7 @@ from caf.utils import ExpRun, IoV
 
 import reconstruction as reco
 import modularAnalysis as ana
+from caf.strategies import SequentialBoundaries
 
 input_branches = [
     'SVDShaperDigitsFromTracks',
@@ -27,6 +28,7 @@ input_branches = [
 ]
 
 now = datetime.datetime.now()
+# uniqueID = "SVDCoGTimeCalibrations_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_lat=+47.16"
 
 
 def remove_module(path, name):
@@ -78,8 +80,6 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
 
     path = remove_module(path, 'SVDMissingAPVsClusterCreator')
 
-    # output_iov = IoV(8, 0, 8, -1)
-
     # collector setup
     collector = register_module('SVDCoGTimeCalibrationCollector')
     collector.param("SVDClustersFromTracksName", "SVDClustersFromTracks")
@@ -88,7 +88,8 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
 
     # algorithm setup
     algorithm = SVDCoGTimeCalibrationAlgorithm(uniqueID)
-    algorithm.setMinEntries(10000)
+    algorithm.setMinEntries(100)
+    algorithm.setAllowedT0Shift(2.)
 
     # calibration setup
     calibration = Calibration('SVDCoGTime',
@@ -102,12 +103,7 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
                               backend_args=None
                               )
 
-    # calibration.pre_algorithms = pre_alg
-    calibration.strategies = strategies.SequentialRunByRun
-    # calibration.strategies = strategies.SingleIOV
-
-    # for algorithm in calibration.algorithms:
-    #     algorithm.params = {"apply_iov": output_iov}
+    calibration.strategies = strategies.SequentialBoundaries
 
     return calibration
 
@@ -157,17 +153,9 @@ if __name__ == "__main__":
     print("")
     print(str(uniqueID))
     print("")
-    # 'data_reprocessing_prompt_rel4_patch'
     svdCoGCAF = SVDCoGTimeCalibration(good_input_files, ['data_reprocessing_prompt_rel4_patchb', 'svd_NOCoGCorrections'], uniqueID)
 
     cal_fw = CAF()
     cal_fw.add_calibration(svdCoGCAF)
     cal_fw.backend = backends.LSF()
-    # caf_fw.output_dir = 'calibration'
-    # Try to guess if we are at KEKCC and change the backend to Local if not
-#    if multiprocessing.cpu_count() < 10:
-#        cal_fw.backend = backends.Local(8)
-
-    # iov_to_calibrate = IoV(exp_low=8, run_low=0, exp_high=8, run_high=-1)
-    # cal_fw.run(iov=iov_to_calibrate)
     cal_fw.run()

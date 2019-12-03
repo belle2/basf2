@@ -42,8 +42,8 @@
 
 namespace Belle2 {
   /**
-   * This collects the EventT0 vs CoG used for the
-   * calibration of the SVD timing estimator (CoG) with CAF
+   * Collector module used to create the histograms needed for the
+   * SVD CoG-Time calibration
    */
   class SVDCoGTimeCalibrationCollectorModule : public CalibrationCollectorModule {
 
@@ -90,6 +90,8 @@ namespace Belle2 {
     SVDHistograms<TH1F>* m_hEventT0 = NULL; /*< EventT0 synchronized distribution*/
     SVDHistograms<TH1F>* m_hEventT0nosync = NULL; /*< EventT0 NOT synchroinized distribution*/
 
+    TH1F* m_hEventT0FromCDST = NULL; /*< EventT0 distribution read by the cDST*/
+    TH1F* m_hEventT0FromCDSTSync = NULL; /*< EventT0 distribution read by the cDST and then synchronized*/
   };
 
 } // end namespace Belle2

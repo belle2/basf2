@@ -601,7 +601,7 @@ def getStatSpecifier():
             'CombineMC': None
         },
         'udstSizePerSkimmedEvent': {
-            'LongName': 'uDST size per event (kB)',
+            'LongName': 'uDST size of passed events (kB)',
             'FloatFormat': '.3f',
             'PrintToScreen': True,
             'PrintToConfluence': True,

@@ -51,7 +51,7 @@ Belle2PhysicsList::Belle2PhysicsList(const G4String& physicsListName)
   m_pxdCutValue = m_globalCutValue;
   m_svdCutValue = m_globalCutValue;
   m_cdcCutValue = m_globalCutValue;
-
+  m_arichtopCutValue = m_globalCutValue;
   // Decay
   RegisterPhysics(new G4DecayPhysics());
 
@@ -121,6 +121,32 @@ void Belle2PhysicsList::SetCuts()
   regionCuts->SetProductionCut(m_cdcCutValue * cm);
   G4cout << " CDC cut set to " << m_cdcCutValue << G4endl;
   theRegionStore->GetRegion("CDCEnvelope")->SetProductionCuts(regionCuts);
+
+  // ARICH region cut
+  regionCuts = new G4ProductionCuts;
+  regionCuts->SetProductionCut(m_arichtopCutValue * cm);
+  theRegionStore->GetRegion("ARICHEnvelope")->SetProductionCuts(regionCuts);
+
+  // TOP module region cuts
+  regionCuts = new G4ProductionCuts;
+  regionCuts->SetProductionCut(m_arichtopCutValue * cm);
+  G4cout << " ARICH and TOP modules cuts set to " << m_arichtopCutValue << G4endl;
+  theRegionStore->GetRegion("TOPModule02")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule03")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule04")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule05")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule06")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule07")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule08")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule09")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule10")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule11")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule12")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule13")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule14")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule15")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule16")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule17")->SetProductionCuts(regionCuts);
 }
 
 
@@ -151,6 +177,12 @@ void Belle2PhysicsList::SetSVDProductionCutValue(G4double value)
 void Belle2PhysicsList::SetCDCProductionCutValue(G4double value)
 {
   m_cdcCutValue = value;
+}
+
+
+void Belle2PhysicsList::SetARICHTOPProductionCutValue(G4double value)
+{
+  m_arichtopCutValue = value;
 }
 
 

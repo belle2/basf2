@@ -84,20 +84,22 @@ def getArgumentParser():
                         choices=['all']+allCombinedSkims, metavar='SKIM',
                         help='List of combined skims to run.')
     parser.add_argument('-C', '--confluence', action='store_true',
-                        help='Print a wiki markup table to be copied to Confluence. '
-                        'By default, this tool only prints to the terminal and a JSON file.')
+                        help='Print a wiki markup table to be copied to Confluence.')
+    parser.add_argument('-J', '--json', action='store_true',
+                        help='Save the tables of statistics to a JSON file.')
     parser.add_argument('--mccampaign', default='MC12',
                         choices=['MC9', 'MC10', 'MC11', 'MC12'],
                         help='The MC campaign to test on.')
-    parser.add_argument('-v', '--verbose', action='store_true', dest='VERBOSE',
-                        help='Print out extra warning messages when the script cannot ' +
-                        'calculate a value, but moves on anyway.')
 
     sampleGroup = parser.add_mutually_exclusive_group()
     sampleGroup.add_argument('--mconly', action='store_true',
                              help='Test on only MC samples.')
     sampleGroup.add_argument('--dataonly', action='store_true',
                              help='Test on only data samples.')
+
+    parser.add_argument('-v', '--verbose', action='store_true', dest='VERBOSE',
+                        help='Print out extra warning messages when the script cannot ' +
+                        'calculate a value, but moves on anyway.')
 
     return parser
 
@@ -362,21 +364,21 @@ def testJsonFile(jsonFileContents):
     """
     try:
         outputFileInfoList = jsonFileContents['output_files']
-
-        jsonTests = [
-            jsonFileContents['basf2_status']['finished'],
-            jsonFileContents['basf2_status']['success'],
-            jsonFileContents['basf2_status']['errors'] == 0,
-            jsonFileContents['basf2_status']['fatals'] == 0,
-            all(check for outputFileInfo in outputFileInfoList
-                for check in outputFileInfo['checks_passed'].values())
-        ]
-
-        if all(jsonTests):
-            return True
-        else:
-            return False
     except KeyError:
+        return False
+
+    jsonTests = [
+        jsonFileContents['basf2_status']['finished'],
+        jsonFileContents['basf2_status']['success'],
+        jsonFileContents['basf2_status']['errors'] == 0,
+        jsonFileContents['basf2_status']['fatals'] == 0,
+        all(check for outputFileInfo in outputFileInfoList
+            for check in outputFileInfo['checks_passed'].values())
+    ]
+
+    if all(jsonTests):
+        return True
+    else:
         return False
 
 
@@ -1016,7 +1018,6 @@ if __name__ == '__main__':
 
         printToScreen(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels,
                       beamBackgrounds, args.mconly, args.dataonly, tabulateAvailable=True)
-        printToJson(allSkimStats, statSpecifier)
 
         if args.confluence:
             printToConfluence(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels, samples, beamBackgrounds)
@@ -1024,7 +1025,6 @@ if __name__ == '__main__':
     except ModuleNotFoundError:
         printToScreen(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels,
                       beamBackgrounds, args.mconly, args.dataonly, tabulateAvailable=False)
-        printToJson(allSkimStats, statSpecifier)
         
         if args.confluence:
             B2ERROR('This tool relies on the third-party package `tabulate` to '
@@ -1033,3 +1033,5 @@ if __name__ == '__main__':
                     '    pip3 install tabulate --user')
             sys.exit(1)
 
+    if args.json:
+        printToJson(allSkimStats, statSpecifier)

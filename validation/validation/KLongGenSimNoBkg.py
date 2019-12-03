@@ -15,7 +15,6 @@ from basf2 import set_random_seed, create_path, process, statistics, \
     register_module
 from simulation import add_simulation
 from beamparameters import add_beamparameters
-import validation
 
 set_random_seed(12345)
 
@@ -61,13 +60,14 @@ process(main)
 # Print call statistics
 print(statistics)
 
-validation.statistics_plots(
+from validation import *
+statistics_plots(
     'KLongGenSimNoBkg_statistics.root',
     contact='Software team b2soft@mail.desy.de',
     job_desc='a standard simulation job with generic KLongGenSimNoBkg events',
     prefix='KLongGenSimNoBkg'
 )
-validation.event_timing_plot(
+event_timing_plot(
     '../KLongGenSimNoBkg.root',
     'KLongGenSimNoBkg_statistics.root',
     contact='Software team b2soft@mail.desy.de',

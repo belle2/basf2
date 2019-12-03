@@ -40,6 +40,7 @@ class TestClusterControlDrmaa(unittest.TestCase):
 
         def __exit__(self, exc, value, tb):
             """ to support python with syntax"""
+            pass
 
         def createJobTemplate(self):
             """fake creating job template"""

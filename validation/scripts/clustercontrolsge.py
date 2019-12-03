@@ -257,3 +257,4 @@ class Cluster:
         Terminate a running job, not support with this backend so ignore the
         call.
         """
+        pass

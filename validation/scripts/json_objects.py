@@ -22,6 +22,7 @@ class JsonBase:
     """
     Base object for all json-serializable objects of the validation suite
     """
+    pass
 
 
 class Revision(JsonBase):

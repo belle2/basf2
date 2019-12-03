@@ -8,8 +8,7 @@ Expert functions
 Some helper functions to do common tasks relating to skims.
 Like testing, and for skim name encoding(decoding).
 """
-from basf2 import create_path, register_module, LogLevel, B2ERROR, AfterConditionPath
-from basf2 import Path, B2WARNING, B2INFO, B2RESULT, Module
+import basf2 as b2
 from mdst import add_mdst_output
 from modularAnalysis import removeParticlesNotInLists, skimOutputUdst, summaryOfLists
 from skim.registry import skim_registry
@@ -37,7 +36,7 @@ def encodeSkimName(skimScriptName):
     """
     lookup_dict = {n: c for c, n in skim_registry}
     if skimScriptName not in lookup_dict:
-        B2ERROR("Skim Unknown. Please add your skim to skimExpertFunctions.py.")
+        b2.B2ERROR("Skim Unknown. Please add your skim to skimExpertFunctions.py.")
     return lookup_dict[skimScriptName]
 
 
@@ -50,7 +49,7 @@ def decodeSkimName(skimCode):
     """
     lookup_dict = {c: n for c, n in skim_registry}
     if skimCode not in lookup_dict:
-        B2ERROR("Code Unknown. Please add your skim to skimExpertFunctions.py")
+        b2.B2ERROR("Code Unknown. Please add your skim to skimExpertFunctions.py")
     return lookup_dict[skimCode]
 
 
@@ -65,7 +64,7 @@ def get_test_file(sample, skimCampaign):
     sampleName = skimCampaign + '_' + sample
     lookup_dict = {s: f for s, f in skimTestFilesInfo.kekcc_locations}
     if sampleName not in lookup_dict:
-        B2ERROR("Testing file for this sample and skim campaign is not available.")
+        b2.B2ERROR("Testing file for this sample and skim campaign is not available.")
     return lookup_dict[sampleName]
 
 
@@ -112,7 +111,7 @@ def setSkimLogging(path, additional_modules=[]):
     noisy_modules = ['ParticleLoader', 'ParticleVertexFitter'] + additional_modules
     for module in path.modules():
         if module.type() in noisy_modules:
-            module.set_log_level(LogLevel.ERROR)
+            module.set_log_level(b2.LogLevel.ERROR)
     return
 
 
@@ -127,7 +126,7 @@ def ifEventPasses(cut, conditional_path, path):
         path (basf2.Path): modules are added to this path
     """
     eselect = path.add_module("VariableToReturnValue", variable=f"passesEventCut({cut})")
-    eselect.if_value('>=1', conditional_path, AfterConditionPath.CONTINUE)
+    eselect.if_value('>=1', conditional_path, b2.AfterConditionPath.CONTINUE)
 
 
 def get_eventN(fileName):
@@ -145,7 +144,7 @@ def get_eventN(fileName):
         nevents = metadata['nEvents']
         return nevents
     else:
-        B2ERROR("FILE INVALID OR NOT FOUND.")
+        b2.B2ERROR("FILE INVALID OR NOT FOUND.")
 
 
 def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=[], outputParticleLists=[], includeArrays=[], *,
@@ -179,15 +178,15 @@ def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=[], outputParticl
     if not outputFile.endswith(".mdst.root"):
         outputFile += ".mdst.root"
 
-    skimfilter = register_module('SkimFilter')
+    skimfilter = b2.register_module('SkimFilter')
     skimfilter.set_name('SkimFilter_' + skimDecayMode)
     skimfilter.param('particleLists', skimParticleLists)
     path.add_module(skimfilter)
-    filter_path = create_path()
-    skimfilter.if_value('=1', filter_path, AfterConditionPath.CONTINUE)
+    filter_path = b2.create_path()
+    skimfilter.if_value('=1', filter_path, b2.AfterConditionPath.CONTINUE)
 
     # add_independent_path() is rather expensive, only do this for skimmed events
-    skim_path = create_path()
+    skim_path = b2.create_path()
     saveParticleLists = skimParticleLists + outputParticleLists
     removeParticlesNotInLists(saveParticleLists, path=skim_path)
 
@@ -201,7 +200,7 @@ def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=[], outputParticl
     filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
 
 
-class RetentionCheck(Module):
+class RetentionCheck(b2.Module):
     """Check the retention rate and the number of candidates for a given set of particle lists.
 
     The module stores its results in the static variable "summary".
@@ -281,7 +280,7 @@ class RetentionCheck(Module):
 
             else:
 
-                B2WARNING("Belle2.Environment.Instance().getNumberOfEvents() gives 0 or less.")
+                b2.B2WARNING("Belle2.Environment.Instance().getNumberOfEvents() gives 0 or less.")
                 retention_rate = 0
 
             type(self).summary[self._key][particle_list] = {"retention_rate": retention_rate,
@@ -320,16 +319,16 @@ class RetentionCheck(Module):
                         summary_tables[particle_list] += table_line.format(module, *list_results.values())
 
         for particle_list, summary_table in summary_tables.items():
-            B2INFO("\n" + "=" * 160 + "\n" +
-                   "Results of the modules RetentionCheck for the list " + particle_list + ".\n" +
-                   "=" * 160 + "\n" +
-                   "Note: the module RetentionCheck is defined in skim/scripts/skimExpertFunctions.py\n" +
-                   "=" * 160 + "\n" +
-                   summary_table +
-                   "=" * 160 + "\n" +
-                   "End of the results of the modules RetentionCheck for the list " + particle_list + ".\n" +
-                   "=" * 160 + "\n"
-                   )
+            b2.B2INFO("\n" + "=" * 160 + "\n" +
+                      "Results of the modules RetentionCheck for the list " + particle_list + ".\n" +
+                      "=" * 160 + "\n" +
+                      "Note: the module RetentionCheck is defined in skim/scripts/skimExpertFunctions.py\n" +
+                      "=" * 160 + "\n" +
+                      summary_table +
+                      "=" * 160 + "\n" +
+                      "End of the results of the modules RetentionCheck for the list " + particle_list + ".\n" +
+                      "=" * 160 + "\n"
+                      )
 
     @classmethod
     def plot_retention(cls, particle_list, plot_title="", save_as=None, module_name_max_length=80):
@@ -353,8 +352,8 @@ class RetentionCheck(Module):
         for module, results in cls.summary.items():
 
             if particle_list not in results.keys():
-                B2WARNING(particle_list+" is not present in the results of the RetentionCheck for the module {}."
-                          .format(module))
+                b2.B2WARNING(particle_list+" is not present in the results of the RetentionCheck for the module {}."
+                             .format(module))
                 return
 
             if results[particle_list]['retention_rate'] > 0 or at_least_one_entry:
@@ -365,7 +364,7 @@ class RetentionCheck(Module):
                 retention.append(100*(results[particle_list]['retention_rate']))
 
         if not at_least_one_entry:
-            B2WARNING(particle_list+" seems to have a zero retention rate when created (if created).")
+            b2.B2WARNING(particle_list+" seems to have a zero retention rate when created (if created).")
             return
 
         plt.figure()
@@ -390,8 +389,8 @@ class RetentionCheck(Module):
                 os.makedirs(os.path.dirname(save_as), exist_ok=True)
             plt.title(plot_title)
             plt.savefig(save_as, bbox_inches="tight")
-            B2RESULT("Retention rate results for list {} saved in {}."
-                     .format(particle_list, os.getcwd()+"/"+save_as))
+            b2.B2RESULT("Retention rate results for list {} saved in {}."
+                        .format(particle_list, os.getcwd()+"/"+save_as))
 
 
 def pathWithRetentionCheck(particle_lists, path):
@@ -423,7 +422,7 @@ def pathWithRetentionCheck(particle_lists, path):
         particle_lists (list(str)): list of particle list names which will be tracked by RetentionCheck
         path (basf2.Path): initial path (it is not modified, see warning above and example of use)
     """
-    new_path = Path()
+    new_path = b2.Path()
     for module_number, module in enumerate(path.modules()):
         new_path.add_module(module)
         if 'ParticleSelector' in module.name():

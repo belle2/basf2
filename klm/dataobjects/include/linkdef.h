@@ -9,6 +9,8 @@
 #pragma link C++ class Belle2::KLMChannelMapValue<unsigned int>+;
 #pragma link C++ class Belle2::KLMDigitEventInfo+;
 #pragma link C++ class Belle2::KLMDigitRaw+;
+#pragma link C++ class Belle2::KLMMuidHit+;
+#pragma link C++ class Belle2::KLMMuidLikelihood+;
 #pragma link C++ class Belle2::KLMScintillatorFirmwareFitResult+;
 
 /* Element numbers and indices. */

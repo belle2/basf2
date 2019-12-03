@@ -26,7 +26,8 @@ using namespace Belle2;
 CDCDedxCosineAlgorithm::CDCDedxCosineAlgorithm() :
   CalibrationAlgorithm("CDCDedxElectronCollector"),
   isMethodSep(true),
-  isMakePlots(true)
+  isMakePlots(true),
+  isMergePayload(true)
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx electron cos(theta) dependence");
@@ -286,9 +287,28 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
     delete ctmpCCComp;
   }
 
+  generateNewPayloads(cosine);
+  return c_OK;
+}
+
+
+
+void CDCDedxCosineAlgorithm::generateNewPayloads(std::vector<double> cosine)
+{
+
+  if (isMergePayload) {
+    const auto expRun = getRunList()[0];
+    updateDBObjPtrs(1, expRun.second, expRun.first);
+    // bool refchange = m_DBCosineCor.hasChanged(); //Add this feature for major processing
+    B2INFO("Saving new rung for (Exp, Run) : (" << expRun.first << "," << expRun.second << ")");
+    for (unsigned int ibin = 0; ibin < m_DBCosineCor->getSize(); ibin++) {
+      B2INFO("Cosine Corr for Bin # " << ibin << ", Previous = " << m_DBCosineCor->getMean(ibin) << ", Relative = " << cosine.at(
+               ibin) << ", Merged = " << m_DBCosineCor->getMean(ibin)*cosine.at(ibin));
+      cosine.at(ibin) *= (double)m_DBCosineCor->getMean(ibin);
+    }
+  }
+
   B2INFO("dE/dx calibration done for CDC dE/dx electron saturation");
   CDCDedxCosineCor* gain = new CDCDedxCosineCor(cosine);
   saveCalibration(gain, "CDCDedxCosineCor");
-
-  return c_OK;
 }

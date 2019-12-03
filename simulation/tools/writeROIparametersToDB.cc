@@ -10,8 +10,7 @@
 
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
-#include <framework/database/LocalDatabase.h>
-#include <framework/database/DatabaseChain.h>
+#include <framework/database/Configuration.h>
 #include <framework/logging/LogSystem.h>
 #include <framework/utilities/FileSystem.h>
 
@@ -53,7 +52,8 @@ int main(int argc, char** argv)
 
   //------------------------------------------------------------------------
   //..Specify database
-  Belle2::LocalDatabase::createInstance("localdb/database.txt", "", Belle2::LogConfig::c_Debug);
+  auto& conf = Belle2::Conditions::Configuration::getInstance();
+  conf.prependTestingPayloadLocation("localdb/database.txt");
 
   //..set debug level
   Belle2::LogConfig* logging = Belle2::LogSystem::Instance().getLogConfig();

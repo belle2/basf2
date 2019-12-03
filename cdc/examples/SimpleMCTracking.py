@@ -75,7 +75,7 @@ g4sim = register_module('FullSim')
 # this is needed for the MCTrackFinder to work correctly <- obsolete ?
 g4sim.param('StoreAllSecondaries', True)
 # g4sim.param('SecondariesEnergyCut', 0.0)
-g4sim.param('UICommands', ['/control/execute interactions.mac'])
+g4sim.param('UICommandsAtIdle', ['/control/execute interactions.mac'])
 # suppress delta-rays
 g4sim.param('ProductionCut', 1000000.)
 

@@ -20,8 +20,7 @@
 
 using namespace Belle2;
 
-
-MetadataService::MetadataService()
+MetadataService::MetadataService(): m_basf2StartTime{Utils::getClock()}
 {
   m_json["basf2_apiversion"] = 1;
 }
@@ -73,13 +72,11 @@ void MetadataService::addRootNtupleFile(const std::string& fileName)
   writeJson();
 }
 
-static auto basf2StartTime = Utils::getClock();
-
 void MetadataService::addBasf2Status(const std::string& message)
 {
   if (m_fileName.empty()) return;
   auto& status = m_json["basf2_status"];
-  status["elapsed_walltime_sec"] = (Utils::getClock() - basf2StartTime) / Unit::s;
+  status["elapsed_walltime_sec"] = (Utils::getClock() - m_basf2StartTime) / Unit::s;
   status["resident_memory_mb"] = Utils::getRssMemoryKB() / 1024;
   StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
   if (processStatistics.isValid()) {

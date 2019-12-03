@@ -28,6 +28,19 @@ namespace Belle2 {
   public:
 
     /**
+     * Calibration stage.
+     */
+    enum CalibrationStage {
+
+      /** Check of set of planes with determined efficiency. */
+      c_MeasurablePlaneCheck,
+
+      /** Measurement. */
+      c_EfficiencyMeasurement,
+
+    };
+
+    /**
      * Constructor.
      */
     KLMStripEfficiencyAlgorithm();
@@ -69,11 +82,43 @@ namespace Belle2 {
     }
 
     /**
+     * Set calibration stage.
+     */
+    void setCalibrationStage(enum CalibrationStage calibrationStage)
+    {
+      m_CalibrationStage = calibrationStage;
+    }
+
+    /**
      * Set minimal number of ExtHits.
      */
     void setMinimalExtHits(int minimalExtHits)
     {
       m_MinimalExtHits = minimalExtHits;
+    }
+
+    /**
+     * Set requested precision of efficiency measurement.
+     */
+    void setRequestedPrecision(float requestedPrecision)
+    {
+      m_RequestedPrecision = requestedPrecision;
+    }
+
+    /**
+     * Get requested precision of efficiency measurement.
+     */
+    float getRequestedPrecision() const
+    {
+      return m_RequestedPrecision;
+    }
+
+    /**
+     * Get achieved precision of efficiency measurement (the worst one).
+     */
+    float getAchievedPrecision() const
+    {
+      return m_AchievedPrecision;
     }
 
     /**
@@ -90,6 +135,14 @@ namespace Belle2 {
     float* getEfficiency() const
     {
       return m_Efficiency;
+    }
+
+    /**
+     * Get total number of ExtHits.
+     */
+    int getExtHits() const
+    {
+      return m_ExtHits;
     }
 
     /**
@@ -120,14 +173,26 @@ namespace Belle2 {
     /** Whether the calibration is forced. */
     bool m_ForcedCalibration = false;
 
+    /** Calibration stage. */
+    enum CalibrationStage m_CalibrationStage = c_MeasurablePlaneCheck;
+
     /** Minimal number of ExtHits per plane. */
     int m_MinimalExtHits = 10;
+
+    /** Requested precision of efficiency measurement. */
+    float m_RequestedPrecision = 0.02;
+
+    /** Achieved precision of efficiency measurement. */
+    float m_AchievedPrecision = 0;
 
     /** Number of matched digits. */
     int m_MatchedDigits = 0;
 
     /** Efiiciency. */
     float* m_Efficiency;
+
+    /** Number of ExtHits. */
+    int m_ExtHits;
 
     /** Number of ExtHits per plane. */
     int* m_ExtHitsPlane;

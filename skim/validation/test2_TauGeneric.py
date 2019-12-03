@@ -1,8 +1,8 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from variables import variables
 from stdCharged import *
 from stdPhotons import *
@@ -15,9 +15,9 @@ from stdPhotons import *
 </header>
 """
 
-taugenericskim = Path()
+taugenericskim = b2.Path()
 
-inputMdst('default', '../TauGeneric.udst.root', path=taugenericskim)
+ma.inputMdst('default', '../TauGeneric.udst.root', path=taugenericskim)
 
 stdPi('all', path=taugenericskim)
 stdPhotons('all', path=taugenericskim)
@@ -29,7 +29,7 @@ SetTauGenericSkimVariables(path=taugenericskim)
 variables.addAlias('Theta_miss', 'formula(missingMomentumOfEvent_theta*180/3.14159)')
 
 # the variables that are printed out are:
-variablesToHistogram(
+ma.variablesToHistogram(
     filename='TauGeneric_Validation.root',
     decayString='',
     variables=[('nGoodTracks', 7, 1, 8),
@@ -42,8 +42,8 @@ variablesToHistogram(
     variables_2d=[('invMS1', 30, 0, 3, 'invMS2', 30, 0, 3)],
     path=taugenericskim
 )
-process(taugenericskim)
-print(statistics)
+b2.process(taugenericskim)
+print(b2.statistics)
 
 # add contact information to histogram
 contact = "kenji@hepl.phys.nagoya-u.ac.jp"

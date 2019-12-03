@@ -11,20 +11,17 @@
 
 __author__ = "Kenji Inami"
 
-import sys
-import glob
-import os.path
 
-from basf2 import *
-from modularAnalysis import *
-from skimExpertFunctions import *
+import basf2 as b2
+import modularAnalysis as ma
+import skimExpertFunctions as expert
 from stdCharged import *
 from stdPhotons import *
 
-taugenericskim = Path()
+taugenericskim = b2.Path()
 
 fileList = ['../TauGeneric.dst.root']
-inputMdstList('default', fileList, path=taugenericskim)
+ma.inputMdstList('default', fileList, path=taugenericskim)
 
 stdPi('all', path=taugenericskim)
 stdPhotons('all', path=taugenericskim)
@@ -32,12 +29,12 @@ stdPhotons('all', path=taugenericskim)
 # TauGeneric skim
 from skim.taupair import *
 tauList = TauList(path=taugenericskim)
-skimOutputUdst('../TauGeneric.udst.root', tauList, path=taugenericskim)
-summaryOfLists(tauList, path=taugenericskim)
+expert.skimOutputUdst('../TauGeneric.udst.root', tauList, path=taugenericskim)
+ma.summaryOfLists(tauList, path=taugenericskim)
 
 # Suppress noisy modules, and then process
-setSkimLogging(path=taugenericskim)
-process(taugenericskim)
+expert.setSkimLogging(path=taugenericskim)
+b2.process(taugenericskim)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

@@ -11,9 +11,8 @@
 """
 
 
-import basf2
 import modularAnalysis as ma
-from skimExpertFunctions import *
+import skimExpertFunctions as expert
 
 from stdCharged import *
 from stdPhotons import *
@@ -22,11 +21,11 @@ from stdV0s import *
 from skim.standardlists.lightmesons import loadStdLightMesons
 from skim.standardlists.dileptons import loadStdDiLeptons
 
-tcpvskimpath = Path()
+tcpvskimpath = b2.Path()
 
 fileList = ['../TCPV.dst.root']
 
-inputMdstList('default', fileList, path=tcpvskimpath)
+ma.inputMdstList('default', fileList, path=tcpvskimpath)
 
 
 loadStdSkimPi0(path=tcpvskimpath)
@@ -41,17 +40,17 @@ stdPhotons('loose', path=tcpvskimpath)
 stdKshorts(path=tcpvskimpath)
 loadStdDiLeptons(True, path=tcpvskimpath)
 loadStdLightMesons(path=tcpvskimpath)
-cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=tcpvskimpath)
+ma.cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=tcpvskimpath)
 
 
 # TCPV  B0 skim
 from skim.tcpv import TCPVList
 TCPVList = TCPVList(path=tcpvskimpath)
-ma.skimOutputUdst('../TCPV.udst.root', TCPVList, path=tcpvskimpath)
+ma.expert.skimOutputUdst('../TCPV.udst.root', TCPVList, path=tcpvskimpath)
 ma.summaryOfLists(TCPVList, path=tcpvskimpath)
 
-setSkimLogging(path=tcpvskimpath)
-process(tcpvskimpath)
+expert.setSkimLogging(path=tcpvskimpath)
+b2.process(tcpvskimpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

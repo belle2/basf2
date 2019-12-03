@@ -11,20 +11,20 @@
 """
 __author__ = "G. GONG"
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from stdCharged import stdPi
 from stdCharged import stdK
-from skimExpertFunctions import encodeSkimName, setSkimLogging
+import skimExpertFunctions as expert
 
 
-c2bhdpath = Path()
+c2bhdpath = b2.Path()
 
-skimCode = encodeSkimName('DstToD0Pi_D0ToHpJm')
+skimCode = expert.encodeSkimName('DstToD0Pi_D0ToHpJm')
 
 fileList = ['../DstToD0Pi_D0ToHpJm.dst.root']
 
-inputMdstList('default', fileList, path=c2bhdpath)
+ma.inputMdstList('default', fileList, path=c2bhdpath)
 
 # Load particle lists
 stdPi('loose', path=c2bhdpath)
@@ -35,12 +35,12 @@ stdK('all', path=c2bhdpath)
 # Charm 2 Body Hadronic skim
 from skim.charm import DstToD0PiD0ToHpJm
 DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm(path=c2bhdpath)
-skimOutputUdst(skimCode, DstToD0PiD0ToHpJmList, path=c2bhdpath)
-summaryOfLists(DstToD0PiD0ToHpJmList, path=c2bhdpath)
+expert.skimOutputUdst(skimCode, DstToD0PiD0ToHpJmList, path=c2bhdpath)
+ma.summaryOfLists(DstToD0PiD0ToHpJmList, path=c2bhdpath)
 
 # Suppress noisy modules, and then process
-setSkimLogging(path=c2bhdpath)
-process(c2bhdpath)
+expert.setSkimLogging(path=c2bhdpath)
+b2.process(c2bhdpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

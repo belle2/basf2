@@ -11,20 +11,20 @@
 """
 __author__ = "P. Grace"
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.charm import *
-from skimExpertFunctions import *
+import skimExpertFunctions as expert
 
 
-SLpath = Path()
+SLpath = b2.Path()
 
 fileList = ['../SLUntagged.dst.root']
 
-inputMdstList('default', fileList, path=SLpath)
+ma.inputMdstList('default', fileList, path=SLpath)
 
 stdPi('loose', path=SLpath)
 stdK('loose', path=SLpath)
@@ -44,13 +44,13 @@ loadStdDstarPlus(path=SLpath)
 # SL Skim
 from skim.semileptonic import SemileptonicList
 SLList = SemileptonicList(SLpath)
-skimOutputUdst('../SLUntagged', SLList, path=SLpath)
+expert.skimOutputUdst('../SLUntagged', SLList, path=SLpath)
 
-summaryOfLists(SLList, path=SLpath)
+ma.summaryOfLists(SLList, path=SLpath)
 
 
-setSkimLogging(path=SLpath)
-process(SLpath)
+expert.setSkimLogging(path=SLpath)
+b2.process(SLpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

@@ -9,19 +9,18 @@
 </header>
 """
 
-from basf2 import *
+import basf2 as b2
 from vertex import *
-from modularAnalysis import *
-from reconstruction import *
+import modularAnalysis as ma
 
 from stdCharged import *
 from variables import variables
 
 # create path
-myAna_Main = create_path()
+myAna_Main = b2.create_path()
 
 # load input ROOT file
-inputMdst('default', '../WG6_DstToD0ToKpi.udst.root', path=myAna_Main)
+ma.inputMdst('default', '../WG6_DstToD0ToKpi.udst.root', path=myAna_Main)
 
 # --------------------------------------------------
 # write out useful information to a ROOT file
@@ -44,6 +43,6 @@ variablesToNtuple(filename='WG6_DstToD0ToKpi.ntup.root',
 # --------------------------------------------------
 myAna_Main.add_module('Progress')
 
-process(myAna_Main)
+b2.process(myAna_Main)
 
-print(statistics)
+print(b2.statistics)

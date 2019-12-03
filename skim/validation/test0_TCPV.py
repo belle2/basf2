@@ -16,8 +16,6 @@ import generators as ge
 import simulation as si
 import reconstruction as re
 import modularAnalysis as ma
-from ROOT import Belle2
-import glob
 
 
 # Defining custom path
@@ -42,7 +40,7 @@ re.add_reconstruction(path=tcpvskimpath)
 
 # Finally add mdst output
 output_filename = "../TCPV.dst.root"
-mdst.add_mdst_output(path=tcpvskimpath, mc=True, filename=output_filename)
+mdst.b2.add_mdst_output(path=tcpvskimpath, mc=True, filename=output_filename)
 
 
 # process events and print call statistics

@@ -9,14 +9,14 @@
 </header>
 """
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from variables import variables
 from validation_tools.metadata import create_validation_histograms
 
-path = Path()
+path = b2.Path()
 
-inputMdst('default', '../feiSLBplus.udst.root', path=path)
+ma.inputMdst('default', '../feiSLBplus.udst.root', path=path)
 
 variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
 variables.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
@@ -52,5 +52,5 @@ create_validation_histograms(
                    'Decay mode ID', '#log_10(signal probability)', 'colz')],
     path=path)
 
-process(path)
-print(statistics)
+b2.process(path)
+print(b2.statistics)

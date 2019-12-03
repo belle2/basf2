@@ -9,16 +9,16 @@
 </header>
 """
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from stdCharged import stdPi, stdK
 from variables import variables
 from validation_tools.metadata import create_validation_histograms
 
 
-c2bhdpath = Path()
+c2bhdpath = b2.Path()
 
-inputMdst('default', '17240100.udst.root', path=c2bhdpath)
+ma.inputMdst('default', '17240100.udst.root', path=c2bhdpath)
 
 # Load particle lists
 stdPi('loose', path=c2bhdpath)
@@ -26,8 +26,8 @@ stdK('loose', path=c2bhdpath)
 stdPi('all', path=c2bhdpath)
 stdK('all', path=c2bhdpath)
 
-reconstructDecay('D0:HpJm0_test -> pi+:loose K-:loose', '1.80 < M < 1.93 and useCMSFrame(p)>2.2', path=c2bhdpath)
-reconstructDecay('D*+:HpJm0_test -> D0:HpJm0_test pi+:all', '0 < Q < 0.018', path=c2bhdpath)
+ma.reconstructDecay('D0:HpJm0_test -> pi+:loose K-:loose', '1.80 < M < 1.93 and useCMSFrame(p)>2.2', path=c2bhdpath)
+ma.reconstructDecay('D*+:HpJm0_test -> D0:HpJm0_test pi+:all', '0 < Q < 0.018', path=c2bhdpath)
 
 variables.addAlias('M_D0', 'daughter(0,InvM)')
 variables.addAlias('Pcms_D0', 'daughter(0,useCMSFrame(p))')
@@ -68,5 +68,5 @@ create_validation_histograms(
     ],
     path=c2bhdpath)
 
-process(c2bhdpath)
-print(statistics)
+b2.process(c2bhdpath)
+print(b2.statistics)

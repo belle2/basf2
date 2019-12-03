@@ -1,9 +1,8 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
-from basf2 import *
-from modularAnalysis import *
-from variables import variables
+import basf2 as b2
+import modularAnalysis as ma
 from stdCharged import *
 from stdPhotons import *
 
@@ -15,9 +14,9 @@ from stdPhotons import *
 </header>
 """
 
-tauthrustskim = Path()
+tauthrustskim = b2.Path()
 
-inputMdst('default', '../TauThrust.udst.root', path=tauthrustskim)
+ma.inputMdst('default', '../TauThrust.udst.root', path=tauthrustskim)
 
 stdPi('all', path=tauthrustskim)
 stdPhotons('all', path=tauthrustskim)
@@ -27,7 +26,7 @@ from skim.taupair import *
 SetTauThrustSkimVariables(path=tauthrustskim)
 
 # the variables that are printed out are:
-variablesToHistogram(
+ma.variablesToHistogram(
     filename='TauThrust_Validation.root',
     decayString='',
     variables=[('nGoodTracksThrust', 7, 1, 8),
@@ -35,8 +34,8 @@ variablesToHistogram(
                ('thrust', 50, 0.75, 1)],
     path=tauthrustskim
 )
-process(tauthrustskim)
-print(statistics)
+b2.process(tauthrustskim)
+print(b2.statistics)
 
 # add contact information to histogram
 contact = "kenji@hepl.phys.nagoya-u.ac.jp"

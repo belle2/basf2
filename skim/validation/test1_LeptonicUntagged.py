@@ -11,20 +11,19 @@
 """
 __author__ = "P. Grace"
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPi0s import *
-from stdV0s import stdKshorts
 from skim.standardlists.charm import *
-from skimExpertFunctions import *
+import skimExpertFunctions as expert
 
 
-path = Path()
+path = b2.Path()
 
 fileList = ['../LeptonicUntagged.dst.root']
 
-inputMdstList('default', fileList, path=path)
+ma.inputMdstList('default', fileList, path=path)
 
 # Load particle lists
 loadStdSkimPi0(path=path)
@@ -41,13 +40,13 @@ stdPhotons('loose', path=path)
 from skim.leptonic import LeptonicList
 
 lepList = LeptonicList(path=path)
-skimOutputUdst('../LeptonicUntagged', lepList, path=path)
+expert.skimOutputUdst('../LeptonicUntagged', lepList, path=path)
 
-summaryOfLists(lepList, path=path)
+ma.summaryOfLists(lepList, path=path)
 
 # Suppress noisy modules, and then process
-setSkimLogging(path)
-process(path)
+expert.setSkimLogging(path)
+b2.process(path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

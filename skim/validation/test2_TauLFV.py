@@ -1,8 +1,8 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from stdCharged import *
 from stdPhotons import *
 from stdPi0s import *
@@ -17,9 +17,9 @@ from skim.standardlists.lightmesons import *
 </header>
 """
 
-taulfvskim = Path()
+taulfvskim = b2.Path()
 
-inputMdst('default', '../TauLFV.udst.root', path=taulfvskim)
+ma.inputMdst('default', '../TauLFV.udst.root', path=taulfvskim)
 
 stdPi('loose', path=taulfvskim)
 stdK('loose', path=taulfvskim)
@@ -37,16 +37,15 @@ tauList = TauLFVList(0, path=taulfvskim)
 copyLists('tau+:LFV', tauList, path=taulfvskim)
 
 # the variables that are printed out are: M, deltaE
-from variables import variables
-variablesToHistogram(
+ma.variablesToHistogram(
     filename='TauLFV_Validation.root',
     decayString='tau+:LFV',
     variables=[('M', 100, 1.50, 2.00), ('deltaE', 120, -1.1, 1.1)],
     variables_2d=[('M', 50, 1.50, 2.00, 'deltaE', 60, -1.1, 1.1)],
     path=taulfvskim
 )
-process(taulfvskim)
-print(statistics)
+b2.process(taulfvskim)
+print(b2.statistics)
 
 # add contact information to histogram
 contact = "kenji@hepl.phys.nagoya-u.ac.jp"

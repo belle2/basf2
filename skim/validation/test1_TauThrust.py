@@ -11,20 +11,17 @@
 
 __author__ = "Kenji Inami"
 
-import sys
-import glob
-import os.path
 
-from basf2 import *
-from modularAnalysis import *
-from skimExpertFunctions import *
+import basf2 as b2
+import modularAnalysis as ma
+import skimExpertFunctions as expert
 from stdCharged import *
 from stdPhotons import *
 
-tauthrustskim = Path()
+tauthrustskim = b2.Path()
 
 fileList = ['../TauThrust.dst.root']
-inputMdstList('default', fileList, path=tauthrustskim)
+ma.inputMdstList('default', fileList, path=tauthrustskim)
 
 stdPi('all', path=tauthrustskim)
 stdPhotons('all', path=tauthrustskim)
@@ -32,12 +29,12 @@ stdPhotons('all', path=tauthrustskim)
 # TauThrust skim
 from skim.taupair import *
 tauList = TauThrustList(path=tauthrustskim)
-skimOutputUdst('../TauThrust.udst.root', tauList, path=tauthrustskim)
-summaryOfLists(tauList, path=tauthrustskim)
+expert.skimOutputUdst('../TauThrust.udst.root', tauList, path=tauthrustskim)
+ma.summaryOfLists(tauList, path=tauthrustskim)
 
 # Suppress noisy modules, and then process
-setSkimLogging(path=tauthrustskim)
-process(tauthrustskim)
+expert.setSkimLogging(path=tauthrustskim)
+b2.process(tauthrustskim)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

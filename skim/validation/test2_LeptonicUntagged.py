@@ -9,23 +9,23 @@
 </header>
 """
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from variables import variables
 from validation_tools.metadata import create_validation_histograms
 
-path = Path()
+path = b2.Path()
 
-inputMdst('default', '../LeptonicUntagged.udst.root', path=path)
+ma.inputMdst('default', '../LeptonicUntagged.udst.root', path=path)
 
-cutAndCopyLists('B-:all', ['B-:L0', 'B-:L1'], '', path=path)
+ma.cutAndCopyLists('B-:all', ['B-:L0', 'B-:L1'], '', path=path)
 
-buildRestOfEvent('B-:all', path=path)
-appendROEMask('B-:all', 'basic',
-              'pt>0.05 and -2<dr<2 and -4.0<dz<4.0',
-              'E>0.05',
-              path=path)
-buildContinuumSuppression('B-:all', 'basic', path=path)
+ma.buildRestOfEvent('B-:all', path=path)
+ma.appendROEMask('B-:all', 'basic',
+                 'pt>0.05 and -2<dr<2 and -4.0<dz<4.0',
+                 'E>0.05',
+                 path=path)
+ma.buildContinuumSuppression('B-:all', 'basic', path=path)
 
 variables.addAlias('d0_p', 'daughter(0,p)')
 variables.addAlias('d0_electronID', 'daughter(0,electronID)')
@@ -49,5 +49,5 @@ create_validation_histograms(
     variables_2d=[('deltaE', 100, -5, 5, 'Mbc', 100, 4.0, 5.3, 'Mbc vs deltaE', myEmail, '', '')],
     path=path)
 
-process(path)
-print(statistics)
+b2.process(path)
+print(b2.statistics)

@@ -11,16 +11,15 @@
 """
 __author__ = "P. Grace"
 
-from basf2 import *
-from modularAnalysis import *
-from beamparameters import add_beamparameters
-from skimExpertFunctions import *
+import basf2 as b2
+import modularAnalysis as ma
+import skimExpertFunctions as expert
 
-path = Path()
+path = b2.Path()
 
 fileList = ['../feiHadronicB0.dst.root']
 
-inputMdstList('default', fileList, path=path)
+ma.inputMdstList('default', fileList, path=path)
 
 from skim.fei import *
 # run pre-selection cuts and FEI
@@ -31,12 +30,12 @@ path.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=Tru
 
 # Apply final B0 tag cuts
 B0HadronicList = B0Hadronic(path)
-skimOutputUdst('../feiHadronicB0', B0HadronicList, path=path)
-summaryOfLists(B0HadronicList, path=path)
+expert.skimOutputUdst('../feiHadronicB0', B0HadronicList, path=path)
+ma.summaryOfLists(B0HadronicList, path=path)
 
 # Suppress noisy modules, and then process
-setSkimLogging(path)
-process(path)
+expert.setSkimLogging(path)
+b2.process(path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

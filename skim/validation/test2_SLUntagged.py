@@ -9,23 +9,23 @@
 </header>
 """
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from variables import variables
 from validation_tools.metadata import create_validation_histograms
 
-path = Path()
+path = b2.Path()
 
-inputMdst('default', '../SLUntagged.udst.root', path=path)
+ma.inputMdst('default', '../SLUntagged.udst.root', path=path)
 
-cutAndCopyLists('B+:all', ['B+:SL0', 'B+:SL1', 'B+:SL2', 'B+:SL3'], '', path=path)
+ma.cutAndCopyLists('B+:all', ['B+:SL0', 'B+:SL1', 'B+:SL2', 'B+:SL3'], '', path=path)
 
-buildRestOfEvent('B+:all', path=path)
-appendROEMask('B+:all', 'basic',
-              'pt>0.05 and -2<dr<2 and -4.0<dz<4.0',
-              'E>0.05',
-              path=path)
-buildContinuumSuppression('B+:all', 'basic', path=path)
+ma.buildRestOfEvent('B+:all', path=path)
+ma.appendROEMask('B+:all', 'basic',
+                 'pt>0.05 and -2<dr<2 and -4.0<dz<4.0',
+                 'E>0.05',
+                 path=path)
+ma.buildContinuumSuppression('B+:all', 'basic', path=path)
 
 variables.addAlias('d1_p', 'daughter(1,p)')
 variables.addAlias('MissM2', 'weMissM2(basic,0)')
@@ -46,5 +46,5 @@ create_validation_histograms(
     path=path)
 
 
-process(path)
-print(statistics)
+b2.process(path)
+print(b2.statistics)

@@ -12,6 +12,7 @@ from caf.utils import IoV, AlgResult
 from caf.utils import runs_overlapping_iov, runs_from_vector
 from caf.strategies import AlgorithmStrategy
 from caf.state_machines import AlgorithmMachine
+from ROOT.Belle2 import KLMStripEfficiencyAlgorithm
 
 
 class KLMStripEfficiency(AlgorithmStrategy):
@@ -52,6 +53,8 @@ class KLMStripEfficiency(AlgorithmStrategy):
         self.machine.setup_from_dict(machine_params)
         # Start moving through machine states
         basf2.B2INFO(f"Starting AlgorithmMachine of {self.algorithm.name}")
+        self.algorithm.algorithm.setCalibrationStage(
+            KLMStripEfficiencyAlgorithm.c_EfficiencyMeasurement)
         # This sets up the logging and database chain, plus it assigns all input files from collector jobs.
         # Note that we simply assign all input files, and use the execute(runs) to define which data to use.
         self.machine.setup_algorithm(iteration=iteration)

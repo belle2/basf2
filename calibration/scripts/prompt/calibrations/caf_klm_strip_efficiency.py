@@ -15,11 +15,11 @@ from prompt import CalibrationSettings
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
 #: Tells the automated system some details of this script
-settings = CalibrationSettings(name="KLM Strip Efficiency",
-                               expert_username="chilikin",
+settings = CalibrationSettings(name='KLM strip efficiency',
+                               expert_username='chilikin',
                                description=__doc__,
-                               input_data_formats=["raw"],
-                               input_data_names=["raw_physics", "raw_cosmic"],
+                               input_data_formats=['cdst'],
+                               input_data_names=['hlt_mumu'],
                                depends_on=[])
 
 ##############################
@@ -56,8 +56,7 @@ def get_calibrations(input_data, **kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    file_to_iov_physics = input_data["raw_physics"]
-    file_to_iov_cosmic = input_data["raw_cosmic"]
+    file_to_iov_cdst = input_data['hlt_mumu']
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
@@ -73,20 +72,18 @@ def get_calibrations(input_data, **kwargs):
     # already. This procedure respects that ordering
     from prompt.utils import filter_by_max_files_per_run
 
-    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run, min_events_per_file)
-    input_files_physics = sorted(list(reduced_file_to_iov_physics.keys()))
-    basf2.B2INFO(f"Total number of 'physics' files actually used as input = {len(input_files_physics)}")
+    # For testing
+    # reduced_file_to_iov_cdst = filter_by_max_files_per_run(file_to_iov_cdst, max_files_per_run, min_events_per_file)
+    # input_files_cdst = sorted(list(reduced_file_to_iov_cdst.keys()))
+    input_files_cdst = sorted(list(file_to_iov_cdst.keys()))
+    basf2.B2INFO(f'Total number of \'hlt_mumu\' files actually used as input = {len(input_files_cdst)}')
 
-    reduced_file_to_iov_cosmic = filter_by_max_files_per_run(file_to_iov_cosmic, max_files_per_run, min_events_per_file)
-    input_files_cosmic = sorted(list(reduced_file_to_iov_cosmic.keys()))
-    basf2.B2INFO(f"Total number of 'cosmic' files actually used as input = {len(input_files_cosmic)}")
-
-    if not input_files_physics and not input_files_cosmic:
-        raise Exception("No valid input files found!")
+    if not input_files_cdst:
+        raise Exception('No valid input files found!')
 
     # Get the overall IoV we our process should cover. Includes the end values that we may want to ignore since our output
     # IoV should be open ended. We could also use this as part of the input data selection in some way.
-    requested_iov = kwargs["requested_iov"]
+    requested_iov = kwargs['requested_iov']
 
     from caf.utils import IoV
     # The actual value our output IoV payload should have. Notice that we've set it open ended.
@@ -105,34 +102,22 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.framework import Calibration, Collection
 
-    cal_klm = Calibration("KLMStripEfficiency")
+    cal_klm = Calibration('KLMStripEfficiency')
 
     ########
     # Collect on multiple input data types for one calibration
 
-    from klm_calibration_utils import get_physics_pre_collector_path, get_cosmic_pre_collector_path
+    from klm_calibration_utils import get_cdst_pre_collector_path
 
-    if input_files_physics:
-        coll_physics = get_collector("raw_physics")
-        rec_path_physics = get_physics_pre_collector_path(entry_sequence="0:1000")
-#        rec_path_physics = get_physics_pre_collector_path()
+    if input_files_cdst:
+        coll_cdst = get_collector('hlt_mumu')
+        rec_path_cdst = get_cdst_pre_collector_path()
 
-        collection_physics = Collection(collector=coll_physics,
-                                        input_files=input_files_physics,
-                                        pre_collector_path=rec_path_physics)
+        collection_cdst = Collection(collector=coll_cdst,
+                                     input_files=input_files_cdst,
+                                     pre_collector_path=rec_path_cdst)
 
-        cal_klm.add_collection(name="physics", collection=collection_physics)
-
-    if input_files_cosmic:
-        coll_cosmic = get_collector("raw_cosmic")
-        rec_path_cosmic = get_cosmic_pre_collector_path(entry_sequence="0:1000")
-#        rec_path_cosmic = get_cosmic_pre_collector_path()
-
-        collection_cosmic = Collection(collector=coll_cosmic,
-                                       input_files=input_files_cosmic,
-                                       pre_collector_path=rec_path_cosmic)
-
-        cal_klm.add_collection(name="cosmic",  collection=collection_cosmic)
+        cal_klm.add_collection(name='cdst', collection=collection_cdst)
 
     #####
     # Algorithm step config
@@ -143,7 +128,7 @@ def get_calibrations(input_data, **kwargs):
 
     for algorithm in cal_klm.algorithms:
         algorithm.strategy = KLMStripEfficiency
-        algorithm.params = {"apply_iov": output_iov}
+        algorithm.params = {'apply_iov': output_iov}
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
     return [cal_klm]
@@ -157,12 +142,10 @@ def get_collector(input_data_name):
     Placed here so it can be different for prompt compared to standard.
     """
 
-    if input_data_name == "raw_physics":
-        return basf2.register_module("KLMStripEfficiencyCollector",
-                                     MuonListName="mu+:all",
-                                     MinimalMatchingDigits=10)
-    elif input_data_name == "raw_cosmic":
-        return basf2.register_module("KLMStripEfficiencyCollector",
-                                     MuonListName="mu+:all",
-                                     MinimalMatchingDigits=10)
+    if input_data_name == 'hlt_mumu':
+        return basf2.register_module('KLMStripEfficiencyCollector',
+                                     MuonListName='mu+:all',
+                                     MinimalMatchingDigits=14,
+                                     MinimalMatchingDigitsOuterLayers=4,
+                                     MinimalMomentumNoOuterLayers=4.0)
     raise Exception("Unknown input data name used when setting up collector")

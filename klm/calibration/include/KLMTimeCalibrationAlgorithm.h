@@ -10,11 +10,13 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/dbobjects/KLMTimeCableDelay.h>
+#include <klm/dbobjects/KLMTimeConstants.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+
 /* Belle2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
-#include <klm/dbobjects/KLMTimeCableDelay.h>
-#include <klm/dbobjects/KLMTimeDetParts.h>
-#include <klm/dataobjects/KLMElementNumbers.h>
 
 
 class TH1D;
@@ -173,7 +175,7 @@ namespace Belle2 {
      * DBObject of time cost on some parts of
      * the detector.
      */
-    KLMTimeDetParts* m_timeDetParts;
+    KLMTimeConstants* m_timeConstants;
 
     /**
      * DBObject of the calibration constant of

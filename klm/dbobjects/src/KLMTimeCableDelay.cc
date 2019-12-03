@@ -14,11 +14,7 @@
 
 using namespace Belle2;
 
-KLMTimeCableDelay::KLMTimeCableDelay() :
-  m_effLightSpeed(0.0),
-  m_effLightSpeedRPC(0.0),
-  m_ampTimeConstant(0.0),
-  m_ampTimeConstantRPC(0.0)
+KLMTimeCableDelay::KLMTimeCableDelay()
 {
 }
 
@@ -49,40 +45,3 @@ void KLMTimeCableDelay::cleanTimeShift()
 {
   m_timeShift.clear();
 }
-
-double KLMTimeCableDelay::getEffLightSpeed(bool isRPC) const
-{
-  if (isRPC) {
-    return m_effLightSpeedRPC;
-  } else {
-    return m_effLightSpeed;
-  }
-}
-
-void KLMTimeCableDelay::setEffLightSpeed(double lightSpeed, bool isRPC)
-{
-  if (isRPC) {
-    m_effLightSpeedRPC = lightSpeed;
-  } else {
-    m_effLightSpeed = lightSpeed;
-  }
-}
-
-double KLMTimeCableDelay::getAmpTimeConstant(bool isRPC) const
-{
-  if (isRPC) {
-    return m_ampTimeConstantRPC;
-  } else {
-    return m_ampTimeConstant;
-  }
-}
-
-void KLMTimeCableDelay::setAmpTimeConstant(double amplitudeTimeConstant, bool isRPC)
-{
-  if (isRPC) {
-    m_ampTimeConstantRPC = amplitudeTimeConstant;
-  } else {
-    m_ampTimeConstant = amplitudeTimeConstant;
-  }
-}
-

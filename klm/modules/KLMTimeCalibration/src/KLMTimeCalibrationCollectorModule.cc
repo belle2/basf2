@@ -8,13 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* ROOT headers. */
-#include <TFile.h>
-#include <TTree.h>
-#include <TH1D.h>
-#include <TH1I.h>
-#include <TH2D.h>
+/* Own headers. */
+#include <klm/modules/KLMTimeCalibration/KLMTimeCalibrationCollectorModule.h>
 
+/* KLM headers. */
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/dataobjects/BKLMHit1d.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
 
 /* Belle2 headers. */
 #include <mdst/dataobjects/Track.h>
@@ -33,12 +34,12 @@
 #include <framework/logging/LogSystem.h>
 #include <framework/dataobjects/EventT0.h>
 
-#include <klm/modules/KLMTimeCalibration/KLMTimeCalibrationCollectorModule.h>
-#include <klm/dataobjects/KLMElementNumbers.h>
-
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMHit1d.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
+/* ROOT headers. */
+#include <TFile.h>
+#include <TTree.h>
+#include <TH1D.h>
+#include <TH1I.h>
+#include <TH2D.h>
 
 
 using namespace Belle2;
@@ -50,10 +51,10 @@ REG_MODULE(KLMTimeCalibrationCollector)
 KLMTimeCalibrationCollectorModule::KLMTimeCalibrationCollectorModule() :
   CalibrationCollectorModule()
 {
-  setDescription("Module for BKLM time calibration (data collection).");
+  setDescription("Module for KLM time calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("deBug", m_Debug, "debug mode.", false);
+  addParam("debug", m_Debug, "debug mode.", false);
   addParam("inputParticleList", m_inputListName, "input particle list.", std::string("mu:cali"));
 
   m_geoParB = nullptr;

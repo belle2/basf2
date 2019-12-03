@@ -8,14 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-/* Belle2 headers. */
+/* Own headers. */
 #include <klm/calibration/KLMTimeCalibrationAlgorithm.h>
 
+/* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
 
+/* Belle2 headers. */
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
@@ -621,10 +622,10 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   effSpeed_RPC = (fabs(effC_rpc_phi) + fabs(effC_rpc_z)) / 2.0;
   effSpeed_RPC = 0.50 * Const::speedOfLight;
 
-  m_timeDetParts->setEffLightSpeed(effSpeed, false);
-  m_timeDetParts->setAmpTimeConstant(0, false);
-  m_timeDetParts->setEffLightSpeed(effSpeed_RPC, true);
-  m_timeDetParts->setAmpTimeConstant(0, true);
+  m_timeConstants->setEffLightSpeed(effSpeed, false);
+  m_timeConstants->setAmpTimeConstant(0, false);
+  m_timeConstants->setEffLightSpeed(effSpeed_RPC, true);
+  m_timeConstants->setAmpTimeConstant(0, true);
 
   /** ======================================================================================= **/
   B2INFO("Time distribution filling begins.");

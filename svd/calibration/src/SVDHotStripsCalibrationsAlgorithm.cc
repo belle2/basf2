@@ -20,7 +20,7 @@
 using namespace std;
 using namespace Belle2;
 
-SVDHotStripsCalibrationsAlgorithm::SVDHotStripsCalibrationsAlgorithm(std::string str) :
+SVDHotStripsCalibrationsAlgorithm::SVDHotStripsCalibrationsAlgorithm(const std::string& str) :
   CalibrationAlgorithm("SVDOccupancyCalibrationsCollector")
 {
   setDescription("SVDHotStripsCalibrations calibration algorithm");

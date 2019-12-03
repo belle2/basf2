@@ -156,7 +156,7 @@ if __name__ == "__main__":
                 "# When finished, save and quit."
             )
             if input_editor.editor_command_list[0] in ['vi', 'vim']:
-                editor_help_comment += "#\nIf in vim: Use :wq to save and quit or :q! to discard changes."
+                editor_help_comment += "\n# If in vim: Use :wq to save and quit or :q! to discard changes."
             input_editor.initial_content = editor_help_comment
             data['details'] = input_editor.input()
         else:

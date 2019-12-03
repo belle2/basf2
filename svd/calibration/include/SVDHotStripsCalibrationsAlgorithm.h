@@ -20,7 +20,7 @@ namespace Belle2 {
   public:
 
     /// Constructor set the prefix to SVDHotStripsCalibrationsCollector
-    SVDHotStripsCalibrationsAlgorithm(std::string str);
+    explicit SVDHotStripsCalibrationsAlgorithm(const std::string& str);
 
     /// Destructor
     virtual ~SVDHotStripsCalibrationsAlgorithm() {}

@@ -276,7 +276,8 @@ void SVDValidation()
   TFile* inputSpacePoint = TFile::Open("../SVDValidationTTreeSpacePoint.root");
   TFile* inputSimhit = TFile::Open("../SVDValidationTTreeSimhit.root");
   
-  // open the output file for the validation histograms
+  // open the output file for the validation histograms, 
+  // cppcheck-suppress unreadVariable
   TFile* output = TFile::Open("SVDValidation.root", "recreate");
   
   //------------------------------------------------------------------  

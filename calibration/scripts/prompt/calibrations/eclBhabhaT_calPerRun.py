@@ -12,14 +12,14 @@ from prompt import CalibrationSettings
 # Will be used to construct the calibration in the automated system, as well as set up the submission web forms.
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
-#: Tells the automated system some details of this script
-#     default is to read in "physics" but this code should
-#     run over cdst hlt_bhabha files.
+#: Tells the automated system some details of this script.
+#     Default is to read in "hlt_bhabha" since we want to
+#     run over cdst hlt_bhabha skim files.
 settings = CalibrationSettings(name="ECL crate time calibrations",
                                expert_username="ehill",
                                description=__doc__,
                                input_data_formats=["cdst"],
-                               input_data_names=["physics"],
+                               input_data_names=["hlt_bhabha"],
                                depends_on=[])
 
 ##############################
@@ -58,7 +58,7 @@ def get_calibrations(input_data, **kwargs):
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
     # The input data should be the hlt bhabha skim
-    file_to_iov_physics = input_data["physics"]
+    file_to_iov_physics = input_data["hlt_bhabha"]
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!

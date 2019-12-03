@@ -115,7 +115,7 @@ def getLogFile(skim, sample):
             from the skim test job.
 
     Raises:
-        SkimNotRunException: Raised if any of the log or JSON files cannot be opened.
+        SkimNotRunException: Raised if the log file cannot be opened.
     """
     try:
         logFileName = Path('log', f'{skim}_{sample}.out')
@@ -141,10 +141,10 @@ def getJsonFile(skim, sample):
 
     Returns:
         jsonFileContents (dict): A dict read from the ``--jobinformation`` JSON
-            output of teh skim test job.
+            output of the skim test job.
 
     Raises:
-        SkimNotRunException: Raised if any of the JSON files cannot be opened,
+        SkimNotRunException: Raised if the JSON file cannot be opened,
             or the JSON file does not pass `testJsonFile`.
     """
     try:

@@ -360,20 +360,23 @@ def testJsonFile(jsonFileContents):
             successfully, or the JSON file indicates the output files were not
             written correctly.
     """
-    outputFileInfoList = jsonFileContents['output_files']
+    try:
+        outputFileInfoList = jsonFileContents['output_files']
 
-    jsonTests = [
-        jsonFileContents['basf2_status']['finished'],
-        jsonFileContents['basf2_status']['success'],
-        jsonFileContents['basf2_status']['errors'] == 0,
-        jsonFileContents['basf2_status']['fatals'] == 0,
-        all(check for outputFileInfo in outputFileInfoList
-            for check in outputFileInfo['checks_passed'].values())
-    ]
+        jsonTests = [
+            jsonFileContents['basf2_status']['finished'],
+            jsonFileContents['basf2_status']['success'],
+            jsonFileContents['basf2_status']['errors'] == 0,
+            jsonFileContents['basf2_status']['fatals'] == 0,
+            all(check for outputFileInfo in outputFileInfoList
+                for check in outputFileInfo['checks_passed'].values())
+        ]
 
-    if all(jsonTests):
-        return True
-    else:
+        if all(jsonTests):
+            return True
+        else:
+            return False
+    except KeyError:
         return False
 
 

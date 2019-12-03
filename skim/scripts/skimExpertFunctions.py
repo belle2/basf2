@@ -14,8 +14,6 @@ from modularAnalysis import removeParticlesNotInLists, skimOutputUdst, summaryOf
 from skim.registry import skim_registry
 import skimTestFilesInfo
 import os
-import sys
-import inspect
 import subprocess
 import json
 import matplotlib.pyplot as plt

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2 as b2
 import modularAnalysis as ma
 
 # Call to build all light mesons. Not recommended to use this general function as it creates many candidates

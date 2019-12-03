@@ -11,7 +11,6 @@ __authors__ = [
     "Phil Grace"
 ]
 
-import basf2 as b2
 import modularAnalysis as ma
 
 

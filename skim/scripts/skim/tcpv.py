@@ -85,7 +85,6 @@
 
 __author__ = " Reem Rasheed"
 
-import basf2 as b2
 import modularAnalysis as ma
 
 

@@ -1,5 +1,0 @@
-Import('env')
-
-env['TOOLS_LIBS']['b2klm-create-dqm'] = ['stdc++', 'framework']
-
-Return('env')

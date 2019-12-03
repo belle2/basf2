@@ -21,7 +21,7 @@ fileList = ['../feiSLB0.dst.root']
 
 ma.inputMdstList('default', fileList, path=path)
 
-from skim.fei import *
+from skim.fei import B0SL, runFEIforB0SL
 # run pre-selection cuts and FEI
 runFEIforB0SL(path)
 

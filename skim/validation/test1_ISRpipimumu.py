@@ -16,7 +16,7 @@ __author__ = "S. Jia"
 import basf2 as b2
 import modularAnalysis as ma
 import skimExpertFunctions as expert
-from stdCharged import stdPi, stdK, stdE, stdMu
+from stdCharged import stdE, stdK, stdMu, stdPi
 
 # create a new path
 ISRskimpath = b2.Path()

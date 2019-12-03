@@ -11,9 +11,9 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdPi, stdK
+from stdCharged import stdK, stdPi
 from stdPi0s import loadStdSkimPi0
-from stdV0s import *
+from stdV0s import stdKshorts
 from stdPi0s import stdPi0s
 
 kspi0Path = b2.Path()

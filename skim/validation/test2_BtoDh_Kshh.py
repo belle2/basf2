@@ -11,8 +11,8 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdPi, stdK
-from stdV0s import *
+from stdCharged import stdK, stdPi
+from stdV0s import stdKshorts
 
 kshhPath = b2.Path()
 

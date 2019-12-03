@@ -3,8 +3,9 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import *
-from stdPhotons import *
+from stdCharged import stdPi
+from stdPhotons import stdPhotons
+from skim.taupair import SetTauThrustSkimVariables
 
 """
 <header>
@@ -22,7 +23,6 @@ stdPi('all', path=tauthrustskim)
 stdPhotons('all', path=tauthrustskim)
 
 # set variables
-from skim.taupair import *
 SetTauThrustSkimVariables(path=tauthrustskim)
 
 # the variables that are printed out are:

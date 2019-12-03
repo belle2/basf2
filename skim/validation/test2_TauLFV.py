@@ -3,11 +3,11 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import *
-from stdPhotons import *
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.lightmesons import *
+from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
+from stdPhotons import stdPhotons
+from stdPi0s import stdPi0s, loadStdSkimPi0
+from stdV0s import stdKshorts
+from skim.standardlists.lightmesons import loadStdLightMesons
 
 """
 <header>
@@ -32,9 +32,9 @@ loadStdSkimPi0(path=taulfvskim)
 stdKshorts(path=taulfvskim)
 loadStdLightMesons(path=taulfvskim)
 
-from skim.taupair import *
+from skim.taupair import TauLFVList
 tauList = TauLFVList(0, path=taulfvskim)
-copyLists('tau+:LFV', tauList, path=taulfvskim)
+ma.copyLists('tau+:LFV', tauList, path=taulfvskim)
 
 # the variables that are printed out are: M, deltaE
 ma.variablesToHistogram(

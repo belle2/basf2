@@ -8,10 +8,11 @@
   <contact>reem.rasheed@iphc.cnrs.fr</contact>
 </header>
 """
+import basf2 as b2
 import modularAnalysis as ma
 from stdV0s import stdKshorts
-from stdPhotons import *
-from stdCharged import *
+from stdPhotons import stdPhotons
+from stdCharged import stdPi
 
 from ROOT import gROOT
 import sysconfig

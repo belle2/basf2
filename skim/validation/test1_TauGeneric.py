@@ -15,8 +15,8 @@ __author__ = "Kenji Inami"
 import basf2 as b2
 import modularAnalysis as ma
 import skimExpertFunctions as expert
-from stdCharged import *
-from stdPhotons import *
+from stdCharged import stdPi
+from stdPhotons import stdPhotons
 
 taugenericskim = b2.Path()
 
@@ -27,7 +27,7 @@ stdPi('all', path=taugenericskim)
 stdPhotons('all', path=taugenericskim)
 
 # TauGeneric skim
-from skim.taupair import *
+from skim.taupair import TauList
 tauList = TauList(path=taugenericskim)
 expert.skimOutputUdst('../TauGeneric.udst.root', tauList, path=taugenericskim)
 ma.summaryOfLists(tauList, path=taugenericskim)

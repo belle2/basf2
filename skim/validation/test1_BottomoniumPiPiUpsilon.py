@@ -14,9 +14,8 @@ __author__ = "S. Spataro && S. Jia"
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdPi0s import *
-from stdPhotons import *
-from stdCharged import *
+from stdPhotons import stdPhotons
+from stdCharged import stdE, stdMu, stdPi
 import skimExpertFunctions as expert
 
 # create a new path
@@ -34,7 +33,7 @@ stdMu('loose', path=BottomoniumPiPiUpsilonskimpath)
 stdPhotons('loose', path=BottomoniumPiPiUpsilonskimpath)
 
 # Bottomonium Skim
-from skim.quarkonium import *
+from skim.quarkonium import UpsilonList
 YList = UpsilonList(path=BottomoniumPiPiUpsilonskimpath)
 expert.skimOutputUdst('../BottomoniumPiPiUpsilon.udst.root', YList, path=BottomoniumPiPiUpsilonskimpath)
 ma.summaryOfLists(YList, path=BottomoniumPiPiUpsilonskimpath)

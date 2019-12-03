@@ -15,11 +15,11 @@ __author__ = "Kenji Inami"
 import basf2 as b2
 import modularAnalysis as ma
 import skimExpertFunctions as expert
-from stdCharged import *
-from stdPhotons import *
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.lightmesons import *
+from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
+from stdPhotons import stdPhotons
+from stdPi0s import stdPi0s, loadStdSkimPi0
+from stdV0s import stdKshorts
+from skim.standardlists.lightmesons import loadStdLightMesons
 
 taulfvskim = b2.Path()
 
@@ -38,7 +38,7 @@ stdKshorts(path=taulfvskim)
 loadStdLightMesons(path=taulfvskim)
 
 # TauLFV skim
-from skim.taupair import *
+from skim.taupair import TauLFVList
 tauList = TauLFVList(1, path=taulfvskim)
 expert.skimOutputUdst('../TauLFV.udst.root', tauList, path=taulfvskim)
 ma.summaryOfLists(tauList, path=taulfvskim)

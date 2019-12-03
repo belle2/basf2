@@ -14,10 +14,8 @@ __author__ = "K. Smith"
 import basf2 as b2
 import modularAnalysis as ma
 from skim.standardlists.lightmesons import loadStdLightMesons
-from stdCharged import stdPi
-from stdCharged import stdK
-from stdPi0s import loadStdSkimPi0
-from stdPi0s import stdPi0s
+from stdCharged import stdK, stdPi
+from stdPi0s import stdPi0s, loadStdSkimPi0
 from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
 import skimExpertFunctions as expert
@@ -39,7 +37,7 @@ loadStdSkimPi0(path=charmless3chargedpath)
 loadStdLightMesons(path=charmless3chargedpath)
 
 # Hadronic Bm skim
-from skim.btocharmless import *
+from skim.btocharmless import CharmlessHad3BodyBmList
 Had3BodyList = CharmlessHad3BodyBmList(path=charmless3chargedpath)
 expert.skimOutputUdst('../CharmlessHad3BodyCharged.udst.root', Had3BodyList, path=charmless3chargedpath)
 ma.summaryOfLists(Had3BodyList, path=charmless3chargedpath)

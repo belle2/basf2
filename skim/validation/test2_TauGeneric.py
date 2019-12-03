@@ -4,8 +4,9 @@
 import basf2 as b2
 import modularAnalysis as ma
 from variables import variables
-from stdCharged import *
-from stdPhotons import *
+from stdCharged import stdPi
+from stdPhotons import stdPhotons
+from skim.taupair import SetTauGenericSkimVariables
 
 """
 <header>
@@ -23,7 +24,6 @@ stdPi('all', path=taugenericskim)
 stdPhotons('all', path=taugenericskim)
 
 # set variables
-from skim.taupair import *
 SetTauGenericSkimVariables(path=taugenericskim)
 
 variables.addAlias('Theta_miss', 'formula(missingMomentumOfEvent_theta*180/3.14159)')

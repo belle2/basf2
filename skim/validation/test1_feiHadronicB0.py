@@ -21,7 +21,7 @@ fileList = ['../feiHadronicB0.dst.root']
 
 ma.inputMdstList('default', fileList, path=path)
 
-from skim.fei import *
+from skim.fei import B0Hadronic, runFEIforB0Hadronic
 # run pre-selection cuts and FEI
 runFEIforB0Hadronic(path)
 

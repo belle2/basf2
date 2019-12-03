@@ -11,7 +11,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdPi, stdMu
+from stdCharged import stdMu, stdPi
 
 # create a new path
 ISRskimpath = b2.Path()

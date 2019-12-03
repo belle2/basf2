@@ -13,10 +13,11 @@ __author__ = "P. Grace"
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.charm import *
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPhotons import stdPhotons
+from stdPi0s import stdPi0s
+from stdV0s import stdKshorts
+from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loadStdDstarPlus
 import skimExpertFunctions as expert
 
 

@@ -11,8 +11,8 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdPi, stdMu
-from stdPhotons import *
+from stdCharged import stdMu, stdPi
+from stdPhotons import stdPhotons
 from beamparameters import add_beamparameters
 
 # create a new path

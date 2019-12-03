@@ -11,7 +11,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdPi, stdK
+from stdCharged import stdK, stdPi
 from variables import variables
 from validation_tools.metadata import create_validation_histograms
 

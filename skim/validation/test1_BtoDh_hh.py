@@ -13,8 +13,7 @@ __author__ = "N. Rout"
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdPi
-from stdCharged import stdK
+from stdCharged import stdK, stdPi
 import skimExpertFunctions as expert
 
 

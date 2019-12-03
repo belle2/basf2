@@ -600,13 +600,13 @@ def getStatSpecifier():
             'CalculationDescription': 'File size of output uDST.',
             'CombineMC': None
         },
-        'udstSizePerEvent': {
+        'udstSizePerSkimmedEvent': {
             'LongName': 'uDST size per event (kB)',
             'FloatFormat': '.3f',
             'PrintToScreen': True,
             'PrintToConfluence': True,
-            'Calculate': lambda skim, sample: udstSize(skim, sample) / nInputEvents(skim, sample),
-            'CalculationDescription': 'File size of output uDST divided by number of input events.',
+            'Calculate': lambda skim, sample: udstSize(skim, sample) / nSkimmedEvents(skim, sample),
+            'CalculationDescription': 'File size of output uDST divided by number of skimmed events.',
             'CombineMC': lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(statDict, mcCampaign, beamBackground)
         },
         'udstSizePerFile': {

@@ -67,6 +67,9 @@ skim_registry = [
     ('18520400', 'LFVZpVisible'),
     ('18570600', 'TauGeneric'),
     ('18570700', 'TauThrust'),
+    ('14120600', 'B0toDpi_kpipi'),  # B0 -> D-(k+ pi- pi-)pi+
+    ('14120700', 'B0toDStarPi_D0pi_kpi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k+ pi-
+    ('14120800', 'B0toDStarPi_D0pi_kpipipi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k- pi+ pi- pi+
 ]
 
 combined_skims = {

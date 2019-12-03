@@ -395,8 +395,8 @@ def testLogFile(logFileContents):
         return False
 
 
-def getSkimsToRun(parser, standaloneList, combinedList):
-    """Get a list of of skims to be tested, dependent on the skim names present in
+def getSkimsToPrint(parser, standaloneList, combinedList):
+    """Get a list of of skims to print stats for, dependent on the skim names present in
     ``standaloneSkimList`` and ``combinedSkimList``.
 
     If ``standaloneSkimList`` is a list of skim names, then those are included
@@ -478,9 +478,9 @@ def getAllSamples(mcCampaign):
     return mcSampleLabels, dataSampleLabels
 
 
-def getSamplesToRun(mcSamples, dataSamples, mcOnly=False, dataOnly=False):
-    """Get a list of samples to be tested, filtered by whether the ``mcOnly``
-    or ``dataOnly`` flags are provided.
+def getSamplesToPrint(mcSamples, dataSamples, mcOnly=False, dataOnly=False):
+    """Get a list of samples to print stats for, filtered by whether the 
+    ``mcOnly`` or ``dataOnly`` flags are provided.
 
     Args:
         mcSamples (list): A list of internal labels (as used by
@@ -996,9 +996,9 @@ if __name__ == '__main__':
     parser = getArgumentParser()
     args = parser.parse_args()
 
-    skims = getSkimsToRun(parser, args.standalone, args.combined)
+    skims = getSkimsToPrint(parser, args.standalone, args.combined)
     mcSampleLabels, dataSampleLabels = getAllSamples(args.mccampaign)
-    samples = getSamplesToRun(list(mcSampleLabels.keys()), list(dataSampleLabels.keys()), args.mconly, args.dataonly)
+    samples = getSamplesToPrint(list(mcSampleLabels.keys()), list(dataSampleLabels.keys()), args.mconly, args.dataonly)
 
     statSpecifier = getStatSpecifier()
     allSkimStats = fillSkimStatsDict(skims, samples, statSpecifier, args.VERBOSE)

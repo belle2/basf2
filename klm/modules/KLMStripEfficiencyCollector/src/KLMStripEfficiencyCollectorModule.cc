@@ -10,6 +10,7 @@
 
 /* Own header. */
 #include <klm/modules/KLMStripEfficiencyCollector/KLMStripEfficiencyCollectorModule.h>
+#include <klm/dataobjects/KLMChannelIndex.h>
 
 /* ROOT headers. */
 #include <TH1F.h>
@@ -73,6 +74,54 @@ void KLMStripEfficiencyCollectorModule::prepare()
 
 void KLMStripEfficiencyCollectorModule::startRun()
 {
+  int minimalActivePlanes = -1;
+  KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
+  for (KLMChannelIndex& klmSector : klmSectors) {
+    KLMChannelIndex klmNextSector(klmSector);
+    ++klmNextSector;
+    int activePlanes = 0;
+    KLMChannelIndex klmPlane(klmSector);
+    klmPlane.setIndexLevel(KLMChannelIndex::c_IndexLevelPlane);
+    for (; klmPlane != klmNextSector; ++klmPlane) {
+      KLMChannelIndex klmNextPlane(klmPlane);
+      ++klmNextPlane;
+      bool isActive = false;
+      KLMChannelIndex klmChannel(klmPlane);
+      klmChannel.setIndexLevel(KLMChannelIndex::c_IndexLevelStrip);
+      for (; klmChannel != klmNextPlane; ++ klmChannel) {
+        uint16_t channel = klmChannel.getKLMChannelNumber();
+        enum KLMChannelStatus::ChannelStatus status =
+          m_ChannelStatus->getChannelStatus(channel);
+        if (status == KLMChannelStatus::c_Unknown)
+          B2FATAL("Incomplete KLM channel status data.");
+        if (status == KLMChannelStatus::c_Normal) {
+          isActive = true;
+          break;
+        }
+      }
+      if (isActive)
+        ++activePlanes;
+    }
+    /*
+     * If a sector is completely off, it is not necessary to reduce
+     * the minimal number of digits, because the efficiencies cannot be
+     * measured for the entire sector anyway.
+     */
+    if (activePlanes == 0)
+      continue;
+    if (minimalActivePlanes < 0)
+      minimalActivePlanes = activePlanes;
+    else if (minimalActivePlanes < activePlanes)
+      minimalActivePlanes = activePlanes;
+  }
+  if ((minimalActivePlanes >= 0) &&
+      (minimalActivePlanes < m_MinimalMatchingDigits)) {
+    B2WARNING("The minimal number of active planes (" << minimalActivePlanes <<
+              ") is less than the minimal number of matching digits (" <<
+              m_MinimalMatchingDigits << "). The minimal number of "
+              "matching digits is reduced to make the calibration possible.");
+    m_MinimalMatchingDigits = minimalActivePlanes;
+  }
 }
 
 void KLMStripEfficiencyCollectorModule::closeRun()

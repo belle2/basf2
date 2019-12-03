@@ -39,16 +39,9 @@ from ROOT import PyConfig
 # Importing ROOT in skimExpertFunctions has the side-effect of hijacking argument parsing
 PyConfig.IgnoreCommandLineOptions = True
 from basf2 import B2WARNING, B2ERROR
+from basf2.utils import pretty_print_table
 from skim.registry import skim_registry, combined_skims
 from skimExpertFunctions import get_test_file, get_total_infiles, get_events_per_file
-
-try:
-    from tabulate import tabulate
-except ModuleNotFoundError:
-    B2ERROR('This tool relies on the third-party package `tabulate`, ' +
-            'which is not currently installed. Please install it with:\n' +
-            '    pip3 install tabulate --user')
-    sys.exit(1)
 
 
 class SkimNotRunException(Exception):
@@ -89,6 +82,9 @@ def getArgumentParser():
     parser.add_argument('-c', '--combined', nargs='+', default=[],
                         choices=['all']+allCombinedSkims, metavar='SKIM',
                         help='List of combined skims to run.')
+    parser.add_argument('-C', '--confluence', action='store_true',
+                        help='Print a wiki markup table to be copied to Confluence. '
+                        'By default, this tool only prints to the terminal and a JSON file.')
     parser.add_argument('--mccampaign', default='MC12',
                         choices=['MC9', 'MC10', 'MC11', 'MC12'],
                         help='The MC campaign to test on.')
@@ -856,11 +852,15 @@ def printToJson(allSkimStats, statSpecifier):
     print(f'\nWrote stats to JSON file {outputJsonName}.')
 
 
-def printToScreen(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels, beamBackgrounds, mcOnly, dataOnly):
-    """Format the skim performance statistics in an ASCII table, and print to the terminal for each skim.
+def printToScreen(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels,
+                  beamBackgrounds, mcOnly, dataOnly, tabulateAvailable=True):
+    """Format the skim performance statistics in an ASCII table, and print to 
+    the terminal for each skim. If the module tabulate is not available, then
+    fall back on `basf2.pretty_print_table`.
 
     Args:
-        allSkimStats (dict): A nested dict of statistics, as returned by ``getSkimStatsDict``.
+        allSkimStats (dict): A nested dict of statistics, as returned by
+            ``getSkimStatsDict``.
         statSpecifier (dict): A nested dict specifying how each statistic should
             be calculated and printed, as returned by ``getStatSpecifier``.
         mcSampleLabels (dict): A dict in which the keys are internal MC sample
@@ -872,6 +872,8 @@ def printToScreen(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels,
         beamBackgrounds (list): A list of beam background labels, such as "BGx1".
         mcOnly (bool): Print only MC samples statistics.
         dataOnly (bool): Print only data samples statistics.
+        tabulateAvailable (bool): True if the Python module `tabulate` can be
+            imported.
     """
     selectedStats = [stat for (stat, statSpec) in statSpecifier.items() if statSpec['PrintToScreen']]
 
@@ -901,12 +903,28 @@ def printToScreen(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels,
         df = df.reindex(index)
         df = df.rename(index=renamingPairs)
 
-        table = tabulate(df[selectedStats],
-                         headers=headers, tablefmt="fancy_grid",
-                         numalign='right', stralign='left',
-                         floatfmt=floatFormat)
-        table = table.replace(' nan ', ' -   ')
-        print(table)
+        if tabulateAvailable:
+            table = tabulate(df[selectedStats],
+                             headers=headers, tablefmt="fancy_grid",
+                             numalign='right', stralign='left',
+                             floatfmt=floatFormat)
+            table = table.replace(' nan ', ' -   ')
+            print(table)
+        else:
+            # Construct a 2D list for pretty_print_table
+            rows = df.values.tolist()
+            rows = [['{:.2f}'.format(entry) for entry in row] for row in rows]
+            rows = [[sample, *row] for sample, row in zip(renamingPairs.values(), rows)]
+            headers = ['Sample label', *headers]
+
+            nColumns = df.shape[1]
+
+            pretty_print_table([headers] + rows,
+                               [-14]*nColumns)
+
+            B2WARNING('Please consider installing the third-party package `tabulate`:\n'
+                      '    pip3 install tabulate --user')
+            
 
 
 def printToConfluence(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels, samples, beamBackgrounds):
@@ -989,6 +1007,25 @@ if __name__ == '__main__':
     if not args.dataonly:
         allSkimStats = addWeightedMC(allSkimStats, statSpecifier, args.mccampaign, beamBackgrounds, args.VERBOSE)
 
-    printToScreen(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels, beamBackgrounds, args.mconly, args.dataonly)
-    printToJson(allSkimStats, statSpecifier)
-    printToConfluence(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels, samples, beamBackgrounds)
+    try:
+        from tabulate import tabulate
+
+        printToScreen(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels,
+                      beamBackgrounds, args.mconly, args.dataonly, tabulateAvailable=True)
+        printToJson(allSkimStats, statSpecifier)
+
+        if args.confluence:
+            printToConfluence(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels, samples, beamBackgrounds)
+
+    except ModuleNotFoundError:
+        printToScreen(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels,
+                      beamBackgrounds, args.mconly, args.dataonly, tabulateAvailable=False)
+        printToJson(allSkimStats, statSpecifier)
+        
+        if args.confluence:
+            B2ERROR('This tool relies on the third-party package `tabulate` to '
+                    'format wiki markdown. The package is not currently installed. '
+                    'Please install it with:\n'
+                    '    pip3 install tabulate --user')
+            sys.exit(1)
+

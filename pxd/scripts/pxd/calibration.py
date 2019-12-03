@@ -11,7 +11,7 @@ from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm
 from caf.framework import Calibration
 from caf.strategies import SequentialRunByRun, SimpleRunByRun
 
-run_types = ['beam', 'physcs', 'cosmic', 'all']
+run_types = ['beam', 'physics', 'cosmic', 'all']
 
 
 def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration", run_type=None, global_tags=None, local_dbs=None):
@@ -20,7 +20,7 @@ def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration
       input_files (list): A list of input files to be assigned to calibration.input_files
 
       run_type    ( str): The run type which will define different calibration parameters.
-        Should be in ['beam', 'physcs', 'cosmic', 'all']
+        Should be in ['beam', 'physics', 'cosmic', 'all']
 
       global_tags (list): A list of global tags
 
@@ -46,11 +46,14 @@ def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration
     geometry.param('components', ['PXD'])
     pxdunpacker = register_module('PXDUnpacker')
     pxdunpacker.param('SuppressErrorMask', 0xFFFFFFFFFFFFFFFF)
+    checker = register_module('PXDPostErrorChecker')
+    checker.param("CriticalErrorMask", 0)  # 0xC000000000000000)
 
     main = create_path()
     main.add_module(gearbox)
     main.add_module(geometry)
     main.add_module(pxdunpacker)
+    main.add_module(checker)
     main.add_module("PXDRawHitSorter")
 
     # Collector setup
@@ -90,7 +93,7 @@ def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration
 
     # Run type dependent configurations
 
-    # if run_type == 'cosmic':
-    # cal.strategies = SimpleRunByRun
+    if run_type == 'cosmic':
+        cal.strategies = SimpleRunByRun
 
     return cal

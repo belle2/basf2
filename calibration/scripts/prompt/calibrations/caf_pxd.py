@@ -18,7 +18,7 @@ settings = CalibrationSettings(name="PXD hot/dead pixel calibration",
                                expert_username="qyliu",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["beamorphyscs", "cosmic"],
+                               input_data_names=["beamorphysics", "cosmic"],
                                depends_on=[])
 
 
@@ -43,16 +43,18 @@ def get_calibrations(input_data, **kwargs):
     # Set up config options
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
+    max_files_per_run = 20
+    min_files_per_chunk = 10
+    min_events_per_file = 1000  # avoid empty files
 
     # Read input_data
-    file_to_iov_physics = input_data["beamorphyscs"]
+    file_to_iov_physics = input_data["beamorphysics"]
     file_to_iov_cosmics = input_data["cosmic"]
 
     # Reduce data and create calibration instances for different data categories
     cal_list = []
-    max_files_per_run = 20
-    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run)
-    reduced_file_to_iov_cosmics = filter_by_max_files_per_run(file_to_iov_cosmics, max_files_per_run)
+    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run, min_events_per_file)
+    reduced_file_to_iov_cosmics = filter_by_max_files_per_run(file_to_iov_cosmics, max_files_per_run, min_events_per_file)
 
     # Create run chunks based on exp no. and run type
     iov_set_physics = set(reduced_file_to_iov_physics.values())
@@ -78,52 +80,52 @@ def get_calibrations(input_data, **kwargs):
     # Physics or beam run
     chunk_list = chunks_phy
     input_data = reduced_file_to_iov_physics
-    iSkip = -1
+    iCal = 0
     for ichunk, chunk in enumerate(chunk_list):
         first_iov = IoV(chunk[0].exp_low, chunk[0].run_low, -1, -1)
         last_iov = IoV(chunk[-1].exp_low, chunk[-1].run_low, -1, -1)
         if last_iov < output_iov:  # All the chunk iovs are earlier than the requested
-            iSkip = ichunk
             continue
         else:
+            input_files = list(chain.from_iterable([list(g) for k, g in groupby(
+                input_data, lambda x: input_data[x] in chunk) if k]))
+            # Check the minimum number of files in the physics/beam run chunk
+            if len(input_files) < min_files_per_chunk:
+                continue
             # From the second chunk within the requested range, we have the iov defined by the first run
-            specific_iov = first_iov if ichunk > (iSkip + 1) else output_iov
-        input_files = list(chain.from_iterable([list(g) for k, g in groupby(
-            input_data, lambda x: input_data[x] in chunk) if k]))
+        specific_iov = first_iov if iCal > 0 else output_iov
         basf2.B2INFO(f"Total number of files actually used as input = {len(input_files)} for the output {specific_iov}")
         cal = hot_pixel_mask_calibration(
-                cal_name="{}_PXDHotPixelMaskCalibration_BeamorPhysics".format(ichunk+1),
+                cal_name="{}_PXDHotPixelMaskCalibration_BeamorPhysics".format(iCal + 1),
                 input_files=input_files)
         cal.algorithms[0].params = {"iov_coverage": specific_iov}
         cal_list.append(cal)
+        iCal += 1
 
     # Cosmic run
-    nchunks_phy = len(chunks_phy)
+    nCal_phy = iCal
     chunk_list = chunks_cosmic
     input_data = reduced_file_to_iov_cosmics
-    iSkip = -1
     for ichunk, chunk in enumerate(chunk_list):
         first_iov = IoV(chunk[0].exp_low, chunk[0].run_low, chunk[-1].exp_high, chunk[-1].run_high)
         last_iov = IoV(chunk[-1].exp_low, chunk[-1].run_low, chunk[-1].exp_high, chunk[-1].run_high)
         if last_iov < output_iov:  # All the chunk iovs are earlier than the requested
-            iSkip = ichunk
             continue
+        # From the first chunk within the requested range, we have the iov defined by the first run
+        if iCal == nCal_phy:
+            specific_iov = max(first_iov, IoV(
+                requested_iov.exp_low, requested_iov.run_low, chunk[-1].exp_high, chunk[-1].run_high))
         else:
-            # From the first chunk within the requested range, we have the iov defined by the first run
-            if ichunk == (iSkip + 1):
-                specific_iov = max(first_iov, IoV(
-                    requested_iov.exp_low, requested_iov.run_low, chunk[-1].exp_high, chunk[-1].run_high))
-            else:  # ichunk > (iSkip + 1)
-                specific_iov = first_iov
+            specific_iov = first_iov
         input_files = list(chain.from_iterable([list(g) for k, g in groupby(
             input_data, lambda x: input_data[x] in chunk) if k]))
         basf2.B2INFO(f"Total number of files actually used as input = {len(input_files)} for the output {specific_iov}")
         cal = hot_pixel_mask_calibration(
-                cal_name="{}_PXDHotPixelMaskCalibration_Cosmic".format(ichunk+1+nchunks_phy),
+                cal_name="{}_PXDHotPixelMaskCalibration_Cosmic".format(iCal + 1),
                 input_files=input_files,
                 run_type='cosmic')
-        cal.algorithms[0].params = {"iov_coverage": specific_iov}
+        cal.algorithms[0].params = {"iov_coverage": specific_iov}  # Not valid when using SimpleRunByRun strategy
         cal_list.append(cal)
+        iCal += 1
 
     return cal_list
-    # return []

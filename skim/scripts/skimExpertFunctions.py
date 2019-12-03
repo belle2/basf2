@@ -313,7 +313,7 @@ class RetentionCheck(b2.Module):
 
                         atLeastOneEntry[particle_list] = True
                         if len(module) > 100:  # module name tool long
-                            module = module[:96]+"..."
+                            module = module[:96] + "..."
                         summary_tables[particle_list] += table_line.format(module, *list_results.values())
 
         for particle_list, summary_table in summary_tables.items():
@@ -350,19 +350,19 @@ class RetentionCheck(b2.Module):
         for module, results in cls.summary.items():
 
             if particle_list not in results.keys():
-                b2.B2WARNING(particle_list+" is not present in the results of the RetentionCheck for the module {}."
+                b2.B2WARNING(particle_list + " is not present in the results of the RetentionCheck for the module {}."
                              .format(module))
                 return
 
             if results[particle_list]['retention_rate'] > 0 or at_least_one_entry:
                 at_least_one_entry = True
                 if len(module) > module_name_max_length and module_name_max_length > 3:  # module name tool long
-                    module = module[:module_name_max_length-3]+"..."
+                    module = module[:module_name_max_length - 3] + "..."
                 module_name.append(module)
-                retention.append(100*(results[particle_list]['retention_rate']))
+                retention.append(100 * (results[particle_list]['retention_rate']))
 
         if not at_least_one_entry:
-            b2.B2WARNING(particle_list+" seems to have a zero retention rate when created (if created).")
+            b2.B2WARNING(particle_list + " seems to have a zero retention rate when created (if created).")
             return
 
         plt.figure()
@@ -370,7 +370,7 @@ class RetentionCheck(b2.Module):
 
         for bar in bars:
             yval = bar.get_width()
-            plt.text(0.5, bar.get_y()+bar.get_height()/2.0+0.1, str(round(yval, 3)))
+            plt.text(0.5, bar.get_y() + bar.get_height() / 2.0 + 0.1, str(round(yval, 3)))
 
         plt.gca().invert_yaxis()
         plt.xticks(rotation=45)
@@ -382,13 +382,13 @@ class RetentionCheck(b2.Module):
         if save_as or cls.output_override:
             if cls.output_override:
                 plot_title = (cls.output_override).split(".")[0]
-                save_as = plot_title+'.pdf'
+                save_as = plot_title + '.pdf'
             if '/' in save_as:
                 os.makedirs(os.path.dirname(save_as), exist_ok=True)
             plt.title(plot_title)
             plt.savefig(save_as, bbox_inches="tight")
             b2.B2RESULT("Retention rate results for list {} saved in {}."
-                        .format(particle_list, os.getcwd()+"/"+save_as))
+                        .format(particle_list, os.getcwd() + "/" + save_as))
 
 
 def pathWithRetentionCheck(particle_lists, path):
@@ -424,7 +424,7 @@ def pathWithRetentionCheck(particle_lists, path):
     for module_number, module in enumerate(path.modules()):
         new_path.add_module(module)
         if 'ParticleSelector' in module.name():
-            name = module.name()+'('+module.available_params()[0].values+')'  # get the cut string
+            name = module.name() + '(' + module.available_params()[0].values + ')'  # get the cut string
         else:
             name = module.name()
         new_path.add_module(RetentionCheck(name, module_number, particle_lists))

@@ -41,7 +41,7 @@ create_validation_histograms(
         ('Mbc', 100, 4.0, 5.3, 'Mbc', myEmail, '', ''),
         ('d1_p', 100, 0, 5.2, 'Signal-side lepton momentum', myEmail, '', ''),
         ('MissM2', 100, -5, 5, 'Missing mass squared', myEmail, '', '')
-        ],
+    ],
     variables_2d=[('deltaE', 100, -5, 5, 'Mbc', 100, 4.0, 5.3, 'Mbc vs deltaE', myEmail, '', '')],
     path=path)
 

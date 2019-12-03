@@ -139,9 +139,6 @@ def get_calibrations(input_data, **kwargs):
     # WireGain Algorithm setup
     Algorithm_WG = CDCDedxWireGainAlgorithm()
     Algorithm_WG.setMonitoringPlots(False)
-    badwireslist = Belle2.FileSystem.findFile('reconstruction/examples/BadWireList_allCause.dat')
-    print("---> badwireslist", badwireslist)
-    Algorithm_WG.setBadWiresdatafile(f"{os.path.dirname(badwireslist)}", "BadWireList_allCause.dat")
 
     # WireGain Calibration setup
     Calibration_WG = Calibration(
@@ -154,7 +151,7 @@ def get_calibrations(input_data, **kwargs):
     Calibration_WG.depends_on(Calibration_CC)
     Calibration_WG.algorithms[0].params = {"apply_iov": output_iov}
 
-    # ----------1. Final Run Gain to take Wire and Cosine correction in effect
+    # ----------4. Final Run Gain to take Wire and Cosine correction in effect
     # Rungain Precollector path
     Calibrate_RG = basf2.create_path()
     Calibrate_RG.add_module(

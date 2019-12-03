@@ -122,8 +122,6 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
   B2INFO("dE/dx run gains done: " << RunGainConst);
   printf("run = %d, const = %0.03f, status = %s\n", runtemp, RunGainConst, rstatus.data());
   generateNewPayloads(RunGainConst);
-  // CDCDedxRunGain* gain = new CDCDedxRunGain(RunGainConst);
-  // saveCalibration(gain, "CDCDedxRunGain");
 
   return c_OK;
 
@@ -137,11 +135,11 @@ void CDCDedxRunGainAlgorithm::generateNewPayloads(double RunGainConst)
     updateDBObjPtrs(1, expRun.second, expRun.first);
     double ExistingRG = m_DBRunGain->getRunGain();
     // bool refchange = m_DBRunGain.hasChanged(); //Add this feature for major processing
-
     B2INFO("Saving new rung for (Exp, Run) : (" << expRun.first << "," << expRun.second << ")");
     B2INFO("--> RunGain: Previous = " << ExistingRG << ", Relative = " << RunGainConst << ", Merged = " << RunGainConst * ExistingRG);
     if (isMergePayload) RunGainConst *= ExistingRG;
-    CDCDedxRunGain* gain = new CDCDedxRunGain(RunGainConst);
-    saveCalibration(gain, "CDCDedxRunGain");
   }
+
+  CDCDedxRunGain* gain = new CDCDedxRunGain(RunGainConst);
+  saveCalibration(gain, "CDCDedxRunGain");
 }

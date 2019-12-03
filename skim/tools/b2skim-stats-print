@@ -370,7 +370,7 @@ def testJsonFile(jsonFileContents):
     jsonTests = [
         jsonFileContents['basf2_status']['finished'],
         jsonFileContents['basf2_status']['success'],
-        jsonFileContents['basf2_status']['errors'] == 0,
+        # jsonFileContents['basf2_status']['errors'] == 0,
         jsonFileContents['basf2_status']['fatals'] == 0,
         all(check for outputFileInfo in outputFileInfoList
             for check in outputFileInfo['checks_passed'].values())
@@ -711,21 +711,28 @@ def fillSkimStatsDict(skims, samples, statSpecifier, verbose=False):
     allSkimStats = {skim: {stat: {} for stat in statSpecifier.keys()} for skim in skims}
 
     for skim in skims:
-        try:
-            for sample in samples:
-                for statName, statSpec in statSpecifier.items():
-                    statFunction = statSpec['Calculate']
+        for sample in samples:
+            for statName, statSpec in statSpecifier.items():
+                statFunction = statSpec['Calculate']
 
-                    try:
-                        allSkimStats[skim][statName][sample] = statFunction(skim, sample)
-                    except TypeError:
-                        allSkimStats[skim][statName][sample] = None
-                        if verbose:
-                            B2WARNING(f'Could not calculate {statName} for {skim} skim on {sample} sample.')
+                try:
+                    allSkimStats[skim][statName][sample] = statFunction(skim, sample)
 
-        except SkimNotRunException as e:
+                except (TypeError, ZeroDivisionError):
+                    allSkimStats[skim][statName][sample] = None
+                    if verbose:
+                        B2WARNING(f'Could not calculate {statName} for {skim} skim on {sample} sample.')
+
+                except SkimNotRunException as e:
+                    B2ERROR(f'Could not get stats for {skim}. Reason:\n{e}\n')
+                    break
+
+            else:
+                continue
+
+            # Delete entries for skim if inner loop encountered `break`
             del allSkimStats[skim]
-            B2ERROR(f'Could not get stats for {skim}. Reason:\n{e}\n')
+            break
 
     return allSkimStats
 

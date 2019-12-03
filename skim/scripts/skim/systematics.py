@@ -256,7 +256,7 @@ def getSigmacList(path):
     Sigmac0List = []
     for chID, channel in enumerate(Sigmac0Channel):
         ma.reconstructDecay('Sigma_c0:resonance' + str(chID) + ' -> ' + channel, SigmacCuts, chID, path=path)
-        SigmacList.append('Sigma_c0:resonance' + str(chID))
+        Sigmac0List.append('Sigma_c0:resonance' + str(chID))
         ma.matchMCTruth('Sigma_c0:resonance0', path=path)
 
     return SigmacList

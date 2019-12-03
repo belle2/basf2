@@ -1028,7 +1028,8 @@ if __name__ == '__main__':
         
         if args.confluence:
             B2ERROR('This tool relies on the third-party package `tabulate` to '
-                    'format wiki markdown. The package is not currently installed. '
+                    'format wiki markdown. The package is not currently installed, '
+                    'but will be included in a future version of the externals. '
                     'Please install it with:\n'
                     '    pip3 install tabulate --user')
             sys.exit(1)

@@ -28,7 +28,7 @@ def getAllSamples(mcCampaign):
         mcCampaign (str): A label like ``MC12`` for the MC campaign to test on.
 
     Returns:
-        mcSampleLabels (list): A lsit of internal MC sample labels (as used by
+        mcSampleLabels (list): A list of internal MC sample labels (as used by
             `skimExpertFunctions.get_test_file`).
         dataSampleLabels (list): A list of internal data sample labels (as used by
             `skimExpertFunctions.get_test_file`).

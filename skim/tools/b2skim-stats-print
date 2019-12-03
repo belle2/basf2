@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 A script to print tables of statistics for skims which have been run by
-``b2skim-stats-submit``.
+``b2skim-stats-submit``. The output files of ``b2skim-stats-submit`` should be
+in a subdirectory ``log/`` in the current directory when you run this script.
 
 This tool works by constructing a nested dictionary of values indexed by skim
 name, then by performance statistic, and then by sample name. The main function

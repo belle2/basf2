@@ -14,7 +14,7 @@ from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
-from skim.standardlists.charm import loadStdD0, loadStdDplus, loadStdDstarPlus
+from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loadStdDstarPlus
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
 b2.set_log_level(b2.LogLevel.INFO)

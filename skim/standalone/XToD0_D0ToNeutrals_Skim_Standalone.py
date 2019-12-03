@@ -11,6 +11,7 @@
 import basf2 as b2
 import modularAnalysis as ma
 from stdCharged import stdK, stdPi
+from stdPi0s import loadStdSkimPi0
 from stdV0s import mergedKshorts, stdKshorts
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'

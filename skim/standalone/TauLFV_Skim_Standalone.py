@@ -12,7 +12,7 @@ import modularAnalysis as ma
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from skim.standardlists.lightmesons import loadStdLightMesons
-from stdPi0s import stdPi0s
+from stdPi0s import stdPi0s, loadStdSkimPi0
 from stdV0s import stdKshorts
 import skimExpertFunctions as expert
 b2.set_log_level(b2.LogLevel.INFO)

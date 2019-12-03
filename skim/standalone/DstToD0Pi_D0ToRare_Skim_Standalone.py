@@ -11,6 +11,7 @@
 import basf2 as b2
 import modularAnalysis as ma
 from stdCharged import stdE, stdMu, stdPi
+from stdPi0s import loadStdSkimPi0
 from stdPhotons import loadStdSkimPhoton
 import skimExpertFunctions as expert
 

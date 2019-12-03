@@ -114,6 +114,10 @@ void StatisticsTimingHLTDQMModule::event()
 
 void StatisticsTimingHLTDQMModule::beginRun()
 {
+  if (!m_meanTimeHistogram || !m_meanMemoryHistogram || !m_fullTimeHistogram) {
+    B2FATAL("Histograms were not created. Did you setup a HistoManager?");
+  }
+
   m_meanTimeHistogram->Reset();
   m_meanMemoryHistogram->Reset();
   m_fullTimeHistogram->Reset();

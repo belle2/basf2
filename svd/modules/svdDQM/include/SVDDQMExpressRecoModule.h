@@ -13,6 +13,8 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
@@ -35,6 +37,8 @@ namespace Belle2 {
 
     /** Module function initialize */
     void initialize() override final;
+    /** Module function terminate */
+    void terminate() override final;
     /** Module function beginRun */
     void beginRun() override final;
     /** Module function event */
@@ -48,8 +52,11 @@ namespace Belle2 {
 
   private:
 
+    /// Store Object for reading the trigger decision.
+    StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
+
     /** list of cumulative histograms */
-    TList* m_cumHistos = nullptr;
+    TList* m_histoList = nullptr;
 
     /** experiment number*/
     int m_expNumber = 0;

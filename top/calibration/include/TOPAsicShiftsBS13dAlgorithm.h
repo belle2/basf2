@@ -100,6 +100,7 @@ namespace Belle2 {
       int m_winSize = 21; /**< size of the window on reference time distribution */
       int m_i0 = 0; /**< first bin of the window on reference time distribution */
       int m_i1 = 0; /**< last bin of the window on reference time distribution */
+      std::vector<int> m_lastEntries; /**< number of histogram entries */
 
     };
 

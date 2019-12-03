@@ -136,9 +136,15 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("deltaChordInMagneticField", m_deltaChordInMagneticField,
            "[mm] The maximum miss-distance between the trajectory curve and its linear cord(s) approximation", 0.25);
 
-  vector<string> defaultCommands;
-  addParam("UICommands", m_uiCommands, "A list of Geant4 UI commands that should be applied before the simulation starts.",
-           defaultCommands);
+  vector<string> defaultCommandsAtPreInit;
+  addParam("UICommandsAtPreInit", m_uiCommandsAtPreInit,
+           "A list of Geant4 UI commands that should be applied at PreInit state, before the simulation starts.",
+           defaultCommandsAtPreInit);
+  vector<string> defaultCommandsAtIdle;
+  addParam("UICommandsAtIdle", m_uiCommandsAtIdle,
+           "A list of Geant4 UI commands that should be applied at Idle state, before the simulation starts.",
+           defaultCommandsAtIdle);
+
 
   addParam("trajectoryStore", m_trajectoryStore,
            "If non-zero save the full trajectory of 1=primary, 2=non-optical or 3=all particles", 0);
@@ -208,6 +214,15 @@ void FullSimModule::initialize()
     physicsList->SetSVDProductionCutValue(m_svdProductionCut);
     physicsList->SetCDCProductionCutValue(m_cdcProductionCut);
     physicsList->SetARICHTOPProductionCutValue(m_arichtopProductionCut);
+
+    //Apply the Geant4 UI commands in PreInit State - before initialization
+    if (m_uiCommandsAtPreInit.size() > 0) {
+      G4UImanager* uiManager = G4UImanager::GetUIpointer();
+      for (vector<string>::iterator iter = m_uiCommandsAtPreInit.begin(); iter != m_uiCommandsAtPreInit.end(); ++iter) {
+        uiManager->ApplyCommand(*iter);
+      }
+    }
+
     runManager.SetUserInitialization(physicsList);
 
   } else {
@@ -222,6 +237,14 @@ void FullSimModule::initialize()
       physicsList->RegisterPhysics(new G4MonopolePhysics(m_monopoleMagneticCharge));
     }
     physicsList->SetDefaultCutValue((m_productionCut / Unit::mm) * CLHEP::mm);  // default is 0.7 mm
+
+    //Apply the Geant4 UI commands in PreInit State - before initialization
+    if (m_uiCommandsAtPreInit.size() > 0) {
+      G4UImanager* uiManager = G4UImanager::GetUIpointer();
+      for (vector<string>::iterator iter = m_uiCommandsAtPreInit.begin(); iter != m_uiCommandsAtPreInit.end(); ++iter) {
+        uiManager->ApplyCommand(*iter);
+      }
+    }
 
     // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
     // all the energy (as is done in G4ErrorPhysicsList)
@@ -382,10 +405,10 @@ void FullSimModule::initialize()
     m_visManager->Initialize();
   }
 
-  //Apply the Geant4 UI commands
-  if (m_uiCommands.size() > 0) {
+  //Apply the Geant4 UI commands at Idle state - after initilization
+  if (m_uiCommandsAtIdle.size() > 0) {
     G4UImanager* uiManager = G4UImanager::GetUIpointer();
-    for (vector<string>::iterator iter = m_uiCommands.begin(); iter != m_uiCommands.end(); ++iter) {
+    for (vector<string>::iterator iter = m_uiCommandsAtIdle.begin(); iter != m_uiCommandsAtIdle.end(); ++iter) {
       uiManager->ApplyCommand(*iter);
     }
   }

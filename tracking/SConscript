@@ -25,8 +25,7 @@ env['LIBS'] = [
     'CLHEP',
     '$ROOT_LIBS',
     '$GEANT4_LIBS',
-    'FastBDT_shared',
-    'tracking_dbobjects',
+    'FastBDT_shared'
     ]
 
 Return('env')

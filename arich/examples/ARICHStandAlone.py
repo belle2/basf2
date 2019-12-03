@@ -92,7 +92,7 @@ simulation = register_module('FullSim')
 if (options.hepr):
     print('Visualisation with HepRep')
     simulation.param('EnableVisualization', True)
-    simulation.param('UICommands', [
+    simulation.param('UICommandsAtIdle', [
         '/vis/open HepRepFile',
         '/vis/scene/create',
         '/vis/scene/add/volume',

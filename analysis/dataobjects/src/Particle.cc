@@ -4,7 +4,8 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Anze Zupanc, Marko Staric, Christian Pulvermacher,       *
- *               Sam Cunliffe, Torben Ferber, Thomas Kuhr                 *
+ *               Sam Cunliffe, Torben Ferber, Thomas Kuhr,                *
+ *               Umberto Tamponi                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -27,6 +28,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/HTML.h>
+#include <framework/utilities/Conversion.h>
 
 #include <TClonesArray.h>
 #include <TDatabasePDG.h>
@@ -36,6 +38,8 @@
 #include <iomanip>
 #include <stdexcept>
 #include <queue>
+
+#include <boost/algorithm/string.hpp>
 
 using namespace Belle2;
 
@@ -742,6 +746,50 @@ const MCParticle* Particle::getMCParticle() const
   return nullptr;
 }
 
+
+const Particle* Particle::getParticleFromGeneralizedIndexString(const std::string& generalizedIndex) const
+{
+  // Split the generalizedIndex string in a vector of strings.
+  std::vector<std::string> generalizedIndexes;
+  boost::split(generalizedIndexes, generalizedIndex, boost::is_any_of(":"));
+
+  if (generalizedIndexes.empty()) {
+    B2WARNING("Generalized index of daughter particle is empty. Skipping.");
+    return nullptr;
+  }
+
+  // To explore a decay tree of unknown depth, we need a place to store
+  // both the root particle and the daughter particle at each iteration
+  const Particle* dauPart =
+    nullptr; // This will be eventually returned
+  const Particle* currentPart = this; // This is the root particle of the next iteration
+
+  // Loop over the generalizedIndexes until you get to the particle you want
+  for (auto& indexString : generalizedIndexes) {
+    // indexString is a string. First try to convert it into an int
+    int dauIndex = 0;
+    try {
+      dauIndex = Belle2::convertString<int>(indexString);
+    } catch (boost::bad_lexical_cast&) {
+      B2WARNING("Found the string " << indexString << "instead of a daughter index.");
+      return nullptr;
+    }
+
+    // Check that the daughter index is smaller than the number of daughters of the current root particle
+    if (dauIndex >= int(currentPart->getNDaughters()) or dauIndex < 0) {
+      B2WARNING("Daughter index " << dauIndex << " out of range");
+      B2WARNING("Trying to access non-existing particle.");
+      return nullptr;
+    } else {
+      dauPart = currentPart->getDaughter(dauIndex); // Pick the particle indicated by the generalizedIndex
+      currentPart = dauPart;
+    }
+  }
+  return dauPart;
+}
+
+
+
 //--- private methods --------------------------------------------
 
 void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
@@ -1087,3 +1135,5 @@ bool Particle::forEachDaughter(const std::function<bool(const Particle*)>& funct
   }
   return false;
 }
+
+

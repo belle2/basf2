@@ -46,7 +46,7 @@ namespace Belle2 {
     /// Parameter: name of the root file - can include {run_number} or {experiment_number}.
     std::string m_rootFileName;
     /// Parameter: size of the temporary internal compression buffer
-    unsigned int m_maximalUncompressedBufferSize = 200'000'000;
+    unsigned int m_maximalUncompressedBufferSize = 128'000'000;
   };
 
   /**
@@ -78,7 +78,7 @@ namespace Belle2 {
     /// Parameter: output address
     std::string m_outputAddress;
     /// Parameter: size of the temporary internal compression buffer
-    unsigned int m_maximalUncompressedBufferSize = 200'000'000;
+    unsigned int m_maximalUncompressedBufferSize = 128'000'000;
   };
 
   /**
@@ -109,6 +109,6 @@ namespace Belle2 {
     /// Parameter: output address
     std::string m_outputAddress;
     /// Parameter: size of the temporary internal compression buffer
-    unsigned int m_maximalUncompressedBufferSize = 200'000'000;
+    unsigned int m_maximalUncompressedBufferSize = 128'000'000;
   };
 }

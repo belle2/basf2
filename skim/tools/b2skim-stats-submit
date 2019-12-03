@@ -212,7 +212,7 @@ def submitJobs(skims, scripts, samples, nTestEvents):
             errFile = Path(logDirectory, f'{skim}_{sample}.err')
             jsonFile = Path(logDirectory, f'JobInformation_{skim}_{sample}.json')
 
-            workingDirectory = Path(logDirectory, f'{skim}_sample')
+            workingDirectory = Path(logDirectory, f'{skim}_{sample}')
             workingDirectory.mkdir(exist_ok=True)
 
             with working_directory(workingDirectory):

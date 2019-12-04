@@ -64,8 +64,8 @@ def BsigToD0hToKpiList(path):
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B-:BtoD0h' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B-:BtoD0h' + str(chID))
+        reconstructDecay('B-:BtoD0h_Kpi' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        BsigList.append('B-:BtoD0h_Kpi' + str(chID))
 
     Lists = BsigList
     return Lists
@@ -112,8 +112,8 @@ def BsigToD0hToKpipipiList(path):
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B-:BtoDhkpipipi' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B-:BtoDhkpipipi' + str(chID))
+        reconstructDecay('B-:BtoD0h_Kpipipi' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        BsigList.append('B-:BtoD0h_Kpipipi' + str(chID))
 
     Lists = BsigList
     return Lists

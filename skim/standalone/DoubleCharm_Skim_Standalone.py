@@ -23,7 +23,7 @@ import os
 import sys
 import glob
 skimCode = encodeSkimName('DoubleCharm')
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 
 path = Path()
 inputMdstList('default', fileList, path=path)

@@ -54,33 +54,49 @@ def decodeSkimName(skimCode):
     return lookup_dict[skimCode]
 
 
-def get_test_file(sample, skimCampaign):
+def get_test_file(sampleName):
     """
     Returns the KEKcc location of files used specifically for skim testing
 
-    Arguments:
-        sample: Type of MC sample: charged mixed ccbar uubar ddbar ssbar taupair or other of-resonance samples.
-        skimCampaign: MC9, MC10, MC11, etc..
+    Args:
+        sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
+    Returns:
+        sampleFileName (str): The path to the test file on KEKCC.
     """
-    sampleName = skimCampaign + '_' + sample
     lookup_dict = {s: f for s, f in skimTestFilesInfo.kekcc_locations}
     if sampleName not in lookup_dict:
         B2ERROR("Testing file for this sample and skim campaign is not available.")
     return lookup_dict[sampleName]
 
 
-def get_total_infiles(sample, skimCampaign):
+def get_total_infiles(sampleName):
     """
     Returns the total number of input Mdst files for a given sample. This is useful for resource estimate.
-    Arguments:
-        sample: Type of MC sample: charged mixed ccbar uubar ddbar ssbar taupair or other of-resonance samples.
-        skimCampaign: MC9, MC10, MC11, etc..
+
+    Args:
+        sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
+    Returns:
+        nInFiles (int): Total number of input files for sample.
     """
-    sampleName = skimCampaign + '_' + sample
     lookup_dict = {s: f for s, f in skimTestFilesInfo.total_input_files}
     if sampleName not in lookup_dict:
-        return 1000
+        return None
     return lookup_dict[sampleName]
+
+
+def get_events_per_file(sample):
+    """
+    Returns an estimate for the average number of events in an input Mdst file of the given sample type.
+
+    Args:
+        sample (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
+    Returns:
+        nEventsPerFile (int): The average number of events in file of the given sample type.
+    """
+    try:
+        return skimTestFilesInfo.nEventsPerFile[sample]
+    except KeyError:
+        return None
 
 
 def add_skim(label, lists, path):

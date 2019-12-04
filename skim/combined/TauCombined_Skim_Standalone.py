@@ -14,7 +14,7 @@ from skim.standardlists.charm import *
 from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
 
 skimpath = b2.Path()
-fileList = get_test_file('mixedBGx1', 'MC12')
+fileList = get_test_file('MC12_mixedBGx1')
 ma.inputMdstList('default', fileList, path=skimpath)
 
 stdE('loose', path=skimpath)

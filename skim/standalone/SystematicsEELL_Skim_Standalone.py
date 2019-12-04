@@ -25,7 +25,7 @@ import glob
 skimpath = Path()
 
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 inputMdstList('default', fileList, path=skimpath)
 
 stdE('all', path=skimpath)

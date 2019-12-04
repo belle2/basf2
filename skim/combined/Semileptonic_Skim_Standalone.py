@@ -19,7 +19,7 @@ set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 SLskimpath = Path()
 
 inputMdstList('default', fileList, path=SLskimpath)

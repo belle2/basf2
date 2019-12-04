@@ -22,7 +22,7 @@ import glob
 skimCode = encodeSkimName("DstToD0Pi_D0ToSemileptonic")
 
 cslpath = Path()
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 inputMdstList('default', fileList, path=cslpath)
 
 

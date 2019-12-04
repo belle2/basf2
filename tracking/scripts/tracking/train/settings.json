@@ -8,4 +8,9 @@
     "run_mva_evaluate": true,
     "run_validation_tasks": true,
     "experiment_numbers": [0, 1003],
+    "bkgfiles_by_exp": {
+        "0": "/sw/belle2/bkg.rel4/",
+        "1002": "/gpfs/group/belle2/BGFile/OfficialBKG/phase2/pseudorandom/prod6/",
+        "1003": "/gpfs/group/belle2/BGFile/OfficialBKG/early_phase3/prerelease-04-00-00a/overlay/phase31/BGx1/set0"
+    },
 }

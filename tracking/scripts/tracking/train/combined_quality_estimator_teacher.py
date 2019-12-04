@@ -397,7 +397,7 @@ class VXDQEDataCollectionTask(Basf2PathTask):
         Generate list of luigi Tasks that this Task depends on.
         """
         yield GenerateSimTask(
-            bkgfiles_dir=MasterTask.bkgfiles_dir,
+            bkgfiles_dir=MasterTask.bkgfiles_by_exp[self.experiment_number],
             num_processes=self.num_processes,
             random_seed=self.random_seed,
             n_events=self.n_events,
@@ -468,7 +468,7 @@ class CDCQEDataCollectionTask(Basf2PathTask):
         Generate list of luigi Tasks that this Task depends on.
         """
         yield GenerateSimTask(
-            bkgfiles_dir=MasterTask.bkgfiles_dir,
+            bkgfiles_dir=MasterTask.bkgfiles_by_exp[self.experiment_number],
             num_processes=self.num_processes,
             random_seed=self.random_seed,
             n_events=self.n_events,
@@ -536,7 +536,7 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
         Generate list of luigi Tasks that this Task depends on.
         """
         yield GenerateSimTask(
-            bkgfiles_dir=MasterTask.bkgfiles_dir,
+            bkgfiles_dir=MasterTask.bkgfiles_by_exp[self.experiment_number],
             num_processes=MasterTask.num_processes,
             random_seed=self.random_seed,
             n_events=self.n_events,
@@ -827,7 +827,7 @@ class HarvestingValidationBaseTask(Basf2PathTask):
             experiment_number=self.experiment_number,
         )
         yield GenerateSimTask(
-            bkgfiles_dir=MasterTask.bkgfiles_dir,
+            bkgfiles_dir=MasterTask.bkgfiles_by_exp[self.experiment_number],
             num_processes=MasterTask.num_processes,
             n_events=self.n_events_testing,
             experiment_number=self.experiment_number,
@@ -937,7 +937,7 @@ class CDCQEHarvestingValidationTask(HarvestingValidationBaseTask):
             training_target=self.training_target,
         )
         yield GenerateSimTask(
-            bkgfiles_dir=MasterTask.bkgfiles_dir,
+            bkgfiles_dir=MasterTask.bkgfiles_by_exp[self.experiment_number],
             num_processes=MasterTask.num_processes,
             n_events=self.n_events_testing,
             experiment_number=self.experiment_number,
@@ -1009,7 +1009,7 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
             cdc_training_target=self.cdc_training_target,
         )
         yield GenerateSimTask(
-            bkgfiles_dir=MasterTask.bkgfiles_dir,
+            bkgfiles_dir=MasterTask.bkgfiles_by_exp[self.experiment_number],
             experiment_number=self.experiment_number,
             num_processes=MasterTask.num_processes,
             n_events=self.n_events_testing,
@@ -1325,7 +1325,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
                 "Date": datetime.today().strftime("%Y-%m-%d %H:%M"),
                 "Created by steering file": os.path.realpath(__file__),
                 "Created from data in": validation_harvest_path,
-                "Background directory": MasterTask.bkgfiles_dir,
+                "Background directory": MasterTask.bkgfiles_by_exp[self.experiment_number],
                 "weight file": weightfile_identifier,
             }
             if hasattr(self, 'exclude_variables'):
@@ -1619,7 +1619,6 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
         # remove existing local databases in output directories
         self._clean()
         # "Upload" the weightfiles of all 3 teacher tasks into the same localdb
-        iov_dict = b2luigi.get_setting("localdb_iov")
         for task in (VXDQETeacherTask, CDCQETeacherTask, FullTrackQETeacherTask):
             # Extract xml identifier input file name before switching working directories, as it returns relative paths
             weightfile_xml_identifier_path = os.path.abspath(self.get_input_file_names(
@@ -1685,8 +1684,10 @@ class MasterTask(b2luigi.WrapperTask):
     n_events_testing = b2luigi.get_setting("n_events_testing", default=1000)
     #: Number of basf2 processes to use in Basf2PathTasks
     num_processes = b2luigi.get_setting("basf2_processes_per_worker", default=0)
-    #: directory with MC overlay background root files
-    bkgfiles_dir = b2luigi.get_setting("bkgfiles_directory")
+    #: Dictionary with experiment numbers as keys and background directory paths as values
+    bkgfiles_by_exp = b2luigi.get_setting("bkgfiles_by_exp")
+    # transform dictionary keys (exp. numbers) from strings to int
+    bkgfiles_by_exp = {int(key): val for (key, val) in bkgfiles_by_exp.items()}
 
     def requires(self):
         """
@@ -1707,7 +1708,7 @@ class MasterTask(b2luigi.WrapperTask):
 
         cdc_training_targets = [
             "truth",  # treats clones as signal
-            "truth_track_is_matched"  # treats clones as backround, only best matched CDC tracks are true
+            # "truth_track_is_matched"  # treats clones as backround, only best matched CDC tracks are true
         ]
 
         experiment_numbers = b2luigi.get_setting("experiment_numbers")

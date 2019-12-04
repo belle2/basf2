@@ -171,7 +171,8 @@ def get_physics_pre_collector_path(entry_sequence=""):
     # Unpackers and reconstruction.
     add_unpackers(main)
     add_reconstruction(main)
-    ma.fillParticleList('mu+:all', '1 < p and p < 11 and d0 < 2 and abs(z0) < 5',
+    ma.fillParticleList('mu+:all',
+                        '1 < p and p < 11 and abs(d0) < 2 and abs(z0) < 5',
                         path=main)
 
     return main

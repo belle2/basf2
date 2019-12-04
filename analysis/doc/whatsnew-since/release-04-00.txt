@@ -66,6 +66,8 @@ Modules
 
   .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
 
+ * Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`. Inefficiency and large background when one used ``=direct=>`` or sub-decay such as ``D*+ -> [D0 -> pi+ pi- pi0] pi+`` are fixed.
+
 Conditions DB
 +++++++++++++
 

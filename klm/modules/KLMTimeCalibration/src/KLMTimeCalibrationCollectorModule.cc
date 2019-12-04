@@ -13,6 +13,8 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMMuidHit.h>
+#include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/dataobjects/BKLMHit1d.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
@@ -23,11 +25,7 @@
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-
-#include <tracking/dataobjects/Muid.h>
-#include <tracking/dataobjects/MuidHit.h>
 #include <tracking/dataobjects/ExtHit.h>
-
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
@@ -210,11 +208,11 @@ void KLMTimeCalibrationCollectorModule::collect()
       int tSub, tFor, tSec, tLay;
       m_elementNum->moduleNumberToElementNumbers(copyId, &tSub, &tFor, &tSec, &tLay);
       bool crossed = false; // should be only once ?
-      Muid* muid = track->getRelatedTo<Muid>();
+      KLMMuidLikelihood* muidLikelihood = track->getRelatedTo<KLMMuidLikelihood>();
       if (tSub == KLMElementNumbers::c_BKLM)
-        crossed = muid->isExtrapolatedBarrelLayerCrossed(tLay - 1);
+        crossed = muidLikelihood->isExtrapolatedBarrelLayerCrossed(tLay - 1);
       else
-        crossed = muid->isExtrapolatedEndcapLayerCrossed(tLay);
+        crossed = muidLikelihood->isExtrapolatedEndcapLayerCrossed(tLay);
       if (crossed)
         m_mapExtHits.insert(std::pair<int, ExtHit*>(copyId, extHit));
     }

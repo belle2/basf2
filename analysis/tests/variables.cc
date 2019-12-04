@@ -3238,59 +3238,249 @@ namespace {
   }
 
 
-  TEST_F(MetaVariableTest, isChildOfList)
+  TEST_F(MetaVariableTest, isDescendantOfList)
   {
-
-    StoreObjPtr<ParticleList> DList("D0:vartest");
     DataStore::Instance().setInitializeActive(true);
+    StoreObjPtr<ParticleList> DList("D0:vartest");
     DList.registerInDataStore();
     DList.create();
     DList->initialize(421, "D0:vartest");
+    StoreObjPtr<ParticleList> BList("B:vartest");
+    BList.registerInDataStore();
+    BList.create();
+    BList->initialize(521, "B:vartest");
+    DataStore::Instance().setInitializeActive(false);
 
     TLorentzVector momentum;
     TLorentzVector momentum_0;
     TLorentzVector momentum_1;
     StoreArray<Particle> particles;
-    std::vector<int> daughterIndices;
-    std::vector<int> grandDaughterIndices_0;
-    std::vector<int> grandDaughterIndices_1;
+    std::vector<int> D_daughterIndices;
+    std::vector<int> D_grandDaughterIndices_0;
+    std::vector<int> D_grandDaughterIndices_1;
+    std::vector<int> B_daughterIndices;
+    std::vector<int> B_grandDaughterIndices;
+    std::vector<int> B_grandGrandDaughterIndices;
+
+    // Creation of D decay: D->K0s(->pi pi) K0s(->pi pi)
+
+    const Particle* D_gd_0_0 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
+    const Particle* D_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
+    const Particle* D_gd_1_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
+    const Particle* D_gd_1_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
+
+    D_grandDaughterIndices_0.push_back(D_gd_0_0->getArrayIndex());
+    D_grandDaughterIndices_0.push_back(D_gd_0_1->getArrayIndex());
+    D_grandDaughterIndices_1.push_back(D_gd_1_0->getArrayIndex());
+    D_grandDaughterIndices_1.push_back(D_gd_1_1->getArrayIndex());
+    momentum_0 = D_gd_0_0->get4Vector() + D_gd_0_1->get4Vector();
+    momentum_1 = D_gd_1_0->get4Vector() + D_gd_1_1->get4Vector();
 
 
-    const Particle* gd_0_0 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
-    const Particle* gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
-    const Particle* gd_1_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
-    const Particle* gd_1_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
-
-    grandDaughterIndices_0.push_back(gd_0_0->getArrayIndex());
-    grandDaughterIndices_0.push_back(gd_0_1->getArrayIndex());
-    grandDaughterIndices_1.push_back(gd_1_0->getArrayIndex());
-    grandDaughterIndices_1.push_back(gd_1_1->getArrayIndex());
-    momentum_0 = gd_0_0->get4Vector() + gd_0_1->get4Vector();
-    momentum_1 = gd_1_0->get4Vector() + gd_1_1->get4Vector();
+    const Particle* D_d_0 = particles.appendNew(momentum_0, 310, Particle::c_Unflavored, D_grandDaughterIndices_0);
+    const Particle* D_d_1 = particles.appendNew(momentum_1, 310, Particle::c_Unflavored, D_grandDaughterIndices_1);
 
 
-    const Particle* d_0 = particles.appendNew(momentum_0, 310, Particle::c_Unflavored, grandDaughterIndices_0);
-    const Particle* d_1 = particles.appendNew(momentum_1, 310, Particle::c_Unflavored, grandDaughterIndices_1);
+    momentum = D_d_0->get4Vector() + D_d_1->get4Vector();
+    D_daughterIndices.push_back(D_d_0->getArrayIndex());
+    D_daughterIndices.push_back(D_d_1->getArrayIndex());
 
+    const Particle* D_m = particles.appendNew(momentum, 421, Particle::c_Unflavored, D_daughterIndices);
+    DList->addParticle(D_m);
 
-    momentum = d_0->get4Vector() + d_1->get4Vector();
-    daughterIndices.push_back(d_0->getArrayIndex());
-    daughterIndices.push_back(d_1->getArrayIndex());
+    // Creation of B decay B -> D(->K0s(->pi pi) pi) pi
 
-    const Particle* m = particles.appendNew(momentum, 421, Particle::c_Unflavored, daughterIndices);
-    DList->addParticle(m);
+    const Particle* B_d_1 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
+    const Particle* B_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
+    const Particle* B_ggd_0_0_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
+    const Particle* B_ggd_0_0_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
 
+    B_grandGrandDaughterIndices.push_back(B_ggd_0_0_0->getArrayIndex());
+    B_grandGrandDaughterIndices.push_back(B_ggd_0_0_1->getArrayIndex());
+    momentum_0 = B_ggd_0_0_0->get4Vector() + B_ggd_0_0_1->get4Vector();
+    const Particle* B_gd_0_0 = particles.appendNew(momentum_0, 310, Particle::c_Unflavored, B_grandGrandDaughterIndices);
+
+    B_grandDaughterIndices.push_back(B_gd_0_0->getArrayIndex());
+    B_grandDaughterIndices.push_back(B_gd_0_1->getArrayIndex());
+    momentum_1 = B_gd_0_0->get4Vector() + B_gd_0_1->get4Vector();
+    const Particle* B_d_0 = particles.appendNew(momentum_1, -411, Particle::c_Unflavored, B_grandDaughterIndices);
+
+    B_daughterIndices.push_back(B_d_0->getArrayIndex());
+    B_daughterIndices.push_back(B_d_1->getArrayIndex());
+    momentum = B_d_0->get4Vector() + B_d_1->get4Vector();
+    const Particle* B_m = particles.appendNew(momentum, 521, Particle::c_Unflavored, B_daughterIndices);
+    BList->addParticle(B_m);
+
+    // Particle that is not an child
     const Particle* not_child = particles.appendNew(TLorentzVector(5.0, 1, 1, 1), 211);
 
-    const Manager::Var* var = Manager::Instance().getVariable("isChildOfList(D0:vartest)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(gd_0_1), 1.);
-    EXPECT_FLOAT_EQ(var->function(d_0), 1.);
-    EXPECT_FLOAT_EQ(var->function(not_child), 0.);
+
+
+    const Manager::Var* var_0 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest)");
+    ASSERT_NE(var_0, nullptr);
+    EXPECT_FLOAT_EQ(var_0->function(D_gd_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_0->function(D_gd_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_0->function(D_gd_1_0), 1.);
+    EXPECT_FLOAT_EQ(var_0->function(D_gd_1_1), 1.);
+    EXPECT_FLOAT_EQ(var_0->function(D_d_0), 1.);
+    EXPECT_FLOAT_EQ(var_0->function(D_d_1), 1.);
+    EXPECT_FLOAT_EQ(var_0->function(B_ggd_0_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_0->function(B_ggd_0_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_0->function(B_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_0->function(B_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_0->function(B_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_0->function(B_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_0->function(not_child), 0.);
+
+    const Manager::Var* var_0a = Manager::Instance().getVariable("isDaughterOfList(D0:vartest)");
+    ASSERT_NE(var_0a, nullptr);
+    EXPECT_FLOAT_EQ(var_0a->function(D_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_0a->function(D_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_0a->function(D_gd_1_0), 0.);
+    EXPECT_FLOAT_EQ(var_0a->function(D_gd_1_1), 0.);
+    EXPECT_FLOAT_EQ(var_0a->function(D_d_0), 1.);
+    EXPECT_FLOAT_EQ(var_0a->function(D_d_1), 1.);
+    EXPECT_FLOAT_EQ(var_0a->function(B_ggd_0_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_0a->function(B_ggd_0_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_0a->function(B_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_0a->function(B_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_0a->function(B_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_0a->function(B_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_0a->function(not_child), 0.);
+
+    const Manager::Var* var_0b = Manager::Instance().getVariable("isGrandDaughterOfList(D0:vartest)");
+    ASSERT_NE(var_0b, nullptr);
+    EXPECT_FLOAT_EQ(var_0b->function(D_gd_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_0b->function(D_gd_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_0b->function(D_gd_1_0), 1.);
+    EXPECT_FLOAT_EQ(var_0b->function(D_gd_1_1), 1.);
+    EXPECT_FLOAT_EQ(var_0b->function(D_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_0b->function(D_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_0b->function(B_ggd_0_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_0b->function(B_ggd_0_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_0b->function(B_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_0b->function(B_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_0b->function(B_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_0b->function(B_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_0b->function(not_child), 0.);
+
+    const Manager::Var* var_1 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, 1)");
+    ASSERT_NE(var_1, nullptr);
+    EXPECT_FLOAT_EQ(var_1->function(D_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(D_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(D_gd_1_0), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(D_gd_1_1), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(D_d_0), 1.);
+    EXPECT_FLOAT_EQ(var_1->function(D_d_1), 1.);
+    EXPECT_FLOAT_EQ(var_1->function(B_ggd_0_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(B_ggd_0_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(B_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(B_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(B_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(B_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(not_child), 0.);
+
+    const Manager::Var* var_2 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, 2)");
+    ASSERT_NE(var_2, nullptr);
+    EXPECT_FLOAT_EQ(var_2->function(D_gd_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_2->function(D_gd_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_2->function(D_gd_1_0), 1.);
+    EXPECT_FLOAT_EQ(var_2->function(D_gd_1_1), 1.);
+    EXPECT_FLOAT_EQ(var_2->function(D_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_2->function(D_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_2->function(B_ggd_0_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_2->function(B_ggd_0_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_2->function(B_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_2->function(B_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_2->function(B_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_2->function(B_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_2->function(not_child), 0.);
+
+    const Manager::Var* var_3 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, B:vartest)");
+    ASSERT_NE(var_3, nullptr);
+    EXPECT_FLOAT_EQ(var_3->function(D_gd_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_3->function(D_gd_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_3->function(D_gd_1_0), 1.);
+    EXPECT_FLOAT_EQ(var_3->function(D_gd_1_1), 1.);
+    EXPECT_FLOAT_EQ(var_3->function(D_d_0), 1.);
+    EXPECT_FLOAT_EQ(var_3->function(D_d_1), 1.);
+    EXPECT_FLOAT_EQ(var_3->function(B_ggd_0_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_3->function(B_ggd_0_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_3->function(B_gd_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_3->function(B_gd_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_3->function(B_d_0), 1.);
+    EXPECT_FLOAT_EQ(var_3->function(B_d_1), 1.);
+    EXPECT_FLOAT_EQ(var_3->function(not_child), 0.);
+
+    const Manager::Var* var_4 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, B:vartest, -1)");
+    ASSERT_NE(var_4, nullptr);
+    EXPECT_FLOAT_EQ(var_4->function(D_gd_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_4->function(D_gd_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_4->function(D_gd_1_0), 1.);
+    EXPECT_FLOAT_EQ(var_4->function(D_gd_1_1), 1.);
+    EXPECT_FLOAT_EQ(var_4->function(D_d_0), 1.);
+    EXPECT_FLOAT_EQ(var_4->function(D_d_1), 1.);
+    EXPECT_FLOAT_EQ(var_4->function(B_ggd_0_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_4->function(B_ggd_0_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_4->function(B_gd_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_4->function(B_gd_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_4->function(B_d_0), 1.);
+    EXPECT_FLOAT_EQ(var_4->function(B_d_1), 1.);
+    EXPECT_FLOAT_EQ(var_4->function(not_child), 0.);
+
+
+    const Manager::Var* var_5 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, B:vartest, 1)");
+    ASSERT_NE(var_5, nullptr);
+    EXPECT_FLOAT_EQ(var_5->function(D_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(D_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(D_gd_1_0), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(D_gd_1_1), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(D_d_0), 1.);
+    EXPECT_FLOAT_EQ(var_5->function(D_d_1), 1.);
+    EXPECT_FLOAT_EQ(var_5->function(B_ggd_0_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(B_ggd_0_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(B_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(B_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(B_d_0), 1.);
+    EXPECT_FLOAT_EQ(var_5->function(B_d_1), 1.);
+    EXPECT_FLOAT_EQ(var_5->function(not_child), 0.);
+
+
+    const Manager::Var* var_6 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, B:vartest, 2)");
+    ASSERT_NE(var_6, nullptr);
+    EXPECT_FLOAT_EQ(var_6->function(D_gd_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_6->function(D_gd_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_6->function(D_gd_1_0), 1.);
+    EXPECT_FLOAT_EQ(var_6->function(D_gd_1_1), 1.);
+    EXPECT_FLOAT_EQ(var_6->function(D_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_6->function(D_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_6->function(B_ggd_0_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_6->function(B_ggd_0_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_6->function(B_gd_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_6->function(B_gd_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_6->function(B_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_6->function(B_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_6->function(not_child), 0.);
+
+    const Manager::Var* var_7 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, B:vartest, 3)");
+    ASSERT_NE(var_7, nullptr);
+    EXPECT_FLOAT_EQ(var_7->function(D_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_7->function(D_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_7->function(D_gd_1_0), 0.);
+    EXPECT_FLOAT_EQ(var_7->function(D_gd_1_1), 0.);
+    EXPECT_FLOAT_EQ(var_7->function(D_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_7->function(D_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_7->function(B_ggd_0_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_7->function(B_ggd_0_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_7->function(B_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_7->function(B_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_7->function(B_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_7->function(B_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_7->function(not_child), 0.);
   }
 
 
-  TEST_F(MetaVariableTest, isMCChildOfList)
+  TEST_F(MetaVariableTest, isMCDescendantOfList)
   {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
@@ -3302,14 +3492,20 @@ namespace {
     BList.registerInDataStore();
     BList.create();
     BList->initialize(521, "B:vartest");
+    StoreObjPtr<ParticleList> DList("D0:vartest");
+    DList.registerInDataStore();
+    DList.create();
+    DList->initialize(421, "D0:vartest");
+    DataStore::Instance().setInitializeActive(false);
     TLorentzVector momentum;
     TLorentzVector momentum_0;
     TLorentzVector momentum_1;
     std::vector<int> daughterIndices;
     std::vector<int> grandDaughterIndices;
     std::vector<int> grandGrandDaughterIndices;
-    DataStore::Instance().setInitializeActive(false);
-
+    std::vector<int> D_daughterIndices;
+    std::vector<int> D_grandDaughterIndices_0;
+    std::vector<int> D_grandDaughterIndices_1;
 
 
     // Create MC graph for B+ -> (D -> (K0s -> pi+ + pi-) pi-)  + pi+
@@ -3361,6 +3557,33 @@ namespace {
     mc_ggd_0_0_1->setStatus(MCParticle::c_PrimaryParticle);
     mc_not_child->setStatus(MCParticle::c_PrimaryParticle);
 
+    // Creation of D decay: D->K0s(->pi pi) K0s(->pi pi) (not matched)
+
+    const Particle* D_gd_0_0 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
+    const Particle* D_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
+    const Particle* D_gd_1_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
+    const Particle* D_gd_1_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
+
+    D_grandDaughterIndices_0.push_back(D_gd_0_0->getArrayIndex());
+    D_grandDaughterIndices_0.push_back(D_gd_0_1->getArrayIndex());
+    D_grandDaughterIndices_1.push_back(D_gd_1_0->getArrayIndex());
+    D_grandDaughterIndices_1.push_back(D_gd_1_1->getArrayIndex());
+    momentum_0 = D_gd_0_0->get4Vector() + D_gd_0_1->get4Vector();
+    momentum_1 = D_gd_1_0->get4Vector() + D_gd_1_1->get4Vector();
+
+
+    const Particle* D_d_0 = particles.appendNew(momentum_0, 310, Particle::c_Unflavored, D_grandDaughterIndices_0);
+    const Particle* D_d_1 = particles.appendNew(momentum_1, 310, Particle::c_Unflavored, D_grandDaughterIndices_1);
+
+
+    momentum = D_d_0->get4Vector() + D_d_1->get4Vector();
+    D_daughterIndices.push_back(D_d_0->getArrayIndex());
+    D_daughterIndices.push_back(D_d_1->getArrayIndex());
+
+    const Particle* D_m = particles.appendNew(momentum, 421, Particle::c_Unflavored, D_daughterIndices);
+    DList->addParticle(D_m);
+
+    // Creating B decay
     const Particle* d_1 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
     const Particle* gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
     const Particle* ggd_0_0_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
@@ -3397,16 +3620,108 @@ namespace {
     m->addRelationTo(mc_m);
     not_child->addRelationTo(mc_not_child);
 
-    const Manager::Var* var = Manager::Instance().getVariable("isMCChildOfList(B:vartest)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(ggd_0_0_0), 1.);
-    EXPECT_FLOAT_EQ(var->function(ggd_0_0_1), 1.);
-    EXPECT_FLOAT_EQ(var->function(gd_0_0), 1.);
-    EXPECT_FLOAT_EQ(var->function(gd_0_1), 1.);
-    EXPECT_FLOAT_EQ(var->function(d_0), 1.);
-    EXPECT_FLOAT_EQ(var->function(d_1), 1.);
-    EXPECT_FLOAT_EQ(var->function(not_child), 0.);
-    EXPECT_FLOAT_EQ(var->function(not_child_2), 0.);
+    const Manager::Var* var_0 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest)");
+    ASSERT_NE(var_0, nullptr);
+    EXPECT_FLOAT_EQ(var_0->function(D_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_0->function(D_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_0->function(D_gd_1_0), 0.);
+    EXPECT_FLOAT_EQ(var_0->function(D_gd_1_1), 0.);
+    EXPECT_FLOAT_EQ(var_0->function(D_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_0->function(D_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_0->function(ggd_0_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_0->function(ggd_0_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_0->function(gd_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_0->function(gd_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_0->function(d_0), 1.);
+    EXPECT_FLOAT_EQ(var_0->function(d_1), 1.);
+    EXPECT_FLOAT_EQ(var_0->function(not_child), 0.);
+    EXPECT_FLOAT_EQ(var_0->function(not_child_2), 0.);
+
+    const Manager::Var* var_1 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest, D0:vartest)");
+    ASSERT_NE(var_1, nullptr);
+    EXPECT_FLOAT_EQ(var_1->function(D_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(D_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(D_gd_1_0), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(D_gd_1_1), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(D_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(D_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(ggd_0_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_1->function(ggd_0_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_1->function(gd_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_1->function(gd_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_1->function(d_0), 1.);
+    EXPECT_FLOAT_EQ(var_1->function(d_1), 1.);
+    EXPECT_FLOAT_EQ(var_1->function(not_child), 0.);
+    EXPECT_FLOAT_EQ(var_1->function(not_child_2), 0.);
+
+    const Manager::Var* var_2 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest, -1)");
+    ASSERT_NE(var_2, nullptr);
+    EXPECT_FLOAT_EQ(var_2->function(D_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_2->function(D_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_2->function(D_gd_1_0), 0.);
+    EXPECT_FLOAT_EQ(var_2->function(D_gd_1_1), 0.);
+    EXPECT_FLOAT_EQ(var_2->function(D_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_2->function(D_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_2->function(ggd_0_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_2->function(ggd_0_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_2->function(gd_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_2->function(gd_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_2->function(d_0), 1.);
+    EXPECT_FLOAT_EQ(var_2->function(d_1), 1.);
+    EXPECT_FLOAT_EQ(var_2->function(not_child), 0.);
+    EXPECT_FLOAT_EQ(var_2->function(not_child_2), 0.);
+
+    const Manager::Var* var_3 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest, 1)");
+    ASSERT_NE(var_3, nullptr);
+    EXPECT_FLOAT_EQ(var_3->function(D_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_3->function(D_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_3->function(D_gd_1_0), 0.);
+    EXPECT_FLOAT_EQ(var_3->function(D_gd_1_1), 0.);
+    EXPECT_FLOAT_EQ(var_3->function(D_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_3->function(D_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_3->function(ggd_0_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_3->function(ggd_0_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_3->function(gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_3->function(gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_3->function(d_0), 1.);
+    EXPECT_FLOAT_EQ(var_3->function(d_1), 1.);
+    EXPECT_FLOAT_EQ(var_3->function(not_child), 0.);
+    EXPECT_FLOAT_EQ(var_3->function(not_child_2), 0.);
+
+    const Manager::Var* var_4 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest, 2)");
+    ASSERT_NE(var_4, nullptr);
+    EXPECT_FLOAT_EQ(var_4->function(D_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_4->function(D_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_4->function(D_gd_1_0), 0.);
+    EXPECT_FLOAT_EQ(var_4->function(D_gd_1_1), 0.);
+    EXPECT_FLOAT_EQ(var_4->function(D_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_4->function(D_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_4->function(ggd_0_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_4->function(ggd_0_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_4->function(gd_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_4->function(gd_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_4->function(d_0), 0.);
+    EXPECT_FLOAT_EQ(var_4->function(d_1), 0.);
+    EXPECT_FLOAT_EQ(var_4->function(not_child), 0.);
+    EXPECT_FLOAT_EQ(var_4->function(not_child_2), 0.);
+
+
+    const Manager::Var* var_5 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest, 3)");
+    ASSERT_NE(var_5, nullptr);
+    EXPECT_FLOAT_EQ(var_5->function(D_gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(D_gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(D_gd_1_0), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(D_gd_1_1), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(D_d_0), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(D_d_1), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(ggd_0_0_0), 1.);
+    EXPECT_FLOAT_EQ(var_5->function(ggd_0_0_1), 1.);
+    EXPECT_FLOAT_EQ(var_5->function(gd_0_0), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(gd_0_1), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(d_0), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(d_1), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(not_child), 0.);
+    EXPECT_FLOAT_EQ(var_5->function(not_child_2), 0.);
   }
 
 

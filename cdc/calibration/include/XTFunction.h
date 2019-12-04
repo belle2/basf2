@@ -168,6 +168,18 @@ namespace Belle2 {
       }
 
       /**
+       * Is valid.
+       */
+      bool isValid()
+      {
+        if (m_fitFunc->IsValid() == true) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      /**
        * Set XT mode.
        * 1 is 5th order Chebshev polynomial.
        * 0 is 5th order polynomial.
@@ -411,7 +423,6 @@ namespace Belle2 {
 
     void XTFunction::FitChebyshev()
     {
-
       if (m_mode != c_Chebyshev) {
         B2ERROR("Fitting function is wrong");
       }
@@ -425,10 +436,12 @@ namespace Belle2 {
       double p[6];
       double par[8];
       m_fitFunc->SetParLimits(7, 0., 0.001);
-      m_h1->Fit("chebyshev5", "QME", "", m_tmin, m_XTParam[6]);
-      m_h1->GetFunction("chebyshev5")->GetParameters(p);
-      m_fitFunc->SetParameters(p[0], p[1], p[2], p[3], p[4], p[5], m_XTParam[6], 0.000);
 
+      int fitresult = m_h1->Fit("chebyshev5", "QME", "", m_tmin, m_XTParam[6]);
+      if (fitresult >= 0) {
+        m_h1->GetFunction("chebyshev5")->GetParameters(p);
+        m_fitFunc->SetParameters(p[0], p[1], p[2], p[3], p[4], p[5], m_XTParam[6], 0.000);
+      }
       double stat;
       for (int i = 0; i < 10; ++i) {
         stat = m_h1->Fit(m_fitFunc, "MQ", "0", m_tmin, m_tmax);
@@ -439,7 +452,7 @@ namespace Belle2 {
         }
         m_fitFunc->GetParameters(par);
         if (p[1] < 0) { // negative c1
-          std::cout << " neg c1 converted" << std::endl;
+          // std::cout << " neg c1 converted" << std::endl;
           p[0] = 0;
           p[1] *= -1.0;
           p[2] = 0;

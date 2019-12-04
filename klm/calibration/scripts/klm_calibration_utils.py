@@ -194,6 +194,8 @@ def get_cdst_pre_collector_path(entry_sequence=""):
     main.add_module('Geometry')
 
     # Fill muon particle list
-    ma.fillParticleList('mu+:all', '1 < p and p < 11', path=main)
+    ma.fillParticleList('mu+:all',
+                        '1 < p and p < 11 and abs(d0) < 2 and abs(z0) < 5',
+                        path=main)
 
     return main

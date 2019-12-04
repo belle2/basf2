@@ -2,12 +2,15 @@
 # -*- coding: utf-8 -*-
 
 """
-Skim list building functions for :math:`B\\to X_c + h` analyses
+List of functions to skim events containing :math:`B\\to X_c + h` decays,
+where :math:`X_c` stays for :math:`D^0`, :math:`D^{\\pm}`, :math:`D^{*0}` and :math:`D^{*\\pm}`,
+and :math:`h` stays for :math:`\\pi^{\\pm}`, :math:`K^{\\pm}`, :math:`\\rho^{\\pm}` and :math:`a_1^{\\pm}`.
 """
 
 __authors__ = [
-    "Niharika Rout"
+    "Fernando Abudinen", "Chiara La Licata", "Niharika Rout",
 ]
+
 
 from basf2 import *
 from modularAnalysis import *
@@ -17,13 +20,13 @@ import os.path
 import basf2
 
 
-def BsigToDhToKpiList(path):
+def BsigToD0hToKpiList(path):
     """
     Skim list definitions for all charged  B to charm 3 body decays.
 
     **Skim Author**: Niharika Rout
 
-    **Skim Name**: BtoDh_Kpi
+    **Skim Name**: BtoD0h_Kpi
 
     **Skim Category**: physics, hadronic B to charm
 
@@ -32,19 +35,22 @@ def BsigToDhToKpiList(path):
     **Working Group**: BtoCharm (WG4)
 
     **Decay Modes**:
-    1. B- -> D0 (K- pi+) pi-
-    2. B- -> D0 (K- pi+) K-
+
+    1.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^-) \\pi^+`,
+
+    2.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^-) K^+`,
 
 
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    1. 1.6 < M_D0 < 2.0
-    2. 5.2 < Mbc
+    1. 1.7 < M_D0 < 2.0
+    2. Mbc > 5.2
     3. abs(deltaE) < 0.5
 
-Note:
-    This skim uses loadD0_Kpi() where D0 channels are defined.
+    Note:
+    This skim uses loadD0_Kpi() from the ``hadrons_for_validation.py`` script
+    where D0 channels are defined.
 
 
     """
@@ -65,25 +71,11 @@ Note:
     return Lists
 
 
-def loadD0_Kpi(path):
-
-    Dcuts = '1.6 < M < 2.0'
-    D0Channels = [
-        'K-:all pi+:all'
-    ]
-    D0List = []
-    for chID, channel in enumerate(D0Channels):
-        reconstructDecay('D0:list' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
-        D0List.append('D0:list' + str(chID))
-        copyLists('D0:Kpi', D0List, path=path)
-    return D0List
-
-
-def BsigToDhToKpipipiList(path):
+def BsigToD0hToKpipipiList(path):
     """
     **Skim Author**: N. Rout
 
-    **Skim Name**: BtoDh_Kpipipi
+    **Skim Name**: BtoD0h_Kpipipi
 
     **Skim Category**: physics, hadronic B to charm
 
@@ -92,19 +84,23 @@ def BsigToDhToKpipipiList(path):
     **Working Group**: BtoCharm (WG4)
 
     **Decay Modes**:
-    1. B- -> D0 (K- pi+ pi- pi+) pi-
-    2. B- -> D0 (K- pi+ pi- pi+) K-
+
+
+    1.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+) \\pi^+`,
+
+    2.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+) K^+`,
 
 
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    1. 1.6 < M_D0 < 2.0
-    2. 5.2 < Mbc
+    1. 1.7 < M_D0 < 2.0
+    2. Mbc > 5.2
     3. abs(deltaE) < 0.5
 
     Note:
-    This skim uses loadD0_Kpipipi() where D0 channels are defined.
+    This skim uses loadD0_Kpipipi() from the ``hadrons_for_validation.py`` script
+    where D0 channels are defined.
 
     """
     __author__ = "Niharika Rout"
@@ -121,17 +117,3 @@ def BsigToDhToKpipipiList(path):
 
     Lists = BsigList
     return Lists
-
-
-def loadD0_Kpipipi(path):
-    Dcuts = '1.6 < M < 2.0'
-
-    D0_Channels = [
-        'K-:all pi+:all pi-:all pi+:all'
-    ]
-    D0List = []
-    for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:Kpipipi' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
-        D0List.append('D0:Kpipipi' + str(chID))
-        copyLists('D0:Kpipipi', D0List, path=path)
-    return D0List

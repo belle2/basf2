@@ -1631,10 +1631,8 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
                 basf2_mva.upload(
                     weightfile_xml_identifier_path,
                     task.weightfile_identifier_basename,
-                    iov_dict["exp1"],
-                    iov_dict["run1"],
-                    iov_dict["exp2"],
-                    iov_dict["run2"],
+                    self.experiment_number, 0,
+                    self.experiment_number, -1,
                 )
             finally:  # Switch back to working directory of b2luigi, even if upload failed
                 os.chdir(current_path)

@@ -74,7 +74,11 @@ namespace Belle2 {
 
   void DBStore::update()
   {
-    if (m_dbEntries.empty()) return;
+    if (m_dbEntries.empty()) {
+      // make sure we at least fix the list og globaltags on the first time
+      Database::Instance().initialize(Database::c_InitGlobaltagList);
+      return;
+    }
 
     // Make sure our EventMetaData pointer is reconnected as it could get
     // disconnected if the DataStore is reset.
@@ -88,7 +92,11 @@ namespace Belle2 {
 
   void DBStore::update(const EventMetaData& event)
   {
-    if (m_dbEntries.empty()) return;
+    if (m_dbEntries.empty()) {
+      // make sure we at least fix the list og globaltags on the first time
+      Database::Instance().initialize(Database::c_InitGlobaltagList);
+      return;
+    }
     m_manualEvent = event;
     performUpdate(*m_manualEvent);
   }

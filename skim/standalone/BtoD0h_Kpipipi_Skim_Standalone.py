@@ -11,17 +11,16 @@ from ROOT import Belle2
 import basf2 as b2
 import modularAnalysis as ma
 from stdCharged import stdPi, stdK
-from skim.standardlists.charm import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import skimExpertFunctions as sef
 
-set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-04-00-04'
+b2.set_log_level(b2.LogLevel.INFO)
+b2.gb2_setuprel = 'release-04-00-04'
 
 path = b2.create_path()
 
-skimCode = encodeSkimName('BtoDh_Kpipipi')
+skimCode = sef.encodeSkimName('BtoD0h_Kpipipi')
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = sef.get_test_file("mixedBGx1", "MC12")
 
 ma.inputMdstList('default', fileList, path=path)
 
@@ -32,14 +31,16 @@ ma.applyCuts(list_name='pi+:all', cut='abs(dr) < 2 and abs(dz) < 5', path=path)
 ma.applyCuts(list_name='K+:all', cut='abs(dr) < 2 and abs(dz) < 5', path=path)
 
 # B- to D(->Kpipipi)h- Skim
-from skim.btohadron_validation import loadD0_Kpipipi, BsigToDhToKpipipiList
+from skim.btohadron_validation import BsigToD0hToKpipipiList
+from skim.standardlists.hadrons_for_validation import loadD0_Kpipipi
+
 loadD0_Kpipipi(path=path)
-BtoDhList = BsigToDhToKpipipiList(path=path)
-skimOutputUdst(skimCode, BtoDhList, path=path)
-summaryOfLists(BtoDhList, path=path)
+BtoD0h_Kpipipi_list = BsigToD0hToKpipipiList(path=path)
+sef.skimOutputUdst(skimCode, BtoD0h_Kpipipi_list, path=path)
+ma.summaryOfLists(BtoD0h_Kpipipi_list, path=path)
 
 
-setSkimLogging(path)
+sef.setSkimLogging(path)
 b2.process(path)
 
 # print out the summary

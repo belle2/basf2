@@ -2,27 +2,25 @@
 # -*- coding: utf-8 -*-
 
 #######################################################
-# B -> D(Kpi) h skims
-# Niharika Rout
+# B+ -> anti-D0 (-> Kpi) h+ skims
+# Author: Niharika Rout
 #
-######################################################
+#######################################################
 
 from ROOT import Belle2
 import basf2 as b2
 import modularAnalysis as ma
 from stdCharged import stdPi, stdK
-from stdPi0s import *
-from stdV0s import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import skimExpertFunctions as sef
 
-set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-04-00-04'
+b2.set_log_level(b2.LogLevel.INFO)
+b2.gb2_setuprel = 'release-04-00-04'
 
 path = b2.create_path()
 
-skimCode = encodeSkimName('BtoDh_Kpi')
+skimCode = sef.encodeSkimName('BtoD0h_Kpi')
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = sef.get_test_file("mixedBGx1", "MC12")
 
 ma.inputMdstList('default', fileList, path=path)
 
@@ -34,13 +32,15 @@ ma.applyCuts(list_name='pi+:all', cut='abs(dr) < 2 and abs(dz) < 5', path=path)
 ma.applyCuts(list_name='K+:all', cut='abs(dr) < 2 and abs(dz) < 5', path=path)
 
 # B+ to D(->h+h-)h+ Skim
-from skim.btohadron_validation import loadD0_Kpi, BsigToDhToKpiList
-loadD0_Kpi(path=path)
-BtoDhList = BsigToDhToKpiList(path=path)
-skimOutputUdst(skimCode, BtoDhList, path=path)
-summaryOfLists(BtoDhList, path=path)
+from skim.btohadron_validation import BsigToD0hToKpiList
+from skim.standardlists.hadrons_for_validation import loadD0_Kpi
 
-setSkimLogging(path)
+loadD0_Kpi(path=path)
+BtoD0h_Kpi_list = BsigToD0hToKpiList(path=path)
+sef.skimOutputUdst(skimCode, BtoD0h_Kpi_list, path=path)
+ma.summaryOfLists(BtoD0h_Kpi_list, path=path)
+
+sef.setSkimLogging(path)
 b2.process(path)
 
 # print out the summary

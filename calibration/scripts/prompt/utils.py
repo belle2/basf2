@@ -3,7 +3,6 @@
 """
 This module contains various utility functions for the prompt calibration CAF scripts to use.
 """
-
 from basf2 import B2INFO, B2WARNING, B2DEBUG
 from collections import defaultdict, OrderedDict
 import ROOT
@@ -44,6 +43,48 @@ def filter_by_max_files_per_run(files_to_iov, max_files_per_run=1, min_events_pe
             if not min_events_per_file or (min_events_per_file and events_in_basf2_file(input_file) >= min_events_per_file):
                 B2INFO(f"Choosing input file for {run}: {input_file}")
                 run_to_files[run].append(input_file)
+
+    # runs_to_files was useful for looking up number of files per run. But we want to invert this back to a
+    # files_to_iov object, just with less files.
+    # In case the input dictionary was OrderedDict we keep the ordering.
+    # Python's dictionaries are ordered now, but may not always be.
+    new_files_to_iov = OrderedDict()
+    for run, run_files in run_to_files.items():
+        for file_path in run_files:
+            # We made the assumption that the IoVs are single runs
+            new_files_to_iov[file_path] = IoV(*run, *run)
+    return new_files_to_iov
+
+
+def filter_by_max_files_max_events(files_to_iov, max_events_in_files=99999):
+    """
+    This function creates a new files_to_iov dictionary by adding n # of files
+    until the maximum number of events are achived
+
+    Returns:
+        dict: The same style of dict as the input file_to_iov, but filtered down.
+    """
+    B2INFO(f"Beginning filtering process to limit {max_events_in_files} events per run.")
+
+    # Our dictionary for appending files to and checking the number per run
+    run_to_files = defaultdict(list)
+    temprun = -99
+    totalevent = 0
+    for input_file, file_iov in files_to_iov.items():
+        run = ExpRun(exp=file_iov.exp_low, run=file_iov.run_low)
+        run_files = run_to_files.get(run, None)
+
+        if temprun != file_iov.run_low:
+            totalevent = 0
+
+        temprun = file_iov.run_low
+
+        if not run_files or totalevent < max_events_in_files:
+            run_to_files[run].append(input_file)
+            totalevent += events_in_basf2_file(input_file)
+            B2INFO(f"Choosing input file for {run}: {input_file} and total events so far {totalevent}")
+        else:
+            continue
 
     # runs_to_files was useful for looking up number of files per run. But we want to invert this back to a
     # files_to_iov object, just with less files.

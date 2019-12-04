@@ -129,6 +129,11 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
     decay->setObj(const_cast<MCParticle*>(mcp));
     return decay;
   }
+  // Get number of daughter recursively if missing intermediate states are accepted.
+  int nDaughtersRecursiveD = nDaughtersD;
+  if (d->isIgnoreIntermediate()) {
+    nDaughtersRecursiveD = getNDaughtersRecursive(d);
+  }
 
   // Get daughters of MCParticle
   vector<const MCParticle*> daughtersP;
@@ -142,7 +147,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
 
   // The MCParticle must have at least as many daughters as the decaydescriptor
   int nDaughtersP = daughtersP.size();
-  if (nDaughtersD > nDaughtersP) {
+  if (nDaughtersRecursiveD > nDaughtersP) {
     B2DEBUG(10, "DecayDescriptor has more daughters than MCParticle!");
     return decay;
   }
@@ -211,7 +216,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
         else if (d->isIgnoreGamma()) continue;
       } else if ((daugP->getPDG() == 12 or daugP->getPDG() == 14 or daugP->getPDG() == 16)) { // neutrino
         if (d->isIgnoreNeutrino()) continue;
-      } else if (MCMatching::isFSP(daugP->getPDG()) and d->isIgnoreMassive()) { // other final state particle
+      } else if (MCMatching::isFSP(daugP->getPDG())) { // other final state particle
         if (d->isIgnoreMassive()) continue;
       } else { // intermediate
         if (d->isIgnoreIntermediate()) continue;
@@ -259,4 +264,19 @@ void MCDecayFinderModule::appendParticles(const MCParticle* gen, vector<const MC
     children.push_back(daug);
     appendParticles(daug, children);
   }
+}
+
+int MCDecayFinderModule::getNDaughtersRecursive(const DecayDescriptor* d)
+{
+  const int nDaughter = d->getNDaughters();
+  if (nDaughter == 0) return nDaughter;
+
+  int nDaughterRecursive = nDaughter;
+  for (int iDaug = 0; iDaug < nDaughter; iDaug++) {
+    const DecayDescriptor* dDaug = d->getDaughter(iDaug);
+
+    nDaughterRecursive += getNDaughtersRecursive(dDaug);
+  }
+
+  return nDaughterRecursive;
 }

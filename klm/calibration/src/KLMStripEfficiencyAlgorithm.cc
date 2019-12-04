@@ -33,8 +33,8 @@ KLMStripEfficiencyAlgorithm::KLMStripEfficiencyAlgorithm() : CalibrationAlgorith
 KLMStripEfficiencyAlgorithm::~KLMStripEfficiencyAlgorithm()
 {
   delete m_StripEfficiency;
-  delete m_Efficiency;
-  delete m_ExtHitsPlane;
+  delete[] m_Efficiency;
+  delete[] m_ExtHitsPlane;
 }
 
 CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()

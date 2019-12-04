@@ -188,11 +188,11 @@ namespace Belle2 {
     /** Number of matched digits. */
     int m_MatchedDigits = 0;
 
-    /** Efiiciency. */
+    /** Efficiency. */
     float* m_Efficiency;
 
-    /** Number of ExtHits. */
-    int m_ExtHits;
+    /** Number of ExtHits (overall). */
+    int m_ExtHits = 0;
 
     /** Number of ExtHits per plane. */
     int* m_ExtHitsPlane;

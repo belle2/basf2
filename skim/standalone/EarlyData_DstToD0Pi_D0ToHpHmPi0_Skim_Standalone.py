@@ -21,7 +21,7 @@ skimCode = expert.encodeSkimName('DstToD0Pi_D0ToHpHmPi0')
 
 c3bh1path = b2.Path()
 
-fileList = expert.get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 ma.inputMdstList('default', fileList, path=c3bh1path)
 
 loadStdSkimPhoton(path=c3bh1path)

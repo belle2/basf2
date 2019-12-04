@@ -13,7 +13,7 @@
 #include <calibration/CalibrationCollectorModule.h>
 #include <arich/dataobjects/ARICHDigit.h>
 #include <framework/datastore/StoreArray.h>
-#include <string>
+
 
 namespace Belle2 {
   /// Testing module for collection of calibration data

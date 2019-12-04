@@ -24,7 +24,7 @@ charmless2skimpath = b2.Path()
 
 # Retrieve skim code
 skimCode = expert.encodeSkimName("CharmlessHad2Body")
-fileList = expert.get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 ma.inputMdstList('default', fileList, path=charmless2skimpath)
 
 # Load particle lists

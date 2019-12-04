@@ -49,12 +49,6 @@ namespace Belle2 {
     double isSignal(const Particle* part);
 
     /**
-     * return 1 if Particle is correctly reconstructed (SIGNAL), 0 otherwise
-     * It does not consider the ignore particle flags of PropertyFlags of the particle.
-     */
-    double isSignalWithoutProperty(const Particle* part);
-
-    /**
      * return 1 if Particle is almost correctly reconstructed (SIGNAL), 0 otherwise.
      * Misidentification of charged FSP is allowed.
      * It will be deprecated in release-05, please consider to use isSignalAcceptWrongFSPs.
@@ -157,11 +151,6 @@ namespace Belle2 {
      * return combination of MCMatching::MCErrorFlags flags.
      */
     double particleMCErrors(const Particle* particle);
-
-    /**
-     * return combination of MCMatching::MCErrorFlags flags without considering PropertyFlags of particle which are set by decaystring grammar.
-     */
-    double particleMCErrorsWithoutProperty(const Particle* particle);
 
     /**
      * return the weight of the Particle -> MCParticle relation (only for the first Relation = largest weight)

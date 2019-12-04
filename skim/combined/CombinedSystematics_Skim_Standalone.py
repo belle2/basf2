@@ -25,7 +25,7 @@ from skim.systematics import ResonanceList, SystematicsLambdaList, SystematicsLi
 b2.set_log_level(b2.LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'
 
-fileList = expert.get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 
 syspath = b2.Path()
 ma.inputMdstList('default', fileList, path=syspath)

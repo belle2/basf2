@@ -21,7 +21,7 @@ b2.set_log_level(b2.LogLevel.INFO)
 skimCode = expert.encodeSkimName('DstToD0Pi_D0ToHpJmPi0')
 
 c3bhpath = b2.Path()
-fileList = expert.get_test_file("ddbarBGx0", "MC12")
+fileList = expert.get_test_file("MC12_ddbarBGx0")
 ma.inputMdstList('default', fileList, path=c3bhpath)
 
 

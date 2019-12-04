@@ -21,7 +21,7 @@ b2.set_log_level(b2.LogLevel.INFO)
 ISRskimpath = b2.Path()
 
 # Add default samples
-fileList = expert.get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 ma.inputMdstList('default', fileList, path=ISRskimpath)
 
 # use standard final state particle lists

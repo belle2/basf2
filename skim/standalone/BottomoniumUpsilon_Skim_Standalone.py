@@ -20,7 +20,7 @@ BottomoniumUpsilonskimpath = b2.Path()
 
 skimCode = expert.encodeSkimName('BottomoniumUpsilon')
 
-fileList = expert.get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 ma.inputMdstList('default', fileList, path=BottomoniumUpsilonskimpath)
 
 # use standard final state particle lists

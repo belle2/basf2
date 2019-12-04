@@ -22,7 +22,7 @@ gb2_setuprel = 'release-04-00-00'
 
 skimCode = expert.encodeSkimName('PRsemileptonicUntagged')
 
-fileList = expert.get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 
 # create a new path
 PRSLpath = b2.Path()

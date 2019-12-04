@@ -19,7 +19,7 @@ skimCode = expert.encodeSkimName('TauGeneric')
 
 taugenericskim = b2.Path()
 
-fileList = expert.get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 
 ma.inputMdstList('default', fileList, path=taugenericskim)
 

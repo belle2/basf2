@@ -69,6 +69,7 @@ skim_registry = [
     ('18570700', 'TauThrust'),
 ]
 
+#: A dict listing which standalone skims are included the combined skim scripts
 combined_skims = {
     'BtoCharm': [
         'BtoDh_Kshh', 'BtoDh_hh', 'BtoDh_Kspi0', 'BtoDh_Kspipipi0'
@@ -102,12 +103,15 @@ combined_skims = {
         'feiSLB0', 'feiSLBplus'
     ],
     'MiscCombined': [
-        'TCPV', 'TauLFV', 'TauThrust', 'TauGeneric'
+        'TCPV'
     ],
     'Quarkonium': [
         'ISRpipicc', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon'
     ],
     'Semileptonic': [
         'PRsemileptonicUntagged', 'LeptonicUntagged', 'SLUntagged'
+    ],
+    'TauCombined': [
+        'TauLFV', 'TauThrust', 'TauGeneric'
     ]
 }

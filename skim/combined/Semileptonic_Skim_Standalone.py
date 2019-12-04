@@ -17,7 +17,7 @@ from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loa
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
 b2.set_log_level(b2.LogLevel.INFO)
-fileList = expert.get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 SLskimpath = b2.Path()
 
 ma.inputMdstList('default', fileList, path=SLskimpath)

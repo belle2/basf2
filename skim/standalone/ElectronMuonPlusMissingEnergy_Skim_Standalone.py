@@ -18,7 +18,7 @@ gb2_setuprel = 'release-04-00-00'
 
 emu_path = b2.Path()
 
-fileList = expert.get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 ma.inputMdstList('default', fileList, path=emu_path)
 
 charged.stdE('all', path=emu_path)

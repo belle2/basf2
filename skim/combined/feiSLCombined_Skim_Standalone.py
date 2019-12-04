@@ -15,7 +15,7 @@ import modularAnalysis as ma
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
 
-fileList = expert.get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 path = b2.create_path()
 ma.inputMdstList('default', fileList, path=path)
 

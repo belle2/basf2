@@ -20,7 +20,7 @@ skimCode = expert.encodeSkimName('DstToD0Pi_D0ToKsOmega')
 
 c2bn2path = b2.Path()
 
-fileList = expert.get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 ma.inputMdstList('default', fileList, path=c2bn2path)
 
 stdPi('loose', path=c2bn2path)

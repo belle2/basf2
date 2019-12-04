@@ -13,7 +13,7 @@
 
 namespace Belle2 {
   /**
-   * Test class implementing calibration algorithm
+   * ARICH channel mask calibration algorithm
    */
   class ARICHChannelMaskMaker : public CalibrationAlgorithm {
   public:
@@ -21,23 +21,23 @@ namespace Belle2 {
     /// Constructor set the prefix to TestCalibration
     ARICHChannelMaskMaker();
 
-    /// Destructor
-    //    virtual ~ARICHChannelMaskMaker {}
+    /// setter for m_minOcc
+    void setMinOcc(double minOcc) {m_minOcc = minOcc;}
 
-    /// setter for m_willFail
-    void setForceFail(bool forceFail) {m_forceFail = forceFail;}
+    /// setter for m_maxOcc
+    void setMaxOcc(double maxOcc) {m_maxOcc = maxOcc;}
 
-    /// getter for m_willFail
-    bool getForceFail() {return m_forceFail;}
+    /// setter for m_minHitAtMinOcc
+    void setMinHitAtMinOcc(double minHitAtMinOcc) {m_minHitAtMinOcc = minHitAtMinOcc;}
 
-    /// setter for m_minEntries
-    void setMinEntries(int minEntries) {m_minEntries = minEntries;}
+    /// getter for m_minOcc
+    double getMinOcc() {return m_minOcc;}
 
-    /// getter for m_minEntries
-    int getMinEntries() {return m_minEntries;}
+    /// getter for m_maxOcc
+    double getMaxOcc() {return m_maxOcc;}
 
-    /// setter for m_debugHisto
-    void setDebugHisto(bool debugHisto) {m_debugHisto = debugHisto;}
+    /// getter for m_minHitAtMinOcc
+    double getMinHitAtMinOcc() {return m_minHitAtMinOcc;}
 
   protected:
 
@@ -45,14 +45,13 @@ namespace Belle2 {
     virtual EResult calibrate() override;
 
   private:
-    /// Set when c_NotEnoughData will be returned
-    int m_minEntries = 100;
-    /// Force always fail for testing
-    int m_forceFail = false;
-    /// Set if a debugging histogram should be created in the algorithm output directory
-    int m_debugHisto = false;
-    /// Perform debug histogram file creation
-    void createDebugHistogram();
+
+    /// Minimal occupany (for dead channels)
+    double m_minOcc = 0.00003;
+    /// Maximal occupany (for hot channels)
+    double m_maxOcc = 0.005;
+    /// Minimal number of hits expected at minimal occupancy, collect more data if not satisfied (m_minOcc*nevents>m_minHitAtMinOcc)
+    double m_minHitAtMinOcc = 20.;
 
   };
 } // namespace Belle2

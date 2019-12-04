@@ -32,59 +32,101 @@ SVDCoGTimeCalibrationAlgorithm::SVDCoGTimeCalibrationAlgorithm(const std::string
 CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
 {
 
+  int layer_num = 0;
+  int ladder_num = 0;
+  int sensor_num = 0;
+
+  int ladderOfLayer[4] = {7, 10, 12, 16};
+  int sensorOnLayer[4] = {2, 3, 4, 5};
+
   auto timeCal = new Belle2::SVDCoGCalibrationFunction();
   auto payload = new Belle2::SVDCoGTimeCalibrations::t_payload(*timeCal, m_id);
 
-  TF1* pol = new TF1("pol", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -150, 150);
-  pol->SetParameters(-50, 1.5, 0.001, 0.00001);
+  TF1* pol3 = new TF1("pol3", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -50, 80);
+  pol3->SetParameters(-40, 0.5, 0.05, 0.0005);
+  TF1* pol5 = new TF1("pol5", "[0] + [1]*x + [2]*x*x + [3]*x*x*x + [4]*x*x*x*x + [5]*x*x*x*x*x", -100, 100);
+  pol5->SetParameters(-50, 1.5, 0.01, 0.0001, 0.00001, 0.000001);
 
-  TH2F* hEventT0vsCoG = new TH2F(" ", " ", 300, -150, 150, 300, -150, 150);
-  //TProfile* pfx = new TProfile("hprof", " ", 300, -150, 150);
+  TFile* f = new TFile("algorithm_output.root", "RECREATE");
 
-  TFile* f = new TFile("profileOutput.root", "RECREATE");
+  for (int layer = 0; layer < 4; layer++) {
+    layer_num = layer + 3;
+    for (int ladder = 0; ladder < (int)ladderOfLayer[layer]; ladder++) {
+      ladder_num = ladder + 1;
+      for (int sensor = 0; sensor < (int)sensorOnLayer[layer]; sensor++) {
+        sensor_num = sensor + 1;
+        for (int view  = 1; view > -1; view--) {
+          char side = 'U';
+          if (view == 0)
+            side = 'V';
+          auto hEventT0vsCoG = getObjectPtr<TH2F>(Form("eventT0vsCoG__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          auto hEventT0 = getObjectPtr<TH1F>(Form("eventT0__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          auto hEventT0nosync = getObjectPtr<TH1F>(Form("eventT0nosync__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          cout << " " << endl;
+          cout << typeid(hEventT0vsCoG).name() << " " << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << endl;
+          if (layer_num == 3 && hEventT0vsCoG->GetEntries() < m_minEntries) {
+            cout << " " << endl;
+            cout << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << " Entries required: " << m_minEntries << endl;
+            cout << "Not enough data, adding one run to the collector" << endl;
+            return c_NotEnoughData;
+          }
+          cout << " " << endl;
+          for (int i = 0; i < hEventT0vsCoG->GetNbinsX(); i++) {
+            for (int j = 0; j < hEventT0vsCoG->GetNbinsY(); j++) {
+              if (hEventT0vsCoG->GetBinContent(i, j) < int(hEventT0vsCoG->GetEntries() * 0.001)) {
+                hEventT0vsCoG->SetBinContent(i, j, 0);
+              }
+            }
+          }
+          TProfile* pfx = hEventT0vsCoG->ProfileX();
+          std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
+          pfx->SetName(name.c_str());
+          pfx->SetErrorOption("S");
+          pfx->Fit("pol3", "RQ");
+          double par[4];
+          pol3->GetParameters(par);
+          double meanT0 = hEventT0->GetMean();
+          double meanT0NoSync = hEventT0nosync->GetMean();
+          timeCal->set_current(1);
+          // timeCal->set_current(2);
+          timeCal->set_pol3parameters(par[0], par[1], par[2], par[3]);
+          payload->set(layer_num, ladder_num, sensor_num, bool(view), 1, *timeCal);
+          f->cd();
+          hEventT0->Write();
+          hEventT0vsCoG->Write();
+          hEventT0nosync->Write();
+          pfx->Write();
 
-  auto tree = getObjectPtr<TTree>("HTreeCoGTimeCalib");
-  auto h = getObjectPtr<TH1F>("hEventT0");
-  float meanT0 = h->GetMean();
-
-  if (!tree) {
-    B2WARNING("No tree object.");
-  } else if (!tree->GetEntries()) {
-    B2WARNING("No data in the tree.");
+        }
+      }
+    }
   }
-
-  int layer = 0;
-  int ladder = 0;
-  int sensor = 0;
-  int side = 0;
-
-  tree->SetBranchAddress("hist", &hEventT0vsCoG);
-  tree->SetBranchAddress("layer", &layer);
-  tree->SetBranchAddress("ladder", &ladder);
-  tree->SetBranchAddress("sensor", &sensor);
-  tree->SetBranchAddress("view", &side);
-
-  for (int i = 0; i < tree->GetEntries(); i++) {
-    tree->GetEntry(i);
-    TProfile* pfx = hEventT0vsCoG->ProfileX();
-    std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
-    pfx->SetName(name.c_str());
-    pfx->Fit("pol", "0");
-    double par[4];
-    pol->GetParameters(par);
-    timeCal->set_current(1);
-    timeCal->set_pol3parameters(par[0] - meanT0, par[1], par[2], par[3]);
-
-    payload->set(layer, ladder, sensor, bool(side), 1, *timeCal);
-    f->cd();
-    pfx->Write();
-    hEventT0vsCoG->Clear();
-  }
-  h->Write();
   f->Close();
   saveCalibration(payload, "SVDCoGTimeCalibrations");
 
   // probably not needed - would trigger re-doing the collection
-  //if ( ... too large corrections ... ) return c_Iterate;
+  // if ( ... too large corrections ... ) return c_Iterate;
   return c_OK;
+  delete f;
 }
+
+bool SVDCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRun& currentRun)
+{
+  auto eventT0Hist = getObjectPtr<TH1F>("hEventT0FromCDST");
+  float meanEventT0 = eventT0Hist->GetMean();
+  if (!m_previousEventT0) {
+    B2INFO("Setting start payload boundary to be the first run ("
+           << currentRun.first << "," << currentRun.second << ")");
+    m_previousEventT0.emplace(meanEventT0);
+    return true;
+  } else if (abs(meanEventT0 - m_previousEventT0.value()) > m_allowedT0Shift) {
+    B2INFO("Histogram mean has shifted from " << m_previousEventT0.value()
+           << " to " << meanEventT0 << ". We are requesting a new payload boundary for ("
+           << currentRun.first << "," << currentRun.second << ")");
+    m_previousEventT0.emplace(meanEventT0);
+    return true;
+  } else {
+    return false;
+  }
+}
+

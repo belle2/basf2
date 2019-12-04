@@ -10,11 +10,7 @@
 
 #include <arich/modules/arichChannelMask/ARICHChannelMaskModule.h>
 
-#include <string>
-
-#include <TTree.h>
 #include <TH1F.h>
-#include <TRandom.h>
 
 
 using namespace Belle2;
@@ -32,17 +28,13 @@ REG_MODULE(ARICHChannelMask)
 ARICHChannelMaskModule::ARICHChannelMaskModule() : CalibrationCollectorModule()
 {
   // Set module properties
-  setDescription("Test Module for saving big data in CAF");
-  // Parameter definitions
-  //  addParam("entriesPerEvent", m_entriesPerEvent,
-  //         "Number of entries that we fill into the saved tree per event. As we increase this we start storing larger amonuts of data in a smaller number of events to test the limits.",
-  //        int(10));
+  setDescription("Collector for ARICH channel mask production in CAF");
 }
 
 void ARICHChannelMaskModule::prepare()
 {
 
-  auto hist = new TH1F("ch_occupancy", "HAPD channel occupancy", 420 * 144, -0.5, 420 * 144 - 1);
+  auto hist = new TH1F("ch_occupancy", "HAPD channel occupancy", 420 * 144 + 1, -0.5, 420 * 144 + 0.5);
   registerObject<TH1F>("ch_occupancy", hist);
   m_ARICHDigits.isRequired();
 }
@@ -51,9 +43,9 @@ void ARICHChannelMaskModule::prepare()
 void ARICHChannelMaskModule::collect()
 {
   auto hist = getObjectPtr<TH1F>("ch_occupancy");
-
+  hist->Fill(420 * 144); // evnt count
   for (const auto& digit : m_ARICHDigits) {
-    hist->Fill((digit.getModuleID() - 1) * 420 + digit.getChannelID());
+    hist->Fill((digit.getModuleID() - 1) * 144 + digit.getChannelID());
   }
 }
 

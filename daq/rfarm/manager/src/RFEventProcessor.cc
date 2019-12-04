@@ -181,6 +181,9 @@ int RFEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
   // Simple implementation to stop all processes
   //  system("killall basf2 sock2rbr rb2sockr hrelay hserver");
 
+  // Emergency stop
+  system("killall -9 python");
+
   // Normal abort
   int status;
   if (m_pid_sender != 0) {

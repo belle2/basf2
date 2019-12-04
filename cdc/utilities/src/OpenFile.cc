@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
 #include <cdc/utilities/OpenFile.h>
 
 #include <boost/iostreams/device/file.hpp>

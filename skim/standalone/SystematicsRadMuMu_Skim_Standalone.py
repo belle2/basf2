@@ -15,13 +15,13 @@ from modularAnalysis import inputMdstList, skimOutputUdst, summaryOfLists
 from stdCharged import stdMu
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 
 # create a path to build skim lists
 skimpath = Path()
 
 # input test data
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 inputMdstList('default', fileList, path=skimpath)
 stdMu('all', path=skimpath)
 

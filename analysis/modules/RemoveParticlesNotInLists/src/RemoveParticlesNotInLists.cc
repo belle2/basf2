@@ -9,8 +9,10 @@
  **************************************************************************/
 
 #include <analysis/modules/RemoveParticlesNotInLists/RemoveParticlesNotInLists.h>
+#include <analysis/dataobjects/ParticleList.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 using namespace std;
 using namespace Belle2;

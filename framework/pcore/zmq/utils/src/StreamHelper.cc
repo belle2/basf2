@@ -9,9 +9,9 @@
  **************************************************************************/
 
 #include <framework/pcore/zmq/utils/StreamHelper.h>
-#include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/core/Environment.h>
 #include <framework/core/RandomNumbers.h>
+#include <framework/logging/Logger.h>
 
 #include <TSystem.h>
 

@@ -13,11 +13,10 @@
 #include <alignment/GlobalLabel.h>
 #include <alignment/GlobalParam.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/EventDependency.h>
-#include <memory>
 
-#include <boost/python.hpp>
-#include <boost/python/list.hpp>
+#include <Python.h>
+
+#include <memory>
 
 namespace Belle2 {
   namespace alignment {

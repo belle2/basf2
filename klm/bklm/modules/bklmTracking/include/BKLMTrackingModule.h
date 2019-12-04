@@ -10,18 +10,21 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
 #include <klm/bklm/dataobjects/BKLMTrack.h>
-#include <klm/bklm/modules/bklmTracking/BKLMTrackFinder.h>
-#include <klm/bklm/geometry/Module.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <klm/bklm/geometry/GeometryPar.h>
+
+/* Belle 2 headers. */
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <tracking/dataobjects/RecoTrack.h>
+
+/* ROOT headers. */
+#include <TEfficiency.h>
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TEfficiency.h>
 
 namespace Belle2 {
 

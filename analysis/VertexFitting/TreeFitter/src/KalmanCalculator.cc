@@ -10,7 +10,6 @@
 
 #include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
 
-#include <iostream>
 namespace TreeFitter {
 
   KalmanCalculator::KalmanCalculator(
@@ -18,7 +17,6 @@ namespace TreeFitter {
     int sizeState
   ) :
     m_constrDim(sizeRes),
-    m_stateDim(sizeState),
     m_chisq(1e10),
     m_res(sizeRes),
     m_G(sizeRes, sizeState),
@@ -97,14 +95,6 @@ namespace TreeFitter {
       fitCov - deltaCov;
 
     fitparams.getCovariance().triangularView<Eigen::Lower>() = delta.triangularView<Eigen::Lower>();
-
-    for (int col = 0; col < m_constrDim; ++col) {
-      for (int k = 0; k < m_stateDim; ++k) {
-        if (m_G(col, k) != 0) {
-          ++(fitparams.incrementNConstraintsVec(k));
-        }
-      }
-    }//end for block
 
   }//end function
 

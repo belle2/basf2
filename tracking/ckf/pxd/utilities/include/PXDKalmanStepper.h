@@ -16,7 +16,6 @@ namespace genfit {
 }
 
 namespace Belle2 {
-  class SpacePoint;
   class CKFToPXDState;
 
   /// Kalman stepper implementation for the PXD CKF

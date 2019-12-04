@@ -273,7 +273,7 @@ def vertexRave(
     Warning:
         `RAVE <https://github.com/rave-package>`_ is deprecated since it is not maintained.
         Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.
-        Instead, we recommend `TreeFitter` (`vertex.vertexTree`) or `vertex.vertexKFit`.
+        Instead, we recommend :doc:`TreeFitter` (`vertex.vertexTree`) or `vertex.vertexKFit`.
 
     Parameters:
         list_name (str):    name of the input ParticleList
@@ -327,10 +327,10 @@ def vertexRaveDaughtersUpdate(
     Warning:
         `RAVE <https://github.com/rave-package>`_ is deprecated since it is not maintained.
         Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.
-        Instead, we recommend `TreeFitter` (`vertex.vertexTree`) or `vertex.vertexKFit`.
+        Instead, we recommend :doc:`TreeFitter` (`vertex.vertexTree`) or `vertex.vertexKFit`.
 
     The mother is only used in the fit if all daugthers (charged and neutral) are selected.
-    For this, leave the `decay_string` empty.
+    For this, leave the ``decay_string`` empty.
 
     Information:
        For vertices with a single track the mother is not used.
@@ -395,7 +395,7 @@ def massVertexRave(
     Warning:
         `RAVE <https://github.com/rave-package>`_ is deprecated since it is not maintained.
         Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.
-        Instead, we recommend `TreeFitter` (`vertex.vertexTree`) or `vertex.vertexKFit`.
+        Instead, we recommend :doc:`TreeFitter` (`vertex.vertexTree`) or `vertex.vertexKFit`.
 
     Parameters:
         list_name (str):    name of the input ParticleList
@@ -445,7 +445,7 @@ def massVertexRaveDaughtersUpdate(
     Warning:
         `RAVE <https://github.com/rave-package>`_ is deprecated since it is not maintained.
         Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.
-        Instead, we recommend `TreeFitter` (`vertex.vertexTree`) or `vertex.vertexKFit`.
+        Instead, we recommend :doc:`TreeFitter` (`vertex.vertexTree`) or `vertex.vertexKFit`.
 
     Parameters:
         list_name (str):    name of the input ParticleList
@@ -496,7 +496,7 @@ def massRave(
     Warning:
         `RAVE <https://github.com/rave-package>`_ is deprecated since it is not maintained.
         Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.
-        Instead, we recommend `TreeFitter` (`vertex.vertexTree`) or `vertex.vertexKFit`.
+        Instead, we recommend :doc:`TreeFitter` (`vertex.vertexTree`) or `vertex.vertexKFit`.
 
     Parameters:
         list_name (str):    name of the input ParticleList
@@ -545,7 +545,7 @@ def vertexTree(
     path=None,
 ):
     """
-    Perform a `TreeFitter` fit for each Particle in the given ParticleList.
+    Perform a :doc:`TreeFitter` fit for each Particle in the given ParticleList.
 
     :Example:
         An example of usage for the decay chain :math:`B^0\\to\\pi^+\\pi^-\\pi^0`  is the following:

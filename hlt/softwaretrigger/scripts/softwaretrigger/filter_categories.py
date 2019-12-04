@@ -1,6 +1,8 @@
 # ECL Physics channels
 ECL_PHYSICS = [
     "filter 0.3ltEstar max clustlt2 GeV plus 2 others gt 0.2 GeV",
+    "filter Elab gt 0.3 plus 3 others with Elab gt 0.18 plus no clust with Ecms gt 2.0",
+    "filter Elab gt 0.5 plus 2 others with Elab gt 0.18 plus no clust with Ecms gt 2.0",
     "filter ge1 Estargt2 GeV neutral clst 2232 or 130145 not gg2clst ee2clst ee1leg eeBrem",
     "filter ge1 Estargt2 GeV neutral clst 32130 not gg2clst ee1leg1clst ee1leg1trk eeBrem",
 ]
@@ -8,6 +10,7 @@ ECL_PHYSICS = [
 # ECL Potentially Prescaled channels
 ECL_PRESCALED = [
     "filter 1 electron Estargt1 GeV clust in 45115 and no other clust Estargt0.3 GeV",
+    "filter 1 electron Estargt1 GeV clust in 32130 and no other clust Estargt0.3 GeV",
     "filter 1 Estargt1 GeV cluster no other cluster Estargt0.3 GeV",
     "filter 1 photon Estargt1 GeV clust not low not 45115 no other clust Estargt0.3 GeV",
     "filter gg2clst",
@@ -38,7 +41,11 @@ CDC_PRESCALED = [
 # Targeted Physics channels
 PHYSICS = [
     "filter 1 photon Estargt1 GeV clust in 45115 and no other clust Estargt0.3 GeV",
-    "filter ggBarrelLoose"
+    "filter 1 photon Estargt1 GeV clust in 32130 and no other clust Estargt0.3 GeV",
+    "filter 1 photon Estargt0.5 GeV clust in 4498 and no other clust Estargt0.3 GeV",
+    "filter ggBarrelLoose",
+    "filter singleTagLowMass",
+    "filter singleTagHighMass",
 ]
 
 # QED channels
@@ -59,6 +66,7 @@ QED = [
     "filter radiative Bhabha",
     "filter selectmumu",
     "filter single muon",
+    "filter cosmic",
 ]
 
 # L1 Passthrough channels

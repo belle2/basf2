@@ -12,14 +12,11 @@
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
 #include <beast/microtpc/dataobjects/TPCG4TrackInfo.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
 
 #include <G4Track.hh>
 #include <G4Step.hh>
-#include "G4VProcess.hh"
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for the MICROTPC detector */

@@ -4,8 +4,7 @@
 ##############################################################################
 # This steering file which shows all usage options for the cosmics module
 # in the generators package. The generated particles from the cosmic generator
-# are then fed through a full Geant4 simulation and the output is stored in
-# a root file.
+# are stored in a ROOT file.
 #
 # The different options for the particle gun are explained below.
 # Uncomment/comment different lines to get the wanted settings
@@ -43,10 +42,6 @@ cosmics.param('ipRequirement', 0)
 eventinfosetter = basf2.register_module('EventInfoSetter')
 # Show progress of processing
 progress = basf2.register_module('Progress')
-# Load parameters
-gearbox = basf2.register_module('Gearbox')
-# Create geometry
-geometry = basf2.register_module('Geometry')
 
 # Save output of generation
 output = basf2.register_module('RootOutput')
@@ -63,8 +58,6 @@ output.param('outputFileName', 'CosmicsOutput.root')
 main = basf2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)
-main.add_module(gearbox)
-main.add_module(geometry)
 main.add_module(cosmics)
 main.add_module(output)
 

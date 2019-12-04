@@ -35,12 +35,14 @@ namespace {
   {
     int old{5};
     {
+      // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
       auto guard = Belle2::ScopeGuard::guardValue(old);
       ASSERT_EQ(old, 5);
       old = 17;
     }
     ASSERT_EQ(old, 5);
     {
+      // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
       auto guard = Belle2::ScopeGuard::guardValue(old, 17);
       ASSERT_EQ(old, 17);
     }
@@ -84,12 +86,14 @@ namespace {
     int old{5};
     IntSetterGetterFunctor functor(old);
     {
+      // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
       auto guard = Belle2::ScopeGuard::guardFunctor(functor);
       ASSERT_EQ(old, 5);
       old = 17;
     }
     ASSERT_EQ(old, 5);
     {
+      // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
       auto guard = Belle2::ScopeGuard::guardFunctor(functor, 17);
       ASSERT_EQ(old, 17);
     }
@@ -101,6 +105,7 @@ namespace {
     }
     ASSERT_EQ(old, 17);
     {
+      // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
       auto guard = Belle2::ScopeGuard::guardFunctor(overloads{
         [&old](int v) { old = v; },
         [&old]() { return old; }
@@ -117,11 +122,13 @@ namespace {
   {
     std::string value{"before"};
     {
+      // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
       auto guard = Belle2::ScopeGuard::guardValue(value, "after");
       ASSERT_EQ(value, "after");
     }
     ASSERT_EQ(value, "before");
     {
+      // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
       auto guard = Belle2::ScopeGuard::guardFunctor(overloads{
         [&value](const std::string & v) { value = v; },
         [&value]() { return value; }
@@ -137,9 +144,11 @@ namespace {
     std::stringstream buf;
     buf << "a:" << std::setprecision(4) << 1.2;
     {
+      // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
       auto guard1 = Belle2::ScopeGuard::guardStreamState(buf);
       buf << ":b:" << std::fixed << std::setprecision(4) << 2.3;
       {
+        // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
         auto guard3 = Belle2::ScopeGuard::guardStreamState(buf);
         buf << ":c:" << std::setprecision(5) << std::setw(10) << std::setfill('-') << 3.4;
       }
@@ -157,6 +166,7 @@ namespace {
     std::string tmpdir("/tmp");
     std::string root("/");
     {
+      // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
       auto guard1 = Belle2::ScopeGuard::guardWorkingDirectory("/tmp");
       ASSERT_EQ(tmpdir, boost::filesystem::current_path().c_str());
       {
@@ -175,9 +185,11 @@ namespace {
   {
     const bool start = gROOT->IsBatch();
     {
+      // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
       auto guard1 = Belle2::ScopeGuard::guardBatchMode();
       ASSERT_EQ(true, gROOT->IsBatch());
       {
+        // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
         auto guard2 = Belle2::ScopeGuard::guardBatchMode(false);
         ASSERT_EQ(false, gROOT->IsBatch());
       }

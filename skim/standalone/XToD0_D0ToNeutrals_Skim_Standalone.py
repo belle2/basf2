@@ -15,12 +15,12 @@ from stdCharged import stdPi, stdK, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 skimCode = encodeSkimName('XToD0_D0ToNeutrals')
 
 c2bndpath = Path()
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 inputMdstList('default', fileList, path=c2bndpath)
 
 

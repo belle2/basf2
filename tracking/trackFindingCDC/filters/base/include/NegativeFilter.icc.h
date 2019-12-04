@@ -11,10 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/NegativeFilter.dcl.h>
 
-#include <memory>
-
 namespace Belle2 {
-  class ModuleParamList;
 
   namespace TrackFindingCDC {
     template<class AFilter>

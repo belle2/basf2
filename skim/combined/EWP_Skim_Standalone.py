@@ -15,8 +15,8 @@ from stdCharged import stdE, stdMu, stdPi
 from stdPhotons import *
 from skimExpertFunctions import *
 
-gb2_setuprel = 'release-03-02-04'
-fileList = get_test_file("mixedBGx1", "MC12")
+gb2_setuprel = 'release-04-00-00'
+fileList = get_test_file("MC12_mixedBGx1")
 path = Path()
 
 inputMdstList('default', fileList, path=path)

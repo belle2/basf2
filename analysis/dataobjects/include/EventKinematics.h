@@ -13,8 +13,6 @@
 #include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>
-#include <vector>
-#include <set>
 
 namespace Belle2 {
 

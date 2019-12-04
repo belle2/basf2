@@ -16,13 +16,13 @@ from stdPi0s import *
 from stdV0s import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 
 skimCode = encodeSkimName('TauLFV')
 
 taulfvskim = Path()
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 inputMdstList('default', fileList, path=taulfvskim)
 
 stdPi('loose', path=taulfvskim)

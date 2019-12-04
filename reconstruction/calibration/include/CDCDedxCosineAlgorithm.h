@@ -36,8 +36,20 @@ namespace Belle2 {
     /** * function to make flag active for method of sep */
     void setMethodSep(bool value = true) {isMethodSep = value;}
 
+    /**
+    * function to decide merge vs relative gains
+    */
+    void setMergePayload(bool value = true) {isMergePayload = value;}
+
+    /**
+    * function to store new payload after full calibration
+    */
+    void generateNewPayloads(std::vector<double> cosine);
+
+
     /** * function to make flag active for plotting */
     void setMonitoringPlots(bool value = false) {isMakePlots = value;}
+
 
   protected:
 
@@ -48,8 +60,11 @@ namespace Belle2 {
 
   private:
 
-    bool isMethodSep = false; /**< if e+e- need to be consider sep */
-    bool isMakePlots = false; /**< produce plots for status */
+    bool isMethodSep; /**< if e+e- need to be consider sep */
+    bool isMakePlots; /**< produce plots for status */
+    bool isMergePayload; /**< merge payload at the of calibration */
+
+    DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
 
   };
 } // namespace Belle2

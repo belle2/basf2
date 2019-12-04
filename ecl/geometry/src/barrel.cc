@@ -1,11 +1,8 @@
 #include <ecl/geometry/GeoECLCreator.h>
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
-#include "G4NistManager.hh"
-#include <G4VisAttributes.hh>
 #include <G4Tubs.hh>
 #include <G4Box.hh>
-#include <G4AssemblyVolume.hh>
 #include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
 #include <G4Trd.hh>

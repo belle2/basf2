@@ -8,12 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/logging/Logger.h>
-
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
-#include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
 #include <string>
+
 namespace TreeFitter {
 
 

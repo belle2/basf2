@@ -13,9 +13,6 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TString.h>
-#include <TPaletteAxis.h>
-#include <TBox.h>
-#include <TAxis.h>
 
 using namespace std;
 using namespace Belle2;
@@ -33,23 +30,20 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
-  B2INFO("DQMHistAnalysisSVDEfficiency: Constructor done.");
+  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: Constructor done.");
 
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("SVDrefHisto.root"));
-  addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", float(0.6));
-  addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", float(0.8));
+  addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", float(0.9));
+  addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", float(0.94));
   addParam("effLevel_Empty", m_effEmpty, "Threshold to consider the sensor efficiency as too low", float(0));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
-  /*  addParam("errEffLevel_Error", m_errEffError, "Maximum Efficiency Error allowed for safe operations (red)", float(5));
-  addParam("errEffLevel_Warning", m_errEffWarning, "Efficiency Error at WARNING level (orange)", float(3));*/
-
 }
 
 DQMHistAnalysisSVDEfficiencyModule::~DQMHistAnalysisSVDEfficiencyModule() { }
 
 void DQMHistAnalysisSVDEfficiencyModule::initialize()
 {
-  B2INFO("DQMHistAnalysisSVDEfficiency: initialized.");
+  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: initialized.");
   B2DEBUG(10, " black = " << kBlack);
   B2DEBUG(10, " green = " << kGreen);
   B2DEBUG(10, " orange = " << kOrange);
@@ -59,6 +53,27 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   if (m_refFileName != "") {
     m_refFile = new TFile(m_refFileName.data(), "READ");
   }
+
+  //search for reference
+  if (m_refFile && m_refFile->IsOpen()) {
+    B2INFO("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") FOUND, reading ref histograms");
+
+    TH1F* ref_eff = (TH1F*)m_refFile->Get("refEfficiency");
+    if (!ref_eff)
+      B2WARNING("SVD DQMHistAnalysis: Efficiency Level Refence not found! using module parameters");
+    else {
+      m_effEmpty = ref_eff->GetBinContent(1);
+      m_effWarning = ref_eff->GetBinContent(2);
+      m_effError = ref_eff->GetBinContent(3);
+    }
+
+  } else
+    B2WARNING("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed, using module parameters");
+
+  B2INFO(" SVD efficiency thresholds:");
+  B2INFO(" EFFICIENCY: empty < " << m_effEmpty << " < normal < " << m_effWarning << " < warning < " << m_effError << " < error");
+
+
   //build the legend
   m_legProblem = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
   m_legProblem->AddText("ERROR!");
@@ -84,24 +99,6 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_legEmpty->SetBorderSize(0.);
   m_legEmpty->SetLineColor(kBlack);
 
-  //search for reference
-  if (m_refFile && m_refFile->IsOpen()) {
-    B2INFO("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") FOUND, reading ref histograms");
-
-    TH1F* ref_eff = (TH1F*)m_refFile->Get("refEfficiency");
-    if (!ref_eff)
-      B2WARNING("SVD DQMHistAnalysis: Efficiency Level Refence not found! using module parameters");
-    else {
-      m_effEmpty = ref_eff->GetBinContent(1);
-      m_effWarning = ref_eff->GetBinContent(2);
-      m_effError = ref_eff->GetBinContent(3);
-    }
-
-  } else
-    B2WARNING("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed, using module parameters");
-
-  B2INFO(" SVD efficiency thresholds:");
-  B2INFO(" EFFICIENCY: empty < " << m_effEmpty << " < normal < " << m_effWarning << " < warning < " << m_effError << " < error");
 
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
@@ -128,7 +125,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
 
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()
 {
-  B2INFO("DQMHistAnalysisSVDEfficiency: beginRun called.");
+  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: beginRun called.");
   m_cEfficiencyU->Clear();
   m_cEfficiencyV->Clear();
   m_cEfficiencyErrU->Clear();
@@ -137,7 +134,7 @@ void DQMHistAnalysisSVDEfficiencyModule::beginRun()
 
 void DQMHistAnalysisSVDEfficiencyModule::event()
 {
-  B2INFO("DQMHistAnalysisSVDEfficiency: event called.");
+  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: event called.");
 
   //SETUP gSTYLE - all plots
   //  gStyle->SetOptStat(0);
@@ -170,15 +167,13 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
   TH2F* matched_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHitsU");
 
-  B2INFO("DQMHistAnalysisSVDEfficiency: before cycle.");
-
   if (matched_clusU == NULL || found_tracksU == NULL) {
     B2INFO("Histograms needed for Efficiency computation are not found");
     m_cEfficiencyU->SetFillColor(kRed);
   } else {
     B2INFO("U-side Before loop on sensors, size :" << m_SVDModules.size());
     for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
-      B2INFO("module " << i << "," << m_SVDModules[i]);
+      B2DEBUG(10, "module " << i << "," << m_SVDModules[i]);
       int bin = found_tracksU->FindBin(m_SVDModules[i].getLadderNumber(), findBinY(m_SVDModules[i].getLayerNumber(),
                                        m_SVDModules[i].getSensorNumber()));
       float numU = matched_clusU->GetBinContent(bin);
@@ -187,7 +182,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         effU = numU / denU;
       else
         effU = -1;
-      B2INFO("effU  = " << numU << "/" << denU << " = " << effU);
+      B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
       m_hEfficiency->fill(m_SVDModules[i], 1, effU * 100);
       if (effU == -1)
         erreffU = -1;
@@ -207,13 +202,9 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     }
   }
 
-  B2INFO("DQMHistAnalysisSVDEfficiency: after cycle.");
-
   //Efficiency for the V side
   TH2F* found_tracksV = (TH2F*)findHist("SVDEfficiency/TrackHitsV");
   TH2F* matched_clusV = (TH2F*)findHist("SVDEfficiency/MatchedHitsV");
-
-  B2INFO("DQMHistAnalysisSVDEfficiency: before cycle.");
 
   if (matched_clusV == NULL || found_tracksV == NULL) {
     B2INFO("Histograms needed for Efficiency computation are not found");
@@ -221,7 +212,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   } else {
     B2INFO("V-side Before loop on sensors, size :" << m_SVDModules.size());
     for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
-      B2INFO("module " << i << "," << m_SVDModules[i]);
+      B2DEBUG(10, "module " << i << "," << m_SVDModules[i]);
       int bin = found_tracksV->FindBin(m_SVDModules[i].getLadderNumber(), findBinY(m_SVDModules[i].getLayerNumber(),
                                        m_SVDModules[i].getSensorNumber()));
       float numV = matched_clusV->GetBinContent(bin);
@@ -231,7 +222,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       else
         effV = -1;
 
-      B2INFO("effV  = " << numV << "/" << denV << " = " << effV);
+      B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
       m_hEfficiency->fill(m_SVDModules[i], 0, effV * 100);
       if (effV == -1)
         erreffV = -1;
@@ -251,8 +242,6 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       }
     }
   }
-
-  B2INFO("DQMHistAnalysisSVDEfficiency: after cycle.");
 
 
   //update summary
@@ -339,7 +328,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
 void DQMHistAnalysisSVDEfficiencyModule::endRun()
 {
-  B2INFO("DQMHistAnalysisSVDEfficiency:  endRun called");
+  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency:  endRun called");
   if (m_printCanvas) {
     m_cEfficiencyU->Print("c_SVDEfficiencyU.pdf");
     m_cEfficiencyV->Print("c_SVDEfficiencyV.pdf");
@@ -350,7 +339,7 @@ void DQMHistAnalysisSVDEfficiencyModule::endRun()
 
 void DQMHistAnalysisSVDEfficiencyModule::terminate()
 {
-  B2INFO("DQMHistAnalysisSVDEfficiency: terminate called");
+  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: terminate called");
 
   delete m_refFile;
   delete m_legProblem;

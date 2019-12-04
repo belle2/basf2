@@ -1,4 +1,3 @@
-#include <framework/gearbox/Const.h>
 
 #pragma link off all globals;
 #pragma link off all classes;
@@ -7,8 +6,6 @@
 // #pragma link C++ all namespaces;
 
 #pragma link C++ class Belle2::ExtHit+;
-#pragma link C++ class Belle2::Muid+;
-#pragma link C++ class Belle2::MuidHit+;
 #pragma link C++ class Belle2::TrackClusterSeparation+;
 #pragma link C++ class Belle2::V0ValidationVertex+;
 #pragma link C++ class Belle2::FullSecID+;

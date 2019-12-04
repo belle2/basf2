@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/utilities/FileSystem.h>
-
 #include <boost/iostreams/filtering_stream.hpp>
 
 #include <string>

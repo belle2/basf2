@@ -16,7 +16,6 @@
 #include <mdst/dbobjects/BeamSpot.h>
 
 #include <string>
-#include <TList.h>
 #include <TFile.h>
 #include <TTree.h>
 #include <TBranch.h>

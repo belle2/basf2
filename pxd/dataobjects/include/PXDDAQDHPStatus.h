@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <vxd/dataobjects/VxdID.h>
 /// TClass is not used in this class, but the include is needed for the ClassDef
 #include <TClass.h>
 

@@ -13,13 +13,13 @@ from stdCharged import *
 from stdPhotons import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 
 skimCode = encodeSkimName('TauGeneric')
 
 taugenericskim = Path()
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 
 inputMdstList('default', fileList, path=taugenericskim)
 

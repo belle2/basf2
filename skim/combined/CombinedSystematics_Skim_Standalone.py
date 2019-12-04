@@ -24,9 +24,9 @@ from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import *
 from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 
 syspath = Path()
 inputMdstList('default', fileList, path=syspath)

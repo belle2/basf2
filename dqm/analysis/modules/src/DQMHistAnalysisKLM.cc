@@ -8,6 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* External headers. */
+#include <TClass.h>
+#include <TROOT.h>
+
 /* Belle2 headers. */
 #include <dqm/analysis/modules/DQMHistAnalysisKLM.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
@@ -24,35 +28,17 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   m_SectorArrayIndex = &(KLMSectorArrayIndex::Instance());
   m_ElementNumbers = &(KLMElementNumbers::Instance());
   m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
-  char label[8];
-  const double histMinNDC = 0.1;
-  const double histMaxNDC = 0.9;
-  const double histRangeNDC = histMaxNDC - histMinNDC;
-  for (int sectorFB = 0; sectorFB < BKLMElementNumbers::getMaximalSectorGlobalNumber(); ++sectorFB) {
-    double xLineNDC = histMinNDC + (histRangeNDC * sectorFB) / BKLMElementNumbers::getMaximalSectorGlobalNumber();
-    double xTextNDC = histMinNDC + (histRangeNDC * (sectorFB + 0.5)) / BKLMElementNumbers::getMaximalSectorGlobalNumber();
-    double yTextNDC = histMinNDC + 0.98 * histRangeNDC;
-    m_sectorLine[sectorFB] = new TLine(xLineNDC, histMinNDC, xLineNDC, (sectorFB == 0 ? histMinNDC : histMaxNDC));
-    m_sectorLine[sectorFB]->SetNDC(true);
-    m_sectorLine[sectorFB]->SetLineColor(8); // dark green
-    m_sectorLine[sectorFB]->SetLineWidth(1);
-    m_sectorLine[sectorFB]->SetLineStyle(2); // dashed
-    sprintf(label, "B%c%d", (sectorFB < 8 ? 'B' : 'F'), sectorFB % 8);
-    m_sectorText[sectorFB] = new TText(xTextNDC, yTextNDC, label);
-    m_sectorText[sectorFB]->SetNDC(true);
-    m_sectorText[sectorFB]->SetTextAlign(22); // centred, middle
-    m_sectorText[sectorFB]->SetTextColor(8); // dark green
-    m_sectorText[sectorFB]->SetTextFont(42); // Helvetica regular
-    m_sectorText[sectorFB]->SetTextSize(0.02); // 2% of TPad's full height
-  }
+  m_PlaneLine.SetLineColor(8); // dark green
+  m_PlaneLine.SetLineWidth(1);
+  m_PlaneLine.SetLineStyle(2); // dashed
+  m_PlaneText.SetTextAlign(22); // centred, middle
+  m_PlaneText.SetTextColor(8); // dark green
+  m_PlaneText.SetTextFont(42); // Helvetica regular
+  m_PlaneText.SetTextSize(0.02); // 2% of TPad's full height
 }
 
 DQMHistAnalysisKLMModule::~DQMHistAnalysisKLMModule()
 {
-  for (int sectorFB = 0; sectorFB < BKLMElementNumbers::getMaximalSectorGlobalNumber(); ++sectorFB) {
-    delete m_sectorLine[sectorFB];
-    delete m_sectorText[sectorFB];
-  }
 }
 
 void DQMHistAnalysisKLMModule::initialize()
@@ -171,7 +157,8 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
           B2FATAL("Incomplete BKLM electronics map.");
         str = "Hot channel: HSLB " +
               BKLMElementNumbers::getHSLBName(
-                electronicsChannel->getCopper(), electronicsChannel->getSlot()) +
+                electronicsChannel->getCopper(),
+                electronicsChannel->getSlot()) +
               ", lane " + std::to_string(electronicsChannel->getLane()) +
               ", axis " + std::to_string(electronicsChannel->getAxis()) +
               ", channel " + std::to_string(electronicsChannel->getChannel());
@@ -198,16 +185,21 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   canvas->Modified();
 }
 
-void DQMHistAnalysisKLMModule::processBKLMSectorLayerHistogram(const std::string& histName)
+void DQMHistAnalysisKLMModule::processPlaneHistogram(
+  const std::string& histName)
 {
-  TH1* histogram = findHist("BKLM/" + histName);
+  std::string name;
+  const double histMinNDC = 0.1;
+  const double histMaxNDC = 0.9;
+  const double histRangeNDC = histMaxNDC - histMinNDC;
+  TH1* histogram = findHist("KLM/" + histName);
   if (histogram == nullptr) {
-    B2ERROR("KLM DQM histogram BKLM/" << histName << " is not found.");
+    B2ERROR("KLM DQM histogram KLM/" << histName << " is not found.");
     return;
   }
-  TCanvas* canvas = findCanvas("BKLM/c_" + histName);
+  TCanvas* canvas = findCanvas("KLM/c_" + histName);
   if (canvas == nullptr) {
-    B2ERROR("KLM DQM histogram canvas BKLM/c_" << histName << " is not found.");
+    B2ERROR("KLM DQM histogram canvas KLM/c_" << histName << " is not found.");
     return;
   }
   canvas->Clear();
@@ -215,9 +207,40 @@ void DQMHistAnalysisKLMModule::processBKLMSectorLayerHistogram(const std::string
   histogram->SetStats(false);
   histogram->Draw();
   canvas->Modified();
-  for (int sectorFB = 0; sectorFB < BKLMElementNumbers::getMaximalSectorGlobalNumber(); ++sectorFB) {
-    m_sectorLine[sectorFB]->Draw();
-    m_sectorText[sectorFB]->Draw();
+  if (histName.find("bklm") != std::string::npos) {
+    const double maximalSector = BKLMElementNumbers::getMaximalSectorGlobalNumber();
+    for (int sector = 0; sector < BKLMElementNumbers::getMaximalSectorGlobalNumber(); ++sector) {
+      double xLineNDC = histMinNDC + (histRangeNDC * sector) / maximalSector;
+      double xTextNDC = histMinNDC + (histRangeNDC * (sector + 0.5)) / maximalSector;
+      double yTextNDC = histMinNDC + 0.98 * histRangeNDC;
+      if (sector > 0)
+        m_PlaneLine.DrawLineNDC(xLineNDC, histMinNDC, xLineNDC, histMaxNDC);
+      name = "B";
+      if (sector < 8)
+        name += "B";
+      else
+        name += "F";
+      name += std::to_string(sector % 8);
+      m_PlaneText.DrawTextNDC(xTextNDC, yTextNDC, name.c_str());
+    }
+  } else {
+    const double maximalLayer = EKLMElementNumbers::getMaximalLayerGlobalNumber();
+    for (int layerGlobal = 1; layerGlobal <= maximalLayer; ++layerGlobal) {
+      double xLineNDC = histMinNDC + (histRangeNDC * layerGlobal) / maximalLayer;
+      double xTextNDC = histMinNDC + (histRangeNDC * (layerGlobal - 0.5)) / maximalLayer;
+      double yTextNDC = histMinNDC + 0.98 * histRangeNDC;
+      if (layerGlobal < maximalLayer)
+        m_PlaneLine.DrawLineNDC(xLineNDC, histMinNDC, xLineNDC, histMaxNDC);
+      int section, layer;
+      m_ElementNumbersEKLM->layerNumberToElementNumbers(
+        layerGlobal, &section, &layer);
+      if (section == EKLMElementNumbers::c_BackwardSection)
+        name = "B";
+      else
+        name = "F";
+      name += std::to_string(layer);
+      m_PlaneText.DrawTextNDC(xTextNDC, yTextNDC, name.c_str());
+    }
   }
 }
 
@@ -270,6 +293,7 @@ void DQMHistAnalysisKLMModule::event()
         klmSector.getSector(), histogram, canvas, latex);
     }
   }
-  processBKLMSectorLayerHistogram("SectorLayerPhi");
-  processBKLMSectorLayerHistogram("SectorLayerZ");
+  processPlaneHistogram("plane_bklm_phi");
+  processPlaneHistogram("plane_bklm_z");
+  processPlaneHistogram("plane_eklm");
 }

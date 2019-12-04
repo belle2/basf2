@@ -1,18 +1,9 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TGraphErrors.h>
-#include <TProfile.h>
 #include <TF1.h>
-#include <TFile.h>
-#include <TChain.h>
-#include <TTree.h>
-#include <TSystem.h>
-#include <framework/logging/Logger.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/Database.h>
 #include <cdc/dbobjects/CDCSpaceResols.h>
-#include <framework/database/IntervalOfValidity.h>
 
 namespace Belle2 {
   namespace CDC {

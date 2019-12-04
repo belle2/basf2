@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include <analysis/VariableManager/Manager.h>
-
 namespace Belle2 {
   class Particle;
 

@@ -76,7 +76,7 @@ namespace Belle2::Conditions {
     /** Default constructible */
     MetadataProvider() = default;
     /** Construct with a known set of usable global tag states */
-    explicit MetadataProvider(const std::set<std::string>& usableTagStates): m_usableTagStates(usableTagStates) {}
+    explicit MetadataProvider(const std::set<std::string>& usableTagStates): m_payloads{nullptr}, m_usableTagStates(usableTagStates) {}
     /** Default destructible */
     virtual ~MetadataProvider() = default;
     /** Set the list of globaltag names to be considered for payloads.

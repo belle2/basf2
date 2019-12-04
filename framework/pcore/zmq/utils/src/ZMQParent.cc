@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <framework/pcore/zmq/utils/ZMQParent.h>
-#include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <bitset>
 
 using namespace std;

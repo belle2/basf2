@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 #include <tracking/trackFindingVXD/segmentNetwork/ActiveSector.h>
 

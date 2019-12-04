@@ -16,15 +16,12 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <stdint.h> //< For fixed-size integers
 #include <vector>
-#include <TFile.h>
 #include <TGraph.h>
 #include <TH1F.h>
 #include <TH1I.h>
 #include <framework/core/RandomNumbers.h>
 #include <TVector3.h>
-#include <TVectorD.h>
 #include <math.h>
 
 #define PI 3.14159265358979323846

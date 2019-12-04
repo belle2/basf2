@@ -11,7 +11,6 @@
 #ifndef CDCGEOMETRYPAR_H
 #define CDCGEOMETRYPAR_H
 
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>

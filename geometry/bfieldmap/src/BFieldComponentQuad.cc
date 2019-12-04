@@ -12,13 +12,11 @@
 
 #include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/device/file.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
 
 #include <cmath>
 

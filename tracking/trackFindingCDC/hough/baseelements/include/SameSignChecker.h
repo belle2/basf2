@@ -9,11 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/ESign.h>
-#include <array>
-#include <algorithm>
-#include <cmath>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
 

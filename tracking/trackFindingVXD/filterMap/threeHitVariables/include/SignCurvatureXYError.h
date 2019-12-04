@@ -11,8 +11,6 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariable.h>
-#include <boost/math/special_functions/sign.hpp>
-
 #include <framework/geometry/B2Vector3.h>
 
 #include <math.h>

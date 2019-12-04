@@ -13,12 +13,12 @@ from modularAnalysis import *
 from stdPhotons import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 
 
 skimpath = Path()
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 inputMdstList('default', fileList, path=skimpath)
 
 from skim.systematics import *

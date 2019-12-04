@@ -144,6 +144,7 @@ the inputs of the combiner are saved.
 For more information see 
 `BELLE2-PTHESIS-2018-003 <https://docs.belle2.org/record/1215/files/BELLE2-PTHESIS-2018-003.pdf>`_.
 
+
 Using the FlavorTagger
 ----------------------
 
@@ -168,40 +169,13 @@ If you just want to use the flavor tagger as standard user you need only:
 and to add the ``flavor_tagging`` variables to your nTuple as explained below. BGx1 stays for MC generated
 with machine Background. Only BGx1 files are provided centrally.
  
-If you use a release that is older than release-03 please use 
-
-::
-
-  weightFiles='B2JpsiKs_muBGx1'
-
 The current flavor tagger is trained with MC samples for the signal channel 
 :math:`B^0 \to \overline{\nu}\nu` which has
 no built-in CP violation. This is needed to avoid that the flavorTagger learns CP asymmetries
-on the tag side. This effect was discovered first before release-03. 
-Before release-03-01-00, the flavor tagger was trained with MC samples for the signal channel 
-:math:`B^0 \to J/\Psi K^0_{\rm S}`.
+on the tag side. 
 
 The full interface of :func:`flavorTagger` function has 10 possible arguments and it is described below.
 
-How to get the weight files?
-----------------------------
-
-To download the weightfiles from the conditionsdb you have to append a special global tag 
-that depends on the release that you are using.
-You need to add in the
-steering file right before calling the flavor tagger:
-
-::
- 
-  basf2.use_central_database("analysis_tools_release-03-01-00")
-
-+---------------------------+-------------------------------------------+
-| Release                   | Global DataBase Tag                       |
-+===========================+===========================================+
-| release-01-02-04          | analysis_AAT-parameters_release-01-02-03  |
-+---------------------------+-------------------------------------------+
-| release-03-01-00 or later | analysis_tools_release-03-01-00           |
-+---------------------------+-------------------------------------------+
 
 Saving to nTuples
 -----------------
@@ -262,9 +236,9 @@ The variable has several output values. The meaning  are the following:
     not work well at all and one could think for an instant that the flavor tagger
     is under or overestimating the dilution.
 
-The flavor tagger also saves the variable ``mcFlavorOfOtherB0`` which returns the flavor of the 
-accompaning tag-side neutral :math:`B` meson if the given particle is a correctly MC matched 
-neutral :math:`B` (it returns 0 else). In other words, this variable checks the generated flavor 
+The flavor tagger also saves the variable ``mcFlavorOfOtherB`` which returns the flavor of the 
+accompaning tag-side :math:`B` meson (positive or negative) if the given particle is a correctly MC-matched 
+:math:`B` (it returns 0 else). In other words, this variable checks the generated flavor 
 of the other MC :math:`\Upsilon(4{\rm S})` daughter without considering the ROE particles.
 
 The additional informations about individual categories are saved using the aliases

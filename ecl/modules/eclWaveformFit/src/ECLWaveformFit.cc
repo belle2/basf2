@@ -19,13 +19,14 @@
 #include <ecl/modules/eclWaveformFit/ECLWaveformFit.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
-#include <ecl/dataobjects/ECLWaveformData.h>
+#include <ecl/digitization/shaperdsp.h>
 #include <ecl/dbobjects/ECLDigitWaveformParameters.h>
 #include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
 #include <ecl/dbobjects/ECLAutoCovariance.h>
 
 //FRAMEWORK
 #include <framework/core/Environment.h>
+#include <framework/database/DBObjPtr.h>
 
 //ROOT
 #include <TMinuit.h>

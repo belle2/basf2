@@ -10,10 +10,7 @@
 #include <framework/pcore/zmq/utils/ZMQAddressUtils.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/core/Environment.h>
-#include <framework/pcore/ProcHandler.h>
-#include <framework/logging/LogMethod.h>
 #include <set>
-#include <utility>
 
 using namespace Belle2;
 

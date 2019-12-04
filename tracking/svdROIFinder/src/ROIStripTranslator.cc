@@ -8,13 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
 #include <tracking/svdROIFinder/ROIStripTranslator.h>
 #include <framework/logging/Logger.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
-
-#include <list>
 
 using namespace std;
 using namespace Belle2;

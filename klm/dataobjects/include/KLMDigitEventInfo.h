@@ -10,7 +10,7 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* Belle 2 headers. */
 #include <framework/datastore/RelationsObject.h>
 #include <rawdata/dataobjects/RawKLM.h>
 

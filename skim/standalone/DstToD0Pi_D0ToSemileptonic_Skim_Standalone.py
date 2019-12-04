@@ -14,7 +14,7 @@ from stdPhotons import *
 from stdPi0s import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 
 import os
 import sys
@@ -22,7 +22,7 @@ import glob
 skimCode = encodeSkimName("DstToD0Pi_D0ToSemileptonic")
 
 cslpath = Path()
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 inputMdstList('default', fileList, path=cslpath)
 
 

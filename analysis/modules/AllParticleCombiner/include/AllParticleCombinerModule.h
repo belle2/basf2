@@ -12,11 +12,8 @@
 
 #include <framework/core/Module.h>
 
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/VariableManager/Utility.h>
-
-#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
 

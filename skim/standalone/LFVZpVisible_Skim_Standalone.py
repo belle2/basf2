@@ -14,14 +14,14 @@ from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 skimCode = encodeSkimName('LFVZpVisible')
 import sys
 import os
 import glob
 
 lfvzppath = Path()
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 inputMdstList('default', fileList, path=lfvzppath)
 
 stdPi('loose', path=lfvzppath)

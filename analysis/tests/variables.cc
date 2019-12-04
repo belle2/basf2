@@ -1,12 +1,9 @@
 
 #include <analysis/variables/Variables.h>
 #include <analysis/variables/BasicParticleInformation.h>
-#include <analysis/variables/EventVariables.h>
-#include <analysis/variables/FlightInfoVariables.h>
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/PIDVariables.h>
 #include <analysis/variables/TrackVariables.h>
-#include <analysis/variables/ROEVariables.h>
 
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
@@ -20,7 +17,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
 #include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
@@ -785,59 +781,59 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 0.0);
 
-    var = Manager::Instance().getVariable("ROE_charge(mask1)");
+    var = Manager::Instance().getVariable("roeCharge(mask1)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 1.0);
 
-    var = Manager::Instance().getVariable("ROE_charge(mask2)");
+    var = Manager::Instance().getVariable("roeCharge(mask2)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 0.0);
 
-    var = Manager::Instance().getVariable("ROE_eextra(mask1)");
+    var = Manager::Instance().getVariable("roeEextra(mask1)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), savedROEECL->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
 
-    var = Manager::Instance().getVariable("ROE_eextra(mask2)");
+    var = Manager::Instance().getVariable("roeEextra(mask2)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 0.0);
 
-    var = Manager::Instance().getVariable("ROE_deltae(mask1)");
+    var = Manager::Instance().getVariable("roeDeltae(mask1)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), roe4vecCMS.E() - E0);
 
-    var = Manager::Instance().getVariable("ROE_deltae(mask2)");
+    var = Manager::Instance().getVariable("roeDeltae(mask2)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), -E0);
 
-    var = Manager::Instance().getVariable("ROE_mbc(mask1)");
+    var = Manager::Instance().getVariable("roeMbc(mask1)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), TMath::Sqrt(E0 * E0 - roe4vecCMS.Vect().Mag2()));
 
-    var = Manager::Instance().getVariable("ROE_mbc(mask2)");
+    var = Manager::Instance().getVariable("roeMbc(mask2)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), E0);
 
-    var = Manager::Instance().getVariable("WE_deltae(mask1,0)");
+    var = Manager::Instance().getVariable("weDeltae(mask1,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), corrRec4vecCMS.E() - E0);
 
-    var = Manager::Instance().getVariable("WE_deltae(mask2,0)");
+    var = Manager::Instance().getVariable("weDeltae(mask2,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), rec4vecCMS.E() + rec4vecCMS.Vect().Mag() - E0);
 
-    var = Manager::Instance().getVariable("WE_mbc(mask1,0)");
+    var = Manager::Instance().getVariable("weMbc(mask1,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), TMath::Sqrt(E0 * E0 - corrRec4vecCMS.Vect().Mag2()));
 
-    var = Manager::Instance().getVariable("WE_mbc(mask2,0)");
+    var = Manager::Instance().getVariable("weMbc(mask2,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), E0);
 
-    var = Manager::Instance().getVariable("WE_MissM2(mask1,0)");
+    var = Manager::Instance().getVariable("weMissM2(mask1,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), m4v0.Mag2());
 
-    var = Manager::Instance().getVariable("WE_MissM2(mask2,0)");
+    var = Manager::Instance().getVariable("weMissM2(mask2,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), (2 * E0 - rec4vecCMS.E()) * (2 * E0 - rec4vecCMS.E()) - rec4vecCMS.Vect().Mag2());
 
@@ -1147,6 +1143,45 @@ namespace {
     EXPECT_FLOAT_EQ(var->function(&p), 3.185117);
   }
 
+  TEST_F(MetaVariableTest, useTagSideRecoilRestFrame)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<Particle> particles;
+    particles.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+    PCmsLabTransform T;
+    TLorentzVector vec0 = {0.0, 0.0, 0.0, T.getCMSEnergy()};
+    TLorentzVector vec1 = {0.0, +0.332174566, 0.0, T.getCMSEnergy() / 2.};
+    TLorentzVector vec2 = {0.0, -0.332174566, 0.0, T.getCMSEnergy() / 2.};
+    Particle* p0 = particles.appendNew(Particle(T.rotateCmsToLab() * vec0, 300553));
+    Particle* p1 = particles.appendNew(Particle(T.rotateCmsToLab() * vec1, 511, Particle::c_Unflavored, Particle::c_Undefined, 1));
+    Particle* p2 = particles.appendNew(Particle(T.rotateCmsToLab() * vec2, -511, Particle::c_Unflavored, Particle::c_Undefined, 2));
+
+    p0->appendDaughter(p1->getArrayIndex());
+    p0->appendDaughter(p2->getArrayIndex());
+
+    const Manager::Var* var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, p), 0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+
+    var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, px), 0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+
+    var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, py), 0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+
+    var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, pz), 0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+
+    var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, E), 0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_NEAR(var->function(p0), p1->getMass(), 1e-6);
+  }
+
+
   TEST_F(MetaVariableTest, extraInfo)
   {
     Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
@@ -1156,12 +1191,8 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(&p), 3.14);
 
-    // If nullptr is given event extra info should be returned
-    StoreObjPtr<EventExtraInfo> eventExtraInfo;
-    if (not eventExtraInfo.isValid())
-      eventExtraInfo.create();
-    eventExtraInfo->addExtraInfo("pi", 3.15);
-    EXPECT_FLOAT_EQ(var->function(nullptr), 3.15);
+    // If nullptr is given, -999. is returned
+    EXPECT_TRUE(std::isnan(var->function(nullptr)));
   }
 
   TEST_F(MetaVariableTest, eventExtraInfo)
@@ -1313,7 +1344,21 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(&p), 1);
     EXPECT_FLOAT_EQ(var->function(&p2), 0);
-    EXPECT_FLOAT_EQ(var->function(nullptr), -999);
+    EXPECT_TRUE(std::isnan(var->function(nullptr)));
+
+  }
+
+  TEST_F(MetaVariableTest, conditionalVariableSelector)
+  {
+    Particle p({ 0.1, -0.4, 0.8, 2.0 }, 11);
+
+    const Manager::Var* var = Manager::Instance().getVariable("conditionalVariableSelector(E>1, px, py)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.1);
+
+    var = Manager::Instance().getVariable("conditionalVariableSelector(E<1, px, py)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), -0.4);
 
   }
 
@@ -1380,7 +1425,7 @@ namespace {
 
   }
 
-  TEST_F(MetaVariableTest, daughterInvariantMass)
+  TEST_F(MetaVariableTest, daughterInvM)
   {
     TLorentzVector momentum;
     const int nDaughters = 6;
@@ -1394,19 +1439,15 @@ namespace {
     }
     const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
 
-    const Manager::Var* var = Manager::Instance().getVariable("daughterInvariantMass(6)");
+    const Manager::Var* var = Manager::Instance().getVariable("daughterInvM(6,5)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), -999.0);
+    EXPECT_TRUE(std::isnan(var->function(p)));
 
-    var = Manager::Instance().getVariable("daughterInvariantMass(0)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 2.0);
-
-    var = Manager::Instance().getVariable("daughterInvariantMass(0, 1)");
+    var = Manager::Instance().getVariable("daughterInvM(0, 1)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p), 4.0);
 
-    var = Manager::Instance().getVariable("daughterInvariantMass(0, 1, 2)");
+    var = Manager::Instance().getVariable("daughterInvM(0, 1, 2)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p), 6.0);
   }
@@ -1427,7 +1468,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("daughter(6, px)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), -999.0);
+    EXPECT_TRUE(std::isnan(var->function(p)));
 
     var = Manager::Instance().getVariable("daughter(0, px)");
     ASSERT_NE(var, nullptr);
@@ -1508,25 +1549,25 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(pGrandMother), 13);
     EXPECT_FLOAT_EQ(var->function(pMother), 11);
-    EXPECT_FLOAT_EQ(var->function(p_noMC), -999);
-    EXPECT_FLOAT_EQ(var->function(p_noDaughter), -999);
+    EXPECT_TRUE(std::isnan(var->function(p_noMC)));
+    EXPECT_TRUE(std::isnan(var->function(p_noDaughter)));
     var = Manager::Instance().getVariable("mcDaughter(1, PDG)");
     EXPECT_FLOAT_EQ(var->function(pGrandMother), -14);
     EXPECT_FLOAT_EQ(var->function(pMother), 14);
     // Test for particle where mc daughter index is out of range of mc daughters
     var = Manager::Instance().getVariable("mcDaughter(2, PDG)");
-    EXPECT_FLOAT_EQ(var->function(pGrandMother), -999);
-    EXPECT_FLOAT_EQ(var->function(pMother), -999);
+    EXPECT_TRUE(std::isnan(var->function(pGrandMother)));
+    EXPECT_TRUE(std::isnan(var->function(pMother)));
     // Test nested application of mcDaughter
     var = Manager::Instance().getVariable("mcDaughter(0, mcDaughter(0, PDG))");
     EXPECT_FLOAT_EQ(var->function(pGrandMother), 11);
-    EXPECT_FLOAT_EQ(var->function(pMother), -999);
+    EXPECT_TRUE(std::isnan(var->function(pMother)));
     var = Manager::Instance().getVariable("mcDaughter(0, mcDaughter(1, PDG))");
     EXPECT_FLOAT_EQ(var->function(pGrandMother), 14);
     var = Manager::Instance().getVariable("mcDaughter(0, mcDaughter(2, PDG))");
-    EXPECT_FLOAT_EQ(var->function(pGrandMother), -999);
+    EXPECT_TRUE(std::isnan(var->function(pGrandMother)));
     var = Manager::Instance().getVariable("mcDaughter(1, mcDaughter(0, PDG))");
-    EXPECT_FLOAT_EQ(var->function(pGrandMother), -999);
+    EXPECT_TRUE(std::isnan(var->function(pGrandMother)));
   }
 
   TEST_F(MetaVariableTest, mcMother)
@@ -1600,8 +1641,8 @@ namespace {
     EXPECT_FLOAT_EQ(var->function(p1), 13);
     EXPECT_FLOAT_EQ(var->function(p2), 13);
     EXPECT_FLOAT_EQ(var->function(pMother), -521);
-    EXPECT_FLOAT_EQ(var->function(p_noMC), -999);
-    EXPECT_FLOAT_EQ(var->function(p_noMother), -999);
+    EXPECT_TRUE(std::isnan(var->function(p_noMC)));
+    EXPECT_TRUE(std::isnan(var->function(p_noMother)));
 
     // Test if nested calls of mcMother work correctly
     var = Manager::Instance().getVariable("mcMother(mcMother(PDG))");
@@ -1699,8 +1740,8 @@ namespace {
 
     var = Manager::Instance().getVariable("genParticle(5, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), -999);
-    EXPECT_FLOAT_EQ(var->function(p_noMC), -999);
+    EXPECT_TRUE(std::isnan(var->function(p1)));
+    EXPECT_TRUE(std::isnan(var->function(p_noMC)));
   }
 
   TEST_F(MetaVariableTest, genUpsilon4S)
@@ -1809,7 +1850,7 @@ namespace {
 
     var = Manager::Instance().getVariable("genUpsilon4S(PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(someParticle), -999);
+    EXPECT_TRUE(std::isnan(var->function(someParticle)));
   }
 
   TEST_F(MetaVariableTest, daughterProductOf)
@@ -3012,6 +3053,196 @@ namespace {
     EXPECT_B2FATAL(Manager::Instance().getVariable("pValueCombination(chiProb, NONEXISTANTVARIABLE)"));
   }
 
+
+  TEST_F(MetaVariableTest, daughterCombinationOneGeneration)
+  {
+    const int nDaughters = 5;
+    TLorentzVector momentum(0, 0, 0, 0);
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    std::vector<TLorentzVector> daughterMomenta;
+
+    for (int i = 0; i < nDaughters; i++) {
+      TLorentzVector mom(1, i * 0.5, 1, i * 1.0 + 2.0);
+      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+      daughterMomenta.push_back(mom);
+      momentum = momentum + mom;
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Flavored, daughterIndices);
+
+    // Test the invariant mass of several combinations
+    const Manager::Var* var = Manager::Instance().getVariable("daughterCombination(M, 0,1,2)");
+    double M_test = (daughterMomenta[0] + daughterMomenta[1] + daughterMomenta[2]).Mag();
+    EXPECT_FLOAT_EQ(var->function(p), M_test);
+
+    var = Manager::Instance().getVariable("daughterCombination(M, 0,4)");
+    M_test = (daughterMomenta[0] + daughterMomenta[4]).Mag();
+    EXPECT_FLOAT_EQ(var->function(p), M_test);
+
+
+    // Try with a non-lorentz invariant quantity
+    var = Manager::Instance().getVariable("daughterCombination(p, 1, 0, 4)");
+    double p_test = (daughterMomenta[0] + daughterMomenta[1] + daughterMomenta[4]).Vect().Mag();
+    EXPECT_FLOAT_EQ(var->function(p), p_test);
+
+
+    // errors and bad stuff
+    EXPECT_B2FATAL(Manager::Instance().getVariable("daughterCombination(aVeryNonExistingVariableSillyName, 1, 0, 4)"));
+
+    var = Manager::Instance().getVariable("daughterCombination(M, 1, 0, 100)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+
+    var = Manager::Instance().getVariable("daughterCombination(M, 1, -1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+
+    var = Manager::Instance().getVariable("daughterCombination(M, 1, 0:1:0:0:1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+  }
+
+
+  TEST_F(MetaVariableTest, daughterCombinationTwoGenerations)
+  {
+    StoreArray<Particle> particles;
+
+    // make a 1 -> 3 particle
+
+    TLorentzVector momentum_1(0, 0, 0, 0);
+    std::vector<TLorentzVector> daughterMomenta_1;
+    std::vector<int> daughterIndices_1;
+
+    for (int i = 0; i < 3; i++) {
+      TLorentzVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
+      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices_1.push_back(newDaughters->getArrayIndex());
+      daughterMomenta_1.push_back(mom);
+      momentum_1 = momentum_1 + mom;
+    }
+
+    const Particle* compositeDau_1 = particles.appendNew(momentum_1, 411, Particle::c_Flavored, daughterIndices_1);
+
+
+    // make a 1 -> 2 particle
+
+    TLorentzVector momentum_2(0, 0, 0, 0);
+    std::vector<TLorentzVector> daughterMomenta_2;
+    std::vector<int> daughterIndices_2;
+
+    for (int i = 0; i < 2; i++) {
+      TLorentzVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
+      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices_2.push_back(newDaughters->getArrayIndex());
+      daughterMomenta_2.push_back(mom);
+      momentum_2 = momentum_2 + mom;
+    }
+
+    const Particle* compositeDau_2 = particles.appendNew(momentum_2, 411, Particle::c_Flavored, daughterIndices_2);
+
+
+    // make the composite particle
+    std::vector<int> daughterIndices = {compositeDau_1->getArrayIndex(), compositeDau_2->getArrayIndex()};
+    const Particle* p = particles.appendNew(momentum_2 + momentum_1, 111, Particle::c_Unflavored, daughterIndices);
+
+
+    // Test the invariant mass of several combinations
+    const Manager::Var* var = Manager::Instance().getVariable("daughterCombination(M, 0,1)");
+    double M_test = (momentum_1 + momentum_2).Mag();
+    EXPECT_FLOAT_EQ(var->function(p), M_test);
+
+    // this should be the mass of the first daughter
+    var = Manager::Instance().getVariable("daughterCombination(M, 0:0, 0:1, 0:2)");
+    M_test = (momentum_1).Mag();
+    EXPECT_FLOAT_EQ(var->function(p), M_test);
+
+    // this should be a generic combinations
+    var = Manager::Instance().getVariable("daughterCombination(M, 0:0, 0:1, 1:0)");
+    M_test = (daughterMomenta_1[0] + daughterMomenta_1[1] + daughterMomenta_2[0]).Mag();
+    EXPECT_FLOAT_EQ(var->function(p), M_test);
+
+  }
+
+
+
+  TEST_F(MetaVariableTest, daughterAngleInBetween)
+  {
+    StoreArray<Particle> particles;
+
+    // make a 1 -> 3 particle
+
+    TLorentzVector momentum_1(0, 0, 0, 0);
+    std::vector<TLorentzVector> daughterMomenta_1;
+    std::vector<int> daughterIndices_1;
+
+    for (int i = 0; i < 3; i++) {
+      TLorentzVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
+      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices_1.push_back(newDaughters->getArrayIndex());
+      daughterMomenta_1.push_back(mom);
+      momentum_1 = momentum_1 + mom;
+    }
+
+    const Particle* compositeDau_1 = particles.appendNew(momentum_1, 411, Particle::c_Flavored, daughterIndices_1);
+
+
+    // make a 1 -> 2 particle
+
+    TLorentzVector momentum_2(0, 0, 0, 0);
+    std::vector<TLorentzVector> daughterMomenta_2;
+    std::vector<int> daughterIndices_2;
+
+    for (int i = 0; i < 2; i++) {
+      TLorentzVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
+      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices_2.push_back(newDaughters->getArrayIndex());
+      daughterMomenta_2.push_back(mom);
+      momentum_2 = momentum_2 + mom;
+    }
+
+    const Particle* compositeDau_2 = particles.appendNew(momentum_2, 411, Particle::c_Flavored, daughterIndices_2);
+
+
+    // make the composite particle
+    std::vector<int> daughterIndices = {compositeDau_1->getArrayIndex(), compositeDau_2->getArrayIndex()};
+    const Particle* p = particles.appendNew(momentum_2 + momentum_1, 111, Particle::c_Unflavored, daughterIndices);
+
+
+    // Test the invariant mass of several combinations
+    const Manager::Var* var = Manager::Instance().getVariable("daughterAngleInBetween(0, 1)");
+    double v_test = momentum_1.Vect().Angle(momentum_2.Vect());
+    EXPECT_FLOAT_EQ(var->function(p), v_test);
+
+    // this should be a generic combinations
+    var = Manager::Instance().getVariable("daughterAngleInBetween(0:0, 1:0)");
+    v_test = daughterMomenta_1[0].Vect().Angle(daughterMomenta_2[0].Vect());
+    EXPECT_FLOAT_EQ(var->function(p), v_test);
+
+    var = Manager::Instance().getVariable("daughterAngleInBetween( 1, -1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+    var = Manager::Instance().getVariable("daughterAngleInBetween(1, 0:1:0:0:1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+  }
+
+
+
+
+
+
+
   class PIDVariableTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
@@ -3462,7 +3693,7 @@ namespace {
 
     var = Manager::Instance().getVariable("flightDistanceOfDaughter(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+    EXPECT_TRUE(std::isnan(var->function(newDp)));
   }
   TEST_F(FlightInfoTest, flightDistanceOfDaughterErr)
   {
@@ -3475,7 +3706,7 @@ namespace {
 
     var = Manager::Instance().getVariable("flightDistanceOfDaughterErr(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+    EXPECT_TRUE(std::isnan(var->function(newDp)));
   }
   TEST_F(FlightInfoTest, flightTimeOfDaughter)
   {
@@ -3490,7 +3721,7 @@ namespace {
 
     var = Manager::Instance().getVariable("flightTimeOfDaughter(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+    EXPECT_TRUE(std::isnan(var->function(newDp)));
   }
   TEST_F(FlightInfoTest, flightTimeOfDaughterErr)
   {
@@ -3503,7 +3734,7 @@ namespace {
 
     var = Manager::Instance().getVariable("flightTimeOfDaughterErr(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+    EXPECT_TRUE(std::isnan(var->function(newDp)));
   }
   TEST_F(FlightInfoTest, mcFlightDistanceOfDaughter)
   {
@@ -3517,7 +3748,7 @@ namespace {
 
     var = Manager::Instance().getVariable("mcFlightDistanceOfDaughter(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+    EXPECT_TRUE(std::isnan(var->function(newDp)));
   }
   TEST_F(FlightInfoTest, mcFlightTimeOfDaughter)
   {
@@ -3534,7 +3765,7 @@ namespace {
 
     var = Manager::Instance().getVariable("mcFlightTimeOfDaughter(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+    EXPECT_TRUE(std::isnan(var->function(newDp)));
   }
 
   TEST_F(FlightInfoTest, vertexDistance)
@@ -3582,7 +3813,7 @@ namespace {
 
     var = Manager::Instance().getVariable("vertexDistanceOfDaughter(2)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), -999);
+    EXPECT_TRUE(std::isnan(var->function(newDp)));
   }
 
   TEST_F(FlightInfoTest, vertexDistanceOfDaughterError)

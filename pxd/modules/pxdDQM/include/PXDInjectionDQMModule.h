@@ -12,7 +12,6 @@
 
 #include <framework/core/HistoModule.h>
 #include <vxd/geometry/GeoCache.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <pxd/dataobjects/PXDRawHit.h>

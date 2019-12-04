@@ -193,28 +193,37 @@ namespace {
 
 void Path::exposePythonAPI()
 {
-  docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
+  docstring_options options(true, false, false); //userdef, py sigs, c++ sigs
   using bparg = boost::python::arg;
 
   class_<Path>("Path",
-               R"(Implements a path consisting of Module and/or Path objects (arranged in a linear order). Use `basf2.create_path()` to create a new object.
+               R"(Implements a path consisting of Module and/or Path objects (arranged in a linear order).
 
 .. seealso:: :func:`basf2.process`)")
   .def("__str__", &Path::getPathString)
   .def("_add_module_object", &Path::addModule) // actual add_module() is found in basf2.py
-  .def("add_path", &Path::addPath, args("path"), R"(Insert another path at the end of this one.
+  .def("add_path", &Path::addPath, args("path"), R"(add_path(path)
+
+Insert another path at the end of this one.
 For example,
 
     >>> path.add_module('A')
     >>> path.add_path(otherPath)
     >>> path.add_module('B')
 
-would create a path [ A -> [ contents of otherPath ] -> B ].)")
-  .def("modules", &_getModulesPython, "Returns an ordered list of all modules in this path.")
-  .def("for_each", &Path::forEach, R"(Similar to `add_path()`, this will
+would create a path [ A -> [ contents of otherPath ] -> B ].)
+
+Parameters:
+  path (Path): path to add to this path)")
+  .def("modules", &_getModulesPython, R"(modules()
+
+Returns an ordered list of all modules in this path.)")
+  .def("for_each", &Path::forEach, R"(for_each(loop_object_name, array_name, path)
+
+Similar to `add_path()`, this will
 execute the given ``path`` at the current position, but in each event it will
 execute it once for each object in the given StoreArray ``arrayName``. It will
-create a StoreObject named ``loopObjectName``  of same type as array which will
+create a StoreObject named ``loop_object_name``  of same type as array which will
 point to each element in turn for each execution.
 
 This has the effect of calling the ``event()`` methods of modules in ``path``
@@ -236,13 +245,13 @@ available, which will point to the first element in the first execution, and
 the second element in the second execution.
 
 .. seealso::
-    A worked example of this `for_each` RestOfEvent is to build a veto against
+    A working example of this `for_each` RestOfEvent is to build a veto against
     photons from :math:`\pi^0\to\gamma\gamma`. It is described in `HowToVeto`.
 
 .. note:: This feature is used by both the `FlavorTagger` and `FullEventInterpretation` algorithms.
 
 Changes to existing arrays / objects will be available to all modules after the
-`for_each()`, including those made to the loop variable (it will simply modify
+`for_each()`, including those made to the loop object itself (it will simply modify
 the i'th item in the array looped over.)
 
 StoreArrays / StoreObjects (of event durability) *created* inside the loop will
@@ -251,13 +260,14 @@ inside a `for_each()` path execution the particle list will not exist for the
 next iteration or after the `for_each()` is complete.
 
 Parameters:
-  loopObjectName (str): The name of the object in the datastore during each execution
-  arrayName (str): The name of the StoreArray to loop over where the i-th
-    element will be available as ``loopObjectName`` during the i-th execution
+  loop_object_name (str): The name of the object in the datastore during each execution
+  array_name (str): The name of the StoreArray to loop over where the i-th
+    element will be available as ``loop_object_name`` during the i-th execution
     of ``path``
-  path (basf2.Path): The path to execute for each element in ``arrayName``)",
-       args("loopObjectName", "arrayName", "path"))
-  .def("do_while", &Path::doWhile, R"(
+  path (basf2.Path): The path to execute for each element in ``array_name``)",
+       args("loop_object_name", "array_name", "path"))
+  .def("do_while", &Path::doWhile, R"(do_while(path, condition='<1', max_iterations=10000)
+
 Similar to `add_path()` this will execute a path at the current position but it
 will repeat execution of this path as long as the return value of the last
 module in the path fulfills the given ``condition``.
@@ -277,7 +287,7 @@ Parameters:
   .def("_add_independent_path", &Path::addIndependentPath)
   .def("__contains__", &Path::contains, R"(Does this Path contain a module of the given type?
 
-    >>> path = create_path()
+    >>> path = basf2.Path()
     >>> 'RootInput' in path
     False
     >>> path.add_module('RootInput')

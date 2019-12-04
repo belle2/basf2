@@ -17,20 +17,14 @@
  *                                                                        *
  **************************************************************************/
 
-#include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/Database.h>
-#include <framework/database/LocalDatabase.h>
-#include <framework/database/DatabaseChain.h>
-#include <framework/database/ConditionsDatabase.h>
-#include <framework/logging/LogSystem.h>
+#include <framework/database/Configuration.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <iostream>
-#include <fstream>
 #include <TFile.h>
 #include <TH1F.h>
 
@@ -71,10 +65,9 @@ int main(int argc, char** argv)
 
   //------------------------------------------------------------------------
   //..Specify database
-  Database::reset();
-  bool resetIovs = false;
-  DatabaseChain::createInstance(resetIovs);
-  ConditionsDatabase::createDefaultInstance(gtName, LogConfig::c_Debug);
+  auto& conf = Conditions::Configuration::getInstance();
+  conf.prependGlobalTag(gtName);
+  conf.prependTestingPayloadLocation("localdb/database.txt");
 
   //..Populate database contents
   std::cout << "calling setupDatabase " << std::endl;

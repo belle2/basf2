@@ -28,6 +28,8 @@
 #include <TRandom.h>
 #include <TVector3.h>
 #include <TRotation.h>
+#include <TFormula.h>
+#include <TF1.h>
 
 using namespace std;
 
@@ -56,8 +58,12 @@ namespace Belle2 {
     addParam("y", m_y, "position in y [cm]", 0.0);
     addParam("z", m_z, "position in z [cm]", 0.0);
     addParam("diameter", m_diameter, "source diameter [cm]", 0.0);
-    addParam("alpha", m_alpha, "source maximal emission angle [deg]", 0.0);
-    addParam("na", m_na, "source numerical aperture", 0.50);
+    addParam("minAlpha", m_minAlpha, "source minimum emission angle [deg]. ", 0.0);
+    addParam("maxAlpha", m_maxAlpha, "source maximum emission angle [deg]. ", 30.);
+    addParam("na", m_na, "source numerical aperture. It is used only by the Gaussian distribution", 0.50);
+    addParam("angularDistribution", m_angularDistribution,
+             "source angular distribution: uniform, Lambertian, an arbitrary TFormula, or  Gaussian (only one to use na and ignore m_minAlpha dn m_maxAlpha). If you are writing a TFormula, assume the angles are measured in degrees. The conversion to rad is done internally.",
+             string("Gaussian"));
     addParam("wavelength", m_wavelength, "wavelength of photons [nm]", 405.0);
     addParam("phi", m_phi, "first rotation angle (around z) [deg]", 0.0);
     addParam("theta", m_theta, "second rotation angle (around x) [deg]", 0.0);
@@ -67,8 +73,8 @@ namespace Belle2 {
     addParam("numPhotons", m_numPhotons,
              "average number of photons per pulse, if positive, otherwise exactly one",
              0.0);
-    addParam("barID", m_barID,
-             "TOP bar ID: if valid, source position and rotation angles assumed to be given in a local bar frame, otherwise Belle II frame assumed",
+    addParam("slotID", m_slotID,
+             "TOP slot ID (1-16): if valid, source position and rotation angles assumed to be given in a local bar frame, otherwise Belle II frame assumed",
              0);
     addParam("slitDX", m_slitDX, "slit size in x [cm], if positive, otherwise full open",
              0.0);
@@ -78,12 +84,11 @@ namespace Belle2 {
     addParam("slitY0", m_slitY0, "slit y-offset in respect to source [cm] ", 0.0);
     addParam("slitZ", m_slitZ, "slit distance to source [cm], if > 0.01, otherwise none",
              0.0);
-    addParam("angularDistribution", m_angularDistribution,
-             "source angular distribution: uniform, Lambertian, Gaussian (uses na)", string("Gaussian"));
   }
 
   OpticalGunModule::~OpticalGunModule()
   {
+    if (m_customDistribution) delete m_customDistribution;
   }
 
   void OpticalGunModule::initialize()
@@ -94,28 +99,63 @@ namespace Belle2 {
 
     // parameters check
     if (m_wavelength < 150 or m_wavelength > 1000)
-      B2FATAL("Wavelength does not correspond to optical photons");
+      B2FATAL("Wavelength does not correspond to optical photons.");
     if (m_na < 0 or m_na > 1)
-      B2FATAL("Numerical aperture must be between 0 and 1");
+      B2FATAL("Numerical aperture must be between 0 and 1.");
+    if (m_minAlpha < 0)
+      B2FATAL("Minimum emission angle must be positive");
+    if (m_maxAlpha < 0)
+      B2FATAL("Maximum emission angle must be positive");
+    if (m_minAlpha >= m_maxAlpha)
+      B2FATAL("Minimum emission angle msut me smaller than the maximum emission angle");
+
+
+    if (m_angularDistribution == string("uniform") or
+        m_angularDistribution == string("Lambertian") or
+        m_angularDistribution == string("Gaussian"))
+      B2INFO("Using the  pre-defined angular distribution " << m_angularDistribution);
+    else {
+      B2INFO(m_angularDistribution << " is not a pre-defined distribution. Checking if it's a valid, positively-defined TFormula.");
+      TFormula testFormula("testFormula", m_angularDistribution.c_str());
+      int result = testFormula.Compile();
+      if (result != 0) {
+        B2FATAL(m_angularDistribution << " is not a valid angular distribution keyword, or it's a TFormula that does not compile.");
+      }
+      double testPoint = m_minAlpha; // let's test if the function is postive defined everywhere
+      while (testPoint < m_maxAlpha) {
+        double value = testFormula.Eval(testPoint * Unit::deg);
+        if (value < 0) {
+          B2FATAL("The formula " << m_angularDistribution << " is not positively defined in the test point " << testPoint << " deg (value = "
+                  <<
+                  value << ")");
+        }
+        testPoint += (m_maxAlpha - m_minAlpha) / 100.;
+      }
+      m_customDistribution = new TF1("m_customDistribution", m_angularDistribution.c_str(), m_minAlpha * Unit::deg,
+                                     m_maxAlpha * Unit::deg);
+    }
+
+
 
     // set other private variables
-    m_cosAlpha = cos(m_alpha * Unit::deg);
+    m_cosMinAlpha = cos(m_minAlpha * Unit::deg);
+    m_cosMaxAlpha = cos(m_maxAlpha * Unit::deg);
     m_energy = TOPGeometryPar::c_hc / m_wavelength * Unit::eV;
 
     double barY0 = 0;
     double barZ0 = 0;
     double barPhi = 0;
-    if (m_barID != 0) {
+    if (m_slotID != 0) {
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       int Nbars = geo->getNumModules();
       if (Nbars == 0) B2ERROR("TOP bars are not defined");
-      if (m_barID < 0 || m_barID > Nbars) {
-        B2ERROR("barID = " << m_barID << " : not a valid ID");
-        m_barID = 0;
+      if (m_slotID < 0 or m_slotID > Nbars) {
+        B2ERROR("barID = " << m_slotID << " : not a valid ID");
+        m_slotID = 0;
       } else {
-        barY0 = geo->getModule(m_barID).getRadius();
-        barZ0 = geo->getModule(m_barID).getZc();
-        barPhi = geo->getModule(m_barID).getPhi() - M_PI / 2;
+        barY0 = geo->getModule(m_slotID).getRadius();
+        barZ0 = geo->getModule(m_slotID).getZc();
+        barPhi = geo->getModule(m_slotID).getPhi() - M_PI / 2;
       }
     }
     m_translate.SetXYZ(m_x, m_y + barY0, m_z + barZ0);
@@ -162,8 +202,8 @@ namespace Belle2 {
         direction = getDirectionLambertian();
       } else if (m_angularDistribution == string("Gaussian")) {
         direction = getDirectionGaussian();
-      } else {
-        B2FATAL("Wrong source angular distribution. Available ones are: uniform, Lambertian, Gaussian(default)");
+      } else { // we already have tested the formula and initialized the TF1 in the initialize() method
+        direction = getDirectionCustom();
       }
       TVector3 momentum = m_energy * direction;
 
@@ -171,8 +211,8 @@ namespace Belle2 {
       if (!isInsideSlit(point, direction)) continue;
 
       // generate polarization vector (unpolarized light source assumed)
-      double alpha = 2.0 * M_PI * gRandom->Rndm();
-      TVector3 polarization(cos(alpha), sin(alpha), 0);
+      double alphaPol = 2.0 * M_PI * gRandom->Rndm();
+      TVector3 polarization(cos(alphaPol), sin(alphaPol), 0);
       polarization.RotateUz(direction);
 
       // generate emission time
@@ -183,7 +223,7 @@ namespace Belle2 {
       polarization.Transform(m_rotate);
       point.Transform(m_rotate);
       point += m_translate;
-      if (m_barID > 0) {
+      if (m_slotID > 0) {
         momentum.Transform(m_rotateBar);
         polarization.Transform(m_rotateBar);
         point.Transform(m_rotateBar);
@@ -253,7 +293,7 @@ namespace Belle2 {
 
   TVector3 OpticalGunModule::getDirectionUniform() const
   {
-    double cosTheta = (1.0 - m_cosAlpha) * gRandom->Rndm() + m_cosAlpha;
+    double cosTheta = (m_cosMinAlpha - m_cosMaxAlpha) * gRandom->Rndm() + m_cosMaxAlpha;
     double sinTheta = sqrt(1.0 - cosTheta * cosTheta);
     double phi = 2.0 * M_PI * gRandom->Rndm();
     return TVector3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
@@ -261,11 +301,18 @@ namespace Belle2 {
 
   TVector3 OpticalGunModule::getDirectionLambertian() const
   {
-    double cosTheta = sqrt((1.0 - m_cosAlpha * m_cosAlpha) * gRandom->Rndm() +
-                           m_cosAlpha * m_cosAlpha);
+    double cosTheta = sqrt((m_cosMinAlpha * m_cosMinAlpha - m_cosMaxAlpha * m_cosMaxAlpha) * gRandom->Rndm() +
+                           m_cosMaxAlpha * m_cosMaxAlpha);
     double sinTheta = sqrt(1.0 - cosTheta * cosTheta);
     double phi = 2.0 * M_PI * gRandom->Rndm();
     return TVector3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
+  }
+
+  TVector3 OpticalGunModule::getDirectionCustom() const
+  {
+    double alpha = m_customDistribution->GetRandom();
+    double phi = 2.0 * M_PI * gRandom->Rndm();
+    return TVector3(cos(phi) * sin(alpha), sin(phi) * sin(alpha), cos(alpha));
   }
 
 

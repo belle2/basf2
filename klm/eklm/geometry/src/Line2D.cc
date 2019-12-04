@@ -8,9 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <klm/eklm/geometry/Circle2D.h>
+/* Own header. */
 #include <klm/eklm/geometry/Line2D.h>
+
+/* KLM headers. */
+#include <klm/eklm/geometry/Circle2D.h>
 
 using namespace Belle2;
 

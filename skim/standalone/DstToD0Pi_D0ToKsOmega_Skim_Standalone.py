@@ -15,13 +15,13 @@ from stdCharged import stdPi, stdK, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 
 skimCode = encodeSkimName('DstToD0Pi_D0ToKsOmega')
 
 c2bn2path = Path()
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 inputMdstList('default', fileList, path=c2bn2path)
 
 stdPi('loose', path=c2bn2path)
@@ -33,7 +33,6 @@ stdK('all', path=c2bn2path)
 stdE('all', path=c2bn2path)
 stdMu('all', path=c2bn2path)
 stdKshorts(path=c2bn2path)
-mergedKshorts(path=c2bn2path)
 loadStdSkimPi0(path=c2bn2path)
 
 from skim.charm import DstToD0PiD0ToKsOmega

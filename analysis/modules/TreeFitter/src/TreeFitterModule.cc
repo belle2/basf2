@@ -19,15 +19,13 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
 
 #include <analysis/utility/ParticleCopy.h>
-
-#include <framework/geometry/BFieldManager.h>
 
 #include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 #include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
 
-#include <framework/particledb/EvtGenDatabasePDG.h>
 using namespace Belle2;
 
 REG_MODULE(TreeFitter)

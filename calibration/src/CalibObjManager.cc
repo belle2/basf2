@@ -136,4 +136,10 @@ namespace Belle2 {
     string indexString = strs.back();
     return stoi(indexString);
   }
+
+  bool CalibObjManager::isRegistered(const std::string& name) const
+  {
+    if (m_templateObjects.count(name)) return true;
+    else return false;
+  }
 }

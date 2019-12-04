@@ -14,13 +14,13 @@ from modularAnalysis import inputMdstList, skimOutputUdst, summaryOfLists
 from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 
 # create a path
 darkskimpath = Path()
 
 # test input file
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 inputMdstList('default', fileList, path=darkskimpath)
 stdPhotons('all', path=darkskimpath)
 stdE('all', path=darkskimpath)

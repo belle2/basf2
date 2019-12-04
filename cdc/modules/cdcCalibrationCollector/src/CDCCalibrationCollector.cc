@@ -10,7 +10,6 @@
 
 #include "cdc/modules/cdcCalibrationCollector/CDCCalibrationCollector.h"
 #include <cdc/translators/RealisticTDCCountTranslator.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -19,7 +18,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackPoint.h>
-#include <genfit/KalmanFitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/MeasurementOnPlane.h>
 #include <genfit/MeasuredStateOnPlane.h>
@@ -28,6 +26,7 @@
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
+#include <TH1F.h>
 
 using namespace std;
 using namespace Belle2;
@@ -97,11 +96,15 @@ void CDCCalibrationCollectorModule::prepare()
   auto m_hNDF = new TH1F("hNDF", "NDF of fitted track;NDF;Tracks", 71, -1, 70);
   auto m_hPval = new TH1F("hPval", "p-values of tracks;pVal;Tracks", 1000, 0, 1);
   auto m_hEventT0 = new TH1F("hEventT0", "Event T0", 1000, -100, 100);
+  auto m_hNTracks = new TH1F("hNTracks", "Number of tracks", 50, 0, 10);
+  auto m_hOccupancy = new TH1F("hOccupancy", "occupancy", 100, 0, 1.0);
 
   registerObject<TTree>("tree", m_tree);
   registerObject<TH1F>("hNDF", m_hNDF);
   registerObject<TH1F>("hPval", m_hPval);
   registerObject<TH1F>("hEventT0", m_hEventT0);
+  registerObject<TH1F>("hNTracks", m_hNTracks);
+  registerObject<TH1F>("hOccupancy", m_hOccupancy);
 }
 
 void CDCCalibrationCollectorModule::collect()
@@ -129,6 +132,12 @@ void CDCCalibrationCollectorModule::collect()
 
 
   const int nTr = recoTracks.getEntries();
+  const int nHits = cdcHits.getEntries();
+  const int nWires = 14336;
+  float oc = static_cast<float>(nHits) / static_cast<float>(nWires);
+  int nCTracks  = 0;
+
+  getObjectPtr<TH1F>("hOccupancy")->Fill(oc);
 
   for (int i = 0; i < nTr; ++i) {
     RecoTrack* track = recoTracks[i];
@@ -166,6 +175,11 @@ void CDCCalibrationCollectorModule::collect()
     omega = fitresult->getOmega();
     phi0 = fitresult->getPhi0() * 180 / M_PI;
 
+    short charge = fitresult->getChargeSign();
+    if (fabs(charge) > 0) {
+      nCTracks++;
+    }
+
     // Rejection of suspicious cosmic tracks.
     // phi0 of cosmic track must be negative in our definition!
     if (m_isCosmic == true && phi0 > 0.0) continue;
@@ -177,6 +191,7 @@ void CDCCalibrationCollectorModule::collect()
     } catch (...) {
     }
   }
+  getObjectPtr<TH1F>("hNTracks")->Fill(nCTracks);
 }
 
 void CDCCalibrationCollectorModule::finish()

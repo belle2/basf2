@@ -10,13 +10,10 @@
 #include <tracking/ckf/cdc/filters/states/MCTruthEclSeedFilter.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
-#include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
 #include <ecl/dataobjects/ECLShower.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-
-#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 

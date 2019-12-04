@@ -56,7 +56,7 @@ void BKLMHitRateCounter::accumulate(unsigned timeStamp)
     if (!digit.inRPC() && !digit.isAboveThreshold())
       continue;
 
-    int layerGlobal = BKLMElementNumbers::layerGlobalNumber(digit.getSection(), digit.getSector(), digit.getLayer());
+    int layerGlobal = BKLMElementNumbers::layerGlobalNumber(digit.getSection(), digit.getSector(), digit.getLayer()) - 1;
     if (layerGlobal >= 0 and layerGlobal < m_maxGlobalLayer) {
       rates.layerRates[layerGlobal]++;
     } else {
@@ -88,7 +88,8 @@ void BKLMHitRateCounter::normalize(unsigned timeStamp)
       m_rates.layerRates[layerGlobal] = 0;
     else {
       m_rates.layerRates[layerGlobal] /= activeStrips;
-      if ((layerGlobal % BKLMElementNumbers::getMaximalLayerNumber()) >= 2) {
+      // layerGlobal is 0-based, while c_FirstRPCLayer is 1-based
+      if ((layerGlobal % BKLMElementNumbers::getMaximalLayerNumber()) >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
         // The layer is an RPC-layer: there are two digits per "real" hit
         // so it's better to divide by 2 the rate
         m_rates.layerRates[layerGlobal] /= 2;

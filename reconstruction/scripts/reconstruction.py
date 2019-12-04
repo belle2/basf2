@@ -30,7 +30,7 @@ import mdst
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=False,
-                       nCDCHitsMax=4000, nSVDShaperDigitsMax=70000):
+                       nCDCHitsMax=6000, nSVDShaperDigitsMax=70000):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -321,6 +321,7 @@ def add_cdst_output(
     calibrationBranches = [
         'RecoTracks',
         'EventT0',
+        'SVDEventInfo',
         'SVDShaperDigits',
         'SVDRecoDigits',
         'SVDClusters',
@@ -354,8 +355,8 @@ def add_cdst_output(
         'EKLMHit2ds',
         'EKLMDigits',
         'EKLMHit2dsToEKLMDigits',
-        'Muids',
-        'TracksToMuids',
+        'KLMMuidLikelihoods',
+        'TracksToKLMMuidLikelihoods',
         'TracksToARICHLikelihoods',
         'TracksToExtHits',
         'ARICHDigits',

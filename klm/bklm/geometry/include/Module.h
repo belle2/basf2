@@ -10,10 +10,13 @@
 
 #pragma once
 
-#include "CLHEP/Vector/ThreeVector.h"
-#include "CLHEP/Vector/Rotation.h"
+/* CLHEP headers. */
 #include <CLHEP/Geometry/Transform3D.h>
-#include "vector"
+#include <CLHEP/Vector/Rotation.h>
+#include <CLHEP/Vector/ThreeVector.h>
+
+/* C++ headers. */
+#include <vector>
 
 namespace Belle2 {
 

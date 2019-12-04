@@ -11,7 +11,6 @@
 #include <tracking/modules/trackingPerformanceEvaluation/HitXPModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
@@ -20,9 +19,6 @@
 #include <tracking/dataobjects/hitXPDerivate.h>
 
 #include <string>
-#include "TMath.h"
-#include <algorithm>
-#include <functional>
 
 using namespace Belle2;
 

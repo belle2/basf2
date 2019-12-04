@@ -106,6 +106,7 @@ namespace {
     }
     std::cout << "this will not be captured" << std::endl;
     {
+      // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
       auto guard = IOIntercept::start_intercept(logmessages);
       std::cerr << "this is my error";
     }

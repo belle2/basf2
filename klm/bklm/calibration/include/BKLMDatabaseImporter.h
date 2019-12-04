@@ -11,10 +11,10 @@
 
 #pragma once
 
+/* KLM headers. */
 #include <klm/bklm/dbobjects/BKLMADCThreshold.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
+#include <klm/bklm/dbobjects/BKLMElectronicsChannel.h>
 #include <klm/bklm/dbobjects/BKLMTimeWindow.h>
-#include <framework/database/DBImportObjPtr.h>
 
 namespace Belle2 {
 
@@ -68,16 +68,6 @@ namespace Belle2 {
      * Import BKLM simulation parameters into the database
      */
     void importSimulationPar();
-
-    /**
-     * Import BKLM Alignment parameters into the database
-     */
-    void importAlignment();
-
-    /**
-     * Import BKLM displaced-geometry parameters into the database
-     */
-    void importDisplacement();
 
     /**
      * Import BKLM scintillator ADC parameters into the database

@@ -17,11 +17,11 @@ from stdPhotons import *
 from stdCharged import stdE, stdMu, stdPi
 from skimExpertFunctions import setSkimLogging, encodeSkimName, get_test_file
 
-gb2_setuprel = 'release-03-02-03'
+gb2_setuprel = 'release-04-00-00'
 skimCode = encodeSkimName('BtoXll')
 
 path = Path()
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 inputMdstList('default', fileList, path=path)
 
 # import standard lists

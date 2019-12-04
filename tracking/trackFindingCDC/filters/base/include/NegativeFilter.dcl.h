@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 namespace Belle2 {
-  class ModuleParamList;
 
   namespace TrackFindingCDC {
     /// Filter adapter type that negates the acceptance criterion for cross checks

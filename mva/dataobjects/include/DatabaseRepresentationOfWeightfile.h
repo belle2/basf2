@@ -13,7 +13,6 @@
 #define INCLUDE_GUARD_BELLE2_MVA_DATABASE_WEIGHTFILE_HEADER
 
 #include <TObject.h>
-#include <TGenericClassInfo.h>
 
 #include <string>
 

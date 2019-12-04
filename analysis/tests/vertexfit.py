@@ -46,11 +46,10 @@ matchMCTruth('pi0', path=main)
 # KFit
 vertexKFit('pi0', 0.0, path=main)
 
-reconstructDecay('D0 -> K- pi+', '', 0, path=main)
+reconstructDecay('D0 -> K- pi+ pi0', '', 0, path=main)
 matchMCTruth('D0', path=main)
 
-# Rave
-vertexRave('D0', 0.0, path=main, silence_warning=True)
+vertexKFit('D0', 0.0, 'D0 -> ^K- ^pi+ pi0', path=main)
 
 ntupler = register_module('VariablesToNtuple')
 ntupler.param('fileName', testFile.name)

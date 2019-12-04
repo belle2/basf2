@@ -12,7 +12,7 @@ from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPhotons import *
 
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-gb2_setuprel = 'release-03-02-00'
+gb2_setuprel = 'release-04-00-00'
 set_log_level(LogLevel.INFO)
 
 skimpath = Path()
@@ -21,7 +21,7 @@ skimCode = encodeSkimName('Systematics')
 argvs = sys.argv
 argc = len(argvs)
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 
 inputMdstList('default', fileList, path=skimpath)
 

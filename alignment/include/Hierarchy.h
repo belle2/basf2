@@ -10,21 +10,20 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-#include <map>
-#include <Geant4/G4Transform3D.hh>
-#include <root/TMatrixD.h>
-#include <genfit/StateOnPlane.h>
-#include <root/TGeoMatrix.h>
-
-#include <framework/logging/Logger.h>
-#include <alignment/GlobalParam.h>
-
 #include <framework/geometry/B2Vector3.h>
 
+#include <genfit/StateOnPlane.h>
+
+#include <root/TMatrixD.h>
+#include <root/TGeoMatrix.h>
+
+#include <Geant4/G4Transform3D.hh>
+
+#include <map>
+#include <set>
+#include <vector>
+
 namespace Belle2 {
-  class MillepedeAlgorithm;
   namespace alignment {
 
     /// pair of the global unique id from object with constants and element representing some rigid body in hierarchy

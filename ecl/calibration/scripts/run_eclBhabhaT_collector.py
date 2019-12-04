@@ -3,10 +3,11 @@
 #
 # -----------------------------------------------------------
 # BASF2 (Belle Analysis Framework 2)
-# Copyright(C) 2018 Belle II Collaboration
+# Copyright(C) 2019 Belle II Collaboration
 #
 # Author: The Belle II Collaboration
-# Contributors: Mikhail Remnev
+# Contributors: Ewan Hill       (ehill@mail.ubc.ca)
+#               Mikhail Remnev
 #
 # This software is provided "as is" without any warranty.
 # -----------------------------------------------------------
@@ -44,11 +45,8 @@ env = Belle2.Environment.Instance()
 # NOTE: It is going to be sorted (alphabetic and length sorting, files with
 #       shortest names are first)
 INPUT_LIST = []
-# = Adding data for exp3 run 529 as an example.
 # = Processed data
-INPUT_LIST += glob.glob("/hsm/belle2/bdata/Data/release-01-02-09/DB00000410/prod00000004/e0003/4S/r00529/all/dst/sub00/*.root")
-# = Raw data
-# INPUT_LIST += glob.glob("/ghi/fs01/belle2/bdata/Data/Raw/e0003/r00529/sub00/*.root")
+INPUT_LIST += glob.glob("oneTestFile/*.root")
 
 # == Output file
 OUTPUT = "eclBhabhaTCollector.root"
@@ -72,23 +70,13 @@ if len(output_arg) > 0:
 # == Collector parameters
 ###################################################################
 
-# Low energy cut (GeV)
-MIN_EN = 0.04
-# High energy cut (GeV)
-MAX_EN = 10.0
-# High energy cut for max total energy in event (GeV)
-MAX_TOTAL_EN = 15.0
+
 # Events with abs(time_ECL-time_CDC) > TIME_ABS_MAX are excluded
 TIME_ABS_MAX = 250
-# Events with ECLDigits.getEntries() > NENTRIES_MAX are excluded
-# (currently unused -- set to arbitrarily high value)
-NENTRIES_MAX = 9999
 
 # If true, output file will contain TTree "tree" with detailed
 # event information.
 SAVE_TREE = False
-# If true, fill histogram with weight min(energy**2, 1 GeV)
-WEIGHTED_HIST = True
 
 # First ECL CellId to calibrate
 MIN_CRYSTAL = 1
@@ -126,29 +114,43 @@ if add_unpackers:
     reconstruction.add_ext_module(main, components)
     reconstruction.add_ecl_modules(main, components)
     reconstruction.add_ecl_track_matcher_module(main, components)
-else:
-    main.add_module('Geometry', useDB=True, components=components)
+
 
 # == Generate time calibration matrix from ECLDigit
-main.add_module('ECLBhabhaTCollector', minEn=MIN_EN,
-                maxEn=MAX_EN, maxTotalEn=MAX_TOTAL_EN, timeAbsMax=TIME_ABS_MAX,
-                minCrystal=MIN_CRYSTAL, maxCrystal=MAX_CRYSTAL,
-                nentriesMax=NENTRIES_MAX, saveTree=SAVE_TREE,
-                weightedHist=WEIGHTED_HIST)
+ECLBhabhaTCollectorInfo = main.add_module('ECLBhabhaTCollector', timeAbsMax=TIME_ABS_MAX,
+                                          minCrystal=MIN_CRYSTAL, maxCrystal=MAX_CRYSTAL,
+                                          saveTree=SAVE_TREE)
+
+ECLBhabhaTCollectorInfo.set_log_level(LogLevel.INFO)  # OR: LogLevel.DEBUG
+ECLBhabhaTCollectorInfo.set_debug_level(36)
+
 
 # == Show progress
 main.add_module('Progress')
 
+# set_log_level(LogLevel.DEBUG)
 set_log_level(LogLevel.INFO)
+set_debug_level(100)
 
 # == Configure database
 reset_database()
 use_database_chain()
-use_central_database("development")
+
+# Read in any required central databases
+# use_central_database("online")
+
+# 2 GT required for making proc 10
+use_central_database("data_reprocessing_proc10")
+use_central_database("data_reprocessing_prompt_rel4_patchb")
+
+# Read in any required local databases.  This may be required when doing crystal/crate iterations
 use_local_database("localdb/database.txt")
 
+
 # == Process events
-# set_nprocesses(8) # Run in multiple threads.
-process(main)
+# process(main, max_event=350000)  # reasonable stats for one crate
+# process(main, max_event=600000)  # reasonable stats for crystal calibs for proc10
+# process(main, max_event=3000)    # reasonable stats and speed for a quick test
+process(main)                      # process all events
 
 print(statistics)

@@ -16,8 +16,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <boost/foreach.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/spirit/home/support/detail/endian.hpp>
 
 using namespace std;

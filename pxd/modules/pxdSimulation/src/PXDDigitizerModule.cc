@@ -15,7 +15,6 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -27,7 +26,6 @@
 #include <cmath>
 
 #include <TRandom.h>
-#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;

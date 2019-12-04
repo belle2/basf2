@@ -10,6 +10,7 @@
 
 #include <analysis/modules/VariablesToExtraInfo/VariablesToExtraInfoModule.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 

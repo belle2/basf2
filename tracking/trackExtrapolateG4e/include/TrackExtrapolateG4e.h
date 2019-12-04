@@ -11,17 +11,15 @@
 #ifndef TRACKEXTRAPOLATEG4E_H
 #define TRACKEXTRAPOLATEG4E_H
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/database/DBObjPtr.h>
-#include <klm/dbobjects/KLMStripEfficiency.h>
-#include <klm/eklm/dbobjects/EKLMChannels.h>
-#include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
+#include <klm/dbobjects/KLMStripEfficiency.h>
+#include <klm/dbobjects/MuidParameters.h>
+#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <tracking/dbobjects/MuidParameters.h>
 
 #include <G4TouchableHandle.hh>
 #include <G4ErrorTrajErr.hh>
@@ -38,9 +36,8 @@ class G4StepPoint;
 namespace Belle2 {
 
   class Track;
-  class RecoTrack;
-  class Muid;
-  class MuidPar;
+  class KLMMuidLikelihood;
+  class MuidBuilder;
   class KLMCluster;
   class ECLCluster;
   namespace Simulation {
@@ -300,7 +297,7 @@ namespace Belle2 {
                       const std::pair<ECLCluster*, G4ThreeVector>&, double, double);
 
     //! Create another MUID extrapolation hit for a track candidate
-    bool createMuidHit(ExtState&, G4ErrorFreeTrajState&, Muid*, std::vector<std::map<const Track*, double> >*);
+    bool createMuidHit(ExtState&, G4ErrorFreeTrajState&, KLMMuidLikelihood*, std::vector<std::map<const Track*, double> >*);
 
     //! Find the intersection point of the track with the crossed BKLM plane
     bool findBarrelIntersection(ExtState&, const G4ThreeVector&, Intersection&);
@@ -318,7 +315,7 @@ namespace Belle2 {
     void adjustIntersection(Intersection&, const double*, const G4ThreeVector&, const G4ThreeVector&);
 
     //! Complete muon identification after end of track extrapolation
-    void finishTrack(const ExtState&, Muid*, bool);
+    void finishTrack(const ExtState&, KLMMuidLikelihood*, bool);
 
     //! Stores pointer to the singleton class
     static TrackExtrapolateG4e* m_Singleton;
@@ -432,22 +429,23 @@ namespace Belle2 {
     int m_OutermostActiveBarrelLayer;
 
     //! BKLM RPC phi-measuring strip position variance (cm^2) by layer
-    double m_BarrelPhiStripVariance[NLAYER + 1];
+    double m_BarrelPhiStripVariance[BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! BKLM RPC z-measuring strip position variance (cm^2) by layer
-    double m_BarrelZStripVariance[NLAYER + 1];
+    double m_BarrelZStripVariance[BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! BKLM scintillator strip position variance (cm^2)
     double m_BarrelScintVariance;
 
     //! hit-plane radius (cm) at closest distance to IP of each barrel end | sector | layer
-    double m_BarrelModuleMiddleRadius[2][NSECTOR + 1][NLAYER + 1];
+    double m_BarrelModuleMiddleRadius[2][BKLMElementNumbers::getMaximalSectorNumber() + 1]
+    [BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! normal unit vector of each barrel sector
-    G4ThreeVector m_BarrelSectorPerp[NSECTOR + 1];
+    G4ThreeVector m_BarrelSectorPerp[BKLMElementNumbers::getMaximalSectorNumber() + 1];
 
     //! azimuthal unit vector of each barrel sector
-    G4ThreeVector m_BarrelSectorPhi[NSECTOR + 1];
+    G4ThreeVector m_BarrelSectorPhi[BKLMElementNumbers::getMaximalSectorNumber() + 1];
 
     //! maximum radius (cm) of the endcaps
     double m_EndcapMaxR;
@@ -471,7 +469,7 @@ namespace Belle2 {
     double m_EndcapScintVariance;
 
     //! hit-plane z (cm) of each IP layer relative to KLM midpoint
-    double m_EndcapModuleMiddleZ[NLAYER + 1];
+    double m_EndcapModuleMiddleZ[BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! experiment number for the current set of particle-hypothesis PDFs
     int m_ExpNo;
@@ -488,9 +486,6 @@ namespace Belle2 {
     //! Conditions-database object for KLM strip efficiency
     DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;
 
-    //! Conditions-database object for EKLM dead-channel list (updated at start of each run)
-    DBObjPtr<EKLMChannels> m_eklmChannels;
-
     //! Conditions-database object for KLM channel status (updated at start of each run)
     DBObjPtr<KLMChannelStatus> m_klmChannelStatus;
 
@@ -501,40 +496,40 @@ namespace Belle2 {
     const EKLM::TransformDataGlobalAligned* m_eklmTransformData;
 
     //! probability density function for positive-muon hypothesis
-    MuidPar* m_MuonPlusPar;
+    MuidBuilder* m_MuonPlusPar;
 
     //! probability density function for negative-muon hypothesis
-    MuidPar* m_MuonMinusPar;
+    MuidBuilder* m_MuonMinusPar;
 
     //! probability density function for positive-pion hypothesis
-    MuidPar* m_PionPlusPar;
+    MuidBuilder* m_PionPlusPar;
 
     //! probability density function for negative-pion hypothesis
-    MuidPar* m_PionMinusPar;
+    MuidBuilder* m_PionMinusPar;
 
     //! probability density function for positive-kaon hypothesis
-    MuidPar* m_KaonPlusPar;
+    MuidBuilder* m_KaonPlusPar;
 
     //! probability density function for negative-kaon hypothesis
-    MuidPar* m_KaonMinusPar;
+    MuidBuilder* m_KaonMinusPar;
 
     //! probability density function for proton hypothesis
-    MuidPar* m_ProtonPar;
+    MuidBuilder* m_ProtonPar;
 
     //! probability density function for antiproton hypothesis
-    MuidPar* m_AntiprotonPar;
+    MuidBuilder* m_AntiprotonPar;
 
     //! probability density function for deuteron hypothesis
-    MuidPar* m_DeuteronPar;
+    MuidBuilder* m_DeuteronPar;
 
     //! probability density function for antideuteron hypothesis
-    MuidPar* m_AntideuteronPar;
+    MuidBuilder* m_AntideuteronPar;
 
     //! probability density function for electron hypothesis
-    MuidPar* m_ElectronPar;
+    MuidBuilder* m_ElectronPar;
 
     //! probability density function for positron hypothesis
-    MuidPar* m_PositronPar;
+    MuidBuilder* m_PositronPar;
 
   };
 

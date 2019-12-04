@@ -45,8 +45,8 @@ def get_calibrations(input_data, **kwargs):
         input_files_physics = file_to_iov_physics
     else:
         max_files_for_maxevents = 100000  # 100k events max (around 5-6 max files)
-        from prompt.utils import filter_by_max_files_max_events
-        reduced_file_to_iov_physics = filter_by_max_files_max_events(file_to_iov_physics, max_files_for_maxevents)
+        from prompt.utils import filter_by_max_events_per_run
+        reduced_file_to_iov_physics = filter_by_max_events_per_run(file_to_iov_physics, max_files_for_maxevents)
         input_files_physics = list(reduced_file_to_iov_physics.keys())
         basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_physics)}")
 

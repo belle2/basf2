@@ -20,7 +20,7 @@ path = b2.create_path()
 
 skimCode = sef.encodeSkimName('BtoD0h_Kpi')
 
-fileList = sef.get_test_file("mixedBGx1", "MC12")
+fileList = sef.get_test_file("MC12_mixedBGx1")
 
 ma.inputMdstList('default', fileList, path=path)
 

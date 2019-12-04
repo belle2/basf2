@@ -73,6 +73,7 @@ Modules
   .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
 
  * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector `^` to select daughters.
+ * The KFitter can be used to fit vertices of fully-inclusive particles.
 
 Conditions DB
 +++++++++++++

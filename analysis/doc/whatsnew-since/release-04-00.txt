@@ -61,12 +61,11 @@ Modules
  * In `ChargedPidMVA` module, remove handling of particle list modified by the deprecated `FSRCorrection` module.
  * In `ChargedPidMVA` module, apply MVA category cuts retrieved from the DB payload.
  * Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`. One can find and create a ``ParticleList`` for all ``MCParticle`` decays matching a given :ref:`DecayString`.
+   Inefficiency and large background when one used ``=direct=>`` or sub-decay such as ``D*+ -> [D0 -> pi+ pi- pi0] pi+`` are fixed.
 
  * Added a :b2:mod:`BremsFinder` to unpack the bremsstrahlung relations provided by tracking.
 
   .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
-
- * Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`. Inefficiency and large background when one used ``=direct=>`` or sub-decay such as ``D*+ -> [D0 -> pi+ pi- pi0] pi+`` are fixed.
 
 Conditions DB
 +++++++++++++

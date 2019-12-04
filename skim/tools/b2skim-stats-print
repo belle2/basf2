@@ -805,7 +805,8 @@ def mcWeightedAverage(statsPerSample, mcCampaign, beamBackground):
     weightedAverage = 0
     for process, crossSection in processCrossSections.items():
         sample = f'{mcCampaign}_{process}{beamBackground}'
-        weightedAverage += statsPerSample[sample]*crossSection/totalCrossSection
+        if statsPerSample[sample]:
+            weightedAverage += statsPerSample[sample]*crossSection/totalCrossSection
 
     return weightedAverage
 

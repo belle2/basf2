@@ -12,15 +12,22 @@ import ROOT
 from ROOT import Belle2
 
 
-# Add the necessary database
-# You can use the command b2conditionsdb-recommend
-b2.conditions.globaltags = ['B2BII_MC']
+# Add the necessary database if required by default B2BII should be set up
+# You can use the command b2conditionsdb-recommend also to recommend databases
+# It is possible to chain an additional database with the command below
+# b2.conditions.globaltags = ['B2BII_MC']
 
 # Create path
 path = b2.create_path()
 
 # Run conversion on input file
-b2biiConversion.convertBelleMdstToBelleIIMdst(None, applyHadronBJSkim=True, path=path)
+b2biiConversion.convertBelleMdstToBelleIIMdst(
+    b2.find_file(
+        'b2bii_input_evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst',
+        'examples',
+        False),
+    applyHadronBJSkim=True,
+    path=path)
 ma.setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 
 # Get FEI default channels for a converted training

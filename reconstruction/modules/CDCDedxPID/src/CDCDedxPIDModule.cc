@@ -327,12 +327,18 @@ void CDCDedxPIDModule::event()
               pdgCode == Const::kaon.getPDGCode() ||
               pdgCode == Const::proton.getPDGCode())) continue;
         const genfit::KalmanFitterInfo* kalmanFitterInfo = (*tp)->getKalmanFitterInfo(*trep);
-        std::vector<double> weights = kalmanFitterInfo->getWeights();
+        if (kalmanFitterInfo == NULL) {
+          //B2WARNING("No KalmanFitterInfo for hit in "<<pdgCode<<" track representationt. Skipping.");
+          continue;
+        }
+
         // there are always 2 hits, one of which is ~1, the other ~0; or both ~0. Store only the largest.
+        std::vector<double> weights = kalmanFitterInfo->getWeights();
         double maxWeight = weights[0] > weights[1] ? weights[0] : weights[1];
         if (pdgCode == Const::pion.getPDGCode()) weightPionHypo = maxWeight;
         else if (pdgCode == Const::kaon.getPDGCode()) weightKaonHypo = maxWeight;
         else if (pdgCode == Const::proton.getPDGCode()) weightProtHypo = maxWeight;
+
       }
 
       // continuous layer number

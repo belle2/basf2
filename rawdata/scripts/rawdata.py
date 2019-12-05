@@ -156,8 +156,9 @@ def add_unpackers(path, components=None):
         ])
         neurounpacker.param('unpackNeuro', True)
         neurounpacker.param('decodeNeuro', True)
-        neurounpacker.param('delayNNOutput', [9, 9, 9, 9])
-        neurounpacker.param('delayNNSelect', [4, 4, 4, 4])
+        neurounpacker.param('delayNNOutput', [0, 0, 0, 0])
+        neurounpacker.param('delayNNSelect', [0, 0, 0, 0])
+        unpacker.param('NNOutputScale', [])
         path.add_module(neurounpacker)
 
 

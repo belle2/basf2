@@ -71,6 +71,9 @@ namespace Belle2 {
     /** debug flag */
     bool m_Debug;
 
+    /** use event T0 or not. */
+    bool m_useEvtT0;
+
     /** Input partilce list name */
     std::string m_inputListName;
 

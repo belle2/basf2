@@ -23,16 +23,10 @@
 /* External headers. */
 #include <TFile.h>
 #include <TTree.h>
-#include <TH1D.h>
-#include <TH2D.h>
-#include <TProfile.h>
-#include <TH1I.h>
-#include <TF1.h>
 #include <TCanvas.h>
 #include <TVector3.h>
 #include <TString.h>
 #include <TGraph.h>
-#include <TGraphErrors.h>
 #include <TFitResult.h>
 #include <TString.h>
 

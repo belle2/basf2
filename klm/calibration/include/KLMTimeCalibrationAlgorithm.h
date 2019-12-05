@@ -18,13 +18,13 @@
 /* Belle2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 
-
-class TH1D;
-class TH2D;
-class TH1I;
-class TGraphErrors;
-class TF1;
-class TProfile;
+/* ROOT headers. */
+#include <TH1D.h>
+#include <TH2D.h>
+#include <TH1I.h>
+#include <TGraphErrors.h>
+#include <TF1.h>
+#include <TProfile.h>
 
 
 namespace Belle2 {

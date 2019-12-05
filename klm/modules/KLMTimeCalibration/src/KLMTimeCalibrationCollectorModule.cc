@@ -54,12 +54,12 @@ KLMTimeCalibrationCollectorModule::KLMTimeCalibrationCollectorModule() :
 
   addParam("debug", m_Debug, "debug mode.", false);
   addParam("inputParticleList", m_inputListName, "input particle list.", std::string("mu:cali"));
+  addParam("useEventT0", m_useEvtT0, "Use event T0 or not.", true);
 
-  m_geoParB = nullptr;
-  m_geoParE = nullptr;
-  m_TransformData = nullptr;
-  m_elementNum = nullptr;
-  m_outTree = nullptr;
+  m_geoParB = GeometryPar::instance();
+  m_geoParE = &(EKLM::GeometryData::Instance());
+  m_elementNum = &(KLMElementNumbers::Instance());
+  m_TransformData = new EKLM::TransformData(true, EKLM::TransformData::c_None);
 }
 
 KLMTimeCalibrationCollectorModule::~KLMTimeCalibrationCollectorModule()
@@ -70,15 +70,9 @@ void KLMTimeCalibrationCollectorModule::prepare()
 {
   setDescription("Preparation for BKLM TimeCalibration Collector Module.");
 
-  /* Geommetry objects initialize. */
-  m_geoParB = GeometryPar::instance();
-  m_geoParE = &(EKLM::GeometryData::Instance());
-  m_TransformData = new EKLM::TransformData(true, EKLM::TransformData::c_None);
-  m_elementNum = &(KLMElementNumbers::Instance());
-
   /* Require input dataobjects. */
+  if (m_useEvtT0) m_eventT0.isRequired("EventT0");
   m_tracks.isRequired();
-  m_eventT0.isRequired("EventT0");
 
   m_outTree = new TTree("time_calibration_data", "");
   m_outTree->Branch("t0",        &m_ev.t0,        "t0/D");
@@ -140,16 +134,19 @@ void KLMTimeCalibrationCollectorModule::collect()
   setDescription("Time Calibration Collector. Main Collect Function of Collector Module Begins.");
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
 
+  m_ev.t0 = 0.0;
   /* Require event T0 determined from CDC */
-  if (!m_eventT0.isValid()) return;
-  if (!m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) return;
-  const std::vector<EventT0::EventT0Component> evtT0C = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
+  if (m_useEvtT0) {
+    if (!m_eventT0.isValid()) return;
+    if (!m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) return;
+    const std::vector<EventT0::EventT0Component> evtT0C = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
+    m_ev.t0 = evtT0C.back().eventT0;
+  }
 
   /* Read data meta infor */
   int runId = eventMetaData->getRun();
   int evtId = eventMetaData->getEvent();
 
-  m_ev.t0 = evtT0C.back().eventT0;
   getObjectPtr<TH1D>("m_HevtT0_0")->Fill(m_ev.t0);
 
   const StoreObjPtr<ParticleList> inputList(m_inputListName);
@@ -172,15 +169,6 @@ void KLMTimeCalibrationCollectorModule::collect()
     // Good track selection
     const Particle* particle = inputList->getParticle(iT);
     const Track* track = particle->getTrack();
-
-    //Track* track = m_tracks[iT];
-    //const TrackFitResult* tFtr = track->getTrackFitResultWithClosestMass(Const::muon);
-    //double d_zero = tFtr->getD0();
-    //double z_zero = tFtr->getZ0();
-    //int nCDChits = tFtr->getHitPatternCDC().getNHits() ;
-    //if (fabs(d_zero) > 0.5 || fabs(z_zero) > 2.0) continue;
-    //if (tFtr->getMomentum().Mag() < 0.55) continue;
-    //if (nCDChits < 20) continue;
 
     // Find data objects related to track
     RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();

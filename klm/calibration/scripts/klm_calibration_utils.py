@@ -39,6 +39,7 @@ class KLMStripEfficiency(AlgorithmStrategy):
         """
         if not self.is_valid():
             raise StrategyError("This AlgorithmStrategy was not set up correctly!")
+        #: The multiprocessing queue we use to pass back results one at a time
         self.queue = queue
 
         basf2.B2INFO(f"Setting up {self.__class__.__name__} strategy for {self.algorithm.name}")

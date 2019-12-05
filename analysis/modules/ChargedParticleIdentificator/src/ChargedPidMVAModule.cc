@@ -115,7 +115,7 @@ void ChargedPidMVAModule::event()
       }
 
       // Retrieve the index for the correct MVA expert and dataset,
-      // given (signal hypo, clusterTheta, p)
+      // given reconstructed (clusterTheta, p)
       auto theta   = eclCluster->getTheta();
       auto p       = particle->getP();
       int jth, ip;
@@ -145,10 +145,10 @@ void ChargedPidMVAModule::event()
 
       B2DEBUG(11, "\tMVA variables:");
 
-      auto nvars  = m_variables.at(index).size();
+      auto nvars = m_variables.at(index).size();
       for (unsigned int ivar(0); ivar < nvars; ++ivar) {
 
-        auto varobj =  m_variables.at(index).at(ivar);
+        auto varobj = m_variables.at(index).at(ivar);
 
         auto var = varobj->function(particle);
 
@@ -163,10 +163,10 @@ void ChargedPidMVAModule::event()
 
       B2DEBUG(12, "\tMVA spectators:");
 
-      auto nspecs  = m_spectators.at(index).size();
+      auto nspecs = m_spectators.at(index).size();
       for (unsigned int ispec(0); ispec < nspecs; ++ispec) {
 
-        auto specobj =  m_spectators.at(index).at(ispec);
+        auto specobj = m_spectators.at(index).at(ispec);
 
         auto spec = specobj->function(particle);
 

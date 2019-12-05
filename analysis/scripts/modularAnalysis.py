@@ -2271,19 +2271,6 @@ def writePi0EtaVeto(
     @param path       modules are added to this path
     """
 
-    if not os.path.isfile(workingDirectory + '/pi0veto.root') and downloadFlag:
-        pi0veto_error_message = (
-            "The necessary weight file pi0veto.root is not present in the provided working directory.\n"
-            "Unfortunately, it can not be downloaded from the database in this release."
-        )
-        B2ERROR(pi0veto_error_message)
-    if not os.path.isfile(workingDirectory + '/etaveto.root') and downloadFlag:
-        etaveto_error_message = (
-            "The necessary weight file etaveto.root is not present in the provided working directory.\n"
-            "Unfortunately, it can not be downloaded from the database in this release."
-        )
-        B2ERROR(etaveto_error_message)
-
     global PI0ETAVETO_COUNTER
 
     if PI0ETAVETO_COUNTER == 0:
@@ -2327,15 +2314,15 @@ def writePi0EtaVeto(
 
     if not os.path.isfile(workingDirectory + '/pi0veto.root'):
         if downloadFlag:
-            # use_central_database('development') // The development GT can no longer be used
+            conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download('Pi0VetoIdentifier', workingDirectory + '/pi0veto.root')
-            # B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
+            B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
 
     if not os.path.isfile(workingDirectory + '/etaveto.root'):
         if downloadFlag:
-            # use_central_database('development') // The development GT can no longer be used
+            conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download('EtaVetoIdentifier', workingDirectory + '/etaveto.root')
-            # B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
+            B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
 
     roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO'], extraInfoName='Pi0Veto',
                         identifier=workingDirectory + '/pi0veto.root')

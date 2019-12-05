@@ -587,13 +587,13 @@ namespace Belle2 {
      *  @return CDCTriggerTrack*  pointer to 2D track RelationsObject
      *
      */
-    CDCTriggerHWTrack* decodeNNInput(short iclock,
-                                     unsigned iTracker,
-                                     NNInputBitStream* bitsIn,
-                                     StoreArray<CDCTriggerHWTrack>* store2DTracks,
-                                     StoreArray<CDCTriggerSegmentHit>* tsHits)
+    CDCTriggerTrack* decodeNNInput(short iclock,
+                                   unsigned iTracker,
+                                   NNInputBitStream* bitsIn,
+                                   StoreArray<CDCTriggerTrack>* store2DTracks,
+                                   StoreArray<CDCTriggerSegmentHit>* tsHits)
     {
-      CDCTriggerHWTrack* track2D = nullptr;
+      CDCTriggerTrack* track2D = nullptr;
       constexpr unsigned lenTrack = 135; //119;
       // omega (7 bit) + phi (7 bit) + 5 * TS (21 bit) + old track found(6bit) + valid stereo bit (1bit) + drift threshold (9bit)
       const auto slvIn = bitsIn->signal()[iTracker];
@@ -632,7 +632,16 @@ namespace Belle2 {
             foundoldtrack.push_back(false);
           }
         }
-        for (i = 6; i < 15; i++) {
+        i = 6;
+        if (infobits.substr(i, 1) == "1") {
+          valstereobit = true;
+        } else if (infobits.substr(i, 1) == "0") {
+          valstereobit = false;
+        } else {
+          B2WARNING("Invalid input in NNBitstream appending 'false'!");
+          valstereobit = false;
+        }
+        for (i = 7; i < 16; i++) {
           if (infobits.substr(i, 1) == "1") {
             driftthreshold.push_back(true);
           } else if (infobits.substr(i, 1) == "0") {
@@ -641,15 +650,6 @@ namespace Belle2 {
             B2WARNING("Invalid input in NNBitstream appending 'false'!");
             driftthreshold.push_back(false);
           }
-        }
-        i = 15;
-        if (infobits.substr(i, 1) == "1") {
-          valstereobit = true;
-        } else if (infobits.substr(i, 1) == "0") {
-          valstereobit = false;
-        } else {
-          B2WARNING("Invalid input in NNBitstream appending 'false'!");
-          valstereobit = false;
         }
         B2DEBUG(15, "bits for foundoldtrack:    "   << foundoldtrack[0]
                 << foundoldtrack[1]
@@ -720,7 +720,7 @@ namespace Belle2 {
                         StoreArray<CDCTriggerTrack>* storeNNTracks,
                         StoreArray<CDCTriggerSegmentHit>* tsHits,
                         StoreArray<CDCTriggerMLPInput>* storeNNInputs,
-                        CDCTriggerHWTrack* track2D,
+                        CDCTriggerTrack* track2D,
                         const CDCTriggerMLP& mlp)
     {
       const auto slvOut = bitsOut->signal()[iTracker];
@@ -737,7 +737,8 @@ namespace Belle2 {
         omega = track2D->getOmega();
       }
       CDCTriggerTrack* trackNN = storeNNTracks->appendNew(phi0, omega, 0.,
-                                                          trkNN.z, cos(trkNN.theta) / sin(trkNN.theta), 0., foundTime, iTracker);
+                                                          trkNN.z, cos(trkNN.theta) / sin(trkNN.theta), 0., track2D->getFoundOldTrack(), track2D->getDriftThreshold(),
+                                                          track2D->getValidStereoBit(), foundTime, iTracker);
       std::vector<float> inputVector(27, 0.);
       for (unsigned iSL = 0; iSL < 9; ++iSL) {
         inputVector[3 * iSL] = trkNN.inputID[iSL];
@@ -782,7 +783,7 @@ namespace Belle2 {
     void decodeNNIO(
       StoreArray<CDCTriggerUnpacker::NNInputBitStream>* bitsToNN,
       StoreArray<CDCTriggerUnpacker::NNOutputBitStream>* bitsFromNN,
-      StoreArray<CDCTriggerHWTrack>* store2DTracks,
+      StoreArray<CDCTriggerTrack>* store2DTracks,
       StoreArray<CDCTriggerTrack>* storeNNTracks,
       StoreArray<CDCTriggerSegmentHit>* tsHits,
       StoreArray<CDCTriggerMLPInput>* storeNNInputs,
@@ -797,7 +798,7 @@ namespace Belle2 {
           const auto slvOutEnable = bitsOutEnable->signal()[iTracker];
           std::string stringOutEnable = slv_to_bin_string(slvOutEnable);
           if (stringOutEnable.c_str()[0] == '1') {
-            CDCTriggerHWTrack* nntrack2D = decodeNNInput(iclock, iTracker, bitsIn, store2DTracks, tsHits);
+            CDCTriggerTrack* nntrack2D = decodeNNInput(iclock, iTracker, bitsIn, store2DTracks, tsHits);
             if (nntrack2D) {
               int foundTime = iclock + delayNNOutput[iTracker];
               if (foundTime  < bitsFromNN->getEntries()) {

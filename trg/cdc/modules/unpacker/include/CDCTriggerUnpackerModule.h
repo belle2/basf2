@@ -306,7 +306,7 @@ namespace Belle2 {
     StoreArray<CDCTriggerMLPInput> m_NeuroInputs;
 
     /** decoded 2D finder tracks from the neural network input */
-    StoreArray<CDCTriggerHWTrack> m_NNInput2DFinderTracks;
+    StoreArray<CDCTriggerTrack> m_NNInput2DFinderTracks;
 
     /** decoded track segment hits from the neural network input */
     StoreArray<CDCTriggerSegmentHit> m_NNInputTSHits;

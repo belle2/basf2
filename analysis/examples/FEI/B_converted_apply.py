@@ -23,8 +23,8 @@ path = b2.create_path()
 # Run conversion on input file
 b2biiConversion.convertBelleMdstToBelleIIMdst(
     b2.find_file(
-        'b2bii_input_evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst',
-        'examples',
+        'analysis/mdstBelle1_exp65_charged.root',
+        'validation',
         False),
     applyHadronBJSkim=True,
     path=path)

@@ -47,7 +47,7 @@ ma.cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=tcpvskimpath)
 # TCPV  B0 skim
 from skim.tcpv import TCPVList
 TCPVList = TCPVList(path=tcpvskimpath)
-ma.expert.skimOutputUdst('../TCPV.udst.root', TCPVList, path=tcpvskimpath)
+expert.skimOutputUdst('../TCPV.udst.root', TCPVList, path=tcpvskimpath)
 ma.summaryOfLists(TCPVList, path=tcpvskimpath)
 
 expert.setSkimLogging(path=tcpvskimpath)

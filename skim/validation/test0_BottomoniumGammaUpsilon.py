@@ -11,7 +11,7 @@
 
 import basf2 as b2
 from simulation import add_simulation
-from reconstruction import add_reconstruction
+from reconstruction import add_reconstruction, add_mdst_output
 from beamparameters import add_beamparameters
 from ROOT import Belle2
 import glob
@@ -50,7 +50,7 @@ add_reconstruction(BottomoniumGammaUpsilonskimpath)
 
 # Finally add mdst output
 output_filename = "../BottomoniumGammaUpsilon.dst.root"
-b2.add_mdst_output(BottomoniumGammaUpsilonskimpath, filename=output_filename)
+add_mdst_output(BottomoniumGammaUpsilonskimpath, filename=output_filename)
 
 # process events and print call statistics
 b2.process(BottomoniumGammaUpsilonskimpath)

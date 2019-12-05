@@ -11,7 +11,7 @@
 
 import basf2 as b2
 from simulation import add_simulation
-from reconstruction import add_reconstruction
+from reconstruction import add_reconstruction, add_mdst_output
 from ROOT import Belle2
 import glob
 
@@ -44,7 +44,7 @@ add_reconstruction(path=charmless3neutralpath)
 
 # Finally add mdst output
 output_filename = "../CharmlessHad3BodyNeutral.dst.root"
-b2.add_mdst_output(charmless3neutralpath, filename=output_filename)
+add_mdst_output(charmless3neutralpath, filename=output_filename)
 
 # process events and print call statistics
 b2.process(charmless3neutralpath)

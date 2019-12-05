@@ -40,7 +40,7 @@ re.add_reconstruction(path=tcpvskimpath)
 
 # Finally add mdst output
 output_filename = "../TCPV.dst.root"
-mdst.b2.add_mdst_output(path=tcpvskimpath, mc=True, filename=output_filename)
+mdst.add_mdst_output(path=tcpvskimpath, mc=True, filename=output_filename)
 
 
 # process events and print call statistics

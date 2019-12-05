@@ -11,7 +11,7 @@
 
 import basf2 as b2
 from simulation import add_simulation
-from reconstruction import add_reconstruction
+from reconstruction import add_reconstruction, add_mdst_output
 
 b2.set_random_seed(12345)
 
@@ -40,7 +40,7 @@ add_reconstruction(main)
 
 # Finally add mdst output
 output_filename = "../LeptonicUntagged.dst.root"
-b2.add_mdst_output(main, filename=output_filename)
+add_mdst_output(main, filename=output_filename)
 
 # process events and print call statistics
 b2.process(main)

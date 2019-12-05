@@ -195,7 +195,7 @@ namespace Belle2 {
 
   void Database::initialize(const EDatabaseState target)
   {
-    if (m_configState >= target || m_configState == c_Ready) return;
+    if (m_configState >= target) return;
     auto conf = Conditions::Configuration::getInstance();
 
     if (m_configState == c_PreInit) {
@@ -210,8 +210,7 @@ namespace Belle2 {
       [&seen](const auto & tag) {
         return not seen.insert(tag).second;
       }), m_globalTags.end());
-      // and also obtain som other configuration values like usable tag states and
-      // metadata providers
+      // and also obtain usable tag states and metadata providers
       m_usableTagStates = conf.getUsableTagStates();
       m_metadataConfigurations = conf.getMetadataProviders();
       // reverse because we want to pop out elements when used

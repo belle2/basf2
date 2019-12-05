@@ -75,7 +75,7 @@ namespace Belle2 {
   void DBStore::update()
   {
     if (m_dbEntries.empty()) {
-      // make sure we at least fix the list og globaltags on the first time
+      // make sure we at least fix the list of globaltags on the first time
       Database::Instance().initialize(Database::c_InitGlobaltagList);
       return;
     }
@@ -93,7 +93,7 @@ namespace Belle2 {
   void DBStore::update(const EventMetaData& event)
   {
     if (m_dbEntries.empty()) {
-      // make sure we at least fix the list og globaltags on the first time
+      // make sure we at least fix the list of globaltags on the first time
       Database::Instance().initialize(Database::c_InitGlobaltagList);
       return;
     }

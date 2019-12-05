@@ -177,6 +177,9 @@ namespace Belle2 {
     double h_wireGain[kMaxHits] = {}; /**< calibration hit gain */
     double h_twodCor[kMaxHits] = {};  /**< calibration 2D correction */
     double h_onedCor[kMaxHits] = {};  /**< calibration 1D cleanup correction */
+    double h_WeightPionHypo[kMaxHits] = {}; /**< weight for pion hypothesis from KalmanFitterInfo*/
+    double h_WeightKaonHypo[kMaxHits] = {}; /**< weight for pion hypothesis from KalmanFitterInfo*/
+    double h_WeightProtonHypo[kMaxHits] = {}; /**< weight for pion hypothesis from KalmanFitterInfo*/
 
     bool h_hasReaddedFlag[kMaxHits] = {}; /**< was the hit readded */
 

@@ -27,6 +27,7 @@
 #include <genfit/Exception.h>
 #include <genfit/MaterialEffects.h>
 #include <genfit/StateOnPlane.h>
+#include <genfit/KalmanFitterInfo.h>
 
 #include <TFile.h>
 #include <TH2F.h>
@@ -279,6 +280,7 @@ void CDCDedxPIDModule::event()
     // Get the TrackPoints, which contain the hit information we need.
     // Then iterate over each point.
     int tpcounter = 0;
+    const std::vector< genfit::AbsTrackRep* >& gftrackRepresentations = recoTrack->getRepresentations();
     const std::vector< genfit::TrackPoint* >& gftrackPoints = recoTrack->getHitPointsWithMeasurement();
     for (std::vector< genfit::TrackPoint* >::const_iterator tp = gftrackPoints.begin();
          tp != gftrackPoints.end(); ++tp) {
@@ -310,6 +312,27 @@ void CDCDedxPIDModule::event()
       const RecoHitInformation* hitInfo = recoTrack->getRecoHitInformation(cdcHit);
       if (hitInfo->getFoundByTrackFinder() == RecoHitInformation::c_ReattachCDCWireHitsToRecoTracks) {
         hasReaddedFlag = true;
+      }
+
+      // add weights for hypotheses
+      double weightPionHypo = 0;
+      double weightProtHypo = 0;
+      double weightKaonHypo = 0;
+      // loop over all the present hypotheses
+      for (std::vector<genfit::AbsTrackRep* >::const_iterator trep = gftrackRepresentations.begin();
+           trep != gftrackRepresentations.end(); ++trep) {
+        const int pdgCode = TMath::Abs((*trep)->getPDG());
+        // configured to only save weights for one of these 3
+        if (!(pdgCode == Const::pion.getPDGCode() ||
+              pdgCode == Const::kaon.getPDGCode() ||
+              pdgCode == Const::proton.getPDGCode())) continue;
+        const genfit::KalmanFitterInfo* kalmanFitterInfo = (*tp)->getKalmanFitterInfo(*trep);
+        std::vector<double> weights = kalmanFitterInfo->getWeights();
+        // there are always 2 hits, one of which is ~1, the other ~0; or both ~0. Store only the largest.
+        double maxWeight = weights[0] > weights[1] ? weights[0] : weights[1];
+        if (pdgCode == Const::pion.getPDGCode()) weightPionHypo = maxWeight;
+        else if (pdgCode == Const::kaon.getPDGCode()) weightKaonHypo = maxWeight;
+        else if (pdgCode == Const::proton.getPDGCode()) weightProtHypo = maxWeight;
       }
 
       // continuous layer number
@@ -476,7 +499,7 @@ void CDCDedxPIDModule::event()
               dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS, adcCount, hitCharge, celldx, cellDedx, cellHeight,
                                 cellHalfWidth, driftT,
                                 driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor,
-                                hasReaddedFlag);
+                                hasReaddedFlag, weightPionHypo, weightKaonHypo, weightProtHypo);
             nhitscombined++;
           }
         }

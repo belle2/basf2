@@ -293,6 +293,8 @@ An example tutorial for normal use can be found under:
 
   analysis/examples/tutorials/B2A801-FlavorTagger.py
 
+Find the latest turotial given at the `2nd OPEN Belle II physics week <https://indico.belle2.org/event/493/contributions/4538>`_ 
+at `DESY stash <https://stash.desy.de/users/abudinen/repos/handsonexercises>`_.
 
 Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse/B2T_Advanced_3_FlavorTagger.ipynb>`_
 (Jupyter notebook) under the latest `b2-starter-kit <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse>`_ tutorials.
@@ -319,6 +321,7 @@ The convention is BGx0 for no machine background and BGx1 for MC with machine ba
   flavorTaggerVertexingValidation.py
 
 
+If you are interested in the validation of the flavor tagger. You can have a look at the `flavortaggingvalidation <https://stash.desy.de/projects/B2A/repos/flavortaggingvalidation>`_ repository.
 
 
 Functions

@@ -14,6 +14,7 @@
 #include <klm/dbobjects/KLMTimeCableDelay.h>
 #include <klm/dbobjects/KLMTimeConstants.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMChannelIndex.h>
 
 /* Belle2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
@@ -157,19 +158,9 @@ namespace Belle2 {
 
     /** Element number handler */
     const KLMElementNumbers* m_elementNum;
-    /** Element number */
-    /** BKLM or EKLM */
-    int iSub;
-    /** Forward or Backward */
-    int iFor;
-    /** Section number */
-    int iSec;
-    /** Layer number */
-    int iLay;
-    /** Plane number */
-    int iPla;
-    /** Channel number */
-    int iStr;
+
+    /** KLM ChannelIndex object. */
+    KLMChannelIndex m_klmChannels;
 
     /**
      * DBObject of time cost on some parts of

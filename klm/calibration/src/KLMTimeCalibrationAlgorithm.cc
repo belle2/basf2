@@ -521,6 +521,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     }
 
     m_cFlag[channelId] = 1;
+    int iSub, iFor, iSec, iLay, iPla, iStr;
     m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
 
     for (it_v = m_evtsChannel.begin(); it_v != m_evtsChannel.end(); ++it_v) {
@@ -553,57 +554,41 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   double tmpMean_scint_global = h_time_scint_tc->GetMean();
   double tmpMean_scint_global_end = h_time_scint_tc_end->GetMean();
 
-  for (int iF = 0; iF < 2; ++iF) {
-    for (int iS = 0; iS < 8; ++iS) {
-      for (int iP = 0; iP < 2; ++iP) {
-        for (int iL = 0; iL < 2; ++iL) {
-          int nchannel_max = BKLMElementNumbers::getNStrips(iF, iS + 1, iL + 1, iP);
-          for (int iC = 0; iC < nchannel_max; ++iC) {
-            channelId = m_elementNum->channelNumberBKLM(iF, iS + 1, iL + 1, iP, iC + 1);
-            iSub = int(m_elementNum->isEKLMChannel(channelId));
-            if (m_cFlag.find(channelId) == m_cFlag.end()) continue;
-            if (!m_cFlag[channelId]) continue;
-            if (h_timeFSLPC_tc[iF][iS][iL][iP][iC]->GetEntries() < m_lower_limit_counts) continue;
-            h_timeFSLPC_tc[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LSM");
-            double tmpMean_channel = fcn_gaus->GetParameter(1);
-            m_timeShift[channelId] = tmpMean_channel - tmpMean_scint_global;
-          }
-        }
-        for (int iL = 2; iL < 15; ++iL) {
-          int nchannel_max = BKLMElementNumbers::getNStrips(iF, iS + 1, iL + 1, iP);
-          for (int iC = 0; iC < nchannel_max; ++iC) {
-            channelId = m_elementNum->channelNumberBKLM(iF, iS + 1, iL + 1, iP, iC + 1);
-            iSub = int(m_elementNum->isEKLMChannel(channelId));
-            if (m_cFlag.find(channelId) == m_cFlag.end()) continue;
-            if (!m_cFlag[channelId]) continue;
-            if (h_timeFSLPC_tc[iF][iS][iL][iP][iC]->GetEntries() < m_lower_limit_counts) continue;
-            h_timeFSLPC_tc[iF][iS][iL][iP][iC]->Fit(fcn_land, "LSM");
-            double tmpMean_channel = fcn_land->GetParameter(1);
-            m_timeShift[channelId] = tmpMean_channel - tmpMean_rpc_global;
-          }
-        }
-      }
-    }
-    int maxLayer = 12 + iF * 2;
-    for (int iS = 0; iS < 4; ++iS) {
-      for (int iP = 0; iP < 2; ++iP) {
-        for (int iC = 0; iC < 75; ++iC) {
-          for (int iL = 0; iL < maxLayer; ++iL) {
-            channelId = m_elementNum->channelNumberEKLM(iF, iS + 1, iL + 1, iP, iC + 1);
-            iSub = int(m_elementNum->isEKLMChannel(channelId));
-            if (m_cFlag.find(channelId) == m_cFlag.end()) continue;
-            if (!m_cFlag[channelId]) continue;
+  for (KLMChannelIndex bklmChannel = m_klmChannels.beginBKLM(); bklmChannel != m_klmChannels.endBKLM(); ++bklmChannel) {
+    int iF = bklmChannel.getSection();
+    int iS = bklmChannel.getSector() - 1;
+    int iL = bklmChannel.getLayer() - 1;
+    int iP = bklmChannel.getPlane();
+    int iC = bklmChannel.getStrip() - 1;
 
-            if (h_timeFSLPC_tc_end[iF][iS][iL][iP][iC]->GetEntries() < m_lower_limit_counts) continue;
-            h_timeFSLPC_tc_end[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LSM");
-            double tmpMean_channel = fcn_gaus->GetParameter(1);
-            m_timeShift[channelId] = tmpMean_channel - tmpMean_scint_global_end;
-          }
-        }
-      }
+    channelId = m_elementNum->channelNumberBKLM(iF, iS + 1, iL + 1, iP, iC + 1);
+    if (m_cFlag.find(channelId) == m_cFlag.end()) continue;
+    if (!m_cFlag[channelId]) continue;
+    if (h_timeFSLPC_tc[iF][iS][iL][iP][iC]->GetEntries() < m_lower_limit_counts) continue;
+    h_timeFSLPC_tc[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LSM");
+    double tmpMean_channel = fcn_gaus->GetParameter(1);
+    if (iL < 2) {
+      m_timeShift[channelId] = tmpMean_channel - tmpMean_scint_global;
+    } else {
+      m_timeShift[channelId] = tmpMean_channel - tmpMean_rpc_global;
     }
   }
+  for (KLMChannelIndex eklmChannel = m_klmChannels.beginEKLM(); eklmChannel != m_klmChannels.endEKLM(); ++eklmChannel) {
+    int iF = eklmChannel.getSection();
+    int iS = eklmChannel.getSector() - 1;
+    int iL = eklmChannel.getLayer() - 1;
+    int iP = eklmChannel.getPlane();
+    int iC = eklmChannel.getStrip() - 1;
 
+    channelId = m_elementNum->channelNumberEKLM(iF, iS + 1, iL + 1, iP, iC + 1);
+    if (m_cFlag.find(channelId) == m_cFlag.end()) continue;
+    if (!m_cFlag[channelId]) continue;
+
+    if (h_timeFSLPC_tc_end[iF][iS][iL][iP][iC]->GetEntries() < m_lower_limit_counts) continue;
+    h_timeFSLPC_tc_end[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LSM");
+    double tmpMean_channel = fcn_gaus->GetParameter(1);
+    m_timeShift[channelId] = tmpMean_channel - tmpMean_scint_global_end;
+  }
 
   delete h_time_scint_tc;
   delete h_time_scint_tc_end;
@@ -616,6 +601,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     if (!m_cFlag[channelId]) continue;
     if (m_timeShift.find(channelId) == m_timeShift.end()) continue;
     m_evtsChannel = it_m->second;
+    int iSub, iFor, iSec, iLay, iPla, iStr;
     m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
 
     for (it_v = m_evtsChannel.begin(); it_v != m_evtsChannel.end(); ++it_v) {
@@ -717,12 +703,11 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   for (it_m = m_evts.begin(); it_m != m_evts.end(); ++it_m) {
     channelId = it_m->first;
     if (!m_cFlag[channelId]) continue;
-    m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
-    int iF = iFor;
-    int iS = iSec - 1;
-    int iL = iLay - 1;
-    int iP = iPla;
-    int iC = iStr - 1;
+    int iF, iS, iL, iP, iC, iSub;
+    m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iF, &iS, &iL, &iP, &iC);
+    iS = iS - 1;
+    iL = iL - 1;
+    iC = iC - 1;
     m_evtsChannel = it_m->second;
 
     if (m_elementNum->isBKLMChannel(channelId)) {
@@ -777,73 +762,54 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
   int iChannel_rpc = 0;
   int iChannel = 0;
+  for (KLMChannelIndex bklmChannel = m_klmChannels.beginBKLM(); bklmChannel != m_klmChannels.endBKLM(); ++bklmChannel) {
+    int iF = bklmChannel.getSection();
+    int iS = bklmChannel.getSector() - 1;
+    int iL = bklmChannel.getLayer() - 1;
+    int iP = bklmChannel.getPlane();
+    int iC = bklmChannel.getStrip() - 1;
+
+    channelId = m_elementNum->channelNumberBKLM(iF, iS + 1, iL + 1, iP, iC + 1);
+    if (m_evts.find(channelId) == m_evts.end()) continue;
+    if (h_timeFSLPC[iF][iS][iL][iP][iC]->GetEntries() < m_lower_limit_counts) continue;
+
+    TFitResultPtr r = h_timeFSLPC[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LSM");
+    TFitResult& ftr = *r;
+    if (ftr.IsValid()) m_cFlag[channelId] = 2;
+    m_time_channel[channelId] = fcn_gaus->GetParameter(1);
+    m_etime_channel[channelId] = fcn_gaus->GetParError(1);
+
+    if (iL > 1) {
+      gre_time_channel_scint->SetPoint(iChannel, channelId, m_time_channel[channelId]);
+      gre_time_channel_scint->SetPointError(iChannel, 0., m_etime_channel[channelId]);
+      iChannel++;
+    } else {
+      gre_time_channel_rpc->SetPoint(iChannel_rpc, channelId, m_time_channel[channelId]);
+      gre_time_channel_rpc->SetPointError(iChannel_rpc, 0., m_etime_channel[channelId]);
+      iChannel_rpc++;
+    }
+  }
   int iChannel_end = 0;
-  for (int iF = 0; iF < 2; ++iF) {
-    for (int iS = 0; iS < 8; ++iS) {
-      for (int iL = 0; iL < 2; ++iL) {
-        for (int iP = 0; iP < 2; ++iP) {
-          int nchannel_max = BKLMElementNumbers::getNStrips(iF, iS + 1, iL + 1, iP);
-          for (int iC = 0; iC < nchannel_max; ++iC) {
-            channelId = m_elementNum->channelNumberBKLM(iF, iS + 1, iL + 1, iP, iC + 1);
-            if (m_evts.find(channelId) == m_evts.end()) continue;
-            if (h_timeFSLPC[iF][iS][iL][iP][iC]->GetEntries() < m_lower_limit_counts) continue;
+  for (KLMChannelIndex eklmChannel = m_klmChannels.beginEKLM(); eklmChannel != m_klmChannels.endEKLM(); ++eklmChannel) {
+    int iF = eklmChannel.getSection();
+    int iS = eklmChannel.getSector() - 1;
+    int iL = eklmChannel.getLayer() - 1;
+    int iP = eklmChannel.getPlane();
+    int iC = eklmChannel.getStrip() - 1;
 
-            TFitResultPtr r = h_timeFSLPC[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LSM");
-            TFitResult& ftr = *r;
-            if (ftr.IsValid()) m_cFlag[channelId] = 2;
-            m_time_channel[channelId] = fcn_gaus->GetParameter(1);
-            m_etime_channel[channelId] = fcn_gaus->GetParError(1);
+    channelId = m_elementNum->channelNumberEKLM(iF, iS + 1, iL + 1, iP, iC + 1);
+    if (m_evts.find(channelId) == m_evts.end()) continue;
+    if (h_timeFSLPC_end[iF][iS][iL][iP][iC]->GetEntries() < m_lower_limit_counts) continue;
 
-            gre_time_channel_scint->SetPoint(iChannel, channelId, m_time_channel[channelId]);
-            gre_time_channel_scint->SetPointError(iChannel, 0., m_etime_channel[channelId]);
-            iChannel++;
-          }
-        }
-      }
-      for (int iL = 2; iL < 15; ++iL) {
-        for (int iP = 0; iP < 2; ++iP) {
-          int nchannel_max = BKLMElementNumbers::getNStrips(iF, iS + 1, iL + 1, iP);
-          for (int iC = 0; iC < nchannel_max; ++iC) {
-            channelId = m_elementNum->channelNumberBKLM(iF, iS + 1, iL + 1, iP, iC + 1);
-            if (m_evts.find(channelId) == m_evts.end()) continue;
-            if (h_timeFSLPC[iF][iS][iL][iP][iC]->GetEntries() < m_lower_limit_counts) continue;
+    TFitResultPtr r = h_timeFSLPC_end[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LSM");
+    TFitResult& ftr = *r;
+    if (ftr.IsValid()) m_cFlag[channelId] = 2;
+    m_time_channel[channelId] = fcn_gaus->GetParameter(1);
+    m_etime_channel[channelId] = fcn_gaus->GetParError(1);
 
-            TFitResultPtr r = h_timeFSLPC[iF][iS][iL][iP][iC]->Fit(fcn_land, "LSM");
-            TFitResult& ftr = *r;
-            if (ftr.IsValid()) m_cFlag[channelId] = 2;
-            m_time_channel[channelId] = fcn_land->GetParameter(1);
-            m_etime_channel[channelId] = fcn_land->GetParError(1);
-
-            gre_time_channel_rpc->SetPoint(iChannel_rpc, channelId, m_time_channel[channelId]);
-            gre_time_channel_rpc->SetPointError(iChannel_rpc, 0., m_etime_channel[channelId]);
-            iChannel_rpc++;
-          }
-        }
-      }
-    }
-    // EKLM part here
-    int maxLayer = 12 + iF * 2;
-    for (int iS = 0; iS < 4; ++iS) {
-      for (int iL = 0; iL < maxLayer; ++iL) {
-        for (int iP = 0; iP < 2; ++iP) {
-          for (int iC = 0; iC < 75; ++iC) {
-            channelId = m_elementNum->channelNumberEKLM(iF, iS + 1, iL + 1, iP, iC + 1);
-            if (m_evts.find(channelId) == m_evts.end()) continue;
-            if (h_timeFSLPC_end[iF][iS][iL][iP][iC]->GetEntries() < m_lower_limit_counts) continue;
-
-            TFitResultPtr r = h_timeFSLPC_end[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LSM");
-            TFitResult& ftr = *r;
-            if (ftr.IsValid()) m_cFlag[channelId] = 2;
-            m_time_channel[channelId] = fcn_gaus->GetParameter(1);
-            m_etime_channel[channelId] = fcn_gaus->GetParError(1);
-
-            gre_time_channel_scint_end->SetPoint(iChannel_end, channelId, m_time_channel[channelId]);
-            gre_time_channel_scint_end->SetPointError(iChannel_end, 0., m_etime_channel[channelId]);
-            iChannel_end++;
-          }
-        }
-      }
-    }
+    gre_time_channel_scint_end->SetPoint(iChannel_end, channelId, m_time_channel[channelId]);
+    gre_time_channel_scint_end->SetPointError(iChannel_end, 0., m_etime_channel[channelId]);
+    iChannel_end++;
   }
 
   gre_time_channel_scint->Fit("fcn_const");
@@ -884,12 +850,11 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     m_timeCableDelay->setTimeShift(channelId, m_timeShift[channelId]);
 
     for (it_v = m_evtsChannel.begin(); it_v != m_evtsChannel.end(); ++it_v) {
-      m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
-      int iF = iFor;
-      int iS = iSec - 1;
-      int iL = iLay - 1;
-      int iP = iPla;
-      int iC = iStr - 1;
+      int iF, iS, iL, iP, iC, iSub;
+      m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iF, &iS, &iL, &iP, &iC);
+      iS = iS - 1;
+      iL = iL - 1;
+      iC = iC - 1;
       double timeHit = it_v->time();
       if (m_useEventT0) timeHit = timeHit - it_v->t0;
 

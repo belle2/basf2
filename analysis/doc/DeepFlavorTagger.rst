@@ -52,7 +52,7 @@ The scheme of the input parameters are shown below:
 The output of the algorithm is the variable ``'DNN_qrCombined'``, which corresponds to the tag-side :math:`B` flavor :math:`q_{\rm DNN}` 
 times the dilution factor :math:`r_{\rm DNN}`. The range of ``'DNN_qrCombined'`` is :math:`[-1, 1]`. 
 The output is close to :math:`-1` if the tag side of an event is likely to be related to a :math:`\bar{B}^0`, 
-and close to :math:`1` if to a :math:`B^0`. The value :math:`0` corresponds to a random decision.
+and close to :math:`1` for a :math:`B^0`. The value :math:`0` corresponds to a random decision.
 
 
 How to use

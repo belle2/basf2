@@ -60,7 +60,7 @@ How to use
 
 The usage of the Deep Flavor Tagger is pretty simple and straight forward.
 
-In your *steering file*, you have first to import the the interface to the Deep Flavor Tagger
+In your *steering file*, you first have to import the interface to the Deep Flavor Tagger
 
 ::
 

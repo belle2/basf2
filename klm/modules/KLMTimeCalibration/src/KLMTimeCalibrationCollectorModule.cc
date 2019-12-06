@@ -47,7 +47,10 @@ using namespace Belle2::EKLM;
 REG_MODULE(KLMTimeCalibrationCollector)
 
 KLMTimeCalibrationCollectorModule::KLMTimeCalibrationCollectorModule() :
-  CalibrationCollectorModule()
+  CalibrationCollectorModule(),
+  m_geoParB(nullptr),
+  m_geoParE(nullptr),
+  m_TransformData(nullptr)
 {
   setDescription("Module for KLM time calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -56,10 +59,7 @@ KLMTimeCalibrationCollectorModule::KLMTimeCalibrationCollectorModule() :
   addParam("inputParticleList", m_inputListName, "input particle list.", std::string("mu:cali"));
   addParam("useEventT0", m_useEvtT0, "Use event T0 or not.", true);
 
-  m_geoParB = GeometryPar::instance();
-  m_geoParE = &(EKLM::GeometryData::Instance());
   m_elementNum = &(KLMElementNumbers::Instance());
-  m_TransformData = new EKLM::TransformData(true, EKLM::TransformData::c_None);
 }
 
 KLMTimeCalibrationCollectorModule::~KLMTimeCalibrationCollectorModule()
@@ -69,6 +69,11 @@ KLMTimeCalibrationCollectorModule::~KLMTimeCalibrationCollectorModule()
 void KLMTimeCalibrationCollectorModule::prepare()
 {
   setDescription("Preparation for BKLM TimeCalibration Collector Module.");
+
+  /* Initialize geometry. */
+  m_geoParB = bklm::GeometryPar::instance();
+  m_geoParE = &(EKLM::GeometryData::Instance());
+  m_TransformData = new EKLM::TransformData(true, EKLM::TransformData::c_None);
 
   /* Require input dataobjects. */
   if (m_useEvtT0) m_eventT0.isRequired("EventT0");

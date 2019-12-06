@@ -12,11 +12,11 @@ from stdPi0s import stdPi0s
 def loadStdXi(fitter='kfitter', BELLE=False, path=None):
     if not BELLE:
         stdLambdas(path=path)
-        # 3.5 MeV Range about the nominal mass
+        # 3.5 MeV Range around the nominal mass
         cutAndCopyList(
             'Lambda0:reco',
             'Lambda0:merged',
-            '[ M > 1.112183 and M < 1.119183 ] and \
+            '[ abs( M - 1.115683 ) < 0.0035 ] and \
     [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
     [ daughter(0,protonID) > 0.01 ] and \
     [ chiProb > 0.0 ]',
@@ -28,7 +28,7 @@ def loadStdXi(fitter='kfitter', BELLE=False, path=None):
         cutAndCopyList(
             'Lambda0:reco',
             'Lambda0:mdst',
-            '[ M > 1.112183 and M < 1.119183 ] and \
+            '[ abs( M - 1.115683 ) < 0.0035 ] and \
    [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
    [ formula( [ x^2 + y^2 ]^[0.5] ) > 0.35 ] and \
    [ daughter(0,atcPIDBelle(4,3)) > 0.2 ] and \
@@ -61,49 +61,49 @@ def loadStdXi(fitter='kfitter', BELLE=False, path=None):
 def loadStdXi0(gammatype='eff40', BELLE=False, path=None):
     if not BELLE:
         stdLambdas(path=path)
-        # 3.5 MeV Range about nominal mass (~7*sigma_core)
+        # 3.5 MeV Range around nominal mass (~7*sigma_core)
         cutAndCopyList(
             'Lambda0:reco',
             'Lambda0:merged',
-            '[ M > 1.112183 and M < 1.119183 ] and \
+            '[ abs( M - 1.115683 ) < 0.0035 ] and \
        [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
        [ daughter(0,protonID) > 0.01 ] and \
        [ chiProb > 0.0 ]',
             True, path=path)
-        # 7*sigma_core Range about nominal mass for sigma_core~7.8MeV
+        # 7*sigma_core Range around nominal mass for sigma_core~7.8MeV
         if gammatype == 'eff60':
             stdPhotons('pi0eff60', path=path)
             reconstructDecay(
                 'pi0:reco -> gamma:pi0eff60 gamma:pi0eff60',
-                '0.08377 < M < 0.189577',
+                'abs( M - 0.134977 ) < 0.0546',
                 True,
                 path=path)
         elif gammatype == 'eff50':
             stdPhotons('pi0eff50', path=path)
             reconstructDecay(
                 'pi0:reco -> gamma:pi0eff50 gamma:pi0eff50',
-                '0.08377 < M < 0.189577',
+                'abs( M - 0.134977 ) < 0.0546',
                 True,
                 path=path)
         elif gammatype == 'eff40':
             stdPhotons('pi0eff40', path=path)
             reconstructDecay(
                 'pi0:reco -> gamma:pi0eff40 gamma:pi0eff40',
-                '0.08377 < M < 0.189577',
+                'abs( M - 0.134977 ) < 0.0546',
                 True,
                 path=path)
         elif gammatype == 'eff30':
             stdPhotons('pi0eff30', path=path)
             reconstructDecay(
                 'pi0:reco -> gamma:pi0eff30 gamma:pi0eff30',
-                '0.08377 < M < 0.189577',
+                'abs( M - 0.134977 ) < 0.0546',
                 True,
                 path=path)
         elif gammatype == 'eff20':
             stdPhotons('pi0eff20', path=path)
             reconstructDecay(
                 'pi0:reco -> gamma:pi0eff20 gamma:pi0eff20',
-                '0.08377 < M < 0.189577',
+                'abs( M - 0.134977 ) < 0.0546',
                 True,
                 path=path)
         else:
@@ -114,7 +114,7 @@ def loadStdXi0(gammatype='eff40', BELLE=False, path=None):
         cutAndCopyList(
             'pi0:reco',
             'pi0:mdst',
-            '[ M > 0.116077 and M < 0.153877 ] and \
+            '[ abs( M - 0.134977 ) < 0.0189 ] and \
    [ [ daughter(0,clusterReg) == 1 and daughter(0,E) > 0.05 ] or [ daughter(0,clusterReg) == 3 and daughter(0,E) > 0.05 ]  or \
    [ daughter(0,clusterReg) == 2 and  daughter(0,E) > 0.03 ] ] and \
    [ [ daughter(1,clusterReg) == 1 and daughter(1,E) > 0.05 ] or [ daughter(1,clusterReg) == 3 and daughter(1,E) > 0.05 ]  or \
@@ -124,7 +124,7 @@ def loadStdXi0(gammatype='eff40', BELLE=False, path=None):
         cutAndCopyList(
             'Lambda0:reco',
             'Lambda0:mdst',
-            '[ M > 1.112183 and M < 1.119183 ] and \
+            '[ abs( M - 1.115683 ) < 0.0035 ] and \
    [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
    [ formula( [ x^2 + y^2 ]^[0.5] ) > 0.35 ] and \
    [ daughter(0,atcPIDBelle(4,3)) > 0.2 ] and \
@@ -138,7 +138,7 @@ def loadStdXi0(gammatype='eff40', BELLE=False, path=None):
         path=path,
         ignoreIfTooManyCandidates=False)
     vertexTree('Xi0:prelim', conf_level=0.0, massConstraint=[3122], ipConstraint=True, updateAllDaughters=True, path=path)
-    # Reconstructed core resolution pi0~7.8 MeV selecting 3*sigma_core about the nominal mass
+    # Reconstructed core resolution pi0~7.8 MeV selecting 3*sigma_core around the nominal mass
     # pi0 mass range is invariant for BELLE=True, tighter selection is required by user
     applyCuts('Xi0:prelim', '[ daughter(1,M) > 0.111577 and daughter(1,M) < 0.158377 ]', path=path)
     vertexTree('Xi0:prelim', conf_level=0.0, massConstraint=[111, 3122], ipConstraint=True, updateAllDaughters=False, path=path)
@@ -160,11 +160,11 @@ def loadStdXi0(gammatype='eff40', BELLE=False, path=None):
 def loadStdOmega(fitter='kfitter', BELLE=False, path=None):
     if not BELLE:
         stdLambdas(path=path)
-        # 3.5 MeV Range about the nominal mass
+        # 3.5 MeV Range around the nominal mass
         cutAndCopyList(
             'Lambda0:reco',
             'Lambda0:merged',
-            '[ M > 1.112183 and M < 1.119183 ] and \
+            '[ abs( M - 1.115683 ) < 0.0035 ] and \
     [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
     [ daughter(0,protonID) > 0.01 ] and \
     [ chiProb > 0.0 ]',
@@ -176,7 +176,7 @@ def loadStdOmega(fitter='kfitter', BELLE=False, path=None):
         cutAndCopyList(
             'Lambda0:reco',
             'Lambda0:mdst',
-            '[ M > 1.112183 and M < 1.119183 ] and \
+            '[ abs( M - 1.115683 ) < 0.0035 ] and \
    [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
    [ formula( [ x^2 + y^2 ]^[0.5] ) > 0.35 ] and \
    [ daughter(0,atcPIDBelle(4,3)) > 0.2 ] and \
@@ -250,35 +250,35 @@ def goodXi(xitype='loose', path=None):
 
 def goodXi0(xitype='loose', path=None):
     if xitype == 'veryloose':
-        # Reconstructed core resolution pi0~7.8 MeV, cut at 3*sigma_core about the nomin"al mass
+        # Reconstructed core resolution pi0~7.8 MeV, cut at 3*sigma_core around the nomin"al mass
         cutAndCopyList(
             'Xi0:veryloose',
             'Xi0:std',
             '[ daughter(1,p) > 0.150 ] and \
          [ formula( [ x^2 + y^2 + z^2 ]^[0.5] ) > 0.25 ] and \
-         [ daughter(1,M) > 0.111577 and daughter(1,M) < 0.158377 ]',
+         [ abs( daughter(1,M) - 0.134977 ) < 0.0234 ]',
             True,
             path=path)
 
     elif xitype == 'loose':
-        # Reconstructed core resolution pi0~7.8 MeV, cut at 3*sigma_core about the nominal mass
+        # Reconstructed core resolution pi0~7.8 MeV, cut at 3*sigma_core around the nominal mass
         cutAndCopyList(
             'Xi0:loose',
             'Xi0:std',
             '[ daughter(1,p) > 0.150 ] and \
          [ formula( [ x^2 + y^2 + z^2 ]^[0.5] ) > 1.5 ] and \
-         [ daughter(1,M) > 0.111577 and daughter(1,M) < 0.158377 ]',
+         [ abs( daughter(1,M) - 0.134977 ) < 0.0234 ]',
             True,
             path=path)
 
     elif xitype == 'tight':
-        # Reconstructed core resolution pi0~7.8 MeV, cut at 2*sigma_core about the nominal mass
+        # Reconstructed core resolution pi0~7.8 MeV, cut at 2*sigma_core around the nominal mass
         cutAndCopyList(
             'Xi0:tight',
             'Xi0:std',
             '[ daughter(1,p) > 0.150 ] and \
          [ formula( [ x^2 + y^2 + z^2 ]^[0.5] ) > 1.5 ] and \
-         [ daughter(1,M) > 0.119377 and daughter(1,M) < 0.150577 ]',
+         [ abs( daughter(1,M) - 0.134977 ) < 0.0156 ]',
             True,
             path=path)
 

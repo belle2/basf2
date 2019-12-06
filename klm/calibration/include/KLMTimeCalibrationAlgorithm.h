@@ -215,9 +215,9 @@ namespace Belle2 {
     TProfile* hprf_scint_phi_effC;
     /** For BKLM scintillator z plane */
     TProfile* hprf_scint_z_effC;
-    /** For EKLM scintillator phi plane */
+    /** For EKLM scintillator plane1 */
     TProfile* hprf_scint_plane1_effC_end;
-    /** For EKLM scintillator z plane */
+    /** For EKLM scintillator plane2 */
     TProfile* hprf_scint_plane2_effC_end;
 
     /** Histograms of Global time distribution used for effected light speed estimation **/

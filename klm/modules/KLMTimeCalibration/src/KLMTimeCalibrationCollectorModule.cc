@@ -50,7 +50,21 @@ KLMTimeCalibrationCollectorModule::KLMTimeCalibrationCollectorModule() :
   CalibrationCollectorModule(),
   m_geoParB(nullptr),
   m_geoParE(nullptr),
-  m_TransformData(nullptr)
+  m_TransformData(nullptr),
+  m_HeventT0_0(nullptr),
+  m_HeventT0_1(nullptr),
+  m_HnumTrack(nullptr),
+  m_HnBHit2dOfTrack(nullptr),
+  m_HnEHit2dOfTrack(nullptr),
+  m_HpositionXDiff(nullptr),
+  m_HpositionYDiff(nullptr),
+  m_HpositionZDiff(nullptr),
+  m_HflyTimeB(nullptr),
+  m_HflyTimeE(nullptr),
+  m_HnumDigit_scint_end(nullptr),
+  m_HnumDigit_scint(nullptr),
+  m_HnumDigit_rpc(nullptr),
+  m_outTree(nullptr)
 {
   setDescription("Module for KLM time calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);

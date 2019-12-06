@@ -147,7 +147,7 @@ namespace Belle2 {
     /**
      * Class definition required for creation of ROOT dictionary.
      */
-    ClassDefOverride(BackgroundMetaData, 3);
+    ClassDefOverride(BackgroundMetaData, 4); /** 4: moved over enum BG_TAG from SimHitBase */
   };
 }
 

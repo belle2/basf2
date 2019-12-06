@@ -36,7 +36,6 @@
 
 // MetaData
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/dataobjects/BackgroundMetaData.h>
 #include <framework/dataobjects/BackgroundInfo.h>
 
 // Root

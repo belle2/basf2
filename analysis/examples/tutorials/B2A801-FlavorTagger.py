@@ -162,7 +162,7 @@ ft.flavorTagger(
 #
 # Another possibility is to train a combiner for a specific category combination using the default weight files
 #
-# Attention: to train the flavor tagger you need MC samples generated withou CP violation!
+# Attention: to train the flavor tagger you need MC samples generated without built-in CP violation!
 # The best sample for this is B0-> nu_tau anti-nu_tau .
 # You can apply cuts using the flavor Tagger: qrOutput(FBDT) > -2 rejects all events which do not
 # provide flavor information using the tag side

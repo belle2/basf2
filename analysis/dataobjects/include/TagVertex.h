@@ -3,7 +3,7 @@
  * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi, Stefano Lacaprara                         *
+ * Contributors: Luigi Li Gioi, Stefano Lacaprara, Thibaud Humair         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,7 +19,7 @@
 // DataObjects
 // #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <analysis/dataobjects/DistanceTools.h>
+#include <analysis/utility/DistanceTools.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 namespace Belle2 {

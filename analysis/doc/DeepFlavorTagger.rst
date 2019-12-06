@@ -106,7 +106,7 @@ To use on Belle data or MC with ``b2bii``, you need a special identifier and a s
         'chiProb',
     ]
 
-    DeepFlavorTagger(..., uniqueIdentifier='FlavorTagger_Belle2_B2nunubarBGx1DNN_1', 
+    DeepFlavorTagger(..., uniqueIdentifier=BELLE_IDENTIFIER, 
                           variable_list=BELLE_FLAVOR_TAG_VARIABLES)
 
 Studies have shown, that we can reduce a certain kind of bias, by applying additional rest of event cuts, you can do

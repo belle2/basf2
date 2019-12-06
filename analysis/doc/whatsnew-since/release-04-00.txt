@@ -2,19 +2,13 @@ Changes in the analysis package
 -------------------------------
 
 Scripts
-+++++++++
++++++++
  
  * Added stdHyperons.py, this analysis script reconstructions the standard hyperons Xi-, Xi0, and Omega-.
-  .. These reconstructions are made using the steering functions stdXi(fitter, b2bii), stdXi0(gammtype, b2bii), and stdOmega(kitter, b2bii).
-  .. The user can select which fitter option  ['kfitter' or 'treefitter'] reconstructions stdXi and stdOmega in their analysis.
-  .. The user can select by a boolean option b2bii whether this is a Belle or Belle II reconstruction.
-  .. When reconstructing stdXi0, the user can select which gamma:pi0effxx is used to reconstruct Xi0 candidates 
-  .. using gammatype ['eff60', 'eff50', 'eff40', 'eff30', or 'eff20'] options
-  ..
-  .. Preliminary good candidates are available to the user after running stdXi(), stdXi0(), or stdOmega().
-  .. These good selections are available by running goodXi(xitype), goodXi0(xitype), and goodOmega(omegatype).
-  .. The good steering functions allow argument types ['veryloose', 'loose', or 'tight'] to the user.
-  .. All documentation for this optimization and usage is found at BELLE2-NOTE-PH-2019-011
+  .. New functions include `stdXi`, `stdXi0`, `stdOmega`, `goodXi`, `goodXi0`, and `goodOmega`
+  .. All documentation for this optimization and usage is found at 
+  .. `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/1337/files/BELLE2-NOTE-PH-2019-011.pdf>`_BELLE2-NOTE-PH-2019-011
+
 
 Variables
 +++++++++

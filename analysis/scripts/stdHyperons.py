@@ -8,6 +8,20 @@ from stdV0s import *
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
 
+# Information:
+#
+# These reconstructions are made using the steering functions
+# stdXi(fitter, b2bii), stdXi0(gammtype, b2bii), and stdOmega(kitter, b2bii).
+# The user can select which fitter option  ['kfitter' or 'treefitter'] reconstructions stdXi and stdOmega in their analysis.
+# The user can select by a boolean option b2bii whether this is a Belle or Belle II reconstruction.
+# When reconstructing stdXi0, the user can select which gamma:pi0effxx is used to reconstruct Xi0 candidates
+# using gammatype ['eff60', 'eff50', 'eff40', 'eff30', or 'eff20'] options
+#
+# Preliminary good candidates are available to the user after running stdXi(), stdXi0(), or stdOmega().
+# These good selections are available by running goodXi(xitype), goodXi0(xitype), and goodOmega(omegatype).
+# The good steering functions allow argument types ['veryloose', 'loose', or 'tight'] to the user.
+# All documentation for this optimization and usage is found at BELLE2-NOTE-PH-2019-011
+
 
 def stdXi(fitter='kfitter', b2bii=False, path=None):
     if not b2bii:
@@ -71,8 +85,8 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
        [ chiProb > 0.0 ]',
             True, path=path)
         # 7*sigma_core Range around nominal mass for sigma_core~7.8MeV
-        stdPhotons('pi0' + gammatype, path=path)
-        reconstructDecay('pi0:reco -> gamma:pi0' + gammatype ' gamma:pi0' + gammatype,
+        stdPhotons(f'pi0{gammatype}', path=path)
+        reconstructDecay(f'pi0:reco -> gamma:pi0{gammatype} gamma:pi0{gammatype}',
                          'abs( M - 0.134977 ) < 0.0546',
                          True, path=path)
 

@@ -186,16 +186,7 @@ namespace Belle2 {
     /** Debug mode. */
     bool m_debug;
 
-    /** calibration for scintilltors only */
-    bool m_onlySci;
-
-    /** calibration for RPCs only */
-    bool m_onlyRpc;
-
-    /** Method Choice Fit or Simple Mean **/
-    bool m_fitted;
-
-    /** if MC **/
+    /** MC or data. */
     bool m_mc;
 
     /** if use event T0 from CDC **/

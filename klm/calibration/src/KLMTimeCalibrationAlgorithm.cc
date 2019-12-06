@@ -19,6 +19,7 @@
 /* Belle2 headers. */
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
+#include <framework/core/Environment.h>
 
 /* External headers. */
 #include <TFile.h>
@@ -37,10 +38,12 @@ KLMTimeCalibrationAlgorithm::KLMTimeCalibrationAlgorithm() :
   CalibrationAlgorithm("KLMTimeCalibrationCollector")
 {
   m_debug = false;
-  m_mc = false;
   m_useEventT0 = true;
   m_lower_limit_counts = 50;
+
+  m_mc = Environment::Instance().isMC();
   m_elementNum = &(KLMElementNumbers::Instance());
+
   m_time_channelAvg_rpc = 0.0;
   m_etime_channelAvg_rpc = 0.0;
   m_time_channelAvg_scint = 0.0;

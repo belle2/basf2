@@ -23,5 +23,7 @@ namespace Belle2 {
 
     /// Raise an exception if called - there should never be any incoming message
     void handleIncomingData();
+    /// Return the connection string
+    std::string getEndPoint() const { return ""; }
   };
 }

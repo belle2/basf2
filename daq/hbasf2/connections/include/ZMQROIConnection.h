@@ -40,7 +40,8 @@ namespace Belle2 {
     bool isReady() const final;
     /// Copy the functionality from the raw output
     std::vector<zmq::socket_t*> getSockets() const final;
-
+    /// Return the connection string
+    std::string getEndPoint() const { return m_rawOutput.getEndPoint(); }
   private:
     /// Size of the header in bytes
     static constexpr const unsigned int HEADER_SIZE = sizeof(struct h2m_header_t);
@@ -83,7 +84,8 @@ namespace Belle2 {
     bool isReady() const final;
     /// Return both sockets for polling
     std::vector<zmq::socket_t*> getSockets() const final;
-
+    /// Return the connection string
+    std::string getEndPoint() const { return m_dataOutput.getEndPoint() + ";" + m_roiOutput.getEndPoint(); }
   private:
     /// The used raw connection
     ZMQRawOutput m_dataOutput;

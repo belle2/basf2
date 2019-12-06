@@ -49,8 +49,8 @@ The scheme of the input parameters are shown below:
   :align: center
 
 
-The output of the algorithm is the variable ``DNN_qrCombined``, which corresponds to the tag-side :math:`B` flavor :math:`q_{\rm DNN}` 
-times the dilution factor :math:`r_{\rm DNN}`. The range of ``DNN_qrCombined`` is :math:`[-1, 1]`. 
+The output of the algorithm is the variable ``'DNN_qrCombined'``, which corresponds to the tag-side :math:`B` flavor :math:`q_{\rm DNN}` 
+times the dilution factor :math:`r_{\rm DNN}`. The range of ``'DNN_qrCombined'`` is :math:`[-1, 1]`. 
 The output is close to :math:`-1` if the tag side of an event is likely to be related to a :math:`\bar{B}^0`, 
 and close to :math:`1` if to a :math:`B^0`. The value :math:`0` corresponds to a random decision.
 
@@ -66,7 +66,7 @@ In your *steering file*, you have first to import the the interface to the Deep 
 
     from dft.DeepFlavorTagger import DeepFlavorTagger
 
-After reconstructing your signal :math:`B` meson , make sure that you build the rest of event:
+After reconstructing your signal :math:`B` meson, make sure that you build the rest of event:
 
 ::
 
@@ -77,9 +77,7 @@ To use the Deep Flavor Tagger with basic functionality on Belle II data or MC, u
 ::
 
     DeepFlavorTagger('B0:sig',
-                     mode='expert',
                      uniqueIdentifier='FlavorTagger_Belle2_B2nunubarBGx1DNN_1',
-                     output_variable='network_output',
                      path=path)
 
 .. note::
@@ -87,7 +85,7 @@ To use the Deep Flavor Tagger with basic functionality on Belle II data or MC, u
     ``FlavorTagger_Belle2_B2nunubarBGx1DNN_1.xml``
 
 
-To use on Belle data or MC with ``b2bii`` you need a special identifier and a different set of variables:
+To use on Belle data or MC with ``b2bii``, you need a special identifier and a special set of variables:
 
 ::
 
@@ -119,17 +117,16 @@ this with the following argument. You can basically treat this like cuts in an R
     DeepFlavorTagger(..., additional_roe_filter='dr < 2 and abs(dz) < 4')
 
 
-The output variable will be available as extra info to the signal particle list ``'B0:sig'`` and can for example be
-written out with the following command. It is probably also helpful for MC studies, to write out the MC truth of the
-tag side.
+Finally, do not forget to save the output variable ``'DNN_qrCombined'`` into your ntuples.
+It is probably also helpful for MC studies, to write out the MC truth flavor of the
+tag side ``'mcFlavorOfOtherB'``.
 
 
-Finally, do not forget to save the output variable into your ntuples.
 
 ::
 
     ma.variablesToNtuple(decayString='B0:sig',
-                         variables=['mcFlavorOfOtherB', 'DNN_qrCombined'],
+                         variables=['DNN_qrCombined', 'mcFlavorOfOtherB'],
                          path=path)
 
 

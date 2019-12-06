@@ -31,7 +31,6 @@ import vertex as vx
 import variables.collections as vc
 import variables.utils as vu
 
-b2.conditions.disable_globaltag_replay()
 
 # create path
 cp_val_path = b2.Path()

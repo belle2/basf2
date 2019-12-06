@@ -102,7 +102,7 @@
 [INFO] Number of ParticleLists studied 1 
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] Conditions data: configured globaltag is master_2018-12-24
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================

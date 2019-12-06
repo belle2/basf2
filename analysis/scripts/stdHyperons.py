@@ -58,7 +58,7 @@ def stdXi(fitter='kfitter', b2bii=False, path=None):
         path=path)
 
 
-def stdXi0(gammatype='eff40', b2bii=False, path=None):
+def stdXi0(gammatype='pi0eff40', b2bii=False, path=None):
     if not b2bii:
         stdLambdas(path=path)
         # 3.5 MeV Range around nominal mass (~7*sigma_core)
@@ -71,43 +71,26 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
        [ chiProb > 0.0 ]',
             True, path=path)
         # 7*sigma_core Range around nominal mass for sigma_core~7.8MeV
-        if gammatype == 'eff60':
-            stdPhotons('pi0eff60', path=path)
-            reconstructDecay(
-                'pi0:reco -> gamma:pi0eff60 gamma:pi0eff60',
-                'abs( M - 0.134977 ) < 0.0546',
-                True,
-                path=path)
-        elif gammatype == 'eff50':
-            stdPhotons('pi0eff50', path=path)
-            reconstructDecay(
-                'pi0:reco -> gamma:pi0eff50 gamma:pi0eff50',
-                'abs( M - 0.134977 ) < 0.0546',
-                True,
-                path=path)
-        elif gammatype == 'eff40':
-            stdPhotons('pi0eff40', path=path)
-            reconstructDecay(
-                'pi0:reco -> gamma:pi0eff40 gamma:pi0eff40',
-                'abs( M - 0.134977 ) < 0.0546',
-                True,
-                path=path)
-        elif gammatype == 'eff30':
-            stdPhotons('pi0eff30', path=path)
-            reconstructDecay(
-                'pi0:reco -> gamma:pi0eff30 gamma:pi0eff30',
-                'abs( M - 0.134977 ) < 0.0546',
-                True,
-                path=path)
-        elif gammatype == 'eff20':
-            stdPhotons('pi0eff20', path=path)
-            reconstructDecay(
-                'pi0:reco -> gamma:pi0eff20 gamma:pi0eff20',
-                'abs( M - 0.134977 ) < 0.0546',
-                True,
-                path=path)
+        stdPhotons(gammatype, path=path)
+        if gammatype == 'pi0eff60':
+            copyList('gamma:select', 'gamma:pi0eff60', path=path)
+        elif gammatype == 'pi0eff50':
+            copyList('gamma:select', 'gamma:pi0eff50', path=path)
+        elif gammatype == 'pi0eff40':
+            copyList('gamma:select', 'gamma:pi0eff40', path=path)
+        elif gammatype == 'pi0eff30':
+            copyList('gamma:select', 'gamma:pi0eff30', path=path)
+        elif gammatype == 'pi0eff20':
+            copyList('gamma:select', 'gamma:pi0eff20', path=path)
         else:
+            print("WARNING: Please select gammatype == pi0effxx")
             return
+
+        reconstructDecay(
+            'pi0:reco -> gamma:select gamma:select',
+            'abs( M - 0.134977 ) < 0.0546',
+            True,
+            path=path)
 
     elif b2bii:
         # Rough pi0/Lambda0 cuts from J. Yelton Observations of an Excited Omega- Baryon

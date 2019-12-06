@@ -99,7 +99,7 @@ ma.matchMCTruth(list_name='B0:sig', path=cp_val_path)
 ma.buildRestOfEvent(target_list_name='B0:sig',
                     path=cp_val_path)
 
-# Temporary we use the analysis GT with the flavor tagger payloads for release-03-00-02.
+# Temporary we use the analysis GT with the flavor tagger payloads for release-03-02-00.
 # This will NOT be needed aonce we retrain with MC13!
 
 b2.conditions.append_globaltag("analysis_tools_release-03-02-00")

@@ -9,8 +9,8 @@ from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
 
 
-def loadStdXi(fitter='kfitter', BELLE=False, path=None):
-    if not BELLE:
+def stdXi(fitter='kfitter', b2bii=False, path=None):
+    if not b2bii:
         stdLambdas(path=path)
         # 3.5 MeV Range around the nominal mass
         cutAndCopyList(
@@ -21,7 +21,7 @@ def loadStdXi(fitter='kfitter', BELLE=False, path=None):
     [ daughter(0,protonID) > 0.01 ] and \
     [ chiProb > 0.0 ]',
             True, path=path)
-    elif BELLE:
+    elif b2bii:
         stdPi('all', path=path)
         # Rough Lambda0 cuts from J. Yelton Observations of an Excited Omega- Baryon
         vertexKFit('Lambda0:mdst', conf_level=0.0, path=path)  # Re-vertexing, recover vertex variables and error matrix
@@ -44,6 +44,8 @@ def loadStdXi(fitter='kfitter', BELLE=False, path=None):
     elif fitter == 'treefitter':
         reconstructDecay('Xi-:reco -> Lambda0:reco pi-:all', '1.295 < M < 1.35', path=path)
         vertexTree('Xi-:reco', conf_level=0.0, massConstraint=[3122], path=path)
+    else:
+        print("WARNING: fitter == kfitter or fitter == treefitter")
 
     cutAndCopyList(
         'Xi-:std',
@@ -55,11 +57,9 @@ def loadStdXi(fitter='kfitter', BELLE=False, path=None):
         True,
         path=path)
 
-    matchMCTruth('Xi-:std', path=path)
 
-
-def loadStdXi0(gammatype='eff40', BELLE=False, path=None):
-    if not BELLE:
+def stdXi0(gammatype='eff40', b2bii=False, path=None):
+    if not b2bii:
         stdLambdas(path=path)
         # 3.5 MeV Range around nominal mass (~7*sigma_core)
         cutAndCopyList(
@@ -109,7 +109,7 @@ def loadStdXi0(gammatype='eff40', BELLE=False, path=None):
         else:
             return
 
-    elif BELLE:
+    elif b2bii:
         # Rough pi0/Lambda0 cuts from J. Yelton Observations of an Excited Omega- Baryon
         cutAndCopyList(
             'pi0:reco',
@@ -135,11 +135,10 @@ def loadStdXi0(gammatype='eff40', BELLE=False, path=None):
     reconstructDecay(
         'Xi0:prelim -> Lambda0:reco pi0:reco',
         '1.225 < M < 1.405',
-        path=path,
-        ignoreIfTooManyCandidates=False)
+        path=path)
     vertexTree('Xi0:prelim', conf_level=0.0, massConstraint=[3122], ipConstraint=True, updateAllDaughters=True, path=path)
     # Reconstructed core resolution pi0~7.8 MeV selecting 3*sigma_core around the nominal mass
-    # pi0 mass range is invariant for BELLE=True, tighter selection is required by user
+    # pi0 mass range is invariant for b2bii=True, tighter selection is required by user
     applyCuts('Xi0:prelim', '[ daughter(1,M) > 0.111577 and daughter(1,M) < 0.158377 ]', path=path)
     vertexTree('Xi0:prelim', conf_level=0.0, massConstraint=[111, 3122], ipConstraint=True, updateAllDaughters=False, path=path)
 
@@ -154,11 +153,9 @@ def loadStdXi0(gammatype='eff40', BELLE=False, path=None):
         True,
         path=path)
 
-    matchMCTruth('Xi0:std', path=path)
 
-
-def loadStdOmega(fitter='kfitter', BELLE=False, path=None):
-    if not BELLE:
+def stdOmega(fitter='kfitter', b2bii=False, path=None):
+    if not b2bii:
         stdLambdas(path=path)
         # 3.5 MeV Range around the nominal mass
         cutAndCopyList(
@@ -169,7 +166,7 @@ def loadStdOmega(fitter='kfitter', BELLE=False, path=None):
     [ daughter(0,protonID) > 0.01 ] and \
     [ chiProb > 0.0 ]',
             True, path=path)
-    elif BELLE:
+    elif b2bii:
         stdPi('all', path=path)
         # Rough Lambda0 cuts from J. Yelton Observations of an Excited Omega- Baryon
         vertexKFit('Lambda0:mdst', conf_level=0.0, path=path)  # Re-vertexing, recover vertex variables and error matrix
@@ -193,8 +190,10 @@ def loadStdOmega(fitter='kfitter', BELLE=False, path=None):
     elif fitter == 'treefitter':
         reconstructDecay('Omega-:reco -> Lambda0:reco K-:all', '1.622 < M < 1.722', path=path)
         vertexTree('Omega-:reco', conf_level=0.0, massConstraint=[3122], path=path)
+    else:
+        print("WARNING: fitter == kfitter or fitter == treefitter")
 
-    if not BELLE:
+    if not b2bii:
         cutAndCopyList(
             'Omega-:std',
             'Omega-:reco',
@@ -206,7 +205,7 @@ def loadStdOmega(fitter='kfitter', BELLE=False, path=None):
             True,
             path=path)
 
-    elif BELLE:
+    elif b2bii:
         cutAndCopyList(
             'Omega-:std',
             'Omega-:reco',
@@ -217,8 +216,6 @@ def loadStdOmega(fitter='kfitter', BELLE=False, path=None):
        [ daughter(1,atcPIDBelle(3,4)) > 0.2 and daughter(1,atcPIDBelle(3,2)) > 0.2 ]',
             True,
             path=path)
-
-    matchMCTruth('Omega-:std', path=path)
 
 
 def goodXi(xitype='loose', path=None):

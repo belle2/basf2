@@ -3,7 +3,8 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi                                            *
+ * Contributors: Luigi Li Gioi (most of the stuff)                        *
+ *               Thibaud Humair (tube and extra tag track info)           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -107,6 +108,10 @@ namespace Belle2 {
     StoreArray<TagVertex> verArray;
     verArray.registerInDataStore();
     particles.registerRelationTo(verArray);
+    //temporary while the one track fit is broken
+    if (m_trackFindingType == "singleTrack" || m_trackFindingType == "singleTrack_PXD") {
+      B2ERROR("TagVertexModule : the singleTrack option is temporarily broken.");
+    }
   }
 
   void TagVertexModule::beginRun()
@@ -119,7 +124,7 @@ namespace Belle2 {
   {
     StoreObjPtr<ParticleList> plist(m_listName);
     if (!plist) {
-      B2ERROR("ParticleList " << m_listName << " not found");
+      B2ERROR("TagVertexModule: ParticleList " << m_listName << " not found");
       return;
     }
 
@@ -265,7 +270,7 @@ namespace Belle2 {
         && m_constraintType == "IP") ok = findConstraintBoost(cut);
     //tube length here set to 20 * 2 * c tau beta gamma ~= 0.5 cm, should be enough to not bias the decay
     //time but should still help getting rid of some pions from kshorts
-    if (m_constraintType == "tube") ok = findConstraintBTube(Breco, 20 * cut);
+    if (m_constraintType == "tube") ok = findConstraintBTube(Breco, 1000 * cut);
     if (m_constraintType == "boost") ok = findConstraintBoost(cut * 200000.);
     if (m_constraintType == "noConstraint") ok = true;
     if (m_constraintType == "breco") ok = findConstraint(Breco, cut * 2000.);
@@ -291,6 +296,7 @@ namespace Belle2 {
     */
 
     m_FitType = 0;
+
     if (m_trackFindingType == "singleTrack_PXD") {
       ok = getTagTracks_singleTrackAlgorithm(Breco, 1);
       if (ok) {
@@ -317,6 +323,7 @@ namespace Belle2 {
       if (ok) {
         ok = makeGeneralFit();
         m_FitType = 3;
+
       }
     }
     if ((ok == false || m_fitPval < 0.001) || m_trackFindingType == "standard") {
@@ -523,8 +530,8 @@ namespace Belle2 {
       B2DEBUG(10, "Brec direction before fit: " << printVector((1. / Breco->getP()) * Breco->getMomentum()));
       B2DEBUG(10, "Brec direction after fit: " << printVector((1. / tubecreatorBCopy->getP()) * tubecreatorBCopy->getMomentum()));
       B2DEBUG(10, "IP position: " << printVector(m_BeamSpotCenter));
-      B2DEBUG(10, "Brec primary vertex: " << printVector(tubecreatorBCopy->getVertex()));
       B2DEBUG(10, "IP covariance: " << printMatrix(m_BeamSpotCov));
+      B2DEBUG(10, "Brec primary vertex: " << printVector(tubecreatorBCopy->getVertex()));
       B2DEBUG(10, "Brec PV covariance: " << printMatrix(pv));
       B2DEBUG(10, "BTag direction: " << printVector((1. / v4FinalNew.P())*v4FinalNew.Vect()));
       B2DEBUG(10, "BTag direction in CMF: " << printVector((1. / vecNew.P())*vecNew.Vect()));
@@ -603,11 +610,7 @@ namespace Belle2 {
 
     TMatrixDSym beamSpotCov(3);
     beamSpotCov = m_beamSpotDB->getCovVertex();
-    //std::cout<<"beamSpotCov before cut:"<<std::endl;
-    //beamSpotCov.Print();
     beamSpotCov(2, 2) = cut * cut;
-    //std::cout<<"beamSpotCov after cut:"<<std::endl;
-    //beamSpotCov.Print();
     double thetab = boostDir.Theta();
     double phib = boostDir.Phi();
 
@@ -631,9 +634,6 @@ namespace Belle2 {
     TMatrix TubePart(3, 3);  TubePart.Mult(rt, beamSpotCov);
     TMatrix Tube(3, 3); Tube.Mult(TubePart, r);
 
-    //std::cout<<"beamSpotCov after rotation:"<<std::endl;
-    //Tube.Print();
-
     m_constraintCov.ResizeTo(3, 3);
 
     m_constraintCov(0, 0) = Tube(0, 0); m_constraintCov(0, 1) = Tube(0, 1);  m_constraintCov(0, 2) = Tube(0, 2);
@@ -647,9 +647,6 @@ namespace Belle2 {
 
     if (shiftAlongBoost > -1000) {
       float boostAngle = TMath::ATan(float(boostDir[0]) / boostDir[2]); // boost angle with respect from Z
-
-      //double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
-      //m_shiftZ = 4.184436e+02 * bg *  0.0001;   // shift of 120 um (Belle2) in the boost direction
 
       m_constraintCenter = m_BeamSpotCenter +
                            TVector3(shiftAlongBoost * TMath::Sin(boostAngle), 0., shiftAlongBoost * TMath::Cos(boostAngle)); // boost in the XZ plane
@@ -714,8 +711,6 @@ namespace Belle2 {
         }
       }
     }
-
-    //std::cout<<"U: "<<mcPDG<<" "<<nReco<<" ("<<MCTagVert[0]<<"< "<<MCTagVert[1]<<", "<<MCTagVert[2]<<") "<<Breco->getPDGCode()<<std::endl;
 
     m_MCtagV = MCTagVert;
     m_mcPDG = mcPDG;
@@ -1147,7 +1142,6 @@ namespace Belle2 {
 
   bool TagVertexModule::makeGeneralFit()
   {
-
     //prepare container of pointer to tracks
     TrackAndWeight trackAndWeight;
     trackAndWeight.mcParticle = 0;
@@ -1211,7 +1205,6 @@ namespace Belle2 {
     int isGoodFit(-1);
     try {
       isGoodFit = rFit.fit("avf");
-
     } catch (const rave::CheckedFloatException&) {
       B2ERROR("Exception caught in TagVertexModule::makeGeneralFit(): Invalid inputs (nan/inf)?");
       return false;
@@ -1355,8 +1348,8 @@ namespace Belle2 {
 
   bool TagVertexModule::doVertexFitForBTube(Particle* mother)
   {
-    //TMatrixDSym beamSpotCov(3);
-    //beamSpotCov = m_beamSpotDB->getCovVertex();
+    //Here rave is used to find the upsilon(4S) vtx as the intersection
+    //between the mother B trajectory and the beam spot
 
     analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_BeamSpotCov);
 
@@ -1369,6 +1362,8 @@ namespace Belle2 {
     } else {return false;}
     return true;
   }
+
+  //The following functions are just here to help printing stuff
 
   std::string TagVertexModule::printVector(TVector3 const& vec)
   {

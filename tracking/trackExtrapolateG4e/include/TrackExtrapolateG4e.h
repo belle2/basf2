@@ -177,21 +177,6 @@ namespace Belle2 {
     //! Assign the ExtHits collection name before initialization
     void setExtHitsColName(std::string& extHitsColName) { m_ExtHitsColName = &extHitsColName; }
 
-    //! Assign the Muids collection name before initialization
-    void setMuidsColName(std::string& muidsColName) { m_MuidsColName = &muidsColName; }
-
-    //! Assign the MuidHits collection name before initialization
-    void setMuidHitsColName(std::string& muidHitsColName) { m_MuidHitsColName = &muidHitsColName; }
-
-    //! Assign the BKLMHits collection name before initialization
-    void setBKLMHitsColName(std::string& bklmHitsColName) { m_BKLMHitsColName = &bklmHitsColName; }
-
-    //! Assign the EKLMHits collection name before initialization
-    void setEKLMHitsColName(std::string& eklmHitsColName) { m_EKLMHitsColName = &eklmHitsColName; }
-
-    //! Assign the KLMClusters collection name before initialization
-    void setKLMClustersColName(std::string& klmClustersColName) { m_KLMClustersColName = &klmClustersColName; }
-
     //! Assign the ECLClusters collection name before initialization
     void setECLClustersColName(std::string& eclClustersColName) { m_ECLClustersColName = &eclClustersColName; }
 
@@ -367,21 +352,6 @@ namespace Belle2 {
 
     //! Pointer to name of the extHit collection of the extrapolation hits
     std::string* m_ExtHitsColName;
-
-    //! Pointer to name of the muid collection of the muon identification information
-    std::string* m_MuidsColName;
-
-    //! Pointer to name of the muidHit collection of the extrapolation hits
-    std::string* m_MuidHitsColName;
-
-    //! Pointer to name of the BKLM 2D hits collection
-    std::string* m_BKLMHitsColName;
-
-    //! Pointer to name of the EKLM 2D hits collection
-    std::string* m_EKLMHitsColName;
-
-    //! Pointer to name of the KLMCluster collection
-    std::string* m_KLMClustersColName;
 
     //! Pointer to name of the ECLCluster collection
     std::string* m_ECLClustersColName;

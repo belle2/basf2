@@ -37,11 +37,6 @@ MuidModule::MuidModule() :
   m_TracksColName(""),
   m_RecoTracksColName(""),
   m_ExtHitsColName(""),
-  m_MuidsColName(""),
-  m_MuidHitsColName(""),
-  m_BKLMHitsColName(""),
-  m_EKLMHitsColName(""),
-  m_KLMClustersColName(""),
   m_ECLClustersColName(""),
   m_TrackClusterSeparationsColName(""),
   m_MeanDt(0.0),
@@ -68,12 +63,6 @@ MuidModule::MuidModule() :
   addParam("TracksColName", m_TracksColName, "Name of collection holding the reconstructed tracks", string(""));
   addParam("RecoTracksColName", m_RecoTracksColName, "Name of collection holding the reconstructed tracks (RecoTrack)", string(""));
   addParam("ExtHitsColName", m_ExtHitsColName, "Name of collection holding the extHits from the extrapolation", string(""));
-  addParam("MuidsColName", m_MuidsColName, "Name of collection holding the muon identification information from the extrapolation",
-           string(""));
-  addParam("MuidHitsColName", m_MuidHitsColName, "Name of collection holding the muidHits from the extrapolation", string(""));
-  addParam("BKLMHitsColName", m_BKLMHitsColName, "Name of collection holding the reconstructed 2D hits in barrel KLM", string(""));
-  addParam("EKLMHitsColName", m_EKLMHitsColName, "Name of collection holding the reconstructed 2D hits in endcap KLM", string(""));
-  addParam("KLMClustersColName", m_KLMClustersColName, "Name of collection holding the KLMClusters", string(""));
   addParam("ECLClustersColName", m_ECLClustersColName, "Name of collection holding the ECLClusters", string(""));
   addParam("TrackClusterSeparationsColName", m_TrackClusterSeparationsColName,
            "Name of collection holding the TrackClusterSeparations", string(""));
@@ -166,18 +155,11 @@ void MuidModule::initialize()
   m_Extrapolator->setTracksColName(m_TracksColName);
   m_Extrapolator->setRecoTracksColName(m_RecoTracksColName);
   m_Extrapolator->setExtHitsColName(m_ExtHitsColName);
-  m_Extrapolator->setMuidsColName(m_MuidsColName);
-  m_Extrapolator->setMuidHitsColName(m_MuidHitsColName);
-  m_Extrapolator->setBKLMHitsColName(m_BKLMHitsColName);
-  m_Extrapolator->setEKLMHitsColName(m_EKLMHitsColName);
-  m_Extrapolator->setKLMClustersColName(m_KLMClustersColName);
   m_Extrapolator->setECLClustersColName(m_ECLClustersColName);
   m_Extrapolator->setTrackClusterSeparationsColName(m_TrackClusterSeparationsColName);
   m_Extrapolator->initialize(m_MeanDt, m_MaxDt, m_MaxDistSqInVariances, m_MaxKLMTrackClusterDistance,
                              m_MaxECLTrackClusterDistance, m_MinPt, m_MinKE, m_addHitsToRecoTrack, m_Hypotheses);
-
   return;
-
 }
 
 void MuidModule::beginRun()
@@ -187,7 +169,6 @@ void MuidModule::beginRun()
 
 void MuidModule::event()
 {
-  //m_Extrapolator->event(true);
   m_Extrapolator->event(true);
 }
 

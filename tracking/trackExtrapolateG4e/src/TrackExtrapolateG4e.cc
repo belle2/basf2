@@ -98,11 +98,6 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_TracksColName(NULL), // initialized later
   m_RecoTracksColName(NULL), // initialized later
   m_ExtHitsColName(NULL), // initialized later
-  m_MuidsColName(NULL), // initialized later
-  m_MuidHitsColName(NULL), // initialized later
-  m_BKLMHitsColName(NULL), // initialized later
-  m_EKLMHitsColName(NULL), // initialized later
-  m_KLMClustersColName(NULL), // initialized later
   m_ECLClustersColName(NULL), // initialized later
   m_TrackClusterSeparationsColName(NULL), // initialized later
   m_ExtMgr(NULL), // initialized later
@@ -170,7 +165,6 @@ TrackExtrapolateG4e::~TrackExtrapolateG4e()
 void TrackExtrapolateG4e::initialize(double minPt, double minKE,
                                      std::vector<Const::ChargedStable>& hypotheses)
 {
-
   m_ExtInitialized = true;
 
   // Register output and relation arrays
@@ -210,7 +204,6 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
     double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2", 1.20) * CLHEP::cm; // mm
     m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
   }
-
 }
 
 // Initialize for MUID
@@ -219,7 +212,6 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
                                      double minPt, double minKE, bool addHitsToRecoTrack,
                                      std::vector<Const::ChargedStable>& hypotheses)
 {
-
   m_MuidInitialized = true;
   m_addHitsToRecoTrack = addHitsToRecoTrack;
 
@@ -580,11 +572,6 @@ void TrackExtrapolateG4e::identifyMuon(int pdgCode, // signed for charge
     setTracksColName(*m_DefaultName);
     setRecoTracksColName(*m_DefaultName);
     setExtHitsColName(*m_DefaultName);
-    setMuidsColName(*m_DefaultName);
-    setMuidHitsColName(*m_DefaultName);
-    setBKLMHitsColName(*m_DefaultName);
-    setEKLMHitsColName(*m_DefaultName);
-    setKLMClustersColName(*m_DefaultName);
     setECLClustersColName(*m_DefaultName);
     setTrackClusterSeparationsColName(*m_DefaultName);
     m_DefaultHypotheses = new std::vector<Const::ChargedStable>; // not used

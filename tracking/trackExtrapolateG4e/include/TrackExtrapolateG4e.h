@@ -12,6 +12,7 @@
 
 /* Tracking headers. */
 #include <tracking/dataobjects/ExtHit.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
@@ -167,12 +168,6 @@ namespace Belle2 {
 
     //! destructor
     ~TrackExtrapolateG4e();
-
-    //! Assign the Tracks collection name before initialization
-    void setTracksColName(std::string& tracksColName) { m_TracksColName = &tracksColName; }
-
-    //! Assign the RecoTracks collection name before initialization
-    void setRecoTracksColName(std::string& recoTracksColName) { m_RecoTracksColName = &recoTracksColName; }
 
     //! Assign the ExtHits collection name before initialization
     void setExtHitsColName(std::string& extHitsColName) { m_ExtHitsColName = &extHitsColName; }
@@ -343,12 +338,6 @@ namespace Belle2 {
 
     //! Minimum kinetic energy in MeV for extrapolation to continue
     double m_MinKE;
-
-    //! Pointer to name of the Track collection of the reconstructed tracks to be extrapolated
-    std::string* m_TracksColName;
-
-    //! Pointer to name of the RecoTrack collection of the reconstructed tracks to be extrapolated
-    std::string* m_RecoTracksColName;
 
     //! Pointer to name of the extHit collection of the extrapolation hits
     std::string* m_ExtHitsColName;
@@ -522,6 +511,11 @@ namespace Belle2 {
     //! KLM muid likelihoods
     StoreArray<KLMMuidLikelihood> m_klmMuidLikelihoods;
 
+    //! Reco tracks
+    StoreArray<RecoTrack> m_recoTracks;
+
+    //! Tracks
+    StoreArray<Track> m_tracks;
   };
 
 } // end of namespace Belle2

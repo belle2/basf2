@@ -13,7 +13,6 @@
 
 /* Tracking headers. */
 #include <tracking/dataobjects/ExtHit.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
 
 /* Belle 2 headers. */
@@ -95,8 +94,6 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_MaxECLTrackClusterDistance(0.0), // initialized later
   m_MinPt(0.0), // initialized later
   m_MinKE(0.0), // initialized later
-  m_TracksColName(NULL), // initialized later
-  m_RecoTracksColName(NULL), // initialized later
   m_ExtHitsColName(NULL), // initialized later
   m_ECLClustersColName(NULL), // initialized later
   m_TrackClusterSeparationsColName(NULL), // initialized later
@@ -166,13 +163,11 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
 {
   m_ExtInitialized = true;
 
-  // Register output and relation arrays
+  // Define required objects, register the new ones and relations
+  m_tracks.isRequired();
   StoreArray<ExtHit> extHits(*m_ExtHitsColName);
-  StoreArray<Track> tracks(*m_TracksColName);
-  StoreArray<RecoTrack> recoTracks(*m_RecoTracksColName);
   extHits.registerInDataStore();
-  tracks.registerRelationTo(extHits);
-  RecoTrack::registerRequiredRelations(recoTracks);
+  m_tracks.registerRelationTo(extHits);
 
   // Save the magnetic field z component (gauss) at the origin
   m_MagneticField = BFieldManager::getField(B2Vector3D(0, 0, 0)).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
@@ -218,8 +213,8 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_bklmHit2ds.isRequired();
   m_eklmHit2ds.isRequired();
   m_klmClusters.isRequired();
-  StoreArray<Track> tracks(*m_TracksColName);
-  StoreArray<RecoTrack> recoTracks(*m_RecoTracksColName);
+  m_recoTracks.isRequired();
+  m_tracks.isRequired();
   StoreArray<ExtHit> extHits(*m_ExtHitsColName);
   StoreArray<ECLCluster> eclClusters(*m_ECLClustersColName);
   StoreArray<TrackClusterSeparation> trackClusterSeparations(*m_TrackClusterSeparationsColName);
@@ -228,16 +223,16 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_klmMuidHits.registerInDataStore();
   eclClusters.registerInDataStore();
   trackClusterSeparations.registerInDataStore();
-  tracks.registerRelationTo(extHits);
-  tracks.registerRelationTo(m_klmMuidLikelihoods);
-  tracks.registerRelationTo(m_klmMuidHits);
-  tracks.registerRelationTo(m_bklmHit2ds);
-  tracks.registerRelationTo(m_eklmHit2ds);
-  tracks.registerRelationTo(trackClusterSeparations);
-  tracks.registerRelationTo(m_klmClusters);
+  m_tracks.registerRelationTo(extHits);
+  m_tracks.registerRelationTo(m_klmMuidLikelihoods);
+  m_tracks.registerRelationTo(m_klmMuidHits);
+  m_tracks.registerRelationTo(m_bklmHit2ds);
+  m_tracks.registerRelationTo(m_eklmHit2ds);
+  m_tracks.registerRelationTo(trackClusterSeparations);
+  m_tracks.registerRelationTo(m_klmClusters);
   m_klmClusters.registerRelationTo(trackClusterSeparations);
   eclClusters.registerRelationTo(extHits);
-  RecoTrack::registerRequiredRelations(recoTracks);
+  RecoTrack::registerRequiredRelations(m_recoTracks);
 
   // Save the in-time cut's central value and width for valid hits
   m_MeanDt = meanDt;
@@ -399,11 +394,8 @@ void TrackExtrapolateG4e::event(bool byMuid)
   G4ThreeVector directionAtIP, positionG4e, momentumG4e;
   G4ErrorTrajErr covG4e(5); // initialized to zeroes
 
-  StoreArray<Track> tracks(*m_TracksColName);
-
   // Loop over the reconstructed tracks
   // Do extrapolation for each hypothesis of each reconstructed track.
-
   if (byMuid) { // event() called by Muid module
     G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetMuid);
     StoreArray<ECLCluster> eclClusters(*m_ECLClustersColName);
@@ -423,7 +415,7 @@ void TrackExtrapolateG4e::event(bool byMuid)
     }
     // Keep track of (re-)use of BKLMHit2ds
     std::vector<std::map<const Track*, double> > bklmHitUsed(m_bklmHit2ds.getEntries());
-    for (auto& b2track : tracks) {
+    for (auto& b2track : m_tracks) {
       for (const auto& hypothesis : *m_HypothesesMuid) {
         int pdgCode = hypothesis.getPDGCode();
         if (hypothesis == Const::electron || hypothesis == Const::muon) pdgCode = -pdgCode;
@@ -434,7 +426,7 @@ void TrackExtrapolateG4e::event(bool byMuid)
     } // Muid track loop
   } else { // event() called by Ext module
     G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
-    for (auto& b2track : tracks) {
+    for (auto& b2track : m_tracks) {
       for (const auto& hypothesis : *m_HypothesesExt) {
         int pdgCode = hypothesis.getPDGCode();
         if (hypothesis == Const::electron || hypothesis == Const::muon) pdgCode = -pdgCode;
@@ -509,8 +501,6 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
     G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/magField 0.001");
     G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/energyLoss 0.05");
     m_DefaultName = new std::string;
-    setTracksColName(*m_DefaultName);
-    setRecoTracksColName(*m_DefaultName);
     setExtHitsColName(*m_DefaultName);
     m_DefaultHypotheses = new std::vector<Const::ChargedStable>; // not used
     initialize(0.1, 0.002, *m_DefaultHypotheses);
@@ -561,8 +551,6 @@ void TrackExtrapolateG4e::identifyMuon(int pdgCode, // signed for charge
     G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/magField 0.001");
     G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/energyLoss 0.05");
     m_DefaultName = new std::string;
-    setTracksColName(*m_DefaultName);
-    setRecoTracksColName(*m_DefaultName);
     setExtHitsColName(*m_DefaultName);
     setECLClustersColName(*m_DefaultName);
     setTrackClusterSeparationsColName(*m_DefaultName);

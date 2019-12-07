@@ -66,12 +66,6 @@ namespace Belle2 {
     //!  ChargedStable hypotheses
     std::vector<Const::ChargedStable> m_Hypotheses;
 
-    //! Name of the Track collection of the reconstructed tracks to be extrapolated
-    std::string m_TracksColName;
-
-    //! Name of the RecoTrack collection of the reconstructed tracks to be extrapolated
-    std::string m_RecoTracksColName;
-
     //! Name of the extHit collection of the extrapolation hits
     std::string m_ExtHitsColName;
 

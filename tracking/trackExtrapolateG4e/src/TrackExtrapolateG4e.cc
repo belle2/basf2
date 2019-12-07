@@ -71,11 +71,11 @@
 using namespace std;
 using namespace Belle2;
 
-TrackExtrapolateG4e* TrackExtrapolateG4e::m_Singleton = NULL;
+TrackExtrapolateG4e* TrackExtrapolateG4e::m_Singleton = nullptr;
 
 TrackExtrapolateG4e* TrackExtrapolateG4e::getInstance()
 {
-  if (m_Singleton == NULL) m_Singleton = new TrackExtrapolateG4e;
+  if (m_Singleton == nullptr) m_Singleton = new TrackExtrapolateG4e;
   return m_Singleton;
 }
 
@@ -90,14 +90,14 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_MaxECLTrackClusterDistance(0.0), // initialized later
   m_MinPt(0.0), // initialized later
   m_MinKE(0.0), // initialized later
-  m_ExtMgr(NULL), // initialized later
-  m_HypothesesExt(NULL), // initialized later
-  m_HypothesesMuid(NULL), // initialized later
-  m_DefaultHypotheses(NULL), // initialized later
-  m_EnterExit(NULL), // initialized later
-  m_BKLMVolumes(NULL), // initialized later
-  m_TargetExt(NULL), // initialized later
-  m_TargetMuid(NULL), // initialized later
+  m_ExtMgr(nullptr), // initialized later
+  m_HypothesesExt(nullptr), // initialized later
+  m_HypothesesMuid(nullptr), // initialized later
+  m_DefaultHypotheses(nullptr), // initialized later
+  m_EnterExit(nullptr), // initialized later
+  m_BKLMVolumes(nullptr), // initialized later
+  m_TargetExt(nullptr), // initialized later
+  m_TargetMuid(nullptr), // initialized later
   m_MinRadiusSq(0.0), // initialized later
   m_OffsetZ(0.0), // initialized later
   m_BarrelNSector(0), // initialized later
@@ -114,19 +114,19 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_OutermostActiveBackwardEndcapLayer(0), // initialized later
   m_EndcapScintVariance(0.0), // initialized later
   m_ExpNo(0), // modified later
-  m_MuonPlusPar(NULL), // modified later
-  m_MuonMinusPar(NULL), // modified later
-  m_PionPlusPar(NULL), // modified later
-  m_PionMinusPar(NULL), // modified later
-  m_KaonPlusPar(NULL), // modified later
-  m_KaonMinusPar(NULL), // modified later
-  m_ProtonPar(NULL), // modified later
-  m_AntiprotonPar(NULL), // modified later
-  m_DeuteronPar(NULL), // modified later
-  m_AntideuteronPar(NULL), // modified later
-  m_ElectronPar(NULL), // modified later
-  m_PositronPar(NULL), // modified later
-  m_eklmTransformData(NULL) // initialized later
+  m_MuonPlusPar(nullptr), // modified later
+  m_MuonMinusPar(nullptr), // modified later
+  m_PionPlusPar(nullptr), // modified later
+  m_PionMinusPar(nullptr), // modified later
+  m_KaonPlusPar(nullptr), // modified later
+  m_KaonMinusPar(nullptr), // modified later
+  m_ProtonPar(nullptr), // modified later
+  m_AntiprotonPar(nullptr), // modified later
+  m_DeuteronPar(nullptr), // modified later
+  m_AntideuteronPar(nullptr), // modified later
+  m_ElectronPar(nullptr), // modified later
+  m_PositronPar(nullptr), // modified later
+  m_eklmTransformData(nullptr) // initialized later
 {
   for (int j = 0; j < BKLMElementNumbers::getMaximalLayerNumber() + 1; ++j) {
     m_BarrelPhiStripVariance[j] = 0.0;
@@ -178,7 +178,7 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
   m_ExtMgr = Simulation::ExtManager::GetManager();
 
   // Set up the EXT-specific geometry (might have already been done by MUID)
-  if (m_TargetExt == NULL) {
+  if (m_TargetExt == nullptr) {
     GearDir coilContent = GearDir("/Detector/DetectorComponent[@name=\"COIL\"]/Content/");
     double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
     double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
@@ -249,7 +249,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_ExtMgr = Simulation::ExtManager::GetManager();
 
   // Set up the EXT-specific geometry (might have already been done by EXT)
-  if (m_TargetExt == NULL) {
+  if (m_TargetExt == nullptr) {
     GearDir coilContent = GearDir("/Detector/DetectorComponent[@name=\"COIL\"]/Content/");
     double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
     double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
@@ -340,7 +340,7 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
       B2FATAL("KLM strip efficiency data are not available.");
     if (!m_muidParameters.isValid())
       B2FATAL("Muid parameters are not available.");
-    if (m_MuonPlusPar != NULL) {
+    if (m_MuonPlusPar != nullptr) {
       if (m_ExpNo == expNo) { return; }
       delete m_MuonPlusPar;
       delete m_MuonMinusPar;
@@ -432,7 +432,7 @@ void TrackExtrapolateG4e::endRun(bool)
 
 void TrackExtrapolateG4e::terminate(bool byMuid)
 {
-  if (m_DefaultHypotheses != NULL) { delete m_DefaultHypotheses; }
+  if (m_DefaultHypotheses != nullptr) { delete m_DefaultHypotheses; }
   if (byMuid) {
     delete m_TargetMuid;
     delete m_MuonPlusPar;
@@ -448,16 +448,16 @@ void TrackExtrapolateG4e::terminate(bool byMuid)
     delete m_ElectronPar;
     delete m_PositronPar;
   }
-  if (m_TargetExt != NULL) {
+  if (m_TargetExt != nullptr) {
     delete m_TargetExt;
-    m_TargetExt = NULL;
+    m_TargetExt = nullptr;
   }
-  if (m_EnterExit != NULL) {
+  if (m_EnterExit != nullptr) {
     delete m_EnterExit;
     delete m_BKLMVolumes;
     m_ExtMgr->RunTermination();
-    m_EnterExit = NULL;
-    m_BKLMVolumes = NULL;
+    m_EnterExit = nullptr;
+    m_BKLMVolumes = nullptr;
   }
 }
 
@@ -503,7 +503,7 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
   fromPhasespaceToG4e(momentum, covariance, covarianceG4e);
   G4String nameG4e("g4e_" + G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetParticleName());
   G4ErrorFreeTrajState g4eState(nameG4e, positionG4e, momentumG4e, covarianceG4e);
-  ExtState extState = { NULL, pdgCode, isCosmic, tof, 0.0,                         // for EXT and MUID
+  ExtState extState = { nullptr, pdgCode, isCosmic, tof, 0.0,                         // for EXT and MUID
                         momentumG4e.unit(), 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false  // for MUID only
                       };
   swim(extState, g4eState);
@@ -550,10 +550,10 @@ void TrackExtrapolateG4e::identifyMuon(int pdgCode, // signed for charge
   fromPhasespaceToG4e(momentum, covariance, covarianceG4e);
   G4String nameG4e("g4e_" + G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetParticleName());
   G4ErrorFreeTrajState g4eState(nameG4e, positionG4e, momentumG4e, covarianceG4e);
-  ExtState extState = { NULL, pdgCode, isCosmic, tof, 0.0,                             // for EXT and MUID
+  ExtState extState = { nullptr, pdgCode, isCosmic, tof, 0.0,                             // for EXT and MUID
                         momentumG4e.unit(), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, false  // for MUID only
                       };
-  swim(extState, g4eState, NULL, NULL, NULL);
+  swim(extState, g4eState, nullptr, nullptr, nullptr);
 }
 
 // Swim one track for MUID until it stops or leaves the KLM-bounding cylinder
@@ -571,7 +571,7 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   // Create structures for ECLCluster-Track matching
   std::vector<double> eclClusterDistance;
   std::vector<ExtHit> eclHit1, eclHit2, eclHit3;
-  if (eclClusterInfo != NULL) {
+  if (eclClusterInfo != nullptr) {
     eclClusterDistance.resize(eclClusterInfo->size(), 1.0E10); // "positive infinity"
     ExtHit tempExtHit(extState.pdgCode, Const::EDetector::ECL, 0, EXT_FIRST,
                       extState.isCosmic, 0.0,
@@ -582,11 +582,11 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   }
   // Create structures for KLMCluster-Track matching
   std::vector<TrackClusterSeparation> klmHit;
-  if (klmClusterInfo != NULL) {
+  if (klmClusterInfo != nullptr) {
     klmHit.resize(klmClusterInfo->size()); // initialize each to huge distance
   }
   KLMMuidLikelihood* muid = m_klmMuidLikelihoods.appendNew(extState.pdgCode); // rest of this object will be filled later
-  if (extState.track != NULL) { extState.track->addRelationTo(muid); }
+  if (extState.track != nullptr) { extState.track->addRelationTo(muid); }
   G4ErrorMode propagationMode = (extState.isCosmic ? G4ErrorMode_PropBackwards : G4ErrorMode_PropForwards);
   m_ExtMgr->InitTrackPropagation(propagationMode);
   while (true) {
@@ -631,7 +631,7 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
         // Force geant4e to update its G4Track from the Kalman-updated state
         m_ExtMgr->GetPropagator()->SetStepN(0);
       }
-      if (eclClusterInfo != NULL) {
+      if (eclClusterInfo != nullptr) {
         for (unsigned int c = 0; c < eclClusterInfo->size(); ++c) {
           G4ThreeVector eclPos((*eclClusterInfo)[c].second);
           G4ThreeVector prePos(preStepPoint->GetPosition());
@@ -681,7 +681,7 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
           }
         }
       }
-      if (klmClusterInfo != NULL) {
+      if (klmClusterInfo != nullptr) {
         for (unsigned int c = 0; c < klmClusterInfo->size(); ++c) {
           G4ThreeVector klmPos = (*klmClusterInfo)[c].second;
           G4ThreeVector separation = klmPos - pos;
@@ -714,7 +714,7 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
 
   finishTrack(extState, muid, (g4eState.GetPosition().z() > m_OffsetZ));
 
-  if (eclClusterInfo != NULL) {
+  if (eclClusterInfo != nullptr) {
     for (unsigned int c = 0; c < eclClusterInfo->size(); ++c) {
       if (eclHit1[c].getStatus() != EXT_FIRST) {
         ExtHit* h = m_extHits.appendNew(eclHit1[c]);
@@ -734,7 +734,7 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
     }
   }
 
-  if (klmClusterInfo != NULL) {
+  if (klmClusterInfo != nullptr) {
     // here we set a relation only to the closest KLMCluster
     // and we don't set any relation if the distance is too large
     double minDistance = m_MaxKLMTrackClusterDistance;
@@ -845,7 +845,7 @@ void TrackExtrapolateG4e::registerVolumes()
     B2FATAL("No geometry defined. Please create the geometry first.");
   }
 
-  if (m_EnterExit != NULL) { return; } // Only do this once
+  if (m_EnterExit != nullptr) { return; } // Only do this once
 
   m_EnterExit = new map<G4VPhysicalVolume*, enum VolTypes>;
   m_BKLMVolumes = new vector<G4VPhysicalVolume*>;
@@ -997,7 +997,7 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
                        G4ThreeVector(0, 0, 1), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, false // for MUID only
                       };
   RecoTrack* recoTrack = b2track.getRelatedTo<RecoTrack>();
-  if (recoTrack == NULL) {
+  if (recoTrack == nullptr) {
     B2WARNING("Track without associated RecoTrack: skipping extrapolation for this track.");
     extState.pdgCode = 0; // prevent start of extrapolation in swim()
     return extState;
@@ -1246,7 +1246,7 @@ void TrackExtrapolateG4e::createExtHit(ExtHitStatus status, const ExtState& extS
                                        extState.isCosmic, extState.tof,
                                        pos, mom, covariance);
   // If called standalone, there will be no associated track
-  if (extState.track != NULL) { extState.track->addRelationTo(extHit); }
+  if (extState.track != nullptr) { extState.track->addRelationTo(extHit); }
 
 }
 
@@ -1429,7 +1429,7 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
     KLMMuidHit* muidHit = m_klmMuidHits.appendNew(extState.pdgCode, intersection.inBarrel, intersection.isForward, intersection.sector,
                                                   intersection.layer, tpos,
                                                   tposAtHitPlane, extState.tof, intersection.time, intersection.chi2);
-    if (extState.track != NULL) { extState.track->addRelationTo(muidHit); }
+    if (extState.track != nullptr) { extState.track->addRelationTo(muidHit); }
     G4Point3D newPos(intersection.position.x() * CLHEP::cm,
                      intersection.position.y() * CLHEP::cm,
                      intersection.position.z() * CLHEP::cm);
@@ -1596,7 +1596,7 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
     if (intersection.chi2 >= 0.0) {
       intersection.hit = bestHit;
       hit->isOnTrack(true);
-      if (track != NULL) {
+      if (track != nullptr) {
         track->addRelationTo(hit);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
         if (m_addHitsToRecoTrack) {
@@ -1647,7 +1647,7 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
     if (intersection.chi2 >= 0.0) {
       // DIVOT no such function for EKLM!
       // hit->isOnTrack(true);
-      if (track != NULL) {
+      if (track != nullptr) {
         RelationVector<EKLMAlignmentHit> eklmAlignmentHits = hit->getRelationsFrom<EKLMAlignmentHit>();
         track->addRelationTo(hit);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();

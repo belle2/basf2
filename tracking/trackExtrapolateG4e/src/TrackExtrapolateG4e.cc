@@ -125,8 +125,6 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_OutermostActiveBackwardEndcapLayer(0), // initialized later
   m_EndcapScintVariance(0.0), // initialized later
   m_ExpNo(0), // modified later
-  m_klmChannelStatusValid(false), // initialized later
-  m_eklmTransformData(NULL), // initialized later
   m_MuonPlusPar(NULL), // modified later
   m_MuonMinusPar(NULL), // modified later
   m_PionPlusPar(NULL), // modified later
@@ -138,7 +136,8 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_DeuteronPar(NULL), // modified later
   m_AntideuteronPar(NULL), // modified later
   m_ElectronPar(NULL), // modified later
-  m_PositronPar(NULL) // modified later
+  m_PositronPar(NULL), // modified later
+  m_eklmTransformData(NULL) // initialized later
 {
   for (int j = 0; j < BKLMElementNumbers::getMaximalLayerNumber() + 1; ++j) {
     m_BarrelPhiStripVariance[j] = 0.0;
@@ -316,7 +315,6 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   }
 
   // KLM geometry (for associating KLM hit with extrapolated crossing point)
-
   m_OutermostActiveBarrelLayer = nBarrelLayers - 1; // zero-based counting
   for (int section = 0; section <= BKLMElementNumbers::getMaximalSectionNumber(); ++section) {
     for (int sector = 1; sector <= m_BarrelNSector; ++sector) {
@@ -331,7 +329,6 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
              + eklmGeometry.getLayerShiftZ()
              - 0.5 * eklmGeometry.getSectionPosition()->getLength()
              - 0.5 * eklmGeometry.getLayerPosition()->getLength()) / CLHEP::cm); // in G4e units (cm)
-
   int nEndcapLayers = eklmGeometry.getNLayers();
   m_OutermostActiveForwardEndcapLayer = eklmGeometry.getNDetectorLayers(2) - 1; // zero-based counting
   m_OutermostActiveBackwardEndcapLayer = eklmGeometry.getNDetectorLayers(1) - 1; // zero-based counting
@@ -344,6 +341,8 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
     m_BarrelSectorPerp[sector - 1].set(std::cos(phi), std::sin(phi), 0.0);
     m_BarrelSectorPhi[sector - 1].set(-std::sin(phi), std::cos(phi), 0.0);
   }
+
+  m_eklmTransformData = &(EKLM::TransformDataGlobalAligned::Instance());
 }
 
 void TrackExtrapolateG4e::beginRun(bool byMuid)
@@ -352,10 +351,12 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
   int expNo = evtMetaData->getExperiment();
   B2DEBUG(20, (byMuid ? "muid" : "ext") << ": Experiment " << expNo << "  run " << evtMetaData->getRun());
   if (byMuid) {
-    if (!m_muidParameters.isValid())
-      B2FATAL("Muid parameters are not available.");
+    if (!m_klmChannelStatus.isValid())
+      B2FATAL("KLM channel status data are not available.");
     if (!m_klmStripEfficiency.isValid())
       B2FATAL("KLM strip efficiency data are not available.");
+    if (!m_muidParameters.isValid())
+      B2FATAL("Muid parameters are not available.");
     if (m_MuonPlusPar != NULL) {
       if (m_ExpNo == expNo) { return; }
       delete m_MuonPlusPar;
@@ -384,15 +385,6 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
     m_AntideuteronPar = new MuidBuilder(expNo, "Antideuteron");
     m_ElectronPar = new MuidBuilder(expNo, "Electron");
     m_PositronPar = new MuidBuilder(expNo, "Positron");
-
-    // Check availability of KLM channel status for muid
-    m_eklmTransformData = &(EKLM::TransformDataGlobalAligned::Instance());
-    m_klmChannelStatusValid = m_klmChannelStatus.isValid();
-    if (!m_klmChannelStatusValid) {
-      B2WARNING("KLM channel database requested but not available for experiment "
-                << expNo << " run " << evtMetaData->getRun());
-    }
-
   }
 }
 
@@ -1347,40 +1339,38 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         // Record a no-hit track crossing if this step is strictly within a barrel sensitive volume
         vector<G4VPhysicalVolume*>::iterator j = find(m_BKLMVolumes->begin(), m_BKLMVolumes->end(), g4eState.GetG4Track()->GetVolume());
         if (j != m_BKLMVolumes->end()) {
-          int layer = intersection.layer + 1; // from 0-based to 1-based enumeration
           bool isDead = true; // by default, the nearest orthogonal strips are dead
-          if (m_klmChannelStatusValid) {
-            int section = intersection.isForward ?
-                          BKLMElementNumbers::c_ForwardSection :
-                          BKLMElementNumbers::c_BackwardSection;
-            int sector = intersection.sector + 1; // from 0-based to 1-based enumeration
-            const bklm::Module* m = bklm::GeometryPar::instance()->findModule(section, sector, layer); // uses 1-based enumeration
-            if (m) {
-              const CLHEP::Hep3Vector localPosition = m->globalToLocal(intersection.position); // uses and returns position in cm
-              int zStrip = m->getZStripNumber(localPosition);
-              int phiStrip = m->getPhiStripNumber(localPosition);
-              if (zStrip >= 0 && phiStrip >= 0) {
-                uint16_t channel1, channel2;
-                channel1 = m_klmElementNumbers->channelNumberBKLM(
-                             section, sector, layer,
-                             BKLMElementNumbers::c_ZPlane, zStrip);
-                channel2 = m_klmElementNumbers->channelNumberBKLM(
-                             section, sector, layer,
-                             BKLMElementNumbers::c_PhiPlane, phiStrip);
-                enum KLMChannelStatus::ChannelStatus status1, status2;
-                status1 = m_klmChannelStatus->getChannelStatus(channel1);
-                status2 = m_klmChannelStatus->getChannelStatus(channel2);
-                if (status1 == KLMChannelStatus::c_Unknown ||
-                    status2 == KLMChannelStatus::c_Unknown)
-                  B2ERROR("No KLM channel status data."
-                          << LogVar("Section", section)
-                          << LogVar("Sector", sector)
-                          << LogVar("Layer", layer)
-                          << LogVar("Z strip", zStrip)
-                          << LogVar("Phi strip", phiStrip));
-                isDead = (status1 == KLMChannelStatus::c_Dead ||
-                          status2 == KLMChannelStatus::c_Dead);
-              }
+          int section = intersection.isForward ?
+                        BKLMElementNumbers::c_ForwardSection :
+                        BKLMElementNumbers::c_BackwardSection;
+          int sector = intersection.sector + 1; // from 0-based to 1-based enumeration
+          int layer = intersection.layer + 1; // from 0-based to 1-based enumeration
+          const bklm::Module* m = bklm::GeometryPar::instance()->findModule(section, sector, layer); // uses 1-based enumeration
+          if (m) {
+            const CLHEP::Hep3Vector localPosition = m->globalToLocal(intersection.position); // uses and returns position in cm
+            int zStrip = m->getZStripNumber(localPosition);
+            int phiStrip = m->getPhiStripNumber(localPosition);
+            if (zStrip >= 0 && phiStrip >= 0) {
+              uint16_t channel1, channel2;
+              channel1 = m_klmElementNumbers->channelNumberBKLM(
+                           section, sector, layer,
+                           BKLMElementNumbers::c_ZPlane, zStrip);
+              channel2 = m_klmElementNumbers->channelNumberBKLM(
+                           section, sector, layer,
+                           BKLMElementNumbers::c_PhiPlane, phiStrip);
+              enum KLMChannelStatus::ChannelStatus status1, status2;
+              status1 = m_klmChannelStatus->getChannelStatus(channel1);
+              status2 = m_klmChannelStatus->getChannelStatus(channel2);
+              if (status1 == KLMChannelStatus::c_Unknown ||
+                  status2 == KLMChannelStatus::c_Unknown)
+                B2ERROR("No KLM channel status data."
+                        << LogVar("Section", section)
+                        << LogVar("Sector", sector)
+                        << LogVar("Layer", layer)
+                        << LogVar("Z strip", zStrip)
+                        << LogVar("Phi strip", phiStrip));
+              isDead = (status1 == KLMChannelStatus::c_Dead ||
+                        status2 == KLMChannelStatus::c_Dead);
             }
           }
           if (!isDead) {
@@ -1435,23 +1425,21 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         }
       } else {
         bool isDead = true;
-        if (m_klmChannelStatusValid) {
-          int result, strip1, strip2;
-          result = m_eklmTransformData->getStripsByIntersection(
-                     intersection.position, &strip1, &strip2);
-          if (result == 0) {
-            uint16_t channel1, channel2;
-            channel1 = m_klmElementNumbers->channelNumberEKLM(strip1);
-            channel2 = m_klmElementNumbers->channelNumberEKLM(strip2);
-            enum KLMChannelStatus::ChannelStatus status1, status2;
-            status1 = m_klmChannelStatus->getChannelStatus(channel1);
-            status2 = m_klmChannelStatus->getChannelStatus(channel2);
-            if (status1 == KLMChannelStatus::c_Unknown ||
-                status2 == KLMChannelStatus::c_Unknown)
-              B2ERROR("Incomplete KLM channel status data.");
-            isDead = (status1 == KLMChannelStatus::c_Dead ||
-                      status2 == KLMChannelStatus::c_Dead);
-          }
+        int result, strip1, strip2;
+        result = m_eklmTransformData->getStripsByIntersection(
+                   intersection.position, &strip1, &strip2);
+        if (result == 0) {
+          uint16_t channel1, channel2;
+          channel1 = m_klmElementNumbers->channelNumberEKLM(strip1);
+          channel2 = m_klmElementNumbers->channelNumberEKLM(strip2);
+          enum KLMChannelStatus::ChannelStatus status1, status2;
+          status1 = m_klmChannelStatus->getChannelStatus(channel1);
+          status2 = m_klmChannelStatus->getChannelStatus(channel2);
+          if (status1 == KLMChannelStatus::c_Unknown ||
+              status2 == KLMChannelStatus::c_Unknown)
+            B2ERROR("Incomplete KLM channel status data.");
+          isDead = (status1 == KLMChannelStatus::c_Dead ||
+                    status2 == KLMChannelStatus::c_Dead);
         }
         if (!isDead) {
           extState.extLayerPattern |= (0x00008000 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit

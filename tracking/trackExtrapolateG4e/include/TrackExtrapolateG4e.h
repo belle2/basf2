@@ -456,24 +456,6 @@ namespace Belle2 {
     //! Parameter to add the found hits also to the reco tracks or not. Is turned off by default.
     bool m_addHitsToRecoTrack = false;
 
-    //! KLM element numbers.
-    const KLMElementNumbers* m_klmElementNumbers;
-
-    //! Conditions-database object for Muid parameters
-    DBObjPtr<MuidParameters> m_muidParameters;
-
-    //! Conditions-database object for KLM strip efficiency
-    DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;
-
-    //! Conditions-database object for KLM channel status (updated at start of each run)
-    DBObjPtr<KLMChannelStatus> m_klmChannelStatus;
-
-    //! Flag to indicate that the KLM channel status is valid for the given run
-    bool m_klmChannelStatusValid;
-
-    //! EKLM transformation data.
-    const EKLM::TransformDataGlobalAligned* m_eklmTransformData;
-
     //! probability density function for positive-muon hypothesis
     MuidBuilder* m_MuonPlusPar;
 
@@ -509,6 +491,21 @@ namespace Belle2 {
 
     //! probability density function for positron hypothesis
     MuidBuilder* m_PositronPar;
+
+    //! KLM element numbers.
+    const KLMElementNumbers* m_klmElementNumbers;
+
+    //! EKLM transformation data.
+    const EKLM::TransformDataGlobalAligned* m_eklmTransformData;
+
+    //! Conditions-database object for KLM channel status
+    DBObjPtr<KLMChannelStatus> m_klmChannelStatus;
+
+    //! Conditions-database object for KLM strip efficiency
+    DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;
+
+    //! Conditions-database object for Muid parameters
+    DBObjPtr<MuidParameters> m_muidParameters;
 
     //! BKLM 2d hits
     StoreArray<BKLMHit2d> m_bklmHit2ds;

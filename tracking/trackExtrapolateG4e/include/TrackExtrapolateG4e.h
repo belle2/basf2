@@ -15,12 +15,15 @@
 
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/MuidParameters.h>
+#include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 
 /* Geant4 headers. */
@@ -39,11 +42,13 @@ class G4StepPoint;
 
 namespace Belle2 {
 
-  class Track;
+  class ECLCluster;
+  class KLMCluster;
+  class KLMMuidHit;
   class KLMMuidLikelihood;
   class MuidBuilder;
-  class KLMCluster;
-  class ECLCluster;
+  class Track;
+
   namespace Simulation {
     class ExtCylSurfaceTarget;
     class ExtManager;
@@ -139,20 +144,20 @@ namespace Belle2 {
     double chi2;
   };
 
-  /** geant4e-based track extrapolation
-     *
-     * This class extrapolates tracks outward from the outer perimeter of the CDC
-     * using geant4e.
-     *
-     * This class requires a valid geometry in memory (gGeoManager). Therefore,
-     * a geometry building module should have been executed before this module is called.
-     *
-     * This class has the same functions as a module - and these are called from
-     * the ExtModule's so-named functions - but also has an entry that can be
-     * called to extrapolate a single user-defined track.
-     *
-     */
-
+  /**
+   * geant4e-based track extrapolation.
+   *
+   * This class extrapolates tracks outward from the outer perimeter of the CDC
+   * using geant4e.
+   *
+   * This class requires a valid geometry in memory (gGeoManager). Therefore,
+   * a geometry building module should have been executed before this module is called.
+   *
+   * This class has the same functions as a module - and these are called from
+   * the ExtModule's so-named functions - but also has an entry that can be
+   * called to extrapolate a single user-defined track.
+   *
+   */
   class TrackExtrapolateG4e {
 
   public:
@@ -534,6 +539,21 @@ namespace Belle2 {
 
     //! probability density function for positron hypothesis
     MuidBuilder* m_PositronPar;
+
+    //! BKLM 2d hits
+    StoreArray<BKLMHit2d> m_bklmHit2ds;
+
+    //! EKLM 2d hits
+    StoreArray<EKLMHit2d> m_eklmHit2ds;
+
+    //! KLM clusters
+    StoreArray<KLMCluster> m_klmClusters;
+
+    //! KLM muid hits
+    StoreArray<KLMMuidHit> m_klmMuidHits;
+
+    //! KLM muid likelihoods
+    StoreArray<KLMMuidLikelihood> m_klmMuidLikelihoods;
 
   };
 

@@ -25,14 +25,12 @@
 #include <framework/geometry/BFieldManager.h>
 #include <framework/logging/Logger.h>
 #include <genfit/Exception.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/dataobjects/KLMMuidHit.h>
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/muid/MuidBuilder.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -225,33 +223,28 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_MuidInitialized = true;
   m_addHitsToRecoTrack = addHitsToRecoTrack;
 
-  // Register output and relation arrays' persistence
+  // Define required objects, register the new ones and relations
+  m_bklmHit2ds.isRequired();
+  m_eklmHit2ds.isRequired();
+  m_klmClusters.isRequired();
   StoreArray<Track> tracks(*m_TracksColName);
   StoreArray<RecoTrack> recoTracks(*m_RecoTracksColName);
   StoreArray<ExtHit> extHits(*m_ExtHitsColName);
-  StoreArray<KLMMuidLikelihood> muids(*m_MuidsColName);
-  StoreArray<KLMMuidHit> muidHits(*m_MuidHitsColName);
-  StoreArray<BKLMHit2d> bklmHits(*m_BKLMHitsColName);
-  StoreArray<EKLMHit2d> eklmHits(*m_EKLMHitsColName);
-  StoreArray<KLMCluster> klmClusters(*m_KLMClustersColName);
   StoreArray<ECLCluster> eclClusters(*m_ECLClustersColName);
   StoreArray<TrackClusterSeparation> trackClusterSeparations(*m_TrackClusterSeparationsColName);
   extHits.registerInDataStore();
-  muids.registerInDataStore();
-  muidHits.registerInDataStore();
-  bklmHits.registerInDataStore();
-  eklmHits.registerInDataStore();
-  klmClusters.registerInDataStore();
+  m_klmMuidLikelihoods.registerInDataStore();
+  m_klmMuidHits.registerInDataStore();
   eclClusters.registerInDataStore();
   trackClusterSeparations.registerInDataStore();
   tracks.registerRelationTo(extHits);
-  tracks.registerRelationTo(muids);
-  tracks.registerRelationTo(muidHits);
-  tracks.registerRelationTo(bklmHits);
-  tracks.registerRelationTo(eklmHits);
+  tracks.registerRelationTo(m_klmMuidLikelihoods);
+  tracks.registerRelationTo(m_klmMuidHits);
+  tracks.registerRelationTo(m_bklmHit2ds);
+  tracks.registerRelationTo(m_eklmHit2ds);
   tracks.registerRelationTo(trackClusterSeparations);
-  tracks.registerRelationTo(klmClusters);
-  klmClusters.registerRelationTo(trackClusterSeparations);
+  tracks.registerRelationTo(m_klmClusters);
+  m_klmClusters.registerRelationTo(trackClusterSeparations);
   eclClusters.registerRelationTo(extHits);
   RecoTrack::registerRequiredRelations(recoTracks);
 
@@ -437,17 +430,15 @@ void TrackExtrapolateG4e::event(bool byMuid)
                                                eclClusters[c]->getClusterPosition().Y(),
                                                eclClusters[c]->getClusterPosition().Z()) * CLHEP::cm;
     }
-    StoreArray<KLMCluster> klmClusters(*m_KLMClustersColName);
-    std::vector<std::pair<KLMCluster*, G4ThreeVector> > klmClusterInfo(klmClusters.getEntries());
-    for (int c = 0; c < klmClusters.getEntries(); ++c) {
-      klmClusterInfo[c].first = klmClusters[c];
-      klmClusterInfo[c].second = G4ThreeVector(klmClusters[c]->getClusterPosition().X(),
-                                               klmClusters[c]->getClusterPosition().Y(),
-                                               klmClusters[c]->getClusterPosition().Z()) * CLHEP::cm;
+    std::vector<std::pair<KLMCluster*, G4ThreeVector> > klmClusterInfo(m_klmClusters.getEntries());
+    for (int c = 0; c < m_klmClusters.getEntries(); ++c) {
+      klmClusterInfo[c].first = m_klmClusters[c];
+      klmClusterInfo[c].second = G4ThreeVector(m_klmClusters[c]->getClusterPosition().X(),
+                                               m_klmClusters[c]->getClusterPosition().Y(),
+                                               m_klmClusters[c]->getClusterPosition().Z()) * CLHEP::cm;
     }
     // Keep track of (re-)use of BKLMHit2ds
-    StoreArray<BKLMHit2d> bklmHits(*m_BKLMHitsColName);
-    std::vector<std::map<const Track*, double> > bklmHitUsed(bklmHits.getEntries());
+    std::vector<std::map<const Track*, double> > bklmHitUsed(m_bklmHit2ds.getEntries());
     for (auto& b2track : tracks) {
       for (const auto& hypothesis : *m_HypothesesMuid) {
         int pdgCode = hypothesis.getPDGCode();
@@ -652,8 +643,7 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   if (klmClusterInfo != NULL) {
     klmHit.resize(klmClusterInfo->size()); // initialize each to huge distance
   }
-  StoreArray<KLMMuidLikelihood> muids(*m_MuidsColName);
-  KLMMuidLikelihood* muid = muids.appendNew(extState.pdgCode); // rest of this object will be filled later
+  KLMMuidLikelihood* muid = m_klmMuidLikelihoods.appendNew(extState.pdgCode); // rest of this object will be filled later
   if (extState.track != NULL) { extState.track->addRelationTo(muid); }
   G4ErrorMode propagationMode = (extState.isCosmic ? G4ErrorMode_PropBackwards : G4ErrorMode_PropForwards);
   m_ExtMgr->InitTrackPropagation(propagationMode);
@@ -1497,14 +1487,13 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
   // Create a new MuidHit and RelationEntry between it and the track.
   // Adjust geant4e's position, momentum and covariance based on matching hit and tell caller to update the geant4e state.
   if (intersection.chi2 >= 0.0) {
-    StoreArray<KLMMuidHit> muidHits(*m_MuidHitsColName);
     TVector3 tpos(intersection.position.x(), intersection.position.y(), intersection.position.z());
     TVector3 tposAtHitPlane(intersection.positionAtHitPlane.x(),
                             intersection.positionAtHitPlane.y(),
                             intersection.positionAtHitPlane.z());
-    KLMMuidHit* muidHit = muidHits.appendNew(extState.pdgCode, intersection.inBarrel, intersection.isForward, intersection.sector,
-                                             intersection.layer, tpos,
-                                             tposAtHitPlane, extState.tof, intersection.time, intersection.chi2);
+    KLMMuidHit* muidHit = m_klmMuidHits.appendNew(extState.pdgCode, intersection.inBarrel, intersection.isForward, intersection.sector,
+                                                  intersection.layer, tpos,
+                                                  tposAtHitPlane, extState.tof, intersection.time, intersection.chi2);
     if (extState.track != NULL) { extState.track->addRelationTo(muidHit); }
     G4Point3D newPos(intersection.position.x() * CLHEP::cm,
                      intersection.position.y() * CLHEP::cm,
@@ -1600,16 +1589,13 @@ bool TrackExtrapolateG4e::findEndcapIntersection(ExtState& extState, const G4Thr
 bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, const Track* track)
 
 {
-
   G4ThreeVector extPos0(intersection.position);
-
-  StoreArray<BKLMHit2d> bklmHits(*m_BKLMHitsColName);
   double diffBestMagSq = 1.0E60;
   int bestHit = -1;
   int matchingLayer = intersection.layer + 1;
   G4ThreeVector n(m_BarrelSectorPerp[intersection.sector]);
-  for (int h = 0; h < bklmHits.getEntries(); ++h) {
-    BKLMHit2d* hit = bklmHits[h];
+  for (int h = 0; h < m_bklmHit2ds.getEntries(); ++h) {
+    BKLMHit2d* hit = m_bklmHit2ds[h];
     if (hit->getLayer() != matchingLayer) continue;
     if (hit->isOutOfTime()) continue;
     if (std::fabs(hit->getTime() - m_MeanDt) > m_MaxDt) continue;
@@ -1655,7 +1641,7 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
   }
 
   if (bestHit >= 0) {
-    BKLMHit2d* hit = bklmHits[bestHit];
+    BKLMHit2d* hit = m_bklmHit2ds[bestHit];
     intersection.isForward = (hit->getSection() == 1);
     intersection.sector = hit->getSector() - 1;
     intersection.time = hit->getTime();
@@ -1690,15 +1676,13 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
 
 bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, const Track* track)
 {
-
-  StoreArray<EKLMHit2d> eklmHits(*m_EKLMHitsColName);
   double diffBestMagSq = 1.0E60;
   int bestHit = -1;
   int matchingLayer = intersection.layer + 1;
   int matchingEndcap = (intersection.isForward ? 2 : 1);
   G4ThreeVector n(0.0, 0.0, (intersection.isForward ? 1.0 : -1.0));
-  for (int h = 0; h < eklmHits.getEntries(); ++h) {
-    EKLMHit2d* hit = eklmHits[h];
+  for (int h = 0; h < m_eklmHit2ds.getEntries(); ++h) {
+    EKLMHit2d* hit = m_eklmHit2ds[h];
     if (hit->getLayer() != matchingLayer) continue;
     if (hit->getSection() != matchingEndcap) continue;
     // DIVOT no such function for EKLM!
@@ -1717,7 +1701,7 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
   }
 
   if (bestHit >= 0) {
-    EKLMHit2d* hit = eklmHits[bestHit];
+    EKLMHit2d* hit = m_eklmHit2ds[bestHit];
     intersection.hit = bestHit;
     intersection.isForward = (hit->getSection() == 2);
     intersection.sector = hit->getSector() - 1;

@@ -66,15 +66,6 @@ namespace Belle2 {
     //!  ChargedStable hypotheses
     std::vector<Const::ChargedStable> m_Hypotheses;
 
-    //! Name of the extHit collection of the extrapolation hits
-    std::string m_ExtHitsColName;
-
-    //! Name of the ECLCluster collection
-    std::string m_ECLClustersColName;
-
-    //! Name of the TrackClusterSeparation collection
-    std::string m_TrackClusterSeparationsColName;
-
     //! Mean hit - trigger time (ns)
     double m_MeanDt;
 

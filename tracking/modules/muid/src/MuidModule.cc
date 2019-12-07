@@ -34,9 +34,6 @@ REG_MODULE(Muid)
 
 MuidModule::MuidModule() :
   Module(),
-  m_ExtHitsColName(""),
-  m_ECLClustersColName(""),
-  m_TrackClusterSeparationsColName(""),
   m_MeanDt(0.0),
   m_MaxDt(0.0),
   m_MinPt(0.0),
@@ -58,10 +55,6 @@ MuidModule::MuidModule() :
   setDescription("Identifies muons by extrapolating tracks from CDC to KLM using geant4e");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("pdgCodes", m_PDGCodes, "Positive-charge PDG codes for extrapolation hypotheses", m_PDGCodes);
-  addParam("ExtHitsColName", m_ExtHitsColName, "Name of collection holding the extHits from the extrapolation", string(""));
-  addParam("ECLClustersColName", m_ECLClustersColName, "Name of collection holding the ECLClusters", string(""));
-  addParam("TrackClusterSeparationsColName", m_TrackClusterSeparationsColName,
-           "Name of collection holding the TrackClusterSeparations", string(""));
   addParam("MeanDt", m_MeanDt, "[ns] Mean hit-trigger time for coincident hits (default 0)", double(0.0));
   // Raw KLM scintillator hit times are in the range from -5000 to -4000 ns
   // approximately. The time window can be readjusted after completion of
@@ -147,10 +140,7 @@ void MuidModule::initialize()
   }
 
   // Initialize the extrapolator engine for MUID (vs EXT)
-  // *NOTE* that MinPt, MinKE, ExtHitsColName are shared by MUID and EXT; only last caller wins
-  m_Extrapolator->setExtHitsColName(m_ExtHitsColName);
-  m_Extrapolator->setECLClustersColName(m_ECLClustersColName);
-  m_Extrapolator->setTrackClusterSeparationsColName(m_TrackClusterSeparationsColName);
+  // *NOTE* that MinPt and MinKE are shared by MUID and EXT; only last caller wins
   m_Extrapolator->initialize(m_MeanDt, m_MaxDt, m_MaxDistSqInVariances, m_MaxKLMTrackClusterDistance,
                              m_MaxECLTrackClusterDistance, m_MinPt, m_MinKE, m_addHitsToRecoTrack, m_Hypotheses);
   return;

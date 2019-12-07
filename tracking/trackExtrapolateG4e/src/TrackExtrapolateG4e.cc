@@ -11,10 +11,6 @@
 /* Own header. */
 #include <tracking/trackExtrapolateG4e/TrackExtrapolateG4e.h>
 
-/* Tracking headers. */
-#include <tracking/dataobjects/ExtHit.h>
-#include <tracking/dataobjects/TrackClusterSeparation.h>
-
 /* Belle 2 headers. */
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -94,13 +90,9 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_MaxECLTrackClusterDistance(0.0), // initialized later
   m_MinPt(0.0), // initialized later
   m_MinKE(0.0), // initialized later
-  m_ExtHitsColName(NULL), // initialized later
-  m_ECLClustersColName(NULL), // initialized later
-  m_TrackClusterSeparationsColName(NULL), // initialized later
   m_ExtMgr(NULL), // initialized later
   m_HypothesesExt(NULL), // initialized later
   m_HypothesesMuid(NULL), // initialized later
-  m_DefaultName(NULL), // initialized later
   m_DefaultHypotheses(NULL), // initialized later
   m_EnterExit(NULL), // initialized later
   m_BKLMVolumes(NULL), // initialized later
@@ -165,9 +157,8 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
 
   // Define required objects, register the new ones and relations
   m_tracks.isRequired();
-  StoreArray<ExtHit> extHits(*m_ExtHitsColName);
-  extHits.registerInDataStore();
-  m_tracks.registerRelationTo(extHits);
+  m_extHits.registerInDataStore();
+  m_tracks.registerRelationTo(m_extHits);
 
   // Save the magnetic field z component (gauss) at the origin
   m_MagneticField = BFieldManager::getField(B2Vector3D(0, 0, 0)).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
@@ -210,28 +201,25 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_addHitsToRecoTrack = addHitsToRecoTrack;
 
   // Define required objects, register the new ones and relations
+  m_eclClusters.isRequired();
   m_bklmHit2ds.isRequired();
   m_eklmHit2ds.isRequired();
   m_klmClusters.isRequired();
   m_recoTracks.isRequired();
   m_tracks.isRequired();
-  StoreArray<ExtHit> extHits(*m_ExtHitsColName);
-  StoreArray<ECLCluster> eclClusters(*m_ECLClustersColName);
-  StoreArray<TrackClusterSeparation> trackClusterSeparations(*m_TrackClusterSeparationsColName);
-  extHits.registerInDataStore();
+  m_extHits.registerInDataStore();
   m_klmMuidLikelihoods.registerInDataStore();
   m_klmMuidHits.registerInDataStore();
-  eclClusters.registerInDataStore();
-  trackClusterSeparations.registerInDataStore();
-  m_tracks.registerRelationTo(extHits);
+  m_trackClusterSeparations.registerInDataStore();
+  m_tracks.registerRelationTo(m_extHits);
   m_tracks.registerRelationTo(m_klmMuidLikelihoods);
   m_tracks.registerRelationTo(m_klmMuidHits);
   m_tracks.registerRelationTo(m_bklmHit2ds);
   m_tracks.registerRelationTo(m_eklmHit2ds);
-  m_tracks.registerRelationTo(trackClusterSeparations);
+  m_tracks.registerRelationTo(m_trackClusterSeparations);
   m_tracks.registerRelationTo(m_klmClusters);
-  m_klmClusters.registerRelationTo(trackClusterSeparations);
-  eclClusters.registerRelationTo(extHits);
+  m_klmClusters.registerRelationTo(m_trackClusterSeparations);
+  m_eclClusters.registerRelationTo(m_extHits);
   RecoTrack::registerRequiredRelations(m_recoTracks);
 
   // Save the in-time cut's central value and width for valid hits
@@ -398,13 +386,12 @@ void TrackExtrapolateG4e::event(bool byMuid)
   // Do extrapolation for each hypothesis of each reconstructed track.
   if (byMuid) { // event() called by Muid module
     G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetMuid);
-    StoreArray<ECLCluster> eclClusters(*m_ECLClustersColName);
-    std::vector<std::pair<ECLCluster*, G4ThreeVector> > eclClusterInfo(eclClusters.getEntries());
-    for (int c = 0; c < eclClusters.getEntries(); ++c) {
-      eclClusterInfo[c].first = eclClusters[c];
-      eclClusterInfo[c].second = G4ThreeVector(eclClusters[c]->getClusterPosition().X(),
-                                               eclClusters[c]->getClusterPosition().Y(),
-                                               eclClusters[c]->getClusterPosition().Z()) * CLHEP::cm;
+    std::vector<std::pair<ECLCluster*, G4ThreeVector> > eclClusterInfo(m_eclClusters.getEntries());
+    for (int c = 0; c < m_eclClusters.getEntries(); ++c) {
+      eclClusterInfo[c].first = m_eclClusters[c];
+      eclClusterInfo[c].second = G4ThreeVector(m_eclClusters[c]->getClusterPosition().X(),
+                                               m_eclClusters[c]->getClusterPosition().Y(),
+                                               m_eclClusters[c]->getClusterPosition().Z()) * CLHEP::cm;
     }
     std::vector<std::pair<KLMCluster*, G4ThreeVector> > klmClusterInfo(m_klmClusters.getEntries());
     for (int c = 0; c < m_klmClusters.getEntries(); ++c) {
@@ -445,10 +432,7 @@ void TrackExtrapolateG4e::endRun(bool)
 
 void TrackExtrapolateG4e::terminate(bool byMuid)
 {
-
-  if (m_DefaultName != NULL) { delete m_DefaultName; }
   if (m_DefaultHypotheses != NULL) { delete m_DefaultHypotheses; }
-
   if (byMuid) {
     delete m_TargetMuid;
     delete m_MuonPlusPar;
@@ -475,7 +459,6 @@ void TrackExtrapolateG4e::terminate(bool byMuid)
     m_EnterExit = NULL;
     m_BKLMVolumes = NULL;
   }
-
 }
 
 void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
@@ -483,10 +466,8 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
                                       // DIVOT bool isCosmic, // true for back-extrapolation
                                       const G4ThreeVector& position, // in cm (genfit2 units)
                                       const G4ThreeVector& momentum, // in GeV/c (genfit2 units)
-                                      const G4ErrorSymMatrix& covariance, // (6x6) using cm, GeV/c (genfit2 units)
-                                      const std::string&) // DIVOT: NO LONGER USED - REMOVE THIS ARGUMENT
+                                      const G4ErrorSymMatrix& covariance) // (6x6) using cm, GeV/c (genfit2 units)
 {
-
   bool isCosmic = false; // DIVOT
   if ((!m_ExtInitialized) && (!m_MuidInitialized)) {
     // No EXT nor MUID module in analysis path ==> mimic ext::initialize() with reasonable defaults.
@@ -500,8 +481,6 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
     G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/stepLength 250 mm");
     G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/magField 0.001");
     G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/energyLoss 0.05");
-    m_DefaultName = new std::string;
-    setExtHitsColName(*m_DefaultName);
     m_DefaultHypotheses = new std::vector<Const::ChargedStable>; // not used
     initialize(0.1, 0.002, *m_DefaultHypotheses);
   }
@@ -550,10 +529,6 @@ void TrackExtrapolateG4e::identifyMuon(int pdgCode, // signed for charge
     G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/stepLength 250 mm");
     G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/magField 0.001");
     G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/energyLoss 0.05");
-    m_DefaultName = new std::string;
-    setExtHitsColName(*m_DefaultName);
-    setECLClustersColName(*m_DefaultName);
-    setTrackClusterSeparationsColName(*m_DefaultName);
     m_DefaultHypotheses = new std::vector<Const::ChargedStable>; // not used
     initialize(0.0, 30.0, 3.5, 150.0, 100.0, 0.1, 0.002, false, *m_DefaultHypotheses);
   }
@@ -740,20 +715,19 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   finishTrack(extState, muid, (g4eState.GetPosition().z() > m_OffsetZ));
 
   if (eclClusterInfo != NULL) {
-    StoreArray<ExtHit> extHits(*m_ExtHitsColName);
     for (unsigned int c = 0; c < eclClusterInfo->size(); ++c) {
       if (eclHit1[c].getStatus() != EXT_FIRST) {
-        ExtHit* h = extHits.appendNew(eclHit1[c]);
+        ExtHit* h = m_extHits.appendNew(eclHit1[c]);
         (*eclClusterInfo)[c].first->addRelationTo(h);
         extState.track->addRelationTo(h);
       }
       if (eclHit2[c].getStatus() != EXT_FIRST) {
-        ExtHit* h = extHits.appendNew(eclHit2[c]);
+        ExtHit* h = m_extHits.appendNew(eclHit2[c]);
         (*eclClusterInfo)[c].first->addRelationTo(h);
         extState.track->addRelationTo(h);
       }
       if (eclHit3[c].getStatus() != EXT_FIRST) {
-        ExtHit* h = extHits.appendNew(eclHit3[c]);
+        ExtHit* h = m_extHits.appendNew(eclHit3[c]);
         (*eclClusterInfo)[c].first->addRelationTo(h);
         extState.track->addRelationTo(h);
       }
@@ -763,14 +737,13 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   if (klmClusterInfo != NULL) {
     // here we set a relation only to the closest KLMCluster
     // and we don't set any relation if the distance is too large
-    StoreArray<TrackClusterSeparation> trackClusterSeparations(*m_TrackClusterSeparationsColName);
     double minDistance = m_MaxKLMTrackClusterDistance;
     unsigned int closestCluster = 0;
     for (unsigned int c = 0; c < klmClusterInfo->size(); ++c) {
       if (klmHit[c].getDistance() > 1.0E9) {
         continue;
       }
-      TrackClusterSeparation* h = trackClusterSeparations.appendNew(klmHit[c]);
+      TrackClusterSeparation* h = m_trackClusterSeparations.appendNew(klmHit[c]);
       (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackSep
       extState.track->addRelationTo(h); // relation Track to TrackSep
       if (klmHit[c].getDistance() < minDistance) {
@@ -1269,10 +1242,9 @@ void TrackExtrapolateG4e::createExtHit(ExtHitStatus status, const ExtState& extS
   if (extState.isCosmic) mom = -mom;
   G4ErrorSymMatrix covariance(6, 0);
   fromG4eToPhasespace(g4eState, covariance);
-  StoreArray<ExtHit> extHits(*m_ExtHitsColName);
-  ExtHit* extHit = extHits.appendNew(extState.pdgCode, detID, copyID, status,
-                                     extState.isCosmic, extState.tof,
-                                     pos, mom, covariance);
+  ExtHit* extHit = m_extHits.appendNew(extState.pdgCode, detID, copyID, status,
+                                       extState.isCosmic, extState.tof,
+                                       pos, mom, covariance);
   // If called standalone, there will be no associated track
   if (extState.track != NULL) { extState.track->addRelationTo(extHit); }
 

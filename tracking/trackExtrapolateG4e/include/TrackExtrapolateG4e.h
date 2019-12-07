@@ -13,6 +13,7 @@
 /* Tracking headers. */
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/TrackClusterSeparation.h>
 
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
@@ -169,15 +170,6 @@ namespace Belle2 {
     //! destructor
     ~TrackExtrapolateG4e();
 
-    //! Assign the ExtHits collection name before initialization
-    void setExtHitsColName(std::string& extHitsColName) { m_ExtHitsColName = &extHitsColName; }
-
-    //! Assign the ECLClusters collection name before initialization
-    void setECLClustersColName(std::string& eclClustersColName) { m_ECLClustersColName = &eclClustersColName; }
-
-    //! Assign the TrackClusterSeparations collection name before initialization
-    void setTrackClusterSeparationsColName(std::string& trackClusterSeparationsColName) { m_TrackClusterSeparationsColName = &trackClusterSeparationsColName; }
-
     //! Initialize for track extrapolation by the EXT module.
     //! @param minPt Minimum transverse momentum to begin extrapolation (GeV/c).
     //! @param minKE Minimum kinetic energy to continue extrapolation (GeV/c).
@@ -220,13 +212,11 @@ namespace Belle2 {
     //! @param position Starting point of the extrapolation (cm).
     //! @param momentum Momentum of the track at the starting point (GeV/c).
     //! @param covariance Phase-space covariance matrix (6x6) at the starting point (cm, GeV/c).
-    //! @param extHitsColName (not used).
     void extrapolate(int pdgCode,
                      double tof,
                      const G4ThreeVector& position,
                      const G4ThreeVector& momentum,
-                     const G4ErrorSymMatrix& covariance,
-                     const std::string& extHitsColName);
+                     const G4ErrorSymMatrix& covariance);
 
     //! Performs muon identification for a single track (specified in genfit2 units).
     //! @param pdgCode Signed PDG identifier of the particle hypothesis to be used for the extrapolation.
@@ -339,15 +329,6 @@ namespace Belle2 {
     //! Minimum kinetic energy in MeV for extrapolation to continue
     double m_MinKE;
 
-    //! Pointer to name of the extHit collection of the extrapolation hits
-    std::string* m_ExtHitsColName;
-
-    //! Pointer to name of the ECLCluster collection
-    std::string* m_ECLClustersColName;
-
-    //! Pointer to name of the TrackClusterSeparation collection
-    std::string* m_TrackClusterSeparationsColName;
-
     //! Pointer to the ExtManager singleton
     Simulation::ExtManager* m_ExtMgr;
 
@@ -356,9 +337,6 @@ namespace Belle2 {
 
     //!  ChargedStable hypotheses for MUID
     const std::vector<Const::ChargedStable>* m_HypothesesMuid;
-
-    //! Pointer to an empty string
-    std::string* m_DefaultName;
 
     //! Default ChargedStable hypotheses (needed as call argument but not used)
     std::vector<Const::ChargedStable>* m_DefaultHypotheses;
@@ -496,6 +474,12 @@ namespace Belle2 {
     //! Conditions-database object for Muid parameters
     DBObjPtr<MuidParameters> m_muidParameters;
 
+    //! ECL clusters
+    StoreArray<ECLCluster> m_eclClusters;
+
+    //! Ext hits
+    StoreArray<ExtHit> m_extHits;
+
     //! BKLM 2d hits
     StoreArray<BKLMHit2d> m_bklmHit2ds;
 
@@ -516,6 +500,10 @@ namespace Belle2 {
 
     //! Tracks
     StoreArray<Track> m_tracks;
+
+    //! Track cluster sepration
+    StoreArray<TrackClusterSeparation> m_trackClusterSeparations;
+
   };
 
 } // end of namespace Belle2

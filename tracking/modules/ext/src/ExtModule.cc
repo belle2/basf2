@@ -34,7 +34,6 @@ REG_MODULE(Ext)
 
 ExtModule::ExtModule() :
   Module(),
-  m_ExtHitsColName(""),
   m_MinPt(0.0),
   m_MinKE(0.0),
   m_MaxStep(0.0),
@@ -51,7 +50,6 @@ ExtModule::ExtModule() :
   setDescription("Extrapolates tracks from CDC to outer detectors using geant4e");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("pdgCodes", m_PDGCodes, "Positive-charge PDG codes for extrapolation hypotheses", m_PDGCodes);
-  addParam("ExtHitsColName", m_ExtHitsColName, "Name of collection holding the ExtHits from the extrapolation", string(""));
   addParam("MinPt", m_MinPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated (default 0.1)",
            double(0.1));
   addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation (default 0.002)", double(0.002));
@@ -127,8 +125,7 @@ void ExtModule::initialize()
   }
 
   // Initialize the extrapolator engine for EXT (vs MUID)
-  // *NOTE* that MinPt, MinKE, ExtHitsColName are shared by MUID and EXT; only last caller wins
-  m_Extrapolator->setExtHitsColName(m_ExtHitsColName);
+  // *NOTE* that MinPt and MinKE are shared by MUID and EXT; only last caller wins
   m_Extrapolator->initialize(m_MinPt, m_MinKE, m_Hypotheses);
 }
 

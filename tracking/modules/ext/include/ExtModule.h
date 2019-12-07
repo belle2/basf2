@@ -66,9 +66,6 @@ namespace Belle2 {
     //!  ChargedStable hypotheses
     std::vector<Const::ChargedStable> m_Hypotheses;
 
-    //! User-defined name of the extHit collection of the extrapolation hits
-    std::string m_ExtHitsColName;
-
     //! User-defined minimum transverse momentum in GeV/c for extrapolation to be started
     double m_MinPt;
 

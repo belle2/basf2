@@ -8,12 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MUIDMODULE_H
-#define MUIDMODULE_H
+#pragma once
 
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
 
+/* C++ headers. */
 #include <string>
 #include <vector>
 
@@ -148,5 +149,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif // MUIDMODULE_H

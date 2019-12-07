@@ -8,23 +8,27 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TRACKEXTRAPOLATEG4E_H
-#define TRACKEXTRAPOLATEG4E_H
+#pragma once
 
-#include <framework/gearbox/Const.h>
+/* Tracking headers. */
+#include <tracking/dataobjects/ExtHit.h>
+
+/* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
+#include <framework/gearbox/Const.h>
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/MuidParameters.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
-#include <tracking/dataobjects/ExtHit.h>
 
-#include <G4TouchableHandle.hh>
+/* Geant4 headers. */
 #include <G4ErrorTrajErr.hh>
 #include <G4ThreeVector.hh>
+#include <G4TouchableHandle.hh>
 
+/* C++ headers. */
 #include <string>
 #include <vector>
 
@@ -534,5 +538,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif // TRACKEXTRAPOLATEG4E_H

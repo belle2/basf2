@@ -8,59 +8,67 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <tracking/trackExtrapolateG4e/TrackExtrapolateG4e.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/geometry/BFieldManager.h>
-#include <klm/bklm/dataobjects/BKLMStatus.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
+
+/* Tracking headers. */
 #include <tracking/dataobjects/ExtHit.h>
-#include <klm/dataobjects/KLMMuidLikelihood.h>
-#include <klm/dataobjects/KLMMuidHit.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
-#include <klm/muid/MuidBuilder.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/ECLCluster.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
-#include <simulation/kernel/ExtManager.h>
-#include <simulation/kernel/ExtCylSurfaceTarget.h>
+
+/* Belle 2 headers. */
 #include <ecl/geometry/ECLGeometryPar.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/geometry/BFieldManager.h>
+#include <framework/logging/Logger.h>
+#include <genfit/Exception.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/bklm/dataobjects/BKLMStatus.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
+#include <klm/dataobjects/KLMMuidLikelihood.h>
+#include <klm/dataobjects/KLMMuidHit.h>
+#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
+#include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/geometry/GeometryData.h>
-#include <genfit/Exception.h>
+#include <klm/muid/MuidBuilder.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/Track.h>
+#include <simulation/kernel/ExtCylSurfaceTarget.h>
+#include <simulation/kernel/ExtManager.h>
 
-#include <cmath>
-#include <vector>
-#include <algorithm>
-#include <iostream>
-
+/* CLHEP headers. */
+#include <CLHEP/Matrix/Vector.h>
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
-#include <CLHEP/Matrix/Vector.h>
 
+/* Geant4 headers. */
+#include <G4ErrorFreeTrajState.hh>
+#include <G4ErrorMatrix.hh>
+#include <G4ErrorPropagatorData.hh>
+#include <G4ErrorSymMatrix.hh>
+#include <G4ParticleTable.hh>
 #include <G4PhysicalVolumeStore.hh>
-#include <G4VPhysicalVolume.hh>
-#include <G4Track.hh>
+#include <G4Point3D.hh>
+#include <G4StateManager.hh>
 #include <G4Step.hh>
 #include <G4StepPoint.hh>
-#include <G4VTouchable.hh>
-#include <G4TouchableHandle.hh>
-#include <G4ParticleTable.hh>
-#include <G4ErrorPropagatorData.hh>
-#include <G4ErrorFreeTrajState.hh>
-#include <G4StateManager.hh>
 #include <G4ThreeVector.hh>
-#include <G4ErrorMatrix.hh>
-#include <G4ErrorSymMatrix.hh>
-#include <G4Point3D.hh>
+#include <G4TouchableHandle.hh>
+#include <G4Track.hh>
 #include <G4UImanager.hh>
+#include <G4VPhysicalVolume.hh>
+#include <G4VTouchable.hh>
+
+/* C++ headers. */
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+#include <vector>
 
 #define TWOPI (2.0*M_PI)
 #define PI_8 (0.125*M_PI)

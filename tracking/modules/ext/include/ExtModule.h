@@ -8,12 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EXTMODULE_H
-#define EXTMODULE_H
+#pragma once
 
-#include <framework/core/Module.h>
+/* Belle 2 headers. */
 #include <framework/gearbox/Const.h>
+#include <framework/core/Module.h>
 
+/* C++ headers. */
 #include <string>
 #include <vector>
 
@@ -104,5 +105,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif // EXTMODULE_H

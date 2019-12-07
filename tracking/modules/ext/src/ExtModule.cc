@@ -8,16 +8,24 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <tracking/modules/ext/ExtModule.h>
+
+/* Tracking headers. */
 #include <tracking/trackExtrapolateG4e/TrackExtrapolateG4e.h>
+
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 #include <simulation/kernel/ExtManager.h>
 
-#include <vector>
-
+/* CLHEP headers. */
 #include <CLHEP/Units/SystemOfUnits.h>
 
+/* Geant4 headers. */
 #include <G4UImanager.hh>
+
+/* C++ headers. */
+#include <vector>
 
 using namespace std;
 using namespace Belle2;

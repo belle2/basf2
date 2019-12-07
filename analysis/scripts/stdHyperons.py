@@ -8,22 +8,15 @@ from stdV0s import *
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
 
-# Information:
-#
-# These reconstructions are made using the steering functions
-# stdXi(fitter, b2bii), stdXi0(gammtype, b2bii), and stdOmega(kitter, b2bii).
-# The user can select which fitter option  ['kfitter' or 'treefitter'] reconstructions stdXi and stdOmega in their analysis.
-# The user can select by a boolean option b2bii whether this is a Belle or Belle II reconstruction.
-# When reconstructing stdXi0, the user can select which gamma:pi0effxx is used to reconstruct Xi0 candidates
-# using gammatype ['eff60', 'eff50', 'eff40', 'eff30', or 'eff20'] options
-#
-# Preliminary good candidates are available to the user after running stdXi(), stdXi0(), or stdOmega().
-# These good selections are available by running goodXi(xitype), goodXi0(xitype), and goodOmega(omegatype).
-# The good steering functions allow argument types ['veryloose', 'loose', or 'tight'] to the user.
-# All documentation for this optimization and usage is found at BELLE2-NOTE-PH-2019-011
-
 
 def stdXi(fitter='kfitter', b2bii=False, path=None):
+    """
+    stdXi(fitter, b2bii) reconstructs the standard Xi- ParticleList
+    fitter option allows the user to use either kfit or treefit Xi- vertex reconstructions
+    boolean b2bii allows for Belle or Belle II analysis reconstructions
+    Documentation at BELLE2-NOTE-PH-2019-011
+    """
+
     if not b2bii:
         stdLambdas(path=path)
         # 3.5 MeV Range around the nominal mass
@@ -73,6 +66,13 @@ def stdXi(fitter='kfitter', b2bii=False, path=None):
 
 
 def stdXi0(gammatype='eff40', b2bii=False, path=None):
+    """
+    stdXi0(gammatype, b2bii) reconstructs the standard Xi0 ParticleList with the TreeFitter
+    gammatype option allows use of all pi0effxx gamma ParticleLists from stdPhotons to optimize yield
+    boolean b2bii allows for Belle or Belle II analysis reconstructions
+    Documentation at BELLE2-NOTE-PH-2019-011
+    """
+
     if not b2bii:
         stdLambdas(path=path)
         # 3.5 MeV Range around nominal mass (~7*sigma_core)
@@ -136,6 +136,13 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
 
 
 def stdOmega(fitter='kfitter', b2bii=False, path=None):
+    """
+    stOmega(fitter, b2bii) reconstructs the standard Omega- ParticleList
+    fitter option allows the user to use either kfit or treefit Omega- vertex reconstructions
+    boolean b2bii allows for Belle or Belle II analysis reconstructions
+    Documentation at BELLE2-NOTE-PH-2019-011
+    """
+
     if not b2bii:
         stdLambdas(path=path)
         # 3.5 MeV Range around the nominal mass
@@ -200,6 +207,11 @@ def stdOmega(fitter='kfitter', b2bii=False, path=None):
 
 
 def goodXi(xitype='loose', path=None):
+    """Belle II Optimized selection cuts for good Xi- candidates
+    option xitype 'veryloose', 'loose', and 'tight' produce the selection lists
+    of BELLE2-NOTE-PH-2019-011
+    """
+
     if xitype == 'veryloose':
         cutAndCopyList(
             'Xi-:veryloose',
@@ -227,6 +239,11 @@ def goodXi(xitype='loose', path=None):
 
 
 def goodXi0(xitype='loose', path=None):
+    """Belle II Optimized selection cuts for good Xi0 candidates
+    option xitype 'veryloose', 'loose', and 'tight' produce the selection lists
+    of BELLE2-NOTE-PH-2019-011
+    """
+
     if xitype == 'veryloose':
         # Reconstructed core resolution pi0~7.8 MeV, cut at 3*sigma_core around the nomin"al mass
         cutAndCopyList(
@@ -262,6 +279,11 @@ def goodXi0(xitype='loose', path=None):
 
 
 def goodOmega(omegatype='veryloose', path=None):
+    """Belle II Optimized selection cuts for good Omega- candidates
+    option omegatype 'veryloose', 'loose', and 'tight' produce the selection lists
+    of BELLE2-NOTE-PH-2019-011
+    """
+
     if omegatype == 'veryloose':
         cutAndCopyList(
             'Omega-:veryloose',

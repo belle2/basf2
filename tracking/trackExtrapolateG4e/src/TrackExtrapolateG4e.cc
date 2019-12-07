@@ -585,8 +585,8 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   if (klmClusterInfo != nullptr) {
     klmHit.resize(klmClusterInfo->size()); // initialize each to huge distance
   }
-  KLMMuidLikelihood* muid = m_klmMuidLikelihoods.appendNew(extState.pdgCode); // rest of this object will be filled later
-  if (extState.track != nullptr) { extState.track->addRelationTo(muid); }
+  KLMMuidLikelihood* klmMuidLikelihood = m_klmMuidLikelihoods.appendNew(extState.pdgCode); // rest of this object will be filled later
+  if (extState.track != nullptr) { extState.track->addRelationTo(klmMuidLikelihood); }
   G4ErrorMode propagationMode = (extState.isCosmic ? G4ErrorMode_PropBackwards : G4ErrorMode_PropForwards);
   m_ExtMgr->InitTrackPropagation(propagationMode);
   while (true) {
@@ -627,7 +627,7 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
           }
         }
       }
-      if (createMuidHit(extState, g4eState, muid, bklmHitUsed)) {
+      if (createMuidHit(extState, g4eState, klmMuidLikelihood, bklmHitUsed)) {
         // Force geant4e to update its G4Track from the Kalman-updated state
         m_ExtMgr->GetPropagator()->SetStepN(0);
       }
@@ -712,7 +712,7 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
 
   m_ExtMgr->EventTermination(propagationMode);
 
-  finishTrack(extState, muid, (g4eState.GetPosition().z() > m_OffsetZ));
+  finishTrack(extState, klmMuidLikelihood, (g4eState.GetPosition().z() > m_OffsetZ));
 
   if (eclClusterInfo != nullptr) {
     for (unsigned int c = 0; c < eclClusterInfo->size(); ++c) {
@@ -1253,7 +1253,7 @@ void TrackExtrapolateG4e::createExtHit(ExtHitStatus status, const ExtState& extS
 // Write another volume-entry point on track.
 // The track state will be modified here by the Kalman fitter.
 
-bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState& g4eState, KLMMuidLikelihood* muid,
+bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState& g4eState, KLMMuidLikelihood* klmMuidLikelihood,
                                         std::vector<std::map<const Track*, double> >* bklmHitUsed)
 {
 
@@ -1280,7 +1280,7 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
                                     intersection.layer + 1, 1, 1);
         float zBarrelEfficiency = m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0), intersection.sector + 1,
                                   intersection.layer + 1, 0, 1);
-        muid->setExtBKLMEfficiencyValue(intersection.layer, phiBarrelEfficiency * zBarrelEfficiency);
+        klmMuidLikelihood->setExtBKLMEfficiencyValue(intersection.layer, phiBarrelEfficiency * zBarrelEfficiency);
 
         if (extState.lastBarrelExtLayer < intersection.layer) {
           extState.lastBarrelExtLayer = intersection.layer;
@@ -1343,9 +1343,9 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
               m_klmStripEfficiency->getBarrelEfficiency(
                 (intersection.isForward ? 1 : 0), intersection.sector + 1,
                 intersection.layer + 1, BKLMElementNumbers::c_ZPlane, 1);
-            muid->setExtBKLMEfficiencyValue(intersection.layer, phiBarrelEfficiency * zBarrelEfficiency);
+            klmMuidLikelihood->setExtBKLMEfficiencyValue(intersection.layer, phiBarrelEfficiency * zBarrelEfficiency);
           } else {
-            muid->setExtBKLMEfficiencyValue(intersection.layer, 0);
+            klmMuidLikelihood->setExtBKLMEfficiencyValue(intersection.layer, 0);
           }
           if (extState.lastBarrelExtLayer < intersection.layer) {
             extState.lastBarrelExtLayer = intersection.layer;
@@ -1368,7 +1368,7 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           layerEndcapEfficiency *= m_klmStripEfficiency->getEndcapEfficiency((intersection.isForward ? 1 : 0) + 1, intersection.sector + 1,
                                    intersection.layer + 1, plane, 1);
         }
-        muid->setExtEKLMEfficiencyValue(intersection.layer, layerEndcapEfficiency);
+        klmMuidLikelihood->setExtEKLMEfficiencyValue(intersection.layer, layerEndcapEfficiency);
 
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;
@@ -1408,9 +1408,9 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
             layerEndcapEfficiency *= m_klmStripEfficiency->getEndcapEfficiency((intersection.isForward ? 1 : 0) + 1, intersection.sector + 1,
                                      intersection.layer + 1, plane, 1);
           }
-          muid->setExtEKLMEfficiencyValue(intersection.layer, layerEndcapEfficiency);
+          klmMuidLikelihood->setExtEKLMEfficiencyValue(intersection.layer, layerEndcapEfficiency);
         } else {
-          muid->setExtEKLMEfficiencyValue(intersection.layer, 0);
+          klmMuidLikelihood->setExtEKLMEfficiencyValue(intersection.layer, 0);
         }
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;
@@ -1426,10 +1426,11 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
     TVector3 tposAtHitPlane(intersection.positionAtHitPlane.x(),
                             intersection.positionAtHitPlane.y(),
                             intersection.positionAtHitPlane.z());
-    KLMMuidHit* muidHit = m_klmMuidHits.appendNew(extState.pdgCode, intersection.inBarrel, intersection.isForward, intersection.sector,
-                                                  intersection.layer, tpos,
-                                                  tposAtHitPlane, extState.tof, intersection.time, intersection.chi2);
-    if (extState.track != nullptr) { extState.track->addRelationTo(muidHit); }
+    KLMMuidHit* klmMuidHit = m_klmMuidHits.appendNew(extState.pdgCode, intersection.inBarrel, intersection.isForward,
+                                                     intersection.sector,
+                                                     intersection.layer, tpos,
+                                                     tposAtHitPlane, extState.tof, intersection.time, intersection.chi2);
+    if (extState.track != nullptr) { extState.track->addRelationTo(klmMuidHit); }
     G4Point3D newPos(intersection.position.x() * CLHEP::cm,
                      intersection.position.y() * CLHEP::cm,
                      intersection.position.z() * CLHEP::cm);
@@ -1812,7 +1813,7 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
 
 }
 
-void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihood* muid, bool isForward)
+void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihood* klmMuidLikelihood, bool isForward)
 {
 
   // Done with this track: compute likelihoods and fill the muid object
@@ -1824,19 +1825,19 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihoo
     outcome = ((extState.lastEndcapExtLayer < 0) ? 1 : 2) + (extState.escaped ? 2 : 0);
   }
 
-  muid->setOutcome(outcome);
-  muid->setBarrelExtLayer(extState.lastBarrelExtLayer);
-  muid->setEndcapExtLayer(extState.lastEndcapExtLayer);
-  muid->setBarrelHitLayer(extState.lastBarrelHitLayer);
-  muid->setEndcapHitLayer(extState.lastEndcapHitLayer);
-  muid->setExtLayer(lastExtLayer);
-  muid->setHitLayer(((extState.lastEndcapHitLayer == -1) ?
-                     extState.lastBarrelHitLayer :
-                     extState.lastBarrelExtLayer + extState.lastEndcapHitLayer + 1));
-  muid->setChiSquared(extState.chi2);
-  muid->setDegreesOfFreedom(extState.nPoint);
-  muid->setExtLayerPattern(extState.extLayerPattern);
-  muid->setHitLayerPattern(extState.hitLayerPattern);
+  klmMuidLikelihood->setOutcome(outcome);
+  klmMuidLikelihood->setBarrelExtLayer(extState.lastBarrelExtLayer);
+  klmMuidLikelihood->setEndcapExtLayer(extState.lastEndcapExtLayer);
+  klmMuidLikelihood->setBarrelHitLayer(extState.lastBarrelHitLayer);
+  klmMuidLikelihood->setEndcapHitLayer(extState.lastEndcapHitLayer);
+  klmMuidLikelihood->setExtLayer(lastExtLayer);
+  klmMuidLikelihood->setHitLayer(((extState.lastEndcapHitLayer == -1) ?
+                                  extState.lastBarrelHitLayer :
+                                  extState.lastBarrelExtLayer + extState.lastEndcapHitLayer + 1));
+  klmMuidLikelihood->setChiSquared(extState.chi2);
+  klmMuidLikelihood->setDegreesOfFreedom(extState.nPoint);
+  klmMuidLikelihood->setExtLayerPattern(extState.extLayerPattern);
+  klmMuidLikelihood->setHitLayerPattern(extState.hitLayerPattern);
 
 // Do likelihood calculation
 
@@ -1854,23 +1855,23 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihoo
   double logL_d = -1.0E20;
   double logL_e = -1.0E20;
   if (outcome != 0) { // extrapolation reached KLM sensitive volume
-    int charge = (muid->getPDGCode() > 0);
-    if ((abs(muid->getPDGCode()) == Const::muon.getPDGCode()) ||
-        (abs(muid->getPDGCode()) == Const::electron.getPDGCode())) charge = -charge;
+    int charge = (klmMuidLikelihood->getPDGCode() > 0);
+    if ((abs(klmMuidLikelihood->getPDGCode()) == Const::muon.getPDGCode()) ||
+        (abs(klmMuidLikelihood->getPDGCode()) == Const::electron.getPDGCode())) charge = -charge;
     if (charge > 0) {
-      muon = m_MuonPlusPar->getPDF(muid, isForward);
-      pion = m_PionPlusPar->getPDF(muid, isForward);
-      kaon = m_KaonPlusPar->getPDF(muid, isForward);
-      proton = m_ProtonPar->getPDF(muid, isForward);
-      deuteron = m_DeuteronPar->getPDF(muid, isForward);
-      electron = m_PositronPar->getPDF(muid, isForward);
+      muon = m_MuonPlusPar->getPDF(klmMuidLikelihood, isForward);
+      pion = m_PionPlusPar->getPDF(klmMuidLikelihood, isForward);
+      kaon = m_KaonPlusPar->getPDF(klmMuidLikelihood, isForward);
+      proton = m_ProtonPar->getPDF(klmMuidLikelihood, isForward);
+      deuteron = m_DeuteronPar->getPDF(klmMuidLikelihood, isForward);
+      electron = m_PositronPar->getPDF(klmMuidLikelihood, isForward);
     } else {
-      muon = m_MuonMinusPar->getPDF(muid, isForward);
-      pion = m_PionMinusPar->getPDF(muid, isForward);
-      kaon = m_KaonMinusPar->getPDF(muid, isForward);
-      proton = m_AntiprotonPar->getPDF(muid, isForward);
-      deuteron = m_AntideuteronPar->getPDF(muid, isForward);
-      electron = m_ElectronPar->getPDF(muid, isForward);
+      muon = m_MuonMinusPar->getPDF(klmMuidLikelihood, isForward);
+      pion = m_PionMinusPar->getPDF(klmMuidLikelihood, isForward);
+      kaon = m_KaonMinusPar->getPDF(klmMuidLikelihood, isForward);
+      proton = m_AntiprotonPar->getPDF(klmMuidLikelihood, isForward);
+      deuteron = m_AntideuteronPar->getPDF(klmMuidLikelihood, isForward);
+      electron = m_ElectronPar->getPDF(klmMuidLikelihood, isForward);
     }
     if (muon > 0.0) logL_mu = log(muon);
     if (pion > 0.0) logL_pi = log(pion);
@@ -1892,18 +1893,18 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihoo
     }
   }
 
-  muid->setJunkPDFValue(junk);
-  muid->setMuonPDFValue(muon);
-  muid->setPionPDFValue(pion);
-  muid->setKaonPDFValue(kaon);
-  muid->setProtonPDFValue(proton);
-  muid->setDeuteronPDFValue(deuteron);
-  muid->setElectronPDFValue(electron);
-  muid->setLogL_mu(logL_mu);
-  muid->setLogL_pi(logL_pi);
-  muid->setLogL_K(logL_K);
-  muid->setLogL_p(logL_p);
-  muid->setLogL_d(logL_d);
-  muid->setLogL_e(logL_e);
+  klmMuidLikelihood->setJunkPDFValue(junk);
+  klmMuidLikelihood->setMuonPDFValue(muon);
+  klmMuidLikelihood->setPionPDFValue(pion);
+  klmMuidLikelihood->setKaonPDFValue(kaon);
+  klmMuidLikelihood->setProtonPDFValue(proton);
+  klmMuidLikelihood->setDeuteronPDFValue(deuteron);
+  klmMuidLikelihood->setElectronPDFValue(electron);
+  klmMuidLikelihood->setLogL_mu(logL_mu);
+  klmMuidLikelihood->setLogL_pi(logL_pi);
+  klmMuidLikelihood->setLogL_K(logL_K);
+  klmMuidLikelihood->setLogL_p(logL_p);
+  klmMuidLikelihood->setLogL_d(logL_d);
+  klmMuidLikelihood->setLogL_e(logL_e);
 
 }

@@ -55,9 +55,7 @@ void KLMStripEfficiencyCollectorModule::prepare()
 {
   m_EklmDigits.isRequired();
   m_BklmDigits.isRequired();
-  m_recoTracks.isRequired();
   m_tracks.isRequired();
-  m_trackFitResults.isRequired();
   m_extHits.isRequired();
   m_MuonList.isRequired(m_MuonListName);
   int nPlanes = m_PlaneArrayIndex->getNPlanes();

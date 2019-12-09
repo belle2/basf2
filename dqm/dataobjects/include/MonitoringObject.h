@@ -29,7 +29,12 @@ namespace Belle2 {
   public:
     /** Constructor.
      */
-    //    MonitoringObject();
+    MonitoringObject() {};
+
+    MonitoringObject(const std::string& name)
+    {
+      m_name = name;
+    }
 
 
     const std::string& getName() const {return m_name;}

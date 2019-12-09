@@ -34,32 +34,16 @@ namespace Belle2 {
      */
     unsigned int getNEvents() const {return m_nEvents;}
 
-    /** Lowest experiment number getter.
+    /** experiment number getter.
      */
-    int getExperimentLow() const {return m_experimentLow;}
+    int getExperiment() const {return m_experiment;}
 
-    /** Lowest run number getter.
+    /** run number getter.
      */
-    int getRunLow() const {return m_runLow;}
+    int getRun() const {return m_run;}
 
-    /** Lowest event number in lowest run getter.
-     */
-    unsigned int getEventLow() const {return m_eventLow;}
-
-    /** Highest experiment number getter.
-     */
-    int getExperimentHigh() const {return m_experimentHigh;}
-
-    /** Highest run number getter.
-     */
-    int getRunHigh() const {return m_runHigh;}
-
-    /** Highest event number in highest run getter.
-     */
-    unsigned int getEventHigh() const {return m_eventHigh;}
-
-    /** File creation date and time getter (UTC) */
-    const std::string& getDate() const {return m_date;}
+    /** Run date getter (UTC) */
+    const std::string& getRunDate() const {return m_date;}
 
     /** Software release version getter.
      */
@@ -86,32 +70,22 @@ namespace Belle2 {
      */
     void setNEvents(unsigned int nEvents) {m_nEvents = nEvents;}
 
-    /** Lowest experiment, run and event number setter.
+    /** Set experiment and run.
      *
-     *  @param experiment The lowest experiment number.
-     *  @param run The lowest run number.
-     *  @param event The lowest event number of the lowest run.
+     *  @param experiment experiment number.
+     *  @param run run number.
      */
-    void setLow(int experiment, int run, unsigned int event) {m_experimentLow = experiment; m_runLow = run; m_eventLow = event;}
+    void setExperimentRun(int experiment, int run) {m_experiment = experiment; m_run = run;}
 
-    /** Highest experiment, run and event number setter.
-     *
-     *  @param experiment The highest experiment number.
-     *  @param run The highest run number.
-     *  @param event The highest event number of the highest run.
-     */
-    void setHigh(int experiment, int run, unsigned int event) {m_experimentHigh = experiment; m_runHigh = run; m_eventHigh = event;}
+    void setRelease(const std::string& release)
+    {
+      m_release = release;
+    }
 
-    /** Creation data setter.
-     *
-     *  @param date The creation date and time.
-     *  @param site The site where the file was created.
-     *  @param user The user who created the file.
-     *  @param release The software release.
-     */
-    void setCreationData(const std::string& date, const std::string& release)
-    {m_date = date; m_release = release;}
-
+    void setRunDate(const std::string& date)
+    {
+      m_date = date;
+    }
 
     /** Number of generated events setter.
      *
@@ -142,19 +116,11 @@ namespace Belle2 {
 
     unsigned int m_nEvents; /**< Number of events.  */
 
-    int m_experimentLow; /**< Lowest experiment number.  */
+    int m_experiment; /**< experiment number.  */
 
-    int m_runLow; /**< Lowest run number.  */
+    int m_run; /**< run number.  */
 
-    unsigned int m_eventLow; /**< Lowest event number in lowest run.  */
-
-    int m_experimentHigh; /**< Highest experiment number.  */
-
-    int m_runHigh; /**< Highest run number.  */
-
-    unsigned int m_eventHigh; /**< Highest event number in highest run.  */
-
-    std::string m_date; /**< File creation date and time (UTC).  */
+    std::string m_date; /**< run date and time (UTC).  */
 
     std::string m_release; /**< Software release version.  */
 

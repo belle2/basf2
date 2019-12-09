@@ -52,6 +52,9 @@ Variables
    which were aliases created using `matchedMC`, with the dedicated variables
    `mcFlightTime` and `mcFlightDistance`, respectively.
 
+ * Removed ``output_variable`` option in the :ref:`DeepFlavorTagger` and introduced a standard variable ``DNN_qrCombined`` for the output. The new variable returns 
+   the flavor times the dilution factor as the category-based :ref:`FlavorTagger` output variables ``FBDT_qrCombined`` and ``FANN_qrCombined`` do. 
+   Now we can evaluate the output of both taggers in the same way.
 
 Modules
 +++++++

@@ -307,7 +307,7 @@ void CDCDedxPIDModule::event()
       int layer = cdcHit->getILayer(); // layer within superlayer
       int superlayer = cdcHit->getISuperLayer();
 
-      // check if the hit was
+      // check if the hit was readded by the ReattachCDCWireHitsToRecoTracks module
       bool hasReaddedFlag = false;
       const RecoHitInformation* hitInfo = recoTrack->getRecoHitInformation(cdcHit);
       if (hitInfo->getFoundByTrackFinder() == RecoHitInformation::c_ReattachCDCWireHitsToRecoTracks) {
@@ -334,7 +334,7 @@ void CDCDedxPIDModule::event()
 
         // there are always 2 hits, one of which is ~1, the other ~0; or both ~0. Store only the largest.
         std::vector<double> weights = kalmanFitterInfo->getWeights();
-        double maxWeight = weights[0] > weights[1] ? weights[0] : weights[1];
+        const double maxWeight = weights[0] > weights[1] ? weights[0] : weights[1];
         if (pdgCode == Const::pion.getPDGCode()) weightPionHypo = maxWeight;
         else if (pdgCode == Const::kaon.getPDGCode()) weightKaonHypo = maxWeight;
         else if (pdgCode == Const::proton.getPDGCode()) weightProtHypo = maxWeight;

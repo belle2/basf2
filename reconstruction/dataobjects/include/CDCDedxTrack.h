@@ -214,7 +214,7 @@ namespace Belle2 {
     /** Return the 1D correction for this hit */
     double getOneDCorrection(int i) const { return m_hOnedCor[i]; }
 
-    /** Return whether the hit was readded to the track */
+    /** Return whether the hit was readded to the track by the ReattachCDCWireHitsToRecoTracks module*/
     bool getReaddedFlag(int i) const { return m_hHasReaddedFlag[i]; }
 
     /** Return the max weights from KalmanFitterInfo */

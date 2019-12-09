@@ -11,12 +11,7 @@ __authors__ = [
     "Niharika Rout"
 ]
 
-from basf2 import *
-from modularAnalysis import *
-import sys
-import glob
-import os.path
-import basf2
+import modularAnalysis as ma
 
 
 def BsigToDhTohhList(path):
@@ -66,7 +61,7 @@ def BsigToDhTohhList(path):
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B+:BtoDh' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        ma.reconstructDecay('B+:BtoDh' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BsigList.append('B+:BtoDh' + str(chID))
 
     Lists = BsigList
@@ -84,9 +79,9 @@ def loadD0bar(path):
     ]
     D0barList = []
     for chID, channel in enumerate(D0barChannels):
-        reconstructDecay('anti-D0:D0Bar' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
+        ma.reconstructDecay('anti-D0:D0Bar' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
         D0barList.append('anti-D0:D0Bar' + str(chID))
-        copyLists('anti-D0:hh', D0barList, path=path)
+        ma.copyLists('anti-D0:hh', D0barList, path=path)
     return D0barList
 
 
@@ -133,7 +128,7 @@ def BsigToDhToKshhList(path):
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B-:BtoDhkshh' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        ma.reconstructDecay('B-:BtoDhkshh' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BsigList.append('B-:BtoDhkshh' + str(chID))
 
     Lists = BsigList
@@ -149,9 +144,9 @@ def loadDkshh(path):
     ]
     D0List = []
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:Kshh' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
+        ma.reconstructDecay('D0:Kshh' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
         D0List.append('D0:Kshh' + str(chID))
-        copyLists('D0:Kshh', D0List, path=path)
+        ma.copyLists('D0:Kshh', D0List, path=path)
     return D0List
 
 
@@ -192,7 +187,7 @@ def BsigToDhToKspi0List(path):
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B-:BtoDhkspi0' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        ma.reconstructDecay('B-:BtoDhkspi0' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BsigList.append('B-:BtoDhkspi0' + str(chID))
 
     Lists = BsigList
@@ -208,9 +203,9 @@ def loadDkspi0(path):
 
     D0List = []
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:Kspi0' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
+        ma.reconstructDecay('D0:Kspi0' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
         D0List.append('D0:Kspi0' + str(chID))
-        copyLists('D0:Kspi0', D0List, path=path)
+        ma.copyLists('D0:Kspi0', D0List, path=path)
     return D0List
 
 
@@ -251,7 +246,7 @@ def BsigToDhToKspipipi0List(path):
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B-:BtoDhkspipipi0' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        ma.reconstructDecay('B-:BtoDhkspipipi0' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BsigList.append('B-:BtoDhkspipipi0' + str(chID))
 
     Lists = BsigList
@@ -266,9 +261,9 @@ def loadDkspipipi0(path):
     ]
     D0List = []
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:Kspipipi0' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
+        ma.reconstructDecay('D0:Kspipipi0' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
         D0List.append('D0:Kspipipi0' + str(chID))
-        copyLists('D0:Kspipipi0', D0List, path=path)
+        ma.copyLists('D0:Kspipipi0', D0List, path=path)
     return D0List
 
 
@@ -282,7 +277,7 @@ def DoubleCharmList(path):
 
     B0List = []
     for chID, channel in enumerate(B0_Channels):
-        reconstructDecay('B0:DC' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        ma.reconstructDecay('B0:DC' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         B0List.append('B0:DC' + str(chID))
 
     Lists = B0List

@@ -22,7 +22,6 @@
 
 // MetaData
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/dataobjects/BackgroundMetaData.h>
 
 using namespace std;
 

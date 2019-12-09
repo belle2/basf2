@@ -9,22 +9,19 @@
 
 __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling", "Phil Grace"]
 
-import sys
-import glob
-import os.path
 
-from basf2 import *
-from modularAnalysis import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import basf2 as b2
+import modularAnalysis as ma
+import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
-skimCode = encodeSkimName('feiSLBplus')
-fileList = get_test_file("MC12_mixedBGx1")
+skimCode = expert.encodeSkimName('feiSLBplus')
+fileList = expert.get_test_file("MC12_mixedBGx1")
 
-path = create_path()
+path = b2.create_path()
 
-inputMdstList('default', fileList, path=path)
+ma.inputMdstList('default', fileList, path=path)
 
-from skim.fei import *
+from skim.fei import BplusSL, runFEIforBplusSL
 # run pre-selection cuts and FEI
 runFEIforBplusSL(path)
 
@@ -33,12 +30,12 @@ path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatchin
 
 # Apply final B+ tag cuts
 BtagList = BplusSL(path)
-skimOutputUdst(skimCode, BtagList, path=path)
-summaryOfLists(BtagList, path=path)
+expert.skimOutputUdst(skimCode, BtagList, path=path)
+ma.summaryOfLists(BtagList, path=path)
 
 # Suppress noisy modules, and then process
-setSkimLogging(path)
-process(path)
+expert.setSkimLogging(path)
+b2.process(path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

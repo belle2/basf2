@@ -8,26 +8,24 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdPi0s import *
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPhotons import stdPhotons, loadStdSkimPhoton
+from stdPi0s import stdPi0s, loadStdSkimPi0
 from stdV0s import stdKshorts
-from skim.standardlists.charm import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loadStdDstarPlus
+import skimExpertFunctions as expert
 
-set_log_level(LogLevel.INFO)
-import sys
-import os
-import glob
+b2.set_log_level(b2.LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'
-skimCode = encodeSkimName('LeptonicUntagged')
+skimCode = expert.encodeSkimName('LeptonicUntagged')
 
-fileList = get_test_file("MC12_mixedBGx1")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 
-leppath = Path()
+leppath = b2.Path()
 
-inputMdstList('default', fileList, path=leppath)
+ma.inputMdstList('default', fileList, path=leppath)
 
 loadStdSkimPi0(path=leppath)
 loadStdSkimPhoton(path=leppath)
@@ -49,13 +47,13 @@ loadStdDstarPlus(path=leppath)
 from skim.leptonic import LeptonicList
 
 lepList = LeptonicList(path=leppath)
-skimOutputUdst(skimCode, lepList, path=leppath)
+expert.skimOutputUdst(skimCode, lepList, path=leppath)
 
-summaryOfLists(lepList, path=leppath)
+ma.summaryOfLists(lepList, path=leppath)
 
 
-setSkimLogging(path=leppath)
-process(leppath)
+expert.setSkimLogging(path=leppath)
+b2.process(leppath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

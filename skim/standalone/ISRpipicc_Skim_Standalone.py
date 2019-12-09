@@ -9,24 +9,20 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdPhotons import *
-from stdCharged import stdPi, stdK, stdE, stdMu
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdK, stdMu, stdPi
+import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
-import os
-import sys
-import glob
 
 # create a new path
-ISRskimpath = Path()
+ISRskimpath = b2.Path()
 
 # Add default samples
-fileList = get_test_file("MC12_mixedBGx1")
-inputMdstList('default', fileList, path=ISRskimpath)
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=ISRskimpath)
 
 # use standard final state particle lists
 stdPi('loose', path=ISRskimpath)
@@ -43,17 +39,17 @@ from skim.quarkonium import ISRpipiccList
 ISRpipicc = ISRpipiccList(path=ISRskimpath)
 
 # output to Udst file
-skimCode = encodeSkimName('ISRpipicc')
-skimOutputUdst(skimCode, ISRpipicc, path=ISRskimpath)
+skimCode = expert.encodeSkimName('ISRpipicc')
+expert.skimOutputUdst(skimCode, ISRpipicc, path=ISRskimpath)
 
 # print out Particle List statistics
-summaryOfLists(ISRpipicc, path=ISRskimpath)
+ma.summaryOfLists(ISRpipicc, path=ISRskimpath)
 
 # output skim log information
-setSkimLogging(path=ISRskimpath)
+expert.setSkimLogging(path=ISRskimpath)
 
 # process the path
-process(ISRskimpath)
+b2.process(ISRskimpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

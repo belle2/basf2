@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-from modularAnalysis import *
+import modularAnalysis as ma
 
 
 def loadStdD0(path):
@@ -27,9 +26,9 @@ def loadStdD0(path):
 
     DList = []
     for chID, channel in enumerate(D_Channels):
-        reconstructDecay('D0:std' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
+        ma.reconstructDecay('D0:std' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
         DList.append('D0:std' + str(chID))
-    copyLists('D0:all', DList, path=path)
+    ma.copyLists('D0:all', DList, path=path)
     return DList
 
 
@@ -53,9 +52,9 @@ def loadStdDplus(path):
 
     DList = []
     for chID, channel in enumerate(D_Channels):
-        reconstructDecay('D+:std' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
+        ma.reconstructDecay('D+:std' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
         DList.append('D+:std' + str(chID))
-    copyLists('D+:all', DList, path=path)
+    ma.copyLists('D+:all', DList, path=path)
     return DList
 
 
@@ -74,9 +73,9 @@ def loadStdDstar0(path):
 
     DList = []
     for chID, channel in enumerate(D_Channels):
-        reconstructDecay('D*0:std' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
+        ma.reconstructDecay('D*0:std' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
         DList.append('D*0:std' + str(chID))
-    copyLists('D*0:all', DList, path=path)
+    ma.copyLists('D*0:all', DList, path=path)
     return DList
 
 
@@ -94,7 +93,7 @@ def loadStdDstarPlus(path):
 
     DList = []
     for chID, channel in enumerate(D_Channels):
-        reconstructDecay('D*+:std' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
+        ma.reconstructDecay('D*+:std' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
         DList.append('D*+:std' + str(chID))
-    copyLists('D*+:all', DList, path=path)
+    ma.copyLists('D*+:all', DList, path=path)
     return DList

@@ -1,3 +1,5 @@
+.. _DeepFlavorTagger: 
+
 Deep Flavor Tagger
 ==================
 

@@ -1,3 +1,5 @@
+.. _FlavorTagger:
+
 Flavor Tagger
 ==============
 

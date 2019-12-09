@@ -3,18 +3,23 @@
 from basf2 import *
 from modularAnalysis import *
 from variables import variables
-from stdCharged import *
-from stdV0s import *
+
+from stdCharged import stdPi, stdK
+from stdV0s import stdLambdas
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
 
 
 def stdXi(fitter='kfitter', b2bii=False, path=None):
     """
-    stdXi(fitter, b2bii) reconstructs the standard Xi- ParticleList
-    fitter option allows the user to use either kfit or treefit Xi- vertex reconstructions
-    boolean b2bii allows for Belle or Belle II analysis reconstructions
-    Documentation at BELLE2-NOTE-PH-2019-011
+    Reconstruct the standard :math:`\Xi^-` ``ParticleList`` named ``Xi-:std``.
+
+    .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
+
+    Parameters:
+    fitter (str): specify either ``kfitter`` or ``treefit`` for the vertex reconstructions (default ``kfitter``)
+    b2bii (bool): specify Belle or Belle II reconstruction
+    path (basf2.Path): modules are added to this path building the ``Xi-:std`` list
     """
 
     if not b2bii:
@@ -67,10 +72,15 @@ def stdXi(fitter='kfitter', b2bii=False, path=None):
 
 def stdXi0(gammatype='eff40', b2bii=False, path=None):
     """
-    stdXi0(gammatype, b2bii) reconstructs the standard Xi0 ParticleList with the TreeFitter
-    gammatype option allows use of all pi0effxx gamma ParticleLists from stdPhotons to optimize yield
-    boolean b2bii allows for Belle or Belle II analysis reconstructions
-    Documentation at BELLE2-NOTE-PH-2019-011
+    Reconstruct the standard :math:`\Xi^0` ``ParticleList`` named ``Xi0:std``.
+
+    .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
+
+    Parameters:
+    gammatype (str): specify either ``eff60``, ``eff50``, ``eff40``, ``eff30``, or ``eff20``
+    for the pi0 reconstruction from ``gamma:pi0effxx`` (default ``eff40``)
+    b2bii (bool): specify Belle or Belle II reconstruction
+    path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
     """
 
     if not b2bii:
@@ -137,10 +147,14 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
 
 def stdOmega(fitter='kfitter', b2bii=False, path=None):
     """
-    stOmega(fitter, b2bii) reconstructs the standard Omega- ParticleList
-    fitter option allows the user to use either kfit or treefit Omega- vertex reconstructions
-    boolean b2bii allows for Belle or Belle II analysis reconstructions
-    Documentation at BELLE2-NOTE-PH-2019-011
+    Reconstruct the standard :math:`\Omega^-` ``ParticleList`` named ``Omega-:std``.
+
+    .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
+
+    Parameters:
+    fitter (str): specify either ``kfitter`` or ``treefit`` for the vertex reconstructions (default ``kfitter``)
+    b2bii (bool): specify Belle or Belle II reconstruction
+    path (basf2.Path): modules are added to this path building the ``Omega-:std`` list
     """
 
     if not b2bii:
@@ -207,9 +221,15 @@ def stdOmega(fitter='kfitter', b2bii=False, path=None):
 
 
 def goodXi(xitype='loose', path=None):
-    """Belle II Optimized selection cuts for good Xi- candidates
-    option xitype 'veryloose', 'loose', and 'tight' produce the selection lists
-    of BELLE2-NOTE-PH-2019-011
+    """
+    Select the standard good :math:`\Xi^-` ``ParticleList`` named ``Xi-:veryloose``, ``Xi-:loose``, or ``Xi-:tight``
+    from the reconstructed ``Xi-:std``.
+
+    .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
+
+    Parameters:
+    xitype (str): specify either ``veryloose``, ``loose``,  or ``tight`` for good ``ParticleList`` selection (default ``loose``)
+    path (basf2.Path): modules are added to this path building the ``Xi-:veryloose``, ``Xi-:loose``, or ``Xi-:tight``, list
     """
 
     if xitype == 'veryloose':
@@ -239,9 +259,15 @@ def goodXi(xitype='loose', path=None):
 
 
 def goodXi0(xitype='loose', path=None):
-    """Belle II Optimized selection cuts for good Xi0 candidates
-    option xitype 'veryloose', 'loose', and 'tight' produce the selection lists
-    of BELLE2-NOTE-PH-2019-011
+    """
+    Select the standard good :math:`\Xi^0` ``ParticleList`` named ``Xi0:veryloose``, ``Xi0:loose``, or ``Xi0:tight``
+    from the reconstructed ``Xi0:std``.
+
+    .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
+
+    Parameters:
+    xitype (str): specify either ``veryloose``, ``loose``,  or ``tight`` for good ``ParticleList`` selection (default ``loose``)
+    path (basf2.Path): modules are added to this path building the ``Xi0:veryloose``, ``Xi0:loose``, or ``Xi0:tight``, list
     """
 
     if xitype == 'veryloose':
@@ -279,9 +305,17 @@ def goodXi0(xitype='loose', path=None):
 
 
 def goodOmega(omegatype='veryloose', path=None):
-    """Belle II Optimized selection cuts for good Omega- candidates
-    option omegatype 'veryloose', 'loose', and 'tight' produce the selection lists
-    of BELLE2-NOTE-PH-2019-011
+    """
+    Select the standard good :math:`\Omega^-` ``ParticleList`` named ``Omega-:veryloose``, ``Omega-:loose``,
+    or ``Omega-:tight`` from the reconstructed ``Omega-:std``.
+
+    .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
+
+    Parameters:
+    omegatype (str): specify either ``veryloose``, ``loose``,  or ``tight`` for good ``ParticleList`` selection
+    (default ``veryloose``)
+    path (basf2.Path): modules are added to this path building the ``Omega-:veryloose``, ``Omega-:loose``,
+    or ``Omega-:tight``, list
     """
 
     if omegatype == 'veryloose':

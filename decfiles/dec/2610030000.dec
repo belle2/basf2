@@ -5,6 +5,9 @@
 # Documentation: 
 # PhysicsWG: Charm
 # Tested: Yes
+# Responsible: Yeqi Chen
+# Email: chenyq15@mail.ustc.edu.cn
+# Date: 20191210
 
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 

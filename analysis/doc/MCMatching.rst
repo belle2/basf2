@@ -158,9 +158,9 @@ Steering file snippet
  
 
    .. warning:: 
-        ``isSignal`` of output particle, `'B+:testB'` in above case, is not related to given decay string for now.
-	For example, even if one uses ``...``, ``?gamma``, and ``?nu``, ``isSignal`` will be 0.
-	So please use a specific isSignal* variable, ``isSignalAcceptMissing`` in this case.
+        `isSignal` of output particle, `'B+:testB'` in above case, is not related to given decay string for now.
+	For example, even if one uses ``...``, ``?gamma``, or ``?nu``, `isSignal` will be 0.
+	So please use a specific isSignal* variable, `isSignalAcceptMissing` in this case.
 
 
 ---------------

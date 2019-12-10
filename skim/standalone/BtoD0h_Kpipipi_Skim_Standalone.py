@@ -32,9 +32,9 @@ ma.applyCuts(list_name='K+:all', cut='abs(dr) < 2 and abs(dz) < 5', path=path)
 
 # B- to D(->Kpipipi)h- Skim
 from skim.btohadron_validation import BsigToD0hToKpipipiList
-from skim.standardlists.hadrons_for_validation import loadD0_Kpipipi
+from skim.standardlists.charm import loadStdD0_Kpipipi
 
-loadD0_Kpipipi(path=path)
+loadStdD0_Kpipipi(path=path)
 BtoD0h_Kpipipi_list = BsigToD0hToKpipipiList(path=path)
 sef.skimOutputUdst(skimCode, BtoD0h_Kpipipi_list, path=path)
 ma.summaryOfLists(BtoD0h_Kpipipi_list, path=path)

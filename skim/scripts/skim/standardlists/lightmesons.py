@@ -81,6 +81,22 @@ def loadStdAllRhoPlus(persistent=True, path=None):
     return 'rho+:all'
 
 
+def loadA_1Plus(persistent=True, path=None):
+    """
+    Creates a 'a_1+:all' list from 'pi+:all pi+:all pi-:all' requiring :math:`0.8 < M < 1.6~{\\rm GeV}/c^2`.
+
+    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
+    @param path         modules are added to this path
+    """
+    reconstructDecay(
+        decayString='a_1+:all -> pi+:all pi+:all pi-:all',
+        cut='0.8 < M < 1.6',
+        dmID=1, writeOut=persistent,
+        path=path)
+
+    return 'a_1+:all'
+
+
 def loadStdLooseKstar0(persistent=True, path=None):
     """
     Create a list of 'K*0:loose' list from 'pi-:loose K+:loose' with :math:`0.74 < M < 1.04~GeV`

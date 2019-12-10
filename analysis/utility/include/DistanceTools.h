@@ -5,6 +5,8 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thibaud Humair                                           *
  *                                                                        *
+ * Inspired from DistanceCalculatorModule by Sourav Dey & Abi Soffer      *
+ *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 

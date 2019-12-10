@@ -19,7 +19,6 @@
 // DataObjects
 // #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <analysis/utility/DistanceTools.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 namespace Belle2 {
@@ -82,6 +81,16 @@ namespace Belle2 {
     float getTagVertexPval();
 
     /**
+     * Returns a ptr to the tag vtx track indexed by trackIndex
+     */
+    const TrackFitResult* getVtxFitTrackResultPtr(unsigned int trackIndex);
+
+    /**
+     * Returns a ptr to the MC particle matched to the tag vtx track indexed by trackIndex
+     */
+    const MCParticle* getVtxFitTrackMCParticle(unsigned int trackIndex);
+
+    /**
      * Returns DeltaT
      */
     float getDeltaT();
@@ -110,6 +119,12 @@ namespace Belle2 {
      * Returns fit algo type
      */
     int getFitType() ;
+
+    /**
+     * get the constraint type used in the tag fit
+     */
+
+    std::string getConstraintType();
 
     /**
      * Returns number of tracks used in the fit
@@ -167,58 +182,51 @@ namespace Belle2 {
     float getTagVChi2IP() ;
 
     /**
+     *
+     *  Returns the position of the constraint, ie centre of the constraint ellipse
+     */
+
+    TVector3 getConstraintCenter();
+
+    /**
+     * Get the covariance matrix of the constraint for the tag fit
+     */
+
+    TMatrixDSym getConstraintCov();
+
+    /**
+     * Returns the position vector (X, Y, Z) of the tag track indexed by trackindex
+     */
+
+    TVector3 getVtxFitTrackPosition(unsigned int trackIndex);
+
+    /**
+     * Returns the momentum vector of the tag track indexed by trackindex
+     */
+
+    TVector3 getVtxFitTrackP(unsigned int trackIndex);
+
+    /**
      * Returns one of the 3 components of the momentum of tag track indexed by trackindex
      */
     double getVtxFitTrackPComponent(unsigned int trackIndex, unsigned int component);
 
+    /**
+     * Returns the longitudinal distance from the IP to the POCA of the tag track indexed by trackIndex
+     */
+
     double getVtxFitTrackZ0(unsigned int trackIndex);
+
+    /**
+     * Returns the radial distance from the IP to the POCA of the tag track indexed by trackIndex
+     */
+
     double getVtxFitTrackD0(unsigned int trackIndex);
-
-    /**
-     *  Returns the distance between the constraint and the tag track indexed by trackindex
-     */
-
-    double getTrackDistanceToConstraint(unsigned int trackIndex);
-
-    /**
-     *  Returns the uncertainty on the distance between the constraint and the tag track indexed by trackindex
-     */
-
-    double getTrackDistanceToConstraintErr(unsigned int trackIndex);
-
-    /**
-     *  Returns the distance between the constraint and the tag vtx
-     */
-
-    double getTagVDistanceToConstraint();
-
-    /**
-     *  Returns the distance between the tag vtx and the track indexed by trackIndex
-     */
-
-    double getTrackDistanceToTagV(unsigned int trackIndex);
-
-    /**
-     *  Returns the ertimated error on the distance between the tag vtx and the track indexed by trackIndex
-     */
-
-    double getTrackDistanceToTagVErr(unsigned int trackIndex);
-
-    /**
-     *  Returns the distance between the MC tag vtx and the MC p'cle corresponding to the track indexed by trackIndex
-     */
-
-    double getTrueTagDistanceToTagV(unsigned int trackIndex);
-
-    /**
-     *  Returns the uncertainty on the distance between the constraint and the tag vtx
-     */
-
-    double getTagVDistanceToConstraintErr();
 
     /**
      * Returns the weight assigned by Rave to the track indexed by trackIndex
      */
+
     double getRaveWeight(unsigned int trackIndex);
 
     // set methods
@@ -379,8 +387,6 @@ namespace Belle2 {
     std::string m_constraintType;       /**< Type of the constraint used for the tag vertex fit (noConstraint, IP, Boost, Tube) */
     TVector3 m_constraintCenter;        /**< centre of the constraint */
     TMatrixDSym m_constraintCov;        /**< covariance matrix associated to the constraint, ie size of the constraint */
-    DistanceTools
-    m_distanceTools;      /**< this class contains a collection of function useful to get distances between tracks and vtx's */
 
 
     /**

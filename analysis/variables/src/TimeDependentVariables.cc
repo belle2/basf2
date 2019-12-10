@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi, Fernando Abudinen                         *
+ * Contributors: Luigi Li Gioi, Fernando Abudinen, Thibaud Humair         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,8 +18,10 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/TagVertex.h>
-
 #include <mdst/dataobjects/MCParticle.h>
+
+//utilities
+#include <analysis/utility/DistanceTools.h>
 
 // framework aux
 #include <framework/gearbox/Const.h>
@@ -649,8 +651,15 @@ namespace Belle2 {
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
-      if (vert)
-        result = vert->getTrackDistanceToConstraint(trackIndexInt);
+      if (!vert) return result;
+      if (vert->getConstraintType() == "noConstraint") return result;
+      const TrackFitResult* tagTrack(vert->getVtxFitTrackResultPtr(trackIndexInt));
+      if (!tagTrack) return result;
+
+      DistanceTools distanceTools;
+      result =  distanceTools.trackToVtxDist(tagTrack -> getPosition(),
+                                             tagTrack -> getMomentum(),
+                                             vert -> getConstraintCenter());
 
       return result;
     }
@@ -663,10 +672,24 @@ namespace Belle2 {
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
-      if (vert)
-        result = vert->getTrackDistanceToConstraintErr(trackIndexInt);
+      if (!vert) return result;
+      if (vert->getConstraintType() == "noConstraint") return result;
+      const TrackFitResult* tagTrack(vert->getVtxFitTrackResultPtr(trackIndexInt));
+      if (!tagTrack) return result;
+
+      //recover the covariance matrix associated to the position of the tag track
+
+      TMatrixDSym trackPosCovMat(tagTrack->getCovariance6().GetSub(0, 2, 0, 2));
+
+      DistanceTools distanceTools;
+      result = distanceTools.trackToVtxDistErr(tagTrack -> getPosition(),
+                                               tagTrack -> getMomentum(),
+                                               vert -> getConstraintCenter(),
+                                               trackPosCovMat,
+                                               vert -> getConstraintCov());
 
       return result;
+
     }
 
     double tagVDistanceToConstraint(const Particle* part)
@@ -675,9 +698,12 @@ namespace Belle2 {
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
-      if (vert)
-        result = vert->getTagVDistanceToConstraint();
+      if (!vert) return result;
+      if (vert->getConstraintType() == "noConstraint") return result;
 
+      DistanceTools distanceTools;
+      result =  distanceTools.vtxToVtxDist(vert -> getConstraintCenter(),
+                                           vert -> getTagVertex());
       return result;
     }
 
@@ -687,8 +713,19 @@ namespace Belle2 {
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
-      if (vert)
-        result = vert->getTagVDistanceToConstraintErr();
+      if (!vert) return result;
+      if (vert->getConstraintType() == "noConstraint") return result;
+
+      //To compute the uncertainty, the tag vtx uncertainty is NOT taken into account
+      //The error computed is the the one used  in the chi2.
+      //To change that, emptyMat has to be replaced by m_TagVertexErrMatrix
+      TMatrixDSym emptyMat(3);
+
+      DistanceTools distanceTools;
+      result = distanceTools.vtxToVtxDistErr(vert -> getConstraintCenter(),
+                                             vert -> getTagVertex(),
+                                             vert -> getConstraintCov(),
+                                             emptyMat);
 
       return result;
     }
@@ -701,8 +738,16 @@ namespace Belle2 {
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
-      if (vert)
-        result = vert->getTrackDistanceToTagV(trackIndexInt);
+      if (!vert) return result;
+
+      const TrackFitResult* tagTrack(vert->getVtxFitTrackResultPtr(trackIndexInt));
+      if (!tagTrack) return result;
+
+      DistanceTools distanceTools;
+      result = distanceTools.trackToVtxDist(tagTrack -> getPosition(),
+                                            tagTrack -> getMomentum(),
+                                            vert -> getTagVertex());
+
 
       return result;
     }
@@ -714,9 +759,27 @@ namespace Belle2 {
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return result;
 
-      if (vert)
-        result = vert->getTrackDistanceToTagVErr(trackIndexInt);
+      const TrackFitResult* tagTrack(vert->getVtxFitTrackResultPtr(trackIndexInt));
+      if (!tagTrack) return result;
+
+      //recover the covariance matrix associated to the position of the tag track
+
+      TMatrixDSym trackPosCovMat(tagTrack->getCovariance6().GetSub(0, 2, 0, 2));
+
+      //To compute the uncertainty, the tag vtx uncertainty is NOT taken into account
+      //The error computed is then the one in the chi2.
+      //To change that, emptyMat has to be replaced by m_TagVertexErrMatrix
+
+      TMatrixDSym emptyMat(3);
+
+      DistanceTools distanceTools;
+      result = distanceTools.trackToVtxDistErr(tagTrack -> getPosition(),
+                                               tagTrack -> getMomentum(),
+                                               vert -> getTagVertex(),
+                                               trackPosCovMat,
+                                               emptyMat);
 
       return result;
     }
@@ -728,9 +791,19 @@ namespace Belle2 {
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return result;
 
-      if (vert)
-        result = vert->getTrueTagDistanceToTagV(trackIndexInt);
+      const MCParticle* mcParticle(vert -> getVtxFitTrackMCParticle(trackIndexInt));
+      if (!mcParticle) return result;
+
+      TVector3 mcTagV(vert->getMCTagVertex());
+
+      if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return -1111.;
+      if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0) return -1111.;
+
+      DistanceTools distanceTools;
+      result = distanceTools.vtxToVtxDist(mcParticle -> getProductionVertex(),
+                                          mcTagV);
 
       return result;
     }

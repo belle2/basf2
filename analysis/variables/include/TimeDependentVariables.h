@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi, Fernando Abudinen                         *
+ * Contributors: Luigi Li Gioi, Fernando Abudinen, Thibaud Humair         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

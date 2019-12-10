@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SVD_OCCUPANCY_H_
-#define SVD_OCCUPANCY_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -112,5 +111,4 @@ namespace Belle2 {
   };
 }
 
-#endif /* SVDOccupancyAnalysisModule_H_ */
 

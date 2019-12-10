@@ -146,23 +146,24 @@ expert.add_skim('SystematicsRadEE', systematics.SystematicsRadEEList(path=skimpa
 
 # Charm skims
 from skim import btocharm
-btocharm.loadD0bar(path=skimpath)
-expert.add_skim('BtoDh_hh', btocharm.BsigToDhTohhList(path=skimpath), path=skimpath)
+from skim.standardlists import charm
+charm.loadD0_hh_sideband(path=skimpath)
+expert.add_skim('BtoD0h_hh', btocharm.BsigToD0hTohhList(path=skimpath), path=skimpath)
 
-# B- to D(->Kshh)h- Skim
-btocharm.loadDkshh(path=skimpath)
-BtoDhKshhList = btocharm.BsigToDhToKshhList(path=skimpath)
-expert.add_skim('BtoDh_Kshh', BtoDhKshhList, path=skimpath)
+# B+ to anti-D0(->Kshh)h+ Skim
+charm.loadD0_Kshh_sideband(path=skimpath)
+BtoD0hKshhList = btocharm.BsigToD0hToKshhList(path=skimpath)
+expert.add_skim('BtoD0h_Kshh', BtoD0hKshhList, path=skimpath)
 
-# B- to D(->Kspi0)h- Skim
-btocharm.loadDkspi0(path=skimpath)
-BtoDhKspi0List = btocharm.BsigToDhToKspi0List(path=skimpath)
-expert.add_skim('BtoDh_Kspi0', BtoDhKspi0List, path=skimpath)
+# B+ to anti-D0(->Kspi0)h+ Skim
+charm.loadD0_Kspi0_sideband(path=skimpath)
+BtoDhKspi0List = btocharm.BsigToD0hToKspi0List(path=skimpath)
+expert.add_skim('BtoD0h_Kspi0', BtoDhKspi0List, path=skimpath)
 
-# B- to D(->Kspipipi0)h- Skim
-btocharm.loadDkspipipi0(path=skimpath)
-BtoDhKspipipi0List = btocharm.BsigToDhToKspipipi0List(path=skimpath)
-expert.add_skim('BtoDh_Kspipipi0', BtoDhKspipipi0List, path=skimpath)
+# B+ to anti-D0(->Kspipipi0)h+ Skim
+charm.loadD0_Kspipipi0(path=skimpath)
+BtoD0hKspipipi0List = btocharm.BsigToD0hToKspipipi0List(path=skimpath)
+expert.add_skim('BtoD0h_Kspipipi0', BtoD0hKspipipi0List, path=skimpath)
 
 
 # EWP Skims

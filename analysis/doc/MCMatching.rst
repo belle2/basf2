@@ -162,6 +162,7 @@ Steering file snippet
 	For example, even if one uses ``...``, ``?gamma``, or ``?nu``, `isSignal` will be 0.
 	So please use a specific isSignal* variable, `isSignalAcceptMissing` in this case.
 
+For more information and examples how to use the decay strings correctly, please see :ref:`DecayString` and :ref:`Grammar_for_custom_MCMatching`.
 
 ---------------
 MC decay string

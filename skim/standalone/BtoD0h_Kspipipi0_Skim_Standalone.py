@@ -30,7 +30,7 @@ stdK('all', path=path)
 stdKshorts(path=path)
 loadStdSkimPi0(path=path)
 
-# B+ to anti-D(->Kspipipi0)h+ Skim
+# B+ to anti-D0(->Kspipipi0)h+ Skim
 from skim.btocharm import BsigToD0hToKspipipi0List
 from skim.standardlists.charm import loadD0_Kspipipi0
 

@@ -23,7 +23,7 @@ skim_registry = [
     ('14120300', 'BtoD0h_Kspi0'),
     ('14140200', 'BtoD0h_Kshh'),
     ('14120400', 'BtoD0h_Kspipipi0'),
-    # ('14140500', 'BtoDh_Kspi0pi0'), Add when skim script is ready
+    # ('14140500', 'BtoD0h_Kspi0pi0'), Add when skim script is ready
     ('14140101', 'BtoD0h_Kpi'),
     ('14140102', 'BtoD0h_Kpipipi'),
     ('11180100', 'feiHadronicB0'),

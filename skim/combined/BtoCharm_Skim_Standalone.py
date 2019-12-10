@@ -52,7 +52,7 @@ loadD0_Kshh_sideband(path=btocharmpath)
 BtoD0h_Kshh_List = BsigToD0hToKshhList(path=btocharmpath)
 expert.add_skim('BtoD0h_Kshh', BtoD0h_Kshh_List, path=btocharmpath)
 
-# B- to D(->Kspi0)h- Skim
+# B+ to anti-D0(->Kspi0)h+ Skim
 from skim.btocharm import BsigToD0hToKspi0List
 from skim.standardlists.charm import loadD0_Kspi0_sideband
 
@@ -60,7 +60,7 @@ loadD0_Kspi0_sideband(path=btocharmpath)
 BtoD0h_Kspi0_List = BsigToD0hToKspi0List(path=btocharmpath)
 expert.add_skim('BtoD0h_Kspi0', BtoD0h_Kspi0_List, path=btocharmpath)
 
-# B+ to anti-D(->Kspipipi0)h+ Skim
+# B+ to anti-D0(->Kspipipi0)h+ Skim
 from skim.btocharm import BsigToD0hToKspipipi0List
 from skim.standardlists.charm import loadD0_Kspipipi0
 

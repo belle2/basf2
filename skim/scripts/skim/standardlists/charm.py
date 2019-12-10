@@ -97,6 +97,102 @@ def loadStdD0_Kspipi(path=None):
     return ['D0:Kspipi']
 
 
+def loadD0_hh_sideband(path):
+    """
+    Creates a 'D0:hh' list, with an invariant mass in the range :math:`1.5 < M < 2.2~{\\rm GeV}/c^2`,
+    from the following particles lists:
+
+      1. 'K+:all pi-:all',
+      2. 'K-:all pi+:all',
+      3. 'pi+:all pi-:all',
+      4. 'K+:all K-:all'.
+
+    @param path     modules are added to this path
+    """
+
+    Dcuts = '1.5 < M < 2.2'
+    D0_hh_Channels = [
+        'K+:all pi-:all',
+        'K-:all pi+:all',
+        'pi+:all pi-:all',
+        'K+:all K-:all'
+    ]
+    D0_hh_List = []
+    for chID, channel in enumerate(D0_hh_Channels):
+        ma.reconstructDecay(decayString='D0:D0Bar' + str(chID) + ' -> ' + channel, cut=Dcuts, dmID=chID, path=path)
+        D0_hh_List.append('D0:D0Bar' + str(chID))
+        ma.copyLists(outputListName='D0:hh', inputListNames=D0_hh_List, path=path)
+    return D0_hh_List
+
+
+def loadD0_Kshh_sideband(path):
+    """
+    Creates a 'D0:Kshh' list, with an invariant mass in the range :math:`1.5 < M < 2.2~{\\rm GeV}/c^2`,
+    from the following particles lists:
+
+      1. 'K_S0:merged pi+:all pi-:all',
+      2. 'K_S0:merged K+:all K-:all'.
+
+    @param path     modules are added to this path
+    """
+
+    Dcuts = '1.5 < M < 2.2'
+
+    D0_Channels = [
+        'K_S0:merged pi+:all pi-:all',
+        'K_S0:merged K+:all K-:all'
+    ]
+    D0List = []
+    for chID, channel in enumerate(D0_Channels):
+        ma.reconstructDecay(decayString='D0:Kshh' + str(chID) + ' -> ' + channel, cut=Dcuts, dmID=chID, path=path)
+        D0List.append('D0:Kshh' + str(chID))
+        ma.copyLists(outputListName='D0:Kshh', inputListNames=D0List, path=path)
+    return D0List
+
+
+def loadD0_Kspi0_sideband(path):
+    """
+    Creates a 'D0:Kspi0' list, with an invariant mass in the range :math:`1.5 < M < 2.2~{\\rm GeV}/c^2`,
+    from the 'K_S0:merged' and the 'pi0:skim' lists.
+
+    @param path     modules are added to this path
+    """
+
+    Dcuts = '1.5 < M < 2.2'
+
+    D0_Channels = [
+        'K_S0:merged pi0:skim'
+    ]
+
+    D0List = []
+    for chID, channel in enumerate(D0_Channels):
+        ma.reconstructDecay(decayString='D0:Kspi0' + str(chID) + ' -> ' + channel, cut=Dcuts, dmID=chID, path=path)
+        D0List.append('D0:Kspi0' + str(chID))
+        ma.copyLists(outputListName='D0:Kspi0', inputListNames=D0List, path=path)
+    return D0List
+
+
+def loadD0_Kspipipi0(path):
+    """
+    Creates a 'D0:Kspipipi0' list, with an invariant mass in the range :math:`1.5 < M < 2.2~{\\rm GeV}/c^2`,
+    from the 'K_S0:merged', 'pi+:all', 'pi-:all' and 'pi0:skim' lists.
+
+    @param path     modules are added to this path
+    """
+
+    Dcuts = '1.8 < M < 1.9'
+
+    D0_Channels = [
+        'K_S0:merged pi+:all pi-:all pi0:skim'
+    ]
+    D0List = []
+    for chID, channel in enumerate(D0_Channels):
+        ma.reconstructDecay(decayString='D0:Kspipipi0' + str(chID) + ' -> ' + channel, cut=Dcuts, dmID=chID, path=path)
+        D0List.append('D0:Kspipipi0' + str(chID))
+        ma.copyLists(outputListName='D0:Kspipipi0', inputListNames=D0List, path=path)
+    return D0List
+
+
 def loadStdDplus(path):
     """
     Creates a 'D+:all' list, with an invariant mass in the range :math:`1.8 < M < 1.9~{\\rm GeV}/c^2`,

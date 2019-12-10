@@ -31,7 +31,7 @@ ma.applyCuts(list_name='pi+:all', cut='abs(dr) < 2 and abs(dz) < 5', path=path)
 ma.applyCuts(list_name='K+:all', cut='abs(dr) < 2 and abs(dz) < 5', path=path)
 
 # B- to D(->Kpipipi)h- Skim
-from skim.btohadron_validation import BsigToD0hToKpipipiList
+from skim.btocharm import BsigToD0hToKpipipiList
 from skim.standardlists.charm import loadStdD0_Kpipipi
 
 loadStdD0_Kpipipi(path=path)

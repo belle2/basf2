@@ -17,7 +17,7 @@ gb2_setuprel = 'release-04-00-00'
 
 path = b2.Path()
 
-skimCode = expert.encodeSkimName('BtoDh_Kspi0')
+skimCode = expert.encodeSkimName('BtoD0h_Kspi0')
 
 fileList = expert.get_test_file("MC12_mixedBGx1")
 
@@ -31,11 +31,13 @@ loadStdSkimPi0(path=path)
 stdKshorts(path=path)
 
 # B- to D(->Kspi0)h- Skim
-from skim.btocharm import loadDkspi0, BsigToDhToKspi0List
-loadDkspi0(path=path)
-BtoDhList = BsigToDhToKspi0List(path=path)
-expert.skimOutputUdst(skimCode, BtoDhList, path=path)
-ma.summaryOfLists(BtoDhList, path=path)
+from skim.btocharm import BsigToD0hToKspi0List
+from skim.standardlists.charm import loadD0_Kspi0_sideband
+
+loadD0_Kspi0_sideband(path=path)
+BtoD0h_Kspi0_List = BsigToD0hToKspi0List(path=path)
+expert.skimOutputUdst(skimCode, BtoD0h_Kspi0_List, path=path)
+ma.summaryOfLists(BtoD0h_Kspi0_List, path=path)
 
 
 expert.setSkimLogging(path)

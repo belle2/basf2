@@ -187,13 +187,13 @@ def loadStdDstar0(path):
 
     @param path     modules are added to this path
     """
-    Dcuts = '1.95 < M < 2.05'
+    Dstar0Cuts = 'massDifference(0) < 0.16'
     D_Channels = ['D0:all pi0:loose',
                   'D0:all gamma:loose']
 
     DList = []
     for chID, channel in enumerate(D_Channels):
-        ma.reconstructDecay(decayString='D*0:std' + str(chID) + ' -> ' + channel, cut=Dcuts, dmID=chID, path=path)
+        ma.reconstructDecay(decayString='D*0:std' + str(chID) + ' -> ' + channel, cut=Dstar0Cuts, dmID=chID, path=path)
         DList.append('D*0:std' + str(chID))
     ma.copyLists(outputListName='D*0:all', inputListNames=DList, path=path)
     return DList
@@ -270,13 +270,13 @@ def loadStdDstarPlus(path):
 
     @param path     modules are added to this path
     """
-    Dcuts = '1.95 < M < 2.05'
+    DstarPlusCuts = 'massDifference(0) < 0.16'
     D_Channels = ['D0:all pi+:all',
                   'D+:all pi0:loose']
 
     DList = []
     for chID, channel in enumerate(D_Channels):
-        ma.reconstructDecay(decayString='D*+:std' + str(chID) + ' -> ' + channel, cut=Dcuts, dmID=chID, path=path)
+        ma.reconstructDecay(decayString='D*+:std' + str(chID) + ' -> ' + channel, cut=DstarPlusCuts, dmID=chID, path=path)
         DList.append('D*+:std' + str(chID))
     ma.copyLists(outputListName='D*+:all', inputListNames=DList, path=path)
     return DList

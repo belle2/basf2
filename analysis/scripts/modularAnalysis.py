@@ -2337,6 +2337,201 @@ def writePi0EtaVeto(
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
+PI0ETAVETO_COUNTER = 0
+
+
+def UENOwritePi0EtaVeto(
+    particleList,
+    decayString,
+    workingDirectory='.',
+    pi0vetoname='Pi0_Prob',
+    etavetoname='Eta_Prob',
+    downloadFlag=True,
+    selection='',
+    path=None
+):
+
+    global PI0ETAVETO_COUNTER
+
+    if PI0ETAVETO_COUNTER == 0:
+        variables.addAlias('lowE', 'daughter(1,E)')
+        variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
+        variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
+        variables.addAlias('minC2Tdist', 'daughter(1,minC2TDist)')
+        variables.addAlias('cluNHits', 'daughter(1,clusterNHits)')
+        variables.addAlias('E9E21', 'daughter(1,clusterE9E21)')
+        variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
+
+    PI0ETAVETO_COUNTER = PI0ETAVETO_COUNTER + 1
+
+    roe_path = create_path()
+
+    deadEndPath = create_path()
+
+    signalSideParticleFilter(particleList, selection, roe_path, deadEndPath)
+
+    fillSignalSideParticleList('gamma:HARDPHOTON', decayString, path=roe_path)
+
+    pi0softname = 'gamma:PI0SOFT'
+    pi0softname_energy = 'gamma:PI0SOFT_energy'
+    pi0softname_cluster = 'gamma:PI0SOFT_cluster'
+    pi0softname_both = 'gamma:PI0SOFT_both'
+    etasoftname = 'gamma:ETASOFT'
+    etasoftname_energy = 'gamma:ETASOFT_energy'
+    etasoftname_cluster = 'gamma:ETASOFT_cluster'
+    etasoftname_both = 'gamma:ETASOFT_both'
+    softphoton1 = pi0softname + str(PI0ETAVETO_COUNTER)
+    softphoton2 = pi0softname_energy + str(PI0ETAVETO_COUNTER)
+    softphoton3 = pi0softname_cluster + str(PI0ETAVETO_COUNTER)
+    softphoton4 = pi0softname_both + str(PI0ETAVETO_COUNTER)
+    softphoton5 = etasoftname + str(PI0ETAVETO_COUNTER)
+    softphoton6 = etasoftname_energy + str(PI0ETAVETO_COUNTER)
+    softphoton7 = etasoftname_cluster + str(PI0ETAVETO_COUNTER)
+    softphoton8 = etasoftname_both + str(PI0ETAVETO_COUNTER)
+
+    fillParticleList(
+        softphoton1,
+        '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]',
+        path=roe_path)
+    applyCuts(softphoton1, 'abs(clusterTiming)<clusterErrorTiming', path=roe_path)
+    fillParticleList(
+        softphoton2,
+        '[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]',
+        path=roe_path)
+    applyCuts(softphoton2, 'abs(clusterTiming)<clusterErrorTiming', path=roe_path)
+    fillParticleList(
+        softphoton3,
+        '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]',
+        path=roe_path)
+    applyCuts(softphoton3, 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2', path=roe_path)
+    fillParticleList(
+        softphoton4,
+        '[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]',
+        path=roe_path)
+    applyCuts(softphoton4, 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2', path=roe_path)
+    fillParticleList(
+        softphoton5,
+        '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]',
+        path=roe_path)
+    applyCuts(softphoton5, 'abs(clusterTiming)<clusterErrorTiming', path=roe_path)
+    fillParticleList(
+        softphoton6,
+        '[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]',
+        path=roe_path)
+    applyCuts(softphoton6, 'abs(clusterTiming)<clusterErrorTiming', path=roe_path)
+    fillParticleList(
+        softphoton7,
+        '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]',
+        path=roe_path)
+    applyCuts(softphoton7, 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2', path=roe_path)
+    fillParticleList(
+        softphoton8,
+        '[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]',
+        path=roe_path)
+    applyCuts(softphoton8, 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2', path=roe_path)
+
+    reconstructDecay('pi0:PI0VETO1 -> gamma:HARDPHOTON ' + softphoton1, '', path=roe_path)
+    reconstructDecay('pi0:PI0VETO2 -> gamma:HARDPHOTON ' + softphoton2, '', path=roe_path)
+    reconstructDecay('pi0:PI0VETO3 -> gamma:HARDPHOTON ' + softphoton3, '', path=roe_path)
+    reconstructDecay('pi0:PI0VETO4 -> gamma:HARDPHOTON ' + softphoton4, '', path=roe_path)
+    reconstructDecay('eta:ETAVETO1 -> gamma:HARDPHOTON ' + softphoton5, '', path=roe_path)
+    reconstructDecay('eta:ETAVETO2 -> gamma:HARDPHOTON ' + softphoton6, '', path=roe_path)
+    reconstructDecay('eta:ETAVETO3 -> gamma:HARDPHOTON ' + softphoton7, '', path=roe_path)
+    reconstructDecay('eta:ETAVETO4 -> gamma:HARDPHOTON ' + softphoton8, '', path=roe_path)
+
+    if not os.path.isdir(workingDirectory):
+        os.mkdir(workingDirectory)
+        B2INFO('writePi0EtaVeto: ' + workingDirectory + ' has been created as workingDirectory.')
+
+    if not os.path.isfile(workingDirectory + '/pi0veto.root'):
+        if downloadFlag:
+            conditions.prepend_globaltag('analysis_tools_release-04_rev0')
+            basf2_mva.download('Pi0VetoIdentifierStandard', workingDirectory + '/pi0veto.root')
+            B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
+
+    if not os.path.isfile(workingDirectory + '/pi0veto_energy.root'):
+        if downloadFlag:
+            conditions.prepend_globaltag('analysis_tools_release-04_rev0')
+            basf2_mva.download('Pi0VetoIdentifierWithHigherEnergyThreshold', workingDirectory + '/pi0veto_energy.root')
+            B2INFO('writePi0EtaVeto: pi0veto_energy.root has been downloaded from database to workingDirectory.')
+
+    if not os.path.isfile(workingDirectory + '/pi0veto_cluster.root'):
+        if downloadFlag:
+            conditions.prepend_globaltag('analysis_tools_release-04_rev0')
+            basf2_mva.download('Pi0VetoIdentifierWithLargerClusterSize', workingDirectory + '/pi0veto_cluster.root')
+            B2INFO('writePi0EtaVeto: pi0veto_cluster.root has been downloaded from database to workingDirectory.')
+
+    if not os.path.isfile(workingDirectory + '/pi0veto_both.root'):
+        if downloadFlag:
+            conditions.prepend_globaltag('analysis_tools_release-04_rev0')
+            basf2_mva.download(
+                'Pi0VetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize',
+                workingDirectory + '/pi0veto_both.root')
+            B2INFO('writePi0EtaVeto: pi0veto_both.root has been downloaded from database to workingDirectory.')
+
+    if not os.path.isfile(workingDirectory + '/etaveto.root'):
+        if downloadFlag:
+            conditions.prepend_globaltag('analysis_tools_release-04_rev0')
+            basf2_mva.download('EtaVetoIdentifierStandard', workingDirectory + '/etaveto.root')
+            B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
+
+    if not os.path.isfile(workingDirectory + '/etaveto.root'):
+        if downloadFlag:
+            conditions.prepend_globaltag('analysis_tools_release-04_rev0')
+            basf2_mva.download('EtaVetoIdentifierWithHigherEnergyThreshold', workingDirectory + '/etaveto_energy.root')
+            B2INFO('writePi0EtaVeto: etaveto_energy.root has been downloaded from database to workingDirectory.')
+
+    if not os.path.isfile(workingDirectory + '/etaveto.root'):
+        if downloadFlag:
+            conditions.prepend_globaltag('analysis_tools_release-04_rev0')
+            basf2_mva.download('EtaVetoIdentifierWithLargerClusterSize', workingDirectory + '/etaveto_cluster.root')
+            B2INFO('writePi0EtaVeto: etaveto_cluster.root has been downloaded from database to workingDirectory.')
+
+    if not os.path.isfile(workingDirectory + '/etaveto_both.root'):
+        if downloadFlag:
+            conditions.prepend_globaltag('analysis_tools_release-04_rev0')
+            basf2_mva.download(
+                'EtaVetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize',
+                workingDirectory + '/etaveto_both.root')
+            B2INFO('writePi0EtaVeto: etaveto_both.root has been downloaded from database to workingDirectory.')
+
+    roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO1'], extraInfoName='Pi0Veto',
+                        identifier=workingDirectory + '/pi0veto.root')
+    roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO2'], extraInfoName='Pi0VetoEnergy',
+                        identifier=workingDirectory + '/pi0veto_energy.root')
+    roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO3'], extraInfoName='Pi0VetoCluster',
+                        identifier=workingDirectory + '/pi0veto_cluster.root')
+    roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO4'], extraInfoName='Pi0VetoBoth',
+                        identifier=workingDirectory + '/pi0veto_both.root')
+    roe_path.add_module('MVAExpert', listNames=['eta:ETAVETO1'], extraInfoName='EtaVeto',
+                        identifier=workingDirectory + '/etaveto.root')
+    roe_path.add_module('MVAExpert', listNames=['eta:ETAVETO2'], extraInfoName='EtaVetoEnergy',
+                        identifier=workingDirectory + '/etaveto_energy.root')
+    roe_path.add_module('MVAExpert', listNames=['eta:ETAVETO3'], extraInfoName='EtaVetoCluster',
+                        identifier=workingDirectory + '/etaveto_cluster.root')
+    roe_path.add_module('MVAExpert', listNames=['eta:ETAVETO4'], extraInfoName='EtaVetoBoth',
+                        identifier=workingDirectory + '/etaveto_both.root')
+
+    rankByHighest('pi0:PI0VETO1', 'extraInfo(Pi0Veto)', numBest=1, path=roe_path)
+    rankByHighest('pi0:PI0VETO2', 'extraInfo(Pi0VetoEnergy)', numBest=1, path=roe_path)
+    rankByHighest('pi0:PI0VETO3', 'extraInfo(Pi0VetoCluster)', numBest=1, path=roe_path)
+    rankByHighest('pi0:PI0VETO4', 'extraInfo(Pi0VetoBoth)', numBest=1, path=roe_path)
+    rankByHighest('eta:ETAVETO1', 'extraInfo(EtaVeto)', numBest=1, path=roe_path)
+    rankByHighest('eta:ETAVETO2', 'extraInfo(EtaVetoEnergy)', numBest=1, path=roe_path)
+    rankByHighest('eta:ETAVETO3', 'extraInfo(EtaVetoCluster)', numBest=1, path=roe_path)
+    rankByHighest('eta:ETAVETO4', 'extraInfo(EtaVetoBoth)', numBest=1, path=roe_path)
+
+    variableToSignalSideExtraInfo('pi0:PI0VETO1', {'extraInfo(Pi0Veto)': pi0vetoname}, path=roe_path)
+    variableToSignalSideExtraInfo('pi0:PI0VETO2', {'extraInfo(Pi0VetoEnergy)': pi0vetoname + '_energy'}, path=roe_path)
+    variableToSignalSideExtraInfo('pi0:PI0VETO3', {'extraInfo(Pi0VetoCluster)': pi0vetoname + '_cluster'}, path=roe_path)
+    variableToSignalSideExtraInfo('pi0:PI0VETO4', {'extraInfo(Pi0VetoBoth)': pi0vetoname + '_both'}, path=roe_path)
+    variableToSignalSideExtraInfo('eta:ETAVETO1', {'extraInfo(EtaVeto)': etavetoname}, path=roe_path)
+    variableToSignalSideExtraInfo('eta:ETAVETO2', {'extraInfo(EtaVetoEnergy)': etavetoname + '_energy'}, path=roe_path)
+    variableToSignalSideExtraInfo('eta:ETAVETO3', {'extraInfo(EtaVetoCluster)': etavetoname + '_cluster'}, path=roe_path)
+    variableToSignalSideExtraInfo('eta:ETAVETO4', {'extraInfo(EtaVetoBoth)': etavetoname + '_both'}, path=roe_path)
+
+    path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
 
 def buildEventKinematics(inputListNames=[], default_cleanup=True, path=None):
     """

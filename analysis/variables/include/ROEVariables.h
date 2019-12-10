@@ -329,6 +329,45 @@ namespace Belle2 {
      */
     Manager::FunctionPtr WE_q2lnu(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns pi0 probability
+     */
+    double particlePi0Veto(const Particle* particle);
+
+    /**
+     * Returns pi0 probability
+     */
+    double particlePi0VetoEnergy(const Particle* particle);
+
+    /**
+     * Returns pi0 probability
+     */
+    double particlePi0VetoCluster(const Particle* particle);
+
+    /**
+     * Returns pi0 probability
+     */
+    double particlePi0VetoBoth(const Particle* particle);
+
+    /**
+     * Returns eta probability
+     */
+    double particleEtaVeto(const Particle* particle);
+
+    /**
+     * Returns eta probability
+     */
+    double particleEtaVetoEnergy(const Particle* particle);
+
+    /**
+     * Returns eta probability
+     */
+    double particleEtaVetoCluster(const Particle* particle);
+
+    /**
+     * Returns eta probability
+     */
+    double particleEtaVetoBoth(const Particle* particle);
 
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables

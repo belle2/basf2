@@ -1779,6 +1779,85 @@ namespace Belle2 {
       return 0.0;
     }
 
+    double particlePi0Veto(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("Pi0_Prob")) {
+        return particle->getExtraInfo("Pi0_Prob");
+      } else {
+        B2WARNING("Pi0Veto is not registerted in extraInfo!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double particlePi0VetoEnergy(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("Pi0_Prob_energy")) {
+        return particle->getExtraInfo("Pi0_Prob_energy");
+      } else {
+        B2WARNING("Pi0VetoEnergy is not registerted in extraInfo!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double particlePi0VetoCluster(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("Pi0_Prob_cluster")) {
+        return particle->getExtraInfo("Pi0_Prob_cluster");
+      } else {
+        B2WARNING("Pi0VetoCluster is not registerted in extraInfo!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double particlePi0VetoBoth(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("Pi0_Prob_both")) {
+        return particle->getExtraInfo("Pi0_Prob_both");
+      } else {
+        B2WARNING("Pi0VetoBoth is not registerted in extraInfo!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double particleEtaVeto(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("Eta_Prob")) {
+        return particle->getExtraInfo("Eta_Prob");
+      } else {
+        B2WARNING("EtaVeto is not registerted in extraInfo!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double particleEtaVetoEnergy(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("Eta_Prob_energy")) {
+        return particle->getExtraInfo("Eta_Prob_energy");
+      } else {
+        B2WARNING("EtaVetoEnergy is not registerted in extraInfo!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double particleEtaVetoCluster(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("Eta_Prob_cluster")) {
+        return particle->getExtraInfo("Eta_Prob_cluster");
+      } else {
+        B2WARNING("EtaVetoCluster is not registerted in extraInfo!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double particleEtaVetoBoth(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("Eta_Prob_both")) {
+        return particle->getExtraInfo("Eta_Prob_both");
+      } else {
+        B2WARNING("EtaVetoBoth is not registerted in extraInfo!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables
     // ------------------------------------------------------------------------------
@@ -2184,5 +2263,30 @@ The neutrino momentum is calculated from ROE taking into account the specified m
 
     REGISTER_VARIABLE("printROE", printROE,
                       "For debugging, prints indices of all particles in the ROE and all masks. Returns 0.");
+
+    REGISTER_VARIABLE("pi0Veto", particlePi0Veto,
+                      "Returns pi0 probability");
+
+    REGISTER_VARIABLE("pi0VetoEnergy", particlePi0VetoEnergy,
+                      "Returns pi0 probability");
+
+    REGISTER_VARIABLE("pi0VetoCluster", particlePi0VetoCluster,
+                      "Returns pi0 probability");
+
+    REGISTER_VARIABLE("pi0VetoBoth", particlePi0VetoBoth,
+                      "Returns pi0 probability");
+
+    REGISTER_VARIABLE("etaVeto", particleEtaVeto,
+                      "Returns eta probability");
+
+    REGISTER_VARIABLE("etaVetoEnergy", particleEtaVetoEnergy,
+                      "Returns eta probability");
+
+    REGISTER_VARIABLE("etaVetoCluster", particleEtaVetoCluster,
+                      "Returns eta probability");
+
+    REGISTER_VARIABLE("etaVetoBoth", particleEtaVetoBoth,
+                      "Returns eta probability");
+
   }
 }

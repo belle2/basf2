@@ -41,6 +41,8 @@
 #include <memory>
 #include <string>
 
+#include <TDatabasePDG.h>
+
 namespace Belle2 {
   namespace Variable {
 
@@ -2239,6 +2241,133 @@ endloop:
 
 
 
+    Manager::FunctionPtr useAlternativeDaughterHypothesis(const std::vector<std::string>& arguments)
+    {
+      /*
+       `arguments` contains the variable to calculate and a list of colon-separated index-particle pairs.
+       Overall, it looks like {"M", "0:K+", "1:p+", "3:e-"}.
+       The code is thus divided in two parts:
+       1) Parsing. A loop over the elements of `arguments` that first separates the variable from the rest, and then splits all the index:particle
+          pairs, filling a std::vector with the indexes and another one with the new mass values.
+       2) Replacing: A loop over the particle's daughters. We take the 4-momentum of each of them, recalculating it with a new mass if needed, and then we calculate
+          the variable value using the sum of all the 4-momenta, both updated and non-updated ones.
+      */
+
+      // Expect 2 or more arguments.
+      if (arguments.size() >= 2) {
+
+        //----
+        // 1) parsing
+        //----
+
+        // First argument is the variable name
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+
+        // Parses the other arguments, which are in the form of index:particleName pairs,
+        // and stores indexes and masses in two std::vectors
+        std::vector<unsigned int>indexesToBeReplaced = {};
+        std::vector<double>massesToBeReplaced = {};
+
+        // Loop over the arguments to parse them
+        for (unsigned int iCoord = 1; iCoord < arguments.size(); iCoord++) {
+          auto replacedDauString = arguments[iCoord];
+          // Split the string in index and new mass
+          std::vector<std::string> indexAndMass;
+          boost::split(indexAndMass, replacedDauString, boost::is_any_of(":"));
+
+          // Checks that the index:particleName pair is properly formatted.
+          if (indexAndMass.size() > 2) {
+            B2WARNING("The string indicating which daughter's mass should be replaced contains more than two elements separated by a colon. Perhaps you tried to pass a generalized index, which is not supported yet for this variable. The offending string is "
+                      << replacedDauString << ", while a correct syntax looks like 0:K+.");
+            return nullptr;
+          }
+
+          if (indexAndMass.size() < 2) {
+            B2WARNING("The string indicating which daughter's mass should be replaced contains only one colon-separated element instead of two. The offending string is "
+                      << replacedDauString << ", while a correct syntax looks like 0:K+.");
+            return nullptr;
+          }
+
+          // indexAndMass[0] is the daughter index as string. Try to convert it
+          int dauIndex = 0;
+          try {
+            dauIndex = Belle2::convertString<int>(indexAndMass[0]);
+          } catch (boost::bad_lexical_cast&) {
+            B2WARNING("Found the string " << indexAndMass[0] << "instead of a daughter index.");
+            return nullptr;
+          }
+
+          // Determine PDG code  corresponding to indexAndMass[1] using the particle names defined in evt.pdl
+          TParticlePDG* particlePDG = TDatabasePDG::Instance()->GetParticle(indexAndMass[1].c_str());
+          if (!particlePDG) {
+            B2WARNING("Particle not in evt.pdl file! " << indexAndMass[1]);
+            return nullptr;
+          }
+
+          // Stores the indexes and the masses in the vectors that will be passed to the lambda function
+          int pdgCode = particlePDG->PdgCode();
+          double dauNewMass = TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass() ;
+          indexesToBeReplaced.push_back(dauIndex);
+          massesToBeReplaced.push_back(dauNewMass);
+        } // End of parsing
+
+        //----
+        // 2) replacing
+        //----
+
+        // Core function: creates a new particle from the original one changing
+        // some of the daughters' masses
+        auto func = [var, indexesToBeReplaced, massesToBeReplaced](const Particle * particle) -> double {
+          if (particle == nullptr)
+          {
+            B2WARNING("Trying to access a particle that does not exist. Skipping");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+
+          const auto& frame = ReferenceFrame::GetCurrent();
+
+          // Sum of the 4-momenta of all the daughters with the new mass assumptions
+          TLorentzVector pSum(0, 0, 0, 0);
+
+          for (unsigned int iDau = 0; iDau < particle->getNDaughters(); iDau++)
+          {
+            const Particle* dauPart = particle->getDaughter(iDau);
+            if (not dauPart) {
+              B2WARNING("Trying to access a daughter that does not exist. Index = " << iDau);
+              return std::numeric_limits<float>::quiet_NaN();
+            }
+
+            TLorentzVector dauMom =  frame.getMomentum(dauPart);
+
+            // This can be improved with a faster algorithm to check if an std::vector contains a
+            // certain element
+            for (unsigned int iReplace = 0; iReplace < indexesToBeReplaced.size(); iReplace++) {
+              if (indexesToBeReplaced[iReplace] == iDau) {
+                double p_x = dauMom.Vect().Px();
+                double p_y = dauMom.Vect().Py();
+                double p_z = dauMom.Vect().Pz();
+                dauMom.SetXYZM(p_x, p_y, p_z, massesToBeReplaced[iReplace]);
+                break;
+              }
+            }
+            pSum = pSum + dauMom;
+          } // End of loop over number of daughter
+
+          // Make a dummy particle out of the sum of the 4-momenta of the selected daughters
+          Particle* sumOfDaughters = new Particle(pSum, 100); // 100 is one of the special numbers
+
+          // Calculate the variable on the dummy particle
+          return var->function(sumOfDaughters);
+        }; // end of lambda function
+        return func;
+      }// end of check on number of arguments
+      else
+        B2FATAL("Wrong number of arguments for meta function useAlternativeDaughterHypothesis");
+    }
+
+
+
+
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
                       "[Eventbased] Returns the number of clean Clusters in the event\n"
@@ -2550,8 +2679,23 @@ daughter (3) of the second daughter (1) of the first daughter (0) of the mother 
     ``daughterCombination(M, 0:0, 3:0)`` will return the invariant mass of the system made of the first daughter of the first daughter and the first daughter of the fourth daughter.
 
 )DOC");
+    REGISTER_VARIABLE("useAlternativeDaughterHypothesis(variable, daughterIndex_1:newMassHyp_1, ..., daughterIndex_n:newMassHyp_n)", useAlternativeDaughterHypothesis,R"DOC(
+Returns a ``variable`` calculated using new mass hypotheses for (some of) the particle's daughers. 
 
+.. warning::
+    ``variable`` can only be a function of the particle 4-momentum, which is re-calculated as the sum of the daughters' 4-momenta. 
+    This means that if you made a kinematic fit without updating the daughters' momenta, the result of this variable will not reflect the effect of the kinematic fit.
+    Also, the track fit is not performed again: the variable only re-calculates the 4-vectors using different mass assumptions. The alternative mass assumpion is 
+    used only internally by the variable, and is not stored in the datastore (i.e the daughters are not permanently changed).
 
+.. warning::
+    Generalized daughter indexes are not supported (yet!): this variable can be used only on first-generation daughters.
+
+.. tip::
+    ``useAlternativeDaughterHypothesis(M, 0:K+, 2:pi-)`` will return the invariant mass of the particle assuming that the first daughter is a kaon and the third is a pion, instead of whatever was used in reconstructing the decay. 
+    ``useAlternativeDaughterHypothesis(mRecoil, 1:p+)`` will return the recoil mass of the particle assuming that the second daughter is a proton instead of whatever was used in reconstructing the decay. 
+
+)DOC");
 
 
   }

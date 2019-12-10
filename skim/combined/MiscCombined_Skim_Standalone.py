@@ -8,16 +8,17 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdPi, stdK, stdPr, stdE, stdMu
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.charm import *
-from skim.standardlists.lightmesons import *
-from skim.standardlists.dileptons import *
-from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPhotons import stdPhotons, loadStdSkimPhoton
+from stdPi0s import stdPi0s, loadStdSkimPi0
+from stdV0s import stdKshorts
+from skim.standardlists.lightmesons import loadStdLightMesons
+from skim.standardlists.dileptons import loadStdDiLeptons
+import skimExpertFunctions as expert
+gb2_setuprel = 'release-04-00-00'
 
 skimpath = b2.Path()
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 ma.inputMdstList('default', fileList, path=skimpath)
 
 
@@ -41,9 +42,9 @@ ma.cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=skimpath)
 
 # TCPV Skim
 from skim.tcpv import TCPVList
-add_skim('TCPV', TCPVList(path=skimpath), path=skimpath)
+expert.add_skim('TCPV', TCPVList(path=skimpath), path=skimpath)
 
-setSkimLogging(path=skimpath)
+expert.setSkimLogging(path=skimpath)
 b2.process(path=skimpath)
 
 # print out the summary

@@ -12,37 +12,34 @@
 #
 ################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdE, stdMu
-from stdPi0s import *
-from stdV0s import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-from skim.standardlists.charm import *
-set_log_level(LogLevel.INFO)
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdMu, stdPi
+import skimExpertFunctions as expert
+b2.set_log_level(b2.LogLevel.INFO)
 
 gb2_setuprel = 'release-04-00-00'
 
-skimCode = encodeSkimName('PRsemileptonicUntagged')
+skimCode = expert.encodeSkimName('PRsemileptonicUntagged')
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 
 # create a new path
-PRSLpath = Path()
+PRSLpath = b2.Path()
 
-inputMdstList('default', fileList, path=PRSLpath)
+ma.inputMdstList('default', fileList, path=PRSLpath)
 stdPi('all', path=PRSLpath)
 stdE('all', path=PRSLpath)
 stdMu('all', path=PRSLpath)
 # PR Skim
 from skim.semileptonic import PRList
 PRList = PRList(path=PRSLpath)
-skimOutputUdst(skimCode, PRList, path=PRSLpath)
+expert.skimOutputUdst(skimCode, PRList, path=PRSLpath)
 
-summaryOfLists(PRList, path=PRSLpath)
+ma.summaryOfLists(PRList, path=PRSLpath)
 
 
-setSkimLogging(path=PRSLpath)
-process(path=PRSLpath)
+expert.setSkimLogging(path=PRSLpath)
+b2.process(path=PRSLpath)
 # print out the summary
-print(statistics)
+print(b2.statistics)

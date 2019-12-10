@@ -47,17 +47,8 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   TF1* pol5 = new TF1("pol5", "[0] + [1]*x + [2]*x*x + [3]*x*x*x + [4]*x*x*x*x + [5]*x*x*x*x*x", -100, 100);
   pol5->SetParameters(-50, 1.5, 0.01, 0.0001, 0.00001, 0.000001);
 
-  TH1F* par0U = new TH1F("par0U", " ", 100, -50, 0);
-  TH1F* par1U = new TH1F("par1U", " ", 100, -2, 2);
-  TH1F* par2U = new TH1F("par2U", " ", 100, -0.5, 0.5);
-  TH1F* par3U = new TH1F("par3U", " ", 100, -0.01, 0.01);
-
-  TH1F* par0V = new TH1F("par0V", " ", 100, -50, 50);
-  TH1F* par1V = new TH1F("par1V", " ", 100, -10, 10);
-  TH1F* par2V = new TH1F("par2V", " ", 150, -0.5, 1);
-  TH1F* par3V = new TH1F("par3V", " ", 100, -0.02, 0.01);
-
   TFile* f = new TFile("algorithm_output.root", "RECREATE");
+
   for (int layer = 0; layer < 4; layer++) {
     layer_num = layer + 3;
     for (int ladder = 0; ladder < (int)ladderOfLayer[layer]; ladder++) {
@@ -75,7 +66,7 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           cout << typeid(hEventT0vsCoG).name() << " " << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << endl;
           if (layer_num == 3 && hEventT0vsCoG->GetEntries() < m_minEntries) {
             cout << " " << endl;
-            cout << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << endl;
+            cout << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << " Entries required: " << m_minEntries << endl;
             cout << "Not enough data, adding one run to the collector" << endl;
             return c_NotEnoughData;
           }
@@ -99,17 +90,6 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           timeCal->set_current(1);
           // timeCal->set_current(2);
           timeCal->set_pol3parameters(par[0], par[1], par[2], par[3]);
-          if (view == 1) {
-            par0U->Fill(par[0]);
-            par1U->Fill(par[1]);
-            par2U->Fill(par[2]);
-            par3U->Fill(par[3]);
-          } else {
-            par0V->Fill(par[0]);
-            par1V->Fill(par[1]);
-            par2V->Fill(par[2]);
-            par3V->Fill(par[3]);
-          }
           payload->set(layer_num, ladder_num, sensor_num, bool(view), 1, *timeCal);
           f->cd();
           hEventT0->Write();
@@ -121,27 +101,32 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
       }
     }
   }
-  par0U->Write();
-  par1U->Write();
-  par2U->Write();
-  par3U->Write();
-  par0V->Write();
-  par1V->Write();
-  par2V->Write();
-  par3V->Write();
   f->Close();
   saveCalibration(payload, "SVDCoGTimeCalibrations");
-  delete par0U;
-  delete par1U;
-  delete par2U;
-  delete par3U;
-  delete par0V;
-  delete par1V;
-  delete par2V;
-  delete par3V;
 
   // probably not needed - would trigger re-doing the collection
   // if ( ... too large corrections ... ) return c_Iterate;
   return c_OK;
   delete f;
 }
+
+bool SVDCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRun& currentRun)
+{
+  auto eventT0Hist = getObjectPtr<TH1F>("hEventT0FromCDST");
+  float meanEventT0 = eventT0Hist->GetMean();
+  if (!m_previousEventT0) {
+    B2INFO("Setting start payload boundary to be the first run ("
+           << currentRun.first << "," << currentRun.second << ")");
+    m_previousEventT0.emplace(meanEventT0);
+    return true;
+  } else if (abs(meanEventT0 - m_previousEventT0.value()) > m_allowedT0Shift) {
+    B2INFO("Histogram mean has shifted from " << m_previousEventT0.value()
+           << " to " << meanEventT0 << ". We are requesting a new payload boundary for ("
+           << currentRun.first << "," << currentRun.second << ")");
+    m_previousEventT0.emplace(meanEventT0);
+    return true;
+  } else {
+    return false;
+  }
+}
+

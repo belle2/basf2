@@ -27,9 +27,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 /* C++ headers. */
 #include <map>
@@ -166,12 +164,6 @@ namespace Belle2 {
 
     /** Tracks. */
     StoreArray<Track> m_tracks;
-
-    /** RecoTracks. */
-    StoreArray<RecoTrack> m_recoTracks;
-
-    /** TrackFitResult. */
-    StoreArray<TrackFitResult> m_trackFitResults;
 
     /** ExtHits. */
     StoreArray<ExtHit> m_extHits;

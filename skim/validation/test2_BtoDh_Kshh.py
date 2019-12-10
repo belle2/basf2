@@ -9,26 +9,25 @@
 </header>
 """
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK
-from stdV0s import *
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdK, stdPi
+from stdV0s import stdKshorts
 
-kshhPath = Path()
+kshhPath = b2.Path()
 
-inputMdst('default', '14140200.udst.root', path=kshhPath)
+ma.inputMdst('default', '14140200.udst.root', path=kshhPath)
 
 stdPi('all', path=kshhPath)
 stdK('all', path=kshhPath)
 stdKshorts(path=kshhPath)
 
-reconstructDecay('D0 -> K_S0:merged pi+:all pi-:all', '1.84 < M < 1.89', path=kshhPath)
-reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=kshhPath)
+ma.reconstructDecay('D0 -> K_S0:merged pi+:all pi-:all', '1.84 < M < 1.89', path=kshhPath)
+ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=kshhPath)
 
 # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
 
-from variables import variables
-variablesToHistogram(
+ma.variablesToHistogram(
     filename='BtoDh_Kshh_Validation.root',
     decayString='B-:ch3',
     variables=[
@@ -38,5 +37,5 @@ variablesToHistogram(
     variables_2d=[
         ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7)], path=kshhPath)
 
-process(kshhPath)
-print(statistics)
+b2.process(kshhPath)
+print(b2.statistics)

@@ -85,8 +85,7 @@
 
 __author__ = " Reem Rasheed"
 
-from basf2 import *
-from modularAnalysis import *
+import modularAnalysis as ma
 
 
 def TCPVList(path):
@@ -117,14 +116,14 @@ def TCPVList(path):
 
     bd_qqs_List = []
     for chID, channel in enumerate(bd_qqs_Channels):
-        reconstructDecay('B0:TCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
-        applyCuts('B0:TCPV_qqs' + str(chID), 'nTracks>4', path=path)
+        ma.reconstructDecay('B0:TCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
+        ma.applyCuts('B0:TCPV_qqs' + str(chID), 'nTracks>4', path=path)
         bd_qqs_List.append('B0:TCPV_qqs' + str(chID))
 
     bd_ccs_List = []
     for chID, channel in enumerate(bd_ccs_Channels):
-        reconstructDecay('B0:TCPV_ccs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
-        applyCuts('B0:TCPV_ccs' + str(chID), 'nTracks>4', path=path)
+        ma.reconstructDecay('B0:TCPV_ccs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
+        ma.applyCuts('B0:TCPV_ccs' + str(chID), 'nTracks>4', path=path)
         bd_ccs_List.append('B0:TCPV_ccs' + str(chID))
 
     tcpvLists = bd_qqs_List + bd_ccs_List

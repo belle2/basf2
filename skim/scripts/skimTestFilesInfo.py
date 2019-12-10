@@ -2,14 +2,14 @@
 #: the total number if input files for each campaign
 total_input_files = [
     ('MC9_mixedBGx1', 3564),
-    ('MC9_chargededBGx1', 3770),
+    ('MC9_chargedBGx1', 3770),
     ('MC9_uubarBGx1', 6115),
     ('MC9_ddbarBGx1', 1783),
     ('MC9_ssbarBGx1', 1704),
     ('MC9_ccbarBGx1', 7088),
     ('MC9_taupairBGx1', 3501),
     ('MC9_mixedBGx0', 357),
-    ('MC9_chargededBGx0', 377),
+    ('MC9_chargedBGx0', 377),
     ('MC9_uubarBGx0', 803),
     ('MC9_ddbarBGx0', 201),
     ('MC9_ssbarBGx0', 192),
@@ -18,14 +18,14 @@ total_input_files = [
 
 
     ('MC11_mixedBGx1', 3844),
-    ('MC11_chargededBGx1', 4039),
+    ('MC11_chargedBGx1', 4039),
     ('MC11_uubarBGx1', 8025),
     ('MC11_ddbarBGx1', 2005),
     ('MC11_ssbarBGx1', 1915),
     ('MC11_ccbarBGx1', 9230),
     ('MC11_taupairBGx1', 3830),
     ('MC11_mixedBGx0', 1097),
-    ('MC11_chargededBGx0', 1240),
+    ('MC11_chargedBGx0', 1240),
     ('MC11_uubarBGx0', 1985),
     ('MC11_ddbarBGx0', 463),
     ('MC11_ssbarBGx0', 502),
@@ -34,14 +34,14 @@ total_input_files = [
 
 
     ('MC12_mixedBGx1', 1070),
-    ('MC12_chargededBGx1', 1135),
+    ('MC12_chargedBGx1', 1135),
     ('MC12_uubarBGx1', 3210),
     ('MC12_ddbarBGx1', 805),
     ('MC12_ssbarBGx1', 770),
     ('MC12_ccbarBGx1', 2660),
     ('MC12_taupairBGx1', 1840),
     ('MC12_mixedBGx0', 270),
-    ('MC12_chargededBGx0', 285),
+    ('MC12_chargedBGx0', 285),
     ('MC12_uubarBGx0', 805),
     ('MC12_ddbarBGx0', 205),
     ('MC12_ssbarBGx0', 195),
@@ -50,8 +50,41 @@ total_input_files = [
 
 ]
 
+# Average number of events in test files
+nEventsPerFile = {
+    'proc9_exp3': 3456,
+    'proc9_exp7': 3691,
+    'proc9_exp8': 7846,
+    'bucket7_exp8': 11242,
+
+    'MC12_mixedBGx1': 200000,
+    'MC12_chargedBGx1': 200000,
+    'MC12_uubarBGx1': 200000,
+    'MC12_ddbarBGx1': 200000,
+    'MC12_ssbarBGx1': 200000,
+    'MC12_ccbarBGx1': 200000,
+    'MC12_taupairBGx1': 200000,
+    'MC12_mixedBGx0': 200000,
+    'MC12_chargedBGx0': 200000,
+    'MC12_uubarBGx0': 200000,
+    'MC12_ddbarBGx0': 200000,
+    'MC12_ssbarBGx0': 200000,
+    'MC12_ccbarBGx0': 200000,
+    'MC12_taupairBGx0': 200000,
+}
+
 #: location of test files on kekcc
 kekcc_locations = [
+    ('proc9_exp3', '/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/e0003/4S/r05241/skim/hlt_hadron/' +
+     'mdst/sub00/mdst.physics.0003.05241.HLT0.hlt_hadron.f00000.root'),
+    ('proc9_exp7', '/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/e0007/4S/GoodRuns/r03822/skim/hlt_hadron/' +
+     'mdst/sub00/mdst.physics.0007.03822.HLT0.hlt_hadron.f00000.root'),
+    ('proc9_exp8', '/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/e0008/4S/GoodRuns/r01527/skim/hlt_hadron/' +
+     'mdst/sub00/mdst.physics.0008.01527.HLT4.hlt_hadron.f00000.root'),
+    ('bucket7_exp8', '/group/belle2/dataprod/Data/release-03-02-04/DB00000677/bucket7/e0008/4S/GoodRuns/r03123/skim/hlt_hadron/' +
+     'mdst/sub00/mdst.physics.0008.03123.HLT4.hlt_hadron.f00000.root'),
+
+
     ('MC12_mixedBGx1', '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007392/s00/e1003/4S/r00000/mixed/' +
      'mdst/sub00/mdst_000141_prod00007392_task10020000141.root'),
     ('MC12_chargedBGx1', '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007394/s00/e1003/4S/r00000/charged/' +

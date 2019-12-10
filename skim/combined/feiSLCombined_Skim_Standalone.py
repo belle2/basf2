@@ -9,21 +9,17 @@
 
 __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling", "Phil Grace"]
 
-import sys
-import glob
-import os.path
 
-from basf2 import *
-from modularAnalysis import *
-from beamparameters import add_beamparameters
-from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
+import basf2 as b2
+import modularAnalysis as ma
+import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
 
-fileList = get_test_file("mixedBGx1", "MC12")
-path = create_path()
-inputMdstList('default', fileList, path=path)
+fileList = expert.get_test_file("MC12_mixedBGx1")
+path = b2.create_path()
+ma.inputMdstList('default', fileList, path=path)
 
-from skim.fei import *
+from skim.fei import B0SL, BplusSL, runFEIforSLCombined
 # run pre-selection  cuts and FEI
 runFEIforSLCombined(path)
 
@@ -33,19 +29,19 @@ path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatchin
 
 # Apply final B0 semileptonic tag cuts
 B0semileptonicList = B0SL(path)
-skimCode1 = encodeSkimName('feiSLB0')
-skimOutputUdst(skimCode1, B0semileptonicList, path=path)
-summaryOfLists(B0semileptonicList, path=path)
+skimCode1 = expert.encodeSkimName('feiSLB0')
+expert.skimOutputUdst(skimCode1, B0semileptonicList, path=path)
+ma.summaryOfLists(B0semileptonicList, path=path)
 
 # Apply final B+ semileptonic tag cuts
 BpsemileptonicList = BplusSL(path)
-skimCode2 = encodeSkimName('feiSLBplus')
-skimOutputUdst(skimCode2, BpsemileptonicList, path=path)
-summaryOfLists(BpsemileptonicList, path=path)
+skimCode2 = expert.encodeSkimName('feiSLBplus')
+expert.skimOutputUdst(skimCode2, BpsemileptonicList, path=path)
+ma.summaryOfLists(BpsemileptonicList, path=path)
 
 
-setSkimLogging(path)
-process(path)
+expert.setSkimLogging(path)
+b2.process(path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

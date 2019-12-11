@@ -15,7 +15,6 @@ from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loa
 from skim.standardlists.lightmesons import loadStdLightMesons
 from skim.standardlists.dileptons import loadStdDiLeptons
 b2.set_log_level(b2.LogLevel.INFO)
-b2.conditions.disable_globaltag_replay()
 
 skimpath = b2.Path()
 ma.inputMdstList('MC9', Belle2.FileSystem.findFile('analysis/tests/mdst.root'), path=skimpath)

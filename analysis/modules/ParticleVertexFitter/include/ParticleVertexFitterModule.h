@@ -213,6 +213,9 @@ namespace Belle2 {
 
     /**  calculate iptube constraint (quasi cylinder along boost direction) for RAVE fit*/
     void findConstraintBoost(double cut);
+
+    /** smear beam spot covariance */
+    void smearBeamSpot(double width);
   };
 
 } // Belle2 namespace

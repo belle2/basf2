@@ -77,7 +77,6 @@ namespace Belle2 {
   private:
 
     //std::string m_EventType;      /**< Btag decay type */
-    int tagFitType;                 /**< */
     std::string m_listName;         /**< Breco particle list name */
     double m_confidenceLevel;       /**< required fit confidence level */
     std::string m_useMCassociation; /**< No MC assication or standard Breco particle or internal MCparticle association */
@@ -179,9 +178,26 @@ namespace Belle2 {
      */
     void deltaT(Particle* Breco);
 
+
+
     //just to help printing things out
     std::string printVector(TVector3 const& vec);
     std::string printMatrix(TMatrix const& mat);
     std::string printMatrix(TMatrixFSym const& mat);
   };
+
+  /**
+   * this struct is used to store and sort the tag tracks
+   */
+  struct TrackAndWeight {
+    double weight; /**< rave weight associated to the track, for sorting purposes*/
+    const TrackFitResult* track;  /**< tag track fit result, for sorting purposes */
+    const MCParticle* mcParticle;  /**< mc particle matched to the tag track, for sorting purposes*/
+  };
+
+  /**
+   * This is used to sort the tag tracks by rave weight, to have the tracks having the
+   * most significance contribution to the tag vertex fit appearing first
+   */
+  bool compare(TrackAndWeight& a, TrackAndWeight& b) { return a.weight > b.weight; }
 }

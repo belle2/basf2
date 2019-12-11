@@ -12,7 +12,6 @@
 #define ECLHIT_H
 
 #include <simulation/dataobjects/SimHitBase.h>
-#include <framework/dataobjects/BackgroundMetaData.h>
 
 namespace Belle2 {
 

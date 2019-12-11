@@ -12,6 +12,10 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
+#include <TLorentzVector.h>
+#include <TVector3.h>
+#include <TDatabasePDG.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -49,6 +53,18 @@ void InclusiveDstarReconstructionModule::initialize()
 
   m_cut = Variable::Cut::compile(m_slowPionCut);
 
+  // initialize Dstar and D masses from PDG
+  // check the validity of output ParticleList name
+  bool valid = m_decaydescriptor.init(m_outputDstarListName);
+  if (!valid)
+    B2ERROR("InclusiveDstarReconstructionModule::initialize Invalid output ParticleList name: " << m_outputDstarListName);
+
+  const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
+  m_dstar_pdg_code  = mother->getPDGCode();
+  m_dstar_pdg_mass = TDatabasePDG::Instance()->GetParticle(m_dstar_pdg_code)->Mass();
+  // if output list is a charged (neutral) D*, assign charged (neutral) D mass
+  m_d_pdg_mass = (abs(m_dstar_pdg_code) == 413) ? TDatabasePDG::Instance()->GetParticle(411)->Mass() :
+                 TDatabasePDG::Instance()->GetParticle(421)->Mass();
 }
 
 void InclusiveDstarReconstructionModule::event()
@@ -58,30 +74,49 @@ void InclusiveDstarReconstructionModule::event()
   // check if pion and dstar list fit to each other
   // estimate dstar four vector
   // create dstar particle and set slow pion as daughter
-  int pdgCode  = 0;
 
-  // check the validity of output ParticleList name
-  bool valid = m_decaydescriptor.init(m_outputDstarListName);
-  if (!valid)
-    B2ERROR("InclusiveDstarReconstructionModule::initialize Invalid output ParticleList name: " << m_outputDstarListName);
+  // Create output particle and antiparticle list
 
-  // Output particle
-  const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
-  pdgCode  = mother->getPDGCode();
+  StoreArray<Particle> particles;
 
   StoreObjPtr<ParticleList> outputDstarList(m_outputDstarListName);
   outputDstarList.create();
-  outputDstarList->initialize(pdgCode, outputDstarList.getName());
+  outputDstarList->initialize(m_dstar_pdg_code, outputDstarList.getName());
 
   StoreObjPtr<ParticleList> outputAntiDstarList(ParticleListName::antiParticleListName(m_outputDstarListName));
   outputAntiDstarList.create();
-  outputAntiDstarList->initialize(-pdgCode, ParticleListName::antiParticleListName(m_outputDstarListName));
-
+  outputAntiDstarList->initialize(-m_dstar_pdg_code, ParticleListName::antiParticleListName(m_outputDstarListName));
   outputDstarList->bindAntiParticleList(*outputAntiDstarList);
 
 
+  // loop over all pions and cut on slow pion cut
+  StoreObjPtr<ParticleList> inputPionList(m_inputPionListName);
+  unsigned int num_pions = inputPionList->getListSize();
+  for (unsigned int pion_index = 0; pion_index < num_pions; pion_index++) {
+    auto pion = inputPionList->getParticle(pion_index);
+    if (!m_cut->check(pion)) {
+      continue;
+    }
 
+    TLorentzVector dstar_four_vector = estimateDstarFourMomentum(pion);
+    Particle dstar = Particle(dstar_four_vector, m_dstar_pdg_code);
+    dstar.appendDaughter(pion, false);
 
+    Particle* new_dstar = particles.appendNew(dstar);
 
+    outputDstarList->addParticle(new_dstar);
 
+  }
+
+}
+
+TLorentzVector InclusiveDstarReconstructionModule::estimateDstarFourMomentum(const Particle* pion)
+{
+  float slow_pion_energy = pion->getEnergy();
+  TVector3 slow_pion_momentum = pion ->getMomentum();
+  float dstar_energy = slow_pion_energy * m_dstar_pdg_mass / (m_dstar_pdg_mass - m_d_pdg_mass);
+  float dstar_momentum_mag = sqrt(dstar_energy * dstar_energy - m_dstar_pdg_mass * m_dstar_pdg_mass);
+  TVector3 dstar_momentum = slow_pion_momentum * (dstar_momentum_mag / slow_pion_momentum.Mag());
+
+  return TLorentzVector(dstar_momentum, dstar_energy);
 }

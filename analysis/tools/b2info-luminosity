@@ -255,10 +255,11 @@ class Luminosity:
         x = srs_lumi_date.index.values
         y = srs_lumi_date.values
 
+        # integrated luminosity
+        yInt = np.cumsum(srs_lumi_date.values)
+
         figure, ax1 = plt.subplots()
 
-        # there must be a cleaner way to do this
-        yInt = np.append(np.array([0]), np.cumsum(srs_lumi_date.values)[1:])
         
         ax1.bar(x, y, label=f"{label}", color="blue", width=width)
 

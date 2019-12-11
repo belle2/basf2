@@ -15,7 +15,7 @@
 import os
 import basf2
 import modularAnalysis as ma  # a shorthand for the analysis tools namespace
-from vertex import vertexKFit
+from vertex import KFit
 
 if os.path.isfile('mdst.root'):
     filename = 'mdst.root'
@@ -37,7 +37,7 @@ mypath.add_module('VariablesToExtraInfo',
 
 # Now we do a vertex fit (this can change the mass).
 # All candidates are kept.
-vertexKFit('D0', -1.0, path=mypath)
+KFit('D0', -1.0, path=mypath)
 
 # now save the pre- and post- fit mass using VariablesToNtuple
 mypath.add_module('VariablesToNtuple',

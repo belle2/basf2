@@ -73,41 +73,41 @@ def stdPi0s(listtype='veryLoose', path=None):
     elif listtype == 'skim':
         stdPi0s('eff60_nomcmatch', path)
         cutAndCopyList('pi0:skim', 'pi0:eff60_nomcmatch', '', True, path)
-        massKFit('pi0:skim', 0.0, '', path)
+        KFit('pi0:skim', 0.0, 'mass', path=path)
 
     # same lists with, but with  mass constraints fits
     elif listtype == 'veryLooseFit':
         stdPi0s('veryLoose', path)
         cutAndCopyList('pi0:veryLooseFit', 'pi0:veryLoose', '', True, path)
-        massKFit('pi0:veryLooseFit', 0.0, '', path)
+        KFit('pi0:veryLooseFit', 0.0, 'mass', path=path)
     elif listtype == 'looseFit':
         stdPi0s('loose', path)
         cutAndCopyList('pi0:looseFit', 'pi0:loose', '', True, path)
-        massKFit('pi0:looseFit', 0.0, '', path)
+        KFit('pi0:looseFit', 0.0, 'mass', path=path)
     elif listtype == 'allFit':
         stdPi0s('all', path)
         cutAndCopyList('pi0:allFit', 'pi0:all', '', True, path)
-        massKFit('pi0:allFit', 0.0, '', path)
+        KFit('pi0:allFit', 0.0, 'mass', path=path)
     elif listtype == 'eff20Fit':
         stdPi0s('eff20', path)
         cutAndCopyList('pi0:eff20Fit', 'pi0:eff20', '', True, path)
-        massKFit('pi0:eff20Fit', 0.0, '', path)
+        KFit('pi0:eff20Fit', 0.0, 'mass', path=path)
     elif listtype == 'eff30Fit':
         stdPi0s('eff30', path)
         cutAndCopyList('pi0:eff30Fit', 'pi0:eff30', '', True, path)
-        massKFit('pi0:eff30Fit', 0.0, '', path)
+        KFit('pi0:eff30Fit', 0.0, 'mass', path=path)
     elif listtype == 'eff40Fit':
         stdPi0s('eff40', path)
         cutAndCopyList('pi0:eff40Fit', 'pi0:eff40', '', True, path)
-        massKFit('pi0:eff40Fit', 0.0, '', path)
+        KFit('pi0:eff40Fit', 0.0, 'mass', path=path)
     elif listtype == 'eff50Fit':
         stdPi0s('eff50', path)
         cutAndCopyList('pi0:eff50Fit', 'pi0:eff50', '', True, path)
-        massKFit('pi0:eff50Fit', 0.0, '', path)
+        KFit('pi0:eff50Fit', 0.0, 'mass', path=path)
     elif listtype == 'eff60Fit':
         stdPi0s('eff60', path)
         cutAndCopyList('pi0:eff60Fit', 'pi0:eff60', '', True, path)
-        massKFit('pi0:eff60Fit', 0.0, '', path)
+        KFit('pi0:eff60Fit', 0.0, 'mass', path=path)
 
 # pi0 list for skims (and ONLY for skims)
 

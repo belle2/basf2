@@ -200,7 +200,7 @@ These methods should be executed inside the ROE loop:
   # Reconstruct a K_S0 candidate using ROE pions:
   ma.reconstructDecay('K_S0:roe -> pi+:roe pi-:roe', '0.45 < M < 0.55', path = roe_path)
   # Perform vertex fitting:
-  vtx.vertexKFit('K_S0:roe',0.001, path=roe_path)
+  vtx.KFit('K_S0:roe',0.001, path=roe_path)
   # Insert a K_S0 candidate into the ROE mask:
   ma.optimizeROEWithV0('K_S0:roe',['cleanMask'],'', path=roe_path)
   # Execute loop for each ROE:

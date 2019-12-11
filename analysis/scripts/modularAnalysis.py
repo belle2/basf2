@@ -2218,7 +2218,7 @@ def V0ListMerger(firstList, secondList, prioritiseV0, path):
     if (listName == secondList.split(':')[0]):
         outList = listName + ':merged'
         copyLists(outList, [firstList, secondList], False, path)
-        vertexKFit(outList, 0.0, '', '', path)
+        KFit(outList, 0.0, path=path)
         markDuplicate(outList, prioritiseV0, path)
         applyCuts(outList, 'extraInfo(highQualityVertex)', path)
     else:

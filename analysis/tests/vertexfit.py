@@ -42,12 +42,12 @@ reconstructDecay('pi0 -> gamma gamma', '0.11 < M < 0.15', 0, path=main)
 matchMCTruth('pi0', path=main)
 
 # KFit
-vertexKFit('pi0', 0.0, path=main)
+KFit('pi0', 0.0, path=main)
 
 reconstructDecay('D0 -> K- pi+ pi0', '', 0, path=main)
 matchMCTruth('D0', path=main)
 
-vertexKFit('D0', 0.0, 'D0 -> ^K- ^pi+ pi0', path=main)
+KFit('D0', 0.0, decay_string='D0 -> ^K- ^pi+ pi0', path=main)
 
 ntupler = register_module('VariablesToNtuple')
 ntupler.param('fileName', testFile.name)

@@ -147,16 +147,16 @@ expert.add_skim('SystematicsRadEE', systematics.SystematicsRadEEList(path=skimpa
 # Charm skims
 from skim import btocharm
 from skim.standardlists import charm
-charm.loadD0_hh_sideband(path=skimpath)
+charm.loadD0_hh_loose(path=skimpath)
 expert.add_skim('BtoD0h_hh', btocharm.BsigToD0hTohhList(path=skimpath), path=skimpath)
 
 # B+ to anti-D0(->Kshh)h+ Skim
-charm.loadD0_Kshh_sideband(path=skimpath)
+charm.loadD0_Kshh_loose(path=skimpath)
 BtoD0hKshhList = btocharm.BsigToD0hToKshhList(path=skimpath)
 expert.add_skim('BtoD0h_Kshh', BtoD0hKshhList, path=skimpath)
 
 # B+ to anti-D0(->Kspi0)h+ Skim
-charm.loadD0_Kspi0_sideband(path=skimpath)
+charm.loadD0_Kspi0_loose(path=skimpath)
 BtoDhKspi0List = btocharm.BsigToD0hToKspi0List(path=skimpath)
 expert.add_skim('BtoD0h_Kspi0', BtoDhKspi0List, path=skimpath)
 

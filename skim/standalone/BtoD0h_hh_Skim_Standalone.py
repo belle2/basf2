@@ -30,9 +30,9 @@ stdK('all', path=path)
 
 # B+ to anti-D0(->h+h-)h+ Skim
 from skim.btocharm import BsigToD0hTohhList
-from skim.standardlists.charm import loadD0_hh_sideband
+from skim.standardlists.charm import loadD0_hh_loose
 
-loadD0_hh_sideband(path=path)
+loadD0_hh_loose(path=path)
 BtoD0h_hh_List = BsigToD0hTohhList(path=path)
 expert.skimOutputUdst(skimCode, BtoD0h_hh_List, path=path)
 ma.summaryOfLists(BtoD0h_hh_List, path=path)

@@ -38,25 +38,25 @@ loadStdSkimPhoton(path=btocharmpath)
 
 # B+ to anti-D0(->h+h-)h+ Skim
 from skim.btocharm import BsigToD0hTohhList
-from skim.standardlists.charm import loadD0_hh_sideband
+from skim.standardlists.charm import loadD0_hh_loose
 
-loadD0_hh_sideband(path=btocharmpath)
+loadD0_hh_loose(path=btocharmpath)
 BtoD0h_hh_List = BsigToD0hTohhList(path=btocharmpath)
 expert.add_skim('BtoD0h_hh', BtoD0h_hh_List, path=btocharmpath)
 
 # B+ to anti-D0(->Kshh)h+ Skim
 from skim.btocharm import BsigToD0hToKshhList
-from skim.standardlists.charm import loadD0_Kshh_sideband
+from skim.standardlists.charm import loadD0_Kshh_loose
 
-loadD0_Kshh_sideband(path=btocharmpath)
+loadD0_Kshh_loose(path=btocharmpath)
 BtoD0h_Kshh_List = BsigToD0hToKshhList(path=btocharmpath)
 expert.add_skim('BtoD0h_Kshh', BtoD0h_Kshh_List, path=btocharmpath)
 
 # B+ to anti-D0(->Kspi0)h+ Skim
 from skim.btocharm import BsigToD0hToKspi0List
-from skim.standardlists.charm import loadD0_Kspi0_sideband
+from skim.standardlists.charm import loadD0_Kspi0_loose
 
-loadD0_Kspi0_sideband(path=btocharmpath)
+loadD0_Kspi0_loose(path=btocharmpath)
 BtoD0h_Kspi0_List = BsigToD0hToKspi0List(path=btocharmpath)
 expert.add_skim('BtoD0h_Kspi0', BtoD0h_Kspi0_List, path=btocharmpath)
 

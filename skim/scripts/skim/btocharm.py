@@ -59,7 +59,7 @@ def BsigToD0hTohhList(path):
     3. abs(deltaE) < 0.3
 
     Note:
-    This skim uses loadD0_hh_sideband()  from the ``charm.py`` script where D0 channels are defined.
+    This skim uses loadD0_hh_loose()  from the ``charm.py`` script where D0 channels are defined.
 
 
     """
@@ -119,7 +119,7 @@ def BsigToD0hToKshhList(path):
     3. abs(deltaE) < 0.3
 
     Note:
-    This skim uses loadD0_Kshh_sideband()  from the ``charm.py`` script where D0 channels are defined.
+    This skim uses loadD0_Kshh_loose()  from the ``charm.py`` script where D0 channels are defined.
 
     """
     __author__ = "M. Nayak"
@@ -165,7 +165,7 @@ def BsigToD0hToKspi0List(path):
     3. abs(deltaE) < 0.3
 
     Note:
-    This skim uses loadD0_Kspi0_sideband()  from the ``charm.py`` script where D0 channels are defined.
+    This skim uses loadD0_Kspi0_loose()  from the ``charm.py`` script where D0 channels are defined.
 
     """
     __author__ = "M. Nayak"

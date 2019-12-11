@@ -32,9 +32,9 @@ stdKshorts(path=path)
 
 # B+ to anti-D0(->Kspi0)h+ Skim
 from skim.btocharm import BsigToD0hToKspi0List
-from skim.standardlists.charm import loadD0_Kspi0_sideband
+from skim.standardlists.charm import loadD0_Kspi0_loose
 
-loadD0_Kspi0_sideband(path=path)
+loadD0_Kspi0_loose(path=path)
 BtoD0h_Kspi0_List = BsigToD0hToKspi0List(path=path)
 expert.skimOutputUdst(skimCode, BtoD0h_Kspi0_List, path=path)
 ma.summaryOfLists(BtoD0h_Kspi0_List, path=path)

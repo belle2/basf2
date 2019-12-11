@@ -97,7 +97,7 @@ def loadStdD0_Kspipi(path=None):
     return ['D0:Kspipi']
 
 
-def loadD0_hh_sideband(path):
+def loadD0_hh_loose(path):
     """
     Creates a 'D0:hh' list, with an invariant mass in the range :math:`1.5 < M < 2.2~{\\rm GeV}/c^2`,
     from the following particles lists:
@@ -125,7 +125,7 @@ def loadD0_hh_sideband(path):
     return D0_hh_List
 
 
-def loadD0_Kshh_sideband(path):
+def loadD0_Kshh_loose(path):
     """
     Creates a 'D0:Kshh' list, with an invariant mass in the range :math:`1.5 < M < 2.2~{\\rm GeV}/c^2`,
     from the following particles lists:
@@ -150,7 +150,7 @@ def loadD0_Kshh_sideband(path):
     return D0List
 
 
-def loadD0_Kspi0_sideband(path):
+def loadD0_Kspi0_loose(path):
     """
     Creates a 'D0:Kspi0' list, with an invariant mass in the range :math:`1.5 < M < 2.2~{\\rm GeV}/c^2`,
     from the 'K_S0:merged' and the 'pi0:skim' lists.

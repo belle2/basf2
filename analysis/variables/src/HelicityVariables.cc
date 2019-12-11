@@ -39,7 +39,10 @@ namespace Belle2 {
 
         for (auto& idaughter : daughters) {
           if (idaughter -> getNDaughters() == 2) {
-            if (std::abs(idaughter -> getDaughters()[0]-> getPDGCode()) == 11) isOneConversion = true;
+            if (std::abs(idaughter -> getDaughters()[0]-> getPDGCode()) == 11
+                && std::abs(idaughter -> getDaughters()[1]-> getPDGCode()) == 11) {
+              isOneConversion = true;
+            }
           }
         }
 

@@ -118,8 +118,16 @@ namespace Belle2 {
     // now flag actual data Cherenkov hits as coming from masked channels
 
     for (auto& digit : m_digits) {
+      // if already set switch the state back to c_Good (e.g. for digits read from file)
+      if (digit.getHitQuality() == TOPDigit::c_Masked or
+          digit.getHitQuality() == TOPDigit::c_Uncalibrated) {
+        digit.setHitQuality(TOPDigit::c_Good);
+      }
+      // skip digit if not c_Good
+      if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+      // now do the new masking of c_Good
       if (not m_channelMask->isActive(digit.getModuleID(), digit.getChannel())) {
-        digit.setHitQuality(TOPDigit::c_Junk);
+        digit.setHitQuality(TOPDigit::c_Masked);
       }
       if (m_maskUncalibratedChannelT0 and not digit.isChannelT0Calibrated()) {
         digit.setHitQuality(TOPDigit::c_Uncalibrated);

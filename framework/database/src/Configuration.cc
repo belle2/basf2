@@ -16,32 +16,18 @@
 #include <framework/utilities/Utils.h>
 #include <boost/python.hpp>
 #include <framework/core/PyObjConvUtils.h>
+#include <framework/core/PyObjROOTUtils.h>
 #include <boost/algorithm/string.hpp>
 
 #include <set>
 #include <TPython.h>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "master_2019-09-26"
+#define CURRENT_DEFAULT_TAG "master_2019-11-11"
 
 namespace py = boost::python;
 
 namespace {
-  /** Create a python wrapped copy from a class instance which has a ROOT dictionary.
-   * This piece of dark magic creates a python object referencing a ROOT object
-   * the same way as you would see it in the ROOT python module.
-   *
-   * It will create a copy of the object using the copy constructor which is then
-   * owned by python.
-   */
-  template<class T>
-  py::object createPyCopy(const T& instance)
-  {
-    const char* classname = instance.IsA()->GetName();
-    void* addr = new T(instance);
-    PyObject* obj = TPython::ObjectProxy_FromVoidPtr(addr, classname, true);
-    return py::object(py::handle<>(obj));
-  }
   /** extract a list of strings from any iterable python object
    * This function is much more lenient than what we usually do: It will use `str()`
    * on each object in the list and use the string representation. So it should
@@ -119,7 +105,7 @@ namespace Belle2::Conditions {
       overrideGlobalTags();
     }
     std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", "http://belle2db.sdcc.bnl.gov/b2s/rest/");
-    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", serverList + " /cvms/belle.cern.ch/conditions/database.sqlite");
+    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", serverList + " /cvmfs/belle.cern.ch/conditions/database.sqlite");
     fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", "/cvmfs/belle.cern.ch/conditions");
   }
 
@@ -192,7 +178,7 @@ namespace Belle2::Conditions {
         youngest = metadata.getDate();
       }
     }
-    if (youngest->compare("2019-10-01") < 0) {
+    if (youngest->compare("2019-12-31") < 0) {
       B2DEBUG(30, "Enabling legacy IP information globaltag in tag replay");
       m_inputGlobaltags->emplace_back("Legacy_IP_Information");
     }
@@ -232,7 +218,7 @@ namespace Belle2::Conditions {
       // otherwise it's a list of file metadata instances
       if (m_inputGlobaltags) {
         py::list metaDataList;
-        for (const auto& m : m_inputMetadata) metaDataList.append(createPyCopy(m));
+        for (const auto& m : m_inputMetadata) metaDataList.append(createROOTObjectPyCopy(m));
         arguments["metadata"] = metaDataList;
       }
       // arguments ready, call callback function, python will handle the exceptions
@@ -461,8 +447,8 @@ Warning:
     .def("prepend_testing_payloads", &Configuration::prependTestingPayloadLocation, py::args("filename"), R"DOC(prepend_testing_payloads(filename)
 
 Insert a text file containing local test payloads in the beginning of the list
-of `testing_payloads`. This will mean they will have lower priority than payloads in
-previously defined text files but still higher priority than globaltags.
+of `testing_payloads`. This will mean they will have higher priority than payloads in
+previously defined text files as well as higher priority than globaltags.
 
 Parameters:
     filename (str): file containing a local definition of payloads and their

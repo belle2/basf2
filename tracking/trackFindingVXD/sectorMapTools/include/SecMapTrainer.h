@@ -230,7 +230,7 @@ namespace Belle2 {
   public:
 
     /** constructor. */
-    SecMapTrainer(const std::string& setupName , const std::string& appendix = "") :
+    explicit SecMapTrainer(const std::string& setupName , const std::string& appendix = "") :
       m_nameSetup(setupName),
       m_config(m_filtersContainer.getFilters(m_nameSetup)->getConfig()),
       m_factory(

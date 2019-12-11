@@ -11,6 +11,7 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
 
@@ -22,8 +23,6 @@
 
 namespace Belle2 {
 
-  class BKLMDigit;
-
   //! Store one reconstructed BKLM 1D hit as a ROOT object
   class BKLMHit1d : public RelationsObject {
 
@@ -34,7 +33,7 @@ namespace Belle2 {
 
     //! Constructor with initial values
     //! @param digits vector of contiguous BKLMDigits
-    explicit BKLMHit1d(const std::vector<Belle2::BKLMDigit*>& digits);
+    explicit BKLMHit1d(const std::vector<const BKLMDigit*>& digits);
 
     //! Copy constructor
     BKLMHit1d(const BKLMHit1d&);
@@ -75,7 +74,7 @@ namespace Belle2 {
 
     //! Get plane number.
     //! @return Plane number (0=z, 1=phi).
-    bool getPlane() const
+    int getPlane() const
     {
       return BKLMElementNumbers::getPlaneByModule(m_ModuleID);
     }

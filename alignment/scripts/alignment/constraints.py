@@ -37,13 +37,13 @@ class Constraints():
         pass
 
 
-def generate_constraints(constraint_sets, timedep, global_tags):
+def generate_constraints(constraint_sets, timedep, global_tags, init_event):
     files = []
     for filename in [consts.filename for consts in constraint_sets]:
         files.append(os.path.abspath(filename))
 
     from alignment.constraints_generator import save_config
-    ccfn = save_config(constraint_sets, timedep, global_tags)
+    ccfn = save_config(constraint_sets, timedep, global_tags, init_event)
     os.system('basf2 {} {}'.format(Belle2.FileSystem.findFile('alignment/scripts/alignment/constraints_generator.py'), ccfn))
 
     return files
@@ -330,7 +330,8 @@ if __name__ == '__main__':
     # timedep = [([], [(0, 0, 1003)])]
 
     # final detector (phase 3)
-    timedep = [([], [(0, 0, 0)])]
+    timedep = []  # [([], [(0, 0, 0)])]
+    init_event = (0, 0, 0)
 
     files = generate_constraints(
       [
@@ -343,4 +344,5 @@ if __name__ == '__main__':
         Constraints("my_file.txt")],
 
       timedep=timedep,
-      global_tags=None)
+      global_tags=None,
+      init_event=init_event)

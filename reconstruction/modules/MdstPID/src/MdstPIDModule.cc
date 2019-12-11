@@ -98,7 +98,7 @@ namespace Belle2 {
       if (ecl) setLikelihoods(ecl);
 
       // set klm likelihoods
-      const Muid* muid = track->getRelatedTo<Muid>();
+      const KLMMuidLikelihood* muid = track->getRelatedTo<KLMMuidLikelihood>();
       if (muid) setLikelihoods(muid);
 
     }
@@ -158,11 +158,11 @@ namespace Belle2 {
   }
 
 
-  void MdstPIDModule::setLikelihoods(const Muid* muid)
+  void MdstPIDModule::setLikelihoods(const KLMMuidLikelihood* muid)
   {
 
     if (abs(muid->getPDGCode()) != abs(Const::muon.getPDGCode())) {
-      B2WARNING("MdstPID, Muid: extrapolation with other than muon hypothesis ignored");
+      B2WARNING("MdstPID, KLMMuidLikelihood: extrapolation with other than muon hypothesis ignored");
       return;
     }
 

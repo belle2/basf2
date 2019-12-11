@@ -43,6 +43,7 @@
 #include <G4Sphere.hh>
 #include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4Region.hh>
 #include <G4Colour.hh>
 #include <G4TwoVector.hh>
 #include <G4ThreeVector.hh>
@@ -177,6 +178,12 @@ namespace Belle2 {
         G4Transform3D T = Rz * tr * D * T1;
         auto* module = createModule(geo, moduleID);
         std::string name = geoModule.getName();
+
+        // Set up region for production cuts
+        G4Region* aRegion = new G4Region(name);
+        module->SetRegion(aRegion);
+        aRegion->AddRootLogicalVolume(module);
+
         new G4PVPlacement(T, module, name, &topVolume, false, moduleID);
       }
 
@@ -200,8 +207,6 @@ namespace Belle2 {
 
       const auto& geoQBB = geo.getQBB();
       auto* module = createModuleEnvelope(geoQBB, moduleID);
-
-      // add quartz optics together with PMT array
 
       const auto& geoModule = geo.getModule(moduleID);
       auto* optics = assembleOptics(geoModule);

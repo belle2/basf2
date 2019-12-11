@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from basf2 import create_path, process, reset_database, use_central_database
+from basf2 import create_path, process
 from rawdata import add_unpackers
 from reconstruction import add_reconstruction, add_cosmics_reconstruction
 
-reset_database()
-use_central_database('validation_2019-07-22')
+from basf2 import conditions
+conditions.override_globaltags(['validation_2019-11-11'])
 
 main = create_path()
 

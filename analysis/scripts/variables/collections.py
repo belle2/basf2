@@ -23,7 +23,6 @@ cluster = [
     'clusterAbsZernikeMoment40',
     'clusterAbsZernikeMoment51',
     'clusterBelleQuality',
-    'clusterCRID',
     'clusterClusterID',
     'clusterConnectedRegionID',
     'clusterE1E9',
@@ -149,7 +148,7 @@ flight_info = [
 ]
 
 #: MC true flight info variables
-mc_flight_info = utils.create_mctruth_aliases(flight_info)
+mc_flight_info = ['mcFlightTime', 'mcFlightDistance']
 
 #: Replacement for Vertex tuple tool
 vertex = [
@@ -241,7 +240,7 @@ reco_stats = [
 inv_mass = ['M', 'ErrM', 'SigM', 'InvM']
 
 #: Extra energy variables
-extra_energy = ["ROE_eextra()"]
+extra_energy = ["roeEextra()"]
 
 #: Event level tracking variables
 event_level_tracking = [

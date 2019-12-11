@@ -7,23 +7,22 @@
 # P. Urquijo, 6/Jan/2015
 #
 ######################################################
-from ROOT import Belle2
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK
-from stdV0s import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdK, stdPi
+from stdV0s import stdKshorts
+import skimExpertFunctions as expert
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'
 
-path = Path()
+path = b2.Path()
 
-skimCode = encodeSkimName('BtoDh_Kshh')
+skimCode = expert.encodeSkimName('BtoDh_Kshh')
 
 
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=path)
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=path)
 
 
 stdPi('all', path=path)
@@ -34,12 +33,12 @@ stdKshorts(path=path)
 from skim.btocharm import loadDkshh, BsigToDhToKshhList
 loadDkshh(path=path)
 BtoDhList = BsigToDhToKshhList(path=path)
-skimOutputUdst(skimCode, BtoDhList, path=path)
-summaryOfLists(BtoDhList, path=path)
+expert.skimOutputUdst(skimCode, BtoDhList, path=path)
+ma.summaryOfLists(BtoDhList, path=path)
 
 
-setSkimLogging(path)
-process(path)
+expert.setSkimLogging(path)
+b2.process(path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

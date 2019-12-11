@@ -1,7 +1,15 @@
+// weird bug in intel compiler and or boost::process: If we include boost
+// process intel compile fails. It seems that including sys/wait.h after
+// other c++ std:: headers triggers a weird behavior failing two static
+// asserts. We work around that by including it right away
+#include <sys/wait.h>
+
 #include <framework/utilities/Utils.h>
 
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+
+#include <boost/process.hpp>
 
 #include <sys/time.h>
 #include <unistd.h>
@@ -82,20 +90,18 @@ namespace Belle2::Utils {
   }
 
   std::string getCommandOutput(const std::string& command, const std::vector<std::string>& arguments,
-                               bool searchPath [[maybe_unused]])
+                               bool searchPath)
   {
-    std::string cmd = command;
-    for (auto& arg : arguments) {
-      cmd += " " + arg;
-    }
+    namespace bp = boost::process;
+    auto cmd = searchPath ? bp::search_path(command) : boost::filesystem::path(command);
+    bp::ipstream cmdOut;
+    bp::child child(cmd, bp::args(arguments), bp::std_in.close(), bp::std_out > cmdOut);
+    char buffer[4096];
     std::string result;
-    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
-    if (pipe) {
-      std::array<char, 256> buffer;
-      while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-        result += buffer.data();
-      }
+    while (child.running() && cmdOut.read(buffer, sizeof(buffer))) {
+      result.append(buffer, sizeof(buffer));
     }
+    if (cmdOut.gcount()) result.append(buffer, cmdOut.gcount());
     return result;
   }
 }

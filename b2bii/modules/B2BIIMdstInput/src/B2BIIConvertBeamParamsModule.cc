@@ -57,7 +57,8 @@ namespace Belle2 {
   B2BIIConvertBeamParamsModule::B2BIIConvertBeamParamsModule()
   {
     addParam("mcFlag", m_mcFlag, "which mc flag to use", m_mcFlag);
-    addParam("missing", m_missing, "where to store information about runs with missing database info", m_missing);
+    addParam("missingBenergy", m_missingBenergy, "where to store information about runs with missing database info", m_missingBenergy);
+    addParam("missingIp", m_missingIp, "where to store information about runs with missing IP profile info", m_missingIp);
   }
 
   void B2BIIConvertBeamParamsModule::initialize()
@@ -84,11 +85,11 @@ namespace Belle2 {
     Belle::Ip_profile_general_Manager& ipMgr = Belle::Ip_profile_general_Manager::get_manager();
 
     if (!Belle::BeamEnergy::usable()) {
-      FileSystem::Lock lock(m_missing);
+      FileSystem::Lock lock(m_missingBenergy);
       if (!lock.lock()) {
         B2ERROR("No BeamEnergy for exp " << m_event->getExperiment() << ", run " << m_event->getRun());
       } else {
-        std::ofstream file(m_missing.c_str(), std::ios::app);
+        std::ofstream file(m_missingBenergy.c_str(), std::ios::app);
         file << m_event->getExperiment() << "," << m_event->getRun() << std::endl;
       }
       return;
@@ -121,6 +122,13 @@ namespace Belle2 {
 
     // and now we continue with the vertex
     if (!Belle::IpProfile::usable()) {
+      FileSystem::Lock lock(m_missingIp);
+      if (!lock.lock()) {
+        B2ERROR("No IpProfile for exp " << m_event->getExperiment() << ", run " << m_event->getRun());
+      } else {
+        std::ofstream file(m_missingIp.c_str(), std::ios::app);
+        file << m_event->getExperiment() << "," << m_event->getRun() << std::endl;
+      }
       beamParams.setVertex(TVector3(
                              std::numeric_limits<double>::quiet_NaN(),
                              std::numeric_limits<double>::quiet_NaN(),
@@ -134,7 +142,7 @@ namespace Belle2 {
                  std::numeric_limits<double>::quiet_NaN()
                 ), TMatrixTSym<double>(3)
       );
-      Database::Instance().storeData("BeamSpot", &beamParams, iov);
+      Database::Instance().storeData("BeamSpot", &beamSpot, iov);
       B2INFO("No IpProfile, created BeamEnergy Payload");
       return;
     }
@@ -175,8 +183,8 @@ namespace Belle2 {
       beamspotList.emplace_back(beamSpot);
 
       if (!beamparams) {
-        beamparams = std::make_unique<EventDependency>(&beamparamsList.back());
-        beamspots = std::make_unique<EventDependency>(&beamspotList.back());
+        beamparams = std::make_unique<EventDependency>(&beamparamsList.back(), false);
+        beamspots = std::make_unique<EventDependency>(&beamspotList.back(), false);
       } else {
         beamparams->add(evtNr, &beamparamsList.back());
         beamspots->add(evtNr, &beamspotList.back());

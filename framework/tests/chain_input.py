@@ -45,6 +45,7 @@ inputfiles = [
     basf2.find_file('framework/tests/chaintest_2.root')
 ]
 
+basf2.conditions.disable_globaltag_replay()
 main = basf2.Path()
 
 # not used for anything, just checking wether the master module

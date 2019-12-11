@@ -11,6 +11,8 @@
 #include <simulation/physicslist/Belle2PhysicsList.h>
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
+#include "G4RegionStore.hh"
+#include "G4ProductionCuts.hh"
 
 // EM and decay physics
 #include "G4EmStandardPhysics.hh"
@@ -46,6 +48,10 @@ Belle2PhysicsList::Belle2PhysicsList(const G4String& physicsListName)
 {
   G4cout << " Using " << physicsListName << " physics list " << G4endl;
 
+  m_pxdCutValue = m_globalCutValue;
+  m_svdCutValue = m_globalCutValue;
+  m_cdcCutValue = m_globalCutValue;
+  m_arichtopCutValue = m_globalCutValue;
   // Decay
   RegisterPhysics(new G4DecayPhysics());
 
@@ -94,6 +100,53 @@ void Belle2PhysicsList::SetCuts()
   SetCutValue(m_globalCutValue * cm, "e-");
   SetCutValue(m_globalCutValue * cm, "e+");
   SetCutValue(m_globalCutValue * cm, "gamma");
+
+  G4RegionStore* theRegionStore = G4RegionStore::GetInstance();
+  G4ProductionCuts* regionCuts = 0;
+
+  // VXD region cut
+  regionCuts = new G4ProductionCuts;
+  regionCuts->SetProductionCut(m_pxdCutValue * cm);
+  G4cout << " PXD cut set to " << m_pxdCutValue << G4endl;
+  theRegionStore->GetRegion("PXDEnvelope")->SetProductionCuts(regionCuts);
+
+  // SVD region cut
+  regionCuts = new G4ProductionCuts;
+  regionCuts->SetProductionCut(m_svdCutValue * cm);
+  G4cout << " SVD cut set to " << m_svdCutValue << G4endl;
+  theRegionStore->GetRegion("SVDEnvelope")->SetProductionCuts(regionCuts);
+
+  // CDC region cut
+  regionCuts = new G4ProductionCuts;
+  regionCuts->SetProductionCut(m_cdcCutValue * cm);
+  G4cout << " CDC cut set to " << m_cdcCutValue << G4endl;
+  theRegionStore->GetRegion("CDCEnvelope")->SetProductionCuts(regionCuts);
+
+  // ARICH region cut
+  regionCuts = new G4ProductionCuts;
+  regionCuts->SetProductionCut(m_arichtopCutValue * cm);
+  theRegionStore->GetRegion("ARICHEnvelope")->SetProductionCuts(regionCuts);
+
+  // TOP module region cuts
+  regionCuts = new G4ProductionCuts;
+  regionCuts->SetProductionCut(m_arichtopCutValue * cm);
+  G4cout << " ARICH and TOP modules cuts set to " << m_arichtopCutValue << G4endl;
+  theRegionStore->GetRegion("TOPModule02")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule03")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule04")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule05")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule06")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule07")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule08")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule09")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule10")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule11")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule12")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule13")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule14")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule15")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule16")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPModule17")->SetProductionCuts(regionCuts);
 }
 
 
@@ -106,6 +159,30 @@ void Belle2PhysicsList::SetVerbosity(G4int verb)
 void Belle2PhysicsList::SetProductionCutValue(G4double value)
 {
   m_globalCutValue = value;
+}
+
+
+void Belle2PhysicsList::SetPXDProductionCutValue(G4double value)
+{
+  m_pxdCutValue = value;
+}
+
+
+void Belle2PhysicsList::SetSVDProductionCutValue(G4double value)
+{
+  m_svdCutValue = value;
+}
+
+
+void Belle2PhysicsList::SetCDCProductionCutValue(G4double value)
+{
+  m_cdcCutValue = value;
+}
+
+
+void Belle2PhysicsList::SetARICHTOPProductionCutValue(G4double value)
+{
+  m_arichtopCutValue = value;
 }
 
 

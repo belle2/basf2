@@ -426,7 +426,8 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
                             q = 0
                             q_err = 0
 
-                        T0MEAN = self.EventT0Hist.GetMean()
+                        # T0MEAN = self.EventT0Hist.GetMean()
+                        T0MEAN = cdc.GetMean()
                         '''
                         print(
                             "Mean of the CoG corrected distribution: " +

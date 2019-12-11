@@ -310,7 +310,7 @@ void TagVertex::setConstraintCov(TMatrixDSym const& constraintCov)
   m_constraintCov = constraintCov;
 }
 
-void TagVertex::setConstraintType(std::string constraintType)
+void TagVertex::setConstraintType(std::string const& constraintType)
 {
   m_constraintType = constraintType;
 }

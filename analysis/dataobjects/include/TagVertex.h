@@ -357,7 +357,7 @@ namespace Belle2 {
      * Set the type of the constraint for the tag fit
      */
 
-    void setConstraintType(std::string constraintType);
+    void setConstraintType(std::string const& constraintType);
 
 
   private:

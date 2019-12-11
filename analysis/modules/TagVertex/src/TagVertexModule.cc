@@ -216,17 +216,6 @@ namespace Belle2 {
 
   }
 
-  //this struct and sort function are used to sort the tagV track
-
-  struct TrackAndWeight {
-    double weight;
-    const TrackFitResult* track;
-    const MCParticle* mcParticle;
-  };
-
-  bool compare(TrackAndWeight& a, TrackAndWeight& b) { return a.weight > b.weight; }
-
-
   bool TagVertexModule::doVertexFit(Particle* Breco)
   {
     if ((m_trackFindingType == "singleTrack" || m_trackFindingType == "singleTrack_PXD") && m_constraintType == "noConstraint") {
@@ -1024,8 +1013,6 @@ namespace Belle2 {
       listNPXDHits[i] = int(Variable::trackNPXDHits(listParticle[i]));
     }
 
-    return false;
-
     // Here the program keeps track of the tracks that are repeated inside the FlavorTaggerInfo
     int nonRepeated = 1;
     for (unsigned i = 0; i < listTracks.size(); i++) {
@@ -1119,7 +1106,6 @@ namespace Belle2 {
     std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
     if (ROETracks.size() == 0) return false;
     std::vector<const Track*> fitTracks;
-    std::vector<const MCParticle*> fitTracksMC;
     for (auto& ROETrack : ROETracks) {
       // TODO: this will always return something (so not nullptr) contrary to the previous method
       // used here. This line can be removed as soon as the multi hypothesis fitting method
@@ -1363,6 +1349,8 @@ namespace Belle2 {
     return true;
   }
 
+
+
   //The following functions are just here to help printing stuff
 
   std::string TagVertexModule::printVector(TVector3 const& vec)
@@ -1398,7 +1386,6 @@ namespace Belle2 {
     }
     return oss.str();
   }
-
 
 
 } // end Belle2 namespace

@@ -57,12 +57,12 @@ SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
   addParam("offlineZSShaperDigits", m_storeSVDShaperDigitsName, "ShaperDigits StoreArray name", std::string("SVDShaperDigitsZS5"));
   addParam("ShaperDigits", m_storeNoZSSVDShaperDigitsName, "not zero-suppressed ShaperDigits StoreArray name",
            std::string("SVDShaperDigits"));
-
-  addParam("ShowAllHistos", m_ShowAllHistos, "Flag to show all histos in DQM, default = 0 ", m_ShowAllHistos);
+  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If TRUE skip events rejected by HLT", bool(true));
+  addParam("ShowAllHistos", m_ShowAllHistos, "Flag to show all histos in DQM, default = 0 ", int(0));
   addParam("CutSVDCharge", m_CutSVDCharge,
-           "cut for accepting to hitmap histogram, using strips only", m_CutSVDCharge);
+           "cut for accepting to hitmap histogram, using strips only", float(0));
   addParam("CutSVDClusterCharge", m_CutSVDClusterCharge,
-           "cut for accepting clusters to hitmap histogram", m_CutSVDClusterCharge);
+           "cut for accepting clusters to hitmap histogram", float(0));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("SVDExpReco"));
 
@@ -629,7 +629,7 @@ void SVDDQMExpressRecoModule::event()
 
   //check HLT decision and increase number of events only if the event has been accepted
 
-  if (m_resultStoreObjectPointer.isValid()) {
+  if (m_skipRejectedEvents && (m_resultStoreObjectPointer.isValid())) {
     const bool eventAccepted = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
     if (!eventAccepted) return;
   }

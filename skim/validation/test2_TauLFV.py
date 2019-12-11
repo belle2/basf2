@@ -1,13 +1,13 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import *
-from stdPhotons import *
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.lightmesons import *
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
+from stdPhotons import stdPhotons
+from stdPi0s import stdPi0s, loadStdSkimPi0
+from stdV0s import stdKshorts
+from skim.standardlists.lightmesons import loadStdLightMesons
 
 """
 <header>
@@ -17,9 +17,9 @@ from skim.standardlists.lightmesons import *
 </header>
 """
 
-taulfvskim = Path()
+taulfvskim = b2.Path()
 
-inputMdst('default', '../TauLFV.udst.root', path=taulfvskim)
+ma.inputMdst('default', '../TauLFV.udst.root', path=taulfvskim)
 
 stdPi('loose', path=taulfvskim)
 stdK('loose', path=taulfvskim)
@@ -32,21 +32,20 @@ loadStdSkimPi0(path=taulfvskim)
 stdKshorts(path=taulfvskim)
 loadStdLightMesons(path=taulfvskim)
 
-from skim.taupair import *
+from skim.taupair import TauLFVList
 tauList = TauLFVList(0, path=taulfvskim)
-copyLists('tau+:LFV', tauList, path=taulfvskim)
+ma.copyLists('tau+:LFV', tauList, path=taulfvskim)
 
 # the variables that are printed out are: M, deltaE
-from variables import variables
-variablesToHistogram(
+ma.variablesToHistogram(
     filename='TauLFV_Validation.root',
     decayString='tau+:LFV',
     variables=[('M', 100, 1.50, 2.00), ('deltaE', 120, -1.1, 1.1)],
     variables_2d=[('M', 50, 1.50, 2.00, 'deltaE', 60, -1.1, 1.1)],
     path=taulfvskim
 )
-process(taulfvskim)
-print(statistics)
+b2.process(taulfvskim)
+print(b2.statistics)
 
 # add contact information to histogram
 contact = "kenji@hepl.phys.nagoya-u.ac.jp"

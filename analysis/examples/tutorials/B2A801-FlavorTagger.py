@@ -31,7 +31,6 @@ import vertex as vx
 import variables.collections as vc
 import variables.utils as vu
 
-b2.conditions.disable_globaltag_replay()
 
 # create path
 cp_val_path = b2.Path()
@@ -99,14 +98,10 @@ ma.matchMCTruth(list_name='B0:sig', path=cp_val_path)
 ma.buildRestOfEvent(target_list_name='B0:sig',
                     path=cp_val_path)
 
-# Before using the Flavor Tagger you need at least the default weight files. If you do not set
-# any parameter the flavorTagger downloads them automatically from the database.
-# For this, you have to append a special global tag of the conditions database just before loading the flavor tagger.
-# Check the database matching your release in
-# https://b2-master.belle2.org/software/development/sphinx/analysis/doc/FlavorTagger.html
-# E.g. for release-03-01-00 and later versions
+# Temporarily, we use the analysis GT with the flavor tagger payloads for release-03-02-00.
+# This will NOT be needed once we retrain with MC13!
 
-b2.use_central_database("analysis_tools_release-03-01-00")
+b2.conditions.append_globaltag("analysis_tools_release-03-02-00")
 
 # The default working directory is '.'
 # Note that if you also train by yourself the weights of the trained Methods are saved therein.
@@ -166,7 +161,7 @@ ft.flavorTagger(
 #
 # Another possibility is to train a combiner for a specific category combination using the default weight files
 #
-# Attention to train the flavor tagger you need MC samples generated withou CP violation!
+# Attention: to train the flavor tagger you need MC samples generated without built-in CP violation!
 # The best sample for this is B0-> nu_tau anti-nu_tau .
 # You can apply cuts using the flavor Tagger: qrOutput(FBDT) > -2 rejects all events which do not
 # provide flavor information using the tag side

@@ -67,7 +67,7 @@ namespace Belle2 {
     void addHit(int lwire, int wire, int layer, double doca, double docaRS, double enta, double entaRS, int adcCount, double dE,
                 double path, double dedx,
                 double cellHeight, double cellHalfWidth, int driftT, double driftD, double driftDRes, double wiregain, double twodcor,
-                double onedcor, bool hasReaddedFlag, double weightPionHypo, double weightKaonHypo, double weightProtHypo)
+                double onedcor, int foundByTrackFinder, double weightPionHypo, double weightKaonHypo, double weightProtHypo)
     {
 
       m_hLWire.push_back(lwire);
@@ -89,7 +89,7 @@ namespace Belle2 {
       m_hWireGain.push_back(wiregain);
       m_hTwodCor.push_back(twodcor);
       m_hOnedCor.push_back(onedcor);
-      m_hHasReaddedFlag.push_back(hasReaddedFlag);
+      m_hFoundByTrackFinder.push_back(foundByTrackFinder);
       m_hWeightPionHypo.push_back(weightPionHypo);
       m_hWeightKaonHypo.push_back(weightKaonHypo);
       m_hWeightProtHypo.push_back(weightProtHypo);
@@ -214,8 +214,8 @@ namespace Belle2 {
     /** Return the 1D correction for this hit */
     double getOneDCorrection(int i) const { return m_hOnedCor[i]; }
 
-    /** Return whether the hit was readded to the track by the ReattachCDCWireHitsToRecoTracks module*/
-    bool getReaddedFlag(int i) const { return m_hHasReaddedFlag[i]; }
+    /** Return the found by track finder flag for the given hit (every type) */
+    int getFoundByTrackFinder(int i) const { return m_hFoundByTrackFinder[i]; }
 
     /** Return the max weights from KalmanFitterInfo */
     double getWeightPionHypo(int i) const { return m_hWeightPionHypo[i]; }
@@ -290,10 +290,10 @@ namespace Belle2 {
     std::vector<int> m_hDriftT;       /**< drift time for each hit */
     std::vector<double> m_hDriftD;    /**< drift distance for each hit */
     std::vector<double> m_hDriftDRes; /**< drift distance resolution for each hit */
-    std::vector<bool> m_hHasReaddedFlag; /**< flags for each hit if it was readded */
-    std::vector<double> m_hWeightPionHypo;  /**< Weight for pion hypothesis from KalmanFitterInfo*/
-    std::vector<double> m_hWeightKaonHypo; /**< Weight for kaon hypothesis from KalmanFitterInfo*/
-    std::vector<double> m_hWeightProtHypo; /**< Weight for proton hypothesis from KalmanFitterInfo*/
+    std::vector<int> m_hFoundByTrackFinder; /**< the 'found by track finder' flag for the given hit */
+    std::vector<double> m_hWeightPionHypo;  /**< weight for pion hypothesis from KalmanFitterInfo*/
+    std::vector<double> m_hWeightKaonHypo; /**< weight for kaon hypothesis from KalmanFitterInfo*/
+    std::vector<double> m_hWeightProtHypo; /**< weight for proton hypothesis from KalmanFitterInfo*/
 
     std::vector<double> m_hCellHeight;    /**< height of the CDC cell */
     std::vector<double> m_hCellHalfWidth; /**< half-width of the CDC cell */

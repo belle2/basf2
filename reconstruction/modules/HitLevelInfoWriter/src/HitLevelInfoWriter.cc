@@ -300,7 +300,7 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
       h_WeightPionHypo[ihit] = dedxTrack->getWeightPionHypo(ihit);
       h_WeightKaonHypo[ihit] = dedxTrack->getWeightKaonHypo(ihit);
       h_WeightProtonHypo[ihit] = dedxTrack->getWeightProtonHypo(ihit);
-      h_hasReaddedFlag[ihit] = dedxTrack->getReaddedFlag(ihit);
+      h_foundByTrackFinder[ihit] = dedxTrack->getFoundByTrackFinder(ihit);
 
       // Get the calibration constants
       h_wireGain[ihit] = m_DBWireGains->getWireGain(h_wire[ihit]);
@@ -341,7 +341,7 @@ HitLevelInfoWriterModule::clearEntries()
       h_WeightPionHypo[ihit] = 0;
       h_WeightKaonHypo[ihit] = 0;
       h_WeightProtonHypo[ihit] = 0;
-      h_hasReaddedFlag[ihit] = false;
+      h_foundByTrackFinder[ihit] = 0;
     }
   }
 }
@@ -432,7 +432,7 @@ HitLevelInfoWriterModule::bookOutput(std::string filename)
     m_tree[i]->Branch("hWeightPionHypo", h_WeightPionHypo, "hWeightPionHypo[hNHits]/D");
     m_tree[i]->Branch("hWeightKaonHypo", h_WeightKaonHypo, "hWeightKaonHypo[hNHits]/D");
     m_tree[i]->Branch("hWeightProtonHypo", h_WeightProtonHypo, "hWeightProtonHypo[hNHits]/D");
-    m_tree[i]->Branch("hHasReaddedFlag", h_hasReaddedFlag, "hHasReaddedFlag[hNHits]/O");
+    m_tree[i]->Branch("hFoundByTrackFinder", h_foundByTrackFinder, "hFoundByTrackFinder[hNHits]/I");
 
   }
 }

@@ -181,7 +181,7 @@ namespace Belle2 {
     double h_WeightKaonHypo[kMaxHits] = {}; /**< weight for pion hypothesis from KalmanFitterInfo*/
     double h_WeightProtonHypo[kMaxHits] = {}; /**< weight for pion hypothesis from KalmanFitterInfo*/
 
-    bool h_hasReaddedFlag[kMaxHits] = {}; /**< was the hit readded by the ReattachCDCWireHitsToRecoTracks module*/
+    int h_foundByTrackFinder[kMaxHits] = {}; /**< the 'found by track finder' flag for the given hit */
 
     // parameters: calibration constants
     DBObjPtr<CDCDedxScaleFactor> m_DBScaleFactor; /**< Scale factor to make electrons ~1 */

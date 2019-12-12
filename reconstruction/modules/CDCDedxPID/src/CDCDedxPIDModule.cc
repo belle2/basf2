@@ -307,12 +307,12 @@ void CDCDedxPIDModule::event()
       int layer = cdcHit->getILayer(); // layer within superlayer
       int superlayer = cdcHit->getISuperLayer();
 
-      // check if the hit was readded by the ReattachCDCWireHitsToRecoTracks module
-      bool hasReaddedFlag = false;
+      // check which algorithm found this hit
+      int foundByTrackFinder = -1;
       const RecoHitInformation* hitInfo = recoTrack->getRecoHitInformation(cdcHit);
-      if (hitInfo->getFoundByTrackFinder() == RecoHitInformation::c_ReattachCDCWireHitsToRecoTracks) {
-        hasReaddedFlag = true;
-      }
+      //if (hitInfo->getFoundByTrackFinder() == RecoHitInformation::c_ReattachCDCWireHitsToRecoTracks) {
+      foundByTrackFinder = hitInfo->getFoundByTrackFinder();
+      //}
 
       // add weights for hypotheses
       double weightPionHypo = 0;
@@ -505,7 +505,7 @@ void CDCDedxPIDModule::event()
               dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS, adcCount, hitCharge, celldx, cellDedx, cellHeight,
                                 cellHalfWidth, driftT,
                                 driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor,
-                                hasReaddedFlag, weightPionHypo, weightKaonHypo, weightProtHypo);
+                                foundByTrackFinder, weightPionHypo, weightKaonHypo, weightProtHypo);
             nhitscombined++;
           }
         }

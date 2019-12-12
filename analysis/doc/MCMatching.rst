@@ -157,11 +157,12 @@ Steering file snippet
   ...
  
 
-~~~~~~
-Status
-~~~~~~
+.. warning:: 
+  `isSignal` of output particle, ``'B+:testB'`` in above case, is not related to given decay string for now.
+  For example, even if one uses ``...``, ``?gamma``, or ``?nu``, `isSignal` will be 0.
+  So please use a specific isSignal* variable, `isSignalAcceptMissing` in this case.
 
-Skipping of intermediate states in decay chain not supported yet, e.g. :math:`B \to \pi \pi K`.
+For more information and examples how to use the decay strings correctly, please see :ref:`DecayString` and :ref:`Grammar_for_custom_MCMatching`.
 
 ---------------
 MC decay string

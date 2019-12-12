@@ -18,7 +18,7 @@ set_log_level(LogLevel.DEBUG)
 main = basf2.create_path()
 
 # event info setter
-main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=99966)
+main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=1)
 
 # beam parameters
 beamparameters = add_beamparameters(main, "Y4S")
@@ -27,14 +27,14 @@ beamparameters = add_beamparameters(main, "Y4S")
 
 # to run the framework the used modules need to be registered
 trepsinput = basf2.register_module('trepsinput')
-# trepsinput.param('W', 2.0)
 trepsinput.param('InputFileName', './treps_par.dat')
+trepsinput.param('InputFileName2', './pipidcs.dat')
 trepsinput.param('RootFileNameForCheck', './treps_test.rot')
 
 # run
 main.add_module("Progress")
 main.add_module(trepsinput)
-main.add_module("RootOutput", outputFileName="utrepsbpipi_100k_B.root")
+main.add_module("RootOutput", outputFileName="utrepsbpipi_100k_1.root")
 main.add_module("PrintMCParticles", logLevel=basf2.LogLevel.INFO, onlyPrimaries=False)
 
 # generate events

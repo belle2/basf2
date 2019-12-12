@@ -1,5 +1,11 @@
 /**************************************************************************
-
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Kiyoshi Hayasaka                                         *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <string.h>
@@ -111,7 +117,6 @@ double UtrepsB::qfunc(double y, double mm) const
 //form factor effect
 double UtrepsB::tpform(double _q2, double _w) const
 {
-
   //B2DEBUG(10, " Fmodel "<< TrepsB::fmodel );
   double dis = 1. / pow((1.0 + _q2 / (_w * _w)), 2);
   if (TrepsB::fmodel == 1) {

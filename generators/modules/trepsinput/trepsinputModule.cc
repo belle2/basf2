@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kiyoshi Hayasaka                                         *
+ * Contributors: Kiyoshi Hayasaka, Yo Sato                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,6 +15,9 @@
 #include <string>
 #include <boost/filesystem.hpp>
 #include <TFile.h>
+
+#include <random>
+#include <map>
 /* --------------- WARNING ---------------------------------------------- *
    If you have more complex parameter types in your class then simple int,
    double or std::vector of those you might need to uncomment the following
@@ -48,14 +51,12 @@ trepsinputModule::trepsinputModule() : Module(), UtrepsB()
   //     )DOC");
 
   // Parameter definitions
-  //   dscr->define_param ( "W", "W, gamma-gamma cm energy", &module->wf );
-  addParam("W", wf, "W, gamma-gamma cm energy", (float)2.0);
   std::string dfname("treps_par.dat");
   std::string fname;
   addParam("InputFileName", fname, "filename for TREPS input", dfname);
   strncpy(filename, fname.c_str(), 130);
 
-  std::string dfname2("wlist_table.dat");
+  std::string dfname2("pipidcs.dat");
   std::string fname2;
   addParam("InputFileName2", fname2, "filename for W-List input", dfname2);
   strncpy(filename2, fname2.c_str(), 130);
@@ -63,58 +64,34 @@ trepsinputModule::trepsinputModule() : Module(), UtrepsB()
   std::string nocheck("");
   addParam("RootFileNameForCheck", rfnfc, "filename for TREPS W-Listbehavior check", nocheck);
 
-  //
-
   TrepsB::initp();
   TrepsB::create_hist();
-  // set default value for w
-  // wf = 2.0;
 
   //Initialize generator;
   UtrepsB::initg();
 
   //201903
-  TrepsB::wtcount = 0;
-  double dum = TrepsB::wtable(0);
+  B2DEBUG(10, "wtable started !!!");
+  TrepsB::wtable();
   //201903E
 
 }
 
 void trepsinputModule::initialize()
 {
+  B2DEBUG(10, "TrepsInputModule is initialized !!!");
 
-  TrepsB::w = (double)TrepsB::wf;
-  trepsinputModule::updateW();
   m_mcparticles.registerInDataStore();
 }
 
 void trepsinputModule::event()
 {
+  B2DEBUG(10, "Event started in TrepsInputModule !!!");
 
-  if (TrepsB::inmode != 0) return;
+  TrepsB::w = simulateW();
+  trepsinputModule::updateW();
 
-  // check the change of W value
-  //201903
-  // get W from table
-  TrepsB::wtcount++;
-  TrepsB::wf = (float)(wtable(1));
-  //201903E
-
-  // check the change of W value
-
-  //201903
-  //DEBUG if( abs((double)wf - TrepsB::w ) >=0.001 ){
-  if (abs((double)TrepsB::wf - TrepsB::w) >= 0.001 && TrepsB::wf > 0.01) {
-    //201903E
-    B2INFO(" W value changed. " << TrepsB::w << " to " << TrepsB::wf);
-    //initialize();
-    TrepsB::w = (double)TrepsB::wf;
-    trepsinputModule::updateW();
-
-  }
-  //   char ctemp;
   int idummy = 0;
-  // cin >> ctemp;
   int iret = TrepsB::event_gen(idummy);
   mpg.clear();
 
@@ -122,72 +99,25 @@ void trepsinputModule::event()
 
     const Part_gen* part = TrepsB::partgen;
 
-    //  cout <<TrepsB::npart<<TrepsB::pp<<endl;
-
     // fill data of the final-state particles
     for (int i = 0; i < npart ; i++) {
       auto& p = mpg.addParticle();
-      //  hepevt.isthep( 1 );
-      //  hepevt.idhep( part[i].part_prop.icode);
       p.setPDG(part[i].part_prop.icode);
-      //  hepevt.mother( 0 );
-      //  hepevt.mo(0,0);
-      //  hepevt.daFirst( 0 );
-      //  hepevt.daLast( 0 );
-      //  hepevt.PX( (float)(part[i].p.x()) );
-      //  hepevt.PY( (float)(part[i].p.y()) );
-      //  hepevt.PZ( (float)(part[i].p.z()) );
-      //  hepevt.E( (float)(part[i].p.t()) );
       p.set4Vector(part[i].p);
-      //  hepevt.M( (float)(part[i].part_prop.pmass) );
       p.setMass(part[i].part_prop.pmass);
-      //  hepevt.VX( 0.0 );
-      //  hepevt.VY( 0.0 );
-      //  hepevt.VZ( 0.0 );
-      //  hepevt.T( 0.0 );
       p.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
     }
     // fill data of the recoil electron and positron
     auto& p1 = mpg.addParticle();
-    //  hepevt1.isthep( 1 );
-    //  hepevt1.idhep( 11 );
     p1.setPDG(11);
-    //  hepevt1.mother( 0 );
-    //  hepevt1.mo( 0, 0 );
-    //  hepevt1.daFirst( 0 );
-    //  hepevt1.daLast( 0 );
-    //  hepevt1.PX( (float)(TrepsB::pe.x()) );
-    //  hepevt1.PY( (float)(TrepsB::pe.y()) );
-    //  hepevt1.PZ( (float)(TrepsB::pe.z()) );
-    //  hepevt1.E( (float)(TrepsB::pe.t()) );
     p1.set4Vector(TrepsB::pe);
-    //  hepevt1.M( (float)(TrepsB::me) );
     p1.setMass(TrepsB::me);
-    //  hepevt1.VX( 0.0 );
-    //  hepevt1.VY( 0.0 );
-    //  hepevt1.VZ( 0.0 );
-    //  hepevt1.T( 0.0 );
     p1.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
 
     auto& p2 = mpg.addParticle();
-    //  hepevt2.isthep( 1 );
-    //  hepevt2.idhep( -11 );
     p2.setPDG(-11);
-    //    hepevt2.mother( 0 );
-    //  hepevt2.mo( 0, 0 );
-    //  hepevt2.daFirst( 0 );
-    //  hepevt2.daLast( 0 );
-    //  hepevt2.PX( (float)(TrepsB::pp.x()) );
-    //  hepevt2.PY( (float)(TrepsB::pp.y()) );
-    //  hepevt2.PZ( (float)(TrepsB::pp.z()) );
-    //  hepevt2.E( (float)(TrepsB::pp.t()) );
     p2.set4Vector(TrepsB::pp);
-    //  hepevt2.M( (float)(TrepsB::me) );
     p2.setMass(TrepsB::me);
-    //  hepevt2.VX( 0.0 );
-    //  hepevt2.VY( 0.0 );
-    //  hepevt2.VZ( 0.0 );
-    //  hepevt2.T( 0.0 );
     p2.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
 
 
@@ -215,3 +145,82 @@ void trepsinputModule::terminate()
   TrepsB::terminate();
 }
 
+double trepsinputModule::simulateW()
+{
+  std::random_device rnd;
+  std::mt19937 mt(rnd());
+
+  const std::map<double, double> upperLimit_pipi = {
+    {0.5, 4.5},
+    {1.5, 0.2},
+    {2.0, 0.025},
+    {2.5, 0.006},
+    {3.0, 0.0013},
+    {4.0, 0.}
+  };
+
+  std::map<double, double> areaUpToBin;
+  double areaOfRandom = 0.;
+  double lowerEdge = 0.;
+  double upperEdge = 0.;
+  double currentLimit = 0.;
+  for (auto x : upperLimit_pipi) {
+    upperEdge = x.first;
+    areaOfRandom += (upperEdge - lowerEdge) * currentLimit;
+
+    lowerEdge = upperEdge;
+    currentLimit = x.second;
+
+    areaUpToBin[lowerEdge] = areaOfRandom;
+  }
+
+  std::uniform_real_distribution<double> getScaledW(0.0, areaOfRandom);
+
+  while (1) {
+    double scaledW = getScaledW(mt);
+
+    double W = 0.;
+
+    double edge = 0.;
+    double limit = 0.;
+    double area = 0.;
+    for (auto x : areaUpToBin) {
+
+      if (scaledW < x.second) {
+        W = (scaledW - area) / limit + edge;
+        break;
+      }
+
+      edge = x.first;
+      area = x.second;
+      limit = upperLimit_pipi.at(edge);
+    }
+
+    if (W < 0.5 or W > 4.0)
+      B2FATAL("W has to be in [0.5, 4.0] !!! W = " << W << ", scaledW = " << scaledW);
+
+    std::uniform_real_distribution<double> getTrial(0.0, limit);
+    double trial = getTrial(mt);
+    double crossSection = getCrossSection(W);
+
+    if (trial < crossSection)
+      return W;
+
+  }
+
+  return 0;
+}
+
+double trepsinputModule::getCrossSection(double W)
+{
+  if (TrepsB::crossSectionOfW.size() == 0) {
+    B2ERROR("Cross Section Table is empty !!!");
+    return 0.;
+  }
+
+  auto it_upper = crossSectionOfW.lower_bound(W); // This lower_bound returns first iterator which meets >=w condition. --> upper side
+  auto it_lower = it_upper;
+  it_lower--;
+
+  return (it_upper->second - it_lower->second) / (it_upper->first - it_lower->first) * (W - it_lower->first) + it_lower->second;
+}

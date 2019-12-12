@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kiyoshi Hayasaka                                         *
+ * Contributors: Kiyoshi Hayasaka, Yo Sato                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,18 +18,13 @@
 #include <generators/utilities/InitialParticleGeneration.h>
 #include <string>
 
-
 namespace Belle2 {
   /**
    * Input from TREPS generator for ee->eeff
-   *
-   * Input from TREPS generator for ee->eeff
-
    */
   class trepsinputModule : public Module, public UtrepsB {
 
   public:
-
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
@@ -44,15 +39,13 @@ namespace Belle2 {
     /** input event from TREPS */
     virtual void event() override;
 
-    //virtual double tpform( double, double ) const override ;
-    //virtual double tpangd( double, double ) const override ;
-
-    float wf;
     std::string rfnfc;
 
-  private:
-    //double d2func(double) const;
-    //double qfunc(double) const;
+    /** Simulate W distribution according to given input file of cross section table */
+    double simulateW();
+
+    /** Returns the differential cross section for given W [GeV] */
+    double getCrossSection(double W);
 
   private:
 

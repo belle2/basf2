@@ -124,8 +124,6 @@ namespace Belle2 {
       int icodex, ndecx ;
       double pmassx, pchargx, pwidthx ;
 
-      //   std::cout << "ndecay = "<< ndecay << std::endl ;
-
       for (int i = 0 ; i < ndecay ; i++) {
         sutool.nextline(infile);
 
@@ -136,8 +134,6 @@ namespace Belle2 {
         if (ndecx >= 2) ndecs += ndecx ;
       }
 
-      //  std::cout << "ndecs = "<< ndecs << std::endl;
-
       for (int j = 0 ; j < ndecs ; j++) {
         sutool.nextline(infile);
 
@@ -145,8 +141,6 @@ namespace Belle2 {
         Part_cont _pp  = Part_cont(icodex, pmassx, pchargx);
         parts[j] = _pp ;
       }
-
-      //  std::cout << parti[0].icode << std::endl ;
 
       // Boost of the total system
       double tsws4 = pfeb.Mag() + pfpb.Mag() ;
@@ -157,8 +151,6 @@ namespace Belle2 {
       peb = ppp;
       ppp3 = TVector3(ebeam * pfpb);
       ppb = TLorentzVector(ppp3, ppp3.Mag());
-
-      //  std::cout << peb << ppb << std::endl;
 
       ppp.Boost(tsws.x() / tsws4, tsws.y() / tsws4, tsws.z() / tsws4);
       ephi = ppp.Phi();
@@ -215,17 +207,7 @@ namespace Belle2 {
       ntot = 0 ;
       nsave = 0;
     }
-    /*
-      long seed = 12357;
-      HepRandom& gRandom->Uniform = sutool.gRandom->Uniform;
 
-
-      HepRandom::setTheSeed(seed);
-      double rrrrr  = gRandom->Uniform();
-      double sssss  = gRandom->Uniform();
-
-      std::cout <<" The first random "<<seed<<"  "<<rrrrr<<"  "<<sssss<<std::endl;
-    */
   }
 
   void TrepsB::create_hist(void)
@@ -250,82 +232,25 @@ namespace Belle2 {
 
   //201903
   // W table
-  double TrepsB::wtable(int mode)
+  void TrepsB::wtable()
   {
-    double prew = 0.;
-    if (mode == 0) {
+    // initialization and load table
 
-      // initialization and load table
-
-      for (int i = 0 ; i < 5000 ; i++) {
-        wthead[i] = 999999999;
-        wtcond[i] = 0.0;
+    // Load Wlist_table
+    ifstream infile2(filename2);
+    if (!infile2) {
+      B2FATAL("Can't open W-list input file") ;
+    } else {
+      double w; // W [GeV]
+      double crossSection; // Number of events for given W
+      while (infile2 >> w >> crossSection) {
+        if (w > 9000. || w < 0.) continue;
+        crossSectionOfW[w] = crossSection;
       }
 
-      B2DEBUG(10, " wtable mode=0  initialized");
-
-      // Load Wlist_table
-
-      ifstream infile2(filename2);
-      if (!infile2) {
-        B2FATAL("Can't open W-list input file") ;
-      } else {
-        double w1;
-        int n1;
-        int hpoint, nwpoint;
-        int inmodein;
-
-        hpoint = 1;
-        nwpoint = 0;
-
-        infile2 >> inmodein;
-        inmode = inmodein;
-
-        while (!infile2.eof() && inmode == 0) {
-          sutool.nextline(infile2);
-          infile2 >> w1 >> n1 ;
-          if (w1 > 9000. || w1 < 0.) continue;
-
-          if (nwpoint == 0) wthead[0] = 1;
-          wtcond[nwpoint] =  w1;
-          nwpoint++ ;
-          hpoint += n1;
-          B2DEBUG(10,  w1 << " GeV  " << n1 << " events   " << hpoint - 1 << "events in total");
-          wthead[nwpoint] = hpoint;
-        }
-        while (!infile2.eof() && (inmode == 1 || inmode == 2)) {
-          sutool.nextline(infile2);
-          infile2 >> w1 >> n1 ;
-          if (w1 > 9000. || w1 < 0.) continue;
-          wf = w1;
-          w = (double)wf;
-          //B2DEBUG(10,"Here1");
-          updateW();
-          //B2DEBUG(10, "Here");
-          if (inmode == 1)
-            B2INFO(w << " " << twlumi() << "   //W(GeV) and Two-photon lumi. func.(wide)(1/GeV)");
-          else
-            B2INFO(w << " " << twlumi_n() << "   //W(GeV) and Two-photon lumi. func.(narrow)(nb/keV/(2J+1))");
-
-          //B2DEBUG(10, "Here" );
-        }
-
-        B2DEBUG(10, wthead[0] << " " << wtcond[0]);
-        B2DEBUG(10, " wtable mode=0  loaded");
-      }
-      return 0.0 ;
-    } else if (mode == 1) {
-      // Get W
-      int i = 0;
-
-      do {
-        if (wtcount >= wthead[i])  prew = wtcond[i];
-        i++;
-      } while (wthead[i] < 999999999);
-
-
-      return prew;
+      B2DEBUG(10, " wtable loaded");
     }
+
   }
   //201903E
 
@@ -340,8 +265,6 @@ namespace Belle2 {
 
   void TrepsB::updateW(void)
   {
-
-
     if (q2max < 0.0) q2max = s - w * w - 2.0 * me * w ;
     rs = w * w / s ;
     double zmax = 1.0 - me / ebeam ;
@@ -556,9 +479,6 @@ namespace Belle2 {
 
       TVector3 wsb = (1. / ws.T()) * ws3 ;
 
-      //    std::cout << pe <<" "<<pp<<" "<< ws.t() <<" "<<
-      //                      w<<" "<< (pp.t()+pe.t()+ws.t())<<std::endl ;
-
       // decide of 4-momenta of particles in the two-photon system
 
       // particle masses
@@ -575,7 +495,6 @@ namespace Belle2 {
         double m2 =  parti[1].pmassp;
         double pm = sutool.p2bdy(w, m1, m2, jcode);
         if (jcode == 0) continue ;
-        //std::cout<<"  mass "<< w<<" "<<m1<<" "<<m2<<std::endl;
         pppp[0] = TLorentzVector(pm * sqrt(1. - zz * zz) * cos(phi),
                                  pm * sqrt(1. - zz * zz) * sin(phi),
                                  pm * zz, sqrt(pm * pm + m1 * m1));
@@ -586,9 +505,6 @@ namespace Belle2 {
         pppp[0].Boost(wsb);
         pppp[1].Boost(wsb);
 
-        //     std::cout << pppp[0] << pppp[1]<<
-        //      ( pppp[0]+pppp[1]+pe+pp)<< (pppp[0]+pppp[1]).mag() <<std::endl;
-
       } else {
         // more than two body
         double* massa = new double [ndecay];
@@ -598,10 +514,6 @@ namespace Belle2 {
         if (jcode == 0) continue;
 
         delete [] massa ;
-
-        //     std::cout << pppp[0] << pppp[1] << std::endl;
-        //     std::cout << pppp[2] << pppp[3] << std::endl;
-
       }
       // more decay
       npoint = 0;
@@ -645,10 +557,6 @@ namespace Belle2 {
       }
       if (jcode == 0) continue ;
 
-      //   std::cout << partgen[0].p << partgen[1].p << partgen[2].p << std::endl;
-      //   std::cout << partgen[0].part_prop.icode << partgen[1].part_prop.icode
-      //                 << partgen[2].part_prop.icode << std::endl;
-
       int iret = tpuser(pe, pp, partgen, npoint);
       if (iret <= 0) continue ;
       comp = 1;
@@ -663,7 +571,6 @@ namespace Belle2 {
     double eall = pcm.T();
     double wcal = sqrt(pfinal.T() * pfinal.T() -
                        ptsumcm * ptsumcm - pzsumcm * pzsumcm);
-    // std::cout << "in e+e- cm system: "<<npoint << pcm <<pzsumcm<<" "<<ptsumcm<<std::endl;
     treh1->Fill((float)pzsumcm, 1.0);
     treh2->Fill((float)ptsumcm, 1.0);
     treh3->Fill((float)eall, 1.0);
@@ -713,8 +620,6 @@ namespace Belle2 {
     double rr = gRandom->Uniform();
     double xx = (rr + ccc) / rk ;
 
-    //   std::cout << " xx = " << xx << " "<<rr<<" "<<s<<" "<<z<<" "<<q2max<<std::endl ;
-
     return exp(xx);
   }
 
@@ -750,14 +655,6 @@ namespace Belle2 {
 
   double TrepsB::tpdfnc(double d) const
   {
-    //  Ordinary (Original) Version
-    /*  double r = ( 2.0 + d*d/rs + sqrt( pow((2.0+d*d/rs),2) - 4.0 ) )*0.5 ;
-    if( d < 0.0 )
-    r = ( 2.0 + d*d/rs - sqrt( pow((2.0+d*d/rs),2) - 4.0 ) )*0.5 ;
-    return
-    double tmp = tpxint(r,rs,q2max)/(0.5*sqrt(rs/r)*(1.0+1.0/r) );
-    */
-
     // New (Working) version 2016 April S.Uehara
     const double alpppi = 0.002322816 ;
     double y0 = (d + sqrt(d * d + 4.*rs)) * 0.5;
@@ -769,8 +666,6 @@ namespace Belle2 {
     double integz = simpsnz(d, xminz, xmax, 1000);
     double integrd = (integy + (-1. + y0) / y0) * (integz + (-1. + z0) / z0) / sqrt(d * d + 4.*rs)
                      * alpppi * alpppi;
-
-    //std::cout << " d   "<<  d << " "<<integrd*sqrt(d*d+4.*rs) <<std::endl;
 
     return integrd;
   }
@@ -832,7 +727,6 @@ namespace Belle2 {
 
     double y = sqrt(r * _rs);
     double z = sqrt(_rs / r);
-    //std::cout <<"  tpxint "<< tpf(y,q2max)*tpf(z, q2max)<<std::endl;
     return tpf(y, _q2max) * tpf(z, _q2max) * 0.5 / r ;
   }
 
@@ -996,8 +890,6 @@ namespace Belle2 {
     z = pa.CosTheta();
     phi0 = pa.Phi();
 
-    // std::cout << "******* "<<m12<<" "<<z<<" "<<phi0<<std::endl;
-
     sutool.rotate(p1, 0., phi0);
     sutool.rotate(p2, 0., phi0);
     sutool.rotate(p3, 0., phi0);
@@ -1011,27 +903,17 @@ namespace Belle2 {
 
     // Now, we are at 12 c.m.s.
 
-    //std::cout << p1.x()<<" "<<p1.y()<<" "<<p1.z()<<std::endl;
-    //std::cout << p2.x()<<" "<<p2.y()<<" "<<p2.z()<<std::endl;
-
     zp = p1.CosTheta(); phip = p1.Phi();
-
-    //std::cout << "     ** "<<zp<<" "<<phip<<std::endl;
 
     TVector3 ay = TVector3(0., 1., 0.);
     TVector3 ax = ay.Cross(az);
-
-
-    //std::cout << " az"<< az <<std::endl;
-    //std::cout << " ay"<< ay <<std::endl;
-    //std::cout << " ax"<< ax <<std::endl;
 
     zs = az.Dot(p1.Vect()) / (p1.Vect()).Mag();
     TVector3 azk = az.Cross(p1.Vect());
     double cosphis = ay.Dot(azk) * (1. / azk.Mag());
     double sinphis = ax.Dot(azk) * (-1. / azk.Mag());
     phis = atan2(sinphis, cosphis);
-    //std::cout << "     ** "<<zs<<" "<<phis<<std::endl;
+
   }
 
   void TrepsB::tpkin4(Part_gen* part,
@@ -1061,8 +943,6 @@ namespace Belle2 {
     z = pa.CosTheta();
     phi0 = pa.Phi();
 
-    //std::cout << "******* "<<m12<<" "<<z<<" "<<phi0<<std::endl;
-
     sutool.rotate(p1, 0., phi0);
     sutool.rotate(p2, 0., phi0);
     sutool.rotate(p3, 0., phi0);
@@ -1077,27 +957,16 @@ namespace Belle2 {
 
     // Now, we are at 12 c.m.s.
 
-    //std::cout << p1.x()<<" "<<p1.y()<<" "<<p1.z()<<std::endl;
-    //std::cout << p2.x()<<" "<<p2.y()<<" "<<p2.z()<<std::endl;
-
     zp = p1.CosTheta(); phip = p1.Phi();
-
-    //std::cout << "     ** "<<zp<<" "<<phip<<std::endl;
 
     TVector3 ay = TVector3(0., 1., 0.);
     TVector3 ax = ay.Cross(az);
-
-
-    //std::cout << " az"<< az <<std::endl;
-    //std::cout << " ay"<< ay <<std::endl;
-    //std::cout << " ax"<< ax <<std::endl;
 
     zs = az.Dot(p1.Vect()) / (p1.Vect()).Mag();
     TVector3 azk = az.Cross(p1.Vect());
     double cosphis = ay.Dot(azk) * (1. / azk.Mag());
     double sinphis = ax.Dot(azk) * (-1. / azk.Mag());
     phis = atan2(sinphis, cosphis);
-    //std::cout << "     ** "<<zs<<" "<<phis<<std::endl;
 
     // next go to 34
 
@@ -1106,39 +975,20 @@ namespace Belle2 {
     m34 = pb.M();
 
     TVector3 pbcm = (-1. / pb.T()) * pb.Vect();
-    //  TVector3 bz = (TVector3)pb*(1./((TVector3)pb).mag());
     p3.Boost(pbcm); p4.Boost(pbcm);
 
     // Now, we are at 34 c.m.s.
 
-    //std::cout << p3.x()<<" "<<p3.y()<<" "<<p3.z()<<std::endl;
-    //std::cout << p4.x()<<" "<<p4.y()<<" "<<p4.z()<<std::endl;
-
     zpp = p3.CosTheta(); phipp = p3.Phi();
 
-    //std::cout << "     ** "<<zpp<<" "<<phipp<<std::endl;
     // 2004.02.29   Here, I change the definision of zss and phiss
     //            Use the same system as 3
 
-    //TVector3 by = TVector3( 0., 1., 0. );
-    //TVector3 bx = by.cross(bz);
-
-
-    //std::cout << " bz"<< bz <<std::endl;
-    //std::cout << " by"<< by <<std::endl;
-    //std::cout << " bx"<< bx <<std::endl;
-
-    //zss = bz.dot((TVector3)p3)/((TVector3)p3).mag();
-    //TVector3 bzk = bz.cross(p3);
-    //double cosphiss = by.dot(bzk)*(1./bzk.mag());
-    //double sinphiss = bx.dot(bzk)*(-1./bzk.mag());
     zss = az.Dot(p3.Vect()) / (p3.Vect()).Mag();
     TVector3 bzk = az.Cross(p3.Vect());
     double cosphiss = ay.Dot(bzk) * (1. / bzk.Mag());
     double sinphiss = ax.Dot(bzk) * (-1. / bzk.Mag());
     phiss = atan2(sinphiss, cosphiss);
-    //std::cout << "     ** "<<zss<<" "<<phiss<<std::endl;
-
 
   }
   void TrepsB::tpkin5(Part_gen* part,
@@ -1168,15 +1018,11 @@ namespace Belle2 {
     z = pa.CosTheta();
     phi0 = pa.Phi();
 
-    //std::cout << "******* "<<m12<<" "<<z<<" "<<phi0<<std::endl;
-
     sutool.rotate(p1, 0., phi0);
     sutool.rotate(p2, 0., phi0);
     sutool.rotate(p3, 0., phi0);
     sutool.rotate(p4, 0., phi0);
     sutool.rotate(p5, 0., phi0);
-
-    // Now, we are in x-z plane of 12
 
     pa = p1 + p2;
     TVector3 pacm = (-1. / pa.T()) * pa.Vect();
@@ -1185,27 +1031,17 @@ namespace Belle2 {
 
     // Now, we are at 12 c.m.s.
 
-    //std::cout << p1.x()<<" "<<p1.y()<<" "<<p1.z()<<std::endl;
-    //std::cout << p2.x()<<" "<<p2.y()<<" "<<p2.z()<<std::endl;
-
     zp = p1.CosTheta(); phip = p1.Phi();
-
-    //std::cout << "     ** "<<zp<<" "<<phip<<std::endl;
 
     TVector3 ay = TVector3(0., 1., 0.);
     TVector3 ax = ay.Cross(az);
 
-
-    //std::cout << " az"<< az <<std::endl;
-    //std::cout << " ay"<< ay <<std::endl;
-    //std::cout << " ax"<< ax <<std::endl;
 
     zs = az.Dot(p1.Vect()) / p1.Vect().Mag();
     TVector3 azk = az.Cross(p1.Vect());
     double cosphis = ay.Dot(azk) * (1. / azk.Mag());
     double sinphis = ax.Dot(azk) * (-1. / azk.Mag());
     phis = atan2(sinphis, cosphis);
-    //std::cout << "     ** "<<zs<<" "<<phis<<std::endl;
 
     // next go to 345
 
@@ -1219,13 +1055,6 @@ namespace Belle2 {
 
     // Now, we are at 345 c.m.s.
     // double mm = 0.1396*0.1396;
-    //std::cout <<" **** "<<std::endl;
-    //std::cout << ps3.x()<<" "<<ps3.y()<<" "<<ps3.z()<<" "<<ps3.mag()<<std::endl;
-    //std::cout << ps4.x()<<" "<<ps4.y()<<" "<<ps4.z()<<" "<<ps4.mag()<<std::endl;
-    //std::cout << ps5.x()<<" "<<ps5.y()<<" "<<ps5.z()<<" "<<ps5.mag()<<std::endl;
-    //std::cout << (ps3+ps4+ps5).x()<<" "<< (ps3+ps4+ps5).y()<<" "<< (ps3+ps4+ps5).z()<<" "<<sqrt(ps3.mag2()+mm)+sqrt(ps4.mag2()+mm)+sqrt(ps5.mag2()+mm)<<std::endl;
-
-
   }
 
 } // namespace Belle2

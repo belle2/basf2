@@ -88,6 +88,7 @@ namespace Belle2 {
 
     //201903
     void wtable();
+    double wtable(int);
     //201903E
 
 
@@ -139,6 +140,11 @@ namespace Belle2 {
 
     //201903
   public:
+    float wf;
+    int inmode;
+    int wtcount;
+    int  wthead[5000];
+    double  wtcond[5000];
     std::map<double, double> crossSectionOfW;
     //201903E
     int ndecay;  // Num of particles at the first stage

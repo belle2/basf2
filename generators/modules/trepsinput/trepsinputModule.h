@@ -39,6 +39,7 @@ namespace Belle2 {
     /** input event from TREPS */
     virtual void event() override;
 
+    float wf;
     std::string rfnfc;
 
     /** Simulate W distribution according to given input file of cross section table */

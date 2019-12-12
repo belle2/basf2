@@ -51,6 +51,8 @@ trepsinputModule::trepsinputModule() : Module(), UtrepsB()
   //     )DOC");
 
   // Parameter definitions
+  addParam("W", wf, "W, gamma-gamma cm energy", (float)2.0);
+
   std::string dfname("treps_par.dat");
   std::string fname;
   addParam("InputFileName", fname, "filename for TREPS input", dfname);

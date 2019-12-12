@@ -250,8 +250,86 @@ namespace Belle2 {
 
       B2DEBUG(10, " wtable loaded");
     }
-
   }
+
+  double TrepsB::wtable(int mode)
+  {
+    double prew = 0.;
+    if (mode == 0) {
+
+      // initialization and load table
+
+      for (int i = 0 ; i < 5000 ; i++) {
+        wthead[i] = 999999999;
+        wtcond[i] = 0.0;
+      }
+
+      B2DEBUG(10, " wtable mode=0  initialized");
+
+      // Load Wlist_table
+
+      ifstream infile2(filename2);
+      if (!infile2) {
+        B2FATAL("Can't open W-list input file") ;
+      } else {
+        double w1;
+        int n1;
+        int hpoint, nwpoint;
+        int inmodein;
+
+        hpoint = 1;
+        nwpoint = 0;
+
+        infile2 >> inmodein;
+        inmode = inmodein;
+
+        while (!infile2.eof() && inmode == 0) {
+          sutool.nextline(infile2);
+          infile2 >> w1 >> n1 ;
+          if (w1 > 9000. || w1 < 0.) continue;
+
+          if (nwpoint == 0) wthead[0] = 1;
+          wtcond[nwpoint] =  w1;
+          nwpoint++ ;
+          hpoint += n1;
+          B2DEBUG(10,  w1 << " GeV  " << n1 << " events   " << hpoint - 1 << "events in total");
+          wthead[nwpoint] = hpoint;
+        }
+        while (!infile2.eof() && (inmode == 1 || inmode == 2)) {
+          sutool.nextline(infile2);
+          infile2 >> w1 >> n1 ;
+          if (w1 > 9000. || w1 < 0.) continue;
+          wf = w1;
+          w = (double)wf;
+          //B2DEBUG(10,"Here1");
+          updateW();
+          //B2DEBUG(10, "Here");
+          if (inmode == 1)
+            B2INFO(w << " " << twlumi() << "   //W(GeV) and Two-photon lumi. func.(wide)(1/GeV)");
+          else
+            B2INFO(w << " " << twlumi_n() << "   //W(GeV) and Two-photon lumi. func.(narrow)(nb/keV/(2J+1))");
+
+          //B2DEBUG(10, "Here" );
+        }
+
+        B2DEBUG(10, wthead[0] << " " << wtcond[0]);
+        B2DEBUG(10, " wtable mode=0  loaded");
+      }
+      return 0.0 ;
+    } else if (mode == 1) {
+      // Get W
+      int i = 0;
+
+      do {
+        if (wtcount >= wthead[i])  prew = wtcond[i];
+        i++;
+      } while (wthead[i] < 999999999);
+
+
+      return prew;
+    }
+  }
+
   //201903E
 
 

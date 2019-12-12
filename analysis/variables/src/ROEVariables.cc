@@ -1779,82 +1779,82 @@ namespace Belle2 {
       return 0.0;
     }
 
-    double particlePi0Veto(const Particle* particle)
+    double particlePi0VetoOrigin(const Particle* particle)
     {
       if (particle->hasExtraInfo("Pi0_Prob")) {
         return particle->getExtraInfo("Pi0_Prob");
       } else {
-        B2WARNING("Pi0Veto is not registerted in extraInfo!");
+        B2WARNING("Pi0_Prob is not registerted in extraInfo!");
         return std::numeric_limits<float>::quiet_NaN();
       }
     }
 
-    double particlePi0VetoEnergy(const Particle* particle)
+    double particlePi0VetoTightEnergyThreshold(const Particle* particle)
     {
-      if (particle->hasExtraInfo("Pi0_Prob_energy")) {
-        return particle->getExtraInfo("Pi0_Prob_energy");
+      if (particle->hasExtraInfo("Pi0_Prob_Tight_Energy_Threshold")) {
+        return particle->getExtraInfo("Pi0_Prob_Tight_Energy_Threshold");
       } else {
-        B2WARNING("Pi0VetoEnergy is not registerted in extraInfo!");
+        B2WARNING("Pi0_Prob_Tight_Energy_Thereshold is not registerted in extraInfo!");
         return std::numeric_limits<float>::quiet_NaN();
       }
     }
 
-    double particlePi0VetoCluster(const Particle* particle)
+    double particlePi0VetoLargeClusterSize(const Particle* particle)
     {
-      if (particle->hasExtraInfo("Pi0_Prob_cluster")) {
-        return particle->getExtraInfo("Pi0_Prob_cluster");
+      if (particle->hasExtraInfo("Pi0_Prob_Large_Cluster_Size")) {
+        return particle->getExtraInfo("Pi0_Prob_Large_Cluster_Size");
       } else {
-        B2WARNING("Pi0VetoCluster is not registerted in extraInfo!");
+        B2WARNING("Pi0_Prob_Large_Cluster_Size is not registerted in extraInfo!");
         return std::numeric_limits<float>::quiet_NaN();
       }
     }
 
-    double particlePi0VetoBoth(const Particle* particle)
+    double particlePi0VetoTightEnergyThresholdAndLargeClusterSize(const Particle* particle)
     {
-      if (particle->hasExtraInfo("Pi0_Prob_both")) {
-        return particle->getExtraInfo("Pi0_Prob_both");
+      if (particle->hasExtraInfo("Pi0_Prob_Tight_Energy_Threshold_And_Large_Cluster_Size")) {
+        return particle->getExtraInfo("Pi0_Prob_Tight_Energy_Threshold_And_Large_Cluster_Size");
       } else {
-        B2WARNING("Pi0VetoBoth is not registerted in extraInfo!");
+        B2WARNING("Pi0_Prob_Tight_Energy_Threshold_And_Large_Cluster_Size is not registerted in extraInfo!");
         return std::numeric_limits<float>::quiet_NaN();
       }
     }
 
-    double particleEtaVeto(const Particle* particle)
+    double particleEtaVetoOrigin(const Particle* particle)
     {
       if (particle->hasExtraInfo("Eta_Prob")) {
         return particle->getExtraInfo("Eta_Prob");
       } else {
-        B2WARNING("EtaVeto is not registerted in extraInfo!");
+        B2WARNING("Eta_Prob is not registerted in extraInfo!");
         return std::numeric_limits<float>::quiet_NaN();
       }
     }
 
-    double particleEtaVetoEnergy(const Particle* particle)
+    double particleEtaVetoTightEnergyThreshold(const Particle* particle)
     {
-      if (particle->hasExtraInfo("Eta_Prob_energy")) {
-        return particle->getExtraInfo("Eta_Prob_energy");
+      if (particle->hasExtraInfo("Eta_Prob_Tight_Energy_Threshold")) {
+        return particle->getExtraInfo("Eta_Prob_Tight_Energy_Threshold");
       } else {
-        B2WARNING("EtaVetoEnergy is not registerted in extraInfo!");
+        B2WARNING("Eta_Prob_Tight_Energy_Threshold is not registerted in extraInfo!");
         return std::numeric_limits<float>::quiet_NaN();
       }
     }
 
-    double particleEtaVetoCluster(const Particle* particle)
+    double particleEtaVetoLargeClusterSize(const Particle* particle)
     {
-      if (particle->hasExtraInfo("Eta_Prob_cluster")) {
-        return particle->getExtraInfo("Eta_Prob_cluster");
+      if (particle->hasExtraInfo("Eta_Prob_Large_Cluster_Size")) {
+        return particle->getExtraInfo("Eta_Prob_Large_Cluster_Size");
       } else {
-        B2WARNING("EtaVetoCluster is not registerted in extraInfo!");
+        B2WARNING("Eta_Prob_Large_Cluster_Size is not registerted in extraInfo!");
         return std::numeric_limits<float>::quiet_NaN();
       }
     }
 
-    double particleEtaVetoBoth(const Particle* particle)
+    double particleEtaVetoTightEnergyThresholdAndLargeClusterSize(const Particle* particle)
     {
-      if (particle->hasExtraInfo("Eta_Prob_both")) {
-        return particle->getExtraInfo("Eta_Prob_both");
+      if (particle->hasExtraInfo("Eta_Prob_Tight_Energy_Threshold_And_Large_Cluster_Size")) {
+        return particle->getExtraInfo("Eta_Prob_Tight_Energy_Threshold_And_Large_Cluster_Size");
       } else {
-        B2WARNING("EtaVetoBoth is not registerted in extraInfo!");
+        B2WARNING("Eta_Prob_Tight_Energy_Threshold_And_Large_Cluster_Size is not registerted in extraInfo!");
         return std::numeric_limits<float>::quiet_NaN();
       }
     }
@@ -2264,28 +2264,28 @@ The neutrino momentum is calculated from ROE taking into account the specified m
     REGISTER_VARIABLE("printROE", printROE,
                       "For debugging, prints indices of all particles in the ROE and all masks. Returns 0.");
 
-    REGISTER_VARIABLE("pi0Veto", particlePi0Veto,
+    REGISTER_VARIABLE("pi0_prob_origin", particlePi0VetoOrigin,
                       "Returns pi0 probability");
 
-    REGISTER_VARIABLE("pi0VetoEnergy", particlePi0VetoEnergy,
+    REGISTER_VARIABLE("pi0_prob_tight_energy_threshold", particlePi0VetoTightEnergyThreshold,
                       "Returns pi0 probability");
 
-    REGISTER_VARIABLE("pi0VetoCluster", particlePi0VetoCluster,
+    REGISTER_VARIABLE("pi0_prob_large_cluster_size", particlePi0VetoLargeClusterSize,
                       "Returns pi0 probability");
 
-    REGISTER_VARIABLE("pi0VetoBoth", particlePi0VetoBoth,
+    REGISTER_VARIABLE("pi0_prob_tight_energy_threshold_and_large_cluster_size", particlePi0VetoTightEnergyThresholdAndLargeClusterSize,
                       "Returns pi0 probability");
 
-    REGISTER_VARIABLE("etaVeto", particleEtaVeto,
+    REGISTER_VARIABLE("eta_prob_origin", particleEtaVetoOrigin,
                       "Returns eta probability");
 
-    REGISTER_VARIABLE("etaVetoEnergy", particleEtaVetoEnergy,
+    REGISTER_VARIABLE("eta_prob_tight_energy_threshold", particleEtaVetoTightEnergyThreshold,
                       "Returns eta probability");
 
-    REGISTER_VARIABLE("etaVetoCluster", particleEtaVetoCluster,
+    REGISTER_VARIABLE("eta_prob_large_cluster_size", particleEtaVetoLargeClusterSize,
                       "Returns eta probability");
 
-    REGISTER_VARIABLE("etaVetoBoth", particleEtaVetoBoth,
+    REGISTER_VARIABLE("eta_prob_tight_energy_threshold_and_large_cluster_size", particleEtaVetoTightEnergyThresholdAndLargeClusterSize,
                       "Returns eta probability");
 
   }

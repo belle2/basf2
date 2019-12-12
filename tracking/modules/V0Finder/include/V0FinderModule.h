@@ -59,9 +59,11 @@ namespace Belle2 {
     std::string m_arrayNameV0ValidationVertex; ///< StoreArray name of the V0ValidationVertex.
 
     /// range for reconstructed Kshort mass used for pre-selection
-    std::tuple<double, double> m_MassRangeKshort = { -std::numeric_limits<double>::infinity() , std::numeric_limits<double>::infinity() };
-    ///< range for reconstructed Lambda mass used for pre-selection
-    std::tuple<double, double> m_MassRangeLambda = { -std::numeric_limits<double>::infinity() , std::numeric_limits<double>::infinity() };
+    /// default range set to nomminal KS mass +/- 0.005 GeV
+    std::tuple<double, double> m_MassRangeKshort = { 0.497614 - 0.005 , 0.497614 + 0.005 };
+    /// range for reconstructed Lambda mass used for pre-selection
+    /// Default range set to nominal Lambda mass +/- 0.03
+    std::tuple<double, double> m_MassRangeLambda = { 1.115683 - 0.03, 1.115683 + 0.03 };
 
     /** helper function that gets the approximate mass range for the two given tracks and rejects candidates which
       do not fall into a user given mass range for lambda and Kshort.

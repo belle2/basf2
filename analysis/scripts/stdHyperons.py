@@ -17,9 +17,9 @@ def stdXi(fitter='kfitter', b2bii=False, path=None):
     .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
 
     Parameters:
-    fitter (str): specify either ``kfitter`` or ``treefit`` for the vertex reconstructions (default ``kfitter``)
-    b2bii (bool): specify Belle or Belle II reconstruction
-    path (basf2.Path): modules are added to this path building the ``Xi-:std`` list
+        fitter (str): specify either ``kfitter`` or ``treefit`` for the vertex reconstructions (default ``kfitter``)
+        b2bii (bool): specify Belle or Belle II reconstruction
+        path (basf2.Path): modules are added to this path building the ``Xi-:std`` list
     """
 
     if not b2bii:
@@ -77,10 +77,10 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
     .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
 
     Parameters:
-    gammatype (str): specify either ``eff60``, ``eff50``, ``eff40``, ``eff30``, or ``eff20``
+        gammatype (str): specify either ``eff60``, ``eff50``, ``eff40``, ``eff30``, or ``eff20``
     for the pi0 reconstruction from ``gamma:pi0effxx`` (default ``eff40``)
-    b2bii (bool): specify Belle or Belle II reconstruction
-    path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
+        b2bii (bool): specify Belle or Belle II reconstruction
+        path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
     """
 
     if not b2bii:
@@ -152,9 +152,9 @@ def stdOmega(fitter='kfitter', b2bii=False, path=None):
     .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
 
     Parameters:
-    fitter (str): specify either ``kfitter`` or ``treefit`` for the vertex reconstructions (default ``kfitter``)
-    b2bii (bool): specify Belle or Belle II reconstruction
-    path (basf2.Path): modules are added to this path building the ``Omega-:std`` list
+        fitter (str): specify either ``kfitter`` or ``treefit`` for the vertex reconstructions (default ``kfitter``)
+        b2bii (bool): specify Belle or Belle II reconstruction
+        path (basf2.Path): modules are added to this path building the ``Omega-:std`` list
     """
 
     if not b2bii:
@@ -228,8 +228,8 @@ def goodXi(xitype='loose', path=None):
     .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
 
     Parameters:
-    xitype (str): specify either ``veryloose``, ``loose``,  or ``tight`` for good ``ParticleList`` selection (default ``loose``)
-    path (basf2.Path): modules are added to this path building the ``Xi-:veryloose``, ``Xi-:loose``, or ``Xi-:tight``, list
+        xitype (str): specify either ``veryloose``, ``loose``,  or ``tight`` for good ``ParticleList`` selection (default ``loose``)
+        path (basf2.Path): modules are added to this path building the ``Xi-:veryloose``, ``Xi-:loose``, or ``Xi-:tight``, list
     """
 
     if xitype == 'veryloose':
@@ -266,8 +266,8 @@ def goodXi0(xitype='loose', path=None):
     .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
 
     Parameters:
-    xitype (str): specify either ``veryloose``, ``loose``,  or ``tight`` for good ``ParticleList`` selection (default ``loose``)
-    path (basf2.Path): modules are added to this path building the ``Xi0:veryloose``, ``Xi0:loose``, or ``Xi0:tight``, list
+        xitype (str): specify either ``veryloose``, ``loose``,  or ``tight`` for good ``ParticleList`` selection (default ``loose``)
+        path (basf2.Path): modules are added to this path building the ``Xi0:veryloose``, ``Xi0:loose``, or ``Xi0:tight``, list
     """
 
     if xitype == 'veryloose':
@@ -312,9 +312,9 @@ def goodOmega(omegatype='veryloose', path=None):
     .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
 
     Parameters:
-    omegatype (str): specify either ``veryloose``, ``loose``,  or ``tight`` for good ``ParticleList`` selection
+        omegatype (str): specify either ``veryloose``, ``loose``,  or ``tight`` for good ``ParticleList`` selection
     (default ``veryloose``)
-    path (basf2.Path): modules are added to this path building the ``Omega-:veryloose``, ``Omega-:loose``,
+        path (basf2.Path): modules are added to this path building the ``Omega-:veryloose``, ``Omega-:loose``,
     or ``Omega-:tight``, list
     """
 

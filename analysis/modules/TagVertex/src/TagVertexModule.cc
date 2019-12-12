@@ -87,6 +87,8 @@ namespace Belle2 {
              "TRUE when requesting MC Information from the tracks performing the vertex fit", false);
     addParam("reqPXDHits", m_reqPXDHits,
              "Minium number of PXD hits for a track to be used in the vertex fit", 0);
+    addParam("fitAlgorithm", m_fitAlgo,
+             "Fitter used for the tag vertex fit: Rave or KFitter", string("Rave"));
 
 
   }
@@ -284,6 +286,9 @@ namespace Belle2 {
 
     m_FitType = 0;
 
+    double minPVal(0.001);
+    if (m_fitAlgo == "KFitter") minPVal = 0.;
+
     if (m_trackFindingType == "singleTrack_PXD") {
       ok = getTagTracks_singleTrackAlgorithm(Breco, 1);
       if (ok) {
@@ -291,7 +296,7 @@ namespace Belle2 {
         m_FitType = 1;
       }
     }
-    if ((ok == false || m_fitPval < 0.001) || m_trackFindingType == "singleTrack") {
+    if ((ok == false || m_fitPval < minPVal) || m_trackFindingType == "singleTrack") {
       ok = getTagTracks_singleTrackAlgorithm(Breco, 0);
       if (ok) {
         ok = makeGeneralFit();
@@ -300,12 +305,12 @@ namespace Belle2 {
     }
 
     //if the IP constraint is used and the 1 track fit fails, must re-compute the constraint
-    if ((ok == false || m_fitPval < 0.001) && m_constraintType == "IP" && (m_trackFindingType == "singleTrack"
+    if ((ok == false || m_fitPval < minPVal) && m_constraintType == "IP" && (m_trackFindingType == "singleTrack"
         || m_trackFindingType == "singleTrack_PXD")) {
       ok = findConstraintBoost(cut);
     }
 
-    if ((ok == false || m_fitPval < 0.001) || m_trackFindingType == "standard_PXD") {
+    if ((ok == false || m_fitPval < minPVal) || m_trackFindingType == "standard_PXD") {
       ok = getTagTracks_standardAlgorithm(Breco, 1);
       if (ok) {
         ok = makeGeneralFit();
@@ -313,7 +318,7 @@ namespace Belle2 {
 
       }
     }
-    if ((ok == false || m_fitPval < 0.001) || m_trackFindingType == "standard") {
+    if ((ok == false || m_fitPval < minPVal) || m_trackFindingType == "standard") {
       ok = getTagTracks_standardAlgorithm(Breco, m_reqPXDHits);
       if (ok) {
         ok = makeGeneralFit();
@@ -321,7 +326,7 @@ namespace Belle2 {
       }
     }
 
-    if ((ok == false || m_fitPval <= 0.) && m_constraintType != "noConstraint") {
+    if ((ok == false || (m_fitPval <= 0. && m_fitAlgo == "Rave")) && m_constraintType != "noConstraint") {
       ok = findConstraintBoost(cut * 200000.);
       if (ok) ok = getTagTracks_standardAlgorithm(Breco, m_reqPXDHits);
       if (ok) {
@@ -1119,26 +1124,24 @@ namespace Belle2 {
     return true;
   }
 
-  bool TagVertexModule::makeGeneralFit()
+  bool TagVertexModule::getTracksWithoutKS(vector<const Track*> const&  tagTracks, vector<TrackAndWeight>& trackAndWeights)
   {
-    //prepare container of pointer to tracks
+    //clear the vector
+    if (trackAndWeights.size() > 0)
+      B2WARNING("In TagVertexModule::getTracksWithoutKS, trackAndWeights has non-zero size, risk of memory leak.");
+    trackAndWeights.clear();
+
     TrackAndWeight trackAndWeight;
     trackAndWeight.mcParticle = 0;
-    trackAndWeight.weight = std::numeric_limits<float>::quiet_NaN();
-    vector<TrackAndWeight> trackAndWeights;
-
-    // apply constraint
-    analysis::RaveSetup::getInstance()->unsetBeamSpot();
-    if (m_constraintType != "noConstraint") analysis::RaveSetup::getInstance()->setBeamSpot(m_constraintCenter, m_constraintCov);
-    analysis::RaveVertexFitter rFit;
+    trackAndWeight.weight = -1111.;
 
     // Mpi &&  MKs
     const double mpi = Const::pionMass;
     const double mks = Const::K0Mass;
     double Mass = 0.0;
     // remove traks from KS
-    for (unsigned int i = 0; i < m_tagTracks.size(); i++) {
-      const Track* trak1 = m_tagTracks[i];
+    for (unsigned int i = 0; i < tagTracks.size(); i++) {
+      const Track* trak1 = tagTracks[i];
       const TrackFitResult* trak1Res = nullptr;
       if (trak1) trak1Res = trak1->getTrackFitResultWithClosestMass(Const::pion);
       TVector3 mom1;
@@ -1147,9 +1150,9 @@ namespace Belle2 {
       if (!trak1Res) continue;
 
       bool isKsDau = false;
-      for (unsigned int j = 0; j < m_tagTracks.size(); j++) {
+      for (unsigned int j = 0; j < tagTracks.size(); j++) {
         if (i != j) {
-          const Track* trak2 = m_tagTracks[j];
+          const Track* trak2 = tagTracks[j];
           const TrackFitResult* trak2Res = nullptr;
 
           if (trak2) trak2Res = trak2->getTrackFitResultWithClosestMass(Const::pion);
@@ -1166,26 +1169,56 @@ namespace Belle2 {
         }
 
       }
-      try {
-        if (!isKsDau) {
-          trackAndWeight.track = trak1Res;
-          rFit.addTrack(trak1Res); // Temporal fix: some mom go to Inf
+      if (!isKsDau) {
+        trackAndWeight.track = trak1Res;
+        //rFit.addTrack(trak1Res); // Temporal fix: some mom go to Inf
 
-          if (m_useMCassociation == "breco" || m_useMCassociation == "internal")
-            trackAndWeight.mcParticle = trak1->getRelatedTo<MCParticle>();
+        if (m_useMCassociation == "breco" || m_useMCassociation == "internal")
+          trackAndWeight.mcParticle = trak1->getRelatedTo<MCParticle>();
 
-          trackAndWeights.push_back(trackAndWeight);
-        }
-      } catch (const rave::CheckedFloatException&) {
-        B2ERROR("Exception caught in TagVertexModule::makeGeneralFit(): Invalid inputs (nan/inf)?");
+        trackAndWeights.push_back(trackAndWeight);
       }
     }
+
+    return true;
+  }
+
+  bool TagVertexModule::makeGeneralFit()
+  {
+    if (m_fitAlgo == "Rave") return  makeGeneralFitRave();
+    if (m_fitAlgo == "KFitter") return makeGeneralFitKFitter();
+
+    B2WARNING("TagVertexModule::makeGeneralFit: invalid fitting algorithm.");
+    return false;
+  }
+
+  bool TagVertexModule::makeGeneralFitRave()
+  {
+    // apply constraint
+    analysis::RaveSetup::getInstance()->unsetBeamSpot();
+    if (m_constraintType != "noConstraint") analysis::RaveSetup::getInstance()->setBeamSpot(m_constraintCenter, m_constraintCov);
+    analysis::RaveVertexFitter rFit;
+
+    //feed rave with tracks without Kshorts
+
+    vector<TrackAndWeight> trackAndWeights;
+    getTracksWithoutKS(m_tagTracks, trackAndWeights);
+
+    for (unsigned int i(0); i < trackAndWeights.size(); ++i) {
+      try {
+        rFit.addTrack(trackAndWeights.at(i).track); // Temporal fix: some mom go to Inf
+      } catch (const rave::CheckedFloatException&) {
+        B2ERROR("Exception caught in TagVertexModule::makeGeneralFitRave(): Invalid inputs (nan/inf)?");
+      }
+    }
+
+    //perform fit
 
     int isGoodFit(-1);
     try {
       isGoodFit = rFit.fit("avf");
     } catch (const rave::CheckedFloatException&) {
-      B2ERROR("Exception caught in TagVertexModule::makeGeneralFit(): Invalid inputs (nan/inf)?");
+      B2ERROR("Exception caught in TagVertexModule::makeGeneralFitRave(): Invalid inputs (nan/inf)?");
       return false;
     }
 
@@ -1232,6 +1265,164 @@ namespace Belle2 {
     m_tagVChi2 = rFit.getChi2(0);
 
     m_fitPval = rFit.getPValue();
+
+    return true;
+  }
+
+  CLHEP::HepSymMatrix TagVertexModule::getHepMatrix(TMatrixDSym const& mat1)
+  {
+    int n(mat1.GetNcols());
+    CLHEP::HepSymMatrix mat2(n, 0);
+    for (int i(0); i < n; ++i) {
+      for (int j(0); j < n; ++j)
+        mat2[i][j] = mat1(i, j);
+    }
+    return mat2;
+  }
+
+  TMatrixDSym TagVertexModule::getRootMatrix(CLHEP::HepSymMatrix const& mat1)
+  {
+    int n = mat1.num_row();
+    TMatrixFSym m(n);
+    /*
+     * TMatrixFSym is stored as a full matrix, thus all elements must be set.
+     */
+    for (int i = 0; i < n; ++i) {
+      for (int j = 0; j < n; ++j)
+        m[i][j] = mat1[i][j];
+    }
+    return m;
+  }
+
+  HepPoint3D TagVertexModule::getHepPoint(TVector3 const& v1)
+  {
+    return HepPoint3D(v1.X(), v1.Y(), v1.Z());
+  }
+
+  TVector3 TagVertexModule::getRootVector(HepPoint3D const& v1)
+  {
+    return TVector3(v1.x(), v1.y(), v1.z());
+  }
+
+  CLHEP::HepLorentzVector TagVertexModule::getHepLorentzVector(TLorentzVector const& p)
+  {
+    return CLHEP::HepLorentzVector(p.X(), p.Y(), p.Z(), p.T());
+  }
+
+  bool TagVertexModule::makeGeneralFitKFitter()
+  {
+    //initialize KFitter
+
+    analysis::VertexFitKFit kFit;
+    kFit.setMagneticField(m_Bfield);
+
+    // apply constraint
+
+    if (m_constraintType != "noConstraint")
+      kFit.setIpProfile(getHepPoint(m_constraintCenter), getHepMatrix(m_constraintCov));
+
+    //feed KFitter with tracks without Kshorts
+    //For this, we need to construct a particle from the trackfit result as
+    //KFitter needs the complete 7X7 cov matrix (maybe there is a nicer solution)
+
+    vector<TrackAndWeight> trackAndWeights;
+    getTracksWithoutKS(m_tagTracks, trackAndWeights);
+
+    const TrackFitResult* trackRes;
+    vector<Particle> particles;
+    const int dummyIndex(0);
+    int addedOK;
+    int nTracksAdded(0);
+
+    for (unsigned int i(0); i < trackAndWeights.size(); ++i) {
+      trackRes = trackAndWeights.at(i).track;
+
+      particles.push_back(Particle(dummyIndex, trackRes, Const::ChargedStable(211), Const::ChargedStable(211)));
+
+      addedOK = kFit.addParticle(&particles.at(i));
+
+      if (addedOK != 0) {
+        B2WARNING("TagVertexModule::makeGeneralFitKFitter: failed to add a track");
+        trackAndWeights.at(i).weight = 0.;
+      }
+
+      if (addedOK == 0) {
+        nTracksAdded++;
+        trackAndWeights.at(i).weight = 1.;
+      }
+
+      //Particle(const int trackArrayIndex,
+      //             const TrackFitResult* trackFit,
+      //                          const Const::ChargedStable& chargedStable,
+      //                                       const Const::ChargedStable& chargedStableUsedForFit)
+
+      //kFit.addTrack( getHepLorentzVector(trackRes.get4Momentum()),
+      //               getHepPoint(trackRes.getPosition()),
+      //               getHepMatrix(trackRes.)  );
+      //addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e,
+      //                                                 const double q);
+
+      //try {
+      //  rFit.addTrack(trackAndWeights.at(i).track); // Temporal fix: some mom go to Inf
+      //}
+      //catch (const rave::CheckedFloatException&) {
+      //  B2ERROR("Exception caught in TagVertexModule::makeGeneralFit(): Invalid inputs (nan/inf)?");
+      //}
+    }
+
+
+    //perform fit if there are enough tracks
+
+    if ((nTracksAdded < 2 && m_constraintType == "noConstraint") || nTracksAdded < 1)
+      return false;
+
+    int isGoodFit(-1);
+
+    isGoodFit = kFit.doFit();
+
+    //save the track info for later use
+    //Tracks are sorted from highest rave weight to lowest
+
+    unsigned int n(trackAndWeights.size());
+    sort(trackAndWeights.begin(), trackAndWeights.end(), compare);
+
+    m_raveTracks.resize(n);
+    m_raveWeights.resize(n);
+    m_raveTracksMCParticles.resize(n);
+
+    for (unsigned int i(0); i < n; ++i) {
+      m_raveTracks.at(i) = trackAndWeights.at(i).track;
+      m_raveTracksMCParticles.at(i) = trackAndWeights.at(i).mcParticle;
+      m_raveWeights.at(i) = trackAndWeights.at(i).weight;
+    }
+
+    //if the fit is good, save the infos related to the vertex
+
+    if (isGoodFit != 0) return false;
+
+
+    m_tagV = getRootVector(kFit.getVertex());
+
+    if (m_constraintType != "noConstraint") {
+      TMatrixDSym tubeInv = m_constraintCov;
+      tubeInv.Invert();
+      TVector3 dTagV = m_tagV - m_BeamSpotCenter;
+      TVectorD dV(0, 2,
+                  dTagV.X(),
+                  dTagV.Y(),
+                  dTagV.Z(),
+                  "END");
+      m_tagVChi2IP = tubeInv.Similarity(dV);
+    }
+
+    TMatrixDSym errMat(getRootMatrix(kFit.getVertexError()));
+
+    m_tagVErrMatrix.ResizeTo(errMat);
+    m_tagVErrMatrix = errMat;
+    m_tagVNDF = kFit.getNDF();
+    m_tagVChi2 = kFit.getCHIsq();
+
+    m_fitPval = TMath::Prob(m_tagVChi2, m_tagVNDF);
 
     return true;
   }

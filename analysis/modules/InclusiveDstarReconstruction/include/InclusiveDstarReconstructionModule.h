@@ -19,13 +19,8 @@
 
 namespace Belle2 {
   /**
-   * Inclusively reconstructs `anti-B:tag` from input ParticleLists for given `B:sig`.
+   * Inclusively reconstructs a D* particle list  from an input pion particle list.
    *
-   * `upsilonListName` ParticleList is filled with `upsilonListName -> bsigListName DstarListName`,
-   * where `anti-B:tag` Particle is inclusively reconstructed from particles in input ParticleLists,
-   * which do not share any final state particles (mdstSource) with `B:sig`.
-   *
-   * Input ParticleLists are passed as std::vector containing their names (`inputListsNames`).
    */
   class InclusiveDstarReconstructionModule : public Module {
 
@@ -43,7 +38,12 @@ namespace Belle2 {
 
   private:
 
+    /** Exstimates the D* four momentum given a slow pion */
     TLorentzVector estimateDstarFourMomentum(const Particle* pion);
+
+    /** Checks if the given pion is list if compatible with the charge of the D* particle */
+    bool pionCompatibleWithDstar(int pion_pdg_code);
+
 
     std::string m_inputPionListName;  /**< Name of the input pion particle list */
     std::string m_outputDstarListName;  /**< Name of the output D* particle list */

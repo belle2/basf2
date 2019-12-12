@@ -1,0 +1,46 @@
+# EventType: 1113042000
+# Descriptor: [B0 -> (D- -> K+ pi- pi-) (rho+ -> pi+ pi0)]
+# NickName: Bd_Drho_kpipi
+# Documentation: One of the neutral B decays needed for phase3 data validation
+#
+# Tested: Yes
+# Physics WG: BtoCharm(less)
+# Responsible: Eldar Ganiev
+# Email: eldar.ganiev@ts.infn.it
+# Cuts: none
+# Data: 20190806
+
+
+Alias MyD- D-
+Alias MyD+ D+
+ChargeConj MyD+ MyD-
+
+Alias MyB0 B0
+Alias Myanti-B0 anti-B0
+ChargeConj MyB0 Myanti-B0
+
+Alias Myrho+ rho+
+Alias Myrho- rho-
+ChargeConj Myrho+ Myrho-
+
+Decay Upsilon(4S)
+0.500 MyB0 anti-B0 VSS_BMIX dm;
+0.500 B0 Myanti-B0 VSS_BMIX dm;
+Enddecay
+
+Decay MyB0
+1.000 MyD- Myrho+ PHSP;
+Enddecay
+CDecay Myanti-B0
+
+Decay MyD-
+1.000 K+ pi- pi- PHSP;
+Enddecay
+CDecay MyD+
+
+Decay Myrho+
+1.000 pi+ pi0 PHSP;
+Enddecay
+CDecay Myrho-
+
+End

@@ -39,9 +39,10 @@ ma.applyCuts(list_name='K+:all', cut='abs(dr) < 2 and abs(dz) < 5',
              path=mypath)
 
 # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k+ pi-
-from skim.b0toDh_TDCPVControlSample_List import loadB0toDstarh_kpi, loadDstar_kpi, loadD0_kpi
-loadD0_kpi(path=mypath)
-loadDstar_kpi(path=mypath)
+from skim.btocharm import loadB0toDstarh_kpi
+from skim.standardlists.charm import loadStdD0_Kpi, loadStdDstarPlus_D0pi_Kpi
+loadStdD0_Kpi(path=mypath)
+loadStdDstarPlus_D0pi_Kpi(path=mypath)
 B0toDstarhList_kpi = loadB0toDstarh_kpi(path=mypath)
 
 skimOutputUdst(skimCode, B0toDstarhList_kpi, path=mypath)

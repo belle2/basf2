@@ -329,6 +329,127 @@ def BsigToD0hToKpipipiList(path):
     return Lists
 
 
+def loadB0toDpi(path):
+    """
+    **Skim Author**: C. La Licata
+
+    **Skim Name**: B0toDpi_kpipi
+
+    **Skim Category**: physics, hadronic neutral B to charm
+
+    **Skim Code**: 14120600
+
+    **Working Group**: BtoCharm (WG4)
+
+    **Decay Mode**:
+
+
+    1.  :math:`B^{0}\\to \\D^{-} (\\to K^+ pi^- pi^-) \\pi^+`
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+    2. Mbc > 5.2
+    3. abs(deltaE) < 0.3
+
+    Note:
+    This skim uses loadStdDplus_Kpipi from the ``charm.py`` script
+    where D- channel is defined.
+
+    """
+
+    Bcuts = '5.2 < Mbc and abs(deltaE) < 0.3'
+
+    BsigList = []
+
+    ma.reconstructDecay('B0:Dpi -> D-:Kpipi pi+:all', Bcuts, 0, path=path)
+
+    BsigList.append('B0:Dpi')
+
+    List = BsigList
+    return List
+
+
+def loadB0toDstarh_kpi(path):
+    """
+    **Skim Author**: C. La Licata
+
+    **Skim Name**: B0toDStarPi_D0pi_kpi
+
+    **Skim Category**: physics, hadronic neutral B to charm
+
+    **Skim Code**: 14120700
+
+    **Working Group**: BtoCharm (WG4)
+
+    **Decay Mode**:
+
+
+    1.  :math:`B^{0}\\to \\D^{*-} (\\to K^+ pi^-) \\pi^+`
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+    2. Mbc > 5.2
+    3. abs(deltaE) < 0.3
+
+    Note:
+    This skim uses loadStdDstarPlus_D0pi_Kpi from the ``charm.py`` script
+    where D*- channel is defined.
+
+    """
+
+    Bcuts = '5.2 < Mbc and abs(deltaE) < 0.3'
+
+    BsigList_kpi = []
+
+    ma.reconstructDecay('B0:Dstarpi_kpi -> D*-:D0_Kpi pi+:all', Bcuts, 0, path=path)
+    BsigList_kpi.append('B0:Dstarpi_kpi')
+
+    List = BsigList_kpi
+    return List
+
+
+def loadB0toDstarh_kpipipi(path):
+    """
+   **Skim Author**: C. La Licata
+
+   **Skim Name**: B0toDStarPi_D0pi_kpipipi
+
+   **Skim Category**: physics, hadronic neutral B to charm
+
+   **Skim Code**: 14120700
+
+   **Working Group**: BtoCharm (WG4)
+
+   **Decay Mode**:
+
+
+   1.  :math:`B^{0}\\to \\D^{*-} (\\to K^+ pi^- pi^- pi^+) \\pi^+`
+
+   **Particle Lists**: Standard lists for all particles.
+
+   **Additional Cuts**:
+   2. Mbc > 5.2
+   3. abs(deltaE) < 0.3
+
+   Note:
+   This skim uses  from the ``charm.py`` script
+   where D*- channel is defined.
+
+   """
+
+    Bcuts = '5.2 < Mbc and abs(deltaE) < 0.3'
+
+    BsigList_kpipipi = []
+
+    ma.reconstructDecay('B0:Dstarpi_kpipipi -> D*-:D0_Kpipipi pi+:all', Bcuts, 0, path=path)
+    BsigList_kpipipi.append('B0:Dstarpi_kpipipi')
+
+    Lists = BsigList_kpipipi
+    return Lists
+
+
 def DoubleCharmList(path):
     """
     **Skim Author**: Phillip Urquijo

@@ -40,8 +40,9 @@ ma.applyCuts(list_name='K+:all', cut='abs(dr) < 2 and abs(dz) < 5',
 
 
 # B0 to D-(k+ pi- pi-)pi+ Skim
-from skim.b0toDh_TDCPVControlSample_List import loadB0toDpi, loadD
-loadD(path=mypath)
+from skim.btocharm import loadB0toDpi
+from skim.standardlists.charm import loadStdDplus_Kpipi
+loadStdDplus_Kpipi(path=mypath)
 B0toDpiList = loadB0toDpi(path=mypath)
 
 skimOutputUdst(skimCode, B0toDpiList, path=mypath)

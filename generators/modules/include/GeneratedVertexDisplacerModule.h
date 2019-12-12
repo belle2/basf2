@@ -58,7 +58,6 @@ namespace Belle2 {
                          TLorentzVector& displacement); /**< Helper function to calculate the numerical value of the vertex displacement (x,y,z,t) */
     std::string m_particleList; /**< The name of the MCParticle collection. */
     StoreArray<MCParticle> m_mcparticles; /**< store array for the MCParticles */
-    RandomGenerator rnd; /**< Used to generate random numbers for flat and exponential decay time options. */
 
   private:
     // Parameters

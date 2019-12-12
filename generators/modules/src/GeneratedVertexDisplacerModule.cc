@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #include <generators/modules/GeneratedVertexDisplacerModule.h>
-
-// needed for std::vector as input
 #include <framework/core/ModuleParam.templateDetails.h>
 
 
@@ -43,7 +41,7 @@ GeneratedVertexDisplacerModule::GeneratedVertexDisplacerModule() : Module()
            "PDG values of MCParticles that should be displaced. Subsequent daughters of these will be displaced accordingly. Example: (PDG_1, PDG_2, ... , PDG_N). PDG_X corresponds to lifetime_X.",
            std::vector<int> { -999});
   addParam("maxDecayTime", m_maxDecayTime,
-           "Set the maximal allowed decay time in c*tau [cm] for the options 'flat' and 'exponential'. Set globally, default value at 300cm.",
+           "Set the maximal allowed decay time in c*tau [cm] for the option 'flat'. The 'exponential' option is not bound. Default 300cm.",
            static_cast<float>(300));
 
 }
@@ -63,8 +61,6 @@ void GeneratedVertexDisplacerModule::initialize()
       && (m_lifetimeOption.compare("exponential") != 0)) {
     B2FATAL("Lifetime option must be 0 (fixed), 1 (flat) or 2 (exponential).");
   }
-
-  rnd.initialize();
 }
 
 
@@ -81,8 +77,6 @@ void GeneratedVertexDisplacerModule::event()
     MCParticle& mcp = *m_mcparticles[mcp_index];
 
     if (!(mcp.hasStatus(MCParticle::c_PrimaryParticle)) || (mcp.hasStatus(MCParticle::c_Initial))) return;
-    // what about virtual? will the S-particle have the virtual-flag?
-    if (mcp.hasStatus(MCParticle::c_IsVirtual)) return;
 
     int mcp_pdg = mcp.getPDG();
 
@@ -155,17 +149,16 @@ void GeneratedVertexDisplacerModule::getDisplacement(MCParticle& particle, float
   if (m_lifetimeOption.compare("fixed") == 0)
     decayTime_mcp = lifetime;
   else if (m_lifetimeOption.compare("flat") == 0) {
-    decayTime_mcp = rnd.random01() * m_maxDecayTime;
-  } else  {
-    decayTime_mcp = -1 * std::log(rnd.random01()) * lifetime * fourVector_mcp.Gamma() * fourVector_mcp.Beta();
+    decayTime_mcp = gRandom->Uniform(0, m_maxDecayTime);
+  } else {
+    decayTime_mcp = -1 * std::log(gRandom->Uniform(0, 1.)) * lifetime * fourVector_mcp.Gamma() * fourVector_mcp.Beta();
 
     if (!particle.getMass()) {
       B2WARNING("Displacing a particle with zero mass. Forcing Gamma=1 for the decay time.");
-      decayTime_mcp = -1 * std::log(rnd.random01()) * lifetime * fourVector_mcp.Beta();
+      decayTime_mcp = -1 * std::log(gRandom->Uniform(0, 1.)) * lifetime * fourVector_mcp.Beta();
     }
   }
 
-  // calculate the magnitude of the displacement from the lifetime
   float pMag = fourVector_mcp.P();
 
   displacement.SetX(decayTime_mcp * fourVector_mcp.X() / pMag);

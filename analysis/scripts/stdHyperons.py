@@ -78,7 +78,7 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
 
     Parameters:
         gammatype (str): specify either ``eff60``, ``eff50``, ``eff40``, ``eff30``, or ``eff20``
-    for the pi0 reconstruction from ``gamma:pi0effxx`` (default ``eff40``)
+        for the pi0 reconstruction from ``gamma:pi0effxx`` (default ``eff40``)
         b2bii (bool): specify Belle or Belle II reconstruction
         path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
     """
@@ -313,9 +313,9 @@ def goodOmega(omegatype='veryloose', path=None):
 
     Parameters:
         omegatype (str): specify either ``veryloose``, ``loose``,  or ``tight`` for good ``ParticleList`` selection
-    (default ``veryloose``)
+        (default ``veryloose``)
         path (basf2.Path): modules are added to this path building the ``Omega-:veryloose``, ``Omega-:loose``,
-    or ``Omega-:tight``, list
+        or ``Omega-:tight``, list
     """
 
     if omegatype == 'veryloose':

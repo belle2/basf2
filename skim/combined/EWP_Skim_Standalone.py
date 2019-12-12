@@ -5,7 +5,7 @@
 #
 # EWP combined skim standalone steering script
 #
-# Trevor Shillington August 2019
+# Trevor Shillington December 2019
 #
 ######################################################
 
@@ -25,8 +25,8 @@ ma.inputMdstList('default', fileList, path=path)
 stdPhotons('loose', path=path)
 stdPhotons('all', path=path)
 stdPi('all', path=path)
-stdE('loose', path=path)
-stdMu('loose', path=path)
+stdE('all', path=path)
+stdMu('all', path=path)
 
 
 # BtoXgamma
